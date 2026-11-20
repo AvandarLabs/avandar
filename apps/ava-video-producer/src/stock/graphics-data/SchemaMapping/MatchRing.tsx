@@ -4,6 +4,7 @@ import {
   useGraphicProps,
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
+import type { ReactNode } from "react";
 
 type Props = {
   y: number;
@@ -12,8 +13,10 @@ type Props = {
   showCheck: boolean;
 };
 
-/** The ring on the centre line where a mapping connects, with an optional check. */
-export function MatchRing({ y, color, opacity, showCheck }: Props) {
+/**
+ * The ring on the centre line where a mapping connects, with an optional check.
+ */
+export function MatchRing({ y, color, opacity, showCheck }: Props): ReactNode {
   const style = useGraphicProps("SchemaMapping", {});
   const tokens = useGraphicTokens();
   const x = GRAPHIC_WIDTH / 2;

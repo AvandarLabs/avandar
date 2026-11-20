@@ -36,16 +36,18 @@ export function CacheColumn({
       <LabelSlots
         labels={[[column.label, 70 + index * 168, 280, 148, 14, 4]]}
       />
-      {column.cells.map((value, rowIndex) => (
-        <CacheCell
-          key={rowIndex}
-          value={value}
-          columnId={column.id}
-          rowIndex={rowIndex}
-          x={70 + index * 168}
-          y={351 + rowIndex * 44}
-        />
-      ))}
+      {column.cells.map((value, rowIndex) => {
+        return (
+          <CacheCell
+            key={rowIndex}
+            value={value}
+            columnId={column.id}
+            rowIndex={rowIndex}
+            x={70 + index * 168}
+            y={351 + rowIndex * 44}
+          />
+        );
+      })}
     </g>
   );
 }

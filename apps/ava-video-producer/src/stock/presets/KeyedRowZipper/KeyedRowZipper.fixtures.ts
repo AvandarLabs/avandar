@@ -60,14 +60,18 @@ export const fixtures: Array<{ id: string; input: Input }> = [
     id: "dense",
     input: {
       ...DEFAULT_INPUT,
-      leftRows: Array.from({ length: 4 }, (_, index) => ({
-        key: `ABCDEFGH${index}X`,
-        value: "W".repeat(24),
-      })),
-      rightRows: [0, 4, 5, 6].map((index) => ({
-        key: `ABCDEFGH${index}X`,
-        value: "W".repeat(24),
-      })),
+      leftRows: Array.from({ length: 4 }, (_, index) => {
+        return {
+          key: `ABCDEFGH${index}X`,
+          value: "W".repeat(24),
+        };
+      }),
+      rightRows: [0, 4, 5, 6].map((index) => {
+        return {
+          key: `ABCDEFGH${index}X`,
+          value: "W".repeat(24),
+        };
+      }),
       labels: {
         title: "W".repeat(40),
         left: "W".repeat(24),

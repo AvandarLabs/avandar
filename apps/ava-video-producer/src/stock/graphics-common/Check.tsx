@@ -1,4 +1,5 @@
 import { useGraphicProps } from "../theme/useGraphicTheme/useGraphicTheme";
+import type { ReactNode } from "react";
 
 /** A themed check mark in the caller's colour and size. */
 export function Check({
@@ -11,7 +12,7 @@ export function Check({
   y: number;
   color: string;
   size: number;
-}) {
+}): ReactNode {
   const check = useGraphicProps("Check", {});
   const s = size;
   return (

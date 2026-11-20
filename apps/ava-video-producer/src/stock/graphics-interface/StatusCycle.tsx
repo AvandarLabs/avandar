@@ -144,23 +144,25 @@ export function StatusCycle({
           {Math.round(progress * 100)}%
         </Text>
       </Panel>
-      {states.map((state, i) => (
-        <g key={state.label}>
-          <circle
-            cx={252 + i * 230}
-            cy={511}
-            r={4}
-            fill={accent}
-            fillOpacity={0.2 + ramp(frame, state.at, DUR.chip) * 0.8}
-          />
-          <Text x={268 + i * 230} y={516} size={16} fill={STOCK.muted}>
-            {state.label}
-          </Text>
-          {i < states.length - 1 ? (
-            <path d={`M${352 + i * 230} 511 h90`} stroke={STOCK.line} />
-          ) : null}
-        </g>
-      ))}
+      {states.map((state, i) => {
+        return (
+          <g key={state.label}>
+            <circle
+              cx={252 + i * 230}
+              cy={511}
+              r={4}
+              fill={accent}
+              fillOpacity={0.2 + ramp(frame, state.at, DUR.chip) * 0.8}
+            />
+            <Text x={268 + i * 230} y={516} size={16} fill={STOCK.muted}>
+              {state.label}
+            </Text>
+            {i < states.length - 1 ? (
+              <path d={`M${352 + i * 230} 511 h90`} stroke={STOCK.line} />
+            ) : null}
+          </g>
+        );
+      })}
     </g>
   );
 }

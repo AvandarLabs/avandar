@@ -41,14 +41,16 @@ const textLayoutOptions = {
   fixtures,
   render: _render,
   excludedTextFields: ["id"],
-  getVisibleTexts: ({ input }: Readonly<{ input: Input }>) => [
-    input.sceneLabel,
-    input.axis.venueLabel,
-    input.axis.unitLabel,
-    input.investigationWindow.label,
-    ...input.records.map(prop("label")),
-    ...Object.values(input.copy),
-  ],
+  getVisibleTexts: ({ input }: Readonly<{ input: Input }>) => {
+    return [
+      input.sceneLabel,
+      input.axis.venueLabel,
+      input.axis.unitLabel,
+      input.investigationWindow.label,
+      ...input.records.map(prop("label")),
+      ...Object.values(input.copy),
+    ];
+  },
 } satisfies Pick<
   PresetAssertions<Input>,
   | "inputSchema"
@@ -74,15 +76,21 @@ test("partial, containing and exact intersections have correct geometry while en
     ),
   );
   assert.deepEqual(
-    spans.map((match) => match[1]),
+    spans.map((match) => {
+      return match[1];
+    }),
     ["p0", "p1", "p2"],
   );
   assert.deepEqual(
-    spans.map((match) => Number(match[4])),
+    spans.map((match) => {
+      return Number(match[4]);
+    }),
     [63, 189, 189],
   );
   assert.deepEqual(
-    spans.map((match) => Number(match[2])),
+    spans.map((match) => {
+      return Number(match[2]);
+    }),
     [469, 469, 469],
   );
   assert.equal((markup.match(/data-state="none"/g) ?? []).length, 2);
@@ -102,10 +110,11 @@ test("partial, containing and exact intersections have correct geometry while en
       assert.ok(Number(y) >= 85 && Number(y) + Number(height) <= 465);
     });
   });
-  const stencil = (frame: number) =>
-    _render({ frame: frame, input: input }).match(
+  const stencil = (frame: number) => {
+    return _render({ frame: frame, input: input }).match(
       /data-window="stencil" x="[^"]*" y="([^"]*)"/,
     )?.[1];
+  };
   assert.equal(stencil(36), "85");
   assert.equal(stencil(108), "195");
   assert.doesNotMatch(

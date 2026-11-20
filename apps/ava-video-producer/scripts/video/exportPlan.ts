@@ -6,8 +6,13 @@ import { freshStage } from "./freshStage";
 import { writeJson } from "./writeJson";
 import type { Storyboard } from "../../src/storyboard/schema/schema";
 
-/** Writes the storyboard, shot list, transcript, and caption files for a plan. */
-export async function exportPlan(plan: Storyboard, workspace: string) {
+/**
+ * Writes the storyboard, shot list, transcript, and caption files for a plan.
+ */
+export async function exportPlan(
+  plan: Storyboard,
+  workspace: string,
+): Promise<string> {
   const directory = await freshStage(plan, "plan", workspace);
   const captions = captionFiles(plan);
   await writeJson(path.join(directory, "storyboard.json"), plan);

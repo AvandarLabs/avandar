@@ -1,8 +1,6 @@
 import { useId } from "react";
-import {
-  HorizontalBlurFilter,
-  getHorizontalBlurFilter,
-} from "../../../../motion-components/HorizontalBlur";
+import { getHorizontalBlurFilter } from "../../../../motion-components/getHorizontalBlurFilter/getHorizontalBlurFilter";
+import { HorizontalBlurFilter } from "../../../../motion-components/HorizontalBlur";
 import {
   WINDOW_CHROME,
   WINDOW_SHADOW,
@@ -11,18 +9,9 @@ import {
 import { DemoWindow } from "./DemoWindow";
 import css from "./parts.module.css";
 import type { WindowPose } from "../../../../scenes/TiltedWindowScene/windowMotion";
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 type Rect = { x: number; y: number; width: number; height: number };
-
-/** A window at rest in its box, in the tilted plane. */
-export const RESTING_WINDOW_POSE: WindowPose = {
-  translateX: 0,
-  translateZ: 0,
-  rotateY: WINDOW_TILT.rotateY,
-  opacity: 1,
-  blurX: 0,
-};
 
 type Props = {
   box: Rect;
@@ -60,7 +49,7 @@ function _buildTiltTransform({
  * A window placed in its box and posed in the tilted plane, composed the
  * way the tilted window scene composes its own window card.
  */
-export function TiltedDemoWindow(props: Props) {
+export function TiltedDemoWindow(props: Props): ReactNode {
   const { box, pose, variant, label, contentStyle } = props;
   const filterId = `demo-blur-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
   const transform = _buildTiltTransform(props);

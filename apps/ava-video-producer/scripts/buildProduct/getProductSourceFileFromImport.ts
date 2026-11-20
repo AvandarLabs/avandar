@@ -42,10 +42,16 @@ async function _locate(base: string): Promise<string> {
   ];
   const isFileList = await Promise.all(
     candidates.map(async (candidate) => {
-      return (await fs.stat(candidate).catch(() => undefined))?.isFile();
+      return (
+        await fs.stat(candidate).catch(() => {
+          return undefined;
+        })
+      )?.isFile();
     }),
   );
-  const found = candidates.find((_, index) => isFileList[index]);
+  const found = candidates.find((_, index) => {
+    return isFileList[index];
+  });
   if (!found) {
     throw new Error(`Source import not found: ${base}`);
   }
@@ -58,15 +64,16 @@ async function _getWorkspacePackageFile(
 ): Promise<string | undefined> {
   const match = Object.entries(WORKSPACE_PACKAGES)
     .flatMap(([name, folder]) => {
-      return [`@${name}`, `@avandar/${name}`].map((prefix) => ({
-        prefix,
-        folder,
-      }));
+      return [`@${name}`, `@avandar/${name}`].map((prefix) => {
+        return {
+          prefix,
+          folder,
+        };
+      });
     })
-    .find(
-      ({ prefix }) =>
-        importPath === prefix || importPath.startsWith(`${prefix}/`),
-    );
+    .find(({ prefix }) => {
+      return importPath === prefix || importPath.startsWith(`${prefix}/`);
+    });
   if (!match) {
     return undefined;
   }
@@ -89,7 +96,7 @@ export async function getProductSourceFileFromImport(
   aliases: Readonly<Aliases>,
 ): Promise<string | undefined> {
   if (args.path === "@tanstack/react-router") {
-    return path.join(ADAPTER_ROOT, "shims/router.tsx");
+    return path.join(ADAPTER_ROOT, "shims/router.ts");
   }
   if (aliases[args.path]) {
     return _locate(path.resolve(PRODUCER_ROOT, aliases[args.path]));

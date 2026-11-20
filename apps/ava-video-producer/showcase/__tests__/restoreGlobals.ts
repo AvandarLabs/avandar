@@ -9,9 +9,9 @@ export type GlobalSnapshot = ReadonlyArray<
  * `restoreGlobals`.
  */
 export function captureGlobals(keys: readonly string[]): GlobalSnapshot {
-  return keys.map(
-    (key) => [key, Object.getOwnPropertyDescriptor(globalThis, key)] as const,
-  );
+  return keys.map((key) => {
+    return [key, Object.getOwnPropertyDescriptor(globalThis, key)] as const;
+  });
 }
 
 /** Puts back the global properties a fixture replaced. */

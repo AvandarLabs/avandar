@@ -280,24 +280,28 @@ test("group-relative selectors expose only their own records after another group
 });
 
 test("matrix cells have individual names and edits preserve neighboring cells", () => {
-  const number = (inputPath: string): StockControl => ({
-    kind: "number",
-    path: inputPath,
-    label: label(inputPath),
-    min: 0,
-    max: 9,
-  });
+  const number = (inputPath: string): StockControl => {
+    return {
+      kind: "number",
+      path: inputPath,
+      label: label(inputPath),
+      min: 0,
+      max: 9,
+    };
+  };
   const controls: StockControl[] = [
     {
       kind: "object",
       path: "matrix",
       label: label("Matrix"),
-      controls: ["0", "1"].map((inputPath) => ({
-        kind: "object",
-        path: inputPath,
-        label: label(inputPath),
-        controls: [number("0"), number("1")],
-      })),
+      controls: ["0", "1"].map((inputPath) => {
+        return {
+          kind: "object",
+          path: inputPath,
+          label: label(inputPath),
+          controls: [number("0"), number("1")],
+        };
+      }),
     },
   ];
   const view = render(

@@ -40,9 +40,9 @@ export const VIDEO_FONT_REGISTRY = registry as Readonly<
 export const VIDEO_FONT_IDS = Object.keys(registry) as readonly VideoFontId[];
 
 /** CSS stacks of every registered font, for Mantine's font keys. */
-export const VIDEO_FONT_STACKS: readonly string[] = VIDEO_FONT_IDS.map(
-  (id) => VIDEO_FONT_REGISTRY[id].stack,
-);
+export const VIDEO_FONT_STACKS: readonly string[] = VIDEO_FONT_IDS.map((id) => {
+  return VIDEO_FONT_REGISTRY[id].stack;
+});
 
 /**
  * The registered font whose CSS stack this is, or undefined. Use it to map a
@@ -51,7 +51,9 @@ export const VIDEO_FONT_STACKS: readonly string[] = VIDEO_FONT_IDS.map(
 export function getVideoFontIdFromStack(
   stack: string,
 ): VideoFontId | undefined {
-  return VIDEO_FONT_IDS.find((id) => VIDEO_FONT_REGISTRY[id].stack === stack);
+  return VIDEO_FONT_IDS.find((id) => {
+    return VIDEO_FONT_REGISTRY[id].stack === stack;
+  });
 }
 
 /**

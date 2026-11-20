@@ -13,7 +13,7 @@ import type { PresetAssertions } from "../../../../../tests/helpers/registerStoc
 function _render({
   frame,
   input = DEFAULT_INPUT,
-}: Readonly<{ frame: number; input?: typeof DEFAULT_INPUT }>) {
+}: Readonly<{ frame: number; input?: typeof DEFAULT_INPUT }>): string {
   return renderToStaticMarkup(
     createElement(
       "svg",
@@ -31,7 +31,7 @@ function _render({
 function _getVisibleTexts({
   input,
   frame,
-}: Readonly<{ input: Input; frame: number }>) {
+}: Readonly<{ input: Input; frame: number }>): string[] {
   const incoming = input.event.incomingM3;
   const infiltration = input.event.infiltratedM3;
   const discharge = input.event.dischargedM3;
@@ -50,9 +50,9 @@ function _getVisibleTexts({
     input.copy.discharge,
     input.copy.detained,
     input.copy.overflow,
-    ...[infiltration, discharge, detained, overflow].map(
-      (value) => `${value} ${input.copy.unit}`,
-    ),
+    ...[infiltration, discharge, detained, overflow].map((value) => {
+      return `${value} ${input.copy.unit}`;
+    }),
     ...(input.showBalance
       ? [
           `${incoming} = ${infiltration} + ${discharge} + ${detained} + ${overflow} ${input.copy.unit}`,

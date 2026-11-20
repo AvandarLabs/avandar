@@ -24,7 +24,9 @@ export function getBlockCellGeometryFromFrame({
     top = mix(compression, 171 + fieldIndex * 112, 240 + fieldIndex * 112);
   plan.forEach((moves, index) => {
     const departure = 61 + index * duration;
-    const move = moves.find((candidate) => candidate[2] === token);
+    const move = moves.find((candidate) => {
+      return candidate[2] === token;
+    });
     if (!move || frame < departure) {
       return;
     }

@@ -28,11 +28,12 @@ export function makeRedactedTextFromValue({
 }>): string {
   const withoutSecrets = [...secrets]
     .filter(isNotEmpty)
-    .sort((a, b) => b.length - a.length)
-    .reduce(
-      (text, secret) => text.split(secret).join("[redacted]"),
-      String(value),
-    );
+    .sort((a, b) => {
+      return b.length - a.length;
+    })
+    .reduce((text, secret) => {
+      return text.split(secret).join("[redacted]");
+    }, String(value));
   return withoutSecrets
     .replace(TOKEN_PATTERN, "[redacted token]")
     .replace(/\bBearer\s+[^\s"'<>]+/gi, "Bearer [redacted]")
@@ -41,9 +42,13 @@ export function makeRedactedTextFromValue({
       "[redacted credential]",
     )
     .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, "[redacted email]")
-    .replace(/https?:\/\/[^\s"'<>]+/g, (url) => makeSourceUrlFromUrl(url))
+    .replace(/https?:\/\/[^\s"'<>]+/g, (url) => {
+      return makeSourceUrlFromUrl(url);
+    })
     .split("")
-    .filter((character) => !_isStrippedControl(character))
+    .filter((character) => {
+      return !_isStrippedControl(character);
+    })
     .join("")
     .slice(0, limit);
 }

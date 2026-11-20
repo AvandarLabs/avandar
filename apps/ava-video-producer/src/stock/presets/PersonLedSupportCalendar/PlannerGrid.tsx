@@ -19,21 +19,23 @@ export function PlannerGrid({ input }: Readonly<Props>): ReactNode {
         stroke={STOCK.line}
       />
       <PlannerColumns input={input} />
-      {input.timeBands.map((band, row) => (
-        <LabelSlots
-          key={band.id}
-          labels={[
-            [
-              band.label,
-              62,
-              244 + (row * 228) / input.timeBands.length,
-              155,
-              12,
-              3,
-            ],
-          ]}
-        />
-      ))}
+      {input.timeBands.map((band, row) => {
+        return (
+          <LabelSlots
+            key={band.id}
+            labels={[
+              [
+                band.label,
+                62,
+                244 + (row * 228) / input.timeBands.length,
+                155,
+                12,
+                3,
+              ],
+            ]}
+          />
+        );
+      })}
     </g>
   );
 }

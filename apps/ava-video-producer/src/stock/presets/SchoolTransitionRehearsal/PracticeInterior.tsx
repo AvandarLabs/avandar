@@ -36,15 +36,17 @@ export function PracticeInterior({
       />
       {input.showFootprints ? (
         <g opacity={0.25 * finalStep} fill={accent}>
-          {Array.from({ length: 7 }, (_, index) => (
-            <ellipse
-              key={index}
-              cx={410 + index * 45}
-              cy={420 + (index % 2) * 7}
-              rx={7}
-              ry={3}
-            />
-          ))}
+          {Array.from({ length: 7 }, (_, index) => {
+            return (
+              <ellipse
+                key={index}
+                cx={410 + index * 45}
+                cy={420 + (index % 2) * 7}
+                rx={7}
+                ry={3}
+              />
+            );
+          })}
         </g>
       ) : undefined}
       <LabelSlots

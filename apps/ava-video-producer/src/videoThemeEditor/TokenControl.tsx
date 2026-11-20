@@ -5,6 +5,7 @@ import { ReferenceControl } from "./controls/ReferenceControl/ReferenceControl";
 import { ValueControl } from "./controls/ValueControl";
 import { useTokenEditor } from "./TokenEditorContext";
 import type { TokenRow } from "./tokenRows/tokenRows";
+import type { ReactNode } from "react";
 
 /**
  * The control for a token row: literal values in the atomic and Mantine
@@ -13,10 +14,12 @@ import type { TokenRow } from "./tokenRows/tokenRows";
 export function TokenControl({
   row,
   label,
-}: Readonly<{ row: TokenRow; label: string }>) {
+}: Readonly<{ row: TokenRow; label: string }>): ReactNode {
   const editor = useTokenEditor();
   const kind = row.definition.kind;
-  const write = (value: unknown) => editor.setToken(row.path, value);
+  const write = (value: unknown) => {
+    return editor.setToken(row.path, value);
+  };
   if (
     row.tier === "atomic" ||
     row.tier === "mantine" ||

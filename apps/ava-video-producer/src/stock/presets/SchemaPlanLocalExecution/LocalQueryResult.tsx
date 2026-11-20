@@ -13,8 +13,12 @@ export function LocalQueryResult({
   accent,
 }: Readonly<Props>): ReactNode {
   const result = input.rows
-    .filter(({ category }) => category === input.request.selectedCategory)
-    .reduce((sum, { value }) => sum + value, 0);
+    .filter(({ category }) => {
+      return category === input.request.selectedCategory;
+    })
+    .reduce((sum, { value }) => {
+      return sum + value;
+    }, 0);
   return (
     <g>
       <LabelSlots

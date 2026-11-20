@@ -29,9 +29,9 @@ window.addEventListener("message", (event) => {
   if (event.origin !== window.location.origin || !event.data) {
     return;
   }
-  const film = films.find(
-    ({ player }) => player.contentWindow === event.source,
-  );
+  const film = films.find(({ player }) => {
+    return player.contentWindow === event.source;
+  });
   if (!film) {
     return;
   }
@@ -76,7 +76,9 @@ async function _downloadFilmFromCard(film: ProductionFilm): Promise<void> {
 }
 
 films.forEach((film) => {
-  film.button.addEventListener("click", () => _downloadFilmFromCard(film));
+  film.button.addEventListener("click", () => {
+    return _downloadFilmFromCard(film);
+  });
   film.player.src = film.player.dataset.src ?? "";
 });
 watchFilms(films.map(prop("player")));

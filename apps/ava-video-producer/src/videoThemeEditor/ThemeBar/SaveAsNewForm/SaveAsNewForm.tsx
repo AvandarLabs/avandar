@@ -1,5 +1,5 @@
 import { Button, Group, TextInput } from "@mantine/core";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { getThemeLabelFromInput } from "../themeBarHelpers/themeBarHelpers";
 import css from "./SaveAsNewForm.module.css";
 
@@ -9,11 +9,13 @@ type Props = Readonly<{
 }>;
 
 /** The name form for saving the draft as a new theme. Escape cancels it. */
-export function SaveAsNewForm({ onSubmit, onCancel }: Props) {
+export function SaveAsNewForm({ onSubmit, onCancel }: Props): ReactNode {
   const [input, setInput] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const label = getThemeLabelFromInput(input);
-  useEffect(() => inputRef.current?.focus(), []);
+  useEffect(() => {
+    return inputRef.current?.focus();
+  }, []);
   return (
     <form
       className={css.saveAsNewForm}
@@ -29,7 +31,9 @@ export function SaveAsNewForm({ onSubmit, onCancel }: Props) {
         size="xs"
         label="New theme name"
         value={input}
-        onChange={(event) => setInput(event.currentTarget.value)}
+        onChange={(event) => {
+          return setInput(event.currentTarget.value);
+        }}
         onKeyDown={(event) => {
           if (event.key === "Escape") {
             event.preventDefault();

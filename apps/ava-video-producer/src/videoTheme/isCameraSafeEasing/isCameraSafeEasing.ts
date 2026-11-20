@@ -10,5 +10,7 @@ export function isCameraSafeEasing(easing: EasingValue): boolean {
   if ("powerInOut" in easing) {
     return easing.powerInOut === 3;
   }
-  return easing.every((point) => point >= 0 && point <= 1);
+  return easing.every((point) => {
+    return point >= 0 && point <= 1;
+  });
 }

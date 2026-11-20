@@ -65,12 +65,12 @@ export function CustodyCaptions({ input, frame }: Readonly<Props>): ReactNode {
 
   return (
     <g opacity={ramp(frame, 18, 12)}>
-      {holders.map(({ role, text, x }) => (
-        <FitText key={role} {...HOLDER_TEXT} text={text} x={x} />
-      ))}
-      {captions.map((caption) => (
-        <FitText key={caption.y} {...CAPTION_TEXT} {...caption} />
-      ))}
+      {holders.map(({ role, text, x }) => {
+        return <FitText key={role} {...HOLDER_TEXT} text={text} x={x} />;
+      })}
+      {captions.map((caption) => {
+        return <FitText key={caption.y} {...CAPTION_TEXT} {...caption} />;
+      })}
     </g>
   );
 }

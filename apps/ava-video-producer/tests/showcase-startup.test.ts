@@ -20,15 +20,23 @@ async function _readBuiltShowcaseFiles(): Promise<string[]> {
   const appRoot = fileURLToPath(new URL("../", import.meta.url));
   const site = path.join(appRoot, "out/showcase/browser");
   const builtFiles = (await readdir(site, { recursive: true }))
-    .map((filename) => path.join(site, filename))
-    .filter((filename) => /\.(?:html|js|css)$/.test(filename));
+    .map((filename) => {
+      return path.join(site, filename);
+    })
+    .filter((filename) => {
+      return /\.(?:html|js|css)$/.test(filename);
+    });
   assert.ok(
-    builtFiles.some((filename) => filename.endsWith(".js")),
+    builtFiles.some((filename) => {
+      return filename.endsWith(".js");
+    }),
     "The showcase build emitted no scripts",
   );
   return Promise.all(
     [...builtFiles, path.join(appRoot, "out/showcase/product/product.js")].map(
-      (filename) => readFile(filename, "utf8"),
+      (filename) => {
+        return readFile(filename, "utf8");
+      },
     ),
   );
 }
@@ -73,7 +81,9 @@ test("an occupied showcase port exits with actionable guidance and no build erro
     output += chunk;
   });
   // The server builds the product and every page before it listens.
-  const timeout = setTimeout(() => child.kill("SIGKILL"), 120_000);
+  const timeout = setTimeout(() => {
+    return child.kill("SIGKILL");
+  }, 120_000);
   try {
     const [code, signal] = await once(child, "close");
     assert.equal(signal, null, output);
@@ -88,7 +98,11 @@ test("an occupied showcase port exits with actionable guidance and no build erro
   } finally {
     clearTimeout(timeout);
     child.kill("SIGKILL");
-    await new Promise<void>((resolve) => occupied.close(() => resolve()));
+    await new Promise<void>((resolve) => {
+      return occupied.close(() => {
+        return resolve();
+      });
+    });
     await rm(directory, { recursive: true, force: true });
   }
 });
@@ -180,7 +194,11 @@ async function _findFreePort(): Promise<number> {
   await once(probe, "listening");
   const address = probe.address();
   assert.ok(address && typeof address !== "string");
-  await new Promise<void>((resolve) => probe.close(() => resolve()));
+  await new Promise<void>((resolve) => {
+    return probe.close(() => {
+      return resolve();
+    });
+  });
   return address.port;
 }
 
@@ -305,8 +323,15 @@ async function _verifyEvents(port: number): Promise<void> {
 
 async function _verifyExportValidation(port: number): Promise<void> {
   const origin = `http://localhost:${port}`;
-  const post = (body: string, headers: Record<string, string> = { origin }) =>
-    _request({ port, pathname: "/api/exports", method: "POST", headers, body });
+  const post = (body: string, headers: Record<string, string> = { origin }) => {
+    return _request({
+      port,
+      pathname: "/api/exports",
+      method: "POST",
+      headers,
+      body,
+    });
+  };
   assert.equal((await post('{"id":"title-study"}', {})).status, 403);
   assert.equal((await post("{not json")).status, 400);
   assert.equal((await post('{"id":"title-study","extra":true}')).status, 400);

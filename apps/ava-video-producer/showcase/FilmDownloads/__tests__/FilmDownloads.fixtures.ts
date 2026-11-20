@@ -132,12 +132,14 @@ export function installBrowserFixture(
 export function createDocumentFixture(downloads: string[]): DocumentFixture {
   return {
     body: { append() {} },
-    createElement: () => ({
-      href: "",
-      click() {
-        downloads.push(this.href);
-      },
-      remove() {},
-    }),
+    createElement: () => {
+      return {
+        href: "",
+        click() {
+          downloads.push(this.href);
+        },
+        remove() {},
+      };
+    },
   };
 }

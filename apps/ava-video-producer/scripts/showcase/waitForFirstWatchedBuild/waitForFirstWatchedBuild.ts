@@ -45,9 +45,9 @@ export function waitForFirstWatchedBuild(
           isFirstBuild = false;
           built.then(resolve, reject);
         } else {
-          built.catch((error) =>
-            console.error("Showcase refresh failed:", error),
-          );
+          built.catch((error) => {
+            return console.error("Showcase refresh failed:", error);
+          });
         }
       }
       if (event.code === "ERROR" && isFirstBuild) {

@@ -57,15 +57,14 @@ export const inputSchema = z
         });
       }
       if (
-        input.parcels
-          .slice(index + 1)
-          .some(
-            (other) =>
-              parcel.x < other.x + other.width &&
-              other.x < parcel.x + parcel.width &&
-              parcel.y < other.y + other.height &&
-              other.y < parcel.y + parcel.height,
-          )
+        input.parcels.slice(index + 1).some((other) => {
+          return (
+            parcel.x < other.x + other.width &&
+            other.x < parcel.x + parcel.width &&
+            parcel.y < other.y + other.height &&
+            other.y < parcel.y + parcel.height
+          );
+        })
       ) {
         context.addIssue({
           code: "custom",

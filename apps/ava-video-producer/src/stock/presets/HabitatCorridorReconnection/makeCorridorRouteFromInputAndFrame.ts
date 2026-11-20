@@ -27,7 +27,9 @@ export function makeCorridorRouteFromInputAndFrame({
   return {
     points,
     path: points
-      .map((point, index) => `${index ? "L" : "M"} ${point.x} ${point.y}`)
+      .map((point, index) => {
+        return `${index ? "L" : "M"} ${point.x} ${point.y}`;
+      })
       .join(" "),
   };
 }

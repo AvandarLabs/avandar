@@ -23,28 +23,18 @@ import { NavbarLinkItem } from "@/components/AppShell/Navbar/NavbarLinkItem";
 import slateCss from "@/components/layouts/AppSlate/AppSlate.module.css";
 import { NavbarLinks } from "@/config/NavbarLinks/NavbarLinks";
 import { Theme, cssVariablesResolver } from "@/config/Theme/Theme";
-import {
-  AttributeMappingScreen,
-  ATTRIBUTE_MAPPING_BEATS,
-} from "./AttributeMappingScreen/AttributeMappingScreen";
-import { CasesScreen, CASES_BEATS } from "./CasesScreen/CasesScreen";
-import {
-  DashboardScreen,
-  DASHBOARD_BEATS,
-} from "./DashboardScreen/DashboardScreen";
-import {
-  ExplorerScreen,
-  EXPLORER_BEATS,
-} from "./ExplorerScreen/ExplorerScreen";
-import { ImportScreen, IMPORT_BEATS } from "./ImportScreen/ImportScreen";
-import { MapScreen, MAP_BEATS } from "./MapScreen/MapScreen";
-import {
-  OntologyScreen,
-  ONTOLOGY_BEATS,
-} from "./OntologyScreen/OntologyScreen";
+import { AttributeMappingScreen } from "./AttributeMappingScreen/AttributeMappingScreen";
+import { CasesScreen } from "./CasesScreen/CasesScreen";
+import { DashboardScreen } from "./DashboardScreen/DashboardScreen";
+import { ExplorerScreen } from "./ExplorerScreen/ExplorerScreen";
+import { ImportScreen } from "./ImportScreen/ImportScreen";
+import { MapScreen } from "./MapScreen/MapScreen";
+import { OntologyScreen } from "./OntologyScreen/OntologyScreen";
 import { ProductThemeRoot } from "./ProductThemeRoot/ProductThemeRoot";
-import { VideoRouteContext } from "./shims/router";
+import { VideoRouteContext } from "./shims/VideoRouteContext";
 import "./stage.css";
+import type { ExplorerMode } from "./ExplorerScreen/explorerStage";
+import type { ReactNode } from "react";
 
 i18n.setMessagesCompiler(compileMessage);
 i18n.loadAndActivate({ locale: "en", messages: {} });
@@ -75,17 +65,11 @@ const routeIndex = {
   ontology: 5,
   "attribute-mapping": 5,
 };
-export const FEATURE_BEATS = {
-  import: IMPORT_BEATS,
-  explorer: EXPLORER_BEATS,
-  dashboards: DASHBOARD_BEATS,
-  cases: CASES_BEATS,
-  map: MAP_BEATS,
-  ontology: ONTOLOGY_BEATS,
-  "attribute-mapping": ATTRIBUTE_MAPPING_BEATS,
-};
 
-/** Actual source components and CSS, with frame-controlled fixtures replacing app services. */
+/**
+ * Actual source components and CSS, with frame-controlled fixtures replacing
+ * app services.
+ */
 export function AvandarStage({
   feature,
   frame,
@@ -97,13 +81,13 @@ export function AvandarStage({
   frame: number;
   width?: number;
   height?: number;
-  mode?: string;
-}) {
+  mode?: ExplorerMode;
+}): ReactNode {
   const contentWidth = width - 240;
   const contentHeight = height - 82;
-  const [initialHandle] = useState(() =>
-    delayRender("Avandar product fonts and initial layout"),
-  );
+  const [initialHandle] = useState(() => {
+    return delayRender("Avandar product fonts and initial layout");
+  });
   useLayoutEffect(
     function delayUntilFontsReady() {
       let alive = true;
@@ -121,7 +105,9 @@ export function AvandarStage({
   useLayoutEffect(
     function delayUntilControlledLayoutSettles() {
       const handle = delayRender("Avandar controlled component layout");
-      const timer = setTimeout(() => continueRender(handle), 100);
+      const timer = setTimeout(() => {
+        return continueRender(handle);
+      }, 100);
       return () => {
         clearTimeout(timer);
         continueRender(handle);
@@ -155,9 +141,11 @@ export function AvandarStage({
                 </Text>
                 <IconChevronDown size={18} />
               </Group>
-              {links.map((item) => (
-                <NavbarLinkItem key={item.link.key} item={item} isOnline />
-              ))}
+              {links.map((item) => {
+                return (
+                  <NavbarLinkItem key={item.link.key} item={item} isOnline />
+                );
+              })}
               <Box mt="auto">
                 <NavbarLinkItem
                   item={NavbarLinks.workspaceSettings("avandar-labs")}
@@ -198,7 +186,7 @@ export function AvandarStage({
                     frame={frame}
                     width={contentWidth}
                     height={contentHeight}
-                    mode={mode as any}
+                    mode={mode}
                   />
                 ) : null}
                 {feature === "dashboards" ? (

@@ -19,6 +19,6 @@ export const ContinuityAppearanceContext = createContext<ContinuityAppearance>({
 });
 
 /** Read the current film's live/export render switches. */
-export function useContinuityAppearance() {
+export function useContinuityAppearance(): ContinuityAppearance {
   return useContext(ContinuityAppearanceContext);
 }

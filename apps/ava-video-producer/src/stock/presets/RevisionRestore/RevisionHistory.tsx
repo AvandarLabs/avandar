@@ -30,17 +30,19 @@ export function RevisionHistory({
         breakLongWords
       />
       <RevisionDrawer hasDrawer={input.showStorageDrawer} />
-      {input.revisions.map((revision, index) => (
-        <SavedRevision
-          key={revision.id}
-          revision={revision}
-          index={index}
-          selected={index === selectedIndex}
-          frame={frame}
-          accent={accent}
-          showLabel={input.showVersionLabels}
-        />
-      ))}
+      {input.revisions.map((revision, index) => {
+        return (
+          <SavedRevision
+            key={revision.id}
+            revision={revision}
+            index={index}
+            selected={index === selectedIndex}
+            frame={frame}
+            accent={accent}
+            showLabel={input.showVersionLabels}
+          />
+        );
+      })}
     </g>
   );
 }

@@ -32,12 +32,14 @@ export function OfflineLedger({
         fill={STOCK.ground}
         stroke={STOCK.line}
       />
-      {input.entries.map((entry, index) => (
-        <LedgerEntry
-          key={entry.id}
-          {...{ entry, index, frame, accent, input }}
-        />
-      ))}
+      {input.entries.map((entry, index) => {
+        return (
+          <LedgerEntry
+            key={entry.id}
+            {...{ entry, index, frame, accent, input }}
+          />
+        );
+      })}
       <LedgerCopy {...{ frame, input }} />
     </g>
   );

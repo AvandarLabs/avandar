@@ -163,9 +163,9 @@ export async function previewMotionRequests(
   requests: MotionRequest[],
 ): Promise<void> {
   await Promise.all(
-    requests.map(({ sourceHash }) =>
-      StockFingerprintModule.verifySources({ root: ROOT, sourceHash }),
-    ),
+    requests.map(({ sourceHash }) => {
+      return StockFingerprintModule.verifySources({ root: ROOT, sourceHash });
+    }),
   );
   const digest = await StockFingerprintModule.getSourceHashFromRoot(ROOT);
   const temporary = await makeFreshMotionDirectory("bundle");

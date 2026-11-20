@@ -24,16 +24,20 @@ export async function runCasesFlow(ctx: FlowContext): Promise<void> {
   const [expectedRows, expectedVisits, isNew] = await Promise.all([
     readFixtureRows(ctx, "cases"),
     readFixtureRows(ctx, "visits"),
-    ctx.step("cases-create-type", () => openOrCreateCaseType(ctx, sources)),
+    ctx.step("cases-create-type", () => {
+      return openOrCreateCaseType(ctx, sources);
+    }),
   ]);
   await ctx.checkpoint("cases-type");
-  await ctx.step("cases-sync-records", () => openCaseRecords(ctx, isNew));
-  await ctx.step("cases-verify-240-records", () =>
-    verifyRecordCount(ctx, expectedRows),
-  );
+  await ctx.step("cases-sync-records", () => {
+    return openCaseRecords(ctx, isNew);
+  });
+  await ctx.step("cases-verify-240-records", () => {
+    return verifyRecordCount(ctx, expectedRows);
+  });
   await ctx.checkpoint("cases-records");
-  await ctx.step("cases-open-record", () =>
-    openFirstRecord(ctx, { sources, expectedRows, expectedVisits }),
-  );
+  await ctx.step("cases-open-record", () => {
+    return openFirstRecord(ctx, { sources, expectedRows, expectedVisits });
+  });
   await ctx.checkpoint("cases-record-detail");
 }

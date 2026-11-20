@@ -9,8 +9,8 @@ import { type Input } from "../DuplicateReviewStack.schema";
 const render = ({
   frame,
   input = DEFAULT_INPUT,
-}: Readonly<{ frame: number; input?: Input }>): string =>
-  renderToStaticMarkup(
+}: Readonly<{ frame: number; input?: Input }>): string => {
+  return renderToStaticMarkup(
     createElement(DuplicateReviewStack, {
       frame,
       input,
@@ -18,29 +18,48 @@ const render = ({
       id: "test",
     }),
   );
+};
 
-function _cards(markup: string) {
+function _cards(markup: string): string[] {
   return [...markup.matchAll(/<rect[^>]*data-candidate-id="[^"]*"[^>]*>/g)].map(
-    (match) => match[0],
+    (match) => {
+      return match[0];
+    },
   );
 }
 
-function _texts({ markup, label }: { markup: string; label: string }) {
+function _texts({
+  markup,
+  label,
+}: {
+  markup: string;
+  label: string;
+}): string[] {
   return [...markup.matchAll(/<text\b[^>]*>[\s\S]*?<\/text>/g)]
-    .map((match) => match[0])
-    .filter((text) => text.includes(`aria-label="${label}"`));
+    .map((match) => {
+      return match[0];
+    })
+    .filter((text) => {
+      return text.includes(`aria-label="${label}"`);
+    });
 }
 
-function _assertPairRoles({ markup, input }: { markup: string; input: Input }) {
+function _assertPairRoles({
+  markup,
+  input,
+}: {
+  markup: string;
+  input: Input;
+}): void {
   const rects = _cards(markup);
   input.groups.forEach((group) => {
     if (group.retainedId === null) {
       return;
     }
     group.records.forEach((record) => {
-      const card = rects.find((rect) =>
-        rect.includes(`data-candidate-id="${record.id}"`),
-      );
+      const card = rects.find((rect) => {
+        return rect.includes(`data-candidate-id="${record.id}"`);
+      });
       assert.ok(card);
       const x = SvgAttributes.getNumberFromMarkup({
           attributes: card,
@@ -93,12 +112,12 @@ function _assertPairRoles({ markup, input }: { markup: string; input: Input }) {
       );
       const baseline =
         SvgAttributes.getNumberFromMarkup({ attributes: caption, name: "y" }) +
-        [...caption.matchAll(/<tspan\b[^>]*>/g)].reduce(
-          (total, [span]) =>
+        [...caption.matchAll(/<tspan\b[^>]*>/g)].reduce((total, [span]) => {
+          return (
             total +
-            SvgAttributes.getNumberFromMarkup({ attributes: span, name: "dy" }),
-          0,
-        );
+            SvgAttributes.getNumberFromMarkup({ attributes: span, name: "dy" })
+          );
+        }, 0);
       assert.ok(baseline + 4 <= 600);
     });
   });
@@ -119,11 +138,13 @@ function _createPairInput({
       alternatives: `語 ${"語".repeat(20)} ${"語".repeat(5)}`,
       unresolved: "界".repeat(28),
     },
-    groups: fixtures[2].input.groups.map((group) => ({
-      ...group,
-      records: group.records.slice(0, recordCount),
-      retainedId: group.records[retainedIndex].id,
-    })),
+    groups: fixtures[2].input.groups.map((group) => {
+      return {
+        ...group,
+        records: group.records.slice(0, recordCount),
+        retainedId: group.records[retainedIndex].id,
+      };
+    }),
   };
 }
 export { render, _cards, _texts, _assertPairRoles, _createPairInput };

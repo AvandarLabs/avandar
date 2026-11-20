@@ -2,7 +2,8 @@ import { Img, staticFile } from "remotion";
 import { MONO } from "../../fonts";
 import { DUR, STAGGER_COLUMN, caretOn, enter, typed } from "../../motion";
 import { safePublicPath, textUnits } from "../layout/layout";
-import { positioned, SceneShell } from "../SceneShell";
+import { positioned } from "../positioned";
+import { SceneShell } from "../SceneShell";
 import { getLineRevealStyle, getWipeExitStyle } from "../textReveal";
 import {
   MARK_BUILD_DEFAULTS,
@@ -14,6 +15,7 @@ import {
 } from "./brandLockupMotion";
 import type { Rect } from "../layout/layout";
 import type { BrandLockupSceneProps } from "../scenes.types";
+import type { ReactNode } from "react";
 
 /** Largest rotation of the flying columns, at the middle of the flight. */
 const FLIGHT_TILT_DEGREES = 28;
@@ -29,7 +31,7 @@ const COMMAND_CHARS_PER_SECOND = 30;
  * badge) can cascade in below, and the mark's columns can fly through the
  * frame to hand over to the next shot's field colour.
  */
-export function BrandLockupScene(props: BrandLockupSceneProps) {
+export function BrandLockupScene(props: BrandLockupSceneProps): ReactNode {
   const { frame, width = 1600, height = 1000, wordmark, cta } = props;
   const geometry = _getLockupGeometry(props, width, height);
   const wordmarkAt =
@@ -127,25 +129,29 @@ function _Mark({
     );
   }
   const rise = getMarkBuildProgress(frame, build, columns);
-  const flights = rise.map(
-    (_, index) =>
-      getFlightProgress(frame - index * STAGGER_COLUMN, exit).flight,
-  );
-  const meanFlight = flights.reduce((sum, value) => sum + value, 0) / columns;
+  const flights = rise.map((_, index) => {
+    return getFlightProgress(frame - index * STAGGER_COLUMN, exit).flight;
+  });
+  const meanFlight =
+    flights.reduce((sum, value) => {
+      return sum + value;
+    }, 0) / columns;
   const tilt = FLIGHT_TILT_DEGREES * Math.sin(Math.PI * meanFlight);
   const cover = getFlightProgress(frame, exit).cover;
-  const columnSlices = rise.map((columnRise, index) => ({
-    id: `mark-column-${index}-of-${columns}`,
-    index,
-    columnRise,
-    rect: getFlightColumnRect(
+  const columnSlices = rise.map((columnRise, index) => {
+    return {
+      id: `mark-column-${index}-of-${columns}`,
       index,
-      columns,
-      mark,
-      { width, height },
-      flights[index],
-    ),
-  }));
+      columnRise,
+      rect: getFlightColumnRect(
+        index,
+        columns,
+        mark,
+        { width, height },
+        flights[index],
+      ),
+    };
+  });
   return (
     <div
       style={{
@@ -161,36 +167,38 @@ function _Mark({
           transform: `rotateY(${tilt.toFixed(2)}deg)`,
         }}
       >
-        {columnSlices.map(({ id, index, columnRise, rect }) => (
-          <div
-            key={id}
-            style={{
-              ...positioned(rect),
-              overflow: "hidden",
-              clipPath: `inset(${((1 - columnRise) * 100).toFixed(2)}% 0 0 0)`,
-            }}
-          >
-            <Img
-              src={src}
-              alt=""
-              style={{
-                position: "absolute",
-                left: -index * rect.width,
-                top: 0,
-                width: rect.width * columns,
-                height: rect.height,
-              }}
-            />
+        {columnSlices.map(({ id, index, columnRise, rect }) => {
+          return (
             <div
+              key={id}
               style={{
-                position: "absolute",
-                inset: 0,
-                background: `var(--${exit?.color ?? "brand"})`,
-                opacity: cover,
+                ...positioned(rect),
+                overflow: "hidden",
+                clipPath: `inset(${((1 - columnRise) * 100).toFixed(2)}% 0 0 0)`,
               }}
-            />
-          </div>
-        ))}
+            >
+              <Img
+                src={src}
+                alt=""
+                style={{
+                  position: "absolute",
+                  left: -index * rect.width,
+                  top: 0,
+                  width: rect.width * columns,
+                  height: rect.height,
+                }}
+              />
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  background: `var(--${exit?.color ?? "brand"})`,
+                  opacity: cover,
+                }}
+              />
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -210,16 +218,18 @@ function _LockupCta({
 }) {
   const cps = cta.commandCharsPerSecond ?? COMMAND_CHARS_PER_SECOND;
   const beats = getCtaBeats(cta, cps);
-  const line = (top: number, fontSize: number) => ({
-    position: "absolute" as const,
-    left: width * 0.1,
-    width: width * 0.8,
-    top: height * top,
-    textAlign: "center" as const,
-    fontSize,
-    lineHeight: 1.2,
-    whiteSpace: "nowrap" as const,
-  });
+  const line = (top: number, fontSize: number) => {
+    return {
+      position: "absolute" as const,
+      left: width * 0.1,
+      width: width * 0.8,
+      top: height * top,
+      textAlign: "center" as const,
+      fontSize,
+      lineHeight: 1.2,
+      whiteSpace: "nowrap" as const,
+    };
+  };
   const isTyping = frame >= beats.typingAt && frame < beats.typingEnd;
   return (
     <>

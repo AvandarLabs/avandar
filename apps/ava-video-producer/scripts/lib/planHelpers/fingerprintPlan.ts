@@ -39,7 +39,9 @@ async function _rendererFiles(
     withFileTypes: true,
   });
   const files: string[] = [];
-  for (const entry of entries.sort((a, b) => a.name.localeCompare(b.name))) {
+  for (const entry of entries.sort((a, b) => {
+    return a.name.localeCompare(b.name);
+  })) {
     const relative = `${directory}/${entry.name}`;
     if (entry.isSymbolicLink()) {
       throw new Error("Renderer source cannot contain symlinks");
@@ -61,10 +63,12 @@ async function _hashPlanAssets(
   plan: Readonly<Storyboard>,
   assetRoot: string,
 ): Promise<PlanFingerprint["assets"]> {
-  return promiseMapSequential(assetReferences(plan).sort(), async (asset) => ({
-    path: asset,
-    sha256: await getSha256FromFile(await publicAsset(assetRoot, asset)),
-  }));
+  return promiseMapSequential(assetReferences(plan).sort(), async (asset) => {
+    return {
+      path: asset,
+      sha256: await getSha256FromFile(await publicAsset(assetRoot, asset)),
+    };
+  });
 }
 
 /** Every source file whose edit must invalidate the plan's preview. */
@@ -96,8 +100,12 @@ async function _listSupportFiles(root: string): Promise<string[]> {
     (supportFile: string) => {
       // Optional in isolated tests, which copy only part of the app.
       return fs.access(path.join(root, supportFile)).then(
-        () => supportFile,
-        () => undefined,
+        () => {
+          return supportFile;
+        },
+        () => {
+          return undefined;
+        },
       );
     },
   );

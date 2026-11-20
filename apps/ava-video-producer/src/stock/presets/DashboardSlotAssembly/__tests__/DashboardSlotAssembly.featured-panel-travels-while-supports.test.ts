@@ -98,15 +98,17 @@ test("all supplied widget text remains clear during staged final docking", async
     [
       correctionContract.defaultInput,
       correctionContract.fixtures.find(propEq("id", "dense"))!.input,
-    ].flatMap((candidateInput) =>
-      (["feature-left", "feature-top"] as const).flatMap((layout) =>
-        candidateInput.widgets.map((widget) => ({
-          ...candidateInput,
-          layout,
-          featuredWidgetId: widget.id,
-        })),
-      ),
-    ),
+    ].flatMap((candidateInput) => {
+      return (["feature-left", "feature-top"] as const).flatMap((layout) => {
+        return candidateInput.widgets.map((widget) => {
+          return {
+            ...candidateInput,
+            layout,
+            featuredWidgetId: widget.id,
+          };
+        });
+      });
+    }),
   ).forEach((source) => {
     const input = { ...source };
     const markup = renderToStaticMarkup(
@@ -130,15 +132,16 @@ test("all supplied widget text remains clear during staged final docking", async
         ),
       );
       SvgPaintAssertions.assertPaintClearance({
-        texts: paint.filter(
-          (item) => item.kind === "text" && item.opacity === 1,
-        ),
-        rectangles: paint.filter(
-          (item) =>
+        texts: paint.filter((item) => {
+          return item.kind === "text" && item.opacity === 1;
+        }),
+        rectangles: paint.filter((item) => {
+          return (
             item.kind === "rect" &&
             item.fill !== "none" &&
-            item.opacity * item.fillOpacity === 1,
-        ),
+            item.opacity * item.fillOpacity === 1
+          );
+        }),
       });
     });
   });

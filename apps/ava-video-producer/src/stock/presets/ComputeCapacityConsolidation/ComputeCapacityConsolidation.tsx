@@ -16,15 +16,17 @@ export function ComputeCapacityConsolidation({
   return (
     <g>
       <ComputeHeader input={input} frame={frame} />
-      {input.hosts.map((host, index) => (
-        <HostBay
-          key={host.id}
-          input={input}
-          index={index}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {input.hosts.map((host, index) => {
+        return (
+          <HostBay
+            key={host.id}
+            input={input}
+            index={index}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
       <WorkBlocks input={input} frame={frame} />
       <ComputeSummary input={input} frame={frame} />
     </g>

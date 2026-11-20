@@ -1,22 +1,20 @@
-import {
-  AnchoredOverlay,
-  getOverlayPose,
-} from "../../../motion-components/AnchoredOverlay";
+import { AnchoredOverlay } from "../../../motion-components/AnchoredOverlay";
+import { getObjectFlight } from "../../../motion-components/getObjectFlight";
+import { getOverlayPose } from "../../../motion-components/getOverlayPose";
 import { getMotionProgress } from "../../../motion-components/motionSettings";
 import { SharedElement } from "../../../motion-components/SharedElement";
-import {
-  SvgObjectDeparture,
-  getObjectFlight,
-} from "../../../motion-components/SvgObjectDeparture";
+import { SvgObjectDeparture } from "../../../motion-components/SvgObjectDeparture";
 import css from "./demos.module.css";
 import { formatReadout } from "./demoTheme";
 import { HelperDemoFrame } from "./HelperDemoFrame/HelperDemoFrame";
-import { DemoDiagram, getDiagramNodeRect } from "./parts/DemoDiagram";
+import { DemoDiagram } from "./parts/DemoDiagram";
+import { getDiagramNodeRect } from "./parts/getDiagramNodeRect";
 import type {
   MotionRect,
   OverlayCue,
-} from "../../../motion-components/AnchoredOverlay";
+} from "../../../motion-components/getOverlayTimings";
 import type { HelperDemoProps } from "./helperDemo.types";
+import type { ReactNode } from "react";
 
 const SOURCE: MotionRect = { x: 40, y: 300, width: 200, height: 52 };
 const TARGET: MotionRect = { x: 420, y: 40, width: 440, height: 140 };
@@ -41,7 +39,10 @@ function RectOutline({ rect, label }: { rect: MotionRect; label: string }) {
 }
 
 /** One chip travelling from a list into a header as the same element. */
-export function SharedElementDemo({ frame, frames }: HelperDemoProps) {
+export function SharedElementDemo({
+  frame,
+  frames,
+}: HelperDemoProps): ReactNode {
   const progress = getMotionProgress(frame, SHARE_AT, SHARE_FRAMES);
   return (
     <HelperDemoFrame
@@ -75,7 +76,10 @@ const CUE: OverlayCue = {
 const TABLE_ROWS = ["first", "second", "third", "fourth"];
 
 /** A callout rising from a table cell, holding, and returning to it. */
-export function AnchoredOverlayDemo({ frame, frames }: HelperDemoProps) {
+export function AnchoredOverlayDemo({
+  frame,
+  frames,
+}: HelperDemoProps): ReactNode {
   const pose = getOverlayPose(frame, CUE, CELL);
   return (
     <HelperDemoFrame
@@ -89,16 +93,18 @@ export function AnchoredOverlayDemo({ frame, frames }: HelperDemoProps) {
         { name: "scale", value: formatReadout(pose.scale) },
       ]}
     >
-      {TABLE_ROWS.map((row, index) => (
-        <div
-          key={row}
-          className={css.tableRow}
-          style={{ top: 160 + index * 50 }}
-        >
-          <span className={css.tableCell} />
-          <span className={css.tableCell} />
-        </div>
-      ))}
+      {TABLE_ROWS.map((row, index) => {
+        return (
+          <div
+            key={row}
+            className={css.tableRow}
+            style={{ top: 160 + index * 50 }}
+          >
+            <span className={css.tableCell} />
+            <span className={css.tableCell} />
+          </div>
+        );
+      })}
       <div
         className={css.box}
         style={{
@@ -129,7 +135,10 @@ const FLIGHT = {
 };
 
 /** One diagram node leaving on its own vector while the diagram stays. */
-export function ObjectDepartureDemo({ frame, frames }: HelperDemoProps) {
+export function ObjectDepartureDemo({
+  frame,
+  frames,
+}: HelperDemoProps): ReactNode {
   const flight = getObjectFlight(FLIGHT, frame);
   return (
     <HelperDemoFrame

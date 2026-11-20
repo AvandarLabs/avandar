@@ -7,6 +7,7 @@ import { ContinuityBoxOutline } from "./ContinuityBoxOutline";
 import css from "./ContinuityScene.module.css";
 import { getContinuityTimeline } from "./continuityTimeline";
 import type { ContinuityPlan } from "./continuitySchema";
+import type { ReactNode } from "react";
 
 /** A single persistent object carries identity across a scene boundary. */
 export function ContinuityToken({
@@ -15,7 +16,7 @@ export function ContinuityToken({
 }: {
   plan: ContinuityPlan;
   frame: number;
-}) {
+}): ReactNode {
   const tokens = useVideoTokens();
   const sharedObject = useVideoProps("SharedObject", {});
   const motion = useVideoMotion();
@@ -23,10 +24,9 @@ export function ContinuityToken({
   const timing = getContinuityTimeline(plan.beats);
   const index = Math.max(
     0,
-    timing.reduce(
-      (found, entry, position) => (frame >= entry.start ? position : found),
-      0,
-    ),
+    timing.reduce((found, entry, position) => {
+      return frame >= entry.start ? position : found;
+    }, 0),
   );
   const beat = plan.beats[index];
   if (!beat.token) return null;

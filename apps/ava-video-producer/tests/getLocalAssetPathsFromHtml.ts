@@ -8,8 +8,14 @@ export function getLocalAssetPathsFromHtml(html: string): string[] {
     ...html.matchAll(/<script[^>]*\ssrc="([^"]+)"/g),
     ...html.matchAll(/<link[^>]*rel="stylesheet"[^>]*href="([^"]+)"/g),
     ...html.matchAll(/<link[^>]*href="([^"]+)"[^>]*rel="stylesheet"/g),
-  ].map((match) => match[1]);
+  ].map((match) => {
+    return match[1];
+  });
   return [...new Set(references)]
-    .filter((reference) => !/^(?:[a-z]+:|\/\/)/i.test(reference))
-    .map((reference) => new URL(reference, "http://localhost/").pathname);
+    .filter((reference) => {
+      return !/^(?:[a-z]+:|\/\/)/i.test(reference);
+    })
+    .map((reference) => {
+      return new URL(reference, "http://localhost/").pathname;
+    });
 }

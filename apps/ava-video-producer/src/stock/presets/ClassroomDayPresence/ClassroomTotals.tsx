@@ -25,52 +25,54 @@ export function ClassroomTotals({ input, day }: Readonly<Props>): ReactNode {
       data-unknown={unknown}
       data-roster={input.learners.length}
     >
-      {totals.map(({ key, label, value }, index) => (
-        <g key={key}>
-          {key === "present" ? (
-            <circle cx={39 + index * 232} cy={538} r={5} fill={STOCK.mint} />
-          ) : key === "absent" ? (
-            <rect
-              x={34 + index * 232}
-              y={533}
-              width={10}
-              height={10}
-              stroke={STOCK.muted}
-              fill="none"
+      {totals.map(({ key, label, value }, index) => {
+        return (
+          <g key={key}>
+            {key === "present" ? (
+              <circle cx={39 + index * 232} cy={538} r={5} fill={STOCK.mint} />
+            ) : key === "absent" ? (
+              <rect
+                x={34 + index * 232}
+                y={533}
+                width={10}
+                height={10}
+                stroke={STOCK.muted}
+                fill="none"
+              />
+            ) : key === "unknown" ? (
+              <path
+                d={`M ${39 + index * 232} 532 l 6 6 l -6 6 l -6 -6 Z`}
+                stroke={STOCK.orange}
+                fill="none"
+              />
+            ) : undefined}
+            <FitText
+              text={label}
+              x={54 + index * 232}
+              y={542}
+              width={194}
+              fontSize={12}
+              maxLines={3}
+              breakLongWords
+              normalizeWhitespace
             />
-          ) : key === "unknown" ? (
-            <path
-              d={`M ${39 + index * 232} 532 l 6 6 l -6 6 l -6 -6 Z`}
-              stroke={STOCK.orange}
-              fill="none"
+            <FitText
+              text={
+                key === "present"
+                  ? `${value} / ${input.learners.length}`
+                  : String(value)
+              }
+              x={54 + index * 232}
+              y={592}
+              width={194}
+              fontSize={14}
+              maxLines={1}
+              breakLongWords
+              normalizeWhitespace
             />
-          ) : undefined}
-          <FitText
-            text={label}
-            x={54 + index * 232}
-            y={542}
-            width={194}
-            fontSize={12}
-            maxLines={3}
-            breakLongWords
-            normalizeWhitespace
-          />
-          <FitText
-            text={
-              key === "present"
-                ? `${value} / ${input.learners.length}`
-                : String(value)
-            }
-            x={54 + index * 232}
-            y={592}
-            width={194}
-            fontSize={14}
-            maxLines={1}
-            breakLongWords
-            normalizeWhitespace
-          />
-        </g>
-      ))}
+          </g>
+        );
+      })}
     </g>
   );
 }

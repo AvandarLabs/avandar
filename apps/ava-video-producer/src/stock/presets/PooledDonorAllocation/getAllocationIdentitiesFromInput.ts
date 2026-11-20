@@ -22,15 +22,21 @@ export function getAllocationIdentitiesFromInput(
 ): GetAllocationIdentitiesResult[] {
   return input.contributions.flatMap((donor, donorIndex) => {
     const destinations = input.allocations
-      .filter(({ contributionId }) => contributionId === donor.id)
-      .flatMap(({ requestId, credits }) =>
-        Array.from({ length: credits }, () => requestId),
-      );
-    return Array.from({ length: donor.credits }, (_, unitIndex) => ({
-      donor,
-      donorIndex,
-      unitIndex,
-      requestId: destinations[unitIndex] ?? null,
-    }));
+      .filter(({ contributionId }) => {
+        return contributionId === donor.id;
+      })
+      .flatMap(({ requestId, credits }) => {
+        return Array.from({ length: credits }, () => {
+          return requestId;
+        });
+      });
+    return Array.from({ length: donor.credits }, (_, unitIndex) => {
+      return {
+        donor,
+        donorIndex,
+        unitIndex,
+        requestId: destinations[unitIndex] ?? null,
+      };
+    });
   });
 }

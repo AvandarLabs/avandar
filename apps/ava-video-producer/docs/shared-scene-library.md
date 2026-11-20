@@ -97,7 +97,7 @@ screen. Text fitting and layout checks do not replace rendered inspection.
 | `timeline()` / `durationInFrames()` | [schema.ts](../src/storyboard/schema/schema.ts) | Accumulate ordered shot durations. Transitions occur inside a shot's duration; they do not subtract overlapping time from the total |
 | `absoluteCues()` | [schema.ts](../src/storyboard/schema/schema.ts) | Resolves narration's shot-relative bounds into the absolute film coordinates used for captions and audio exports |
 | `ShotView` | [StoryFilm.tsx](../src/storyboard/StoryFilm/StoryFilm.tsx) | Private exhaustive scene switch; not a dynamic plugin registry |
-| `SceneShell` / layout helpers | [SceneShell.tsx](../src/scenes/SceneShell.tsx), [layout.ts](../src/scenes/layout/layout.ts) | Internal shared frame, heading (rising or wiped in through `headingReveal`), geometry, fitting, formatting, and validation code; not separately registered scenes |
+| `SceneShell` / layout helpers | [SceneShell.tsx](../src/scenes/SceneShell.tsx), [positioned.ts](../src/scenes/positioned.ts), [layout.ts](../src/scenes/layout/layout.ts) | Internal shared frame, heading (rising or wiped in through `headingReveal`), geometry, fitting, formatting, and validation code; not separately registered scenes |
 | `Clip({body,name,kicker})` | [Root.tsx](../src/Root.tsx) | Original private wrapper for `demo` and `motion-lab`: TitleCard, then a body `Sequence` starting at frame 66 |
 | `RemotionRoot` / entry point | [Root.tsx](../src/Root.tsx), [index.ts](../src/index.ts) | Registers 174 compositions and boots Remotion |
 
@@ -159,7 +159,8 @@ evidence; update delivery records after those artifacts have been inspected.
 | Module | Current role |
 | --- | --- |
 | [motion.ts](../src/motion.ts) | Original curves, durations and frame helpers, plus periodic phase/pulse/loop-envelope helpers; see [motion inventory](motion-vocabulary.md) |
-| [chrome.tsx](../src/chrome/chrome.tsx) | `Box`, `abs`, `BAR = 40`, `HEAD = 68`, `BODY_Y = 108`, pointer tracking and click windows |
+| [chrome.tsx](../src/chrome/chrome.tsx) | `BAR = 40`, `HEAD = 68`, `BODY_Y = 108`, pointer tracking and click windows |
+| [abs.ts](../src/chrome/abs.ts) | `Box`, `abs` |
 | [fonts.ts](../src/fonts.ts) | Loads the bundled Figtree variable font (Avandar's brand typeface, Latin subset, weights 300–900); exports `FACE`, `TYPE` and `MONO` |
 | [theme.css](../src/theme.css) | Original generic surface, foreground, border, brand, ground and radius tokens |
 | [adoptTheme.ts](../scripts/adoptTheme/adoptTheme.ts) | Product token/easing adoption for faithful reconstructions; not a scene |

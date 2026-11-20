@@ -20,7 +20,7 @@ catalog, token catalog or source literal.
 The one exception is `avandar-adapter/`. Its product components bring their
 own translations, so the adapter keeps only the minimum needed to host them:
 
-- `avandar-adapter/index.tsx` creates an English `i18n` instance
+- `avandar-adapter/AvandarStage.tsx` creates an English `i18n` instance
   (`@lingui/core`, `@lingui/message-utils`) and wraps the stage in
   `I18nProvider` (`@lingui/react`) because product components call the
   product's own `useLingui` and `<Trans>`.

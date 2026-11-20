@@ -29,20 +29,22 @@ export function SourceMerge({
           descriptor: LEGACY_DISPLAY_COPY["source-merge"].unifyTheInputs,
         })}
       </Eyebrow>
-      {input.sources.map((source, index) => (
-        <SourceRow
-          key={source.name}
-          source={source}
-          index={index}
-          frame={frame}
-          color={
-            index === 1
-              ? accent
-              : getContentColorFromValue(source.color, { tokens, accent })
-          }
-          showPackets={input.showPackets}
-        />
-      ))}
+      {input.sources.map((source, index) => {
+        return (
+          <SourceRow
+            key={source.name}
+            source={source}
+            index={index}
+            frame={frame}
+            color={
+              index === 1
+                ? accent
+                : getContentColorFromValue(source.color, { tokens, accent })
+            }
+            showPackets={input.showPackets}
+          />
+        );
+      })}
       <OutputEdge
         frame={frame}
         accent={accent}

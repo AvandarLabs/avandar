@@ -104,55 +104,64 @@ export const DEFAULT_INPUT: Input = {
 };
 const minimum: Input = {
   ...DEFAULT_INPUT,
-  stops: DEFAULT_INPUT.stops.map((stop, index) =>
-    index ? stop : { ...stop, id: "", label: "" },
-  ),
+  stops: DEFAULT_INPUT.stops.map((stop, index) => {
+    return index ? stop : { ...stop, id: "", label: "" };
+  }),
   crates: [
     {
       ...DEFAULT_INPUT.crates[0],
       id: "",
       label: "",
       checkpoints: DEFAULT_INPUT.crates[0].checkpoints.map(
-        (checkpoint, index) =>
-          index ? checkpoint : { ...checkpoint, stopId: "" },
+        (checkpoint, index) => {
+          return index ? checkpoint : { ...checkpoint, stopId: "" };
+        },
       ),
     },
   ],
 };
 const dense: Input = {
   ...DEFAULT_INPUT,
-  stops: DEFAULT_INPUT.stops.map((stop) => ({
-    ...stop,
-    label: "界".repeat(24),
-  })),
-  crates: Array.from({ length: 5 }, (_, index) => ({
-    ...DEFAULT_INPUT.crates[index % 3],
-    id: `crate ${index}界`,
-    label: "界".repeat(20),
-  })),
+  stops: DEFAULT_INPUT.stops.map((stop) => {
+    return {
+      ...stop,
+      label: "界".repeat(24),
+    };
+  }),
+  crates: Array.from({ length: 5 }, (_, index) => {
+    return {
+      ...DEFAULT_INPUT.crates[index % 3],
+      id: `crate ${index}界`,
+      label: "界".repeat(20),
+    };
+  }),
   sceneLabel: "界".repeat(40),
   copy: Object.fromEntries(
-    Object.keys(DEFAULT_INPUT.copy).map((key) => [key, "界".repeat(42)]),
+    Object.keys(DEFAULT_INPUT.copy).map((key) => {
+      return [key, "界".repeat(42)];
+    }),
   ) as Input["copy"],
 };
 const changed: Input = {
   ...DEFAULT_INPUT,
-  crates: DEFAULT_INPUT.crates.map((crate, index) => ({
-    ...crate,
-    kind: index === 0 ? "specimen" : crate.kind,
-    checkpoints: crate.checkpoints.map((checkpoint, stopIndex) =>
-      index === 0 && stopIndex === 2
-        ? {
-            ...checkpoint,
-            state: "logged",
-            acknowledged: false,
-            seal: "unknown",
-          }
-        : index === 1 && stopIndex === 1
-          ? { ...checkpoint, state: "review", seal: "broken" }
-          : checkpoint,
-    ),
-  })),
+  crates: DEFAULT_INPUT.crates.map((crate, index) => {
+    return {
+      ...crate,
+      kind: index === 0 ? "specimen" : crate.kind,
+      checkpoints: crate.checkpoints.map((checkpoint, stopIndex) => {
+        return index === 0 && stopIndex === 2
+          ? {
+              ...checkpoint,
+              state: "logged",
+              acknowledged: false,
+              seal: "unknown",
+            }
+          : index === 1 && stopIndex === 1
+            ? { ...checkpoint, state: "review", seal: "broken" }
+            : checkpoint;
+      }),
+    };
+  }),
 };
 const toggles: Input = {
   ...changed,
@@ -176,8 +185,9 @@ export const invalidInputs: unknown[] = [
       {
         ...DEFAULT_INPUT.crates[0],
         checkpoints: DEFAULT_INPUT.crates[0].checkpoints.map(
-          (checkpoint, index) =>
-            index ? checkpoint : { ...checkpoint, stopId: "absent" },
+          (checkpoint, index) => {
+            return index ? checkpoint : { ...checkpoint, stopId: "absent" };
+          },
         ),
       },
     ],

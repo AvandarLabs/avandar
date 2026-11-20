@@ -87,7 +87,9 @@ registerStockTextLayoutAssertions({
 function _booking({ markup, id }: { markup: string; id: string }): string {
   const match = [
     ...markup.matchAll(/<rect data-booking="([^"]*)"[^>]+>/g),
-  ].find((item) => item[1] === id);
+  ].find((item) => {
+    return item[1] === id;
+  });
   assert.ok(match);
   return match[0];
 }
@@ -130,14 +132,43 @@ test("only the support booking changes cells; proposal ghosts never duplicate bo
   );
 });
 test("worker contact places the proposal; participant contact carries it to the agreed cell", () => {
-  Array.from({ length: 97 }, (_, index) => 12 + index * 0.25).forEach(
-    (frame) => {
-      const markup = _render({ frame: frame }),
-        booking = _booking({ markup, id: "visit" }),
-        hand = SvgAttributes.fromMarker({ markup, marker: "worker-hand" });
+  Array.from({ length: 97 }, (_, index) => {
+    return 12 + index * 0.25;
+  }).forEach((frame) => {
+    const markup = _render({ frame: frame }),
+      booking = _booking({ markup, id: "visit" }),
+      hand = SvgAttributes.fromMarker({ markup, marker: "worker-hand" });
+    assert.equal(
+      SvgAttributes.getNumberFromMarkup({ attributes: hand, name: "cx" }),
+      SvgAttributes.getNumberFromMarkup({ attributes: booking, name: "x" }) +
+        SvgAttributes.getNumberFromMarkup({
+          attributes: booking,
+          name: "width",
+        }) /
+          2,
+    );
+    assert.equal(
+      SvgAttributes.getNumberFromMarkup({ attributes: hand, name: "cy" }),
+      SvgAttributes.getNumberFromMarkup({ attributes: booking, name: "y" }),
+    );
+  });
+  [DEFAULT_INPUT, fixtures[2].input, changedInput].forEach((input) => {
+    return Array.from({ length: 193 }, (_, index) => {
+      return 52 + index * 0.25;
+    }).forEach((frame) => {
+      const markup = _render({ frame: frame, input: input }),
+        support = input.commitments.find(propEq("kind", "support"))!;
+      const booking = _booking({ markup, id: support.id }),
+        hand = SvgAttributes.fromMarker({
+          markup,
+          marker: "participant-hand",
+        });
       assert.equal(
         SvgAttributes.getNumberFromMarkup({ attributes: hand, name: "cx" }),
-        SvgAttributes.getNumberFromMarkup({ attributes: booking, name: "x" }) +
+        SvgAttributes.getNumberFromMarkup({
+          attributes: booking,
+          name: "x",
+        }) +
           SvgAttributes.getNumberFromMarkup({
             attributes: booking,
             name: "width",
@@ -148,37 +179,8 @@ test("worker contact places the proposal; participant contact carries it to the 
         SvgAttributes.getNumberFromMarkup({ attributes: hand, name: "cy" }),
         SvgAttributes.getNumberFromMarkup({ attributes: booking, name: "y" }),
       );
-    },
-  );
-  [DEFAULT_INPUT, fixtures[2].input, changedInput].forEach((input) =>
-    Array.from({ length: 193 }, (_, index) => 52 + index * 0.25).forEach(
-      (frame) => {
-        const markup = _render({ frame: frame, input: input }),
-          support = input.commitments.find(propEq("kind", "support"))!;
-        const booking = _booking({ markup, id: support.id }),
-          hand = SvgAttributes.fromMarker({
-            markup,
-            marker: "participant-hand",
-          });
-        assert.equal(
-          SvgAttributes.getNumberFromMarkup({ attributes: hand, name: "cx" }),
-          SvgAttributes.getNumberFromMarkup({
-            attributes: booking,
-            name: "x",
-          }) +
-            SvgAttributes.getNumberFromMarkup({
-              attributes: booking,
-              name: "width",
-            }) /
-              2,
-        );
-        assert.equal(
-          SvgAttributes.getNumberFromMarkup({ attributes: hand, name: "cy" }),
-          SvgAttributes.getNumberFromMarkup({ attributes: booking, name: "y" }),
-        );
-      },
-    ),
-  );
+    });
+  });
   const markup = _render({ frame: 120 }),
     hand = SvgAttributes.fromMarker({ markup, marker: "worker-hand" }),
     booking = _booking({ markup, id: "visit" });
@@ -201,18 +203,26 @@ test("worker contact places the proposal; participant contact carries it to the 
 test("maximum-grid final bookings stay separate and inside their actual cells", () => {
   const markup = _render({ frame: 150, input: fixtures[2].input });
   const boxes = [...markup.matchAll(/<rect data-booking[^>]+>/g)].map(
-    (match) => ({
-      x: SvgAttributes.getNumberFromMarkup({ attributes: match[0], name: "x" }),
-      y: SvgAttributes.getNumberFromMarkup({ attributes: match[0], name: "y" }),
-      width: SvgAttributes.getNumberFromMarkup({
-        attributes: match[0],
-        name: "width",
-      }),
-      height: SvgAttributes.getNumberFromMarkup({
-        attributes: match[0],
-        name: "height",
-      }),
-    }),
+    (match) => {
+      return {
+        x: SvgAttributes.getNumberFromMarkup({
+          attributes: match[0],
+          name: "x",
+        }),
+        y: SvgAttributes.getNumberFromMarkup({
+          attributes: match[0],
+          name: "y",
+        }),
+        width: SvgAttributes.getNumberFromMarkup({
+          attributes: match[0],
+          name: "width",
+        }),
+        height: SvgAttributes.getNumberFromMarkup({
+          attributes: match[0],
+          name: "height",
+        }),
+      };
+    },
   );
   assert.equal(boxes.length, 5);
   boxes.forEach((box, index) => {
@@ -222,25 +232,25 @@ test("maximum-grid final bookings stay separate and inside their actual cells", 
         box.x + box.width <= 780 &&
         box.y + box.height <= 442,
     );
-    boxes
-      .slice(index + 1)
-      .forEach((other) =>
-        assert.ok(
-          box.x + box.width <= other.x ||
-            other.x + other.width <= box.x ||
-            box.y + box.height <= other.y ||
-            other.y + other.height <= box.y,
-        ),
+    boxes.slice(index + 1).forEach((other) => {
+      return assert.ok(
+        box.x + box.width <= other.x ||
+          other.x + other.width <= box.x ||
+          box.y + box.height <= other.y ||
+          other.y + other.height <= box.y,
       );
+    });
   });
 });
 test("the participant grip clears the full proposal caption and agreed booking label", () => {
   const input = {
     ...fixtures[2].input,
-    commitments: fixtures[2].input.commitments.map((item) => ({
-      ...item,
-      label: "界界界界界 界界界界界 界界界界界 界界界界",
-    })),
+    commitments: fixtures[2].input.commitments.map((item) => {
+      return {
+        ...item,
+        label: "界界界界界 界界界界界 界界界界界 界界界界",
+      };
+    }),
   };
   [52, 76, 100].forEach((frame) => {
     const markup = _render({ frame: frame, input: input });
@@ -281,7 +291,9 @@ test("the participant grip clears the full proposal caption and agreed booking l
       );
     } else {
       const offsets = [...supportText.matchAll(/ dy="([^"]+)"/g)].reduce(
-        (sum, match) => sum + Number(match[1]),
+        (sum, match) => {
+          return sum + Number(match[1]);
+        },
         0,
       );
       assert.ok(
@@ -324,15 +336,19 @@ test("carry across the same row preserves every existing commitment label", () =
     ...fixtures[2].input,
     commitments: fixtures[2].input.commitments
       .filter(propNotEq("id", "3"))
-      .map((item) => ({
-        ...item,
-        label: `${"界".repeat(21)}${item.id}`,
-        ...(item.kind === "support"
-          ? { agreedDayId: "3", agreedBandId: "0" }
-          : {}),
-      })),
+      .map((item) => {
+        return {
+          ...item,
+          label: `${"界".repeat(21)}${item.id}`,
+          ...(item.kind === "support"
+            ? { agreedDayId: "3", agreedBandId: "0" }
+            : {}),
+        };
+      }),
   });
-  Array.from({ length: 89 }, (_, index) => index + 12).forEach((frame) => {
+  Array.from({ length: 89 }, (_, index) => {
+    return index + 12;
+  }).forEach((frame) => {
     const markup = _render({ frame: frame, input: input });
     PlannerVisibilityAssertions.assertCommitmentLabelsVisible({
       markup,

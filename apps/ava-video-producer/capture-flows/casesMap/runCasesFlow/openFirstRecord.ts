@@ -55,7 +55,9 @@ async function _scrollRecordIntoView(
   const pane = ctx.page
     .locator(".mantine-ScrollArea-viewport")
     .filter({ has: links.first() });
-  await pane.evaluate((element) => element.scrollTo(0, 0));
+  await pane.evaluate((element) => {
+    return element.scrollTo(0, 0);
+  });
   await expect(links.filter({ hasText: name }).first()).toBeInViewport();
 }
 
@@ -80,7 +82,9 @@ export async function openFirstRecord(
   }
   const kits = options.expectedVisits
     .filter(propEq("case_id", expected.case_id))
-    .reduce((sum, visit) => sum + Number(visit.supply_kits_delivered), 0);
+    .reduce((sum, visit) => {
+      return sum + Number(visit.supply_kits_delivered);
+    }, 0);
   await firstRecordLink.click();
   await ctx.page.getByRole("heading", { name, exact: true }).waitFor();
   await ctx.page

@@ -1,6 +1,6 @@
 import { Freeze, Img, OffthreadVideo, staticFile } from "remotion";
 import { safePublicPath } from "./layout/layout";
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 type Props = {
   frame: number;
@@ -25,7 +25,7 @@ export function MediaPlane({
   trimBefore = 0,
   alt,
   style,
-}: Props) {
+}: Props): ReactNode {
   const asset = staticFile(safePublicPath(src));
   if (kind === "image") {
     return <Img src={asset} alt={alt} style={style} />;

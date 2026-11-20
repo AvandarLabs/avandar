@@ -1,8 +1,16 @@
 import { getCueWindowFromShot } from "./getCueWindowFromShot";
-import type { Storyboard } from "./storyboardSchema";
+import type { Shot, Storyboard } from "./storyboardSchema";
 
-/** Compute shot starts once, in the same coordinate system as exported captions. */
-export function timeline(plan: Storyboard) {
+/** A shot with its absolute first frame and the frame after its last. */
+type TimelineShot = Shot & { startFrame: number; endFrame: number };
+
+/** A narration cue whose frames are absolute film frames. */
+type NarrationCue = Storyboard["narration"][number];
+
+/**
+ * Compute shot starts once, in the same coordinate system as exported captions.
+ */
+export function timeline(plan: Storyboard): TimelineShot[] {
   let startFrame = 0;
   return plan.shots.map((shot) => {
     const entry = {
@@ -22,19 +30,27 @@ export function timeline(plan: Storyboard) {
  */
 export function declaredCutFrames(plan: Storyboard): number[] {
   return timeline(plan)
-    .filter((shot) => shot.transition?.kind === "cut")
-    .map((shot) => shot.startFrame);
+    .filter((shot) => {
+      return shot.transition?.kind === "cut";
+    })
+    .map((shot) => {
+      return shot.startFrame;
+    });
 }
 
 export function durationInFrames(plan: Storyboard): number {
-  return plan.shots.reduce((sum, shot) => sum + shot.durationInFrames, 0);
+  return plan.shots.reduce((sum, shot) => {
+    return sum + shot.durationInFrames;
+  }, 0);
 }
 
 /** Resolve local narration cues to absolute film frames. */
-export function absoluteCues(plan: Storyboard) {
+export function absoluteCues(plan: Storyboard): NarrationCue[] {
   const shots = timeline(plan);
   return plan.narration.map((cue) => {
-    const shot = shots.find((candidate) => candidate.id === cue.shotId)!;
+    const shot = shots.find((candidate) => {
+      return candidate.id === cue.shotId;
+    })!;
     const offset =
       shot.startFrame +
       getCueWindowFromShot({ shot, beatId: cue.beatId }).start;

@@ -67,7 +67,9 @@ export async function compileSqlParser(
     babelrc: false,
     compact: true,
     plugins: [
-      () => ({ visitor: { ObjectExpression: _normalizeSqlKeywordSet } }),
+      () => {
+        return { visitor: { ObjectExpression: _normalizeSqlKeywordSet } };
+      },
     ],
   });
   return {

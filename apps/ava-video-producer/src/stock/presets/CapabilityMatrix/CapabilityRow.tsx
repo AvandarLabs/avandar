@@ -33,7 +33,9 @@ export function CapabilityRow({
         <FitText {...label} breakLongWords normalizeWhitespace />
       </g>
       {input.options.map((option, optionIndex) => {
-        const cell = row.cells.find(({ optionId }) => optionId === option.id)!;
+        const cell = row.cells.find(({ optionId }) => {
+          return optionId === option.id;
+        })!;
         return (
           <CapabilityCell
             key={option.id}

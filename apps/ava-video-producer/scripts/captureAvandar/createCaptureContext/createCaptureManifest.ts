@@ -73,7 +73,9 @@ export function createCaptureManifest(
     // Keep the written key order: policy and timing come before features.
     networkPolicy,
     timing,
-    features: options.flowIds.map((id) => ({ id, status: "pending" })),
+    features: options.flowIds.map((id) => {
+      return { id, status: "pending" };
+    }),
     ...evidence,
   };
 }

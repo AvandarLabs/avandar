@@ -3,6 +3,7 @@ import css from "./demos.module.css";
 import { formatReadout } from "./demoTheme";
 import { HelperDemoFrame } from "./HelperDemoFrame/HelperDemoFrame";
 import type { HelperDemoProps } from "./helperDemo.types";
+import type { ReactNode } from "react";
 
 /** Where the ramp preview's window opens. */
 const RAMP_AT = 15;
@@ -10,7 +11,7 @@ const RAMP_AT = 15;
 const RAMP_DISTANCE = 640;
 
 /** `ramp()` producing clamped progress, and `mix()` turning it into pixels. */
-export function RampDemo({ frame, frames }: HelperDemoProps) {
+export function RampDemo({ frame, frames }: HelperDemoProps): ReactNode {
   const progress = ramp(frame, RAMP_AT, DUR.sheet);
   const x = mix(progress, 0, RAMP_DISTANCE);
   return (
@@ -46,7 +47,7 @@ export function RampDemo({ frame, frames }: HelperDemoProps) {
 const SWATCH_STEPS = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1];
 
 /** A chip turning on and off through `mixToken()` rather than snapping. */
-export function MixTokenDemo({ frame, frames }: HelperDemoProps) {
+export function MixTokenDemo({ frame, frames }: HelperDemoProps): ReactNode {
   const t = ramp(frame, 15, DUR.chip) * (1 - ramp(frame, 50, DUR.chip));
   const color = mixToken(t, "var(--border)", "var(--brand)");
   return (
@@ -65,19 +66,21 @@ export function MixTokenDemo({ frame, frames }: HelperDemoProps) {
             Selected
           </div>
           <div className={css.swatchStrip}>
-            {SWATCH_STEPS.map((step) => (
-              <span
-                key={step}
-                className={css.swatch}
-                style={{
-                  background: mixToken(step, "var(--border)", "var(--brand)"),
-                  outline:
-                    Math.abs(step - t) < 0.05
-                      ? "2px solid var(--demo-highlight)"
-                      : undefined,
-                }}
-              />
-            ))}
+            {SWATCH_STEPS.map((step) => {
+              return (
+                <span
+                  key={step}
+                  className={css.swatch}
+                  style={{
+                    background: mixToken(step, "var(--border)", "var(--brand)"),
+                    outline:
+                      Math.abs(step - t) < 0.05
+                        ? "2px solid var(--demo-highlight)"
+                        : undefined,
+                  }}
+                />
+              );
+            })}
           </div>
         </div>
       </div>
@@ -88,7 +91,7 @@ export function MixTokenDemo({ frame, frames }: HelperDemoProps) {
 const COUNT_TARGET = 1280;
 
 /** A count rising to its final value instead of snapping to it. */
-export function CountToDemo({ frame, frames }: HelperDemoProps) {
+export function CountToDemo({ frame, frames }: HelperDemoProps): ReactNode {
   const value = countTo(frame, 15, COUNT_TARGET, 30);
   return (
     <HelperDemoFrame

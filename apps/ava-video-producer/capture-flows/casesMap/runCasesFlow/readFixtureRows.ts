@@ -24,8 +24,14 @@ export async function readFixtureRows(
   const [header, ...rows] = csv
     .trim()
     .split(/\r?\n/)
-    .map((line) => line.split(","));
-  return rows.map((values) =>
-    Object.fromEntries(header.map((column, index) => [column, values[index]])),
-  );
+    .map((line) => {
+      return line.split(",");
+    });
+  return rows.map((values) => {
+    return Object.fromEntries(
+      header.map((column, index) => {
+        return [column, values[index]];
+      }),
+    );
+  });
 }

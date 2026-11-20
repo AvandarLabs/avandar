@@ -24,8 +24,12 @@ import type { Aliases, ImportedFiles } from "./buildProduct.types";
 async function _listAliasFiles(): Promise<string[]> {
   const files = await fs.readdir(ADAPTER_ROOT);
   return files
-    .filter((file) => file.endsWith("-aliases.json"))
-    .map((file) => path.join(ADAPTER_ROOT, file));
+    .filter((file) => {
+      return file.endsWith("-aliases.json");
+    })
+    .map((file) => {
+      return path.join(ADAPTER_ROOT, file);
+    });
 }
 
 async function _readAliases(): Promise<Aliases> {
@@ -72,19 +76,25 @@ function _createSourcePlugin(
           aliases: currentAliases,
           imported,
         });
-        return compiled && args.path === path.join(ADAPTER_ROOT, "index.tsx")
+        return compiled &&
+          args.path === path.join(ADAPTER_ROOT, "product-entry.ts")
           ? _watchAdapter(compiled)
           : compiled;
       });
-      builder.onLoad({ filter: /\.css$/ }, (args) =>
-        compileProductCss(args, imported),
-      );
-      builder.onLoad({ filter: /\.(json|png|svg)$/ }, (args) =>
-        loadProductAsset(args, imported),
-      );
-      builder.onEnd((result) =>
-        finishProductBuild({ result, imported, outputDirectory, onBuilt }),
-      );
+      builder.onLoad({ filter: /\.css$/ }, (args) => {
+        return compileProductCss(args, imported);
+      });
+      builder.onLoad({ filter: /\.(json|png|svg)$/ }, (args) => {
+        return loadProductAsset(args, imported);
+      });
+      builder.onEnd((result) => {
+        return finishProductBuild({
+          result,
+          imported,
+          outputDirectory,
+          onBuilt,
+        });
+      });
     },
   };
 }
@@ -95,7 +105,7 @@ function _createBuildOptions(
 ): BuildOptions {
   return {
     absWorkingDir: PRODUCER_ROOT,
-    entryPoints: ["avandar-adapter/index.tsx"],
+    entryPoints: ["avandar-adapter/product-entry.ts"],
     outfile: path.join(outputDirectory, "product.js"),
     bundle: true,
     format: "esm",
@@ -167,7 +177,11 @@ if (
   process.argv[1] &&
   pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url
 ) {
-  if (process.argv.slice(2).some((arg) => arg !== "--watch")) {
+  if (
+    process.argv.slice(2).some((arg) => {
+      return arg !== "--watch";
+    })
+  ) {
     throw new Error(
       "Usage: component:build [--watch]. Product source is always this Avandar worktree.",
     );

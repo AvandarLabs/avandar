@@ -41,17 +41,19 @@ export function ReceiptText({
   ];
   return (
     <g>
-      {labels.map((label) => (
-        <FitText
-          key={label.y}
-          {...label}
-          x={10}
-          width={width - 20}
-          fontSize={12}
-          normalizeWhitespace
-          breakLongWords
-        />
-      ))}
+      {labels.map((label) => {
+        return (
+          <FitText
+            key={label.y}
+            {...label}
+            x={10}
+            width={width - 20}
+            fontSize={12}
+            normalizeWhitespace
+            breakLongWords
+          />
+        );
+      })}
     </g>
   );
 }

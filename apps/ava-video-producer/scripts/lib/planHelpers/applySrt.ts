@@ -36,7 +36,9 @@ function _makeCueFromSrtBlock(options: {
     throw new Error(`Invalid SRT cue ${index + 1}`);
   }
   const cue = plan.narration[index];
-  const normalize = (value: string) => value.replace(/\s+/g, " ").trim();
+  const normalize = (value: string) => {
+    return value.replace(/\s+/g, " ").trim();
+  };
   if (normalize(lines.join(" ")) !== normalize(cue.text)) {
     throw new Error(`SRT text differs from narration cue ${cue.id}`);
   }
@@ -71,9 +73,9 @@ export function applySrt(
   }
   return storyboardSchema.parse({
     ...plan,
-    narration: blocks.map((block, index) =>
-      _makeCueFromSrtBlock({ plan, block, index }),
-    ),
+    narration: blocks.map((block, index) => {
+      return _makeCueFromSrtBlock({ plan, block, index });
+    }),
     narrationTrack: { src: audio, startFrame: 0, volume: 1 },
   });
 }

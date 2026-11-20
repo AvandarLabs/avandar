@@ -33,26 +33,30 @@ export function ReturningLearnerWorktable({
         portfolioOffset={portfolioOffset}
         accent={accent}
       />
-      {input.priorWork.map((work, index) => (
-        <PriorWorkSample
-          key={work.id}
-          work={work}
-          index={index}
-          offset={portfolioOffset}
-          accent={accent}
-        />
-      ))}
+      {input.priorWork.map((work, index) => {
+        return (
+          <PriorWorkSample
+            key={work.id}
+            work={work}
+            index={index}
+            offset={portfolioOffset}
+            accent={accent}
+          />
+        );
+      })}
       <ReturningTeacher input={input} teacherX={teacherX} handX={handX} />
-      {input.returnActivities.map((activity, index) => (
-        <ReturnActivity
-          key={activity.id}
-          activity={activity}
-          index={index}
-          input={input}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {input.returnActivities.map((activity, index) => {
+        return (
+          <ReturnActivity
+            key={activity.id}
+            activity={activity}
+            index={index}
+            input={input}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
       <SceneText
         text={input.caption}
         anchor="middle"

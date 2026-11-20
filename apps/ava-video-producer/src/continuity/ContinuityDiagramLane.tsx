@@ -9,6 +9,7 @@ import css from "./ContinuityOverlays.module.css";
 import { sampleStockFrame } from "./continuityTimeline";
 import { DiagramConnector } from "./DiagramConnector";
 import type { ContinuityBeat } from "./continuitySchema";
+import type { ReactNode } from "react";
 
 type Content = Extract<ContinuityBeat["content"], { kind: "composite" }>;
 type Props = { content: Content; frame: number; accent: string };
@@ -16,7 +17,10 @@ type DiagramProps = Omit<Props, "accent"> & {
   diagram: Content["diagrams"][number];
 };
 
-/** Extracted explanatory artwork travels from the UI without cloning the UI itself. */
+/**
+ * Extracted explanatory artwork travels from the UI without cloning the UI
+ * itself.
+ */
 function FloatingDiagram({ content, diagram, frame }: DiagramProps) {
   const clipId = `overlay-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
   const appearance = useContinuityAppearance();
@@ -76,18 +80,24 @@ function FloatingDiagram({ content, diagram, frame }: DiagramProps) {
 }
 
 /** Timed spotlight and anchored artwork share the full native product stage. */
-export function ContinuityDiagramLane({ content, frame, accent }: Props) {
+export function ContinuityDiagramLane({
+  content,
+  frame,
+  accent,
+}: Props): ReactNode {
   return (
     <>
       <DiagramConnector content={content} frame={frame} accent={accent} />
-      {content.diagrams.map((diagram) => (
-        <FloatingDiagram
-          key={diagram.at}
-          content={content}
-          diagram={diagram}
-          frame={frame}
-        />
-      ))}
+      {content.diagrams.map((diagram) => {
+        return (
+          <FloatingDiagram
+            key={diagram.at}
+            content={content}
+            diagram={diagram}
+            frame={frame}
+          />
+        );
+      })}
     </>
   );
 }

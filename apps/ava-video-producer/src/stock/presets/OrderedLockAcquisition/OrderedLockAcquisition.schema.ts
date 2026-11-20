@@ -59,7 +59,9 @@ export const inputSchema = z
     input.operations.forEach(({ requestedIds }, index) => {
       if (
         new Set(requestedIds).size !== 2 ||
-        requestedIds.some((id) => !resourceIds.has(id))
+        requestedIds.some((id) => {
+          return !resourceIds.has(id);
+        })
       ) {
         context.addIssue({
           code: "custom",

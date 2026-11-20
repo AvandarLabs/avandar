@@ -30,15 +30,17 @@ export function PdfNearestLabelReview({
         ]}
       />
       <ReviewSourcePage input={input} frame={frame} accent={accent} />
-      {input.labels.map((label, index) => (
-        <ReviewLabelRail
-          key={label.id}
-          input={input}
-          index={index}
-          frame={frame}
-          distance={association.distances[index]}
-        />
-      ))}
+      {input.labels.map((label, index) => {
+        return (
+          <ReviewLabelRail
+            key={label.id}
+            input={input}
+            index={index}
+            frame={frame}
+            distance={association.distances[index]}
+          />
+        );
+      })}
       {frame >= 96 ? (
         <ReviewedExtraction input={input} frame={frame} accent={accent} />
       ) : undefined}

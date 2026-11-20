@@ -1,10 +1,11 @@
-import { abs } from "../../chrome/chrome";
+import { abs } from "../../chrome/abs";
 import { DUR, enter, press } from "../../motion";
 import { PUBLISH, PUBLISH_CLICK, ROWS_AT } from "./timeline";
+import type { ReactNode } from "react";
 
 /** The publish phase: the button entering with the side panel, then
  *  answering the click that sends the report. */
-export function PublishButton({ frame }: { frame: number }) {
+export function PublishButton({ frame }: { frame: number }): ReactNode {
   const publishIn = enter(frame, ROWS_AT + 10, { dur: DUR.panel, y: 10 });
   return (
     <div

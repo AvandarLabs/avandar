@@ -110,9 +110,9 @@ async function _measureAllFeatures(
   measureOptions: Readonly<MeasureOptions>,
 ): Promise<void> {
   await ReviewPageDriver.load(run, { url: measureOptions.url.href });
-  const beats = await run.page.evaluate(
-    () => (window as ReviewWindow).review.beats,
-  );
+  const beats = await run.page.evaluate(() => {
+    return (window as ReviewWindow).review.beats;
+  });
   const features = measureOptions.requestedFeatures.length
     ? measureOptions.requestedFeatures
     : Object.keys(beats);
@@ -191,9 +191,9 @@ async function _measure(options: Readonly<MeasureOptions>): Promise<void> {
     await browser.close();
     await _writeReport(run, options);
   }
-  const differences = run.determinism.filter(
-    (result) => !result.identicalPixels || !result.identicalText,
-  );
+  const differences = run.determinism.filter((result) => {
+    return !result.identicalPixels || !result.identicalText;
+  });
   console.log(
     JSON.stringify({
       output: options.output,

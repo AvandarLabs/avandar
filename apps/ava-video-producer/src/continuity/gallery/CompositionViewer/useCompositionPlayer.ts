@@ -23,12 +23,14 @@ function _isOptionsMessage(data: unknown): data is {
   );
 }
 
-/** One source watcher and caption handshake scoped to the current live iframe. */
+/**
+ * One source watcher and caption handshake scoped to the current live iframe.
+ */
 export function useCompositionPlayer(options: {
   id: string;
   player: RefObject<HTMLIFrameElement | null>;
   onOptions: (options: { id: string; captions: boolean }) => void;
-}) {
+}): void {
   const { id, player, onOptions } = options;
   useEffect(() => {
     if (!player.current) {
@@ -37,7 +39,9 @@ export function useCompositionPlayer(options: {
     let cancelRefresh: (() => void) | undefined;
     const stopWatching = watchFilms([player.current], () => {
       cancelRefresh?.();
-      cancelRefresh = FilmDownloads.afterDownloads(() => location.reload());
+      cancelRefresh = FilmDownloads.afterDownloads(() => {
+        return location.reload();
+      });
     });
     return () => {
       stopWatching();
@@ -57,6 +61,8 @@ export function useCompositionPlayer(options: {
       onOptions({ id, captions: event.data.options.captions });
     };
     window.addEventListener("message", receive);
-    return () => window.removeEventListener("message", receive);
+    return () => {
+      return window.removeEventListener("message", receive);
+    };
   }, [id, onOptions, player]);
 }

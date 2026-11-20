@@ -39,18 +39,20 @@ export function ConflictField({
         progress={progress}
         accent={accent}
       />
-      {input.sources.map((source, sourceIndex) => (
-        <ConflictCandidate
-          key={source.id}
-          source={source}
-          sourceIndex={sourceIndex}
-          field={field}
-          input={input}
-          y={y}
-          progress={progress}
-          accent={accent}
-        />
-      ))}
+      {input.sources.map((source, sourceIndex) => {
+        return (
+          <ConflictCandidate
+            key={source.id}
+            source={source}
+            sourceIndex={sourceIndex}
+            field={field}
+            input={input}
+            y={y}
+            progress={progress}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

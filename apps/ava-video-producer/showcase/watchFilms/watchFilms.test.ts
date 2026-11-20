@@ -146,9 +146,9 @@ function _createEnvironment(playerCount = 1): WatchEnvironment {
     "clearTimeout",
   ]);
   const clock = _installGallery(streams, listeners);
-  const players = Array.from({ length: playerCount }, (_, index) =>
-    _createPlayer(index),
-  );
+  const players = Array.from({ length: playerCount }, (_, index) => {
+    return _createPlayer(index);
+  });
   return {
     streams,
     listeners,
@@ -162,13 +162,13 @@ function _createEnvironment(playerCount = 1): WatchEnvironment {
       source: unknown = players[0].contentWindow,
       messageOrigin = origin,
     ) => {
-      listeners.forEach((listener) =>
-        listener({
+      listeners.forEach((listener) => {
+        return listener({
           source,
           origin: messageOrigin,
           data: { type: "film-reloading", requestId: String(requestId) },
-        }),
-      );
+        });
+      });
     },
     restore: () => {
       restoreGlobals(originals);
@@ -197,7 +197,11 @@ test("seven players share one source stream and ignore initial or repeated gener
     assert.equal(streams[0].url, "/events");
     notify("5");
     notify("5");
-    assert.ok(players.every((player) => player.messages.length === 0));
+    assert.ok(
+      players.every((player) => {
+        return player.messages.length === 0;
+      }),
+    );
     notify("6");
     notify("6");
     const requestIds = new Set<string | undefined>();

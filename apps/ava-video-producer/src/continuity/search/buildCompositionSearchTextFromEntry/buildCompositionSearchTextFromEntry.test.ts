@@ -5,9 +5,9 @@ import { buildCompositionSearchTextFromEntry } from "./buildCompositionSearchTex
 
 test("retrieval text normalizes semantic prose without including source or control paths", () => {
   const entry = {
-    ...CONTINUITY_CATALOG.filter(
-      (candidate) => candidate.family === "vocabulary",
-    )[0]!,
+    ...CONTINUITY_CATALOG.filter((candidate) => {
+      return candidate.family === "vocabulary";
+    })[0]!,
     title: "  Persistent\n object ",
     tags: ["identity   continuity"],
   };
@@ -17,5 +17,7 @@ test("retrieval text normalizes semantic prose without including source or contr
   assert.ok(text.includes(entry.goodFor));
   assert.ok(text.includes(entry.creativeDirection));
   assert.ok(!text.includes(entry.path));
-  entry.controls.forEach((control) => assert.ok(!text.includes(control.path)));
+  entry.controls.forEach((control) => {
+    return assert.ok(!text.includes(control.path));
+  });
 });

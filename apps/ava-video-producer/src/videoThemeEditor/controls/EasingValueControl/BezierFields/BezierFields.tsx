@@ -1,5 +1,6 @@
 import { RangeNumberInput } from "../../RangeNumberInput";
 import css from "./BezierFields.module.css";
+import type { ReactNode } from "react";
 
 type Bezier = readonly [number, number, number, number];
 
@@ -22,24 +23,30 @@ function _withPoint(points: Bezier, index: number, value: number): Bezier {
 }
 
 /** The four Bezier control values. A camera curve keeps every point in 0..1. */
-export function BezierFields({ points, isCameraCurve, onChange }: Props) {
+export function BezierFields({
+  points,
+  isCameraCurve,
+  onChange,
+}: Props): ReactNode {
   return (
     <div className={css.bezierFields}>
-      {points.map((point, index) => (
-        <RangeNumberInput
-          key={BEZIER_FIELD_NAMES[index]}
-          size="xs"
-          label={BEZIER_FIELD_NAMES[index]}
-          min={isCameraCurve || index % 2 === 0 ? 0 : -1}
-          max={isCameraCurve || index % 2 === 0 ? 1 : 2}
-          step={0.01}
-          decimalScale={3}
-          value={point}
-          onChange={(pointValue) =>
-            onChange(_withPoint(points, index, pointValue))
-          }
-        />
-      ))}
+      {points.map((point, index) => {
+        return (
+          <RangeNumberInput
+            key={BEZIER_FIELD_NAMES[index]}
+            size="xs"
+            label={BEZIER_FIELD_NAMES[index]}
+            min={isCameraCurve || index % 2 === 0 ? 0 : -1}
+            max={isCameraCurve || index % 2 === 0 ? 1 : 2}
+            step={0.01}
+            decimalScale={3}
+            value={point}
+            onChange={(pointValue) => {
+              return onChange(_withPoint(points, index, pointValue));
+            }}
+          />
+        );
+      })}
     </div>
   );
 }

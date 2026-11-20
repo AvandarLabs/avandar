@@ -37,28 +37,30 @@ export function BarRace({ input, frame, accent }: Readonly<Props>): ReactNode {
       <Text x={64} y={112} size={29} weight={600}>
         {input.heading}
       </Text>
-      {[0, 25, 50, 75, 100].map((value) => (
-        <g key={value}>
-          <line
-            x1={205 + value * 6}
-            y1={157}
-            x2={205 + value * 6}
-            y2={474}
-            stroke={STOCK.line}
-            strokeOpacity={0.5}
-          />
-          <Text
-            x={205 + value * 6}
-            y={507}
-            size={14}
-            mono
-            anchor="middle"
-            fill={STOCK.muted}
-          >
-            {value}
-          </Text>
-        </g>
-      ))}
+      {[0, 25, 50, 75, 100].map((value) => {
+        return (
+          <g key={value}>
+            <line
+              x1={205 + value * 6}
+              y1={157}
+              x2={205 + value * 6}
+              y2={474}
+              stroke={STOCK.line}
+              strokeOpacity={0.5}
+            />
+            <Text
+              x={205 + value * 6}
+              y={507}
+              size={14}
+              mono
+              anchor="middle"
+              fill={STOCK.muted}
+            >
+              {value}
+            </Text>
+          </g>
+        );
+      })}
       {bars.map((bar, i) => {
         const value = mix(t, bar.start, bar.end) * enter;
         const y = 175 + mix(t, bar.from, bar.to) * 77;
@@ -98,19 +100,21 @@ export function BarRace({ input, frame, accent }: Readonly<Props>): ReactNode {
         );
       })}
       {input.showLegend
-        ? bars.map((bar, i) => (
-            <g key={bar.label}>
-              <circle
-                cx={72 + i * 216}
-                cy={546}
-                r={5}
-                fill={i === 0 ? accent : bar.color}
-              />
-              <Text x={86 + i * 216} y={552} size={17} fill={STOCK.text}>
-                {bar.label}
-              </Text>
-            </g>
-          ))
+        ? bars.map((bar, i) => {
+            return (
+              <g key={bar.label}>
+                <circle
+                  cx={72 + i * 216}
+                  cy={546}
+                  r={5}
+                  fill={i === 0 ? accent : bar.color}
+                />
+                <Text x={86 + i * 216} y={552} size={17} fill={STOCK.text}>
+                  {bar.label}
+                </Text>
+              </g>
+            );
+          })
         : null}
       <Text x={64} y={580} size={12} fill={STOCK.muted}>
         {getStockDisplayCopyFromDescriptor({

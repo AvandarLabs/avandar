@@ -35,25 +35,27 @@ export function SeedBalanceCaptions({
   ];
   return (
     <g>
-      {names.map((name, index) => (
-        <g key={index}>
-          <LabelSlots labels={[[name, 48 + index * 230, 450, 200, 14, 4]]} />
-          {input.showQuantities ? (
-            <LabelSlots
-              labels={[
-                [
-                  `${values[index] / 100} ${input.crop.unitLabel}`,
-                  48 + index * 230,
-                  535,
-                  200,
-                  14,
-                  3,
-                ],
-              ]}
-            />
-          ) : undefined}
-        </g>
-      ))}
+      {names.map((name, index) => {
+        return (
+          <g key={index}>
+            <LabelSlots labels={[[name, 48 + index * 230, 450, 200, 14, 4]]} />
+            {input.showQuantities ? (
+              <LabelSlots
+                labels={[
+                  [
+                    `${values[index] / 100} ${input.crop.unitLabel}`,
+                    48 + index * 230,
+                    535,
+                    200,
+                    14,
+                    3,
+                  ],
+                ]}
+              />
+            ) : undefined}
+          </g>
+        );
+      })}
     </g>
   );
 }

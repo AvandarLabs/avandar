@@ -84,7 +84,9 @@ function _refusal(value: unknown): string[] {
   assert.equal(snapshot, undefined);
   assert.equal(message.type, "film-theme-error");
   return message.type === "film-theme-error"
-    ? message.issues.map((issue) => issue.message)
+    ? message.issues.map((issue) => {
+        return issue.message;
+      })
     : [];
 }
 
@@ -139,7 +141,9 @@ test("a snapshot with a literal semantic value is refused with its path", () => 
   assert.equal(message.type, "film-theme-error");
   assert.ok(
     message.type === "film-theme-error" &&
-      message.issues.some((issue) => issue.path.includes("accent")),
+      message.issues.some((issue) => {
+        return issue.path.includes("accent");
+      }),
   );
 });
 
@@ -314,7 +318,12 @@ test("a film that cannot take a theme refuses it with a fixed code", () => {
 
 test("a usage message drops overlong paths and keeps within the path cap", () => {
   const longPath = "x".repeat(257);
-  const paths = [longPath, ...Array.from({ length: 5000 }, (_, i) => `p${i}`)];
+  const paths = [
+    longPath,
+    ...Array.from({ length: 5000 }, (_, i) => {
+      return `p${i}`;
+    }),
+  ];
   const message = createFilmTokensUsedMessage(ITEM_ID, paths);
   assert.equal(message.paths.length, 4096);
   assert.equal(message.paths.includes(longPath), false);

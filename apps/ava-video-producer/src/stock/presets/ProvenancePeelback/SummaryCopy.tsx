@@ -21,9 +21,11 @@ export function SummaryCopy({ summary, accent }: Readonly<Props>): ReactNode {
   ];
   return (
     <g data-copy-block="summary" data-bottom={212}>
-      {slots.map((slot) => (
-        <FitText key={slot.y} {...slot} breakLongWords normalizeWhitespace />
-      ))}
+      {slots.map((slot) => {
+        return (
+          <FitText key={slot.y} {...slot} breakLongWords normalizeWhitespace />
+        );
+      })}
     </g>
   );
 }

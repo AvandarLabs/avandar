@@ -7,10 +7,16 @@ type Props = { input: Input; frame: number };
 
 /** Resolved quantities retain their supplied denominator and copy. */
 export function ShadeSummary({ input, frame }: Readonly<Props>): ReactNode {
-  const total = input.zones.reduce((sum, zone) => sum + zone.areaM2, 0);
+  const total = input.zones.reduce((sum, zone) => {
+    return sum + zone.areaM2;
+  }, 0);
   const shaded =
-    input.zones.reduce((sum, zone) => sum + zone.existingShadeM2, 0) +
-    input.installations.reduce((sum, item) => sum + item.addedShadeM2, 0);
+    input.zones.reduce((sum, zone) => {
+      return sum + zone.existingShadeM2;
+    }, 0) +
+    input.installations.reduce((sum, item) => {
+      return sum + item.addedShadeM2;
+    }, 0);
   return (
     <g>
       <g

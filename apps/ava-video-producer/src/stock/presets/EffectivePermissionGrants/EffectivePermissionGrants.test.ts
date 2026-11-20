@@ -65,11 +65,12 @@ test("eligible grants combine by maximum rank with a separate action requirement
   );
 });
 test("candidates climb their own ranks before gates close and the result rises", () => {
-  const token = (frame: number) =>
-    SvgAttributes.fromMarker({
+  const token = (frame: number) => {
+    return SvgAttributes.fromMarker({
       markup: _render({ frame: frame }),
       marker: "grant-token",
     });
+  };
   assert.equal(
     SvgAttributes.getNumberFromMarkup({ attributes: token(13), name: "cy" }),
     440,
@@ -83,14 +84,15 @@ test("candidates climb their own ranks before gates close and the result rises",
     260,
   );
   assert.match(_render({ frame: 100 }), /data-grant-gate="app"/);
-  const result = (frame: number) =>
-    SvgAttributes.getNumberFromMarkup({
+  const result = (frame: number) => {
+    return SvgAttributes.getNumberFromMarkup({
       attributes: SvgAttributes.fromMarker({
         markup: _render({ frame: frame }),
         marker: "result-marker",
       }),
       name: "cy",
     });
+  };
   assert.equal(result(101), 440);
   assert.ok(result(120) < 440 && result(120) > 350);
   assert.equal(result(139), 350);
@@ -113,13 +115,14 @@ function _getVisibleTexts({
     input.labels.editor,
     input.labels.admin,
     ...input.grants
-      .filter(
-        (grant) =>
+      .filter((grant) => {
+        return (
           input.showExcludedGrants ||
           (grant.eligible &&
             (!input.restricted || grant.kind !== "app-default")) ||
-          frame < 100,
-      )
+          frame < 100
+        );
+      })
       .map(prop("label")),
   ];
 }
@@ -158,8 +161,8 @@ test("hidden excluded grants retain the maximum and requirement comparison for e
     [...DEFAULT_INPUT.grants].reverse(),
     [DEFAULT_INPUT.grants[1], DEFAULT_INPUT.grants[2], DEFAULT_INPUT.grants[0]],
   ];
-  grantOrders.forEach((grants) =>
-    [false, true].forEach((showExcludedGrants) => {
+  grantOrders.forEach((grants) => {
+    return [false, true].forEach((showExcludedGrants) => {
       const hold = _render({
         frame: 150,
         input: {
@@ -180,8 +183,8 @@ test("hidden excluded grants retain the maximum and requirement comparison for e
       );
       assert.ok(hold.includes(`aria-label="${DEFAULT_INPUT.labels.denied}"`));
       assert.match(hold, /data-required-notch="editor"/);
-    }),
-  );
+    });
+  });
   const none = _render({
     frame: 150,
     input: {

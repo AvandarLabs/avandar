@@ -13,13 +13,17 @@ import type { Dispatch, SetStateAction } from "react";
 
 const SAVED_KEY = "motion-atlas:saved:v1" as const;
 
-const _findPreset = (id: string): Preset | undefined =>
-  STOCK_CATALOG.find(propEq<{ id: unknown }, "id", unknown>("id", id));
+const _findPreset = (id: string): Preset | undefined => {
+  return STOCK_CATALOG.find(propEq<{ id: unknown }, "id", unknown>("id", id));
+};
 
-const _getPresetFromHash = (): Preset | undefined =>
-  _findPreset(window.location.hash.slice(1));
+const _getPresetFromHash = (): Preset | undefined => {
+  return _findPreset(window.location.hash.slice(1));
+};
 
-/** Catalog selection, saved references, editable content, and playback controls. */
+/**
+ * Catalog selection, saved references, editable content, and playback controls.
+ */
 export type MotionGalleryState = {
   category: string;
   selectCategory: (value: string) => void;
@@ -58,7 +62,9 @@ export function useMotionGalleryState(): MotionGalleryState {
     events.onmessage = (event) => {
       if (generation !== undefined && generation !== event.data) {
         cancelRefresh?.();
-        cancelRefresh = FilmDownloads.afterDownloads(() => location.reload());
+        cancelRefresh = FilmDownloads.afterDownloads(() => {
+          return location.reload();
+        });
       }
       generation = event.data;
     };
@@ -76,27 +82,30 @@ export function useMotionGalleryState(): MotionGalleryState {
     Partial<Record<StockPresetId, ContentDraft>>
   >({});
 
-  const updateContent = (id: StockPresetId, state: ContentDraft) =>
-    setDrafts((previous) => ({
-      ...previous,
-      [id]: state,
-    }));
+  const updateContent = (id: StockPresetId, state: ContentDraft) => {
+    return setDrafts((previous) => {
+      return {
+        ...previous,
+        [id]: state,
+      };
+    });
+  };
 
   const [query, setQuery] = useState("");
 
-  const [playing, setPlaying] = useState(() => !isReducedMotionPreferred());
+  const [playing, setPlaying] = useState(() => {
+    return !isReducedMotionPreferred();
+  });
 
   const [selected, setSelected] = useState<Preset | undefined>(
     _getPresetFromHash,
   );
 
-  const contentState = useMemo(
-    () =>
-      selected
-        ? (drafts[selected.id] ?? ContentDraftModule.fromPreset(selected.id))
-        : undefined,
-    [selected, drafts],
-  );
+  const contentState = useMemo(() => {
+    return selected
+      ? (drafts[selected.id] ?? ContentDraftModule.fromPreset(selected.id))
+      : undefined;
+  }, [selected, drafts]);
 
   const [notice, setNotice] = useState("");
 
@@ -110,10 +119,9 @@ export function useMotionGalleryState(): MotionGalleryState {
       return Array.isArray(data)
         ? [
             ...new Set(
-              data.filter(
-                (id): id is StockPresetId =>
-                  typeof id === "string" && Boolean(_findPreset(id)),
-              ),
+              data.filter((id): id is StockPresetId => {
+                return typeof id === "string" && Boolean(_findPreset(id));
+              }),
             ),
           ]
         : [];
@@ -134,7 +142,9 @@ export function useMotionGalleryState(): MotionGalleryState {
   );
 
   useEffect(function syncSelectionWithUrlAndMotionPreference() {
-    const update = () => setSelected(_getPresetFromHash());
+    const update = () => {
+      return setSelected(_getPresetFromHash());
+    };
     window.addEventListener("hashchange", update);
     window.addEventListener("popstate", update);
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -155,18 +165,20 @@ export function useMotionGalleryState(): MotionGalleryState {
   const announce = useCallback((message: string) => {
     setNotice(message);
     clearTimeout(noticeTimer.current);
-    noticeTimer.current = setTimeout(() => setNotice(""), 4200);
+    noticeTimer.current = setTimeout(() => {
+      return setNotice("");
+    }, 4200);
   }, []);
 
-  const onSave = useCallback(
-    (id: StockPresetId) =>
-      setSaved((previous) =>
-        previous.includes(id)
-          ? previous.filter((value) => value !== id)
-          : [...previous, id],
-      ),
-    [],
-  );
+  const onSave = useCallback((id: StockPresetId) => {
+    return setSaved((previous) => {
+      return previous.includes(id)
+        ? previous.filter((value) => {
+            return value !== id;
+          })
+        : [...previous, id];
+    });
+  }, []);
 
   const onOpen = useCallback((preset: Preset) => {
     setNotice("");
@@ -198,43 +210,42 @@ export function useMotionGalleryState(): MotionGalleryState {
     [announce],
   );
 
-  const results = useMemo(
-    () =>
-      STOCK_CATALOG.filter(
-        (preset) =>
-          (collection === "all" || preset.collection === collection) &&
-          (category === "All motions" ||
-            (category === "Saved references"
-              ? saved.includes(preset.id)
-              : preset.category === category)) &&
-          [
-            preset.name,
-            preset.id,
-            preset.description,
-            preset.useWhen,
-            preset.searchText,
-            ...preset.tags,
-          ]
-            .join(" ")
-            .toLowerCase()
-            .includes(query.toLowerCase().trim()),
-      ),
-    [category, collection, query, saved],
-  );
+  const results = useMemo(() => {
+    return STOCK_CATALOG.filter((preset) => {
+      return (
+        (collection === "all" || preset.collection === collection) &&
+        (category === "All motions" ||
+          (category === "Saved references"
+            ? saved.includes(preset.id)
+            : preset.category === category)) &&
+        [
+          preset.name,
+          preset.id,
+          preset.description,
+          preset.useWhen,
+          preset.searchText,
+          ...preset.tags,
+        ]
+          .join(" ")
+          .toLowerCase()
+          .includes(query.toLowerCase().trim())
+      );
+    });
+  }, [category, collection, query, saved]);
 
   const selectedCatalogIndex = selected ? STOCK_CATALOG.indexOf(selected) : -1;
 
-  const previousPreset = [...results]
-    .reverse()
-    .find((preset) => STOCK_CATALOG.indexOf(preset) < selectedCatalogIndex);
+  const previousPreset = [...results].reverse().find((preset) => {
+    return STOCK_CATALOG.indexOf(preset) < selectedCatalogIndex;
+  });
 
-  const nextPreset = results.find(
-    (preset) => STOCK_CATALOG.indexOf(preset) > selectedCatalogIndex,
-  );
+  const nextPreset = results.find((preset) => {
+    return STOCK_CATALOG.indexOf(preset) > selectedCatalogIndex;
+  });
 
-  const savedPresets = STOCK_CATALOG.filter((preset) =>
-    saved.includes(preset.id),
-  );
+  const savedPresets = STOCK_CATALOG.filter((preset) => {
+    return saved.includes(preset.id);
+  });
 
   const selectCategory = (value: string) => {
     setCategory(value);

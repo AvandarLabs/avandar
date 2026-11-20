@@ -61,7 +61,9 @@ function _createBuildOptions(
         }
       },
       input: makeObject(SHOWCASE_PAGES, {
-        valueFn: (page) => path.join(paths.pages, `${page}.html`),
+        valueFn: (page) => {
+          return path.join(paths.pages, `${page}.html`);
+        },
       }),
     },
     watch: isWatching ? { buildDelay: 100 } : undefined,

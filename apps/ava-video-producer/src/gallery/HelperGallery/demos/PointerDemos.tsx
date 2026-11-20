@@ -13,6 +13,7 @@ import { DEMO_COLORS, formatReadout } from "./demoTheme";
 import { HelperDemoFrame } from "./HelperDemoFrame/HelperDemoFrame";
 import type { CursorKey, CursorTarget } from "../../../cursor-motion";
 import type { HelperDemoProps } from "./helperDemo.types";
+import type { ReactNode } from "react";
 
 /** Field and button centres on the preview stage. */
 const FIELD = { x: 230, y: 120 };
@@ -33,8 +34,12 @@ const TARGETS: CursorTarget[] = [
 ];
 
 /** The whole route, sampled once a frame, for a faint trail. */
-const TRAIL = Array.from({ length: 105 }, (_, frame) => trackPos(frame, PATH))
-  .map((point) => `${point.x.toFixed(1)},${point.y.toFixed(1)}`)
+const TRAIL = Array.from({ length: 105 }, (_, frame) => {
+  return trackPos(frame, PATH);
+})
+  .map((point) => {
+    return `${point.x.toFixed(1)},${point.y.toFixed(1)}`;
+  })
   .join(" ");
 
 /** The field and button the pointer travels between. */
@@ -69,7 +74,7 @@ function Targets({ frame }: { frame: number }) {
 }
 
 /** A pointer travelling between measured targets with arrival holds. */
-export function TrackPosDemo({ frame, frames }: HelperDemoProps) {
+export function TrackPosDemo({ frame, frames }: HelperDemoProps): ReactNode {
   const position = trackPos(frame, PATH);
   return (
     <HelperDemoFrame
@@ -89,7 +94,10 @@ export function TrackPosDemo({ frame, frames }: HelperDemoProps) {
 }
 
 /** The pointer taking the I-beam and hand shapes only on arrival. */
-export function CursorOnTargetDemo({ frame, frames }: HelperDemoProps) {
+export function CursorOnTargetDemo({
+  frame,
+  frames,
+}: HelperDemoProps): ReactNode {
   const shape = cursorOnTarget(frame, PATH, TARGETS);
   return (
     <HelperDemoFrame
@@ -112,7 +120,10 @@ const PRESS_PATH: CursorKey[] = [
 const PRESS_CLICKS = [35, 62];
 
 /** A button held down while `downAt()` is true, the pointer dipping with it. */
-export function ClickFeedbackDemo({ frame, frames }: HelperDemoProps) {
+export function ClickFeedbackDemo({
+  frame,
+  frames,
+}: HelperDemoProps): ReactNode {
   const isDown = downAt(frame, PRESS_CLICKS);
   const fill = mixToken(Number(isDown), "var(--brand)", "var(--demo-accent)");
   return (
@@ -132,7 +143,11 @@ export function ClickFeedbackDemo({ frame, frames }: HelperDemoProps) {
         className={clsx(css.button, css.absolute, css.pressTarget)}
         style={{
           background: fill,
-          transform: `scale(${Math.min(...PRESS_CLICKS.map((at) => press(frame, at)))})`,
+          transform: `scale(${Math.min(
+            ...PRESS_CLICKS.map((at) => {
+              return press(frame, at);
+            }),
+          )})`,
         }}
       >
         Run query
@@ -160,29 +175,36 @@ const SAMPLE_NAMES = ["far", "middle", "near"] as const;
 const INSET_SCALE = 12;
 
 /** A fast pointer with its trailing shutter samples drawn enlarged. */
-export function CursorShutterDemo({ frame, frames }: HelperDemoProps) {
+export function CursorShutterDemo({
+  frame,
+  frames,
+}: HelperDemoProps): ReactNode {
   const samples = cursorShutter(frame, FAST_PATH);
   return (
     <HelperDemoFrame
       frame={frame}
       frames={frames}
       label="cursorShutter(frame, path)"
-      readouts={samples.map((sample, index) => ({
-        name: `sample ${index}`,
-        value: `${formatReadout(Math.hypot(sample.x, sample.y), 1)}px · ${sample.opacity}`,
-      }))}
+      readouts={samples.map((sample, index) => {
+        return {
+          name: `sample ${index}`,
+          value: `${formatReadout(Math.hypot(sample.x, sample.y), 1)}px · ${sample.opacity}`,
+        };
+      })}
     >
       <div className={css.inset}>
-        {samples.map((sample, index) => (
-          <span
-            key={SAMPLE_NAMES[index]}
-            className={css.insetSample}
-            style={{
-              transform: `translate(${(sample.x * INSET_SCALE).toFixed(1)}px, ${(sample.y * INSET_SCALE).toFixed(1)}px)`,
-              opacity: sample.opacity > 0 ? 0.6 : 0,
-            }}
-          />
-        ))}
+        {samples.map((sample, index) => {
+          return (
+            <span
+              key={SAMPLE_NAMES[index]}
+              className={css.insetSample}
+              style={{
+                transform: `translate(${(sample.x * INSET_SCALE).toFixed(1)}px, ${(sample.y * INSET_SCALE).toFixed(1)}px)`,
+                opacity: sample.opacity > 0 ? 0.6 : 0,
+              }}
+            />
+          );
+        })}
         <span className={css.insetCenter} />
         <span className={css.insetLabel}>{`× ${INSET_SCALE}`}</span>
       </div>

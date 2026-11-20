@@ -2,7 +2,9 @@ import { readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { getProductRootFromProducerRoot } from "./productSourceHelpers";
 
-/** The producer's env file in the workspace root, next to every other env file. */
+/**
+ * The producer's env file in the workspace root, next to every other env file.
+ */
 export const ROOT_ENV_FILENAME = ".env.video-producer.local";
 
 function _readOptionalFile(filename: string): Buffer | undefined {

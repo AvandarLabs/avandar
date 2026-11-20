@@ -14,7 +14,9 @@ import {
 /** A temporary capture root with one fixture CSV. */
 async function _createCaptureRoot(t: TestContext): Promise<string> {
   const root = await mkdtemp(join(tmpdir(), "capture-run-"));
-  t.after(() => rm(root, { recursive: true, force: true }));
+  t.after(() => {
+    return rm(root, { recursive: true, force: true });
+  });
   await mkdir(join(root, "demo-data"));
   await writeFile(join(root, "demo-data", "cases.csv"), "id\n1\n");
   return root;
@@ -35,7 +37,12 @@ test("runner keeps auth in memory, records after login, logs actions, finalizes 
     },
     flowMap: {
       import: async (ctx) => {
-        assert.equal(await ctx.step("read-result", async () => 42), 42);
+        assert.equal(
+          await ctx.step("read-result", async () => {
+            return 42;
+          }),
+          42,
+        );
         await ctx.checkpoint("ready", { text: true });
         await ctx.recordResource({
           kind: "dataset",
@@ -50,7 +57,9 @@ test("runner keeps auth in memory, records after login, logs actions, finalizes 
   assert.ok(typeof storageState === "object" && storageState !== null);
   assert.equal(storageState.cookies[0].value, "never-persist-this");
   assert.ok(
-    contexts.every((context) => context.options.serviceWorkers === "block"),
+    contexts.every((context) => {
+      return context.options.serviceWorkers === "block";
+    }),
   );
   assert.equal(events.includes("browser-close"), false);
   assert.ok(events.includes("fonts-ready") && events.includes("settle-600"));
@@ -109,11 +118,12 @@ test("feedback widget is fulfilled locally in both contexts and logged without i
   assert.deepEqual(result.manifest.networkPolicy.blockedRequests, []);
   assert.equal(result.manifest.networkPolicy.suppressedRequests.length, 2);
   assert.ok(
-    result.manifest.networkPolicy.suppressedRequests.every(
-      (request) =>
+    result.manifest.networkPolicy.suppressedRequests.every((request) => {
+      return (
         request.sourceUrl === endpoint &&
-        request.reason === "nonessential-feedback-widget",
-    ),
+        request.reason === "nonessential-feedback-widget"
+      );
+    }),
   );
   assert.equal(
     result.manifest.networkPolicy.suppressedRequests[0].videoAtMs,

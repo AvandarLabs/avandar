@@ -52,10 +52,16 @@ test("a rough bar edge stays within its depth and repeats for the same row", () 
   assert.equal(clip, getRoughEdgeClipPath(4, 8));
   assert.notEqual(clip, getRoughEdgeClipPath(5, 8));
   const offsets = [...clip.matchAll(/calc\(100% - ([\d.]+)px\)/g)].map(
-    (match) => Number(match[1]),
+    (match) => {
+      return Number(match[1]);
+    },
   );
   assert.ok(offsets.length > 2);
-  assert.ok(offsets.every((offset) => offset >= 0 && offset <= 8));
+  assert.ok(
+    offsets.every((offset) => {
+      return offset >= 0 && offset <= 8;
+    }),
+  );
 });
 
 test("a row value without display text keeps the panel's decimal places", () => {

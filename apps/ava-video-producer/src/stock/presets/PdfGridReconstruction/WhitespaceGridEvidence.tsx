@@ -20,31 +20,35 @@ export function WhitespaceGridEvidence({
         <g>
           {Array.from(
             { length: input.grid.columnLabels.length - 1 },
-            (_, index) => (
+            (_, index) => {
+              return (
+                <rect
+                  key={`v${index}`}
+                  data-whitespace-corridor={`v${index}`}
+                  x={48 + (index + 1) * width}
+                  y={210}
+                  width={8}
+                  height={height * progress}
+                  fill={STOCK.orange}
+                  fillOpacity={0.25}
+                />
+              );
+            },
+          )}
+          {Array.from({ length: input.grid.rows.length }, (_, index) => {
+            return (
               <rect
-                key={`v${index}`}
-                data-whitespace-corridor={`v${index}`}
-                x={48 + (index + 1) * width}
-                y={210}
-                width={8}
-                height={height * progress}
+                key={`h${index}`}
+                data-whitespace-corridor={`h${index}`}
+                x={52}
+                y={286 + index * 64}
+                width={400 * progress}
+                height={8}
                 fill={STOCK.orange}
                 fillOpacity={0.25}
               />
-            ),
-          )}
-          {Array.from({ length: input.grid.rows.length }, (_, index) => (
-            <rect
-              key={`h${index}`}
-              data-whitespace-corridor={`h${index}`}
-              x={52}
-              y={286 + index * 64}
-              width={400 * progress}
-              height={8}
-              fill={STOCK.orange}
-              fillOpacity={0.25}
-            />
-          ))}
+            );
+          })}
         </g>
       ) : undefined}
     </g>

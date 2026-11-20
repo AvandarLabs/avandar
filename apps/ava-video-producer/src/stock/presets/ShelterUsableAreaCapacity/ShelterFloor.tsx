@@ -22,15 +22,17 @@ export function ShelterFloor({
           strokeWidth={2}
         />
       ) : undefined}
-      {input.floorTiles.map((tile) => (
-        <ShelterTile
-          key={tile.id}
-          input={input}
-          tile={tile}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {input.floorTiles.map((tile) => {
+        return (
+          <ShelterTile
+            key={tile.id}
+            input={input}
+            tile={tile}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

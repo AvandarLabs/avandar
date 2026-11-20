@@ -71,10 +71,16 @@ function _getVisibleTexts({
   input,
   frame,
 }: Readonly<{ input: Input; frame: number }>) {
-  const total = input.zones.reduce((sum, zone) => sum + zone.areaM2, 0);
+  const total = input.zones.reduce((sum, zone) => {
+    return sum + zone.areaM2;
+  }, 0);
   const shaded =
-    input.zones.reduce((sum, zone) => sum + zone.existingShadeM2, 0) +
-    input.installations.reduce((sum, item) => sum + item.addedShadeM2, 0);
+    input.zones.reduce((sum, zone) => {
+      return sum + zone.existingShadeM2;
+    }, 0) +
+    input.installations.reduce((sum, item) => {
+      return sum + item.addedShadeM2;
+    }, 0);
   return [
     input.copy.map,
     input.referenceCondition,
@@ -122,7 +128,9 @@ test("concentrated installations tile their actual zone without covering unchang
   fixtures.forEach(({ input }) => {
     Array.from(
       { length: Math.max(0, Math.floor((120 - 24) / 0.5) + 1) },
-      (_, sampleIndex) => 24 + sampleIndex * 0.5,
+      (_, sampleIndex) => {
+        return 24 + sampleIndex * 0.5;
+      },
     ).forEach((frame) => {
       const markup = _render({ frame: frame, input: input });
       input.zones.forEach((zone, index) => {
@@ -137,8 +145,12 @@ test("concentrated installations tile their actual zone without covering unchang
           600,
         );
         const additions = input.installations
-          .map((item, itemIndex) => ({ item, itemIndex }))
-          .filter(({ item }) => item.zoneId === zone.id);
+          .map((item, itemIndex) => {
+            return { item, itemIndex };
+          })
+          .filter(({ item }) => {
+            return item.zoneId === zone.id;
+          });
         let right = 285 + (zone.existingShadeM2 / zone.areaM2) * 600;
         additions.forEach(({ itemIndex }) => {
           const footprint = markup.match(
@@ -181,7 +193,9 @@ test("concentrated installations tile their actual zone without covering unchang
         }),
         name: "data-denominator",
       }),
-      input.zones.reduce((sum, zone) => sum + zone.areaM2, 0),
+      input.zones.reduce((sum, zone) => {
+        return sum + zone.areaM2;
+      }, 0),
     );
   });
 });

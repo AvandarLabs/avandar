@@ -65,7 +65,9 @@ export const inputSchema = z
     if (
       bookIds.length !== input.books.length ||
       new Set(bookIds).size !== bookIds.length ||
-      bookIds.some((id) => !input.books.some(propEq("id", id)))
+      bookIds.some((id) => {
+        return !input.books.some(propEq("id", id));
+      })
     ) {
       context.addIssue({
         code: "custom",
@@ -77,7 +79,9 @@ export const inputSchema = z
     if (
       learnerIds.length !== input.learners.length ||
       new Set(learnerIds).size !== learnerIds.length ||
-      learnerIds.some((id) => !input.learners.some(propEq("id", id)))
+      learnerIds.some((id) => {
+        return !input.learners.some(propEq("id", id));
+      })
     ) {
       context.addIssue({
         code: "custom",

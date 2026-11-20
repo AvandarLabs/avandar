@@ -5,8 +5,10 @@ import { measuredPath } from "./choreography";
 import targets from "./cursor-targets.json";
 import { AvandarStage } from "./generated/product";
 import type { ProductSceneRenderer } from "../storyboard/StoryFilm/StoryFilm";
+import type { ReactNode } from "react";
 
-// End-of-typing holds from the adapters' typed() intervals, in full feature frames.
+// End-of-typing holds from the adapters' typed() intervals, in full feature
+// frames.
 const TEXT_HOLDS: Record<string, number> = {
   "import-name": 166,
   "import-description": 312,
@@ -16,6 +18,9 @@ const TEXT_HOLDS: Record<string, number> = {
   "mapping-manual-name": 442,
 };
 
+/** The props every product scene renderer receives from `ShotView`. */
+type AvandarSceneProps = Parameters<ProductSceneRenderer>[0];
+
 type MeasuredBeat = {
   frame: number;
   target: string;
@@ -24,43 +29,52 @@ type MeasuredBeat = {
   y: number;
 };
 
-/** Pointer paths use measured rendered targets, with a hold through each click. */
-export const AvandarScene: ProductSceneRenderer = ({
+/**
+ * Pointer paths use measured rendered targets, with a hold through each click.
+ */
+export function AvandarScene({
   feature,
   frame,
   fromFrame = 0,
   mode = "full",
   width,
   height,
-}) => {
+}: AvandarSceneProps): ReactNode {
   const productFrame = frame + fromFrame;
   const offset = mode === "query" ? 290 : mode === "chart" ? 570 : 0;
   const beats = (
     (targets as Partial<Record<string, MeasuredBeat[]>>)[feature] ?? []
   )
-    .filter(
-      (b) =>
+    .filter((b) => {
+      return (
         mode === "full" ||
         (mode === "filter" && b.frame < 300) ||
         (mode === "query" && b.frame >= 300 && b.frame < 620) ||
-        (mode === "chart" && b.frame >= 620),
-    )
-    .map((b) => ({
-      ...b,
-      frame: b.frame - offset,
-      holdUntil: (TEXT_HOLDS[b.target] ?? 0) - offset,
-      cursor: (b.target in TEXT_HOLDS
-        ? "text"
-        : b.action === "click"
-          ? "pointer"
-          : "default") as CursorKind,
-    }));
+        (mode === "chart" && b.frame >= 620)
+      );
+    })
+    .map((b) => {
+      return {
+        ...b,
+        frame: b.frame - offset,
+        holdUntil: (TEXT_HOLDS[b.target] ?? 0) - offset,
+        cursor: (b.target in TEXT_HOLDS
+          ? "text"
+          : b.action === "click"
+            ? "pointer"
+            : "default") as CursorKind,
+      };
+    });
   const keys = beats.length
     ? measuredPath(beats, width, height)
     : [{ at: 0, x: 0, y: 0 }];
   const clicks = beats
-    .filter((b) => b.action === "click" || b.action === "select")
-    .map((b) => b.frame);
+    .filter((b) => {
+      return b.action === "click" || b.action === "select";
+    })
+    .map((b) => {
+      return b.frame;
+    });
   const cursor = cursorOnTarget(productFrame, keys, beats);
   return (
     <div
@@ -98,4 +112,4 @@ export const AvandarScene: ProductSceneRenderer = ({
       </div>
     </div>
   );
-};
+}

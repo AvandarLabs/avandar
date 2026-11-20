@@ -46,42 +46,47 @@ async function _statusOf(promise: Promise<unknown>): Promise<number> {
   return 200;
 }
 
-test("listing marks built-in themes", () =>
-  _withStore(async (store) => {
+test("listing marks built-in themes", () => {
+  return _withStore(async (store) => {
     assert.deepEqual(await store.list(), [
       { id: "classic", label: "Classic", builtIn: true },
     ]);
-  }));
+  });
+});
 
-test("a created theme reads back with the same hash", () =>
-  _withStore(async (store) => {
+test("a created theme reads back with the same hash", () => {
+  return _withStore(async (store) => {
     const created = await store.create(WARM);
     assert.equal((await store.read("warm")).hash, created.hash);
-  }));
+  });
+});
 
-test("creating a theme whose id exists is a conflict", () =>
-  _withStore(async (store) => {
+test("creating a theme whose id exists is a conflict", () => {
+  return _withStore(async (store) => {
     await store.create(WARM);
     assert.equal(await _statusOf(store.create(WARM)), 409);
-  }));
+  });
+});
 
-test("saving a built-in theme is refused", () =>
-  _withStore(async (store) => {
+test("saving a built-in theme is refused", () => {
+  return _withStore(async (store) => {
     const classic = await store.read("classic");
     assert.equal(
       await _statusOf(store.save("classic", classic.document, classic.hash)),
       403,
     );
-  }));
+  });
+});
 
-test("saving with a stale hash is a conflict", () =>
-  _withStore(async (store) => {
+test("saving with a stale hash is a conflict", () => {
+  return _withStore(async (store) => {
     await store.create(WARM);
     assert.equal(await _statusOf(store.save("warm", WARM, "stale")), 409);
-  }));
+  });
+});
 
-test("saving with the current hash replaces the file", () =>
-  _withStore(async (store) => {
+test("saving with the current hash replaces the file", () => {
+  return _withStore(async (store) => {
     const created = await store.create(WARM);
     const saved = await store.save(
       "warm",
@@ -90,120 +95,136 @@ test("saving with the current hash replaces the file", () =>
     );
     assert.notEqual(saved.hash, created.hash);
     assert.equal((await store.read("warm")).document.label, "Warmer");
-  }));
+  });
+});
 
-test("a theme with a broken reference is rejected with its token path", () =>
-  _withStore(async (store) => {
+test("a theme with a broken reference is rejected with its token path", () => {
+  return _withStore(async (store) => {
     const broken = {
       ...WARM,
       other: {
         video: { semantic: { color: { accent: "$atomic.swatch.nope" } } },
       },
     };
-    await assert.rejects(
-      store.create(broken),
-      (error: unknown) =>
+    await assert.rejects(store.create(broken), (error: unknown) => {
+      return (
         error instanceof ThemeStoreError &&
         error.status === 400 &&
-        error.issues.some((issue) => issue.path === "color.accent"),
-    );
-  }));
+        error.issues.some((issue) => {
+          return issue.path === "color.accent";
+        })
+      );
+    });
+  });
+});
 
-test("a theme over the size cap is rejected", () =>
-  _withStore(async (store) => {
+test("a theme over the size cap is rejected", () => {
+  return _withStore(async (store) => {
     const huge = {
       ...WARM,
       label: "Huge",
       overrides: Object.fromEntries(
-        Array.from({ length: 4000 }, (_, index) => [
-          `item-${index}`,
-          {
-            other: {
-              video: {
-                atomic: {
-                  swatch: {
-                    ground: "#201510",
-                    surface: "#201510",
-                    line: "#201510",
+        Array.from({ length: 4000 }, (_, index) => {
+          return [
+            `item-${index}`,
+            {
+              other: {
+                video: {
+                  atomic: {
+                    swatch: {
+                      ground: "#201510",
+                      surface: "#201510",
+                      line: "#201510",
+                    },
                   },
                 },
               },
             },
-          },
-        ]),
+          ];
+        }),
       ),
     };
     assert.equal(await _statusOf(store.create(huge)), 413);
-  }));
+  });
+});
 
-test("writes leave no temporary files behind", () =>
-  _withStore(async (store, directory) => {
+test("writes leave no temporary files behind", () => {
+  return _withStore(async (store, directory) => {
     await store.create(WARM);
     assert.deepEqual((await fs.readdir(directory)).sort(), [
       "classic.theme.json",
       "warm.theme.json",
     ]);
-  }));
+  });
+});
 
-test("theme ids must be slugs", () =>
-  _withStore(async (store) => {
+test("theme ids must be slugs", () => {
+  return _withStore(async (store) => {
     assert.equal(
       await _statusOf(store.create({ ...WARM, id: "Warm Theme" })),
       400,
     );
-  }));
+  });
+});
 
-test("the reserved draft theme id cannot be created", () =>
-  _withStore(async (store) => {
+test("the reserved draft theme id cannot be created", () => {
+  return _withStore(async (store) => {
     assert.equal(
       await _statusOf(store.create({ ...WARM, id: "unsaved-draft" })),
       400,
     );
-  }));
+  });
+});
 
-test("the reserved draft theme id cannot be saved", () =>
-  _withStore(async (store) => {
+test("the reserved draft theme id cannot be saved", () => {
+  return _withStore(async (store) => {
     assert.equal(
       await _statusOf(
         store.save("unsaved-draft", { ...WARM, id: "unsaved-draft" }, "any"),
       ),
       400,
     );
-  }));
+  });
+});
 
-test("a hand-placed reserved draft theme file is neither listed nor read", () =>
-  _withStore(async (store, directory) => {
+test("a hand-placed reserved draft theme file is neither listed nor read", () => {
+  return _withStore(async (store, directory) => {
     await fs.writeFile(
       path.join(directory, "unsaved-draft.theme.json"),
       JSON.stringify({ ...WARM, id: "unsaved-draft" }),
     );
     assert.deepEqual(
-      (await store.list()).map((summary) => summary.id),
+      (await store.list()).map((summary) => {
+        return summary.id;
+      }),
       ["classic"],
     );
     assert.equal(await _statusOf(store.read("unsaved-draft")), 404);
-  }));
+  });
+});
 
-test("a theme whose id differs from its file name is rejected", () =>
-  _withStore(async (store, directory) => {
+test("a theme whose id differs from its file name is rejected", () => {
+  return _withStore(async (store, directory) => {
     await fs.writeFile(
       path.join(directory, "foo.theme.json"),
       JSON.stringify({ ...WARM, id: "warm" }),
     );
     assert.equal(await _statusOf(store.read("foo")), 400);
-  }));
+  });
+});
 
-test("the reserved draft id inside another file name is rejected", () =>
-  _withStore(async (store, directory) => {
+test("the reserved draft id inside another file name is rejected", () => {
+  return _withStore(async (store, directory) => {
     await fs.writeFile(
       path.join(directory, "foo.theme.json"),
       JSON.stringify({ ...WARM, id: "unsaved-draft" }),
     );
     assert.equal(await _statusOf(store.read("foo")), 400);
-  }));
+  });
+});
 
-test("listing skips rejected files and keeps every valid theme", () =>
-  _withStore(async (store, directory) => {
+test("listing skips rejected files and keeps every valid theme", () => {
+  return _withStore(async (store, directory) => {
     await store.create(WARM);
     await fs.writeFile(
       path.join(directory, "foo.theme.json"),
@@ -214,10 +235,13 @@ test("listing skips rejected files and keeps every valid theme", () =>
       JSON.stringify({ ...WARM, id: "warm" }),
     );
     assert.deepEqual(
-      (await store.list()).map((summary) => summary.id),
+      (await store.list()).map((summary) => {
+        return summary.id;
+      }),
       ["classic", "warm"],
     );
-  }));
+  });
+});
 
 async function _settledStatuses(
   promises: ReadonlyArray<Promise<unknown>>,
@@ -225,8 +249,8 @@ async function _settledStatuses(
   return (await Promise.all(promises.map(_statusOf))).sort();
 }
 
-test("two creates of the same id at once leave one winner and one conflict", () =>
-  _withStore(async (store, directory) => {
+test("two creates of the same id at once leave one winner and one conflict", () => {
+  return _withStore(async (store, directory) => {
     const statuses = await _settledStatuses([
       store.create(WARM),
       store.create({ ...WARM, label: "Warm again" }),
@@ -236,20 +260,22 @@ test("two creates of the same id at once leave one winner and one conflict", () 
       "classic.theme.json",
       "warm.theme.json",
     ]);
-  }));
+  });
+});
 
-test("two saves with the same hash at once leave one winner and one conflict", () =>
-  _withStore(async (store) => {
+test("two saves with the same hash at once leave one winner and one conflict", () => {
+  return _withStore(async (store) => {
     const created = await store.create(WARM);
     const statuses = await _settledStatuses([
       store.save("warm", { ...WARM, label: "First" }, created.hash),
       store.save("warm", { ...WARM, label: "Second" }, created.hash),
     ]);
     assert.deepEqual(statuses, [200, 409]);
-  }));
+  });
+});
 
-test("a refused create leaves the existing file as it was", () =>
-  _withStore(async (store, directory) => {
+test("a refused create leaves the existing file as it was", () => {
+  return _withStore(async (store, directory) => {
     await store.create(WARM);
     const before = await fs.readFile(
       path.join(directory, "warm.theme.json"),
@@ -263,20 +289,23 @@ test("a refused create leaves the existing file as it was", () =>
       await fs.readFile(path.join(directory, "warm.theme.json"), "utf8"),
       before,
     );
-  }));
+  });
+});
 
-test("a failed write does not block the next write to the same theme", () =>
-  _withStore(async (store) => {
+test("a failed write does not block the next write to the same theme", () => {
+  return _withStore(async (store) => {
     const created = await store.create(WARM);
     assert.equal(await _statusOf(store.save("warm", WARM, "stale")), 409);
     assert.equal(await _statusOf(store.save("warm", WARM, created.hash)), 200);
-  }));
+  });
+});
 
-test("writes to different themes do not wait for each other", () =>
-  _withStore(async (store) => {
+test("writes to different themes do not wait for each other", () => {
+  return _withStore(async (store) => {
     const statuses = await _settledStatuses([
       store.create(WARM),
       store.create({ ...WARM, id: "cool", label: "Cool" }),
     ]);
     assert.deepEqual(statuses, [200, 200]);
-  }));
+  });
+});

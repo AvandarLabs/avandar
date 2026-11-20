@@ -1,9 +1,10 @@
 import { Select, type SelectProps } from "@mantine/core";
 import { useState } from "react";
 import css from "./AtlasSelect.module.css";
+import type { ReactNode } from "react";
 
 /** Compact Mantine select whose menu stays inside the native preview dialog. */
-export function AtlasSelect(props: SelectProps) {
+export function AtlasSelect(props: SelectProps): ReactNode {
   const [opened, setOpened] = useState(false);
   const closeDropdown = () => {
     setOpened(false);
@@ -39,7 +40,9 @@ export function AtlasSelect(props: SelectProps) {
         }}
         {...props}
         dropdownOpened={opened}
-        onDropdownOpen={() => setOpened(true)}
+        onDropdownOpen={() => {
+          return setOpened(true);
+        }}
         onDropdownClose={closeDropdown}
       />
     </div>

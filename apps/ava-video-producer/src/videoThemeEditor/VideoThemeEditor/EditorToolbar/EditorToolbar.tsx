@@ -3,6 +3,7 @@ import css from "./EditorToolbar.module.css";
 import { ScopeSwitch } from "./ScopeSwitch/ScopeSwitch";
 import { UsageFilter } from "./UsageFilter/UsageFilter";
 import type { ThemeEditScope } from "../../themeDraft/themeDraft";
+import type { ReactNode } from "react";
 
 /** Which tier tab is open. */
 export type EditorTier = "component" | "semantic" | "atomic";
@@ -42,7 +43,7 @@ export function EditorToolbar({
   overrideCount,
   hasUsage,
   onScopeChange,
-}: Props) {
+}: Props): ReactNode {
   return (
     <div className={css.editorToolbar}>
       {item ? (
@@ -59,9 +60,12 @@ export function EditorToolbar({
         aria-label="Search settings"
         placeholder="Search by name, path, or description"
         value={filters.query}
-        onChange={(event) =>
-          onFiltersChange({ ...filters, query: event.currentTarget.value })
-        }
+        onChange={(event) => {
+          return onFiltersChange({
+            ...filters,
+            query: event.currentTarget.value,
+          });
+        }}
       />
       {hasUsage ? (
         <UsageFilter filters={filters} onFiltersChange={onFiltersChange} />

@@ -40,30 +40,34 @@ export function CachedRelation({
         stroke={color.line}
         strokeWidth={style.tableStrokeWidth}
       />
-      {Array.from({ length: scene.rowCount }, (_, rowIndex) => (
-        <StockRect
-          key={rowIndex}
-          data-cache-row={rowIndex}
-          x={60}
-          y={334 + rowIndex * 44}
-          width={scene.width}
-          height={44}
-          fill="none"
-          stroke={color.line}
-          strokeWidth={style.gridStrokeWidth}
-        />
-      ))}
-      {columns.map((column, index) => (
-        <CacheColumn
-          key={column.id}
-          column={column}
-          index={index}
-          rowCount={scene.rowCount}
-          isAdded={!input.cachedColumnIds.includes(column.id)}
-          growth={scene.growth}
-          accent={accent}
-        />
-      ))}
+      {Array.from({ length: scene.rowCount }, (_, rowIndex) => {
+        return (
+          <StockRect
+            key={rowIndex}
+            data-cache-row={rowIndex}
+            x={60}
+            y={334 + rowIndex * 44}
+            width={scene.width}
+            height={44}
+            fill="none"
+            stroke={color.line}
+            strokeWidth={style.gridStrokeWidth}
+          />
+        );
+      })}
+      {columns.map((column, index) => {
+        return (
+          <CacheColumn
+            key={column.id}
+            column={column}
+            index={index}
+            rowCount={scene.rowCount}
+            isAdded={!input.cachedColumnIds.includes(column.id)}
+            growth={scene.growth}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

@@ -19,7 +19,9 @@ export function getQueueItemScheduleFromInput({
 }: Readonly<{ input: Input; index: number }>): GetQueueItemScheduleResult {
   const initialSlots = input.serviceSlots.filter(prop("initiallyOpen"));
   const expandedSlots = [
-    ...input.serviceSlots.filter((slot) => !slot.initiallyOpen),
+    ...input.serviceSlots.filter((slot) => {
+      return !slot.initiallyOpen;
+    }),
     ...initialSlots,
   ];
   const isInitial = index < initialSlots.length;

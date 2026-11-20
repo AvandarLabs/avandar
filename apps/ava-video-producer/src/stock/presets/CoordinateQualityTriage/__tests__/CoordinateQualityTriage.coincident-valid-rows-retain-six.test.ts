@@ -19,11 +19,13 @@ test("coincident valid rows retain six visible source keys and exact plotted-coo
       const input = inputSchema.parse({
         ...DEFAULT_INPUT,
         showValues,
-        rows: Array.from({ length: 6 }, (_, index) => ({
-          id: index ? `row ${index}` : "",
-          latitude,
-          longitude,
-        })),
+        rows: Array.from({ length: 6 }, (_, index) => {
+          return {
+            id: index ? `row ${index}` : "",
+            latitude,
+            longitude,
+          };
+        }),
       });
       const markup = _render({ frame: 150, input: input });
       const pointX = 50 + ((longitude + 180) / 360) * 340;
@@ -47,10 +49,9 @@ test("coincident valid rows retain six visible source keys and exact plotted-coo
           getSvgAttributeMatchesFromMarkup({
             markup: markup,
             attribute: "data-row-key",
-          }).tags.map(
-            (tag) =>
-              `${SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "x" })},${SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "y" })}`,
-          ),
+          }).tags.map((tag) => {
+            return `${SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "x" })},${SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "y" })}`;
+          }),
         ).size,
         6,
       );
@@ -65,12 +66,13 @@ test("coincident valid rows retain six visible source keys and exact plotted-coo
       });
       const paint =
         SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup(markup);
-      const keys = paint.filter(
-        (item) =>
+      const keys = paint.filter((item) => {
+        return (
           item.kind === "text" &&
           item.ariaLabel !== undefined &&
-          /^[1-6]$/.test(item.ariaLabel),
-      );
+          /^[1-6]$/.test(item.ariaLabel)
+        );
+      });
       assert.equal(keys.length, 6);
       SvgPaintAssertions.assertPaintClearance({ texts: keys, rectangles: [] });
     });
@@ -81,11 +83,13 @@ test("arrived plotted copies yield to fixed coordinates while every persistent s
   const input = {
     ...DEFAULT_INPUT,
     showValues: false,
-    rows: Array.from({ length: 6 }, (_, index) => ({
-      id: `key ${index}`,
-      latitude: 20,
-      longitude: 40,
-    })),
+    rows: Array.from({ length: 6 }, (_, index) => {
+      return {
+        id: `key ${index}`,
+        latitude: 20,
+        longitude: 40,
+      };
+    }),
   };
   [true, false].forEach((showValues) => {
     const enabled = { ...input, showValues };
@@ -96,32 +100,32 @@ test("arrived plotted copies yield to fixed coordinates while every persistent s
         attribute: "data-row-key",
       });
       assert.equal(keys.tags.length, 6);
-      keys.tags.forEach((tag, index) =>
-        assert.equal(
+      keys.tags.forEach((tag, index) => {
+        return assert.equal(
           SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "y" }),
           136 + index * 69,
-        ),
-      );
+        );
+      });
       if (frame >= 111) {
         getSvgAttributeMatchesFromMarkup({
           markup,
           attribute: "data-moving-row-key",
-        }).tags.forEach((tag, index) =>
-          assert.equal(
+        }).tags.forEach((tag, index) => {
+          return assert.equal(
             SvgAttributes.getNumberFromMarkup({
               attributes: tag,
               name: "opacity",
             }),
             index ? 0 : 1,
-          ),
-        );
+          );
+        });
       }
       const paint =
         SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup(markup);
       SvgPaintAssertions.assertPaintClearance({
-        texts: paint.filter(
-          (item) => item.kind === "text" && item.ariaLabel !== undefined,
-        ),
+        texts: paint.filter((item) => {
+          return item.kind === "text" && item.ariaLabel !== undefined;
+        }),
         rectangles: [],
       });
     });
@@ -129,11 +133,13 @@ test("arrived plotted copies yield to fixed coordinates while every persistent s
 });
 
 test("separate coincident groups retain distinct plotted representatives and explicit source-key membership", () => {
-  const rows = Array.from({ length: 6 }, (_, index) => ({
-    id: `row ${index}`,
-    latitude: Math.floor(index / 2) * 20,
-    longitude: Math.floor(index / 2) * 30,
-  }));
+  const rows = Array.from({ length: 6 }, (_, index) => {
+    return {
+      id: `row ${index}`,
+      latitude: Math.floor(index / 2) * 20,
+      longitude: Math.floor(index / 2) * 30,
+    };
+  });
   [true, false].forEach((showValues) => {
     const markup = _render({
       frame: 150,
@@ -148,18 +154,20 @@ test("separate coincident groups retain distinct plotted representatives and exp
     );
     assert.deepEqual(
       SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup(markup)
-        .filter((item) => item.kind === "text" && item.left === 472)
+        .filter((item) => {
+          return item.kind === "text" && item.left === 472;
+        })
         .map(prop("text")),
       ["→1", "→1", "→3", "→3", "→5", "→5"],
     );
     getSvgAttributeMatchesFromMarkup({
       markup,
       attribute: "data-moving-row-key",
-    }).tags.forEach((tag, index) =>
-      assert.equal(
+    }).tags.forEach((tag, index) => {
+      return assert.equal(
         SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "opacity" }),
         index % 2 ? 0 : 1,
-      ),
-    );
+      );
+    });
   });
 });

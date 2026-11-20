@@ -46,15 +46,17 @@ test("the same tray preserves existing positions while only expand admits the co
 });
 
 test("complete fixture set includes minimum, dense and changed inputs before behavior", () => {
-  [DEFAULT_INPUT, MINIMUM_INPUT, DENSE_INPUT, CHANGED_INPUT].forEach((input) =>
-    assert.deepEqual(inputSchema.parse(input), input),
+  [DEFAULT_INPUT, MINIMUM_INPUT, DENSE_INPUT, CHANGED_INPUT].forEach(
+    (input) => {
+      return assert.deepEqual(inputSchema.parse(input), input);
+    },
   );
   assert.equal(fixtures.length, 4);
 });
 test("invalid structure and cross-field values are rejected", () => {
-  INVALID_INPUTS.forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  );
+  INVALID_INPUTS.forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
 });
 
 import { registerStockPresetAssertions } from "../../../../../tests/helpers/registerStockPresetAssertions";
@@ -105,16 +107,16 @@ test("partially revealed new slots stay inside the actually extended tray", () =
     const markup = _render({ frame: frame, input: DENSE_INPUT });
     const tray = markup.match(/data-capacity-tray="" d="M80 220 H([^ ]*)/)!;
     assert.ok(tray);
-    [...markup.matchAll(/<rect data-extra-slot[^>]*>/g)].forEach((slot) =>
-      assert.ok(
+    [...markup.matchAll(/<rect data-extra-slot[^>]*>/g)].forEach((slot) => {
+      return assert.ok(
         SvgAttributes.getNumberFromMarkup({ attributes: slot[0], name: "x" }) +
           SvgAttributes.getNumberFromMarkup({
             attributes: slot[0],
             name: "width",
           }) <=
           Number(tray[1]),
-      ),
-    );
+      );
+    });
   });
 });
 test("existing tabs remain at identical positions and only complete expansion seats requests", () => {
@@ -124,19 +126,23 @@ test("existing tabs remain at identical positions and only complete expansion se
     ),
   ]
     .slice(0, 6)
-    .map((match) => match[0]);
-  [50, 80, 100, 110, 124, 125, 150].forEach((frame) =>
-    assert.deepEqual(
+    .map((match) => {
+      return match[0];
+    });
+  [50, 80, 100, 110, 124, 125, 150].forEach((frame) => {
+    return assert.deepEqual(
       [
         ..._render({ frame: frame, input: DENSE_INPUT }).matchAll(
           /<rect data-resource-tab[^>]*>/g,
         ),
       ]
         .slice(0, 6)
-        .map((match) => match[0]),
+        .map((match) => {
+          return match[0];
+        }),
       before,
-    ),
-  );
+    );
+  });
   assert.equal(
     (
       _render({ frame: 124, input: DENSE_INPUT }).match(
@@ -182,14 +188,18 @@ import { getTextEnvelopesFromMarkup } from "../../SchemaColumnEvolution/getTextE
 test("full resource names remain inside moving tabs and clear framing captions", () => {
   const input = {
     ...DENSE_INPUT,
-    existingResources: DENSE_INPUT.existingResources.map((row) => ({
-      ...row,
-      label: "界 界界界界 界界界界界界界界界界界界界",
-    })),
-    requestedResources: DENSE_INPUT.requestedResources.map((row) => ({
-      ...row,
-      label: "界 界界界界 界界界界界界界界界界界界界",
-    })),
+    existingResources: DENSE_INPUT.existingResources.map((row) => {
+      return {
+        ...row,
+        label: "界 界界界界 界界界界界界界界界界界界界",
+      };
+    }),
+    requestedResources: DENSE_INPUT.requestedResources.map((row) => {
+      return {
+        ...row,
+        label: "界 界界界界 界界界界界界界界界界界界界",
+      };
+    }),
   };
   [50, 80, 100, 110, 124, 125, 150].forEach((frame) => {
     const markup = _render({ frame: frame, input: input });
@@ -204,7 +214,9 @@ test("full resource names remain inside moving tabs and clear framing captions",
         attributes: tab[0],
         name: "y",
       });
-      const name = texts.find((text) => text.x === x + 5 && text.y === y + 36)!;
+      const name = texts.find((text) => {
+        return text.x === x + 5 && text.y === y + 36;
+      })!;
       assert.ok(name.right <= x + 78);
       assert.ok(name.bottom <= y + 132);
       assert.ok(y > 216);
@@ -225,7 +237,9 @@ function _assertPendingCaptionClearance({
     propEq("label", input.copy.pending),
   )!;
   const tabs = [...markup.matchAll(/<rect data-resource-tab[^>]*>/g)].map(
-    (match) => match[0],
+    (match) => {
+      return match[0];
+    },
   );
   const firstRequest = tabs[input.existingResources.length];
   const requestX = SvgAttributes.getNumberFromMarkup({
@@ -261,17 +275,17 @@ function _assertPendingCaptionClearance({
 }
 
 test("pending caption identifies the moving request group and clears its seating path", () => {
-  [12.5, 36, 50, 80, 106, 110, 120, 124.99].forEach((frame) =>
-    _assertPendingCaptionClearance({ input: DEFAULT_INPUT, frame }),
-  );
+  [12.5, 36, 50, 80, 106, 110, 120, 124.99].forEach((frame) => {
+    return _assertPendingCaptionClearance({ input: DEFAULT_INPUT, frame });
+  });
   [MINIMUM_INPUT, DENSE_INPUT].forEach((input) => {
     const fullCaption = {
       ...input,
       copy: { ...input.copy, pending: "界".repeat(42) },
     };
-    [36, 110, 124].forEach((frame) =>
-      _assertPendingCaptionClearance({ input: fullCaption, frame }),
-    );
+    [36, 110, 124].forEach((frame) => {
+      return _assertPendingCaptionClearance({ input: fullCaption, frame });
+    });
   });
   assert.doesNotMatch(_render({ frame: 125 }), /data-pending-link/);
   assert.ok(
@@ -290,8 +304,8 @@ test("hidden resource names retain an associated pending caption when capacity i
       (markup.match(/data-request-state="pending"/g) ?? []).length,
       input.requestedResources.length,
     );
-    input.requestedResources.forEach((resource) =>
-      assert.ok(!markup.includes(`aria-label="${resource.label}"`)),
-    );
+    input.requestedResources.forEach((resource) => {
+      return assert.ok(!markup.includes(`aria-label="${resource.label}"`));
+    });
   });
 });

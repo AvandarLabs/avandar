@@ -1,7 +1,9 @@
 import { COMMANDS, HELP } from "./video.constants";
 import type { Command, Options } from "./video.types";
 
-/** Parse the intentionally small CLI without shell evaluation or implicit flags. */
+/**
+ * Parse the intentionally small CLI without shell evaluation or implicit flags.
+ */
 export function parseArgs(argv: string[]): Options {
   const [command, filename, ...rest] = argv;
   if (!COMMANDS.includes(command as Command) || !filename)

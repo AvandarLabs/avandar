@@ -34,15 +34,17 @@ export function RestoreImpression({
         strokeWidth={2}
         strokeDasharray="8 5"
       />
-      {revision.content.map((line, lineIndex) => (
-        <path
-          key={lineIndex}
-          d={`M${mix(progress, 60 + index * 225, 294)} ${mix(progress, 433 + lineIndex * 43, 174 + lineIndex * 53)} h${Math.min(150, 20 + line.length * 4)}`}
-          stroke={accent}
-          strokeWidth={3}
-          strokeOpacity={0.7}
-        />
-      ))}
+      {revision.content.map((line, lineIndex) => {
+        return (
+          <path
+            key={lineIndex}
+            d={`M${mix(progress, 60 + index * 225, 294)} ${mix(progress, 433 + lineIndex * 43, 174 + lineIndex * 53)} h${Math.min(150, 20 + line.length * 4)}`}
+            stroke={accent}
+            strokeWidth={3}
+            strokeOpacity={0.7}
+          />
+        );
+      })}
     </g>
   );
 }

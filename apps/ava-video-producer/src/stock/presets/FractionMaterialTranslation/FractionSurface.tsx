@@ -39,14 +39,16 @@ export function FractionSurface({
           accent={accent}
         />
         {frame >= 88 && frame < 126
-          ? Array.from({ length: input.fraction.numerator }, (_, part) => (
-              <path
-                key={part}
-                d={`M${-96 + ((part + 0.5) * 192) / input.fraction.denominator} 30 V46`}
-                stroke={accent}
-                strokeWidth={1}
-              />
-            ))
+          ? Array.from({ length: input.fraction.numerator }, (_, part) => {
+              return (
+                <path
+                  key={part}
+                  d={`M${-96 + ((part + 0.5) * 192) / input.fraction.denominator} 30 V46`}
+                  stroke={accent}
+                  strokeWidth={1}
+                />
+              );
+            })
           : undefined}
       </g>
     </>

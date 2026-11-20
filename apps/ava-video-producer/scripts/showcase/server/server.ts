@@ -32,9 +32,9 @@ let generation = 0;
 async function _publish(): Promise<void> {
   await buildStockContracts(appRoot);
   generation += 1;
-  clients.forEach((client) =>
-    client.write(`data: ${session}:${generation}\n\n`),
-  );
+  clients.forEach((client) => {
+    return client.write(`data: ${session}:${generation}\n\n`);
+  });
 }
 const site = await watchShowcase(_publish);
 const showcasePaths = makeShowcasePathsFromAppRoot(appRoot);
@@ -45,9 +45,15 @@ const plansWatcher = watch(
   () => {
     clearTimeout(planTimer);
     planTimer = setTimeout(() => {
-      void Promise.all(Object.keys(PLANS).map((id) => ShowcaseFilms.load(id)))
+      void Promise.all(
+        Object.keys(PLANS).map((id) => {
+          return ShowcaseFilms.load(id);
+        }),
+      )
         .then(_publish)
-        .catch((error) => console.error("Storyboard not ready:", error));
+        .catch((error) => {
+          return console.error("Storyboard not ready:", error);
+        });
     }, 200);
   },
 );
@@ -65,7 +71,9 @@ const themesWatcher = watch(
     }
     clearTimeout(themeTimer);
     themeTimer = setTimeout(() => {
-      _publish().catch((error) => console.error("Theme reload failed:", error));
+      _publish().catch((error) => {
+        return console.error("Theme reload failed:", error);
+      });
     }, 200);
   },
 );
@@ -113,7 +121,9 @@ function _onEventsRequest(req: IncomingMessage, res: ServerResponse): void {
   });
   res.write(`data: ${session}:${generation}\n\n`);
   clients.add(res);
-  req.on("close", () => clients.delete(res));
+  req.on("close", () => {
+    return clients.delete(res);
+  });
 }
 
 /** Routes one request to the API, the event stream, or a static file. */
@@ -137,7 +147,14 @@ async function _onRequest(
       req,
       res,
       pathname,
-      context: { themeStore, jobs, media, getGeneration: () => generation },
+      context: {
+        themeStore,
+        jobs,
+        media,
+        getGeneration: () => {
+          return generation;
+        },
+      },
     });
     return;
   }
@@ -168,9 +185,11 @@ const server = createServer(async (req, res) => {
     res.end();
   }
 });
-server.listen(Number(process.env.PORT ?? 4173), "127.0.0.1", () =>
-  console.log(`Live showcase: http://localhost:${process.env.PORT ?? 4173}`),
-);
+server.listen(Number(process.env.PORT ?? 4173), "127.0.0.1", () => {
+  return console.log(
+    `Live showcase: http://localhost:${process.env.PORT ?? 4173}`,
+  );
+});
 server.on("error", (error: NodeJS.ErrnoException) => {
   if (error.code === "EADDRINUSE") {
     const port = Number(process.env.PORT ?? 4173);
@@ -186,11 +205,17 @@ server.on("error", (error: NodeJS.ErrnoException) => {
 async function _close(): Promise<void> {
   clearTimeout(planTimer);
   clearTimeout(themeTimer);
-  clients.forEach((client) => client.end());
+  clients.forEach((client) => {
+    return client.end();
+  });
   plansWatcher.close();
   themesWatcher.close();
   server.close();
   await site.dispose();
 }
-process.once("SIGINT", () => void _close());
-process.once("SIGTERM", () => void _close());
+process.once("SIGINT", () => {
+  return void _close();
+});
+process.once("SIGTERM", () => {
+  return void _close();
+});

@@ -17,12 +17,14 @@ export const ffprobe = process.env.FFPROBE_BIN || "ffprobe";
 
 type RunOptions = { cwd?: string; quiet?: boolean; env?: NodeJS.ProcessEnv };
 
-/** Execute argument arrays without a shell; retain diagnostic stderr separately. */
+/**
+ * Execute argument arrays without a shell; retain diagnostic stderr separately.
+ */
 export async function runProcess(
   command: string,
   args: string[],
   options: RunOptions = {},
-) {
+): Promise<{ stdout: string; stderr: string }> {
   return await new Promise<{ stdout: string; stderr: string }>(
     (resolve, reject) => {
       const child = spawn(command, args, {
@@ -41,20 +43,22 @@ export async function runProcess(
         if (!options.quiet) process.stderr.write(chunk);
       });
       child.on("error", reject);
-      child.on("close", (code) =>
-        code === 0
+      child.on("close", (code) => {
+        return code === 0
           ? resolve({ stdout, stderr })
           : reject(
               new Error(
                 `${path.basename(command)} exited ${code}: ${stderr.slice(-3000)}`,
               ),
-            ),
-      );
+            );
+      });
     },
   );
 }
 
-/** Run without a shell so filenames and narration text cannot become commands. */
+/**
+ * Run without a shell so filenames and narration text cannot become commands.
+ */
 export async function run(
   command: string,
   args: string[],
@@ -75,7 +79,9 @@ export type MediaStream = {
 };
 
 /** Probe the actual media container, independent of its filename extension. */
-export async function probe(filename: string) {
+export async function probe(
+  filename: string,
+): Promise<{ duration: number; streams: MediaStream[] }> {
   const result = JSON.parse(
     await run(
       ffprobe,
@@ -89,8 +95,13 @@ export async function probe(filename: string) {
   };
 }
 
-/** Check timing before rendering so no speech or effects are silently cut off. */
-export async function validateMedia(plan: Storyboard, root: string) {
+/**
+ * Check timing before rendering so no speech or effects are silently cut off.
+ */
+export async function validateMedia(
+  plan: Storyboard,
+  root: string,
+): Promise<void> {
   const cache = new Map<string, Awaited<ReturnType<typeof probe>>>();
   const inspect = async (asset: string) => {
     if (!cache.has(asset))
@@ -100,7 +111,9 @@ export async function validateMedia(plan: Storyboard, root: string) {
   const audio = async (asset: string, label: string) => {
     const info = await inspect(asset);
     if (
-      !info.streams.some((stream) => stream.codec_type === "audio") ||
+      !info.streams.some((stream) => {
+        return stream.codec_type === "audio";
+      }) ||
       !Number.isFinite(info.duration) ||
       info.duration <= 0
     )
@@ -111,12 +124,13 @@ export async function validateMedia(plan: Storyboard, root: string) {
     if (shot.scene !== "media") continue;
     const info = await inspect(shot.props.src);
     if (
-      !info.streams.some(
-        (stream) =>
+      !info.streams.some((stream) => {
+        return (
           stream.codec_type === "video" &&
           Number(stream.width) > 0 &&
-          Number(stream.height) > 0,
-      )
+          Number(stream.height) > 0
+        );
+      })
     )
       throw new Error(`${shot.id}: asset has no visual stream`);
     if (
@@ -156,7 +170,9 @@ export async function validateMedia(plan: Storyboard, root: string) {
   }
 }
 
-/** Hash encoded video packets to prove audio assembly did not re-encode picture. */
+/**
+ * Hash encoded video packets to prove audio assembly did not re-encode picture.
+ */
 export async function videoHash(filename: string): Promise<string> {
   return (
     await run(
@@ -201,7 +217,9 @@ export async function audioPeak(
 /** Verify picture duration before a mix can truncate or extend it. */
 async function _assertPictureDuration(plan: Storyboard, picture: string) {
   const info = await probe(picture);
-  const video = info.streams.find((stream) => stream.codec_type === "video");
+  const video = info.streams.find((stream) => {
+    return stream.codec_type === "video";
+  });
   if (!video) throw new Error("Picture has no video stream");
   const duration = Number(video.duration ?? info.duration);
   if (
@@ -213,7 +231,10 @@ async function _assertPictureDuration(plan: Storyboard, picture: string) {
   }
 }
 
-/** Mix approved tracks, then assert duration, signal and unchanged video packets. */
+/**
+ * Mix approved tracks, then assert duration, signal and unchanged video
+ * packets.
+ */
 export async function mixAudio(
   plan: Storyboard,
   root: string,
@@ -236,9 +257,11 @@ export async function mixAudio(
           },
         ]
       : []),
-    ...absoluteCues(plan).flatMap((cue) =>
-      cue.audio ? [{ src: cue.audio, atFrame: cue.startFrame, volume: 1 }] : [],
-    ),
+    ...absoluteCues(plan).flatMap((cue) => {
+      return cue.audio
+        ? [{ src: cue.audio, atFrame: cue.startFrame, volume: 1 }]
+        : [];
+    }),
     ...plan.soundEffects,
   ];
   if (!tracks.length) {
@@ -253,7 +276,13 @@ export async function mixAudio(
     return `[${index + 1}:a]aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo,volume=${track.volume},adelay=${delay}|${delay}[a${index}]`;
   });
   filters.push(
-    `${tracks.map((_, index) => `[a${index}]`).join("")}amix=inputs=${tracks.length}:normalize=0:dropout_transition=0,alimiter=limit=0.95:level=false:latency=1,apad[mix]`,
+    `${tracks
+      .map((_, index) => {
+        return `[a${index}]`;
+      })
+      .join(
+        "",
+      )}amix=inputs=${tracks.length}:normalize=0:dropout_transition=0,alimiter=limit=0.95:level=false:latency=1,apad[mix]`,
   );
   const expectedDuration = durationInFrames(plan) / plan.fps;
   args.push(
@@ -277,14 +306,20 @@ export async function mixAudio(
   );
   await run(ffmpeg, args, { quiet: true });
   const result = await probe(destination);
-  if (!result.streams.some((stream) => stream.codec_type === "audio"))
+  if (
+    !result.streams.some((stream) => {
+      return stream.codec_type === "audio";
+    })
+  )
     throw new Error("Audio assembly produced no audio stream");
   if (Math.abs(result.duration - expectedDuration) > 0.08)
     throw new Error("Audio assembly changed film duration");
   if ((await videoHash(picture)) !== (await videoHash(destination)))
     throw new Error("Audio assembly changed the video packets");
   if (
-    tracks.some((track) => track.volume > 0) &&
+    tracks.some((track) => {
+      return track.volume > 0;
+    }) &&
     (await audioPeak(destination)) <= -80
   )
     throw new Error("Assembled audio is silent");

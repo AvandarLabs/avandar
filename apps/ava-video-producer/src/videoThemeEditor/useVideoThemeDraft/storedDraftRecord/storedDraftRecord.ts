@@ -90,11 +90,12 @@ function _isDeepEqual(left: unknown, right: unknown): boolean {
   const leftEntries = Object.entries(left);
   return (
     leftEntries.length === Object.keys(right).length &&
-    leftEntries.every(
-      ([key, value]) =>
+    leftEntries.every(([key, value]) => {
+      return (
         Object.hasOwn(right, key) &&
-        _isDeepEqual(value, (right as Record<string, unknown>)[key]),
-    )
+        _isDeepEqual(value, (right as Record<string, unknown>)[key])
+      );
+    })
   );
 }
 
@@ -123,14 +124,15 @@ function _omitSavedOverrides(
 ): ThemeDraft["overrides"] {
   return Object.fromEntries(
     Object.entries(overrides)
-      .map(
-        ([itemId, patch]) =>
-          [
-            itemId,
-            _omitSavedTokens(patch, savedDocument.overrides?.[itemId] ?? {}),
-          ] as const,
-      )
-      .filter(([, patch]) => Object.keys(patch).length > 0),
+      .map(([itemId, patch]) => {
+        return [
+          itemId,
+          _omitSavedTokens(patch, savedDocument.overrides?.[itemId] ?? {}),
+        ] as const;
+      })
+      .filter(([, patch]) => {
+        return Object.keys(patch).length > 0;
+      }),
   );
 }
 

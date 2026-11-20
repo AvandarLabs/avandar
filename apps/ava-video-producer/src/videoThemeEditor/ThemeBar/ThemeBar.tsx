@@ -1,4 +1,4 @@
-import { useRef, useState, type RefObject } from "react";
+import { useRef, useState, type RefObject, type ReactNode } from "react";
 import { SaveAsNewForm } from "./SaveAsNewForm/SaveAsNewForm";
 import { ThemeActions } from "./ThemeActions/ThemeActions";
 import css from "./ThemeBar.module.css";
@@ -52,10 +52,15 @@ function _buildStatusText(): (message: ThemeBarMessage) => string {
     themeTooLarge: "This theme is too large to save.",
     saveFailed: "The theme could not be saved. Check the showcase terminal.",
   };
-  return (message) => texts[message];
+  return (message) => {
+    return texts[message];
+  };
 }
 
-/** Whether the new theme's name form is open, and where focus returns when it closes. */
+/**
+ * Whether the new theme's name form is open, and where focus returns when it
+ * closes.
+ */
 function useNamingForm() {
   const [isNaming, setIsNaming] = useState(false);
   const saveAsNewRef = useRef<HTMLButtonElement>(null);
@@ -67,20 +72,23 @@ function useNamingForm() {
     isNaming,
     saveAsNewRef,
     closeNaming,
-    startNaming: () => setIsNaming(true),
+    startNaming: () => {
+      return setIsNaming(true);
+    },
   };
 }
 
 /**
  * The theme picker and theme actions above the editor (a focusable group, so
  * focus can land here when Reload from file is gone): Save (custom themes
- * only), Save as new theme, Discard, and Copy JSON (plus Reload from file after a save conflict), with an unsaved
- * indicator, a polite status line that also says why saving is unavailable,
- * and, for a built-in theme, a notice that its changes are saved as a new
- * theme. The new theme's name form stays open, with the typed name, until
- * the theme is created, so a failed save does not lose the name.
+ * only), Save as new theme, Discard, and Copy JSON (plus Reload from file
+ * after a save conflict), with an unsaved indicator, a polite status line
+ * that also says why saving is unavailable, and, for a built-in theme, a
+ * notice that its changes are saved as a new theme. The new theme's name
+ * form stays open, with the typed name, until the theme is created, so a
+ * failed save does not lose the name.
  */
-export function ThemeBar({ barRef, onSaveAsNew, ...state }: Props) {
+export function ThemeBar({ barRef, onSaveAsNew, ...state }: Props): ReactNode {
   const statusText = _buildStatusText();
   const { isNaming, saveAsNewRef, closeNaming, startNaming } = useNamingForm();
   return (
@@ -110,13 +118,13 @@ export function ThemeBar({ barRef, onSaveAsNew, ...state }: Props) {
       {isNaming ? (
         <SaveAsNewForm
           onCancel={closeNaming}
-          onSubmit={(label) =>
-            submitNewThemeName({
+          onSubmit={(label) => {
+            return submitNewThemeName({
               label,
               saveAsNew: onSaveAsNew,
               close: closeNaming,
-            })
-          }
+            });
+          }}
         />
       ) : null}
       <p className={css.status} role="status" aria-live="polite">

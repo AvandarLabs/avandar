@@ -21,9 +21,9 @@ function _sceneBeatFrames(shot: Storyboard["shots"][number]): number[] {
       : undefined;
   const swaps =
     shot.scene === "tilted-window"
-      ? (shot.props.windows ?? []).flatMap((window) =>
-          window.atFrame === undefined ? [] : [window.atFrame + 2],
-        )
+      ? (shot.props.windows ?? []).flatMap((window) => {
+          return window.atFrame === undefined ? [] : [window.atFrame + 2];
+        })
       : [];
   return [
     ...(exitAt === undefined ? [] : [exitAt + 3]),
@@ -67,12 +67,16 @@ function _getContinuityOffsets(shot: Readonly<TimelineShot>): number[] {
       overlap,
       Math.min(180, beat.duration - 1),
       beat.duration - 1,
-    ].map((offset) => start + offset);
+    ].map((offset) => {
+      return start + offset;
+    });
     return beat.content.kind === "composite"
       ? [
           ...offsets,
           start + beat.content.signalAt + 30,
-          ...beat.content.diagrams.map((diagram) => start + diagram.at + 120),
+          ...beat.content.diagrams.map((diagram) => {
+            return start + diagram.at + 120;
+          }),
         ]
       : offsets;
   });
@@ -91,9 +95,17 @@ function _getAvandarOffsets(shot: Readonly<TimelineShot>): number[] {
     chart: 570,
   });
   return cursorTargets[feature]
-    .map((beat) => beat.frame - modeOffset - fromFrame)
-    .filter((beatFrame) => beatFrame >= 0 && beatFrame < shot.durationInFrames)
-    .flatMap((beatFrame) => [-1, 8, 24].map((shift) => beatFrame + shift));
+    .map((beat) => {
+      return beat.frame - modeOffset - fromFrame;
+    })
+    .filter((beatFrame) => {
+      return beatFrame >= 0 && beatFrame < shot.durationInFrames;
+    })
+    .flatMap((beatFrame) => {
+      return [-1, 8, 24].map((shift) => {
+        return beatFrame + shift;
+      });
+    });
 }
 
 /**
@@ -103,14 +115,14 @@ function _getAvandarOffsets(shot: Readonly<TimelineShot>): number[] {
 function _getSceneMomentOffsets(shot: Readonly<TimelineShot>): number[] {
   return match(shot)
     .with({ scene: "graph" }, (graphShot) => {
-      return (graphShot.props.traversal ?? []).map(
-        (traversalStep) => traversalStep.atFrame + 12,
-      );
+      return (graphShot.props.traversal ?? []).map((traversalStep) => {
+        return traversalStep.atFrame + 12;
+      });
     })
     .with({ scene: "flowchart" }, (flowchartShot) => {
-      return (flowchartShot.props.stepAtFrames ?? []).map(
-        (stepFrame) => stepFrame + 12,
-      );
+      return (flowchartShot.props.stepAtFrames ?? []).map((stepFrame) => {
+        return stepFrame + 12;
+      });
     })
     .with({ scene: "metric" }, (metricShot) => {
       return [
@@ -119,10 +131,9 @@ function _getSceneMomentOffsets(shot: Readonly<TimelineShot>): number[] {
       ];
     })
     .with({ scene: "media" }, (mediaShot) => {
-      return (mediaShot.props.callouts ?? []).flatMap((callout) => [
-        callout.startFrame + 1,
-        callout.endFrame - 1,
-      ]);
+      return (mediaShot.props.callouts ?? []).flatMap((callout) => {
+        return [callout.startFrame + 1, callout.endFrame - 1];
+      });
     })
     .with(
       {
@@ -137,7 +148,9 @@ function _getSceneMomentOffsets(shot: Readonly<TimelineShot>): number[] {
           "stock",
         ),
       },
-      () => [],
+      () => {
+        return [];
+      },
     )
     .exhaustive();
 }
@@ -164,23 +177,32 @@ function _getShotSampleOffsets(shot: Readonly<TimelineShot>): number[] {
  */
 export function previewFrames(plan: Readonly<Storyboard>): number[] {
   const totalFrames = durationInFrames(plan);
-  const frames = timeline(plan).flatMap((shot) => [
-    shot.startFrame - 1,
-    // Offsets stay inside the shot, so a late beat samples its last frame.
-    ..._getShotSampleOffsets(shot).map(
-      (value) =>
-        shot.startFrame +
-        Math.min(shot.durationInFrames - 1, Math.max(0, value)),
-    ),
-  ]);
-  const cueMiddles = absoluteCues(plan).map((cue) =>
-    Math.floor((cue.startFrame + cue.endFrame) / 2),
-  );
+  const frames = timeline(plan).flatMap((shot) => {
+    return [
+      shot.startFrame - 1,
+      // Offsets stay inside the shot, so a late beat samples its last frame.
+      ..._getShotSampleOffsets(shot).map((value) => {
+        return (
+          shot.startFrame +
+          Math.min(shot.durationInFrames - 1, Math.max(0, value))
+        );
+      }),
+    ];
+  });
+  const cueMiddles = absoluteCues(plan).map((cue) => {
+    return Math.floor((cue.startFrame + cue.endFrame) / 2);
+  });
   return [
     ...new Set(
       [...frames, ...cueMiddles]
-        .filter((value) => value >= 0 && value < totalFrames)
-        .map((value) => Math.round(value)),
+        .filter((value) => {
+          return value >= 0 && value < totalFrames;
+        })
+        .map((value) => {
+          return Math.round(value);
+        }),
     ),
-  ].sort((a, b) => a - b);
+  ].sort((a, b) => {
+    return a - b;
+  });
 }

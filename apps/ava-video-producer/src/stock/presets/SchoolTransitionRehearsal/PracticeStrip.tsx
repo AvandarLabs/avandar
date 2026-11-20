@@ -37,14 +37,16 @@ export function PracticeStrip({
             stroke={STOCK.line}
           />
           <LabelSlots
-            labels={input.stops.map((stop, index) => [
-              stop.actionLabel,
-              learnerX - 150 + index * 160,
-              450,
-              140,
-              12,
-              5,
-            ])}
+            labels={input.stops.map((stop, index) => {
+              return [
+                stop.actionLabel,
+                learnerX - 150 + index * 160,
+                450,
+                140,
+                12,
+                5,
+              ];
+            })}
           />
         </g>
       ) : undefined}

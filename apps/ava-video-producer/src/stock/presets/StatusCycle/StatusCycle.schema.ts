@@ -34,10 +34,11 @@ export const statusCycleInputSchema: z.ZodObject<
     showProgress: z.boolean(),
   })
   .refine(
-    (input) =>
-      input.states.every(
-        (state, index) => !index || state.at >= input.states[index - 1].at + 12,
-      ),
+    (input) => {
+      return input.states.every((state, index) => {
+        return !index || state.at >= input.states[index - 1].at + 12;
+      });
+    },
     {
       path: ["states"],
       message:

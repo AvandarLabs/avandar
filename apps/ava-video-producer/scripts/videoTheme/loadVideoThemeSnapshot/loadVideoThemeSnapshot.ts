@@ -29,7 +29,9 @@ export async function loadVideoThemeSnapshot(
   });
   const summaries = await store.list();
   const documents = await Promise.all(
-    summaries.map(async ({ id }) => (await store.read(id)).document),
+    summaries.map(async ({ id }) => {
+      return (await store.read(id)).document;
+    }),
   );
   const library = createVideoThemeLibrary(documents);
   if (!library.has(request.id)) {

@@ -35,10 +35,11 @@ const render: ({
   frame,
   input,
 }: Readonly<{ frame: number; input: Input }>) => string = _render;
-test("complete rejection fixtures reject structural and reference violations", () =>
-  invalidInputs.forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  ));
+test("complete rejection fixtures reject structural and reference violations", () => {
+  return invalidInputs.forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
+});
 test("focus moves the pointing fingertip and acknowledgment anchor to the authored object", () => {
   const input = fixtures[3].input;
   input.contributions.forEach((contribution) => {
@@ -151,8 +152,8 @@ test("hidden authorship stays visibly beside the focused stationary work through
         markup,
         marker: "focused-object",
       });
-      ["x", "y", "width", "height"].forEach((attribute) =>
-        assert.equal(
+      ["x", "y", "width", "height"].forEach((attribute) => {
+        return assert.equal(
           SvgAttributes.getNumberFromMarkup({
             attributes: object,
             name: attribute,
@@ -161,8 +162,8 @@ test("hidden authorship stays visibly beside the focused stationary work through
             attributes: setup,
             name: attribute,
           }),
-        ),
-      );
+        );
+      });
       const byline = markup.match(
         /<g data-authorship-byline="true">([\s\S]*?)<\/g>/,
       )?.[1];
@@ -214,17 +215,19 @@ test("complete contribution captions clear both acknowledgment containers and th
     fixtures[2].input,
     {
       ...fixtures[2].input,
-      contributions: fixtures[2].input.contributions.map((item) => ({
-        ...item,
-        label: `界 ${"界".repeat(9)} ${"界".repeat(28)}`.slice(0, 28),
-      })),
+      contributions: fixtures[2].input.contributions.map((item) => {
+        return {
+          ...item,
+          label: `界 ${"界".repeat(9)} ${"界".repeat(28)}`.slice(0, 28),
+        };
+      }),
       acknowledgment: {
         ...fixtures[2].input.acknowledgment,
         text: `界 ${"界".repeat(27)} ${"界".repeat(52)}`.slice(0, 52),
       },
     },
-  ].forEach((input) =>
-    ["spoken", "note"].forEach((form) => {
+  ].forEach((input) => {
+    return ["spoken", "note"].forEach((form) => {
       [96, 128, 150].forEach((frame) => {
         const markup = render({
           frame: frame,
@@ -263,8 +266,11 @@ test("complete contribution captions clear both acknowledgment containers and th
             name: "font-size",
           });
           const lineOffset = [...text[2].matchAll(/<tspan([^>]*)>/g)].reduce(
-            (offset, [, spanAttributes]) =>
-              offset + Number(spanAttributes.match(/ dy="([^"]*)"/)?.[1] ?? 0),
+            (offset, [, spanAttributes]) => {
+              return (
+                offset + Number(spanAttributes.match(/ dy="([^"]*)"/)?.[1] ?? 0)
+              );
+            },
             0,
           );
           assert.ok(
@@ -285,8 +291,8 @@ test("complete contribution captions clear both acknowledgment containers and th
           );
         });
       });
-    }),
-  );
+    });
+  });
 });
 
 test("serialized controls preserve the reviewed pre-extraction bounds and message identities", () => {

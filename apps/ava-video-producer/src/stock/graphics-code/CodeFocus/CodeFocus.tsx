@@ -24,30 +24,33 @@ const HIGHLIGHT_CUE = 43;
 const HIGHLIGHT_STEP = 38;
 const HIGHLIGHT_FRAMES = 13;
 
-/** The fractional line the highlight sits on at `frame`, easing between authored lines. */
+/**
+ * The fractional line the highlight sits on at `frame`, easing between authored
+ * lines.
+ */
 function useHighlightLine(highlight: readonly number[], frame: number): number {
   const motion = useGraphicMotion();
-  return highlight
-    .slice(1)
-    .reduce(
-      (offset, lineIndex, index) =>
-        offset +
-        ramp(
-          frame,
-          HIGHLIGHT_CUE + index * HIGHLIGHT_STEP,
-          motion.scale(HIGHLIGHT_FRAMES),
-          motion.travel.easing,
-        ) *
-          (lineIndex - highlight[index]),
-      highlight[0],
+  return highlight.slice(1).reduce((offset, lineIndex, index) => {
+    return (
+      offset +
+      ramp(
+        frame,
+        HIGHLIGHT_CUE + index * HIGHLIGHT_STEP,
+        motion.scale(HIGHLIGHT_FRAMES),
+        motion.travel.easing,
+      ) *
+        (lineIndex - highlight[index])
     );
+  }, highlight[0]);
 }
 
 function _buildKeyedCodeLines(lines: CodeFocusInput["lines"]) {
   const counts = new Map<string, number>();
   return lines.map((codeTokens, lineNumber) => {
     const signature = codeTokens
-      .map((token) => `${token.color}:${token.text}`)
+      .map((token) => {
+        return `${token.color}:${token.text}`;
+      })
       .join("|");
     const occurrence = counts.get(signature) ?? 0;
     counts.set(signature, occurrence + 1);
@@ -84,14 +87,16 @@ export function CodeFocus({
           <CodeHighlight line={line} accent={accent} />
         ) : null}
         {_buildKeyedCodeLines(input.lines).map(
-          ({ key, codeTokens, lineNumber }) => (
-            <CodeLineRow
-              key={key}
-              codeTokens={codeTokens}
-              index={lineNumber}
-              accent={accent}
-            />
-          ),
+          ({ key, codeTokens, lineNumber }) => {
+            return (
+              <CodeLineRow
+                key={key}
+                codeTokens={codeTokens}
+                index={lineNumber}
+                accent={accent}
+              />
+            );
+          },
         )}
         <CodeFooter footer={input.footer} accent={accent} />
       </CodeWindow>

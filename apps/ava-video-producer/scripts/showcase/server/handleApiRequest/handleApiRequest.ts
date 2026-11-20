@@ -71,9 +71,9 @@ async function _getPlayerFilmFromId(
       ? film.assets
       : [];
   await Promise.all(
-    assets.map(async (asset) =>
-      media.set(`/${asset}`, await publicAsset(appRoot, asset)),
-    ),
+    assets.map(async (asset) => {
+      return media.set(`/${asset}`, await publicAsset(appRoot, asset));
+    }),
   );
   return film;
 }

@@ -11,8 +11,10 @@ const BARE_TRIPLET =
  * learns the wrapper the source uses and re-applies it.
  */
 export function getColorWrapperFromCss(css: string): string | undefined {
-  return ["hsl", "hsla", "rgb", "rgba", "oklch", "lab"].find((colorFunction) =>
-    new RegExp(`${colorFunction}\\(\\s*var\\(`).test(css),
+  return ["hsl", "hsla", "rgb", "rgba", "oklch", "lab"].find(
+    (colorFunction) => {
+      return new RegExp(`${colorFunction}\\(\\s*var\\(`).test(css);
+    },
   );
 }
 

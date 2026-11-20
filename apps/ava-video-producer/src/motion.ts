@@ -156,8 +156,9 @@ export const EASE = {
   inOut: bezier(0.45, 0, 0.55, 1),
   /** Symmetric cubic, for a thing crossing the frame under its own power:
    *  a cursor between two targets. Flatter in the middle than `inOut`. */
-  inOutCubic: (t: number) =>
-    t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2,
+  inOutCubic: (t: number) => {
+    return t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
+  },
   /** The typographic curve: masked words, staged line fades, and the
    *  growing or rising parts of a staged build (columns, bars). */
   word: bezier(0.22, 1, 0.36, 1),
@@ -173,7 +174,7 @@ export const EASE = {
  * ease-in-out for travel between visible landmarks. Configurable presets
  * and bounded custom cubic Bezier curves live in motion-components. */
 
-/* -------------------------------------------------------------- durations -- */
+/* ------------------------------------------------------------- durations -- */
 
 /** Frames at 30fps. A product demo is the *explanatory* tier, where the
  *  sub-300ms ceiling for operable UI does not apply: the viewer is

@@ -119,7 +119,9 @@ async function _startRecording({
 }>): Promise<void> {
   const { settings, context, session, live, runDir } = run;
   await Promise.all(
-    ["raw", "screens", "text"].map((folder) => mkdir(join(runDir, folder))),
+    ["raw", "screens", "text"].map((folder) => {
+      return mkdir(join(runDir, folder));
+    }),
   );
   session.recordingContext = await browser.newContext({
     viewport: settings.viewport,
@@ -153,12 +155,12 @@ function _hasSwallowedFailure(
   flowId: string,
 ): boolean {
   return (
-    context.manifest.actions.some(
-      (action) => action.flowId === flowId && action.status === "failed",
-    ) ||
-    context.manifest.checkpoints.some(
-      (shot) => shot.flowId === flowId && shot.status === "failed",
-    )
+    context.manifest.actions.some((action) => {
+      return action.flowId === flowId && action.status === "failed";
+    }) ||
+    context.manifest.checkpoints.some((shot) => {
+      return shot.flowId === flowId && shot.status === "failed";
+    })
   );
 }
 
@@ -185,14 +187,19 @@ async function _runFeature({
     fixtureDir,
     runLabel: settings.runLabel,
     state,
-    checkpoint: (id, options) =>
-      context.checkpoint({
+    checkpoint: (id, options) => {
+      return context.checkpoint({
         flowId: feature.id,
         id,
         checkpointOptions: options,
-      }),
-    step: (id, action) => context.step({ flowId: feature.id, id, action }),
-    recordResource: (resource) => context.recordResource(feature.id, resource),
+      });
+    },
+    step: (id, action) => {
+      return context.step({ flowId: feature.id, id, action });
+    },
+    recordResource: (resource) => {
+      return context.recordResource(feature.id, resource);
+    },
   });
   context.assertPolicy();
   if (_hasSwallowedFailure(context, feature.id)) {

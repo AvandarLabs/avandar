@@ -74,7 +74,7 @@ function _primitive({
  * under `buildEffectFilterId(graphicId, tokenPath)`. Renders nothing when the
  * theme defines none. Steps chain in order, so a glow wraps a drop shadow.
  */
-export function VideoEffectDefs({ graphicId, filters }: Props) {
+export function VideoEffectDefs({ graphicId, filters }: Props): ReactNode {
   if (filters.length === 0) {
     return null;
   }

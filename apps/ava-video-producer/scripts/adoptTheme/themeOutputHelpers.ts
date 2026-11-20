@@ -154,19 +154,27 @@ export function makeKitTokensFromPalette(
       : [];
   });
   const takenValues: Palette = Object.fromEntries(
-    takenTokens.map((taken) => [taken.kitToken, taken.value]),
+    takenTokens.map((taken) => {
+      return [taken.kitToken, taken.value];
+    }),
   );
   const derived = _getDerivedVariants(takenValues);
   const placeholderValues: Palette = Object.fromEntries(
-    KIT_TOKENS.filter(
-      (kitToken) => !(kitToken in takenValues) && !(kitToken in derived),
-    ).map((kitToken) => [kitToken, PLACEHOLDER[kitToken]]),
+    KIT_TOKENS.filter((kitToken) => {
+      return !(kitToken in takenValues) && !(kitToken in derived);
+    }).map((kitToken) => {
+      return [kitToken, PLACEHOLDER[kitToken]];
+    }),
   );
   const derivedValues: Palette = Object.fromEntries(
-    Object.entries(derived).map(([kitToken, { value }]) => [kitToken, value]),
+    Object.entries(derived).map(([kitToken, { value }]) => {
+      return [kitToken, value];
+    }),
   );
   const report = KIT_TOKENS.map((kitToken): TokenReportRow => {
-    const taken = takenTokens.find((entry) => entry.kitToken === kitToken);
+    const taken = takenTokens.find((entry) => {
+      return entry.kitToken === kitToken;
+    });
     return taken
       ? [kitToken, taken.from, "taken"]
       : [kitToken, "—", derived[kitToken]?.outcome ?? "PLACEHOLDER — no match"];
@@ -175,7 +183,9 @@ export function makeKitTokensFromPalette(
     resolved: { ...takenValues, ...derivedValues, ...placeholderValues },
     report,
     wrapper,
-    numWrappedValues: takenTokens.filter((taken) => taken.isWrapped).length,
+    numWrappedValues: takenTokens.filter((taken) => {
+      return taken.isWrapped;
+    }).length,
   };
 }
 
@@ -192,9 +202,9 @@ export function getEasingsFromPalette(
     if (!match || !/ease|curve|transition/.test(name)) {
       return [];
     }
-    const controlPoints = match[1]
-      .split(",")
-      .map((part) => parseFloat(part.trim()));
+    const controlPoints = match[1].split(",").map((part) => {
+      return parseFloat(part.trim());
+    });
     return controlPoints.length === 4 && controlPoints.every(Number.isFinite)
       ? [{ name, controlPoints }]
       : [];
@@ -240,7 +250,9 @@ export function makeThemeCssFromTokens(
  * script so the mapping is right for everyone. */
 
 :root {
-${KIT_TOKENS.map((token) => `  ${token}: ${options.resolved[token]};`).join("\n")}
+${KIT_TOKENS.map((token) => {
+  return `  ${token}: ${options.resolved[token]};`;
+}).join("\n")}
 }
 
 html,
@@ -310,9 +322,9 @@ function _printTokenReport(options: Readonly<ReportOptions>): void {
       outcome === "taken" ? "✓" : outcome.startsWith("PLACEHOLDER") ? "!" : "~";
     console.log(`  ${mark} ${_pad(kitToken, 20)} ${_pad(from, 24)} ${outcome}`);
   });
-  const missing = options.report.filter((row) =>
-    row[2].startsWith("PLACEHOLDER"),
-  );
+  const missing = options.report.filter((row) => {
+    return row[2].startsWith("PLACEHOLDER");
+  });
   if (missing.length) {
     console.log(
       `\n${missing.length} token(s) fell back to the placeholder palette.`,

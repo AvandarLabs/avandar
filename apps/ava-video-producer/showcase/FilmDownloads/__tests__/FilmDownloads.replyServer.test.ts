@@ -65,8 +65,9 @@ function _createGate(): { promise: Promise<void>; resolve: () => void } {
 function _installPage(origin: string, downloads: string[]): void {
   const originalFetch = globalThis.fetch;
   Object.assign(globalThis, {
-    fetch: (url: string, options?: RequestInit) =>
-      originalFetch(new URL(url, origin), options),
+    fetch: (url: string, options?: RequestInit) => {
+      return originalFetch(new URL(url, origin), options);
+    },
     window: { location: { origin, href: `${origin}/index.html` } },
     document: createDocumentFixture(downloads),
   });
@@ -98,7 +99,9 @@ test("MP4 download requests", async (suite) => {
     await _verifyRefreshQueue(suite, runningService);
   } finally {
     restoreGlobals(originals);
-    await new Promise((resolve) => server.close(resolve));
+    await new Promise((resolve) => {
+      return server.close(resolve);
+    });
   }
 });
 
@@ -128,7 +131,9 @@ async function _verifyCompletion(
       const first = FilmDownloads.downloadFilm({
         id: "avandar-home",
         options: { captions: false },
-        onStatus: (status) => statuses.push(status.state),
+        onStatus: (status) => {
+          return statuses.push(status.state);
+        },
       });
       let isRefreshed = false;
       FilmDownloads.afterDownloads(() => {
@@ -217,14 +222,16 @@ function _queueOverlappingReplies(
   replies: Reply[],
   secondGate: Promise<unknown>,
 ): void {
-  const reply = (id: string, state: string) => ({
-    id,
-    state,
-    message: state === "running" ? "Rendering" : "Ready",
-    ...(state === "complete"
-      ? { download: `/api/exports/${id}/download` }
-      : {}),
-  });
+  const reply = (id: string, state: string) => {
+    return {
+      id,
+      state,
+      message: state === "running" ? "Rendering" : "Ready",
+      ...(state === "complete"
+        ? { download: `/api/exports/${id}/download` }
+        : {}),
+    };
+  };
   replies.push(
     { body: reply("refresh-first", "running") },
     { body: reply("refresh-second", "running") },
@@ -261,11 +268,15 @@ async function _verifyRefreshQueue(
       });
       try {
         await firstDownload;
-        await new Promise((resolve) => setImmediate(resolve));
+        await new Promise((resolve) => {
+          return setImmediate(resolve);
+        });
         assert.equal(isRefreshed, false);
         secondCompletionGate.resolve();
         await secondDownload;
-        await new Promise((resolve) => setImmediate(resolve));
+        await new Promise((resolve) => {
+          return setImmediate(resolve);
+        });
         assert.equal(isRefreshed, true);
       } finally {
         secondCompletionGate.resolve();

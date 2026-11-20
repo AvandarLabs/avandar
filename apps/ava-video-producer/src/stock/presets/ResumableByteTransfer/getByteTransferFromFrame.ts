@@ -48,9 +48,8 @@ export function getByteTransferFromFrame({
       };
     },
   );
-  const confirmed = chunks.reduce(
-    (total, chunk) => total + (chunk.isConfirmed ? chunk.end - chunk.start : 0),
-    0,
-  );
+  const confirmed = chunks.reduce((total, chunk) => {
+    return total + (chunk.isConfirmed ? chunk.end - chunk.start : 0);
+  }, 0);
   return { chunks, confirmed, remaining: sizeBytes - confirmed };
 }

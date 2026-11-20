@@ -12,17 +12,23 @@ export function BallotPapers({
 }: Readonly<Props>): ReactNode {
   return (
     <g>
-      {input.ballots.map((ballot, index) => (
-        <BallotResident
-          key={ballot.id}
-          ballot={ballot}
-          index={index}
-          frame={frame}
-          geometry={getBallotGeometryFromInputAndFrame({ input, frame, index })}
-          isRows={input.tallyArrangement === "rows"}
-          accent={accent}
-        />
-      ))}
+      {input.ballots.map((ballot, index) => {
+        return (
+          <BallotResident
+            key={ballot.id}
+            ballot={ballot}
+            index={index}
+            frame={frame}
+            geometry={getBallotGeometryFromInputAndFrame({
+              input,
+              frame,
+              index,
+            })}
+            isRows={input.tallyArrangement === "rows"}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

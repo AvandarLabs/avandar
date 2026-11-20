@@ -3,6 +3,7 @@ import { AppFrame, Cursor } from "../chrome/chrome";
 import { MOTION_LAB_LEN } from "../composition-timing";
 import { TYPE } from "../fonts";
 import { countTo, enterAt, mixToken, press, ramp, typed } from "../motion";
+import type { ReactNode } from "react";
 
 export { MOTION_LAB_LEN } from "../composition-timing";
 
@@ -27,7 +28,7 @@ const POINTER = [
   { at: MOTION_LAB_LEN, x: 1260, y: 861 },
 ];
 
-export function MotionLab() {
+export function MotionLab(): ReactNode {
   const frame = useCurrentFrame();
   const visibility = Math.min(
     ramp(frame, APP_IN, 14),
@@ -68,35 +69,39 @@ export function MotionLab() {
         >
           FOUR BUILDING BLOCKS
         </div>
-        {ITEMS.map(([number, title, detail], index) => (
-          <div
-            key={number}
-            style={{
-              ...panel,
-              left: 60,
-              top: 212 + index * 170,
-              width: 704,
-              height: 146,
-              padding: 28,
-              display: "flex",
-              alignItems: "center",
-              gap: 26,
-              ...enterAt(frame, ROWS_AT, index, { y: 12, dur: 12 }),
-            }}
-          >
-            <span style={{ fontSize: 24, color: "var(--brand-strong)" }}>
-              {number}
-            </span>
-            <div>
-              <div style={{ fontSize: 25, fontWeight: 600, marginBottom: 10 }}>
-                {title}
-              </div>
-              <div style={{ fontSize: 18, color: "var(--muted-foreground)" }}>
-                {detail}
+        {ITEMS.map(([number, title, detail], index) => {
+          return (
+            <div
+              key={number}
+              style={{
+                ...panel,
+                left: 60,
+                top: 212 + index * 170,
+                width: 704,
+                height: 146,
+                padding: 28,
+                display: "flex",
+                alignItems: "center",
+                gap: 26,
+                ...enterAt(frame, ROWS_AT, index, { y: 12, dur: 12 }),
+              }}
+            >
+              <span style={{ fontSize: 24, color: "var(--brand-strong)" }}>
+                {number}
+              </span>
+              <div>
+                <div
+                  style={{ fontSize: 25, fontWeight: 600, marginBottom: 10 }}
+                >
+                  {title}
+                </div>
+                <div style={{ fontSize: 18, color: "var(--muted-foreground)" }}>
+                  {detail}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
         <div
           style={{
             ...panel,

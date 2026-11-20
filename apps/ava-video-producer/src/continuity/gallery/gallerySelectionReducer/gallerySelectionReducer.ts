@@ -36,9 +36,9 @@ export function gallerySelectionReducer(
 ): GallerySelection {
   switch (action.type) {
     case "open": {
-      const entry = CONTINUITY_CATALOG.find(
-        (candidate) => candidate.id === action.id,
-      );
+      const entry = CONTINUITY_CATALOG.find((candidate) => {
+        return candidate.id === action.id;
+      });
       if (!entry || entry.family !== state.family || entry.id === state.openId)
         return state;
       return { ...state, openId: entry.id, captions: undefined };
@@ -73,13 +73,14 @@ export function filterCompositionEntries(
   selection: Pick<GallerySelection, "family" | "category" | "query">,
 ): ContinuityCatalogEntry[] {
   const query = selection.query.trim().toLowerCase();
-  return CONTINUITY_CATALOG.filter(
-    (entry) =>
+  return CONTINUITY_CATALOG.filter((entry) => {
+    return (
       entry.family === selection.family &&
       (selection.category === ALL_ATLAS_CATEGORIES ||
         entry.category === selection.category) &&
-      (!query || _buildSearchText(entry).includes(query)),
-  );
+      (!query || _buildSearchText(entry).includes(query))
+    );
+  });
 }
 
 /** Each of the family's categories, in catalog order, with its entry count. */
@@ -92,5 +93,7 @@ export function countCompositionCategories(
       counts.set(entry.category, (counts.get(entry.category) ?? 0) + 1);
     }
   });
-  return Array.from(counts, ([id, count]) => ({ id, count }));
+  return Array.from(counts, ([id, count]) => {
+    return { id, count };
+  });
 }

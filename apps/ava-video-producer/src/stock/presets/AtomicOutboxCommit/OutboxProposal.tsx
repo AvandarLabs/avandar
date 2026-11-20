@@ -32,7 +32,9 @@ export function OutboxProposal({
   const x = side === "local" ? 100 : 540;
   const graphemes = Array.from(
     GRAPHEMES.segment(input.change.after),
-    ({ segment }) => segment,
+    ({ segment }) => {
+      return segment;
+    },
   );
   const value = graphemes
     .slice(0, Math.ceil(writing * graphemes.length))

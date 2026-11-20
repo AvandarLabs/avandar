@@ -43,10 +43,9 @@ function _getVisibleTexts({ input }: Readonly<{ input: Input }>): string[] {
     input.scenarioCaption,
     ...Object.values(input.labels),
     ...input.requests.map(prop("label")),
-    ...input.contributions.flatMap(({ donorLabel, mark }) => [
-      donorLabel,
-      mark,
-    ]),
+    ...input.contributions.flatMap(({ donorLabel, mark }) => {
+      return [donorLabel, mark];
+    }),
   ];
 }
 const EXCLUDED_TEXT_FIELDS: string[] = [
@@ -77,15 +76,23 @@ registerStockTextLayoutAssertions({
 
 test("every attributed credit stays singular, restricted and visibly above its envelope", () => {
   fixtures.forEach(({ input }) => {
-    Array.from({ length: 90 }, (_, index) => index * 2).forEach((frame) => {
+    Array.from({ length: 90 }, (_, index) => {
+      return index * 2;
+    }).forEach((frame) => {
       const markup = _render({ frame: frame, input: input });
       const tokens = [...markup.matchAll(/<g data-token="([^"]*)"[^>]*>/g)];
       assert.equal(
         tokens.length,
-        input.contributions.reduce((sum, item) => sum + item.credits, 0),
+        input.contributions.reduce((sum, item) => {
+          return sum + item.credits;
+        }, 0),
       );
       assert.equal(
-        new Set(tokens.map((match) => match[1])).size,
+        new Set(
+          tokens.map((match) => {
+            return match[1];
+          }),
+        ).size,
         tokens.length,
       );
       tokens.forEach(([attributes]) => {
@@ -105,9 +112,9 @@ test("every attributed credit stays singular, restricted and visibly above its e
         return;
       }
       input.contributions.forEach((donor) => {
-        const attributed = tokens.filter(([attributes]) =>
-          attributes.includes(`data-donor="${donor.id}"`),
-        );
+        const attributed = tokens.filter(([attributes]) => {
+          return attributes.includes(`data-donor="${donor.id}"`);
+        });
         assert.equal(attributed.length, donor.credits);
         attributed.forEach(([attributes]) => {
           if (
@@ -121,14 +128,18 @@ test("every attributed credit stays singular, restricted and visibly above its e
         });
       });
       input.requests.forEach((request) => {
-        const allocated = tokens.filter(([attributes]) =>
-          attributes.includes(`data-request="${request.id}"`),
-        );
+        const allocated = tokens.filter(([attributes]) => {
+          return attributes.includes(`data-request="${request.id}"`);
+        });
         assert.equal(
           allocated.length,
           input.allocations
-            .filter(({ requestId }) => requestId === request.id)
-            .reduce((sum, item) => sum + item.credits, 0),
+            .filter(({ requestId }) => {
+              return requestId === request.id;
+            })
+            .reduce((sum, item) => {
+              return sum + item.credits;
+            }, 0),
         );
         const edge = markup.match(
           new RegExp(`<path data-envelope="${request.id}"[^>]+>`),
@@ -138,24 +149,24 @@ test("every attributed credit stays singular, restricted and visibly above its e
           attributes: edge[0],
           name: "data-edge",
         });
-        allocated.forEach(([attributes]) =>
-          assert.ok(_getTokenCoordinate({ attributes, axis: "y" }) + 20 < top),
-        );
+        allocated.forEach(([attributes]) => {
+          return assert.ok(
+            _getTokenCoordinate({ attributes, axis: "y" }) + 20 < top,
+          );
+        });
       });
-      tokens.forEach(([attributes], index) =>
-        tokens
-          .slice(index + 1)
-          .forEach(([other]) =>
-            assert.ok(
-              Math.hypot(
-                _getTokenCoordinate({ attributes, axis: "x" }) -
-                  _getTokenCoordinate({ attributes: other, axis: "x" }),
-                _getTokenCoordinate({ attributes, axis: "y" }) -
-                  _getTokenCoordinate({ attributes: other, axis: "y" }),
-              ) >= 34,
-            ),
-          ),
-      );
+      tokens.forEach(([attributes], index) => {
+        return tokens.slice(index + 1).forEach(([other]) => {
+          return assert.ok(
+            Math.hypot(
+              _getTokenCoordinate({ attributes, axis: "x" }) -
+                _getTokenCoordinate({ attributes: other, axis: "x" }),
+              _getTokenCoordinate({ attributes, axis: "y" }) -
+                _getTokenCoordinate({ attributes: other, axis: "y" }),
+            ) >= 34,
+          );
+        });
+      });
     });
   });
 });
@@ -170,10 +181,12 @@ test("overspending, wrong earmarks, missing references and duplicate allocation 
     },
     {
       ...DEFAULT_INPUT,
-      allocations: DEFAULT_INPUT.allocations.map((item) => ({
-        ...item,
-        credits: 5,
-      })),
+      allocations: DEFAULT_INPUT.allocations.map((item) => {
+        return {
+          ...item,
+          credits: 5,
+        };
+      }),
     },
     {
       ...DEFAULT_INPUT,
@@ -181,15 +194,17 @@ test("overspending, wrong earmarks, missing references and duplicate allocation 
     },
     {
       ...DEFAULT_INPUT,
-      contributions: DEFAULT_INPUT.contributions.map((item) => ({
-        ...item,
-        earmarkedRequestId: null,
-      })),
+      contributions: DEFAULT_INPUT.contributions.map((item) => {
+        return {
+          ...item,
+          earmarkedRequestId: null,
+        };
+      }),
     },
   ];
-  inputs.forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  );
+  inputs.forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
   assert.equal(inputSchema.safeParse(MINIMUM_INPUT).success, true);
 });
 
@@ -199,9 +214,9 @@ test("envelope totals count the actual arrived tokens during allocation", () => 
     DEFAULT_INPUT.requests.forEach((request) => {
       const expected = [
         ...markup.matchAll(/<g data-token="[^"]*"[^>]*>/g),
-      ].filter(([attributes]) =>
-        attributes.includes(`data-request="${request.id}"`),
-      ).length;
+      ].filter(([attributes]) => {
+        return attributes.includes(`data-request="${request.id}"`);
+      }).length;
       const total = markup.match(
         new RegExp(
           `<text data-allocation-total="${request.id}"[^>]*>([0-9]+)</text>`,
@@ -228,35 +243,41 @@ test("contribution totals, unique literal marks and complete request coverage ar
   [
     {
       ...DENSE_INPUT,
-      contributions: DENSE_INPUT.contributions.map((item) => ({
-        ...item,
-        credits: 5,
-      })),
+      contributions: DENSE_INPUT.contributions.map((item) => {
+        return {
+          ...item,
+          credits: 5,
+        };
+      }),
     },
     {
       ...DEFAULT_INPUT,
-      contributions: DEFAULT_INPUT.contributions.map((item) => ({
-        ...item,
-        mark: "A",
-      })),
+      contributions: DEFAULT_INPUT.contributions.map((item) => {
+        return {
+          ...item,
+          mark: "A",
+        };
+      }),
     },
     {
       ...DEFAULT_INPUT,
-      contributions: DEFAULT_INPUT.contributions.map((item) => ({
-        ...item,
-        earmarkedRequestId: "missing",
-      })),
+      contributions: DEFAULT_INPUT.contributions.map((item) => {
+        return {
+          ...item,
+          earmarkedRequestId: "missing",
+        };
+      }),
     },
     {
       ...DEFAULT_INPUT,
-      allocations: DEFAULT_INPUT.allocations.filter(
-        ({ requestId }) => requestId === "food",
-      ),
+      allocations: DEFAULT_INPUT.allocations.filter(({ requestId }) => {
+        return requestId === "food";
+      }),
     },
     { ...DEFAULT_INPUT, labels: { ...DEFAULT_INPUT.labels, extra: true } },
-  ].forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  );
+  ].forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
 });
 
 test("contributors tip their supported credits", () => {
@@ -291,26 +312,30 @@ test("one coordinator slides each configured request batch with a connected scoo
       );
       const moving = [
         ...markup.matchAll(/<g data-token="[^"]*"[^>]*>/g),
-      ].filter(([attributes]) =>
-        attributes.includes('data-owner="coordinator"'),
-      );
+      ].filter(([attributes]) => {
+        return attributes.includes('data-owner="coordinator"');
+      });
       assert.equal(
         moving.length,
         input.allocations
-          .filter(({ requestId }) => requestId === input.requests[index].id)
-          .reduce((sum, item) => sum + item.credits, 0),
+          .filter(({ requestId }) => {
+            return requestId === input.requests[index].id;
+          })
+          .reduce((sum, item) => {
+            return sum + item.credits;
+          }, 0),
       );
       const right =
         Math.max(
-          ...moving.map(([attributes]) =>
-            _getTokenCoordinate({ attributes, axis: "x" }),
-          ),
+          ...moving.map(([attributes]) => {
+            return _getTokenCoordinate({ attributes, axis: "x" });
+          }),
         ) + 23;
       const bottom =
         Math.max(
-          ...moving.map(([attributes]) =>
-            _getTokenCoordinate({ attributes, axis: "y" }),
-          ),
+          ...moving.map(([attributes]) => {
+            return _getTokenCoordinate({ attributes, axis: "y" });
+          }),
         ) + 24;
       assert.equal(
         SvgAttributes.getNumberFromMarkup({ attributes: hand[0], name: "cx" }),
@@ -329,21 +354,25 @@ test("coordinator arm and body stay on canvas through every scoop pickup and rel
   fixtures.forEach(({ input }) => {
     Array.from(
       { length: Math.max(0, Math.ceil((180 - 0) / 1)) },
-      (_, sampleIndex) => 0 + sampleIndex * 1,
+      (_, sampleIndex) => {
+        return 0 + sampleIndex * 1;
+      },
     ).forEach((frame) => {
       const markup = _render({ frame: frame, input: input });
       const arm = markup.match(/<path data-coordinator-arm[^>]*d="([^"]+)"/);
       assert.ok(arm);
       const points = [...arm[1].matchAll(/[ML]([^ ]+) ([^ ML]+)/g)].map(
-        (match) => [Number(match[1]), Number(match[2])],
+        (match) => {
+          return [Number(match[1]), Number(match[2])];
+        },
       );
       assert.ok(
         points[0][0] + 17 <= 952,
         `facilitator badge exceeds canvas at frame ${frame}`,
       );
-      points.forEach(([x, y]) =>
-        assert.ok(x >= 8 && x <= 952 && y >= 8 && y <= 592),
-      );
+      points.forEach(([x, y]) => {
+        return assert.ok(x >= 8 && x <= 952 && y >= 8 && y <= 592);
+      });
     });
   });
 });

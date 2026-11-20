@@ -38,16 +38,20 @@ export const fixtures: Array<{ id: string; input: Input }> = [
     id: "dense",
     input: {
       ...DEFAULT_INPUT,
-      warp: Array.from({ length: 3 }, (_, index) => ({
-        id: `warp ${index}`,
-        label: "W".repeat(24),
-        pattern: (["solid", "stripe", "dot"] as const)[index],
-      })),
-      weft: Array.from({ length: 3 }, (_, index) => ({
-        id: `weft ${index}`,
-        label: "W".repeat(24),
-        pattern: (["dot", "solid", "stripe"] as const)[index],
-      })),
+      warp: Array.from({ length: 3 }, (_, index) => {
+        return {
+          id: `warp ${index}`,
+          label: "W".repeat(24),
+          pattern: (["solid", "stripe", "dot"] as const)[index],
+        };
+      }),
+      weft: Array.from({ length: 3 }, (_, index) => {
+        return {
+          id: `weft ${index}`,
+          label: "W".repeat(24),
+          pattern: (["dot", "solid", "stripe"] as const)[index],
+        };
+      }),
       copy: { result: "W".repeat(34), example: "W".repeat(34) },
     },
   },
@@ -56,10 +60,12 @@ export const fixtures: Array<{ id: string; input: Input }> = [
     input: {
       ...DEFAULT_INPUT,
       weaveStart: "under-first",
-      warp: DEFAULT_INPUT.warp.map((item) => ({
-        ...item,
-        label: `Shared ${item.id}`,
-      })),
+      warp: DEFAULT_INPUT.warp.map((item) => {
+        return {
+          ...item,
+          label: `Shared ${item.id}`,
+        };
+      }),
       copy: {
         result: "Example co-created guide",
         example: "Fictional partnership",

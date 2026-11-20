@@ -9,13 +9,13 @@ test("every default prose path holds text and resolves into an independent copy 
     const resolved = makeStockDataFromContract({ contract });
     assert.notEqual(resolved.defaultInput, contract.defaultInput, contract.id);
     assert.deepEqual(resolved.defaultInput, contract.defaultInput, contract.id);
-    contract.defaultTextPaths.forEach((path) =>
-      assert.equal(
+    contract.defaultTextPaths.forEach((path) => {
+      return assert.equal(
         typeof getStockValueFromPath({ value: contract.defaultInput, path }),
         "string",
         `${contract.id}.${path.join(".")}`,
-      ),
-    );
+      );
+    });
   });
 });
 

@@ -1,12 +1,15 @@
 import { clsx } from "clsx";
 import css from "./CompositionStage.module.css";
 import type { ContinuityCatalogEntry } from "../../../continuityCatalog";
-import type { RefObject } from "react";
+import type { ReactNode, RefObject } from "react";
 
 type Props = Readonly<{
   selected: ContinuityCatalogEntry;
   player: RefObject<HTMLIFrameElement | null>;
-  /** Whether the Design tokens tab is open, which pins the stage as a strip on a phone. */
+  /**
+   * Whether the Design tokens tab is open, which pins the stage as a strip on a
+   * phone.
+   */
   isTokenPanel: boolean;
   onLoad: () => void;
 }>;
@@ -17,7 +20,7 @@ export function CompositionStage({
   player,
   isTokenPanel,
   onLoad,
-}: Props) {
+}: Props): ReactNode {
   return (
     <div
       className={clsx(

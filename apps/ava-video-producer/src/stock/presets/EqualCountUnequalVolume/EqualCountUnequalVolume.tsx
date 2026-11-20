@@ -26,16 +26,18 @@ export function EqualCountUnequalVolume({
           [input.copy.example, 55, 578, 840, 12, 1],
         ]}
       />
-      {input.groups.map((group, index) => (
-        <VolumeShelf
-          key={group.id}
-          group={group}
-          input={input}
-          index={index}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {input.groups.map((group, index) => {
+        return (
+          <VolumeShelf
+            key={group.id}
+            group={group}
+            input={input}
+            index={index}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

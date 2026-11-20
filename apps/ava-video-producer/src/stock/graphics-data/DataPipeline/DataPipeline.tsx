@@ -39,10 +39,12 @@ export function DataPipeline({
   const motion = useGraphicMotion();
   const margin = tokens.layout.graphic.margin;
   const trackWidth = GRAPHIC_WIDTH - margin * 2;
-  const stages = input.stages.map((stage, index) => ({
-    ...stage,
-    x: margin + index * STAGE_SPACING,
-  }));
+  const stages = input.stages.map((stage, index) => {
+    return {
+      ...stage,
+      x: margin + index * STAGE_SPACING,
+    };
+  });
   const progress =
     ramp(
       frame,
@@ -60,33 +62,37 @@ export function DataPipeline({
       <Text role="display" x={margin} y={HEADING_Y}>
         {input.heading}
       </Text>
-      {stages.slice(0, -1).map((stage, i) => (
-        <g key={stage.label}>
-          <path
-            d={`M${stage.x + STAGE_WIDTH} ${CONNECTOR_Y} H${stage.x + STAGE_SPACING}`}
-            stroke={tokens.color.line}
-            strokeWidth={tokens.stroke.default}
-          />
-          <Packet
+      {stages.slice(0, -1).map((stage, i) => {
+        return (
+          <g key={stage.label}>
+            <path
+              d={`M${stage.x + STAGE_WIDTH} ${CONNECTOR_Y} H${stage.x + STAGE_SPACING}`}
+              stroke={tokens.color.line}
+              strokeWidth={tokens.stroke.default}
+            />
+            <Packet
+              frame={frame}
+              from={{ x: stage.x + STAGE_WIDTH, y: CONNECTOR_Y }}
+              to={{ x: stage.x + STAGE_SPACING, y: CONNECTOR_Y }}
+              period={style.packetPeriod}
+              delay={i * PACKET_PHASE_STEP}
+              color={accent}
+            />
+          </g>
+        );
+      })}
+      {stages.map((stage, i) => {
+        return (
+          <PipelineStage
+            key={stage.label}
+            stage={stage}
+            index={i}
             frame={frame}
-            from={{ x: stage.x + STAGE_WIDTH, y: CONNECTOR_Y }}
-            to={{ x: stage.x + STAGE_SPACING, y: CONNECTOR_Y }}
-            period={style.packetPeriod}
-            delay={i * PACKET_PHASE_STEP}
-            color={accent}
+            accent={accent}
+            active={Math.min(1, Math.max(0, progress - i))}
           />
-        </g>
-      ))}
-      {stages.map((stage, i) => (
-        <PipelineStage
-          key={stage.label}
-          stage={stage}
-          index={i}
-          frame={frame}
-          accent={accent}
-          active={Math.min(1, Math.max(0, progress - i))}
-        />
-      ))}
+        );
+      })}
       {input.showProgress ? (
         <>
           <StockRect

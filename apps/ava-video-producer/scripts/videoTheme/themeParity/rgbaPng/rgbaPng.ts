@@ -13,16 +13,18 @@ async function _runFfmpeg(
     const child = spawn(ffmpeg, args, { stdio: ["pipe", "pipe", "pipe"] });
     const chunks: Buffer[] = [];
     let stderr = "";
-    child.stdout.on("data", (chunk: Buffer) => chunks.push(chunk));
+    child.stdout.on("data", (chunk: Buffer) => {
+      return chunks.push(chunk);
+    });
     child.stderr.on("data", (chunk: Buffer) => {
       stderr = (stderr + chunk.toString()).slice(-4000);
     });
     child.on("error", reject);
-    child.on("close", (code) =>
-      code === 0
+    child.on("close", (code) => {
+      return code === 0
         ? resolve(Buffer.concat(chunks))
-        : reject(new Error(`ffmpeg exited ${code}: ${stderr}`)),
-    );
+        : reject(new Error(`ffmpeg exited ${code}: ${stderr}`));
+    });
     child.stdin.end(input);
   });
 }

@@ -16,7 +16,9 @@ export function buildValidationSummary(plan: Storyboard): string {
       assets: assetReferences(plan).length,
       narration: plan.narrationTrack
         ? "provided track"
-        : plan.narration.some((cue) => cue.audio)
+        : plan.narration.some((cue) => {
+              return cue.audio;
+            })
           ? "per-cue recordings"
           : "text only",
     },

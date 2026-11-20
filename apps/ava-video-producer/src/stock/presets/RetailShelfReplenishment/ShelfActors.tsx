@@ -17,7 +17,9 @@ export function ShelfActors({
   const units = getShelfUnitsFromInputAndFrame({ input, frame });
   const loading = units.find(propEq("owner", "retailer-hand"));
   const selecting = units.find(propEq("owner", "shopper-hand"));
-  const gapIndex = input.goods.findIndex((good) => good.incomingUnits > 0);
+  const gapIndex = input.goods.findIndex((good) => {
+    return good.incomingUnits > 0;
+  });
   const gapX = 192 + input.goods[gapIndex].openingUnits * 56;
   const gapY = 200 + gapIndex * 105;
   const slip = getOrderSlipPoseFromFrame(frame);

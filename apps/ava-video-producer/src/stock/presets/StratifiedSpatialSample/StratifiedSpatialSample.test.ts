@@ -51,11 +51,12 @@ function _getSummaryNumbers({
   return SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup(
     _render({ frame: frame, input: input }),
   )
-    .filter(
-      ({ kind, top, text }) =>
-        kind === "text" && top >= 480 && /^\d+$/.test(text ?? ""),
-    )
-    .map(({ text }) => text ?? "");
+    .filter(({ kind, top, text }) => {
+      return kind === "text" && top >= 480 && /^\d+$/.test(text ?? "");
+    })
+    .map(({ text }) => {
+      return text ?? "";
+    });
 }
 function _getVisibleTexts({
   input,
@@ -64,10 +65,11 @@ function _getVisibleTexts({
   return [
     ...input.strata.map(prop("label")),
     ...input.sites
-      .filter(
-        (site) =>
-          input.showUnselectedLabels || input.selectedSiteIds.includes(site.id),
-      )
+      .filter((site) => {
+        return (
+          input.showUnselectedLabels || input.selectedSiteIds.includes(site.id)
+        );
+      })
       .map(prop("label")),
     ...Object.values(input.copy),
   ];
@@ -150,15 +152,15 @@ test("sampling rejects foreign and boundary sites, missing denominators and over
   [
     {
       ...defaultInput,
-      sites: defaultInput.sites.map((site, index) =>
-        index ? site : { ...site, x: 70 },
-      ),
+      sites: defaultInput.sites.map((site, index) => {
+        return index ? site : { ...site, x: 70 };
+      }),
     },
     {
       ...defaultInput,
-      sites: defaultInput.sites.map((site, index) =>
-        index ? site : { ...site, x: 50 },
-      ),
+      sites: defaultInput.sites.map((site, index) => {
+        return index ? site : { ...site, x: 50 };
+      }),
     },
     {
       ...defaultInput,
@@ -167,11 +169,13 @@ test("sampling rejects foreign and boundary sites, missing denominators and over
     { ...defaultInput, selectedSiteIds: ["foreign"] },
     {
       ...defaultInput,
-      sites: defaultInput.sites.map((site) => ({ ...site, stratumId: "w" })),
+      sites: defaultInput.sites.map((site) => {
+        return { ...site, stratumId: "w" };
+      }),
     },
-  ].forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  );
+  ].forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
   assert.equal(inputSchema.safeParse(defaultInput).success, true);
 });
 test("coincident sites retain distinct fixed keys for alternating selections", () => {
@@ -182,13 +186,17 @@ test("coincident sites retain distinct fixed keys for alternating selections", (
   const markup = _render({ frame: 150, input: input });
   assert.equal((markup.match(/data-site-anchor=/g) ?? []).length, 12);
   const keys = [...markup.matchAll(/<circle cx="638" cy="([^"]+)" r="9"/g)].map(
-    (match) => Number(match[1]),
+    (match) => {
+      return Number(match[1]);
+    },
   );
   assert.equal(keys.length, 12);
-  keys.slice(1).forEach((y, index) => assert.ok(y - keys[index] > 19));
-  [...markup.matchAll(/<path d="M[^"]+ L([\d.]+) 456"/g)].forEach((match) =>
-    assert.ok(Number(match[1]) <= 430),
-  );
+  keys.slice(1).forEach((y, index) => {
+    return assert.ok(y - keys[index] > 19);
+  });
+  [...markup.matchAll(/<path d="M[^"]+ L([\d.]+) 456"/g)].forEach((match) => {
+    return assert.ok(Number(match[1]) <= 430);
+  });
 });
 
 [
@@ -227,7 +235,11 @@ test("long summary captions, quantities and unit retain separate painted space",
     _render({ frame: 150, input: fixtures[2].input }),
   );
   SvgPaintAssertions.assertPaintClearance({
-    texts: paint.filter(({ kind, top }) => kind === "text" && top >= 470),
-    rectangles: paint.filter(({ kind }) => kind === "rect"),
+    texts: paint.filter(({ kind, top }) => {
+      return kind === "text" && top >= 470;
+    }),
+    rectangles: paint.filter(({ kind }) => {
+      return kind === "rect";
+    }),
   });
 });

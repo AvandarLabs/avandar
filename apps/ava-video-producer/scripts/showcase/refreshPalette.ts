@@ -26,16 +26,20 @@ export async function refreshPalette(
     ),
   );
   const text = `${JSON.stringify(palette, null, 2)}\n`;
-  const tokens = (["primary", "neutral"] as const).flatMap((scale) =>
-    palette[scale].map(
-      (color, index) => `  --ava-${scale}-${index}: ${color};`,
-    ),
-  );
+  const tokens = (["primary", "neutral"] as const).flatMap((scale) => {
+    return palette[scale].map((color, index) => {
+      return `  --ava-${scale}-${index}: ${color};`;
+    });
+  });
   await writeFile(
     path.join(options.outputDirectory, "showcase-theme.css"),
     `${await makeFontFaceCssFromRegistry()}\n:root {\n${tokens.join("\n")}\n  --ava-font: Figtree, ui-sans-serif, system-ui, sans-serif;\n}\n`,
   );
-  if ((await readFile(options.paletteFile, "utf8").catch(() => "")) !== text) {
+  if (
+    (await readFile(options.paletteFile, "utf8").catch(() => {
+      return "";
+    })) !== text
+  ) {
     await writeFile(options.paletteFile, text);
   }
 }

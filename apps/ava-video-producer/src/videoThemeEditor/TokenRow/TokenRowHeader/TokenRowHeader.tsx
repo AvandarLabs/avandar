@@ -6,6 +6,7 @@ import { useTokenEditor } from "../../TokenEditorContext";
 import { OverrideDot } from "./OverrideDot/OverrideDot";
 import css from "./TokenRowHeader.module.css";
 import type { TokenRow } from "../../tokenRows/tokenRows";
+import type { ReactNode } from "react";
 
 type Props = Readonly<{
   row: TokenRow;
@@ -15,7 +16,12 @@ type Props = Readonly<{
 }>;
 
 /** A row's name, state, current value, and reset action. */
-export function TokenRowHeader({ row, label, isInherited, hasIssue }: Props) {
+export function TokenRowHeader({
+  row,
+  label,
+  isInherited,
+  hasIssue,
+}: Props): ReactNode {
   const editor = useTokenEditor();
   const kind = row.definition.kind;
   const value = formatTokenValue({ kind, value: row.resolved });
@@ -51,7 +57,9 @@ export function TokenRowHeader({ row, label, isInherited, hasIssue }: Props) {
           variant="subtle"
           aria-label={`Reset ${label}`}
           title={`Reset ${label}`}
-          onClick={() => editor.resetToken(row.path)}
+          onClick={() => {
+            return editor.resetToken(row.path);
+          }}
         >
           <IconArrowBackUp size={14} aria-hidden="true" />
         </ActionIcon>

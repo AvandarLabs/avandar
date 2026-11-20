@@ -41,8 +41,12 @@ export function validateRelativePath(value: unknown, name = "path"): string {
     !value ||
     isAbsolute(value) ||
     /[\\:%?#]/.test(value) ||
-    value.split("").some((character) => character.charCodeAt(0) <= 0x1f) ||
-    value.split("/").some((part) => !part || part.startsWith("."))
+    value.split("").some((character) => {
+      return character.charCodeAt(0) <= 0x1f;
+    }) ||
+    value.split("/").some((part) => {
+      return !part || part.startsWith(".");
+    })
   ) {
     throw new Error(
       `${name} must be a non-hidden relative path without traversal`,

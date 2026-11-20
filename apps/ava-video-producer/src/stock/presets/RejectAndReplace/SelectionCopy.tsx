@@ -55,17 +55,19 @@ export function SelectionCopy({
   const labels = _getLabelsFromSelection({ frame, input, isReplacement });
   return (
     <g>
-      {labels.map(({ opacity, ...label }, index) => (
-        <g key={index} opacity={opacity} aria-label={label.text}>
-          <FitText
-            {...label}
-            x={0}
-            breakLongWords
-            normalizeWhitespace
-            anchor="middle"
-          />
-        </g>
-      ))}
+      {labels.map(({ opacity, ...label }, index) => {
+        return (
+          <g key={index} opacity={opacity} aria-label={label.text}>
+            <FitText
+              {...label}
+              x={0}
+              breakLongWords
+              normalizeWhitespace
+              anchor="middle"
+            />
+          </g>
+        );
+      })}
     </g>
   );
 }

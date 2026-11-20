@@ -58,43 +58,43 @@ function _validCommitments(input: SchemaInput): boolean {
   const existing = input.commitments.filter(propEq("kind", "existing"));
   return (
     support.length === 1 &&
-    existing.every(
-      (item) =>
+    existing.every((item) => {
+      return (
         item.initialDayId === item.agreedDayId &&
-        item.initialBandId === item.agreedBandId,
-    ) &&
-    existing.some((item) => _sameCell({ first: item, second: support[0] })) &&
+        item.initialBandId === item.agreedBandId
+      );
+    }) &&
+    existing.some((item) => {
+      return _sameCell({ first: item, second: support[0] });
+    }) &&
     (support[0].initialDayId !== support[0].agreedDayId ||
       support[0].initialBandId !== support[0].agreedBandId) &&
     new Set(
-      input.commitments.map((item) =>
-        JSON.stringify([item.agreedDayId, item.agreedBandId]),
-      ),
+      input.commitments.map((item) => {
+        return JSON.stringify([item.agreedDayId, item.agreedBandId]);
+      }),
     ).size === input.commitments.length
   );
 }
 /** Strict negotiated move with unchanged existing commitments. */
 export const inputSchema = structure
-  .refine(
-    (input) =>
-      [input.days, input.timeBands, input.commitments].every(
-        (items) => new Set(items.map(prop("id"))).size === items.length,
-      ),
-    "Day, band and commitment IDs must be unique.",
-  )
-  .refine(
-    (input) =>
-      input.commitments.every(
-        (item) =>
-          [item.initialDayId, item.agreedDayId].every((id) =>
-            input.days.some(propEq("id", id)),
-          ) &&
-          [item.initialBandId, item.agreedBandId].every((id) =>
-            input.timeBands.some(propEq("id", id)),
-          ),
-      ),
-    "All day and time-band references must exist.",
-  )
+  .refine((input) => {
+    return [input.days, input.timeBands, input.commitments].every((items) => {
+      return new Set(items.map(prop("id"))).size === items.length;
+    });
+  }, "Day, band and commitment IDs must be unique.")
+  .refine((input) => {
+    return input.commitments.every((item) => {
+      return (
+        [item.initialDayId, item.agreedDayId].every((id) => {
+          return input.days.some(propEq("id", id));
+        }) &&
+        [item.initialBandId, item.agreedBandId].every((id) => {
+          return input.timeBands.some(propEq("id", id));
+        })
+      );
+    });
+  }, "All day and time-band references must exist.")
   .refine(
     _validCommitments,
     "Exactly one support appointment must move from an existing conflict to an unoccupied final cell. Existing commitments stay fixed; final cells cannot overlap.",

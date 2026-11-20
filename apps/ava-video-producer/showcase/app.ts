@@ -164,7 +164,9 @@ window.addEventListener("message", (event) => {
   if (!wasAwaitingPlayer) {
     return;
   }
-  pendingControls.forEach(({ action, value }) => _control(action, value));
+  pendingControls.forEach(({ action, value }) => {
+    _control(action, value);
+  });
   pendingControls = [];
   if (shouldPlayWhenReady) {
     _control("play");
@@ -172,7 +174,7 @@ window.addEventListener("message", (event) => {
   shouldPlayWhenReady = false;
 });
 
-document.querySelectorAll<HTMLElement>("[data-clip]").forEach((button) =>
+document.querySelectorAll<HTMLElement>("[data-clip]").forEach((button) => {
   button.addEventListener("click", () => {
     const index = Number(button.dataset.clip);
     if (index === currentIndex) {
@@ -187,11 +189,17 @@ document.querySelectorAll<HTMLElement>("[data-clip]").forEach((button) =>
     player.title = `${CLIPS[index].title}: live preview`;
     player.src = `/live.html?id=${encodeURIComponent(CLIPS[index].id)}`;
     _updateDetails(currentIndex);
-  }),
-);
-speed.addEventListener("change", () => _control("speed", Number(speed.value)));
-loop.addEventListener("change", () => _control("loop", loop.checked));
-_requireElement("#replay").addEventListener("click", () => _control("replay"));
+  });
+});
+speed.addEventListener("change", () => {
+  _control("speed", Number(speed.value));
+});
+loop.addEventListener("change", () => {
+  _control("loop", loop.checked);
+});
+_requireElement("#replay").addEventListener("click", () => {
+  _control("replay");
+});
 player.addEventListener("load", _restoreTransport);
 
 downloadButton.addEventListener("click", async () => {

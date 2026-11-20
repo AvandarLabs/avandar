@@ -42,7 +42,9 @@ async function _openMapList(ctx: Readonly<FlowContext>): Promise<void> {
   // Observe the app's list request so an initially empty render cannot
   // create a duplicate.
   const mapListResponse = page.waitForResponse(
-    (response) => isRestListResponse(response, "maps"),
+    (response) => {
+      return isRestListResponse(response, "maps");
+    },
     { timeout: WAIT },
   );
   const [response] = await Promise.all([
@@ -285,9 +287,9 @@ export async function runMapFlow(ctx: FlowContext): Promise<void> {
   await ctx.step("map-create", async () => {
     await _openOrCreateMap(ctx);
   });
-  await ctx.step("map-remove-failed-fixture-layer", () =>
-    _removeFailedFixtureLayer(ctx),
-  );
+  await ctx.step("map-remove-failed-fixture-layer", () => {
+    return _removeFailedFixtureLayer(ctx);
+  });
   await ctx.step("map-case-locations", async () => {
     await _configurePoints(ctx, {
       source: sources.cases,
@@ -307,8 +309,8 @@ export async function runMapFlow(ctx: FlowContext): Promise<void> {
     });
   });
   await ctx.checkpoint("map-facilities");
-  await ctx.step("map-verify-persistence", () =>
-    _verifyMapPersistence(ctx, sources),
-  );
+  await ctx.step("map-verify-persistence", () => {
+    return _verifyMapPersistence(ctx, sources);
+  });
   await ctx.checkpoint("map-saved");
 }

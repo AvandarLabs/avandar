@@ -4,7 +4,9 @@ import { getHeadingRevealStyles } from "./textReveal";
 import type { SceneBase } from "./scenes.types";
 import type { CSSProperties, ReactNode } from "react";
 
-/** Shared chrome for a scene: the ground, title/kicker header, and content area. */
+/**
+ * Shared chrome for a scene: the ground, title/kicker header, and content area.
+ */
 export function SceneShell({
   frame,
   width = 1600,
@@ -13,7 +15,7 @@ export function SceneShell({
   kicker,
   headingReveal,
   children,
-}: SceneBase & { children: ReactNode }) {
+}: SceneBase & { children: ReactNode }): ReactNode {
   assertFinite(frame, "scene frame");
   const reveal = getHeadingRevealStyles(frame, headingReveal);
   // A wipe clips to the text's own width, not to the header's full width.
@@ -71,21 +73,4 @@ export function SceneShell({
       {children}
     </div>
   );
-}
-
-/** Absolutely positions an element at a pixel rect computed by scene layout. */
-export function positioned(rect: {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}): CSSProperties {
-  return {
-    position: "absolute",
-    left: rect.x,
-    top: rect.y,
-    width: rect.width,
-    height: rect.height,
-    boxSizing: "border-box",
-  };
 }

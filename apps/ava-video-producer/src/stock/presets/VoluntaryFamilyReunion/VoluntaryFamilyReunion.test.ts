@@ -69,22 +69,39 @@ test("changed greeting changes actual arms and every member stays distinct after
     waved.match(/<path data-greeting-arm[^>]*>/)?.[0],
   );
   fixtures.forEach(({ input }) => {
-    const people = (frame: number) => [
-      ..._render({ frame: frame, input: input }).matchAll(
-        /<g data-member="([^"]*)"[^>]*data-x="([^"]*)"/g,
-      ),
-    ];
+    const people = (frame: number) => {
+      return [
+        ..._render({ frame: frame, input: input }).matchAll(
+          /<g data-member="([^"]*)"[^>]*data-x="([^"]*)"/g,
+        ),
+      ];
+    };
     assert.deepEqual(
-      people(24).map((person) => person[2]),
-      people(59).map((person) => person[2]),
+      people(24).map((person) => {
+        return person[2];
+      }),
+      people(59).map((person) => {
+        return person[2];
+      }),
     );
     assert.notDeepEqual(
-      people(59).map((person) => person[2]),
-      people(80).map((person) => person[2]),
+      people(59).map((person) => {
+        return person[2];
+      }),
+      people(80).map((person) => {
+        return person[2];
+      }),
     );
     const final = people(150);
     assert.equal(final.length, input.groups.flatMap(prop("members")).length);
-    assert.equal(new Set(final.map((person) => person[2])).size, final.length);
+    assert.equal(
+      new Set(
+        final.map((person) => {
+          return person[2];
+        }),
+      ).size,
+      final.length,
+    );
     assert.equal(
       (
         _render({ frame: 60, input: input }).match(/data-accepted="true"/g) ??
@@ -113,10 +130,12 @@ function _getVisibleTexts({
     input.meetingLabel,
     input.invitationLabels.heading,
     ...(frame >= 36 ? [input.invitationLabels.acceptance] : []),
-    ...input.groups.flatMap((group) => [
-      group.label,
-      ...(input.showMemberLabels ? group.members.map(prop("label")) : []),
-    ]),
+    ...input.groups.flatMap((group) => {
+      return [
+        group.label,
+        ...(input.showMemberLabels ? group.members.map(prop("label")) : []),
+      ];
+    }),
   ];
 }
 const EXCLUDED_TEXT_FIELDS: string[] = ["id", "greeting"];
@@ -205,21 +224,24 @@ test("I5 every authored member arrives inside the actual meeting structure", () 
         name: "cx",
       });
     });
-    heads.forEach((x) =>
-      assert.ok(
+    heads.forEach((x) => {
+      return assert.ok(
         x - 8 > left && x + 8 < right,
         `member at ${x} outside ${left}..${right}`,
-      ),
-    );
+      );
+    });
   });
 });
 test("I5 sparse groups converge at one meeting rather than only enlarging its outline", () => {
-  const positions = (frame: number) =>
-    [
+  const positions = (frame: number) => {
+    return [
       ..._render({ frame: frame, input: MINIMUM_INPUT }).matchAll(
         /<g data-member="[^"]*" data-x="([^"]*)"/g,
       ),
-    ].map((match) => Number(match[1]));
+    ].map((match) => {
+      return Number(match[1]);
+    });
+  };
   const before = positions(24),
     after = positions(150);
   assert.equal(after.length, 2);

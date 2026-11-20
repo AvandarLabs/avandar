@@ -33,8 +33,7 @@ function _mergeTwoLayers(
 export function mergeVideoThemePatches(
   ...layers: readonly VideoThemePatch[]
 ): VideoThemePatch {
-  return layers.reduce<Record<string, unknown>>(
-    (merged, layer) => _mergeTwoLayers(merged, layer),
-    {},
-  );
+  return layers.reduce<Record<string, unknown>>((merged, layer) => {
+    return _mergeTwoLayers(merged, layer);
+  }, {});
 }

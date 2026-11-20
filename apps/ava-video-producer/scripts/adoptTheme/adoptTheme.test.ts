@@ -97,11 +97,15 @@ test("makeKitTokensFromPalette wraps bare channels in hsl(), derives brand and g
   );
   assert.ok(numWrappedValues >= 5);
   assert.deepEqual(
-    report.find((row) => row[0] === "--brand-strong"),
+    report.find((row) => {
+      return row[0] === "--brand-strong";
+    }),
     ["--brand-strong", "—", "derived from --brand"],
   );
   assert.deepEqual(
-    report.find((row) => row[0] === "--muted-foreground"),
+    report.find((row) => {
+      return row[0] === "--muted-foreground";
+    }),
     ["--muted-foreground", "—", "PLACEHOLDER — no match"],
   );
   assert.equal(
@@ -123,7 +127,9 @@ test("makeThemeCssFromTokens writes each resolved token as a declaration", () =>
       resolved,
     })
       .split("\n")
-      .find((line) => line.includes("--brand:")),
+      .find((line) => {
+        return line.includes("--brand:");
+      }),
     "  --brand: hsl(221 83% 53%);",
   );
 });

@@ -125,19 +125,28 @@ function _createFakePage(events: string[], video: FakeVideo): FakePage {
     goto: async (url: string) => {
       currentUrl = url;
     },
-    url: () => currentUrl,
-    video: () => video,
+    url: () => {
+      return currentUrl;
+    },
+    video: () => {
+      return video;
+    },
     evaluate: async () => {
       events.push("fonts-ready");
     },
     waitForTimeout: async (milliseconds: number) => {
       events.push(`settle-${milliseconds}`);
     },
-    locator: () => ({
-      innerText: async () =>
-        "Visible result for user@example.test with capture-test-password",
-    }),
-    getByText: () => ({}),
+    locator: () => {
+      return {
+        innerText: async () => {
+          return "Visible result for user@example.test with capture-test-password";
+        },
+      };
+    },
+    getByText: () => {
+      return {};
+    },
     screenshot: async ({ path, animations }) => {
       assert.equal(animations, "disabled");
       await writeFile(path, "unit-test-image-placeholder");
@@ -158,11 +167,19 @@ async function _dispatchThroughGuard({
   assert.ok(routeHandler, "network guard must be installed first");
   const result: DispatchResult = { continued: false, aborted: false };
   await routeHandler({
-    request: () => ({
-      url: () => url,
-      method: () => method,
-      resourceType: () => "fetch",
-    }),
+    request: () => {
+      return {
+        url: () => {
+          return url;
+        },
+        method: () => {
+          return method;
+        },
+        resourceType: () => {
+          return "fetch";
+        },
+      };
+    },
     continue: async () => {
       result.continued = true;
     },
@@ -194,13 +211,18 @@ function _createFakeContext(
       routeHandler = handler;
     },
     routeWebSocket: async () => {},
-    dispatchRequest: (url: string, method = "POST") =>
-      _dispatchThroughGuard({ routeHandler, url, method }),
-    newPage: async () => page,
-    storageState: async () => ({
-      cookies: [{ name: "session", value: "never-persist-this" }],
-      origins: [],
-    }),
+    dispatchRequest: (url: string, method = "POST") => {
+      return _dispatchThroughGuard({ routeHandler, url, method });
+    },
+    newPage: async () => {
+      return page;
+    },
+    storageState: async () => {
+      return {
+        cookies: [{ name: "session", value: "never-persist-this" }],
+        origins: [],
+      };
+    },
     close: async () => {
       events.push(`close-${options.contextNumber}`);
     },
@@ -221,7 +243,9 @@ export function createFakeBrowser(): {
   const events: string[] = [];
   const contexts: FakeContext[] = [];
   const browser: FakeBrowser = {
-    version: () => "fake-browser-for-lifecycle-unit-test",
+    version: () => {
+      return "fake-browser-for-lifecycle-unit-test";
+    },
     close: async () => {
       events.push("browser-close");
     },

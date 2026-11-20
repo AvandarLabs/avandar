@@ -4,13 +4,14 @@ import {
   useRowIssueAriaProps,
 } from "../RowIssueContext/RowIssueContext";
 import type { ValueControlProps } from "./valueControl.types";
+import type { ReactNode } from "react";
 
 /** A switch token. */
 export function BooleanValueControl({
   label,
   value,
   onChange,
-}: ValueControlProps) {
+}: ValueControlProps): ReactNode {
   const hasIssue = useRowHasIssue();
   const issueAriaProps = useRowIssueAriaProps();
   return (
@@ -20,7 +21,9 @@ export function BooleanValueControl({
       error={hasIssue}
       {...issueAriaProps}
       checked={value === true}
-      onChange={(event) => onChange(event.currentTarget.checked)}
+      onChange={(event) => {
+        return onChange(event.currentTarget.checked);
+      }}
     />
   );
 }

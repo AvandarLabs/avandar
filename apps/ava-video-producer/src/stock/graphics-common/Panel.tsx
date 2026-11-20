@@ -24,7 +24,7 @@ export function Panel({
   stroke?: string;
   fill?: string;
   radius?: number;
-}) {
+}): ReactNode {
   const panel = useGraphicProps("Panel", { stroke, fill, radius });
   const filter = useGraphicFilter("components.Panel.elevation");
   return (

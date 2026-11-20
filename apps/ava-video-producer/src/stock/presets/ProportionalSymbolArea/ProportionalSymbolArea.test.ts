@@ -19,8 +19,8 @@ import { inputSchema, type Input } from "./ProportionalSymbolArea.schema";
 const render = ({
   frame,
   input = DEFAULT_INPUT,
-}: Readonly<{ frame: number; input?: Input }>): string =>
-  renderToStaticMarkup(
+}: Readonly<{ frame: number; input?: Input }>): string => {
+  return renderToStaticMarkup(
     createElement(
       "svg",
       {},
@@ -32,10 +32,13 @@ const render = ({
       }),
     ),
   );
+};
 function _marks({ markup, name }: { markup: string; name: string }): string[] {
   return [
     ...markup.matchAll(new RegExp(`<[^>]*data-${name}="[^"]*"[^>]*>`, "g")),
-  ].map((match) => match[0]);
+  ].map((match) => {
+    return match[0];
+  });
 }
 function _attribute({
   markup,
@@ -63,10 +66,12 @@ test("circle area, radius and legend share one authored area scale", () => {
     const input: Input = {
       ...DEFAULT_INPUT,
       sites: DEFAULT_INPUT.sites.map(
-        (site: Input["sites"][number], i: number) => ({
-          ...site,
-          value: values[i],
-        }),
+        (site: Input["sites"][number], i: number) => {
+          return {
+            ...site,
+            value: values[i],
+          };
+        },
       ),
     };
     const circles = _marks({
@@ -99,17 +104,23 @@ test("circle area, radius and legend share one authored area scale", () => {
     );
     const moved = {
       ...input,
-      sites: input.sites.map((site: Input["sites"][number]) => ({
-        ...site,
-        x: site.x + 2,
-      })),
+      sites: input.sites.map((site: Input["sites"][number]) => {
+        return {
+          ...site,
+          x: site.x + 2,
+        };
+      }),
     };
     assert.deepEqual(
       _marks({
         markup: render({ frame: 150, input: moved }),
         name: "symbol",
-      }).map((mark) => _number({ markup: mark, name: "r" })),
-      circles.map((mark) => _number({ markup: mark, name: "r" })),
+      }).map((mark) => {
+        return _number({ markup: mark, name: "r" });
+      }),
+      circles.map((mark) => {
+        return _number({ markup: mark, name: "r" });
+      }),
     );
   });
 });
@@ -118,37 +129,41 @@ test("unit tiles physically reshape before the complete symbols hold", () => {
     middle = _marks({ markup: render({ frame: 80 }), name: "unit-tile" });
   assert.equal(initial.length, 5);
   assert.equal(middle.length, 5);
-  initial.forEach((tile, i) =>
-    assert.notEqual(
+  initial.forEach((tile, i) => {
+    return assert.notEqual(
       _attribute({ markup: tile, name: "d" }),
       _attribute({ markup: middle[i], name: "d" }),
-    ),
-  );
+    );
+  });
   assert.equal(
     _marks({ markup: render({ frame: 110 }), name: "symbol" }).length,
     2,
   );
 });
 test("fixtures retain exact input while schemas reject invalid documents", () => {
-  fixtures.forEach(({ input }) =>
-    assert.deepEqual(inputSchema.parse(input), input),
-  );
-  invalidInputs.forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  );
+  fixtures.forEach(({ input }) => {
+    return assert.deepEqual(inputSchema.parse(input), input);
+  });
+  invalidInputs.forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
 });
 
 const getVisibleTexts = ({
   input,
   frame,
-}: Readonly<{ input: Input; frame: number }>): string[] => [
-  ...Object.values(input.copy),
-  ...input.sites.flatMap((site, index) => [
-    `${index + 1} · ${site.label}`,
-    `${site.value} ${input.unitLabel}`,
-  ]),
-  `1 ${input.unitLabel} = ${input.areaPerUnit} px²`,
-];
+}: Readonly<{ input: Input; frame: number }>): string[] => {
+  return [
+    ...Object.values(input.copy),
+    ...input.sites.flatMap((site, index) => {
+      return [
+        `${index + 1} · ${site.label}`,
+        `${site.value} ${input.unitLabel}`,
+      ];
+    }),
+    `1 ${input.unitLabel} = ${input.areaPerUnit} px²`,
+  ];
+};
 registerStockPresetAssertions({
   inputSchema,
   defaultInput: DEFAULT_INPUT,

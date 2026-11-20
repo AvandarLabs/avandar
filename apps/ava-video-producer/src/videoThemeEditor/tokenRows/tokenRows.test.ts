@@ -64,7 +64,9 @@ function _rows(
 }
 
 function _row(rows: readonly TokenRow[], path: string): TokenRow | undefined {
-  return rows.find((row) => row.path === path);
+  return rows.find((row) => {
+    return row.path === path;
+  });
 }
 
 test("every catalog token gets a row, with one row per scale entry", () => {
@@ -88,7 +90,9 @@ test("rows group by tier and first segment", () => {
       "atomic.swatch.mint",
       "fontSizes.md",
       "components.ProgressBar.height",
-    ].map((path) => _row(rows, path)?.group),
+    ].map((path) => {
+      return _row(rows, path)?.group;
+    }),
     [
       "semantic:color",
       "atomic:swatch",
@@ -107,9 +111,9 @@ test("item-scope rows tell draft edits from saved overrides", () => {
   });
   const rows = _rows(ITEM, draft);
   assert.deepEqual(
-    ["color.accent", "stroke.default", "color.line"].map(
-      (path) => _row(rows, path)?.overrideState,
-    ),
+    ["color.accent", "stroke.default", "color.line"].map((path) => {
+      return _row(rows, path)?.overrideState;
+    }),
     ["saved", "draft", "none"],
   );
 });
@@ -166,12 +170,26 @@ test("the used filter keeps atomic rows and drops unused semantic rows", () => {
       tiers: ["semantic", "atomic"],
       query: "",
       usedTokens: ["color.accent"],
-      getText: () => "",
+      getText: () => {
+        return "";
+      },
     },
   });
-  assert.ok(filtered.some((row) => row.path === "color.accent"));
-  assert.ok(filtered.some((row) => row.path === "atomic.swatch.mint"));
-  assert.ok(!filtered.some((row) => row.path === "color.line"));
+  assert.ok(
+    filtered.some((row) => {
+      return row.path === "color.accent";
+    }),
+  );
+  assert.ok(
+    filtered.some((row) => {
+      return row.path === "atomic.swatch.mint";
+    }),
+  );
+  assert.ok(
+    !filtered.some((row) => {
+      return row.path === "color.line";
+    }),
+  );
 });
 
 test("search matches a row's text or its path", () => {
@@ -180,18 +198,24 @@ test("search matches a row's text or its path", () => {
     filter: {
       tiers: ["semantic"],
       query: "corner.pill",
-      getText: () => "",
+      getText: () => {
+        return "";
+      },
     },
   });
   assert.deepEqual(
-    filtered.map((row) => row.path),
+    filtered.map((row) => {
+      return row.path;
+    }),
     ["corner.pill"],
   );
 });
 
 test("Essentials come out in their fixed order", () => {
   assert.deepEqual(
-    getEssentialRows(_rows({ kind: "theme" })).map((row) => row.path),
+    getEssentialRows(_rows({ kind: "theme" })).map((row) => {
+      return row.path;
+    }),
     [
       "color.accent",
       "color.ground",
@@ -249,10 +273,16 @@ test("a new scale value takes the first free custom key in its whole scale", () 
     filter: {
       tiers: ["atomic"],
       query: "mint",
-      getText: () => "",
+      getText: () => {
+        return "";
+      },
     },
   });
-  assert.ok(!visible.some((row) => row.scaleKey === "custom1"));
+  assert.ok(
+    !visible.some((row) => {
+      return row.scaleKey === "custom1";
+    }),
+  );
   assert.equal(
     buildNextCustomScaleKey({ rows, group: "atomic:swatch" }),
     "custom2",
@@ -335,7 +365,9 @@ test("in theme scope, an unsaved item edit also counts as the item's own value",
 
 test("item-scope rows never carry an item override, since their state says it", () => {
   assert.equal(
-    _rows(ITEM).filter((row) => row.itemOverride !== undefined).length,
+    _rows(ITEM).filter((row) => {
+      return row.itemOverride !== undefined;
+    }).length,
     0,
   );
 });

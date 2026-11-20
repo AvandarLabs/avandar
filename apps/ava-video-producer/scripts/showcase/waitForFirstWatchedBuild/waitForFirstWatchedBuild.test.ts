@@ -22,10 +22,12 @@ function _createWatcher(): {
   };
   return {
     watcher: emitter,
-    succeed: () =>
-      emitCycle([{ code: "BUNDLE_START" }, { code: "BUNDLE_END" }]),
-    fail: (error = new Error("Build failed")) =>
-      emitCycle([{ code: "BUNDLE_START" }, { code: "ERROR", error }]),
+    succeed: () => {
+      return emitCycle([{ code: "BUNDLE_START" }, { code: "BUNDLE_END" }]);
+    },
+    fail: (error = new Error("Build failed")) => {
+      return emitCycle([{ code: "BUNDLE_START" }, { code: "ERROR", error }]);
+    },
   };
 }
 
@@ -39,10 +41,14 @@ test("only successful watched builds refresh the showcase", async () => {
   await firstBuild;
   assert.equal(refreshCount, 1);
   fail();
-  await new Promise((resolve) => setImmediate(resolve));
+  await new Promise((resolve) => {
+    return setImmediate(resolve);
+  });
   assert.equal(refreshCount, 1, "A failed rebuild must not refresh pages");
   succeed();
-  await new Promise((resolve) => setImmediate(resolve));
+  await new Promise((resolve) => {
+    return setImmediate(resolve);
+  });
   assert.equal(refreshCount, 2);
 });
 
@@ -54,6 +60,8 @@ test("a failed first build rejects without refreshing the showcase", async () =>
   });
   fail(new Error("Unexpected token"));
   await assert.rejects(firstBuild, /Unexpected token/);
-  await new Promise((resolve) => setImmediate(resolve));
+  await new Promise((resolve) => {
+    return setImmediate(resolve);
+  });
   assert.equal(refreshCount, 0);
 });

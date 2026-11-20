@@ -36,22 +36,26 @@ const options = {
   fixtures,
   render: _render,
   excludedTextFields: ["id", "sheetMotion"],
-  getVisibleTexts: ({ input }: Readonly<{ input: Input }>) => [
-    input.exampleLabel,
-    input.labels.expected,
-    input.labels.observed,
-    ...input.tests.flatMap((item) => [
-      item.label,
-      ...(input.showInputs ? [item.inputLabel] : []),
-      item.expected,
-      ...(item.observed === null ? [] : [item.observed]),
-      item.observed === null
-        ? input.labels.untested
-        : item.expected === item.observed
-          ? input.labels.match
-          : input.labels.mismatch,
-    ]),
-  ],
+  getVisibleTexts: ({ input }: Readonly<{ input: Input }>) => {
+    return [
+      input.exampleLabel,
+      input.labels.expected,
+      input.labels.observed,
+      ...input.tests.flatMap((item) => {
+        return [
+          item.label,
+          ...(input.showInputs ? [item.inputLabel] : []),
+          item.expected,
+          ...(item.observed === null ? [] : [item.observed]),
+          item.observed === null
+            ? input.labels.untested
+            : item.expected === item.observed
+              ? input.labels.match
+              : input.labels.mismatch,
+        ];
+      }),
+    ];
+  },
 } satisfies Pick<
   PresetAssertions<Input>,
   | "inputSchema"
@@ -71,25 +75,28 @@ registerStockTextLayoutAssertions({
   getVisibleTexts: ({
     input,
     frame,
-  }: Readonly<{ input: Input; frame: number }>) =>
-    frame >= 141 ? options.getVisibleTexts({ input: input }) : [],
+  }: Readonly<{ input: Input; frame: number }>) => {
+    return frame >= 141 ? options.getVisibleTexts({ input: input }) : [];
+  },
 });
 
 test("only the changed case mismatches and null receives no verdict", () => {
   const matched = {
     ...DEFAULT_INPUT,
-    tests: DEFAULT_INPUT.tests.map((item) => ({
-      ...item,
-      observed: item.expected,
-    })),
+    tests: DEFAULT_INPUT.tests.map((item) => {
+      return {
+        ...item,
+        observed: item.expected,
+      };
+    }),
   };
   const same = _render({ frame: 150, input: matched });
   assert.equal((same.match(/data-state="match"/g) ?? []).length, 2);
   const changed = {
     ...matched,
-    tests: matched.tests.map((item, index) =>
-      index === 0 ? { ...item, observed: "different" } : item,
-    ),
+    tests: matched.tests.map((item, index) => {
+      return index === 0 ? { ...item, observed: "different" } : item;
+    }),
   };
   assert.match(
     _render({ frame: 150, input: changed }),
@@ -101,9 +108,9 @@ test("only the changed case mismatches and null receives no verdict", () => {
   );
   const absent = {
     ...changed,
-    tests: changed.tests.map((item, index) =>
-      index === 0 ? { ...item, observed: null } : item,
-    ),
+    tests: changed.tests.map((item, index) => {
+      return index === 0 ? { ...item, observed: null } : item;
+    }),
     showStateGlyphs: false,
     showInputs: false,
   };
@@ -173,7 +180,9 @@ test("three-line case captions clear the input caption below them", () => {
   const label = `界 ${"界".repeat(13)} ${"界".repeat(8)}`;
   const input = {
     ...DEFAULT_INPUT,
-    tests: DEFAULT_INPUT.tests.map((item) => ({ ...item, label })),
+    tests: DEFAULT_INPUT.tests.map((item) => {
+      return { ...item, label };
+    }),
   };
   const text = _render({ frame: 150, input: input }).match(
     /<text aria-label="[^"]+" x="45" y="130"[^>]*>(.*?)<\/text>/s,

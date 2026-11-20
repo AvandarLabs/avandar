@@ -43,6 +43,9 @@ export const EFFECT_FIELDS: Record<
   ],
 };
 
-/** The layer a new shadow layer starts from, and the fallback for a missing field. */
+/**
+ * The layer a new shadow layer starts from, and the fallback for a missing
+ * field.
+ */
 export const DEFAULT_SHADOW_LAYER =
   getDefaultLiteralFromKind("shadow").layers[0];

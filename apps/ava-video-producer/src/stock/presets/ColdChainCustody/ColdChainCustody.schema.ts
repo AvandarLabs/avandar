@@ -74,10 +74,9 @@ export const inputSchema = z
     }
     input.crates.forEach((crate, index) => {
       if (
-        crate.checkpoints.some(
-          (checkpoint, stopIndex) =>
-            checkpoint.stopId !== input.stops[stopIndex]?.id,
-        )
+        crate.checkpoints.some((checkpoint, stopIndex) => {
+          return checkpoint.stopId !== input.stops[stopIndex]?.id;
+        })
       ) {
         context.addIssue({
           code: "custom",

@@ -6,8 +6,25 @@ import {
   filterCompositionEntries,
   gallerySelectionReducer,
 } from "./gallerySelectionReducer/gallerySelectionReducer";
-import type { ContinuityFamily } from "../continuityCatalog";
+import type {
+  ContinuityCatalogEntry,
+  ContinuityFamily,
+} from "../continuityCatalog";
 import type { GallerySelection } from "./gallerySelectionReducer/gallerySelectionReducer";
+
+/** One family's selection, visible entries, open preview, and actions. */
+type CompositionGalleryState = {
+  selection: GallerySelection;
+  entries: ContinuityCatalogEntry[];
+  open: ContinuityCatalogEntry | undefined;
+  previous: ContinuityCatalogEntry | undefined;
+  next: ContinuityCatalogEntry | undefined;
+  openEntry: (id: string) => void;
+  close: () => void;
+  chooseCategory: (category: string) => void;
+  setQuery: (query: string) => void;
+  receiveOptions: (options: { id: string; captions: boolean }) => void;
+};
 
 /** The Atlas section that browses a catalog family. */
 function _toSection(family: ContinuityFamily): "films" | "compositions" {
@@ -22,14 +39,15 @@ function _toSection(family: ContinuityFamily): "films" | "compositions" {
  */
 function _createInitialSelection(family: ContinuityFamily): GallerySelection {
   const parameters = new URLSearchParams(location.search);
-  const entry = CONTINUITY_CATALOG.find(
-    (candidate) =>
-      candidate.id === parameters.get("film") && candidate.family === family,
-  );
+  const entry = CONTINUITY_CATALOG.find((candidate) => {
+    return (
+      candidate.id === parameters.get("film") && candidate.family === family
+    );
+  });
   const category = parameters.get("category");
-  const isKnownCategory = countCompositionCategories(family).some(
-    (item) => item.id === category,
-  );
+  const isKnownCategory = countCompositionCategories(family).some((item) => {
+    return item.id === category;
+  });
   return {
     family,
     category: isKnownCategory ? category! : ALL_ATLAS_CATEGORIES,
@@ -59,16 +77,18 @@ function _replaceUrl(
  * One family's gallery: category filter, search, the open preview and its
  * neighbours, with caption state scoped to the open live player.
  */
-export function useCompositionGallery(family: ContinuityFamily) {
+export function useCompositionGallery(
+  family: ContinuityFamily,
+): CompositionGalleryState {
   const [selection, dispatch] = useReducer(
     gallerySelectionReducer,
     family,
     _createInitialSelection,
   );
   const entries = filterCompositionEntries(selection);
-  const open = CONTINUITY_CATALOG.find(
-    (entry) => entry.id === selection.openId,
-  );
+  const open = CONTINUITY_CATALOG.find((entry) => {
+    return entry.id === selection.openId;
+  });
   // Browsing a deep-linked entry outside the current filter still works.
   const browsable = open && !entries.includes(open) ? [open] : entries;
   const index = open ? browsable.indexOf(open) : -1;
@@ -96,7 +116,9 @@ export function useCompositionGallery(family: ContinuityFamily) {
       dispatch({ type: "category", category });
       _replaceUrl({ ...selection, category });
     },
-    setQuery: (query: string) => dispatch({ type: "query", query }),
+    setQuery: (query: string) => {
+      return dispatch({ type: "query", query });
+    },
     receiveOptions,
   };
 }

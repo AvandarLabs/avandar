@@ -49,10 +49,9 @@ function _splitBlocks(css: string, start = 0): CssBlock[] {
 function _readDeclarations(body: string): Palette {
   const topLevelBody = body.replace(/\{[\s\S]*?\}/g, "");
   return Object.fromEntries(
-    Array.from(topLevelBody.matchAll(/(--[\w-]+)\s*:\s*([^;]+);/g), (match) => [
-      match[1],
-      match[2].trim(),
-    ]),
+    Array.from(topLevelBody.matchAll(/(--[\w-]+)\s*:\s*([^;]+);/g), (match) => {
+      return [match[1], match[2].trim()];
+    }),
   );
 }
 
@@ -75,9 +74,9 @@ function _mergeDeclarations(
   return {
     ...target,
     ...Object.fromEntries(
-      Object.entries(incoming).filter(
-        ([name, value]) => !_isSelfReference(name, value) || !target[name],
-      ),
+      Object.entries(incoming).filter(([name, value]) => {
+        return !_isSelfReference(name, value) || !target[name];
+      }),
     ),
   };
 }
@@ -124,16 +123,16 @@ function _collectAtRule(
       })
     : palettes;
   return _splitBlocks(block.body)
-    .filter((inner) => _isRoot(inner.selector) || _isDark(inner.selector))
-    .reduce(
-      (current, inner) =>
-        _mergeIntoPalettes({
-          palettes: current,
-          isDarkTarget: _isDark(block.selector) || _isDark(inner.selector),
-          incoming: _readDeclarations(inner.body),
-        }),
-      themePalettes,
-    );
+    .filter((inner) => {
+      return _isRoot(inner.selector) || _isDark(inner.selector);
+    })
+    .reduce((current, inner) => {
+      return _mergeIntoPalettes({
+        palettes: current,
+        isDarkTarget: _isDark(block.selector) || _isDark(inner.selector),
+        incoming: _readDeclarations(inner.body),
+      });
+    }, themePalettes);
 }
 
 /** The palettes after reading one top-level block into them. */
@@ -197,6 +196,8 @@ export function makeInlinedPaletteFromPalette(
 ): Palette {
   const inlined = { ...palette };
   // Stop at the first pass that changes nothing.
-  [0, 1, 2, 3].every(() => _inlinePointersOnce(inlined, fallback));
+  [0, 1, 2, 3].every(() => {
+    return _inlinePointersOnce(inlined, fallback);
+  });
   return inlined;
 }

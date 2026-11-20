@@ -4,6 +4,7 @@ import css from "./ContinuityScene.module.css";
 import { getProductFrame } from "./continuityTimeline";
 import type { ProductSceneRenderer } from "../storyboard/StoryFilm/ShotView";
 import type { ContinuityBeat } from "./continuitySchema";
+import type { ReactNode } from "react";
 
 type Props = {
   content: Extract<ContinuityBeat["content"], { kind: "composite" }>;
@@ -12,13 +13,16 @@ type Props = {
   productScene?: ProductSceneRenderer;
 };
 
-/** One full-stage native product instance beneath independently moving explanations. */
+/**
+ * One full-stage native product instance beneath independently moving
+ * explanations.
+ */
 export function ContinuityComposite({
   content,
   frame,
   accent,
   productScene,
-}: Props) {
+}: Props): ReactNode {
   if (!productScene)
     throw new Error("Composite scenes require the Avandar product bridge");
   return (

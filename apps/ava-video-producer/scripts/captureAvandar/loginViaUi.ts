@@ -17,7 +17,7 @@ export async function loginViaUi({
   await page.getByLabel(/^Email(?: \*)?$/).fill(email);
   await page.getByLabel(/^Password(?: \*)?$/).fill(password);
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
-  await page.waitForURL((url) =>
-    isWorkspaceRoute({ url: url.href, baseUrl, workspace }),
-  );
+  await page.waitForURL((url) => {
+    return isWorkspaceRoute({ url: url.href, baseUrl, workspace });
+  });
 }

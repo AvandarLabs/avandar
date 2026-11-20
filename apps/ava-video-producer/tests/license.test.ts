@@ -65,10 +65,9 @@ const ENTRY_POINT_COMMANDS = [
     "checkFrames",
     "curateCapture/curateCapture",
     "captureAvandar/captureAvandar",
-  ].map((name) => [
-    process.execPath,
-    ["--import", "tsx", `scripts/${name}.ts`],
-  ]),
+  ].map((name) => {
+    return [process.execPath, ["--import", "tsx", `scripts/${name}.ts`]];
+  }),
   [
     process.execPath,
     [
@@ -80,12 +79,13 @@ const ENTRY_POINT_COMMANDS = [
     ],
   ],
   ...["studio", "preview", "render", "render-showcase", "add-sfx"].map(
-    (name) => ["sh", [`scripts/${name}.sh`]],
+    (name) => {
+      return ["sh", [`scripts/${name}.sh`]];
+    },
   ),
-  ...["generate", "validate"].map((name) => [
-    "python3",
-    [`demo-data/${name}.py`],
-  ]),
+  ...["generate", "validate"].map((name) => {
+    return ["python3", [`demo-data/${name}.py`]];
+  }),
 ] as Array<[string, string[]]>;
 
 test("the direct video command refuses to start without license keys", async () => {
@@ -288,7 +288,9 @@ test("missing, blank, swapped, and free-license keys fail without disclosing val
     ];
     invalidPairs.forEach((environment) => {
       assert.throws(
-        () => getRemotionLicenseFromAppRoot(directory, environment),
+        () => {
+          return getRemotionLicenseFromAppRoot(directory, environment);
+        },
         (error: unknown) => {
           assert.ok(error instanceof Error);
           assert.match(error.message, /Remotion license keys are required/);

@@ -36,9 +36,9 @@ export function getMeasuredTargetFromSnapshot(
     return { reason: "Film stage is absent" };
   }
   const { stage, candidates } = snapshot;
-  const rejections = candidates.map((candidate) =>
-    _getRejectionFromCandidate(candidate, stage),
-  );
+  const rejections = candidates.map((candidate) => {
+    return _getRejectionFromCandidate(candidate, stage);
+  });
   const index = rejections.findIndex(isUndefined);
   if (index < 0) {
     return {
@@ -47,7 +47,9 @@ export function getMeasuredTargetFromSnapshot(
         : "No matching data-video-target",
     };
   }
-  const round = (value: number) => Math.round(value * 100) / 100;
+  const round = (value: number) => {
+    return Math.round(value * 100) / 100;
+  };
   const { rect } = candidates[index];
   return {
     x: round(rect.x + rect.width / 2 - stage.x),

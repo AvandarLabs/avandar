@@ -5,6 +5,7 @@ import { ReferenceControl } from "../../ReferenceControl/ReferenceControl";
 import css from "./CompositeField.module.css";
 import type { FieldSpec } from "../../../../videoTheme/tokenCatalog/defineTokensHelpers";
 import type { TokenRow } from "../../../tokenRows/tokenRows";
+import type { ReactNode } from "react";
 
 type Props = Readonly<{
   row: TokenRow;
@@ -14,13 +15,23 @@ type Props = Readonly<{
   value: Readonly<Record<string, unknown>>;
 }>;
 
-/** One field of a composite token: its name beside an enum menu or a reference picker. */
-export function CompositeField({ row, label, name, field, value }: Props) {
+/**
+ * One field of a composite token: its name beside an enum menu or a reference
+ * picker.
+ */
+export function CompositeField({
+  row,
+  label,
+  name,
+  field,
+  value,
+}: Props): ReactNode {
   const editor = useTokenEditor();
   const fieldName = getFieldName(name);
   const fieldLabel = `${label}, ${fieldName}`;
-  const write = (fieldValue: unknown) =>
-    editor.setToken(row.path, { ...value, [name]: fieldValue });
+  const write = (fieldValue: unknown) => {
+    return editor.setToken(row.path, { ...value, [name]: fieldValue });
+  };
   return (
     <div className={css.compositeField}>
       <span className={css.compositeFieldName} aria-hidden="true">

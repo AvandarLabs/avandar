@@ -15,11 +15,11 @@ export function getJigSceneFromFrame({
   frame,
   input,
 }: Readonly<{ frame: number; input: Input }>): GetJigSceneFromFrameResult {
-  const centers = input.collaborators.map((_, index) =>
-    input.collaborators.length === 1
+  const centers = input.collaborators.map((_, index) => {
+    return input.collaborators.length === 1
       ? 610
-      : 350 + (index * 500) / (input.collaborators.length - 1),
-  );
+      : 350 + (index * 500) / (input.collaborators.length - 1);
+  });
   const duration = 73 / input.collaborators.length;
   const activeIndex = Math.min(
     input.collaborators.length - 1,
@@ -40,9 +40,9 @@ export function getJigSceneFromFrame({
     guideX,
     guideY: 350,
     formed: ramp(frame, 20, 28, EASE.inOut),
-    applications: centers.map(
-      (_, index) => frame >= 49 + index * duration + duration * 0.65,
-    ),
+    applications: centers.map((_, index) => {
+      return frame >= 49 + index * duration + duration * 0.65;
+    }),
     activeIndex: frame >= 49 && frame < 122 ? activeIndex : -1,
   };
 }

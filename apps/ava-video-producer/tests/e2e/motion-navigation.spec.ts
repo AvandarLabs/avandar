@@ -6,11 +6,11 @@ test("preview arrows follow filtered catalog order and keep the dialog open", as
   await page.goto("/motion.html");
   await page.getByRole("searchbox", { name: "Search motions" }).fill("data");
   const cards = page.getByRole("button", { name: /^Explore / });
-  const names = await cards.evaluateAll((buttons) =>
-    buttons.map((button) =>
-      button.getAttribute("aria-label")!.replace(/^Explore /, ""),
-    ),
-  );
+  const names = await cards.evaluateAll((buttons) => {
+    return buttons.map((button) => {
+      return button.getAttribute("aria-label")!.replace(/^Explore /, "");
+    });
+  });
   expect(names.length).toBeGreaterThan(2);
   await cards.first().click();
   const dialog = page.getByRole("dialog");
@@ -104,21 +104,23 @@ test("composition sections share the atlas and offer a fitted keyboard preview",
     await dialog
       .getByRole("checkbox", { name: "Motion blur", exact: true })
       .uncheck();
-    const overflow = await dialog.evaluate((element) => ({
-      horizontal: element.scrollWidth > element.clientWidth,
-      vertical: element.scrollHeight > element.clientHeight,
-      controlsOutside: Array.from(
-        element.querySelectorAll("button, input, select, iframe"),
-      ).some((control) => {
-        const bounds = control.getBoundingClientRect();
-        return (
-          bounds.left < 0 ||
-          bounds.top < 0 ||
-          bounds.right > innerWidth ||
-          bounds.bottom > innerHeight
-        );
-      }),
-    }));
+    const overflow = await dialog.evaluate((element) => {
+      return {
+        horizontal: element.scrollWidth > element.clientWidth,
+        vertical: element.scrollHeight > element.clientHeight,
+        controlsOutside: Array.from(
+          element.querySelectorAll("button, input, select, iframe"),
+        ).some((control) => {
+          const bounds = control.getBoundingClientRect();
+          return (
+            bounds.left < 0 ||
+            bounds.top < 0 ||
+            bounds.right > innerWidth ||
+            bounds.bottom > innerHeight
+          );
+        }),
+      };
+    });
     expect(overflow).toEqual({
       horizontal: false,
       vertical: false,
@@ -167,9 +169,9 @@ test("legacy links and filtered composition navigation retain their selection", 
   ).toBeInViewport();
   // The dialog scrolls vertically at phone widths, like the Motions dialog.
   expect(
-    await dialog.evaluate(
-      (element) => element.scrollWidth <= element.clientWidth,
-    ),
+    await dialog.evaluate((element) => {
+      return element.scrollWidth <= element.clientWidth;
+    }),
   ).toBe(true);
   await expect(
     dialog.getByRole("button", { name: "Download MP4", exact: true }),

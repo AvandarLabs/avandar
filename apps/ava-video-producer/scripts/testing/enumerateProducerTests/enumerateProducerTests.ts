@@ -39,7 +39,9 @@ async function _enumerate(
 export async function enumerateProducerTests(root: string): Promise<string[]> {
   const trees = await Promise.all([
     ...["src", "scripts", "tests/helpers", "avandar-adapter", "showcase"].map(
-      (directory) => _enumerate({ root, directory, recursive: true }),
+      (directory) => {
+        return _enumerate({ root, directory, recursive: true });
+      },
     ),
     _enumerate({ root, directory: "tests", recursive: false }),
   ]);

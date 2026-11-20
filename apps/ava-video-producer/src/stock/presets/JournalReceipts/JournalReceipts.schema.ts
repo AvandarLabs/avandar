@@ -47,7 +47,9 @@ export const inputSchema = z
     const receiptIds = input.receipts.map(prop("entryId"));
     if (
       new Set(receiptIds).size !== receiptIds.length ||
-      receiptIds.some((entryId) => !identifiers.includes(entryId)) ||
+      receiptIds.some((entryId) => {
+        return !identifiers.includes(entryId);
+      }) ||
       input.receipts.length > input.entries.length
     ) {
       context.addIssue({

@@ -34,15 +34,17 @@ export function LeakPipe({ input, frame, accent }: Readonly<Props>): ReactNode {
       ) : undefined}
       {leaking ? (
         <g data-side-leak="true">
-          {[0, 1, 2].map((index) => (
-            <circle
-              key={index}
-              cx={480}
-              cy={300 + loopPhase(frame, 30, index * 10) * 110}
-              r={4}
-              fill={STOCK.cyan}
-            />
-          ))}
+          {[0, 1, 2].map((index) => {
+            return (
+              <circle
+                key={index}
+                cx={480}
+                cy={300 + loopPhase(frame, 30, index * 10) * 110}
+                r={4}
+                fill={STOCK.cyan}
+              />
+            );
+          })}
         </g>
       ) : undefined}
     </g>

@@ -5,8 +5,8 @@ import { storyboardSchema } from "../../../src/storyboard/schema/schema";
 import { previewFrames } from "../planHelpers/previewFrames";
 import { productRequirements } from "./productRequirements";
 
-const readFilm = (id: string) =>
-  storyboardSchema.parse(
+const readFilm = (id: string) => {
+  return storyboardSchema.parse(
     JSON.parse(
       readFileSync(
         new URL(
@@ -17,6 +17,7 @@ const readFilm = (id: string) =>
       ),
     ),
   );
+};
 
 test("nested product beats select the product build and entry without affecting motion-only films", () => {
   assert.deepEqual(productRequirements(readFilm("ontology-to-product")), {

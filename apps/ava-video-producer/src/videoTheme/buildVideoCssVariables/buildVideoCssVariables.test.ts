@@ -44,9 +44,9 @@ test("layout boxes become one variable per side", () => {
 
 test("motion, camera, and sketch tokens produce no variables", () => {
   assert.ok(
-    Object.keys(variables).every(
-      (name) => !/^--video-(motion|camera|motion-blur|sketch)-/.test(name),
-    ),
+    Object.keys(variables).every((name) => {
+      return !/^--video-(motion|camera|motion-blur|sketch)-/.test(name);
+    }),
   );
 });
 

@@ -64,13 +64,13 @@ function _assertBarrierClearance({
       _renderScene({ frame: 24, input }),
     ),
   );
-  obstacles.forEach((obstacle) =>
-    ServiceParticipantAssertions.assertObstacleClearance({
+  obstacles.forEach((obstacle) => {
+    return ServiceParticipantAssertions.assertObstacleClearance({
       participant,
       obstacle,
       frame,
-    }),
-  );
+    });
+  });
   const route = markup.match(/<path data-access-route[^>]*>/);
   assert.ok(route);
   const segments = ServiceSvgGeometry.getPathSegmentsFromTag(route[0]);
@@ -121,27 +121,29 @@ function _getJoinFrames(input: Readonly<Input>): number[] {
   ).circles[0].x;
   const positions = ServiceSvgGeometry.getPathSegmentsFromTag(route[0])
     .slice(0, -1)
-    .flatMap(({ end }) =>
-      [0, -33, -27, -21, -15, 6, 27].map((offset) => end.x + offset),
-    )
-    .filter((x) => x > startX && x < endX);
-  return [...new Set(positions)].map((x) =>
-    _getFrameFromX({ targetX: x, input }),
-  );
+    .flatMap(({ end }) => {
+      return [0, -33, -27, -21, -15, 6, 27].map((offset) => {
+        return end.x + offset;
+      });
+    })
+    .filter((x) => {
+      return x > startX && x < endX;
+    });
+  return [...new Set(positions)].map((x) => {
+    return _getFrameFromX({ targetX: x, input });
+  });
 }
 
 function _getCoordinates(
   geometry: Readonly<ServiceParticipantGeometry>,
 ): number[] {
   return [
-    ...geometry.circles.flatMap(({ x, y, radius }) => [x, y, radius]),
-    ...geometry.segments.flatMap(({ start, end, strokeWidth }) => [
-      start.x,
-      start.y,
-      end.x,
-      end.y,
-      strokeWidth,
-    ]),
+    ...geometry.circles.flatMap(({ x, y, radius }) => {
+      return [x, y, radius];
+    }),
+    ...geometry.segments.flatMap(({ start, end, strokeWidth }) => {
+      return [start.x, start.y, end.x, end.y, strokeWidth];
+    }),
   ];
 }
 
@@ -164,19 +166,21 @@ function _assertJoin({
         _renderParticipant({ frame: sample, input }),
       ),
     );
-    coordinates.forEach((coordinate, index) =>
-      assert.ok(
+    coordinates.forEach((coordinate, index) => {
+      return assert.ok(
         Math.abs(coordinate - boundary[index]) < 0.0001,
         `participant coordinate jumps at fractional route join ${frame}`,
-      ),
-    );
+      );
+    });
   });
 }
 
 function _registerTravelCase(input: Readonly<Input>): void {
   test(`N2 ${input.services.length} services, chosen ${JSON.stringify(input.chosenServiceId)}, ${input.accessChange}, ${input.participantMobility}: full travel clears every unchosen barrier`, () => {
     const frames = [
-      ...Array.from({ length: 169 }, (_, index) => 78 + index / 4),
+      ...Array.from({ length: 169 }, (_, index) => {
+        return 78 + index / 4;
+      }),
       77.999999,
       78.000001,
       97.999999,
@@ -184,8 +188,12 @@ function _registerTravelCase(input: Readonly<Input>): void {
       119.999999,
       120.000001,
     ];
-    frames.forEach((frame) => _assertBarrierClearance({ frame, input }));
-    _getJoinFrames(input).forEach((frame) => _assertJoin({ frame, input }));
+    frames.forEach((frame) => {
+      return _assertBarrierClearance({ frame, input });
+    });
+    _getJoinFrames(input).forEach((frame) => {
+      return _assertJoin({ frame, input });
+    });
   });
 }
 
@@ -198,8 +206,8 @@ export function registerServiceBarrierAssertions(): void {
     });
     _assertBarrierClearance({ frame: 88, input });
   });
-  [MINIMUM_INPUT, DENSE_INPUT].forEach((fixture) =>
-    fixture.services.forEach((service) => {
+  [MINIMUM_INPUT, DENSE_INPUT].forEach((fixture) => {
+    return fixture.services.forEach((service) => {
       (["unfold-ramp", "clear-entrance"] as const).forEach((accessChange) => {
         (["wheelchair", "walking"] as const).forEach((participantMobility) => {
           const input = inputSchema.parse({
@@ -212,6 +220,6 @@ export function registerServiceBarrierAssertions(): void {
           _registerTravelCase(input);
         });
       });
-    }),
-  );
+    });
+  });
 }

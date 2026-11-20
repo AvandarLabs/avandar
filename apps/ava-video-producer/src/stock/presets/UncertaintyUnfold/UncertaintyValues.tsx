@@ -28,22 +28,28 @@ export function UncertaintyValues({
   ];
   return (
     <g opacity={opacity}>
-      {values.map(({ value, x, slot }, index) => (
-        <g key={index}>
-          <path d={`M${x} 326 L${slot} 362`} stroke={STOCK.line} fill="none" />
-          <FitText
-            text={String(value)}
-            x={slot}
-            y={384}
-            width={228}
-            fontSize={12}
-            maxLines={2}
-            anchor={index === 0 ? "start" : index === 2 ? "end" : "middle"}
-            normalizeWhitespace
-            breakLongWords
-          />
-        </g>
-      ))}
+      {values.map(({ value, x, slot }, index) => {
+        return (
+          <g key={index}>
+            <path
+              d={`M${x} 326 L${slot} 362`}
+              stroke={STOCK.line}
+              fill="none"
+            />
+            <FitText
+              text={String(value)}
+              x={slot}
+              y={384}
+              width={228}
+              fontSize={12}
+              maxLines={2}
+              anchor={index === 0 ? "start" : index === 2 ? "end" : "middle"}
+              normalizeWhitespace
+              breakLongWords
+            />
+          </g>
+        );
+      })}
     </g>
   );
 }

@@ -33,16 +33,24 @@ export function exitWithAdoptThemeError(message: string): never {
 export function makeAdoptThemeArgsFromArgv(
   argv: readonly string[],
 ): AdoptThemeArgs {
-  const hasFlag = (name: string) => argv.some((arg) => arg === `--${name}`);
+  const hasFlag = (name: string) => {
+    return argv.some((arg) => {
+      return arg === `--${name}`;
+    });
+  };
   const getOptionValue = (name: string, fallback: string) => {
-    const optionArgument = argv.find((arg) => arg.startsWith(`--${name}=`));
+    const optionArgument = argv.find((arg) => {
+      return arg.startsWith(`--${name}=`);
+    });
     return optionArgument ? optionArgument.slice(name.length + 3) : fallback;
   };
   return {
     isDryRun: hasFlag("dry-run"),
     shouldWriteCurves: hasFlag("curves"),
     mode: getOptionValue("mode", "auto"),
-    paths: argv.filter((arg) => !arg.startsWith("--")),
+    paths: argv.filter((arg) => {
+      return !arg.startsWith("--");
+    }),
   };
 }
 
@@ -60,13 +68,16 @@ export function getStylesheetFromPaths(paths: readonly string[]): string {
     return stylesheet;
   }
   const stylesheetPath = [".", ".."]
-    .flatMap((base) =>
-      STYLESHEET_CANDIDATES.map((candidate) => resolve(base, candidate)),
-    )
-    .find(
-      (candidate) =>
-        existsSync(candidate) && readFileSync(candidate, "utf8").includes("--"),
-    );
+    .flatMap((base) => {
+      return STYLESHEET_CANDIDATES.map((candidate) => {
+        return resolve(base, candidate);
+      });
+    })
+    .find((candidate) => {
+      return (
+        existsSync(candidate) && readFileSync(candidate, "utf8").includes("--")
+      );
+    });
   return (
     stylesheetPath ??
     exitWithAdoptThemeError(

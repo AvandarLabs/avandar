@@ -88,20 +88,22 @@ export function LinkedParameterRehearsal({
           fill={accent}
         />
       </g>
-      {input.outputs.map((output, index) => (
-        <RehearsalOutput
-          key={output.id}
-          output={output}
-          source={input.source}
-          value={value}
-          index={index}
-          frame={frame}
-          accent={accent}
-          sourceX={sourceX}
-          showRules={input.showRules}
-          showBaselineMarkers={input.showBaselineMarkers}
-        />
-      ))}
+      {input.outputs.map((output, index) => {
+        return (
+          <RehearsalOutput
+            key={output.id}
+            output={output}
+            source={input.source}
+            value={value}
+            index={index}
+            frame={frame}
+            accent={accent}
+            sourceX={sourceX}
+            showRules={input.showRules}
+            showBaselineMarkers={input.showBaselineMarkers}
+          />
+        );
+      })}
     </g>
   );
 }

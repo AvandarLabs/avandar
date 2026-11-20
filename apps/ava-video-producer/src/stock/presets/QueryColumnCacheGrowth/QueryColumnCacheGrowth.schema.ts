@@ -46,9 +46,9 @@ export const inputSchema = z
       });
     }
     if (
-      input.columns.some(
-        ({ cells }) => cells.length !== input.columns[0]?.cells.length,
-      )
+      input.columns.some(({ cells }) => {
+        return cells.length !== input.columns[0]?.cells.length;
+      })
     ) {
       context.addIssue({
         code: "custom",
@@ -60,7 +60,9 @@ export const inputSchema = z
       (refs, index) => {
         if (
           new Set(refs).size !== refs.length ||
-          refs.some((id) => !ids.includes(id))
+          refs.some((id) => {
+            return !ids.includes(id);
+          })
         ) {
           context.addIssue({
             code: "custom",
@@ -84,9 +86,9 @@ export const inputSchema = z
       });
     }
     if (
-      input.requests[0]?.columnIds.some(
-        (id) => !input.cachedColumnIds.includes(id),
-      )
+      input.requests[0]?.columnIds.some((id) => {
+        return !input.cachedColumnIds.includes(id);
+      })
     ) {
       context.addIssue({
         code: "custom",
@@ -96,9 +98,9 @@ export const inputSchema = z
     }
     if (
       input.requests[1] &&
-      !input.requests[1].columnIds.some(
-        (id) => !input.cachedColumnIds.includes(id),
-      )
+      !input.requests[1].columnIds.some((id) => {
+        return !input.cachedColumnIds.includes(id);
+      })
     ) {
       context.addIssue({
         code: "custom",

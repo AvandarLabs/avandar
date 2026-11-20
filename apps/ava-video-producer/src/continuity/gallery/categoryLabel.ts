@@ -15,7 +15,10 @@ const CATEGORY_LABELS: Record<string, string> = {
   "entrances-and-reveals": "Entrances and reveals",
 };
 
-/** The display name for a catalog category id, or the id itself when it has none. */
+/**
+ * The display name for a catalog category id, or the id itself when it has
+ * none.
+ */
 export function categoryLabel(category: string): string {
   return CATEGORY_LABELS[category] ?? category;
 }

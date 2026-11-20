@@ -38,11 +38,14 @@ test("a whip exit accelerates past the left edge with growing blur", () => {
 });
 
 test("a whip exit with a longer duration is still on screen when the default would be gone", () => {
-  const offscreen = (frame: number, durationInFrames?: number) =>
-    box.x +
-      box.width +
-      getWhipExit(frame, 100, box, durationInFrames).translateX <=
-    0;
+  const offscreen = (frame: number, durationInFrames?: number) => {
+    return (
+      box.x +
+        box.width +
+        getWhipExit(frame, 100, box, durationInFrames).translateX <=
+      0
+    );
+  };
   assert.equal(offscreen(108), true);
   assert.equal(offscreen(108, 12), false);
   assert.equal(offscreen(112, 12), true);

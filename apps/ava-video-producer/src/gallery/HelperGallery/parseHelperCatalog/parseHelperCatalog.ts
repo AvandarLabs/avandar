@@ -21,6 +21,7 @@ const HELPER_SCHEMA = z.strictObject({
   category: TEXT,
   description: TEXT,
   source: TEXT,
+  relatedSources: z.array(TEXT).default([]),
   exports: z.array(TEXT).min(1),
   signature: TEXT,
   defaults: z.array(z.strictObject({ name: TEXT, value: TEXT })),
@@ -52,8 +53,16 @@ function _assertUniqueIds(ids: readonly string[]): void {
 }
 
 function _assertReferences(catalog: HelperCatalog): void {
-  const categories = new Set(catalog.categories.map((item) => item.id));
-  const modules = new Set(catalog.modules.map((item) => item.path));
+  const categories = new Set(
+    catalog.categories.map((item) => {
+      return item.id;
+    }),
+  );
+  const modules = new Set(
+    catalog.modules.map((item) => {
+      return item.path;
+    }),
+  );
   catalog.helpers.forEach((helper) => {
     if (!categories.has(helper.category)) {
       throw new Error(
@@ -65,9 +74,20 @@ function _assertReferences(catalog: HelperCatalog): void {
         `Unlisted source module "${helper.source}" for "${helper.id}"`,
       );
     }
+    helper.relatedSources.forEach((relatedSource) => {
+      if (!modules.has(relatedSource)) {
+        throw new Error(
+          `Unlisted related source module "${relatedSource}" for "${helper.id}"`,
+        );
+      }
+    });
   });
   catalog.categories.forEach((category) => {
-    if (!catalog.helpers.some((helper) => helper.category === category.id)) {
+    if (
+      !catalog.helpers.some((helper) => {
+        return helper.category === category.id;
+      })
+    ) {
       throw new Error(`Category "${category.id}" has no helpers`);
     }
   });
@@ -79,7 +99,11 @@ function _assertReferences(catalog: HelperCatalog): void {
  */
 export function parseHelperCatalog(raw: unknown): HelperCatalog {
   const catalog = CATALOG_SCHEMA.parse(raw);
-  _assertUniqueIds(catalog.helpers.map((helper) => helper.id));
+  _assertUniqueIds(
+    catalog.helpers.map((helper) => {
+      return helper.id;
+    }),
+  );
   _assertReferences(catalog);
   return catalog;
 }

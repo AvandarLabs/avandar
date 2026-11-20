@@ -136,9 +136,9 @@ function _createControlCopy({
     label: {
       id: `motionAtlas.${id}.controls.${path || "item"}`,
       message:
-        path
-          .replace(/([A-Z])/g, " $1")
-          .replace(/^./, (letter) => letter.toUpperCase()) || "Value",
+        path.replace(/([A-Z])/g, " $1").replace(/^./, (letter) => {
+          return letter.toUpperCase();
+        }) || "Value",
     },
   };
 }

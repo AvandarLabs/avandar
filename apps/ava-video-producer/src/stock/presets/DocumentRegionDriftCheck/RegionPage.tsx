@@ -31,14 +31,16 @@ export function RegionPage({
         fill={STOCK.surface}
         stroke={STOCK.line}
       />
-      {[0, 1, 2, 3].map((index) => (
-        <path
-          key={index}
-          d={`M${x + 18} ${y + 26 + index * 34} h264`}
-          stroke={STOCK.line}
-          strokeOpacity={0.4}
-        />
-      ))}
+      {[0, 1, 2, 3].map((index) => {
+        return (
+          <path
+            key={index}
+            d={`M${x + 18} ${y + 26 + index * 34} h264`}
+            stroke={STOCK.line}
+            strokeOpacity={0.4}
+          />
+        );
+      })}
       <rect
         data-saved-region={side}
         data-page={input.saved.page}

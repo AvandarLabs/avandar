@@ -208,9 +208,9 @@ async function _deliverFilm(options: {
     [path.join(plan, "captions.srt"), `${film.id}.srt`],
     [path.join(plan, "captions.vtt"), `${film.id}.vtt`],
   ];
-  await promiseMapSequential(assets, ([sourceFile, name]) =>
-    _deliverAsset({ sourceFile, name, backup }),
-  );
+  await promiseMapSequential(assets, ([sourceFile, name]) => {
+    return _deliverAsset({ sourceFile, name, backup });
+  });
   await _writeDeliveryRecord({
     film,
     posterFrame,
@@ -249,9 +249,9 @@ async function _deliverFilms(ids: readonly string[]): Promise<void> {
   );
   await fs.mkdir(backup, { recursive: true });
   // Deliver one film at a time, so a failure stops before the next one.
-  await promiseMapSequential(films, (film) =>
-    _deliverFilm({ film, backup, provenance }),
-  );
+  await promiseMapSequential(films, (film) => {
+    return _deliverFilm({ film, backup, provenance });
+  });
   console.log(
     `Delivered ${films.length} component films under ${DELIVERY_DIRECTORY}; previous files preserved in ${backup}.`,
   );

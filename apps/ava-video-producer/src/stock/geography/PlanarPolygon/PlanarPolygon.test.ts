@@ -50,9 +50,9 @@ test("accepts concavity, reversed winding, collinear intermediate vertices and t
       [99, 99.00000000000001],
     ],
   ];
-  accepted.forEach((polygon) =>
-    assert.equal(PlanarPolygon.isSimple({ polygon }), true),
-  );
+  accepted.forEach((polygon) => {
+    return assert.equal(PlanarPolygon.isSimple({ polygon }), true);
+  });
   const concave: Array<[number, number]> = [
     [0, 0],
     [10, 0],
@@ -112,9 +112,9 @@ test("rejects repeated vertices, backtracking, nonadjacent contact and crossings
       [0, 10],
     ],
   ];
-  rejected.forEach((polygon) =>
-    assert.equal(PlanarPolygon.isSimple({ polygon }), false),
-  );
+  rejected.forEach((polygon) => {
+    return assert.equal(PlanarPolygon.isSimple({ polygon }), false);
+  });
 });
 
 test("interior overlap includes containment, identical and crossing rings", () => {
@@ -146,12 +146,12 @@ test("interior overlap includes containment, identical and crossing rings", () =
       [0, 10],
     ],
   ];
-  samples.forEach((secondPolygon) =>
-    assert.equal(
+  samples.forEach((secondPolygon) => {
+    return assert.equal(
       PlanarPolygon.doInteriorsOverlap({ firstPolygon: SQUARE, secondPolygon }),
       true,
-    ),
-  );
+    );
+  });
 });
 test("shared borders, vertices and concave voids have no interior overlap", () => {
   const samples: Array<Array<[number, number]>> = [
@@ -174,12 +174,12 @@ test("shared borders, vertices and concave voids have no interior overlap", () =
       [11, 10],
     ],
   ];
-  samples.forEach((secondPolygon) =>
-    assert.equal(
+  samples.forEach((secondPolygon) => {
+    return assert.equal(
       PlanarPolygon.doInteriorsOverlap({ firstPolygon: SQUARE, secondPolygon }),
       false,
-    ),
-  );
+    );
+  });
   const firstPolygon: Array<[number, number]> = [
     [0, 0],
     [10, 0],
@@ -252,8 +252,8 @@ test("interior overlap is symmetric under order and winding at a shared diagonal
     [10, 10],
     [0, 10],
   ];
-  [lower, [...lower].reverse()].forEach((firstPolygon) =>
-    [upper, [...upper].reverse()].forEach((secondPolygon) => {
+  [lower, [...lower].reverse()].forEach((firstPolygon) => {
+    return [upper, [...upper].reverse()].forEach((secondPolygon) => {
       assert.equal(
         PlanarPolygon.doInteriorsOverlap({ firstPolygon, secondPolygon }),
         false,
@@ -265,8 +265,8 @@ test("interior overlap is symmetric under order and winding at a shared diagonal
         }),
         false,
       );
-    }),
-  );
+    });
+  });
   const cut: Array<[number, number]> = [
     [0, 0],
     [10, 0],
@@ -310,14 +310,14 @@ test("closed disks require strict containment and retain every boundary contact"
     { center: [0, 5], radius: 0, expected: "intersecting" },
     { center: [5, 5], radius: 0, expected: "inside" },
   ];
-  cases.forEach(({ center, radius, expected }) =>
-    [polygon, [...polygon].reverse()].forEach((ring) =>
-      assert.equal(
+  cases.forEach(({ center, radius, expected }) => {
+    return [polygon, [...polygon].reverse()].forEach((ring) => {
+      return assert.equal(
         PlanarPolygon.getDiskClassification({ center, radius, polygon: ring }),
         expected,
-      ),
-    ),
-  );
+      );
+    });
+  });
 });
 test("concave corners and subnormal disks use exact squared edge distance", () => {
   const concave: Array<[number, number]> = [
@@ -369,13 +369,13 @@ test("concave corners and subnormal disks use exact squared edge distance", () =
     }),
     "intersecting",
   );
-  [NaN, Infinity, -1].forEach((radius) =>
-    assert.throws(() =>
-      PlanarPolygon.getDiskClassification({
+  [NaN, Infinity, -1].forEach((radius) => {
+    return assert.throws(() => {
+      return PlanarPolygon.getDiskClassification({
         center: [1, 1],
         radius,
         polygon: concave,
-      }),
-    ),
-  );
+      });
+    });
+  });
 });

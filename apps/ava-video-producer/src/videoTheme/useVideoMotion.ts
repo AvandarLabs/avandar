@@ -11,5 +11,7 @@ import { useVideoTokens } from "./useVideoTheme";
  */
 export function useVideoMotion(): VideoMotion {
   const { motion } = useVideoTokens();
-  return useMemo(() => createVideoMotion(motion), [motion]);
+  return useMemo(() => {
+    return createVideoMotion(motion);
+  }, [motion]);
 }

@@ -34,13 +34,15 @@ function _createCloseInput({
         requestLabel: "Information requested",
       },
     ],
-    teams: Array.from({ length: 4 }, (_, index) => ({
-      id: String(index),
-      label: `Team ${index}`,
-      serviceLabel: "Information",
-      initialPlaceId: "a",
-      agreedPlaceId: index === movingIndex ? "b" : "a",
-    })),
+    teams: Array.from({ length: 4 }, (_, index) => {
+      return {
+        id: String(index),
+        label: `Team ${index}`,
+        serviceLabel: "Information",
+        initialPlaceId: "a",
+        agreedPlaceId: index === movingIndex ? "b" : "a",
+      };
+    }),
   });
 }
 function _getMarkerBounds(markup: string) {
@@ -82,35 +84,33 @@ export function registerCoordinationReviewAssertions(
   render: (options: Readonly<{ frame: number; input: Input }>) => string,
 ): void {
   test("I3 final full marker shapes remain disjoint for nearby diagonal places and every moving index", () => {
-    ["flags", "wooden-pieces"].forEach((markerStyle) =>
-      Array.from({ length: 4 }, (_, index) => index).forEach((movingIndex) =>
-        Array.from({ length: 72 }, (_, index) => index * 5 + 1).forEach(
-          (angle) => {
-            const input = _createCloseInput({
-              movingIndex,
-              angle,
-              markerStyle: markerStyle as Input["markerStyle"],
+    ["flags", "wooden-pieces"].forEach((markerStyle) => {
+      return Array.from({ length: 4 }, (_, index) => {
+        return index;
+      }).forEach((movingIndex) => {
+        return Array.from({ length: 72 }, (_, index) => {
+          return index * 5 + 1;
+        }).forEach((angle) => {
+          const input = _createCloseInput({
+            movingIndex,
+            angle,
+            markerStyle: markerStyle as Input["markerStyle"],
+          });
+          const boxes = _getMarkerBounds(render({ frame: 150, input: input }));
+          boxes.forEach((box, index) => {
+            return boxes.slice(index + 1).forEach((other) => {
+              return assert.ok(
+                box.x + box.width <= other.x ||
+                  other.x + other.width <= box.x ||
+                  box.y + box.height <= other.y ||
+                  other.y + other.height <= box.y,
+                `overlap: ${movingIndex}, ${angle}, ${markerStyle}`,
+              );
             });
-            const boxes = _getMarkerBounds(
-              render({ frame: 150, input: input }),
-            );
-            boxes.forEach((box, index) =>
-              boxes
-                .slice(index + 1)
-                .forEach((other) =>
-                  assert.ok(
-                    box.x + box.width <= other.x ||
-                      other.x + other.width <= box.x ||
-                      box.y + box.height <= other.y ||
-                      other.y + other.height <= box.y,
-                    `overlap: ${movingIndex}, ${angle}, ${markerStyle}`,
-                  ),
-                ),
-            );
-          },
-        ),
-      ),
-    );
+          });
+        });
+      });
+    });
   });
   test("I4 named places, team tokens and each open request have visible ownership", () => {
     const input = DEFAULT_INPUT,
@@ -120,7 +120,9 @@ export function registerCoordinationReviewAssertions(
         ...markup.matchAll(
           /<path data-place-connector="([^"]*)"[^>]*d="([^"]*)"/g,
         ),
-      ].find((match) => match[1] === place.id);
+      ].find((match) => {
+        return match[1] === place.id;
+      });
       assert.ok(connector, `missing visible place connector ${index}`);
       assert.ok(
         connector[2].endsWith(`L${340 + place.x * 270} ${160 + place.y * 280}`),
@@ -132,7 +134,9 @@ export function registerCoordinationReviewAssertions(
     input.teams.forEach((team, index) => {
       const token = [
         ...markup.matchAll(/<g data-team="([^"]*)"[^>]*>(.*?)<\/g>/g),
-      ].find((match) => match[1] === team.id);
+      ].find((match) => {
+        return match[1] === team.id;
+      });
       assert.ok(token);
       assert.match(token[2], new RegExp(`data-team-key[^>]*>${index + 1}<`));
     });
@@ -168,9 +172,9 @@ export function registerCoordinationReviewAssertions(
     });
     const variants = [
       exact,
-      ...["flags", "wooden-pieces"].flatMap((markerStyle) =>
-        Array.from({ length: 4 }, (_, destinationIndex) =>
-          Array.from({ length: 4 }, (_team, movingIndex) => {
+      ...["flags", "wooden-pieces"].flatMap((markerStyle) => {
+        return Array.from({ length: 4 }, (_, destinationIndex) => {
+          return Array.from({ length: 4 }, (_team, movingIndex) => {
             const input = _createCloseInput({
               movingIndex,
               angle: 44.4,
@@ -195,24 +199,22 @@ export function registerCoordinationReviewAssertions(
             ];
             places.splice(destinationIndex, 0, input.places[1]);
             return inputSchema.parse({ ...input, places });
-          }),
-        ).flat(),
-      ),
+          });
+        }).flat();
+      }),
     ];
     variants.forEach((input) => {
       const boxes = _getMarkerBounds(render({ frame: 150, input: input }));
-      boxes.forEach((box, index) =>
-        boxes
-          .slice(index + 1)
-          .forEach((other) =>
-            assert.ok(
-              box.x + box.width <= other.x ||
-                other.x + other.width <= box.x ||
-                box.y + box.height <= other.y ||
-                other.y + other.height <= box.y,
-            ),
-          ),
-      );
+      boxes.forEach((box, index) => {
+        return boxes.slice(index + 1).forEach((other) => {
+          return assert.ok(
+            box.x + box.width <= other.x ||
+              other.x + other.width <= box.x ||
+              box.y + box.height <= other.y ||
+              other.y + other.height <= box.y,
+          );
+        });
+      });
     });
   });
   test("I4 keys visibly join raw labels, assignments and every open caption including empty and Unicode IDs", () => {
@@ -247,9 +249,9 @@ export function registerCoordinationReviewAssertions(
           /<g data-unassigned-caption="([^"]*)"[^>]*>(.*?)<\/g>/g,
         ),
       ];
-      const unassigned = input.places.filter(
-        (place) => !input.teams.some(propEq("agreedPlaceId", place.id)),
-      );
+      const unassigned = input.places.filter((place) => {
+        return !input.teams.some(propEq("agreedPlaceId", place.id));
+      });
       assert.equal(
         open.length,
         input.showUnassignedRequests ? unassigned.length : 0,
@@ -279,13 +281,14 @@ export function registerCoordinationReviewAssertions(
   });
   test("I4 the community role rail clears complete fourth-place request copy", () => {
     const markup = render({ frame: 150, input: fixtures[2].input });
-    const role = [...markup.matchAll(/<text[^>]*>/g)].find(
-      (match) =>
+    const role = [...markup.matchAll(/<text[^>]*>/g)].find((match) => {
+      return (
         SvgAttributes.getNumberFromMarkup({
           attributes: match[0],
           name: "y",
-        }) === 530,
-    );
+        }) === 530
+      );
+    });
     assert.ok(role);
     assert.ok(
       SvgAttributes.getNumberFromMarkup({ attributes: role[0], name: "x" }) >=

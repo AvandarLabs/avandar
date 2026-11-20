@@ -10,12 +10,14 @@ type GetRecipientPoseResult = {
 };
 
 function _getSelections(input: Input) {
-  return input.contents.flatMap((content, contentIndex) =>
-    Array.from({ length: content.selectedUnits }, (_, unitIndex) => ({
-      contentIndex,
-      unitIndex,
-    })),
-  );
+  return input.contents.flatMap((content, contentIndex) => {
+    return Array.from({ length: content.selectedUnits }, (_, unitIndex) => {
+      return {
+        contentIndex,
+        unitIndex,
+      };
+    });
+  });
 }
 
 /**

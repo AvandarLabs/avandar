@@ -31,17 +31,19 @@ export function CodeLineRow({ codeTokens, index, accent }: Props): ReactNode {
         fontFamily={code.fontFamily}
         xmlSpace="preserve"
       >
-        {codeTokens.map((token, j) => (
-          <tspan
-            key={j}
-            fill={getContentColorFromValue(
-              token.color === STOCK.mint ? "accent" : token.color,
-              { tokens, accent },
-            )}
-          >
-            {token.text}
-          </tspan>
-        ))}
+        {codeTokens.map((token, j) => {
+          return (
+            <tspan
+              key={j}
+              fill={getContentColorFromValue(
+                token.color === STOCK.mint ? "accent" : token.color,
+                { tokens, accent },
+              )}
+            >
+              {token.text}
+            </tspan>
+          );
+        })}
       </text>
     </g>
   );

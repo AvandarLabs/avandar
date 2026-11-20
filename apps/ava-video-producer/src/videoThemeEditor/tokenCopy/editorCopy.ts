@@ -6,7 +6,10 @@ import { humanizeScaleKey } from "../customScaleKey/customScaleKey";
  * field names, and enum options.
  */
 
-/** Readable words for a component name, such as `Progress bar` for `ProgressBar`. */
+/**
+ * Readable words for a component name, such as `Progress bar` for
+ * `ProgressBar`.
+ */
 function _humanize(name: string): string {
   return capitalize(humanizeScaleKey(name));
 }
@@ -29,7 +32,10 @@ const GROUP_NAMES: Readonly<Record<string, string>> = {
   "mantine:rendering": "Rendering",
 };
 
-/** Section names for semantic and Mantine groups. Atomic groups use their scale's catalog label. */
+/**
+ * Section names for semantic and Mantine groups. Atomic groups use their
+ * scale's catalog label.
+ */
 export function getGroupName(group: string): string | undefined {
   const [tier, name] = group.split(":");
   return tier === "component" ? _humanize(name) : GROUP_NAMES[group];

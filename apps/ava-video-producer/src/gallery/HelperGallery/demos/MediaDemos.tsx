@@ -4,12 +4,13 @@ import css from "./demos.module.css";
 import { formatReadout } from "./demoTheme";
 import { HelperDemoFrame } from "./HelperDemoFrame/HelperDemoFrame";
 import type { HelperDemoProps } from "./helperDemo.types";
+import type { ReactNode } from "react";
 
 /** The curated fictional screenshot the media preview loads. */
 const SCREEN = "avandar/screens/explorer-explorer-chart.png";
 
 /** A still sampled through `MediaPlane`, fading in and drifting slightly. */
-export function MediaPlaneDemo({ frame, frames }: HelperDemoProps) {
+export function MediaPlaneDemo({ frame, frames }: HelperDemoProps): ReactNode {
   const drift = ramp(frame, 10, 70);
   return (
     <HelperDemoFrame

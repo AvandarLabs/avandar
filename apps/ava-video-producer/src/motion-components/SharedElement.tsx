@@ -1,10 +1,12 @@
 import { interpolateStyles } from "@remotion/animation-utils";
 import { getMotionProgress } from "./motionSettings";
-import type { MotionRect } from "./AnchoredOverlay";
+import type { MotionRect } from "./getOverlayTimings";
 import type { MotionOptions } from "./motionSettings";
 import type { CSSProperties, ReactNode } from "react";
 
-/** A persistent child's source, destination and frame-authored travel controls. */
+/**
+ * A persistent child's source, destination and frame-authored travel controls.
+ */
 export type SharedElementProps = {
   source: MotionRect;
   target: MotionRect;
@@ -28,7 +30,7 @@ export function SharedElement({
   children,
   className,
   style,
-}: SharedElementProps) {
+}: SharedElementProps): ReactNode {
   const progress = getMotionProgress(frame, at, durationInFrames, motion);
   const geometry = interpolateStyles(
     progress,

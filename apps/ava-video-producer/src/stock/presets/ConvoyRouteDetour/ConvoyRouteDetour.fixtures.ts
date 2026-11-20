@@ -181,15 +181,17 @@ export const fixtures: Array<{ id: string; input: Input }> = [
     id: "repeated-nonzero-waypoints",
     input: {
       ...DEFAULT_INPUT,
-      routes: DEFAULT_INPUT.routes.map((route) => ({
-        ...route,
-        points: [
-          route.points[0],
-          route.points[1],
-          route.points[1],
-          ...route.points.slice(2),
-        ],
-      })),
+      routes: DEFAULT_INPUT.routes.map((route) => {
+        return {
+          ...route,
+          points: [
+            route.points[0],
+            route.points[1],
+            route.points[1],
+            ...route.points.slice(2),
+          ],
+        };
+      }),
       obstruction: { ...DEFAULT_INPUT.obstruction, segmentIndex: 2 },
     },
   },

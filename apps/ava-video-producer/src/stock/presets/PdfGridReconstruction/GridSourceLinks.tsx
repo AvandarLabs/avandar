@@ -18,16 +18,18 @@ export function GridSourceLinks({
     <g>
       {" "}
       {input.showSourceLinks && frame >= 106
-        ? input.grid.rows.map((_, rowIndex) => (
-            <path
-              key={rowIndex}
-              data-source-link={rowIndex}
-              d={`M452 ${322 + rowIndex * 64} H${resultX}`}
-              stroke={accent}
-              strokeDasharray="2 4"
-              fill="none"
-            />
-          ))
+        ? input.grid.rows.map((_, rowIndex) => {
+            return (
+              <path
+                key={rowIndex}
+                data-source-link={rowIndex}
+                d={`M452 ${322 + rowIndex * 64} H${resultX}`}
+                stroke={accent}
+                strokeDasharray="2 4"
+                fill="none"
+              />
+            );
+          })
         : undefined}
     </g>
   );

@@ -14,7 +14,9 @@ export function readTargetCandidatesInPage(
   }
   const { x, y, right, bottom } = stage.getBoundingClientRect();
   const candidates = [...document.querySelectorAll("[data-video-target]")]
-    .filter((element) => element.getAttribute("data-video-target") === targetId)
+    .filter((element) => {
+      return element.getAttribute("data-video-target") === targetId;
+    })
     .map((element) => {
       const rect = element.getBoundingClientRect();
       const computed = getComputedStyle(element);

@@ -30,13 +30,15 @@ const productBundle: Plugin = {
       {
         filter: /generated\/product(?:\.(js|css))?$/,
       },
-      ({ path: filename }) => ({
-        path: path.join(
-          root,
-          "out/showcase/product",
-          `product.${filename.endsWith(".css") ? "css" : "js"}`,
-        ),
-      }),
+      ({ path: filename }) => {
+        return {
+          path: path.join(
+            root,
+            "out/showcase/product",
+            `product.${filename.endsWith(".css") ? "css" : "js"}`,
+          ),
+        };
+      },
     );
   },
 };
@@ -105,9 +107,9 @@ async function _assertBrowserBundle(entry: string): Promise<void> {
     await fs.writeFile(probe, probeSource);
     const result = await _bundleWithProbe({ entry, probe, directory });
     assert.ok(
-      Object.keys(result.metafile!.inputs).some((filename) =>
-        filename.startsWith("src/stock/"),
-      ),
+      Object.keys(result.metafile!.inputs).some((filename) => {
+        return filename.startsWith("src/stock/");
+      }),
     );
     const loaded = await import(
       pathToFileURL(path.join(directory, "out/probe.js")).href
@@ -125,8 +127,9 @@ async function _assertBrowserBundle(entry: string): Promise<void> {
   "src/stock-entry.tsx",
   "src/showcase/LivePlayer.tsx",
 ].forEach((entry) => {
-  test(`${entry} shares the same English defaults and untouched authored copy`, () =>
-    _assertBrowserBundle(entry));
+  test(`${entry} shares the same English defaults and untouched authored copy`, () => {
+    return _assertBrowserBundle(entry);
+  });
 });
 test("producer source modules do not import Lingui, except the generated product bundle", async () => {
   const filenames = await fs.readdir(path.join(root, "src"), {
@@ -134,11 +137,12 @@ test("producer source modules do not import Lingui, except the generated product
   });
   await Promise.all(
     filenames
-      .filter(
-        (filename) =>
+      .filter((filename) => {
+        return (
           /\.[tj]sx?$/.test(filename) &&
-          !filename.startsWith(`avandar${path.sep}generated${path.sep}`),
-      )
+          !filename.startsWith(`avandar${path.sep}generated${path.sep}`)
+        );
+      })
       .map(async (filename) => {
         assert.doesNotMatch(
           await fs.readFile(path.join(root, "src", filename), "utf8"),

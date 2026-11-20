@@ -17,12 +17,13 @@ async function _watchChartInPage(
   let replacements = 0;
   const observer = new MutationObserver((records) => {
     records.forEach((record) => {
-      replacements += Array.from(record.removedNodes).filter(
-        (node) =>
+      replacements += Array.from(record.removedNodes).filter((node) => {
+        return (
           node instanceof Element &&
           (node.matches(".recharts-wrapper") ||
-            Boolean(node.querySelector(".recharts-wrapper"))),
-      ).length;
+            Boolean(node.querySelector(".recharts-wrapper")))
+        );
+      }).length;
     });
   });
   observer.observe(document.body, { childList: true, subtree: true });

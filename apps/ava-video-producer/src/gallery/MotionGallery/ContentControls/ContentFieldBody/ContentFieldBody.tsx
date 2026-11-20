@@ -27,14 +27,16 @@ export function ContentFieldBody({
           aria-describedby={context.field["aria-describedby"]}
         >
           <legend>{context.label}</legend>
-          {matchedControl.controls.map((child) => (
-            <ContentField
-              {...{ ...remainingProps, control: matchedControl, context }}
-              key={child.path}
-              control={child}
-              parentPath={context.path}
-            />
-          ))}
+          {matchedControl.controls.map((child) => {
+            return (
+              <ContentField
+                {...{ ...remainingProps, control: matchedControl, context }}
+                key={child.path}
+                control={child}
+                parentPath={context.path}
+              />
+            );
+          })}
         </fieldset>
       );
     })

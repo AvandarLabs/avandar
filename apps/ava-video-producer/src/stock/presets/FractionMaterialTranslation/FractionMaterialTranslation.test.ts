@@ -39,7 +39,12 @@ test("all physical materials select the same numerator and denominator", () => {
       ),
     ];
     assert.equal(pieces.length, 8);
-    assert.equal(pieces.filter((piece) => piece[1] === "true").length, 8);
+    assert.equal(
+      pieces.filter((piece) => {
+        return piece[1] === "true";
+      }).length,
+      8,
+    );
   });
   assert.equal([...markup.matchAll(/aria-label="8 \/ 8"/g)].length, 4);
 });
@@ -56,10 +61,9 @@ function _getVisibleTexts({
   return [
     input.lessonLabel,
     input.caption,
-    ...input.representations.flatMap((representation) => [
-      representation.learnerLabel,
-      representation.materialLabel,
-    ]),
+    ...input.representations.flatMap((representation) => {
+      return [representation.learnerLabel, representation.materialLabel];
+    }),
   ];
 }
 const options = {
@@ -103,11 +107,13 @@ test("all material choices and arrangements derive selection from one fraction",
         [true, false].forEach((showFractionNotation) => {
           [
             denseInput.representations,
-            ...denseInput.representations.map((_, index) =>
-              denseInput.representations.filter(
-                (_representation, otherIndex) => index !== otherIndex,
-              ),
-            ),
+            ...denseInput.representations.map((_, index) => {
+              return denseInput.representations.filter(
+                (_representation, otherIndex) => {
+                  return index !== otherIndex;
+                },
+              );
+            }),
           ].forEach((representations) => {
             const input = {
               ...denseInput,
@@ -128,7 +134,9 @@ test("all material choices and arrangements derive selection from one fraction",
               ];
               assert.equal(pieces.length, 8);
               assert.equal(
-                pieces.filter((piece) => piece[1] === "true").length,
+                pieces.filter((piece) => {
+                  return piece[1] === "true";
+                }).length,
                 numerator,
               );
             });
@@ -149,12 +157,15 @@ test("all material choices and arrangements derive selection from one fraction",
 test("surface motion preserves separate learners and full material clearance", () => {
   const initial = _render({ frame: 24, input: denseInput });
   const resolved = _render({ frame: 150, input: denseInput });
-  const surfaces = (markup: string) =>
-    [
+  const surfaces = (markup: string) => {
+    return [
       ...markup.matchAll(
         /data-work-surface="[^"]+" transform="translate\(([-.\d]+) ([-.\d]+)\)"/g,
       ),
-    ].map((match) => [Number(match[1]), Number(match[2])]);
+    ].map((match) => {
+      return [Number(match[1]), Number(match[2])];
+    });
+  };
   assert.notDeepEqual(surfaces(initial), surfaces(resolved));
   assert.deepEqual(
     surfaces(
@@ -196,14 +207,15 @@ test("fraction schemas forbid contradictory equal-part counts and duplicate mate
       fraction: { numerator: 1, denominator: 2, extra: true },
     },
     { ...minimumInput, lessonLabel: "x".repeat(37) },
-  ].forEach((value) =>
-    assert.equal(inputSchema.safeParse(value).success, false),
-  );
+  ].forEach((value) => {
+    return assert.equal(inputSchema.safeParse(value).success, false);
+  });
   assert.ok(
-    contract.semanticRules.some(
-      (rule) =>
+    contract.semanticRules.some((rule) => {
+      return (
         rule.paths.includes("fraction.numerator") &&
-        rule.description.includes("1..denominator"),
-    ),
+        rule.description.includes("1..denominator")
+      );
+    }),
   );
 });

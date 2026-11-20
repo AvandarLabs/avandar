@@ -24,18 +24,20 @@ export function DisclosureCopy({ input }: Readonly<Props>): ReactNode {
   ];
   return (
     <g>
-      {captions.map(({ text, x, y, width }) => (
-        <FitText
-          key={x + y}
-          {...{ text, x, y, width }}
-          fontSize={14}
-          maxLines={2}
-          anchor="middle"
-          normalizeWhitespace
-          breakLongWords
-          color={STOCK.muted}
-        />
-      ))}
+      {captions.map(({ text, x, y, width }) => {
+        return (
+          <FitText
+            key={x + y}
+            {...{ text, x, y, width }}
+            fontSize={14}
+            maxLines={2}
+            anchor="middle"
+            normalizeWhitespace
+            breakLongWords
+            color={STOCK.muted}
+          />
+        );
+      })}
     </g>
   );
 }

@@ -91,7 +91,9 @@ async function _runExport({
   });
   while (job.state === "running") {
     onStatus(job);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => {
+      return setTimeout(resolve, 1000);
+    });
     job = await _requestJob(`/api/exports/${encodeURIComponent(job.id ?? "")}`);
   }
   if (job.state === "failed") {
@@ -127,7 +129,9 @@ async function _downloadFilm({
       onStatus({ state: "failed", message: error.message });
       throw error;
     })
-    .finally(() => activeDownloads.delete(request));
+    .finally(() => {
+      return activeDownloads.delete(request);
+    });
   activeDownloads.set(request, pending);
   return pending;
 }

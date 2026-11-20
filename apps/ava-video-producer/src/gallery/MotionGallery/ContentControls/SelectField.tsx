@@ -36,7 +36,9 @@ export function SelectField({
     propEq<{ value: unknown }, "value", unknown>("value", context.value),
   );
   const selectValue = (value: string) => {
-    const option = options.find((_, index) => `option:${index}` === value);
+    const option = options.find((_, index) => {
+      return `option:${index}` === value;
+    });
     if (option) {
       context.update(option.value);
     }
@@ -45,18 +47,22 @@ export function SelectField({
     <select
       {...context.field}
       value={selectedIndex < 0 ? "" : `option:${selectedIndex}`}
-      onChange={(event) => selectValue(event.target.value)}
+      onChange={(event) => {
+        return selectValue(event.target.value);
+      }}
     >
       <option value="" disabled>
         {"Choose a value"}
       </option>
-      {options.map((option, index) => (
-        <option key={`${option.value}-${index}`} value={`option:${index}`}>
-          {typeof option.label === "string"
-            ? option.label
-            : option.label.message}
-        </option>
-      ))}
+      {options.map((option, index) => {
+        return (
+          <option key={`${option.value}-${index}`} value={`option:${index}`}>
+            {typeof option.label === "string"
+              ? option.label
+              : option.label.message}
+          </option>
+        );
+      })}
     </select>
   );
 }

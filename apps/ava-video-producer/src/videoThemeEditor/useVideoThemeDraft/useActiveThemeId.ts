@@ -18,13 +18,13 @@ export function useActiveThemeId(
   const { library, storage } = options;
   const availableKey = [...library.keys()].join(",");
   const hasChosen = useRef(false);
-  const [themeId, setThemeId] = useState(() =>
-    getActiveThemeIdFromLocation({
+  const [themeId, setThemeId] = useState(() => {
+    return getActiveThemeIdFromLocation({
       search: location.search,
       storage,
       available: availableKey.split(","),
-    }),
-  );
+    });
+  });
   useEffect(
     function adoptActiveThemeIdFromLocation() {
       if (!hasChosen.current) {

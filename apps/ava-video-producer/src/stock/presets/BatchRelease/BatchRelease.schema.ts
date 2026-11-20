@@ -32,10 +32,9 @@ export const inputSchema = z
     showItemLabels: z.boolean(),
   })
   .superRefine((input, context) => {
-    const ids = input.batches.flatMap((batch) => [
-      batch.id,
-      ...batch.items.map(prop("id")),
-    ]);
+    const ids = input.batches.flatMap((batch) => {
+      return [batch.id, ...batch.items.map(prop("id"))];
+    });
     if (new Set(ids).size !== ids.length) {
       context.addIssue({
         code: "custom",

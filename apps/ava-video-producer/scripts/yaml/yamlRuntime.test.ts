@@ -125,21 +125,13 @@ test("Remotion webpack bundles contain the same authored YAML values", async () 
 test("malformed YAML prevents Node and browser bundles from loading", async () => {
   await _withFixture(async (root) => {
     await fs.writeFile(path.join(root, "preset.yaml"), "copy: [unterminated");
-    assert.throws(
-      () =>
-        execFileSync(
-          process.execPath,
-          [
-            "--import",
-            "tsx",
-            "--import",
-            bootstrap,
-            path.join(root, "entry.ts"),
-          ],
-          { stdio: "pipe" },
-        ),
-      /YAML|Flow sequence/,
-    );
+    assert.throws(() => {
+      return execFileSync(
+        process.execPath,
+        ["--import", "tsx", "--import", bootstrap, path.join(root, "entry.ts")],
+        { stdio: "pipe" },
+      );
+    }, /YAML|Flow sequence/);
     await assert.rejects(
       build({
         entryPoints: [path.join(root, "entry.ts")],

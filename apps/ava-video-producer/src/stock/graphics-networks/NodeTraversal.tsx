@@ -90,30 +90,38 @@ export function NodeTraversal({
       </Eyebrow>
       {input.showRouteLabel ? (
         <TraversalRouteSummary
-          label={route.map((index) => nodes[index].label).join(" → ")}
+          label={route
+            .map((index) => {
+              return nodes[index].label;
+            })
+            .join(" → ")}
           accent={accent}
         />
       ) : null}
-      {_buildKeyedEdges(edges, nodes).map(({ key, from, to, stepOffset }) => (
-        <DrawPath
-          key={key}
-          d={`M${from.x} ${from.y} L${to.x} ${to.y}`}
-          frame={frame}
-          at={EDGE_CUE + stepOffset * motion.stagger.edge}
-        />
-      ))}
-      {_buildKeyedRouteSteps(route, nodes).map(
-        ({ key, from, to, stepOffset }) => (
-          <Route
+      {_buildKeyedEdges(edges, nodes).map(({ key, from, to, stepOffset }) => {
+        return (
+          <DrawPath
             key={key}
-            from={from}
-            to={to}
-            progress={_clampUnit(progress - stepOffset)}
+            d={`M${from.x} ${from.y} L${to.x} ${to.y}`}
             frame={frame}
-            at={ROUTE_LINE_CUE}
-            color={accent}
+            at={EDGE_CUE + stepOffset * motion.stagger.edge}
           />
-        ),
+        );
+      })}
+      {_buildKeyedRouteSteps(route, nodes).map(
+        ({ key, from, to, stepOffset }) => {
+          return (
+            <Route
+              key={key}
+              from={from}
+              to={to}
+              progress={_clampUnit(progress - stepOffset)}
+              frame={frame}
+              at={ROUTE_LINE_CUE}
+              color={accent}
+            />
+          );
+        },
       )}
       {nodes.map((node, i) => {
         const routeIndex = route.indexOf(i);

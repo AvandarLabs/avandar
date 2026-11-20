@@ -14,7 +14,9 @@ test("incoming beats start inside the outgoing beat's overlap", () => {
     { duration: 180, transition: { frames: 18 } },
   ]);
   assert.deepEqual(
-    result.map(({ start, end }) => [start, end]),
+    result.map(({ start, end }) => {
+      return [start, end];
+    }),
     [
       [0, 300],
       [276, 516],
@@ -23,15 +25,13 @@ test("incoming beats start inside the outgoing beat's overlap", () => {
   );
 });
 test("a beat cannot be swallowed by its two adjacent transitions", () => {
-  assert.throws(
-    () =>
-      getContinuityTimeline([
-        { duration: 100, transition: { frames: 0 } },
-        { duration: 30, transition: { frames: 20 } },
-        { duration: 100, transition: { frames: 20 } },
-      ]),
-    /overlap/,
-  );
+  assert.throws(() => {
+    return getContinuityTimeline([
+      { duration: 100, transition: { frames: 0 } },
+      { duration: 30, transition: { frames: 20 } },
+      { duration: 100, transition: { frames: 20 } },
+    ]);
+  }, /overlap/);
 });
 test("a long film beat holds the resolved stock pose instead of replaying its reset", () => {
   assert.equal(sampleStockFrame(0), 12);

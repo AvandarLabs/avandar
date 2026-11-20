@@ -23,17 +23,20 @@ async function _addRenderedRecords(
   options: Readonly<RenderedRecordsRead>,
 ): Promise<boolean> {
   const { links, records } = options;
-  const renderedRecordLinks = await links.evaluateAll((elements) =>
-    elements.map((element) => ({
-      href: element.getAttribute("href") ?? undefined,
-      name: (element.textContent ?? "").trim(),
-    })),
-  );
-  renderedRecordLinks.forEach((link) => records.set(link.href, link.name));
-  const isAtBottom = await options.viewport.evaluate(
-    (element) =>
-      element.scrollTop + element.clientHeight >= element.scrollHeight - 1,
-  );
+  const renderedRecordLinks = await links.evaluateAll((elements) => {
+    return elements.map((element) => {
+      return {
+        href: element.getAttribute("href") ?? undefined,
+        name: (element.textContent ?? "").trim(),
+      };
+    });
+  });
+  renderedRecordLinks.forEach((link) => {
+    return records.set(link.href, link.name);
+  });
+  const isAtBottom = await options.viewport.evaluate((element) => {
+    return element.scrollTop + element.clientHeight >= element.scrollHeight - 1;
+  });
   const loadingMoreIndicator = options.ctx.page.getByText("Loading more...", {
     exact: true,
   });
@@ -49,15 +52,20 @@ async function _scrollRecordPane(
   links: Locator,
   viewport: Locator,
 ): Promise<void> {
-  const renderedRecords = () =>
-    links.evaluateAll((elements) =>
-      elements.map((element) => element.getAttribute("href")).join("|"),
-    );
+  const renderedRecords = () => {
+    return links.evaluateAll((elements) => {
+      return elements
+        .map((element) => {
+          return element.getAttribute("href");
+        })
+        .join("|");
+    });
+  };
   const renderedHrefsBeforeScroll = await renderedRecords();
   // This scrolls the rendered record pane, without reading application state.
-  await viewport.evaluate((element) =>
-    element.scrollBy(0, Math.floor(element.clientHeight * 0.65)),
-  );
+  await viewport.evaluate((element) => {
+    return element.scrollBy(0, Math.floor(element.clientHeight * 0.65));
+  });
   // A boundary may fetch another page before the scrollbar can move again.
   await expect
     .poll(renderedRecords, { timeout: WAIT })

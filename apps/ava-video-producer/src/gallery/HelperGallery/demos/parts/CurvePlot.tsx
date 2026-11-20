@@ -1,4 +1,5 @@
 import css from "./parts.module.css";
+import type { ReactNode } from "react";
 
 type Props = {
   easing: (t: number) => number;
@@ -16,9 +17,12 @@ const SAMPLES = 80;
 /** Maps curve time and value to plot pixels. */
 function _createScale(size: number) {
   return {
-    toX: (value: number) => value * size,
-    toY: (value: number) =>
-      size - ((value - Y_RANGE[0]) / (Y_RANGE[1] - Y_RANGE[0])) * size,
+    toX: (value: number) => {
+      return value * size;
+    },
+    toY: (value: number) => {
+      return size - ((value - Y_RANGE[0]) / (Y_RANGE[1] - Y_RANGE[0])) * size;
+    },
   };
 }
 
@@ -48,30 +52,32 @@ function PlotHandles({
     { id: "start", from: [0, 0], to: [handles[0], handles[1]] },
     { id: "end", from: [1, 1], to: [handles[2], handles[3]] },
   ];
-  return ends.map(({ id, from, to }) => (
-    <g key={id}>
-      <line
-        className={css.plotHandle}
-        x1={scale.toX(from[0])}
-        y1={scale.toY(from[1])}
-        x2={scale.toX(to[0])}
-        y2={scale.toY(to[1])}
-      />
-      <circle
-        className={css.plotHandlePoint}
-        cx={scale.toX(to[0])}
-        cy={scale.toY(to[1])}
-        r={5}
-      />
-    </g>
-  ));
+  return ends.map(({ id, from, to }) => {
+    return (
+      <g key={id}>
+        <line
+          className={css.plotHandle}
+          x1={scale.toX(from[0])}
+          y1={scale.toY(from[1])}
+          x2={scale.toX(to[0])}
+          y2={scale.toY(to[1])}
+        />
+        <circle
+          className={css.plotHandlePoint}
+          cx={scale.toX(to[0])}
+          cy={scale.toY(to[1])}
+          r={5}
+        />
+      </g>
+    );
+  });
 }
 
 /**
  * A plotted easing curve: time on X, eased value on Y, the curve drawn in
  * full, the travelled part highlighted, and a dot at the current value.
  */
-export function CurvePlot({ easing, t, size, handles }: Props) {
+export function CurvePlot({ easing, t, size, handles }: Props): ReactNode {
   const scale = _createScale(size);
   const { toX, toY } = scale;
   return (

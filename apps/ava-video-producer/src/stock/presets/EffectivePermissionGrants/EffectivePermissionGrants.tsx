@@ -28,15 +28,17 @@ export function EffectivePermissionGrants({
     >
       <PermissionSceneHeadings input={input} />
       <PermissionLadder input={input} frame={frame} accent={accent} />
-      {input.grants.map((grant, index) => (
-        <GrantCandidate
-          key={grant.id}
-          input={input}
-          index={index}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {input.grants.map((grant, index) => {
+        return (
+          <GrantCandidate
+            key={grant.id}
+            input={input}
+            index={index}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
       <g opacity={ramp(frame, 139, 1)}>
         <LabelSlots
           labels={[

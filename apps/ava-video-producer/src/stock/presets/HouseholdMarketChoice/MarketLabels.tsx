@@ -14,42 +14,46 @@ export function MarketLabels({ input }: Readonly<Props>): ReactNode {
   ];
   return (
     <g>
-      {labels.map(([text, x, y, width, fontSize], index) => (
-        <FitText
-          key={index}
-          text={text}
-          x={x}
-          y={y}
-          width={width}
-          fontSize={fontSize}
-          maxLines={3}
-          normalizeWhitespace
-          breakLongWords
-        />
-      ))}
-      {input.products.map((product, index) => (
-        <g key={product.id}>
+      {labels.map(([text, x, y, width, fontSize], index) => {
+        return (
           <FitText
-            text={product.label}
-            x={42 + index * 176}
-            y={128}
-            width={156}
-            fontSize={14}
-            maxLines={4}
+            key={index}
+            text={text}
+            x={x}
+            y={y}
+            width={width}
+            fontSize={fontSize}
+            maxLines={3}
             normalizeWhitespace
             breakLongWords
           />
-          <text
-            x={120 + index * 176}
-            y={216}
-            textAnchor="middle"
-            fill={STOCK.muted}
-            fontSize={16}
-          >
-            {product.price}
-          </text>
-        </g>
-      ))}
+        );
+      })}
+      {input.products.map((product, index) => {
+        return (
+          <g key={product.id}>
+            <FitText
+              text={product.label}
+              x={42 + index * 176}
+              y={128}
+              width={156}
+              fontSize={14}
+              maxLines={4}
+              normalizeWhitespace
+              breakLongWords
+            />
+            <text
+              x={120 + index * 176}
+              y={216}
+              textAnchor="middle"
+              fill={STOCK.muted}
+              fontSize={16}
+            >
+              {product.price}
+            </text>
+          </g>
+        );
+      })}
     </g>
   );
 }

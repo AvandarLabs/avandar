@@ -13,33 +13,38 @@ export function BufferInclusionLedger({
   accent,
 }: Readonly<Props>): ReactNode {
   const included = input.locations
-    .map((location, index) => ({ location, index }))
-    .filter(
-      ({ location }) =>
+    .map((location, index) => {
+      return { location, index };
+    })
+    .filter(({ location }) => {
+      return (
         Math.hypot(location.x - input.origin.x, location.y - input.origin.y) <=
-        input.radiusUnits,
-    );
+        input.radiusUnits
+      );
+    });
   return (
     <g>
-      {included.map(({ location, index }, ledgerIndex) => (
-        <g key={location.id}>
-          <BufferClassificationToken
-            input={input}
-            location={location}
-            index={index}
-            ledgerIndex={ledgerIndex}
-            frame={frame}
-            accent={accent}
-          />
-          {frame >= 129 + index * 2 ? (
-            <LabelSlots
-              labels={[
-                [location.label, 720, 282 + ledgerIndex * 48, 200, 12, 3],
-              ]}
+      {included.map(({ location, index }, ledgerIndex) => {
+        return (
+          <g key={location.id}>
+            <BufferClassificationToken
+              input={input}
+              location={location}
+              index={index}
+              ledgerIndex={ledgerIndex}
+              frame={frame}
+              accent={accent}
             />
-          ) : undefined}
-        </g>
-      ))}
+            {frame >= 129 + index * 2 ? (
+              <LabelSlots
+                labels={[
+                  [location.label, 720, 282 + ledgerIndex * 48, 200, 12, 3],
+                ]}
+              />
+            ) : undefined}
+          </g>
+        );
+      })}
     </g>
   );
 }

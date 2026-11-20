@@ -13,31 +13,33 @@ export function RegistrationGrids({
 }: Readonly<Props>): ReactNode {
   return (
     <g>
-      {[65, 555].map((x, index) => (
-        <g key={x}>
-          <RegistrationGrid x={x} index={index} frame={frame} />
-          <LabelSlots
-            labels={[
-              [
-                index ? input.frames.target : input.frames.source,
-                x,
-                140,
-                330,
-                14,
-                2,
-              ],
-              [
-                index ? input.frames.targetUnit : input.frames.sourceUnit,
-                x,
-                167,
-                330,
-                12,
-                2,
-              ],
-            ]}
-          />
-        </g>
-      ))}
+      {[65, 555].map((x, index) => {
+        return (
+          <g key={x}>
+            <RegistrationGrid x={x} index={index} frame={frame} />
+            <LabelSlots
+              labels={[
+                [
+                  index ? input.frames.target : input.frames.source,
+                  x,
+                  140,
+                  330,
+                  14,
+                  2,
+                ],
+                [
+                  index ? input.frames.targetUnit : input.frames.sourceUnit,
+                  x,
+                  167,
+                  330,
+                  12,
+                  2,
+                ],
+              ]}
+            />
+          </g>
+        );
+      })}
     </g>
   );
 }

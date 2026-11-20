@@ -62,7 +62,9 @@ export function ScalarField({
           maxLength={matchedControl.maxLength}
           rows={matchedControl.multiline ? undefined : 1}
           wrap={matchedControl.multiline ? "soft" : "off"}
-          onChange={(event) => context.update(event.target.value)}
+          onChange={(event) => {
+            return context.update(event.target.value);
+          }}
         />
       );
     })
@@ -71,15 +73,15 @@ export function ScalarField({
         <input
           {...context.field}
           {..._inputProps({ control: matchedControl, value: context.value })}
-          onChange={(event) =>
-            context.update(
+          onChange={(event) => {
+            return context.update(
               matchedControl.kind === "boolean"
                 ? event.target.checked
                 : matchedControl.kind === "number" && event.target.value !== ""
                   ? event.target.valueAsNumber
                   : event.target.value,
-            )
-          }
+            );
+          }}
         />
       );
     })

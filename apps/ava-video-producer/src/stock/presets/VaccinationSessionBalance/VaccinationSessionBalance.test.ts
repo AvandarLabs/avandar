@@ -47,16 +47,18 @@ const textLayoutOptions = {
   fixtures,
   render: _render,
   excludedTextFields: ["id", "recipientId", "outcome"],
-  getVisibleTexts: ({ input }: Readonly<{ input: Input }>) => [
-    input.sceneLabel,
-    input.copy.opening,
-    input.copy.administered,
-    input.copy.remaining,
-    input.copy.discarded,
-    ...input.recipients.map(prop("label")),
-    ...(input.showEquation ? [input.copy.unit] : []),
-    ...(input.showPeopleTotal ? [input.copy.people] : []),
-  ],
+  getVisibleTexts: ({ input }: Readonly<{ input: Input }>) => {
+    return [
+      input.sceneLabel,
+      input.copy.opening,
+      input.copy.administered,
+      input.copy.remaining,
+      input.copy.discarded,
+      ...input.recipients.map(prop("label")),
+      ...(input.showEquation ? [input.copy.unit] : []),
+      ...(input.showPeopleTotal ? [input.copy.people] : []),
+    ];
+  },
 } satisfies Pick<
   PresetAssertions<Input>,
   | "inputSchema"
@@ -83,7 +85,14 @@ test("tokens leave the carrier once, remain conserved and settle beside the exac
       ),
     );
     assert.equal(tokens.length, input.units.length);
-    assert.equal(new Set(tokens.map((match) => match[1])).size, 12);
+    assert.equal(
+      new Set(
+        tokens.map((match) => {
+          return match[1];
+        }),
+      ).size,
+      12,
+    );
     tokens.forEach((match) => {
       const x = Number(match[2]);
       const y = Number(match[3]);
@@ -100,10 +109,12 @@ test("tokens leave the carrier once, remain conserved and settle beside the exac
   const onePerson: Input = {
     ...input,
     recipients: [input.recipients[0]],
-    units: input.units.map((unit) => ({
-      ...unit,
-      recipientId: input.recipients[0].id,
-    })),
+    units: input.units.map((unit) => {
+      return {
+        ...unit,
+        recipientId: input.recipients[0].id,
+      };
+    }),
   };
   assert.equal(inputSchema.safeParse(onePerson).success, true);
   const markup = _render({ frame: 150, input: onePerson });
@@ -121,7 +132,9 @@ test("every final destination owns precisely its authored unit identities", () =
   DEFAULT_INPUT.units.forEach((unit) => {
     const token = Array.from(
       markup.matchAll(/<rect data-dose="([^"]*)"[^>]*>/g),
-    ).find((match) => match[1] === unit.id)?.[0];
+    ).find((match) => {
+      return match[1] === unit.id;
+    })?.[0];
     assert.ok(token);
     assert.ok(token.includes(`data-outcome="${unit.outcome}"`));
     if (unit.recipientId !== null) {
@@ -143,7 +156,14 @@ function _getRecipientLabelBounds(markup: string): TextBox[] {
     const lines = Array.from(
       contents.matchAll(/<tspan([^>]*)>(.*?)<\/tspan>/g),
     );
-    assert.equal(lines.map(([, , text]) => text).join(""), "界".repeat(18));
+    assert.equal(
+      lines
+        .map(([, , text]) => {
+          return text;
+        })
+        .join(""),
+      "界".repeat(18),
+    );
     return lines.map(([, span, text]) => {
       baseline += Number(span.match(/dy="([^"]+)"/)?.[1]);
       const left = Number(span.match(/x="([^"]+)"/)?.[1]);
@@ -163,14 +183,16 @@ test("concentrated doses stay clear of complete recipient labels and neighboring
     const input = inputSchema.parse({
       ...fixtures[2].input,
       recipients,
-      units: Array.from({ length: 12 }, (_, index) => ({
-        id: `dose${index}`,
-        outcome: "administered",
-        recipientId:
-          recipients[
-            index < 13 - numRecipients ? 0 : index - (12 - numRecipients)
-          ].id,
-      })),
+      units: Array.from({ length: 12 }, (_, index) => {
+        return {
+          id: `dose${index}`,
+          outcome: "administered",
+          recipientId:
+            recipients[
+              index < 13 - numRecipients ? 0 : index - (12 - numRecipients)
+            ].id,
+        };
+      }),
     });
     [108, 150, 167].forEach((frame) => {
       const markup = _render({ frame: frame, input: input });
@@ -182,8 +204,8 @@ test("concentrated doses stay clear of complete recipient labels and neighboring
         ),
       );
       assert.equal(tokens.length, 12);
-      tokens.forEach(([, x, y, width, height]) =>
-        labels.forEach((label) => {
+      tokens.forEach(([, x, y, width, height]) => {
+        return labels.forEach((label) => {
           assert.ok(
             Number(x) + Number(width) <= label.left ||
               Number(x) >= label.right ||
@@ -191,8 +213,8 @@ test("concentrated doses stay clear of complete recipient labels and neighboring
               Number(y) >= label.bottom,
             `dose [${x}, ${y}, ${width}, ${height}] intersects label ${JSON.stringify(label)}`,
           );
-        }),
-      );
+        });
+      });
     });
   });
 });

@@ -95,7 +95,9 @@ async function _renderTargets(
   const { privateKey } = requireLicense();
   const options = SHOWCASE_STILL_BROWSER_OPTIONS;
   const serveUrl = await bundleShowcaseFilms(
-    targets.map(({ film }) => film),
+    targets.map(({ film }) => {
+      return film;
+    }),
     path.join(PARITY_DIRECTORY, "bundle"),
   );
   const browser = await openBrowser("chrome", options);
@@ -145,7 +147,9 @@ async function _compareFrame(
   const reference = await readRgbaFromPng(
     _frameFile({ stage: "reference", id: targetId, frame }),
     size,
-  ).catch(() => undefined);
+  ).catch(() => {
+    return undefined;
+  });
   if (!reference) {
     return { kind: "missing" };
   }
@@ -186,11 +190,9 @@ async function _compareTarget({
     id: target.id,
     frames: frames.length,
     differingFrames: comparisons.filter(propEq("kind", "different")).length,
-    unexplainedPixels: comparisons.reduce(
-      (sum, item) =>
-        sum + (item.kind === "different" ? item.unexplainedPixels : 0),
-      0,
-    ),
+    unexplainedPixels: comparisons.reduce((sum, item) => {
+      return sum + (item.kind === "different" ? item.unexplainedPixels : 0);
+    }, 0),
     missingFrames: comparisons.filter(propEq("kind", "missing")).length,
   };
 }
@@ -198,7 +200,9 @@ async function _compareTarget({
 async function _writeManifest(targets: readonly LoadedTarget[]) {
   const file = path.join(PARITY_DIRECTORY, "reference/manifest.json");
   const previous = JSON.parse(
-    await fs.readFile(file, "utf8").catch(() => '{"targets":{}}'),
+    await fs.readFile(file, "utf8").catch(() => {
+      return '{"targets":{}}';
+    }),
   ) as { targets: Record<string, readonly number[]> };
   const manifest = {
     capturedAt: new Date().toISOString(),
@@ -209,7 +213,9 @@ async function _writeManifest(targets: readonly LoadedTarget[]) {
     targets: {
       ...previous.targets,
       ...Object.fromEntries(
-        targets.map(({ target, frames }) => [target.id, frames]),
+        targets.map(({ target, frames }) => {
+          return [target.id, frames];
+        }),
       ),
     },
   };
@@ -235,14 +241,14 @@ async function _runThemeParity({
   const stages: readonly ParityStage[] =
     mode === "capture" ? ["reference"] : ["current", "diff"];
   await Promise.all(
-    targets.flatMap(({ target }) =>
-      stages.map((stage) =>
-        fs.rm(path.join(PARITY_DIRECTORY, stage, target.id), {
+    targets.flatMap(({ target }) => {
+      return stages.map((stage) => {
+        return fs.rm(path.join(PARITY_DIRECTORY, stage, target.id), {
           recursive: true,
           force: true,
-        }),
-      ),
-    ),
+        });
+      });
+    }),
   );
   await _renderTargets(targets, mode === "capture" ? "reference" : "current");
   if (mode === "capture") {
@@ -255,9 +261,9 @@ async function _runThemeParity({
   }
   console.table(results);
   if (
-    results.some(
-      (result) => result.unexplainedPixels > 0 || result.missingFrames > 0,
-    )
+    results.some((result) => {
+      return result.unexplainedPixels > 0 || result.missingFrames > 0;
+    })
   ) {
     console.error(
       `Parity failed. Diff images: ${path.relative(appRoot, path.join(PARITY_DIRECTORY, "diff"))}`,
@@ -272,9 +278,9 @@ const themeId = themeIndex < 0 ? "classic" : argv[themeIndex + 1];
 const [mode, ...ids] =
   themeIndex < 0
     ? argv
-    : argv.filter(
-        (_, index) => index !== themeIndex && index !== themeIndex + 1,
-      );
+    : argv.filter((_, index) => {
+        return index !== themeIndex && index !== themeIndex + 1;
+      });
 PARITY_DIRECTORY =
   themeId === "classic" ? PARITY_ROOT : path.join(PARITY_ROOT, themeId);
 if ((mode === "capture" || mode === "compare") && themeId) {

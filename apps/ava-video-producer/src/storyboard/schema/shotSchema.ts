@@ -413,9 +413,9 @@ export const shotSchema = z.discriminatedUnion("scene", [
           const { title, kicker, ...request } = props;
           const result = stockRequestSchema.safeParse(request);
           if (!result.success) {
-            result.error.issues.forEach((issue) =>
-              context.addIssue({ ...issue }),
-            );
+            result.error.issues.forEach((issue) => {
+              return context.addIssue({ ...issue });
+            });
             return z.NEVER;
           }
           return {

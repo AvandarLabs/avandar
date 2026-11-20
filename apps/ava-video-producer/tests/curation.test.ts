@@ -123,14 +123,17 @@ async function _createCurationFixture(
   t: TestContext,
 ): Promise<CurationFixture> {
   const root = await mkdtemp(join(tmpdir(), "capture-curation-"));
-  t.after(() => rm(root, { recursive: true, force: true }));
+  t.after(() => {
+    return rm(root, { recursive: true, force: true });
+  });
   const runDir = "out/captures/fixture-run";
   const run = join(root, runDir);
   await mkdir(join(run, "screens"), { recursive: true });
   await writeFile(join(run, "screens/import-ready.png"), image);
   const manifest = _createPassedManifest();
-  const save = () =>
-    writeFile(join(run, "manifest.json"), JSON.stringify(manifest));
+  const save = () => {
+    return writeFile(join(run, "manifest.json"), JSON.stringify(manifest));
+  };
   await save();
   return { root, runDir, run, manifest, save };
 }
@@ -315,7 +318,9 @@ test("replacement is explicit and preserves the complete previous curated set", 
 test("curation refuses output symlinks without creating files outside the project", async (t) => {
   const fixture = await _createCurationFixture(t);
   const outside = await mkdtemp(join(tmpdir(), "curation-outside-"));
-  t.after(() => rm(outside, { recursive: true, force: true }));
+  t.after(() => {
+    return rm(outside, { recursive: true, force: true });
+  });
   await symlink(outside, join(fixture.root, "public"));
   await assert.rejects(
     curateCapture({ root: fixture.root, runDir: fixture.runDir }),

@@ -101,7 +101,10 @@ type RowContext = Readonly<{
   theme: ResolvedVideoTheme;
   scopePatch: VideoThemePatch;
   savedOverride: VideoThemePatch;
-  /** In theme scope, the previewed item's own settings and the theme it resolves to. */
+  /**
+   * In theme scope, the previewed item's own settings and the theme it resolves
+   * to.
+   */
   itemOwn?: Readonly<{
     patches: readonly VideoThemePatch[];
     theme: ResolvedVideoTheme;
@@ -166,9 +169,9 @@ function _createRow(
       : getValueAtPath(context.savedOverride, documentPath) !== undefined
         ? "saved"
         : "none";
-  const isItemOwn = context.itemOwn?.patches.some(
-    (patch) => getValueAtPath(patch, documentPath) !== undefined,
-  );
+  const isItemOwn = context.itemOwn?.patches.some((patch) => {
+    return getValueAtPath(patch, documentPath) !== undefined;
+  });
   return {
     path,
     definition,
@@ -195,7 +198,10 @@ type TokenRowsOptions = Readonly<{
   scope: ThemeEditScope;
   merged: VideoThemePatch;
   theme: ResolvedVideoTheme;
-  /** The previewed item and the theme it resolves to, so theme scope can show its own values. */
+  /**
+   * The previewed item and the theme it resolves to, so theme scope can show
+   * its own values.
+   */
   item?: Readonly<{ id: string; theme: ResolvedVideoTheme }>;
 }>;
 
@@ -245,14 +251,14 @@ export function listTokenRows(options: TokenRowsOptions): readonly TokenRow[] {
       typeof entries === "object" && entries !== null
         ? Object.keys(entries)
         : [];
-    return keys.map((key) =>
-      _createRow({
+    return keys.map((key) => {
+      return _createRow({
         context,
         path: `${path}.${key}`,
         definition,
         scaleKey: key,
-      }),
-    );
+      });
+    });
   });
 }
 
@@ -270,8 +276,8 @@ export function filterTokenRows(
   const usedTokenSet = filter.usedTokens
     ? new Set(filter.usedTokens)
     : undefined;
-  return rows.filter(
-    (row) =>
+  return rows.filter((row) => {
+    return (
       allowedTiers.has(row.tier) &&
       (!usedTokenSet ||
         row.tier === "atomic" ||
@@ -279,29 +285,32 @@ export function filterTokenRows(
         usedTokenSet.has(row.path)) &&
       (!query ||
         row.path.toLowerCase().includes(query) ||
-        filter.getText(row).toLowerCase().includes(query)),
-  );
+        filter.getText(row).toLowerCase().includes(query))
+    );
+  });
 }
 
 /** Rows split into sections, keeping first-appearance order. */
 export function groupTokenRows(
   rows: readonly TokenRow[],
 ): readonly TokenRowGroup[] {
-  const groups = rows.reduce(
-    (grouped, row) =>
-      grouped.set(row.group, [...(grouped.get(row.group) ?? []), row]),
-    new Map<string, TokenRow[]>(),
-  );
-  return [...groups].map(([group, grouped]) => ({ group, rows: grouped }));
+  const groups = rows.reduce((grouped, row) => {
+    return grouped.set(row.group, [...(grouped.get(row.group) ?? []), row]);
+  }, new Map<string, TokenRow[]>());
+  return [...groups].map(([group, grouped]) => {
+    return { group, rows: grouped };
+  });
 }
 
 /** The Essentials rows, in their fixed order. */
 export function getEssentialRows(
   rows: readonly TokenRow[],
 ): readonly TokenRow[] {
-  return ESSENTIAL_TOKEN_PATHS.flatMap((path) =>
-    rows.filter((row) => row.path === path),
-  );
+  return ESSENTIAL_TOKEN_PATHS.flatMap((path) => {
+    return rows.filter((row) => {
+      return row.path === path;
+    });
+  });
 }
 
 /**
@@ -311,11 +320,21 @@ export function getEssentialRows(
 export function listEmptyAtomicScaleGroups(
   rows: readonly TokenRow[],
 ): readonly string[] {
-  const filled = new Set(rows.map((row) => row.group));
+  const filled = new Set(
+    rows.map((row) => {
+      return row.group;
+    }),
+  );
   return listTokenDefinitions()
-    .filter(({ path, isScale }) => isScale && path.startsWith("atomic."))
-    .map(({ path }) => `atomic:${path.split(".")[1]}`)
-    .filter((group) => !filled.has(group));
+    .filter(({ path, isScale }) => {
+      return isScale && path.startsWith("atomic.");
+    })
+    .map(({ path }) => {
+      return `atomic:${path.split(".")[1]}`;
+    })
+    .filter((group) => {
+      return !filled.has(group);
+    });
 }
 
 /**
@@ -329,13 +348,14 @@ export function findTokenRowIssue(
   }>,
 ): VideoThemeIssue | undefined {
   const { issues, tokenPath } = options;
-  return issues.find(
-    (issue) =>
-      issue.path === tokenPath || issue.path.startsWith(`${tokenPath}.`),
-  );
+  return issues.find((issue) => {
+    return issue.path === tokenPath || issue.path.startsWith(`${tokenPath}.`);
+  });
 }
 
-/** What a row's resolver message means, so the row can say it in plain words. */
+/**
+ * What a row's resolver message means, so the row can say it in plain words.
+ */
 export type RowIssueDescription =
   | Readonly<{ kind: "missingReference"; reference: string }>
   | Readonly<{ kind: "loop" }>
@@ -366,7 +386,13 @@ export function buildNextCustomScaleKey(
 ): string {
   const { rows, group } = options;
   const taken = new Set(
-    rows.filter((row) => row.group === group).map((row) => row.scaleKey),
+    rows
+      .filter((row) => {
+        return row.group === group;
+      })
+      .map((row) => {
+        return row.scaleKey;
+      }),
   );
   let index = 1;
   while (taken.has(`custom${index}`)) {

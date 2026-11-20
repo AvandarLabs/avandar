@@ -20,16 +20,18 @@ export function DrillBreadcrumb({ input }: Readonly<Props>): ReactNode {
         breakLongWords
         normalizeWhitespace
       />
-      {input.selectionPath.map((value, index) => (
-        <g key={index} data-breadcrumb-level={index + 1}>
-          <path
-            d={`M${392 + index * 266} 106l6 6-6 6`}
-            fill="none"
-            stroke={STOCK.muted}
-          />
-          <LiteralDataText value={value} x={408 + index * 266} y={116} />
-        </g>
-      ))}
+      {input.selectionPath.map((value, index) => {
+        return (
+          <g key={index} data-breadcrumb-level={index + 1}>
+            <path
+              d={`M${392 + index * 266} 106l6 6-6 6`}
+              fill="none"
+              stroke={STOCK.muted}
+            />
+            <LiteralDataText value={value} x={408 + index * 266} y={116} />
+          </g>
+        );
+      })}
     </g>
   );
 }

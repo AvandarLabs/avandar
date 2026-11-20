@@ -37,19 +37,22 @@ export function DashboardSlotAssembly({
         <DashboardGuides layout={input.layout} frame={frame} accent={accent} />
       ) : undefined}
       {[...input.widgets]
-        .sort(
-          (first, second) =>
+        .sort((first, second) => {
+          return (
             Number(second.id === input.featuredWidgetId) -
-            Number(first.id === input.featuredWidgetId),
-        )
-        .map((widget) => (
-          <DashboardWidgetPanel
-            key={widget.id}
-            widget={widget}
-            index={input.widgets.findIndex(propEq("id", widget.id))}
-            {...panelProps}
-          />
-        ))}
+            Number(first.id === input.featuredWidgetId)
+          );
+        })
+        .map((widget) => {
+          return (
+            <DashboardWidgetPanel
+              key={widget.id}
+              widget={widget}
+              index={input.widgets.findIndex(propEq("id", widget.id))}
+              {...panelProps}
+            />
+          );
+        })}
       <DashboardContext input={input} frame={frame} />
     </g>
   );

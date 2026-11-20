@@ -37,20 +37,24 @@ export function PickerObservation({
         stroke={selected ? accent : STOCK.line}
         strokeWidth={selected ? 3 : 1}
       />
-      {Array.from(GRAPHEMES.segment(observation.id), ({ segment }) => segment)
+      {Array.from(GRAPHEMES.segment(observation.id), ({ segment }) => {
+        return segment;
+      })
         .reduce<string[]>((lines, segment, graphemeIndex) => {
           const lineIndex = Math.floor(graphemeIndex / 6);
           lines[lineIndex] = `${lines[lineIndex] ?? ""}${segment}`;
           return lines;
         }, [])
-        .map((line, lineIndex) => (
-          <LiteralDataText
-            key={lineIndex}
-            value={line}
-            x={x + 8}
-            y={180 + lineIndex * 16}
-          />
-        ))}
+        .map((line, lineIndex) => {
+          return (
+            <LiteralDataText
+              key={lineIndex}
+              value={line}
+              x={x + 8}
+              y={180 + lineIndex * 16}
+            />
+          );
+        })}
       {observation.value === null ? (
         <LabelSlots labels={[["∅", x + 120, 180, 16, 12, 1]]} />
       ) : null}

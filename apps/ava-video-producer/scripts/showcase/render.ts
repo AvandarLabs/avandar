@@ -196,9 +196,12 @@ async function _renderPictureFrames(
       imageFormat: "jpeg",
       jpegQuality: 90,
       concurrency: 1,
-      onStart: () => progress("Rendering frames…"),
-      onFrameUpdate: (count) =>
-        progress(`Rendering frame ${count} of ${film.frames}…`),
+      onStart: () => {
+        return progress("Rendering frames…");
+      },
+      onFrameUpdate: (count) => {
+        return progress(`Rendering frame ${count} of ${film.frames}…`);
+      },
     });
   } finally {
     await browser.close({ silent: true });

@@ -35,16 +35,18 @@ export function QuantityBand({
   return (
     <g>
       <rect x={x} y={y} width={width} height={height} fill={STOCK.line} />
-      {segments.map((segment, index) => (
-        <rect
-          key={index}
-          x={x + segment.start * width}
-          y={y}
-          width={segment.fraction * width}
-          height={height}
-          fill={values[index].color}
-        />
-      ))}
+      {segments.map((segment, index) => {
+        return (
+          <rect
+            key={index}
+            x={x + segment.start * width}
+            y={y}
+            width={segment.fraction * width}
+            height={height}
+            fill={values[index].color}
+          />
+        );
+      })}
     </g>
   );
 }

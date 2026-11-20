@@ -22,7 +22,9 @@ const USAGE =
 function _getRunRelative(requestedRoot: string, runDir: unknown): string {
   if (
     typeof runDir !== "string" ||
-    runDir.split(/[\\/]/).some((part) => part.startsWith("."))
+    runDir.split(/[\\/]/).some((part) => {
+      return part.startsWith(".");
+    })
   ) {
     throw new Error(
       "Capture run path must be plain without hidden segments or traversal",

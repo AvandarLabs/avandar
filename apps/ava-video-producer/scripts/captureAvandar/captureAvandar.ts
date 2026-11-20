@@ -19,7 +19,9 @@ async function _main(): Promise<void> {
   }
   if (list) {
     const flows = await loadFlows(options.root ?? process.cwd());
-    Object.keys(flows).forEach((id) => console.log(validateId(id, "flow id")));
+    Object.keys(flows).forEach((id) => {
+      return console.log(validateId(id, "flow id"));
+    });
     return;
   }
   const result = await runCapture(options);

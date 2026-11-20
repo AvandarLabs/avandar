@@ -26,20 +26,20 @@ async function _createFailedBuildFixture(root: string): Promise<void> {
     "process.stdout.write(JSON.stringify({ primary: [], neutral: [] }));",
   );
   await Promise.all(
-    SHOWCASE_PAGES.map((page) =>
-      fs.writeFile(
+    SHOWCASE_PAGES.map((page) => {
+      return fs.writeFile(
         path.join(root, "showcase", `${page}.html`),
         `<!doctype html><script type="module" src="./${page}.ts"></script>`,
-      ),
-    ),
+      );
+    }),
   );
   await Promise.all(
-    SHOWCASE_PAGES.map((page) =>
-      fs.writeFile(
+    SHOWCASE_PAGES.map((page) => {
+      return fs.writeFile(
         path.join(root, "showcase", `${page}.ts`),
         page === "motion" ? "export const =" : "export {};",
-      ),
-    ),
+      );
+    }),
   );
 }
 

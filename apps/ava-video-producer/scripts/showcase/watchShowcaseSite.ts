@@ -31,5 +31,9 @@ export async function watchShowcaseSite({
     await watcher.close();
     throw error;
   }
-  return { dispose: () => watcher.close() };
+  return {
+    dispose: () => {
+      return watcher.close();
+    },
+  };
 }

@@ -16,21 +16,23 @@ export function TaggedGridEvidence({
     <g>
       {" "}
       {input.signal === "tagged-cells"
-        ? input.grid.rows.flatMap((row, rowIndex) =>
-            row.map((_, columnIndex) => (
-              <rect
-                key={`${rowIndex}:${columnIndex}`}
-                data-tagged-outline={`${rowIndex}:${columnIndex}`}
-                x={56 + columnIndex * width}
-                y={294 + rowIndex * 64}
-                width={width - 8}
-                height={56}
-                fill="none"
-                stroke={accent}
-                strokeDasharray="3 4"
-              />
-            )),
-          )
+        ? input.grid.rows.flatMap((row, rowIndex) => {
+            return row.map((_, columnIndex) => {
+              return (
+                <rect
+                  key={`${rowIndex}:${columnIndex}`}
+                  data-tagged-outline={`${rowIndex}:${columnIndex}`}
+                  x={56 + columnIndex * width}
+                  y={294 + rowIndex * 64}
+                  width={width - 8}
+                  height={56}
+                  fill="none"
+                  stroke={accent}
+                  strokeDasharray="3 4"
+                />
+              );
+            });
+          })
         : undefined}
     </g>
   );

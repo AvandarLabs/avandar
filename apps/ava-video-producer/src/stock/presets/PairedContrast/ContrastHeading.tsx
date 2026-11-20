@@ -27,18 +27,20 @@ export function ContrastHeading({ frame, input }: Readonly<Props>): ReactNode {
   ];
   return (
     <g>
-      {headings.map(({ opacity, ...label }, index) => (
-        <g key={index} opacity={opacity} aria-label={label.text}>
-          <FitText
-            {...label}
-            x={480}
-            width={840}
-            breakLongWords
-            normalizeWhitespace
-            anchor="middle"
-          />
-        </g>
-      ))}
+      {headings.map(({ opacity, ...label }, index) => {
+        return (
+          <g key={index} opacity={opacity} aria-label={label.text}>
+            <FitText
+              {...label}
+              x={480}
+              width={840}
+              breakLongWords
+              normalizeWhitespace
+              anchor="middle"
+            />
+          </g>
+        );
+      })}
     </g>
   );
 }

@@ -24,7 +24,9 @@ const compatibleControls: StockControl[] = makeStockControlsFromSchema({
     additionalProperties: false,
     required: COMPATIBLE_PATHS,
     properties: Object.fromEntries(
-      COMPATIBLE_PATHS.map((path) => [path, properties[path]]),
+      COMPATIBLE_PATHS.map((path) => {
+        return [path, properties[path]];
+      }),
     ),
   },
   messageNamespace: NAMESPACE,

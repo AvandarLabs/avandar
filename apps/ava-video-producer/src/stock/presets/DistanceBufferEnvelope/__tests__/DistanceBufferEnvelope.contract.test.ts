@@ -238,9 +238,9 @@ test("distance ledger captions stay clear through the compass sweep and dense fi
     );
     SvgPaintAssertions.assertPaintClearance({
       texts: paint.filter(propEq("kind", "text")),
-      rectangles: paint.filter(
-        (item) => item.kind === "rect" && item.opacity * item.fillOpacity > 0.9,
-      ),
+      rectangles: paint.filter((item) => {
+        return item.kind === "rect" && item.opacity * item.fillOpacity > 0.9;
+      }),
     });
   });
 });
@@ -268,8 +268,8 @@ test("diagonal pairs and moving inclusion tokens preserve the full supplied-loca
     }).length,
     3,
   );
-  [106, 110, 122, 133, 139, 150].forEach((frame) =>
-    _tags({
+  [106, 110, 122, 133, 139, 150].forEach((frame) => {
+    return _tags({
       markup: _render({ frame: frame, input: input }),
       attribute: "data-ledger-token",
     }).forEach((tag) => {
@@ -279,8 +279,8 @@ test("diagonal pairs and moving inclusion tokens preserve the full supplied-loca
         }),
         y = SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "cy" });
       assert.ok(x - 8 >= 40 && x + 8 < 720 && y - 8 >= 182 && y + 8 <= 558);
-    }),
-  );
+    });
+  });
 });
 
 test("approved buffer default and complete binding retain Location A independently of the empty-label minimum", () => {

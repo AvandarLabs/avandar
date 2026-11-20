@@ -106,7 +106,9 @@ async function _createGeneration(
       hash,
       filename,
       sourceHash,
-      retain: () => _retainGeneration({ root, entry }),
+      retain: () => {
+        return _retainGeneration({ root, entry });
+      },
     },
   };
   return entry;
@@ -155,14 +157,19 @@ async function _dependencyHash(
   const { root, files, contents } = options;
   const hash = createHash("sha256");
   await files
-    .filter((file) => file !== "stock-contract-generation.ts")
+    .filter((file) => {
+      return file !== "stock-contract-generation.ts";
+    })
     .sort()
     .reduce(async (previous, file) => {
       await previous;
       const filename = await fs.realpath(path.resolve(root, file));
       const isInsideContractSources = CONTRACT_SOURCE_DIRECTORIES.some(
-        (directory) =>
-          filename.startsWith(`${path.resolve(root, directory)}${path.sep}`),
+        (directory) => {
+          return filename.startsWith(
+            `${path.resolve(root, directory)}${path.sep}`,
+          );
+        },
       );
       if (!isInsideContractSources || filename.endsWith(".tsx")) {
         throw new Error(
@@ -215,6 +222,8 @@ export async function buildStockContracts(
   root = await fs.realpath(root);
   return _enqueueLifecycleOperation({
     root,
-    action: () => _buildGeneration(root),
+    action: () => {
+      return _buildGeneration(root);
+    },
   });
 }

@@ -53,9 +53,13 @@ export function assetReferences(plan: Storyboard): string[] {
   return [
     ...new Set([
       ...plan.shots.flatMap(_shotAssetReferences),
-      ...plan.narration.flatMap((cue) => (cue.audio ? [cue.audio] : [])),
+      ...plan.narration.flatMap((cue) => {
+        return cue.audio ? [cue.audio] : [];
+      }),
       ...(plan.narrationTrack ? [plan.narrationTrack.src] : []),
-      ...plan.soundEffects.map((sound) => sound.src),
+      ...plan.soundEffects.map((sound) => {
+        return sound.src;
+      }),
     ]),
   ];
 }
@@ -71,8 +75,12 @@ function _shotAssetReferences(shot: Storyboard["shots"][number]): string[] {
       return [shot.props.logo.src];
     case "tilted-window":
       return [
-        ...(shot.props.windows ?? []).map((window) => window.src),
-        ...(shot.props.pair ?? []).map((column) => column.window.src),
+        ...(shot.props.windows ?? []).map((window) => {
+          return window.src;
+        }),
+        ...(shot.props.pair ?? []).map((column) => {
+          return column.window.src;
+        }),
         ...(shot.props.secondary ? [shot.props.secondary.src] : []),
       ];
     default:
@@ -88,8 +96,12 @@ function _shotAssetReferences(shot: Storyboard["shots"][number]): string[] {
 export function shotList(plan: Storyboard): string {
   const lines = timeline(plan).map((shot) => {
     const cues = plan.narration
-      .filter((cue) => cue.shotId === shot.id)
-      .map((cue) => cue.text)
+      .filter((cue) => {
+        return cue.shotId === shot.id;
+      })
+      .map((cue) => {
+        return cue.text;
+      })
       .join(" ");
     const summary =
       shot.note ??
@@ -99,7 +111,11 @@ export function shotList(plan: Storyboard): string {
           shot.scene));
     return `| ${shot.startFrame} | ${(shot.startFrame / plan.fps).toFixed(2)} s | ${shot.id} | ${shot.scene} | ${shot.durationInFrames} | ${summary.replaceAll("|", "\\|")} | ${cues.replaceAll("|", "\\|")} |`;
   });
-  return `# ${plan.title}\n\n${plan.description}\n\n${durationInFrames(plan)} frames at ${plan.fps} fps (${(durationInFrames(plan) / plan.fps).toFixed(2)} seconds). ${plan.purpose}.\n\n| Start frame | Time | Shot | Scene | Frames | On screen | Narration |\n| ---: | ---: | --- | --- | ---: | --- | --- |\n${lines.join("\n")}\n\n## Evidence\n\n${plan.sourceNotes.map((note) => `- ${note}`).join("\n")}\n`;
+  return `# ${plan.title}\n\n${plan.description}\n\n${durationInFrames(plan)} frames at ${plan.fps} fps (${(durationInFrames(plan) / plan.fps).toFixed(2)} seconds). ${plan.purpose}.\n\n| Start frame | Time | Shot | Scene | Frames | On screen | Narration |\n| ---: | ---: | --- | --- | ---: | --- | --- |\n${lines.join("\n")}\n\n## Evidence\n\n${plan.sourceNotes
+    .map((note) => {
+      return `- ${note}`;
+    })
+    .join("\n")}\n`;
 }
 
 /** Reject unexpected and hidden input files before reading any content. */
@@ -107,10 +123,15 @@ export async function safeInputFile(
   filename: string,
   extensions: readonly string[],
 ): Promise<string> {
-  const allowed = (value: string) =>
-    !path.basename(value).startsWith(".") &&
-    !value.split(path.sep).some((part) => part.startsWith(".env")) &&
-    extensions.includes(path.extname(value).toLowerCase());
+  const allowed = (value: string) => {
+    return (
+      !path.basename(value).startsWith(".") &&
+      !value.split(path.sep).some((part) => {
+        return part.startsWith(".env");
+      }) &&
+      extensions.includes(path.extname(value).toLowerCase())
+    );
+  };
   if (!allowed(filename)) {
     throw new Error("Input file has a hidden name or unsupported extension");
   }
@@ -134,9 +155,9 @@ export async function ensureDirectory(
   const parts = relative.split("/");
   if (
     path.isAbsolute(relative) ||
-    parts.some(
-      (part) => !part || part === "." || part === ".." || part.includes("\\"),
-    )
+    parts.some((part) => {
+      return !part || part === "." || part === ".." || part.includes("\\");
+    })
   ) {
     throw new Error("Output directory must be relative and cannot traverse");
   }

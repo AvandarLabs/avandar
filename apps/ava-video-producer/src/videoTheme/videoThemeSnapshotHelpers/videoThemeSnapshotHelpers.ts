@@ -42,7 +42,9 @@ export function createVideoThemeSnapshot(
   patches: readonly VideoThemePatch[] = [],
 ): VideoThemeSnapshot {
   const documents = getExtendsChainFromThemeId(library, themeId).filter(
-    (document) => !BUILT_IN_VIDEO_THEMES.has(document.id),
+    (document) => {
+      return !BUILT_IN_VIDEO_THEMES.has(document.id);
+    },
   );
   return { themeId, documents, patches };
 }

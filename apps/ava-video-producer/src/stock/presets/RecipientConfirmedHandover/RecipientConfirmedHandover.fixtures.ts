@@ -148,10 +148,12 @@ export const fixtures: Array<{ id: string; input: Input }> = [
     id: "all-four-counting-rows",
     input: {
       ...DENSE_INPUT,
-      contents: DENSE_INPUT.contents.map((content, index) => ({
-        ...content,
-        selectedUnits: index === 2 ? 2 : 1,
-      })),
+      contents: DENSE_INPUT.contents.map((content, index) => {
+        return {
+          ...content,
+          selectedUnits: index === 2 ? 2 : 1,
+        };
+      }),
     },
   },
   {

@@ -40,7 +40,9 @@ test("both reveal rules show the open setup and opaquely cover the retained brie
     );
     Array.from(
       { length: Math.max(0, Math.floor((108 - 72) / 1) + 1) },
-      (_, sampleIndex) => 72 + sampleIndex * 1,
+      (_, sampleIndex) => {
+        return 72 + sampleIndex * 1;
+      },
     ).forEach((frame) => {
       const markup = _render({ frame: frame, input: input });
       assert.match(markup, /data-opaque-cover="closed"/);
@@ -56,7 +58,9 @@ test("both reveal rules show the open setup and opaquely cover the retained brie
 test("the recipient opens only after arrival while remain-sealed never reopens after closure", () => {
   Array.from(
     { length: Math.max(0, Math.ceil((180 - 66) / 1)) },
-    (_, sampleIndex) => 66 + sampleIndex * 1,
+    (_, sampleIndex) => {
+      return 66 + sampleIndex * 1;
+    },
   ).forEach((frame) => {
     assert.match(
       _render({
@@ -68,7 +72,9 @@ test("the recipient opens only after arrival while remain-sealed never reopens a
   });
   Array.from(
     { length: Math.max(0, Math.floor((120 - 66) / 1) + 1) },
-    (_, sampleIndex) => 66 + sampleIndex * 1,
+    (_, sampleIndex) => {
+      return 66 + sampleIndex * 1;
+    },
   ).forEach((frame) => {
     assert.match(_render({ frame: frame }), /data-cover-progress="1"/);
   });
@@ -91,28 +97,30 @@ registerStockPresetAssertions({
   render: _render,
   excludedTextFields: ["id", "revealRule"],
   textFrames: [18, 80, 110, 150],
-  getVisibleTexts: ({ input, frame }) => [
-    input.copy.example,
-    input.copy[
-      frame < 66
-        ? "contents"
-        : frame < 108
-          ? "covered"
-          : input.revealRule === "recipient" && frame >= 120
-            ? "opened"
-            : "received"
-    ],
-    ...(frame < 36 || (input.revealRule === "recipient" && frame >= 136)
-      ? input.brief.map(prop("line"))
-      : []),
-    ...(frame >= 66 && (input.revealRule !== "recipient" || frame <= 120)
-      ? [
-          input.address.sender,
-          input.address.recipient,
-          ...(input.showExteriorReference ? [input.address.reference] : []),
-        ]
-      : []),
-  ],
+  getVisibleTexts: ({ input, frame }) => {
+    return [
+      input.copy.example,
+      input.copy[
+        frame < 66
+          ? "contents"
+          : frame < 108
+            ? "covered"
+            : input.revealRule === "recipient" && frame >= 120
+              ? "opened"
+              : "received"
+      ],
+      ...(frame < 36 || (input.revealRule === "recipient" && frame >= 136)
+        ? input.brief.map(prop("line"))
+        : []),
+      ...(frame >= 66 && (input.revealRule !== "recipient" || frame <= 120)
+        ? [
+            input.address.sender,
+            input.address.recipient,
+            ...(input.showExteriorReference ? [input.address.reference] : []),
+          ]
+        : []),
+    ];
+  },
 });
 test("the actual full-opacity cover bounds enclose the still-painted brief throughout transit", () => {
   Array.from(["recipient", "remain-sealed"] as const).forEach((revealRule) => {
@@ -248,10 +256,10 @@ test("all exterior address lines have opaque separation from fold seams", async 
     );
     const labels = paint.filter(propEq("kind", "text"));
     assert.ok(labels.length > 0);
-    labels.forEach((label) =>
-      assert.ok(
-        paint.some(
-          (item) =>
+    labels.forEach((label) => {
+      return assert.ok(
+        paint.some((item) => {
+          return (
             item.kind === "rect" &&
             item.fill !== "none" &&
             item.opacity * item.fillOpacity === 1 &&
@@ -259,10 +267,11 @@ test("all exterior address lines have opaque separation from fold seams", async 
             item.left <= label.left &&
             item.right >= label.right &&
             item.top <= label.top &&
-            item.bottom >= label.bottom,
-        ),
+            item.bottom >= label.bottom
+          );
+        }),
         "Address lines remain clear of physical envelope seams",
-      ),
-    );
+      );
+    });
   });
 });

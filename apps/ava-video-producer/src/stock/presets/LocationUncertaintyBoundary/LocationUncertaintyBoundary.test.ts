@@ -169,12 +169,14 @@ test("concave notches, outside records and overlapping disks use whole-footprint
   );
   const overlap = inputSchema.parse({
     ...DEFAULT_INPUT,
-    locations: DEFAULT_INPUT.locations.map((item) => ({
-      ...item,
-      x: 48,
-      y: 55,
-      radius: 8,
-    })),
+    locations: DEFAULT_INPUT.locations.map((item) => {
+      return {
+        ...item,
+        x: 48,
+        y: 55,
+        radius: 8,
+      };
+    }),
   });
   assert.match(
     _render({ frame: 150, input: overlap }),
@@ -184,24 +186,26 @@ test("concave notches, outside records and overlapping disks use whole-footprint
 test("coincident locations retain separate visible keys with actual map connectors", () => {
   const input = {
     ...fixtures[2].input,
-    locations: fixtures[2].input.locations.map((location) => ({
-      ...location,
-      x: 48,
-      y: 55,
-      radius: 8,
-    })),
+    locations: fixtures[2].input.locations.map((location) => {
+      return {
+        ...location,
+        x: 48,
+        y: 55,
+        radius: 8,
+      };
+    }),
   };
   const markup = _render({ frame: 150, input: input });
   const connectors = [
     ...markup.matchAll(/<path data-location-connector[^>]+>/g),
   ];
   assert.equal(connectors.length, 6);
-  connectors.forEach((match, index) =>
-    assert.match(
+  connectors.forEach((match, index) => {
+    return assert.match(
       match[0],
       new RegExp(`M222.8 338 L420 ${332 + index * 31 - 4}`),
-    ),
-  );
+    );
+  });
   assert.equal((markup.match(/data-district-connector=/g) ?? []).length, 4);
 });
 test("possible-district marks distinguish touched districts from excluded districts", () => {
@@ -220,16 +224,20 @@ test("equal-radius records visibly own the focused explanation with either footp
         ...DEFAULT_INPUT,
         focusedLocationId,
         showOtherFootprints,
-        locations: DEFAULT_INPUT.locations.map((location) => ({
-          ...location,
-          radius: 3,
-        })),
+        locations: DEFAULT_INPUT.locations.map((location) => {
+          return {
+            ...location,
+            radius: 3,
+          };
+        }),
       });
       const markup = _render({ frame: 150, input: input });
       const pins = [
         ...markup.matchAll(/<circle data-nominal-pin="([^"]*)"[^>]*>/g),
       ];
-      const focusedPin = pins.find((pin) => pin[1] === focusedLocationId)![0];
+      const focusedPin = pins.find((pin) => {
+        return pin[1] === focusedLocationId;
+      })![0];
       assert.equal(
         SvgAttributes.getNumberFromMarkup({
           attributes: focusedPin,
@@ -240,16 +248,18 @@ test("equal-radius records visibly own the focused explanation with either footp
       );
       assert.match(focusedPin, /stroke-width="2"/);
       pins
-        .filter((pin) => pin[1] !== focusedLocationId)
-        .forEach((pin) =>
-          assert.equal(
+        .filter((pin) => {
+          return pin[1] !== focusedLocationId;
+        })
+        .forEach((pin) => {
+          return assert.equal(
             SvgAttributes.getNumberFromMarkup({
               attributes: pin[0],
               name: "r",
             }),
             3,
-          ),
-        );
+          );
+        });
       const highlight = SvgAttributes.fromMarker({
         markup,
         marker: "focused-record",

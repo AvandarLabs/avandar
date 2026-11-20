@@ -4,6 +4,7 @@ import {
   useGraphicProps,
 } from "../theme/useGraphicTheme/useGraphicTheme";
 import type { Point } from "./graphicCommon.types";
+import type { ReactNode } from "react";
 
 /** A themed highlighted route segment that grows with `progress`. */
 export function Route({
@@ -20,7 +21,7 @@ export function Route({
   frame: number;
   at: number;
   color: string;
-}) {
+}): ReactNode {
   const route = useGraphicProps("Route", {});
   const motion = useGraphicMotion();
   return (

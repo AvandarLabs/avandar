@@ -20,16 +20,16 @@ import {
 } from "./SchemaPlanLocalExecutionTestHelpers";
 
 test("all authored fixtures are accepted and every rejection fixture fails", () => {
-  FIXTURES.forEach(({ input }) =>
-    assert.deepEqual(inputSchema.parse(input), input),
-  );
-  invalidInputs.forEach((input) =>
-    assert.equal(
+  FIXTURES.forEach(({ input }) => {
+    return assert.deepEqual(inputSchema.parse(input), input);
+  });
+  invalidInputs.forEach((input) => {
+    return assert.equal(
       inputSchema.safeParse(input).success,
       false,
       JSON.stringify(input),
-    ),
-  );
+    );
+  });
 });
 
 test("only supplied schema/question travel while retained rows compute five or ten locally", () => {
@@ -155,7 +155,9 @@ test("exact categories including whitespace select only equal rows and hidden ro
 test("maximum supplied question and schema words fit their outbound card without narrowing inputs", () => {
   Array.from(
     { length: Math.max(0, Math.floor((25 - 1) / 1) + 1) },
-    (_, sampleIndex) => 1 + sampleIndex * 1,
+    (_, sampleIndex) => {
+      return 1 + sampleIndex * 1;
+    },
   ).forEach((wordLength) => {
     const words = `${"界".repeat(wordLength)} `.repeat(60);
     const input = inputSchema.parse({
@@ -171,9 +173,11 @@ test("maximum supplied question and schema words fit their outbound card without
         planLabel: words.slice(0, 38),
       },
     });
-    [30, 55, 90, 150].forEach((frame) =>
-      assert.doesNotThrow(() => render({ frame: frame, input: input })),
-    );
+    [30, 55, 90, 150].forEach((frame) => {
+      return assert.doesNotThrow(() => {
+        return render({ frame: frame, input: input });
+      });
+    });
   });
 });
 
@@ -181,7 +185,9 @@ test("the complete returning plan avoids every retained header line throughout t
   FIXTURES.forEach(({ input }) => {
     Array.from(
       { length: Math.max(0, Math.floor((167 - 56) / 1) + 1) },
-      (_, sampleIndex) => 56 + sampleIndex * 1,
+      (_, sampleIndex) => {
+        return 56 + sampleIndex * 1;
+      },
     ).forEach((frame) => {
       const markup = render({ frame: frame, input: input });
       const card = _getCardBounds({ markup, kind: "inbound" });
@@ -191,13 +197,13 @@ test("the complete returning plan avoids every retained header line throughout t
         markup: markup.slice(tableStart, firstRow),
       });
       assert.ok(headers.length >= 2);
-      headers.forEach((header) =>
-        _assertSeparate({
+      headers.forEach((header) => {
+        return _assertSeparate({
           first: card,
           second: header,
           context: `frame ${frame}: plan/header`,
-        }),
-      );
+        });
+      });
     });
   });
 });
@@ -210,17 +216,18 @@ test("exchange cards retain complete wrapped text and avoid other cards, caption
       columns: { category: words.slice(0, 20), measure: "V".repeat(20) },
       request: { ...FIXTURES[2].input.request, planLabel: words.slice(0, 38) },
       boundaryLabels: Object.fromEntries(
-        Object.keys(DEFAULT_INPUT.boundaryLabels).map((key) => [
-          key,
-          words.slice(0, 30),
-        ]),
+        Object.keys(DEFAULT_INPUT.boundaryLabels).map((key) => {
+          return [key, words.slice(0, 30)];
+        }),
       ),
     });
   });
   [...FIXTURES.map(prop("input")), ...stress].forEach((input) => {
     Array.from(
       { length: Math.max(0, Math.floor((167 - 56) / 3) + 1) },
-      (_, sampleIndex) => 56 + sampleIndex * 3,
+      (_, sampleIndex) => {
+        return 56 + sampleIndex * 3;
+      },
     ).forEach((frame) => {
       const markup = render({ frame: frame, input: input }),
         inbound = _getCardBounds({ markup, kind: "inbound" }),
@@ -237,23 +244,24 @@ test("exchange cards retain complete wrapped text and avoid other cards, caption
           y: card.top,
         });
         assert.ok(lines.length);
-        lines.forEach((line) =>
-          assert.ok(
+        lines.forEach((line) => {
+          return assert.ok(
             line.left >= card.left &&
               line.right <= card.right &&
               line.top >= card.top &&
               line.bottom <= card.bottom,
             `frame ${frame}: complete card text ${JSON.stringify(line)}`,
-          ),
-        );
+          );
+        });
         const tableStart = markup.indexOf('data-local-table="true"');
         _getTextLineBounds({ markup: markup.slice(0, tableStart) }).forEach(
-          (caption) =>
-            _assertSeparate({
+          (caption) => {
+            return _assertSeparate({
               first: card,
               second: caption,
               context: `frame ${frame}: card/caption`,
-            }),
+            });
+          },
         );
         [...markup.matchAll(/<rect[^>]*data-row-body="[^"]*"[^>]*>/g)].forEach(
           ([row]) => {

@@ -29,7 +29,9 @@ function _getAcknowledgingPlayer(
 ): FilmPlayer | undefined {
   return event.origin === window.location.origin &&
     event.data?.type === "film-reloading"
-    ? players.find((candidate) => candidate.contentWindow === event.source)
+    ? players.find((candidate) => {
+        return candidate.contentWindow === event.source;
+      })
     : undefined;
 }
 
@@ -75,7 +77,9 @@ function _createReloadController(players: readonly FilmPlayer[]): {
       );
     },
     dispose: () => {
-      pending.forEach(({ timer }) => clearTimeout(timer));
+      pending.forEach(({ timer }) => {
+        return clearTimeout(timer);
+      });
       pending.clear();
       window.removeEventListener("message", acknowledge);
     },
@@ -101,7 +105,9 @@ export function watchFilms(
     if (!hasChanged) {
       return;
     }
-    players.forEach((player) => reloads.request(player));
+    players.forEach((player) => {
+      return reloads.request(player);
+    });
     if (onReload) {
       clearTimeout(galleryTimer);
       galleryTimer = setTimeout(onReload, 1100);

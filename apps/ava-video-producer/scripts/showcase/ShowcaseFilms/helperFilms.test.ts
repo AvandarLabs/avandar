@@ -30,10 +30,11 @@ test("unknown helpers and palette options are rejected", async () => {
 
 test("helper previews are live only and cannot be exported", async () => {
   const film = await ShowcaseFilms.load("helper-ease-out");
-  assert.throws(
-    () => ShowcaseFilms.assertExportable(film),
-    /Helper previews play live only/,
-  );
+  assert.throws(() => {
+    return ShowcaseFilms.assertExportable(film);
+  }, /Helper previews play live only/);
   const stock = await ShowcaseFilms.load("stock-plexus-field");
-  assert.doesNotThrow(() => ShowcaseFilms.assertExportable(stock));
+  assert.doesNotThrow(() => {
+    return ShowcaseFilms.assertExportable(stock);
+  });
 });

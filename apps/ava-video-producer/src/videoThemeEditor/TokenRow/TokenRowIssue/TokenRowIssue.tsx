@@ -5,6 +5,7 @@ import type {
   TokenKind,
   VideoThemeIssue,
 } from "../../../videoTheme/videoTheme.types";
+import type { ReactNode } from "react";
 
 type Props = Readonly<{ issue: VideoThemeIssue; kind: TokenKind }>;
 
@@ -20,8 +21,11 @@ function _issueToSentence(issue: VideoThemeIssue, kind: TokenKind): string {
     : "This value cannot be used.";
 }
 
-/** A problem in plain words, with the resolver's own message as secondary detail. */
-export function TokenRowIssue({ issue, kind }: Props) {
+/**
+ * A problem in plain words, with the resolver's own message as secondary
+ * detail.
+ */
+export function TokenRowIssue({ issue, kind }: Props): ReactNode {
   return (
     <div className={css.tokenRowIssue} role="alert">
       <IconAlertCircle

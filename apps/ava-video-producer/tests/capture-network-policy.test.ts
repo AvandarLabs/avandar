@@ -24,7 +24,9 @@ test("capture origins are literal loopback origins, without embedded credentials
     "http://localhost:5173?token=abc",
     "http://localhost:5173/#token",
   ]) {
-    assert.throws(() => validateBaseUrl(origin));
+    assert.throws(() => {
+      return validateBaseUrl(origin);
+    });
   }
   assert.equal(
     isWorkspaceRoute({

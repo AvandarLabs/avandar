@@ -47,7 +47,9 @@ function _formatEffect(kind: TokenKind, value: unknown): string | undefined {
     case "elevation":
       return (
         (value as ShadowValue).layers
-          .map((layer) => `${layer.offsetX} ${layer.offsetY} ${layer.blur}`)
+          .map((layer) => {
+            return `${layer.offsetX} ${layer.offsetY} ${layer.blur}`;
+          })
           .join(", ") || "0"
       );
     case "glow": {
@@ -111,7 +113,9 @@ function _formatCollection(
   switch (kind) {
     case "box":
       return Object.entries(value as Readonly<Record<string, number>>)
-        .map(([side, pixels]) => `${side} ${_number(pixels)}`)
+        .map(([side, pixels]) => {
+          return `${side} ${_number(pixels)}`;
+        })
         .join(" · ");
     case "motionStep": {
       const step = value as ResolvedMotionStep;

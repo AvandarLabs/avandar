@@ -3,18 +3,15 @@ import test from "node:test";
 import { parseArgs } from "../scripts/video/parseArgs";
 
 test("CLI rejects unknown or unsafe numeric options and requires manual-alignment inputs", () => {
-  assert.throws(
-    () => parseArgs(["render", "plan.json", "--skip-gate", "true"]),
-    /Invalid/,
-  );
-  assert.throws(
-    () => parseArgs(["align", "plan.json", "--audio", "voice.wav"]),
-    /requires/,
-  );
-  assert.throws(
-    () => parseArgs(["tts", "plan.json", "--rate", "175; touch unexpected"]),
-    /rate/,
-  );
+  assert.throws(() => {
+    return parseArgs(["render", "plan.json", "--skip-gate", "true"]);
+  }, /Invalid/);
+  assert.throws(() => {
+    return parseArgs(["align", "plan.json", "--audio", "voice.wav"]);
+  }, /requires/);
+  assert.throws(() => {
+    return parseArgs(["tts", "plan.json", "--rate", "175; touch unexpected"]);
+  }, /rate/);
   assert.equal(
     parseArgs(["tts", "plan.json", "--voice", "A voice name", "--rate", "190"])
       .voice,
@@ -34,8 +31,7 @@ test("preview and render accept one theme", () => {
 });
 
 test("commands that draw no picture refuse a theme", () => {
-  assert.throws(
-    () => parseArgs(["validate", "plan.json", "--theme", "avandar"]),
-    /Invalid/,
-  );
+  assert.throws(() => {
+    return parseArgs(["validate", "plan.json", "--theme", "avandar"]);
+  }, /Invalid/);
 });

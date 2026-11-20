@@ -51,17 +51,23 @@ export function getPixelComparisonFromScreenshots(
   const changed = Array.from({ length: left.length / 4 }, (_, pixel) => {
     const offset = pixel * 4;
     const delta = Math.max(
-      ...[0, 1, 2, 3].map((channel) =>
-        Math.abs(left[offset + channel] - right[offset + channel]),
-      ),
+      ...[0, 1, 2, 3].map((channel) => {
+        return Math.abs(left[offset + channel] - right[offset + channel]);
+      }),
     );
     return { pixel, delta };
-  }).filter(({ delta }) => delta > 0);
+  }).filter(({ delta }) => {
+    return delta > 0;
+  });
   if (!changed.length) {
     return { changedPixels: 0, maxChannelDelta: 0, bounds: undefined };
   }
-  const xs = changed.map(({ pixel }) => pixel % STAGE.width);
-  const ys = changed.map(({ pixel }) => Math.floor(pixel / STAGE.width));
+  const xs = changed.map(({ pixel }) => {
+    return pixel % STAGE.width;
+  });
+  const ys = changed.map(({ pixel }) => {
+    return Math.floor(pixel / STAGE.width);
+  });
   const bounds = {
     x: Math.min(...xs),
     y: Math.min(...ys),

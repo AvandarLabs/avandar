@@ -21,9 +21,10 @@ test("count templates insert complete units and preserve inserted strings litera
     }),
     ": 0 things",
   );
-  assert.throws(
-    () =>
-      getStockDisplayCopyFromDescriptor({ descriptor, values: { count: 1 } }),
-    /Missing display-copy value/,
-  );
+  assert.throws(() => {
+    return getStockDisplayCopyFromDescriptor({
+      descriptor,
+      values: { count: 1 },
+    });
+  }, /Missing display-copy value/);
 });

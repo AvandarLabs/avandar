@@ -7,9 +7,13 @@ import {
   chartConfig,
 } from "../shims/import-dashboard/DashboardFixtureContext";
 import css from "./DashboardScreen.module.css";
+import type { ReactNode } from "react";
 
-/** The Data Explorer chart leaf this film saves to a dashboard, with its real Save menu. */
-export function SourceChart({ frame }: { frame: number }) {
+/**
+ * The Data Explorer chart leaf this film saves to a dashboard, with its real
+ * Save menu.
+ */
+export function SourceChart({ frame }: { frame: number }): ReactNode {
   return (
     <div className={css.sourceChartRoot}>
       <Group
@@ -17,8 +21,9 @@ export function SourceChart({ frame }: { frame: number }) {
         p="sm"
         style={{ borderBottom: "1px solid var(--ava-border-default)" }}
       >
-        {/* Markup and complete available item list from DataExplorerSaveMenu and
-          DataExplorerSaveAsMenuItems; handlers are deterministic film state. */}
+        {/* Markup and complete available item list from DataExplorerSaveMenu
+          and DataExplorerSaveAsMenuItems; handlers are deterministic film
+          state. */}
         <Menu
           shadow="md"
           width={240}

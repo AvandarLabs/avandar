@@ -1,4 +1,6 @@
-/** The workspace root's producer env file reaches the app before each command. */
+/**
+ * The workspace root's producer env file reaches the app before each command.
+ */
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import {

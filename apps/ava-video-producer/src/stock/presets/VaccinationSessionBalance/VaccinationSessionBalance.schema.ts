@@ -49,7 +49,9 @@ export const inputSchema = z
       !_unique(input.units) ||
       !_unique(input.recipients) ||
       recipientIds.size !== input.recipients.length ||
-      input.recipients.some((recipient) => !recipientIds.has(recipient.id))
+      input.recipients.some((recipient) => {
+        return !recipientIds.has(recipient.id);
+      })
     ) {
       context.addIssue({
         code: "custom",

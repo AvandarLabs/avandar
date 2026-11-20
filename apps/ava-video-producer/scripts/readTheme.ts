@@ -15,7 +15,8 @@ import { requireLicense } from "./requireLicense";
 
 requireLicense();
 
-// Export only palette values, without bundling the product's runtime into the gallery.
+// Export only palette values, without bundling the product's runtime into the
+// gallery.
 const palette = {
   primary: Theme.colors?.primary,
   neutral: NEUTRAL_SHADES,
@@ -29,7 +30,8 @@ const palette = {
   surfaces: ElevationTheme.surfaces,
 };
 
-// `--for-video` adds the values `theme:sync-avandar` maps into avandar.theme.json.
+// `--for-video` adds the values `theme:sync-avandar` maps into
+// avandar.theme.json.
 process.stdout.write(
   JSON.stringify(
     process.argv.includes("--for-video")

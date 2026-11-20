@@ -88,14 +88,18 @@ export const ReviewPageDriver = {
     const { page } = run;
     const { url, feature } = options;
     await page.goto(url, { waitUntil: "networkidle" });
-    await page.waitForFunction(() => Boolean((window as ReviewWindow).review));
+    await page.waitForFunction(() => {
+      return Boolean((window as ReviewWindow).review);
+    });
     if (feature) {
       await page.evaluate((value) => {
         (window as ReviewWindow).review.setFeature(value);
       }, feature);
     }
     await page.locator(".avandar-film").waitFor({ state: "visible" });
-    await page.evaluate(() => document.fonts.ready);
+    await page.evaluate(() => {
+      return document.fonts.ready;
+    });
     const rect = await page.locator(".avandar-film").boundingBox();
     if (!rect || rect.width !== STAGE.width || rect.height !== STAGE.height) {
       throw new Error("Review stage must be exactly 1600 by 840.");
@@ -109,19 +113,19 @@ export const ReviewPageDriver = {
     await page.evaluate((value) => {
       (window as ReviewWindow).review.seek(value);
     }, frame);
-    await page.waitForFunction(
-      (value) => (window as ReviewWindow).review.frame() === value,
-      frame,
-    );
+    await page.waitForFunction((value) => {
+      return (window as ReviewWindow).review.frame() === value;
+    }, frame);
     // Player acknowledgement can precede the React commit. Let effects
     // register native rendering handles before testing readiness (notably
     // MapLibre idle).
-    await page.evaluate(
-      () =>
-        new Promise((done) => {
-          requestAnimationFrame(() => requestAnimationFrame(done));
-        }),
-    );
+    await page.evaluate(() => {
+      return new Promise((done) => {
+        requestAnimationFrame(() => {
+          return requestAnimationFrame(done);
+        });
+      });
+    });
     const isReady = (value: number) => {
       const reviewWindow = window as ReviewWindow;
       return (

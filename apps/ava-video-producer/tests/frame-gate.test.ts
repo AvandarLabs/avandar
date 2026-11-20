@@ -19,7 +19,9 @@ function createLumaTrack(
   startFrame: number,
   values: number[],
 ): number[] {
-  const luma = Array.from({ length }, () => 100);
+  const luma = Array.from({ length }, () => {
+    return 100;
+  });
   values.forEach((value, offset) => {
     luma[startFrame + offset] = value;
   });
@@ -55,7 +57,9 @@ test("gate arguments keep the file apart from the declared cut list", () => {
     ["film.mp4", "--loose"],
   ]) {
     assert.throws(
-      () => makeGateArgumentsFromArgv(argv),
+      () => {
+        return makeGateArgumentsFromArgv(argv);
+      },
       /usage/,
       argv.join(" "),
     );
@@ -168,9 +172,10 @@ test("a copy-level half match next to a near-uniform frame is still tiled", () =
   const halves = [...MEASURED_HALVES];
   halves[10] = 54.72;
   assert.deepEqual(
-    getTiledFramesFromMeasurements({ halves, contrast: MEASURED_CONTRAST }).map(
-      (tile) => tile.frame,
-    ),
+    getTiledFramesFromMeasurements({
+      halves,
+      contrast: MEASURED_CONTRAST,
+    }).map(prop("frame")),
     [10],
   );
 });
@@ -194,7 +199,9 @@ const TILE_GRAPH =
 test("a 2x3 grid of its own frame is caught, including next to a uniform frame", async () => {
   const directory = await fs.mkdtemp(path.join(os.tmpdir(), "frame-gate-"));
   try {
-    const frame = (index: number) => path.join(directory, `f-${index}.png`);
+    const frame = (index: number) => {
+      return path.join(directory, `f-${index}.png`);
+    };
     runFfmpeg([
       "-f",
       "lavfi",

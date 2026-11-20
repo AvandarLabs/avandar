@@ -17,22 +17,24 @@ export function SourceVertices({
   const kept = new Set(keptIndices);
   return (
     <g>
-      {input.vertices.map(([x, y], index) => (
-        <circle
-          key={index}
-          data-source-vertex={index}
-          data-kept-index={kept.has(index) ? index : undefined}
-          cx={60 + x * 3.6}
-          cy={160 + y * 3.6}
-          r={5}
-          fill={
-            kept.has(index)
-              ? mixToken(ramp(frame, 111, 28), STOCK.muted, accent)
-              : STOCK.muted
-          }
-          opacity={ramp(frame, 13 + index * 2, 23)}
-        />
-      ))}
+      {input.vertices.map(([x, y], index) => {
+        return (
+          <circle
+            key={index}
+            data-source-vertex={index}
+            data-kept-index={kept.has(index) ? index : undefined}
+            cx={60 + x * 3.6}
+            cy={160 + y * 3.6}
+            r={5}
+            fill={
+              kept.has(index)
+                ? mixToken(ramp(frame, 111, 28), STOCK.muted, accent)
+                : STOCK.muted
+            }
+            opacity={ramp(frame, 13 + index * 2, 23)}
+          />
+        );
+      })}
     </g>
   );
 }

@@ -77,8 +77,12 @@ function _describeCut(cut: Readonly<JudgedCut>, frameCount: number): string {
     .with("flash", () => {
       return `${frame}rejected   ${jump}, ${reversal} by frame ${cut.reversalFrame}: a flash, not a cut`;
     })
-    .with("accepted", () => held("accepted "))
-    .with("under-limit", () => held("under limit"))
+    .with("accepted", () => {
+      return held("accepted ");
+    })
+    .with("under-limit", () => {
+      return held("under limit");
+    })
     .exhaustive();
 }
 
@@ -122,7 +126,9 @@ function _reportGate(
     console.log(
       `\ndeclared cuts (a jump is accepted if it does not swing back over ${LUMA_JUMP} within ${CUT_REVERSAL_FRAMES} frames):`,
     );
-    cuts.forEach((cut) => console.log(_describeCut(cut, luma.length)));
+    cuts.forEach((cut) => {
+      return console.log(_describeCut(cut, luma.length));
+    });
   }
   console.log(
     `\nluminance jumps over ${LUMA_JUMP}: ${jumps.length ? "" : "none"}`,
@@ -146,8 +152,10 @@ function _reportGate(
 }
 
 requireLicense();
-const options = _runOrExit(() =>
-  makeGateArgumentsFromArgv(process.argv.slice(2)),
-);
-const measured = _runOrExit(() => getFrameMeasurementsFromVideo(options.file));
+const options = _runOrExit(() => {
+  return makeGateArgumentsFromArgv(process.argv.slice(2));
+});
+const measured = _runOrExit(() => {
+  return getFrameMeasurementsFromVideo(options.file);
+});
 process.exit(_reportGate(options, measured) ? 1 : 0);

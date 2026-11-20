@@ -17,11 +17,15 @@ test("preview samples the composed film on both sides of its transition", () => 
   for (const frame of [29, 30, 31, 36, 42, 59])
     assert.ok(frames.includes(frame), String(frame));
   assert.equal(new Set(frames).size, frames.length);
-  assert.ok(frames.every((frame) => frame >= 0 && frame < 60));
+  assert.ok(
+    frames.every((frame) => {
+      return frame >= 0 && frame < 60;
+    }),
+  );
 });
 
-test("render requires preview proof matching plan, renderer and asset bytes", async () =>
-  temporary(async (root) => {
+test("render requires preview proof matching plan, renderer and asset bytes", async () => {
+  return temporary(async (root) => {
     const plan = fixture();
     const planPath = path.join(root, "plan.json");
     await fs.writeFile(planPath, JSON.stringify(plan));
@@ -67,10 +71,11 @@ test("render requires preview proof matching plan, renderer and asset bytes", as
       ),
       /changed/i,
     );
-  }));
+  });
+});
 
-test("input and output guards reject hidden files and symlink escapes before writes", async () =>
-  temporary(async (root) => {
+test("input and output guards reject hidden files and symlink escapes before writes", async () => {
+  return temporary(async (root) => {
     await fs.writeFile(path.join(root, ".private"), "not narration");
     await fs.symlink(path.join(root, ".private"), path.join(root, "fake.wav"));
     await assert.rejects(
@@ -88,4 +93,5 @@ test("input and output guards reject hidden files and symlink escapes before wri
     } finally {
       await fs.rm(outside, { recursive: true, force: true });
     }
-  }));
+  });
+});

@@ -61,7 +61,9 @@ test("registration keeps nested exclusions, caller oracles and all existing stre
   assert.equal(SNAPSHOTS.length, 510);
   assert.deepEqual(
     ORACLE_FRAMES,
-    Array.from({ length: 40 }, () => [24, 72, 150]).flat(),
+    Array.from({ length: 40 }, () => {
+      return [24, 72, 150];
+    }).flat(),
   );
   assert.deepEqual(SNAPSHOTS.slice(0, 120).map(prop("frame")), ORACLE_FRAMES);
   assert.equal(SNAPSHOTS[0].input.label, "界 界 界界界界界界界界界界界界界界");
@@ -77,9 +79,11 @@ test("registration keeps nested exclusions, caller oracles and all existing stre
   });
   assert.deepEqual(
     SNAPSHOTS.slice(120, 390).map(prop("frame")),
-    Array.from({ length: 3 }, () =>
-      Array.from({ length: 90 }, (_, index) => index * 2),
-    ).flat(),
+    Array.from({ length: 3 }, () => {
+      return Array.from({ length: 90 }, (_, index) => {
+        return index * 2;
+      });
+    }).flat(),
   );
   assert.equal(dense.label, "界".repeat(18));
   assert.deepEqual(dense.learnerIds, ["learner-a"]);

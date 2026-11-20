@@ -48,12 +48,14 @@ function _createReviewBundle(options: {
           build.onResolve(
             // Matches the extensionless script import and the stylesheet.
             { filter: /generated\/product(?:\.(js|css))?$/ },
-            (args) => ({
-              path: path.join(
-                options.productDirectory,
-                args.path.endsWith(".css") ? "product.css" : "product.js",
-              ),
-            }),
+            (args) => {
+              return {
+                path: path.join(
+                  options.productDirectory,
+                  args.path.endsWith(".css") ? "product.css" : "product.js",
+                ),
+              };
+            },
           );
         },
       },
@@ -85,7 +87,9 @@ async function _onRequest(options: Readonly<ReviewRequest>): Promise<void> {
     });
     res.write(`data: ${options.getGeneration()}\n\n`);
     clients.add(res);
-    req.on("close", () => clients.delete(res));
+    req.on("close", () => {
+      return clients.delete(res);
+    });
     return;
   }
   const file = pathname === "/" ? "index.html" : pathname.slice(1);
@@ -109,9 +113,15 @@ function _closeOnSignal(options: {
   disposables: ReadonlyArray<BuildContext | undefined>;
 }): void {
   const close = async () => {
-    options.clients.forEach((client) => client.end());
+    options.clients.forEach((client) => {
+      return client.end();
+    });
     options.server.close();
-    await Promise.all(options.disposables.map((item) => item?.dispose()));
+    await Promise.all(
+      options.disposables.map((item) => {
+        return item?.dispose();
+      }),
+    );
   };
   process.once("SIGINT", close);
   process.once("SIGTERM", close);
@@ -131,7 +141,9 @@ async function _runReview(isBuildOnly: boolean): Promise<void> {
   const onBuilt = async () => {
     await review.rebuild();
     generation += 1;
-    clients.forEach((client) => client.write(`data: ${generation}\n\n`));
+    clients.forEach((client) => {
+      return client.write(`data: ${generation}\n\n`);
+    });
   };
   await fs.writeFile(path.join(root, "index.html"), REVIEW_PAGE);
   const product = await buildProduct({
@@ -150,7 +162,9 @@ async function _runReview(isBuildOnly: boolean): Promise<void> {
       res,
       root,
       clients,
-      getGeneration: () => generation,
+      getGeneration: () => {
+        return generation;
+      },
     });
   }).listen(port, "127.0.0.1", () => {
     console.log(

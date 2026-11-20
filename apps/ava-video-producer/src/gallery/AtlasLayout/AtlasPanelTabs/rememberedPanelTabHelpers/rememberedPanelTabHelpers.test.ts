@@ -9,7 +9,9 @@ function _createStorage(initial: Record<string, string> = {}) {
   const values = new Map(Object.entries(initial));
   return {
     values,
-    getItem: (key: string) => values.get(key) ?? null,
+    getItem: (key: string) => {
+      return values.get(key) ?? null;
+    },
     setItem: (key: string, value: string) => {
       values.set(key, value);
     },
@@ -88,7 +90,7 @@ test("no storage, a corrupt value, or a throwing storage all read as Details", (
     },
   };
   assert.equal(readRememberedPanelTab(throwing, "a"), "details");
-  assert.doesNotThrow(() =>
-    rememberPanelTab({ storage: throwing, itemId: "a", tab: "tokens" }),
-  );
+  assert.doesNotThrow(() => {
+    return rememberPanelTab({ storage: throwing, itemId: "a", tab: "tokens" });
+  });
 });

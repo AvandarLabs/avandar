@@ -17,15 +17,17 @@ export function ClassroomAccessRearrangement({
     <g>
       <ClassroomFurniture input={input} frame={frame} accent={accent} />
       <ClassroomLabels input={input} frame={frame} />
-      {input.learners.map((learner, index) => (
-        <ClassroomLearner
-          key={learner.id}
-          input={input}
-          index={index}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {input.learners.map((learner, index) => {
+        return (
+          <ClassroomLearner
+            key={learner.id}
+            input={input}
+            index={index}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

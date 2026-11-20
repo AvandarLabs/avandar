@@ -1,16 +1,15 @@
 import { useId } from "react";
 import { mix } from "../../motion";
-import {
-  HorizontalBlurFilter,
-  getHorizontalBlurFilter,
-} from "../../motion-components/HorizontalBlur";
+import { getHorizontalBlurFilter } from "../../motion-components/getHorizontalBlurFilter/getHorizontalBlurFilter";
+import { HorizontalBlurFilter } from "../../motion-components/HorizontalBlur";
 import { MediaPlane } from "../MediaPlane";
-import { positioned } from "../SceneShell";
+import { positioned } from "../positioned";
 import { getScrollOffset } from "./windowMotion";
 import { WINDOW_CHROME, WINDOW_SHADOW, WINDOW_TILT } from "./windowTilt";
 import type { Rect } from "../layout/layout";
 import type { WindowSource } from "../scenes.types";
 import type { WindowPose } from "./windowMotion";
+import type { ReactNode } from "react";
 
 type Props = {
   frame: number;
@@ -46,7 +45,7 @@ export function WindowCard({
   rotateZ = WINDOW_TILT.rotateZ,
   perspective = WINDOW_TILT.perspective,
   clipPath,
-}: Props) {
+}: Props): ReactNode {
   const filterId = `window-blur-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
   const titlebar =
     chrome === "titlebar"

@@ -1,4 +1,5 @@
-import { abs, Orb } from "../../chrome/chrome";
+import { abs } from "../../chrome/abs";
+import { Orb } from "../../chrome/chrome";
 import {
   DUR,
   enter,
@@ -32,7 +33,7 @@ export function SidePanel({
   shown: number;
   refilter: number;
   chipOn: number;
-}) {
+}): ReactNode {
   return (
     <div
       style={{
@@ -126,23 +127,25 @@ export function SidePanel({
           ],
           ["Period", "Q3 2026"],
         ] as Array<[string, ReactNode]>
-      ).map(([k, v], i) => (
-        <div
-          key={k}
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            fontSize: 17,
-            marginTop: 20,
-            paddingTop: 20,
-            borderTop: "1px solid var(--border)",
-            ...enterAt(frame, ROWS_AT + 16, i, { y: 8 }),
-          }}
-        >
-          <span style={{ color: "var(--muted-foreground)" }}>{k}</span>
-          <span>{v}</span>
-        </div>
-      ))}
+      ).map(([k, v], i) => {
+        return (
+          <div
+            key={k}
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              fontSize: 17,
+              marginTop: 20,
+              paddingTop: 20,
+              borderTop: "1px solid var(--border)",
+              ...enterAt(frame, ROWS_AT + 16, i, { y: 8 }),
+            }}
+          >
+            <span style={{ color: "var(--muted-foreground)" }}>{k}</span>
+            <span>{v}</span>
+          </div>
+        );
+      })}
 
       {/* The hero beat of the last phase. One per phase: if everything
        * is animated, nothing reads as animated. A spring, because this

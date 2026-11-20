@@ -37,15 +37,17 @@ export function AtomicOutboxCommit({
       <path d="M480 155 V470" stroke={STOCK.line} strokeDasharray="5 7" />
       <OutboxDurableState input={input} frame={frame} accent={accent} />
       {frame < 139
-        ? (["local", "journal"] as const).map((side) => (
-            <OutboxProposal
-              key={side}
-              input={input}
-              frame={frame}
-              side={side}
-              accent={accent}
-            />
-          ))
+        ? (["local", "journal"] as const).map((side) => {
+            return (
+              <OutboxProposal
+                key={side}
+                input={input}
+                frame={frame}
+                side={side}
+                accent={accent}
+              />
+            );
+          })
         : undefined}
       <OutboxCommitMarks input={input} frame={frame} accent={accent} />
       <OutboxOutcome input={input} frame={frame} />

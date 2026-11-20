@@ -52,9 +52,14 @@ export const inputSchema = z
       });
     }
     if (
-      new Set(input.groups.flatMap((group) => group.items.map(prop("id"))))
-        .size !==
-      input.groups.reduce((sum, group) => sum + group.items.length, 0)
+      new Set(
+        input.groups.flatMap((group) => {
+          return group.items.map(prop("id"));
+        }),
+      ).size !==
+      input.groups.reduce((sum, group) => {
+        return sum + group.items.length;
+      }, 0)
     ) {
       context.addIssue({
         code: "custom",
@@ -75,8 +80,12 @@ export const inputSchema = z
     }
     if (
       input.groups.length === 2 &&
-      input.groups[0].items.reduce((sum, item) => sum + item.bytes, 0) ===
-        input.groups[1].items.reduce((sum, item) => sum + item.bytes, 0)
+      input.groups[0].items.reduce((sum, item) => {
+        return sum + item.bytes;
+      }, 0) ===
+        input.groups[1].items.reduce((sum, item) => {
+          return sum + item.bytes;
+        }, 0)
     ) {
       context.addIssue({
         code: "custom",
@@ -85,11 +94,13 @@ export const inputSchema = z
       });
     }
     if (
-      input.groups.some(
-        (group) =>
-          group.items.reduce((sum, item) => sum + item.bytes, 0) >
-          input.measure.scaleMaximumBytes,
-      )
+      input.groups.some((group) => {
+        return (
+          group.items.reduce((sum, item) => {
+            return sum + item.bytes;
+          }, 0) > input.measure.scaleMaximumBytes
+        );
+      })
     ) {
       context.addIssue({
         code: "custom",

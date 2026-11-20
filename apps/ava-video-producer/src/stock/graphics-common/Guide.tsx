@@ -1,5 +1,6 @@
 import { SketchedShape } from "../primitives/SketchedShape";
 import { useGraphicProps } from "../theme/useGraphicTheme/useGraphicTheme";
+import type { ReactNode } from "react";
 
 /** A themed dashed guide ellipse, such as an orbit. */
 export function Guide({
@@ -12,7 +13,7 @@ export function Guide({
   cy: number;
   rx: number;
   ry: number;
-}) {
+}): ReactNode {
   const guide = useGraphicProps("Guide", {});
   return (
     <SketchedShape

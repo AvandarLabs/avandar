@@ -22,7 +22,9 @@ export function buildCompositionSearchTextFromEntry(
     entry.creativeDirection,
     entry.avoid,
   ]
-    .map((text) => text.trim().replace(/\s+/g, " "))
+    .map((text) => {
+      return text.trim().replace(/\s+/g, " ");
+    })
     .filter(Boolean)
     .join("\n");
 }

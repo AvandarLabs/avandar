@@ -73,8 +73,9 @@ test("a wipe exit retracts from the right until nothing is left", () => {
 
 test("a staged exit fades each element out after the one before it", () => {
   const exit = { atFrame: 20, staggerFrames: 3, durationInFrames: 6 };
-  const opacityAt = (frame: number, index: number) =>
-    Number(getStagedExitStyle(frame, exit, index).opacity);
+  const opacityAt = (frame: number, index: number) => {
+    return Number(getStagedExitStyle(frame, exit, index).opacity);
+  };
   assert.equal(opacityAt(19, 0), 1);
   assert.ok(opacityAt(22, 0) < 1);
   assert.equal(opacityAt(22, 1), 1);

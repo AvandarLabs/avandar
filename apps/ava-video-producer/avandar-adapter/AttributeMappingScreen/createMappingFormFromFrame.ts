@@ -16,7 +16,9 @@ export const MAPPING_CONCEPT_ID = uuid<Concept.Id>(
 const MANUAL_ATTRIBUTE_ID = uuid<ConceptAttribute.Id>(
   "00000000-0000-4000-8000-000000000802",
 );
-const ignoreEdit = () => undefined;
+const ignoreEdit = () => {
+  return undefined;
+};
 
 function _createFieldBindings(options: {
   stage: ReturnType<typeof createMappingStageFromFrame>;
@@ -32,27 +34,33 @@ function _createFieldBindings(options: {
       : stage;
   return {
     keys: Object.fromEntries(
-      fields.map((field) => [field, `${prefix}.${field}`]),
+      fields.map((field) => {
+        return [field, `${prefix}.${field}`];
+      }),
     ),
     inputProps: Object.fromEntries(
-      fields.map((field) => [
-        field,
-        () => ({
-          ...(typeof values[field] === "boolean"
-            ? { checked: values[field] }
-            : { value: values[field] ?? "" }),
-          onChange: ignoreEdit,
-          ...(field === "valuePickerRuleType"
-            ? {
-                dropdownOpened: stage.isRuleMenuOpen,
-                comboboxProps: {
-                  withinPortal: false,
-                  transitionProps: { duration: 0 },
-                },
-              }
-            : {}),
-        }),
-      ]),
+      fields.map((field) => {
+        return [
+          field,
+          () => {
+            return {
+              ...(typeof values[field] === "boolean"
+                ? { checked: values[field] }
+                : { value: values[field] ?? "" }),
+              onChange: ignoreEdit,
+              ...(field === "valuePickerRuleType"
+                ? {
+                    dropdownOpened: stage.isRuleMenuOpen,
+                    comboboxProps: {
+                      withinPortal: false,
+                      transitionProps: { duration: 0 },
+                    },
+                  }
+                : {}),
+            };
+          },
+        ];
+      }),
     ),
   };
 }
@@ -100,7 +108,9 @@ export function createMappingFormFromFrame(options: {
       : defaultManualFieldName;
   const values = _createMappingValuesFromStage({ stage, manualFieldName });
   return {
-    getValues: () => values,
+    getValues: () => {
+      return values;
+    },
     errors: {},
     keysAndProps: (prefix, fields) => {
       const { keys, inputProps } = _createFieldBindings({

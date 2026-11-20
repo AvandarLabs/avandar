@@ -1,4 +1,5 @@
 import type { EffectPrimitive } from "../videoEffectFilterHelpers/videoEffectFilterHelpers";
+import type { ReactNode } from "react";
 
 type Props = Readonly<{
   primitive: Extract<EffectPrimitive, { kind: "glow" }>;
@@ -13,7 +14,7 @@ type Props = Readonly<{
  * source alpha merged under the input. Render it inside a `<filter>`, since
  * filter primitives are order sensitive.
  */
-export function GlowEffect({ primitive, input, result }: Props) {
+export function GlowEffect({ primitive, input, result }: Props): ReactNode {
   return (
     <>
       <feGaussianBlur

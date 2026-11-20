@@ -19,9 +19,13 @@ export function SchoolCostSatchel({
 }: Readonly<Props>): ReactNode {
   const expenses =
     input.unpackOrder === "largest-first"
-      ? [...input.expenses].sort((left, right) => right.amount - left.amount)
+      ? [...input.expenses].sort((left, right) => {
+          return right.amount - left.amount;
+        })
       : input.expenses;
-  const total = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+  const total = expenses.reduce((sum, expense) => {
+    return sum + expense.amount;
+  }, 0);
   return (
     <g data-total={total}>
       <SatchelHeading input={input} />
@@ -36,18 +40,20 @@ export function SchoolCostSatchel({
         fill={STOCK.surface}
         stroke={STOCK.line}
       />
-      {expenses.map((expense, index) => (
-        <SatchelExpense
-          key={expense.id}
-          expense={expense}
-          index={index}
-          numExpenses={expenses.length}
-          total={total}
-          frame={frame}
-          accent={accent}
-          showShares={input.showExpenseShares}
-        />
-      ))}
+      {expenses.map((expense, index) => {
+        return (
+          <SatchelExpense
+            key={expense.id}
+            expense={expense}
+            index={index}
+            numExpenses={expenses.length}
+            total={total}
+            frame={frame}
+            accent={accent}
+            showShares={input.showExpenseShares}
+          />
+        );
+      })}
       <SatchelTotal input={input} frame={frame} accent={accent} total={total} />
       <SceneText
         text={input.caption}

@@ -75,7 +75,7 @@ These are all the exported functions in [src/motion.ts](../src/motion.ts), inclu
 
 ## Pointer and click vocabulary
 
-The pointer helpers live in [src/cursor-motion.ts](../src/cursor-motion.ts). `trackPos` and `downAt` are also re-exported from [src/chrome.tsx](../src/chrome/chrome.tsx), which renders the shared `Cursor`.
+The pointer helpers live in [src/cursor-motion.ts](../src/cursor-motion.ts). [src/chrome.tsx](../src/chrome/chrome.tsx) renders the shared `Cursor`.
 
 | API | Behavior |
 | --- | --- |

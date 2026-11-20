@@ -11,7 +11,9 @@ async function _expectAtlasStylesheetsServed(
     ...(await atlasPage.text()).matchAll(
       /<link rel="stylesheet"[^>]*href="([^"]+)"/g,
     ),
-  ].map((match) => match[1]);
+  ].map((match) => {
+    return match[1];
+  });
   expect(stylesheets.length).toBeGreaterThan(0);
   await Promise.all(
     stylesheets.map(async (href) => {
@@ -62,15 +64,23 @@ test("authored whitespace stays exact in native copied JSON and export input", a
     .getByRole("textbox", { name: "label", exact: true })
     .first()
     .fill(authoredGain);
-  await page.evaluate(() => navigator.clipboard.writeText(""));
+  await page.evaluate(() => {
+    return navigator.clipboard.writeText("");
+  });
   await dialog
     .getByRole("button", { name: "Copy configured JSON", exact: true })
     .click();
   await expect
-    .poll(() => page.evaluate(() => navigator.clipboard.readText()))
+    .poll(() => {
+      return page.evaluate(() => {
+        return navigator.clipboard.readText();
+      });
+    })
     .toContain('"preset": "tradeoff-pivot"');
   const copied = JSON.parse(
-    await page.evaluate(() => navigator.clipboard.readText()),
+    await page.evaluate(() => {
+      return navigator.clipboard.readText();
+    }),
   );
   expect(copied.input.approach).toBe(authoredApproach);
   expect(copied.input.priorityStatement).toBe(authoredPriority);
@@ -92,7 +102,9 @@ test("authored whitespace stays exact in native copied JSON and export input", a
     .getByRole("button", { name: "Download MP4", exact: true })
     .click();
   await expect
-    .poll(() => exportPayload)
+    .poll(() => {
+      return exportPayload;
+    })
     .toEqual({
       id: "stock-tradeoff-pivot",
       options: {
@@ -131,19 +143,29 @@ test("native pasted CR and CRLF use LF in copied JSON", async ({
     name: "approach",
     exact: true,
   });
-  await page.evaluate(() => navigator.clipboard.writeText("A\rB\r\nC\nD\tE"));
+  await page.evaluate(() => {
+    return navigator.clipboard.writeText("A\rB\r\nC\nD\tE");
+  });
   await approach.fill("");
   await approach.press("ControlOrMeta+V");
   await expect(approach).toHaveValue("A\nB\nC\nD\tE");
-  await page.evaluate(() => navigator.clipboard.writeText(""));
+  await page.evaluate(() => {
+    return navigator.clipboard.writeText("");
+  });
   await dialog
     .getByRole("button", { name: "Copy configured JSON", exact: true })
     .click();
   await expect
-    .poll(() => page.evaluate(() => navigator.clipboard.readText()))
+    .poll(() => {
+      return page.evaluate(() => {
+        return navigator.clipboard.readText();
+      });
+    })
     .toContain('"preset": "tradeoff-pivot"');
   const copied = JSON.parse(
-    await page.evaluate(() => navigator.clipboard.readText()),
+    await page.evaluate(() => {
+      return navigator.clipboard.readText();
+    }),
   );
   expect(copied.input.approach).toBe("A\nB\nC\nD\tE");
 });
@@ -180,15 +202,15 @@ test("edited branches keep preview, JSON and download content identical", async 
     reducedMotion: "reduce",
   });
   await page.goto("/motion.html");
-  contentTransportUrl = await page.evaluate(() =>
-    URL.createObjectURL(
+  contentTransportUrl = await page.evaluate(() => {
+    return URL.createObjectURL(
       new Blob(["intercepted transport"], { type: "video/mp4" }),
-    ),
-  );
+    );
+  });
   expect(
-    await page.evaluate(
-      () => matchMedia("(prefers-reduced-motion: reduce)").matches,
-    ),
+    await page.evaluate(() => {
+      return matchMedia("(prefers-reduced-motion: reduce)").matches;
+    }),
   ).toBe(true);
   await expect(
     page.getByRole("button", {
@@ -307,9 +329,9 @@ test("edited branches keep preview, JSON and download content identical", async 
       name: "Copy configured JSON",
     })
     .click();
-  const copied = await page.evaluate(() =>
-    JSON.parse(String(Reflect.get(window, "copiedMotionJson"))),
-  );
+  const copied = await page.evaluate(() => {
+    return JSON.parse(String(Reflect.get(window, "copiedMotionJson")));
+  });
   expect(stockRequestSchema.parse(copied)).toEqual(copied);
   expect(copied.input.branches).toHaveLength(2);
   expect(copied.input.branches[0].condition).toBe("Needs review");
@@ -328,8 +350,14 @@ test("edited branches keep preview, JSON and download content identical", async 
   expect(await fs.readFile(downloadedFile!, "utf8")).toBe(
     "intercepted transport",
   );
-  await page.evaluate((url) => URL.revokeObjectURL(url), contentTransportUrl);
-  await expect.poll(() => downloadPayload).toBeTruthy();
+  await page.evaluate((url) => {
+    return URL.revokeObjectURL(url);
+  }, contentTransportUrl);
+  await expect
+    .poll(() => {
+      return downloadPayload;
+    })
+    .toBeTruthy();
   expect(downloadPayload).toEqual({
     id: "stock-decision-fork",
     options: {

@@ -10,12 +10,11 @@ type Props = { input: Input; frame: number };
  * The conservation equation and unique-person count are separate quantities.
  */
 export function SessionTotals({ input, frame }: Readonly<Props>): ReactNode {
-  const counts = ["administered", "remaining", "discarded"].map(
-    (outcome) =>
-      input.units.filter(
-        propEq<{ outcome: unknown }, "outcome", unknown>("outcome", outcome),
-      ).length,
-  );
+  const counts = ["administered", "remaining", "discarded"].map((outcome) => {
+    return input.units.filter(
+      propEq<{ outcome: unknown }, "outcome", unknown>("outcome", outcome),
+    ).length;
+  });
   return (
     <g opacity={ramp(frame, 112, 12)}>
       {input.showEquation ? (

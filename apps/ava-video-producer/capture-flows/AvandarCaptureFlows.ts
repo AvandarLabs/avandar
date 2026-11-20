@@ -143,17 +143,21 @@ async function _showBarChart(page: Page): Promise<void> {
 
 async function _explorer(ctx: FlowContext): Promise<void> {
   const { page, step, checkpoint } = ctx;
-  const dataset = await step("explorer-select-source", () =>
-    _openExplorer(ctx),
-  );
+  const dataset = await step("explorer-select-source", () => {
+    return _openExplorer(ctx);
+  });
   await checkpoint("explorer-records");
-  await step("explorer-filter-eastbank", () => _filterEastbank(page));
+  await step("explorer-filter-eastbank", () => {
+    return _filterEastbank(page);
+  });
   await checkpoint("explorer-filtered");
-  await step("explorer-aggregate-districts", () =>
-    _aggregateDistricts(page, dataset.id),
-  );
+  await step("explorer-aggregate-districts", () => {
+    return _aggregateDistricts(page, dataset.id);
+  });
   await checkpoint("explorer-query");
-  await step("explorer-bar-chart", () => _showBarChart(page));
+  await step("explorer-bar-chart", () => {
+    return _showBarChart(page);
+  });
   ctx.state.explorerUrl = page.url();
   await checkpoint("explorer-chart");
 }
@@ -163,9 +167,9 @@ async function _explorer(ctx: FlowContext): Promise<void> {
  * field.
  */
 async function _waitForDashboardForm(page: Page): Promise<void> {
-  const response = await page.waitForResponse((dashboardResponse) =>
-    isRestListResponse(dashboardResponse, "dashboards"),
-  );
+  const response = await page.waitForResponse((dashboardResponse) => {
+    return isRestListResponse(dashboardResponse, "dashboards");
+  });
   const rows = await response.json();
   if (!Array.isArray(rows)) {
     throw new Error("Dashboard list did not return a collection.");
@@ -218,7 +222,9 @@ async function _dashboards(ctx: FlowContext): Promise<void> {
     await _explorer(ctx);
   }
   const name = `Video - Harborfield response overview - ${runLabel}`;
-  await step("dashboard-save-view", () => _saveViewToDashboard(page, name));
+  await step("dashboard-save-view", () => {
+    return _saveViewToDashboard(page, name);
+  });
   await step("dashboard-open-editor", async () => {
     await _navigate(page, {
       linkName: "Dashboards",
@@ -251,9 +257,14 @@ const PRODUCT_FLOWS: Readonly<
   import: _importFlow,
   explorer: _explorer,
   dashboards: _dashboards,
-  cases: async (ctx) =>
-    (await import("./casesMap/runCasesFlow/runCasesFlow")).runCasesFlow(ctx),
-  map: async (ctx) => (await import("./casesMap/runMapFlow")).runMapFlow(ctx),
+  cases: async (ctx) => {
+    return (await import("./casesMap/runCasesFlow/runCasesFlow")).runCasesFlow(
+      ctx,
+    );
+  },
+  map: async (ctx) => {
+    return (await import("./casesMap/runMapFlow")).runMapFlow(ctx);
+  },
 };
 
 /**

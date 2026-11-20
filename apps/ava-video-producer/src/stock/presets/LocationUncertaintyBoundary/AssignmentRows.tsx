@@ -17,16 +17,18 @@ export function AssignmentRows({
 }: Readonly<Props>): ReactNode {
   return (
     <g>
-      {assignments.map((location, index) => (
-        <AssignmentRow
-          key={location.id}
-          location={location}
-          index={index}
-          frame={frame}
-          accent={accent}
-          isFocused={location.id === focusedLocationId}
-        />
-      ))}
+      {assignments.map((location, index) => {
+        return (
+          <AssignmentRow
+            key={location.id}
+            location={location}
+            index={index}
+            frame={frame}
+            accent={accent}
+            isFocused={location.id === focusedLocationId}
+          />
+        );
+      })}
     </g>
   );
 }

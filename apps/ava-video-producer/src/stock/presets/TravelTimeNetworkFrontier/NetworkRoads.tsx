@@ -16,17 +16,19 @@ export function NetworkRoads({
   const time = input.budgetMinutes * ramp(frame, 46, 64, EASE.inOut);
   return (
     <g>
-      {input.roads.map((road, index) => (
-        <g key={road.id} opacity={ramp(frame, 13 + index * 2, 18)}>
-          <FrontierRoad
-            road={road}
-            first={nodes.find(propEq("id", road.fromId))!}
-            second={nodes.find(propEq("id", road.toId))!}
-            time={time}
-            accent={accent}
-          />
-        </g>
-      ))}
+      {input.roads.map((road, index) => {
+        return (
+          <g key={road.id} opacity={ramp(frame, 13 + index * 2, 18)}>
+            <FrontierRoad
+              road={road}
+              first={nodes.find(propEq("id", road.fromId))!}
+              second={nodes.find(propEq("id", road.toId))!}
+              time={time}
+              accent={accent}
+            />
+          </g>
+        );
+      })}
     </g>
   );
 }

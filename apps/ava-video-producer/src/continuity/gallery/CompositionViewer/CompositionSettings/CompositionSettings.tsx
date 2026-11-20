@@ -1,9 +1,9 @@
-import { useMemo, type RefObject } from "react";
+import { useMemo, type ReactNode, type RefObject } from "react";
 import {
   AtlasPanelTabs,
   type AtlasPanelTab,
 } from "../../../../gallery/AtlasLayout/AtlasPanelTabs/AtlasPanelTabs";
-import { useGalleryVideoTheme } from "../../../../gallery/GalleryVideoTheme/GalleryVideoTheme";
+import { useGalleryVideoTheme } from "../../../../gallery/GalleryVideoTheme/useGalleryVideoTheme";
 import { VideoThemePanel } from "../../../../gallery/VideoThemePanel/VideoThemePanel";
 import {
   createExportThemeFromDraft,
@@ -24,35 +24,34 @@ type Props = Readonly<{
   onTabChange: (tab: AtlasPanelTab) => void;
 }>;
 
-/** The draft's theme for one composition: what its player shows and what its export sends. */
+/**
+ * The draft's theme for one composition: what its player shows and what its
+ * export sends.
+ */
 function useCompositionDraftTheme(
   selected: ContinuityCatalogEntry,
   player: RefObject<HTMLIFrameElement | null>,
 ) {
   const { library, themeId, validDraft, hasIssues } = useGalleryVideoTheme();
   const isScene = isSceneEntry(selected);
-  const snapshot = useMemo(
-    () =>
-      isScene
-        ? undefined
-        : createSnapshotFromDraft({
-            library,
-            themeId,
-            draft: validDraft,
-            itemId: selected.id,
-          }),
-    [isScene, library, themeId, validDraft, selected.id],
-  );
-  const exportTheme = useMemo(
-    () =>
-      createExportThemeFromDraft({
-        library,
-        themeId,
-        draft: validDraft,
-        itemId: selected.id,
-      }),
-    [library, themeId, validDraft, selected.id],
-  );
+  const snapshot = useMemo(() => {
+    return isScene
+      ? undefined
+      : createSnapshotFromDraft({
+          library,
+          themeId,
+          draft: validDraft,
+          itemId: selected.id,
+        });
+  }, [isScene, library, themeId, validDraft, selected.id]);
+  const exportTheme = useMemo(() => {
+    return createExportThemeFromDraft({
+      library,
+      themeId,
+      draft: validDraft,
+      itemId: selected.id,
+    });
+  }, [library, themeId, validDraft, selected.id]);
   const theme = useCompositionTheme({
     id: selected.id,
     player,
@@ -63,7 +62,10 @@ function useCompositionDraftTheme(
   return { isScene, exportTheme, theme };
 }
 
-/** The settings column: appearance and downloads, plus the design tokens for the composition. */
+/**
+ * The settings column: appearance and downloads, plus the design tokens for the
+ * composition.
+ */
 export function CompositionSettings({
   selected,
   captions,
@@ -71,7 +73,7 @@ export function CompositionSettings({
   appearance,
   tab,
   onTabChange,
-}: Props) {
+}: Props): ReactNode {
   const { isScene, exportTheme, theme } = useCompositionDraftTheme(
     selected,
     player,

@@ -2,14 +2,32 @@ import { assertFinite, assertFrame } from "./geometry";
 import { fitTextLines } from "./textLayout";
 import type { CaptionCue } from "../scenes.types";
 
-/** One geometry calculation controls both the caption box and its reserved band. */
+/** A caption's fitted lines, box metrics and the band it reserves. */
+type CaptionGeometry = {
+  fontSize: number;
+  lines: string[];
+  maxWidth: number;
+  paddingX: number;
+  paddingY: number;
+  borderWidth: number;
+  lineHeight: number;
+  bottom: number;
+  boxHeight: number;
+  clearance: number;
+  requiredBand: number;
+};
+
+/**
+ * One geometry calculation controls both the caption box and its reserved
+ * band.
+ */
 export function captionGeometry(
   text: string,
   width: number,
   height: number,
   fontSize = 38,
   bottom = 48,
-) {
+): CaptionGeometry {
   assertFinite(width, "caption width");
   assertFinite(height, "caption height");
   assertFinite(bottom, "caption bottom");
@@ -50,7 +68,10 @@ export function captionGeometry(
   };
 }
 
-/** Reserve the tallest cue for the entire film so scenes never resize between cues. */
+/**
+ * Reserve the tallest cue for the entire film so scenes never resize between
+ * cues.
+ */
 export function captionBand(
   cues: ReadonlyArray<Pick<CaptionCue, "text">>,
   width: number,
@@ -59,7 +80,9 @@ export function captionBand(
   if (!cues.length) return 0;
   return Math.max(
     160,
-    ...cues.map((cue) => captionGeometry(cue.text, width, height).requiredBand),
+    ...cues.map((cue) => {
+      return captionGeometry(cue.text, width, height).requiredBand;
+    }),
   );
 }
 
@@ -68,9 +91,12 @@ export function safePublicPath(src: string): string {
   if (
     !src ||
     src.startsWith("/") ||
-    // oxlint-disable-next-line no-control-regex -- intentional: rejecting control characters in a media URL
+    // intentional: rejecting control characters in a media URL
+    // oxlint-disable-next-line no-control-regex
     /[\\:%?#\u0000-\u001f]/.test(src) ||
-    src.split("/").some((part) => !part || part === "." || part === "..")
+    src.split("/").some((part) => {
+      return !part || part === "." || part === "..";
+    })
   ) {
     throw new Error(
       "Media src must be a public-relative file path without traversal, URLs, queries, or fragments",
@@ -98,5 +124,7 @@ export function activeCaption(
   frame: number,
   cues: CaptionCue[],
 ): CaptionCue | undefined {
-  return cues.find((cue) => frame >= cue.startFrame && frame < cue.endFrame);
+  return cues.find((cue) => {
+    return frame >= cue.startFrame && frame < cue.endFrame;
+  });
 }

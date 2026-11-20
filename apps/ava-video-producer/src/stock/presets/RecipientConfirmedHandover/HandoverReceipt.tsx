@@ -35,15 +35,17 @@ export function HandoverReceipt({
         normalizeWhitespace
         breakLongWords
       />
-      {input.contents.map((content, index) => (
-        <HandoverReceiptRow
-          key={content.id}
-          input={input}
-          frame={frame}
-          accent={accent}
-          index={index}
-        />
-      ))}
+      {input.contents.map((content, index) => {
+        return (
+          <HandoverReceiptRow
+            key={content.id}
+            input={input}
+            frame={frame}
+            accent={accent}
+            index={index}
+          />
+        );
+      })}
       <HandoverAcknowledgement input={input} frame={frame} accent={accent} />
     </g>
   );

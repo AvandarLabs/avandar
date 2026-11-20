@@ -27,7 +27,10 @@ export type Props = Readonly<{
   onSave: (id: StockPresetId) => void;
   onCopy: (text: string, label: string) => void;
   notice: string;
-  /** The theme's resolved accent and ground, quoted in briefs and configured JSON. */
+  /**
+   * The theme's resolved accent and ground, quoted in briefs and configured
+   * JSON.
+   */
   accent: string;
   background: string;
 }>;
@@ -44,12 +47,17 @@ function usePlayingUnlessReducedMotion(initialPlaying: boolean) {
       }
     };
     preference.addEventListener("change", pauseForPreference);
-    return () => preference.removeEventListener("change", pauseForPreference);
+    return () => {
+      return preference.removeEventListener("change", pauseForPreference);
+    };
   }, []);
   return [playing, setPlaying] as const;
 }
 
-/** Remounts for each motion to isolate playback, pending exports, and the editor's scope. */
+/**
+ * Remounts for each motion to isolate playback, pending exports, and the
+ * editor's scope.
+ */
 export function PreviewDialogContent({
   initialPlaying,
   ...detailsProps

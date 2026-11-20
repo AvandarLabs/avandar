@@ -15,19 +15,25 @@ import { writeJson } from "./writeJson";
 import type { Storyboard } from "../../src/storyboard/schema/schema";
 import type { Options } from "./video.types";
 
-/** Import supplied SRT timing with exact text matching; this performs no ASR. */
+/**
+ * Import supplied SRT timing with exact text matching; this performs no ASR.
+ */
 export async function alignRecording(
   plan: Storyboard,
   options: Options,
   workspace: string,
-) {
+): Promise<string> {
   const recording = await safeInputFile(options.audio!, AUDIO_EXTENSIONS);
   const srtFile = await safeInputFile(options.srt!, [".srt"]);
   const digest = await getSha256FromFile(recording);
   const src = `audio/${plan.id}/recorded-${digest}${path.extname(recording).toLowerCase()}`;
   const derived = applySrt(plan, await fs.readFile(srtFile, "utf8"), src);
   const info = await probe(recording);
-  if (!info.streams.some((stream) => stream.codec_type === "audio"))
+  if (
+    !info.streams.some((stream) => {
+      return stream.codec_type === "audio";
+    })
+  )
     throw new Error("Provided recording has no audio stream");
   const directory = await freshStage(plan, "aligned", workspace);
   const assetDirectory = await ensureDirectory(

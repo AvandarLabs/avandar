@@ -35,9 +35,9 @@ function _assertFixtureSeeks<Input extends object>({
   fixtures.forEach(({ input }) => {
     assert.deepEqual(inputSchema.parse(input), input);
     const frames = [0, 36, 72, 108, 150, 179];
-    const samples = frames.map((frame) =>
-      render({ frame: frame, input: input }),
-    );
+    const samples = frames.map((frame) => {
+      return render({ frame: frame, input: input });
+    });
     textFrames.forEach((frame) => {
       const markup = render({ frame: frame, input: input });
       const texts =
@@ -46,18 +46,16 @@ function _assertFixtureSeeks<Input extends object>({
           value: input,
           excludedFields: excludedTextFields,
         });
-      texts.forEach((text) =>
-        assert.ok(markup.includes(`aria-label="${text}"`), text),
+      texts.forEach((text) => {
+        return assert.ok(markup.includes(`aria-label="${text}"`), text);
+      });
+    });
+    [...frames].reverse().forEach((frame) => {
+      return assert.equal(
+        render({ frame: frame, input: input }),
+        samples[frames.indexOf(frame)],
       );
     });
-    [...frames]
-      .reverse()
-      .forEach((frame) =>
-        assert.equal(
-          render({ frame: frame, input: input }),
-          samples[frames.indexOf(frame)],
-        ),
-      );
   });
 }
 
@@ -71,9 +69,9 @@ function _assertContract<Input extends object>({
     contract.controls.map(prop("path")),
     Object.keys(defaultInput),
   );
-  contract.bindingExamples.forEach(({ input }) =>
-    assert.deepEqual(inputSchema.parse(input), input),
-  );
+  contract.bindingExamples.forEach(({ input }) => {
+    return assert.deepEqual(inputSchema.parse(input), input);
+  });
   assert.deepEqual(contract.defaultInput, defaultInput);
   const serialized = JSON.stringify(contract.metadata);
   assert.doesNotMatch(
@@ -91,7 +89,9 @@ function _assertTextStress<Input extends object>({
   textFrames = [150],
 }: Readonly<PresetAssertions<Input>>): void {
   [
-    ...Array.from({ length: 24 }, (_, index) => `packing-${index + 1}`),
+    ...Array.from({ length: 24 }, (_, index) => {
+      return `packing-${index + 1}`;
+    }),
     "prefix",
     "whitespace",
     "graphemes",
@@ -111,9 +111,9 @@ function _assertTextStress<Input extends object>({
           value: input,
           excludedFields: excludedTextFields,
         });
-      texts.forEach((text) =>
-        assert.ok(markup.includes(`aria-label="${text}"`), text),
-      );
+      texts.forEach((text) => {
+        return assert.ok(markup.includes(`aria-label="${text}"`), text);
+      });
       assert.doesNotMatch(markup, />[\u0300-\u036f\u200d]/u);
     });
   });
@@ -127,13 +127,13 @@ export function registerStockPresetAssertions<Input extends object>(
     _assertFixtureSeeks(options);
   });
   test("strict schemas reject incomplete, extra, out-of-bound and invalid collection inputs", () => {
-    options.invalidInputs.forEach((input) =>
-      assert.equal(
+    options.invalidInputs.forEach((input) => {
+      return assert.equal(
         options.inputSchema.safeParse(input).success,
         false,
         JSON.stringify(input),
-      ),
-    );
+      );
+    });
   });
   test("complete contracts expose recursive editable inputs and valid bindings", () => {
     _assertContract(options);
@@ -154,16 +154,18 @@ function _getTextsFromInput({
     return [value];
   }
   if (Array.isArray(value)) {
-    return value.flatMap((item) =>
-      _getTextsFromInput({ value: item, excludedFields }),
-    );
+    return value.flatMap((item) => {
+      return _getTextsFromInput({ value: item, excludedFields });
+    });
   }
   if (value && typeof value === "object") {
     return Object.entries(value)
-      .filter(([key]) => !excludedFields.includes(key))
-      .flatMap(([, item]) =>
-        _getTextsFromInput({ value: item, excludedFields }),
-      );
+      .filter(([key]) => {
+        return !excludedFields.includes(key);
+      })
+      .flatMap(([, item]) => {
+        return _getTextsFromInput({ value: item, excludedFields });
+      });
   }
   return [];
 }
@@ -188,16 +190,23 @@ function _createStressedInput({
       : _buildStressedText({ value, mode });
   }
   if (Array.isArray(value)) {
-    return value.map((item) =>
-      _createStressedInput({ value: item, mode, excludedFields, key }),
-    );
+    return value.map((item) => {
+      return _createStressedInput({ value: item, mode, excludedFields, key });
+    });
   }
   if (value && typeof value === "object") {
     return Object.fromEntries(
-      Object.entries(value).map(([field, item]) => [
-        field,
-        _createStressedInput({ value: item, mode, excludedFields, key: field }),
-      ]),
+      Object.entries(value).map(([field, item]) => {
+        return [
+          field,
+          _createStressedInput({
+            value: item,
+            mode,
+            excludedFields,
+            key: field,
+          }),
+        ];
+      }),
     );
   }
   return value;
@@ -218,10 +227,14 @@ function _buildStressedText({
   }
   const packingWidth = Number(mode.split("-")[1]) || 8;
   const lengths = mode.startsWith("packing")
-    ? Array.from({ length: 70 }, () => packingWidth)
+    ? Array.from({ length: 70 }, () => {
+        return packingWidth;
+      })
     : [1, 15, 15, 15, 15];
   return lengths
-    .map((length) => "界".repeat(length))
+    .map((length) => {
+      return "界".repeat(length);
+    })
     .join(" ")
     .slice(0, value.length);
 }

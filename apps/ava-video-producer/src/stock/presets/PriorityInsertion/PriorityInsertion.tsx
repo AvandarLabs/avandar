@@ -38,34 +38,36 @@ export function PriorityInsertion({
           stroke={accent}
           fill="none"
         />
-        {Array.from({ length: input.queue.length + 1 }, (_, index) => (
-          <g key={index}>
-            <FitText
-              text={String(index + 1)}
-              x={65}
-              y={218 + 58 * index}
-              width={30}
-              fontSize={14}
-              maxLines={1}
-              normalizeWhitespace
-              anchor="end"
-              color={STOCK.muted}
-            />
-            {input.showOriginalPositions && index < input.queue.length ? (
-              <rect
-                data-original-slot={index}
-                x={96}
-                y={186 + 58 * index}
-                width={368}
-                height={56}
-                rx={8}
-                fill="none"
-                stroke={STOCK.line}
-                strokeDasharray="3 6"
+        {Array.from({ length: input.queue.length + 1 }, (_, index) => {
+          return (
+            <g key={index}>
+              <FitText
+                text={String(index + 1)}
+                x={65}
+                y={218 + 58 * index}
+                width={30}
+                fontSize={14}
+                maxLines={1}
+                normalizeWhitespace
+                anchor="end"
+                color={STOCK.muted}
               />
-            ) : undefined}
-          </g>
-        ))}
+              {input.showOriginalPositions && index < input.queue.length ? (
+                <rect
+                  data-original-slot={index}
+                  x={96}
+                  y={186 + 58 * index}
+                  width={368}
+                  height={56}
+                  rx={8}
+                  fill="none"
+                  stroke={STOCK.line}
+                  strokeDasharray="3 6"
+                />
+              ) : undefined}
+            </g>
+          );
+        })}
       </g>
       <g opacity={ramp(frame, 38, 26)}>
         <path
@@ -86,16 +88,18 @@ export function PriorityInsertion({
           color={STOCK.orange}
         />
       </g>
-      {input.queue.map((item, index) => (
-        <PriorityQueueItem
-          key={item.id}
-          item={item}
-          x={100}
-          y={190 + 58 * (index + (index >= insertion ? shift : 0))}
-          accent={accent}
-          opacity={ramp(frame, 12 + index * 2, 18)}
-        />
-      ))}
+      {input.queue.map((item, index) => {
+        return (
+          <PriorityQueueItem
+            key={item.id}
+            item={item}
+            x={100}
+            y={190 + 58 * (index + (index >= insertion ? shift : 0))}
+            accent={accent}
+            opacity={ramp(frame, 12 + index * 2, 18)}
+          />
+        );
+      })}
       <PriorityQueueItem
         item={input.incomingItem}
         x={mix(incoming, 580, 100)}

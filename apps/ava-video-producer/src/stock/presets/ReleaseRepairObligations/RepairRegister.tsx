@@ -16,7 +16,9 @@ export function RepairRegister({
   artifactX,
 }: Readonly<Props>): ReactNode {
   const followUps = getVisibleReleaseIssueRowsFromInput(input).filter(
-    ({ issue }) => issue.state === "open" && issue.releaseRole === "follow-up",
+    ({ issue }) => {
+      return issue.state === "open" && issue.releaseRole === "follow-up";
+    },
   );
   return (
     <g>

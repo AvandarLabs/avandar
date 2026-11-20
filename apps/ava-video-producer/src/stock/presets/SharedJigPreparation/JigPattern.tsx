@@ -22,10 +22,9 @@ export function JigPattern({
   const radius = 7 * progress;
   const body = `M${x} ${y} h100 v64 h-100 Z`;
   const holes = [30, 70]
-    .map(
-      (offset) =>
-        `M${x + offset - radius} ${y + 32} a${radius} ${radius} 0 1 0 ${radius * 2} 0 a${radius} ${radius} 0 1 0 ${-radius * 2} 0`,
-    )
+    .map((offset) => {
+      return `M${x + offset - radius} ${y + 32} a${radius} ${radius} 0 1 0 ${radius * 2} 0 a${radius} ${radius} 0 1 0 ${-radius * 2} 0`;
+    })
     .join(" ");
   const notch = `M${x} ${y} h${22 * progress} v${22 * progress} h${-22 * progress} Z`;
   return (
@@ -41,17 +40,19 @@ export function JigPattern({
         />
       ) : undefined}
       {pattern === "two-holes" ? (
-        [30, 70].map((offset) => (
-          <circle
-            key={offset}
-            data-hole-mark="true"
-            cx={x + offset}
-            cy={y + 32}
-            r={radius}
-            fill={isGuide ? "none" : color}
-            stroke={color}
-          />
-        ))
+        [30, 70].map((offset) => {
+          return (
+            <circle
+              key={offset}
+              data-hole-mark="true"
+              cx={x + offset}
+              cy={y + 32}
+              r={radius}
+              fill={isGuide ? "none" : color}
+              stroke={color}
+            />
+          );
+        })
       ) : (
         <path
           data-corner-mark="true"

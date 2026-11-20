@@ -6,18 +6,19 @@ type Props = { input: Input; frame: number; index: number };
 function _getUse({ input, frame, index }: Readonly<Props>) {
   const bookings = input.requests
     .filter(propNotEq("agreedSlotId", null))
-    .sort(
-      (first, second) =>
+    .sort((first, second) => {
+      return (
         input.timeSlots.findIndex(
           propEq<{ id: unknown }, "id", unknown>("id", first.agreedSlotId),
         ) -
         input.timeSlots.findIndex(
           propEq<{ id: unknown }, "id", unknown>("id", second.agreedSlotId),
-        ),
-    );
-  const order = bookings.findIndex(
-    (item) => item.id === input.requests[index].id,
-  );
+        )
+      );
+    });
+  const order = bookings.findIndex((item) => {
+    return item.id === input.requests[index].id;
+  });
   const duration = 44 / Math.max(bookings.length, 1);
   const turnAt = 108 + order * duration;
   const use =

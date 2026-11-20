@@ -64,19 +64,15 @@ export async function finalizeCapture(run: CaptureRun): Promise<void> {
   const { manifest } = run.context;
   const { loginContext, browser, ownsBrowser } = run.session;
   if (loginContext) {
-    await loginContext
-      .close()
-      .catch((error) =>
-        _recordTeardownError({ run, stage: "login-context-close", error }),
-      );
+    await loginContext.close().catch((error) => {
+      return _recordTeardownError({ run, stage: "login-context-close", error });
+    });
   }
   await _saveVideo(run);
   if (ownsBrowser && browser) {
-    await browser
-      .close()
-      .catch((error) =>
-        _recordTeardownError({ run, stage: "browser-close", error }),
-      );
+    await browser.close().catch((error) => {
+      return _recordTeardownError({ run, stage: "browser-close", error });
+    });
   }
   // A guard rejection arriving during teardown must still invalidate the run.
   if (manifest.networkPolicy.blockedRequests.length) {

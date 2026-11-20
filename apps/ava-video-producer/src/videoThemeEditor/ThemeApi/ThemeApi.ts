@@ -13,7 +13,9 @@ export type ThemeSummary = Readonly<{
   extends?: string;
 }>;
 
-/** A theme file and the hash of its bytes, sent back as `If-Match` when saving. */
+/**
+ * A theme file and the hash of its bytes, sent back as `If-Match` when saving.
+ */
 export type StoredTheme = Readonly<{
   document: VideoThemeDocument;
   hash: string;
@@ -45,11 +47,15 @@ async function _request<Body>(
     headers: { "Content-Type": "application/json", ...init.headers },
   });
   if (!response.ok) {
-    const errorBody: unknown = await response.json().catch(() => ({}));
+    const errorBody: unknown = await response.json().catch(() => {
+      return {};
+    });
     const { message, issues } = _errorBody(errorBody);
     throw new ThemeApiError(response.status, message, issues);
   }
-  return (await response.json().catch(() => ({}))) as Body;
+  return (await response.json().catch(() => {
+    return {};
+  })) as Body;
 }
 
 async function _read(id: string): Promise<StoredTheme> {
@@ -68,7 +74,9 @@ async function _loadAll(): Promise<{
 }> {
   const themes = await _request<ThemeSummary[]>("/api/themes");
   const stored = await Promise.all(
-    themes.map(async (theme) => [theme.id, await _read(theme.id)] as const),
+    themes.map(async (theme) => {
+      return [theme.id, await _read(theme.id)] as const;
+    }),
   );
   return { themes, stored: new Map(stored) };
 }
@@ -81,18 +89,24 @@ async function _loadAll(): Promise<{
 export const ThemeApi = {
   loadAll: _loadAll,
   read: _read,
-  create: (document: VideoThemeDocument) =>
-    _request<{ id: string; hash: string }>("/api/themes", {
+  create: (
+    document: VideoThemeDocument,
+  ): Promise<{ id: string; hash: string }> => {
+    return _request<{ id: string; hash: string }>("/api/themes", {
       method: "POST",
       body: JSON.stringify(document),
-    }),
-  save: (options: Readonly<{ document: VideoThemeDocument; hash: string }>) =>
-    _request<{ hash: string }>(
+    });
+  },
+  save: (
+    options: Readonly<{ document: VideoThemeDocument; hash: string }>,
+  ): Promise<{ hash: string }> => {
+    return _request<{ hash: string }>(
       `/api/themes/${encodeURIComponent(options.document.id)}`,
       {
         method: "PUT",
         headers: { "If-Match": options.hash },
         body: JSON.stringify(options.document),
       },
-    ),
+    );
+  },
 };

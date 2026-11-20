@@ -25,9 +25,9 @@ export function validateGraph({
     if (
       node >= input.nodes.length ||
       (index > 0 &&
-        !input.edges.some(
-          ([from, to]) => from === route[index - 1] && to === node,
-        ))
+        !input.edges.some(([from, to]) => {
+          return from === route[index - 1] && to === node;
+        }))
     ) {
       context.addIssue({
         code: "custom",

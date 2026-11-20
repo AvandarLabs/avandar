@@ -20,7 +20,9 @@ function _readFlowIds(flowIds: unknown): string[] {
   ) {
     throw new Error("flowIds must be a nonempty unique list");
   }
-  return flowIds.map((id) => validateId(id, "flow id"));
+  return flowIds.map((id) => {
+    return validateId(id, "flow id");
+  });
 }
 
 function _readViewport(viewport: Readonly<CaptureViewport>): CaptureViewport {

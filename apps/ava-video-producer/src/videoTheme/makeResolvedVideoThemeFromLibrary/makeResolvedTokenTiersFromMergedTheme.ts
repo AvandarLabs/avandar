@@ -33,7 +33,9 @@ type ResolutionContext = Readonly<{
   components: unknown;
   mantine: MantineTheme;
   isDarkGround: boolean;
-  /** True while resolving the ground itself, which cannot depend on the ground. */
+  /**
+   * True while resolving the ground itself, which cannot depend on the ground.
+   */
   forbidColorPairs: boolean;
   issues: VideoThemeIssue[];
 }>;
@@ -251,36 +253,42 @@ function _buildNodeFromCatalog(
   if (isTokenScale(node)) {
     const entries = _isRecord(raw) ? Object.entries(raw) : [];
     return Object.fromEntries(
-      entries.map(([key, value]) => [
-        key,
-        _buildValueFromRaw(context, value, node.scale, `${path}.${key}`, []),
-      ]),
+      entries.map(([key, value]) => {
+        return [
+          key,
+          _buildValueFromRaw(context, value, node.scale, `${path}.${key}`, []),
+        ];
+      }),
     );
   }
   return Object.fromEntries(
-    Object.entries(node).map(([key, child]) => [
-      key,
-      _buildNodeFromCatalog(
-        context,
-        child,
-        _isRecord(raw) ? raw[key] : undefined,
-        path ? `${path}.${key}` : key,
-      ),
-    ]),
+    Object.entries(node).map(([key, child]) => {
+      return [
+        key,
+        _buildNodeFromCatalog(
+          context,
+          child,
+          _isRecord(raw) ? raw[key] : undefined,
+          path ? `${path}.${key}` : key,
+        ),
+      ];
+    }),
   );
 }
 
 function _buildComponentsFromCatalog(context: ResolutionContext): unknown {
   return Object.fromEntries(
-    Object.entries(VIDEO_TOKEN_CATALOG.components).map(([name, group]) => [
-      name,
-      _buildNodeFromCatalog(
-        context,
-        group,
-        getValueAtPath(context.components, [name, "defaultProps"]),
-        `components.${name}`,
-      ),
-    ]),
+    Object.entries(VIDEO_TOKEN_CATALOG.components).map(([name, group]) => {
+      return [
+        name,
+        _buildNodeFromCatalog(
+          context,
+          group,
+          getValueAtPath(context.components, [name, "defaultProps"]),
+          `components.${name}`,
+        ),
+      ];
+    }),
   );
 }
 

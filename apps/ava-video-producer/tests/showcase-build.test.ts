@@ -18,22 +18,30 @@ test("the Vite production build emits every showcase page with its scripts and s
         const assets = getLocalAssetPathsFromHtml(html);
         if (page !== "compositions") {
           assert.ok(
-            assets.some((asset) => asset.endsWith(".js")),
+            assets.some((asset) => {
+              return asset.endsWith(".js");
+            }),
             `${page}.html loads no built script`,
           );
           assert.ok(
-            assets.some((asset) => asset.endsWith(".css")),
+            assets.some((asset) => {
+              return asset.endsWith(".css");
+            }),
             `${page}.html loads no built stylesheet`,
           );
         }
         await Promise.all(
-          assets.map((asset) => fs.access(path.join(site, asset))),
+          assets.map((asset) => {
+            return fs.access(path.join(site, asset));
+          }),
         );
       }),
     );
     const scripts = await fs.readdir(path.join(site, "bundles"));
     assert.ok(
-      !scripts.some((file) => /\.(?:tsx?|mjs)$/.test(file)),
+      !scripts.some((file) => {
+        return /\.(?:tsx?|mjs)$/.test(file);
+      }),
       "Source modules must not be copied into the built site",
     );
   } finally {

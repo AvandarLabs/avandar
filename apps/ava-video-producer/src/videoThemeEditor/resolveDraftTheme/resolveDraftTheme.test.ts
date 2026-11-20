@@ -55,7 +55,11 @@ test("a draft reference to a missing token reports the token path", () => {
   // a reference, such as `text.stage.sharedObject.color`.
   assert.ok(
     !result.ok &&
-      result.issues.map((issue) => issue.path).includes("color.accent"),
+      result.issues
+        .map((issue) => {
+          return issue.path;
+        })
+        .includes("color.accent"),
   );
 });
 
@@ -74,7 +78,9 @@ test("a draft value that breaks the schema reports the token path", () => {
   });
   assert.ok(
     !result.ok &&
-      result.issues.some((issue) => issue.path.startsWith("color.accent")),
+      result.issues.some((issue) => {
+        return issue.path.startsWith("color.accent");
+      }),
   );
 });
 

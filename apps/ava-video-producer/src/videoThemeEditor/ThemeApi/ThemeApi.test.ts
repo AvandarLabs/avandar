@@ -42,10 +42,13 @@ test("a refused save keeps the server's status and issues", async () => {
   });
   await assert.rejects(
     ThemeApi.save({ document: WARM, hash: "hash" }),
-    (error: unknown) =>
-      error instanceof ThemeApiError &&
-      error.status === 400 &&
-      error.issues[0]?.path === "color.accent",
+    (error: unknown) => {
+      return (
+        error instanceof ThemeApiError &&
+        error.status === 400 &&
+        error.issues[0]?.path === "color.accent"
+      );
+    },
   );
 });
 

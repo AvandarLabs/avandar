@@ -42,10 +42,12 @@ export function createProductBundlePlugin(productDirectory: string): Plugin {
  * `url()` references resolve through aliases, not plugin hooks.
  */
 export function makePublicFileAliasesFromAppRoot(appRoot: string): Alias[] {
-  return Object.entries(SHOWCASE_PUBLIC_FILES).map(([servedPath, file]) => ({
-    find: new RegExp(`^${servedPath.replaceAll(".", "\\.")}$`),
-    replacement: path.join(appRoot, "public", file),
-  }));
+  return Object.entries(SHOWCASE_PUBLIC_FILES).map(([servedPath, file]) => {
+    return {
+      find: new RegExp(`^${servedPath.replaceAll(".", "\\.")}$`),
+      replacement: path.join(appRoot, "public", file),
+    };
+  });
 }
 
 /** Avandar theme sources whose edits refresh the gallery palette. */
@@ -55,12 +57,18 @@ async function _findThemeSourceFiles(appRoot: string): Promise<string[]> {
   const entries = await readdir(themeDirectory, {
     withFileTypes: true,
     recursive: true,
-  }).catch(() => []);
+  }).catch(() => {
+    return [];
+  });
   return [
     path.join(product, "shared/config/Theme.ts"),
     ...entries
-      .filter((entry) => entry.isFile() && /\.tsx?$/.test(entry.name))
-      .map((entry) => path.join(entry.parentPath, entry.name)),
+      .filter((entry) => {
+        return entry.isFile() && /\.tsx?$/.test(entry.name);
+      })
+      .map((entry) => {
+        return path.join(entry.parentPath, entry.name);
+      }),
   ];
 }
 
@@ -88,14 +96,16 @@ export function createShowcaseThemePlugin({
         this.addWatchFile(file);
       });
     },
-    resolveId: (source) =>
-      /(?:^|\/)showcase-theme\.css$/.test(source)
+    resolveId: (source) => {
+      return /(?:^|\/)showcase-theme\.css$/.test(source)
         ? SHOWCASE_THEME_ID
-        : undefined,
-    load: async (id) =>
-      id === SHOWCASE_THEME_ID
+        : undefined;
+    },
+    load: async (id) => {
+      return id === SHOWCASE_THEME_ID
         ? readFile(path.join(themeDirectory, "showcase-theme.css"), "utf8")
-        : undefined,
+        : undefined;
+    },
   };
 }
 
@@ -118,8 +128,12 @@ export function createStaleOutputPrunePlugin(): Plugin {
       });
       await Promise.all(
         entries
-          .filter((entry) => entry.isFile())
-          .map((entry) => path.join(entry.parentPath, entry.name))
+          .filter((entry) => {
+            return entry.isFile();
+          })
+          .map((entry) => {
+            return path.join(entry.parentPath, entry.name);
+          })
           .filter((file) => {
             const fileName = path
               .relative(outputDirectory, file)
@@ -127,7 +141,9 @@ export function createStaleOutputPrunePlugin(): Plugin {
               .join("/");
             return !Object.hasOwn(bundle, fileName);
           })
-          .map((file) => rm(file, { force: true })),
+          .map((file) => {
+            return rm(file, { force: true });
+          }),
       );
     },
   };

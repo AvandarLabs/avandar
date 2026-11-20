@@ -23,9 +23,9 @@ import {
 } from "./MobileClinicRelocationTestHelpers";
 
 test("invalid authored inputs reject before rendering", () => {
-  invalidInputs.forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  );
+  invalidInputs.forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
 });
 
 test("one clinic relocates while authored slot assignments conserve finite capacity", () => {
@@ -121,13 +121,13 @@ test("the vehicle body moves with its awning folded and preserves both map conte
         value: "clinic",
       }).includes("M-42 -22 H20 L20 -22 H-42 Z"),
     );
-    [30, 150].forEach((frame) =>
-      assert.ok(
+    [30, 150].forEach((frame) => {
+      return assert.ok(
         _render({ frame: frame, input: input }).includes(
           'transform="translate(518 418) scale(',
         ),
-      ),
-    );
+      );
+    });
   });
 });
 
@@ -161,11 +161,14 @@ test("serialized contract exposes collection identity validation", () => {
     JSON.stringify(mobileClinicRelocationContract.semanticRules),
   ) as typeof mobileClinicRelocationContract.semanticRules;
   const paths = ["sites.*.id", "slots.*.id", "people.*.id"];
-  const rule = rules.find(
-    (candidate) =>
+  const rule = rules.find((candidate) => {
+    return (
       candidate.paths.length === paths.length &&
-      paths.every((path) => candidate.paths.includes(path)),
-  );
+      paths.every((path) => {
+        return candidate.paths.includes(path);
+      })
+    );
+  });
   assert.ok(rule, "Runtime-only rule retains its precise field paths.");
   assert.match(rule.description, /unique within each collection/i);
 });
@@ -175,11 +178,14 @@ test("serialized contract exposes site separation validation", () => {
     JSON.stringify(mobileClinicRelocationContract.semanticRules),
   ) as typeof mobileClinicRelocationContract.semanticRules;
   const paths = ["sites.*.x", "sites.*.y"];
-  const rule = rules.find(
-    (candidate) =>
+  const rule = rules.find((candidate) => {
+    return (
       candidate.paths.length === paths.length &&
-      paths.every((path) => candidate.paths.includes(path)),
-  );
+      paths.every((path) => {
+        return candidate.paths.includes(path);
+      })
+    );
+  });
   assert.ok(rule, "Runtime-only rule retains its precise field paths.");
   assert.match(rule.description, /Euclidean.*at least 0\.4/i);
 });
@@ -189,11 +195,14 @@ test("serialized contract exposes booking reference validation", () => {
     JSON.stringify(mobileClinicRelocationContract.semanticRules),
   ) as typeof mobileClinicRelocationContract.semanticRules;
   const paths = ["people.*.slotId", "slots.*.id"];
-  const rule = rules.find(
-    (candidate) =>
+  const rule = rules.find((candidate) => {
+    return (
       candidate.paths.length === paths.length &&
-      paths.every((path) => candidate.paths.includes(path)),
-  );
+      paths.every((path) => {
+        return candidate.paths.includes(path);
+      })
+    );
+  });
   assert.ok(rule, "Runtime-only rule retains its precise field paths.");
   assert.match(
     rule.description,
@@ -206,11 +215,14 @@ test("serialized contract exposes booking exclusivity validation", () => {
     JSON.stringify(mobileClinicRelocationContract.semanticRules),
   ) as typeof mobileClinicRelocationContract.semanticRules;
   const paths = ["people.*.slotId"];
-  const rule = rules.find(
-    (candidate) =>
+  const rule = rules.find((candidate) => {
+    return (
       candidate.paths.length === paths.length &&
-      paths.every((path) => candidate.paths.includes(path)),
-  );
+      paths.every((path) => {
+        return candidate.paths.includes(path);
+      })
+    );
+  });
   assert.ok(rule, "Runtime-only rule retains its precise field paths.");
   assert.match(rule.description, /at most one.*assigned.*slot/i);
 });
@@ -219,9 +231,9 @@ bookingLabelInputs.forEach((input, rotation) => {
   test(`occupied slot mapping ${rotation} clears complete site labels`, () => {
     assert.equal(inputSchema.safeParse(input).success, true);
     const markup = _render({ frame: 150, input: input });
-    const boxes = input.sites.flatMap(({ label }) =>
-      _getLabelLineBoxes({ markup: markup, label: label }),
-    );
+    const boxes = input.sites.flatMap(({ label }) => {
+      return _getLabelLineBoxes({ markup: markup, label: label });
+    });
     assert.equal((markup.match(/data-booking=/g) ?? []).length, 6);
     const paths = input.people.flatMap((person, index) => {
       if (person.slotId === null) {
@@ -234,7 +246,9 @@ bookingLabelInputs.forEach((input, rotation) => {
       });
       const samples = _assertBookingClearsLabels({ path, boxes });
       _assertBookingClearsLabels({ path, boxes, clearance: 3.5 });
-      const slotIndex = input.slots.findIndex(({ id }) => id === person.slotId);
+      const slotIndex = input.slots.findIndex(({ id }) => {
+        return id === person.slotId;
+      });
       assert.deepEqual(samples[0], { x: 74 + index * 114, y: 418 });
       assert.deepEqual(samples.at(-1), { x: 642, y: 160 + slotIndex * 44 });
       return [path.match(/ d="([^"]+)"/)?.[1]];

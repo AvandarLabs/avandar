@@ -18,24 +18,26 @@ export function InterpretedCaseDialogue({
     <g>
       <DialogueLegend input={input} accent={accent} />{" "}
       <DialoguePeople input={input} frame={frame} accent={accent} />
-      {input.turns.map((turn, turnIndex) => (
-        <g key={turn.id}>
-          <DialogueBubble
-            input={input}
-            frame={frame}
-            turnIndex={turnIndex}
-            interpreted={false}
-            accent={accent}
-          />
-          <DialogueBubble
-            input={input}
-            frame={frame}
-            turnIndex={turnIndex}
-            interpreted
-            accent={accent}
-          />
-        </g>
-      ))}
+      {input.turns.map((turn, turnIndex) => {
+        return (
+          <g key={turn.id}>
+            <DialogueBubble
+              input={input}
+              frame={frame}
+              turnIndex={turnIndex}
+              interpreted={false}
+              accent={accent}
+            />
+            <DialogueBubble
+              input={input}
+              frame={frame}
+              turnIndex={turnIndex}
+              interpreted
+              accent={accent}
+            />
+          </g>
+        );
+      })}
     </g>
   );
 }

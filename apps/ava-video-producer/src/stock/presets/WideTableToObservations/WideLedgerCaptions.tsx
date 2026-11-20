@@ -18,11 +18,14 @@ export function WideLedgerCaptions({
 }: Readonly<Props>): ReactNode {
   const omitted =
     input.missingPolicy === "omit-with-ledger"
-      ? input.subjects.reduce(
-          (total, subject) =>
-            total + subject.values.filter(({ value }) => value === null).length,
-          0,
-        )
+      ? input.subjects.reduce((total, subject) => {
+          return (
+            total +
+            subject.values.filter(({ value }) => {
+              return value === null;
+            }).length
+          );
+        }, 0)
       : 0;
   const resultHeading = frame < 111 ? input.copy.source : input.copy.result;
   const omissionCaption = `${ledgerMessage.message}: ${omitted}`;
@@ -36,14 +39,16 @@ export function WideLedgerCaptions({
       />
       <g opacity={ramp(frame, 111, 10)}>
         <LabelSlots
-          labels={Object.values(headingMessages).map((message, index) => [
-            message.message,
-            62 + [0, 218, 440, 650][index],
-            130,
-            [180, 200, 190, 186][index],
-            12,
-            1,
-          ])}
+          labels={Object.values(headingMessages).map((message, index) => {
+            return [
+              message.message,
+              62 + [0, 218, 440, 650][index],
+              130,
+              [180, 200, 190, 186][index],
+              12,
+              1,
+            ];
+          })}
         />
         <g data-omitted={omitted}>
           <LabelSlots labels={[[omissionCaption, 52, 570, 856, 14, 1]]} />

@@ -31,14 +31,11 @@ function _isEmphasized({
     (input.emphasis === "missed-and-returned" &&
       (state === "missed" ||
         (state === "recorded" &&
-          input.visits
-            .slice(0, visitIndex)
-            .some((visit) =>
-              participant.records.some(
-                (record) =>
-                  record.visitId === visit.id && record.state === "missed",
-              ),
-            ))))
+          input.visits.slice(0, visitIndex).some((visit) => {
+            return participant.records.some((record) => {
+              return record.visitId === visit.id && record.state === "missed";
+            });
+          }))))
   );
 }
 /** Only recorded visits have an arch for the persistent person to enter. */

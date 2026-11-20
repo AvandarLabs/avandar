@@ -17,8 +17,8 @@ import type { PresetAssertions } from "../../../../tests/helpers/registerStockPr
 const render = ({
   frame,
   input = DEFAULT_INPUT,
-}: Readonly<{ frame: number; input?: Input }>): string =>
-  renderToStaticMarkup(
+}: Readonly<{ frame: number; input?: Input }>): string => {
+  return renderToStaticMarkup(
     createElement(WideTableToObservations, {
       frame,
       input,
@@ -26,6 +26,7 @@ const render = ({
       id: "packet27",
     }),
   );
+};
 function _marker({
   markup,
   key,
@@ -35,10 +36,12 @@ function _marker({
   key: string;
   value: string;
 }): string {
-  const tags = [...markup.matchAll(/<[^>]+>/g)].map((match) => match[0]);
-  const tag = tags.find((candidateTag) =>
-    candidateTag.includes(`data-${key}="${value}"`),
-  );
+  const tags = [...markup.matchAll(/<[^>]+>/g)].map((match) => {
+    return match[0];
+  });
+  const tag = tags.find((candidateTag) => {
+    return candidateTag.includes(`data-${key}="${value}"`);
+  });
   assert.ok(tag, `${key} ${value}`);
   return tag;
 }
@@ -93,21 +96,27 @@ const EXCLUDED_TEXT_FIELDS: string[] = ["id", "measureId", "missingPolicy"];
 const getVisibleTexts = ({
   input,
   frame,
-}: Readonly<{ input: Input; frame: number }>): string[] => [
-  input.copy.context,
-  frame < 111 ? input.copy.source : input.copy.result,
-  ...input.measures.flatMap((measure) =>
-    input.subjects
-      .filter(
-        (subject) =>
-          frame < 100 ||
-          input.missingPolicy === "retain-missing-row" ||
-          subject.values.find(({ measureId }) => measureId === measure.id)!
-            .value !== null,
-      )
-      .flatMap((subject) => [subject.label, measure.label, measure.unit]),
-  ),
-];
+}: Readonly<{ input: Input; frame: number }>): string[] => {
+  return [
+    input.copy.context,
+    frame < 111 ? input.copy.source : input.copy.result,
+    ...input.measures.flatMap((measure) => {
+      return input.subjects
+        .filter((subject) => {
+          return (
+            frame < 100 ||
+            input.missingPolicy === "retain-missing-row" ||
+            subject.values.find(({ measureId }) => {
+              return measureId === measure.id;
+            })!.value !== null
+          );
+        })
+        .flatMap((subject) => {
+          return [subject.label, measure.label, measure.unit];
+        });
+    }),
+  ];
+};
 const options = {
   inputSchema,
   defaultInput: DEFAULT_INPUT,
@@ -163,13 +172,15 @@ test("reversed measurement arrays and duplicate subject labels retain zero, nega
   const input = inputSchema.parse({
     ...fixtures[1].input,
     missingPolicy: "retain-missing-row",
-    subjects: fixtures[1].input.subjects.map((subject) => ({
-      ...subject,
-      values: [
-        { measureId: "b", value: -3.25 },
-        { measureId: "", value: 0 },
-      ],
-    })),
+    subjects: fixtures[1].input.subjects.map((subject) => {
+      return {
+        ...subject,
+        values: [
+          { measureId: "b", value: -3.25 },
+          { measureId: "", value: 0 },
+        ],
+      };
+    }),
   });
   const markup = render({ frame: 150, input: input });
   assert.equal((markup.match(/data-source-value="0"/g) ?? []).length, 2);
@@ -182,20 +193,23 @@ test("measure strips occupy disjoint row envelopes before moving horizontally", 
   const markup = render({ frame: 110, input: fixtures[2].input });
   const strips = [
     ...markup.matchAll(/<rect[^>]*data-transfer-measurement=[^>]*>/g),
-  ].map((match) => match[0]);
+  ].map((match) => {
+    return match[0];
+  });
   assert.deepEqual(
-    strips.map(
-      (strip) => strip.match(/data-transfer-measurement="([^"]*)"/)![1],
-    ),
+    strips.map((strip) => {
+      return strip.match(/data-transfer-measurement="([^"]*)"/)![1];
+    }),
     ["0:0", "1:0", "0:1", "1:1"],
   );
-  const sorted = [...strips].sort(
-    (a, b) =>
+  const sorted = [...strips].sort((a, b) => {
+    return (
       SvgAttributes.getNumberFromMarkup({ attributes: a, name: "y" }) -
-      SvgAttributes.getNumberFromMarkup({ attributes: b, name: "y" }),
-  );
-  sorted.slice(1).forEach((strip, index) =>
-    assert.ok(
+      SvgAttributes.getNumberFromMarkup({ attributes: b, name: "y" })
+    );
+  });
+  sorted.slice(1).forEach((strip, index) => {
+    return assert.ok(
       SvgAttributes.getNumberFromMarkup({
         attributes: sorted[index],
         name: "y",
@@ -205,8 +219,8 @@ test("measure strips occupy disjoint row envelopes before moving horizontally", 
           name: "height",
         }) <=
         SvgAttributes.getNumberFromMarkup({ attributes: strip, name: "y" }),
-    ),
-  );
+    );
+  });
 });
 
 test("every rendered observation pair traces to exactly one authored source cell", () => {
@@ -219,24 +233,30 @@ test("every rendered observation pair traces to exactly one authored source cell
     const markup = render({ frame: 150, input: input }),
       observations = [
         ...markup.matchAll(/<rect[^>]*data-observation=[^>]*>/g),
-      ].map((match) => match[0]);
-    const pairs = observations.map((tag) =>
-      JSON.stringify([
+      ].map((match) => {
+        return match[0];
+      });
+    const pairs = observations.map((tag) => {
+      return JSON.stringify([
         tag.match(/data-subject-id="([^"]*)"/)![1],
         tag.match(/data-measure-id="([^"]*)"/)![1],
-      ]),
-    );
+      ]);
+    });
     assert.equal(new Set(pairs).size, pairs.length);
-    const expected = input.measures.flatMap((measure) =>
-      input.subjects
-        .filter(
-          (subject) =>
+    const expected = input.measures.flatMap((measure) => {
+      return input.subjects
+        .filter((subject) => {
+          return (
             input.missingPolicy === "retain-missing-row" ||
-            subject.values.find(({ measureId }) => measureId === measure.id)!
-              .value !== null,
-        )
-        .map((subject) => JSON.stringify([subject.id, measure.id])),
-    );
+            subject.values.find(({ measureId }) => {
+              return measureId === measure.id;
+            })!.value !== null
+          );
+        })
+        .map((subject) => {
+          return JSON.stringify([subject.id, measure.id]);
+        });
+    });
     assert.deepEqual(pairs, expected);
   });
 });

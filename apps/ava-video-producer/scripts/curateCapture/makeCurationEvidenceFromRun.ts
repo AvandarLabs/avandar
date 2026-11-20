@@ -101,11 +101,13 @@ function _readPassedFlows(manifest: Readonly<CaptureManifest>): Set<string> {
 }
 
 function _readFixtures(manifest: Readonly<CaptureManifest>): FixtureFile[] {
-  return _readArray(manifest.fixtures, "fixtures").map((fixture) => ({
-    path: validateRelativePath(fixture.path, "fixture metadata path"),
-    sha256: _readDigest(fixture.sha256, "fixture"),
-    bytes: fixture.bytes,
-  }));
+  return _readArray(manifest.fixtures, "fixtures").map((fixture) => {
+    return {
+      path: validateRelativePath(fixture.path, "fixture metadata path"),
+      sha256: _readDigest(fixture.sha256, "fixture"),
+      bytes: fixture.bytes,
+    };
+  });
 }
 
 function _readActions(
@@ -219,7 +221,11 @@ export async function makeCurationEvidenceFromRun({
   const actions = _readActions(manifest, flows);
   const fixtures = _readFixtures(manifest);
   const resources = _readArray(manifest.resources, "resources");
-  if (resources.some((resource) => !flows.has(resource.flowId))) {
+  if (
+    resources.some((resource) => {
+      return !flows.has(resource.flowId);
+    })
+  ) {
     throw new Error("Capture resource refers to an unknown flow");
   }
   const screenshots = await _readScreenshots({

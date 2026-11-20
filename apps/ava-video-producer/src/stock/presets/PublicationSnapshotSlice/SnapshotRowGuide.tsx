@@ -18,9 +18,9 @@ export function SnapshotRowGuide({
   const duration = 36 / input.selection.rowIds.length,
     departure =
       56 + (input.selection.rowIds.length - 1 - selectedRow) * duration;
-  const sourceRow = input.table.rows.findIndex(
-    ({ id }) => id === input.selection.rowIds[selectedRow],
-  );
+  const sourceRow = input.table.rows.findIndex(({ id }) => {
+    return id === input.selection.rowIds[selectedRow];
+  });
   const sourceY = 276 + sourceRow * 72,
     copyY = mix(
       ramp(frame, departure, duration - 1, EASE.inOut),

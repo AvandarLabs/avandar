@@ -1,13 +1,23 @@
 import { productRequirements } from "../../lib/productRequirements/productRequirements";
 import type { Storyboard } from "../../../src/storyboard/schema/schema";
 
+/** The browser and Chromium options a preview's renders share. */
+type PreviewBrowserSettings = {
+  browserOptions:
+    | { browserExecutable: string; chromeMode: "chrome-for-testing" }
+    | { chromeMode: "headless-shell"; browserExecutable?: undefined };
+  chromiumOptions: { gl?: "angle" | undefined; headless: boolean };
+};
+
 /**
  * The browser and Chromium options a preview uses to open its browser and
  * render its stills. Native MapLibre needs ANGLE on macOS Headless Shell:
  * the default SwiftShader can fail WebGL2 context creation. This does not
  * replace serial rendering.
  */
-export function getBrowserSettingsFromPlan(plan: Storyboard) {
+export function getBrowserSettingsFromPlan(
+  plan: Storyboard,
+): PreviewBrowserSettings {
   const browserOptions = process.env.CHROME_PATH
     ? {
         browserExecutable: process.env.CHROME_PATH,

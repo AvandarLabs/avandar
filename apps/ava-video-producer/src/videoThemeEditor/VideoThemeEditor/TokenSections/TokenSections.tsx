@@ -1,5 +1,5 @@
 import { Accordion } from "@mantine/core";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { getTokenDefinitionFromPath } from "../../../videoTheme/tokenCatalog/tokenCatalogHelpers";
 import { getGroupName } from "../../tokenCopy/editorCopy";
 import {
@@ -25,13 +25,14 @@ function useSectionGroups(
   rows: readonly TokenRowModel[],
   emptyGroups: readonly string[],
 ): TokenRowGroup[] {
-  return useMemo(
-    () => [
+  return useMemo(() => {
+    return [
       ...groupTokenRows(rows),
-      ...emptyGroups.map((group) => ({ group, rows: [] })),
-    ],
-    [rows, emptyGroups],
-  );
+      ...emptyGroups.map((group) => {
+        return { group, rows: [] };
+      }),
+    ];
+  }, [rows, emptyGroups]);
 }
 
 /**
@@ -48,9 +49,11 @@ export function TokenSections({
   /** Every row, for choosing a free key when a value is added. */
   allRows: readonly TokenRowModel[];
   emptyGroups: readonly string[];
-}>) {
+}>): ReactNode {
   const [openGroups, setOpenGroups] = useState<string[]>([]);
-  const openGroupSet = useMemo(() => new Set(openGroups), [openGroups]);
+  const openGroupSet = useMemo(() => {
+    return new Set(openGroups);
+  }, [openGroups]);
   const groups = useSectionGroups(rows, emptyGroups);
   if (groups.length === 0) {
     return <p className={css.tokenSectionsEmpty}>{"No settings match."}</p>;
@@ -66,19 +69,21 @@ export function TokenSections({
         panel: css.tokenSectionPanel,
       }}
     >
-      {groups.map(({ group, rows: grouped }) => (
-        <Accordion.Item key={group} value={group}>
-          <Accordion.Control>
-            {_groupToName(group)}{" "}
-            <span className={css.tokenSectionCount}>{grouped.length}</span>
-          </Accordion.Control>
-          <Accordion.Panel>
-            {openGroupSet.has(group) ? (
-              <SectionRows group={group} rows={grouped} allRows={allRows} />
-            ) : null}
-          </Accordion.Panel>
-        </Accordion.Item>
-      ))}
+      {groups.map(({ group, rows: grouped }) => {
+        return (
+          <Accordion.Item key={group} value={group}>
+            <Accordion.Control>
+              {_groupToName(group)}{" "}
+              <span className={css.tokenSectionCount}>{grouped.length}</span>
+            </Accordion.Control>
+            <Accordion.Panel>
+              {openGroupSet.has(group) ? (
+                <SectionRows group={group} rows={grouped} allRows={allRows} />
+              ) : null}
+            </Accordion.Panel>
+          </Accordion.Item>
+        );
+      })}
     </Accordion>
   );
 }

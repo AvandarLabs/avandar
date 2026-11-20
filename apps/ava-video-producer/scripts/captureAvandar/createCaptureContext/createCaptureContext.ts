@@ -23,12 +23,16 @@ function _createRecorderState(
 ): CaptureRecorderState {
   const manifest = createCaptureManifest(options);
   const manifestPath = join(options.runDir, "manifest.json");
-  const roundMs = (value: number) => Math.round(value * 1000) / 1000;
+  const roundMs = (value: number) => {
+    return Math.round(value * 1000) / 1000;
+  };
   let writes = Promise.resolve();
   return {
     ...options,
     manifest,
-    elapsed: () => roundMs(performance.now() - options.startedAtMs),
+    elapsed: () => {
+      return roundMs(performance.now() - options.startedAtMs);
+    },
     videoElapsed: () => {
       return options.live.recordingOrigin === undefined
         ? null
@@ -37,18 +41,20 @@ function _createRecorderState(
     manifestUrl: (value) => {
       return makeRedactedTextFromValue({
         value: makeSourceUrlFromUrl(value),
-        secrets: options.secrets.filter((secret) => secret.length >= 8),
+        secrets: options.secrets.filter((secret) => {
+          return secret.length >= 8;
+        }),
       });
     },
     // Writes are queued so the file always ends at the latest manifest.
     persist: () => {
-      writes = writes.then(() =>
-        writeManifest({
+      writes = writes.then(() => {
+        return writeManifest({
           path: manifestPath,
           manifest,
           secrets: options.secrets,
-        }),
-      );
+        });
+      });
       return writes;
     },
     assertPolicy: () => {

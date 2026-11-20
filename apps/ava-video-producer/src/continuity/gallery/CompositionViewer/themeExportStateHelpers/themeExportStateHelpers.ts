@@ -17,7 +17,10 @@ export type ThemeExportState =
   | Readonly<{ kind: "timed-out" }>
   | Readonly<{ kind: "refused"; reason: ThemeRefusalReason }>;
 
-/** The live player's latest answer: a resolved hash, or the issues it refused with. */
+/**
+ * The live player's latest answer: a resolved hash, or the issues it refused
+ * with.
+ */
 export type ThemeAcknowledgement = Readonly<{
   hash?: string;
   issues: readonly VideoThemeIssue[];
@@ -51,7 +54,10 @@ export function getThemeExportState(
   input: Readonly<{
     isScene: boolean;
     hasDraftIssues: boolean;
-    /** The hash the gallery resolves for its snapshot, or undefined if it cannot. */
+    /**
+     * The hash the gallery resolves for its snapshot, or undefined if it
+     * cannot.
+     */
     expectedHash: string | undefined;
     acknowledgement: ThemeAcknowledgement | undefined;
     isTimedOut: boolean;

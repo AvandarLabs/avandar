@@ -34,20 +34,22 @@ export function SharedJigPreparation({
           [input.labels.example, 48, 24, 864, 14, 1],
         ]}
       />
-      {input.collaborators.map((collaborator, index) => (
-        <JigStation
-          key={collaborator.id}
-          collaborator={collaborator}
-          x={scene.centers[index]}
-          hasApplication={scene.applications[index]}
-          isAligned={
-            scene.activeIndex === index &&
-            scene.guideX === scene.centers[index] - 50
-          }
-          input={input}
-          accent={accent}
-        />
-      ))}
+      {input.collaborators.map((collaborator, index) => {
+        return (
+          <JigStation
+            key={collaborator.id}
+            collaborator={collaborator}
+            x={scene.centers[index]}
+            hasApplication={scene.applications[index]}
+            isAligned={
+              scene.activeIndex === index &&
+              scene.guideX === scene.centers[index] - 50
+            }
+            input={input}
+            accent={accent}
+          />
+        );
+      })}
       <PersonGlyph
         x={scene.guideX}
         y={440}

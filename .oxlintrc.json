@@ -414,22 +414,9 @@
       }
     },
     {
-      "files": ["apps/ava-video-producer/**/*.{ts,tsx,js,mjs}"],
+      "files": ["**/*.js"],
       "rules": {
-        "eslint-js/max-len": "off",
-        "arrow-body-style": "off",
-        "typescript/explicit-module-boundary-types": "off",
-        "react-js/function-component-definition": "off",
-        "react-refresh/only-export-components": "off"
-      }
-    },
-    {
-      "files": [
-        "apps/ava-video-producer/avandar-adapter/**/*.{ts,tsx}",
-        "apps/ava-video-producer/tests/**/*.ts"
-      ],
-      "rules": {
-        "typescript/no-explicit-any": "off"
+        "typescript/explicit-module-boundary-types": "off"
       }
     }
   ]

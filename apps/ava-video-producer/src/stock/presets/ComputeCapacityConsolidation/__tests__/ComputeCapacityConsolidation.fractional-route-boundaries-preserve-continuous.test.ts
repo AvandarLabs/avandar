@@ -11,9 +11,9 @@ import {
 } from "./ComputeCapacityConsolidationTestHelpers";
 
 test("fractional route boundaries preserve continuous full-rectangle clearance", () => {
-  const input = REVIEW_FIXTURES.find(
-    ({ id }) => id === "fractional-full-stack",
-  )!.input;
+  const input = REVIEW_FIXTURES.find(({ id }) => {
+    return id === "fractional-full-stack";
+  })!.input;
   const plan = makeJobTransfersFromInput(input);
   const held = _getJobs({ frame: 48, input });
   const final = _getJobs({ frame: 150, input });
@@ -21,12 +21,14 @@ test("fractional route boundaries preserve continuous full-rectangle clearance",
     ..._render({ frame: 48, input: input }).matchAll(
       /<text[^>]* y="366"[^>]*>(.*?)<\/text>/g,
     ),
-  ].map(([attributes]) => ({
-    x: SvgAttributes.getNumberFromMarkup({ attributes, name: "x" }),
-    y: 354,
-    width: 65,
-    height: 32,
-  }));
+  ].map(([attributes]) => {
+    return {
+      x: SvgAttributes.getNumberFromMarkup({ attributes, name: "x" }),
+      y: 354,
+      width: 65,
+      height: 32,
+    };
+  });
   let distance = 0;
   plan.transfers.forEach((transfer) => {
     const job = held[transfer.index];
@@ -45,9 +47,13 @@ test("fractional route boundaries preserve continuous full-rectangle clearance",
           height: job.height + Math.abs(point.y - prior.y),
         };
         [
-          ...held.filter((_, jobIndex) => jobIndex !== transfer.index),
+          ...held.filter((_, jobIndex) => {
+            return jobIndex !== transfer.index;
+          }),
           ...captions,
-        ].forEach((obstacle) => _assertClear({ rectangle: swept, obstacle }));
+        ].forEach((obstacle) => {
+          return _assertClear({ rectangle: swept, obstacle });
+        });
         distance += Math.abs(point.x - prior.x) + Math.abs(point.y - prior.y);
       }
       const boundary = _getBoundaryFrame(distance / plan.totalLength);
@@ -56,14 +62,15 @@ test("fractional route boundaries preserve continuous full-rectangle clearance",
       before.forEach((rectangle, jobIndex) => {
         assert.ok(Math.abs(rectangle.x - after[jobIndex].x) < 0.001);
         assert.ok(Math.abs(rectangle.y - after[jobIndex].y) < 0.001);
-        after
-          .slice(jobIndex + 1)
-          .forEach((other) =>
-            _assertClear({ rectangle: after[jobIndex], obstacle: other }),
-          );
-        captions.forEach((caption) =>
-          _assertClear({ rectangle: after[jobIndex], obstacle: caption }),
-        );
+        after.slice(jobIndex + 1).forEach((other) => {
+          return _assertClear({ rectangle: after[jobIndex], obstacle: other });
+        });
+        captions.forEach((caption) => {
+          return _assertClear({
+            rectangle: after[jobIndex],
+            obstacle: caption,
+          });
+        });
       });
       assert.ok(Math.abs(after[transfer.index].x - point.x) < 0.01);
       assert.ok(Math.abs(after[transfer.index].y - point.y) < 0.01);

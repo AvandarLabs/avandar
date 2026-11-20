@@ -20,13 +20,15 @@ async function _populateShowcaseFixture(root: string): Promise<void> {
       "themes",
       "public/fonts",
       "public/avandar",
-    ].map((directory) =>
-      fs.cp(directory, path.join(root, directory), {
+    ].map((directory) => {
+      return fs.cp(directory, path.join(root, directory), {
         recursive: true,
         // Skips generated output the fixture replaces with a stub.
-        filter: (source) => !source.includes(`${path.sep}generated${path.sep}`),
-      }),
-    ),
+        filter: (source) => {
+          return !source.includes(`${path.sep}generated${path.sep}`);
+        },
+      });
+    }),
   );
   await fs.writeFile(
     path.join(root, "scripts/readTheme.ts"),

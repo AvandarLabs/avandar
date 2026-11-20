@@ -18,21 +18,23 @@ export function LedgerCopy({ frame, input }: Readonly<Props>): ReactNode {
   ];
   return (
     <g>
-      {captions.map(({ text, y }) => (
-        <FitText
-          key={y}
-          text={text}
-          x={480}
-          y={y}
-          width={600}
-          fontSize={14}
-          maxLines={2}
-          anchor="middle"
-          normalizeWhitespace
-          breakLongWords
-          color={y === 580 ? STOCK.muted : STOCK.text}
-        />
-      ))}
+      {captions.map(({ text, y }) => {
+        return (
+          <FitText
+            key={y}
+            text={text}
+            x={480}
+            y={y}
+            width={600}
+            fontSize={14}
+            maxLines={2}
+            anchor="middle"
+            normalizeWhitespace
+            breakLongWords
+            color={y === 580 ? STOCK.muted : STOCK.text}
+          />
+        );
+      })}
     </g>
   );
 }

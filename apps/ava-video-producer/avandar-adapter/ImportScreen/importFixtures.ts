@@ -41,18 +41,20 @@ export const columnNames = Object.keys(cases[0]!);
  */
 // Fixture records carry only the fields this film shows. Filling the rest of
 // the product type would put invented values on screen, so the cast stays.
-export const columns = columnNames.map((name, index) => ({
-  id: `film-case-column-${index}`,
-  name,
-  description: undefined,
-  dataType: DATE_COLUMNS.has(name)
-    ? "date"
-    : NUMERIC_COLUMNS.has(name)
-      ? name === "household_size"
-        ? "bigint"
-        : "double"
-      : "varchar",
-})) as unknown as DatasetColumn.T[];
+export const columns = columnNames.map((name, index) => {
+  return {
+    id: `film-case-column-${index}`,
+    name,
+    description: undefined,
+    dataType: DATE_COLUMNS.has(name)
+      ? "date"
+      : NUMERIC_COLUMNS.has(name)
+        ? name === "household_size"
+          ? "bigint"
+          : "double"
+        : "varchar",
+  };
+}) as unknown as DatasetColumn.T[];
 
 /** The saved dataset record this screen's "saved" phase displays. */
 // Fixture records carry only the fields this film shows. Filling the rest of

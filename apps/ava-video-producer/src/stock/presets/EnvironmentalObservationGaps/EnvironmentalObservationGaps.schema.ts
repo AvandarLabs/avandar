@@ -92,8 +92,11 @@ export const inputSchema = z
       (Math.max(...rows) - Math.min(...rows) + 1) *
       (Math.max(...columns) - Math.min(...columns) + 1);
     if (
-      new Set(cells.map((cell) => `${cell.row}:${cell.column}`)).size !==
-        cells.length ||
+      new Set(
+        cells.map((cell) => {
+          return `${cell.row}:${cell.column}`;
+        }),
+      ).size !== cells.length ||
       area !== cells.length
     ) {
       context.addIssue({

@@ -43,10 +43,11 @@ export const inputSchema = baseSchema.superRefine((input, context) => {
     const [lower, middle, upper] = scheme.breaks;
     if (
       !(lower < middle && middle < upper) ||
-      input.zones.some(
-        (zone) =>
-          zone.value !== null && (zone.value < lower || zone.value > upper),
-      )
+      input.zones.some((zone) => {
+        return (
+          zone.value !== null && (zone.value < lower || zone.value > upper)
+        );
+      })
     ) {
       context.addIssue({
         code: "custom",

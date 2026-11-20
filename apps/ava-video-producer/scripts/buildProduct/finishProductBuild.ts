@@ -24,8 +24,12 @@ async function _appendTailwindUtilities(
   const content = [
     "avandar-adapter/**/*.{ts,tsx}",
     ...Array.from(imported.keys())
-      .filter((file) => /\.tsx?$/.test(file))
-      .map((file) => path.join(PRODUCT_ROOT, file)),
+      .filter((file) => {
+        return /\.tsx?$/.test(file);
+      })
+      .map((file) => {
+        return path.join(PRODUCT_ROOT, file);
+      }),
   ];
   const utilities = await postcss([
     tailwind({ content, corePlugins: { preflight: false } }),

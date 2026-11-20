@@ -25,15 +25,15 @@ export async function makeFontFaceCssFromRegistry(): Promise<string> {
   );
   return Object.values(registry)
     .filter(propEq("source", "bundled"))
-    .map(
-      (font) => `@font-face {
+    .map((font) => {
+      return `@font-face {
   font-display: swap;
   font-family: ${font.face};
   font-style: normal;
   font-weight: ${font.weight};
   src: url("/${font.file}") format("woff2");
 }
-`,
-    )
+`;
+    })
     .join("\n");
 }

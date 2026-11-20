@@ -22,27 +22,29 @@ export function ReconstructionGrid({
   return (
     <g data-grid-region={isResult ? "result" : "source"}>
       <ReconstructionHeaders input={input} columnXs={columnXs} width={width} />
-      {input.grid.rows.flatMap((row, rowIndex) =>
-        row.map((value, columnIndex) => (
-          <ReconstructionCell
-            key={`${rowIndex}:${columnIndex}`}
-            value={value}
-            rowIndex={rowIndex}
-            columnIndex={columnIndex}
-            x={columnXs[columnIndex]}
-            y={290 + rowIndex * 64}
-            registration={ramp(
-              frame,
-              56 +
-                (rowIndex * input.grid.columnLabels.length + columnIndex) * 2,
-              19,
-            )}
-            isResult={isResult}
-            width={width}
-            accent={accent}
-          />
-        )),
-      )}
+      {input.grid.rows.flatMap((row, rowIndex) => {
+        return row.map((value, columnIndex) => {
+          return (
+            <ReconstructionCell
+              key={`${rowIndex}:${columnIndex}`}
+              value={value}
+              rowIndex={rowIndex}
+              columnIndex={columnIndex}
+              x={columnXs[columnIndex]}
+              y={290 + rowIndex * 64}
+              registration={ramp(
+                frame,
+                56 +
+                  (rowIndex * input.grid.columnLabels.length + columnIndex) * 2,
+                19,
+              )}
+              isResult={isResult}
+              width={width}
+              accent={accent}
+            />
+          );
+        });
+      })}
     </g>
   );
 }

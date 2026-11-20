@@ -6,14 +6,18 @@ import type { ReactNode } from "react";
 type Props = { input: Input; frame: number };
 /** The completed fold states the count or exact numeric calculation. */
 export function PickerFormula({ input, frame }: Readonly<Props>): ReactNode {
-  const numeric = input.observations.flatMap(({ value }) =>
-    value === null ? [] : [value],
-  );
+  const numeric = input.observations.flatMap(({ value }) => {
+    return value === null ? [] : [value];
+  });
   const formula =
     input.rule === "mean"
       ? `(${numeric.join(" + ")}) ÷ ${numeric.length}`
       : input.rule === "count"
-        ? numeric.map(() => "1").join(" + ")
+        ? numeric
+            .map(() => {
+              return "1";
+            })
+            .join(" + ")
         : input.rule === "sum"
           ? numeric.join(" + ")
           : input.rule === "first"

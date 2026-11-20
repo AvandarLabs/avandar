@@ -12,6 +12,7 @@ import {
 } from "../theme/useGraphicTheme/useGraphicTheme";
 import { GroundFill } from "./GroundFill";
 import type { Props as StockGraphicProps } from "./StockGraphic";
+import type { ReactNode } from "react";
 
 type Props = Omit<
   StockGraphicProps,
@@ -20,7 +21,10 @@ type Props = Omit<
   id: string;
 };
 
-/** The stock graphic's svg: its ground, effect definitions, and the preset renderer at the clamped frame. */
+/**
+ * The stock graphic's svg: its ground, effect definitions, and the preset
+ * renderer at the clamped frame.
+ */
 export function StockCanvas({
   preset,
   frame,
@@ -29,7 +33,7 @@ export function StockCanvas({
   input,
   transparent = false,
   id,
-}: Props) {
+}: Props): ReactNode {
   const tokens = useGraphicTokens();
   const theme = useGraphicTheme();
   const localFrame = Math.max(

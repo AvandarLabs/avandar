@@ -36,28 +36,30 @@ export function SourceSentence({
         height={Math.max(...parts.map(prop("y"))) - 96 + 14}
         fill={background}
       />
-      {parts.map((part) => (
-        <g key={part.id} data-source-fragment={part.id}>
-          <text
-            aria-label={part.text}
-            x={part.x}
-            y={part.y}
-            fill={STOCK.text}
-            fontSize={12}
-            fontFamily="Arial, sans-serif"
-            xmlSpace="preserve"
-          >
-            {part.text}
-          </text>
-          {mapped.has(part.id) ? (
-            <path
-              d={`M${part.x} ${part.y + 8} h${part.width * ramp(frame, 12, 36)}`}
-              stroke={accent}
-              strokeWidth={2}
-            />
-          ) : undefined}
-        </g>
-      ))}
+      {parts.map((part) => {
+        return (
+          <g key={part.id} data-source-fragment={part.id}>
+            <text
+              aria-label={part.text}
+              x={part.x}
+              y={part.y}
+              fill={STOCK.text}
+              fontSize={12}
+              fontFamily="Arial, sans-serif"
+              xmlSpace="preserve"
+            >
+              {part.text}
+            </text>
+            {mapped.has(part.id) ? (
+              <path
+                d={`M${part.x} ${part.y + 8} h${part.width * ramp(frame, 12, 36)}`}
+                stroke={accent}
+                strokeWidth={2}
+              />
+            ) : undefined}
+          </g>
+        );
+      })}
     </g>
   );
 }

@@ -51,14 +51,18 @@ export const fixtures: Array<{ id: string; input: Input }> = [
     id: "dense",
     input: {
       ...DEFAULT_INPUT,
-      fields: Array.from({ length: 5 }, (_, index) => ({
-        id: `field-${index}`,
-        label: "W".repeat(22),
-        value: "W".repeat(28),
-        disclosure: "share",
-      })),
+      fields: Array.from({ length: 5 }, (_, index) => {
+        return {
+          id: `field-${index}`,
+          label: "W".repeat(22),
+          value: "W".repeat(28),
+          disclosure: "share",
+        };
+      }),
       copy: Object.fromEntries(
-        Object.keys(DEFAULT_INPUT.copy).map((key) => [key, "W".repeat(32)]),
+        Object.keys(DEFAULT_INPUT.copy).map((key) => {
+          return [key, "W".repeat(32)];
+        }),
       ) as Input["copy"],
     },
   },

@@ -7,14 +7,16 @@ type Props = { input: Input; accent: string };
 export function ClassLegends({ input, accent }: Readonly<Props>): ReactNode {
   return (
     <g>
-      {input.schemes.map((scheme, index) => (
-        <ClassLegend
-          key={index}
-          {...{ scheme, index, accent }}
-          unitLabel={input.unitLabel}
-          noDataLabel={input.noDataLabel}
-        />
-      ))}
+      {input.schemes.map((scheme, index) => {
+        return (
+          <ClassLegend
+            key={index}
+            {...{ scheme, index, accent }}
+            unitLabel={input.unitLabel}
+            noDataLabel={input.noDataLabel}
+          />
+        );
+      })}
     </g>
   );
 }

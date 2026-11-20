@@ -39,6 +39,8 @@ export function getAliasValueFromPalette(
   palette: Readonly<Palette>,
   kitToken: string,
 ): AliasHit | undefined {
-  const alias = (ALIASES[kitToken] ?? []).find((name) => palette[name]);
+  const alias = (ALIASES[kitToken] ?? []).find((name) => {
+    return palette[name];
+  });
   return alias ? { value: palette[alias], from: alias } : undefined;
 }

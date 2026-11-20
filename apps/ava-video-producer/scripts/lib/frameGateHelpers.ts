@@ -261,13 +261,15 @@ function _measureLuma(file: string): { luma: number[]; contrast: number[] } {
       stats.matchAll(
         new RegExp(`lavfi\\.signalstats\\.${name}=([0-9.]+)`, "g"),
       ),
-      (match) => Number(match[1]),
+      (match) => {
+        return Number(match[1]);
+      },
     );
   };
   const minimums = readAll("YMIN");
-  const contrast = readAll("YMAX").map(
-    (maximum, index) => maximum - (minimums[index] ?? 0),
-  );
+  const contrast = readAll("YMAX").map((maximum, index) => {
+    return maximum - (minimums[index] ?? 0);
+  });
   return { luma: readAll("YAVG"), contrast };
 }
 
@@ -292,7 +294,9 @@ export function getFrameMeasurementsFromVideo(file: string): FrameMeasurements {
 }
 
 function _median(values: readonly number[]): number {
-  const sorted = [...values].sort((a, b) => a - b);
+  const sorted = [...values].sort((a, b) => {
+    return a - b;
+  });
   return sorted[Math.floor(sorted.length / 2)];
 }
 
@@ -311,11 +315,12 @@ function _neighbourMatches(halves: readonly number[], index: number): number[] {
   return Array.from({ length: numNeighbourIndexes }, (_, offset) => {
     return firstNeighbourIndex + offset;
   })
-    .filter(
-      (neighbourIndex) =>
-        neighbourIndex !== index && halves[neighbourIndex] !== undefined,
-    )
-    .map((neighbourIndex) => halves[neighbourIndex]);
+    .filter((neighbourIndex) => {
+      return neighbourIndex !== index && halves[neighbourIndex] !== undefined;
+    })
+    .map((neighbourIndex) => {
+      return halves[neighbourIndex];
+    });
 }
 
 /** The frame's spike over its neighbours, or undefined when it is not tiled. */
@@ -377,7 +382,9 @@ function _measureReversal(options: {
   const lastFrame = Math.min(luma.length - 1, frame + CUT_REVERSAL_FRAMES);
   const laterFrames = Array.from(
     { length: Math.max(0, lastFrame - frame) },
-    (_, offset) => frame + 1 + offset,
+    (_, offset) => {
+      return frame + 1 + offset;
+    },
   );
   return laterFrames.reduce<{
     furthest: number;
@@ -440,10 +447,14 @@ export function getLumaJumpsFromLuma(
   );
   return luma
     .slice(1)
-    .map((value, offset) => ({
-      from: offset,
-      to: offset + 1,
-      jump: Math.abs(value - luma[offset]),
-    }))
-    .filter(({ to, jump }) => jump > LUMA_JUMP && !acceptedFrames.has(to));
+    .map((value, offset) => {
+      return {
+        from: offset,
+        to: offset + 1,
+        jump: Math.abs(value - luma[offset]),
+      };
+    })
+    .filter(({ to, jump }) => {
+      return jump > LUMA_JUMP && !acceptedFrames.has(to);
+    });
 }

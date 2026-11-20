@@ -10,26 +10,28 @@ export function PermissionRanks({ input }: Readonly<Props>): ReactNode {
   return (
     <g>
       {" "}
-      {(["none", "viewer", "editor", "admin"] as const).map((role) => (
-        <g key={role}>
-          <path
-            d={`M210 ${440 - ROLE_RANK[role] * 90} H820`}
-            stroke={STOCK.line}
-          />
-          <LabelSlots
-            labels={[
-              [
-                input.labels[role],
-                55,
-                440 - ROLE_RANK[role] * 90 + 5,
-                145,
-                14,
-                5,
-              ],
-            ]}
-          />
-        </g>
-      ))}
+      {(["none", "viewer", "editor", "admin"] as const).map((role) => {
+        return (
+          <g key={role}>
+            <path
+              d={`M210 ${440 - ROLE_RANK[role] * 90} H820`}
+              stroke={STOCK.line}
+            />
+            <LabelSlots
+              labels={[
+                [
+                  input.labels[role],
+                  55,
+                  440 - ROLE_RANK[role] * 90 + 5,
+                  145,
+                  14,
+                  5,
+                ],
+              ]}
+            />
+          </g>
+        );
+      })}
     </g>
   );
 }

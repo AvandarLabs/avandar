@@ -7,13 +7,17 @@ import { useTokenEditor } from "../../TokenEditorContext";
 import { ContrastBadge } from "../ContrastBadge/ContrastBadge";
 import css from "./TypeSpecimen.module.css";
 import type { ResolvedTypeStyle } from "../../../videoTheme/videoTheme.types";
+import type { ReactNode } from "react";
 
 const SPECIMEN_MAX_SIZE = 40;
 
-/** A sample line set in a resolved type style on the theme's ground, with its contrast. */
+/**
+ * A sample line set in a resolved type style on the theme's ground, with its
+ * contrast.
+ */
 export function TypeSpecimen({
   style,
-}: Readonly<{ style: ResolvedTypeStyle | undefined }>) {
+}: Readonly<{ style: ResolvedTypeStyle | undefined }>): ReactNode {
   const { theme } = useTokenEditor();
   if (!style) {
     return null;

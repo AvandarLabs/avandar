@@ -18,16 +18,18 @@ export function LocalCountSheet({ input, frame }: Readonly<Props>): ReactNode {
         stroke={STOCK.muted}
         strokeDasharray="5 5"
       />
-      {input.cells.map((cell, index) => (
-        <LocalAggregateCell
-          key={cell.id}
-          cell={cell}
-          index={index}
-          minimum={input.minimum}
-          showLocalCounts={input.showLocalCounts}
-          frame={frame}
-        />
-      ))}
+      {input.cells.map((cell, index) => {
+        return (
+          <LocalAggregateCell
+            key={cell.id}
+            cell={cell}
+            index={index}
+            minimum={input.minimum}
+            showLocalCounts={input.showLocalCounts}
+            frame={frame}
+          />
+        );
+      })}
     </g>
   );
 }

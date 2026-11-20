@@ -10,28 +10,42 @@ import type {
   ShadowValue,
 } from "../../../videoTheme/videoTheme.types";
 import type { ValueControlProps } from "../valueControl.types";
+import type { ReactNode } from "react";
 
 const MAX_SHADOW_LAYERS = 4;
 
-/** A shadow token: up to four layers, previewed in the theme's shadow colour. */
+/**
+ * A shadow token: up to four layers, previewed in the theme's shadow colour.
+ */
 export function ShadowValueControl({
   label,
   value,
   onChange,
-}: ValueControlProps) {
+}: ValueControlProps): ReactNode {
   const { theme } = useTokenEditor();
-  const [layerIds, setLayerIds] = useState<readonly string[]>(() =>
-    Array.from({ length: MAX_SHADOW_LAYERS }, () => crypto.randomUUID()),
-  );
+  const [layerIds, setLayerIds] = useState<readonly string[]>(() => {
+    return Array.from({ length: MAX_SHADOW_LAYERS }, () => {
+      return crypto.randomUUID();
+    });
+  });
   const layers = (value as ShadowValue | undefined)?.layers ?? [];
-  const setLayers = (nextLayers: readonly ShadowLayer[]) =>
-    onChange({ layers: nextLayers });
+  const setLayers = (nextLayers: readonly ShadowLayer[]) => {
+    return onChange({ layers: nextLayers });
+  };
   const removeLayer = (index: number) => {
-    setLayerIds((current) => [
-      ...current.filter((_, position) => position !== index),
-      crypto.randomUUID(),
-    ]);
-    setLayers(layers.filter((_, position) => position !== index));
+    setLayerIds((current) => {
+      return [
+        ...current.filter((_, position) => {
+          return position !== index;
+        }),
+        crypto.randomUUID(),
+      ];
+    });
+    setLayers(
+      layers.filter((_, position) => {
+        return position !== index;
+      }),
+    );
   };
   const boxShadow = elevationToBoxShadow({
     layers,
@@ -50,7 +64,9 @@ export function ShadowValueControl({
           size="compact-xs"
           variant="default"
           disabled={layers.length >= MAX_SHADOW_LAYERS}
-          onClick={() => setLayers([...layers, DEFAULT_SHADOW_LAYER])}
+          onClick={() => {
+            return setLayers([...layers, DEFAULT_SHADOW_LAYER]);
+          }}
         >
           {"Add layer"}
         </Button>

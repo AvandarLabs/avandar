@@ -82,8 +82,9 @@ registerStockPresetAssertions({
   invalidInputs: INVALID_INPUTS,
   render: _render,
   excludedTextFields: EXCLUDED_TEXT_FIELDS,
-  getVisibleTexts: ({ input, frame }) =>
-    _visible({ input: input, frame: frame }).map(_escape),
+  getVisibleTexts: ({ input, frame }) => {
+    return _visible({ input: input, frame: frame }).map(_escape);
+  },
 });
 registerStockTextLayoutAssertions({
   inputSchema,
@@ -114,12 +115,18 @@ test("zero full and concentrated corrections conserve every per-payment position
       );
       const tokens = [
         ...row.matchAll(/<circle data-payment-token="[^"]*"[^>]*>/g),
-      ].map(([attributes]) => [
-        SvgAttributes.getNumberFromMarkup({ attributes, name: "cx" }),
-        SvgAttributes.getNumberFromMarkup({ attributes, name: "cy" }),
-      ]);
+      ].map(([attributes]) => {
+        return [
+          SvgAttributes.getNumberFromMarkup({ attributes, name: "cx" }),
+          SvgAttributes.getNumberFromMarkup({ attributes, name: "cy" }),
+        ];
+      });
       assert.equal(
-        new Set(tokens.map((point) => point.join(","))).size,
+        new Set(
+          tokens.map((point) => {
+            return point.join(",");
+          }),
+        ).size,
         tokens.length,
       );
       tokens.forEach(([x, y]) => {

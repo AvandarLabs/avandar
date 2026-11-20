@@ -32,24 +32,36 @@ export function getTextEnvelopesFromMarkup(
       name: "font-size",
     });
     const spans = [...match[2].matchAll(/<tspan([^>]*)>(.*?)<\/tspan>/g)];
-    const hasAbsoluteLines = spans.some((span) => span[1].includes(" x="));
+    const hasAbsoluteLines = spans.some((span) => {
+      return span[1].includes(" x=");
+    });
     const lines = hasAbsoluteLines
-      ? spans.map((span) => span[2])
-      : [spans.map((span) => span[2]).join("")];
-    const height = spans.reduce(
-      (sum, span) =>
+      ? spans.map((span) => {
+          return span[2];
+        })
+      : [
+          spans
+            .map((span) => {
+              return span[2];
+            })
+            .join(""),
+        ];
+    const height = spans.reduce((sum, span) => {
+      return (
         sum +
         (span[1].includes(" dy=")
           ? SvgAttributes.getNumberFromMarkup({
               attributes: span[1],
               name: "dy",
             })
-          : 0),
-      0,
-    );
+          : 0)
+      );
+    }, 0);
     const width = Math.max(
       0,
-      ...lines.map((text) => getConservativeWidthFromText({ text, fontSize })),
+      ...lines.map((text) => {
+        return getConservativeWidthFromText({ text, fontSize });
+      }),
     );
     return {
       x,

@@ -21,14 +21,13 @@ export function ReunionMember({
   accent,
 }: Readonly<Props>): ReactNode {
   const travel = ramp(frame, 60, 48, EASE.inOut);
-  const numMembers = input.groups.reduce(
-    (sum, group) => sum + group.members.length,
-    0,
-  );
+  const numMembers = input.groups.reduce((sum, group) => {
+    return sum + group.members.length;
+  }, 0);
   const memberIndex =
-    input.groups
-      .slice(0, groupIndex)
-      .reduce((sum, group) => sum + group.members.length, 0) + index;
+    input.groups.slice(0, groupIndex).reduce((sum, group) => {
+      return sum + group.members.length;
+    }, 0) + index;
   const finalX = 480 + (memberIndex - (numMembers - 1) / 2) * 90;
   const x = mix(travel, (groupIndex === 0 ? 100 : 680) + index * 90, finalX);
   const y = 390;

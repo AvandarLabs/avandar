@@ -14,10 +14,14 @@ import { createShowcaseFixture } from "./createShowcaseFixture";
 async function _readBuiltScripts(root: string): Promise<string> {
   const site = path.join(root, "out/showcase/browser");
   const files = (await fs.readdir(site, { recursive: true })).filter(
-    (filename) => filename.endsWith(".js"),
+    (filename) => {
+      return filename.endsWith(".js");
+    },
   );
   const scripts = await Promise.all(
-    files.map((filename) => fs.readFile(path.join(site, filename), "utf8")),
+    files.map((filename) => {
+      return fs.readFile(path.join(site, filename), "utf8");
+    }),
   );
   return scripts.join("\n");
 }

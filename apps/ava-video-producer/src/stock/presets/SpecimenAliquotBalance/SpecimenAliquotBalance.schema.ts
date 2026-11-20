@@ -41,8 +41,9 @@ export const inputSchema = z
       });
     }
     if (
-      input.aliquots.reduce((total, aliquot) => total + aliquot.volume, 0) >
-      input.parent.volume
+      input.aliquots.reduce((total, aliquot) => {
+        return total + aliquot.volume;
+      }, 0) > input.parent.volume
     ) {
       context.addIssue({
         code: "custom",

@@ -12,7 +12,10 @@ import type { CameraKeyframe } from "./cameraTrack";
 import type { MotionOptions } from "./motionSettings";
 import type { ReactNode } from "react";
 
-/** Vector-only camera. The render callback receives the real, fractional content frame. */
+/**
+ * Vector-only camera. The render callback receives the real, fractional content
+ * frame.
+ */
 export type DiagramCameraProps = MotionOptions & {
   track?: readonly CameraKeyframe[];
   width?: number;
@@ -95,12 +98,11 @@ export function DiagramCamera({
   blurOptions,
   render,
   ...motion
-}: DiagramCameraProps) {
+}: DiagramCameraProps): ReactNode {
   const frame = useCurrentFrame();
-  const validatedTrack = useMemo(
-    () => track && createCameraTrackSchema(width, height).parse(track),
-    [track, width, height],
-  );
+  const validatedTrack = useMemo(() => {
+    return track && createCameraTrackSchema(width, height).parse(track);
+  }, [track, width, height]);
   const settings = resolveMotionSettings({ ...motion, ...blurOptions });
   const shutterAngle = Math.min(
     360,

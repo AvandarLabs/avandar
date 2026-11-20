@@ -12,23 +12,25 @@ export function SedimentQuantities({ input }: Readonly<Props>): ReactNode {
         { label: input.copy.mobilized, value: input.sediment.mobilizedKg },
         { label: input.copy.retained, value: input.sediment.retainedKg },
         { label: input.copy.exported, value: exported },
-      ].map(({ label, value }, index) => (
-        <g key={index}>
-          <SceneLabel
-            text={label}
-            x={45 + index * 300}
-            y={470}
-            width={265}
-            lines={3}
-          />
-          <SceneLabel
-            text={`${value} ${input.copy.unit}`}
-            x={45 + index * 300}
-            y={520}
-            width={265}
-          />
-        </g>
-      ))}
+      ].map(({ label, value }, index) => {
+        return (
+          <g key={index}>
+            <SceneLabel
+              text={label}
+              x={45 + index * 300}
+              y={470}
+              width={265}
+              lines={3}
+            />
+            <SceneLabel
+              text={`${value} ${input.copy.unit}`}
+              x={45 + index * 300}
+              y={520}
+              width={265}
+            />
+          </g>
+        );
+      })}
       <g data-exported="quantity" data-quantity={exported}>
         <SceneLabel
           text={`${input.sediment.mobilizedKg} = ${input.sediment.retainedKg} + ${exported} ${input.copy.unit}`}

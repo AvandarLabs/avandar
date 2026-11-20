@@ -15,7 +15,10 @@ import type { PlayerRef } from "@remotion/player";
 
 const PLAYBACK_SPEEDS: readonly number[] = [0.5, 1, 1.5, 2];
 
-/** Posts a film status or acknowledgement message to the same-origin parent gallery. */
+/**
+ * Posts a film status or acknowledgement message to the same-origin parent
+ * gallery.
+ */
 export function postToParentGallery(message: object): void {
   window.parent.postMessage(message, location.origin);
 }
@@ -122,9 +125,9 @@ function useUsedTokensReport(id: string, usedTokens: readonly string[]): void {
       if (
         message.paths.length === 0 ||
         (message.paths.length === lastSentPaths.current.length &&
-          message.paths.every(
-            (path, index) => path === lastSentPaths.current[index],
-          ))
+          message.paths.every((path, index) => {
+            return path === lastSentPaths.current[index];
+          }))
       ) {
         return;
       }
@@ -187,7 +190,9 @@ export function useFilmControl(options: FilmControlOptions): void {
       }
     };
     window.addEventListener("message", receive);
-    return () => window.removeEventListener("message", receive);
+    return () => {
+      return window.removeEventListener("message", receive);
+    };
   }, []);
   useUsedTokensReport(id, usedTokens);
 }

@@ -18,10 +18,17 @@ export function UncertaintyUnfold({
   accent,
   id,
 }: Readonly<Props>): ReactNode {
-  const scale = (value: number) =>
-    100 +
-    760 *
-      normalizeFiniteRange({ value, min: input.axis.min, max: input.axis.max });
+  const scale = (value: number) => {
+    return (
+      100 +
+      760 *
+        normalizeFiniteRange({
+          value,
+          min: input.axis.min,
+          max: input.axis.max,
+        })
+    );
+  };
   const pointX = scale(input.estimate.point),
     lowerX = scale(input.estimate.lower),
     upperX = scale(input.estimate.upper);

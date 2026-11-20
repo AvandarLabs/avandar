@@ -8,17 +8,19 @@ type Props = { input: Input };
 export function MaterialLegend({ input }: Readonly<Props>): ReactNode {
   return (
     <g>
-      {getMaterialItemsFromInput(input).map((item, index) => (
-        <g key={item.id} data-label-owner={index}>
-          <SceneLabel
-            text={`${index + 1}. ${item.label}`}
-            x={45 + (index % 3) * 300}
-            y={430 + Math.floor(index / 3) * 44}
-            width={280}
-            lines={3}
-          />
-        </g>
-      ))}
+      {getMaterialItemsFromInput(input).map((item, index) => {
+        return (
+          <g key={item.id} data-label-owner={index}>
+            <SceneLabel
+              text={`${index + 1}. ${item.label}`}
+              x={45 + (index % 3) * 300}
+              y={430 + Math.floor(index / 3) * 44}
+              width={280}
+              lines={3}
+            />
+          </g>
+        );
+      })}
     </g>
   );
 }

@@ -9,12 +9,14 @@ async function _assertNoSymlinks(
 ): Promise<void> {
   const folders = [
     privateRoot,
-    ...parts.map((_, index) =>
-      path.join(privateRoot, ...parts.slice(0, index + 1)),
-    ),
+    ...parts.map((_, index) => {
+      return path.join(privateRoot, ...parts.slice(0, index + 1));
+    }),
   ];
   const results = await Promise.allSettled(
-    folders.map((folder) => fs.lstat(folder)),
+    folders.map((folder) => {
+      return fs.lstat(folder);
+    }),
   );
   // Report the outermost problem, as a walk from the private root would.
   results.forEach((result) => {

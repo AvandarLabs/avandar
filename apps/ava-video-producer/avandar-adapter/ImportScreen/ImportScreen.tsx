@@ -10,6 +10,7 @@ import { ImportReview } from "./ImportReview";
 import css from "./ImportScreen.module.css";
 import { SavedSource } from "./SavedSource";
 import { SourceList } from "./SourceList";
+import type { ReactNode } from "react";
 
 const _noop = () => {};
 
@@ -36,7 +37,7 @@ export function ImportScreen({
   frame: number;
   width: number;
   height: number;
-}) {
+}): ReactNode {
   const saved = frame >= 456;
   return (
     <div
@@ -66,28 +67,37 @@ export function ImportScreen({
                   "open-data-catalog": "Open data",
                 }}
                 renderTabPanel={{
-                  "upload-view": () => (
-                    <Box pt="lg">
-                      {frame < 68 ? (
-                        <Stack gap="xs">
-                          <div
-                            data-video-target="import-upload"
-                            style={{ opacity: 1 - ramp(frame, 52, 16) }}
-                          >
-                            <FileDropzone isLoading={false} onSelect={_noop} />
-                          </div>
-                          <Text size="xs" c="dimmed">
-                            Avandar reads the file in your browser. Nothing
-                            leaves this device until you save the dataset.
-                          </Text>
-                        </Stack>
-                      ) : (
-                        <ImportReview frame={Math.min(frame, 455)} />
-                      )}
-                    </Box>
-                  ),
-                  "connectors-view": () => null,
-                  "open-data-catalog": () => null,
+                  "upload-view": () => {
+                    return (
+                      <Box pt="lg">
+                        {frame < 68 ? (
+                          <Stack gap="xs">
+                            <div
+                              data-video-target="import-upload"
+                              style={{ opacity: 1 - ramp(frame, 52, 16) }}
+                            >
+                              <FileDropzone
+                                isLoading={false}
+                                onSelect={_noop}
+                              />
+                            </div>
+                            <Text size="xs" c="dimmed">
+                              Avandar reads the file in your browser. Nothing
+                              leaves this device until you save the dataset.
+                            </Text>
+                          </Stack>
+                        ) : (
+                          <ImportReview frame={Math.min(frame, 455)} />
+                        )}
+                      </Box>
+                    );
+                  },
+                  "connectors-view": () => {
+                    return null;
+                  },
+                  "open-data-catalog": () => {
+                    return null;
+                  },
                 }}
               />
             </AppViewBody>

@@ -24,16 +24,18 @@ export function PaymentRow({
         index={index}
         accent={accent}
       />
-      {Array.from({ length: payment.statedUnits }, (_, unitIndex) => (
-        <PaymentUnit
-          key={unitIndex}
-          payment={payment}
-          frame={frame}
-          index={index}
-          unitIndex={unitIndex}
-          accent={accent}
-        />
-      ))}
+      {Array.from({ length: payment.statedUnits }, (_, unitIndex) => {
+        return (
+          <PaymentUnit
+            key={unitIndex}
+            payment={payment}
+            frame={frame}
+            index={index}
+            unitIndex={unitIndex}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

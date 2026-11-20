@@ -22,5 +22,7 @@ export function getHelperFromFilmId(filmId: string): HelperEntry | undefined {
     return undefined;
   }
   const id = filmId.slice(HELPER_FILM_PREFIX.length);
-  return HELPER_CATALOG.helpers.find((helper) => helper.id === id);
+  return HELPER_CATALOG.helpers.find((helper) => {
+    return helper.id === id;
+  });
 }

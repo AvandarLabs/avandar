@@ -26,7 +26,9 @@ export function OutreachHouseholdRevisits({
       data-unique-contacted={
         new Set(
           completed
-            .filter(({ contacted }) => contacted)
+            .filter(({ contacted }) => {
+              return contacted;
+            })
             .map(prop("householdId")),
         ).size
       }

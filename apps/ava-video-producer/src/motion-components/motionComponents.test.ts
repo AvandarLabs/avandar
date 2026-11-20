@@ -1,12 +1,16 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { EASE } from "../motion";
-import { getOverlayPose, getOverlayTimings } from "./AnchoredOverlay";
 import {
   createCameraTrackSchema,
   getCameraPose,
   retimeCameraTrack,
 } from "./cameraTrack";
+import { createSceneTransition } from "./createSceneTransition";
+import { getObjectFlight } from "./getObjectFlight";
+import { getOverlayPose } from "./getOverlayPose";
+import { getOverlayTimings } from "./getOverlayTimings";
+import { getSceneTransitionStyle } from "./getSceneTransitionStyle";
 import {
   getMotionDuration,
   getMotionEasing,
@@ -16,11 +20,6 @@ import {
   motionOptionsSchema,
   resolveMotionSettings,
 } from "./motionSettings";
-import {
-  createSceneTransition,
-  getSceneTransitionStyle,
-} from "./SceneTransition";
-import { getObjectFlight } from "./SvgObjectDeparture";
 import type { CameraKeyframe } from "./cameraTrack";
 
 const route: CameraKeyframe[] = [
@@ -36,11 +35,15 @@ test("five presets resolve distinct travel durations and restrained-to-strong sh
     keyof typeof MOTION_PRESETS
   >;
   assert.deepEqual(
-    presets.map((preset) => getMotionDuration(24, { preset })),
+    presets.map((preset) => {
+      return getMotionDuration(24, { preset });
+    }),
     [96, 48, 32, 24, 16],
   );
   assert.deepEqual(
-    presets.map((preset) => resolveMotionSettings({ preset }).shutterAngle),
+    presets.map((preset) => {
+      return resolveMotionSettings({ preset }).shutterAngle;
+    }),
     [45, 90, 120, 180, 240],
   );
   assert.equal(getMotionDuration(0, { preset: "deliberate" }), 0);
@@ -106,11 +109,15 @@ test("custom Bezier curves respect endpoints and deterministic fractional seeks"
 
 test("slower camera travel preserves both reading holds and the final destination", () => {
   assert.deepEqual(
-    retimeCameraTrack(route, { speed: 0.5 }).map((key) => key.at),
+    retimeCameraTrack(route, { speed: 0.5 }).map((key) => {
+      return key.at;
+    }),
     [0, 60, 108, 168, 216],
   );
   assert.deepEqual(
-    route.map((key) => key.at),
+    route.map((key) => {
+      return key.at;
+    }),
     [0, 60, 84, 144, 168],
   );
   assert.deepEqual(getCameraPose(route, 400, true, { speed: 0.5 }), {
@@ -176,10 +183,9 @@ test("slowed overlays hold sharply then return, and reject a window without read
     getVelocityBlur(10, { preset: "gentle" }) <
       getVelocityBlur(10, { preset: "whip" }),
   );
-  assert.throws(
-    () => getOverlayTimings({ ...cue, until: 140 }),
-    /reading hold/,
-  );
+  assert.throws(() => {
+    return getOverlayTimings({ ...cue, until: 140 });
+  }, /reading hold/);
 });
 
 test("isolated objects use resolved departure timing with no residual motion after exit", () => {
@@ -219,10 +225,9 @@ test("scene factory applies duration and easing to the same transition", () => {
   });
   assert.equal(transition.timing.getDurationInFrames({ fps: 30 }), 48);
   assert.equal(transition.timing.getProgress({ frame: 12, fps: 30 }), 0.25);
-  assert.throws(
-    () => createSceneTransition({ kind: "cut", durationInFrames: 0 }),
-    /Cuts/,
-  );
+  assert.throws(() => {
+    return createSceneTransition({ kind: "cut", durationInFrames: 0 });
+  }, /Cuts/);
 });
 
 test("native UI scene movement has bounded blur, exact rests and an opaque outgoing dissolve", () => {

@@ -36,11 +36,13 @@ function _visibleTexts(input: Readonly<Input>): string[] {
     input.summary.label,
     input.summary.text,
     input.citationLabel,
-    ...input.sources.flatMap((source) => [
-      source.title,
-      source.excerpt,
-      ...(input.showLocators ? [source.locator] : []),
-    ]),
+    ...input.sources.flatMap((source) => {
+      return [
+        source.title,
+        source.excerpt,
+        ...(input.showLocators ? [source.locator] : []),
+      ];
+    }),
   ];
 }
 registerStockPresetAssertions({
@@ -51,7 +53,9 @@ registerStockPresetAssertions({
   invalidInputs,
   render: _render,
   excludedTextFields: ["id", "selectedSourceId", "sourceArrangement"],
-  getVisibleTexts: ({ input }) => _visibleTexts(input),
+  getVisibleTexts: ({ input }) => {
+    return _visibleTexts(input);
+  },
 });
 test("the focal citation names only the selected source's exact passage and optional locator", () => {
   fixtures.forEach(({ input }) => {
@@ -72,9 +76,9 @@ test("the focal citation names only the selected source's exact passage and opti
       (markup.match(/data-source-sheet=/g) ?? []).length,
       input.sources.length,
     );
-    input.sources.forEach((source) =>
-      assert.ok(markup.includes(`data-source-sheet="${source.id}"`)),
-    );
+    input.sources.forEach((source) => {
+      return assert.ok(markup.includes(`data-source-sheet="${source.id}"`));
+    });
     assert.notEqual(
       SvgAttributes.fromMarker({
         markup: _render({ frame: 36, input: input }),
@@ -112,10 +116,12 @@ test("both arrangements keep actual paragraph baselines within their upright sou
         label: "界".repeat(32),
         text: Array(7).fill("界".repeat(11)).join(" ").slice(0, 82),
       },
-      sources: fixtures[2].input.sources.map((source) => ({
-        ...source,
-        excerpt: Array(7).fill("界".repeat(11)).join(" ").slice(0, 78),
-      })),
+      sources: fixtures[2].input.sources.map((source) => {
+        return {
+          ...source,
+          excerpt: Array(7).fill("界".repeat(11)).join(" ").slice(0, 78),
+        };
+      }),
     };
     [18, 72, 104, 150].forEach((frame) => {
       const markup = _render({ frame: frame, input: input });
@@ -132,7 +138,9 @@ test("both arrangements keep actual paragraph baselines within their upright sou
           ),
         ].forEach(([, y, fontSize, content]) => {
           const leading = [...content.matchAll(/ dy="([^"]*)"/g)].reduce(
-            (sum, match) => sum + Number(match[1]),
+            (sum, match) => {
+              return sum + Number(match[1]);
+            },
             0,
           );
           assert.ok(

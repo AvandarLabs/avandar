@@ -26,15 +26,17 @@ export function BenefitShortfallCorrection({
       />
       <PersonGlyph x={250} y={160} color={accent} />
       <PersonGlyph x={740} y={160} color={STOCK.cyan} role="worker" />
-      {input.payments.map((payment, index) => (
-        <PaymentRow
-          key={payment.id}
-          payment={payment}
-          frame={frame}
-          index={index}
-          accent={accent}
-        />
-      ))}
+      {input.payments.map((payment, index) => {
+        return (
+          <PaymentRow
+            key={payment.id}
+            payment={payment}
+            frame={frame}
+            index={index}
+            accent={accent}
+          />
+        );
+      })}
       <PaymentLegend input={input} accent={accent} />
     </g>
   );

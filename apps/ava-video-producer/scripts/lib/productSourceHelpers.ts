@@ -30,7 +30,9 @@ export function getProductSourcePathFromFile(
   const parts = relativePath.split(path.sep);
   if (
     !["src", "shared", "packages", "public"].includes(parts[0]) ||
-    parts.some((part) => !part || part.startsWith(".")) ||
+    parts.some((part) => {
+      return !part || part.startsWith(".");
+    }) ||
     !/\.(tsx?|jsx?|css|json|svg|png|woff2?)$/.test(relativePath)
   ) {
     throw new Error(`Refusing non-product source: ${relativePath}`);

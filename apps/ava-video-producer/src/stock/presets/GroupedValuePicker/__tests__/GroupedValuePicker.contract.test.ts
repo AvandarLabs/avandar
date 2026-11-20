@@ -106,7 +106,9 @@ registerStockDefaultTextAssertions({
     ["labels", "missing"],
     ["labels", "result"],
   ],
-  suppliedInputs: FIXTURES.map(({ input }) => input),
+  suppliedInputs: FIXTURES.map(({ input }) => {
+    return input;
+  }),
 });
 
 test("literal source identities and first-selection geometry remain visible after attachment", () => {
@@ -116,21 +118,23 @@ test("literal source identities and first-selection geometry remain visible afte
   });
   const tiles = [
     ...markup.matchAll(/<rect data-observation-tile="([^"]*)"([^>]*)>/g),
-  ].map(([, id, attributes]) => [
-    id,
-    SvgAttributes.getNumberFromMarkup({ attributes: attributes, name: "x" }),
-    SvgAttributes.getNumberFromMarkup({ attributes, name: "width" }),
-    SvgAttributes.getNumberFromMarkup({ attributes, name: "stroke-width" }),
-  ]);
+  ].map(([, id, attributes]) => {
+    return [
+      id,
+      SvgAttributes.getNumberFromMarkup({ attributes: attributes, name: "x" }),
+      SvgAttributes.getNumberFromMarkup({ attributes, name: "width" }),
+      SvgAttributes.getNumberFromMarkup({ attributes, name: "stroke-width" }),
+    ];
+  });
   assert.deepEqual(tiles, [
     ["a", 48, 144, 3],
     ["b", 192, 144, 1],
     ["c", 336, 144, 1],
     ["d", 480, 144, 1],
   ]);
-  ["a", "b", "c", "d"].forEach((id) =>
-    assert.ok(markup.includes(`data-literal-value="${id}"`)),
-  );
+  ["a", "b", "c", "d"].forEach((id) => {
+    return assert.ok(markup.includes(`data-literal-value="${id}"`));
+  });
   assert.match(markup, /aria-label="2"/);
   const mode = _render({ frame: 150, input: DEFAULT_INPUT });
   assert.equal((mode.match(/data-frequency-token="4"/g) || []).length, 2);
@@ -238,11 +242,13 @@ test("tied numeric modes and included null move into separate equal-value stacks
     ],
   };
   const markup = _render({ frame: 92, input: input });
-  const values = ["a", "b", "c", "d", "e", "f"].map((id) =>
-    _getMovingCopy({ markup, id }),
-  );
+  const values = ["a", "b", "c", "d", "e", "f"].map((id) => {
+    return _getMovingCopy({ markup, id });
+  });
   assert.deepEqual(
-    values.map(({ x, y }) => [x, y]),
+    values.map(({ x, y }) => {
+      return [x, y];
+    }),
     [
       [240, 376],
       [55, 376],

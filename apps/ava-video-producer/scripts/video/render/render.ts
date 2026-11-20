@@ -13,13 +13,16 @@ import { writeRenderManifest } from "./writeRenderManifest";
 import type { Storyboard } from "../../../src/storyboard/schema/schema";
 import type { VideoThemeSnapshot } from "../../../src/videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 
-/** Delegate picture creation to the original JPEG, encode and mandatory gate path. */
+/**
+ * Delegate picture creation to the original JPEG, encode and mandatory gate
+ * path.
+ */
 export async function render(
   plan: Storyboard,
   filename: string,
   workspace: string,
   theme: VideoThemeSnapshot,
-) {
+): Promise<string> {
   const fingerprint = await fingerprintThemedPlan({
     plan,
     filename,

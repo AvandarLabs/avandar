@@ -55,7 +55,9 @@ test("canonical values reject unsupported objects, sparse arrays and nonfinite n
     Infinity,
     -Infinity,
     undefined,
-    () => 1,
+    () => {
+      return 1;
+    },
     1n,
     Symbol("value"),
     new Date(),
@@ -65,10 +67,9 @@ test("canonical values reject unsupported objects, sparse arrays and nonfinite n
     cyclic,
     { [Symbol("key")]: 1 },
   ].forEach((value) => {
-    assert.throws(
-      () => StockFingerprintModule.getCanonicalValueFromValue(value),
-      /stock value/i,
-    );
+    assert.throws(() => {
+      return StockFingerprintModule.getCanonicalValueFromValue(value);
+    }, /stock value/i);
   });
 });
 
