@@ -1,4 +1,7 @@
-import { DUR, enter, mix, ramp } from "../motion";
+import { mix } from "../motion";
+import { useVideoMotion } from "../videoTheme/useVideoMotion";
+import { useVideoShapeScales } from "../videoTheme/useVideoShapeScales";
+import { useVideoTheme, useVideoTokens } from "../videoTheme/useVideoTheme";
 import {
   assertFinite,
   assertFrame,
@@ -8,11 +11,17 @@ import {
 } from "./layout/layout";
 import { positioned } from "./positioned";
 import { SceneShell } from "./SceneShell";
-import type { MetricSceneProps } from "./scenes.types";
+import { StageTheme } from "./StageTheme/StageTheme";
+import type { MetricSceneProps as Props } from "./scenes.types";
 import type { ReactNode } from "react";
-
+/** How far the figure row rises as it arrives, in pixels. */
+const FIGURE_RISE = 10;
+/** How far the detail rises as it arrives, in pixels. */
+const DETAIL_RISE = 8;
 /**
  * A single headline metric that counts from an initial value up to its target.
+ * The figure is `text.stage.figure` in the strong brand colour, the label
+ * the `text.stage.caption` weight, on a scene palette card.
  */
 export function MetricScene({
   frame,
@@ -29,12 +38,17 @@ export function MetricScene({
   detail,
   countAtFrame = 18,
   countDurationInFrames = 36,
-}: MetricSceneProps): ReactNode {
+}: Props): ReactNode {
   assertFinite(from, "metric from");
   assertFrame(countAtFrame, "countAtFrame");
   assertFrame(countDurationInFrames, "countDurationInFrames");
   if (!countDurationInFrames)
     throw new Error("countDurationInFrames must be positive");
+  const tokens = useVideoTokens();
+  const motion = useVideoMotion();
+  const scales = useVideoShapeScales();
+  const lineHeights = useVideoTheme().mantine.lineHeights;
+  const scene = tokens.color.scene;
   const bounds = sceneBounds(width, height, Boolean(title || kicker));
   const layout = fitMetricContent({
     width: bounds.width,
@@ -47,7 +61,16 @@ export function MetricScene({
     detail,
   });
   const display = formatMetric(
-    mix(ramp(frame, countAtFrame, countDurationInFrames), from, value),
+    mix(
+      motion.ramp(
+        frame,
+        countAtFrame,
+        countDurationInFrames,
+        motion.reveal.easing,
+      ),
+      from,
+      value,
+    ),
     precision,
   );
   return (
@@ -60,21 +83,23 @@ export function MetricScene({
           alignItems: "center",
           justifyContent: "center",
           flexDirection: "column",
-          border: "1px solid var(--border)",
-          borderRadius: "var(--radius)",
-          background: "var(--card)",
+          border: `${scales.stroke(tokens.stroke.hairline)}px solid ${scene.border}`,
+          borderRadius: scales.corner(tokens.corner.scene),
+          background: scene.card,
           padding: `${layout.paddingY}px ${layout.paddingX}px`,
-          ...enter(frame, 6, { y: 12, dur: DUR.sheet }),
+          ...motion.enter(frame, 6, { dur: motion.sheet }),
         }}
       >
         <div
           style={{
             flexShrink: 0,
             fontSize: layout.label.fontSize,
-            lineHeight: 1.22,
-            fontWeight: 500,
+            ...StageTheme.getStageTextStyle({
+              role: tokens.text.stage.caption,
+              fields: ["lineHeight", "fontWeight"],
+            }),
             textAlign: "center",
-            color: "var(--muted-foreground)",
+            color: scene.mutedForeground,
           }}
         >
           {layout.label.lines.map((line, i) => {
@@ -92,16 +117,17 @@ export function MetricScene({
             margin: `${layout.numberGap}px 0`,
             whiteSpace: "nowrap",
             fontVariantNumeric: "tabular-nums",
-            ...enter(frame, 12, { y: 10 }),
+            ...motion.enter(frame, 12, { y: FIGURE_RISE }),
           }}
         >
           <span
             style={{
               fontSize: layout.numberSize,
-              lineHeight: 1.05,
-              fontWeight: 600,
-              letterSpacing: -layout.numberSize * 0.035,
-              color: "var(--brand-strong)",
+              ...StageTheme.getStageTextStyle({
+                role: tokens.text.stage.figure,
+                fields: ["lineHeight", "fontWeight", "letterSpacing"],
+              }),
+              color: scene.brandStrong,
             }}
           >
             {display}
@@ -110,8 +136,8 @@ export function MetricScene({
             <span
               style={{
                 fontSize: layout.unitSize,
-                lineHeight: 1.2,
-                color: "var(--muted-foreground)",
+                lineHeight: lineHeights["120"],
+                color: scene.mutedForeground,
               }}
             >
               {unit}
@@ -124,9 +150,11 @@ export function MetricScene({
               flexShrink: 0,
               fontSize: layout.detail.fontSize,
               textAlign: "center",
-              lineHeight: 1.3,
+              lineHeight: lineHeights.md,
               maxWidth: "100%",
-              ...enter(frame, countAtFrame + countDurationInFrames, { y: 8 }),
+              ...motion.enter(frame, countAtFrame + countDurationInFrames, {
+                y: DETAIL_RISE,
+              }),
             }}
           >
             {layout.detail.lines.map((line, i) => {

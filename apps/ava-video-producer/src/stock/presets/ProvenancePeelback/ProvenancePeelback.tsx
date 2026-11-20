@@ -1,6 +1,8 @@
 import { propEq, propNotEq } from "@avandar/utils";
-import { ramp } from "../../../motion";
-import { ProvenanceSource } from "./ProvenanceSource";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { FocalCitation } from "./FocalCitation";
+import { ProvenanceSource } from "./ProvenanceSource/ProvenanceSource";
 import { ProvenanceSummary } from "./ProvenanceSummary";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ProvenancePeelback.schema";
@@ -33,21 +35,12 @@ export function ProvenancePeelback({
         );
       })}
       <ProvenanceSummary input={input} frame={frame} accent={accent} />
-      <g
-        data-focal-citation="authored"
-        data-source-id={selected.id}
-        data-excerpt={selected.excerpt}
-        data-locator={input.showLocators ? selected.locator : undefined}
-        opacity={ramp(frame, 82, 22)}
-      >
-        <path
-          data-citation-link="selected-passage"
-          d="M464 330H480V192H512"
-          fill="none"
-          stroke={accent}
-          strokeWidth={1}
-        />
-      </g>
+      <FocalCitation
+        selected={selected}
+        showLocators={input.showLocators}
+        frame={frame}
+        accent={accent}
+      />
     </g>
   );
 }

@@ -1,3 +1,5 @@
+import { StockRect } from "../../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = { id: string; index: number; accent: string };
@@ -7,18 +9,20 @@ export function FocusedRecord({
   index,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
-    <rect
+    <StockRect
       data-focused-record={id}
       x={472}
       y={315 + index * 31}
       width={370}
       height={25}
-      rx={4}
+      rx={scales.corner(tokens.corner.chip)}
       fill={accent}
-      fillOpacity={0.12}
+      fillOpacity={scales.wash(tokens.alpha.tint)}
       stroke={accent}
-      strokeWidth={2}
+      strokeWidth={scales.stroke(tokens.stroke.default)}
     />
   );
 }

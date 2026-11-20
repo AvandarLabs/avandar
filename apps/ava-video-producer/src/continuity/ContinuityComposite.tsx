@@ -1,6 +1,6 @@
 import { ContinuityAnnotation } from "./ContinuityAnnotation";
 import { ContinuityDiagramLane } from "./ContinuityDiagramLane";
-import css from "./ContinuityScene.module.css";
+import css from "./ContinuityScene/ContinuityScene.module.css";
 import { getProductFrame } from "./continuityTimeline";
 import type { ProductSceneRenderer } from "../storyboard/StoryFilm/ShotView";
 import type { ContinuityBeat } from "./continuitySchema";

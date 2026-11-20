@@ -1,5 +1,5 @@
 import { propNotEq } from "@avandar/utils";
-import { ramp } from "../../../motion";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { makePublicCellsFromInput } from "./makePublicCellsFromInput";
 import { PublicReleaseTile } from "./PublicReleaseTile";
 import { ReleasedCountToken } from "./ReleasedCountToken";
@@ -13,10 +13,11 @@ export function PublicCountMap({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const cells = makePublicCellsFromInput(input);
   return (
     <g data-public-map="safe">
-      <g opacity={ramp(frame, 106, 12)}>
+      <g opacity={motion.reveal(frame, 106)}>
         {cells.map((cell) => {
           return (
             <PublicReleaseTile

@@ -1,5 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { BoundaryRequest } from "./BoundaryRequest";
 import { BoundaryWorker } from "./BoundaryWorker";
 import { ProtectedSlot } from "./ProtectedSlot";
@@ -15,6 +16,8 @@ export function ProtectedWorkBoundary({
   accent,
   id,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
       <defs>
@@ -25,9 +28,14 @@ export function ProtectedWorkBoundary({
           patternUnits="userSpaceOnUse"
         >
           {input.protectedPattern === "hatch" ? (
-            <path d="M0 8 L8 0" stroke={STOCK.muted} strokeWidth={1} />
+            <SketchedShape
+              shape={{ kind: "path", d: "M0 8 L8 0" }}
+              profile={tokens.sketch.shape}
+              stroke={tokens.color.inactive}
+              strokeWidth={scales.stroke(tokens.stroke.hairline)}
+            />
           ) : (
-            <circle cx={3} cy={3} r={1.2} fill={STOCK.muted} />
+            <circle cx={3} cy={3} r={1.2} fill={tokens.color.inactive} />
           )}
         </pattern>
       </defs>

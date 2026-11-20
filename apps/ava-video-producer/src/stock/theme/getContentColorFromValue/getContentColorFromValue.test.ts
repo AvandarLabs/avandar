@@ -44,3 +44,16 @@ test("content accepts colour roles but not other references", () => {
     false,
   );
 });
+
+test("a nested role such as a category colour resolves through the theme", () => {
+  assert.deepEqual(
+    [
+      contentColorSchema.safeParse("$color.categorical.4").success,
+      getContentColorFromValue("$color.categorical.4", {
+        tokens,
+        accent: "#51a7ff",
+      }),
+    ],
+    [true, "#df95aa"],
+  );
+});

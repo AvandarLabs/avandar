@@ -1,15 +1,14 @@
 import { Accordion } from "@mantine/core";
 import { useMemo, useState, type ReactNode } from "react";
-import { getTokenDefinitionFromPath } from "../../../videoTheme/tokenCatalog/tokenCatalogHelpers";
+import { getTokenDefinitionFromPath } from "../../../videoTheme/tokenCatalog/tokenCatalogHelpers/tokenCatalogHelpers";
 import { getGroupName } from "../../tokenCopy/editorCopy";
+import { groupTokenRows } from "../../tokenRows/tokenRows";
 import {
-  groupTokenRows,
-  type TokenRow as TokenRowModel,
+  type TokenRow,
   type TokenRowGroup,
-} from "../../tokenRows/tokenRows";
+} from "../../tokenRows/tokenRows.types";
 import { SectionRows } from "./SectionRows";
 import css from "./TokenSections.module.css";
-
 /** Display name for a token group key such as `atomic:color`. */
 function _groupToName(group: string): string {
   const [tier, name] = group.split(":");
@@ -19,10 +18,9 @@ function _groupToName(group: string): string {
       : undefined;
   return getGroupName(group) ?? (scaleLabel ? scaleLabel : name);
 }
-
 /** Sections for the visible rows, then the empty scales after them. */
 function useSectionGroups(
-  rows: readonly TokenRowModel[],
+  rows: readonly TokenRow[],
   emptyGroups: readonly string[],
 ): TokenRowGroup[] {
   return useMemo(() => {
@@ -34,7 +32,6 @@ function useSectionGroups(
     ];
   }, [rows, emptyGroups]);
 }
-
 /**
  * Rows grouped into accordion sections. Only open sections render their
  * rows, so a long tier stays fast. Atomic sections can add a value.
@@ -45,9 +42,9 @@ export function TokenSections({
   emptyGroups,
 }: Readonly<{
   /** The rows to show, after search and filters. */
-  rows: readonly TokenRowModel[];
+  rows: readonly TokenRow[];
   /** Every row, for choosing a free key when a value is added. */
-  allRows: readonly TokenRowModel[];
+  allRows: readonly TokenRow[];
   emptyGroups: readonly string[];
 }>): ReactNode {
   const [openGroups, setOpenGroups] = useState<string[]>([]);

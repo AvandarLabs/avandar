@@ -1,8 +1,9 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { STOCK } from "../../stockPalette";
-import { CacheOrigin } from "./CacheOrigin";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { CacheOrigin } from "./CacheOrigin/CacheOrigin";
 import { CacheRequester } from "./CacheRequester";
+import { PANEL_CORNER } from "./cacheReuseShape";
 import type { Input } from "./CacheReuse.schema";
 import type { ReactNode } from "react";
 
@@ -13,6 +14,8 @@ export function CacheParticipants({
   originActive,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
       <CacheRequester input={input} accent={accent} />
@@ -22,9 +25,9 @@ export function CacheParticipants({
         y={185}
         width={510}
         height={160}
-        rx={16}
-        fill={STOCK.surface}
-        stroke={STOCK.line}
+        rx={scales.corner(PANEL_CORNER)}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
       />
       <FitText
         text={input.systemLabels.cache}

@@ -8,10 +8,7 @@ export type HelperCategory = {
 };
 
 /** An exported name in a listed module that is deliberately not catalogued. */
-export type HelperExclusion = {
-  name: string;
-  reason: string;
-};
+export type HelperExclusion = { name: string; reason: string };
 
 /**
  * A source module whose runtime exports must all be catalogued or excluded.
@@ -21,14 +18,13 @@ export type HelperExclusion = {
 export type HelperModule = {
   path: string;
   exhaustiveMembers: readonly string[];
+  /** Plain modules whose immediate members must be catalogued or excluded. */
+  memberModules: readonly string[];
   excluded: readonly HelperExclusion[];
 };
 
 /** A named default the helper applies when the caller omits an argument. */
-export type HelperDefault = {
-  name: string;
-  value: string;
-};
+export type HelperDefault = { name: string; value: string };
 
 /** The live preview that plays a helper in isolation. */
 export type HelperDemo = {

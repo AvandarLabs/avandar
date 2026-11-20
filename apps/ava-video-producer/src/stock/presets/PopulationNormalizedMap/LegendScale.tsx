@@ -1,11 +1,13 @@
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { getZoneShadeFromFraction } from "./getZoneShadeFromFraction";
 import type { ReactNode } from "react";
 /** Inputs for LegendScale. */
 type Props = { accent: string };
-
 /**
  * A fixed zero-to-maximum shade key accompanies both explicitly named measures.
  */
 export function LegendScale({ accent }: Readonly<Props>): ReactNode {
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
       {Array.from({ length: 10 }, (_, index) => {
@@ -17,7 +19,7 @@ export function LegendScale({ accent }: Readonly<Props>): ReactNode {
             width={24}
             height={12}
             fill={accent}
-            fillOpacity={0.12 + (index / 9) * 0.76}
+            fillOpacity={scales.wash(getZoneShadeFromFraction(index / 9))}
           />
         );
       })}

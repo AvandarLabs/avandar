@@ -1,10 +1,10 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { ComparisonTags } from "./ComparisonTags";
+import { ComparisonTags } from "./ComparisonTags/ComparisonTags";
 import {
   ordinalMessage,
   pageMessage,
 } from "./DocumentRegionDriftCheck.controls";
-import { ReviewLatch } from "./ReviewLatch";
+import { ReviewLatch } from "./ReviewLatch/ReviewLatch";
 import type { Input } from "./DocumentRegionDriftCheck.schema";
 import type { ReactNode } from "react";
 

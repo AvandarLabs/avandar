@@ -4,12 +4,16 @@ import test from "node:test";
 import { prop } from "@avandar/utils";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { VaccinationSessionBalance } from "./VaccinationSessionBalance";
+import { vaccinationSessionBalanceContract } from "./VaccinationSessionBalance.contract";
 import {
   DEFAULT_INPUT,
   fixtures,
   invalidInputs,
 } from "./VaccinationSessionBalance.fixtures";
+import { inputSchema, type Input } from "./VaccinationSessionBalance.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 
 function _render({
@@ -36,12 +40,6 @@ test("Used, remaining and lost dose tokens sum exactly to starting units; people
     DEFAULT_INPUT.recipients.length,
   );
 });
-
-import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
-import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
-import { vaccinationSessionBalanceContract } from "./VaccinationSessionBalance.contract";
-import { inputSchema, type Input } from "./VaccinationSessionBalance.schema";
-
 const textLayoutOptions = {
   inputSchema,
   fixtures,
@@ -74,11 +72,10 @@ registerStockPresetAssertions({
   contract: vaccinationSessionBalanceContract,
 });
 registerStockTextLayoutAssertions(textLayoutOptions);
-
 test("tokens leave the carrier once, remain conserved and settle beside the exact recipient", () => {
   const input = fixtures[2].input;
   [24, 36, 58, 80, 108, 150].forEach((frame) => {
-    const markup = _render({ frame: frame, input: input });
+    const markup = _render({ frame, input });
     const tokens = Array.from(
       markup.matchAll(
         /<rect data-dose="([^"]*)"[^>]* x="([^"]*)" y="([^"]*)" width="11" height="16"/g,
@@ -110,10 +107,7 @@ test("tokens leave the carrier once, remain conserved and settle beside the exac
     ...input,
     recipients: [input.recipients[0]],
     units: input.units.map((unit) => {
-      return {
-        ...unit,
-        recipientId: input.recipients[0].id,
-      };
+      return { ...unit, recipientId: input.recipients[0].id };
     }),
   };
   assert.equal(inputSchema.safeParse(onePerson).success, true);
@@ -126,7 +120,6 @@ test("tokens leave the carrier once, remain conserved and settle beside the exac
     /data-recipient=/,
   );
 });
-
 test("every final destination owns precisely its authored unit identities", () => {
   const markup = _render({ frame: 150 });
   DEFAULT_INPUT.units.forEach((unit) => {
@@ -144,7 +137,6 @@ test("every final destination owns precisely its authored unit identities", () =
     }
   });
 });
-
 type TextBox = { left: number; right: number; top: number; bottom: number };
 function _getRecipientLabelBounds(markup: string): TextBox[] {
   return Array.from(
@@ -176,7 +168,6 @@ function _getRecipientLabelBounds(markup: string): TextBox[] {
     });
   });
 }
-
 test("concentrated doses stay clear of complete recipient labels and neighboring rows", () => {
   [1, 6].forEach((numRecipients) => {
     const recipients = fixtures[2].input.recipients.slice(0, numRecipients);
@@ -195,7 +186,7 @@ test("concentrated doses stay clear of complete recipient labels and neighboring
       }),
     });
     [108, 150, 167].forEach((frame) => {
-      const markup = _render({ frame: frame, input: input });
+      const markup = _render({ frame, input });
       const labels = _getRecipientLabelBounds(markup);
       assert.equal(labels.length, numRecipients * 2);
       const tokens = Array.from(

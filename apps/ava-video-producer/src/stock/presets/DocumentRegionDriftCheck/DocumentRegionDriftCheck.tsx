@@ -1,5 +1,5 @@
-import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ContentComparison } from "./ContentComparison";
 import { RegionPage } from "./RegionPage";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
@@ -13,8 +13,9 @@ export function DocumentRegionDriftCheck({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
-    <g opacity={ramp(frame, 0, 12)}>
+    <g opacity={motion.reveal(frame, 0)}>
       <LabelSlots
         labels={[
           [input.copy.context, 52, 40, 856, 18, 2],

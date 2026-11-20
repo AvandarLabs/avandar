@@ -1,22 +1,23 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import test from "node:test";
-import { getCameraPose } from "../../motion-components/cameraTrack";
-import {
-  getMotionEasing,
-  resolveMotionSettings,
-} from "../../motion-components/motionSettings";
+import { getCameraPose } from "../../motion-components/cameraTrack/cameraTrack";
+import { MotionSettings } from "../../motion-components/MotionSettings/MotionSettings";
 import { storyboardSchema } from "../../storyboard/schema/schema";
 import { durationInFrames } from "../../storyboard/schema/timeline";
 import { BUILT_IN_VIDEO_THEMES } from "../../videoTheme/builtInVideoThemes/builtInVideoThemes";
 import { makeResolvedVideoThemeFromLibrary } from "../../videoTheme/makeResolvedVideoThemeFromLibrary/makeResolvedVideoThemeFromLibrary";
 import { createContinuityPlanFromOptions } from "../continuityAppearance";
 import { CONTINUITY_CATALOG } from "../continuityCatalog";
+import { getContinuityTimeline } from "../continuityTimeline";
 import {
   createContinuityPlanFromVideoTheme,
   createMotionOptionsFromTheme,
 } from "./createContinuityPlanFromVideoTheme";
-import type { MotionOptions } from "../../motion-components/motionSettings";
+import type {
+  MotionOptions,
+  MotionSettingsTheme,
+} from "../../motion-components/MotionSettings/MotionSettings";
 import type { Storyboard } from "../../storyboard/schema/schema";
 import type { VideoThemePatch } from "../../videoTheme/videoTheme.types";
 
@@ -31,13 +32,11 @@ const CLASSIC_BLUR = {
   velocityBlurLimit: 3,
   transitionBlur: 12,
 };
-
 function _classicWith(patch: VideoThemePatch) {
   return makeResolvedVideoThemeFromLibrary(BUILT_IN_VIDEO_THEMES, "classic", {
     patches: [patch],
   });
 }
-
 function _classicWithCamera(
   cameraPreset: "authored" | (typeof PRESETS)[number],
 ) {
@@ -45,7 +44,6 @@ function _classicWithCamera(
     other: { video: { semantic: { camera: { preset: cameraPreset } } } },
   });
 }
-
 function _readPlan(path: string): Storyboard {
   return storyboardSchema.parse(
     JSON.parse(
@@ -56,15 +54,10 @@ function _readPlan(path: string): Storyboard {
     ),
   );
 }
-
 const PLANS = CONTINUITY_CATALOG.map((entry) => {
-  return {
-    id: entry.id,
-    plan: _readPlan(entry.path),
-  };
+  return { id: entry.id, plan: _readPlan(entry.path) };
 });
 const HANDOFF = _readPlan("explainers/study-shared-object-handoff");
-
 function _cameraKeys(plan: Storyboard) {
   return plan.shots.flatMap((shot) => {
     return shot.scene !== "continuity"
@@ -76,7 +69,6 @@ function _cameraKeys(plan: Storyboard) {
         });
   });
 }
-
 /**
  * Every camera pose of every stock beat, frame by frame, with the beat's
  * options or the given ones.
@@ -89,18 +81,17 @@ function _cameraPoses(plan: Storyboard, options?: MotionOptions) {
           const content = beat.content;
           return content.kind === "stock" && content.camera
             ? Array.from({ length: beat.duration }, (_, frame) => {
-                return getCameraPose(
-                  content.camera,
+                return getCameraPose({
+                  keys: content.camera,
                   frame,
-                  true,
-                  options ?? content.cameraOptions,
-                );
+                  enabled: true,
+                  options: options ?? content.cameraOptions,
+                });
               })
             : [];
         });
   });
 }
-
 test("a motion preset expands from the theme's camera presets", () => {
   assert.deepEqual(
     createMotionOptionsFromTheme({ preset: "whip" }, CLASSIC.semantic),
@@ -112,7 +103,6 @@ test("a motion preset expands from the theme's camera presets", () => {
     },
   );
 });
-
 test("authored motion values win over the theme", () => {
   const options = createMotionOptionsFromTheme(
     { preset: "whip", speed: 2, samples: 4 },
@@ -123,14 +113,13 @@ test("authored motion values win over the theme", () => {
     [2, 4, 240],
   );
 });
-
-test("a cue without a preset keeps its own timing and curve and takes the theme's blur", () => {
+test("a cue without a preset takes the default preset's speed, keeps its curve, and takes the theme's blur", () => {
   assert.deepEqual(createMotionOptionsFromTheme(undefined, CLASSIC.semantic), {
+    speed: 1,
     shutterAngle: 180,
     ...CLASSIC_BLUR,
   });
 });
-
 test("a theme's preset speed reaches the motion", () => {
   const theme = _classicWith({
     other: { video: { atomic: { cameraSpeed: { whip: 2 } } } },
@@ -140,11 +129,12 @@ test("a theme's preset speed reaches the motion", () => {
     2,
   );
 });
-
 test("the unthemed motion presets and blur defaults equal classic's", () => {
   PRESETS.forEach((preset) => {
     const themed = createMotionOptionsFromTheme({ preset }, CLASSIC.semantic);
-    const unthemed = resolveMotionSettings({ preset });
+    const unthemed = MotionSettings.resolveMotionSettings({
+      options: { preset },
+    });
     assert.deepEqual(
       [themed.speed, themed.shutterAngle],
       [unthemed.speed, unthemed.shutterAngle],
@@ -152,20 +142,24 @@ test("the unthemed motion presets and blur defaults equal classic's", () => {
     );
     [0.1, 0.25, 0.5, 0.75, 0.9].forEach((progress) => {
       assert.equal(
-        getMotionEasing({ easing: themed.easing })(progress),
-        getMotionEasing({ preset })(progress),
+        MotionSettings.getMotionEasing({ options: { easing: themed.easing } })(
+          progress,
+        ),
+        MotionSettings.getMotionEasing({ options: { preset } })(progress),
         preset,
       );
     });
   });
   const {
+    speed,
     shutterAngle,
     samples,
     velocityBlurFactor,
     velocityBlurLimit,
     transitionBlur,
-  } = resolveMotionSettings();
+  } = MotionSettings.resolveMotionSettings({});
   assert.deepEqual(createMotionOptionsFromTheme(undefined, CLASSIC.semantic), {
+    speed,
     shutterAngle,
     samples,
     velocityBlurFactor,
@@ -173,7 +167,6 @@ test("the unthemed motion presets and blur defaults equal classic's", () => {
     transitionBlur,
   });
 });
-
 test("classic keeps every catalog film's timing and camera path", () => {
   PLANS.forEach(({ id, plan }) => {
     const themed = createContinuityPlanFromVideoTheme(plan, CLASSIC);
@@ -182,7 +175,6 @@ test("classic keeps every catalog film's timing and camera path", () => {
     assert.equal(storyboardSchema.safeParse(themed).success, true, id);
   });
 });
-
 test("a theme camera preset lengthens travel without truncating holds or modifying the plan", () => {
   const before = structuredClone(HANDOFF);
   const themed = createContinuityPlanFromVideoTheme(
@@ -207,7 +199,6 @@ test("a theme camera preset lengthens travel without truncating holds or modifyi
     },
   );
 });
-
 test("every theme camera preset moves the camera exactly as the matching motion preset", () => {
   PRESETS.forEach((preset) => {
     const themed = createContinuityPlanFromVideoTheme(
@@ -221,7 +212,6 @@ test("every theme camera preset moves the camera exactly as the matching motion 
     );
   });
 });
-
 test("every catalog film stays valid with every theme camera preset, which camera motion off ignores", () => {
   PLANS.forEach(({ id, plan }) => {
     const still = createContinuityPlanFromOptions(plan, {
@@ -244,13 +234,71 @@ test("every catalog film stays valid with every theme camera preset, which camer
     });
   });
 });
-
+/**
+ * Each continuity shot's beats with the reading hold each one keeps between
+ * its incoming and outgoing overlap, and the frame its `TransitionSeries`
+ * ends on, with overlaps sized as `ContinuityScene` sizes them.
+ */
+function _renderedBeatSchedules({
+  plan,
+  settings,
+}: Readonly<{ plan: Storyboard; settings?: MotionSettingsTheme }>) {
+  return plan.shots.flatMap((shot) => {
+    if (shot.scene !== "continuity") {
+      return [];
+    }
+    const { beats } = shot.props;
+    const overlaps = beats.map((beat, index) => {
+      return index === 0
+        ? 0
+        : MotionSettings.getMotionDuration({
+            frames: beat.transition.frames,
+            options: beat.transition.motion,
+            theme: settings,
+          });
+    });
+    const holds = beats.map((beat, index) => {
+      return beat.duration - overlaps[index] - (overlaps[index + 1] ?? 0);
+    });
+    const end = beats.reduce((sum, beat, index) => {
+      return sum + beat.duration - overlaps[index];
+    }, 0);
+    return [{ shot, holds, end }];
+  });
+}
+test("a theme's default camera speed retimes continuity beats the way they render", () => {
+  [0.15, 0.6, 1.5].forEach((brisk) => {
+    const theme = _classicWith({
+      other: { video: { atomic: { cameraSpeed: { brisk } } } },
+    });
+    const settings = MotionSettings.makeMotionSettingsThemeFromVideoTheme({
+      theme,
+    });
+    PLANS.forEach(({ id, plan }) => {
+      const themed = createContinuityPlanFromVideoTheme(plan, theme);
+      const authored = _renderedBeatSchedules({ plan });
+      _renderedBeatSchedules({ plan: themed, settings }).forEach(
+        ({ shot, holds, end }, index) => {
+          const label = `${id}: ${shot.id} at ${brisk}`;
+          const props = shot.scene === "continuity" ? shot.props : undefined;
+          const timeline = getContinuityTimeline(props?.beats ?? []);
+          assert.equal(timeline[timeline.length - 1].end, end, label);
+          assert.equal(shot.durationInFrames, end, label);
+          holds.forEach((hold, beat) => {
+            assert.ok(hold >= authored[index].holds[beat], label);
+          });
+        },
+      );
+      const result = storyboardSchema.safeParse(themed);
+      assert.equal(result.success, true, `${id}: ${result.error?.message}`);
+    });
+  });
+});
 test("applying the same theme twice changes nothing", () => {
   const theme = _classicWithCamera("gentle");
   const once = createContinuityPlanFromVideoTheme(HANDOFF, theme);
   assert.deepEqual(createContinuityPlanFromVideoTheme(once, theme), once);
 });
-
 test("the theme's zoom limit keeps every camera key inside it and inside the diagram", () => {
   const theme = _classicWith({
     other: { video: { atomic: { zoom: { max: 1.5 } } } },
@@ -271,7 +319,6 @@ test("the theme's zoom limit keeps every camera key inside it and inside the dia
     assert.equal(storyboardSchema.safeParse(themed).success, true, id);
   });
 });
-
 test("a camera curve that overshoots its framings is refused", () => {
   // The resolver refuses the curve before the plan is themed.
   const patch = {

@@ -10,17 +10,20 @@ export type CompositionExportOptions =
   | ContinuityAppearance
   | Pick<ContinuityAppearance, "captions">;
 
+type GetExportOptionsFromAcknowledgementOptions = {
+  id: string;
+  isScene: boolean;
+  draft: ContinuityAppearance;
+  acknowledged: { id: string; options: ContinuityAppearance } | undefined;
+};
 /**
  * The options a download may use, or undefined until the active player has
  * acknowledged them. A continuity player must echo the whole draft; a scene
  * player only has to answer for its own id.
  */
-export function getExportOptionsFromAcknowledgement(options: {
-  id: string;
-  isScene: boolean;
-  draft: ContinuityAppearance;
-  acknowledged: { id: string; options: ContinuityAppearance } | undefined;
-}): CompositionExportOptions | undefined {
+export function getExportOptionsFromAcknowledgement(
+  options: GetExportOptionsFromAcknowledgementOptions,
+): CompositionExportOptions | undefined {
   const { id, isScene, draft, acknowledged } = options;
   if (acknowledged?.id !== id) {
     return undefined;

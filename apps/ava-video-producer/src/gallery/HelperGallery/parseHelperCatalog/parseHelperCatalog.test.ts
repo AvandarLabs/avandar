@@ -37,7 +37,9 @@ test("preserves authored helper metadata in catalog order", () => {
   const catalog = parseHelperCatalog(createCatalog());
   assert.deepEqual(catalog.helpers, [{ ...HELPER, relatedSources: [] }]);
   assert.deepEqual(catalog.categories, [CATEGORY]);
-  assert.deepEqual(catalog.modules, [{ ...MODULE, exhaustiveMembers: [] }]);
+  assert.deepEqual(catalog.modules, [
+    { ...MODULE, exhaustiveMembers: [], memberModules: [] },
+  ]);
 });
 
 test("rejects unknown fields instead of dropping authored copy", () => {
@@ -106,9 +108,7 @@ test("rejects an empty related source path", () => {
 test("rejects a declared category with no helpers", () => {
   assert.throws(() => {
     return parseHelperCatalog(
-      createCatalog({
-        categories: [CATEGORY, { ...CATEGORY, id: "empty" }],
-      }),
+      createCatalog({ categories: [CATEGORY, { ...CATEGORY, id: "empty" }] }),
     );
   }, /Category "empty" has no helpers/);
 });
@@ -131,9 +131,7 @@ test("rejects non-integer preview lengths and empty export lists", () => {
 test("rejects an exclusion without a reason", () => {
   assert.throws(() => {
     return parseHelperCatalog(
-      createCatalog({
-        modules: [{ ...MODULE, excluded: [{ name: "span" }] }],
-      }),
+      createCatalog({ modules: [{ ...MODULE, excluded: [{ name: "span" }] }] }),
     );
   });
 });

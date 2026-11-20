@@ -35,9 +35,9 @@ function useCopyThemeJson(state: VideoThemeDraftState): () => Promise<void> {
  * Owns the one theme draft every Atlas modal edits, and makes the saved
  * active theme the ambient video theme source. It sets no Mantine theme:
  * each preview gets its own `GalleryItemTheme`, so the gallery chrome never
- * picks up video tokens. Wrap the Motions, Compositions, and Sample films
- * sections in it. Its value keeps its identity until the draft state or
- * the resolved draft changes, so consumers skip unrelated renders.
+ * picks up video tokens. Wrap the Motions, Compositions, Sample films, and
+ * Helpers sections in it. Its value keeps its identity until the draft state
+ * or the resolved draft changes, so consumers skip unrelated renders.
  */
 export function GalleryVideoTheme({
   children,

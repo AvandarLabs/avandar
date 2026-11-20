@@ -60,15 +60,11 @@ registerStockPresetAssertions({
     {
       ...DEFAULT_INPUT,
       attempts: DEFAULT_INPUT.attempts.map((attempt) => {
-        return {
-          ...attempt,
-          outcome: "complete",
-        };
+        return { ...attempt, outcome: "complete" };
       }),
     },
   ],
 });
-
 test("waiting brackets preserve supplied delay ratios and only declared attempts exist", () => {
   const markup = _render({ frame: 150, input: DEFAULT_INPUT });
   const brackets = [
@@ -123,21 +119,15 @@ test("extreme increasing waits keep distinct markers and finite geometry at ever
   const input: Input = {
     ...FIXTURES[2].input,
     attempts: FIXTURES[2].input.attempts.map((attempt, index) => {
-      return {
-        ...attempt,
-        delayAfter: [1, 15, 16, 0][index],
-      };
+      return { ...attempt, delayAfter: [1, 15, 16, 0][index] };
     }),
   };
   Array.from({ length: 180 }, (_, frame) => {
     return frame;
   }).forEach((frame) => {
-    return assert.doesNotMatch(
-      _render({ frame: frame, input: input }),
-      /NaN|Infinity/,
-    );
+    return assert.doesNotMatch(_render({ frame, input }), /NaN|Infinity/);
   });
-  const markup = _render({ frame: 150, input: input });
+  const markup = _render({ frame: 150, input });
   const markers = [
     ...markup.matchAll(/<circle[^>]*data-attempt-index="\d+"[^>]*>/g),
   ].map(([value]) => {

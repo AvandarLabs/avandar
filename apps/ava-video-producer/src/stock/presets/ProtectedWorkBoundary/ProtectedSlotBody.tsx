@@ -1,4 +1,5 @@
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./ProtectedWorkBoundary.schema";
 import type { ReactNode } from "react";
 
@@ -17,17 +18,19 @@ export function ProtectedSlotBody({
   accent,
   id,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
       {" "}
-      <rect
+      <StockRect
         data-slot-body={slot.id}
         x={x}
         y={210}
         width={width}
         height={300}
-        fill={STOCK.surface}
-        stroke={slot.kind === "work" ? STOCK.line : accent}
+        fill={tokens.color.surface}
+        stroke={slot.kind === "work" ? tokens.color.line : accent}
       />
       {slot.kind !== "work" ? (
         <rect
@@ -36,7 +39,7 @@ export function ProtectedSlotBody({
           width={width - 4}
           height={296}
           fill={`url(#${id}-protected)`}
-          opacity={0.2}
+          opacity={atomic.opacity["20"]}
         />
       ) : undefined}
     </g>

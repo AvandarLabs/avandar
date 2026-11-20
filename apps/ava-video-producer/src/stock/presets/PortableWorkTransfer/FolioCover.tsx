@@ -1,5 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./PortableWorkTransfer.schema";
 import type { ReactNode } from "react";
 
@@ -13,20 +14,22 @@ export function FolioCover({
   opening,
   frame,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const isClosed = frame >= 92 && opening === 0;
   const cover = {
     x: folioX,
     y: 198,
     width: 264 * (1 - opening),
     height: input.artifacts.length * 86 + 10,
-    rx: 8,
-    fill: STOCK.elevated,
-    stroke: STOCK.orange,
+    rx: scales.corner(tokens.corner.cell),
+    fill: tokens.color.elevated,
+    stroke: tokens.color.highlight,
     opacity: frame >= 92 ? 1 : 0,
   };
   return (
     <g>
-      <rect
+      <StockRect
         data-folio-cover="true"
         data-folio-closed={isClosed ? true : undefined}
         {...cover}

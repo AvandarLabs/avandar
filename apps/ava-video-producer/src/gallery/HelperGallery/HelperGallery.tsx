@@ -3,7 +3,7 @@ import { useState } from "react";
 import { AtlasCategoryNav } from "../AtlasLayout/AtlasCategoryNav/AtlasCategoryNav";
 import { AtlasCollection } from "../AtlasLayout/AtlasCollection/AtlasCollection";
 import { AtlasDialog } from "../AtlasLayout/AtlasDialog/AtlasDialog";
-import { AtlasSections } from "../MotionGallery/AtlasSections";
+import { AtlasSections } from "../MotionGallery/AtlasSections/AtlasSections";
 import { GalleryHeader } from "../MotionGallery/GalleryHeader";
 import { Icon } from "../MotionGallery/Icon";
 import { isReducedMotionPreferred } from "../MotionGallery/isReducedMotionPreferred";

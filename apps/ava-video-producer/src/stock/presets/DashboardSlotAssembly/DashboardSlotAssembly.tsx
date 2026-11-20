@@ -1,7 +1,6 @@
 import { propEq } from "@avandar/utils";
-import { ramp } from "../../../motion";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { DashboardContext } from "./DashboardContext";
 import { DashboardGuides } from "./DashboardGuides";
 import { DashboardWidgetPanel } from "./DashboardWidgetPanel";
@@ -15,13 +14,10 @@ const BOARD = {
   y: 120,
   width: 928,
   height: 468,
-  rx: 12,
   fill: "none",
-  stroke: STOCK.line,
-  strokeWidth: 2,
 } satisfies Pick<
   ComponentProps<"rect">,
-  "x" | "y" | "width" | "height" | "rx" | "fill" | "stroke" | "strokeWidth"
+  "x" | "y" | "width" | "height" | "fill"
 >;
 /** Authored panels dock into a common scope with fixed readable type. */
 export function DashboardSlotAssembly({
@@ -29,10 +25,19 @@ export function DashboardSlotAssembly({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const panelProps = { input, frame, accent };
   return (
     <g>
-      <StockRect {...BOARD} opacity={ramp(frame, 12, 12)} />
+      <StockRect
+        {...BOARD}
+        rx={scales.corner(tokens.corner.card)}
+        stroke={tokens.color.line}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
+        opacity={motion.reveal(frame, 12)}
+      />
       {input.showGuides && frame < 130 ? (
         <DashboardGuides layout={input.layout} frame={frame} accent={accent} />
       ) : undefined}

@@ -1,11 +1,11 @@
 .essentialsGroup {
-  border-bottom: 1px solid var(--line);
+  border-bottom: var(--atlas-border-1) solid var(--line);
 }
 
 .essentialsGroupTitle {
   color: var(--ink);
-  font-size: 12px;
-  font-weight: 650;
-  letter-spacing: 0.02em;
+  font-size: var(--atlas-font-size-12);
+  font-weight: var(--atlas-font-weight-650);
+  letter-spacing: var(--atlas-tracking-em-wide-0-02);
   margin: 0;
 }

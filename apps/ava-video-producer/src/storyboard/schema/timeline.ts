@@ -1,12 +1,9 @@
 import { getCueWindowFromShot } from "./getCueWindowFromShot";
-import type { Shot, Storyboard } from "./storyboardSchema";
-
+import type { Shot, Storyboard } from "./storyboardSchema/storyboardSchema";
 /** A shot with its absolute first frame and the frame after its last. */
 type TimelineShot = Shot & { startFrame: number; endFrame: number };
-
 /** A narration cue whose frames are absolute film frames. */
 type NarrationCue = Storyboard["narration"][number];
-
 /**
  * Compute shot starts once, in the same coordinate system as exported captions.
  */
@@ -22,7 +19,6 @@ export function timeline(plan: Storyboard): TimelineShot[] {
     return entry;
   });
 }
-
 /**
  * The absolute first frames of the shots that declare a hard cut with
  * `transition: {kind: "cut"}`, in film order. The storyboard render passes
@@ -37,13 +33,11 @@ export function declaredCutFrames(plan: Storyboard): number[] {
       return shot.startFrame;
     });
 }
-
 export function durationInFrames(plan: Storyboard): number {
   return plan.shots.reduce((sum, shot) => {
     return sum + shot.durationInFrames;
   }, 0);
 }
-
 /** Resolve local narration cues to absolute film frames. */
 export function absoluteCues(plan: Storyboard): NarrationCue[] {
   const shots = timeline(plan);

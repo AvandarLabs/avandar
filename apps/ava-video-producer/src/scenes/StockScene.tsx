@@ -1,6 +1,7 @@
 import { loopPhase } from "../motion";
 import { STOCK_LOOP_FRAMES } from "../stock/catalog";
 import { StockGraphic } from "../stock/StockGraphic/StockGraphic";
+import { useVideoTokens } from "../videoTheme/useVideoTheme";
 import { SceneShell } from "./SceneShell";
 import type { StockRequest } from "../stock/contracts/StockContract.types";
 import type { SceneBase } from "./scenes.types";
@@ -11,7 +12,8 @@ export type Props = SceneBase & StockRequest;
 
 /**
  * Conceptual stock graphics repeat their six-second cycle; authored content is
- * preserved.
+ * preserved. The graphic sits on the request's background, or the theme's
+ * `color.ground`.
  */
 export function StockScene({
   frame,
@@ -21,6 +23,7 @@ export function StockScene({
   kicker,
   ...request
 }: Props): ReactNode {
+  const tokens = useVideoTokens();
   const top = title || kicker ? 200 : 0;
   return (
     <SceneShell
@@ -37,7 +40,7 @@ export function StockScene({
           left: 0,
           width,
           height: height - top,
-          background: request.background ?? "#0b1219",
+          background: request.background ?? tokens.color.ground,
         }}
       >
         <StockGraphic

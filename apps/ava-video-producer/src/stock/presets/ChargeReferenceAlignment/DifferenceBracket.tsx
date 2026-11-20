@@ -1,4 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./ChargeReferenceAlignment.schema";
 import type { getComparisonFromInput } from "./getComparisonFromInput";
 import type { ReactNode } from "react";
@@ -20,11 +22,16 @@ export function DifferenceBracket({
   precision,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g opacity={progress} data-difference-minor={comparison.difference}>
-      <path
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${290 + (comparison.reference / comparison.domain) * 600 * progress} 490 v8 H${290 + (comparison.billed / comparison.domain) * 600 * progress} v-8`,
+        }}
+        profile={tokens.sketch.shape}
         data-difference-bracket=""
-        d={`M${290 + (comparison.reference / comparison.domain) * 600 * progress} 490 v8 H${290 + (comparison.billed / comparison.domain) * 600 * progress} v-8`}
         stroke={accent}
         fill="none"
       />

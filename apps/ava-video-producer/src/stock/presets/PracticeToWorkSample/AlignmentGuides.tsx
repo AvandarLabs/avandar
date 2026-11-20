@@ -1,17 +1,26 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./PracticeToWorkSample.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input };
 /** Alignment Guides for the authored scene. */
 export function AlignmentGuides({ input }: Readonly<Props>): ReactNode {
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return input.showAlignmentGuides ? (
-    <path
-      data-alignment-guide={input.task.value}
-      d={`M30 24 V75 M${30 + input.task.value * 12} 24 V75`}
-      stroke={STOCK.muted}
-      strokeWidth={1}
-      strokeDasharray="3 4"
-    />
+    <g data-alignment-guide={input.task.value}>
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M30 24 V75 M${30 + input.task.value * 12} 24 V75`,
+        }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.inactive}
+        strokeWidth={scales.stroke(tokens.stroke.hairline)}
+        strokeDasharray={atomic.dash.short.join(" ")}
+      />
+    </g>
   ) : undefined;
 }

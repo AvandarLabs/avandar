@@ -1,16 +1,10 @@
 import { mix, ramp } from "../../../motion";
-import {
-  useGraphicMotion,
-  useGraphicProps,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Props as BranchProps } from "./DecisionBranch";
 import type { ReactNode } from "react";
 
 type Props = Pick<BranchProps, "branch" | "x" | "frame" | "isSelected">;
-
 const CLOSE_CUE = 60;
-
 /** Untaken alternatives close gently before the marker leaves the junction. */
 export function DecisionGate({
   branch,
@@ -18,16 +12,19 @@ export function DecisionGate({
   frame,
   isSelected,
 }: Readonly<Props>): ReactNode {
-  const style = useGraphicProps("DecisionFork", {});
-  const { color } = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const closed = isSelected ? 0 : ramp(frame, CLOSE_CUE, motion.sheet);
+  const style = GraphicThemeHooks.useGraphicProps("DecisionFork", {});
+  const { color } = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const closed = isSelected
+    ? 0
+    : ramp(frame, CLOSE_CUE, motion.sheet, motion.reveal.easing);
   const spread = mix(closed, 0, style.gateSpread);
   return (
     <g
       opacity={closed}
       stroke={color.inactive}
-      strokeWidth={style.gateWidth}
+      strokeWidth={scales.stroke(style.gateWidth)}
       data-closed-gate={branch.id}
     >
       <path

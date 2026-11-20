@@ -1,0 +1,24 @@
+.sections {
+  background: var(--paper);
+  border-bottom: var(--atlas-border-1) solid var(--line);
+  display: flex;
+  gap: var(--atlas-space-24);
+  padding: 0 var(--atlas-space-32);
+}
+
+.section {
+  border-bottom: var(--atlas-border-2) solid transparent;
+  color: var(--atlas-color-muted);
+  font-size: var(--atlas-font-size-14);
+  padding: var(--atlas-space-16) 0;
+  text-decoration: none;
+}
+
+.section:hover {
+  color: var(--ink);
+}
+
+.active {
+  border-bottom-color: var(--ava-primary-6);
+  color: var(--ink);
+}

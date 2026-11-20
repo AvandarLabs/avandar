@@ -1,16 +1,17 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { normalizeFiniteRange } from "../../numeric/normalizeFiniteRange/normalizeFiniteRange";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { UncertaintyAxis } from "./UncertaintyAxis";
-import { UncertaintyReference } from "./UncertaintyReference";
+import { UncertaintyReference } from "./UncertaintyReference/UncertaintyReference";
 import { UncertaintyValues } from "./UncertaintyValues";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./UncertaintyUnfold.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
-
 /** Supplied bounds unfold around a point on one fixed finite ruler. */
 export function UncertaintyUnfold({
   frame,
@@ -18,6 +19,8 @@ export function UncertaintyUnfold({
   accent,
   id,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const scale = (value: number) => {
     return (
       100 +
@@ -32,14 +35,14 @@ export function UncertaintyUnfold({
   const pointX = scale(input.estimate.point),
     lowerX = scale(input.estimate.lower),
     upperX = scale(input.estimate.upper);
-  const unfold = ramp(frame, 38, 48, EASE.inOut),
-    referenceProgress = ramp(frame, 90, 24);
+  const unfold = motion.ramp(frame, 38, motion.scale(48), motion.travel.easing),
+    referenceProgress = motion.ramp(frame, 90, motion.scale(24));
   const left = mix(unfold, pointX, lowerX),
     right = mix(unfold, pointX, upperX);
   const referenceX = input.reference ? scale(input.reference.value) : 0;
   const patternId = `interval-${encodeURIComponent(id)}`;
   return (
-    <g opacity={ramp(frame, 12, 20)}>
+    <g opacity={motion.ramp(frame, 12, motion.scale(20))}>
       <defs>
         <pattern
           id={patternId}
@@ -47,15 +50,16 @@ export function UncertaintyUnfold({
           height={10}
           patternUnits="userSpaceOnUse"
         >
-          <path
-            d="M-2 2 L2 -2 M0 10 L10 0 M8 12 L12 8"
+          <SketchedShape
+            shape={{ kind: "path", d: "M-2 2 L2 -2 M0 10 L10 0 M8 12 L12 8" }}
+            profile={tokens.sketch.shape}
             stroke={accent}
-            strokeOpacity={0.5}
+            strokeOpacity={tokens.alpha.guide}
           />
         </pattern>
       </defs>
       <UncertaintyAxis input={input} />
-      <rect
+      <StockRect
         data-interval-band="true"
         x={left}
         y={278}
@@ -65,21 +69,17 @@ export function UncertaintyUnfold({
         stroke={accent}
         strokeOpacity={unfold}
       />
-      <line
+      <SketchedShape
+        shape={{ kind: "line", x1: left, y1: 270, x2: left, y2: 330 }}
+        profile={tokens.sketch.shape}
         data-lower-endpoint="true"
-        x1={left}
-        x2={left}
-        y1={270}
-        y2={330}
         stroke={accent}
         opacity={unfold}
       />
-      <line
+      <SketchedShape
+        shape={{ kind: "line", x1: right, y1: 270, x2: right, y2: 330 }}
+        profile={tokens.sketch.shape}
         data-upper-endpoint="true"
-        x1={right}
-        x2={right}
-        y1={270}
-        y2={330}
         stroke={accent}
         opacity={unfold}
       />
@@ -115,7 +115,7 @@ export function UncertaintyUnfold({
           anchor="middle"
           breakLongWords
           normalizeWhitespace
-          color={STOCK.muted}
+          color={tokens.color.textMuted}
         />
         <FitText
           text={input.interval.label}
@@ -129,7 +129,7 @@ export function UncertaintyUnfold({
           color={accent}
         />
       </g>
-      <g opacity={ramp(frame, 108, 12)}>
+      <g opacity={motion.reveal(frame, 108)}>
         <FitText
           text={input.interpretation}
           x={100}

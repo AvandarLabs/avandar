@@ -1,7 +1,8 @@
 import { ramp } from "../../../motion";
 import { normalizeFiniteRange } from "../../numeric/normalizeFiniteRange/normalizeFiniteRange";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getRehearsalStateFromInputAndFrame } from "./getRehearsalStateFromInputAndFrame";
 import { RehearsalOutput } from "./RehearsalOutput";
 import { RehearsalRuler } from "./RehearsalRuler";
@@ -10,6 +11,8 @@ import type { Input } from "./LinkedParameterRehearsal.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
+/** Frames the source lane takes to fade in. */
+const INTRO_FRAMES = 20;
 /**
  * Direct dependent pointers rehearse a source change and restore its
  * baseline.
@@ -19,7 +22,13 @@ export function LinkedParameterRehearsal({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { value, label } = getRehearsalStateFromInputAndFrame({ frame, input });
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const { value, label } = getRehearsalStateFromInputAndFrame({
+    frame,
+    input,
+    motion,
+  });
   const sourceX =
     380 +
     270 *
@@ -38,7 +47,14 @@ export function LinkedParameterRehearsal({
       });
   return (
     <g>
-      <g opacity={ramp(frame, 12, 20)}>
+      <g
+        opacity={ramp(
+          frame,
+          12,
+          motion.scale(INTRO_FRAMES),
+          motion.reveal.easing,
+        )}
+      >
         <FitText
           text={input.contextLabel}
           x={64}
@@ -48,7 +64,7 @@ export function LinkedParameterRehearsal({
           maxLines={2}
           breakLongWords
           normalizeWhitespace
-          color={STOCK.muted}
+          color={tokens.color.textMuted}
         />
         <FitText
           text={label}
@@ -70,13 +86,12 @@ export function LinkedParameterRehearsal({
           y={170}
         />
         {input.showBaselineMarkers ? (
-          <circle
-            cx={baselineX}
-            cy={170}
-            r={10}
+          <SketchedShape
+            shape={{ kind: "circle", cx: baselineX, cy: 170, r: 10 }}
+            profile={tokens.sketch.shape}
             fill="none"
             stroke={accent}
-            strokeOpacity={0.5}
+            strokeOpacity={tokens.alpha.guide}
           />
         ) : undefined}
         <circle

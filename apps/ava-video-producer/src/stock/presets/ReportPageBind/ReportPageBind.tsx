@@ -1,6 +1,6 @@
 import { DestinationTray } from "./DestinationTray";
 import { ReportHeader } from "./ReportHeader";
-import { ReportPage } from "./ReportPage";
+import { ReportPage } from "./ReportPage/ReportPage";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ReportPageBind.schema";
 import type { ReactNode } from "react";

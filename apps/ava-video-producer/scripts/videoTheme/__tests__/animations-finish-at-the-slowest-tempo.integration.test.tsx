@@ -1,10 +1,15 @@
 /** @jsxRuntime automatic */
 /*
- * At the slowest tempo (0.8) every in-scope animation still finishes
- * before its stock loop or continuity beat ends. Tempo stretches only
- * one-shot animations, never cue frames or repeating motion, so a stock
- * graphic has finished when its picture at the slowest tempo equals its
- * picture at tempo 1.
+ * Stock and continuity animations follow tempo. At the slowest tempo (0.8)
+ * every animation still finishes before its stock loop or continuity beat
+ * ends: every stock preset, and every continuity composition. Tempo
+ * stretches only one-shot animations, never cue frames or repeating motion,
+ * so a stock graphic has finished when its picture at the slowest tempo
+ * equals its picture at tempo 1. While it animates, the two pictures must
+ * differ somewhere, or none of its animation lengths reads tempo. The fixed
+ * compositions (`Demo`, `MotionLab`, `TitleStudy`, the title card) need
+ * Remotion's frame hook stubbed, so their half of this guard is
+ * `src/compositions/__tests__/fixed-compositions-finish-at-the-slowest-tempo`.
  */
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -12,17 +17,14 @@ import test from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { CONTINUITY_CATALOG } from "../../../src/continuity/continuityCatalog";
 import { sampleStockFrame } from "../../../src/continuity/continuityTimeline";
-import { getMotionDuration } from "../../../src/motion-components/motionSettings";
+import { MotionSettings } from "../../../src/motion-components/MotionSettings/MotionSettings";
+import { STOCK_IDS } from "../../../src/stock/catalog";
 import { StockGraphic } from "../../../src/stock/StockGraphic/StockGraphic";
 import { storyboardSchema } from "../../../src/storyboard/schema/schema";
 import { BUILT_IN_VIDEO_THEMES } from "../../../src/videoTheme/builtInVideoThemes/builtInVideoThemes";
 import { createVideoMotion } from "../../../src/videoTheme/createVideoMotion/createVideoMotion";
 import { makeResolvedVideoThemeFromLibrary } from "../../../src/videoTheme/makeResolvedVideoThemeFromLibrary/makeResolvedVideoThemeFromLibrary";
 import { VideoThemeScope } from "../../../src/videoTheme/VideoThemeScope/VideoThemeScope";
-import {
-  PARITY_COMPOSITION_IDS,
-  PARITY_STOCK_PRESET_IDS,
-} from "../themeParity/parityTargets/parityTargets";
 import type { ContinuityBeat } from "../../../src/continuity/continuitySchema";
 import type { StockRequest } from "../../../src/stock/contracts/StockContract.types";
 import type { VideoThemePatch } from "../../../src/videoTheme/videoTheme.types";
@@ -33,21 +35,31 @@ const SLOWEST_TEMPO: VideoThemePatch = {
 /** The last frame of a 180-frame stock loop. */
 const LAST_LOOP_FRAME = 179;
 /**
+ * Presets whose motion only repeats (orbits, drifts, packet flow). Tempo
+ * never stretches a repeating motion, so their pictures match at every
+ * tempo.
+ */
+const REPEATING_MOTION_PRESETS: ReadonlySet<string> = new Set([
+  "orbital-system",
+  "packet-stream",
+  "plexus-field",
+]);
+/** Frames from the first cue to well inside every one-shot animation. */
+const MID_ANIMATION_FRAMES = Array.from({ length: 41 }, (_, index) => {
+  return index * 3;
+});
+/**
  * Cue frames from `ContinuityToken`: the shared object fades in at 12 and an
  * outline starts fading 60 frames into its beat.
  */
 const SHARED_OBJECT_FADE_IN_AT = 12;
 const OUTLINE_FADE_AT = 60;
-
 const slowest = makeResolvedVideoThemeFromLibrary(
   BUILT_IN_VIDEO_THEMES,
   "classic",
-  {
-    patches: [SLOWEST_TEMPO],
-  },
+  { patches: [SLOWEST_TEMPO] },
 );
 const motion = createVideoMotion(slowest.semantic.motion);
-
 function _picture(
   request: StockRequest,
   frame: number,
@@ -62,7 +74,6 @@ function _picture(
     ),
   );
 }
-
 function _readContinuityShots(
   id: string,
 ): ReadonlyArray<readonly ContinuityBeat[]> {
@@ -82,14 +93,11 @@ function _readContinuityShots(
     return shot.scene === "continuity" ? [shot.props.beats] : [];
   });
 }
-
-const COMPOSITIONS = PARITY_COMPOSITION_IDS.map((id) => {
-  return {
-    id,
-    shots: _readContinuityShots(id),
-  };
+const COMPOSITIONS = CONTINUITY_CATALOG.map(({ id }) => {
+  return { id, shots: _readContinuityShots(id) };
+}).filter(({ shots }) => {
+  return shots.length > 0;
 });
-
 /**
  * The last beat-local frame before the next beat's transition starts covering
  * this one.
@@ -97,14 +105,16 @@ const COMPOSITIONS = PARITY_COMPOSITION_IDS.map((id) => {
 function _readableEnd(beats: readonly ContinuityBeat[], index: number): number {
   const nextBeat = beats[index + 1];
   const outgoing = nextBeat
-    ? getMotionDuration(nextBeat.transition.frames, nextBeat.transition.motion)
+    ? MotionSettings.getMotionDuration({
+        frames: nextBeat.transition.frames,
+        options: nextBeat.transition.motion,
+      })
     : 0;
   return beats[index].duration - outgoing - 1;
 }
-
 /**
- * One row per beat of every in-scope composition, with its shot's beats and its
- * index in them.
+ * One row per beat of every continuity composition, with its shot's beats
+ * and its index in them.
  */
 function _listBeatRows(): Array<
   Readonly<{
@@ -122,7 +132,6 @@ function _listBeatRows(): Array<
     });
   });
 }
-
 /**
  * When each tempo-scaled stage animation of a beat ends, in beat-local frames.
  */
@@ -147,18 +156,47 @@ function _stageAnimationEnds(
       : {}),
   };
 }
-
-test("every in-scope stock loop finishes its animations before the loop ends", () => {
-  PARITY_STOCK_PRESET_IDS.forEach((preset) => {
+test("every stock loop finishes its animations before the loop ends", () => {
+  STOCK_IDS.forEach((preset) => {
+    // TypeScript cannot narrow a request over 170 preset ids to the
+    // preset-discriminated union, though every preset has a default input.
+    const request = { preset } as StockRequest;
     assert.equal(
-      _picture({ preset }, LAST_LOOP_FRAME, true),
-      _picture({ preset }, LAST_LOOP_FRAME, false),
+      _picture(request, LAST_LOOP_FRAME, true),
+      _picture(request, LAST_LOOP_FRAME, false),
       preset,
     );
   });
 });
-
-test("every in-scope composition's stage animations finish inside their beats", () => {
+test("every stock loop with one-shot motion follows tempo while it animates", () => {
+  assert.deepEqual(
+    STOCK_IDS.filter((preset) => {
+      const request = { preset } as StockRequest;
+      return (
+        !REPEATING_MOTION_PRESETS.has(preset) &&
+        MID_ANIMATION_FRAMES.every((frame) => {
+          return (
+            _picture(request, frame, true) === _picture(request, frame, false)
+          );
+        })
+      );
+    }),
+    [],
+  );
+});
+test("a repeating-motion preset draws the same picture at every tempo", () => {
+  REPEATING_MOTION_PRESETS.forEach((preset) => {
+    const request = { preset } as StockRequest;
+    MID_ANIMATION_FRAMES.forEach((frame) => {
+      assert.equal(
+        _picture(request, frame, true),
+        _picture(request, frame, false),
+        `${preset} at ${frame}`,
+      );
+    });
+  });
+});
+test("every continuity composition's stage animations finish inside their beats", () => {
   _listBeatRows().forEach(({ id, beat, index, beats }) => {
     const readableEnd = _readableEnd(beats, index);
     Object.entries(_stageAnimationEnds(beats, index)).forEach(([name, end]) => {
@@ -169,7 +207,6 @@ test("every in-scope composition's stage animations finish inside their beats", 
     });
   });
 });
-
 test("every nested stock graphic has settled before its beat stops being readable", () => {
   _listBeatRows().forEach(({ id, beat, index, beats }) => {
     const content = beat.content;

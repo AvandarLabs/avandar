@@ -1,10 +1,12 @@
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { SketchedShape } from "../SketchedShape";
 import type { ReactNode } from "react";
 
 type Props = {
   x: number;
   y: number;
   membership: "included" | "excluded" | "unknown";
+  /** Defaults to the theme's positive colour. */
   color?: string;
 };
 const MEMBERSHIP_PATHS: {
@@ -16,7 +18,6 @@ const MEMBERSHIP_PATHS: {
   excluded: "M-4 -4 L4 4 M-4 4 L4 -4",
   unknown: "M-4 0 H4",
 };
-
 /**
  * Draws explicit membership state without determining eligibility or grants.
  */
@@ -24,25 +25,33 @@ export function MembershipMarker({
   x,
   y,
   membership,
-  color = STOCK.mint,
+  color,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   if (![x, y].every(Number.isFinite) || !(membership in MEMBERSHIP_PATHS)) {
     throw new Error(
       "Membership markers require finite placement and an explicit supported state.",
     );
   }
+  const stroke =
+    membership === "included"
+      ? (color ?? tokens.color.positive)
+      : tokens.color.inactive;
   return (
     <g transform={`translate(${x} ${y})`}>
-      <circle
-        r={11}
-        fill={STOCK.surface}
-        stroke={membership === "included" ? color : STOCK.muted}
+      <SketchedShape
+        shape={{ kind: "circle", cx: 0, cy: 0, r: 11 }}
+        profile={tokens.sketch.shape}
+        fill={tokens.color.surface}
+        stroke={stroke}
       />
-      <path
-        d={MEMBERSHIP_PATHS[membership]}
+      <SketchedShape
+        shape={{ kind: "path", d: MEMBERSHIP_PATHS[membership] }}
+        profile={tokens.sketch.shape}
         fill="none"
-        stroke={membership === "included" ? color : STOCK.muted}
-        strokeWidth={2}
+        stroke={stroke}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
         strokeLinecap="round"
         strokeLinejoin="round"
       />

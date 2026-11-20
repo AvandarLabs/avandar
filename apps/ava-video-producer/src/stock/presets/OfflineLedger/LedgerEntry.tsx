@@ -1,5 +1,6 @@
 import { ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { LedgerEntryText } from "./LedgerEntryText";
 import { LedgerImpression } from "./LedgerImpression";
 import type { Input } from "./OfflineLedger.schema";
@@ -12,6 +13,12 @@ type Props = {
   accent: string;
   input: Input;
 };
+/** The cue the first entry is written on. */
+const FIRST_WRITE_CUE = 36;
+/** Frames between entries, the fixed writing cadence. */
+const CADENCE_FRAMES = 16;
+/** The writing mark's normalized path length, which its dash spans. */
+const MARK_LENGTH = 1;
 /**
  * Each writing stroke presses one persistent matching impression beneath its
  * page.
@@ -23,23 +30,28 @@ export function LedgerEntry({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
-  const writing = ramp(frame, 36 + index * 16, 8);
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const writeAt = FIRST_WRITE_CUE + index * CADENCE_FRAMES;
+  const writing = ramp(frame, writeAt, motion.whip, motion.reveal.easing);
   const y = 196 + index * 54;
   return (
     <g>
-      <g
-        data-ledger-entry={entry.id}
-        data-write-at={36 + index * 16}
-        opacity={writing}
-      >
-        <path d={`M208 ${y + 25} H752`} stroke={STOCK.line} />
-        <path
-          d={`M208 ${y - 8} H220`}
-          pathLength={1}
+      <g data-ledger-entry={entry.id} data-write-at={writeAt} opacity={writing}>
+        <SketchedShape
+          shape={{ kind: "path", d: `M208 ${y + 25} H752` }}
+          profile={tokens.sketch.shape}
+          stroke={tokens.color.line}
+        />
+        <SketchedShape
+          shape={{ kind: "path", d: `M208 ${y - 8} H220` }}
+          profile={tokens.sketch.shape}
+          pathLength={MARK_LENGTH}
           stroke={accent}
-          strokeWidth={3}
-          strokeDasharray={1}
-          strokeDashoffset={1 - writing}
+          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+          strokeDasharray={MARK_LENGTH}
+          strokeDashoffset={MARK_LENGTH * (1 - writing)}
         />
         <LedgerEntryText {...{ entry, y }} showLabels={input.showLabels} />
       </g>

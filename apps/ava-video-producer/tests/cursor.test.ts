@@ -1,12 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { measuredPath } from "../src/avandar/choreography";
-import {
-  cursorOnTarget,
-  cursorScale,
-  cursorShutter,
-  trackPos,
-} from "../src/cursor-motion";
+import { CursorMotionHelpers } from "../src/CursorMotionHelpers";
 
 test("cursor stays on measured targets throughout typing and click release", () => {
   const beats = [
@@ -28,32 +23,55 @@ test("cursor stays on measured targets throughout typing and click release", () 
   ];
   const path = measuredPath(beats);
   for (let frame = 20; frame <= 60; frame++) {
-    assert.deepEqual(trackPos(frame, path), { x: 100.25, y: 70.5 });
-    assert.equal(cursorOnTarget(frame, path, beats), "text");
+    assert.deepEqual(CursorMotionHelpers.trackPos({ frame, keys: path }), {
+      x: 100.25,
+      y: 70.5,
+    });
+    assert.equal(
+      CursorMotionHelpers.cursorOnTarget({ frame, path, targets: beats }),
+      "text",
+    );
     assert.ok(
-      cursorShutter(frame, path).every((s) => {
+      CursorMotionHelpers.cursorShutter({ frame, path }).every((s) => {
         return s.opacity === 0;
       }),
     );
   }
-  assert.equal(cursorOnTarget(70, path, beats), "default");
+  assert.equal(
+    CursorMotionHelpers.cursorOnTarget({ frame: 70, path, targets: beats }),
+    "default",
+  );
   for (let frame = 90; frame <= 98; frame++) {
-    assert.deepEqual(trackPos(frame, path), { x: 250.5, y: 150.25 });
-    assert.equal(cursorOnTarget(frame, path, beats), "pointer");
+    assert.deepEqual(CursorMotionHelpers.trackPos({ frame, keys: path }), {
+      x: 250.5,
+      y: 150.25,
+    });
+    assert.equal(
+      CursorMotionHelpers.cursorOnTarget({ frame, path, targets: beats }),
+      "pointer",
+    );
   }
 });
-
 test("subframe motion and shutter remain deterministic, bounded, and stationary at endpoints", () => {
   const path = [
     { at: 0, x: 0, y: 0 },
     { at: 20, x: 1000, y: 400 },
     { at: 40, x: 1000, y: 400 },
   ];
-  assert.notEqual(trackPos(2.25, path).x % 1, 0);
-  assert.deepEqual(trackPos(-5, path), { x: 0, y: 0 });
-  assert.deepEqual(trackPos(50, path), { x: 1000, y: 400 });
+  assert.notEqual(
+    CursorMotionHelpers.trackPos({ frame: 2.25, keys: path }).x % 1,
+    0,
+  );
+  assert.deepEqual(CursorMotionHelpers.trackPos({ frame: -5, keys: path }), {
+    x: 0,
+    y: 0,
+  });
+  assert.deepEqual(CursorMotionHelpers.trackPos({ frame: 50, keys: path }), {
+    x: 1000,
+    y: 400,
+  });
   for (const frame of [5, 10, 15]) {
-    const samples = cursorShutter(frame, path);
+    const samples = CursorMotionHelpers.cursorShutter({ frame, path });
     assert.ok(
       samples.some((s) => {
         return s.opacity > 0;
@@ -65,17 +83,19 @@ test("subframe motion and shutter remain deterministic, bounded, and stationary 
       }),
     );
   }
-  assert.deepEqual(cursorShutter(10, path), cursorShutter(10, path));
+  assert.deepEqual(
+    CursorMotionHelpers.cursorShutter({ frame: 10, path }),
+    CursorMotionHelpers.cursorShutter({ frame: 10, path }),
+  );
   assert.ok(
-    cursorShutter(30, path).every((s) => {
+    CursorMotionHelpers.cursorShutter({ frame: 30, path }).every((s) => {
       return s.opacity === 0;
     }),
   );
 });
-
 test("click response eases through a shallow dip and fully releases before travel", () => {
   const scales = Array.from({ length: 12 }, (_, i) => {
-    return cursorScale(19 + i, [20]);
+    return CursorMotionHelpers.cursorScale({ frame: 19 + i, clicks: [20] });
   });
   assert.equal(scales[0], 1);
   assert.equal(scales[1], 1);
@@ -85,5 +105,5 @@ test("click response eases through a shallow dip and fully releases before trave
       return i === 0 || Math.abs(scale - scales[i - 1]) < 0.04;
     }),
   );
-  assert.equal(cursorScale(28, [20]), 1);
+  assert.equal(CursorMotionHelpers.cursorScale({ frame: 28, clicks: [20] }), 1);
 });

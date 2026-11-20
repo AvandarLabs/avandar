@@ -2,7 +2,7 @@ import { matchLiteral } from "@avandar/utils";
 import { match, P } from "ts-pattern";
 import cursorTargets from "../../../src/avandar/cursor-targets.json";
 import { getContinuityTimeline } from "../../../src/continuity/continuityTimeline";
-import { getMotionDuration } from "../../../src/motion-components/motionSettings";
+import { MotionSettings } from "../../../src/motion-components/MotionSettings/MotionSettings";
 import {
   absoluteCues,
   timeline,
@@ -56,10 +56,10 @@ function _getContinuityOffsets(shot: Readonly<TimelineShot>): number[] {
   const positions = getContinuityTimeline(shot.props.beats);
   return shot.props.beats.flatMap((beat, index) => {
     const start = positions[index].start;
-    const overlap = getMotionDuration(
-      beat.transition.frames,
-      beat.transition.motion,
-    );
+    const overlap = MotionSettings.getMotionDuration({
+      frames: beat.transition.frames,
+      options: beat.transition.motion,
+    });
     const offsets = [
       -1,
       0,

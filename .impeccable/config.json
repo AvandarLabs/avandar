@@ -52,6 +52,15 @@
         "value": "font",
         "createdAt": "2026-11-13T18:17:04.393Z",
         "reason": "agent: false positive, L174 is the editor control name string 'font' in TOKEN_CONTROLS, not a CSS font"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "arial",
+        "files": [
+          "apps/ava-video-producer/scripts/videoTheme/themeLiteralBudgets/countThemeLiterals/countThemeLiterals.test.ts"
+        ],
+        "createdAt": "2026-11-19T17:51:23.450Z",
+        "reason": "Claude (S1 worker): test fixture string for the theme literal scanner, not rendered UI"
       }
     ]
   }

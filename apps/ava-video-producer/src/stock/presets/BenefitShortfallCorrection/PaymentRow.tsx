@@ -1,5 +1,5 @@
-import { PaymentTray } from "./PaymentTray";
-import { PaymentUnit } from "./PaymentUnit";
+import { PaymentTray } from "./PaymentTray/PaymentTray";
+import { PaymentUnit } from "./PaymentUnit/PaymentUnit";
 import type { Input } from "./BenefitShortfallCorrection.schema";
 import type { ReactNode } from "react";
 

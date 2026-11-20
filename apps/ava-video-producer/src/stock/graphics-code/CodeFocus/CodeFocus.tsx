@@ -4,10 +4,7 @@ import { Eyebrow } from "../../graphics-common/Eyebrow";
 import { GRAPHIC_WIDTH } from "../../graphics-common/graphicCanvas.constants";
 import { Pill } from "../../graphics-common/Pill";
 import { LEGACY_DISPLAY_COPY } from "../../presets/legacy/legacyDisplayCopy";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CodeWindow } from "../CodeWindow";
 import { CodeFooter } from "./CodeFooter";
 import { CodeHighlight } from "./CodeHighlight";
@@ -17,19 +14,17 @@ import type { CodeFocusInput } from "../../presets/CodeFocus/CodeFocus.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: CodeFocusInput };
-
 const BADGE_TOP = 44;
 const BADGE_WIDTH = 156;
 const HIGHLIGHT_CUE = 43;
 const HIGHLIGHT_STEP = 38;
 const HIGHLIGHT_FRAMES = 13;
-
 /**
  * The fractional line the highlight sits on at `frame`, easing between authored
  * lines.
  */
 function useHighlightLine(highlight: readonly number[], frame: number): number {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return highlight.slice(1).reduce((offset, lineIndex, index) => {
     return (
       offset +
@@ -43,7 +38,6 @@ function useHighlightLine(highlight: readonly number[], frame: number): number {
     );
   }, highlight[0]);
 }
-
 function _buildKeyedCodeLines(lines: CodeFocusInput["lines"]) {
   const lineSignatureCounts = new Map<string, number>();
   return lines.map((codeTokens, lineNumber) => {
@@ -57,14 +51,13 @@ function _buildKeyedCodeLines(lines: CodeFocusInput["lines"]) {
     return { key: `${signature}#${occurrence}`, codeTokens, lineNumber };
   });
 }
-
 /** Draws the bounded authored code-focus study at an explicit frame. */
 export function CodeFocus({
   input,
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const line = useHighlightLine(input.highlight, frame);
   return (
     <g>

@@ -1,4 +1,5 @@
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { DuplicateCandidateCopy } from "./DuplicateCandidateCopy";
 import { DuplicateCandidateRole } from "./DuplicateCandidateRole";
 import { getDuplicateCardLayoutFromGroupAndFrame } from "./getDuplicateCardLayoutFromGroupAndFrame";
@@ -14,6 +15,8 @@ type Props = {
   index: number;
   accent: string;
 };
+/** A candidate card's corner before the corner style scales it. */
+const CARD_CORNER = 5;
 /**
  * Candidate content stays intact behind the retained face, with exposed IDs.
  */
@@ -26,6 +29,9 @@ export function DuplicateCandidate({
   index,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const layout = getDuplicateCardLayoutFromGroupAndFrame({
     frame,
     input,
@@ -33,11 +39,12 @@ export function DuplicateCandidate({
     groupIndex,
     record,
     index,
+    motion,
   });
   const { x, y, width, height, isRetained, isFolded } = layout;
   return (
     <g>
-      <rect
+      <StockRect
         data-candidate-id={record.id}
         data-group-id={group.id}
         data-retained-id={isRetained && isFolded ? record.id : undefined}
@@ -45,9 +52,9 @@ export function DuplicateCandidate({
         y={y}
         width={width}
         height={height}
-        rx={5}
-        fill={STOCK.surface}
-        stroke={isRetained ? accent : STOCK.line}
+        rx={scales.corner(CARD_CORNER)}
+        fill={tokens.color.surface}
+        stroke={isRetained ? accent : tokens.color.line}
       />
       <DuplicateCandidateCopy
         input={input}

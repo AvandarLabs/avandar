@@ -13,6 +13,22 @@ import {
 } from "./EffectivePermissionGrants.fixtures";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 
+/**
+ * The shape a marker names: the marked element itself, or the sketch-aware
+ * shape inside a marked group.
+ */
+function _markedShape({
+  markup,
+  marker,
+}: Readonly<{ markup: string; marker: string }>): string {
+  const wrapped = markup.match(
+    new RegExp(
+      `<g [^>]*data-${marker}="[^"]*"[^>]*><(?:line|path|circle|rect|ellipse)\\b[^>]*>`,
+    ),
+  );
+  return wrapped ? wrapped[0] : SvgAttributes.fromMarker({ markup, marker });
+}
+
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -66,7 +82,7 @@ test("eligible grants combine by maximum rank with a separate action requirement
 });
 test("candidates climb their own ranks before gates close and the result rises", () => {
   const token = (frame: number) => {
-    return SvgAttributes.fromMarker({
+    return _markedShape({
       markup: _render({ frame: frame }),
       marker: "grant-token",
     });
@@ -86,7 +102,7 @@ test("candidates climb their own ranks before gates close and the result rises",
   assert.match(_render({ frame: 100 }), /data-grant-gate="app"/);
   const result = (frame: number) => {
     return SvgAttributes.getNumberFromMarkup({
-      attributes: SvgAttributes.fromMarker({
+      attributes: _markedShape({
         markup: _render({ frame: frame }),
         marker: "result-marker",
       }),
@@ -173,7 +189,7 @@ test("hidden excluded grants retain the maximum and requirement comparison for e
       });
       assert.equal(
         SvgAttributes.getNumberFromMarkup({
-          attributes: SvgAttributes.fromMarker({
+          attributes: _markedShape({
             markup: hold,
             marker: "result-marker",
           }),
@@ -194,7 +210,7 @@ test("hidden excluded grants retain the maximum and requirement comparison for e
   });
   assert.equal(
     SvgAttributes.getNumberFromMarkup({
-      attributes: SvgAttributes.fromMarker({
+      attributes: _markedShape({
         markup: none,
         marker: "result-marker",
       }),

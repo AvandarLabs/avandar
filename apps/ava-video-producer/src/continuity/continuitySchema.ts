@@ -1,11 +1,8 @@
 import { z } from "zod";
-import { retimeCameraTrack } from "../motion-components/cameraTrack";
+import { retimeCameraTrack } from "../motion-components/cameraTrack/cameraTrack";
 import { getOverlayTimings } from "../motion-components/getOverlayTimings";
 import { SCENE_TRANSITION_KINDS } from "../motion-components/getSceneTransitionStyle";
-import {
-  getMotionDuration,
-  motionOptionsSchema,
-} from "../motion-components/motionSettings";
+import { MotionSettings } from "../motion-components/MotionSettings/MotionSettings";
 import { stockRequestSchema } from "../stock/contracts/stockRequestSchema/stockRequestSchema";
 import { cameraTrackSchema } from "./camera/continuityCamera";
 import { objectFlightSchema } from "./camera/objectFlight";
@@ -94,7 +91,7 @@ const overlay = z
     at: frame,
     until: frame,
     target: anchorSchema,
-    motion: motionOptionsSchema.optional(),
+    motion: MotionSettings.motionOptionsSchema.optional(),
     entryFrames: frame.min(1).max(300).optional(),
     exitFrames: frame.min(1).max(300).optional(),
     fadeFrames: frame.min(1).max(300).optional(),
@@ -102,7 +99,7 @@ const overlay = z
   .strict()
   .refine((cue) => {
     try {
-      getOverlayTimings(cue);
+      getOverlayTimings({ cue });
       return true;
     } catch {
       return false;
@@ -112,7 +109,7 @@ const transition = z
   .object({
     kind: z.enum(SCENE_TRANSITION_KINDS),
     frames: frame.max(300),
-    motion: motionOptionsSchema.optional(),
+    motion: MotionSettings.motionOptionsSchema.optional(),
     origin: z
       .object({ x: z.number().min(0).max(1600), y: z.number().min(0).max(840) })
       .strict()
@@ -125,7 +122,7 @@ const stock = z
     request: stockRequestSchema,
     settleFrame: frame.min(120).max(165).default(150),
     camera: cameraTrackSchema.optional(),
-    cameraOptions: motionOptionsSchema.optional(),
+    cameraOptions: MotionSettings.motionOptionsSchema.optional(),
     flight: objectFlightSchema.optional(),
   })
   .strict();
@@ -249,10 +246,10 @@ export const continuitySchema = z
         if (
           beat.content.kind === "stock" &&
           beat.content.camera &&
-          retimeCameraTrack(
-            beat.content.camera,
-            beat.content.cameraOptions,
-          ).some((key) => {
+          retimeCameraTrack({
+            keys: beat.content.camera,
+            options: beat.content.cameraOptions,
+          }).some((key) => {
             return key.at >= beat.duration;
           })
         )
@@ -261,10 +258,10 @@ export const continuitySchema = z
           beat.content.kind === "stock" &&
           beat.content.flight &&
           beat.content.flight.at +
-            getMotionDuration(
-              beat.content.flight.duration,
-              beat.content.flight.motion,
-            ) >=
+            MotionSettings.getMotionDuration({
+              frames: beat.content.flight.duration,
+              options: beat.content.flight.motion,
+            }) >=
             beat.duration
         )
           issue("Object flight must finish within its beat");
@@ -333,6 +330,5 @@ export type ContinuityBeat = ContinuityPlan["beats"][number];
 export type ProductSegment = z.infer<typeof productSegmentSchema>;
 /** Measured or authored rectangular target. */
 export type ContinuityAnchor = z.infer<typeof anchorSchema>;
-
 /** A deterministic rough-notation cue on the native product stage. */
 export type ProductAnnotation = z.infer<typeof productAnnotationSchema>;

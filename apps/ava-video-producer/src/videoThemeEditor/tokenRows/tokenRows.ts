@@ -4,67 +4,32 @@ import { getValueAtPath } from "../../videoTheme/getValueAtPath";
 import {
   isMantineTokenRoot,
   listTokenDefinitions,
-} from "../../videoTheme/tokenCatalog/tokenCatalogHelpers";
+} from "../../videoTheme/tokenCatalog/tokenCatalogHelpers/tokenCatalogHelpers";
 import { getDocumentPathFromTokenPath } from "../getDocumentPathFromTokenPath/getDocumentPathFromTokenPath";
+import { isThemeDraftEmpty, type ThemeDraft } from "../themeDraft/themeDraft";
 import {
-  isThemeDraftEmpty,
-  type ThemeDraft,
-  type ThemeEditScope,
-} from "../themeDraft/themeDraft";
+  type TokenTier,
+  type RowContext,
+  type TokenRow,
+  type TokenOverrideState,
+  type TokenRowsOptions,
+  type TokenRowFilter,
+  type TokenRowGroup,
+  type RowIssueDescription,
+} from "./tokenRows.types";
 import type {
-  ResolvedVideoTheme,
   TokenDefinition,
   VideoThemeIssue,
   VideoThemeLibrary,
   VideoThemePatch,
 } from "../../videoTheme/videoTheme.types";
-
-/** Which layer of the theme a token belongs to. */
-export type TokenTier = "mantine" | "atomic" | "semantic" | "component";
-
-/** Whether the scope being edited sets a token itself, and how. */
-export type TokenOverrideState = "none" | "draft" | "saved";
-
-/** One editable token as a scope sees it. */
-export type TokenRow = Readonly<{
-  path: string;
-  definition: TokenDefinition;
-  /** The key inside a scale, such as `mint` for `atomic.swatch.mint`. */
-  scaleKey?: string;
-  tier: TokenTier;
-  /** Accordion section: `<tier>:<name>`. */
-  group: string;
-  /** The authored value in effect: a reference or a literal. */
-  value: unknown;
-  resolved: unknown;
-  overrideState: TokenOverrideState;
-  /**
-   * In theme scope, the value the previewed item uses when it has its own
-   * for this token, saved or unsaved. Item scope states this in
-   * `overrideState`, so it never sets this.
-   */
-  itemOverride?: Readonly<{ resolved: unknown }>;
-}>;
-
-/** A run of rows that share a section. */
-export type TokenRowGroup = Readonly<{
-  group: string;
-  rows: readonly TokenRow[];
-}>;
-
-/** How the editor narrows its rows. */
-export type TokenRowFilter = Readonly<{
-  tiers: readonly TokenTier[];
-  query: string;
-  /** When set, semantic and component rows must appear here. */
-  usedTokens?: readonly string[];
-  /** The label and description of a row, for search. */
-  getText: (row: TokenRow) => string;
-}>;
-
 /**
- * The handful of tokens that change a look the most. The editor shows them
- * first, above the tiers, in this order.
+ * The handful of tokens that change a look the most: the Look and feel
+ * rows. The editor shows them first, above the tiers, in this order. Each
+ * global option (line weight, corner style, shadow intensity, tint
+ * strength, easing family, stagger, entrance style, loop fade) sits beside
+ * the token it adjusts and starts at its identity value, so it changes
+ * nothing until a producer moves it.
  */
 export const ESSENTIAL_TOKEN_PATHS = [
   "color.accent",
@@ -72,11 +37,29 @@ export const ESSENTIAL_TOKEN_PATHS = [
   "color.text",
   "atomic.fontFamily.figtree",
   "stroke.default",
+  "stroke.scale",
   "corner.panel",
+  "corner.scale",
+  "elevation.strength",
+  "alpha.washScale",
   "motion.tempo",
+  "motion.easingProfile",
+  "motion.staggerScale",
+  "motion.entranceStyle",
+  "motion.loopFade.graphic",
   "sketch.box",
+  "sketch.shape",
+  "sketch.annotation",
+  "color.categorical.1",
+  "color.categorical.2",
+  "color.categorical.3",
+  "color.categorical.4",
+  "color.categorical.5",
+  "color.categorical.6",
+  "color.categorical.7",
+  "color.categorical.8",
+  "color.categorical.9",
 ] as const;
-
 const MANTINE_GROUPS: Readonly<Record<string, string>> = {
   colors: "palette",
   white: "palette",
@@ -95,22 +78,6 @@ const MANTINE_GROUPS: Readonly<Record<string, string>> = {
   luminanceThreshold: "rendering",
   fontSmoothing: "rendering",
 };
-
-type RowContext = Readonly<{
-  merged: VideoThemePatch;
-  theme: ResolvedVideoTheme;
-  scopePatch: VideoThemePatch;
-  savedOverride: VideoThemePatch;
-  /**
-   * In theme scope, the previewed item's own settings and the theme it resolves
-   * to.
-   */
-  itemOwn?: Readonly<{
-    patches: readonly VideoThemePatch[];
-    theme: ResolvedVideoTheme;
-  }>;
-}>;
-
 function _tierFromRoot(root: string): TokenTier {
   if (root === "atomic") {
     return "atomic";
@@ -120,7 +87,6 @@ function _tierFromRoot(root: string): TokenTier {
   }
   return isMantineTokenRoot(root) ? "mantine" : "semantic";
 }
-
 function _groupFromSegments(
   segments: readonly string[],
   tier: TokenTier,
@@ -132,7 +98,6 @@ function _groupFromSegments(
     ? `mantine:${MANTINE_GROUPS[segments[0]] ?? segments[0]}`
     : `semantic:${segments[0]}`;
 }
-
 // A built-in theme with a draft previews as an unsaved theme with no
 // overrides of its own (see createDraftThemeTarget), so none show as saved.
 function _savedOverride(
@@ -150,7 +115,6 @@ function _savedOverride(
   });
   return target.library.get(target.themeId)?.overrides?.[options.itemId] ?? {};
 }
-
 function _createRow(
   options: Readonly<{
     context: RowContext;
@@ -190,21 +154,6 @@ function _createRow(
       : {}),
   };
 }
-
-type TokenRowsOptions = Readonly<{
-  library: VideoThemeLibrary;
-  themeId: string;
-  draft: ThemeDraft;
-  scope: ThemeEditScope;
-  merged: VideoThemePatch;
-  theme: ResolvedVideoTheme;
-  /**
-   * The previewed item and the theme it resolves to, so theme scope can show
-   * its own values.
-   */
-  item?: Readonly<{ id: string; theme: ResolvedVideoTheme }>;
-}>;
-
 function _createRowContext(options: TokenRowsOptions): RowContext {
   const { scope, draft, item } = options;
   return {
@@ -231,7 +180,6 @@ function _createRowContext(options: TokenRowsOptions): RowContext {
       : {}),
   };
 }
-
 /**
  * Every token as one scope sees it, one row per scale entry, in catalog
  * order. The editor filters and groups these rows; reference pickers read
@@ -261,7 +209,6 @@ export function listTokenRows(options: TokenRowsOptions): readonly TokenRow[] {
     });
   });
 }
-
 /**
  * Rows in the chosen tiers that match the search and, when given, the
  * tokens an item used. Atomic and Mantine rows ignore usage: renders report
@@ -289,7 +236,6 @@ export function filterTokenRows(
     );
   });
 }
-
 /** Rows split into sections, keeping first-appearance order. */
 export function groupTokenRows(
   rows: readonly TokenRow[],
@@ -301,7 +247,6 @@ export function groupTokenRows(
     return { group, rows: grouped };
   });
 }
-
 /** The Essentials rows, in their fixed order. */
 export function getEssentialRows(
   rows: readonly TokenRow[],
@@ -312,7 +257,6 @@ export function getEssentialRows(
     });
   });
 }
-
 /**
  * Sections for atomic scales that have no entries yet, such as an empty
  * `textShadow` scale, so the editor can offer to add the first value.
@@ -336,31 +280,18 @@ export function listEmptyAtomicScaleGroups(
       return !filled.has(group);
     });
 }
-
 /**
  * The resolver problem a row shows: one reported at the token itself or at
  * one of its fields, such as `text.stage.title.color` for `text.stage.title`.
  */
 export function findTokenRowIssue(
-  options: Readonly<{
-    issues: readonly VideoThemeIssue[];
-    tokenPath: string;
-  }>,
+  options: Readonly<{ issues: readonly VideoThemeIssue[]; tokenPath: string }>,
 ): VideoThemeIssue | undefined {
   const { issues, tokenPath } = options;
   return issues.find((issue) => {
     return issue.path === tokenPath || issue.path.startsWith(`${tokenPath}.`);
   });
 }
-
-/**
- * What a row's resolver message means, so the row can say it in plain words.
- */
-export type RowIssueDescription =
-  | Readonly<{ kind: "missingReference"; reference: string }>
-  | Readonly<{ kind: "loop" }>
-  | Readonly<{ kind: "other" }>;
-
 /**
  * Sorts a resolver message into the cases the editor words for a producer: a
  * reference to a token that is gone, a reference loop, or anything else. The
@@ -375,7 +306,6 @@ export function describeRowIssue(issue: VideoThemeIssue): RowIssueDescription {
     ? { kind: "loop" }
     : { kind: "other" };
 }
-
 /**
  * The key for a value added to a scale group: the first `custom<n>` no entry
  * of that scale uses. Pass every row, not a filtered view, so a value hidden

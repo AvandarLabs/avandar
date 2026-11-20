@@ -1,3 +1,6 @@
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { RESULT_CUE } from "./getEvidenceFromFrame";
 import { getReconstructionColumnXsFromFrame } from "./getReconstructionColumnXsFromFrame";
 import type { Input } from "./PdfGridReconstruction.schema";
 import type { ReactNode } from "react";
@@ -9,25 +12,33 @@ export function GridSourceLinks({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const resultX = getReconstructionColumnXsFromFrame({
     input,
     frame,
     isResult: true,
+    motion,
   })[0];
   return (
     <g>
       {" "}
-      {input.showSourceLinks && frame >= 106
+      {input.showSourceLinks && frame >= RESULT_CUE
         ? input.grid.rows.map((_, rowIndex) => {
             return (
-              <path
-                key={rowIndex}
-                data-source-link={rowIndex}
-                d={`M452 ${322 + rowIndex * 64} H${resultX}`}
-                stroke={accent}
-                strokeDasharray="2 4"
-                fill="none"
-              />
+              <g key={rowIndex} data-source-link={rowIndex}>
+                <SketchedShape
+                  shape={{
+                    kind: "path",
+                    d: `M452 ${322 + rowIndex * 64} H${resultX}`,
+                  }}
+                  profile={tokens.sketch.shape}
+                  stroke={accent}
+                  strokeDasharray={atomic.dash.dotted.join(" ")}
+                  fill="none"
+                />
+              </g>
             );
           })
         : undefined}

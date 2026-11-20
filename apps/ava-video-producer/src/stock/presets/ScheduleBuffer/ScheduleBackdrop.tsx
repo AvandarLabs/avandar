@@ -1,11 +1,14 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./ScheduleBuffer.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input };
 /** The authored result and deadline frame one fixed schedule endpoint. */
 export function ScheduleBackdrop({ input }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
       <FitText
@@ -28,17 +31,19 @@ export function ScheduleBackdrop({ input }: Readonly<Props>): ReactNode {
         normalizeWhitespace
         breakLongWords
       />
-      <path
+      <SketchedShape
+        shape={{ kind: "path", d: "M920 225 V388 M912 225 H928" }}
+        profile={tokens.sketch.shape}
         data-deadline-pin="true"
-        d="M920 225 V388 M912 225 H928"
-        stroke={STOCK.text}
-        strokeWidth={2}
+        stroke={tokens.color.text}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
-      <path
-        d="M40 378 V388 H920"
+      <SketchedShape
+        shape={{ kind: "path", d: "M40 378 V388 H920" }}
+        profile={tokens.sketch.shape}
         fill="none"
-        stroke={STOCK.line}
-        strokeWidth={2}
+        stroke={tokens.color.line}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
     </g>
   );

@@ -1,4 +1,5 @@
 import { getShelfUnitPoseFromInputAndFrame } from "./getShelfUnitPoseFromInputAndFrame";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./RetailShelfReplenishment.schema";
 /** Data for getShelfUnitsFromInputAndFrame. */
 type GetShelfUnitsResult = {
@@ -20,7 +21,12 @@ type GetShelfUnitsResult = {
 export function getShelfUnitsFromInputAndFrame({
   input,
   frame,
-}: Readonly<{ input: Input; frame: number }>): GetShelfUnitsResult[] {
+  motion,
+}: Readonly<{
+  input: Input;
+  frame: number;
+  motion: VideoMotion;
+}>): GetShelfUnitsResult[] {
   return input.goods.flatMap((good, goodIndex) => {
     return Array.from(
       { length: good.openingUnits + good.incomingUnits },
@@ -45,6 +51,7 @@ export function getShelfUnitsFromInputAndFrame({
             unitIndex,
             incomingIndex,
             selectedIndex,
+            motion,
           }),
         };
       },

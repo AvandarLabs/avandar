@@ -2,12 +2,13 @@ import { useId } from "react";
 import { AnchoredOverlay } from "../motion-components/AnchoredOverlay";
 import { StockGraphic } from "../stock/StockGraphic/StockGraphic";
 import { elevationToDropShadowFilter } from "../videoTheme/cssValueHelpers/cssValueHelpers";
+import { useVideoShapeScales } from "../videoTheme/useVideoShapeScales";
 import { useVideoProps, useVideoTokens } from "../videoTheme/useVideoTheme";
 import { useContinuityAppearance } from "./ContinuityAppearanceContext";
 import { ContinuityBoxOutline } from "./ContinuityBoxOutline";
 import css from "./ContinuityOverlays.module.css";
 import { sampleStockFrame } from "./continuityTimeline";
-import { DiagramConnector } from "./DiagramConnector";
+import { DiagramConnector } from "./DiagramConnector/DiagramConnector";
 import type { ContinuityBeat } from "./continuitySchema";
 import type { ReactNode } from "react";
 
@@ -16,7 +17,6 @@ type Props = { content: Content; frame: number; accent: string };
 type DiagramProps = Omit<Props, "accent"> & {
   diagram: Content["diagrams"][number];
 };
-
 /**
  * Extracted explanatory artwork travels from the UI without cloning the UI
  * itself.
@@ -25,6 +25,7 @@ function FloatingDiagram({ content, diagram, frame }: DiagramProps) {
   const clipId = `overlay-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
   const appearance = useContinuityAppearance();
   const tokens = useVideoTokens();
+  const scales = useVideoShapeScales();
   const floating = useVideoProps("FloatingDiagram", {});
   const isSketched = tokens.sketch.box.roughness > 0;
   const cue = diagram.overlay;
@@ -43,7 +44,7 @@ function FloatingDiagram({ content, diagram, frame }: DiagramProps) {
         className={css.label}
         style={{
           borderColor: isSketched ? "transparent" : undefined,
-          borderRadius: isSketched ? 0 : undefined,
+          borderRadius: isSketched ? 0 : scales.corner(tokens.corner.label),
         }}
       >
         <ContinuityBoxOutline />
@@ -78,7 +79,6 @@ function FloatingDiagram({ content, diagram, frame }: DiagramProps) {
     </AnchoredOverlay>
   );
 }
-
 /** Timed spotlight and anchored artwork share the full native product stage. */
 export function ContinuityDiagramLane({
   content,

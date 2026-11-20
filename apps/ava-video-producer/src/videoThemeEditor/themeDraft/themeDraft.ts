@@ -6,7 +6,7 @@ import {
 } from "../../videoTheme/createDraftThemeTarget/createDraftThemeTarget";
 import { getValueAtPath } from "../../videoTheme/getValueAtPath";
 import { mergeVideoThemePatches } from "../../videoTheme/mergeVideoThemeLayers/mergeVideoThemePatches/mergeVideoThemePatches";
-import { listTokenDefinitions } from "../../videoTheme/tokenCatalog/tokenCatalogHelpers";
+import { listTokenDefinitions } from "../../videoTheme/tokenCatalog/tokenCatalogHelpers/tokenCatalogHelpers";
 import {
   createVideoThemeSnapshot,
   type VideoThemeSnapshot,

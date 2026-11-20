@@ -1,5 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { getFeedbackStateFromInputAndFrame } from "./getFeedbackStateFromInputAndFrame";
 import type { ReactNode } from "react";
 
@@ -14,6 +15,8 @@ export function FeedbackDraft({
   accent,
   id,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const { x, round, revision } = state;
   const clipId = `feedback-${encodeURIComponent(id)}`;
   return (
@@ -31,14 +34,14 @@ export function FeedbackDraft({
           <rect x={x + 16} y={230} width={268 * revision} height={84} />
         </clipPath>
       </defs>
-      <rect
+      <StockRect
         data-draft={revision === 1 ? round.revised : round.draft}
         x={x}
         y={220}
         width={300}
         height={100}
-        rx={8}
-        fill={STOCK.surface}
+        rx={scales.corner(tokens.corner.cell)}
+        fill={tokens.color.surface}
         stroke={accent}
       />
       <g clipPath={`url(#${clipId}-draft)`}>

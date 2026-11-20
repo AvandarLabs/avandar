@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "starter",
+  "label": "Starter",
+  "extends": "classic",
+  "other": {
+    "video": {
+      "semantic": {
+        "color": {
+          "scene": {
+            "background": "$atomic.swatch.starterBackground",
+            "foreground": "$atomic.swatch.starterForeground",
+            "card": "$atomic.swatch.starterCard",
+            "muted": "$atomic.swatch.starterMuted",
+            "mutedForeground": "$atomic.swatch.starterMutedForeground",
+            "border": "$atomic.swatch.starterBorder",
+            "brand": "$atomic.swatch.starterBrand",
+            "brandSoft": "$atomic.swatch.starterBrandSoft",
+            "brandStrong": "$atomic.swatch.starterBrandStrong",
+            "ground": "$atomic.swatch.starterGround"
+          }
+        }
+      }
+    }
+  }
+}

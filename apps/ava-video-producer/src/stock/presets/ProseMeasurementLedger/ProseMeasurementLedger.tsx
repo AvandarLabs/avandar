@@ -1,5 +1,5 @@
-import { ramp } from "../../../motion";
-import { ObservationSlot } from "./ObservationSlot";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { ObservationSlot } from "./ObservationSlot/ObservationSlot";
 import { ProseHeadings } from "./ProseHeadings";
 import { SentenceSpans } from "./SentenceSpans";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
@@ -13,9 +13,10 @@ export function ProseMeasurementLedger({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g
-      opacity={ramp(frame, 0, 12)}
+      opacity={motion.reveal(frame, 0)}
       data-method={input.method}
       data-review={input.reviewState}
     >

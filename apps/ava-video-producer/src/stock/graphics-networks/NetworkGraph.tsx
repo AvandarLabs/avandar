@@ -7,33 +7,27 @@ import { GRAPHIC_WIDTH } from "../graphics-common/graphicCanvas.constants";
 import { Packet } from "../graphics-common/Packet";
 import { Pill } from "../graphics-common/Pill";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
-import {
-  useGraphicMotion,
-  useGraphicProps,
-  useGraphicTokens,
-} from "../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { GraphicProps } from "../graphics-common/graphicCommon.types";
 import type { NetworkGraphInput } from "../presets/NetworkGraph/NetworkGraph.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: NetworkGraphInput };
-
 const HIGHLIGHTED_EDGES = 6;
 const EDGE_CUE = 22;
 const PACKET_PHASE_STEP = 13;
 const NODE_PHASE_STEP = 16;
 const COUNT_PILL_TOP = 44;
 const COUNT_PILL_WIDTH = 113;
-
 /** Draws the bounded authored network-graph study at an explicit frame. */
 export function NetworkGraph({
   input,
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const style = useGraphicProps("NetworkGraph", {});
-  const { color, layout } = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const style = GraphicThemeHooks.useGraphicProps("NetworkGraph", {});
+  const { color, layout } = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const nodes = input.nodes;
   return (
     <g>

@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
 
+/** The stroke width SVG draws when no ancestor sets one. */
+const SVG_INITIAL_STROKE_WIDTH = 1;
+
 /** One actual SVG point in the service scene. */
 export type ServicePoint = { x: number; y: number };
 /** A straight emitted SVG path segment. */
@@ -74,7 +77,7 @@ function _getServiceParticipantGeometryFromMarkup(
   markup: string,
 ): ServiceParticipantGeometry {
   const result: ServiceParticipantGeometry = { circles: [], segments: [] };
-  const styles = [{ hasStroke: false, strokeWidth: 1 }];
+  const styles = [{ hasStroke: false, strokeWidth: SVG_INITIAL_STROKE_WIDTH }];
   [...markup.matchAll(/<\/?(?:g|path|circle)\b[^>]*>/g)].forEach(([tag]) => {
     if (tag.startsWith("</")) {
       if (tag.startsWith("</g")) {
@@ -122,7 +125,7 @@ function _getServiceParticipantGeometryFromMarkup(
 function _getServiceObstaclesFromMarkup(markup: string): ServiceObstacle[] {
   return [
     ...markup.matchAll(
-      /<path data-barrier="[^"]*"[^>]*data-barrier-selected="false"[^>]*>/g,
+      /<path\b[^>]*\bdata-barrier="[^"]*"[^>]*data-barrier-selected="false"[^>]*>/g,
     ),
   ].map(([tag]) => {
     return {

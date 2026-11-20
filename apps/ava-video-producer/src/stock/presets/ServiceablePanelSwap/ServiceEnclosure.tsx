@@ -1,4 +1,6 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { getServiceSceneFromFrame } from "./getServiceSceneFromFrame";
 import type { Input } from "./ServiceablePanelSwap.schema";
 import type { ReactNode } from "react";
@@ -7,22 +9,28 @@ type Props = {
   input: Input;
   scene: ReturnType<typeof getServiceSceneFromFrame>;
 };
+/** The cabinet's corner, before the theme's corner style. */
+const CABINET_CORNER = 2;
 /**
  * Stable enclosure and actual opening seam around the chosen fixed connector.
  */
 export function ServiceEnclosure({ input, scene }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
-      <rect
+      <StockRect
         data-enclosure={input.enclosure}
         x={160}
         y={205}
         width={input.modules.length * 170 - 10}
         height={174}
-        rx={input.enclosure === "console" ? 18 : 2}
-        fill={STOCK.elevated}
-        stroke={STOCK.line}
-        strokeWidth={3}
+        rx={scales.corner(
+          input.enclosure === "console" ? tokens.corner.panel : CABINET_CORNER,
+        )}
+        fill={tokens.color.elevated}
+        stroke={tokens.color.line}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
       />
       <rect
         data-connector="true"
@@ -30,29 +38,35 @@ export function ServiceEnclosure({ input, scene }: Readonly<Props>): ReactNode {
         y={218}
         width={6}
         height={30}
-        fill={STOCK.cyan}
+        fill={tokens.color.accentAlt}
       />
-      <path
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${scene.slotX - 8} 365 V${223 - 38 * scene.latchOpen} H${scene.slotX + 144} V365`,
+        }}
+        profile={tokens.sketch.shape}
         data-service-latch="true"
-        d={`M${scene.slotX - 8} 365 V${223 - 38 * scene.latchOpen} H${scene.slotX + 144} V365`}
         fill="none"
-        stroke={STOCK.orange}
-        strokeWidth={3}
+        stroke={tokens.color.highlight}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
       />
       {input.showConnectorGuide ? (
-        <path
+        <SketchedShape
+          shape={{ kind: "path", d: `M${scene.slotX + 71} 252 V400` }}
+          profile={tokens.sketch.shape}
           data-connector-guide="true"
-          d={`M${scene.slotX + 71} 252 V400`}
-          stroke={STOCK.cyan}
-          strokeDasharray="3 5"
+          stroke={tokens.color.accentAlt}
+          strokeDasharray={tokens.dash.guide.join(" ")}
         />
       ) : undefined}
-      <path
+      <SketchedShape
+        shape={{ kind: "path", d: "M48 420 v138 h160 V420" }}
+        profile={tokens.sketch.shape}
         data-retained-tray="true"
-        d="M48 420 v138 h160 V420"
         fill="none"
-        stroke={STOCK.orange}
-        strokeWidth={2}
+        stroke={tokens.color.highlight}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
     </g>
   );

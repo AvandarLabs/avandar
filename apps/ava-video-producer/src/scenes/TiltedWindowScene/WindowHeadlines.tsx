@@ -1,14 +1,12 @@
-import { MONO } from "../../fonts";
-import { DUR, EASE, ramp } from "../../motion";
+import { useVideoTheme } from "../../videoTheme/useVideoTheme";
 import { fitTextLines } from "../layout/layout";
-import { getLineRevealStyle } from "../textReveal";
-import { getActiveHeadline } from "./windowMotion";
+import { StageTheme } from "../StageTheme/StageTheme";
+import { getLineRevealStyle } from "../textReveal/textReveal";
+import { useWindowStage } from "./useWindowStage";
+import { WindowMotion } from "./WindowMotion/WindowMotion";
 import { HEADLINE_BOX } from "./windowTilt";
 import type { WindowHeadline } from "../scenes.types";
 import type { ReactNode } from "react";
-
-/** Frames between headline lines fading in. */
-const LINE_STAGGER = 3;
 
 type Props = {
   frame: number;
@@ -18,11 +16,12 @@ type Props = {
   /** The frame the window starts whipping out; the headline fades in place. */
   exitAtFrame?: number;
 };
-
 /**
- * The headline column beside a tilted window: lines fade in a few frames
+ * The headline column beside a tilted window: lines fade in a rise stagger
  * apart, a later headline replaces the earlier one, and on exit the copy
- * fades where it stands while the window leaves.
+ * fades where it stands while the window leaves. Lines are
+ * `text.stage.windowHeadline` at their fitted size; the subtitle is
+ * `text.stage.windowSubtitle` at its fitted size.
  */
 export function WindowHeadlines({
   frame,
@@ -31,7 +30,16 @@ export function WindowHeadlines({
   height,
   exitAtFrame,
 }: Props): ReactNode {
-  const { index, opacity } = getActiveHeadline(frame, headlines);
+  const theme = useVideoTheme();
+  const stage = useWindowStage();
+  const { motion } = stage;
+  const scene = theme.semantic.color.scene;
+  const lineStagger = motion.rise.stagger;
+  const { index, opacity } = WindowMotion.getActiveHeadline({
+    frame,
+    headlines,
+    stage,
+  });
   const headline = headlines[index];
   const columnWidth = width * HEADLINE_BOX.width;
   const fitted = fitTextLines(
@@ -44,7 +52,13 @@ export function WindowHeadlines({
   const exitOpacity =
     exitAtFrame === undefined
       ? 1
-      : 1 - ramp(frame, exitAtFrame + 1, DUR.chip, EASE.inOut);
+      : 1 -
+        motion.ramp(
+          frame,
+          exitAtFrame + 1,
+          motion.chip,
+          motion.dissolve.easing,
+        );
   return (
     <div
       style={{
@@ -60,16 +74,19 @@ export function WindowHeadlines({
           <div
             key={`${headline.atFrame}-${row}`}
             style={{
+              ...StageTheme.getStageTextStyle({
+                role: theme.semantic.text.stage.windowHeadline,
+                fields: ["lineHeight", "fontWeight", "letterSpacing"],
+              }),
               fontSize: fitted.fontSize,
-              lineHeight: 1.25,
-              fontWeight: 600,
-              letterSpacing: -fitted.fontSize * 0.02,
-              color: "var(--foreground)",
-              ...getLineRevealStyle(
+              color: scene.foreground,
+              ...getLineRevealStyle({
                 frame,
-                headline.atFrame + row * LINE_STAGGER,
-                "line-fade",
-              ),
+                at: headline.atFrame + row * lineStagger,
+                mode: "line-fade",
+                options: {},
+                motion,
+              }),
             }}
           >
             {line}
@@ -80,14 +97,18 @@ export function WindowHeadlines({
         <div
           style={{
             marginTop: height * 0.02,
-            fontFamily: MONO,
+            ...StageTheme.getStageTextStyle({
+              role: theme.semantic.text.stage.windowSubtitle,
+              fields: ["fontFamily", "color"],
+            }),
             fontSize: Math.round(height * 0.024),
-            color: "color-mix(in oklab, var(--foreground) 45%, transparent)",
-            ...getLineRevealStyle(
+            ...getLineRevealStyle({
               frame,
-              headline.atFrame + fitted.lines.length * LINE_STAGGER,
-              "line-fade",
-            ),
+              at: headline.atFrame + fitted.lines.length * lineStagger,
+              mode: "line-fade",
+              options: {},
+              motion,
+            }),
           }}
         >
           {headline.subtitle}

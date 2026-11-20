@@ -1,7 +1,8 @@
-import { EASE, mix, ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { mix } from "../../../motion";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SelectionCopy } from "./SelectionCopy";
-import { SelectionMarker } from "./SelectionMarker";
+import { SelectionMarker } from "./SelectionMarker/SelectionMarker";
 import type { Input } from "./RejectAndReplace.schema";
 import type { ReactNode } from "react";
 
@@ -20,26 +21,35 @@ export function SelectionOption({
   accent,
   isReplacement,
 }: Readonly<Props>): ReactNode {
-  const move = ramp(frame, 48, 30, EASE.inOut);
-  const entry = ramp(
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const move = motion.ramp(frame, 48, motion.scale(30), motion.travel.easing);
+  const entry = motion.ramp(
     frame,
     isReplacement ? 78 : 12,
-    isReplacement ? 30 : 18,
-    EASE.inOut,
+    motion.scale(isReplacement ? 30 : 18),
+    motion.travel.easing,
   );
   const x = isReplacement ? mix(entry, 1000, 480) : mix(move, 480, 156);
   const width = isReplacement ? 320 : mix(move, 320, 296);
-  const panel = { x: -width / 2, y: 210, width, height: 304, rx: 18 };
+  const panel = {
+    x: -width / 2,
+    y: 210,
+    width,
+    height: 304,
+    rx: scales.corner(tokens.corner.panel),
+  };
   return (
     <g
       data-option={isReplacement ? "replacement" : "rejected"}
       opacity={entry}
       transform={`translate(${x} 0)`}
     >
-      <rect
+      <StockRect
         {...panel}
-        fill={STOCK.surface}
-        stroke={isReplacement ? accent : STOCK.line}
+        fill={tokens.color.surface}
+        stroke={isReplacement ? accent : tokens.color.line}
       />
       <SelectionMarker
         {...{ frame, accent, isReplacement }}

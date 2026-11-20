@@ -1,15 +1,21 @@
-import { ramp } from "../motion";
-import { getMotionProgress } from "../motion-components/motionSettings";
+import { MotionSettings } from "../motion-components/MotionSettings/MotionSettings";
 import { SharedElement } from "../motion-components/SharedElement";
 import { useVideoMotion } from "../videoTheme/useVideoMotion";
+import { useVideoShapeScales } from "../videoTheme/useVideoShapeScales";
 import { useVideoProps, useVideoTokens } from "../videoTheme/useVideoTheme";
 import { ContinuityBoxOutline } from "./ContinuityBoxOutline";
-import css from "./ContinuityScene.module.css";
+import css from "./ContinuityScene/ContinuityScene.module.css";
 import { getContinuityTimeline } from "./continuityTimeline";
 import type { ContinuityPlan } from "./continuitySchema";
 import type { ReactNode } from "react";
-
-/** A single persistent object carries identity across a scene boundary. */
+/** Frame the shared object starts fading in. */
+const FADE_IN_AT = 12;
+/** Frames into its beat an outline token starts fading. */
+const OUTLINE_FADE_AFTER = 60;
+/**
+ * A single persistent object carries identity across a scene boundary, on
+ * the shared object corner and its fades.
+ */
 export function ContinuityToken({
   plan,
   frame,
@@ -20,6 +26,9 @@ export function ContinuityToken({
   const tokens = useVideoTokens();
   const sharedObject = useVideoProps("SharedObject", {});
   const motion = useVideoMotion();
+  const scales = useVideoShapeScales();
+  const settings = MotionSettings.useMotionSettingsTheme();
+  const fade = motion.reveal.easing;
   const isSketched = tokens.sketch.box.roughness > 0;
   const timing = getContinuityTimeline(plan.beats);
   const index = Math.max(
@@ -31,12 +40,14 @@ export function ContinuityToken({
   const beat = plan.beats[index];
   if (!beat.token) return null;
   const previous = plan.beats[index - 1]?.token;
-  const progress = getMotionProgress(
+  const progress = MotionSettings.getMotionProgress({
     frame,
-    timing[index].start,
-    Math.max(1, beat.transition.frames),
-    beat.transition.motion,
-  );
+    at: timing[index].start,
+    duration: Math.max(1, beat.transition.frames),
+    options: beat.transition.motion,
+    fallback: undefined,
+    theme: settings,
+  });
   const destination = beat.token.anchor;
   const source =
     previous?.label === beat.token.label ? previous.anchor : destination;
@@ -51,17 +62,25 @@ export function ContinuityToken({
       className={css.continuityToken}
       style={{
         borderColor: isSketched ? "transparent" : undefined,
-        borderRadius: isSketched ? 0 : undefined,
+        borderRadius: isSketched
+          ? 0
+          : scales.corner(tokens.corner.sharedObject),
         background:
           beat.token.appearance === "outline" ? "transparent" : undefined,
         opacity:
-          ramp(frame, 12, motion.scale(sharedObject.fadeIn)) *
+          motion.ramp(
+            frame,
+            FADE_IN_AT,
+            motion.scale(sharedObject.fadeIn),
+            fade,
+          ) *
           (beat.token.appearance === "outline"
             ? 1 -
-              ramp(
+              motion.ramp(
                 frame,
-                timing[index].start + 60,
+                timing[index].start + OUTLINE_FADE_AFTER,
                 motion.scale(sharedObject.outlineFade),
+                fade,
               )
             : 1),
       }}

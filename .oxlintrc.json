@@ -15,7 +15,15 @@
       "specifier": "eslint-plugin-react-refresh"
     },
     "@tanstack/eslint-plugin-query",
-    "@tanstack/eslint-plugin-router"
+    "@tanstack/eslint-plugin-router",
+    {
+      "name": "video-producer",
+      "specifier": "./eslint/video-producer-function-length.js"
+    },
+    {
+      "name": "video-theme",
+      "specifier": "./eslint/video-theme-restrictions.js"
+    }
   ],
   "categories": {
     "correctness": "off"
@@ -37,6 +45,7 @@
     ".cursor/**",
     ".opencode",
     ".opencode/**",
+    ".playwright-mcp/**",
     "agent-skills/**",
     "apps/desktop/build/**",
     "**/.videos/**",
@@ -417,6 +426,14 @@
       "files": ["**/*.js"],
       "rules": {
         "typescript/explicit-module-boundary-types": "off"
+      }
+    },
+    {
+      "files": ["apps/ava-video-producer/**/*.{js,jsx,mjs,ts,tsx}"],
+      "rules": {
+        "video-producer/max-lines-per-function": "error",
+        "video-theme/no-restricted-imports": "error",
+        "video-theme/no-restricted-syntax": "error"
       }
     }
   ]

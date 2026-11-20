@@ -1,10 +1,9 @@
-import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./RepeatingBlocksToTable.schema";
 import type { ReactNode } from "react";
 /** Inputs for TableFieldHeadings. */
 type Props = { input: Input; frame: number };
-
 /**
  * Field ordering owns output columns without changing keyed cell membership.
  */
@@ -12,8 +11,9 @@ export function TableFieldHeadings({
   input,
   frame,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
-    <g opacity={ramp(frame, 106, 12)}>
+    <g opacity={motion.reveal(frame, 106)}>
       <LabelSlots labels={[[input.copy.result, 300, 145, 608, 14, 2]]} />
       {input.fields.map((field, index) => {
         return (

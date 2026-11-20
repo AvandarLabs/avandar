@@ -1,13 +1,19 @@
-import { ramp, EASE } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ClusterLedger } from "./ClusterLedger";
-import { ClusterPoints } from "./ClusterPoints";
+import { ClusterPoints } from "./ClusterPoints/ClusterPoints";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./MapClusterUnfold.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
+const SCENE_FADE_AT = 0;
+const CLUSTER_AT = 53;
+const CLUSTER_FRAMES = 29;
+const UNFOLD_AT = 99;
+const UNFOLD_FRAMES = 40;
 /**
  * The same supplied points contract into clusters and unfold without jitter.
  */
@@ -16,12 +22,12 @@ export function MapClusterUnfold({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const grouping =
-    frame <= 99
-      ? ramp(frame, 53, 29, EASE.inOut)
-      : 1 - ramp(frame, 99, 40, EASE.inOut);
+  const { color, stroke } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const grouping = _getGrouping({ frame, motion });
   return (
-    <g opacity={ramp(frame, 0, 12)}>
+    <g opacity={motion.reveal(frame, SCENE_FADE_AT)}>
       <LabelSlots
         labels={[
           [input.copy.context, 48, 28, 864, 14, 1],
@@ -37,16 +43,37 @@ export function MapClusterUnfold({
           ],
         ]}
       />
-      <rect
+      <StockRect
         x={48}
         y={140}
         width={480}
         height={360}
-        fill={STOCK.surface}
-        stroke={STOCK.line}
+        fill={color.surface}
+        stroke={color.line}
+        strokeWidth={shapes.stroke(stroke.hairline)}
       />
       <ClusterPoints {...{ input, frame, grouping, accent }} />
       <ClusterLedger {...{ input, grouping, accent }} />
     </g>
   );
+}
+/** How far the points have contracted into clusters, 0 to 1 and back. */
+function _getGrouping({
+  frame,
+  motion,
+}: Readonly<{ frame: number; motion: VideoMotion }>): number {
+  return frame <= UNFOLD_AT
+    ? motion.ramp(
+        frame,
+        CLUSTER_AT,
+        motion.scale(CLUSTER_FRAMES),
+        motion.travel.easing,
+      )
+    : 1 -
+        motion.ramp(
+          frame,
+          UNFOLD_AT,
+          motion.scale(UNFOLD_FRAMES),
+          motion.travel.easing,
+        );
 }

@@ -1,9 +1,18 @@
 import { propEq } from "@avandar/utils";
-import { EASE, mix, ramp } from "../../../motion";
+import { mix, ramp } from "../../../motion";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./ChosenServiceAccess.schema";
 import type { ReactNode } from "react";
 
+type GetStaffHandOptions = {
+  input: Input;
+  frame: number;
+  x: number;
+  motion: VideoMotion;
+};
 type Props = { input: Input; frame: number; accent: string };
 /** Staff handles the selected barrier and holds its door without pushing. */
 export function ServiceStaff({
@@ -11,31 +20,56 @@ export function ServiceStaff({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const index = input.services.findIndex(propEq("id", input.chosenServiceId));
   const x = 160 + ((index + 0.5) * 640) / input.services.length;
-  const progress = ramp(frame, 44, 32, EASE.inOut);
-  const barrierX =
-    input.accessChange === "clear-entrance"
-      ? x - 30 + ramp(frame, 44, 32, EASE.inOut) * 94
-      : x - 42 - 58 * progress;
-  const handX = frame >= 44 && frame < 77 ? barrierX : x + 42;
-  const handY =
-    frame >= 44 && frame < 77
-      ? input.accessChange === "unfold-ramp"
-        ? mix(progress, 246, 356)
-        : 337
-      : 270;
+  const { handX, handY } = _getStaffHand({ input, frame, x, motion });
   return (
     <g>
       <PersonGlyph x={x + 88} y={272} size={40} role="worker" color={accent} />
-      <path
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${x + 88} 272 L${x + 64} ${handY - 10} L${handX} ${handY}`,
+        }}
+        profile={tokens.sketch.shape}
         data-staff-arm
-        d={`M${x + 88} 272 L${x + 64} ${handY - 10} L${handX} ${handY}`}
         fill="none"
         stroke={accent}
-        strokeWidth={3}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
       />
       <circle data-staff-hand cx={handX} cy={handY} r={3} fill={accent} />
     </g>
   );
+}
+/** The staff hand: on the moving barrier while it works, else at rest. */
+function _getStaffHand({
+  input,
+  frame,
+  x,
+  motion,
+}: Readonly<GetStaffHandOptions>) {
+  const progress = motion.ramp(
+    frame,
+    44,
+    motion.scale(32),
+    motion.travel.easing,
+  );
+  const barrierX =
+    input.accessChange === "clear-entrance"
+      ? x -
+        30 +
+        motion.ramp(frame, 44, motion.scale(32), motion.travel.easing) * 94
+      : x - 42 - 58 * progress;
+  const isHandling = frame >= 44 && frame < 77;
+  return {
+    handX: isHandling ? barrierX : x + 42,
+    handY: isHandling
+      ? input.accessChange === "unfold-ramp"
+        ? mix(progress, 246, 356)
+        : 337
+      : 270,
+  };
 }

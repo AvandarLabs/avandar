@@ -1,6 +1,6 @@
-import { ramp } from "../../../motion";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SceneText } from "./SceneText";
 import type { Input } from "./TeacherLearningCover.schema";
 import type { ReactNode } from "react";
@@ -24,11 +24,18 @@ export function CoverStaff({
   mode,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const practicing = frame >= 72 && frame <= 104;
   const gesture =
     mode === "rehearsal"
-      ? Math.sin(ramp(frame, 72, 32) * Math.PI * 2) * 15
-      : ramp(frame, 72, 32) * 28;
+      ? Math.sin(
+          motion.ramp(frame, 72, motion.scale(32), motion.entrance.easing) *
+            Math.PI *
+            2,
+        ) * 15
+      : motion.ramp(frame, 72, motion.scale(32), motion.entrance.easing) * 28;
   const handX = role === "teacher" ? 700 + gesture : 810 - gesture;
   return (
     <g>
@@ -50,19 +57,24 @@ export function CoverStaff({
             role === "teacher"
               ? accent
               : role === "cover"
-                ? STOCK.cyan
-                : STOCK.orange
+                ? tokens.color.accentAlt
+                : tokens.color.highlight
           }
         />
         {practicing && role !== "cover" ? (
-          <path
-            data-teaching-hand={role}
-            d={`M0 0 L${(handX - x) / 2} 25 L${handX - x} 50`}
-            fill="none"
-            stroke={role === "teacher" ? accent : STOCK.orange}
-            strokeWidth={3}
-            strokeLinecap="round"
-          />
+          <g data-teaching-hand={role}>
+            <SketchedShape
+              shape={{
+                kind: "path",
+                d: `M0 0 L${(handX - x) / 2} 25 L${handX - x} 50`,
+              }}
+              profile={tokens.sketch.shape}
+              fill="none"
+              stroke={role === "teacher" ? accent : tokens.color.highlight}
+              strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+              strokeLinecap="round"
+            />
+          </g>
         ) : undefined}
       </g>
     </g>

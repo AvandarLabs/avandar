@@ -1,6 +1,9 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SceneText } from "./SceneText";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./FractionMaterialTranslation.schema";
 import type { ReactNode } from "react";
 
@@ -19,8 +22,57 @@ export function FractionLearner({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const materialProgress = ramp(frame, 36, 48, EASE.inOut);
-  const handReach = ramp(frame, 30, 6) * (1 - ramp(frame, 84, 4));
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const handReach =
+    motion.ramp(frame, 30, motion.chip) *
+    (1 - motion.ramp(frame, 84, motion.press.duration));
+  const { contactX, contactY } = _getMaterialContact({
+    input: { input, representation, initialX, frame },
+    motion,
+  });
+  const learnerX = initialX - 60;
+  return (
+    <>
+      <SceneText
+        text={representation.learnerLabel}
+        anchor="middle"
+        slot={[initialX, 162, 230, 14, 2]}
+      />
+      <g data-fraction-learner={representation.id}>
+        <PersonGlyph x={learnerX} y={270} size={64} color={accent} />
+        <SketchedShape
+          shape={{
+            kind: "path",
+            d: `M${learnerX} 270 L${mix(handReach, learnerX + 18, contactX)} ${mix(handReach, 282, contactY)}`,
+          }}
+          profile={tokens.sketch.shape}
+          data-material-hand={representation.id}
+          fill="none"
+          stroke={accent}
+          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+        />
+      </g>
+    </>
+  );
+}
+/** Where the learner's hand touches the material as it is worked. */
+function _getMaterialContact({
+  input: { input, representation, initialX, frame },
+  motion,
+}: Readonly<{
+  input: Readonly<
+    Pick<Props, "input" | "representation" | "initialX" | "frame">
+  >;
+  motion: VideoMotion;
+}>) {
+  const materialProgress = motion.ramp(
+    frame,
+    36,
+    motion.scale(48),
+    motion.travel.easing,
+  );
   const firstCenter = -96 + 96 / input.fraction.denominator;
   const contactX =
     representation.material === "folded-paper"
@@ -35,25 +87,5 @@ export function FractionLearner({
       : representation.material === "counters"
         ? 330 + mix(materialProgress, -36, 0) - 8
         : 352 - 44 * materialProgress;
-  const learnerX = initialX - 60;
-
-  return (
-    <>
-      <SceneText
-        text={representation.learnerLabel}
-        anchor="middle"
-        slot={[initialX, 162, 230, 14, 2]}
-      />
-      <g data-fraction-learner={representation.id}>
-        <PersonGlyph x={learnerX} y={270} size={64} color={accent} />
-        <path
-          data-material-hand={representation.id}
-          d={`M${learnerX} 270 L${mix(handReach, learnerX + 18, contactX)} ${mix(handReach, 282, contactY)}`}
-          fill="none"
-          stroke={accent}
-          strokeWidth={3}
-        />
-      </g>
-    </>
-  );
+  return { contactX, contactY };
 }

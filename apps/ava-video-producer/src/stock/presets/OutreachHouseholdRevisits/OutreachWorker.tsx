@@ -1,5 +1,6 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./OutreachHouseholdRevisits.schema";
 import type { ReactNode } from "react";
 
@@ -12,6 +13,7 @@ export function OutreachWorker({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const duration = 72 / input.visits.length;
   const eventIndex = Math.min(
     input.visits.length - 1,
@@ -29,11 +31,11 @@ export function OutreachWorker({
   if (!household || (eventIndex > 0 && !previous)) {
     throw new Error("Visit references must resolve to supplied households.");
   }
-  const progress = ramp(
+  const progress = motion.ramp(
     frame,
     36 + eventIndex * duration,
     duration,
-    EASE.inOut,
+    motion.travel.easing,
   );
   const x = mix(
     progress,

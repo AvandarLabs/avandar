@@ -1,5 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getConsentTurnFromPermissionsAndFrame } from "./getConsentTurnFromPermissionsAndFrame";
 import type { Input } from "./ReferralConsentWithdrawal.schema";
 import type { ReactNode } from "react";
@@ -19,24 +20,28 @@ export function ConsentSlip({
   permission,
   index,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const y = 190 + index * 102;
   const turn = getConsentTurnFromPermissionsAndFrame({
     frame,
     permissions: input.permissions,
     permissionId: permission.id,
+    motion,
   });
   const width = 460 * (0.12 + 0.88 * Math.abs(2 * turn - 1));
   return (
     <g data-permission={permission.id} data-withdrawn={turn === 1}>
-      <rect
+      <StockRect
         data-slip={permission.id}
         x={48 + (460 - width) / 2}
         y={y}
         width={width}
         height={96}
-        rx={5}
-        fill={STOCK.surface}
-        stroke={turn > 0.5 ? STOCK.orange : accent}
+        rx={scales.corner(5)}
+        fill={tokens.color.surface}
+        stroke={turn > 0.5 ? tokens.color.highlight : accent}
       />
       <g opacity={Math.abs(2 * turn - 1)}>
         <LabelSlots

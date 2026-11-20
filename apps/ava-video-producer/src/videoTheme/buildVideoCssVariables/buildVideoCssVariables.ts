@@ -9,7 +9,7 @@ import { getResolvedTokenValue } from "../getResolvedTokenValue";
 import {
   isMantineTokenRoot,
   listTokenDefinitions,
-} from "../tokenCatalog/tokenCatalogHelpers";
+} from "../tokenCatalog/tokenCatalogHelpers/tokenCatalogHelpers";
 import type {
   GlowValue,
   ResolvedBox,
@@ -22,13 +22,11 @@ import type {
 } from "../videoTheme.types";
 
 const UNSTYLED_GROUPS = new Set(["motion", "camera", "motionBlur", "sketch"]);
-
 function _kebab(segment: string): string {
   return segment.replace(/[A-Z]/g, (letter) => {
     return `-${letter.toLowerCase()}`;
   });
 }
-
 function _typeStyleVariables(
   name: string,
   style: ResolvedTypeStyle,
@@ -55,7 +53,6 @@ function _typeStyleVariables(
       : {}),
   };
 }
-
 function _elevationVariables(
   name: string,
   elevation: ResolvedElevation,
@@ -65,7 +62,6 @@ function _elevationVariables(
     [`${name}-drop-shadow`]: elevationToDropShadowFilter(elevation),
   };
 }
-
 function _boxVariables(name: string, box: ResolvedBox): Record<string, string> {
   return Object.fromEntries(
     Object.entries(box).map(([side, pixels]) => {
@@ -73,7 +69,6 @@ function _boxVariables(name: string, box: ResolvedBox): Record<string, string> {
     }),
   );
 }
-
 function _glowVariables(name: string, glow: GlowValue): Record<string, string> {
   return {
     [`${name}-spread`]: `${glow.spread}px`,
@@ -81,14 +76,12 @@ function _glowVariables(name: string, glow: GlowValue): Record<string, string> {
     [`${name}-opacity`]: String(glow.opacity),
   };
 }
-
 function _paintVariables(
   name: string,
   paint: ResolvedPaint,
 ): Record<string, string> {
   return { [name]: buildColorWithAlpha(paint.color, paint.alpha) };
 }
-
 function _variablesFromValue(
   kind: TokenKind,
   name: string,
@@ -122,13 +115,11 @@ function _variablesFromValue(
       return {};
   }
 }
-
 function _variableNameFromPath(segments: readonly string[]): string {
   return segments[0] === "components"
     ? `--video-component-${segments.slice(1).map(_kebab).join("-").replace(/^-/, "")}`
     : `--video-${segments.map(_kebab).join("-")}`;
 }
-
 function _isSkippedPath(path: string, isScale: boolean): boolean {
   const [root = ""] = path.split(".");
   return (
@@ -138,13 +129,14 @@ function _isSkippedPath(path: string, isScale: boolean): boolean {
     UNSTYLED_GROUPS.has(root)
   );
 }
-
 /**
  * CSS custom properties for every styled semantic and component token, such
- * as `--video-color-ground` and `--video-text-stage-heading-font-size`.
- * `VideoThemeProvider` sets them on its container so CSS modules (the
- * continuity stage and overlays) read the theme without JavaScript. Motion,
- * camera, and sketch tokens have no CSS meaning and are skipped.
+ * as `--video-color-ground` and `--video-text-stage-heading-font-size`, plus
+ * the scene palette under its storyboard names (`--brand`, `--ground`, ...).
+ * `VideoThemeProvider` sets them on its container so CSS modules and scene
+ * styles read the theme without JavaScript; a storyboard theme set inside
+ * still overrides the scene names. Motion, camera, and sketch tokens have no
+ * CSS meaning and are skipped.
  */
 export function buildVideoCssVariables(
   theme: ResolvedVideoTheme,
@@ -165,9 +157,16 @@ export function buildVideoCssVariables(
             ),
           ];
     });
-  return Object.fromEntries(
-    variableSets.flatMap((variables) => {
+  return Object.fromEntries([
+    ...variableSets.flatMap((variables) => {
       return Object.entries(variables);
     }),
-  );
+    ...Object.entries(
+      Object.fromEntries(
+        Object.entries(theme.semantic.color.scene).flatMap(([name, color]) => {
+          return color === undefined ? [] : [[`--${_kebab(name)}`, color]];
+        }),
+      ),
+    ),
+  ]);
 }

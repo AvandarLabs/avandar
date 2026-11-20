@@ -1,4 +1,5 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 /** Data for getSideReadingCarrierFromFrame. */
 type GetSideReadingCarrierResult = {
   x: number;
@@ -17,18 +18,30 @@ export function getSideReadingCarrierFromFrame({
   frame,
   groupIndex,
   tableX,
+  motion,
 }: Readonly<{
   frame: number;
   groupIndex: number;
   tableX: number;
+  motion: VideoMotion;
 }>): GetSideReadingCarrierResult {
   const elapsed = frame - (24 + groupIndex * 18);
   const pickupY = 210 + groupIndex * 55;
-  const lift = ramp(elapsed, 4, 3, EASE.inOut);
-  const rise = ramp(elapsed, 7, 3, EASE.inOut);
-  const travel = ramp(elapsed, 10, 10, EASE.inOut);
-  const lower = ramp(elapsed, 20, 3, EASE.inOut);
-  const settle = ramp(elapsed, 23, 4, EASE.inOut);
+  const lift = motion.ramp(elapsed, 4, motion.scale(3), motion.travel.easing);
+  const rise = motion.ramp(elapsed, 7, motion.scale(3), motion.travel.easing);
+  const travel = motion.ramp(
+    elapsed,
+    10,
+    motion.scale(10),
+    motion.travel.easing,
+  );
+  const lower = motion.ramp(elapsed, 20, motion.scale(3), motion.travel.easing);
+  const settle = motion.ramp(
+    elapsed,
+    23,
+    motion.press.duration,
+    motion.travel.easing,
+  );
   const x = mix(travel, 45, tableX - 60);
   const carriedY = mix(lower, mix(rise, pickupY, 210), 290);
   return {
@@ -36,7 +49,7 @@ export function getSideReadingCarrierFromFrame({
     y: mix(settle, carriedY, 265),
     bookX: x + 60,
     bookY: carriedY + 40 * (1 - lift + lower),
-    reach: ramp(elapsed, 0, 4, EASE.inOut),
+    reach: motion.ramp(elapsed, 0, motion.press.duration, motion.travel.easing),
     isCarrying: elapsed >= 4 && elapsed <= 23,
     hasHand: elapsed >= 0 && elapsed <= 23,
   };

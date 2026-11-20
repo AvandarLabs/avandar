@@ -19,7 +19,6 @@ const render = ({
     }),
   );
 };
-
 function _cards(markup: string): string[] {
   return [...markup.matchAll(/<rect[^>]*data-candidate-id="[^"]*"[^>]*>/g)].map(
     (match) => {
@@ -27,7 +26,6 @@ function _cards(markup: string): string[] {
     },
   );
 }
-
 function _texts({
   markup,
   label,
@@ -43,7 +41,6 @@ function _texts({
       return text.includes(`aria-label="${label}"`);
     });
 }
-
 function _assertPairRoles({
   markup,
   input,
@@ -122,7 +119,6 @@ function _assertPairRoles({
     });
   });
 }
-
 function _createPairInput({
   recordCount,
   retainedIndex,

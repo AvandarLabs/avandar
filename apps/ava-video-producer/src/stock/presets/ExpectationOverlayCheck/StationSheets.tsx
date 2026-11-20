@@ -1,6 +1,7 @@
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
-import { STOCK } from "../../stockPalette";
-import { ExpectedSheet } from "./ExpectedSheet";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { ExpectedSheet } from "./ExpectedSheet/ExpectedSheet";
 import type { Input } from "./ExpectationOverlayCheck.schema";
 import type { ReactNode } from "react";
 
@@ -23,18 +24,21 @@ export function StationSheets({
   state,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
       {" "}
-      <rect
+      <StockRect
         data-observed-slot={item.id}
         x={510}
         y={y + 22}
         width={390}
         height={35}
-        fill={STOCK.surface}
-        stroke={STOCK.muted}
-        strokeDasharray={item.observed === null ? "5 5" : undefined}
+        fill={tokens.color.surface}
+        stroke={tokens.color.inactive}
+        strokeDasharray={
+          item.observed === null ? tokens.dash.placeholder.join(" ") : undefined
+        }
       />
       {item.observed !== null ? (
         <LiteralDataText value={item.observed} x={525} y={y + 44} />

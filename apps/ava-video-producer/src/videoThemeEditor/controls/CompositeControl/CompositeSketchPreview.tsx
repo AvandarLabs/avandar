@@ -1,10 +1,9 @@
+import { type TokenRow } from "../../tokenRows/tokenRows.types";
 import { SketchPreview } from "../SketchPreview/SketchPreview";
 import type { ResolvedSketchProfile } from "../../../videoTheme/videoTheme.types";
-import type { TokenRow } from "../../tokenRows/tokenRows";
 import type { ReactNode } from "react";
 
 type Props = Readonly<{ row: TokenRow }>;
-
 /**
  * The sketch preview of a sketch profile row, and nothing for any other row.
  */

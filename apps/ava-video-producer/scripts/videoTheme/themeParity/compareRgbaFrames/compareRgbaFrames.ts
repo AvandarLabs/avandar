@@ -1,11 +1,22 @@
-/** A rectangle in frame pixels, inclusive of its top-left corner. */
+type CompareRgbaFramesOptions = {
+  reference: Uint8Array;
+  current: Uint8Array;
+  width: number;
+  height: number;
+  allowedRegions: readonly ParityRegion[];
+};
+/**
+ * A rectangle in frame pixels, inclusive of its top-left corner. With
+ * `maxChannelDelta`, a pixel inside it is allowed only when no channel moved
+ * by more than that many levels; without it, any change is allowed.
+ */
 export type ParityRegion = Readonly<{
   x: number;
   y: number;
   width: number;
   height: number;
+  maxChannelDelta?: number;
 }>;
-
 /** What changed between a reference frame and the current render of it. */
 export type FrameComparison = Readonly<{
   differingPixels: number;
@@ -16,34 +27,44 @@ export type FrameComparison = Readonly<{
    */
   diff: Uint8Array;
 }>;
-
 const ALLOWED_COLOR = [255, 191, 0, 255] as const;
 const UNEXPLAINED_COLOR = [255, 0, 255, 255] as const;
-
-function _isInside(regions: readonly ParityRegion[], x: number, y: number) {
+function _isAllowed({
+  regions,
+  pixel,
+}: Readonly<{
+  regions: readonly ParityRegion[];
+  pixel: Readonly<{ x: number; y: number; channelDelta: number }>;
+}>) {
   return regions.some((region) => {
     return (
-      x >= region.x &&
-      x < region.x + region.width &&
-      y >= region.y &&
-      y < region.y + region.height
+      pixel.x >= region.x &&
+      pixel.x < region.x + region.width &&
+      pixel.y >= region.y &&
+      pixel.y < region.y + region.height &&
+      pixel.channelDelta <= (region.maxChannelDelta ?? 255)
     );
   });
 }
-
+/** The reference pixel at `offset` as a dimmed gray, for unchanged pixels. */
+function _dimmedGrayAt({
+  reference,
+  offset,
+}: Readonly<{ reference: Uint8Array; offset: number }>): number {
+  return Math.round(
+    (reference[offset] * 0.2126 +
+      reference[offset + 1] * 0.7152 +
+      reference[offset + 2] * 0.0722) *
+      0.3,
+  );
+}
 /**
  * Compares two same-size RGBA frames pixel by pixel. `theme:parity` uses it
  * to prove a renderer change kept `classic` identical, with the only allowed
  * differences confined to the regions of a deliberate consolidation.
  */
 export function compareRgbaFrames(
-  options: Readonly<{
-    reference: Uint8Array;
-    current: Uint8Array;
-    width: number;
-    height: number;
-    allowedRegions: readonly ParityRegion[];
-  }>,
+  options: Readonly<CompareRgbaFramesOptions>,
 ): FrameComparison {
   const { reference, current, width, height, allowedRegions } = options;
   const length = width * height * 4;
@@ -58,22 +79,26 @@ export function compareRgbaFrames(
       return reference[offset + channel] === current[offset + channel];
     });
     if (isSame) {
-      const gray = Math.round(
-        (reference[offset] * 0.2126 +
-          reference[offset + 1] * 0.7152 +
-          reference[offset + 2] * 0.0722) *
-          0.3,
-      );
+      const gray = _dimmedGrayAt({ reference, offset });
       diff.set([gray, gray, gray, 255], offset);
       continue;
     }
     differingPixels += 1;
     const pixel = offset / 4;
-    const isAllowed = _isInside(
-      allowedRegions,
-      pixel % width,
-      Math.floor(pixel / width),
-    );
+    const isAllowed = _isAllowed({
+      regions: allowedRegions,
+      pixel: {
+        x: pixel % width,
+        y: Math.floor(pixel / width),
+        channelDelta: Math.max(
+          ...[0, 1, 2, 3].map((channel) => {
+            return Math.abs(
+              reference[offset + channel] - current[offset + channel],
+            );
+          }),
+        ),
+      },
+    });
     unexplainedPixels += isAllowed ? 0 : 1;
     diff.set(isAllowed ? ALLOWED_COLOR : UNEXPLAINED_COLOR, offset);
   }

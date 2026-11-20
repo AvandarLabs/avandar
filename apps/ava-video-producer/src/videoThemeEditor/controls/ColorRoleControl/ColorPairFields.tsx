@@ -1,16 +1,11 @@
 import { getFieldName } from "../../tokenCopy/editorCopy";
 import { useTokenEditor } from "../../TokenEditorContext";
+import { type TokenRow } from "../../tokenRows/tokenRows.types";
 import { ReferenceControl } from "../ReferenceControl/ReferenceControl";
-import type { TokenRow } from "../../tokenRows/tokenRows";
 import type { ColorPair } from "../roleValueHelpers/roleValueHelpers";
 import type { ReactNode } from "react";
 
-type Props = Readonly<{
-  row: TokenRow;
-  label: string;
-  pair: ColorPair;
-}>;
-
+type Props = Readonly<{ row: TokenRow; label: string; pair: ColorPair }>;
 /** One picker per ground for a colour role that differs on light grounds. */
 export function ColorPairFields({ row, label, pair }: Props): ReactNode {
   const editor = useTokenEditor();

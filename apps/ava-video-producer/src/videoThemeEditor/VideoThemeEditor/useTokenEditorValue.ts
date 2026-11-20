@@ -7,12 +7,12 @@ import {
   type ThemeDraft,
   type ThemeEditScope,
 } from "../themeDraft/themeDraft";
+import { type TokenRow } from "../tokenRows/tokenRows.types";
 import type {
   ResolvedVideoTheme,
   VideoThemeIssue,
 } from "../../videoTheme/videoTheme.types";
 import type { TokenEditorContextValue } from "../TokenEditorContext";
-import type { TokenRow } from "../tokenRows/tokenRows";
 import type { EditorItem } from "./EditorToolbar/EditorToolbar";
 
 type TokenEditorValueOptions = Readonly<{
@@ -24,7 +24,6 @@ type TokenEditorValueOptions = Readonly<{
   item?: EditorItem;
   onDraftChange: (draft: ThemeDraft) => void;
 }>;
-
 /** The context `VideoThemeEditor` gives its controls; tightly coupled to it. */
 export function useTokenEditorValue(
   options: TokenEditorValueOptions,

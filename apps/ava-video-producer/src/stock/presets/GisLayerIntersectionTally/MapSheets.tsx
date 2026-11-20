@@ -1,5 +1,6 @@
 import { mix } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./GisLayerIntersectionTally.schema";
 import type { ReactNode } from "react";
 
@@ -18,6 +19,8 @@ export function MapSheets({
   registration,
   frame,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return [first, second].map((path, index) => {
     return (
       <g
@@ -25,12 +28,13 @@ export function MapSheets({
         data-map-layer={input.layers[index].id}
         transform={`translate(${mix(registration, index ? 24 : -24, 0)} ${mix(registration, index ? -18 : 18, 0)})`}
       >
-        <path
-          d={path}
-          fill={index ? STOCK.mint : STOCK.cyan}
-          fillOpacity={0.12}
-          stroke={index ? STOCK.mint : STOCK.cyan}
-          strokeWidth={1.5}
+        <SketchedShape
+          shape={{ kind: "path", d: path }}
+          profile={tokens.sketch.shape}
+          fill={index ? tokens.color.positive : tokens.color.accentAlt}
+          fillOpacity={scales.wash(tokens.alpha.tint)}
+          stroke={index ? tokens.color.positive : tokens.color.accentAlt}
+          strokeWidth={scales.stroke(tokens.stroke.outline)}
           strokeOpacity={input.showLayerOutlines || frame < 108 ? 1 : 0}
         />
       </g>

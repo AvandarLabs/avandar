@@ -1,8 +1,11 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix, ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { OutboxProposalSheet } from "./OutboxProposalSheet";
+import { OUTCOME_CUE, UNMOUNT_CUE } from "./outboxShape";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./AtomicOutboxCommit.schema";
 import type { ReactNode } from "react";
 
@@ -12,6 +15,8 @@ type Props = {
   side: "local" | "journal";
   accent: string;
 };
+/** Frames each half takes to write its value. */
+const WRITE_FRAMES = 40;
 const GRAPHEMES: Intl.Segmenter = new Intl.Segmenter("und", {
   granularity: "grapheme",
 });
@@ -22,23 +27,11 @@ export function OutboxProposal({
   side,
   accent,
 }: Readonly<Props>): ReactNode {
-  const writing = ramp(
-    frame,
-    13 + (side === "journal" ? 2 : 0),
-    40,
-    EASE.inOut,
-  );
-  const withdrawal = ramp(frame, 111, 28, EASE.inOut);
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const { writing, withdrawal } = _getProposalProgress({ frame, side, motion });
   const x = side === "local" ? 100 : 540;
-  const graphemes = Array.from(
-    GRAPHEMES.segment(input.change.after),
-    ({ segment }) => {
-      return segment;
-    },
-  );
-  const value = graphemes
-    .slice(0, Math.ceil(writing * graphemes.length))
-    .join("");
   return (
     <g
       data-provisional-half={side}
@@ -47,15 +40,52 @@ export function OutboxProposal({
     >
       <OutboxProposalSheet x={x} accent={accent} />
       <LabelSlots labels={[[input.labels.pending, x + 12, 402, 296, 12, 3]]} />
-      <LiteralDataText x={x + 12} y={455} value={value} />
-      <path
-        d={`M${x + 12} 465 h${296 * writing}`}
-        stroke={STOCK.orange}
-        strokeWidth={2}
+      <LiteralDataText
+        x={x + 12}
+        y={455}
+        value={_buildWrittenValue({ value: input.change.after, writing })}
+      />
+      <SketchedShape
+        shape={{ kind: "path", d: `M${x + 12} 465 h${296 * writing}` }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.highlight}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
       {side === "journal" && input.showIdentifier ? (
         <LiteralDataText x={x + 12} y={491} value={input.change.id} />
       ) : undefined}
     </g>
   );
+}
+/** A half writing its value, then withdrawing on the outcome, both 0 to 1. */
+function _getProposalProgress({
+  frame,
+  side,
+  motion,
+}: Readonly<{ frame: number; side: Props["side"]; motion: VideoMotion }>) {
+  return {
+    writing: ramp(
+      frame,
+      13 + (side === "journal" ? motion.stagger.list : 0),
+      motion.scale(WRITE_FRAMES),
+      motion.travel.easing,
+    ),
+    // The halves withdraw until they unmount, so this move keeps its cue span.
+    withdrawal: ramp(
+      frame,
+      OUTCOME_CUE,
+      UNMOUNT_CUE - OUTCOME_CUE,
+      motion.travel.easing,
+    ),
+  };
+}
+/** The leading graphemes of `value` written so far. */
+function _buildWrittenValue({
+  value,
+  writing,
+}: Readonly<{ value: string; writing: number }>): string {
+  const graphemes = Array.from(GRAPHEMES.segment(value), ({ segment }) => {
+    return segment;
+  });
+  return graphemes.slice(0, Math.ceil(writing * graphemes.length)).join("");
 }

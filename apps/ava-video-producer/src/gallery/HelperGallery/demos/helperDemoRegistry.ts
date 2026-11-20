@@ -1,15 +1,15 @@
-import { HorizontalBlurDemo, VelocityBlurDemo } from "./BlurDemos";
+import { HorizontalBlurDemo, VelocityBlurDemo } from "./BlurDemos/BlurDemos";
 import {
   BarBeatsDemo,
   CtaBeatsDemo,
   FlyThroughDemo,
   MarkBuildDemo,
-} from "./BuildDemos";
+} from "./BuildDemos/BuildDemos";
 import {
   CameraTrackDemo,
   DiagramCameraDemo,
   WindowCameraDemo,
-} from "./CameraDemos";
+} from "./CameraDemos/CameraDemos";
 import {
   AnchoredOverlayDemo,
   ObjectDepartureDemo,
@@ -27,7 +27,11 @@ import {
   PopDemo,
   PressDemo,
 } from "./EntranceDemos";
-import { CountToDemo, MixTokenDemo, RampDemo } from "./InterpolationDemos";
+import {
+  CountToDemo,
+  MixTokenDemo,
+  RampDemo,
+} from "./InterpolationDemos/InterpolationDemos";
 import { LoopEnvelopeDemo, LoopPhaseDemo, WaveDemo } from "./LoopDemos";
 import {
   EraseMaskDemo,
@@ -35,14 +39,14 @@ import {
   RoughEdgeDemo,
   SteppedColumnWipeDemo,
   WindowRevealDemo,
-} from "./MaskDemos";
+} from "./MaskDemos/MaskDemos";
 import { MediaPlaneDemo } from "./MediaDemos";
 import {
   ClickFeedbackDemo,
   CursorOnTargetDemo,
   CursorShutterDemo,
   TrackPosDemo,
-} from "./PointerDemos";
+} from "./PointerDemos/PointerDemos";
 import {
   ActiveHeadlineDemo,
   HeadingRevealDemo,
@@ -51,7 +55,10 @@ import {
   WipeExitDemo,
 } from "./TextDemos";
 import { ThemeStyleDemo } from "./ThemeDemos";
-import { SceneTransitionDemo, ShotTransitionDemo } from "./TransitionDemos";
+import {
+  SceneTransitionDemo,
+  ShotTransitionDemo,
+} from "./TransitionDemos/TransitionDemos";
 import {
   CarouselDemo,
   FlipSplitDemo,
@@ -61,11 +68,10 @@ import {
   WindowBoxesDemo,
   WindowTiltDemo,
   WindowWhipDemo,
-} from "./WindowDemos";
+} from "./WindowDemos/WindowDemos";
 import type { HelperDemoId } from "../helperDemoIds";
 import type { HelperDemoProps } from "./helperDemo.types";
 import type { ComponentType } from "react";
-
 /**
  * Every live helper preview by id. Typed against `HELPER_DEMO_IDS`, so a new
  * id fails to compile until its preview is registered here.

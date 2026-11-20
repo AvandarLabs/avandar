@@ -1,4 +1,4 @@
-import { DisclosureField } from "./DisclosureField";
+import { DisclosureField } from "./DisclosureField/DisclosureField";
 import type { Input } from "./DisclosureAperture.schema";
 import type { ReactNode } from "react";
 

@@ -2,24 +2,21 @@ import { clsx } from "clsx";
 import { RowIssueContext } from "../RowIssueContext/RowIssueContext";
 import { TokenControl } from "../TokenControl";
 import { useTokenEditor } from "../TokenEditorContext";
-import {
-  findTokenRowIssue,
-  type TokenRow as TokenRowModel,
-} from "../tokenRows/tokenRows";
+import { findTokenRowIssue } from "../tokenRows/tokenRows";
+import { type TokenRow } from "../tokenRows/tokenRows.types";
 import { ItemOverrideNote } from "./ItemOverrideNote/ItemOverrideNote";
 import css from "./TokenRow.module.css";
 import { TokenRowHeader } from "./TokenRowHeader/TokenRowHeader";
 import { TokenRowIssue } from "./TokenRowIssue/TokenRowIssue";
 import { useTokenRowLabel } from "./useTokenRowLabel";
 import type { ReactNode } from "react";
-
 /**
  * One token: its name and state, its control, its path and description, and
  * any problem. An inherited item-scope value shows muted text and an
  * "Same as the theme" tag, and its chips and previews dim. A problem puts the
  * control's inputs in Mantine's error state and adds an alert line.
  */
-export function TokenRow({ row }: Readonly<{ row: TokenRowModel }>): ReactNode {
+export function TokenRow({ row }: Readonly<{ row: TokenRow }>): ReactNode {
   const editor = useTokenEditor();
   const label = useTokenRowLabel()(row);
   const issue = findTokenRowIssue({

@@ -1,4 +1,4 @@
-import { EASE, ramp } from "../../../motion";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ParcelEnvelope } from "./ParcelEnvelope";
 import { SetbackHatch } from "./SetbackHatch";
 import { StructureFootprint } from "./StructureFootprint";
@@ -15,7 +15,13 @@ export function ParcelGeometry({
   accent,
   id,
 }: Readonly<Props>): ReactNode {
-  const progress = ramp(frame, 36, 48, EASE.inOut);
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const progress = motion.ramp(
+    frame,
+    36,
+    motion.scale(48),
+    motion.travel.easing,
+  );
   const hatchId = `setback-${Array.from(id)
     .map((character) => {
       return character.codePointAt(0)?.toString(16);

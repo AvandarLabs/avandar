@@ -1,7 +1,10 @@
 import { prop } from "@avandar/utils";
-import { ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
-import { getPhrasePositionsFromSentenceParts } from "./getPhrasePositionsFromSentenceParts";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import {
+  getPhrasePositionsFromSentenceParts,
+  SENTENCE_FONT_SIZE,
+} from "./getPhrasePositionsFromSentenceParts";
 import type { Input } from "./UtteranceToModelDraft.schema";
 import type { ReactNode } from "react";
 
@@ -18,6 +21,9 @@ export function SourceSentence({
   accent,
   background,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const mapped = new Set(
     [
       ...input.draft.entities,
@@ -43,18 +49,23 @@ export function SourceSentence({
               aria-label={part.text}
               x={part.x}
               y={part.y}
-              fill={STOCK.text}
-              fontSize={12}
-              fontFamily="Arial, sans-serif"
+              fill={tokens.color.text}
+              fontSize={SENTENCE_FONT_SIZE}
+              fontFamily={tokens.text.graphic.data.fontFamily}
+              fontWeight={tokens.text.graphic.data.fontWeight}
               xmlSpace="preserve"
             >
               {part.text}
             </text>
             {mapped.has(part.id) ? (
-              <path
-                d={`M${part.x} ${part.y + 8} h${part.width * ramp(frame, 12, 36)}`}
+              <SketchedShape
+                shape={{
+                  kind: "path",
+                  d: `M${part.x} ${part.y + 8} h${part.width * motion.ramp(frame, 12, motion.scale(36))}`,
+                }}
+                profile={tokens.sketch.shape}
                 stroke={accent}
-                strokeWidth={2}
+                strokeWidth={scales.stroke(tokens.stroke.default)}
               />
             ) : undefined}
           </g>

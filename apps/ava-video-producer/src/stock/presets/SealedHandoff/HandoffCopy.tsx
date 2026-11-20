@@ -1,5 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./SealedHandoff.schema";
 import type { ReactNode } from "react";
 
@@ -9,6 +9,7 @@ type Props = { frame: number; input: Input };
  * reveal.
  */
 export function HandoffCopy({ frame, input }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   if (!input.showLabels) {
     return undefined;
   }
@@ -43,7 +44,7 @@ export function HandoffCopy({ frame, input }: Readonly<Props>): ReactNode {
         anchor="middle"
         normalizeWhitespace
         breakLongWords
-        color={STOCK.muted}
+        color={tokens.color.textMuted}
       />
     </g>
   );

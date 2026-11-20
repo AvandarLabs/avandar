@@ -138,7 +138,7 @@ test("both layouts retain all supplied maximum CJK wordings without speaker subs
         assert.ok(!content.includes('aria-label="通訳者"'));
       });
       const rectangles = [
-        ...markup.matchAll(/<rect data-bubble="[^"]*"[^>]*>/g),
+        ...markup.matchAll(/<rect\b[^>]*\bdata-bubble="[^"]*"[^>]*>/g),
       ].map(([r]) => {
         return {
           x: SvgAttributes.getNumberFromMarkup({ attributes: r, name: "x" }),

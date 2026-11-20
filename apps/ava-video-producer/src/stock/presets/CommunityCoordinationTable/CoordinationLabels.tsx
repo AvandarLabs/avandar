@@ -1,5 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { CoordinationOpenRequests } from "./CoordinationOpenRequests";
+import { CoordinationOpenRequests } from "./CoordinationOpenRequests/CoordinationOpenRequests";
 import { CoordinationPlaceCopy } from "./CoordinationPlaceCopy";
 import { CoordinationTeamCopy } from "./CoordinationTeamCopy";
 import type { Input } from "./CommunityCoordinationTable.schema";

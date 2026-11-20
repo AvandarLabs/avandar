@@ -1,6 +1,7 @@
-import { AllocationCoordinator } from "./AllocationCoordinator";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { AllocationCoordinator } from "./AllocationCoordinator/AllocationCoordinator";
 import { DonorToken } from "./DonorToken";
-import { DonorTray } from "./DonorTray";
+import { DonorTray } from "./DonorTray/DonorTray";
 import { FundingLabels } from "./FundingLabels";
 import { FundingPool } from "./FundingPool";
 import { FundingRequests } from "./FundingRequests";
@@ -16,7 +17,8 @@ export function PooledDonorAllocation({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = getAllocationTokensFromInputAndFrame({ input, frame });
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const tokens = getAllocationTokensFromInputAndFrame({ input, frame, motion });
   return (
     <g>
       <FundingLabels input={input} />

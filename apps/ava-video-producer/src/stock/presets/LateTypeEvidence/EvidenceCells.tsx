@@ -1,4 +1,5 @@
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { EvidenceOutputCell } from "./EvidenceOutputCell";
 import { EvidenceSourceCell } from "./EvidenceSourceCell";
 import type { Input } from "./LateTypeEvidence.schema";
@@ -17,26 +18,27 @@ export function EvidenceCells({
   accent,
   background,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
       {input.values.map((value, index) => {
         return (
           <g key={`${index}:${value}`}>
-            <rect
+            <StockRect
               x={64}
               y={225 + index * 50}
               width={330}
               height={42}
               fill="none"
-              stroke={STOCK.line}
+              stroke={tokens.color.line}
             />
-            <rect
+            <StockRect
               x={540}
               y={225 + index * 50}
               width={330}
               height={42}
               fill="none"
-              stroke={STOCK.line}
+              stroke={tokens.color.line}
             />
             <EvidenceSourceCell input={input} index={index} frame={frame} />
             <EvidenceOutputCell

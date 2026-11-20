@@ -5,7 +5,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
-import { STOCK } from "../../stockPalette";
+import classicTheme from "../../../../themes/classic.theme.json";
 import { SchoolLunchTrayComposition } from "./SchoolLunchTrayComposition";
 import { schoolLunchTrayCompositionContract as contract } from "./SchoolLunchTrayComposition.contract";
 import {
@@ -229,7 +229,7 @@ function _assertOutlineTreatment({
       frame < 104;
     assert.equal(
       outline.stroke,
-      STOCK.line,
+      classicTheme.other.video.atomic.swatch.line,
       `neutral outline at frame ${frame}`,
     );
     assert.equal(

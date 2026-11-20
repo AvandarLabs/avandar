@@ -16,17 +16,14 @@ const ROOT: string = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "../..",
 );
-
 export type MotionRequest = {
   entry: StockEntry;
   request: ResolvedStockRequest;
   sourceHash: string;
   theme: VideoThemeSnapshot;
 };
-
 const MOTION_USAGE =
   "Usage: pnpm motion -- list | preview [all|preset-id] [--input file.json] [--theme id] | render [all|preset-id] [--input file.json] [--theme id]";
-
 function _parseFlags(
   extra: readonly string[],
 ): Readonly<Record<string, string>> {
@@ -50,7 +47,6 @@ function _parseFlags(
   }
   return Object.fromEntries(pairs);
 }
-
 /**
  * Resolve stable CLI selections, the optional complete-input file, and the
  * theme.
@@ -81,7 +77,6 @@ function _parseMotionArgs(args: readonly string[]): {
     themeId: flags["--theme"] ?? "classic",
   };
 }
-
 function _freezeSnapshot<Value>(value: Value): Value {
   if (value && typeof value === "object") {
     Object.values(value).forEach((child) => {
@@ -91,7 +86,6 @@ function _freezeSnapshot<Value>(value: Value): Value {
   }
   return value;
 }
-
 /** Validate complete authored requests before starting any renderer bundle. */
 async function _makeMotionRequestsFromArgs(
   options: Readonly<{

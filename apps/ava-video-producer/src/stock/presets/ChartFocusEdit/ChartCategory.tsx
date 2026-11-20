@@ -1,7 +1,9 @@
-import { EASE, mix, ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { mix } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CategoryContext } from "./CategoryContext";
 import { CategoryLabel } from "./CategoryLabel";
+import { RefinementMotion } from "./RefinementMotion";
 import type { Input } from "./ChartFocusEdit.schema";
 import type { ReactNode } from "react";
 
@@ -12,6 +14,8 @@ type Props = {
   frame: number;
   accent: string;
 };
+/** A bar's corner before the corner style scales it. */
+const BAR_CORNER = 2;
 /**
  * An unchanging quantitative bar with independently moving editorial labels.
  */
@@ -22,25 +26,31 @@ export function ChartCategory({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const refinement = ramp(frame, 40, 72, EASE.inOut);
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const refinement = RefinementMotion.getRefinementFromFrame({ frame, motion });
   const direct = input.treatment !== "focus" ? refinement : 0;
   const emphasized =
     input.treatment !== "direct-labels" && category.id !== input.focusId;
   const y = 174 + index * 72;
   return (
-    <g opacity={ramp(frame, 12 + index * 2, 12)}>
+    <g opacity={motion.reveal(frame, 12 + index * motion.stagger.list)}>
       {input.showBeforeGuide ? (
-        <path
-          data-before-guide={category.id}
-          d={`M20 ${y + 29}H332`}
-          stroke={STOCK.line}
-          strokeDasharray="3 5"
-          opacity={refinement * 0.4}
-        />
+        <g data-before-guide={category.id}>
+          <SketchedShape
+            shape={{ kind: "path", d: `M20 ${y + 29}H332` }}
+            profile={tokens.sketch.shape}
+            stroke={tokens.color.line}
+            strokeDasharray={tokens.dash.guide.join(" ")}
+            opacity={refinement * tokens.alpha.dimmed}
+          />
+        </g>
       ) : undefined}
       <g
         data-bar-emphasis={category.id}
-        opacity={emphasized ? mix(refinement, 1, 0.35) : 1}
+        opacity={emphasized ? mix(refinement, 1, atomic.opacity["35"]) : 1}
       >
         <rect
           data-chart-bar={category.id}
@@ -48,7 +58,7 @@ export function ChartCategory({
           y={y}
           width={(category.value / input.axisMaximum) * 400}
           height={20}
-          rx={2}
+          rx={scales.corner(BAR_CORNER)}
           fill={accent}
         />
       </g>

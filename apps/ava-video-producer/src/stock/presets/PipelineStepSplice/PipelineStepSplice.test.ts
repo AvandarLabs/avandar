@@ -87,7 +87,7 @@ test("one parked module enters the requested gap and its joints follow the final
     const markup = _render({ frame: 150, input: input });
     const joins = [
       ...markup.matchAll(
-        /data-final-join="[^"]*" data-from="([^"]*)" data-to="([^"]*)" x1="([^"]*)"[^>]*x2="([^"]*)"/g,
+        /data-final-join="[^"]*" data-from="([^"]*)" data-to="([^"]*)"><line x1="([^"]*)"[^>]*x2="([^"]*)"/g,
       ),
     ];
     assert.deepEqual(

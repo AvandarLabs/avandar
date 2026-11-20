@@ -1,6 +1,8 @@
-import { getMotionDuration } from "./motionSettings";
-import type { MotionOptions } from "./motionSettings";
-
+import { MotionSettings } from "./MotionSettings/MotionSettings";
+import type {
+  MotionOptions,
+  MotionSettingsTheme,
+} from "./MotionSettings/MotionSettings";
 /** Measured geometry in the enclosing composition's coordinate system. */
 export type MotionRect = {
   x: number;
@@ -21,16 +23,32 @@ export type OverlayCue = {
   fadeFrames?: number;
   motion?: MotionOptions;
 };
-
 /** Resolved travel and fade durations of an overlay cue, in frames. */
-export type OverlayTimings = { entry: number; exit: number; fade: number };
-
+export type OverlayTimings = {
+  entry: number;
+  exit: number;
+  fade: number;
+};
 /**
  * Resolve travel and fade durations, rejecting cues that cannot include a hold.
  */
-export function getOverlayTimings(cue: OverlayCue): OverlayTimings {
-  const entry = getMotionDuration(cue.entryFrames ?? 36, cue.motion);
-  const exit = getMotionDuration(cue.exitFrames ?? 30, cue.motion);
+export function getOverlayTimings({
+  cue,
+  theme = MotionSettings.getClassicMotionSettingsTheme(),
+}: Readonly<{
+  cue: OverlayCue;
+  theme?: MotionSettingsTheme;
+}>): OverlayTimings {
+  const entry = MotionSettings.getMotionDuration({
+    frames: cue.entryFrames ?? 36,
+    options: cue.motion,
+    theme,
+  });
+  const exit = MotionSettings.getMotionDuration({
+    frames: cue.exitFrames ?? 30,
+    options: cue.motion,
+    theme,
+  });
   const fade = cue.fadeFrames ?? 20;
   if (
     entry < 1 ||

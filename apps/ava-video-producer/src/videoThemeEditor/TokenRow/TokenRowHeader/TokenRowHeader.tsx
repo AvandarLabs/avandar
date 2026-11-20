@@ -3,9 +3,9 @@ import { IconArrowBackUp } from "@tabler/icons-react";
 import { clsx } from "clsx";
 import { formatTokenValue } from "../../formatTokenValue/formatTokenValue";
 import { useTokenEditor } from "../../TokenEditorContext";
+import { type TokenRow } from "../../tokenRows/tokenRows.types";
 import { OverrideDot } from "./OverrideDot/OverrideDot";
 import css from "./TokenRowHeader.module.css";
-import type { TokenRow } from "../../tokenRows/tokenRows";
 import type { ReactNode } from "react";
 
 type Props = Readonly<{
@@ -14,7 +14,6 @@ type Props = Readonly<{
   isInherited: boolean;
   hasIssue: boolean;
 }>;
-
 /** A row's name, state, current value, and reset action. */
 export function TokenRowHeader({
   row,

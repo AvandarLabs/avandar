@@ -30,10 +30,15 @@ export function isTokenDefinition(node: CatalogNode): node is TokenDefinition {
   return "kind" in node && typeof node.kind === "string";
 }
 
-/** Whether a catalog node is a scale of same-kind tokens. */
+/**
+ * Whether a catalog node is a scale of same-kind tokens. A scale has `scale`
+ * as its only key, so a group may also hold a token named `scale`, such as
+ * `stroke.scale`.
+ */
 export function isTokenScale(node: CatalogNode): node is TokenScale {
   return (
     "scale" in node &&
+    Object.keys(node).length === 1 &&
     typeof node.scale === "object" &&
     node.scale !== null &&
     "kind" in node.scale
@@ -115,6 +120,7 @@ export const COMPOSITE_TOKEN_FIELDS = {
       spring: { kind: "spring" },
       period: { kind: "duration" },
       rate: { kind: "number" },
+      stagger: { kind: "number" },
     },
   },
   cameraPreset: {

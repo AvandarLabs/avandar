@@ -1,4 +1,5 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./ContributionWeave.schema";
 import type { ReactNode } from "react";
 
@@ -13,18 +14,28 @@ export function WeaveBandPattern({
   color,
   pattern,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <pattern id={id} width={12} height={12} patternUnits="userSpaceOnUse">
       <rect width={12} height={12} fill={color} />
       {pattern === "stripe" ? (
-        <path
-          d="M0 3 H12 M0 9 H12"
-          stroke={STOCK.ground}
-          strokeOpacity={0.45}
-          strokeWidth={2}
+        <SketchedShape
+          shape={{ kind: "path", d: "M0 3 H12 M0 9 H12" }}
+          profile={tokens.sketch.shape}
+          stroke={tokens.color.ground}
+          strokeOpacity={atomic.opacity["45"]}
+          strokeWidth={scales.stroke(tokens.stroke.default)}
         />
       ) : pattern === "dot" ? (
-        <circle cx={6} cy={6} r={2} fill={STOCK.ground} fillOpacity={0.5} />
+        <circle
+          cx={6}
+          cy={6}
+          r={2}
+          fill={tokens.color.ground}
+          fillOpacity={atomic.opacity["50"]}
+        />
       ) : undefined}
     </pattern>
   );

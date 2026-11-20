@@ -1,9 +1,9 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getJigSceneFromFrame } from "./getJigSceneFromFrame";
-import { JigGuide } from "./JigGuide";
+import { JigGuide } from "./JigGuide/JigGuide";
 import { JigMakingTool } from "./JigMakingTool";
 import { JigMarkingHand } from "./JigMarkingHand";
 import { JigStation } from "./JigStation";
@@ -12,14 +12,15 @@ import type { Input } from "./SharedJigPreparation.schema";
 import type { ReactNode } from "react";
 /** Inputs for SharedJigPreparation. */
 type Props = GraphicProps & { input: Input };
-
 /** One prepared guide is physically shared in collection order and retained. */
 export function SharedJigPreparation({
   frame,
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const scene = getJigSceneFromFrame({ frame, input });
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scene = getJigSceneFromFrame({ motion, frame, input });
   const action =
     frame < 49
       ? input.labels.prepare
@@ -55,7 +56,7 @@ export function SharedJigPreparation({
         y={440}
         size={32}
         role="worker"
-        color={STOCK.orange}
+        color={tokens.color.highlight}
       />
       <FitText
         text={input.makerLabel}
@@ -64,7 +65,7 @@ export function SharedJigPreparation({
         width={300}
         fontSize={12}
         maxLines={2}
-        color={STOCK.orange}
+        color={tokens.color.highlight}
         normalizeWhitespace
         breakLongWords
       />

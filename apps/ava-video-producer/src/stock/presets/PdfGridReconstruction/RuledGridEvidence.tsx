@@ -1,4 +1,6 @@
-import { ramp } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { getEvidenceFromFrame } from "./getEvidenceFromFrame";
 import type { Input } from "./PdfGridReconstruction.schema";
 import type { ReactNode } from "react";
 
@@ -9,9 +11,11 @@ export function RuledGridEvidence({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const width = 400 / input.grid.columnLabels.length;
   const height = 80 + input.grid.rows.length * 64;
-  const progress = ramp(frame, 13, 42);
+  const progress = getEvidenceFromFrame({ frame, motion });
   return (
     <g>
       {" "}
@@ -21,29 +25,37 @@ export function RuledGridEvidence({
             { length: input.grid.columnLabels.length + 1 },
             (_, index) => {
               return (
-                <line
-                  key={`v${index}`}
-                  data-ruling-line={`v${index}`}
-                  x1={52 + index * width}
-                  x2={52 + index * width}
-                  y1={210}
-                  y2={210 + height * progress}
-                  stroke={accent}
-                />
+                <g key={`v${index}`} data-ruling-line={`v${index}`}>
+                  <SketchedShape
+                    shape={{
+                      kind: "line",
+                      x1: 52 + index * width,
+                      x2: 52 + index * width,
+                      y1: 210,
+                      y2: 210 + height * progress,
+                    }}
+                    profile={tokens.sketch.shape}
+                    stroke={accent}
+                  />
+                </g>
               );
             },
           )}
           {Array.from({ length: input.grid.rows.length + 2 }, (_, index) => {
             return (
-              <line
-                key={`h${index}`}
-                data-ruling-line={`h${index}`}
-                x1={52}
-                x2={52 + 400 * progress}
-                y1={index === 0 ? 210 : 290 + (index - 1) * 64}
-                y2={index === 0 ? 210 : 290 + (index - 1) * 64}
-                stroke={accent}
-              />
+              <g key={`h${index}`} data-ruling-line={`h${index}`}>
+                <SketchedShape
+                  shape={{
+                    kind: "line",
+                    x1: 52,
+                    x2: 52 + 400 * progress,
+                    y1: index === 0 ? 210 : 290 + (index - 1) * 64,
+                    y2: index === 0 ? 210 : 290 + (index - 1) * 64,
+                  }}
+                  profile={tokens.sketch.shape}
+                  stroke={accent}
+                />
+              </g>
             );
           })}
         </g>

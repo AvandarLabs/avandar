@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { STOCK_CATALOG } from "../../stock/catalog";
 import { makeDraftThemeResultFromDraft } from "../../videoThemeEditor/resolveDraftTheme/resolveDraftTheme";
 import { useGalleryVideoTheme } from "../GalleryVideoTheme/useGalleryVideoTheme";
-import { AtlasSections } from "./AtlasSections";
+import { AtlasSections } from "./AtlasSections/AtlasSections";
 import { GalleryHeader } from "./GalleryHeader";
 import { GalleryIntroduction } from "./GalleryIntroduction";
 import { GalleryNavigation } from "./GalleryNavigation";

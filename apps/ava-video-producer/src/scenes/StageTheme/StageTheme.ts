@@ -1,0 +1,85 @@
+import { DEFAULT_VIDEO_THEME_SOURCE } from "../../videoTheme/builtInVideoThemes/builtInVideoThemes";
+import {
+  createVideoMotion,
+  type VideoMotion,
+} from "../../videoTheme/createVideoMotion/createVideoMotion";
+import { buildColorWithAlpha } from "../../videoTheme/cssValueHelpers/cssValueHelpers";
+import { makeResolvedVideoThemeFromSource } from "../../videoTheme/makeResolvedVideoThemeFromSource/makeResolvedVideoThemeFromSource";
+import type {
+  ResolvedTypeStyle,
+  ResolvedVideoTheme,
+} from "../../videoTheme/videoTheme.types";
+import type { CSSProperties } from "react";
+
+let classicMotion: VideoMotion | undefined;
+/**
+ * The `classic` theme, resolved once. Pure stage helpers that take the
+ * theme's motion as an argument default to it, for a caller that renders
+ * outside any video theme, such as a unit test.
+ */
+function _getClassicStageTheme(): ResolvedVideoTheme {
+  return makeResolvedVideoThemeFromSource(DEFAULT_VIDEO_THEME_SOURCE);
+}
+/** `VideoMotion` for `classic`, the default of every pure stage helper. */
+function _getClassicStageMotion(): VideoMotion {
+  classicMotion ??= createVideoMotion(_getClassicStageTheme().semantic.motion);
+  return classicMotion;
+}
+/**
+ * The CSS of a stage text role: its face, size, weight, and colour, plus
+ * its line height and tracking when the role sets them. Pass `fields` to
+ * take only some of them, for example a fitted heading that keeps its own
+ * size.
+ */
+function _getStageTextStyle({
+  role,
+  fields = STAGE_TEXT_FIELDS,
+}: Readonly<{
+  role: ResolvedTypeStyle;
+  fields?: readonly StageTextField[];
+}>): CSSProperties {
+  const style: CSSProperties = {
+    fontFamily: role.fontFamily,
+    fontSize: role.fontSize,
+    fontWeight: role.fontWeight,
+    lineHeight: role.lineHeight,
+    letterSpacing:
+      role.letterSpacing === undefined ? undefined : `${role.letterSpacing}em`,
+    color: buildColorWithAlpha(role.color, role.alpha),
+  };
+  return Object.fromEntries(
+    fields.flatMap((field) => {
+      return style[field] === undefined ? [] : [[field, style[field]]];
+    }),
+  );
+}
+/** One CSS property a stage text role sets. */
+export type StageTextField =
+  | "fontFamily"
+  | "fontSize"
+  | "fontWeight"
+  | "lineHeight"
+  | "letterSpacing"
+  | "color";
+const STAGE_TEXT_FIELDS: readonly StageTextField[] = [
+  "fontFamily",
+  "fontSize",
+  "fontWeight",
+  "lineHeight",
+  "letterSpacing",
+  "color",
+];
+/** Provides classic motion defaults and converts stage text roles to CSS. */
+export const StageTheme = {
+  /** The `classic` theme, resolved once. Pure stage helpers that take the
+    theme's motion as an argument default to it, for a caller that renders
+    outside any video theme, such as a unit test. */
+  getClassicStageTheme: _getClassicStageTheme,
+  /** `VideoMotion` for `classic`, the default of every pure stage helper. */
+  getClassicStageMotion: _getClassicStageMotion,
+  /** The CSS of a stage text role: its face, size, weight, and colour, plus
+    its line height and tracking when the role sets them. Pass `fields` to
+    take only some of them, for example a fitted heading that keeps its own
+    size. */
+  getStageTextStyle: _getStageTextStyle,
+};

@@ -1,5 +1,6 @@
-import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getCapacityFromFloorTiles } from "./getCapacityFromFloorTiles";
 import { ShelterAccounting } from "./ShelterAccounting";
 import { ShelterFloor } from "./ShelterFloor";
@@ -17,6 +18,9 @@ export function ShelterUsableAreaCapacity({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const values = getCapacityFromFloorTiles(input);
   const width = (360 * values.sleeping.length) / input.floorTiles.length;
   return (
@@ -29,16 +33,20 @@ export function ShelterUsableAreaCapacity({
     >
       <LabelSlots labels={[[input.copy.context, 60, 30, 840, 14, 2]]} />
       <ShelterFloor input={input} frame={frame} accent={accent} />
-      <g opacity={ramp(frame, 108, 12)}>
+      <g opacity={motion.reveal(frame, 108)}>
         {Array.from({ length: values.equivalents + 1 }, (_, index) => {
           return (
-            <path
-              key={index}
-              data-place-division={index}
-              d={`M${60 + (values.usable === 0 ? 0 : ((index * input.illustrativeAreaPerPlace) / values.usable) * width)} 388v28`}
-              stroke={accent}
-              strokeWidth={0.8}
-            />
+            <g key={index} data-place-division={index}>
+              <SketchedShape
+                shape={{
+                  kind: "path",
+                  d: `M${60 + (values.usable === 0 ? 0 : ((index * input.illustrativeAreaPerPlace) / values.usable) * width)} 388v28`,
+                }}
+                profile={tokens.sketch.shape}
+                stroke={accent}
+                strokeWidth={scales.stroke(0.8)}
+              />
+            </g>
           );
         })}
       </g>

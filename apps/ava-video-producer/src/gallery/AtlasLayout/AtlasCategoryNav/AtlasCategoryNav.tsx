@@ -75,19 +75,20 @@ export function AtlasCategoryNav({
   );
 }
 
+type CategoryButtonOptions = {
+  icon: IconName;
+  label: string;
+  count: number;
+  isActive: boolean;
+  onClick: () => void;
+};
 function CategoryButton({
   icon,
   label,
   count,
   isActive,
   onClick,
-}: {
-  icon: IconName;
-  label: string;
-  count: number;
-  isActive: boolean;
-  onClick: () => void;
-}) {
+}: CategoryButtonOptions) {
   return (
     <button
       type="button"

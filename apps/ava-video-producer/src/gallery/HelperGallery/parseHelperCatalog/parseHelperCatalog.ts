@@ -12,6 +12,7 @@ const CATEGORY_SCHEMA = z.strictObject({
 const MODULE_SCHEMA = z.strictObject({
   path: TEXT,
   exhaustiveMembers: z.array(TEXT).default([]),
+  memberModules: z.array(TEXT).default([]),
   excluded: z.array(z.strictObject({ name: TEXT, reason: TEXT })),
 });
 

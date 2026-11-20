@@ -1,12 +1,9 @@
-import { Arrive } from "../../graphics-common/Arrive";
+import { Arrive } from "../../graphics-common/Arrive/Arrive";
 import { DrawPath } from "../../graphics-common/DrawPath";
 import { Packet } from "../../graphics-common/Packet";
 import { Panel } from "../../graphics-common/Panel";
 import { Text } from "../../graphics-common/Text";
-import {
-  useGraphicProps,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SourceChip } from "./SourceChip";
 import {
   MERGE_INPUT,
@@ -22,7 +19,6 @@ import type { SourceMergeInput } from "../../presets/SourceMerge/SourceMerge.sch
 import type { ReactNode } from "react";
 
 type Source = SourceMergeInput["sources"][number];
-
 type Props = Readonly<{
   source: Source;
   index: number;
@@ -30,7 +26,6 @@ type Props = Readonly<{
   color: string;
   showPackets: boolean;
 }>;
-
 /**
  * One source: its edge into the merge node, packets, and its labelled panel.
  */
@@ -41,8 +36,8 @@ export function SourceRow({
   color,
   showPackets,
 }: Props): ReactNode {
-  const style = useGraphicProps("SourceMerge", {});
-  const { layout } = useGraphicTokens();
+  const style = GraphicThemeHooks.useGraphicProps("SourceMerge", {});
+  const { layout } = GraphicThemeHooks.useGraphicTokens();
   const x = layout.graphic.margin;
   const y = SOURCE_TOP + index * SOURCE_STEP;
   const from = { x: x + SOURCE_WIDTH, y: y + 43 };

@@ -1,5 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./ProvenancePeelback.schema";
 import type { ReactNode, ComponentProps } from "react";
 
@@ -18,15 +18,16 @@ export function SourcePassageCopy({
   height,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const slots: Array<ComponentProps<typeof FitText>> = [
     {
       text: source.title,
       x: 16,
       y: 26,
       width: 368,
-      fontSize: 14,
+      fontSize: 14 as const,
       maxLines: 2,
-      color: selected ? accent : STOCK.text,
+      color: selected ? accent : tokens.color.text,
     },
     ...(showLocators
       ? [
@@ -37,7 +38,7 @@ export function SourcePassageCopy({
             width: 368,
             fontSize: 12 as const,
             maxLines: 1,
-            color: STOCK.muted,
+            color: tokens.color.textMuted,
           },
         ]
       : []),
@@ -46,7 +47,7 @@ export function SourcePassageCopy({
       x: 16,
       y: selected ? 92 : 82,
       width: 368,
-      fontSize: 14,
+      fontSize: 14 as const,
       maxLines: 8,
     },
   ];

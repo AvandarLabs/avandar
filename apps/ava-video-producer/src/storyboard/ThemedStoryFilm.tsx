@@ -13,7 +13,6 @@ type Props = Readonly<{
   theme?: VideoThemeSnapshot;
   productScene?: ProductSceneRenderer;
 }>;
-
 /**
  * A storyboard film drawn inside its theme, scoped by the plan id so the
  * theme's override for that composition applies. The root of every

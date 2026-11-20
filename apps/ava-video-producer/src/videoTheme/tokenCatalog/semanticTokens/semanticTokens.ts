@@ -15,7 +15,6 @@ function _stroke(label: string, description: string) {
     description,
   });
 }
-
 function _corner(label: string, description: string) {
   return token({
     kind: "length",
@@ -27,11 +26,34 @@ function _corner(label: string, description: string) {
     description,
   });
 }
-
+function _multiplier({
+  label,
+  description,
+  range,
+}: Readonly<{
+  label: string;
+  description: string;
+  range: Readonly<{ min: number; max: number; step: number }>;
+}>) {
+  return token({ kind: "number", unit: "×", ...range, label, description });
+}
+function _alpha({
+  label,
+  description,
+}: Readonly<{ label: string; description: string }>) {
+  return token({
+    kind: "opacity",
+    unit: "%",
+    min: 0,
+    max: 1,
+    step: 0.01,
+    label,
+    description,
+  });
+}
 function _sketch(label: string, description: string) {
   return token({ kind: "sketchProfile", label, description });
 }
-
 /**
  * Semantic roles under `other.video.semantic`. A theme author sets these by
  * meaning ("the accent", "the caption style"); each one is a reference to
@@ -57,6 +79,20 @@ export const SEMANTIC_TOKENS = {
       "Hand-drawn underlines and annotations.",
     ),
     route: _stroke("Route stroke", "A highlighted route through a diagram."),
+    emphasis: _stroke(
+      "Emphasis stroke",
+      "Outlines and paths that carry the point: the active box, the chosen route.",
+    ),
+    heavy: _stroke(
+      "Heavy stroke",
+      "The thickest line role, for bold rules, ticks, and marks.",
+    ),
+    scale: _multiplier({
+      label: "Line weight",
+      description:
+        "Multiplies every stroke a graphic draws, including shape-specific widths. 1 draws them as authored.",
+      range: { min: 0.25, max: 3, step: 0.05 },
+    }),
   },
   corner: {
     panel: _corner("Panel corner", "Corner radius of panels inside a graphic."),
@@ -78,6 +114,77 @@ export const SEMANTIC_TOKENS = {
       "Corner radius of a spotlight cut-out.",
     ),
     label: _corner("Label corner", "Corner radius of a floating label."),
+    cell: _corner(
+      "Cell corner",
+      "Corner radius of table cells, slots, and other small boxes in a graphic.",
+    ),
+    scene: _corner(
+      "Scene corner",
+      "Corner radius of cards, panels, captions, and media in a storyboard scene.",
+    ),
+    scale: _multiplier({
+      label: "Corner style",
+      description:
+        "Multiplies every corner radius, including shape-specific ones. 0 draws square corners.",
+      range: { min: 0, max: 3, step: 0.05 },
+    }),
+  },
+  alpha: {
+    wash: _alpha({
+      label: "Wash",
+      description:
+        "The faint accent fill behind an active row, cell, or region.",
+    }),
+    tint: _alpha({
+      label: "Tint",
+      description:
+        "A stronger accent fill, such as the head of a glyph or a selected chip.",
+    }),
+    ghost: _alpha({
+      label: "Ghost",
+      description:
+        "Shapes that remain as a trace: a removed item, a past position.",
+    }),
+    dimmed: _alpha({
+      label: "Dimmed",
+      description: "Shapes stepped back while another is the point.",
+    }),
+    guide: _alpha({
+      label: "Guide",
+      description:
+        "Construction marks and guides that should read under the content.",
+    }),
+    washScale: _multiplier({
+      label: "Tint strength",
+      description:
+        "Multiplies wash and tint fills behind active items. 1 draws them as authored.",
+      range: { min: 0, max: 2, step: 0.05 },
+    }),
+  },
+  dash: {
+    guide: token({
+      kind: "dash",
+      label: "Guide dash",
+      description: "The dash of guides, boundaries, and construction lines.",
+    }),
+    pending: token({
+      kind: "dash",
+      label: "Pending dash",
+      description:
+        "The dash of an outline still waiting on its content: a pending step or a slot about to fill.",
+    }),
+    placeholder: token({
+      kind: "dash",
+      label: "Placeholder dash",
+      description:
+        "The dash of an outline standing in for something missing or absent, such as a missing partner, an empty form, or a stencil.",
+    }),
+    planned: token({
+      kind: "dash",
+      label: "Planned dash",
+      description:
+        "The dash of an outline for something planned but not there yet: an empty visit slot or a planned shade footprint.",
+    }),
   },
   elevation: {
     flat: token({
@@ -90,6 +197,19 @@ export const SEMANTIC_TOKENS = {
       label: "Floating",
       description:
         "Surfaces that hover over the stage, such as floating labels and lifted diagrams.",
+    }),
+    window: token({
+      kind: "shadow",
+      surface: "stage",
+      label: "Window shadow",
+      description:
+        "The cast shadow under a tilted window. Its colour is the scene shadow, or the scene background at 60% when that is unset.",
+    }),
+    strength: _multiplier({
+      label: "Shadow intensity",
+      description:
+        "Multiplies the opacity of every shadow. 0 removes shadows and 1 draws them as authored.",
+      range: { min: 0, max: 2, step: 0.05 },
     }),
   },
   effect: {
@@ -222,6 +342,12 @@ export const SEMANTIC_TOKENS = {
       label: "Transition blur",
       description:
         "Peak blur of a spatial transition at full strength and a 180 degree shutter.",
+    }),
+    strength: _multiplier({
+      label: "Motion blur strength",
+      description:
+        "Multiplies camera and transition motion blur. 0 turns it off.",
+      range: { min: 0, max: 2, step: 0.05 },
     }),
   },
 } as const;

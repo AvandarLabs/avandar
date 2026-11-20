@@ -1,4 +1,5 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./PublicationSnapshotSlice.schema";
 
 type Params = {
@@ -7,6 +8,7 @@ type Params = {
   rowIndex: number;
   columnIndex: number;
   snapshot: boolean;
+  motion: VideoMotion;
 };
 /** Data for getSnapshotCellFromFrame. */
 type GetSnapshotCellFromFrameResult = {
@@ -35,6 +37,7 @@ export function getSnapshotCellFromFrame({
   rowIndex,
   columnIndex,
   snapshot,
+  motion,
 }: Readonly<Params>): GetSnapshotCellFromFrameResult {
   const row = input.table.rows[rowIndex],
     column = input.table.columns[columnIndex];
@@ -47,7 +50,7 @@ export function getSnapshotCellFromFrame({
     departure =
       56 + (input.selection.rowIds.length - 1 - selectedRow) * duration;
   const progress = snapshot
-    ? ramp(frame, departure, duration - 1, EASE.inOut)
+    ? motion.ramp(frame, departure, duration - 1, motion.travel.easing)
     : 0;
   const isEditTarget =
     !snapshot &&
@@ -61,7 +64,7 @@ export function getSnapshotCellFromFrame({
     isEditTarget,
     isEdited,
     departure,
-    copyOpacity: ramp(frame, departure, 1),
+    copyOpacity: motion.ramp(frame, departure, motion.scale(1)),
     isActiveCopy:
       snapshot && frame >= departure && frame < departure + duration,
     value: isEdited ? input.liveEdit.value : row.cells[columnIndex],

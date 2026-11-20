@@ -1,10 +1,17 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 /** Rotates chair geometry toward its book while retaining caption clearance. */
 export function getReadingSeatPathFromFrame({
   frame,
   angle,
-}: Readonly<{ frame: number; angle: number }>): string {
-  const progress = ramp(frame, 44, 64, EASE.inOut);
+  motion,
+}: Readonly<{ frame: number; angle: number; motion: VideoMotion }>): string {
+  const progress = motion.ramp(
+    frame,
+    44,
+    motion.scale(64),
+    motion.travel.easing,
+  );
   const rotation = angle * progress;
   const pivotY = mix(progress, 25, 16);
   return [

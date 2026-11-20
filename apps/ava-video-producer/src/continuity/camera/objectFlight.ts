@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { motionOptionsSchema } from "../../motion-components/motionSettings";
-
+import { getObjectFlight } from "../../motion-components/getObjectFlight/getObjectFlight";
+import { MotionSettings } from "../../motion-components/MotionSettings/MotionSettings";
 /** A bounded cutout of a diagram that can leave independently of its camera. */
 export const objectFlightSchema = z
   .object({
@@ -8,7 +8,7 @@ export const objectFlightSchema = z
     duration: z.number().int().min(1).max(300),
     dx: z.number().min(-1200).max(1200),
     dy: z.number().min(-800).max(800),
-    motion: motionOptionsSchema.optional(),
+    motion: MotionSettings.motionOptionsSchema.optional(),
     rect: z
       .object({
         x: z.number().nonnegative(),
@@ -22,6 +22,5 @@ export const objectFlightSchema = z
       }, "Flying object must fit inside the diagram"),
   })
   .strict();
-
 /** Compatibility export for deterministic object-departure geometry. */
-export { getObjectFlight } from "../../motion-components/getObjectFlight";
+export { getObjectFlight } from "../../motion-components/getObjectFlight/getObjectFlight";

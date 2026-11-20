@@ -1,20 +1,23 @@
+import {
+  type ScrollStep,
+  type CarouselWindow,
+  type WindowReveal,
+  type PullBack,
+  type WindowCameraKey,
+} from "./TiltedWindowScene/WindowMotion/WindowMotion.types";
 import type { ThemeTokenName } from "../storyboard/schema/themeSchema";
 import type {
   LockupCta,
   MarkBuild,
   MarkFlyThrough,
-} from "./BrandLockupScene/brandLockupMotion";
+} from "./BrandLockupScene/BrandLockupMotion/BrandLockupMotion";
 import type { GraphPacket } from "./layout/graphLayout";
-import type { HeadingReveal, StagedExit, TextRevealMode } from "./textReveal";
 import type {
-  CarouselWindow,
-  PullBack,
-  ScrollStep,
-  WindowCameraKey,
-  WindowReveal,
-} from "./TiltedWindowScene/windowMotion";
+  HeadingReveal,
+  StagedExit,
+  TextRevealMode,
+} from "./textReveal/textReveal";
 import type { WindowBoxName } from "./TiltedWindowScene/windowTilt";
-
 /**
  * All times are scene-local frames. Coordinates are normalized unless noted.
  */
@@ -24,11 +27,12 @@ export type SceneBase = {
   height?: number;
   title?: string;
   kicker?: string;
-  /** How the title and kicker arrive. Default: each rises in, the kicker a
-   *  panel after the title. */
+  /**
+   * How the title and kicker arrive. Default: each rises in, the kicker a
+   * panel after the title.
+   */
   headingReveal?: HeadingReveal;
 };
-
 export type GraphNode = {
   id: string;
   label: string;
@@ -61,7 +65,6 @@ export type GraphSceneProps = SceneBase & {
   traversal?: TraversalBeat[];
   revealAtFrame?: number;
 };
-
 export type FlowStep = { id: string; label: string; detail?: string };
 export type FlowConnector = { from: string; to: string; label?: string };
 export type FlowchartSceneProps = SceneBase & {
@@ -71,7 +74,6 @@ export type FlowchartSceneProps = SceneBase & {
   stepAtFrames?: number[];
   revealAtFrame?: number;
 };
-
 export type MetricSceneProps = SceneBase & {
   label: string;
   value: number;
@@ -82,7 +84,6 @@ export type MetricSceneProps = SceneBase & {
   countAtFrame?: number;
   countDurationInFrames?: number;
 };
-
 export type TypographySceneProps = SceneBase & {
   lines: string[];
   /** Exact, case-sensitive words, including punctuation. */
@@ -95,16 +96,17 @@ export type TypographySceneProps = SceneBase & {
   revealMode?: TextRevealMode;
   /** Frames between lines for the line-by-line modes. Default 3. */
   lineStaggerFrames?: number;
-  /** A public-relative image drawn above the lines, `size` px tall. It
-   *  fades in at `atFrame`, or at `revealAtFrame` with the lines a panel
-   *  later when `atFrame` is omitted. */
+  /**
+   * A public-relative image drawn above the lines, `size` px tall. It
+   * fades in at `atFrame`, or at `revealAtFrame` with the lines a panel
+   * later when `atFrame` is omitted.
+   */
   icon?: { src: string; size?: number; atFrame?: number };
   /** Lines fade out top to bottom, then the icon. */
   exit?: StagedExit;
   /** `caption` sets small regular-weight text instead of a display size. */
   size?: "display" | "caption";
 };
-
 export type NormalizedRect = {
   x: number;
   y: number;
@@ -129,7 +131,6 @@ export type MediaSceneProps = SceneBase & {
   /** Rectangles are relative to the final visible media viewport. */
   callouts?: MediaCallout[];
 };
-
 export type CaptionCue = {
   id: string;
   startFrame: number;
@@ -144,7 +145,6 @@ export type CaptionOverlayProps = {
   bottom?: number;
   fontSize?: number;
 };
-
 /** One hero number over its ranked rows in a `BarComparisonScene`. */
 export type BarComparisonPanel = {
   value: number;
@@ -180,7 +180,6 @@ export type BarComparisonSceneProps = SceneBase & {
     durationInFrames?: number;
   };
 };
-
 export type BrandLockupSceneProps = SceneBase & {
   /** Public-relative raster mark. `aspectRatio` is its width over height. */
   logo: { src: string; aspectRatio?: number; height?: number };
@@ -194,7 +193,6 @@ export type BrandLockupSceneProps = SceneBase & {
   /** The mark's columns fly through and cover the frame in `color`. */
   exit?: MarkFlyThrough & { color?: ThemeTokenName };
 };
-
 /** A still or footage shown inside a tilted window. */
 export type WindowSource = {
   kind: "image" | "video";
@@ -205,7 +203,6 @@ export type WindowSource = {
   /** Jumps through a tall still, as fractions of its height. */
   scrollSteps?: ScrollStep[];
 };
-
 /** A headline beside the window; later ones replace earlier ones. */
 export type WindowHeadline = {
   atFrame: number;
@@ -213,7 +210,6 @@ export type WindowHeadline = {
   /** A small dimmed monospace note under the headline. */
   subtitle?: string;
 };
-
 /** One side of the `pair` layout: label, window, live counter and stat. */
 export type RaceColumn = {
   label: string;
@@ -229,7 +225,6 @@ export type RaceColumn = {
   };
   stat?: string;
 };
-
 export type TiltedWindowSceneProps = SceneBase & {
   headlines?: WindowHeadline[];
   /** `single` shows one window (or a carousel); `pair` shows two. */
@@ -257,18 +252,24 @@ export type TiltedWindowSceneProps = SceneBase & {
       }
     | { kind: "flip-split" | "none"; atFrame?: number }
     | PullBack;
-  /** Windows whip off the left edge from `atFrame` over `durationInFrames`
-   *  (default `DUR.whip`). */
+  /**
+   * Windows whip off the left edge from `atFrame` over `durationInFrames`
+   * (default `DUR.whip`).
+   */
   exit?: { kind: "whip-left"; atFrame: number; durationInFrames?: number };
-  /** Single layout: which window box from `WINDOW_BOXES` the window rests
-   *  in. Default `default`. */
+  /**
+   * Single layout: which window box from `WINDOW_BOXES` the window rests
+   * in. Default `default`.
+   */
   windowBox?: WindowBoxName;
   /** A camera on the primary window only; the headline never moves. */
   camera?: WindowCameraKey[];
   /** A small second window in the same plane, such as a desktop app. */
   secondary?: WindowSource & { box: NormalizedRect; atFrame: number };
   chrome?: "titlebar" | "none";
-  /** Small muted note at the bottom left, for example **Fictional
-   *  demonstration data** under product footage. */
+  /**
+   * Small muted note at the bottom left, for example **Fictional
+   * demonstration data** under product footage.
+   */
   footnote?: string;
 };

@@ -1,14 +1,14 @@
 import { propEq, propNotEq, isDefined } from "@avandar/utils";
 import { Text } from "../../graphics-common/Text";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./EnvironmentalObservationGaps.schema";
 import type { ReactNode } from "react";
 /** Inputs for ObservationCaptions. */
 type Props = { input: Input };
-
 /** Point labels and area totals explicitly retain their different supports. */
 export function ObservationCaptions({ input }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const observed =
     input.cells.filter(propNotEq("value", null)).length *
     input.metric.cellAreaHa;
@@ -63,7 +63,12 @@ export function ObservationCaptions({ input }: Readonly<Props>): ReactNode {
       {input.fieldChecks.map((check, index) => {
         return (
           <g key={check.id}>
-            <Text x={32 + index * 310} y={479} size={12} fill={STOCK.orange}>
+            <Text
+              x={32 + index * 310}
+              y={479}
+              role="data"
+              fill={tokens.color.highlight}
+            >
               {index + 1}
             </Text>
             <FitText

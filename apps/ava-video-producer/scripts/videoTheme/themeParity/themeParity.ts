@@ -21,17 +21,14 @@ import {
   type ParityRegion,
 } from "./compareRgbaFrames/compareRgbaFrames";
 import {
-  getAllowedRegionsFromFilm,
-  getParityFramesFromFilm,
-  listParityTargets,
   type ParityTarget,
-} from "./parityTargets/parityTargets";
+  ParityTargets,
+} from "./ParityTargets/ParityTargets";
 import { readRgbaFromPng, writePngFromRgba } from "./rgbaPng/rgbaPng";
 import type { Film } from "../../../src/showcase/showcase.types";
 
 const PARITY_ROOT = path.join(appRoot, "out/theme-parity");
-let PARITY_DIRECTORY = PARITY_ROOT;
-
+let parityDirectory = PARITY_ROOT;
 type ParityStage = "reference" | "current" | "diff";
 type LoadedTarget = Readonly<{
   target: ParityTarget;
@@ -66,28 +63,33 @@ function _frameFile({
   frame,
 }: Readonly<{ stage: ParityStage; id: string; frame: number }>) {
   return path.join(
-    PARITY_DIRECTORY,
+    parityDirectory,
     stage,
     id,
     `${String(frame).padStart(4, "0")}.png`,
   );
 }
-
 async function _loadTargets(
   ids: readonly string[],
   themeId: string,
 ): Promise<LoadedTarget[]> {
   return Promise.all(
-    listParityTargets(ids).map(async (target) => {
+    (ids.includes("--all")
+      ? ParityTargets.listAllParityTargets()
+      : ParityTargets.listParityTargets(ids)
+    ).map(async (target) => {
       const film = await ShowcaseFilms.load(target.filmId, {
         ...target.options,
         theme: { id: themeId },
       });
-      return { target, film, frames: getParityFramesFromFilm(film) };
+      return {
+        target,
+        film,
+        frames: ParityTargets.getParityFramesFromFilm(film),
+      };
     }),
   );
 }
-
 async function _renderTargets(
   targets: readonly LoadedTarget[],
   stage: "reference" | "current",
@@ -98,7 +100,7 @@ async function _renderTargets(
     targets.map(({ film }) => {
       return film;
     }),
-    path.join(PARITY_DIRECTORY, "bundle"),
+    path.join(parityDirectory, "bundle"),
   );
   const browser = await openBrowser("chrome", options);
   try {
@@ -178,7 +180,10 @@ async function _compareTarget({
   frames,
 }: LoadedTarget): Promise<TargetResult> {
   const size = { width: film.width, height: film.height };
-  const allowedRegions = getAllowedRegionsFromFilm(target.id, film);
+  const allowedRegions = ParityTargets.getAllowedRegionsFromFilm({
+    id: target.id,
+    film,
+  });
   const comparisons: FrameComparison[] = [];
   // Frames compare one at a time to keep only two decoded frames in memory.
   for (const frame of frames) {
@@ -196,9 +201,8 @@ async function _compareTarget({
     missingFrames: comparisons.filter(propEq("kind", "missing")).length,
   };
 }
-
 async function _writeManifest(targets: readonly LoadedTarget[]) {
-  const file = path.join(PARITY_DIRECTORY, "reference/manifest.json");
+  const file = path.join(parityDirectory, "reference/manifest.json");
   const previous = JSON.parse(
     await fs.readFile(file, "utf8").catch(() => {
       return '{"targets":{}}';
@@ -221,7 +225,6 @@ async function _writeManifest(targets: readonly LoadedTarget[]) {
   };
   await fs.writeFile(file, `${JSON.stringify(manifest, null, 2)}\n`);
 }
-
 /**
  * Captures reference frames with `capture`, or renders current frames and
  * compares them with the reference with `compare`, for the named targets or
@@ -243,7 +246,7 @@ async function _runThemeParity({
   await Promise.all(
     targets.flatMap(({ target }) => {
       return stages.map((stage) => {
-        return fs.rm(path.join(PARITY_DIRECTORY, stage, target.id), {
+        return fs.rm(path.join(parityDirectory, stage, target.id), {
           recursive: true,
           force: true,
         });
@@ -266,12 +269,11 @@ async function _runThemeParity({
     })
   ) {
     console.error(
-      `Parity failed. Diff images: ${path.relative(appRoot, path.join(PARITY_DIRECTORY, "diff"))}`,
+      `Parity failed. Diff images: ${path.relative(appRoot, path.join(parityDirectory, "diff"))}`,
     );
     process.exitCode = 1;
   }
 }
-
 const argv = process.argv.slice(2);
 const themeIndex = argv.indexOf("--theme");
 const themeId = themeIndex < 0 ? "classic" : argv[themeIndex + 1];
@@ -281,13 +283,13 @@ const [mode, ...ids] =
     : argv.filter((_, index) => {
         return index !== themeIndex && index !== themeIndex + 1;
       });
-PARITY_DIRECTORY =
+parityDirectory =
   themeId === "classic" ? PARITY_ROOT : path.join(PARITY_ROOT, themeId);
 if ((mode === "capture" || mode === "compare") && themeId) {
   await _runThemeParity({ mode, ids, themeId });
 } else {
   console.error(
-    "Usage: pnpm theme:parity <capture|compare> [target ids...] [--theme id]",
+    "Usage: pnpm theme:parity <capture|compare> [target ids... | --all] [--theme id]",
   );
   process.exitCode = 2;
 }

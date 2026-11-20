@@ -1,5 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -19,17 +20,19 @@ export function PriorityQueueItem({
   opacity,
   isIncoming = false,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g opacity={opacity}>
-      <rect
+      <StockRect
         data-queue-id={item.id}
         x={x}
         y={y}
         width={360}
         height={48}
-        rx={6}
-        fill={STOCK.surface}
-        stroke={isIncoming ? accent : STOCK.line}
+        rx={scales.corner(6)}
+        fill={tokens.color.surface}
+        stroke={isIncoming ? accent : tokens.color.line}
       />
       <FitText
         text={item.label}
@@ -40,7 +43,7 @@ export function PriorityQueueItem({
         maxLines={2}
         breakLongWords
         normalizeWhitespace
-        color={isIncoming ? accent : STOCK.text}
+        color={isIncoming ? accent : tokens.color.text}
       />
     </g>
   );

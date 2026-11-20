@@ -24,7 +24,6 @@ function _render({
     ),
   );
 }
-
 function _values({
   markup,
   attribute,
@@ -34,7 +33,6 @@ function _values({
 }): string[] {
   return getSvgAttributeMatchesFromMarkup({ markup, attribute }).values;
 }
-
 function _tags({
   markup,
   attribute,
@@ -42,9 +40,19 @@ function _tags({
   markup: string;
   attribute: string;
 }): string[] {
-  return getSvgAttributeMatchesFromMarkup({ markup, attribute }).tags;
+  // A marked group wraps the sketch-aware shape it names.
+  return getSvgAttributeMatchesFromMarkup({ markup, attribute }).tags.map(
+    (tag) => {
+      if (!tag.startsWith("<g ")) {
+        return tag;
+      }
+      const followingTagMatch = markup
+        .slice(markup.indexOf(tag) + tag.length)
+        .match(/^<[^>]+>/);
+      return followingTagMatch ? `${tag}${followingTagMatch[0]}` : tag;
+    },
+  );
 }
-
 function _getVisibleTexts({
   input,
   frame,
@@ -63,7 +71,6 @@ function _getVisibleTexts({
       : []),
   ];
 }
-
 const EXCLUSIONS: string[] = [
   "id",
   "fromId",
@@ -72,7 +79,6 @@ const EXCLUSIONS: string[] = [
   "policy",
   "values",
 ];
-
 /** Inputs for overlaps. */
 type OverlapsFirst = {
   left: number;
@@ -80,7 +86,6 @@ type OverlapsFirst = {
   right: number;
   bottom: number;
 };
-
 /** Inputs for overlaps. */
 type OverlapsSecond = {
   left: number;
@@ -88,7 +93,6 @@ type OverlapsSecond = {
   right: number;
   bottom: number;
 };
-
 function _overlaps({
   first,
   second,
@@ -101,7 +105,6 @@ function _overlaps({
     Math.max(first.top, second.top) < Math.min(first.bottom, second.bottom)
   );
 }
-
 /** The padded bounds of one painted bracket stroke segment. */
 type BracketStroke = {
   left: number;
@@ -109,7 +112,6 @@ type BracketStroke = {
   right: number;
   bottom: number;
 };
-
 function _getBracketStrokes(markup: string): BracketStroke[] {
   return _tags({ markup, attribute: "data-review-bracket" }).flatMap((tag) => {
     if (Number(_values({ markup: tag, attribute: "opacity" })[0] ?? 1) === 0) {
@@ -144,7 +146,6 @@ function _getBracketStrokes(markup: string): BracketStroke[] {
     ];
   });
 }
-
 function _assertStationaryStrokeShielding({
   markup,
   value,

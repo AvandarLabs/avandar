@@ -1,6 +1,8 @@
-import { mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getWorkPartitionFromInput } from "./getWorkPartitionFromInput";
 import { WorkCutLines } from "./WorkCutLines";
 import { WorkPiece } from "./WorkPiece";
@@ -10,6 +12,11 @@ import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
 /**
+ * The tint of the whole piece before it splits, before the theme's tint
+ * strength.
+ */
+const WHOLE_TINT = 0.16;
+/**
  * A conserved slab becomes proportionally weighted, externally labeled
  * pieces.
  */
@@ -18,30 +25,40 @@ export function WorkDecomposition({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const separation = ramp(frame, 86, 38);
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const separation = motion.ramp(frame, 86, motion.scale(38));
   const pieces = getWorkPartitionFromInput(input);
   const total = input.workItems.reduce((sum, item) => {
     return sum + item.effort;
   }, 0);
   return (
-    <g opacity={ramp(frame, 12, 26)}>
-      <rect
+    <g opacity={motion.ramp(frame, 12, motion.scale(26))}>
+      <StockRect
         data-original-slab="true"
         x={90}
         y={230}
         width={500}
         height={270}
         fill={accent}
-        fillOpacity={0.16 * (1 - ramp(frame, 38, 2))}
+        fillOpacity={
+          scales.wash(WHOLE_TINT) *
+          (1 - motion.ramp(frame, 38, motion.scale(2)))
+        }
         stroke={accent}
-        strokeOpacity={0.25}
+        strokeOpacity={tokens.alpha.ghost}
       />
-      <path
-        d="M66 222 V206 H614 V222 M66 508 V524 H614 V508"
-        stroke={STOCK.line}
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: "M66 222 V206 H614 V222 M66 508 V524 H614 V508",
+        }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.line}
         fill="none"
       />
-      <g opacity={ramp(frame, 38, 2)}>
+      <g opacity={motion.ramp(frame, 38, motion.scale(2))}>
         {pieces.map((piece, index) => {
           return (
             <WorkPiece

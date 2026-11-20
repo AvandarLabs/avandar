@@ -1,4 +1,5 @@
-import { ramp } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { makeCoordinateTriageFromInputAndFrame } from "./makeCoordinateTriageFromInputAndFrame";
 import type { ReactNode } from "react";
 
@@ -13,15 +14,24 @@ export function PlottedRowAssociation({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const { stroke, sketch } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const y = 132 + row.index * 69;
   return (
-    <path
+    <SketchedShape
       data-row-association={row.id}
-      d={`M${row.targetX} ${row.targetY} L438 ${row.targetY} L438 ${y} L441 ${y}`}
+      shape={{
+        kind: "path",
+        d: `M${row.targetX} ${row.targetY} L438 ${row.targetY} L438 ${y} L441 ${y}`,
+      }}
+      profile={sketch.shape}
       fill="none"
       stroke={accent}
-      strokeOpacity={0.45}
-      opacity={ramp(frame, 90 + row.index * 3, 6)}
+      strokeOpacity={atomic.opacity["45"]}
+      strokeWidth={shapes.stroke(stroke.hairline)}
+      opacity={motion.ramp(frame, row.arrivedAt, motion.chip)}
     />
   );
 }

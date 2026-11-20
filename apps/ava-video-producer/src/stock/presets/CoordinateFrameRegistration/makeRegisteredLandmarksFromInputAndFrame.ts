@@ -1,4 +1,5 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./CoordinateFrameRegistration.schema";
 /** Data for RegisteredLandmark. */
 type RegisteredLandmarkResult = {
@@ -10,14 +11,27 @@ type RegisteredLandmarkResult = {
 };
 
 type RegisteredLandmark = Input["landmarks"][number] & RegisteredLandmarkResult;
+
+const REGISTER_AT = 53;
+const REGISTER_FRAMES = 57;
 /**
  * Transform coordinate representations while preserving landmark identities.
  */
 export function makeRegisteredLandmarksFromInputAndFrame({
   input,
   frame,
-}: Readonly<{ input: Input; frame: number }>): RegisteredLandmark[] {
-  const progress = ramp(frame, 53, 57, EASE.inOut);
+  motion,
+}: Readonly<{
+  input: Input;
+  frame: number;
+  motion: Pick<VideoMotion, "ramp" | "scale" | "travel">;
+}>): RegisteredLandmark[] {
+  const progress = motion.ramp(
+    frame,
+    REGISTER_AT,
+    motion.scale(REGISTER_FRAMES),
+    motion.travel.easing,
+  );
   return input.landmarks.map((point, index) => {
     const targetX = point.x * input.transform.scaleX + input.transform.offsetX;
     const targetY = point.y * input.transform.scaleY + input.transform.offsetY;

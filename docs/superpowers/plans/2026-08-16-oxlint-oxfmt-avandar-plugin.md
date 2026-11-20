@@ -770,15 +770,23 @@ Do not add `eslint-plugin-avandar` yet. Goal: same policy as
   `@oxlint/migrate`'s 1,059 inlined browser globals with
   `"env": { "browser": true }`.
 - The final config uses native `eslint`, `import`, `react`, `jsx-a11y`, and
-  `typescript` plugins, plus five JS plugins: `oxlint-plugin-eslint`
-  (`eslint-js/max-len`, `eslint-js/no-octal`), `eslint-plugin-react`
-  (`react-js/function-component-definition`, because native
-  `react/function-component-definition` misidentifies a `forwardRef` pattern),
-  `eslint-plugin-react-refresh` (`react-refresh/only-export-components`,
+  `typescript` plugins, five npm JS plugins (`oxlint-plugin-eslint` for
+  `eslint-js/max-len` and `eslint-js/no-octal`, `eslint-plugin-react` for
+  `react-js/function-component-definition` because native
+  `react/function-component-definition` misidentifies a `forwardRef` pattern,
+  `eslint-plugin-react-refresh` for `react-refresh/only-export-components`
   because native `react/only-export-components` flags TanStack route files that
-  ESLint accepts), `@tanstack/eslint-plugin-query`, and
-  `@tanstack/eslint-plugin-router`. Do not remove those five packages while
-  their `jsPlugins` entries remain.
+  ESLint accepts, `@tanstack/eslint-plugin-query`, and
+  `@tanstack/eslint-plugin-router`), plus two repo-local JS plugins ported from
+  `develop`'s Atlas theme coverage guards
+  (`./eslint/video-producer-function-length.js` as
+  `video-producer/max-lines-per-function` and
+  `./eslint/video-theme-restrictions.js` as
+  `video-theme/no-restricted-imports` and `video-theme/no-restricted-syntax`,
+  both delegating to `oxlint-plugin-eslint` and reading
+  `apps/ava-video-producer/scripts/videoTheme/themeLiterals/rendererGlobs.json`
+  directly). Keep those five npm packages installed while their `jsPlugins`
+  entries or `./eslint/*.js` imports remain.
 - `eslint-plugin-import-x` and `eslint-import-resolver-typescript` are removed
   rather than retained: `tsc` and `deno check` already reject unresolved
   imports, and all `import/extensions` overrides run natively under Oxlint
@@ -789,18 +797,18 @@ Do not add `eslint-plugin-avandar` yet. Goal: same policy as
   regression in adapter `@/*` import-extension handling.
 - Native `import/no-named-as-default` lacks import-x's exemption for bindings
   exported both as default and by name (`clsx`, `Dexie`, `zod`'s `z`, `jsPDF`,
-  four tiptap extensions, `WorkspaceInviteEmail`). All 57 call sites across 54
-  files are refactored to named imports so
+  four tiptap extensions, `WorkspaceInviteEmail`). All call sites across the
+  repo are refactored to named imports so
   `oxlint --report-unused-disable-directives-severity=error .` finishes with 0
   warnings and 0 errors.
 - `react.version` is pinned to installed `19.2.5` because Oxlint rejects
   `"detect"`. Update it with React upgrades.
-- `.cursor/**` and `.opencode/**` (alongside `**/.videos/**`,
-  `apps/ava-video-producer/out/**`,
+- `.cursor/**`, `.opencode/**`, and `.playwright-mcp/**` (alongside
+  `**/.videos/**`, `apps/ava-video-producer/out/**`,
   `apps/ava-video-producer/src/avandar/generated/**`,
   `**/locales/**/messages.ts`, and `**/.superpowers/**`) are in
-  `ignorePatterns` because Oxlint follows skill symlinks while ESLint did not,
-  preserving the linted file set.
+  `ignorePatterns` to match `develop` and because Oxlint follows skill symlinks
+  while ESLint did not, preserving the linted file set.
 - Deferred to Phase 3 Task 13: `curly`, `prefer-template`,
   `typescript/consistent-type-imports`, and `import/no-default-export` (5, 17,
   340, and 41 hits when measured at initial migration on 2026-08-27).
@@ -811,9 +819,13 @@ Do not add `eslint-plugin-avandar` yet. Goal: same policy as
   `routeTreeFileHeader` emits `/* oxlint-disable */`, and `pnpm lint` runs
   `oxlint --report-unused-disable-directives-severity=error .` so stale
   directives fail lint.
-- After merging `develop` through 2026-11-20, the `apps/ava-video-producer`
-  rule overrides are removed so root rules apply across the entire repo,
-  `stylelint` also checks `apps/ava-video-producer/**/*.css`, and
+- After merging `develop` through `23e6f32a8` (2026-11-20), the legacy
+  `apps/ava-video-producer` rule exemptions are removed so root rules apply
+  across the entire repo, `develop`'s renderer function-length ratchet and
+  video-theme restrictions are enforced under Oxlint via
+  `./eslint/video-producer-function-length.js` and
+  `./eslint/video-theme-restrictions.js`, `stylelint` checks
+  `apps/ava-video-producer/**/*.css`, and
   `typescript/explicit-module-boundary-types` is turned off only for `**/*.js`
   (matching `develop`'s policy for plain JS files typed via `.d.ts` or JSDoc).
   This branch also includes `refactor/showcase-vite`, migrating
@@ -1440,7 +1452,15 @@ from Phase 2:
     "specifier": "eslint-plugin-react-refresh"
   },
   "@tanstack/eslint-plugin-query",
-  "@tanstack/eslint-plugin-router"
+  "@tanstack/eslint-plugin-router",
+  {
+    "name": "video-producer",
+    "specifier": "./eslint/video-producer-function-length.js"
+  },
+  {
+    "name": "video-theme",
+    "specifier": "./eslint/video-theme-restrictions.js"
+  }
 ]
 ```
 
@@ -2273,7 +2293,7 @@ shows up here as an unpushable branch rather than as a lint failure.
 | ------------------------------------------------------------------------- | ---------------------------------------------------------- |
 | oxfmt                                                                     | JS/TS/JSON/CSS layout, import sort, Tailwind class sort. **Not** markdown: `.oxfmtignore` excludes `*.md`, matching what `pnpm format` skips today. Reformatting markdown repo-wide is a separate decision. |
 | Prettier                                                                  | `supabase/schemas/**/*.sql` only                           |
-| oxlint native + jsPlugins (TanStack, react/react-refresh, max-len/octal)  | today's ESLint policy                                      |
+| oxlint native + jsPlugins (TanStack, react/react-refresh, max-len/octal, video-producer/video-theme) | today's ESLint policy |
 | `avandar/*` type 2                                                        | mechanical rewrites; skill deleted                         |
 | `avandar/*` type 1                                                        | CI/dev gate; skill keeps how-to-fix + disable audit        |
 | avandar-code-review                                                       | type 3 judgement only, plus disable audit                  |

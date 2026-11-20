@@ -3,5 +3,5 @@
 }
 
 .numberValueInput {
-  flex: 0 0 112px;
+  flex: 0 0 var(--atlas-size-112);
 }

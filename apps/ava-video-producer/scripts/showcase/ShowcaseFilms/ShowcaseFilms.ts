@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { z } from "zod";
+import { STARTER_VIDEO_THEME_ID } from "../../../src/compositions/StarterVideoTheme/makeStarterVideoThemeSourceFromItemId/makeStarterVideoThemeSourceFromItemId";
 import { createContinuityPlanFromOptions } from "../../../src/continuity/continuityAppearance";
 import { CONTINUITY_CATALOG } from "../../../src/continuity/continuityCatalog";
 import { createContinuityPlanFromVideoThemeSnapshot } from "../../../src/continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme";
@@ -28,7 +29,6 @@ import {
 } from "../../stock/StockFingerprintModule/StockFingerprintModule";
 import { loadVideoThemeSnapshot } from "../../videoTheme/loadVideoThemeSnapshot/loadVideoThemeSnapshot";
 import type { Film } from "../../../src/showcase/showcase.types";
-
 /**
  * App location derived from this module, independent of the shell directory.
  */
@@ -56,14 +56,12 @@ const stockGenerations: WeakMap<Film, StockContractGeneration> = new WeakMap<
   Film,
   StockContractGeneration
 >();
-
 /**
  * Retain the exact validators and defaults until an active export completes.
  */
 function _retainFilmContracts(film: Readonly<Film>): () => Promise<void> {
   return stockGenerations.get(film)?.retain() ?? (async () => {});
 }
-
 /** Bind a frozen stock film to the exact sources that validated its content. */
 async function _fingerprintStockFilm(
   film: Readonly<Film>,
@@ -78,7 +76,6 @@ async function _fingerprintStockFilm(
     expectedSourceHash: generation.sourceHash,
   });
 }
-
 const color = z.string().regex(/^#[0-9a-fA-F]{6}$/) satisfies z.ZodType;
 const optionsSchema = z.strictObject({
   captions: z.boolean().optional(),
@@ -96,7 +93,6 @@ const optionsSchema = z.strictObject({
     })
     .optional(),
 }) satisfies z.ZodType;
-
 function _freezeSnapshot<Value>(value: Value): Value {
   if (value && typeof value === "object") {
     Object.values(value).forEach((child) => {
@@ -106,7 +102,6 @@ function _freezeSnapshot<Value>(value: Value): Value {
   }
   return value;
 }
-
 async function _sourceModuleUrl(relative: string) {
   const filename = path.join(appRoot, relative);
   const hash = createHash("sha256")
@@ -116,18 +111,28 @@ async function _sourceModuleUrl(relative: string) {
   url.searchParams.set("source", hash);
   return url.href;
 }
-
-/** A helper preview at the Atlas canvas size. It accepts no options. */
-function _loadHelperFilm(id: string, options: object): Film | undefined {
+/**
+ * A helper preview at the Atlas canvas size. It accepts only a theme, and
+ * renders in `classic` without one.
+ */
+async function _loadHelperFilm({
+  id,
+  options,
+}: Readonly<{ id: string; options: FilmOptions }>): Promise<Film | undefined> {
   const helper = getHelperFromFilmId(id);
   if (!helper) {
     return undefined;
   }
-  if (Object.keys(options).length > 0) {
-    throw new Error("Helper previews accept no options");
+  if (
+    Object.keys(options).some((key) => {
+      return key !== "theme";
+    })
+  ) {
+    throw new Error("Helper previews accept only a theme");
   }
   return {
     id,
+    theme: await loadVideoThemeSnapshot(options.theme ?? { id: "classic" }),
     kind: "helper",
     helper: helper.id,
     assets: helper.demo.assets ?? [],
@@ -140,14 +145,12 @@ function _loadHelperFilm(id: string, options: object): Film | undefined {
     showCaptions: false,
   };
 }
-
 /** Helper previews play live in the gallery and are never rendered to MP4. */
 function _assertExportable(film: Readonly<Film>): void {
   if (film.kind === "helper") {
     throw new Error("Helper previews play live only");
   }
 }
-
 /**
  * The options a continuity film's shots take. Colours, sketch roughness, and
  * the camera preset are theme tokens, so they reach the film through `theme`.
@@ -164,16 +167,24 @@ function _renderOptions(
     ),
   );
 }
-
 type FilmOptions = z.infer<typeof optionsSchema>;
-
+/**
+ * The fixed compositions authored on the starter palette. They render in the
+ * `starter` theme unless the viewer picks another.
+ */
+const STARTER_FILM_IDS: readonly string[] = ["title-study", "motion-lab"];
 /** The fields every film shares, with the theme the film renders in. */
 async function _loadBaseFilm({
   id,
   options,
 }: Readonly<{ id: string; options: FilmOptions }>) {
+  const defaultThemeId = STARTER_FILM_IDS.includes(id)
+    ? STARTER_VIDEO_THEME_ID
+    : "classic";
   return {
-    theme: await loadVideoThemeSnapshot(options.theme ?? { id: "classic" }),
+    theme: await loadVideoThemeSnapshot(
+      options.theme ?? { id: defaultThemeId },
+    ),
     id,
     fps: 30,
     width: 1600,
@@ -183,9 +194,7 @@ async function _loadBaseFilm({
     showCaptions: options.captions ?? true,
   };
 }
-
 type BaseFilm = Awaited<ReturnType<typeof _loadBaseFilm>>;
-
 /** Refuses options the film's kind does not take. */
 function _assertOptionsFit({
   options,
@@ -216,7 +225,6 @@ function _assertOptionsFit({
       "Continuity input and colours come from the storyboard and theme",
     );
 }
-
 /** A stock film bound to the contract generation that validated its content. */
 function _loadStockFilm({
   base,
@@ -251,7 +259,6 @@ function _loadStockFilm({
   stockGenerations.set(film, contracts);
   return film;
 }
-
 /**
  * The title study or the motion lab, sized from the current composition timing.
  */
@@ -275,7 +282,6 @@ async function _loadCompositionFilm({
     source: `apps/ava-video-producer/src/compositions/${id === "title-study" ? "TitleStudy" : "MotionLab"}.tsx`,
   };
 }
-
 /** A storyboard film, with a continuity film's options applied to its shots. */
 async function _loadStoryboardFilm({
   base,
@@ -317,13 +323,12 @@ async function _loadStoryboardFilm({
     source: `apps/ava-video-producer/${source}`,
   };
 }
-
 /**
  * Read current authored inputs and reject unknown IDs or unsupported options.
  */
 async function _loadFilm(id: string, rawOptions: unknown = {}): Promise<Film> {
   const options = optionsSchema.parse(rawOptions);
-  const helperFilm = _loadHelperFilm(id, options);
+  const helperFilm = await _loadHelperFilm({ id, options });
   if (helperFilm) {
     return helperFilm;
   }
@@ -344,7 +349,6 @@ async function _loadFilm(id: string, rawOptions: unknown = {}): Promise<Film> {
   }
   return _loadStoryboardFilm({ base, id, options, isContinuity });
 }
-
 /** Related ShowcaseFilms operations. */
 export const ShowcaseFilms = {
   /**

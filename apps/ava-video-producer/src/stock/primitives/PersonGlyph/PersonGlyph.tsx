@@ -1,12 +1,14 @@
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
-
+/** A person's line weight before the theme's line weight scales it. */
+const PERSON_STROKE = 2.5;
 type Props = {
   x: number;
   y: number;
   size?: number;
   posture?: "standing" | "seated" | "walking";
   role?: "participant" | "facilitator" | "worker";
+  /** Defaults to the theme's positive colour. */
   color?: string;
 };
 const POSTURES: { standing: string; seated: string; walking: string } = {
@@ -14,7 +16,6 @@ const POSTURES: { standing: string; seated: string; walking: string } = {
   seated: "M0 -4 V9 H12 V24 M0 9 L-8 14 V24 M-10 3 L0 0 L11 4",
   walking: "M0 -4 L-3 11 M-11 7 L0 0 L10 -2 M-3 11 L-12 23 M-3 11 L10 18",
 };
-
 function _validatePresentation({
   x,
   y,
@@ -34,7 +35,6 @@ function _validatePresentation({
     );
   }
 }
-
 /** Neutral local person shapes encode only authored posture and role badges. */
 export function PersonGlyph({
   x,
@@ -42,19 +42,28 @@ export function PersonGlyph({
   size = 48,
   posture = "standing",
   role = "participant",
-  color = STOCK.mint,
+  color,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   _validatePresentation({ x, y, size, posture, role });
+  const ink = color ?? tokens.color.positive;
   return (
     <g
       transform={`translate(${x} ${y}) scale(${size / 48})`}
-      stroke={color}
-      strokeWidth={2.5}
+      stroke={ink}
+      strokeWidth={scales.stroke(PERSON_STROKE)}
       strokeLinecap="round"
       strokeLinejoin="round"
       fill="none"
     >
-      <circle cx={0} cy={-14} r={7} fill={color} fillOpacity={0.12} />
+      <circle
+        cx={0}
+        cy={-14}
+        r={7}
+        fill={ink}
+        fillOpacity={scales.wash(tokens.alpha.tint)}
+      />
       <path d={POSTURES[posture]} />
       {role === "facilitator" ? <path d="M16 -17 h9 M20 -21 v8" /> : null}
       {role === "worker" ? <path d="M9 8 h10 v8 H9 Z M12 8 V5 h4 v3" /> : null}

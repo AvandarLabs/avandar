@@ -1,4 +1,5 @@
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -18,17 +19,18 @@ export function FractionBoardCell({
   selected,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
-      <rect
+      <StockRect
         data-piece-owner={id}
         data-selected={selected}
         x={centerX - cellWidth / 2 + 1}
         y={-24}
         width={cellWidth - 2}
         height={48}
-        fill={STOCK.surface}
-        stroke={STOCK.muted}
+        fill={tokens.color.surface}
+        stroke={tokens.color.inactive}
       />
       {selected ? (
         <rect

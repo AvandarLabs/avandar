@@ -1,8 +1,8 @@
-import { ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
-import { ReadingBook } from "./ReadingBook";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { ReadingBook } from "./ReadingBook/ReadingBook";
 import { ReadingHeadings } from "./ReadingHeadings";
-import { ReadingLearner } from "./ReadingLearner";
+import { ReadingLearner } from "./ReadingLearner/ReadingLearner";
 import { SceneText } from "./SceneText";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./SharedReadingCircles.schema";
@@ -17,21 +17,30 @@ export function SharedReadingCircles({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
       <ReadingHeadings input={input} />
-      <path
-        opacity={1 - ramp(frame, 94, 14)}
-        data-reading-shelf={input.startingShelf}
-        d={
-          input.startingShelf === "front"
-            ? "M65 275 H920 M75 275 V290 M910 275 V290"
-            : "M65 228 V440 M65 275 H140 M65 330 H140 M65 385 H140 M65 440 H140"
-        }
-        fill="none"
-        stroke={STOCK.line}
-        strokeWidth={3}
-      />
+      <g data-reading-shelf={input.startingShelf}>
+        <SketchedShape
+          shape={{
+            kind: "path",
+            d:
+              input.startingShelf === "front"
+                ? "M65 275 H920 M75 275 V290 M910 275 V290"
+                : "M65 228 V440 M65 275 H140 M65 330 H140 M65 385 H140 M65 440 H140",
+          }}
+          profile={tokens.sketch.shape}
+          opacity={
+            1 - motion.ramp(frame, 94, motion.scale(14), motion.exit.easing)
+          }
+          fill="none"
+          stroke={tokens.color.line}
+          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+        />
+      </g>
       {input.readingGroups.map((group, groupIndex) => {
         return (
           <ReadingBook

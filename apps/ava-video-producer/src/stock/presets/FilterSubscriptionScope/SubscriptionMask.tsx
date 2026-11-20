@@ -1,4 +1,5 @@
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -18,18 +19,20 @@ export function SubscriptionMask({
   progress,
   showExcludedRecords,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
-    <rect
+    <StockRect
       data-excluded-mask={id}
       x={x + 12}
       y={y - 13}
       width={(width - 24) * progress}
       height={35}
-      fill={STOCK.ground}
-      fillOpacity={0.14}
-      stroke={STOCK.orange}
-      strokeOpacity={progress * 0.5}
-      strokeDasharray="3 4"
+      fill={tokens.color.ground}
+      fillOpacity={atomic.opacity["14"]}
+      stroke={tokens.color.highlight}
+      strokeOpacity={progress * atomic.opacity["50"]}
+      strokeDasharray={atomic.dash.short.join(" ")}
       opacity={showExcludedRecords ? 1 : 1 - progress}
     />
   );

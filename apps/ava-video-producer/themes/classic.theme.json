@@ -118,16 +118,48 @@
     "6xl": "24px",
     "7xl": "25px",
     "8xl": "30px",
-    "9xl": "32px"
+    "9xl": "32px",
+    "10xl": "38px",
+    "11xl": "92px",
+    "10": "10px",
+    "11": "11px",
+    "19": "19px",
+    "26": "26px",
+    "28": "28px",
+    "29": "29px",
+    "31": "31px",
+    "34": "34px",
+    "36": "36px",
+    "37": "37px",
+    "44": "44px",
+    "46": "46px",
+    "76": "76px",
+    "79": "79px",
+    "103": "103px",
+    "108": "108px",
+    "140": "140px"
   },
-  "lineHeights": { "xs": "1.12", "sm": "1.25", "md": "1.3", "lg": "1.35" },
+  "lineHeights": {
+    "xs": "1.12",
+    "sm": "1.25",
+    "md": "1.3",
+    "lg": "1.35",
+    "105": "1.05",
+    "106": "1.06",
+    "108": "1.08",
+    "120": "1.2",
+    "122": "1.22",
+    "100": "1",
+    "115": "1.15"
+  },
   "radius": {
     "xs": "4px",
     "sm": "8px",
     "md": "10px",
     "lg": "12px",
     "xl": "18px",
-    "full": "9999px"
+    "full": "9999px",
+    "14": "14px"
   },
   "spacing": {
     "2xs": "16px",
@@ -138,7 +170,27 @@
     "xl": "64px",
     "2xl": "70px",
     "3xl": "96px",
-    "4xl": "192px"
+    "4xl": "192px",
+    "2": "2px",
+    "3": "3px",
+    "4": "4px",
+    "6": "6px",
+    "8": "8px",
+    "9": "9px",
+    "10": "10px",
+    "12": "12px",
+    "14": "14px",
+    "18": "18px",
+    "22": "22px",
+    "24": "24px",
+    "26": "26px",
+    "28": "28px",
+    "30": "30px",
+    "34": "34px",
+    "38": "38px",
+    "40": "40px",
+    "48": "48px",
+    "120": "120px"
   },
   "autoContrast": false,
   "luminanceThreshold": 0.3,
@@ -159,7 +211,31 @@
           "textDark": "#182d27",
           "productBackdrop": "#eaeef2",
           "scrim": "#061019a8",
-          "shadow": "#06101455"
+          "shadow": "#06101455",
+          "rose": "#df95aa",
+          "lavender": "#b7a3e8",
+          "sand": "#e7b792",
+          "teal": "#87bac7",
+          "olive": "#bfc790",
+          "pink": "#dba1c1",
+          "starterBackground": "#060a13",
+          "starterForeground": "#f8fafc",
+          "starterCard": "#121723",
+          "starterMuted": "#212937",
+          "starterMutedForeground": "#99a6b8",
+          "starterBorder": "#252e3d",
+          "starterBrand": "#5d90ff",
+          "starterBrandSoft": "#1e305b",
+          "starterBrandStrong": "#97c2ff",
+          "starterGround": "#03050e",
+          "slate50": "#f8fafc",
+          "slate300": "#cbd5e1",
+          "slate400": "#94a3b8",
+          "slate500": "#64748b",
+          "slate700": "#334155",
+          "slate800": "#1e293b",
+          "slate900": "#0f172a",
+          "slateInk": "#0b0f17"
         },
         "fontFamily": {
           "figtree": "figtree",
@@ -176,7 +252,15 @@
         "letterSpacing": {
           "tight": -0.025,
           "none": 0,
-          "wide": 0.17142857142857143
+          "wide": 0.17142857142857143,
+          "title": -0.02717391304347826,
+          "headline": -0.02,
+          "slight": -0.01,
+          "wordmark": -0.03,
+          "figure": -0.035,
+          "capitals": 0.125,
+          "counter": -0.02631578947368421,
+          "largeCounter": -0.037037037037037035
         },
         "size": {},
         "strokeWidth": {
@@ -186,7 +270,8 @@
           "sm": 2,
           "md": 2.5,
           "lg": 3,
-          "xl": 3.5
+          "xl": 3.5,
+          "2xl": 4
         },
         "opacity": {
           "3": 0.03,
@@ -194,15 +279,32 @@
           "8": 0.08,
           "9": 0.09,
           "10": 0.1,
+          "12": 0.12,
+          "14": 0.14,
+          "15": 0.15,
+          "16": 0.16,
+          "18": 0.18,
+          "20": 0.2,
+          "22": 0.22,
           "24": 0.24,
           "25": 0.25,
+          "26": 0.26,
           "28": 0.28,
           "30": 0.3,
           "32": 0.32,
           "34": 0.34,
+          "35": 0.35,
+          "38": 0.38,
           "40": 0.4,
+          "45": 0.45,
+          "50": 0.5,
+          "55": 0.55,
+          "60": 0.6,
           "65": 0.65,
+          "68": 0.68,
           "70": 0.7,
+          "80": 0.8,
+          "85": 0.85,
           "100": 1
         },
         "shadow": {
@@ -215,6 +317,28 @@
                 "blur": 22,
                 "spread": 0,
                 "alpha": 1
+              }
+            ]
+          },
+          "window": {
+            "layers": [
+              {
+                "offsetX": 0,
+                "offsetY": 30,
+                "blur": 60,
+                "spread": 0,
+                "alpha": 1
+              }
+            ]
+          },
+          "cursor": {
+            "layers": [
+              {
+                "offsetX": 0,
+                "offsetY": 1,
+                "blur": 1,
+                "spread": 0,
+                "alpha": 0.16
               }
             ]
           }
@@ -230,7 +354,26 @@
           "none": [],
           "fine": [0.015, 0.02],
           "orbit": [3, 9],
-          "connector": [5, 9]
+          "connector": [5, 9],
+          "short": [3, 4],
+          "even": [4, 4],
+          "loose": [3, 5],
+          "wide": [5, 5],
+          "spaced": [4, 6],
+          "boundary": [5, 7],
+          "long": [6, 6],
+          "tight": [4, 3],
+          "dense": [3, 3],
+          "dot": [2, 3],
+          "dotted": [2, 4],
+          "medium": [4, 5],
+          "sparse": [3, 6],
+          "trail": [3, 7],
+          "airy": [4, 8],
+          "open": [5, 8],
+          "stitch": [5, 3],
+          "notch": [6, 3],
+          "bold": [6, 4]
         },
         "curveTension": { "md": 0.45 },
         "duration": {
@@ -238,6 +381,7 @@
           "xs": 6,
           "sm": 8,
           "md": 9,
+          "ml": 12,
           "lg": 13,
           "xl": 15,
           "2xl": 18
@@ -249,10 +393,14 @@
           "inOutCubic": { "powerInOut": 3 },
           "word": [0.22, 1, 0.36, 1],
           "in": [0.55, 0, 1, 0.45],
-          "surge": [0.7, 0, 0.2, 1]
+          "surge": [0.7, 0, 0.2, 1],
+          "cssEaseIn": [0.42, 0, 1, 1],
+          "cssEaseOut": [0, 0, 0.58, 1],
+          "snappy": [0.2, 0, 0, 1],
+          "gentle": [0.25, 0.1, 0.25, 1]
         },
         "spring": { "pop": { "damping": 14, "stiffness": 120, "mass": 0.8 } },
-        "stagger": { "xs": 0.5, "sm": 2 },
+        "stagger": { "xs": 0.5, "sm": 2, "md": 3 },
         "period": { "sm": 75, "md": 90, "lg": 120 },
         "distance": { "sm": 8, "md": 12 },
         "typingRate": { "md": 28 },
@@ -273,7 +421,10 @@
         },
         "samples": { "md": 10 },
         "zoom": { "min": 1, "max": 3 },
-        "velocityBlur": { "factor": 0.09, "max": 3 }
+        "velocityBlur": { "factor": 0.09, "max": 3 },
+        "multiplier": { "identity": 1 },
+        "pressDepth": { "md": 0.04 },
+        "entranceScale": { "md": 0.96 }
       },
       "semantic": {
         "color": {
@@ -296,7 +447,32 @@
           "highlight": "$atomic.swatch.orange",
           "scrim": "$atomic.swatch.scrim",
           "productBackdrop": "$atomic.swatch.productBackdrop",
-          "shadowColor": "$atomic.swatch.shadow"
+          "shadowColor": "$atomic.swatch.shadow",
+          "positive": "$atomic.swatch.mint",
+          "categorical": {
+            "1": "$atomic.swatch.mint",
+            "2": "$atomic.swatch.cyan",
+            "3": "$atomic.swatch.orange",
+            "4": "$atomic.swatch.rose",
+            "5": "$atomic.swatch.lavender",
+            "6": "$atomic.swatch.sand",
+            "7": "$atomic.swatch.teal",
+            "8": "$atomic.swatch.olive",
+            "9": "$atomic.swatch.pink"
+          },
+          "onAccent": { "onDark": "$white", "onLight": "$black" },
+          "scene": {
+            "background": "$atomic.swatch.starterBackground",
+            "foreground": "$atomic.swatch.starterForeground",
+            "card": "$atomic.swatch.starterCard",
+            "muted": "$atomic.swatch.starterMuted",
+            "mutedForeground": "$atomic.swatch.starterMutedForeground",
+            "border": "$atomic.swatch.starterBorder",
+            "brand": "$atomic.swatch.starterBrand",
+            "brandSoft": "$atomic.swatch.starterBrandSoft",
+            "brandStrong": "$atomic.swatch.starterBrandStrong",
+            "ground": "$atomic.swatch.starterGround"
+          }
         },
         "text": {
           "graphic": {
@@ -433,6 +609,30 @@
               "weight": "$atomic.fontWeight.regular",
               "lineHeight": "$lineHeights.md",
               "color": "$color.text"
+            },
+            "figure": {
+              "family": "$atomic.fontFamily.arial",
+              "size": "$fontSizes.9xl",
+              "weight": "$atomic.fontWeight.semibold",
+              "color": "$color.text"
+            },
+            "value": {
+              "family": "$atomic.fontFamily.arial",
+              "size": "$fontSizes.xs",
+              "weight": "$atomic.fontWeight.regular",
+              "color": "$color.text"
+            },
+            "smallCaption": {
+              "family": "$atomic.fontFamily.arial",
+              "size": "$fontSizes.xs",
+              "weight": "$atomic.fontWeight.regular",
+              "color": "$color.textMuted"
+            },
+            "mark": {
+              "family": "$atomic.fontFamily.arial",
+              "size": "$fontSizes.9xl",
+              "weight": "$atomic.fontWeight.regular",
+              "color": "$color.textMuted"
             }
           },
           "stage": {
@@ -483,6 +683,120 @@
               "weight": "$atomic.fontWeight.regular",
               "lineHeight": "$lineHeights.sm",
               "color": "$color.text"
+            },
+            "title": {
+              "family": "$atomic.fontFamily.figtree",
+              "size": "$fontSizes.11xl",
+              "weight": "$atomic.fontWeight.bold",
+              "lineHeight": "$lineHeights.106",
+              "letterSpacing": "$atomic.letterSpacing.title",
+              "color": "$white"
+            },
+            "kicker": {
+              "family": "$atomic.fontFamily.figtree",
+              "size": "$fontSizes.4xl",
+              "weight": "$atomic.fontWeight.medium",
+              "color": "$white",
+              "alpha": "$atomic.opacity.68"
+            },
+            "caption": {
+              "family": "$atomic.fontFamily.figtree",
+              "size": "$fontSizes.10xl",
+              "weight": "$atomic.fontWeight.medium",
+              "lineHeight": "$lineHeights.122",
+              "color": "$color.scene.foreground"
+            },
+            "sceneHeading": {
+              "family": "$atomic.fontFamily.figtree",
+              "size": "$headings.sizes.h2.fontSize",
+              "weight": "$atomic.fontWeight.semibold",
+              "lineHeight": "$lineHeights.xs",
+              "letterSpacing": "$atomic.letterSpacing.tight",
+              "color": "$color.scene.foreground"
+            },
+            "sceneBody": {
+              "family": "$atomic.fontFamily.figtree",
+              "size": "$fontSizes.6xl",
+              "weight": "$atomic.fontWeight.regular",
+              "lineHeight": "$lineHeights.lg",
+              "color": "$color.scene.foreground"
+            },
+            "cardTitle": {
+              "family": "$atomic.fontFamily.figtree",
+              "size": "$fontSizes.xl",
+              "weight": "$atomic.fontWeight.semibold",
+              "lineHeight": "$lineHeights.122",
+              "color": "$color.scene.foreground"
+            },
+            "figure": {
+              "family": "$atomic.fontFamily.figtree",
+              "size": "$fontSizes.6xl",
+              "weight": "$atomic.fontWeight.semibold",
+              "lineHeight": "$lineHeights.105",
+              "letterSpacing": "$atomic.letterSpacing.figure",
+              "color": "$color.scene.foreground"
+            },
+            "windowHeadline": {
+              "family": "$atomic.fontFamily.figtree",
+              "size": "$headings.sizes.h2.fontSize",
+              "weight": "$atomic.fontWeight.semibold",
+              "lineHeight": "$lineHeights.sm",
+              "letterSpacing": "$atomic.letterSpacing.headline",
+              "color": "$color.scene.foreground"
+            },
+            "barLabel": {
+              "family": "$atomic.fontFamily.figtree",
+              "size": "$fontSizes.xl",
+              "weight": "$atomic.fontWeight.semibold",
+              "lineHeight": "$lineHeights.md",
+              "color": "$color.scene.foreground"
+            },
+            "badge": {
+              "family": "$atomic.fontFamily.figtree",
+              "size": "$fontSizes.xl",
+              "weight": "$atomic.fontWeight.bold",
+              "lineHeight": "$lineHeights.120",
+              "color": "$color.scene.foreground"
+            },
+            "appTitle": {
+              "family": "$atomic.fontFamily.figtree",
+              "size": "$fontSizes.3xl",
+              "weight": "$atomic.fontWeight.semibold",
+              "color": "$color.scene.foreground"
+            },
+            "appBody": {
+              "family": "$atomic.fontFamily.figtree",
+              "size": "$fontSizes.sm",
+              "weight": "$atomic.fontWeight.regular",
+              "color": "$color.scene.mutedForeground"
+            },
+            "heroFigure": {
+              "family": "$atomic.fontFamily.figtree",
+              "size": "$fontSizes.6xl",
+              "weight": "$atomic.fontWeight.semibold",
+              "lineHeight": "$lineHeights.100",
+              "letterSpacing": "$atomic.letterSpacing.wordmark",
+              "color": "$color.scene.foreground"
+            },
+            "wordmark": {
+              "family": "$atomic.fontFamily.figtree",
+              "size": "$fontSizes.11xl",
+              "weight": "$atomic.fontWeight.semibold",
+              "letterSpacing": "$atomic.letterSpacing.wordmark",
+              "color": "$color.scene.foreground"
+            },
+            "command": {
+              "family": "$atomic.fontFamily.systemMono",
+              "size": "$fontSizes.8xl",
+              "weight": "$atomic.fontWeight.regular",
+              "color": "$color.scene.foreground"
+            },
+            "windowSubtitle": {
+              "family": "$atomic.fontFamily.systemMono",
+              "size": "$fontSizes.6xl",
+              "weight": "$atomic.fontWeight.regular",
+              "color": "$color.scene.foreground",
+              "alpha": "$atomic.opacity.45"
             }
           }
         },
@@ -492,7 +806,10 @@
           "outline": "$atomic.strokeWidth.xs",
           "default": "$atomic.strokeWidth.sm",
           "annotation": "$atomic.strokeWidth.lg",
-          "route": "$atomic.strokeWidth.xl"
+          "route": "$atomic.strokeWidth.xl",
+          "emphasis": "$atomic.strokeWidth.lg",
+          "heavy": "$atomic.strokeWidth.2xl",
+          "scale": "$atomic.multiplier.identity"
         },
         "corner": {
           "panel": "$radius.xl",
@@ -501,7 +818,10 @@
           "chip": "$radius.xs",
           "sharedObject": "$radius.sm",
           "spotlight": "$radius.lg",
-          "label": "$radius.md"
+          "label": "$radius.md",
+          "cell": "$radius.sm",
+          "scene": "$radius.14",
+          "scale": "$atomic.multiplier.identity"
         },
         "elevation": {
           "flat": {
@@ -511,7 +831,9 @@
           "floating": {
             "shadow": "$atomic.shadow.lg",
             "color": "$color.shadowColor"
-          }
+          },
+          "strength": "$atomic.multiplier.identity",
+          "window": "$atomic.shadow.window"
         },
         "effect": { "halo": "$atomic.glow.halo" },
         "sketch": {
@@ -601,7 +923,37 @@
             "list": "$atomic.stagger.sm",
             "edge": "$atomic.stagger.sm",
             "column": "$atomic.stagger.xs"
-          }
+          },
+          "reveal": {
+            "duration": "$atomic.duration.ml",
+            "easing": "$atomic.easing.out"
+          },
+          "rise": {
+            "duration": "$motion.word",
+            "easing": "$atomic.easing.word",
+            "stagger": "$atomic.stagger.md"
+          },
+          "depart": {
+            "duration": "$motion.whip",
+            "easing": "$atomic.easing.in"
+          },
+          "surge": { "easing": "$atomic.easing.surge" },
+          "dissolve": { "easing": "$atomic.easing.inOut" },
+          "loopFade": {
+            "graphic": "$atomic.duration.ml",
+            "film": "$atomic.duration.2xl"
+          },
+          "pressDepth": "$atomic.pressDepth.md",
+          "caret": { "halfPeriod": "$atomic.duration.xl" },
+          "easingProfile": "authored",
+          "easingProfiles": {
+            "smooth": "$atomic.easing.inOut",
+            "snappy": "$atomic.easing.snappy",
+            "gentle": "$atomic.easing.gentle"
+          },
+          "staggerScale": "$atomic.multiplier.identity",
+          "entranceStyle": "rise",
+          "entranceScale": "$atomic.entranceScale.md"
         },
         "camera": {
           "preset": "authored",
@@ -644,7 +996,22 @@
           "samples": "$atomic.samples.md",
           "velocityFactor": "$atomic.velocityBlur.factor",
           "velocityMax": "$atomic.velocityBlur.max",
-          "transitionBlur": "$atomic.blur.md"
+          "transitionBlur": "$atomic.blur.md",
+          "strength": "$atomic.multiplier.identity"
+        },
+        "alpha": {
+          "wash": "$atomic.opacity.8",
+          "tint": "$atomic.opacity.12",
+          "ghost": "$atomic.opacity.25",
+          "dimmed": "$atomic.opacity.40",
+          "guide": "$atomic.opacity.50",
+          "washScale": "$atomic.multiplier.identity"
+        },
+        "dash": {
+          "guide": "$atomic.dash.loose",
+          "pending": "$atomic.dash.even",
+          "placeholder": "$atomic.dash.wide",
+          "planned": "$atomic.dash.dense"
         }
       }
     }
@@ -707,7 +1074,7 @@
         "haloRadius": 14,
         "haloAlpha": "$atomic.opacity.6",
         "twinklePeriod": "$motion.pulse.period",
-        "twinkleFloor": 0.45
+        "twinkleFloor": "$atomic.opacity.45"
       }
     },
     "Guide": {
@@ -766,17 +1133,17 @@
         "highlightEdgeAlpha": "$atomic.opacity.34",
         "edgeAlpha": "$atomic.opacity.65",
         "hubPulsePeriod": "$motion.pulse.period",
-        "hubPulseFloor": 0.65,
-        "hubPulseSwing": 0.3,
+        "hubPulseFloor": "$atomic.opacity.65",
+        "hubPulseSwing": "$atomic.opacity.30",
         "nodePulsePeriod": "$atomic.period.lg",
-        "nodePulseSwing": 0.5
+        "nodePulseSwing": "$atomic.opacity.50"
       }
     },
     "RadialNetwork": {
       "defaultProps": {
         "spokeAlpha": "$atomic.opacity.30",
         "spokePulsePeriod": "$motion.pulse.period",
-        "spokePulseSwing": 0.6,
+        "spokePulseSwing": "$atomic.opacity.60",
         "hubRadius": 70,
         "hubStrokeAlpha": "$atomic.opacity.40",
         "hubStrokeWidth": "$stroke.hairline",
@@ -816,11 +1183,11 @@
     "DataPipeline": {
       "defaultProps": {
         "activeTintAlpha": 0.04,
-        "activeStrokeAlpha": 0.6,
+        "activeStrokeAlpha": "$atomic.opacity.60",
         "activeStrokeWidth": "$stroke.hairline",
         "iconRadius": 25,
         "iconFillAlpha": "$atomic.opacity.8",
-        "iconStrokeAlpha": 0.35,
+        "iconStrokeAlpha": "$atomic.opacity.35",
         "iconStrokeWidth": "$stroke.hairline",
         "checkSize": 19,
         "dotRadius": 5,
@@ -831,7 +1198,7 @@
     "PredicatePushdownBoundary": {
       "defaultProps": {
         "boundaryWidth": "$stroke.default",
-        "boundaryDash": [5, 7],
+        "boundaryDash": "$atomic.dash.boundary",
         "predicateRadius": 10,
         "predicateStrokeWidth": "$stroke.hairline",
         "rowRadius": 5,
@@ -844,7 +1211,7 @@
         "radius": 19,
         "dividerWidth": "$stroke.hairline",
         "dotRadius": 4.5,
-        "dotAlpha": 0.45
+        "dotAlpha": "$atomic.opacity.45"
       }
     },
     "CodeFocus": {
@@ -863,7 +1230,7 @@
         "dotRadius": 5,
         "edgeAlpha": "$atomic.opacity.70",
         "ringRadius": 13,
-        "ringAlpha": 0.6,
+        "ringAlpha": "$atomic.opacity.60",
         "ringStrokeWidth": "$stroke.hairline",
         "checkSize": 10
       }
@@ -873,7 +1240,7 @@
         "tableRadius": 5,
         "tableStrokeWidth": "$stroke.default",
         "gridStrokeWidth": "$stroke.hairline",
-        "missingDash": [5, 3],
+        "missingDash": "$atomic.dash.stitch",
         "missingStrokeWidth": "$stroke.hairline",
         "cardRadius": 10,
         "cardStrokeWidth": "$stroke.hairline",
@@ -889,7 +1256,7 @@
         "chipFillAlpha": 0.07,
         "chipStrokeAlpha": "$atomic.opacity.30",
         "chipStrokeWidth": "$stroke.hairline",
-        "outEdgeAlpha": 0.5,
+        "outEdgeAlpha": "$atomic.opacity.50",
         "outEdgeWidth": "$atomic.strokeWidth.lg",
         "outPacketPeriod": 60,
         "mergeRadius": 39,
@@ -897,10 +1264,10 @@
         "mergeStrokeWidth": "$stroke.hairline",
         "glyphWidth": "$atomic.strokeWidth.md",
         "barHeight": 6,
-        "barAlpha": 0.8,
+        "barAlpha": "$atomic.opacity.80",
         "slotRadius": 5,
-        "slotFillAlpha": 0.12,
-        "slotStrokeAlpha": 0.6,
+        "slotFillAlpha": "$atomic.opacity.12",
+        "slotStrokeAlpha": "$atomic.opacity.60",
         "slotStrokeWidth": "$stroke.default"
       }
     },
@@ -914,7 +1281,7 @@
         "gateWidth": "$stroke.default",
         "gateSpread": 9,
         "markerRadius": 13,
-        "markerAlpha": 0.12,
+        "markerAlpha": "$atomic.opacity.12",
         "markerCoreRadius": 5,
         "lineGap": 4
       }
@@ -992,6 +1359,50 @@
         "height": 3,
         "paint": { "color": "$color.accent", "alpha": "$atomic.opacity.100" }
       }
+    },
+    "WindowTilt": {
+      "defaultProps": {
+        "perspective": 1400,
+        "rotateY": -13,
+        "rotateX": 3,
+        "rotateZ": -1,
+        "entryRotateY": -24,
+        "pairPerspective": 1600,
+        "pairRotateY": 8,
+        "pairRotateX": 2,
+        "flipPerspective": 3200,
+        "flipStartRotateY": 80,
+        "chromeRadius": "$radius.md",
+        "titlebarHeight": 0.035
+      }
+    },
+    "WindowMotion": {
+      "defaultProps": {
+        "whipBlur": 40,
+        "slideBlur": 25,
+        "cameraBlur": "$atomic.blur.md",
+        "slideHold": 0.6
+      }
+    },
+    "BrandLockup": {
+      "defaultProps": {
+        "flightTilt": 28,
+        "columnStagger": 1.5,
+        "flightPerspective": 1400
+      }
+    },
+    "Cursor": {
+      "defaultProps": {
+        "scale": 1.4,
+        "pressDepth": 0.07,
+        "trailAlpha": "$atomic.opacity.9",
+        "trailLimit": 4,
+        "shadow": { "shadow": "$atomic.shadow.cursor", "color": "$black" },
+        "travelEasing": "$atomic.easing.inOutCubic"
+      }
+    },
+    "Orb": {
+      "defaultProps": { "ringWidth": 3, "ringColor": "$color.scene.brandSoft" }
     }
   },
   "overrides": {
@@ -1153,6 +1564,43 @@
       "other": {
         "video": {
           "semantic": { "color": { "accent": "$atomic.swatch.cyan" } }
+        }
+      }
+    },
+    "bar-comparison": {
+      "other": {
+        "video": {
+          "semantic": {
+            "color": {
+              "scene": {
+                "ground": "$atomic.swatch.slate50",
+                "foreground": "$atomic.swatch.slate900",
+                "mutedForeground": "$atomic.swatch.slate500",
+                "muted": "$atomic.swatch.slate300",
+                "border": "$atomic.swatch.slate400",
+                "background": "$atomic.swatch.slateInk",
+                "card": "$atomic.swatch.slate800"
+              }
+            }
+          }
+        }
+      }
+    },
+    "avandar-home": {
+      "other": {
+        "video": {
+          "semantic": {
+            "color": { "scene": { "brand": "$colors.primary.6" } }
+          }
+        }
+      }
+    },
+    "motion-reference": {
+      "other": {
+        "video": {
+          "semantic": {
+            "color": { "scene": { "ground": "$atomic.swatch.ground" } }
+          }
         }
       }
     }

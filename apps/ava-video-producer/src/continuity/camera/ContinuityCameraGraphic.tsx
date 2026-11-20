@@ -1,29 +1,44 @@
 import { useCurrentFrame } from "remotion";
-import { isCameraMoving } from "../../motion-components/cameraTrack";
+import { isCameraMoving } from "../../motion-components/cameraTrack/cameraTrack";
 import { DiagramCamera } from "../../motion-components/DiagramCamera";
-import { resolveMotionSettings } from "../../motion-components/motionSettings";
+import { getObjectFlight } from "../../motion-components/getObjectFlight/getObjectFlight";
+import { MotionSettings } from "../../motion-components/MotionSettings/MotionSettings";
 import { useContinuityAppearance } from "../ContinuityAppearanceContext";
 import { ContinuityGraphicObjects } from "./ContinuityGraphicObjects";
-import { getObjectFlight } from "./objectFlight";
 import type { ContinuityBeat } from "../continuitySchema";
 import type { ReactNode } from "react";
 
-type Props = { content: Extract<ContinuityBeat["content"], { kind: "stock" }> };
-
+type Props = {
+  content: Extract<
+    ContinuityBeat["content"],
+    {
+      kind: "stock";
+    }
+  >;
+};
 /** Apply the reusable vector camera to the continuity beat's stock artwork. */
 export function ContinuityCameraGraphic({ content }: Props): ReactNode {
   const frame = useCurrentFrame();
   const { cameraMotion, motionBlur } = useContinuityAppearance();
+  const theme = MotionSettings.useMotionSettingsTheme();
   const flightActive = Boolean(
-    content.flight && getObjectFlight(content.flight, frame).active,
+    content.flight &&
+    getObjectFlight({ flight: content.flight, frame, theme }).active,
   );
   const useFlightBlur =
     flightActive &&
     content.flight?.motion &&
-    !isCameraMoving(content.camera, frame, content.cameraOptions);
-  const { shutterAngle, samples, blurStrength } = resolveMotionSettings(
-    content.flight?.motion,
-  );
+    !isCameraMoving({
+      keys: content.camera,
+      frame,
+      options: content.cameraOptions,
+      theme,
+    });
+  const { shutterAngle, samples, blurStrength } =
+    MotionSettings.resolveMotionSettings({
+      options: content.flight?.motion,
+      theme,
+    });
   return (
     <DiagramCamera
       track={content.camera}

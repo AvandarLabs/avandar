@@ -1,4 +1,3 @@
-import { ramp } from "../../motion";
 import { getStockDisplayCopyFromDescriptor } from "../copy/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
 import { Caption } from "../graphics-common/Caption";
 import { CircleNode } from "../graphics-common/CircleNode";
@@ -7,26 +6,26 @@ import { Eyebrow } from "../graphics-common/Eyebrow";
 import { Route } from "../graphics-common/Route";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
 import { TraversalRouteSummary } from "../presets/NodeTraversal/TraversalRouteSummary/TraversalRouteSummary";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { GraphicProps } from "../graphics-common/graphicCommon.types";
 import type { NodeTraversalInput } from "../presets/NodeTraversal/NodeTraversal.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: NodeTraversalInput };
-
 const ROUTE_CUE = 24;
 const ROUTE_DRAW_FRAMES = 106;
+/**
+ * Compositions hold a nested stock graphic on frame 150, so the route is
+ * complete by then at any tempo, even where a slow tempo would stretch it
+ * further.
+ */
+const ROUTE_SETTLED_AT = 150;
 const EDGE_CUE = 14;
 const ROUTE_LINE_CUE = 25;
 const CAPTION_CUE = 80;
-
 function _clampUnit(value: number): number {
   return Math.min(1, Math.max(0, value));
 }
-
 type KeyedTraversalStep = {
   key: string;
   from: NodeTraversalInput["nodes"][number];
@@ -70,21 +69,20 @@ function _buildKeyedRouteSteps(
     };
   });
 }
-
 /** Draws the bounded authored node-traversal study at an explicit frame. */
 export function NodeTraversal({
   input,
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { color } = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const { color } = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const { nodes, edges, route } = input;
   const progress =
-    ramp(
+    motion.ramp(
       frame,
       ROUTE_CUE,
-      motion.scale(ROUTE_DRAW_FRAMES),
+      Math.min(motion.scale(ROUTE_DRAW_FRAMES), ROUTE_SETTLED_AT - ROUTE_CUE),
       motion.travel.easing,
     ) *
     (route.length - 1);
@@ -144,7 +142,7 @@ export function NodeTraversal({
           />
         );
       })}
-      <g opacity={ramp(frame, CAPTION_CUE, motion.sheet)}>
+      <g opacity={motion.ramp(frame, CAPTION_CUE, motion.sheet)}>
         <Caption>
           {getStockDisplayCopyFromDescriptor({
             descriptor:

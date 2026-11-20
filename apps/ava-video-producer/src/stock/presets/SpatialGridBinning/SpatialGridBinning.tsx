@@ -1,7 +1,7 @@
 import { Text } from "../../graphics-common/Text";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { GridCells } from "./GridCells";
-import { GridTokens } from "./GridTokens";
+import { GridCells } from "./GridCells/GridCells";
+import { GridTokens } from "./GridTokens/GridTokens";
 import { ZeroCountLegend } from "./ZeroCountLegend";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./SpatialGridBinning.schema";
@@ -28,7 +28,7 @@ export function SpatialGridBinning({
       <ZeroCountLegend label={input.labels.zero} />
       <GridCells input={input} frame={frame} accent={accent} />
       <GridTokens input={input} frame={frame} accent={accent} />
-      <Text x={870} y={485} size={20} anchor="end">
+      <Text x={870} y={485} anchor="end">
         {input.points.length}
       </Text>
       {input.points.map((point, index) => {
@@ -37,7 +37,7 @@ export function SpatialGridBinning({
             <Text
               x={40 + (index % 4) * 220}
               y={534 + Math.floor(index / 4) * 28}
-              size={12}
+              role="data"
             >
               {index + 1}·
             </Text>

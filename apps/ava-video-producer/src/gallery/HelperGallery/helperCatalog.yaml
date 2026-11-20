@@ -7,7 +7,10 @@
 categories:
   - id: curves
     title: "Curves and durations"
-    description: "Easing curves, the duration scale and stagger tokens every helper builds on."
+    description:
+      "Easing curves, the duration scale and stagger tokens every helper
+      builds on. Renderers read the same steps from the theme's motion, whose
+      classic values these are."
   - id: interpolation
     title: "Interpolation"
     description: "Turn a frame into progress, a number, a colour or a count."
@@ -55,75 +58,110 @@ modules:
   - path: src/motion.ts
     exhaustiveMembers: [EASE, DUR]
     excluded: []
-  - path: src/motion-components/motionSettings.ts
+  - path: src/motion-components/MotionSettings/MotionSettings.ts
     excluded:
-      - name: motionOptionsSchema
-        reason: "Validation schema for the options the motion presets resolve, not motion."
-      - name: motionEasingSchema
+      - name: MotionSettings.makeMotionSettingsThemeFromVideoTheme
+        reason: "Builds the theme values the motion helpers read; plumbing, not motion."
+      - name: MotionSettings.getClassicMotionSettingsTheme
+        reason:
+          "The classic theme values the motion helpers default to; plumbing, not
+          motion."
+      - name: MotionSettings.useMotionSettingsTheme
+        reason:
+          "Reads the theme values the motion helpers take from the video theme in
+          effect; plumbing, not motion."
+      - name: MotionSettings.motionOptionsSchema
+        reason:
+          "Validation schema for the options the motion presets resolve, not
+          motion."
+      - name: MotionSettings.motionEasingSchema
         reason: "Validation schema for named and cubic Bezier easings, not motion."
-  - path: src/cursor-motion.ts
-    excluded: []
-  - path: src/scenes/textReveal.ts
+      - name: MotionSettings.DEFAULT_MOTION_PRESET
+        reason:
+          "The preset name an unnamed motion cue resolves to; plumbing, not
+          motion."
+    memberModules:
+      - MotionSettings
+  - path: src/CursorMotionHelpers.ts
+    excluded:
+      - name: CursorMotionHelpers.makeCursorMotionFromVideoMotionAndCursor
+        reason: "Builds the theme values the pointer helpers read; plumbing, not
+          motion."
+    memberModules:
+      - CursorMotionHelpers
+  - path: src/scenes/textReveal/textReveal.ts
     excluded:
       - name: getTypographyRevealFrames
-        reason: "TypographyScene's own icon-then-lines start frames; not a general helper."
+        reason:
+          "TypographyScene's own icon-then-lines start frames; not a general
+          helper."
   - path: src/motion-components/eraseMask.ts
     excluded: []
   - path: src/motion-components/HorizontalBlur.tsx
     excluded: []
-  - path: src/motion-components/getHorizontalBlurFilter/getHorizontalBlurFilter.ts
-    excluded:
-      - name: MIN_VISIBLE_BLUR
-        reason: "The blur radius below which HorizontalBlurFilter and getHorizontalBlurFilter skip the filter; not a helper on its own."
-  - path: src/motion-components/cameraTrack.ts
+  - path: src/motion-components/cameraTrack/cameraTrack.ts
     excluded: []
   - path: src/motion-components/DiagramCamera.tsx
     excluded: []
   - path: src/scenes/MediaPlane.tsx
     excluded: []
-  - path: src/scenes/TiltedWindowScene/windowMotion.ts
-    excluded: []
+  - path: src/scenes/TiltedWindowScene/WindowMotion/WindowMotion.ts
+    excluded:
+      - name: WindowMotion.getClassicWindowStage
+        reason:
+          "The classic theme values the window helpers default to; plumbing, not
+          motion."
+    memberModules:
+      - WindowMotion
   - path: src/scenes/TiltedWindowScene/windowTilt.ts
     excluded: []
-  - path: src/storyboard/StoryFilm/steppedColumnWipe.ts
+  - path: src/storyboard/StoryFilm/steppedColumnWipe/steppedColumnWipe.ts
     excluded: []
-  - path: src/storyboard/StoryFilm/getShotTransitionLayers.ts
+  - path: src/storyboard/StoryFilm/getShotTransitionLayers/getShotTransitionLayers.ts
     excluded: []
   - path: src/storyboard/StoryFilm/createThemeStyleFromTheme.ts
     excluded: []
   - path: src/motion-components/SceneTransition.tsx
     excluded: []
-  - path: src/motion-components/createSceneTransition.ts
-    excluded: []
-  - path: src/motion-components/getSceneTransitionStyle.ts
-    excluded:
-      - name: SCENE_TRANSITION_KINDS
-        reason: "The list of transition kinds that schemas validate against; not motion."
   - path: src/motion-components/SharedElement.tsx
     excluded: []
   - path: src/motion-components/AnchoredOverlay.tsx
     excluded: []
+  - path: src/motion-components/SvgObjectDeparture.tsx
+    excluded: []
+  - path: src/scenes/BrandLockupScene/BrandLockupMotion/BrandLockupMotion.ts
+    excluded: []
+    memberModules:
+      - BrandLockupMotion
+  - path: src/scenes/BarComparisonScene/barComparisonMotion/barComparisonMotion.ts
+    excluded:
+      - name: getRowValueLabel
+        reason: "Formats a bar's value text at the panel's precision; not motion."
   - path: src/motion-components/getOverlayPose.ts
     excluded: []
   - path: src/motion-components/getOverlayTimings.ts
     excluded: []
-  - path: src/motion-components/SvgObjectDeparture.tsx
+  - path: src/motion-components/getObjectFlight/getObjectFlight.ts
     excluded: []
-  - path: src/motion-components/getObjectFlight.ts
+  - path: src/motion-components/makeSceneTransitionSpecFromProps.ts
     excluded: []
-  - path: src/scenes/BrandLockupScene/brandLockupMotion.ts
-    excluded: []
-  - path: src/scenes/BarComparisonScene/barComparisonMotion.ts
+  - path: src/motion-components/getSceneTransitionStyle.ts
     excluded:
-      - name: getRowValueLabel
-        reason: "Formats a bar's value text at the panel's precision; not motion."
+      - name: SCENE_TRANSITION_KINDS
+        reason: Transition kinds shared with validation schemas, not a motion helper.
+  - path: src/motion-components/getHorizontalBlurFilter/getHorizontalBlurFilter.ts
+    excluded:
+      - name: MIN_VISIBLE_BLUR
+        reason: Shared minimum visible blur radius, not a motion helper.
 
 helpers:
   # ------------------------------------------------------------ curves --
   - id: ease-out
     title: "Ease out"
     category: curves
-    description: "Exponential ease-out. Arrives fast and settles slowly: the default for entrances, exits and state responses."
+    description:
+      "Exponential ease-out. Arrives fast and settles slowly: the default
+      for entrances, exits and state responses."
     source: src/motion.ts
     exports: [EASE.out]
     signature: "EASE.out: (t: number) => number"
@@ -132,11 +170,10 @@ helpers:
         value: "bezier(0.16, 1, 0.3, 1)"
     usage: |
       const progress = ramp(frame, 12, DUR.panel, EASE.out);
-    goodFor: "Anything arriving or responding: cards, rows, panels, a whip-in settling into its box."
+    goodFor: "Anything arriving or responding: cards, rows, panels, a whip-in
+      settling into its box."
     avoid: "Travel between two visible landmarks, which reads better on EASE.inOut."
-    usedBy:
-      - src/scenes/TiltedWindowScene/windowMotion.ts
-      - src/compositions/Demo/ResultsPanel.tsx
+    usedBy: []
     demo: { id: curve-out, frames: 75 }
 
   - id: ease-out-back
@@ -152,14 +189,18 @@ helpers:
     usage: |
       const scale = mix(ramp(frame, 20, DUR.sheet, EASE.outBack), 0.94, 1);
     goodFor: "One element landing in its slot, once per clip."
-    avoid: "Repeated use: overshoot everywhere reads as a toy. Values outside 0 to 1 can push layouts past their bounds."
+    avoid:
+      "Repeated use: overshoot everywhere reads as a toy. Values outside 0 to 1
+      can push layouts past their bounds."
     usedBy: []
     demo: { id: curve-out-back, frames: 75 }
 
   - id: ease-in-out
     title: "Ease in-out"
     category: curves
-    description: "Symmetric ease for something already on screen travelling between positions."
+    description:
+      "Symmetric ease for something already on screen travelling between
+      positions."
     source: src/motion.ts
     exports: [EASE.inOut]
     signature: "EASE.inOut: (t: number) => number"
@@ -170,16 +211,15 @@ helpers:
       const x = mix(ramp(frame, 30, DUR.sheet, EASE.inOut), 120, 640);
     goodFor: "Travel, dissolves, colour cross-fades and staged exits."
     avoid: "Arrivals from off screen: the slow start reads as hesitation."
-    usedBy:
-      - src/scenes/BarComparisonScene/BarComparisonScene.tsx
-      - src/scenes/BrandLockupScene/brandLockupMotion.ts
-      - src/motion-components/cameraTrack.ts
+    usedBy: []
     demo: { id: curve-in-out, frames: 75 }
 
   - id: ease-in-out-cubic
     title: "Ease in-out cubic"
     category: curves
-    description: "Symmetric cubic, flatter through the middle than EASE.inOut. The pointer's travel curve."
+    description:
+      "Symmetric cubic, flatter through the middle than EASE.inOut. The
+      pointer's travel curve."
     source: src/motion.ts
     exports: [EASE.inOutCubic]
     signature: "EASE.inOutCubic: (t: number) => number"
@@ -188,17 +228,17 @@ helpers:
         value: "t < 0.5 ? 4t³ : 1 - (-2t + 2)³ / 2"
     usage: |
       const progress = ramp(frame, from.at, to.at - from.at, EASE.inOutCubic);
-    goodFor: "A thing crossing the frame under its own power: a cursor between targets, an object departing."
+    goodFor: "A thing crossing the frame under its own power: a cursor between
+      targets, an object departing."
     avoid: "Short UI responses, where the long slow start delays the answer."
-    usedBy:
-      - src/cursor-motion.ts
-      - src/motion-components/getObjectFlight.ts
+    usedBy: []
     demo: { id: curve-in-out-cubic, frames: 75 }
 
   - id: ease-word
     title: "Ease word"
     category: curves
-    description: "The typographic curve: quick to rise, long to settle. Masked words, line fades, rising columns and growing bars."
+    description: "The typographic curve: quick to rise, long to settle. Masked
+      words, line fades, rising columns and growing bars."
     source: src/motion.ts
     exports: [EASE.word]
     signature: "EASE.word: (t: number) => number"
@@ -209,10 +249,7 @@ helpers:
       const rise = ramp(frame, at, DUR.word, EASE.word);
     goodFor: "Staged builds: words, lines, columns, bars and carousel slides."
     avoid: "Departures; pair it with EASE.in or EASE.inOut on the way out."
-    usedBy:
-      - src/scenes/textReveal.ts
-      - src/scenes/TypographyScene.tsx
-      - src/scenes/TiltedWindowScene/windowMotion.ts
+    usedBy: []
     demo: { id: curve-word, frames: 75 }
 
   - id: ease-in
@@ -227,17 +264,18 @@ helpers:
         value: "bezier(0.55, 0, 1, 0.45)"
     usage: |
       const away = ramp(frame, exitAt, DUR.whip, EASE.in);
-    goodFor: "Accelerating departures: a window whipped off the frame, an outgoing shot drifting under a wipe."
+    goodFor:
+      "Accelerating departures: a window whipped off the frame, an outgoing
+      shot drifting under a wipe."
     avoid: "Arrivals. It lands at full speed and reads as a crash."
-    usedBy:
-      - src/scenes/TiltedWindowScene/windowMotion.ts
-      - src/storyboard/StoryFilm/getShotTransitionLayers.ts
+    usedBy: []
     demo: { id: curve-in, frames: 75 }
 
   - id: ease-surge
     title: "Ease surge"
     category: curves
-    description: "A strong in-out: lingers at rest, surges through the middle, settles before the cut."
+    description: "A strong in-out: lingers at rest, surges through the middle,
+      settles before the cut."
     source: src/motion.ts
     exports: [EASE.surge]
     signature: "EASE.surge: (t: number) => number"
@@ -248,17 +286,21 @@ helpers:
       const flight = ramp(frame, flightAt, DUR.hero, EASE.surge);
     goodFor: "A fly-through that fills the frame before a cut."
     avoid: "Ordinary travel; the long hold at each end reads as a stall."
-    usedBy:
-      - src/scenes/BrandLockupScene/brandLockupMotion.ts
+    usedBy: []
     demo: { id: curve-surge, frames: 75 }
 
   - id: bezier
     title: "Custom cubic Bezier"
     category: curves
-    description: "Builds a CSS-style cubic-bezier easing. Returns 0 at or below 0 and 1 at or above 1; overshooting control points can leave 0 to 1 in between."
+    description:
+      "Builds a CSS-style cubic-bezier easing. Returns 0 at or below 0
+      and 1 at or above 1; overshooting control points can leave 0 to 1 in
+      between."
     source: src/motion.ts
     exports: [bezier]
-    signature: "bezier(x1: number, y1: number, x2: number, y2: number): (t: number) => number"
+    signature:
+      "bezier(x1: number, y1: number, x2: number, y2: number): (t: number)
+      => number"
     defaults: []
     usage: |
       const productEase = bezier(0.2, 0.8, 0.2, 1);
@@ -266,23 +308,34 @@ helpers:
     goodFor: "Matching a curve read from the product's own CSS."
     avoid: "Inventing a new curve per scene; add a named token to EASE instead."
     usedBy:
-      - src/motion-components/motionSettings.ts
+      - src/motion-components/MotionSettings/MotionSettings.ts
     demo: { id: curve-bezier, frames: 75 }
 
   - id: motion-presets
     title: "Motion presets"
     category: curves
-    description: "Five semantic presets, deliberate to whip, that scale travel time, shutter angle and easing for the configurable motion components. Reading holds keep their length."
-    source: src/motion-components/motionSettings.ts
+    description:
+      "Five semantic presets, deliberate to whip, that scale travel time,
+      shutter angle and easing for the configurable motion components. Reading
+      holds keep their length."
+    source: src/motion-components/MotionSettings/MotionSettings.ts
     exports:
-      [
-        MOTION_PRESETS,
-        resolveMotionSettings,
-        getMotionDuration,
-        getMotionProgress,
-        getMotionEasing,
-      ]
-    signature: "getMotionProgress(frame: number, at: number, duration: number, options?: MotionOptions, fallback?: Easing): number"
+      - MotionSettings.MOTION_PRESETS
+      - MotionSettings.resolveMotionSettings
+      - MotionSettings.getMotionDuration
+      - MotionSettings.getMotionProgress
+      - MotionSettings.getMotionEasing
+    signature:
+      "MotionSettings.resolveMotionSettings({ options, theme, }: Readonly<{
+      options?: MotionOptions; theme?: MotionSettingsTheme; }>):
+      ResolvedMotionSettings · MotionSettings.getMotionDuration({ frames,
+      options, theme, }: Readonly<{ frames: number; options?: MotionOptions;
+      theme?: MotionSettingsTheme; }>): number ·
+      MotionSettings.getMotionProgress({ frame, at, duration, options, fallback,
+      theme, }: Readonly<GetMotionProgressOptions>): number ·
+      MotionSettings.getMotionEasing({ options, fallback, theme, }: Readonly<{
+      options?: MotionOptions; fallback?: (t: number) => number; theme?:
+      MotionSettingsTheme; }>): (t: number) => number"
     defaults:
       - name: preset
         value: "brisk (speed 1, shutter 180, ease-in-out-cubic)"
@@ -291,14 +344,27 @@ helpers:
       - name: blurStrength
         value: "1"
     usage: |
-      const duration = getMotionDuration(24, { preset: "gentle" });
-      const progress = getMotionProgress(frame, 30, 24, { preset: "gentle" });
-    goodFor: "Changing the pace of a camera, overlay or shared element without retiming its holds."
-    avoid: "Scene choreography built on ramp(); presets only apply to the configurable motion components."
+      const duration = MotionSettings.getMotionDuration({
+          frames: 24,
+          options: { preset: "gentle" }
+      });
+      const progress = MotionSettings.getMotionProgress({
+          frame,
+          at: 30,
+          duration: 24,
+          options: { preset: "gentle" }
+      });
+    goodFor: "Changing the pace of a camera, overlay or shared element without
+      retiming its holds."
+    avoid: "Scene choreography built on ramp(); presets only apply to the
+      configurable motion components."
     usedBy:
       - src/motion-components/SharedElement.tsx
       - src/motion-components/getOverlayPose.ts
       - src/motion-components/getOverlayTimings.ts
+      - src/motion-components/getObjectFlight/getObjectFlight.ts
+      - src/motion-components/makeSceneTransitionSpecFromProps.ts
+      - src/motion-components/getSceneTransitionStyle.ts
       - src/continuity/ContinuityToken.tsx
     demo: { id: motion-presets, frames: 120 }
 
@@ -314,9 +380,7 @@ helpers:
       const split = ramp(frame, at, DUR.press, EASE.out);
     goodFor: "A press answering back, the smallest step of a build."
     avoid: "Entrances; at 4 frames an element appears to pop in."
-    usedBy:
-      - src/scenes/TiltedWindowScene/windowMotion.ts
-      - src/scenes/BrandLockupScene/brandLockupMotion.ts
+    usedBy: []
     demo: { id: duration-press, frames: 60 }
 
   - id: dur-chip
@@ -331,15 +395,15 @@ helpers:
       const fill = mixToken(ramp(frame, at, DUR.chip), "var(--border)", "var(--brand)");
     goodFor: "State flips, line fades, carousel slides."
     avoid: "Travel across the frame."
-    usedBy:
-      - src/scenes/MediaScene.tsx
-      - src/scenes/textReveal.ts
+    usedBy: []
     demo: { id: duration-chip, frames: 60 }
 
   - id: dur-panel
     title: "Panel duration"
     category: curves
-    description: "9 frames (300 ms). A row, card or panel arriving; the default ramp length."
+    description:
+      "9 frames (300 ms). A row, card or panel arriving; the default ramp
+      length."
     source: src/motion.ts
     exports: [DUR.panel]
     signature: "DUR.panel = 9"
@@ -348,15 +412,15 @@ helpers:
       const style = enter(frame, 12, { dur: DUR.panel });
     goodFor: "Most entrances."
     avoid: "The one hero beat of a phase; use DUR.hero for that."
-    usedBy:
-      - src/scenes/GraphScene.tsx
-      - src/scenes/textReveal.ts
+    usedBy: []
     demo: { id: duration-panel, frames: 60 }
 
   - id: dur-sheet
     title: "Sheet duration"
     category: curves
-    description: "13 frames (433 ms). A sheet or full column; the default spring and counter length."
+    description:
+      "13 frames (433 ms). A sheet or full column; the default spring and
+      counter length."
     source: src/motion.ts
     exports: [DUR.sheet]
     signature: "DUR.sheet = 13"
@@ -365,9 +429,7 @@ helpers:
       const pose = getWhipEntrance(frame, 0, canvas, box, DUR.sheet);
     goodFor: "Large surfaces, counters, bars growing."
     avoid: "Small chips and labels, which feel sluggish at this length."
-    usedBy:
-      - src/scenes/GraphScene.tsx
-      - src/scenes/MetricScene.tsx
+    usedBy: []
     demo: { id: duration-sheet, frames: 60 }
 
   - id: dur-hero
@@ -382,9 +444,7 @@ helpers:
       const { rect } = getPullBack(frame, { kind: "pull-back", atFrame: 0 }, canvas, box);
     goodFor: "The pull-back, the fly-through, the result landing."
     avoid: "Several hero beats in one phase."
-    usedBy:
-      - src/scenes/TiltedWindowScene/windowMotion.ts
-      - src/compositions/Demo/ResultsPanel.tsx
+    usedBy: []
     demo: { id: duration-hero, frames: 60 }
 
   - id: dur-word
@@ -399,15 +459,15 @@ helpers:
       const rise = ramp(frame, 6 + index * 3, DUR.word, EASE.word);
     goodFor: "Masked word rises and the gap between CTA lines."
     avoid: "Line fades, which use DUR.chip."
-    usedBy:
-      - src/title-card.tsx
-      - src/scenes/TypographyScene.tsx
+    usedBy: []
     demo: { id: duration-word, frames: 60 }
 
   - id: dur-whip
     title: "Whip duration"
     category: curves
-    description: "8 frames (267 ms). A whip-out or column wipe, deliberately shorter than a panel entrance so the boundary reads as a cut with motion in it."
+    description:
+      "8 frames (267 ms). A whip-out or column wipe, deliberately shorter
+      than a panel entrance so the boundary reads as a cut with motion in it."
     source: src/motion.ts
     exports: [DUR.whip]
     signature: "DUR.whip = 8"
@@ -416,15 +476,14 @@ helpers:
       const pose = getWhipExit(frame, exitAt, box, DUR.whip);
     goodFor: "Whip exits, flip-ins, mark column rises."
     avoid: "Arrivals the viewer has to read."
-    usedBy:
-      - src/scenes/TiltedWindowScene/windowMotion.ts
-      - src/scenes/BrandLockupScene/brandLockupMotion.ts
+    usedBy: []
     demo: { id: duration-whip, frames: 60 }
 
   - id: stagger
     title: "Sibling stagger"
     category: curves
-    description: "2 frames (67 ms) between siblings in a list, so a group never arrives on one frame."
+    description: "2 frames (67 ms) between siblings in a list, so a group never
+      arrives on one frame."
     source: src/motion.ts
     exports: [STAGGER]
     signature: "STAGGER = 2"
@@ -432,16 +491,17 @@ helpers:
     usage: |
       rows.map((row, index) => enter(frame, 10 + index * STAGGER));
     goodFor: "Rows, cards, list items, bar rows."
-    avoid: "Longer gaps: at 30 fps a six-item list then takes half a second to arrive."
-    usedBy:
-      - src/scenes/GraphScene.tsx
-      - src/scenes/BarComparisonScene/barComparisonMotion.ts
+    avoid: "Longer gaps: at 30 fps a six-item list then takes half a second to
+      arrive."
+    usedBy: []
     demo: { id: stagger, frames: 60 }
 
   - id: stagger-column
     title: "Column stagger"
     category: curves
-    description: "Half a frame (17 ms) between columns of a stepped wipe. Fractional on purpose: renderers interpolate each column at its sub-frame offset."
+    description:
+      "Half a frame (17 ms) between columns of a stepped wipe. Fractional
+      on purpose: renderers interpolate each column at its sub-frame offset."
     source: src/motion.ts
     exports: [STAGGER_COLUMN]
     signature: "STAGGER_COLUMN = 0.5"
@@ -450,19 +510,21 @@ helpers:
       getSteppedColumnWipeStyle(frame, 18, { columns: 8, staggerFrames: STAGGER_COLUMN });
     goodFor: "Eight columns crossing the frame inside one whip."
     avoid: "Rounding the offsets; the columns then move in lockstep pairs."
-    usedBy:
-      - src/storyboard/StoryFilm/steppedColumnWipe.ts
-      - src/scenes/BrandLockupScene/BrandLockupScene.tsx
+    usedBy: []
     demo: { id: stagger-column, frames: 60 }
 
   # ----------------------------------------------------- interpolation --
   - id: ramp
     title: "Ramp and mix"
     category: interpolation
-    description: "ramp() maps a frame window to eased 0 to 1 progress, clamped at both ends. mix() turns that progress into any number."
+    description:
+      "ramp() maps a frame window to eased 0 to 1 progress, clamped at
+      both ends. mix() turns that progress into any number."
     source: src/motion.ts
     exports: [ramp, mix]
-    signature: "ramp(frame: number, at: number, dur?: number, easing?: (t: number) => number): number"
+    signature:
+      "ramp(frame: number, at: number, dur?: number, easing?: (t: number)
+      => number): number"
     defaults:
       - name: dur
         value: "DUR.panel (9)"
@@ -472,17 +534,19 @@ helpers:
       const progress = ramp(frame, 15, DUR.sheet);
       const width = mix(progress, 0, 640);
     goodFor: "Every timed style value; the primitive the other helpers build on."
-    avoid: "Unclamped arithmetic on frame, which keeps moving after its window closes."
+    avoid: "Unclamped arithmetic on frame, which keeps moving after its window
+      closes."
     usedBy:
       - src/scenes/MetricScene.tsx
-      - src/scenes/MediaScene.tsx
-      - src/compositions/MotionLab.tsx
+      - src/compositions/MotionLab/CounterCard.tsx
     demo: { id: ramp, frames: 75 }
 
   - id: mix-token
     title: "Mix token"
     category: interpolation
-    description: "Blends two design tokens through an OKLab color-mix() string, so a state change ramps instead of snapping."
+    description:
+      "Blends two design tokens through an OKLab color-mix() string, so a
+      state change ramps instead of snapping."
     source: src/motion.ts
     exports: [mixToken]
     signature: "mixToken(t: number, from: string, to: string): string"
@@ -492,8 +556,8 @@ helpers:
     goodFor: "Focus, selection and finished states: borders, fills, text colours."
     avoid: "Hex values; pass var(--token) references so the film follows the theme."
     usedBy:
-      - src/scenes/GraphScene.tsx
-      - src/scenes/TiltedWindowScene/RacePair.tsx
+      - src/scenes/GraphScene/GraphScene.tsx
+      - src/scenes/TiltedWindowScene/RaceStats/RaceCounter.tsx
     demo: { id: mix-token, frames: 75 }
 
   - id: count-to
@@ -509,20 +573,23 @@ helpers:
     usage: |
       const value = countTo(frame, 20, 1280, 30);
     goodFor: "A count the viewer is already reading, so it never snaps."
-    avoid: "Changes between two nonzero values; use Math.round(mix(ramp(...), from, to))."
-    usedBy:
-      - src/compositions/MotionLab.tsx
-      - src/compositions/Demo/Demo.tsx
+    avoid:
+      "Changes between two nonzero values; use Math.round(mix(ramp(...), from,
+      to))."
+    usedBy: []
     demo: { id: count-to, frames: 75 }
 
   # --------------------------------------------------------- entrances --
   - id: enter
     title: "Enter"
     category: entrances
-    description: "An element arriving: opacity plus a short translation and optional scale, ending at rest. Returns transform and opacity only."
+    description:
+      "An element arriving: opacity plus a short translation and optional
+      scale, ending at rest. Returns transform and opacity only."
     source: src/motion.ts
     exports: [enter]
-    signature: "enter(frame: number, at: number, opts?: { dur?, x?, y?, scale?, easing? }): CSSProperties"
+    signature: "enter(frame: number, at: number, opts?: { dur?, x?, y?, scale?,
+      easing? }): CSSProperties"
     defaults:
       - name: dur
         value: "DUR.panel (9)"
@@ -537,11 +604,9 @@ helpers:
     usage: |
       <div style={enter(frame, 12, { y: 12 })}>Saved</div>
     goodFor: "Cards, labels and panels settling into place."
-    avoid: "Travel above 16 px or scale below 0.9, which stops looking like software. A later transform in the same style replaces it."
-    usedBy:
-      - src/scenes/GraphScene.tsx
-      - src/scenes/BarComparisonScene/BarComparisonScene.tsx
-      - src/continuity/ContinuityThesis.tsx
+    avoid: "Travel above 16 px or scale below 0.9, which stops looking like
+      software. A later transform in the same style replaces it."
+    usedBy: []
     demo: { id: enter, frames: 75 }
 
   - id: enter-at
@@ -550,7 +615,9 @@ helpers:
     description: "The same entrance, delayed by index times STAGGER, to walk a list in."
     source: src/motion.ts
     exports: [enterAt]
-    signature: "enterAt(frame: number, at: number, index: number, opts?: EnterOpts): CSSProperties"
+    signature:
+      "enterAt(frame: number, at: number, index: number, opts?: EnterOpts):
+      CSSProperties"
     defaults:
       - name: stagger
         value: "STAGGER (2) per index"
@@ -558,15 +625,15 @@ helpers:
       rows.map((row, index) => <Row key={row.id} style={enterAt(frame, 20, index)} />);
     goodFor: "Sibling rows and cards."
     avoid: "Unrelated elements; give each its own beat instead."
-    usedBy:
-      - src/scenes/GraphScene.tsx
-      - src/compositions/Demo/ResultsPanel.tsx
+    usedBy: []
     demo: { id: enter-at, frames: 75 }
 
   - id: leave
     title: "Leave"
     category: entrances
-    description: "Exit the way it entered: opacity to 0 while translating away on the same axis."
+    description:
+      "Exit the way it entered: opacity to 0 while translating away on
+      the same axis."
     source: src/motion.ts
     exports: [leave]
     signature: "leave(frame: number, at: number, opts?: EnterOpts): CSSProperties"
@@ -579,7 +646,9 @@ helpers:
         value: "EASE.out"
     usage: |
       <div style={leave(frame, 48)}>Draft</div>
-    goodFor: "Short exits that keep a leaving element from drifting where the next phase lands."
+    goodFor:
+      "Short exits that keep a leaving element from drifting where the next
+      phase lands."
     avoid: "Scale: leave() ignores the scale option."
     usedBy: []
     demo: { id: leave, frames: 75 }
@@ -587,10 +656,12 @@ helpers:
   - id: pop
     title: "Pop"
     category: entrances
-    description: "A damped spring anchored at a frame, 0 to 1, fitted to settle inside its duration."
+    description: "A damped spring anchored at a frame, 0 to 1, fitted to settle
+      inside its duration."
     source: src/motion.ts
     exports: [pop]
-    signature: "pop(frame: number, at: number, config?: { damping?, stiffness?, mass? }, durationInFrames?: number): number"
+    signature: "pop(frame: number, at: number, config?: { damping?, stiffness?,
+      mass? }, durationInFrames?: number): number"
     defaults:
       - name: damping
         value: "14"
@@ -605,8 +676,7 @@ helpers:
       const y = mix(landing, -40, 0);
     goodFor: "Something physical landing: a toast, a value snapping into a slot."
     avoid: "Damping below 14, which wobbles. Travel, which belongs to ramp()."
-    usedBy:
-      - src/compositions/Demo/SidePanel.tsx
+    usedBy: []
     demo: { id: pop, frames: 75 }
 
   - id: press
@@ -625,10 +695,7 @@ helpers:
       <button style={{ transform: `scale(${press(frame, CLICK)})` }}>Publish</button>
     goodFor: "The clicked element answering on the same beat as the pointer."
     avoid: "Deeper dips than 0.07; the button reads as squashed."
-    usedBy:
-      - src/compositions/Demo/PublishButton.tsx
-      - src/compositions/MotionLab.tsx
-      - src/cursor-motion.ts
+    usedBy: []
     demo: { id: press, frames: 75 }
 
   # -------------------------------------------------------------- text --
@@ -636,41 +703,54 @@ helpers:
     title: "Line fade"
     category: text
     description: "A line fading in with a small rise over DUR.chip on EASE.word."
-    source: src/scenes/textReveal.ts
+    source: src/scenes/textReveal/textReveal.ts
     exports: [getLineRevealStyle]
-    signature: 'getLineRevealStyle(frame: number, at: number, mode: "line-fade", options?: { rise?: number }): CSSProperties'
+    signature: "getLineRevealStyle({ frame, at, mode, options, motion, }:
+      Readonly<GetLineRevealStyleOptions>): CSSProperties"
     defaults:
       - name: rise
         value: "12 px (0 for a pure fade)"
       - name: duration
         value: "DUR.chip (6)"
     usage: |
-      <p style={getLineRevealStyle(frame, 10 + index * 3, "line-fade")}>{line}</p>
+      <p style={getLineRevealStyle({
+          frame,
+          at: 10 + index * 3,
+          mode: "line-fade"
+      })}>{line}</p>;
     goodFor: "Headlines beside a window, statements line by line."
     avoid: "Single-word emphasis; the whole line moves together."
     usedBy:
-      - src/scenes/TypographyScene.tsx
+      - src/scenes/TypographyScene/RevealedLine.tsx
+      - src/scenes/TypographyScene/TypographyScene.tsx
       - src/scenes/TiltedWindowScene/WindowHeadlines.tsx
     demo: { id: line-fade, frames: 75 }
 
   - id: line-wipe
     title: "Line wipe"
     category: text
-    description: "A line revealed left to right behind a clip while it travels in 8% from the left, over DUR.panel."
-    source: src/scenes/textReveal.ts
+    description:
+      "A line revealed left to right behind a clip while it travels in 8%
+      from the left, over DUR.panel."
+    source: src/scenes/textReveal/textReveal.ts
     exports: [getLineRevealStyle]
-    signature: 'getLineRevealStyle(frame: number, at: number, mode: "wipe"): CSSProperties'
+    signature: "getLineRevealStyle({ frame, at, mode, options, motion, }:
+      Readonly<GetLineRevealStyleOptions>): CSSProperties"
     defaults:
       - name: travel
         value: "-8% to 0"
       - name: duration
         value: "DUR.panel (9)"
     usage: |
-      <h2 style={getLineRevealStyle(frame, 6, "wipe")}>Harborfield</h2>
+      <h2 style={getLineRevealStyle({
+          frame,
+          at: 6,
+          mode: "wipe"
+      })}>Harborfield</h2>;
     goodFor: "Wordmarks, labels and headings that should feel drawn rather than faded."
     avoid: "Right-to-left scripts, which read against the wipe."
     usedBy:
-      - src/scenes/BrandLockupScene/BrandLockupScene.tsx
+      - src/scenes/BrandLockupScene/LockupWordmark/LockupWordmarkText.tsx
       - src/scenes/BarComparisonScene/BarComparisonScene.tsx
     demo: { id: line-wipe, frames: 75 }
 
@@ -678,43 +758,61 @@ helpers:
     title: "Line cut"
     category: text
     description: "A line that appears on its frame with no transition."
-    source: src/scenes/textReveal.ts
+    source: src/scenes/textReveal/textReveal.ts
     exports: [getLineRevealStyle]
-    signature: 'getLineRevealStyle(frame: number, at: number, mode: "cut"): CSSProperties'
+    signature: "getLineRevealStyle({ frame, at, mode, options, motion, }:
+      Readonly<GetLineRevealStyleOptions>): CSSProperties"
     defaults: []
     usage: |
-      <p style={getLineRevealStyle(frame, beat, "cut")}>{line}</p>
+      <p style={getLineRevealStyle({
+          frame,
+          at: beat,
+          mode: "cut"
+      })}>{line}</p>;
     goodFor: "Lines timed to a hard beat in the sound or a cut in the picture."
     avoid: "Many cuts in a row, which read as flicker."
     usedBy:
-      - src/scenes/TypographyScene.tsx
+      - src/scenes/TypographyScene/RevealedLine.tsx
+      - src/scenes/TypographyScene/TypographyScene.tsx
     demo: { id: line-cut, frames: 75 }
 
   - id: wipe-exit
     title: "Wipe exit"
     category: text
-    description: "Retracts a line from its right edge back to its left, the reverse of a wipe reveal."
-    source: src/scenes/textReveal.ts
+    description:
+      "Retracts a line from its right edge back to its left, the reverse
+      of a wipe reveal."
+    source: src/scenes/textReveal/textReveal.ts
     exports: [getWipeExitStyle]
-    signature: "getWipeExitStyle(frame: number, at: number, durationInFrames: number): CSSProperties"
+    signature: "getWipeExitStyle({ frame, at, durationInFrames, motion, }:
+      Readonly<GetWipeExitStyleOptions>): CSSProperties"
     defaults:
       - name: easing
         value: "EASE.inOut"
     usage: |
-      <h2 style={getWipeExitStyle(frame, exitAt, DUR.chip)}>Harborfield</h2>
+      <h2 style={getWipeExitStyle({
+          frame,
+          at: exitAt,
+          durationInFrames: DUR.chip
+      })}>Harborfield</h2>;
     goodFor: "A wordmark withdrawing before its mark flies through the frame."
-    avoid: "Combining with a wipe reveal on the same element without separate wrappers; both set clipPath."
+    avoid: "Combining with a wipe reveal on the same element without separate
+      wrappers; both set clipPath."
     usedBy:
-      - src/scenes/BrandLockupScene/BrandLockupScene.tsx
+      - src/scenes/BrandLockupScene/LockupWordmark/LockupWordmark.tsx
     demo: { id: wipe-exit, frames: 75 }
 
   - id: heading-reveal
     title: "Heading reveal"
     category: text
-    description: "Styles for a scene's title and kicker: a rise by default, or a left-to-right wipe per line, the kicker a panel later."
-    source: src/scenes/textReveal.ts
+    description: "Styles for a scene's title and kicker: a rise by default, or a
+      left-to-right wipe per line, the kicker a panel later."
+    source: src/scenes/textReveal/textReveal.ts
     exports: [getHeadingRevealStyles]
-    signature: 'getHeadingRevealStyles(frame: number, reveal: { mode: "rise" | "wipe", atFrame?, staggerFrames? } | undefined): { title, kicker }'
+    signature:
+      "getHeadingRevealStyles({ frame, reveal, motion, }: Readonly<{ frame:
+      number; reveal: HeadingReveal | undefined; motion?: VideoMotion; }>): {
+      title: CSSProperties; kicker: CSSProperties; }"
     defaults:
       - name: mode
         value: "rise"
@@ -723,7 +821,10 @@ helpers:
       - name: staggerFrames
         value: "DUR.panel (9)"
     usage: |
-      const { title, kicker } = getHeadingRevealStyles(frame, { mode: "wipe" });
+      const { title, kicker } = getHeadingRevealStyles({
+          frame,
+          reveal: { mode: "wipe" }
+      });
     goodFor: "Every scene heading through SceneShell's headingReveal."
     avoid: "Different reveals for headings within one film."
     usedBy:
@@ -733,27 +834,35 @@ helpers:
   - id: staged-exit
     title: "Staged exit"
     category: text
-    description: "Elements fading out in place one after another, so the field empties in steps rather than one dissolve."
-    source: src/scenes/textReveal.ts
+    description: "Elements fading out in place one after another, so the field
+      empties in steps rather than one dissolve."
+    source: src/scenes/textReveal/textReveal.ts
     exports: [getStagedExitStyle]
-    signature: "getStagedExitStyle(frame: number, exit: { atFrame, staggerFrames?, durationInFrames? } | undefined, orderIndex: number): CSSProperties"
+    signature: "getStagedExitStyle({ frame, exit, orderIndex, motion, }:
+      Readonly<GetStagedExitStyleOptions>): CSSProperties"
     defaults:
       - name: staggerFrames
         value: "3"
       - name: durationInFrames
         value: "DUR.chip (6)"
     usage: |
-      <p style={getStagedExitStyle(frame, { atFrame: 50 }, index)}>{line}</p>
+      <p style={getStagedExitStyle({
+          frame,
+          exit: { atFrame: 50 },
+          orderIndex: index
+      })}>{line}</p>;
     goodFor: "A statement leaving before its icon."
     avoid: "Moving elements; the exit fades in place without travel."
     usedBy:
-      - src/scenes/TypographyScene.tsx
+      - src/scenes/TypographyScene/TypographyScene.tsx
     demo: { id: staged-exit, frames: 90 }
 
   - id: typed
     title: "Typing and caret"
     category: text
-    description: "typed() reveals text one character at a time; caretOn() blinks a caret on a half-second rhythm."
+    description:
+      "typed() reveals text one character at a time; caretOn() blinks a
+      caret on a half-second rhythm."
     source: src/motion.ts
     exports: [typed, caretOn]
     signature: "typed(frame: number, at: number, text: string, cps?: number): string"
@@ -767,20 +876,27 @@ helpers:
     goodFor: "A field the flow claims is being filled, a command typed in a CTA."
     avoid: "Caption or speech timing; this simulates typing only."
     usedBy:
-      - src/scenes/BrandLockupScene/BrandLockupScene.tsx
-      - src/compositions/MotionLab.tsx
+      - src/scenes/BrandLockupScene/LockupCta/CtaCommand.tsx
+      - src/compositions/MotionLab/TypedCard.tsx
     demo: { id: typed, frames: 90 }
 
   - id: active-headline
     title: "Active headline"
     category: text
-    description: "Which of several timed headlines is on screen, fading each out over DUR.press as the next one starts."
-    source: src/scenes/TiltedWindowScene/windowMotion.ts
-    exports: [getActiveHeadline]
-    signature: "getActiveHeadline(frame: number, headlines: ReadonlyArray<{ atFrame: number }>): { index: number, opacity: number }"
+    description: "Which of several timed headlines is on screen, fading each out
+      over DUR.press as the next one starts."
+    source: src/scenes/TiltedWindowScene/WindowMotion/WindowMotion.ts
+    exports:
+      - WindowMotion.getActiveHeadline
+    signature: "WindowMotion.getActiveHeadline({ frame, headlines, stage, }:
+      Readonly<{ frame: number; headlines: ReadonlyArray<{ atFrame: number; }>;
+      stage?: WindowStage; }>): { index: number; opacity: number; }"
     defaults: []
     usage: |
-      const { index, opacity } = getActiveHeadline(frame, headlines);
+      const { index, opacity } = WindowMotion.getActiveHeadline({
+          frame,
+          headlines
+      });
     goodFor: "A headline column that changes while the window beside it stays."
     avoid: "Headlines closer than DUR.press apart; the fade has no room."
     usedBy:
@@ -791,7 +907,9 @@ helpers:
   - id: erase-mask
     title: "Erase mask"
     category: masks
-    description: "A mask that erases an element left to right behind a soft edge as progress goes from 0 to 1."
+    description:
+      "A mask that erases an element left to right behind a soft edge as
+      progress goes from 0 to 1."
     source: src/motion-components/eraseMask.ts
     exports: [getEraseMaskStyle]
     signature: "getEraseMaskStyle(progress: number, feather?: number): CSSProperties"
@@ -809,10 +927,13 @@ helpers:
   - id: erase-schedule
     title: "Erase schedule"
     category: masks
-    description: "The frame each element of each panel starts erasing: reading order within a panel, panel by panel, fractional frames kept."
-    source: src/scenes/BarComparisonScene/barComparisonMotion.ts
+    description:
+      "The frame each element of each panel starts erasing: reading order
+      within a panel, panel by panel, fractional frames kept."
+    source: src/scenes/BarComparisonScene/barComparisonMotion/barComparisonMotion.ts
     exports: [getEraseStartFrames]
-    signature: "getEraseStartFrames({ atFrame, elementCounts, staggerFrames, panelStaggerFrames }): number[][]"
+    signature: "getEraseStartFrames({ atFrame, elementCounts, staggerFrames,
+      panelStaggerFrames }): number[][]"
     defaults: []
     usage: |
       const starts = getEraseStartFrames({ atFrame: 40, elementCounts: [4, 4], staggerFrames: 0.1, panelStaggerFrames: 2 });
@@ -825,15 +946,20 @@ helpers:
   - id: stepped-column-wipe
     title: "Stepped column wipe"
     category: masks
-    description: "A staircase clip whose columns cross the frame one after another, each at its own sub-frame offset."
-    source: src/storyboard/StoryFilm/steppedColumnWipe.ts
+    description:
+      "A staircase clip whose columns cross the frame one after another,
+      each at its own sub-frame offset."
+    source: src/storyboard/StoryFilm/steppedColumnWipe/steppedColumnWipe.ts
     exports:
       [
         getSteppedColumnWipeStyle,
         getColumnWipeProgress,
         STEPPED_COLUMN_WIPE_DEFAULTS,
       ]
-    signature: "getSteppedColumnWipeStyle(frame: number, durationInFrames: number, options: { columns?, staggerFrames?, from?, order? }): CSSProperties"
+    signature: "getSteppedColumnWipeStyle({ frame, durationInFrames, options,
+      motion, }: Readonly<GetSteppedColumnWipeStyleOptions>): CSSProperties ·
+      getColumnWipeProgress({ frame, durationInFrames, options, motion, }:
+      Readonly<GetColumnWipeProgressOptions>): number[]"
     defaults:
       - name: columns
         value: "8"
@@ -844,39 +970,55 @@ helpers:
       - name: order
         value: "left-to-right"
     usage: |
-      <AbsoluteFill style={getSteppedColumnWipeStyle(frame, 18, { columns: 8 })}>{incoming}</AbsoluteFill>
-    goodFor: "A shot transition with motion in it; a stepped reveal of a window or a mark."
+      <AbsoluteFill style={getSteppedColumnWipeStyle({
+          frame,
+          durationInFrames: 18,
+          options: { columns: 8 }
+      })}>{incoming}</AbsoluteFill>;
+    goodFor:
+      "A shot transition with motion in it; a stepped reveal of a window or a
+      mark."
     avoid: "Dark-on-light pairs with few columns, where each step reads as a flash."
     usedBy:
-      - src/storyboard/StoryFilm/getShotTransitionLayers.ts
-      - src/scenes/TiltedWindowScene/windowMotion.ts
+      - src/storyboard/StoryFilm/getShotTransitionLayers/getShotTransitionLayers.ts
+      - src/scenes/TiltedWindowScene/WindowMotion/WindowMotion.ts
     demo: { id: stepped-column-wipe, frames: 60 }
 
   - id: window-reveal
     title: "Window stepped reveal"
     category: masks
-    description: "The clip on a window while its columns rise in turn, the stepped column wipe drawn in the window's own plane."
-    source: src/scenes/TiltedWindowScene/windowMotion.ts
-    exports: [getWindowRevealStyle]
-    signature: "getWindowRevealStyle(frame: number, at: number, reveal: { columns?, durationInFrames } | undefined): CSSProperties"
+    description:
+      "The clip on a window while its columns rise in turn, the stepped
+      column wipe drawn in the window's own plane."
+    source: src/scenes/TiltedWindowScene/WindowMotion/WindowMotion.ts
+    exports:
+      - WindowMotion.getWindowRevealStyle
+    signature: "WindowMotion.getWindowRevealStyle({ frame, at, reveal, stage, }:
+      Readonly<GetWindowRevealStyleOptions>): CSSProperties"
     defaults:
       - name: columns
         value: "4"
       - name: staggerFrames
         value: "durationInFrames / (columns + 1)"
     usage: |
-      <div style={getWindowRevealStyle(frame, 0, { durationInFrames: 12 })}>{window}</div>
+      <div style={WindowMotion.getWindowRevealStyle({
+          frame,
+          at: 0,
+          reveal: { durationInFrames: 12 }
+      })}>{window}</div>;
     goodFor: "A window entering through a staircase instead of a whip."
     avoid: "Live product UI under the reveal; it is for stills and footage."
     usedBy:
-      - src/scenes/TiltedWindowScene/TiltedWindowScene.tsx
+      - src/scenes/TiltedWindowScene/TiltedWindowSceneShared/TiltedWindowSceneShared.ts
     demo: { id: window-reveal, frames: 60 }
 
   - id: rough-edge
     title: "Rough bar edge"
     category: masks
-    description: "A torn, brush-like right edge for a bar as a clip path, seeded so every frame draws the same edge."
-    source: src/scenes/BarComparisonScene/barComparisonMotion.ts
+    description:
+      "A torn, brush-like right edge for a bar as a clip path, seeded so
+      every frame draws the same edge."
+    source: src/scenes/BarComparisonScene/barComparisonMotion/barComparisonMotion.ts
     exports: [getRoughEdgeClipPath]
     signature: "getRoughEdgeClipPath(seed: number, depth: number): string"
     defaults: []
@@ -892,39 +1034,50 @@ helpers:
   - id: horizontal-blur
     title: "Horizontal blur"
     category: blur
-    description: "An SVG filter that blurs along X only, the motion blur of a layer moving sideways. Below 0.25 px no filter runs."
+    description:
+      "An SVG filter that blurs along X only, the motion blur of a layer
+      moving sideways. Below 0.25 px no filter runs."
     source: src/motion-components/HorizontalBlur.tsx
-    relatedSources:
-      [src/motion-components/getHorizontalBlurFilter/getHorizontalBlurFilter.ts]
     exports: [HorizontalBlurFilter, getHorizontalBlurFilter]
-    signature: "<HorizontalBlurFilter id={id} amount={px} /> + getHorizontalBlurFilter(id: string, amount: number): string | undefined"
+    signature: "<HorizontalBlurFilter id={id} amount={px} /> +
+      getHorizontalBlurFilter(id: string, amount: number): string | undefined"
     defaults:
       - name: minimum visible blur
         value: "0.25 px"
     usage: |
       <HorizontalBlurFilter id="whip" amount={blurX} />
       <div style={{ filter: getHorizontalBlurFilter("whip", blurX) }}>{window}</div>
-    goodFor: "Whips, carousel slides and drifting layers, where CSS blur() would also smear the top and bottom edges."
+    goodFor: "Whips, carousel slides and drifting layers, where CSS blur() would
+      also smear the top and bottom edges."
     avoid: "Reusing one id for two layers with different amounts."
     usedBy:
       - src/scenes/TiltedWindowScene/WindowCard.tsx
-      - src/storyboard/StoryFilm/StoryFilm.tsx
+      - src/storyboard/StoryFilm/_OutgoingShotLayer.tsx
     demo: { id: horizontal-blur, frames: 60 }
+    relatedSources:
+      - src/motion-components/getHorizontalBlurFilter/getHorizontalBlurFilter.ts
 
   - id: velocity-blur
     title: "Velocity blur"
     category: blur
-    description: "A bounded screen-space blur radius from distance travelled per frame, scaled by the motion preset's shutter."
-    source: src/motion-components/motionSettings.ts
-    exports: [getVelocityBlur]
-    signature: "getVelocityBlur(distancePerFrame: number, options?: MotionOptions, maximum?: number): number"
+    description: "A bounded screen-space blur radius from distance travelled per
+      frame, scaled by the motion preset's shutter."
+    source: src/motion-components/MotionSettings/MotionSettings.ts
+    exports:
+      - MotionSettings.getVelocityBlur
+    signature:
+      "MotionSettings.getVelocityBlur({ distancePerFrame, options, maximum,
+      theme, }: Readonly<GetVelocityBlurOptions>): number"
     defaults:
       - name: maximum
         value: "3 px"
       - name: shutter
         value: "the preset's shutterAngle / 180"
     usage: |
-      const blur = getVelocityBlur(Math.hypot(dx, dy), { preset: "whip" });
+      const blur = MotionSettings.getVelocityBlur({
+          distancePerFrame: Math.hypot(dx, dy),
+          options: { preset: "whip" }
+      });
     goodFor: "Single overlays travelling across the frame."
     avoid: "Large layers holding text that must stay legible while moving."
     usedBy:
@@ -935,8 +1088,9 @@ helpers:
   - id: camera-track
     title: "Camera track"
     category: camera
-    description: "Samples a camera centre and zoom from ordered keys. A repeated pose is a reading hold, kept exact when presets retime the travel."
-    source: src/motion-components/cameraTrack.ts
+    description: "Samples a camera centre and zoom from ordered keys. A repeated
+      pose is a reading hold, kept exact when presets retime the travel."
+    source: src/motion-components/cameraTrack/cameraTrack.ts
     exports:
       [
         getCameraPose,
@@ -945,7 +1099,15 @@ helpers:
         createCameraTrackSchema,
         cameraTrackSchema,
       ]
-    signature: "getCameraPose(keys, frame: number, enabled?: boolean, options?: MotionOptions, viewport?: { width, height }): { x, y, zoom }"
+    signature:
+      "getCameraPose({ keys, frame, enabled, options, viewport, theme, }:
+      Readonly<GetCameraPoseOptions>): CameraPose · retimeCameraTrack({ keys,
+      options, theme, }: Readonly<{ keys: readonly CameraKeyframe[]; options?:
+      MotionOptions; theme?: MotionSettingsTheme; }>): CameraKeyframe[] ·
+      isCameraMoving({ keys, frame, options, theme, }:
+      Readonly<IsCameraMovingOptions>): boolean ·
+      createCameraTrackSchema(width?: number, height?: number):
+      CameraTrackSchema"
     defaults:
       - name: viewport
         value: "960 × 600"
@@ -954,23 +1116,29 @@ helpers:
       - name: zoom
         value: "1 to 3"
     usage: |
-      const pose = getCameraPose(keys, frame);
+      const pose = getCameraPose({
+          keys,
+          frame
+      });
       const viewBox = `${pose.x - 480 / pose.zoom} ${pose.y - 300 / pose.zoom} ${960 / pose.zoom} ${600 / pose.zoom}`;
     goodFor: "Pushing into a region of a vector diagram and holding while it is read."
     avoid: "Scaling live product UI; the camera is for vector artwork and stills."
     usedBy:
       - src/motion-components/DiagramCamera.tsx
-      - src/scenes/TiltedWindowScene/windowMotion.ts
+      - src/scenes/TiltedWindowScene/WindowMotion/WindowMotion.ts
       - src/continuity/continuitySchema.ts
     demo: { id: camera-track, frames: 150 }
 
   - id: diagram-camera
     title: "Diagram camera"
     category: camera
-    description: "A vector-only camera component: it pans and zooms an SVG viewBox along a track, with temporal motion blur only while it travels."
+    description:
+      "A vector-only camera component: it pans and zooms an SVG viewBox
+      along a track, with temporal motion blur only while it travels."
     source: src/motion-components/DiagramCamera.tsx
     exports: [DiagramCamera]
-    signature: "<DiagramCamera track={keys} width={960} height={600} motionBlur render={(frame) => <Diagram />} />"
+    signature: "<DiagramCamera track={keys} width={960} height={600} motionBlur
+      render={(frame) => <Diagram />} />"
     defaults:
       - name: width × height
         value: "960 × 600"
@@ -989,58 +1157,98 @@ helpers:
   - id: window-camera
     title: "Window camera"
     category: camera
-    description: "A camera on the window layer only: the window scales about a normalized anchor, with X blur while the zoom changes."
-    source: src/scenes/TiltedWindowScene/windowMotion.ts
-    exports: [getWindowCamera]
-    signature: "getWindowCamera(frame: number, keys: ReadonlyArray<{ at, x, y, zoom, ease? }>, box: Rect): { scale, originX, originY, blurX }"
+    description: "A camera on the window layer only: the window scales about a
+      normalized anchor, with X blur while the zoom changes."
+    source: src/scenes/TiltedWindowScene/WindowMotion/WindowMotion.ts
+    exports:
+      - WindowMotion.getWindowCamera
+    signature: "WindowMotion.getWindowCamera({ frame, keys, box, stage, }:
+      Readonly<GetWindowCameraOptions>): { scale: number; originX: number;
+      originY: number; blurX: number; }"
     defaults:
       - name: anchor
         value: "x, y in 0 to 1 of the window"
       - name: maximum blur
         value: "12 px"
     usage: |
-      const camera = getWindowCamera(frame, [{ at: 0, x: 0.5, y: 0.5, zoom: 1 }, { at: 30, x: 0.7, y: 0.4, zoom: 1.6, ease: "push" }], box);
+      const camera = WindowMotion.getWindowCamera({
+          frame,
+          keys: [{ at: 0, x: 0.5, y: 0.5, zoom: 1 }, { at: 30, x: 0.7, y: 0.4, zoom: 1.6, ease: "push" }],
+          box
+      });
     goodFor: "Pushing into one area of a screenshot inside the tilted window."
     avoid: "Zooming the whole frame; only the window layer scales."
     usedBy:
-      - src/scenes/TiltedWindowScene/TiltedWindowScene.tsx
+      - src/scenes/TiltedWindowScene/PrimaryWindow/getWindowCameraStateFromProps.ts
     demo: { id: window-camera, frames: 120 }
 
   # ----------------------------------------------------------- windows --
   - id: window-whip
     title: "Window whip"
     category: windows
-    description: "A window whipping in from beyond the right edge and settling its tilt, then whipping out past the left edge, with X blur on both."
-    source: src/scenes/TiltedWindowScene/windowMotion.ts
-    exports: [getWhipEntrance, getWhipExit]
-    signature: "getWhipEntrance(frame, at, canvas, box, durationInFrames?): WindowPose · getWhipExit(frame, at, box, durationInFrames?): WindowPose"
+    description:
+      "A window whipping in from beyond the right edge and settling its
+      tilt, then whipping out past the left edge, with X blur on both."
+    source: src/scenes/TiltedWindowScene/WindowMotion/WindowMotion.ts
+    exports:
+      - WindowMotion.getWhipEntrance
+      - WindowMotion.getWhipExit
+    signature: "WindowMotion.getWhipEntrance({ frame, at, canvas, box,
+      durationInFrames, stage, }: Readonly<GetWhipEntranceOptions>): WindowPose
+      · WindowMotion.getWhipExit({ frame, at, box, durationInFrames, stage, }:
+      Readonly<GetWhipExitOptions>): WindowPose"
     defaults:
       - name: entrance
         value: "DUR.sheet, EASE.out, rotateY -24° to -13°, blur 40 to 0"
       - name: exit
         value: "DUR.whip, EASE.in, blur 0 to 40"
     usage: |
-      const pose = frame < exitAt ? getWhipEntrance(frame, 0, canvas, box) : getWhipExit(frame, exitAt, box);
+      const pose = frame < exitAt ? WindowMotion.getWhipEntrance({
+          frame,
+          at: 0,
+          canvas,
+          box
+      }) : WindowMotion.getWhipExit({
+          frame,
+          at: exitAt,
+          box
+      });
     goodFor: "A window shot that arrives and leaves with energy."
     avoid: "Live product UI inside the lasting 3D transform."
     usedBy:
-      - src/scenes/TiltedWindowScene/TiltedWindowScene.tsx
       - src/scenes/TiltedWindowScene/RacePair.tsx
+      - src/scenes/TiltedWindowScene/TiltedWindowSceneShared/TiltedWindowSceneShared.ts
+      - src/scenes/TiltedWindowScene/SecondaryWindow.tsx
     demo: { id: window-whip, frames: 90 }
 
   - id: side-entrance
     title: "Side entrance"
     category: windows
-    description: "One window of a pair sliding in from its own outer edge, decelerating into its box with X blur."
-    source: src/scenes/TiltedWindowScene/windowMotion.ts
-    exports: [getSideEntrance]
-    signature: "getSideEntrance(frame, at, side: 0 | 1, canvas, box, durationInFrames?): WindowPose"
+    description: "One window of a pair sliding in from its own outer edge,
+      decelerating into its box with X blur."
+    source: src/scenes/TiltedWindowScene/WindowMotion/WindowMotion.ts
+    exports:
+      - WindowMotion.getSideEntrance
+    signature: "WindowMotion.getSideEntrance({ frame, at, side, canvas, box,
+      durationInFrames, stage, }: Readonly<GetSideEntranceOptions>): WindowPose"
     defaults:
       - name: durationInFrames
         value: "DUR.panel (9)"
     usage: |
-      const left = getSideEntrance(frame, 0, 0, canvas, leftBox);
-      const right = getSideEntrance(frame, 0, 1, canvas, rightBox);
+      const left = WindowMotion.getSideEntrance({
+          frame,
+          at: 0,
+          side: 0,
+          canvas,
+          box: leftBox
+      });
+      const right = WindowMotion.getSideEntrance({
+          frame,
+          at: 0,
+          side: 1,
+          canvas,
+          box: rightBox
+      });
     goodFor: "Two windows arriving together to be compared."
     avoid: "A single window, which reads better whipping in."
     usedBy:
@@ -1050,60 +1258,98 @@ helpers:
   - id: carousel
     title: "Carousel slide"
     category: windows
-    description: "Which carousel window is current and the poses of a slide: the incoming window slides in on top, the outgoing one recedes and fades only once mostly covered."
-    source: src/scenes/TiltedWindowScene/windowMotion.ts
-    exports: [getCarouselState, getCarouselPoses]
-    signature: "getCarouselState(frame, windows: { atFrame?, swap? }[]): { current, previous?, progress } · getCarouselPoses(progress, box): { incoming, outgoing }"
+    description: "Which carousel window is current and the poses of a slide: the
+      incoming window slides in on top, the outgoing one recedes and fades only
+      once mostly covered."
+    source: src/scenes/TiltedWindowScene/WindowMotion/WindowMotion.ts
+    exports:
+      - WindowMotion.getCarouselState
+      - WindowMotion.getCarouselPoses
+    signature:
+      "WindowMotion.getCarouselState({ frame, windows, stage, }: Readonly<{
+      frame: number; windows: readonly CarouselWindow[]; stage?: WindowStage;
+      }>): { current: number; previous?: number; progress: number; } ·
+      WindowMotion.getCarouselPoses({ progress, box, stage, }: Readonly<{
+      progress: number; box: Rect; stage?: WindowStage; }>): { incoming:
+      WindowPose; outgoing: WindowPose; }"
     defaults:
       - name: slide
         value: "DUR.chip, EASE.word"
       - name: outgoing hold
         value: "opaque for the first 60% of the slide"
     usage: |
-      const state = getCarouselState(frame, windows);
-      const poses = state.previous === undefined ? undefined : getCarouselPoses(state.progress, box);
+      const state = WindowMotion.getCarouselState({
+          frame,
+          windows
+      });
+      const poses = state.previous === undefined ? undefined : WindowMotion.getCarouselPoses({
+          progress: state.progress,
+          box
+      });
     goodFor: "Stepping through several screenshots in one window."
     avoid: "Fading both windows at once; the field shows through and the frame dips."
     usedBy:
-      - src/scenes/TiltedWindowScene/TiltedWindowScene.tsx
+      - src/scenes/TiltedWindowScene/PrimaryWindow/makePrimaryWindowStateFromProps.ts
     demo: { id: carousel, frames: 90 }
 
   - id: pull-back
     title: "Pull-back"
     category: windows
-    description: "A window that opens as full-bleed footage and pulls back into its box, its tilt growing as it lands."
-    source: src/scenes/TiltedWindowScene/windowMotion.ts
-    exports: [getPullBack]
-    signature: 'getPullBack(frame, enter: { kind: "pull-back", atFrame, durationInFrames?, ease? }, canvas, box): { rect, tilt }'
+    description:
+      "A window that opens as full-bleed footage and pulls back into its
+      box, its tilt growing as it lands."
+    source: src/scenes/TiltedWindowScene/WindowMotion/WindowMotion.ts
+    exports:
+      - WindowMotion.getPullBack
+    signature: "WindowMotion.getPullBack({ frame, enter, canvas, box, stage, }:
+      Readonly<GetPullBackOptions>): { rect: Rect; tilt: number; }"
     defaults:
       - name: durationInFrames
         value: "DUR.hero (18)"
       - name: ease
         value: "word (or inOut for a bright still on a dark field)"
     usage: |
-      const { rect, tilt } = getPullBack(frame, { kind: "pull-back", atFrame: 20 }, canvas, box);
+      const { rect, tilt } = WindowMotion.getPullBack({
+          frame,
+          enter: { kind: "pull-back", atFrame: 20 },
+          canvas,
+          box
+      });
     goodFor: "Opening on the product full screen, then placing it beside a headline."
-    avoid: "Bright stills on a dark field with the word ease; use inOut to avoid a luminance step."
+    avoid:
+      "Bright stills on a dark field with the word ease; use inOut to avoid a
+      luminance step."
     usedBy:
-      - src/scenes/TiltedWindowScene/TiltedWindowScene.tsx
+      - src/scenes/TiltedWindowScene/PrimaryWindow/getWindowCameraStateFromProps.ts
     demo: { id: pull-back, frames: 90 }
 
   - id: flip-split
     title: "Flip and split"
     category: windows
-    description: "One joined card flips in on Y from nearly edge-on while travelling in from the left, then splits into two windows."
-    source: src/scenes/TiltedWindowScene/windowMotion.ts
-    exports: [getFlipSplit]
-    signature: "getFlipSplit(frame: number, at: number, canvasWidth: number): { rotateY, opacity, translateX, split }"
+    description:
+      "One joined card flips in on Y from nearly edge-on while travelling
+      in from the left, then splits into two windows."
+    source: src/scenes/TiltedWindowScene/WindowMotion/WindowMotion.ts
+    exports:
+      - WindowMotion.getFlipSplit
+    signature: "WindowMotion.getFlipSplit({ frame, at, canvasWidth, stage, }:
+      Readonly<GetFlipSplitOptions>): { rotateY: number; opacity: number;
+      translateX: number; split: number; }"
     defaults:
       - name: flip
         value: "DUR.whip from 80°"
       - name: split
         value: "DUR.press, starting DUR.panel + DUR.press - 1 after at"
     usage: |
-      const { rotateY, translateX, split } = getFlipSplit(frame, 0, width);
+      const { rotateY, translateX, split } = WindowMotion.getFlipSplit({
+          frame,
+          at: 0,
+          canvasWidth: width
+      });
     goodFor: "Introducing a before and after pair."
-    avoid: "Shorter lenses than PAIR_TILT.flipPerspective; the near edge magnifies past the frame."
+    avoid:
+      "Shorter lenses than components.WindowTilt.flipPerspective; the near edge
+      magnifies past the frame."
     usedBy:
       - src/scenes/TiltedWindowScene/RacePair.tsx
     demo: { id: flip-split, frames: 75 }
@@ -1111,13 +1357,21 @@ helpers:
   - id: scroll-offset
     title: "Scroll offset"
     category: windows
-    description: "How far tall window content has scrolled after quick authored jumps, each over DUR.press."
-    source: src/scenes/TiltedWindowScene/windowMotion.ts
-    exports: [getScrollOffset]
-    signature: "getScrollOffset(frame: number, steps: ReadonlyArray<{ atFrame: number, offset: number }>): number"
+    description: "How far tall window content has scrolled after quick authored
+      jumps, each over DUR.press."
+    source: src/scenes/TiltedWindowScene/WindowMotion/WindowMotion.ts
+    exports:
+      - WindowMotion.getScrollOffset
+    signature:
+      "WindowMotion.getScrollOffset({ frame, steps, stage, }: Readonly<{
+      frame: number; steps: readonly ScrollStep[]; stage?: WindowStage; }>):
+      number"
     defaults: []
     usage: |
-      const offset = getScrollOffset(frame, [{ atFrame: 30, offset: 0.35 }, { atFrame: 60, offset: 0.7 }]);
+      const offset = WindowMotion.getScrollOffset({
+          frame,
+          steps: [{ atFrame: 30, offset: 0.35 }, { atFrame: 60, offset: 0.7 }]
+      });
     goodFor: "Showing more of a tall screenshot without a camera move."
     avoid: "Smooth continuous scrolling; it is built for jumps."
     usedBy:
@@ -1127,30 +1381,41 @@ helpers:
   - id: window-tilt
     title: "Window plane and chrome"
     category: windows
-    description: "Design tokens for the tilted window's resting 3D plane, the pair's mirrored tilt, its corner radius, titlebar and cast shadow."
-    source: src/scenes/TiltedWindowScene/windowTilt.ts
-    exports: [WINDOW_TILT, PAIR_TILT, WINDOW_CHROME, WINDOW_SHADOW]
-    signature: "WINDOW_TILT = { perspective, rotateY, rotateX, rotateZ, entryRotateY }"
+    description:
+      'The tilted window''s resting 3D plane, the pair''s mirrored tilt,
+      its corner radius and titlebar are the theme''s components.WindowTilt.
+      Read them with useVideoProps("WindowTilt"), and pose a window at rest with
+      getRestingPose.'
+    source: src/scenes/TiltedWindowScene/WindowMotion/WindowMotion.ts
+    exports:
+      - WindowMotion.getRestingPose
+    signature: "getRestingPose(stage?: WindowStage): { translateX, translateZ,
+      rotateY, opacity, blurX }"
     defaults:
-      - name: WINDOW_TILT
-        value: "perspective 1400, rotateY -13°, rotateX 3°, rotateZ -1°, entry -24°"
-      - name: PAIR_TILT
-        value: "perspective 1600, rotateY ±8°, rotateX 2°, flip 3200"
-      - name: WINDOW_CHROME
-        value: "radius 10, titlebar 3.5% of the height"
+      - name: components.WindowTilt
+        value:
+          "classic: perspective 1400, rotateY -13°, rotateX 3°, rotateZ -1°, entry
+          -24°"
+      - name: pair
+        value: "classic: perspective 1600, rotateY ±8°, rotateX 2°, flip 3200"
+      - name: chrome
+        value: "classic: radius md, titlebar 3.5% of the height"
     usage: |
-      const transform = `perspective(${WINDOW_TILT.perspective}px) rotateY(${WINDOW_TILT.rotateY}deg) rotateX(${WINDOW_TILT.rotateX}deg)`;
+      const tilt = useVideoProps("WindowTilt", {});
+      const transform = `perspective(${tilt.perspective}px) rotateY(${tilt.rotateY}deg) rotateX(${tilt.rotateX}deg)`;
     goodFor: "Keeping every window shot of a film in the same plane."
-    avoid: "Inline angles per shot; add new geometry here."
+    avoid: "Inline angles per shot; set them in the theme's components.WindowTilt."
     usedBy:
-      - src/scenes/TiltedWindowScene/WindowCard.tsx
-      - src/scenes/TiltedWindowScene/RacePair.tsx
+      - src/scenes/TiltedWindowScene/TiltedWindowSceneShared/TiltedWindowSceneShared.ts
+      - src/scenes/TiltedWindowScene/PrimaryWindow/PrimaryWindow.tsx
     demo: { id: window-tilt, frames: 90 }
 
   - id: window-boxes
     title: "Window boxes"
     category: windows
-    description: "Where windows and headlines sit on the canvas, as fractions: the default and tall single boxes, the pair boxes and the headline column."
+    description:
+      "Where windows and headlines sit on the canvas, as fractions: the
+      default and tall single boxes, the pair boxes and the headline column."
     source: src/scenes/TiltedWindowScene/windowTilt.ts
     exports:
       [WINDOW_BOX, WINDOW_BOX_TALL, WINDOW_BOXES, PAIR_BOXES, HEADLINE_BOX]
@@ -1167,24 +1432,32 @@ helpers:
     goodFor: "Choosing a window layout by name in a plan's windowBox."
     avoid: "Hand-placed boxes that drift between shots."
     usedBy:
-      - src/scenes/TiltedWindowScene/TiltedWindowScene.tsx
+      - src/scenes/TiltedWindowScene/WindowFootnote.tsx
+      - src/scenes/TiltedWindowScene/RaceStats/RaceStatsShared/RaceStatsShared.ts
+      - src/scenes/TiltedWindowScene/RaceStats/RaceStat.tsx
       - src/scenes/TiltedWindowScene/RacePair.tsx
+      - src/scenes/TiltedWindowScene/PrimaryWindow/makePrimaryWindowStateFromProps.ts
+      - src/scenes/TiltedWindowScene/WindowHeadlines.tsx
     demo: { id: window-boxes, frames: 120 }
 
   # ------------------------------------------------------------- media --
   - id: media-plane
     title: "Media plane"
     category: media
-    description: "One still or one piece of footage sampled at an explicit scene frame. Video goes through Freeze, so footage follows the scene's clock."
+    description: "One still or one piece of footage sampled at an explicit scene
+      frame. Video goes through Freeze, so footage follows the scene's clock."
     source: src/scenes/MediaPlane.tsx
     exports: [MediaPlane]
-    signature: '<MediaPlane frame={frame} kind="image" | "video" src="public/relative.png" trimBefore? alt style />'
+    signature: '<MediaPlane frame={frame} kind="image" | "video"
+      src="public/relative.png" trimBefore? alt style />'
     defaults:
       - name: trimBefore
         value: "0"
     usage: |
       <MediaPlane frame={frame} kind="image" src="avandar/screens/explorer-explorer-chart.png" alt="" style={{ width: "100%" }} />
-    goodFor: "Any scene framing captured media: a full-bleed shot or a screenshot inside a window."
+    goodFor:
+      "Any scene framing captured media: a full-bleed shot or a screenshot
+      inside a window."
     avoid: "Remote URLs and paths outside public/; media errors stay render failures."
     usedBy:
       - src/scenes/MediaScene.tsx
@@ -1198,10 +1471,14 @@ helpers:
   - id: shot-transition
     title: "Shot transition layers"
     category: transitions
-    description: "The two layers StoryFilm stacks at a shot boundary: the outgoing shot, if any, and the incoming shot's style. Dissolve by default, a stepped column wipe with optional drift, or a declared cut."
-    source: src/storyboard/StoryFilm/getShotTransitionLayers.ts
+    description:
+      "The two layers StoryFilm stacks at a shot boundary: the outgoing
+      shot, if any, and the incoming shot's style. Dissolve by default, a
+      stepped column wipe with optional drift, or a declared cut."
+    source: src/storyboard/StoryFilm/getShotTransitionLayers/getShotTransitionLayers.ts
     exports: [getShotTransitionLayers]
-    signature: "getShotTransitionLayers({ transition?, transitionInFrames, previousDurationInFrames?, localFrame, width }): { outgoing?, incoming }"
+    signature: "getShotTransitionLayers({ transition?, transitionInFrames,
+      previousDurationInFrames?, localFrame, width }): { outgoing?, incoming }"
     defaults:
       - name: kind
         value: "dissolve over EASE.inOut"
@@ -1212,40 +1489,57 @@ helpers:
     goodFor: "Any shot boundary in a storyboard film."
     avoid: "Calling it outside StoryFilm; plans set transitions declaratively."
     usedBy:
-      - src/storyboard/StoryFilm/StoryFilm.tsx
+      - src/storyboard/StoryFilm/StoryFilmShared/StoryFilmShared.ts
     demo: { id: shot-transition, frames: 90 }
 
   - id: scene-transition
     title: "Scene transition"
     category: transitions
-    description: "Reveal and continuity treatments for a TransitionSeries: dissolve, wipe, aperture, spatial, handoff and morph, with matching timing."
+    description:
+      "Reveal and continuity treatments for a TransitionSeries: dissolve,
+      wipe, aperture, spatial, handoff and morph, with matching timing."
     source: src/motion-components/SceneTransition.tsx
-    relatedSources:
-      - src/motion-components/createSceneTransition.ts
-      - src/motion-components/getSceneTransitionStyle.ts
-    exports: [SceneTransition, createSceneTransition, getSceneTransitionStyle]
-    signature: "createSceneTransition({ kind, durationInFrames, anchor?, origin?, width?, height?, motion? }): { timing, presentation }"
+    exports:
+      [
+        SceneTransition,
+        makeSceneTransitionSpecFromProps,
+        getSceneTransitionStyle,
+      ]
+    signature: "makeSceneTransitionSpecFromProps({ input: { durationInFrames,
+      ...props }, theme, }: Readonly<{ input: SceneTransitionProps & {
+      durationInFrames: number; }; theme?: MotionSettingsTheme; }>):
+      SceneTransitionSpec · getSceneTransitionStyle({ progress, entering, props,
+      theme, }: Readonly<GetSceneTransitionStyleOptions>): CSSProperties"
     defaults:
       - name: stage
         value: "1600 × 840"
       - name: cameraMotion
         value: "true (false falls back to dissolve)"
     usage: |
-      <TransitionSeries.Transition {...createSceneTransition({ kind: "aperture", durationInFrames: 24 })} />
+      <TransitionSeries.Transition {...makeSceneTransitionSpecFromProps({
+          input: { kind: "aperture", durationInFrames: 24 }
+      })}/>;
     goodFor: "Handing native UI between scenes while keeping one instance of each."
     avoid: "Cuts; use adjacent sequences without a Transition element."
     usedBy:
-      - src/continuity/ContinuityScene.tsx
+      - src/continuity/ContinuityScene/ContinuityScene.tsx
     demo: { id: scene-transition, frames: 75 }
+    relatedSources:
+      - src/motion-components/makeSceneTransitionSpecFromProps.ts
+      - src/motion-components/getSceneTransitionStyle.ts
 
   # -------------------------------------------------------- continuity --
   - id: shared-element
     title: "Shared element"
     category: continuity
-    description: "Keeps one object mounted while its measured rectangle travels from a source to a target."
+    description:
+      "Keeps one object mounted while its measured rectangle travels from
+      a source to a target."
     source: src/motion-components/SharedElement.tsx
     exports: [SharedElement]
-    signature: "<SharedElement source={rect} target={rect} frame at durationInFrames motion?>{children}</SharedElement>"
+    signature:
+      "<SharedElement source={rect} target={rect} frame at durationInFrames
+      motion?>{children}</SharedElement>"
     defaults:
       - name: easing
         value: "EASE.inOut unless a preset or easing is given"
@@ -1260,13 +1554,13 @@ helpers:
   - id: anchored-overlay
     title: "Anchored overlay"
     category: continuity
-    description: "Floating artwork that rises from a measured region to a target, holds while it is read, and returns, without moving the source UI."
+    description:
+      "Floating artwork that rises from a measured region to a target,
+      holds while it is read, and returns, without moving the source UI."
     source: src/motion-components/AnchoredOverlay.tsx
-    relatedSources:
-      - src/motion-components/getOverlayPose.ts
-      - src/motion-components/getOverlayTimings.ts
     exports: [AnchoredOverlay, getOverlayPose, getOverlayTimings]
-    signature: "<AnchoredOverlay frame source={rect} cue={{ at, until, target, entryFrames?, exitFrames?, fadeFrames?, motion? }} motionBlur?>"
+    signature: "<AnchoredOverlay frame source={rect} cue={{ at, until, target,
+      entryFrames?, exitFrames?, fadeFrames?, motion? }} motionBlur?>"
     defaults:
       - name: entryFrames
         value: "36"
@@ -1281,15 +1575,20 @@ helpers:
     usedBy:
       - src/continuity/ContinuityDiagramLane.tsx
     demo: { id: anchored-overlay, frames: 150 }
+    relatedSources:
+      - src/motion-components/getOverlayPose.ts
+      - src/motion-components/getOverlayTimings.ts
 
   - id: object-departure
     title: "Object departure"
     category: continuity
-    description: "Cuts a rectangle out of an SVG drawing and sends it away on its own vector while the rest stays."
+    description:
+      "Cuts a rectangle out of an SVG drawing and sends it away on its
+      own vector while the rest stays."
     source: src/motion-components/SvgObjectDeparture.tsx
-    relatedSources: [src/motion-components/getObjectFlight.ts]
     exports: [SvgObjectDeparture, getObjectFlight]
-    signature: "<SvgObjectDeparture frame flight={{ at, duration, dx, dy, rect, motion? }}>{svg}</SvgObjectDeparture>"
+    signature: "<SvgObjectDeparture frame flight={{ at, duration, dx, dy, rect,
+      motion? }}>{svg}</SvgObjectDeparture>"
     defaults:
       - name: easing
         value: "EASE.inOutCubic"
@@ -1302,109 +1601,148 @@ helpers:
     usedBy:
       - src/continuity/camera/ContinuityGraphicObjects.tsx
     demo: { id: object-departure, frames: 90 }
+    relatedSources:
+      - src/motion-components/getObjectFlight/getObjectFlight.ts
 
   # ------------------------------------------------------------- theme --
   - id: theme-style
     title: "Theme style"
     category: theme
-    description: "Turns storyboard theme tokens into CSS custom properties for a film layer, so a plan or a single shot can recolour scenes."
+    description: "Turns storyboard theme tokens into CSS custom properties for a
+      film layer, so a plan or a single shot can recolour scenes."
     source: src/storyboard/StoryFilm/createThemeStyleFromTheme.ts
     exports: [createThemeStyleFromTheme]
-    signature: "createThemeStyleFromTheme(theme: Theme | ShotTheme | undefined): CSSProperties"
+    signature: "createThemeStyleFromTheme(theme: Theme | ShotTheme | undefined):
+      CSSProperties"
     defaults: []
     usage: |
       <AbsoluteFill style={createThemeStyleFromTheme(shot.theme)}>{scene}</AbsoluteFill>
     goodFor: "Cutting between field colours within one film."
     avoid: "Names outside the theme schema; scenes only read the listed tokens."
-    usedBy:
-      - src/storyboard/StoryFilm/StoryFilm.tsx
+    usedBy: []
     demo: { id: theme-style, frames: 90 }
 
   # ----------------------------------------------------------- pointer --
   - id: track-pos
     title: "Pointer travel"
     category: pointer
-    description: "Interpolates pointer keys with EASE.inOutCubic and holds the last position. Equal keys create a dwell."
-    source: src/cursor-motion.ts
-    exports: [trackPos]
-    signature: "trackPos(frame: number, keys: readonly { at, x, y }[]): { x, y }"
+    description:
+      "Interpolates pointer keys with EASE.inOutCubic and holds the last
+      position. Equal keys create a dwell."
+    source: src/CursorMotionHelpers.ts
+    exports:
+      - CursorMotionHelpers.trackPos
+    signature:
+      "CursorMotionHelpers.trackPos({ frame, keys, motion, }: Readonly<{
+      frame: number; keys: readonly CursorKey[]; motion?: CursorMotion; }>): {
+      x: number; y: number; }"
     defaults:
       - name: easing
         value: "EASE.inOutCubic"
     usage: |
       const path = [{ at: 0, x: 200, y: 400 }, { at: 24, x: 620, y: 260 }, { at: CLICK + 8, x: 620, y: 260 }];
-      <Cursor frame={frame} path={path} clicks={[CLICK]} />
+      <Cursor frame={frame} path={path} clicks={[CLICK]}/>;
     goodFor: "A drawn pointer moving between measured targets."
-    avoid: "One key per target: the next leg starts the frame it arrives and the click misses."
+    avoid: "One key per target: the next leg starts the frame it arrives and the
+      click misses."
     usedBy:
-      - src/chrome/Cursor.tsx
+      - src/chrome/Cursor/CursorContent.tsx
     demo: { id: track-pos, frames: 120 }
 
   - id: cursor-on-target
     title: "Cursor shape on arrival"
     category: pointer
-    description: "Chooses a target's cursor shape only once the pointer reaches it, and the arrow while travelling."
-    source: src/cursor-motion.ts
-    exports: [cursorOnTarget]
-    signature: "cursorOnTarget(frame, path, targets: readonly { frame, x, y, cursor }[]): CursorKind"
+    description:
+      "Chooses a target's cursor shape only once the pointer reaches it,
+      and the arrow while travelling."
+    source: src/CursorMotionHelpers.ts
+    exports:
+      - CursorMotionHelpers.cursorOnTarget
+    signature:
+      "CursorMotionHelpers.cursorOnTarget({ frame, path, targets, motion,
+      }: Readonly<CursorOnTargetOptions>): CursorKind"
     defaults:
       - name: travel shape
         value: "default (arrow)"
     usage: |
-      <Cursor frame={frame} path={path} cursor={cursorOnTarget(frame, path, targets)} />
+      <Cursor frame={frame} path={path} cursor={CursorMotionHelpers.cursorOnTarget({
+          frame,
+          path,
+          targets
+      })}/>;
     goodFor: "An I-beam over a field being typed in, a hand over a button."
     avoid: "Switching shape while crossing unrelated controls."
     usedBy:
       - src/compositions/Demo/Demo.tsx
-      - src/avandar/AvandarScene.tsx
+      - src/avandar/AvandarScene/AvandarScene.tsx
     demo: { id: cursor-on-target, frames: 120 }
 
   - id: click-feedback
     title: "Click feedback"
     category: pointer
-    description: "downAt() is true for six frames from each click beat; cursorScale() is the pointer's own press envelope, at most a 7% dip."
-    source: src/cursor-motion.ts
-    exports: [downAt, cursorScale]
-    signature: "downAt(frame, beats: readonly number[]): boolean · cursorScale(frame, clicks: readonly number[]): number"
+    description: "downAt() is true for six frames from each click beat;
+      cursorScale() is the pointer's own press envelope, at most a 7% dip."
+    source: src/CursorMotionHelpers.ts
+    exports:
+      - CursorMotionHelpers.downAt
+      - CursorMotionHelpers.cursorScale
+    signature:
+      "CursorMotionHelpers.downAt(frame: number, beats: readonly number[]):
+      boolean · CursorMotionHelpers.cursorScale({ frame, clicks, motion, }:
+      Readonly<{ frame: number; clicks: readonly number[]; motion?:
+      CursorMotion; }>): number"
     defaults:
       - name: down window
         value: "6 frames"
       - name: depth
         value: "0.07"
     usage: |
-      const isDown = downAt(frame, [CLICK]);
-      const scale = cursorScale(frame, [CLICK]);
+      const isDown = CursorMotionHelpers.downAt(frame, [CLICK]);
+      const scale = CursorMotionHelpers.cursorScale({
+          frame,
+          clicks: [CLICK]
+      });
     goodFor: "A button-down state that matches the pointer's press."
     avoid: "Clicks before the pointer has held on its target."
     usedBy:
-      - src/chrome/Cursor.tsx
+      - src/chrome/Cursor/CursorContent.tsx
     demo: { id: click-feedback, frames: 90 }
 
   - id: cursor-shutter
     title: "Cursor shutter"
     category: pointer
-    description: "Three trailing sub-frame samples for the pointer's motion blur, capped at 4 px, vanishing at rest."
-    source: src/cursor-motion.ts
-    exports: [cursorShutter]
-    signature: "cursorShutter(frame: number, path: readonly CursorKey[]): { x, y, opacity }[]"
+    description:
+      "Three trailing sub-frame samples for the pointer's motion blur,
+      capped at 4 px, vanishing at rest."
+    source: src/CursorMotionHelpers.ts
+    exports:
+      - CursorMotionHelpers.cursorShutter
+    signature: "CursorMotionHelpers.cursorShutter({ frame, path, motion, }:
+      Readonly<{ frame: number; path: readonly CursorKey[]; motion?:
+      CursorMotion; }>): Array<{ x: number; y: number; opacity: number; }>"
     defaults:
       - name: samples
         value: "0.45, 0.3 and 0.15 frames back"
       - name: cap
         value: "4 px"
     usage: |
-      cursorShutter(frame, path).map((sample) => <Arrow style={{ translate: `${sample.x}px ${sample.y}px`, opacity: sample.opacity }} />);
+      CursorMotionHelpers.cursorShutter({
+          frame,
+          path
+      }).map((sample) => <Arrow style={{ translate: `${sample.x}px ${sample.y}px`, opacity: sample.opacity }}/>);
     goodFor: "Restrained blur that keeps a fast pointer readable."
     avoid: "Adding a CSS blur on top; the samples already carry the motion."
     usedBy:
-      - src/chrome/Cursor.tsx
+      - src/chrome/Cursor/CursorShutterTrail.tsx
     demo: { id: cursor-shutter, frames: 90 }
 
   # ------------------------------------------------------------- loops --
   - id: loop-phase
     title: "Loop phase"
     category: loops
-    description: "A normalized 0 to under 1 cycle position, with a positive modulo for negative frames and offsets."
+    description:
+      "A normalized 0 to under 1 cycle position, with a positive modulo
+      for negative frames and offsets."
     source: src/motion.ts
     exports: [loopPhase]
     signature: "loopPhase(frame: number, period: number, offset?: number): number"
@@ -1442,10 +1780,13 @@ helpers:
   - id: loop-envelope
     title: "Loop envelope"
     category: loops
-    description: "Reveals a graphic and returns it to the ground exactly on both boundary frames of a loop."
+    description: "Reveals a graphic and returns it to the ground exactly on both
+      boundary frames of a loop."
     source: src/motion.ts
     exports: [loopEnvelope]
-    signature: "loopEnvelope(frame: number, duration: number, fadeFrames?: number): number"
+    signature:
+      "loopEnvelope(frame: number, duration: number, fadeFrames?: number):
+      number"
     defaults:
       - name: fadeFrames
         value: "12"
@@ -1453,18 +1794,24 @@ helpers:
       <g opacity={loopEnvelope(frame, 180)}>{graphic}</g>
     goodFor: "Graphics that loop in a page without a seam."
     avoid: "Durations shorter than twice the fade; they throw."
-    usedBy:
-      - src/stock/StockGraphic/StockCanvas.tsx
+    usedBy: []
     demo: { id: loop-envelope, frames: 90 }
 
   # ------------------------------------------------------------ builds --
   - id: mark-build
     title: "Column build"
     category: builds
-    description: "How far each column of a mark has risen, left to right, each staggered and eased on EASE.word."
-    source: src/scenes/BrandLockupScene/brandLockupMotion.ts
-    exports: [getMarkBuildProgress, getMarkBuildEndFrame, MARK_BUILD_DEFAULTS]
-    signature: "getMarkBuildProgress(frame: number, build: { atFrame?, columns?, staggerFrames?, durationInFrames? } | undefined): number[]"
+    description: "How far each column of a mark has risen, left to right, each
+      staggered and eased on EASE.word."
+    source: src/scenes/BrandLockupScene/BrandLockupMotion/BrandLockupMotion.ts
+    exports:
+      - BrandLockupMotion.getMarkBuildProgress
+      - BrandLockupMotion.getMarkBuildEndFrame
+      - BrandLockupMotion.MARK_BUILD_DEFAULTS
+    signature: "BrandLockupMotion.getMarkBuildProgress({ frame, build, columns,
+      buildMotion, }: Readonly<GetMarkBuildProgressOptions>): number[] ·
+      BrandLockupMotion.getMarkBuildEndFrame({ build, buildMotion, }: Readonly<{
+      build: MarkBuild | undefined; buildMotion?: MarkBuildMotion; }>): number"
     defaults:
       - name: atFrame
         value: "5"
@@ -1475,70 +1822,106 @@ helpers:
       - name: durationInFrames
         value: "DUR.whip (8)"
     usage: |
-      const columns = getMarkBuildProgress(frame, { columns: 8 });
+      const columns = BrandLockupMotion.getMarkBuildProgress({
+          frame,
+          build: { columns: 8 }
+      });
     goodFor: "Building a raster mark through column masks."
     avoid: "Redrawing another brand's mark as vectors; cut the raster instead."
     usedBy:
+      - src/scenes/BrandLockupScene/LockupMark/MarkColumns.tsx
+      - src/scenes/BrandLockupScene/LockupMark/LockupMark.tsx
       - src/scenes/BrandLockupScene/BrandLockupScene.tsx
     demo: { id: mark-build, frames: 75 }
 
   - id: fly-through
     title: "Column fly-through"
     category: builds
-    description: "A mark's columns flying from their slices of the mark to full-height slices of the frame, with a retract, a flight on EASE.surge and a colour cover."
-    source: src/scenes/BrandLockupScene/brandLockupMotion.ts
-    exports: [getFlightProgress, getFlightColumnRect]
-    signature: 'getFlightProgress(frame, exit: { kind: "fly-through", atFrame, durationInFrames? } | undefined): { retract, flight, cover } · getFlightColumnRect(index, columns, mark, canvas, progress): Rect'
+    description: "A mark's columns flying from their slices of the mark to
+      full-height slices of the frame, with a retract, a flight on EASE.surge
+      and a colour cover."
+    source: src/scenes/BrandLockupScene/BrandLockupMotion/BrandLockupMotion.ts
+    exports:
+      - BrandLockupMotion.getFlightProgress
+      - BrandLockupMotion.getFlightColumnRect
+    signature: "BrandLockupMotion.getFlightProgress({ frame, exit, motion, }:
+      Readonly<{ frame: number; exit: MarkFlyThrough | undefined; motion?:
+      VideoMotion; }>): { retract: number; flight: number; cover: number; } ·
+      BrandLockupMotion.getFlightColumnRect(index: number, columns: number,
+      mark: Rect, canvas: { width: number; height: number; }, progress: number):
+      Rect"
     defaults:
       - name: durationInFrames
         value: "DUR.hero (18)"
       - name: cover
         value: "lands by 75% of the flight"
     usage: |
-      const { flight, cover } = getFlightProgress(frame, { kind: "fly-through", atFrame: 40 });
-      const rect = getFlightColumnRect(index, 8, mark, canvas, flight);
+      const { flight, cover } = BrandLockupMotion.getFlightProgress({
+          frame,
+          exit: { kind: "fly-through", atFrame: 40 }
+      });
+      const rect = BrandLockupMotion.getFlightColumnRect(index, 8, mark, canvas, flight);
     goodFor: "Ending a lockup by filling the frame with a token colour."
     avoid: "Mid-film; it is an exit that covers the frame."
     usedBy:
-      - src/scenes/BrandLockupScene/BrandLockupScene.tsx
+      - src/scenes/BrandLockupScene/LockupMark/LockupMarkShared/LockupMarkShared.ts
+      - src/scenes/BrandLockupScene/LockupMark/MarkColumnCover.tsx
+      - src/scenes/BrandLockupScene/LockupMark/MarkColumns.tsx
+      - src/scenes/BrandLockupScene/LockupMark/LockupMark.tsx
     demo: { id: fly-through, frames: 90 }
 
   - id: cta-beats
     title: "CTA cascade beats"
     category: builds
-    description: "When each line of a call to action arrives: subtitle, URL, the typed command and when it finishes, then the badge."
-    source: src/scenes/BrandLockupScene/brandLockupMotion.ts
-    exports: [getCtaBeats]
-    signature: "getCtaBeats(cta: { atFrame, command?, ... }, charsPerSecond: number): { subtitleAt, urlAt, promptAt, typingAt, typingEnd, badgeAt }"
+    description: "When each line of a call to action arrives: subtitle, URL, the
+      typed command and when it finishes, then the badge."
+    source: src/scenes/BrandLockupScene/BrandLockupMotion/BrandLockupMotion.ts
+    exports:
+      - BrandLockupMotion.getCtaBeats
+    signature: "BrandLockupMotion.getCtaBeats({ cta, charsPerSecond, motion, }:
+      Readonly<{ cta: LockupCta; charsPerSecond: number; motion?: VideoMotion;
+      }>): CtaBeats"
     defaults:
       - name: url gap
         value: "DUR.word after the subtitle"
       - name: badge gap
         value: "DUR.panel after typing ends"
     usage: |
-      const beats = getCtaBeats({ atFrame: 10, command: "npx avandar init" }, 30);
+      const beats = BrandLockupMotion.getCtaBeats({
+          cta: { atFrame: 10, command: "npx avandar init" },
+          charsPerSecond: 30
+      });
     goodFor: "A closing card whose lines must not crowd the typed command."
     avoid: "Hand-timed CTA lines that drift when the command changes length."
     usedBy:
-      - src/scenes/BrandLockupScene/BrandLockupScene.tsx
+      - src/scenes/BrandLockupScene/LockupCta/LockupCta.tsx
     demo: { id: cta-beats, frames: 150 }
 
   - id: bar-beats
     title: "Bar build beats"
     category: builds
-    description: "When a bar panel's hero number, labels, bars and values start, and each bar's length relative to the longest."
-    source: src/scenes/BarComparisonScene/barComparisonMotion.ts
-    exports: [getBarComparisonBeats, getBarFractions, BAR_GROW_FRAMES]
-    signature: "getBarComparisonBeats(revealAtFrame, panelIndex, panelStaggerFrames): { heroAt, labelsAt, barsAt, valuesAt } · getBarFractions(rows): number[]"
+    description:
+      "When a bar panel's hero number, labels, bars and values start, and
+      each bar's length relative to the longest."
+    source: src/scenes/BarComparisonScene/barComparisonMotion/barComparisonMotion.ts
+    exports: [getBarComparisonBeats, getBarFractions]
+    signature: "getBarComparisonBeats({ revealAtFrame, panelIndex,
+      panelStaggerFrames, motion, }: Readonly<GetBarComparisonBeatsOptions>): {
+      heroAt: number; labelsAt: number; barsAt: number; valuesAt: number; } ·
+      getBarFractions(rows: ReadonlyArray<{ value: number; }>): number[]"
     defaults:
-      - name: BAR_GROW_FRAMES
-        value: "DUR.sheet (13)"
+      - name: bars grow
+        value: "over motion.sheet (13 in classic)"
       - name: labels
         value: "DUR.panel after the hero"
       - name: bars
         value: "DUR.chip after the labels"
     usage: |
-      const beats = getBarComparisonBeats(10, panelIndex, 3);
+      const beats = getBarComparisonBeats({
+          revealAtFrame: 10,
+          panelIndex,
+          panelStaggerFrames: 3
+      });
       const fractions = getBarFractions(rows);
     goodFor: "One or two ranked bar panels read left to right."
     avoid: "Negative values; bars are relative to the longest positive bar."

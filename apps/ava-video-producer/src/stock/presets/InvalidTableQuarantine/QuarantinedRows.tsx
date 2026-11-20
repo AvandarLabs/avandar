@@ -1,5 +1,6 @@
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = { rows: readonly string[]; x: number; isReload?: boolean };
@@ -9,6 +10,7 @@ export function QuarantinedRows({
   x,
   isReload = false,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
       {rows.map((value, index) => {
@@ -19,13 +21,13 @@ export function QuarantinedRows({
             data-raw-value={value}
             data-reload-row={isReload ? index : undefined}
           >
-            <rect
+            <StockRect
               x={x}
               y={158 + index * 70}
               width={520}
               height={62}
-              fill={STOCK.surface}
-              stroke={STOCK.line}
+              fill={tokens.color.surface}
+              stroke={tokens.color.line}
             />
             <LiteralDataText value={value} x={x + 20} y={195 + index * 70} />
           </g>

@@ -1,5 +1,8 @@
-import { mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { DrillSecondSelection } from "./DrillSecondSelection";
+import { DrillTiming } from "./DrillTiming";
 import type { Input } from "./NestedDrilldownWindow.schema";
 import type { ReactNode } from "react";
 
@@ -12,6 +15,9 @@ export function DrillSelectionWindow({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const parentGroups = [
     ...new Set(
       input.records.map((record) => {
@@ -30,14 +36,14 @@ export function DrillSelectionWindow({
         }),
     ),
   ];
-  const parent = ramp(frame, 40, 34);
-  const child = ramp(frame, 74, 44);
+  const parent = DrillTiming.getParentFromFrame({ frame, motion });
+  const child = DrillTiming.getChildFromFrame({ frame, motion });
   const parentX = 44 + parentGroups.indexOf(input.selectionPath[0]) * 292;
   const hasChild = input.selectionPath.length === 2;
   return (
     <g>
-      {frame >= 40 ? (
-        <rect
+      {frame >= DrillTiming.PARENT_CUE ? (
+        <StockRect
           data-first-selection={input.selectionPath[0]}
           x={mix(parent, parentX, 36)}
           y={mix(parent, 174, 294)}
@@ -45,11 +51,15 @@ export function DrillSelectionWindow({
           height={mix(parent, 390, 266)}
           fill="none"
           stroke={accent}
-          strokeWidth={input.selectionStyle === "inset-frame" ? 5 : 2}
+          strokeWidth={scales.stroke(
+            input.selectionStyle === "inset-frame"
+              ? DrillTiming.INSET_STROKE
+              : tokens.stroke.default,
+          )}
           opacity={hasChild ? 1 - child : 1}
         />
       ) : undefined}
-      {hasChild && frame >= 74 ? (
+      {hasChild && frame >= DrillTiming.CHILD_CUE ? (
         <DrillSecondSelection
           input={input}
           progress={child}

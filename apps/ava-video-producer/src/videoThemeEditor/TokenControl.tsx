@@ -4,9 +4,8 @@ import { CompositeControl } from "./controls/CompositeControl/CompositeControl";
 import { ReferenceControl } from "./controls/ReferenceControl/ReferenceControl";
 import { ValueControl } from "./controls/ValueControl";
 import { useTokenEditor } from "./TokenEditorContext";
-import type { TokenRow } from "./tokenRows/tokenRows";
+import { type TokenRow } from "./tokenRows/tokenRows.types";
 import type { ReactNode } from "react";
-
 /**
  * The control for a token row: literal values in the atomic and Mantine
  * tiers (and for enums and switches anywhere), references above them.

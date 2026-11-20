@@ -96,6 +96,10 @@ export function fitTextLines(
   );
 }
 
+type FitMetricContentOptions = Pick<
+  MetricSceneProps,
+  "label" | "value" | "from" | "unit" | "precision" | "detail"
+> & { width: number; height: number };
 /**
  * Fit the complete metric stack once, including padding, gaps and both count
  * endpoints.
@@ -109,10 +113,7 @@ export function fitMetricContent({
   unit,
   precision = 0,
   detail,
-}: Pick<
-  MetricSceneProps,
-  "label" | "value" | "from" | "unit" | "precision" | "detail"
-> & { width: number; height: number }): MetricContentFit {
+}: FitMetricContentOptions): MetricContentFit {
   assertFinite(width, "metric width");
   assertFinite(height, "metric height");
   const paddingX = 80;

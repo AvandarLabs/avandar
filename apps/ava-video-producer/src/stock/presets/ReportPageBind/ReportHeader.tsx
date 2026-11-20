@@ -1,6 +1,5 @@
-import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getReportPageGeometryFromInputAndFrame } from "./getReportPageGeometryFromInputAndFrame";
 import { ReportHeaderPaper } from "./ReportHeaderPaper";
 import type { Input } from "./ReportPageBind.schema";
@@ -13,7 +12,10 @@ export function ReportHeader({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const { x, y, margins } = getReportPageGeometryFromInputAndFrame({
+    motion,
     input,
     frame,
     index: 0,
@@ -24,7 +26,7 @@ export function ReportHeader({
       x,
       y: 44,
       width: 770,
-      fontSize: 24,
+      fontSize: 24 as const,
       maxLines: 2,
     },
     {
@@ -32,23 +34,26 @@ export function ReportHeader({
       x,
       y: 106,
       width: 620,
-      fontSize: 14,
+      fontSize: 14 as const,
       maxLines: 1,
-      color: STOCK.muted,
+      color: tokens.color.textMuted,
     },
     {
       text: input.formatLabel,
       x: x + 768,
       y: 106,
       width: 220,
-      fontSize: 14,
+      fontSize: 14 as const,
       maxLines: 1,
       anchor: "end",
       color: accent,
     },
   ];
   return (
-    <g data-report-header="first-page" opacity={ramp(frame, 38, 30)}>
+    <g
+      data-report-header="first-page"
+      opacity={motion.ramp(frame, 38, motion.scale(30))}
+    >
       <ReportHeaderPaper x={x} y={y} margins={margins} />
       {labels.map((label) => {
         return (

@@ -96,6 +96,7 @@ export type ResolvedMotionStep = Readonly<{
   spring?: SpringValue;
   period?: number;
   rate?: number;
+  stagger?: number;
 }>;
 export type ResolvedCameraPreset = Readonly<{
   speed: number;
@@ -155,6 +156,24 @@ export type TokenDefinition = Readonly<{
   step?: number;
   options?: readonly string[];
   surface?: TokenSurface;
+  /**
+   * A theme may leave the token unset, and renderers then use their own
+   * fallback. Its resolved value is undefined.
+   */
+  isOptional?: boolean;
+  /**
+   * For a colour pair: the token path of the colour that picks the pair
+   * instead of the ground, such as `color.accent` for text drawn on the
+   * accent. The pair's on-dark value is used when that colour's luminance is
+   * at or below `contrastThreshold`.
+   */
+  contrastWith?: string;
+  contrastThreshold?: number;
+  /**
+   * For a text role: the colour token it is drawn on when that is not the
+   * ground, such as `color.scene.ground`. Contrast checks measure against it.
+   */
+  contrastGround?: string;
 }>;
 export type TokenScale = Readonly<{ scale: TokenDefinition }>;
 export type CatalogGroup = Readonly<{ [key: string]: CatalogNode }>;
@@ -164,11 +183,15 @@ export type CatalogNode = TokenDefinition | TokenScale | CatalogGroup;
 export type ResolvedTokenNode<Node> = Node extends {
   readonly kind: infer Kind extends TokenKind;
 }
-  ? Node extends { readonly options: ReadonlyArray<infer Option> }
-    ? Option
-    : TokenKindValues[Kind]
+  ? Node extends { readonly isOptional: true }
+    ? TokenKindValues[Kind] | undefined
+    : Node extends { readonly options: ReadonlyArray<infer Option> }
+      ? Option
+      : TokenKindValues[Kind]
   : Node extends { readonly scale: infer Definition }
-    ? Readonly<Record<string, ResolvedTokenNode<Definition>>>
+    ? Exclude<keyof Node, "scale"> extends never
+      ? Readonly<Record<string, ResolvedTokenNode<Definition>>>
+      : { readonly [Key in keyof Node]: ResolvedTokenNode<Node[Key]> }
     : { readonly [Key in keyof Node]: ResolvedTokenNode<Node[Key]> };
 
 export type ResolvedVideoAtomic = ResolvedTokenNode<typeof ATOMIC_TOKENS>;

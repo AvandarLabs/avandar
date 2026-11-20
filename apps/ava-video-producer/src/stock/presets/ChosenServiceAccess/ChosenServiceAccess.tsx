@@ -1,6 +1,7 @@
 import { propEq } from "@avandar/utils";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { AccessParticipant } from "./AccessParticipant";
 import { DEFAULT_INPUT } from "./ChosenServiceAccess.fixtures";
 import { ServiceEntrance } from "./ServiceEntrance";
@@ -18,6 +19,8 @@ export function ChosenServiceAccess({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const chosenIndex = input.services.findIndex(
     propEq("id", input.chosenServiceId),
   );
@@ -25,7 +28,13 @@ export function ChosenServiceAccess({
   const threshold = input.accessChange === "clear-entrance" ? 356 : 326;
   return (
     <g>
-      <path d="M50 356 H860" fill="none" stroke={STOCK.line} strokeWidth={2} />
+      <SketchedShape
+        shape={{ kind: "path", d: "M50 356 H860" }}
+        profile={tokens.sketch.shape}
+        fill="none"
+        stroke={tokens.color.line}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
+      />
       {input.services.map((service, index) => {
         return (
           <ServiceEntrance
@@ -38,14 +47,22 @@ export function ChosenServiceAccess({
           />
         );
       })}
-      <path
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M25 440 H${doorX - 170} L${doorX - 100} 356 L${doorX - 42} ${threshold} H${doorX + 42}`,
+        }}
+        profile={tokens.sketch.shape}
         data-access-route
-        d={`M25 440 H${doorX - 170} L${doorX - 100} 356 L${doorX - 42} ${threshold} H${doorX + 42}`}
-        stroke={STOCK.line}
+        stroke={tokens.color.line}
         fill="none"
-        strokeWidth={1}
+        strokeWidth={scales.stroke(tokens.stroke.hairline)}
       />
-      <ServiceStaff input={input} frame={frame} accent={STOCK.orange} />
+      <ServiceStaff
+        input={input}
+        frame={frame}
+        accent={tokens.color.highlight}
+      />
       <AccessParticipant input={input} frame={frame} accent={accent} />
       <FitText
         text={input.labels.participant}

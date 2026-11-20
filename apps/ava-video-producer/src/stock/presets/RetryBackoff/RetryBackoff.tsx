@@ -1,7 +1,9 @@
-import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { BackoffAttempt } from "./BackoffAttempt";
 import { getBackoffStateFromInputAndFrame } from "./getBackoffStateFromInputAndFrame";
+import { OperationHeading } from "./OperationHeading";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./RetryBackoff.schema";
 import type { ReactNode } from "react";
@@ -13,20 +15,11 @@ export function RetryBackoff({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const state = getBackoffStateFromInputAndFrame({ frame, input });
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const state = getBackoffStateFromInputAndFrame({ motion, frame, input });
   return (
-    <g opacity={ramp(frame, 12, 12)}>
-      <FitText
-        text={input.operationLabel}
-        x={40}
-        y={72}
-        width={880}
-        maxLines={2}
-        fontSize={24}
-        normalizeWhitespace
-        breakLongWords
-      />
-      <path d="M80 310 H880" stroke={accent} strokeOpacity={0.24} />
+    <g opacity={motion.reveal(frame, 12)}>
+      <OperationHeading label={input.operationLabel} accent={accent} />
       {state.markers.map((marker) => {
         return (
           <BackoffAttempt

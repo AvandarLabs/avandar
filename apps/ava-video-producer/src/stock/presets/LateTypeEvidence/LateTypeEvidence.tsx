@@ -1,5 +1,6 @@
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { EvidenceCells } from "./EvidenceCells";
+import { RESOLVED_CUE } from "./evidenceTiming";
 import { TypeEvidenceHeadings } from "./TypeEvidenceHeadings";
 import { TypeReviewBracket } from "./TypeReviewBracket";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
@@ -14,7 +15,8 @@ export function LateTypeEvidence({
   accent,
   background,
 }: Readonly<Props>): ReactNode {
-  const isResolved = frame >= 139;
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const isResolved = frame >= RESOLVED_CUE;
   const isWidened = input.policy === "widen-to-text";
   return (
     <g
@@ -27,7 +29,7 @@ export function LateTypeEvidence({
         input={input}
         frame={frame}
         accent={accent}
-        background={background ?? STOCK.ground}
+        background={background ?? tokens.color.ground}
       />
       <TypeReviewBracket input={input} frame={frame} />
       <TypeEvidenceHeadings input={input} frame={frame} />

@@ -1,4 +1,5 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./SharedJigPreparation.schema";
 /** Data for getJigSceneFromFrame. */
 type GetJigSceneFromFrameResult = {
@@ -9,12 +10,17 @@ type GetJigSceneFromFrameResult = {
   applications: boolean[];
   activeIndex: number;
 };
-
+type JigSceneArgs = Readonly<{
+  frame: number;
+  input: Input;
+  motion: VideoMotion;
+}>;
 /** Frame-derived guide position and one application beat per collaborator. */
 export function getJigSceneFromFrame({
   frame,
   input,
-}: Readonly<{ frame: number; input: Input }>): GetJigSceneFromFrameResult {
+  motion,
+}: JigSceneArgs): GetJigSceneFromFrameResult {
   const centers = input.collaborators.map((_, index) => {
     return input.collaborators.length === 1
       ? 610
@@ -26,20 +32,26 @@ export function getJigSceneFromFrame({
     Math.max(0, Math.floor((frame - 49) / duration)),
   );
   const previousX = activeIndex === 0 ? 80 : centers[activeIndex - 1] - 50;
-  const arriving = ramp(
+  const arriving = motion.ramp(
     frame,
     49 + activeIndex * duration,
     duration * 0.4,
-    EASE.inOut,
+    motion.travel.easing,
   );
   const travellingX = mix(arriving, previousX, centers[activeIndex] - 50);
   const guideX =
-    frame < 49 ? 80 : mix(ramp(frame, 122, 8, EASE.inOut), travellingX, 80);
+    frame < 49
+      ? 80
+      : mix(
+          motion.ramp(frame, 122, motion.whip, motion.travel.easing),
+          travellingX,
+          80,
+        );
   return {
     centers,
     guideX,
     guideY: 350,
-    formed: ramp(frame, 20, 28, EASE.inOut),
+    formed: motion.ramp(frame, 20, motion.scale(28), motion.travel.easing),
     applications: centers.map((_, index) => {
       return frame >= 49 + index * duration + duration * 0.65;
     }),

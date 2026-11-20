@@ -1,12 +1,19 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./CoordinateQualityTriage.schema";
 
 type Reason = "plotted" | "missing" | "nonNumeric" | "range";
+
+const TRIAGE_AT = 51;
+const TRIAGE_STEP = 3;
+const TRIAGE_FRAMES = 39;
 /** Data for TriagedRow. */
 type TriagedRowResult = {
   index: number;
   reason: Reason;
   representativeIndex: number;
+  /** The frame the row's token reaches its target. */
+  arrivedAt: number;
   targetX: number;
   targetY: number;
   x: number;
@@ -52,7 +59,12 @@ function _getRepresentativeIndex({
 export function makeCoordinateTriageFromInputAndFrame({
   input,
   frame,
-}: Readonly<{ input: Input; frame: number }>): {
+  motion,
+}: Readonly<{
+  input: Input;
+  frame: number;
+  motion: Pick<VideoMotion, "ramp" | "scale" | "travel">;
+}>): {
   rows: TriagedRow[];
   counts: Array<{ reason: Reason; count: number }>;
 } {
@@ -71,12 +83,19 @@ export function makeCoordinateTriageFromInputAndFrame({
       reason === "plotted" && typeof row.latitude === "number"
         ? 180 + ((90 - row.latitude) / 180) * 210
         : 440 + Math.floor(rank / 4) * 22;
-    const progress = ramp(frame, 51 + index * 3, 39, EASE.inOut);
+    const departedAt = TRIAGE_AT + index * TRIAGE_STEP;
+    const progress = motion.ramp(
+      frame,
+      departedAt,
+      motion.scale(TRIAGE_FRAMES),
+      motion.travel.easing,
+    );
     return {
       ...row,
       index,
       reason,
       representativeIndex: _getRepresentativeIndex({ input, row, index }),
+      arrivedAt: departedAt + motion.scale(TRIAGE_FRAMES),
       targetX,
       targetY,
       x: mix(progress, 450, targetX),
@@ -87,8 +106,8 @@ export function makeCoordinateTriageFromInputAndFrame({
     (reason) => {
       return {
         reason,
-        count: reasons.filter((item, index) => {
-          return item === reason && frame >= 90 + index * 3;
+        count: rows.filter((row) => {
+          return row.reason === reason && frame >= row.arrivedAt;
         }).length,
       };
     },

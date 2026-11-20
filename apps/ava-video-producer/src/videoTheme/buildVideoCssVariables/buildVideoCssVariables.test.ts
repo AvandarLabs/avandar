@@ -54,3 +54,18 @@ test("component tokens are namespaced by component", () => {
   assert.equal(variables["--video-component-progress-bar-height"], "3px");
   assert.equal(variables["--video-component-progress-bar-paint"], "#51a7ff");
 });
+
+test("the scene palette is emitted under the names storyboard scenes read", () => {
+  assert.deepEqual(
+    [
+      variables["--brand"],
+      variables["--muted-foreground"],
+      variables["--ground"],
+    ],
+    ["#5d90ff", "#99a6b8", "#03050e"],
+  );
+});
+
+test("an unset scene shadow emits nothing, so a scene keeps its fallback", () => {
+  assert.equal("--shadow" in variables, false);
+});

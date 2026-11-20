@@ -3,26 +3,26 @@ import test from "node:test";
 import { prop, propEq } from "@avandar/utils";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
+import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
+import { createThemePatchFromStockColors } from "../../../videoTheme/createThemePatchFromStockColors/createThemePatchFromStockColors";
+import { VideoThemeScope } from "../../../videoTheme/VideoThemeScope/VideoThemeScope";
 import { ClusterEpicurveLink } from "./ClusterEpicurveLink";
+import { clusterEpicurveLinkContract } from "./ClusterEpicurveLink.contract";
 import {
+  invalidInputs,
   defaultInput,
   fixtures,
-  invalidInputs,
   changedInput,
 } from "./ClusterEpicurveLink.fixtures";
+import { inputSchema, type Input } from "./ClusterEpicurveLink.schema";
 
 test("The default investigation group contains three cases, including one unknown onset. Each case maps to exactly one histogram bin or the unknown compartment. Focusing a time bin highlights precisely its case IDs on the map.", () => {
   const markup = _render({ frame: 150 });
   assert.equal((markup.match(/data-histogram-case=/g) ?? []).length, 5);
   assert.match(markup, /data-investigation-count="3"/);
 });
-
-import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
-import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
-import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
-import { clusterEpicurveLinkContract } from "./ClusterEpicurveLink.contract";
-import { inputSchema, type Input } from "./ClusterEpicurveLink.schema";
-
 function _render({
   frame,
   input = defaultInput,
@@ -156,10 +156,7 @@ test("case schemas reject foreign onset, focus and investigation references", ()
     {
       ...defaultInput,
       cases: defaultInput.cases.map((record) => {
-        return {
-          ...record,
-          onsetBinId: "missing",
-        };
+        return { ...record, onsetBinId: "missing" };
       }),
     },
   ].forEach((input) => {
@@ -170,13 +167,10 @@ test("twelve unknown cases retain twelve non-overlapping keyed histogram units",
   const input = inputSchema.parse({
     ...fixtures[2].input,
     cases: fixtures[2].input.cases.map((record) => {
-      return {
-        ...record,
-        onsetBinId: null,
-      };
+      return { ...record, onsetBinId: null };
     }),
   });
-  const markup = _render({ frame: 150, input: input });
+  const markup = _render({ frame: 150, input });
   const segments = [
     ...markup.matchAll(/data-unknown-onset="true"><rect([^>]+)>/g),
   ].map((match) => {
@@ -204,7 +198,6 @@ test("twelve unknown cases retain twelve non-overlapping keyed histogram units",
   });
   assert.equal((markup.match(/data-map-case=/g) ?? []).length, 12);
 });
-
 test("selected histogram identity numerals contrast against their bright blocks", async () => {
   const { clusterEpicurveLinkContract: correctionContract } =
     await import("./ClusterEpicurveLink.contract");
@@ -245,9 +238,9 @@ test("selected histogram identity numerals contrast against their bright blocks"
       });
   });
 });
-
 test("selected histogram identities keep at least 4.5 contrast under light and dark accents", async () => {
-  const { HistogramSegments } = await import("./HistogramSegments");
+  const { HistogramSegments } =
+    await import("./HistogramSegments/HistogramSegments");
   const { defaultInput: identityInput } =
     await import("./ClusterEpicurveLink.fixtures");
   const luminance = (color: string) => {
@@ -269,10 +262,13 @@ test("selected histogram identities keep at least 4.5 contrast under light and d
   ["#9fefca", "#3caeff", "#15151a", "#ffffff", "#ff0000", "#777777"].forEach(
     (accent) => {
       const markup = renderToStaticMarkup(
-        createElement(HistogramSegments, {
-          input: identityInput,
-          frame: 150,
-          accent,
+        createElement(VideoThemeScope, {
+          patches: [createThemePatchFromStockColors({ accent })],
+          children: createElement(HistogramSegments, {
+            input: identityInput,
+            frame: 150,
+            accent,
+          }),
         }),
       );
       const identityFill = markup.match(/<text[^>]*fill="([^"]*)"/)![1];

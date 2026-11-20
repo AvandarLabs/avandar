@@ -99,7 +99,7 @@ function _assertChoiceMarks({
   markup: string;
   input: Input;
 }) {
-  const marks = [...markup.matchAll(/<path[^>]*data-choice-[^>]*>/g)];
+  const marks = [...markup.matchAll(/<g data-choice-[^>]*><path[^>]*>/g)];
   assert.equal(marks.length, input.fields.length);
   marks.forEach(([mark], fieldIndex) => {
     const panel = _chosenCell({ markup, input, fieldIndex });
@@ -243,7 +243,7 @@ test("moving decision marks leave clear space below the field names", () => {
   };
   [60, 77, 100, 112].forEach((frame) => {
     const markup = render({ frame: frame, input: input });
-    const marks = [...markup.matchAll(/<path[^>]*data-choice-[^>]*>/g)];
+    const marks = [...markup.matchAll(/<g data-choice-[^>]*><path[^>]*>/g)];
     input.fields.forEach((field, index) => {
       const heading = _texts({ markup, label: field.label })[0];
       const path = marks[index][0].match(/d="M[\d.-]+ ([\d.-]+)/);

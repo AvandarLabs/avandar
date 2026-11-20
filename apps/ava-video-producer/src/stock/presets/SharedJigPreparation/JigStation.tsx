@@ -1,6 +1,8 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { JigPattern } from "./JigPattern";
 import type { Input } from "./SharedJigPreparation.schema";
 import type { ReactNode } from "react";
@@ -13,6 +15,10 @@ type Props = {
   input: Input;
   accent: string;
 };
+/** A fabric workpiece's corner, before the theme's corner style. */
+const FABRIC_CORNER = 16;
+/** A card workpiece's corner, before the theme's corner style. */
+const CARD_CORNER = 2;
 /** A retained existing workpiece receives one matching application. */
 export function JigStation({
   collaborator,
@@ -22,26 +28,33 @@ export function JigStation({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
-      <PersonGlyph x={x} y={275} color={STOCK.cyan} />
+      <PersonGlyph x={x} y={275} color={tokens.color.accentAlt} />
       <LabelSlots
         labels={[
           [collaborator.label, x - 88, 200, 176, 18, 3],
           [collaborator.workpieceLabel, x - 100, 480, 200, 14, 3],
         ]}
       />
-      <rect
+      <StockRect
         data-workpiece={collaborator.id}
         x={x - 70}
         y={330}
         width={140}
         height={112}
-        rx={input.workpieceMaterial === "fabric" ? 16 : 2}
-        fill={STOCK.surface}
-        stroke={STOCK.line}
+        rx={scales.corner(
+          input.workpieceMaterial === "fabric" ? FABRIC_CORNER : CARD_CORNER,
+        )}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
         strokeDasharray={
-          input.workpieceMaterial === "fabric" ? "5 3" : undefined
+          input.workpieceMaterial === "fabric"
+            ? atomic.dash.stitch.join(" ")
+            : undefined
         }
       />
       {hasApplication ? (
@@ -55,12 +68,13 @@ export function JigStation({
         </g>
       ) : undefined}
       {input.showAlignmentGuides && isAligned ? (
-        <path
+        <SketchedShape
+          shape={{ kind: "path", d: `M${x - 58} 342 h116 v80 h-116 Z` }}
+          profile={tokens.sketch.shape}
           data-alignment={collaborator.id}
-          d={`M${x - 58} 342 h116 v80 h-116 Z`}
-          stroke={STOCK.cyan}
+          stroke={tokens.color.accentAlt}
           fill="none"
-          strokeDasharray="4 4"
+          strokeDasharray={tokens.dash.pending.join(" ")}
         />
       ) : undefined}
     </g>

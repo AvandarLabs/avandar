@@ -1,14 +1,15 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ReleaseArtifact } from "./ReleaseArtifact";
-import { RepairRegister } from "./RepairRegister";
+import { RepairRegister } from "./RepairRegister/RepairRegister";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ReleaseRepairObligations.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
-
 /**
  * A physical release gate preserves every unresolved limitation and commitment.
  */
@@ -17,27 +18,35 @@ export function ReleaseRepairObligations({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const isHeld = input.issues.some((issue) => {
     return issue.state === "open" && issue.releaseRole === "blocking";
   });
-  const artifactX = mix(isHeld ? 0 : ramp(frame, 91, 39, EASE.inOut), 60, 580);
+  const artifactX = mix(
+    isHeld ? 0 : motion.ramp(frame, 91, motion.scale(39), motion.travel.easing),
+    60,
+    580,
+  );
   return (
     <g>
-      <g opacity={ramp(frame, 12, 12)}>
-        <rect
+      <g opacity={motion.reveal(frame, 12)}>
+        <StockRect
           data-recipient-bay="true"
           x={550}
           y={88}
           width={350}
           height={322}
-          rx={12}
+          rx={scales.corner(tokens.corner.card)}
           fill="none"
-          stroke={STOCK.line}
-          strokeDasharray="6 6"
+          stroke={tokens.color.line}
+          strokeDasharray={atomic.dash.long.join(" ")}
         />
         <LabelSlots labels={[[input.recipientLabel, 550, 35, 350, 16, 3]]} />
       </g>
-      <g opacity={ramp(frame, 12, 12)}>
+      <g opacity={motion.reveal(frame, 12)}>
         <LabelSlots
           labels={[
             [input.labels.resolved, 60, 35, 200, 12, 3],
@@ -58,16 +67,17 @@ export function ReleaseRepairObligations({
         artifactX={artifactX}
       />
       {isHeld ? (
-        <path
+        <SketchedShape
+          shape={{ kind: "path", d: "M375 96 h15 v324 h-15" }}
+          profile={tokens.sketch.shape}
           data-held-bracket="true"
-          d="M375 96 h15 v324 h-15"
-          stroke={STOCK.orange}
-          strokeWidth={4}
+          stroke={tokens.color.highlight}
+          strokeWidth={scales.stroke(tokens.stroke.heavy)}
           fill="none"
-          opacity={ramp(frame, 91, 12)}
+          opacity={motion.reveal(frame, 91)}
         />
       ) : undefined}
-      <g opacity={ramp(frame, 91, 12)}>
+      <g opacity={motion.reveal(frame, 91)}>
         <LabelSlots
           labels={[
             [

@@ -1,6 +1,7 @@
 import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { ArgumentDeck } from "./ArgumentDeck";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { ArgumentDeck } from "./ArgumentDeck/ArgumentDeck";
 import { ArgumentPremise } from "./ArgumentPremise";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ArgumentBridge.schema";
@@ -14,9 +15,10 @@ export function ArgumentBridge({
   input,
   id,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g>
-      <g opacity={ramp(frame, 12, 18)}>
+      <g opacity={ramp(frame, 12, motion.hero, motion.reveal.easing)}>
         <FitText
           text={input.premiseHeading}
           x={480}

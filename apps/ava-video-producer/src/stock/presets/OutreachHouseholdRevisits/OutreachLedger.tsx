@@ -1,6 +1,6 @@
 import { prop } from "@avandar/utils";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./OutreachHouseholdRevisits.schema";
 import type { ReactNode } from "react";
 
@@ -12,6 +12,7 @@ export function OutreachLedger({
   input,
   completed,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const visited = new Set(completed.map(prop("householdId")));
   const contactedHouseholds = new Set(
     completed
@@ -25,37 +26,37 @@ export function OutreachLedger({
       label: input.copy.visits,
       value: completed.length,
       visible: input.showUniqueLedger,
-      color: STOCK.text,
+      color: tokens.color.text,
     },
     {
       label: input.copy.visited,
       value: visited.size,
       visible: input.showUniqueLedger,
-      color: STOCK.text,
+      color: tokens.color.text,
     },
     {
       label: input.copy.contacted,
       value: contactedHouseholds.size,
       visible: true,
-      color: STOCK.mint,
+      color: tokens.color.positive,
     },
     {
       label: input.copy.noContact,
       value: visited.size - contactedHouseholds.size,
       visible: true,
-      color: STOCK.orange,
+      color: tokens.color.highlight,
     },
     {
       label: input.copy.unvisited,
       value: input.households.length - visited.size,
       visible: true,
-      color: STOCK.muted,
+      color: tokens.color.textMuted,
     },
     {
       label: input.copy.denominator,
       value: input.households.length,
       visible: true,
-      color: STOCK.text,
+      color: tokens.color.text,
     },
   ];
   return (

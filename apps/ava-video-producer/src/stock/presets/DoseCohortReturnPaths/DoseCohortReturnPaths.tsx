@@ -1,5 +1,6 @@
-import { STOCK } from "../../stockPalette";
-import { CohortLane } from "./CohortLane";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { BaselineCount } from "./BaselineCount";
+import { CohortLane } from "./CohortLane/CohortLane";
 import { CohortLegend } from "./CohortLegend";
 import { SceneLabel } from "./SceneLabel";
 import { VisitHeader } from "./VisitHeader";
@@ -18,9 +19,7 @@ export function DoseCohortReturnPaths({
     <g>
       <SceneLabel text={input.sceneLabel} x={32} y={30} width={700} />
       <SceneLabel text={input.copy.baseline} x={32} y={60} width={360} />
-      <text x={415} y={60} fill={STOCK.text} fontSize={18}>
-        {input.participants.length}
-      </text>
+      <BaselineCount count={input.participants.length} />
       {input.visits.map((visit, index) => {
         return (
           <VisitHeader

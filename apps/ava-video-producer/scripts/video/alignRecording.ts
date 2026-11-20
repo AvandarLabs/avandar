@@ -14,7 +14,6 @@ import { AUDIO_EXTENSIONS } from "./video.constants";
 import { writeJson } from "./writeJson";
 import type { Storyboard } from "../../src/storyboard/schema/schema";
 import type { Options } from "./video.types";
-
 /**
  * Import supplied SRT timing with exact text matching; this performs no ASR.
  */

@@ -1,6 +1,8 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ByteIntervalRails } from "./ByteIntervalRails";
 import type { TransferChunk } from "./getByteTransferFromFrame";
 import type { Input } from "./ResumableByteTransfer.schema";
@@ -19,12 +21,24 @@ export function ByteChunk({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const x = 84 + (chunk.start / input.file.sizeBytes) * 792;
   const width = ((chunk.end - chunk.start) / input.file.sizeBytes) * 792;
   const interruptedY =
     frame <= 73
-      ? mix(ramp(frame, 56, 17, EASE.inOut), 180, 275)
-      : mix(ramp(frame, 73, 17, EASE.inOut), 275, 180);
+      ? mix(
+          motion.ramp(frame, 56, motion.scale(17), motion.travel.easing),
+          180,
+          275,
+        )
+      : mix(
+          motion.ramp(frame, 73, motion.scale(17), motion.travel.easing),
+          275,
+          180,
+        );
   const y = chunk.isInterrupted ? interruptedY : mix(chunk.progress, 180, 380);
   return (
     <g
@@ -33,17 +47,17 @@ export function ByteChunk({
       data-chunk-bytes={chunk.end - chunk.start}
     >
       <ByteIntervalRails x={x} width={width} />
-      <rect
+      <StockRect
         data-received-chunk={chunk.isConfirmed ? chunk.start : undefined}
         data-moving-chunk={!chunk.isConfirmed ? chunk.start : undefined}
         x={x}
         y={y}
         width={width}
         height={54}
-        rx={3}
-        fill={chunk.isInterrupted ? STOCK.orange : accent}
-        fillOpacity={0.15}
-        stroke={chunk.isInterrupted ? STOCK.orange : accent}
+        rx={scales.corner(3)}
+        fill={chunk.isInterrupted ? tokens.color.highlight : accent}
+        fillOpacity={scales.wash(atomic.opacity["15"])}
+        stroke={chunk.isInterrupted ? tokens.color.highlight : accent}
       />
       {input.showOffsets ? (
         <g data-offset-label={chunk.start}>
@@ -51,11 +65,15 @@ export function ByteChunk({
         </g>
       ) : undefined}
       {chunk.isInterrupted ? (
-        <path
+        <SketchedShape
+          shape={{
+            kind: "path",
+            d: `M${x + width / 2 - 6} ${y + 21} l12 12 m0 -12 l-12 12`,
+          }}
+          profile={tokens.sketch.shape}
           data-interrupted-byte={chunk.start}
-          d={`M${x + width / 2 - 6} ${y + 21} l12 12 m0 -12 l-12 12`}
-          stroke={STOCK.orange}
-          strokeWidth={2}
+          stroke={tokens.color.highlight}
+          strokeWidth={scales.stroke(tokens.stroke.default)}
         />
       ) : undefined}
     </g>

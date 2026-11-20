@@ -162,17 +162,18 @@ function useLiveFilmState(film: Film, continuity: ContinuityShot | undefined) {
   };
 }
 
+type UsePreviewTimingOptions = {
+  film: Film;
+  appearance: ContinuityAppearance;
+  theme: VideoThemeSnapshot | undefined;
+  isContinuity: boolean;
+};
 /**
  * The plan the live film plays and its length. The plan stays unthemed, but
  * its frames are counted with the theme applied, because the theme's camera
  * preset can lengthen beats.
  */
-function usePreviewTiming(options: {
-  film: Film;
-  appearance: ContinuityAppearance;
-  theme: VideoThemeSnapshot | undefined;
-  isContinuity: boolean;
-}) {
+function usePreviewTiming(options: UsePreviewTimingOptions) {
   const { film, appearance, theme, isContinuity } = options;
   const previewPlan = useMemo(
     // The film keeps its unthemed plan: FilmComposition applies the theme.

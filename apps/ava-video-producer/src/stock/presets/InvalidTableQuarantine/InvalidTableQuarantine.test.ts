@@ -14,6 +14,22 @@ import {
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 import type { Input } from "./InvalidTableQuarantine.schema";
 
+/**
+ * The shape a marker names: the marked element itself, or the sketch-aware
+ * shape inside a marked group.
+ */
+function _markedShape({
+  markup,
+  marker,
+}: Readonly<{ markup: string; marker: string }>): string {
+  const wrapped = markup.match(
+    new RegExp(
+      `<g [^>]*data-${marker}="[^"]*"[^>]*><(?:line|path|circle|rect|ellipse)\\b[^>]*>`,
+    ),
+  );
+  return wrapped ? wrapped[0] : SvgAttributes.fromMarker({ markup, marker });
+}
+
 function _render({
   frame,
   input,
@@ -34,7 +50,7 @@ test("completed or failed attempts keep the full shutter closed without a reload
       attempt: { ...DEFAULT_INPUT.attempt, outcome },
       reload: { performed: false, rows: [] },
     };
-    const shutter = SvgAttributes.fromMarker({
+    const shutter = _markedShape({
       markup: _render({ frame: 150, input: input }),
       marker: "read-shutter",
     });
@@ -69,7 +85,7 @@ test("every literal displayed row is replaced before the shutter first opens", (
   });
   assert.equal(
     SvgAttributes.getNumberFromMarkup({
-      attributes: SvgAttributes.fromMarker({
+      attributes: _markedShape({
         markup: _render({ frame: 112, input: input }),
         marker: "read-shutter",
       }),
@@ -79,7 +95,7 @@ test("every literal displayed row is replaced before the shutter first opens", (
   );
   assert.equal(
     SvgAttributes.getNumberFromMarkup({
-      attributes: SvgAttributes.fromMarker({
+      attributes: _markedShape({
         markup: _render({ frame: 139, input: input }),
         marker: "read-shutter",
       }),
@@ -148,7 +164,7 @@ test("closed shutter geometry precedes the first literal row mutation", () => {
     mutated = _render({ frame: 46, input: DEFAULT_INPUT });
   assert.equal(
     SvgAttributes.getNumberFromMarkup({
-      attributes: SvgAttributes.fromMarker({
+      attributes: _markedShape({
         markup: closed,
         marker: "read-shutter",
       }),
@@ -161,7 +177,7 @@ test("closed shutter geometry precedes the first literal row mutation", () => {
   assert.match(mutated, /data-literal-value="B: 9"/);
   assert.equal(
     SvgAttributes.getNumberFromMarkup({
-      attributes: SvgAttributes.fromMarker({
+      attributes: _markedShape({
         markup: mutated,
         marker: "read-shutter",
       }),
@@ -234,7 +250,9 @@ test("completed reload status replaces the historical attempt icon", async () =>
         id: "correction",
       }),
     );
-    const attempt = markup.match(/<path[^>]*data-attempt-outcome[^>]*>/)![0];
+    const attempt = markup.match(
+      /<g data-attempt-outcome[^>]*><path[^>]*>/,
+    )![0];
     assert.match(
       attempt,
       /opacity="0"/,

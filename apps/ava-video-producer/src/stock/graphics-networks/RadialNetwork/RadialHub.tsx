@@ -1,9 +1,7 @@
-import { Arrive } from "../../graphics-common/Arrive";
+import { Arrive } from "../../graphics-common/Arrive/Arrive";
 import { Text } from "../../graphics-common/Text";
-import {
-  useGraphicProps,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CENTER } from "./RadialNetwork.constants";
 import type { RadialNetworkInput } from "../../presets/RadialNetwork/RadialNetwork.schema";
 import type { ReactNode } from "react";
@@ -13,28 +11,32 @@ type Props = Readonly<{
   frame: number;
   accent: string;
 }>;
-
 /** The hub at the centre: its ring, glow, title, and detail. */
 export function RadialHub({ input, frame, accent }: Props): ReactNode {
-  const style = useGraphicProps("RadialNetwork", {});
-  const { color } = useGraphicTokens();
+  const style = GraphicThemeHooks.useGraphicProps("RadialNetwork", {});
+  const { color, sketch } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <Arrive frame={frame}>
-      <circle
-        cx={CENTER.x}
-        cy={CENTER.y}
-        r={style.hubRadius}
+      <SketchedShape
+        shape={{
+          kind: "circle",
+          cx: CENTER.x,
+          cy: CENTER.y,
+          r: style.hubRadius,
+        }}
+        profile={sketch.shape}
         fill={color.surface}
         stroke={accent}
         strokeOpacity={style.hubStrokeAlpha}
-        strokeWidth={style.hubStrokeWidth}
+        strokeWidth={shapes.stroke(style.hubStrokeWidth)}
       />
       <circle
         cx={CENTER.x}
         cy={CENTER.y}
         r={style.hubGlowRadius}
         fill={accent}
-        fillOpacity={style.hubGlowAlpha}
+        fillOpacity={shapes.wash(style.hubGlowAlpha)}
       />
       <Text
         role="title"

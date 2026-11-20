@@ -1,5 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./InterpretedCaseDialogue.schema";
 import type { ReactNode } from "react";
 
@@ -9,6 +10,7 @@ type Props = { input: Input; accent: string };
  * layout.
  */
 export function DialogueLegend({ input, accent }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
       {" "}
@@ -19,14 +21,21 @@ export function DialogueLegend({ input, accent }: Readonly<Props>): ReactNode {
           [input.labels.interpreted, 527, 80, 385, 12, 3],
         ]}
       />
-      <rect x={48} y={70} width={10} height={10} fill="none" stroke={accent} />
-      <rect
+      <StockRect
+        x={48}
+        y={70}
+        width={10}
+        height={10}
+        fill="none"
+        stroke={accent}
+      />
+      <StockRect
         x={510}
         y={70}
         width={10}
         height={10}
         fill="none"
-        stroke={STOCK.cyan}
+        stroke={tokens.color.accentAlt}
       />
     </g>
   );

@@ -1,4 +1,6 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SceneText } from "./SceneText";
 import type { Input } from "./ReturningLearnerWorktable.schema";
 import type { ReactNode } from "react";
@@ -21,27 +23,31 @@ export function PriorWorkSample({
   offset,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g
       data-work-id={work.id}
       transform={`translate(${280 + index * 50 + offset} 260)`}
     >
-      <rect
+      <StockRect
         x={-20}
         y={-26}
         width={40}
         height={52}
-        rx={2}
-        fill={STOCK.surface}
+        rx={scales.corner(2)}
+        fill={tokens.color.surface}
         stroke={accent}
       />
-      <path
-        data-work-marks={work.id}
-        d={MARKS[work.form]}
-        fill="none"
-        stroke={accent}
-        strokeWidth={1.5}
-      />
+      <g data-work-marks={work.id}>
+        <SketchedShape
+          shape={{ kind: "path", d: MARKS[work.form] }}
+          profile={tokens.sketch.shape}
+          fill="none"
+          stroke={accent}
+          strokeWidth={scales.stroke(tokens.stroke.outline)}
+        />
+      </g>
       <SceneText
         text={String(index + 1)}
         anchor="middle"

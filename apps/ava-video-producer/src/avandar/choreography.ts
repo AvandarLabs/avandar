@@ -1,4 +1,4 @@
-import type { CursorKey } from "../cursor-motion";
+import type { CursorKey } from "../CursorMotionHelpers";
 
 export type PointerBeat = {
   frame: number;

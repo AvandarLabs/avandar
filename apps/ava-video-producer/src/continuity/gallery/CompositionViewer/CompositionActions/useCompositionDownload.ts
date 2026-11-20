@@ -10,16 +10,19 @@ type CompositionDownload = {
   start: () => Promise<void>;
 };
 
-/**
- * On-demand rendering with the acknowledged options and theme, with progress
- * scoped to the selected film.
- */
-export function useCompositionDownload(options: {
+type UseCompositionDownloadOptions = {
   id: string;
   options: CompositionExportOptions | undefined;
   captions: boolean | undefined;
   theme: ExportTheme | undefined;
-}): CompositionDownload {
+};
+/**
+ * On-demand rendering with the acknowledged options and theme, with progress
+ * scoped to the selected film.
+ */
+export function useCompositionDownload(
+  options: UseCompositionDownloadOptions,
+): CompositionDownload {
   const { id, options: appearance, theme } = options;
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState({ id: "", message: "" });

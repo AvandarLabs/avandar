@@ -1,9 +1,11 @@
 import { AbsoluteFill } from "remotion";
-import { getSceneTransitionStyle } from "./getSceneTransitionStyle";
-import type { SceneTransitionProps } from "./getSceneTransitionStyle";
-import type { TransitionPresentationComponentProps } from "@remotion/transitions";
+import {
+  SceneTransitionProps,
+  getSceneTransitionStyle,
+} from "./getSceneTransitionStyle";
+import { MotionSettings } from "./MotionSettings/MotionSettings";
+import type { TransitionPresentationComponentProps as Props } from "@remotion/transitions";
 import type { ReactNode } from "react";
-
 /**
  * Remotion presentation. CSS blur keeps stateful product children
  * single-instance.
@@ -13,14 +15,16 @@ export function SceneTransition({
   presentationDirection,
   presentationProgress,
   passedProps,
-}: TransitionPresentationComponentProps<SceneTransitionProps>): ReactNode {
+}: Props<SceneTransitionProps>): ReactNode {
+  const theme = MotionSettings.useMotionSettingsTheme();
   return (
     <AbsoluteFill
-      style={getSceneTransitionStyle(
-        presentationProgress,
-        presentationDirection === "entering",
-        passedProps,
-      )}
+      style={getSceneTransitionStyle({
+        progress: presentationProgress,
+        entering: presentationDirection === "entering",
+        props: passedProps,
+        theme,
+      })}
     >
       {children}
     </AbsoluteFill>

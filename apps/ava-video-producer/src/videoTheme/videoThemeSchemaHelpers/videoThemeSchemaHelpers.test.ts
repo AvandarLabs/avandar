@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import classicTheme from "../../../themes/classic.theme.json";
-import { listTokenDefinitions } from "../tokenCatalog/tokenCatalogHelpers";
+import { listTokenDefinitions } from "../tokenCatalog/tokenCatalogHelpers/tokenCatalogHelpers";
 import {
   createVideoThemeJsonSchema,
   parseVideoThemeDocument,

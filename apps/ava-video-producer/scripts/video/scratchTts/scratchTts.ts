@@ -9,7 +9,6 @@ import { writeJson } from "../writeJson";
 import { synthesizeCue } from "./synthesizeCue";
 import type { Storyboard } from "../../../src/storyboard/schema/schema";
 import type { Options } from "../video.types";
-
 /** Produce scratch speech from captured cues in an owned output directory. */
 export async function scratchTts(
   plan: Storyboard,

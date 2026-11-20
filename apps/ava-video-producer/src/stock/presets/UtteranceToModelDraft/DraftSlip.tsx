@@ -1,6 +1,6 @@
 import { propEq } from "@avandar/utils";
-import { ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getPhrasePositionsFromSentenceParts } from "./getPhrasePositionsFromSentenceParts";
 import { PhraseCopy } from "./PhraseCopy";
 import { PhraseSocket } from "./PhraseSocket";
@@ -28,6 +28,9 @@ export function DraftSlip({
   y,
   role,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const source = getPhrasePositionsFromSentenceParts(input.sentenceParts).find(
     propEq("id", item.partId),
   )!;
@@ -36,11 +39,15 @@ export function DraftSlip({
   return (
     <g>
       {input.showSourceGuides ? (
-        <path
+        <SketchedShape
+          shape={{
+            kind: "path",
+            d: `M${source.x} ${source.y + 10} L${x} ${y}`,
+          }}
+          profile={tokens.sketch.shape}
           data-source-guide={item.id}
-          opacity={0.3 * ramp(frame, start, duration)}
-          d={`M${source.x} ${source.y + 10} L${x} ${y}`}
-          stroke={STOCK.muted}
+          opacity={atomic.opacity["30"] * motion.ramp(frame, start, duration)}
+          stroke={tokens.color.inactive}
           fill="none"
         />
       ) : undefined}
@@ -57,7 +64,7 @@ export function DraftSlip({
         data-model-item={item.id}
         data-source-part={item.partId}
         transform={`translate(${x} ${y})`}
-        opacity={ramp(frame, 97, 8)}
+        opacity={motion.ramp(frame, 97, motion.whip)}
       >
         <PhraseSocket role={role} label={item.label} accent={accent} />
       </g>

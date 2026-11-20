@@ -1,8 +1,9 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getShelfUnitsFromInputAndFrame } from "./getShelfUnitsFromInputAndFrame";
 import { DEFAULT_INPUT } from "./RetailShelfReplenishment.fixtures";
 import { ShelfActors } from "./ShelfActors";
-import { ShelfCarrier } from "./ShelfCarrier";
+import { ShelfCarrier } from "./ShelfCarrier/ShelfCarrier";
 import { ShelfLabels } from "./ShelfLabels";
 import { ShelfOrder } from "./ShelfOrder";
 import { ShelfStructure } from "./ShelfStructure";
@@ -20,21 +21,28 @@ export function RetailShelfReplenishment({
   accent,
   input = DEFAULT_INPUT,
 }: Readonly<Props>): ReactNode {
-  const units = getShelfUnitsFromInputAndFrame({ input, frame });
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const units = getShelfUnitsFromInputAndFrame({ input, frame, motion });
   const shelfQuantities = input.goods.map((good) => {
     return units.filter((unit) => {
       return unit.good.id === good.id && unit.owner === "shelf";
     }).length;
   });
   return (
-    <g color={STOCK.text}>
+    <g color={tokens.color.text}>
       <ShelfStructure input={input} />
       <ShelfCarrier input={input} frame={frame} accent={accent} />
-      <path
-        d="M700 463 L710 498 H830 L840 463 M715 463 Q770 428 825 463"
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: "M700 463 L710 498 H830 L840 463 M715 463 Q770 428 825 463",
+        }}
+        profile={tokens.sketch.shape}
         fill="none"
         stroke={accent}
-        strokeWidth={2}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
       <ShelfOrder input={input} frame={frame} />
       {units.map((unit) => {
