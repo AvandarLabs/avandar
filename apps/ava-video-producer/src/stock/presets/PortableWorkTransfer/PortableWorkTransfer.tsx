@@ -24,26 +24,11 @@ export function PortableWorkTransfer({
   accent,
 }: Readonly<Props>): ReactNode {
   const motion = useGraphicMotion();
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
   const scene = getTransferSceneFromFrame({ motion, frame, input });
   return (
     <g>
       <TransferCaptions input={input} frame={frame} folioX={scene.folioX} />
-      <SketchedShape
-        shape={{ kind: "path", d: "M36 550 H310 M45 550 v12 M300 550 v12" }}
-        profile={tokens.sketch.shape}
-        data-source-bench="true"
-        stroke={tokens.color.line}
-        strokeWidth={scales.stroke(tokens.stroke.heavy)}
-      />
-      <SketchedShape
-        shape={{ kind: "path", d: "M330 550 H920 M340 550 v12 M910 550 v12" }}
-        profile={tokens.sketch.shape}
-        data-destination-bench="true"
-        stroke={tokens.color.line}
-        strokeWidth={scales.stroke(tokens.stroke.heavy)}
-      />
+      <TransferBenches />
       {input.artifacts.map((artifact, index) => {
         return (
           <TransferArtifact
@@ -65,5 +50,29 @@ export function PortableWorkTransfer({
       />
       <TransferOwner scene={scene} />
     </g>
+  );
+}
+
+/** The source bench and the destination bench the owner carries between. */
+function TransferBenches(): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <>
+      <SketchedShape
+        shape={{ kind: "path", d: "M36 550 H310 M45 550 v12 M300 550 v12" }}
+        profile={tokens.sketch.shape}
+        data-source-bench="true"
+        stroke={tokens.color.line}
+        strokeWidth={scales.stroke(tokens.stroke.heavy)}
+      />
+      <SketchedShape
+        shape={{ kind: "path", d: "M330 550 H920 M340 550 v12 M910 550 v12" }}
+        profile={tokens.sketch.shape}
+        data-destination-bench="true"
+        stroke={tokens.color.line}
+        strokeWidth={scales.stroke(tokens.stroke.heavy)}
+      />
+    </>
   );
 }

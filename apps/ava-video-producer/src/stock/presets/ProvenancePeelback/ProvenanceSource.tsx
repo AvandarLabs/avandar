@@ -29,7 +29,6 @@ export function ProvenanceSource({
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
   const selected = source.id === input.selectedSourceId;
   const { x, y, height, angle } = getSourceSheetGeometryFromSelectionAndFrame({
     motion,
@@ -45,15 +44,10 @@ export function ProvenanceSource({
       transform={`translate(${x} ${y})`}
       opacity={motion.reveal(frame, 14 + index * motion.stagger.list)}
     >
-      <StockRect
-        x={0}
-        y={0}
-        width={400}
+      <SourceSheet
         height={height}
-        rx={scales.corner(3)}
-        fill={tokens.color.surface}
+        angle={angle}
         stroke={selected ? accent : tokens.color.line}
-        transform={`rotate(${angle} 200 ${height / 2})`}
       />
       <SourcePassageCopy
         source={source}
@@ -66,5 +60,27 @@ export function ProvenanceSource({
         <CitationUnderline source={source} frame={frame} accent={accent} />
       ) : undefined}
     </g>
+  );
+}
+
+/** The sheet itself, turned open by `angle` about its centre. */
+function SourceSheet({
+  height,
+  angle,
+  stroke,
+}: Readonly<{ height: number; angle: number; stroke: string }>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <StockRect
+      x={0}
+      y={0}
+      width={400}
+      height={height}
+      rx={scales.corner(3)}
+      fill={tokens.color.surface}
+      stroke={stroke}
+      transform={`rotate(${angle} 200 ${height / 2})`}
+    />
   );
 }

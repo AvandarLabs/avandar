@@ -29,8 +29,6 @@ export function SnapshotCell({
   columnIndex,
   snapshot,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
   const motion = useGraphicMotion();
   const scene = getSnapshotCellFromFrame({
     motion,
@@ -43,36 +41,69 @@ export function SnapshotCell({
   if (!scene.isVisible) {
     return undefined;
   }
-  const identity = `${scene.row.id}:${scene.column.id}`;
   return (
     <g opacity={snapshot ? scene.copyOpacity : 1}>
-      <StockRect
-        data-snapshot-cell={snapshot ? identity : undefined}
-        data-live-cell={!snapshot ? identity : undefined}
-        data-value={scene.value}
-        data-row-id={scene.row.id}
-        data-column-id={scene.column.id}
-        x={scene.x}
-        y={scene.y}
-        width={scene.width}
-        height={72}
-        fill={tokens.color.surface}
-        stroke={scene.selected ? accent : tokens.color.line}
-        strokeWidth={scales.stroke(
-          scene.selected
-            ? mix(
-                motion.ramp(
-                  frame,
-                  13 + (rowIndex + columnIndex) * motion.stagger.list,
-                  motion.scale(22),
-                ),
-                tokens.stroke.hairline,
-                tokens.stroke.default,
-              )
-            : tokens.stroke.hairline,
-        )}
+      <SnapshotCellFrame
+        scene={scene}
+        snapshot={snapshot}
+        frame={frame}
+        diagonal={rowIndex + columnIndex}
+        accent={accent}
       />
       <SnapshotCellText scene={scene} frame={frame} />
     </g>
+  );
+}
+
+type CellFrameProps = Readonly<{
+  scene: ReturnType<typeof getSnapshotCellFromFrame>;
+  snapshot: boolean;
+  frame: number;
+  diagonal: number;
+  accent: string;
+}>;
+
+/**
+ * The cell's frame, keyed as a live or snapshot copy. A selected cell's
+ * outline thickens on its diagonal stagger.
+ */
+function SnapshotCellFrame({
+  scene,
+  snapshot,
+  frame,
+  diagonal,
+  accent,
+}: CellFrameProps): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  const motion = useGraphicMotion();
+  const identity = `${scene.row.id}:${scene.column.id}`;
+  return (
+    <StockRect
+      data-snapshot-cell={snapshot ? identity : undefined}
+      data-live-cell={!snapshot ? identity : undefined}
+      data-value={scene.value}
+      data-row-id={scene.row.id}
+      data-column-id={scene.column.id}
+      x={scene.x}
+      y={scene.y}
+      width={scene.width}
+      height={72}
+      fill={tokens.color.surface}
+      stroke={scene.selected ? accent : tokens.color.line}
+      strokeWidth={scales.stroke(
+        scene.selected
+          ? mix(
+              motion.ramp(
+                frame,
+                13 + diagonal * motion.stagger.list,
+                motion.scale(22),
+              ),
+              tokens.stroke.hairline,
+              tokens.stroke.default,
+            )
+          : tokens.stroke.hairline,
+      )}
+    />
   );
 }

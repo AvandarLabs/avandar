@@ -7,6 +7,7 @@ import {
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { StatementContext } from "./StatementContext";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./QualifyApparentConflict.schema";
 import type { ReactNode } from "react";
 
@@ -28,15 +29,7 @@ export function ContextStatement({
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const scales = useGraphicShapeScales();
-  const arrival = motion.ramp(
-    frame,
-    12 + index * motion.scaleStagger(6),
-    motion.hero,
-  );
-  const split = motion.ramp(frame, 48, motion.scale(36), motion.travel.easing);
-  const x =
-    mix(split, index ? 680 : 280, index ? 710 : 250) +
-    mix(arrival, index ? 14 : -14, 0);
+  const { arrival, x } = _getStatementMotion(frame, index, motion);
   const contextY = placement === "above" ? 145 : 340;
   return (
     <g
@@ -65,4 +58,24 @@ export function ContextStatement({
       <StatementContext {...{ frame, accent, statement, index, contextY }} />
     </g>
   );
+}
+
+/** A statement arriving inward, then splitting outward from its partner. */
+function _getStatementMotion(
+  frame: number,
+  index: number,
+  motion: VideoMotion,
+) {
+  const arrival = motion.ramp(
+    frame,
+    12 + index * motion.scaleStagger(6),
+    motion.hero,
+  );
+  const split = motion.ramp(frame, 48, motion.scale(36), motion.travel.easing);
+  return {
+    arrival,
+    x:
+      mix(split, index ? 680 : 280, index ? 710 : 250) +
+      mix(arrival, index ? 14 : -14, 0),
+  };
 }

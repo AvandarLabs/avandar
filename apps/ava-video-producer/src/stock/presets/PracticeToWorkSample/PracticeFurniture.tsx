@@ -19,9 +19,7 @@ export function PracticeFurniture({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
   const transfer = motion.ramp(
     frame,
     56,
@@ -32,17 +30,7 @@ export function PracticeFurniture({
   const practiceY = mix(transfer, 270, 320);
   return (
     <g>
-      <g
-        data-practice-desk="true"
-        transform={`translate(${practiceX - 20} ${practiceY + 118})`}
-      >
-        <SketchedShape
-          shape={{ kind: "path", d: "M0 0 H260 M20 0 V55 M240 0 V55" }}
-          profile={tokens.sketch.shape}
-          stroke={tokens.color.line}
-          strokeWidth={scales.stroke(6)}
-        />
-      </g>
+      <PracticeDesk x={practiceX - 20} y={practiceY + 118} />
       <WorkshopBench transfer={transfer} />
       {input.showFirstArtifactAtHold || frame < 112 ? (
         <MeasuredArtifact
@@ -64,6 +52,22 @@ export function PracticeFurniture({
           accent={accent}
         />
       </g>
+    </g>
+  );
+}
+
+/** The practice desk, moving aside with the practice sheet. */
+function PracticeDesk({ x, y }: Readonly<{ x: number; y: number }>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <g data-practice-desk="true" transform={`translate(${x} ${y})`}>
+      <SketchedShape
+        shape={{ kind: "path", d: "M0 0 H260 M20 0 V55 M240 0 V55" }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.line}
+        strokeWidth={scales.stroke(6)}
+      />
     </g>
   );
 }

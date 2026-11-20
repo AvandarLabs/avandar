@@ -31,9 +31,6 @@ export function AreaSite({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const { stroke, sketch } = useGraphicTokens();
-  const shapes = useGraphicShapeScales();
   const motion = useGraphicMotion();
   const radius = Math.sqrt((site.value * input.areaPerUnit) / Math.PI),
     progress = motion.ramp(
@@ -59,23 +56,44 @@ export function AreaSite({
           />
         );
       })}
-      <SketchedShape
-        data-symbol={site.id}
-        data-area={site.value * input.areaPerUnit}
-        shape={{
-          kind: "circle",
-          cx: 48 + site.x * 4,
-          cy: 148 + site.y * 4,
-          r: radius,
-        }}
-        profile={sketch.shape}
-        fill={accent}
-        fillOpacity={progress === 1 ? atomic.opacity["55"] : 0}
-        stroke={accent}
-        strokeOpacity={progress}
-        strokeWidth={shapes.stroke(stroke.hairline)}
-      />
+      <SiteSymbol {...{ site, input, radius, progress, accent }} />
       <AreaSiteLabels {...{ site, index, input, accent }} />
     </g>
+  );
+}
+
+/** The site's circle of the same total area, filled once the tiles merge. */
+function SiteSymbol({
+  site,
+  input,
+  radius,
+  progress,
+  accent,
+}: Readonly<
+  Pick<Props, "site" | "input" | "accent"> & {
+    radius: number;
+    progress: number;
+  }
+>): ReactNode {
+  const { atomic } = useGraphicTheme();
+  const { stroke, sketch } = useGraphicTokens();
+  const shapes = useGraphicShapeScales();
+  return (
+    <SketchedShape
+      data-symbol={site.id}
+      data-area={site.value * input.areaPerUnit}
+      shape={{
+        kind: "circle",
+        cx: 48 + site.x * 4,
+        cy: 148 + site.y * 4,
+        r: radius,
+      }}
+      profile={sketch.shape}
+      fill={accent}
+      fillOpacity={progress === 1 ? atomic.opacity["55"] : 0}
+      stroke={accent}
+      strokeOpacity={progress}
+      strokeWidth={shapes.stroke(stroke.hairline)}
+    />
   );
 }

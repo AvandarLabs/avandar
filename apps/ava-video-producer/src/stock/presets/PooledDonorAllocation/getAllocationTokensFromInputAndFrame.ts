@@ -61,6 +61,54 @@ function _getPlacement({
   };
 }
 
+type AllocationTokensArgs = Readonly<{
+  input: Input;
+  frame: number;
+  motion: VideoMotion;
+}>;
+
+type Placement = ReturnType<typeof _getPlacement>;
+
+/** A credit tipping off its donor's tray, then across into the pool. */
+function _getPooledPoint(
+  token: Identity,
+  tray: ReturnType<typeof getDonorTrayFromInputAndFrame>,
+  placement: Placement,
+  pooling: number,
+) {
+  const sourceX = tray.x - 20 + (token.unitIndex * 32 + 20) * tray.cosine;
+  const sourceY = tray.y + (token.unitIndex * 32 + 20) * tray.sine;
+  return {
+    x: mix(Math.min(1, pooling * 2), sourceX, placement.poolX),
+    y: mix(Math.max(0, pooling * 2 - 1), sourceY, placement.poolY),
+  };
+}
+
+/** A carried credit descends to the corridor, then drops into its request. */
+function _getAllocatedY(
+  allocation: number,
+  y: number,
+  placement: Placement,
+): number {
+  if (allocation === 0) {
+    return y;
+  }
+  const descend = Math.min(1, allocation / 0.45);
+  const insert = Math.max(0, (allocation - 0.85) / 0.15);
+  return mix(insert, mix(descend, y, placement.corridorY), placement.targetY);
+}
+
+/** Who holds a credit: its donor, the pool, the coordinator, or a request. */
+function _getTokenOwner(allocation: number, pooling: number): string {
+  if (allocation === 1) {
+    return "request";
+  }
+  if (allocation > 0) {
+    return "coordinator";
+  }
+  return pooling === 1 ? "pool" : "donor";
+}
+
 /**
  * Every authored credit tips into the pool, then shares its request scoop's
  * rigid travel.
@@ -69,11 +117,7 @@ export function getAllocationTokensFromInputAndFrame({
   input,
   frame,
   motion,
-}: Readonly<{
-  input: Input;
-  frame: number;
-  motion: VideoMotion;
-}>): GetAllocationTokensResult[] {
+}: AllocationTokensArgs): GetAllocationTokensResult[] {
   const identities = getAllocationIdentitiesFromInput(input);
   return identities.map((token, index) => {
     const placement = _getPlacement({ input, identities, index });
@@ -89,10 +133,7 @@ export function getAllocationTokensFromInputAndFrame({
       motion.scale(20),
       motion.travel.easing,
     );
-    const sourceX = tray.x - 20 + (token.unitIndex * 32 + 20) * tray.cosine;
-    const sourceY = tray.y + (token.unitIndex * 32 + 20) * tray.sine;
-    const x = mix(Math.min(1, pooling * 2), sourceX, placement.poolX);
-    const y = mix(Math.max(0, pooling * 2 - 1), sourceY, placement.poolY);
+    const { x, y } = _getPooledPoint(token, tray, placement, pooling);
     const allocation =
       token.requestId === null
         ? 0
@@ -102,28 +143,12 @@ export function getAllocationTokensFromInputAndFrame({
             motion.scale(14),
             motion.travel.easing,
           );
-    const descend = Math.min(1, allocation / 0.45);
     const slide = Math.max(0, Math.min(1, (allocation - 0.45) / 0.4));
-    const insert = Math.max(0, (allocation - 0.85) / 0.15);
     return {
       ...token,
       x: mix(slide, x, placement.targetX),
-      y:
-        allocation === 0
-          ? y
-          : mix(
-              insert,
-              mix(descend, y, placement.corridorY),
-              placement.targetY,
-            ),
-      owner:
-        allocation === 1
-          ? "request"
-          : allocation > 0
-            ? "coordinator"
-            : pooling === 1
-              ? "pool"
-              : "donor",
+      y: _getAllocatedY(allocation, y, placement),
+      owner: _getTokenOwner(allocation, pooling),
       arrived: allocation === 1,
     };
   });

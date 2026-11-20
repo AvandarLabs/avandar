@@ -18,9 +18,6 @@ export function ProvenancePeelback({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
   const selected = input.sources.find(propEq("id", input.selectedSourceId))!;
   const remaining = input.sources.filter(
     propNotEq("id", input.selectedSourceId),
@@ -41,22 +38,47 @@ export function ProvenancePeelback({
         );
       })}
       <ProvenanceSummary input={input} frame={frame} accent={accent} />
-      <g
-        data-focal-citation="authored"
-        data-source-id={selected.id}
-        data-excerpt={selected.excerpt}
-        data-locator={input.showLocators ? selected.locator : undefined}
-        opacity={motion.ramp(frame, 82, motion.scale(22))}
-      >
-        <SketchedShape
-          shape={{ kind: "path", d: "M464 330H480V192H512" }}
-          profile={tokens.sketch.shape}
-          data-citation-link="selected-passage"
-          fill="none"
-          stroke={accent}
-          strokeWidth={scales.stroke(tokens.stroke.hairline)}
-        />
-      </g>
+      <FocalCitation
+        selected={selected}
+        showLocators={input.showLocators}
+        frame={frame}
+        accent={accent}
+      />
+    </g>
+  );
+}
+
+/** The link from the summary to the selected source's cited passage. */
+function FocalCitation({
+  selected,
+  showLocators,
+  frame,
+  accent,
+}: Readonly<{
+  selected: Input["sources"][number];
+  showLocators: boolean;
+  frame: number;
+  accent: string;
+}>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
+  return (
+    <g
+      data-focal-citation="authored"
+      data-source-id={selected.id}
+      data-excerpt={selected.excerpt}
+      data-locator={showLocators ? selected.locator : undefined}
+      opacity={motion.ramp(frame, 82, motion.scale(22))}
+    >
+      <SketchedShape
+        shape={{ kind: "path", d: "M464 330H480V192H512" }}
+        profile={tokens.sketch.shape}
+        data-citation-link="selected-passage"
+        fill="none"
+        stroke={accent}
+        strokeWidth={scales.stroke(tokens.stroke.hairline)}
+      />
     </g>
   );
 }

@@ -19,7 +19,6 @@ export function MeasuredStructure({
   accent,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
   const promisedWidth = input.specification.length * 65;
   const observedWidth = input.observation.length * 65;
   return (
@@ -43,28 +42,46 @@ export function MeasuredStructure({
         fill={input.structure === "low-wall" ? tokens.color.surface : accent}
         stroke={accent}
       />
-      {input.structure === "low-wall" ? (
-        <SketchedShape
-          shape={{
-            kind: "path",
-            d: `M200 305 H${200 + observedWidth} M200 335 H${200 + observedWidth}`,
-          }}
-          profile={tokens.sketch.shape}
-          stroke={accent}
-          opacity={tokens.alpha.dimmed}
-        />
-      ) : (
-        <SketchedShape
-          shape={{
-            kind: "path",
-            d: `M200 285 V360 M${200 + observedWidth} 285 V360`,
-          }}
-          profile={tokens.sketch.shape}
-          stroke={accent}
-          strokeWidth={scales.stroke(6)}
-        />
-      )}
+      <StructureDetail
+        isLowWall={input.structure === "low-wall"}
+        width={observedWidth}
+        accent={accent}
+      />
       <MeasurementRuler />
     </g>
+  );
+}
+
+/** Courses across a low wall, or posts at both ends of anything else. */
+function StructureDetail({
+  isLowWall,
+  width,
+  accent,
+}: Readonly<{ isLowWall: boolean; width: number; accent: string }>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  if (isLowWall) {
+    return (
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M200 305 H${200 + width} M200 335 H${200 + width}`,
+        }}
+        profile={tokens.sketch.shape}
+        stroke={accent}
+        opacity={tokens.alpha.dimmed}
+      />
+    );
+  }
+  return (
+    <SketchedShape
+      shape={{
+        kind: "path",
+        d: `M200 285 V360 M${200 + width} 285 V360`,
+      }}
+      profile={tokens.sketch.shape}
+      stroke={accent}
+      strokeWidth={scales.stroke(6)}
+    />
   );
 }

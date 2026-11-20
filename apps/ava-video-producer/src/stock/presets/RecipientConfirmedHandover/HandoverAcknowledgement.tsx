@@ -19,9 +19,7 @@ export function HandoverAcknowledgement({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
   return (
     <g
       opacity={motion.reveal(frame, 114)}
@@ -37,26 +35,39 @@ export function HandoverAcknowledgement({
         normalizeWhitespace
         breakLongWords
       />
-      {input.acknowledgementMark === "initials" ? (
-        <FitText
-          text={input.initialsText}
-          x={860}
-          y={552}
-          width={60}
-          fontSize={14}
-          maxLines={1}
-          normalizeWhitespace
-          breakLongWords
-        />
-      ) : (
-        <SketchedShape
-          shape={{ kind: "path", d: "M875 542 l9 8 l17 -18" }}
-          profile={tokens.sketch.shape}
-          stroke={accent}
-          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
-          fill="none"
-        />
-      )}
+      <AcknowledgementMark input={input} accent={accent} />
     </g>
+  );
+}
+
+/** The recipient's initials, or a tick when no initials are authored. */
+function AcknowledgementMark({
+  input,
+  accent,
+}: Readonly<Omit<Props, "frame">>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  if (input.acknowledgementMark === "initials") {
+    return (
+      <FitText
+        text={input.initialsText}
+        x={860}
+        y={552}
+        width={60}
+        fontSize={14}
+        maxLines={1}
+        normalizeWhitespace
+        breakLongWords
+      />
+    );
+  }
+  return (
+    <SketchedShape
+      shape={{ kind: "path", d: "M875 542 l9 8 l17 -18" }}
+      profile={tokens.sketch.shape}
+      stroke={accent}
+      strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+      fill="none"
+    />
   );
 }

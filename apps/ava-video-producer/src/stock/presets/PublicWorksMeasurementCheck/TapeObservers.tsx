@@ -15,7 +15,6 @@ export function TapeObservers({
   endX,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   return (
@@ -29,39 +28,77 @@ export function TapeObservers({
         />
       </g>
       {input.observers.map((observer, index) => {
-        const handX = index === 0 ? 200 : endX;
-        const personX = handX + (index === 0 ? -30 : 30);
         return (
-          <g key={observer.id} data-observer={observer.id}>
-            <PersonGlyph x={personX} y={421} color={accent} />
-            <g data-tape-hand={observer.id}>
-              <SketchedShape
-                shape={{
-                  kind: "line",
-                  x1: personX,
-                  y1: 421,
-                  x2: handX,
-                  y2: 386,
-                }}
-                profile={tokens.sketch.shape}
-                stroke={accent}
-                strokeWidth={scales.stroke(tokens.stroke.emphasis)}
-              />
-            </g>
-            <circle cx={handX} cy={386} r={4} fill={accent} />
-            <SketchedShape
-              shape={{
-                kind: "path",
-                d: `M${personX} 452 V468 H${index === 0 ? 100 : 550} V480`,
-              }}
-              profile={tokens.sketch.shape}
-              stroke={accent}
-              opacity={atomic.opacity["35"]}
-              fill="none"
-            />
-          </g>
+          <TapeObserver
+            key={observer.id}
+            observerId={observer.id}
+            index={index}
+            endX={endX}
+            accent={accent}
+          />
         );
       })}
     </g>
+  );
+}
+
+/** One observer holding a tape end, with a leader down to their name. */
+function TapeObserver({
+  observerId,
+  index,
+  endX,
+  accent,
+}: Readonly<{
+  observerId: string;
+  index: number;
+  endX: number;
+  accent: string;
+}>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  const handX = index === 0 ? 200 : endX;
+  const personX = handX + (index === 0 ? -30 : 30);
+  return (
+    <g data-observer={observerId}>
+      <PersonGlyph x={personX} y={421} color={accent} />
+      <g data-tape-hand={observerId}>
+        <SketchedShape
+          shape={{
+            kind: "line",
+            x1: personX,
+            y1: 421,
+            x2: handX,
+            y2: 386,
+          }}
+          profile={tokens.sketch.shape}
+          stroke={accent}
+          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+        />
+      </g>
+      <circle cx={handX} cy={386} r={4} fill={accent} />
+      <ObserverLeader personX={personX} index={index} accent={accent} />
+    </g>
+  );
+}
+
+/** The faint leader from an observer down to their name. */
+function ObserverLeader({
+  personX,
+  index,
+  accent,
+}: Readonly<{ personX: number; index: number; accent: string }>): ReactNode {
+  const { atomic } = useGraphicTheme();
+  const tokens = useGraphicTokens();
+  return (
+    <SketchedShape
+      shape={{
+        kind: "path",
+        d: `M${personX} 452 V468 H${index === 0 ? 100 : 550} V480`,
+      }}
+      profile={tokens.sketch.shape}
+      stroke={accent}
+      opacity={atomic.opacity["35"]}
+      fill="none"
+    />
   );
 }

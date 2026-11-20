@@ -45,19 +45,28 @@ export function ConversationPartition({
           stroke={tokens.color.accentAlt}
         />
       ) : (
-        <g data-separator-shape="door">
-          <SketchedShape
-            shape={{
-              kind: "path",
-              d: `M623 310 L${623 + 90 * (1 - closure)} ${310 + 140 * closure} L${631 + 90 * (1 - closure)} ${310 + 140 * closure} L631 310 Z`,
-            }}
-            profile={tokens.sketch.shape}
-            fill={tokens.color.surface}
-            stroke={tokens.color.accentAlt}
-            strokeWidth={scales.stroke(tokens.stroke.default)}
-          />
-        </g>
+        <ClosingDoor closure={closure} />
       )}
+    </g>
+  );
+}
+
+/** A door swinging shut across the doorway. */
+function ClosingDoor({ closure }: Readonly<{ closure: number }>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <g data-separator-shape="door">
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M623 310 L${623 + 90 * (1 - closure)} ${310 + 140 * closure} L${631 + 90 * (1 - closure)} ${310 + 140 * closure} L631 310 Z`,
+        }}
+        profile={tokens.sketch.shape}
+        fill={tokens.color.surface}
+        stroke={tokens.color.accentAlt}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
+      />
     </g>
   );
 }

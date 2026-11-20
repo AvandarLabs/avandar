@@ -4,6 +4,7 @@ import {
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { getHandoverPositionFromInputAndFrame } from "./getHandoverPositionFromInputAndFrame";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./RecipientConfirmedHandover.schema";
 import type { ReactNode } from "react";
 
@@ -21,20 +22,7 @@ export function HandoverReceiptRow({
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const content = input.contents[index];
-  const received = Array.from(
-    { length: content.selectedUnits },
-    (_, unitIndex) => {
-      return getHandoverPositionFromInputAndFrame({
-        input,
-        frame,
-        contentIndex: index,
-        unitIndex,
-        motion,
-      });
-    },
-  ).filter(({ travel }) => {
-    return travel === 1;
-  }).length;
+  const received = _countReceivedUnits({ input, frame, index, motion });
   return (
     <g data-receipt={content.id} data-selected={received}>
       <FitText
@@ -60,4 +48,29 @@ export function HandoverReceiptRow({
       </text>
     </g>
   );
+}
+
+/** How many selected units of a good have completed their pull. */
+function _countReceivedUnits({
+  input,
+  frame,
+  index,
+  motion,
+}: Readonly<
+  Pick<Props, "input" | "frame" | "index"> & { motion: VideoMotion }
+>): number {
+  return Array.from(
+    { length: input.contents[index].selectedUnits },
+    (_, unitIndex) => {
+      return getHandoverPositionFromInputAndFrame({
+        input,
+        frame,
+        contentIndex: index,
+        unitIndex,
+        motion,
+      });
+    },
+  ).filter(({ travel }) => {
+    return travel === 1;
+  }).length;
 }

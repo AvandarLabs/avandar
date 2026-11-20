@@ -31,7 +31,6 @@ export function MeasuredArtifact({
   isPractice,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   const material = isPractice ? "sheet" : input.workpieces.material;
@@ -45,6 +44,26 @@ export function MeasuredArtifact({
         stroke={isPractice ? tokens.color.text : tokens.color.highlight}
         strokeWidth={scales.stroke(tokens.stroke.default)}
       />
+      <MaterialTexture material={material} />
+      <MeasurementMark
+        input={input}
+        progress={progress}
+        isPractice={isPractice}
+        accent={accent}
+      />
+      <AlignmentGuides input={input} />
+    </g>
+  );
+}
+
+/** Wood grain or a fabric seam allowance; a plain sheet has neither. */
+function MaterialTexture({
+  material,
+}: Readonly<{ material: string }>): ReactNode {
+  const { atomic } = useGraphicTheme();
+  const tokens = useGraphicTokens();
+  return (
+    <>
       {material === "wood" ? (
         <SketchedShape
           shape={{
@@ -66,13 +85,6 @@ export function MeasuredArtifact({
           strokeDasharray={tokens.dash.guide.join(" ")}
         />
       ) : undefined}
-      <MeasurementMark
-        input={input}
-        progress={progress}
-        isPractice={isPractice}
-        accent={accent}
-      />
-      <AlignmentGuides input={input} />
-    </g>
+    </>
   );
 }

@@ -47,16 +47,25 @@ export function MeasurementMark({
         strokeWidth={scales.stroke(tokens.stroke.default)}
         opacity={progress}
       />
-      <FitText
-        text={`${input.task.value} ${input.task.unit}`}
-        x={30}
-        y={95}
-        width={180}
-        fontSize={14}
-        maxLines={1}
-        normalizeWhitespace
-        breakLongWords
-      />
+      <MeasurementLabel task={input.task} />
     </g>
   ) : undefined;
+}
+
+/** The measured value and its unit, under the mark. */
+function MeasurementLabel({
+  task,
+}: Readonly<{ task: Input["task"] }>): ReactNode {
+  return (
+    <FitText
+      text={`${task.value} ${task.unit}`}
+      x={30}
+      y={95}
+      width={180}
+      fontSize={14}
+      maxLines={1}
+      normalizeWhitespace
+      breakLongWords
+    />
+  );
 }
