@@ -8,28 +8,39 @@
 # Usage:
 #   bash scripts/alpha/importCatalogData.sh <target-db-url> <dump.sql> \
 #     [--dry-run] [--yes-i-know-the-target <user@host>] \
+#     [--rewrite-storage-host <source-storage-host> <target-storage-host>] \
 #     [--replace-existing --backup-file <backup.sql> \
 #      [--yes-i-know-the-cascade <rows>]]
 #
-# <target-db-url> is the target's `postgres` connection string, in URL form
-# (postgresql://<user>:<password>@<host>:<port>/postgres), with no `host`,
-# `hostaddr`, `service`, `dbname`, or `user` query parameter. The `postgres`
-# role owns the catalog tables and the facet count refresh function.
+# <target-db-url> is the target's `postgres` connection string, exactly
+# postgresql://<user>:<percent-encoded password>@<host>:<port>/postgres,
+# optionally followed by ?sslmode=require (or verify-ca, verify-full) and
+# nothing else, on the direct host or the session pooler. Port 6543, the
+# transaction pooler, is refused. The `postgres` role owns the catalog tables
+# and the facet count refresh function. Every PG* variable that could point
+# libpq elsewhere is unset first, so the URL alone decides the target.
 #
 # Before it writes anything, the script:
-#   - refuses a psql older than 15;
-#   - refuses a missing or empty dump, and a dump that holds anything but
-#     `COPY` rows for the tables in catalogTables.sh, and loads a private copy
-#     of the dump it checked;
-#   - prints the target's user, host, and database (never the password), the
-#     rows the dump holds, and a read-only report of the target: its row
-#     counts, the listing ids the dump would drop, every foreign key outside
-#     the catalog that a delete of the catalog would reach, and the
-#     `public.datasets` rows that would be left with no open data details;
+#   - refuses a psql older than 15.14, 16.10, 17.6, or 18;
+#   - refuses a missing, empty, or cut-short dump, and a dump that holds
+#     anything but `COPY` rows for the tables in catalogTables.sh, and loads
+#     a private copy of the dump it checked;
+#   - prints the target's user and host (never the password), the rows the
+#     dump holds, the Storage hosts its listings link to, and a read-only
+#     report of the target: its row counts, the listing ids the dump would
+#     drop, every foreign key outside the catalog that a delete of the
+#     catalog would reach, and the `public.datasets` rows that would be left
+#     with no open data details;
 #   - asks you to type the target's `<user>@<host>`, or takes it from
 #     `--yes-i-know-the-target`, and refuses on any mismatch. The user is part
 #     of it because a Supabase pooler host is shared by every project, and
 #     only the pooler user (`postgres.<project-ref>`) names the project.
+#
+# A listing's `canonical_urls` carry the public URL of its Parquet object in
+# the source project's Storage. When the dump has any, the import needs
+# `--rewrite-storage-host <source> <target>`, and rewrites them to the target
+# project's Storage inside the transaction, refusing to commit while any
+# listing still mentions the source host.
 #
 # By default it refuses a target whose catalog tables hold any row. With
 # `--replace-existing` it deletes them first, children first, in the same
@@ -37,11 +48,16 @@
 # deletes or changes every dependent row the report lists, so it also:
 #   - refuses when a restricting foreign key has rows that would block it;
 #   - needs `--backup-file`, a pg_dump data-only dump made in the last 24
-#     hours of the catalog, the facet counts, and every dependent table, whose
-#     row counts match the target's (the refusal prints the command that makes
-#     one, and the script prints how to restore it);
+#     hours of the catalog, the facet counts, and every dependent table, and
+#     nothing else, whose row counts and ids match the target's (the refusal
+#     prints the command that makes one, and the script prints how to
+#     restore it);
 #   - asks you to type `delete <N> dependent rows`, or takes N from
 #     `--yes-i-know-the-cascade`, and checks N again inside the transaction.
+#
+# Inside the transaction, each lock waits at most 10 seconds, and every
+# catalog table must hold exactly the dump's rows before `commit`. Any error
+# rolls the whole transaction back.
 #
 # `--dry-run` prints the report and the plan, then exits 0 without writing.
 # Row counts are printed before and after the import, and after a failed one
@@ -51,13 +67,23 @@
 #-------------------------------------------------------------------------------
 set -euo pipefail
 
+# libpq reads these before the URL, and PGHOSTADDR or a service file can send
+# psql to a host other than the one the confirmation names.
+unset PGHOST PGHOSTADDR PGPORT PGDATABASE PGUSER PGPASSFILE PGSERVICE \
+  PGSERVICEFILE PGSYSCONFDIR PGOPTIONS PGTARGETSESSIONATTRS PGSSLMODE \
+  PGREQUIRESSL
+
 TARGET_FLAG="--yes-i-know-the-target"
 CASCADE_FLAG="--yes-i-know-the-cascade"
-USAGE="Usage: importCatalogData.sh <target-db-url> <dump.sql> [--dry-run] [$TARGET_FLAG <user@host>] [--replace-existing --backup-file <backup.sql> [$CASCADE_FLAG <rows>]]"
+REWRITE_FLAG="--rewrite-storage-host"
+USAGE="Usage: importCatalogData.sh <target-db-url> <dump.sql> [--dry-run] [$TARGET_FLAG <user@host>] [$REWRITE_FLAG <source-host> <target-host>] [--replace-existing --backup-file <backup.sql> [$CASCADE_FLAG <rows>]]"
+TARGET_URL_PATTERN='^postgres(ql)?://([A-Za-z0-9._-]+)(:[^@/?#]*)?@([A-Za-z0-9.-]+)(:([0-9]+))?/postgres(\?sslmode=(require|verify-ca|verify-full))?$'
+STORAGE_HOST_PATTERN='^[A-Za-z0-9.-]+(:[0-9]+)?$'
 PSQL_BIN="${PSQL_BIN:-psql}"
 NEW_PSQL="/opt/homebrew/opt/libpq@18/bin/psql"
 FIELD_SEPARATOR=$'\x1f'
 OPEN_DATA_TABLE="public.datasets__open_data"
+LOCK_TIMEOUT="10s"
 # How many missing listing ids the report prints before summarizing.
 MAX_LISTED_IDS=50
 
@@ -67,6 +93,8 @@ source "$(dirname "${BASH_SOURCE[0]}")/catalogTables.sh"
 IS_DRY_RUN=false
 IS_REPLACE=false
 BACKUP_FILE=""
+REWRITE_SOURCE_HOST=""
+REWRITE_TARGET_HOST=""
 WORK_DIR=""
 LOAD_FILE=""
 DEPENDENT_TABLES=()
@@ -76,6 +104,7 @@ SET_NULL_TABLES=""
 BLOCKING_DEPENDENTS=""
 ORPHAN_SUMMARY=""
 TARGET_HAS_ROWS=false
+TARGET_LISTING_IDS=""
 LAST_COUNTS=""
 BEFORE_COUNTS=""
 
@@ -91,61 +120,68 @@ cleanup() {
 }
 trap cleanup EXIT
 
-# Prints one part of a postgres:// URL: user, host, database, or query.
-# Never prints the password.
-url_part() {
-  local rest="${2#*://}"
-  local credentials="${rest%@*}"
-  local location="${rest##*@}"
-  [[ "$rest" == *@* ]] || credentials=""
-  case "$1" in
-    user) echo "${credentials%%:*}" ;;
-    host) location="${location%%[/?]*}" && echo "${location%%:*}" ;;
-    query) [[ "$location" != *\?* ]] || echo "${location#*\?}" ;;
-    database)
-      location="${location%%\?*}"
-      [[ "$location" == */* ]] || return 0
-      echo "${location#*/}"
-      ;;
-  esac
-}
-
-# Refuses a URL that could make libpq connect somewhere other than the
-# `<user>@<host>` the confirmation names.
+# Reads the user, host, and port from the whole URL with one anchored
+# pattern, so the script and libpq cannot see different hosts in it.
 check_target_url() {
-  [[ "$TARGET_DB_URL" =~ ^postgres(ql)?:// ]] || fail "the target must be a postgres:// URL."
-  local query user host
-  query="$(url_part query "$TARGET_DB_URL")"
-  if [[ "&$query" =~ \&(host|hostaddr|service|dbname|user)= ]]; then
-    fail "the URL's query sets ${BASH_REMATCH[1]}, which could connect somewhere else. Put it in the URL itself."
-  fi
-  user="$(url_part user "$TARGET_DB_URL")"
-  host="$(url_part host "$TARGET_DB_URL")"
-  [[ "$user" =~ ^[A-Za-z0-9._-]+$ ]] || fail "the URL must name a plain user."
-  [[ "$host" =~ ^[A-Za-z0-9.-]+$ ]] ||
-    fail "the URL's host must be one plain hostname or IPv4 address. IPv6 and several hosts are not supported."
-  TARGET_ID="$user@$host"
+  [[ "$TARGET_DB_URL" =~ $TARGET_URL_PATTERN ]] ||
+    fail "the target URL must be exactly postgresql://<user>:<percent-encoded password>@<host>:<port>/postgres, optionally with ?sslmode=require, verify-ca, or verify-full, and nothing else."
+  TARGET_USER="${BASH_REMATCH[2]}"
+  TARGET_HOST="${BASH_REMATCH[4]}"
+  local port="${BASH_REMATCH[6]:-5432}"
+  [[ "$port" != 6543 ]] ||
+    fail "port 6543 is the transaction pooler, where the dump's session settings would leak onto other clients' connections. Use the direct host or the session pooler on 5432."
+  TARGET_ID="$TARGET_USER@$TARGET_HOST"
 }
 
-# psql before 15 can commit a `--single-transaction` script after a
-# client-side error. The import carries its own `begin` and `commit`, so it
-# does not depend on that, and this check keeps an old psql out as a second
-# guard.
+# The Storage host of a Supabase target, from the direct host
+# (`db.<ref>.supabase.co`) or the pooler user (`postgres.<ref>`), or
+# nothing when the URL does not name a project ref.
+expected_storage_host() {
+  if [[ "$TARGET_HOST" =~ ^db\.([a-z0-9-]+)\.supabase\.co$ ]] ||
+    [[ "$TARGET_USER" =~ ^postgres\.([a-z0-9-]+)$ ]]; then
+    echo "${BASH_REMATCH[1]}.supabase.co"
+  fi
+}
+
+check_rewrite_hosts() {
+  [[ -n "$REWRITE_SOURCE_HOST" ]] || return 0
+  [[ "$REWRITE_SOURCE_HOST" =~ $STORAGE_HOST_PATTERN && "$REWRITE_TARGET_HOST" =~ $STORAGE_HOST_PATTERN ]] ||
+    fail "$REWRITE_FLAG takes two plain hosts, such as <ref>.supabase.co."
+  [[ "$REWRITE_SOURCE_HOST" != "$REWRITE_TARGET_HOST" ]] || fail "$REWRITE_FLAG names the same host twice."
+  local expected
+  expected="$(expected_storage_host)"
+  if [[ -n "$expected" && "$REWRITE_TARGET_HOST" != "$expected" ]]; then
+    fail "$REWRITE_FLAG rewrites to $REWRITE_TARGET_HOST, but the target's Storage is $expected."
+  fi
+}
+
+# psql must know pg_dump 18's `\restrict`, which arrived in 15.14, 16.10,
+# 17.6, and 18. psql before 15 can also commit a `--single-transaction`
+# script after a client-side error. The import carries its own `begin` and
+# `commit`, so it does not depend on that, and this check is a second guard.
 check_psql_version() {
-  local version_line major
+  local version_line major minor minimum
   version_line="$("$PSQL_BIN" --version)" || fail "cannot run $PSQL_BIN."
-  major="$(awk '{ for (i = 1; i <= NF; i++) if ($i ~ /^[0-9]+(\.[0-9]+)*$/) { split($i, parts, "."); print parts[1]; exit } }' <<<"$version_line")"
-  if [[ -z "$major" ]] || ((major < 15)); then
-    fail "psql 15 or newer is needed, found '$version_line'. Run with PSQL_BIN=$NEW_PSQL."
+  read -r major minor <<<"$(awk '{ for (i = 1; i <= NF; i++) if ($i ~ /^[0-9]+(\.[0-9]+)*$/) { split($i, parts, "."); print parts[1], parts[2] + 0; exit } }' <<<"$version_line")"
+  case "${major:-0}" in
+    15) minimum=14 ;;
+    16) minimum=10 ;;
+    17) minimum=6 ;;
+    *) minimum=0 ;;
+  esac
+  if ((${major:-0} < 15 || ${minor:-0} < minimum)); then
+    fail "psql 15.14, 16.10, 17.6, 18, or newer is needed, found '$version_line'. Run with PSQL_BIN=$NEW_PSQL."
   fi
 }
 
 # Runs one query in a read-only transaction and prints its rows, unaligned,
 # with fields separated by FIELD_SEPARATOR. One transaction per call, so it
-# also stays read-only through a transaction pooler.
+# also stays read-only through a pooler, and it waits at most LOCK_TIMEOUT
+# for a lock another session holds.
 read_target() {
   "$PSQL_BIN" "$TARGET_DB_URL" -X -q -t -A -F "$FIELD_SEPARATOR" \
-    -v ON_ERROR_STOP=1 -1 -c "set transaction read only" -c "$1"
+    -v ON_ERROR_STOP=1 -1 -c "set transaction read only" \
+    -c "set local lock_timeout = '$LOCK_TIMEOUT'" -c "$1"
 }
 
 target_row_count() {
@@ -164,6 +200,10 @@ parse_args() {
           --backup-file) BACKUP_FILE="$2" ;;
         esac
         shift 2
+        ;;
+      "$REWRITE_FLAG")
+        [[ $# -ge 3 ]] || fail "$1 needs a source and a target host. $USAGE"
+        REWRITE_SOURCE_HOST="$2" && REWRITE_TARGET_HOST="$3" && shift 3
         ;;
       --replace-existing) IS_REPLACE=true && shift ;;
       --dry-run) IS_DRY_RUN=true && shift ;;
@@ -191,10 +231,12 @@ prepare_dump() {
   WORK_DIR="$(mktemp -d)"
   LOAD_FILE="$(absolute_path "$WORK_DIR/catalog.sql")"
   cp "$DUMP_FILE" "$LOAD_FILE"
-  local unexpected_lines table
-  unexpected_lines="$(print_unexpected_dump_lines "$LOAD_FILE")"
-  if [[ -n "$unexpected_lines" ]]; then
-    echo "$unexpected_lines" >&2
+  local problems table
+  problems="$(print_dump_completeness_problems "$LOAD_FILE")"
+  [[ -z "$problems" ]] || fail "$DUMP_FILE looks cut short: $(echo "$problems" | paste -s -d ';' -)."
+  problems="$(print_unexpected_dump_lines "$LOAD_FILE")"
+  if [[ -n "$problems" ]]; then
+    echo "$problems" >&2
     fail "$DUMP_FILE holds more than catalog rows (lines above)."
   fi
   for table in "${CATALOG_TABLES[@]}"; do
@@ -270,6 +312,7 @@ action_label() {
 # block become a blocker.
 record_dependent() {
   local depth="$1" child="$2" columns="$3" parent="$4" action="$5" rows="$6" count_query="$7"
+  [[ "$rows" =~ ^[0-9]+$ ]] || fail "could not count the rows $child would lose."
   local line
   line="  $child.($columns) -> $parent: $(action_label "$action")"
   case "$action" in
@@ -294,7 +337,7 @@ record_dependent() {
 }
 
 report_dependents() {
-  local rows depth child columns parent action affected_sql count_query
+  local rows depth child columns parent action affected_sql count_query affected_rows
   rows="$(read_target "$(dependents_query)")"
   echo "Foreign keys outside the catalog that deleting the catalog reaches:"
   if [[ -z "$rows" ]]; then
@@ -303,36 +346,45 @@ report_dependents() {
   fi
   while IFS="$FIELD_SEPARATOR" read -r -u 3 depth child columns parent action affected_sql; do
     count_query="select count(*) from ($affected_sql) as affected"
+    affected_rows="$(read_target "$count_query")"
     record_dependent "$depth" "$child" "$columns" "$parent" "$action" \
-      "$(read_target "$count_query")" "$count_query"
+      "$affected_rows" "$count_query"
   done 3<<<"$rows"
   echo "  The delete deletes or changes $DEPENDENT_ROW_COUNT dependent rows, even for listings the dump brings back under the same id."
+}
+
+# Prints "<datasets> public.datasets rows in <workspaces> workspaces" from a
+# query that returns those two counts, or fails when the query does.
+orphan_summary() {
+  local result datasets workspaces
+  result="$(read_target "$1")"
+  IFS="$FIELD_SEPARATOR" read -r datasets workspaces <<<"$result"
+  [[ "$datasets" =~ ^[0-9]+$ && "$workspaces" =~ ^[0-9]+$ ]] ||
+    fail "could not count the datasets the cascade orphans."
+  echo "$datasets public.datasets rows in $workspaces workspaces"
 }
 
 # Says how many `public.datasets` rows the cascade on `datasets__open_data`
 # leaves behind with no open data details, and in how many workspaces.
 report_orphaned_datasets() {
   [[ " ${DEPENDENT_TABLES[*]:-} " == *" $OPEN_DATA_TABLE "* ]] || return 0
-  local datasets workspaces
-  IFS="$FIELD_SEPARATOR" read -r datasets workspaces <<<"$(read_target \
+  ORPHAN_SUMMARY="$(orphan_summary \
     "select count(distinct dataset_id), count(distinct workspace_id) from $OPEN_DATA_TABLE")"
-  ORPHAN_SUMMARY="$datasets public.datasets rows in $workspaces workspaces"
   echo "  The cascade leaves $ORPHAN_SUMMARY with no open data details: users' catalog datasets stay listed but can no longer load."
 }
 
 report_orphans_after() {
   [[ -n "$ORPHAN_SUMMARY" ]] || return 0
-  local datasets workspaces
-  IFS="$FIELD_SEPARATOR" read -r datasets workspaces <<<"$(read_target \
-    "select count(*), count(distinct workspace_id) from public.datasets dataset where dataset.source_type = 'open_data' and not exists (select 1 from $OPEN_DATA_TABLE open_data where open_data.dataset_id = dataset.id)")"
-  echo "$datasets open data public.datasets rows in $workspaces workspaces now have no open data details."
+  local summary
+  summary="$(orphan_summary "select count(*), count(distinct workspace_id) from public.datasets dataset where dataset.source_type = 'open_data' and not exists (select 1 from $OPEN_DATA_TABLE open_data where open_data.dataset_id = dataset.id)")"
+  echo "Open data datasets with no open data details now: $summary."
 }
 
 report_missing_listing_ids() {
-  local target_ids missing_ids missing_count
-  target_ids="$(read_target "select id from public.data_catalog_listings order by id")"
-  missing_ids="$(LC_ALL=C comm -23 <(printf '%s\n' "$target_ids" | sed '/^$/d' | LC_ALL=C sort) \
-    <(print_dump_listing_ids "$LOAD_FILE" | LC_ALL=C sort))"
+  local missing_ids missing_count
+  TARGET_LISTING_IDS="$(read_target "select id::text from public.data_catalog_listings order by 1")"
+  missing_ids="$(LC_ALL=C comm -23 <(printf '%s\n' "$TARGET_LISTING_IDS" | sed '/^$/d' | LC_ALL=C sort) \
+    <(print_dump_column "$LOAD_FILE" public.data_catalog_listings id | LC_ALL=C sort))"
   missing_count="$(printf '%s' "$missing_ids" | grep -c . || true)"
   if [[ "$missing_count" == "0" ]]; then
     echo "Every listing id in the target is in the dump."
@@ -343,6 +395,17 @@ report_missing_listing_ids() {
   if ((missing_count > MAX_LISTED_IDS)); then
     echo "  ...and $((missing_count - MAX_LISTED_IDS)) more."
   fi
+}
+
+report_storage_hosts() {
+  local hosts
+  hosts="$(print_dump_storage_hosts "$LOAD_FILE")"
+  echo "Listings in the dump that link to Supabase Storage, by host:"
+  if [[ -z "$hosts" ]]; then
+    echo "  none"
+    return 0
+  fi
+  printf '%s\n' "$hosts" | awk '{ print "  " $1 ": " $2 " listings" }'
 }
 
 # Prints the row counts of the catalog, the facet counts, and every dependent
@@ -364,11 +427,12 @@ print_target_counts() {
 
 report() {
   local table
-  echo "Target: $TARGET_ID, database $(url_part database "$TARGET_DB_URL")"
+  echo "Target: $TARGET_ID, database postgres"
   echo "The dump holds, per table:"
   for table in "${CATALOG_TABLES[@]}"; do
     echo "  $table: $(count_dump_rows "$LOAD_FILE" "$table")"
   done
+  report_storage_hosts
   report_dependents
   report_orphaned_datasets
   print_target_counts "The target holds, per table:"
@@ -383,9 +447,26 @@ backup_tables() {
 fail_backup() {
   echo "Make the backup with a pg_dump at least as new as the target's server, such as /opt/homebrew/opt/libpq@18/bin/pg_dump:" >&2
   # shellcheck disable=SC2016 # The variable is for the reader to fill in.
-  printf '  pg_dump "$TARGET_DB_URL" --data-only --no-owner --no-privileges %s--file catalog-backup.sql\n' \
-    "$(backup_tables | sed "s/.*/--table '&'/" | tr '\n' ' ')" >&2
+  printf '  pg_dump "$TARGET_DB_URL" --data-only --no-owner --no-privileges %s--file %s\n' \
+    "$(backup_tables | sed "s/.*/--table '&'/" | tr '\n' ' ')" \
+    "'catalog-backup-$TARGET_HOST-$(date +%Y%m%d-%H%M).sql'" >&2
   fail "$1"
+}
+
+# Prints the ids a target table holds and the ids the backup holds for it,
+# sorted, and fails when they differ. Tables with no `id` column are skipped.
+check_backup_ids() {
+  local table="$1" has_id target_ids backup_ids
+  has_id="$(read_target "select count(*) from pg_attribute where attrelid = '$table'::regclass and attname = 'id' and not attisdropped")"
+  [[ "$has_id" == "1" ]] || return 0
+  if [[ "$table" == public.data_catalog_listings ]]; then
+    target_ids="$TARGET_LISTING_IDS"
+  else
+    target_ids="$(read_target "select id::text from $table order by 1")"
+  fi
+  backup_ids="$(print_dump_column "$BACKUP_FILE" "$table" id | LC_ALL=C sort)"
+  [[ "$(printf '%s\n' "$target_ids" | sed '/^$/d' | LC_ALL=C sort)" == "$(printf '%s\n' "$backup_ids" | sed '/^$/d')" ]] ||
+    fail_backup "$BACKUP_FILE holds other $table ids than the target. Make a fresh backup."
 }
 
 check_backup() {
@@ -395,6 +476,9 @@ check_backup() {
   awk 'NR <= 5 && /PostgreSQL database dump/ { found = 1 } END { exit !found }' "$BACKUP_FILE" ||
     fail_backup "$BACKUP_FILE is not a pg_dump dump."
   ! grep -q '^CREATE ' "$BACKUP_FILE" || fail_backup "$BACKUP_FILE is not a data-only dump."
+  local extra_table
+  extra_table="$(awk '$1 == "COPY" { print $2 }' "$BACKUP_FILE" | grep -vxF -f <(backup_tables) | head -n 1 || true)"
+  [[ -z "$extra_table" ]] || fail_backup "$BACKUP_FILE also holds $extra_table, which this import does not touch."
   local table expected actual
   while read -r table expected; do
     [[ -n "$table" ]] || continue
@@ -402,6 +486,7 @@ check_backup() {
     actual="$(count_dump_rows "$BACKUP_FILE" "$table")"
     [[ "$actual" == "$expected" ]] ||
       fail_backup "$BACKUP_FILE holds $actual rows of $table, but the target holds $expected. Make a fresh backup."
+    check_backup_ids "$table"
   done <<<"$BEFORE_COUNTS"
 }
 
@@ -419,7 +504,7 @@ print_restore_steps() {
   echo "       \\i '$backup_path'"
   echo "       commit;"
   # shellcheck disable=SC2016 # The variable is for the reader to fill in.
-  echo '  3. Run it with psql 15 or newer: psql "$TARGET_DB_URL" -X -v ON_ERROR_STOP=1 --file restore.sql'
+  echo '  3. Run it with psql 15.14 or newer: psql "$TARGET_DB_URL" -X -v ON_ERROR_STOP=1 --file restore.sql'
   if [[ -n "$SET_NULL_TABLES" ]]; then
     echo "  The delete only nulls rows of: $SET_NULL_TABLES. Their backup rows cannot load over them, so restore those columns by hand."
   fi
@@ -458,11 +543,54 @@ write_cascade_check() {
   echo "end \$check\$;"
 }
 
+# Writes the statements that rewrite the source Storage host in the loaded
+# listings' `canonical_urls`, print how many listings changed, and raise
+# while any listing still mentions the source host.
+write_storage_rewrite() {
+  [[ -n "$REWRITE_SOURCE_HOST" ]] || return 0
+  local from="https://$REWRITE_SOURCE_HOST/storage/v1/" to="https://$REWRITE_TARGET_HOST/storage/v1/"
+  cat <<SQL
+with rewritten as (
+  update public.data_catalog_listings listing
+  set canonical_urls = array(
+    select replace(item.url, '$from', '$to')
+    from unnest(listing.canonical_urls) with ordinality as item (url, position)
+    order by item.position
+  )
+  where exists (select 1 from unnest(listing.canonical_urls) as item (url) where item.url like '$from%')
+  returning 1
+)
+select 'Rewrote the Storage URLs of ' || count(*) || ' listings.' from rewritten;
+do \$storage\$ begin
+  if exists (select 1 from public.data_catalog_listings listing where listing::text like '%$REWRITE_SOURCE_HOST%') then
+    raise exception 'Listings still mention $REWRITE_SOURCE_HOST after the rewrite.';
+  end if;
+end \$storage\$;
+SQL
+}
+
+# Writes the statement that raises unless every catalog table holds exactly
+# the dump's rows, so a short load cannot commit.
+write_row_count_check() {
+  local table rows
+  echo "do \$counts\$ begin"
+  for table in "${CATALOG_TABLES[@]}"; do
+    rows="$(count_dump_rows "$LOAD_FILE" "$table")"
+    echo "  if (select count(*) from $table) <> $rows then"
+    echo "    raise exception '$table holds % rows after the load, not the dump''s $rows.', (select count(*) from $table);"
+    echo "  end if;"
+  done
+  echo "end \$counts\$;"
+}
+
 write_import_wrapper() {
   local table
   {
     echo '\set ON_ERROR_STOP on'
+    echo '\pset tuples_only on'
+    echo '\pset format unaligned'
     echo "begin;"
+    echo "set local lock_timeout = '$LOCK_TIMEOUT';"
     if [[ "$IS_REPLACE" == true ]]; then
       write_cascade_check
       while read -r table; do
@@ -470,6 +598,10 @@ write_import_wrapper() {
       done < <(catalog_tables_children_first)
     fi
     echo "\\i '$LOAD_FILE'"
+    # The dump sets lock_timeout to 0 for the session, so set it again.
+    echo "set local lock_timeout = '$LOCK_TIMEOUT';"
+    write_storage_rewrite
+    write_row_count_check
     echo "select public.data_catalog_facet_counts__refresh();"
     echo "commit;"
   } >"$1"
@@ -477,15 +609,35 @@ write_import_wrapper() {
 
 print_plan() {
   local step=1
-  echo "Plan, in one transaction that rolls back on any error:"
+  echo "Plan, in one transaction that rolls back on any error and waits at most $LOCK_TIMEOUT for each lock:"
   if [[ "$IS_REPLACE" == true ]]; then
     echo "  $step. Lock the catalog and its dependents, and check the delete still reaches $DEPENDENT_ROW_COUNT dependent rows."
     step=$((step + 1))
     echo "  $step. Delete every catalog row, children first, deleting or changing $DEPENDENT_ROW_COUNT dependent rows.${ORPHAN_SUMMARY:+ This leaves $ORPHAN_SUMMARY with no open data details.}"
     step=$((step + 1))
   fi
-  echo "  $step. Load $DUMP_FILE."
-  echo "  $((step + 1)). Recount $FACET_COUNTS_TABLE."
+  echo "  $step. Load $DUMP_FILE, and check every catalog table holds the dump's rows."
+  step=$((step + 1))
+  if [[ -n "$REWRITE_SOURCE_HOST" ]]; then
+    echo "  $step. Rewrite Storage URLs from $REWRITE_SOURCE_HOST to $REWRITE_TARGET_HOST."
+    step=$((step + 1))
+  fi
+  echo "  $step. Recount $FACET_COUNTS_TABLE."
+}
+
+# Prints why the dump's Storage links stop the import, or nothing.
+storage_refusal() {
+  local hosts other_hosts
+  hosts="$(print_dump_storage_hosts "$LOAD_FILE" | awk '{ print $1 }')"
+  [[ -n "$hosts" ]] || return 0
+  if [[ -z "$REWRITE_SOURCE_HOST" ]]; then
+    echo "the dump's listings link to Storage on $(echo "$hosts" | paste -s -d, -). Pass $REWRITE_FLAG <source-host> <target-host>."
+    return 0
+  fi
+  other_hosts="$(echo "$hosts" | grep -vxF -e "$REWRITE_SOURCE_HOST" -e "$REWRITE_TARGET_HOST" || true)"
+  if [[ -n "$other_hosts" ]]; then
+    echo "the dump's listings also link to Storage on $(echo "$other_hosts" | paste -s -d, -), which $REWRITE_FLAG does not rewrite."
+  fi
 }
 
 # Prints why the import must stop before writing, or nothing.
@@ -494,6 +646,8 @@ plan_refusal() {
     printf 'foreign keys with no action or restrict would block the delete:\n%s' "$BLOCKING_DEPENDENTS"
   elif [[ "$IS_REPLACE" != true && "$TARGET_HAS_ROWS" == true ]]; then
     echo "the target's catalog already has rows. Check --dry-run --replace-existing first."
+  else
+    storage_refusal
   fi
 }
 
@@ -533,6 +687,7 @@ main() {
   if [[ -n "${CONFIRMED_TARGET:-}" && "$CONFIRMED_TARGET" != "$TARGET_ID" ]]; then
     fail "$TARGET_FLAG says $CONFIRMED_TARGET, but the target is $TARGET_ID."
   fi
+  check_rewrite_hosts
   prepare_dump
   check_psql_version
   report

@@ -61,23 +61,71 @@ dump_has_table() {
   ' "$1"
 }
 
-# Prints the `id` of every row in a dump's `data_catalog_listings` block,
-# one per line, finding the column by name in the `COPY` header.
+# Prints one column of every row in a dump's block for one table, one value
+# per line, finding the column by name in the `COPY` header.
 #
-# Usage: print_dump_listing_ids <dump.sql>
-print_dump_listing_ids() {
-  awk -F '\t' '
-    $0 ~ /^COPY public\.data_catalog_listings \(/ {
+# Usage: print_dump_column <dump.sql> <schema.table> <column>
+print_dump_column() {
+  awk -F '\t' -v table="$2" -v wanted="$3" '
+    $1 ~ /^COPY / && !inside {
+      split($0, words, " ")
+      if (words[2] != table) { next }
       header = $0
       sub(/^[^(]*\(/, "", header)
       sub(/\).*$/, "", header)
       count = split(header, columns, ", ")
-      for (i = 1; i <= count; i++) { if (columns[i] == "id") { column = i } }
+      column = 0
+      for (i = 1; i <= count; i++) { if (columns[i] == wanted) { column = i } }
       inside = 1
       next
     }
     inside && $0 == "\\." { inside = 0; next }
     inside && column { print $column }
+  ' "$1"
+}
+
+# Prints, per Supabase Storage host, how many rows of a dump's
+# `data_catalog_listings` block link to `https://<host>/storage/v1/`, as
+# `<host> <rows>` lines sorted by host.
+#
+# Usage: print_dump_storage_hosts <dump.sql>
+print_dump_storage_hosts() {
+  awk '
+    $0 ~ /^COPY public\.data_catalog_listings \(/ { inside = 1; next }
+    inside && $0 == "\\." { inside = 0; next }
+    inside {
+      line = $0
+      split("", seen)
+      while (match(line, /https?:\/\/[A-Za-z0-9.:-]+\/storage\/v1\//)) {
+        host = substr(line, RSTART, RLENGTH)
+        line = substr(line, RSTART + RLENGTH)
+        sub(/^https?:\/\//, "", host)
+        sub(/\/storage\/v1\/$/, "", host)
+        if (!(host in seen)) { seen[host] = 1; rows[host]++ }
+      }
+    }
+    END { for (host in rows) { print host, rows[host] } }
+  ' "$1" | LC_ALL=C sort
+}
+
+# Prints why a dump looks cut short, one reason per line, or nothing: a
+# `COPY` block with no closing `\.`, a `\restrict` with no matching
+# `\unrestrict`, or no "PostgreSQL database dump complete" footer.
+#
+# Usage: print_dump_completeness_problems <dump.sql>
+print_dump_completeness_problems() {
+  awk '
+    inside && $0 == "\\." { inside = 0; next }
+    inside { next }
+    $1 == "COPY" && $NF == "stdin;" { inside = 1; table = $2; next }
+    /^\\restrict / { restrict_key = $2 }
+    /^\\unrestrict / { unrestrict_key = $2 }
+    /^-- PostgreSQL database dump complete$/ { is_complete = 1 }
+    END {
+      if (inside) { print "the rows block for " table " has no closing \\." }
+      if (restrict_key != unrestrict_key) { print "\\restrict has no matching \\unrestrict" }
+      if (!is_complete) { print "the \"PostgreSQL database dump complete\" footer is missing" }
+    }
   ' "$1"
 }
 

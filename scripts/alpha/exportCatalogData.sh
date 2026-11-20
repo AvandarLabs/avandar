@@ -21,6 +21,12 @@
 #-------------------------------------------------------------------------------
 set -euo pipefail
 
+# libpq reads these before the URL, and PGHOSTADDR or a service file can send
+# pg_dump to a host other than the one the URL names.
+unset PGHOST PGHOSTADDR PGPORT PGDATABASE PGUSER PGPASSFILE PGSERVICE \
+  PGSERVICEFILE PGSYSCONFDIR PGOPTIONS PGTARGETSESSIONATTRS PGSSLMODE \
+  PGREQUIRESSL
+
 USAGE="Usage: exportCatalogData.sh <source-db-url> <out-file.sql>"
 SOURCE_DB_URL="${1:?$USAGE}"
 OUT_FILE="${2:?$USAGE}"
