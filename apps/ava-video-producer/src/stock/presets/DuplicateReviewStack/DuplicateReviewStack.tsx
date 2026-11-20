@@ -26,6 +26,27 @@ export function DuplicateReviewStack({
         motion.reveal.easing,
       )}
     >
+      <ReviewHeadings input={input} />
+      {input.groups.map((group, groupIndex) => {
+        return (
+          <DuplicateGroup
+            key={group.id}
+            frame={frame}
+            input={input}
+            group={group}
+            groupIndex={groupIndex}
+            accent={accent}
+          />
+        );
+      })}
+    </g>
+  );
+}
+
+/** The review's title over the field the candidates are compared on. */
+function ReviewHeadings({ input }: Readonly<{ input: Input }>): ReactNode {
+  return (
+    <>
       <FitText
         text={input.title}
         x={44}
@@ -46,18 +67,6 @@ export function DuplicateReviewStack({
         breakLongWords
         normalizeWhitespace
       />
-      {input.groups.map((group, groupIndex) => {
-        return (
-          <DuplicateGroup
-            key={group.id}
-            frame={frame}
-            input={input}
-            group={group}
-            groupIndex={groupIndex}
-            accent={accent}
-          />
-        );
-      })}
-    </g>
+    </>
   );
 }

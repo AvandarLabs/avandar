@@ -27,14 +27,7 @@ export function PermissionLadder({
   accent,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
   const motion = useGraphicMotion();
-  const link = ramp(
-    frame,
-    132,
-    motion.scale(LINK_FRAMES),
-    motion.reveal.easing,
-  );
   const effective = getEffectiveRoleFromInput(input);
   const resultY = mix(
     ramp(frame, 101, motion.scale(RISE_FRAMES), motion.travel.easing),
@@ -50,7 +43,39 @@ export function PermissionLadder({
         profile={tokens.sketch.shape}
         stroke={tokens.color.inactive}
       />
-      <g data-required-notch={input.requiredRole}>
+      <LadderMarks
+        requiredRole={input.requiredRole}
+        requiredY={requiredY}
+        resultY={resultY}
+        accent={accent}
+      />
+      <ResultLink
+        requiredY={requiredY}
+        resultY={resultY}
+        label={input.labels[effective]}
+        frame={frame}
+      />
+    </g>
+  );
+}
+
+/** The fixed notch at the required rank and the rising result marker. */
+function LadderMarks({
+  requiredRole,
+  requiredY,
+  resultY,
+  accent,
+}: Readonly<{
+  requiredRole: Input["requiredRole"];
+  requiredY: number;
+  resultY: number;
+  accent: string;
+}>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <>
+      <g data-required-notch={requiredRole}>
         <SketchedShape
           shape={{ kind: "path", d: `M725 ${requiredY - 10} v20 l16 -10 Z` }}
           profile={tokens.sketch.shape}
@@ -67,6 +92,32 @@ export function PermissionLadder({
           fill={tokens.color.ground}
         />
       </g>
+    </>
+  );
+}
+
+/** The link from the required notch to the result, and the result's label. */
+function ResultLink({
+  requiredY,
+  resultY,
+  label,
+  frame,
+}: Readonly<{
+  requiredY: number;
+  resultY: number;
+  label: string;
+  frame: number;
+}>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const link = ramp(
+    frame,
+    132,
+    motion.scale(LINK_FRAMES),
+    motion.reveal.easing,
+  );
+  return (
+    <>
       <SketchedShape
         shape={{ kind: "path", d: `M754 ${requiredY} H770 V${resultY} H776` }}
         profile={tokens.sketch.shape}
@@ -75,10 +126,8 @@ export function PermissionLadder({
         opacity={link}
       />
       <g opacity={link}>
-        <LabelSlots
-          labels={[[input.labels[effective], 720, 488, 185, 16, 4]]}
-        />
+        <LabelSlots labels={[[label, 720, 488, 185, 16, 4]]} />
       </g>
-    </g>
+    </>
   );
 }

@@ -42,26 +42,43 @@ export function AperturePanel({
           return undefined;
         }
         return (
-          <g key={field.id}>
-            <rect
-              data-open-aperture={field.id}
-              x={452}
-              y={164 + index * 68}
-              width={56}
-              height={68}
-              fill={tokens.color.ground}
-            />
-            <SketchedShape
-              shape={{
-                kind: "path",
-                d: `M452 ${164 + index * 68} h56 M452 ${232 + index * 68} h56`,
-              }}
-              profile={tokens.sketch.shape}
-              stroke={accent}
-            />
-          </g>
+          <OpenAperture
+            key={field.id}
+            fieldId={field.id}
+            index={index}
+            accent={accent}
+          />
         );
       })}
+    </g>
+  );
+}
+
+/** An opening in the panel opposite a field while its share passes. */
+function OpenAperture({
+  fieldId,
+  index,
+  accent,
+}: Readonly<{ fieldId: string; index: number; accent: string }>): ReactNode {
+  const tokens = useGraphicTokens();
+  return (
+    <g>
+      <rect
+        data-open-aperture={fieldId}
+        x={452}
+        y={164 + index * 68}
+        width={56}
+        height={68}
+        fill={tokens.color.ground}
+      />
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M452 ${164 + index * 68} h56 M452 ${232 + index * 68} h56`,
+        }}
+        profile={tokens.sketch.shape}
+        stroke={accent}
+      />
     </g>
   );
 }

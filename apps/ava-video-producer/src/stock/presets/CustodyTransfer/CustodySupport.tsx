@@ -6,6 +6,7 @@ import {
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { SUPPORT_STROKE, WITHDRAW_CUE } from "./custodyShape";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -31,28 +32,8 @@ export function CustodySupport({
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   const motion = useGraphicMotion();
-  const contact = ramp(
-    frame,
-    36,
-    motion.scale(CONTACT_FRAMES),
-    motion.travel.easing,
-  );
-  const withdraw = accepted
-    ? ramp(
-        frame,
-        WITHDRAW_CUE,
-        motion.scale(WITHDRAW_FRAMES),
-        motion.travel.easing,
-      )
-    : 0;
   const color = recipient ? accent : tokens.color.accentAlt;
-  const line = {
-    kind: "line",
-    x1: recipient ? mix(contact, 720, 480) : 240,
-    x2: recipient ? 720 : mix(withdraw, 480, 240),
-    y1: 376,
-    y2: 376,
-  } as const;
+  const line = _createSupportLine(frame, recipient, accepted, motion);
   return (
     <g opacity={motion.reveal(frame, recipient ? 16 : 12)}>
       <SketchedShape
@@ -79,4 +60,37 @@ export function CustodySupport({
       </g>
     </g>
   );
+}
+
+/**
+ * The support under the object: the recipient's reaches in to make contact,
+ * the sender's withdraws once the transfer is accepted.
+ */
+function _createSupportLine(
+  frame: number,
+  recipient: boolean,
+  accepted: boolean,
+  motion: VideoMotion,
+) {
+  const contact = ramp(
+    frame,
+    36,
+    motion.scale(CONTACT_FRAMES),
+    motion.travel.easing,
+  );
+  const withdraw = accepted
+    ? ramp(
+        frame,
+        WITHDRAW_CUE,
+        motion.scale(WITHDRAW_FRAMES),
+        motion.travel.easing,
+      )
+    : 0;
+  return {
+    kind: "line",
+    x1: recipient ? mix(contact, 720, 480) : 240,
+    x2: recipient ? 720 : mix(withdraw, 480, 240),
+    y1: 376,
+    y2: 376,
+  } as const;
 }

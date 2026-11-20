@@ -41,26 +41,51 @@ export function ContourTreatment({
         fillOpacity={scales.wash(atomic.opacity["35"])}
         stroke={accent}
       />
-      {input.intervention.kind === "vegetated-strip" ? (
-        <SketchedShape
-          shape={{
-            kind: "path",
-            d: `M${x + 12} ${y + 55}V${y - 14}M${x + 12} ${y + 10}l-16 -20M${x + 12} ${y + 28}l20 -20`,
-          }}
-          profile={tokens.sketch.shape}
-          fill="none"
-          stroke={accent}
-          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
-        />
-      ) : (
-        <SketchedShape
-          shape={{ kind: "path", d: `M${x} ${y + 20}h24M${x} ${y + 43}h24` }}
-          profile={tokens.sketch.shape}
-          stroke={tokens.color.text}
-          strokeWidth={scales.stroke(tokens.stroke.default)}
-        />
-      )}
+      <TreatmentDetail
+        isVegetated={input.intervention.kind === "vegetated-strip"}
+        x={x}
+        y={y}
+        accent={accent}
+      />
       <LandSteward x={x} y={y} accent={accent} />
     </g>
+  );
+}
+
+/** Stems on a vegetated strip, or courses on a stone bund. */
+function TreatmentDetail({
+  isVegetated,
+  x,
+  y,
+  accent,
+}: Readonly<{
+  isVegetated: boolean;
+  x: number;
+  y: number;
+  accent: string;
+}>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  if (isVegetated) {
+    return (
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${x + 12} ${y + 55}V${y - 14}M${x + 12} ${y + 10}l-16 -20M${x + 12} ${y + 28}l20 -20`,
+        }}
+        profile={tokens.sketch.shape}
+        fill="none"
+        stroke={accent}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+      />
+    );
+  }
+  return (
+    <SketchedShape
+      shape={{ kind: "path", d: `M${x} ${y + 20}h24M${x} ${y + 43}h24` }}
+      profile={tokens.sketch.shape}
+      stroke={tokens.color.text}
+      strokeWidth={scales.stroke(tokens.stroke.default)}
+    />
   );
 }

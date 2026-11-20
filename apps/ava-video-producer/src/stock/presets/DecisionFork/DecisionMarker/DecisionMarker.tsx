@@ -2,6 +2,7 @@ import { mix, ramp } from "../../../../motion";
 import { cubicPoint } from "../../../graphics-common/cubicPoint";
 import { useGraphicMotion } from "../../../theme/useGraphicTheme/useGraphicTheme";
 import { MarkerDot } from "./MarkerDot";
+import type { VideoMotion } from "../../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { ReactNode } from "react";
 
 type Props = { frame: number; x: number; accent: string; branchId: string };
@@ -34,19 +35,7 @@ export function DecisionMarker({
     { x, y: 408 },
     progress,
   );
-  const markerY =
-    frame < DEPART_CUE
-      ? mix(
-          ramp(
-            frame,
-            DROP_CUE,
-            motion.scale(DROP_FRAMES),
-            motion.travel.easing,
-          ),
-          174,
-          235,
-        )
-      : point.y;
+  const markerY = frame < DEPART_CUE ? _getDropY(frame, motion) : point.y;
   return (
     <g
       data-marker-branch={branchId}
@@ -59,5 +48,14 @@ export function DecisionMarker({
     >
       <MarkerDot x={point.x} y={markerY} accent={accent} />
     </g>
+  );
+}
+
+/** The marker dropping onto the junction before it departs. */
+function _getDropY(frame: number, motion: VideoMotion): number {
+  return mix(
+    ramp(frame, DROP_CUE, motion.scale(DROP_FRAMES), motion.travel.easing),
+    174,
+    235,
   );
 }

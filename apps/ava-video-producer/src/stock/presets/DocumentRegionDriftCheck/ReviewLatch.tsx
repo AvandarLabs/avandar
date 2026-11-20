@@ -25,7 +25,6 @@ export function ReviewLatch({
   matched,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
   const motion = useGraphicMotion();
   const closure = ramp(
       frame,
@@ -37,20 +36,13 @@ export function ReviewLatch({
   return (
     <g>
       {(["left", "right"] as const).map((side) => {
-        const reach = side === "left" ? -gap : gap;
         return (
-          <g key={side} data-review-latch={side}>
-            <SketchedShape
-              shape={{
-                kind: "path",
-                d: `M${480 + reach} 260 v36 h${-reach}`,
-              }}
-              profile={tokens.sketch.shape}
-              stroke={matched ? accent : tokens.color.highlight}
-              fill="none"
-              strokeWidth={scales.stroke(LATCH_STROKE)}
-            />
-          </g>
+          <LatchArm
+            key={side}
+            side={side}
+            reach={side === "left" ? -gap : gap}
+            color={matched ? accent : tokens.color.highlight}
+          />
         );
       })}
       <g opacity={closure}>
@@ -67,6 +59,34 @@ export function ReviewLatch({
           ]}
         />
       </g>
+    </g>
+  );
+}
+
+/** One side of the latch, reaching in toward the centre as it closes. */
+function LatchArm({
+  side,
+  reach,
+  color,
+}: Readonly<{
+  side: "left" | "right";
+  reach: number;
+  color: string;
+}>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <g data-review-latch={side}>
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${480 + reach} 260 v36 h${-reach}`,
+        }}
+        profile={tokens.sketch.shape}
+        stroke={color}
+        fill="none"
+        strokeWidth={scales.stroke(LATCH_STROKE)}
+      />
     </g>
   );
 }

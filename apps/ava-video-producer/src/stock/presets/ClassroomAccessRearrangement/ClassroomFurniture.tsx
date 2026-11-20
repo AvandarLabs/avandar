@@ -33,12 +33,8 @@ export function ClassroomFurniture({
     motion.scale(36),
     motion.travel.easing,
   );
-  const hasTable = input.adaptations.some(({ kind }) => {
-    return kind === "shared-table";
-  });
-  const hasBoard = input.adaptations.some(({ kind }) => {
-    return kind === "large-print-board";
-  });
+  const hasTable = _hasAdaptation(input, "shared-table");
+  const hasBoard = _hasAdaptation(input, "large-print-board");
   return (
     <g>
       <StockRect
@@ -93,4 +89,13 @@ function ClassroomBoard({
       )}
     />
   );
+}
+
+function _hasAdaptation(
+  input: Input,
+  kind: Input["adaptations"][number]["kind"],
+): boolean {
+  return input.adaptations.some((adaptation) => {
+    return adaptation.kind === kind;
+  });
 }

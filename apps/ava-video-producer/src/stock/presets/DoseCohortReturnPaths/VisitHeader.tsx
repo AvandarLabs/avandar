@@ -4,6 +4,7 @@ import {
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { SceneLabel } from "./SceneLabel";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./DoseCohortReturnPaths.schema";
 import type { ReactNode } from "react";
 
@@ -24,19 +25,7 @@ export function VisitHeader({
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
-  const x =
-    380 +
-    index * 155 +
-    mix(
-      motion.ramp(
-        frame,
-        24 + index * motion.scaleStagger(18),
-        motion.scale(24),
-        motion.travel.easing,
-      ),
-      35,
-      0,
-    );
+  const x = 380 + index * 155 + _getColumnShift(frame, index, motion);
   return (
     <g
       data-visit={visit.id}
@@ -55,18 +44,37 @@ export function VisitHeader({
           fill={accent}
           textAnchor="middle"
         >
-          {
-            input.participants.filter((person) => {
-              return person.records.some((record) => {
-                return (
-                  record.visitId === visit.id && record.state === "recorded"
-                );
-              });
-            }).length
-          }
-          /{input.participants.length}
+          {_countRecordedParticipants(input, visit.id)}/
+          {input.participants.length}
         </text>
       ) : undefined}
     </g>
   );
+}
+
+/** The column sliding in from the right onto its visit position. */
+function _getColumnShift(
+  frame: number,
+  index: number,
+  motion: VideoMotion,
+): number {
+  return mix(
+    motion.ramp(
+      frame,
+      24 + index * motion.scaleStagger(18),
+      motion.scale(24),
+      motion.travel.easing,
+    ),
+    35,
+    0,
+  );
+}
+
+/** How many participants have a recorded dose at this visit. */
+function _countRecordedParticipants(input: Input, visitId: string): number {
+  return input.participants.filter((person) => {
+    return person.records.some((record) => {
+      return record.visitId === visitId && record.state === "recorded";
+    });
+  }).length;
 }

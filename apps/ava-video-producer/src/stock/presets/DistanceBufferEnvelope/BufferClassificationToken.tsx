@@ -30,7 +30,6 @@ export function BufferClassificationToken({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { color, text } = useGraphicTokens();
   const motion = useGraphicMotion();
   const progress = motion.ramp(
     frame,
@@ -56,18 +55,30 @@ export function BufferClassificationToken({
         r={8}
         fill={accent}
       />
-      {progress === 1 ? (
-        <text
-          x={point.x}
-          y={point.y + 4}
-          fontSize={text.graphic.data.fontSize}
-          fontWeight={text.graphic.data.fontWeight}
-          textAnchor="middle"
-          fill={color.ground}
-        >
-          {index + 1}
-        </text>
-      ) : undefined}
+      {progress === 1 ? <TokenKey point={point} index={index} /> : undefined}
     </g>
   ) : undefined;
+}
+
+/** The token's stable source key, once it has landed in the ledger. */
+function TokenKey({
+  point,
+  index,
+}: Readonly<{
+  point: Readonly<{ x: number; y: number }>;
+  index: number;
+}>): ReactNode {
+  const { color, text } = useGraphicTokens();
+  return (
+    <text
+      x={point.x}
+      y={point.y + 4}
+      fontSize={text.graphic.data.fontSize}
+      fontWeight={text.graphic.data.fontWeight}
+      textAnchor="middle"
+      fill={color.ground}
+    >
+      {index + 1}
+    </text>
+  );
 }

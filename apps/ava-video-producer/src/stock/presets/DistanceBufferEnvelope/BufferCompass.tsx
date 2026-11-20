@@ -84,17 +84,7 @@ export function BufferCompass({
         stroke={color.highlight}
         strokeWidth={width}
       />
-      <SketchedShape
-        data-compass-arm=""
-        shape={{ kind: "line", ...arm }}
-        profile={sketch.shape}
-        stroke={accent}
-        strokeWidth={width}
-        opacity={
-          motion.ramp(frame, SWEEP_AT, motion.panel) *
-          (1 - motion.ramp(frame, ARM_FADE_AT, motion.reveal.duration))
-        }
-      />
+      <CompassArm arm={arm} frame={frame} accent={accent} />
       <circle
         data-origin-position={`${input.origin.x},${input.origin.y}`}
         {...center}
@@ -102,5 +92,33 @@ export function BufferCompass({
         fill={color.highlight}
       />
     </g>
+  );
+}
+
+/** The compass arm, shown while it sweeps and faded once the circle closes. */
+function CompassArm({
+  arm,
+  frame,
+  accent,
+}: Readonly<{
+  arm: ReturnType<typeof _getCompassGeometry>["arm"];
+  frame: number;
+  accent: string;
+}>): ReactNode {
+  const { stroke, sketch } = useGraphicTokens();
+  const shapes = useGraphicShapeScales();
+  const motion = useGraphicMotion();
+  return (
+    <SketchedShape
+      data-compass-arm=""
+      shape={{ kind: "line", ...arm }}
+      profile={sketch.shape}
+      stroke={accent}
+      strokeWidth={shapes.stroke(stroke.default)}
+      opacity={
+        motion.ramp(frame, SWEEP_AT, motion.panel) *
+        (1 - motion.ramp(frame, ARM_FADE_AT, motion.reveal.duration))
+      }
+    />
   );
 }

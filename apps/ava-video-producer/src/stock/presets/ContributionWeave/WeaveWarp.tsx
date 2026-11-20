@@ -43,17 +43,6 @@ export function WeaveWarp({
     fill: `url(#${id}-band-${index})`,
   };
   const end = { ...band, y: 150, height: 30 };
-  const label = {
-    text: contributor.label,
-    x,
-    y: 88,
-    width: 190,
-    fontSize: 12 as const,
-    maxLines: 3,
-    anchor: "middle" as const,
-    breakLongWords: true,
-    normalizeWhitespace: true,
-  };
   return (
     <g
       opacity={ramp(
@@ -67,7 +56,24 @@ export function WeaveWarp({
       {input.showContributorEnds ? (
         <rect data-contributor-end={contributor.id} {...end} />
       ) : undefined}
-      {input.showLabels ? <FitText {...label} /> : undefined}
+      {input.showLabels ? (
+        <FitText {..._createWarpLabel(contributor.label, x)} />
+      ) : undefined}
     </g>
   );
+}
+
+/** The contributor's label, centred above its warp band. */
+function _createWarpLabel(text: string, x: number) {
+  return {
+    text,
+    x,
+    y: 88,
+    width: 190,
+    fontSize: 12 as const,
+    maxLines: 3,
+    anchor: "middle" as const,
+    breakLongWords: true,
+    normalizeWhitespace: true,
+  };
 }

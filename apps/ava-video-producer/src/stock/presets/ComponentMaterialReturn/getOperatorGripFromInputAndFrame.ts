@@ -32,23 +32,10 @@ export function getOperatorGripFromInputAndFrame({
         frame: 150,
       }).target
     : { x: 340, y: 265 };
-  const withdraw = motion.ramp(
+  const { withdraw, traverse, approach } = _getGripPhases(
     frame,
     point.start,
-    motion.scale(0.3),
-    motion.travel.easing,
-  );
-  const traverse = motion.ramp(
-    frame,
-    point.start + 0.3,
-    motion.scale(0.4),
-    motion.travel.easing,
-  );
-  const approach = motion.ramp(
-    frame,
-    point.start + 0.7,
-    motion.scale(0.3),
-    motion.travel.easing,
+    motion,
   );
   const x =
     frame < point.start + 1 ? mix(traverse, prior.x, point.source.x) : point.x;
@@ -59,4 +46,21 @@ export function getOperatorGripFromInputAndFrame({
         ? mix(approach, 265, point.source.y)
         : point.y;
   return { x, y, index };
+}
+
+/** The empty hand's lift clear, traverse, and approach, each 0 to 1. */
+function _getGripPhases(frame: number, start: number, motion: VideoMotion) {
+  const phase = (offset: number, length: number) => {
+    return motion.ramp(
+      frame,
+      start + offset,
+      motion.scale(length),
+      motion.travel.easing,
+    );
+  };
+  return {
+    withdraw: phase(0, 0.3),
+    traverse: phase(0.3, 0.4),
+    approach: phase(0.7, 0.3),
+  };
 }

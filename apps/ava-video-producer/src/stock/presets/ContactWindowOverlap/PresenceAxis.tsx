@@ -29,27 +29,36 @@ export function PresenceAxis({ input }: Readonly<Props>): ReactNode {
         profile={tokens.sketch.shape}
         stroke={tokens.color.inactive}
       />
-      <text
-        x={280}
-        y={170}
-        fill={tokens.color.text}
-        fontFamily={tokens.text.graphic.data.fontFamily}
-        fontWeight={tokens.text.graphic.data.fontWeight}
-        fontSize={tokens.text.graphic.data.fontSize}
-      >
-        {input.axis.start}
-      </text>
-      <text
-        x={910}
-        y={170}
-        fill={tokens.color.text}
-        fontFamily={tokens.text.graphic.data.fontFamily}
-        fontWeight={tokens.text.graphic.data.fontWeight}
-        fontSize={tokens.text.graphic.data.fontSize}
-        textAnchor="end"
-      >
+      <AxisEndLabel x={280}>{input.axis.start}</AxisEndLabel>
+      <AxisEndLabel x={910} anchor="end">
         {input.axis.end}
-      </text>
+      </AxisEndLabel>
     </g>
+  );
+}
+
+/** The axis value at one end, above the axis line. */
+function AxisEndLabel({
+  x,
+  anchor,
+  children,
+}: Readonly<{
+  x: number;
+  anchor?: "end";
+  children: ReactNode;
+}>): ReactNode {
+  const tokens = useGraphicTokens();
+  return (
+    <text
+      x={x}
+      y={170}
+      fill={tokens.color.text}
+      fontFamily={tokens.text.graphic.data.fontFamily}
+      fontWeight={tokens.text.graphic.data.fontWeight}
+      fontSize={tokens.text.graphic.data.fontSize}
+      textAnchor={anchor}
+    >
+      {children}
+    </text>
   );
 }

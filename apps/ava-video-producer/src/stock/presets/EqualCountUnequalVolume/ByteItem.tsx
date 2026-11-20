@@ -33,7 +33,6 @@ export function ByteItem({
   accent,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
   const motion = useGraphicMotion();
   const unfolding = ramp(
     frame,
@@ -43,16 +42,7 @@ export function ByteItem({
   );
   return (
     <g data-item-id={item.id} data-item-bytes={item.bytes}>
-      <StockRect
-        data-count-tab={item.id}
-        x={x}
-        y={y - 15}
-        width={365}
-        height={34}
-        rx={scales.corner(TAB_CORNER)}
-        fill={tokens.color.surface}
-        stroke={tokens.color.line}
-      />
+      <CountTab itemId={item.id} x={x} y={y} />
       <ByteItemLabels {...{ input, item, x, y }} />
       <rect
         data-byte-strip={item.id}
@@ -71,5 +61,27 @@ export function ByteItem({
         strokeOpacity={unfolding}
       />
     </g>
+  );
+}
+
+/** The item's identity tab, kept even when it holds zero bytes. */
+function CountTab({
+  itemId,
+  x,
+  y,
+}: Readonly<{ itemId: string; x: number; y: number }>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <StockRect
+      data-count-tab={itemId}
+      x={x}
+      y={y - 15}
+      width={365}
+      height={34}
+      rx={scales.corner(TAB_CORNER)}
+      fill={tokens.color.surface}
+      stroke={tokens.color.line}
+    />
   );
 }

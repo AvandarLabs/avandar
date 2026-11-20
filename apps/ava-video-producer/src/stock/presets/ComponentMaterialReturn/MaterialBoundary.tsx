@@ -41,34 +41,9 @@ export function MaterialBoundary({
         stroke={tokens.color.line}
         strokeWidth={scales.stroke(tokens.stroke.emphasis)}
       />
-      {isAppliance ? (
-        <SketchedShape
-          shape={{ kind: "circle", cx: 185, cy: 325, r: 6 }}
-          profile={tokens.sketch.shape}
-          fill="none"
-          stroke={tokens.color.inactive}
-        />
-      ) : (
-        <SketchedShape
-          shape={{ kind: "path", d: "M65 335v8M305 335v8" }}
-          profile={tokens.sketch.shape}
-          stroke={tokens.color.inactive}
-          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
-        />
-      )}
+      <ReturnedShellDetail isAppliance={isAppliance} />
       {assembled > 0 ? (
-        <StockRect
-          data-output-shell="physical"
-          x={408}
-          y={288}
-          width={305}
-          height={48}
-          rx={scales.corner(isAppliance ? APPLIANCE_CORNER : MODULE_CORNER)}
-          fill="none"
-          stroke={tokens.color.line}
-          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
-          opacity={motion.reveal(frame, 108)}
-        />
+        <OutputShell frame={frame} isAppliance={isAppliance} />
       ) : undefined}
       <SketchedShape
         shape={{ kind: "path", d: "M740 290V335H930V290M740 355V400H930V355" }}
@@ -79,5 +54,55 @@ export function MaterialBoundary({
       />
       <MaterialCaptions input={input} />
     </g>
+  );
+}
+
+/** A dial on a returned appliance, or feet on a returned module. */
+function ReturnedShellDetail({
+  isAppliance,
+}: Readonly<{ isAppliance: boolean }>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  if (isAppliance) {
+    return (
+      <SketchedShape
+        shape={{ kind: "circle", cx: 185, cy: 325, r: 6 }}
+        profile={tokens.sketch.shape}
+        fill="none"
+        stroke={tokens.color.inactive}
+      />
+    );
+  }
+  return (
+    <SketchedShape
+      shape={{ kind: "path", d: "M65 335v8M305 335v8" }}
+      profile={tokens.sketch.shape}
+      stroke={tokens.color.inactive}
+      strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+    />
+  );
+}
+
+/** The output assembly's own shell, appearing once parts are assembled. */
+function OutputShell({
+  frame,
+  isAppliance,
+}: Readonly<{ frame: number; isAppliance: boolean }>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
+  return (
+    <StockRect
+      data-output-shell="physical"
+      x={408}
+      y={288}
+      width={305}
+      height={48}
+      rx={scales.corner(isAppliance ? APPLIANCE_CORNER : MODULE_CORNER)}
+      fill="none"
+      stroke={tokens.color.line}
+      strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+      opacity={motion.reveal(frame, 108)}
+    />
   );
 }

@@ -15,8 +15,6 @@ type Props = { input: Input };
  * tile.
  */
 export function ObservationContext({ input }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const tokens = useGraphicTokens();
   const labels = [
     { text: input.metric.label, x: 32, y: 27, width: 300 },
     { text: input.metric.unit, x: 350, y: 27, width: 150 },
@@ -41,24 +39,33 @@ export function ObservationContext({ input }: Readonly<Props>): ReactNode {
         );
       })}
       {input.context === "globe-and-schematic-tile" ? (
-        <g data-globe-context="true" transform="translate(115 175)">
-          <SketchedShape
-            shape={{ kind: "circle", cx: 0, cy: 0, r: 65 }}
-            profile={tokens.sketch.shape}
-            fill={tokens.color.surface}
-            stroke={tokens.color.line}
-          />
-          <path
-            d={GlobeProjection.getLandPathFromView({
-              centerLongitude: 0,
-              centerLatitude: 15,
-              radius: 65,
-            })}
-            fill={tokens.color.inactive}
-            fillOpacity={atomic.opacity["70"]}
-          />
-        </g>
+        <GlobeContext />
       ) : undefined}
+    </g>
+  );
+}
+
+/** A globe for context; it does not locate the detached tile. */
+function GlobeContext(): ReactNode {
+  const { atomic } = useGraphicTheme();
+  const tokens = useGraphicTokens();
+  return (
+    <g data-globe-context="true" transform="translate(115 175)">
+      <SketchedShape
+        shape={{ kind: "circle", cx: 0, cy: 0, r: 65 }}
+        profile={tokens.sketch.shape}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
+      />
+      <path
+        d={GlobeProjection.getLandPathFromView({
+          centerLongitude: 0,
+          centerLatitude: 15,
+          radius: 65,
+        })}
+        fill={tokens.color.inactive}
+        fillOpacity={atomic.opacity["70"]}
+      />
     </g>
   );
 }

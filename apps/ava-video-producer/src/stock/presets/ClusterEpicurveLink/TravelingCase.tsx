@@ -23,7 +23,6 @@ export function TravelingCase({
   accent,
   showGuide,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const { record, index, mapX, mapY, histogramX, histogramY } = position;
@@ -39,20 +38,7 @@ export function TravelingCase({
   return (
     <g>
       {showGuide ? (
-        <SketchedShape
-          shape={{
-            kind: "line",
-            x1: mapX,
-            y1: mapY,
-            x2: histogramX,
-            y2: histogramY - 6,
-          }}
-          profile={tokens.sketch.shape}
-          data-identity-guide={record.id}
-          stroke={accent}
-          strokeOpacity={atomic.opacity["45"]}
-          strokeDasharray={tokens.dash.guide.join(" ")}
-        />
+        <IdentityGuide position={position} accent={accent} />
       ) : undefined}
       <SketchedShape
         shape={{ kind: "circle", cx: x, cy: y, r: 9 }}
@@ -73,5 +59,30 @@ export function TravelingCase({
         {index + 1}
       </text>
     </g>
+  );
+}
+
+/** The dashed guide from a case's map record to its histogram segment. */
+function IdentityGuide({
+  position: { record, mapX, mapY, histogramX, histogramY },
+  accent,
+}: Readonly<Pick<Props, "position" | "accent">>): ReactNode {
+  const { atomic } = useGraphicTheme();
+  const tokens = useGraphicTokens();
+  return (
+    <SketchedShape
+      shape={{
+        kind: "line",
+        x1: mapX,
+        y1: mapY,
+        x2: histogramX,
+        y2: histogramY - 6,
+      }}
+      profile={tokens.sketch.shape}
+      data-identity-guide={record.id}
+      stroke={accent}
+      strokeOpacity={atomic.opacity["45"]}
+      strokeDasharray={tokens.dash.guide.join(" ")}
+    />
   );
 }

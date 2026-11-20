@@ -37,20 +37,10 @@ export function CustodyFactMark({
       />
     );
   }
-  const path =
-    kind === "monitoring"
-      ? value === "logged"
-        ? "M-5 -5 h10 v10 h-10 Z"
-        : value === "review"
-          ? "M0 -6 l6 11 h-12 Z"
-          : "M-5 0 h10"
-      : value === "broken"
-        ? "M-4 -5 l4 4 -4 2 4 4 M4 -5 l-4 4 4 2 -4 4"
-        : "M0 -6 l6 6 -6 6 -6 -6 Z";
   return (
     <g transform={`translate(${x} ${y})`}>
       <SketchedShape
-        shape={{ kind: "path", d: path }}
+        shape={{ kind: "path", d: _buildFactMarkPath(kind, value) }}
         profile={tokens.sketch.shape}
         fill="none"
         stroke={
@@ -64,4 +54,24 @@ export function CustodyFactMark({
       />
     </g>
   );
+}
+
+/**
+ * A monitoring fact as a square, triangle, or dash; a seal as a diamond, or
+ * two jagged halves once broken.
+ */
+function _buildFactMarkPath(
+  kind: "monitoring" | "seal",
+  value: string,
+): string {
+  if (kind === "monitoring") {
+    return value === "logged"
+      ? "M-5 -5 h10 v10 h-10 Z"
+      : value === "review"
+        ? "M0 -6 l6 11 h-12 Z"
+        : "M-5 0 h10";
+  }
+  return value === "broken"
+    ? "M-4 -5 l4 4 -4 2 4 4 M4 -5 l-4 4 4 2 -4 4"
+    : "M0 -6 l6 6 -6 6 -6 -6 Z";
 }

@@ -28,30 +28,11 @@ function _getTeamPosition({
   }
   const previous = checks[index - 1];
   const start = 56 + index * 18;
-  const returnProgress = motion.ramp(
-      frame,
-      start,
-      motion.press.duration,
-      motion.travel.easing,
-    ),
-    vertical = motion.ramp(
-      frame,
-      start + 4,
-      motion.press.duration,
-      motion.travel.easing,
-    ),
-    approach = motion.ramp(
-      frame,
-      start + 8,
-      motion.press.duration,
-      motion.travel.easing,
-    ),
-    reach = motion.ramp(
-      frame,
-      start + 12,
-      motion.scale(2),
-      motion.travel.easing,
-    );
+  const { returnProgress, vertical, approach, reach } = _getTeamPhases(
+    frame,
+    start,
+    motion,
+  );
   const departureX = previous ? previous.x - 20 : 235;
   const x =
     frame < start + 4
@@ -120,4 +101,30 @@ export function ObservationFieldTeam({
       ) : undefined}
     </g>
   );
+}
+
+/**
+ * The member's return to the band, move along it, approach to the point, and
+ * reach, each 0 to 1.
+ */
+function _getTeamPhases(frame: number, start: number, motion: VideoMotion) {
+  const step = (offset: number) => {
+    return motion.ramp(
+      frame,
+      start + offset,
+      motion.press.duration,
+      motion.travel.easing,
+    );
+  };
+  return {
+    returnProgress: step(0),
+    vertical: step(4),
+    approach: step(8),
+    reach: motion.ramp(
+      frame,
+      start + 12,
+      motion.scale(2),
+      motion.travel.easing,
+    ),
+  };
 }

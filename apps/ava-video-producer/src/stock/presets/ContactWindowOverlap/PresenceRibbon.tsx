@@ -25,9 +25,7 @@ export function PresenceRibbon({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
   const y = 215 + index * 45;
   const overlapStart = Math.max(
     record.start ?? 0,
@@ -47,24 +45,55 @@ export function PresenceRibbon({
       <SceneLabel text={record.label} x={70} y={y - 3} width={195} lines={3} />
       <RecordedInterval record={record} axisEnd={input.axis.end} y={y} />
       {hasOverlap ? (
-        <StockRect
-          data-overlap="true"
-          data-overlap-person={record.id}
-          x={280 + (630 * overlapStart) / input.axis.end}
-          y={y - 10}
-          width={(630 * (overlapEnd - overlapStart)) / input.axis.end}
-          height={20}
-          rx={scales.corner(tokens.corner.chip)}
-          fill="none"
-          stroke={accent}
-          strokeWidth={scales.stroke(tokens.stroke.default)}
-          opacity={motion.ramp(
-            frame,
-            96 + index * motion.scaleStagger(2),
-            motion.scale(10),
-          )}
+        <OverlapBand
+          {...{ record, index, frame, accent, y }}
+          start={overlapStart}
+          end={overlapEnd}
+          axisEnd={input.axis.end}
         />
       ) : undefined}
     </g>
+  );
+}
+
+/** The part of a ribbon inside the investigation window. */
+function OverlapBand({
+  record,
+  index,
+  frame,
+  accent,
+  y,
+  start,
+  end,
+  axisEnd,
+}: Readonly<
+  Omit<Props, "input"> & {
+    y: number;
+    start: number;
+    end: number;
+    axisEnd: number;
+  }
+>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
+  return (
+    <StockRect
+      data-overlap="true"
+      data-overlap-person={record.id}
+      x={280 + (630 * start) / axisEnd}
+      y={y - 10}
+      width={(630 * (end - start)) / axisEnd}
+      height={20}
+      rx={scales.corner(tokens.corner.chip)}
+      fill="none"
+      stroke={accent}
+      strokeWidth={scales.stroke(tokens.stroke.default)}
+      opacity={motion.ramp(
+        frame,
+        96 + index * motion.scaleStagger(2),
+        motion.scale(10),
+      )}
+    />
   );
 }

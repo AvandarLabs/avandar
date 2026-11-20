@@ -22,7 +22,6 @@ export function EffectivePermissionGrants({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
   const effective = getEffectiveRoleFromInput(input);
   const isAllowed = ROLE_RANK[effective] >= ROLE_RANK[input.requiredRole];
   return (
@@ -44,27 +43,30 @@ export function EffectivePermissionGrants({
           />
         );
       })}
-      <g
-        opacity={ramp(
-          frame,
-          139,
-          motion.scale(VERDICT_FRAMES),
-          motion.reveal.easing,
-        )}
-      >
-        <LabelSlots
-          labels={[
-            [
-              isAllowed ? input.labels.allowed : input.labels.denied,
-              55,
-              580,
-              840,
-              18,
-              1,
-            ],
-          ]}
-        />
-      </g>
+      <PermissionVerdict
+        label={isAllowed ? input.labels.allowed : input.labels.denied}
+        frame={frame}
+      />
+    </g>
+  );
+}
+
+/** The verdict, appearing once the result has risen. */
+function PermissionVerdict({
+  label,
+  frame,
+}: Readonly<{ label: string; frame: number }>): ReactNode {
+  const motion = useGraphicMotion();
+  return (
+    <g
+      opacity={ramp(
+        frame,
+        139,
+        motion.scale(VERDICT_FRAMES),
+        motion.reveal.easing,
+      )}
+    >
+      <LabelSlots labels={[[label, 55, 580, 840, 18, 1]]} />
     </g>
   );
 }

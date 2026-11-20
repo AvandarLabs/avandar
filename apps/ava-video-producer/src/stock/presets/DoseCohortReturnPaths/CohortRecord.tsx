@@ -61,16 +61,6 @@ export function CohortRecord({
   }
   const isEmphasized = _isEmphasized({ input, participant, state, visitIndex });
   const x = 380 + visitIndex * 155;
-  const shift = mix(
-    motion.ramp(
-      frame,
-      24 + visitIndex * motion.scaleStagger(18),
-      motion.scale(24),
-      motion.travel.easing,
-    ),
-    35,
-    0,
-  );
   return (
     <g
       data-record-person={participant.id}
@@ -84,17 +74,7 @@ export function CohortRecord({
       )}
     >
       {state === "recorded" ? (
-        <SketchedShape
-          shape={{
-            kind: "path",
-            d: `M${x - 14 + shift} ${y + 5} V${y - 18} Q${x + shift} ${y - 34} ${x + 14 + shift} ${y - 18} V${y + 5}`,
-          }}
-          profile={tokens.sketch.shape}
-          data-visit-arch={participant.id}
-          data-arch-visit={visit.id}
-          stroke={tokens.color.line}
-          fill="none"
-        />
+        <VisitArch {...{ participant, visit, visitIndex, y, frame }} x={x} />
       ) : undefined}
       <VisitMark
         state={state}
@@ -103,5 +83,45 @@ export function CohortRecord({
         color={isEmphasized ? accent : tokens.color.textMuted}
       />
     </g>
+  );
+}
+
+/** The arch of a recorded visit, sliding into place under its column. */
+function VisitArch({
+  participant,
+  visit,
+  visitIndex,
+  x,
+  y,
+  frame,
+}: Readonly<
+  Pick<Props, "participant" | "visit" | "visitIndex" | "y" | "frame"> & {
+    x: number;
+  }
+>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const shift = mix(
+    motion.ramp(
+      frame,
+      24 + visitIndex * motion.scaleStagger(18),
+      motion.scale(24),
+      motion.travel.easing,
+    ),
+    35,
+    0,
+  );
+  return (
+    <SketchedShape
+      shape={{
+        kind: "path",
+        d: `M${x - 14 + shift} ${y + 5} V${y - 18} Q${x + shift} ${y - 34} ${x + 14 + shift} ${y - 18} V${y + 5}`,
+      }}
+      profile={tokens.sketch.shape}
+      data-visit-arch={participant.id}
+      data-arch-visit={visit.id}
+      stroke={tokens.color.line}
+      fill="none"
+    />
   );
 }

@@ -29,10 +29,8 @@ export function DecisionOutcome({
   isSelected,
   showUnchosenOutcomes,
 }: Readonly<Props>): ReactNode {
-  const style = useGraphicProps("DecisionFork", {});
   const { color } = useGraphicTokens();
   const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
   const selected = isSelected
     ? ramp(frame, SELECTION_CUE, motion.sheet, motion.reveal.easing)
     : 0;
@@ -44,28 +42,38 @@ export function DecisionOutcome({
   }
   return (
     <g opacity={opacity}>
-      <StockRect
-        x={x - 104}
-        y={424}
-        width={208}
-        height={94}
-        rx={scales.corner(style.outcomeRadius)}
-        fill={color.surface}
-        stroke={color.line}
-        strokeWidth={scales.stroke(style.outcomeStrokeWidth)}
-      />
-      <StockRect
-        x={x - 104}
-        y={424}
-        width={208}
-        height={94}
-        rx={scales.corner(style.outcomeRadius)}
-        fill="none"
-        stroke={accent}
-        strokeOpacity={selected}
-        strokeWidth={scales.stroke(style.outcomeStrokeWidth)}
-      />
+      <OutcomeCard x={x} fill={color.surface} stroke={color.line} />
+      <OutcomeCard x={x} fill="none" stroke={accent} strokeOpacity={selected} />
       <ForkLabel text={branch.outcome} x={x} y={449} width={184} />
     </g>
+  );
+}
+
+/** The outcome card's outline, drawn once plain and once in the accent. */
+function OutcomeCard({
+  x,
+  fill,
+  stroke,
+  strokeOpacity,
+}: Readonly<{
+  x: number;
+  fill: string;
+  stroke: string;
+  strokeOpacity?: number;
+}>): ReactNode {
+  const style = useGraphicProps("DecisionFork", {});
+  const scales = useGraphicShapeScales();
+  return (
+    <StockRect
+      x={x - 104}
+      y={424}
+      width={208}
+      height={94}
+      rx={scales.corner(style.outcomeRadius)}
+      fill={fill}
+      stroke={stroke}
+      strokeOpacity={strokeOpacity}
+      strokeWidth={scales.stroke(style.outcomeStrokeWidth)}
+    />
   );
 }

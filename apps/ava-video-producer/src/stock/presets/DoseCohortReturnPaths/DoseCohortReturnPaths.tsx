@@ -14,21 +14,11 @@ export function DoseCohortReturnPaths({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
   return (
     <g>
       <SceneLabel text={input.sceneLabel} x={32} y={30} width={700} />
       <SceneLabel text={input.copy.baseline} x={32} y={60} width={360} />
-      <text
-        x={415}
-        y={60}
-        fill={tokens.color.text}
-        fontFamily={tokens.text.graphic.label.fontFamily}
-        fontWeight={tokens.text.graphic.label.fontWeight}
-        fontSize={tokens.text.graphic.label.fontSize}
-      >
-        {input.participants.length}
-      </text>
+      <BaselineCount count={input.participants.length} />
       {input.visits.map((visit, index) => {
         return (
           <VisitHeader
@@ -55,5 +45,22 @@ export function DoseCohortReturnPaths({
       })}
       <CohortLegend input={input} />
     </g>
+  );
+}
+
+/** The number of participants beside the baseline caption. */
+function BaselineCount({ count }: Readonly<{ count: number }>): ReactNode {
+  const tokens = useGraphicTokens();
+  return (
+    <text
+      x={415}
+      y={60}
+      fill={tokens.color.text}
+      fontFamily={tokens.text.graphic.label.fontFamily}
+      fontWeight={tokens.text.graphic.label.fontWeight}
+      fontSize={tokens.text.graphic.label.fontSize}
+    >
+      {count}
+    </text>
   );
 }

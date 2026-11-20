@@ -19,25 +19,7 @@ export function CustodyTransfer({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
   const accepted = input.outcome === "accepted";
-  // Responsibility crosses from the acknowledgement until the sender's
-  // support withdraws, so this move keeps its cue span.
-  const transfer = accepted
-    ? ramp(
-        frame,
-        TRANSFER_CUE,
-        WITHDRAW_CUE - TRANSFER_CUE,
-        motion.travel.easing,
-      )
-    : 0;
-  const marker = {
-    cx: mix(transfer, 240, 720),
-    cy: 415,
-    r: 9,
-    fill: tokens.color.highlight,
-  };
   return (
     <g>
       <CustodySupport
@@ -55,11 +37,39 @@ export function CustodyTransfer({
       />
       <CustodyAcceptance frame={frame} accepted={accepted} accent={accent} />
       {input.showResponsibilityMarker ? (
-        <circle data-responsibility="single" {...marker} />
+        <ResponsibilityMarker frame={frame} accepted={accepted} />
       ) : undefined}
       {input.showLabels ? (
         <CustodyCaptions input={input} frame={frame} />
       ) : undefined}
     </g>
+  );
+}
+
+/** The single responsibility marker, crossing once the transfer is accepted. */
+function ResponsibilityMarker({
+  frame,
+  accepted,
+}: Readonly<{ frame: number; accepted: boolean }>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  // Responsibility crosses from the acknowledgement until the sender's
+  // support withdraws, so this move keeps its cue span.
+  const transfer = accepted
+    ? ramp(
+        frame,
+        TRANSFER_CUE,
+        WITHDRAW_CUE - TRANSFER_CUE,
+        motion.travel.easing,
+      )
+    : 0;
+  return (
+    <circle
+      data-responsibility="single"
+      cx={mix(transfer, 240, 720)}
+      cy={415}
+      r={9}
+      fill={tokens.color.highlight}
+    />
   );
 }

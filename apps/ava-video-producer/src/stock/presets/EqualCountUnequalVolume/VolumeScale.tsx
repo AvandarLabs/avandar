@@ -44,18 +44,30 @@ export function VolumeScale({
         ]}
       />
       {input.showCountGuides ? (
-        <g data-count-guide={group.id}>
-          <SketchedShape
-            shape={{
-              kind: "path",
-              d: `M420 ${y + 45} v${group.items.length * 39}`,
-            }}
-            profile={tokens.sketch.shape}
-            stroke={accent}
-            strokeDasharray={tokens.dash.guide.join(" ")}
-          />
-        </g>
+        <CountGuide group={group} y={y} accent={accent} />
       ) : null}
+    </g>
+  );
+}
+
+/** A guide beside the group as long as its count of items. */
+function CountGuide({
+  group,
+  y,
+  accent,
+}: Readonly<Omit<Props, "input">>): ReactNode {
+  const tokens = useGraphicTokens();
+  return (
+    <g data-count-guide={group.id}>
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M420 ${y + 45} v${group.items.length * 39}`,
+        }}
+        profile={tokens.sketch.shape}
+        stroke={accent}
+        strokeDasharray={tokens.dash.guide.join(" ")}
+      />
     </g>
   );
 }

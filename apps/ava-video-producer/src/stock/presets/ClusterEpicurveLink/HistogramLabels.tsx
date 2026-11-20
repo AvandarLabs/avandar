@@ -11,32 +11,7 @@ export function HistogramLabels({ input }: Readonly<Props>): ReactNode {
   return (
     <g>
       {input.timeBins.map((bin, index) => {
-        return (
-          <g key={bin.id}>
-            <text
-              x={40 + (index % 3) * 195}
-              y={385 + Math.floor(index / 3) * 48}
-              fill={tokens.color.textMuted}
-              fontFamily={tokens.text.graphic.data.fontFamily}
-              fontWeight={tokens.text.graphic.data.fontWeight}
-              fontSize={tokens.text.graphic.data.fontSize}
-            >
-              {index + 1}
-            </text>
-            <LabelSlots
-              labels={[
-                [
-                  bin.label,
-                  58 + (index % 3) * 195,
-                  385 + Math.floor(index / 3) * 48,
-                  175,
-                  12,
-                  3,
-                ],
-              ]}
-            />
-          </g>
-        );
+        return <BinLabel key={bin.id} label={bin.label} index={index} />;
       })}
       <text
         x={620}
@@ -49,6 +24,30 @@ export function HistogramLabels({ input }: Readonly<Props>): ReactNode {
         ?
       </text>
       <LabelSlots labels={[[input.copy.unknown, 640, 84, 290, 12, 4]]} />
+    </g>
+  );
+}
+
+/** A time bin's number beside its label, three bins to a row. */
+function BinLabel({
+  label,
+  index,
+}: Readonly<{ label: string; index: number }>): ReactNode {
+  const tokens = useGraphicTokens();
+  const y = 385 + Math.floor(index / 3) * 48;
+  return (
+    <g>
+      <text
+        x={40 + (index % 3) * 195}
+        y={y}
+        fill={tokens.color.textMuted}
+        fontFamily={tokens.text.graphic.data.fontFamily}
+        fontWeight={tokens.text.graphic.data.fontWeight}
+        fontSize={tokens.text.graphic.data.fontSize}
+      >
+        {index + 1}
+      </text>
+      <LabelSlots labels={[[label, 58 + (index % 3) * 195, y, 175, 12, 3]]} />
     </g>
   );
 }

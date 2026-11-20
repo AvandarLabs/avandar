@@ -28,7 +28,6 @@ export function SpineObservation({
   accent,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
   const motion = useGraphicMotion();
   const entityIndex = input.entities.findIndex(({ id }) => {
       return id === observation.entityId;
@@ -47,22 +46,36 @@ export function SpineObservation({
         stroke={tokens.color.line}
         opacity={motion.reveal(frame, 49)}
       />
-      <StockRect
-        x={50}
-        y={sourceY}
-        width={340}
-        height={54}
-        rx={scales.corner(tokens.corner.chip)}
-        fill={tokens.color.surface}
-        stroke={tokens.color.line}
-      />
-      <LiteralDataText value={observation.id} x={60} y={sourceY + 14} />
-      <LiteralDataText value={observation.entityId} x={60} y={sourceY + 32} />
+      <ObservationCard observation={observation} y={sourceY} />
       {frame < 49 || frame >= 139 ? (
         <LabelSlots
           labels={[[String(observation.value), 60, sourceY + 50, 320, 12, 1]]}
         />
       ) : null}
     </g>
+  );
+}
+
+/** The observation's card with its own ID over the entity it names. */
+function ObservationCard({
+  observation,
+  y,
+}: Readonly<{ observation: Props["observation"]; y: number }>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <>
+      <StockRect
+        x={50}
+        y={y}
+        width={340}
+        height={54}
+        rx={scales.corner(tokens.corner.chip)}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
+      />
+      <LiteralDataText value={observation.id} x={60} y={y + 14} />
+      <LiteralDataText value={observation.entityId} x={60} y={y + 32} />
+    </>
   );
 }

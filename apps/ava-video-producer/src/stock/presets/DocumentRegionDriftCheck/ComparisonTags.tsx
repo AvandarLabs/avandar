@@ -21,45 +21,62 @@ export function ComparisonTags({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
-  const width = scales.stroke(tokens.stroke.emphasis);
-  const draw = (at: number) => {
-    return ramp(frame, at, motion.scale(TAG_DRAW_FRAMES), motion.reveal.easing);
-  };
   return (
     <g>
       <LiteralDataText value={input.saved.header} x={52} y={416} />
       <LiteralDataText value={input.current.header} x={508} y={416} />
       <LiteralDataText value={input.saved.fingerprint} x={52} y={450} />
       <LiteralDataText value={input.current.fingerprint} x={508} y={450} />
-      <SketchedShape
-        shape={{ kind: "path", d: "M456 412 h36" }}
-        profile={tokens.sketch.shape}
-        stroke={
-          input.saved.header === input.current.header
-            ? accent
-            : tokens.color.highlight
-        }
-        strokeWidth={width}
-        pathLength={TAG_LENGTH}
-        strokeDasharray={TAG_LENGTH}
-        strokeDashoffset={TAG_LENGTH * (1 - draw(51))}
+      <ComparisonStroke
+        y={412}
+        isMatch={input.saved.header === input.current.header}
+        frame={frame}
+        at={51}
+        accent={accent}
       />
-      <SketchedShape
-        shape={{ kind: "path", d: "M456 446 h36" }}
-        profile={tokens.sketch.shape}
-        stroke={
-          input.saved.fingerprint === input.current.fingerprint
-            ? accent
-            : tokens.color.highlight
-        }
-        strokeWidth={width}
-        pathLength={TAG_LENGTH}
-        strokeDasharray={TAG_LENGTH}
-        strokeDashoffset={TAG_LENGTH * (1 - draw(78))}
+      <ComparisonStroke
+        y={446}
+        isMatch={input.saved.fingerprint === input.current.fingerprint}
+        frame={frame}
+        at={78}
+        accent={accent}
       />
     </g>
+  );
+}
+
+/** One comparison stroke, in the accent on a match, drawing on from `at`. */
+function ComparisonStroke({
+  y,
+  isMatch,
+  frame,
+  at,
+  accent,
+}: Readonly<{
+  y: number;
+  isMatch: boolean;
+  frame: number;
+  at: number;
+  accent: string;
+}>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  const motion = useGraphicMotion();
+  const draw = ramp(
+    frame,
+    at,
+    motion.scale(TAG_DRAW_FRAMES),
+    motion.reveal.easing,
+  );
+  return (
+    <SketchedShape
+      shape={{ kind: "path", d: `M456 ${y} h36` }}
+      profile={tokens.sketch.shape}
+      stroke={isMatch ? accent : tokens.color.highlight}
+      strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+      pathLength={TAG_LENGTH}
+      strokeDasharray={TAG_LENGTH}
+      strokeDashoffset={TAG_LENGTH * (1 - draw)}
+    />
   );
 }

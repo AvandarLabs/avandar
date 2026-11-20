@@ -53,17 +53,24 @@ export function ExceptionCase({
         fill="none"
         opacity={motion.reveal(frame, RESOLVED_CUE)}
       />
-      <FitText
-        text={input.caseLabel}
-        x={480}
-        y={546}
-        width={820}
-        fontSize={18}
-        maxLines={2}
-        anchor="middle"
-        breakLongWords
-        normalizeWhitespace
-      />
+      <CaseLabel text={input.caseLabel} />
     </g>
+  );
+}
+
+/** The case's name, centred under the resolution bracket. */
+function CaseLabel({ text }: Readonly<{ text: string }>): ReactNode {
+  return (
+    <FitText
+      text={text}
+      x={480}
+      y={546}
+      width={820}
+      fontSize={18}
+      maxLines={2}
+      anchor="middle"
+      breakLongWords
+      normalizeWhitespace
+    />
   );
 }

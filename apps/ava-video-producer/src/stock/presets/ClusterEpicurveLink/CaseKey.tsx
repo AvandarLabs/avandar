@@ -19,7 +19,6 @@ export function CaseKey({
   accent,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
   const scales = useGraphicShapeScales();
   const { record, index, isInvestigated, isFocused } = position;
   return (
@@ -34,17 +33,7 @@ export function CaseKey({
         stroke={isInvestigated ? accent : tokens.color.line}
       />
       {isFocused ? (
-        <StockRect
-          data-focused-key={record.id}
-          x={626}
-          y={142 + index * 26}
-          width={25}
-          height={25}
-          rx={scales.corner(7)}
-          fill="none"
-          stroke={tokens.color.highlight}
-          opacity={motion.ramp(frame, 90, motion.hero)}
-        />
+        <FocusRing recordId={record.id} index={index} frame={frame} />
       ) : undefined}
       <text
         x={638.5}
@@ -58,5 +47,29 @@ export function CaseKey({
         {index + 1}
       </text>
     </g>
+  );
+}
+
+/** The highlight ring around the key of the case in focus. */
+function FocusRing({
+  recordId,
+  index,
+  frame,
+}: Readonly<{ recordId: string; index: number; frame: number }>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
+  return (
+    <StockRect
+      data-focused-key={recordId}
+      x={626}
+      y={142 + index * 26}
+      width={25}
+      height={25}
+      rx={scales.corner(7)}
+      fill="none"
+      stroke={tokens.color.highlight}
+      opacity={motion.ramp(frame, 90, motion.hero)}
+    />
   );
 }

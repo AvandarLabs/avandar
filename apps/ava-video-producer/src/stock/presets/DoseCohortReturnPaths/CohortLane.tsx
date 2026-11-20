@@ -53,8 +53,6 @@ export function CohortLane({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const y = 185 + index * 40;
   const x = _getPersonPosition({ input, participant, index, frame, motion });
@@ -70,12 +68,7 @@ export function CohortLane({
         width={215}
         lines={2}
       />
-      <SketchedShape
-        shape={{ kind: "path", d: `M280 ${y + 12} H900` }}
-        profile={tokens.sketch.shape}
-        stroke={tokens.color.line}
-        strokeDasharray={atomic.dash.sparse.join(" ")}
-      />
+      <CohortTrack y={y} />
       {input.visits.map((visit, visitIndex) => {
         return (
           <CohortRecord
@@ -93,5 +86,19 @@ export function CohortLane({
       })}
       <CohortPerson id={participant.id} x={x} y={y - 10} accent={accent} />
     </g>
+  );
+}
+
+/** The participant's dashed track across the visits. */
+function CohortTrack({ y }: Readonly<{ y: number }>): ReactNode {
+  const { atomic } = useGraphicTheme();
+  const tokens = useGraphicTokens();
+  return (
+    <SketchedShape
+      shape={{ kind: "path", d: `M280 ${y + 12} H900` }}
+      profile={tokens.sketch.shape}
+      stroke={tokens.color.line}
+      strokeDasharray={atomic.dash.sparse.join(" ")}
+    />
   );
 }

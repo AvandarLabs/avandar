@@ -16,8 +16,6 @@ export function ConvoyLandmarks({
   accent,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
   const points = input.routes.find(({ role }) => {
     return role === "blocked";
   })!.points;
@@ -49,21 +47,39 @@ export function ConvoyLandmarks({
         fill={tokens.color.surface}
         stroke={tokens.color.accentAlt}
       />
-      <g
-        data-gate="arrival"
-        transform={`translate(${80 + destination.x * 800} ${180 + destination.y * 280})`}
-      >
-        <SketchedShape
-          shape={{
-            kind: "path",
-            d: `M-25 -28 V-52 M25 -28 V-52 M-25 -40 L${25 - 42 * motion.reveal(frame, 114)} ${-40 - 28 * motion.reveal(frame, 114)}`,
-          }}
-          profile={tokens.sketch.shape}
-          stroke={accent}
-          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
-        />
-        <PersonGlyph x={42} y={-40} size={30} color={tokens.color.accentAlt} />
-      </g>
+      <ArrivalGate destination={destination} frame={frame} accent={accent} />
+    </g>
+  );
+}
+
+/** The receiving gate, its arm lifting for the convoy, with its keeper. */
+function ArrivalGate({
+  destination,
+  frame,
+  accent,
+}: Readonly<{
+  destination: Readonly<{ x: number; y: number }>;
+  frame: number;
+  accent: string;
+}>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
+  return (
+    <g
+      data-gate="arrival"
+      transform={`translate(${80 + destination.x * 800} ${180 + destination.y * 280})`}
+    >
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M-25 -28 V-52 M25 -28 V-52 M-25 -40 L${25 - 42 * motion.reveal(frame, 114)} ${-40 - 28 * motion.reveal(frame, 114)}`,
+        }}
+        profile={tokens.sketch.shape}
+        stroke={accent}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+      />
+      <PersonGlyph x={42} y={-40} size={30} color={tokens.color.accentAlt} />
     </g>
   );
 }

@@ -41,7 +41,7 @@ export function GroupingZone({ zone, accent }: Readonly<Props>): ReactNode {
   );
 }
 
-/** The zone's key on its first cell and beside its summary, then the summary. */
+/** The zone key on its first cell and by its summary, then the summary. */
 function _buildZoneLabels(
   zone: Props["zone"],
   cell: Props["zone"]["cells"][number],
