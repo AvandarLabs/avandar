@@ -456,7 +456,7 @@ helpers:
     avoid: "Hex values; pass var(--token) references so the film follows the theme."
     usedBy:
       - src/scenes/GraphScene.tsx
-      - src/scenes/TiltedWindowScene/RacePair.tsx
+      - src/scenes/TiltedWindowScene/RaceStats.tsx
     demo: { id: mix-token, frames: 75 }
 
   - id: count-to
@@ -719,7 +719,7 @@ helpers:
     goodFor: "A field the flow claims is being filled, a command typed in a CTA."
     avoid: "Caption or speech timing; this simulates typing only."
     usedBy:
-      - src/scenes/BrandLockupScene/BrandLockupScene.tsx
+      - src/scenes/BrandLockupScene/LockupCta.tsx
       - src/compositions/MotionLab.tsx
     demo: { id: typed, frames: 90 }
 
@@ -1441,7 +1441,7 @@ helpers:
     goodFor: "Ending a lockup by filling the frame with a token colour."
     avoid: "Mid-film; it is an exit that covers the frame."
     usedBy:
-      - src/scenes/BrandLockupScene/BrandLockupScene.tsx
+      - src/scenes/BrandLockupScene/LockupMark.tsx
     demo: { id: fly-through, frames: 90 }
 
   - id: cta-beats
@@ -1461,7 +1461,7 @@ helpers:
     goodFor: "A closing card whose lines must not crowd the typed command."
     avoid: "Hand-timed CTA lines that drift when the command changes length."
     usedBy:
-      - src/scenes/BrandLockupScene/BrandLockupScene.tsx
+      - src/scenes/BrandLockupScene/LockupCta.tsx
     demo: { id: cta-beats, frames: 150 }
 
   - id: bar-beats
