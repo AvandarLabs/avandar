@@ -5,6 +5,7 @@ import {
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ContactCard } from "./ContactCard";
 import { ContactHandling } from "./ContactHandling";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./ReferralConsentWithdrawal.schema";
 import type { ReactNode } from "react";
 
@@ -29,21 +30,12 @@ export function PreparedContact({
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
-  const progress =
-    order < 0
-      ? 0
-      : motion.ramp(
-          frame,
-          60 + order * motion.scaleStagger(16),
-          motion.scale(16),
-          motion.entrance.easing,
-        );
-  const x = mix(progress, 520, 560);
-  const y = 194 + index * 102 - 20 * Math.sin(progress * Math.PI);
-  const isHandling =
-    order >= 0 &&
-    frame >= 60 + order * motion.scaleStagger(16) &&
-    frame <= 76 + order * motion.scaleStagger(16);
+  const { progress, x, y, isHandling } = _getPreparation(
+    frame,
+    index,
+    order,
+    motion,
+  );
   return (
     <g>
       <ContactHandling
@@ -70,4 +62,34 @@ export function PreparedContact({
       />
     </g>
   );
+}
+
+/**
+ * A contact affected by the withdrawal lifts and moves to the held column
+ * on its turn; the worker handles it while it moves.
+ */
+function _getPreparation(
+  frame: number,
+  index: number,
+  order: number,
+  motion: VideoMotion,
+) {
+  const progress =
+    order < 0
+      ? 0
+      : motion.ramp(
+          frame,
+          60 + order * motion.scaleStagger(16),
+          motion.scale(16),
+          motion.entrance.easing,
+        );
+  return {
+    progress,
+    x: mix(progress, 520, 560),
+    y: 194 + index * 102 - 20 * Math.sin(progress * Math.PI),
+    isHandling:
+      order >= 0 &&
+      frame >= 60 + order * motion.scaleStagger(16) &&
+      frame <= 76 + order * motion.scaleStagger(16),
+  };
 }

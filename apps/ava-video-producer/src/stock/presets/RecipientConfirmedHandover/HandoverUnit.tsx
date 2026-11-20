@@ -32,7 +32,6 @@ export function HandoverUnit({
 }: Readonly<Props>): ReactNode {
   const motion = useGraphicMotion();
   const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
   const content = input.contents[contentIndex];
   const { x, y, travel } = getHandoverPositionFromInputAndFrame({
     input,
@@ -50,16 +49,7 @@ export function HandoverUnit({
       data-y={y}
       transform={`translate(${x} ${y})`}
     >
-      <StockRect
-        x={-12}
-        y={-14}
-        width={24}
-        height={28}
-        rx={scales.corner(tokens.corner.chip)}
-        fill={tokens.color.surface}
-        stroke={accent}
-        strokeWidth={scales.stroke(tokens.stroke.outline)}
-      />
+      <UnitCard accent={accent} />
       <SketchedShape
         shape={{ kind: "path", d: SYMBOLS[content.symbol] }}
         profile={tokens.sketch.shape}
@@ -67,5 +57,23 @@ export function HandoverUnit({
         fill="none"
       />
     </g>
+  );
+}
+
+/** The unit's card, under its good's symbol. */
+function UnitCard({ accent }: Readonly<{ accent: string }>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <StockRect
+      x={-12}
+      y={-14}
+      width={24}
+      height={28}
+      rx={scales.corner(tokens.corner.chip)}
+      fill={tokens.color.surface}
+      stroke={accent}
+      strokeWidth={scales.stroke(tokens.stroke.outline)}
+    />
   );
 }

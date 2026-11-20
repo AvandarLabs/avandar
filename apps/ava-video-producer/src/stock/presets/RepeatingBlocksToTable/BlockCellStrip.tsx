@@ -27,8 +27,6 @@ export function BlockCellStrip({
 }: Readonly<Props>): ReactNode {
   const motion = useGraphicMotion();
   const tokens = useGraphicTokens();
-  const { atomic } = useGraphicTheme();
-  const scales = useGraphicShapeScales();
   const field = input.fields[fieldIndex],
     block = input.blocks[blockIndex];
   const value = block.cells.find(({ fieldId }) => {
@@ -46,18 +44,13 @@ export function BlockCellStrip({
   ];
   return (
     <g data-field={field.id} data-cell-value={value ?? input.missingLabel}>
-      <StockRect
-        data-transfer-cell={`${blockIndex}:${fieldIndex}`}
+      <TransferCell
+        cellKey={`${blockIndex}:${fieldIndex}`}
         x={x}
-        y={y - 44}
+        y={y}
         width={width}
-        height={108}
-        rx={scales.corner(5)}
-        fill={tokens.color.surface}
-        stroke={value === null ? tokens.color.highlight : color}
-        strokeDasharray={
-          value === null ? atomic.dash.tight.join(" ") : undefined
-        }
+        isMissing={value === null}
+        color={color}
       />
       <LabelSlots
         labels={[
@@ -66,5 +59,39 @@ export function BlockCellStrip({
         ]}
       />
     </g>
+  );
+}
+
+/** A cell's frame, dashed in the highlight when its value is missing. */
+function TransferCell({
+  cellKey,
+  x,
+  y,
+  width,
+  isMissing,
+  color,
+}: Readonly<{
+  cellKey: string;
+  x: number;
+  y: number;
+  width: number;
+  isMissing: boolean;
+  color: string;
+}>): ReactNode {
+  const tokens = useGraphicTokens();
+  const { atomic } = useGraphicTheme();
+  const scales = useGraphicShapeScales();
+  return (
+    <StockRect
+      data-transfer-cell={cellKey}
+      x={x}
+      y={y - 44}
+      width={width}
+      height={108}
+      rx={scales.corner(5)}
+      fill={tokens.color.surface}
+      stroke={isMissing ? tokens.color.highlight : color}
+      strokeDasharray={isMissing ? atomic.dash.tight.join(" ") : undefined}
+    />
   );
 }

@@ -23,8 +23,6 @@ export function ShelfActor({
   handY,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
   return (
     <g>
       <PersonGlyph
@@ -34,22 +32,7 @@ export function ShelfActor({
         color={accent}
         role={role === "retailer" ? "worker" : "participant"}
       />
-      <g
-        data-retailer-arm={role === "retailer" ? "" : undefined}
-        data-shopper-arm={role === "shopper" ? "" : undefined}
-      >
-        <SketchedShape
-          shape={{
-            kind: "path",
-            d: `M${x} ${y} L${(x + handX) / 2} ${handY + 16} L${handX} ${handY}`,
-          }}
-          profile={tokens.sketch.shape}
-          stroke={accent}
-          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
-          fill="none"
-          strokeLinecap="round"
-        />
-      </g>
+      <ActorArm {...{ role, x, y, handX, handY, accent }} />
       <circle
         data-retailer-hand={role === "retailer" ? "" : undefined}
         data-shopper-hand={role === "shopper" ? "" : undefined}
@@ -57,6 +40,37 @@ export function ShelfActor({
         cy={handY}
         r={3.5}
         fill={accent}
+      />
+    </g>
+  );
+}
+
+/** The actor's arm from body through elbow to hand. */
+function ActorArm({
+  role,
+  x,
+  y,
+  handX,
+  handY,
+  accent,
+}: Readonly<Props>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <g
+      data-retailer-arm={role === "retailer" ? "" : undefined}
+      data-shopper-arm={role === "shopper" ? "" : undefined}
+    >
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${x} ${y} L${(x + handX) / 2} ${handY + 16} L${handX} ${handY}`,
+        }}
+        profile={tokens.sketch.shape}
+        stroke={accent}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+        fill="none"
+        strokeLinecap="round"
       />
     </g>
   );

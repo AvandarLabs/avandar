@@ -18,18 +18,7 @@ export function RecurringLeakPrevention({
   accent,
 }: Readonly<Props>): ReactNode {
   const motion = useGraphicMotion();
-  const observation =
-    input.retest === "stopped"
-      ? input.labels.stopped
-      : input.retest === "still-leaking"
-        ? input.labels.continued
-        : input.labels.untested;
-  const phase =
-    frame < 63
-      ? input.labels.containment
-      : frame < 107 || input.retest === "not-tested"
-        ? input.labels.repair
-        : input.labels.test;
+  const { observation, phase } = _getLeakCaptions(input, frame);
   return (
     <g>
       <LabelSlots labels={[[input.labels.example, 60, 570, 840, 14, 2]]} />
@@ -59,4 +48,21 @@ export function RecurringLeakPrevention({
       </g>
     </g>
   );
+}
+
+/** The retest's observation and the caption of the current phase. */
+function _getLeakCaptions(input: Input, frame: number) {
+  const observation =
+    input.retest === "stopped"
+      ? input.labels.stopped
+      : input.retest === "still-leaking"
+        ? input.labels.continued
+        : input.labels.untested;
+  const phase =
+    frame < 63
+      ? input.labels.containment
+      : frame < 107 || input.retest === "not-tested"
+        ? input.labels.repair
+        : input.labels.test;
+  return { observation, phase };
 }

@@ -28,7 +28,6 @@ export function BallotPaper({
   accent,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
   const scales = useGraphicShapeScales();
   const { x, y, width, height, unfold } = geometry;
   const color = ballot.projectId === null ? tokens.color.highlight : accent;
@@ -47,28 +46,56 @@ export function BallotPaper({
         fill={tokens.color.surface}
         stroke={color}
       />
-      <g data-ballot-mark={ballot.id}>
-        <SketchedShape
-          shape={{ kind: "path", d: `M${x + 6} ${y + 8} l4 4 l6 -7` }}
-          profile={tokens.sketch.shape}
-          fill="none"
-          stroke={color}
-          opacity={
-            motion.ramp(
-              frame,
-              18 + index * motion.stagger.list,
-              motion.press.duration,
-              motion.entrance.easing,
-            ) *
-            (1 - unfold)
-          }
-        />
-      </g>
+      <BallotMark
+        ballotId={ballot.id}
+        {...{ x, y, index, frame, unfold, color }}
+      />
       {unfold === 1 ? (
         <LabelSlots
           labels={[[ballot.id, x + 7, y + 12, width - 14, 12, isRows ? 3 : 2]]}
         />
       ) : undefined}
+    </g>
+  );
+}
+
+/** The resident's tick, marked on their turn and hidden as it unfolds. */
+function BallotMark({
+  ballotId,
+  x,
+  y,
+  index,
+  frame,
+  unfold,
+  color,
+}: Readonly<{
+  ballotId: string;
+  x: number;
+  y: number;
+  index: number;
+  frame: number;
+  unfold: number;
+  color: string;
+}>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  return (
+    <g data-ballot-mark={ballotId}>
+      <SketchedShape
+        shape={{ kind: "path", d: `M${x + 6} ${y + 8} l4 4 l6 -7` }}
+        profile={tokens.sketch.shape}
+        fill="none"
+        stroke={color}
+        opacity={
+          motion.ramp(
+            frame,
+            18 + index * motion.stagger.list,
+            motion.press.duration,
+            motion.entrance.easing,
+          ) *
+          (1 - unfold)
+        }
+      />
     </g>
   );
 }

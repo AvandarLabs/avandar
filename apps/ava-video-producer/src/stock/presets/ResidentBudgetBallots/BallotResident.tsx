@@ -30,7 +30,6 @@ export function BallotResident({
   accent,
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
   const { x, y, sourceX, cast } = geometry;
   const isHandling = frame >= 16 + index * 2 && frame <= 54 + index * 3;
   return (
@@ -42,18 +41,11 @@ export function BallotResident({
         color={tokens.color.textMuted}
       />
       {isHandling ? (
-        <g data-ballot-hand={ballot.id}>
-          <SketchedShape
-            shape={{
-              kind: "path",
-              d: `M${sourceX - 10} 136 L${x + 14} ${y + 16}`,
-            }}
-            profile={tokens.sketch.shape}
-            fill="none"
-            stroke={accent}
-            strokeWidth={scales.stroke(tokens.stroke.emphasis)}
-          />
-        </g>
+        <BallotHand
+          ballotId={ballot.id}
+          path={`M${sourceX - 10} 136 L${x + 14} ${y + 16}`}
+          accent={accent}
+        />
       ) : undefined}
       <BallotPaper
         ballot={ballot}
@@ -64,16 +56,48 @@ export function BallotResident({
         accent={accent}
       />
       {cast === 0 && frame < 40 + index * 3 ? (
-        <StockRect
-          data-privacy-screen={ballot.id}
-          x={sourceX - 2}
-          y={118}
-          width={42}
-          height={46}
-          fill={tokens.color.surface}
-          stroke={tokens.color.line}
-        />
+        <PrivacyScreen ballotId={ballot.id} sourceX={sourceX} />
       ) : undefined}
     </g>
+  );
+}
+
+/** The resident's hand on their paper while marking and casting. */
+function BallotHand({
+  ballotId,
+  path,
+  accent,
+}: Readonly<{ ballotId: string; path: string; accent: string }>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <g data-ballot-hand={ballotId}>
+      <SketchedShape
+        shape={{ kind: "path", d: path }}
+        profile={tokens.sketch.shape}
+        fill="none"
+        stroke={accent}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+      />
+    </g>
+  );
+}
+
+/** The screen that keeps a paper private until it is cast. */
+function PrivacyScreen({
+  ballotId,
+  sourceX,
+}: Readonly<{ ballotId: string; sourceX: number }>): ReactNode {
+  const tokens = useGraphicTokens();
+  return (
+    <StockRect
+      data-privacy-screen={ballotId}
+      x={sourceX - 2}
+      y={118}
+      width={42}
+      height={46}
+      fill={tokens.color.surface}
+      stroke={tokens.color.line}
+    />
   );
 }

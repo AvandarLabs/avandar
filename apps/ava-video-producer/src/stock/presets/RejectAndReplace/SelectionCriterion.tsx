@@ -21,14 +21,6 @@ export function SelectionCriterion({
   const { atomic } = useGraphicTheme();
   const motion = useGraphicMotion();
   const scales = useGraphicShapeScales();
-  const label = {
-    text: input.criterion,
-    x: 480,
-    y: 60,
-    width: 840,
-    fontSize: 24 as const,
-    maxLines: 3,
-  };
   const slot = {
     x: 312,
     y: 202,
@@ -38,17 +30,7 @@ export function SelectionCriterion({
   };
   return (
     <g>
-      <g
-        opacity={motion.ramp(frame, 12, motion.hero)}
-        aria-label={input.criterion}
-      >
-        <FitText
-          {...label}
-          breakLongWords
-          normalizeWhitespace
-          anchor="middle"
-        />
-      </g>
+      <CriterionLabel criterion={input.criterion} frame={frame} />
       <StockRect
         {...slot}
         fill="none"
@@ -57,19 +39,48 @@ export function SelectionCriterion({
         opacity={motion.ramp(frame, 18, motion.hero)}
       />
       {input.showCriterionLink ? (
-        <g
-          data-criterion-link="replacement"
-          opacity={motion.reveal(frame, 108)}
-        >
-          <DrawPath
-            d="M480 145 V176 H674 V444 H624"
-            frame={frame}
-            at={108}
-            duration={12}
-            color={accent}
-          />
-        </g>
+        <CriterionLink frame={frame} accent={accent} />
       ) : null}
+    </g>
+  );
+}
+
+/** The link from the criterion to the replacement it selected. */
+function CriterionLink({
+  frame,
+  accent,
+}: Readonly<{ frame: number; accent: string }>): ReactNode {
+  const motion = useGraphicMotion();
+  return (
+    <g data-criterion-link="replacement" opacity={motion.reveal(frame, 108)}>
+      <DrawPath
+        d="M480 145 V176 H674 V444 H624"
+        frame={frame}
+        at={108}
+        duration={12}
+        color={accent}
+      />
+    </g>
+  );
+}
+
+/** The stated criterion, fading in above the selection slot. */
+function CriterionLabel({
+  criterion,
+  frame,
+}: Readonly<{ criterion: string; frame: number }>): ReactNode {
+  const motion = useGraphicMotion();
+  const label = {
+    text: criterion,
+    x: 480,
+    y: 60,
+    width: 840,
+    fontSize: 24 as const,
+    maxLines: 3,
+  };
+  return (
+    <g opacity={motion.ramp(frame, 12, motion.hero)} aria-label={criterion}>
+      <FitText {...label} breakLongWords normalizeWhitespace anchor="middle" />
     </g>
   );
 }

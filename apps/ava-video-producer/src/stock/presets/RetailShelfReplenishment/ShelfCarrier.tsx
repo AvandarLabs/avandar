@@ -32,30 +32,8 @@ export function ShelfCarrier({
         stroke={tokens.color.inactive}
         strokeWidth={scales.stroke(tokens.stroke.emphasis)}
       />
-      <SketchedShape
-        shape={{
-          kind: "circle",
-          cx: 700,
-          cy: 424,
-          r: input.deliveryMode === "cargo-bike" ? 20 : 10,
-        }}
-        profile={tokens.sketch.shape}
-        fill="none"
-        stroke={tokens.color.inactive}
-        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
-      />
-      <SketchedShape
-        shape={{
-          kind: "circle",
-          cx: 800,
-          cy: 424,
-          r: input.deliveryMode === "cargo-bike" ? 20 : 10,
-        }}
-        profile={tokens.sketch.shape}
-        fill="none"
-        stroke={tokens.color.inactive}
-        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
-      />
+      <CarrierWheel cx={700} isBike={input.deliveryMode === "cargo-bike"} />
+      <CarrierWheel cx={800} isBike={input.deliveryMode === "cargo-bike"} />
       {input.deliveryMode === "cargo-bike" ? (
         <SketchedShape
           shape={{
@@ -69,5 +47,28 @@ export function ShelfCarrier({
         />
       ) : undefined}
     </g>
+  );
+}
+
+/** A wheel: large on a cargo bike, small on a trolley. */
+function CarrierWheel({
+  cx,
+  isBike,
+}: Readonly<{ cx: number; isBike: boolean }>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <SketchedShape
+      shape={{
+        kind: "circle",
+        cx,
+        cy: 424,
+        r: isBike ? 20 : 10,
+      }}
+      profile={tokens.sketch.shape}
+      fill="none"
+      stroke={tokens.color.inactive}
+      strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+    />
   );
 }

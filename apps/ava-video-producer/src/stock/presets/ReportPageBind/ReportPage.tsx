@@ -41,16 +41,7 @@ export function ReportPage({
       transform={`translate(${x} ${y})`}
       opacity={motion.reveal(frame, 12 + index * motion.stagger.list)}
     >
-      <StockRect
-        data-page-paper={section.id}
-        x={-16}
-        y={-8}
-        width={mix(margins, 740, 800)}
-        height={mix(margins, 86, 136)}
-        rx={scales.corner(tokens.corner.chip)}
-        fill={tokens.color.surface}
-        stroke={tokens.color.line}
-      />
+      <PagePaper sectionId={section.id} margins={margins} />
       <SketchedShape
         shape={{ kind: "path", d: "M0 6V108" }}
         profile={tokens.sketch.shape}
@@ -68,5 +59,26 @@ export function ReportPage({
         accent={accent}
       />
     </g>
+  );
+}
+
+/** The paper growing its margins around the section. */
+function PagePaper({
+  sectionId,
+  margins,
+}: Readonly<{ sectionId: string; margins: number }>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <StockRect
+      data-page-paper={sectionId}
+      x={-16}
+      y={-8}
+      width={mix(margins, 740, 800)}
+      height={mix(margins, 86, 136)}
+      rx={scales.corner(tokens.corner.chip)}
+      fill={tokens.color.surface}
+      stroke={tokens.color.line}
+    />
   );
 }

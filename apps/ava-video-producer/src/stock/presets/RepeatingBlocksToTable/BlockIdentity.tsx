@@ -4,6 +4,7 @@ import {
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { BlockCaption } from "./BlockCaption";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./RepeatingBlocksToTable.schema";
 import type { ReactNode } from "react";
 
@@ -17,10 +18,39 @@ export function BlockIdentity({
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
+  const color = [accent, tokens.color.accentAlt, tokens.color.highlight][index];
+  const poses = _createIdentityPoses(input, index, frame, motion);
+  return (
+    <g data-output-block={input.blocks[index].id}>
+      {poses.map((pose, poseIndex) => {
+        return (
+          <BlockCaption
+            key={poseIndex}
+            {...pose}
+            heading={input.blocks[index].heading}
+            index={index}
+            showBlockNumbers={input.showBlockNumbers}
+            accent={color}
+          />
+        );
+      })}
+    </g>
+  );
+}
+
+/**
+ * The heading over its source block, fading out, and beside its result row,
+ * arriving last block first.
+ */
+function _createIdentityPoses(
+  input: Input,
+  index: number,
+  frame: number,
+  motion: VideoMotion,
+) {
   const duration = 9 / input.blocks.length,
     departure = 96 + (input.blocks.length - 1 - index) * duration;
-  const color = [accent, tokens.color.accentAlt, tokens.color.highlight][index];
-  const poses = [
+  return [
     {
       x: 52 + index * 294,
       y: 135,
@@ -38,20 +68,4 @@ export function BlockIdentity({
       opacity: motion.ramp(frame, departure, motion.scale(0.5)),
     },
   ];
-  return (
-    <g data-output-block={input.blocks[index].id}>
-      {poses.map((pose, poseIndex) => {
-        return (
-          <BlockCaption
-            key={poseIndex}
-            {...pose}
-            heading={input.blocks[index].heading}
-            index={index}
-            showBlockNumbers={input.showBlockNumbers}
-            accent={color}
-          />
-        );
-      })}
-    </g>
-  );
 }

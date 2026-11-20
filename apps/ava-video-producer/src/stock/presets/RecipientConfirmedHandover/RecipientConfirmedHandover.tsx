@@ -21,9 +21,7 @@ export function RecipientConfirmedHandover({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
   return (
     <g>
       <HandoverLabels input={input} />
@@ -34,6 +32,33 @@ export function RecipientConfirmedHandover({
         role="worker"
         color={tokens.color.accentAlt}
       />
+      <HandoverFurniture accent={accent} />
+      {input.contents.map((content, index) => {
+        return (
+          <HandoverGoodsRow
+            key={content.id}
+            input={input}
+            index={index}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
+      <HandoverRecipient input={input} frame={frame} accent={accent} />
+      <HandoverReceipt input={input} frame={frame} accent={accent} />
+    </g>
+  );
+}
+
+/** The delivery table and the recipient's basket mat. */
+function HandoverFurniture({
+  accent,
+}: Readonly<{ accent: string }>): ReactNode {
+  const { atomic } = useGraphicTheme();
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <>
       <StockRect
         x={353}
         y={165}
@@ -54,19 +79,6 @@ export function RecipientConfirmedHandover({
         stroke={accent}
         strokeWidth={scales.stroke(tokens.stroke.default)}
       />
-      {input.contents.map((content, index) => {
-        return (
-          <HandoverGoodsRow
-            key={content.id}
-            input={input}
-            index={index}
-            frame={frame}
-            accent={accent}
-          />
-        );
-      })}
-      <HandoverRecipient input={input} frame={frame} accent={accent} />
-      <HandoverReceipt input={input} frame={frame} accent={accent} />
-    </g>
+    </>
   );
 }

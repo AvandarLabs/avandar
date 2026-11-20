@@ -20,7 +20,6 @@ export function ProjectTally({
   columnWidth,
   offset,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
   const total = input.ballots.filter(
     propEq("projectId", project?.id ?? null),
   ).length;
@@ -47,17 +46,40 @@ export function ProjectTally({
         ]}
       />
       {input.showTotals ? (
-        <text
+        <TallyTotal
+          total={total}
           x={x + (project ? 100 : 30)}
           y={200 + offset}
-          fill={project ? tokens.color.text : tokens.color.highlight}
-          fontSize={tokens.text.graphic.body.fontSize}
-          fontFamily={tokens.text.graphic.body.fontFamily}
-          fontWeight={tokens.text.graphic.body.fontWeight}
-        >
-          {total}
-        </text>
+          isAbstention={!project}
+        />
       ) : undefined}
     </g>
+  );
+}
+
+/** A tally's total, in the highlight for abstentions. */
+function TallyTotal({
+  total,
+  x,
+  y,
+  isAbstention,
+}: Readonly<{
+  total: number;
+  x: number;
+  y: number;
+  isAbstention: boolean;
+}>): ReactNode {
+  const tokens = useGraphicTokens();
+  return (
+    <text
+      x={x}
+      y={y}
+      fill={isAbstention ? tokens.color.highlight : tokens.color.text}
+      fontSize={tokens.text.graphic.body.fontSize}
+      fontFamily={tokens.text.graphic.body.fontFamily}
+      fontWeight={tokens.text.graphic.body.fontWeight}
+    >
+      {total}
+    </text>
   );
 }

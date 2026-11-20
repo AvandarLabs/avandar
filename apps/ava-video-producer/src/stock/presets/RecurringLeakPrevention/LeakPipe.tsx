@@ -40,40 +40,53 @@ export function LeakPipe({ input, frame, accent }: Readonly<Props>): ReactNode {
         stroke={tokens.color.inactive}
         strokeWidth={scales.stroke(6)}
       />
-      {running ? (
-        <g data-outlet-flow="true">
-          <SketchedShape
-            shape={{ kind: "path", d: "M220 260 H735 V430" }}
-            profile={tokens.sketch.shape}
-            stroke={tokens.color.accentAlt}
-            strokeWidth={scales.stroke(5)}
-            strokeDasharray={FLOW_DASH}
-            strokeDashoffset={-loopPhase(frame, 48) * 48}
-            fill="none"
+      {running ? <OutletFlow frame={frame} /> : undefined}
+      {leaking ? <SideLeak frame={frame} /> : undefined}
+    </g>
+  );
+}
+
+/** Water running through the pipe and out of the outlet. */
+function OutletFlow({ frame }: Readonly<{ frame: number }>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <g data-outlet-flow="true">
+      <SketchedShape
+        shape={{ kind: "path", d: "M220 260 H735 V430" }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.accentAlt}
+        strokeWidth={scales.stroke(5)}
+        strokeDasharray={FLOW_DASH}
+        strokeDashoffset={-loopPhase(frame, 48) * 48}
+        fill="none"
+      />
+      <SketchedShape
+        shape={{ kind: "path", d: "M720 440 h30" }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.accentAlt}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+      />
+    </g>
+  );
+}
+
+/** Drops falling from the leaking joint. */
+function SideLeak({ frame }: Readonly<{ frame: number }>): ReactNode {
+  const tokens = useGraphicTokens();
+  return (
+    <g data-side-leak="true">
+      {[0, 1, 2].map((index) => {
+        return (
+          <circle
+            key={index}
+            cx={480}
+            cy={300 + loopPhase(frame, 30, index * 10) * 110}
+            r={4}
+            fill={tokens.color.accentAlt}
           />
-          <SketchedShape
-            shape={{ kind: "path", d: "M720 440 h30" }}
-            profile={tokens.sketch.shape}
-            stroke={tokens.color.accentAlt}
-            strokeWidth={scales.stroke(tokens.stroke.emphasis)}
-          />
-        </g>
-      ) : undefined}
-      {leaking ? (
-        <g data-side-leak="true">
-          {[0, 1, 2].map((index) => {
-            return (
-              <circle
-                key={index}
-                cx={480}
-                cy={300 + loopPhase(frame, 30, index * 10) * 110}
-                r={4}
-                fill={tokens.color.accentAlt}
-              />
-            );
-          })}
-        </g>
-      ) : undefined}
+        );
+      })}
     </g>
   );
 }
