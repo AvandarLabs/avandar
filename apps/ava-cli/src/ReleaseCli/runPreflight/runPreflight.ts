@@ -53,14 +53,15 @@ export type PreflightResult =
  */
 function _resolveLine(
   git: ReleaseCommands,
-): { line: ReleaseLine } | PreflightRefusal {
+): { ok: true; line: ReleaseLine } | ({ ok: false } & PreflightRefusal) {
   const currentBranch = getCurrentBranch(git);
   const line = getReleaseLineFromBranch(currentBranch);
   const alphaSource = ALPHA_RELEASE_LINE.sourceBranch;
   const mainlineSource = MAINLINE_RELEASE_LINE.sourceBranch;
   return line !== undefined
-    ? { line }
+    ? { ok: true, line }
     : {
+        ok: false,
         reason: "wrong-branch",
         message: `Releases are cut from "${alphaSource}" or "${mainlineSource}" (currently on "${currentBranch ?? "a detached HEAD"}"). Run it on ${alphaSource} to release alpha, or on ${mainlineSource} to release mainline.`,
       };
@@ -137,11 +138,45 @@ function _refuseFailedFetch(
 }
 
 /**
- * Why `origin/<target>` is missing, for `_resolveReleaseRefs`. On the alpha
- * line this is expected before the first release, so the message carries the
- * command that creates `alpha` at `main`'s commit.
+ * The refusal when the local source branch is not exactly `originSha`.
+ *
+ * Releasing a commit that only exists locally would ship code the source
+ * branch's CI never ran, and would leave origin describing a release it does
+ * not contain.
  */
-function _describeMissingTarget(line: ReleaseLine): string {
+function _refuseOutOfSyncSourceBranch(
+  git: ReleaseCommands,
+  options: Readonly<{ line: ReleaseLine; originSha: string }>,
+): PreflightRefusal | undefined {
+  const { line, originSha } = options;
+  const localSourceSha = revParse(git, line.sourceBranch);
+  if (localSourceSha === undefined) {
+    return {
+      reason: "missing-ref",
+      message: `Could not resolve ${line.sourceBranch}.`,
+    };
+  }
+  if (localSourceSha === originSha) {
+    return undefined;
+  }
+  const { ahead, behind } = getDivergence(
+    git,
+    line.sourceBranch,
+    `origin/${line.sourceBranch}`,
+  );
+  return {
+    reason: "out-of-sync",
+    message: `${line.sourceBranch} is out of sync with origin/${line.sourceBranch} (${ahead} ahead, ${behind} behind). Push or pull it, then release.`,
+  };
+}
+
+/**
+ * The refusal message when `origin/<target>` is missing, for
+ * `_resolveReleaseRefs`. On the alpha line this is expected before the first
+ * release, so the message carries the command that creates `alpha` at
+ * `main`'s commit.
+ */
+function _buildMissingTargetMessage(line: ReleaseLine): string {
   const missing = `origin/${line.targetBranch} does not exist.`;
   return line.kind === "alpha"
     ? `${missing} For the first alpha release, create it at ${MAINLINE_RELEASE_LINE.targetBranch}'s commit first: git push origin origin/${MAINLINE_RELEASE_LINE.targetBranch}:refs/heads/${line.targetBranch}`
@@ -176,7 +211,7 @@ function _resolveReleaseRefs(
     return {
       ok: false,
       reason: "missing-ref",
-      message: _describeMissingTarget(line),
+      message: _buildMissingTargetMessage(line),
     };
   }
 
@@ -188,43 +223,12 @@ function _resolveReleaseRefs(
     return { ok: false, ...outOfSync };
   }
 
-  const localTargetSha = refExists(git, `refs/heads/${line.targetBranch}`)
-    ? revParse(git, line.targetBranch)
+  // Fully qualified, so a tag named `main` or `alpha` cannot win the lookup.
+  const localTargetRef = `refs/heads/${line.targetBranch}`;
+  const localTargetSha = refExists(git, localTargetRef)
+    ? revParse(git, localTargetRef)
     : undefined;
   return { ok: true, line, originSourceSha, originTargetSha, localTargetSha };
-}
-
-/**
- * The refusal when the local source branch is not exactly `originSha`.
- *
- * Releasing a commit that only exists locally would ship code the source
- * branch's CI never ran, and would leave origin describing a release it does
- * not contain.
- */
-function _refuseOutOfSyncSourceBranch(
-  git: ReleaseCommands,
-  options: Readonly<{ line: ReleaseLine; originSha: string }>,
-): PreflightRefusal | undefined {
-  const { line, originSha } = options;
-  const localSourceSha = revParse(git, line.sourceBranch);
-  if (localSourceSha === undefined) {
-    return {
-      reason: "missing-ref",
-      message: `Could not resolve ${line.sourceBranch}.`,
-    };
-  }
-  if (localSourceSha === originSha) {
-    return undefined;
-  }
-  const { ahead, behind } = getDivergence(
-    git,
-    line.sourceBranch,
-    `origin/${line.sourceBranch}`,
-  );
-  return {
-    reason: "out-of-sync",
-    message: `${line.sourceBranch} is out of sync with origin/${line.sourceBranch} (${ahead} ahead, ${behind} behind). Push or pull it, then release.`,
-  };
 }
 
 /**
@@ -240,8 +244,8 @@ function _refuseOutOfSyncSourceBranch(
 export function runPreflight(git: ReleaseCommands): PreflightResult {
   // The branch decides everything else, so nothing runs on a refused one.
   const resolvedLine = _resolveLine(git);
-  if (!("line" in resolvedLine)) {
-    return { ok: false, ...resolvedLine };
+  if (!resolvedLine.ok) {
+    return resolvedLine;
   }
   const { line } = resolvedLine;
 

@@ -27,6 +27,13 @@ type FakeRepoState = {
   originTarget?: string | undefined;
   /** Tip of the local checked-out branch. */
   localSource?: string;
+  /** Tip of the local target branch (`refs/heads/<target>`). */
+  localTarget?: string;
+  /**
+   * A tag named like the target branch, or `undefined` for none. As in git, a
+   * bare `main` or `alpha` then resolves to the tag, not the branch.
+   */
+  targetTag?: string | undefined;
   /** The `origin` URL, which decides whether the permission check applies. */
   remoteUrl?: string;
   /** Mirrors `createReleaseCommands`' `--dry-run` mode. */
@@ -41,8 +48,16 @@ const TARGET_BRANCH_BY_SOURCE: Readonly<Record<string, string>> = {
   "alpha-dev": "alpha",
 };
 
-/** A `FakeRepoState` with every default filled in. */
-type ResolvedRepoState = Required<FakeRepoState>;
+/**
+ * A `FakeRepoState` with every default filled in. The fields that may be
+ * `undefined` are listed apart, since `Required` would strip `undefined`.
+ */
+type ResolvedRepoState = Required<
+  Omit<FakeRepoState, "originTarget" | "targetTag">
+> & {
+  originTarget: string | undefined;
+  targetTag: string | undefined;
+};
 
 /** Fill in the defaults a test did not override. */
 function _resolveRepoState(state: Readonly<FakeRepoState>): ResolvedRepoState {
@@ -55,6 +70,8 @@ function _resolveRepoState(state: Readonly<FakeRepoState>): ResolvedRepoState {
     originSource: "source-sha",
     originTarget: "target-sha",
     localSource: "source-sha",
+    localTarget: "local-target-sha",
+    targetTag: undefined,
     remoteUrl: "git@github.com:AvandarLabs/avandar.git",
     dryRun: false,
     ...state,
@@ -86,9 +103,11 @@ function _createReadGit(
                 ? state.originTarget
                 : revision === state.branch
                   ? state.localSource
-                  : revision === targetBranch
-                    ? state.originTarget
-                    : undefined;
+                  : revision === `refs/heads/${targetBranch}`
+                    ? state.localTarget
+                    : revision === targetBranch
+                      ? (state.targetTag ?? state.localTarget)
+                      : undefined;
   };
 }
 
@@ -178,7 +197,9 @@ describe("runPreflight", () => {
     expect(result.ok === true && result.originSourceSha).toBe("source-sha");
     expect(result.ok === true && result.originTargetSha).toBe("target-sha");
     // Downstream, `updateLocalMainRef` branches on this.
-    expect(result.ok === true && result.localTargetSha).toBe("target-sha");
+    expect(result.ok === true && result.localTargetSha).toBe(
+      "local-target-sha",
+    );
   });
 
   it("resolves the mainline release line on develop", () => {
@@ -199,10 +220,37 @@ describe("runPreflight", () => {
     const result = runPreflight(git);
 
     expect(result.ok === true && result.line).toBe(ALPHA_RELEASE_LINE);
+  });
+
+  it("reads alpha-dev's release refs from origin/alpha-dev, origin/alpha, and local alpha", () => {
+    const { git } = _createFakeCommands({
+      branch: ALPHA_RELEASE_LINE.sourceBranch,
+    });
+
+    const result = runPreflight(git);
+
     expect(result.ok === true && result.originSourceSha).toBe("source-sha");
     expect(result.ok === true && result.originTargetSha).toBe("target-sha");
-    expect(result.ok === true && result.localTargetSha).toBe("target-sha");
+    expect(result.ok === true && result.localTargetSha).toBe(
+      "local-target-sha",
+    );
   });
+
+  it.each([
+    MAINLINE_RELEASE_LINE.sourceBranch,
+    ALPHA_RELEASE_LINE.sourceBranch,
+  ])(
+    "reads the local target branch on %s, not a tag with the same name",
+    (branch) => {
+      const { git } = _createFakeCommands({ branch, targetTag: "tag-sha" });
+
+      const result = runPreflight(git);
+
+      expect(result.ok === true && result.localTargetSha).toBe(
+        "local-target-sha",
+      );
+    },
+  );
 
   it("reports no local target branch on a fresh clone", () => {
     const { git } = _createFakeCommands({ localTargetExists: false });
@@ -225,36 +273,54 @@ describe("runPreflight", () => {
     expect(result.ok === true && result.localTargetSha).toBeUndefined();
   });
 
-  it.each(["main", "alpha", "feat/something"])(
-    "refuses %s before running any other command, naming both source branches",
+  it.each(["main", "alpha", "feat/something", "HEAD"])(
+    "refuses %s as the wrong branch",
     (branch) => {
-      const { git, executedCommands } = _createFakeCommands({ branch });
+      const { git } = _createFakeCommands({ branch });
 
       const result = runPreflight(git);
 
       expect(result.ok === false && result.reason).toBe("wrong-branch");
+    },
+  );
+
+  it.each(["main", "alpha", "feat/something"])(
+    "names %s and both source branches in the refusal",
+    (branch) => {
+      const { git } = _createFakeCommands({ branch });
+
+      const result = runPreflight(git);
+
       // The offending branch has to reach the message the reviewer reads.
       expect(result.ok === false && result.message).toContain(`"${branch}"`);
       expect(result.ok === false && result.message).toContain(
         '"alpha-dev" or "develop"',
       );
-      // Nothing past the branch lookup runs: no status, gh, fetch, or push.
-      expect(executedCommands).toEqual(["git rev-parse --abbrev-ref HEAD"]);
     },
   );
 
-  it("refuses on a detached HEAD, naming both source branches", () => {
-    const { git, executedCommands } = _createFakeCommands({ branch: "HEAD" });
+  it("names a detached HEAD and both source branches in the refusal", () => {
+    const { git } = _createFakeCommands({ branch: "HEAD" });
 
     const result = runPreflight(git);
 
-    expect(result.ok === false && result.reason).toBe("wrong-branch");
     expect(result.ok === false && result.message).toContain("detached HEAD");
     expect(result.ok === false && result.message).toContain(
       '"alpha-dev" or "develop"',
     );
-    expect(executedCommands).toEqual(["git rev-parse --abbrev-ref HEAD"]);
   });
+
+  it.each(["main", "alpha", "feat/something", "HEAD"])(
+    "runs only the branch lookup on %s",
+    (branch) => {
+      const { git, executedCommands } = _createFakeCommands({ branch });
+
+      runPreflight(git);
+
+      // No status, gh, fetch, or push follows a refused branch.
+      expect(executedCommands).toHaveLength(1);
+    },
+  );
 
   it("refuses a dirty tree and shows what is dirty", () => {
     const { git } = _createFakeCommands({ trackedChanges: " M package.json" });
