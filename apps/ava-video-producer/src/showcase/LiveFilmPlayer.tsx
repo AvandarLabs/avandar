@@ -19,7 +19,8 @@ import { useObservedTokenUsage } from "../videoThemeEditor/observedTokenUsage/us
 import { CaptionToggle } from "./CaptionToggle";
 import { LiveFilm } from "./LiveFilm";
 import { LIVE_FILM_ID } from "./liveFilmId";
-import { postToParentGallery, useFilmControl } from "./useFilmControl";
+import { postToParentGallery } from "./postToParentGallery";
+import { useFilmControl } from "./useFilmControl";
 import type { VideoThemeSnapshot } from "../videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 import type { Film } from "./showcase.types";
 

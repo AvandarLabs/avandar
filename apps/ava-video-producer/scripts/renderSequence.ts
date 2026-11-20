@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { isPlainObject } from "@avandar/utils";
 import { bundle } from "@remotion/bundler";
 import {
   type ChromiumOptions,
@@ -65,6 +66,22 @@ async function _bundleEntry(root: string): Promise<string> {
   });
 }
 
+/** Reads and validates `REMOTION_PROPS_FILE` as a plain input-props object. */
+async function _readInputProps(
+  propsFile: string | undefined,
+): Promise<Record<string, unknown>> {
+  if (!propsFile) {
+    return {};
+  }
+  const parsed: unknown = JSON.parse(await fs.readFile(propsFile, "utf8"));
+  if (!isPlainObject(parsed)) {
+    throw new Error(
+      `REMOTION_PROPS_FILE must contain a JSON object: ${propsFile}`,
+    );
+  }
+  return parsed;
+}
+
 /** Renders the composition's frames serially to JPEG in `outputDir`. */
 async function _renderFrames(
   session: Readonly<
@@ -103,10 +120,7 @@ async function _renderSequence(options: {
   outputDir: string;
 }): Promise<void> {
   const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-  const propsFile = process.env.REMOTION_PROPS_FILE;
-  const inputProps = propsFile
-    ? JSON.parse(await fs.readFile(propsFile, "utf8"))
-    : {};
+  const inputProps = await _readInputProps(process.env.REMOTION_PROPS_FILE);
   const serveUrl = await _bundleEntry(root);
   const browserOptions = _getBrowserOptions();
   const chromiumOptions = _getChromiumOptions();

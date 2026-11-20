@@ -10,16 +10,13 @@ import type {
   Route,
 } from "@playwright/test";
 
-/** The subset of a Playwright `Request` the network-policy mock inspects. */
-type FakeRequest = Pick<Request, "url" | "method" | "resourceType">;
-
 /**
  * The subset of a Playwright `Route` the network-policy mock exercises.
- * `request` is narrowed to `FakeRequest` since the mock never builds a full
- * `Request`.
+ * `request` is narrowed to the inspected fields since the mock never builds a
+ * full `Request`.
  */
 type FakeRoute = Pick<Route, "continue" | "abort" | "fulfill"> & {
-  request: () => FakeRequest;
+  request: () => Pick<Request, "url" | "method" | "resourceType">;
 };
 
 type FakeRouteHandler = (route: FakeRoute) => Promise<void>;
@@ -44,14 +41,6 @@ type FakeVideo = {
 };
 
 /**
- * The screenshot options the mock reads. The rest of
- * `PageScreenshotOptions` is unused.
- */
-type FakeScreenshotOptions = Pick<PageScreenshotOptions, "animations"> & {
-  path: string;
-};
-
-/**
  * The subset of a Playwright `Page` the capture runner drives: navigation,
  * readiness waits, locator stubs for narration/password masking, and
  * screenshotting.
@@ -62,7 +51,9 @@ type FakePage = Pick<Page, "url" | "waitForTimeout"> & {
   evaluate: () => Promise<void>;
   locator: () => { innerText: () => Promise<string> };
   getByText: () => Record<string, never>;
-  screenshot: (options: FakeScreenshotOptions) => Promise<void>;
+  screenshot: (
+    options: Pick<PageScreenshotOptions, "animations"> & { path: string },
+  ) => Promise<void>;
 };
 
 /**
@@ -91,15 +82,6 @@ export type FakeContext = Pick<
 type FakeBrowser = Pick<Browser, "version" | "close"> & {
   newContext: (options?: BrowserContextOptions) => Promise<FakeContext>;
 };
-
-/**
- * The fake as the Playwright browser `runCapture` accepts. It implements only
- * the browser, context, and page members a capture run calls, so it cannot
- * satisfy Playwright's full types.
- */
-function _asBrowser(browser: FakeBrowser): Browser {
-  return browser as unknown as Browser;
-}
 
 /** A video that may only be saved after its context closed. */
 function _createFakeVideo(events: string[], contextNumber: number): FakeVideo {
@@ -205,8 +187,8 @@ function _createFakeContext(
   let routeHandler: FakeRouteHandler | undefined;
   return {
     options: options.settings,
-    setDefaultTimeout() {},
-    setDefaultNavigationTimeout() {},
+    setDefaultTimeout: () => {},
+    setDefaultNavigationTimeout: () => {},
     route: async (_pattern, handler) => {
       routeHandler = handler;
     },
@@ -258,5 +240,7 @@ export function createFakeBrowser(): {
       return context;
     },
   };
-  return { browser: _asBrowser(browser), events, contexts };
+  // FakeBrowser implements only the Browser members runCapture calls in unit
+  // tests rather than Playwright's full Browser interface.
+  return { browser: browser as unknown as Browser, events, contexts };
 }

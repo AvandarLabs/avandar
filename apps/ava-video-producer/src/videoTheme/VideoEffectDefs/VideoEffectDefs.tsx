@@ -3,7 +3,7 @@ import {
   type EffectPrimitive,
   type VideoEffectFilter,
 } from "../videoEffectFilterHelpers/videoEffectFilterHelpers";
-import { GlowEffect } from "./GlowEffect";
+import { FilterPrimitive } from "./FilterPrimitive";
 import type { ReactNode } from "react";
 
 type Props = Readonly<{
@@ -11,20 +11,20 @@ type Props = Readonly<{
   filters: readonly VideoEffectFilter[];
 }>;
 
-type KeyedPrimitive = Readonly<{
+type KeyedPrimitive = {
   key: string;
   primitive: EffectPrimitive;
   input: string;
   result: string;
-}>;
+};
 
 function _buildKeyedPrimitives(
   primitives: readonly EffectPrimitive[],
 ): KeyedPrimitive[] {
-  const counts = new Map<string, number>();
+  const primitiveKindCounts = new Map<string, number>();
   return primitives.map((primitive, stepOffset) => {
-    const occurrence = counts.get(primitive.kind) ?? 0;
-    counts.set(primitive.kind, occurrence + 1);
+    const occurrence = primitiveKindCounts.get(primitive.kind) ?? 0;
+    primitiveKindCounts.set(primitive.kind, occurrence + 1);
     return {
       key: `${primitive.kind}-${occurrence}`,
       primitive,
@@ -32,41 +32,6 @@ function _buildKeyedPrimitives(
       result: `fx${stepOffset}`,
     };
   });
-}
-
-function _primitive({
-  key,
-  primitive,
-  input,
-  result,
-}: KeyedPrimitive): ReactNode {
-  if (primitive.kind === "dropShadow") {
-    return (
-      <feDropShadow
-        key={key}
-        dx={primitive.dx}
-        dy={primitive.dy}
-        stdDeviation={primitive.stdDeviation}
-        floodColor={primitive.color}
-        floodOpacity={primitive.opacity}
-        in={input}
-        result={result}
-      />
-    );
-  }
-  if (primitive.kind === "blur") {
-    return (
-      <feGaussianBlur
-        key={key}
-        in={input}
-        stdDeviation={primitive.stdDeviation}
-        result={result}
-      />
-    );
-  }
-  return (
-    <GlowEffect key={key} primitive={primitive} input={input} result={result} />
-  );
 }
 
 /**
@@ -91,7 +56,16 @@ export function VideoEffectDefs({ graphicId, filters }: Props): ReactNode {
             height="200%"
             colorInterpolationFilters="sRGB"
           >
-            {_buildKeyedPrimitives(filter.primitives).map(_primitive)}
+            {_buildKeyedPrimitives(filter.primitives).map((step) => {
+              return (
+                <FilterPrimitive
+                  key={step.key}
+                  primitive={step.primitive}
+                  input={step.input}
+                  result={step.result}
+                />
+              );
+            })}
           </filter>
         );
       })}

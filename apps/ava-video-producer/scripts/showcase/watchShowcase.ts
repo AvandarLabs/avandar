@@ -5,7 +5,7 @@ import { appRoot } from "./ShowcaseFilms/ShowcaseFilms";
 import {
   type ShowcaseSiteWatcher,
   watchShowcaseSite,
-} from "./watchShowcaseSite";
+} from "./watchShowcaseSite/watchShowcaseSite";
 
 /**
  * Watches product source and every showcase page without serving the repo,

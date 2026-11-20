@@ -1,6 +1,6 @@
 import { buildProduct } from "../buildProduct/buildProduct";
 import { requireLicense } from "../requireLicense";
-import { buildShowcaseSite } from "./buildShowcaseSite";
+import { buildShowcaseSite } from "./buildShowcaseSite/buildShowcaseSite";
 import { makeShowcasePathsFromAppRoot } from "./makeShowcasePathsFromAppRoot";
 import { appRoot } from "./ShowcaseFilms/ShowcaseFilms";
 

@@ -55,14 +55,19 @@ function _makeCueFromSrtBlock(options: {
 }
 
 /**
- * Import manually aligned SRT cues without pretending to perform speech
- * recognition.
+ * Retimes a storyboard's narration cues from manually aligned SRT blocks with
+ * exact text verification, attaching `audio` as `narrationTrack`. Performs no
+ * speech recognition. Called by `alignRecording`.
  */
-export function applySrt(
-  plan: Storyboard,
-  srt: string,
-  audio: string,
-): Storyboard {
+export function applySrt({
+  plan,
+  srt,
+  audio,
+}: Readonly<{
+  plan: Readonly<Storyboard>;
+  srt: string;
+  audio: string;
+}>): Storyboard {
   const blocks = srt
     .replace(/^﻿/, "")
     .replaceAll("\r\n", "\n")

@@ -19,8 +19,8 @@ const REVIEW_PAGE =
   '<!doctype html><html><head><link rel="icon" href="data:,"><link rel="stylesheet" href="review.css"><style>body{margin:0;background:#486581}</style></head><body><div id="root"></div><script src="review.js"></script><script>let generation;new EventSource("/events").onmessage=event=>{if(generation!==undefined&&generation!==event.data)location.reload();generation=event.data;};</script></body></html>';
 
 type ReviewRequest = {
-  req: IncomingMessage;
-  res: ServerResponse;
+  request: IncomingMessage;
+  response: ServerResponse;
   root: string;
   clients: Set<ServerResponse>;
   getGeneration: () => number;
@@ -73,36 +73,36 @@ function _getContentType(file: string): string {
 
 /** Answers one review request: the event stream or a served file. */
 async function _onRequest(options: Readonly<ReviewRequest>): Promise<void> {
-  const { req, res, clients } = options;
-  if (!["GET", "HEAD"].includes(req.method ?? "")) {
-    res.writeHead(405).end();
+  const { request, response, clients } = options;
+  if (!["GET", "HEAD"].includes(request.method ?? "")) {
+    response.writeHead(405).end();
     return;
   }
-  const pathname = new URL(req.url ?? "/", "http://localhost").pathname;
+  const pathname = new URL(request.url ?? "/", "http://localhost").pathname;
   if (pathname === "/events") {
-    res.writeHead(200, {
+    response.writeHead(200, {
       "Content-Type": "text/event-stream",
       "Cache-Control": "no-cache",
       Connection: "keep-alive",
     });
-    res.write(`data: ${options.getGeneration()}\n\n`);
-    clients.add(res);
-    req.on("close", () => {
-      return clients.delete(res);
+    response.write(`data: ${options.getGeneration()}\n\n`);
+    clients.add(response);
+    request.on("close", () => {
+      return clients.delete(response);
     });
     return;
   }
   const file = pathname === "/" ? "index.html" : pathname.slice(1);
   if (!["index.html", "review.js", "review.css"].includes(file)) {
-    res.writeHead(404).end();
+    response.writeHead(404).end();
     return;
   }
   try {
-    res.setHeader("Cache-Control", "no-cache");
-    res.setHeader("Content-Type", _getContentType(file));
-    res.end(await fs.readFile(path.join(options.root, file)));
+    response.setHeader("Cache-Control", "no-cache");
+    response.setHeader("Content-Type", _getContentType(file));
+    response.end(await fs.readFile(path.join(options.root, file)));
   } catch {
-    res.writeHead(404).end();
+    response.writeHead(404).end();
   }
 }
 
@@ -156,10 +156,10 @@ async function _runReview(isBuildOnly: boolean): Promise<void> {
     return;
   }
   const port = Number(process.env.PORT || 4175);
-  const server = createServer((req, res) => {
+  const server = createServer((request, response) => {
     void _onRequest({
-      req,
-      res,
+      request,
+      response,
       root,
       clients,
       getGeneration: () => {

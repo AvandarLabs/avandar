@@ -1,3 +1,4 @@
+import { isPlainObject } from "@avandar/utils";
 import { FilmDownloads } from "./FilmDownloads/FilmDownloads";
 import { watchFilms } from "./watchFilms/watchFilms";
 
@@ -142,21 +143,25 @@ function _restoreTransport(): void {
   _control("loop", loop.checked);
 }
 
-window.addEventListener("message", (event) => {
+window.addEventListener("message", (event: MessageEvent<unknown>) => {
   if (
     event.origin !== window.location.origin ||
-    event.source !== player.contentWindow
+    event.source !== player.contentWindow ||
+    !isPlainObject(event.data)
   ) {
     return;
   }
   if (
-    event.data?.type !== "film-options" ||
+    event.data.type !== "film-options" ||
     event.data.id !== CLIPS[currentIndex].id
   ) {
     return;
   }
+  const options = isPlainObject(event.data.options)
+    ? event.data.options
+    : undefined;
   clipOptions.set(event.data.id, {
-    captions: event.data.options?.captions !== false,
+    captions: options?.captions !== false,
   });
   const wasAwaitingPlayer = isAwaitingPlayer;
   isAwaitingPlayer = false;

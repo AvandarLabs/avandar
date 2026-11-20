@@ -2,7 +2,10 @@ import assert from "node:assert/strict";
 import { createServer, type Server } from "node:http";
 import { test, type TestContext } from "node:test";
 import { propEq } from "@avandar/utils";
-import { captureGlobals, restoreGlobals } from "../../__tests__/restoreGlobals";
+import {
+  captureGlobals,
+  restoreGlobals,
+} from "../../__tests__/restoreGlobalsHelpers";
 import { FilmDownloads } from "../FilmDownloads";
 import { createDocumentFixture } from "./FilmDownloads.fixtures";
 

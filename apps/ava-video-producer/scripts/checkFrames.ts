@@ -30,7 +30,7 @@
 //
 // Wire this into every render script and let it fail the build. Do not
 // "fix" a failure by loosening the thresholds in
-// scripts/lib/frameGateHelpers.ts.
+// scripts/lib/frameGateHelpers/frameGateHelpers.constants.ts.
 //
 // Usage: node --import tsx scripts/checkFrames.ts out/demo.mp4 [--standalone]
 //          [--declared-cuts 602,1022]
@@ -38,18 +38,22 @@
 import { propIsInArray } from "@avandar/utils";
 import { match } from "ts-pattern";
 import {
-  CUT_REVERSAL_FRAMES,
-  type FrameMeasurements,
-  type GateArguments,
-  type JudgedCut,
-  LUMA_JUMP,
   getLumaJumpsFromLuma,
   getTiledFramesFromMeasurements,
   makeJudgedCutsFromLuma,
-  getFrameMeasurementsFromVideo,
-  makeGateArgumentsFromArgv,
-} from "./lib/frameGateHelpers";
+} from "./lib/frameGateHelpers/frameGateHelpers";
+import {
+  CUT_REVERSAL_FRAMES,
+  LUMA_JUMP,
+} from "./lib/frameGateHelpers/frameGateHelpers.constants";
+import { getFrameMeasurementsFromVideo } from "./lib/frameGateHelpers/getFrameMeasurementsFromVideo";
+import { makeGateArgumentsFromArgv } from "./lib/frameGateHelpers/makeGateArgumentsFromArgv";
 import { requireLicense } from "./requireLicense";
+import type {
+  FrameMeasurements,
+  GateArguments,
+  JudgedCut,
+} from "./lib/frameGateHelpers/frameGateHelpers.types";
 
 /** Runs one gate step, exiting with status 2 and its message when it throws. */
 function _runOrExit<T>(step: () => T): T {
@@ -87,11 +91,15 @@ function _describeCut(cut: Readonly<JudgedCut>, frameCount: number): string {
 }
 
 /** Prints the loop seam line for the first and last frame's luma. */
-function _printLoopSeam(
-  luma: readonly number[],
-  seam: number,
-  isStandalone: boolean,
-): void {
+function _printLoopSeam({
+  luma,
+  seam,
+  isStandalone,
+}: Readonly<{
+  luma: readonly number[];
+  seam: number;
+  isStandalone: boolean;
+}>): void {
   const firstLuma = luma[0].toFixed(1);
   const lastLuma = luma[luma.length - 1].toFixed(1);
   if (isStandalone) {
@@ -139,7 +147,7 @@ function _reportGate(
     );
   });
   const seam = Math.abs(luma[0] - luma[luma.length - 1]);
-  _printLoopSeam(luma, seam, options.isStandalone);
+  _printLoopSeam({ luma, seam, isStandalone: options.isStandalone });
   const hasRejectedCut = cuts.some(
     propIsInArray("verdict", ["flash", "outside-video"]),
   );

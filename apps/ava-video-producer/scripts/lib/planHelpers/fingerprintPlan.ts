@@ -1,11 +1,20 @@
 import { createHash } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { isDefined, promiseMapSequential } from "@avandar/utils";
+import {
+  isDefined,
+  promiseMapSequential,
+  prop,
+  sortObjList,
+} from "@avandar/utils";
 import { getSha256FromFile } from "../getSha256FromFile";
 import { productRequirements } from "../productRequirements/productRequirements";
 import { verifyProductBuild } from "../productSourceHelpers";
-import { assetReferences, publicAsset, safeInputFile } from "./planHelpers";
+import {
+  getAssetReferencesFromPlan,
+  getPublicAssetPathFromAsset,
+  safeInputFile,
+} from "./planHelpers";
 import type { Storyboard } from "../../../src/storyboard/schema/schema";
 import type { PlanFingerprint } from "./planHelpers.types";
 
@@ -18,7 +27,6 @@ const RENDER_SUPPORT_FILES = [
   "scripts/render.sh",
   "scripts/renderSequence.ts",
   "scripts/checkFrames.ts",
-  "scripts/lib/frameGateHelpers.ts",
   "scripts/lib/mediaHelpers.ts",
   "scripts/yaml/makeEsModuleFromYaml.ts",
   "scripts/lib/makeWorkspaceWebpackConfigFromConfig.ts",
@@ -27,6 +35,7 @@ const RENDER_SUPPORT_FILES = [
 
 /** Source directories a render depends on, hashed file by file. */
 const RENDER_SUPPORT_DIRECTORIES = [
+  "scripts/lib/frameGateHelpers",
   "scripts/lib/planHelpers",
   "scripts/video",
 ] as const;
@@ -38,24 +47,26 @@ async function _rendererFiles(
   const entries = await fs.readdir(path.join(root, directory), {
     withFileTypes: true,
   });
-  const files: string[] = [];
-  for (const entry of entries.sort((a, b) => {
-    return a.name.localeCompare(b.name);
-  })) {
-    const relative = `${directory}/${entry.name}`;
-    if (entry.isSymbolicLink()) {
-      throw new Error("Renderer source cannot contain symlinks");
-    }
-    if (entry.isDirectory()) {
-      files.push(...(await _rendererFiles(root, relative)));
-    } else if (
-      /\.(tsx?|[cm]?jsx?|css|json|ya?ml)$/.test(entry.name) &&
-      !entry.name.startsWith(".")
-    ) {
-      files.push(relative);
-    }
-  }
-  return files;
+  const nestedGroups = await promiseMapSequential(
+    sortObjList(entries, { sortBy: prop("name") }),
+    async (entry): Promise<string[]> => {
+      const relative = `${directory}/${entry.name}`;
+      if (entry.isSymbolicLink()) {
+        throw new Error("Renderer source cannot contain symlinks");
+      }
+      if (entry.isDirectory()) {
+        return _rendererFiles(root, relative);
+      }
+      if (
+        /\.(tsx?|[cm]?jsx?|css|json|ya?ml)$/.test(entry.name) &&
+        !entry.name.startsWith(".")
+      ) {
+        return [relative];
+      }
+      return [];
+    },
+  );
+  return nestedGroups.flat();
 }
 
 /** Each referenced public asset's path and hash, in path order. */
@@ -63,34 +74,17 @@ async function _hashPlanAssets(
   plan: Readonly<Storyboard>,
   assetRoot: string,
 ): Promise<PlanFingerprint["assets"]> {
-  return promiseMapSequential(assetReferences(plan).sort(), async (asset) => {
-    return {
-      path: asset,
-      sha256: await getSha256FromFile(await publicAsset(assetRoot, asset)),
-    };
-  });
-}
-
-/** Every source file whose edit must invalidate the plan's preview. */
-async function _listRendererFiles(
-  root: string,
-  plan: Readonly<Storyboard>,
-): Promise<string[]> {
-  const files = await _rendererFiles(root);
-  if (productRequirements(plan).needsProduct) {
-    files.push(...(await _rendererFiles(root, "avandar-adapter")));
-    await verifyProductBuild(root);
-    files.push(
-      "src/avandar/generated/build.json",
-      ...(await _rendererFiles(root, "scripts/buildProduct")),
-      "scripts/lib/productSourceHelpers.ts",
-    );
-  }
-  const [supportFiles, directoryFiles] = await Promise.all([
-    _listSupportFiles(root),
-    _listSupportDirectoryFiles(root),
-  ]);
-  return [...files, ...supportFiles, ...directoryFiles];
+  return promiseMapSequential(
+    getAssetReferencesFromPlan(plan).sort(),
+    async (asset) => {
+      return {
+        path: asset,
+        sha256: await getSha256FromFile(
+          await getPublicAssetPathFromAsset(assetRoot, asset),
+        ),
+      };
+    },
+  );
 }
 
 /** The render support files present under `root`. */
@@ -131,6 +125,40 @@ async function _listSupportDirectoryFiles(root: string): Promise<string[]> {
   return directoryFiles.flat();
 }
 
+/** Product adapter and build inputs when the plan renders product beats. */
+async function _listProductFiles(
+  root: string,
+  plan: Readonly<Storyboard>,
+): Promise<string[]> {
+  if (!productRequirements(plan).needsProduct) {
+    return [];
+  }
+  const adapterFiles = await _rendererFiles(root, "avandar-adapter");
+  await verifyProductBuild(root);
+  const buildProductFiles = await _rendererFiles(root, "scripts/buildProduct");
+  return [
+    ...adapterFiles,
+    "src/avandar/generated/build.json",
+    ...buildProductFiles,
+    "scripts/lib/productSourceHelpers.ts",
+  ];
+}
+
+/** Every source file whose edit must invalidate the plan's preview. */
+async function _listRendererFiles(
+  root: string,
+  plan: Readonly<Storyboard>,
+): Promise<string[]> {
+  const [sourceFiles, productFiles, supportFiles, directoryFiles] =
+    await Promise.all([
+      _rendererFiles(root),
+      _listProductFiles(root, plan),
+      _listSupportFiles(root),
+      _listSupportDirectoryFiles(root),
+    ]);
+  return [...sourceFiles, ...productFiles, ...supportFiles, ...directoryFiles];
+}
+
 /** One hash over each file's path and contents, in path order. */
 async function _hashFiles(
   root: string,
@@ -147,14 +175,21 @@ async function _hashFiles(
 }
 
 /**
- * Hash renderer sources and every referenced media asset, not only the JSON.
+ * Computes a `PlanFingerprint` hashing the source JSON, parsed plan, every
+ * referenced public asset, and renderer/support source files. Used by
+ * `fingerprintThemedPlan` and preview/render verification tests.
  */
-export async function fingerprintPlan(
-  root: string,
-  filename: string,
-  plan: Readonly<Storyboard>,
+export async function fingerprintPlan({
+  root,
+  filename,
+  plan,
   assetRoot = root,
-): Promise<PlanFingerprint> {
+}: Readonly<{
+  root: string;
+  filename: string;
+  plan: Readonly<Storyboard>;
+  assetRoot?: string;
+}>): Promise<PlanFingerprint> {
   const sourcePlanSha256 = await getSha256FromFile(
     await safeInputFile(filename, [".json"]),
   );

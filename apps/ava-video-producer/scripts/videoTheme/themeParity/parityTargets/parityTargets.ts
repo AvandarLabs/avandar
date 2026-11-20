@@ -2,7 +2,7 @@ import {
   DEFAULT_ACCENT,
   DEFAULT_BACKGROUND,
 } from "../../../../src/gallery/palette";
-import { previewFrames } from "../../../lib/planHelpers/previewFrames";
+import { getPreviewFramesFromPlan } from "../../../lib/planHelpers/getPreviewFramesFromPlan";
 import { StockFingerprintModule } from "../../../stock/StockFingerprintModule/StockFingerprintModule";
 import type { Film } from "../../../../src/showcase/showcase.types";
 import type { ParityRegion } from "../compareRgbaFrames/compareRgbaFrames";
@@ -116,7 +116,7 @@ export function getParityFramesFromFilm(
   if (film.kind === "stock") {
     return StockFingerprintModule.SAMPLE_PARAMETERS.samples;
   }
-  return film.plan ? previewFrames(film.plan) : [0];
+  return film.plan ? getPreviewFramesFromPlan(film.plan) : [0];
 }
 
 /**

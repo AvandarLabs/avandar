@@ -103,20 +103,21 @@ async function _inspectPlainPath({
   return target;
 }
 
-/** Appends fixture files under `subdirectory` to `entries`, in name order. */
-async function _appendFixturePaths({
+/** Fixture files under `subdirectory`, visited in deterministic name order. */
+async function _getFixturePaths({
   directory,
-  entries,
   subdirectory = "",
+  seenCount = 0,
 }: Readonly<{
   directory: string;
-  entries: string[];
   subdirectory?: string;
-}>): Promise<void> {
+  seenCount?: number;
+}>): Promise<string[]> {
   const directoryEntries = sortObjList(
     await readdir(join(directory, subdirectory), { withFileTypes: true }),
     { sortBy: prop("name") },
   );
+  const paths: string[] = [];
   // Visit entries in name order, so a limit or link error is deterministic.
   for (const directoryEntry of directoryEntries) {
     if (directoryEntry.name.startsWith(".")) {
@@ -129,17 +130,24 @@ async function _appendFixturePaths({
       throw new Error("Fixture directory contains a symbolic link");
     }
     if (directoryEntry.isDirectory()) {
-      await _appendFixturePaths({ directory, entries, subdirectory: name });
+      paths.push(
+        ...(await _getFixturePaths({
+          directory,
+          subdirectory: name,
+          seenCount: seenCount + paths.length,
+        })),
+      );
     } else if (
       directoryEntry.isFile() &&
       FIXTURE_EXTENSIONS.has(extname(name).toLowerCase())
     ) {
-      entries.push(name);
+      paths.push(name);
     }
-    if (entries.length > MAX_FIXTURE_FILES) {
+    if (seenCount + paths.length > MAX_FIXTURE_FILES) {
       throw new Error("Fixture inventory exceeds 128 files");
     }
   }
+  return paths;
 }
 
 async function _hashFixture(
@@ -178,12 +186,10 @@ export async function makeFixtureInventoryFromDirectory({
     file: fixtureDir,
     isDirectory: true,
   });
-  const entries: string[] = [];
-  if (fixtureFiles === undefined) {
-    await _appendFixturePaths({ directory, entries });
-  } else {
-    entries.push(...fixtureFiles);
-  }
+  const entries =
+    fixtureFiles === undefined
+      ? await _getFixturePaths({ directory })
+      : [...fixtureFiles];
   if (
     !entries.length ||
     entries.length > MAX_FIXTURE_FILES ||

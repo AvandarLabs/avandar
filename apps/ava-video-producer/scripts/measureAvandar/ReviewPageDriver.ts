@@ -2,18 +2,21 @@ import { STAGE } from "./measureAvandar.constants";
 import type { MeasurementRun, ReviewWindow } from "./measureAvandar.types";
 import type { Page } from "@playwright/test";
 
+/** Measured bounds of one `[data-video-target]` element in a snapshot. */
+type ReviewTargetSnapshot = {
+  target: string | undefined;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
 /** The page's frame, readiness, and every target's bounds at one moment. */
 type ReviewSnapshot = {
   frame: number;
   ready: boolean | undefined;
   handles: number;
-  targets: Array<{
-    target: string | null;
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  }>;
+  targets: ReviewTargetSnapshot[];
 };
 
 /** The page's current frame, readiness, and every target's bounds. */
@@ -28,7 +31,7 @@ async function _readSnapshot(page: Page): Promise<ReviewSnapshot> {
         (element) => {
           const { x, y, width, height } = element.getBoundingClientRect();
           return {
-            target: element.getAttribute("data-video-target"),
+            target: element.getAttribute("data-video-target") ?? undefined,
             x,
             y,
             width,
@@ -83,7 +86,7 @@ export const ReviewPageDriver = {
   /** Opens the review page, optionally switching it to a feature. */
   load: async (
     run: Readonly<MeasurementRun>,
-    options: { url: string; feature?: string },
+    options: Readonly<{ url: string; feature?: string }>,
   ): Promise<void> => {
     const { page } = run;
     const { url, feature } = options;

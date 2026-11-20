@@ -1,5 +1,6 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { makeObject, objectValuesMap, prop, propEq } from "@avandar/utils";
 import { getColorWrapperFromCss, isBareChannels } from "./colorNotationHelpers";
 import { getAliasValueFromPalette } from "./getAliasValueFromPalette";
 import type {
@@ -153,28 +154,24 @@ export function makeKitTokensFromPalette(
         ]
       : [];
   });
-  const takenValues: Palette = Object.fromEntries(
-    takenTokens.map((taken) => {
-      return [taken.kitToken, taken.value];
-    }),
-  );
+  const takenValues: Palette = makeObject(takenTokens, {
+    key: "kitToken",
+    valueKey: "value",
+  });
   const derived = _getDerivedVariants(takenValues);
-  const placeholderValues: Palette = Object.fromEntries(
+  const placeholderValues: Palette = makeObject(
     KIT_TOKENS.filter((kitToken) => {
       return !(kitToken in takenValues) && !(kitToken in derived);
-    }).map((kitToken) => {
-      return [kitToken, PLACEHOLDER[kitToken]];
     }),
+    {
+      valueFn: (kitToken) => {
+        return PLACEHOLDER[kitToken];
+      },
+    },
   );
-  const derivedValues: Palette = Object.fromEntries(
-    Object.entries(derived).map(([kitToken, { value }]) => {
-      return [kitToken, value];
-    }),
-  );
+  const derivedValues: Palette = objectValuesMap(derived, prop("value"));
   const report = KIT_TOKENS.map((kitToken): TokenReportRow => {
-    const taken = takenTokens.find((entry) => {
-      return entry.kitToken === kitToken;
-    });
+    const taken = takenTokens.find(propEq("kitToken", kitToken));
     return taken
       ? [kitToken, taken.from, "taken"]
       : [kitToken, "—", derived[kitToken]?.outcome ?? "PLACEHOLDER — no match"];
@@ -183,9 +180,7 @@ export function makeKitTokensFromPalette(
     resolved: { ...takenValues, ...derivedValues, ...placeholderValues },
     report,
     wrapper,
-    numWrappedValues: takenTokens.filter((taken) => {
-      return taken.isWrapped;
-    }).length,
+    numWrappedValues: takenTokens.filter(prop("isWrapped")).length,
   };
 }
 

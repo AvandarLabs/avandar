@@ -160,7 +160,7 @@ async function _previewRequest(
  * are rendered.
  */
 export async function previewMotionRequests(
-  requests: MotionRequest[],
+  requests: readonly MotionRequest[],
 ): Promise<void> {
   await Promise.all(
     requests.map(({ sourceHash }) => {

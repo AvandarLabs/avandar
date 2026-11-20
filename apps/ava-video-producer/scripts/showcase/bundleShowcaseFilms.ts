@@ -3,7 +3,10 @@ import path from "node:path";
 import { bundle } from "@remotion/bundler";
 import { buildProduct } from "../buildProduct/buildProduct";
 import { makeWorkspaceWebpackConfigFromConfig } from "../lib/makeWorkspaceWebpackConfigFromConfig";
-import { assetReferences, publicAsset } from "../lib/planHelpers/planHelpers";
+import {
+  getAssetReferencesFromPlan,
+  getPublicAssetPathFromAsset,
+} from "../lib/planHelpers/planHelpers";
 import { appRoot } from "./ShowcaseFilms/ShowcaseFilms";
 import type { Film } from "../../src/showcase/showcase.types";
 
@@ -37,13 +40,16 @@ export async function bundleShowcaseFilms(
   );
   const assets = new Set(
     films.flatMap((film) => {
-      return film.plan ? assetReferences(film.plan) : [];
+      return film.plan ? getAssetReferencesFromPlan(film.plan) : [];
     }),
   );
   for (const asset of assets) {
     const target = path.join(publicDir, asset);
     await fs.mkdir(path.dirname(target), { recursive: true });
-    await fs.copyFile(await publicAsset(appRoot, asset), target);
+    await fs.copyFile(
+      await getPublicAssetPathFromAsset(appRoot, asset),
+      target,
+    );
   }
   await buildProduct();
   return bundle({

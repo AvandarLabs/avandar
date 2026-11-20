@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { createContinuityPlanFromVideoThemeSnapshot } from "../../../src/continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme";
 import { DRAFT_THEME_ID } from "../../../src/videoTheme/createDraftThemeTarget/createDraftThemeTarget";
-import { captionFiles } from "../../lib/planHelpers/captionFiles";
+import { makeCaptionFilesFromPlan } from "../../lib/planHelpers/makeCaptionFilesFromPlan";
 import { ShowcaseFilms } from "../ShowcaseFilms/ShowcaseFilms";
 import { createCaptionFilesFromRequest } from "./createCaptionFilesFromRequest";
 
@@ -40,7 +40,7 @@ test("a draft that changes a camera preset's speed reaches the captions and matc
   const options = { theme: _deliberateTheme(0.1) };
   const captions = await _captions(options);
   const exported = await ShowcaseFilms.load(FILM_ID, options);
-  const exportFiles = captionFiles(
+  const exportFiles = makeCaptionFilesFromPlan(
     createContinuityPlanFromVideoThemeSnapshot(exported.plan!, exported.theme, [
       FILM_ID,
     ]),

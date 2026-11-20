@@ -13,6 +13,22 @@ import {
 /** One timeline shot, with its absolute start frame. */
 type TimelineShot = ReturnType<typeof timeline>[number];
 
+/** Mid-motion frames of a scene's build, flight, or window entrance. */
+function _signatureBeatFrames(shot: Storyboard["shots"][number]): number[] {
+  if (shot.scene === "brand-lockup") {
+    return [
+      ...(shot.props.build ? [(shot.props.build.atFrame ?? 5) + 6] : []),
+      ...(shot.props.exit ? [shot.props.exit.atFrame + 12] : []),
+    ];
+  }
+  if (shot.scene === "tilted-window" && shot.props.enter) {
+    const { enter } = shot.props;
+    const at = enter.atFrame ?? 1;
+    return enter.kind === "pull-back" ? [at + 9] : [at + 4];
+  }
+  return [];
+}
+
 /** Frames inside a shot where its scene's own exit or swap is mid-motion. */
 function _sceneBeatFrames(shot: Storyboard["shots"][number]): number[] {
   const exitAt =
@@ -30,22 +46,6 @@ function _sceneBeatFrames(shot: Storyboard["shots"][number]): number[] {
     ...swaps,
     ..._signatureBeatFrames(shot),
   ];
-}
-
-/** Mid-motion frames of a scene's build, flight or window entrance. */
-function _signatureBeatFrames(shot: Storyboard["shots"][number]): number[] {
-  if (shot.scene === "brand-lockup") {
-    return [
-      ...(shot.props.build ? [(shot.props.build.atFrame ?? 5) + 6] : []),
-      ...(shot.props.exit ? [shot.props.exit.atFrame + 12] : []),
-    ];
-  }
-  if (shot.scene === "tilted-window" && shot.props.enter) {
-    const { enter } = shot.props;
-    const at = enter.atFrame ?? 1;
-    return enter.kind === "pull-back" ? [at + 9] : [at + 4];
-  }
-  return [];
 }
 
 /** Offsets around each continuity beat's start, overlap, and scene beats. */
@@ -173,9 +173,11 @@ function _getShotSampleOffsets(shot: Readonly<TimelineShot>): number[] {
 }
 
 /**
- * Sample complete-film frames, including dissolves and scene-specific beats.
+ * Returns sorted, deduplicated complete-film frame numbers to sample for
+ * previewing transitions, narration cues, and scene-specific beats. Called by
+ * `renderPreviewStills`, showcase `renderFilm`, and `parityTargets`.
  */
-export function previewFrames(plan: Readonly<Storyboard>): number[] {
+export function getPreviewFramesFromPlan(plan: Readonly<Storyboard>): number[] {
   const totalFrames = durationInFrames(plan);
   const frames = timeline(plan).flatMap((shot) => {
     return [

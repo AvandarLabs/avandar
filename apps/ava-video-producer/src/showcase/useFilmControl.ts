@@ -10,18 +10,11 @@ import {
   parseFilmControlMessage,
   type FilmControl,
 } from "./filmThemeMessageHelpers/filmThemeMessageHelpers";
+import { postToParentGallery } from "./postToParentGallery";
 import type { VideoThemeSnapshot } from "../videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 import type { PlayerRef } from "@remotion/player";
 
 const PLAYBACK_SPEEDS: readonly number[] = [0.5, 1, 1.5, 2];
-
-/**
- * Posts a film status or acknowledgement message to the same-origin parent
- * gallery.
- */
-export function postToParentGallery(message: object): void {
-  window.parent.postMessage(message, location.origin);
-}
 
 /** The live player's state and setters that parent messages read and change. */
 export type FilmControlOptions = Readonly<{

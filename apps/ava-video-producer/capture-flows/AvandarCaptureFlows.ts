@@ -32,41 +32,41 @@ async function _navigate(
   await expect(page).toHaveURL(new RegExp(options.urlSuffix));
 }
 
-async function _importFlow(ctx: FlowContext): Promise<void> {
-  await ensureDataset(ctx, "cases", { shouldDemonstrate: true });
+async function _importFlow(context: FlowContext): Promise<void> {
+  await ensureDataset({ context, key: "cases", shouldDemonstrate: true });
   // Each import drives the one recording page, so they run in order.
   for (const key of ["visits", "facilities", "districts"]) {
-    await ensureDataset(ctx, key);
+    await ensureDataset({ context, key });
   }
 }
 
 /** Opens the Data Explorer on the cases dataset in manual query mode. */
-async function _openExplorer(ctx: FlowContext): Promise<FlowRecord> {
-  const dataset = await ensureFixtureDataset(ctx, "cases");
-  await _navigate(ctx.page, {
+async function _openExplorer(context: FlowContext): Promise<FlowRecord> {
+  const dataset = await ensureFixtureDataset(context, "cases");
+  await _navigate(context.page, {
     linkName: "Data Explorer",
-    urlSuffix: `/${ctx.workspace}/data-explorer`,
+    urlSuffix: `/${context.workspace}/data-explorer`,
   });
-  await ctx.page
+  await context.page
     .getByRole("heading", { name: "Data Explorer", exact: true })
     .waitFor();
-  await closeChat(ctx.page);
-  await ctx.page.getByRole("tab", { name: "Query", exact: true }).click();
-  const manual = ctx.page
+  await closeChat(context.page);
+  await context.page.getByRole("tab", { name: "Query", exact: true }).click();
+  const manual = context.page
     .getByRole("radiogroup", { name: "Query editor mode" })
     .getByText("Manual", { exact: true });
   if (await manual.count()) {
     await manual.click();
   }
-  const source = ctx.page
+  const source = context.page
     .getByRole("tabpanel", { name: "Query", exact: true })
     .getByLabel("Data source", { exact: true });
   await expect(source).toBeEnabled();
   await source.click();
-  await ctx.page
+  await context.page
     .getByRole("option", { name: dataset.name, exact: true })
     .click();
-  await ctx.page
+  await context.page
     .getByRole("columnheader", { name: "case_id", exact: true })
     .waitFor({ timeout: 20000 });
   return dataset;
@@ -141,10 +141,10 @@ async function _showBarChart(page: Page): Promise<void> {
   await expect(page.locator(".recharts-bar-rectangle")).toHaveCount(6);
 }
 
-async function _explorer(ctx: FlowContext): Promise<void> {
-  const { page, step, checkpoint } = ctx;
+async function _explorer(context: FlowContext): Promise<void> {
+  const { page, step, checkpoint } = context;
   const dataset = await step("explorer-select-source", () => {
-    return _openExplorer(ctx);
+    return _openExplorer(context);
   });
   await checkpoint("explorer-records");
   await step("explorer-filter-eastbank", () => {
@@ -158,7 +158,7 @@ async function _explorer(ctx: FlowContext): Promise<void> {
   await step("explorer-bar-chart", () => {
     return _showBarChart(page);
   });
-  ctx.state.explorerUrl = page.url();
+  context.state.explorerUrl = page.url();
   await checkpoint("explorer-chart");
 }
 
@@ -216,10 +216,10 @@ async function _saveViewToDashboard(page: Page, name: string): Promise<void> {
     .waitFor({ timeout: 20000 });
 }
 
-async function _dashboards(ctx: FlowContext): Promise<void> {
-  const { page, step, checkpoint, runLabel } = ctx;
-  if (!ctx.state.explorerUrl) {
-    await _explorer(ctx);
+async function _dashboards(context: FlowContext): Promise<void> {
+  const { page, step, checkpoint, runLabel } = context;
+  if (!context.state.explorerUrl) {
+    await _explorer(context);
   }
   const name = `Video - Harborfield response overview - ${runLabel}`;
   await step("dashboard-save-view", () => {
@@ -228,14 +228,14 @@ async function _dashboards(ctx: FlowContext): Promise<void> {
   await step("dashboard-open-editor", async () => {
     await _navigate(page, {
       linkName: "Dashboards",
-      urlSuffix: `/${ctx.workspace}/dashboards`,
+      urlSuffix: `/${context.workspace}/dashboards`,
     });
     await page.getByText(name, { exact: true }).click();
     await page.getByRole("button", { name: "View", exact: true }).waitFor();
   });
   const id = getRecordIdFromPageUrl(page, "dashboards");
-  ctx.state.dashboard = { id, name };
-  await ctx.recordResource?.({ kind: "dashboard", id, name });
+  context.state.dashboard = { id, name };
+  await context.recordResource?.({ kind: "dashboard", id, name });
   await checkpoint("dashboard-editor");
   await step("dashboard-preview", async () => {
     await page.getByRole("button", { name: "View", exact: true }).click();
@@ -252,18 +252,18 @@ async function _dashboards(ctx: FlowContext): Promise<void> {
  * claims.
  */
 const PRODUCT_FLOWS: Readonly<
-  Record<string, (ctx: FlowContext) => Promise<void>>
+  Record<string, (context: FlowContext) => Promise<void>>
 > = {
   import: _importFlow,
   explorer: _explorer,
   dashboards: _dashboards,
-  cases: async (ctx) => {
+  cases: async (context) => {
     return (await import("./casesMap/runCasesFlow/runCasesFlow")).runCasesFlow(
-      ctx,
+      context,
     );
   },
-  map: async (ctx) => {
-    return (await import("./casesMap/runMapFlow")).runMapFlow(ctx);
+  map: async (context) => {
+    return (await import("./casesMap/runMapFlow")).runMapFlow(context);
   },
 };
 
@@ -275,11 +275,11 @@ const PRODUCT_FLOWS: Readonly<
 export const AvandarCaptureFlows: Record<string, CaptureFlow> = objectValuesMap(
   PRODUCT_FLOWS,
   (flow) => {
-    return async (ctx: CaptureFlowContext) => {
+    return async (context: CaptureFlowContext) => {
       try {
-        return await flow(ctx);
+        return await flow(context);
       } catch (error) {
-        await ctx.checkpoint("failure", { text: true }).catch(() => {});
+        await context.checkpoint("failure", { text: true }).catch(() => {});
         throw error;
       }
     };

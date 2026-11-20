@@ -22,7 +22,9 @@ const APP_ROOT = fileURLToPath(new URL("../", import.meta.url));
  * Every direct script entry point the license guard must stop, as the program
  * and arguments that start it.
  */
-const ENTRY_POINT_COMMANDS = [
+const ENTRY_POINT_COMMANDS: ReadonlyArray<
+  readonly [string, readonly string[]]
+> = [
   [
     process.execPath,
     [
@@ -66,7 +68,10 @@ const ENTRY_POINT_COMMANDS = [
     "curateCapture/curateCapture",
     "captureAvandar/captureAvandar",
   ].map((name) => {
-    return [process.execPath, ["--import", "tsx", `scripts/${name}.ts`]];
+    return [
+      process.execPath,
+      ["--import", "tsx", `scripts/${name}.ts`],
+    ] as const;
   }),
   [
     process.execPath,
@@ -80,13 +85,13 @@ const ENTRY_POINT_COMMANDS = [
   ],
   ...["studio", "preview", "render", "render-showcase", "add-sfx"].map(
     (name) => {
-      return ["sh", [`scripts/${name}.sh`]];
+      return ["sh", [`scripts/${name}.sh`]] as const;
     },
   ),
   ...["generate", "validate"].map((name) => {
-    return ["python3", [`demo-data/${name}.py`]];
+    return ["python3", [`demo-data/${name}.py`]] as const;
   }),
-] as Array<[string, string[]]>;
+];
 
 test("the direct video command refuses to start without license keys", async () => {
   const directory = await mkdtemp(path.join(tmpdir(), "producer-license-"));
@@ -225,7 +230,7 @@ test("direct exports with missing keys create no output directory", async () => 
         "-e",
         `
       const {renderFilm} = await import("./scripts/showcase/render.ts");
-      await renderFilm({}, ${JSON.stringify(id)}, () => {});
+      await renderFilm({ film: {}, id: ${JSON.stringify(id)}, progress: () => {} });
     `,
       ],
       {

@@ -9,8 +9,8 @@ import type { FlowContext, FlowRecord } from "./captureFlows.types";
  * `runMapFlow`, so every flow in a run shares one upload of each dataset.
  */
 export async function ensureFixtureDataset(
-  ctx: FlowContext,
+  context: FlowContext,
   key: string,
 ): Promise<FlowRecord> {
-  return ctx.state.datasets?.[key] ?? ensureDataset(ctx, key);
+  return context.state.datasets?.[key] ?? ensureDataset({ context, key });
 }

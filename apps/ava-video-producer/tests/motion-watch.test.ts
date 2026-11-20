@@ -6,7 +6,7 @@ import { setTimeout as pause } from "node:timers/promises";
 import {
   type ShowcaseSiteWatcher,
   watchShowcaseSite,
-} from "../scripts/showcase/watchShowcaseSite";
+} from "../scripts/showcase/watchShowcaseSite/watchShowcaseSite";
 import { buildStockContracts } from "../scripts/stock/buildStockContracts/buildStockContracts";
 import { createShowcaseFixture } from "./createShowcaseFixture";
 

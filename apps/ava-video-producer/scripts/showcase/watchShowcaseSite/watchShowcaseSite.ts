@@ -1,6 +1,6 @@
 import { build } from "vite";
-import { makeShowcaseViteConfigFromAppRoot } from "./makeShowcaseViteConfigFromAppRoot";
-import { waitForFirstWatchedBuild } from "./waitForFirstWatchedBuild/waitForFirstWatchedBuild";
+import { makeShowcaseViteConfigFromAppRoot } from "../makeShowcaseViteConfigFromAppRoot";
+import { waitForFirstWatchedBuild } from "../waitForFirstWatchedBuild/waitForFirstWatchedBuild";
 
 /** A running watched showcase build. */
 export type ShowcaseSiteWatcher = {

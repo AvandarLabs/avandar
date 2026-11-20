@@ -9,9 +9,9 @@ import {
   getLumaJumpsFromLuma,
   getTiledFramesFromMeasurements,
   makeJudgedCutsFromLuma,
-  getFrameMeasurementsFromVideo,
-  makeGateArgumentsFromArgv,
-} from "../scripts/lib/frameGateHelpers";
+} from "../scripts/lib/frameGateHelpers/frameGateHelpers";
+import { getFrameMeasurementsFromVideo } from "../scripts/lib/frameGateHelpers/getFrameMeasurementsFromVideo";
+import { makeGateArgumentsFromArgv } from "../scripts/lib/frameGateHelpers/makeGateArgumentsFromArgv";
 
 /** A steady luma track with `values` written over it from `startFrame`. */
 function createLumaTrack(

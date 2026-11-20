@@ -10,9 +10,11 @@ import { runInNewContext } from "node:vm";
 import { webpack } from "@remotion/bundler";
 import { type BuildResult, build, context } from "esbuild";
 import { makeWorkspaceWebpackConfigFromConfig } from "../lib/makeWorkspaceWebpackConfigFromConfig";
-import { yamlPlugin } from "./yamlPlugin";
+import { yamlPlugin } from "../yaml/yamlPlugin";
 
-const bootstrap = fileURLToPath(new URL("./registerYaml.ts", import.meta.url));
+const bootstrap = fileURLToPath(
+  new URL("../yaml/registerYaml.ts", import.meta.url),
+);
 const expected = {
   id: "decision-fork",
   count: 2,
@@ -157,7 +159,7 @@ test("esbuild watch refreshes authored YAML edits without a conversion command",
         yamlPlugin,
         {
           name: "observe-output",
-          setup(builder) {
+          setup: (builder) => {
             builder.onEnd((result) => {
               completed.resolve(result);
             });

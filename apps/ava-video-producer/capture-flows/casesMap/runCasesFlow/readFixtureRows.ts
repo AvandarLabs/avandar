@@ -10,10 +10,13 @@ import type { FixtureRow } from "./runCasesFlow.types";
  * Called by `runCasesFlow` for the cases and visits fixtures.
  */
 export async function readFixtureRows(
-  ctx: Readonly<FlowContext>,
+  context: Readonly<FlowContext>,
   key: string,
 ): Promise<FixtureRow[]> {
-  const csv = await readFile(path.join(ctx.fixtureDir, `${key}.csv`), "utf8");
+  const csv = await readFile(
+    path.join(context.fixtureDir, `${key}.csv`),
+    "utf8",
+  );
   // These two generated fixtures contain no quoted fields or embedded
   // delimiters.
   if (csv.includes('"')) {

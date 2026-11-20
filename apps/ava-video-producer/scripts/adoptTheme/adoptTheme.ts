@@ -18,7 +18,7 @@ import {
   printReport,
   writeCurves,
 } from "./themeOutputHelpers";
-import type { SourceEasing, ThemePalettes } from "./adoptTheme.types";
+import type { ThemePalettes } from "./adoptTheme.types";
 
 // Points the kit at your product's stylesheet and takes its real tokens.
 //
@@ -49,31 +49,19 @@ import type { SourceEasing, ThemePalettes } from "./adoptTheme.types";
  * dark mode hands over its dark values. Products without one fall back to
  * what they have, and `--ground` is derived rather than guessed.
  */
-function _getPaletteMode(requestedMode: string, hasDark: boolean): string {
+function _getPaletteMode({
+  requestedMode,
+  hasDark,
+}: Readonly<{
+  requestedMode: string;
+  hasDark: boolean;
+}>): string {
   const mode =
     requestedMode === "auto" ? (hasDark ? "dark" : "light") : requestedMode;
   if (!["dark", "light"].includes(mode)) {
     exitWithAdoptThemeError("--mode must be dark or light");
   }
   return mode;
-}
-
-/**
- * How many easings `--curves` wrote into `src/motion.ts`, counted without
- * writing on a dry run. Undefined when `--curves` is off or the palette has
- * no easings, so the report prints a hint instead of a count.
- */
-function _getNumCurvesWritten(
-  options: Readonly<{
-    shouldWriteCurves: boolean;
-    isDryRun: boolean;
-    easings: readonly SourceEasing[];
-  }>,
-): number | undefined {
-  const { shouldWriteCurves, isDryRun, easings } = options;
-  return shouldWriteCurves && easings.length > 0
-    ? writeCurves({ isDryRun, easings })
-    : undefined;
 }
 
 /**
@@ -109,7 +97,7 @@ function _adoptTheme(argv: readonly string[]): void {
     stylesheetCss,
   );
   const hasDark = isNotEmpty(dark);
-  const mode = _getPaletteMode(requestedMode, hasDark);
+  const mode = _getPaletteMode({ requestedMode, hasDark });
   const primary = mode === "dark" ? { ...light, ...dark } : light;
   const matchedTokens = makeKitTokensFromPalette(primary, stylesheetCss);
   const relativeStylesheetPath = relative(resolve("."), stylesheet);
@@ -123,6 +111,10 @@ function _adoptTheme(argv: readonly string[]): void {
     writeFileSync(resolve("src/theme.css"), css);
   }
   const easings = getEasingsFromPalette(primary);
+  const numCurvesWritten =
+    shouldWriteCurves && easings.length > 0
+      ? writeCurves({ isDryRun, easings })
+      : undefined;
   printReport({
     ...matchedTokens,
     relativeStylesheetPath,
@@ -130,11 +122,7 @@ function _adoptTheme(argv: readonly string[]): void {
     hasDark,
     primary,
     easings,
-    numCurvesWritten: _getNumCurvesWritten({
-      shouldWriteCurves,
-      isDryRun,
-      easings,
-    }),
+    numCurvesWritten,
     isDryRun,
   });
 }

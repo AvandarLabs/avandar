@@ -5,10 +5,13 @@ import path from "node:path";
 import test from "node:test";
 import { pathToFileURL } from "node:url";
 import { promisify } from "node:util";
-import { SHOWCASE_PAGES } from "../scripts/showcase/makeShowcaseViteConfigFromAppRoot";
-import { createRealTempDirectory } from "./createRealTempDirectory";
-import { buildLicenseFixture, licenseTestEnvironment } from "./license-fixture";
-import { linkAppDependencies } from "./linkAppDependencies";
+import { createRealTempDirectory } from "../../../tests/createRealTempDirectory";
+import {
+  buildLicenseFixture,
+  licenseTestEnvironment,
+} from "../../../tests/license-fixture";
+import { linkAppDependencies } from "../../../tests/linkAppDependencies";
+import { SHOWCASE_PAGES } from "../makeShowcaseViteConfigFromAppRoot";
 
 /** Showcase pages whose Motion Atlas entry does not compile. */
 async function _createFailedBuildFixture(root: string): Promise<void> {
@@ -48,7 +51,7 @@ test("a failed first showcase build closes its watcher so the process exits", as
   try {
     await _createFailedBuildFixture(root);
     const entry = pathToFileURL(
-      path.resolve("scripts/showcase/watchShowcaseSite.ts"),
+      path.resolve("scripts/showcase/watchShowcaseSite/watchShowcaseSite.ts"),
     ).href;
     const script = `
       import assert from "node:assert/strict";

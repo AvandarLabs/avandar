@@ -14,30 +14,30 @@ import type { FlowContext } from "../../captureFlows.types";
  * `AvandarCaptureFlows` loads it on demand as the `cases` flow that
  * `pnpm capture` runs.
  */
-export async function runCasesFlow(ctx: FlowContext): Promise<void> {
-  makeWorkspaceUrlFromRoute(ctx, "ontology-designer");
+export async function runCasesFlow(context: FlowContext): Promise<void> {
+  makeWorkspaceUrlFromRoute(context, "ontology-designer");
   // Each dataset step drives the one recording page, so they run in order.
   const sources = {
-    cases: await ensureFixtureDataset(ctx, "cases"),
-    visits: await ensureFixtureDataset(ctx, "visits"),
+    cases: await ensureFixtureDataset(context, "cases"),
+    visits: await ensureFixtureDataset(context, "visits"),
   };
   const [expectedRows, expectedVisits, isNew] = await Promise.all([
-    readFixtureRows(ctx, "cases"),
-    readFixtureRows(ctx, "visits"),
-    ctx.step("cases-create-type", () => {
-      return openOrCreateCaseType(ctx, sources);
+    readFixtureRows(context, "cases"),
+    readFixtureRows(context, "visits"),
+    context.step("cases-create-type", () => {
+      return openOrCreateCaseType(context, sources);
     }),
   ]);
-  await ctx.checkpoint("cases-type");
-  await ctx.step("cases-sync-records", () => {
-    return openCaseRecords(ctx, isNew);
+  await context.checkpoint("cases-type");
+  await context.step("cases-sync-records", () => {
+    return openCaseRecords({ context, isNew });
   });
-  await ctx.step("cases-verify-240-records", () => {
-    return verifyRecordCount(ctx, expectedRows);
+  await context.step("cases-verify-240-records", () => {
+    return verifyRecordCount(context, expectedRows);
   });
-  await ctx.checkpoint("cases-records");
-  await ctx.step("cases-open-record", () => {
-    return openFirstRecord(ctx, { sources, expectedRows, expectedVisits });
+  await context.checkpoint("cases-records");
+  await context.step("cases-open-record", () => {
+    return openFirstRecord(context, { sources, expectedRows, expectedVisits });
   });
-  await ctx.checkpoint("cases-record-detail");
+  await context.checkpoint("cases-record-detail");
 }

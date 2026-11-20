@@ -1,5 +1,5 @@
 import { createContinuityPlanFromVideoThemeSnapshot } from "../../../src/continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme";
-import { captionFiles } from "../../lib/planHelpers/captionFiles";
+import { makeCaptionFilesFromPlan } from "../../lib/planHelpers/makeCaptionFilesFromPlan";
 import type { Film } from "../../../src/showcase/showcase.types";
 
 type CaptionFilm = Pick<Film, "id" | "plan" | "theme">;
@@ -11,7 +11,7 @@ export type CaptionFilesResult<FilmValue extends CaptionFilm> =
   | Readonly<{
       status: 200;
       film: FilmValue;
-      files: ReturnType<typeof captionFiles>;
+      files: ReturnType<typeof makeCaptionFilesFromPlan>;
     }>
   | Readonly<{ status: 400 }>
   | Readonly<{ status: 404 }>;
@@ -76,5 +76,5 @@ export async function createCaptionFilesFromRequest<
     film.theme,
     [film.id],
   );
-  return { status: 200, film, files: captionFiles(plan) };
+  return { status: 200, film, files: makeCaptionFilesFromPlan(plan) };
 }

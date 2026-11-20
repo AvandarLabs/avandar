@@ -27,15 +27,22 @@ function _clampUnit(value: number): number {
   return Math.min(1, Math.max(0, value));
 }
 
+type KeyedTraversalStep = {
+  key: string;
+  from: NodeTraversalInput["nodes"][number];
+  to: NodeTraversalInput["nodes"][number];
+  stepOffset: number;
+};
+
 function _buildKeyedEdges(
   edges: NodeTraversalInput["edges"],
   nodes: NodeTraversalInput["nodes"],
-) {
-  const counts = new Map<string, number>();
+): KeyedTraversalStep[] {
+  const edgePairCounts = new Map<string, number>();
   return edges.map(([from, to], stepOffset) => {
     const pairKey = `${nodes[from].label}->${nodes[to].label}`;
-    const occurrence = counts.get(pairKey) ?? 0;
-    counts.set(pairKey, occurrence + 1);
+    const occurrence = edgePairCounts.get(pairKey) ?? 0;
+    edgePairCounts.set(pairKey, occurrence + 1);
     return {
       key: `${pairKey}#${occurrence}`,
       from: nodes[from],
@@ -48,13 +55,13 @@ function _buildKeyedEdges(
 function _buildKeyedRouteSteps(
   route: NodeTraversalInput["route"],
   nodes: NodeTraversalInput["nodes"],
-) {
-  const counts = new Map<string, number>();
+): KeyedTraversalStep[] {
+  const routePairCounts = new Map<string, number>();
   return route.slice(0, -1).map((fromIndex, stepOffset) => {
     const toIndex = route[stepOffset + 1];
     const pairKey = `${nodes[fromIndex].label}->${nodes[toIndex].label}`;
-    const occurrence = counts.get(pairKey) ?? 0;
-    counts.set(pairKey, occurrence + 1);
+    const occurrence = routePairCounts.get(pairKey) ?? 0;
+    routePairCounts.set(pairKey, occurrence + 1);
     return {
       key: `${pairKey}#${occurrence}`,
       from: nodes[fromIndex],

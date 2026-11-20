@@ -26,11 +26,14 @@ function _createDatasetRoutePattern(workspace: string): RegExp {
 }
 
 /** Opens the data sources list, waiting until every dataset link has loaded. */
-async function _openSourceList(
-  ctx: Readonly<FlowContext>,
+async function _openSourceList({
+  context,
   shouldShowImport = false,
-): Promise<void> {
-  const { page, baseUrl, workspace } = ctx;
+}: Readonly<{
+  context: Readonly<FlowContext>;
+  shouldShowImport?: boolean;
+}>): Promise<void> {
+  const { page, baseUrl, workspace } = context;
   await page.goto(
     `${baseUrl}/${workspace}/data-manager${shouldShowImport ? "/data-import" : ""}`,
   );
@@ -59,10 +62,13 @@ async function _openSourceList(
  * Closes the dataset-limit dialog when previewing a dataset that already
  * exists, and refuses a new upload the workspace has no room for.
  */
-async function _dismissDatasetLimit(
-  page: Page,
-  doesDatasetExist: boolean,
-): Promise<void> {
+async function _dismissDatasetLimit({
+  page,
+  doesDatasetExist,
+}: Readonly<{
+  page: Page;
+  doesDatasetExist: boolean;
+}>): Promise<void> {
   const datasetLimitDialog = page
     .getByRole("dialog")
     .filter({ hasText: "Dataset limit reached" });
@@ -81,18 +87,18 @@ async function _dismissDatasetLimit(
 
 /** Uploads a fixture CSV and fills its name and description, ready to save. */
 async function _uploadFixture(
-  ctx: Readonly<FlowContext>,
+  context: Readonly<FlowContext>,
   options: Readonly<FixtureUpload>,
 ): Promise<void> {
-  const { page, workspace } = ctx;
+  const { page, workspace } = context;
   if (!options.shouldDemonstrate) {
-    await page.goto(`${ctx.baseUrl}/${workspace}/data-manager/data-import`);
+    await page.goto(`${context.baseUrl}/${workspace}/data-manager/data-import`);
     await page.getByRole("tabpanel", { name: "Upload", exact: true }).waitFor();
   }
   await page
     .getByRole("tabpanel", { name: "Upload", exact: true })
     .locator('input[type="file"]')
-    .setInputFiles(path.join(ctx.fixtureDir, `${options.key}.csv`));
+    .setInputFiles(path.join(context.fixtureDir, `${options.key}.csv`));
   await page
     .getByPlaceholder("Enter a name for this dataset")
     .waitFor({ timeout: 30000 });
@@ -105,7 +111,10 @@ async function _uploadFixture(
       "Fictional Harborfield response-coordination data. Reproducible fixtures from avandar-video-agent/demo-data.",
     );
   await page.getByPlaceholder("What is in this dataset?").press("Tab");
-  await _dismissDatasetLimit(page, options.doesDatasetExist);
+  await _dismissDatasetLimit({
+    page,
+    doesDatasetExist: options.doesDatasetExist,
+  });
   await expect(
     page.getByRole("button", { name: "Save Dataset", exact: true }),
   ).toBeEnabled({ timeout: 30000 });
@@ -113,20 +122,20 @@ async function _uploadFixture(
 
 /** Saves a new upload, or opens the existing dataset with the same name. */
 async function _saveOrReuseDataset(
-  ctx: Readonly<FlowContext>,
+  context: Readonly<FlowContext>,
   options: Readonly<{
     stepKey: string;
     name: string;
     doesDatasetExist: boolean;
   }>,
 ): Promise<void> {
-  const { page, workspace } = ctx;
+  const { page, workspace } = context;
   const existingDatasetLink = page.getByRole("link", {
     name: options.name,
     exact: true,
   });
   if (!options.doesDatasetExist) {
-    await ctx.step(`save-${options.stepKey}`, async () => {
+    await context.step(`save-${options.stepKey}`, async () => {
       await page
         .getByRole("button", { name: "Save Dataset", exact: true })
         .click();
@@ -137,7 +146,7 @@ async function _saveOrReuseDataset(
     });
     return;
   }
-  await ctx.step(`reuse-${options.stepKey}`, async () => {
+  await context.step(`reuse-${options.stepKey}`, async () => {
     await existingDatasetLink.click();
     await page.waitForURL(_createDatasetRoutePattern(workspace));
   });
@@ -145,10 +154,10 @@ async function _saveOrReuseDataset(
 
 /** Uploads (or previews) and saves or reuses one fixture dataset. */
 async function _importFixture(
-  ctx: FlowContext,
+  context: FlowContext,
   options: Readonly<Pick<FixtureUpload, "key" | "name" | "shouldDemonstrate">>,
 ): Promise<void> {
-  const { page } = ctx;
+  const { page } = context;
   const existingDatasetLink = page.getByRole("link", {
     name: options.name,
     exact: true,
@@ -160,19 +169,19 @@ async function _importFixture(
   const stepKey = options.key.replaceAll("_", "-");
   if (doesDatasetExist && !options.shouldDemonstrate) {
     await existingDatasetLink.click();
-    await page.waitForURL(_createDatasetRoutePattern(ctx.workspace));
+    await page.waitForURL(_createDatasetRoutePattern(context.workspace));
     return;
   }
-  await ctx.step(`upload-${stepKey}`, async () => {
-    await _uploadFixture(ctx, { ...options, doesDatasetExist });
+  await context.step(`upload-${stepKey}`, async () => {
+    await _uploadFixture(context, { ...options, doesDatasetExist });
   });
   if (options.shouldDemonstrate) {
     await page
       .getByText("Dataset ready", { exact: true })
       .waitFor({ state: "hidden", timeout: 15000 });
-    await ctx.checkpoint("import-preview");
+    await context.checkpoint("import-preview");
   }
-  await _saveOrReuseDataset(ctx, {
+  await _saveOrReuseDataset(context, {
     stepKey,
     name: options.name,
     doesDatasetExist,
@@ -187,26 +196,30 @@ async function _importFixture(
  * Called by the import flow in `AvandarCaptureFlows` and by
  * `ensureFixtureDataset`, which serves the explorer, cases, and map flows.
  */
-export async function ensureDataset(
-  ctx: FlowContext,
-  key: string,
-  { shouldDemonstrate = false }: Readonly<{ shouldDemonstrate?: boolean }> = {},
-): Promise<FlowRecord> {
-  const { page, state } = ctx;
+export async function ensureDataset({
+  context,
+  key,
+  shouldDemonstrate = false,
+}: Readonly<{
+  context: FlowContext;
+  key: string;
+  shouldDemonstrate?: boolean;
+}>): Promise<FlowRecord> {
+  const { page, state } = context;
   state.datasets ??= {};
   const name = FIXTURE_NAMES[key];
   if (!name) {
     throw new Error(`Unknown fixture: ${key}`);
   }
-  await _openSourceList(ctx, shouldDemonstrate);
-  await _importFixture(ctx, { key, name, shouldDemonstrate });
+  await _openSourceList({ context, shouldShowImport: shouldDemonstrate });
+  await _importFixture(context, { key, name, shouldDemonstrate });
   const id = getRecordIdFromPageUrl(page, "data-manager");
   state.datasets[key] = { id, name };
-  await ctx.recordResource?.({ kind: "dataset", id, name });
+  await context.recordResource?.({ kind: "dataset", id, name });
   if (shouldDemonstrate) {
     await page.getByRole("tab", { name: "Metadata", exact: true }).waitFor();
     await expect(page.getByRole("main")).toContainText("240 rows");
-    await ctx.checkpoint("import-saved");
+    await context.checkpoint("import-saved");
   }
   return state.datasets[key];
 }

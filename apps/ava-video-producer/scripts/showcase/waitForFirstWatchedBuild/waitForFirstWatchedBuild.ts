@@ -21,7 +21,7 @@ export type BuildEventWatcher = {
  * rebuild.
  */
 export function waitForFirstWatchedBuild(
-  watcher: BuildEventWatcher,
+  watcher: Readonly<BuildEventWatcher>,
   onBuilt: () => Promise<void>,
 ): Promise<void> {
   return new Promise((resolve, reject) => {

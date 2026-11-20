@@ -107,7 +107,7 @@ delivery dimensions together; the CLI checks matching aspect ratios.
 - **`src/motion.ts` has no runtime imports.** Its React `CSSProperties` import
   is type-only. Keep the helpers independent of the renderer so they remain portable.
 - **The gate is not optional.** `render.sh` exits non-zero on its failure. Do
-  not loosen the thresholds in `checkFrames.ts` or `scripts/lib/frameGateHelpers.ts`
+  not loosen the thresholds in `checkFrames.ts` or `scripts/lib/frameGateHelpers/`
   to make a render pass. It keeps the frame sequence on a failure so the
   flagged JPEG can be opened. The one sanctioned exception is a storyboard's
   declared cut (`transition: {kind: "cut"}`): `video render` passes its first

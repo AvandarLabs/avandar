@@ -1,19 +1,25 @@
 import fs from "node:fs/promises";
 import type { PlanFingerprint } from "./planHelpers.types";
 
-/** Refuse a render without a complete preview of the same evidence. */
+/**
+ * Verifies that the preview manifest at `filename` completed and matches
+ * `fingerprint`, throwing before `render` can proceed with stale or missing
+ * preview evidence.
+ */
 export async function requireMatchingPreview(
   filename: string,
-  fingerprint: PlanFingerprint,
+  fingerprint: Readonly<PlanFingerprint>,
 ): Promise<void> {
-  let saved: { complete?: boolean; fingerprint?: PlanFingerprint };
-  try {
-    saved = JSON.parse(await fs.readFile(filename, "utf8"));
-  } catch {
-    throw new Error(
-      "Run preview before render; its complete manifest is missing",
-    );
-  }
+  const saved: { complete?: boolean; fingerprint?: PlanFingerprint } =
+    await (async () => {
+      try {
+        return JSON.parse(await fs.readFile(filename, "utf8"));
+      } catch {
+        throw new Error(
+          "Run preview before render; its complete manifest is missing",
+        );
+      }
+    })();
   if (!saved.complete) {
     throw new Error("The preview did not complete; run preview again");
   }

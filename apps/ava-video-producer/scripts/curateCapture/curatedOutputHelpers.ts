@@ -29,17 +29,50 @@ type InstallRequest = {
   publicDirectory: string;
   stage: string;
   existing: readonly string[];
-  backup: string | null;
+  backup: string | undefined;
 };
+
+/**
+ * Moves existing outputs into `backup`, then installs the staged ones,
+ * undoing every completed move in reverse order if any move fails.
+ */
+async function _installOutputs(
+  options: Readonly<InstallRequest>,
+): Promise<void> {
+  const { publicDirectory, stage, backup } = options;
+  const backedUp: string[] = [];
+  const installed: string[] = [];
+  try {
+    for (const name of options.existing) {
+      await rename(join(publicDirectory, name), join(backup ?? stage, name));
+      backedUp.push(name);
+    }
+    for (const name of TARGETS) {
+      await rename(join(stage, name), join(publicDirectory, name));
+      installed.push(name);
+    }
+  } catch (error) {
+    for (const name of installed.reverse()) {
+      await rename(join(publicDirectory, name), join(stage, name));
+    }
+    for (const name of backedUp.reverse()) {
+      await rename(join(backup ?? stage, name), join(publicDirectory, name));
+    }
+    throw error;
+  }
+}
 
 /**
  * Finds the curated outputs already installed, refusing them unless
  * `shouldReplace` is set. `curateCapture` calls it before staging anything.
  */
-export async function findExistingOutputs(
-  publicDirectory: string,
-  shouldReplace: boolean,
-): Promise<string[]> {
+export async function findExistingOutputs({
+  publicDirectory,
+  shouldReplace,
+}: Readonly<{
+  publicDirectory: string;
+  shouldReplace: boolean;
+}>): Promise<string[]> {
   const existing: string[] = [];
   // Check one target at a time, so the first unsafe or blocked one stops it.
   for (const name of TARGETS) {
@@ -95,36 +128,6 @@ export async function stageOutputs(
 }
 
 /**
- * Moves existing outputs into `backup`, then installs the staged ones,
- * undoing every completed move in reverse order if any move fails.
- */
-async function _installOutputs(
-  options: Readonly<InstallRequest>,
-): Promise<void> {
-  const { publicDirectory, stage, backup } = options;
-  const backedUp: string[] = [];
-  const installed: string[] = [];
-  try {
-    for (const name of options.existing) {
-      await rename(join(publicDirectory, name), join(backup ?? stage, name));
-      backedUp.push(name);
-    }
-    for (const name of TARGETS) {
-      await rename(join(stage, name), join(publicDirectory, name));
-      installed.push(name);
-    }
-  } catch (error) {
-    for (const name of installed.reverse()) {
-      await rename(join(publicDirectory, name), join(stage, name));
-    }
-    for (const name of backedUp.reverse()) {
-      await rename(join(backup ?? stage, name), join(publicDirectory, name));
-    }
-    throw error;
-  }
-}
-
-/**
  * Re-checks the source manifest, installs the staged output (backing up what
  * it replaces), and writes the receipt beside the staged files.
  */
@@ -139,7 +142,7 @@ export async function installStagedOutputs(
       "Capture manifest changed during curation; staged output retained",
     );
   }
-  const backup = existing.length ? join(stage, "previous") : null;
+  const backup = existing.length ? join(stage, "previous") : undefined;
   if (backup) {
     await mkdir(backup);
   }

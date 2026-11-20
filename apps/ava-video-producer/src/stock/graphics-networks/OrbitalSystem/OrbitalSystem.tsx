@@ -21,11 +21,11 @@ const CUBE_GLYPH =
   "M480 272 L503 285 L503 311 L480 324 L457 311 L457 285 Z M480 272 V298 L503 311 M480 298 L457 311";
 
 function _buildKeyedBodies(bodies: OrbitalSystemInput["bodies"]) {
-  const counts = new Map<string, number>();
+  const bodySignatureCounts = new Map<string, number>();
   return bodies.map((orbit) => {
     const signature = `${orbit.label}:${orbit.rx}:${orbit.ry}:${orbit.angle}:${orbit.phase}`;
-    const occurrence = counts.get(signature) ?? 0;
-    counts.set(signature, occurrence + 1);
+    const occurrence = bodySignatureCounts.get(signature) ?? 0;
+    bodySignatureCounts.set(signature, occurrence + 1);
     return { key: `${signature}#${occurrence}`, orbit };
   });
 }

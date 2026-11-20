@@ -7,9 +7,9 @@ import type { FlowCaseType, FlowContext } from "../../captureFlows.types";
  * Called by the record steps of `runCasesFlow`: `openCaseRecords`,
  * `verifyRecordCount`, and `openFirstRecord`.
  */
-export function getCaseType(ctx: Readonly<FlowContext>): FlowCaseType {
-  if (!ctx.state.caseType) {
+export function getCaseType(context: Readonly<FlowContext>): FlowCaseType {
+  if (!context.state.caseType) {
     throw new Error("The cases flow needs its case type first.");
   }
-  return ctx.state.caseType;
+  return context.state.caseType;
 }

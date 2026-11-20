@@ -16,7 +16,7 @@ function _hash(bytes: Readonly<Buffer>): string {
  */
 export async function checkDeterminism(
   run: MeasurementRun,
-  options: { url: string; feature: string; frame: number },
+  options: Readonly<{ url: string; feature: string; frame: number }>,
 ): Promise<void> {
   const { url, feature, frame } = options;
   const stage = run.page.locator(".avandar-film");

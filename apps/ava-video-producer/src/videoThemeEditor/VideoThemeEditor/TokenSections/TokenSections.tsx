@@ -51,9 +51,7 @@ export function TokenSections({
   emptyGroups: readonly string[];
 }>): ReactNode {
   const [openGroups, setOpenGroups] = useState<string[]>([]);
-  const openGroupSet = useMemo(() => {
-    return new Set(openGroups);
-  }, [openGroups]);
+  const openGroupSet = new Set(openGroups);
   const groups = useSectionGroups(rows, emptyGroups);
   if (groups.length === 0) {
     return <p className={css.tokenSectionsEmpty}>{"No settings match."}</p>;

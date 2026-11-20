@@ -1,3 +1,4 @@
+import { propEq } from "@avandar/utils";
 import { useState } from "react";
 import { AtlasCategoryNav } from "../AtlasLayout/AtlasCategoryNav/AtlasCategoryNav";
 import { AtlasCollection } from "../AtlasLayout/AtlasCollection/AtlasCollection";
@@ -26,11 +27,7 @@ const HELPER_CATEGORIES = HELPER_CATALOG.categories.map((category) => {
 });
 
 function _getCategoryLabelFromId(id: string): string {
-  return (
-    HELPER_CATEGORIES.find((category) => {
-      return category.id === id;
-    })?.label ?? id
-  );
+  return HELPER_CATEGORIES.find(propEq("id", id))?.label ?? id;
 }
 
 /**

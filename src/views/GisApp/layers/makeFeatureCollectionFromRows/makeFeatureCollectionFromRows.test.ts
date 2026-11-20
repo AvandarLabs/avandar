@@ -13,7 +13,7 @@ const binding: MapLayer.GeoBindingColumnNames = {
 const exact = { mode: "exact" } as const;
 const MAP_SALT = "8f14e45f-ceea-467a-9575-1a1c0c1e7f3b";
 
-function getFirstPointCoordinates(
+function _getFirstPointCoordinates(
   featureCollection: GeoJSON.FeatureCollection,
 ): GeoJSON.Position {
   const geometry = featureCollection.features[0]?.geometry;
@@ -232,7 +232,7 @@ describe("makeFeatureCollectionFromRows", () => {
       layerId: "layer-1",
       jitterSalt: MAP_SALT,
     });
-    const [longitude, latitude] = getFirstPointCoordinates(
+    const [longitude, latitude] = _getFirstPointCoordinates(
       jittered.featureCollection,
     );
     expect(longitude).not.toBe(15.27);
@@ -249,7 +249,7 @@ describe("makeFeatureCollectionFromRows", () => {
         layerId: "layer-1",
         jitterSalt,
       });
-      return getFirstPointCoordinates(result.featureCollection);
+      return _getFirstPointCoordinates(result.featureCollection);
     };
     const expected = jitterCoordinate({
       longitude: 15.27,
@@ -300,7 +300,7 @@ describe("makeFeatureCollectionFromRows", () => {
         layerId: "layer-1",
         jitterSalt: MAP_SALT,
       });
-      const [longitude = 0, latitude = 0] = getFirstPointCoordinates(
+      const [longitude = 0, latitude = 0] = _getFirstPointCoordinates(
         result.featureCollection,
       );
       return [longitude - point.lon, latitude - point.lat];

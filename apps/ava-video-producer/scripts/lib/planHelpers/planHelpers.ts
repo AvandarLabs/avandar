@@ -1,5 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import { prop, propEq } from "@avandar/utils";
+import { match, P } from "ts-pattern";
 import {
   storyboardSchema,
   assetPathSchema,
@@ -7,6 +9,45 @@ import {
   durationInFrames,
   type Storyboard,
 } from "../../../src/storyboard/schema/schema";
+
+/** Every public asset one shot's scene draws, such as stills and logos. */
+function _shotAssetReferences(shot: Storyboard["shots"][number]): string[] {
+  return match(shot)
+    .with({ scene: "media" }, (mediaShot) => {
+      return [mediaShot.props.src];
+    })
+    .with({ scene: "typography" }, (typographyShot) => {
+      return typographyShot.props.icon ? [typographyShot.props.icon.src] : [];
+    })
+    .with({ scene: "brand-lockup" }, (lockupShot) => {
+      return [lockupShot.props.logo.src];
+    })
+    .with({ scene: "tilted-window" }, (windowShot) => {
+      return [
+        ...(windowShot.props.windows ?? []).map(prop("src")),
+        ...(windowShot.props.pair ?? []).map(prop("window.src")),
+        ...(windowShot.props.secondary ? [windowShot.props.secondary.src] : []),
+      ];
+    })
+    .with(
+      {
+        scene: P.union(
+          "continuity",
+          "avandar",
+          "title",
+          "graph",
+          "flowchart",
+          "metric",
+          "bar-comparison",
+          "stock",
+        ),
+      },
+      () => {
+        return [];
+      },
+    )
+    .exhaustive();
+}
 
 /**
  * Reads and validates a storyboard plan from a JSON file, refusing hidden or
@@ -22,10 +63,11 @@ export async function readPlan(filename: string): Promise<Storyboard> {
 }
 
 /**
- * Resolve public assets without following a symlink outside the public
- * directory.
+ * Resolves a public asset path inside `public/` without following symlinks
+ * outside `public/`. Returns the verified real path for validation, preview
+ * staging, media probing, and showcase bundling.
  */
-export async function publicAsset(
+export async function getPublicAssetPathFromAsset(
   root: string,
   asset: string,
 ): Promise<string> {
@@ -33,7 +75,7 @@ export async function publicAsset(
   const publicRoot = await fs.realpath(path.join(root, "public"));
   const filename = await fs.realpath(path.join(publicRoot, asset));
   if (
-    !filename.startsWith(publicRoot + path.sep) ||
+    !filename.startsWith(`${publicRoot}${path.sep}`) ||
     !(await fs.stat(filename)).isFile()
   ) {
     throw new Error(`Asset must be a file inside public/: ${asset}`);
@@ -49,7 +91,9 @@ export async function publicAsset(
  * narration audio, and sound effects. Use it to hash or copy a film's media,
  * for example when fingerprinting a preview.
  */
-export function assetReferences(plan: Storyboard): string[] {
+export function getAssetReferencesFromPlan(
+  plan: Readonly<Storyboard>,
+): string[] {
   return [
     ...new Set([
       ...plan.shots.flatMap(_shotAssetReferences),
@@ -57,35 +101,9 @@ export function assetReferences(plan: Storyboard): string[] {
         return cue.audio ? [cue.audio] : [];
       }),
       ...(plan.narrationTrack ? [plan.narrationTrack.src] : []),
-      ...plan.soundEffects.map((sound) => {
-        return sound.src;
-      }),
+      ...plan.soundEffects.map(prop("src")),
     ]),
   ];
-}
-
-/** Every public asset one shot's scene draws, such as stills and logos. */
-function _shotAssetReferences(shot: Storyboard["shots"][number]): string[] {
-  switch (shot.scene) {
-    case "media":
-      return [shot.props.src];
-    case "typography":
-      return shot.props.icon ? [shot.props.icon.src] : [];
-    case "brand-lockup":
-      return [shot.props.logo.src];
-    case "tilted-window":
-      return [
-        ...(shot.props.windows ?? []).map((window) => {
-          return window.src;
-        }),
-        ...(shot.props.pair ?? []).map((column) => {
-          return column.window.src;
-        }),
-        ...(shot.props.secondary ? [shot.props.secondary.src] : []),
-      ];
-    default:
-      return [];
-  }
 }
 
 /**
@@ -93,15 +111,11 @@ function _shotAssetReferences(shot: Storyboard["shots"][number]): string[] {
  * summary, and narration, with the plan's evidence notes. The video CLI
  * writes it beside a plan for review.
  */
-export function shotList(plan: Storyboard): string {
+export function makeShotListFromPlan(plan: Readonly<Storyboard>): string {
   const lines = timeline(plan).map((shot) => {
     const cues = plan.narration
-      .filter((cue) => {
-        return cue.shotId === shot.id;
-      })
-      .map((cue) => {
-        return cue.text;
-      })
+      .filter(propEq("shotId", shot.id))
+      .map(prop("text"))
       .join(" ");
     const summary =
       shot.note ??
@@ -118,7 +132,11 @@ export function shotList(plan: Storyboard): string {
     .join("\n")}\n`;
 }
 
-/** Reject unexpected and hidden input files before reading any content. */
+/**
+ * Rejects hidden names, `.env` segments, and disallowed extensions before
+ * returning the input file's real path. Used by `readPlan`, `fingerprintPlan`,
+ * and `alignRecording` before reading user-supplied files.
+ */
 export async function safeInputFile(
   filename: string,
   extensions: readonly string[],
@@ -145,8 +163,9 @@ export async function safeInputFile(
 }
 
 /**
- * Create owned output directories one segment at a time, never through
- * symlinks.
+ * Creates owned output directories one segment at a time, never traversing
+ * symlinks, and returns the resolved directory path. Used by `freshStage`,
+ * `alignRecording`, and `scratchTts` when staging build outputs.
  */
 export async function ensureDirectory(
   root: string,

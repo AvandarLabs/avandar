@@ -81,7 +81,10 @@ export async function curateCapture({
   const { evidence, manifestPath, manifestSha256 } =
     await makeCurationEvidenceFromRun({ sourceDirectory, runRelative });
   const publicDirectory = await _getPublicDirectory(root);
-  const existing = await findExistingOutputs(publicDirectory, shouldReplace);
+  const existing = await findExistingOutputs({
+    publicDirectory,
+    shouldReplace,
+  });
   const { screenshots } = evidence;
   const stage = await stageOutputs({
     root,

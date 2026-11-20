@@ -45,15 +45,15 @@ function useHighlightLine(highlight: readonly number[], frame: number): number {
 }
 
 function _buildKeyedCodeLines(lines: CodeFocusInput["lines"]) {
-  const counts = new Map<string, number>();
+  const lineSignatureCounts = new Map<string, number>();
   return lines.map((codeTokens, lineNumber) => {
     const signature = codeTokens
       .map((token) => {
         return `${token.color}:${token.text}`;
       })
       .join("|");
-    const occurrence = counts.get(signature) ?? 0;
-    counts.set(signature, occurrence + 1);
+    const occurrence = lineSignatureCounts.get(signature) ?? 0;
+    lineSignatureCounts.set(signature, occurrence + 1);
     return { key: `${signature}#${occurrence}`, codeTokens, lineNumber };
   });
 }

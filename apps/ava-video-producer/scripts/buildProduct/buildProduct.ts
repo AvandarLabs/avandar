@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import { valNotEq } from "@avandar/utils";
 import {
   build,
   type BuildContext,
@@ -179,11 +180,7 @@ if (
   process.argv[1] &&
   pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url
 ) {
-  if (
-    process.argv.slice(2).some((arg) => {
-      return arg !== "--watch";
-    })
-  ) {
+  if (process.argv.slice(2).some(valNotEq("--watch"))) {
     throw new Error(
       "Usage: component:build [--watch]. Product source is always this Avandar worktree.",
     );

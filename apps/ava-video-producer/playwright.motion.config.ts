@@ -5,7 +5,7 @@ import { defineConfig } from "@playwright/test";
 // registered later run first, so this answers YAML imports before
 // Playwright's own transform tries to parse them as JavaScript. The config
 // loads in the runner and in every worker, so each process registers it.
-register("./scripts/yaml/yamlHooks.ts", import.meta.url);
+register("./scripts/yaml/load.ts", import.meta.url);
 
 /**
  * Producer-only headless gallery checks run one spec and one worker at a time.

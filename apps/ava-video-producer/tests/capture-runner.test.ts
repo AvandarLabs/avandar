@@ -9,7 +9,7 @@ import { runCapture } from "../scripts/captureAvandar/runCapture";
 import {
   createFakeBrowser,
   type DispatchResult,
-} from "./helpers/createFakeBrowser/createFakeBrowser";
+} from "./helpers/createFakeBrowser";
 
 /** A temporary capture root with one fixture CSV. */
 async function _createCaptureRoot(t: TestContext): Promise<string> {
@@ -36,15 +36,15 @@ test("runner keeps auth in memory, records after login, logs actions, finalizes 
       assert.equal(contexts[0].options.recordVideo, undefined);
     },
     flowMap: {
-      import: async (ctx) => {
+      import: async (context) => {
         assert.equal(
-          await ctx.step("read-result", async () => {
+          await context.step("read-result", async () => {
             return 42;
           }),
           42,
         );
-        await ctx.checkpoint("ready", { text: true });
-        await ctx.recordResource({
+        await context.checkpoint("ready", { text: true });
+        await context.recordResource({
           kind: "dataset",
           id: "fixture-id",
           name: "Fixture dataset",
@@ -105,11 +105,11 @@ test("feedback widget is fulfilled locally in both contexts and logged without i
       responses.push(await contexts[0].dispatchRequest(endpoint));
     },
     flowMap: {
-      import: async (ctx) => {
-        await ctx.step("read-result", async () => {
+      import: async (context) => {
+        await context.step("read-result", async () => {
           responses.push(await contexts[1].dispatchRequest(endpoint));
         });
-        await ctx.checkpoint("ready");
+        await context.checkpoint("ready");
       },
     },
   });
@@ -169,8 +169,8 @@ test("unknown external writes still fail capture and retain a useful source URL"
       flowIds: ["import"],
       login: async () => {},
       flowMap: {
-        import: async (ctx) => {
-          await ctx.step("read-result", async () => {
+        import: async (context) => {
+          await context.step("read-result", async () => {
             response = await contexts[1].dispatchRequest(
               `${endpoint}?token=hidden`,
             );
@@ -213,13 +213,13 @@ test("swallowed action failures remain failed evidence and skip later flows whil
         flowIds: ["import", "explorer"],
         login: async () => {},
         flowMap: {
-          import: async (ctx) => {
+          import: async (context) => {
             try {
-              await ctx.step("failed-save", async () => {
+              await context.step("failed-save", async () => {
                 throw new Error("Save failed with capture-test-password");
               });
             } catch {
-              /* Exercise a swallowed action failure. */
+              // Exercise a swallowed action failure.
             }
           },
           explorer: async () => {

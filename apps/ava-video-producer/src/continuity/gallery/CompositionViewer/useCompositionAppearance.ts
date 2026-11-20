@@ -134,7 +134,7 @@ export function useCompositionAppearance(
           JSON.stringify(nextDraft),
         );
       } catch {
-        /* Preferences remain usable when storage is unavailable. */
+        // Preferences remain usable when storage is unavailable.
       }
     },
     loaded: () => {

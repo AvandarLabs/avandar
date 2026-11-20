@@ -12,8 +12,11 @@ import { buildProduct } from "../buildProduct/buildProduct";
 import { getSha256FromFile } from "../lib/getSha256FromFile";
 import { makeWorkspaceWebpackConfigFromConfig } from "../lib/makeWorkspaceWebpackConfigFromConfig";
 import { ffmpeg, run, mixAudio, probe } from "../lib/mediaHelpers";
-import { assetReferences, publicAsset } from "../lib/planHelpers/planHelpers";
-import { previewFrames } from "../lib/planHelpers/previewFrames";
+import { getPreviewFramesFromPlan } from "../lib/planHelpers/getPreviewFramesFromPlan";
+import {
+  getAssetReferencesFromPlan,
+  getPublicAssetPathFromAsset,
+} from "../lib/planHelpers/planHelpers";
 import { requireLicense } from "../requireLicense";
 import {
   type StockFingerprint,
@@ -58,11 +61,16 @@ async function _prepare(film: Film, directory: string) {
     { recursive: true },
   );
   await Promise.all(
-    (film.plan ? assetReferences(film.plan) : []).map(async (asset) => {
-      const target = path.join(publicDir, asset);
-      await fs.mkdir(path.dirname(target), { recursive: true });
-      await fs.copyFile(await publicAsset(appRoot, asset), target);
-    }),
+    (film.plan ? getAssetReferencesFromPlan(film.plan) : []).map(
+      async (asset) => {
+        const target = path.join(publicDir, asset);
+        await fs.mkdir(path.dirname(target), { recursive: true });
+        await fs.copyFile(
+          await getPublicAssetPathFromAsset(appRoot, asset),
+          target,
+        );
+      },
+    ),
   );
   await buildProduct();
   await fs.writeFile(
@@ -130,7 +138,7 @@ function _getPreviewSamplesFromFilm(
   plan: Readonly<Storyboard> | undefined,
 ): number[] {
   if (plan) {
-    return previewFrames(plan);
+    return getPreviewFramesFromPlan(plan);
   }
   return film.kind === "stock"
     ? [...StockFingerprintModule.SAMPLE_PARAMETERS.samples]
@@ -257,12 +265,17 @@ async function _writeDeliveryRecord(
 }
 
 /** Capture previews and frames from one immutable bundle, then run the gate. */
-export async function renderFilm(
-  film: Readonly<Film>,
-  id: string,
-  progress: (message: string) => void,
-  expectedStockSourceHash?: string,
-): Promise<string> {
+export async function renderFilm({
+  film,
+  id,
+  progress,
+  expectedStockSourceHash,
+}: Readonly<{
+  film: Readonly<Film>;
+  id: string;
+  progress: (message: string) => void;
+  expectedStockSourceHash?: string;
+}>): Promise<string> {
   const { privateKey } = requireLicense();
   const stockFingerprint =
     film.kind === "stock"

@@ -1,23 +1,23 @@
 import { z } from "zod";
 import {
-  assetReferences,
-  publicAsset,
-} from "../../../lib/planHelpers/planHelpers";
-import { type StockFingerprint } from "../../../stock/StockFingerprintModule/StockFingerprintModule";
+  getAssetReferencesFromPlan,
+  getPublicAssetPathFromAsset,
+} from "../../lib/planHelpers/planHelpers";
+import { type StockFingerprint } from "../../stock/StockFingerprintModule/StockFingerprintModule";
 import {
   type CaptionFilesResult,
   createCaptionFilesFromRequest,
-} from "../../createCaptionFilesFromRequest/createCaptionFilesFromRequest";
-import { type createExportJobs } from "../../createExportJobs/createExportJobs";
+} from "../createCaptionFilesFromRequest/createCaptionFilesFromRequest";
+import { type createExportJobs } from "../createExportJobs/createExportJobs";
 import {
   THEME_FILE_MAX_BYTES,
   type ThemeStore,
-} from "../../createThemeStore/createThemeStore";
-import { handleThemeRequest } from "../../handleThemeRequest/handleThemeRequest";
-import { withNarration } from "../../narrationHelpers/narrationHelpers";
-import { appRoot, ShowcaseFilms } from "../../ShowcaseFilms/ShowcaseFilms";
-import { streamFile } from "../../staticFileHelpers/staticFileHelpers";
-import type { Film } from "../../../../src/showcase/showcase.types";
+} from "../createThemeStore/createThemeStore";
+import { handleThemeRequest } from "../handleThemeRequest/handleThemeRequest";
+import { withNarration } from "../narrationHelpers/narrationHelpers";
+import { appRoot, ShowcaseFilms } from "../ShowcaseFilms/ShowcaseFilms";
+import { streamFile } from "../staticFileHelpers/staticFileHelpers";
+import type { Film } from "../../../src/showcase/showcase.types";
 import type { IncomingMessage, ServerResponse } from "node:http";
 
 /** What one queued export render needs: the film and its stock evidence. */
@@ -27,18 +27,18 @@ export type ExportJobInput = { film: Film; fingerprint?: StockFingerprint };
 export type ExportJobs = ReturnType<typeof createExportJobs<ExportJobInput>>;
 
 /** The server state the `/api/` routes read, shared with the static routes. */
-export type ApiContext = Readonly<{
+export type ApiContext = {
   themeStore: ThemeStore;
   jobs: ExportJobs;
   /** Served path to file path for the media of every film opened so far. */
   media: Map<string, string>;
   getGeneration: () => number;
-}>;
+};
 
-type FilmRequestOptions = Readonly<{
-  req: IncomingMessage;
-  res: ServerResponse;
-}>;
+type FilmRequestOptions = {
+  request: IncomingMessage;
+  response: ServerResponse;
+};
 
 const requestSchema = z.strictObject({
   id: z.string().max(80),
@@ -50,9 +50,13 @@ const requestSchema = z.strictObject({
 const EXPORT_BODY_MAX_BYTES = 8192 + THEME_FILE_MAX_BYTES;
 
 function _sendJson(
-  options: Readonly<{ res: ServerResponse; status: number; body: unknown }>,
+  options: Readonly<{
+    response: ServerResponse;
+    status: number;
+    body: unknown;
+  }>,
 ): void {
-  options.res
+  options.response
     .writeHead(options.status, {
       "Content-Type": "application/json",
       "Cache-Control": "no-store",
@@ -66,13 +70,16 @@ async function _getPlayerFilmFromId(
 ): Promise<Film> {
   const film = await withNarration(await ShowcaseFilms.load(id));
   const assets = film.plan
-    ? assetReferences(film.plan)
+    ? getAssetReferencesFromPlan(film.plan)
     : film.kind === "helper"
       ? film.assets
       : [];
   await Promise.all(
     assets.map(async (asset) => {
-      return media.set(`/${asset}`, await publicAsset(appRoot, asset));
+      return media.set(
+        `/${asset}`,
+        await getPublicAssetPathFromAsset(appRoot, asset),
+      );
     }),
   );
   return film;
@@ -84,23 +91,29 @@ async function _getPlayerFilmFromId(
  * and returns undefined when the body is refused.
  */
 async function _readFilmRequest({
-  req,
-  res,
-}: FilmRequestOptions): Promise<z.infer<typeof requestSchema> | undefined> {
-  if (req.headers.origin !== `http://${req.headers.host}`) {
+  request,
+  response,
+}: Readonly<FilmRequestOptions>): Promise<
+  z.infer<typeof requestSchema> | undefined
+> {
+  if (request.headers.origin !== `http://${request.headers.host}`) {
     _sendJson({
-      res,
+      response,
       status: 403,
       body: { message: "Use the local showcase to request a render." },
     });
     return undefined;
   }
   let body = "";
-  req.setEncoding("utf8");
-  for await (const chunk of req) {
+  request.setEncoding("utf8");
+  for await (const chunk of request) {
     body += chunk;
     if (Buffer.byteLength(body) > EXPORT_BODY_MAX_BYTES) {
-      _sendJson({ res, status: 413, body: { message: "Request too large" } });
+      _sendJson({
+        response,
+        status: 413,
+        body: { message: "Request too large" },
+      });
       return undefined;
     }
   }
@@ -109,7 +122,7 @@ async function _readFilmRequest({
   } catch (error) {
     console.error("Invalid showcase film request:", error);
     _sendJson({
-      res,
+      response,
       status: 400,
       body: {
         message: "Invalid film or export options. Check the showcase terminal.",
@@ -121,21 +134,21 @@ async function _readFilmRequest({
 
 /** Sends a transcript or caption file, or the status its request earned. */
 function _sendCaptionFile({
-  res,
+  response,
   result,
   fileName,
 }: Readonly<{
-  res: ServerResponse;
+  response: ServerResponse;
   result: CaptionFilesResult<Film>;
   fileName: "transcript.txt" | "captions.srt";
 }>): void {
   if (result.status === 404) {
-    res.writeHead(404).end();
+    response.writeHead(404).end();
     return;
   }
   if (result.status === 400) {
     _sendJson({
-      res,
+      response,
       status: 400,
       body: {
         message:
@@ -144,7 +157,7 @@ function _sendCaptionFile({
     });
     return;
   }
-  res
+  response
     .writeHead(200, {
       "Content-Type": "text/plain; charset=utf-8",
       "Content-Disposition": `attachment; filename="${result.film.id}-${fileName}"`,
@@ -155,28 +168,34 @@ function _sendCaptionFile({
 }
 
 /** Captions timed by the same options and theme an export sends. */
-async function _captionRequest(options: FilmRequestOptions): Promise<void> {
-  const request = await _readFilmRequest(options);
-  if (request) {
+async function _captionRequest(
+  options: Readonly<FilmRequestOptions>,
+): Promise<void> {
+  const filmRequest = await _readFilmRequest(options);
+  if (filmRequest) {
     const result = await createCaptionFilesFromRequest({
-      id: request.id,
-      options: request.options,
+      id: filmRequest.id,
+      options: filmRequest.options,
       load: ShowcaseFilms.load,
     });
-    _sendCaptionFile({ res: options.res, result, fileName: "captions.srt" });
+    _sendCaptionFile({
+      response: options.response,
+      result,
+      fileName: "captions.srt",
+    });
   }
 }
 
 async function _onExportRequest(
-  options: FilmRequestOptions & Readonly<{ context: ApiContext }>,
+  options: Readonly<FilmRequestOptions & { context: Readonly<ApiContext> }>,
 ): Promise<void> {
-  const { res, context } = options;
-  const request = await _readFilmRequest(options);
-  if (!request) {
+  const { response, context } = options;
+  const filmRequest = await _readFilmRequest(options);
+  if (!filmRequest) {
     return;
   }
   try {
-    const film = await ShowcaseFilms.load(request.id, request.options);
+    const film = await ShowcaseFilms.load(filmRequest.id, filmRequest.options);
     ShowcaseFilms.assertExportable(film);
     const fingerprint =
       film.kind === "stock"
@@ -186,7 +205,7 @@ async function _onExportRequest(
       fingerprint?.configurationHash ??
       JSON.stringify({ generation: context.getGeneration(), film });
     _sendJson({
-      res,
+      response,
       status: 202,
       body: context.jobs.start(key, { film, fingerprint }),
     });
@@ -197,7 +216,7 @@ async function _onExportRequest(
       console.error("Invalid showcase export request:", error);
     }
     _sendJson({
-      res,
+      response,
       status: busy ? 409 : 400,
       body: {
         message: busy
@@ -210,17 +229,17 @@ async function _onExportRequest(
 
 /** Answers `GET /api/films/<id>` and its transcript and caption downloads. */
 async function _onFilmRequest({
-  res,
+  response,
   match,
   media,
 }: Readonly<{
-  res: ServerResponse;
+  response: ServerResponse;
   match: Readonly<RegExpExecArray>;
   media: Map<string, string>;
 }>): Promise<void> {
   if (!match[2]) {
     _sendJson({
-      res,
+      response,
       status: 200,
       body: await _getPlayerFilmFromId(match[1], media),
     });
@@ -234,7 +253,7 @@ async function _onFilmRequest({
     load: ShowcaseFilms.load,
   });
   _sendCaptionFile({
-    res,
+    response,
     result,
     fileName: match[2] === "captions.srt" ? "captions.srt" : "transcript.txt",
   });
@@ -242,26 +261,26 @@ async function _onFilmRequest({
 
 /** Answers an export job's status or download; false when it is unknown. */
 async function _onExportJobRequest({
-  req,
-  res,
+  request,
+  response,
   match,
   jobs,
 }: Readonly<{
-  req: IncomingMessage;
-  res: ServerResponse;
+  request: IncomingMessage;
+  response: ServerResponse;
   match: Readonly<RegExpExecArray>;
   jobs: ExportJobs;
 }>): Promise<boolean> {
   if (match[2]) {
     const file = jobs.file(match[1]);
     if (file) {
-      await streamFile(req, res, file, true);
+      await streamFile(request, response, file, true);
     }
     return Boolean(file);
   }
   const job = jobs.get(match[1]);
   if (job) {
-    _sendJson({ res, status: 200, body: job });
+    _sendJson({ response, status: 200, body: job });
   }
   return Boolean(job);
 }
@@ -272,30 +291,37 @@ async function _onExportJobRequest({
  * that matches no route.
  */
 export async function handleApiRequest({
-  req,
-  res,
+  request,
+  response,
   pathname,
   context,
 }: Readonly<{
-  req: IncomingMessage;
-  res: ServerResponse;
+  request: IncomingMessage;
+  response: ServerResponse;
   pathname: string;
-  context: ApiContext;
+  context: Readonly<ApiContext>;
 }>): Promise<void> {
   const { themeStore, jobs, media } = context;
-  if (await handleThemeRequest({ req, res, pathname, store: themeStore })) {
+  if (
+    await handleThemeRequest({
+      req: request,
+      res: response,
+      pathname,
+      store: themeStore,
+    })
+  ) {
     return;
   }
-  if (pathname === "/api/exports" && req.method === "POST") {
-    await _onExportRequest({ req, res, context });
+  if (pathname === "/api/exports" && request.method === "POST") {
+    await _onExportRequest({ request, response, context });
     return;
   }
-  if (pathname === "/api/captions" && req.method === "POST") {
-    await _captionRequest({ req, res });
+  if (pathname === "/api/captions" && request.method === "POST") {
+    await _captionRequest({ request, response });
     return;
   }
-  if (!["GET", "HEAD"].includes(req.method ?? "")) {
-    res.writeHead(405).end();
+  if (!["GET", "HEAD"].includes(request.method ?? "")) {
+    response.writeHead(405).end();
     return;
   }
   const filmMatch =
@@ -303,7 +329,7 @@ export async function handleApiRequest({
       pathname,
     );
   if (filmMatch) {
-    await _onFilmRequest({ res, match: filmMatch, media });
+    await _onFilmRequest({ response, match: filmMatch, media });
     return;
   }
   const exportMatch = /^\/api\/exports\/([a-f0-9-]+)(\/download)?$/.exec(
@@ -311,8 +337,13 @@ export async function handleApiRequest({
   );
   if (
     !exportMatch ||
-    !(await _onExportJobRequest({ req, res, match: exportMatch, jobs }))
+    !(await _onExportJobRequest({
+      request,
+      response,
+      match: exportMatch,
+      jobs,
+    }))
   ) {
-    res.writeHead(404).end();
+    response.writeHead(404).end();
   }
 }

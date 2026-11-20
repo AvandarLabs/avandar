@@ -52,8 +52,6 @@ const AVAILABLE_FILMS = [
   "avandar-overview",
 ] as const;
 
-type AvailableFilmId = (typeof AVAILABLE_FILMS)[number];
-
 const DELIVERY_DIRECTORY = "out/component-deliveries";
 
 const ffmpeg =
@@ -218,14 +216,12 @@ async function _deliverFilm(options: {
   });
 }
 
-function _isAvailableFilm(id: string): id is AvailableFilmId {
-  return (AVAILABLE_FILMS as readonly string[]).includes(id);
-}
-
 /** The requested film IDs, or all six when none are named. */
 function _getRequestedFilms(requested: readonly string[]): string[] {
   if (
-    !requested.every(_isAvailableFilm) ||
+    !requested.every((id) => {
+      return (AVAILABLE_FILMS as readonly string[]).includes(id);
+    }) ||
     new Set(requested).size !== requested.length
   ) {
     throw Error(

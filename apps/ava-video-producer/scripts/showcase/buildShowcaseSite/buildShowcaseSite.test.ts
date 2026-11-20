@@ -2,10 +2,10 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
-import { buildShowcaseSite } from "../scripts/showcase/buildShowcaseSite";
-import { SHOWCASE_PAGES } from "../scripts/showcase/makeShowcaseViteConfigFromAppRoot";
-import { createShowcaseFixture } from "./createShowcaseFixture";
-import { getLocalAssetPathsFromHtml } from "./getLocalAssetPathsFromHtml";
+import { createShowcaseFixture } from "../../../tests/createShowcaseFixture";
+import { getLocalAssetPathsFromHtml } from "../../../tests/getLocalAssetPathsFromHtml";
+import { SHOWCASE_PAGES } from "../makeShowcaseViteConfigFromAppRoot";
+import { buildShowcaseSite } from "./buildShowcaseSite";
 
 test("the Vite production build emits every showcase page with its scripts and styles", async () => {
   const root = await createShowcaseFixture("showcase-build-");

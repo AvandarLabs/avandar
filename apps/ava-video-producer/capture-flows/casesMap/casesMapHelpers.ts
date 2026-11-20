@@ -10,19 +10,19 @@ export const WAIT = 30000;
  * origin throws.
  */
 export function makeWorkspaceUrlFromRoute(
-  ctx: Readonly<Pick<FlowContext, "baseUrl" | "workspace" | "runLabel">>,
+  context: Readonly<Pick<FlowContext, "baseUrl" | "workspace" | "runLabel">>,
   suffix: string,
 ): string {
-  const origin = new URL(ctx.baseUrl);
+  const origin = new URL(context.baseUrl);
   if (!["localhost", "127.0.0.1", "[::1]"].includes(origin.hostname)) {
     throw new Error(
       "Case and map capture requires a localhost development app.",
     );
   }
-  if (!ctx.workspace || !ctx.runLabel) {
+  if (!context.workspace || !context.runLabel) {
     throw new Error("workspace and runLabel are required.");
   }
-  return `${origin.origin}/${encodeURIComponent(ctx.workspace)}/${suffix}`;
+  return `${origin.origin}/${encodeURIComponent(context.workspace)}/${suffix}`;
 }
 
 /** Escapes a string for safe interpolation into a RegExp literal. */
@@ -58,9 +58,9 @@ export async function selectOption(
  * provenance.
  */
 export async function recordFlowResource(
-  ctx: Readonly<FlowContext>,
+  context: Readonly<FlowContext>,
   options: Readonly<{ kind: string; item: Readonly<FlowRecord> }>,
 ): Promise<void> {
   const { kind, item } = options;
-  await ctx.recordResource?.({ kind, id: item.id, name: item.name });
+  await context.recordResource?.({ kind, id: item.id, name: item.name });
 }

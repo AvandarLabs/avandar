@@ -191,7 +191,7 @@ async function _renderRequest(
  * `out/motion/deliveries/`, after checking that each has a current preview.
  */
 export async function renderMotionRequests(
-  requests: MotionRequest[],
+  requests: readonly MotionRequest[],
 ): Promise<void> {
   const digest = await StockFingerprintModule.getSourceHashFromRoot(ROOT);
   // Check the whole selection before spending time on a partial batch.

@@ -17,10 +17,7 @@ import { appRoot, ShowcaseFilms, PLANS } from "../ShowcaseFilms/ShowcaseFilms";
 import { SHOWCASE_PUBLIC_FILES } from "../showcaseVitePluginHelpers";
 import { servedFile, streamFile } from "../staticFileHelpers/staticFileHelpers";
 import { watchShowcase } from "../watchShowcase";
-import {
-  type ExportJobInput,
-  handleApiRequest,
-} from "./handleApiRequest/handleApiRequest";
+import { type ExportJobInput, handleApiRequest } from "./handleApiRequest";
 
 requireLicense();
 
@@ -81,12 +78,12 @@ const jobs = createExportJobs<ExportJobInput>(
   async ({ input: { film, fingerprint }, directoryId: id, progress }) => {
     const release = ShowcaseFilms.retainContracts(film);
     try {
-      return await renderFilm(
-        await withNarration(film),
+      return await renderFilm({
+        film: await withNarration(film),
         id,
         progress,
-        fingerprint?.sourceHash,
-      );
+        expectedStockSourceHash: fingerprint?.sourceHash,
+      });
     } finally {
       await release();
     }
@@ -113,39 +110,42 @@ async function _getStaticFileFromPath(pathname: string): Promise<string> {
   );
 }
 /** Opens the shared source-watch stream for one page. */
-function _onEventsRequest(req: IncomingMessage, res: ServerResponse): void {
-  res.writeHead(200, {
+function _onEventsRequest(
+  request: IncomingMessage,
+  response: ServerResponse,
+): void {
+  response.writeHead(200, {
     "Content-Type": "text/event-stream",
     "Cache-Control": "no-store",
     Connection: "keep-alive",
   });
-  res.write(`data: ${session}:${generation}\n\n`);
-  clients.add(res);
-  req.on("close", () => {
-    return clients.delete(res);
+  response.write(`data: ${session}:${generation}\n\n`);
+  clients.add(response);
+  request.on("close", () => {
+    return clients.delete(response);
   });
 }
 
 /** Routes one request to the API, the event stream, or a static file. */
 async function _onRequest(
-  req: IncomingMessage,
-  res: ServerResponse,
+  request: IncomingMessage,
+  response: ServerResponse,
 ): Promise<void> {
   if (
     !["localhost", "127.0.0.1"].includes(
-      new URL(`http://${req.headers.host}`).hostname,
+      new URL(`http://${request.headers.host}`).hostname,
     )
   ) {
-    res.writeHead(403).end();
+    response.writeHead(403).end();
     return;
   }
   const pathname = decodeURIComponent(
-    new URL(req.url ?? "/", `http://${req.headers.host}`).pathname,
+    new URL(request.url ?? "/", `http://${request.headers.host}`).pathname,
   );
   if (pathname.startsWith("/api/")) {
     await handleApiRequest({
-      req,
-      res,
+      request,
+      response,
       pathname,
       context: {
         themeStore,
@@ -158,31 +158,31 @@ async function _onRequest(
     });
     return;
   }
-  if (!["GET", "HEAD"].includes(req.method ?? "")) {
-    res.writeHead(405).end();
+  if (!["GET", "HEAD"].includes(request.method ?? "")) {
+    response.writeHead(405).end();
     return;
   }
   if (pathname === "/events") {
-    _onEventsRequest(req, res);
+    _onEventsRequest(request, response);
     return;
   }
   const file = await _getStaticFileFromPath(pathname);
   if (path.extname(file) === ".mp4") {
-    res.writeHead(404).end();
+    response.writeHead(404).end();
     return;
   }
-  await streamFile(req, res, file);
+  await streamFile(request, response, file);
 }
 
-const server = createServer(async (req, res) => {
+const server = createServer(async (request, response) => {
   try {
-    await _onRequest(req, res);
+    await _onRequest(request, response);
   } catch (error) {
     console.error(error);
-    if (!res.headersSent) {
-      res.writeHead(404);
+    if (!response.headersSent) {
+      response.writeHead(404);
     }
-    res.end();
+    response.end();
   }
 });
 server.listen(Number(process.env.PORT ?? 4173), "127.0.0.1", () => {

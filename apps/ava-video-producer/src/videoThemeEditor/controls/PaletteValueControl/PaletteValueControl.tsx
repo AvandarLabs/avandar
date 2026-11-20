@@ -19,7 +19,11 @@ export function PaletteValueControl({
   value,
   onChange,
 }: ValueControlProps): ReactNode {
-  const shades: string[] = Array.isArray(value) ? value : [];
+  const shades = Array.isArray(value)
+    ? value.filter((entry): entry is string => {
+        return typeof entry === "string";
+      })
+    : [];
   return (
     <div className={css.paletteValueGrid} role="group" aria-label={label}>
       {_buildShadeEntries(shades).map(({ key, shadeSlot, shade }) => {

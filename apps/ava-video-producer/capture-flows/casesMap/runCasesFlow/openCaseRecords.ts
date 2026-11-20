@@ -10,18 +10,21 @@ import type { FlowContext } from "../../captureFlows.types";
  *
  * Called by the `cases-sync-records` step of `runCasesFlow`.
  */
-export async function openCaseRecords(
-  ctx: FlowContext,
-  isNew: boolean,
-): Promise<void> {
-  const { page } = ctx;
-  const caseType = getCaseType(ctx);
+export async function openCaseRecords({
+  context,
+  isNew,
+}: Readonly<{
+  context: FlowContext;
+  isNew: boolean;
+}>): Promise<void> {
+  const { page } = context;
+  const caseType = getCaseType(context);
   let shouldSync = isNew;
   if (!isNew) {
     await page
       .getByRole("button", { name: "View records", exact: true })
       .click();
-    const firstRecord = getRecordLinks(page, getCaseType(ctx).id).first();
+    const firstRecord = getRecordLinks(page, getCaseType(context).id).first();
     const empty = page.getByText("No records yet", { exact: true });
     await expect(firstRecord.or(empty).first()).toBeVisible({ timeout: WAIT });
     shouldSync = await empty.isVisible();
@@ -31,7 +34,7 @@ export async function openCaseRecords(
     // records.
     if (!isNew) {
       await page.goto(
-        makeWorkspaceUrlFromRoute(ctx, `ontology-designer/${caseType.id}`),
+        makeWorkspaceUrlFromRoute(context, `ontology-designer/${caseType.id}`),
       );
     }
     await page
@@ -47,7 +50,7 @@ export async function openCaseRecords(
       .getByRole("button", { name: "View records", exact: true })
       .click();
   }
-  await getRecordLinks(page, getCaseType(ctx).id)
+  await getRecordLinks(page, getCaseType(context).id)
     .first()
     .waitFor({ timeout: WAIT });
 }

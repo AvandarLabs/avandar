@@ -8,7 +8,7 @@ import type { FixtureRow } from "./runCasesFlow.types";
 
 /** What one pass over the rendered record links reads and adds to. */
 type RenderedRecordsRead = {
-  ctx: FlowContext;
+  context: FlowContext;
   links: Locator;
   viewport: Locator;
   records: Map<string | undefined, string>;
@@ -37,9 +37,12 @@ async function _addRenderedRecords(
   const isAtBottom = await options.viewport.evaluate((element) => {
     return element.scrollTop + element.clientHeight >= element.scrollHeight - 1;
   });
-  const loadingMoreIndicator = options.ctx.page.getByText("Loading more...", {
-    exact: true,
-  });
+  const loadingMoreIndicator = options.context.page.getByText(
+    "Loading more...",
+    {
+      exact: true,
+    },
+  );
   return (
     isAtBottom &&
     records.size >= options.expectedCount &&
@@ -79,12 +82,12 @@ async function _scrollRecordPane(
  * Called by the `cases-verify-240-records` step of `runCasesFlow`.
  */
 export async function verifyRecordCount(
-  ctx: FlowContext,
+  context: FlowContext,
   expectedRows: readonly FixtureRow[],
 ): Promise<void> {
-  const caseType = getCaseType(ctx);
-  const links = getRecordLinks(ctx.page, caseType.id);
-  const viewport = ctx.page
+  const caseType = getCaseType(context);
+  const links = getRecordLinks(context.page, caseType.id);
+  const viewport = context.page
     .locator(".mantine-ScrollArea-viewport")
     .filter({ has: links.first() });
   await expect(viewport).toHaveCount(1);
@@ -94,7 +97,7 @@ export async function verifyRecordCount(
     const expectedCount = expectedRows.length;
     if (
       await _addRenderedRecords({
-        ctx,
+        context,
         links,
         viewport,
         records,
@@ -112,7 +115,7 @@ export async function verifyRecordCount(
   // The current product repeats pagination boundary keys in its virtual list.
   // Reload the same records route after proving unique labels, restoring a
   // clean view.
-  await ctx.page.reload();
+  await context.page.reload();
   await expect(
     links.filter({ hasText: expectedRows[0].case_label }).first(),
   ).toBeVisible({ timeout: WAIT });

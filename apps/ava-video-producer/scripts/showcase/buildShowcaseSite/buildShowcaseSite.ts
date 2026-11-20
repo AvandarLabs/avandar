@@ -1,5 +1,5 @@
 import { build } from "vite";
-import { makeShowcaseViteConfigFromAppRoot } from "./makeShowcaseViteConfigFromAppRoot";
+import { makeShowcaseViteConfigFromAppRoot } from "../makeShowcaseViteConfigFromAppRoot";
 
 /**
  * Builds every showcase page once into `out/showcase/browser`, expecting the

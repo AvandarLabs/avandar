@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { captureGlobals, restoreGlobals } from "../__tests__/restoreGlobals";
+import {
+  captureGlobals,
+  restoreGlobals,
+} from "../__tests__/restoreGlobalsHelpers";
 import { watchFilms } from "./watchFilms";
 
 const origin = "http://localhost:4173";
@@ -63,7 +66,7 @@ function _createPlayer(index: number): FakePlayer {
       navigations.push(value);
     },
     contentWindow: {
-      postMessage(message, targetOrigin) {
+      postMessage: (message, targetOrigin) => {
         messages.push({ message, targetOrigin });
       },
     },
@@ -86,12 +89,12 @@ function _createClock(): ManualClock {
     },
     advance: (milliseconds: number) => {
       time += milliseconds;
-      for (const [id, timer] of [...timers]) {
+      [...timers].forEach(([id, timer]) => {
         if (timer.at <= time) {
           timers.delete(id);
           timer.callback();
         }
-      }
+      });
     },
     get pending() {
       return timers.size;
@@ -204,15 +207,16 @@ test("seven players share one source stream and ignore initial or repeated gener
     );
     notify("6");
     notify("6");
-    const requestIds = new Set<string | undefined>();
-    for (const player of players) {
-      assert.equal(player.messages.length, 1);
-      const { message, targetOrigin } = player.messages[0];
-      assert.equal(message.type, "film-control");
-      assert.equal(message.action, "reload");
-      assert.equal(targetOrigin, origin);
-      requestIds.add(message.requestId);
-    }
+    const requestIds = new Set(
+      players.map((player) => {
+        assert.equal(player.messages.length, 1);
+        const { message, targetOrigin } = player.messages[0];
+        assert.equal(message.type, "film-control");
+        assert.equal(message.action, "reload");
+        assert.equal(targetOrigin, origin);
+        return message.requestId;
+      }),
+    );
     assert.equal(requestIds.size, 7);
   });
 });

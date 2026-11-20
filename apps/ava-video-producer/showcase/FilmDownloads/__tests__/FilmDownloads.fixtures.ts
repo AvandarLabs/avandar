@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
-import { captureGlobals, restoreGlobals } from "../../__tests__/restoreGlobals";
+import {
+  captureGlobals,
+  restoreGlobals,
+} from "../../__tests__/restoreGlobalsHelpers";
 import { FilmDownloads, type DownloadStatus } from "../FilmDownloads";
 import type { TestContext } from "node:test";
 
@@ -131,15 +134,16 @@ export function installBrowserFixture(
 /** Creates a fake document that records each clicked download link. */
 export function createDocumentFixture(downloads: string[]): DocumentFixture {
   return {
-    body: { append() {} },
+    body: { append: () => {} },
     createElement: () => {
-      return {
+      const link = {
         href: "",
-        click() {
-          downloads.push(this.href);
+        click: () => {
+          downloads.push(link.href);
         },
-        remove() {},
+        remove: () => {},
       };
+      return link;
     },
   };
 }

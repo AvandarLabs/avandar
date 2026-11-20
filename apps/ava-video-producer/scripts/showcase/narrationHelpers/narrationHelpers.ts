@@ -6,8 +6,8 @@ import {
   type Storyboard,
 } from "../../../src/storyboard/schema/schema";
 import {
-  assetReferences,
-  publicAsset,
+  getAssetReferencesFromPlan,
+  getPublicAssetPathFromAsset,
 } from "../../lib/planHelpers/planHelpers";
 import { scratchTts } from "../../video/scratchTts/scratchTts";
 import { appRoot, PLANS } from "../ShowcaseFilms/ShowcaseFilms";
@@ -31,8 +31,8 @@ async function _prepareNarration(
       JSON.parse(await fs.readFile(cache, "utf8")),
     );
     await Promise.all(
-      assetReferences(plan).map((asset) => {
-        return publicAsset(root, asset);
+      getAssetReferencesFromPlan(plan).map((asset) => {
+        return getPublicAssetPathFromAsset(root, asset);
       }),
     );
     return plan;

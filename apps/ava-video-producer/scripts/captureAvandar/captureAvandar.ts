@@ -33,10 +33,10 @@ if (
   process.argv[1] &&
   resolve(process.argv[1]) === fileURLToPath(import.meta.url)
 ) {
-  _main().catch((error: Error) => {
+  _main().catch((error: unknown) => {
     console.error(
       makeRedactedTextFromValue({
-        value: error.message,
+        value: error instanceof Error ? error.message : String(error),
         secrets: [
           process.env.AVANDAR_DEMO_EMAIL,
           process.env.AVANDAR_DEMO_PASSWORD,

@@ -1,7 +1,5 @@
 /** The original property descriptors of the globals a fixture replaces. */
-export type GlobalSnapshot = ReadonlyArray<
-  readonly [string, PropertyDescriptor | undefined]
->;
+export type GlobalSnapshot = Array<[string, PropertyDescriptor | undefined]>;
 
 /**
  * Records the current descriptor of each named global, so a test can replace
@@ -10,12 +8,14 @@ export type GlobalSnapshot = ReadonlyArray<
  */
 export function captureGlobals(keys: readonly string[]): GlobalSnapshot {
   return keys.map((key) => {
-    return [key, Object.getOwnPropertyDescriptor(globalThis, key)] as const;
+    return [key, Object.getOwnPropertyDescriptor(globalThis, key)];
   });
 }
 
 /** Puts back the global properties a fixture replaced. */
-export function restoreGlobals(originals: GlobalSnapshot): void {
+export function restoreGlobals(
+  originals: ReadonlyArray<readonly [string, PropertyDescriptor | undefined]>,
+): void {
   originals.forEach(([key, descriptor]) => {
     if (descriptor) {
       Object.defineProperty(globalThis, key, descriptor);

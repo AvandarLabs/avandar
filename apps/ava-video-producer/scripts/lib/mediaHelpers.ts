@@ -8,7 +8,7 @@ import {
   durationInFrames,
   type Storyboard,
 } from "../../src/storyboard/schema/schema";
-import { publicAsset } from "./planHelpers/planHelpers";
+import { getPublicAssetPathFromAsset } from "./planHelpers/planHelpers";
 
 export const ffmpeg =
   process.env.FFMPEG_BIN ||
@@ -105,7 +105,10 @@ export async function validateMedia(
   const cache = new Map<string, Awaited<ReturnType<typeof probe>>>();
   const inspect = async (asset: string) => {
     if (!cache.has(asset))
-      cache.set(asset, await probe(await publicAsset(root, asset)));
+      cache.set(
+        asset,
+        await probe(await getPublicAssetPathFromAsset(root, asset)),
+      );
     return cache.get(asset)!;
   };
   const audio = async (asset: string, label: string) => {
@@ -270,7 +273,7 @@ export async function mixAudio(
   }
   const args = ["-y", "-loglevel", "error", "-i", picture];
   for (const track of tracks)
-    args.push("-i", await publicAsset(root, track.src));
+    args.push("-i", await getPublicAssetPathFromAsset(root, track.src));
   const filters = tracks.map((track, index) => {
     const delay = Math.round((track.atFrame / plan.fps) * 1000);
     return `[${index + 1}:a]aresample=48000,aformat=sample_fmts=fltp:channel_layouts=stereo,volume=${track.volume},adelay=${delay}|${delay}[a${index}]`;

@@ -8,7 +8,7 @@ import type { CaseSources, FixtureRow } from "./runCasesFlow.types";
 
 /** Checks each record field's value and the dataset it is read from. */
 async function _expectRecordFields(
-  ctx: Readonly<FlowContext>,
+  context: Readonly<FlowContext>,
   options: Readonly<{
     expected: FixtureRow;
     kits: number;
@@ -24,7 +24,7 @@ async function _expectRecordFields(
     "referral_status",
     "supply_kits_delivered",
   ]) {
-    const item = ctx.page
+    const item = context.page
       .getByRole("listitem")
       .filter({ hasText: new RegExp(`^${field}\\s`) })
       .first();
@@ -39,7 +39,7 @@ async function _expectRecordFields(
     );
   }
   await expect(
-    ctx.page
+    context.page
       .getByRole("listitem")
       .filter({ hasText: /^case_id\s/ })
       .locator("p:last-child"),
@@ -48,11 +48,11 @@ async function _expectRecordFields(
 
 /** Scrolls the record list back to the top and checks the record is in view. */
 async function _scrollRecordIntoView(
-  ctx: FlowContext,
+  context: FlowContext,
   name: string,
 ): Promise<void> {
-  const links = getRecordLinks(ctx.page, getCaseType(ctx).id);
-  const pane = ctx.page
+  const links = getRecordLinks(context.page, getCaseType(context).id);
+  const pane = context.page
     .locator(".mantine-ScrollArea-viewport")
     .filter({ has: links.first() });
   await pane.evaluate((element) => {
@@ -67,14 +67,17 @@ async function _scrollRecordIntoView(
  * Called by the `cases-open-record` step of `runCasesFlow`.
  */
 export async function openFirstRecord(
-  ctx: FlowContext,
+  context: FlowContext,
   options: Readonly<{
     sources: CaseSources;
     expectedRows: readonly FixtureRow[];
     expectedVisits: readonly FixtureRow[];
   }>,
 ): Promise<void> {
-  const firstRecordLink = getRecordLinks(ctx.page, getCaseType(ctx).id).first();
+  const firstRecordLink = getRecordLinks(
+    context.page,
+    getCaseType(context).id,
+  ).first();
   const name = (await firstRecordLink.innerText()).trim();
   const expected = options.expectedRows.find(propEq("case_label", name));
   if (!expected) {
@@ -86,12 +89,16 @@ export async function openFirstRecord(
       return sum + Number(visit.supply_kits_delivered);
     }, 0);
   await firstRecordLink.click();
-  await ctx.page.getByRole("heading", { name, exact: true }).waitFor();
-  await ctx.page
+  await context.page.getByRole("heading", { name, exact: true }).waitFor();
+  await context.page
     .getByRole("heading", { name: "Details", exact: true })
     .waitFor();
-  await _expectRecordFields(ctx, { expected, kits, sources: options.sources });
-  getCaseType(ctx).recordName = name;
-  getCaseType(ctx).recordUrl = ctx.page.url();
-  await _scrollRecordIntoView(ctx, name);
+  await _expectRecordFields(context, {
+    expected,
+    kits,
+    sources: options.sources,
+  });
+  getCaseType(context).recordName = name;
+  getCaseType(context).recordUrl = context.page.url();
+  await _scrollRecordIntoView(context, name);
 }

@@ -12,7 +12,7 @@ import type { MeasurementRun } from "./measureAvandar.types";
  */
 export async function measureBeat(
   run: MeasurementRun,
-  options: { feature: string; beat: Readonly<ProductBeat> },
+  options: Readonly<{ feature: string; beat: Readonly<ProductBeat> }>,
 ): Promise<void> {
   const { feature, beat } = options;
   const attempts: Array<{ frame: number; reason: string }> = [];

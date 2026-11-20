@@ -5,7 +5,7 @@ import { probe } from "../lib/mediaHelpers";
 import { applySrt } from "../lib/planHelpers/applySrt";
 import {
   ensureDirectory,
-  publicAsset,
+  getPublicAssetPathFromAsset,
   safeInputFile,
 } from "../lib/planHelpers/planHelpers";
 import { freshStage } from "./freshStage";
@@ -27,7 +27,11 @@ export async function alignRecording(
   const srtFile = await safeInputFile(options.srt!, [".srt"]);
   const digest = await getSha256FromFile(recording);
   const src = `audio/${plan.id}/recorded-${digest}${path.extname(recording).toLowerCase()}`;
-  const derived = applySrt(plan, await fs.readFile(srtFile, "utf8"), src);
+  const derived = applySrt({
+    plan,
+    srt: await fs.readFile(srtFile, "utf8"),
+    audio: src,
+  });
   const info = await probe(recording);
   if (
     !info.streams.some((stream) => {
@@ -46,7 +50,9 @@ export async function alignRecording(
   } catch (error) {
     if (
       (error as NodeJS.ErrnoException).code !== "EEXIST" ||
-      (await getSha256FromFile(await publicAsset(workspace, src))) !== digest
+      (await getSha256FromFile(
+        await getPublicAssetPathFromAsset(workspace, src),
+      )) !== digest
     )
       throw error;
   }

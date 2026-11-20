@@ -21,7 +21,12 @@ export async function fingerprintThemedPlan({
   theme: VideoThemeSnapshot;
 }>): Promise<PlanFingerprint & { themeHash: string }> {
   return {
-    ...(await fingerprintPlan(ROOT, filename, plan, workspace)),
+    ...(await fingerprintPlan({
+      root: ROOT,
+      filename,
+      plan,
+      assetRoot: workspace,
+    })),
     themeHash: makeResolvedVideoThemeFromSnapshot(theme, [plan.id]).hash,
   };
 }

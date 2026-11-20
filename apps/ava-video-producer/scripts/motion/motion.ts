@@ -30,8 +30,8 @@ if (
   process.argv[1] &&
   import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
 ) {
-  _main().catch((error) => {
-    console.error(error.message);
+  _main().catch((error: unknown) => {
+    console.error(error instanceof Error ? error.message : String(error));
     process.exitCode = 1;
   });
 }

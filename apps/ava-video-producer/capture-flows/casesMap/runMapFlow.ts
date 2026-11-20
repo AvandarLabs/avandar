@@ -1,10 +1,10 @@
 import { promiseMapSequential } from "@avandar/utils";
 import { expect, type Locator, type Page } from "@playwright/test";
+import { UUID } from "../captureFlows.constants";
 import { closeChat } from "../closeChat";
 import { ensureFixtureDataset } from "../ensureFixtureDataset";
 import { getRecordIdFromPageUrl } from "../getRecordIdFromPageUrl";
 import { isRestListResponse } from "../isRestListResponse";
-import { UUID } from "../UUID";
 import {
   WAIT,
   makeRegexSourceFromText,
@@ -37,8 +37,8 @@ async function _mapSaved(page: Page): Promise<void> {
 }
 
 /** Opens the map list once the app's list request has fully rendered. */
-async function _openMapList(ctx: Readonly<FlowContext>): Promise<void> {
-  const { page } = ctx;
+async function _openMapList(context: Readonly<FlowContext>): Promise<void> {
+  const { page } = context;
   // Observe the app's list request so an initially empty render cannot
   // create a duplicate.
   const mapListResponse = page.waitForResponse(
@@ -49,7 +49,7 @@ async function _openMapList(ctx: Readonly<FlowContext>): Promise<void> {
   );
   const [response] = await Promise.all([
     mapListResponse,
-    page.goto(makeWorkspaceUrlFromRoute(ctx, "map")),
+    page.goto(makeWorkspaceUrlFromRoute(context, "map")),
   ]);
   const rows = await response.json();
   if (!Array.isArray(rows)) {
@@ -64,11 +64,11 @@ async function _openMapList(ctx: Readonly<FlowContext>): Promise<void> {
 
 /** Opens the map with the capture name, or creates one, and records it. */
 async function _openOrCreateNamedMap(
-  ctx: FlowContext,
+  context: FlowContext,
   name: string,
 ): Promise<void> {
-  const { page } = ctx;
-  await _openMapList(ctx);
+  const { page } = context;
+  await _openMapList(context);
   const existing = page.getByRole("link", {
     name: `Open the map ${name}`,
     exact: true,
@@ -85,23 +85,23 @@ async function _openOrCreateNamedMap(
   await page.waitForURL(new RegExp(`/map/${UUID}(?:\\?|$)`), {
     timeout: WAIT,
   });
-  ctx.state.map = {
+  context.state.map = {
     id: getRecordIdFromPageUrl(page, "map"),
     name,
     createdByRun: !isExistingMap,
   };
-  await recordFlowResource(ctx, { kind: "map", item: ctx.state.map });
+  await recordFlowResource(context, { kind: "map", item: context.state.map });
 }
 
-async function _openOrCreateMap(ctx: FlowContext): Promise<void> {
-  const { page, state } = ctx;
+async function _openOrCreateMap(context: FlowContext): Promise<void> {
+  const { page, state } = context;
   const name =
-    state.map?.name ?? `Video - Harborfield response map - ${ctx.runLabel}`;
+    state.map?.name ?? `Video - Harborfield response map - ${context.runLabel}`;
   if (state.map?.id) {
-    await page.goto(makeWorkspaceUrlFromRoute(ctx, `map/${state.map.id}`));
-    await recordFlowResource(ctx, { kind: "map", item: state.map });
+    await page.goto(makeWorkspaceUrlFromRoute(context, `map/${state.map.id}`));
+    await recordFlowResource(context, { kind: "map", item: state.map });
   } else {
-    await _openOrCreateNamedMap(ctx, name);
+    await _openOrCreateNamedMap(context, name);
   }
   await closeChat(page);
   const nameInput = page.getByRole("textbox", {
@@ -118,10 +118,10 @@ async function _openOrCreateMap(ctx: FlowContext): Promise<void> {
 }
 
 async function _openLayer(
-  ctx: Readonly<FlowContext>,
+  context: Readonly<FlowContext>,
   source: Readonly<FlowRecord>,
 ): Promise<Locator> {
-  const { page } = ctx;
+  const { page } = context;
   const row = _layerRow(page, source.name);
   if ((await row.count()) > 1) {
     throw new Error(`Duplicate capture layer: ${source.name}`);
@@ -147,7 +147,7 @@ async function _openLayer(
 
 /** Sets a point layer's colour and radius, then waits for the map to save. */
 async function _styleLayer(
-  ctx: Readonly<FlowContext>,
+  context: Readonly<FlowContext>,
   options: Readonly<{ inspector: Locator; color: string; radius: number }>,
 ): Promise<void> {
   const { inspector } = options;
@@ -158,27 +158,27 @@ async function _styleLayer(
     .fill(String(options.radius));
   await inspector.getByLabel("Radius", { exact: true }).press("Tab");
   // Tab moves into the Outline ColorInput, which opens its native color picker.
-  await ctx.page.keyboard.press("Escape");
-  await ctx.page
+  await context.page.keyboard.press("Escape");
+  await context.page
     .getByRole("textbox", { name: "Map name", exact: true })
     .click();
-  await expect(ctx.page.locator(".mantine-ColorPicker-root")).toBeHidden();
-  await _mapSaved(ctx.page);
+  await expect(context.page.locator(".mantine-ColorPicker-root")).toBeHidden();
+  await _mapSaved(context.page);
 }
 
 async function _configurePoints(
-  ctx: Readonly<FlowContext>,
+  context: Readonly<FlowContext>,
   options: Readonly<PointLayerSettings>,
 ): Promise<void> {
   const { source, expectedRowCount, color, radius } = options;
-  const inspector = await _openLayer(ctx, source);
+  const inspector = await _openLayer(context, source);
   await expect(
     inspector.getByRole("combobox", { name: "Latitude", exact: true }),
   ).toHaveValue("latitude", { timeout: WAIT });
   await expect(
     inspector.getByRole("combobox", { name: "Longitude", exact: true }),
   ).toHaveValue("longitude", { timeout: WAIT });
-  const loadError = ctx.page.getByText(`Could not load ${source.name}`, {
+  const loadError = context.page.getByText(`Could not load ${source.name}`, {
     exact: true,
   });
   const mapped = inspector.getByText(
@@ -187,16 +187,16 @@ async function _configurePoints(
   );
   await expect(mapped.or(loadError).first()).toBeVisible({ timeout: WAIT });
   if (await loadError.count()) {
-    await ctx.page
+    await context.page
       .getByRole("button", { name: "Show details", exact: true })
       .click();
-    await ctx.checkpoint("map-layer-query-error", { text: true });
+    await context.checkpoint("map-layer-query-error", { text: true });
     throw new Error(
       `The product could not load the point layer ${source.name}; see the visible query-error checkpoint.`,
     );
   }
   await mapped.waitFor({ timeout: WAIT });
-  await _styleLayer(ctx, { inspector, color, radius });
+  await _styleLayer(context, { inspector, color, radius });
 }
 
 async function _openLayerActions(page: Page, name: string): Promise<void> {
@@ -221,16 +221,18 @@ async function _zoomToLayer(page: Page, name: string): Promise<void> {
  * QETL. Unrelated layers and imported datasets stay intact.
  */
 async function _removeFailedFixtureLayer(
-  ctx: Readonly<FlowContext>,
+  context: Readonly<FlowContext>,
 ): Promise<void> {
   const name = "Video - Harborfield districts";
-  if (!(await _layerRow(ctx.page, name).count())) {
+  if (!(await _layerRow(context.page, name).count())) {
     return;
   }
-  await _openLayerActions(ctx.page, name);
-  await ctx.page.getByRole("menuitem", { name: "Delete", exact: true }).click();
-  await expect(_layerRow(ctx.page, name)).toHaveCount(0);
-  await _mapSaved(ctx.page);
+  await _openLayerActions(context.page, name);
+  await context.page
+    .getByRole("menuitem", { name: "Delete", exact: true })
+    .click();
+  await expect(_layerRow(context.page, name)).toHaveCount(0);
+  await _mapSaved(context.page);
 }
 
 /**
@@ -238,19 +240,19 @@ async function _removeFailedFixtureLayer(
  * persisted.
  */
 async function _verifyMapPersistence(
-  ctx: Readonly<FlowContext>,
+  context: Readonly<FlowContext>,
   sources: Readonly<{ cases: FlowRecord; facilities: FlowRecord }>,
 ): Promise<void> {
-  await _mapSaved(ctx.page);
-  await ctx.page.reload();
+  await _mapSaved(context.page);
+  await context.page.reload();
   await expect(
-    ctx.page.getByRole("textbox", { name: "Map name", exact: true }),
-  ).toHaveValue(ctx.state.map?.name ?? "", { timeout: WAIT });
+    context.page.getByRole("textbox", { name: "Map name", exact: true }),
+  ).toHaveValue(context.state.map?.name ?? "", { timeout: WAIT });
   // Each check reads the one recording page, so they run in order.
   await promiseMapSequential(Object.values(sources), async (source) => {
-    await _layerRow(ctx.page, source.name).waitFor({ timeout: WAIT });
+    await _layerRow(context.page, source.name).waitFor({ timeout: WAIT });
   });
-  await ctx.page.locator(".maplibregl-canvas").waitFor();
+  await context.page.locator(".maplibregl-canvas").waitFor();
   // Each layer is opened on the one recording page, so they run in order.
   await promiseMapSequential(
     [
@@ -258,7 +260,7 @@ async function _verifyMapPersistence(
       ["facilities", 12],
     ] as const,
     async ([key, expectedRowCount]) => {
-      const inspector = await _openLayer(ctx, sources[key]);
+      const inspector = await _openLayer(context, sources[key]);
       await inspector
         .getByText(`${expectedRowCount} of ${expectedRowCount} rows mapped`, {
           exact: true,
@@ -266,8 +268,8 @@ async function _verifyMapPersistence(
         .waitFor({ timeout: WAIT });
     },
   );
-  await _zoomToLayer(ctx.page, sources.cases.name);
-  await _mapSaved(ctx.page);
+  await _zoomToLayer(context.page, sources.cases.name);
+  await _mapSaved(context.page);
 }
 
 /**
@@ -278,39 +280,39 @@ async function _verifyMapPersistence(
  * `AvandarCaptureFlows` loads it on demand as the `map` flow that
  * `pnpm capture` runs.
  */
-export async function runMapFlow(ctx: FlowContext): Promise<void> {
-  makeWorkspaceUrlFromRoute(ctx, "map");
+export async function runMapFlow(context: FlowContext): Promise<void> {
+  makeWorkspaceUrlFromRoute(context, "map");
   const sources = {
-    cases: await ensureFixtureDataset(ctx, "cases"),
-    facilities: await ensureFixtureDataset(ctx, "facilities"),
+    cases: await ensureFixtureDataset(context, "cases"),
+    facilities: await ensureFixtureDataset(context, "facilities"),
   };
-  await ctx.step("map-create", async () => {
-    await _openOrCreateMap(ctx);
+  await context.step("map-create", async () => {
+    await _openOrCreateMap(context);
   });
-  await ctx.step("map-remove-failed-fixture-layer", () => {
-    return _removeFailedFixtureLayer(ctx);
+  await context.step("map-remove-failed-fixture-layer", () => {
+    return _removeFailedFixtureLayer(context);
   });
-  await ctx.step("map-case-locations", async () => {
-    await _configurePoints(ctx, {
+  await context.step("map-case-locations", async () => {
+    await _configurePoints(context, {
       source: sources.cases,
       expectedRowCount: 240,
       color: "#228be6",
       radius: 4,
     });
-    await _zoomToLayer(ctx.page, sources.cases.name);
+    await _zoomToLayer(context.page, sources.cases.name);
   });
-  await ctx.checkpoint("map-cases");
-  await ctx.step("map-facility-locations", async () => {
-    await _configurePoints(ctx, {
+  await context.checkpoint("map-cases");
+  await context.step("map-facility-locations", async () => {
+    await _configurePoints(context, {
       source: sources.facilities,
       expectedRowCount: 12,
       color: "#f08c00",
       radius: 8,
     });
   });
-  await ctx.checkpoint("map-facilities");
-  await ctx.step("map-verify-persistence", () => {
-    return _verifyMapPersistence(ctx, sources);
+  await context.checkpoint("map-facilities");
+  await context.step("map-verify-persistence", () => {
+    return _verifyMapPersistence(context, sources);
   });
-  await ctx.checkpoint("map-saved");
+  await context.checkpoint("map-saved");
 }

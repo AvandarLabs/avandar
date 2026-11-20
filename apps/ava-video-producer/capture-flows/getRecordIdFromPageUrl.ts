@@ -1,4 +1,4 @@
-import { UUID } from "./UUID";
+import { UUID } from "./captureFlows.constants";
 import type { Page } from "@playwright/test";
 
 /**

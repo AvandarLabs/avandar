@@ -1,8 +1,8 @@
 import { promiseMapSequential } from "@avandar/utils";
 import { expect, type Page } from "@playwright/test";
+import { UUID } from "../../captureFlows.constants";
 import { closeChat } from "../../closeChat";
 import { getRecordIdFromPageUrl } from "../../getRecordIdFromPageUrl";
-import { UUID } from "../../UUID";
 import {
   WAIT,
   makeWorkspaceUrlFromRoute,
@@ -67,10 +67,10 @@ async function _chooseCaseFieldRules(
 }
 
 async function _configureCaseFields(
-  ctx: Readonly<FlowContext>,
+  context: Readonly<FlowContext>,
   sources: Readonly<CaseSources>,
 ): Promise<void> {
-  const { page } = ctx;
+  const { page } = context;
   await page
     .getByRole("switch", {
       name: "Some data should come from existing datasets",
@@ -102,16 +102,16 @@ async function _configureCaseFields(
 
 /** Reopens the case type an earlier flow in this run already recorded. */
 async function _reopenRecordedCaseType(
-  ctx: FlowContext,
+  context: FlowContext,
   caseType: Readonly<FlowCaseType>,
 ): Promise<void> {
-  await ctx.page.goto(
-    makeWorkspaceUrlFromRoute(ctx, `ontology-designer/${caseType.id}`),
+  await context.page.goto(
+    makeWorkspaceUrlFromRoute(context, `ontology-designer/${caseType.id}`),
   );
-  await ctx.page
+  await context.page
     .getByRole("button", { name: "View records", exact: true })
     .waitFor();
-  await recordFlowResource(ctx, { kind: "case-type", item: caseType });
+  await recordFlowResource(context, { kind: "case-type", item: caseType });
 }
 
 /**
@@ -119,11 +119,11 @@ async function _reopenRecordedCaseType(
  * none.
  */
 async function _openExistingCaseType(
-  ctx: FlowContext,
+  context: FlowContext,
   name: string,
 ): Promise<boolean> {
-  const { page } = ctx;
-  await page.goto(makeWorkspaceUrlFromRoute(ctx, "ontology-designer"));
+  const { page } = context;
+  await page.goto(makeWorkspaceUrlFromRoute(context, "ontology-designer"));
   await closeChat(page);
   await page
     .getByRole("button", {
@@ -142,29 +142,29 @@ async function _openExistingCaseType(
   }
   await existing.click();
   await page.waitForURL(new RegExp(`/ontology-designer/${UUID}(?:\\?|$)`));
-  ctx.state.caseType = {
+  context.state.caseType = {
     id: getRecordIdFromPageUrl(page, "ontology-designer"),
     name,
     createdByRun: false,
   };
-  await recordFlowResource(ctx, {
+  await recordFlowResource(context, {
     kind: "case-type",
-    item: ctx.state.caseType,
+    item: context.state.caseType,
   });
   return true;
 }
 
 /** Creates the case type through the manual designer route. */
 async function _createCaseType(
-  ctx: FlowContext,
+  context: FlowContext,
   options: Readonly<{ sources: CaseSources; name: string }>,
 ): Promise<void> {
-  const { page } = ctx;
+  const { page } = context;
   const { sources, name } = options;
   // The visible new-type card starts AI chat. This existing manual route is
   // intentional.
   await page.goto(
-    makeWorkspaceUrlFromRoute(ctx, "ontology-designer/concept-creator"),
+    makeWorkspaceUrlFromRoute(context, "ontology-designer/concept-creator"),
   );
   await page
     .getByRole("textbox", { name: "Case type name", exact: true })
@@ -174,26 +174,26 @@ async function _createCaseType(
     .fill(
       "Fictional Harborfield response records linked to visit activity by case_id.",
     );
-  await _configureCaseFields(ctx, sources);
+  await _configureCaseFields(context, sources);
   await page
     .getByRole("combobox", { name: sources.cases.name, exact: true })
     .scrollIntoViewIfNeeded();
-  await ctx.checkpoint("cases-source-fields");
+  await context.checkpoint("cases-source-fields");
   await page
     .getByRole("button", { name: "Create case type", exact: true })
     .click();
   await page.waitForURL(new RegExp(`/ontology-designer/${UUID}(?:\\?|$)`), {
     timeout: WAIT,
   });
-  ctx.state.caseType = {
+  context.state.caseType = {
     id: getRecordIdFromPageUrl(page, "ontology-designer"),
     name,
     createdByRun: true,
     synced: false,
   };
-  await recordFlowResource(ctx, {
+  await recordFlowResource(context, {
     kind: "case-type",
-    item: ctx.state.caseType,
+    item: context.state.caseType,
   });
   await page
     .getByRole("button", { name: "Sync records", exact: true })
@@ -207,19 +207,19 @@ async function _createCaseType(
  * Called by the `cases-create-type` step of `runCasesFlow`.
  */
 export async function openOrCreateCaseType(
-  ctx: FlowContext,
+  context: FlowContext,
   sources: Readonly<CaseSources>,
 ): Promise<boolean> {
   const name =
-    ctx.state.caseType?.name ??
-    `Video - Harborfield response case - ${ctx.runLabel}`;
-  if (ctx.state.caseType?.id) {
-    await _reopenRecordedCaseType(ctx, ctx.state.caseType);
+    context.state.caseType?.name ??
+    `Video - Harborfield response case - ${context.runLabel}`;
+  if (context.state.caseType?.id) {
+    await _reopenRecordedCaseType(context, context.state.caseType);
     return false;
   }
-  if (await _openExistingCaseType(ctx, name)) {
+  if (await _openExistingCaseType(context, name)) {
     return false;
   }
-  await _createCaseType(ctx, { sources, name });
+  await _createCaseType(context, { sources, name });
   return true;
 }

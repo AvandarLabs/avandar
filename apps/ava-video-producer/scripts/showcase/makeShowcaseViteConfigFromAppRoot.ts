@@ -36,10 +36,13 @@ function _createAliases(appRoot: string): Alias[] {
 }
 
 /** Writes every page into the site folder, unminified while watching. */
-function _createBuildOptions(
-  paths: Readonly<ShowcasePaths>,
-  isWatching: boolean,
-): BuildOptions {
+function _createBuildOptions({
+  paths,
+  isWatching,
+}: Readonly<{
+  paths: Readonly<ShowcasePaths>;
+  isWatching: boolean;
+}>): BuildOptions {
   return {
     outDir: paths.site,
     // A watched build replaces files in place and prunes stale ones after
@@ -100,6 +103,6 @@ export function makeShowcaseViteConfigFromAppRoot({
       createShowcaseThemePlugin({ appRoot, themeDirectory: paths.theme }),
       ...(isWatching ? [createStaleOutputPrunePlugin()] : []),
     ],
-    build: _createBuildOptions(paths, isWatching),
+    build: _createBuildOptions({ paths, isWatching }),
   };
 }

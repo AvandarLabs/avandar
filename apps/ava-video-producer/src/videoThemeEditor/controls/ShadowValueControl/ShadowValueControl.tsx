@@ -1,3 +1,4 @@
+import { removeAtIndex } from "@avandar/utils";
 import { Button, Group } from "@mantine/core";
 import { useState } from "react";
 import { elevationToBoxShadow } from "../../../videoTheme/cssValueHelpers/cssValueHelpers";
@@ -23,7 +24,7 @@ export function ShadowValueControl({
   onChange,
 }: ValueControlProps): ReactNode {
   const { theme } = useTokenEditor();
-  const [layerIds, setLayerIds] = useState<readonly string[]>(() => {
+  const [layerIds, setLayerIds] = useState(() => {
     return Array.from({ length: MAX_SHADOW_LAYERS }, () => {
       return crypto.randomUUID();
     });
@@ -34,18 +35,9 @@ export function ShadowValueControl({
   };
   const removeLayer = (index: number) => {
     setLayerIds((current) => {
-      return [
-        ...current.filter((_, position) => {
-          return position !== index;
-        }),
-        crypto.randomUUID(),
-      ];
+      return [...removeAtIndex(current, index), crypto.randomUUID()];
     });
-    setLayers(
-      layers.filter((_, position) => {
-        return position !== index;
-      }),
-    );
+    setLayers(removeAtIndex(layers, index));
   };
   const boxShadow = elevationToBoxShadow({
     layers,

@@ -4,10 +4,16 @@ import type {
   StockPresetId,
 } from "../../src/stock/contracts/StockContract.types";
 
+/** Lifecycle states reported by the local on-demand export service. */
+export const DOWNLOAD_STATES = ["running", "complete", "failed"] as const;
+
+/** One lifecycle state reported by the local on-demand export service. */
+export type DownloadState = (typeof DOWNLOAD_STATES)[number];
+
 /** Public status from the local, on-demand export service. */
 export type DownloadStatus = {
   id?: string;
-  state: string;
+  state: DownloadState;
   message: string;
   download?: string;
 };
@@ -28,23 +34,36 @@ type DownloadFilmOptions = {
 
 const activeDownloads = new Map<string, Promise<DownloadStatus>>();
 
+function _isDownloadState(value: unknown): value is DownloadState {
+  return DOWNLOAD_STATES.some((state) => {
+    return state === value;
+  });
+}
+
 async function _requestJob(
   url: string,
   init?: RequestInit,
 ): Promise<DownloadStatus> {
   const response = await fetch(url, init);
-  const job: DownloadStatus = await response.json();
+  const body: unknown = await response.json();
+  const message =
+    isPlainObject(body) && typeof body.message === "string" ? body.message : "";
   if (!response.ok) {
     const fallback =
       response.status === 409
         ? "Another export is running. Try again when it finishes."
         : "The export could not start. Try again.";
-    throw new Error(job.message || fallback);
+    throw new Error(message || fallback);
   }
-  if (!["running", "complete", "failed"].includes(job.state)) {
+  if (!isPlainObject(body) || !_isDownloadState(body.state)) {
     throw new Error("The export returned an unexpected response. Try again.");
   }
-  return job;
+  return {
+    ...(typeof body.id === "string" ? { id: body.id } : {}),
+    state: body.state,
+    message,
+    ...(typeof body.download === "string" ? { download: body.download } : {}),
+  };
 }
 
 function _saveDownload(download: string | undefined): void {
@@ -104,12 +123,6 @@ async function _runExport({
   return job;
 }
 
-/**
- * Render and download a film using the selected preview options.
- * Calls onStatus with job progress and rejects failures so the caller can
- * retry.
- * Concurrent identical requests share the active export and download.
- */
 async function _downloadFilm({
   id,
   options = {},
@@ -125,8 +138,9 @@ async function _downloadFilm({
     return activeDownload;
   }
   const pending = _runExport({ request, onStatus })
-    .catch((error: Error) => {
-      onStatus({ state: "failed", message: error.message });
+    .catch((error: unknown) => {
+      const message = error instanceof Error ? error.message : String(error);
+      onStatus({ state: "failed", message });
       throw error;
     })
     .finally(() => {
@@ -136,10 +150,6 @@ async function _downloadFilm({
   return pending;
 }
 
-/**
- * Defer source refresh until every pending browser download has been started.
- * Returns a function that cancels the deferred callback.
- */
 function _afterDownloads(callback: () => void): () => void {
   let isCancelled = false;
   const waitForDownloads = async () => {
@@ -164,9 +174,18 @@ function _afterDownloads(callback: () => void): () => void {
  * Called by the showcase page scripts and by the Atlas hooks that start a film
  * download or refresh a preview when the source changes, such as
  * `useCompositionDownload`, `usePreviewDownload`, `useCompositionPlayer`,
- * `HelperPreview` and `useMotionGalleryState`.
+ * `HelperPreview`, and `useMotionGalleryState`.
  */
 export const FilmDownloads = {
+  /**
+   * Renders and downloads a film using the selected preview options. Calls
+   * `onStatus` with job progress, rejects failures so the caller can retry,
+   * and shares active exports across concurrent identical requests.
+   */
   downloadFilm: _downloadFilm,
+  /**
+   * Defers a source refresh until every pending browser download has started,
+   * returning a function that cancels the deferred callback.
+   */
   afterDownloads: _afterDownloads,
 };

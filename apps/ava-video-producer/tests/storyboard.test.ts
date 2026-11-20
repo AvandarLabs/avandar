@@ -4,13 +4,13 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { applySrt } from "../scripts/lib/planHelpers/applySrt";
-import { captionFiles } from "../scripts/lib/planHelpers/captionFiles";
+import { getPreviewFramesFromPlan } from "../scripts/lib/planHelpers/getPreviewFramesFromPlan";
+import { makeCaptionFilesFromPlan } from "../scripts/lib/planHelpers/makeCaptionFilesFromPlan";
+import { makeTimestampFromFrame } from "../scripts/lib/planHelpers/makeTimestampFromFrame";
 import {
-  publicAsset,
-  assetReferences,
+  getAssetReferencesFromPlan,
+  getPublicAssetPathFromAsset,
 } from "../scripts/lib/planHelpers/planHelpers";
-import { previewFrames } from "../scripts/lib/planHelpers/previewFrames";
-import { timestamp } from "../scripts/lib/planHelpers/timestamp";
 import {
   storyboardSchema,
   timeline,
@@ -74,9 +74,15 @@ test("one timeline drives duration and frame-accurate SRT/VTT", () => {
     [0, 66],
   );
   assert.equal(absoluteCues(plan)[0].endFrame, 156);
-  assert.match(captionFiles(plan).srt, /00:00:02,200 --> 00:00:05,200/);
-  assert.match(captionFiles(plan).vtt, /00:00:02\.200 --> 00:00:05\.200/);
-  assert.equal(timestamp(29, 30), "00:00:00,967");
+  assert.match(
+    makeCaptionFilesFromPlan(plan).srt,
+    /00:00:02,200 --> 00:00:05,200/,
+  );
+  assert.match(
+    makeCaptionFilesFromPlan(plan).vtt,
+    /00:00:02\.200 --> 00:00:05\.200/,
+  );
+  assert.equal(makeTimestampFromFrame({ frame: 29, fps: 30 }), "00:00:00,967");
 });
 
 test("reject invalid IDs, timing, FPS, aspect ratios and unknown fields", () => {
@@ -174,7 +180,10 @@ test("public asset resolution rejects a symlink escape", async () => {
       path.join(root, "outside.txt"),
       path.join(root, "public", "escape.txt"),
     );
-    await assert.rejects(publicAsset(root, "escape.txt"), /inside public/);
+    await assert.rejects(
+      getPublicAssetPathFromAsset(root, "escape.txt"),
+      /inside public/,
+    );
   } finally {
     await fs.rm(root, { recursive: true, force: true });
   }
@@ -182,26 +191,26 @@ test("public asset resolution rejects a symlink escape", async () => {
 
 test("SRT alignment preserves narration text and requires cues to fit their shots", () => {
   const plan = storyboardSchema.parse(fixture());
-  const aligned = applySrt(
+  const aligned = applySrt({
     plan,
-    "1\n00:00:02,400 --> 00:00:05,400\nTwo hundred forty records.\n",
-    "voice/recorded.wav",
-  );
+    srt: "1\n00:00:02,400 --> 00:00:05,400\nTwo hundred forty records.\n",
+    audio: "voice/recorded.wav",
+  });
   assert.equal(aligned.narration[0].startFrame, 6);
   assert.equal(aligned.narrationTrack?.src, "voice/recorded.wav");
   assert.throws(() => {
-    return applySrt(
+    return applySrt({
       plan,
-      "1\n00:00:02,400 --> 00:00:05,400\nDifferent words.\n",
-      "voice/recorded.wav",
-    );
+      srt: "1\n00:00:02,400 --> 00:00:05,400\nDifferent words.\n",
+      audio: "voice/recorded.wav",
+    });
   }, /differs/);
   assert.throws(() => {
-    return applySrt(
+    return applySrt({
       plan,
-      "1\n00:00:00,000 --> 00:00:05,400\nTwo hundred forty records.\n",
-      "voice/recorded.wav",
-    );
+      srt: "1\n00:00:00,000 --> 00:00:05,400\nTwo hundred forty records.\n",
+      audio: "voice/recorded.wav",
+    });
   });
 });
 
@@ -712,7 +721,7 @@ test("asset references include window, icon and logo images of the new scenes", 
     },
   );
   assert.deepEqual(
-    assetReferences(storyboardSchema.parse(plan)).sort(),
+    getAssetReferencesFromPlan(storyboardSchema.parse(plan)).sort(),
     [
       screen.src,
       "a/icon.png",
@@ -731,7 +740,9 @@ test("previews sample the middle of a scene exit", () => {
     durationInFrames: 150,
     props: { lines: ["Leaving"], exit: { atFrame: 100 } },
   };
-  assert.ok(previewFrames(storyboardSchema.parse(plan)).includes(66 + 103));
+  assert.ok(
+    getPreviewFramesFromPlan(storyboardSchema.parse(plan)).includes(66 + 103),
+  );
 });
 
 test("previews sample a lockup mid-build and mid-flight, and a window mid-entrance", () => {
@@ -752,7 +763,7 @@ test("previews sample a lockup mid-build and mid-flight, and a window mid-entran
     durationInFrames: 90,
     props: { windows: [screen], enter: { kind: "pull-back", atFrame: 30 } },
   });
-  const frames = previewFrames(storyboardSchema.parse(plan));
+  const frames = getPreviewFramesFromPlan(storyboardSchema.parse(plan));
   assert.ok(frames.includes(66 + 11), "mid-build");
   assert.ok(frames.includes(66 + 112), "mid-flight");
   assert.ok(frames.includes(216 + 39), "mid-pull-back");
