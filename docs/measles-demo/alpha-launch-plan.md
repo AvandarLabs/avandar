@@ -36,7 +36,7 @@ The two lines are parallel:
 | Vercel | One `avandar` project. The alpha line deploys explicitly from CI, not through the Git integration. |
 | Mainline test URL | `main`'s test URL uses the staging Supabase project, the same database as `develop`. `main` never runs migrations of its own. |
 | Rehearsal | Restore a production dump into a local switched stack. Approved: production holds no sensitive data yet. |
-| `alpha-dev` data | Seeded at cutover from the same production dump, then refreshed by guardrail 2.2. |
+| `alpha-dev` data | Seeded at cutover from the rehearsal's production data after the rehearsal migrated it, dumped before any use of the rehearsal app (production's raw dump has `main`'s schema and does not load into `alpha-dev`). The seed keeps users' emails and leaves out Google tokens and Auth sessions and tokens. Then refreshed by guardrail 2.2. |
 
 ## Rules that hold from cutover onward
 
@@ -44,7 +44,11 @@ The two lines are parallel:
    delete it, on any branch. A review fix is a new migration. Without this,
    `main` can never be pushed to production again.
 2. **Only `alpha` may reach the production Supabase project.** The GitHub
-   `production` environment is restricted to the `alpha` branch.
+   `production` environment is restricted to the `alpha` branch. That
+   restricts the environment's credentials by branch only: what keeps other
+   workflows away from production is their code, since the Staging
+   environment's tokens, a Supabase access token among them, are usable by
+   any branch (guardrail 2.8).
 3. **`alpha` changes only through `ava release`.** Branch protection blocks
    direct pushes and PRs into `alpha`, as on `main`.
 4. **Every migration reaches `alpha-dev` before `alpha`.** Pablo checks
@@ -62,7 +66,7 @@ The two lines are parallel:
 | 0.4 | Agent | Lock mainline out of production: in `production.yaml`, remove the production `migrate` job and deploy `main` to a `mainline` Vercel environment instead. In `vercel.json`, turn off Git-integration deploys for `main`, `alpha`, and `alpha-dev`. Goes to `develop` and, as a small PR, to `main`. |
 | 0.5 | Agent | `ava release` (details below), with tests, on `alpha-dev`. Ported to `develop`. |
 | 0.6 | Agent | Rename references from `demo/measles` to `alpha-dev`: docs, `CLAUDE.md`, agent memory, worktree. Set `package.json` to `0.15.0-alpha-dev`. |
-| 0.7 | Agent | Catalog export from the `demo-measles` Supabase branch: data-only dump of `data_catalog_drives`, `data_catalog_listings`, `data_catalog_listings__relation_columns`, `data_catalog_facet_counts`, `pipeline_executions`, `pipeline_execution_scopes`, `pipeline_scope_checkpoints`. Copy script for the `opendata` bucket's `catalog-cache/` folder. Listing IDs are preserved, so Parquet paths stay valid. Loaded into both `alpha-dev` and production. |
+| 0.7 | Agent | Catalog export from the `demo-measles` Supabase branch: data-only dump of `data_catalog_drives`, `data_catalog_listings`, `data_catalog_listings__relation_columns`, `pipeline_executions`, `pipeline_execution_scopes`, `pipeline_scope_checkpoints`. `data_catalog_facet_counts` is not copied: the import recounts it. The import replaces the target's existing catalog rows (`--replace-existing`) in one transaction. Copy script for the Parquet objects each target listing points at in the `opendata` bucket. Listing IDs are preserved, so Parquet paths stay valid. Loaded into both `alpha-dev` and production. |
 | 0.8 | Agent | Write the cutover runbook (Stage 1) with exact commands, backup and restore steps, and Vercel click paths. |
 | 0.9 | Pablo | Rehearsal: restore a production dump locally, apply the 76 migrations, run alpha against it, open existing dashboards. |
 | 0.10 | Pablo | Portal work from the runbook: GitHub `production` environment secrets and branch restriction; branch protection on `alpha`; Vercel `alpha-dev` and `mainline` environments and the `alpha.avandarlabs.com` domain; production Polar, Google OAuth redirect URIs, pipeline server target. |
@@ -80,11 +84,15 @@ The two lines are parallel:
    data, so rule 4's data check means something from the first release.
 4. Back up production: database dump plus a note of the latest Supabase
    backup. Verify the dump restores.
-5. Merge the mainline lock-out (0.4) into `main`. Confirm `main` no longer
-   deploys to production.
-6. Run `ava release` on `alpha-dev`. It creates `alpha`, tags
-   `v0.15.0-alpha`, and pushes. `alpha.yaml` gates, migrates production,
-   deploys edge functions, and deploys `app.avandarlabs.com`.
+5. Merge the mainline lock-out (0.4) into `develop` first, then into `main`
+   (a mainline release makes `main` a copy of `develop`, so the reverse
+   order would bring the old `production.yaml` back). Confirm `main` no
+   longer deploys to production.
+6. Create `alpha` by hand at `main`'s commit (`ava release` refuses while
+   `origin/alpha` is missing and prints the push). Then run `ava release` on
+   `alpha-dev`. It tags `v0.15.0-alpha` and pushes. `alpha.yaml` gates,
+   migrates production, deploys edge functions, and deploys
+   `app.avandarlabs.com`.
 7. Load the catalog dump and copy the Parquet files into production.
 8. Smoke test: sign in with an existing account, open an old dashboard,
    browse the catalog, run a query, check Cmd+K shows `0.15.0-alpha`.
@@ -99,8 +107,8 @@ partial rollback, because `main`'s code does not match the migrated schema.
 
 | Run on | Banner (colored, first line) | What happens |
 |---|---|---|
-| `alpha-dev` | `ALPHA release: alpha-dev to alpha (app.avandarlabs.com)` | Preflight: clean and in sync with `origin/alpha-dev`, CI green on that commit. Prompt for the version, suggesting one. `-alpha` is appended automatically and rejected if typed. `alpha` becomes an exact copy of `alpha-dev`, tagged `vX.Y.Z-alpha`, and the push deploys production. `alpha-dev` moves to the next `-alpha-dev` version. Release notes published. |
-| `develop` | `MAINLINE release: develop to main` | Today's flow, unchanged. |
+| `alpha-dev` | `ALPHA release: alpha-dev to alpha. Deploys PRODUCTION (app.avandarlabs.com).` | Preflight: clean and in sync with `origin/alpha-dev`, CI green on that commit. Prompt for the version, suggesting one. `-alpha` is appended automatically and rejected if typed. `alpha` becomes an exact copy of `alpha-dev`, tagged `vX.Y.Z-alpha`, and the push deploys production. `alpha-dev` moves to the next `-alpha-dev` version. Release notes published. |
+| `develop` | `MAINLINE release: develop to main. Deploys the mainline test URL, not production.` | Today's flow, except that pushing `main` deploys the mainline test URL, not production, and the wording says so. |
 | Anything else, `alpha` and `main` included | Error | Fails before any git command, naming `alpha-dev` and `develop`. |
 
 ## Stage 2: hardening (starts the week after cutover)
