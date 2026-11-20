@@ -25,6 +25,9 @@ export async function preview(
     workspace,
     theme,
   });
+  // Finish source and asset fingerprint validation before creating a preview
+  // output directory.
+  // react-doctor-disable-next-line server-sequential-independent-await
   const directory = await freshStage(plan, "preview", workspace);
   const publicDir = await stageAssets(plan, directory, workspace);
   const serveUrl = await bundlePreviewSite({ plan, directory, publicDir });

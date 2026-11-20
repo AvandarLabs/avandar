@@ -243,6 +243,9 @@ test("staff role identity and exact collection bounds survive contract serializa
   ].forEach((value) => {
     return assert.equal(inputSchema.safeParse(value).success, false);
   });
+  // This assertion exercises the JSON serialization boundary of the public
+  // contract.
+  // react-doctor-disable-next-line no-json-parse-stringify-clone
   const rules = JSON.parse(
     JSON.stringify(contract.semanticRules),
   ) as typeof contract.semanticRules;

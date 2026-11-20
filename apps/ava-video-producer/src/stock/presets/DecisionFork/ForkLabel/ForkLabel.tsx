@@ -70,8 +70,11 @@ export function ForkLabel({
     <g aria-label={text}>
       {lines.map((line, index) => {
         return (
-          <Text
-            key={index}
+          // prettier-ignore
+          // Wrapped text uses fixed line slots within one fork
+          // label. Duplicate lines carry no independent state.
+          // react-doctor-disable-next-line no-array-index-as-key
+          <Text key={index}
             role={role}
             x={x}
             y={y + index * (fontSize + lineGap)}

@@ -41,6 +41,9 @@ export async function renderPreviewStills({
     });
     for (const [index, frame] of frames.entries()) {
       samples.push(
+        // All stills share one Chromium renderer, which must stay serial to
+        // avoid frame flicker.
+        // react-doctor-disable-next-line async-await-in-loop
         await renderPreviewStill({
           plan,
           theme,

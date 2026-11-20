@@ -1,14 +1,8 @@
 import { useVideoMotion } from "../videoTheme/useVideoMotion";
 import { useVideoShapeScales } from "../videoTheme/useVideoShapeScales";
 import { useVideoTheme, useVideoTokens } from "../videoTheme/useVideoTheme";
-import {
-  assertFrame,
-  assertRect,
-  assertUnit,
-  fitTextLines,
-  sceneBounds,
-  textUnits,
-} from "./layout/layout";
+import { assertMediaScene } from "./assertMediaScene";
+import { fitTextLines, textUnits } from "./layout/layout";
 import { MediaPlane } from "./MediaPlane";
 import { positioned } from "./positioned";
 import { SceneShell } from "./SceneShell";
@@ -39,15 +33,16 @@ export function MediaScene({
   crop = { x: 0, y: 0, width: 1, height: 1 },
   callouts = [],
 }: Props): ReactNode {
-  assertFrame(trimBefore, "trimBefore");
-  assertUnit(objectPosition.x, "objectPosition.x");
-  assertUnit(objectPosition.y, "objectPosition.y");
-  assertRect(crop, "crop");
-  if (kind !== "image" && kind !== "video")
-    throw new Error("Media kind must be image or video");
-  if (fit !== "contain" && fit !== "cover")
-    throw new Error("Media fit must be contain or cover");
-  sceneBounds(width, height); // Apply the shared minimum-size checks.
+  assertMediaScene({
+    trimBefore,
+    objectPosition,
+    crop,
+    kind,
+    fit,
+    width,
+    height,
+    callouts,
+  });
   const tokens = useVideoTokens();
   const { spacing } = useVideoTheme().mantine;
   const motion = useVideoMotion();
@@ -69,20 +64,6 @@ export function MediaScene({
   const subtitle = kicker
     ? fitTextLines([kicker], width * 0.38, 54, 24, 18)
     : undefined;
-  const ids = new Set<string>();
-  callouts.forEach((callout) => {
-    assertRect(callout, `callout ${callout.id}`);
-    assertFrame(callout.startFrame, "callout.startFrame");
-    assertFrame(callout.endFrame, "callout.endFrame");
-    if (
-      !callout.id ||
-      ids.has(callout.id) ||
-      !callout.label.trim() ||
-      callout.endFrame <= callout.startFrame
-    )
-      throw new Error(`Invalid or duplicate media callout: ${callout.id}`);
-    ids.add(callout.id);
-  });
   const mediaStyle: CSSProperties = {
     display: "block",
     width: "100%",
@@ -121,6 +102,11 @@ export function MediaScene({
               }}
             >
               {heading.lines.map((line, i) => {
+                // prettier-ignore
+                // These stateless text nodes are fixed
+                // wrapped-line slots within one keyed scene
+                // or callout. Duplicate lines are valid.
+                // react-doctor-disable-next-line no-array-index-as-key
                 return <div key={i}>{line}</div>;
               })}
             </h1>
@@ -138,6 +124,12 @@ export function MediaScene({
             >
               {subtitle.lines.map((line, i) => {
                 return (
+                  // prettier-ignore
+                  // These stateless text nodes are fixed
+                  // wrapped-line slots within one keyed
+                  // scene or callout. Duplicate lines are
+                  // valid.
+                  // react-doctor-disable-next-line no-array-index-as-key
                   <span key={i} style={{ display: "block" }}>
                     {line}
                   </span>
@@ -246,6 +238,12 @@ export function MediaScene({
                 }}
               >
                 {label.lines.map((line, i) => {
+                  // prettier-ignore
+                  // These stateless text nodes are fixed
+                  // wrapped-line slots within one keyed
+                  // scene or callout. Duplicate lines are
+                  // valid.
+                  // react-doctor-disable-next-line no-array-index-as-key
                   return <div key={i}>{line}</div>;
                 })}
               </div>

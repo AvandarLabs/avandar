@@ -1,5 +1,8 @@
 import { Player, type PlayerRef } from "@remotion/player";
 import { useRef, useState } from "react";
+// The imperative window.review.setFeature contract commits the selected
+// composition before the next console seek or capture call.
+// react-doctor-disable-next-line no-flush-sync
 import { flushSync } from "react-dom";
 import { FEATURE_BEATS } from "../../src/avandar/generated/product";
 import { Scene } from "./Scene";

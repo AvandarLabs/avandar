@@ -200,6 +200,9 @@ export async function makeFixtureInventoryFromDirectory({
   const files: FixtureFile[] = [];
   // Hash in sorted order, stopping at the first unsafe file.
   for (const name of entries.sort()) {
+    // Stop at the first unsafe fixture and bound file hashing to one file at a
+    // time.
+    // react-doctor-disable-next-line async-await-in-loop
     files.push(await _hashFixture(directory, name));
   }
   return {

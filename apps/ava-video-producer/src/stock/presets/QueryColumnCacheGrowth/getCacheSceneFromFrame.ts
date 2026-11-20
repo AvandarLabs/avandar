@@ -29,12 +29,21 @@ export function getCacheSceneFromFrame({
   motion: Pick<VideoMotion, "scale" | "travel">;
 }>): GetCacheSceneFromFrameResult {
   const missingIds = input.requests[1].columnIds.filter((id) => {
+    // Both source and subset contain at most five IDs. Measured Set
+    // construction costs more than these bounded scans.
+    // react-doctor-disable-next-line js-set-map-lookups
     return !input.cachedColumnIds.includes(id);
   });
   const original = input.columns.filter(({ id }) => {
+    // Both source and subset contain at most five IDs. Measured Set
+    // construction costs more than these bounded scans.
+    // react-doctor-disable-next-line js-set-map-lookups
     return input.cachedColumnIds.includes(id);
   });
   const additions = input.columns.filter(({ id }) => {
+    // Both source and subset contain at most five IDs. Measured Set
+    // construction costs more than these bounded scans.
+    // react-doctor-disable-next-line js-set-map-lookups
     return missingIds.includes(id);
   });
   const union = [...original, ...additions];

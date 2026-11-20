@@ -125,6 +125,9 @@ export async function validateMedia(
   };
   for (const shot of plan.shots) {
     if (shot.scene !== "media") continue;
+    // Inspection shares the completed-probe cache and limits ffprobe to one
+    // process.
+    // react-doctor-disable-next-line async-await-in-loop
     const info = await inspect(shot.props.src);
     if (
       !info.streams.some((stream) => {
@@ -147,6 +150,9 @@ export async function validateMedia(
   }
   for (const cue of plan.narration) {
     if (!cue.audio) continue;
+    // Inspection shares the completed-probe cache and limits ffprobe to one
+    // process.
+    // react-doctor-disable-next-line async-await-in-loop
     const info = await audio(cue.audio, cue.id);
     if (info.duration > (cue.endFrame - cue.startFrame) / plan.fps + 0.02)
       throw new Error(
@@ -167,6 +173,9 @@ export async function validateMedia(
       throw new Error("Narration recording ends before the last aligned cue");
   }
   for (const sound of plan.soundEffects) {
+    // Inspection shares the completed-probe cache and limits ffprobe to one
+    // process.
+    // react-doctor-disable-next-line async-await-in-loop
     const info = await audio(sound.src, sound.id);
     if (sound.atFrame / plan.fps + info.duration > total + 0.02)
       throw new Error(`${sound.id}: sound extends beyond the film`);
@@ -273,6 +282,9 @@ export async function mixAudio(
   }
   const args = ["-y", "-loglevel", "error", "-i", picture];
   for (const track of tracks)
+    // Resolve inputs in filter-index order, stopping before later paths if one
+    // is unsafe.
+    // react-doctor-disable-next-line async-await-in-loop
     args.push("-i", await getPublicAssetPathFromAsset(root, track.src));
   const filters = tracks.map((track, index) => {
     const delay = Math.round((track.atFrame / plan.fps) * 1000);

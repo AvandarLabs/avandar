@@ -45,10 +45,10 @@ export function ObservationCaptions({ input }: Readonly<Props>): ReactNode {
   ].filter(isDefined);
   return (
     <g>
-      {labels.map(({ text, x, y, width, maxLines }, index) => {
+      {labels.map(({ text, x, y, width, maxLines }) => {
         return (
           <FitText
-            key={index}
+            key={`${x}:${y}`}
             text={text}
             x={x}
             y={y}
@@ -101,11 +101,11 @@ export function ObservationCaptions({ input }: Readonly<Props>): ReactNode {
           data-missing-area={missing}
         >
           {[
-            { label: input.copy.observed, value: observed },
-            { label: input.copy.missing, value: missing },
-          ].map(({ label, value }, index) => {
+            { role: "observed", label: input.copy.observed, value: observed },
+            { role: "missing", label: input.copy.missing, value: missing },
+          ].map(({ role, label, value }, index) => {
             return (
-              <g key={index}>
+              <g key={role}>
                 <FitText
                   text={label}
                   x={32 + index * 466}

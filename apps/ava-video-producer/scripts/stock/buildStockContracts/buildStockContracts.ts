@@ -162,6 +162,9 @@ async function _dependencyHash(
     })
     .sort()
     .reduce(async (previous, file) => {
+      // Each callback waits for the prior update of this shared,
+      // order-sensitive hash.
+      // react-doctor-disable-next-line async-await-in-loop
       await previous;
       const filename = await fs.realpath(path.resolve(root, file));
       const isInsideContractSources = CONTRACT_SOURCE_DIRECTORIES.some(
@@ -186,6 +189,9 @@ async function _buildGeneration(
   root: string,
 ): Promise<StockContractGeneration> {
   const sourceHash = await StockFingerprintModule.getSourceHashFromRoot(root);
+  // Fingerprint before bundling and verify it afterwards to detect source
+  // changes during the build.
+  // react-doctor-disable-next-line server-sequential-independent-await
   const result = await build({
     absWorkingDir: root,
     stdin: {

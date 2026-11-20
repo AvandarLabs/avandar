@@ -67,6 +67,10 @@ function _getStratumSites({
   return {
     eligible,
     selected: eligible.filter((site) => {
+      // The validated selection contains at most eight IDs, and this
+      // call scans one bounded stratum. Per-call Set allocation did
+      // not amortize in measurement.
+      // react-doctor-disable-next-line js-set-map-lookups
       return input.selectedSiteIds.includes(site.id);
     }),
   };

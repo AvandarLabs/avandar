@@ -9,7 +9,8 @@ import { GalleryNavigation } from "./GalleryNavigation";
 import { GalleryToolbar } from "./GalleryToolbar";
 import { Icon } from "./Icon";
 import { MotionCard } from "./MotionCard";
-import { PreviewDialog } from "./PreviewDialog/PreviewDialog";
+import { MotionLibraryEmptyState } from "./MotionLibraryEmptyState";
+import { MotionLibraryPreview } from "./MotionLibraryPreview/MotionLibraryPreview";
 import { ReferenceTray } from "./ReferenceTray";
 import { useMotionGalleryState } from "./useMotionGalleryState";
 import type { ReactNode } from "react";
@@ -54,6 +55,7 @@ function useItemThemeColors(
  * motion presets.
  */
 export function MotionLibrary(): ReactNode {
+  const state = useMotionGalleryState();
   const {
     category,
     selectCategory,
@@ -73,12 +75,10 @@ export function MotionLibrary(): ReactNode {
     savedPresets,
     onCopy,
     notice,
-    previousPreset,
-    nextPreset,
-    contentState,
-    updateContent,
-    onClose,
-  } = useMotionGalleryState();
+  } = state;
+  const savedIds = useMemo(() => {
+    return new Set(saved);
+  }, [saved]);
   const { galleryTheme } = useGalleryVideoTheme();
   const accent = galleryTheme.semantic.color.accent;
   const background = galleryTheme.semantic.color.ground;
@@ -134,7 +134,7 @@ export function MotionLibrary(): ReactNode {
                       index={PRESET_INDEX.get(preset.id) ?? 0}
                       playing={playing && !selected}
                       contentState={drafts[preset.id]}
-                      saved={saved.includes(preset.id)}
+                      saved={savedIds.has(preset.id)}
                       onOpen={onOpen}
                       onSave={onSave}
                     />
@@ -142,35 +142,9 @@ export function MotionLibrary(): ReactNode {
                 })}
               </div>
             ) : (
-              <div className="empty-state">
-                <Icon
-                  name={
-                    category === "Saved references" && !query
-                      ? "bookmark"
-                      : "search"
-                  }
-                  size={30}
-                />
-                <h3>
-                  {category === "Saved references" && !query
-                    ? "Keep a little inspiration."
-                    : "No matching motions."}
-                </h3>
-                <p>
-                  {category === "Saved references" && !query
-                    ? "Use the bookmark on any preset to add it to your references."
-                    : "Try a different keyword, or explore the full collection."}
-                </p>
-                <button
-                  className="button"
-                  onClick={() => {
-                    return selectCategory("All motions");
-                  }}
-                >
-                  Explore all motions
-                  <Icon name="arrow" size={16} />
-                </button>
-              </div>
+              <MotionLibraryEmptyState
+                {...{ category, query, selectCategory }}
+              />
             )}
           </section>
           <footer className="library-footer">
@@ -203,37 +177,9 @@ export function MotionLibrary(): ReactNode {
           </>
         ) : null}
       </div>
-      {selected ? (
-        <PreviewDialog
-          accent={selectedColors?.accent ?? accent}
-          background={selectedColors?.background ?? background}
-          preset={selected}
-          onPrevious={
-            previousPreset
-              ? () => {
-                  return onOpen(previousPreset);
-                }
-              : undefined
-          }
-          onNext={
-            nextPreset
-              ? () => {
-                  return onOpen(nextPreset);
-                }
-              : undefined
-          }
-          contentState={contentState!}
-          onContentChange={(state) => {
-            return updateContent(selected.id, state);
-          }}
-          saved={saved.includes(selected.id)}
-          initialPlaying={playing}
-          onClose={onClose}
-          onSave={onSave}
-          onCopy={onCopy}
-          notice={notice}
-        />
-      ) : null}
+      <MotionLibraryPreview
+        {...{ state, accent, background, selectedColors }}
+      />
     </>
   );
 }

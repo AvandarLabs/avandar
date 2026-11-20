@@ -21,10 +21,10 @@ export function CarbonPhysicalLabels({ input }: Readonly<Props>): ReactNode {
   ];
   return (
     <g>
-      {copies.map(([text, x, y, width, maxLines, anchor], index) => {
+      {copies.map(([text, x, y, width, maxLines, anchor]) => {
         return (
           <FitText
-            key={index}
+            key={`${x}:${y}`}
             text={text}
             x={x}
             y={y}

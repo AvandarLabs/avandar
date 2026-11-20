@@ -75,26 +75,22 @@ const graph = z.strictObject({
     .min(1)
     .max(12),
   edges: z.array(edgeSchema).max(40),
-  traversal: z
-    .array(z.object({ nodeId: id, atFrame: frame }).strict())
-    .optional(),
+  traversal: z.array(z.strictObject({ nodeId: id, atFrame: frame })).optional(),
   revealAtFrame: frame.optional(),
 });
-const flowchart = z
-  .object({
-    ...heading,
-    steps: z
-      .array(z.object({ id, label, detail: detail.optional() }).strict())
-      .min(1)
-      .max(6),
-    connectors: z
-      .array(z.object({ from: id, to: id, label: label.optional() }).strict())
-      .max(12),
-    activeStep: id.optional(),
-    stepAtFrames: z.array(frame).optional(),
-    revealAtFrame: frame.optional(),
-  })
-  .strict();
+const flowchart = z.strictObject({
+  ...heading,
+  steps: z
+    .array(z.strictObject({ id, label, detail: detail.optional() }))
+    .min(1)
+    .max(6),
+  connectors: z
+    .array(z.strictObject({ from: id, to: id, label: label.optional() }))
+    .max(12),
+  activeStep: id.optional(),
+  stepAtFrames: z.array(frame).optional(),
+  revealAtFrame: frame.optional(),
+});
 const metric = z.strictObject({
   ...headingWithReveal,
   label,
@@ -132,31 +128,27 @@ const region = {
   width: z.number().positive().max(1),
   height: z.number().positive().max(1),
 };
-const media = z
-  .object({
-    ...heading,
-    kind: z.enum(["image", "video"]),
-    src: assetPathSchema,
-    trimBefore: frame.optional(),
-    fit: z.enum(["contain", "cover"]).optional(),
-    objectPosition: z.object({ x: unit, y: unit }).strict().optional(),
-    crop: z.object(region).strict().optional(),
-    callouts: z
-      .array(
-        z
-          .object({
-            id,
-            label,
-            ...region,
-            startFrame: frame,
-            endFrame: positiveFrames,
-          })
-          .strict(),
-      )
-      .max(8)
-      .optional(),
-  })
-  .strict();
+const media = z.strictObject({
+  ...heading,
+  kind: z.enum(["image", "video"]),
+  src: assetPathSchema,
+  trimBefore: frame.optional(),
+  fit: z.enum(["contain", "cover"]).optional(),
+  objectPosition: z.strictObject({ x: unit, y: unit }).optional(),
+  crop: z.strictObject(region).optional(),
+  callouts: z
+    .array(
+      z.strictObject({
+        id,
+        label,
+        ...region,
+        startFrame: frame,
+        endFrame: positiveFrames,
+      }),
+    )
+    .max(8)
+    .optional(),
+});
 const barComparison = z.strictObject({
   ...headingWithReveal,
   panels: z
@@ -350,44 +342,40 @@ const shotBase = {
 
 /** The scene discriminator is also the renderer's exhaustive registry. */
 export const shotSchema = z.discriminatedUnion("scene", [
-  z
-    .object({
-      ...shotBase,
-      scene: z.literal("continuity"),
-      // A continuity shot can contain twelve independently timed beats.
-      durationInFrames: positiveFrames.max(12 * 1800),
-      props: continuitySchema,
-    })
-    .strict(),
-  z
-    .object({
-      ...shotBase,
-      scene: z.literal("avandar"),
-      props: z
-        .object({
-          feature: z.enum(["import", "explorer", "dashboards", "cases", "map"]),
-          fromFrame: frame.max(799).default(0),
-          mode: z.enum(["full", "filter", "query", "chart"]).default("full"),
-        })
-        .strict(),
-    })
-    .strict(),
-  z
-    .object({
-      ...shotBase,
-      scene: z.literal("title"),
-      props: z.object({ name: text.max(48), kicker: text.max(100) }).strict(),
-    })
-    .strict(),
-  z.object({ ...shotBase, scene: z.literal("graph"), props: graph }).strict(),
-  z
-    .object({ ...shotBase, scene: z.literal("flowchart"), props: flowchart })
-    .strict(),
-  z.object({ ...shotBase, scene: z.literal("metric"), props: metric }).strict(),
-  z
-    .object({ ...shotBase, scene: z.literal("typography"), props: typography })
-    .strict(),
-  z.object({ ...shotBase, scene: z.literal("media"), props: media }).strict(),
+  z.strictObject({
+    ...shotBase,
+    scene: z.literal("continuity"),
+    // A continuity shot can contain twelve independently timed beats.
+    durationInFrames: positiveFrames.max(12 * 1800),
+    props: continuitySchema,
+  }),
+  z.strictObject({
+    ...shotBase,
+    scene: z.literal("avandar"),
+    props: z.strictObject({
+      feature: z.enum(["import", "explorer", "dashboards", "cases", "map"]),
+      fromFrame: frame.max(799).default(0),
+      mode: z.enum(["full", "filter", "query", "chart"]).default("full"),
+    }),
+  }),
+  z.strictObject({
+    ...shotBase,
+    scene: z.literal("title"),
+    props: z.strictObject({ name: text.max(48), kicker: text.max(100) }),
+  }),
+  z.strictObject({ ...shotBase, scene: z.literal("graph"), props: graph }),
+  z.strictObject({
+    ...shotBase,
+    scene: z.literal("flowchart"),
+    props: flowchart,
+  }),
+  z.strictObject({ ...shotBase, scene: z.literal("metric"), props: metric }),
+  z.strictObject({
+    ...shotBase,
+    scene: z.literal("typography"),
+    props: typography,
+  }),
+  z.strictObject({ ...shotBase, scene: z.literal("media"), props: media }),
   z.strictObject({
     ...shotBase,
     scene: z.literal("tilted-window"),
@@ -403,27 +391,25 @@ export const shotSchema = z.discriminatedUnion("scene", [
     scene: z.literal("bar-comparison"),
     props: barComparison,
   }),
-  z
-    .object({
-      ...shotBase,
-      scene: z.literal("stock"),
-      props: stockRequestEnvelopeSchema
-        .extend(heading)
-        .transform((props, context) => {
-          const { title, kicker, ...request } = props;
-          const result = stockRequestSchema.safeParse(request);
-          if (!result.success) {
-            result.error.issues.forEach((issue) => {
-              return context.addIssue({ ...issue });
-            });
-            return z.NEVER;
-          }
-          return {
-            ...result.data,
-            ...(title === undefined ? {} : { title }),
-            ...(kicker === undefined ? {} : { kicker }),
-          };
-        }),
-    })
-    .strict(),
+  z.strictObject({
+    ...shotBase,
+    scene: z.literal("stock"),
+    props: stockRequestEnvelopeSchema
+      .extend(heading)
+      .transform((props, context) => {
+        const { title, kicker, ...request } = props;
+        const result = stockRequestSchema.safeParse(request);
+        if (!result.success) {
+          result.error.issues.forEach((issue) => {
+            return context.addIssue({ ...issue });
+          });
+          return z.NEVER;
+        }
+        return {
+          ...result.data,
+          ...(title === undefined ? {} : { title }),
+          ...(kicker === undefined ? {} : { kicker }),
+        };
+      }),
+  }),
 ]);

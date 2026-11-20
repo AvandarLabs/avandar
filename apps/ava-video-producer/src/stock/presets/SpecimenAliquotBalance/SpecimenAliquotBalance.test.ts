@@ -267,6 +267,9 @@ test("dense complete tube labels and ledger text occupy separate boxes", () => {
 });
 
 test("serialized contract exposes tube identity validation", () => {
+  // This assertion exercises the JSON serialization boundary of the public
+  // contract.
+  // react-doctor-disable-next-line no-json-parse-stringify-clone
   const rules = JSON.parse(
     JSON.stringify(specimenAliquotBalanceContract.semanticRules),
   ) as typeof specimenAliquotBalanceContract.semanticRules;
@@ -284,6 +287,9 @@ test("serialized contract exposes tube identity validation", () => {
 });
 
 test("serialized contract exposes volume conservation validation", () => {
+  // This assertion exercises the JSON serialization boundary of the public
+  // contract.
+  // react-doctor-disable-next-line no-json-parse-stringify-clone
   const rules = JSON.parse(
     JSON.stringify(specimenAliquotBalanceContract.semanticRules),
   ) as typeof specimenAliquotBalanceContract.semanticRules;

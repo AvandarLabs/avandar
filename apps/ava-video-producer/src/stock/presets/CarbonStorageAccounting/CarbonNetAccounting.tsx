@@ -34,8 +34,12 @@ export function CarbonNetAccounting({
       />
       {[retained, emissions, retained - emissions].map((value, index) => {
         return (
-          <FitText
-            key={index}
+          // prettier-ignore
+          // The three slots always mean retained mass, emissions
+          // and their difference, in that order. Only their values
+          // change.
+          // react-doctor-disable-next-line no-array-index-as-key
+          <FitText key={index}
             text={String(value)}
             x={540 + index * 135}
             y={510}

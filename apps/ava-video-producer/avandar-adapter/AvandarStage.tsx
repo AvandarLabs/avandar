@@ -17,7 +17,7 @@ import {
 } from "@tabler/icons-react";
 import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
 import { useLayoutEffect, useState } from "react";
-import { delayRender, continueRender } from "remotion";
+import { delayRender, continueRender, Img } from "remotion";
 import navCss from "@/components/AppShell/Navbar/Navbar.module.css";
 import { NavbarLinkItem } from "@/components/AppShell/Navbar/NavbarLinkItem";
 import slateCss from "@/components/layouts/AppSlate/AppSlate.module.css";
@@ -135,7 +135,7 @@ export function AvandarStage({
                 py="sm"
                 wrap="nowrap"
               >
-                <img src={logo} width={25} height={25} alt="Avandar Labs" />
+                <Img src={logo} width={25} height={25} alt="Avandar Labs" />
                 <Text size="sm" fw={500} flex={1}>
                   Avandar Labs
                 </Text>

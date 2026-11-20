@@ -1,6 +1,6 @@
-import { mix } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { getReadinessRibbonGeometry } from "./getReadinessRibbonGeometry";
 import { ReadinessRibbonLabels } from "./ReadinessRibbonLabels";
 import type { Input } from "./ReadinessLatch.schema";
 import type { ReactNode } from "react";
@@ -44,23 +44,13 @@ export function ReadinessRibbon({
     participant.ready && frame >= 24 + duration
       ? input.copy.ready
       : input.copy.waiting;
-  const track = {
+  const { track, ribbon, pin } = getReadinessRibbonGeometry({
+    horizontal,
     x,
     y,
-    width: horizontal ? 350 : 8,
-    height: horizontal ? 8 : 100,
-  };
-  const ribbon = {
-    ...track,
-    width: horizontal ? 350 * progress : 8,
-    height: horizontal ? 8 : 100 * progress,
-  };
-  const pin = {
-    x1: horizontal ? mix(withdrawal, 640, 692) : x - 18,
-    x2: horizontal ? mix(withdrawal, 662, 714) : x + 26,
-    y1: horizontal ? y + 4 : mix(withdrawal, 400, 350),
-    y2: horizontal ? y + 4 : mix(withdrawal, 400, 350),
-  };
+    progress,
+    withdrawal,
+  });
   const labels = { participant, input, state, horizontal, x, y };
   return (
     <g

@@ -77,6 +77,9 @@ export async function findExistingOutputs({
   // Check one target at a time, so the first unsafe or blocked one stops it.
   for (const name of TARGETS) {
     const target = join(publicDirectory, name);
+    // Fail at the first unsafe or existing target before inspecting later
+    // output trees.
+    // react-doctor-disable-next-line async-await-in-loop
     if (await getOptionalStatFromPath(target)) {
       await inspectExistingTree(target);
       if (!shouldReplace) {

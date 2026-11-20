@@ -38,7 +38,8 @@ export const inputSchema = z
   })
   .superRefine((input, context) => {
     const ids = input.columns.map(prop("id"));
-    if (new Set(ids).size !== ids.length) {
+    const columnIdSet = new Set(ids);
+    if (columnIdSet.size !== ids.length) {
       context.addIssue({
         code: "custom",
         path: ["columns"],
@@ -56,12 +57,13 @@ export const inputSchema = z
         message: "All columns must have equal cell lengths.",
       });
     }
+    const cachedIdSet = new Set(input.cachedColumnIds);
     [input.cachedColumnIds, ...input.requests.map(prop("columnIds"))].forEach(
       (refs, index) => {
         if (
-          new Set(refs).size !== refs.length ||
+          (index === 0 ? cachedIdSet : new Set(refs)).size !== refs.length ||
           refs.some((id) => {
-            return !ids.includes(id);
+            return !columnIdSet.has(id);
           })
         ) {
           context.addIssue({
@@ -76,8 +78,8 @@ export const inputSchema = z
       },
     );
     if (
-      !ids.includes(input.keyColumnId) ||
-      !input.cachedColumnIds.includes(input.keyColumnId)
+      !columnIdSet.has(input.keyColumnId) ||
+      !cachedIdSet.has(input.keyColumnId)
     ) {
       context.addIssue({
         code: "custom",
@@ -87,7 +89,7 @@ export const inputSchema = z
     }
     if (
       input.requests[0]?.columnIds.some((id) => {
-        return !input.cachedColumnIds.includes(id);
+        return !cachedIdSet.has(id);
       })
     ) {
       context.addIssue({
@@ -99,7 +101,7 @@ export const inputSchema = z
     if (
       input.requests[1] &&
       !input.requests[1].columnIds.some((id) => {
-        return !input.cachedColumnIds.includes(id);
+        return !cachedIdSet.has(id);
       })
     ) {
       context.addIssue({

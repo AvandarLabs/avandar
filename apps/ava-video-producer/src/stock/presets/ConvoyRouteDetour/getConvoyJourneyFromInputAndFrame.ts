@@ -1,6 +1,7 @@
 import { mix } from "../../../motion";
 import { getRoutePointFromProgress } from "../../primitives/RoutePath/getRoutePointFromProgress";
 import { getClosedInteriorEncounterFromSegments } from "./getClosedInteriorEncounterFromSegments";
+import { getConvoyRouteFromRole } from "./getConvoyRouteFromRole";
 import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./ConvoyRouteDetour.schema";
 
@@ -19,9 +20,8 @@ function _getPoint({
   return getRoutePointFromProgress({ points, progress });
 }
 function _getSafePrefix(input: Readonly<Input>): Point[] {
-  const points = input.routes.find(({ role }) => {
-    return role === "blocked";
-  })!.points;
+  // ConvoyRouteDetour.schema requires exactly one blocked route.
+  const points = getConvoyRouteFromRole({ input, role: "blocked" }).points;
   const start = points[input.obstruction.segmentIndex];
   const end = points[input.obstruction.segmentIndex + 1];
   const encounters = points
@@ -80,12 +80,10 @@ export function getConvoyJourneyFromInputAndFrame({
   input: Input;
   motion: VideoMotion;
 }>): GetConvoyJourneyResult {
-  const blocked = input.routes.find(({ role }) => {
-    return role === "blocked";
-  })!.points;
-  const detour = input.routes.find(({ role }) => {
-    return role === "detour";
-  })!.points;
+  // ConvoyRouteDetour.schema requires exactly one blocked route.
+  const blocked = getConvoyRouteFromRole({ input, role: "blocked" }).points;
+  // ConvoyRouteDetour.schema requires exactly one detour route.
+  const detour = getConvoyRouteFromRole({ input, role: "detour" }).points;
   const prefix = _getSafePrefix(input);
   // A first-edge stop is before the shared junction, so continue to it safely.
   const returning =

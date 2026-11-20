@@ -33,6 +33,9 @@ export async function scratchTts(
   for (const cue of plan.narration) {
     const src = `${namespace}/${cue.id}.wav`;
     metadata.push(
+      // Bound local speech synthesis and conversion to one cue process pipeline
+      // at a time.
+      // react-doctor-disable-next-line async-await-in-loop
       await synthesizeCue(
         cue.text,
         directory,

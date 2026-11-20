@@ -1,28 +1,19 @@
-import { mix, ramp } from "../../../motion";
+import { mix } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { getQuarantineStateFromFrame } from "./getQuarantineStateFromFrame";
 import { QuarantinedRows } from "./QuarantinedRows";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./InvalidTableQuarantine.schema";
 import type { ReactNode } from "react";
 /** Frame-driven authored study props. */
 export type Props = GraphicProps & { input: Input };
-/** The cue the shutter starts to close on. */
-const CLOSE_CUE = 13;
-/** The cue a read is attempted on, once the shutter has closed. */
-const ATTEMPT_CUE = 46;
-/** The cue the replacement sheet starts to slide in on. */
-const INCOMING_CUE = 96;
-/** The cue the replacement takes the table's place on. */
-const REPLACED_CUE = 112;
-/** Frames the shutter takes to reopen after the replacement. */
-const OPEN_FRAMES = 26;
-/** How opaque the shutter is while a blocked attempt stays visible. */
-const SEE_THROUGH_SHUTTER = 0.87;
 /** The shutter slat's line weight before the line weight scales it. */
 const SLAT_STROKE = 8;
+/** How opaque the shutter is while a blocked attempt stays visible. */
+const SEE_THROUGH_SHUTTER = 0.87;
 /** Invalidation closes reads until a whole replacement precedes reopening. */
 export function InvalidTableQuarantine({
   frame,
@@ -33,34 +24,17 @@ export function InvalidTableQuarantine({
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   const motion = GraphicThemeHooks.useGraphicMotion();
-  const travel = motion.travel.easing;
   const emphasis = scales.stroke(tokens.stroke.emphasis);
-  const isReplaced = input.reload.performed && frame >= REPLACED_CUE;
-  const rows = isReplaced
-    ? input.reload.rows
-    : input.originalRows.map((value, index) => {
-        return frame >= ATTEMPT_CUE &&
-          input.showAttempt &&
-          index === input.attempt.rowIndex
-          ? input.attempt.replacement
-          : value;
-      });
-  // The shutter is fully closed the frame before the attempt.
-  const closing = ramp(frame, CLOSE_CUE, ATTEMPT_CUE - 1 - CLOSE_CUE, travel),
-    opening = input.reload.performed
-      ? ramp(frame, REPLACED_CUE + 1, motion.scale(OPEN_FRAMES), travel)
-      : 0;
-  // The replacement slides in until it takes the table's place.
-  const arrival = ramp(
-    frame,
-    INCOMING_CUE,
-    REPLACED_CUE - INCOMING_CUE,
-    travel,
-  );
-  const height = 300 * closing * (1 - opening),
-    readable = frame < CLOSE_CUE || opening === 1;
-  const incoming =
-    input.reload.performed && frame >= INCOMING_CUE && frame < REPLACED_CUE;
+  const {
+    isReplaced,
+    rows,
+    arrival,
+    height,
+    readable,
+    incoming,
+    showReload,
+    showAttempt,
+  } = getQuarantineStateFromFrame({ frame, input, motion });
   return (
     <g data-readable={readable}>
       <StockRect
@@ -122,10 +96,10 @@ export function InvalidTableQuarantine({
           ],
         ]}
       />
-      {input.reload.performed && frame >= INCOMING_CUE ? (
+      {showReload ? (
         <LabelSlots labels={[[input.labels.reload, 680, 390, 230, 16, 4]]} />
       ) : null}
-      {frame >= ATTEMPT_CUE && input.showAttempt ? (
+      {showAttempt ? (
         <g data-attempt-outcome={input.attempt.outcome}>
           <SketchedShape
             shape={{

@@ -42,6 +42,9 @@ function _assertKeys({
     typeof node !== "object" ||
     Array.isArray(node) ||
     Object.keys(node).some((key) => {
+      // Every caller supplies a fixed allowlist of two to five schema
+      // keywords. A Set allocation is slower for these bounded scans.
+      // react-doctor-disable-next-line js-set-map-lookups
       return !keys.includes(key);
     })
   ) {
@@ -92,13 +95,14 @@ function _validateObject({
     _fail(prefix);
   }
   const keys = Object.keys(properties);
+  const requiredKeys = new Set(node.required);
   if (
     keys.some((key) => {
       return !key.length || key.includes(".");
     }) ||
     keys.length !== (node.required?.length ?? 0) ||
     keys.some((key) => {
-      return !node.required?.includes(key);
+      return !requiredKeys.has(key);
     })
   ) {
     _fail(prefix);
@@ -282,10 +286,10 @@ export function makeStockControlsFromSchema({
       referenceSelects,
     });
   });
-  const paths = _getControlPaths({ controls });
+  const paths = new Set(_getControlPaths({ controls }));
   if (
     Object.keys(referenceSelects).some((path) => {
-      return !paths.includes(path);
+      return !paths.has(path);
     })
   ) {
     _fail("referenceSelects");

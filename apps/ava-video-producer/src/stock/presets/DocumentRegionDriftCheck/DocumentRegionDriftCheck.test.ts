@@ -252,6 +252,9 @@ test("saved geometry preserves full boundary extents while comparison captions r
 });
 
 test("serialized saved-region tuple retains exact four-coordinate cardinality", () => {
+  // This assertion exercises the JSON serialization boundary of the public
+  // contract.
+  // react-doctor-disable-next-line no-json-parse-stringify-clone
   const schema = JSON.parse(JSON.stringify(contract.jsonSchema));
   assert.equal(schema.properties.saved.properties.box.minItems, 4);
   assert.equal(schema.properties.saved.properties.box.maxItems, 4);

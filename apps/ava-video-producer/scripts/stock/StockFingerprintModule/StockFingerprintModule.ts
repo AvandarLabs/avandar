@@ -183,24 +183,26 @@ async function _sourceFiles(
  */
 async function _getStockSourceHashFromRoot(root: string): Promise<string> {
   root = await fs.realpath(root);
-  const discovered = await Promise.all(
-    SOURCE_DIRECTORIES.map((directory) => {
-      return _sourceFiles({ root, relative: directory });
-    }),
-  );
-  const optional = await Promise.all(
-    SOURCE_FILES.map(async (file) => {
-      try {
-        await fs.lstat(path.join(root, file));
-        return file;
-      } catch (error) {
-        if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
-          throw error;
+  const [discovered, optional] = await Promise.all([
+    Promise.all(
+      SOURCE_DIRECTORIES.map((directory) => {
+        return _sourceFiles({ root, relative: directory });
+      }),
+    ),
+    Promise.all(
+      SOURCE_FILES.map(async (file) => {
+        try {
+          await fs.lstat(path.join(root, file));
+          return file;
+        } catch (error) {
+          if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
+            throw error;
+          }
+          return undefined;
         }
-        return undefined;
-      }
-    }),
-  );
+      }),
+    ),
+  ]);
   const files = [
     ...discovered.flat(),
     ...optional.filter((file): file is string => {
@@ -209,6 +211,9 @@ async function _getStockSourceHashFromRoot(root: string): Promise<string> {
   ].sort();
   const hash = createHash("sha256");
   await files.reduce(async (previous, file) => {
+    // Each callback waits for the prior update of this shared, order-sensitive
+    // hash.
+    // react-doctor-disable-next-line async-await-in-loop
     await previous;
     const filename = path.join(root, file);
     const resolved = await fs.realpath(filename);

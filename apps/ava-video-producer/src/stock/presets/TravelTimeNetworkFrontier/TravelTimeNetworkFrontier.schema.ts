@@ -38,12 +38,13 @@ function _validateNetworkReferences({
   context: z.RefinementCtx;
 }): void {
   const nodeIds = input.nodes.map(prop("id"));
+  const nodeIdSet = new Set(nodeIds);
   const roadIds = input.roads.map(prop("id"));
   const edges = input.roads.map((road) => {
     return JSON.stringify([road.fromId, road.toId].sort());
   });
   if (
-    new Set(nodeIds).size !== nodeIds.length ||
+    nodeIdSet.size !== nodeIds.length ||
     new Set(roadIds).size !== roadIds.length ||
     new Set(edges).size !== edges.length
   ) {
@@ -54,12 +55,12 @@ function _validateNetworkReferences({
     });
   }
   if (
-    !nodeIds.includes(input.originId) ||
+    !nodeIdSet.has(input.originId) ||
     input.roads.some((road) => {
       return (
         road.fromId === road.toId ||
-        !nodeIds.includes(road.fromId) ||
-        !nodeIds.includes(road.toId)
+        !nodeIdSet.has(road.fromId) ||
+        !nodeIdSet.has(road.toId)
       );
     })
   ) {

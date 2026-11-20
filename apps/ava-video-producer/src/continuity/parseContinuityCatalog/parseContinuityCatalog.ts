@@ -24,13 +24,11 @@ const STUDY_SCHEMA = BASE_SCHEMA.extend({
   creativeDirection: z.string().min(1),
   avoid: z.string().min(1),
   controls: z.array(
-    z
-      .object({
-        path: z.string().min(1),
-        label: z.string().min(1),
-        description: z.string().min(1),
-      })
-      .strict(),
+    z.strictObject({
+      path: z.string().min(1),
+      label: z.string().min(1),
+      description: z.string().min(1),
+    }),
   ),
 }).strict();
 

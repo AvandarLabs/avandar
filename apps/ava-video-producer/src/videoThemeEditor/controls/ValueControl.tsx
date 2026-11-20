@@ -24,49 +24,41 @@ const LAYER_CONTROLS = {
   textShadow: TextShadowValueControl,
 } as const;
 
+const VALUE_CONTROLS = {
+  palette: PaletteValueControl,
+  shade: ShadeValueControl,
+  gradient: GradientValueControl,
+  slider: NumberValueControl,
+  duration: DurationValueControl,
+  easing: EasingValueControl,
+  spring: SpringValueControl,
+  dash: DashValueControl,
+  font: FontValueControl,
+  segmented: EnumValueControl,
+  switch: BooleanValueControl,
+} as const;
+
 /**
  * The control for a literal value of any token kind, such as an atomic
  * value, a Mantine key, or a custom component value.
  */
 export function ValueControl(props: ValueControlProps): ReactNode {
   const { swatches } = useTokenEditor();
-  switch (TOKEN_CONTROLS[props.definition.kind]) {
-    case "color":
-      return <ColorValueControl {...props} swatches={swatches} />;
-    case "fill":
-      return typeof props.value === "string" ? (
-        <ColorValueControl {...props} swatches={swatches} />
-      ) : (
-        <GradientValueControl {...props} />
-      );
-    case "palette":
-      return <PaletteValueControl {...props} />;
-    case "shade":
-      return <ShadeValueControl {...props} />;
-    case "gradient":
-      return <GradientValueControl {...props} />;
-    case "slider":
-      return <NumberValueControl {...props} />;
-    case "duration":
-      return <DurationValueControl {...props} />;
-    case "easing":
-      return <EasingValueControl {...props} />;
-    case "spring":
-      return <SpringValueControl {...props} />;
-    case "dash":
-      return <DashValueControl {...props} />;
-    case "font":
-      return <FontValueControl {...props} />;
-    case "segmented":
-      return <EnumValueControl {...props} />;
-    case "switch":
-      return <BooleanValueControl {...props} />;
-    case "layers": {
-      const LayerControl =
-        LAYER_CONTROLS[props.definition.kind as keyof typeof LAYER_CONTROLS];
-      return <LayerControl {...props} />;
-    }
-    default:
-      return null;
+  const control = TOKEN_CONTROLS[props.definition.kind];
+  if (
+    control === "color" ||
+    (control === "fill" && typeof props.value === "string")
+  ) {
+    return <ColorValueControl {...props} swatches={swatches} />;
   }
+  if (control === "fill") {
+    return <GradientValueControl {...props} />;
+  }
+  if (control === "layers") {
+    const LayerControl =
+      LAYER_CONTROLS[props.definition.kind as keyof typeof LAYER_CONTROLS];
+    return <LayerControl {...props} />;
+  }
+  const Control = VALUE_CONTROLS[control as keyof typeof VALUE_CONTROLS];
+  return Control ? <Control {...props} /> : null;
 }

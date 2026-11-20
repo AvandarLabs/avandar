@@ -10,12 +10,25 @@ type Params = {
   measureIndex: number;
   motion: VideoMotion;
 };
+function _getMeasurementValue({
+  subject,
+  measureId,
+}: Readonly<{
+  subject: Input["subjects"][number];
+  measureId: string;
+}>): number | null {
+  const measurement = subject.values.find(propEq("measureId", measureId));
+  if (!measurement) {
+    throw new Error(`Missing subject measurement: ${measureId}`);
+  }
+  return measurement.value;
+}
 function _getOrderedValues(input: Readonly<Input>): Array<number | null> {
   return input.measures.flatMap((measure) => {
     return input.subjects.map((subject) => {
-      return subject.values.find(({ measureId }) => {
-        return measureId === measure.id;
-      })!.value;
+      // WideTableToObservations.schema verifies exactly one value per
+      // existing measure in each subject.
+      return _getMeasurementValue({ subject, measureId: measure.id });
     });
   });
 }
@@ -47,7 +60,7 @@ export function getMeasurementStripFromFrame({
   const subject = input.subjects[subjectIndex],
     measure = input.measures[measureIndex];
   const value =
-    subject.values.find(propEq("measureId", measure.id))!.value ?? undefined;
+    _getMeasurementValue({ subject, measureId: measure.id }) ?? undefined;
   const sourceIndex = measureIndex * 2 + subjectIndex;
   const outputIndex = _getOutputIndex({ input, sourceIndex });
   const isOmitted =

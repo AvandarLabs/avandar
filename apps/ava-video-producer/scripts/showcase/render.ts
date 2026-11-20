@@ -162,6 +162,9 @@ async function _renderPreviewStills(
   // One browser renders the stills in order before the full render.
   for (const frame of _getPreviewSamplesFromFilm(film, render.plan)) {
     progress(`Checking preview frame ${frame + 1} of ${film.frames}…`);
+    // All preview stills share one Chromium renderer, which must stay serial to
+    // avoid frame flicker.
+    // react-doctor-disable-next-line async-await-in-loop
     await renderStill({
       ...stillOptions,
       licenseKey,

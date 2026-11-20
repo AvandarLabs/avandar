@@ -60,6 +60,9 @@ async function _renderSampleStills(
   });
   // One browser renders the stills in order.
   for (const [index, frame] of SAMPLES.entries()) {
+    // The shared Chromium renderer must run serially to avoid wrapped-frame
+    // flicker.
+    // react-doctor-disable-next-line async-await-in-loop
     await renderStill({
       ...shared,
       composition,
@@ -168,8 +171,14 @@ export async function previewMotionRequests(
     }),
   );
   const digest = await StockFingerprintModule.getSourceHashFromRoot(ROOT);
+  // Validate the source fingerprint before creating a renderer output
+  // directory.
+  // react-doctor-disable-next-line server-sequential-independent-await
   const temporary = await makeFreshMotionDirectory("bundle");
   const serveUrl = await _bundleStockRenderer(temporary);
+  // Open the owned browser only after bundling succeeds so a failed bundle
+  // cannot leak it.
+  // react-doctor-disable-next-line server-sequential-independent-await
   const browser = await openBrowser("chrome", { logLevel: "error" });
   try {
     // Previews share one browser, so they run one after another.

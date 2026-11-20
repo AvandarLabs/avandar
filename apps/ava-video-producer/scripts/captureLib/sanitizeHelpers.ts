@@ -70,6 +70,9 @@ function _assertSafeString({
   }
   secrets.filter(isNotEmpty).forEach((secret) => {
     // Short demo passwords can also be legitimate product/workspace substrings.
+    // Secrets must match substrings of this string. Set membership cannot
+    // detect leaks.
+    // react-doctor-disable-next-line js-set-map-lookups
     if (value === secret || (secret.length >= 8 && value.includes(secret))) {
       throw new Error(`Unredacted credential at ${path}`);
     }

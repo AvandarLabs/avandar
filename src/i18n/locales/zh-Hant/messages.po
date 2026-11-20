@@ -6588,9 +6588,8 @@ msgstr "新增"
 msgid "Pick one from the list to see its details."
 msgstr "從清單中選取一項以查看詳細資料。"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesFieldsetControls.tsx
 msgid "What is a series?"
 msgstr "什麼是系列？"
 
@@ -6878,9 +6877,8 @@ msgstr "刪除資料集"
 msgid "Created {0}"
 msgstr "建立於 {0}"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesFieldsetControls.tsx
 msgid "Add series"
 msgstr "添加系列"
 

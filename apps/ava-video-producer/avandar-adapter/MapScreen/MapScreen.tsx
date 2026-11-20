@@ -1,7 +1,7 @@
 import { ActionIcon, Button } from "@mantine/core";
 import { IconDownload, IconPlus, IconShare } from "@tabler/icons-react";
-import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
-import { cancelRender, continueRender, delayRender } from "remotion";
+import { useCallback, useLayoutEffect, useMemo, useRef } from "react";
+import { cancelRender } from "remotion";
 import { DrawerHeight } from "@/components/CanvasDrawer/DrawerHeight/DrawerHeight";
 import { MapCanvasSurface } from "@/views/GisApp/MapCanvas/MapCanvasSurface/MapCanvasSurface";
 import { useMapCanvas } from "@/views/GisApp/MapCanvas/useMapCanvas";
@@ -34,6 +34,7 @@ import css from "./MapScreen.module.css";
 import { PointInspector } from "./PointInspector";
 import "./setUpMapLibreWorker";
 import { PointMapTools } from "./PointMapTools";
+import { useCommittedRenderDelay } from "./useCommittedRenderDelay/useCommittedRenderDelay";
 import type { ErrorEvent as MapLibreErrorEvent } from "maplibre-gl";
 import type { ReactNode } from "react";
 
@@ -89,66 +90,71 @@ export function MapScreen({
     mapToolMode: PAN,
   });
   const { mapInstance } = controller;
-  const frameHandle = useMemo(() => {
-    return delayRender(
-      `Harborfield map frame ${frame}, style ${mapInstance.styleLoadCount}`,
-    );
-  }, [frame, mapInstance.styleLoadCount]);
-
-  useEffect(() => {
-    const map = mapInstance.mapRef.current;
-    if (!map) return;
-    const complete = () => {
-      // Idle alone is insufficient if a provider returned an empty/failed
-      // style. Require the actual vector source, loaded tiles and rendered
-      // geography.
-      const basemapLayers = (map.getStyle().layers ?? [])
-        .filter((layer) => {
-          return "source" in layer && layer.source === "openmaptiles";
-        })
-        .map((layer) => {
-          return layer.id;
-        });
-      const geography = basemapLayers.length
-        ? map.queryRenderedFeatures({ layers: basemapLayers }).length
-        : 0;
-      if (
-        !map.isStyleLoaded() ||
-        !map.areTilesLoaded() ||
-        !map.getSource("openmaptiles") ||
-        geography === 0
-      ) {
+  const prepareFrame = useCallback(
+    (completeRender: () => void) => {
+      const map = mapInstance.mapRef.current;
+      if (!map) return;
+      const complete = () => {
+        // Idle alone is insufficient if a provider returned an empty/failed
+        // style. Require the actual vector source, loaded tiles and rendered
+        // geography.
+        const basemapLayers = (map.getStyle().layers ?? [])
+          .filter((layer) => {
+            return "source" in layer && layer.source === "openmaptiles";
+          })
+          .map((layer) => {
+            return layer.id;
+          });
+        const geography = basemapLayers.length
+          ? map.queryRenderedFeatures({ layers: basemapLayers }).length
+          : 0;
+        if (
+          !map.isStyleLoaded() ||
+          !map.areTilesLoaded() ||
+          !map.getSource("openmaptiles") ||
+          geography === 0
+        ) {
+          cancelRender(
+            new Error(
+              "Avandar basemap tiles or geographic features are missing",
+            ),
+          );
+          return;
+        }
+        if (root.current) {
+          root.current.dataset.basemapReady = "true";
+          root.current.dataset.basemapFeatures = String(geography);
+        }
+        if (pointTarget.current) {
+          const point = map.project(selectedCoordinates);
+          pointTarget.current.style.left = `${point.x - 6}px`;
+          pointTarget.current.style.top = `${point.y - 6}px`;
+        }
+        completeRender();
+      };
+      const onError = (event: MapLibreErrorEvent) => {
         cancelRender(
-          new Error("Avandar basemap tiles or geographic features are missing"),
+          new Error(event.error.message || "Native map failed to render"),
         );
-        return;
-      }
-      if (root.current) {
-        root.current.dataset.basemapReady = "true";
-        root.current.dataset.basemapFeatures = String(geography);
-      }
-      if (pointTarget.current) {
-        const point = map.project(selectedCoordinates);
-        pointTarget.current.style.left = `${point.x - 6}px`;
-        pointTarget.current.style.top = `${point.y - 6}px`;
-      }
-      continueRender(frameHandle);
-    };
-    const onError = (event: MapLibreErrorEvent) => {
-      cancelRender(
-        new Error(event.error.message || "Native map failed to render"),
-      );
-    };
-    map.once("idle", complete);
-    map.on("error", onError);
-    map.resize();
-    map.triggerRepaint();
-    return () => {
-      map.off("idle", complete);
-      map.off("error", onError);
-      continueRender(frameHandle);
-    };
-  }, [frame, frameHandle, mapInstance, spec, view, height, width]);
+      };
+      map.once("idle", complete);
+      // useCommittedRenderDelay invokes this callback's returned listener
+      // cleanup before the next frame and on unmount.
+      // react-doctor-disable-next-line effect-needs-cleanup
+      map.on("error", onError);
+      map.resize();
+      map.triggerRepaint();
+      return () => {
+        map.off("idle", complete);
+        map.off("error", onError);
+      };
+    },
+    [mapInstance],
+  );
+  useCommittedRenderDelay({
+    label: `Harborfield map frame ${frame}, style ${mapInstance.styleLoadCount}, ${width}x${height}`,
+    prepare: prepareFrame,
+  });
 
   useLayoutEffect(() => {
     root.current?.querySelectorAll("button").forEach((button) => {

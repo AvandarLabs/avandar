@@ -73,11 +73,11 @@ async function _loadTargets(
   ids: readonly string[],
   themeId: string,
 ): Promise<LoadedTarget[]> {
+  const targets = ids.includes("--all")
+    ? ParityTargets.listAllParityTargets()
+    : ParityTargets.listParityTargets(ids);
   return Promise.all(
-    (ids.includes("--all")
-      ? ParityTargets.listAllParityTargets()
-      : ParityTargets.listParityTargets(ids)
-    ).map(async (target) => {
+    targets.map(async (target) => {
       const film = await ShowcaseFilms.load(target.filmId, {
         ...target.options,
         theme: { id: themeId },
@@ -102,6 +102,9 @@ async function _renderTargets(
     }),
     path.join(parityDirectory, "bundle"),
   );
+  // Open the owned browser only after bundling succeeds so a failed bundle
+  // cannot leak it.
+  // react-doctor-disable-next-line server-sequential-independent-await
   const browser = await openBrowser("chrome", options);
   try {
     for (const { target, film, frames } of targets) {

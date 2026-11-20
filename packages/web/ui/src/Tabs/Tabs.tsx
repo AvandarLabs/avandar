@@ -6,7 +6,7 @@ import {
   Text,
 } from "@mantine/core";
 import { clsx } from "clsx";
-import { ReactNode, useState } from "react";
+import { ReactNode, useMemo, useState } from "react";
 import classes from "./Tabs.module.css";
 
 export type TabsIndicatorVariant = "underline" | "floating";
@@ -126,12 +126,22 @@ export function Tabs<TabId extends string>({
   >(() => {
     return makeObject(tabIds, { defaultValue: null });
   });
-  const tabItemRefCallback = (tabItemId: TabId) => {
-    return (node: HTMLButtonElement | null) => {
-      tabItemRefs[tabItemId] = node; // intentional mutation
-      setTabItemRefs(tabItemRefs);
-    };
-  };
+  const tabItemRefCallbacks = useMemo(() => {
+    return Object.fromEntries(
+      tabIds.map((tabItemId) => {
+        return [
+          tabItemId,
+          (node: HTMLButtonElement | null) => {
+            setTabItemRefs((currentRefs) => {
+              return currentRefs[tabItemId] === node
+                ? currentRefs
+                : { ...currentRefs, [tabItemId]: node };
+            });
+          },
+        ];
+      }),
+    ) as Record<TabId, (node: HTMLButtonElement | null) => void>;
+  }, [tabIds]);
 
   const isFloating = indicatorVariant === "floating";
 
@@ -186,7 +196,7 @@ export function Tabs<TabId extends string>({
             <MantineTabs.Tab
               key={tabId}
               value={tabId}
-              ref={tabItemRefCallback(tabId)}
+              ref={tabItemRefCallbacks[tabId]}
               className={clsx(
                 isFloating && classes.tab,
                 isSmall && classes.tabSm,

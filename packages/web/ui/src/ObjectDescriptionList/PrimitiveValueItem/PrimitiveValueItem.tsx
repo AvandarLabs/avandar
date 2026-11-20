@@ -8,258 +8,76 @@ import {
 } from "@avandar/utils";
 import { Text } from "@mantine/core";
 import { useI18nMessages } from "@ui/i18n/useI18nMessages";
-import { match } from "ts-pattern";
-import { isStringOrNumber } from "../guards";
-import { BooleanValueItem } from "./BooleanValueItem";
-import { DateValueItem } from "./DateValueItem";
 import { NullOrUndefinedValueItem } from "./NullOrUndefinedValueItem";
-import { NumberValueItem } from "./NumberValueItem";
-import { TextValueItem } from "./TextValueItem";
+import { TypedPrimitiveValueItem } from "./TypedPrimitiveValueItem/TypedPrimitiveValueItem";
 import type {
   GenericRootData,
   PrimitiveValue,
-  PrimitiveValueRenderOptions,
+  RenderAsTypeOptions,
 } from "../ObjectDescriptionList.types";
+import type { PrimitiveValueItemProps as Props } from "./PrimitiveValueItem.types";
 
-type Props<
-  T extends PrimitiveValue,
-  RootData extends GenericRootData | undefined,
-> = {
-  /** The value to render. */
-  value: T;
+/** Infers the built-in display type for an unconfigured primitive value. */
+function _getPrimitiveRenderType(
+  value: PrimitiveValue,
+): RenderAsTypeOptions | undefined {
+  if (isBoolean(value)) {
+    return "boolean";
+  }
+  if (isDate(value) || isISODateString(value)) {
+    return "date";
+  }
+  if (isNumber(value)) {
+    return "number";
+  }
+  if (isString(value)) {
+    return "text";
+  }
+  return undefined;
+}
 
-  /** Whether to render the value in edit mode. */
-  editMode?: boolean;
-
-  /** Called when the value changes in edit mode. */
-  onChange?: (value: T) => void;
-
-  /**
-   * Data that gets passed into the `renderValue` function, if provided.
-   * This prop gets auto-filled when this component is used recursively
-   * within an `ObjectDescriptionList` hierarchy.
-   *
-   * If `PrimitiveValueItem` is being used directly, outsiede of an
-   * `ObjectDescriptionList` hierarchy, this prop does not need to be
-   * passed in.
-   */
-  rootData?: RootData;
-} & PrimitiveValueRenderOptions<T, RootData>;
-
-/**
- * Render a primitive value. Primitive values are not recursive.
- */
+/** Renders primitive display or edit values with optional custom renderers. */
 export function PrimitiveValueItem<
   T extends PrimitiveValue,
   RootData extends GenericRootData | undefined,
 >({
   value,
-  onChange,
   editMode = false,
-  renderAsType = undefined,
-  rootData = undefined,
-  renderValue = undefined,
-  renderEditableValue = undefined,
-  renderEmptyString,
-  renderBooleanTrue,
-  renderBooleanFalse,
+  rootData,
+  renderValue,
+  renderEditableValue,
+  renderAsType: configuredRenderAsType,
   renderNullString,
   renderUndefinedString,
-  dateFormat = "YYYY-MM-DDTHH:mm:ssZ",
-  dateTimeZone = "local",
-}: Props<T, RootData>): JSX.Element {
+  ...renderOptions
+}: Readonly<Props<T, RootData>>): JSX.Element {
   const i18n = useI18nMessages();
-  const resolvedRenderEmptyString = renderEmptyString ?? i18n.emptyText;
-  const resolvedRenderBooleanTrue = renderBooleanTrue ?? i18n.yes;
-  const resolvedRenderBooleanFalse = renderBooleanFalse ?? i18n.no;
-  const resolvedRenderNullString = renderNullString ?? i18n.noValue;
-  const resolvedRenderUndefinedString = renderUndefinedString ?? i18n.noValue;
-  // if we are in display mode and there is a `renderValue` function, then
-  // we use that instead
-  if (!editMode && renderValue !== undefined) {
-    const customRenderedValue = renderValue(value, rootData as RootData);
-
-    // only use the custom display value if it's not `undefined`, which we use
-    // to signal a no-op. If a no-op, we continue down this function until we
-    // hit the appropriate fallback.
-    if (customRenderedValue !== undefined) {
-      return <>{customRenderedValue}</>;
-    }
+  const customRenderer = editMode ? renderEditableValue : renderValue;
+  const customValue = customRenderer?.(value, rootData as RootData);
+  if (customValue !== undefined) {
+    return <>{customValue}</>;
   }
-
-  // if we are in edit mode and there is a `renderEditableValue` function, then
-  // we use that instead
-  if (editMode && renderEditableValue !== undefined) {
-    const customEditableValue = renderEditableValue(
-      value,
-      rootData as RootData,
+  const renderAsType = configuredRenderAsType ?? _getPrimitiveRenderType(value);
+  if (renderAsType !== undefined) {
+    return (
+      <TypedPrimitiveValueItem
+        {...renderOptions}
+        value={value}
+        editMode={editMode}
+        renderNullString={renderNullString}
+        renderUndefinedString={renderUndefinedString}
+        renderAsType={renderAsType}
+      />
     );
-
-    // only use the custom editable value if it's not `undefined`, which we use
-    // to signal a no-op. If a no-op, we continue down this function until we
-    // hit the appropriate fallback.
-    if (customEditableValue !== undefined) {
-      return <>{customEditableValue}</>;
-    }
   }
-
-  // if renderAsType is provided then we don't do any type inference
-  // and we can just render the appropriate component
-  if (renderAsType) {
-    return match(renderAsType)
-      .with("number", () => {
-        return (
-          <NumberValueItem
-            editMode={editMode}
-            value={
-              isNullish(value)
-                ? value
-                : isStringOrNumber(value)
-                  ? value
-                  : String(value)
-            }
-            onChange={(newValue) => {
-              return onChange?.(newValue as T);
-            }}
-            renderNullString={resolvedRenderNullString}
-            renderUndefinedString={resolvedRenderUndefinedString}
-          />
-        );
-      })
-      .with("boolean", () => {
-        return (
-          <BooleanValueItem
-            editMode={editMode}
-            value={isNullish(value) ? value : Boolean(value)}
-            onChange={(newValue) => {
-              return onChange?.(newValue as T);
-            }}
-            renderNullString={resolvedRenderNullString}
-            renderUndefinedString={resolvedRenderUndefinedString}
-            renderBooleanTrue={resolvedRenderBooleanTrue}
-            renderBooleanFalse={resolvedRenderBooleanFalse}
-          />
-        );
-      })
-      .with("text", { type: "text" }, (typeOptions) => {
-        return (
-          <TextValueItem
-            editMode={editMode}
-            value={isNullish(value) ? value : String(value)}
-            onChange={(newValue) => {
-              return onChange?.(newValue as T);
-            }}
-            choices={
-              typeof typeOptions === "object" ? typeOptions.choices : undefined
-            }
-            renderNullString={resolvedRenderNullString}
-            renderUndefinedString={resolvedRenderUndefinedString}
-            renderEmptyString={resolvedRenderEmptyString}
-          />
-        );
-      })
-      .with("date", () => {
-        if (isBoolean(value)) {
-          return (
-            <Text span fs="italic">
-              {i18n.invalidDate}
-            </Text>
-          );
-        }
-
-        return (
-          <DateValueItem
-            editMode={editMode}
-            value={isNullish(value) ? value : value}
-            onChange={(newValue) => {
-              return onChange?.(newValue as T);
-            }}
-            renderNullString={resolvedRenderNullString}
-            renderUndefinedString={resolvedRenderUndefinedString}
-            dateFormat={dateFormat}
-            dateTimeZone={dateTimeZone}
-          />
-        );
-      })
-      .exhaustive();
-  }
-
-  // if no `renderAsType` was provided, then we will try to infer the
-  // type in order to render the appropriate component.
   if (isNullish(value)) {
-    // it doesn't matter if we are in edit more or not, if the value is
-    // nullish and there is no `renderAsType`, all we can do is render in
-    // display mode.
     return (
       <NullOrUndefinedValueItem
         value={value}
-        renderNullString={resolvedRenderNullString}
-        renderUndefinedString={resolvedRenderUndefinedString}
+        renderNullString={renderNullString ?? i18n.noValue}
+        renderUndefinedString={renderUndefinedString ?? i18n.noValue}
       />
     );
   }
-
-  if (isBoolean(value)) {
-    return (
-      <BooleanValueItem
-        editMode={editMode}
-        value={value}
-        onChange={(newValue) => {
-          return onChange?.(newValue as T);
-        }}
-        renderNullString={resolvedRenderNullString}
-        renderUndefinedString={resolvedRenderUndefinedString}
-        renderBooleanTrue={resolvedRenderBooleanTrue}
-        renderBooleanFalse={resolvedRenderBooleanFalse}
-      />
-    );
-  }
-
-  if (isDate(value) || isISODateString(value)) {
-    return (
-      <DateValueItem
-        editMode={editMode}
-        value={value}
-        onChange={(newValue) => {
-          return onChange?.(newValue as T);
-        }}
-        renderNullString={resolvedRenderNullString}
-        renderUndefinedString={resolvedRenderUndefinedString}
-        dateFormat={dateFormat}
-        dateTimeZone={dateTimeZone}
-      />
-    );
-  }
-
-  if (isNumber(value)) {
-    return (
-      <NumberValueItem
-        editMode={editMode}
-        value={value}
-        onChange={(newValue) => {
-          return onChange?.(newValue as T);
-        }}
-        renderNullString={resolvedRenderNullString}
-        renderUndefinedString={resolvedRenderUndefinedString}
-      />
-    );
-  }
-
-  if (isString(value)) {
-    return (
-      <TextValueItem
-        editMode={editMode}
-        value={value}
-        onChange={(newValue) => {
-          return onChange?.(newValue as T);
-        }}
-        renderNullString={resolvedRenderNullString}
-        renderUndefinedString={resolvedRenderUndefinedString}
-        renderEmptyString={resolvedRenderEmptyString}
-      />
-    );
-  }
-
-  // fallback, just cast to string
   return <Text>{String(value)}</Text>;
 }

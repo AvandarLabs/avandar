@@ -26,8 +26,12 @@ export function ChargeRulers({
     <g>
       {amounts.map((total, index) => {
         return (
-          <AmountRuler
-            key={index}
+          // prettier-ignore
+          // The two ruler slots always mean billed amount then
+          // reference amount. Their identities remain fixed as
+          // totals change.
+          // react-doctor-disable-next-line no-array-index-as-key
+          <AmountRuler key={index}
             {...{
               input,
               total,

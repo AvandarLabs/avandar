@@ -40,10 +40,10 @@ export function GisTally({
       data-selected-quantity={selectedQuantity}
       data-total-quantity={totalQuantity}
     >
-      {slots.map(([text, x, y, width, fontSize, maxLines, color], index) => {
+      {slots.map(([text, x, y, width, fontSize, maxLines, color]) => {
         return (
           <FitText
-            key={index}
+            key={`${x}:${y}`}
             {...{ text, x, y, width, fontSize, maxLines, color }}
             breakLongWords
             normalizeWhitespace

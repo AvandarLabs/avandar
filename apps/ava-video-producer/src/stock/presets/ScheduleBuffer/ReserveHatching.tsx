@@ -10,8 +10,12 @@ export function ReserveHatching({ x, width }: Readonly<Props>): ReactNode {
     <g>
       {Array.from({ length: Math.floor(width / 12) }, (_, index) => {
         return (
-          <SketchedShape
-            key={index}
+          // prettier-ignore
+          // Generated hatch marks occupy fixed spacing slots.
+          // Width changes append or remove marks at the end
+          // without reordering existing slots.
+          // react-doctor-disable-next-line no-array-index-as-key
+          <SketchedShape key={index}
             shape={{
               kind: "path",
               d: `M${x + index * 12} 370 l${Math.min(10, width - index * 12)} -60`,

@@ -5,7 +5,10 @@ import { type Props } from "./LocationCountsShared.types";
 function _getLocations({ input, grouping }: Readonly<Omit<Props, "accent">>) {
   const positions = input.points.map((point) => {
     const cluster = input.clusters.find(propEq("id", point.clusterId))!;
-    return getClusterPointPositionFromPoint({ point, cluster, grouping });
+    return {
+      ...getClusterPointPositionFromPoint({ point, cluster, grouping }),
+      pointId: point.id,
+    };
   });
   return positions
     .filter((position, index) => {
@@ -20,6 +23,7 @@ function _getLocations({ input, grouping }: Readonly<Omit<Props, "accent">>) {
         return other.x === position.x && other.y === position.y;
       });
       return {
+        id: position.pointId,
         x: position.x,
         y: position.y,
         numMembers: members.length,

@@ -34,13 +34,18 @@ export function LunchTray({
       <PersonGlyph x={0} y={190} size={32} color={accent} />
       <g data-tray-for={learner.id} transform={`translate(0 ${y})`}>
         {input.plannedComponents.map((component, componentIndex) => {
+          // A tray and its plan have at most four components.
+          // Constructing a Set per tray was slower in the bounded
+          // lookup benchmark.
+          // react-doctor-disable-next-line js-set-map-lookups
+          const isServed = tray.componentIds.includes(component.id);
           return (
             <TrayCompartment
               key={component.id}
               component={component}
               index={componentIndex}
               frame={frame}
-              isServed={tray.componentIds.includes(component.id)}
+              isServed={isServed}
               showNames={input.showComponentNames}
               emphasize={input.emphasizeMissingComponents}
               accent={accent}

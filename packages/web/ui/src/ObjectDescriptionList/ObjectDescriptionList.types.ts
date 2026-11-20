@@ -303,7 +303,7 @@ type BaseObjectArrayRenderOptions<
    * The key to use as the React key in order to render the array of
    * items in a stable way. If an `idKey` is not provided we will
    * automatically test if the object has an "id" key, otherwise
-   * we will fall back to the array index.
+   * we will fall back to the object reference identity.
    */
   idKey?: Extract<keyof T, string | number>;
 };

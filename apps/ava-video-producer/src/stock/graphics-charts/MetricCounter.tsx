@@ -74,6 +74,12 @@ export function MetricCounter({
                 motion.hero,
               );
               return (
+                // prettier-ignore
+                // Bars retain fixed horizontal slots
+                // throughout the frame-driven grow
+                // animation. Equal authored heights remain
+                // distinct bars.
+                // react-doctor-disable-next-line no-array-index-as-key
                 <Arrive frame={frame} at={BARS_AT} index={i} key={i}>
                   <rect
                     x={172 + i * 50}

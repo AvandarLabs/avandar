@@ -157,6 +157,9 @@ boundaryLabelInputs.forEach((input, index) => {
 });
 
 test("serialized contract exposes collection identity validation", () => {
+  // This assertion exercises the JSON serialization boundary of the public
+  // contract.
+  // react-doctor-disable-next-line no-json-parse-stringify-clone
   const rules = JSON.parse(
     JSON.stringify(mobileClinicRelocationContract.semanticRules),
   ) as typeof mobileClinicRelocationContract.semanticRules;
@@ -174,6 +177,9 @@ test("serialized contract exposes collection identity validation", () => {
 });
 
 test("serialized contract exposes site separation validation", () => {
+  // This assertion exercises the JSON serialization boundary of the public
+  // contract.
+  // react-doctor-disable-next-line no-json-parse-stringify-clone
   const rules = JSON.parse(
     JSON.stringify(mobileClinicRelocationContract.semanticRules),
   ) as typeof mobileClinicRelocationContract.semanticRules;
@@ -191,6 +197,9 @@ test("serialized contract exposes site separation validation", () => {
 });
 
 test("serialized contract exposes booking reference validation", () => {
+  // This assertion exercises the JSON serialization boundary of the public
+  // contract.
+  // react-doctor-disable-next-line no-json-parse-stringify-clone
   const rules = JSON.parse(
     JSON.stringify(mobileClinicRelocationContract.semanticRules),
   ) as typeof mobileClinicRelocationContract.semanticRules;
@@ -211,6 +220,9 @@ test("serialized contract exposes booking reference validation", () => {
 });
 
 test("serialized contract exposes booking exclusivity validation", () => {
+  // This assertion exercises the JSON serialization boundary of the public
+  // contract.
+  // react-doctor-disable-next-line no-json-parse-stringify-clone
   const rules = JSON.parse(
     JSON.stringify(mobileClinicRelocationContract.semanticRules),
   ) as typeof mobileClinicRelocationContract.semanticRules;

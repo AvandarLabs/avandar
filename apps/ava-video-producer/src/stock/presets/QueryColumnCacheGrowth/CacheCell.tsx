@@ -35,6 +35,11 @@ export function CacheCell({
     >
       {lines.map((line, index) => {
         return (
+          // prettier-ignore
+          // The literal cell has fixed first-eight-grapheme and
+          // remainder line slots. Duplicate text has no
+          // independent identity.
+          // react-doctor-disable-next-line no-array-index-as-key
           <LiteralDataText key={index} value={line} x={x} y={y + index * 17} />
         );
       })}

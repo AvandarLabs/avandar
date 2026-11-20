@@ -1,9 +1,9 @@
-import { mix } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { getReferralLaneStateFromFrame } from "./getReferralLaneStateFromFrame";
 import type { Input } from "./ReferralReturnAcknowledgement.schema";
 import type { ReactNode } from "react";
 
@@ -28,33 +28,8 @@ export function ReferralLane({
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const motion = GraphicThemeHooks.useGraphicMotion();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
-  const travel = referral.attended
-    ? motion.ramp(
-        frame,
-        41 + index * motion.stagger.list,
-        motion.scale(36),
-        motion.travel.easing,
-      )
-    : 0;
-  const x = mix(travel, 180, 650);
-  const y = 162 + index * (input.showLedger ? 58 : 72);
-  const returned = referral.acknowledged && frame >= 82 + index * 2;
-  const receiptX = mix(
-    motion.ramp(
-      frame,
-      82 + index * motion.stagger.list,
-      motion.scale(23),
-      motion.travel.easing,
-    ),
-    616,
-    228,
-  );
-  const state =
-    returned && frame >= 105 + index * 2
-      ? "closed"
-      : travel === 1
-        ? "attendedOpen"
-        : "waiting";
+  const { travel, x, y, returned, receiptX, state } =
+    getReferralLaneStateFromFrame({ referral, index, frame, input, motion });
   return (
     <g
       opacity={motion.ramp(

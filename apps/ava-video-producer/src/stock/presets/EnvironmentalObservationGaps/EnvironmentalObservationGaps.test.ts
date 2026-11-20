@@ -122,6 +122,9 @@ registerStockPresetAssertions(assertions);
 registerStockTextLayoutAssertions(assertions);
 test("serialized semantic rules retain every runtime relation", () => {
   assert.deepEqual(
+    // This assertion exercises the JSON serialization boundary of the public
+    // contract.
+    // react-doctor-disable-next-line no-json-parse-stringify-clone
     JSON.parse(JSON.stringify(contract.semanticRules)).map(
       ({ id, paths }: { id: string; paths: string[] }) => {
         return { id, paths };

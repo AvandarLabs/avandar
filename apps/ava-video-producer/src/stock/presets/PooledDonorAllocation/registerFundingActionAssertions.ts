@@ -287,9 +287,10 @@ function _getBatchPoints({
   markup: string;
   ids: string[];
 }): number[][] {
+  const batchIds = new Set(ids);
   const tokens = [...markup.matchAll(/<g data-token="([^"]*)"[^>]*>/g)].filter(
     (match) => {
-      return ids.includes(match[1]);
+      return batchIds.has(match[1]);
     },
   );
   assert.equal(tokens.length, ids.length);

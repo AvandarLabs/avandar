@@ -13,6 +13,21 @@ type Props = {
   blockIndex: number;
   fieldIndex: number;
 };
+function _getCellText({
+  block,
+  fieldId,
+}: Readonly<{
+  block: Input["blocks"][number];
+  fieldId: string;
+}>): string | null {
+  const cell = block.cells.find((candidate) => {
+    return candidate.fieldId === fieldId;
+  });
+  if (!cell) {
+    throw new Error(`Missing block cell for field: ${fieldId}`);
+  }
+  return cell.text;
+}
 /** Field identity travels with its value as block stacks become table rows. */
 export function BlockCellStrip({
   input,
@@ -25,9 +40,9 @@ export function BlockCellStrip({
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const field = input.fields[fieldIndex],
     block = input.blocks[blockIndex];
-  const value = block.cells.find(({ fieldId }) => {
-    return fieldId === field.id;
-  })!.text;
+  // RepeatingBlocksToTable.schema verifies exactly one keyed cell for
+  // every field in each block.
+  const value = _getCellText({ block, fieldId: field.id });
   const { x, y, width } = getBlockCellGeometryFromFrame({
     motion,
     input,

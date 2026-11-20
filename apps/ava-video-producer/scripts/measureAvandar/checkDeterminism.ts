@@ -22,14 +22,18 @@ export async function checkDeterminism(
   const stage = run.page.locator(".avandar-film");
   await ReviewPageDriver.load(run, { url, feature });
   await ReviewPageDriver.seek(run, frame);
-  const direct = await stage.screenshot();
-  const directText = await stage.innerText();
+  const [direct, directText] = await Promise.all([
+    stage.screenshot(),
+    stage.innerText(),
+  ]);
   // Take a non-sequential route through both earlier and later states.
   await ReviewPageDriver.seek(run, 740);
   await ReviewPageDriver.seek(run, 17);
   await ReviewPageDriver.seek(run, frame);
-  const afterSeeks = await stage.screenshot();
-  const afterSeeksText = await stage.innerText();
+  const [afterSeeks, afterSeeksText] = await Promise.all([
+    stage.screenshot(),
+    stage.innerText(),
+  ]);
   const pixelComparison = getPixelComparisonFromScreenshots(direct, afterSeeks);
   const determinismResult = {
     feature,

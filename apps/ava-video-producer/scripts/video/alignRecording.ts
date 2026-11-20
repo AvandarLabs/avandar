@@ -22,8 +22,10 @@ export async function alignRecording(
   options: Options,
   workspace: string,
 ): Promise<string> {
-  const recording = await safeInputFile(options.audio!, AUDIO_EXTENSIONS);
-  const srtFile = await safeInputFile(options.srt!, [".srt"]);
+  const [recording, srtFile] = await Promise.all([
+    safeInputFile(options.audio!, AUDIO_EXTENSIONS),
+    safeInputFile(options.srt!, [".srt"]),
+  ]);
   const digest = await getSha256FromFile(recording);
   const src = `audio/${plan.id}/recorded-${digest}${path.extname(recording).toLowerCase()}`;
   const derived = applySrt({
@@ -39,6 +41,9 @@ export async function alignRecording(
   )
     throw new Error("Provided recording has no audio stream");
   const directory = await freshStage(plan, "aligned", workspace);
+  // Finish validating and creating the private staging path before mutating
+  // public audio output.
+  // react-doctor-disable-next-line server-sequential-independent-await
   const assetDirectory = await ensureDirectory(
     workspace,
     `public/audio/${plan.id}`,

@@ -9,19 +9,20 @@ export function parseArgs(argv: string[]): Options {
   if (!COMMANDS.includes(command as Command) || !filename)
     throw new Error(HELP);
   const options: Options = { command: command as Command, filename };
-  const allowed =
+  const allowed = new Set(
     command === "tts"
       ? ["--voice", "--rate"]
       : command === "align"
         ? ["--audio", "--srt"]
         : command === "preview" || command === "render"
           ? ["--theme"]
-          : [];
+          : [],
+  );
   const seen = new Set<string>();
   for (let index = 0; index < rest.length; index += 2) {
     const flag = rest[index];
     const value = rest[index + 1];
-    if (!allowed.includes(flag) || !value || seen.has(flag))
+    if (!allowed.has(flag) || !value || seen.has(flag))
       throw new Error(`Invalid or repeated option: ${flag}\n${HELP}`);
     seen.add(flag);
     if (flag === "--rate") options.rate = Number(value);

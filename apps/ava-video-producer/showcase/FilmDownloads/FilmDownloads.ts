@@ -44,6 +44,9 @@ async function _requestJob(
   url: string,
   init?: RequestInit,
 ): Promise<DownloadStatus> {
+  // The export service returns actionable error messages in JSON.
+  // The response.ok branch handles that payload before returning success.
+  // react-doctor-disable-next-line no-fetch-response-used-without-status-check
   const response = await fetch(url, init);
   const body: unknown = await response.json();
   const message =

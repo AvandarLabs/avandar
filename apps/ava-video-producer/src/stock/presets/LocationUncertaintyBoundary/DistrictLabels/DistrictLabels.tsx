@@ -16,18 +16,21 @@ export function DistrictLabels({
   return (
     <g>
       {input.districts.map((district, index) => {
+        // At most four district indices are tested. The bounded
+        // lookup benchmark including Set construction favors array
+        // scanning.
+        // react-doctor-disable-next-line js-set-map-lookups
+        const isPossible = focus.possible.includes(index);
         return (
           <g
             key={district.id}
-            data-possible-district={
-              focus.possible.includes(index) ? district.id : undefined
-            }
-            transform={`translate(0 ${focus.possible.includes(index) ? -8 * motion.ramp(frame, 60, motion.scale(36)) : 0})`}
+            data-possible-district={isPossible ? district.id : undefined}
+            transform={`translate(0 ${isPossible ? -8 * motion.ramp(frame, 60, motion.scale(36)) : 0})`}
           >
             <PossibilityMark
               districtId={district.id}
               index={index}
-              isPossible={focus.possible.includes(index)}
+              isPossible={isPossible}
             />
             <LabelSlots
               labels={[

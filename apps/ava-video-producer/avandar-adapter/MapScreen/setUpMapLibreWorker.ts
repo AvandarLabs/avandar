@@ -13,5 +13,8 @@ import workerSource from "maplibre-gl/dist/maplibre-gl-worker.mjs?raw";
 // The URL is never revoked on purpose: MapLibre starts a worker from it each
 // time a map is created, so it must stay valid for the page's lifetime.
 setWorkerUrl(
+  // This module owns the shared worker URL until page teardown. Revoking
+  // on a map unmount would break later maps.
+  // react-doctor-disable-next-line no-create-object-url-without-revoke
   URL.createObjectURL(new Blob([workerSource], { type: "text/javascript" })),
 );

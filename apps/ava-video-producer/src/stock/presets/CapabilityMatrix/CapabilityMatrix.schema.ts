@@ -41,10 +41,13 @@ export const inputSchema = z
   })
   .superRefine((input, context) => {
     const optionIds = input.options.map(prop("id"));
+    const optionIdSet = new Set(optionIds);
     Array.from(["options", "capabilities"] as const).forEach((field) => {
       if (
-        new Set(input[field].map(prop<{ id: string }, "id", string>("id")))
-          .size !== input[field].length
+        (field === "options"
+          ? optionIdSet
+          : new Set(input[field].map(prop("id")))
+        ).size !== input[field].length
       ) {
         context.addIssue({
           code: "custom",
@@ -59,7 +62,7 @@ export const inputSchema = z
         cellIds.length !== optionIds.length ||
         new Set(cellIds).size !== cellIds.length ||
         cellIds.some((id) => {
-          return !optionIds.includes(id);
+          return !optionIdSet.has(id);
         })
       ) {
         context.addIssue({

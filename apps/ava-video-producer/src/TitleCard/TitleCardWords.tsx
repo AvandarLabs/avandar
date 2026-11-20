@@ -20,10 +20,15 @@ export function TitleCardWords({
           motion.rise.easing,
         );
         return (
+          // prettier-ignore
           // One mask per word, never one mask around several lines. The
           // word travels out from behind a hard edge; a word that
           // merely fades up reads as a slide transition, not as
           // typography.
+          // Words occupy fixed reveal slots in one authored title.
+          // Repeated words need distinct slots, and this renderer
+          // never reorders or filters them.
+          // react-doctor-disable-next-line no-array-index-as-key
           <TitleCardWord key={`${word}-${i}`} word={word} progress={t} />
         );
       })}

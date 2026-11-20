@@ -39,10 +39,10 @@ export function BatteryWindows({ input }: Readonly<Props>): ReactNode {
   ];
   return (
     <g>
-      {labels.map(({ text, x, y, width }, index) => {
+      {labels.map(({ text, x, y, width }) => {
         return (
           <FitText
-            key={index}
+            key={`${x}:${y}`}
             text={text}
             x={x}
             y={y}

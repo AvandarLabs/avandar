@@ -255,6 +255,8 @@ async function _createRun(
     fixtureDir: options.fixtureDir ?? "demo-data",
     fixtureFiles: options.fixtureFiles,
   });
+  // Validate and hash all fixtures before creating capture output on disk.
+  // react-doctor-disable-next-line server-sequential-independent-await
   const runDir = await createRunDirectory({
     rootPath: settings.root,
     runLabel: settings.runLabel,

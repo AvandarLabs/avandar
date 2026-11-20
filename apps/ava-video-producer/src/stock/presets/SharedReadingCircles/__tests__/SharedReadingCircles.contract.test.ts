@@ -174,6 +174,9 @@ test("every book is assigned once and references do not mutate during stress reg
     "reader 2",
     "reader 3",
   ]);
+  // This assertion exercises the JSON serialization boundary of the public
+  // contract.
+  // react-doctor-disable-next-line no-json-parse-stringify-clone
   const rules = JSON.parse(
     JSON.stringify(contract.semanticRules),
   ) as typeof contract.semanticRules;

@@ -32,8 +32,12 @@ export function WordMaskedLine({
           motion.rise.easing,
         );
         return (
-          <MaskedWord
-            key={`${index}-${word}`}
+          // prettier-ignore
+          // Each word occupies its authored reveal slot. Repeated
+          // words are valid and the line never reorders or filters
+          // them.
+          // react-doctor-disable-next-line no-array-index-as-key
+          <MaskedWord key={`${index}-${word}`}
             fontSize={fontSize}
             progress={progress}
             style={getWordStyle(word)}

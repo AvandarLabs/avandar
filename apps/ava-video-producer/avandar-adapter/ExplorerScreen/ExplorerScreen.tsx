@@ -1,25 +1,11 @@
-import { Select, Tabs } from "@avandar/ui";
+import { Select } from "@avandar/ui";
 import { propEq } from "@avandar/utils";
-import { Box, Button, Group, Stack, Text } from "@mantine/core";
-import {
-  IconChevronDown,
-  IconDownload,
-  IconFolderOpen,
-  IconRotateClockwise,
-} from "@tabler/icons-react";
+import { Box, Stack } from "@mantine/core";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import { useMemo } from "react";
-import drawerCss from "@/components/CanvasDrawer/CanvasDrawer.module.css";
-import drawerBodyCss from "@/components/CanvasDrawer/CanvasDrawerBody/CanvasDrawerBody.module.css";
-import { CanvasDrawerContext } from "@/components/CanvasDrawer/CanvasDrawerContext";
-import { CanvasDrawerResizeHandle } from "@/components/CanvasDrawer/CanvasDrawerResizeHandle/CanvasDrawerResizeHandle";
-import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
-import { SeriesAwareVizForm } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm";
 import { BarChart } from "@/lib/ui/viz/BarChart/BarChart";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import { AppliedFilterSummary } from "@/views/DataExplorerApp/AppliedFilterSummary/AppliedFilterSummary";
-import railCss from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer.module.css";
-import { DataExplorerDrawerRail } from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawerRail/DataExplorerDrawerRail";
 import { QueryColumnMultiSelect } from "@/views/DataExplorerApp/QueryColumnMultiSelect/QueryColumnMultiSelect";
 import { AggregationFields } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/AggregationFields";
 import { LimitFields } from "@/views/DataExplorerApp/QueryForm/ManualQueryForm/LimitFields/LimitFields";
@@ -35,14 +21,11 @@ import {
   EXPLORER_DISTRICT_COUNTS,
   EXPLORER_SELECTED_COLUMNS,
 } from "../Explorer.constants";
+import { ExplorerDrawer } from "./ExplorerDrawer/ExplorerDrawer";
 import css from "./ExplorerScreen.module.css";
 import { ExplorerSqlEditor } from "./ExplorerSqlEditor";
-import {
-  aggregateColumns,
-  barConfig,
-  emptyFilter,
-  explorerStage,
-} from "./explorerStage";
+import { barConfig, emptyFilter, explorerStage } from "./explorerStage";
+import { ExplorerToolbar } from "./ExplorerToolbar/ExplorerToolbar";
 import { useExplorerVideoTargets } from "./useExplorerVideoTargets";
 import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import type { ExplorerMode } from "./explorerStage";
@@ -203,11 +186,6 @@ export function ExplorerScreen({
     <ExplorerSqlEditor sql={stage.sql} isEditingSql={stage.isEditingSql} />
   );
 
-  // The drawer, toolbar and canvas below remain inline rather than further
-  // split: they share `stage`, `filters`, `manualGroups`, and `sqlEditor` from
-  // this closure in ways that would otherwise require threading most of this
-  // function's state through prop lists, without reducing the file's real
-  // complexity.
   return (
     <div
       ref={rootRef}
@@ -223,55 +201,7 @@ export function ExplorerScreen({
         stage.isChart ? "chart" : stage.isSql ? "sql" : "filter"
       }
     >
-      <Group
-        bg="white"
-        py="xs"
-        w="100%"
-        justify="flex-end"
-        px="md"
-        pos="relative"
-        className={css.explorerToolbar}
-      >
-        <Text size="xs" c="neutral.6" className={css.explorerFictional}>
-          Fictional demonstration data
-        </Text>
-        <Button
-          variant="subtle"
-          color="neutral"
-          leftSection={<IconRotateClockwise size={16} />}
-          size="compact-sm"
-          onClick={_noop}
-        >
-          Reset
-        </Button>
-        <Button
-          variant="outline"
-          color="neutral"
-          leftSection={<IconFolderOpen size={16} />}
-          size="compact-sm"
-          onClick={_noop}
-        >
-          Open
-        </Button>
-        <Button
-          variant="outline"
-          color="neutral"
-          rightSection={<IconChevronDown size={16} />}
-          size="compact-sm"
-          onClick={_noop}
-        >
-          Save
-        </Button>
-        <Button
-          variant="outline"
-          color="neutral"
-          leftSection={<IconDownload size={16} />}
-          size="compact-sm"
-          onClick={_noop}
-        >
-          Export
-        </Button>
-      </Group>
+      <ExplorerToolbar />
       {stage.filterCommitted ? (
         <div className={css.explorerSummary}>
           <AppliedFilterSummary filters={appliedFilters} isStatusRegion />
@@ -308,87 +238,9 @@ export function ExplorerScreen({
           />
         )}
       </div>
-      <CanvasDrawerContext.Provider value={context}>
-        <div className={drawerCss.canvasDrawerRoot} data-chrome="true">
-          <CanvasDrawerResizeHandle />
-          <Tabs
-            size="sm"
-            keepMounted={false}
-            tabIds={["query", "visualizations"]}
-            value={stage.isVisualizations ? "visualizations" : "query"}
-            onTabChange={_noop}
-            withActiveIndicator={stage.drawerProgress > 0}
-            classNames={{ list: railCss.drawerRail }}
-            listRightSection={
-              <DataExplorerDrawerRail
-                activeTab={stage.isVisualizations ? "visualizations" : "query"}
-                isCollapsed={stage.drawerProgress === 0}
-                regionId="demo-explorer-drawer"
-                queryEditorMode={stage.isSql ? "sql" : "manual"}
-                vizType={stage.isChart ? "bar" : "table"}
-                isStructuredQueryInSync
-                onQueryEditorModeChange={_noop}
-                onVizTypeChange={_noop}
-                onToggleCollapsed={_noop}
-              />
-            }
-            renderTabHeader={{
-              query: <span data-video-target="explorer-query-tab">Query</span>,
-              visualizations: (
-                <span data-video-target="explorer-viz-tab">Visualizations</span>
-              ),
-            }}
-            wrapPanels={(panels) => {
-              return (
-                <div
-                  id="demo-explorer-drawer"
-                  className={css.explorerDrawerBody}
-                  style={{ height: drawerHeight * stage.drawerProgress }}
-                >
-                  <Box
-                    className={drawerBodyCss.canvasDrawerBody}
-                    style={{ height: drawerHeight }}
-                  >
-                    {stage.drawerProgress > 0 ? panels : null}
-                  </Box>
-                </div>
-              );
-            }}
-            renderTabPanel={{
-              query: () => {
-                return stage.isSql ? (
-                  <SettingsColumns
-                    layout="columns"
-                    minColumnWidth={320}
-                    groups={[{ id: "sql", title: "SQL", content: sqlEditor }]}
-                  />
-                ) : (
-                  <SettingsColumns groups={manualGroups} layout="columns" />
-                );
-              },
-              visualizations: () => {
-                return stage.isChart ? (
-                  <SeriesAwareVizForm
-                    fields={aggregateColumns}
-                    config={barConfig}
-                    onConfigChange={_noop}
-                    layout="columns"
-                  />
-                ) : (
-                  <Stack gap={4} p="sm">
-                    <Text size="sm" fw={600} c="neutral.7">
-                      Table view has no chart settings.
-                    </Text>
-                    <Text size="xs" c="neutral.6">
-                      Pick a chart type above to configure one.
-                    </Text>
-                  </Stack>
-                );
-              },
-            }}
-          />
-        </div>
-      </CanvasDrawerContext.Provider>
+      <ExplorerDrawer
+        {...{ stage, drawerHeight, context, manualGroups, sqlEditor }}
+      />
     </div>
   );
 }

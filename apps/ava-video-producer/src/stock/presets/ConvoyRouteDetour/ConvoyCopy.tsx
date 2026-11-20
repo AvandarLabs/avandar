@@ -17,10 +17,10 @@ export function ConvoyCopy({ input, accent }: Readonly<Props>): ReactNode {
   ];
   return (
     <g>
-      {labels.map(([text, x, y, width, fontSize, color], index) => {
+      {labels.map(([text, x, y, width, fontSize, color]) => {
         return (
           <FitText
-            key={index}
+            key={`${x}:${y}`}
             text={text}
             x={x}
             y={y}

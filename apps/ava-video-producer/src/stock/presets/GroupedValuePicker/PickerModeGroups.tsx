@@ -68,8 +68,12 @@ export function PickerModeGroups({
             </g>
             {Array.from({ length: group.count }, (_, index) => {
               return (
-                <StockRect
-                  key={index}
+                // prettier-ignore
+                // Generated frequency marks occupy fixed
+                // count slots within one keyed value group.
+                // They have no independent data identity.
+                // react-doctor-disable-next-line no-array-index-as-key
+                <StockRect key={index}
                   data-frequency-token={String(group.value)}
                   x={group.x + 154}
                   y={

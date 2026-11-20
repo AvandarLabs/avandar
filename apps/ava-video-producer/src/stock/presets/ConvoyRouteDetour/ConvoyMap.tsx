@@ -2,6 +2,7 @@ import { mix } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ConvoyLandmarks } from "./ConvoyLandmarks/ConvoyLandmarks";
+import { getConvoyRouteFromRole } from "./getConvoyRouteFromRole";
 import type { Input } from "./ConvoyRouteDetour.schema";
 import type { ReactNode } from "react";
 
@@ -17,9 +18,9 @@ export function ConvoyMap({
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const motion = GraphicThemeHooks.useGraphicMotion();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
-  const points = input.routes.find(({ role }) => {
-    return role === "blocked";
-  })!.points;
+  // ConvoyRouteDetour.schema requires exactly one blocked route with at
+  // least four points.
+  const points = getConvoyRouteFromRole({ input, role: "blocked" }).points;
   const start = points[input.obstruction.segmentIndex];
   const end = points[input.obstruction.segmentIndex + 1];
   return (

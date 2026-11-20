@@ -169,6 +169,9 @@ test("actual X paths project authored latitude and longitude without spreading c
 });
 
 test("serialized contract exposes incident identity validation", () => {
+  // This assertion exercises the JSON serialization boundary of the public
+  // contract.
+  // react-doctor-disable-next-line no-json-parse-stringify-clone
   const rules = JSON.parse(
     JSON.stringify(fictionalConflictGlobeContract.semanticRules),
   ) as typeof fictionalConflictGlobeContract.semanticRules;
@@ -186,6 +189,9 @@ test("serialized contract exposes incident identity validation", () => {
 });
 
 test("serialized contract exposes shortest sweep validation", () => {
+  // This assertion exercises the JSON serialization boundary of the public
+  // contract.
+  // react-doctor-disable-next-line no-json-parse-stringify-clone
   const rules = JSON.parse(
     JSON.stringify(fictionalConflictGlobeContract.semanticRules),
   ) as typeof fictionalConflictGlobeContract.semanticRules;
@@ -203,6 +209,9 @@ test("serialized contract exposes shortest sweep validation", () => {
 });
 
 test("serialized contract exposes endpoint visibility validation", () => {
+  // This assertion exercises the JSON serialization boundary of the public
+  // contract.
+  // react-doctor-disable-next-line no-json-parse-stringify-clone
   const rules = JSON.parse(
     JSON.stringify(fictionalConflictGlobeContract.semanticRules),
   ) as typeof fictionalConflictGlobeContract.semanticRules;

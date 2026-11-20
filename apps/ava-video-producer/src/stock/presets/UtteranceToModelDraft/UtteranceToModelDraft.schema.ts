@@ -98,6 +98,9 @@ export const inputSchema = z
         return id === item.partId;
       });
       const label = _normalizePhrase(item.label);
+      // _normalizePhrase returns a string. This is substring matching,
+      // not array membership.
+      // react-doctor-disable-next-line js-set-map-lookups
       if (!part || !label || !_normalizePhrase(part.text).includes(label)) {
         context.addIssue({
           code: "custom",

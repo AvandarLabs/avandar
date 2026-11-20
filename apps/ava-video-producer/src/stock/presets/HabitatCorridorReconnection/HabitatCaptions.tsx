@@ -40,10 +40,10 @@ export function HabitatCaptions({ input }: Readonly<Props>): ReactNode {
   ].filter(isDefined);
   return (
     <g>
-      {labels.map(({ text, x, y, width, maxLines }, index) => {
+      {labels.map(({ text, x, y, width, maxLines }) => {
         return (
           <FitText
-            key={index}
+            key={`${x}:${y}`}
             text={text}
             x={x}
             y={y}

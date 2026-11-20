@@ -29,13 +29,17 @@ export function UncertaintyMap({
         stroke={tokens.color.line}
       />
       {input.districts.map((district, index) => {
+        // The schema bounds districts to four. Creating a Set for
+        // this frame costs more than these bounded array lookups.
+        // react-doctor-disable-next-line js-set-map-lookups
+        const isPossible = focus.possible.includes(index);
         return (
           <DistrictFootprint
             key={district.id}
             district={district}
             index={index}
             frame={frame}
-            isPossible={focus.possible.includes(index)}
+            isPossible={isPossible}
             accent={accent}
           />
         );

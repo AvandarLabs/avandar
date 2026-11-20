@@ -104,6 +104,11 @@ export function CaptionOverlay({
       }}
     >
       {geometry.lines.map((line, index) => {
+        // prettier-ignore
+        // These stateless text nodes are fixed wrapped-line slots.
+        // Duplicate lines are valid and carry no independent item
+        // state.
+        // react-doctor-disable-next-line no-array-index-as-key
         return <div key={index}>{line}</div>;
       })}
     </div>

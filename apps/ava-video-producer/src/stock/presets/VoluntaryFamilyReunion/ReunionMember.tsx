@@ -2,6 +2,7 @@ import { mix } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { getReunionHandFromFrame } from "./getReunionHandFromFrame";
 import type { Input } from "./VoluntaryFamilyReunion.schema";
 import type { ReactNode } from "react";
 
@@ -45,22 +46,17 @@ export function ReunionMember({
   const stride =
     travel > 0 && travel < 1 ? Math.sin(frame * 0.5 + index) * 7 : 0;
   const side = groupIndex === 0 ? 1 : -1;
-  const accepting =
-    index === 0 &&
-    frame >= 28 + groupIndex * motion.scaleStagger(18) &&
-    frame <= 40 + groupIndex * motion.scaleStagger(18);
-  const acceptProgress = motion.ramp(
+  const { accepting, handX, handY } = getReunionHandFromFrame({
+    index,
     frame,
-    28 + groupIndex * motion.scaleStagger(18),
-    motion.whip,
-    motion.travel.easing,
-  );
-  const handX = accepting
-    ? mix(acceptProgress, x + 18, groupIndex === 0 ? 246 : 866)
-    : x + side * (input.greeting === "wave" ? 22 : 34) * greeting;
-  const handY = accepting
-    ? mix(acceptProgress, y - 28, 282)
-    : y - 28 - (input.greeting === "wave" ? 36 : 8) * greeting;
+    groupIndex,
+    input,
+    x,
+    y,
+    side,
+    greeting,
+    motion,
+  });
   return (
     <g data-member={member.id} data-x={x} data-y={y}>
       <SketchedShape

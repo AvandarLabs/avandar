@@ -54,13 +54,18 @@ export function CachedRelation({
         );
       })}
       {columns.map((column, index) => {
+        // The schema permits at most five cached columns. A
+        // per-frame Set costs more than the bounded lookup in
+        // measurement.
+        // react-doctor-disable-next-line js-set-map-lookups
+        const isAdded = !input.cachedColumnIds.includes(column.id);
         return (
           <CacheColumn
             key={column.id}
             column={column}
             index={index}
             rowCount={scene.rowCount}
-            isAdded={!input.cachedColumnIds.includes(column.id)}
+            isAdded={isAdded}
             growth={scene.growth}
             accent={accent}
           />

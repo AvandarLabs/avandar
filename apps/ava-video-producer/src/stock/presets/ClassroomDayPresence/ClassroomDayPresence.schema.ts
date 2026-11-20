@@ -62,11 +62,12 @@ export const inputSchema = z
     }
     input.days.forEach((day, index) => {
       const ids = day.records.map(prop("learnerId"));
+      const recordIds = new Set(ids);
       if (
         ids.length !== input.learners.length ||
-        new Set(ids).size !== ids.length ||
+        recordIds.size !== ids.length ||
         !input.learners.every((learner) => {
-          return ids.includes(learner.id);
+          return recordIds.has(learner.id);
         })
       ) {
         context.addIssue({

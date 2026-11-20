@@ -50,7 +50,7 @@ export function createCameraTrackSchema(
   return z
     .array(
       z
-        .object({
+        .strictObject({
           at: z.number().int().nonnegative(),
           x: z.number().min(0).max(width),
           y: z.number().min(0).max(height),
@@ -62,7 +62,6 @@ export function createCameraTrackSchema(
             ])
             .default("glide"),
         })
-        .strict()
         .refine((key) => {
           return (
             key.x >= width / 2 / key.zoom &&

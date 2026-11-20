@@ -3,6 +3,7 @@ import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataTex
 import { StockRect } from "../../primitives/StockRect/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getJoinRowLayoutFromInputAndFrame } from "./getJoinRowLayoutFromInputAndFrame";
+import { getJoinRowVisibility } from "./getJoinRowVisibility";
 import { JoinKeyCell } from "./JoinKeyCell";
 import { JoinMissingPartner } from "./JoinMissingPartner";
 import type { Input } from "./KeyedRowZipper.schema";
@@ -40,11 +41,18 @@ export function JoinRow({
       motion,
     });
   const hasPartner = input.rightRows.some(propEq("key", row.key));
-  if (isContext && !input.showUnmatchedTray && progress === 1) {
+  const visibility = getJoinRowVisibility({
+    input,
+    side,
+    isContext,
+    progress,
+    hasPartner,
+  });
+  if (visibility.isHidden) {
     return undefined;
   }
   return (
-    <g opacity={isContext && !input.showUnmatchedTray ? 1 - progress : 1}>
+    <g opacity={visibility.opacity}>
       <StockRect
         data-side={side}
         data-result-key={side === "left" && !isContext ? row.key : undefined}
@@ -57,7 +65,7 @@ export function JoinRow({
         fill={tokens.color.surface}
         stroke={isContext ? tokens.color.line : accent}
       />
-      {input.showKeys || progress < 1 ? (
+      {visibility.showKey ? (
         <JoinKeyCell value={row.key} x={x} y={y} side={side} accent={accent} />
       ) : undefined}
       <LiteralDataText
@@ -65,7 +73,7 @@ export function JoinRow({
         x={x + 12}
         y={y + (isContext ? 33 : 43)}
       />
-      {side === "left" && !isContext && !hasPartner && progress > 0 ? (
+      {visibility.showMissingPartner ? (
         <JoinMissingPartner
           rowKey={row.key}
           y={y}

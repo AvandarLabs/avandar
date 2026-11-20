@@ -12,7 +12,7 @@ const frame = z.number().int().nonnegative();
 const copy = z.string().trim().min(1).max(120);
 /** Native product fixture segments available to continuity compositions. */
 export const productSegmentSchema = z
-  .object({
+  .strictObject({
     feature: z.enum([
       "import",
       "explorer",
@@ -27,7 +27,6 @@ export const productSegmentSchema = z
     toFrame: frame.max(799),
     leadIn: frame.default(30),
   })
-  .strict()
   .superRefine((segment, context) => {
     const horizons = {
       import: 660,
@@ -62,32 +61,30 @@ export const productSegmentSchema = z
  * Geometry in the validated 1600 by 840 stage, measured or authored explicitly.
  */
 export const anchorSchema = z
-  .object({
+  .strictObject({
     x: z.number().min(0).max(1600),
     y: z.number().min(0).max(840),
     width: z.number().positive().max(1600),
     height: z.number().positive().max(840),
   })
-  .strict()
   .refine((box) => {
     return box.x + box.width <= 1600 && box.y + box.height <= 840;
   }, "Anchor must fit the stage");
 /** Frame-authored notation attached to a measured native product rectangle. */
 export const productAnnotationSchema = z
-  .object({
+  .strictObject({
     at: frame,
     until: frame,
     kind: z.enum(["box", "circle", "underline", "highlight", "bracket"]),
     target: anchorSchema,
     seed: z.number().int().nonnegative().default(7),
   })
-  .strict()
   .refine((cue) => {
     return cue.until > cue.at + 36;
   }, "Notation needs a reading hold");
 const annotations = z.array(productAnnotationSchema).max(12).optional();
 const overlay = z
-  .object({
+  .strictObject({
     at: frame,
     until: frame,
     target: anchorSchema,
@@ -96,7 +93,6 @@ const overlay = z
     exitFrames: frame.min(1).max(300).optional(),
     fadeFrames: frame.min(1).max(300).optional(),
   })
-  .strict()
   .refine((cue) => {
     try {
       getOverlayTimings({ cue });
@@ -105,98 +101,82 @@ const overlay = z
       return false;
     }
   }, "Overlay needs travel and a reading hold");
-const transition = z
-  .object({
-    kind: z.enum(SCENE_TRANSITION_KINDS),
-    frames: frame.max(300),
-    motion: MotionSettings.motionOptionsSchema.optional(),
-    origin: z
-      .object({ x: z.number().min(0).max(1600), y: z.number().min(0).max(840) })
-      .strict()
-      .optional(),
-  })
-  .strict();
-const stock = z
-  .object({
-    kind: z.literal("stock"),
-    request: stockRequestSchema,
-    settleFrame: frame.min(120).max(165).default(150),
-    camera: cameraTrackSchema.optional(),
-    cameraOptions: MotionSettings.motionOptionsSchema.optional(),
-    flight: objectFlightSchema.optional(),
-  })
-  .strict();
-const product = z
-  .object({
-    kind: z.literal("product"),
-    segment: productSegmentSchema,
-    annotations,
-  })
-  .strict();
-const composite = z
-  .object({
-    kind: z.literal("composite"),
-    segment: productSegmentSchema,
-    diagrams: z
-      .array(
-        z
-          .object({
-            at: frame,
-            request: stockRequestSchema,
-            label: copy,
-            overlay,
-            detail: z
-              .object({
-                x: z.number().min(0),
-                y: z.number().min(0),
-                width: z.number().min(180),
-                height: z.number().min(120),
-              })
-              .strict()
-              .refine((rect) => {
-                return (
-                  rect.x + rect.width <= 960 && rect.y + rect.height <= 600
-                );
-              }, "Diagram detail must fit the stock stage")
-              .optional(),
+const transition = z.strictObject({
+  kind: z.enum(SCENE_TRANSITION_KINDS),
+  frames: frame.max(300),
+  motion: MotionSettings.motionOptionsSchema.optional(),
+  origin: z
+    .strictObject({
+      x: z.number().min(0).max(1600),
+      y: z.number().min(0).max(840),
+    })
+    .optional(),
+});
+const stock = z.strictObject({
+  kind: z.literal("stock"),
+  request: stockRequestSchema,
+  settleFrame: frame.min(120).max(165).default(150),
+  camera: cameraTrackSchema.optional(),
+  cameraOptions: MotionSettings.motionOptionsSchema.optional(),
+  flight: objectFlightSchema.optional(),
+});
+const product = z.strictObject({
+  kind: z.literal("product"),
+  segment: productSegmentSchema,
+  annotations,
+});
+const composite = z.strictObject({
+  kind: z.literal("composite"),
+  segment: productSegmentSchema,
+  diagrams: z
+    .array(
+      z.strictObject({
+        at: frame,
+        request: stockRequestSchema,
+        label: copy,
+        overlay,
+        detail: z
+          .strictObject({
+            x: z.number().min(0),
+            y: z.number().min(0),
+            width: z.number().min(180),
+            height: z.number().min(120),
           })
-          .strict(),
-      )
-      .min(1)
-      .max(4),
-    annotations,
-    cropX: z.number().min(0).max(600).default(240),
-    signalAt: frame,
-    source: anchorSchema,
-    effect: z.enum(["signal", "bracket", "focus"]),
-  })
-  .strict();
-const thesis = z
-  .object({
-    kind: z.literal("thesis"),
-    lines: z.array(copy).min(2).max(4),
-    emphasis: copy,
-  })
-  .strict();
+          .refine((rect) => {
+            return rect.x + rect.width <= 960 && rect.y + rect.height <= 600;
+          }, "Diagram detail must fit the stock stage")
+          .optional(),
+      }),
+    )
+    .min(1)
+    .max(4),
+  annotations,
+  cropX: z.number().min(0).max(600).default(240),
+  signalAt: frame,
+  source: anchorSchema,
+  effect: z.enum(["signal", "bracket", "focus"]),
+});
+const thesis = z.strictObject({
+  kind: z.literal("thesis"),
+  lines: z.array(copy).min(2).max(4),
+  emphasis: copy,
+});
 /** A complete beat, including its continuity object and narrative heading. */
-export const continuityBeatSchema = z
-  .object({
-    id: z.string().regex(/^[a-z0-9-]+$/),
-    duration: frame.min(60).max(1800),
-    title: copy,
-    subtitle: copy,
-    transition,
-    content: z.discriminatedUnion("kind", [stock, product, composite, thesis]),
-    token: z
-      .object({
-        label: z.string().min(1).max(44),
-        anchor: anchorSchema,
-        appearance: z.enum(["label", "outline"]).default("label"),
-      })
-      .strict()
-      .optional(),
-  })
-  .strict();
+export const continuityBeatSchema = z.strictObject({
+  id: z.string().regex(/^[a-z0-9-]+$/),
+  duration: frame.min(60).max(1800),
+  title: copy,
+  subtitle: copy,
+  transition,
+  content: z.discriminatedUnion("kind", [stock, product, composite, thesis]),
+  token: z
+    .strictObject({
+      label: z.string().min(1).max(44),
+      anchor: anchorSchema,
+      appearance: z.enum(["label", "outline"]).default("label"),
+    })
+    .optional(),
+});
 /** Why a continuity plan cannot set its own palette or sketch. */
 const THEMED_FIELD_MESSAGE =
   "Colours and sketch roughness come from the video theme. Set them in the theme's overrides for this composition (themes/<theme>.theme.json, overrides.<composition id>).";

@@ -137,6 +137,9 @@ async function renderAtlasPosters(ids: readonly string[], themeId: string) {
   const browser = await openBrowser("chrome", SHOWCASE_STILL_BROWSER_OPTIONS);
   try {
     for (const film of films) {
+      // All posters share one Chromium renderer, which must stay serial to
+      // avoid frame flicker.
+      // react-doctor-disable-next-line async-await-in-loop
       await _renderPoster(film, {
         browser,
         serveUrl,

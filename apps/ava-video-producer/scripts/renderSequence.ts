@@ -121,6 +121,8 @@ async function _renderSequence(options: {
 }): Promise<void> {
   const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
   const inputProps = await _readInputProps(process.env.REMOTION_PROPS_FILE);
+  // Reject invalid input props before starting the expensive renderer bundle.
+  // react-doctor-disable-next-line server-sequential-independent-await
   const serveUrl = await _bundleEntry(root);
   const browserOptions = _getBrowserOptions();
   const chromiumOptions = _getChromiumOptions();

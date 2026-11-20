@@ -18,9 +18,13 @@ export function LocationCounts({
             (location.hasStationaryMember && location.numMembers > 1)
           );
         })
-        .map((location, index) => {
+        .map((location) => {
           return (
-            <LocationBadge key={index} location={location} accent={accent} />
+            <LocationBadge
+              key={location.id}
+              location={location}
+              accent={accent}
+            />
           );
         })}
     </g>

@@ -15,10 +15,10 @@ export function MarketLabels({ input }: Readonly<Props>): ReactNode {
   ];
   return (
     <g>
-      {labels.map(([text, x, y, width, fontSize], index) => {
+      {labels.map(([text, x, y, width, fontSize]) => {
         return (
           <FitText
-            key={index}
+            key={`${x}:${y}`}
             text={text}
             x={x}
             y={y}

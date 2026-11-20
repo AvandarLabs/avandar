@@ -173,8 +173,12 @@ export function GraphScene({
                 motion,
               }).map((point, index) => {
                 return (
-                  <circle
-                    key={`packet-${index}`}
+                  // prettier-ignore
+                  // Filtered packet positions occupy stateless SVG draw slots
+                  // inside this keyed edge. Each frame replaces every circle's
+                  // geometry, and circles hold no individual packet state.
+                  // react-doctor-disable-next-line no-array-index-as-key
+                  <circle key={`packet-${index}`}
                     cx={point.x}
                     cy={point.y}
                     r={PACKET_RADIUS}
@@ -259,6 +263,11 @@ export function GraphScene({
               }}
             >
               {label.lines.map((line, i) => {
+                // prettier-ignore
+                // These stateless text nodes are fixed
+                // wrapped-line slots within one keyed node.
+                // Duplicate lines are valid.
+                // react-doctor-disable-next-line no-array-index-as-key
                 return <div key={i}>{line}</div>;
               })}
             </div>
@@ -272,6 +281,11 @@ export function GraphScene({
                 }}
               >
                 {detail.lines.map((line, i) => {
+                  // prettier-ignore
+                  // These stateless text nodes are fixed
+                  // wrapped-line slots within one keyed
+                  // node. Duplicate lines are valid.
+                  // react-doctor-disable-next-line no-array-index-as-key
                   return <div key={i}>{line}</div>;
                 })}
               </div>
@@ -309,8 +323,12 @@ function _NodeItems({ node, frame, at, motion, color }: NodeItemsOptions) {
     <ul style={ITEM_LIST_STYLE}>
       {node.items.map((item, index) => {
         return (
-          <li
-            key={`${index}-${item}`}
+          // prettier-ignore
+          // These stateless text nodes are fixed wrapped-line
+          // slots within one keyed node. Duplicate lines are
+          // valid.
+          // react-doctor-disable-next-line no-array-index-as-key
+          <li key={`${index}-${item}`}
             style={{
               height: GRAPH_ITEM_PITCH,
               fontSize: GRAPH_ITEM_FONT_SIZE,

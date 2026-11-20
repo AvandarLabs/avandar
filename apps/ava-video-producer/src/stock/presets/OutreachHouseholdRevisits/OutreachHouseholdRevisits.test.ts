@@ -211,6 +211,9 @@ test("close accepted homes keep their exact centers and separate fixed label row
 });
 
 test("serialized contract exposes household identity validation", () => {
+  // This assertion exercises the JSON serialization boundary of the public
+  // contract.
+  // react-doctor-disable-next-line no-json-parse-stringify-clone
   const rules = JSON.parse(
     JSON.stringify(outreachHouseholdRevisitsContract.semanticRules),
   ) as typeof outreachHouseholdRevisitsContract.semanticRules;
@@ -228,6 +231,9 @@ test("serialized contract exposes household identity validation", () => {
 });
 
 test("serialized contract exposes household separation validation", () => {
+  // This assertion exercises the JSON serialization boundary of the public
+  // contract.
+  // react-doctor-disable-next-line no-json-parse-stringify-clone
   const rules = JSON.parse(
     JSON.stringify(outreachHouseholdRevisitsContract.semanticRules),
   ) as typeof outreachHouseholdRevisitsContract.semanticRules;
@@ -245,6 +251,9 @@ test("serialized contract exposes household separation validation", () => {
 });
 
 test("serialized contract exposes visit reference validation", () => {
+  // This assertion exercises the JSON serialization boundary of the public
+  // contract.
+  // react-doctor-disable-next-line no-json-parse-stringify-clone
   const rules = JSON.parse(
     JSON.stringify(outreachHouseholdRevisitsContract.semanticRules),
   ) as typeof outreachHouseholdRevisitsContract.semanticRules;
@@ -262,6 +271,9 @@ test("serialized contract exposes visit reference validation", () => {
 });
 
 test("serialized contract exposes revisit limit validation", () => {
+  // This assertion exercises the JSON serialization boundary of the public
+  // contract.
+  // react-doctor-disable-next-line no-json-parse-stringify-clone
   const rules = JSON.parse(
     JSON.stringify(outreachHouseholdRevisitsContract.semanticRules),
   ) as typeof outreachHouseholdRevisitsContract.semanticRules;

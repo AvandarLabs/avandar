@@ -40,8 +40,11 @@ export function GridLiteralCell({ value, x, y }: Readonly<Props>): ReactNode {
     <g data-raw-grid-value={value} aria-label={value}>
       {lines.map((line, index) => {
         return (
-          <LiteralDataText
-            key={index}
+          // prettier-ignore
+          // Grapheme wrapping creates fixed text-line slots within
+          // one cell. Duplicate literal lines must remain valid.
+          // react-doctor-disable-next-line no-array-index-as-key
+          <LiteralDataText key={index}
             value={line.value}
             x={x}
             y={y + index * 16}

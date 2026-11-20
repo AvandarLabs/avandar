@@ -212,6 +212,9 @@ test("the ledger separates exclusive states from overlapping attendance fraction
 });
 
 test("serialized contract exposes referral identity validation", () => {
+  // This assertion exercises the JSON serialization boundary of the public
+  // contract.
+  // react-doctor-disable-next-line no-json-parse-stringify-clone
   const rules = JSON.parse(
     JSON.stringify(referralReturnAcknowledgementContract.semanticRules),
   ) as typeof referralReturnAcknowledgementContract.semanticRules;
@@ -229,6 +232,9 @@ test("serialized contract exposes referral identity validation", () => {
 });
 
 test("serialized contract exposes acknowledgement implication validation", () => {
+  // This assertion exercises the JSON serialization boundary of the public
+  // contract.
+  // react-doctor-disable-next-line no-json-parse-stringify-clone
   const rules = JSON.parse(
     JSON.stringify(referralReturnAcknowledgementContract.semanticRules),
   ) as typeof referralReturnAcknowledgementContract.semanticRules;

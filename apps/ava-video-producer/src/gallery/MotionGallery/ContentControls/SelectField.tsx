@@ -56,6 +56,11 @@ export function SelectField({
       </option>
       {options.map((option, index) => {
         return (
+          // prettier-ignore
+          // The option index is the serialized option value below.
+          // It intentionally distinguishes duplicate authored
+          // values in these fixed select slots.
+          // react-doctor-disable-next-line no-array-index-as-key
           <option key={`${option.value}-${index}`} value={`option:${index}`}>
             {typeof option.label === "string"
               ? option.label

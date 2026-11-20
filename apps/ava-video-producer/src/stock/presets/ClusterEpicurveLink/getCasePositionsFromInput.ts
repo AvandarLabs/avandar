@@ -41,6 +41,10 @@ export function getCasePositionsFromInput(
       mapY: 145 + record.y * 1.9,
       histogramX: 365 + binIndex * 38,
       histogramY: 332 - stackIndex * 17,
+      // The validated investigation subset contains at most eight IDs.
+      // Set construction regressed bounded frame lookups in
+      // measurement.
+      // react-doctor-disable-next-line js-set-map-lookups
       isInvestigated: input.investigationCaseIds.includes(record.id),
       isFocused:
         input.focusedBinId !== null && record.onsetBinId === input.focusedBinId,

@@ -126,7 +126,7 @@ async function _verifyIdenticalRequests({
     "coalesces identical separately allocated requests",
     async () => {
       const first = exports.start(request);
-      const duplicate = exports.start(JSON.parse(JSON.stringify(request)));
+      const duplicate = exports.start(structuredClone(request));
       assert.equal(exports.requests.length, 1);
       exports.complete({ index: 0, id: "shared" });
       assert.equal((await first).id, "shared");

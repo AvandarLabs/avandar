@@ -94,8 +94,10 @@ async function _makeMotionRequestsFromArgs(
   }>,
 ): Promise<MotionRequest[]> {
   const { args, root = ROOT } = options;
-  const contracts = await buildStockContracts(root);
-  const theme = await loadVideoThemeSnapshot({ id: args.themeId });
+  const [contracts, theme] = await Promise.all([
+    buildStockContracts(root),
+    loadVideoThemeSnapshot({ id: args.themeId }),
+  ]);
   const supplied: unknown = args.inputFile
     ? JSON.parse(
         await fs.readFile(

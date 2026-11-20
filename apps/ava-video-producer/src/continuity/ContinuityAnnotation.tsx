@@ -48,8 +48,12 @@ export function ContinuityAnnotation({
     if (progress <= 0) return null;
     const Annotation = notation[cue.kind];
     return (
-      <div
-        key={`${cue.at}-${index}`}
+      // prettier-ignore
+      // Cues retain their authored timeline positions. Hidden cues
+      // return null in place rather than filtering or reordering the
+      // cue array.
+      // react-doctor-disable-next-line no-array-index-as-key
+      <div key={`${cue.at}-${index}`}
         className={css.annotation}
         style={{
           left: cue.target.x,

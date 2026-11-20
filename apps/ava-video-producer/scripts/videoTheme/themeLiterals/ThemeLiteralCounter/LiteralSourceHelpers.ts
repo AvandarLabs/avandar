@@ -73,11 +73,11 @@ function _isCueWindow({
   duration,
   cue,
 }: Readonly<{ duration: ts.Expression; cue: ts.Expression }>): boolean {
-  const subtracted = _subtractedTerms(duration);
+  const subtracted = new Set(_subtractedTerms(duration));
   return (
-    subtracted.length > 0 &&
+    subtracted.size > 0 &&
     _addedTerms(cue).every((term) => {
-      return subtracted.includes(term);
+      return subtracted.has(term);
     })
   );
 }

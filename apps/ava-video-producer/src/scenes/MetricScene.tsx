@@ -103,6 +103,11 @@ export function MetricScene({
           }}
         >
           {layout.label.lines.map((line, i) => {
+            // prettier-ignore
+            // These stateless text nodes are fixed wrapped-line
+            // slots within one metric. Duplicate lines are
+            // valid.
+            // react-doctor-disable-next-line no-array-index-as-key
             return <div key={i}>{line}</div>;
           })}
         </div>
@@ -158,6 +163,11 @@ export function MetricScene({
             }}
           >
             {layout.detail.lines.map((line, i) => {
+              // prettier-ignore
+              // These stateless text nodes are fixed
+              // wrapped-line slots within one metric.
+              // Duplicate lines are valid.
+              // react-doctor-disable-next-line no-array-index-as-key
               return <div key={i}>{line}</div>;
             })}
           </div>

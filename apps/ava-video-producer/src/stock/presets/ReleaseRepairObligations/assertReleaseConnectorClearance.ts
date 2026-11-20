@@ -33,7 +33,8 @@ function _getPoints(attributes: string): Point[] {
             ? { x: prior.x, y: values[0] }
             : { x: values[0], y: prior.y };
       assert.ok(Number.isFinite(point.x + point.y));
-      return [...points, point];
+      points.push(point);
+      return points;
     },
     [],
   );

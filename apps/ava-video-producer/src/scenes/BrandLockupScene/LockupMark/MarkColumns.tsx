@@ -42,8 +42,12 @@ export function MarkColumns({
         const flight = flights[index];
         const rect = getFlightColumnRect(index, columns, mark, stage, flight);
         return (
-          <MarkColumn
-            key={`mark-column-${index}`}
+          // prettier-ignore
+          // These are fixed left-to-right slices of one mark. A
+          // column slot retains its identity while its rise and
+          // flight values animate.
+          // react-doctor-disable-next-line no-array-index-as-key
+          <MarkColumn key={`mark-column-${index}`}
             {...{ frame, exit, src, columns, columnRise, index }}
             rect={rect}
           />

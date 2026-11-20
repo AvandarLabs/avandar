@@ -1,6 +1,7 @@
 import { PersonGlyph } from "../../../primitives/PersonGlyph/PersonGlyph";
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { getConvoyRouteFromRole } from "../getConvoyRouteFromRole";
 import { ArrivalGate } from "./ArrivalGate";
 import type { Input } from "../ConvoyRouteDetour.schema";
 import type { ReactNode } from "react";
@@ -13,9 +14,9 @@ export function ConvoyLandmarks({
   accent,
 }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
-  const points = input.routes.find(({ role }) => {
-    return role === "blocked";
-  })!.points;
+  // ConvoyRouteDetour.schema requires exactly one blocked route with at
+  // least four points.
+  const points = getConvoyRouteFromRole({ input, role: "blocked" }).points;
   const destination = points.at(-1)!;
   return (
     <g>

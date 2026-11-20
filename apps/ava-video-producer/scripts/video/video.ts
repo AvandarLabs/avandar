@@ -29,6 +29,8 @@ export async function main(argv = process.argv.slice(2)): Promise<void> {
   }
   const options = parseArgs(argv);
   const workspace = await getVideoWorkspaceFromPlanPath(ROOT, options.filename);
+  // Authorize the plan workspace before opening the supplied plan file.
+  // react-doctor-disable-next-line server-sequential-independent-await
   const plan = await readPlan(options.filename);
   if (
     ["preview", "render"].includes(options.command) &&

@@ -71,6 +71,9 @@ export async function inspectExistingTree(path: string): Promise<void> {
     // Walk one entry at a time, so the first unsafe entry stops curation.
     for (const name of await readdir(path)) {
       validateRelativePath(name);
+      // Stop traversal on the first unsafe entry and keep only one subtree walk
+      // active.
+      // react-doctor-disable-next-line async-await-in-loop
       await inspectExistingTree(join(path, name));
     }
   } else if (!stats.isFile()) {

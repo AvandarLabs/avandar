@@ -5,6 +5,14 @@ import type { StockSemanticRule } from "../../contracts/StockContract.types";
 function _unique(values: readonly string[]): boolean {
   return new Set(values).size === values.length;
 }
+function _hasUnknownIds(
+  ids: readonly string[],
+  domain: ReadonlySet<string>,
+): boolean {
+  return ids.some((id) => {
+    return !domain.has(id);
+  });
+}
 /** Strict source table, exact selected slice and one distinct live edit. */
 export const inputSchema = z
   .strictObject({
@@ -50,20 +58,18 @@ export const inputSchema = z
     const rowIds = input.table.rows.map(prop("id")),
       columnIds = input.table.columns.map(prop("id"));
     const selected = input.selection;
+    const rowIdSet = new Set(rowIds);
+    const columnIdSet = new Set(columnIds);
     if (
-      !_unique(rowIds) ||
-      !_unique(columnIds) ||
+      rowIdSet.size !== rowIds.length ||
+      columnIdSet.size !== columnIds.length ||
       !_unique(selected.rowIds) ||
       !_unique(selected.columnIds) ||
       input.table.rows.some(({ cells }) => {
         return cells.length !== columnIds.length;
       }) ||
-      selected.rowIds.some((id) => {
-        return !rowIds.includes(id);
-      }) ||
-      selected.columnIds.some((id) => {
-        return !columnIds.includes(id);
-      })
+      _hasUnknownIds(selected.rowIds, rowIdSet) ||
+      _hasUnknownIds(selected.columnIds, columnIdSet)
     ) {
       context.addIssue({
         code: "custom",

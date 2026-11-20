@@ -17,19 +17,19 @@ function _coalesceSameTarget(beats: PointerBeat[]): PointerBeat[] {
       beat.frame > Math.max(previous.frame + 8, previous.holdUntil ?? 0) ||
       beat.x !== previous.x ||
       beat.y !== previous.y
-    )
-      return [...groups, beat];
-    return [
-      ...groups.slice(0, -1),
-      {
-        ...previous,
-        holdUntil: Math.max(
-          beat.frame + 8,
-          beat.holdUntil ?? 0,
-          previous.holdUntil ?? 0,
-        ),
-      },
-    ];
+    ) {
+      groups.push(beat);
+      return groups;
+    }
+    groups[groups.length - 1] = {
+      ...previous,
+      holdUntil: Math.max(
+        beat.frame + 8,
+        beat.holdUntil ?? 0,
+        previous.holdUntil ?? 0,
+      ),
+    };
+    return groups;
   }, []);
 }
 

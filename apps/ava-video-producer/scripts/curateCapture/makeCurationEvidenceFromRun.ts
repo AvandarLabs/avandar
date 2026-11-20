@@ -191,6 +191,9 @@ async function _readScreenshots({
   // Read in manifest order, so a duplicate name fails on its second use.
   for (const checkpoint of checkpoints) {
     screenshots.push(
+      // Each read claims a filename in the shared set. Preserve manifest-order
+      // rejection.
+      // react-doctor-disable-next-line async-await-in-loop
       await _readScreenshotAndClaimFilename({
         checkpoint,
         flows,

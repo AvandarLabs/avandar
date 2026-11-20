@@ -80,6 +80,8 @@ export async function curateCapture({
   });
   const { evidence, manifestPath, manifestSha256 } =
     await makeCurationEvidenceFromRun({ sourceDirectory, runRelative });
+  // Reject unsafe capture evidence before creating or inspecting public output.
+  // react-doctor-disable-next-line server-sequential-independent-await
   const publicDirectory = await _getPublicDirectory(root);
   const existing = await findExistingOutputs({
     publicDirectory,

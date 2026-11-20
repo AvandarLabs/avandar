@@ -13,17 +13,15 @@ import { shotSchema } from "../shotSchema";
 import { themeSchema } from "../themeSchema";
 import { StoryboardValidation } from "./StoryboardValidation";
 
-const cueSchema = z
-  .object({
-    id,
-    shotId: id,
-    beatId: id.optional(),
-    startFrame: frame,
-    endFrame: positiveFrames,
-    text: text.max(180),
-    audio: assetPathSchema.optional(),
-  })
-  .strict();
+const cueSchema = z.strictObject({
+  id,
+  shotId: id,
+  beatId: id.optional(),
+  startFrame: frame,
+  endFrame: positiveFrames,
+  text: text.max(180),
+  audio: assetPathSchema.optional(),
+});
 /** A single source for film order, graphics, narration text, and cue timing. */
 export const storyboardSchema = z
   .strictObject({
@@ -36,34 +34,29 @@ export const storyboardSchema = z
     fps: z.literal(30),
     width: z.number().int().min(960).max(3840),
     height: z.number().int().min(640).max(2160),
-    delivery: z
-      .object({
-        width: z.number().int().min(320).max(3840),
-        height: z.number().int().min(240).max(2160),
-      })
-      .strict(),
+    delivery: z.strictObject({
+      width: z.number().int().min(320).max(3840),
+      height: z.number().int().min(240).max(2160),
+    }),
     theme: themeSchema.optional(),
     shots: z.array(shotSchema).min(1).max(100),
     narration: z.array(cueSchema).default([]),
     captions: z.boolean().default(true),
     narrationTrack: z
-      .object({
+      .strictObject({
         src: assetPathSchema,
         startFrame: frame.default(0),
         volume: z.number().min(0).max(2).default(1),
       })
-      .strict()
       .optional(),
     soundEffects: z
       .array(
-        z
-          .object({
-            id,
-            src: assetPathSchema,
-            atFrame: frame,
-            volume: z.number().min(0).max(1).default(0.25),
-          })
-          .strict(),
+        z.strictObject({
+          id,
+          src: assetPathSchema,
+          atFrame: frame,
+          volume: z.number().min(0).max(1).default(0.25),
+        }),
       )
       .default([]),
   })
@@ -284,11 +277,14 @@ export const storyboardSchema = z
             issue(`${shot.id}: invalid callout timing`);
       }
     }
+    const shotsById = new Map(
+      plan.shots.map((shot) => {
+        return [shot.id, shot] as const;
+      }),
+    );
     let lastEnd = -1;
     for (const item of plan.narration) {
-      const shot = plan.shots.find((candidate) => {
-        return candidate.id === item.shotId;
-      });
+      const shot = shotsById.get(item.shotId);
       let window = { start: 0, duration: shot?.durationInFrames ?? 0 };
       try {
         window = getCueWindowFromShot({ shot, beatId: item.beatId });

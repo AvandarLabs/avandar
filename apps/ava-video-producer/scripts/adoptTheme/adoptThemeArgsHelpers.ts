@@ -75,6 +75,9 @@ export function getStylesheetFromPaths(paths: readonly string[]): string {
     })
     .find((candidate) => {
       return (
+        // The lookup is a stylesheet substring search, not repeated array
+        // membership.
+        // react-doctor-disable-next-line js-set-map-lookups
         existsSync(candidate) && readFileSync(candidate, "utf8").includes("--")
       );
     });
