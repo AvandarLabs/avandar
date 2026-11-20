@@ -3,7 +3,7 @@ import {
   getReleaseLineFromBranch,
   MAINLINE_RELEASE_LINE,
   RELEASE_SOURCE_BRANCHES,
-} from "@ava-cli/ReleaseCli/releaseLine/releaseLine";
+} from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
 import { describe, expect, it } from "vitest";
 
 describe("getReleaseLineFromBranch", () => {
@@ -16,7 +16,7 @@ describe("getReleaseLineFromBranch", () => {
   });
 
   it.each(["main", "alpha", "demo/measles", "feat/x", undefined])(
-    "refuses %s",
+    "finds no release line for %s",
     (branch) => {
       expect(getReleaseLineFromBranch(branch)).toBeUndefined();
     },
@@ -24,7 +24,7 @@ describe("getReleaseLineFromBranch", () => {
 });
 
 describe("release lines", () => {
-  it("mainline cuts main from develop with no release suffix", () => {
+  it("mainline cuts main from develop with its own suffixes and workflows", () => {
     expect(MAINLINE_RELEASE_LINE).toMatchObject({
       kind: "mainline",
       sourceBranch: "develop",
@@ -33,10 +33,14 @@ describe("release lines", () => {
       devSuffix: "-dev",
       sourceCiWorkflow: "staging.yaml",
       targetDeployWorkflow: "production.yaml",
+      bannerTitle: "MAINLINE release",
+      bannerColor: "bright_cyan",
+      deployWarning:
+        "Pushing main deploys the mainline test URL. It does not touch production.",
     });
   });
 
-  it("alpha cuts alpha from alpha-dev with the -alpha suffix", () => {
+  it("alpha cuts alpha from alpha-dev with its own suffixes and workflows", () => {
     expect(ALPHA_RELEASE_LINE).toMatchObject({
       kind: "alpha",
       sourceBranch: "alpha-dev",
@@ -45,6 +49,10 @@ describe("release lines", () => {
       devSuffix: "-alpha-dev",
       sourceCiWorkflow: "alpha-dev.yaml",
       targetDeployWorkflow: "alpha.yaml",
+      bannerTitle: "ALPHA release",
+      bannerColor: "bright_yellow",
+      deployWarning:
+        "Pushing alpha deploys PRODUCTION (app.avandarlabs.com) and migrates the production database.",
     });
   });
 

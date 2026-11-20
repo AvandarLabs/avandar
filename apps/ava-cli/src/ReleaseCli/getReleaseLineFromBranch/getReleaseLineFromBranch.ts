@@ -16,7 +16,7 @@ export type ReleaseLine = Readonly<{
   devSuffix: string;
   /** The workflow whose verdict on the source branch gates a release. */
   sourceCiWorkflow: string;
-  /** The workflow pushing the target branch runs. */
+  /** The workflow that runs when the target branch is pushed. */
   targetDeployWorkflow: string;
   /** The opening banner's title, e.g. `MAINLINE release`. */
   bannerTitle: string;
