@@ -9,11 +9,11 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import test from "node:test";
-import rendererGlobs from "../videoTheme/themeLiterals/rendererGlobs.json";
 import {
   APP_ROOT,
   isFileMatchedByGlobs,
 } from "../videoTheme/themeLiterals/rendererFiles/rendererFiles";
+import rendererGlobs from "../videoTheme/themeLiterals/rendererGlobs.json";
 import allowlist from "./longFunctionAllowlist.json";
 
 /**
