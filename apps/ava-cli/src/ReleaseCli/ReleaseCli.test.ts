@@ -363,7 +363,7 @@ describe("ava release on a source branch", () => {
  * commits and tags work on any machine without touching global config.
  */
 function _configureRepo(repoRoot: string): void {
-  const settings: ReadonlyArray<readonly [string, string]> = [
+  const settings: Array<[string, string]> = [
     ["user.name", "Ava CLI Test"],
     ["user.email", "ava-cli@example.test"],
     ["commit.gpgSign", "false"],
@@ -389,10 +389,28 @@ function _commitVersion(
 }
 
 /**
+ * Tags named like every release branch, all on `main` before the release, so
+ * a bare branch name in any push or lookup would hit the wrong commit.
+ */
+const BRANCH_NAMED_TAGS = ["main", "alpha", "alpha-dev", "develop"];
+
+/**
+ * Isolate the real releases from the machine they run on: no global or system
+ * git config, and npm (which `pnpm version` runs) writes its logs under
+ * `directory` and skips its registry update check. Undone by
+ * `vi.unstubAllEnvs`.
+ */
+function _isolateFromUserConfig(directory: string): void {
+  vi.stubEnv("GIT_CONFIG_GLOBAL", "/dev/null");
+  vi.stubEnv("GIT_CONFIG_NOSYSTEM", "1");
+  vi.stubEnv("npm_config_update_notifier", "false");
+  vi.stubEnv("npm_config_logs_dir", join(directory, "npm-logs"));
+}
+
+/**
  * Push the three line branches from `seed` to origin: `develop` at
  * `0.14.2-dev` and `alpha-dev` at `0.15.0-alpha-dev`, each one commit past
- * `main`, and `alpha` at `main`. Tags named like the branches sit on `main`,
- * so a bare branch name in any push or lookup would hit the wrong commit.
+ * `main`, and `alpha` at `main`, along with every `BRANCH_NAMED_TAGS` tag.
  */
 function _pushLineBranches(seed: string): void {
   _git({ cwd: seed, args: ["switch", "-c", "develop"] });
@@ -409,8 +427,8 @@ function _pushLineBranches(seed: string): void {
     version: "0.15.0-alpha-dev",
     message: "Alpha work",
   });
-  ["alpha", "alpha-dev", "develop"].forEach((branch) => {
-    _git({ cwd: seed, args: ["tag", branch, "main"] });
+  BRANCH_NAMED_TAGS.forEach((tag) => {
+    _git({ cwd: seed, args: ["tag", tag, "main"] });
   });
   _git({
     cwd: seed,
@@ -420,9 +438,9 @@ function _pushLineBranches(seed: string): void {
       "refs/heads/develop:refs/heads/develop",
       "refs/heads/alpha-dev:refs/heads/alpha-dev",
       "refs/heads/main:refs/heads/alpha",
-      "refs/tags/alpha",
-      "refs/tags/alpha-dev",
-      "refs/tags/develop",
+      ...BRANCH_NAMED_TAGS.map((tag) => {
+        return `refs/tags/${tag}`;
+      }),
     ],
   });
 }
@@ -460,7 +478,7 @@ function _createReleaseRepos(directory: string): {
 }
 
 /** Every branch tip in `repoRoot`, keyed by branch name. */
-function _readBranchTips(repoRoot: string): Readonly<Record<string, string>> {
+function _readBranchTips(repoRoot: string): Record<string, string> {
   const output = _git({
     cwd: repoRoot,
     args: [
@@ -494,7 +512,7 @@ type EndToEndReleaseCase = {
   /** The branch the release publishes to. */
   targetBranch: string;
   /** The other line's branches, which the release must not touch. */
-  otherLineBranches: readonly string[];
+  otherLineBranches: string[];
   version: string;
   nextVersion: string;
   /** package.json on the target branch after the release. */
@@ -557,11 +575,12 @@ describe.each(END_TO_END_RELEASE_CASES)(
     let directory: string;
     let origin: string;
     let checkout: string;
-    let tipsBefore: Readonly<Record<string, string>>;
-    let tipsAfter: Readonly<Record<string, string>>;
+    let tipsBefore: Record<string, string>;
+    let tipsAfter: Record<string, string>;
 
     beforeAll(async () => {
       directory = mkdtempSync(join(tmpdir(), "ava-release-e2e-"));
+      _isolateFromUserConfig(directory);
       ({ origin, checkout } = _checkOutFreshSourceBranch({
         directory,
         sourceBranch,
@@ -580,16 +599,17 @@ describe.each(END_TO_END_RELEASE_CASES)(
 
     afterAll(() => {
       vi.restoreAllMocks();
+      vi.unstubAllEnvs();
       rmSync(directory, { recursive: true, force: true });
     });
 
     /** The `n`th parent of the published target commit, 1-based. */
-    function _readTargetParent(parentNumber: number): string {
+    const _readTargetParent = (parentNumber: number): string => {
       return _git({
         cwd: origin,
         args: ["rev-parse", `${tipsAfter[targetBranch]}^${parentNumber}`],
       });
-    }
+    };
 
     it(`leaves ${releaseCase.otherLineBranches.join(" and ")} on origin untouched`, () => {
       releaseCase.otherLineBranches.forEach((branch) => {
@@ -683,8 +703,17 @@ describe.each(END_TO_END_RELEASE_CASES)(
       ).toBe(tipsAfter[targetBranch]);
     });
 
+    it(`leaves the local ${sourceBranch} at origin's bump commit`, () => {
+      expect(
+        _git({
+          cwd: checkout,
+          args: ["rev-parse", `refs/heads/${sourceBranch}`],
+        }),
+      ).toBe(tipsAfter[sourceBranch]);
+    });
+
     it("leaves the tags named like the branches on main", () => {
-      ["alpha", "alpha-dev", "develop"].forEach((tag) => {
+      BRANCH_NAMED_TAGS.forEach((tag) => {
         expect(
           _git({ cwd: origin, args: ["rev-parse", `refs/tags/${tag}`] }),
         ).toBe(tipsBefore.main);
@@ -709,6 +738,7 @@ describe.each(END_TO_END_RELEASE_CASES)(
 
     beforeAll(async () => {
       directory = mkdtempSync(join(tmpdir(), "ava-release-e2e-dry-"));
+      _isolateFromUserConfig(directory);
       ({ origin, checkout } = _checkOutFreshSourceBranch({
         directory,
         sourceBranch: releaseCase.sourceBranch,
@@ -730,6 +760,7 @@ describe.each(END_TO_END_RELEASE_CASES)(
 
     afterAll(() => {
       vi.restoreAllMocks();
+      vi.unstubAllEnvs();
       rmSync(directory, { recursive: true, force: true });
     });
 

@@ -373,6 +373,9 @@ describe("runPreflight", () => {
 
     expect(result.ok === false && result.reason).toBe("dirty-tree");
     expect(result.ok === false && result.message).toContain(" M package.json");
+    expect(result.ok === false && result.message).toContain(
+      "this checkout is not the commit being released",
+    );
   });
 
   it("refuses when gh reports no push access, before fetching", () => {

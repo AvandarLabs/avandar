@@ -82,7 +82,7 @@ function _refuseDirtyTree(git: ReleaseCommands): PreflightRefusal | undefined {
     ? undefined
     : {
         reason: "dirty-tree",
-        message: `The working tree has tracked changes, which would be swept into the version commit. Commit or stash them first:\n${trackedChanges}`,
+        message: `The working tree has tracked changes. Only package.json is committed with the new version, so any other change means this checkout is not the commit being released. Commit or stash them first:\n${trackedChanges}`,
       };
 }
 
