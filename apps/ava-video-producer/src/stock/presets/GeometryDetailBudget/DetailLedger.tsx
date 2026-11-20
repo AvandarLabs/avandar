@@ -17,13 +17,11 @@ const COUNT_FRAMES = 28;
 const TOLERANCE_SIZE = "md";
 /** Retained and removed counts accompany their actual algorithm outputs. */
 export function DetailLedger({ input, frame }: Readonly<Props>): ReactNode {
-  const { text } = useGraphicTokens();
   const motion = useGraphicMotion();
   const counted = motion.ramp(frame, COUNT_AT, motion.scale(COUNT_FRAMES));
   const { keptIndices, removed } = makeDetailSimplificationFromInput(input);
   const keptCount = Math.round(mix(counted, 0, keptIndices.length));
   const removedCount = Math.round(mix(counted, 0, removed.length));
-  const figure = text.graphic.question;
   return (
     <g>
       <LabelSlots
@@ -33,32 +31,44 @@ export function DetailLedger({ input, frame }: Readonly<Props>): ReactNode {
           [input.labels.unit, 480, 334, 420, 14, 2],
         ]}
       />
-      <text
-        data-kept-count={keptCount}
-        x={880}
-        y={210}
-        fontSize={figure.fontSize}
-        fontWeight={figure.fontWeight}
-        fill={figure.color}
-        textAnchor="end"
-      >
-        {keptCount}
-      </text>
-      <text
+      <LedgerCount data-kept-count={keptCount} y={210} count={keptCount} />
+      <LedgerCount
         data-removed-count={removedCount}
-        x={880}
         y={274}
-        fontSize={figure.fontSize}
-        fontWeight={figure.fontWeight}
-        fill={figure.color}
-        textAnchor="end"
-      >
-        {removedCount}
-      </text>
+        count={removedCount}
+      />
       <Text x={480} y={382} size={TOLERANCE_SIZE}>
         ≤ {input.tolerance}
       </Text>
       <DetailEventLedger input={input} />
     </g>
+  );
+}
+
+/** One right-aligned count in the ledger, carrying its own data attribute. */
+function LedgerCount({
+  y,
+  count,
+  ...dataAttributes
+}: Readonly<{
+  y: number;
+  count: number;
+  "data-kept-count"?: number;
+  "data-removed-count"?: number;
+}>): ReactNode {
+  const { text } = useGraphicTokens();
+  const figure = text.graphic.question;
+  return (
+    <text
+      {...dataAttributes}
+      x={880}
+      y={y}
+      fontSize={figure.fontSize}
+      fontWeight={figure.fontWeight}
+      fill={figure.color}
+      textAnchor="end"
+    >
+      {count}
+    </text>
   );
 }

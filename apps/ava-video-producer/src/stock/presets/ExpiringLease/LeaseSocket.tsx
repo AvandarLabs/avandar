@@ -52,8 +52,6 @@ export function LeaseSocket({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
   const motion = useGraphicMotion();
   const { x, y } = getSocketPointFromIndex({
     index,
@@ -72,16 +70,7 @@ export function LeaseSocket({
           isHolder && frame < EXPIRY_CUE ? participant.id : undefined
         }
       >
-        <SketchedShape
-          shape={{ kind: "circle", cx: x, cy: y, r: 32 }}
-          profile={tokens.sketch.shape}
-          fill={tokens.color.surface}
-          stroke={tokens.color.accentAlt}
-          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
-          pathLength={SOCKET_LENGTH}
-          strokeDasharray={SOCKET_LENGTH}
-          strokeDashoffset={SOCKET_LENGTH * opening * OPEN_GAP}
-        />
+        <SocketRing x={x} y={y} opening={opening} />
       </g>
       {isHolder && input.showLifetime ? (
         <LeaseCollar {...collarProps} />
@@ -90,5 +79,27 @@ export function LeaseSocket({
         <FitText {...LABEL} text={participant.label} x={x} />
       ) : undefined}
     </g>
+  );
+}
+
+/** The socket's ring, its outline opening by `opening` at expiry. */
+function SocketRing({
+  x,
+  y,
+  opening,
+}: Readonly<{ x: number; y: number; opening: number }>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <SketchedShape
+      shape={{ kind: "circle", cx: x, cy: y, r: 32 }}
+      profile={tokens.sketch.shape}
+      fill={tokens.color.surface}
+      stroke={tokens.color.accentAlt}
+      strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+      pathLength={SOCKET_LENGTH}
+      strokeDasharray={SOCKET_LENGTH}
+      strokeDashoffset={SOCKET_LENGTH * opening * OPEN_GAP}
+    />
   );
 }

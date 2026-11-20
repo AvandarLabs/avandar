@@ -45,23 +45,36 @@ export function FractionSurface({
           frame={frame}
           accent={accent}
         />
-        {frame >= 88 && frame < 126
-          ? Array.from({ length: input.fraction.numerator }, (_, part) => {
-              return (
-                <SketchedShape
-                  key={part}
-                  shape={{
-                    kind: "path",
-                    d: `M${-96 + ((part + 0.5) * 192) / input.fraction.denominator} 30 V46`,
-                  }}
-                  profile={tokens.sketch.shape}
-                  stroke={accent}
-                  strokeWidth={scales.stroke(tokens.stroke.hairline)}
-                />
-              );
-            })
-          : undefined}
+        {frame >= 88 && frame < 126 ? (
+          <PartTicks fraction={input.fraction} accent={accent} />
+        ) : undefined}
       </g>
     </>
   );
+}
+
+/** A tick over each counted part of the fraction. */
+function PartTicks({
+  fraction,
+  accent,
+}: Readonly<{
+  fraction: Input["fraction"];
+  accent: string;
+}>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return Array.from({ length: fraction.numerator }, (_, part) => {
+    return (
+      <SketchedShape
+        key={part}
+        shape={{
+          kind: "path",
+          d: `M${-96 + ((part + 0.5) * 192) / fraction.denominator} 30 V46`,
+        }}
+        profile={tokens.sketch.shape}
+        stroke={accent}
+        strokeWidth={scales.stroke(tokens.stroke.hairline)}
+      />
+    );
+  });
 }

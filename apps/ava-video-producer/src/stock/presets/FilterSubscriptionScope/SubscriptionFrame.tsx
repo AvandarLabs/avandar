@@ -23,25 +23,11 @@ export function SubscriptionFrame({
   width,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   return (
     <g>
-      <g data-subscription={view.id}>
-        <SketchedShape
-          shape={{
-            kind: "path",
-            d: `M479 134 V136 H${x + width / 2} V140`,
-          }}
-          profile={tokens.sketch.shape}
-          fill="none"
-          stroke={view.subscribed ? accent : tokens.color.inactive}
-          strokeDasharray={
-            view.subscribed ? undefined : atomic.dash.sparse.join(" ")
-          }
-        />
-      </g>
+      <SubscriptionConnector view={view} x={x} width={width} accent={accent} />
       {view.subscribed ? undefined : (
         <SketchedShape
           shape={{
@@ -62,6 +48,33 @@ export function SubscriptionFrame({
         stroke={tokens.color.line}
       />
       <LabelSlots labels={[[view.label, x + 12, 162, width - 24, 14, 3]]} />
+    </g>
+  );
+}
+
+/** The connector to a view: solid when subscribed, sparse dashes when not. */
+function SubscriptionConnector({
+  view,
+  x,
+  width,
+  accent,
+}: Readonly<Props>): ReactNode {
+  const { atomic } = useGraphicTheme();
+  const tokens = useGraphicTokens();
+  return (
+    <g data-subscription={view.id}>
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M479 134 V136 H${x + width / 2} V140`,
+        }}
+        profile={tokens.sketch.shape}
+        fill="none"
+        stroke={view.subscribed ? accent : tokens.color.inactive}
+        strokeDasharray={
+          view.subscribed ? undefined : atomic.dash.sparse.join(" ")
+        }
+      />
     </g>
   );
 }

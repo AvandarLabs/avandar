@@ -26,16 +26,12 @@ export function DetailTrace({
   const { color, stroke } = useGraphicTokens();
   const motion = useGraphicMotion();
   const { keptIndices } = makeDetailSimplificationFromInput(input);
-  const original = input.vertices
-    .map(([x, y], index) => {
-      return `${index ? "L" : "M"}${60 + x * 3.6} ${160 + y * 3.6}`;
-    })
-    .join(" ");
-  const simplified = keptIndices
-    .map((index, position) => {
-      return `${position ? "L" : "M"}${60 + input.vertices[index][0] * 3.6} ${160 + input.vertices[index][1] * 3.6}`;
-    })
-    .join(" ");
+  const original = _buildTracePath(input.vertices);
+  const simplified = _buildTracePath(
+    keptIndices.map((index) => {
+      return input.vertices[index];
+    }),
+  );
   return (
     <g>
       <DrawPath
@@ -65,4 +61,13 @@ export function DetailTrace({
       <SourceVertices input={input} frame={frame} accent={accent} />
     </g>
   );
+}
+
+/** A polyline through source vertices, in the shared trace coordinates. */
+function _buildTracePath(vertices: Input["vertices"]): string {
+  return vertices
+    .map(([x, y], index) => {
+      return `${index ? "L" : "M"}${60 + x * 3.6} ${160 + y * 3.6}`;
+    })
+    .join(" ");
 }

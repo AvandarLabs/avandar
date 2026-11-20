@@ -7,6 +7,7 @@ import {
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { SceneText } from "./SceneText";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./FractionMaterialTranslation.schema";
 import type { ReactNode } from "react";
 
@@ -28,29 +29,13 @@ export function FractionLearner({
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const scales = useGraphicShapeScales();
-  const materialProgress = motion.ramp(
-    frame,
-    36,
-    motion.scale(48),
-    motion.travel.easing,
-  );
   const handReach =
     motion.ramp(frame, 30, motion.chip) *
     (1 - motion.ramp(frame, 84, motion.press.duration));
-  const firstCenter = -96 + 96 / input.fraction.denominator;
-  const contactX =
-    representation.material === "folded-paper"
-      ? initialX - 96
-      : initialX +
-        (representation.material === "counters"
-          ? mix(materialProgress, -82, firstCenter)
-          : firstCenter);
-  const contactY =
-    representation.material === "folded-paper"
-      ? 306
-      : representation.material === "counters"
-        ? 330 + mix(materialProgress, -36, 0) - 8
-        : 352 - 44 * materialProgress;
+  const { contactX, contactY } = _getMaterialContact(
+    { input, representation, initialX, frame },
+    motion,
+  );
   const learnerX = initialX - 60;
 
   return (
@@ -76,4 +61,37 @@ export function FractionLearner({
       </g>
     </>
   );
+}
+
+/** Where the learner's hand touches the material as it is worked. */
+function _getMaterialContact(
+  {
+    input,
+    representation,
+    initialX,
+    frame,
+  }: Readonly<Pick<Props, "input" | "representation" | "initialX" | "frame">>,
+  motion: VideoMotion,
+) {
+  const materialProgress = motion.ramp(
+    frame,
+    36,
+    motion.scale(48),
+    motion.travel.easing,
+  );
+  const firstCenter = -96 + 96 / input.fraction.denominator;
+  const contactX =
+    representation.material === "folded-paper"
+      ? initialX - 96
+      : initialX +
+        (representation.material === "counters"
+          ? mix(materialProgress, -82, firstCenter)
+          : firstCenter);
+  const contactY =
+    representation.material === "folded-paper"
+      ? 306
+      : representation.material === "counters"
+        ? 330 + mix(materialProgress, -36, 0) - 8
+        : 352 - 44 * materialProgress;
+  return { contactX, contactY };
 }

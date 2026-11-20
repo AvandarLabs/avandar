@@ -10,6 +10,12 @@ type GetShopperPoseResult = {
   handY: number;
 };
 
+type ShopperPoseArgs = Readonly<{
+  input: Input;
+  frame: number;
+  motion: VideoMotion;
+}>;
+
 /**
  * The shopper approaches, grips, carries and releases the same chosen object.
  */
@@ -17,14 +23,8 @@ export function getShopperPoseFromInputAndFrame({
   input,
   frame,
   motion,
-}: Readonly<{
-  input: Input;
-  frame: number;
-  motion: VideoMotion;
-}>): GetShopperPoseResult {
-  const selections = input.products.flatMap((product, index) => {
-    return product.chosen ? [index] : [];
-  });
+}: ShopperPoseArgs): GetShopperPoseResult {
+  const selections = _getChosenProductIndices(input);
   const ordinal = Math.max(
     0,
     Math.min(selections.length - 1, Math.floor((frame - 30) / 24)),
@@ -52,13 +52,26 @@ export function getShopperPoseFromInputAndFrame({
     30 + selections.length * motion.scaleStagger(24),
     motion.chip,
   );
-  const x = mix(Math.max(0, retreat * 2 - 1), bodyX, 175);
-  const y = mix(Math.min(1, retreat * 2), bodyY, 414);
+  const { x, y } = _getRetreatPosition(retreat, bodyX, bodyY);
   const grip = approach * (1 - release) * (1 - retreat);
   return {
     x,
     y,
     handX: mix(grip, x - 12, product.x + 23),
     handY: mix(grip, y + 10, product.y),
+  };
+}
+
+function _getChosenProductIndices(input: Input): number[] {
+  return input.products.flatMap((product, index) => {
+    return product.chosen ? [index] : [];
+  });
+}
+
+/** The shopper stepping back to the till once every choice is made. */
+function _getRetreatPosition(retreat: number, bodyX: number, bodyY: number) {
+  return {
+    x: mix(Math.max(0, retreat * 2 - 1), bodyX, 175),
+    y: mix(Math.min(1, retreat * 2), bodyY, 414),
   };
 }

@@ -40,26 +40,40 @@ export function MarketTender({
       <SketchedShape
         shape={{
           kind: "path",
-          d:
-            input.tender === "cash"
-              ? "M-33 -15 H33 V15 H-33 Z M-27 -10 H27 V10 H-27 Z"
-              : "M-33 -15 H33 V-5 Q22 0 33 5 V15 H-33 V5 Q-22 0 -33 -5 Z",
+          d: _buildTenderPath(input.tender),
         }}
         profile={tokens.sketch.shape}
         fill={tokens.color.surface}
         stroke={accent}
       />
-      <text
-        x={0}
-        y={5}
-        fontFamily={tokens.text.graphic.value.fontFamily}
-        fontWeight={tokens.text.graphic.value.fontWeight}
-        fontSize={tokens.text.graphic.value.fontSize}
-        fill={accent}
-        textAnchor="middle"
-      >
-        {total}
-      </text>
+      <TenderTotal total={total} accent={accent} />
     </g>
+  );
+}
+
+/** A banknote for cash, a ticket with notched sides otherwise. */
+function _buildTenderPath(tender: Input["tender"]): string {
+  return tender === "cash"
+    ? "M-33 -15 H33 V15 H-33 Z M-27 -10 H27 V10 H-27 Z"
+    : "M-33 -15 H33 V-5 Q22 0 33 5 V15 H-33 V5 Q-22 0 -33 -5 Z";
+}
+
+function TenderTotal({
+  total,
+  accent,
+}: Readonly<{ total: number; accent: string }>): ReactNode {
+  const tokens = useGraphicTokens();
+  return (
+    <text
+      x={0}
+      y={5}
+      fontFamily={tokens.text.graphic.value.fontFamily}
+      fontWeight={tokens.text.graphic.value.fontWeight}
+      fontSize={tokens.text.graphic.value.fontSize}
+      fill={accent}
+      textAnchor="middle"
+    >
+      {total}
+    </text>
   );
 }

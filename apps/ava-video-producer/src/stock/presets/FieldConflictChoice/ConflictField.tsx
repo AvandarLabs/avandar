@@ -34,31 +34,18 @@ export function ConflictField({
     motion.scale(CHOOSE_FRAMES),
     motion.travel.easing,
   );
+  const lane = { field, input, y, progress };
   return (
     <g>
-      <ConflictFieldHeading
-        field={field}
-        input={input}
-        y={y}
-        progress={progress}
-      />
-      <ConflictChoiceMark
-        field={field}
-        input={input}
-        y={y}
-        progress={progress}
-        accent={accent}
-      />
+      <ConflictFieldHeading {...lane} />
+      <ConflictChoiceMark {...lane} accent={accent} />
       {input.sources.map((source, sourceIndex) => {
         return (
           <ConflictCandidate
             key={source.id}
+            {...lane}
             source={source}
             sourceIndex={sourceIndex}
-            field={field}
-            input={input}
-            y={y}
-            progress={progress}
             accent={accent}
           />
         );

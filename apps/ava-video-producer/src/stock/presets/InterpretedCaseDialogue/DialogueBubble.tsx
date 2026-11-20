@@ -40,9 +40,7 @@ export function DialogueBubble({
   interpreted,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
   const turn = input.turns[turnIndex];
   const at = 24 + turnIndex * 56 + (interpreted ? 20 : 0);
   if (frame <= at) {
@@ -56,18 +54,12 @@ export function DialogueBubble({
       data-turn={turn.id}
       opacity={motion.ramp(frame, at, motion.scale(10))}
     >
-      <StockRect
-        data-bubble={turn.id}
+      <BubbleOutline
+        turnId={turn.id}
         x={x}
         y={y}
-        width={interpreted ? 382 : 402}
-        height={interpreted ? 150 : 155}
-        rx={scales.corner(tokens.corner.card)}
-        fill={tokens.color.surface}
-        stroke={interpreted ? tokens.color.accentAlt : accent}
-        strokeWidth={scales.stroke(
-          interpreted ? tokens.stroke.hairline : tokens.stroke.default,
-        )}
+        interpreted={interpreted}
+        accent={accent}
       />
       <DialogueWording
         input={input}
@@ -77,5 +69,38 @@ export function DialogueBubble({
         y={y}
       />
     </g>
+  );
+}
+
+/** The bubble: an interpreted wording is smaller and finer than its original. */
+function BubbleOutline({
+  turnId,
+  x,
+  y,
+  interpreted,
+  accent,
+}: Readonly<{
+  turnId: string;
+  x: number;
+  y: number;
+  interpreted: boolean;
+  accent: string;
+}>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <StockRect
+      data-bubble={turnId}
+      x={x}
+      y={y}
+      width={interpreted ? 382 : 402}
+      height={interpreted ? 150 : 155}
+      rx={scales.corner(tokens.corner.card)}
+      fill={tokens.color.surface}
+      stroke={interpreted ? tokens.color.accentAlt : accent}
+      strokeWidth={scales.stroke(
+        interpreted ? tokens.stroke.hairline : tokens.stroke.default,
+      )}
+    />
   );
 }

@@ -4,6 +4,7 @@ import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ReconnectCase } from "./ReconnectCase";
 import { ReconnectLedger } from "./ReconnectLedger";
 import { ReconnectSetting } from "./ReconnectSetting";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./MissedVisitReconnect.schema";
 import type { ReactNode } from "react";
@@ -16,18 +17,7 @@ export function MissedVisitReconnect({
   input,
 }: Readonly<Props>): ReactNode {
   const motion = useGraphicMotion();
-  const workerPosition = input.cases.reduce((position, _, index) => {
-    return mix(
-      motion.ramp(
-        frame,
-        39 + index * motion.scaleStagger(9),
-        motion.scale(7),
-        motion.travel.easing,
-      ),
-      position,
-      160 + index * 48,
-    );
-  }, 160);
+  const workerPosition = _getWorkerY(input, frame, motion);
   return (
     <g>
       <ReconnectSetting input={input} />
@@ -57,4 +47,20 @@ export function MissedVisitReconnect({
       <ReconnectLedger input={input} frame={frame} />
     </g>
   );
+}
+
+/** The worker stepping down to each case in turn. */
+function _getWorkerY(input: Input, frame: number, motion: VideoMotion): number {
+  return input.cases.reduce((position, _, index) => {
+    return mix(
+      motion.ramp(
+        frame,
+        39 + index * motion.scaleStagger(9),
+        motion.scale(7),
+        motion.travel.easing,
+      ),
+      position,
+      160 + index * 48,
+    );
+  }, 160);
 }

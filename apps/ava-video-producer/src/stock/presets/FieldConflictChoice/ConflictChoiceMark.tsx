@@ -33,17 +33,7 @@ export function ConflictChoiceMark({
     progress,
   });
   if (!position) {
-    return (
-      <g data-review-field={field.id}>
-        <SketchedShape
-          shape={{ kind: "path", d: `M468 ${y + 34}h12v58h12` }}
-          profile={tokens.sketch.shape}
-          stroke={tokens.color.highlight}
-          fill="none"
-          opacity={progress}
-        />
-      </g>
-    );
+    return <ReviewBracket fieldId={field.id} y={y} progress={progress} />;
   }
   const { x, top } = position;
   return input.decisionStyle === "sliding-rail" ? (
@@ -62,6 +52,26 @@ export function ConflictChoiceMark({
         shape={{ kind: "path", d: `M${x + 2} ${top - 5}h-8v76h8` }}
         profile={tokens.sketch.shape}
         stroke={accent}
+        fill="none"
+        opacity={progress}
+      />
+    </g>
+  );
+}
+
+/** A review bracket for a field whose conflict no source resolves. */
+function ReviewBracket({
+  fieldId,
+  y,
+  progress,
+}: Readonly<{ fieldId: string; y: number; progress: number }>): ReactNode {
+  const tokens = useGraphicTokens();
+  return (
+    <g data-review-field={fieldId}>
+      <SketchedShape
+        shape={{ kind: "path", d: `M468 ${y + 34}h12v58h12` }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.highlight}
         fill="none"
         opacity={progress}
       />

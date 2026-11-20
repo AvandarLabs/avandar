@@ -27,7 +27,6 @@ export function HouseholdMarker({
   isSelected,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const progress = isSelected
@@ -39,19 +38,11 @@ export function HouseholdMarker({
   const y = mix(progress, 205 + Math.floor(index / 4) * 105, 174 + index * 28);
   return (
     <g>
-      <circle
-        data-map-household={household.id}
-        cx={mapX}
-        cy={mapY}
-        r={3}
-        fill={tokens.color.inactive}
-      />
-      <SketchedShape
-        shape={{ kind: "path", d: `M${mapX} ${mapY} L${x} ${y}` }}
-        profile={tokens.sketch.shape}
-        fill="none"
-        stroke={isSelected ? accent : tokens.color.inactive}
-        strokeOpacity={atomic.opacity["35"]}
+      <HouseholdAnchor
+        householdId={household.id}
+        mapPoint={{ x: mapX, y: mapY }}
+        badgePoint={{ x, y }}
+        color={isSelected ? accent : tokens.color.inactive}
       />
       <HouseholdBadge
         household={household}
@@ -64,5 +55,44 @@ export function HouseholdMarker({
       />
       <HouseholdCaption household={household} index={index} />
     </g>
+  );
+}
+
+type Point = Readonly<{ x: number; y: number }>;
+
+/** The household's map anchor and its leader to the badge. */
+function HouseholdAnchor({
+  householdId,
+  mapPoint,
+  badgePoint,
+  color,
+}: Readonly<{
+  householdId: string;
+  mapPoint: Point;
+  badgePoint: Point;
+  color: string;
+}>): ReactNode {
+  const { atomic } = useGraphicTheme();
+  const tokens = useGraphicTokens();
+  return (
+    <>
+      <circle
+        data-map-household={householdId}
+        cx={mapPoint.x}
+        cy={mapPoint.y}
+        r={3}
+        fill={tokens.color.inactive}
+      />
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${mapPoint.x} ${mapPoint.y} L${badgePoint.x} ${badgePoint.y}`,
+        }}
+        profile={tokens.sketch.shape}
+        fill="none"
+        stroke={color}
+        strokeOpacity={atomic.opacity["35"]}
+      />
+    </>
   );
 }

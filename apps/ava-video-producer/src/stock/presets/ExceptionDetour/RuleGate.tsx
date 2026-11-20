@@ -14,22 +14,11 @@ export function RuleGate({ frame, accent, input }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
   const scales = useGraphicShapeScales();
   const motion = useGraphicMotion();
-  const opening = motion.reveal(frame, 48);
   const emphasis = scales.stroke(tokens.stroke.emphasis);
   const side = input.detourSide === "above" ? -1 : 1;
   return (
     <g opacity={ramp(frame, 12, motion.hero, motion.reveal.easing)}>
-      <FitText
-        text={input.rule.label}
-        x={480}
-        y={50}
-        width={840}
-        fontSize={24}
-        maxLines={3}
-        anchor="middle"
-        breakLongWords
-        normalizeWhitespace
-      />
+      <RuleLabel text={input.rule.label} />
       <g data-standard-route="true">
         <SketchedShape
           shape={{ kind: "path", d: "M100 300 H880" }}
@@ -45,17 +34,7 @@ export function RuleGate({ frame, accent, input }: Readonly<Props>): ReactNode {
         stroke={accent}
         strokeWidth={emphasis}
       />
-      <g
-        data-side-latch="true"
-        transform={`rotate(${mix(opening, 0, side * 62)} 420 300)`}
-      >
-        <SketchedShape
-          shape={{ kind: "path", d: "M420 300 H462" }}
-          profile={tokens.sketch.shape}
-          stroke={tokens.color.highlight}
-          strokeWidth={scales.stroke(tokens.stroke.heavy)}
-        />
-      </g>
+      <SideLatch frame={frame} side={side} />
       <StandardOutcome input={input} />
       {input.showStandardReference ? (
         <circle
@@ -66,6 +45,46 @@ export function RuleGate({ frame, accent, input }: Readonly<Props>): ReactNode {
           fill={tokens.color.inactive}
         />
       ) : null}
+    </g>
+  );
+}
+
+function RuleLabel({ text }: Readonly<{ text: string }>): ReactNode {
+  return (
+    <FitText
+      text={text}
+      x={480}
+      y={50}
+      width={840}
+      fontSize={24}
+      maxLines={3}
+      anchor="middle"
+      breakLongWords
+      normalizeWhitespace
+    />
+  );
+}
+
+/** The latch that swings open to the detour side for the exception. */
+function SideLatch({
+  frame,
+  side,
+}: Readonly<{ frame: number; side: number }>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  const motion = useGraphicMotion();
+  const opening = motion.reveal(frame, 48);
+  return (
+    <g
+      data-side-latch="true"
+      transform={`rotate(${mix(opening, 0, side * 62)} 420 300)`}
+    >
+      <SketchedShape
+        shape={{ kind: "path", d: "M420 300 H462" }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.highlight}
+        strokeWidth={scales.stroke(tokens.stroke.heavy)}
+      />
     </g>
   );
 }

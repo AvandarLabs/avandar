@@ -25,7 +25,6 @@ export function RemedyActions({
   const reach = isRetesting
     ? motion.ramp(frame, 88, motion.whip)
     : motion.ramp(frame, 10, motion.scale(10));
-  const replacement = motion.ramp(frame, 56, motion.scale(22));
   return (
     <g>
       {isInitial || isRetesting ? (
@@ -44,20 +43,31 @@ export function RemedyActions({
         />
       ) : undefined}
       {frame >= 44 && frame <= 78 ? (
-        <SketchedShape
-          shape={{
-            kind: "path",
-            d: `M760 310 L${mix(replacement, 742, 562)} ${mix(replacement, 374, 330)}`,
-          }}
-          profile={tokens.sketch.shape}
-          data-repair-hand="worker"
-          fill="none"
-          stroke={tokens.color.accentAlt}
-          strokeWidth={scales.stroke(5)}
-          strokeLinecap="round"
-        />
+        <WorkerRepairHand frame={frame} />
       ) : undefined}
       <ComplaintPlacement frame={frame} input={input} accent={accent} />
     </g>
+  );
+}
+
+/** The worker's hand, carrying the replacement part in and out. */
+function WorkerRepairHand({ frame }: Readonly<{ frame: number }>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
+  const replacement = motion.ramp(frame, 56, motion.scale(22));
+  return (
+    <SketchedShape
+      shape={{
+        kind: "path",
+        d: `M760 310 L${mix(replacement, 742, 562)} ${mix(replacement, 374, 330)}`,
+      }}
+      profile={tokens.sketch.shape}
+      data-repair-hand="worker"
+      fill="none"
+      stroke={tokens.color.accentAlt}
+      strokeWidth={scales.stroke(5)}
+      strokeLinecap="round"
+    />
   );
 }

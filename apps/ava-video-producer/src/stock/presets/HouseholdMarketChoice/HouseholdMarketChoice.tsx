@@ -19,11 +19,33 @@ export function HouseholdMarketChoice({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
   return (
     <g>
       <MarketLabels input={input} />
+      <MarketScenery accent={accent} />
+      {input.products.map((product, index) => {
+        return (
+          <MarketProduct
+            key={product.id}
+            input={input}
+            frame={frame}
+            index={index}
+            accent={accent}
+          />
+        );
+      })}
+      <MarketShopper input={input} frame={frame} accent={accent} />
+      <MarketCheckout input={input} frame={frame} accent={accent} />
+    </g>
+  );
+}
+
+/** The shelf, the retailer behind it, and the shopper's basket. */
+function MarketScenery({ accent }: Readonly<{ accent: string }>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <>
       <SketchedShape
         shape={{ kind: "path", d: "M40 288 H922 M40 288 V304 M922 288 V304" }}
         profile={tokens.sketch.shape}
@@ -48,19 +70,6 @@ export function HouseholdMarketChoice({
         strokeWidth={scales.stroke(tokens.stroke.default)}
         fill="none"
       />
-      {input.products.map((product, index) => {
-        return (
-          <MarketProduct
-            key={product.id}
-            input={input}
-            frame={frame}
-            index={index}
-            accent={accent}
-          />
-        );
-      })}
-      <MarketShopper input={input} frame={frame} accent={accent} />
-      <MarketCheckout input={input} frame={frame} accent={accent} />
-    </g>
+    </>
   );
 }

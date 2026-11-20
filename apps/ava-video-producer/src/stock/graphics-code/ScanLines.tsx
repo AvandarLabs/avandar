@@ -38,7 +38,6 @@ export function ScanLines({
   const { color, stroke, corner, sketch } = useGraphicTokens();
   const shapes = useGraphicShapeScales();
   const motion = useGraphicMotion();
-  const hairline = shapes.stroke(stroke.hairline);
   const fields = input.fields;
   const t = motion.ramp(
     frame,

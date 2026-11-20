@@ -28,23 +28,7 @@ export function GlobeSurface({
         fill={tokens.color.surface}
         stroke={tokens.color.inactive}
       />
-      {showGraticule ? (
-        <SketchedShape
-          shape={{
-            kind: "path",
-            d:
-              GlobeProjection.getPathFromGeometry({
-                ...view,
-                geometry: geoGraticule10(),
-              }) ?? "",
-          }}
-          profile={tokens.sketch.shape}
-          data-graticule="world"
-          fill="none"
-          stroke={tokens.color.line}
-          strokeWidth={scales.stroke(0.7)}
-        />
-      ) : undefined}
+      {showGraticule ? <Graticule view={view} /> : undefined}
       <SketchedShape
         shape={{
           kind: "path",
@@ -57,5 +41,36 @@ export function GlobeSurface({
         strokeWidth={scales.stroke(0.7)}
       />
     </g>
+  );
+}
+
+/** Ten-degree graticules, clipped to the visible hemisphere. */
+function Graticule({
+  view,
+}: Readonly<{
+  view: Readonly<{
+    centerLongitude: number;
+    centerLatitude: number;
+    radius: number;
+  }>;
+}>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <SketchedShape
+      shape={{
+        kind: "path",
+        d:
+          GlobeProjection.getPathFromGeometry({
+            ...view,
+            geometry: geoGraticule10(),
+          }) ?? "",
+      }}
+      profile={tokens.sketch.shape}
+      data-graticule="world"
+      fill="none"
+      stroke={tokens.color.line}
+      strokeWidth={scales.stroke(0.7)}
+    />
   );
 }

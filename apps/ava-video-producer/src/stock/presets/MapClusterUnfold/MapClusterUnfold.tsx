@@ -7,6 +7,7 @@ import {
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { ClusterLedger } from "./ClusterLedger";
 import { ClusterPoints } from "./ClusterPoints";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./MapClusterUnfold.schema";
 import type { ReactNode } from "react";
@@ -29,21 +30,7 @@ export function MapClusterUnfold({
   const { color, stroke } = useGraphicTokens();
   const shapes = useGraphicShapeScales();
   const motion = useGraphicMotion();
-  const grouping =
-    frame <= UNFOLD_AT
-      ? motion.ramp(
-          frame,
-          CLUSTER_AT,
-          motion.scale(CLUSTER_FRAMES),
-          motion.travel.easing,
-        )
-      : 1 -
-        motion.ramp(
-          frame,
-          UNFOLD_AT,
-          motion.scale(UNFOLD_FRAMES),
-          motion.travel.easing,
-        );
+  const grouping = _getGrouping(frame, motion);
   return (
     <g opacity={motion.reveal(frame, SCENE_FADE_AT)}>
       <LabelSlots
@@ -74,4 +61,22 @@ export function MapClusterUnfold({
       <ClusterLedger {...{ input, grouping, accent }} />
     </g>
   );
+}
+
+/** How far the points have contracted into clusters, 0 to 1 and back. */
+function _getGrouping(frame: number, motion: VideoMotion): number {
+  return frame <= UNFOLD_AT
+    ? motion.ramp(
+        frame,
+        CLUSTER_AT,
+        motion.scale(CLUSTER_FRAMES),
+        motion.travel.easing,
+      )
+    : 1 -
+        motion.ramp(
+          frame,
+          UNFOLD_AT,
+          motion.scale(UNFOLD_FRAMES),
+          motion.travel.easing,
+        );
 }

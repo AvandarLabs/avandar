@@ -69,9 +69,7 @@ export function ExpectedSheet({
   state,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
   const motion = useGraphicMotion();
   const { registration, top, scale } = _getSheetGeometry({
     frame,
@@ -83,20 +81,11 @@ export function ExpectedSheet({
   return (
     <g>
       <g data-expected-sheet={item.id} transform={`translate(510 ${top})`}>
-        <g
-          data-hinge={input.sheetMotion === "hinge"}
-          transform={`matrix(1 0 0 ${scale} 0 0)`}
-        >
-          <StockRect
-            width={390}
-            height={39}
-            rx={scales.corner(SHEET_CORNER)}
-            fill={accent}
-            fillOpacity={scales.wash(atomic.opacity["6"])}
-            stroke={accent}
-            strokeWidth={scales.stroke(tokens.stroke.default)}
-          />
-        </g>
+        <HingedSheet
+          isHinge={input.sheetMotion === "hinge"}
+          scale={scale}
+          accent={accent}
+        />
         <g opacity={input.sheetMotion === "hinge" ? registration : 1}>
           <LiteralDataText value={item.expected} x={15} y={24} color={accent} />
         </g>
@@ -109,6 +98,30 @@ export function ExpectedSheet({
         profile={tokens.sketch.shape}
         stroke={tokens.color.line}
         fill="none"
+      />
+    </g>
+  );
+}
+
+/** The expected sheet itself, folded flat on its hinge until it registers. */
+function HingedSheet({
+  isHinge,
+  scale,
+  accent,
+}: Readonly<{ isHinge: boolean; scale: number; accent: string }>): ReactNode {
+  const { atomic } = useGraphicTheme();
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <g data-hinge={isHinge} transform={`matrix(1 0 0 ${scale} 0 0)`}>
+      <StockRect
+        width={390}
+        height={39}
+        rx={scales.corner(SHEET_CORNER)}
+        fill={accent}
+        fillOpacity={scales.wash(atomic.opacity["6"])}
+        stroke={accent}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
     </g>
   );

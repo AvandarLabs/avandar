@@ -23,11 +23,7 @@ export function KernelCones({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const { stroke, alpha, sketch } = useGraphicTokens();
-  const shapes = useGraphicShapeScales();
   const motion = useGraphicMotion();
-  const hairline = shapes.stroke(stroke.hairline);
   const { radius } = getKernelSamplesFromInput({
     input,
     frame,
@@ -45,31 +41,62 @@ export function KernelCones({
         const center = { cx: 180 + point.x * 2.8, cy: 200 + point.y * 2.8 };
         return frame < CONES_HIDE_AT || input.showKernels ? (
           <g key={point.id} opacity={rise}>
-            <SketchedShape
-              data-kernel-boundary={point.id}
-              shape={{ kind: "circle", ...center, r: radius * 2.8 }}
-              profile={sketch.shape}
-              fill="none"
-              stroke={accent}
-              strokeOpacity={atomic.opacity["32"]}
-              strokeWidth={hairline}
-            />
-            <SketchedShape
-              data-cone={point.id}
-              shape={{
-                kind: "path",
-                d: `M ${center.cx - radius * 2.8} ${center.cy} L ${center.cx} ${center.cy - height} L ${center.cx + radius * 2.8} ${center.cy} Z`,
-              }}
-              profile={sketch.shape}
-              fill={accent}
-              fillOpacity={shapes.wash(CONE_FILL_ALPHA)}
-              stroke={accent}
-              strokeOpacity={alpha.dimmed}
-              strokeWidth={hairline}
+            <KernelCone
+              pointId={point.id}
+              center={center}
+              radius={radius}
+              height={height}
+              accent={accent}
             />
           </g>
         ) : undefined;
       })}
     </g>
+  );
+}
+
+/** One weighted cone over its observation, with its kernel's boundary. */
+function KernelCone({
+  pointId,
+  center,
+  radius,
+  height,
+  accent,
+}: Readonly<{
+  pointId: string;
+  center: Readonly<{ cx: number; cy: number }>;
+  radius: number;
+  height: number;
+  accent: string;
+}>): ReactNode {
+  const { atomic } = useGraphicTheme();
+  const { stroke, alpha, sketch } = useGraphicTokens();
+  const shapes = useGraphicShapeScales();
+  const hairline = shapes.stroke(stroke.hairline);
+  return (
+    <>
+      <SketchedShape
+        data-kernel-boundary={pointId}
+        shape={{ kind: "circle", ...center, r: radius * 2.8 }}
+        profile={sketch.shape}
+        fill="none"
+        stroke={accent}
+        strokeOpacity={atomic.opacity["32"]}
+        strokeWidth={hairline}
+      />
+      <SketchedShape
+        data-cone={pointId}
+        shape={{
+          kind: "path",
+          d: `M ${center.cx - radius * 2.8} ${center.cy} L ${center.cx} ${center.cy - height} L ${center.cx + radius * 2.8} ${center.cy} Z`,
+        }}
+        profile={sketch.shape}
+        fill={accent}
+        fillOpacity={shapes.wash(CONE_FILL_ALPHA)}
+        stroke={accent}
+        strokeOpacity={alpha.dimmed}
+        strokeWidth={hairline}
+      />
+    </>
   );
 }
