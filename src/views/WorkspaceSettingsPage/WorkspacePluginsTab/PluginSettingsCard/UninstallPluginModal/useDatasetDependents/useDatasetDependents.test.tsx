@@ -170,7 +170,11 @@ describe("useDatasetDependents", () => {
     const { result } = _renderDependents();
 
     expect(result.current.dependents).toEqual([
-      { key: "binding-1", kind: "dataSlot", label: "Cases in the Epidemiology plugin" },
+      {
+        key: "binding-1",
+        kind: "dataSlot",
+        label: "Cases in the Epidemiology plugin",
+      },
     ]);
   });
 
@@ -196,7 +200,11 @@ describe("useDatasetDependents", () => {
     const { result } = _renderDependents();
 
     expect(result.current.dependents).toEqual([
-      { key: "binding-2", kind: "dataSlot", label: "rows in the acme.unbundled plugin" },
+      {
+        key: "binding-2",
+        kind: "dataSlot",
+        label: "rows in the acme.unbundled plugin",
+      },
     ]);
   });
 
@@ -293,7 +301,11 @@ describe("useDatasetDependents", () => {
     const { result } = _renderDependents();
 
     expect(result.current.dependents).toEqual([
-      { key: "binding-1", kind: "dataSlot", label: "Cases in the Epidemiology plugin" },
+      {
+        key: "binding-1",
+        kind: "dataSlot",
+        label: "Cases in the Epidemiology plugin",
+      },
     ]);
   });
 
@@ -371,7 +383,11 @@ describe("useDatasetDependents", () => {
     const { result } = _renderDependents();
 
     expect(result.current.dependents).toEqual([
-      { key: "binding-1", kind: "dataSlot", label: "Cases in the Epidemiology plugin" },
+      {
+        key: "binding-1",
+        kind: "dataSlot",
+        label: "Cases in the Epidemiology plugin",
+      },
     ]);
   });
 
@@ -385,7 +401,11 @@ describe("useDatasetDependents", () => {
 
     expect(result.current.dependents).toEqual([
       { key: "linked-1", kind: "linkedDataset", label: "Districts linked" },
-      { key: "binding-1", kind: "dataSlot", label: "Cases in the Epidemiology plugin" },
+      {
+        key: "binding-1",
+        kind: "dataSlot",
+        label: "Cases in the Epidemiology plugin",
+      },
     ]);
   });
 
@@ -398,7 +418,11 @@ describe("useDatasetDependents", () => {
     const { result } = _renderDependents();
 
     expect(result.current.dependents).toEqual([
-      { key: "binding-1", kind: "dataSlot", label: "Casos in the Epidemiologia plugin" },
+      {
+        key: "binding-1",
+        kind: "dataSlot",
+        label: "Casos in the Epidemiologia plugin",
+      },
     ]);
   });
 

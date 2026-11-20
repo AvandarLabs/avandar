@@ -5,8 +5,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DatasetDeleteError } from "@/clients/datasets/DatasetClient/DatasetDeleteError";
 import { useNotifyDatasetDeleteError } from "@/hooks/datasets/useNotifyDatasetDeleteError/useNotifyDatasetDeleteError";
 import { renderHook } from "@/test-utils";
-import type { ReactNode } from "react";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { ReactNode } from "react";
 
 const mocks = vi.hoisted(() => {
   return { notifyErrorMock: vi.fn(), reportErrorMock: vi.fn() };
@@ -61,7 +61,8 @@ describe("useNotifyDatasetDeleteError", () => {
 
     expect(mocks.notifyErrorMock).toHaveBeenCalledWith({
       title: "Dataset not deleted",
-      message: "You don't have permission to delete this dataset, or it has already been deleted.",
+      message:
+        "You don't have permission to delete this dataset, or it has already been deleted.",
     });
   });
 
@@ -69,7 +70,10 @@ describe("useNotifyDatasetDeleteError", () => {
     const notify = _renderNotifier();
 
     notify(
-      new DatasetDeleteError({ datasetId: DATASET_ID, reason: "still_present" }),
+      new DatasetDeleteError({
+        datasetId: DATASET_ID,
+        reason: "still_present",
+      }),
     );
 
     expect(mocks.notifyErrorMock).toHaveBeenCalledWith({

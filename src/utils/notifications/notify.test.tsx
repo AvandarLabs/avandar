@@ -1,8 +1,8 @@
 import { notifications } from "@mantine/notifications";
 import { act } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { notifyError } from "@/utils/notifications/notify";
 import { render, screen } from "@/test-utils";
+import { notifyError } from "@/utils/notifications/notify";
 
 afterEach(() => {
   act(() => {

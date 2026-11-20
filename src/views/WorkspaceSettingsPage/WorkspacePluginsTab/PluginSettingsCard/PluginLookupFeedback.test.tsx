@@ -42,9 +42,9 @@ describe("PluginLookupFeedback", () => {
   it("ties Retry to the thing it belongs to", () => {
     render(_buildFeedback("failed"));
 
-    expect(screen.getByRole("button", { name: "Retry" })).toHaveAccessibleDescription(
-      "Epidemiology",
-    );
+    expect(
+      screen.getByRole("button", { name: "Retry" }),
+    ).toHaveAccessibleDescription("Epidemiology");
   });
 
   it("keeps the alert, shows Retry loading and announces the retry while retrying", () => {

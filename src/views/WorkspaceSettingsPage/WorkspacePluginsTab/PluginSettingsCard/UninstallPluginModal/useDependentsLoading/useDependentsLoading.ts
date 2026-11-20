@@ -18,8 +18,9 @@ export type ReportDependentsLoading = (
  * rows that show what reads a checked dataset. Outside a modal it does
  * nothing, so a row can be rendered on its own.
  */
-export const DependentsLoadingContext =
-  createContext<ReportDependentsLoading>(() => {});
+export const DependentsLoadingContext = createContext<ReportDependentsLoading>(
+  () => {},
+);
 
 /**
  * Collects which checked datasets are still loading what reads them, so the

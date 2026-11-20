@@ -622,7 +622,9 @@ describe("WorkspacePluginsTab", () => {
     _renderTab();
 
     const card = await screen.findByRole("region", { name: REMOVED_PLUGIN_ID });
-    expect(within(card).getByRole("button", { name: "Uninstall" })).toBeEnabled();
+    expect(
+      within(card).getByRole("button", { name: "Uninstall" }),
+    ).toBeEnabled();
   });
 
   describe("the uninstall modal of a plugin that imported datasets", () => {

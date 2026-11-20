@@ -31,8 +31,7 @@ mocks.createServerApiMock.mockImplementation(() => {
 });
 
 const { UserClient } = await import("@/clients/UserClient");
-const serverApiCreationsAtImport =
-  mocks.createServerApiMock.mock.calls.length;
+const serverApiCreationsAtImport = mocks.createServerApiMock.mock.calls.length;
 
 const PARAMS = {
   resourceType: "dataset",

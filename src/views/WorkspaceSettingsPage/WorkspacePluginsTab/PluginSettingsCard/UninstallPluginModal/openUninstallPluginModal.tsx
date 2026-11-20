@@ -6,8 +6,8 @@ import {
   returnFocusFromOpener,
   returnFocusToCardHeading,
 } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/returnFocusFromOpener";
-import type { UninstallModalCloseReason } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallPluginModal";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
+import type { UninstallModalCloseReason } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallPluginModal";
 
 type OpenUninstallPluginModalOptions = Readonly<{
   pluginName: string;

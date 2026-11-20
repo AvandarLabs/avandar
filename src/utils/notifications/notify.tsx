@@ -1,7 +1,7 @@
 import { i18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
-import { notifications } from "@mantine/notifications";
 import { Stack, Text } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 import { UntranslatedDetail } from "@/components/UntranslatedDetail/UntranslatedDetail";
 import type { MantineColor } from "@mantine/core";
 import type { ReactNode } from "react";

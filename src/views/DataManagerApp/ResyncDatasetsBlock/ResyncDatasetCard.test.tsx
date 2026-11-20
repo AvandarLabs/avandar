@@ -160,7 +160,8 @@ describe("ResyncDatasetCard", () => {
     });
     expect(mocks.notifyError).toHaveBeenCalledWith({
       title: "Dataset not deleted",
-      message: "You don't have permission to delete this dataset, or it has already been deleted.",
+      message:
+        "You don't have permission to delete this dataset, or it has already been deleted.",
     });
     expect(mocks.notifySuccess).not.toHaveBeenCalled();
   });

@@ -3,14 +3,13 @@ import {
   requiresOriginalFileRetention,
 } from "$/models/datasets/DatasetSource/DatasetSource";
 import { createServerApiClient } from "$/ServerApiClient";
+import { DatasetDeleteError } from "@/clients/datasets/DatasetClient/DatasetDeleteError";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { DatasetOriginalFileStorageClient } from "@/clients/storage/DatasetOriginalFileStorageClient/DatasetOriginalFileStorageClient";
 import { DatasetParquetStorageClient } from "@/clients/storage/DatasetParquetStorageClient/DatasetParquetStorageClient";
 import { UserClient } from "@/clients/UserClient";
-import { DatasetDeleteError } from "@/clients/datasets/DatasetClient/DatasetDeleteError";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { ILogger } from "@avandar/logger";
 import type { CompositeTypes } from "$/types/database.types";
 import type {
   DatasetColumnInput,
@@ -18,6 +17,7 @@ import type {
   DatasetMutationConfig,
   DatasetMutationRecord,
 } from "@/clients/datasets/DatasetClient/DatasetClient.types";
+import type { ILogger } from "@avandar/logger";
 
 // Platform-aware server API client; reads the Supabase client registered by
 // AvaSupabase for the web-backed adapter.

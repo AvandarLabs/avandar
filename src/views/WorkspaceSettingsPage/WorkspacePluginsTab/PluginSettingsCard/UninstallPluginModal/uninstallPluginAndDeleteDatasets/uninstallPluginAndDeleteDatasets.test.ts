@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DatasetDeleteError } from "@/clients/datasets/DatasetClient/DatasetDeleteError";
-import { UninstallPluginError } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/uninstallPluginAndDeleteDatasets/UninstallPluginError";
 import { uninstallPluginAndDeleteDatasets } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/uninstallPluginAndDeleteDatasets/uninstallPluginAndDeleteDatasets";
-import type { UninstallOutcome } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/uninstallPluginAndDeleteDatasets/uninstallPluginAndDeleteDatasets";
+import { UninstallPluginError } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/uninstallPluginAndDeleteDatasets/UninstallPluginError";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
+import type { UninstallOutcome } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/uninstallPluginAndDeleteDatasets/uninstallPluginAndDeleteDatasets";
 
 const mocks = vi.hoisted(() => {
   return {
@@ -44,9 +44,7 @@ const INSTALLATION_ID = "installation-1" as PluginInstallation.Id;
 const PROVINCES_DATASET_ID = "dataset-provinces" as Dataset.Id;
 const DISTRICTS_DATASET_ID = "dataset-districts" as Dataset.Id;
 
-function _run(
-  datasetIds: readonly Dataset.Id[],
-): Promise<UninstallOutcome> {
+function _run(datasetIds: readonly Dataset.Id[]): Promise<UninstallOutcome> {
   return uninstallPluginAndDeleteDatasets({
     installationId: INSTALLATION_ID,
     datasetIds,
@@ -154,7 +152,10 @@ describe("uninstallPluginAndDeleteDatasets", () => {
     it("still deletes the datasets after it", async () => {
       await _run([PROVINCES_DATASET_ID, DISTRICTS_DATASET_ID]);
 
-      expect(mocks.calls).toEqual(["uninstall", `delete ${DISTRICTS_DATASET_ID}`]);
+      expect(mocks.calls).toEqual([
+        "uninstall",
+        `delete ${DISTRICTS_DATASET_ID}`,
+      ]);
     });
 
     it("returns that dataset as incomplete and the others as deleted", async () => {
@@ -194,7 +195,10 @@ describe("uninstallPluginAndDeleteDatasets", () => {
         incompleteDatasetIds: [],
         unreadDatasetIds: [],
       });
-      expect(mocks.calls).toEqual(["uninstall", `delete ${DISTRICTS_DATASET_ID}`]);
+      expect(mocks.calls).toEqual([
+        "uninstall",
+        `delete ${DISTRICTS_DATASET_ID}`,
+      ]);
     });
 
     it("is not logged as an unexpected error", async () => {

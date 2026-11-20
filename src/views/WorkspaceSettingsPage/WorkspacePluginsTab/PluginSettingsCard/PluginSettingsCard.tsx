@@ -3,8 +3,8 @@ import { useId } from "react";
 import { PluginActions } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/PluginActions";
 import { PluginCardSummary } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginCardSummary";
 import { PluginImportLookupFeedback } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginImportLookupFeedback";
-import { usePluginCardState } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginCardState";
 import { PluginInstalledSections } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginInstalledSections";
+import { usePluginCardState } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginCardState";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
 import type { PluginManifestModule } from "@/lib/plugins/PluginIndex.types";
 

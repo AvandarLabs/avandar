@@ -12,11 +12,11 @@ import { useRunUninstall } from "@/views/WorkspaceSettingsPage/WorkspacePluginsT
 import { useUninstallContentRows } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useUninstallContentRows/useUninstallContentRows";
 import { useKeepModalOpenWhile } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/useKeepModalOpenWhile";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
 import type {
   UninstallContentRow,
   UninstallContentRows,
 } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useUninstallContentRows/useUninstallContentRows";
-import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
 
 /**
  * Why the modal is closing: the admin backed out, or the plugin was
@@ -130,10 +130,7 @@ function UninstallModalBody(
   const content = useUninstallContentRows(props.pluginId);
   const { checkedIds, setIsChecked } = useCheckedDatasetIds();
   const uninstaller = useModalUninstaller(props, content.rows);
-  const datasetIdsToDelete = _listCheckedIdsInRowOrder(
-    content,
-    checkedIds,
-  );
+  const datasetIdsToDelete = _listCheckedIdsInRowOrder(content, checkedIds);
   const confirmLabel = useConfirmLabel({
     checkedCount: datasetIdsToDelete.length,
     isKeepingAll: content.hasFailed || content.isRetrying,

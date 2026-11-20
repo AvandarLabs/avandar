@@ -45,16 +45,17 @@ vi.mock(
 vi.mock(
   "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/UninstallDatasetDependents/UninstallDatasetDependents",
   async () => {
-    const { useReportDependentsLoading } = await import(
-      "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useDependentsLoading/useDependentsLoading"
-    );
+    const { useReportDependentsLoading } =
+      await import("@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useDependentsLoading/useDependentsLoading");
     return {
       UninstallDatasetDependents: ({ datasetId }: { datasetId: string }) => {
         useReportDependentsLoading({
           datasetId: datasetId as never,
           isLoading: mocks.isLoadingDependents,
         });
-        return mocks.hasDependents ? <p>{`dependents of ${datasetId}`}</p> : null;
+        return mocks.hasDependents ? (
+          <p>{`dependents of ${datasetId}`}</p>
+        ) : null;
       },
     };
   },
@@ -358,7 +359,6 @@ describe("UninstallPluginModal", () => {
     });
   });
 
-
   it("closes the modal once the uninstall finishes", async () => {
     _renderModal();
 
@@ -447,7 +447,9 @@ describe("UninstallPluginModal", () => {
       _renderModal();
 
       expect(screen.queryByText(/you can't see/)).not.toBeInTheDocument();
-      expect(screen.queryByText(/Only a dataset admin/)).not.toBeInTheDocument();
+      expect(
+        screen.queryByText(/Only a dataset admin/),
+      ).not.toBeInTheDocument();
       expect(screen.queryByRole("group")).not.toBeInTheDocument();
     });
 
@@ -655,5 +657,4 @@ describe("UninstallPluginModal", () => {
       });
     });
   });
-
 });

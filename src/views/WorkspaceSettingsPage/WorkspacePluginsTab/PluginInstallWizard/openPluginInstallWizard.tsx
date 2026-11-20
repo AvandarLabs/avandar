@@ -1,8 +1,8 @@
 import { t } from "@lingui/core/macro";
 import { randomId } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
-import { returnFocusFromOpener } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/returnFocusFromOpener";
 import { PluginInstallWizard } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/PluginInstallWizard";
+import { returnFocusFromOpener } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/returnFocusFromOpener";
 import type { PluginManifestModule } from "@/lib/plugins/PluginIndex.types";
 
 /**

@@ -472,12 +472,10 @@ describe("buildDataAgentSystemPrompt", () => {
     const changeBullet = bullets[2]!;
 
     expect(v5).not.toContain("how a chart on the page is shown");
-    expect(addBullet.endsWith("a question about the data, uses run_query.")).toBe(
-      true,
-    );
-    expect(changeBullet).toContain(
-      "Changing how a chart on the page is shown",
-    );
+    expect(
+      addBullet.endsWith("a question about the data, uses run_query."),
+    ).toBe(true);
+    expect(changeBullet).toContain("Changing how a chart on the page is shown");
     expect(changeBullet).toContain(
       "When the page lists more than one chart and the user names none, call ask_user with their titles as options, and run no query until they answer.",
     );
@@ -517,9 +515,7 @@ describe("buildDataAgentSystemPrompt", () => {
     expect(filterBullet).toContain(
       "use only the filters and period the user asked for, and all dates when they named no period",
     );
-    expect(filterBullet).toContain(
-      "only when the user refers to that period",
-    );
+    expect(filterBullet).toContain("only when the user refers to that period");
     expect(filterBullet).toContain(
       "A chart copied from the page keeps its own filters.",
     );

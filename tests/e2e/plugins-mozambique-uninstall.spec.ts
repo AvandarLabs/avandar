@@ -54,7 +54,9 @@ test.describe("Mozambique plugin uninstall", () => {
       });
 
       const card = getPluginCard(page, MOZAMBIQUE_PLUGIN_NAME);
-      await card.getByRole("button", { name: "Uninstall", exact: true }).click();
+      await card
+        .getByRole("button", { name: "Uninstall", exact: true })
+        .click();
       const dialog = page.getByRole("dialog", {
         name: `Uninstall ${MOZAMBIQUE_PLUGIN_NAME}?`,
         exact: true,
@@ -78,9 +80,9 @@ test.describe("Mozambique plugin uninstall", () => {
       await expect(page.getByRole("link", { name: KEPT_DATASET })).toBeVisible({
         timeout: LONG_WAIT,
       });
-      await expect(page.getByRole("link", { name: DELETED_DATASET })).toHaveCount(
-        0,
-      );
+      await expect(
+        page.getByRole("link", { name: DELETED_DATASET }),
+      ).toHaveCount(0);
     } finally {
       // Each cleanup step runs even when an earlier one fails.
       await deleteMozambiqueImportedContent({ admin, workspaceId }).catch(

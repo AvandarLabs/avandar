@@ -13,7 +13,5 @@
   "costPerQuestion": 0.00026334,
   "latencyMedianMs": 2503.417292,
   "latencyP90Ms": 2503.417292,
-  "failedIds": [
-    "D04"
-  ]
+  "failedIds": ["D04"]
 }

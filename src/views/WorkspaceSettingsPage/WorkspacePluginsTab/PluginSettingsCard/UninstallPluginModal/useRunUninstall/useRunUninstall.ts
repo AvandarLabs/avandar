@@ -12,8 +12,8 @@ import {
   notifySuccess,
   notifyWarning,
 } from "@/utils/notifications/notify";
-import { UninstallPluginError } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/uninstallPluginAndDeleteDatasets/UninstallPluginError";
 import { uninstallPluginAndDeleteDatasets } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/uninstallPluginAndDeleteDatasets/uninstallPluginAndDeleteDatasets";
+import { UninstallPluginError } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/uninstallPluginAndDeleteDatasets/UninstallPluginError";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { PluginInstallation } from "$/models/PluginInstallation/PluginInstallation";
 import type { UninstallContentRow } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/UninstallPluginModal/useUninstallContentRows/useUninstallContentRows";
@@ -128,9 +128,7 @@ async function _uninstallAndRefresh(
  * was not deleted, in the order incomplete, could not be checked, refused.
  * It returns no sentences when every chosen dataset was handled.
  */
-function useBuildUninstallWarnings(): (
-  summary: UninstallSummary,
-) => string[] {
+function useBuildUninstallWarnings(): (summary: UninstallSummary) => string[] {
   const { t, i18n } = useLingui();
   return ({ refusedNames, incompleteNames, unreadNames }) => {
     const listFormat = new Intl.ListFormat(i18n.locale, {

@@ -3,8 +3,8 @@ import { describe, expect, it, vi } from "vitest";
 import { DEFAULT_MODAL_PROPS } from "@/config/Theme";
 import { fireEvent, render, screen, within } from "@/test-utils";
 import { PluginActions } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/PluginActions";
-import type { ImportedDatasetsState } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/PluginActions.types";
 import type { PluginInstallStatus } from "@/lib/plugins/getPluginInstallStatusFromInstallation/getPluginInstallStatusFromInstallation";
+import type { ImportedDatasetsState } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/PluginActions/PluginActions.types";
 import type { PluginInstallationActions } from "@/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginSettingsCard/usePluginInstallationActions/usePluginInstallationActions";
 
 const HEADING_ID = "plugin-heading";

@@ -291,9 +291,7 @@ describe("struct cells", () => {
   });
 
   it("shows a struct holding a bigint", () => {
-    expect(_formatPlainCell("location", { count: 12n })).toBe(
-      '{"count":"12"}',
-    );
+    expect(_formatPlainCell("location", { count: 12n })).toBe('{"count":"12"}');
   });
 
   it("uses a value's own toJSON, as an Arrow struct row has", () => {

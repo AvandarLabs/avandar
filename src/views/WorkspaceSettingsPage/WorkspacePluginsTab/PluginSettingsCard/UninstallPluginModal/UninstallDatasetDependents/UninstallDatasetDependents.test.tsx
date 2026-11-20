@@ -47,9 +47,7 @@ const PLUGIN = {
 
 const LOAD_FAILURE = "We could not load what reads this dataset.";
 
-function _renderDependents(
-  report: ReportDependentsLoading = vi.fn(),
-): void {
+function _renderDependents(report: ReportDependentsLoading = vi.fn()): void {
   render(
     <DependentsLoadingContext.Provider value={report}>
       <UninstallDatasetDependents
@@ -124,9 +122,9 @@ describe("UninstallDatasetDependents", () => {
 
     _renderDependents();
 
-    expect(
-      screen.getByRole("listitem"),
-    ).toHaveTextContent("Districts joined (linked dataset)");
+    expect(screen.getByRole("listitem")).toHaveTextContent(
+      "Districts joined (linked dataset)",
+    );
   });
 
   it("shows a plugin dependent's label without the linked dataset suffix", () => {

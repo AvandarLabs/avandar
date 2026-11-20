@@ -98,10 +98,8 @@ export const UserProfileDBReadToModelReadSchema: z.ZodType<
   });
 
 function createUserClient(options?: TUserClientOptions): TUserClient {
-  const {
-    dbClient = AvaSupabase.db(),
-    getServerApi = createServerApiClient,
-  } = options ?? {};
+  const { dbClient = AvaSupabase.db(), getServerApi = createServerApiClient } =
+    options ?? {};
   const baseClient = createServiceClient("UserClient");
 
   const client = withLogger(baseClient, (baseLogger: ILogger) => {

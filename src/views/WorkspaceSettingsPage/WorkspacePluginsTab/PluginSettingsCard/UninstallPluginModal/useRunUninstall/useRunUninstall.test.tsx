@@ -327,10 +327,10 @@ describe("useRunUninstall", () => {
 
     await run();
 
-    expect(loggerError).toHaveBeenCalledWith(
-      "Could not uninstall a plugin",
-      { installationId: INSTALLATION_ID, error: cause },
-    );
+    expect(loggerError).toHaveBeenCalledWith("Could not uninstall a plugin", {
+      installationId: INSTALLATION_ID,
+      error: cause,
+    });
   });
 
   it("logs nothing when the uninstall succeeds", async () => {

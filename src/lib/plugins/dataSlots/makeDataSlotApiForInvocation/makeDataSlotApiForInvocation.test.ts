@@ -1,7 +1,7 @@
 import { PluginError } from "@avandar/plugin-sdk";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { ConceptRelationDenied } from "@/clients/qetl/QueryMediator/conceptRelation/ConceptRelationDenied";
 import { WorkspaceRelationsDenied } from "@/clients/qetl/assertWorkspaceRelations/WorkspaceRelationsDenied";
+import { ConceptRelationDenied } from "@/clients/qetl/QueryMediator/conceptRelation/ConceptRelationDenied";
 import { QUERY_SLOT_MAX_ROWS } from "@/lib/pluginDataSlots/makeDataSlotSqlFromBinding/makeDataSlotSqlFromBinding";
 import { PluginDrawerStore } from "@/lib/plugins/PluginDrawerHost/PluginDrawerStore";
 import { MAX_LIVE_QUERY_HANDLES } from "@/lib/plugins/QueryHandleRegistry/QueryHandleRegistry";

@@ -1,8 +1,8 @@
 import { Model } from "@avandar/models";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { DatasetDeleteError } from "@/clients/datasets/DatasetClient/DatasetDeleteError";
 import { fireEvent, render, screen } from "@/test-utils";
 import { DatasetActionsMenu } from "@/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu";
-import { DatasetDeleteError } from "@/clients/datasets/DatasetClient/DatasetDeleteError";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 const { navigateMock, notifyErrorMock, permissionState } = vi.hoisted(() => {
@@ -451,7 +451,8 @@ describe("DatasetActionsMenu", () => {
 
     expect(notifyErrorMock).toHaveBeenCalledWith({
       title: "Dataset not deleted",
-      message: "You don't have permission to delete this dataset, or it has already been deleted.",
+      message:
+        "You don't have permission to delete this dataset, or it has already been deleted.",
     });
   });
 });

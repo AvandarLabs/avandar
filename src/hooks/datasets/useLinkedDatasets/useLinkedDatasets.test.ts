@@ -138,15 +138,18 @@ describe("useLinkedDatasets", () => {
     ["virtual datasets", "virtualFlags"],
     ["datasets", "datasetsFlags"],
     ["dictionary bindings", "bindingsFlags"],
-  ] as const)("reports a failure when the %s lookup fails", (_name, flagsKey) => {
-    mocks[flagsKey] = { isFetching: false, isError: true };
+  ] as const)(
+    "reports a failure when the %s lookup fails",
+    (_name, flagsKey) => {
+      mocks[flagsKey] = { isFetching: false, isError: true };
 
-    const { result } = renderHook(() => {
-      return useLinkedDatasets(SOURCE_ID);
-    });
+      const { result } = renderHook(() => {
+        return useLinkedDatasets(SOURCE_ID);
+      });
 
-    expect(result.current.hasFailed).toBe(true);
-  });
+      expect(result.current.hasFailed).toBe(true);
+    },
+  );
 
   it("ignores a stale failure of a lookup that is not enabled", () => {
     mocks.virtualDatasets = [];
