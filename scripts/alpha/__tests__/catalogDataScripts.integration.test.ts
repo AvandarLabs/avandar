@@ -3,6 +3,7 @@ import {
   chmodSync,
   existsSync,
   mkdtempSync,
+  readdirSync,
   readFileSync,
   rmSync,
   utimesSync,
@@ -82,7 +83,10 @@ ${[
   "public.datasets__open_data",
 ]
   .map((table) => {
-    return `COPY ${table} (id) FROM stdin;\n\\.\n`;
+    const rows = Array.from({ length: 6 }, (_value, index) => {
+      return `${index + 1}\n`;
+    }).join("");
+    return `COPY ${table} (id) FROM stdin;\n${rows}\\.\n`;
   })
   .join("\n")}`;
 
@@ -107,14 +111,20 @@ done
 `;
 
 const FAKE_PSQL = `#!/bin/bash
+if [[ "$1" == "--version" ]]; then
+  echo "\${FAKE_PSQL_VERSION:-psql (PostgreSQL) 18.3}"
+  exit 0
+fi
 printf '%s\\n' "$*" >> "$FAKE_LOG"
 query=""
 while (($#)); do
   case "$1" in
     --file)
       cp "$2" "$FAKE_STATE/wrapper.sql"
-      touch "$FAKE_STATE/imported"
-      exit "\${FAKE_IMPORT_EXIT:-0}"
+      # A failed import rolls back, so only a successful one changes counts.
+      exit_code="\${FAKE_IMPORT_EXIT:-0}"
+      [[ "$exit_code" != 0 ]] || touch "$FAKE_STATE/imported"
+      exit "$exit_code"
       ;;
     -c) query="$2"; shift ;;
   esac
@@ -122,6 +132,8 @@ while (($#)); do
 done
 case "$query" in
   *pg_constraint*) printf '%s' "\${FAKE_DEPENDENTS:-}" ;;
+  *"count(distinct dataset_id)"*) echo "$FAKE_ORPHANS" ;;
+  *"source_type = 'open_data'"*) echo "$FAKE_ORPHANS" ;;
   "select count(*) from ("*) echo "\${FAKE_DEPENDENT_ROWS:-0}" ;;
   "select id from public.data_catalog_listings"*)
     printf '%s' "\${FAKE_TARGET_IDS:-}"
@@ -166,6 +178,7 @@ function _runScript(
       FAKE_STATE: workDir,
       FAKE_DUMP_CONTENT: CATALOG_DUMP,
       CATALOG_TABLES_SH: join(SCRIPTS_DIR, "catalogTables.sh"),
+      FAKE_ORPHANS: `4${FIELD_SEPARATOR}2`,
       ...env,
     },
   });
@@ -280,36 +293,41 @@ describe("exportCatalogData.sh", () => {
     expect(readFileSync(outFile, "utf8")).toBe("keep me");
   });
 
-  it("fails when the dump holds a table outside the catalog", () => {
+  it("fails when the dump holds a table outside the catalog, keeping no file", () => {
+    const outFile = join(workDir, "out.sql");
+
     const run = _runScript(
       "exportCatalogData.sh",
-      ["postgres://src", join(workDir, "out.sql")],
+      ["postgres://src", outFile],
       { FAKE_DUMP_EXTRA: "COPY public.workspaces (id) FROM stdin;\nw1\n\\.\n" },
     );
 
     expect(run.status).toBe(1);
     expect(run.output).toContain("COPY public.workspaces");
+    expect(run.output).toContain("Deleted the rejected dump");
+    expect(
+      readdirSync(workDir).filter((name) => {
+        return name.startsWith("out.sql");
+      }),
+    ).toEqual([]);
   });
 });
 
 describe("importCatalogData.sh into an empty target", () => {
-  it("loads the dump in one transaction that stops on the first error", () => {
-    const dump = _writeDump();
-
+  it("runs the wrapper with ON_ERROR_STOP and without psql's --single-transaction", () => {
     const run = _runScript("importCatalogData.sh", [
       TARGET_URL,
-      dump,
+      _writeDump(),
       "--yes-i-know-the-target",
       TARGET_ID,
     ]);
 
     expect(run.status).toBe(0);
-    expect(run.log).toMatch(
-      /--single-transaction --set ON_ERROR_STOP=1 --file \S+/,
-    );
+    expect(run.log).toMatch(/--set ON_ERROR_STOP=1 --file \S+/);
+    expect(run.log).not.toContain("--single-transaction");
   });
 
-  it("loads the dump and then refreshes the facet counts, deleting nothing", () => {
+  it("loads a private copy of the dump and refreshes the facet counts between begin and commit", () => {
     const dump = _writeDump();
 
     const run = _runScript("importCatalogData.sh", [
@@ -321,9 +339,55 @@ describe("importCatalogData.sh into an empty target", () => {
 
     expect(run.wrapper.trim().split("\n")).toEqual([
       "\\set ON_ERROR_STOP on",
-      `\\i '${dump}'`,
+      "begin;",
+      expect.stringMatching(/^\\i '\/.+\/catalog\.sql'$/),
       "select public.data_catalog_facet_counts__refresh();",
+      "commit;",
     ]);
+    expect(run.wrapper).not.toContain(`'${dump}'`);
+  });
+
+  it("refuses a psql older than 15, naming a newer one", () => {
+    const run = _runScript(
+      "importCatalogData.sh",
+      [TARGET_URL, _writeDump(), "--yes-i-know-the-target", TARGET_ID],
+      { FAKE_PSQL_VERSION: "psql (PostgreSQL) 14.25 (Homebrew)" },
+    );
+
+    expect(run.status).toBe(1);
+    expect(run.output).toContain("/opt/homebrew/opt/libpq@18/bin/psql");
+    expect(run.log).toBe("");
+  });
+
+  it.each([
+    ["a host query parameter", `${TARGET_URL}?host=elsewhere.example.com`],
+    [
+      "a hostaddr query parameter",
+      `${TARGET_URL}?sslmode=require&hostaddr=10.0.0.1`,
+    ],
+    ["a service query parameter", `${TARGET_URL}?service=prod`],
+    ["an IPv6 host", "postgresql://postgres:pw@[::1]:5432/postgres"],
+    [
+      "several hosts",
+      "postgresql://postgres:pw@a.example.com,b.example.com/postgres",
+    ],
+  ])("refuses a target URL with %s, without connecting", (_name, url) => {
+    const run = _runScript("importCatalogData.sh", [url, _writeDump()]);
+
+    expect(run.status).toBe(1);
+    expect(run.output).toMatch(/connect somewhere else|plain hostname/);
+    expect(run.log).toBe("");
+  });
+
+  it("reports that the failed import rolled back when the counts did not change", () => {
+    const run = _runScript(
+      "importCatalogData.sh",
+      [TARGET_URL, _writeDump(), "--yes-i-know-the-target", TARGET_ID],
+      { FAKE_IMPORT_EXIT: "3" },
+    );
+
+    expect(run.status).toBe(1);
+    expect(run.output).toContain("its transaction rolled back");
   });
 
   it("prints each table's row count in the target after the import", () => {
@@ -399,6 +463,24 @@ describe("importCatalogData.sh into an empty target", () => {
     expect(run.log).toBe("");
   });
 
+  it("refuses a dump that sets session_replication_role, without connecting", () => {
+    const run = _runScript("importCatalogData.sh", [
+      TARGET_URL,
+      _writeDump(
+        CATALOG_DUMP.replace(
+          "SET statement_timeout = 0;",
+          "SET session_replication_role = replica;",
+        ),
+      ),
+      "--yes-i-know-the-target",
+      TARGET_ID,
+    ]);
+
+    expect(run.status).toBe(1);
+    expect(run.output).toContain("session_replication_role");
+    expect(run.log).toBe("");
+  });
+
   it("refuses a dump that carries facet counts, without connecting", () => {
     const run = _runScript("importCatalogData.sh", [
       TARGET_URL,
@@ -428,23 +510,32 @@ describe("importCatalogData.sh into an empty target", () => {
 });
 
 describe("importCatalogData.sh --replace-existing", () => {
-  it("deletes the catalog children first, loads the dump, and refreshes, in one transaction", () => {
+  it("rechecks the cascade, deletes children first, loads, and refreshes between begin and commit", () => {
     const run = _runReplace(_confirmedReplaceArgs());
 
     expect(run.status).toBe(0);
-    expect(run.log).toMatch(
-      /--single-transaction --set ON_ERROR_STOP=1 --file \S+/,
-    );
     expect(run.wrapper.trim().split("\n")).toEqual([
       "\\set ON_ERROR_STOP on",
+      "begin;",
+      "lock table public.pipeline_scope_checkpoints, public.pipeline_execution_scopes, public.pipeline_executions, public.data_catalog_listings__relation_columns, public.data_catalog_listings, public.data_catalog_drives, public.datasets__open_data in share row exclusive mode;",
+      "do $check$ begin",
+      expect.stringMatching(
+        /^ {2}if \(0 \+ \(select count\(\*\) from \(select \* from public\.datasets__open_data .+\) as affected\)\) <> 4 then$/,
+      ),
+      expect.stringMatching(
+        /^ {4}raise exception 'The delete now reaches % dependent rows, not the 4 confirmed\.'/,
+      ),
+      "  end if;",
+      "end $check$;",
       "delete from public.pipeline_scope_checkpoints;",
       "delete from public.pipeline_execution_scopes;",
       "delete from public.pipeline_executions;",
       "delete from public.data_catalog_listings__relation_columns;",
       "delete from public.data_catalog_listings;",
       "delete from public.data_catalog_drives;",
-      `\\i '${join(workDir, "catalog.sql")}'`,
+      expect.stringMatching(/^\\i '\/.+\/catalog\.sql'$/),
       "select public.data_catalog_facet_counts__refresh();",
+      "commit;",
     ]);
   });
 
@@ -453,6 +544,48 @@ describe("importCatalogData.sh --replace-existing", () => {
 
     expect(run.output).toMatch(
       /public\.datasets__open_data\.\(catalog_listing_id\) -> public\.data_catalog_listings: on delete cascade, 4 rows deleted/,
+    );
+  });
+
+  it("says which users' datasets the cascade orphans, in the report, the plan, and the final output", () => {
+    const run = _runReplace(_confirmedReplaceArgs());
+
+    const orphanLines = run.output.split("\n").filter((line) => {
+      return line.includes("4 public.datasets rows in 2 workspaces");
+    });
+    expect(orphanLines).toHaveLength(2);
+    expect(run.output).toContain(
+      "4 open data public.datasets rows in 2 workspaces now have no open data details",
+    );
+  });
+
+  it("refuses a backup whose row counts differ from the target's", () => {
+    const run = _runReplace([
+      "--backup-file",
+      _writeBackup(
+        BACKUP_DUMP.replace(
+          "COPY public.datasets__open_data (id) FROM stdin;\n1\n",
+          "COPY public.datasets__open_data (id) FROM stdin;\n",
+        ),
+      ),
+      "--yes-i-know-the-target",
+      TARGET_ID,
+      "--yes-i-know-the-cascade",
+      "4",
+    ]);
+
+    expect(run.status).toBe(1);
+    expect(run.output).toContain(
+      "holds 5 rows of public.datasets__open_data, but the target holds 6",
+    );
+    expect(run.log).not.toContain("--file");
+  });
+
+  it("prints how to restore the backup before it imports", () => {
+    const run = _runReplace(_confirmedReplaceArgs());
+
+    expect(run.output).toMatch(
+      /To restore the backup later:[\s\S]*SET transaction_timeout = 0;[\s\S]*begin;[\s\S]*delete from public\.data_catalog_facet_counts;[\s\S]*commit;/,
     );
   });
 
@@ -479,7 +612,7 @@ describe("importCatalogData.sh --replace-existing", () => {
     expect(run.output).toContain(
       'pg_dump "$TARGET_DB_URL" --data-only --no-owner --no-privileges',
     );
-    expect(run.output).toContain("--table public.datasets__open_data");
+    expect(run.output).toContain("--table 'public.datasets__open_data'");
     expect(run.log).not.toContain("--file");
   });
 

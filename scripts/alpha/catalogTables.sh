@@ -81,23 +81,47 @@ print_dump_listing_ids() {
   ' "$1"
 }
 
+# The session settings pg_dump writes at the top of a data-only dump. A dump
+# with any other `SET`, such as `session_replication_role`, is refused.
+DUMP_SETTINGS=(
+  "SET statement_timeout = 0;"
+  "SET lock_timeout = 0;"
+  "SET idle_in_transaction_session_timeout = 0;"
+  "SET transaction_timeout = 0;"
+  "SET client_encoding = 'UTF8';"
+  "SET standard_conforming_strings = on;"
+  "SELECT pg_catalog.set_config('search_path', '', false);"
+  "SET check_function_bodies = false;"
+  "SET xmloption = content;"
+  "SET client_min_messages = warning;"
+  "SET row_security = off;"
+)
+
 # Prints each line of a dump that a data-only catalog dump never contains,
 # with its line number, so an import refuses a dump that would do anything
 # but load rows into the catalog tables. Allowed outside the `COPY` data:
-# blank lines, comments, `SET`, the `search_path` reset, psql's `\restrict`
-# guard, and `COPY` into a catalog table. A `COPY` into any other table,
-# `data_catalog_facet_counts` included, is reported.
+# blank lines, comments, the settings in DUMP_SETTINGS, psql's `\restrict`
+# guard, and a whole `COPY <catalog table> (<columns>) FROM stdin;` line. A
+# `COPY` into any other table, `data_catalog_facet_counts` included, is
+# reported.
 #
 # Usage: print_unexpected_dump_lines <dump.sql>
 print_unexpected_dump_lines() {
-  awk -v tables="${CATALOG_TABLES[*]}" '
-    BEGIN { split(tables, names, " "); for (i in names) allowed[names[i]] = 1 }
+  DUMP_SETTINGS_LINES="$(printf '%s\n' "${DUMP_SETTINGS[@]}")" \
+    awk -v tables="${CATALOG_TABLES[*]}" '
+    BEGIN {
+      split(tables, names, " "); for (i in names) allowed[names[i]] = 1
+      split(ENVIRON["DUMP_SETTINGS_LINES"], lines, "\n")
+      for (i in lines) allowed_settings[lines[i]] = 1
+    }
     inside && $0 == "\\." { inside = 0; next }
     inside { next }
-    $1 == "COPY" && ($2 in allowed) && $NF == "stdin;" { inside = 1; next }
+    $1 == "COPY" && ($2 in allowed) && $0 ~ /^COPY [a-z0-9_.]+ \([a-z0-9_", ]+\) FROM stdin;$/ {
+      inside = 1
+      next
+    }
     /^$/ || /^--/ { next }
-    /^SET [a-z_]+ = [^;]*;$/ { next }
-    /^SELECT pg_catalog\.set_config\(.search_path., .., false\);$/ { next }
+    $0 in allowed_settings { next }
     /^\\(un)?restrict [A-Za-z0-9]+$/ { next }
     { printf "line %d: %s\n", NR, substr($0, 1, 120) }
   ' "$1"

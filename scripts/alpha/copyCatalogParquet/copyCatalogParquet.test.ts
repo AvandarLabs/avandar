@@ -76,13 +76,15 @@ function _guard<T extends object>(
 function _createFakeBucket(
   options: FakeProjectOptions,
   objects: Map<string, Uint8Array>,
-  uploads: FakeUpload[],
+  calls: { uploads: FakeUpload[]; listedPrefixes: string[] },
 ) {
+  const { uploads } = calls;
   return {
     list: async (
       prefix: string,
       listOptions: { limit: number; offset?: number },
     ) => {
+      calls.listedPrefixes.push(prefix);
       if (options.hasBucket === false) {
         return { data: null, error: { message: "Bucket not found" } };
       }
@@ -154,6 +156,7 @@ function _createFakeDatabase(listingIds: readonly string[]) {
 function _createFakeProject(options: FakeProjectOptions) {
   const violations: string[] = [];
   const uploads: FakeUpload[] = [];
+  const listedPrefixes: string[] = [];
   const objects = new Map(
     Object.entries(options.objects ?? {}).map(([path, text]) => {
       return [path, new TextEncoder().encode(text)];
@@ -162,7 +165,7 @@ function _createFakeProject(options: FakeProjectOptions) {
   const bucketAllowed =
     options.role === "source" ? ["list", "download"] : ["list", "upload"];
   const bucket = _guard(
-    _createFakeBucket(options, objects, uploads),
+    _createFakeBucket(options, objects, { uploads, listedPrefixes }),
     [...bucketAllowed, "then"],
     violations,
     `${options.role}.bucket`,
@@ -188,7 +191,7 @@ function _createFakeProject(options: FakeProjectOptions) {
       return database;
     },
   };
-  return { client, objects, uploads, violations };
+  return { client, objects, uploads, listedPrefixes, violations };
 }
 
 function _decode(body: Uint8Array | undefined): string | undefined {
@@ -373,7 +376,7 @@ describe("copyCatalogParquet", () => {
     await expect(
       copyCatalogParquet({ source: source.client, target: target.client }),
     ).rejects.toThrow(/opendata/);
-    expect(target.uploads).toEqual([]);
+    expect(source.listedPrefixes).toEqual([]);
   });
 
   it("only reads the source and only uploads to the target", async () => {
@@ -446,6 +449,19 @@ describe("getCopySetupFromEnv", () => {
     ).toMatchObject({ isRefused: true, reason: expect.stringMatching(/same/) });
   });
 
+  it("allows the same host on another port, which is another project", () => {
+    expect(
+      getCopySetupFromEnv({
+        ...env,
+        SOURCE_SUPABASE_URL: "http://127.0.0.1:54321",
+        TARGET_SUPABASE_URL: "http://127.0.0.1:55421",
+      }),
+    ).toMatchObject({
+      isRefused: false,
+      setup: { sourceHost: "127.0.0.1:54321", targetHost: "127.0.0.1:55421" },
+    });
+  });
+
   it("refuses a URL that cannot be parsed", () => {
     expect(
       getCopySetupFromEnv({ ...env, TARGET_SUPABASE_URL: "not a url" }),
@@ -461,6 +477,12 @@ describe("getTargetHostFromArgs", () => {
     expect(
       getTargetHostFromArgs(["--yes-i-know-the-target", "target.supabase.co"]),
     ).toBe("target.supabase.co");
+  });
+
+  it("returns undefined when another flag follows in place of a host", () => {
+    expect(
+      getTargetHostFromArgs(["--yes-i-know-the-target", "--dry-run"]),
+    ).toBeUndefined();
   });
 
   it("returns undefined when the flag has no value", () => {

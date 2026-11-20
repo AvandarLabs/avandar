@@ -44,7 +44,7 @@ type StorageErrorLike = {
 type CatalogStorageBucket = {
   list: (
     path: string,
-    options: { limit: number; offset?: number },
+    options: Readonly<{ limit: number; offset?: number }>,
   ) => PromiseLike<{
     data: ReadonlyArray<{ name: string; id: string | null }> | null;
     error: { message: string } | null;
@@ -56,7 +56,11 @@ type CatalogStorageBucket = {
   upload: (
     path: string,
     body: ArrayBuffer,
-    options: { contentType: string; cacheControl: string; upsert: boolean },
+    options: Readonly<{
+      contentType: string;
+      cacheControl: string;
+      upsert: boolean;
+    }>,
   ) => PromiseLike<{ error: StorageErrorLike | null }>;
 };
 
@@ -131,9 +135,10 @@ export function getTargetHostFromArgs(
   return host.startsWith("--") ? undefined : host;
 }
 
+/** The URL's host, with its port when the URL names one. */
 function _getHostFromUrl(url: string): string | undefined {
   try {
-    return new URL(url).hostname;
+    return new URL(url).host;
   } catch {
     return undefined;
   }
@@ -255,11 +260,13 @@ function _isAlreadyExistsError(error: StorageErrorLike): boolean {
   );
 }
 
-async function _copyObject(options: {
-  sourceBucket: CatalogStorageBucket;
-  targetBucket: CatalogStorageBucket;
-  path: string;
-}): Promise<"copied" | "alreadyPresent"> {
+async function _copyObject(
+  options: Readonly<{
+    sourceBucket: CatalogStorageBucket;
+    targetBucket: CatalogStorageBucket;
+    path: string;
+  }>,
+): Promise<"copied" | "alreadyPresent"> {
   const { sourceBucket, targetBucket, path } = options;
   const { data, error } = await sourceBucket.download(path);
   if (error !== null || data === null) {
@@ -318,11 +325,13 @@ async function _assertTargetHasBucket(
  * and exits 1 when any object failed. Node runs this file directly, so keep
  * every `$/` import type-only.
  */
-export async function copyCatalogParquet(options: {
-  source: CatalogParquetClient;
-  target: CatalogParquetClient;
-  log?: (line: string) => void;
-}): Promise<CatalogParquetCopyCounts> {
+export async function copyCatalogParquet(
+  options: Readonly<{
+    source: CatalogParquetClient;
+    target: CatalogParquetClient;
+    log?: (line: string) => void;
+  }>,
+): Promise<CatalogParquetCopyCounts> {
   const { source, target, log = () => {} } = options;
   const targetBucket = target.storage.from(OPEN_DATA_BUCKET);
   await _assertTargetHasBucket(targetBucket);
