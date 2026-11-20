@@ -27,13 +27,13 @@ How to read it:
 | 3 | Lock `main` out | 6.2 | Pablo: GitHub | A `migrate` job runs on `main`, or Vercel's Production deployment changes |
 | 4 | Build and gate `ava` | 6.3 | Pablo: laptop | The help text is not the alpha-line one |
 | 5 | `alpha-dev` live | 6.4, 6.5, then 6.11 for `alpha-dev` | Pablo: GitHub, laptop | `alpha-dev.yaml` is not green; seed counts differ |
-| 6 | Create `alpha` | 6.7 | Pablo: laptop | Any `STOP` line |
+| 6 | Create `alpha` | 6.7 | Pablo: laptop | No `all checks passed` line |
 | 7 | **Release: writes to production** | **6.8**, with 6.6 taken while the `deploy` job waits for approval | Pablo: laptop, GitHub approval | 6.6's restore test fails: do not approve |
 | 8 | Smoke test | 6.9 | Pablo: browser | Anything fails: section 7 |
 | 9 | **Catalog into production: writes to production** | **6.11** for production | Pablo: laptop | The dry run would refuse, or names another Storage host |
 | 10 | Cleanup | 8 | Pablo | |
 
-The rollback basis (5.8) is decided before day 7: PITR on, or a release
+The rollback basis (5.8) is decided before phase 7: PITR on, or a release
 started right after the daily backup.
 
 ## 1. Before you start
