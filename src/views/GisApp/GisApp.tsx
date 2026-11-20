@@ -4,7 +4,7 @@ import { GisAppMapShell } from "@/views/GisApp/GisAppMapShell";
 import { useGisApp } from "@/views/GisApp/useGisApp/useGisApp";
 import { useRequestSpatialExtension } from "@/views/GisApp/useRequestSpatialExtension/useRequestSpatialExtension";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
-import "maplibre-gl/dist/maplibre-gl.css";
+import "@/views/GisApp/setUpMapLibre/setUpMapLibre";
 import type { ReactNode } from "react";
 
 type Props = {

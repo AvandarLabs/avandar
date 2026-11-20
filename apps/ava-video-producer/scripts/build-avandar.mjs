@@ -269,6 +269,28 @@ async function finishBuild(result, imported, outputDirectory, onBuilt) {
   await onBuilt();
 }
 
+/** Makes `?raw` imports return a file's text, matching Vite's query. */
+function registerRawTextLoader(builder) {
+  builder.onResolve({ filter: /\?raw$/ }, async (args) => {
+    const resolved = await builder.resolve(args.path.slice(0, -4), {
+      importer: args.importer,
+      kind: args.kind,
+      resolveDir: args.resolveDir,
+    });
+    return {
+      path: resolved.path,
+      namespace: "raw",
+      errors: resolved.errors,
+    };
+  });
+  builder.onLoad({ filter: /.*/, namespace: "raw" }, async (args) => {
+    return {
+      contents: await fs.readFile(args.path, "utf8"),
+      loader: "text",
+    };
+  });
+}
+
 function createSourcePlugin(aliases, outputDirectory, onBuilt) {
   const imported = new Map();
   let currentAliases = aliases;
@@ -279,6 +301,7 @@ function createSourcePlugin(aliases, outputDirectory, onBuilt) {
         imported.clear();
         currentAliases = await readAliases();
       });
+      registerRawTextLoader(builder);
       builder.onResolve({ filter: /.*/ }, (args) =>
         resolveSource(args, currentAliases),
       );

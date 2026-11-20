@@ -185,7 +185,7 @@
     "idb-keyval": "^6.2.5",
     "jspdf": "^4.2.1",
     "knex": "^3.1.0",
-    "maplibre-gl": "^5.13.0",
+    "maplibre-gl": "^6.18.0",
     "match-sorter": "^8.2.0",
     "node-sql-parser": "^5.4.0",
     "papaparse": "^5.5.2",
