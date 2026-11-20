@@ -74,7 +74,7 @@ const REFUSED_BRANCHES: readonly string[] = [
  * A `FakeRepoState` with every default filled in. The fields that may be
  * `undefined` are listed apart, since `Required` would strip `undefined`.
  */
-type ResolvedRepoState = Required<
+type FilledRepoState = Required<
   Omit<FakeRepoState, "originTarget" | "sourceTag" | "targetTag">
 > & {
   originTarget: string | undefined;
@@ -83,7 +83,9 @@ type ResolvedRepoState = Required<
 };
 
 /** Fill in the defaults a test did not override. */
-function _resolveRepoState(state: Readonly<FakeRepoState>): ResolvedRepoState {
+function _fillRepoStateDefaults(
+  state: Readonly<FakeRepoState>,
+): FilledRepoState {
   return {
     branch: MAINLINE_RELEASE_LINE.sourceBranch,
     trackedChanges: "",
@@ -108,8 +110,8 @@ function _resolveRepoState(state: Readonly<FakeRepoState>): ResolvedRepoState {
  * branch name resolves to a same-named tag when one exists. Nothing resolves
  * on a branch with no target, which preflight refuses before any lookup.
  */
-function _resolveRevision(
-  state: Readonly<ResolvedRepoState>,
+function _getShaFromRevision(
+  state: Readonly<FilledRepoState>,
   revision: string,
 ): string | undefined {
   const targetBranch = TARGET_BRANCH_BY_SOURCE[state.branch];
@@ -131,13 +133,13 @@ function _resolveRevision(
  * What `git symbolic-ref --quiet HEAD` prints: the checked-out branch's full
  * ref, or nothing (a failed read) on a detached HEAD.
  */
-function _readHeadRef(state: Readonly<ResolvedRepoState>): string | undefined {
+function _readHeadRef(state: Readonly<FilledRepoState>): string | undefined {
   return state.branch === "HEAD" ? undefined : `refs/heads/${state.branch}`;
 }
 
 /** The fake's `readGit`: the repo state, keyed by the git command asked for. */
 function _createReadGit(
-  state: ResolvedRepoState,
+  state: FilledRepoState,
   executedCommands: string[],
 ): (args: readonly string[]) => string | undefined {
   return (args: readonly string[]): string | undefined => {
@@ -150,14 +152,14 @@ function _createReadGit(
         : verb === "symbolic-ref"
           ? _readHeadRef(state)
           : verb === "rev-parse"
-            ? _resolveRevision(state, args.at(-1) ?? "")
+            ? _getShaFromRevision(state, args.at(-1) ?? "")
             : undefined;
   };
 }
 
 /** The fake's `tryGit`: the fetch result and the ref-existence probes. */
 function _createTryGit(
-  state: ResolvedRepoState,
+  state: FilledRepoState,
   executedCommands: string[],
 ): (args: readonly string[]) => CommandResult {
   return (args: readonly string[]): CommandResult => {
@@ -193,13 +195,13 @@ function _createFakeCommands(state: Readonly<FakeRepoState> = {}): {
   git: ReleaseCommands;
   executedCommands: string[];
 } {
-  const resolvedState = _resolveRepoState(state);
+  const filledState = _fillRepoStateDefaults(state);
   const executedCommands: string[] = [];
   const recordMutation = (
     command: string,
     args: readonly string[],
   ): CommandResult => {
-    if (resolvedState.dryRun) {
+    if (filledState.dryRun) {
       return OK;
     }
     executedCommands.push(`MUTATE ${command} ${args.join(" ")}`);
@@ -208,12 +210,12 @@ function _createFakeCommands(state: Readonly<FakeRepoState> = {}): {
 
   const git: ReleaseCommands = {
     repoRoot: "/tmp/fake-repo",
-    dryRun: resolvedState.dryRun,
-    readGit: _createReadGit(resolvedState, executedCommands),
-    tryGit: _createTryGit(resolvedState, executedCommands),
+    dryRun: filledState.dryRun,
+    readGit: _createReadGit(filledState, executedCommands),
+    tryGit: _createTryGit(filledState, executedCommands),
     readCommand: (command: string, args: readonly string[]): CommandResult => {
       executedCommands.push(`${command} ${args.join(" ")}`);
-      return resolvedState.pushPermission;
+      return filledState.pushPermission;
     },
     mutate: recordMutation,
     mutateQuietly: recordMutation,
@@ -240,7 +242,7 @@ describe("runPreflight", () => {
     expect(result.ok).toBe(true);
     expect(result.ok === true && result.originSourceSha).toBe("source-sha");
     expect(result.ok === true && result.originTargetSha).toBe("target-sha");
-    // Downstream, `updateLocalMainRef` branches on this.
+    // Downstream, `updateLocalTargetRef` branches on this.
     expect(result.ok === true && result.localTargetSha).toBe(
       "local-target-sha",
     );

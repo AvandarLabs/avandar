@@ -73,7 +73,7 @@ function _pushSourceBranch(
 /** Refuse a tag that already exists locally or on origin. */
 export function assertTagIsUnused(
   git: ReleaseCommands,
-  plan: ReleasePlan,
+  plan: Readonly<ReleasePlan>,
 ): void {
   const { releaseTag, publishedVersion } = plan;
 
@@ -257,7 +257,7 @@ export function updateLocalTargetRef(
  */
 export function bumpSourceToNextVersion(
   git: ReleaseCommands,
-  plan: ReleasePlan,
+  plan: Readonly<ReleasePlan>,
 ): void {
   const { line, nextVersion, releaseTag } = plan;
   const devVersion = toDevVersion(nextVersion, line);

@@ -1,5 +1,5 @@
 import { checkSourceBranchCi } from "@ava-cli/ReleaseCli/checkSourceBranchCi/checkSourceBranchCi";
-import { describeCiStatus } from "@ava-cli/ReleaseCli/describeCiStatus";
+import { describeCiStatus } from "@ava-cli/ReleaseCli/describeCiStatus/describeCiStatus";
 import {
   getGitHubRepoSlug,
   readTreeSha,
@@ -55,7 +55,7 @@ export async function confirmCiVerdict(
   }
   printHeading("CI");
   const ciStatus = checkSourceBranchCi(git, { commitSha, line });
-  const verdict = `${describeCiStatus(ciStatus)} (${shortSha(commitSha)})`;
+  const verdict = `${describeCiStatus({ status: ciStatus, line })} (${shortSha(commitSha)})`;
 
   if (ciStatus.kind === "passed") {
     printSuccess(verdict);
@@ -79,7 +79,7 @@ const CONFIRM_PROMPT_DESTINATION: Readonly<
 };
 
 /** The last-chance prompt, e.g. `Release 0.15.0-alpha to PRODUCTION?`. */
-function _buildConfirmPrompt(plan: ReleasePlan): string {
+function _buildConfirmPrompt(plan: Readonly<ReleasePlan>): string {
   const { line, publishedVersion } = plan;
   return `Release ${publishedVersion}${CONFIRM_PROMPT_DESTINATION[line.kind]}?`;
 }
@@ -155,7 +155,7 @@ const RELEASE_NOTES_LINE_FLAG: Readonly<Record<ReleaseLine["kind"], string>> = {
 };
 
 /** The `ava release notes` command that retries this release's notes. */
-function _buildReleaseNotesRetryHint(plan: ReleasePlan): string {
+function _buildReleaseNotesRetryHint(plan: Readonly<ReleasePlan>): string {
   const { line, releaseVersion } = plan;
   return `Retry publishing release notes: ava release notes --version ${releaseVersion}${RELEASE_NOTES_LINE_FLAG[line.kind]}`;
 }

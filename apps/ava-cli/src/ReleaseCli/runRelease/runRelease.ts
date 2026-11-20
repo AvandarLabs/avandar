@@ -45,8 +45,8 @@ export type ReleaseOptions = {
   /** Version to release. Prompted for when omitted. */
   version: string | undefined;
   /**
-   * Version the source branch moves to; gains the line's dev suffix (`-dev`
-   * or `-alpha-dev`). Asked for if omitted.
+   * Version the source branch moves to. It gains the line's dev suffix
+   * (`-dev` or `-alpha-dev`). Asked for if omitted.
    */
   nextVersion: string | undefined;
   /** Accept every default and skip confirmations. */

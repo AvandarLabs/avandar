@@ -51,7 +51,7 @@ export type PreflightResult =
  * may not be cut from it. Only a source branch qualifies: a target branch
  * (`main`, `alpha`), a feature branch, and a detached HEAD are all refused.
  */
-function _resolveLine(
+function _getReleaseLineOrRefusal(
   git: ReleaseCommands,
 ): { ok: true; line: ReleaseLine } | ({ ok: false } & PreflightRefusal) {
   const currentBranch = getCurrentBranch(git);
@@ -90,10 +90,10 @@ function _refuseDirtyTree(git: ReleaseCommands): PreflightRefusal | undefined {
  * The refusal when the person running this cannot push to the repository, or
  * `undefined` when they can.
  *
- * A release pushes both branches, deploys production, and migrates the
- * production database, so it refuses here rather than half-way through: without
- * this, the first thing to fail is the `push` after a local version commit has
- * already been made.
+ * A release pushes both of its line's branches, and pushing the target branch
+ * deploys it (production, on the alpha line), so it refuses here rather than
+ * half-way through: without this, the first thing to fail is the `push` after
+ * a local version commit has already been made.
  */
 function _refuseWithoutPushPermission(
   git: ReleaseCommands,
@@ -175,23 +175,25 @@ function _refuseOutOfSyncSourceBranch(
 }
 
 /**
- * The refusal message when `origin/<target>` is missing, for
- * `_resolveReleaseRefs`. On the alpha line this is expected before the first
- * release, so the message carries the command that creates `alpha` at
- * `main`'s commit.
+ * What the missing-target refusal adds, by line. On the alpha line a missing
+ * `origin/alpha` is expected before the first release, so the hint carries the
+ * command that creates `alpha` at `main`'s commit.
  */
+const MISSING_TARGET_HINT: Readonly<Record<ReleaseLine["kind"], string>> = {
+  alpha: ` For the first alpha release, create it at ${MAINLINE_RELEASE_LINE.targetBranch}'s commit first: git push origin refs/remotes/origin/${MAINLINE_RELEASE_LINE.targetBranch}:refs/heads/${ALPHA_RELEASE_LINE.targetBranch}`,
+  mainline: "",
+};
+
+/** The `_readReleaseRefs` refusal message when `origin/<target>` is missing. */
 function _buildMissingTargetMessage(line: ReleaseLine): string {
-  const missing = `origin/${line.targetBranch} does not exist.`;
-  return line.kind === "alpha"
-    ? `${missing} For the first alpha release, create it at ${MAINLINE_RELEASE_LINE.targetBranch}'s commit first: git push origin refs/remotes/origin/${MAINLINE_RELEASE_LINE.targetBranch}:refs/heads/${line.targetBranch}`
-    : missing;
+  return `origin/${line.targetBranch} does not exist.${MISSING_TARGET_HINT[line.kind]}`;
 }
 
 /**
  * The refs the release will be built from, or a refusal when one is missing or
  * the source branch is out of sync with origin.
  */
-function _resolveReleaseRefs(
+function _readReleaseRefs(
   git: ReleaseCommands,
   line: ReleaseLine,
 ): PreflightResult {
@@ -241,17 +243,17 @@ function _resolveReleaseRefs(
  * on `alpha-dev` cuts alpha, one on `develop` cuts mainline, and any other
  * branch is refused before a single network call.
  *
- * Every check refuses; none of them fixes anything. A release must never be the
- * thing that discovers a branch was stale, and it must never quietly repair
- * state on the way to pushing production.
+ * Every check refuses. None of them fixes anything. A release must never be
+ * the thing that discovers a branch was stale, and it must never quietly
+ * repair state on the way to a deploy.
  */
 export function runPreflight(git: ReleaseCommands): PreflightResult {
   // The branch decides everything else, so nothing runs on a refused one.
-  const resolvedLine = _resolveLine(git);
-  if (!resolvedLine.ok) {
-    return resolvedLine;
+  const lineOrRefusal = _getReleaseLineOrRefusal(git);
+  if (!lineOrRefusal.ok) {
+    return lineOrRefusal;
   }
-  const { line } = resolvedLine;
+  const { line } = lineOrRefusal;
 
   // Cheapest first: a local check, then the permission call, then the fetch.
   const refusal =
@@ -261,5 +263,5 @@ export function runPreflight(git: ReleaseCommands): PreflightResult {
   if (refusal !== undefined) {
     return { ok: false, ...refusal };
   }
-  return _resolveReleaseRefs(git, line);
+  return _readReleaseRefs(git, line);
 }

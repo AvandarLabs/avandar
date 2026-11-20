@@ -174,7 +174,7 @@ type ReleaseCommitOptions = {
  * `develop` on mainline, `alpha` and `alpha-dev` on alpha).
  *
  * This is the heart of the command, and the reason it cannot conflict. A
- * release is not a content merge; the target is only ever a published snapshot
+ * release is not a content merge. The target is only ever a published snapshot
  * of the source, so the answer is always "take the source's tree, whole".
  * Handing that tree straight to `commit-tree` means no merge algorithm runs at
  * all, so nothing can report a conflict and nothing has to be forced.

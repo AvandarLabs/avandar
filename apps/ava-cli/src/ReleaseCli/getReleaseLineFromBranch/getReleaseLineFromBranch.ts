@@ -77,10 +77,3 @@ export function getReleaseLineFromBranch(
     return line.sourceBranch === branch;
   });
 }
-
-/** The branches `ava release` may run on, listed in its error messages. */
-export const RELEASE_SOURCE_BRANCHES: readonly string[] = RELEASE_LINES.map(
-  (line) => {
-    return line.sourceBranch;
-  },
-);

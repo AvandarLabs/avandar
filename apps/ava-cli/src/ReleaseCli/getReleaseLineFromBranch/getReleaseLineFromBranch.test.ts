@@ -2,7 +2,6 @@ import {
   ALPHA_RELEASE_LINE,
   getReleaseLineFromBranch,
   MAINLINE_RELEASE_LINE,
-  RELEASE_SOURCE_BRANCHES,
 } from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
 import { describe, expect, it } from "vitest";
 
@@ -54,9 +53,5 @@ describe("release lines", () => {
       deployWarning:
         "Pushing alpha deploys PRODUCTION (app.avandarlabs.com) and migrates the production database.",
     });
-  });
-
-  it("lists every source branch a release may run on", () => {
-    expect(RELEASE_SOURCE_BRANCHES).toEqual(["develop", "alpha-dev"]);
   });
 });
