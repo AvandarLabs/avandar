@@ -1,4 +1,4 @@
-import maplibregl from "maplibre-gl";
+import * as maplibregl from "maplibre-gl";
 import { applyMapStyles } from "@/views/GisApp/basemap/applyMapStyles";
 import { BasemapStyle } from "@/views/GisApp/basemap/BasemapStyle";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";

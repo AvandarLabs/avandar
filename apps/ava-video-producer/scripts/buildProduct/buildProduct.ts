@@ -18,6 +18,7 @@ import { compileSqlParser } from "./compileSqlParser";
 import { finishProductBuild } from "./finishProductBuild";
 import { getProductSourceFileFromImport } from "./getProductSourceFileFromImport";
 import { loadProductAsset } from "./loadProductAsset";
+import { registerRawTextLoader } from "./registerRawTextLoader";
 import type { Aliases, ImportedFiles } from "./buildProduct.types";
 
 /** The absolute paths of the adapter's `-aliases.json` maps. */
@@ -63,6 +64,7 @@ function _createSourcePlugin(
         imported.clear();
         currentAliases = await _readAliases();
       });
+      registerRawTextLoader(builder);
       builder.onResolve({ filter: /.*/ }, async (args) => {
         const file = await getProductSourceFileFromImport(args, currentAliases);
         return file ? ({ path: file } satisfies OnResolveResult) : undefined;

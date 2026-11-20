@@ -1,4 +1,4 @@
-import "maplibre-gl/dist/maplibre-gl.css";
+import "@/views/GisApp/setUpMapLibre/setUpMapLibre";
 import { LiveMapViewer } from "@/views/GisApp/MapViewer/LiveMapViewer";
 import { SnapshotMapViewer } from "@/views/GisApp/MapViewer/SnapshotMapViewer";
 import type {

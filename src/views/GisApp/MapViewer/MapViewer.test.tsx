@@ -42,7 +42,7 @@ const {
   };
 });
 
-vi.mock("maplibre-gl/dist/maplibre-gl.css", () => {
+vi.mock("@/views/GisApp/setUpMapLibre/setUpMapLibre", () => {
   return {};
 });
 vi.mock("@/views/GisApp/MapCanvas/useMapCanvas", () => {
