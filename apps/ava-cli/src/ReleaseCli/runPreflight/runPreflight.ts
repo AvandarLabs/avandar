@@ -149,7 +149,10 @@ function _refuseOutOfSyncSourceBranch(
   options: Readonly<{ line: ReleaseLine; originSha: string }>,
 ): PreflightRefusal | undefined {
   const { line, originSha } = options;
-  const localSourceSha = revParse(git, line.sourceBranch);
+  // Fully qualified: the fetch brings in tags, and a tag named like the source
+  // branch would otherwise shadow it and hide unpushed commits.
+  const localSourceRef = `refs/heads/${line.sourceBranch}`;
+  const localSourceSha = revParse(git, localSourceRef);
   if (localSourceSha === undefined) {
     return {
       reason: "missing-ref",
@@ -161,8 +164,8 @@ function _refuseOutOfSyncSourceBranch(
   }
   const { ahead, behind } = getDivergence(
     git,
-    line.sourceBranch,
-    `origin/${line.sourceBranch}`,
+    localSourceRef,
+    `refs/remotes/origin/${line.sourceBranch}`,
   );
   return {
     reason: "out-of-sync",
@@ -179,7 +182,7 @@ function _refuseOutOfSyncSourceBranch(
 function _buildMissingTargetMessage(line: ReleaseLine): string {
   const missing = `origin/${line.targetBranch} does not exist.`;
   return line.kind === "alpha"
-    ? `${missing} For the first alpha release, create it at ${MAINLINE_RELEASE_LINE.targetBranch}'s commit first: git push origin origin/${MAINLINE_RELEASE_LINE.targetBranch}:refs/heads/${line.targetBranch}`
+    ? `${missing} For the first alpha release, create it at ${MAINLINE_RELEASE_LINE.targetBranch}'s commit first: git push origin refs/remotes/origin/${MAINLINE_RELEASE_LINE.targetBranch}:refs/heads/${line.targetBranch}`
     : missing;
 }
 

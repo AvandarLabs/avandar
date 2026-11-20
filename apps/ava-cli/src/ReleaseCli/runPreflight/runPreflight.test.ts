@@ -25,8 +25,13 @@ type FakeRepoState = {
   originSource?: string;
   /** Tip of the origin target branch, or `undefined` when it does not exist. */
   originTarget?: string | undefined;
-  /** Tip of the local checked-out branch. */
+  /** Tip of the local checked-out branch (`refs/heads/<branch>`). */
   localSource?: string;
+  /**
+   * A tag named like the checked-out branch, or `undefined` for none. As in
+   * git, a bare `develop` or `alpha-dev` then resolves to the tag.
+   */
+  sourceTag?: string | undefined;
   /** Tip of the local target branch (`refs/heads/<target>`). */
   localTarget?: string;
   /**
@@ -49,13 +54,31 @@ const TARGET_BRANCH_BY_SOURCE: Readonly<Record<string, string>> = {
 };
 
 /**
+ * Branches preflight must refuse. Besides the target branches and a feature
+ * branch, these are near-misses of a source branch, so a prefix, suffix, or
+ * substring match on `develop` or `alpha-dev` turns these tests red.
+ */
+const REFUSED_BRANCHES: readonly string[] = [
+  "main",
+  "alpha",
+  "feat/something",
+  "demo/measles",
+  "alpha-dev-old",
+  "alpha-dev/x",
+  "develop2",
+  "heads/alpha-dev",
+  "origin/alpha-dev",
+];
+
+/**
  * A `FakeRepoState` with every default filled in. The fields that may be
  * `undefined` are listed apart, since `Required` would strip `undefined`.
  */
 type ResolvedRepoState = Required<
-  Omit<FakeRepoState, "originTarget" | "targetTag">
+  Omit<FakeRepoState, "originTarget" | "sourceTag" | "targetTag">
 > & {
   originTarget: string | undefined;
+  sourceTag: string | undefined;
   targetTag: string | undefined;
 };
 
@@ -70,12 +93,34 @@ function _resolveRepoState(state: Readonly<FakeRepoState>): ResolvedRepoState {
     originSource: "source-sha",
     originTarget: "target-sha",
     localSource: "source-sha",
+    sourceTag: undefined,
     localTarget: "local-target-sha",
     targetTag: undefined,
     remoteUrl: "git@github.com:AvandarLabs/avandar.git",
     dryRun: false,
     ...state,
   };
+}
+
+/**
+ * What `rev-parse` answers for `revision` in the fake repo. Keys are exact,
+ * since `origin/alpha` is a prefix of `origin/alpha-dev`. As in git, a bare
+ * branch name resolves to a same-named tag when one exists.
+ */
+function _resolveRevision(
+  state: ResolvedRepoState,
+  revision: string,
+): string | undefined {
+  const targetBranch = TARGET_BRANCH_BY_SOURCE[state.branch];
+  const tipByRevision: Record<string, string | undefined> = {
+    [`refs/remotes/origin/${state.branch}`]: state.originSource,
+    [`refs/remotes/origin/${targetBranch}`]: state.originTarget,
+    [`refs/heads/${state.branch}`]: state.localSource,
+    [state.branch]: state.sourceTag ?? state.localSource,
+    [`refs/heads/${targetBranch}`]: state.localTarget,
+    [`${targetBranch}`]: state.targetTag ?? state.localTarget,
+  };
+  return tipByRevision[revision];
 }
 
 /** The fake's `readGit`: the repo state, keyed by the git command asked for. */
@@ -86,9 +131,6 @@ function _createReadGit(
   return (args: readonly string[]): string | undefined => {
     executedCommands.push(`git ${args.join(" ")}`);
     const [verb] = args;
-    const revision = args.at(-1) ?? "";
-    const targetBranch = TARGET_BRANCH_BY_SOURCE[state.branch];
-    // Exact matches: `origin/alpha` is a prefix of `origin/alpha-dev`.
     return verb === "status"
       ? state.trackedChanges
       : verb === "remote"
@@ -97,17 +139,7 @@ function _createReadGit(
           ? undefined
           : args.includes("--abbrev-ref")
             ? state.branch
-            : revision === `refs/remotes/origin/${state.branch}`
-              ? state.originSource
-              : revision === `refs/remotes/origin/${targetBranch}`
-                ? state.originTarget
-                : revision === state.branch
-                  ? state.localSource
-                  : revision === `refs/heads/${targetBranch}`
-                    ? state.localTarget
-                    : revision === targetBranch
-                      ? (state.targetTag ?? state.localTarget)
-                      : undefined;
+            : _resolveRevision(state, args.at(-1) ?? "");
   };
 }
 
@@ -273,7 +305,7 @@ describe("runPreflight", () => {
     expect(result.ok === true && result.localTargetSha).toBeUndefined();
   });
 
-  it.each(["main", "alpha", "feat/something", "HEAD"])(
+  it.each([...REFUSED_BRANCHES, "HEAD"])(
     "refuses %s as the wrong branch",
     (branch) => {
       const { git } = _createFakeCommands({ branch });
@@ -284,7 +316,7 @@ describe("runPreflight", () => {
     },
   );
 
-  it.each(["main", "alpha", "feat/something"])(
+  it.each(REFUSED_BRANCHES)(
     "names %s and both source branches in the refusal",
     (branch) => {
       const { git } = _createFakeCommands({ branch });
@@ -310,7 +342,7 @@ describe("runPreflight", () => {
     );
   });
 
-  it.each(["main", "alpha", "feat/something", "HEAD"])(
+  it.each([...REFUSED_BRANCHES, "HEAD"])(
     "runs only the branch lookup on %s",
     (branch) => {
       const { git, executedCommands } = _createFakeCommands({ branch });
@@ -430,6 +462,24 @@ describe("runPreflight", () => {
     );
   });
 
+  it.each([
+    MAINLINE_RELEASE_LINE.sourceBranch,
+    ALPHA_RELEASE_LINE.sourceBranch,
+  ])(
+    "refuses unpushed %s commits even when a same-named tag matches origin",
+    (branch) => {
+      const { git } = _createFakeCommands({
+        branch,
+        localSource: "unpushed-sha",
+        sourceTag: "source-sha",
+      });
+
+      const result = runPreflight(git);
+
+      expect(result.ok === false && result.reason).toBe("out-of-sync");
+    },
+  );
+
   it("refuses when origin/main is missing, without the alpha hint", () => {
     const { git } = _createFakeCommands({ originTarget: undefined });
 
@@ -451,7 +501,7 @@ describe("runPreflight", () => {
 
     expect(result.ok === false && result.reason).toBe("missing-ref");
     expect(result.ok === false && result.message).toBe(
-      "origin/alpha does not exist. For the first alpha release, create it at main's commit first: git push origin origin/main:refs/heads/alpha",
+      "origin/alpha does not exist. For the first alpha release, create it at main's commit first: git push origin refs/remotes/origin/main:refs/heads/alpha",
     );
   });
 
