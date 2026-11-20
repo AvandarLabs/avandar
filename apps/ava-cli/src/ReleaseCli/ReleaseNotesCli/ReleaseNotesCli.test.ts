@@ -1,5 +1,7 @@
+import * as collectReleaseChangelogCommitsModule from "@ava-cli/ReleaseCli/releaseChangelog/collectReleaseChangelogCommits/collectReleaseChangelogCommits";
 import * as publishReleaseNotesModule from "@ava-cli/ReleaseCli/releaseChangelog/publishReleaseNotes/publishReleaseNotes";
 import { ReleaseNotesCli } from "@ava-cli/ReleaseCli/ReleaseNotesCli/ReleaseNotesCli";
+import * as releasePromptHelpersModule from "@ava-cli/ReleaseCli/releasePromptHelpers";
 import * as findRepoRootModule from "@ava-cli/utils/findRepoRoot";
 import { Acclimate } from "@avandar/acclimate";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -8,6 +10,32 @@ vi.mock(
   "@ava-cli/ReleaseCli/releaseChangelog/publishReleaseNotes/publishReleaseNotes",
 );
 vi.mock("@ava-cli/utils/findRepoRoot");
+vi.mock(
+  "@ava-cli/ReleaseCli/releaseChangelog/collectReleaseChangelogCommits/collectReleaseChangelogCommits",
+);
+vi.mock("@ava-cli/ReleaseCli/releasePromptHelpers");
+
+/** Run `ava release notes --dry-run` with no `--version`, as typed. */
+async function _runWithoutVersion(
+  options: Readonly<{ alpha: boolean }>,
+): Promise<void> {
+  await ReleaseNotesCli.state.action?.({
+    // Acclimate types every declared option as present, but hands the action
+    // `undefined` for an omitted `--version`, which is the case under test.
+    version: undefined as unknown as string,
+    alpha: options.alpha,
+    dryRun: true,
+    update: false,
+  });
+}
+
+/** Both lines' tags, sorted the way `git tag --sort=v:refname` sorts them. */
+const MIXED_RELEASE_TAGS = [
+  "v0.14.1",
+  "v0.14.2",
+  "v0.15.0-alpha",
+  "v0.15.1-alpha",
+];
 
 function _loggedText(logSpy: ReturnType<typeof vi.spyOn>): string {
   return logSpy.mock.calls
@@ -223,5 +251,62 @@ describe("ava release notes", () => {
 
     expect(_loggedText(logSpy)).toContain("Did a thing");
     expect(process.exitCode).toBeUndefined();
+  });
+
+  describe("without --version", () => {
+    beforeEach(() => {
+      vi.mocked(
+        collectReleaseChangelogCommitsModule.listSortedReleaseTags,
+      ).mockReturnValue(MIXED_RELEASE_TAGS);
+      vi.mocked(releasePromptHelpersModule.promptForVersion).mockImplementation(
+        async (options) => {
+          return options.defaultValue ?? "";
+        },
+      );
+      vi.mocked(
+        publishReleaseNotesModule.publishReleaseNotes,
+      ).mockResolvedValue({ kind: "previewed", notes: "preview" });
+    });
+
+    it("suggests the newest mainline version, skipping newer alpha tags", async () => {
+      await _runWithoutVersion({ alpha: false });
+
+      expect(releasePromptHelpersModule.promptForVersion).toHaveBeenCalledWith(
+        expect.objectContaining({ defaultValue: "0.14.2" }),
+      );
+    });
+
+    it("suggests the newest alpha version without its suffix with --alpha", async () => {
+      await _runWithoutVersion({ alpha: true });
+
+      expect(releasePromptHelpersModule.promptForVersion).toHaveBeenCalledWith(
+        expect.objectContaining({ defaultValue: "0.15.1" }),
+      );
+    });
+
+    it("publishes the newest alpha tag when the alpha suggestion is accepted", async () => {
+      await _runWithoutVersion({ alpha: true });
+
+      expect(
+        publishReleaseNotesModule.publishReleaseNotes,
+      ).toHaveBeenCalledWith(expect.anything(), {
+        releaseTag: "v0.15.1-alpha",
+        dryRun: true,
+        update: false,
+      });
+      expect(process.exitCode).toBeUndefined();
+    });
+
+    it("offers no suggestion when the line has no tags yet", async () => {
+      vi.mocked(
+        collectReleaseChangelogCommitsModule.listSortedReleaseTags,
+      ).mockReturnValue(["v0.14.1", "v0.14.2"]);
+
+      await _runWithoutVersion({ alpha: true });
+
+      expect(releasePromptHelpersModule.promptForVersion).toHaveBeenCalledWith(
+        expect.objectContaining({ defaultValue: undefined }),
+      );
+    });
   });
 });
