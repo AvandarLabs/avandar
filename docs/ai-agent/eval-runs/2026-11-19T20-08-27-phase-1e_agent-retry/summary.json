@@ -1,0 +1,20 @@
+{
+  "label": "phase-1e:agent-retry",
+  "questionCount": 6,
+  "passCount": 5,
+  "needlessQuestions": 0,
+  "missedQuestions": 0,
+  "repeatCount": 0,
+  "consentPrompts": 0,
+  "modelCalls": 11,
+  "promptTokens": 66616,
+  "cachedPromptTokens": 63828,
+  "completionTokens": 3579,
+  "totalCost": 0.00277518,
+  "costPerQuestion": 0.00046253,
+  "latencyMedianMs": 2085.81725,
+  "latencyP90Ms": 2992.1514159999997,
+  "failedIds": [
+    "T02"
+  ]
+}

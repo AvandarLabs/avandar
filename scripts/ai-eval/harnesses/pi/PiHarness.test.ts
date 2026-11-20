@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
+import { TRY_AGAIN_LINE } from "$/agent/pageContext/buildAgentTurnText";
 import { ExplorerPluginResultStore } from "@/lib/plugins/ExplorerPluginResultStore/ExplorerPluginResultStore";
 import { DASHBOARD_QUESTIONS } from "../../covid/covidDashboardQuestions";
 import { MENTION_QUESTIONS } from "../../covid/covidMentionQuestions";
@@ -10,7 +11,10 @@ import type { ChatGeneratedDashboardBlock } from "$/types/chat.types";
 import type { EvalQuestion } from "../../EvalQuestion";
 import type { EvalDatabase } from "../../runtime/EvalDatabase";
 import type { DataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
-import type { DataAgentHost } from "@/lib/agent/dataAgent/DataAgentHost";
+import type {
+  DataAgentHost,
+  DataAgentUserAnswer,
+} from "@/lib/agent/dataAgent/DataAgentHost";
 
 const { runEvalSqlMock } = vi.hoisted(() => {
   return { runEvalSqlMock: vi.fn() };
@@ -785,5 +789,171 @@ describe("createPiConversation with a default page", () => {
     expect(asked[2]).toContain(
       "<current_page>Unchanged since the last message.</current_page>",
     );
+  });
+});
+
+/** QUESTION as a Try again question. */
+const TRY_AGAIN_QUESTION = {
+  ...QUESTION,
+  id: "T02",
+  category: "try_again",
+  tryAgain: {},
+} as unknown as EvalQuestion;
+
+/**
+ * A data agent that records each message and answers "First." then
+ * "Second.". With `cardAnswers`, each ask shows one card first and records
+ * the host's answer to it.
+ */
+function _createTwoAttemptAgent(
+  host: DataAgentHost,
+  asked: string[],
+  cardAnswers?: DataAgentUserAnswer[],
+): DataAgent {
+  return {
+    agent: { state: { messages: [] } },
+    ask: async (text: string) => {
+      asked.push(text);
+      if (cardAnswers) {
+        cardAnswers.push(
+          await host.askUser({
+            question: "Which Georgia?",
+            options: ["The US state", "The country"],
+            isMulti: false,
+            kind: "choice",
+          }),
+        );
+      }
+      return {
+        text: asked.length === 1 ? "First." : "Second.",
+        state: { questions: [], valuesSentToModel: [] },
+        usage: {
+          calls: 1,
+          inputTokens: 10,
+          cachedInputTokens: 0,
+          outputTokens: 2,
+          reasoningTokens: 0,
+          cost: 0.001,
+        },
+      };
+    },
+  } as unknown as DataAgent;
+}
+
+/** A two-attempt agent whose first ask fails on a model call. */
+function _createFailingFirstAttemptAgent(
+  host: DataAgentHost,
+  asked: string[],
+): DataAgent {
+  const dataAgent = _createTwoAttemptAgent(host, asked);
+  return {
+    ...dataAgent,
+    ask: async (text: string) => {
+      const reply = await dataAgent.ask(text);
+      if (asked.length === 1) {
+        throw new Error("429 Too Many Requests");
+      }
+      return reply;
+    },
+  } as DataAgent;
+}
+
+describe("createPiConversation with a Try again question", () => {
+  it("asks twice on one conversation, the second time with the Try again line", async () => {
+    const asked: string[] = [];
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      createAgent: (host) => {
+        return _createTwoAttemptAgent(host, asked);
+      },
+    });
+
+    await conversation.ask(TRY_AGAIN_QUESTION);
+
+    expect(asked).toEqual([
+      "How many cases?",
+      `${TRY_AGAIN_LINE}\n\nHow many cases?`,
+    ]);
+  });
+
+  it("sends a device conversation's Try again no line", async () => {
+    const asked: string[] = [];
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      privacy: "device",
+      createAgent: (host) => {
+        return _createTwoAttemptAgent(host, asked);
+      },
+    });
+
+    await conversation.ask(TRY_AGAIN_QUESTION);
+
+    expect(asked).toEqual(["How many cases?", "How many cases?"]);
+  });
+
+  it("sends no Try again line after a first attempt that failed", async () => {
+    const asked: string[] = [];
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      createAgent: (host) => {
+        return _createFailingFirstAttemptAgent(host, asked);
+      },
+    });
+
+    await conversation.ask(TRY_AGAIN_QUESTION);
+
+    expect(asked).toEqual(["How many cases?", "How many cases?"]);
+  });
+
+  it("leaves the first attempt's first card on screen and answers the second's", async () => {
+    const asked: string[] = [];
+    const cardAnswers: DataAgentUserAnswer[] = [];
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      createAgent: (host) => {
+        return _createTwoAttemptAgent(host, asked, cardAnswers);
+      },
+    });
+
+    await conversation.ask({
+      ...TRY_AGAIN_QUESTION,
+      tryAgain: { isFirstCardUnanswered: true },
+    });
+
+    expect(cardAnswers).toEqual([
+      { kind: "deferred" },
+      { kind: "picked", values: ["The US state"] },
+    ]);
+  });
+
+  it("returns the second attempt, with the first kept beside it", async () => {
+    const asked: string[] = [];
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      createAgent: (host) => {
+        return _createTwoAttemptAgent(host, asked);
+      },
+    });
+
+    const answer = await conversation.ask(TRY_AGAIN_QUESTION);
+
+    expect(answer.assistantText).toBe("Second.");
+    expect(answer.firstAttempt?.assistantText).toBe("First.");
+    expect(answer.firstAttempt).not.toHaveProperty("result");
+  });
+
+  it("counts both attempts' model calls in the question's usage", async () => {
+    const asked: string[] = [];
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      createAgent: (host) => {
+        return _createTwoAttemptAgent(host, asked);
+      },
+    });
+
+    const answer = await conversation.ask(TRY_AGAIN_QUESTION);
+
+    expect(answer.usage.calls).toBe(2);
+    expect(answer.firstAttempt?.usage.calls).toBe(1);
   });
 });

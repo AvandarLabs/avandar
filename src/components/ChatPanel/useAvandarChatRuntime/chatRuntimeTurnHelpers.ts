@@ -56,12 +56,25 @@ export function chatMessagesKey(
 }
 
 /**
- * Maps a previously-returned `ChatResponse` to the compact retry
- * context shape the backend wants. Returns `undefined` when the
- * previous turn produced nothing worth telling the model about.
+ * The four fields of a response that a retry context describes.
+ * `ChatResponse.T` has them, and so does the eval's response from today's
+ * chat.
+ */
+export type RetryContextSource = {
+  assistantText?: string;
+  generatedSql?: { sql: string };
+  clarification?: { question: string };
+  dashboardBlock?: { kind: string };
+};
+
+/**
+ * Maps a previously-returned response (any `RetryContextSource`, such as a
+ * `ChatResponse.T`) to the compact retry context shape the backend wants.
+ * Returns `undefined` when the previous turn produced nothing worth telling
+ * the model about.
  */
 export function buildRetryContext(
-  response: ChatResponse.T,
+  response: Readonly<RetryContextSource>,
 ): ChatRetryContext | undefined {
   const retryContext: ChatRetryContext = {
     ...(response.assistantText?.trim()

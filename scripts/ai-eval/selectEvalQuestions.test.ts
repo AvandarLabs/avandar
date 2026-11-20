@@ -29,4 +29,19 @@ describe("selectEvalQuestions", () => {
     expect(ids).toHaveLength(45);
     expect(ids).not.toContain("R01");
   });
+
+  it("selects the Try again questions for T", () => {
+    expect(_ids("T")).toEqual(["T01", "T02", "T03", "T04", "T05", "T06"]);
+  });
+
+  it("keeps the Try again questions out of the default run", () => {
+    const questions = selectEvalQuestions("");
+
+    expect(questions).toHaveLength(45);
+    expect(
+      questions.filter((question) => {
+        return question.category === "try_again";
+      }),
+    ).toEqual([]);
+  });
 });

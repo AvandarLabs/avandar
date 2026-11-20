@@ -7,7 +7,12 @@ import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { AgentDashboardBlock } from "@/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlock";
 import { AgentQueryResult } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResult";
 import { buildLocalGadgetName } from "@/components/ChatPanel/useAvandarChatRuntime/agentMentions/loadTurnGadgetContext";
+import { ChatAnalyticsPayloads } from "@/components/ChatPanel/useAvandarChatRuntime/ChatAnalyticsPayloads/ChatAnalyticsPayloads";
 import { DataAgentDatasetCache } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/DataAgentDatasetCache";
+import {
+  createAgentAskRecord,
+  getAgentTurnKind,
+} from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/getAgentTurnKind/getAgentTurnKind";
 import { getLastQuestionFromMessages } from "@/components/ChatPanel/useAvandarChatRuntime/getLastQuestionFromMessages/getLastQuestionFromMessages";
 import {
   readAppliedSqlResult,
@@ -15,6 +20,7 @@ import {
 } from "@/components/ChatPanel/useAvandarChatRuntime/waitForAppliedSqlOutcome/waitForAppliedSqlOutcome";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { hideEarlierPlaceholders } from "@/lib/agent/dataAgent/pagePrivacy/hideEarlierPlaceholders/hideEarlierPlaceholders";
+import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import { loadColumnCodes } from "@/lib/dataDictionaries/loadColumnCodes/loadColumnCodes";
 import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
 import type { AgentContextBlocks } from "$/agent/mentions/buildAgentContextBlocks";
@@ -240,12 +246,16 @@ function _dropOtherChats(
 /**
  * Stops a run still in progress (a message sent before the last reply
  * finished) and waits for it to settle, so its turn keeps its results and
- * the agent is free for the next message.
+ * the agent is free for the next message. The stopped run's shown query is
+ * forgotten and its turn is noted as stopped, so the turn logs no
+ * `chat.sql_generated`, even for a query a tool still running shows later.
  */
 async function _stopAsk(
   conversation: DataAgentConversation,
   activeAsk: Promise<unknown>,
 ): Promise<void> {
+  conversation.lastShownQuery = undefined;
+  conversation.stoppedTurn = conversation.turnRef.current;
   conversation.dataAgent.agent.abort();
   await activeAsk.catch(() => {
     // The stopped turn reports its own failure.
@@ -461,6 +471,165 @@ function _reportReplyIfKept(
 }
 
 /**
+ * The conversation a turn goes to, and whether the turn is a hosted Try
+ * again.
+ */
+type TurnConversation = {
+  conversation: DataAgentConversation;
+  isNew: boolean;
+  /** A hosted Try again of the latest answer after a kept reply. */
+  isRetry: boolean;
+};
+
+/**
+ * Stops a conversation's agent and removes it from the map, so the next
+ * lookup starts a new conversation from the thread's recap. The map entry is
+ * removed only while it still holds this conversation, so a newer one that
+ * another turn already put there stays.
+ */
+function _dropConversation(
+  options: Readonly<{
+    conversations: Map<string, DataAgentConversation>;
+    turn: Readonly<DataAgentTurnOptions>;
+    conversation: DataAgentConversation;
+  }>,
+): void {
+  const { conversations, conversation } = options;
+  const key = buildConversationKey(options.turn);
+  conversation.dataAgent.agent.abort();
+  if (conversations.get(key) === conversation) {
+    conversations.delete(key);
+  }
+}
+
+/**
+ * The conversation a turn goes to. Any run in progress is stopped first, so
+ * the turn is classified against the last ask that settled. A thread that
+ * neither repeats nor extends that ask's (Try again on an earlier answer)
+ * starts a new conversation, as after a reload. The same thread after a kept
+ * reply is a Try again of the latest answer, which a hosted turn marks with
+ * the Try again line.
+ */
+async function _resolveTurnConversation(
+  options: Readonly<AskConversationDataAgentOptions>,
+): Promise<TurnConversation> {
+  const { turn } = options;
+  const found = await _getConversation(options);
+  while (found.conversation.activeAsk) {
+    await _stopAsk(found.conversation, found.conversation.activeAsk);
+  }
+  const { lastAsk } = found.conversation;
+  const kind = getAgentTurnKind({ lastAsk, apiMessages: turn.apiMessages });
+  if (kind !== "rewound") {
+    return {
+      ...found,
+      isRetry:
+        kind === "same_thread" &&
+        lastAsk?.isKept === true &&
+        turn.isOffline !== true,
+    };
+  }
+  _dropConversation({
+    conversations: options.conversations,
+    turn,
+    conversation: found.conversation,
+  });
+  return { ...(await _getConversation(options)), isRetry: false };
+}
+
+/**
+ * Points the conversation at the turn. Each turn gets fresh lists, so a
+ * stopped run's late results and cards land in its own, the last turn's
+ * question card is cleared, and no query an earlier turn showed is logged
+ * again.
+ */
+function _startTurn(
+  options: Readonly<{
+    conversation: DataAgentConversation;
+    turn: Readonly<DataAgentTurnOptions>;
+  }>,
+): {
+  results: AgentQueryResultData[];
+  dashboardCards: AgentDashboardBlockData[];
+} {
+  const { conversation, turn } = options;
+  const results: AgentQueryResultData[] = [];
+  const dashboardCards: AgentDashboardBlockData[] = [];
+  conversation.turnRef.current = turn;
+  conversation.results = results;
+  conversation.resultsByTurn.push(results);
+  conversation.dashboardCards = dashboardCards;
+  conversation.lastShownQuery = undefined;
+  turn.chatPanelDispatch.setPendingClarification(undefined);
+  return { results, dashboardCards };
+}
+
+/**
+ * Runs the ask, then records the thread it was given and whether its reply
+ * is kept: the ask resolved and the turn is not stale. A rejected ask is
+ * recorded as not kept and rethrown. Only the conversation's current turn
+ * writes: a run that settles after a newer turn has started leaves that
+ * turn's record alone. A run a newer message stops usually settles before
+ * the newer turn starts, so it writes its own record first, and the newer
+ * turn's record replaces it once that turn's ask settles.
+ */
+async function _recordAsk<Reply>(
+  options: Readonly<{
+    conversation: DataAgentConversation;
+    turn: Readonly<DataAgentTurnOptions>;
+    ask: () => Promise<Reply>;
+  }>,
+): Promise<Reply> {
+  const { conversation, turn } = options;
+  const record = (isKept: boolean): void => {
+    if (conversation.turnRef.current === turn) {
+      conversation.lastAsk = createAgentAskRecord({
+        apiMessages: turn.apiMessages,
+        isKept,
+      });
+    }
+  };
+  try {
+    const reply = await options.ask();
+    record(!turn.isStale?.());
+    return reply;
+  } catch (error) {
+    record(false);
+    throw error;
+  }
+}
+
+/**
+ * Logs one `chat.sql_generated` for a kept answer that showed a query, with
+ * the last query it showed. An answer whose turn went stale, was stopped by
+ * a newer message, or is no longer the conversation's current turn logs
+ * nothing.
+ */
+function _logShownQuery(
+  options: Readonly<{
+    conversation: DataAgentConversation;
+    turn: Readonly<DataAgentTurnOptions>;
+  }>,
+): void {
+  const { conversation, turn } = options;
+  const shownQuery = conversation.lastShownQuery;
+  if (
+    shownQuery === undefined ||
+    turn.isStale?.() ||
+    conversation.stoppedTurn === turn ||
+    conversation.turnRef.current !== turn
+  ) {
+    return;
+  }
+  void AnalyticsClient.logEvent({
+    event: "chat.sql_generated",
+    workspaceId: turn.workspaceId,
+    app: shownQuery.app,
+    payload: ChatAnalyticsPayloads.fromSql(shownQuery.sql),
+  });
+}
+
+/**
  * Asks this conversation's agent the turn's message, creating the
  * conversation on its first turn, and returns the reply with any results
  * this turn added to the chat. `conversations` holds one per
@@ -469,43 +638,44 @@ function _reportReplyIfKept(
  * message, and each mention in the thread reads as `@"Name"`. A hosted
  * turn's reply is shown with real values in place of its placeholders. A
  * run still in progress is stopped first, since a conversation answers one
- * message at a time.
+ * message at a time. The same thread again is a Try again: a hosted turn
+ * after a kept reply puts the Try again line before the message, and a
+ * thread that rewinds starts a new conversation from its recap.
  */
 export async function askConversationDataAgent(
   options: Readonly<AskConversationDataAgentOptions>,
 ): Promise<ChatModelRunResult> {
   const { turn } = options;
-  const { conversation, isNew } = await _getConversation(options);
+  const { conversation, isNew, isRetry } =
+    await _resolveTurnConversation(options);
   // Checked again after every wait: another message may have started a run
   // meanwhile. From the last check to the ask, nothing awaits.
   while (conversation.activeAsk) {
     await _stopAsk(conversation, conversation.activeAsk);
   }
-  // A fresh list per turn: a stopped run's late results land in its own.
-  const results: AgentQueryResultData[] = [];
-  const dashboardCards: AgentDashboardBlockData[] = [];
-  conversation.turnRef.current = turn;
-  conversation.results = results;
-  conversation.resultsByTurn.push(results);
-  conversation.dashboardCards = dashboardCards;
-  turn.chatPanelDispatch.setPendingClarification(undefined);
+  const { results, dashboardCards } = _startTurn({ conversation, turn });
   options.onConversationReady?.(conversation);
   const inputs = options.buildTurnInputs?.(conversation);
   const blocks = inputs?.blocks ?? {};
-  const reply = await _askAndRememberBlocks(
+  const text = buildAgentTurnText({
+    message: _buildPromptText(_namedMessages(turn, inputs, isNew), isNew),
+    pageBlock: blocks.pageBlock,
+    previousPageBlock: conversation.lastPageBlock,
+    attachedBlock: blocks.attachedBlock,
+    previousAttachedBlock: conversation.lastAttachedBlock,
+    mentionedBlock: blocks.mentionedBlock,
+    dashboardCardLines: inputs?.dashboardCardLines,
+    isRetry,
+  });
+  const reply = await _recordAsk({
     conversation,
-    blocks,
-    buildAgentTurnText({
-      message: _buildPromptText(_namedMessages(turn, inputs, isNew), isNew),
-      pageBlock: blocks.pageBlock,
-      previousPageBlock: conversation.lastPageBlock,
-      attachedBlock: blocks.attachedBlock,
-      previousAttachedBlock: conversation.lastAttachedBlock,
-      mentionedBlock: blocks.mentionedBlock,
-      dashboardCardLines: inputs?.dashboardCardLines,
-    }),
-  );
+    turn,
+    ask: () => {
+      return _askAndRememberBlocks(conversation, blocks, text);
+    },
+  });
   _reportReplyIfKept(turn, inputs);
+  _logShownQuery({ conversation, turn });
   return _toRunResult({
     replyText: _replyTextOf(reply, turn),
     inputs,

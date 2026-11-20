@@ -50,6 +50,9 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
 | D40 | 1E brings the agent's question cards and analytics to parity | Approved |
 | D41 | Attachable context: inline mentions plus a chat-long tray | Built |
 | D42 | Mentions add three privacy rules beyond the page block | Built |
+| D43 | Several chat sessions, stored in the browser | Approved |
+| D44 | Dashboard blocks from any page, online and offline | Approved |
+| D45 | Try again keeps the first attempt, and cards and analytics share today's code | Built |
 
 ---
 
@@ -878,3 +881,80 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
   `dashboard.block_added_via_chat` (1E, D40). Editing, moving, removing,
   and creating dashboards (Phase 3.1). Confirmation for other tools
   (roadmap 2.3).
+
+## D45. Try again keeps the first attempt, and cards and analytics share today's code (built)
+
+- **Decision (2026-11-19, delegated by Pablo).** On Try again of the
+  agent's latest answer, the agent keeps its first attempt in its
+  transcript, and a hosted turn adds one fixed line before the message
+  saying the user wants a different answer. Prompt v6 does not change. Try
+  again on an earlier answer starts the agent over from the thread's
+  recap. An offline turn, or one after a failed attempt, asks again with
+  no line, as today's chat sends no `retryContext` there. Every card the
+  agent shows goes through `recordClarificationShown`, shared with today's
+  chat: the bias check, then the audit row, before the card shows, with
+  `turnNumber` counted from the thread as the server counts it. The agent
+  logs one `chat.sql_generated` per answer that showed a query, and
+  `dashboard.block_added_via_chat` for every block that reaches a
+  dashboard through the open editor or a confirmed card. Spec:
+  [phase-1e.md](specs/phase-1e.md). The line that ships is the third of
+  three wordings the Try again eval tried (`TRY_AGAIN_LINE` in
+  `shared/agent/pageContext/buildAgentTurnText.ts`,
+  [eval](eval.md#phase-1e)): "The user clicked Try again: they want a
+  different answer to the message below than your last one above, one that
+  still does everything the message asks, exactly as asked, even what your
+  last answer already did, since that answer is the one being replaced. Do
+  not repeat it, but if the message has only one right answer, give that
+  answer again, reached another way. Read the message another way, take a
+  different approach, or ask one question if your last answer had to
+  guess, but never change what the message asks for."
+- **Why.** The model gets its first attempt in its own words, tool calls
+  and results included, for about 130 tokens per retry and no prompt
+  version. One card function keeps the two paths from drifting. One SQL
+  event per answer keeps that event's ratio to `chat.message_sent` when
+  the agent is turned on. Since 1D a block reaches a dashboard from any
+  page, so the event follows every path that adds one.
+- **Departs from [phase-1.md](specs/phase-1.md).** Its 1E row said
+  regenerating "rolls the agent back to before the last turn". A
+  rolled-back attempt has to be described to the model again anyway, and
+  rolling back adds transcript surgery and restored block memory. The
+  goal, an agent history in step with the thread, is kept where the two
+  would mislead the model: Try again on an earlier answer. The thread has
+  no edit action, so "an edited message resyncs" is dropped.
+- **How a Try again is told apart, as built.** Each conversation keeps, in
+  memory only, a record of the user messages of the thread it was last
+  asked (`chatMessagesKey` over them, and their count) and whether that
+  ask's reply was kept. The record leaves out assistant messages, because
+  a run that a newer message stops can land its reply after the newer turn
+  was sent without it, which would put an assistant message between two
+  user messages and make a follow-up look like a rewind. The same user
+  messages again are a Try again of the latest answer. More user messages
+  after the recorded ones are a follow-up. Anything else (fewer user
+  messages, as on Try again of an earlier answer, or a changed one) starts
+  the agent over. A stopped run settles before the newer turn takes the
+  conversation, so it can write its own record first. The newer turn's
+  thread extends it, and the newer turn writes its record last. A stopped
+  run never logs `chat.sql_generated`: stopping it clears the query it
+  showed and marks its turn as stopped.
+- **Known limit.** The app has no branch picker and no edit action, so two
+  branches with the same user messages and different replies cannot
+  happen today, and the record could not tell them apart. Revisit the
+  record if either is added.
+- **Fallbacks.** Roll back and describe the attempt, if the Try again eval
+  shows the kept attempt misleads the retry or the follow-up. A
+  `<try_again>` block under prompt v7, if the model ignores the plain line
+  after three wordings. Neither shipped: the third wording met every bar,
+  and no miss showed a follow-up built on the first attempt.
+- **Alternatives.** Today's `retryContext` sent to the agent proxy
+  (changes the request Pi's `streamProxy` sends, and breaks the system
+  prompt's cache or needs a new version). Detecting a retry with
+  `lastTurnRef` (cannot see an earlier answer's retry, and the offline
+  agent never reaches it). The line on offline turns (today's offline chat
+  sends nothing, and the 4B model's window is tight). A copy of the card
+  code in the browser host (two copies drift). Recording the card after
+  the reply (a quick answer would find no `auditId`). An event per query
+  shown (up to three per answer). Only the open editor's blocks (misses
+  every block added from another page).
+- **Cost.** About 130 uncached input tokens on a hosted retry turn. The
+  transcript holds both attempts, as cached prefix. Each agent card waits
+  for one local Dexie insert, as today's chat's cards do.

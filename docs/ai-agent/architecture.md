@@ -186,9 +186,10 @@ The approved, ordered plan is in [roadmap.md](roadmap.md) (D33); this
 section is the design behind it.
 
 1. Move the remaining Data Explorer features into the agent path: charts
-   (done through `run_query`'s `chart`), dashboards (`add_dashboard_block`),
-   and "Try again". Phase 1A is done: the agent answers on every page and
-   results outside the Data Explorer show in the chat
+   (done through `run_query`'s `chart`), dashboards (`add_dashboard_block`,
+   done in 1D, [spec](specs/phase-1d.md)), and "Try again" (done in 1E,
+   [spec](specs/phase-1e.md)). Phase 1A is done: the agent answers on every
+   page and results outside the Data Explorer show in the chat
    ([spec](specs/phase-1a.md)).
 2. Define one **tool registry** for Avandar operations: name, schema, area,
    what it exposes, whether it changes anything, and whether it needs

@@ -20,8 +20,13 @@ export type BrowserDataAgentHostOptions = {
   checkQuery?: DataAgentHost["checkQuery"];
   /** Places a dashboard block in the open editor or on a card. */
   addDashboardBlock?: DataAgentHost["addDashboardBlock"];
-  /** Shows a question card in the chat panel. */
-  showQuestionCard: (clarification: ChatClarifyRequest) => void;
+  /**
+   * Records and shows a question card in the chat panel. The turn number
+   * is the caller's, which reads the thread.
+   */
+  showQuestionCard: (
+    card: Omit<ChatClarifyRequest, "turnNumber">,
+  ) => Promise<void>;
 };
 
 async function _readColumnValues(
@@ -85,9 +90,8 @@ export function createBrowserDataAgentHost(
       return _readColumnValues(options.workspaceId, sql);
     },
     askUser: async (request) => {
-      options.showQuestionCard({
+      await options.showQuestionCard({
         question: request.question,
-        turnNumber: 1,
         responseShape: _buildResponseShape(request),
       });
       return { kind: "deferred" };

@@ -1,3 +1,4 @@
+import { omit } from "@avandar/utils";
 import { createModels } from "@earendil-works/pi-ai/models";
 import { openrouterProvider } from "@earendil-works/pi-ai/providers/openrouter";
 import { getAgentGadgetName } from "$/agent/mentions/AgentGadgetContext";
@@ -23,7 +24,7 @@ import { ExplorerPluginResultStore } from "@/lib/plugins/ExplorerPluginResultSto
 import { COVID_DATASETS } from "../../covid/covidWorkspace";
 import { runEvalSql } from "../../runtime/runEvalSql";
 import { SimulatedUser } from "../../runtime/SimulatedUser";
-import { EMPTY_EVAL_USAGE } from "../EvalHarness";
+import { addEvalUsage, EMPTY_EVAL_USAGE } from "../EvalHarness";
 import {
   getEvalPluginAiTools,
   publishFitRegressionResult,
@@ -95,6 +96,12 @@ type QuestionRecorder = {
   vizType?: string;
   consentPrompts: number;
   dashboardWrites: EvalDashboardWrite[];
+  /**
+   * The next card stays on screen, unanswered, so the agent's turn ends
+   * there, as in the browser. Set for the first attempt of a Try again
+   * question that leaves its first card unanswered.
+   */
+  isNextCardDeferred: boolean;
 };
 
 function _toUserAnswer(
@@ -188,6 +195,7 @@ function _startQuestion(question: EvalQuestion | undefined): QuestionRecorder {
     vizType: undefined,
     consentPrompts: 0,
     dashboardWrites: [],
+    isNextCardDeferred: false,
   };
 }
 
@@ -256,6 +264,30 @@ async function _showEvalQuery(
   };
 }
 
+/** The simulated user's answer to a card, or a card left on screen. */
+function _answerEvalCard(
+  options: Readonly<{
+    recorder: QuestionRecorder;
+    request: Parameters<DataAgentHost["askUser"]>[0];
+  }>,
+): DataAgentUserAnswer {
+  const { recorder, request } = options;
+  if (recorder.isNextCardDeferred) {
+    recorder.isNextCardDeferred = false;
+    return { kind: "deferred" };
+  }
+  const script = recorder.question?.user;
+  return _toUserAnswer(
+    request.kind === "values"
+      ? SimulatedUser.pickValues(
+          request.options,
+          script,
+          recorder.question?.prompt ?? "",
+        )
+      : SimulatedUser.answerOptions(request.options, script),
+  );
+}
+
 /** The data agent's host in the eval: DuckDB in Node and a simulated user. */
 function _createEvalHost(
   database: EvalDatabase,
@@ -274,16 +306,7 @@ function _createEvalHost(
           });
     },
     askUser: async (request) => {
-      const script = recorder.question?.user;
-      return _toUserAnswer(
-        request.kind === "values"
-          ? SimulatedUser.pickValues(
-              request.options,
-              script,
-              recorder.question?.prompt ?? "",
-            )
-          : SimulatedUser.answerOptions(request.options, script),
-      );
+      return _answerEvalCard({ recorder, request });
     },
     checkQuery: async (sql) => {
       return _checkEvalQuery(database, sql);
@@ -540,6 +563,11 @@ type PiConversationState = {
   explorer?: AgentPageContext["explorer"];
   lastPageBlock?: string;
   lastAttachedBlock?: string;
+  /**
+   * Whether the last ask resolved, as the app records its last ask. Only a
+   * Try again after a kept reply carries the Try again line.
+   */
+  isLastAskKept: boolean;
 };
 
 /**
@@ -595,14 +623,27 @@ function _getPageBlockToSend(
     : blocks.pageBlock;
 }
 
+/** How one attempt at a question is asked. */
+type PiAttempt = {
+  /** A Try again: a hosted conversation's turn text carries the line. */
+  isRetry: boolean;
+  /** The attempt's first card stays on screen, unanswered. */
+  isFirstCardDeferred: boolean;
+};
+
+/** An ordinary question's only attempt. */
+const ONLY_ATTEMPT: PiAttempt = { isRetry: false, isFirstCardDeferred: false };
+
 /** Asks one question in the conversation and records how it went. */
 async function _askPiQuestion(
   state: PiConversationState,
   question: EvalQuestion,
+  attempt: Readonly<PiAttempt> = ONLY_ATTEMPT,
 ): Promise<EvalAnswer> {
   const { dataAgent, recorder } = state;
   const shown = _withDefaultPage(question, state);
   Object.assign(recorder, _startQuestion(shown));
+  recorder.isNextCardDeferred = attempt.isFirstCardDeferred;
   const startedAt = performance.now();
   const firstMessageIndex = dataAgent.agent.state.messages.length;
   const inputs = _buildTurnInputs(shown, state.vault, state.privacy);
@@ -616,8 +657,10 @@ async function _askPiQuestion(
         attachedBlock: inputs.blocks.attachedBlock,
         previousAttachedBlock: state.lastAttachedBlock,
         mentionedBlock: inputs.blocks.mentionedBlock,
+        isRetry: attempt.isRetry && state.privacy === "hosted",
       }),
     );
+    state.isLastAskKept = true;
     state.lastPageBlock = pageBlock ?? state.lastPageBlock;
     state.lastAttachedBlock = inputs.blocks.attachedBlock;
     const toolNames = _toolNamesSince(dataAgent, firstMessageIndex);
@@ -625,10 +668,40 @@ async function _askPiQuestion(
     state.explorer = _readExplorerFromAnswer(answer) ?? state.explorer;
     return answer;
   } catch (error) {
+    state.isLastAskKept = false;
     const usage = _usageSince(dataAgent, firstMessageIndex);
     const toolNames = _toolNamesSince(dataAgent, firstMessageIndex);
     return _toFailedEvalAnswer(error, usage, startedAt, toolNames);
   }
+}
+
+/**
+ * Asks a Try again question: the question, then the same message again on
+ * the same conversation, as a Try again. A hosted conversation's second
+ * turn carries the Try again line when the first attempt's reply was kept,
+ * and a device one's never does. The page block is built as for any turn,
+ * so the Data Explorer shows the first attempt's query. Returns the second
+ * attempt, with the first beside it.
+ */
+async function _askPiTryAgain(
+  state: PiConversationState,
+  question: EvalQuestion,
+): Promise<EvalAnswer> {
+  const firstAttempt = await _askPiQuestion(state, question, {
+    isRetry: false,
+    isFirstCardDeferred: question.tryAgain?.isFirstCardUnanswered === true,
+  });
+  const secondAttempt = await _askPiQuestion(state, question, {
+    isRetry: state.isLastAskKept,
+    isFirstCardDeferred: false,
+  });
+  return {
+    ...secondAttempt,
+    // The question cost both attempts. Its latency stays the second
+    // attempt's: the wait after the user clicks Try again.
+    usage: addEvalUsage(firstAttempt.usage, secondAttempt.usage),
+    firstAttempt: omit(firstAttempt, ["result", "firstAttempt"]),
+  };
 }
 
 /**
@@ -662,6 +735,7 @@ export function createPiConversation(
     vault,
     privacy: options.privacy ?? "hosted",
     defaultPage: options.defaultPage,
+    isLastAskKept: false,
     dataAgent: options.createAgent(
       createPlaceholderRestoringHost(
         _createEvalHost(options.database, recorder),
@@ -672,7 +746,9 @@ export function createPiConversation(
   return {
     ask: (question) => {
       return _withFitRegressionResult(question, () => {
-        return _askPiQuestion(state, question);
+        return question.tryAgain
+          ? _askPiTryAgain(state, question)
+          : _askPiQuestion(state, question);
       });
     },
   };

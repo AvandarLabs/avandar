@@ -25,11 +25,18 @@ function _namesNearMatch(folded: string): boolean {
 function _saysNotStackable(folded: string): boolean {
   return (
     /not (?:directly )?(?:append|stack)/.test(folded) ||
+    /(?:^|[.:!?]\s+|^\W*)not directly\b/.test(folded) ||
+    /(?<!\bno (?:\w+ )?)renaming is (?:needed|required)/.test(folded) ||
     /can(?:not|'t| not) be (?:appended|stacked)/.test(folded) ||
     /(?:aren't|are not) the same/.test(folded) ||
     /columns differ/.test(folded) ||
     /different columns/.test(folded) ||
-    /rename/.test(folded)
+    /columns (?:(?:would|will|do|does) not|wouldn't|won't|don't|doesn't) line up/.test(
+      folded,
+    ) ||
+    /(?<!\b(?:nothing|no need|(?:don't|do not|doesn't|does not) need) to )rename/.test(
+      folded,
+    )
   );
 }
 

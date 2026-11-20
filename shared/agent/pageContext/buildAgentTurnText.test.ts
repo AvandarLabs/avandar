@@ -6,6 +6,7 @@ import {
   buildAgentTurnText,
   PAGE_UNCHANGED_BLOCK,
   splitAgentTurnText,
+  TRY_AGAIN_LINE,
 } from "$/agent/pageContext/buildAgentTurnText.ts";
 
 const BLOCK = "<current_page>\nPage: Map\n</current_page>";
@@ -135,5 +136,105 @@ describe("splitAgentTurnText", () => {
     expect(message).toBe("hello");
     expect(text).not.toContain("<dashboard_card>");
     expect(text).not.toContain("</dashboard_card>");
+  });
+});
+
+describe("turn text that is not a Try again", () => {
+  it.each([
+    [
+      "card lines, a changed page block, and a mentioned block",
+      {
+        message: "m",
+        dashboardCardLines: ["<dashboard_card>C</dashboard_card>"],
+        pageBlock: "<current_page>B</current_page>",
+        previousPageBlock: "<current_page>A</current_page>",
+        mentionedBlock: "<mentioned>M</mentioned>",
+      },
+      "<dashboard_card>C</dashboard_card>\n\n<current_page>B</current_page>\n\n<mentioned>M</mentioned>\n\nm",
+    ],
+    [
+      "an unchanged page and attached block",
+      {
+        message: "m",
+        pageBlock: "<current_page>A</current_page>",
+        previousPageBlock: "<current_page>A</current_page>",
+        attachedBlock: "<attached>T</attached>",
+        previousAttachedBlock: "<attached>T</attached>",
+      },
+      "<current_page>Unchanged since the last message.</current_page>\n\n<attached>Unchanged since the last message.</attached>\n\nm",
+    ],
+    [
+      "a cleared attached block",
+      { message: "m", previousAttachedBlock: "<attached>T</attached>" },
+      "<attached>Nothing is attached any more.</attached>\n\nm",
+    ],
+    ["a message alone", { message: "m" }, "m"],
+  ])("is exactly today's text for %s", (_label, options, expected) => {
+    expect(buildAgentTurnText(options)).toBe(expected);
+    expect(buildAgentTurnText({ ...options, isRetry: false })).toBe(expected);
+  });
+});
+
+describe("the Try again line", () => {
+  const CARD_LINE =
+    "<dashboard_card>Cancelled: nothing was added.</dashboard_card>";
+  const PAGE = "<current_page>Page: Map</current_page>";
+
+  it("goes after the card lines and blocks and before the message", () => {
+    expect(
+      buildAgentTurnText({
+        message: "how many?",
+        pageBlock: PAGE,
+        dashboardCardLines: [CARD_LINE],
+        isRetry: true,
+      }),
+    ).toBe([CARD_LINE, PAGE, TRY_AGAIN_LINE, "how many?"].join("\n\n"));
+  });
+
+  it("comes first when the turn has no blocks", () => {
+    expect(buildAgentTurnText({ message: "how many?", isRetry: true })).toBe(
+      `${TRY_AGAIN_LINE}\n\nhow many?`,
+    );
+  });
+});
+
+describe("TRY_AGAIN_LINE", () => {
+  /** The words the column-question patterns in `isSchemaAnswerTurn` use. */
+  const COLUMN_PATTERN_WORDS = [
+    "column",
+    "columns",
+    "same",
+    "similar",
+    "matching",
+    "append",
+    "appended",
+    "appendable",
+    "stack",
+    "stacked",
+    "compare",
+    "comparing",
+  ];
+
+  it("uses none of the words the column-question patterns are built from", () => {
+    const words = TRY_AGAIN_LINE.toLowerCase().match(/[a-z]+/g) ?? [];
+
+    expect(
+      words.filter((word) => {
+        return COLUMN_PATTERN_WORDS.includes(word);
+      }),
+    ).toEqual([]);
+  });
+
+  it("does not start like a retry follow-up", () => {
+    expect(TRY_AGAIN_LINE).not.toMatch(/^(?:try again\b|that query failed\b)/i);
+  });
+
+  it("is at most three sentences of plain text, with no tag and no em dash", () => {
+    expect(TRY_AGAIN_LINE).not.toMatch(/[<>\u2014]/);
+    expect(TRY_AGAIN_LINE.split(/(?<=[.!?])\s+/).length).toBeLessThanOrEqual(3);
+  });
+
+  it("names no tool and asks for no query", () => {
+    expect(TRY_AGAIN_LINE).not.toMatch(/_|\bquer(?:y|ies)\b/i);
   });
 });

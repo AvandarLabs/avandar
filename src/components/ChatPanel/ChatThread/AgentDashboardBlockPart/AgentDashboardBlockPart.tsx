@@ -354,7 +354,11 @@ function useConfirmCard(
         card,
         dashboard,
         identity,
-        editor: { activeDashboardId: editorState.activeDashboardId, dispatch },
+        editor: {
+          activeDashboardId: editorState.activeDashboardId,
+          editorData: editorState.editorData,
+          dispatch,
+        },
       });
     } finally {
       setIsBusy(false);

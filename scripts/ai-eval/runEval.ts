@@ -14,6 +14,9 @@
  * attaches). `--questions R` runs the fitRegression question, which calls the
  * epidemiology plugin's tool on a result the Data Explorer shows.
  * `--questions D` runs the dashboard questions (adding a block).
+ * `--questions T` runs the Try again questions: each is asked, then asked
+ * again as a Try again, and the second attempt is graded. T06 follows
+ * T01's second attempt.
  *
  * `--harness pi-local --model <WebLLM id>` runs the offline agent on WebLLM
  * in a headless Chromium instead of calling OpenRouter.
@@ -96,12 +99,20 @@ async function _runConversation(
   }>,
 ): Promise<void> {
   const conversation = options.harness.startConversation();
+  // Each answer's result by question id, so a follow-up's grader reads its
+  // parent's.
+  const resultsById = new Map<string, EvalQueryResult | undefined>();
   for (const question of options.questions) {
     const [answer, truth] = await Promise.all([
       conversation.ask(question),
       _computeTruth(options.database, question),
     ]);
-    options.onGraded(gradeEvalAnswer(question, answer, truth));
+    resultsById.set(question.id, answer.result);
+    const parentResult =
+      question.followsId === undefined
+        ? undefined
+        : resultsById.get(question.followsId);
+    options.onGraded(gradeEvalAnswer(question, answer, truth, parentResult));
   }
 }
 
@@ -295,7 +306,7 @@ async function main(): Promise<void> {
         onGraded: (answer) => {
           graded.push(answer);
           console.log(
-            `${answer.pass ? "PASS" : "FAIL"} ${answer.id} ${answer.questionsAsked > 0 ? `(asked ${answer.questionsAsked}) ` : ""}$${answer.answer.usage.cost.toFixed(5)} ${(answer.answer.latencyMs / 1000).toFixed(1)}s  ${answer.detail}`,
+            `${answer.pass ? "PASS" : "FAIL"} ${answer.id} ${answer.questionsAsked > 0 ? `(asked ${answer.questionsAsked}) ` : ""}${answer.isRepeat ? "(repeat) " : ""}$${answer.answer.usage.cost.toFixed(5)} ${(answer.answer.latencyMs / 1000).toFixed(1)}s  ${answer.detail}`,
           );
         },
       });

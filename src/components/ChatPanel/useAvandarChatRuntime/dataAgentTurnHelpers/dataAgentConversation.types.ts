@@ -2,6 +2,7 @@ import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPro
 import type { PluginAiToolDeclaration } from "$/agent/dataAgent/pluginAiTools.types";
 import type { AgentGadgetContext } from "$/agent/mentions/AgentGadgetContext";
 import type { AgentPageContext } from "$/agent/pageContext/AgentPageContext";
+import type { AnalyticsApp } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
 import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
 import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
 import type { User } from "$/models/User/User";
@@ -12,7 +13,10 @@ import type { AgentQueryResultData } from "@/components/ChatPanel/ChatThread/Age
 import type { ChatRuntimeCopy } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
 import type { DataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
 import type { SqlPlaceholderVault } from "@/lib/agent/dataAgent/pagePrivacy/SqlPlaceholderVault";
-import type { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
+import type {
+  DashboardEditorAppState,
+  DashboardEditorStateManager,
+} from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import type { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import type { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
 import type { MutableRefObject } from "react";
@@ -53,6 +57,12 @@ export type DataAgentTurnOptions = {
    */
   pageContext?: AgentPageContext;
   /**
+   * The page's app as `chat.message_sent` records it. A shown query's
+   * `chat.sql_generated` names it, unless the query went to the Data
+   * Explorer.
+   */
+  analyticsApp?: AnalyticsApp;
+  /**
    * True for a turn answered by the offline models. Its answer is marked as
    * offline. Its results go where an online turn's do once it carries a page
    * context.
@@ -84,6 +94,8 @@ export type DataAgentTurnOptions = {
   dashboardEditor?: {
     activeDashboardId: string | undefined;
     dispatch: ReturnType<typeof DashboardEditorStateManager.useDispatch>;
+    /** Reads the editor's state now, for a block's analytics payload. */
+    getState: () => DashboardEditorAppState;
   };
   /** The chat session the turn belongs to, for its dashboard cards. */
   sessionId?: string;
@@ -122,6 +134,28 @@ export type AgentConversationState = {
   sqlVault: SqlPlaceholderVault;
   /** Dashboard cards this turn added to the chat. Reset every turn. */
   dashboardCards: AgentDashboardBlockData[];
+  /**
+   * The last query this turn showed, and where it went, for the turn's one
+   * `chat.sql_generated`. Reset every turn, and cleared when a newer message
+   * stops the run. A stopped turn never logs it, whatever this holds.
+   */
+  lastShownQuery?: { sql: string; app: AnalyticsApp | undefined };
+};
+
+/**
+ * The user messages of the thread one ask was given, and how the ask ended.
+ * `askConversationDataAgent` writes it once an ask settles, through
+ * `createAgentAskRecord`, and `getAgentTurnKind` reads it to classify the
+ * next turn. Assistant messages are left out: a run a newer message stopped
+ * can fill in its reply after the newer turn was sent without it.
+ */
+export type AgentAskRecord = {
+  /** `chatMessagesKey` of the user messages in the turn's `apiMessages`. */
+  threadKey: string;
+  /** How many user messages that thread held. */
+  messageCount: number;
+  /** The ask resolved and its turn was not stale. */
+  isKept: boolean;
 };
 
 /** One conversation's agent, the turn it is answering, and its results. */
@@ -146,4 +180,17 @@ export type DataAgentConversation = AgentConversationState & {
   lastAttachedBlock?: string;
   /** The agent's run in progress, if any. A conversation runs one at once. */
   activeAsk?: Promise<unknown>;
+  /**
+   * The last turn whose run a newer message stopped. Written by
+   * `askConversationDataAgent` when it stops a run, and read once that run
+   * settles, so the stopped turn logs no `chat.sql_generated` even when a
+   * tool still running shows a query after the stop.
+   */
+  stoppedTurn?: DataAgentTurnOptions;
+  /**
+   * The last ask that settled, to tell a Try again from a follow-up. Unset
+   * until one does. In memory only, so a reload or a session switch forgets
+   * it.
+   */
+  lastAsk?: AgentAskRecord;
 };

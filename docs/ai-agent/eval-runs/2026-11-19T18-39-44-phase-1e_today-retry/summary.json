@@ -1,0 +1,18 @@
+{
+  "label": "phase-1e:today-retry",
+  "questionCount": 6,
+  "passCount": 6,
+  "needlessQuestions": 1,
+  "missedQuestions": 0,
+  "repeatCount": 1,
+  "consentPrompts": 0,
+  "modelCalls": 13,
+  "promptTokens": 135521,
+  "cachedPromptTokens": 0,
+  "completionTokens": 9071,
+  "totalCost": 0.0180876,
+  "costPerQuestion": 0.0030145999999999997,
+  "latencyMedianMs": 5265.04975,
+  "latencyP90Ms": 6373.146499999999,
+  "failedIds": []
+}

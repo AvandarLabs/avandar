@@ -672,6 +672,47 @@ describe("createChatModelAdapter with the agent on", () => {
     expect(result).toEqual({ content: [] });
     expect(offerOfflineFallbackMock).not.toHaveBeenCalled();
   });
+
+  it.each([
+    ["data-explorer", "data_explorer"],
+    ["dashboards", "dashboards"],
+    ["data-sources", "data_sources"],
+    ["other", undefined],
+  ] as const)(
+    "logs a message on %s with app %s and gives the agent the same app",
+    async (app, analyticsApp) => {
+      vi.mocked(AnalyticsClient.logEvent).mockClear();
+
+      await _ask(_createAdapter(app));
+
+      const event = vi.mocked(AnalyticsClient.logEvent).mock.calls[0]![0];
+      expect(event).toMatchObject({ event: "chat.message_sent" });
+      expect(event.app).toBe(analyticsApp);
+      expect(runDataAgentTurnMock.mock.calls[0]![0].analyticsApp).toBe(
+        analyticsApp,
+      );
+    },
+  );
+
+  it("lets the agent read the editor's state as it is when a block is added", async () => {
+    const dashboardEditorStateRef = {
+      current: { activeDashboardId: "d-open" },
+    };
+    await _ask(
+      _createAdapter("dashboards", {
+        dashboardEditorStateRef,
+      } as unknown as Partial<CreateChatModelAdapterOptions>),
+    );
+    const laterState = {
+      activeDashboardId: "d-open",
+      editorData: { content: [] },
+    };
+    dashboardEditorStateRef.current = laterState;
+
+    expect(
+      runDataAgentTurnMock.mock.calls[0]![0].dashboardEditor.getState(),
+    ).toBe(laterState);
+  });
 });
 
 const DATASET_REF: Gadget.Ref = {

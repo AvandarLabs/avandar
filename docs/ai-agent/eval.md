@@ -880,6 +880,167 @@ escalation unless the row says offline.
 - The first-numbered prompt's online runs cost $0.06, in 17 runs, reruns
   included (the baseline's $0.035 not included).
 
+### Phase 1E
+
+Runs for Try again and parity in the agent (D45,
+[phase-1e.md](specs/phase-1e.md)), archived under the `phase-1e` label.
+The Try again questions T01 to T06 are described under "Questions and
+ground truth". Today's chat set the bar first, on 2026-11-19, before the
+agent side was built. It ran with its `retryContext`, on
+`anthropic/claude-haiku-5.5`.
+
+| Run | Correct | T01 | T02 | T03 | T04 | T05 | T06 | Repeats (T01 and T04 / all) | Needless / missed | Cost per question | Input tokens per call | Latency p50 / p90 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| phase-1e:today-retry #1 | 6/6 | pass | pass | pass | pass | pass (repeat) | pass | 0 / 1 | 1 / 0 | $0.00301 | 10,425 | 5.3 s / 6.4 s |
+| phase-1e:today-retry #2 | 6/6 | pass | pass | pass | pass | pass | pass | 0 / 0 | 1 / 0 | $0.00292 | 10,433 | 4.6 s / 5.0 s |
+| phase-1e:today-retry #3 | 6/6 | pass | pass | pass | pass | pass | pass | 0 / 0 | 0 / 0 | $0.00280 | 10,627 | 4.6 s / 4.8 s |
+
+- **The bars for the agent:** today's chat passes 18 of the 18 graded
+  answers, and repeats on T01 and T04 sum to 0 over the three runs.
+- On T01 the first attempt asked whether to rank by cases or deaths, and
+  the retry ran a different query. On T04 the first attempt asked which
+  Georgia, and the retry answered without asking, with the US state's
+  monthly deaths, on all three runs.
+- T05's retry asked a needless question on runs #1 and #2 (what to put
+  under the heading) before it wrote the heading again. It repeated the
+  first attempt's block on run #1. On runs #2 and #3 it avoided a repeat
+  only narrowly: the block differs only in its heading level or alignment.
+  T05 has one right answer, so a repeat there is fine.
+- The three runs cost $0.052.
+
+The agent then ran the same set on prompt v6, on the Pi harness with
+Haiku 5.5 and Sonnet 5.5 escalation and `--page data-explorer`, on
+2026-11-19. Each retry is a hosted Try again, so its turn text carries the
+Try again line (`TRY_AGAIN_LINE` in
+`shared/agent/pageContext/buildAgentTurnText.ts`) before the message. Three
+wordings of the line ran, three times each. The row label names the
+wording.
+
+| Run | Correct | T01 | T02 | T03 | T04 | T05 | T06 | Repeats (T01 and T04 / all) | Needless / missed | Cost per question | Input tokens per call | Latency p50 / p90 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| phase-1e:agent-retry #1 (starting line) | 4/6 | pass | fail | pass | pass | fail | pass | 0 / 0 | 1 / 0 | $0.00096 | 6,134 | 3.2 s / 4.1 s |
+| phase-1e:agent-retry #2 (starting line) | 5/6 | pass | fail | pass | pass | pass | pass | 0 / 0 | 0 / 0 | $0.00046 | 6,056 | 2.1 s / 3.0 s |
+| phase-1e:agent-retry #3 (starting line) | 6/6 | pass | pass | pass | pass | pass | pass | 0 / 0 | 1 / 0 | $0.00047 | 6,079 | 2.1 s / 3.7 s |
+| phase-1e:agent-retry-w2 #1 (wording 2) | 6/6 | pass | pass | pass | pass | pass | pass | 0 / 0 | 0 / 0 | $0.00052 | 6,163 | 2.8 s / 3.6 s |
+| phase-1e:agent-retry-w2 #2 (wording 2) | 5/6 | pass | pass | pass | pass | fail | pass | 0 / 0 | 0 / 0 | $0.00046 | 6,086 | 1.9 s / 2.5 s |
+| phase-1e:agent-retry-w2 #3 (wording 2) | 4/6 (5/6 regraded) | pass | pass | fail (grader gap, passes regraded) | pass | fail | pass | 0 / 0 | 0 / 0 | $0.00046 | 6,086 | 1.8 s / 3.0 s |
+| phase-1e:agent-retry-w2-recheck (T03, three runs) | 3/3 | | | pass, pass, pass | | | | 0 / 0 | 0 / 0 | $0.00069 to $0.00075 | 6,113 to 6,138 | 2.4 to 2.9 s |
+| **phase-1e:agent-retry-w3 #1 (wording 3, shipped)** | **6/6** | **pass** | **pass** | **pass** | **pass** | **pass** | **pass** | **0 / 0** | **0 / 0** | **$0.00098** | **6,180** | **2.3 s / 3.2 s** |
+| **phase-1e:agent-retry-w3 #2 (wording 3, shipped)** | **6/6** | **pass** | **pass** | **pass** | **pass** | **pass** | **pass** | **0 / 0** | **0 / 0** | **$0.00053** | **6,184** | **2.4 s / 2.8 s** |
+| **phase-1e:agent-retry-w3 #3 (wording 3, shipped)** | **6/6** | **pass** | **pass** | **pass** | **pass** | **pass** | **pass** | **0 / 0** | **0 / 0** | **$0.00048** | **6,113** | **2.1 s / 2.8 s** |
+
+- **The agent met all five bars on wording 3.** Against today's chat's
+  three runs:
+
+  | # | Bar | Today's chat | Starting line | Wording 2 | Wording 3 |
+  |---|---|---|---|---|---|
+  | 1 | Right: passes over T01 to T06, three runs | 18/18 | 15/18, missed | 16/18 regraded (15/18 as graded), missed | **18/18, met** |
+  | 2 | No more repeats: repeats on T01 and T04, three runs | 0 | 0, met | 0, met | **0, met** |
+  | 3 | T06 passes on every run | 3/3 | 3/3, met | 3/3, met | **3/3, met** |
+  | 4 | T03 passes on every run | 3/3 | 3/3, met | 2/3 as graded, met on its recheck (3/3) and 3/3 regraded | **3/3, met** |
+  | 5 | T04 passes on every run | 3/3 | 3/3, met | 3/3, met | **3/3, met** |
+
+  No answer on any wording repeated its first attempt, on any question.
+- **Rechecks.** Only wording 2's bar 4 was missed by exactly one graded
+  answer. T03 ran three more times (`phase-1e:agent-retry-w2-recheck`) and
+  passed all three. Bar 1 was missed by more than one answer on the
+  starting line and on wording 2, so it had no recheck. Wording 3 needed
+  none.
+- **The starting line:** "The user clicked Try again: they want a
+  different answer to the message below than your last one above. Do not
+  repeat it. Read the message another way, take a different approach, or
+  ask one question if your last answer had to guess." 15/18, 0 repeats on
+  T01 and T04.
+- **Its misses.** On runs #1 and #2, T02 ("How many people died of covid
+  in the US in total?") gave the right total on the first attempt, and the
+  retry took "a different answer" literally. It answered with a breakdown
+  by state that has no total, after a needless card on run #1 ("Should the
+  total include the Unassigned and out-of-state rows?"). On run #1, T05's
+  retry called no tool and replied "I added the heading "Deaths in 2022"
+  to the COVID 2022 dashboard", as if the first attempt's write were the
+  retry's. Both are wording misses: the line pushed the model off a
+  question's one right answer, and let it treat the first attempt's work as
+  done. Neither reused a wrong first attempt's result.
+- **Wording 2,** aimed at those two misses: "The user clicked Try again:
+  they want a different answer to the message below than your last one
+  above, and one that still does everything the message asks, even what
+  your last answer already did. Do not repeat it, but if the message has
+  only one right answer, give that answer again, reached another way. Read
+  the message another way, take a different approach, or ask one question
+  if your last answer had to guess." 15/18 as graded, 16/18 regraded, 0
+  repeats on T01 and T04. T02 then passed 3/3.
+- **Its misses.** T05 missed twice. On run #2 the retry called no tool and
+  replied "The heading is already on the dashboard ... Since the request
+  has one clear target, I added it once and didn't repeat it." On run #3 it
+  added a ParagraphBlock "as a plain text line instead of a heading": it
+  took "a different approach" as license to change what the message asked
+  for. On run #3, T03's retry answered correctly in text ("Short answer:
+  not directly. The two files can be stacked only after some cleanup",
+  naming Country_Region and Country/Region and saying "Renaming is
+  needed"), and the grader failed it. See the grader changes below.
+- **Wording 3, which ships,** aimed at the T05 misses: "The user clicked
+  Try again: they want a different answer to the message below than your
+  last one above, one that still does everything the message asks, exactly
+  as asked, even what your last answer already did, since that answer is
+  the one being replaced. Do not repeat it, but if the message has only one
+  right answer, give that answer again, reached another way. Read the
+  message another way, take a different approach, or ask one question if
+  your last answer had to guess, but never change what the message asks
+  for." 18/18, 0 repeats on T01 and T04. On every run T05's retry wrote one
+  new HeadingBlock "Deaths in 2022", at level 1 where the first attempt
+  wrote level 2. T01's retry ranked by deaths after the first attempt ranked
+  by cases (after asking on run #2). T04's first attempt asked which
+  Georgia on every run. Its retry answered about the US state on runs #1
+  and #2, and showed both Georgias side by side on run #3.
+- **Grader changes.** Four commits changed the schema grader's "cannot be
+  stacked as they are" check (`_saysNotStackable` in
+  `scripts/ai-eval/covid/covidSchemaQuestions.ts`), each with its own
+  tests in `covidSchemaQuestions.test.ts`. The first two came before
+  today's chat ran. The last two came after wording 2 run #3's correct T03
+  reply (above) failed the check:
+
+  | Commit | What it changed |
+  |---|---|
+  | f4da653cb | Accepts "do not line up" (or "does", "will", "would not"), and "renam" in place of "rename", so "renaming" matched. |
+  | 09e31504e | Accepts the contractions ("don't", "doesn't", "won't", "wouldn't line up"), and goes back to "rename", since "renam" accepted "no renaming is needed". |
+  | d8ef5c4f9 | Accepts "not directly" on its own and "renaming is needed" (or required). Rejects "nothing to rename" and "no need to rename", which the bare "rename" accepted. |
+  | 71040955f | Rejects four wrong replies the earlier checks accepted: "No column renaming is needed", "Admin2 and Population don't line up with any global column" ("line up" now needs "columns" before it), "not directly present in the global file" ("not directly" now has to start a sentence or follow a colon), and "you don't need to rename anything". |
+
+  The archived runs hold 15 different T03 replies. Each gets the same
+  verdict from the grader before f4da653cb and from the grader after
+  71040955f, except wording 2 run #3's reply, the correct answer that
+  failed. It passes on the final grader, and the archived run keeps its
+  original verdict. Today's chat's three runs ran after 09e31504e. One gap
+  is still open: "nothing needs to be renamed" passes, because the check
+  rejects "rename" only after "nothing to", "no need to", or "don't need
+  to". The wordings
+  are commits f2c641fda (wording 2) and 6fae80030 (wording 3).
+- **T05 adds a second heading.** The eval host records each attempt's
+  writes on their own, so T05's grader sees only the retry's write, and it
+  passes when that one write is a correct heading. In the app the first
+  attempt's heading stays, so a Try again on T05 leaves two headings on
+  the dashboard. Today's chat does the same, and the user sees both.
+- **The Pi harness sends the line as the app does.** It adds the Try again
+  line to the retry only when the first attempt's ask resolved
+  (`isLastAskKept` in `PiHarness.ts`), as the app adds it only after a
+  kept reply. A first attempt that failed is asked again without it.
+- **Input tokens per call.** The agent sent 6,056 to 6,184 per call on the
+  T set, about 41% fewer than today's chat (10,425 to 10,627). 1D's last v6
+  runs sent 5,534 to 5,607 (the 45 5,534, D 5,543 to 5,544, P 5,575, M
+  5,607). The T set costs more per call because each retry turn rides on
+  its first attempt's transcript, and it carries the line. The starting
+  line is about 60 tokens and wording 3 about 130, which shows as about
+  70 more input tokens per call on wording 3's runs than on the starting
+  line's. Of input tokens, 94 to 96% were cache reads on every run that
+  followed another (94% on the T03 recheck's three runs, 95 to 96% on the
+  others), and 63 to 69% on the first run of a batch.
+- **No fallback was taken.** No miss showed a follow-up built on the first
+  attempt (T06 passed on all nine runs) or a retry reusing a wrong first
+  attempt's result, so A2 did not apply. Wording 3 met every bar, so A3 did
+  not apply.
+- The twelve agent runs cost $0.034: the starting line $0.0114, wording 2
+  $0.0087, its recheck $0.0021, and wording 3 $0.0119.
+
 ## Offline mode
 
 The offline agent runs on WebLLM in a headless Chromium on this Mac (an M4
@@ -979,7 +1140,7 @@ pnpm vite-script scripts/ai-eval/runEval.ts -- --harness pi-local --model Qwen3-
 # The coded-column questions over the measles line list
 pnpm vite-script scripts/ai-eval/runEval.ts -- --harness pi --config haiku-sonnet --workspace measles
 
-# A subset: question ids, or a category letter (B, I, H, N, F, P, M, S, D)
+# A subset: question ids, or a category letter (B, I, H, N, F, P, M, S, D, T)
 pnpm vite-script scripts/ai-eval/runEval.ts -- --harness pi --config haiku-sonnet --questions H,N11
 ```
 
@@ -1218,6 +1379,37 @@ measles workspace's coded-column D01 to D04, which run only with
 | D08 | Map page | A dashboard that does not exist: must add nothing and say it cannot find it |
 | D09 | Map page, two dashboards with the same name | The simulated user picks one on the card, and only that one gets the block |
 
+`covid/covidTryAgainQuestions.ts` adds the Try again questions T01 to T06,
+in the `try_again` category. `createTryAgainQuestions` copies each source
+question by id (a missing id throws), and `covidQuestions.ts` appends them
+to `COVID_QUESTIONS`. They run only with `--questions T`: the default run
+stays at the original 45. A question with `tryAgain` is asked twice in one
+conversation: the first attempt, then the same thread again as a Try
+again, and the second attempt is the one graded. The baseline harness
+drops the trailing reply, as assistant-ui does, and sends today's
+`retryContext` built from the first attempt's last response. The Pi
+harness asks the same message again, with the Try again line on a hosted
+conversation whose first attempt resolved and never on a device one.
+
+| Id | Built from | First attempt | The second attempt passes when |
+|---|---|---|---|
+| T01 | B04, "Which state had the most covid?" | Answered fully. A card is answered by B04's script (deaths). | Its result passes B04's grader: the top state by deaths or by cases. |
+| T02 | B05, "How many people died of covid in the US in total?" | Answered fully. | Its result passes B05's grader: the US total. |
+| T03 | S01, the appendable-files question | Answered fully. | It shows no query, and its text passes `gradeSchemaComparison`. |
+| T04 | N06, "show me deaths in georgia" | Ends at its first card, unanswered (`tryAgain.isFirstCardUnanswered`), as when the user clicks Try again on the card. | It asks, and once N06's script answers (the US state) its result passes N06's grader. Or it answers without asking, with the state's total, sum, or monthly series, or the country's (`countryTotal` and `countryMonthly` over `global_deaths`). Asking is `allowed`. |
+| T05 | D02, "Add a heading that says Deaths in 2022", in the dashboard editor | Answered fully: one editor write. | The second attempt makes exactly one write, and it passes D02's `expectedWrite`. |
+| T06 | New, follows T01: "show that by month" | Not retried. Asked after T01's second attempt. | Its result is the monthly series (95% of months, as N01's) of the reading T01's second attempt used: deaths of the top deaths state, or cases of the top cases state. It fails when that attempt matched neither reading. |
+
+`runtime/isRepeatedAttempt.ts` tells whether a second attempt repeated
+the first: the same query (whitespace collapsed, trimmed, lowercased), the
+same first card question, the same single dashboard block, or, when
+neither showed a query, a card, or a block, the same reply. The grader
+marks such an answer `isRepeat`, `summary.json` counts them in
+`repeatCount`, and `runEval.ts` prints `(repeat)` beside them. T06's
+grader reads `GradeContext.parentResult`, the result of T01's second
+attempt, which `runEval.ts` passes to any question with `followsId`, to
+tell which reading to require.
+
 ### Metrics
 
 | Metric | Definition |
@@ -1274,7 +1466,11 @@ Prerequisites: the three CSVs above in `~/cleaned-test-data`,
 `OPEN_ROUTER_API_KEY` in the environment or in `.env.development.edge` (for
 online runs), Deno for the `baseline` harness, and Playwright's Chromium
 (`npx playwright install chromium`) for `pi-local`. Every command runs from
-the repo root and writes `.temp/ai-eval/runs/<time>-<label>/`.
+the repo root and writes `.temp/ai-eval/runs/<time>-<label>/`. When you
+export the key from an env file, strip any quotes around its value: the
+runner uses an exported key exactly as given, and a quoted one gets a 401
+from OpenRouter. A key read from `.env.development.edge` itself has its
+quotes removed.
 
 | Result | Command (`pnpm vite-script scripts/ai-eval/runEval.ts -- ...`) |
 |---|---|
@@ -1302,6 +1498,9 @@ the repo root and writes `.temp/ai-eval/runs/<time>-<label>/`.
 | A single question again (add `--label phase-1d:rerun-p04`) | `--harness pi --config haiku-sonnet --questions P04` |
 | P04 ten times in a row (add `--label phase-1d:p04-fix1`) | `for i in 1 2 3 4 5 6 7 8 9 10; do pnpm vite-script scripts/ai-eval/runEval.ts -- --harness pi --config haiku-sonnet --questions P04 --label phase-1d:p04-fix1; done` |
 | P04 on an older prompt (add `--label phase-1d:diag-p04-v5`) | Set `DATA_AGENT_PROMPT_ID` in `shared/agent/dataAgent/dataAgentTools.ts` to `"data-agent-v5"` (or v3, v4) without committing, then `--harness pi --config haiku-sonnet --questions P04`. Restore the file after. |
+| Today's chat on the Try again questions, three runs (add `--label phase-1e:today-retry`) | `--harness baseline --model anthropic/claude-haiku-5.5 --questions T` |
+| The agent on the Try again questions, three runs (add `--label phase-1e:agent-retry`; wordings 2 and 3 of the line ran as `phase-1e:agent-retry-w2` and `phase-1e:agent-retry-w3`) | `--harness pi --config haiku-sonnet --page data-explorer --questions T` |
+| A Try again bar's recheck, three runs (add `--label phase-1e:agent-retry-w2-recheck`) | `--harness pi --config haiku-sonnet --page data-explorer --questions T03`. A T06 recheck runs `--questions T01,T06`, since T06 follows T01. |
 | Offline N01 without the dashboard tool (add `--label phase-1d:offline-diag-notool`) | Make `_offersDashboardTool` in `src/lib/agent/dataAgent/createDataAgent/createDataAgent.ts` return false without committing (the offline agent now does this on every plain turn, so this repeats the diagnostic on a dashboard turn), then `--harness pi-local --config single --model Qwen3-4B-q4f16_1-MLC --questions N01 --concurrency 1`. Restore the file after. |
 
 The PDF table assistant has its own runner,
@@ -1338,7 +1537,7 @@ harness on Sonnet 5; 20 to 25 minutes for one offline run of 45 questions.
 
 [eval-runs/README.md](eval-runs/README.md) lists all chat eval runs, and
 [eval-runs/pdf/README.md](eval-runs/pdf/README.md) the PDF assistant's. The
-chat index lists all 346 runs (every
+chat index lists all 361 runs (every
 model, harness, screen, rerun, and smoke check), each linked to its
 `results.jsonl`. To check a number here, find its label in that index and
 open the answers: each line has the question, the final SQL, the first
@@ -1379,5 +1578,9 @@ setup went from 1 per run to 0.
   per-capita math, lookups, clarifications, and follow-ups on COVID data;
   other domains (program data, survey data) need their own question sets.
 - The simulated user answers instantly and always cooperates.
+- A Try again whose two attempts both end in an error counts as a repeat:
+  neither shows a query, a card, or a block, and their empty replies match
+  in `isRepeatedAttempt`. A network error on both attempts would inflate
+  the repeat count. No Phase 1E run had one.
 - The browser path (Data Explorer, DuckDB-Wasm, question cards) is tested
   separately; see [spike-findings.md](spike-findings.md).

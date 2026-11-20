@@ -31,6 +31,25 @@ export function countClarificationAnswersInThread(
   }).length;
 }
 
+/** Every turn number a clarification card can carry, in order. */
+const CLARIFICATION_TURN_NUMBERS = [1, 2, 3] as const;
+
+/**
+ * The turn number of a card shown now: one more than the thread's card
+ * answers, at most `MAX_CLARIFICATIONS_PER_QUESTION`, as the edge function
+ * counts it.
+ */
+export function buildClarificationTurnNumber(
+  messages: readonly ThreadMessage[],
+): 1 | 2 | 3 {
+  const answerCount = countClarificationAnswersInThread(messages);
+  return (
+    CLARIFICATION_TURN_NUMBERS[
+      Math.min(answerCount, MAX_CLARIFICATIONS_PER_QUESTION - 1)
+    ] ?? MAX_CLARIFICATIONS_PER_QUESTION
+  );
+}
+
 /**
  * Values the user explicitly supplied via clarification answers. Does not
  * include "(none of the listed options)" or legacy skip markers.
