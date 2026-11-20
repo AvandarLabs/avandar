@@ -31,8 +31,9 @@ export function getCurrentBranch(git: ReleaseCommands): string | undefined {
  *
  * Untracked files are deliberately excluded: this command never checks out a
  * branch and never cleans, so untracked files cannot reach the release. Tracked
- * modifications and staged changes are a different matter, because the version
- * commits use `git commit -a` and would sweep them in.
+ * modifications and staged changes are a different matter: a change to
+ * package.json would be committed with the new version, and any other one
+ * means the checkout is not the commit being released.
  */
 export function getTrackedChanges(git: ReleaseCommands): string | undefined {
   const changes = git.readGit(["status", "--short", "--untracked-files=no"]);

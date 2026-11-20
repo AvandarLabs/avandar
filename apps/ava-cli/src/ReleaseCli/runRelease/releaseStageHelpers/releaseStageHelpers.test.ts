@@ -27,22 +27,75 @@ vi.mock("@ava-cli/ReleaseCli/releasePromptHelpers");
 
 const OK: CommandResult = { ok: true, stdout: "", stderr: "" };
 
+/** The checkout a fake `ReleaseCommands` describes. */
+type FakeCheckout = {
+  /** The checked-out branch, or undefined for a detached HEAD. */
+  branch?: string;
+  /** The commit HEAD starts at. Defaults to `source-sha`. */
+  head?: string;
+  /** `git status --short` output. Empty or omitted means a clean tree. */
+  trackedChanges?: string;
+  /** `git worktree list --porcelain` output. */
+  worktreeList?: string;
+  /** The origin URL. */
+  remoteUrl?: string;
+};
+
+const TREE_SUFFIX = "^{tree}";
+
+/**
+ * What the fake's `readGit` answers. A tree lookup answers `<commit>-tree`, so
+ * a test can tell which commit's tree a stage read.
+ */
+function _readFakeGit(
+  options: Readonly<{
+    checkout: FakeCheckout;
+    head: string;
+    args: readonly string[];
+  }>,
+): string | undefined {
+  const { checkout, head, args } = options;
+  const lastArg = args.at(-1) ?? "";
+  switch (args[0]) {
+    case "worktree":
+      return checkout.worktreeList ?? "";
+    case "remote":
+      return checkout.remoteUrl;
+    case "status":
+      return checkout.trackedChanges ?? "";
+    case "symbolic-ref":
+      return checkout.branch === undefined
+        ? undefined
+        : `refs/heads/${checkout.branch}`;
+    default:
+      return lastArg.endsWith(TREE_SUFFIX)
+        ? `${lastArg.slice(0, -TREE_SUFFIX.length)}-tree`
+        : lastArg === "HEAD"
+          ? head
+          : undefined;
+  }
+}
+
 /**
  * A `ReleaseCommands` that runs nothing and records every mutation as one
  * space-joined string, so a test can assert the exact commands a stage would
- * run. `commit-tree` answers with `release-commit-sha`, a tree lookup with
- * `tree-sha`, `worktree list` with `worktreeList`, and the origin URL with
- * `remoteUrl`.
+ * run. `commit-tree` answers with `release-commit-sha`, and a `git commit`
+ * moves HEAD to `version-commit-sha`.
  */
-function _createFakeCommands(
-  options: Readonly<{ worktreeList?: string; remoteUrl?: string }> = {},
-): { git: ReleaseCommands; mutations: string[] } {
+function _createFakeCommands(checkout: Readonly<FakeCheckout> = {}): {
+  git: ReleaseCommands;
+  mutations: string[];
+} {
   const mutations: string[] = [];
+  let head = checkout.head ?? "source-sha";
   const recordMutation = (
     command: string,
     args: readonly string[],
   ): CommandResult => {
     mutations.push([command, ...args].join(" "));
+    if (command === "git" && args[0] === "commit") {
+      head = "version-commit-sha";
+    }
     return args[0] === "commit-tree"
       ? { ok: true, stdout: "release-commit-sha", stderr: "" }
       : OK;
@@ -51,16 +104,7 @@ function _createFakeCommands(
     repoRoot: "/tmp/fake-repo",
     dryRun: false,
     readGit: (args: readonly string[]) => {
-      const lastArg = args.at(-1) ?? "";
-      return args[0] === "worktree"
-        ? (options.worktreeList ?? "")
-        : args[0] === "remote"
-          ? options.remoteUrl
-          : lastArg.endsWith("^{tree}")
-            ? "tree-sha"
-            : lastArg === "HEAD"
-              ? "head-sha"
-              : undefined;
+      return _readFakeGit({ checkout, head, args });
     },
     tryGit: () => {
       return OK;
@@ -124,7 +168,7 @@ describe("release stages", () => {
   });
 
   it("sets alpha-dev to 0.15.0-alpha and pushes it by full ref on the alpha line", () => {
-    const { git, mutations } = _createFakeCommands();
+    const { git, mutations } = _createFakeCommands({ branch: "alpha-dev" });
 
     const releaseSha = commitReleaseVersionOnSource(git, {
       plan: _createPlan(ALPHA_RELEASE_LINE),
@@ -133,14 +177,14 @@ describe("release stages", () => {
 
     expect(mutations).toEqual([
       "pnpm version 0.15.0-alpha --no-git-tag-version",
-      "git commit -am Release: v0.15.0-alpha [skip deploy]",
+      "git commit -m Release: v0.15.0-alpha [skip deploy] -- package.json",
       "git push origin HEAD:refs/heads/alpha-dev",
     ]);
-    expect(releaseSha).toBe("head-sha");
+    expect(releaseSha).toBe("version-commit-sha");
   });
 
   it("sets develop to 0.14.2 and pushes it by full ref on the mainline", () => {
-    const { git, mutations } = _createFakeCommands();
+    const { git, mutations } = _createFakeCommands({ branch: "develop" });
 
     commitReleaseVersionOnSource(git, {
       plan: _createPlan(MAINLINE_RELEASE_LINE),
@@ -149,13 +193,13 @@ describe("release stages", () => {
 
     expect(mutations).toEqual([
       "pnpm version 0.14.2 --no-git-tag-version",
-      "git commit -am Release: v0.14.2 [skip deploy]",
+      "git commit -m Release: v0.14.2 [skip deploy] -- package.json",
       "git push origin HEAD:refs/heads/develop",
     ]);
   });
 
   it("commits nothing when alpha-dev is already at 0.15.0-alpha", () => {
-    const { git, mutations } = _createFakeCommands();
+    const { git, mutations } = _createFakeCommands({ branch: "alpha-dev" });
 
     const releaseSha = commitReleaseVersionOnSource(git, {
       plan: {
@@ -166,8 +210,31 @@ describe("release stages", () => {
     });
 
     expect(mutations).toEqual([]);
-    expect(releaseSha).toBe("head-sha");
+    expect(releaseSha).toBe("source-sha");
   });
+
+  it.each<[string, FakeCheckout]>([
+    ["HEAD moved since preflight", { branch: "alpha-dev", head: "moved-sha" }],
+    ["the checkout is on another branch", { branch: "develop" }],
+    ["the checkout is a detached HEAD", {}],
+    [
+      "a tracked file is modified",
+      { branch: "alpha-dev", trackedChanges: " M src/app.ts" },
+    ],
+  ])(
+    "refuses to commit the release version, running nothing, when %s",
+    (_condition, checkout) => {
+      const { git, mutations } = _createFakeCommands(checkout);
+
+      expect(() => {
+        return commitReleaseVersionOnSource(git, {
+          plan: _createPlan(ALPHA_RELEASE_LINE),
+          originSourceSha: "source-sha",
+        });
+      }).toThrow(/Nothing has been released\.$/);
+      expect(mutations).toEqual([]);
+    },
+  );
 
   it("bumps alpha-dev to 0.15.1-alpha-dev and pushes it by full ref", () => {
     const { git, mutations } = _createFakeCommands();
@@ -176,7 +243,7 @@ describe("release stages", () => {
 
     expect(mutations).toEqual([
       "pnpm version 0.15.1-alpha-dev --no-git-tag-version",
-      "git commit -am Bump version to 0.15.1-alpha-dev [skip deploy]",
+      "git commit -m Bump version to 0.15.1-alpha-dev [skip deploy] -- package.json",
       "git push origin HEAD:refs/heads/alpha-dev",
     ]);
   });
@@ -188,7 +255,7 @@ describe("release stages", () => {
 
     expect(mutations).toEqual([
       "pnpm version 0.14.3-dev --no-git-tag-version",
-      "git commit -am Bump version to 0.14.3-dev [skip deploy]",
+      "git commit -m Bump version to 0.14.3-dev [skip deploy] -- package.json",
       "git push origin HEAD:refs/heads/develop",
     ]);
   });
@@ -234,7 +301,7 @@ describe("release stages", () => {
     });
 
     expect(mutations[0]).toBe(
-      "git commit-tree tree-sha -p target-sha -p release-sha -m Release 0.15.0-alpha\n\nSets alpha to alpha-dev's tree at release-sha verbatim. Written with git commit-tree, so this is a two-parent merge carrying alpha-dev's exact content with no merge resolution. See apps/ava-cli/src/ReleaseCli.",
+      "git commit-tree release-sha-tree -p target-sha -p release-sha -m Release 0.15.0-alpha\n\nSets alpha to alpha-dev's tree at release-sha verbatim. Written with git commit-tree, so this is a two-parent merge carrying alpha-dev's exact content with no merge resolution. See apps/ava-cli/src/ReleaseCli.",
     );
   });
 
@@ -248,7 +315,7 @@ describe("release stages", () => {
     });
 
     expect(mutations[0]).toBe(
-      "git commit-tree tree-sha -p target-sha -p release-sha -m Release 0.14.2\n\nSets main to develop's tree at release-sha verbatim. Written with git commit-tree, so this is a two-parent merge carrying develop's exact content with no merge resolution. See apps/ava-cli/src/ReleaseCli.",
+      "git commit-tree release-sha-tree -p target-sha -p release-sha -m Release 0.14.2\n\nSets main to develop's tree at release-sha verbatim. Written with git commit-tree, so this is a two-parent merge carrying develop's exact content with no merge resolution. See apps/ava-cli/src/ReleaseCli.",
     );
   });
 

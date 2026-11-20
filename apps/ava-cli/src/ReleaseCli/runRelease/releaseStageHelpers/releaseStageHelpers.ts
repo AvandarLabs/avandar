@@ -1,6 +1,8 @@
 import {
   createReleaseCommit,
   findWorktreeForBranch,
+  getCurrentBranch,
+  getTrackedChanges,
   localTagExists,
   readTreeSha,
   remoteTagExists,
@@ -88,6 +90,30 @@ export function assertTagIsUnused(
 }
 
 /**
+ * Why the checkout cannot take the release version commit, or undefined when
+ * it can: it must be on the line's source branch, at the commit preflight
+ * resolved, with no tracked changes. Preflight checked all three, but prompts
+ * run between preflight and this commit, and the commit is pushed straight to
+ * the source branch.
+ */
+function _getUnreleasableCheckoutReason(
+  git: ReleaseCommands,
+  options: Readonly<{ line: ReleaseLine; originSourceSha: string }>,
+): string | undefined {
+  const { line, originSourceSha } = options;
+  const currentBranch = getCurrentBranch(git);
+  if (currentBranch !== line.sourceBranch) {
+    return `the checkout is on ${currentBranch ?? "a detached HEAD"}, not ${line.sourceBranch}`;
+  }
+  if (revParse(git, "HEAD") !== originSourceSha) {
+    return `HEAD is no longer at origin/${line.sourceBranch} (${shortSha(originSourceSha)}), where preflight found it`;
+  }
+  return getTrackedChanges(git) === undefined
+    ? undefined
+    : "the working tree has tracked changes";
+}
+
+/**
  * Put the published release version (`0.10.2`, or `0.15.0-alpha` on alpha) on
  * the source branch and push it, so the released tree is one that exists on
  * that branch under its real version number.
@@ -101,6 +127,15 @@ export function commitReleaseVersionOnSource(
   const { plan, originSourceSha } = options;
   const { line, sourceVersion, publishedVersion, releaseTag } = plan;
 
+  const unreleasableReason = _getUnreleasableCheckoutReason(git, {
+    line,
+    originSourceSha,
+  });
+  if (unreleasableReason !== undefined) {
+    throw new Error(
+      `Cannot commit ${publishedVersion} on ${line.sourceBranch}: ${unreleasableReason}. Nothing has been released.`,
+    );
+  }
   printHeading(`Setting ${line.sourceBranch} to ${publishedVersion}`);
   if (sourceVersion === publishedVersion) {
     printSuccess(
@@ -248,7 +283,10 @@ export function bumpSourceToNextVersion(
   }
 }
 
-/** Set the root package.json version and commit it on the current branch. */
+/**
+ * Set the root package.json version and commit only that file on the current
+ * branch, so nothing else in the working tree can reach the version commit.
+ */
 function _commitVersion(
   git: ReleaseCommands,
   options: Readonly<{ version: string; message: string }>,
@@ -266,7 +304,13 @@ function _commitVersion(
     );
   }
 
-  const commitResult = git.mutate("git", ["commit", "-am", message]);
+  const commitResult = git.mutate("git", [
+    "commit",
+    "-m",
+    message,
+    "--",
+    "package.json",
+  ]);
   if (!commitResult.ok) {
     throw new Error(
       `Could not commit the version change: ${commitResult.stderr}`,

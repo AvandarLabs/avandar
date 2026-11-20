@@ -72,8 +72,9 @@ function _resolveLine(
  *
  * Untracked files are fine: the release never checks out a branch and never
  * cleans, so they cannot reach it. Tracked modifications and staged changes are
- * a different matter, because the version commits use `git commit -a` and would
- * sweep them in.
+ * a different matter: a change to package.json would be committed with the new
+ * version, and any other one means the checkout is not the commit being
+ * released.
  */
 function _refuseDirtyTree(git: ReleaseCommands): PreflightRefusal | undefined {
   const trackedChanges = getTrackedChanges(git);
