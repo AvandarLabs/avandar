@@ -1,5 +1,10 @@
 import { describeCommandFailure } from "@ava-cli/ReleaseCli/describeCommandFailure/describeCommandFailure";
 import {
+  ALPHA_RELEASE_LINE,
+  getReleaseLineFromBranch,
+  MAINLINE_RELEASE_LINE,
+} from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
+import {
   getCurrentBranch,
   getDivergence,
   getGitHubRepoSlug,
@@ -8,11 +13,7 @@ import {
   revParse,
 } from "@ava-cli/ReleaseCli/releaseGitHelpers";
 import type { ReleaseCommands } from "@ava-cli/ReleaseCli/createReleaseCommands";
-
-/** The branch releases are cut from. */
-export const RELEASE_SOURCE_BRANCH = "develop";
-/** The branch a release publishes to, and which production deploys from. */
-export const RELEASE_TARGET_BRANCH = "main";
+import type { ReleaseLine } from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
 
 /** Why a release was refused, for callers that need more than the message. */
 export type PreflightRefusalReason =
@@ -34,45 +35,34 @@ export type PreflightRefusal = {
 export type PreflightResult =
   | {
       ok: true;
-      /** Tip of origin/develop: the commit the release is built from. */
-      originDevelopSha: string;
-      /** Tip of origin/main: the first parent of the release commit. */
-      originMainSha: string;
-      /** Local main, when it exists, so it can be fast-forwarded later. */
-      localMainSha: string | undefined;
+      /** The line being released, from the checked-out branch. */
+      line: ReleaseLine;
+      /** Tip of origin/<source>: the commit the release is built from. */
+      originSourceSha: string;
+      /** Tip of origin/<target>: the first parent of the release commit. */
+      originTargetSha: string;
+      /** Local <target>, when it exists, so it can be fast-forwarded later. */
+      localTargetSha: string | undefined;
     }
   | ({ ok: false } & PreflightRefusal);
 
 /**
- * Whether the repository is in a state a release may be cut from.
- *
- * Every check refuses; none of them fixes anything. A release must never be the
- * thing that discovers a branch was stale, and it must never quietly repair
- * state on the way to pushing production.
+ * The line released from the checked-out branch, or the refusal when releases
+ * may not be cut from it. Only a source branch qualifies: a target branch
+ * (`main`, `alpha`), a feature branch, and a detached HEAD are all refused.
  */
-export function runPreflight(git: ReleaseCommands): PreflightResult {
-  // Cheapest first: two local checks, then the permission call, then the fetch.
-  const refusal =
-    _refuseWrongBranch(git) ??
-    _refuseDirtyTree(git) ??
-    _refuseWithoutPushPermission(git) ??
-    _refuseFailedFetch(git);
-  if (refusal !== undefined) {
-    return { ok: false, ...refusal };
-  }
-  return _resolveReleaseRefs(git);
-}
-
-/** The refusal when the checkout is not on the source branch. */
-function _refuseWrongBranch(
+function _resolveLine(
   git: ReleaseCommands,
-): PreflightRefusal | undefined {
+): { line: ReleaseLine } | PreflightRefusal {
   const currentBranch = getCurrentBranch(git);
-  return currentBranch === RELEASE_SOURCE_BRANCH
-    ? undefined
+  const line = getReleaseLineFromBranch(currentBranch);
+  const alphaSource = ALPHA_RELEASE_LINE.sourceBranch;
+  const mainlineSource = MAINLINE_RELEASE_LINE.sourceBranch;
+  return line !== undefined
+    ? { line }
     : {
         reason: "wrong-branch",
-        message: `Releases are cut from "${RELEASE_SOURCE_BRANCH}" (currently on "${currentBranch ?? "a detached HEAD"}").`,
+        message: `Releases are cut from "${alphaSource}" or "${mainlineSource}" (currently on "${currentBranch ?? "a detached HEAD"}"). Run it on ${alphaSource} to release alpha, or on ${mainlineSource} to release mainline.`,
       };
 }
 
@@ -105,6 +95,7 @@ function _refuseDirtyTree(git: ReleaseCommands): PreflightRefusal | undefined {
  */
 function _refuseWithoutPushPermission(
   git: ReleaseCommands,
+  line: ReleaseLine,
 ): PreflightRefusal | undefined {
   // A non-GitHub origin (a local bare remote, say) has nobody to ask.
   const repoSlug = getGitHubRepoSlug(git);
@@ -122,12 +113,12 @@ function _refuseWithoutPushPermission(
   return !pushPermissionResult.ok
     ? {
         reason: "unverified-push-permission",
-        message: `Could not confirm you can push to ${repoSlug}: ${describeCommandFailure(pushPermissionResult, "the gh CLI could not answer")}. Releases push ${RELEASE_SOURCE_BRANCH} and ${RELEASE_TARGET_BRANCH}, so this refuses rather than guess. Run \`gh auth login\` and try again.`,
+        message: `Could not confirm you can push to ${repoSlug}: ${describeCommandFailure(pushPermissionResult, "the gh CLI could not answer")}. Releases push ${line.sourceBranch} and ${line.targetBranch}, so this refuses rather than guess. Run \`gh auth login\` and try again.`,
       }
     : pushPermissionResult.stdout.trim() !== "true"
       ? {
           reason: "no-push-permission",
-          message: `You do not have push access to ${repoSlug}, so this release would fail once it tried to push ${RELEASE_SOURCE_BRANCH}. Ask whoever owns the repo to cut the release.`,
+          message: `You do not have push access to ${repoSlug}, so this release would fail once it tried to push ${line.sourceBranch}. Ask whoever owns the repo to cut the release.`,
         }
       : undefined;
 }
@@ -146,43 +137,61 @@ function _refuseFailedFetch(
 }
 
 /**
+ * Why `origin/<target>` is missing, for `_resolveReleaseRefs`. On the alpha
+ * line this is expected before the first release, so the message carries the
+ * command that creates `alpha` at `main`'s commit.
+ */
+function _describeMissingTarget(line: ReleaseLine): string {
+  const missing = `origin/${line.targetBranch} does not exist.`;
+  return line.kind === "alpha"
+    ? `${missing} For the first alpha release, create it at ${MAINLINE_RELEASE_LINE.targetBranch}'s commit first: git push origin origin/${MAINLINE_RELEASE_LINE.targetBranch}:refs/heads/${line.targetBranch}`
+    : missing;
+}
+
+/**
  * The refs the release will be built from, or a refusal when one is missing or
  * the source branch is out of sync with origin.
  */
-function _resolveReleaseRefs(git: ReleaseCommands): PreflightResult {
-  const originDevelopSha = revParse(
+function _resolveReleaseRefs(
+  git: ReleaseCommands,
+  line: ReleaseLine,
+): PreflightResult {
+  const originSourceSha = revParse(
     git,
-    `refs/remotes/origin/${RELEASE_SOURCE_BRANCH}`,
+    `refs/remotes/origin/${line.sourceBranch}`,
   );
-  if (originDevelopSha === undefined) {
+  if (originSourceSha === undefined) {
     return {
       ok: false,
       reason: "missing-ref",
-      message: `origin/${RELEASE_SOURCE_BRANCH} does not exist.`,
+      message: `origin/${line.sourceBranch} does not exist.`,
     };
   }
 
-  const originMainSha = revParse(
+  const originTargetSha = revParse(
     git,
-    `refs/remotes/origin/${RELEASE_TARGET_BRANCH}`,
+    `refs/remotes/origin/${line.targetBranch}`,
   );
-  if (originMainSha === undefined) {
+  if (originTargetSha === undefined) {
     return {
       ok: false,
       reason: "missing-ref",
-      message: `origin/${RELEASE_TARGET_BRANCH} does not exist.`,
+      message: _describeMissingTarget(line),
     };
   }
 
-  const outOfSync = _refuseOutOfSyncSourceBranch(git, originDevelopSha);
+  const outOfSync = _refuseOutOfSyncSourceBranch(git, {
+    line,
+    originSha: originSourceSha,
+  });
   if (outOfSync !== undefined) {
     return { ok: false, ...outOfSync };
   }
 
-  const localMainSha = refExists(git, `refs/heads/${RELEASE_TARGET_BRANCH}`)
-    ? revParse(git, RELEASE_TARGET_BRANCH)
+  const localTargetSha = refExists(git, `refs/heads/${line.targetBranch}`)
+    ? revParse(git, line.targetBranch)
     : undefined;
-  return { ok: true, originDevelopSha, originMainSha, localMainSha };
+  return { ok: true, line, originSourceSha, originTargetSha, localTargetSha };
 }
 
 /**
@@ -194,25 +203,55 @@ function _resolveReleaseRefs(git: ReleaseCommands): PreflightResult {
  */
 function _refuseOutOfSyncSourceBranch(
   git: ReleaseCommands,
-  originSha: string,
+  options: Readonly<{ line: ReleaseLine; originSha: string }>,
 ): PreflightRefusal | undefined {
-  const localDevelopSha = revParse(git, RELEASE_SOURCE_BRANCH);
-  if (localDevelopSha === undefined) {
+  const { line, originSha } = options;
+  const localSourceSha = revParse(git, line.sourceBranch);
+  if (localSourceSha === undefined) {
     return {
       reason: "missing-ref",
-      message: `Could not resolve ${RELEASE_SOURCE_BRANCH}.`,
+      message: `Could not resolve ${line.sourceBranch}.`,
     };
   }
-  if (localDevelopSha === originSha) {
+  if (localSourceSha === originSha) {
     return undefined;
   }
   const { ahead, behind } = getDivergence(
     git,
-    RELEASE_SOURCE_BRANCH,
-    `origin/${RELEASE_SOURCE_BRANCH}`,
+    line.sourceBranch,
+    `origin/${line.sourceBranch}`,
   );
   return {
     reason: "out-of-sync",
-    message: `${RELEASE_SOURCE_BRANCH} is out of sync with origin/${RELEASE_SOURCE_BRANCH} (${ahead} ahead, ${behind} behind). Push or pull it, then release.`,
+    message: `${line.sourceBranch} is out of sync with origin/${line.sourceBranch} (${ahead} ahead, ${behind} behind). Push or pull it, then release.`,
   };
+}
+
+/**
+ * Whether the repository is in a state a release may be cut from, and which
+ * line it releases. `runRelease` calls it before anything else, so a release
+ * on `alpha-dev` cuts alpha, one on `develop` cuts mainline, and any other
+ * branch is refused before a single network call.
+ *
+ * Every check refuses; none of them fixes anything. A release must never be the
+ * thing that discovers a branch was stale, and it must never quietly repair
+ * state on the way to pushing production.
+ */
+export function runPreflight(git: ReleaseCommands): PreflightResult {
+  // The branch decides everything else, so nothing runs on a refused one.
+  const resolvedLine = _resolveLine(git);
+  if (!("line" in resolvedLine)) {
+    return { ok: false, ...resolvedLine };
+  }
+  const { line } = resolvedLine;
+
+  // Cheapest first: a local check, then the permission call, then the fetch.
+  const refusal =
+    _refuseDirtyTree(git) ??
+    _refuseWithoutPushPermission(git, line) ??
+    _refuseFailedFetch(git);
+  if (refusal !== undefined) {
+    return { ok: false, ...refusal };
+  }
+  return _resolveReleaseRefs(git, line);
 }
