@@ -311,6 +311,11 @@ export const TRY_AGAIN_LINE =
 isRetry?: boolean;
 ```
 
+As built, the constant above is the starting wording. The wording that
+ships is the third one tried (about 130 tokens), quoted in D45 in
+[decisions.md](../decisions.md) and kept in `TRY_AGAIN_LINE` in
+`shared/agent/pageContext/buildAgentTurnText.ts`.
+
 With `isRetry`, the text is the card lines and blocks, then
 `TRY_AGAIN_LINE`, then the message, joined with blank lines as the blocks
 already are. With no blocks, the line comes first. Without `isRetry`, the
@@ -531,7 +536,9 @@ id. To read the editor:
 
 - No part adds a model call. The only new model input is the line, about
   50 tokens, on hosted retry turns only. The first attempt is already in
-  the cached prefix.
+  the cached prefix. As built, the shipped line is wording 3, about 130
+  tokens (D45, and `TRY_AGAIN_LINE` in
+  `shared/agent/pageContext/buildAgentTurnText.ts`).
 - Nothing new reaches a hosted model: the line points at an attempt the
   model already wrote. The bias check and the audit row run on the device.
 - The analytics payloads do not change: counts, kinds, and ids, never SQL
@@ -543,7 +550,7 @@ id. To read the editor:
 | Situation | Behavior |
 |---|---|
 | Try again while a run is in progress | Cannot happen: assistant-ui enables Try again only while the thread is idle. |
-| A card answer or view change sent while a run is in progress | The run is stopped, as today. The new thread extends the recorded one, so it is `continues`. The stopped run does not write the record. |
+| A card answer or view change sent while a run is in progress | The run is stopped, as today. The new thread extends the recorded one, so it is `continues`. The stopped run usually settles before the newer turn takes the conversation, so it can write its own record first. The newer turn's record replaces it once that turn's ask settles, and the stopped run logs no `chat.sql_generated`. |
 | The audit write fails | `recordShown` swallows it and returns an id. The card shows. |
 | The turn goes stale while the audit row is written | The row stays. The card is not set. |
 | An analytics insert fails, or the device is offline | `AnalyticsClient.logEvent` swallows it. |

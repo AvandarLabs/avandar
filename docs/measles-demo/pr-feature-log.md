@@ -592,8 +592,8 @@ Take only your feature's hunks from these files. The last feature in the
 | `src/components/ChatPanel/useAvandarChatRuntime/dashboardBlocks/addAgentDashboardBlock.{ts,test.ts}` | F139, F140 | F139 creates it. F140: a block the tool queues into the open editor logs `dashboard.block_added_via_chat` (`1fbc7565b`). |
 | `src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/{confirmAgentDashboardCard.{ts,test.ts},AgentDashboardBlockPart.tsx}` | F139, F140 | F139 creates them. F140: Confirm logs `dashboard.block_added_via_chat` once the block is queued or saved, and the part passes `editor.editorData` (`e2cac534d`). |
 | `src/lib/agent/schemaAnswer/isSchemaAnswerTurn.test.ts` | F95, F140 | F95 creates it. F140: a retried column question stays one, and the Try again line alone is not one (`6a1cc904a`). |
-| `scripts/ai-eval/covid/covidSchemaQuestions.{ts,test.ts}` | F95, F140 | F95 creates them. F140: `_saysNotStackable` accepts "do not line up" and its contractions, "not directly", and "renaming is needed", and still rejects the negated forms (`f4da653cb`, `09e31504e`, `d8ef5c4f9`). |
-| `docs/ai-agent/{README.md,decisions.md,roadmap.md,eval.md}`, `docs/ai-agent/specs/{phase-1.md,phase-1a.md}` | F81 to F85, F86 and F87, F89, F95, F128, F139, F140 | F128: D43, and the 1C rows in `roadmap.md` and `phase-1.md`. F89: D40 to D42, the 1A and 1B roadmap rows, "What keeps the agent off", the 1E row, the Phase 1B eval section, and the M questions. F95: the S questions and the category list in `eval.md`. F139: D44, the 1D rows in `roadmap.md` and `phase-1.md`, and the Phase 1D eval section. F140: D45, the 1E rows in `roadmap.md` and `phase-1.md`, section 8 of `architecture.md`, and the Phase 1E section and T questions in `eval.md`. |
+| `scripts/ai-eval/covid/covidSchemaQuestions.{ts,test.ts}` | F95, F140 | F95 creates them. F140: `_saysNotStackable` accepts "do not line up" and its contractions (`f4da653cb`, `09e31504e`), "not directly" and "renaming is needed", and rejects "nothing to rename" and "no need to rename" (`d8ef5c4f9`). `71040955f` then rejects four wrong replies the earlier checks accepted ("No column renaming is needed", extra columns that "don't line up", "not directly" mid-sentence, and "you don't need to rename anything"). So the changes both loosen and tighten the check. "nothing needs to be renamed" still passes. |
+| `docs/ai-agent/{README.md,decisions.md,roadmap.md,eval.md,architecture.md}`, `docs/ai-agent/specs/{phase-1.md,phase-1a.md}` | F81 to F85, F86 and F87, F89, F95, F128, F139, F140 | F128: D43, and the 1C rows in `roadmap.md` and `phase-1.md`. F89: D40 to D42, the 1A and 1B roadmap rows, "What keeps the agent off", the 1E row, the Phase 1B eval section, and the M questions. F95: the S questions and the category list in `eval.md`. F139: D44, the 1D rows in `roadmap.md` and `phase-1.md`, and the Phase 1D eval section. F140: D45, the 1E rows in `roadmap.md` and `phase-1.md`, section 8 of `architecture.md`, and the Phase 1E section and T questions in `eval.md`. |
 
 ### Plugins (F96 to F112)
 
@@ -12149,10 +12149,13 @@ and keeps the chat analytics comparable with today's.
 repeats on T01 and T04. The agent on v6 met all five bars on the third
 wording of the line, the one that ships: 18/18, 0 repeats on T01 and T04,
 and T03, T04, and T06 on all three runs. The starting line and wording 2
-missed bar 1 (15/18 each as graded). No fallback was taken. Three grader
-gaps in the schema grader's `_saysNotStackable` were fixed along the way
-(`f4da653cb`, `09e31504e`, `d8ef5c4f9`). The 45, P, M, and D were not
-rerun, since no prompt changed.
+missed bar 1 (15/18 each as graded). No fallback was taken. Four commits
+changed the schema grader's `_saysNotStackable` along the way, loosening it
+for correct replies and tightening it against wrong ones (`f4da653cb`,
+`09e31504e`, `d8ef5c4f9`, `71040955f`). The 15 archived T03 replies get the
+same verdicts before and after, except the one correct reply that
+triggered the fixes. The 45, P, M, and D were not rerun, since no prompt
+changed.
 
 **Design:** `docs/ai-agent/specs/phase-1e.md` and D45 in
 `docs/ai-agent/decisions.md`. The task plan is
@@ -12209,7 +12212,9 @@ blocks F139's `add_dashboard_block` and confirm card add).
 | `1fbc7565b` | feat(ai-agent): log a block the agent queues into the open editor | All of it. |
 | `e2cac534d` | feat(ai-agent): log a block a confirmed dashboard card adds | All of it. |
 | `73ebeb1da` | test(ai-agent): warm the agent import in the hosted reply privacy tests | All of it. |
-| the commit with the subject `docs(ai-agent): record Phase 1E, Try again and parity in the agent, as built` | | All of it: D45, the 1E rows, the eval notes, and this section. |
+| `64226cd2b` | docs(ai-agent): record Phase 1E, Try again and parity in the agent, as built | All of it: D45, the 1E rows, the eval notes, and this section. |
+| `71040955f` | fix(ai-eval): keep the schema grader from accepting wrong replies that mention renaming or line up | All of it. |
+| the commit with the subject `docs(ai-agent): correct the Phase 1E grader, cost, and spec notes` | | All of it. |
 
 **Files:**
 - Turn text (shared row below): `shared/agent/pageContext/buildAgentTurnText.{ts,test.ts}`:

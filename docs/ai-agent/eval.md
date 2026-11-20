@@ -977,7 +977,7 @@ wording.
   for. On run #3, T03's retry answered correctly in text ("Short answer:
   not directly. The two files can be stacked only after some cleanup",
   naming Country_Region and Country/Region and saying "Renaming is
-  needed"), and the grader failed it. See the grader gap below.
+  needed"), and the grader failed it. See the grader changes below.
 - **Wording 3, which ships,** aimed at the T05 misses: "The user clicked
   Try again: they want a different answer to the message below than your
   last one above, one that still does everything the message asks, exactly
@@ -992,25 +992,29 @@ wording.
   by cases (after asking on run #2). T04's first attempt asked which
   Georgia on every run. Its retry answered about the US state on runs #1
   and #2, and showed both Georgias side by side on run #3.
-- **A grader gap, found on wording 2 and fixed.** The schema grader's
-  "cannot be stacked as they are" check (`_saysNotStackable` in
-  `scripts/ai-eval/covid/covidSchemaQuestions.ts`) matched "not directly"
-  only when followed by "append" or "stack", and "rename" but not
-  "renaming". Commit d8ef5c4f9 accepts "not directly" on its own and
-  "renaming is needed" (or required), and still rejects the negated forms
-  ("no renaming is needed", "nothing to rename", "no need to rename").
-  Regraded with the fix, every saved T03 answer above passes. The archived
-  wording 2 run #3 keeps its original verdict. The wordings are commits
-  f2c641fda (wording 2) and 6fae80030 (wording 3).
-- **Two earlier grader fixes, made before today's chat ran.** Correct T03
-  replies that said the columns "do not line up" were graded wrong, so
-  f4da653cb accepts "do not line up" (or "does", "will", "would not"), and
-  09e31504e the contractions ("don't", "doesn't", "won't", "wouldn't line
-  up"). f4da653cb also let
-  "renaming" match, which accepted "no renaming is needed", so 09e31504e
-  took that back. Today's chat's three runs ran after both fixes. All three
-  fixes only loosen `_saysNotStackable`, and each has its own tests in
-  `covidSchemaQuestions.test.ts`.
+- **Grader changes.** Four commits changed the schema grader's "cannot be
+  stacked as they are" check (`_saysNotStackable` in
+  `scripts/ai-eval/covid/covidSchemaQuestions.ts`), each with its own
+  tests in `covidSchemaQuestions.test.ts`. The first two came before
+  today's chat ran. The last two came after wording 2 run #3's correct T03
+  reply (above) failed the check:
+
+  | Commit | What it changed |
+  |---|---|
+  | f4da653cb | Accepts "do not line up" (or "does", "will", "would not"), and "renam" in place of "rename", so "renaming" matched. |
+  | 09e31504e | Accepts the contractions ("don't", "doesn't", "won't", "wouldn't line up"), and goes back to "rename", since "renam" accepted "no renaming is needed". |
+  | d8ef5c4f9 | Accepts "not directly" on its own and "renaming is needed" (or required). Rejects "nothing to rename" and "no need to rename", which the bare "rename" accepted. |
+  | 71040955f | Rejects four wrong replies the earlier checks accepted: "No column renaming is needed", "Admin2 and Population don't line up with any global column" ("line up" now needs "columns" before it), "not directly present in the global file" ("not directly" now has to start a sentence or follow a colon), and "you don't need to rename anything". |
+
+  The archived runs hold 15 different T03 replies. Each gets the same
+  verdict from the grader before f4da653cb and from the grader after
+  71040955f, except wording 2 run #3's reply, the correct answer that
+  failed. It passes on the final grader, and the archived run keeps its
+  original verdict. Today's chat's three runs ran after 09e31504e. One gap
+  is still open: "nothing needs to be renamed" passes, because the check
+  rejects "rename" only after "nothing to", "no need to", or "don't need
+  to". The wordings
+  are commits f2c641fda (wording 2) and 6fae80030 (wording 3).
 - **T05 adds a second heading.** The eval host records each attempt's
   writes on their own, so T05's grader sees only the retry's write, and it
   passes when that one write is a correct heading. In the app the first
@@ -1027,14 +1031,15 @@ wording.
   its first attempt's transcript, and it carries the line. The starting
   line is about 60 tokens and wording 3 about 130, which shows as about
   70 more input tokens per call on wording 3's runs than on the starting
-  line's. Of input tokens, 95 to 96% were cache reads on every run that
-  followed another, and 63 to 69% on the first run of a batch.
+  line's. Of input tokens, 94 to 96% were cache reads on every run that
+  followed another (94% on the T03 recheck's three runs, 95 to 96% on the
+  others), and 63 to 69% on the first run of a batch.
 - **No fallback was taken.** No miss showed a follow-up built on the first
   attempt (T06 passed on all nine runs) or a retry reusing a wrong first
   attempt's result, so A2 did not apply. Wording 3 met every bar, so A3 did
   not apply.
 - The twelve agent runs cost $0.034: the starting line $0.0114, wording 2
-  $0.0086, its recheck $0.0022, and wording 3 $0.0120.
+  $0.0087, its recheck $0.0021, and wording 3 $0.0119.
 
 ## Offline mode
 
