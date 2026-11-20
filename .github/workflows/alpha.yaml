@@ -5,8 +5,8 @@ name: CI/CD for alpha
 # lint, type-check, and the quick suite. The end-to-end suite runs alongside
 # and reports its result, but does not block the deploy.
 #
-# Nothing touches production until the deploy job has checked the production
-# configuration, confirmed it is running for the tip of `alpha`, and built
+# Nothing touches production until the deploy job has confirmed it is running
+# for the tip of `alpha`, checked the production configuration, and built
 # the web app. Only then does it migrate the database, set the edge function
 # secrets, deploy the edge functions, and finally deploy the prebuilt app.
 #
@@ -183,8 +183,8 @@ jobs:
           retention-days: 30
           if-no-files-found: warn
 
-  # Deploys to production. The first steps only read: the configuration
-  # check, the tip check, and the Vercel pull and build. A failure in any of
+  # Deploys to production. The first steps only read: the tip check, the
+  # configuration check, and the Vercel pull and build. A failure in any of
   # them leaves production as it was. Then the job migrates the database,
   # sets the edge function secrets, deploys the edge functions, and deploys
   # the prebuilt app last.
@@ -275,6 +275,22 @@ jobs:
               has_problem=true
             fi
           done
+          # A pasted value often picks up stray whitespace or a Windows line
+          # ending, which would reach production as part of the value.
+          for name in "${required_names[@]}" GEOAPIFY_API_KEY; do
+            value="${!name}"
+            if [ -n "$value" ] && [[ "$value" =~ ^[[:space:]]*$ ]]; then
+              echo "$name is only whitespace." >&2
+              has_problem=true
+            elif [[ "$value" =~ ^[[:space:]] || "$value" =~ [[:space:]]$ ]]; then
+              echo "$name has leading or trailing whitespace." >&2
+              has_problem=true
+            fi
+            if [[ "$value" == *$'\r'* ]]; then
+              echo "$name contains a carriage return." >&2
+              has_problem=true
+            fi
+          done
           for name in "${secrets_file_names[@]}"; do
             if [[ "${!name}" == *"'"* || "${!name}" == *$'\n'* ]]; then
               echo "$name contains a single quote or a line break." >&2
@@ -284,6 +300,16 @@ jobs:
           if [ -n "$SUPABASE_PROJECT_ID" ] &&
             [ "$PRODUCTION_SUPABASE_URL" != "https://$SUPABASE_PROJECT_ID.supabase.co" ]; then
             echo "PRODUCTION_SUPABASE_URL must be https://<PRODUCTION_PROJECT_ID>.supabase.co." >&2
+            has_problem=true
+          fi
+          if [ -n "$PRODUCTION_SB_PUBLISHABLE_KEY" ] &&
+            [[ ! "$PRODUCTION_SB_PUBLISHABLE_KEY" =~ ^sb_publishable_[A-Za-z0-9_-]+$ ]]; then
+            echo "PRODUCTION_SB_PUBLISHABLE_KEY must be the publishable key (sb_publishable_...)." >&2
+            has_problem=true
+          fi
+          if [ -n "$PRODUCTION_SB_SECRET_KEY" ] &&
+            [[ ! "$PRODUCTION_SB_SECRET_KEY" =~ ^sb_secret_[A-Za-z0-9_-]+$ ]]; then
+            echo "PRODUCTION_SB_SECRET_KEY must be an unmasked secret key (sb_secret_...)." >&2
             has_problem=true
           fi
           # `vercel deploy` looks the team up by this ID and only accepts a
@@ -384,7 +410,7 @@ jobs:
           # The configuration check refused values with a single quote or a
           # line break, and this refuses them again in case that check moves.
           write_secret() {
-            if [[ "$2" == *"'"* || "$2" == *$'\n'* ]]; then
+            if [[ "$2" == *"'"* || "$2" == *$'\n'* || "$2" == *$'\r'* ]]; then
               echo "$1 contains a single quote or a line break." >&2
               exit 1
             fi
