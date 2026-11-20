@@ -11,16 +11,8 @@ type Props = { input: Input; y: number };
 /** Model identity and optional detail sit on the resident cartridge face. */
 export function CartridgeText({ input, y }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
   if (!input.showLabels) {
-    return (
-      <SketchedShape
-        shape={{ kind: "path", d: `M220 ${y + 28} h240 M544 ${y + 28} h164` }}
-        profile={tokens.sketch.shape}
-        stroke={tokens.color.inactive}
-        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
-      />
-    );
+    return <CartridgePlaceholder y={y} />;
   }
   const labels = [
     {
@@ -55,5 +47,19 @@ export function CartridgeText({ input, y }: Readonly<Props>): ReactNode {
         );
       })}
     </g>
+  );
+}
+
+/** Unlabelled strokes standing in for the cartridge text. */
+function CartridgePlaceholder({ y }: Readonly<{ y: number }>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <SketchedShape
+      shape={{ kind: "path", d: `M220 ${y + 28} h240 M544 ${y + 28} h164` }}
+      profile={tokens.sketch.shape}
+      stroke={tokens.color.inactive}
+      strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+    />
   );
 }

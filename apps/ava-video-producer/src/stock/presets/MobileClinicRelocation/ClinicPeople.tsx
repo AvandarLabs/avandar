@@ -35,7 +35,6 @@ export function ClinicPeople({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   return (
@@ -55,24 +54,13 @@ export function ClinicPeople({
             opacity={motion.reveal(frame, 12 + index * motion.stagger.list)}
           >
             {person.slotId !== null ? (
-              <g data-booking={person.slotId}>
-                <SketchedShape
-                  shape={{
-                    kind: "path",
-                    d: _buildBookingPath({ x, personIndex: index, slotIndex }),
-                  }}
-                  profile={tokens.sketch.shape}
-                  stroke={accent}
-                  fill="none"
-                  opacity={motion.ramp(
-                    frame,
-                    96 + index,
-                    motion.scale(10),
-                    motion.reveal.easing,
-                  )}
-                  strokeDasharray={atomic.dash.medium.join(" ")}
-                />
-              </g>
+              <BookingConnector
+                slotId={person.slotId}
+                path={_buildBookingPath({ x, personIndex: index, slotIndex })}
+                frame={frame}
+                index={index}
+                accent={accent}
+              />
             ) : undefined}
             <PersonGlyph
               x={x}
@@ -93,6 +81,42 @@ export function ClinicPeople({
           </g>
         );
       })}
+    </g>
+  );
+}
+
+/** The dashed connector from a booked person to their appointment tab. */
+function BookingConnector({
+  slotId,
+  path,
+  frame,
+  index,
+  accent,
+}: Readonly<{
+  slotId: string;
+  path: string;
+  frame: number;
+  index: number;
+  accent: string;
+}>): ReactNode {
+  const { atomic } = useGraphicTheme();
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  return (
+    <g data-booking={slotId}>
+      <SketchedShape
+        shape={{ kind: "path", d: path }}
+        profile={tokens.sketch.shape}
+        stroke={accent}
+        fill="none"
+        opacity={motion.ramp(
+          frame,
+          96 + index,
+          motion.scale(10),
+          motion.reveal.easing,
+        )}
+        strokeDasharray={atomic.dash.medium.join(" ")}
+      />
     </g>
   );
 }

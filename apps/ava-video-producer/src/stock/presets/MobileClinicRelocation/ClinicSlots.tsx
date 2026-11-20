@@ -15,9 +15,7 @@ export function ClinicSlots({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
   return (
     <g>
       {input.slots.map((slot, index) => {
@@ -29,26 +27,12 @@ export function ClinicSlots({
             key={slot.id}
             opacity={motion.reveal(frame, 14 + index * motion.stagger.list)}
           >
-            <StockRect
-              data-slot-id={slot.id}
-              data-occupied={occupied}
-              x={630}
-              y={145 + index * 44}
-              width={30}
-              height={30}
-              rx={scales.corner(tokens.corner.chip)}
-              fill={occupied ? accent : tokens.color.surface}
-              stroke={occupied ? accent : tokens.color.inactive}
-              fillOpacity={
-                occupied
-                  ? motion.ramp(
-                      frame,
-                      96,
-                      motion.scale(17),
-                      motion.entrance.easing,
-                    )
-                  : 1
-              }
+            <SlotTab
+              slotId={slot.id}
+              index={index}
+              isOccupied={occupied}
+              frame={frame}
+              accent={accent}
             />
             <FitText
               text={slot.label}
@@ -64,5 +48,42 @@ export function ClinicSlots({
         );
       })}
     </g>
+  );
+}
+
+/** An appointment tab, filling in the accent once it is booked. */
+function SlotTab({
+  slotId,
+  index,
+  isOccupied,
+  frame,
+  accent,
+}: Readonly<{
+  slotId: string;
+  index: number;
+  isOccupied: boolean;
+  frame: number;
+  accent: string;
+}>): ReactNode {
+  const tokens = useGraphicTokens();
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
+  return (
+    <StockRect
+      data-slot-id={slotId}
+      data-occupied={isOccupied}
+      x={630}
+      y={145 + index * 44}
+      width={30}
+      height={30}
+      rx={scales.corner(tokens.corner.chip)}
+      fill={isOccupied ? accent : tokens.color.surface}
+      stroke={isOccupied ? accent : tokens.color.inactive}
+      fillOpacity={
+        isOccupied
+          ? motion.ramp(frame, 96, motion.scale(17), motion.entrance.easing)
+          : 1
+      }
+    />
   );
 }

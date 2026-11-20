@@ -18,20 +18,7 @@ export function PocketInput({ frame, input }: Readonly<Props>): ReactNode {
   const scales = useGraphicShapeScales();
   const progress = motion.ramp(frame, 38, motion.scale(16));
   const y = mix(progress, 218, 228);
-  const labels = [
-    {
-      text: input.input.label,
-      y: y + 16,
-      maxLines: 1,
-      color: tokens.color.textMuted,
-    },
-    {
-      text: input.input.text,
-      y: y + 38,
-      maxLines: 4,
-      color: tokens.color.text,
-    },
-  ];
+  const labels = _createInputLabels(input, y, tokens.color);
   return (
     <g>
       <StockRect
@@ -60,17 +47,48 @@ export function PocketInput({ frame, input }: Readonly<Props>): ReactNode {
             );
           })
         ) : (
-          <SketchedShape
-            shape={{
-              kind: "path",
-              d: `M214 ${y + 20} h490 M214 ${y + 38} h418`,
-            }}
-            profile={tokens.sketch.shape}
-            stroke={tokens.color.inactive}
-            strokeWidth={scales.stroke(tokens.stroke.emphasis)}
-          />
+          <InputPlaceholder y={y} />
         )}
       </g>
     </g>
+  );
+}
+
+/** The input's label over its supplied text, inside the writing area. */
+function _createInputLabels(
+  input: Input,
+  y: number,
+  color: ReturnType<typeof useGraphicTokens>["color"],
+) {
+  return [
+    {
+      text: input.input.label,
+      y: y + 16,
+      maxLines: 1,
+      color: color.textMuted,
+    },
+    {
+      text: input.input.text,
+      y: y + 38,
+      maxLines: 4,
+      color: color.text,
+    },
+  ];
+}
+
+/** Unlabelled strokes standing in for the input text. */
+function InputPlaceholder({ y }: Readonly<{ y: number }>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <SketchedShape
+      shape={{
+        kind: "path",
+        d: `M214 ${y + 20} h490 M214 ${y + 38} h418`,
+      }}
+      profile={tokens.sketch.shape}
+      stroke={tokens.color.inactive}
+      strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+    />
   );
 }

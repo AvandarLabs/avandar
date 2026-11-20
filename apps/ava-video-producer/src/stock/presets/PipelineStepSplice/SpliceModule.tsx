@@ -36,19 +36,7 @@ export function SpliceModule({
       transform={`translate(${step.x} ${step.y})`}
       opacity={motion.reveal(frame, 12 + index * motion.stagger.list)}
     >
-      <StockRect
-        data-step-body={step.id}
-        x={0}
-        y={0}
-        width={140}
-        height={110}
-        rx={scales.corner(STEP_CORNER)}
-        fill={tokens.color.surface}
-        stroke={step.isInserted ? accent : tokens.color.line}
-        strokeWidth={scales.stroke(
-          step.isInserted ? tokens.stroke.default : tokens.stroke.hairline,
-        )}
-      />
+      <StepBody step={step} accent={accent} />
       <SketchedShape
         shape={{ kind: "path", d: "M14 16h32" }}
         profile={tokens.sketch.shape}
@@ -67,5 +55,29 @@ export function SpliceModule({
         normalizeWhitespace
       />
     </g>
+  );
+}
+
+/** The step's card, outlined in the accent if it is the inserted step. */
+function StepBody({
+  step,
+  accent,
+}: Readonly<Pick<Props, "step" | "accent">>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <StockRect
+      data-step-body={step.id}
+      x={0}
+      y={0}
+      width={140}
+      height={110}
+      rx={scales.corner(STEP_CORNER)}
+      fill={tokens.color.surface}
+      stroke={step.isInserted ? accent : tokens.color.line}
+      strokeWidth={scales.stroke(
+        step.isInserted ? tokens.stroke.default : tokens.stroke.hairline,
+      )}
+    />
   );
 }

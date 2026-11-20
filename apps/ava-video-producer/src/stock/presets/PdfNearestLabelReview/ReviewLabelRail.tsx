@@ -48,22 +48,45 @@ export function ReviewLabelRail({
         ]}
       />
       {input.showDistanceValues ? (
-        <g
-          data-distance-value={label.id}
-          opacity={ramp(
-            frame,
-            MEASURE_CUE,
-            STATUS_CUE - MEASURE_CUE,
-            motion.reveal.easing,
-          )}
-        >
-          <LiteralDataText
-            value={`≈ ${distance.toPrecision(3)}`}
-            x={582}
-            y={y + 78}
-          />
-        </g>
+        <DistanceValue
+          labelId={label.id}
+          distance={distance}
+          y={y}
+          frame={frame}
+        />
       ) : undefined}
+    </g>
+  );
+}
+
+/** The measured distance, shown while the measure holds. */
+function DistanceValue({
+  labelId,
+  distance,
+  y,
+  frame,
+}: Readonly<{
+  labelId: string;
+  distance: number;
+  y: number;
+  frame: number;
+}>): ReactNode {
+  const motion = useGraphicMotion();
+  return (
+    <g
+      data-distance-value={labelId}
+      opacity={ramp(
+        frame,
+        MEASURE_CUE,
+        STATUS_CUE - MEASURE_CUE,
+        motion.reveal.easing,
+      )}
+    >
+      <LiteralDataText
+        value={`≈ ${distance.toPrecision(3)}`}
+        x={582}
+        y={y + 78}
+      />
     </g>
   );
 }

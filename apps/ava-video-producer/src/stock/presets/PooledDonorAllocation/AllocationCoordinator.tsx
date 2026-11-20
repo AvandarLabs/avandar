@@ -43,6 +43,34 @@ export function AllocationCoordinator({
         role="facilitator"
         color={graphicTokens.color.accentAlt}
       />
+      <CoordinatorArm pose={pose} />
+      <g data-allocation-scoop>
+        <SketchedShape
+          shape={{
+            kind: "path",
+            d: `M${pose.left} ${pose.top} L${pose.left} ${pose.bottom} L${pose.right} ${pose.bottom} L${pose.right} ${pose.top}`,
+          }}
+          profile={graphicTokens.sketch.shape}
+          stroke={graphicTokens.color.accentAlt}
+          strokeWidth={scales.stroke(graphicTokens.stroke.outline)}
+          fill="none"
+          opacity={pose.opacity}
+        />
+      </g>
+    </g>
+  );
+}
+
+/** The coordinator's arm and the hand holding the scoop. */
+function CoordinatorArm({
+  pose,
+}: Readonly<{
+  pose: ReturnType<typeof getAllocationHandlingFromTokens>;
+}>): ReactNode {
+  const graphicTokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <>
       <g data-coordinator-arm>
         <SketchedShape
           shape={{
@@ -62,19 +90,6 @@ export function AllocationCoordinator({
         r={3.5}
         fill={graphicTokens.color.accentAlt}
       />
-      <g data-allocation-scoop>
-        <SketchedShape
-          shape={{
-            kind: "path",
-            d: `M${pose.left} ${pose.top} L${pose.left} ${pose.bottom} L${pose.right} ${pose.bottom} L${pose.right} ${pose.top}`,
-          }}
-          profile={graphicTokens.sketch.shape}
-          stroke={graphicTokens.color.accentAlt}
-          strokeWidth={scales.stroke(graphicTokens.stroke.outline)}
-          fill="none"
-          opacity={pose.opacity}
-        />
-      </g>
-    </g>
+    </>
   );
 }

@@ -25,8 +25,6 @@ export function ContrastAlternative({
   alternative,
   index,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
   const motion = useGraphicMotion();
   const separation = ramp(
     frame,
@@ -34,6 +32,29 @@ export function ContrastAlternative({
     motion.scale(SEPARATE_FRAMES),
     motion.travel.easing,
   );
+  return (
+    <g
+      data-alternative={alternative.id}
+      opacity={separation}
+      transform={`translate(${mix(separation, index ? -100 : 100, 0)} 0)`}
+    >
+      <AlternativePanel
+        alternative={alternative}
+        index={index}
+        accent={accent}
+      />
+    </g>
+  );
+}
+
+/** One alternative's panel with its label at a fixed size. */
+function AlternativePanel({
+  alternative,
+  index,
+  accent,
+}: Readonly<Omit<Props, "frame">>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
   const panel = {
     x: 48 + index * 512,
     y: 146,
@@ -50,11 +71,7 @@ export function ContrastAlternative({
     maxLines: 3,
   };
   return (
-    <g
-      data-alternative={alternative.id}
-      opacity={separation}
-      transform={`translate(${mix(separation, index ? -100 : 100, 0)} 0)`}
-    >
+    <>
       <StockRect
         {...panel}
         fill={tokens.color.surface}
@@ -69,6 +86,6 @@ export function ContrastAlternative({
           color={index ? tokens.color.positive : accent}
         />
       </g>
-    </g>
+    </>
   );
 }

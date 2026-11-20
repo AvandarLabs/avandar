@@ -72,7 +72,7 @@ export function DialogueBubble({
   );
 }
 
-/** The bubble: an interpreted wording is smaller and finer than its original. */
+/** The bubble. An interpreted wording is smaller and finer than its source. */
 function BubbleOutline({
   turnId,
   x,

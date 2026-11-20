@@ -51,6 +51,32 @@ type GetAllocationHandlingResult = {
   opacity: number;
 };
 
+type AllocationHandlingArgs = Readonly<{
+  input: Input;
+  frame: number;
+  tokens: readonly Token[];
+  motion: VideoMotion;
+}>;
+
+/** The scoop's pickup, lift, and release for one batch, each 0 to 1. */
+function _getHandlingPhases(frame: number, start: number, motion: VideoMotion) {
+  return {
+    pickup: motion.ramp(frame, start, motion.scale(1), motion.entrance.easing),
+    lift: motion.ramp(
+      frame,
+      start + 1,
+      motion.scale(1),
+      motion.entrance.easing,
+    ),
+    release: motion.ramp(
+      frame,
+      start + 16,
+      motion.press.duration,
+      motion.entrance.easing,
+    ),
+  };
+}
+
 /**
  * The empty scoop resizes while repositioning, then rigidly carries its batch.
  */
@@ -59,12 +85,7 @@ export function getAllocationHandlingFromTokens({
   frame,
   tokens,
   motion,
-}: Readonly<{
-  input: Input;
-  frame: number;
-  tokens: readonly Token[];
-  motion: VideoMotion;
-}>): GetAllocationHandlingResult {
+}: AllocationHandlingArgs): GetAllocationHandlingResult {
   const index = Math.max(
     0,
     Math.min(input.requests.length - 1, Math.floor((frame - 62) / 20)),
@@ -74,24 +95,7 @@ export function getAllocationHandlingFromTokens({
     tokens,
     requestId: input.requests[index].id,
   });
-  const pickup = motion.ramp(
-    frame,
-    start,
-    motion.scale(1),
-    motion.entrance.easing,
-  );
-  const lift = motion.ramp(
-    frame,
-    start + 1,
-    motion.scale(1),
-    motion.entrance.easing,
-  );
-  const release = motion.ramp(
-    frame,
-    start + 16,
-    motion.press.duration,
-    motion.entrance.easing,
-  );
+  const { pickup, lift, release } = _getHandlingPhases(frame, start, motion);
   const previous = _getPreviousScoop({ input, index, batch, motion });
   const handX = mix(pickup, previous.right, batch.right);
   const handY = mix(lift, previous.bottom, batch.bottom + release * 26);

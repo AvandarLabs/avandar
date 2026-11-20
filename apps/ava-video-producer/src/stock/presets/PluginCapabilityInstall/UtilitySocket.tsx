@@ -27,12 +27,7 @@ export function UtilitySocket({
       ? motion.ramp(frame, 56, motion.scale(34), motion.travel.easing)
       : 0;
   const y = mix(installation, 78, 197);
-  const status =
-    installation === 1
-      ? input.copy.installed
-      : input.installation.choice === "defer" && frame >= 56
-        ? input.copy.deferred
-        : input.copy.emptySocket;
+  const status = _getSocketStatus(input, frame, installation);
   return (
     <g>
       <StockRect
@@ -58,4 +53,18 @@ export function UtilitySocket({
       <LabelSlots labels={[[status, 500, 317, 395, 12, 3]]} />
     </g>
   );
+}
+
+/** Installed once the utility seats, deferred once declined, else empty. */
+function _getSocketStatus(
+  input: Input,
+  frame: number,
+  installation: number,
+): string {
+  if (installation === 1) {
+    return input.copy.installed;
+  }
+  return input.installation.choice === "defer" && frame >= 56
+    ? input.copy.deferred
+    : input.copy.emptySocket;
 }

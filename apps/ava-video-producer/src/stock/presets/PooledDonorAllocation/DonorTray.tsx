@@ -49,6 +49,23 @@ export function DonorTray({
           strokeWidth={scales.stroke(tokens.stroke.default)}
         />
       </g>
+      <DonorArm tray={tray} donorIndex={donorIndex} />
+    </g>
+  );
+}
+
+/** The contributor's arm and the hand tipping the tray. */
+function DonorArm({
+  tray,
+  donorIndex,
+}: Readonly<{
+  tray: Readonly<{ x: number; y: number }>;
+  donorIndex: number;
+}>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <>
       <SketchedShape
         shape={{
           kind: "path",
@@ -66,6 +83,6 @@ export function DonorTray({
         r={3}
         fill={tokens.color.inactive}
       />
-    </g>
+    </>
   );
 }

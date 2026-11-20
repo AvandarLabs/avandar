@@ -31,7 +31,6 @@ export function CategoryTally({
 }: Readonly<Props>): ReactNode {
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
   const records = input.records.filter(propEq("categoryId", category.id));
   const y = 432 + index * 46;
   return (
@@ -51,20 +50,45 @@ export function CategoryTally({
             profile={tokens.sketch.shape}
             stroke={tokens.color.line}
           />
-          <rect
-            data-category-bar={category.id}
-            x={760}
-            y={y - 9}
-            height={17}
-            width={
-              records.length * 16.875 * motion.ramp(frame, 91, motion.scale(41))
-            }
-            fill={accent}
-            fillOpacity={scales.wash(BAR_TINT)}
+          <CategoryBar
+            categoryId={category.id}
+            count={records.length}
+            y={y}
+            frame={frame}
+            accent={accent}
           />
           <TallyMarks {...{ input, records, y, frame, accent }} />
         </g>
       ) : null}
     </g>
+  );
+}
+
+/** The category's bar, growing to its member count. */
+function CategoryBar({
+  categoryId,
+  count,
+  y,
+  frame,
+  accent,
+}: Readonly<{
+  categoryId: string;
+  count: number;
+  y: number;
+  frame: number;
+  accent: string;
+}>): ReactNode {
+  const motion = useGraphicMotion();
+  const scales = useGraphicShapeScales();
+  return (
+    <rect
+      data-category-bar={categoryId}
+      x={760}
+      y={y - 9}
+      height={17}
+      width={count * 16.875 * motion.ramp(frame, 91, motion.scale(41))}
+      fill={accent}
+      fillOpacity={scales.wash(BAR_TINT)}
+    />
   );
 }

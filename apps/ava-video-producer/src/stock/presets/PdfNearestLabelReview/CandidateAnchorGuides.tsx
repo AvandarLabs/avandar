@@ -50,7 +50,36 @@ export function CandidateAnchorGuides({
           }
         />
       </g>
-      <g data-label-anchor={label.id}>
+      <LabelCallout
+        labelId={label.id}
+        x={x}
+        y={y}
+        index={index}
+        color={color}
+      />
+    </g>
+  );
+}
+
+/** A label's anchor ring and its dotted or dashed callout to its row. */
+function LabelCallout({
+  labelId,
+  x,
+  y,
+  index,
+  color,
+}: Readonly<{
+  labelId: string;
+  x: number;
+  y: number;
+  index: number;
+  color: string;
+}>): ReactNode {
+  const { atomic } = useGraphicTheme();
+  const tokens = useGraphicTokens();
+  return (
+    <>
+      <g data-label-anchor={labelId}>
         <SketchedShape
           shape={{ kind: "circle", cx: x, cy: y, r: 6 + index * 4 }}
           profile={tokens.sketch.shape}
@@ -58,7 +87,7 @@ export function CandidateAnchorGuides({
           stroke={color}
         />
       </g>
-      <g data-label-callout={label.id}>
+      <g data-label-callout={labelId}>
         <SketchedShape
           shape={{
             kind: "path",
@@ -73,6 +102,6 @@ export function CandidateAnchorGuides({
           }
         />
       </g>
-    </g>
+    </>
   );
 }

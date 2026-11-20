@@ -6,6 +6,7 @@ import {
   useGraphicTokens,
 } from "../../theme/useGraphicTheme/useGraphicTheme";
 import { DimensionTicks } from "./DimensionTicks";
+import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./ParcelSetbackInset.schema";
 import type { ReactNode } from "react";
 
@@ -22,19 +23,7 @@ export function StructureFootprint({
   const tokens = useGraphicTokens();
   const motion = useGraphicMotion();
   const scales = useGraphicShapeScales();
-  const placement = motion.ramp(
-    frame,
-    84,
-    motion.scale(24),
-    motion.travel.easing,
-  );
-  const x = 70 + (input.placement.centerX - input.structure.width / 2) * 4.8;
-  const y =
-    160 +
-    (input.placement.centerY - input.structure.height / 2) * 2.8 -
-    32 * (1 - placement);
-  const width = input.structure.width * 4.8;
-  const height = input.structure.height * 2.8;
+  const { x, y, width, height } = _getFootprintBox(input, frame, motion);
   return (
     <g opacity={motion.ramp(frame, 78, motion.chip, motion.reveal.easing)}>
       <StockRect
@@ -60,4 +49,23 @@ export function StructureFootprint({
       ) : undefined}
     </g>
   );
+}
+
+/** The footprint's box, lowering into its authored place. */
+function _getFootprintBox(input: Input, frame: number, motion: VideoMotion) {
+  const placement = motion.ramp(
+    frame,
+    84,
+    motion.scale(24),
+    motion.travel.easing,
+  );
+  return {
+    x: 70 + (input.placement.centerX - input.structure.width / 2) * 4.8,
+    y:
+      160 +
+      (input.placement.centerY - input.structure.height / 2) * 2.8 -
+      32 * (1 - placement),
+    width: input.structure.width * 4.8,
+    height: input.structure.height * 2.8,
+  };
 }

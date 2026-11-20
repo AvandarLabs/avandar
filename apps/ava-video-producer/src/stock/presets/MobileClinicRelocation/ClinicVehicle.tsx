@@ -38,18 +38,8 @@ export function ClinicVehicle({
         stroke={accent}
         strokeWidth={scales.stroke(tokens.stroke.heavy)}
       />
-      <SketchedShape
-        shape={{ kind: "circle", cx: -26, cy: 20, r: 7 }}
-        profile={tokens.sketch.shape}
-        fill={tokens.color.ground}
-        stroke={tokens.color.inactive}
-      />
-      <SketchedShape
-        shape={{ kind: "circle", cx: 28, cy: 20, r: 7 }}
-        profile={tokens.sketch.shape}
-        fill={tokens.color.ground}
-        stroke={tokens.color.inactive}
-      />
+      <VehicleWheel cx={-26} />
+      <VehicleWheel cx={28} />
       <path
         data-awning="clinic"
         d={`M-42 -22 H20 L${20 + awning * 10} ${-22 - awning * 22} H${-42 - awning * 10} Z`}
@@ -57,5 +47,17 @@ export function ClinicVehicle({
         opacity={atomic.opacity["55"]}
       />
     </g>
+  );
+}
+
+function VehicleWheel({ cx }: Readonly<{ cx: number }>): ReactNode {
+  const tokens = useGraphicTokens();
+  return (
+    <SketchedShape
+      shape={{ kind: "circle", cx, cy: 20, r: 7 }}
+      profile={tokens.sketch.shape}
+      fill={tokens.color.ground}
+      stroke={tokens.color.inactive}
+    />
   );
 }

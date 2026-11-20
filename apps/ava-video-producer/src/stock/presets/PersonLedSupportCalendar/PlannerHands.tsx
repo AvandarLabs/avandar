@@ -17,7 +17,6 @@ export function PlannerHands({
 }: Readonly<Props>): ReactNode {
   const motion = useGraphicMotion();
   const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
   const { participant, worker } = getPlannerHandsFromInputAndFrame({
     input,
     frame,
@@ -26,27 +25,15 @@ export function PlannerHands({
   return (
     <g>
       <g data-participant-arm="">
-        <SketchedShape
-          shape={{
-            kind: "path",
-            d: `M120 136 L160 191 L ${participant.x} ${participant.y}`,
-          }}
-          profile={tokens.sketch.shape}
-          fill="none"
-          stroke={accent}
-          strokeWidth={scales.stroke(tokens.stroke.heavy)}
+        <PlannerArm
+          path={`M120 136 L160 191 L ${participant.x} ${participant.y}`}
+          color={accent}
         />
       </g>
       <g data-worker-arm="">
-        <SketchedShape
-          shape={{
-            kind: "path",
-            d: `M850 136 L815 191 L ${worker.x} ${worker.y}`,
-          }}
-          profile={tokens.sketch.shape}
-          fill="none"
-          stroke={tokens.color.accentAlt}
-          strokeWidth={scales.stroke(tokens.stroke.heavy)}
+        <PlannerArm
+          path={`M850 136 L815 191 L ${worker.x} ${worker.y}`}
+          color={tokens.color.accentAlt}
         />
       </g>
       <circle
@@ -64,5 +51,23 @@ export function PlannerHands({
         fill={tokens.color.accentAlt}
       />
     </g>
+  );
+}
+
+/** An articulated arm from shoulder through elbow to its hand. */
+function PlannerArm({
+  path,
+  color,
+}: Readonly<{ path: string; color: string }>): ReactNode {
+  const tokens = useGraphicTokens();
+  const scales = useGraphicShapeScales();
+  return (
+    <SketchedShape
+      shape={{ kind: "path", d: path }}
+      profile={tokens.sketch.shape}
+      fill="none"
+      stroke={color}
+      strokeWidth={scales.stroke(tokens.stroke.heavy)}
+    />
   );
 }
