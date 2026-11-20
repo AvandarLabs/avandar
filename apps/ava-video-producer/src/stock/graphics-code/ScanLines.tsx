@@ -84,50 +84,16 @@ export function ScanLines({
       />
       <Panel x={153} y={142} width={691} height={344} radius={corner.card} />
       {fields.map((row, i) => {
-        const y = 178 + i * 55;
-        const passed = motion.ramp(scanY, y - 12, ROW_PASS_SPAN);
         return (
-          <g key={row}>
-            <Text role="field" x={184} y={y + 9} size={FIELD_SIZE}>
-              {row}
-            </Text>
-            <SketchedShape
-              shape={{
-                kind: "path",
-                d: `M423 ${y + 2} h${118 + (i % 3) * 23} M625 ${y + 2} h${53 + (i % 2) * 34}`,
-              }}
-              profile={sketch.shape}
-              stroke={color.inactive}
-              strokeOpacity={atomic.opacity["28"]}
-              strokeWidth={shapes.stroke(PLACEHOLDER_STROKE)}
-              strokeLinecap="round"
-            />
-            <SketchedShape
-              shape={{ kind: "circle", cx: 795, cy: y + 2, r: 11 }}
-              profile={sketch.shape}
-              fill={accent}
-              fillOpacity={passed * shapes.wash(atomic.opacity["12"])}
-              stroke={accent}
-              strokeOpacity={
-                atomic.opacity["15"] + passed * atomic.opacity["60"]
-              }
-              strokeWidth={hairline}
-            />
-            <g opacity={passed}>
-              {input.showChecks ? (
-                <Check x={795} y={y + 2} color={accent} size={9} />
-              ) : null}
-            </g>
-            {i < fields.length - 1 ? (
-              <SketchedShape
-                shape={{ kind: "path", d: `M176 ${y + 29} H821` }}
-                profile={sketch.shape}
-                stroke={color.line}
-                strokeOpacity={atomic.opacity["60"]}
-                strokeWidth={hairline}
-              />
-            ) : null}
-          </g>
+          <ScanRow
+            key={row}
+            row={row}
+            index={i}
+            isLast={i === fields.length - 1}
+            scanY={scanY}
+            accent={accent}
+            showChecks={input.showChecks}
+          />
         );
       })}
       <g clipPath={`url(#${id}-scan-clip)`}>
@@ -170,5 +136,113 @@ export function ScanLines({
         })}
       </Text>
     </g>
+  );
+}
+
+type ScanRowProps = Readonly<{
+  row: string;
+  index: number;
+  isLast: boolean;
+  scanY: number;
+  accent: string;
+  showChecks: ScanLinesInput["showChecks"];
+}>;
+
+/** One field row: its label, placeholder values, and the check it earns. */
+function ScanRow({
+  row,
+  index,
+  isLast,
+  scanY,
+  accent,
+  showChecks,
+}: ScanRowProps): ReactNode {
+  const { atomic } = useGraphicTheme();
+  const { color, stroke, sketch } = useGraphicTokens();
+  const shapes = useGraphicShapeScales();
+  const motion = useGraphicMotion();
+  const hairline = shapes.stroke(stroke.hairline);
+  const y = 178 + index * 55;
+  const passed = motion.ramp(scanY, y - 12, ROW_PASS_SPAN);
+  return (
+    <g>
+      <Text role="field" x={184} y={y + 9} size={FIELD_SIZE}>
+        {row}
+      </Text>
+      <ScanRowPlaceholder y={y} index={index} />
+      <ScanRowCheck
+        y={y}
+        passed={passed}
+        accent={accent}
+        showChecks={showChecks}
+      />
+      {isLast ? null : (
+        <SketchedShape
+          shape={{ kind: "path", d: `M176 ${y + 29} H821` }}
+          profile={sketch.shape}
+          stroke={color.line}
+          strokeOpacity={atomic.opacity["60"]}
+          strokeWidth={hairline}
+        />
+      )}
+    </g>
+  );
+}
+
+/** Two sketched placeholder values, their lengths varied by row. */
+function ScanRowPlaceholder({
+  y,
+  index,
+}: Readonly<{ y: number; index: number }>): ReactNode {
+  const { atomic } = useGraphicTheme();
+  const { color, sketch } = useGraphicTokens();
+  const shapes = useGraphicShapeScales();
+  return (
+    <SketchedShape
+      shape={{
+        kind: "path",
+        d: `M423 ${y + 2} h${118 + (index % 3) * 23} M625 ${y + 2} h${53 + (index % 2) * 34}`,
+      }}
+      profile={sketch.shape}
+      stroke={color.inactive}
+      strokeOpacity={atomic.opacity["28"]}
+      strokeWidth={shapes.stroke(PLACEHOLDER_STROKE)}
+      strokeLinecap="round"
+    />
+  );
+}
+
+/** The row's check circle, filling and ticking once the scan has passed. */
+function ScanRowCheck({
+  y,
+  passed,
+  accent,
+  showChecks,
+}: Readonly<{
+  y: number;
+  passed: number;
+  accent: string;
+  showChecks: ScanLinesInput["showChecks"];
+}>): ReactNode {
+  const { atomic } = useGraphicTheme();
+  const { stroke, sketch } = useGraphicTokens();
+  const shapes = useGraphicShapeScales();
+  return (
+    <>
+      <SketchedShape
+        shape={{ kind: "circle", cx: 795, cy: y + 2, r: 11 }}
+        profile={sketch.shape}
+        fill={accent}
+        fillOpacity={passed * shapes.wash(atomic.opacity["12"])}
+        stroke={accent}
+        strokeOpacity={atomic.opacity["15"] + passed * atomic.opacity["60"]}
+        strokeWidth={shapes.stroke(stroke.hairline)}
+      />
+      <g opacity={passed}>
+        {showChecks ? (
+          <Check x={795} y={y + 2} color={accent} size={9} />
+        ) : null}
+      </g>
+    </>
   );
 }

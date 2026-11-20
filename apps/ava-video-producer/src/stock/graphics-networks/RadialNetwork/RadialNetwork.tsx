@@ -12,14 +12,9 @@ import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: RadialNetworkInput };
 
-/** Draws the bounded authored radial-network study at an explicit frame. */
-export function RadialNetwork({
-  input,
-  frame,
-  accent,
-}: Readonly<Props>): ReactNode {
-  const spokes = input.spokes;
-  const nodes = spokes.map((label, i) => {
+/** Each spoke's endpoint around the orbit, clockwise from the top. */
+function _createRadialNodes(spokes: readonly string[]) {
+  return spokes.map((label, i) => {
     const angle = -Math.PI / 2 + (i * Math.PI * 2) / spokes.length;
     return {
       label,
@@ -27,6 +22,15 @@ export function RadialNetwork({
       y: CENTER.y + Math.sin(angle) * ORBIT.radiusY,
     };
   });
+}
+
+/** Draws the bounded authored radial-network study at an explicit frame. */
+export function RadialNetwork({
+  input,
+  frame,
+  accent,
+}: Readonly<Props>): ReactNode {
+  const nodes = _createRadialNodes(input.spokes);
   return (
     <g>
       <Eyebrow>

@@ -34,18 +34,7 @@ export function Arrive({
     motion.entrance.easing,
   );
   if (style === "scale") {
-    return (
-      <g
-        opacity={t}
-        style={{
-          transformBox: "fill-box",
-          transformOrigin: "center",
-          transform: `scale(${mix(t, SCALE_STYLE_START, 1)})`,
-        }}
-      >
-        {children}
-      </g>
-    );
+    return <ScaleArrive progress={t}>{children}</ScaleArrive>;
   }
   return (
     <g
@@ -55,6 +44,28 @@ export function Arrive({
           ? `translate(0 ${mix(t, motion.entrance.distance, 0)})`
           : undefined
       }
+    >
+      {children}
+    </g>
+  );
+}
+
+/** An entrance that scales up about the children's own centre. */
+function ScaleArrive({
+  progress,
+  children,
+}: {
+  progress: number;
+  children: ReactNode;
+}): ReactNode {
+  return (
+    <g
+      opacity={progress}
+      style={{
+        transformBox: "fill-box",
+        transformOrigin: "center",
+        transform: `scale(${mix(progress, SCALE_STYLE_START, 1)})`,
+      }}
     >
       {children}
     </g>
