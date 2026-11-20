@@ -1,9 +1,10 @@
+import { createHash } from "node:crypto";
 import { createInterface } from "node:readline/promises";
 import { pathToFileURL } from "node:url";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "$/types/database.types";
 
-/** The bucket that holds the open data catalog's prebuilt Parquet copies. */
+/** The bucket that holds the catalog's Parquet objects. */
 const OPEN_DATA_BUCKET = "opendata";
 
 /** The bucket folder every prebuilt copy lives under. */
@@ -12,15 +13,20 @@ const CATALOG_CACHE_FOLDER = "catalog-cache";
 /** The most objects one Storage list call returns. */
 const STORAGE_PAGE_SIZE = 1000;
 
+/** The most listings one target read returns. */
+const LISTING_PAGE_SIZE = 1000;
+
 /** The content type every pipeline uploads Parquet with. */
 const PARQUET_CONTENT_TYPE = "application/vnd.apache.parquet";
 
-/** One year, in seconds: a copy's part never changes once uploaded. */
-const PARQUET_CACHE_CONTROL_SECONDS = "31536000";
+/** One year, in seconds: a prebuilt copy's part never changes. */
+const CACHE_PART_CACHE_CONTROL_SECONDS = "31536000";
 
-/** Listing ids are UUIDs, so any other folder name is not a listing. */
-const LISTING_ID_PATTERN =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+/**
+ * The cache time pipelines upload `pipeline_parquet` objects with, Storage's
+ * default, since a pipeline run replaces the object at the same path.
+ */
+const PIPELINE_OBJECT_CACHE_CONTROL_SECONDS = "3600";
 
 /** The flag that confirms the target host without a typed prompt. */
 const CONFIRM_TARGET_FLAG = "--yes-i-know-the-target";
@@ -34,6 +40,10 @@ const REQUIRED_ENV_NAMES = [
   "TARGET_SUPABASE_URL",
   "TARGET_SECRET_KEY",
 ] as const;
+
+/** The listing columns the copy reads from the target. */
+const LISTING_COLUMNS =
+  "id, access_kind, metadata, parquet_cache_status, parquet_cache_folder_path, parquet_cache_part_count";
 
 type StorageErrorLike = {
   message: string;
@@ -64,31 +74,35 @@ type CatalogStorageBucket = {
   ) => PromiseLike<{ error: StorageErrorLike | null }>;
 };
 
+/** One target listing, with the columns that say where its Parquet lives. */
+export type CatalogParquetListing = {
+  id: string;
+  access_kind: string;
+  metadata: unknown;
+  parquet_cache_status: string | null;
+  parquet_cache_folder_path: string | null;
+  parquet_cache_part_count: number | null;
+};
+
 /**
- * The part of a Supabase client the copy uses: the `opendata` bucket and
- * an id lookup on `data_catalog_listings`. A real `createClient` result
- * satisfies it, and tests pass fakes that refuse every other call.
+ * The part of a Supabase project the copy uses: its `opendata` bucket and a
+ * paged read of `data_catalog_listings`. `_createCatalogClient` builds one
+ * from a real client, and tests pass fakes that refuse every other call.
  */
 export type CatalogParquetClient = {
   storage: { from: (bucket: string) => CatalogStorageBucket };
-  from: (table: "data_catalog_listings") => {
-    select: (columns: "id") => {
-      eq: (
-        column: "id",
-        value: string,
-      ) => PromiseLike<{
-        data: ReadonlyArray<{ id: string }> | null;
-        error: { message: string } | null;
-      }>;
-    };
-  };
+  listListings: (range: Readonly<{ from: number; to: number }>) => PromiseLike<{
+    data: readonly CatalogParquetListing[] | null;
+    error: { message: string } | null;
+  }>;
 };
 
-/** What happened to the objects one copy run looked at. */
+/** What happened to the listings and objects one copy run looked at. */
 export type CatalogParquetCopyCounts = {
+  listings: number;
   copied: number;
   alreadyPresent: number;
-  skipped: number;
+  replaced: number;
   failed: number;
 };
 
@@ -102,7 +116,13 @@ export type CopyCatalogParquetSetup = {
   targetHost: string;
 };
 
-type CopyOutcome = keyof CatalogParquetCopyCounts;
+type ObjectOutcome = "copied" | "alreadyPresent" | "replaced";
+
+type CopyContext = Readonly<{
+  sourceBucket: CatalogStorageBucket;
+  targetBucket: CatalogStorageBucket;
+  record: (outcome: ObjectOutcome | "failed", note?: string) => void;
+}>;
 
 /**
  * Gets the catalog listing id from a path in the `opendata` bucket, such as
@@ -110,7 +130,7 @@ type CopyOutcome = keyof CatalogParquetCopyCounts;
  * path outside `catalog-cache/`.
  *
  * Use it to tell which listing a cached Parquet object belongs to, for
- * example to skip objects of listings a project does not have.
+ * example to check that a listing's cache folder is its own.
  */
 export function getListingIdFromCachePath(path: string): string | undefined {
   const [folder, listingId] = path.split("/");
@@ -133,6 +153,23 @@ export function getTargetHostFromArgs(
     return undefined;
   }
   return host.startsWith("--") ? undefined : host;
+}
+
+/**
+ * Gets why the script's arguments must be refused, or undefined when they
+ * are empty or exactly `--yes-i-know-the-target <host>`. Anything else is
+ * refused, `--dry-run` included, so no flag the copy does not know can make
+ * a reader believe it ran without writing.
+ */
+export function getCopyArgsRefusal(
+  args: readonly string[],
+): string | undefined {
+  const isConfirmation =
+    args.length === 2 && getTargetHostFromArgs(args) !== undefined;
+  if (args.length === 0 || isConfirmation) {
+    return undefined;
+  }
+  return `Unknown arguments: ${args.join(" ")}. The only option is ${CONFIRM_TARGET_FLAG} <target-host>, and there is no dry run.`;
 }
 
 /** The URL's host, with its port when the URL names one. */
@@ -220,30 +257,24 @@ async function* _listObjectPaths(
   }
 }
 
-/** Remembers, per listing id, whether the target has that listing. */
-function _createListingLookup(
+/** Yields every listing in the target, a page at a time, ordered by id. */
+async function* _listTargetListings(
   target: CatalogParquetClient,
-): (listingId: string) => Promise<boolean> {
-  const knownListings = new Map<string, boolean>();
-  return async (listingId) => {
-    if (!LISTING_ID_PATTERN.test(listingId)) {
-      return false;
-    }
-    const knownValue = knownListings.get(listingId);
-    if (knownValue !== undefined) {
-      return knownValue;
-    }
-    const { data, error } = await target
-      .from("data_catalog_listings")
-      .select("id")
-      .eq("id", listingId);
+): AsyncGenerator<CatalogParquetListing> {
+  for (let from = 0; ; from += LISTING_PAGE_SIZE) {
+    const { data, error } = await target.listListings({
+      from,
+      to: from + LISTING_PAGE_SIZE - 1,
+    });
     if (error !== null) {
       throw new Error(`Could not read the target's listings: ${error.message}`);
     }
-    const isInTarget = (data ?? []).length > 0;
-    knownListings.set(listingId, isInTarget);
-    return isInTarget;
-  };
+    const listings = data ?? [];
+    yield* listings;
+    if (listings.length < LISTING_PAGE_SIZE) {
+      return;
+    }
+  }
 }
 
 /**
@@ -260,36 +291,154 @@ function _isAlreadyExistsError(error: StorageErrorLike): boolean {
   );
 }
 
-async function _copyObject(
-  options: Readonly<{
-    sourceBucket: CatalogStorageBucket;
-    targetBucket: CatalogStorageBucket;
-    path: string;
-  }>,
-): Promise<"copied" | "alreadyPresent"> {
-  const { sourceBucket, targetBucket, path } = options;
-  const { data, error } = await sourceBucket.download(path);
+function _getSha256Hex(bytes: ArrayBuffer): string {
+  return createHash("sha256").update(new Uint8Array(bytes)).digest("hex");
+}
+
+async function _download(
+  bucket: CatalogStorageBucket,
+  path: string,
+): Promise<ArrayBuffer> {
+  const { data, error } = await bucket.download(path);
   if (error !== null || data === null) {
     throw new Error(`download failed: ${error?.message ?? "no body"}`);
   }
   // Buffer one object at a time, as an ArrayBuffer so the upload sends the
   // Parquet content type rather than the downloaded Blob's.
-  const { error: uploadError } = await targetBucket.upload(
-    path,
-    await data.arrayBuffer(),
-    {
-      contentType: PARQUET_CONTENT_TYPE,
-      cacheControl: PARQUET_CACHE_CONTROL_SECONDS,
-      upsert: false,
-    },
-  );
-  if (uploadError === null) {
-    return "copied";
+  return await data.arrayBuffer();
+}
+
+/** Uploads one object, reporting an existing object instead of failing. */
+async function _upload(options: {
+  bucket: CatalogStorageBucket;
+  path: string;
+  body: ArrayBuffer;
+  cacheControl: string;
+  upsert: boolean;
+}): Promise<"uploaded" | "exists"> {
+  const { error } = await options.bucket.upload(options.path, options.body, {
+    contentType: PARQUET_CONTENT_TYPE,
+    cacheControl: options.cacheControl,
+    upsert: options.upsert,
+  });
+  if (error === null) {
+    return "uploaded";
   }
-  if (_isAlreadyExistsError(uploadError)) {
-    return "alreadyPresent";
+  if (!options.upsert && _isAlreadyExistsError(error)) {
+    return "exists";
   }
-  throw new Error(`upload failed: ${uploadError.message}`);
+  throw new Error(`upload failed: ${error.message}`);
+}
+
+/**
+ * Copies a listing's prebuilt copy, only the build folder its
+ * `parquet_cache_folder_path` names, and checks that a `ready` copy ends with
+ * `parquet_cache_part_count` parts in the target.
+ */
+async function _copyCacheFolder(
+  context: CopyContext,
+  listing: CatalogParquetListing,
+): Promise<void> {
+  const folder = listing.parquet_cache_folder_path ?? "";
+  if (getListingIdFromCachePath(folder) !== listing.id) {
+    context.record("failed", `${folder} is not listing ${listing.id}'s folder`);
+    return;
+  }
+  for await (const path of _listObjectPaths(context.sourceBucket, folder)) {
+    try {
+      const outcome = await _upload({
+        bucket: context.targetBucket,
+        path,
+        body: await _download(context.sourceBucket, path),
+        cacheControl: CACHE_PART_CACHE_CONTROL_SECONDS,
+        upsert: false,
+      });
+      context.record(outcome === "uploaded" ? "copied" : "alreadyPresent");
+    } catch (error) {
+      context.record("failed", `${path}: ${String(error)}`);
+    }
+  }
+  if (listing.parquet_cache_status !== "ready") {
+    return;
+  }
+  let targetPartCount = 0;
+  for await (const _path of _listObjectPaths(context.targetBucket, folder)) {
+    targetPartCount += 1;
+  }
+  if (targetPartCount !== listing.parquet_cache_part_count) {
+    context.record(
+      "failed",
+      `${folder} has ${targetPartCount} parts in the target, not ${listing.parquet_cache_part_count}`,
+    );
+  }
+}
+
+function _isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/**
+ * Gets where a `pipeline_parquet` listing's object lives and its expected
+ * SHA-256, from the `metadata` the pipeline wrote, or why it cannot be
+ * copied.
+ */
+function _getPipelineObject(
+  listing: CatalogParquetListing,
+): { path: string; sha256: string | undefined } | { problem: string } {
+  const metadata = _isRecord(listing.metadata) ? listing.metadata : {};
+  const path = metadata.storage_object_path;
+  const sha256 = metadata.parquet_sha256;
+  if (metadata.open_data_bucket !== OPEN_DATA_BUCKET) {
+    return { problem: `its bucket is not ${OPEN_DATA_BUCKET}` };
+  }
+  if (
+    typeof path !== "string" ||
+    !path.endsWith(".parquet") ||
+    path.startsWith("/") ||
+    path.startsWith(`${CATALOG_CACHE_FOLDER}/`) ||
+    path.split("/").includes("..")
+  ) {
+    return { problem: `its storage_object_path is not a Parquet object path` };
+  }
+  return { path, sha256: typeof sha256 === "string" ? sha256 : undefined };
+}
+
+/**
+ * Copies a `pipeline_parquet` listing's object. When the target already has
+ * one, it is replaced only when its bytes do not match the listing's
+ * `parquet_sha256`, the one case the copy overwrites.
+ */
+async function _copyPipelineObject(
+  context: CopyContext,
+  listing: CatalogParquetListing,
+): Promise<void> {
+  const object = _getPipelineObject(listing);
+  if ("problem" in object) {
+    context.record("failed", `listing ${listing.id}: ${object.problem}`);
+    return;
+  }
+  const { path, sha256 } = object;
+  const body = await _download(context.sourceBucket, path);
+  if (sha256 !== undefined && _getSha256Hex(body) !== sha256) {
+    throw new Error("the source object does not match parquet_sha256");
+  }
+  const upload = { bucket: context.targetBucket, path, body };
+  const cacheControl = PIPELINE_OBJECT_CACHE_CONTROL_SECONDS;
+  if (
+    (await _upload({ ...upload, cacheControl, upsert: false })) === "uploaded"
+  ) {
+    context.record("copied");
+    return;
+  }
+  if (
+    sha256 === undefined ||
+    _getSha256Hex(await _download(context.targetBucket, path)) === sha256
+  ) {
+    context.record("alreadyPresent");
+    return;
+  }
+  await _upload({ ...upload, cacheControl, upsert: true });
+  context.record("replaced");
 }
 
 async function _assertTargetHasBucket(
@@ -303,16 +452,36 @@ async function _assertTargetHasBucket(
   }
 }
 
+function _createRecorder(
+  counts: CatalogParquetCopyCounts,
+  log: (line: string) => void,
+): CopyContext["record"] {
+  return (outcome, note) => {
+    counts[outcome] += 1;
+    if (outcome === "failed") {
+      log(`Failed ${note ?? ""}`);
+    }
+    const objectCount =
+      counts.copied + counts.alreadyPresent + counts.replaced + counts.failed;
+    if (objectCount % PROGRESS_INTERVAL === 0) {
+      log(`Looked at ${objectCount} objects.`);
+    }
+  };
+}
+
 /**
- * Copies the open data catalog's prebuilt Parquet objects from one Supabase
- * project's `opendata` bucket to the same paths in another's, for listings
- * the target already has. Moves the catalog into `alpha-dev` and production
- * after `importCatalogData.sh` has loaded the listings.
+ * Copies the Parquet objects of every listing the target has, from one
+ * Supabase project's `opendata` bucket to the same paths in another's: the
+ * build folder each prebuilt copy's `parquet_cache_folder_path` names, and
+ * each `pipeline_parquet` listing's `metadata.storage_object_path`. Moves
+ * the catalog into `alpha-dev` and production after `importCatalogData.sh`
+ * has loaded the listings, and throws when the target has none yet.
  *
- * Reads the source only, and only uploads to the target with `upsert:
- * false`, so an object already in the target counts as done and the copy is
- * safe to re-run after a failure. A failed object is logged and counted, and
- * the copy moves on.
+ * Reads the source only. Uploads to the target with `upsert: false`, so an
+ * object already there counts as done and the copy is safe to re-run, except
+ * a `pipeline_parquet` object whose bytes do not match its listing's
+ * `parquet_sha256`, which is replaced. A failed object is logged and
+ * counted, and the copy moves on.
  *
  * Run as a script, with both projects' URLs and secret keys in
  * `SOURCE_SUPABASE_URL`, `SOURCE_SECRET_KEY`, `TARGET_SUPABASE_URL`, and
@@ -322,8 +491,8 @@ async function _assertTargetHasBucket(
  *     [--yes-i-know-the-target <target-host>]
  *
  * It prints both hosts, asks for the target host unless the flag names it,
- * and exits 1 when any object failed. Node runs this file directly, so keep
- * every `$/` import type-only.
+ * refuses any other argument, and exits 1 when any object failed. Node runs
+ * this file directly, so keep every `$/` import type-only.
  */
 export async function copyCatalogParquet(
   options: Readonly<{
@@ -335,36 +504,33 @@ export async function copyCatalogParquet(
   const { source, target, log = () => {} } = options;
   const targetBucket = target.storage.from(OPEN_DATA_BUCKET);
   await _assertTargetHasBucket(targetBucket);
-  const sourceBucket = source.storage.from(OPEN_DATA_BUCKET);
-  const isListingInTarget = _createListingLookup(target);
   const counts: CatalogParquetCopyCounts = {
+    listings: 0,
     copied: 0,
     alreadyPresent: 0,
-    skipped: 0,
+    replaced: 0,
     failed: 0,
   };
-  for await (const path of _listObjectPaths(
-    sourceBucket,
-    CATALOG_CACHE_FOLDER,
-  )) {
-    const listingId = getListingIdFromCachePath(path) ?? "";
-    const outcome: CopyOutcome = (await isListingInTarget(listingId))
-      ? await _copyObject({ sourceBucket, targetBucket, path }).catch(
-          (error: unknown) => {
-            log(
-              `Failed ${path}: ${error instanceof Error ? error.message : String(error)}`,
-            );
-            return "failed" as const;
-          },
-        )
-      : "skipped";
-    counts[outcome] += 1;
-    const seenCount = Object.values(counts).reduce((sum, count) => {
-      return sum + count;
-    }, 0);
-    if (seenCount % PROGRESS_INTERVAL === 0) {
-      log(`Looked at ${seenCount} objects.`);
+  const context: CopyContext = {
+    sourceBucket: source.storage.from(OPEN_DATA_BUCKET),
+    targetBucket,
+    record: _createRecorder(counts, log),
+  };
+  for await (const listing of _listTargetListings(target)) {
+    counts.listings += 1;
+    if (listing.parquet_cache_folder_path !== null) {
+      await _copyCacheFolder(context, listing);
     }
+    if (listing.access_kind === "pipeline_parquet") {
+      await _copyPipelineObject(context, listing).catch((error: unknown) => {
+        context.record("failed", `listing ${listing.id}: ${String(error)}`);
+      });
+    }
+  }
+  if (counts.listings === 0) {
+    throw new Error(
+      "The target has no catalog listings. Run importCatalogData.sh first.",
+    );
   }
   return counts;
 }
@@ -394,8 +560,8 @@ async function _isTargetConfirmed(
 }
 
 /**
- * Creates the Supabase client the copy uses. The table query is forwarded
- * call by call, because checking the whole typed client against
+ * Creates the Supabase project handle the copy uses. The listing read is
+ * written out here, because checking the whole typed client against
  * `CatalogParquetClient` is too deep for the compiler.
  */
 function _createCatalogClient(url: string, key: string): CatalogParquetClient {
@@ -404,30 +570,32 @@ function _createCatalogClient(url: string, key: string): CatalogParquetClient {
   });
   return {
     storage: client.storage,
-    from: (table) => {
-      return {
-        select: (columns) => {
-          return {
-            eq: (column, value) => {
-              return client.from(table).select(columns).eq(column, value);
-            },
-          };
-        },
-      };
+    listListings: (range) => {
+      return client
+        .from("data_catalog_listings")
+        .select(LISTING_COLUMNS)
+        .order("id")
+        .range(range.from, range.to);
     },
   };
 }
 
 async function _main(): Promise<number> {
+  const args = process.argv.slice(2);
+  const argsRefusal = getCopyArgsRefusal(args);
   const result = getCopySetupFromEnv(process.env);
-  if (result.isRefused) {
-    console.error(`Refusing to copy: ${result.reason}`);
+  if (argsRefusal !== undefined || result.isRefused) {
+    console.error(
+      `Refusing to copy: ${argsRefusal ?? (result.isRefused ? result.reason : "")}`,
+    );
     return 1;
   }
   const { setup } = result;
   console.log(`Source: ${setup.sourceHost} (read only)`);
-  console.log(`Target: ${setup.targetHost} (uploads only, never overwrites)`);
-  if (!(await _isTargetConfirmed(setup.targetHost, process.argv.slice(2)))) {
+  console.log(
+    `Target: ${setup.targetHost} (uploads; replaces only a pipeline object whose SHA-256 differs)`,
+  );
+  if (!(await _isTargetConfirmed(setup.targetHost, args))) {
     console.error(
       `Refusing to copy: the target was not confirmed as ${setup.targetHost}. Type it at the prompt or pass ${CONFIRM_TARGET_FLAG} ${setup.targetHost}.`,
     );
@@ -441,7 +609,7 @@ async function _main(): Promise<number> {
     },
   });
   console.log(
-    `Copied ${counts.copied}, already in the target ${counts.alreadyPresent}, skipped ${counts.skipped}, failed ${counts.failed}.`,
+    `Listings ${counts.listings}: copied ${counts.copied}, already in the target ${counts.alreadyPresent}, replaced ${counts.replaced}, failed ${counts.failed}.`,
   );
   return counts.failed > 0 ? 1 : 0;
 }
