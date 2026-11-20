@@ -43,6 +43,7 @@ and implementation, in order.
 | 1D | **Dashboard actions from anywhere.** `add_dashboard_block` on the current, mentioned, or asked-for dashboard, online and offline (was 1.1). **Done (2026-11-17). P04 and D04 are closed (2026-11-18). No eval bar is missed.** ([spec](specs/phase-1d.md), D44). | Final eval on prompt v6 (2026-11-18): dashboard questions D01 to D09 passed 9/9 on each of three runs, M01 to M06 (with M03b) 7/7, the 45 questions 44/45 on the final prompt (45/45 on the first v6 runs; the miss is N11, answered in text), and the offline 45 30/45 against a bar of 26, run with the page block the app sends on every turn, on an empty Data Explorer (a first turn with a non-empty page block behaves like the 26/45 and 27/45 runs, so the real app's score depends on what the Data Explorer shows; the earlier offline runs sent none: they scored 25/45 on the rebased tree, 26/45 after the dashboard text was gated, and 30/45 after the tool was gated too; with the page block, the code gated on any block scored 27/45, gated on dashboard turns 26/45, and gated on dashboard turns with an empty Data Explorer's block left out 30/45, the same misses as with no page block; the offline D questions 6/9). **P04, closed:** P01 to P07 scored 6/7 on the first v6 run (P04 answered without asking which chart) and 5 of 9 on single reruns. P04 asks on 10 of 10 runs of v3 and v4 and 5 of 10 of v5 and of v6, so the drop came with v5 (the CODED COLUMNS rules from `demo/measles`), not with the dashboard rules. A bullet in DASHBOARD BLOCKS (`5a508a3c2`) makes v6 ask which chart before changing how one is shown: P04 10/10, P 7/7, M 7/7, the 45 45/45, and D01 and D06 on all six D runs. Two earlier wordings did not close it and were not kept: one reached 10/10 but broke D01 and D06, the other scored 8/10. **D04, closed:** D04 ("Add a table of the 5 states with the most deaths") missed on about half the runs of committed v6 (7 of 13), because the model added a year taken from the dashboard's title, and sometimes dropped the "Unassigned" and "Out of" rows from the ranking. That made the three-run D bar unreliable (the earlier 9/9 was luck). A second bullet in DASHBOARD BLOCKS (`a4def86ad`) says a dashboard's name, title, and charts are labels, not filters, and that a ranking keeps those rows: D04 10/10, then D 9/9 on all three runs, P 7/7, P04 10/10, M 7/7, and the 45 44/45. Two earlier wordings were not kept. The browser spec `tests/e2e/agent-dashboard-block.spec.ts` passes, and the three agent specs moved to prompt v6 pass. Eval label `phase-1d` ([results](eval.md#phase-1d)). Prompt v6 (first numbered v4, then renumbered on top of `demo/measles`'s v4 and v5, built on v5) is fixed once it is pushed to the demo, so a later change needs a new version served beside v1 to v6. The first eval runs (2026-11-17) used it as first numbered: v3 plus the dashboard rules, and the final runs above used v6 itself. |
 | 1E | **"Try again" and parity in the agent.** Done (2026-11-19). Try again reruns the agent's latest answer with its first attempt kept in context and a line saying the user wants a different answer, and Try again on an earlier answer starts the agent over from the thread. The agent's question cards are audit-logged and bias-checked through today's function, and it logs `chat.sql_generated` and `dashboard.block_added_via_chat` (D40, D45) ([spec](specs/phase-1e.md)). | Met: unit tests and the chat runtime's integration tests. The Try again set T01 to T06 met its bars against today's chat: the agent passed 18 of 18 graded answers over three runs, with 0 repeats on T01 and T04, against the baseline's 18 of 18 and 0, and T03, T04, and T06 on every run. That is the third wording of the Try again line, the one that ships. The first two missed bar 1 (15 of 18 each as graded), and no fallback was needed. No prompt change, so the 45, P, M, and D were not rerun. Eval label `phase-1e` ([results](eval.md#phase-1e)). The browser test is 1F's. |
 | 1F | **Browser test, then on by default.** One Playwright spec (ask, see a table, answer a question card, follow up, ask for a chart), then the agent as the default and the switch removed (was 1.3 and 1.4). | A week on the demo without regressions; the 45-question eval unchanged. |
+| 1G | **Loose ends from 1A to 1E.** Every follow-up the earlier phases left open, in one place ([below](#phase-1g-loose-ends-from-1a-to-1e)). | Each item below is fixed or consciously dropped, and the phase's own checks pass. |
 
 ### Open after 1D (2026-11-17)
 
@@ -125,6 +126,37 @@ Parity or better: data questions (45/45, about a quarter of the cost, about
 twice as fast), consent before values or a typed message cross, the case
 designer, offline mode. New: questions from maps, datasets, case pages,
 settings.
+
+## Phase 1G: loose ends from 1A to 1E
+
+Everything 1A to 1E marked done "except for" something lives here, so a
+finished phase stays finished. Each item names where it came from. The
+specs keep their own lists as history. This table is the one to work from.
+Order: after 1F's browser spec, during its week on the demo, and before
+Phase 2.
+
+| # | Group | Item | From |
+|---|---|---|---|
+| G1 | Privacy | **Names that never appear as a SQL literal** (a column alias, a title no chart filters on, a dashboard name) still reach the model. | [1A redaction](specs/phase-1a-redaction.md#still-open) |
+| G2 | Privacy | **Map layer names** can carry a layer's own filter value, because layer queries are not vaulted. | [1B](specs/phase-1b.md), [1C](specs/phase-1c.md) |
+| G3 | Privacy | **Row counts as an oracle**, double-quoted values, short values, common words that are names, and over-redaction. The rest of the redaction doc's "Still open" list. | [1A redaction](specs/phase-1a-redaction.md#still-open) |
+| G4 | Privacy | **The message that posts a picked option** reads `<value N>` in the thread, because the option goes back to the model with no consent check. | 1D, D39 |
+| G5 | Accuracy | **The agent occasionally invents row details it never saw.** Needs a grader and a prompt or tool fix under the usual bar (no accuracy loss, nothing invented). | [1B](specs/phase-1b.md) |
+| G6 | Accuracy | **Offline score depends on the Data Explorer.** The offline 45 is 30/45 on an empty Data Explorer and about 26/45 when the page block is not empty. | 1D |
+| G7 | Reliability | **Stopping a run:** pass the abort signal into `run_query` and consent so a stopped run ends at once. | [1A](specs/phase-1a.md) |
+| G8 | Reliability | **Two simultaneous first turns** of one chat could each create a conversation. | [1A](specs/phase-1a.md) |
+| G9 | Reliability | **Table aliases can drift:** the proxy rebuilds them from the workspace's current datasets each request, the browser keeps the first list. A dataset added mid-conversation can shift them. | [1A](specs/phase-1a.md) |
+| G10 | Reliability | **Each chat result runs twice** (host, then card) and the two runs can apply different row limits. Also give the result query a fixed id so cached results survive a reload. | [1A](specs/phase-1a.md) |
+| G11 | Reliability | **A saved dashboard card is overwritten** by another tab's next Save when the dashboard is open in an editor there. | [1D](specs/phase-1d.md) |
+| G12 | UX | **Today's chat shows no error text** for a failed turn and no Try again (the message has no content). Render the message's error status. The agent path already replies. | [1A](specs/phase-1a.md) |
+| G13 | UX | An auto-height body for a failed card, and dropping the unused "Unavailable result" label. | [1A](specs/phase-1a.md) |
+| G14 | Try again | **Branches with identical user messages** are not told apart. Only matters if the app gains a branch picker or an edit action. | 1E, D45 |
+| G15 | Try again | `isRepeatedAttempt` counts an errored attempt pair as a repeat, and the schema grader still passes "nothing needs to be renamed". | 1E |
+| G16 | Cleanup | Rename `agentPageNameLoader.ts` to match `createAgentPageNameLoader`. Make `isAgentAccessDenied` stop reading the proxy's error message. Make the e2e helpers `seedDashboardWithTile.ts` and `createDashboardWithDataVizBlock.ts` write snake-cased configs like the app. | 1A, 1B |
+| G17 | Cleanup | The minor review findings 1E left: `create*` naming on three helpers, test names with two claims, a partial `ANALYTICS_APP_BY_PAGE_APP`, two positional-parameter helpers, two `as unknown as` casts, and a card test with no `card_shown` assertion. | 1E |
+
+Accepted and not on the list: offline replies stored before the offline
+answer mark existed reach hosted requests as written.
 
 ## Phase 2: foundations every area needs
 
