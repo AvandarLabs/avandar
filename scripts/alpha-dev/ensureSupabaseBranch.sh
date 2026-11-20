@@ -6,7 +6,8 @@
 #
 # The only Git branch allowed is `alpha-dev`, and it maps to the Supabase
 # branch of the same name. A branch that does not exist yet is created as a
-# persistent branch, so it keeps its data between deploys.
+# persistent branch, and an existing one is switched to persistent, so it is
+# never paused or removed for inactivity.
 #
 # Usage:
 #   STAGING_PROJECT_ID=<ref> bash scripts/alpha-dev/ensureSupabaseBranch.sh alpha-dev
@@ -22,7 +23,7 @@
 #-------------------------------------------------------------------------------
 set -euo pipefail
 
-GIT_BRANCH="${1:?Usage: ensureSupabaseBranch.sh <git-branch>}"
+GIT_BRANCH="${1:?Usage: ensureSupabaseBranch.sh alpha-dev (only alpha-dev is accepted)}"
 : "${STAGING_PROJECT_ID:?STAGING_PROJECT_ID must be set}"
 : "${SUPABASE_ACCESS_TOKEN:?SUPABASE_ACCESS_TOKEN must be set}"
 
@@ -47,9 +48,30 @@ mask() {
   fi
 }
 
+# Prints the JSON for the Supabase branch, or nothing when it does not exist.
+# Fails when the branch list cannot be read, so a failed call is never
+# mistaken for a missing branch.
 find_branch_json() {
-  supabase branches list --project-ref "$STAGING_PROJECT_ID" -o json \
-    | jq -c --arg name "$SUPABASE_BRANCH" '.[] | select(.name == $name)'
+  local branches_json
+  if ! branches_json="$(supabase branches list --project-ref "$STAGING_PROJECT_ID" -o json)"; then
+    log "Could not list the Supabase branches on the staging project."
+    return 1
+  fi
+  jq -c --arg name "$SUPABASE_BRANCH" '.[] | select(.name == $name)' <<<"$branches_json"
+}
+
+# Switches an existing branch to persistent unless it already is. A missing
+# or unreadable `persistent` field still runs the update, which is idempotent.
+ensure_branch_persistent() {
+  local branch_json="$1" is_persistent
+  is_persistent="$(jq -r '.persistent | if . == null then "" else tostring end' <<<"$branch_json" 2>/dev/null || true)"
+  if [[ "$is_persistent" == "true" ]]; then
+    log "Supabase branch '$SUPABASE_BRANCH' is already persistent."
+    return 0
+  fi
+  log "Making Supabase branch '$SUPABASE_BRANCH' persistent (was: ${is_persistent:-unknown})..."
+  supabase branches update "$SUPABASE_BRANCH" --persistent \
+    --project-ref "$STAGING_PROJECT_ID" >&2
 }
 
 create_branch() {
@@ -93,10 +115,12 @@ wait_until_healthy() {
   return 1
 }
 
-if [[ -z "$(find_branch_json)" ]]; then
+EXISTING_BRANCH_JSON="$(find_branch_json)"
+if [[ -z "$EXISTING_BRANCH_JSON" ]]; then
   create_branch
 else
   log "Supabase branch '$SUPABASE_BRANCH' already exists."
+  ensure_branch_persistent "$EXISTING_BRANCH_JSON"
 fi
 wait_until_healthy
 
