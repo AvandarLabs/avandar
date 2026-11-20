@@ -1,14 +1,9 @@
 import { mix } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CategoryContext } from "./CategoryContext";
 import { CategoryLabel } from "./CategoryLabel";
-import { getRefinementFromFrame } from "./getRefinementFromFrame";
+import { RefinementMotion } from "./RefinementMotion";
 import type { Input } from "./ChartFocusEdit.schema";
 import type { ReactNode } from "react";
 
@@ -19,7 +14,6 @@ type Props = {
   frame: number;
   accent: string;
 };
-
 /** A bar's corner before the corner style scales it. */
 const BAR_CORNER = 2;
 /**
@@ -32,11 +26,11 @@ export function ChartCategory({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
-  const refinement = getRefinementFromFrame(frame, motion);
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const refinement = RefinementMotion.getRefinementFromFrame({ frame, motion });
   const direct = input.treatment !== "focus" ? refinement : 0;
   const emphasized =
     input.treatment !== "direct-labels" && category.id !== input.focusId;

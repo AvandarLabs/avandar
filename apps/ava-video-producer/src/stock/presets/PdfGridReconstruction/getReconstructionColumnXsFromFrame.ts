@@ -1,7 +1,14 @@
 import { mix, ramp } from "../../../motion";
-import { RESULT_CUE, SETTLED_CUE } from "./gridTiming";
+import { RESULT_CUE, SETTLED_CUE } from "./getEvidenceFromFrame";
 import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./PdfGridReconstruction.schema";
+
+type GetReconstructionColumnXsFromFrameOptions = {
+  input: Input;
+  frame: number;
+  isResult: boolean;
+  motion: VideoMotion;
+};
 /**
  * Complete result columns travel in a clear lane beside the retained source.
  */
@@ -10,12 +17,7 @@ export function getReconstructionColumnXsFromFrame({
   frame,
   isResult,
   motion,
-}: Readonly<{
-  input: Input;
-  frame: number;
-  isResult: boolean;
-  motion: VideoMotion;
-}>): number[] {
+}: Readonly<GetReconstructionColumnXsFromFrameOptions>): number[] {
   const width = 400 / input.grid.columnLabels.length;
   return input.grid.columnLabels.map((_, columnIndex) => {
     // Columns leave one after another and all settle together.

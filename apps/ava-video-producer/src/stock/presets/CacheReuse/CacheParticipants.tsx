@@ -1,10 +1,7 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
-import { CacheOrigin } from "./CacheOrigin";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { CacheOrigin } from "./CacheOrigin/CacheOrigin";
 import { CacheRequester } from "./CacheRequester";
 import { PANEL_CORNER } from "./cacheReuseShape";
 import type { Input } from "./CacheReuse.schema";
@@ -17,8 +14,8 @@ export function CacheParticipants({
   originActive,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
       <CacheRequester input={input} accent={accent} />

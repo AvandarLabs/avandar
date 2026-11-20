@@ -1,12 +1,14 @@
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./WorkspaceCapacityExtension.schema";
 import type { ReactNode } from "react";
 
-type Props = { input: Input; width: number; extension: number; accent: string };
+type Props = {
+  input: Input;
+  width: number;
+  extension: number;
+  accent: string;
+};
 /** Additional slot outlines remain within the physically unfolding tray. */
 export function CapacitySlots({
   input,
@@ -14,8 +16,8 @@ export function CapacitySlots({
   extension,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const current = input.allowances.currentAllowance.limit;
   const numVisibleSlots =
     extension > 0 ? input.allowances.expandedAllowance.limit : current;

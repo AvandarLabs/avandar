@@ -1,4 +1,4 @@
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { QueueItem } from "./QueueItem";
 import { QueueStructure } from "./QueueStructure";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
@@ -12,7 +12,7 @@ export function QueueRelief({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g opacity={motion.reveal(frame, 0)}>
       <QueueStructure frame={frame} input={input} accent={accent} />

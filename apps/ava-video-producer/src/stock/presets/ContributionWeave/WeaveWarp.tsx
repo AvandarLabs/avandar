@@ -1,6 +1,6 @@
 import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./ContributionWeave.schema";
 import type { ReactNode } from "react";
 
@@ -12,7 +12,6 @@ type Props = {
   frame: number;
   id: string;
 };
-
 /** Frames a warp band takes to draw down the loom. */
 const TENSION_FRAMES = 14;
 /** Frames a warp band takes to fade in. */
@@ -26,7 +25,7 @@ export function WeaveWarp({
   frame,
   id,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const x = 400 + (index * 400) / (numWarp - 1);
   const band = {
     x: x - 24,
@@ -57,14 +56,13 @@ export function WeaveWarp({
         <rect data-contributor-end={contributor.id} {...end} />
       ) : undefined}
       {input.showLabels ? (
-        <FitText {..._createWarpLabel(contributor.label, x)} />
+        <FitText {..._createWarpLabel({ text: contributor.label, x })} />
       ) : undefined}
     </g>
   );
 }
-
 /** The contributor's label, centred above its warp band. */
-function _createWarpLabel(text: string, x: number) {
+function _createWarpLabel({ text, x }: Readonly<{ text: string; x: number }>) {
   return {
     text,
     x,

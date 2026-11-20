@@ -1,13 +1,12 @@
 import { interpolateStyles } from "@remotion/animation-utils";
-import { getMotionProgress, useMotionSettingsTheme } from "./motionSettings";
-import type { MotionRect } from "./AnchoredOverlay";
-import type { MotionOptions } from "./motionSettings";
+import { MotionSettings } from "./MotionSettings/MotionSettings";
+import type { MotionRect } from "./AnchoredOverlay/AnchoredOverlay";
+import type { MotionOptions } from "./MotionSettings/MotionSettings";
 import type { CSSProperties, ReactNode } from "react";
-
 /**
  * A persistent child's source, destination and frame-authored travel controls.
  */
-export type SharedElementProps = {
+export type Props = {
   source: MotionRect;
   target: MotionRect;
   frame: number;
@@ -18,16 +17,9 @@ export type SharedElementProps = {
   className?: string;
   style?: CSSProperties;
 };
-
 function _rectToGeometry(rect: MotionRect) {
-  return {
-    left: rect.x,
-    top: rect.y,
-    width: rect.width,
-    height: rect.height,
-  };
+  return { left: rect.x, top: rect.y, width: rect.width, height: rect.height };
 }
-
 /** Keep one semantic object mounted as its measured rectangle changes. */
 export function SharedElement({
   source,
@@ -39,16 +31,16 @@ export function SharedElement({
   children,
   className,
   style,
-}: SharedElementProps): ReactNode {
-  const theme = useMotionSettingsTheme();
-  const progress = getMotionProgress(
+}: Props): ReactNode {
+  const theme = MotionSettings.useMotionSettingsTheme();
+  const progress = MotionSettings.getMotionProgress({
     frame,
     at,
-    durationInFrames,
-    motion,
-    undefined,
+    duration: durationInFrames,
+    options: motion,
+    fallback: undefined,
     theme,
-  );
+  });
   const geometry = interpolateStyles(
     progress,
     [0, 1],
@@ -63,3 +55,6 @@ export function SharedElement({
     </div>
   );
 }
+
+/** The public input contract for shared-element motion. */
+export type SharedElementProps = Props;

@@ -1,10 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getDrillRecordLayoutFromInputAndFrame } from "./getDrillRecordLayoutFromInputAndFrame";
 import type { Input } from "./NestedDrilldownWindow.schema";
 import type { ReactNode } from "react";
@@ -22,16 +18,11 @@ export function DrillRecord({
   record,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const { x, y, width, height, isDetail, opacity, isSettled } =
-    getDrillRecordLayoutFromInputAndFrame({
-      frame,
-      input,
-      record,
-      motion,
-    });
+    getDrillRecordLayoutFromInputAndFrame({ frame, input, record, motion });
   if (opacity === 0) {
     return undefined;
   }

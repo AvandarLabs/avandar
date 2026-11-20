@@ -3,12 +3,7 @@ import { mix } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { PriorityQueueItem } from "./PriorityQueueItem";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./PriorityInsertion.schema";
@@ -21,10 +16,10 @@ export function PriorityInsertion({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const insertion = input.queue.findIndex(propEq("id", input.insertBeforeId));
   const shift = motion.ramp(frame, 64, motion.scale(44), motion.travel.easing);
   const incoming = motion.ramp(

@@ -1,15 +1,11 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { ResolvedVideoSemantic } from "../../../videoTheme/videoTheme.types";
 import type { Input } from "./RejectAndReplace.schema";
 import type { ReactNode } from "react";
 
 type Props = { frame: number; input: Input; isReplacement: boolean };
-
 function _getLabelsFromSelection({
   frame,
   input,
@@ -55,15 +51,14 @@ function _getLabelsFromSelection({
     },
   ];
 }
-
 /** Option names, states and rationales retain complete fixed-size text. */
 export function SelectionCopy({
   frame,
   input,
   isReplacement,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
-  const { color } = useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const { color } = GraphicThemeHooks.useGraphicTokens();
   const labels = _getLabelsFromSelection({
     frame,
     input,

@@ -1,5 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { OPEN_CUE } from "./journalTiming";
 import type { Input } from "./JournalReceipts.schema";
 import type { ReactNode } from "react";
@@ -7,7 +7,7 @@ import type { ReactNode } from "react";
 type Props = { frame: number; input: Input };
 /** Supplied state legends keep pending and acknowledged meanings explicit. */
 export function JournalCopy({ frame, input }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   if (!input.showLabels) {
     return undefined;
   }

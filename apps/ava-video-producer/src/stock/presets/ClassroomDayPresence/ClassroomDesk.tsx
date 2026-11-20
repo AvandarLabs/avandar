@@ -4,12 +4,8 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
-import { ClassroomImpressions } from "./ClassroomImpressions";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { ClassroomImpressions } from "./ClassroomImpressions/ClassroomImpressions";
 import type { Input } from "./ClassroomDayPresence.schema";
 import type { ReactNode } from "react";
 /** Data for Desk. */
@@ -19,7 +15,6 @@ type DeskResult = {
   state: Input["days"][number]["records"][number]["state"];
   previousState: Input["days"][number]["records"][number]["state"];
 };
-
 type Desk = Input["learners"][number] & DeskResult;
 type Props = {
   desk: Desk;
@@ -39,9 +34,9 @@ export function ClassroomDesk({
   input,
   activeIndex,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const { atomic } = useGraphicTheme();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const occupied = mix(
     transition,
     Number(desk.previousState === "present"),

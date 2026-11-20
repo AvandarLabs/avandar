@@ -1,5 +1,5 @@
 import { mix } from "../../../motion";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { EvolutionCaptions } from "./EvolutionCaptions";
 import { EvolutionHeader } from "./EvolutionHeader";
 import { EvolutionRow } from "./EvolutionRow";
@@ -15,7 +15,7 @@ export function SchemaColumnEvolution({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const expansion = motion.ramp(
     frame,
     12,

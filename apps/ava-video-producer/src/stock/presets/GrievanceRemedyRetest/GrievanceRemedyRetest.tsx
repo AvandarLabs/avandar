@@ -1,7 +1,7 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
-import { RemedyActions } from "./RemedyActions";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { RemedyActions } from "./RemedyActions/RemedyActions";
 import { RemedyObject } from "./RemedyObject";
 import { RemedyResponse } from "./RemedyResponse";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
@@ -15,7 +15,7 @@ export function GrievanceRemedyRetest({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g
       data-complaint-state={

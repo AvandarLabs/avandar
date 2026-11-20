@@ -1,13 +1,8 @@
 import { mix } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
-import { CartridgeText } from "./CartridgeText";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { CartridgeText } from "./CartridgeText/CartridgeText";
 import type { Input } from "./PocketInference.schema";
 import type { ReactNode } from "react";
 
@@ -23,10 +18,10 @@ export function ModelCartridge({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const y = mix(motion.ramp(frame, 20, motion.scale(16)), 106, 130);
   const ripple = motion.ramp(frame, 56, motion.scale(24));
   return (

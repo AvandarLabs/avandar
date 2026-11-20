@@ -1,12 +1,7 @@
 import { mix } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CarbonOperator } from "./CarbonOperator";
 import { CarbonPhysicalLabels } from "./CarbonPhysicalLabels";
 import type { Input } from "./CarbonStorageAccounting.schema";
@@ -19,17 +14,16 @@ const RIBBON_WIDTH = 24;
 const VESSEL_TINT_FLOOR = 0.04;
 /** How much the vessel's tint grows with the share of carbon it retains. */
 const VESSEL_TINT_RANGE = 0.12;
-
 /** An operator cues separate retained and released physical CO2 ribbons. */
 export function CarbonPhysical({
   input,
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const transfer = motion.ramp(
     frame,
     60,

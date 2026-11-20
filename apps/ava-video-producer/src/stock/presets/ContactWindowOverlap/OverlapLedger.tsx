@@ -1,8 +1,5 @@
 import { propEq } from "@avandar/utils";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./ContactWindowOverlap.schema";
 import type { ReactNode } from "react";
@@ -24,8 +21,8 @@ function _getCounts(input: Input) {
  * Review candidates, nonintersections and unknown people partition the input.
  */
 export function OverlapLedger({ input, frame }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const counts = _getCounts(input);
   return (
     <g opacity={motion.ramp(frame, 116, motion.scale(10))}>

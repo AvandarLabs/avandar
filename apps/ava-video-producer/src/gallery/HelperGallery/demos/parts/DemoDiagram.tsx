@@ -2,7 +2,7 @@ import { SketchedShape } from "../../../../stock/primitives/SketchedShape";
 import { StockRect } from "../../../../stock/primitives/StockRect/StockRect";
 import { useVideoShapeScales } from "../../../../videoTheme/useVideoShapeScales";
 import { useVideoTheme } from "../../../../videoTheme/useVideoTheme";
-import { useDemoColors } from "../demoTheme";
+import { DemoTheme } from "../DemoTheme";
 import {
   DIAGRAM_NODE_SIZE,
   DIAGRAM_NODES,
@@ -18,7 +18,6 @@ const EDGES = [
   ["model", "share"],
   ["chart", "share"],
 ] as const;
-
 const NODE_LABELS: Readonly<Record<string, string>> = {
   source: "Source",
   join: "Join",
@@ -27,7 +26,6 @@ const NODE_LABELS: Readonly<Record<string, string>> = {
   chart: "Chart",
   share: "Share",
 };
-
 /** One labelled node of the preview diagram. */
 function DiagramNode({
   x,
@@ -40,7 +38,7 @@ function DiagramNode({
 }): ReactNode {
   const { semantic, mantine, atomic } = useVideoTheme();
   const scales = useVideoShapeScales();
-  const colors = useDemoColors();
+  const colors = DemoTheme.useDemoColors();
   return (
     <g
       transform={`translate(${x - DIAGRAM_NODE_SIZE.width / 2} ${y - DIAGRAM_NODE_SIZE.height / 2})`}
@@ -66,7 +64,6 @@ function DiagramNode({
     </g>
   );
 }
-
 /**
  * An abstract vector diagram for the camera and departure previews, drawn
  * in the 960 by 600 coordinates those helpers default to.
@@ -74,7 +71,7 @@ function DiagramNode({
 export function DemoDiagram(): ReactNode {
   const { stroke, sketch } = useVideoTheme().semantic;
   const scales = useVideoShapeScales();
-  const colors = useDemoColors();
+  const colors = DemoTheme.useDemoColors();
   return (
     <g>
       <rect width={960} height={600} fill={colors.ground} />

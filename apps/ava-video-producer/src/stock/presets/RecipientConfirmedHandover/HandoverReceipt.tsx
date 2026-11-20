@@ -1,10 +1,7 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
-import { HandoverAcknowledgement } from "./HandoverAcknowledgement";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { HandoverAcknowledgement } from "./HandoverAcknowledgement/HandoverAcknowledgement";
 import { HandoverReceiptRow } from "./HandoverReceiptRow";
 import type { Input } from "./RecipientConfirmedHandover.schema";
 import type { ReactNode } from "react";
@@ -18,8 +15,8 @@ export function HandoverReceipt({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
       <StockRect

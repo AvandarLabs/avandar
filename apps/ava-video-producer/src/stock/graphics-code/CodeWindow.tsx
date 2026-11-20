@@ -1,16 +1,11 @@
 import { Panel } from "../graphics-common/Panel";
 import { Text } from "../graphics-common/Text";
 import { SketchedShape } from "../primitives/SketchedShape";
-import {
-  useGraphicProps,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 const DOT_COUNT = 3;
 const DOT_SPACING = 20;
-
 /**
  * Shared terminal/editor frame. Exclusive to this directory's preset
  * components.
@@ -22,9 +17,9 @@ export function CodeWindow({
   title: string;
   children: ReactNode;
 }): ReactNode {
-  const style = useGraphicProps("CodeWindow", {});
-  const { color, sketch } = useGraphicTokens();
-  const shapes = useGraphicShapeScales();
+  const style = GraphicThemeHooks.useGraphicProps("CodeWindow", {});
+  const { color, sketch } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <Panel x={70} y={111} width={820} height={411} radius={style.radius}>
       <SketchedShape

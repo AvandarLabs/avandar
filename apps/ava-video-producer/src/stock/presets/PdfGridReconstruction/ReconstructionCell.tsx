@@ -1,6 +1,6 @@
 import { mix } from "../../../motion";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { GridLiteralCell } from "./GridLiteralCell";
 import type { ReactNode } from "react";
 
@@ -27,7 +27,7 @@ export function ReconstructionCell({
   width,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
       <StockRect

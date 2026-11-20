@@ -1,24 +1,14 @@
 import { Text } from "../../../graphics-common/Text";
 import { SketchedShape } from "../../../primitives/SketchedShape";
-import {
-  useGraphicProps,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
-type Props = Readonly<{
-  x: number;
-  y: number;
-  label: string;
-  color: string;
-}>;
-
+type Props = Readonly<{ x: number; y: number; label: string; color: string }>;
 /** A body's ringed dot and its label. */
 export function BodyMarker({ x, y, label, color }: Props): ReactNode {
-  const style = useGraphicProps("OrbitalSystem", {});
-  const tokens = useGraphicTokens();
-  const shapes = useGraphicShapeScales();
+  const style = GraphicThemeHooks.useGraphicProps("OrbitalSystem", {});
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <>
       <SketchedShape

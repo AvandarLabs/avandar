@@ -1,5 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -24,7 +24,7 @@ export function CleanupLaneHeading({
   color,
   isSublabel = false,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g
       data-cleanup-label={labelRole}

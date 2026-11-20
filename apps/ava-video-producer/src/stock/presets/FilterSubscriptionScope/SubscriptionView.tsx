@@ -1,9 +1,9 @@
 import { propEq } from "@avandar/utils";
 import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getExclusionFromFrame } from "./getExclusionFromFrame";
-import { SubscriptionFrame } from "./SubscriptionFrame";
+import { SubscriptionFrame } from "./SubscriptionFrame/SubscriptionFrame";
 import { SubscriptionRecord } from "./SubscriptionRecord";
 import type { Input } from "./FilterSubscriptionScope.schema";
 import type { ReactNode } from "react";
@@ -15,7 +15,6 @@ type Props = {
   frame: number;
   accent: string;
 };
-
 /** Frames between neighbouring views appearing. */
 const VIEW_STAGGER_FRAMES = 3;
 /** Frames a view takes to fade in. */
@@ -28,10 +27,10 @@ export function SubscriptionView({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const x = 48 + index * (864 / input.views.length),
     width = 864 / input.views.length - 18;
-  const progress = getExclusionFromFrame(frame, motion);
+  const progress = getExclusionFromFrame({ frame, motion });
   const rows =
     view.subscribed && progress === 1
       ? input.records.filter(propEq("category", input.selectedCategory))

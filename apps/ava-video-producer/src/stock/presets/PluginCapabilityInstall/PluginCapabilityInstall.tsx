@@ -1,5 +1,5 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CategoryTallies } from "./CategoryTallies";
 import { RetainedRecordStrip } from "./RetainedRecordStrip";
 import { UtilitySocket } from "./UtilitySocket";
@@ -14,7 +14,7 @@ export function PluginCapabilityInstall({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g>
       <LabelSlots

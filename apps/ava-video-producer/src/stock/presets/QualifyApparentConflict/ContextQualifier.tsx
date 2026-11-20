@@ -1,14 +1,11 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Props } from "./QualifyApparentConflict";
 import type { ReactNode } from "react";
 /** The joining language and qualifier follow the completed context split. */
 export function ContextQualifier({ frame, input }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const resolution = motion.ramp(frame, 96, motion.scale(24));
   return (
     <>

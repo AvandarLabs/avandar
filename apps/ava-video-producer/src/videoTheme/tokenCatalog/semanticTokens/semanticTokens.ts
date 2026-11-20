@@ -15,7 +15,6 @@ function _stroke(label: string, description: string) {
     description,
   });
 }
-
 function _corner(label: string, description: string) {
   return token({
     kind: "length",
@@ -27,16 +26,21 @@ function _corner(label: string, description: string) {
     description,
   });
 }
-
-function _multiplier(
-  label: string,
-  description: string,
-  range: Readonly<{ min: number; max: number; step: number }>,
-) {
+function _multiplier({
+  label,
+  description,
+  range,
+}: Readonly<{
+  label: string;
+  description: string;
+  range: Readonly<{ min: number; max: number; step: number }>;
+}>) {
   return token({ kind: "number", unit: "×", ...range, label, description });
 }
-
-function _alpha(label: string, description: string) {
+function _alpha({
+  label,
+  description,
+}: Readonly<{ label: string; description: string }>) {
   return token({
     kind: "opacity",
     unit: "%",
@@ -47,11 +51,9 @@ function _alpha(label: string, description: string) {
     description,
   });
 }
-
 function _sketch(label: string, description: string) {
   return token({ kind: "sketchProfile", label, description });
 }
-
 /**
  * Semantic roles under `other.video.semantic`. A theme author sets these by
  * meaning ("the accent", "the caption style"); each one is a reference to
@@ -85,11 +87,12 @@ export const SEMANTIC_TOKENS = {
       "Heavy stroke",
       "The thickest line role, for bold rules, ticks, and marks.",
     ),
-    scale: _multiplier(
-      "Line weight",
-      "Multiplies every stroke a graphic draws, including shape-specific widths. 1 draws them as authored.",
-      { min: 0.25, max: 3, step: 0.05 },
-    ),
+    scale: _multiplier({
+      label: "Line weight",
+      description:
+        "Multiplies every stroke a graphic draws, including shape-specific widths. 1 draws them as authored.",
+      range: { min: 0.25, max: 3, step: 0.05 },
+    }),
   },
   corner: {
     panel: _corner("Panel corner", "Corner radius of panels inside a graphic."),
@@ -119,35 +122,44 @@ export const SEMANTIC_TOKENS = {
       "Scene corner",
       "Corner radius of cards, panels, captions, and media in a storyboard scene.",
     ),
-    scale: _multiplier(
-      "Corner style",
-      "Multiplies every corner radius, including shape-specific ones. 0 draws square corners.",
-      { min: 0, max: 3, step: 0.05 },
-    ),
+    scale: _multiplier({
+      label: "Corner style",
+      description:
+        "Multiplies every corner radius, including shape-specific ones. 0 draws square corners.",
+      range: { min: 0, max: 3, step: 0.05 },
+    }),
   },
   alpha: {
-    wash: _alpha(
-      "Wash",
-      "The faint accent fill behind an active row, cell, or region.",
-    ),
-    tint: _alpha(
-      "Tint",
-      "A stronger accent fill, such as the head of a glyph or a selected chip.",
-    ),
-    ghost: _alpha(
-      "Ghost",
-      "Shapes that remain as a trace: a removed item, a past position.",
-    ),
-    dimmed: _alpha("Dimmed", "Shapes stepped back while another is the point."),
-    guide: _alpha(
-      "Guide",
-      "Construction marks and guides that should read under the content.",
-    ),
-    washScale: _multiplier(
-      "Tint strength",
-      "Multiplies wash and tint fills behind active items. 1 draws them as authored.",
-      { min: 0, max: 2, step: 0.05 },
-    ),
+    wash: _alpha({
+      label: "Wash",
+      description:
+        "The faint accent fill behind an active row, cell, or region.",
+    }),
+    tint: _alpha({
+      label: "Tint",
+      description:
+        "A stronger accent fill, such as the head of a glyph or a selected chip.",
+    }),
+    ghost: _alpha({
+      label: "Ghost",
+      description:
+        "Shapes that remain as a trace: a removed item, a past position.",
+    }),
+    dimmed: _alpha({
+      label: "Dimmed",
+      description: "Shapes stepped back while another is the point.",
+    }),
+    guide: _alpha({
+      label: "Guide",
+      description:
+        "Construction marks and guides that should read under the content.",
+    }),
+    washScale: _multiplier({
+      label: "Tint strength",
+      description:
+        "Multiplies wash and tint fills behind active items. 1 draws them as authored.",
+      range: { min: 0, max: 2, step: 0.05 },
+    }),
   },
   dash: {
     guide: token({
@@ -193,11 +205,12 @@ export const SEMANTIC_TOKENS = {
       description:
         "The cast shadow under a tilted window. Its colour is the scene shadow, or the scene background at 60% when that is unset.",
     }),
-    strength: _multiplier(
-      "Shadow intensity",
-      "Multiplies the opacity of every shadow. 0 removes shadows and 1 draws them as authored.",
-      { min: 0, max: 2, step: 0.05 },
-    ),
+    strength: _multiplier({
+      label: "Shadow intensity",
+      description:
+        "Multiplies the opacity of every shadow. 0 removes shadows and 1 draws them as authored.",
+      range: { min: 0, max: 2, step: 0.05 },
+    }),
   },
   effect: {
     halo: token({
@@ -330,10 +343,11 @@ export const SEMANTIC_TOKENS = {
       description:
         "Peak blur of a spatial transition at full strength and a 180 degree shutter.",
     }),
-    strength: _multiplier(
-      "Motion blur strength",
-      "Multiplies camera and transition motion blur. 0 turns it off.",
-      { min: 0, max: 2, step: 0.05 },
-    ),
+    strength: _multiplier({
+      label: "Motion blur strength",
+      description:
+        "Multiplies camera and transition motion blur. 0 turns it off.",
+      range: { min: 0, max: 2, step: 0.05 },
+    }),
   },
 } as const;

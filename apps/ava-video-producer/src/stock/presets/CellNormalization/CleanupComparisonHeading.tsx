@@ -1,5 +1,5 @@
 import { ramp } from "../../../motion";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CleanupLaneHeading } from "./CleanupLaneHeading";
 import {
   EXPLANATION_CUE,
@@ -19,7 +19,7 @@ export function CleanupComparisonHeading({
   input,
   frame,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const inline = input.comparison === "inline-ghost";
   if (inline && !input.showEditLabels) {
     return undefined;

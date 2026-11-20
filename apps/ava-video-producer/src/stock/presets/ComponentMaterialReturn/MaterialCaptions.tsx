@@ -1,4 +1,4 @@
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ROUTE_CATEGORY_KEYS } from "./routeColors";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./ComponentMaterialReturn.schema";
@@ -9,7 +9,7 @@ type Props = { input: Input };
  * Stable captions and route swatches remain above the complete handling path.
  */
 export function MaterialCaptions({ input }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const captions = [
     { text: input.copy.returned, x: 50, y: 70, width: 270 },
     { text: input.copy.output, x: 420, y: 70, width: 280 },

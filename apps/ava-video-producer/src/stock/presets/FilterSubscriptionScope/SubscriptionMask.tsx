@@ -1,8 +1,5 @@
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -13,7 +10,6 @@ type Props = {
   progress: number;
   showExcludedRecords: boolean;
 };
-
 /** The exclusion sweep disappears with hidden excluded records. */
 export function SubscriptionMask({
   id,
@@ -23,8 +19,8 @@ export function SubscriptionMask({
   progress,
   showExcludedRecords,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const tokens = useGraphicTokens();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <StockRect
       data-excluded-mask={id}

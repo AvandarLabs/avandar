@@ -29,16 +29,6 @@ type SowingHandArgs = Readonly<{
   lossEnd: Point;
   motion: VideoMotion;
 }>;
-
-/** The hand drawing the furrow across the plot. */
-function _getFurrowHand(frame: number, motion: VideoMotion): Hand {
-  return {
-    x: 738 + 180 * motion.ramp(frame, 108, motion.whip, motion.entrance.easing),
-    y: 399,
-    action: "furrow",
-  };
-}
-
 function _getSowingHand({
   scene,
   frame,
@@ -60,7 +50,13 @@ function _getSowingHand({
     });
   }
   if (frame <= 116) {
-    return _getFurrowHand(frame, motion);
+    return {
+      x:
+        738 +
+        180 * motion.ramp(frame, 108, motion.whip, motion.entrance.easing),
+      y: 399,
+      action: "furrow",
+    };
   }
   if (frame < 124) {
     return _travel({

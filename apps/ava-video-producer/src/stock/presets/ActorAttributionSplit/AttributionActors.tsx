@@ -2,18 +2,13 @@ import { propEq } from "@avandar/utils";
 import { mix, ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { AttributionCollaborator } from "./AttributionCollaborator";
 import { STAMP_CORNER } from "./attributionShape";
 import type { Input } from "./ActorAttributionSplit.schema";
 import type { ReactNode } from "react";
 
 type Props = { frame: number; input: Input; accent: string };
-
 /** Frames the shared stamp takes to drop away as accounts separate. */
 const SEPARATION_FRAMES = 34;
 /** Supplied collaborators, the retired shared stamp and distinct new stamps. */
@@ -22,9 +17,9 @@ export function AttributionActors({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const separation = ramp(
     frame,
     61,

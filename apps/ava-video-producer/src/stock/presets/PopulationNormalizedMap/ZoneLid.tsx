@@ -1,8 +1,5 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicTokens,
-  useGraphicMotion,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getZoneShadeFromInputAndFrame } from "./getZoneShadeFromInputAndFrame";
 import { ZoneGround } from "./ZoneGround";
 import { ZoneSurface } from "./ZoneSurface";
@@ -28,8 +25,8 @@ export function ZoneLid({
   accent,
   lift,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
-  const tokens = useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const points = zone.polygon
     .map(([x, y]) => {
       return `${55 + x * 5},${180 + y * 2.5}`;

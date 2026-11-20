@@ -1,5 +1,5 @@
 import { mix } from "../../motion";
-import { getClassicStageMotion } from "../stageTheme/stageTheme";
+import { StageTheme } from "../StageTheme/StageTheme";
 import { assertFrame, assertUnit, type Point, type Rect } from "./geometry";
 import { fitTextLines } from "./textLayout";
 import type { VideoMotion } from "../../videoTheme/createVideoMotion/createVideoMotion";
@@ -10,6 +10,25 @@ import type {
   TraversalBeat,
 } from "../scenes.types";
 
+type GetPacketPositionsOptions = {
+  frame: number;
+  packets: readonly GraphPacket[];
+  start: Point;
+  end: Point;
+  motion?: VideoMotion;
+};
+type NodeHighlightOptions = {
+  frame: number;
+  nodeId: string;
+  traversal: TraversalBeat[];
+  motion?: VideoMotion;
+};
+type EdgeHighlightOptions = {
+  frame: number;
+  edge: GraphEdge;
+  traversal: TraversalBeat[];
+  motion?: VideoMotion;
+};
 export function validateGraph(
   nodes: GraphNode[],
   edges: GraphEdge[],
@@ -43,7 +62,6 @@ export function validateGraph(
       throw new Error("Traversal frames must be strictly increasing");
   });
 }
-
 /**
  * Normalized centers map inside a safe inset so edge nodes remain on canvas.
  */
@@ -79,11 +97,9 @@ export function graphNodeRect(node: GraphNode, bounds: Rect): Rect {
     height,
   };
 }
-
 export function rectCenter(rect: Rect): Point {
   return { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
 }
-
 /** Ray/rectangle intersection keeps every connector out of the node text. */
 export function edgeEndpoints(
   from: Rect,
@@ -104,12 +120,10 @@ export function edgeEndpoints(
   };
   return { start: intersect(from, a, dx, dy), end: intersect(to, b, -dx, -dy) };
 }
-
 /** Vertical space a node reserves per list item, in pixels. */
 export const GRAPH_ITEM_PITCH = 34;
 /** Space between a node's heading and its first list item, in pixels. */
 export const GRAPH_ITEM_GAP = 14;
-
 /**
  * Connector endpoints for one of several parallel edges between the same
  * two cards: `offset` from -1 to 1 shifts the edge sideways by up to half
@@ -128,33 +142,27 @@ export function offsetEdgeEndpoints(
   const shiftX = (-(b.y - a.y) / length) * reach;
   const shiftY = ((b.x - a.x) / length) * reach;
   const shift = (rect: Rect) => {
-    return {
-      ...rect,
-      x: rect.x + shiftX,
-      y: rect.y + shiftY,
-    };
+    return { ...rect, x: rect.x + shiftX, y: rect.y + shiftY };
   };
   return edgeEndpoints(shift(from), shift(to));
 }
-
 /** A dot travelling an edge during its own window of frames. */
 export type GraphPacket = {
   atFrame: number;
   durationInFrames: number;
   direction?: "forward" | "reverse";
 };
-
 /**
  * Where each packet currently travelling an edge is, for example a request
  * moving between two services. Packets outside their window are omitted.
  */
-export function getPacketPositions(
-  frame: number,
-  packets: readonly GraphPacket[],
-  start: Point,
-  end: Point,
-  motion: VideoMotion = getClassicStageMotion(),
-): Point[] {
+export function getPacketPositions({
+  frame,
+  packets,
+  start,
+  end,
+  motion = StageTheme.getClassicStageMotion(),
+}: Readonly<GetPacketPositionsOptions>): Point[] {
   return packets
     .filter((packet) => {
       return (
@@ -173,7 +181,6 @@ export function getPacketPositions(
       return { x: mix(along, start.x, end.x), y: mix(along, start.y, end.y) };
     });
 }
-
 /** A serpentine grid keeps a simple sequential process connected locally. */
 export function flowNodes(steps: FlowStep[]): GraphNode[] {
   if (!steps.length || steps.length > 6)
@@ -190,17 +197,16 @@ export function flowNodes(steps: FlowStep[]): GraphNode[] {
     };
   });
 }
-
 /**
  * How lit a node is, 0 to 1: it lights over the chip duration when the
  * traversal reaches it and dims as the traversal moves on.
  */
-export function nodeHighlight(
-  frame: number,
-  nodeId: string,
-  traversal: TraversalBeat[],
-  motion: VideoMotion = getClassicStageMotion(),
-): number {
+export function nodeHighlight({
+  frame,
+  nodeId,
+  traversal,
+  motion = StageTheme.getClassicStageMotion(),
+}: Readonly<NodeHighlightOptions>): number {
   const easing = motion.reveal.easing;
   return Math.max(
     0,
@@ -220,17 +226,16 @@ export function nodeHighlight(
     }),
   );
 }
-
 /**
  * How far the traversal has drawn along an edge, 0 to 1, over the sheet
  * duration once it moves from the edge's source to its target.
  */
-export function edgeHighlight(
-  frame: number,
-  edge: GraphEdge,
-  traversal: TraversalBeat[],
-  motion: VideoMotion = getClassicStageMotion(),
-): number {
+export function edgeHighlight({
+  frame,
+  edge,
+  traversal,
+  motion = StageTheme.getClassicStageMotion(),
+}: Readonly<EdgeHighlightOptions>): number {
   let amount = 0;
   traversal.forEach((beat, index) => {
     if (

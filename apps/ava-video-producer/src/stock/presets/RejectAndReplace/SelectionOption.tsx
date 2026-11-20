@@ -1,12 +1,8 @@
 import { mix } from "../../../motion";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SelectionCopy } from "./SelectionCopy";
-import { SelectionMarker } from "./SelectionMarker";
+import { SelectionMarker } from "./SelectionMarker/SelectionMarker";
 import type { Input } from "./RejectAndReplace.schema";
 import type { ReactNode } from "react";
 
@@ -25,9 +21,9 @@ export function SelectionOption({
   accent,
   isReplacement,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const move = motion.ramp(frame, 48, motion.scale(30), motion.travel.easing);
   const entry = motion.ramp(
     frame,

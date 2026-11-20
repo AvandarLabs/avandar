@@ -6,16 +6,12 @@ import { Eyebrow } from "../graphics-common/Eyebrow";
 import { Route } from "../graphics-common/Route";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
 import { TraversalRouteSummary } from "../presets/NodeTraversal/TraversalRouteSummary/TraversalRouteSummary";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { GraphicProps } from "../graphics-common/graphicCommon.types";
 import type { NodeTraversalInput } from "../presets/NodeTraversal/NodeTraversal.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: NodeTraversalInput };
-
 const ROUTE_CUE = 24;
 const ROUTE_DRAW_FRAMES = 106;
 /**
@@ -27,19 +23,17 @@ const ROUTE_SETTLED_AT = 150;
 const EDGE_CUE = 14;
 const ROUTE_LINE_CUE = 25;
 const CAPTION_CUE = 80;
-
 function _clampUnit(value: number): number {
   return Math.min(1, Math.max(0, value));
 }
-
 /** Draws the bounded authored node-traversal study at an explicit frame. */
 export function NodeTraversal({
   input,
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { color } = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const { color } = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const { nodes, edges, route } = input;
   const progress =
     motion.ramp(

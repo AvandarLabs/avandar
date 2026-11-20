@@ -1,9 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { LocalCountValue } from "./LocalCountValue";
 import { ThresholdShutter } from "./ThresholdShutter";
 import type { Input } from "./MinimumCountMapSuppression.schema";
@@ -24,8 +21,8 @@ export function LocalAggregateCell({
   showLocalCounts,
   frame,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const x = 40 + (index % 2) * 190;
   const y = 170 + Math.floor(index / 2) * 100;
   return (

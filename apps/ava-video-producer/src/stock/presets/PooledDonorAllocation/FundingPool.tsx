@@ -1,12 +1,8 @@
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { getAllocationTokensFromInputAndFrame } from "./getAllocationTokensFromInputAndFrame";
 import type { Input } from "./PooledDonorAllocation.schema";
 import type { ReactNode } from "react";
-
 /** The funding pool's tint, before the theme's tint strength. */
 const POOL_TINT = 0.025;
 type Props = {
@@ -14,15 +10,14 @@ type Props = {
   tokens: ReturnType<typeof getAllocationTokensFromInputAndFrame>;
   accent: string;
 };
-
 /** The transparent pool counts only physically present, unallocated credits. */
 export function FundingPool({
   input,
   tokens,
   accent,
 }: Readonly<Props>): ReactNode {
-  const graphicTokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const graphicTokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const remaining = tokens.filter(({ owner }) => {
     return owner === "pool";
   }).length;

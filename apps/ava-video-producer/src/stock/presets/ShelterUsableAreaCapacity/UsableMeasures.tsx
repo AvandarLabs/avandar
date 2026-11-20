@@ -1,5 +1,5 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getCapacityFromFloorTiles } from "./getCapacityFromFloorTiles";
 import type { Input } from "./ShelterUsableAreaCapacity.schema";
 import type { ReactNode } from "react";
@@ -9,7 +9,7 @@ type Props = { input: Input; frame: number };
  * Usable-area labels appear after the tiles have cleared their travel region.
  */
 export function UsableMeasures({ input, frame }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const { usable } = getCapacityFromFloorTiles(input);
   return (
     <g data-usable-measures="" opacity={motion.reveal(frame, 108)}>

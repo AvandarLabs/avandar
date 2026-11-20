@@ -1,16 +1,10 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { makeDetailSimplificationFromInput } from "./makeDetailSimplificationFromInput";
 import type { Input } from "./GeometryDetailBudget.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number };
-
 const GUIDES_AT = 111;
 const GUIDES_FRAMES = 28;
 /** Each removed point is paired with its own finite retained segment. */
@@ -18,10 +12,10 @@ export function RemovedDeviationGuides({
   input,
   frame,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const { color, stroke, sketch } = useGraphicTokens();
-  const shapes = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const { color, stroke, sketch } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const { removed } = makeDetailSimplificationFromInput(input);
   return (
     <g>

@@ -4,23 +4,17 @@ import { Eyebrow } from "../graphics-common/Eyebrow";
 import { Text } from "../graphics-common/Text";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
 import { SketchedShape } from "../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { GraphicProps } from "../graphics-common/graphicCommon.types";
 import type { WordRevealInput } from "../presets/WordReveal/WordReveal.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: WordRevealInput };
-
 const ARROW_AT = 51;
 const RULE_AT = 62;
 const NOTES_AT = 73;
 /** How far below its mask a word starts, in multiples of its size. */
 const WORD_DROP = 1.12;
-
 /** Draws the bounded authored word-reveal study at an explicit frame. */
 export function WordReveal({
   input,
@@ -28,9 +22,9 @@ export function WordReveal({
   accent,
   id,
 }: Readonly<Props>): ReactNode {
-  const { color, stroke, sketch } = useGraphicTokens();
-  const shapes = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const { color, stroke, sketch } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const words = input.words.map((word, index) => {
     return {
       ...word,

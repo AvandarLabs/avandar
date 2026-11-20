@@ -32,7 +32,7 @@ async function _createWatchFixture(root: string) {
     "src/scenes",
     "src/storyboard",
     "src/chrome",
-    "src/cursor-motion.ts",
+    "src/CursorMotionHelpers.ts",
     "src/fonts.ts",
     "src/videoTheme",
     "src/videoThemeEditor",
@@ -45,12 +45,8 @@ async function _createWatchFixture(root: string) {
   await Promise.all(
     files.map(async (filename) => {
       const target = path.join(root, filename);
-      await fs.mkdir(path.dirname(target), {
-        recursive: true,
-      });
-      await fs.cp(filename, target, {
-        recursive: true,
-      });
+      await fs.mkdir(path.dirname(target), { recursive: true });
+      await fs.cp(filename, target, { recursive: true });
     }),
   );
   await fs.writeFile(
@@ -60,11 +56,7 @@ async function _createWatchFixture(root: string) {
 }
 test("actual buildAtlas watch refreshes edited stock defaults once without a restart or rebuild loop", async () => {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), "atlas-copy-watch-"));
-  let watcher:
-    | {
-        dispose: () => Promise<void>;
-      }
-    | undefined;
+  let watcher: { dispose: () => Promise<void> } | undefined;
   try {
     await _createWatchFixture(root);
     const { buildAtlas } = await import(
@@ -97,9 +89,7 @@ test("actual buildAtlas watch refreshes edited stock defaults once without a res
     );
     await Promise.race([
       completed,
-      pause(15000, undefined, {
-        ref: false,
-      }).then(() => {
+      pause(15000, undefined, { ref: false }).then(() => {
         throw new Error("Gallery watch did not rebuild");
       }),
     ]);
@@ -112,19 +102,14 @@ test("actual buildAtlas watch refreshes edited stock defaults once without a res
     const refreshed = await buildStockContracts(root);
     assert.equal(
       (
-        refreshed.stockRequestSchema.parse({
-          preset: "decision-fork",
-        }).input as {
-          prompt: string;
-        }
+        refreshed.stockRequestSchema.parse({ preset: "decision-fork" })
+          .input as { prompt: string }
       ).prompt,
       "Fresh copy through the actual watcher",
     );
     assert.equal(
       (
-        first.stockRequestSchema.parse({
-          preset: "decision-fork",
-        }).input as {
+        first.stockRequestSchema.parse({ preset: "decision-fork" }).input as {
           prompt: string;
         }
       ).prompt,
@@ -140,9 +125,6 @@ test("actual buildAtlas watch refreshes edited stock defaults once without a res
     await release();
   } finally {
     await watcher?.dispose();
-    await fs.rm(root, {
-      recursive: true,
-      force: true,
-    });
+    await fs.rm(root, { recursive: true, force: true });
   }
 });

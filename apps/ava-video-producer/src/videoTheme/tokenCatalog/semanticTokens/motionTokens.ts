@@ -11,11 +11,9 @@ function _duration(label: string, description: string) {
     description,
   });
 }
-
 function _motionStep(label: string, description: string) {
   return token({ kind: "motionStep", label, description });
 }
-
 function _stagger(label: string, description: string) {
   return token({
     kind: "number",
@@ -27,8 +25,10 @@ function _stagger(label: string, description: string) {
     description,
   });
 }
-
-function _loopFade(label: string, description: string) {
+function _loopFade({
+  label,
+  description,
+}: Readonly<{ label: string; description: string }>) {
   return token({
     kind: "duration",
     unit: "frames",
@@ -39,8 +39,11 @@ function _loopFade(label: string, description: string) {
     description,
   });
 }
-
-function _multiplier(label: string, description: string, max: number) {
+function _multiplier({
+  label,
+  description,
+  max,
+}: Readonly<{ label: string; description: string; max: number }>) {
   return token({
     kind: "number",
     unit: "×",
@@ -51,7 +54,6 @@ function _multiplier(label: string, description: string, max: number) {
     description,
   });
 }
-
 /** The curve families `motion.easingProfile` chooses between. */
 export const EASING_PROFILE_OPTIONS = [
   "authored",
@@ -59,7 +61,6 @@ export const EASING_PROFILE_OPTIONS = [
   "snappy",
   "gentle",
 ] as const;
-
 /** What the themed `enter()` animates besides opacity. */
 export const ENTRANCE_STYLE_OPTIONS = [
   "rise",
@@ -67,7 +68,6 @@ export const ENTRANCE_STYLE_OPTIONS = [
   "scale",
   "none",
 ] as const;
-
 /** Semantic motion timing: durations, steps, and staggers. */
 export const MOTION_TOKENS = {
   tempo: token({
@@ -135,14 +135,16 @@ export const MOTION_TOKENS = {
     "The curve of a dissolve between shots and of a loop fading to its ground.",
   ),
   loopFade: {
-    graphic: _loopFade(
-      "Graphic loop fade",
-      "Frames a stock graphic takes to fade from and back to its ground at each end of its loop. Tempo never changes it.",
-    ),
-    film: _loopFade(
-      "Film loop fade",
-      "Frames a looping film takes to fade from and back to its ground. Tempo never changes it.",
-    ),
+    graphic: _loopFade({
+      label: "Graphic loop fade",
+      description:
+        "Frames a stock graphic takes to fade from and back to its ground at each end of its loop. Tempo never changes it.",
+    }),
+    film: _loopFade({
+      label: "Film loop fade",
+      description:
+        "Frames a looping film takes to fade from and back to its ground. Tempo never changes it.",
+    }),
   },
   pressDepth: token({
     kind: "number",
@@ -188,11 +190,12 @@ export const MOTION_TOKENS = {
       description: "The curve of the gentle easing family.",
     }),
   },
-  staggerScale: _multiplier(
-    "Stagger",
-    "Multiplies every stagger, so siblings arrive tighter or looser. 1 keeps them as authored.",
-    3,
-  ),
+  staggerScale: _multiplier({
+    label: "Stagger",
+    description:
+      "Multiplies every stagger, so siblings arrive tighter or looser. 1 keeps them as authored.",
+    max: 3,
+  }),
   entranceStyle: token({
     kind: "enum",
     options: ENTRANCE_STYLE_OPTIONS,

@@ -1,9 +1,5 @@
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicProps,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CacheColumn } from "./CacheColumn";
 import type { getCacheSceneFromFrame } from "./getCacheSceneFromFrame";
 import type { Input } from "./QueryColumnCacheGrowth.schema";
@@ -25,9 +21,9 @@ export function CachedRelation({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const style = useGraphicProps("QueryColumnCacheGrowth", {});
-  const scales = useGraphicShapeScales();
-  const { color } = useGraphicTokens();
+  const style = GraphicThemeHooks.useGraphicProps("QueryColumnCacheGrowth", {});
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const { color } = GraphicThemeHooks.useGraphicTokens();
   const columns = frame < 106 ? scene.original : scene.union;
   return (
     <g>

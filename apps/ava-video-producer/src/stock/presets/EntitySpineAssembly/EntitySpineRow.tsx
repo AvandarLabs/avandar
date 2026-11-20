@@ -2,11 +2,7 @@ import { mix, ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./EntitySpineAssembly.schema";
 import type { ReactNode } from "react";
 
@@ -17,7 +13,6 @@ type Props = {
   frame: number;
   accent: string;
 };
-
 /** Frames the spine rows take to slide into their column. */
 const ALIGN_FRAMES = 35;
 /** A spine row's corner before the corner style scales it. */
@@ -30,9 +25,9 @@ export function EntitySpineRow({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const rows = input.observations.filter(({ entityId }) => {
     return entityId === entity.id;
   });

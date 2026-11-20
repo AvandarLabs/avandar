@@ -1,5 +1,5 @@
 import { mix } from "../../../motion";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ExpenseAmounts } from "./ExpenseAmounts";
 import { ExpenseObject } from "./ExpenseObject";
 import type { Input } from "./SchoolCostSatchel.schema";
@@ -24,7 +24,7 @@ export function SatchelExpense({
   accent,
   showShares,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const travel = motion.ramp(
     frame,
     38 + index * motion.scaleStagger(9),

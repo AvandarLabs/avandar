@@ -1,5 +1,5 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import {
   ledgerMessage,
   headingMessages,
@@ -8,7 +8,6 @@ import type { Input } from "./WideTableToObservations.schema";
 import type { ReactNode } from "react";
 /** Inputs for WideLedgerCaptions. */
 type Props = { input: Input; frame: number };
-
 /**
  * Explicit long-table headings and a persistent missing-cell omission ledger.
  */
@@ -16,7 +15,7 @@ export function WideLedgerCaptions({
   input,
   frame,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const omitted = _countOmittedCells(input);
   const resultHeading = frame < 111 ? input.copy.source : input.copy.result;
   const omissionCaption = `${ledgerMessage.message}: ${omitted}`;
@@ -48,7 +47,6 @@ export function WideLedgerCaptions({
     </g>
   );
 }
-
 /** How many missing cells the ledger records as omitted. */
 function _countOmittedCells(input: Input): number {
   if (input.missingPolicy !== "omit-with-ledger") {

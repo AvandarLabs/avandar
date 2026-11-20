@@ -1,5 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./ReportPageBind.schema";
 import type { ReactNode, ComponentProps } from "react";
 
@@ -18,7 +18,7 @@ export function ReportPageCopy({
   margins,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const labels: Array<ComponentProps<typeof FitText>> = [
     {
       text: section.heading,

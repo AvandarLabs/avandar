@@ -1,9 +1,5 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./DistanceBufferEnvelope.schema";
 import type { ReactNode } from "react";
 
@@ -12,16 +8,15 @@ type Props = {
   location: Input["locations"][number];
   accent: string;
 };
-
 /** Source geometry remains fixed regardless of the chosen radius. */
 export function BufferSourceMarker({
   input,
   location,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const { color, stroke, sketch } = useGraphicTokens();
-  const shapes = useGraphicShapeScales();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const { color, stroke, sketch } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
   const hairline = shapes.stroke(stroke.hairline);
   const center = { cx: 48 + location.x * 3.6, cy: 190 + location.y * 3.6 };
   const distance = Math.hypot(

@@ -1,10 +1,6 @@
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-  useGraphicMotion,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getCultivatorHandFromFrame } from "./getCultivatorHandFromFrame";
 import type { getSeedSceneFromFrame } from "./getSeedSceneFromFrame";
 import type { Input } from "./SavedSeedSeasonReturn.schema";
@@ -25,9 +21,9 @@ export function SeedCultivator({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const hand = getCultivatorHandFromFrame({ scene, frame, motion });
   return (
     <g data-cultivator={input.cultivator.mode}>

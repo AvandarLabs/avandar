@@ -9,19 +9,22 @@ import type { ReactNode } from "react";
 /** The caret: a bar as tall as the typed line, beside it. */
 const CARET = { width: 2, height: 28 };
 
-/** The prompt field phase: a text field gaining focus, filling with the
- *  query, and a Run button answering the click. */
+type PromptFieldOptions = {
+  frame: number;
+  focus: number;
+  text: string;
+  typing: boolean;
+};
+/**
+ * The prompt field phase: a text field gaining focus, filling with the
+ * query, and a Run button answering the click.
+ */
 export function PromptField({
   frame,
   focus,
   text,
   typing,
-}: {
-  frame: number;
-  focus: number;
-  text: string;
-  typing: boolean;
-}): ReactNode {
+}: PromptFieldOptions): ReactNode {
   const theme = useVideoTheme();
   const { semantic, mantine, atomic } = theme;
   const scene = semantic.color.scene;

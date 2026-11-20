@@ -1,3 +1,3 @@
 export { CodeFocus } from "./CodeFocus/CodeFocus";
 export { TerminalType } from "./TerminalType";
-export { ScanLines } from "./ScanLines";
+export { ScanLines } from "./ScanLines/ScanLines";

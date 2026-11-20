@@ -1,18 +1,14 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 /** Inputs for SetbackHatch. */
 type Props = { hatchId: string };
-
 /**
  * The retained perimeter band distinguishes clearance from occupied footprint.
  */
 export function SetbackHatch({ hatchId }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const tokens = useGraphicTokens();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <defs>
       <pattern id={hatchId} width={8} height={8} patternUnits="userSpaceOnUse">

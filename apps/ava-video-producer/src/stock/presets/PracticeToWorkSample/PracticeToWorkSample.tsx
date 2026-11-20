@@ -1,12 +1,11 @@
 import { MeasuringLearner } from "./MeasuringLearner";
-import { PracticeFurniture } from "./PracticeFurniture";
+import { PracticeFurniture } from "./PracticeFurniture/PracticeFurniture";
 import { PracticeLabels } from "./PracticeLabels";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./PracticeToWorkSample.schema";
 import type { ReactNode } from "react";
 /** Inputs for PracticeToWorkSample. */
 type Props = GraphicProps & { input: Input };
-
 /** One learner repeats the same measured action on a selected work material. */
 export function PracticeToWorkSample({
   frame,

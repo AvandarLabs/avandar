@@ -1,15 +1,11 @@
 import { Text } from "../../../graphics-common/Text";
 import { getConservativeWidthFromText } from "../../../text/getConservativeWidthFromText";
-import {
-  useGraphicProps,
-  useGraphicTokens,
-} from "../../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 const GRAPHEME_SEGMENTER: Intl.Segmenter = new Intl.Segmenter(undefined, {
   granularity: "grapheme",
 });
-
 type Props = {
   text: string;
   x: number;
@@ -23,7 +19,6 @@ type Props = {
   width?: number;
   fill?: string;
 };
-
 function _append({ lines, text, width, size }: AppendOptions): string[] {
   const candidate = `${lines.at(-1) ?? ""}${text}`;
   return lines.length &&
@@ -34,7 +29,6 @@ function _append({ lines, text, width, size }: AppendOptions): string[] {
     ? [...lines.slice(0, -1), candidate]
     : [...lines, text];
 }
-
 function _wrap({
   text,
   width,
@@ -42,10 +36,8 @@ function _wrap({
 }: Readonly<{ text: string; width: number; fontSize: number }>): string[] {
   const tokens = text.match(/\S+\s*|\s+/g) ?? [""];
   return tokens.reduce<string[]>((result, token) => {
-    return getConservativeWidthFromText({
-      text: token.trimEnd(),
-      fontSize,
-    }) > width
+    return getConservativeWidthFromText({ text: token.trimEnd(), fontSize }) >
+      width
       ? Array.from(GRAPHEME_SEGMENTER.segment(token)).reduce(
           (chunks, { segment }) => {
             return _append({
@@ -60,7 +52,6 @@ function _wrap({
       : _append({ lines: result, text: token, width, size: fontSize });
   }, []);
 }
-
 /** Stable, bounded SVG lines preserve every authored character. */
 export function ForkLabel({
   text,
@@ -71,9 +62,9 @@ export function ForkLabel({
   width = 168,
   fill,
 }: Readonly<Props>): ReactNode {
-  const roleStyle = useGraphicTokens().text.graphic[role];
+  const roleStyle = GraphicThemeHooks.useGraphicTokens().text.graphic[role];
   const fontSize = size ?? roleStyle.fontSize;
-  const { lineGap } = useGraphicProps("DecisionFork", {});
+  const { lineGap } = GraphicThemeHooks.useGraphicProps("DecisionFork", {});
   const lines = _wrap({ text, width, fontSize });
   return (
     <g aria-label={text}>

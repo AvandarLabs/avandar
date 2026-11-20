@@ -1,4 +1,4 @@
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = { value: string; x: number; y: number; color?: string };
@@ -22,7 +22,7 @@ export function LiteralDataText({
   y,
   color,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const data = tokens.text.graphic.data;
   return (
     <text

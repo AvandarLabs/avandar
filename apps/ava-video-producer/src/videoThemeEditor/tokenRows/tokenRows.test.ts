@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { propEq } from "@avandar/utils";
 import {
   BUILT_IN_VIDEO_THEMES,
   createVideoThemeLibrary,
@@ -20,8 +21,8 @@ import {
   getEssentialRows,
   listEmptyAtomicScaleGroups,
   listTokenRows,
-  type TokenRow,
 } from "./tokenRows";
+import { type TokenRow } from "./tokenRows.types";
 import type { VideoThemeDocument } from "../../videoTheme/videoTheme.types";
 
 const STUDIO: VideoThemeDocument = {
@@ -39,7 +40,6 @@ const STUDIO: VideoThemeDocument = {
 };
 const LIBRARY = createVideoThemeLibrary([STUDIO]);
 const ITEM: ThemeEditScope = { kind: "item", itemId: "network-graph" };
-
 function _rows(
   scope: ThemeEditScope,
   draft: ThemeDraft = EMPTY_THEME_DRAFT,
@@ -62,13 +62,9 @@ function _rows(
     theme: resolved.theme,
   });
 }
-
 function _row(rows: readonly TokenRow[], path: string): TokenRow | undefined {
-  return rows.find((row) => {
-    return row.path === path;
-  });
+  return rows.find(propEq("path", path));
 }
-
 test("every catalog token gets a row, with one row per scale entry", () => {
   const rows = _rows({ kind: "theme" });
   for (const path of [
@@ -81,7 +77,6 @@ test("every catalog token gets a row, with one row per scale entry", () => {
   }
   assert.equal(_row(rows, "atomic.swatch"), undefined);
 });
-
 test("rows group by tier and first segment", () => {
   const rows = _rows({ kind: "theme" });
   assert.deepEqual(
@@ -101,7 +96,6 @@ test("rows group by tier and first segment", () => {
     ],
   );
 });
-
 test("item-scope rows tell draft edits from saved overrides", () => {
   const draft = setTokenInDraft({
     draft: EMPTY_THEME_DRAFT,
@@ -117,7 +111,6 @@ test("item-scope rows tell draft edits from saved overrides", () => {
     ["saved", "draft", "none"],
   );
 });
-
 test("on a built-in theme with a draft, item rows show no saved overrides", () => {
   const library = new Map<string, VideoThemeDocument>([
     ...BUILT_IN_VIDEO_THEMES,
@@ -162,7 +155,6 @@ test("on a built-in theme with a draft, item rows show no saved overrides", () =
   });
   assert.equal(_row(rows, "color.accent")?.overrideState, "none");
 });
-
 test("the used filter keeps atomic rows and drops unused semantic rows", () => {
   const filtered = filterTokenRows({
     rows: _rows({ kind: "theme" }),
@@ -175,23 +167,10 @@ test("the used filter keeps atomic rows and drops unused semantic rows", () => {
       },
     },
   });
-  assert.ok(
-    filtered.some((row) => {
-      return row.path === "color.accent";
-    }),
-  );
-  assert.ok(
-    filtered.some((row) => {
-      return row.path === "atomic.swatch.mint";
-    }),
-  );
-  assert.ok(
-    !filtered.some((row) => {
-      return row.path === "color.line";
-    }),
-  );
+  assert.ok(filtered.some(propEq("path", "color.accent")));
+  assert.ok(filtered.some(propEq("path", "atomic.swatch.mint")));
+  assert.ok(!filtered.some(propEq("path", "color.line")));
 });
-
 test("search matches a row's text or its path", () => {
   const filtered = filterTokenRows({
     rows: _rows({ kind: "theme" }),
@@ -210,7 +189,6 @@ test("search matches a row's text or its path", () => {
     ["corner.pill"],
   );
 });
-
 test("Essentials come out in their fixed order", () => {
   assert.deepEqual(
     getEssentialRows(_rows({ kind: "theme" })).map((row) => {
@@ -241,13 +219,10 @@ test("Essentials come out in their fixed order", () => {
     ],
   );
 });
-
 test("every Look and feel option starts at its identity value", () => {
   const rows = _rows({ kind: "theme" });
   const resolvedAt = (path: string) => {
-    return rows.find((row) => {
-      return row.path === path;
-    })?.resolved;
+    return rows.find(propEq("path", path))?.resolved;
   };
   assert.deepEqual(
     [
@@ -262,14 +237,12 @@ test("every Look and feel option starts at its identity value", () => {
     [1, 1, 1, 1, 1, "authored", "rise"],
   );
 });
-
 test("atomic scales with no entries still get a section", () => {
   assert.deepEqual(listEmptyAtomicScaleGroups(_rows({ kind: "theme" })), [
     "atomic:size",
     "atomic:textShadow",
   ]);
 });
-
 test("a row's issue is one at its path or inside it, never a sibling's", () => {
   const issues = [
     { path: "color.accentSoft", message: "sibling" },
@@ -288,7 +261,6 @@ test("a row's issue is one at its path or inside it, never a sibling's", () => {
     "sibling",
   );
 });
-
 test("a new scale value takes the first free custom key in its whole scale", () => {
   const draft = setTokenInDraft({
     draft: setTokenInDraft({
@@ -326,7 +298,6 @@ test("a new scale value takes the first free custom key in its whole scale", () 
     "custom1",
   );
 });
-
 test("a reference to a token that does not exist is a missing reference", () => {
   assert.deepEqual(
     describeRowIssue({
@@ -336,7 +307,6 @@ test("a reference to a token that does not exist is a missing reference", () => 
     { kind: "missingReference", reference: "$atomic.swatch.missingSwatch" },
   );
 });
-
 test("a reference cycle is reported as a loop", () => {
   assert.deepEqual(
     describeRowIssue({
@@ -346,14 +316,12 @@ test("a reference cycle is reported as a loop", () => {
     { kind: "loop" },
   );
 });
-
 test("any other resolver message is a general problem", () => {
   assert.deepEqual(
     describeRowIssue({ path: "stroke.default", message: "Expected a length" }),
     { kind: "other" },
   );
 });
-
 function _themeRowsWithItem(draft: ThemeDraft) {
   const input = { library: LIBRARY, themeId: "studio", draft };
   const themeResult = makeDraftThemeResultFromDraft({
@@ -373,7 +341,6 @@ function _themeRowsWithItem(draft: ThemeDraft) {
   });
   return { rows, itemTheme: itemResult.theme };
 }
-
 test("in theme scope, a row the previewed item overrides carries the item's own value", () => {
   const { rows, itemTheme } = _themeRowsWithItem(EMPTY_THEME_DRAFT);
   const accent = _row(rows, "color.accent");
@@ -385,7 +352,6 @@ test("in theme scope, a row the previewed item overrides carries the item's own 
   );
   assert.equal(_row(rows, "color.line")?.itemOverride, undefined);
 });
-
 test("in theme scope, an unsaved item edit also counts as the item's own value", () => {
   const draft = setTokenInDraft({
     draft: EMPTY_THEME_DRAFT,
@@ -396,7 +362,6 @@ test("in theme scope, an unsaved item edit also counts as the item's own value",
   const { rows } = _themeRowsWithItem(draft);
   assert.ok(_row(rows, "stroke.default")?.itemOverride);
 });
-
 test("item-scope rows never carry an item override, since their state says it", () => {
   assert.equal(
     _rows(ITEM).filter((row) => {

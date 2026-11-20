@@ -4,12 +4,16 @@ import test from "node:test";
 import { prop } from "@avandar/utils";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { ColdChainCustody } from "./ColdChainCustody";
+import { coldChainCustodyContract } from "./ColdChainCustody.contract";
 import {
   DEFAULT_INPUT,
   fixtures,
   invalidInputs,
 } from "./ColdChainCustody.fixtures";
+import { inputSchema, type Input } from "./ColdChainCustody.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 
 function _render({
@@ -34,12 +38,6 @@ test("Container IDs persist through every stop; missing acknowledgements, unknow
   assert.match(markup, /data-acknowledged="false"/);
   assert.match(markup, /data-seal="unknown"/);
 });
-
-import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
-import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
-import { coldChainCustodyContract } from "./ColdChainCustody.contract";
-import { inputSchema, type Input } from "./ColdChainCustody.schema";
-
 const textLayoutOptions = {
   inputSchema,
   fixtures,
@@ -86,11 +84,10 @@ registerStockPresetAssertions({
   contract: coldChainCustodyContract,
 });
 registerStockTextLayoutAssertions(textLayoutOptions);
-
 test("the same containers cross the three stops with independent final facts", () => {
   const input = fixtures[3].input;
   [32, 52, 72, 92, 116, 150].forEach((frame) => {
-    const markup = _render({ frame: frame, input: input });
+    const markup = _render({ frame, input });
     const containers = Array.from(
       markup.matchAll(
         /<g data-moving-container="([^"]*)" transform="translate\(([^ ]+) ([^)]+)\)"/g,
@@ -119,7 +116,7 @@ test("the same containers cross the three stops with independent final facts", (
       });
     }
   });
-  const markup = _render({ frame: 150, input: input });
+  const markup = _render({ frame: 150, input });
   assert.match(
     markup,
     /data-state="logged" data-acknowledged="false" data-seal="unknown" opacity="1"/,
@@ -143,7 +140,6 @@ test("the same containers cross the three stops with independent final facts", (
   assert.match(hidden, /data-ack="false"/);
   assert.match(hidden, /data-seal-mark="unknown"/);
 });
-
 test("empty references are accepted only for an existing unique empty stop", () => {
   const input = fixtures[1].input;
   assert.equal(input.stops[0].id, "");

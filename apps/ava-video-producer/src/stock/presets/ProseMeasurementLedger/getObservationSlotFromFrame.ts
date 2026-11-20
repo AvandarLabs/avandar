@@ -26,14 +26,12 @@ type GetObservationSlotFromFrameResult = {
   y: number;
   value: string;
 };
-
 type ObservationSlotArgs = Readonly<{
   input: Input;
   frame: number;
   index: number;
   motion: VideoMotion;
 }>;
-
 /**
  * Exact derived text travels through a clear rail before its destination
  * column.
@@ -46,13 +44,13 @@ export function getObservationSlotFromFrame({
 }: ObservationSlotArgs): GetObservationSlotFromFrameResult {
   const role = ROLES[index],
     fragment = input.fragments.find(propEq("role", role))!;
-  const origin = _findFragmentOrigin(input, fragment);
+  const origin = _findFragmentOrigin({ input, fragment });
   const departure = 56 + ((index + 3) % 6) * 8.5;
-  const { progress, alignment, descent } = _getTravelPhases(
+  const { progress, alignment, descent } = _getTravelPhases({
     frame,
     departure,
     motion,
-  );
+  });
   const slotX = 52 + (index % 3) * 294,
     slotY = 315 + Math.floor(index / 3) * 110;
   return {
@@ -72,12 +70,11 @@ export function getObservationSlotFromFrame({
       .trim(),
   };
 }
-
 /** The sentence glyph where a fragment's content starts. */
-function _findFragmentOrigin(
-  input: Input,
-  fragment: Input["fragments"][number],
-) {
+function _findFragmentOrigin({
+  input,
+  fragment,
+}: Readonly<{ input: Input; fragment: Input["fragments"][number] }>) {
   const fragmentIndex = input.fragments.indexOf(fragment),
     start =
       input.fragments.slice(0, fragmentIndex).reduce((total, item) => {
@@ -87,13 +84,12 @@ function _findFragmentOrigin(
     return glyph.end > start;
   })!;
 }
-
 /** The fragment's overall travel, its alignment, and its descent, 0 to 1. */
-function _getTravelPhases(
-  frame: number,
-  departure: number,
-  motion: VideoMotion,
-) {
+function _getTravelPhases({
+  frame,
+  departure,
+  motion,
+}: Readonly<{ frame: number; departure: number; motion: VideoMotion }>) {
   return {
     progress: motion.ramp(frame, departure, motion.whip, motion.travel.easing),
     alignment: motion.ramp(

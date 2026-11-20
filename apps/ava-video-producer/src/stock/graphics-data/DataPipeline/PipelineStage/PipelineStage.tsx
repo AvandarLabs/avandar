@@ -1,11 +1,8 @@
-import { Arrive } from "../../../graphics-common/Arrive";
+import { Arrive } from "../../../graphics-common/Arrive/Arrive";
 import { Panel } from "../../../graphics-common/Panel";
 import { Text } from "../../../graphics-common/Text";
 import { StockRect } from "../../../primitives/StockRect/StockRect";
-import {
-  useGraphicProps,
-  useGraphicShapeScales,
-} from "../../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import {
   ICON_OFFSET_X,
   STAGE_CUE,
@@ -19,7 +16,6 @@ import type { DataPipelineInput } from "../../../presets/DataPipeline/DataPipeli
 import type { ReactNode } from "react";
 
 type Stage = DataPipelineInput["stages"][number] & { x: number };
-
 type Props = Readonly<{
   stage: Stage;
   index: number;
@@ -27,7 +23,6 @@ type Props = Readonly<{
   accent: string;
   active: number;
 }>;
-
 /** One stage panel: its active tint, number, icon, title, and note. */
 export function PipelineStage({
   stage,
@@ -36,9 +31,9 @@ export function PipelineStage({
   accent,
   active,
 }: Props): ReactNode {
-  const style = useGraphicProps("DataPipeline", {});
-  const panel = useGraphicProps("Panel", {});
-  const shapes = useGraphicShapeScales();
+  const style = GraphicThemeHooks.useGraphicProps("DataPipeline", {});
+  const panel = GraphicThemeHooks.useGraphicProps("Panel", {});
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
   const iconX = stage.x + ICON_OFFSET_X;
   return (
     <Arrive frame={frame} index={index} at={STAGE_CUE}>

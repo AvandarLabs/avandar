@@ -1,8 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./SharedFoundation.schema";
 import type { ReactNode } from "react";
 /** Inputs for ApproachTrait. */
@@ -13,7 +10,6 @@ type Props = {
   x: number;
   showTrait: boolean;
 };
-
 /** A distinguishing trait stays attached to its approach during the reveal. */
 export function ApproachTrait({
   frame,
@@ -22,8 +18,8 @@ export function ApproachTrait({
   x,
   showTrait,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <>
       <g

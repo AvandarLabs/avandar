@@ -1,18 +1,25 @@
-import { ContinuityScene } from "../../continuity/ContinuityScene";
+import { ContinuityScene } from "../../continuity/ContinuityScene/ContinuityScene";
 import { BarComparisonScene } from "../../scenes/BarComparisonScene/BarComparisonScene";
 import { BrandLockupScene } from "../../scenes/BrandLockupScene/BrandLockupScene";
 import { FlowchartScene } from "../../scenes/FlowchartScene";
-import { GraphScene } from "../../scenes/GraphScene";
+import { GraphScene } from "../../scenes/GraphScene/GraphScene";
 import { MediaScene } from "../../scenes/MediaScene";
 import { MetricScene } from "../../scenes/MetricScene";
 import { StockScene } from "../../scenes/StockScene";
 import { TiltedWindowScene } from "../../scenes/TiltedWindowScene/TiltedWindowScene";
-import { TypographyScene } from "../../scenes/TypographyScene";
-import { TitleCard } from "../../title-card";
+import { TypographyScene } from "../../scenes/TypographyScene/TypographyScene";
+import { TitleCard } from "../../TitleCard/TitleCard";
 import type { ProductSegment } from "../../continuity/continuitySchema";
 import type { Shot } from "../schema/schema";
 import type { ReactNode } from "react";
 
+type Props = {
+  shot: Shot;
+  frame: number;
+  width: number;
+  height: number;
+  productScene?: ProductSceneRenderer;
+};
 /** All registered scene inputs are checked by the same storyboard schema. */
 export type ProductSceneRenderer = (
   props: Pick<ProductSegment, "feature" | "mode"> & { fromFrame?: number } & {
@@ -21,7 +28,6 @@ export type ProductSceneRenderer = (
     height: number;
   },
 ) => ReactNode;
-
 /** Renders a single shot by dispatching on its scene kind. */
 export function ShotView({
   shot,
@@ -29,13 +35,7 @@ export function ShotView({
   width,
   height,
   productScene,
-}: {
-  shot: Shot;
-  frame: number;
-  width: number;
-  height: number;
-  productScene?: ProductSceneRenderer;
-}): ReactNode {
+}: Readonly<Props>): ReactNode {
   const common = { frame, width, height };
   switch (shot.scene) {
     case "continuity":

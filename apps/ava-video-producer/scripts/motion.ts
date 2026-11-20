@@ -13,7 +13,7 @@ import {
 import { STOCK_LOOP_FRAMES, STOCK_FPS } from "../src/stock/catalog";
 import { makeResolvedVideoThemeFromSnapshot } from "../src/videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 import { run, ffmpeg, probe } from "./lib/mediaHelpers";
-import { ensureDirectory, fileHash } from "./lib/planHelpers";
+import { ensureDirectory, fileHash } from "./lib/planHelpers/planHelpers";
 import { withWorkspaceAliases } from "./lib/withWorkspaceAliases.mjs";
 import {
   MotionRequests,
@@ -23,9 +23,7 @@ import { requireLicense } from "./require-license.mjs";
 import { StockFingerprintModule } from "./stock/StockFingerprintModule/StockFingerprintModule";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-
 const SAMPLES: number[] = StockFingerprintModule.SAMPLE_PARAMETERS.samples;
-
 async function _fresh(relative: string) {
   const parent = await ensureDirectory(ROOT, "out/motion");
   const target = path.join(parent, relative);
@@ -46,7 +44,6 @@ async function _fresh(relative: string) {
   }
   return ensureDirectory(ROOT, `out/motion/${relative}`);
 }
-
 async function _preview(requests: MotionRequest[]) {
   await Promise.all(
     requests.map(({ sourceHash }) => {
@@ -165,7 +162,6 @@ async function _preview(requests: MotionRequest[]) {
   }
   await fs.rm(temporary, { recursive: true });
 }
-
 async function _render(requests: MotionRequest[]) {
   const digest = await StockFingerprintModule.getSourceHashFromRoot(ROOT);
   // Check the whole selection before spending time on a partial batch.
@@ -283,7 +279,6 @@ async function _render(requests: MotionRequest[]) {
     });
   }
 }
-
 async function _main() {
   requireLicense();
   const args = MotionRequests.parseArgs(process.argv.slice(2));
@@ -303,7 +298,6 @@ async function _main() {
     }
   }
 }
-
 if (
   process.argv[1] &&
   import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href

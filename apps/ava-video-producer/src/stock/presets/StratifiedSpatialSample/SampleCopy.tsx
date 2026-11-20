@@ -1,15 +1,14 @@
 import { Text } from "../../graphics-common/Text";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./StratifiedSpatialSample.schema";
 import type { ReactNode } from "react";
-
 /** How long each aggregate quantity counts up from zero. */
 const COUNT_FRAMES = 28;
 type Props = { input: Input; frame: number };
 /** Captions and aggregate quantities retain the eligible sampling frame. */
 export function SampleCopy({ input, frame }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const selectedCount = input.selectedSiteIds.length;
   const eligibleCount = input.sites.length;
   return (
@@ -26,7 +25,7 @@ export function SampleCopy({ input, frame }: Readonly<Props>): ReactNode {
       {[selectedCount, eligibleCount, eligibleCount - selectedCount].map(
         (quantity, index) => {
           const countAt = 108 + index * motion.stagger.list;
-          const count = motion.count(
+          const displayedQuantity = motion.count(
             frame,
             countAt,
             quantity,
@@ -43,7 +42,7 @@ export function SampleCopy({ input, frame }: Readonly<Props>): ReactNode {
               )}
             >
               <Text x={40 + index * 310} y={552} role="question">
-                {count}
+                {displayedQuantity}
               </Text>
             </g>
           );

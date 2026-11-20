@@ -1,8 +1,15 @@
 import { propEq } from "@avandar/utils";
 import { mix } from "../../../motion";
-import { getChildFromFrame, getParentFromFrame } from "./drillTiming";
+import { DrillTiming } from "./DrillTiming";
 import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./NestedDrilldownWindow.schema";
+
+type DrillRecordLayoutOptions = {
+  frame: number;
+  input: Input;
+  record: Input["records"][number];
+  motion: VideoMotion;
+};
 /** Data for getDrillRecordLayoutFromInputAndFrame. */
 type GetDrillRecordLayoutResult = {
   x: number;
@@ -13,7 +20,6 @@ type GetDrillRecordLayoutResult = {
   opacity: number;
   isSettled: boolean;
 };
-
 /**
  * Membership and positions derive only from exact supplied groups and order.
  */
@@ -22,12 +28,7 @@ export function getDrillRecordLayoutFromInputAndFrame({
   input,
   record,
   motion,
-}: Readonly<{
-  frame: number;
-  input: Input;
-  record: Input["records"][number];
-  motion: VideoMotion;
-}>): GetDrillRecordLayoutResult {
+}: Readonly<DrillRecordLayoutOptions>): GetDrillRecordLayoutResult {
   const groups = [
     ...new Set(
       input.records.map((item) => {
@@ -59,10 +60,10 @@ export function getDrillRecordLayoutFromInputAndFrame({
   const isParent = record.groups[0] === input.selectionPath[0];
   const detailIndex = details.findIndex(propEq("id", record.id));
   const isDetail = detailIndex >= 0;
-  const parent = getParentFromFrame(frame, motion),
+  const parent = DrillTiming.getParentFromFrame({ frame, motion }),
     child =
       input.selectionPath.length === 2
-        ? getChildFromFrame(frame, motion)
+        ? DrillTiming.getChildFromFrame({ frame, motion })
         : parent;
   const startX = 48 + groups.indexOf(record.groups[0]) * 292;
   const startY = 214 + siblings.findIndex(propEq("id", record.id)) * 42;

@@ -1,7 +1,7 @@
 import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
-import { ComparisonVerdict } from "./ComparisonVerdict";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { ComparisonVerdict } from "./ComparisonVerdict/ComparisonVerdict";
 import { StationSheets } from "./StationSheets";
 import type { Input } from "./ExpectationOverlayCheck.schema";
 import type { ReactNode } from "react";
@@ -13,7 +13,6 @@ type Props = {
   input: Input;
   accent: string;
 };
-
 /** Frames between neighbouring stations appearing. */
 const STATION_STAGGER_FRAMES = 8;
 /** Frames a station takes to fade in. */
@@ -28,7 +27,7 @@ export function ExpectationStation({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const state =
     item.observed === null
       ? "unobserved"

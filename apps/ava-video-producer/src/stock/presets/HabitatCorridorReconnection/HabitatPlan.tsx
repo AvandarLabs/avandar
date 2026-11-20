@@ -1,12 +1,7 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { getRoutePointFromProgress } from "../../primitives/RoutePath/getRoutePointFromProgress";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { makeCorridorRouteFromInputAndFrame } from "./makeCorridorRouteFromInputAndFrame";
 import type { Input } from "./HabitatCorridorReconnection.schema";
 import type { ReactNode } from "react";
@@ -20,7 +15,6 @@ type Props = {
 const ROAD_LINE_DASH = "7 5";
 const PATCH_RADIUS_X = 100;
 const PATCH_RADIUS_Y = 62;
-
 /**
  * The complete outline or solid route crosses the road before optional
  * illustrative travel.
@@ -31,10 +25,10 @@ export function HabitatPlan({
   background: backgroundColor,
   input,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const background = backgroundColor ?? tokens.color.ground;
   const { points, path } = makeCorridorRouteFromInputAndFrame({
     motion,

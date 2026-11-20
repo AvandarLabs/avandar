@@ -4,6 +4,7 @@ import {
   useRowIssueAriaProps,
 } from "../../RowIssueContext/RowIssueContext";
 import { useTokenEditor } from "../../TokenEditorContext";
+import { type TokenRow } from "../../tokenRows/tokenRows.types";
 import { ContrastBadge } from "../ContrastBadge/ContrastBadge";
 import { ReferenceControl } from "../ReferenceControl/ReferenceControl";
 import {
@@ -13,13 +14,10 @@ import {
 } from "../roleValueHelpers/roleValueHelpers";
 import { ColorPairFields } from "./ColorPairFields";
 import css from "./ColorRoleControl.module.css";
-import type { TokenRow } from "../../tokenRows/tokenRows";
 import type { ReactNode } from "react";
 
 const TEXT_COLOR_PATHS = new Set(["color.text", "color.textMuted"]);
-
 type Props = Readonly<{ row: TokenRow; label: string }>;
-
 /**
  * A colour role: one reference, or one for dark grounds and one for light
  * grounds. Text colours show their contrast against the ground.

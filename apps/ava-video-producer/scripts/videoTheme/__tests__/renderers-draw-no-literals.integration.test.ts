@@ -10,48 +10,36 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import test from "node:test";
-import {
-  countThemeLiteralsFromSource,
-  sumThemeLiteralCounts,
-  type ThemeLiteralCounts,
-} from "../themeLiterals/countThemeLiterals/countThemeLiterals";
-import {
-  APP_ROOT,
-  listScannedFiles,
-} from "../themeLiterals/rendererFiles/rendererFiles";
-
-function _counts(file: string): ThemeLiteralCounts {
-  return countThemeLiteralsFromSource(
-    file,
-    fs.readFileSync(path.join(APP_ROOT, file), "utf8"),
-  );
-}
+import { RendererFiles } from "../themeLiterals/RendererFiles";
+import { ThemeLiteralCounter } from "../themeLiterals/ThemeLiteralCounter/ThemeLiteralCounter";
+import { type ThemeLiteralCounts } from "../themeLiterals/ThemeLiteralCounter/ThemeLiteralCounter.types";
 
 function _describe(counts: ThemeLiteralCounts): string {
   return Object.entries(counts)
-    .filter(([, count]) => {
-      return count > 0;
+    .filter(([, numLiterals]) => {
+      return numLiterals > 0;
     })
-    .map(([area, count]) => {
-      return `${area} ${count}`;
+    .map(([area, numLiterals]) => {
+      return `${area} ${numLiterals}`;
     })
     .join(", ");
 }
-
 test("no renderer file or chrome stylesheet holds a theme literal", () => {
-  const withLiterals = listScannedFiles().flatMap((file) => {
-    const counts = _counts(file);
-    return sumThemeLiteralCounts(counts) > 0
+  const withLiterals = RendererFiles.listScannedFiles().flatMap((file) => {
+    const counts = ThemeLiteralCounter.countThemeLiteralsFromSource({
+      fileName: file,
+      source: fs.readFileSync(path.join(RendererFiles.APP_ROOT, file), "utf8"),
+    });
+    return ThemeLiteralCounter.sumThemeLiteralCounts(counts) > 0
       ? [`${file}: ${_describe(counts)}`]
       : [];
   });
   assert.deepEqual(withLiterals, []);
 });
-
 test("the stock palette module stays retired", () => {
   assert.deepEqual(
     fs
-      .readdirSync(path.join(APP_ROOT, "src"), {
+      .readdirSync(path.join(RendererFiles.APP_ROOT, "src"), {
         recursive: true,
         encoding: "utf8",
       })

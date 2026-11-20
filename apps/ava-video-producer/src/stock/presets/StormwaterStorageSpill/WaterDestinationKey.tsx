@@ -1,4 +1,4 @@
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SceneLabel } from "./SceneLabel";
 import {
   WATER_DESTINATIONS,
@@ -21,7 +21,7 @@ export function WaterDestinationKey({
   x,
   y,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const key = WATER_DESTINATIONS[destination];
   return (
     <g data-water-key={`${location}-${destination}`}>

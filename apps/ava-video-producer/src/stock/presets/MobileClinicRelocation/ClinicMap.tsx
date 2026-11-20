@@ -2,15 +2,10 @@ import { mix } from "../../../motion";
 import { GlobeProjection } from "../../geography/GlobeProjection/GlobeProjection";
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
-import { ClinicVehicle } from "./ClinicVehicle";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { ClinicVehicle } from "./ClinicVehicle/ClinicVehicle";
 import type { Input } from "./MobileClinicRelocation.schema";
 import type { ReactNode } from "react";
-
 /** The dash of the drive between the two clinic sites. */
 const ROUTE_DASH = "5 10";
 type Props = { input: Input; frame: number; accent: string };
@@ -20,15 +15,11 @@ export function ClinicMap({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const sites = input.sites.map((site) => {
-    return {
-      ...site,
-      x: 70 + site.x * 430,
-      y: 125 + site.y * 200,
-    };
+    return { ...site, x: 70 + site.x * 430, y: 125 + site.y * 200 };
   });
   const progress = motion.ramp(
     frame,

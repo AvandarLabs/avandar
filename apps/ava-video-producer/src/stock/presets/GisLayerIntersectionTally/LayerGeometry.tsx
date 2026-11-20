@@ -1,9 +1,5 @@
 import { useId } from "react";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { LayerDefinitions } from "./LayerDefinitions";
 import { MapSheets } from "./MapSheets";
 import type { Input } from "./GisLayerIntersectionTally.schema";
@@ -25,9 +21,9 @@ export function LayerGeometry({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const identity = useId().replaceAll(":", "");
   const first = _buildPath(input.layers[0].polygon);
   const second = _buildPath(input.layers[1].polygon);

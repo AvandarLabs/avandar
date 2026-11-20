@@ -1,4 +1,4 @@
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getScheduleGeometryFromInputAndFrame } from "./getScheduleGeometryFromInputAndFrame";
 import { ScheduleBackdrop } from "./ScheduleBackdrop";
 import { ScheduledTask } from "./ScheduledTask";
@@ -15,7 +15,7 @@ export function ScheduleBuffer({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const state = getScheduleGeometryFromInputAndFrame({ motion, frame, input });
   const numSlots = input.tasks.length + 2;
   return (

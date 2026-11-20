@@ -1,15 +1,14 @@
 import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { JoinSourceHeadings } from "./JoinSourceHeadings";
 import type { Input } from "./KeyedRowZipper.schema";
 import type { ReactNode } from "react";
 /** Inputs for JoinHeadings. */
 type Props = { frame: number; input: Input };
-
 /** Result and unmatched headings belong to their distinct final regions. */
 export function JoinHeadings({ frame, input }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g>
       {frame < 108 ? (

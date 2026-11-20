@@ -1,5 +1,5 @@
 import { propEq } from "@avandar/utils";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./ComputeCapacityConsolidation.schema";
 import type { ReactNode } from "react";
@@ -11,7 +11,7 @@ export function HostLabels({
   index,
   frame,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const host = input.hosts[index];
   const x = 55 + index * 215;
   const isEmpty = !input.jobs.some(propEq("finalHostId", host.id));

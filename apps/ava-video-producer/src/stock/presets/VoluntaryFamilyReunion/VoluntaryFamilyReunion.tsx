@@ -1,9 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ReunionInvitation } from "./ReunionInvitation";
 import { ReunionMember } from "./ReunionMember";
 import { DEFAULT_INPUT } from "./VoluntaryFamilyReunion.fixtures";
@@ -20,8 +17,8 @@ export function VoluntaryFamilyReunion({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const numMembers = input.groups.reduce((sum, group) => {
     return sum + group.members.length;
   }, 0);

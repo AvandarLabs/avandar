@@ -1,10 +1,7 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getPopulationRateFromCounts } from "./getPopulationRateFromCounts";
 import type { Input } from "./PopulationNormalizedMap.schema";
 import type { ReactNode } from "react";
@@ -24,8 +21,8 @@ export function ZoneFraction({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const y = 170 + index * 80;
   const rate = getPopulationRateFromCounts({
     ...zone,

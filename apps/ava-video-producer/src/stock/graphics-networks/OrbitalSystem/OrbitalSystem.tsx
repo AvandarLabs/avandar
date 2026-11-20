@@ -6,11 +6,7 @@ import { Glyph } from "../../graphics-common/Glyph";
 import { LEGACY_DISPLAY_COPY } from "../../presets/legacy/legacyDisplayCopy";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { getContentColorFromValue } from "../../theme/getContentColorFromValue/getContentColorFromValue";
-import {
-  useGraphicProps,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CENTER } from "./OrbitalSystem.constants";
 import { OrbitingBody } from "./OrbitingBody/OrbitingBody";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
@@ -18,19 +14,17 @@ import type { OrbitalSystemInput } from "../../presets/OrbitalSystem/OrbitalSyst
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: OrbitalSystemInput };
-
 const CUBE_GLYPH =
   "M480 272 L503 285 L503 311 L480 324 L457 311 L457 285 Z M480 272 V298 L503 311 M480 298 L457 311";
-
 /** Draws the bounded authored orbital-system study at an explicit frame. */
 export function OrbitalSystem({
   input,
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const style = useGraphicProps("OrbitalSystem", {});
-  const tokens = useGraphicTokens();
-  const shapes = useGraphicShapeScales();
+  const style = GraphicThemeHooks.useGraphicProps("OrbitalSystem", {});
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
       <Eyebrow>

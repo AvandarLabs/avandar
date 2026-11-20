@@ -1,14 +1,17 @@
 import { mix } from "../../motion";
 import { SketchedShape } from "../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicProps,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Point } from "./graphicCommon.types";
 import type { ReactNode } from "react";
 
+type Props = {
+  from: Point;
+  to: Point;
+  progress: number;
+  frame: number;
+  at: number;
+  color: string;
+};
 /** A themed highlighted route segment that grows with `progress`. */
 export function Route({
   from,
@@ -17,18 +20,11 @@ export function Route({
   frame,
   at,
   color,
-}: {
-  from: Point;
-  to: Point;
-  progress: number;
-  frame: number;
-  at: number;
-  color: string;
-}): ReactNode {
-  const route = useGraphicProps("Route", {});
-  const motion = useGraphicMotion();
-  const { sketch } = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+}: Readonly<Props>): ReactNode {
+  const route = GraphicThemeHooks.useGraphicProps("Route", {});
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const { sketch } = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <SketchedShape
       shape={{

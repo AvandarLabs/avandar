@@ -1,13 +1,16 @@
 import { mix } from "../../../motion";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { BlockCaption } from "./BlockCaption";
 import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./RepeatingBlocksToTable.schema";
 import type { ReactNode } from "react";
 
+type CreateIdentityPosesOptions = {
+  input: Input;
+  index: number;
+  frame: number;
+  motion: VideoMotion;
+};
 type Props = { input: Input; frame: number; accent: string; index: number };
 /** Source block headings retain their identities beside the resulting rows. */
 export function BlockIdentity({
@@ -16,10 +19,10 @@ export function BlockIdentity({
   accent,
   index,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const color = [accent, tokens.color.accentAlt, tokens.color.highlight][index];
-  const poses = _createIdentityPoses(input, index, frame, motion);
+  const poses = _createIdentityPoses({ input, index, frame, motion });
   return (
     <g data-output-block={input.blocks[index].id}>
       {poses.map((pose, poseIndex) => {
@@ -37,17 +40,16 @@ export function BlockIdentity({
     </g>
   );
 }
-
 /**
  * The heading over its source block, fading out, and beside its result row,
  * arriving last block first.
  */
-function _createIdentityPoses(
-  input: Input,
-  index: number,
-  frame: number,
-  motion: VideoMotion,
-) {
+function _createIdentityPoses({
+  input,
+  index,
+  frame,
+  motion,
+}: Readonly<CreateIdentityPosesOptions>) {
   const duration = 9 / input.blocks.length,
     departure = 96 + (input.blocks.length - 1 - index) * duration;
   return [

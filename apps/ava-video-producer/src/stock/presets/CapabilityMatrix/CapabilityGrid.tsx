@@ -2,24 +2,19 @@ import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CapabilityColumn } from "./CapabilityColumn";
 import type { Input } from "./CapabilityMatrix.schema";
 import type { ReactNode } from "react";
 
 type Props = { frame: number; input: Input };
-
 /** The table panel's corner before the corner style scales it. */
 const PANEL_CORNER = 8;
 /** The table skeleton establishes shared row and column geometry first. */
 export function CapabilityGrid({ frame, input }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const height = input.capabilities.length * 66;
   const panel = {
     x: 54,

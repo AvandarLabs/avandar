@@ -1,8 +1,5 @@
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
-import { CatchmentDefinitions } from "./CatchmentDefinitions";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { CatchmentDefinitions } from "./CatchmentDefinitions/CatchmentDefinitions";
 import { CatchmentFootprints } from "./CatchmentFootprints";
 import { CatchmentNames } from "./CatchmentNames";
 import type { Input } from "./CatchmentUnionGaps.schema";
@@ -18,8 +15,8 @@ export function CatchmentGeometry({
   accent,
   id,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const definitionId = `catchment-${Array.from(id)
     .map((character) => {
       return character.codePointAt(0)?.toString(16);

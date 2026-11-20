@@ -1,4 +1,4 @@
-import { useGraphicTheme } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getCatchmentShapesFromInput } from "./getCatchmentShapesFromInput";
 import { IndividualFootprints } from "./IndividualFootprints";
 import type { Input } from "./CatchmentUnionGaps.schema";
@@ -17,7 +17,7 @@ export function CatchmentFootprints({
   accent,
   definitionId,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
   return (
     <g>
       <IndividualFootprints input={input} progress={progress} accent={accent} />

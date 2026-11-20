@@ -1,5 +1,5 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./DistanceBufferEnvelope.schema";
 import type { ReactNode } from "react";
 
@@ -14,7 +14,7 @@ export function BufferSourceRow({
   location,
   index,
 }: Readonly<Props>): ReactNode {
-  const data = useGraphicTokens().text.graphic.data;
+  const data = GraphicThemeHooks.useGraphicTokens().text.graphic.data;
   const distance = Math.hypot(
     location.x - input.origin.x,
     location.y - input.origin.y,

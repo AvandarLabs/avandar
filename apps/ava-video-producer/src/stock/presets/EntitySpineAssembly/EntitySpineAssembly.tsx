@@ -1,7 +1,7 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { EntitySpineRow } from "./EntitySpineRow";
 import { SpineContributions } from "./SpineContributions";
-import { SpineObservation } from "./SpineObservation";
+import { SpineObservation } from "./SpineObservation/SpineObservation";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./EntitySpineAssembly.schema";
 import type { ReactNode } from "react";

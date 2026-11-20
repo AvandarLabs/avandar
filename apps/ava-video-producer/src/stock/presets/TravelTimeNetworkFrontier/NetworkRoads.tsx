@@ -1,6 +1,6 @@
 import { propEq } from "@avandar/utils";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
-import { FrontierRoad } from "./FrontierRoad";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { FrontierRoad } from "./FrontierRoad/FrontierRoad";
 import { getTravelCostsFromInput } from "./getTravelCostsFromInput";
 import type { Input } from "./TravelTimeNetworkFrontier.schema";
 import type { ReactNode } from "react";
@@ -12,7 +12,7 @@ export function NetworkRoads({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const nodes = getTravelCostsFromInput(input);
   const time =
     input.budgetMinutes *

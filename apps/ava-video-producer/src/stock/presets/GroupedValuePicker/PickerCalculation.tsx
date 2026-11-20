@@ -1,6 +1,6 @@
 import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getPickerGroupsFromInput } from "./getPickerGroupsFromInput";
 import { PickerFormula } from "./PickerFormula";
 import { PickerModeGroups } from "./PickerModeGroups";
@@ -15,7 +15,7 @@ export function PickerCalculation({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const groups = getPickerGroupsFromInput(input),
     isMode = input.rule === "most-frequent";
   return (

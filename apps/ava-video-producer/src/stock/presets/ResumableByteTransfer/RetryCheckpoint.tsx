@@ -1,11 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = { label: string; checkpoint: number; frame: number };
@@ -15,10 +10,10 @@ export function RetryCheckpoint({
   checkpoint,
   frame,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const { atomic } = useGraphicTheme();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const captionX = Math.max(84, Math.min(516, checkpoint - 180));
   return (
     <g opacity={motion.ramp(frame, 56, motion.scale(10))}>

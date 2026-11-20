@@ -1,6 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { LegendScale } from "./LegendScale";
 import type { Input } from "./PopulationNormalizedMap.schema";
 import type { ComponentProps, ReactNode } from "react";
@@ -12,7 +12,7 @@ export function PopulationLegend({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const isNormalized = frame >= 72;
   const maximum = isNormalized
     ? input.colorDomains.normalizedMaximum
@@ -28,20 +28,25 @@ export function PopulationLegend({
         profile={tokens.sketch.shape}
         stroke={tokens.color.inactive}
       />
-      <LabelSlots labels={_buildLegendLabels(input, isNormalized, maximum)} />
+      <LabelSlots
+        labels={_buildLegendLabels({ input, isNormalized, maximum })}
+      />
       {isNormalized ? (
         <LabelSlots labels={[[String(input.rateBase), 40, 140, 200, 12, 1]]} />
       ) : undefined}
     </g>
   );
 }
-
 /** The legend's captions, with the measure and range of the current view. */
-function _buildLegendLabels(
-  input: Input,
-  isNormalized: boolean,
-  maximum: number,
-): ComponentProps<typeof LabelSlots>["labels"] {
+function _buildLegendLabels({
+  input,
+  isNormalized,
+  maximum,
+}: Readonly<{
+  input: Input;
+  isNormalized: boolean;
+  maximum: number;
+}>): ComponentProps<typeof LabelSlots>["labels"] {
   return [
     [input.copy.context, 40, 36, 880, 18, 2],
     [

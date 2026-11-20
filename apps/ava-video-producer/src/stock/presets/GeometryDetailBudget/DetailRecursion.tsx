@@ -1,9 +1,5 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ActiveDeviation } from "./ActiveDeviation";
 import { makeCompletedDetailPathFromInputAndFrame } from "./makeCompletedDetailPathFromInputAndFrame";
 import { makeDetailSimplificationFromInput } from "./makeDetailSimplificationFromInput";
@@ -12,7 +8,6 @@ import type { Input } from "./GeometryDetailBudget.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
-
 const RECURSION_AT = 51;
 /**
  * Recursive splits retain their completed trace through the final highlight.
@@ -22,9 +17,9 @@ export function DetailRecursion({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { stroke, sketch } = useGraphicTokens();
-  const shapes = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const { stroke, sketch } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const { events } = makeDetailSimplificationFromInput(input);
   const span = 60 / events.length;
   const activeIndex = Math.min(

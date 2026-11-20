@@ -1,15 +1,14 @@
 import { propEq, propNotEq, isDefined } from "@avandar/utils";
 import { Text } from "../../graphics-common/Text";
 import { FitText } from "../../primitives/FitText/FitText";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./EnvironmentalObservationGaps.schema";
 import type { ReactNode } from "react";
 /** Inputs for ObservationCaptions. */
 type Props = { input: Input };
-
 /** Point labels and area totals explicitly retain their different supports. */
 export function ObservationCaptions({ input }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const observed =
     input.cells.filter(propNotEq("value", null)).length *
     input.metric.cellAreaHa;

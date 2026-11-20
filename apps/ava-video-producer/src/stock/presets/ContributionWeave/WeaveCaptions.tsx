@@ -1,5 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./ContributionWeave.schema";
 import type { ReactNode } from "react";
 
@@ -22,7 +22,7 @@ const TEXT = {
 >;
 /** Result copy remains independent from each contribution's band label. */
 export function WeaveCaptions({ copy }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
       <FitText {...TEXT} text={copy.result} y={535} fontSize={18} />

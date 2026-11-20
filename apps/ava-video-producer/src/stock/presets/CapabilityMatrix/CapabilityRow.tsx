@@ -1,5 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CapabilityCell } from "./CapabilityCell";
 import type { Input } from "./CapabilityMatrix.schema";
 import type { ReactNode } from "react";
@@ -10,7 +10,6 @@ type Props = {
   index: number;
   frame: number;
 };
-
 /** Frames the scanning rule takes to pass one row, which staggers the rows. */
 const ROW_SCAN_FRAMES = 12;
 /** All alternatives in one row resolve together on matching baselines. */
@@ -20,7 +19,7 @@ export function CapabilityRow({
   index,
   frame,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const y = 176 + index * 66;
   const columnWidth = 606 / input.options.length;
   const label = {

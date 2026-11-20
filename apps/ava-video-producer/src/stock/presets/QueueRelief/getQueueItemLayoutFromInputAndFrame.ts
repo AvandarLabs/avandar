@@ -10,19 +10,20 @@ type GetQueueItemLayoutResult = {
   serviceSlot: string | undefined;
   opacity: number;
 };
-
 type QueueItemLayoutArgs = Readonly<{
   input: Input;
   index: number;
   frame: number;
   motion: VideoMotion;
 }>;
-
 /** Where an item is in its journey from the queue through service. */
-function _getQueueState(
-  frame: number,
-  schedule: ReturnType<typeof getQueueItemScheduleFromInput>,
-): string {
+function _getQueueState({
+  frame,
+  schedule,
+}: Readonly<{
+  frame: number;
+  schedule: ReturnType<typeof getQueueItemScheduleFromInput>;
+}>): string {
   if (frame < schedule.start) {
     return schedule.isInitial ? "incoming" : "queued";
   }
@@ -34,7 +35,6 @@ function _getQueueState(
   }
   return frame < schedule.finish ? "completing" : "completed";
 }
-
 /**
  * A single token moves from waiting to its bay and then to a stable tray slot.
  */
@@ -53,7 +53,7 @@ export function getQueueItemLayoutFromInputAndFrame({
   );
   const waitY = 166 + schedule.waitingIndex * 50;
   const serviceY = 196 + schedule.slotIndex * 100;
-  const state = _getQueueState(frame, schedule);
+  const state = _getQueueState({ frame, schedule });
   return {
     x: mix(exit, mix(enter, 48, 370), 680),
     y: mix(exit, mix(enter, waitY, serviceY), 166 + index * 48),

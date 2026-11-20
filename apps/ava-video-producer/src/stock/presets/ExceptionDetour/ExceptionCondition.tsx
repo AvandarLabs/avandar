@@ -1,19 +1,15 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./ExceptionDetour.schema";
 import type { ReactNode } from "react";
 /** Inputs for ExceptionCondition. */
-type Props = {
-  input: Input;
-  targetY: number;
-};
-
+type Props = { input: Input; targetY: number };
 /** The condition and path label explicitly identify the exceptional branch. */
 export function ExceptionCondition({
   input,
   targetY,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <>
       <FitText

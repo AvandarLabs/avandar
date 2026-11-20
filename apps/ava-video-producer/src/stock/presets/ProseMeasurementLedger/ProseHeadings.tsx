@@ -1,5 +1,5 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import {
   methodMessages,
   reviewMessages,
@@ -8,10 +8,9 @@ import type { Input } from "./ProseMeasurementLedger.schema";
 import type { ReactNode } from "react";
 /** Inputs for ProseHeadings. */
 type Props = { input: Input; frame: number };
-
 /** Method and authored review status retain separate captions. */
 export function ProseHeadings({ input, frame }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g>
       <g opacity={motion.ramp(frame, 110, motion.press.duration)}>

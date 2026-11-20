@@ -1,17 +1,14 @@
 import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./PairedContrast.schema";
 import type { ReactNode } from "react";
 
 type Props = { frame: number; input: Input };
 /** The same question and caption frame both alternatives. */
 export function ContrastHeading({ frame, input }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const headings = [
     {
       text: input.question,

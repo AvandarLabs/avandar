@@ -9,29 +9,30 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import test from "node:test";
-import {
-  APP_ROOT,
-  listRendererFiles,
-} from "../../../scripts/videoTheme/themeLiterals/rendererFiles/rendererFiles";
+import { RendererFiles } from "../../../scripts/videoTheme/themeLiterals/RendererFiles";
 import { buildVideoCssVariables } from "../../videoTheme/buildVideoCssVariables/buildVideoCssVariables";
 import { BUILT_IN_VIDEO_THEMES } from "../../videoTheme/builtInVideoThemes/builtInVideoThemes";
 import { makeResolvedVideoThemeFromLibrary } from "../../videoTheme/makeResolvedVideoThemeFromLibrary/makeResolvedVideoThemeFromLibrary";
 
-const STYLE_FILES = listRendererFiles().filter((file) => {
+const STYLE_FILES = RendererFiles.listRendererFiles().filter((file) => {
   return file.endsWith(".css");
 });
-
-function _readStyles(): ReadonlyArray<Readonly<{ file: string; css: string }>> {
+function _readStyles(): Array<{ file: string; css: string }> {
   return STYLE_FILES.map((file) => {
-    return { file, css: fs.readFileSync(path.join(APP_ROOT, file), "utf8") };
+    return {
+      file,
+      css: fs.readFileSync(path.join(RendererFiles.APP_ROOT, file), "utf8"),
+    };
   });
 }
-
 test("the renderer directories hold the stage stylesheets", () => {
   assert.ok(STYLE_FILES.length >= 5, STYLE_FILES.join(", "));
-  assert.ok(STYLE_FILES.includes("src/continuity/ContinuityScene.module.css"));
+  assert.ok(
+    STYLE_FILES.includes(
+      "src/continuity/ContinuityScene/ContinuityScene.module.css",
+    ),
+  );
 });
-
 test("every required theme variable in the stage styles is emitted by every built-in theme", () => {
   const required = new Set(
     _readStyles().flatMap(({ css }) => {
@@ -53,7 +54,6 @@ test("every required theme variable in the stage styles is emitted by every buil
     );
   });
 });
-
 test("no stage stylesheet reads an Atlas chrome token", () => {
   assert.deepEqual(
     _readStyles().flatMap(({ file, css }) => {
@@ -62,17 +62,16 @@ test("no stage stylesheet reads an Atlas chrome token", () => {
     [],
   );
 });
-
 test("every helper preview variable the preview styles read is set from the theme", async () => {
-  const { useDemoThemeStyle } =
-    await import("../../gallery/HelperGallery/demos/demoTheme");
+  const { DemoTheme } =
+    await import("../../gallery/HelperGallery/demos/DemoTheme");
   const { renderToStaticMarkup } = await import("react-dom/server");
   const { createElement } = await import("react");
   const { VideoThemeScope } =
     await import("../../videoTheme/VideoThemeScope/VideoThemeScope");
   const emitted = new Set<string>();
   function Probe() {
-    Object.keys(useDemoThemeStyle()).forEach((name) => {
+    Object.keys(DemoTheme.useDemoThemeStyle()).forEach((name) => {
       return emitted.add(name);
     });
     return null;

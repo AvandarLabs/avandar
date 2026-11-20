@@ -1,9 +1,5 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./ExpiringLease.schema";
 import type { ReactNode } from "react";
 
@@ -14,7 +10,6 @@ type Props = {
   y: number;
   accent: string;
 };
-
 /** The collar's line weight before the line weight scales it. */
 const COLLAR_STROKE = 5;
 /** A finite collar drops one authored segment at each evenly spaced beat. */
@@ -25,9 +20,9 @@ export function LeaseCollar({
   y,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const elapsed = Math.min(
     input.lifetime.value,
     Math.max(0, Math.floor((frame - 36) / (72 / input.lifetime.value))),

@@ -1,10 +1,6 @@
 import { mix, ramp } from "../../../motion";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { BatchItemLabel } from "./BatchItemLabel";
 import type { Input } from "./BatchRelease.schema";
 import type { ReactNode } from "react";
@@ -22,7 +18,6 @@ type Props = {
   showLabel: boolean;
   accent: string;
 };
-
 /** Frames a member takes to drop into its slot. */
 const SETTLE_FRAMES = 12;
 /** One supplied member remains visible inside its own handling boundary. */
@@ -39,9 +34,9 @@ export function BatchMember({
   showLabel,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   // The last member lands exactly as the batch completes.
   const settle = motion.scale(SETTLE_FRAMES);
   const arriveAt =

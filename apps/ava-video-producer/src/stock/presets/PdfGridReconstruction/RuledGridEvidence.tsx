@@ -1,9 +1,6 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
-import { getEvidenceFromFrame } from "./gridTiming";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { getEvidenceFromFrame } from "./getEvidenceFromFrame";
 import type { Input } from "./PdfGridReconstruction.schema";
 import type { ReactNode } from "react";
 
@@ -14,11 +11,11 @@ export function RuledGridEvidence({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const width = 400 / input.grid.columnLabels.length;
   const height = 80 + input.grid.rows.length * 64;
-  const progress = getEvidenceFromFrame(frame, motion);
+  const progress = getEvidenceFromFrame({ frame, motion });
   return (
     <g>
       {" "}

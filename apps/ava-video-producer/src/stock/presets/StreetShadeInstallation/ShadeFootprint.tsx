@@ -1,11 +1,6 @@
 import { propEq } from "@avandar/utils";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { INSTALLATION_CATEGORIES } from "./installationColors";
 import { ShadeStructure } from "./ShadeStructure";
 import type { Input } from "./StreetShadeInstallation.schema";
@@ -18,10 +13,10 @@ export function ShadeFootprint({
   index,
   frame,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const item = input.installations[index];
   const zoneIndex = input.zones.findIndex(propEq("id", item.zoneId));
   const zone = input.zones[zoneIndex];

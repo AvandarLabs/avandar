@@ -1,7 +1,7 @@
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
-import { MeasuredStructure } from "./MeasuredStructure";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { MeasuredStructure } from "./MeasuredStructure/MeasuredStructure";
 import { MeasurementCaptions } from "./MeasurementCaptions";
-import { TapeObservers } from "./TapeObservers";
+import { TapeObservers } from "./TapeObservers/TapeObservers";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./PublicWorksMeasurementCheck.schema";
 import type { ReactNode } from "react";
@@ -13,7 +13,7 @@ export function PublicWorksMeasurementCheck({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const endX =
     200 +
     input.observation.length *

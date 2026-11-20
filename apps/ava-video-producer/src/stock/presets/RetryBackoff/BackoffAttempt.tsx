@@ -1,11 +1,7 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { BackoffFinal } from "./BackoffFinal";
-import { BackoffLabel } from "./BackoffLabel";
+import { BackoffLabel } from "./BackoffLabel/BackoffLabel";
 import { BackoffWait } from "./BackoffWait";
 import type { Input } from "./RetryBackoff.schema";
 import type { ReactNode } from "react";
@@ -31,9 +27,9 @@ export function BackoffAttempt({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const attempt = input.attempts[index];
   const slotX = 40 + index * 220;
   const isFinal = index === input.attempts.length - 1;

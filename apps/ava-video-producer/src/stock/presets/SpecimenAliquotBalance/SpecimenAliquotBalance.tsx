@@ -1,4 +1,4 @@
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { AliquotCaption } from "./AliquotCaption";
 import { AliquotEquation } from "./AliquotEquation";
 import { AliquotLedger } from "./AliquotLedger";
@@ -17,9 +17,9 @@ export function SpecimenAliquotBalance({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const fill = (index: number) => {
-    return _getAliquotFill(frame, index, motion);
+    return _getAliquotFill({ frame, index, motion });
   };
   const transferred = input.aliquots.reduce((total, aliquot, index) => {
     return total + aliquot.volume * fill(index);
@@ -56,13 +56,12 @@ export function SpecimenAliquotBalance({
     </g>
   );
 }
-
 /** How far an aliquot's transfer has run, 0 to 1, staggered by tube. */
-function _getAliquotFill(
-  frame: number,
-  index: number,
-  motion: VideoMotion,
-): number {
+function _getAliquotFill({
+  frame,
+  index,
+  motion,
+}: Readonly<{ frame: number; index: number; motion: VideoMotion }>): number {
   return motion.ramp(
     frame,
     36 + index * motion.scaleStagger(12),

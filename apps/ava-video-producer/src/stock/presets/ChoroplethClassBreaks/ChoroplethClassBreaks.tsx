@@ -1,6 +1,6 @@
 import { interpolateFiniteRange } from "../../numeric/interpolateFiniteRange/interpolateFiniteRange";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ClassLegends } from "./ClassLegends";
 import { ClassRuler } from "./ClassRuler";
 import { ClassZone } from "./ClassZone";
@@ -9,18 +9,16 @@ import type { Input } from "./ChoroplethClassBreaks.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
-
 const SCENE_FADE_AT = 0;
 const BREAK_AT = 51;
 const BREAK_FRAMES = 59;
-
 /** Moving authored thresholds recolor fixed schematic observations. */
 export function ChoroplethClassBreaks({
   frame,
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const threshold = interpolateFiniteRange({
     from: input.schemes[0].breaks[1],
     to: input.schemes[1].breaks[1],

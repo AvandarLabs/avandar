@@ -1,13 +1,10 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
-import { AperturePanel } from "./AperturePanel";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { AperturePanel } from "./AperturePanel/AperturePanel";
 import { DisclosureCopies } from "./DisclosureCopies";
 import { DisclosureCopy } from "./DisclosureCopy";
-import { DisclosureField } from "./DisclosureField";
+import { DisclosureField } from "./DisclosureField/DisclosureField";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./DisclosureAperture.schema";
 import type { ReactNode } from "react";
@@ -22,8 +19,8 @@ export function DisclosureAperture({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const destinationX = input.direction === "left-to-right" ? 540 : 60;
   return (
     <g data-disclosure-direction={input.direction}>

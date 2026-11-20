@@ -2,11 +2,7 @@ import { mix, ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import {
   DEMONSTRATE_CUE,
   HANDOFF_CUE,
@@ -17,7 +13,6 @@ import type { Input } from "./ExpertiseRoleExchange.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string; toolX: number };
-
 /** Frames the first expert takes to reach for the tool. */
 const REACH_FRAMES = 15;
 /** Equal-scale participants retain names and organizational roles. */
@@ -27,9 +22,9 @@ export function ExpertiseParticipants({
   accent,
   toolX,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const topic = input.topics[frame < HANDOFF_CUE ? 0 : 1];
   const reach = ramp(
     frame,

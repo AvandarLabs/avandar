@@ -1,5 +1,5 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ContentComparison } from "./ContentComparison";
 import { RegionPage } from "./RegionPage";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
@@ -13,7 +13,7 @@ export function DocumentRegionDriftCheck({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g opacity={motion.reveal(frame, 0)}>
       <LabelSlots

@@ -1,11 +1,8 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CarbonNetAccounting } from "./CarbonNetAccounting";
-import { OperatingEmissionRow } from "./OperatingEmissionRow";
+import { OperatingEmissionRow } from "./OperatingEmissionRow/OperatingEmissionRow";
 import type { Input } from "./CarbonStorageAccounting.schema";
 import type { ReactNode } from "react";
 
@@ -18,8 +15,8 @@ export function CarbonAccounting({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const retained =
     input.capture.capturedTonnesCO2 - input.capture.releasedTonnesCO2;
   const emissions = input.operatingEmissions.reduce((sum, row) => {

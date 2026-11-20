@@ -1,7 +1,4 @@
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CasePin } from "./CasePin";
 import { getCasePositionsFromInput } from "./getCasePositionsFromInput";
 import { InvestigationBracket } from "./InvestigationBracket";
@@ -11,8 +8,8 @@ import type { ReactNode } from "react";
 type Props = { input: Input; frame: number; accent: string };
 /** The bracket and bin-focus outlines represent independent selections. */
 export function CaseMap({ input, frame, accent }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
       <rect

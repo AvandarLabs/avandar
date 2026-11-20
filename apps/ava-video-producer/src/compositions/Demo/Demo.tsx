@@ -3,14 +3,14 @@ import "../../fonts";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { AppFrame, Cursor } from "../../chrome/chrome";
 import { useCursorMotion } from "../../chrome/useCursorMotion";
-import { cursorOnTarget } from "../../cursor-motion";
+import { CursorMotionHelpers } from "../../CursorMotionHelpers";
 import { mix, typed } from "../../motion";
 import { useVideoMotion } from "../../videoTheme/useVideoMotion";
 import { useVideoTokens } from "../../videoTheme/useVideoTheme";
 import { PromptField } from "./PromptField";
 import { PublishButton } from "./PublishButton";
-import { ResultsPanel } from "./ResultsPanel";
-import { SidePanel } from "./SidePanel";
+import { ResultsPanel } from "./ResultsPanel/ResultsPanel";
+import { SidePanel } from "./SidePanel/SidePanel";
 import {
   APP_IN,
   CHIP_CLICK,
@@ -22,7 +22,6 @@ import {
   PROMPT,
   PUBLISH_CLICK,
   REFILTER_AT,
-  ROWS_AT,
   RUN_CLICK,
   TOTAL_ALL,
   TOTAL_PAID,
@@ -33,16 +32,17 @@ import type { VideoMotion } from "../../videoTheme/createVideoMotion/createVideo
 import type { ReactNode } from "react";
 
 export { DEMO_LEN } from "./timeline";
-
 /** Frames the app takes to fade out at the end of the clip, at tempo 1. */
 const APP_OUT_FRAMES = 20;
 /** The matched-rows figure the counter lands on before the filter. */
 const MATCHED_ALL = 1940;
 /** The matched-rows figure after the filter. */
 const MATCHED_PAID = 312;
-
 /** The counters of one frame: matched rows, the filter ramp, and the total. */
-function _counts(frame: number, motion: VideoMotion) {
+function _counts({
+  frame,
+  motion,
+}: Readonly<{ frame: number; motion: VideoMotion }>) {
   const stateEasing = motion.reveal.easing;
   // Two counters in sequence. The first counts up from nothing when the
   // results land; the second travels from that value to the filtered one
@@ -60,7 +60,6 @@ function _counts(frame: number, motion: VideoMotion) {
     frame < REFILTER_AT
       ? matched
       : Math.round(mix(refilter, MATCHED_ALL, MATCHED_PAID));
-
   // The filter has to act on the thing it filters. A chip lighting up while
   // five channels sit there untouched, Organic search among them, under a
   // "Paid only" filter, is the clip contradicting itself, and it does it in
@@ -72,13 +71,11 @@ function _counts(frame: number, motion: VideoMotion) {
       : Math.round(mix(refilter, TOTAL_ALL, TOTAL_PAID));
   return { shown, refilter, totalShown };
 }
-
 /** The beat values of one frame: what is visible, typed, and counted. */
 function useDemoBeats(frame: number) {
   const motion = useVideoMotion();
   const appearEasing = motion.entrance.easing;
   const stateEasing = motion.reveal.easing;
-
   // The app arrives and leaves on opacity only. Never a transform on this
   // container: it holds the whole UI, and a scale on it resamples every
   // glyph inside. Opacity is safe: it composites.
@@ -86,7 +83,6 @@ function useDemoBeats(frame: number) {
   const appOut =
     1 - motion.ramp(frame, OUT_AT, motion.scale(APP_OUT_FRAMES), appearEasing);
   const app = Math.min(appIn, appOut);
-
   // Focus arrives on the click and leaves again on Run. A field that stays
   // lit for the rest of the clip, caret still blinking while the pointer is
   // across the screen pressing something else, reads as a mock-up: real
@@ -96,13 +92,10 @@ function useDemoBeats(frame: number) {
     (1 - motion.ramp(frame, RUN_CLICK, motion.chip, stateEasing));
   const text = typed(frame, TYPE_AT, PROMPT, motion.typing.rate);
   const typing = text.length > 0 && text.length < PROMPT.length;
-
-  const { shown, refilter, totalShown } = _counts(frame, motion);
+  const { shown, refilter, totalShown } = _counts({ frame, motion });
   const chipOn = motion.ramp(frame, CHIP_CLICK, motion.chip, stateEasing);
-
   return { app, focus, text, typing, shown, refilter, totalShown, chipOn };
 }
-
 /**
  * The worked example, and the reference: to shoot a new clip, copy this
  * structure and change the flow, not the pipeline.
@@ -134,7 +127,6 @@ export function Demo(): ReactNode {
   const cursorMotion = useCursorMotion();
   const { app, focus, text, typing, shown, refilter, totalShown, chipOn } =
     useDemoBeats(frame);
-
   return (
     <AbsoluteFill style={{ background: tokens.color.scene.ground }}>
       <AbsoluteFill
@@ -166,17 +158,17 @@ export function Demo(): ReactNode {
           frame={frame}
           path={POINTER}
           clicks={CLICKS}
-          cursor={cursorOnTarget(
+          cursor={CursorMotionHelpers.cursorOnTarget({
             frame,
-            POINTER,
-            [
+            path: POINTER,
+            targets: [
               { frame: FIELD_CLICK, x: 420, y: 194, cursor: "text" },
               { frame: RUN_CLICK, x: 1484, y: 194, cursor: "pointer" },
               { frame: CHIP_CLICK, x: 1285, y: 465, cursor: "pointer" },
               { frame: PUBLISH_CLICK, x: 1305, y: 917, cursor: "pointer" },
             ],
-            cursorMotion,
-          )}
+            motion: cursorMotion,
+          })}
         />
       </AbsoluteFill>
     </AbsoluteFill>

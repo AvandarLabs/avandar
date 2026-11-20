@@ -1,27 +1,21 @@
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
-import { getEvidenceFromFrame } from "./gridTiming";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { getEvidenceFromFrame } from "./getEvidenceFromFrame";
 import type { Input } from "./PdfGridReconstruction.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
-
 /** Selected structural evidence derives from the supplied grid geometry. */
 export function WhitespaceGridEvidence({
   input,
   frame,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const width = 400 / input.grid.columnLabels.length;
   const height = 80 + input.grid.rows.length * 64;
-  const progress = getEvidenceFromFrame(frame, motion);
+  const progress = getEvidenceFromFrame({ frame, motion });
   return (
     <g>
       {" "}

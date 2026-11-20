@@ -1,10 +1,6 @@
 import { mix } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./SharedJigPreparation.schema";
 import type { ReactNode } from "react";
@@ -20,10 +16,10 @@ export function JigMakingTool({
   pattern,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
-  const { x, y } = _getToolPoint(frame, pattern, motion);
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const { x, y } = _getToolPoint({ frame, pattern, motion });
   return (
     <g>
       <SketchedShape
@@ -50,13 +46,16 @@ export function JigMakingTool({
     </g>
   );
 }
-
 /** The tool stepping between two holes, or sliding along a corner mark. */
-function _getToolPoint(
-  frame: number,
-  pattern: Props["pattern"],
-  motion: VideoMotion,
-) {
+function _getToolPoint({
+  frame,
+  pattern,
+  motion,
+}: Readonly<{
+  frame: number;
+  pattern: Props["pattern"];
+  motion: VideoMotion;
+}>) {
   const progress = motion.ramp(
     frame,
     20,

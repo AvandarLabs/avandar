@@ -1,7 +1,7 @@
 import { mix } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SourceContextCell } from "./SourceContextCell";
 import type { Input } from "./ChargeReferenceAlignment.schema";
 import type { CONTEXT_FIELDS } from "./CONTEXT_FIELDS.constants";
@@ -24,7 +24,7 @@ export function ContextWindow({
   registration,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const y = 130 + 42 * index;
   const isMatched = input.invoice[field] === input.reference[field];
   const referenceY = y + mix(registration, 15, isMatched ? 0 : 8);

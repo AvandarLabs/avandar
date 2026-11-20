@@ -1,9 +1,5 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { AttributeAttachments } from "./AttributeAttachments";
 import type { Input } from "./UtteranceToModelDraft.schema";
 import type { ReactNode } from "react";
@@ -15,9 +11,9 @@ export function DraftRelation({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const relation = input.draft.relationships[0];
   const reversed = relation.fromEntityId === input.draft.entities[1].id;
   const stacked = input.modelLayout === "stacked";

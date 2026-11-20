@@ -1,5 +1,5 @@
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
-import { RestoreImpression } from "./RestoreImpression";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { RestoreImpression } from "./RestoreImpression/RestoreImpression";
 import { RevisionDocument } from "./RevisionDocument";
 import { RevisionHeadings } from "./RevisionHeadings";
 import { RevisionHistory } from "./RevisionHistory";
@@ -16,7 +16,7 @@ export function RevisionRestore({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const selectedIndex = input.revisions.findIndex(({ id }) => {
     return id === input.restoreRevisionId;
   });

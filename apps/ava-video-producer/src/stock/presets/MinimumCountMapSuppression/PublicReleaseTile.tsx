@@ -1,9 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { PublicCellSymbol } from "./PublicCellSymbol";
 import type { makePublicCellsFromInput } from "./makePublicCellsFromInput";
 import type { Input } from "./MinimumCountMapSuppression.schema";
@@ -20,8 +17,8 @@ export function PublicReleaseTile({
   labels,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const x = 550 + (cell.index % 2) * 190;
   const y = 170 + Math.floor(cell.index / 2) * 100;
   return (

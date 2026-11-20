@@ -1,11 +1,7 @@
 import { mix } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { StatementContext } from "./StatementContext";
 import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./QualifyApparentConflict.schema";
@@ -26,10 +22,10 @@ export function ContextStatement({
   index,
   placement,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
-  const { arrival, x } = _getStatementMotion(frame, index, motion);
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const { arrival, x } = _getStatementMotion({ frame, index, motion });
   const contextY = placement === "above" ? 145 : 340;
   return (
     <g
@@ -59,13 +55,12 @@ export function ContextStatement({
     </g>
   );
 }
-
 /** A statement arriving inward, then splitting outward from its partner. */
-function _getStatementMotion(
-  frame: number,
-  index: number,
-  motion: VideoMotion,
-) {
+function _getStatementMotion({
+  frame,
+  index,
+  motion,
+}: Readonly<{ frame: number; index: number; motion: VideoMotion }>) {
   const arrival = motion.ramp(
     frame,
     12 + index * motion.scaleStagger(6),

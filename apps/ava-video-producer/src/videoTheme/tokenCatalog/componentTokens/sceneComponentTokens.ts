@@ -7,7 +7,10 @@ import {
   createStrokeToken,
 } from "./componentTokenHelpers";
 
-function _degrees(label: string, description: string) {
+function _degrees({
+  label,
+  description,
+}: Readonly<{ label: string; description: string }>) {
   return token({
     kind: "number",
     surface: "stage",
@@ -19,8 +22,10 @@ function _degrees(label: string, description: string) {
     description,
   });
 }
-
-function _perspective(label: string, description: string) {
+function _perspective({
+  label,
+  description,
+}: Readonly<{ label: string; description: string }>) {
   return token({
     kind: "number",
     surface: "stage",
@@ -32,8 +37,10 @@ function _perspective(label: string, description: string) {
     description,
   });
 }
-
-function _blur(label: string, description: string) {
+function _blur({
+  label,
+  description,
+}: Readonly<{ label: string; description: string }>) {
   return token({
     kind: "length",
     surface: "stage",
@@ -45,8 +52,10 @@ function _blur(label: string, description: string) {
     description,
   });
 }
-
-function _fraction(label: string, description: string) {
+function _fraction({
+  label,
+  description,
+}: Readonly<{ label: string; description: string }>) {
   return token({
     kind: "number",
     surface: "stage",
@@ -57,7 +66,6 @@ function _fraction(label: string, description: string) {
     description,
   });
 }
-
 /**
  * Tokens of the scene studies, the title card, and the app chrome: the
  * tilted window's plane and motion, the brand lockup's flight, the cursor,
@@ -65,64 +73,79 @@ function _fraction(label: string, description: string) {
  */
 export const SCENE_COMPONENT_TOKENS = {
   WindowTilt: {
-    perspective: _perspective(
-      "Window perspective",
-      "Perspective distance of a single tilted window.",
-    ),
-    rotateY: _degrees(
-      "Window turn",
-      "How far a tilted window turns. Negative brings its right edge toward the camera.",
-    ),
-    rotateX: _degrees("Window lean", "How far a tilted window leans back."),
-    rotateZ: _degrees("Window roll", "How far a tilted window rolls."),
-    entryRotateY: _degrees(
-      "Window entry turn",
-      "The steeper turn a window enters at before it settles.",
-    ),
-    pairPerspective: _perspective(
-      "Pair perspective",
-      "Perspective distance of the two windows in a pair.",
-    ),
-    pairRotateY: _degrees(
-      "Pair turn",
-      "How far the left window of a pair turns. The right one mirrors it.",
-    ),
-    pairRotateX: _degrees(
-      "Pair lean",
-      "How far the windows of a pair lean back.",
-    ),
-    flipPerspective: _perspective(
-      "Flip perspective",
-      "The longer lens of a joined card flipping in, so its near edge stays inside the frame.",
-    ),
-    flipStartRotateY: _degrees(
-      "Flip start turn",
-      "The nearly edge-on turn a joined card starts its flip from.",
-    ),
+    perspective: _perspective({
+      label: "Window perspective",
+      description: "Perspective distance of a single tilted window.",
+    }),
+    rotateY: _degrees({
+      label: "Window turn",
+      description:
+        "How far a tilted window turns. Negative brings its right edge toward the camera.",
+    }),
+    rotateX: _degrees({
+      label: "Window lean",
+      description: "How far a tilted window leans back.",
+    }),
+    rotateZ: _degrees({
+      label: "Window roll",
+      description: "How far a tilted window rolls.",
+    }),
+    entryRotateY: _degrees({
+      label: "Window entry turn",
+      description: "The steeper turn a window enters at before it settles.",
+    }),
+    pairPerspective: _perspective({
+      label: "Pair perspective",
+      description: "Perspective distance of the two windows in a pair.",
+    }),
+    pairRotateY: _degrees({
+      label: "Pair turn",
+      description:
+        "How far the left window of a pair turns. The right one mirrors it.",
+    }),
+    pairRotateX: _degrees({
+      label: "Pair lean",
+      description: "How far the windows of a pair lean back.",
+    }),
+    flipPerspective: _perspective({
+      label: "Flip perspective",
+      description:
+        "The longer lens of a joined card flipping in, so its near edge stays inside the frame.",
+    }),
+    flipStartRotateY: _degrees({
+      label: "Flip start turn",
+      description:
+        "The nearly edge-on turn a joined card starts its flip from.",
+    }),
     chromeRadius: createLengthToken(
       "Window corner",
       "Corner radius of a tilted window's chrome.",
       "stage",
     ),
-    titlebarHeight: _fraction(
-      "Titlebar height",
-      "Height of a tilted window's titlebar, as a fraction of the canvas height.",
-    ),
+    titlebarHeight: _fraction({
+      label: "Titlebar height",
+      description:
+        "Height of a tilted window's titlebar, as a fraction of the canvas height.",
+    }),
   },
   WindowMotion: {
-    whipBlur: _blur(
-      "Whip blur",
-      "Peak horizontal blur of a window whipping in or out.",
-    ),
-    slideBlur: _blur("Slide blur", "Peak horizontal blur of a carousel slide."),
-    cameraBlur: _blur(
-      "Camera blur",
-      "The most blur a camera move adds to a window.",
-    ),
-    slideHold: _fraction(
-      "Slide hold",
-      "Share of a carousel slide the outgoing window stays opaque for.",
-    ),
+    whipBlur: _blur({
+      label: "Whip blur",
+      description: "Peak horizontal blur of a window whipping in or out.",
+    }),
+    slideBlur: _blur({
+      label: "Slide blur",
+      description: "Peak horizontal blur of a carousel slide.",
+    }),
+    cameraBlur: _blur({
+      label: "Camera blur",
+      description: "The most blur a camera move adds to a window.",
+    }),
+    slideHold: _fraction({
+      label: "Slide hold",
+      description:
+        "Share of a carousel slide the outgoing window stays opaque for.",
+    }),
   },
   BrandLockup: {
     flightTilt: token({
@@ -146,10 +169,11 @@ export const SCENE_COMPONENT_TOKENS = {
       label: "Mark column stagger",
       description: "Frames between neighbouring columns of a mark rising in.",
     }),
-    flightPerspective: _perspective(
-      "Flight perspective",
-      "Perspective distance of a fly-through. Smaller values exaggerate the depth.",
-    ),
+    flightPerspective: _perspective({
+      label: "Flight perspective",
+      description:
+        "Perspective distance of a fly-through. Smaller values exaggerate the depth.",
+    }),
   },
   Cursor: {
     scale: token({

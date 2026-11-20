@@ -1,4 +1,4 @@
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CONTEXT_FIELDS } from "./CONTEXT_FIELDS.constants";
 import { ContextWindow } from "./ContextWindow";
 import type { Input } from "./ChargeReferenceAlignment.schema";
@@ -11,7 +11,7 @@ export function ContextWindows({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const registration = motion.ramp(
     frame,
     12,

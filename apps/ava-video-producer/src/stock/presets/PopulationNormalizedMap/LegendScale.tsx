@@ -1,14 +1,13 @@
-import { useGraphicShapeScales } from "../../theme/useGraphicTheme/useGraphicTheme";
-import { getZoneShadeFromFraction } from "./zoneShade";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { getZoneShadeFromFraction } from "./getZoneShadeFromFraction";
 import type { ReactNode } from "react";
 /** Inputs for LegendScale. */
 type Props = { accent: string };
-
 /**
  * A fixed zero-to-maximum shade key accompanies both explicitly named measures.
  */
 export function LegendScale({ accent }: Readonly<Props>): ReactNode {
-  const scales = useGraphicShapeScales();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
       {Array.from({ length: 10 }, (_, index) => {

@@ -1,12 +1,13 @@
 import type { CSSProperties } from "react";
 
-/** Absolutely positions an element at a pixel rect computed by scene layout. */
-export function positioned(rect: {
+type PositionedOptions = {
   x: number;
   y: number;
   width: number;
   height: number;
-}): CSSProperties {
+};
+/** Absolutely positions an element at a pixel rect computed by scene layout. */
+export function positioned(rect: PositionedOptions): CSSProperties {
   return {
     position: "absolute",
     left: rect.x,

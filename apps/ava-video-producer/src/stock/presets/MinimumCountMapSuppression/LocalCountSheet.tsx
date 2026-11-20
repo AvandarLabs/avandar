@@ -1,9 +1,5 @@
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { LocalAggregateCell } from "./LocalAggregateCell";
 import type { Input } from "./MinimumCountMapSuppression.schema";
 import type { ReactNode } from "react";
@@ -11,9 +7,9 @@ import type { ReactNode } from "react";
 type Props = { input: Input; frame: number };
 /** Aggregate-only local sheet with explicit analysis boundary and shutters. */
 export function LocalCountSheet({ input, frame }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
       <StockRect

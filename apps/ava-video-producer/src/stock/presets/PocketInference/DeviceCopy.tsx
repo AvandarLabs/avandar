@@ -1,5 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./PocketInference.schema";
 import type { ReactNode } from "react";
 
@@ -9,7 +9,7 @@ type Props = { input: Input };
  * claims.
  */
 export function DeviceCopy({ input }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g data-device-copy="captions">
       {input.showLabels

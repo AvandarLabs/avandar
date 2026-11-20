@@ -1,10 +1,7 @@
 import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
-import {
-  getRefinementEndFromMotion,
-  getRefinementFromFrame,
-} from "./getRefinementFromFrame";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { RefinementMotion } from "./RefinementMotion";
 import type { Input } from "./ChartFocusEdit.schema";
 import type { ReactNode } from "react";
 
@@ -23,7 +20,7 @@ export function CategoryContextHeading({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   if (input.treatment === "direct-labels" || input.focusId !== category.id) {
     return undefined;
   }
@@ -33,11 +30,11 @@ export function CategoryContextHeading({
   const opacity = direct
     ? ramp(
         frame,
-        getRefinementEndFromMotion(motion) - motion.whip,
+        RefinementMotion.getRefinementEndFromMotion(motion) - motion.whip,
         motion.whip,
         motion.travel.easing,
       )
-    : getRefinementFromFrame(frame, motion);
+    : RefinementMotion.getRefinementFromFrame({ frame, motion });
   return (
     <g data-context={category.id} opacity={opacity}>
       <FitText

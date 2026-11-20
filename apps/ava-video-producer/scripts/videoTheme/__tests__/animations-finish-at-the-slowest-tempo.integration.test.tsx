@@ -17,7 +17,7 @@ import test from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { CONTINUITY_CATALOG } from "../../../src/continuity/continuityCatalog";
 import { sampleStockFrame } from "../../../src/continuity/continuityTimeline";
-import { getMotionDuration } from "../../../src/motion-components/motionSettings";
+import { MotionSettings } from "../../../src/motion-components/MotionSettings/MotionSettings";
 import { STOCK_IDS } from "../../../src/stock/catalog";
 import { StockGraphic } from "../../../src/stock/StockGraphic/StockGraphic";
 import { storyboardSchema } from "../../../src/storyboard/schema/schema";
@@ -54,16 +54,12 @@ const MID_ANIMATION_FRAMES = Array.from({ length: 41 }, (_, index) => {
  */
 const SHARED_OBJECT_FADE_IN_AT = 12;
 const OUTLINE_FADE_AT = 60;
-
 const slowest = makeResolvedVideoThemeFromLibrary(
   BUILT_IN_VIDEO_THEMES,
   "classic",
-  {
-    patches: [SLOWEST_TEMPO],
-  },
+  { patches: [SLOWEST_TEMPO] },
 );
 const motion = createVideoMotion(slowest.semantic.motion);
-
 function _picture(
   request: StockRequest,
   frame: number,
@@ -78,7 +74,6 @@ function _picture(
     ),
   );
 }
-
 function _readContinuityShots(
   id: string,
 ): ReadonlyArray<readonly ContinuityBeat[]> {
@@ -98,16 +93,11 @@ function _readContinuityShots(
     return shot.scene === "continuity" ? [shot.props.beats] : [];
   });
 }
-
 const COMPOSITIONS = CONTINUITY_CATALOG.map(({ id }) => {
-  return {
-    id,
-    shots: _readContinuityShots(id),
-  };
+  return { id, shots: _readContinuityShots(id) };
 }).filter(({ shots }) => {
   return shots.length > 0;
 });
-
 /**
  * The last beat-local frame before the next beat's transition starts covering
  * this one.
@@ -115,11 +105,13 @@ const COMPOSITIONS = CONTINUITY_CATALOG.map(({ id }) => {
 function _readableEnd(beats: readonly ContinuityBeat[], index: number): number {
   const nextBeat = beats[index + 1];
   const outgoing = nextBeat
-    ? getMotionDuration(nextBeat.transition.frames, nextBeat.transition.motion)
+    ? MotionSettings.getMotionDuration({
+        frames: nextBeat.transition.frames,
+        options: nextBeat.transition.motion,
+      })
     : 0;
   return beats[index].duration - outgoing - 1;
 }
-
 /**
  * One row per beat of every continuity composition, with its shot's beats
  * and its index in them.
@@ -140,7 +132,6 @@ function _listBeatRows(): Array<
     });
   });
 }
-
 /**
  * When each tempo-scaled stage animation of a beat ends, in beat-local frames.
  */
@@ -165,7 +156,6 @@ function _stageAnimationEnds(
       : {}),
   };
 }
-
 test("every stock loop finishes its animations before the loop ends", () => {
   STOCK_IDS.forEach((preset) => {
     // TypeScript cannot narrow a request over 170 preset ids to the
@@ -178,7 +168,6 @@ test("every stock loop finishes its animations before the loop ends", () => {
     );
   });
 });
-
 test("every stock loop with one-shot motion follows tempo while it animates", () => {
   assert.deepEqual(
     STOCK_IDS.filter((preset) => {
@@ -195,7 +184,6 @@ test("every stock loop with one-shot motion follows tempo while it animates", ()
     [],
   );
 });
-
 test("a repeating-motion preset draws the same picture at every tempo", () => {
   REPEATING_MOTION_PRESETS.forEach((preset) => {
     const request = { preset } as StockRequest;
@@ -208,7 +196,6 @@ test("a repeating-motion preset draws the same picture at every tempo", () => {
     });
   });
 });
-
 test("every continuity composition's stage animations finish inside their beats", () => {
   _listBeatRows().forEach(({ id, beat, index, beats }) => {
     const readableEnd = _readableEnd(beats, index);
@@ -220,7 +207,6 @@ test("every continuity composition's stage animations finish inside their beats"
     });
   });
 });
-
 test("every nested stock graphic has settled before its beat stops being readable", () => {
   _listBeatRows().forEach(({ id, beat, index, beats }) => {
     const content = beat.content;

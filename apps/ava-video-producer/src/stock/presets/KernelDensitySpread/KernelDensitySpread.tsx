@@ -1,11 +1,8 @@
 import { useId } from "react";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getKernelSamplesFromInput } from "./getKernelSamplesFromInput";
-import { KernelField } from "./KernelField";
+import { KernelField } from "./KernelField/KernelField";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./KernelDensitySpread.schema";
 import type { ReactNode } from "react";
@@ -17,16 +14,12 @@ export function KernelDensitySpread({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { text } = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const { text } = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const data = text.graphic.data;
   const body = text.graphic.body;
   const legendId = useId();
-  const { radius } = getKernelSamplesFromInput({
-    input,
-    frame,
-    motion,
-  });
+  const { radius } = getKernelSamplesFromInput({ input, frame, motion });
   const qualifier =
     "Zero modeled intensity does not establish zero population.";
   return (

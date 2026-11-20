@@ -1,11 +1,7 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicProps,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./PredicatePushdownBoundary.schema";
 import type { ReactNode } from "react";
 
@@ -26,9 +22,12 @@ export function PushdownRow({
   accent,
   opacity = 1,
 }: Readonly<Props>): ReactNode {
-  const style = useGraphicProps("PredicatePushdownBoundary", {});
-  const scales = useGraphicShapeScales();
-  const { color } = useGraphicTokens();
+  const style = GraphicThemeHooks.useGraphicProps(
+    "PredicatePushdownBoundary",
+    {},
+  );
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const { color } = GraphicThemeHooks.useGraphicTokens();
   return (
     <g
       data-source-row={source ? row.id : undefined}

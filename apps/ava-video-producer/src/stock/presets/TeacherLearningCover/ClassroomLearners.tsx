@@ -1,9 +1,6 @@
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SceneText } from "./SceneText";
 import type { Input } from "./TeacherLearningCover.schema";
 import type { ReactNode } from "react";
@@ -11,8 +8,8 @@ import type { ReactNode } from "react";
 type Props = { input: Input };
 /** Draws the scene's ClassroomLearners group with fixed authored geometry. */
 export function ClassroomLearners({ input }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <>
       {input.learners.map((learner, index) => {

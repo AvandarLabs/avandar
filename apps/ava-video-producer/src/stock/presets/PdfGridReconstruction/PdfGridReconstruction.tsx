@@ -1,12 +1,9 @@
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { RESULT_CUE } from "./getEvidenceFromFrame";
 import { GridEvidence } from "./GridEvidence";
 import { GridSceneHeadings } from "./GridSceneHeadings";
 import { GridSourceLinks } from "./GridSourceLinks";
-import { RESULT_CUE } from "./gridTiming";
 import { ReconstructionGrid } from "./ReconstructionGrid";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./PdfGridReconstruction.schema";
@@ -21,8 +18,8 @@ export function PdfGridReconstruction({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
       <GridSceneHeadings input={input} />

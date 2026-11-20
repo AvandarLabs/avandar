@@ -1,8 +1,5 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { getJigSceneFromFrame } from "./getJigSceneFromFrame";
 import type { Input } from "./SharedJigPreparation.schema";
 import type { ReactNode } from "react";
@@ -12,14 +9,14 @@ type Props = { input: Input; scene: ReturnType<typeof getJigSceneFromFrame> };
  * The collaborator's marking hand and tool contact the selected open cutout.
  */
 export function JigMarkingHand({ input, scene }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const index = scene.activeIndex;
   if (index < 0 || scene.guideX !== scene.centers[index] - 50) {
     return null;
   }
   const x = scene.centers[index];
-  const { handX, handY, tool } = _getMarkingHand(input, scene);
+  const { handX, handY, tool } = _getMarkingHand({ input, scene });
   return (
     <g>
       <SketchedShape
@@ -51,9 +48,11 @@ export function JigMarkingHand({ input, scene }: Readonly<Props>): ReactNode {
     </g>
   );
 }
-
 /** The marking hand on the guide, and the tool it holds against the cutout. */
-function _getMarkingHand(input: Input, scene: Props["scene"]) {
+function _getMarkingHand({
+  input,
+  scene,
+}: Readonly<{ input: Input; scene: Props["scene"] }>) {
   const isCornerMark = input.guide.pattern === "corner-mark";
   const handX = scene.guideX + (isCornerMark ? 11 : 70);
   const handY = scene.guideY + (isCornerMark ? 11 : 32);

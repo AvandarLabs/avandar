@@ -1,7 +1,7 @@
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
-import { ExpectedSheet } from "./ExpectedSheet";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { ExpectedSheet } from "./ExpectedSheet/ExpectedSheet";
 import type { Input } from "./ExpectationOverlayCheck.schema";
 import type { ReactNode } from "react";
 
@@ -24,7 +24,7 @@ export function StationSheets({
   state,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
       {" "}

@@ -1,8 +1,5 @@
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicTokens,
-  useGraphicMotion,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { AppointmentGeometry } from "./AppointmentGeometry";
 import { ExistingPlannerCommitments } from "./ExistingPlannerCommitments";
 import { PlannerBooking } from "./PlannerBooking";
@@ -16,8 +13,8 @@ export function PlannerAppointments({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
-  const tokens = useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const appointment = AppointmentGeometry.fromInput({ input, frame, motion });
   return (
     <g>

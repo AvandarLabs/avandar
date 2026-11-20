@@ -2,12 +2,9 @@ import { propEq } from "@avandar/utils";
 import { mix } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { BackfillChart } from "./BackfillChart";
+import { ReportingTab } from "./ReportingTab";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./SurveillanceReportingBackfill.schema";
 import type { ReactNode } from "react";
@@ -52,29 +49,6 @@ export function SurveillanceReportingBackfill({
           />
         );
       })}
-    </g>
-  );
-}
-
-/** The tab sliding from the earlier total to the revised one. */
-function ReportingTab({
-  frame,
-  accent,
-}: Readonly<{ frame: number; accent: string }>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
-  return (
-    <g data-reporting-tab="">
-      <SketchedShape
-        shape={{
-          kind: "path",
-          d: `M${mix(motion.ramp(frame, 36, motion.scale(36), motion.entrance.easing), 60, 500)} 198h380`,
-        }}
-        profile={tokens.sketch.shape}
-        stroke={accent}
-        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
-      />
     </g>
   );
 }

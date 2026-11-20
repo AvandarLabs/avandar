@@ -1,13 +1,17 @@
 import { ramp } from "../../../motion";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getReconstructionColumnXsFromFrame } from "./getReconstructionColumnXsFromFrame";
 import { ReconstructionCell } from "./ReconstructionCell";
 import { ReconstructionHeaders } from "./ReconstructionHeaders";
 import type { Input } from "./PdfGridReconstruction.schema";
 import type { ReactNode } from "react";
 
-type Props = { input: Input; frame: number; accent: string; isResult: boolean };
-
+type Props = {
+  input: Input;
+  frame: number;
+  accent: string;
+  isResult: boolean;
+};
 /** The cue the first literal cell registers on the page. */
 const REGISTER_CUE = 56;
 /** Frames each literal cell takes to register. */
@@ -19,7 +23,7 @@ export function ReconstructionGrid({
   accent,
   isResult,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const columnXs = getReconstructionColumnXsFromFrame({
     input,
     frame,

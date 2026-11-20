@@ -1,11 +1,6 @@
 import { mix, ramp } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -15,7 +10,6 @@ type Props = {
   accent: string;
   isVisible: boolean;
 };
-
 /** The cue the first impression presses into storage on. */
 const FIRST_IMPRESSION_CUE = 44;
 /** Frames between impressions, matching the writing cadence. */
@@ -30,10 +24,10 @@ export function LedgerImpression({
   accent,
   isVisible,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const pressAt = FIRST_IMPRESSION_CUE + index * CADENCE_FRAMES;
   const impression = ramp(frame, pressAt, motion.chip, motion.entrance.easing);
   if (!isVisible || frame < pressAt) {

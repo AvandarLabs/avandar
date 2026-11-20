@@ -1,6 +1,6 @@
 import { mix } from "../../../motion";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ReconnectCase } from "./ReconnectCase";
 import { ReconnectLedger } from "./ReconnectLedger";
 import { ReconnectSetting } from "./ReconnectSetting";
@@ -16,8 +16,8 @@ export function MissedVisitReconnect({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
-  const workerPosition = _getWorkerY(input, frame, motion);
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const workerPosition = _getWorkerY({ input, frame, motion });
   return (
     <g>
       <ReconnectSetting input={input} />
@@ -48,9 +48,12 @@ export function MissedVisitReconnect({
     </g>
   );
 }
-
 /** The worker stepping down to each case in turn. */
-function _getWorkerY(input: Input, frame: number, motion: VideoMotion): number {
+function _getWorkerY({
+  input,
+  frame,
+  motion,
+}: Readonly<{ input: Input; frame: number; motion: VideoMotion }>): number {
   return input.cases.reduce((position, _, index) => {
     return mix(
       motion.ramp(

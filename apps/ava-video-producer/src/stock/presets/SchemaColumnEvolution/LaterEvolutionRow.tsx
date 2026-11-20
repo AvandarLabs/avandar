@@ -1,5 +1,5 @@
 import { mix } from "../../../motion";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { EvolutionRow } from "./EvolutionRow";
 import type { Input } from "./SchemaColumnEvolution.schema";
 import type { ReactNode } from "react";
@@ -19,7 +19,7 @@ export function LaterEvolutionRow({
   accent,
   expansion,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return frame >= 93 ? (
     <g
       opacity={motion.ramp(frame, 93, motion.scale(20))}

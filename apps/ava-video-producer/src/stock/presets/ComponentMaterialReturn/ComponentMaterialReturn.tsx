@@ -1,8 +1,8 @@
 import { getMaterialBalanceFromInput } from "./getMaterialBalanceFromInput";
-import { MaterialBoundary } from "./MaterialBoundary";
+import { MaterialBoundary } from "./MaterialBoundary/MaterialBoundary";
 import { MaterialLegend } from "./MaterialLegend";
 import { MaterialOperator } from "./MaterialOperator";
-import { MaterialParts } from "./MaterialParts";
+import { MaterialParts } from "./MaterialParts/MaterialParts";
 import { MaterialQuantities } from "./MaterialQuantities";
 import { SceneLabel } from "./SceneLabel";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";

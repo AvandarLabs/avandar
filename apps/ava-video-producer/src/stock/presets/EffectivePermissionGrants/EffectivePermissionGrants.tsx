@@ -1,21 +1,16 @@
-import { ramp } from "../../../motion";
-import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
 import {
   getEffectiveRoleFromInput,
   ROLE_RANK,
 } from "./getEffectiveRoleFromInput";
-import { GrantCandidate } from "./GrantCandidate";
-import { PermissionLadder } from "./PermissionLadder";
+import { GrantCandidate } from "./GrantCandidate/GrantCandidate";
+import { PermissionLadder } from "./PermissionLadder/PermissionLadder";
 import { PermissionSceneHeadings } from "./PermissionSceneHeadings";
+import { PermissionVerdict } from "./PermissionVerdict";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./EffectivePermissionGrants.schema";
 import type { ReactNode } from "react";
 /** Frame-driven authored study props. */
 export type Props = GraphicProps & { input: Input };
-
-/** Frames the verdict takes to appear once the result has risen. */
-const VERDICT_FRAMES = 1;
 /** Qualifying grants combine by maximum rank, then meet an action notch. */
 export function EffectivePermissionGrants({
   input,
@@ -47,26 +42,6 @@ export function EffectivePermissionGrants({
         label={isAllowed ? input.labels.allowed : input.labels.denied}
         frame={frame}
       />
-    </g>
-  );
-}
-
-/** The verdict, appearing once the result has risen. */
-function PermissionVerdict({
-  label,
-  frame,
-}: Readonly<{ label: string; frame: number }>): ReactNode {
-  const motion = useGraphicMotion();
-  return (
-    <g
-      opacity={ramp(
-        frame,
-        139,
-        motion.scale(VERDICT_FRAMES),
-        motion.reveal.easing,
-      )}
-    >
-      <LabelSlots labels={[[label, 55, 580, 840, 18, 1]]} />
     </g>
   );
 }

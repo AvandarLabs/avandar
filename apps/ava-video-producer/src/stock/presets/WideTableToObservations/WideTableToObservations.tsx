@@ -1,5 +1,5 @@
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
-import { MeasurementStrip } from "./MeasurementStrip";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { MeasurementStrip } from "./MeasurementStrip/MeasurementStrip";
 import { WideLedgerCaptions } from "./WideLedgerCaptions";
 import { WideSourceGuides } from "./WideSourceGuides";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
@@ -13,7 +13,7 @@ export function WideTableToObservations({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g opacity={motion.reveal(frame, 0)}>
       <WideLedgerCaptions input={input} frame={frame} />

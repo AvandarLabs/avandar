@@ -1,6 +1,6 @@
 import { mix, ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getSpineContributionFromFrame } from "./getSpineContributionFromFrame";
 import type { Input } from "./EntitySpineAssembly.schema";
 import type { ReactNode } from "react";
@@ -11,7 +11,6 @@ type Props = {
   index: number;
   frame: number;
 };
-
 /** Frames a sum takes to fade in. */
 const APPEAR_FRAMES = 5;
 /** The collapsed sum follows a clear gap before entering its derived field. */
@@ -21,7 +20,7 @@ export function SpineSum({
   index,
   frame,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const { groupStart, entityIndex, sum } = getSpineContributionFromFrame({
     input,
     observation,

@@ -2,11 +2,7 @@ import { ramp } from "../../../motion";
 import { normalizeFiniteRange } from "../../numeric/normalizeFiniteRange/normalizeFiniteRange";
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { evaluateAffineRule } from "./evaluateAffineRule";
 import { RehearsalRuler } from "./RehearsalRuler";
 import type { Input } from "./LinkedParameterRehearsal.schema";
@@ -23,7 +19,6 @@ type Props = {
   showRules: boolean;
   showBaselineMarkers: boolean;
 };
-
 /** Frames between neighbouring output lanes appearing. */
 const LANE_STAGGER_FRAMES = 3;
 /** Frames an output lane takes to fade in. */
@@ -43,9 +38,9 @@ export function RehearsalOutput({
   showRules,
   showBaselineMarkers,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const computed = evaluateAffineRule({
     source: value,
     multiplier: output.multiplier,

@@ -2,15 +2,14 @@ import { propEq } from "@avandar/utils";
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./ClassroomDayPresence.schema";
 import type { ReactNode } from "react";
 /** Inputs for ClassroomTotals. */
 type Props = { input: Input; day: Input["days"][number] };
-
 /** Separate state totals share the unchanged supplied-roster denominator. */
 export function ClassroomTotals({ input, day }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const present = day.records.filter(propEq("state", "present")).length,
     absent = day.records.filter(propEq("state", "absent")).length,
     unknown = day.records.filter(propEq("state", "unknown")).length;

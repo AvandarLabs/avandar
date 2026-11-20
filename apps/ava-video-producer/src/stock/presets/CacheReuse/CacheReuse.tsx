@@ -1,14 +1,10 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CacheCaptions } from "./CacheCaptions";
-import { CacheLookupToken } from "./CacheLookupToken";
+import { CacheLookupToken } from "./CacheLookupToken/CacheLookupToken";
 import { CacheParticipants } from "./CacheParticipants";
 import { CacheResponse } from "./CacheResponse";
-import { CacheStoredEntry } from "./CacheStoredEntry";
+import { CacheStoredEntry } from "./CacheStoredEntry/CacheStoredEntry";
 import { getCacheJourneyFromFrame } from "./getCacheJourneyFromFrame";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./CacheReuse.schema";
@@ -21,10 +17,10 @@ export function CacheReuse({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
-  const state = getCacheJourneyFromFrame(frame, motion);
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const state = getCacheJourneyFromFrame({ frame, motion });
   return (
     <g opacity={motion.reveal(frame, 12)}>
       <CacheCaptions frame={frame} input={input} accent={accent} />

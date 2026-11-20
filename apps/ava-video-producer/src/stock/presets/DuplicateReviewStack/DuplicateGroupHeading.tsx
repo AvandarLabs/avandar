@@ -1,12 +1,9 @@
 import { mix, ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { DuplicateDecisionLabels } from "./DuplicateDecisionLabels";
-import { ALIGN_CUE, FOLD_CUE } from "./duplicateTiming";
+import { DuplicateTiming } from "./DuplicateTiming";
 import type { Input } from "./DuplicateReviewStack.schema";
 import type { ReactNode } from "react";
 
@@ -31,8 +28,8 @@ export function DuplicateGroupHeading({
   progress,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g>
       <SketchedShape
@@ -70,7 +67,12 @@ export function DuplicateGroupHeading({
           fill="none"
           stroke={accent}
           opacity={
-            ramp(frame, ALIGN_CUE, FOLD_CUE - ALIGN_CUE, motion.reveal.easing) *
+            ramp(
+              frame,
+              DuplicateTiming.ALIGN_CUE,
+              DuplicateTiming.FOLD_CUE - DuplicateTiming.ALIGN_CUE,
+              motion.reveal.easing,
+            ) *
             (1 - progress)
           }
         />

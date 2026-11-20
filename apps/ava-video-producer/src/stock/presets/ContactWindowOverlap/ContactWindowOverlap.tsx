@@ -1,8 +1,8 @@
 import { InvestigationStencil } from "./InvestigationStencil";
 import { OverlapLedger } from "./OverlapLedger";
 import { OverlapSetting } from "./OverlapSetting";
-import { PresenceAxis } from "./PresenceAxis";
-import { PresenceRibbon } from "./PresenceRibbon";
+import { PresenceAxis } from "./PresenceAxis/PresenceAxis";
+import { PresenceRibbon } from "./PresenceRibbon/PresenceRibbon";
 import { SceneLabel } from "./SceneLabel";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ContactWindowOverlap.schema";

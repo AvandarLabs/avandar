@@ -1,6 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { type FitTextSize } from "../../primitives/FitText/wrapTextToLines";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ClassroomRoster } from "./ClassroomRoster";
 import type { Input } from "./ClassroomAccessRearrangement.schema";
 import type { ReactNode } from "react";
@@ -20,7 +20,7 @@ type Slot = [
  * bound.
  */
 export function ClassroomLabels({ input, frame }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const slots: Slot[] = [
     [input.activity.label, 48, 38, 864, 20, 1],
     [

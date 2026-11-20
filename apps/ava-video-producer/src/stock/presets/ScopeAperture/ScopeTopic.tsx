@@ -1,5 +1,5 @@
 import { mix } from "../../../motion";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ScopeTopicCopy } from "./ScopeTopicCopy";
 import type { Input } from "./ScopeAperture.schema";
 import type { ReactNode } from "react";
@@ -21,7 +21,7 @@ export function ScopeTopic({
   membershipIndex,
   showExcluded,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const contraction = motion.ramp(
     frame,
     36,

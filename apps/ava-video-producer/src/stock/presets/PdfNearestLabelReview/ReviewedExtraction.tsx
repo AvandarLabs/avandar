@@ -1,9 +1,6 @@
 import { mix, ramp } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ExtractionRow } from "./ExtractionRow";
 import { getAssociationFromInput } from "./getAssociationFromInput";
 import { ReviewChoiceMark } from "./ReviewChoiceMark";
@@ -11,7 +8,6 @@ import type { Input } from "./PdfNearestLabelReview.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
-
 /** Frames the reviewed extraction takes to slide into place. */
 const EXTRACT_FRAMES = 43;
 /**
@@ -22,8 +18,8 @@ export function ReviewedExtraction({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const association = getAssociationFromInput(input);
   const progress = ramp(
     frame,

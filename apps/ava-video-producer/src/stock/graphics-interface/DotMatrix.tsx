@@ -6,32 +6,25 @@ import { Pill } from "../graphics-common/Pill";
 import { Text } from "../graphics-common/Text";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
 import { SketchedShape } from "../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { GraphicProps } from "../graphics-common/graphicCommon.types";
 import type { DotMatrixInput } from "../presets/DotMatrix/DotMatrix.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: DotMatrixInput };
-
 const FILL_AT = 18;
 const HEADING_SIZE = "31";
 const COUNT_SIZE = "79";
-
 /** Draws the bounded authored dot-matrix study at an explicit frame. */
 export function DotMatrix({
   input,
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const { color, stroke, alpha, sketch } = useGraphicTokens();
-  const shapes = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const { color, stroke, alpha, sketch } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const selectedTotal = input.groups
     .filter(prop("selected"))
     .reduce((total, group) => {
@@ -48,10 +41,7 @@ export function DotMatrix({
     };
   });
   const legendGroups = input.groups.map((group, index) => {
-    return {
-      ...group,
-      x: 78 + index * 189,
-    };
+    return { ...group, x: 78 + index * 189 };
   });
   const selected = Math.round(
     matrixPoints.slice(0, selectedTotal).reduce((total, _, i) => {
@@ -108,9 +98,7 @@ export function DotMatrix({
       <Text role="question" x={748} y={329}>
         {getStockDisplayCopyFromDescriptor({
           descriptor: LEGACY_DISPLAY_COPY["dot-matrix"].cohortTotal,
-          values: {
-            count: cohortTotal,
-          },
+          values: { count: cohortTotal },
         })}
       </Text>
       <Text role="note" x={748} y={362}>

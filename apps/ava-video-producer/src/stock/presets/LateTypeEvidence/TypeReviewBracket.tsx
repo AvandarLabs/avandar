@@ -1,10 +1,6 @@
 import { ramp } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { LATE_CUE, RESOLVED_CUE, TRANSFER_CUE } from "./evidenceTiming";
 import type { Input } from "./LateTypeEvidence.schema";
 import type { ReactNode } from "react";
@@ -15,9 +11,9 @@ export function TypeReviewBracket({
   input,
   frame,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   // The bracket has drawn the frame before values transfer.
   const progress = ramp(
     frame,

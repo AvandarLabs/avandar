@@ -1,14 +1,13 @@
 import { getSketchPathsFromShape } from "../../../videoTheme/sketchShape/sketchShape";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
-import type { ReactNode, SVGProps } from "react";
-
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import type { ReactNode, SVGProps as Props } from "react";
 /**
  * A box drawn with the theme's box sketch profile (`sketch.box`): the plain
  * SVG rect while the profile is smooth, seeded roughjs outlines otherwise.
  * Text is never sketched. Used by panels, pills, and preset boxes.
  */
-export function StockRect(props: SVGProps<SVGRectElement>): ReactNode {
-  const profile = useGraphicTokens().sketch.box;
+export function StockRect(props: Props<SVGRectElement>): ReactNode {
+  const profile = GraphicThemeHooks.useGraphicTokens().sketch.box;
   const {
     x = 0,
     y = 0,

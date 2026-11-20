@@ -1,6 +1,6 @@
 import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getByteLabelFromBytes } from "./getByteLabelFromBytes";
 import type { Input } from "./EqualCountUnequalVolume.schema";
 import type { ReactNode } from "react";
@@ -11,7 +11,6 @@ type Props = {
   frame: number;
   y: number;
 };
-
 /** Frames a shelf total takes to fade in. */
 const TOTAL_FRAMES = 34;
 /** Exact collection sum shown in the authored common display unit. */
@@ -21,7 +20,7 @@ export function VolumeTotal({
   frame,
   y,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const total = group.items.reduce((sum, item) => {
     return sum + item.bytes;
   }, 0);

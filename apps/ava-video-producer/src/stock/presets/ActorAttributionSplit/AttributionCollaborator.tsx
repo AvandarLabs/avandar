@@ -2,10 +2,7 @@ import { propEq } from "@avandar/utils";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { STAMP_CORNER } from "./attributionShape";
 import type { Input } from "./ActorAttributionSplit.schema";
 import type { ReactNode } from "react";
@@ -25,8 +22,8 @@ export function AttributionCollaborator({
   separation,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const y = 170 + index * 160;
   const account = input.accounts.find(
     propEq("id", person.individualAccountId),

@@ -1,11 +1,7 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicProps,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./QueryColumnCacheGrowth.schema";
 import type { ReactNode } from "react";
 
@@ -18,9 +14,9 @@ export function CacheRequestCards({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const style = useGraphicProps("QueryColumnCacheGrowth", {});
-  const scales = useGraphicShapeScales();
-  const { color, sketch } = useGraphicTokens();
+  const style = GraphicThemeHooks.useGraphicProps("QueryColumnCacheGrowth", {});
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const { color, sketch } = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
       {input.requests.map((request, index) => {

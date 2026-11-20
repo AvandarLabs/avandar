@@ -1,9 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { PlannerColumns } from "./PlannerColumns";
 import type { Input } from "./PersonLedSupportCalendar.schema";
 import type { ReactNode } from "react";
@@ -11,8 +8,8 @@ import type { ReactNode } from "react";
 type Props = { input: Input };
 /** Fixed tabletop grid keeps all authored commitments in discrete cells. */
 export function PlannerGrid({ input }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
       <StockRect

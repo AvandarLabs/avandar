@@ -1,12 +1,9 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ChartCategory } from "./ChartCategory";
 import { ChartHeadings } from "./ChartHeadings";
 import { ChartScale } from "./ChartScale";
-import { getRefinementFromFrame } from "./getRefinementFromFrame";
+import { RefinementMotion } from "./RefinementMotion";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ChartFocusEdit.schema";
 import type { ReactNode } from "react";
@@ -18,9 +15,9 @@ export function ChartFocusEdit({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const refinement = getRefinementFromFrame(frame, motion);
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const refinement = RefinementMotion.getRefinementFromFrame({ frame, motion });
   return (
     <g data-axis-maximum={input.axisMaximum}>
       <ChartHeadings input={input} frame={frame} accent={accent} />

@@ -1,10 +1,6 @@
 import { propEq } from "@avandar/utils";
 import { mix } from "../../../motion";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./VaccinationSessionBalance.schema";
 import type { ReactNode } from "react";
 
@@ -23,10 +19,10 @@ export function DoseToken({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
-  const { destinationX, destinationY } = _getDoseDestination(input, unit);
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const { destinationX, destinationY } = _getDoseDestination({ input, unit });
   const progress = motion.ramp(
     frame,
     36 + index * motion.stagger.list,
@@ -48,12 +44,14 @@ export function DoseToken({
     />
   );
 }
-
 /**
  * Where a dose ends up: beside its recipient if administered, else in the
  * remaining or discarded tray, packed among the doses sharing that place.
  */
-function _getDoseDestination(input: Input, unit: Props["unit"]) {
+function _getDoseDestination({
+  input,
+  unit,
+}: Readonly<{ input: Input; unit: Props["unit"] }>) {
   const peers = input.units.filter((item) => {
     return (
       item.outcome === unit.outcome &&

@@ -1,19 +1,14 @@
 import { ramp } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { SEPARATE_CUE, SEPARATE_FRAMES } from "./getSeparationFromFrame";
 import { getSpliceGeometryFromInputAndFrame } from "./getSpliceGeometryFromInputAndFrame";
 import { SpliceJoint } from "./SpliceJoint";
-import { SpliceModule } from "./SpliceModule";
-import { SEPARATE_CUE, SEPARATE_FRAMES } from "./spliceTiming";
+import { SpliceModule } from "./SpliceModule/SpliceModule";
 import type { Input } from "./PipelineStepSplice.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
-
 /** Frames the new joints take to close around the inserted step. */
 const CLOSE_FRAMES = 16;
 /** Open the old joints and close connectors along the new authored sequence. */
@@ -22,9 +17,9 @@ export function PipelineStrip({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const steps = getSpliceGeometryFromInputAndFrame({ input, frame, motion });
   // The original joints fade out while the steps separate.
   const fade = ramp(

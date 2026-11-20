@@ -1,8 +1,4 @@
-import {
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -29,7 +25,6 @@ const OBJECT_PATHS: Record<
     "M-22 -17 H22 V12 H-22 Z M-10 22 H10 M0 12 V22 M-17 -12 H17 V7 H-17 Z",
   token: "M0 -22 L19 -11 V11 L0 22 L-19 11 V-11 Z M-9 0 L-2 7 L11 -8",
 };
-
 /**
  * Bounded schematic objects are local paths with no remote asset dependency.
  */
@@ -40,9 +35,9 @@ export function ObjectGlyph({
   size = 48,
   color,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   if (
     ![x, y, size].every(Number.isFinite) ||
     size < 8 ||

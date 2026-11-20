@@ -1,9 +1,8 @@
 import { createContinuityPlanFromVideoThemeSnapshot } from "../../../src/continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme";
-import { captionFiles } from "../../lib/planHelpers";
+import { captionFiles } from "../../lib/planHelpers/planHelpers";
 import type { Film } from "../../../src/showcase/showcase.types";
 
 type CaptionFilm = Pick<Film, "id" | "plan" | "theme">;
-
 /**
  * A caption download's film and files, or the status to answer with instead.
  */
@@ -13,9 +12,12 @@ export type CaptionFilesResult<FilmValue extends CaptionFilm> =
       film: FilmValue;
       files: ReturnType<typeof captionFiles>;
     }>
-  | Readonly<{ status: 400 }>
-  | Readonly<{ status: 404 }>;
-
+  | Readonly<{
+      status: 400;
+    }>
+  | Readonly<{
+      status: 404;
+    }>;
 async function _statusOfFailedLoad({
   id,
   error,
@@ -41,7 +43,6 @@ async function _statusOfFailedLoad({
   );
   return isKnownFilm ? 400 : 404;
 }
-
 /**
  * The transcript and caption files for a film loaded with the same options
  * an export sends, `theme: { id, patch }` included, so caption timing

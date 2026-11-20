@@ -1,9 +1,6 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { DeviceCopy } from "./DeviceCopy";
 import { InternalWriting } from "./InternalWriting";
 import { ModelCartridge } from "./ModelCartridge";
@@ -23,8 +20,8 @@ export function PocketInference({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const phone = input.deviceShape === "phone";
   const laptop = input.deviceShape === "laptop";
   return (

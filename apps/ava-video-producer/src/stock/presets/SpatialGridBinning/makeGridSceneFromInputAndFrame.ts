@@ -9,9 +9,7 @@ type CountTokenResult = {
   sourceX: number;
   sourceY: number;
 };
-
 type CountToken = Input["points"][number] & CountTokenResult;
-
 const COUNT_AT = 51;
 const COUNT_FRAMES = 37;
 type CellCount = {
@@ -59,7 +57,6 @@ type GridSceneArgs = Readonly<{
   frame: number;
   motion: Pick<VideoMotion, "ramp" | "scale" | "travel" | "stagger">;
 }>;
-
 /**
  * Assign each observation once, then move its token to a distinct ledger slot.
  */
@@ -67,21 +64,23 @@ export function makeGridSceneFromInputAndFrame({
   input,
   frame,
   motion,
-}: GridSceneArgs): {
-  points: CountToken[];
-  cells: CellCount[];
-} {
+}: GridSceneArgs): { points: CountToken[]; cells: CellCount[] } {
   const assignments = _getAssignments(input);
-  const points = _createCountTokens({ input, frame, motion }, assignments);
+  const points = _createCountTokens({
+    input: { input, frame, motion },
+    assignments,
+  });
   const cells = _createCells({ input, assignments, points });
   return { points, cells };
 }
-
 /** Each observation's token, moving from its source into its cell's slot. */
-function _createCountTokens(
-  { input, frame, motion }: GridSceneArgs,
-  assignments: readonly number[],
-): CountToken[] {
+function _createCountTokens({
+  input: { input, frame, motion },
+  assignments,
+}: Readonly<{
+  input: GridSceneArgs;
+  assignments: readonly number[];
+}>): CountToken[] {
   const { columns, rows } = input.grid;
   return input.points.map((point, index) => {
     const cell = assignments[index];

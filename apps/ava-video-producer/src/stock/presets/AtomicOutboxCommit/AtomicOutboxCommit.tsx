@@ -1,13 +1,7 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { SketchedShape } from "../../primitives/SketchedShape";
-import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
-import { OutboxCommitMarks } from "./OutboxCommitMarks";
+import { OutboxCommitMarks } from "./OutboxCommitMarks/OutboxCommitMarks";
 import { OutboxDurableState } from "./OutboxDurableState";
+import { OutboxEnclosure } from "./OutboxEnclosure";
 import { OutboxOutcome } from "./OutboxOutcome";
 import { OutboxProposal } from "./OutboxProposal";
 import { UNMOUNT_CUE } from "./outboxShape";
@@ -50,31 +44,5 @@ export function AtomicOutboxCommit({
       <OutboxCommitMarks input={input} frame={frame} accent={accent} />
       <OutboxOutcome input={input} frame={frame} />
     </g>
-  );
-}
-
-/** The transaction's outline, split by the boundary between its two stores. */
-function OutboxEnclosure(): ReactNode {
-  const tokens = useGraphicTokens();
-  const { atomic } = useGraphicTheme();
-  const scales = useGraphicShapeScales();
-  return (
-    <>
-      <StockRect
-        x={70}
-        y={140}
-        width={820}
-        height={360}
-        rx={scales.corner(tokens.corner.cell)}
-        fill="none"
-        stroke={tokens.color.line}
-      />
-      <SketchedShape
-        shape={{ kind: "path", d: "M480 155 V470" }}
-        profile={tokens.sketch.shape}
-        stroke={tokens.color.line}
-        strokeDasharray={atomic.dash.boundary.join(" ")}
-      />
-    </>
   );
 }

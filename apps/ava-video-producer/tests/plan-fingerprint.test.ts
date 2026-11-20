@@ -4,12 +4,12 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import {
-  previewFrames,
   fingerprintPlan,
   requireMatchingPreview,
   safeInputFile,
   ensureDirectory,
-} from "../scripts/lib/planHelpers";
+} from "../scripts/lib/planHelpers/planHelpers";
+import { previewFrames } from "../scripts/lib/planHelpers/previewFrames";
 import { fixture, temporary } from "./pipeline-test-helpers";
 
 test("preview samples the composed film on both sides of its transition", () => {
@@ -23,7 +23,6 @@ test("preview samples the composed film on both sides of its transition", () => 
     }),
   );
 });
-
 test("render requires preview proof matching plan, renderer and asset bytes", async () => {
   return temporary(async (root) => {
     const plan = fixture();
@@ -73,7 +72,6 @@ test("render requires preview proof matching plan, renderer and asset bytes", as
     );
   });
 });
-
 test("input and output guards reject hidden files and symlink escapes before writes", async () => {
   return temporary(async (root) => {
     await fs.writeFile(path.join(root, ".private"), "not narration");

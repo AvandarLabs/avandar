@@ -1,6 +1,6 @@
 import { prop } from "@avandar/utils";
 import { mix, ramp } from "../../../motion";
-import { getSeparationFromFrame } from "./spliceTiming";
+import { getSeparationFromFrame } from "./getSeparationFromFrame";
 import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./PipelineStepSplice.schema";
 /** Data for getSpliceGeometryFromInputAndFrame. */
@@ -11,10 +11,8 @@ type GetSpliceGeometryResult = {
   x: number;
   y: number;
 };
-
 /** Frames the inserted step takes to drop into the gap. */
 const INSERT_FRAMES = 36;
-
 /** Final-array identities retain their order through a single middle splice. */
 export function getSpliceGeometryFromInputAndFrame({
   input,
@@ -25,7 +23,7 @@ export function getSpliceGeometryFromInputAndFrame({
   frame: number;
   motion: VideoMotion;
 }>): GetSpliceGeometryResult[] {
-  const separation = getSeparationFromFrame(frame, motion);
+  const separation = getSeparationFromFrame({ frame, motion });
   const insertion = ramp(
     frame,
     62,

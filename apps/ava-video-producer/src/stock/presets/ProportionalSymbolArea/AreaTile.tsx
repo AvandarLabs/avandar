@@ -1,10 +1,6 @@
 import { mix } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./ProportionalSymbolArea.schema";
 import type { ReactNode } from "react";
 
@@ -16,7 +12,6 @@ type Props = {
   accent: string;
   areaPerUnit: number;
 };
-
 function _getBoundaryPoint(step: number) {
   const distance = step * 4,
     side = Math.floor(distance),
@@ -38,9 +33,9 @@ export function AreaTile({
   accent,
   areaPerUnit,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const { stroke, alpha, sketch } = useGraphicTokens();
-  const shapes = useGraphicShapeScales();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const { stroke, alpha, sketch } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
   const side = Math.sqrt(areaPerUnit),
     columns = Math.ceil(Math.sqrt(site.value)),
     rows = Math.ceil(site.value / columns);

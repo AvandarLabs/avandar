@@ -2,19 +2,17 @@
 import "../fonts";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { TITLE_STUDY_LEN } from "../composition-timing";
-import { TitleCard, TITLE_LEN } from "../title-card";
+import { TitleCard, TITLE_LEN } from "../TitleCard/TitleCard";
 import { useVideoTokens } from "../videoTheme/useVideoTheme";
 import type { ReactNode } from "react";
 
 export { TITLE_STUDY_LEN } from "../composition-timing";
-
 // Three unchanged title components, with an 18-frame breath between them.
 const TITLES = [
   ["Acme Studio", "Ask a question, publish the answer"],
   ["Motion vocabulary", "Small movements. Clear meaning."],
   ["Made with code", "React compositions, rendered frame by frame"],
 ];
-
 /**
  * The three titles in turn on the scene ground. Draw it inside a video
  * theme: a showcase film's, or `starter` in Remotion Studio.

@@ -1,9 +1,5 @@
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { DuplicateCandidateCopy } from "./DuplicateCandidateCopy";
 import { DuplicateCandidateRole } from "./DuplicateCandidateRole";
 import { getDuplicateCardLayoutFromGroupAndFrame } from "./getDuplicateCardLayoutFromGroupAndFrame";
@@ -19,7 +15,6 @@ type Props = {
   index: number;
   accent: string;
 };
-
 /** A candidate card's corner before the corner style scales it. */
 const CARD_CORNER = 5;
 /**
@@ -34,9 +29,9 @@ export function DuplicateCandidate({
   index,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const layout = getDuplicateCardLayoutFromGroupAndFrame({
     frame,
     input,

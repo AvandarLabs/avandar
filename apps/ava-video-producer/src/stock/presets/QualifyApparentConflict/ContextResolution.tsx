@@ -1,10 +1,6 @@
 import { mix } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ContextQualifier } from "./ContextQualifier";
 import { ContextQuestion } from "./ContextQuestion";
 import type { Props } from "./QualifyApparentConflict";
@@ -17,9 +13,9 @@ export function ContextResolution({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const split = motion.ramp(frame, 48, motion.scale(36));
   const resolution = motion.ramp(frame, 96, motion.scale(24));
   const dividerOpacity =

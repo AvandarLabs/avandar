@@ -1,13 +1,8 @@
 import { mix } from "../../motion";
-import { RaceStats } from "./RaceStats";
+import { RaceStats } from "./RaceStats/RaceStats";
 import { useWindowStage } from "./useWindowStage";
 import { WindowCard } from "./WindowCard";
-import {
-  getFlipSplit,
-  getSideEntrance,
-  getWhipEntrance,
-  getWhipExit,
-} from "./windowMotion";
+import { WindowMotion } from "./WindowMotion/WindowMotion";
 import { PAIR_BOXES } from "./windowTilt";
 import type { RaceColumn, TiltedWindowSceneProps } from "../scenes.types";
 import type { ReactNode } from "react";
@@ -17,7 +12,6 @@ type Props = TiltedWindowSceneProps & {
   width: number;
   height: number;
 };
-
 /**
  * Two windows side by side, each with a label above and a live counter
  * below, for a race between two runs of the same task. The pair can enter
@@ -30,7 +24,9 @@ export function RacePair(props: Props): ReactNode {
   const tilt = stage.tilt;
   const at = entrance?.atFrame ?? 1;
   const isFlip = (entrance?.kind ?? "flip-split") === "flip-split";
-  const flip = isFlip ? getFlipSplit(frame, at, width, stage) : undefined;
+  const flip = isFlip
+    ? WindowMotion.getFlipSplit({ frame, at, canvasWidth: width, stage })
+    : undefined;
   const split = flip ? flip.split : 1;
   const boxes = PAIR_BOXES.map((box) => {
     return {
@@ -60,32 +56,32 @@ export function RacePair(props: Props): ReactNode {
           const sign = side === 0 ? 1 : -1;
           const base =
             exit && frame >= exit.atFrame
-              ? getWhipExit(
+              ? WindowMotion.getWhipExit({
                   frame,
-                  exit.atFrame,
+                  at: exit.atFrame,
                   box,
-                  exit.durationInFrames,
+                  durationInFrames: exit.durationInFrames,
                   stage,
-                )
+                })
               : entrance?.kind === "whip"
-                ? getWhipEntrance(
+                ? WindowMotion.getWhipEntrance({
                     frame,
                     at,
-                    { width },
+                    canvas: { width },
                     box,
-                    entrance.durationInFrames,
+                    durationInFrames: entrance.durationInFrames,
                     stage,
-                  )
+                  })
                 : entrance?.kind === "from-sides"
-                  ? getSideEntrance(
+                  ? WindowMotion.getSideEntrance({
                       frame,
                       at,
-                      side === 0 ? 0 : 1,
-                      { width },
+                      side: side === 0 ? 0 : 1,
+                      canvas: { width },
                       box,
-                      entrance.durationInFrames,
+                      durationInFrames: entrance.durationInFrames,
                       stage,
-                    )
+                    })
                   : {
                       translateX: 0,
                       translateZ: 0,

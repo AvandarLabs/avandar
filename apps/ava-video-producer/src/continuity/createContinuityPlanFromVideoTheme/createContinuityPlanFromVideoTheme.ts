@@ -1,18 +1,14 @@
-import { getOverlayTimings } from "../../motion-components/AnchoredOverlay";
-import { retimeCameraTrack } from "../../motion-components/cameraTrack";
-import {
-  DEFAULT_MOTION_PRESET,
-  getMotionDuration,
-  motionOptionsSchema,
-} from "../../motion-components/motionSettings";
+import { getOverlayTimings } from "../../motion-components/AnchoredOverlay/AnchoredOverlay";
+import { retimeCameraTrack } from "../../motion-components/cameraTrack/cameraTrack";
+import { MotionSettings } from "../../motion-components/MotionSettings/MotionSettings";
 import { isCameraSafeEasing } from "../../videoTheme/isCameraSafeEasing/isCameraSafeEasing";
 import { makeResolvedVideoThemeFromSnapshot } from "../../videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 import { getContinuityTimeline } from "../continuityTimeline";
-import type { OverlayCue } from "../../motion-components/AnchoredOverlay";
+import type { OverlayCue } from "../../motion-components/AnchoredOverlay/AnchoredOverlay";
 import type {
   MotionEasing,
   MotionOptions,
-} from "../../motion-components/motionSettings";
+} from "../../motion-components/MotionSettings/MotionSettings";
 import type { Storyboard } from "../../storyboard/schema/schema";
 import type {
   EasingValue,
@@ -38,10 +34,8 @@ type CameraTheme = Readonly<{
   zoom: ResolvedRange;
   presetOptions: MotionOptions | undefined;
 }>;
-
 /** The stock diagram a continuity camera frames. */
 const STOCK_CANVAS = { width: 960, height: 600 };
-
 /**
  * A theme curve as a camera curve. The resolver already rejects curves that
  * are not camera-safe, so the throw only guards a theme that skipped it.
@@ -58,7 +52,6 @@ function _toMotionEasing(easing: EasingValue, tokenPath: string): MotionEasing {
   const [x1, y1, x2, y2] = easing;
   return [x1, y1, x2, y2];
 }
-
 function _presetMotionOptions(
   preset: NonNullable<MotionOptions["preset"]>,
   semantic: ThemeSemantic,
@@ -70,7 +63,6 @@ function _presetMotionOptions(
     easing: _toMotionEasing(camera.easing, `camera.presets.${preset}.easing`),
   };
 }
-
 /**
  * Motion options with the theme filled in. A named preset becomes the
  * theme's speed, shutter, and curve for that preset, and every cue gets the
@@ -89,7 +81,8 @@ export function createMotionOptionsFromTheme(
     ...(preset
       ? _presetMotionOptions(preset, semantic)
       : {
-          speed: semantic.camera.presets[DEFAULT_MOTION_PRESET].speed,
+          speed:
+            semantic.camera.presets[MotionSettings.DEFAULT_MOTION_PRESET].speed,
           shutterAngle: blur.shutter,
         }),
     samples: blur.samples,
@@ -99,11 +92,10 @@ export function createMotionOptionsFromTheme(
     ...authored,
   };
 }
-
 /** Reads every camera token once, so a plan's shots share one conversion. */
 function _cameraTheme(semantic: ThemeSemantic): CameraTheme {
   const { easing, zoom, preset } = semantic.camera;
-  const presetName = motionOptionsSchema.shape.preset
+  const presetName = MotionSettings.motionOptionsSchema.shape.preset
     .unwrap()
     .safeParse(preset);
   return {
@@ -118,11 +110,9 @@ function _cameraTheme(semantic: ThemeSemantic): CameraTheme {
       : undefined,
   };
 }
-
 function _isCameraCurveName(ease: string): ease is CameraCurveName {
   return (CAMERA_CURVE_NAMES as readonly string[]).includes(ease);
 }
-
 /**
  * A camera key with the theme's curve for its named ease and its zoom inside
  * the theme's limits. A clamped key moves its centre just enough to keep the
@@ -148,29 +138,26 @@ function _themeCameraKey(key: CameraKey, camera: CameraTheme): CameraKey {
     y: Math.min(STOCK_CANVAS.height - halfHeight, Math.max(halfHeight, key.y)),
   };
 }
-
 /** The fastest speed a motion cue may take. */
 const MAX_MOTION_SPEED = 4;
-
 function _fitsOverlayWindow(cue: OverlayCue): boolean {
   try {
-    getOverlayTimings(cue);
+    getOverlayTimings({ cue });
     return true;
   } catch {
     return false;
   }
 }
-
 /**
  * Overlay motion with the theme filled in, sped up just enough that its
  * travel still leaves a reading hold inside the authored window when the
  * theme's speed is too slow for it. The plan's beats keep their content
  * timing, so the window cannot grow instead.
  */
-function _themeOverlayMotion(
-  overlay: OverlayCue,
-  semantic: ThemeSemantic,
-): MotionOptions {
+function _themeOverlayMotion({
+  overlay,
+  semantic,
+}: Readonly<{ overlay: OverlayCue; semantic: ThemeSemantic }>): MotionOptions {
   const motion = createMotionOptionsFromTheme(overlay.motion, semantic);
   let speed = motion.speed ?? 1;
   while (
@@ -181,7 +168,6 @@ function _themeOverlayMotion(
   }
   return { ...motion, speed };
 }
-
 function _themeCompositeContent(
   content: Extract<BeatContent, { kind: "composite" }>,
   semantic: ThemeSemantic,
@@ -193,19 +179,19 @@ function _themeCompositeContent(
         ...diagram,
         overlay: {
           ...diagram.overlay,
-          motion: _themeOverlayMotion(diagram.overlay, semantic),
+          motion: _themeOverlayMotion({ overlay: diagram.overlay, semantic }),
         },
       };
     }),
   };
 }
-
-function _themeContent(options: {
+type ThemeContentOptions = {
   content: BeatContent;
   semantic: ThemeSemantic;
   camera: CameraTheme;
   presetOptions: MotionOptions | undefined;
-}): BeatContent {
+};
+function _themeContent(options: ThemeContentOptions): BeatContent {
   const { content, semantic, camera, presetOptions } = options;
   if (content.kind === "composite") {
     return _themeCompositeContent(content, semantic);
@@ -238,7 +224,6 @@ function _themeContent(options: {
       : {}),
   };
 }
-
 /**
  * Frames a themed camera route needs beyond the authored one, so reading holds
  * keep their length.
@@ -255,17 +240,23 @@ function _addedCameraFrames(
   ) {
     return 0;
   }
-  const before = retimeCameraTrack(authored.camera, authored.cameraOptions);
-  const after = retimeCameraTrack(themed.camera, themed.cameraOptions);
+  const before = retimeCameraTrack({
+    keys: authored.camera,
+    options: authored.cameraOptions,
+  });
+  const after = retimeCameraTrack({
+    keys: themed.camera,
+    options: themed.cameraOptions,
+  });
   return Math.max(0, after[after.length - 1].at - before[before.length - 1].at);
 }
-
-function _themeBeat(options: {
+type ThemeBeatOptions = {
   beat: ContinuityBeat;
   semantic: ThemeSemantic;
   camera: CameraTheme;
   presetOptions: MotionOptions | undefined;
-}): ContinuityBeat {
+};
+function _themeBeat(options: ThemeBeatOptions): ContinuityBeat {
   const { beat, semantic, camera, presetOptions } = options;
   const content = _themeContent({
     content: beat.content,
@@ -283,25 +274,29 @@ function _themeBeat(options: {
     content,
   };
 }
-
 /** Each beat's incoming overlap in frames. The first beat has none. */
 function _overlapFrames(beats: readonly ContinuityBeat[]): number[] {
   return beats.map((beat, index) => {
     return index === 0
       ? 0
-      : getMotionDuration(beat.transition.frames, beat.transition.motion);
+      : MotionSettings.getMotionDuration({
+          frames: beat.transition.frames,
+          options: beat.transition.motion,
+        });
   });
 }
-
 /**
  * The beats with each one lengthened by what its themed overlaps gained, so
  * the reading hold between its incoming and outgoing overlap keeps its
  * length. A shorter overlap leaves the beat as it is.
  */
-function _keepReadingHolds(
-  authored: readonly ContinuityBeat[],
-  themed: readonly ContinuityBeat[],
-): ContinuityBeat[] {
+function _keepReadingHolds({
+  authored,
+  themed,
+}: Readonly<{
+  authored: readonly ContinuityBeat[];
+  themed: readonly ContinuityBeat[];
+}>): ContinuityBeat[] {
   const before = _overlapFrames(authored);
   const after = _overlapFrames(themed);
   return themed.map((beat, index) => {
@@ -313,7 +308,6 @@ function _keepReadingHolds(
     return { ...beat, duration: beat.duration + Math.max(0, gained) };
   });
 }
-
 function _themeShot(
   shot: ContinuityShot,
   semantic: ThemeSemantic,
@@ -323,12 +317,12 @@ function _themeShot(
     ? camera.presetOptions
     : undefined;
   const authored = shot.props.beats;
-  const beats = _keepReadingHolds(
+  const beats = _keepReadingHolds({
     authored,
-    authored.map((beat) => {
+    themed: authored.map((beat) => {
       return _themeBeat({ beat, semantic, camera, presetOptions });
     }),
-  );
+  });
   const overlaps = _overlapFrames(authored);
   const themedOverlaps = _overlapFrames(beats);
   const isRetimed = beats.some((beat, index) => {
@@ -347,7 +341,6 @@ function _themeShot(
     props: { ...shot.props, beats },
   };
 }
-
 /**
  * A storyboard with its continuity shots fitted to a video theme. The
  * theme's camera preset retimes camera travel where camera motion is on,
@@ -372,7 +365,6 @@ export function createContinuityPlanFromVideoTheme(
     }),
   };
 }
-
 /**
  * `createContinuityPlanFromVideoTheme` with a snapshot's theme, resolved for
  * `overrideIds` (the film or plan id). Use it wherever a themed film's frames

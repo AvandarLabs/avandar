@@ -14,7 +14,7 @@ token catalog in `src/videoTheme/tokenCatalog/`.
 
 The video theme reaches only the items that the first token pass covered: the
 12 stock presets and 5 compositions in
-`scripts/videoTheme/themeParity/parityTargets/parityTargets.ts`, the
+`scripts/videoTheme/themeParity/ParityTargets/ParityTargets.ts`, the
 continuity stage renderer, and the shared graphic primitives in
 `src/stock/graphics-common/`. Everything else draws from three parallel
 sources the Design tokens tab cannot edit:
@@ -294,7 +294,7 @@ makes them the first to migrate within their slice.
 ### 2.3 Compositions (36)
 
 The continuity renderer itself is theme-driven (plan builder plus `--video-*`
-CSS variables) apart from one fallback curve (`src/continuity/overlayMotion.ts:12`,
+CSS variables) apart from one fallback curve (`src/continuity/overlayMotion/overlayMotion.ts:12`,
 `:35-36`) and 4 implicit-easing `ramp()` calls. Scene studies render through
 `src/scenes/` and `StoryFilm`, which read the starter palette and `motion.ts`
 directly. "(a) literals" adds the renderer, the storyboard plan colours, and
@@ -358,7 +358,7 @@ is not in the showcase plan list; it plays three covered stock presets.
 
 Helper previews never enter a `GalleryItemTheme`, and the Helpers section has
 no Design tokens tab. Each preview draws with `DEMO_COLORS`
-(`src/gallery/HelperGallery/demos/demoTheme.ts:6-16`), taken from the
+(`src/gallery/HelperGallery/demos/DemoTheme.ts:6-16`), taken from the
 product's `theme-colors.json`, and plots the `motion.ts` constants rather than
 the theme's curves and durations.
 
@@ -389,9 +389,9 @@ does not emit.
 | `CaptionOverlay` with `layout/captionLayout.ts` | Scene | Literal | 0 | 4 | 1 | 1 | 4 | 1 |
 | `SceneShell` | Scene | Literal | 0 | 6 | 0 | 0 | 3 | 0 |
 | `StockScene` | Scene | Literal | 1 | 0 | 0 | 0 | 0 | 0 |
-| `TitleCard` (`src/title-card.tsx`) | Title | Literal | 2 | 6 | 1 | 10 | 2 | 0 |
+| `TitleCard` (`src/TitleCard/TitleCard.tsx`) | Title | Literal | 2 | 6 | 1 | 10 | 2 | 0 |
 | `AppFrame` | Chrome | Literal | 0 | 4 | 1 | 0 | 8 | 0 |
-| `Cursor` with `src/cursor-motion.ts` | Chrome | Literal | 1 | 0 | 1 | 1 | 0 | 0 |
+| `Cursor` with `src/CursorMotionHelpers.ts` | Chrome | Literal | 1 | 0 | 1 | 1 | 0 | 0 |
 | `Orb` | Chrome | Literal | 0 | 0 | 2 | 0 | 3 | 0 |
 | `Demo` (6 files) | Fixed composition | Literal | 2 | 19 | 7 | 25 | 37 | 7 |
 | `MotionLab` | Fixed composition | Literal | 0 | 19 | 4 | 5 | 17 | 4 |
@@ -498,7 +498,7 @@ type, spacing, radius, and shadow values are literal.
   hex (`legacyColorSchema`); switch them to `contentColorSchema`.
 - **(a2) Stage effects.** `src/scenes/TiltedWindowScene/WindowHeadlines.tsx:85`
   (`color-mix(... var(--foreground) 45%, transparent)`),
-  `src/title-card.tsx:97`, `:139` (`"white"`), `src/chrome/Cursor.tsx:61`
+  `src/TitleCard/TitleCard.tsx:97`, `:139` (`"white"`), `src/chrome/Cursor.tsx:61`
   (`rgb(0 0 0 / 0.16)`), `src/chrome/Orb.tsx:13`, `src/compositions/Demo/PromptField.tsx:30`.
 
 ### 3.2 Typography
@@ -525,8 +525,8 @@ type, spacing, radius, and shadow values are literal.
 
   | Where | Values today | Role |
   | --- | --- | --- |
-  | `src/title-card.tsx:84-97` | 92 px, weight 700, line height 1.06, letter spacing -2.5 px, white | new `text.stage.title` |
-  | `src/title-card.tsx:137-140` | 22 px, weight 500, white at 0.68 | new `text.stage.kicker` |
+  | `src/TitleCard/TitleCard.tsx:84-97` | 92 px, weight 700, line height 1.06, letter spacing -2.5 px, white | new `text.stage.title` |
+  | `src/TitleCard/TitleCard.tsx:137-140` | 22 px, weight 500, white at 0.68 | new `text.stage.kicker` |
   | `src/scenes/CaptionOverlay.tsx:18`, `:44`; `layout/captionLayout.ts:28`, `:44` | 38 px default, weight 500, line height 1.22 | new `text.stage.caption` |
   | `src/scenes/SceneShell.tsx:50-52` | fitted size, weight 600, line height 1.12, -1.2 px | existing `text.stage.heading` (risk R3) |
   | `src/scenes/SceneShell.tsx:63-64` | 24 px, line height 1.35 | new `text.stage.sceneBody` |
@@ -587,11 +587,11 @@ type, spacing, radius, and shadow values are literal.
 - `src/scenes/TiltedWindowScene/windowTilt.ts:75-76`: `WINDOW_SHADOW`, a
   literal `0 30px 60px` shadow, used at `WindowCard.tsx:77`. New
   `elevation.window`.
-- `src/scenes/TiltedWindowScene/windowMotion.ts:18-24`: `WHIP_BLUR = 40`,
+- `src/scenes/TiltedWindowScene/WindowMotion/WindowMotion.ts:18-24`: `WHIP_BLUR = 40`,
   `SLIDE_BLUR = 25`, `CAMERA_BLUR = 12` (equal to `atomic.blur.md`). New
   component tokens on `WindowMotion`.
 - `src/chrome/Cursor.tsx:61`: `drop-shadow(0 1px 1px rgb(0 0 0 / 0.16))`;
-  `src/cursor-motion.ts:77-86`: trail offsets 0.45, 0.3, 0.15, trail alpha
+  `src/CursorMotionHelpers.ts:77-86`: trail offsets 0.45, 0.3, 0.15, trail alpha
   0.09, 4 px limit. New `components.Cursor`.
 - `src/chrome/Orb.tsx:13` and `src/compositions/Demo/PromptField.tsx:30`:
   focus rings built from `var(--brand-soft)`.
@@ -603,13 +603,13 @@ type, spacing, radius, and shadow values are literal.
   stepped wipe), `EASE.in` (whip exits), `EASE.surge` (fly-through), and
   `EASE.inOutCubic` (cursor travel, camera) have atomic curves but no semantic
   consumer; see the new `motion.rise`, `motion.depart`, `motion.surge` tokens.
-  Stage references: `src/scenes/TiltedWindowScene/windowMotion.ts:46-301`
-  (9 curves), `src/scenes/textReveal.ts:34-132`,
-  `src/scenes/BrandLockupScene/brandLockupMotion.ts:49-115`,
-  `src/storyboard/StoryFilm/getShotTransitionLayers.ts:56`, `:61`,
-  `src/storyboard/StoryFilm/steppedColumnWipe.ts:39`, `src/cursor-motion.ts:30`,
-  `src/motion-components/cameraTrack.ts:102`,
-  `src/motion-components/SvgObjectDeparture.tsx:43`.
+  Stage references: `src/scenes/TiltedWindowScene/WindowMotion/WindowMotion.ts:46-301`
+  (9 curves), `src/scenes/textReveal/textReveal.ts:34-132`,
+  `src/scenes/BrandLockupScene/BrandLockupMotion/BrandLockupMotion.ts:49-115`,
+  `src/storyboard/StoryFilm/getShotTransitionLayers/getShotTransitionLayers.ts:56`, `:61`,
+  `src/storyboard/StoryFilm/steppedColumnWipe/steppedColumnWipe.ts:39`, `src/CursorMotionHelpers.ts:30`,
+  `src/motion-components/cameraTrack/cameraTrack.ts:102`,
+  `src/motion-components/SvgObjectDeparture/SvgObjectDeparture.tsx:43`.
 - **(a1) Implicit easing.** `ramp(frame, at, duration)` with no fourth
   argument uses `EASE.out` from `src/motion.ts:220`. 524 such calls in stock
   presets (11 inside parity presets: 6 in `decision-fork`, 4 in
@@ -623,8 +623,8 @@ type, spacing, radius, and shadow values are literal.
   constant wrapped in `motion.scale()`, the precedent set by the parity
   presets, so tempo reaches it.
 - **(a1) Direct `DUR` and `STAGGER`.** 63 `DUR` and `STAGGER` reads in scenes
-  (for example `src/scenes/BarComparisonScene/barComparisonMotion.ts:5-26`,
-  `src/scenes/TiltedWindowScene/windowMotion.ts:44-301`), 21 in the fixed
+  (for example `src/scenes/BarComparisonScene/barComparisonMotion/barComparisonMotion.ts:5-26`,
+  `src/scenes/TiltedWindowScene/WindowMotion/WindowMotion.ts:44-301`), 21 in the fixed
   compositions, 6 in the title card, 4 in `src/Root.tsx`, 29 in helper
   demos. These skip tempo. `index * 2` (59 uses in
   stock cue expressions) is `motion.stagger.list`; `STAGGER_COLUMN`
@@ -638,7 +638,7 @@ type, spacing, radius, and shadow values are literal.
   `motion.ts` must keep no runtime imports, so the fix is a themed facade on
   `VideoMotion` (`ramp`, `enter`, `leave`, `pop`, `press`) that passes the
   theme's values, not a change to `motion.ts`.
-- **(a2) Duplicated presets.** `src/motion-components/motionSettings.ts:17-23`
+- **(a2) Duplicated presets.** `src/motion-components/MotionSettings/MotionSettings.ts:17-23`
   restates `camera.presets` (speed and shutter per preset) and
   `resolveMotionSettings` (`:66-75`) restates `motionBlur.*` (samples 10,
   velocity 0.09 and 3, transition blur 12) plus an untokenised
@@ -647,12 +647,12 @@ type, spacing, radius, and shadow values are literal.
 - **(a2) Loop fades.** `src/stock/StockGraphic/StockCanvas.tsx:65` (12-frame
   stock loop fade) and `src/storyboard/StoryFilm/StoryFilm.tsx:62` (18-frame
   film loop fade). Both bound a loop, so they are not tempo-scaled.
-- **(a2) Title card.** `src/title-card.tsx:13`, `:47`, `:71-72`, `:127`,
+- **(a2) Title card.** `src/TitleCard/TitleCard.tsx:13`, `:47`, `:71-72`, `:127`,
   `:140-142`: word rise, 12-frame exit, rule and kicker entrances.
-- **(a3) Continuity fallbacks.** `src/continuity/overlayMotion.ts:12` and
+- **(a3) Continuity fallbacks.** `src/continuity/overlayMotion/overlayMotion.ts:12` and
   `:35-36` default to 18 frames and 30 frames with `EASE.inOut` when unthemed.
   Every caller is themed; drop the defaults so a missing theme fails loudly.
-  `src/motion-components/cameraTrack.ts:99-102` does the same for the named
+  `src/motion-components/cameraTrack/cameraTrack.ts:99-102` does the same for the named
   camera eases (`push`, `whip`, `glide`): the theme's `camera.easing.*` reach
   it only through the continuity plan builder
   (`src/continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme.ts:101-103`),
@@ -678,7 +678,7 @@ type, spacing, radius, and shadow values are literal.
   `Caption` (4 files). The 150 newer presets place headings with
   `LabelSlots` at bespoke coordinates (for example `[input.copy.x, 40, 34, ...]`). Moving them onto
   the layout tokens would move pixels; listed as an option, not a gap.
-- z-index values are stacking order (b): `src/continuity/ContinuityScene.module.css`
+- z-index values are stacking order (b): `src/continuity/ContinuityScene/ContinuityScene.module.css`
   (0, 22, 30, 40), `ContinuityOverlays.module.css` (10, 18, 20, 24),
   `src/chrome/Cursor.tsx:37` (50), `src/avandar/AvandarScene.tsx:100`
   (10000), `src/showcase/player.css:27` (20000). Recommend one constants
@@ -826,7 +826,7 @@ guard fails when a new literal lands. Proposed, in order of value:
 1. **A literal budget test**,
    `scripts/videoTheme/__tests__/renderers-draw-no-literals.integration.test.ts`.
    It scans the renderer directories (`src/stock/{presets,graphics-*,primitives,graphics-common,StockGraphic}`,
-   `src/scenes`, `src/chrome`, `src/title-card.tsx`,
+   `src/scenes`, `src/chrome`, `src/TitleCard/TitleCard.tsx`,
    `src/storyboard/StoryFilm`, `src/motion-components`, `src/continuity`
    without `gallery`, `src/compositions`, `src/gallery/HelperGallery/demos`)
    with the Appendix A patterns, the same way `every-token-has-a-reader`
@@ -896,7 +896,7 @@ which S1 seeds and the slice lowers to zero.
 | S4 General presets Pl to Z | 38 folders: `plugin-capability-install` to `workspace-capacity-extension` (includes `predicate-pushdown-boundary`, `query-column-cache-growth`, `provenance-peelback`, `schema-column-evolution`, `schema-plan-local-execution`, `scope-aperture`) | As S3 | 1,201 |
 | S5 Social-sector presets A to Mi | 31 folders: `aid-cargo-mode-handoff` to `minimum-count-map-suppression` (includes `compute-capacity-consolidation`, `component-material-return`, `cluster-epicurve-link`) | As S3, plus the categorical palette users | 1,118 |
 | S6 Social-sector presets Mi to Z | 33 folders: `missed-visit-reconnect` to `voluntary-family-reunion` (includes `stormwater-storage-spill`, `street-shade-installation`) | As S3 | 1,121 |
-| S7 Stage | `src/scenes/**`; `src/title-card.tsx`; `src/chrome/**`; `src/cursor-motion.ts`; `src/storyboard/**`; `src/theme.css`; `storyboards/**`; `src/motion-components/**`; `src/continuity/**` except `gallery/`; `src/avandar/AvandarScene.tsx`; `docs/shared-scene-library.md`; `docs/reusable-motion.md`; `docs/scene-api.md` | Scenes, title card, chrome, `StoryFilm`, motion components, and continuity fallbacks read stage tokens; remove the 9 plan-wide storyboard colours now held in `classic` overrides; shot themes accept token references and the 121 per-shot colours point at the slate swatches | 290, plus 130 plan colours |
+| S7 Stage | `src/scenes/**`; `src/TitleCard/TitleCard.tsx`; `src/chrome/**`; `src/CursorMotionHelpers.ts`; `src/storyboard/**`; `src/theme.css`; `storyboards/**`; `src/motion-components/**`; `src/continuity/**` except `gallery/`; `src/avandar/AvandarScene.tsx`; `docs/shared-scene-library.md`; `docs/reusable-motion.md`; `docs/scene-api.md` | Scenes, title card, chrome, `StoryFilm`, motion components, and continuity fallbacks read stage tokens; remove the 9 plan-wide storyboard colours now held in `classic` overrides; shot themes accept token references and the 121 per-shot colours point at the slate swatches | 290, plus 130 plan colours |
 | S8 Fixed compositions and helper previews | `src/compositions/**`; `src/Root.tsx`; `src/gallery/HelperGallery/demos/**`; `src/gallery/HelperGallery/HelperPlayer/**`; `src/gallery/HelperGallery/helperCatalog.yaml`; a new `themes/starter.theme.json` and its line in `builtInVideoThemes.ts` (the only post-S1 edit to that file) | `Demo`, `MotionLab`, `TitleStudy` through a `starter` theme (R12); helper previews inside `GalleryItemTheme`, plotting the theme's curves and durations (R9 decision first) | 136, plus 178 in helper demos and their CSS |
 | S9 Atlas chrome | `showcase/*.css`; CSS modules under `src/gallery/` outside `HelperGallery/demos/` and `HelperGallery/HelperPlayer/`, under `src/continuity/gallery/`, and under `src/videoThemeEditor/`; `src/showcase/player.css` | A chrome type, spacing, and radius scale on `:root`; no video tokens | 1,432 px, 277 font sizes |
 

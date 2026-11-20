@@ -1,7 +1,7 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
-import { HistogramLabels } from "./HistogramLabels";
-import { HistogramSegments } from "./HistogramSegments";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { HistogramLabels } from "./HistogramLabels/HistogramLabels";
+import { HistogramSegments } from "./HistogramSegments/HistogramSegments";
 import type { Input } from "./ClusterEpicurveLink.schema";
 import type { ReactNode } from "react";
 
@@ -14,7 +14,7 @@ export function CaseHistogram({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
       {Array.from({ length: input.timeBins.length + 1 }, (_, index) => {

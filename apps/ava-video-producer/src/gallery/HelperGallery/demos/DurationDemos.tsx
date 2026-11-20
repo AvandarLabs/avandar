@@ -1,7 +1,7 @@
-import { getColumnWipeProgress } from "../../../storyboard/StoryFilm/steppedColumnWipe";
+import { getColumnWipeProgress } from "../../../storyboard/StoryFilm/steppedColumnWipe/steppedColumnWipe";
 import { useVideoMotion } from "../../../videoTheme/useVideoMotion";
 import css from "./demos.module.css";
-import { formatReadout } from "./demoTheme";
+import { DemoTheme } from "./DemoTheme";
 import { getElapsed, START } from "./getElapsed";
 import { HelperDemoFrame } from "./HelperDemoFrame/HelperDemoFrame";
 import { Ruler } from "./parts/Ruler";
@@ -10,7 +10,6 @@ import type { HelperDemoProps } from "./helperDemo.types";
 import type { ReactNode } from "react";
 
 const SIBLINGS = ["first", "second", "third", "fourth", "fifth", "sixth"];
-
 /**
  * Six siblings starting the theme's list stagger apart (`STAGGER` in
  * `classic`), each lasting a panel.
@@ -23,7 +22,9 @@ export function StaggerDemo({ frame, frames }: HelperDemoProps): ReactNode {
     <HelperDemoFrame
       frame={frame}
       frames={frames}
-      label={`enter(frame, ${START} + index * STAGGER)  STAGGER = ${formatReadout(stagger, 1)}`}
+      label={`enter(frame, ${START} + index * STAGGER)  STAGGER = ${DemoTheme.formatReadout(
+        { value: stagger, digits: 1 },
+      )}`}
       readouts={[{ name: "elapsed", value: `${elapsed}f` }]}
     >
       <div className={css.timeline}>
@@ -34,7 +35,10 @@ export function StaggerDemo({ frame, frames }: HelperDemoProps): ReactNode {
                 className={css.timelineName}
                 style={motion.enter(frame, START + index * stagger)}
               >
-                {`index ${index} @ ${formatReadout(index * stagger, 1)}f`}
+                {`index ${index} @ ${DemoTheme.formatReadout({
+                  value: index * stagger,
+                  digits: 1,
+                })}f`}
               </span>
               <TimelineTrack
                 startFrame={index * stagger}
@@ -49,7 +53,6 @@ export function StaggerDemo({ frame, frames }: HelperDemoProps): ReactNode {
     </HelperDemoFrame>
   );
 }
-
 const COLUMNS = 8;
 /** Stable keys of the wipe's columns. */
 const COLUMN_IDS = Array.from({ length: COLUMNS }, (_, position) => {
@@ -57,7 +60,6 @@ const COLUMN_IDS = Array.from({ length: COLUMNS }, (_, position) => {
 });
 /** Frames the whole stepped wipe takes in this preview. */
 const WIPE_FRAMES = 12;
-
 /**
  * Eight columns rising the theme's column stagger apart (`STAGGER_COLUMN`
  * in `classic`), at sub-frame offsets.
@@ -68,24 +70,30 @@ export function StaggerColumnDemo({
 }: HelperDemoProps): ReactNode {
   const motion = useVideoMotion();
   const stagger = motion.stagger.column;
-  const progress = getColumnWipeProgress(
-    Math.max(0, frame - START),
-    motion.scale(WIPE_FRAMES),
-    {
-      columns: COLUMNS,
-      staggerFrames: stagger,
-    },
+  const progress = getColumnWipeProgress({
+    frame: Math.max(0, frame - START),
+    durationInFrames: motion.scale(WIPE_FRAMES),
+    options: { columns: COLUMNS, staggerFrames: stagger },
     motion,
-  );
+  });
   return (
     <HelperDemoFrame
       frame={frame}
       frames={frames}
-      label={`getColumnWipeProgress(frame, ${WIPE_FRAMES}, { columns: ${COLUMNS}, staggerFrames: STAGGER_COLUMN })`}
+      label={`getColumnWipeProgress({ frame, durationInFrames: ${WIPE_FRAMES}, options: { columns: ${COLUMNS}, staggerFrames: STAGGER_COLUMN } })`}
       readouts={[
-        { name: "STAGGER_COLUMN", value: formatReadout(stagger) },
-        { name: "first", value: formatReadout(progress[0]) },
-        { name: "last", value: formatReadout(progress[COLUMNS - 1]) },
+        {
+          name: "STAGGER_COLUMN",
+          value: DemoTheme.formatReadout({ value: stagger }),
+        },
+        {
+          name: "first",
+          value: DemoTheme.formatReadout({ value: progress[0] }),
+        },
+        {
+          name: "last",
+          value: DemoTheme.formatReadout({ value: progress[COLUMNS - 1] }),
+        },
       ]}
     >
       <div className={css.columns}>
@@ -98,9 +106,10 @@ export function StaggerColumnDemo({
                   style={{ height: `${(columnProgress * 100).toFixed(2)}%` }}
                 />
               </div>
-              <span
-                className={css.caption}
-              >{`${formatReadout(index * stagger, 1)}f`}</span>
+              <span className={css.caption}>{`${DemoTheme.formatReadout({
+                value: index * stagger,
+                digits: 1,
+              })}f`}</span>
             </div>
           );
         })}

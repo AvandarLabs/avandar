@@ -1,10 +1,8 @@
-import { useDemoThemeStyle } from "../demoTheme";
+import { DemoTheme } from "../DemoTheme";
 import css from "./HelperDemoFrame.module.css";
 import type { ReactNode } from "react";
-
 /** A named live value shown under a preview, for example `progress 0.42`. */
 export type DemoReadout = { name: string; value: string };
-
 type Props = {
   frame: number;
   frames: number;
@@ -13,7 +11,6 @@ type Props = {
   readouts?: readonly DemoReadout[];
   children: ReactNode;
 };
-
 /**
  * The shared layout of every helper preview: the call being previewed, a
  * frame counter, a stage, and the live values the helper returns. It sets
@@ -26,7 +23,7 @@ export function HelperDemoFrame({
   readouts = [],
   children,
 }: Props): ReactNode {
-  const themeStyle = useDemoThemeStyle();
+  const themeStyle = DemoTheme.useDemoThemeStyle();
   return (
     <div className={css.root} style={themeStyle}>
       <header className={css.header}>

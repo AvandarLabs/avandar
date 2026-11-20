@@ -1,7 +1,7 @@
 import { Text } from "../../graphics-common/Text";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { GridCells } from "./GridCells";
-import { GridTokens } from "./GridTokens";
+import { GridCells } from "./GridCells/GridCells";
+import { GridTokens } from "./GridTokens/GridTokens";
 import { ZeroCountLegend } from "./ZeroCountLegend";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./SpatialGridBinning.schema";

@@ -3,17 +3,16 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./PeerContributionRecognition.schema";
 import type { ReactNode } from "react";
 
-type Props = { input: Input; frame: number; accent: string; focusedX: number };
-
+type Props = {
+  input: Input;
+  frame: number;
+  accent: string;
+  focusedX: number;
+};
 /** Frames the arm takes to point at the object, and later to turn away. */
 const ARM_FRAMES = 24;
 /** Frames the acknowledgment anchor and the acknowledgment take to appear. */
@@ -29,10 +28,10 @@ export function RecognitionExchange({
   accent,
   focusedX,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const arm = motion.scale(ARM_FRAMES);
   const acknowledge = motion.scale(ACKNOWLEDGE_FRAMES);
   const peer = tokens.color.accentAlt;

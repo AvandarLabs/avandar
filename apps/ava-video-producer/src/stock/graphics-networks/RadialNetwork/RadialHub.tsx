@@ -1,11 +1,7 @@
-import { Arrive } from "../../graphics-common/Arrive";
+import { Arrive } from "../../graphics-common/Arrive/Arrive";
 import { Text } from "../../graphics-common/Text";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicProps,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CENTER } from "./RadialNetwork.constants";
 import type { RadialNetworkInput } from "../../presets/RadialNetwork/RadialNetwork.schema";
 import type { ReactNode } from "react";
@@ -15,12 +11,11 @@ type Props = Readonly<{
   frame: number;
   accent: string;
 }>;
-
 /** The hub at the centre: its ring, glow, title, and detail. */
 export function RadialHub({ input, frame, accent }: Props): ReactNode {
-  const style = useGraphicProps("RadialNetwork", {});
-  const { color, sketch } = useGraphicTokens();
-  const shapes = useGraphicShapeScales();
+  const style = GraphicThemeHooks.useGraphicProps("RadialNetwork", {});
+  const { color, sketch } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <Arrive frame={frame}>
       <SketchedShape

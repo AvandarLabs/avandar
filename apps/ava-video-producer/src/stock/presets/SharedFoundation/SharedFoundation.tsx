@@ -1,7 +1,7 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { FoundationApproach } from "./FoundationApproach";
-import { FoundationBase } from "./FoundationBase";
+import { FoundationBase } from "./FoundationBase/FoundationBase";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./SharedFoundation.schema";
 import type { ReactNode } from "react";
@@ -14,7 +14,7 @@ export function SharedFoundation({
   accent,
   ...remainingProps
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g>
       <g opacity={motion.ramp(frame, 12, motion.hero)}>

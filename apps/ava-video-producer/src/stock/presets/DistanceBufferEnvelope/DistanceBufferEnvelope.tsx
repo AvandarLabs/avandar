@@ -1,9 +1,6 @@
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
-import { BufferCompass } from "./BufferCompass";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { BufferCompass } from "./BufferCompass/BufferCompass";
 import { BufferHeadings } from "./BufferHeadings";
 import { BufferLocations } from "./BufferLocations";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
@@ -19,8 +16,8 @@ export function DistanceBufferEnvelope({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { color, stroke } = useGraphicTokens();
-  const shapes = useGraphicShapeScales();
+  const { color, stroke } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
       <StockRect

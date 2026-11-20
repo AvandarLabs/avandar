@@ -1,4 +1,4 @@
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SceneLabel } from "./SceneLabel";
 import { VisitMark } from "./VisitMark";
 import type { Input } from "./DoseCohortReturnPaths.schema";
@@ -7,7 +7,7 @@ import type { ReactNode } from "react";
 type Props = { input: Input };
 /** Distinct visit categories and the fixed denominator remain explicit. */
 export function CohortLegend({ input }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
       {[

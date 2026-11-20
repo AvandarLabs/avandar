@@ -1,15 +1,15 @@
 import { mix, ramp } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
-type Props = { criterionId: string; y: number; frame: number; accent: string };
-
+type Props = {
+  criterionId: string;
+  y: number;
+  frame: number;
+  accent: string;
+};
 /** Frames the focus band takes to expand across the pair. */
 const FOCUS_FRAMES = 24;
 /**
@@ -21,9 +21,9 @@ export function ContrastBand({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const focus = ramp(
     frame,
     96,

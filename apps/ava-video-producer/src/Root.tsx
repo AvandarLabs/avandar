@@ -2,19 +2,18 @@ import { AbsoluteFill, Composition, Sequence, useCurrentFrame } from "remotion";
 import "./theme.css";
 import libraryPlan from "../storyboards/library.json";
 import { Demo, DEMO_LEN } from "./compositions/Demo/Demo";
-import { MotionLab, MOTION_LAB_LEN } from "./compositions/MotionLab";
+import { MotionLab, MOTION_LAB_LEN } from "./compositions/MotionLab/MotionLab";
 import { StarterVideoTheme } from "./compositions/StarterVideoTheme/StarterVideoTheme";
 import { TitleStudy, TITLE_STUDY_LEN } from "./compositions/TitleStudy";
 import { createContinuityPlanFromVideoThemeSnapshot } from "./continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme";
 import { StockCompositions } from "./stock/StockCompositions";
 import { storyboardSchema, durationInFrames } from "./storyboard/schema/schema";
 import { ThemedStoryFilm } from "./storyboard/ThemedStoryFilm";
-import { TITLE_LEN, TitleCard } from "./title-card";
+import { TITLE_LEN, TitleCard } from "./TitleCard/TitleCard";
 import { useVideoTokens } from "./videoTheme/useVideoTheme";
 import type { ReactNode } from "react";
 
 export const FPS = 30;
-
 /* 1600x1000 is 8:5, a wide tile, the shape a demo takes when it sits in a
  * page section rather than in a video player. For docs, a social post or an
  * app store listing you probably want 16:9 (1600x900) or 1:1; change these
@@ -25,7 +24,6 @@ export const FPS = 30;
  * ships at 1536x960, same aspect, both dimensions clean. */
 export const WIDTH = 1600;
 export const HEIGHT = 1000;
-
 /**
  * Title card, then the flow.
  *
@@ -62,7 +60,6 @@ function Clip({
     </AbsoluteFill>
   );
 }
-
 export function RemotionRoot(): ReactNode {
   return (
     <>

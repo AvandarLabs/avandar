@@ -1,6 +1,6 @@
 import { propEq, propNotEq } from "@avandar/utils";
 import { mix } from "../../../motion";
-import { FOLD_CUE, getFoldFromFrame } from "./duplicateTiming";
+import { DuplicateTiming } from "./DuplicateTiming";
 import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./DuplicateReviewStack.schema";
 
@@ -19,7 +19,6 @@ type GetDuplicateGroupLayoutResult = {
   progress: number;
   records: Array<{ id: string; label: string; comparisonValue: string }>;
 };
-
 /** Group frames reflow for comparison pairs while retained faces paint last. */
 export function getDuplicateGroupLayoutFromGroupAndFrame({
   frame,
@@ -28,7 +27,7 @@ export function getDuplicateGroupLayoutFromGroupAndFrame({
   groupIndex,
   motion,
 }: Readonly<Options>): GetDuplicateGroupLayoutResult {
-  const progress = getFoldFromFrame(frame, motion);
+  const progress = DuplicateTiming.getFoldFromFrame({ frame, motion });
   const isPair = input.finalView === "comparison-pair";
   const x = mix(isPair ? progress : 0, 44 + groupIndex * 456, 30);
   const y = mix(isPair ? progress : 0, 200, 192 + groupIndex * 240);
@@ -36,7 +35,7 @@ export function getDuplicateGroupLayoutFromGroupAndFrame({
     propNotEq<{ id: unknown }, "id", unknown>("id", group.retainedId),
   );
   const records =
-    group.retainedId !== null && frame >= FOLD_CUE
+    group.retainedId !== null && frame >= DuplicateTiming.FOLD_CUE
       ? [
           ...alternatives.reverse(),
           ...group.records.filter(

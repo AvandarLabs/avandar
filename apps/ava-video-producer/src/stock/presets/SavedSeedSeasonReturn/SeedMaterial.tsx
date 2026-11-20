@@ -1,4 +1,4 @@
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SeedPortion } from "./SeedPortion";
 import type { ResolvedVideoSemantic } from "../../../videoTheme/videoTheme.types";
 import type { getSeedSceneFromFrame } from "./getSeedSceneFromFrame";
@@ -60,7 +60,7 @@ export function SeedMaterial({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
       {_getPortions({ scene, frame, accent, tokens }).map(

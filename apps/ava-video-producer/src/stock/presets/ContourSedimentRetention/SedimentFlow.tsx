@@ -1,8 +1,5 @@
 import { mix } from "../../../motion";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SlopeExit } from "./SlopeExit";
 import { SlopeGround } from "./SlopeGround";
 import type { Input } from "./ContourSedimentRetention.schema";
@@ -13,8 +10,8 @@ type Props = { input: Input; frame: number };
  * A persistent sediment ribbon separates behind the strip and past the exit.
  */
 export function SedimentFlow({ input, frame }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const { mobilizedKg, retainedKg } = input.sediment;
   const exported = mobilizedKg - retainedKg;
   const travel = motion.ramp(frame, 60, motion.scale(30), motion.travel.easing);

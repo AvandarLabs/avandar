@@ -1,17 +1,14 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./GeometryDetailBudget.schema";
 import type { ReactNode } from "react";
 
 type Props = { labels: Input["labels"]; accent: string };
 /** Paired line samples identify the two styles overlaid in the source plane. */
 export function TraceLegend({ labels, accent }: Readonly<Props>): ReactNode {
-  const { color, stroke, sketch } = useGraphicTokens();
-  const shapes = useGraphicShapeScales();
+  const { color, stroke, sketch } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
       {[labels.original, labels.simplified].map((label, index) => {

@@ -1,4 +1,4 @@
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ConversationPerson } from "./ConversationPerson";
 import { WaitingSpace } from "./WaitingSpace";
 import type { Input } from "./PrivateCaseConversation.schema";
@@ -11,7 +11,7 @@ export function ConversationPeople({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const opacity = input.showWaitingSupporter ? 1 : 1 - motion.reveal(frame, 84);
   return (
     <g>

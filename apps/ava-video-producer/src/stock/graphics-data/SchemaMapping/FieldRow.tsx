@@ -1,10 +1,6 @@
 import { Text } from "../../graphics-common/Text";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicProps,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import {
   FIELD_BASELINE,
   FIELD_INSET,
@@ -23,7 +19,6 @@ type Props = {
   label: string;
   isPortFirst: boolean;
 };
-
 /**
  * A field row's card, port dot, and name. A target row draws its port before
  * its name and a source row after it, so each keeps its legacy paint order.
@@ -36,9 +31,9 @@ export function FieldRow({
   label,
   isPortFirst,
 }: Props): ReactNode {
-  const style = useGraphicProps("SchemaMapping", {});
-  const tokens = useGraphicTokens();
-  const shapes = useGraphicShapeScales();
+  const style = GraphicThemeHooks.useGraphicProps("SchemaMapping", {});
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
   const port = <circle cx={portX} cy={y} r={style.dotRadius} fill={color} />;
   return (
     <>

@@ -1,9 +1,10 @@
 import { GlobeProjection } from "../../geography/GlobeProjection/GlobeProjection";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
-import { CustodyLane } from "./CustodyLane";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { CustodyLane } from "./CustodyLane/CustodyLane";
 import { CustodyLegend } from "./CustodyLegend";
 import { CustodyStops } from "./CustodyStops";
+import { GlobeContext } from "./GlobeContext";
 import { SceneLabel } from "./SceneLabel";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ColdChainCustody.schema";
@@ -37,30 +38,6 @@ export function ColdChainCustody({
         );
       })}
       <CustodyLegend input={input} frame={frame} accent={accent} />
-    </g>
-  );
-}
-
-/** A small globe placing the schematic route in its world. */
-function GlobeContext({ accent }: Readonly<{ accent: string }>): ReactNode {
-  const tokens = useGraphicTokens();
-  return (
-    <g data-globe="context" transform="translate(900 50)">
-      <SketchedShape
-        shape={{ kind: "circle", cx: 0, cy: 0, r: 30 }}
-        profile={tokens.sketch.shape}
-        fill={tokens.color.surface}
-        stroke={tokens.color.line}
-      />
-      <path
-        d={GlobeProjection.getLandPathFromView({
-          centerLongitude: 10,
-          centerLatitude: 15,
-          radius: 30,
-        })}
-        fill={accent}
-        fillOpacity={tokens.alpha.guide}
-      />
     </g>
   );
 }

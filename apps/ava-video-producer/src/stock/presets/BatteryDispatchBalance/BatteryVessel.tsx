@@ -1,12 +1,7 @@
 import { interpolateFiniteRange } from "../../numeric/interpolateFiniteRange/interpolateFiniteRange";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./BatteryDispatchBalance.schema";
 import type { ReactNode } from "react";
 /** Inputs for BatteryVessel. */
@@ -14,7 +9,6 @@ type Props = { frame: number; accent: string; input: Input };
 const DRAW_ON_LENGTH = 1;
 const CHANNEL_WIDTH = 8;
 const LOSS_CHANNEL_WIDTH = 5;
-
 /**
  * Charge and dispatch paths have distinct boundaries and separately timed
  * losses.
@@ -24,10 +18,10 @@ export function BatteryVessel({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const charge = motion.ramp(frame, 36, motion.scale(30), motion.travel.easing),
     dispatch = motion.ramp(frame, 80, motion.scale(28), motion.travel.easing);
   const { battery, cycle } = input;

@@ -1,10 +1,7 @@
 import { mix, ramp } from "../../../motion";
 import { DrawPath } from "../../graphics-common/DrawPath";
 import { FitText } from "../../primitives/FitText/FitText";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ContrastBand } from "./ContrastBand";
 import type { Input } from "./PairedContrast.schema";
 import type { ReactNode } from "react";
@@ -17,10 +14,8 @@ type Props = {
   isFocused: boolean;
   showBrackets: boolean;
 };
-
 /** Frames between neighbouring criteria arriving. */
 const ROW_STAGGER_FRAMES = 12;
-
 function _getLabelsFromCriterion({
   row,
   y,
@@ -51,7 +46,6 @@ function _getLabelsFromCriterion({
     }),
   ];
 }
-
 /**
  * Paired baselines keep every criterion readable during the resolved contrast.
  */
@@ -63,8 +57,8 @@ export function ContrastRow({
   isFocused,
   showBrackets,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const y = 274 + index * 100;
   const stagger = index * motion.scaleStagger(ROW_STAGGER_FRAMES);
   const entrance = ramp(

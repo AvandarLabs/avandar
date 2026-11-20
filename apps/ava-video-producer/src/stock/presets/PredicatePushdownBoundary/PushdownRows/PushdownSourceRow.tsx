@@ -1,18 +1,12 @@
 import { ramp } from "../../../../motion";
 import { SketchedShape } from "../../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicProps,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { PushdownRow } from "../PushdownRow";
 import type { Input } from "../PredicatePushdownBoundary.schema";
 import type { ReactNode } from "react";
 
 const GATE_CUE = 51;
 const GATE_FRAMES = 44;
-
 type Props = Readonly<{
   frame: number;
   row: Input["rows"][number];
@@ -20,7 +14,6 @@ type Props = Readonly<{
   isRejected: boolean;
   accent: string;
 }>;
-
 /**
  * An original row, with a gate closing in front of it when the predicate
  * rejects it.
@@ -32,10 +25,13 @@ export function PushdownSourceRow({
   isRejected,
   accent,
 }: Props): ReactNode {
-  const style = useGraphicProps("PredicatePushdownBoundary", {});
-  const { color, sketch } = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
+  const style = GraphicThemeHooks.useGraphicProps(
+    "PredicatePushdownBoundary",
+    {},
+  );
+  const { color, sketch } = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const gates = ramp(
     frame,
     GATE_CUE,

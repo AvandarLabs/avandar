@@ -2,11 +2,7 @@ import { mix, ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { OutboxProposalSheet } from "./OutboxProposalSheet";
 import { OUTCOME_CUE, UNMOUNT_CUE } from "./outboxShape";
 import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
@@ -19,7 +15,6 @@ type Props = {
   side: "local" | "journal";
   accent: string;
 };
-
 /** Frames each half takes to write its value. */
 const WRITE_FRAMES = 40;
 const GRAPHEMES: Intl.Segmenter = new Intl.Segmenter("und", {
@@ -32,10 +27,10 @@ export function OutboxProposal({
   side,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
-  const { writing, withdrawal } = _getProposalProgress(frame, side, motion);
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const { writing, withdrawal } = _getProposalProgress({ frame, side, motion });
   const x = side === "local" ? 100 : 540;
   return (
     <g
@@ -48,7 +43,7 @@ export function OutboxProposal({
       <LiteralDataText
         x={x + 12}
         y={455}
-        value={_buildWrittenValue(input.change.after, writing)}
+        value={_buildWrittenValue({ value: input.change.after, writing })}
       />
       <SketchedShape
         shape={{ kind: "path", d: `M${x + 12} 465 h${296 * writing}` }}
@@ -62,13 +57,12 @@ export function OutboxProposal({
     </g>
   );
 }
-
 /** A half writing its value, then withdrawing on the outcome, both 0 to 1. */
-function _getProposalProgress(
-  frame: number,
-  side: Props["side"],
-  motion: VideoMotion,
-) {
+function _getProposalProgress({
+  frame,
+  side,
+  motion,
+}: Readonly<{ frame: number; side: Props["side"]; motion: VideoMotion }>) {
   return {
     writing: ramp(
       frame,
@@ -85,9 +79,11 @@ function _getProposalProgress(
     ),
   };
 }
-
 /** The leading graphemes of `value` written so far. */
-function _buildWrittenValue(value: string, writing: number): string {
+function _buildWrittenValue({
+  value,
+  writing,
+}: Readonly<{ value: string; writing: number }>): string {
   const graphemes = Array.from(GRAPHEMES.segment(value), ({ segment }) => {
     return segment;
   });

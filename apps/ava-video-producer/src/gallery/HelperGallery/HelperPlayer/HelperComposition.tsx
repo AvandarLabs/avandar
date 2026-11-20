@@ -3,11 +3,10 @@ import "../../../fonts";
 import { useCurrentFrame, useVideoConfig } from "remotion";
 import { HELPER_DEMOS } from "../demos/helperDemoRegistry";
 import { HELPER_CATALOG } from "../helperCatalog";
-import { HelperVideoTheme } from "./HelperVideoTheme";
+import { HelperVideoTheme } from "./HelperVideoTheme/HelperVideoTheme";
 import type { VideoThemeSnapshot } from "../../../videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
 import type { HelperDemoId } from "../helperDemoIds";
 import type { ReactNode } from "react";
-
 /**
  * One helper's live preview at the player's current frame, drawn in the
  * video theme (see `HelperVideoTheme`). The preview calls the real helper;

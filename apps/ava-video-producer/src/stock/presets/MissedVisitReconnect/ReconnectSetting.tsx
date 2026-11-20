@@ -1,5 +1,5 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./MissedVisitReconnect.schema";
 import type { ReactNode } from "react";
@@ -9,7 +9,7 @@ type Props = { input: Input };
  * Homes, booking calendar and clinic doorway keep distinct physical regions.
  */
 export function ReconnectSetting({ input }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
       <SceneLabel text={input.sceneLabel} x={32} y={30} width={700} />

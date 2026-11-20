@@ -1,12 +1,8 @@
 import { propEq } from "@avandar/utils";
 import { mix } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
-import { ActivityPaper } from "./ActivityPaper";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { ActivityPaper } from "./ActivityPaper/ActivityPaper";
 import { ReturnActivityLabels } from "./ReturnActivityLabels";
 import type { Input } from "./ReturningLearnerWorktable.schema";
 import type { ReactNode } from "react";
@@ -28,9 +24,9 @@ export function ReturnActivity({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const progress = motion.ramp(
     frame,
     94 + index * motion.scaleStagger(16),

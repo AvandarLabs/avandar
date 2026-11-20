@@ -1,11 +1,7 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
-import { ResponseWriting } from "./ResponseWriting";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { ResponseWriting } from "./ResponseWriting/ResponseWriting";
 import type { Input } from "./PocketInference.schema";
 import type { ReactNode } from "react";
 
@@ -19,9 +15,9 @@ export function PocketResponse({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const progress = motion.ramp(frame, 80, motion.scale(28));
   return (
     <g>

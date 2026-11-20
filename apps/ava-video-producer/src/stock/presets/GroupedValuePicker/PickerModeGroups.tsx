@@ -1,11 +1,7 @@
 import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { PickerValueGroup } from "./getPickerGroupsFromInput";
 import type { Input } from "./GroupedValuePicker.schema";
 import type { ReactNode } from "react";
@@ -16,12 +12,10 @@ type Props = {
   frame: number;
   accent: string;
 };
-
 /** Frames the bays take to fade in. */
 const BAY_FRAMES = 14;
 /** Frames the counted value marks take to appear. */
 const MARK_FRAMES = 2;
-
 /** Disjoint frequency bays retain full group labels and counted value marks. */
 export function PickerModeGroups({
   input,
@@ -29,9 +23,9 @@ export function PickerModeGroups({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g
       opacity={ramp(frame, 56, motion.scale(BAY_FRAMES), motion.reveal.easing)}

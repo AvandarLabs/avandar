@@ -1,4 +1,4 @@
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SceneText } from "./SceneText";
 import type { Input } from "./ReturningLearnerWorktable.schema";
 import type { ReactNode } from "react";
@@ -14,7 +14,7 @@ export function ReturnActivityLabels({
   input,
   index,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const labelX = 180 + index * 300;
   return (
     <>

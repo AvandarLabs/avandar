@@ -1,10 +1,10 @@
 import { mix } from "../../../motion";
 import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 /** Overlapping arrival/departure beats preserve physical classroom cover. */
-export function getCoverPositionsFromFrame(
-  frame: number,
-  motion: VideoMotion,
-): {
+export function getCoverPositionsFromFrame({
+  frame,
+  motion,
+}: Readonly<{ frame: number; motion: VideoMotion }>): {
   teacherX: number;
   coverX: number;
   mentorX: number;

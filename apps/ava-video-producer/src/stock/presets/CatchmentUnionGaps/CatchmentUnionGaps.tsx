@@ -1,4 +1,4 @@
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CatchmentGeometry } from "./CatchmentGeometry";
 import { CatchmentRoster } from "./CatchmentRoster";
 import { CatchmentSummary } from "./CatchmentSummary";
@@ -7,7 +7,6 @@ import type { Input } from "./CatchmentUnionGaps.schema";
 import type { ReactNode } from "react";
 /** Inputs for CatchmentUnionGaps. */
 type Props = GraphicProps & { input: Input };
-
 /**
  * Separate catchments fuse around stationary, individually keyed households.
  */
@@ -17,7 +16,7 @@ export function CatchmentUnionGaps({
   id,
   input,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const progress = motion.ramp(
     frame,
     36,

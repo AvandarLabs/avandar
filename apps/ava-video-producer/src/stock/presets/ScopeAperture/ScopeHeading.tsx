@@ -1,10 +1,10 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Props } from "./ScopeAperture";
 import type { ReactNode } from "react";
 /** The broad subject stays visible until the focused question replaces it. */
 export function ScopeHeading({ frame, input }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <>
       <g

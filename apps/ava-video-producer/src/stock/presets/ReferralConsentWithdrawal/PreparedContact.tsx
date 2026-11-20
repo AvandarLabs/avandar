@@ -1,14 +1,17 @@
 import { mix } from "../../../motion";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ContactCard } from "./ContactCard";
 import { ContactHandling } from "./ContactHandling";
 import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./ReferralConsentWithdrawal.schema";
 import type { ReactNode } from "react";
 
+type GetPreparationOptions = {
+  frame: number;
+  index: number;
+  order: number;
+  motion: VideoMotion;
+};
 type Props = {
   frame: number;
   labels: Input["labels"];
@@ -28,14 +31,14 @@ export function PreparedContact({
   order,
   permissionTurn,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const { progress, x, y, isHandling } = _getPreparation(
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const { progress, x, y, isHandling } = _getPreparation({
     frame,
     index,
     order,
     motion,
-  );
+  });
   return (
     <g>
       <ContactHandling
@@ -63,17 +66,16 @@ export function PreparedContact({
     </g>
   );
 }
-
 /**
  * A contact affected by the withdrawal lifts and moves to the held column
  * on its turn; the worker handles it while it moves.
  */
-function _getPreparation(
-  frame: number,
-  index: number,
-  order: number,
-  motion: VideoMotion,
-) {
+function _getPreparation({
+  frame,
+  index,
+  order,
+  motion,
+}: Readonly<GetPreparationOptions>) {
   const progress =
     order < 0
       ? 0

@@ -1,7 +1,4 @@
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { FitText } from "../FitText/FitText";
 import { StockRect } from "../StockRect/StockRect";
 import type { ReactNode } from "react";
@@ -15,7 +12,6 @@ type Props = {
   /** Defaults to the theme's positive colour. */
   color?: string;
 };
-
 /**
  * Bounded table presentation retains the caller's exact value or missing label.
  */
@@ -27,8 +23,8 @@ export function TableCell({
   highlighted = false,
   color,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const accent = color ?? tokens.color.positive;
   if (![x, y, width].every(Number.isFinite) || width < 100 || width > 800) {
     throw new Error(

@@ -8,10 +8,7 @@ import css from "./HelperPreview.module.css";
 import type { HelperEntry } from "../helperCatalog.types";
 import type { ReactNode, RefObject } from "react";
 
-type Props = {
-  helper: HelperEntry;
-};
-
+type Props = { helper: HelperEntry };
 /** Refreshes the live player when the helper or gallery source changes. */
 function useSourceWatch(
   id: string,
@@ -34,15 +31,17 @@ function useSourceWatch(
     };
   }, [id, player]);
 }
-
 /**
  * Posts the gallery's theme draft, scoped to the helper, to its live player
  * whenever the draft changes. Returns the post, for the player's `load`.
  */
-function useThemePost(
-  helper: HelperEntry,
-  player: RefObject<HTMLIFrameElement | null>,
-): () => void {
+function useThemePost({
+  helper,
+  player,
+}: Readonly<{
+  helper: HelperEntry;
+  player: RefObject<HTMLIFrameElement | null>;
+}>): () => void {
   const { library, themeId, validDraft } = useGalleryVideoTheme();
   const snapshot = useMemo(() => {
     return createSnapshotFromDraft({
@@ -66,7 +65,6 @@ function useThemePost(
   useEffect(post, [post]);
   return post;
 }
-
 /**
  * The open helper's live, looping preview, drawn in the gallery's theme. The
  * Atlas preview modal around it owns the title and the previous and next
@@ -75,7 +73,7 @@ function useThemePost(
 export function HelperPreview({ helper }: Props): ReactNode {
   const player = useRef<HTMLIFrameElement>(null);
   useSourceWatch(helper.id, player);
-  const postTheme = useThemePost(helper, player);
+  const postTheme = useThemePost({ helper, player });
   const title = helper.title;
   return (
     <section className={css.preview} aria-label="Live preview">

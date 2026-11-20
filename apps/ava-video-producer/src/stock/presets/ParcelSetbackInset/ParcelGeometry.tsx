@@ -1,4 +1,4 @@
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ParcelEnvelope } from "./ParcelEnvelope";
 import { SetbackHatch } from "./SetbackHatch";
 import { StructureFootprint } from "./StructureFootprint";
@@ -15,7 +15,7 @@ export function ParcelGeometry({
   accent,
   id,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const progress = motion.ramp(
     frame,
     36,

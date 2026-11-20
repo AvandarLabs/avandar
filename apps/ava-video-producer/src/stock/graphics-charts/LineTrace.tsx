@@ -5,23 +5,16 @@ import { Pill } from "../graphics-common/Pill";
 import { Text } from "../graphics-common/Text";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
 import { SketchedShape } from "../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { GraphicProps } from "../graphics-common/graphicCommon.types";
 import type { LineTraceInput } from "../presets/LineTrace/LineTrace.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: LineTraceInput };
-
 const TRACE_AT = 23;
 const TRACE_FRAMES = 94;
 const HEADING_SIZE = "29";
 const SAMPLE_NOTE_SIZE = "2xs";
-
 /** Draws the bounded authored line-trace study at an explicit frame. */
 export function LineTrace({
   input,
@@ -29,10 +22,10 @@ export function LineTrace({
   accent,
   id,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const { color, stroke, dash, sketch } = useGraphicTokens();
-  const shapes = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const { color, stroke, dash, sketch } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const points = input.points;
   const chartPoint = (value: number, index: number) => {
     return {

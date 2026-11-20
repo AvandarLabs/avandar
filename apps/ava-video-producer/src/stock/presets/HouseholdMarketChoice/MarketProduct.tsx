@@ -1,10 +1,6 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getMarketProductPositionFromInputAndFrame } from "./getMarketProductPositionFromInputAndFrame";
 import type { Input } from "./HouseholdMarketChoice.schema";
 import type { ReactNode } from "react";
@@ -23,9 +19,9 @@ export function MarketProduct({
   index,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const product = input.products[index];
   const { x, y, travel } = getMarketProductPositionFromInputAndFrame({
     motion,

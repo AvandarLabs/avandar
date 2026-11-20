@@ -5,16 +5,19 @@ import {
   createCameraTrackSchema,
   getCameraPose,
   isCameraMoving,
-} from "./cameraTrack";
+} from "./cameraTrack/cameraTrack";
 import css from "./MotionComponents.module.css";
-import {
-  resolveMotionSettings,
-  useMotionSettingsTheme,
-} from "./motionSettings";
-import type { CameraKeyframe } from "./cameraTrack";
-import type { MotionOptions } from "./motionSettings";
+import { MotionSettings } from "./MotionSettings/MotionSettings";
+import type { CameraKeyframe } from "./cameraTrack/cameraTrack";
+import type { MotionOptions } from "./MotionSettings/MotionSettings";
 import type { ReactNode } from "react";
 
+type CameraViewportOptions = {
+  children: ReactNode;
+  blur: boolean;
+  samples: number;
+  shutterAngle: number;
+};
 /**
  * Vector-only camera. The render callback receives the real, fractional content
  * frame.
@@ -34,7 +37,6 @@ export type DiagramCameraProps = MotionOptions & {
   >;
   render: (frame: number) => ReactNode;
 };
-
 type CameraSampleProps = {
   track?: readonly CameraKeyframe[];
   width: number;
@@ -43,7 +45,6 @@ type CameraSampleProps = {
   render: (frame: number) => ReactNode;
   motion: MotionOptions;
 };
-
 function CameraSample({
   track,
   width,
@@ -53,15 +54,15 @@ function CameraSample({
   motion,
 }: CameraSampleProps) {
   const frame = useCurrentFrame();
-  const theme = useMotionSettingsTheme();
-  const pose = getCameraPose(
-    track,
+  const theme = MotionSettings.useMotionSettingsTheme();
+  const pose = getCameraPose({
+    keys: track,
     frame,
     enabled,
-    motion,
-    { width, height },
+    options: motion,
+    viewport: { width, height },
     theme,
-  );
+  });
   const visibleWidth = width / pose.zoom;
   const visibleHeight = height / pose.zoom;
   return (
@@ -73,18 +74,12 @@ function CameraSample({
     </svg>
   );
 }
-
 function CameraViewport({
   children,
   blur,
   samples,
   shutterAngle,
-}: {
-  children: ReactNode;
-  blur: boolean;
-  samples: number;
-  shutterAngle: number;
-}) {
+}: CameraViewportOptions) {
   return (
     <div className={css.cameraViewport} data-camera-moving={blur || undefined}>
       {blur ? (
@@ -97,14 +92,6 @@ function CameraViewport({
     </div>
   );
 }
-
-/** The shutter angle scaled by the blur strength, capped at a full turn. */
-function _getScaledShutterAngle(
-  settings: Readonly<{ shutterAngle: number; blurStrength: number }>,
-): number {
-  return Math.min(360, settings.shutterAngle * settings.blurStrength);
-}
-
 /** Pan and zoom through SVG artwork with travel-only temporal motion blur. */
 export function DiagramCamera({
   track,
@@ -121,31 +108,33 @@ export function DiagramCamera({
   const validatedTrack = useMemo(() => {
     return track && createCameraTrackSchema(width, height).parse(track);
   }, [track, width, height]);
-  const theme = useMotionSettingsTheme();
-  const settings = resolveMotionSettings({ ...motion, ...blurOptions }, theme);
-  const shutterAngle = _getScaledShutterAngle(settings);
+  const theme = MotionSettings.useMotionSettingsTheme();
+  const settings = MotionSettings.resolveMotionSettings({
+    options: { ...motion, ...blurOptions },
+    theme,
+  });
+  const shutter = settings.shutterAngle * settings.blurStrength;
+  const shutterAngle = Math.min(360, shutter);
   const blur =
     enabled &&
     motionBlur &&
     shutterAngle > 0 &&
-    (blurActive || isCameraMoving(validatedTrack, frame, motion, theme));
-  const sample = (
-    <CameraSample
-      track={validatedTrack}
-      width={width}
-      height={height}
-      enabled={enabled}
-      render={render}
-      motion={motion}
-    />
-  );
+    (blurActive ||
+      isCameraMoving({ keys: validatedTrack, frame, options: motion, theme }));
   return (
     <CameraViewport
       blur={blur}
       samples={settings.samples}
       shutterAngle={shutterAngle}
     >
-      {sample}
+      <CameraSample
+        track={validatedTrack}
+        width={width}
+        height={height}
+        enabled={enabled}
+        render={render}
+        motion={motion}
+      />
     </CameraViewport>
   );
 }

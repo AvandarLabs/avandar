@@ -111,7 +111,7 @@ Line weight, corner style, and tint strength are not motion, but renderers apply
 
 ## Pointer and click vocabulary
 
-The pointer helpers live in [src/cursor-motion.ts](../src/cursor-motion.ts). [src/chrome.tsx](../src/chrome/chrome.tsx) renders the shared `Cursor`.
+The pointer helpers live in [src/CursorMotionHelpers.ts](../src/CursorMotionHelpers.ts). [src/chrome.tsx](../src/chrome/chrome.tsx) renders the shared `Cursor`.
 
 | API                                                         | Behavior                                                                                                                                                                                                                                              |
 | ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -128,7 +128,7 @@ Measure targets from a rendered frame. Give each target an arrival key and anoth
 
 ## Title choreography
 
-[TitleCard](../src/title-card.tsx) is the original reusable title scene built from this vocabulary. It accepts `{name, kicker, frame}` and spans `TITLE_LEN = 66` frames (2.2 seconds).
+[TitleCard](../src/TitleCard/TitleCard.tsx) is the original reusable title scene built from this vocabulary. It accepts `{name, kicker, frame}` and spans `TITLE_LEN = 66` frames (2.2 seconds).
 
 | Event             | Local frame / duration                       | Motion                                                                                                                 |
 | ----------------- | -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |

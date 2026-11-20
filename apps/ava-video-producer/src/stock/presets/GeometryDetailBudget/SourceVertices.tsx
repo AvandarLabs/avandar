@@ -1,14 +1,10 @@
 import { mixToken } from "../../../motion";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { makeDetailSimplificationFromInput } from "./makeDetailSimplificationFromInput";
 import type { Input } from "./GeometryDetailBudget.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
-
 const VERTEX_AT = 13;
 const VERTEX_FRAMES = 23;
 const KEPT_AT = 111;
@@ -21,8 +17,8 @@ export function SourceVertices({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { color } = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const { color } = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const keptT = motion.ramp(frame, KEPT_AT, motion.scale(KEPT_FRAMES));
   const { keptIndices } = makeDetailSimplificationFromInput(input);
   const kept = new Set(keptIndices);

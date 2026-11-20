@@ -1,7 +1,7 @@
 import { propEq } from "@avandar/utils";
 import { mix, ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import {
   DEMONSTRATE_CUE,
   HANDOFF_CUE,
@@ -14,14 +14,12 @@ import type { Input } from "./ExpertiseRoleExchange.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
-
 /** Frames the topic label takes to fade in. */
 const TOPIC_FRAMES = 10;
 /** Frames the attribution summary takes to fade in. */
 const SUMMARY_FRAMES = 8;
 /** Frames the closing line takes to fade in. */
 const CLOSING_FRAMES = 10;
-
 /**
  * Frame-controlled reciprocal demonstrations keep each person's identity fixed.
  */
@@ -30,7 +28,7 @@ export function ExpertiseRoleExchange({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const topicIndex = frame < HANDOFF_CUE ? 0 : 1;
   const topic = input.topics[topicIndex];
   const firstExpert = input.people.findIndex((person) => {

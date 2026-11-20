@@ -1,7 +1,7 @@
 import { Button } from "@mantine/core";
 import { useState, type ReactNode } from "react";
 import { isTokenReference } from "../../../../videoTheme/themeReferenceHelpers/themeReferenceHelpers";
-import { getTokenDefinitionFromPath } from "../../../../videoTheme/tokenCatalog/tokenCatalogHelpers";
+import { getTokenDefinitionFromPath } from "../../../../videoTheme/tokenCatalog/tokenCatalogHelpers/tokenCatalogHelpers";
 import { getCustomScaleFromReference } from "../../../customTokenValue/customTokenValue";
 import {
   isCameraCurveToken,

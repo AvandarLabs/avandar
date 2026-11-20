@@ -1,5 +1,5 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { makeParcelEnvelopeGeometryFromParcel } from "./makeParcelEnvelopeGeometryFromParcel";
 import { ParcelDimensions } from "./ParcelDimensions";
 import { ParcelShapes } from "./ParcelShapes";
@@ -28,7 +28,7 @@ export function ParcelEnvelope({
   hatchId,
   showDimensions,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const geometry = makeParcelEnvelopeGeometryFromParcel({
     parcel,
     setback,

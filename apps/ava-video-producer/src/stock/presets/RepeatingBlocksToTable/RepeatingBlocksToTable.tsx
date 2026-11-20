@@ -1,6 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
-import { BlockCellStrip } from "./BlockCellStrip";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { BlockCellStrip } from "./BlockCellStrip/BlockCellStrip";
 import { BlockIdentity } from "./BlockIdentity";
 import { TableFieldHeadings } from "./TableFieldHeadings";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
@@ -14,7 +14,7 @@ export function RepeatingBlocksToTable({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g opacity={motion.reveal(frame, 0)}>
       <LabelSlots

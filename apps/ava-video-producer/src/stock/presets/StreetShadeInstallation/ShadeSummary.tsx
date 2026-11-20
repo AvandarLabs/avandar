@@ -1,13 +1,12 @@
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./StreetShadeInstallation.schema";
 import type { ReactNode } from "react";
 /** Inputs for ShadeSummary. */
 type Props = { input: Input; frame: number };
-
 /** Resolved quantities retain their supplied denominator and copy. */
 export function ShadeSummary({ input, frame }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const total = input.zones.reduce((sum, zone) => {
     return sum + zone.areaM2;
   }, 0);

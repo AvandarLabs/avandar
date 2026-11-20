@@ -1,4 +1,4 @@
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./TermLimitedRevenueShare.schema";
 import type { ReactNode } from "react";
 
@@ -17,7 +17,7 @@ export function RevenueAmount({
   reveal,
   color,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g data-amount={portion} opacity={reveal}>
       <circle cx={8 + portion * 115} cy={105} r={4} fill={color} />

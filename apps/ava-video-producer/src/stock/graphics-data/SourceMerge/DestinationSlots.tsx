@@ -1,19 +1,14 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicProps,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = Readonly<{ x: number; accent: string }>;
-
 /** The three empty slots along the bottom of the destination panel. */
 export function DestinationSlots({ x, accent }: Props): ReactNode {
-  const style = useGraphicProps("SourceMerge", {});
-  const { sketch } = useGraphicTokens();
-  const shapes = useGraphicShapeScales();
+  const style = GraphicThemeHooks.useGraphicProps("SourceMerge", {});
+  const { sketch } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
   return [0, 1, 2].map((slot) => {
     return (
       <g key={slot}>

@@ -1,14 +1,10 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { QuantityBand } from "../../primitives/QuantityBand/QuantityBand";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./HabitatCorridorReconnection.schema";
 import type { ReactNode } from "react";
 /** Inputs for HabitatLandBalance. */
 type Props = { frame: number; accent: string; input: Input };
-
 /**
  * The corridor reclassifies existing other land inside the unchanged
  * denominator.
@@ -18,8 +14,8 @@ export function HabitatLandBalance({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const habitat = input.patches.reduce((total, patch) => {
       return total + patch.areaHa;
     }, 0),

@@ -1,5 +1,5 @@
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { getBookingFromFrame } from "./getBookingFromFrame";
 import type { Input } from "./SharedWorkshopBooking.schema";
 import type { ReactNode } from "react";
@@ -15,7 +15,7 @@ export function OriginalRequest({
   scene,
   index,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const request = input.requests[index];
   return (
     <g>

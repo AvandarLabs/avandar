@@ -1,16 +1,11 @@
 import { mix, ramp } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./CapabilityMatrix.schema";
 import type { ReactNode } from "react";
 
 type Props = { frame: number; input: Input; accent: string };
-
 /** Frames the scanning rule takes to cross every row. */
 const SCAN_FRAMES = 72;
 /** The focus outline's corner before the corner style scales it. */
@@ -23,9 +18,9 @@ export function CapabilityFocus({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const columnWidth = 606 / input.options.length;
   const height = input.capabilities.length * 66;
   const isRow = input.focus.kind === "row";

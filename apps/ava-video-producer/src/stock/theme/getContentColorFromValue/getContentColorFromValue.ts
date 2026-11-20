@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { getValueAtPath } from "../../../videoTheme/getValueAtPath";
-import { listTokenDefinitions } from "../../../videoTheme/tokenCatalog/tokenCatalogHelpers";
+import { listTokenDefinitions } from "../../../videoTheme/tokenCatalog/tokenCatalogHelpers/tokenCatalogHelpers";
 import { legacyColorSchema } from "../../presets/legacy/legacyColorSchema.constants";
 import type { ResolvedVideoSemantic } from "../../../videoTheme/videoTheme.types";
 

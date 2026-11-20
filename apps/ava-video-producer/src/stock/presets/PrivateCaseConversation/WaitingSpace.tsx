@@ -1,19 +1,15 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./PrivateCaseConversation.schema";
 import type { ReactNode } from "react";
 /** Inputs for WaitingSpace. */
 type Props = { input: Input; opacity: number };
-
 /** Nearby waiting furniture and acknowledgement form the optional inset. */
 export function WaitingSpace({ input, opacity }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g opacity={opacity} data-waiting-inset={input.showWaitingSupporter}>
       <StockRect

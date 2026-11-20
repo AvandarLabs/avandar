@@ -1,9 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./PooledDonorAllocation.schema";
 import type { ReactNode } from "react";
 
@@ -22,8 +19,8 @@ export function FundingEnvelope({
   accent,
   allocatedCredits,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const request = input.requests[index];
   const width = 880 / input.requests.length;
   const x = 40 + index * width;

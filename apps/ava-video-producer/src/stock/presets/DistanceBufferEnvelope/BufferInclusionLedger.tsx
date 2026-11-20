@@ -1,5 +1,5 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { BufferClassificationToken } from "./BufferClassificationToken";
+import { BufferClassificationToken } from "./BufferClassificationToken/BufferClassificationToken";
 import type { Input } from "./DistanceBufferEnvelope.schema";
 import type { ReactNode } from "react";
 

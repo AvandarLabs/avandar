@@ -1,6 +1,7 @@
 import { isCameraSafeEasing } from "../../videoTheme/isCameraSafeEasing/isCameraSafeEasing";
-import { getTokenDefinitionFromPath } from "../../videoTheme/tokenCatalog/tokenCatalogHelpers";
+import { getTokenDefinitionFromPath } from "../../videoTheme/tokenCatalog/tokenCatalogHelpers/tokenCatalogHelpers";
 import { isCustomScaleKey } from "../customScaleKey/customScaleKey";
+import { type TokenRow } from "../tokenRows/tokenRows.types";
 import type {
   EasingValue,
   ResolvedVideoTheme,
@@ -8,8 +9,6 @@ import type {
   TokenKind,
   TokenReference,
 } from "../../videoTheme/videoTheme.types";
-import type { TokenRow } from "../tokenRows/tokenRows";
-
 /** One token a reference can point at, with what it currently holds. */
 export type ReferenceOption = Readonly<{
   reference: TokenReference;
@@ -21,7 +20,6 @@ export type ReferenceOption = Readonly<{
   key?: string;
   value: unknown;
 }>;
-
 /**
  * What an option is, for naming it: Mantine's primary colour, a value the
  * producer typed in (a generated custom scale entry), or a named entry.
@@ -34,7 +32,6 @@ export function getReferenceOptionRole(
   }
   return isCustomScaleKey(option.key) ? "custom" : "named";
 }
-
 /**
  * The reference a value holds when no option offers it, such as a swatch that
  * was deleted. Undefined for a literal, an unset value, or a listed reference.
@@ -54,7 +51,6 @@ export function getUnresolvedReference(
     ? (value as TokenReference)
     : undefined;
 }
-
 function _effectiveKind(
   options: Readonly<{ path: string; kind: TokenKind }>,
 ): TokenKind {
@@ -67,7 +63,6 @@ function _effectiveKind(
   }
   return kind;
 }
-
 function _primaryOption(theme: ResolvedVideoTheme): ReferenceOption {
   const shade = theme.mantine.primaryShade;
   const index =
@@ -83,7 +78,6 @@ function _primaryOption(theme: ResolvedVideoTheme): ReferenceOption {
     value: theme.mantine.colors[theme.mantine.primaryColor]?.[index],
   };
 }
-
 function _paletteOptions(theme: ResolvedVideoTheme): ReferenceOption[] {
   return Object.entries(theme.mantine.colors).flatMap(([name, shades]) => {
     const definition = getTokenDefinitionFromPath(`colors.${name}`);
@@ -101,7 +95,6 @@ function _paletteOptions(theme: ResolvedVideoTheme): ReferenceOption[] {
       : [];
   });
 }
-
 /**
  * Whether a token, or one field of a composite token, holds a curve that
  * drives the camera: the named camera curves and each camera preset's curve.
@@ -118,7 +111,6 @@ export function isCameraCurveToken(
     /^camera\.presets\.[^.]+\.easing$/.test(path)
   );
 }
-
 /**
  * Tokens a reference of one kind may point at: atomic and Mantine values,
  * semantic tokens of the same kind, and for colours Mantine's primary colour
@@ -169,11 +161,9 @@ export function listReferenceOptions(
     ...(isColor ? _paletteOptions(theme) : []),
   ];
 }
-
 function _scaleOf(path: string): string {
   return path.split(".").slice(0, -1).join(".");
 }
-
 /**
  * Options with those from the current reference's scale first, the likeliest
  * picks.

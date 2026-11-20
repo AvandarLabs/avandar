@@ -1,16 +1,13 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./RetryBackoff.schema";
 import type { ReactNode } from "react";
 
 type Props = { outcome: Input["attempts"][number]["outcome"]; x: number };
 /** The declared final outcome draws a completion socket or stop cap. */
 export function BackoffFinal({ outcome, x }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g data-final-outcome={outcome}>
       {outcome === "complete" ? (

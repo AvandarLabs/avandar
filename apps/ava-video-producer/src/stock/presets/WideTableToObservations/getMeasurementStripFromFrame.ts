@@ -1,3 +1,4 @@
+import { propEq } from "@avandar/utils";
 import { mix } from "../../../motion";
 import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./WideTableToObservations.schema";
@@ -26,7 +27,7 @@ type GetMeasurementStripFromFrameResult = {
     values: Array<{ measureId: string; value: number | null }>;
   };
   measure: { id: string; label: string; unit: string };
-  value: number | null;
+  value: number | undefined;
   sourceIndex: number;
   isOmitted: boolean;
   progress: number;
@@ -35,7 +36,6 @@ type GetMeasurementStripFromFrameResult = {
   width: number;
   opacity: number;
 };
-
 /** Keyed source cell and separated vertical-then-horizontal strip motion. */
 export function getMeasurementStripFromFrame({
   input,
@@ -46,11 +46,12 @@ export function getMeasurementStripFromFrame({
 }: Readonly<Params>): GetMeasurementStripFromFrameResult {
   const subject = input.subjects[subjectIndex],
     measure = input.measures[measureIndex];
-  const value = _findMeasureValue(subject, measure.id);
+  const value =
+    subject.values.find(propEq("measureId", measure.id))!.value ?? undefined;
   const sourceIndex = measureIndex * 2 + subjectIndex;
-  const outputIndex = _getOutputIndex(input, sourceIndex);
+  const outputIndex = _getOutputIndex({ input, sourceIndex });
   const isOmitted =
-    value === null && input.missingPolicy === "omit-with-ledger";
+    value === undefined && input.missingPolicy === "omit-with-ledger";
   const progress = motion.ramp(
     frame,
     81 + sourceIndex * motion.stagger.list,
@@ -81,12 +82,14 @@ export function getMeasurementStripFromFrame({
       (isOmitted ? 1 - motion.ramp(frame, 100, motion.scale(10)) : 1),
   };
 }
-
 /**
  * A strip's row in the long table: its source order, or that order counting
  * only present values when missing rows are omitted.
  */
-function _getOutputIndex(input: Input, sourceIndex: number): number {
+function _getOutputIndex({
+  input,
+  sourceIndex,
+}: Readonly<{ input: Input; sourceIndex: number }>): number {
   if (input.missingPolicy === "retain-missing-row") {
     return sourceIndex;
   }
@@ -95,13 +98,4 @@ function _getOutputIndex(input: Input, sourceIndex: number): number {
     .filter((item) => {
       return item !== null;
     }).length;
-}
-
-function _findMeasureValue(
-  subject: Input["subjects"][number],
-  measureId: string,
-): number | null {
-  return subject.values.find((entry) => {
-    return entry.measureId === measureId;
-  })!.value;
 }

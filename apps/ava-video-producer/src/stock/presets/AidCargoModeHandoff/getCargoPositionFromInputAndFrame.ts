@@ -9,14 +9,12 @@ type GetCargoPositionResult = {
   owner: string;
   mechanism: string | undefined;
 };
-
 type CargoPositionArgs = Readonly<{
   frame: number;
   input: Input;
   parcelIndex: number;
   motion: VideoMotion;
 }>;
-
 /**
  * A parcel rides its carrier until unloading and shares the receiver's later
  * travel.
@@ -49,7 +47,7 @@ export function getCargoPositionFromInputAndFrame({
     frame,
     index: boundary + 1,
   });
-  const mechanism = _getTransferMechanism(travel, input, boundary);
+  const mechanism = _getTransferMechanism({ travel, input, boundary });
   return {
     x: mix(travel, source.x, receiver.x) + offset,
     y: 300 - Math.sin(travel * Math.PI) * 78,
@@ -59,13 +57,14 @@ export function getCargoPositionFromInputAndFrame({
     mechanism,
   };
 }
-
 /** The handling equipment moving a parcel across a boundary, mid-transfer. */
-function _getTransferMechanism(
-  travel: number,
-  input: Input,
-  boundary: number,
-): string | undefined {
+function _getTransferMechanism({
+  travel,
+  input,
+  boundary,
+}: Readonly<{ travel: number; input: Input; boundary: number }>):
+  | string
+  | undefined {
   if (!(travel > 0 && travel < 1)) {
     return undefined;
   }

@@ -1,5 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./MobileClinicRelocation.schema";
 import type { ReactNode } from "react";
 
@@ -8,7 +8,7 @@ type Props = { input: Input; frame: number };
  * Person booking totals and finite slot capacity use different denominators.
  */
 export function ClinicLedger({ input, frame }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const numBooked = input.people.filter(({ slotId }) => {
     return slotId !== null;
   }).length;

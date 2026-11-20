@@ -1,9 +1,5 @@
 import { DrawPath } from "../../graphics-common/DrawPath";
-import {
-  useGraphicMotion,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { makeDetailSimplificationFromInput } from "./makeDetailSimplificationFromInput";
 import { RemovedDeviationGuides } from "./RemovedDeviationGuides";
 import { SourceVertices } from "./SourceVertices";
@@ -11,7 +7,6 @@ import type { Input } from "./GeometryDetailBudget.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
-
 const ORIGINAL_AT = 13;
 const ORIGINAL_FRAMES = 37;
 const SIMPLIFIED_AT = 111;
@@ -22,9 +17,9 @@ export function DetailTrace({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const { color, stroke } = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const { color, stroke } = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const { keptIndices } = makeDetailSimplificationFromInput(input);
   const original = _buildTracePath(input.vertices);
   const simplified = _buildTracePath(
@@ -62,7 +57,6 @@ export function DetailTrace({
     </g>
   );
 }
-
 /** A polyline through source vertices, in the shared trace coordinates. */
 function _buildTracePath(vertices: Input["vertices"]): string {
   return vertices

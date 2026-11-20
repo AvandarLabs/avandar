@@ -1,26 +1,21 @@
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { LunchLabels } from "./LunchLabels";
-import { LunchTray } from "./LunchTray";
+import { LunchTray } from "./LunchTray/LunchTray";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./SchoolLunchTrayComposition.schema";
 import type { ReactNode } from "react";
 /** Inputs for SchoolLunchTrayComposition. */
 type Props = GraphicProps & { input: Input };
-
 /** Serving preserves every planned tray without scoring the learners. */
 export function SchoolLunchTrayComposition({
   frame,
   accent,
   input,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
       <StockRect

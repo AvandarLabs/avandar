@@ -1,6 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./CapabilityMatrix.schema";
 import type { ReactNode } from "react";
 
@@ -17,7 +17,7 @@ export function CapabilityColumn({
   columnWidth,
   height,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const x = 302 + columnWidth * index;
   const label = {
     text: option.label,

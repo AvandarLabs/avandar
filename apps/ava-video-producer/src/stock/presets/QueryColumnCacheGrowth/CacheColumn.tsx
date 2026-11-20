@@ -1,10 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicProps,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CacheCell } from "./CacheCell";
 import type { Input } from "./QueryColumnCacheGrowth.schema";
 import type { ReactNode } from "react";
@@ -26,9 +22,9 @@ export function CacheColumn({
   growth,
   accent,
 }: Readonly<Props>): ReactNode {
-  const style = useGraphicProps("QueryColumnCacheGrowth", {});
-  const scales = useGraphicShapeScales();
-  const { color, sketch } = useGraphicTokens();
+  const style = GraphicThemeHooks.useGraphicProps("QueryColumnCacheGrowth", {});
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const { color, sketch } = GraphicThemeHooks.useGraphicTokens();
   return (
     <g data-cache-column={column.id} opacity={isAdded ? growth : 1}>
       <SketchedShape

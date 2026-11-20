@@ -4,15 +4,15 @@ import { useVideoTheme, useVideoTokens } from "../../videoTheme/useVideoTheme";
 import { fitTextLines, formatMetric, sceneBounds } from "../layout/layout";
 import { positioned } from "../positioned";
 import { SceneShell } from "../SceneShell";
-import { getStageTextStyle } from "../stageTheme/stageTheme";
-import { getLineRevealStyle } from "../textReveal";
+import { StageTheme } from "../StageTheme/StageTheme";
+import { getLineRevealStyle } from "../textReveal/textReveal";
 import {
   getBarComparisonBeats,
   getBarFractions,
   getEraseStartFrames,
   getRoughEdgeClipPath,
   getRowValueLabel,
-} from "./barComparisonMotion";
+} from "./barComparisonMotion/barComparisonMotion";
 import type { VideoMotion } from "../../videoTheme/createVideoMotion/createVideoMotion";
 import type { ResolvedVideoTheme } from "../../videoTheme/videoTheme.types";
 import type { Rect } from "../layout/layout";
@@ -22,13 +22,19 @@ import type {
 } from "../scenes.types";
 import type { ReactNode } from "react";
 
+type ErasableOptions = {
+  frame: number;
+  startFrame?: number;
+  durationInFrames: number;
+  motion: VideoMotion;
+  children: ReactNode;
+};
 /** Gap between two panels, as a fraction of the content width. */
 const PANEL_GAP = 0.06;
 /** Default fractional frames between erased elements inside one panel. */
 const ERASE_STAGGER = 0.1;
 /** Depth of a rough bar edge, in pixels. */
 const ROUGH_EDGE_DEPTH = 10;
-
 /**
  * One or two hero numbers, each over a short ranked bar chart, for an
  * editorial comparison such as two benchmark results side by side. Panels
@@ -102,11 +108,9 @@ export function BarComparisonScene(props: BarComparisonSceneProps): ReactNode {
     </SceneShell>
   );
 }
-
 function _countPanelElements(panel: BarComparisonPanel): number {
   return 1 + (panel.caption ? 1 : 0) + panel.rows.length * 3;
 }
-
 type PanelProps = BarComparisonSceneProps & {
   panel: BarComparisonPanel;
   panelIndex: number;
@@ -115,17 +119,16 @@ type PanelProps = BarComparisonSceneProps & {
   theme: ResolvedVideoTheme;
   motion: VideoMotion;
 };
-
 /** One hero number, its caption and its rows. */
 function _Panel(props: PanelProps) {
   const { frame, panel, panelIndex, rect, eraseStarts, theme, motion } = props;
   const scene = theme.semantic.color.scene;
-  const beats = getBarComparisonBeats(
-    props.revealAtFrame ?? 1,
+  const beats = getBarComparisonBeats({
+    revealAtFrame: props.revealAtFrame ?? 1,
     panelIndex,
-    props.panelStaggerFrames ?? motion.rise.stagger,
+    panelStaggerFrames: props.panelStaggerFrames ?? motion.rise.stagger,
     motion,
-  );
+  });
   const heroText = `${formatMetric(panel.value, panel.precision ?? 0)}${panel.unit ?? ""}`;
   const hero = fitTextLines([heroText], rect.width, rect.height * 0.3, 150, 40);
   const heroHeight = hero.fontSize * 1.05;
@@ -157,11 +160,10 @@ function _Panel(props: PanelProps) {
           style={{
             ...positioned({ ...rect, height: heroHeight }),
             fontSize: hero.fontSize,
-            ...getStageTextStyle(theme.semantic.text.stage.heroFigure, [
-              "fontWeight",
-              "lineHeight",
-              "letterSpacing",
-            ]),
+            ...StageTheme.getStageTextStyle({
+              role: theme.semantic.text.stage.heroFigure,
+              fields: ["fontWeight", "lineHeight", "letterSpacing"],
+            }),
             ...motion.enter(frame, beats.heroAt, {
               dur: motion.panel,
               easing: motion.rise.easing,
@@ -211,6 +213,15 @@ function _Panel(props: PanelProps) {
   );
 }
 
+type RenderRowOptions = PanelProps & {
+  row: BarComparisonPanel["rows"][number];
+  rowIndex: number;
+  top: number;
+  pitch: number;
+  fraction: number;
+  beats: ReturnType<typeof getBarComparisonBeats>;
+  erasable: (children: ReactNode, key: string) => ReactNode;
+};
 /** One row's label, bar and value, each erasable on its own. */
 function _renderRow({
   frame,
@@ -226,15 +237,7 @@ function _renderRow({
   erasable,
   theme,
   motion,
-}: PanelProps & {
-  row: BarComparisonPanel["rows"][number];
-  rowIndex: number;
-  top: number;
-  pitch: number;
-  fraction: number;
-  beats: ReturnType<typeof getBarComparisonBeats>;
-  erasable: (children: ReactNode, key: string) => ReactNode;
-}) {
+}: RenderRowOptions) {
   const fontSize = Math.min(26, pitch * 0.42);
   const barHeight = pitch * 0.58;
   const labelWidth = rect.width * 0.3;
@@ -245,7 +248,10 @@ function _renderRow({
     position: "absolute" as const,
     top: center - fontSize * 0.65,
     fontSize,
-    ...getStageTextStyle(theme.semantic.text.stage.barLabel, ["lineHeight"]),
+    ...StageTheme.getStageTextStyle({
+      role: theme.semantic.text.stage.barLabel,
+      fields: ["lineHeight"],
+    }),
     whiteSpace: "nowrap" as const,
   };
   const rowAt = rowIndex * motion.stagger.list;
@@ -265,13 +271,13 @@ function _renderRow({
           overflow: "hidden",
           textOverflow: "ellipsis",
           color: scene.mutedForeground,
-          ...getLineRevealStyle(
+          ...getLineRevealStyle({
             frame,
-            beats.labelsAt + rowAt,
-            "line-fade",
-            { rise: 0 },
+            at: beats.labelsAt + rowAt,
+            mode: "line-fade",
+            options: { rise: 0 },
             motion,
-          ),
+          }),
         }}
       >
         {row.label}
@@ -306,13 +312,13 @@ function _renderRow({
           textAlign: "right",
           fontVariantNumeric: "tabular-nums",
           color: scene.foreground,
-          ...getLineRevealStyle(
+          ...getLineRevealStyle({
             frame,
-            beats.valuesAt + rowAt,
-            "line-fade",
-            { rise: 0 },
+            at: beats.valuesAt + rowAt,
+            mode: "line-fade",
+            options: { rise: 0 },
             motion,
-          ),
+          }),
         }}
       >
         {getRowValueLabel(row, panel.precision ?? 0)}
@@ -321,7 +327,6 @@ function _renderRow({
     ),
   ];
 }
-
 /**
  * Wraps one element so the scene's exit can erase it on its own, sweeping on
  * the travel curve.
@@ -332,13 +337,7 @@ function _Erasable({
   durationInFrames,
   motion,
   children,
-}: {
-  frame: number;
-  startFrame?: number;
-  durationInFrames: number;
-  motion: VideoMotion;
-  children: ReactNode;
-}) {
+}: ErasableOptions) {
   if (startFrame === undefined) {
     return <>{children}</>;
   }

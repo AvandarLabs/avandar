@@ -2,6 +2,12 @@ import { mix } from "../../../motion";
 import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./RetailShelfReplenishment.schema";
 
+type GetUnitOwnerOptions = {
+  isSelected: boolean;
+  purchase: number;
+  isIncoming: boolean;
+  load: number;
+};
 type Unit = {
   goodIndex: number;
   unitIndex: number;
@@ -23,7 +29,7 @@ export function getShelfUnitPoseFromInputAndFrame({
 }: Readonly<Unit>): { owner: string; x: number; y: number } {
   const good = input.goods[goodIndex];
   const shelf = { x: 180 + unitIndex * 56, y: 200 + goodIndex * 105 };
-  const trolley = _getTrolleyPoint(frame, incomingIndex, motion);
+  const trolley = _getTrolleyPoint({ frame, incomingIndex, motion });
   const load = motion.ramp(
     frame,
     58 + incomingIndex * motion.scaleStagger(5),
@@ -55,19 +61,13 @@ export function getShelfUnitPoseFromInputAndFrame({
     owner: _getUnitOwner({ isSelected, purchase, isIncoming, load }),
   };
 }
-
 /** Who holds a unit: the shelf, the trolley, a hand, or the basket. */
 function _getUnitOwner({
   isSelected,
   purchase,
   isIncoming,
   load,
-}: Readonly<{
-  isSelected: boolean;
-  purchase: number;
-  isIncoming: boolean;
-  load: number;
-}>): string {
+}: Readonly<GetUnitOwnerOptions>): string {
   if (isSelected && purchase > 0) {
     return purchase === 1 ? "basket" : "shopper-hand";
   }
@@ -76,13 +76,12 @@ function _getUnitOwner({
   }
   return "shelf";
 }
-
 /** A unit's place on the trolley as it arrives with its load. */
-function _getTrolleyPoint(
-  frame: number,
-  incomingIndex: number,
-  motion: VideoMotion,
-) {
+function _getTrolleyPoint({
+  frame,
+  incomingIndex,
+  motion,
+}: Readonly<{ frame: number; incomingIndex: number; motion: VideoMotion }>) {
   const arrival = motion.ramp(frame, 38, motion.hero, motion.travel.easing);
   return {
     x: 698 + (incomingIndex % 3) * 36 + mix(arrival, 100, 0),

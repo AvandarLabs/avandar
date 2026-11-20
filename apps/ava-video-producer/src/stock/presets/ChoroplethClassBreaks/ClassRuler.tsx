@@ -1,9 +1,6 @@
 import { normalizeFiniteRange } from "../../numeric/normalizeFiniteRange/normalizeFiniteRange";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./ChoroplethClassBreaks.schema";
 import type { ReactNode } from "react";
 
@@ -12,8 +9,8 @@ type Props = { input: Input; threshold: number };
  * The moving boundary and optional fixed-value ticks share one numeric domain.
  */
 export function ClassRuler({ input, threshold }: Readonly<Props>): ReactNode {
-  const { color, stroke, sketch } = useGraphicTokens();
-  const shapes = useGraphicShapeScales();
+  const { color, stroke, sketch } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
   const min = input.schemes[0].breaks[0],
     max = input.schemes[0].breaks[2];
   const x = 64 + 424 * normalizeFiniteRange({ value: threshold, min, max });

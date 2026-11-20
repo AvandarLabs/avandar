@@ -1,6 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getGroupingFromCells } from "./getGroupingFromCells";
 import type { ComponentProps, ReactNode } from "react";
 
@@ -10,7 +10,7 @@ type Props = {
 };
 /** Matching visible keys attach each arithmetic summary to its zone seam. */
 export function GroupingZone({ zone, accent }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const cell = [...zone.cells].sort((first, second) => {
     return first.row - second.row || first.column - second.column;
   })[0];
@@ -36,16 +36,18 @@ export function GroupingZone({ zone, accent }: Readonly<Props>): ReactNode {
         fill={tokens.color.elevated}
         stroke={color}
       />
-      <LabelSlots labels={_buildZoneLabels(zone, cell)} />
+      <LabelSlots labels={_buildZoneLabels({ zone, cell })} />
     </g>
   );
 }
-
 /** The zone key on its first cell and by its summary, then the summary. */
-function _buildZoneLabels(
-  zone: Props["zone"],
-  cell: Props["zone"]["cells"][number],
-): ComponentProps<typeof LabelSlots>["labels"] {
+function _buildZoneLabels({
+  zone,
+  cell,
+}: Readonly<{
+  zone: Props["zone"];
+  cell: Props["zone"]["cells"][number];
+}>): ComponentProps<typeof LabelSlots>["labels"] {
   const summaryY = 160 + zone.zoneIndex * 108;
   const keyLabel = String(zone.zoneIndex + 1);
   return [

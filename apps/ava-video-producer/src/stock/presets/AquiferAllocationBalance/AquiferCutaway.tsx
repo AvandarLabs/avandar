@@ -2,29 +2,23 @@ import { interpolateFiniteRange } from "../../numeric/interpolateFiniteRange/int
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { AquiferOwnershipKey } from "./AquiferOwnershipKey";
 import type { Input } from "./AquiferAllocationBalance.schema";
 import type { ReactNode } from "react";
 /** Inputs for AquiferCutaway. */
 type Props = { frame: number; accent: string; input: Input };
 const DRAW_ON_LENGTH = 1;
-
 /** Recharge, pumping and natural outflow cross separate physical boundaries. */
 export function AquiferCutaway({
   frame,
   accent,
   input,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const recharge = motion.ramp(
       frame,
       36,

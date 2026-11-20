@@ -1,5 +1,5 @@
 import { prop } from "@avandar/utils";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getQuantitySegmentsFromValues } from "./getQuantitySegmentsFromValues";
 import type { ReactNode } from "react";
 
@@ -11,7 +11,6 @@ type Props = {
   width: number;
   height: number;
 };
-
 /** Draws proportional authored quantities against an explicit common whole. */
 export function QuantityBand({
   values,
@@ -21,7 +20,7 @@ export function QuantityBand({
   width,
   height,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   if (
     ![x, y, width, height].every(Number.isFinite) ||
     width <= 0 ||

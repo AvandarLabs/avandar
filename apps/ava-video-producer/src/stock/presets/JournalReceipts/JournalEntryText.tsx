@@ -1,15 +1,11 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { LABELS_CUE } from "./journalTiming";
 import type { Input } from "./JournalReceipts.schema";
 import type { ReactNode } from "react";
 
 type Props = { entry: Input["entries"][number]; input: Input; frame: number };
-
 function _createLabelsFromEntry({
   entry,
   input,
@@ -45,15 +41,14 @@ function _createLabelsFromEntry({
       : []),
   ];
 }
-
 /** Entry labels and optional identities occupy separate fixed-size slots. */
 export function JournalEntryText({
   entry,
   input,
   frame,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const horizontal = input.foldDirection === "horizontal";
   if (!input.showLabels || frame < LABELS_CUE) {
     return (
@@ -68,11 +63,7 @@ export function JournalEntryText({
       />
     );
   }
-  const labels = _createLabelsFromEntry({
-    entry,
-    input,
-    color: tokens.color,
-  });
+  const labels = _createLabelsFromEntry({ entry, input, color: tokens.color });
   return (
     <g>
       {labels.map((label) => {

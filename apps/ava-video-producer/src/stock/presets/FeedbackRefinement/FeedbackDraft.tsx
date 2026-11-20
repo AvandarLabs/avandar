@@ -1,9 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { getFeedbackStateFromInputAndFrame } from "./getFeedbackStateFromInputAndFrame";
 import type { ReactNode } from "react";
 
@@ -18,8 +15,8 @@ export function FeedbackDraft({
   accent,
   id,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const { x, round, revision } = state;
   const clipId = `feedback-${encodeURIComponent(id)}`;
   return (

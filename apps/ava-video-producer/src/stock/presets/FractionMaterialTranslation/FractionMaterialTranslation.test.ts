@@ -3,7 +3,10 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { FractionMaterialTranslation } from "./FractionMaterialTranslation";
+import { fractionMaterialTranslationContract as contract } from "./FractionMaterialTranslation.contract";
 import {
   changedInput,
   DEFAULT_INPUT,
@@ -12,6 +15,7 @@ import {
   denseInput,
   minimumInput,
 } from "./FractionMaterialTranslation.fixtures";
+import { inputSchema, type Input } from "./FractionMaterialTranslation.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 
 function _render({
@@ -48,12 +52,6 @@ test("all physical materials select the same numerator and denominator", () => {
   });
   assert.equal([...markup.matchAll(/aria-label="8 \/ 8"/g)].length, 4);
 });
-
-import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
-import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
-import { fractionMaterialTranslationContract as contract } from "./FractionMaterialTranslation.contract";
-import { inputSchema, type Input } from "./FractionMaterialTranslation.schema";
-
 function _getVisibleTexts({
   input,
   frame,
@@ -82,10 +80,7 @@ registerStockTextLayoutAssertions(options);
 test("learner hands actually contact their selected material during the operation", () => {
   const markup = _render({
     frame: 60,
-    input: {
-      ...denseInput,
-      resolvedArrangement: "separate-desks",
-    },
+    input: { ...denseInput, resolvedArrangement: "separate-desks" },
   });
   const hand = markup
     .match(/<path\b[^>]*\bdata-material-hand="counters"[^>]*>/)?.[0]
@@ -97,7 +92,7 @@ test("learner hands actually contact their selected material during the operatio
     ? ["cx", "cy", "r"].map((name) => {
         return pieceTag.match(new RegExp(` ${name}="([^"]+)"`))?.[1];
       })
-    : null;
+    : undefined;
   assert.ok(hand);
   assert.ok(piece);
   const numbers = hand[1].match(/-?\d+(?:\.\d+)?/g)!.map(Number);
@@ -129,7 +124,7 @@ test("all material choices and arrangements derive selection from one fraction",
               showFractionNotation,
               representations,
             };
-            const markup = _render({ frame: 150, input: input });
+            const markup = _render({ frame: 150, input });
             representations.forEach((representation) => {
               const pieces = [
                 ...markup.matchAll(
@@ -187,7 +182,7 @@ test("surface motion preserves separate learners and full material clearance", (
     0, 35.999, 36, 36.001, 60, 83.999, 84, 84.001, 87.999, 88, 88.001, 100,
     107.999, 108, 108.001, 150,
   ].forEach((frame) => {
-    const markup = _render({ frame: frame, input: denseInput });
+    const markup = _render({ frame, input: denseInput });
     const positions = surfaces(markup);
     assert.equal([...markup.matchAll(/data-fraction-learner=/g)].length, 3);
     positions.forEach(([x, y], index) => {

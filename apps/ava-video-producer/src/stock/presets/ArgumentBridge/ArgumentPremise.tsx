@@ -1,7 +1,7 @@
 import { mix, ramp } from "../../../motion";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { PremiseStrip } from "./PremiseStrip";
-import { PremiseSupport } from "./PremiseSupport";
+import { PremiseSupport } from "./PremiseSupport/PremiseSupport";
 import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./ArgumentBridge.schema";
 import type { ReactNode } from "react";
@@ -15,7 +15,6 @@ type Props = {
   showSupport: boolean;
   relationship: Input["relationship"];
 };
-
 /** Frames between neighbouring premises arriving. */
 const ARRIVAL_STAGGER_FRAMES = 6;
 /** Frames between neighbouring premises joining the deck. */
@@ -32,11 +31,11 @@ export function ArgumentPremise({
   showSupport,
   relationship,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const slotWidth = 900 / count;
   const x = 30 + index * slotWidth;
   const center = x + slotWidth / 2;
-  const { arrival, joining } = _getPremiseProgress(frame, index, motion);
+  const { arrival, joining } = _getPremiseProgress({ frame, index, motion });
   return (
     <g
       data-premise={premise.id}
@@ -59,13 +58,12 @@ export function ArgumentPremise({
     </g>
   );
 }
-
 /** A premise's arrival and its arms joining the deck, both 0 to 1. */
-function _getPremiseProgress(
-  frame: number,
-  index: number,
-  motion: VideoMotion,
-) {
+function _getPremiseProgress({
+  frame,
+  index,
+  motion,
+}: Readonly<{ frame: number; index: number; motion: VideoMotion }>) {
   return {
     arrival: ramp(
       frame,

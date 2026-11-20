@@ -1,10 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getQueueItemLayoutFromInputAndFrame } from "./getQueueItemLayoutFromInputAndFrame";
 import type { Input } from "./QueueRelief.schema";
 import type { ReactNode } from "react";
@@ -24,9 +20,9 @@ export function QueueItem({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const { x, y, state, serviceSlot, opacity } =
     getQueueItemLayoutFromInputAndFrame({ motion, input, index, frame });
   return (

@@ -1,22 +1,17 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicFontSize,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = { label: string };
-
 /** The type scale step of the zero sample's value. */
 const ZERO_VALUE_SIZE = "md";
 /** The zero caption names a legend sample, including when no cell is empty. */
 export function ZeroCountLegend({ label }: Readonly<Props>): ReactNode {
-  const { color, stroke, text } = useGraphicTokens();
-  const shapes = useGraphicShapeScales();
+  const { color, stroke, text } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
   const body = text.graphic.body;
-  const zeroValueSize = useGraphicFontSize(ZERO_VALUE_SIZE);
+  const zeroValueSize = GraphicThemeHooks.useGraphicFontSize(ZERO_VALUE_SIZE);
   return (
     <g data-zero-legend="observed">
       <LabelSlots labels={[[label, 496, 130, 420, 12, 2]]} />

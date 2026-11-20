@@ -1,12 +1,7 @@
 import { ramp } from "../../../motion";
-import { Arrive } from "../../graphics-common/Arrive";
+import { Arrive } from "../../graphics-common/Arrive/Arrive";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicProps,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ForkLabel } from "./ForkLabel/ForkLabel";
 import type { Props as BranchProps } from "./DecisionBranch";
 import type { ReactNode } from "react";
@@ -15,9 +10,7 @@ type Props = Pick<
   BranchProps,
   "branch" | "x" | "frame" | "index" | "accent" | "isSelected"
 >;
-
 const SELECTION_CUE = 46;
-
 /**
  * Branch conditions remain readable while the selected condition gains focus.
  */
@@ -29,10 +22,10 @@ export function DecisionCondition({
   accent,
   isSelected,
 }: Readonly<Props>): ReactNode {
-  const style = useGraphicProps("DecisionFork", {});
-  const { color } = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
+  const style = GraphicThemeHooks.useGraphicProps("DecisionFork", {});
+  const { color } = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const selected = isSelected
     ? ramp(frame, SELECTION_CUE, motion.sheet, motion.reveal.easing)
     : 0;

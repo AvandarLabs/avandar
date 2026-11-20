@@ -2,19 +2,13 @@ import { mix, ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { QuarantinedRows } from "./QuarantinedRows";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./InvalidTableQuarantine.schema";
 import type { ReactNode } from "react";
 /** Frame-driven authored study props. */
 export type Props = GraphicProps & { input: Input };
-
 /** The cue the shutter starts to close on. */
 const CLOSE_CUE = 13;
 /** The cue a read is attempted on, once the shutter has closed. */
@@ -35,10 +29,10 @@ export function InvalidTableQuarantine({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const travel = motion.travel.easing;
   const emphasis = scales.stroke(tokens.stroke.emphasis);
   const isReplaced = input.reload.performed && frame >= REPLACED_CUE;

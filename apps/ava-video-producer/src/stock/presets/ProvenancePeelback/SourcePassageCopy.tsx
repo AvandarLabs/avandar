@@ -1,5 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./ProvenancePeelback.schema";
 import type { ReactNode, ComponentProps } from "react";
 
@@ -18,7 +18,7 @@ export function SourcePassageCopy({
   height,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const slots: Array<ComponentProps<typeof FitText>> = [
     {
       text: source.title,

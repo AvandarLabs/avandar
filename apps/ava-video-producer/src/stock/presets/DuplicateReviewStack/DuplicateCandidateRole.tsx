@@ -1,10 +1,7 @@
 import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./DuplicateReviewStack.schema";
 import type { getDuplicateCardLayoutFromGroupAndFrame } from "./getDuplicateCardLayoutFromGroupAndFrame";
 import type { ReactNode } from "react";
@@ -16,7 +13,6 @@ type Props = {
   layout: ReturnType<typeof getDuplicateCardLayoutFromGroupAndFrame>;
   accent: string;
 };
-
 /** Frames a card's role caption takes to fade in. */
 const ROLE_FRAMES = 10;
 /** Each comparison card owns its role in a reserved three-line caption slot. */
@@ -27,8 +23,8 @@ export function DuplicateCandidateRole({
   layout,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   if (
     input.finalView !== "comparison-pair" ||
     group.retainedId === null ||

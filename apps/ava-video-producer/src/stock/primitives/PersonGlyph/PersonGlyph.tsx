@@ -1,12 +1,7 @@
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
-
 /** A person's line weight before the theme's line weight scales it. */
 const PERSON_STROKE = 2.5;
-
 type Props = {
   x: number;
   y: number;
@@ -21,7 +16,6 @@ const POSTURES: { standing: string; seated: string; walking: string } = {
   seated: "M0 -4 V9 H12 V24 M0 9 L-8 14 V24 M-10 3 L0 0 L11 4",
   walking: "M0 -4 L-3 11 M-11 7 L0 0 L10 -2 M-3 11 L-12 23 M-3 11 L10 18",
 };
-
 function _validatePresentation({
   x,
   y,
@@ -41,7 +35,6 @@ function _validatePresentation({
     );
   }
 }
-
 /** Neutral local person shapes encode only authored posture and role badges. */
 export function PersonGlyph({
   x,
@@ -51,8 +44,8 @@ export function PersonGlyph({
   role = "participant",
   color,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   _validatePresentation({ x, y, size, posture, role });
   const ink = color ?? tokens.color.positive;
   return (

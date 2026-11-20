@@ -111,6 +111,32 @@ export function buildFunctionKey(appRelativeFile, node) {
   return `${appRelativeFile}#${names.join(" > ")}`;
 }
 
+/** Creates listeners that report non-allowlisted function-length violations. */
+function _createCoreListeners({
+  context,
+  appRelativeFile,
+  reportedKeys,
+  allowlist,
+}) {
+  return CORE_RULE.create(
+    Object.create(context, {
+      options: { value: [MAX_LINES_OPTIONS] },
+      report: {
+        value: (descriptor) => {
+          const key = buildFunctionKey(appRelativeFile, descriptor.node);
+          reportedKeys.add(key);
+          if (!allowlist.has(key)) {
+            context.report({
+              ...descriptor,
+              data: { ...descriptor.data, key },
+            });
+          }
+        },
+      },
+    }),
+  );
+}
+
 /** Wraps the core rule so allowlisted functions pass and stale ones fail. */
 function _createRatchetRule(allowlist) {
   return {
@@ -130,27 +156,16 @@ function _createRatchetRule(allowlist) {
         .split(path.sep)
         .join("/");
       const reportedKeys = new Set();
-      const coreListeners = CORE_RULE.create(
-        Object.create(context, {
-          options: { value: [MAX_LINES_OPTIONS] },
-          report: {
-            value: (descriptor) => {
-              const key = buildFunctionKey(appRelativeFile, descriptor.node);
-              reportedKeys.add(key);
-              if (!allowlist.has(key)) {
-                context.report({
-                  ...descriptor,
-                  data: { ...descriptor.data, key },
-                });
-              }
-            },
-          },
-        }),
-      );
+      const coreListeners = _createCoreListeners({
+        context,
+        appRelativeFile,
+        reportedKeys,
+        allowlist,
+      });
       return {
         ...coreListeners,
         "Program:exit": (program) => {
-          for (const key of allowlist) {
+          allowlist.forEach((key) => {
             if (
               key.startsWith(`${appRelativeFile}#`) &&
               !reportedKeys.has(key)
@@ -161,7 +176,7 @@ function _createRatchetRule(allowlist) {
                 data: { key, maxLines: MAX_LINES_OPTIONS.max },
               });
             }
-          }
+          });
         },
       };
     },

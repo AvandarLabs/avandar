@@ -1,5 +1,5 @@
 import { VideoThemeProvider } from "../../videoTheme/VideoThemeProvider/VideoThemeProvider";
-import { createStarterVideoThemeSource } from "./createStarterVideoThemeSource";
+import { makeStarterVideoThemeSourceFromItemId } from "./makeStarterVideoThemeSourceFromItemId/makeStarterVideoThemeSourceFromItemId";
 import type { ReactNode } from "react";
 
 /**
@@ -12,7 +12,7 @@ export function StarterVideoTheme({
   children,
 }: Readonly<{ itemId: string; children: ReactNode }>): ReactNode {
   return (
-    <VideoThemeProvider source={createStarterVideoThemeSource(itemId)}>
+    <VideoThemeProvider source={makeStarterVideoThemeSourceFromItemId(itemId)}>
       {children}
     </VideoThemeProvider>
   );

@@ -1,13 +1,12 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./WideTableToObservations.schema";
 import type { ReactNode } from "react";
 /** Inputs for WideSourceGuides. */
 type Props = { input: Input; frame: number };
-
 /** Original wide table retains subject, measurement and unit headings. */
 export function WideSourceGuides({ input, frame }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g opacity={1 - motion.ramp(frame, 51, motion.scale(53))}>
       {input.measures.map((measure, index) => {

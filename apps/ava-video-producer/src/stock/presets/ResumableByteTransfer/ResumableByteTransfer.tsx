@@ -1,9 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ByteChunk } from "./ByteChunk";
 import { ByteCounters } from "./ByteCounters";
 import { getByteTransferFromFrame } from "./getByteTransferFromFrame";
@@ -21,8 +18,8 @@ export function ResumableByteTransfer({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
-  const tokens = useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const transfer = getByteTransferFromFrame({ motion, input, frame });
   const checkpoint =
     84 + (input.acknowledgedBytes / input.file.sizeBytes) * 792;

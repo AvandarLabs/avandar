@@ -2,20 +2,14 @@ import { mix } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ReleaseArtifact } from "./ReleaseArtifact";
-import { RepairRegister } from "./RepairRegister";
+import { RepairRegister } from "./RepairRegister/RepairRegister";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ReleaseRepairObligations.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
-
 /**
  * A physical release gate preserves every unresolved limitation and commitment.
  */
@@ -24,10 +18,10 @@ export function ReleaseRepairObligations({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const { atomic } = useGraphicTheme();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const isHeld = input.issues.some((issue) => {
     return issue.state === "open" && issue.releaseRole === "blocking";
   });

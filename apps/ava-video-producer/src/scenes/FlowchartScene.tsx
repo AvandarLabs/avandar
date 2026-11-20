@@ -1,9 +1,8 @@
 import { useVideoMotion } from "../videoTheme/useVideoMotion";
-import { GraphScene } from "./GraphScene";
+import { GraphScene } from "./GraphScene/GraphScene";
 import { assertFrame, flowNodes } from "./layout/layout";
-import type { FlowchartSceneProps } from "./scenes.types";
+import type { FlowchartSceneProps as Props } from "./scenes.types";
 import type { ReactNode } from "react";
-
 /** Explicit directed connectors support linear paths and branches. */
 export function FlowchartScene({
   steps,
@@ -12,7 +11,7 @@ export function FlowchartScene({
   stepAtFrames,
   revealAtFrame = 10,
   ...base
-}: FlowchartSceneProps): ReactNode {
+}: Props): ReactNode {
   const motion = useVideoMotion();
   const nodes = flowNodes(steps);
   if (
@@ -40,16 +39,10 @@ export function FlowchartScene({
     activeStep !== undefined
       ? [{ nodeId: activeStep, atFrame: revealAtFrame }]
       : steps.map((step, index) => {
-          return {
-            nodeId: step.id,
-            atFrame: times[index],
-          };
+          return { nodeId: step.id, atFrame: times[index] };
         });
   const edges = connectors.map((edge, index) => {
-    return {
-      ...edge,
-      id: `connector-${index}`,
-    };
+    return { ...edge, id: `connector-${index}` };
   });
   return (
     <GraphScene {...base} {...{ nodes, edges, traversal, revealAtFrame }} />

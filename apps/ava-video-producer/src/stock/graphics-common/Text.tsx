@@ -1,14 +1,20 @@
-import {
-  getFontSizeFromStep,
-  useGraphicFilter,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getLetterSpacingFromTypeStyle } from "./getLetterSpacingFromTypeStyle";
 import type { ResolvedTypeStyle } from "../../videoTheme/videoTheme.types";
 import type { GraphicTextRole } from "./graphicCommon.types";
 import type { CSSProperties, ReactNode } from "react";
 
+type Props = {
+  x: number;
+  y: number;
+  children: ReactNode;
+  role?: GraphicTextRole;
+  size?: string;
+  fittedSize?: number;
+  fill?: string;
+  anchor?: "start" | "middle" | "end";
+  mono?: boolean;
+};
 function _textStyle(style: ResolvedTypeStyle): CSSProperties | undefined {
   if (!style.textTransform && !style.fontVariantNumeric) {
     return undefined;
@@ -18,7 +24,6 @@ function _textStyle(style: ResolvedTypeStyle): CSSProperties | undefined {
     fontVariantNumeric: style.fontVariantNumeric,
   };
 }
-
 /**
  * SVG text in a graphic type role (`body` unless named), for headings,
  * labels, and figures inside a stock graphic. `size` sets the text at
@@ -37,24 +42,16 @@ export function Text({
   fill,
   anchor = "start",
   mono = false,
-}: {
-  x: number;
-  y: number;
-  children: ReactNode;
-  role?: GraphicTextRole;
-  size?: string;
-  fittedSize?: number;
-  fill?: string;
-  anchor?: "start" | "middle" | "end";
-  mono?: boolean;
-}): ReactNode {
-  const text = useGraphicTokens().text.graphic;
-  const theme = useGraphicTheme();
-  const filter = useGraphicFilter(`text.graphic.${role}`);
+}: Readonly<Props>): ReactNode {
+  const text = GraphicThemeHooks.useGraphicTokens().text.graphic;
+  const theme = GraphicThemeHooks.useGraphicTheme();
+  const filter = GraphicThemeHooks.useGraphicFilter(`text.graphic.${role}`);
   const style = text[role];
   const fontSize =
     fittedSize ??
-    (size === undefined ? style.fontSize : getFontSizeFromStep(theme, size));
+    (size === undefined
+      ? style.fontSize
+      : GraphicThemeHooks.getFontSizeFromStep({ theme, step: size }));
   return (
     <text
       x={x}
@@ -66,7 +63,7 @@ export function Text({
       fontWeight={style.fontWeight}
       textAnchor={anchor}
       fontFamily={mono ? text.code.fontFamily : style.fontFamily}
-      letterSpacing={getLetterSpacingFromTypeStyle(style, fontSize)}
+      letterSpacing={getLetterSpacingFromTypeStyle({ style, fontSize })}
       stroke={style.strokeWidth ? (fill ?? style.color) : undefined}
       strokeWidth={style.strokeWidth}
       paintOrder={style.strokeWidth ? "stroke" : undefined}

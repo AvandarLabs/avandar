@@ -1,18 +1,13 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
-import {
-  useGraphicProps,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
-
 /** Draws the route from the second request to each missing column. */
 export function MissingRoutes({
   missingIds,
 }: Readonly<{ missingIds: string[] }>): ReactNode {
-  const style = useGraphicProps("QueryColumnCacheGrowth", {});
-  const scales = useGraphicShapeScales();
-  const { color, sketch } = useGraphicTokens();
+  const style = GraphicThemeHooks.useGraphicProps("QueryColumnCacheGrowth", {});
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const { color, sketch } = GraphicThemeHooks.useGraphicTokens();
   return missingIds.map((id, index) => {
     return (
       <SketchedShape

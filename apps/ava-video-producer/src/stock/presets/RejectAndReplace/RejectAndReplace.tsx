@@ -1,4 +1,4 @@
-import { SelectionCriterion } from "./SelectionCriterion";
+import { SelectionCriterion } from "./SelectionCriterion/SelectionCriterion";
 import { SelectionOption } from "./SelectionOption";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./RejectAndReplace.schema";

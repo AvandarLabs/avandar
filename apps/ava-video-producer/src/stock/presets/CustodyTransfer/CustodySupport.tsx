@@ -1,21 +1,22 @@
 import { mix, ramp } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SUPPORT_STROKE, WITHDRAW_CUE } from "./custodyShape";
 import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { ReactNode } from "react";
 
+type CreateSupportLineOptions = {
+  frame: number;
+  recipient: boolean;
+  accepted: boolean;
+  motion: VideoMotion;
+};
 type Props = {
   frame: number;
   recipient: boolean;
   accepted: boolean;
   accent: string;
 };
-
 /** Frames the recipient's support takes to reach the object. */
 const CONTACT_FRAMES = 24;
 /** Frames the sender's support takes to withdraw. */
@@ -29,11 +30,11 @@ export function CustodySupport({
   accepted,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const color = recipient ? accent : tokens.color.accentAlt;
-  const line = _createSupportLine(frame, recipient, accepted, motion);
+  const line = _createSupportLine({ frame, recipient, accepted, motion });
   return (
     <g opacity={motion.reveal(frame, recipient ? 16 : 12)}>
       <SketchedShape
@@ -61,17 +62,16 @@ export function CustodySupport({
     </g>
   );
 }
-
 /**
  * The support under the object: the recipient's reaches in to make contact,
  * the sender's withdraws once the transfer is accepted.
  */
-function _createSupportLine(
-  frame: number,
-  recipient: boolean,
-  accepted: boolean,
-  motion: VideoMotion,
-) {
+function _createSupportLine({
+  frame,
+  recipient,
+  accepted,
+  motion,
+}: Readonly<CreateSupportLineOptions>) {
   const contact = ramp(
     frame,
     36,

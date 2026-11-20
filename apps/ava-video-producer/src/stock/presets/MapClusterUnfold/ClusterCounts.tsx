@@ -1,20 +1,16 @@
 import { propEq } from "@avandar/utils";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./MapClusterUnfold.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; accent: string };
-
 const BAR_LENGTH_PER_MEMBER = 12;
 /** Each supplied anchor owns its derived membership subtotal. */
 export function ClusterCounts({ input, accent }: Readonly<Props>): ReactNode {
-  const { stroke, sketch } = useGraphicTokens();
-  const shapes = useGraphicShapeScales();
+  const { stroke, sketch } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
       {input.clusters.map((cluster, index) => {

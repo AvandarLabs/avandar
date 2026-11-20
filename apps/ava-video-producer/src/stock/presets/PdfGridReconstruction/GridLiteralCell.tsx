@@ -1,6 +1,6 @@
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import { getConservativeWidthFromText } from "../../text/getConservativeWidthFromText";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = { value: string; x: number; y: number };
@@ -8,7 +8,10 @@ const GRAPHEMES: Intl.Segmenter = new Intl.Segmenter("und", {
   granularity: "grapheme",
 });
 /** A grapheme's width at the data size `LiteralDataText` draws with. */
-function _width(value: string, fontSize: number): number {
+function _width({
+  value,
+  fontSize,
+}: Readonly<{ value: string; fontSize: number }>): number {
   const bases = value
     .replace(
       /[\p{Nonspacing_Mark}\p{Enclosing_Mark}\p{Default_Ignorable_Code_Point}\p{Emoji_Modifier}]/gu,
@@ -19,12 +22,12 @@ function _width(value: string, fontSize: number): number {
 }
 /** Exact literal data wraps at whole graphemes inside an 84px cell interior. */
 export function GridLiteralCell({ value, x, y }: Readonly<Props>): ReactNode {
-  const { fontSize } = useGraphicTokens().text.graphic.data;
+  const { fontSize } = GraphicThemeHooks.useGraphicTokens().text.graphic.data;
   const lines = [{ value: "", width: 0 }];
   Array.from(GRAPHEMES.segment(value), ({ segment }) => {
     return segment;
   }).forEach((segment) => {
-    const width = _width(segment, fontSize);
+    const width = _width({ value: segment, fontSize });
     const line = lines[lines.length - 1];
     if (line.width + width > 84) {
       lines.push({ value: segment, width });

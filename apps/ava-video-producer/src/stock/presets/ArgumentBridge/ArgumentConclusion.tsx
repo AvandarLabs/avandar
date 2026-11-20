@@ -1,22 +1,18 @@
 import { mix, ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Props } from "./ArgumentBridge";
 import type { ReactNode } from "react";
 /** Frames the conclusion takes to rise into place. */
 const RISE_FRAMES = 24;
-
 /** The authored conclusion rises above the completed support deck. */
 export function ArgumentConclusion({
   frame,
   input,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const conclusion = ramp(
     frame,
     84,

@@ -1,9 +1,5 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-  useGraphicMotion,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ClassroomLearners } from "./ClassroomLearners";
 import { CoverStaff } from "./CoverStaff";
 import { getCoverPositionsFromFrame } from "./getCoverPositionsFromFrame";
@@ -20,10 +16,10 @@ export function TeacherLearningCover({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const positions = getCoverPositionsFromFrame(frame, motion);
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const positions = getCoverPositionsFromFrame({ frame, motion });
   const responsibleX =
     frame >= 42 && frame < 124 ? positions.coverX : positions.teacherX;
   return (

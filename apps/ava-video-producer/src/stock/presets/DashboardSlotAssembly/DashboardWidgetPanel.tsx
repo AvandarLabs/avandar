@@ -1,10 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { DashboardWidgetContent } from "./DashboardWidgetContent";
 import { getWidgetRectFromInput } from "./getWidgetRectFromInput";
 import type { Input } from "./DashboardSlotAssembly.schema";
@@ -27,9 +23,9 @@ export function DashboardWidgetPanel({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const rect = getWidgetRectFromInput({
     input,
     widgetId: widget.id,

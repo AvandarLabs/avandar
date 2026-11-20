@@ -1,11 +1,11 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = { x: number; width: number };
 /** Hatch marks remain within the exact remaining reserve width. */
 export function ReserveHatching({ x, width }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
       {Array.from({ length: Math.floor(width / 12) }, (_, index) => {

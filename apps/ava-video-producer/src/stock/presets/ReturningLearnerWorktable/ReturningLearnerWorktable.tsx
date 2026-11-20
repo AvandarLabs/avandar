@@ -1,4 +1,4 @@
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getReturnSceneFromFrame } from "./getReturnSceneFromFrame";
 import { PortfolioCarrier } from "./PortfolioCarrier";
 import { PriorWorkHeading } from "./PriorWorkHeading";
@@ -18,7 +18,7 @@ export function ReturningLearnerWorktable({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const { portfolioOffset, teacherX, handX } = getReturnSceneFromFrame({
     frame,
     numActivities: input.returnActivities.length,

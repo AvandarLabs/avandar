@@ -1,9 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { RefreshRecord } from "./RefreshRecord";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./StatePreservingSourceRefresh.schema";
@@ -16,8 +13,8 @@ export function StatePreservingSourceRefresh({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const writes = input.records.filter((record) => {
     return (
       input.sourceRows.find(({ id }) => {

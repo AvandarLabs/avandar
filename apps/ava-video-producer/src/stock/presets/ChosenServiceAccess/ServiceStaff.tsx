@@ -2,15 +2,17 @@ import { propEq } from "@avandar/utils";
 import { mix, ramp } from "../../../motion";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./ChosenServiceAccess.schema";
 import type { ReactNode } from "react";
 
+type GetStaffHandOptions = {
+  input: Input;
+  frame: number;
+  x: number;
+  motion: VideoMotion;
+};
 type Props = { input: Input; frame: number; accent: string };
 /** Staff handles the selected barrier and holds its door without pushing. */
 export function ServiceStaff({
@@ -18,12 +20,12 @@ export function ServiceStaff({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const index = input.services.findIndex(propEq("id", input.chosenServiceId));
   const x = 160 + ((index + 0.5) * 640) / input.services.length;
-  const { handX, handY } = _getStaffHand(input, frame, x, motion);
+  const { handX, handY } = _getStaffHand({ input, frame, x, motion });
   return (
     <g>
       <PersonGlyph x={x + 88} y={272} size={40} role="worker" color={accent} />
@@ -42,14 +44,13 @@ export function ServiceStaff({
     </g>
   );
 }
-
 /** The staff hand: on the moving barrier while it works, else at rest. */
-function _getStaffHand(
-  input: Input,
-  frame: number,
-  x: number,
-  motion: VideoMotion,
-) {
+function _getStaffHand({
+  input,
+  frame,
+  x,
+  motion,
+}: Readonly<GetStaffHandOptions>) {
   const progress = motion.ramp(
     frame,
     44,

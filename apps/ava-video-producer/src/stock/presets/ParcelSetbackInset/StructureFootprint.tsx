@@ -1,10 +1,5 @@
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { DimensionTicks } from "./DimensionTicks";
 import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./ParcelSetbackInset.schema";
@@ -19,11 +14,11 @@ export function StructureFootprint({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
-  const { x, y, width, height } = _getFootprintBox(input, frame, motion);
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const { x, y, width, height } = _getFootprintBox({ input, frame, motion });
   return (
     <g opacity={motion.ramp(frame, 78, motion.chip, motion.reveal.easing)}>
       <StockRect
@@ -50,9 +45,12 @@ export function StructureFootprint({
     </g>
   );
 }
-
 /** The footprint's box, lowering into its authored place. */
-function _getFootprintBox(input: Input, frame: number, motion: VideoMotion) {
+function _getFootprintBox({
+  input,
+  frame,
+  motion,
+}: Readonly<{ input: Input; frame: number; motion: VideoMotion }>) {
   const placement = motion.ramp(
     frame,
     84,

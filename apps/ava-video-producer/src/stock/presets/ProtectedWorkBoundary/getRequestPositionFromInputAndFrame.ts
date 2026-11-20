@@ -9,13 +9,11 @@ type GetRequestPositionResult = {
   width: number;
   height: number;
 };
-
 type RequestPositionArgs = Readonly<{
   frame: number;
   input: Input;
   motion: VideoMotion;
 }>;
-
 /**
  * Request travels above protected time before landing at its authored target.
  */
@@ -25,22 +23,24 @@ export function getRequestPositionFromInputAndFrame({
   motion,
 }: RequestPositionArgs): GetRequestPositionResult {
   const width = 860 / input.slots.length - 4;
-  const requested = _getSlotX(
+  const requested = _getSlotX({
     input,
-    input.slots.findIndex(propEq("id", input.request.requestedSlotId)),
-  );
+    slotIndex: input.slots.findIndex(
+      propEq("id", input.request.requestedSlotId),
+    ),
+  });
   const destination =
     input.request.placement === "defer"
       ? 660
-      : _getSlotX(
+      : _getSlotX({
           input,
-          input.slots.findIndex(
+          slotIndex: input.slots.findIndex(
             propEq<{ id: unknown }, "id", unknown>(
               "id",
               input.request.agreedSlotId,
             ),
           ),
-        );
+        });
   const approach = motion.ramp(
       frame,
       39,
@@ -61,8 +61,10 @@ export function getRequestPositionFromInputAndFrame({
     height: 90,
   };
 }
-
 /** The left edge of a slot's request card. */
-function _getSlotX(input: Input, slotIndex: number): number {
+function _getSlotX({
+  input,
+  slotIndex,
+}: Readonly<{ input: Input; slotIndex: number }>): number {
   return 50 + (slotIndex * 860) / input.slots.length + 2;
 }

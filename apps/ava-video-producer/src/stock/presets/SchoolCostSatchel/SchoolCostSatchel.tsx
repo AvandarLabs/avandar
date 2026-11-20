@@ -1,5 +1,5 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SatchelExpense } from "./SatchelExpense";
 import { SatchelHeading } from "./SatchelHeading";
 import { SatchelSetting } from "./SatchelSetting";
@@ -18,7 +18,7 @@ export function SchoolCostSatchel({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const expenses =
     input.unpackOrder === "largest-first"
       ? [...input.expenses].sort((left, right) => {

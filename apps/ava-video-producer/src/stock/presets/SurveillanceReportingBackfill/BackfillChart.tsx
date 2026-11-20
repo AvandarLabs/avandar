@@ -1,5 +1,5 @@
 import { propEq } from "@avandar/utils";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { BackfillBar } from "./BackfillBar";
 import { getRecordPlacementsFromInputAndFrame } from "./getRecordPlacementsFromInputAndFrame";
 import { ReceiptToken } from "./ReceiptToken";
@@ -13,7 +13,7 @@ export function BackfillChart({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const records = getRecordPlacementsFromInputAndFrame({
     input,
     frame,

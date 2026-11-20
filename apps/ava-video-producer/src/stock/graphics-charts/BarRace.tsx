@@ -7,18 +7,12 @@ import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
 import { SketchedShape } from "../primitives/SketchedShape";
 import { StockRect } from "../primitives/StockRect/StockRect";
 import { getContentColorFromValue } from "../theme/getContentColorFromValue/getContentColorFromValue";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { GraphicProps } from "../graphics-common/graphicCommon.types";
 import type { BarRaceInput } from "../presets/BarRace/BarRace.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: BarRaceInput };
-
 const RACE_AT = 52;
 const RACE_FRAMES = 64;
 const GROW_AT = 12;
@@ -26,14 +20,13 @@ const LABEL_RETURN_AT = 116;
 const HEADING_SIZE = "29";
 const BAR_LABEL_SIZE = "5xl";
 const BAR_CORNER = 6;
-
 /** Draws the bounded authored bar-race study at an explicit frame. */
 export function BarRace({ input, frame, accent }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const tokens = useGraphicTokens();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const { color, stroke, alpha, sketch } = tokens;
-  const shapes = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const bars = input.bars;
   const t = motion.ramp(
     frame,

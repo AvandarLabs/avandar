@@ -1,8 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./QualifyApparentConflict.schema";
 import type { ReactNode } from "react";
 /** Inputs for StatementContext. */
@@ -13,7 +10,6 @@ type Props = {
   index: number;
   contextY: number;
 };
-
 /** One original claim receives its own authored context label. */
 export function StatementContext({
   frame,
@@ -22,8 +18,8 @@ export function StatementContext({
   index,
   contextY,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <>
       <g

@@ -1,5 +1,5 @@
 import { mix } from "../../../motion";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { PendingCaption } from "./PendingCaption";
 import { ResourceTab } from "./ResourceTab";
 import type { Input } from "./WorkspaceCapacityExtension.schema";
@@ -12,7 +12,7 @@ export function PendingResources({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const seating =
     input.choice.decision === "expand"
       ? motion.ramp(frame, 106, motion.scale(19), motion.travel.easing)

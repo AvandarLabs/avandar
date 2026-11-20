@@ -1,12 +1,7 @@
 import { mix } from "../../../motion";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { makeObservationLayoutFromInput } from "./makeObservationLayoutFromInput";
 import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./EnvironmentalObservationGaps.schema";
@@ -28,11 +23,11 @@ function _getTeamPosition({
   }
   const previous = checks[index - 1];
   const start = 56 + index * 18;
-  const { returnProgress, vertical, approach, reach } = _getTeamPhases(
+  const { returnProgress, vertical, approach, reach } = _getTeamPhases({
     frame,
     start,
     motion,
-  );
+  });
   const departureX = previous ? previous.x - 20 : 235;
   const x =
     frame < start + 4
@@ -43,7 +38,6 @@ function _getTeamPosition({
 }
 /** Inputs for ObservationFieldTeam. */
 type Props = { frame: number; input: Input };
-
 /**
  * One team member places each point, travelling only along reserved sampling
  * bands.
@@ -52,10 +46,10 @@ export function ObservationFieldTeam({
   frame,
   input,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const position = _getTeamPosition({ frame, input, motion });
   if (!position) {
     return undefined;
@@ -102,12 +96,15 @@ export function ObservationFieldTeam({
     </g>
   );
 }
-
 /**
  * The member's return to the band, move along it, approach to the point, and
  * reach, each 0 to 1.
  */
-function _getTeamPhases(frame: number, start: number, motion: VideoMotion) {
+function _getTeamPhases({
+  frame,
+  start,
+  motion,
+}: Readonly<{ frame: number; start: number; motion: VideoMotion }>) {
   const step = (offset: number) => {
     return motion.ramp(
       frame,

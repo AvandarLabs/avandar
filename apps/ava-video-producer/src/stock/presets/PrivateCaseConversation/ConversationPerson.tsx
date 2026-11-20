@@ -1,10 +1,7 @@
 import { mix } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./PrivateCaseConversation.schema";
 import type { ReactNode } from "react";
 
@@ -21,8 +18,8 @@ export function ConversationPerson({
   waitingOpacity,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const isSupporter = person.role === "supporter";
   const travel = motion.ramp(frame, 44, motion.scale(40), motion.travel.easing);
   const x = isSupporter

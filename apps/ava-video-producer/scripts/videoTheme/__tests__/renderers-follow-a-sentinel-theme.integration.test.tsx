@@ -9,11 +9,12 @@
  * constant; this test can. It covers the stock primitives, the graphic
  * primitives, and all 170 stock presets, at their default input and at
  * every other fixture their contract declares. The sentinel theme and the
- * checks live in `tests/helpers/sentinelVideoTheme.ts`, shared with the
+ * checks live in `tests/helpers/SentinelVideoTheme.ts`, shared with the
  * film, fixed-composition, and helper sentinel tests.
  */
 import assert from "node:assert/strict";
 import test from "node:test";
+import { propNotEq } from "@avandar/utils";
 import { renderToStaticMarkup } from "react-dom/server";
 import { STOCK_IDS } from "../../../src/stock/catalog";
 import { Card } from "../../../src/stock/graphics-common/Card";
@@ -37,11 +38,7 @@ import { TableCell } from "../../../src/stock/primitives/TableCell/TableCell";
 import { stockContracts } from "../../../src/stock/registry/stockContracts";
 import { StockGraphic } from "../../../src/stock/StockGraphic/StockGraphic";
 import { VideoThemeScope } from "../../../src/videoTheme/VideoThemeScope/VideoThemeScope";
-import {
-  findClassicValuesAcrossFrames,
-  findClassicValuesInMarkup,
-  SENTINEL_THEME,
-} from "../../../tests/helpers/sentinelVideoTheme";
+import { SentinelVideoTheme } from "../../../tests/helpers/SentinelVideoTheme/SentinelVideoTheme";
 import type { StockRequest } from "../../../src/stock/contracts/StockContract.types";
 import type { ReactNode } from "react";
 
@@ -58,15 +55,6 @@ const MEASURED_SENTENCE_PRESETS: ReadonlySet<string> = new Set([
 ]);
 /** The colour the test draws content with, so content is never flagged. */
 const CONTENT_COLOR = "#5a5b5c";
-
-function _renderSentinel(children: ReactNode): string {
-  return renderToStaticMarkup(
-    <VideoThemeScope patches={[SENTINEL_THEME]}>
-      <svg>{children}</svg>
-    </VideoThemeScope>,
-  );
-}
-
 const PRIMITIVES: Readonly<Record<string, ReactNode>> = {
   DocumentFragment: (
     <>
@@ -137,12 +125,12 @@ const PRIMITIVES: Readonly<Record<string, ReactNode>> = {
   ),
   Rule: <Rule x1={0} x2={100} y={5} />,
 };
-
-test("the sentinel theme moves the values the test looks for", () => {
+test("the sentinel detector reports classic color, stroke, typography, and opacity values", () => {
   assert.deepEqual(
-    findClassicValuesInMarkup(
-      '<rect stroke="#2a404e" stroke-width="2" rx="12" stroke-dasharray="3 4" opacity="0.5"/><text font-size="29" font-weight="600">a</text><text font-size="16"><tspan>b</tspan></text>',
-    ),
+    SentinelVideoTheme.findClassicValuesInMarkup({
+      markup:
+        '<rect stroke="#2a404e" stroke-width="2" rx="12" stroke-dasharray="3 4" opacity="0.5"/><text font-size="29" font-weight="600">a</text><text font-size="16"><tspan>b</tspan></text>',
+    }),
     [
       "#2a404e",
       "stroke-width 2",
@@ -154,29 +142,36 @@ test("the sentinel theme moves the values the test looks for", () => {
     ],
   );
 });
-
 test("stock and graphic primitives draw no classic value under the sentinel theme", () => {
   assert.deepEqual(
     Object.entries(PRIMITIVES).flatMap(([name, element]) => {
-      const markup = _renderSentinel(element);
-      return findClassicValuesInMarkup(markup).map((value) => {
-        return `${name}: ${value}`;
-      });
+      const markup = renderToStaticMarkup(
+        <VideoThemeScope patches={[SentinelVideoTheme.SENTINEL_THEME]}>
+          <svg>{element}</svg>
+        </VideoThemeScope>,
+      );
+      return SentinelVideoTheme.findClassicValuesInMarkup({ markup }).map(
+        (value) => {
+          return `${name}: ${value}`;
+        },
+      );
     }),
     [],
   );
 });
-
 /** The sentinel findings of one stock request over some frames. */
-function _stockFindings(
-  request: StockRequest,
-  frames: readonly number[],
-): string[] {
-  return findClassicValuesAcrossFrames({
+function _stockFindings({
+  request,
+  frames,
+}: Readonly<{
+  request: StockRequest;
+  frames: readonly number[];
+}>): string[] {
+  return SentinelVideoTheme.findClassicValuesAcrossFrames({
     frames,
     render: (frame) => {
       return renderToStaticMarkup(
-        <VideoThemeScope patches={[SENTINEL_THEME]}>
+        <VideoThemeScope patches={[SentinelVideoTheme.SENTINEL_THEME]}>
           <StockGraphic {...request} frame={frame} />
         </VideoThemeScope>,
       );
@@ -188,34 +183,33 @@ function _stockFindings(
     );
   });
 }
-
 test("every stock preset draws no classic value under the sentinel theme", () => {
   assert.deepEqual(
     STOCK_IDS.flatMap((preset) => {
-      return _stockFindings({ preset } as StockRequest, SAMPLE_FRAMES).map(
-        (value) => {
-          return `${preset}: ${value}`;
-        },
-      );
+      return _stockFindings({
+        request: { preset } as StockRequest,
+        frames: SAMPLE_FRAMES,
+      }).map((value) => {
+        return `${preset}: ${value}`;
+      });
     }),
     [],
   );
 });
-
 test("every non-default stock fixture draws no classic value under the sentinel theme", () => {
   assert.deepEqual(
     STOCK_IDS.flatMap((preset) => {
       return stockContracts[preset].fixtures
-        .filter((fixture) => {
-          return fixture.id !== "default";
-        })
+        .filter(propNotEq("id", "default"))
         .flatMap((fixture) => {
           // TypeScript cannot pair a preset id with its own input type
           // across the 170-preset union.
           const request = { preset, input: fixture.input } as StockRequest;
-          return _stockFindings(request, FIXTURE_FRAMES).map((value) => {
-            return `${preset} ${fixture.id}: ${value}`;
-          });
+          return _stockFindings({ request, frames: FIXTURE_FRAMES }).map(
+            (value) => {
+              return `${preset} ${fixture.id}: ${value}`;
+            },
+          );
         });
     }),
     [],

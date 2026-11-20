@@ -1,8 +1,8 @@
 import { mix } from "../../../motion";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { GlobeCopy } from "./GlobeCopy";
 import { GlobeIncident } from "./GlobeIncident";
-import { GlobeSurface } from "./GlobeSurface";
+import { GlobeSurface } from "./GlobeSurface/GlobeSurface";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./FictionalConflictGlobe.schema";
 import type { ReactNode } from "react";
@@ -14,7 +14,7 @@ export function FictionalConflictGlobe({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const sweep =
     ((input.longitudeSweep.end - input.longitudeSweep.start + 540) % 360) - 180;
   const longitude = mix(

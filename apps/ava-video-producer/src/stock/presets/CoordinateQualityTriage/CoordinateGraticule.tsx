@@ -1,15 +1,12 @@
 import { Text } from "../../graphics-common/Text";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 /** Inclusive latitude and longitude ruler extents remain schematic. */
 export function CoordinateGraticule(): ReactNode {
-  const { color, stroke, alpha, sketch } = useGraphicTokens();
-  const shapes = useGraphicShapeScales();
+  const { color, stroke, alpha, sketch } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
   const hairline = shapes.stroke(stroke.hairline);
   return (
     <g>

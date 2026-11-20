@@ -1,18 +1,13 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { AreaLegend } from "./AreaLegend";
-import { AreaSite } from "./AreaSite";
+import { AreaSite } from "./AreaSite/AreaSite";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ProportionalSymbolArea.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
-
 const SCENE_FADE_AT = 0;
 /** Equal-area unit tiles reshape into circles at fixed authored sites. */
 export function ProportionalSymbolArea({
@@ -20,9 +15,9 @@ export function ProportionalSymbolArea({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { color, stroke } = useGraphicTokens();
-  const shapes = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const { color, stroke } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g opacity={motion.reveal(frame, SCENE_FADE_AT)}>
       <LabelSlots

@@ -1,8 +1,5 @@
 import { ramp } from "../../../motion";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CellLiteralValue } from "./CellLiteralValue";
 import { CleanupLaneHeading } from "./CleanupLaneHeading";
 import { RAIL_CUE, RAIL_FRAMES } from "./cleanupTiming";
@@ -16,8 +13,8 @@ export function CleanupRetainedValue({
   input,
   frame,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const inline = input.comparison === "inline-ghost";
   return (
     <g

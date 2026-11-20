@@ -1,12 +1,7 @@
 import { mix } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { UtilityModule } from "./UtilityModule";
 import type { Input } from "./PluginCapabilityInstall.schema";
 import type { ReactNode } from "react";
@@ -18,16 +13,16 @@ export function UtilitySocket({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const { atomic } = useGraphicTheme();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const installation =
     input.installation.choice === "install"
       ? motion.ramp(frame, 56, motion.scale(34), motion.travel.easing)
       : 0;
   const y = mix(installation, 78, 197);
-  const status = _getSocketStatus(input, frame, installation);
+  const status = _getSocketStatus({ input, frame, installation });
   return (
     <g>
       <StockRect
@@ -54,13 +49,12 @@ export function UtilitySocket({
     </g>
   );
 }
-
 /** Installed once the utility seats, deferred once declined, else empty. */
-function _getSocketStatus(
-  input: Input,
-  frame: number,
-  installation: number,
-): string {
+function _getSocketStatus({
+  input,
+  frame,
+  installation,
+}: Readonly<{ input: Input; frame: number; installation: number }>): string {
   if (installation === 1) {
     return input.copy.installed;
   }

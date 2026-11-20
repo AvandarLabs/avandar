@@ -1,8 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { PipelineStrip } from "./PipelineStrip";
 import { SplicePreview } from "./SplicePreview";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
@@ -16,8 +13,8 @@ export function PipelineStepSplice({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g>
       <FitText

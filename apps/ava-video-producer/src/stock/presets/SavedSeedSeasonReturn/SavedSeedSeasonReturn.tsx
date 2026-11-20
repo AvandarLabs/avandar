@@ -1,12 +1,8 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-  useGraphicMotion,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getSeedSceneFromFrame } from "./getSeedSceneFromFrame";
 import { SeedCaptions } from "./SeedCaptions";
-import { SeedContainers } from "./SeedContainers";
+import { SeedContainers } from "./SeedContainers/SeedContainers";
 import { SeedCultivator } from "./SeedCultivator";
 import { SeedMaterial } from "./SeedMaterial";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
@@ -22,9 +18,9 @@ export function SavedSeedSeasonReturn({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const scene = getSeedSceneFromFrame({ input, frame, motion });
   return (
     <g>

@@ -1,5 +1,5 @@
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getScheduleGeometryFromInputAndFrame } from "./getScheduleGeometryFromInputAndFrame";
 import { ReserveHatching } from "./ReserveHatching";
 import { ScheduleLabelSlot } from "./ScheduleLabelSlot";
@@ -17,7 +17,7 @@ export function ScheduleReserve({
   input,
   numSlots,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
       <StockRect

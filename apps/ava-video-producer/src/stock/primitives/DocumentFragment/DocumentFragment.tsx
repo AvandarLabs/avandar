@@ -1,15 +1,9 @@
-import {
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { FitText } from "../FitText/FitText";
 import { SketchedShape } from "../SketchedShape";
 import type { ReactNode } from "react";
-
 /** The fragment box's own corner, scaled by the theme's corner style. */
 const FRAGMENT_CORNER = 5;
-
 type Props = {
   x: number;
   y: number;
@@ -19,15 +13,17 @@ type Props = {
   /** Defaults to the theme's positive colour. */
   color?: string;
 };
-
-function _assertFragmentPlacement(x: number, y: number, width: number) {
+function _assertFragmentPlacement({
+  x,
+  y,
+  width,
+}: Readonly<{ x: number; y: number; width: number }>) {
   if (![x, y, width].every(Number.isFinite) || width < 100 || width > 800) {
     throw new Error(
       "Document fragments require finite placement and widths from 100 to 800 pixels.",
     );
   }
 }
-
 /**
  * Draws an authored fragment at a stable anchor with at most two text lines.
  */
@@ -39,10 +35,10 @@ export function DocumentFragment({
   emphasized = false,
   color,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  _assertFragmentPlacement(x, y, width);
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  _assertFragmentPlacement({ x, y, width });
   const accent = color ?? tokens.color.positive;
   return (
     <g>

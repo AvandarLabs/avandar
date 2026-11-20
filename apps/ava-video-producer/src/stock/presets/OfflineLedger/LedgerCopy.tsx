@@ -1,12 +1,12 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./OfflineLedger.schema";
 import type { ReactNode } from "react";
 
 type Props = { frame: number; input: Input };
 /** Captions change with connectivity while the completed work remains. */
 export function LedgerCopy({ frame, input }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   if (!input.showLabels) {
     return undefined;
   }

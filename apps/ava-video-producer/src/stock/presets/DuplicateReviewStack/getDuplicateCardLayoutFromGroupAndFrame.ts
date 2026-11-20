@@ -1,6 +1,6 @@
 import { propEq } from "@avandar/utils";
 import { mix } from "../../../motion";
-import { getAlignFromFrame, getFoldFromFrame } from "./duplicateTiming";
+import { DuplicateTiming } from "./DuplicateTiming";
 import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./DuplicateReviewStack.schema";
 
@@ -22,7 +22,6 @@ type GetDuplicateCardLayoutResult = {
   isRetained: boolean;
   isFolded: boolean;
 };
-
 /**
  * Comparison alignment precedes folding, with no inferred retained identity.
  */
@@ -35,8 +34,8 @@ export function getDuplicateCardLayoutFromGroupAndFrame({
   index,
   motion,
 }: Readonly<Options>): GetDuplicateCardLayoutResult {
-  const align = getAlignFromFrame(frame, motion),
-    fold = getFoldFromFrame(frame, motion);
+  const align = DuplicateTiming.getAlignFromFrame({ frame, motion }),
+    fold = DuplicateTiming.getFoldFromFrame({ frame, motion });
   const isRetained = group.retainedId === record.id;
   const isPair = input.finalView === "comparison-pair";
   const alternativeIndex = group.records

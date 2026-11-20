@@ -1,4 +1,4 @@
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ClassLegendHeading } from "./ClassLegendHeading";
 import { ClassRange } from "./ClassRange";
 import { MissingClassKey } from "./MissingClassKey";
@@ -20,7 +20,7 @@ export function ClassLegend({
   unitLabel,
   noDataLabel,
 }: Readonly<Props>): ReactNode {
-  const { color } = useGraphicTokens();
+  const { color } = GraphicThemeHooks.useGraphicTokens();
   const offset = index * 224;
   return (
     <g data-class-legend-index={index}>

@@ -1,9 +1,5 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./ContributionWeave.schema";
 import type { ReactNode } from "react";
 
@@ -12,16 +8,15 @@ type Props = {
   color: string;
   pattern: Input["warp"][number]["pattern"];
 };
-
 /** Bounded authored marks identify bands without implying contribution size. */
 export function WeaveBandPattern({
   id,
   color,
   pattern,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <pattern id={id} width={12} height={12} patternUnits="userSpaceOnUse">
       <rect width={12} height={12} fill={color} />

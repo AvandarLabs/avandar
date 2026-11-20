@@ -1,9 +1,6 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { getServiceSceneFromFrame } from "./getServiceSceneFromFrame";
 import type { Input } from "./ServiceablePanelSwap.schema";
 import type { ReactNode } from "react";
@@ -18,8 +15,8 @@ const CABINET_CORNER = 2;
  * Stable enclosure and actual opening seam around the chosen fixed connector.
  */
 export function ServiceEnclosure({ input, scene }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
       <StockRect

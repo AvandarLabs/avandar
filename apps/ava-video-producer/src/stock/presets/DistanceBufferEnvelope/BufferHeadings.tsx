@@ -1,5 +1,5 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./DistanceBufferEnvelope.schema";
 import type { ReactNode } from "react";
 
@@ -8,7 +8,7 @@ type Props = { input: Input; accent: string };
  * Captions distinguish complete sources, qualifying results and distance units.
  */
 export function BufferHeadings({ input, accent }: Readonly<Props>): ReactNode {
-  const { color, text } = useGraphicTokens();
+  const { color, text } = GraphicThemeHooks.useGraphicTokens();
   const numIncluded = input.locations.filter((location) => {
     return (
       Math.hypot(location.x - input.origin.x, location.y - input.origin.y) <=

@@ -1,6 +1,6 @@
 import { mix } from "../../../motion";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = { x: number; y: number; margins: number };
@@ -10,7 +10,7 @@ export function ReportHeaderPaper({
   y,
   margins,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <StockRect
       data-header-paper="first-page"

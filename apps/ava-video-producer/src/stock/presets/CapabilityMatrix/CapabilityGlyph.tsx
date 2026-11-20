@@ -1,8 +1,5 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./CapabilityMatrix.schema";
 import type { ReactNode } from "react";
 
@@ -22,11 +19,10 @@ const GLYPHS: Record<State, { path: string; color: ColorRole }> = {
 };
 /** Inputs for CapabilityGlyph. */
 type Props = { state: State; x: number; y: number };
-
 /** Four authored categorical meanings use four independent path silhouettes. */
 export function CapabilityGlyph({ state, x, y }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g data-state-glyph={state} transform={`translate(${x} ${y})`}>
       <SketchedShape

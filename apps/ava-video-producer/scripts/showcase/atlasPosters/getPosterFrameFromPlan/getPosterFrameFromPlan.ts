@@ -1,8 +1,7 @@
 import { getContinuityTimeline } from "../../../../src/continuity/continuityTimeline";
-import { getMotionDuration } from "../../../../src/motion-components/motionSettings";
+import { MotionSettings } from "../../../../src/motion-components/MotionSettings/MotionSettings";
 import { timeline } from "../../../../src/storyboard/schema/timeline";
 import type { Storyboard } from "../../../../src/storyboard/schema/schema";
-
 /**
  * The frame an Atlas card poster shows: the middle of the middle beat's
  * reading hold for a continuity shot, so neither transition is mid-flight,
@@ -21,13 +20,13 @@ export function getPosterFrameFromPlan(plan: Storyboard): number {
   const incoming =
     index === 0
       ? 0
-      : getMotionDuration(
-          beats[index].transition.frames,
-          beats[index].transition.motion,
-        );
-  const outgoing = getMotionDuration(
-    beats[index + 1]?.transition.frames ?? 0,
-    beats[index + 1]?.transition.motion,
-  );
+      : MotionSettings.getMotionDuration({
+          frames: beats[index].transition.frames,
+          options: beats[index].transition.motion,
+        });
+  const outgoing = MotionSettings.getMotionDuration({
+    frames: beats[index + 1]?.transition.frames ?? 0,
+    options: beats[index + 1]?.transition.motion,
+  });
   return shot.startFrame + Math.floor((start + incoming + end - outgoing) / 2);
 }

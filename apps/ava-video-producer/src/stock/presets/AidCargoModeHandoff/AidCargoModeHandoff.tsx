@@ -1,6 +1,6 @@
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CargoCarrier } from "./CargoCarrier";
 import { CargoLabels } from "./CargoLabels";
 import { CargoParcel } from "./CargoParcel";
@@ -15,7 +15,7 @@ export function AidCargoModeHandoff({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
       <CargoLabels input={input} accent={accent} />

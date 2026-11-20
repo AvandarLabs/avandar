@@ -1,15 +1,12 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = { mode: "truck" | "cargo-bike"; accent: string };
 /** Road transport silhouette for the selected carrier mode. */
 export function RoadCarrier({ mode, accent }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const isTruck = mode === "truck";
   return (
     <>

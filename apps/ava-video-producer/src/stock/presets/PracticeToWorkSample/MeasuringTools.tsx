@@ -1,10 +1,6 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { RulerTicks } from "./RulerTicks";
 import type { Input } from "./PracticeToWorkSample.schema";
 import type { ReactNode } from "react";
@@ -30,9 +26,9 @@ export function MeasuringTools({
   pencilX,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return isMeasuring ? (
     <g data-measuring-hand={isApplication ? "application" : "practice"}>
       <g data-ruler-hand="true">

@@ -1,4 +1,4 @@
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CargoCarrierShape } from "./CargoCarrierShape/CargoCarrierShape";
 import { getCarrierPositionFromInputAndFrame } from "./getCarrierPositionFromInputAndFrame";
 import type { Input } from "./AidCargoModeHandoff.schema";
@@ -19,7 +19,7 @@ export function CargoCarrier({
   index,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const { x, y } = getCarrierPositionFromInputAndFrame({
     motion,
     input,

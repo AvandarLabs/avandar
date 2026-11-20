@@ -1,8 +1,5 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./SchoolCostSatchel.schema";
 import type { ReactNode } from "react";
 
@@ -21,8 +18,8 @@ const OBJECT_PATHS: Record<
 };
 /** Five distinct silhouettes correspond exactly to authored expense kinds. */
 export function ExpenseObject({ kind, color }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g data-expense-shape={kind}>
       <SketchedShape

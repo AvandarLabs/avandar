@@ -1,7 +1,4 @@
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SketchedShape } from "../SketchedShape";
 import type { ReactNode } from "react";
 
@@ -21,7 +18,6 @@ const MEMBERSHIP_PATHS: {
   excluded: "M-4 -4 L4 4 M-4 4 L4 -4",
   unknown: "M-4 0 H4",
 };
-
 /**
  * Draws explicit membership state without determining eligibility or grants.
  */
@@ -31,8 +27,8 @@ export function MembershipMarker({
   membership,
   color,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   if (![x, y].every(Number.isFinite) || !(membership in MEMBERSHIP_PATHS)) {
     throw new Error(
       "Membership markers require finite placement and an explicit supported state.",

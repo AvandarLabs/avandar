@@ -9,7 +9,6 @@ import { CustodyTransfer } from "./CustodyTransfer";
 import { custodyTransferContract } from "./CustodyTransfer.contract";
 import { DEFAULT_INPUT, fixtures } from "./CustodyTransfer.fixtures";
 import { inputSchema, type Input } from "./CustodyTransfer.schema";
-
 /**
  * The shape a marker names: the marked element itself, or the sketch-aware
  * shape inside a marked group.
@@ -25,7 +24,6 @@ function _markedShape({
   );
   return wrapped ? wrapped[0] : SvgAttributes.fromMarker({ markup, marker });
 }
-
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -82,15 +80,11 @@ registerStockPresetAssertions({
     { ...DEFAULT_INPUT, holders: { ...DEFAULT_INPUT.holders, extra: true } },
   ],
 });
-
 test("sender support persists through acknowledgement before responsibility crosses", () => {
   const contact = _render({ frame: 71 });
   assert.equal(
     SvgAttributes.getNumberFromMarkup({
-      attributes: _markedShape({
-        markup: contact,
-        marker: "sender-support",
-      }),
+      attributes: _markedShape({ markup: contact, marker: "sender-support" }),
       name: "x2",
     }),
     480,
@@ -157,7 +151,7 @@ test("waiting retains sender responsibility and physical support with every obje
       assert.equal(
         SvgAttributes.getNumberFromMarkup({
           attributes: _markedShape({
-            markup: _render({ frame: frame, input: input }),
+            markup: _render({ frame, input }),
             marker: "responsibility",
           }),
           name: "cx",
@@ -167,7 +161,7 @@ test("waiting retains sender responsibility and physical support with every obje
       assert.equal(
         SvgAttributes.getNumberFromMarkup({
           attributes: _markedShape({
-            markup: _render({ frame: frame, input: input }),
+            markup: _render({ frame, input }),
             marker: "sender-support",
           }),
           name: "x2",
@@ -182,7 +176,6 @@ test("hidden labels and responsibility marker leave the custody supports", () =>
   assert.doesNotMatch(markup, /aria-label=|data-responsibility=/);
   assert.match(markup, /data-sender-support=/);
 });
-
 test("distinct holder names retain accepted packing, whitespace and grapheme text", () => {
   [
     "界".repeat(28),
@@ -194,14 +187,13 @@ test("distinct holder names retain accepted packing, whitespace and grapheme tex
       ...fixtures[2].input,
       holders: { sender, recipient: `R${sender.slice(1)}` },
     });
-    const markup = _render({ frame: 150, input: input });
+    const markup = _render({ frame: 150, input });
     Object.values(input.holders).forEach((holder) => {
       return assert.ok(markup.includes(`aria-label="${holder}"`));
     });
     assert.doesNotMatch(markup, />[\u0300-\u036f\u200d]/u);
   });
 });
-
 test("setup geometry reaches shared contact before acknowledgement and release", () => {
   assert.equal(
     SvgAttributes.getNumberFromMarkup({
@@ -224,17 +216,11 @@ test("setup geometry reaches shared contact before acknowledgement and release",
     240,
   );
   assert.match(
-    _markedShape({
-      markup: _render({ frame: 72 }),
-      marker: "acknowledgement",
-    }),
+    _markedShape({ markup: _render({ frame: 72 }), marker: "acknowledgement" }),
     /opacity="0"/,
   );
   assert.match(
-    _markedShape({
-      markup: _render({ frame: 80 }),
-      marker: "acknowledgement",
-    }),
+    _markedShape({ markup: _render({ frame: 80 }), marker: "acknowledgement" }),
     /opacity="1"/,
   );
   assert.equal(
@@ -258,14 +244,10 @@ test("setup geometry reaches shared contact before acknowledgement and release",
     480,
   );
 });
-
 test("custody label and marker toggles operate independently", () => {
   const hiddenMarker = _render({
     frame: 150,
-    input: {
-      ...DEFAULT_INPUT,
-      showResponsibilityMarker: false,
-    },
+    input: { ...DEFAULT_INPUT, showResponsibilityMarker: false },
   });
   assert.doesNotMatch(hiddenMarker, /data-responsibility=/);
   assert.match(hiddenMarker, /aria-label="Example morning team"/);
@@ -276,7 +258,6 @@ test("custody label and marker toggles operate independently", () => {
   assert.doesNotMatch(hiddenLabels, /aria-label=/);
   assert.match(hiddenLabels, /data-responsibility=/);
 });
-
 test("each object physically touches the common support line", () => {
   (["folio", "baton", "key"] as const).forEach((objectShape) => {
     const body = _markedShape({
@@ -294,7 +275,6 @@ test("each object physically touches the common support line", () => {
     assert.equal(bottom, 376);
   });
 });
-
 test("the acceptance seal clears the complete object detail slot", async () => {
   const { custodyTransferContract: correctionContract } =
     await import("./CustodyTransfer.contract");

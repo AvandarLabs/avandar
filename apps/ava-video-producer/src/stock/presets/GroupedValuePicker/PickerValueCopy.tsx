@@ -1,10 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getPickerCopyFromFrame } from "./getPickerCopyFromFrame";
 import type { PickerValueGroup } from "./getPickerGroupsFromInput";
 import type { Input } from "./GroupedValuePicker.schema";
@@ -17,10 +13,8 @@ type Props = {
   accent: string;
   groups: readonly PickerValueGroup[];
 };
-
 /** A value copy's corner before the corner style scales it. */
 const COPY_CORNER = 3;
-
 /** A complete source value becomes a readable stack or calculation operand. */
 export function PickerValueCopy({
   input,
@@ -29,16 +23,10 @@ export function PickerValueCopy({
   accent,
   groups,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
-  const copy = getPickerCopyFromFrame({
-    input,
-    index,
-    frame,
-    groups,
-    motion,
-  });
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const copy = getPickerCopyFromFrame({ input, index, frame, groups, motion });
   if (!copy) {
     return null;
   }

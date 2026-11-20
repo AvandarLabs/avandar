@@ -1,14 +1,9 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
-
 /** The dash of an acknowledgement box left unticked; no theme step draws it. */
 const UNACKNOWLEDGED_DASH = "2 2";
-
 type Props = { x: number; y: number; accent: string } & (
   | { kind: "monitoring"; value: "logged" | "review" | "missing" }
   | { kind: "acknowledgement"; value: boolean }
@@ -22,8 +17,8 @@ export function CustodyFactMark({
   kind,
   value,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const { atomic } = useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
   if (kind === "acknowledgement") {
     return (
       <StockRect
@@ -40,7 +35,7 @@ export function CustodyFactMark({
   return (
     <g transform={`translate(${x} ${y})`}>
       <SketchedShape
-        shape={{ kind: "path", d: _buildFactMarkPath(kind, value) }}
+        shape={{ kind: "path", d: _buildFactMarkPath({ kind, value }) }}
         profile={tokens.sketch.shape}
         fill="none"
         stroke={
@@ -55,15 +50,14 @@ export function CustodyFactMark({
     </g>
   );
 }
-
 /**
  * A monitoring fact as a square, triangle, or dash; a seal as a diamond, or
  * two jagged halves once broken.
  */
-function _buildFactMarkPath(
-  kind: "monitoring" | "seal",
-  value: string,
-): string {
+function _buildFactMarkPath({
+  kind,
+  value,
+}: Readonly<{ kind: "monitoring" | "seal"; value: string }>): string {
   if (kind === "monitoring") {
     return value === "logged"
       ? "M-5 -5 h10 v10 h-10 Z"

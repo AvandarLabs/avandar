@@ -1,10 +1,7 @@
 import { mix, ramp } from "../../../motion";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { TRANSFER_CUE } from "./evidenceTiming";
 import type { Input } from "./LateTypeEvidence.schema";
 import type { ReactNode } from "react";
@@ -16,7 +13,6 @@ type Props = {
   accent: string;
   background: string;
 };
-
 /** Frames a value takes to transfer into the output column. */
 const TRANSFER_FRAMES = 28;
 /**
@@ -29,8 +25,8 @@ export function EvidenceOutputCell({
   accent,
   background,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const value = input.values[index];
   const progress = ramp(
     frame,

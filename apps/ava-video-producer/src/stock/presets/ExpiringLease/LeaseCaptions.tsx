@@ -1,5 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { EXPIRY_CUE } from "./leaseShape";
 import type { Input } from "./ExpiringLease.schema";
 import type { ReactNode } from "react";
@@ -43,7 +43,7 @@ const UNIT = {
  * Possession and neutral-dock copy reflect authored expiry, never a successor.
  */
 export function LeaseCaptions({ input, frame }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const captions = [
     { text: input.permissionLabel, y: 52, fontSize: 18 as const },
     { text: input.copy.dock, y: 486, fontSize: 16 as const },

@@ -1,10 +1,6 @@
 import { mix } from "../../../motion";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CitationTab } from "./CitationTab";
 import { SummaryCopy } from "./SummaryCopy";
 import type { Input } from "./ProvenancePeelback.schema";
@@ -17,9 +13,9 @@ export function ProvenanceSummary({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const peeling = motion.ramp(
     frame,
     40,

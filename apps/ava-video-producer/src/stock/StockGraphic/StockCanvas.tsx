@@ -4,12 +4,7 @@ import { listVideoEffectFilters } from "../../videoTheme/videoEffectFilterHelper
 import { getStockDisplayCopyFromDescriptor } from "../copy/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
 import { STOCK_GRAPHIC_COPY } from "../copy/stockGraphicCopy";
 import { stockRenderers } from "../registry/stockRenderers/stockRenderers";
-import {
-  GraphicIdContext,
-  useGraphicMotion,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { GroundFill } from "./GroundFill";
 import type { Props as StockGraphicProps } from "./StockGraphic";
 import type { ReactNode } from "react";
@@ -17,10 +12,7 @@ import type { ReactNode } from "react";
 type Props = Omit<
   StockGraphicProps,
   "accent" | "background" | "schemaVersion"
-> & {
-  id: string;
-};
-
+> & { id: string };
 /**
  * The stock graphic's svg: its ground, effect definitions, and the preset
  * renderer at the clamped frame, faded from and back to the ground over the
@@ -35,9 +27,9 @@ export function StockCanvas({
   transparent = false,
   id,
 }: Props): ReactNode {
-  const tokens = useGraphicTokens();
-  const theme = useGraphicTheme();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const theme = GraphicThemeHooks.useGraphicTheme();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const localFrame = Math.max(
     0,
     Math.min(179, Number.isFinite(frame) ? frame : 0),
@@ -63,7 +55,7 @@ export function StockCanvas({
     >
       <VideoEffectDefs graphicId={id} filters={listVideoEffectFilters(theme)} />
       {transparent ? null : <GroundFill id={id} />}
-      <GraphicIdContext.Provider value={id}>
+      <GraphicThemeHooks.GraphicIdContext.Provider value={id}>
         <g opacity={motion.loopEnvelope(localFrame, 180)}>
           {stockRenderers[preset](
             {
@@ -75,7 +67,7 @@ export function StockCanvas({
             input,
           )}
         </g>
-      </GraphicIdContext.Provider>
+      </GraphicThemeHooks.GraphicIdContext.Provider>
     </svg>
   );
 }

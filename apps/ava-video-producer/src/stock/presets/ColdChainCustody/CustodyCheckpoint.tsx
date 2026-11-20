@@ -1,4 +1,4 @@
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CustodyFacts } from "./CustodyFacts";
 import type { Input } from "./ColdChainCustody.schema";
 import type { ReactNode } from "react";
@@ -22,7 +22,7 @@ export function CustodyCheckpoint({
   accent,
   showMonitoring,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g
       data-stop={checkpoint.stopId}

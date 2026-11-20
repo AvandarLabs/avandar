@@ -1,14 +1,13 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./SharedWorkshopBooking.schema";
 import type { ReactNode } from "react";
 /** Inputs for WorkshopTimeRuler. */
 type Props = { input: Input };
-
 /** Discrete equal-width authored slots do not infer duration. */
 export function WorkshopTimeRuler({ input }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const slotWidth = 540 / input.timeSlots.length;
   return (
     <g>

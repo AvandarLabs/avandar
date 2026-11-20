@@ -1,10 +1,6 @@
 import { mix } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ReadinessRibbonLabels } from "./ReadinessRibbonLabels";
 import type { Input } from "./ReadinessLatch.schema";
 import type { ReactNode } from "react";
@@ -30,9 +26,9 @@ export function ReadinessRibbon({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const horizontal = input.orientation === "horizontal";
   const position = (index * 280) / (numParticipants - 1);
   const x = horizontal ? 300 : 300 + (index * 584) / (numParticipants - 1);

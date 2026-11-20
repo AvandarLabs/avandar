@@ -11,11 +11,8 @@ import {
 import { createContinuityPlanFromVideoThemeSnapshot } from "../../src/continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme";
 import { buildProduct } from "../build-avandar.mjs";
 import { ffmpeg, run, mixAudio, probe } from "../lib/mediaHelpers";
-import {
-  assetReferences,
-  publicAsset,
-  previewFrames,
-} from "../lib/planHelpers";
+import { assetReferences, publicAsset } from "../lib/planHelpers/planHelpers";
+import { previewFrames } from "../lib/planHelpers/previewFrames";
 import { withWorkspaceAliases } from "../lib/withWorkspaceAliases.mjs";
 import { requireLicense } from "../require-license.mjs";
 import { StockFingerprintModule } from "../stock/StockFingerprintModule/StockFingerprintModule";
@@ -52,7 +49,6 @@ async function _prepare(film: Film, directory: string) {
     publicDir,
   });
 }
-
 async function _encode(film: Film, directory: string) {
   const frames = path.join(directory, "frames");
   const first = (await fs.readdir(frames)).sort()[0];
@@ -98,7 +94,6 @@ async function _encode(film: Film, directory: string) {
   );
   return picture;
 }
-
 /** Capture previews and frames from one immutable bundle, then run the gate. */
 export async function renderFilm(
   film: Film,

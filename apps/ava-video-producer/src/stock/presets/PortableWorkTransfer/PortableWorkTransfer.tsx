@@ -1,11 +1,8 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getTransferSceneFromFrame } from "./getTransferSceneFromFrame";
 import { TransferArtifact } from "./TransferArtifact";
+import { TransferBenches } from "./TransferBenches";
 import { TransferCaptions } from "./TransferCaptions";
 import { TransferFolio } from "./TransferFolio";
 import { TransferOwner } from "./TransferOwner";
@@ -14,7 +11,6 @@ import type { Input } from "./PortableWorkTransfer.schema";
 import type { ReactNode } from "react";
 /** Inputs for PortableWorkTransfer. */
 type Props = GraphicProps & { input: Input };
-
 /**
  * The owner carries copies across tools while source originals remain anchored.
  */
@@ -23,7 +19,7 @@ export function PortableWorkTransfer({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const scene = getTransferSceneFromFrame({ motion, frame, input });
   return (
     <g>
@@ -50,29 +46,5 @@ export function PortableWorkTransfer({
       />
       <TransferOwner scene={scene} />
     </g>
-  );
-}
-
-/** The source bench and the destination bench the owner carries between. */
-function TransferBenches(): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  return (
-    <>
-      <SketchedShape
-        shape={{ kind: "path", d: "M36 550 H310 M45 550 v12 M300 550 v12" }}
-        profile={tokens.sketch.shape}
-        data-source-bench="true"
-        stroke={tokens.color.line}
-        strokeWidth={scales.stroke(tokens.stroke.heavy)}
-      />
-      <SketchedShape
-        shape={{ kind: "path", d: "M330 550 H920 M340 550 v12 M910 550 v12" }}
-        profile={tokens.sketch.shape}
-        data-destination-bench="true"
-        stroke={tokens.color.line}
-        strokeWidth={scales.stroke(tokens.stroke.heavy)}
-      />
-    </>
   );
 }

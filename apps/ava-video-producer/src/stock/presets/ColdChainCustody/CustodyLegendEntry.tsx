@@ -1,7 +1,4 @@
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CustodyFactMark } from "./CustodyFactMark";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./ColdChainCustody.schema";
@@ -50,8 +47,8 @@ export function CustodyLegendEntry({
   column,
   row,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const x = 32 + column * 305;
   const y = 415 + row * 48;
   const { caption, total, fact } = _getEntry({ input, column, row });

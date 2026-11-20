@@ -1,19 +1,17 @@
 import { mix, ramp } from "../../../../motion";
 import { cubicPoint } from "../../../graphics-common/cubicPoint";
-import { useGraphicMotion } from "../../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { MarkerDot } from "./MarkerDot";
 import type { VideoMotion } from "../../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { ReactNode } from "react";
 
 type Props = { frame: number; x: number; accent: string; branchId: string };
-
 const DEPART_CUE = 74;
 const DEPART_FRAMES = 40;
 const DROP_CUE = 18;
 const DROP_FRAMES = 18;
 const APPEAR_CUE = 12;
 const APPEAR_FRAMES = 6;
-
 /** The single scenario marker pauses at the junction then takes one branch. */
 export function DecisionMarker({
   frame,
@@ -21,7 +19,7 @@ export function DecisionMarker({
   accent,
   branchId,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const progress = ramp(
     frame,
     DEPART_CUE,
@@ -35,7 +33,14 @@ export function DecisionMarker({
     { x, y: 408 },
     progress,
   );
-  const markerY = frame < DEPART_CUE ? _getDropY(frame, motion) : point.y;
+  const dropProgress = ramp(
+    frame,
+    DROP_CUE,
+    motion.scale(DROP_FRAMES),
+    motion.travel.easing,
+  );
+  const markerY = frame < DEPART_CUE ? mix(dropProgress, 174, 235) : point.y;
+
   return (
     <g
       data-marker-branch={branchId}
@@ -48,14 +53,5 @@ export function DecisionMarker({
     >
       <MarkerDot x={point.x} y={markerY} accent={accent} />
     </g>
-  );
-}
-
-/** The marker dropping onto the junction before it departs. */
-function _getDropY(frame: number, motion: VideoMotion): number {
-  return mix(
-    ramp(frame, DROP_CUE, motion.scale(DROP_FRAMES), motion.travel.easing),
-    174,
-    235,
   );
 }

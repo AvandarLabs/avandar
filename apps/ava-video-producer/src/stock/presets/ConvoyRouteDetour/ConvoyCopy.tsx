@@ -1,13 +1,13 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { type FitTextSize } from "../../primitives/FitText/wrapTextToLines";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./ConvoyRouteDetour.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; accent: string };
 /** Fixed label rails stay outside the complete authored road region. */
 export function ConvoyCopy({ input, accent }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const labels: Array<[string, number, number, number, FitTextSize, string]> = [
     [input.scenarioCaption, 40, 38, 880, 16, tokens.color.text],
     [input.locations.depotLabel, 65, 95, 245, 14, tokens.color.text],

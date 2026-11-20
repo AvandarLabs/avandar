@@ -1,4 +1,4 @@
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { BookingTab } from "./BookingTab";
 import { CaseHome } from "./CaseHome";
 import { ContactAttempt } from "./ContactAttempt";
@@ -20,7 +20,7 @@ export function ReconnectCase({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const y = 160 + index * 48;
   return (
     <g

@@ -1,9 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { RevenuePortions } from "./RevenuePortions";
 import type { Input } from "./TermLimitedRevenueShare.schema";
 import type { ReactNode } from "react";
@@ -23,9 +20,10 @@ export function RevenuePeriod({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const { distribution, retained, amounts } = _getPeriodAmounts(period, input);
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const periodAmounts = _getPeriodAmounts({ period, input });
+  const { distribution, retained, amounts } = periodAmounts;
   const reveal = motion.ramp(
     frame,
     index === 0 ? 12 : 96,
@@ -60,9 +58,11 @@ export function RevenuePeriod({
     </g>
   );
 }
-
 /** The period's operating outflow, distribution, and retained receipts. */
-function _getPeriodAmounts(period: Props["period"], input: Input) {
+function _getPeriodAmounts({
+  period,
+  input,
+}: Readonly<{ period: Props["period"]; input: Input }>) {
   const distribution = period.distributionActive
     ? (period.receiptsMinor * input.arrangement.rateBasisPoints) / 10000
     : 0;

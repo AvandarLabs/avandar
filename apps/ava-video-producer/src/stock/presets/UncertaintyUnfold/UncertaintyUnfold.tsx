@@ -3,19 +3,15 @@ import { normalizeFiniteRange } from "../../numeric/normalizeFiniteRange/normali
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { UncertaintyAxis } from "./UncertaintyAxis";
-import { UncertaintyReference } from "./UncertaintyReference";
+import { UncertaintyReference } from "./UncertaintyReference/UncertaintyReference";
 import { UncertaintyValues } from "./UncertaintyValues";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./UncertaintyUnfold.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
-
 /** Supplied bounds unfold around a point on one fixed finite ruler. */
 export function UncertaintyUnfold({
   frame,
@@ -23,8 +19,8 @@ export function UncertaintyUnfold({
   accent,
   id,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const scale = (value: number) => {
     return (
       100 +

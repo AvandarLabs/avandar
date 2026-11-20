@@ -1,15 +1,23 @@
 import { mix } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./ClassroomAccessRearrangement.schema";
 import type { ReactNode } from "react";
 
+type GetHorseshoeFrontPositionOptions = {
+  index: number;
+  frame: number;
+  motion: VideoMotion;
+  input: Position;
+};
+type GetHorseshoeBackPositionOptions = {
+  index: number;
+  frame: number;
+  motion: VideoMotion;
+  input: Position;
+};
 type Props = { input: Input; index: number; frame: number; accent: string };
 function _getPosition({
   input,
@@ -19,24 +27,22 @@ function _getPosition({
 }: Readonly<Omit<Props, "accent"> & { motion: VideoMotion }>): Position {
   const position =
     index < 3
-      ? _getSeatedPosition(index, frame, motion)
-      : _getEnteringPosition(index, frame, motion);
+      ? _getSeatedPosition({ index, frame, motion })
+      : _getEnteringPosition({ index, frame, motion });
   if (input.resolvedLayout !== "open-horseshoe") {
     return position;
   }
   return index < 3
-    ? _getHorseshoeFrontPosition(index, frame, motion, position)
-    : _getHorseshoeBackPosition(index, frame, motion, position);
+    ? _getHorseshoeFrontPosition({ index, frame, motion, input: position })
+    : _getHorseshoeBackPosition({ index, frame, motion, input: position });
 }
-
 type Position = { x: number; y: number };
-
 /** The first three learners rise from their desks, then move to a column. */
-function _getSeatedPosition(
-  index: number,
-  frame: number,
-  motion: VideoMotion,
-): Position {
+function _getSeatedPosition({
+  index,
+  frame,
+  motion,
+}: Readonly<{ index: number; frame: number; motion: VideoMotion }>): Position {
   const column = index % 3;
   const y = mix(
     motion.ramp(frame, 36, motion.scale(24), motion.travel.easing),
@@ -49,13 +55,12 @@ function _getSeatedPosition(
     y: mix(progress, y, 280),
   };
 }
-
 /** The other learners step into a lane, then walk down to their column. */
-function _getEnteringPosition(
-  index: number,
-  frame: number,
-  motion: VideoMotion,
-): Position {
+function _getEnteringPosition({
+  index,
+  frame,
+  motion,
+}: Readonly<{ index: number; frame: number; motion: VideoMotion }>): Position {
   const column = index % 3;
   const lane = [210, 550, 600][column];
   let x = mix(
@@ -78,14 +83,13 @@ function _getEnteringPosition(
     y: mix(motion.ramp(frame, 84, motion.chip, motion.travel.easing), y, 450),
   };
 }
-
 /** In the open horseshoe, the first two learners step around the table. */
-function _getHorseshoeFrontPosition(
-  index: number,
-  frame: number,
-  motion: VideoMotion,
-  { x, y }: Position,
-): Position {
+function _getHorseshoeFrontPosition({
+  index,
+  frame,
+  motion,
+  input: { x, y },
+}: Readonly<GetHorseshoeFrontPositionOptions>): Position {
   const step = (at: number) => {
     return motion.ramp(frame, at, motion.press.duration, motion.travel.easing);
   };
@@ -100,14 +104,13 @@ function _getHorseshoeFrontPosition(
   }
   return { x, y };
 }
-
 /** In the open horseshoe, three of the back learners close the curve. */
-function _getHorseshoeBackPosition(
-  index: number,
-  frame: number,
-  motion: VideoMotion,
-  { x, y }: Position,
-): Position {
+function _getHorseshoeBackPosition({
+  index,
+  frame,
+  motion,
+  input: { x, y },
+}: Readonly<GetHorseshoeBackPositionOptions>): Position {
   const progress = motion.ramp(
     frame,
     96,
@@ -129,9 +132,9 @@ export function ClassroomLearner({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const learner = input.learners[index];
   const { x, y } = _getPosition({ input, index, frame, motion });
   return (

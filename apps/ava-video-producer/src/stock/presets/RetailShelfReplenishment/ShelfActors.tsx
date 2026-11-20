@@ -1,12 +1,9 @@
 import { propEq } from "@avandar/utils";
 import { mix } from "../../../motion";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getOrderSlipPoseFromFrame } from "./getOrderSlipPoseFromFrame";
 import { getShelfUnitsFromInputAndFrame } from "./getShelfUnitsFromInputAndFrame";
-import { ShelfActor } from "./ShelfActor";
+import { ShelfActor } from "./ShelfActor/ShelfActor";
 import type { Input } from "./RetailShelfReplenishment.schema";
 import type { ReactNode } from "react";
 
@@ -17,8 +14,8 @@ export function ShelfActors({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const units = getShelfUnitsFromInputAndFrame({ input, frame, motion });
   const loading = units.find(propEq("owner", "retailer-hand"));
   const selecting = units.find(propEq("owner", "shopper-hand"));
@@ -27,7 +24,7 @@ export function ShelfActors({
   });
   const gapX = 192 + input.goods[gapIndex].openingUnits * 56;
   const gapY = 200 + gapIndex * 105;
-  const slip = getOrderSlipPoseFromFrame(frame, motion);
+  const slip = getOrderSlipPoseFromFrame({ frame, motion });
   const reach = motion.ramp(
     frame,
     24,

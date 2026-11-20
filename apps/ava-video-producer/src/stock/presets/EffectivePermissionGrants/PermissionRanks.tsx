@@ -1,6 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ROLE_RANK } from "./getEffectiveRoleFromInput";
 import type { Input } from "./EffectivePermissionGrants.schema";
 import type { ReactNode } from "react";
@@ -8,7 +8,7 @@ import type { ReactNode } from "react";
 type Props = { input: Input };
 /** Every role occupies a stable rank with its complete authored label. */
 export function PermissionRanks({ input }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
       {" "}

@@ -1,11 +1,7 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
-import { SnapshotCell } from "./SnapshotCell";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { SnapshotCell } from "./SnapshotCell/SnapshotCell";
 import { SnapshotHeadings } from "./SnapshotHeadings";
 import { SnapshotRowGuide } from "./SnapshotRowGuide";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
@@ -21,9 +17,9 @@ export function PublicationSnapshotSlice({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g opacity={motion.reveal(frame, 0)}>
       <LabelSlots

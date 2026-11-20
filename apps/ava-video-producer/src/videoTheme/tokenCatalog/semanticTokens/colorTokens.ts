@@ -3,11 +3,12 @@ import { token } from "../defineTokensHelpers";
 function _color(label: string, description: string) {
   return token({ kind: "color", label, description });
 }
-
-function _sceneColor(label: string, description: string) {
+function _sceneColor({
+  label,
+  description,
+}: Readonly<{ label: string; description: string }>) {
   return token({ kind: "color", surface: "stage", label, description });
 }
-
 function _categorical(index: number) {
   return token({
     kind: "color",
@@ -15,7 +16,6 @@ function _categorical(index: number) {
     description: `The colour of category ${index} in a key or series, so a category keeps one colour across a graphic.`,
   });
 }
-
 /**
  * The palette of storyboard scenes, the title card, the app chrome, and the
  * fixed compositions. `VideoThemeProvider` emits each one under the CSS name
@@ -24,37 +24,51 @@ function _categorical(index: number) {
  * per shot.
  */
 const SCENE_COLOR_TOKENS = {
-  background: _sceneColor(
-    "Scene background",
-    "The app background inside a scene: windows, panels, and the media frame.",
-  ),
-  foreground: _sceneColor("Scene text", "Primary text and marks in a scene."),
-  card: _sceneColor("Scene card", "Fill of cards and nodes in a scene."),
-  muted: _sceneColor(
-    "Scene muted fill",
-    "Quiet fills in a scene, such as tracks behind bars.",
-  ),
-  mutedForeground: _sceneColor(
-    "Scene muted text",
-    "Secondary text in a scene: details, units, and captions under values.",
-  ),
-  border: _sceneColor("Scene border", "Borders and dividers in a scene."),
-  brand: _sceneColor(
-    "Scene accent",
-    "The one accent of a scene: the mark, the leading bar, the active edge.",
-  ),
-  brandSoft: _sceneColor(
-    "Scene soft accent",
-    "A dark tint of the scene accent for rings and quiet highlights.",
-  ),
-  brandStrong: _sceneColor(
-    "Scene strong accent",
-    "A light tint of the scene accent for highlights on the accent.",
-  ),
-  ground: _sceneColor(
-    "Scene ground",
-    "The dark field a scene film opens, closes, and loops on.",
-  ),
+  background: _sceneColor({
+    label: "Scene background",
+    description:
+      "The app background inside a scene: windows, panels, and the media frame.",
+  }),
+  foreground: _sceneColor({
+    label: "Scene text",
+    description: "Primary text and marks in a scene.",
+  }),
+  card: _sceneColor({
+    label: "Scene card",
+    description: "Fill of cards and nodes in a scene.",
+  }),
+  muted: _sceneColor({
+    label: "Scene muted fill",
+    description: "Quiet fills in a scene, such as tracks behind bars.",
+  }),
+  mutedForeground: _sceneColor({
+    label: "Scene muted text",
+    description:
+      "Secondary text in a scene: details, units, and captions under values.",
+  }),
+  border: _sceneColor({
+    label: "Scene border",
+    description: "Borders and dividers in a scene.",
+  }),
+  brand: _sceneColor({
+    label: "Scene accent",
+    description:
+      "The one accent of a scene: the mark, the leading bar, the active edge.",
+  }),
+  brandSoft: _sceneColor({
+    label: "Scene soft accent",
+    description:
+      "A dark tint of the scene accent for rings and quiet highlights.",
+  }),
+  brandStrong: _sceneColor({
+    label: "Scene strong accent",
+    description:
+      "A light tint of the scene accent for highlights on the accent.",
+  }),
+  ground: _sceneColor({
+    label: "Scene ground",
+    description: "The dark field a scene film opens, closes, and loops on.",
+  }),
   shadow: token({
     kind: "color",
     surface: "stage",
@@ -64,7 +78,6 @@ const SCENE_COLOR_TOKENS = {
       "The colour of a cast shadow, for example under a tilted window. Unset, the shadow is the scene background at 60%.",
   }),
 } as const;
-
 /** Semantic colour roles: the ground, surfaces, text, and accents. */
 export const COLOR_TOKENS = {
   ground: _color(

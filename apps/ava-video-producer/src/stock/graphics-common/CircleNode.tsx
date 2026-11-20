@@ -1,13 +1,22 @@
 import { SketchedShape } from "../primitives/SketchedShape";
-import {
-  useGraphicProps,
-  useGraphicShapeScales,
-} from "../theme/useGraphicTheme/useGraphicTheme";
-import { Arrive } from "./Arrive";
+import { GraphicThemeHooks } from "../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { Arrive } from "./Arrive/Arrive";
 import { Text } from "./Text";
 import type { NodeSize } from "./graphicCommon.types";
 import type { ReactNode } from "react";
 
+type Props = {
+  x: number;
+  y: number;
+  label: string;
+  detail?: string;
+  frame: number;
+  index?: number;
+  accent: string;
+  active?: number;
+  size?: NodeSize;
+  radius?: number;
+};
 const NODE_RADIUS_KEYS = {
   xs: "radiusXs",
   sm: "radiusSm",
@@ -15,7 +24,6 @@ const NODE_RADIUS_KEYS = {
   lg: "radiusLg",
   xl: "radiusXl",
 } as const;
-
 /**
  * A themed node: active ring, outline, accent tint, centre dot, label, and
  * optional detail. `size` picks a themed radius; `radius` is a content
@@ -32,20 +40,9 @@ export function CircleNode({
   active = 0,
   size = "md",
   radius,
-}: {
-  x: number;
-  y: number;
-  label: string;
-  detail?: string;
-  frame: number;
-  index?: number;
-  accent: string;
-  active?: number;
-  size?: NodeSize;
-  radius?: number;
-}): ReactNode {
-  const node = useGraphicProps("Node", {});
-  const scales = useGraphicShapeScales();
+}: Readonly<Props>): ReactNode {
+  const node = GraphicThemeHooks.useGraphicProps("Node", {});
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const r = radius ?? node[NODE_RADIUS_KEYS[size]];
   return (
     <Arrive frame={frame} index={index}>

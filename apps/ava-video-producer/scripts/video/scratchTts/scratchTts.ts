@@ -2,14 +2,13 @@ import { randomUUID } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { storyboardSchema } from "../../../src/storyboard/schema/schema";
-import { ensureDirectory } from "../../lib/planHelpers";
+import { ensureDirectory } from "../../lib/planHelpers/planHelpers";
 import { freshStage } from "../freshStage";
 import { validate } from "../validate";
 import { writeJson } from "../writeJson";
 import { synthesizeCue } from "./synthesizeCue";
 import type { Storyboard } from "../../../src/storyboard/schema/schema";
 import type { Options } from "../video.types";
-
 /** Produce scratch speech from captured cues in an owned output directory. */
 export async function scratchTts(
   plan: Storyboard,

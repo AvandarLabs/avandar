@@ -1,20 +1,21 @@
 import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
-
 /** The cue the first shared copy starts to cross on. */
 const FIRST_CROSSING_CUE = 36;
 /** Frames between neighbouring shared copies starting to cross. */
 const CROSSING_STAGGER_FRAMES = 12;
 /** Frames a shared copy takes to cross, while its aperture stays open. */
 const CROSSING_FRAMES = 24;
-
 /**
  * When the shared copy at `shareIndex` starts to cross and how long it takes,
  * at the theme's tempo. The aperture opposite it is open for the same span.
  */
-export function getCrossingFromShareIndex(
-  shareIndex: number,
-  motion: VideoMotion,
-): Readonly<{ at: number; duration: number }> {
+export function getCrossingFromShareIndex({
+  shareIndex,
+  motion,
+}: Readonly<{ shareIndex: number; motion: VideoMotion }>): Readonly<{
+  at: number;
+  duration: number;
+}> {
   return {
     at:
       FIRST_CROSSING_CUE +

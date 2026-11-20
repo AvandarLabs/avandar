@@ -1,9 +1,5 @@
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { WeaveBandPattern } from "./WeaveBandPattern";
 import { WeaveCaptions } from "./WeaveCaptions";
 import { WeaveShuttle } from "./WeaveShuttle";
@@ -13,12 +9,10 @@ import type { Input } from "./ContributionWeave.schema";
 import type { ComponentProps, ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
-const LOOM = {
-  x: 320,
-  y: 180,
-  width: 550,
-  height: 300,
-} satisfies Pick<ComponentProps<"rect">, "x" | "y" | "width" | "height">;
+const LOOM = { x: 320, y: 180, width: 550, height: 300 } satisfies Pick<
+  ComponentProps<"rect">,
+  "x" | "y" | "width" | "height"
+>;
 /** The loom frame's corner before the corner style scales it. */
 const LOOM_CORNER = 6;
 /** The loom frame's line weight before the line weight scales it. */
@@ -30,9 +24,9 @@ export function ContributionWeave({
   id,
   input,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const colors = [accent, tokens.color.accentAlt, tokens.color.highlight];
   const warpProps = { numWarp: input.warp.length, input, frame, id };
   const shuttleProps = { input, frame, id };

@@ -1,8 +1,8 @@
 import { prop } from "@avandar/utils";
 import { FitText } from "../../primitives/FitText/FitText";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { MarketBalance } from "./MarketBalance";
-import { MarketTender } from "./MarketTender";
+import { MarketTender } from "./MarketTender/MarketTender";
 import type { Input } from "./HouseholdMarketChoice.schema";
 import type { ReactNode } from "react";
 
@@ -15,7 +15,7 @@ export function MarketCheckout({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const total = input.products.filter(prop("chosen")).reduce((sum, product) => {
     return sum + product.price;
   }, 0);

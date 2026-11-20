@@ -2,22 +2,20 @@ import { propEq } from "@avandar/utils";
 import { ramp } from "../../../motion";
 import { DrawPath } from "../../graphics-common/DrawPath";
 import { Text } from "../../graphics-common/Text";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { DecisionBranch } from "./DecisionBranch";
 import { DecisionHeading } from "./DecisionHeading";
 import { DecisionMarker } from "./DecisionMarker/DecisionMarker";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { DecisionForkInput } from "./DecisionFork.schema";
 import type { ReactNode } from "react";
-
 /** Frame-controlled authored choice preserves the established input type. */
 export type Props = GraphicProps & { input: DecisionForkInput };
-
 /**
  * A bounded authored decision shows conditions, closed gates and one outcome.
  */
 export function DecisionFork({ frame, accent, input }: Props): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const branchSpacing = 880 / input.branches.length;
   const selectedIndex = input.branches.findIndex(
     propEq("id", input.selectedBranchId),

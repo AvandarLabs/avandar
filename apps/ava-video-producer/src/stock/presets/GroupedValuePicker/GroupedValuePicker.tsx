@@ -2,11 +2,7 @@ import { propEq } from "@avandar/utils";
 import { mix, ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getPickedValueFromInput } from "./getPickedValueFromInput";
 import { controls } from "./GroupedValuePicker.controls";
 import { PickerCalculation } from "./PickerCalculation";
@@ -16,12 +12,10 @@ import type { Input } from "./GroupedValuePicker.schema";
 import type { ReactNode } from "react";
 /** Frame-driven authored study props. */
 export type Props = GraphicProps & { input: Input };
-
 /** Frames the derived result takes to slide into place. */
 const ATTACH_FRAMES = 33;
 /** The derived result card's corner before the corner style scales it. */
 const RESULT_CORNER = 6;
-
 function _getSelectLabel({
   path,
   value,
@@ -39,7 +33,6 @@ function _getSelectLabel({
   }
   return option.label.message;
 }
-
 /**
  * A selected aggregation rule produces one nullable field from retained rows.
  */
@@ -48,9 +41,9 @@ export function GroupedValuePicker({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const value = getPickedValueFromInput(input),
     attachment = ramp(
       frame,

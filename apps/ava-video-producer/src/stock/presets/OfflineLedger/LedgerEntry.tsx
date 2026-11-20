@@ -1,10 +1,6 @@
 import { ramp } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { LedgerEntryText } from "./LedgerEntryText";
 import { LedgerImpression } from "./LedgerImpression";
 import type { Input } from "./OfflineLedger.schema";
@@ -17,7 +13,6 @@ type Props = {
   accent: string;
   input: Input;
 };
-
 /** The cue the first entry is written on. */
 const FIRST_WRITE_CUE = 36;
 /** Frames between entries, the fixed writing cadence. */
@@ -35,9 +30,9 @@ export function LedgerEntry({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const writeAt = FIRST_WRITE_CUE + index * CADENCE_FRAMES;
   const writing = ramp(frame, writeAt, motion.whip, motion.reveal.easing);
   const y = 196 + index * 54;

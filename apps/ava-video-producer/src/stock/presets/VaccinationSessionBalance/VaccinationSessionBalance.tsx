@@ -1,11 +1,9 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { DoseToken } from "./DoseToken";
 import { SessionCarrier } from "./SessionCarrier";
+import { SessionFurniture } from "./SessionFurniture";
 import { SessionHeadings } from "./SessionHeadings";
 import { SessionRecipients } from "./SessionRecipients";
 import { SessionTotals } from "./SessionTotals";
@@ -40,33 +38,5 @@ export function VaccinationSessionBalance({
       })}
       <SessionTotals input={input} frame={frame} />
     </g>
-  );
-}
-
-/** The session area and the remaining and discarded trays. */
-function SessionFurniture(): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  return (
-    <>
-      <StockRect
-        x={280}
-        y={180}
-        width={375}
-        height={290}
-        rx={scales.corner(24)}
-        fill="none"
-        stroke={tokens.color.line}
-      />
-      <SketchedShape
-        shape={{
-          kind: "path",
-          d: "M690 205 V280 H930 V205 M690 385 V460 H930 V385",
-        }}
-        profile={tokens.sketch.shape}
-        fill="none"
-        stroke={tokens.color.line}
-      />
-    </>
   );
 }

@@ -1,10 +1,7 @@
 import { propEq } from "@avandar/utils";
 import { ramp } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getJournalGeometryFromFrame } from "./getJournalGeometryFromFrame";
 import { JournalEntryText } from "./JournalEntryText";
 import { RECEIPT_STAGGER_FRAMES, REGISTER_CUE } from "./journalTiming";
@@ -12,6 +9,12 @@ import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVi
 import type { Input } from "./JournalReceipts.schema";
 import type { ReactNode } from "react";
 
+type GetClosingProgressOptions = {
+  frame: number;
+  input: Readonly<Input>;
+  entryId: string;
+  motion: VideoMotion;
+};
 type Props = {
   entry: Input["entries"][number];
   index: number;
@@ -19,18 +22,12 @@ type Props = {
   frame: number;
   accent: string;
 };
-
 function _getClosingProgress({
   frame,
   input,
   entryId,
   motion,
-}: {
-  frame: number;
-  input: Readonly<Input>;
-  entryId: string;
-  motion: VideoMotion;
-}): number {
+}: GetClosingProgressOptions): number {
   const receiptIndex = input.receipts.findIndex(propEq("entryId", entryId));
   return receiptIndex < 0
     ? 0
@@ -42,7 +39,6 @@ function _getClosingProgress({
         motion.entrance.easing,
       );
 }
-
 /** An unmatched fold stays raised even after every supplied receipt arrives. */
 export function JournalTab({
   entry,
@@ -51,8 +47,8 @@ export function JournalTab({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const geometry = getJournalGeometryFromFrame({
     index,
     frame,

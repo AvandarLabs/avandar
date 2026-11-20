@@ -1,5 +1,6 @@
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
-import { CohortLane } from "./CohortLane";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { BaselineCount } from "./BaselineCount";
+import { CohortLane } from "./CohortLane/CohortLane";
 import { CohortLegend } from "./CohortLegend";
 import { SceneLabel } from "./SceneLabel";
 import { VisitHeader } from "./VisitHeader";
@@ -45,22 +46,5 @@ export function DoseCohortReturnPaths({
       })}
       <CohortLegend input={input} />
     </g>
-  );
-}
-
-/** The number of participants beside the baseline caption. */
-function BaselineCount({ count }: Readonly<{ count: number }>): ReactNode {
-  const tokens = useGraphicTokens();
-  return (
-    <text
-      x={415}
-      y={60}
-      fill={tokens.color.text}
-      fontFamily={tokens.text.graphic.label.fontFamily}
-      fontWeight={tokens.text.graphic.label.fontWeight}
-      fontSize={tokens.text.graphic.label.fontSize}
-    >
-      {count}
-    </text>
   );
 }

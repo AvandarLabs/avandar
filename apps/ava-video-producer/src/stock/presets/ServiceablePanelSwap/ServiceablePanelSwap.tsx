@@ -1,4 +1,4 @@
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getServiceSceneFromFrame } from "./getServiceSceneFromFrame";
 import { ServiceCaptions } from "./ServiceCaptions";
 import { ServiceEnclosure } from "./ServiceEnclosure";
@@ -9,14 +9,13 @@ import type { Input } from "./ServiceablePanelSwap.schema";
 import type { ReactNode } from "react";
 /** Inputs for ServiceablePanelSwap. */
 type Props = GraphicProps & { input: Input };
-
 /** A worker services one opening without moving any unaffected module. */
 export function ServiceablePanelSwap({
   frame,
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const scene = getServiceSceneFromFrame({ motion, frame, input });
   return (
     <g>

@@ -1,6 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
-import { CategoryTally } from "./CategoryTally";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { CategoryTally } from "./CategoryTally/CategoryTally";
 import type { Input } from "./PluginCapabilityInstall.schema";
 import type { ReactNode } from "react";
 
@@ -11,7 +11,7 @@ export function CategoryTallies({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const hasTallies = input.installation.choice === "install" && frame >= 91;
   return (
     <g>

@@ -2,11 +2,7 @@ import { mix } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getWorkPartitionFromInput } from "./getWorkPartitionFromInput";
 import { WorkCutLines } from "./WorkCutLines";
 import { WorkPiece } from "./WorkPiece";
@@ -29,9 +25,9 @@ export function WorkDecomposition({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const separation = motion.ramp(frame, 86, motion.scale(38));
   const pieces = getWorkPartitionFromInput(input);
   const total = input.workItems.reduce((sum, item) => {

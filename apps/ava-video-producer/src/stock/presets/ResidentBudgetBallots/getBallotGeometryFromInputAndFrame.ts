@@ -12,16 +12,18 @@ type GetBallotGeometryResult = {
   cast: number;
   unfold: number;
 };
-
 type BallotGeometryArgs = Readonly<{
   input: Input;
   frame: number;
   index: number;
   motion: VideoMotion;
 }>;
-
 /** Where a ballot lands in its project's tally, in rows or a column. */
-function _getTallyTarget(input: Input, index: number, columnWidth: number) {
+function _getTallyTarget({
+  input,
+  index,
+  columnWidth,
+}: Readonly<{ input: Input; index: number; columnWidth: number }>) {
   const ballot = input.ballots[index];
   const column =
     ballot.projectId === null
@@ -39,7 +41,6 @@ function _getTallyTarget(input: Input, index: number, columnWidth: number) {
     targetY: 294 + (isRows ? Math.floor(row / 2) * 62 : row * 32),
   };
 }
-
 /** Paper placement derives from the same authored ballot throughout travel. */
 export function getBallotGeometryFromInputAndFrame({
   input,
@@ -50,7 +51,7 @@ export function getBallotGeometryFromInputAndFrame({
   const ballot = input.ballots[index];
   const columnWidth = 864 / (input.projects.length + 1);
   const isRows = input.tallyArrangement === "rows";
-  const { targetX, targetY } = _getTallyTarget(input, index, columnWidth);
+  const { targetX, targetY } = _getTallyTarget({ input, index, columnWidth });
   const sourceX = 60 + index * 106;
   const cast =
     ballot.projectId === null

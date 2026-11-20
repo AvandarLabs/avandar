@@ -1,11 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicProps,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { PushdownLedger } from "./PushdownLedger";
 import { PushdownPredicate } from "./PushdownPredicate/PushdownPredicate";
 import { PushdownRows } from "./PushdownRows/PushdownRows";
@@ -14,19 +9,20 @@ import type { Input } from "./PredicatePushdownBoundary.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
-
 const INTRO_FRAMES = 12;
-
 /** Source gates filter row copies before they cross a transfer boundary. */
 export function PredicatePushdownBoundary({
   frame,
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const style = useGraphicProps("PredicatePushdownBoundary", {});
-  const { color, sketch } = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
+  const style = GraphicThemeHooks.useGraphicProps(
+    "PredicatePushdownBoundary",
+    {},
+  );
+  const { color, sketch } = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g opacity={motion.ramp(frame, 0, motion.scale(INTRO_FRAMES))}>
       <LabelSlots

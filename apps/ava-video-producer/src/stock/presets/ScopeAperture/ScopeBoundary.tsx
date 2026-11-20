@@ -1,16 +1,11 @@
 import { mix } from "../../../motion";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { FocusedQuestion } from "./FocusedQuestion";
 import { OutsideCaption } from "./OutsideCaption";
 import { ScopeHeading } from "./ScopeHeading";
 import type { Props } from "./ScopeAperture";
 import type { ReactNode } from "react";
-
 /**
  * The aperture draws on as one dash over an outline normalised to this
  * length, so it is geometry, not a theme dash.
@@ -22,9 +17,9 @@ export function ScopeBoundary({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const contraction = motion.ramp(
     frame,
     36,

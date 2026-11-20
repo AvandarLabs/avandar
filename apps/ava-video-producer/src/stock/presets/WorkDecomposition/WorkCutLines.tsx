@@ -1,9 +1,5 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { getWorkPartitionFromInput } from "./getWorkPartitionFromInput";
 import type { Input } from "./WorkDecomposition.schema";
 import type { ReactNode } from "react";
@@ -14,10 +10,8 @@ type Props = {
   layout: Input["partitionLayout"];
   accent: string;
 };
-
 /** The cue the cuts fade out on, after every cut has drawn. */
 const FADE_OUT_AT = 86;
-
 /** Ruled boundaries traverse the still-continuous slab before separation. */
 export function WorkCutLines({
   frame,
@@ -25,9 +19,9 @@ export function WorkCutLines({
   layout,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g opacity={1 - motion.ramp(frame, FADE_OUT_AT, motion.scale(38))}>
       {pieces.slice(0, -1).map((piece, index) => {

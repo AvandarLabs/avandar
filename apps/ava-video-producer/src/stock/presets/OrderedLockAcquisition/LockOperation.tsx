@@ -2,12 +2,7 @@ import { mix, ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { TILE_CORNER } from "./lockShape";
 import type { Input } from "./OrderedLockAcquisition.schema";
 import type { ReactNode } from "react";
@@ -19,7 +14,6 @@ type Props = {
   index: number;
   accent: string;
 };
-
 /** The cue an out-of-order request starts to lift out of its strip on. */
 const LIFT_CUE = 53;
 /** The cue the request strips start to sort on, once lifted. */
@@ -34,10 +28,10 @@ export function LockOperation({
   index,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const travel = motion.travel.easing;
   // The strips sort between the lift and the drop, cue to cue.
   const sorting = ramp(frame, SORT_CUE, SORTED_CUE - SORT_CUE, travel),

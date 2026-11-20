@@ -8,10 +8,10 @@ import { getResolvedTokenValue } from "../getResolvedTokenValue";
 import { buildVideoThemeHashFromContent } from "../hashVideoThemeHelpers/hashVideoThemeHelpers";
 import { isCameraSafeEasing } from "../isCameraSafeEasing/isCameraSafeEasing";
 import { mergeVideoThemeLayers } from "../mergeVideoThemeLayers/mergeVideoThemeLayers";
-import { listTokenDefinitions } from "../tokenCatalog/tokenCatalogHelpers";
+import { listTokenDefinitions } from "../tokenCatalog/tokenCatalogHelpers/tokenCatalogHelpers";
 import { VIDEO_FONT_REGISTRY } from "../videoFontRegistry/videoFontRegistryHelpers";
 import { VideoThemeError } from "../VideoThemeError";
-import { makeResolvedTokenTiersFromMergedTheme } from "./makeResolvedTokenTiersFromMergedTheme";
+import { makeResolvedTokenTiersFromMergedTheme } from "./makeResolvedTokenTiersFromMergedTheme/makeResolvedTokenTiersFromMergedTheme";
 import type {
   ResolvedTypeStyle,
   ResolvedVideoAtomic,
@@ -25,7 +25,6 @@ import type {
 } from "../videoTheme.types";
 
 const MANTINE_SHADOW_KEYS = ["xs", "sm", "md", "lg", "xl"] as const;
-
 function _createMantineTheme(merged: VideoThemePatch) {
   const mantineKeys = Object.fromEntries(
     Object.entries(merged).filter(([key]) => {
@@ -43,7 +42,6 @@ function _createMantineTheme(merged: VideoThemePatch) {
     ]);
   }
 }
-
 function _findUnmeasuredGraphicText(
   tiers: Readonly<{
     atomic: ResolvedVideoAtomic;
@@ -72,7 +70,6 @@ function _findUnmeasuredGraphicText(
       ];
     });
 }
-
 function _findUnsafeCameraCurves(
   semantic: ResolvedVideoSemantic,
 ): VideoThemeIssue[] {
@@ -96,7 +93,6 @@ function _findUnsafeCameraCurves(
       };
     });
 }
-
 function _deriveMantineShadows(atomic: ResolvedVideoAtomic, color: string) {
   return Object.fromEntries(
     MANTINE_SHADOW_KEYS.flatMap((key) => {
@@ -107,21 +103,18 @@ function _deriveMantineShadows(atomic: ResolvedVideoAtomic, color: string) {
     }),
   );
 }
-
 type ResolvedContent = Readonly<{
   atomic: ResolvedVideoAtomic;
   semantic: ResolvedVideoSemantic;
   components: ResolvedVideoComponents;
   isDarkGround: boolean;
 }>;
-
 function _findRuleIssues(content: ResolvedContent): VideoThemeIssue[] {
   return [
     ..._findUnmeasuredGraphicText(content),
     ..._findUnsafeCameraCurves(content.semantic),
   ];
 }
-
 function _buildMantineFromContent(
   mantine: MantineTheme,
   content: ResolvedContent,
@@ -139,7 +132,6 @@ function _buildMantineFromContent(
     other: { video: { atomic: content.atomic, semantic: content.semantic } },
   });
 }
-
 /**
  * Resolves a theme for one item: merges its layers (see
  * `mergeVideoThemeLayers`), resolves every token, enforces measured fonts

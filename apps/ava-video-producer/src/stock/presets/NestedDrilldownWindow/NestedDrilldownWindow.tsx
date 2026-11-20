@@ -1,6 +1,6 @@
 import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { DrillBreadcrumb } from "./DrillBreadcrumb";
 import { DrillCompartments } from "./DrillCompartments";
 import { DrillRecord } from "./DrillRecord";
@@ -9,7 +9,6 @@ import type { Input } from "./NestedDrilldownWindow.schema";
 import type { ReactNode } from "react";
 /** Frame, theme and complete validated authored input. */
 export type Props = GraphicProps & { input: Input };
-
 /** Frames the whole study takes to fade in. */
 const INTRO_FRAMES = 20;
 /** Record identities move through exactly the authored dimension prefix. */
@@ -18,7 +17,7 @@ export function NestedDrilldownWindow({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g
       opacity={ramp(

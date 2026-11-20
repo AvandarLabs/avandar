@@ -1,9 +1,6 @@
 import { DrawPath } from "../../graphics-common/DrawPath";
 import { FitText } from "../../primitives/FitText/FitText";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./TradeoffPivot.schema";
 import type { ReactNode } from "react";
 
@@ -14,8 +11,8 @@ export function TradeoffCopy({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const labels = [
     {
       text: input.approach,

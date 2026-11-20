@@ -1,4 +1,4 @@
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CategoryContextHeading } from "./CategoryContextHeading";
 import type { Input } from "./ChartFocusEdit.schema";
 import type { ReactNode } from "react";
@@ -18,7 +18,7 @@ export function CategoryContext({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
       {input.showValueLabels ? (

@@ -1,23 +1,17 @@
 import { mix } from "../../motion";
 import { getStockDisplayCopyFromDescriptor } from "../copy/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
-import { Arrive } from "../graphics-common/Arrive";
+import { Arrive } from "../graphics-common/Arrive/Arrive";
 import { Eyebrow } from "../graphics-common/Eyebrow";
 import { Panel } from "../graphics-common/Panel";
 import { Pill } from "../graphics-common/Pill";
 import { Text } from "../graphics-common/Text";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { GraphicProps } from "../graphics-common/graphicCommon.types";
 import type { MetricCounterInput } from "../presets/MetricCounter/MetricCounter.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: MetricCounterInput };
-
 const COUNT_AT = 22;
 const COUNT_FRAMES = 66;
 const PILL_AT = 82;
@@ -25,17 +19,16 @@ const BARS_AT = 29;
 const BAR_GROW_AT = 34;
 const FIGURE_SIZE = "103";
 const BAR_ALPHA_STEPS = 18;
-
 /** Draws the bounded authored metric-counter study at an explicit frame. */
 export function MetricCounter({
   input,
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const { color, corner } = useGraphicTokens();
-  const shapes = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const { color, corner } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const bars = input.bars;
   const t = motion.ramp(frame, COUNT_AT, motion.scale(COUNT_FRAMES));
   const value = Math.round(mix(t, 0, input.value));

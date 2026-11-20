@@ -1,18 +1,13 @@
 import { mix } from "../../../motion";
 import { Text } from "../../graphics-common/Text";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { makeObservationLayoutFromInput } from "./makeObservationLayoutFromInput";
 import { ObservationCell } from "./ObservationCell";
 import type { Input } from "./EnvironmentalObservationGaps.schema";
 import type { ReactNode } from "react";
 /** Inputs for ObservationTile. */
 type Props = { frame: number; accent: string; id: string; input: Input };
-
 /**
  * A lifting cloud sheet reveals readings without replacing the missing cells.
  */
@@ -22,9 +17,9 @@ export function ObservationTile({
   id,
   input,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const { cells, checks } = makeObservationLayoutFromInput(input);
   const lift = motion.ramp(frame, 36, motion.scale(20), motion.travel.easing),
     unfold = motion.ramp(frame, 16, motion.hero, motion.travel.easing);

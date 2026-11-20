@@ -1,5 +1,5 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CapacityTray } from "./CapacityTray";
 import { PendingResources } from "./PendingResources";
 import { ResourceTab } from "./ResourceTab";
@@ -14,7 +14,7 @@ export function WorkspaceCapacityExtension({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const isExpanded = input.choice.decision === "expand" && frame >= 125;
   const allowance = isExpanded
     ? input.allowances.expandedAllowance

@@ -1,16 +1,11 @@
 import { propEq } from "@avandar/utils";
 import { mix, ramp } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getSocketPointFromIndex } from "./getSocketPointFromIndex";
 import { LeaseCaptions } from "./LeaseCaptions";
 import { EXPIRY_CUE } from "./leaseShape";
-import { LeaseSocket } from "./LeaseSocket";
+import { LeaseSocket } from "./LeaseSocket/LeaseSocket";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ExpiringLease.schema";
 import type { ReactNode } from "react";
@@ -25,10 +20,10 @@ export function ExpiringLease({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const holderIndex = input.participants.findIndex(
     propEq("id", input.holderId),
   );
@@ -42,7 +37,6 @@ export function ExpiringLease({
     motion.scale(RETURN_FRAMES),
     motion.travel.easing,
   );
-
   const token = {
     cx: mix(returning, holder.x, 480),
     cy: mix(returning, holder.y, 430),

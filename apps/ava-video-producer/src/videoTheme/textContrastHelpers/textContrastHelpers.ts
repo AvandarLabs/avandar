@@ -1,6 +1,6 @@
 import { luminance } from "@mantine/core";
 import { getResolvedTokenValue } from "../getResolvedTokenValue";
-import { listTokenDefinitions } from "../tokenCatalog/tokenCatalogHelpers";
+import { listTokenDefinitions } from "../tokenCatalog/tokenCatalogHelpers/tokenCatalogHelpers";
 import type {
   ResolvedTypeStyle,
   ResolvedVideoTheme,

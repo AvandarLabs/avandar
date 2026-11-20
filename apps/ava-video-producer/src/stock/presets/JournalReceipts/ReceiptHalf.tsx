@@ -1,9 +1,6 @@
 import { mix, ramp } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getJournalGeometryFromFrame } from "./getJournalGeometryFromFrame";
 import {
   RECEIPT_CUE,
@@ -33,8 +30,8 @@ export function ReceiptHalf({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const entryIndex = input.entries.findIndex(({ id }) => {
     return id === receipt.entryId;
   });
@@ -44,7 +41,7 @@ export function ReceiptHalf({
     direction: input.foldDirection,
     motion,
   });
-  const { leaveAt, progress } = _getReceiptTravel(frame, index, motion);
+  const { leaveAt, progress } = _getReceiptTravel({ frame, index, motion });
   const { width, height, pocketX } = _getReceiptSize(input.foldDirection);
   if (frame < leaveAt) {
     return undefined;
@@ -69,7 +66,6 @@ export function ReceiptHalf({
     </g>
   );
 }
-
 /** A receipt's size and the pocket it leaves from, by fold direction. */
 function _getReceiptSize(foldDirection: Input["foldDirection"]) {
   const horizontal = foldDirection === "horizontal";
@@ -79,12 +75,15 @@ function _getReceiptSize(foldDirection: Input["foldDirection"]) {
     pocketX: horizontal ? 800 : 690,
   };
 }
-
 /**
  * When a receipt leaves its pocket and how far it has travelled, 0 to 1. Each
  * receipt registers on its entry's cue, as that fold starts to close.
  */
-function _getReceiptTravel(frame: number, index: number, motion: VideoMotion) {
+function _getReceiptTravel({
+  frame,
+  index,
+  motion,
+}: Readonly<{ frame: number; index: number; motion: VideoMotion }>) {
   const leaveAt =
     RECEIPT_CUE + index * motion.scaleStagger(RECEIPT_STAGGER_FRAMES);
   return {

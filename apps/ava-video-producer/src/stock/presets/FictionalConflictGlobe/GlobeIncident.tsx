@@ -1,9 +1,6 @@
 import { projectGlobePoint } from "../../geography/projectGlobePoint/projectGlobePoint";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { buildIncidentLeaderFromPoints } from "./buildIncidentLeaderFromPoints";
 import { GlobeIncidentLabel } from "./GlobeIncidentLabel";
 import type { Input } from "./FictionalConflictGlobe.schema";
@@ -26,8 +23,8 @@ export function GlobeIncident({
   showLabel,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const point = projectGlobePoint({
     ...incident,
     centerLongitude: longitude,

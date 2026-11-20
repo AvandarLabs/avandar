@@ -1,10 +1,6 @@
 import { propEq } from "@avandar/utils";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { DashboardContext } from "./DashboardContext";
 import { DashboardGuides } from "./DashboardGuides";
 import { DashboardWidgetPanel } from "./DashboardWidgetPanel";
@@ -29,9 +25,9 @@ export function DashboardSlotAssembly({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const panelProps = { input, frame, accent };
   return (
     <g>

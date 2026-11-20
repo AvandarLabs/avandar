@@ -1,5 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { LunchLegend } from "./LunchLegend";
 import { LunchTally } from "./LunchTally";
 import type { Input } from "./SchoolLunchTrayComposition.schema";
@@ -12,7 +12,7 @@ export function LunchLabels({
   accent,
   frame,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const complete = input.trays.filter((tray) => {
     return tray.componentIds.length === input.plannedComponents.length;
   }).length;

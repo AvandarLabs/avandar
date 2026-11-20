@@ -2,10 +2,7 @@ import { ramp } from "../../../motion";
 import { normalizeFiniteRange } from "../../numeric/normalizeFiniteRange/normalizeFiniteRange";
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getRehearsalStateFromInputAndFrame } from "./getRehearsalStateFromInputAndFrame";
 import { RehearsalOutput } from "./RehearsalOutput";
 import { RehearsalRuler } from "./RehearsalRuler";
@@ -14,7 +11,6 @@ import type { Input } from "./LinkedParameterRehearsal.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
-
 /** Frames the source lane takes to fade in. */
 const INTRO_FRAMES = 20;
 /**
@@ -26,8 +22,8 @@ export function LinkedParameterRehearsal({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const { value, label } = getRehearsalStateFromInputAndFrame({
     frame,
     input,

@@ -1,20 +1,18 @@
 import { LabelSlots } from "../../../primitives/LabelSlots/LabelSlots";
 import { StockRect } from "../../../primitives/StockRect/StockRect";
-import {
-  useGraphicProps,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "../PredicatePushdownBoundary.schema";
 import type { ReactNode } from "react";
 
 type Props = Readonly<{ x: number; input: Input; accent: string }>;
-
 /** The predicate's outlined badge: its metric, comparison, and unit. */
 export function PredicateBadge({ x, input, accent }: Props): ReactNode {
-  const style = useGraphicProps("PredicatePushdownBoundary", {});
-  const scales = useGraphicShapeScales();
-  const { color } = useGraphicTokens();
+  const style = GraphicThemeHooks.useGraphicProps(
+    "PredicatePushdownBoundary",
+    {},
+  );
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const { color } = GraphicThemeHooks.useGraphicTokens();
   return (
     <>
       <StockRect

@@ -4,6 +4,7 @@ import {
   getHorizontalBlurFilter,
 } from "../../../../motion-components/HorizontalBlur";
 import { useWindowStage } from "../../../../scenes/TiltedWindowScene/useWindowStage";
+import { type WindowPose } from "../../../../scenes/TiltedWindowScene/WindowMotion/WindowMotion.types";
 import {
   buildColorWithAlpha,
   elevationToBoxShadow,
@@ -15,12 +16,10 @@ import {
 } from "../../../../videoTheme/useVideoTheme";
 import { DemoWindow } from "./DemoWindow";
 import css from "./parts.module.css";
-import type { WindowPose } from "../../../../scenes/TiltedWindowScene/windowMotion";
 import type { ResolvedVideoComponents } from "../../../../videoTheme/videoTheme.types";
 import type { CSSProperties, ReactNode } from "react";
 
 type Rect = { x: number; y: number; width: number; height: number };
-
 type Props = {
   box: Rect;
   pose: WindowPose;
@@ -34,15 +33,17 @@ type Props = {
   /** Frame-driven style on the window itself, for example a reveal clip. */
   contentStyle?: CSSProperties;
 };
-
 /**
  * The 3D transform of a posed window, as the tilted window scene builds it,
  * with the theme's `WindowTilt` plane where the props leave it unset.
  */
-function _buildTiltTransform(
-  props: Props,
-  windowTilt: ResolvedVideoComponents["WindowTilt"],
-): string {
+function _buildTiltTransform({
+  props,
+  windowTilt,
+}: Readonly<{
+  props: Props;
+  windowTilt: ResolvedVideoComponents["WindowTilt"];
+}>): string {
   const {
     pose,
     tilt = 1,
@@ -59,7 +60,6 @@ function _buildTiltTransform(
     `rotateZ(${(rotateZ * tilt).toFixed(3)}deg)`,
   ].join(" ");
 }
-
 /**
  * A window placed in its box and posed in the tilted plane, composed the
  * way the tilted window scene composes its own window card: the theme's
@@ -73,7 +73,7 @@ export function TiltedDemoWindow(props: Props): ReactNode {
   const { atomic } = useVideoTheme();
   const scales = useVideoShapeScales();
   const scene = tokens.color.scene;
-  const transform = _buildTiltTransform(props, tilt);
+  const transform = _buildTiltTransform({ props, windowTilt: tilt });
   const shadow = elevationToBoxShadow({
     layers: tokens.elevation.window.layers,
     color:

@@ -1,10 +1,6 @@
 import { ramp } from "../../../motion";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CleanupCells } from "./CleanupCells";
 import { CleanupRowCopy } from "./CleanupRowCopy";
 import type { Input } from "./CellNormalization.schema";
@@ -17,7 +13,6 @@ type Props = {
   input: Input;
   accent: string;
 };
-
 /** Frames a changed cell takes to cross-fade to its replacement. */
 const EDIT_FRAMES = 64;
 /** A row's corner before the corner style scales it. */
@@ -30,9 +25,9 @@ export function CleanupRow({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const edit =
     row.before !== row.after
       ? ramp(

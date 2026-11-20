@@ -1,7 +1,7 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { RevenueLegend } from "./RevenueLegend";
+import { RevenueLegend } from "./RevenueLegend/RevenueLegend";
 import { RevenuePeriod } from "./RevenuePeriod";
-import { RevenueTerm } from "./RevenueTerm";
+import { RevenueTerm } from "./RevenueTerm/RevenueTerm";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./TermLimitedRevenueShare.schema";
 import type { ReactNode } from "react";

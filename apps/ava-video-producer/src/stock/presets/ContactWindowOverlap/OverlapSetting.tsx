@@ -1,5 +1,5 @@
 import { ObjectGlyph } from "../../primitives/ObjectGlyph/ObjectGlyph";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./ContactWindowOverlap.schema";
 import type { ReactNode } from "react";
@@ -7,7 +7,7 @@ import type { ReactNode } from "react";
 type Props = { input: Input; accent: string };
 /** A shared place and explicit people count contextualize the time ribbons. */
 export function OverlapSetting({ input, accent }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
       <SceneLabel text={input.sceneLabel} x={32} y={30} width={700} />

@@ -7,14 +7,13 @@ import {
   fileHash,
   publicAsset,
   safeInputFile,
-} from "./../lib/planHelpers";
+} from "../lib/planHelpers/planHelpers";
 import { freshStage } from "./freshStage";
 import { validate } from "./validate";
 import { AUDIO_EXTENSIONS } from "./video.constants";
 import { writeJson } from "./writeJson";
 import type { Storyboard } from "../../src/storyboard/schema/schema";
 import type { Options } from "./video.types";
-
 /**
  * Import supplied SRT timing with exact text matching; this performs no ASR.
  */

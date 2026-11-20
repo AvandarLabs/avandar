@@ -1,14 +1,10 @@
 import { mix } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
-import { EnvelopeFlaps } from "./EnvelopeFlaps";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { EnvelopeFlaps } from "./EnvelopeFlaps/EnvelopeFlaps";
 import { ExteriorAddress } from "./ExteriorAddress";
-import { HandoffBrief } from "./HandoffBrief";
+import { HandoffBrief } from "./HandoffBrief/HandoffBrief";
 import { HandoffCopy } from "./HandoffCopy";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./SealedHandoff.schema";
@@ -24,9 +20,9 @@ export function SealedHandoff({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const travel = motion.ramp(frame, 72, motion.scale(36), motion.travel.easing);
   return (
     <g>

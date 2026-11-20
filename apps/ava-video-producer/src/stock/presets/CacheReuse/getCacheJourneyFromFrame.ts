@@ -8,7 +8,6 @@ type GetCacheJourneyResult = {
   stored: number;
   response: number;
 };
-
 /** The cue the first response starts back from the origin on. */
 const FIRST_RETURN_CUE = 68;
 /** Frames the key takes to reach the cache. */
@@ -23,14 +22,13 @@ const SECOND_OUT_FRAMES = 16;
 const STORED_FRAMES = 16;
 /** Frames the delivered response takes to appear. */
 const RESPONSE_FRAMES = 14;
-
 /** Two exact-key lookups: one origin excursion followed by local reuse. */
-export function getCacheJourneyFromFrame(
-  frame: number,
-  motion: VideoMotion,
-): GetCacheJourneyResult {
+export function getCacheJourneyFromFrame({
+  frame,
+  motion,
+}: Readonly<{ frame: number; motion: VideoMotion }>): GetCacheJourneyResult {
   return {
-    ..._getKeyPosition(frame, motion),
+    ..._getKeyPosition({ frame, motion }),
     originActive:
       ramp(frame, 42, motion.whip, motion.reveal.easing) *
       (1 -
@@ -54,12 +52,14 @@ export function getCacheJourneyFromFrame(
     ),
   };
 }
-
 /** Where the lookup key is: out to the cache, down to the origin, and back. */
-function _getKeyPosition(
-  frame: number,
-  motion: VideoMotion,
-): Pick<GetCacheJourneyResult, "x" | "y"> {
+function _getKeyPosition({
+  frame,
+  motion,
+}: Readonly<{ frame: number; motion: VideoMotion }>): Pick<
+  GetCacheJourneyResult,
+  "x" | "y"
+> {
   const travel = motion.travel.easing;
   const outbound = ramp(frame, 24, motion.scale(OUTBOUND_FRAMES), travel);
   const originTrip = ramp(frame, 42, motion.scale(ORIGIN_TRIP_FRAMES), travel);

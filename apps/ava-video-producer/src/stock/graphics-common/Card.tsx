@@ -1,10 +1,15 @@
 import { StockRect } from "../primitives/StockRect/StockRect";
-import {
-  useGraphicProps,
-  useGraphicShapeScales,
-} from "../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
+type Props = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  color: string;
+  children?: ReactNode;
+};
 /** A tinted summary card for labels that outgrow a pill. */
 export function Card({
   x,
@@ -13,16 +18,9 @@ export function Card({
   height,
   color,
   children,
-}: {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  color: string;
-  children?: ReactNode;
-}): ReactNode {
-  const card = useGraphicProps("Card", {});
-  const scales = useGraphicShapeScales();
+}: Readonly<Props>): ReactNode {
+  const card = GraphicThemeHooks.useGraphicProps("Card", {});
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
       <StockRect

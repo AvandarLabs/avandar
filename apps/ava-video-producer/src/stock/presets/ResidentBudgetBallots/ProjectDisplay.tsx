@@ -1,13 +1,12 @@
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
-import { ProjectTally } from "./ProjectTally";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { ProjectTally } from "./ProjectTally/ProjectTally";
 import type { Input } from "./ResidentBudgetBallots.schema";
 import type { ReactNode } from "react";
 /** Inputs for ProjectDisplay. */
 type Props = { input: Input; frame: number };
-
 /** Choices and abstentions own distinct columns regardless of concentration. */
 export function ProjectDisplay({ input, frame }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const offset =
     256 * (1 - motion.ramp(frame, 84, motion.scale(24), motion.exit.easing));
   const columnWidth = 864 / (input.projects.length + 1);

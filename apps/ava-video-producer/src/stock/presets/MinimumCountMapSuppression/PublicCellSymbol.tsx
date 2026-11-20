@@ -1,8 +1,5 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { makePublicCellsFromInput } from "./makePublicCellsFromInput";
 import type { Input } from "./MinimumCountMapSuppression.schema";
 import type { ReactNode } from "react";
@@ -20,8 +17,8 @@ export function PublicCellSymbol({
   x,
   y,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return status === "suppressed" ? (
     <g aria-label={labels.suppressed}>
       <SketchedShape

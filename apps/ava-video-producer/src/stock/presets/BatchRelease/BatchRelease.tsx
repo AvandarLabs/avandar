@@ -1,6 +1,6 @@
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { BatchEnvelope } from "./BatchEnvelope";
-import { BatchHeadings } from "./BatchHeadings";
+import { BatchHeadings } from "./BatchHeadings/BatchHeadings";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./BatchRelease.schema";
 import type { ReactNode } from "react";
@@ -12,7 +12,7 @@ export function BatchRelease({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g opacity={motion.reveal(frame, 12)}>
       <BatchHeadings input={input} />

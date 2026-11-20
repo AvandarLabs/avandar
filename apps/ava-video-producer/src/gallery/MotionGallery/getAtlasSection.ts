@@ -1,5 +1,5 @@
 import { CONTINUITY_CATALOG } from "../../continuity/continuityCatalog";
-import type { AtlasSection } from "./AtlasSections";
+import type { AtlasSection } from "./AtlasSections/AtlasSections";
 
 /** Every Atlas section, in navigation order. */
 export const ATLAS_SECTIONS: readonly AtlasSection[] = [

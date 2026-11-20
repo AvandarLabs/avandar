@@ -2,12 +2,7 @@ import { mix, ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./FeedbackRefinement.schema";
 import type { ReactNode } from "react";
 
@@ -18,7 +13,6 @@ type Props = {
   numRounds: number;
   showReviewTrail: boolean;
 };
-
 /** Frames a returned note takes to detach into its trail slot. */
 const DETACH_FRAMES = 16;
 /** A note's corner before the corner style scales it. */
@@ -31,10 +25,10 @@ export function FeedbackNote({
   numRounds,
   showReviewTrail,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const start = 32 + index * 56,
     reviewAt = numRounds === 1 ? 62 : start + 20,
     returnAt = numRounds === 1 ? 94 : start + 56;

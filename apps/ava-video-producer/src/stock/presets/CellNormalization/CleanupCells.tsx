@@ -1,9 +1,6 @@
 import { mix } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CellLiteralValue } from "./CellLiteralValue";
 import type { Input } from "./CellNormalization.schema";
 import type { ReactNode } from "react";
@@ -14,7 +11,6 @@ type Props = {
   showWhitespace: boolean;
   accent: string;
 };
-
 /** Extra letter spacing the original value loosens from as it is replaced. */
 const BEFORE_SPACING = 1;
 /** Only explicitly different pairs get an authored replacement and brackets. */
@@ -24,8 +20,8 @@ export function CleanupCells({
   showWhitespace,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const tokens = useGraphicTokens();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const changed = row.before !== row.after;
   const bounds = { x: 88, y: 22, showWhitespace };
   return (

@@ -1,5 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CapabilityGlyph } from "./CapabilityGlyph";
 import type { Input } from "./CapabilityMatrix.schema";
 import type { ReactNode } from "react";
@@ -25,7 +25,7 @@ export function CapabilityCell({
   width,
   showNotes,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const note = {
     text: cell.note,
     x: x + 48,

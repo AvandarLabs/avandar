@@ -1,15 +1,10 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { RegistrationAxes } from "./RegistrationAxes";
 import type { ReactNode } from "react";
 
 type Props = { x: number; index: number; frame: number };
-
 const TICKS_AT = 13;
 const TICKS_FRAMES = 39;
 /**
@@ -20,9 +15,9 @@ export function RegistrationGrid({
   index,
   frame,
 }: Readonly<Props>): ReactNode {
-  const { color, stroke, sketch } = useGraphicTokens();
-  const shapes = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const { color, stroke, sketch } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const hairline = shapes.stroke(stroke.hairline);
   return (
     <g>

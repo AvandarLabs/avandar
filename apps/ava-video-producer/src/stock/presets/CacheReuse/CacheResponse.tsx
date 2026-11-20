@@ -1,14 +1,14 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./CacheReuse.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; opacity: number };
 /** The requester retains the exact delivered result during the next lookup. */
 export function CacheResponse({ input, opacity }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g
       data-response-key={input.request.key}

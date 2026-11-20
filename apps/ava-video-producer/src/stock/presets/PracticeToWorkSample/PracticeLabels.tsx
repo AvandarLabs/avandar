@@ -1,6 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { type FitTextSize } from "../../primitives/FitText/wrapTextToLines";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./PracticeToWorkSample.schema";
 import type { ReactNode } from "react";
 
@@ -19,7 +19,7 @@ type Slot = [
  * bound.
  */
 export function PracticeLabels({ input, frame }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const slots: Slot[] = [
     [input.task.instruction, 48, 38, 864, 20, 1],
     [input.settingLabels.practice, 48, 91, 390, 16, 3],

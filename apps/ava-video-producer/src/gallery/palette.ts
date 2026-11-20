@@ -8,6 +8,7 @@ import theme from "./theme-colors.json";
  * the ground of the default video theme.
  */
 export const DEFAULT_ACCENT = theme.primary[4];
+/** The default canvas background for gallery previews. */
 export const DEFAULT_BACKGROUND = makeResolvedVideoThemeFromSource(
   DEFAULT_VIDEO_THEME_SOURCE,
 ).semantic.color.ground;

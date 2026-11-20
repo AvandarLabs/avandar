@@ -1,10 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = { text: string; y: number };
@@ -12,9 +8,9 @@ type Props = { text: string; y: number };
  * The missing key uses the same muted fill and dashed stroke as a null tile.
  */
 export function MissingClassKey({ text, y }: Readonly<Props>): ReactNode {
-  const { color, stroke } = useGraphicTokens();
-  const { atomic } = useGraphicTheme();
-  const shapes = useGraphicShapeScales();
+  const { color, stroke } = GraphicThemeHooks.useGraphicTokens();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
       <StockRect

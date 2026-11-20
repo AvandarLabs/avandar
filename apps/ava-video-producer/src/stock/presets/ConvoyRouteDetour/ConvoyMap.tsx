@@ -1,11 +1,7 @@
 import { mix } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
-import { ConvoyLandmarks } from "./ConvoyLandmarks";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { ConvoyLandmarks } from "./ConvoyLandmarks/ConvoyLandmarks";
 import type { Input } from "./ConvoyRouteDetour.schema";
 import type { ReactNode } from "react";
 
@@ -18,9 +14,9 @@ export function ConvoyMap({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const points = input.routes.find(({ role }) => {
     return role === "blocked";
   })!.points;

@@ -1,8 +1,13 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
-type Props = { value: number; unitLabel: string; x: number; slotWidth: number };
+type Props = {
+  value: number;
+  unitLabel: string;
+  x: number;
+  slotWidth: number;
+};
 /** Duration values and their common unit occupy fixed external slots. */
 export function ScheduleValues({
   value,
@@ -10,7 +15,7 @@ export function ScheduleValues({
   x,
   slotWidth,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
       <FitText

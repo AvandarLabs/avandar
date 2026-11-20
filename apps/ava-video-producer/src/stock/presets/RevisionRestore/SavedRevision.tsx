@@ -1,10 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SavedRevisionLines } from "./SavedRevisionLines";
 import type { Input } from "./RevisionRestore.schema";
 import type { ReactNode } from "react";
@@ -26,9 +22,9 @@ export function SavedRevision({
   showLabel,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const x = 40 + index * 225;
   return (
     <g opacity={motion.reveal(frame, 16 + index * motion.scaleStagger(3))}>

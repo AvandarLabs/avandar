@@ -1,9 +1,6 @@
 import { useMemo } from "react";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getJobPlacementFromPlanAndFrame } from "./getJobPlacementFromPlanAndFrame";
 import { makeJobTransfersFromInput } from "./makeJobTransfersFromInput";
 import { SceneLabel } from "./SceneLabel";
@@ -15,8 +12,8 @@ type Props = { input: Input; frame: number };
 const CATEGORY_KEYS = [1, 2, 3, 4, 5, 6, 7, 8] as const;
 /** Stable swatches associate intact work blocks with a reserved legend rail. */
 export function WorkBlocks({ input, frame }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const palette = CATEGORY_KEYS.map((key) => {
     return tokens.color.categorical[key];
   });

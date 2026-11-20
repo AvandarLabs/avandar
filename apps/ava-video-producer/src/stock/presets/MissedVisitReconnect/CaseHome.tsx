@@ -1,6 +1,6 @@
 import { ObjectGlyph } from "../../primitives/ObjectGlyph/ObjectGlyph";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./MissedVisitReconnect.schema";
 import type { ReactNode } from "react";
@@ -8,7 +8,7 @@ import type { ReactNode } from "react";
 type Props = { item: Input["cases"][number]; y: number };
 /** The original person label, home and empty appointment remain visible. */
 export function CaseHome({ item, y }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
       <SceneLabel text={item.label} x={32} y={y - 6} width={165} lines={3} />

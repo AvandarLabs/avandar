@@ -1,11 +1,7 @@
 import { mix, ramp } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./DocumentRegionDriftCheck.schema";
 import type { ReactNode } from "react";
 
@@ -15,7 +11,6 @@ type Props = {
   accent: string;
   side: "saved" | "current";
 };
-
 /** Frames the current page takes to settle over the saved one. */
 const SETTLE_FRAMES = 37;
 /** Page outlines retain the exact normalized region without label clamping. */
@@ -25,9 +20,9 @@ export function RegionPage({
   accent,
   side,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const progress = ramp(
       frame,
       13,

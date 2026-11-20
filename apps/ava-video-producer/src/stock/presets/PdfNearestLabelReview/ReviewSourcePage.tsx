@@ -1,9 +1,6 @@
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
-import { CandidateAnchorGuides } from "./CandidateAnchorGuides";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { CandidateAnchorGuides } from "./CandidateAnchorGuides/CandidateAnchorGuides";
 import { FigureAnchor } from "./FigureAnchor";
 import type { Input } from "./PdfNearestLabelReview.schema";
 import type { ReactNode } from "react";
@@ -17,8 +14,8 @@ export function ReviewSourcePage({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
       <StockRect

@@ -1,16 +1,15 @@
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { useGraphicTheme } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./PdfGridReconstruction.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
-
 /** Selected structural evidence derives from the supplied grid geometry. */
 export function TaggedGridEvidence({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
   const width = 400 / input.grid.columnLabels.length;
   return (
     <g>

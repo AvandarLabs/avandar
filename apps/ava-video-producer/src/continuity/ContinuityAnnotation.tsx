@@ -9,7 +9,7 @@ import { useVideoMotion } from "../videoTheme/useVideoMotion";
 import { useVideoProps, useVideoTokens } from "../videoTheme/useVideoTheme";
 import { useContinuityAppearance } from "./ContinuityAppearanceContext";
 import css from "./ContinuityOverlays.module.css";
-import { getAnnotationProgress } from "./overlayMotion";
+import { getAnnotationProgress } from "./overlayMotion/overlayMotion";
 import type { ProductAnnotation } from "./continuitySchema";
 import type { ReactNode } from "react";
 
@@ -25,7 +25,6 @@ const notation = {
   highlight: Highlight,
   underline: Underline,
 };
-
 /** Seeded hand-drawn marks retain the measured product coordinates exactly. */
 export function ContinuityAnnotation({
   annotations = [],
@@ -38,9 +37,13 @@ export function ContinuityAnnotation({
   const motion = useVideoMotion();
   if (!appearance.annotations) return null;
   return annotations.map((cue, index) => {
-    const progress = getAnnotationProgress(frame, cue, {
-      duration: motion.scale(annotation.drawIn),
-      easing: motion.reveal.easing,
+    const progress = getAnnotationProgress({
+      frame,
+      cue,
+      timing: {
+        duration: motion.scale(annotation.drawIn),
+        easing: motion.reveal.easing,
+      },
     });
     if (progress <= 0) return null;
     const Annotation = notation[cue.kind];

@@ -1,13 +1,12 @@
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./StormwaterStorageSpill.schema";
 import type { ReactNode } from "react";
 /** Inputs for WaterEquation. */
 type Props = { input: Input; frame: number };
-
 /** All supplied inflow remains in the four explicit destinations. */
 export function WaterEquation({ input, frame }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const { incomingM3, infiltratedM3, dischargedM3 } = input.event;
   const remainder = incomingM3 - (infiltratedM3 + dischargedM3);
   const detained = Math.min(input.detentionCapacityM3, remainder);

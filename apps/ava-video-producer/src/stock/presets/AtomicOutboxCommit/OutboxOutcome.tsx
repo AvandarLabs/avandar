@@ -1,17 +1,16 @@
 import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { OUTCOME_CUE } from "./outboxShape";
 import type { Input } from "./AtomicOutboxCommit.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number };
-
 /** Frames the outcome caption takes to fade in. */
 const CAPTION_FRAMES = 28;
 /** The outcome caption describes both durable halves together. */
 export function OutboxOutcome({ input, frame }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g
       opacity={ramp(

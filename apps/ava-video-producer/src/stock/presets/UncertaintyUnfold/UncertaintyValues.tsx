@@ -1,6 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./UncertaintyUnfold.schema";
 import type { ReactNode } from "react";
 
@@ -22,7 +22,7 @@ export function UncertaintyValues({
   pointX,
   opacity,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const values = [
     { value: input.estimate.lower, x: lowerX, slot: 100 },
     { value: input.estimate.point, x: pointX, slot: 480 },

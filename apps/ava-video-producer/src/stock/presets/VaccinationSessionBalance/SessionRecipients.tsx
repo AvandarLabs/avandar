@@ -1,5 +1,5 @@
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./VaccinationSessionBalance.schema";
 import type { ReactNode } from "react";
@@ -11,7 +11,7 @@ export function SessionRecipients({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g>
       {input.recipients.map((recipient, index) => {

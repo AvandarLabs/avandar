@@ -82,8 +82,10 @@
   flex: 1;
 }
 
-/* The plot also draws in the theme editor, outside a helper preview, where
- * the stroke and dash fallbacks apply. */
+/*
+ * The plot also draws in the theme editor, outside a helper preview, where
+ * the stroke and dash fallbacks apply.
+ */
 .plot {
   overflow: visible;
 }

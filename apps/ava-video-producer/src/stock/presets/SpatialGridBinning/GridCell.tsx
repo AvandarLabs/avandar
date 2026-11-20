@@ -1,10 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { makeGridSceneFromInputAndFrame } from "./makeGridSceneFromInputAndFrame";
 import type { Input } from "./SpatialGridBinning.schema";
 import type { ReactNode } from "react";
@@ -14,16 +10,15 @@ type Props = {
   cell: ReturnType<typeof makeGridSceneFromInputAndFrame>["cells"][number];
   frame: number;
 };
-
 const OUTLINE_AT = 13;
 const OUTLINE_FRAMES = 37;
 /**
  * One ledger retains a separate header and twelve non-overlapping token slots.
  */
 export function GridCell({ input, cell, frame }: Readonly<Props>): ReactNode {
-  const { color, stroke } = useGraphicTokens();
-  const shapes = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const { color, stroke } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const { columns, rows } = input.grid;
   return (
     <g>

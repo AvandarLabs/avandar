@@ -1,4 +1,4 @@
-import { DialogueBubble } from "./DialogueBubble";
+import { DialogueBubble } from "./DialogueBubble/DialogueBubble";
 import { DialogueLegend } from "./DialogueLegend";
 import { DialoguePeople } from "./DialoguePeople";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";

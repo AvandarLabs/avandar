@@ -1,6 +1,6 @@
 import { mix, ramp } from "../../../motion";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
-import { BatchFrame } from "./BatchFrame";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { BatchFrame } from "./BatchFrame/BatchFrame";
 import { BatchMembers } from "./BatchMembers";
 import { BatchReleaseCaption } from "./BatchReleaseCaption";
 import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
@@ -14,7 +14,6 @@ type Props = {
   frame: number;
   accent: string;
 };
-
 /** Frames the first batch takes to cross the dispatch boundary. */
 const FIRST_DISPATCH_FRAMES = 30;
 /** Frames the later batch takes to cross the dispatch boundary. */
@@ -31,8 +30,8 @@ export function BatchEnvelope({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
-  const { start, completeAt, x } = _getBatchLayout(frame, index, motion);
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const { start, completeAt, x } = _getBatchLayout({ frame, index, motion });
   const y = 210 + index * 200;
   return (
     <g opacity={motion.reveal(frame, start - LEAD_IN_FRAMES)}>
@@ -63,9 +62,12 @@ export function BatchEnvelope({
     </g>
   );
 }
-
 /** A batch's cues and its position as it crosses the dispatch boundary. */
-function _getBatchLayout(frame: number, index: number, motion: VideoMotion) {
+function _getBatchLayout({
+  frame,
+  index,
+  motion,
+}: Readonly<{ frame: number; index: number; motion: VideoMotion }>) {
   const dispatchAt = index ? 128 : 82;
   const dispatchDuration = motion.scale(
     index ? LATER_DISPATCH_FRAMES : FIRST_DISPATCH_FRAMES,

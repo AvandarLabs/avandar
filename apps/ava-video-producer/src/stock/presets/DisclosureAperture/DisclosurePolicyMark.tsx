@@ -1,8 +1,11 @@
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./DisclosureAperture.schema";
 import type { ReactNode } from "react";
 
-type Props = { policy: Input["fields"][number]["disclosure"]; accent: string };
+type Props = {
+  policy: Input["fields"][number]["disclosure"];
+  accent: string;
+};
 /**
  * Distinct circle and diamond shapes reinforce the supplied policy captions.
  */
@@ -10,7 +13,7 @@ export function DisclosurePolicyMark({
   policy,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return policy === "share" ? (
     <circle data-policy-mark="share" cx={22} cy={12} r={4} fill={accent} />
   ) : (

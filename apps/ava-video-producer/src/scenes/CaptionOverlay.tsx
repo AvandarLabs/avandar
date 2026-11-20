@@ -6,20 +6,23 @@ import {
   captionGeometry,
   validateCaptions,
 } from "./layout/layout";
-import { getStageTextStyle } from "./stageTheme/stageTheme";
+import { StageTheme } from "./StageTheme/StageTheme";
 import type { VideoMotion } from "../videoTheme/createVideoMotion/createVideoMotion";
-import type { CaptionOverlayProps } from "./scenes.types";
+import type { CaptionOverlayProps as Props } from "./scenes.types";
 import type { CSSProperties, ReactNode } from "react";
-
 /**
  * The caption box, hung from the bottom centre of the canvas and sized by
  * its fitted geometry, through its line height.
  */
-function _buildCaptionBoxStyle(
-  geometry: ReturnType<typeof captionGeometry>,
-  tokens: ReturnType<typeof useVideoTokens>,
-  toCorner: (radius: number) => number,
-): CSSProperties {
+function _buildCaptionBoxStyle({
+  geometry,
+  tokens,
+  toCorner,
+}: Readonly<{
+  geometry: ReturnType<typeof captionGeometry>;
+  tokens: ReturnType<typeof useVideoTokens>;
+  toCorner: (radius: number) => number;
+}>): CSSProperties {
   return {
     position: "absolute",
     left: "50%",
@@ -33,22 +36,24 @@ function _buildCaptionBoxStyle(
     border: `${geometry.borderWidth}px solid ${tokens.color.scene.border}`,
     borderRadius: toCorner(tokens.corner.scene),
     background: tokens.color.scene.ground,
-    ...getStageTextStyle(tokens.text.stage.caption, [
-      "fontFamily",
-      "fontWeight",
-      "color",
-    ]),
+    ...StageTheme.getStageTextStyle({
+      role: tokens.text.stage.caption,
+      fields: ["fontFamily", "fontWeight", "color"],
+    }),
     fontSize: geometry.fontSize,
     lineHeight: geometry.lineHeight,
   };
 }
-
 /** A cue's fade in, never longer than a third of the cue. */
-function _getCueFadeIn(
-  frame: number,
-  cue: Readonly<{ startFrame: number; endFrame: number }>,
-  motion: VideoMotion,
-): number {
+function _getCueFadeIn({
+  frame,
+  cue,
+  motion,
+}: Readonly<{
+  frame: number;
+  cue: Readonly<{ startFrame: number; endFrame: number }>;
+  motion: VideoMotion;
+}>): number {
   const fadeDuration = Math.min(
     motion.chip,
     (cue.endFrame - cue.startFrame) / 3,
@@ -60,7 +65,6 @@ function _getCueFadeIn(
     motion.entrance.easing,
   );
 }
-
 /**
  * Whole-cue captions. Alignment comes from authored or imported cue times.
  * Type is `text.stage.caption`, its size the default the fit starts from,
@@ -73,7 +77,7 @@ export function CaptionOverlay({
   height = 1000,
   bottom = 48,
   fontSize,
-}: CaptionOverlayProps): ReactNode {
+}: Props): ReactNode {
   const tokens = useVideoTokens();
   const motion = useVideoMotion();
   const scales = useVideoShapeScales();
@@ -81,21 +85,21 @@ export function CaptionOverlay({
   validateCaptions(cues);
   const cue = activeCaption(frame, cues);
   if (!cue) return null;
-  const geometry = captionGeometry(
-    cue.text,
+  const geometry = captionGeometry({
+    text: cue.text,
     width,
     height,
-    fontSize ?? caption.fontSize,
+    fontSize: fontSize ?? caption.fontSize,
     bottom,
-    scales.stroke(tokens.stroke.hairline),
-  );
+    borderWidth: scales.stroke(tokens.stroke.hairline),
+  });
   return (
     <div
       aria-label={cue.text}
       style={{
-        ..._buildCaptionBoxStyle(geometry, tokens, scales.corner),
+        ..._buildCaptionBoxStyle({ geometry, tokens, toCorner: scales.corner }),
         textAlign: "center",
-        opacity: _getCueFadeIn(frame, cue, motion),
+        opacity: _getCueFadeIn({ frame, cue, motion }),
         pointerEvents: "none",
       }}
     >

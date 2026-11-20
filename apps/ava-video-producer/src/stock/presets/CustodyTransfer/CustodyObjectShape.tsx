@@ -1,9 +1,6 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SUPPORT_STROKE } from "./custodyShape";
 import type { Input } from "./CustodyTransfer.schema";
 import type { ReactNode } from "react";
@@ -22,8 +19,8 @@ export function CustodyObjectShape({
   shape,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const keyWidth = scales.stroke(SUPPORT_STROKE);
   return shape === "key" ? (
     <g>

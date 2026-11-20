@@ -1,11 +1,7 @@
 import { ramp } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import {
   DEMONSTRATE_CUE,
   HANDOFF_CUE,
@@ -15,7 +11,6 @@ import type { Input } from "./ExpertiseRoleExchange.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string; toolX: number };
-
 /** Frames each demonstration takes to fold or measure. */
 const DEMONSTRATION_FRAMES = 22;
 /** The tool's corner before the corner style scales it. */
@@ -29,9 +24,9 @@ export function ExpertiseWorktable({
   accent,
   toolX,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const toolWidth = scales.stroke(tokens.stroke.default);
   const isFirst = frame < HANDOFF_CUE;
   const topic = input.topics[isFirst ? 0 : 1];

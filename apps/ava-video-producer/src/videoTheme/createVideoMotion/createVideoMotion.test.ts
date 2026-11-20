@@ -134,7 +134,7 @@ test("the stagger option multiplies every stagger", () => {
   );
 });
 
-test("a preset's own stagger follows the tempo and the stagger option", () => {
+test("a preset's own stagger scales inversely with tempo", () => {
   assert.deepEqual(
     [_motionAtTempo(1).scaleStagger(6), _motionAtTempo(1.5).scaleStagger(6)],
     [6, 4],

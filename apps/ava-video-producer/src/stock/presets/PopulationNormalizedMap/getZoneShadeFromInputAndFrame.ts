@@ -1,5 +1,5 @@
 import { getPopulationRateFromCounts } from "./getPopulationRateFromCounts";
-import { getZoneShadeFromFraction } from "./zoneShade";
+import { getZoneShadeFromFraction } from "./getZoneShadeFromFraction";
 import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./PopulationNormalizedMap.schema";
 

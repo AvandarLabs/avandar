@@ -1,6 +1,6 @@
 import { propEq } from "@avandar/utils";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./UtteranceToModelDraft.schema";
 import type { ReactNode } from "react";
 
@@ -10,7 +10,7 @@ export function AttributeAttachments({
   input,
   stacked,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
       {" "}

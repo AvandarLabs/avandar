@@ -1,14 +1,13 @@
 import { prop } from "@avandar/utils";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./ComputeCapacityConsolidation.schema";
 import type { ReactNode } from "react";
 /** Inputs for ComputeSummary. */
 type Props = { input: Input; frame: number };
-
 /** Resolved quantities retain their supplied denominator and copy. */
 export function ComputeSummary({ input, frame }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const total = input.jobs.reduce((sum, job) => {
     return sum + job.cpuHours;
   }, 0);

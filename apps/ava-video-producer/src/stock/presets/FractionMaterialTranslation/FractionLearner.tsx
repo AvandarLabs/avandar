@@ -1,11 +1,7 @@
 import { mix } from "../../../motion";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SceneText } from "./SceneText";
 import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./FractionMaterialTranslation.schema";
@@ -26,18 +22,17 @@ export function FractionLearner({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const handReach =
     motion.ramp(frame, 30, motion.chip) *
     (1 - motion.ramp(frame, 84, motion.press.duration));
-  const { contactX, contactY } = _getMaterialContact(
-    { input, representation, initialX, frame },
+  const { contactX, contactY } = _getMaterialContact({
+    input: { input, representation, initialX, frame },
     motion,
-  );
+  });
   const learnerX = initialX - 60;
-
   return (
     <>
       <SceneText
@@ -62,17 +57,16 @@ export function FractionLearner({
     </>
   );
 }
-
 /** Where the learner's hand touches the material as it is worked. */
-function _getMaterialContact(
-  {
-    input,
-    representation,
-    initialX,
-    frame,
-  }: Readonly<Pick<Props, "input" | "representation" | "initialX" | "frame">>,
-  motion: VideoMotion,
-) {
+function _getMaterialContact({
+  input: { input, representation, initialX, frame },
+  motion,
+}: Readonly<{
+  input: Readonly<
+    Pick<Props, "input" | "representation" | "initialX" | "frame">
+  >;
+  motion: VideoMotion;
+}>) {
   const materialProgress = motion.ramp(
     frame,
     36,

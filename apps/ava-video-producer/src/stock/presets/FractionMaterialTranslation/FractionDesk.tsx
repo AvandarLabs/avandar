@@ -1,7 +1,7 @@
 import { mix } from "../../../motion";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { FractionLearner } from "./FractionLearner";
-import { FractionSurface } from "./FractionSurface";
+import { FractionSurface } from "./FractionSurface/FractionSurface";
 import { SceneText } from "./SceneText";
 import type { Input } from "./FractionMaterialTranslation.schema";
 import type { ReactNode } from "react";
@@ -21,7 +21,7 @@ export function FractionDesk({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const initialX =
     input.representations.length === 2 ? 270 + index * 420 : 180 + index * 300;
   const finalX =

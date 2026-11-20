@@ -1,13 +1,12 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./SharedFoundation.schema";
 import type { ReactNode } from "react";
 /** Inputs for FoundationCopy. */
 type Props = { input: Input };
-
 /** One shared phrase remains intact as the foundation sections are exposed. */
 export function FoundationCopy({ input }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <>
       <FitText

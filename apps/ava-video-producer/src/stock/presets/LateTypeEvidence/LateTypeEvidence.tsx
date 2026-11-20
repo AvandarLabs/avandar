@@ -1,4 +1,4 @@
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { EvidenceCells } from "./EvidenceCells";
 import { RESOLVED_CUE } from "./evidenceTiming";
 import { TypeEvidenceHeadings } from "./TypeEvidenceHeadings";
@@ -15,7 +15,7 @@ export function LateTypeEvidence({
   accent,
   background,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const isResolved = frame >= RESOLVED_CUE;
   const isWidened = input.policy === "widen-to-text";
   return (

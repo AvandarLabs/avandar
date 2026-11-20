@@ -1,13 +1,12 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
-import { LeakPipe } from "./LeakPipe";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { LeakPipe } from "./LeakPipe/LeakPipe";
 import { LeakRepairWorker } from "./LeakRepairWorker";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./RecurringLeakPrevention.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
-
 /**
  * Containment, source repair and observed retest remain separate physical
  * beats.
@@ -17,8 +16,8 @@ export function RecurringLeakPrevention({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
-  const { observation, phase } = _getLeakCaptions(input, frame);
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const { observation, phase } = _getLeakCaptions({ input, frame });
   return (
     <g>
       <LabelSlots labels={[[input.labels.example, 60, 570, 840, 14, 2]]} />
@@ -49,9 +48,11 @@ export function RecurringLeakPrevention({
     </g>
   );
 }
-
 /** The retest's observation and the caption of the current phase. */
-function _getLeakCaptions(input: Input, frame: number) {
+function _getLeakCaptions({
+  input,
+  frame,
+}: Readonly<{ input: Input; frame: number }>) {
   const observation =
     input.retest === "stopped"
       ? input.labels.stopped

@@ -3,16 +3,11 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./GroupedValuePicker.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; index: number; frame: number; accent: string };
-
 /** Frames each source tile takes to fade in. */
 const TILE_FRAMES = 30;
 const GRAPHEMES: Intl.Segmenter = new Intl.Segmenter("und", {
@@ -27,9 +22,9 @@ export function PickerObservation({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const observation = input.observations[index],
     x = 48 + index * 144;
   const selected = input.rule === "first" && index === 0 && frame >= 56;

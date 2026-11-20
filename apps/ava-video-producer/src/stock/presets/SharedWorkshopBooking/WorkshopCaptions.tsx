@@ -1,19 +1,15 @@
 import { propEq } from "@avandar/utils";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./SharedWorkshopBooking.schema";
 import type { ReactNode } from "react";
 /** Inputs for WorkshopCaptions. */
 type Props = { input: Input };
-
 /** Captions stay outside actor travel, with a guide to the agreed strip row. */
 export function WorkshopCaptions({ input }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const unresolved: Array<[string, number, number, number, 14, number]> =
     input.requests.some(propEq("agreedSlotId", null))
       ? [[input.labels.unresolved, 390, 360, 540, 14, 2]]

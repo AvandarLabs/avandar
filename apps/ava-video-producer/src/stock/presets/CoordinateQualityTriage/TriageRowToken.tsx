@@ -1,10 +1,6 @@
 import { Text } from "../../graphics-common/Text";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { makeCoordinateTriageFromInputAndFrame } from "./makeCoordinateTriageFromInputAndFrame";
 import type { ReactNode } from "react";
 
@@ -13,16 +9,15 @@ type Props = {
   frame: number;
   accent: string;
 };
-
 /** Coincident copies yield to the indexed representative and source keys. */
 export function TriageRowToken({
   row,
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { color, stroke, sketch } = useGraphicTokens();
-  const shapes = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const { color, stroke, sketch } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const opacity =
     row.reason === "plotted" && row.representativeIndex !== row.index
       ? 1 - motion.ramp(frame, row.arrivedAt, motion.chip)

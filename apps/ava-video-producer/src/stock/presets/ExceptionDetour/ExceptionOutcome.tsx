@@ -1,26 +1,18 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./ExceptionDetour.schema";
 import type { ReactNode } from "react";
 /** Inputs for ExceptionOutcome. */
-type Props = {
-  input: Input;
-  targetY: number;
-  accent: string;
-};
-
+type Props = { input: Input; targetY: number; accent: string };
 /** A separate destination contains the authored exceptional outcome. */
 export function ExceptionOutcome({
   input,
   targetY,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <>
       <StockRect

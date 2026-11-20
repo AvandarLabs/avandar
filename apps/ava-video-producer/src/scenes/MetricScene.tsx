@@ -11,15 +11,13 @@ import {
 } from "./layout/layout";
 import { positioned } from "./positioned";
 import { SceneShell } from "./SceneShell";
-import { getStageTextStyle } from "./stageTheme/stageTheme";
-import type { MetricSceneProps } from "./scenes.types";
+import { StageTheme } from "./StageTheme/StageTheme";
+import type { MetricSceneProps as Props } from "./scenes.types";
 import type { ReactNode } from "react";
-
 /** How far the figure row rises as it arrives, in pixels. */
 const FIGURE_RISE = 10;
 /** How far the detail rises as it arrives, in pixels. */
 const DETAIL_RISE = 8;
-
 /**
  * A single headline metric that counts from an initial value up to its target.
  * The figure is `text.stage.figure` in the strong brand colour, the label
@@ -40,7 +38,7 @@ export function MetricScene({
   detail,
   countAtFrame = 18,
   countDurationInFrames = 36,
-}: MetricSceneProps): ReactNode {
+}: Props): ReactNode {
   assertFinite(from, "metric from");
   assertFrame(countAtFrame, "countAtFrame");
   assertFrame(countDurationInFrames, "countDurationInFrames");
@@ -96,10 +94,10 @@ export function MetricScene({
           style={{
             flexShrink: 0,
             fontSize: layout.label.fontSize,
-            ...getStageTextStyle(tokens.text.stage.caption, [
-              "lineHeight",
-              "fontWeight",
-            ]),
+            ...StageTheme.getStageTextStyle({
+              role: tokens.text.stage.caption,
+              fields: ["lineHeight", "fontWeight"],
+            }),
             textAlign: "center",
             color: scene.mutedForeground,
           }}
@@ -125,11 +123,10 @@ export function MetricScene({
           <span
             style={{
               fontSize: layout.numberSize,
-              ...getStageTextStyle(tokens.text.stage.figure, [
-                "lineHeight",
-                "fontWeight",
-                "letterSpacing",
-              ]),
+              ...StageTheme.getStageTextStyle({
+                role: tokens.text.stage.figure,
+                fields: ["lineHeight", "fontWeight", "letterSpacing"],
+              }),
               color: scene.brandStrong,
             }}
           >

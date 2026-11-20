@@ -1,9 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./ChargeReferenceAlignment.schema";
 import type { getComparisonFromInput } from "./getComparisonFromInput";
 import type { ReactNode } from "react";
@@ -29,9 +26,9 @@ export function AmountRuler({
   precision,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const tokens = useGraphicTokens();
-  const { x, y, labelX, labelY } = _getRulerPlacement(comparison, index);
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const { x, y, labelX, labelY } = _getRulerPlacement({ comparison, index });
   const amountLabel = (total / input.money.minorUnitsPerUnit).toFixed(
     precision,
   );
@@ -64,12 +61,14 @@ export function AmountRuler({
     </g>
   );
 }
-
 /**
  * Matched rulers stack on one shared scale with labels to their left;
  * unmatched ones sit side by side with labels below.
  */
-function _getRulerPlacement(comparison: Props["comparison"], index: number) {
+function _getRulerPlacement({
+  comparison,
+  index,
+}: Readonly<{ comparison: Props["comparison"]; index: number }>) {
   const x = comparison.isMatched ? 290 : 290 + index * 320;
   const y = comparison.isMatched ? 425 + index * 39 : 425;
   return {

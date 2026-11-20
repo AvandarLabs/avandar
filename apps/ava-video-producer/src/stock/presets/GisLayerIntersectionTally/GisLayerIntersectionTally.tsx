@@ -1,11 +1,8 @@
 import { PlanarPolygon } from "../../geography/PlanarPolygon/PlanarPolygon";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { GisLabels } from "./GisLabels";
-import { HouseholdMarker } from "./HouseholdMarker";
+import { HouseholdMarker } from "./HouseholdMarker/HouseholdMarker";
 import { LayerGeometry } from "./LayerGeometry";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./GisLayerIntersectionTally.schema";
@@ -33,7 +30,6 @@ function _isSelected({
 }
 /** Inputs for GisLayerIntersectionTally. */
 type Props = GraphicProps & { input: Input };
-
 /**
  * Register geometric layers, preserve records and tally the chosen set measure.
  */
@@ -42,8 +38,8 @@ export function GisLayerIntersectionTally({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const selected = input.households.map((household) => {
     return _isSelected({ input, household });
   });

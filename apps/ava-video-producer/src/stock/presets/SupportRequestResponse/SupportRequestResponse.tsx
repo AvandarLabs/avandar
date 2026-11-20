@@ -1,5 +1,5 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SupportParticipants } from "./SupportParticipants";
 import { SupportWords } from "./SupportWords";
 import { SupportWorktable } from "./SupportWorktable";
@@ -8,7 +8,6 @@ import type { Input } from "./SupportRequestResponse.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
-
 /**
  * An authored reply changes participation without transferring task ownership.
  */
@@ -17,7 +16,7 @@ export function SupportRequestResponse({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g>
       <SupportWords input={input} frame={frame} />

@@ -1,8 +1,5 @@
 import { Text } from "../../graphics-common/Text";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./BoundedLocationDisplacement.schema";
 import type { ReactNode } from "react";
 
@@ -19,8 +16,8 @@ export function DisclosedMarker({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const center = {
     cx: 500 + (location.x + location.offsetX) * 3.8,
     cy: 180 + (location.y + location.offsetY) * 2.2,

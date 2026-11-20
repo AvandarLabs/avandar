@@ -1,10 +1,7 @@
 import { mix } from "../../../../motion";
 import { LabelSlots } from "../../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { FocusedRecord } from "./FocusedRecord";
 import type { getAssignmentsFromLocations } from "../getAssignmentsFromLocations";
 import type { ReactNode } from "react";
@@ -26,8 +23,8 @@ export function AssignmentRow({
   accent,
   isFocused,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g data-assignment={location.id} data-district-index={location.district}>
       {isFocused ? (

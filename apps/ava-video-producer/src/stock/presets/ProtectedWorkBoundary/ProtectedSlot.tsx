@@ -1,5 +1,5 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ProtectedSlotBody } from "./ProtectedSlotBody";
 import type { Input } from "./ProtectedWorkBoundary.schema";
 import type { ReactNode } from "react";
@@ -21,7 +21,7 @@ export function ProtectedSlot({
   accent,
   id,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const width = 860 / input.slots.length,
     x = 50 + index * width;
   return (

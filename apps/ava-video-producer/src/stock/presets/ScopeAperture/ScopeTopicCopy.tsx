@@ -1,21 +1,14 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./ScopeAperture.schema";
 import type { ReactNode } from "react";
 /** Inputs for ScopeTopicCopy. */
-type Props = {
-  topic: Input["topics"][number];
-  accent: string;
-};
-
+type Props = { topic: Input["topics"][number]; accent: string };
 /** A topic label keeps its full authored text clear of the rule stroke. */
 export function ScopeTopicCopy({ topic, accent }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <>
       <FitText

@@ -4,12 +4,16 @@ import test from "node:test";
 import { prop } from "@avandar/utils";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { DoseCohortReturnPaths } from "./DoseCohortReturnPaths";
+import { doseCohortReturnPathsContract } from "./DoseCohortReturnPaths.contract";
 import {
   DEFAULT_INPUT,
   fixtures,
   invalidInputs,
 } from "./DoseCohortReturnPaths.fixtures";
+import { inputSchema, type Input } from "./DoseCohortReturnPaths.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 
 function _render({
@@ -36,12 +40,6 @@ test("Every visit uses the same cohort denominator; recorded, missed, not-yet-du
     DEFAULT_INPUT.visits.length,
   );
 });
-
-import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
-import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
-import { doseCohortReturnPathsContract } from "./DoseCohortReturnPaths.contract";
-import { inputSchema, type Input } from "./DoseCohortReturnPaths.schema";
-
 const textLayoutOptions = {
   inputSchema,
   fixtures,
@@ -75,10 +73,9 @@ registerStockPresetAssertions({
   contract: doseCohortReturnPathsContract,
 });
 registerStockTextLayoutAssertions(textLayoutOptions);
-
 test("nonrecorded first visits retain the entire denominator and emphasis never changes identities", () => {
   const input = fixtures[3].input;
-  const markup = _render({ frame: 150, input: input });
+  const markup = _render({ frame: 150, input });
   assert.equal(
     (markup.match(/data-participant=/g) ?? []).length,
     input.participants.length,
@@ -118,17 +115,14 @@ test("nonrecorded first visits retain the entire denominator and emphasis never 
     },
   );
   [24, 36, 54, 72, 94, 116, 150].forEach((frame) => {
-    return translations(
-      _render({ frame: frame, input: fixtures[2].input }),
-    ).forEach(([, x, y]) => {
-      assert.ok(Number(x) - 8 >= 270 && Number(x) + 8 < 920);
-      assert.ok(Number(y) - 11 >= 160 && Number(y) + 14 < 480);
-    });
+    return translations(_render({ frame, input: fixtures[2].input })).forEach(
+      ([, x, y]) => {
+        assert.ok(Number(x) - 8 >= 270 && Number(x) + 8 < 920);
+        assert.ok(Number(y) - 11 >= 160 && Number(y) + 14 < 480);
+      },
+    );
   });
-  assert.notDeepEqual(
-    translations(_render({ frame: 24, input: input })),
-    expected,
-  );
+  assert.notDeepEqual(translations(_render({ frame: 24, input })), expected);
   input.participants.forEach((person) => {
     const recorded = input.visits
       .map((visit, index) => {
@@ -151,7 +145,6 @@ test("nonrecorded first visits retain the entire denominator and emphasis never 
     );
   });
 });
-
 test("missed-and-returned accents only chronologically later records regardless of record array order", () => {
   const states: Array<
     Array<Input["participants"][number]["records"][number]["state"]>
@@ -167,10 +160,7 @@ test("missed-and-returned accents only chronologically later records regardless 
         return {
           ...person,
           records: sequence.map((state, index) => {
-            return {
-              visitId: DEFAULT_INPUT.visits[index].id,
-              state,
-            };
+            return { visitId: DEFAULT_INPUT.visits[index].id, state };
           }),
         };
       }),
@@ -179,7 +169,7 @@ test("missed-and-returned accents only chronologically later records regardless 
       sequence[1] === "missed"
         ? ["#728794", "#65d6ad", "#65d6ad"]
         : ["#728794", "#728794", "#65d6ad"];
-    const markup = _render({ frame: 150, input: input });
+    const markup = _render({ frame: 150, input });
     const marks = Array.from(
       markup.matchAll(
         /data-record-person="[^"]*" data-record-visit="([^"]*)"[\s\S]*?<g transform="[^"]*"><path\b[^>]*\bstroke="([^"]*)"/g,
@@ -200,10 +190,7 @@ test("missed-and-returned accents only chronologically later records regardless 
     const reordered = {
       ...input,
       participants: input.participants.map((person) => {
-        return {
-          ...person,
-          records: [...person.records].reverse(),
-        };
+        return { ...person, records: [...person.records].reverse() };
       }),
     };
     assert.equal(_render({ frame: 150, input: reordered }), markup);

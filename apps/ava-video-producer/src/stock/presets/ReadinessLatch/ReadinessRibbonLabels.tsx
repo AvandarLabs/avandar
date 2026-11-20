@@ -1,5 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./ReadinessLatch.schema";
 import type { ReactNode } from "react";
 
@@ -15,11 +15,7 @@ const TEXT: {
   fontSize: 12;
   breakLongWords: boolean;
   normalizeWhitespace: boolean;
-} = {
-  fontSize: 12 as const,
-  breakLongWords: true,
-  normalizeWhitespace: true,
-};
+} = { fontSize: 12 as const, breakLongWords: true, normalizeWhitespace: true };
 /** Each branch has separate stable slots for its name, state and quantity. */
 export function ReadinessRibbonLabels({
   participant,
@@ -29,7 +25,7 @@ export function ReadinessRibbonLabels({
   x,
   y,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const label = {
     text: participant.label,
     x: horizontal ? 40 : x + 4,

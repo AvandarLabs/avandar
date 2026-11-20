@@ -1,21 +1,16 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { WATER_DESTINATIONS } from "./waterDestinationKeys";
 import type { Input } from "./StormwaterStorageSpill.schema";
 import type { ReactNode } from "react";
-
 /** The normalised path length the overflow path draws on along. */
 const DRAW_ON_LENGTH = 1;
 type Props = { input: Input; frame: number };
 /** Excess water traverses a distinct crest only after detention has filled. */
 export function WaterSpill({ input, frame }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const incoming = input.event.incomingM3;
   const overflow = _getOverflowVolume(input);
   const progress = motion.ramp(
@@ -56,7 +51,6 @@ export function WaterSpill({ input, frame }: Readonly<Props>): ReactNode {
     </g>
   );
 }
-
 /** The water left after infiltration, discharge, and full detention. */
 function _getOverflowVolume(input: Input): number {
   const remainder =
@@ -64,7 +58,6 @@ function _getOverflowVolume(input: Input): number {
     (input.event.infiltratedM3 + input.event.dischargedM3);
   return remainder - Math.min(input.detentionCapacityM3, remainder);
 }
-
 /** The detention lip's height and the crest and outfall on the spill side. */
 function _getCrestGeometry(input: Input) {
   return {

@@ -1,5 +1,5 @@
 import { DIAGRAM_NODE_SIZE, findDiagramNode } from "./findDiagramNode";
-import type { MotionRect } from "../../../../motion-components/AnchoredOverlay";
+import type { MotionRect } from "../../../../motion-components/AnchoredOverlay/AnchoredOverlay";
 import type { DIAGRAM_NODES } from "./findDiagramNode";
 
 /** The rect a diagram node occupies, for cut-outs such as a departure. */

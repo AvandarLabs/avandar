@@ -1,7 +1,7 @@
 import { mix } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { MeasuringTools } from "./MeasuringTools";
 import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./PracticeToWorkSample.schema";
@@ -16,12 +16,12 @@ export function MeasuringLearner({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
-  const { x, isApplication, rulerY, origin, pencilX } = _getMeasuringPose(
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const { x, isApplication, rulerY, origin, pencilX } = _getMeasuringPose({
     input,
     frame,
     motion,
-  );
+  });
   const isMeasuring =
     (frame >= 24 && frame <= 54) || (frame >= 82 && frame <= 112);
   return (
@@ -51,12 +51,15 @@ export function MeasuringLearner({
     </g>
   );
 }
-
 /**
  * The learner moves from practice to application; at each, the ruler lowers
  * and the pencil marks the measured length from the ruler's origin.
  */
-function _getMeasuringPose(input: Input, frame: number, motion: VideoMotion) {
+function _getMeasuringPose({
+  input,
+  frame,
+  motion,
+}: Readonly<{ input: Input; frame: number; motion: VideoMotion }>) {
   const transfer = motion.ramp(
     frame,
     56,

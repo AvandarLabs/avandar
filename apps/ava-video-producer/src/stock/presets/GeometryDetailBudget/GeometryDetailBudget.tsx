@@ -1,5 +1,5 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { DetailLedger } from "./DetailLedger";
+import { DetailLedger } from "./DetailLedger/DetailLedger";
 import { DetailRecursion } from "./DetailRecursion";
 import { DetailTrace } from "./DetailTrace";
 import { TraceLegend } from "./TraceLegend";

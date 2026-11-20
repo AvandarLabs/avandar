@@ -1,5 +1,5 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { DraftModel } from "./DraftModel";
 import { DraftReview } from "./DraftReview";
 import { SourceSentence } from "./SourceSentence";
@@ -15,7 +15,7 @@ export function UtteranceToModelDraft({
   accent,
   background,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const ground = background ?? tokens.color.ground;
   return (
     <g>

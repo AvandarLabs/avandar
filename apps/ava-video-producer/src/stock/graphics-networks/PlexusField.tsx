@@ -7,34 +7,27 @@ import { Rule } from "../graphics-common/Rule";
 import { Text } from "../graphics-common/Text";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
 import { SketchedShape } from "../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicProps,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { GraphicProps } from "../graphics-common/graphicCommon.types";
 import type { PlexusFieldInput } from "../presets/PlexusField/PlexusField.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: PlexusFieldInput };
-
 const LOOP_FRAMES = 180;
 const HEADING_Y = 101;
 const RULE_Y = 529;
 const FOOTER_Y = 560;
 const TWINKLE_PHASE_STEP = 9;
-
 /** Draws the bounded authored plexus-field study at an explicit frame. */
 export function PlexusField({
   input,
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const style = useGraphicProps("PlexusField", {});
-  const { color, layout, sketch } = useGraphicTokens();
-  const shapes = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const style = GraphicThemeHooks.useGraphicProps("PlexusField", {});
+  const { color, layout, sketch } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const margin = layout.graphic.margin;
   const right = GRAPHIC_WIDTH - margin;
   const drift = motion.drift.distance;

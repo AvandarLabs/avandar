@@ -12,15 +12,13 @@ import {
 import { MediaPlane } from "./MediaPlane";
 import { positioned } from "./positioned";
 import { SceneShell } from "./SceneShell";
-import { getStageTextStyle } from "./stageTheme/stageTheme";
-import type { MediaSceneProps } from "./scenes.types";
+import { StageTheme } from "./StageTheme/StageTheme";
+import type { MediaSceneProps as Props } from "./scenes.types";
 import type { CSSProperties, ReactNode } from "react";
-
 /** How far the heading rises as it arrives, in pixels. */
 const HEADING_RISE = 6;
 /** How far the subtitle rises as it arrives, in pixels. */
 const SUBTITLE_RISE = 4;
-
 /**
  * Media stays stationary. Any crop is fixed for the entire scene. The
  * heading is `text.stage.cardTitle` at its fitted size, callouts are
@@ -40,7 +38,7 @@ export function MediaScene({
   objectPosition = { x: 0.5, y: 0.5 },
   crop = { x: 0, y: 0, width: 1, height: 1 },
   callouts = [],
-}: MediaSceneProps): ReactNode {
+}: Props): ReactNode {
   assertFrame(trimBefore, "trimBefore");
   assertUnit(objectPosition.x, "objectPosition.x");
   assertUnit(objectPosition.y, "objectPosition.y");
@@ -112,7 +110,10 @@ export function MediaScene({
               style={{
                 margin: 0,
                 fontSize: heading.fontSize,
-                ...getStageTextStyle(cardTitle, ["lineHeight", "fontWeight"]),
+                ...StageTheme.getStageTextStyle({
+                  role: cardTitle,
+                  fields: ["lineHeight", "fontWeight"],
+                }),
                 ...motion.enter(frame, 0, {
                   y: HEADING_RISE,
                   dur: motion.sheet,
@@ -234,7 +235,10 @@ export function MediaScene({
                   width: labelWidth,
                   padding: `${spacing["10"]} ${spacing["2xs"]}`,
                   fontSize: label.fontSize,
-                  ...getStageTextStyle(caption, ["lineHeight", "fontWeight"]),
+                  ...StageTheme.getStageTextStyle({
+                    role: caption,
+                    fields: ["lineHeight", "fontWeight"],
+                  }),
                   color: scene.foreground,
                   background: scene.ground,
                   border: `${scales.stroke(tokens.stroke.hairline)}px solid ${scene.brandStrong}`,

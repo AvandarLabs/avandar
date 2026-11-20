@@ -1,8 +1,5 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CoordinateGraticule } from "./CoordinateGraticule";
 import { makeCoordinateTriageFromInputAndFrame } from "./makeCoordinateTriageFromInputAndFrame";
 import { TriageOutcome } from "./TriageOutcome";
@@ -12,8 +9,8 @@ import type { ReactNode } from "react";
 type Props = { input: Input; frame: number };
 /** Numeric graticule, diagnostic trays and reconciled outcome counts. */
 export function TriagePlane({ input, frame }: Readonly<Props>): ReactNode {
-  const body = useGraphicTokens().text.graphic.body;
-  const motion = useGraphicMotion();
+  const body = GraphicThemeHooks.useGraphicTokens().text.graphic.body;
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const { counts } = makeCoordinateTriageFromInputAndFrame({
     input,
     frame,

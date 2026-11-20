@@ -1,9 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
-import { getRefinementFromFrame } from "./getRefinementFromFrame";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { RefinementMotion } from "./RefinementMotion";
 import type { Input } from "./ChartFocusEdit.schema";
 import type { ReactNode, ComponentProps } from "react";
 
@@ -11,7 +8,6 @@ type HeadingSlot = Omit<ComponentProps<typeof FitText>, "x" | "width"> & {
   opacity: number;
 };
 type Props = { input: Input; frame: number; accent: string };
-
 /** Fitted heading sizes, which `FitText` checks against measured widths. */
 const TITLE_FONT_SIZE = 24;
 const CAPTION_FONT_SIZE = 14;
@@ -21,9 +17,9 @@ export function ChartHeadings({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const refinement = getRefinementFromFrame(frame, motion);
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const refinement = RefinementMotion.getRefinementFromFrame({ frame, motion });
   const slots: HeadingSlot[] = [
     {
       text: input.headings.title,

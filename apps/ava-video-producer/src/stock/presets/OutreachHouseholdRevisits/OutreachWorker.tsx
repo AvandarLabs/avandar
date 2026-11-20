@@ -1,6 +1,6 @@
 import { mix } from "../../../motion";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./OutreachHouseholdRevisits.schema";
 import type { ReactNode } from "react";
 
@@ -13,7 +13,7 @@ export function OutreachWorker({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const duration = 72 / input.visits.length;
   const eventIndex = Math.min(
     input.visits.length - 1,

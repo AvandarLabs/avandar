@@ -1,16 +1,11 @@
 import { mix, ramp } from "../../../motion";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./FilterSubscriptionScope.schema";
 import type { ReactNode } from "react";
 
 type Props = { frame: number; input: Input; accent: string };
-
 /** Frames the category strip takes to slide into the socket. */
 const SLIDE_FRAMES = 39;
 /** The category strip moves into a fixed subscription source socket. */
@@ -19,9 +14,9 @@ export function SubscriptionSocket({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const corner = scales.corner(tokens.corner.cell);
   const socket = mix(
     ramp(frame, 51, motion.scale(SLIDE_FRAMES), motion.travel.easing),

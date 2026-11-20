@@ -1,8 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getReportPageGeometryFromInputAndFrame } from "./getReportPageGeometryFromInputAndFrame";
 import { ReportHeaderPaper } from "./ReportHeaderPaper";
 import type { Input } from "./ReportPageBind.schema";
@@ -15,8 +12,8 @@ export function ReportHeader({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const { x, y, margins } = getReportPageGeometryFromInputAndFrame({
     motion,
     input,

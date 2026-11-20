@@ -4,6 +4,9 @@ import { prop } from "@avandar/utils";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { registerStockDefaultTextAssertions } from "../../../../tests/helpers/registerStockDefaultTextAssertions";
+import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
+import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
 import { PortableWorkTransfer } from "./PortableWorkTransfer";
 import { portableWorkTransferContract } from "./PortableWorkTransfer.contract";
 import {
@@ -50,7 +53,7 @@ test("each artifact retains its original and one same-ID copy without pending su
       transferState,
       showIdentityTabs: false,
     });
-    const hold = render({ frame: 150, input: input });
+    const hold = render({ frame: 150, input });
     input.artifacts.forEach(({ id }) => {
       assert.equal(
         (hold.match(new RegExp(`data-original="${id}"`, "g")) || []).length,
@@ -72,11 +75,6 @@ test("each artifact retains its original and one same-ID copy without pending su
     );
   });
 });
-
-import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
-import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
-import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
-
 function _getVisibleTexts({
   input,
   frame,
@@ -145,12 +143,11 @@ registerStockDefaultTextAssertions({
     ["labels", "example"],
   ],
 });
-
 test("the complete loaded folio moves rigidly with the owner's contacting hand", () => {
   const input = FIXTURES[2].input;
   const frames = [94, 100, 108, 114];
   const positions = frames.map((frame) => {
-    const markup = render({ frame: frame, input: input }),
+    const markup = render({ frame, input }),
       folio = SvgAttributes.fromMarker({ markup, marker: "folio" }),
       hand = SvgAttributes.fromMarker({ markup, marker: "owner-hand" });
     const x = SvgAttributes.getNumberFromMarkup({
@@ -201,7 +198,7 @@ test("pending copy labels remain visible on a closed cover with no accepted capt
     transferState: "awaiting-open" as const,
     showIdentityTabs: false,
   };
-  const markup = render({ frame: 150, input: input }),
+  const markup = render({ frame: 150, input }),
     cover = SvgAttributes.fromMarker({ markup, marker: "folio-cover" });
   assert.equal(
     SvgAttributes.getNumberFromMarkup({ attributes: cover, name: "width" }),
@@ -217,11 +214,10 @@ test("pending copy labels remain visible on a closed cover with no accepted capt
   );
   assert.doesNotMatch(markup, /data-destination-use=/);
 });
-
 test("accepted copies unload completely outside the folio onto the destination surface", () => {
   FIXTURES.forEach(({ input: fixture }) => {
     const input = { ...fixture, transferState: "accepted" as const };
-    const markup = render({ frame: 150, input: input });
+    const markup = render({ frame: 150, input });
     const folio = SvgAttributes.fromMarker({ markup, marker: "folio" });
     const folioLeft = SvgAttributes.getNumberFromMarkup({
       attributes: folio,
@@ -280,14 +276,13 @@ test("accepted copies unload completely outside the folio onto the destination s
     });
   });
 });
-
 test("the unloading hand follows each rigid copy and stays above the open folio", () => {
   FIXTURES.forEach(({ input: fixture }) => {
     const input = { ...fixture, transferState: "accepted" as const };
     input.artifacts.forEach(({ id }, index) => {
       const markup = render({
         frame: 124 + ((index + 0.5) * 6) / input.artifacts.length,
-        input: input,
+        input,
       });
       const copy = markup.match(
         new RegExp(`<g data-transfer-copy="${id}">([\\s\\S]*?)<\\/g>`),

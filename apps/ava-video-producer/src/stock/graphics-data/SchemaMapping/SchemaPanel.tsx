@@ -1,12 +1,8 @@
-import { Arrive } from "../../graphics-common/Arrive";
+import { Arrive } from "../../graphics-common/Arrive/Arrive";
 import { Panel } from "../../graphics-common/Panel";
 import { Text } from "../../graphics-common/Text";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicProps,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import {
   DIVIDER_Y,
   PANEL_HEIGHT,
@@ -17,18 +13,12 @@ import {
 } from "./SchemaMapping.constants";
 import type { ReactNode } from "react";
 
-type Props = {
-  x: number;
-  title: string;
-  frame: number;
-  index: number;
-};
-
+type Props = { x: number; title: string; frame: number; index: number };
 /** One side panel of the mapping: its title and the divider under it. */
 export function SchemaPanel({ x, title, frame, index }: Props): ReactNode {
-  const style = useGraphicProps("SchemaMapping", {});
-  const { color, sketch } = useGraphicTokens();
-  const shapes = useGraphicShapeScales();
+  const style = GraphicThemeHooks.useGraphicProps("SchemaMapping", {});
+  const { color, sketch } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <Arrive frame={frame} index={index}>
       <Panel x={x} y={PANEL_TOP} width={PANEL_WIDTH} height={PANEL_HEIGHT}>

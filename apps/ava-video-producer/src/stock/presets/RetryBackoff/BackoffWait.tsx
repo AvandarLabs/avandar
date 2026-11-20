@@ -1,7 +1,7 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { BackoffDelay } from "./BackoffDelay";
 import type { Input } from "./RetryBackoff.schema";
 import type { ReactNode } from "react";
@@ -14,7 +14,7 @@ export function BackoffWait({
   x,
   width,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const waitX = 40 + index * 290;
   return (
     <g>

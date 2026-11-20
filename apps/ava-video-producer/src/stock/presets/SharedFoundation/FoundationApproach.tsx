@@ -1,11 +1,7 @@
 import { mix } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ApproachTrait } from "./ApproachTrait";
 import type { Input } from "./SharedFoundation.schema";
 import type { ReactNode } from "react";
@@ -27,9 +23,9 @@ export function FoundationApproach({
   index,
   showTrait,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const x = 80 + index * 440;
   const lift = motion.ramp(frame, 36, motion.scale(36), motion.travel.easing);
   const arrival = motion.ramp(

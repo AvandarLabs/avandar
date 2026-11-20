@@ -1,17 +1,12 @@
 import { mix, ramp } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { PreviewValue } from "./PreviewValue";
 import type { Input } from "./PipelineStepSplice.schema";
 import type { ReactNode } from "react";
 
 type Props = { preview: Input["preview"]; frame: number; accent: string };
-
 /** Frames the preview takes to unfold. */
 const UNFOLD_FRAMES = 34;
 /** The preview panel's corner before the corner style scales it. */
@@ -22,9 +17,9 @@ export function SplicePreview({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const unfolding = ramp(
     frame,
     98,

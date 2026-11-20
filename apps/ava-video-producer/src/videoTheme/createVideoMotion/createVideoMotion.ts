@@ -12,7 +12,6 @@ import type {
 type EasingFunction = (progress: number) => number;
 type MotionTokens = ResolvedVideoSemantic["motion"];
 type TimedStep = Readonly<{ duration: number; easing: EasingFunction }>;
-
 /**
  * Motion a renderer can use directly: durations and staggers already divided
  * by the tempo, easing tokens turned into functions, and the `motion.ts`
@@ -71,9 +70,7 @@ export type VideoMotion = Readonly<{
   stagger: Readonly<{ list: number; edge: number; column: number }>;
 }> &
   ThemedMotionHelpers;
-
 const CURVES = new Map<string, EasingFunction>();
-
 function _curve(easing: EasingValue): EasingFunction {
   const key = JSON.stringify(easing);
   const cached = CURVES.get(key);
@@ -84,14 +81,12 @@ function _curve(easing: EasingValue): EasingFunction {
   CURVES.set(key, curve);
   return curve;
 }
-
 function _required<Value>(value: Value | undefined, path: string): Value {
   if (value === undefined) {
     throw new Error(`The theme is missing ${path}`);
   }
   return value;
 }
-
 /**
  * The curve a step eases on: its own, or the easing family's curve when
  * `motion.easingProfile` picks one.
@@ -112,7 +107,6 @@ function _profileCurve(
     );
   };
 }
-
 function _steps(motion: MotionTokens, scale: (frames: number) => number) {
   const profileCurve = _profileCurve(motion);
   return {
@@ -139,8 +133,10 @@ function _steps(motion: MotionTokens, scale: (frames: number) => number) {
     },
   };
 }
-
-function _timingSteps(motion: MotionTokens, scale: (frames: number) => number) {
+function _timingSteps({
+  motion,
+  scale,
+}: Readonly<{ motion: MotionTokens; scale: (frames: number) => number }>) {
   const profileCurve = _profileCurve(motion);
   return {
     reveal: {
@@ -169,7 +165,6 @@ function _timingSteps(motion: MotionTokens, scale: (frames: number) => number) {
     },
   };
 }
-
 function _cycles(motion: MotionTokens) {
   return {
     pulse: { period: _required(motion.pulse.period, "motion.pulse.period") },
@@ -189,7 +184,6 @@ function _cycles(motion: MotionTokens) {
     entranceScale: motion.entranceScale,
   };
 }
-
 /**
  * Builds `VideoMotion` from a theme's semantic motion tokens. Use it through
  * `useGraphicMotion` in stock shapes and `useVideoMotion` on the stage.
@@ -214,7 +208,7 @@ export function createVideoMotion(motion: MotionTokens): VideoMotion {
     word: scale(motion.word),
     hero: scale(motion.hero),
     ..._steps(motion, scale),
-    ..._timingSteps(motion, scale),
+    ..._timingSteps({ motion, scale }),
     ..._cycles(motion),
     stagger: {
       list: staggerScale(motion.stagger.list),

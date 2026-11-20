@@ -1,12 +1,7 @@
 import { propEq } from "@avandar/utils";
 import { ramp } from "../../../../motion";
 import { SketchedShape } from "../../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicProps,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { getCacheSceneFromFrame } from "../getCacheSceneFromFrame";
 import type { Input } from "../QueryColumnCacheGrowth.schema";
 import type { ReactNode } from "react";
@@ -17,7 +12,6 @@ type Props = Readonly<{
   frame: number;
   accent: string;
 }>;
-
 const ROUTE_CUE = 13;
 const ROUTE_FRAMES = 27;
 /**
@@ -25,7 +19,6 @@ const ROUTE_FRAMES = 27;
  * it is geometry, not a theme dash.
  */
 const DRAW_ON_LENGTH = 1;
-
 /** Draws each covered request's route into its cached column. */
 export function RequestedRoutes({
   input,
@@ -33,10 +26,10 @@ export function RequestedRoutes({
   frame,
   accent,
 }: Props): ReactNode {
-  const style = useGraphicProps("QueryColumnCacheGrowth", {});
-  const scales = useGraphicShapeScales();
-  const { sketch } = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const style = GraphicThemeHooks.useGraphicProps("QueryColumnCacheGrowth", {});
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const { sketch } = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const progress = ramp(
     frame,
     ROUTE_CUE,

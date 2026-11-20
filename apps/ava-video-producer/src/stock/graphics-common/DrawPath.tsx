@@ -1,14 +1,21 @@
 import { ramp } from "../../motion";
 import { SketchedShape } from "../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicProps,
-  useGraphicShapeScales,
-} from "../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { Curve } from "./Curve";
 import type { Point } from "./graphicCommon.types";
 import type { ReactNode } from "react";
 
+type Props = {
+  d?: string;
+  curve?: Readonly<{ from: Point; to: Point; bend?: number }>;
+  frame: number;
+  at?: number;
+  duration?: number;
+  color?: string;
+  width?: number;
+  opacity?: number;
+  dashed?: boolean;
+};
 /**
  * A themed edge that draws itself in. Give `d`, or `curve` to curve with the
  * theme's tension. `duration` is a content length that tempo still scales.
@@ -23,20 +30,13 @@ export function DrawPath({
   width,
   opacity = 1,
   dashed = false,
-}: {
-  d?: string;
-  curve?: Readonly<{ from: Point; to: Point; bend?: number }>;
-  frame: number;
-  at?: number;
-  duration?: number;
-  color?: string;
-  width?: number;
-  opacity?: number;
-  dashed?: boolean;
-}): ReactNode {
-  const edge = useGraphicProps("Edge", { color, strokeWidth: width });
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
+}: Readonly<Props>): ReactNode {
+  const edge = GraphicThemeHooks.useGraphicProps("Edge", {
+    color,
+    strokeWidth: width,
+  });
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const path =
     d ?? (curve ? Curve({ ...curve, tension: edge.curveTension }) : "");
   const t = ramp(

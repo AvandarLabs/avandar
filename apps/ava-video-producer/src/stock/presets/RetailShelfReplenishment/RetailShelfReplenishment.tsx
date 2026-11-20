@@ -1,13 +1,9 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-  useGraphicMotion,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getShelfUnitsFromInputAndFrame } from "./getShelfUnitsFromInputAndFrame";
 import { DEFAULT_INPUT } from "./RetailShelfReplenishment.fixtures";
 import { ShelfActors } from "./ShelfActors";
-import { ShelfCarrier } from "./ShelfCarrier";
+import { ShelfCarrier } from "./ShelfCarrier/ShelfCarrier";
 import { ShelfLabels } from "./ShelfLabels";
 import { ShelfOrder } from "./ShelfOrder";
 import { ShelfStructure } from "./ShelfStructure";
@@ -25,9 +21,9 @@ export function RetailShelfReplenishment({
   accent,
   input = DEFAULT_INPUT,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const units = getShelfUnitsFromInputAndFrame({ input, frame, motion });
   const shelfQuantities = input.goods.map((good) => {
     return units.filter((unit) => {

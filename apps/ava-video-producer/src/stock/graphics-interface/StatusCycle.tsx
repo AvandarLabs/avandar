@@ -7,18 +7,12 @@ import { Pill } from "../graphics-common/Pill";
 import { Text } from "../graphics-common/Text";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
 import { SketchedShape } from "../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { GraphicProps } from "../graphics-common/graphicCommon.types";
 import type { StatusCycleInput } from "../presets/StatusCycle/StatusCycle.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: StatusCycleInput };
-
 /** Frames the progress bar waits after processing starts and before done. */
 const PROGRESS_INSET = 3;
 const SPINNER_PERIOD = 45;
@@ -27,17 +21,16 @@ const SPINNER_STROKE = 2.5;
 const DIAL_FILL_ALPHA = 0.035;
 const STATE_SIZE = "37";
 const TRACK_CORNER = 3;
-
 /** Draws the bounded authored status-cycle study at an explicit frame. */
 export function StatusCycle({
   input,
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const { color, stroke, sketch } = useGraphicTokens();
-  const shapes = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const { color, stroke, sketch } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const states = input.states;
   const processing =
     motion.ramp(frame, states[1].at, motion.chip) *

@@ -1,14 +1,11 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Props } from "./QualifyApparentConflict";
 import type { ReactNode } from "react";
 /** The opening question holds between the two apparently conflicting claims. */
 export function ContextQuestion({ frame, input }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const resolution = motion.ramp(frame, 96, motion.scale(24));
   return (
     <>

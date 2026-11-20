@@ -3,7 +3,11 @@ import test from "node:test";
 import { prop } from "@avandar/utils";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
+import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
 import { RecipientConfirmedHandover } from "./RecipientConfirmedHandover";
+import { recipientConfirmedHandoverContract } from "./RecipientConfirmedHandover.contract";
 import {
   changedInput,
   DEFAULT_INPUT,
@@ -13,6 +17,7 @@ import {
   invalidInputs,
 } from "./RecipientConfirmedHandover.fixtures";
 import { inputSchema, type Input } from "./RecipientConfirmedHandover.schema";
+import { registerRecipientActionAssertions } from "./registerRecipientActionAssertions";
 
 function _render({
   frame,
@@ -35,12 +40,6 @@ test("The basket and receipt equal the recipient's selected quantities; unselect
   assert.equal((markup.match(/data-owner="delivery"/g) ?? []).length, 3);
   assert.match(markup, /data-selected="2"/);
 });
-
-import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
-import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
-import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
-import { recipientConfirmedHandoverContract } from "./RecipientConfirmedHandover.contract";
-
 function _getVisibleTexts({ input }: Readonly<{ input: Input }>): string[] {
   return [
     input.scenarioCaption,
@@ -73,13 +72,12 @@ registerStockTextLayoutAssertions({
   excludedTextFields: EXCLUDED_TEXT_FIELDS,
   getVisibleTexts: _getVisibleTexts,
 });
-
 test("receipt quantities equal completed physical moves while each offered unit remains singular", () => {
   fixtures.forEach(({ input }) => {
     Array.from({ length: 90 }, (_, index) => {
       return index * 2;
     }).forEach((frame) => {
-      const markup = _render({ frame: frame, input: input });
+      const markup = _render({ frame, input });
       const objects = [
         ...markup.matchAll(/<g data-good="([^"]*)" data-unit="([^"]*)"[^>]*>/g),
       ];
@@ -139,19 +137,13 @@ test("selection cannot exceed line availability or accepted aggregate limits", (
     {
       ...DENSE_INPUT,
       contents: DENSE_INPUT.contents.map((item) => {
-        return {
-          ...item,
-          offeredUnits: 4,
-        };
+        return { ...item, offeredUnits: 4 };
       }),
     },
     {
       ...DENSE_INPUT,
       contents: DENSE_INPUT.contents.map((item) => {
-        return {
-          ...item,
-          selectedUnits: item.offeredUnits,
-        };
+        return { ...item, selectedUnits: item.offeredUnits };
       }),
     },
   ];
@@ -159,7 +151,6 @@ test("selection cannot exceed line availability or accepted aggregate limits", (
     return assert.equal(inputSchema.safeParse(input).success, false);
   });
 });
-
 function _getUnitCoordinate({
   attributes,
   axis,
@@ -170,7 +161,6 @@ function _getUnitCoordinate({
   assert.ok(transform);
   return Number(transform[axis === "x" ? 1 : 2]);
 }
-
 test("unknown goods, fractional quantities and invalid initials fail strict validation", () => {
   [
     {
@@ -190,7 +180,6 @@ test("unknown goods, fractional quantities and invalid initials fail strict vali
     return assert.equal(inputSchema.safeParse(input).success, false);
   });
 });
-
 test("recipient indicates, pulls and releases each selected unit with a connected hand", () => {
   fixtures.forEach(({ input }) => {
     let ordinal = 0;
@@ -202,7 +191,7 @@ test("recipient indicates, pulls and releases each selected unit with a connecte
         },
       ).forEach((unit) => {
         const frame = 39 + ordinal * 14;
-        const markup = _render({ frame: frame, input: input });
+        const markup = _render({ frame, input });
         const hand = markup.match(/<circle data-recipient-hand[^>]*>/);
         const arm = markup.match(/<path data-recipient-arm[^>]*>/);
         const item = [
@@ -230,13 +219,13 @@ test("recipient indicates, pulls and releases each selected unit with a connecte
           _getUnitCoordinate({ attributes: item[0], axis: "y" }),
         );
         assert.notEqual(
-          _render({ frame: frame - 7, input: input }).match(
+          _render({ frame: frame - 7, input }).match(
             /<circle data-recipient-hand[^>]*>/,
           )?.[0],
           hand[0],
         );
         assert.notEqual(
-          _render({ frame: frame + 7, input: input }).match(
+          _render({ frame: frame + 7, input }).match(
             /<circle data-recipient-hand[^>]*>/,
           )?.[0],
           hand[0],
@@ -246,7 +235,6 @@ test("recipient indicates, pulls and releases each selected unit with a connecte
     });
   });
 });
-
 test("recipient hand releases continuously before reaching for another selected unit", () => {
   Array.from(
     { length: Math.max(0, Math.ceil((5 - 1) / 1)) },
@@ -256,7 +244,7 @@ test("recipient hand releases continuously before reaching for another selected 
   ).forEach((ordinal) => {
     const boundary = 30 + ordinal * 14;
     const hands = [boundary - 0.001, boundary].map((frame) => {
-      const hand = _render({ frame: frame, input: DENSE_INPUT }).match(
+      const hand = _render({ frame, input: DENSE_INPUT }).match(
         /<circle data-recipient-hand[^>]*>/,
       );
       assert.ok(hand);
@@ -271,9 +259,6 @@ test("recipient hand releases continuously before reaching for another selected 
     );
   });
 });
-
-import { registerRecipientActionAssertions } from "./registerRecipientActionAssertions";
-
 /**
  * Rendered markup with each marked sketch-aware shape read as one element.
  * `SketchedShape` draws its plain shape inside a group that carries the
@@ -286,5 +271,4 @@ function _joinMarkedShapes(markup: string): string {
     "<$2$1$3></$2>",
   );
 }
-
 registerRecipientActionAssertions(_render);

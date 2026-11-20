@@ -1,8 +1,5 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { getSpliceGeometryFromInputAndFrame } from "./getSpliceGeometryFromInputAndFrame";
 import type { Input } from "./PipelineStepSplice.schema";
 import type { ReactNode } from "react";
@@ -16,7 +13,6 @@ type Props = {
   joinStyle: Input["joinStyle"];
   accent: string;
 };
-
 /** A continuous ribbon joint's line weight before the theme scales it. */
 const RIBBON_STROKE = 12;
 /** Closing joints meet the actual adjacent module boundaries. */
@@ -28,8 +24,8 @@ export function SpliceJoint({
   joinStyle,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g opacity={closing}>
       <g data-final-join={index} data-from={from.id} data-to={to.id}>

@@ -1,20 +1,11 @@
 import { normalizeFiniteRange } from "../../numeric/normalizeFiniteRange/normalizeFiniteRange";
 import { FitText } from "../../primitives/FitText/FitText";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./EnvironmentalObservationGaps.schema";
 import type { ReactNode } from "react";
 /** Data for Props. */
-type PropsCell = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-};
-
+type PropsCell = { x: number; y: number; width: number; height: number };
 type Props = {
   cell: Input["cells"][number] & PropsCell;
   metric: Input["metric"];
@@ -25,7 +16,6 @@ type Props = {
 const OBSERVED_TINT_FLOOR = 0.12;
 /** How much the tint grows from the weakest to the strongest reading. */
 const OBSERVED_TINT_RANGE = 0.36;
-
 /** Unknown values keep their hatch, independently of all point observations. */
 export function ObservationCell({
   cell,
@@ -33,8 +23,8 @@ export function ObservationCell({
   accent,
   patternId,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const value = cell.value;
   const strength =
     value === null

@@ -1,21 +1,15 @@
 import { Check } from "../../../graphics-common/Check";
 import { SketchedShape } from "../../../primitives/SketchedShape";
-import {
-  useGraphicProps,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 const ICON_Y = 284;
-
 type Props = Readonly<{ x: number; accent: string; active: number }>;
-
 /** The stage's ring icon, a check that fades in and a dot that fades out. */
 export function StageIcon({ x, accent, active }: Props): ReactNode {
-  const style = useGraphicProps("DataPipeline", {});
-  const { sketch } = useGraphicTokens();
-  const shapes = useGraphicShapeScales();
+  const style = GraphicThemeHooks.useGraphicProps("DataPipeline", {});
+  const { sketch } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <>
       <SketchedShape

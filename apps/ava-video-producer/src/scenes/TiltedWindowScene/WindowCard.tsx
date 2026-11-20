@@ -13,12 +13,21 @@ import { useVideoTheme, useVideoTokens } from "../../videoTheme/useVideoTheme";
 import { MediaPlane } from "../MediaPlane";
 import { positioned } from "../positioned";
 import { useWindowStage } from "./useWindowStage";
-import { getScrollOffset } from "./windowMotion";
+import { WindowMotion } from "./WindowMotion/WindowMotion";
+import {
+  type WindowStage,
+  type WindowPose,
+} from "./WindowMotion/WindowMotion.types";
 import type { Rect } from "../layout/layout";
 import type { WindowSource } from "../scenes.types";
-import type { WindowPose, WindowStage } from "./windowMotion";
 import type { ReactNode } from "react";
 
+type WindowContentOptions = {
+  frame: number;
+  source: WindowSource;
+  height: number;
+  stage: WindowStage;
+};
 type Props = {
   frame: number;
   rect: Rect;
@@ -28,15 +37,16 @@ type Props = {
   /** How much of the resting tilt and chrome applies, 0 to 1. Default 1. */
   tilt?: number;
   chrome?: "titlebar" | "none";
-  /** Mirrors the tilt for the right-hand window of a pair. Each defaults to
-   *  `components.WindowTilt`. */
+  /**
+   * Mirrors the tilt for the right-hand window of a pair. Each defaults to
+   * `components.WindowTilt`.
+   */
   rotateX?: number;
   rotateZ?: number;
   perspective?: number;
   /** A clip in the window's own plane, such as a stepped reveal. */
   clipPath?: string;
 };
-
 /**
  * One tilted window card holding a still or footage: rounded, shadowed,
  * with an optional titlebar, posed in 3D and blurred along X while it
@@ -118,22 +128,16 @@ export function WindowCard({
     </>
   );
 }
-
 /** The still or footage, fitted to the window or scrolled through. */
 function _WindowContent({
   frame,
   source,
   height,
   stage,
-}: {
-  frame: number;
-  source: WindowSource;
-  height: number;
-  stage: WindowStage;
-}) {
+}: WindowContentOptions) {
   const position = source.objectPosition ?? { x: 0.5, y: 0 };
   const scroll = source.scrollSteps
-    ? getScrollOffset(frame, source.scrollSteps, stage)
+    ? WindowMotion.getScrollOffset({ frame, steps: source.scrollSteps, stage })
     : undefined;
   return (
     <div style={{ position: "relative", height, overflow: "hidden" }}>

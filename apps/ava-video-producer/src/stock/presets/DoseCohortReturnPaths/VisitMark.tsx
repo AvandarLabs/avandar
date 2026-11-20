@@ -1,5 +1,5 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./DoseCohortReturnPaths.schema";
 import type { ReactNode } from "react";
 
@@ -11,7 +11,7 @@ type Props = {
 };
 /** Distinct record symbols shared by the attendance fabric and its legend. */
 export function VisitMark({ state, x, y, color }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g transform={`translate(${x} ${y})`}>
       <SketchedShape

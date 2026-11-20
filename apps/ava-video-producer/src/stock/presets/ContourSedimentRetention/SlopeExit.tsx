@@ -1,17 +1,13 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./ContourSedimentRetention.schema";
 import type { ReactNode } from "react";
 /** Inputs for SlopeExit. */
 type Props = { input: Input };
-
 /** An optional receiving tray never hides the persistent boundary arrow. */
 export function SlopeExit({ input }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
       <SketchedShape

@@ -1,10 +1,6 @@
 import { propEq } from "@avandar/utils";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getPhrasePositionsFromSentenceParts } from "./getPhrasePositionsFromSentenceParts";
 import { PhraseCopy } from "./PhraseCopy";
 import { PhraseSocket } from "./PhraseSocket";
@@ -32,9 +28,9 @@ export function DraftSlip({
   y,
   role,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const source = getPhrasePositionsFromSentenceParts(input.sentenceParts).find(
     propEq("id", item.partId),
   )!;

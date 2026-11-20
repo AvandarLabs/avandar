@@ -1,23 +1,17 @@
 import { typed } from "../../motion";
 import { getStockDisplayCopyFromDescriptor } from "../copy/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
-import { Arrive } from "../graphics-common/Arrive";
+import { Arrive } from "../graphics-common/Arrive/Arrive";
 import { Check } from "../graphics-common/Check";
 import { Eyebrow } from "../graphics-common/Eyebrow";
 import { Text } from "../graphics-common/Text";
 import { LEGACY_DISPLAY_COPY } from "../presets/legacy/legacyDisplayCopy";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CodeWindow } from "./CodeWindow";
 import type { GraphicProps } from "../graphics-common/graphicCommon.types";
 import type { TerminalTypeInput } from "../presets/TerminalType/TerminalType.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: TerminalTypeInput };
-
 const TYPING_AT = 17;
 const STEPS_AT = 61;
 const STEP_INTERVAL = 22;
@@ -26,23 +20,19 @@ const PROMPT_SIZE = "4xl";
 const STEP_DETAIL_SIZE = "md";
 const RESPONSE_SIZE = "2xl";
 const CARET_CORNER = 1;
-
 /** Draws the bounded authored terminal-type study at an explicit frame. */
 export function TerminalType({
   input,
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const { corner } = useGraphicTokens();
-  const shapes = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const { corner } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const terminalCommand = input.command;
   const steps = input.steps.map((step, index) => {
-    return {
-      ...step,
-      at: STEPS_AT + index * STEP_INTERVAL,
-    };
+    return { ...step, at: STEPS_AT + index * STEP_INTERVAL };
   });
   const command = typed(frame, TYPING_AT, terminalCommand, motion.typing.rate);
   const terminalX = 130;

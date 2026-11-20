@@ -1,22 +1,17 @@
-import {
-  getMotionProgress,
-  useMotionSettingsTheme,
-} from "../motion-components/motionSettings";
+import { MotionSettings } from "../motion-components/MotionSettings/MotionSettings";
 import { SharedElement } from "../motion-components/SharedElement";
 import { useVideoMotion } from "../videoTheme/useVideoMotion";
 import { useVideoShapeScales } from "../videoTheme/useVideoShapeScales";
 import { useVideoProps, useVideoTokens } from "../videoTheme/useVideoTheme";
 import { ContinuityBoxOutline } from "./ContinuityBoxOutline";
-import css from "./ContinuityScene.module.css";
+import css from "./ContinuityScene/ContinuityScene.module.css";
 import { getContinuityTimeline } from "./continuityTimeline";
 import type { ContinuityPlan } from "./continuitySchema";
 import type { ReactNode } from "react";
-
 /** Frame the shared object starts fading in. */
 const FADE_IN_AT = 12;
 /** Frames into its beat an outline token starts fading. */
 const OUTLINE_FADE_AFTER = 60;
-
 /**
  * A single persistent object carries identity across a scene boundary, on
  * the shared object corner and its fades.
@@ -32,7 +27,7 @@ export function ContinuityToken({
   const sharedObject = useVideoProps("SharedObject", {});
   const motion = useVideoMotion();
   const scales = useVideoShapeScales();
-  const settings = useMotionSettingsTheme();
+  const settings = MotionSettings.useMotionSettingsTheme();
   const fade = motion.reveal.easing;
   const isSketched = tokens.sketch.box.roughness > 0;
   const timing = getContinuityTimeline(plan.beats);
@@ -45,14 +40,14 @@ export function ContinuityToken({
   const beat = plan.beats[index];
   if (!beat.token) return null;
   const previous = plan.beats[index - 1]?.token;
-  const progress = getMotionProgress(
+  const progress = MotionSettings.getMotionProgress({
     frame,
-    timing[index].start,
-    Math.max(1, beat.transition.frames),
-    beat.transition.motion,
-    undefined,
-    settings,
-  );
+    at: timing[index].start,
+    duration: Math.max(1, beat.transition.frames),
+    options: beat.transition.motion,
+    fallback: undefined,
+    theme: settings,
+  });
   const destination = beat.token.anchor;
   const source =
     previous?.label === beat.token.label ? previous.anchor : destination;

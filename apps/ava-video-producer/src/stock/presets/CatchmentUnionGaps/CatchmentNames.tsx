@@ -1,21 +1,16 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getFootprintDashFromIndex } from "./getFootprintDashFromIndex";
 import type { Input } from "./CatchmentUnionGaps.schema";
 import type { ReactNode } from "react";
 /** Inputs for CatchmentNames. */
 type Props = { input: Input; accent: string };
-
 /** Matched line swatches identify up to four authored service footprints. */
 export function CatchmentNames({ input, accent }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const { atomic } = useGraphicTheme();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
       {input.catchments.map((catchment, index) => {
@@ -39,7 +34,7 @@ export function CatchmentNames({ input, accent }: Readonly<Props>): ReactNode {
                 ][index]
               }
               strokeWidth={scales.stroke(tokens.stroke.emphasis)}
-              strokeDasharray={getFootprintDashFromIndex(atomic, index)}
+              strokeDasharray={getFootprintDashFromIndex({ atomic, index })}
             />
             <LabelSlots
               labels={[[catchment.label, 40 + index * 230, 97, 210, 12, 3]]}

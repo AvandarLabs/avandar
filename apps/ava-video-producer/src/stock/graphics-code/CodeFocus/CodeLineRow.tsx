@@ -1,25 +1,19 @@
 import { Text } from "../../graphics-common/Text";
 import { LEGACY_ACCENT_HEX } from "../../presets/legacy/legacyAccentHex";
 import { getContentColorFromValue } from "../../theme/getContentColorFromValue/getContentColorFromValue";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { FIRST_LINE_Y, LINE_STEP } from "./CodeFocus.constants";
 import type { CodeFocusInput } from "../../presets/CodeFocus/CodeFocus.schema";
 import type { ReactNode } from "react";
 
 type CodeLine = CodeFocusInput["lines"][number];
-
-type Props = Readonly<{
-  codeTokens: CodeLine;
-  index: number;
-  accent: string;
-}>;
-
+type Props = Readonly<{ codeTokens: CodeLine; index: number; accent: string }>;
 /**
  * One numbered code line. A token in the legacy accent hex keeps meaning the
  * graphic's accent.
  */
 export function CodeLineRow({ codeTokens, index, accent }: Props): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const code = tokens.text.graphic.code;
   const y = FIRST_LINE_Y + index * LINE_STEP;
   return (

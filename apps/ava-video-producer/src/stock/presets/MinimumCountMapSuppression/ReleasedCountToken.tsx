@@ -1,7 +1,4 @@
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { makeCountCopyPositionFromFrame } from "./makeCountCopyPositionFromFrame";
 import type { makePublicCellsFromInput } from "./makePublicCellsFromInput";
 import type { ReactNode } from "react";
@@ -17,8 +14,8 @@ export function ReleasedCountToken({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const { x, y } = makeCountCopyPositionFromFrame({
     motion,
     frame,
@@ -34,7 +31,6 @@ export function ReleasedCountToken({
       fontWeight={tokens.text.graphic.value.fontWeight}
       fontSize={tokens.text.graphic.value.fontSize}
       fill={accent}
-
       textAnchor="middle"
       opacity={motion.ramp(
         frame,

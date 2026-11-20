@@ -1,10 +1,7 @@
 import { propEq } from "@avandar/utils";
 import { mix, ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { RecordedStamp } from "./RecordedStamp";
 import { StampHandling } from "./StampHandling";
 import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
@@ -18,12 +15,10 @@ type Props = {
   index: number;
   accent: string;
 };
-
 /** Frames a stamp takes to travel from its actor into the ledger. */
 const TRAVEL_FRAMES = 20;
 /** Frames a stamp takes to appear. */
 const APPEAR_FRAMES = 5;
-
 function _getEventStamp({
   frame,
   input,
@@ -74,8 +69,8 @@ export function AttributionEvent({
   index,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const stamp = _getEventStamp({ frame, input, event, index, motion });
   return (
     <g

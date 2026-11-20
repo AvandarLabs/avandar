@@ -1,7 +1,7 @@
 import { Text } from "../../graphics-common/Text";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { DisclosedMarker } from "./DisclosedMarker";
 import type { Input } from "./BoundedLocationDisplacement.schema";
 import type { ReactNode } from "react";
@@ -13,7 +13,7 @@ export function PublicDisplacementMap({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g data-display-map="">
       <StockRect

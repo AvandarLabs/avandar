@@ -9,7 +9,7 @@ import {
   type CompositeTokenKind,
   type FieldSpec,
 } from "../tokenCatalog/defineTokensHelpers";
-import { VIDEO_TOKEN_CATALOG } from "../tokenCatalog/tokenCatalogHelpers";
+import { VIDEO_TOKEN_CATALOG } from "../tokenCatalog/tokenCatalogHelpers/tokenCatalogHelpers";
 import {
   colorValueSchema,
   createValueSchemaFromDefinition,

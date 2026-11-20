@@ -2,11 +2,10 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { bundle } from "@remotion/bundler";
 import { buildProduct } from "../build-avandar.mjs";
-import { assetReferences, publicAsset } from "../lib/planHelpers";
+import { assetReferences, publicAsset } from "../lib/planHelpers/planHelpers";
 import { withWorkspaceAliases } from "../lib/withWorkspaceAliases.mjs";
 import { appRoot } from "./ShowcaseFilms/ShowcaseFilms";
 import type { Film } from "../../src/showcase/showcase.types";
-
 /**
  * Headless Chrome options for rendering showcase stills. Every still script
  * uses the same options so two runs on one machine render identical pixels,
@@ -17,7 +16,6 @@ export const SHOWCASE_STILL_BROWSER_OPTIONS = {
   chromiumOptions: { headless: true, gl: "angle" },
   logLevel: "error",
 } as const;
-
 /**
  * Bundles the showcase render entry with one public directory that holds
  * every film's assets, so stills of several films render from one serve URL.

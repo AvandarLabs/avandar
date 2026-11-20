@@ -3,7 +3,11 @@ import test from "node:test";
 import { prop } from "@avandar/utils";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
+import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
 import { HouseholdMarketChoice } from "./HouseholdMarketChoice";
+import { householdMarketChoiceContract } from "./HouseholdMarketChoice.contract";
 import {
   changedInput,
   DEFAULT_INPUT,
@@ -12,6 +16,7 @@ import {
   invalidInputs,
 } from "./HouseholdMarketChoice.fixtures";
 import { inputSchema, type Input } from "./HouseholdMarketChoice.schema";
+import { registerMarketActionAssertions } from "./registerMarketActionAssertions";
 
 function _render({
   frame,
@@ -31,12 +36,6 @@ test("Only chosen products enter the household basket; their summed prices reduc
   assert.equal((markup.match(/data-owner="basket"/g) ?? []).length, 2);
   assert.match(markup, /data-balance="0"/);
 });
-
-import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
-import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
-import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
-import { householdMarketChoiceContract } from "./HouseholdMarketChoice.contract";
-
 function _getVisibleTexts({ input }: Readonly<{ input: Input }>): string[] {
   return [
     input.scenarioCaption,
@@ -64,13 +63,12 @@ registerStockTextLayoutAssertions({
   excludedTextFields: EXCLUDED_TEXT_FIELDS,
   getVisibleTexts: _getVisibleTexts,
 });
-
 test("only chosen physical products leave the shelf and their journey clears participant labels", () => {
   fixtures.forEach(({ input }) => {
     Array.from({ length: 180 }, (_, index) => {
       return index * 1;
     }).forEach((frame) => {
-      const markup = _render({ frame: frame, input: input });
+      const markup = _render({ frame, input });
       const products = [...markup.matchAll(/<g data-product="([^"]*)"[^>]*>/g)];
       assert.equal(products.length, input.products.length);
       products.forEach(([attributes, productId], index) => {
@@ -101,7 +99,7 @@ test("only chosen physical products leave the shelf and their journey clears par
     const price = input.products.filter(prop("chosen")).reduce((sum, item) => {
       return sum + item.price;
     }, 0);
-    const final = _render({ frame: 150, input: input });
+    const final = _render({ frame: 150, input });
     assert.match(final, new RegExp(`data-total="${price}"`));
     if (input.showRemainingBalance) {
       assert.match(
@@ -128,7 +126,6 @@ test("exact spending and thirty available credits remain valid while unaffordabl
     false,
   );
 });
-
 test("retained demo credits remain beside the household after payment", () => {
   const markup = _render({ frame: 150, input: DEFAULT_INPUT });
   const balance = markup.match(/<text data-retained-credits="3"[^>]*>/);
@@ -138,7 +135,6 @@ test("retained demo credits remain beside the household after payment", () => {
       280,
   );
 });
-
 function _getProductCoordinate({
   attributes,
   axis,
@@ -149,16 +145,12 @@ function _getProductCoordinate({
   assert.ok(transform);
   return Number(transform[axis === "x" ? 1 : 2]);
 }
-
 test("unselected and duplicate-ID baskets, fractional prices and extra label keys fail", () => {
   [
     {
       ...DEFAULT_INPUT,
       products: DEFAULT_INPUT.products.map((item) => {
-        return {
-          ...item,
-          chosen: false,
-        };
+        return { ...item, chosen: false };
       }),
     },
     {
@@ -178,15 +170,14 @@ test("unselected and duplicate-ID baskets, fractional prices and extra label key
     return assert.equal(inputSchema.safeParse(input).success, false);
   });
 });
-
 test("shopper reaches only for chosen products, carries them by hand and releases them", () => {
   fixtures.forEach(({ input }) => {
     const selected = input.products.filter(prop("chosen"));
     selected.forEach((product, ordinal) => {
       const start = 34 + ordinal * 24;
-      const before = _render({ frame: start - 2, input: input });
-      const during = _render({ frame: start + 9, input: input });
-      const released = _render({ frame: start + 19, input: input });
+      const before = _render({ frame: start - 2, input });
+      const during = _render({ frame: start + 9, input });
+      const released = _render({ frame: start + 19, input });
       const hand = during.match(/<circle\b[^>]*\bdata-market-hand[^>]*>/);
       const arm = during.match(/<path\b[^>]*\bdata-market-arm[^>]*>/);
       const item = [
@@ -216,14 +207,10 @@ test("shopper reaches only for chosen products, carries them by hand and release
     });
   });
 });
-
-import { registerMarketActionAssertions } from "./registerMarketActionAssertions";
-
 registerMarketActionAssertions(_render);
-
 test("the shopper holds the authored tender in the free hand while choosing products", () => {
   fixtures.forEach(({ input }) => {
-    const markup = _render({ frame: 43, input: input });
+    const markup = _render({ frame: 43, input });
     const arm = markup.match(
       /<path\b(?=[^>]*\bdata-market-arm)[^>]*\sd="M([^ ]+) ([^ ]+)/,
     );

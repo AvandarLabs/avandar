@@ -3,13 +3,14 @@ import { token } from "../defineTokensHelpers";
 function _graphicType(label: string, description: string) {
   return token({ kind: "typeStyle", surface: "graphic", label, description });
 }
-
 function _stageType(label: string, description: string) {
   return token({ kind: "typeStyle", surface: "stage", label, description });
 }
-
 /** A stage text role drawn on the scene palette rather than the ground. */
-function _sceneType(label: string, description: string) {
+function _sceneType({
+  label,
+  description,
+}: Readonly<{ label: string; description: string }>) {
   return token({
     kind: "typeStyle",
     surface: "stage",
@@ -18,7 +19,6 @@ function _sceneType(label: string, description: string) {
     description,
   });
 }
-
 /** Semantic text styles for graphics and for the stage. */
 export const TEXT_TOKENS = {
   graphic: {
@@ -132,63 +132,81 @@ export const TEXT_TOKENS = {
       "Floating label",
       "A label anchored to a point on the stage.",
     ),
-    title: _sceneType(
-      "Title card title",
-      "The words of a title card, rising one by one.",
-    ),
-    kicker: _sceneType("Title card kicker", "The line under a title card."),
-    caption: _sceneType(
-      "Film caption",
-      "Captions over a storyboard film. Long captions fit down from this size.",
-    ),
-    sceneHeading: _sceneType(
-      "Scene heading",
-      "The heading of a scene study. It fits down from this size, and its tracking is measured at this size so it stays constant in pixels.",
-    ),
-    sceneBody: _sceneType(
-      "Scene body",
-      "Body lines in a scene: a scene's subtitle, metric details, and lockup lines.",
-    ),
-    cardTitle: _sceneType(
-      "Scene card title",
-      "The name on a card or node in a scene, such as a graph node.",
-    ),
-    figure: _sceneType(
-      "Scene figure",
-      "Large numerals in a scene, such as a metric or a bar value. A figure fits its own size.",
-    ),
-    windowHeadline: _sceneType(
-      "Window headline",
-      "The headline beside a tilted window. It fits down from this size.",
-    ),
-    barLabel: _sceneType("Bar label", "The name beside a bar in a comparison."),
-    badge: _sceneType(
-      "Badge",
-      "Short bold labels on a lockup, such as a version badge.",
-    ),
-    appTitle: _sceneType(
-      "App title",
-      "The page heading inside the app chrome of a fixed composition.",
-    ),
-    appBody: _sceneType(
-      "App body",
-      "Body and secondary text inside the app chrome of a fixed composition.",
-    ),
-    heroFigure: _sceneType(
-      "Hero figure",
-      "The one headline number a scene builds to, such as the bar comparison's result. It fits its own size.",
-    ),
-    wordmark: _sceneType(
-      "Wordmark",
-      "The brand name beside the mark in a lockup. It fits its own size to the mark.",
-    ),
-    command: _sceneType(
-      "Command line",
-      "A typed command, such as the install command under a lockup. It fits its own size.",
-    ),
-    windowSubtitle: _sceneType(
-      "Window subtitle",
-      "The monospace line under a window headline. It fits its own size.",
-    ),
+    title: _sceneType({
+      label: "Title card title",
+      description: "The words of a title card, rising one by one.",
+    }),
+    kicker: _sceneType({
+      label: "Title card kicker",
+      description: "The line under a title card.",
+    }),
+    caption: _sceneType({
+      label: "Film caption",
+      description:
+        "Captions over a storyboard film. Long captions fit down from this size.",
+    }),
+    sceneHeading: _sceneType({
+      label: "Scene heading",
+      description:
+        "The heading of a scene study. It fits down from this size, and its tracking is measured at this size so it stays constant in pixels.",
+    }),
+    sceneBody: _sceneType({
+      label: "Scene body",
+      description:
+        "Body lines in a scene: a scene's subtitle, metric details, and lockup lines.",
+    }),
+    cardTitle: _sceneType({
+      label: "Scene card title",
+      description:
+        "The name on a card or node in a scene, such as a graph node.",
+    }),
+    figure: _sceneType({
+      label: "Scene figure",
+      description:
+        "Large numerals in a scene, such as a metric or a bar value. A figure fits its own size.",
+    }),
+    windowHeadline: _sceneType({
+      label: "Window headline",
+      description:
+        "The headline beside a tilted window. It fits down from this size.",
+    }),
+    barLabel: _sceneType({
+      label: "Bar label",
+      description: "The name beside a bar in a comparison.",
+    }),
+    badge: _sceneType({
+      label: "Badge",
+      description: "Short bold labels on a lockup, such as a version badge.",
+    }),
+    appTitle: _sceneType({
+      label: "App title",
+      description:
+        "The page heading inside the app chrome of a fixed composition.",
+    }),
+    appBody: _sceneType({
+      label: "App body",
+      description:
+        "Body and secondary text inside the app chrome of a fixed composition.",
+    }),
+    heroFigure: _sceneType({
+      label: "Hero figure",
+      description:
+        "The one headline number a scene builds to, such as the bar comparison's result. It fits its own size.",
+    }),
+    wordmark: _sceneType({
+      label: "Wordmark",
+      description:
+        "The brand name beside the mark in a lockup. It fits its own size to the mark.",
+    }),
+    command: _sceneType({
+      label: "Command line",
+      description:
+        "A typed command, such as the install command under a lockup. It fits its own size.",
+    }),
+    windowSubtitle: _sceneType({
+      label: "Window subtitle",
+      description:
+        "The monospace line under a window headline. It fits its own size.",
+    }),
   },
 } as const;

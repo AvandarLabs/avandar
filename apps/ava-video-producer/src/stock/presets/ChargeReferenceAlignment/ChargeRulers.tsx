@@ -1,4 +1,4 @@
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { AmountRuler } from "./AmountRuler";
 import { DifferenceBracket } from "./DifferenceBracket";
 import { getComparisonFromInput } from "./getComparisonFromInput";
@@ -14,7 +14,7 @@ export function ChargeRulers({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const comparison = getComparisonFromInput(input);
   const progress = comparison.isMatched
     ? motion.ramp(frame, 71, motion.scale(54), motion.travel.easing)

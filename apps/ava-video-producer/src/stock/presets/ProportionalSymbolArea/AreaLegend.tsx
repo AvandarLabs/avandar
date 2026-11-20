@@ -1,15 +1,10 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./ProportionalSymbolArea.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
-
 const COMPARISON_AT = 111;
 const COMPARISON_FRAMES = 28;
 /** Reference area and optional radius ratios use the same square-root scale. */
@@ -18,9 +13,9 @@ export function AreaLegend({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { stroke, sketch } = useGraphicTokens();
-  const shapes = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const { stroke, sketch } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const hairline = shapes.stroke(stroke.hairline);
   const ratio = input.sites[1].value / input.sites[0].value,
     radius = Math.sqrt(input.areaPerUnit / Math.PI);

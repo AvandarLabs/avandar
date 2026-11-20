@@ -1,5 +1,5 @@
 import { mix } from "../../../motion";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { DistanceBracket } from "./DistanceBracket";
 import { PredictionActor } from "./PredictionActor";
 import { PredictionDrop } from "./PredictionDrop";
@@ -19,7 +19,7 @@ export function PredictionParticipant({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const learner = input.learners[index];
   const y = 180 + index * 84;
   const targetX =

@@ -1,9 +1,9 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ExistingPlannerCommitments } from "./ExistingPlannerCommitments";
 import { PlannerAppointments } from "./PlannerAppointments";
 import { PlannerGrid } from "./PlannerGrid";
-import { PlannerPeople } from "./PlannerPeople";
+import { PlannerPeople } from "./PlannerPeople/PlannerPeople";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./PersonLedSupportCalendar.schema";
 import type { ReactNode } from "react";
@@ -18,7 +18,7 @@ export function PersonLedSupportCalendar({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g>
       <LabelSlots

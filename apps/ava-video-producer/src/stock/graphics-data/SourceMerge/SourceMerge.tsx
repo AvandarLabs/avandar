@@ -4,7 +4,7 @@ import { GRAPHIC_WIDTH } from "../../graphics-common/graphicCanvas.constants";
 import { Text } from "../../graphics-common/Text";
 import { LEGACY_DISPLAY_COPY } from "../../presets/legacy/legacyDisplayCopy";
 import { getContentColorFromValue } from "../../theme/getContentColorFromValue/getContentColorFromValue";
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { Destination } from "./Destination";
 import { MergeNode } from "./MergeNode";
 import { OutputEdge } from "./OutputEdge";
@@ -14,14 +14,13 @@ import type { SourceMergeInput } from "../../presets/SourceMerge/SourceMerge.sch
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: SourceMergeInput };
-
 /** Draws the bounded authored source-merge study at an explicit frame. */
 export function SourceMerge({
   input,
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
       <Eyebrow>

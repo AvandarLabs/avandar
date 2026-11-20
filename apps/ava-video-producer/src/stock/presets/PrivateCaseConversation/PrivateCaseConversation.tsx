@@ -1,6 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { ConversationFurniture } from "./ConversationFurniture";
-import { ConversationPartition } from "./ConversationPartition";
+import { ConversationPartition } from "./ConversationPartition/ConversationPartition";
 import { ConversationPeople } from "./ConversationPeople";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./PrivateCaseConversation.schema";

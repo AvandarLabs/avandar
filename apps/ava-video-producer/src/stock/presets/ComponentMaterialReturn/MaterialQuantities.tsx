@@ -1,4 +1,4 @@
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getMaterialBalanceFromInput } from "./getMaterialBalanceFromInput";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./ComponentMaterialReturn.schema";
@@ -13,7 +13,7 @@ export function MaterialQuantities({
   frame,
   assembled,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const { returned, replacement, recycle, residue } =
     getMaterialBalanceFromInput(input);
   const values = [

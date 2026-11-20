@@ -1,16 +1,17 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getVisibleReleaseIssueRowsFromInput } from "./getVisibleReleaseIssueRowsFromInput";
 import type { Input } from "./ReleaseRepairObligations.schema";
 import type { ReactNode } from "react";
 
-type Props = { input: Input; frame: number; accent: string; artifactX: number };
+type Props = {
+  input: Input;
+  frame: number;
+  accent: string;
+  artifactX: number;
+};
 /** The guide artifact's corner, before the theme's corner style. */
 const GUIDE_CORNER = 3;
 /**
@@ -22,9 +23,9 @@ export function ReleaseArtifact({
   accent,
   artifactX,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const visibleIssues = getVisibleReleaseIssueRowsFromInput(input);
   return (
     <g opacity={motion.reveal(frame, 12)}>

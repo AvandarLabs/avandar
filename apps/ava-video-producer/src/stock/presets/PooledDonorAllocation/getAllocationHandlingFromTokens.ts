@@ -4,8 +4,13 @@ import { getAllocationTokensFromInputAndFrame } from "./getAllocationTokensFromI
 import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./PooledDonorAllocation.schema";
 
+type GetPreviousScoopOptions = {
+  input: Input;
+  index: number;
+  batch: ReturnType<typeof _getBatchBounds>;
+  motion: VideoMotion;
+};
 type Token = ReturnType<typeof getAllocationTokensFromInputAndFrame>[number];
-
 function _getBatchBounds({
   tokens,
   requestId,
@@ -17,18 +22,12 @@ function _getBatchBounds({
   const bottom = Math.max(...batch.map(prop("y"))) + 24;
   return { right, bottom, width: right - left, height: bottom - top };
 }
-
 function _getPreviousScoop({
   input,
   index,
   batch,
   motion,
-}: Readonly<{
-  input: Input;
-  index: number;
-  batch: ReturnType<typeof _getBatchBounds>;
-  motion: VideoMotion;
-}>) {
+}: Readonly<GetPreviousScoopOptions>) {
   if (index === 0) {
     return { ...batch, right: 893, bottom: 355 };
   }
@@ -50,16 +49,18 @@ type GetAllocationHandlingResult = {
   handY: number;
   opacity: number;
 };
-
 type AllocationHandlingArgs = Readonly<{
   input: Input;
   frame: number;
   tokens: readonly Token[];
   motion: VideoMotion;
 }>;
-
 /** The scoop's pickup, lift, and release for one batch, each 0 to 1. */
-function _getHandlingPhases(frame: number, start: number, motion: VideoMotion) {
+function _getHandlingPhases({
+  frame,
+  start,
+  motion,
+}: Readonly<{ frame: number; start: number; motion: VideoMotion }>) {
   return {
     pickup: motion.ramp(frame, start, motion.scale(1), motion.entrance.easing),
     lift: motion.ramp(
@@ -76,7 +77,6 @@ function _getHandlingPhases(frame: number, start: number, motion: VideoMotion) {
     ),
   };
 }
-
 /**
  * The empty scoop resizes while repositioning, then rigidly carries its batch.
  */
@@ -95,7 +95,11 @@ export function getAllocationHandlingFromTokens({
     tokens,
     requestId: input.requests[index].id,
   });
-  const { pickup, lift, release } = _getHandlingPhases(frame, start, motion);
+  const { pickup, lift, release } = _getHandlingPhases({
+    frame,
+    start,
+    motion,
+  });
   const previous = _getPreviousScoop({ input, index, batch, motion });
   const handX = mix(pickup, previous.right, batch.right);
   const handY = mix(lift, previous.bottom, batch.bottom + release * 26);

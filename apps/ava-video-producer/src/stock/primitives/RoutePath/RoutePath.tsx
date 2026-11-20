@@ -1,7 +1,4 @@
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SketchedShape } from "../SketchedShape";
 import {
   type RouteTravel,
@@ -18,15 +15,14 @@ type PropsResult = {
   color?: string;
   showMarker?: boolean;
 };
-
 type Props = RouteTravel & PropsResult;
-
-function _validateRouteStage([x, y, width, height]: readonly [
-  number,
-  number,
-  number,
-  number,
-]): void {
+type ValidateRouteStageOptions = readonly [number, number, number, number];
+function _validateRouteStage([
+  x,
+  y,
+  width,
+  height,
+]: ValidateRouteStageOptions): void {
   if (
     ![x, y, width, height].every(Number.isFinite) ||
     width <= 0 ||
@@ -35,7 +31,6 @@ function _validateRouteStage([x, y, width, height]: readonly [
     throw new Error("Route stage dimensions must be positive and finite.");
   }
 }
-
 /** Draws the supplied polyline and an optional arc-length travel marker. */
 export function RoutePath({
   points,
@@ -47,8 +42,8 @@ export function RoutePath({
   color,
   showMarker = true,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const ink = color ?? tokens.color.positive;
   _validateRouteStage([x, y, width, height]);
   const marker = getRoutePointFromProgress({ points, progress });

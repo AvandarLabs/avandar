@@ -1,13 +1,12 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./QueueRelief.schema";
 import type { ReactNode } from "react";
 /** Inputs for QueueHeadings. */
 type Props = { frame: number; input: Input };
-
 /** Queue, completion and expansion captions label their respective regions. */
 export function QueueHeadings({ frame, input }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g>
       <g opacity={motion.ramp(frame, 54, motion.hero)}>

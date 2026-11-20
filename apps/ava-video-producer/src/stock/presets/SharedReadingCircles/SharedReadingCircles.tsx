@@ -1,12 +1,8 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
-import { ReadingBook } from "./ReadingBook";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { ReadingBook } from "./ReadingBook/ReadingBook";
 import { ReadingHeadings } from "./ReadingHeadings";
-import { ReadingLearner } from "./ReadingLearner";
+import { ReadingLearner } from "./ReadingLearner/ReadingLearner";
 import { SceneText } from "./SceneText";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./SharedReadingCircles.schema";
@@ -21,9 +17,9 @@ export function SharedReadingCircles({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
       <ReadingHeadings input={input} />

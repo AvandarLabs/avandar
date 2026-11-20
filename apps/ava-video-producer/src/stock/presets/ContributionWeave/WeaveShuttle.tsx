@@ -1,6 +1,6 @@
 import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { WeaveCrossing } from "./WeaveCrossing";
 import type { Input } from "./ContributionWeave.schema";
 import type { ReactNode } from "react";
@@ -12,7 +12,6 @@ type Props = {
   frame: number;
   id: string;
 };
-
 /** Frames one shuttle pass takes, which also spaces the passes. */
 const PASS_FRAMES = 24;
 /** Frames a weft band takes to fade in. */
@@ -25,7 +24,7 @@ export function WeaveShuttle({
   frame,
   id,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const y = 240 + (index * 180) / (input.weft.length - 1);
   const progress = ramp(
     frame,

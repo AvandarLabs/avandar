@@ -1,4 +1,4 @@
-import { useGraphicTokens } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = { opening: number };
@@ -12,7 +12,7 @@ const OPAQUE = 1;
  * complete paper.
  */
 export function EnvelopeCover({ opening }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <rect
       data-opaque-cover={opening === 0 ? "closed" : "peeling"}

@@ -1,12 +1,7 @@
 import { mix } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicMotion,
-  useGraphicShapeScales,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./ChoroplethClassBreaks.schema";
 import type { ReactNode } from "react";
 
@@ -18,10 +13,8 @@ type Props = {
   accent: string;
   noDataLabel: string;
 };
-
 const ZONE_AT = 13;
 const ZONE_FRAMES = 25;
-
 function _getZoneState({
   zone,
   index,
@@ -58,10 +51,10 @@ export function ClassZone({
   accent,
   noDataLabel,
 }: Readonly<Props>): ReactNode {
-  const { color: colors, stroke } = useGraphicTokens();
-  const { atomic } = useGraphicTheme();
-  const shapes = useGraphicShapeScales();
-  const motion = useGraphicMotion();
+  const { color: colors, stroke } = GraphicThemeHooks.useGraphicTokens();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const arrival = motion.ramp(
     frame,
     ZONE_AT + index * motion.stagger.list,

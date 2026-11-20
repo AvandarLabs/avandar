@@ -1,12 +1,9 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicTokens,
-  useGraphicMotion,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getRehearsalFromFrame } from "./getRehearsalFromFrame";
-import { PracticeInterior } from "./PracticeInterior";
-import { PracticePeople } from "./PracticePeople";
+import { PracticeInterior } from "./PracticeInterior/PracticeInterior";
+import { PracticePeople } from "./PracticePeople/PracticePeople";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./SchoolTransitionRehearsal.schema";
 import type { ReactNode } from "react";
@@ -20,8 +17,8 @@ export function SchoolTransitionRehearsal({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
-  const tokens = useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const scene = getRehearsalFromFrame({ frame, input, motion });
   return (
     <g>

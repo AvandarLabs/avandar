@@ -1,17 +1,15 @@
 import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./GroupedValuePicker.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number };
-
 /** Frames the formula takes to fade in. */
 const FORMULA_FRAMES = 5;
-
 /** The completed fold states the count or exact numeric calculation. */
 export function PickerFormula({ input, frame }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const numeric = input.observations.flatMap(({ value }) => {
     return value === null ? [] : [value];
   });

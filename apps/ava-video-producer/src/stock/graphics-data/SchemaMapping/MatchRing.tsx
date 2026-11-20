@@ -1,11 +1,7 @@
 import { Check } from "../../graphics-common/Check";
 import { GRAPHIC_WIDTH } from "../../graphics-common/graphicCanvas.constants";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicProps,
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -14,14 +10,13 @@ type Props = {
   opacity: number;
   showCheck: boolean;
 };
-
 /**
  * The ring on the centre line where a mapping connects, with an optional check.
  */
 export function MatchRing({ y, color, opacity, showCheck }: Props): ReactNode {
-  const style = useGraphicProps("SchemaMapping", {});
-  const tokens = useGraphicTokens();
-  const shapes = useGraphicShapeScales();
+  const style = GraphicThemeHooks.useGraphicProps("SchemaMapping", {});
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
   const x = GRAPHIC_WIDTH / 2;
   return (
     <g opacity={opacity}>

@@ -1,15 +1,11 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getHandoverPositionFromInputAndFrame } from "./getHandoverPositionFromInputAndFrame";
 import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
 import type { Input } from "./RecipientConfirmedHandover.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string; index: number };
-
 /**
  * Receipt numbers count only the units that have completed their physical pull.
  */
@@ -19,8 +15,8 @@ export function HandoverReceiptRow({
   accent,
   index,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const content = input.contents[index];
   const received = _countReceivedUnits({ input, frame, index, motion });
   return (
@@ -49,7 +45,6 @@ export function HandoverReceiptRow({
     </g>
   );
 }
-
 /** How many selected units of a good have completed their pull. */
 function _countReceivedUnits({
   input,

@@ -1,4 +1,4 @@
-import { SvgObjectDeparture } from "../../motion-components/SvgObjectDeparture";
+import { SvgObjectDeparture } from "../../motion-components/SvgObjectDeparture/SvgObjectDeparture";
 import { StockGraphic } from "../../stock/StockGraphic/StockGraphic";
 import { useContinuityAppearance } from "../ContinuityAppearanceContext";
 import { sampleStockFrame } from "../continuityTimeline";

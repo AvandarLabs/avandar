@@ -1,12 +1,8 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-  useGraphicMotion,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { AgreementTab } from "./AgreementTab";
-import { BookingParticipant } from "./BookingParticipant";
+import { BookingParticipant } from "./BookingParticipant/BookingParticipant";
 import { getBookingFromFrame } from "./getBookingFromFrame";
 import { OriginalRequest } from "./OriginalRequest";
 import type { Input } from "./SharedWorkshopBooking.schema";
@@ -22,9 +18,9 @@ export function BookingRequest({
   index,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const request = input.requests[index];
   const scene = getBookingFromFrame({ input, frame, index, motion });
   return (

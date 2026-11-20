@@ -1,9 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ReferralLane } from "./ReferralLane";
 import { ReferralLedger } from "./ReferralLedger";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
@@ -17,8 +14,8 @@ export function ReferralReturnAcknowledgement({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g opacity={motion.ramp(frame, 12, motion.hero, motion.reveal.easing)}>
       <FitText

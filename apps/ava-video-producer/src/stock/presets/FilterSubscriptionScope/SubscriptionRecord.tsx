@@ -1,10 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
-import {
-  useGraphicMotion,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getExclusionFromFrame } from "./getExclusionFromFrame";
 import { SubscriptionMask } from "./SubscriptionMask";
 import type { Input } from "./FilterSubscriptionScope.schema";
@@ -20,7 +16,6 @@ type Props = {
   frame: number;
   accent: string;
 };
-
 /** Excluded source records are masked in subscribed tables only. */
 export function SubscriptionRecord({
   record,
@@ -32,12 +27,12 @@ export function SubscriptionRecord({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const excluded =
       view.subscribed && record.category !== input.selectedCategory,
-    progress = getExclusionFromFrame(frame, motion);
+    progress = getExclusionFromFrame({ frame, motion });
   const y = 218 + rowIndex * 48,
     opacity = excluded
       ? input.showExcludedRecords

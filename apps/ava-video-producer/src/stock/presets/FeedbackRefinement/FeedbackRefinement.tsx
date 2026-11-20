@@ -1,11 +1,7 @@
 import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import {
-  useGraphicMotion,
-  useGraphicTheme,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { FeedbackDraft } from "./FeedbackDraft";
 import { FeedbackNote } from "./FeedbackNote";
 import { getFeedbackStateFromInputAndFrame } from "./getFeedbackStateFromInputAndFrame";
@@ -14,7 +10,6 @@ import type { Input } from "./FeedbackRefinement.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
-
 /** Frames the whole study takes to fade in. */
 const INTRO_FRAMES = 20;
 /**
@@ -27,9 +22,9 @@ export function FeedbackRefinement({
   accent,
   id,
 }: Readonly<Props>): ReactNode {
-  const { atomic } = useGraphicTheme();
-  const tokens = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const state = getFeedbackStateFromInputAndFrame({ frame, input, motion });
   return (
     <g

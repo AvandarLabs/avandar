@@ -1,13 +1,13 @@
 import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { DuplicateGroup } from "./DuplicateGroup";
+import { ReviewHeadings } from "./ReviewHeadings";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./DuplicateReviewStack.schema";
 import type { ReactNode } from "react";
 /** Frame, theme and complete validated authored input. */
 export type Props = GraphicProps & { input: Input };
-
 /** Frames the whole review takes to fade in. */
 const INTRO_FRAMES = 20;
 /** Candidate records align by comparison data before explicit retention. */
@@ -16,7 +16,7 @@ export function DuplicateReviewStack({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g
       opacity={ramp(
@@ -40,33 +40,5 @@ export function DuplicateReviewStack({
         );
       })}
     </g>
-  );
-}
-
-/** The review's title over the field the candidates are compared on. */
-function ReviewHeadings({ input }: Readonly<{ input: Input }>): ReactNode {
-  return (
-    <>
-      <FitText
-        text={input.title}
-        x={44}
-        y={50}
-        width={872}
-        fontSize={24}
-        maxLines={2}
-        breakLongWords
-        normalizeWhitespace
-      />
-      <FitText
-        text={input.comparisonFieldLabel}
-        x={44}
-        y={110}
-        width={872}
-        fontSize={14}
-        maxLines={1}
-        breakLongWords
-        normalizeWhitespace
-      />
-    </>
   );
 }

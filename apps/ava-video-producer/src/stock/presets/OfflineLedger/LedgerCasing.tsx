@@ -1,20 +1,16 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicShapeScales,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./OfflineLedger.schema";
 import type { ReactNode } from "react";
 
 type Props = { shape: Input["deviceShape"]; accent: string };
-
 /** A tablet or laptop casing's corner before the corner style scales it. */
 const DEVICE_CORNER = 22;
 /** Three casing silhouettes retain the same notebook and storage geometry. */
 export function LedgerCasing({ shape, accent }: Readonly<Props>): ReactNode {
-  const tokens = useGraphicTokens();
-  const scales = useGraphicShapeScales();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g data-casing={shape}>
       <StockRect

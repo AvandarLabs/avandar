@@ -146,7 +146,7 @@ delivery dimensions together; the CLI checks matching aspect ratios.
 
 ## Layout
 
-`src/motion.ts` vocabulary · `src/title-card.tsx` cold open ·
+`src/motion.ts` vocabulary · `src/TitleCard/TitleCard.tsx` cold open ·
 `src/chrome.tsx` window, cursor, click beats · `src/compositions/` clips ·
 `src/scenes/` reusable scenes · `src/storyboard/` schema and film renderer ·
 `storyboards/` reviewed film inputs · `capture-flows/` real UI actions ·
