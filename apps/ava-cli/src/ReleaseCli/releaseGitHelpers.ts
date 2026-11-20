@@ -156,6 +156,17 @@ export function readTreeSha(
   return git.readGit(["rev-parse", `${revision}^{tree}`]);
 }
 
+/** The tree, parents, and message {@link createReleaseCommit} writes. */
+type ReleaseCommitOptions = {
+  /** The source branch's tree, released verbatim. */
+  releaseTreeSha: string;
+  /** `origin/<target>`, the first parent. */
+  targetParentSha: string;
+  /** The source-branch commit released, the second parent. */
+  sourceParentSha: string;
+  message: string;
+};
+
 /**
  * Builds the release commit: the source branch's tree verbatim, with the
  * target branch and the source branch as its two parents (`main` and
@@ -177,12 +188,7 @@ export function readTreeSha(
  */
 export function createReleaseCommit(
   git: ReleaseCommands,
-  options: {
-    releaseTreeSha: string;
-    targetParentSha: string;
-    sourceParentSha: string;
-    message: string;
-  },
+  options: Readonly<ReleaseCommitOptions>,
 ): string | undefined {
   const { releaseTreeSha, targetParentSha, sourceParentSha, message } = options;
 

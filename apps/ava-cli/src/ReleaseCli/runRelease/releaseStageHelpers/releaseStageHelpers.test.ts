@@ -2,7 +2,12 @@ import {
   ALPHA_RELEASE_LINE,
   MAINLINE_RELEASE_LINE,
 } from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
-import { reportReleaseNotesOutcome } from "@ava-cli/ReleaseCli/runRelease/releaseStageHelpers/releaseConfirmationStages";
+import { promptToConfirm } from "@ava-cli/ReleaseCli/releasePromptHelpers";
+import {
+  confirmReleasePlan,
+  printReleaseSummary,
+  reportReleaseNotesOutcome,
+} from "@ava-cli/ReleaseCli/runRelease/releaseStageHelpers/releaseConfirmationStages";
 import {
   bumpSourceToNextVersion,
   commitReleaseVersionOnSource,
@@ -18,16 +23,19 @@ import type {
 import type { ReleaseLine } from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
 import type { ReleasePlan } from "@ava-cli/ReleaseCli/runRelease/releaseStageHelpers/releaseStageHelpers";
 
+vi.mock("@ava-cli/ReleaseCli/releasePromptHelpers");
+
 const OK: CommandResult = { ok: true, stdout: "", stderr: "" };
 
 /**
  * A `ReleaseCommands` that runs nothing and records every mutation as one
  * space-joined string, so a test can assert the exact commands a stage would
  * run. `commit-tree` answers with `release-commit-sha`, a tree lookup with
- * `tree-sha`, and `worktree list` with `worktreeList`.
+ * `tree-sha`, `worktree list` with `worktreeList`, and the origin URL with
+ * `remoteUrl`.
  */
 function _createFakeCommands(
-  options: Readonly<{ worktreeList?: string }> = {},
+  options: Readonly<{ worktreeList?: string; remoteUrl?: string }> = {},
 ): { git: ReleaseCommands; mutations: string[] } {
   const mutations: string[] = [];
   const recordMutation = (
@@ -46,11 +54,13 @@ function _createFakeCommands(
       const lastArg = args.at(-1) ?? "";
       return args[0] === "worktree"
         ? (options.worktreeList ?? "")
-        : lastArg.endsWith("^{tree}")
-          ? "tree-sha"
-          : lastArg === "HEAD"
-            ? "head-sha"
-            : undefined;
+        : args[0] === "remote"
+          ? options.remoteUrl
+          : lastArg.endsWith("^{tree}")
+            ? "tree-sha"
+            : lastArg === "HEAD"
+              ? "head-sha"
+              : undefined;
     },
     tryGit: () => {
       return OK;
@@ -64,23 +74,43 @@ function _createFakeCommands(
   return { git, mutations };
 }
 
-/** A plan for releasing 0.15.0 on alpha, or 0.14.2 on mainline. */
+/** Each line's test plan versions: 0.15.0 on alpha, 0.14.2 on mainline. */
+const PLAN_VERSIONS_BY_KIND: Readonly<
+  Record<ReleaseLine["kind"], Omit<ReleasePlan, "line">>
+> = {
+  alpha: {
+    sourceVersion: "0.15.0-alpha-dev",
+    releaseVersion: "0.15.0",
+    publishedVersion: "0.15.0-alpha",
+    nextVersion: "0.15.1",
+    releaseTag: "v0.15.0-alpha",
+  },
+  mainline: {
+    sourceVersion: "0.14.2-dev",
+    releaseVersion: "0.14.2",
+    publishedVersion: "0.14.2",
+    nextVersion: "0.14.3",
+    releaseTag: "v0.14.2",
+  },
+};
+
+/** A plan for releasing `line` at its versions in `PLAN_VERSIONS_BY_KIND`. */
 function _createPlan(line: ReleaseLine): ReleasePlan {
-  return line.kind === "alpha"
-    ? {
-        line,
-        sourceVersion: "0.15.0-alpha-dev",
-        releaseVersion: "0.15.0",
-        nextVersion: "0.15.1",
-        releaseTag: "v0.15.0-alpha",
-      }
-    : {
-        line,
-        sourceVersion: "0.14.2-dev",
-        releaseVersion: "0.14.2",
-        nextVersion: "0.14.3",
-        releaseTag: "v0.14.2",
-      };
+  return { line, ...PLAN_VERSIONS_BY_KIND[line.kind] };
+}
+
+/** Everything a spied `Acclimate.log` printed, one call per line. */
+function _getLoggedText(): string {
+  return vi
+    .mocked(Acclimate.log)
+    .mock.calls.map((call) => {
+      return call
+        .map((arg) => {
+          return typeof arg === "string" ? arg : JSON.stringify(arg);
+        })
+        .join(" ");
+    })
+    .join("\n");
 }
 
 describe("release stages", () => {
@@ -208,7 +238,7 @@ describe("release stages", () => {
     );
   });
 
-  it("keeps the mainline release commit message unchanged", () => {
+  it("titles the mainline release commit Release 0.14.2, carrying develop's tree onto main", () => {
     const { git, mutations } = _createFakeCommands();
 
     publishTargetAndTag(git, {
@@ -254,107 +284,100 @@ describe("release stages", () => {
 });
 
 describe("reportReleaseNotesOutcome", () => {
-  let logSpy: ReturnType<typeof vi.spyOn>;
+  const MAINLINE_PLAN = _createPlan(MAINLINE_RELEASE_LINE);
+  const ALPHA_PLAN = _createPlan(ALPHA_RELEASE_LINE);
 
   beforeEach(() => {
-    logSpy = vi.spyOn(Acclimate, "log").mockImplementation(() => {
+    vi.spyOn(Acclimate, "log").mockImplementation(() => {
       return undefined;
     });
   });
   afterEach(() => {
-    logSpy.mockRestore();
+    vi.restoreAllMocks();
   });
-
-  function _loggedText(): string {
-    return logSpy.mock.calls
-      .map((call) => {
-        return call
-          .map((arg) => {
-            return typeof arg === "string" ? arg : JSON.stringify(arg);
-          })
-          .join(" ");
-      })
-      .join("\n");
-  }
 
   it("prints nothing when notes were published", () => {
     reportReleaseNotesOutcome(
-      { kind: "published", url: "https://github.com/x/y/releases/tag/v1.0.0" },
-      { line: MAINLINE_RELEASE_LINE, releaseVersion: "1.0.0", dryRun: false },
+      { kind: "published", url: "https://github.com/x/y/releases/tag/v0.14.2" },
+      { plan: MAINLINE_PLAN, dryRun: false },
     );
-    expect(logSpy).not.toHaveBeenCalled();
+    expect(Acclimate.log).not.toHaveBeenCalled();
   });
 
   it("prints the preview notes on a dry run without a retry hint", () => {
     reportReleaseNotesOutcome(
       { kind: "previewed", notes: "- Did a thing" },
-      { line: MAINLINE_RELEASE_LINE, releaseVersion: "1.0.0", dryRun: false },
+      { plan: MAINLINE_PLAN, dryRun: false },
     );
-    expect(_loggedText()).toContain("Did a thing");
-    expect(_loggedText()).not.toContain("ava release notes");
+    expect(_getLoggedText()).toContain("Did a thing");
+    expect(_getLoggedText()).not.toContain("ava release notes");
   });
 
   it("prints an informational line for no-changes", () => {
     reportReleaseNotesOutcome(
       { kind: "no-changes" },
-      { line: MAINLINE_RELEASE_LINE, releaseVersion: "1.0.0", dryRun: false },
+      { plan: MAINLINE_PLAN, dryRun: false },
     );
-    expect(_loggedText()).toContain("No commits found");
+    expect(_getLoggedText()).toContain("No commits found");
   });
 
   it("warns and prints the retry command when publishing failed", () => {
     reportReleaseNotesOutcome(
       { kind: "failed", reason: "network error" },
-      { line: MAINLINE_RELEASE_LINE, releaseVersion: "1.0.0", dryRun: false },
+      { plan: MAINLINE_PLAN, dryRun: false },
     );
-    expect(_loggedText()).toContain("network error");
-    expect(_loggedText()).toContain("ava release notes --version 1.0.0");
+    expect(_getLoggedText()).toContain("network error");
+    expect(_getLoggedText()).toContain("ava release notes --version 0.14.2");
+    expect(_getLoggedText()).not.toContain("--alpha");
   });
 
   it("warns when a release already exists, without a retry hint", () => {
     reportReleaseNotesOutcome(
       {
         kind: "already-exists",
-        url: "https://github.com/x/y/releases/tag/v1.0.0",
+        url: "https://github.com/x/y/releases/tag/v0.14.2",
       },
-      { line: MAINLINE_RELEASE_LINE, releaseVersion: "1.0.0", dryRun: false },
+      { plan: MAINLINE_PLAN, dryRun: false },
     );
-    expect(_loggedText()).toContain("already exist");
-    expect(_loggedText()).not.toContain("ava release notes");
+    expect(_getLoggedText()).toContain(
+      "Release notes already exist for v0.14.2",
+    );
+    expect(_getLoggedText()).not.toContain("ava release notes");
   });
 
   it("warns and prints the retry command when the tag can't be found", () => {
     reportReleaseNotesOutcome(
       { kind: "tag-not-found" },
-      { line: MAINLINE_RELEASE_LINE, releaseVersion: "1.0.0", dryRun: false },
+      { plan: MAINLINE_PLAN, dryRun: false },
     );
-    expect(_loggedText()).toContain("ava release notes --version 1.0.0");
+    expect(_getLoggedText()).toContain("Could not find tag v0.14.2");
+    expect(_getLoggedText()).toContain("ava release notes --version 0.14.2");
   });
 
   it("suppresses the retry hint for a failed outcome on a dry run", () => {
     reportReleaseNotesOutcome(
       { kind: "failed", reason: "network error" },
-      { line: MAINLINE_RELEASE_LINE, releaseVersion: "1.0.0", dryRun: true },
+      { plan: MAINLINE_PLAN, dryRun: true },
     );
-    expect(_loggedText()).toContain("network error");
-    expect(_loggedText()).not.toContain("ava release notes");
+    expect(_getLoggedText()).toContain("network error");
+    expect(_getLoggedText()).not.toContain("ava release notes");
   });
 
   it("suppresses the retry hint for tag-not-found on a dry run", () => {
     reportReleaseNotesOutcome(
       { kind: "tag-not-found" },
-      { line: MAINLINE_RELEASE_LINE, releaseVersion: "1.0.0", dryRun: true },
+      { plan: MAINLINE_PLAN, dryRun: true },
     );
-    expect(_loggedText()).not.toContain("ava release notes");
+    expect(_getLoggedText()).not.toContain("ava release notes");
   });
 
   it("names the -alpha tag and retries with --alpha on the alpha line", () => {
     reportReleaseNotesOutcome(
       { kind: "tag-not-found" },
-      { line: ALPHA_RELEASE_LINE, releaseVersion: "0.15.0", dryRun: false },
+      { plan: ALPHA_PLAN, dryRun: false },
     );
-    expect(_loggedText()).toContain("Could not find tag v0.15.0-alpha");
-    expect(_loggedText()).toContain(
+    expect(_getLoggedText()).toContain("Could not find tag v0.15.0-alpha");
+    expect(_getLoggedText()).toContain(
       "ava release notes --version 0.15.0 --alpha",
     );
   });
@@ -365,10 +388,121 @@ describe("reportReleaseNotesOutcome", () => {
         kind: "already-exists",
         url: "https://github.com/x/y/releases/tag/v0.15.0-alpha",
       },
-      { line: ALPHA_RELEASE_LINE, releaseVersion: "0.15.0", dryRun: false },
+      { plan: ALPHA_PLAN, dryRun: false },
     );
-    expect(_loggedText()).toContain(
+    expect(_getLoggedText()).toContain(
       "Release notes already exist for v0.15.0-alpha",
+    );
+  });
+});
+
+describe("confirmReleasePlan", () => {
+  beforeEach(() => {
+    vi.spyOn(Acclimate, "log").mockImplementation(() => {
+      return undefined;
+    });
+    vi.mocked(promptToConfirm).mockResolvedValue(true);
+  });
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("asks to release 0.15.0-alpha to PRODUCTION on the alpha line", async () => {
+    const { git } = _createFakeCommands();
+
+    await confirmReleasePlan(git, {
+      plan: _createPlan(ALPHA_RELEASE_LINE),
+      originSourceSha: "source-sha",
+      originTargetSha: "target-sha",
+      assumeYes: false,
+    });
+
+    expect(promptToConfirm).toHaveBeenCalledExactlyOnceWith(
+      "Release 0.15.0-alpha to PRODUCTION?",
+    );
+  });
+
+  it("asks to release 0.14.2, without a destination, on the mainline", async () => {
+    const { git } = _createFakeCommands();
+
+    await confirmReleasePlan(git, {
+      plan: _createPlan(MAINLINE_RELEASE_LINE),
+      originSourceSha: "source-sha",
+      originTargetSha: "target-sha",
+      assumeYes: false,
+    });
+
+    expect(promptToConfirm).toHaveBeenCalledExactlyOnceWith("Release 0.14.2?");
+  });
+
+  it("warns that pushing alpha deploys production before asking", async () => {
+    const { git } = _createFakeCommands();
+
+    await confirmReleasePlan(git, {
+      plan: _createPlan(ALPHA_RELEASE_LINE),
+      originSourceSha: "source-sha",
+      originTargetSha: "target-sha",
+      assumeYes: false,
+    });
+
+    expect(_getLoggedText()).toContain(ALPHA_RELEASE_LINE.deployWarning);
+  });
+
+  it("aborts when the reviewer declines", async () => {
+    vi.mocked(promptToConfirm).mockResolvedValue(false);
+    const { git } = _createFakeCommands();
+
+    await expect(
+      confirmReleasePlan(git, {
+        plan: _createPlan(ALPHA_RELEASE_LINE),
+        originSourceSha: "source-sha",
+        originTargetSha: "target-sha",
+        assumeYes: false,
+      }),
+    ).rejects.toThrow("Aborted.");
+  });
+});
+
+describe("printReleaseSummary", () => {
+  beforeEach(() => {
+    vi.spyOn(Acclimate, "log").mockImplementation(() => {
+      return undefined;
+    });
+  });
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("links the alpha.yaml deploy run and the -alpha tag on the alpha line", () => {
+    const { git } = _createFakeCommands({
+      remoteUrl: "git@github.com:AvandarLabs/avandar.git",
+    });
+
+    printReleaseSummary(git, {
+      plan: _createPlan(ALPHA_RELEASE_LINE),
+      releaseSha: "release-sha",
+    });
+
+    expect(_getLoggedText()).toContain(
+      "Deploy run: https://github.com/AvandarLabs/avandar/actions/workflows/alpha.yaml",
+    );
+    expect(_getLoggedText()).toContain(
+      "https://github.com/AvandarLabs/avandar/releases/tag/v0.15.0-alpha",
+    );
+  });
+
+  it("links the production.yaml deploy run on the mainline", () => {
+    const { git } = _createFakeCommands({
+      remoteUrl: "git@github.com:AvandarLabs/avandar.git",
+    });
+
+    printReleaseSummary(git, {
+      plan: _createPlan(MAINLINE_RELEASE_LINE),
+      releaseSha: "release-sha",
+    });
+
+    expect(_getLoggedText()).toContain(
+      "Deploy run: https://github.com/AvandarLabs/avandar/actions/workflows/production.yaml",
     );
   });
 });

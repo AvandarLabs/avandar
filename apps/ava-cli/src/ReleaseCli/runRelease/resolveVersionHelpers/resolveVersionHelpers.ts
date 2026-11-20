@@ -20,10 +20,13 @@ type ResolveVersionOptions = {
   assumeYes: boolean;
 };
 
-/** The release-version prompt, which on alpha says the suffix is added. */
+/**
+ * The release-version prompt. A line whose releases carry a suffix (`-alpha`)
+ * says it is added, so the reviewer types a bare `X.Y.Z`.
+ */
 function _buildReleaseVersionPrompt(line: ReleaseLine): string {
   const question = "What version number do you want for this release?";
-  return line.kind === "alpha"
+  return line.releaseSuffix.length > 0
     ? `${question} (${line.releaseSuffix} is added automatically)`
     : question;
 }

@@ -6,11 +6,7 @@ import {
   shortSha,
 } from "@ava-cli/ReleaseCli/releaseGitHelpers";
 import { promptToConfirm } from "@ava-cli/ReleaseCli/releasePromptHelpers";
-import {
-  toDevVersion,
-  toPublishedVersion,
-  toReleaseTag,
-} from "@ava-cli/ReleaseCli/releaseVersionUtils/releaseVersionUtils";
+import { toDevVersion } from "@ava-cli/ReleaseCli/releaseVersionUtils/releaseVersionUtils";
 import {
   printDetails,
   printHeading,
@@ -31,23 +27,30 @@ import type { ReleasePlan } from "@ava-cli/ReleaseCli/runRelease/releaseStageHel
  * The stages that do mutate state live in `releaseStageHelpers.ts`.
  */
 
+/** What {@link confirmCiVerdict} checks, and whether it may ask or skip. */
+type ConfirmCiVerdictOptions = {
+  /** The source-branch commit being released. */
+  commitSha: string;
+  /** The line released, which names the branch and workflow to check. */
+  line: ReleaseLine;
+  /** Release on anything other than a pass without asking. */
+  assumeYes: boolean;
+  /** Skip the check entirely (`--skip-ci-check`). */
+  skip: boolean;
+};
+
 /**
  * Report the source branch's CI verdict for the commit being released, and ask
  * before proceeding on anything other than a pass.
  */
 export async function confirmCiVerdict(
   git: ReleaseCommands,
-  options: Readonly<{
-    commitSha: string;
-    line: ReleaseLine;
-    assumeYes: boolean;
-    skip: boolean;
-  }>,
+  options: Readonly<ConfirmCiVerdictOptions>,
 ): Promise<void> {
   const { commitSha, line, assumeYes, skip } = options;
 
   if (skip) {
-    printWarn("Skipping the staging CI check.");
+    printWarn(`Skipping ${line.sourceBranch}'s CI check.`);
     return;
   }
   printHeading("CI");
@@ -64,18 +67,30 @@ export async function confirmCiVerdict(
   }
 }
 
-/** The last-chance prompt, which on alpha says the release is production. */
+/**
+ * What the last-chance prompt adds after the version, by line, so the prompt
+ * on the line that deploys production says so.
+ */
+const CONFIRM_PROMPT_DESTINATION: Readonly<
+  Record<ReleaseLine["kind"], string>
+> = {
+  alpha: " to PRODUCTION",
+  mainline: "",
+};
+
+/** The last-chance prompt, e.g. `Release 0.15.0-alpha to PRODUCTION?`. */
 function _buildConfirmPrompt(plan: ReleasePlan): string {
-  const { line, releaseVersion } = plan;
-  return line.kind === "alpha"
-    ? `Release ${toPublishedVersion(releaseVersion, line)} to PRODUCTION?`
-    : `Release ${releaseVersion}?`;
+  const { line, publishedVersion } = plan;
+  return `Release ${publishedVersion}${CONFIRM_PROMPT_DESTINATION[line.kind]}?`;
 }
 
 /** Print the three numbered steps the release will take. */
-function _printPlanSteps(plan: ReleasePlan, originSourceSha: string): void {
-  const { line, sourceVersion, releaseVersion, nextVersion, releaseTag } = plan;
-  const publishedVersion = toPublishedVersion(releaseVersion, line);
+function _printPlanSteps(
+  options: Readonly<{ plan: ReleasePlan; originSourceSha: string }>,
+): void {
+  const { plan, originSourceSha } = options;
+  const { line, sourceVersion, publishedVersion, nextVersion, releaseTag } =
+    plan;
 
   printHeading("Plan");
   printDetails([
@@ -94,20 +109,26 @@ function _printPlanSteps(plan: ReleasePlan, originSourceSha: string): void {
   ]);
 }
 
+/** What {@link confirmReleasePlan} prints and compares before asking. */
+type ConfirmReleasePlanOptions = {
+  plan: ReleasePlan;
+  /** `origin/<source>`, the commit whose tree is released. */
+  originSourceSha: string;
+  /** `origin/<target>`, compared with the source to spot an empty release. */
+  originTargetSha: string;
+  /** Skip the confirmation prompt (`--yes`). */
+  assumeYes: boolean;
+};
+
 /** Print what the release will do, then take the last chance to stop. */
 export async function confirmReleasePlan(
   git: ReleaseCommands,
-  options: Readonly<{
-    plan: ReleasePlan;
-    originSourceSha: string;
-    originTargetSha: string;
-    assumeYes: boolean;
-  }>,
+  options: Readonly<ConfirmReleasePlanOptions>,
 ): Promise<void> {
   const { plan, originSourceSha, originTargetSha, assumeYes } = options;
   const { line } = plan;
 
-  _printPlanSteps(plan, originSourceSha);
+  _printPlanSteps({ plan, originSourceSha });
   if (readTreeSha(git, originSourceSha) === readTreeSha(git, originTargetSha)) {
     printWarn(
       `${line.sourceBranch} and ${line.targetBranch} already have identical content: this release ships no changes.`,
@@ -124,21 +145,20 @@ export async function confirmReleasePlan(
   }
 }
 
-/** The `ava release notes` command that retries this release's notes. */
-function _buildReleaseNotesRetryHint(
-  line: ReleaseLine,
-  releaseVersion: string,
-): string {
-  const alphaFlag = line.kind === "alpha" ? " --alpha" : "";
-  return `Retry publishing release notes: ava release notes --version ${releaseVersion}${alphaFlag}`;
-}
-
-/** What {@link reportReleaseNotesOutcome} needs to name the tag and retry. */
-type ReleaseNotesOutcomeOptions = {
-  line: ReleaseLine;
-  releaseVersion: string;
-  dryRun: boolean;
+/**
+ * The flag `ava release notes` needs to find each line's tag, so the retry
+ * hint names the tag this release actually created.
+ */
+const RELEASE_NOTES_LINE_FLAG: Readonly<Record<ReleaseLine["kind"], string>> = {
+  alpha: " --alpha",
+  mainline: "",
 };
+
+/** The `ava release notes` command that retries this release's notes. */
+function _buildReleaseNotesRetryHint(plan: ReleasePlan): string {
+  const { line, releaseVersion } = plan;
+  return `Retry publishing release notes: ava release notes --version ${releaseVersion}${RELEASE_NOTES_LINE_FLAG[line.kind]}`;
+}
 
 /**
  * Reports the outcome of generating and publishing this release's GitHub
@@ -151,11 +171,11 @@ type ReleaseNotesOutcomeOptions = {
  */
 export function reportReleaseNotesOutcome(
   outcome: PublishReleaseNotesOutcome,
-  options: Readonly<ReleaseNotesOutcomeOptions>,
+  options: Readonly<{ plan: ReleasePlan; dryRun: boolean }>,
 ): void {
-  const { line, releaseVersion, dryRun } = options;
-  const releaseTag = toReleaseTag(releaseVersion, line);
-  const retryHint = _buildReleaseNotesRetryHint(line, releaseVersion);
+  const { plan, dryRun } = options;
+  const { releaseTag } = plan;
+  const retryHint = _buildReleaseNotesRetryHint(plan);
 
   switch (outcome.kind) {
     case "published":
@@ -199,9 +219,9 @@ export function printReleaseSummary(
   options: Readonly<{ plan: ReleasePlan; releaseSha: string }>,
 ): void {
   const { plan, releaseSha } = options;
-  const { line, releaseVersion, nextVersion, releaseTag } = plan;
+  const { line, publishedVersion, nextVersion, releaseTag } = plan;
 
-  printHeading(`Released ${toPublishedVersion(releaseVersion, line)}`);
+  printHeading(`Released ${publishedVersion}`);
   printSuccess(
     `${line.targetBranch} = ${line.sourceBranch}@${shortSha(releaseSha)}, tagged ${releaseTag}`,
   );

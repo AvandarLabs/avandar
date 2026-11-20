@@ -7,6 +7,7 @@ import {
 } from "@ava-cli/ReleaseCli/releaseGitHelpers";
 import {
   suggestNextVersion,
+  toPublishedVersion,
   toReleaseTag,
   toReleaseVersion,
 } from "@ava-cli/ReleaseCli/releaseVersionUtils/releaseVersionUtils";
@@ -32,7 +33,7 @@ import {
 import {
   resolveNextVersion,
   resolveReleaseVersion,
-} from "@ava-cli/ReleaseCli/runRelease/resolveVersionHelpers";
+} from "@ava-cli/ReleaseCli/runRelease/resolveVersionHelpers/resolveVersionHelpers";
 import { printSuccess, printWarn } from "@ava-cli/utils/cliOutput/cliOutput";
 import { findRepoRoot } from "@ava-cli/utils/findRepoRoot";
 import type { ReleaseCommands } from "@ava-cli/ReleaseCli/createReleaseCommands";
@@ -61,6 +62,22 @@ export type ReleaseOptions = {
 /** A preflight that passed, so its refs are known. */
 type SatisfiedPreflight = Extract<PreflightResult, { ok: true }>;
 
+/** What a release plan is built from: the parsed options and the preflight. */
+type PlanSourceOptions = {
+  releaseOptions: Readonly<ReleaseOptions>;
+  preflight: SatisfiedPreflight;
+};
+
+/** What {@link _finishPublishedRelease} needs once the target is pushed. */
+type FinishPublishedReleaseOptions = {
+  plan: ReleasePlan;
+  preflight: SatisfiedPreflight;
+  /** The source-side commit that was released. */
+  releaseSha: string;
+  /** The target branch's new commit. */
+  releaseCommitSha: string;
+};
+
 /**
  * Release one line: the target branch (`main` or `alpha`) becomes an exact
  * copy of the source branch (`develop` or `alpha-dev`), tagged, and the source
@@ -84,15 +101,15 @@ export async function runRelease(
   // Nothing runs until preflight is satisfied, and nothing is pushed until the
   // plan is confirmed.
   const preflight = _requirePreflight(git);
-  const plan = await _resolveConfirmedPlan(git, options, preflight);
+  const planSource = { releaseOptions: options, preflight };
+  const plan = await _buildConfirmedPlan(git, planSource);
   const { releaseSha, releaseCommitSha } = _publishRelease(git, {
     plan,
     preflight,
   });
 
-  // A dry run pushes nothing. There is no later point in the function to
-  // preview the changelog from, so it happens here, using the source-side
-  // commit as a stand-in for the tag that was never actually created.
+  // A dry run pushes nothing, so the changelog preview happens here, with the
+  // source-side commit standing in for the tag that was never created.
   if (releaseCommitSha === undefined) {
     await _publishReleaseNotesIfEnabled(git, {
       skipChangelog,
@@ -110,9 +127,8 @@ export async function runRelease(
     releaseCommitSha,
   });
 
-  // Runs last, after the source branch is already bumped back to a working
-  // dev version: a slow or failing OpenAI/gh call here must never delay
-  // getting the repo back into a usable state for the next release.
+  // Runs last, once the source branch is back on a dev version: a slow or
+  // failing OpenAI/gh call must never delay getting the repo usable again.
   await _publishReleaseNotesIfEnabled(git, { skipChangelog, dryRun, plan });
 }
 
@@ -121,15 +137,15 @@ export async function runRelease(
  * are resolved, the tag is unused, and the CI verdict and the plan itself
  * have been accepted. Throws when any of those refuses.
  */
-async function _resolveConfirmedPlan(
+async function _buildConfirmedPlan(
   git: ReleaseCommands,
-  options: Readonly<ReleaseOptions>,
-  preflight: SatisfiedPreflight,
+  options: Readonly<PlanSourceOptions>,
 ): Promise<ReleasePlan> {
-  const { yes, skipCiCheck } = options;
+  const { releaseOptions, preflight } = options;
+  const { yes, skipCiCheck } = releaseOptions;
   const { line, originSourceSha, originTargetSha } = preflight;
 
-  const plan = await _resolvePlan(git, options, preflight);
+  const plan = await _buildPlan(git, options);
   assertTagIsUnused(git, plan);
   await confirmCiVerdict(git, {
     commitSha: originSourceSha,
@@ -176,12 +192,7 @@ function _publishRelease(
  */
 function _finishPublishedRelease(
   git: ReleaseCommands,
-  options: Readonly<{
-    plan: ReleasePlan;
-    preflight: SatisfiedPreflight;
-    releaseSha: string;
-    releaseCommitSha: string;
-  }>,
+  options: Readonly<FinishPublishedReleaseOptions>,
 ): void {
   const { plan, preflight, releaseSha, releaseCommitSha } = options;
 
@@ -226,11 +237,7 @@ async function _publishReleaseNotesIfEnabled(
       ? { headRevision: headRevisionOverride, skipExistenceChecks: true }
       : {}),
   });
-  reportReleaseNotesOutcome(outcome, {
-    line: plan.line,
-    releaseVersion: plan.releaseVersion,
-    dryRun,
-  });
+  reportReleaseNotesOutcome(outcome, { plan, dryRun });
 }
 
 /** The repo the release operates on, or a thrown error naming the problem. */
@@ -274,20 +281,14 @@ function _requirePreflight(git: ReleaseCommands): SatisfiedPreflight {
  * The line, versions, and tag this release is cut with, printing the reference
  * block and asking for whatever was not passed as an option.
  */
-async function _resolvePlan(
+async function _buildPlan(
   git: ReleaseCommands,
-  options: Readonly<ReleaseOptions>,
-  preflight: SatisfiedPreflight,
+  options: Readonly<PlanSourceOptions>,
 ): Promise<ReleasePlan> {
-  const { version, nextVersion, yes } = options;
-  const { line, originSourceSha, originTargetSha } = preflight;
+  const { version, nextVersion, yes } = options.releaseOptions;
+  const { line, originTargetSha } = options.preflight;
 
-  const sourceVersion = readVersionAtRevision(git, originSourceSha);
-  if (sourceVersion === undefined) {
-    throw new Error(
-      `Could not read the version from package.json on ${line.sourceBranch}.`,
-    );
-  }
+  const sourceVersion = _requireSourceVersion(git, options.preflight);
   const suggestedRelease = toReleaseVersion(sourceVersion);
   printVersionReference({
     line,
@@ -315,6 +316,21 @@ async function _resolvePlan(
       releaseVersion,
       assumeYes: yes,
     }),
+    publishedVersion: toPublishedVersion(releaseVersion, line),
     releaseTag: toReleaseTag(releaseVersion, line),
   };
+}
+
+/** The version on `origin/<source>`, or a thrown error when unreadable. */
+function _requireSourceVersion(
+  git: ReleaseCommands,
+  preflight: SatisfiedPreflight,
+): string {
+  const sourceVersion = readVersionAtRevision(git, preflight.originSourceSha);
+  if (sourceVersion === undefined) {
+    throw new Error(
+      `Could not read the version from package.json on ${preflight.line.sourceBranch}.`,
+    );
+  }
+  return sourceVersion;
 }

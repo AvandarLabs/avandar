@@ -19,13 +19,17 @@ const BANNER_DEPLOY_NOTE: Readonly<Record<ReleaseLine["kind"], string>> = {
  * what its deploy reaches, so a reviewer on the wrong branch notices before
  * answering any prompt.
  */
-export function buildReleaseBanner(line: ReleaseLine): string {
+export function buildBannerFromReleaseLine(line: ReleaseLine): string {
   return `|${line.bannerColor}|${line.bannerTitle}|reset|: ${line.sourceBranch} to ${line.targetBranch}. ${BANNER_DEPLOY_NOTE[line.kind]}`;
 }
 
-/** Print the banner from {@link buildReleaseBanner}. */
+/**
+ * Print the banner from {@link buildBannerFromReleaseLine}. `runRelease` calls
+ * it first, before the dry-run warning and preflight, so the line and what its
+ * deploy reaches are the first thing on screen.
+ */
 export function printReleaseBanner(line: ReleaseLine): void {
-  Acclimate.log(buildReleaseBanner(line));
+  Acclimate.log(buildBannerFromReleaseLine(line));
 }
 
 /** A label/value pair rendered as one aligned detail row. */

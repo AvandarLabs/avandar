@@ -185,6 +185,33 @@ describe("ava release get-prod-version", () => {
   });
 });
 
+/** Everything `ava release` printed, one `console.log` call per line. */
+function _stdoutText(): string {
+  return vi
+    .mocked(console.log)
+    .mock.calls.map((call) => {
+      return call.map(String).join(" ");
+    })
+    .join("\n");
+}
+
+/**
+ * Run `ava release` with both versions passed, so nothing would prompt if a
+ * refusal regressed.
+ */
+async function _runRelease(
+  options: Readonly<{ dryRun: boolean }>,
+): Promise<void> {
+  await ReleaseCli.state.action?.({
+    version: "0.15.0",
+    next: "0.15.1",
+    yes: false,
+    dryRun: options.dryRun,
+    skipCiCheck: false,
+    skipChangelog: false,
+  });
+}
+
 describe("ava release on a branch that is not a source branch", () => {
   let directory: string;
   let repoRoot: string;
@@ -196,28 +223,6 @@ describe("ava release on a branch that is not a source branch", () => {
     return _git({
       cwd,
       args: ["for-each-ref", "--format=%(refname) %(objectname)"],
-    });
-  }
-
-  /** Everything `ava release` printed, one `console.log` call per line. */
-  function _stdoutText(): string {
-    return vi
-      .mocked(console.log)
-      .mock.calls.map((call) => {
-        return call.map(String).join(" ");
-      })
-      .join("\n");
-  }
-
-  async function _runRelease(): Promise<void> {
-    // Versions are passed so nothing would prompt if the refusal regressed.
-    await ReleaseCli.state.action?.({
-      version: "0.15.0",
-      next: "0.15.1",
-      yes: false,
-      dryRun: false,
-      skipCiCheck: false,
-      skipChangelog: false,
     });
   }
 
@@ -242,7 +247,7 @@ describe("ava release on a branch that is not a source branch", () => {
   });
 
   it("refuses main with exit code 1, naming both source branches", async () => {
-    await _runRelease();
+    await _runRelease({ dryRun: false });
 
     expect(process.exitCode).toBe(1);
     expect(_stdoutText()).toContain('"alpha-dev" or "develop"');
@@ -254,7 +259,7 @@ describe("ava release on a branch that is not a source branch", () => {
     const refsBefore = _listRefs(repoRoot);
     const originRefsBefore = _listRefs(origin);
 
-    await _runRelease();
+    await _runRelease({ dryRun: false });
 
     // A fetch would move origin/main to origin's newer commit.
     expect(_listRefs(repoRoot)).toBe(refsBefore);
@@ -265,7 +270,7 @@ describe("ava release on a branch that is not a source branch", () => {
   });
 
   it("prints no release banner on a refused branch", async () => {
-    await _runRelease();
+    await _runRelease({ dryRun: false });
 
     expect(_stdoutText()).not.toContain("MAINLINE release");
     expect(_stdoutText()).not.toContain("ALPHA release");
@@ -274,7 +279,7 @@ describe("ava release on a branch that is not a source branch", () => {
   it("names the branch, not heads/main, when a tag is also named main", async () => {
     _git({ cwd: repoRoot, args: ["tag", "main"] });
 
-    await _runRelease();
+    await _runRelease({ dryRun: false });
 
     expect(_stdoutText()).toContain('(currently on "main")');
   });
@@ -282,9 +287,63 @@ describe("ava release on a branch that is not a source branch", () => {
   it("refuses a detached HEAD, naming it", async () => {
     _git({ cwd: repoRoot, args: ["switch", "--detach"] });
 
-    await _runRelease();
+    await _runRelease({ dryRun: false });
 
     expect(process.exitCode).toBe(1);
     expect(_stdoutText()).toContain('(currently on "a detached HEAD")');
   });
+});
+
+describe("ava release on a source branch", () => {
+  let directory: string;
+  let repoRoot: string;
+  let originalArgv: string[];
+  let originalExitCode: typeof process.exitCode;
+
+  beforeEach(() => {
+    directory = mkdtempSync(join(tmpdir(), "ava-release-banner-"));
+    ({ repoRoot } = _createRepos(directory));
+    originalArgv = process.argv;
+    originalExitCode = process.exitCode;
+    process.argv = [process.execPath, "ava", "release", "--dry-run"];
+    process.exitCode = undefined;
+    vi.spyOn(process, "cwd").mockReturnValue(join(repoRoot, "apps/ava-cli"));
+    vi.spyOn(console, "log").mockImplementation(noop);
+    vi.spyOn(console, "error").mockImplementation(noop);
+  });
+
+  afterEach(() => {
+    process.argv = originalArgv;
+    process.exitCode = originalExitCode;
+    vi.restoreAllMocks();
+    rmSync(directory, { recursive: true, force: true });
+  });
+
+  it.each([
+    [
+      "alpha-dev",
+      ": alpha-dev to alpha. Deploys PRODUCTION (app.avandarlabs.com).",
+    ],
+    [
+      "develop",
+      ": develop to main. Deploys the mainline test URL, not production.",
+    ],
+  ])(
+    "prints the %s banner before preflight runs",
+    async (branch, bannerText) => {
+      _git({ cwd: repoRoot, args: ["switch", "-c", branch] });
+      // A tracked change makes preflight refuse locally, before any fetch.
+      writeFileSync(join(repoRoot, "package.json"), '{"version":"dirty"}\n');
+
+      await _runRelease({ dryRun: true });
+
+      const stdout = _stdoutText();
+      expect(stdout).toContain(bannerText);
+      expect(stdout.indexOf(bannerText)).toBeLessThan(
+        stdout.indexOf("Preflight"),
+      );
+      expect(stdout).toContain("The working tree has tracked changes");
+      expect(process.exitCode).toBe(1);
+    },
+  );
 });

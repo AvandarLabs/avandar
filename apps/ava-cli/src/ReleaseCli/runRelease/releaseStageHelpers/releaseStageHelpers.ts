@@ -7,10 +7,7 @@ import {
   revParse,
   shortSha,
 } from "@ava-cli/ReleaseCli/releaseGitHelpers";
-import {
-  toDevVersion,
-  toPublishedVersion,
-} from "@ava-cli/ReleaseCli/releaseVersionUtils/releaseVersionUtils";
+import { toDevVersion } from "@ava-cli/ReleaseCli/releaseVersionUtils/releaseVersionUtils";
 import {
   printDetail,
   printHeading,
@@ -47,6 +44,8 @@ export type ReleasePlan = {
   sourceVersion: string;
   /** The bare `X.Y.Z` being released, without the line's suffix. */
   releaseVersion: string;
+  /** The version written to package.json, e.g. `0.10.2` or `0.15.0-alpha`. */
+  publishedVersion: string;
   /** The bare `X.Y.Z` the source branch moves to, without the dev suffix. */
   nextVersion: string;
   /** The git tag, e.g. `v0.10.2` or `v0.15.0-alpha`. */
@@ -74,7 +73,7 @@ export function assertTagIsUnused(
   git: ReleaseCommands,
   plan: ReleasePlan,
 ): void {
-  const { releaseTag, releaseVersion } = plan;
+  const { releaseTag, publishedVersion } = plan;
 
   if (localTagExists(git, releaseTag)) {
     throw new Error(
@@ -83,7 +82,7 @@ export function assertTagIsUnused(
   }
   if (remoteTagExists(git, releaseTag)) {
     throw new Error(
-      `Tag ${releaseTag} already exists on origin, so ${releaseVersion} has been released.`,
+      `Tag ${releaseTag} already exists on origin, so ${publishedVersion} has been released.`,
     );
   }
 }
@@ -100,8 +99,7 @@ export function commitReleaseVersionOnSource(
   options: Readonly<{ plan: ReleasePlan; originSourceSha: string }>,
 ): string {
   const { plan, originSourceSha } = options;
-  const { line, sourceVersion, releaseTag } = plan;
-  const publishedVersion = toPublishedVersion(plan.releaseVersion, line);
+  const { line, sourceVersion, publishedVersion, releaseTag } = plan;
 
   printHeading(`Setting ${line.sourceBranch} to ${publishedVersion}`);
   if (sourceVersion === publishedVersion) {
@@ -154,7 +152,7 @@ export function publishTargetAndTag(
     releaseTreeSha,
     targetParentSha: originTargetSha,
     sourceParentSha: releaseSha,
-    message: _releaseCommitMessage(plan, releaseSha),
+    message: _buildReleaseCommitMessage({ plan, releaseSha }),
   });
 
   if (git.dryRun) {
@@ -171,6 +169,18 @@ export function publishTargetAndTag(
   return releaseCommitSha;
 }
 
+/** What {@link updateLocalTargetRef} needs to decide whether to move it. */
+type UpdateLocalTargetRefOptions = {
+  /** The line released, which names the target branch. */
+  line: ReleaseLine;
+  /** The target branch's new commit, just pushed. */
+  releaseCommitSha: string;
+  /** Local `<target>` before the release, when it exists. */
+  localTargetSha: string | undefined;
+  /** `origin/<target>` before the release. */
+  originTargetSha: string;
+};
+
 /**
  * Fast-forward the local target-branch ref so the next release starts from a
  * sane place.
@@ -182,12 +192,7 @@ export function publishTargetAndTag(
  */
 export function updateLocalTargetRef(
   git: ReleaseCommands,
-  options: Readonly<{
-    line: ReleaseLine;
-    releaseCommitSha: string;
-    localTargetSha: string | undefined;
-    originTargetSha: string;
-  }>,
+  options: Readonly<UpdateLocalTargetRefOptions>,
 ): void {
   const { line, releaseCommitSha, localTargetSha, originTargetSha } = options;
 
@@ -281,7 +286,8 @@ function _tagAndPush(
   options: Readonly<{ plan: ReleasePlan; releaseCommitSha: string }>,
 ): void {
   const { plan, releaseCommitSha } = options;
-  const { line, releaseTag, releaseVersion, nextVersion } = plan;
+  const { line, releaseTag, releaseVersion, publishedVersion, nextVersion } =
+    plan;
 
   const tagResult = git.mutate("git", [
     "tag",
@@ -309,7 +315,7 @@ Nothing has been pushed to ${line.targetBranch}.`,
     git.mutateQuietly("git", ["tag", "-d", releaseTag]);
     throw new Error(
       `Could not push ${line.targetBranch} and ${releaseTag}: ${pushResult.stderr}
-${line.sourceBranch} is already at ${toPublishedVersion(releaseVersion, line)} and pushed, and the local tag has been removed. Retry with --version ${releaseVersion} --next ${nextVersion}.`,
+${line.sourceBranch} is already at ${publishedVersion} and pushed, and the local tag has been removed. Retry with --version ${releaseVersion} --next ${nextVersion}.`,
     );
   }
   printSuccess(
@@ -318,9 +324,12 @@ ${line.sourceBranch} is already at ${toPublishedVersion(releaseVersion, line)} a
 }
 
 /** The commit message for the release commit. */
-function _releaseCommitMessage(plan: ReleasePlan, releaseSha: string): string {
-  const { line, releaseVersion } = plan;
-  return `Release ${toPublishedVersion(releaseVersion, line)}
+function _buildReleaseCommitMessage(
+  options: Readonly<{ plan: ReleasePlan; releaseSha: string }>,
+): string {
+  const { plan, releaseSha } = options;
+  const { line, publishedVersion } = plan;
+  return `Release ${publishedVersion}
 
 Sets ${line.targetBranch} to ${line.sourceBranch}'s tree at ${releaseSha} verbatim. Written with git commit-tree, so this is a two-parent merge carrying ${line.sourceBranch}'s exact content with no merge resolution. See apps/ava-cli/src/ReleaseCli.`;
 }
