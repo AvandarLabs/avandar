@@ -764,17 +764,74 @@ Do not add `eslint-plugin-avandar` yet. Goal: same policy as
 
 ### Phase 2 as built (deviations from the text below)
 
-- Oxlint and `oxlint-plugin-eslint` are installed at 1.80.0. The flat config migration uses `@oxlint/migrate`, then is hand-tuned from the live ESLint policy.
-- The final config uses native import, react, jsx-a11y, typescript, and core rules, with JS fallbacks. `eslint-plugin-react` remains for react-js function-component-definition parity because native Oxlint 1.80 misidentifies a `forwardRef` pattern. `eslint-import-resolver-typescript` remains for `import-js/no-unresolved` and `import-js/extensions` aliases and workspaces. `import-js/extensions` replaces native `import/extensions` because the native rule skips import-x's "resolvable without the extension" check, so it flags `.js` imports of files with a `.d.ts` sidecar that ESLint accepts. `eslint-plugin-react-refresh` remains as the `react-refresh` JS plugin because native `react/only-export-components` flags TanStack route files that ESLint accepts. Naming that plugin `react-refresh` keeps existing `eslint-disable-next-line react-refresh/...` comments working. Do not remove any of these packages while those config entries remain.
-- `react.version` is pinned to installed `19.2.5` because Oxlint 1.80 rejects `detect`; update it with React upgrades.
-- `.cursor/**` and `.opencode/**` are Oxlint ignores because Oxlint follows their skill symlinks while ESLint does not, preserving the linted file set.
-- Measured and deferred to Phase 3 Task 13: `curly` (5), `prefer-template` (17), `typescript/consistent-type-imports` (340), and `import/no-default-export` (41). `typescript/no-explicit-any` has zero unsuppressed hits and is enabled.
-- Existing ESLint-only suppressions for the nine migration errors are converted or replaced without broad config exemptions.
-- The one remaining divergence from ESLint is native `import/no-named-as-default`, at warning severity. It lacks import-x's exemption for a binding exported both as default and by name (`clsx`, `zod`'s `z`, `Dexie`, tiptap extensions, `jsPDF`), so it reports 57 warnings that ESLint does not. Oxlint 1.93 behaves the same. The `import-js` versions of it and of `no-named-as-default-member` cannot parse imported modules under Oxlint (`context.languageOptions.parser.parse` is not implemented), so they are not a fallback.
-- After the 2026-11-15 `develop` merge, the ESLint config's video producer overrides and ignores, its `import-x/newline-after-import` rule (native `import/newline-after-import` here), and the `avandar-adapter` resolver project are ported. On identical sources, Oxlint and ESLint lint the same 6,418 files. Apart from the warnings above, the only difference is that ESLint flags the seven lines whose suppressions now use `oxlint-disable` with Oxlint rule names.
-- React Doctor sets `adoptExistingLintConfig: false` because it already runs after root Oxlint and its temporary extends config breaks import-js resolution under Oxlint 1.80.
-- `lint:ts:fix-changed` has a portable shell argument-count guard so GNU xargs cannot turn empty input into a repo-wide `oxlint --fix`.
-- ESLint CLI, config, and Vite overlay are removed. Retained ESLint ecosystem packages are runtime inputs to Oxlint JS plugins, not an ESLint CLI fallback.
+- Oxlint and `oxlint-plugin-eslint` are specified at `^1.80.0` (resolved to
+  `1.93.0` in `pnpm-lock.yaml`). The flat config migration uses
+  `@oxlint/migrate`, then is hand-tuned from the live ESLint policy, replacing
+  `@oxlint/migrate`'s 1,059 inlined browser globals with
+  `"env": { "browser": true }`.
+- The final config uses native `eslint`, `import`, `react`, `jsx-a11y`, and
+  `typescript` plugins, plus five JS plugins: `oxlint-plugin-eslint`
+  (`eslint-js/max-len`, `eslint-js/no-octal`), `eslint-plugin-react`
+  (`react-js/function-component-definition`, because native
+  `react/function-component-definition` misidentifies a `forwardRef` pattern),
+  `eslint-plugin-react-refresh` (`react-refresh/only-export-components`,
+  because native `react/only-export-components` flags TanStack route files that
+  ESLint accepts), `@tanstack/eslint-plugin-query`, and
+  `@tanstack/eslint-plugin-router`. Do not remove those five packages while
+  their `jsPlugins` entries remain.
+- `eslint-plugin-import-x` and `eslint-import-resolver-typescript` are removed
+  rather than retained: `tsc` and `deno check` already reject unresolved
+  imports, and all `import/extensions` overrides run natively under Oxlint
+  without a JS TypeScript resolver.
+  `tests/integration/adapterImportResolution.integration.test.js` runs `oxlint`
+  over `apps/ava-video-producer/tests` and
+  `apps/ava-video-producer/avandar-adapter` in one batch to guard against any
+  regression in adapter `@/*` import-extension handling.
+- Native `import/no-named-as-default` lacks import-x's exemption for bindings
+  exported both as default and by name (`clsx`, `Dexie`, `zod`'s `z`, `jsPDF`,
+  four tiptap extensions, `WorkspaceInviteEmail`). All 57 call sites across 54
+  files are refactored to named imports so
+  `oxlint --report-unused-disable-directives-severity=error .` finishes with 0
+  warnings and 0 errors.
+- `react.version` is pinned to installed `19.2.5` because Oxlint rejects
+  `"detect"`. Update it with React upgrades.
+- `.cursor/**` and `.opencode/**` (alongside `**/.videos/**`,
+  `apps/ava-video-producer/out/**`,
+  `apps/ava-video-producer/src/avandar/generated/**`,
+  `**/locales/**/messages.ts`, and `**/.superpowers/**`) are in
+  `ignorePatterns` because Oxlint follows skill symlinks while ESLint did not,
+  preserving the linted file set.
+- Deferred to Phase 3 Task 13: `curly`, `prefer-template`,
+  `typescript/consistent-type-imports`, and `import/no-default-export` (5, 17,
+  340, and 41 hits when measured at initial migration on 2026-08-27).
+  `typescript/no-explicit-any` had zero unsuppressed hits and is enabled.
+- All inline `eslint-disable*` and `eslint-enable*` directives across owned
+  source files and `NewAvaModelCli` templates are replaced with canonical
+  `oxlint-disable*` / `oxlint-enable*` rule names, `TanStackRouterVite`'s
+  `routeTreeFileHeader` emits `/* oxlint-disable */`, and `pnpm lint` runs
+  `oxlint --report-unused-disable-directives-severity=error .` so stale
+  directives fail lint.
+- After merging `develop` through 2026-11-20, the `apps/ava-video-producer`
+  rule overrides are removed so root rules apply across the entire repo,
+  `stylelint` also checks `apps/ava-video-producer/**/*.css`, and
+  `typescript/explicit-module-boundary-types` is turned off only for `**/*.js`
+  (matching `develop`'s policy for plain JS files typed via `.d.ts` or JSDoc).
+  This branch also includes `refactor/showcase-vite`, migrating
+  `apps/ava-video-producer`'s showcase and build tooling from esbuild and
+  `.mjs`/`.js` scripts to Vite and TypeScript.
+- `doctor.config.ts` sets `adoptExistingLintConfig: false` (because `pnpm lint`
+  runs root Oxlint first and React Doctor's temporary extends config breaks JS
+  import resolution), ignores `**/dist/**`, scopes historical migration and CI
+  workflow rule overrides, and sets `supplyChain.severity: "warning"`.
+  `pnpm lint` runs `CI=1 react-doctor`.
+- `lint:ts:fix-changed` wraps `oxlint --fix` in a portable shell argument-count
+  guard so GNU xargs cannot turn empty input into a repo-wide fix.
+- ESLint CLI, `eslint.config.js`, and `@nabla/vite-plugin-eslint` are removed,
+  and package generator templates, CI workflow comments, Claude `allowedTools`
+  grants, `README.md`, `.cursor/rules/global.mdc`,
+  `scripts/verify-packages.sh`, and `docs/code-reviews/extra-checklist.md` are
+  pointed at Oxlint. Retained ESLint ecosystem packages are runtime inputs to
+  Oxlint JS plugins, not an ESLint CLI fallback.
 
 ### Task 6: Install oxlint and migrate the flat config
 
@@ -1364,11 +1421,24 @@ ids and on `--fix` output.
 
 - [ ] **Step 3: Wire `jsPlugins` in the repo `.oxlintrc.json`**
 
+Prepend `"./eslint-plugin-avandar/index.js"` to the existing `jsPlugins` array
+from Phase 2:
+
 ```jsonc
 "jsPlugins": [
   "./eslint-plugin-avandar/index.js",
-  "oxlint-plugin-eslint",
-  "eslint-plugin-import-x",
+  {
+    "name": "eslint-js",
+    "specifier": "oxlint-plugin-eslint"
+  },
+  {
+    "name": "react-js",
+    "specifier": "eslint-plugin-react"
+  },
+  {
+    "name": "react-refresh",
+    "specifier": "eslint-plugin-react-refresh"
+  },
   "@tanstack/eslint-plugin-query",
   "@tanstack/eslint-plugin-router"
 ]
@@ -2157,7 +2227,8 @@ rg -n 'prettier-ignore' --glob '!node_modules' --glob '*.ts' --glob '*.tsx' .
 ```
 
 Expected: no CLI/config hits from the first command.
-`eslint-plugin-import-x` and `eslint-plugin-avandar` mentions are allowed.
+`oxlint-plugin-eslint`, `eslint-plugin-react`, `eslint-plugin-react-refresh`,
+`@tanstack/eslint-plugin-*`, and `eslint-plugin-avandar` mentions are allowed.
 The second command must show no stale tool names (Task 3 and Task 8 cover
 `README.md` lines 48 and 145, `global.mdc` lines 30 to 31,
 `verify-packages.sh` line 30, and `extra-checklist.md` line 52). The third
@@ -2198,11 +2269,11 @@ shows up here as an unpushable branch rather than as a lint failure.
 
 ## Skill vs plugin ownership after this plan
 
-| Layer                                                              | Owns                                                       |
-| ------------------------------------------------------------------ | ---------------------------------------------------------- |
-| oxfmt                                                              | JS/TS/JSON/CSS layout, import sort, Tailwind class sort. **Not** markdown: `.oxfmtignore` excludes `*.md`, matching what `pnpm format` skips today. Reformatting markdown repo-wide is a separate decision. |
-| Prettier                                                           | `supabase/schemas/**/*.sql` only                           |
-| oxlint native + jsPlugins (TanStack, import-x unresolved, max-len) | today's ESLint policy                                      |
-| `avandar/*` type 2                                                 | mechanical rewrites; skill deleted                         |
-| `avandar/*` type 1                                                 | CI/dev gate; skill keeps how-to-fix + disable audit        |
-| avandar-code-review                                                | type 3 judgement only, plus disable audit                  |
+| Layer                                                                     | Owns                                                       |
+| ------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| oxfmt                                                                     | JS/TS/JSON/CSS layout, import sort, Tailwind class sort. **Not** markdown: `.oxfmtignore` excludes `*.md`, matching what `pnpm format` skips today. Reformatting markdown repo-wide is a separate decision. |
+| Prettier                                                                  | `supabase/schemas/**/*.sql` only                           |
+| oxlint native + jsPlugins (TanStack, react/react-refresh, max-len/octal)  | today's ESLint policy                                      |
+| `avandar/*` type 2                                                        | mechanical rewrites; skill deleted                         |
+| `avandar/*` type 1                                                        | CI/dev gate; skill keeps how-to-fix + disable audit        |
+| avandar-code-review                                                       | type 3 judgement only, plus disable audit                  |
