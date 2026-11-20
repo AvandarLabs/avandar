@@ -49,6 +49,7 @@ describe("ava release notes", () => {
 
     await ReleaseNotesCli.state.action?.({
       version: "0.13.3",
+      alpha: false,
       dryRun: false,
       update: false,
     });
@@ -62,6 +63,7 @@ describe("ava release notes", () => {
 
     await ReleaseNotesCli.state.action?.({
       version: "0.13.3",
+      alpha: false,
       dryRun: false,
       update: false,
     });
@@ -73,6 +75,7 @@ describe("ava release notes", () => {
   it("rejects an invalid version before calling publishReleaseNotes", async () => {
     await ReleaseNotesCli.state.action?.({
       version: "v0.13.3",
+      alpha: false,
       dryRun: false,
       update: false,
     });
@@ -92,6 +95,7 @@ describe("ava release notes", () => {
 
     await ReleaseNotesCli.state.action?.({
       version: "0.13.3",
+      alpha: false,
       dryRun: false,
       update: false,
     });
@@ -109,12 +113,31 @@ describe("ava release notes", () => {
     });
     await ReleaseNotesCli.state.action?.({
       version: "0.13.4",
+      alpha: false,
       dryRun: true,
       update: true,
     });
     expect(publishReleaseNotesModule.publishReleaseNotes).toHaveBeenCalledWith(
       expect.anything(),
       { releaseTag: "v0.13.4", dryRun: true, update: true },
+    );
+    expect(process.exitCode).toBeUndefined();
+  });
+
+  it("targets the -alpha tag for an alpha release", async () => {
+    vi.mocked(publishReleaseNotesModule.publishReleaseNotes).mockResolvedValue({
+      kind: "previewed",
+      notes: "preview",
+    });
+    await ReleaseNotesCli.state.action?.({
+      version: "0.15.0",
+      alpha: true,
+      dryRun: true,
+      update: false,
+    });
+    expect(publishReleaseNotesModule.publishReleaseNotes).toHaveBeenCalledWith(
+      expect.anything(),
+      { releaseTag: "v0.15.0-alpha", dryRun: true, update: false },
     );
     expect(process.exitCode).toBeUndefined();
   });
@@ -127,6 +150,7 @@ describe("ava release notes", () => {
 
     await ReleaseNotesCli.state.action?.({
       version: "0.13.3",
+      alpha: false,
       dryRun: false,
       update: false,
     });
@@ -142,6 +166,7 @@ describe("ava release notes", () => {
 
     await ReleaseNotesCli.state.action?.({
       version: "9.9.9",
+      alpha: false,
       dryRun: false,
       update: false,
     });
@@ -157,6 +182,7 @@ describe("ava release notes", () => {
 
     await ReleaseNotesCli.state.action?.({
       version: "0.13.3",
+      alpha: false,
       dryRun: false,
       update: false,
     });
@@ -173,6 +199,7 @@ describe("ava release notes", () => {
 
     await ReleaseNotesCli.state.action?.({
       version: "0.13.3",
+      alpha: false,
       dryRun: false,
       update: false,
     });
@@ -189,6 +216,7 @@ describe("ava release notes", () => {
 
     await ReleaseNotesCli.state.action?.({
       version: "0.13.3",
+      alpha: false,
       dryRun: true,
       update: false,
     });

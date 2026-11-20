@@ -1,4 +1,8 @@
 import { createReleaseCommands } from "@ava-cli/ReleaseCli/createReleaseCommands";
+import {
+  ALPHA_RELEASE_LINE,
+  MAINLINE_RELEASE_LINE,
+} from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
 import { listSortedReleaseTags } from "@ava-cli/ReleaseCli/releaseChangelog/collectReleaseChangelogCommits/collectReleaseChangelogCommits";
 import { publishReleaseNotes } from "@ava-cli/ReleaseCli/releaseChangelog/publishReleaseNotes/publishReleaseNotes";
 import { wantsHelp } from "@ava-cli/ReleaseCli/releaseFlagUtils/releaseFlagUtils";
@@ -27,11 +31,13 @@ const USAGE = `ava release notes: publish GitHub release notes for an existing r
 Usage
   ava release notes --version 0.13.3             publish notes for v0.13.3
   ava release notes --version 0.13.4 --update   replace existing notes
+  ava release notes --version 0.15.0 --alpha    publish notes for v0.15.0-alpha
   ava release notes                               ask for a version
   ava release notes --version 0.13.3 --dry-run   preview without publishing
 
 Options
   --version, -v  X.Y.Z to publish notes for. Asked for when omitted.
+  --alpha        The version is an alpha release, tagged vX.Y.Z-alpha.
   --update       Replace notes on an existing release, preserving other metadata.
   --dry-run      Generate and print the notes, but do not publish them.
   --help, -h     This text.`;
@@ -39,6 +45,7 @@ Options
 /** The parsed `ava release notes` options, as Acclimate hands to the action. */
 type ReleaseNotesCliArgs = {
   version?: string;
+  alpha: boolean;
   dryRun: boolean;
   update?: boolean;
 };
@@ -73,7 +80,10 @@ async function _runReleaseNotes(
   if (!validation.valid) {
     throw new Error(validation.message);
   }
-  const releaseTag = toReleaseTag(version);
+  const releaseTag = toReleaseTag(
+    version,
+    args.alpha ? ALPHA_RELEASE_LINE : MAINLINE_RELEASE_LINE,
+  );
 
   const outcome = await publishReleaseNotes(git, {
     releaseTag,
@@ -128,6 +138,13 @@ export const ReleaseNotesCli = Acclimate.createCLI("notes")
     required: false,
     description:
       "The X.Y.Z version to publish notes for. Asked for when omitted.",
+  })
+  .addOption({
+    name: "--alpha",
+    type: "boolean",
+    required: false,
+    defaultValue: false,
+    description: "The version is an alpha release, tagged vX.Y.Z-alpha.",
   })
   .addOption({
     name: "--update",

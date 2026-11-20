@@ -1,6 +1,11 @@
 import {
+  ALPHA_RELEASE_LINE,
+  MAINLINE_RELEASE_LINE,
+} from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
+import {
   suggestNextVersion,
   toDevVersion,
+  toPublishedVersion,
   toReleaseTag,
   toReleaseVersion,
   validateReleaseVersion,
@@ -85,9 +90,34 @@ describe("suggestNextVersion", () => {
   });
 });
 
-describe("toDevVersion and toReleaseTag", () => {
-  it("formats the develop version and the tag", () => {
-    expect(toDevVersion("0.10.3")).toBe("0.10.3-dev");
-    expect(toReleaseTag("0.10.2")).toBe("v0.10.2");
+describe("toDevVersion, toPublishedVersion, and toReleaseTag", () => {
+  it("uses no release suffix and -dev on mainline", () => {
+    expect(toDevVersion("0.10.3", MAINLINE_RELEASE_LINE)).toBe("0.10.3-dev");
+    expect(toPublishedVersion("0.10.2", MAINLINE_RELEASE_LINE)).toBe("0.10.2");
+    expect(toReleaseTag("0.10.2", MAINLINE_RELEASE_LINE)).toBe("v0.10.2");
+  });
+
+  it("uses -alpha and -alpha-dev on alpha", () => {
+    expect(toDevVersion("0.15.1", ALPHA_RELEASE_LINE)).toBe("0.15.1-alpha-dev");
+    expect(toPublishedVersion("0.15.0", ALPHA_RELEASE_LINE)).toBe(
+      "0.15.0-alpha",
+    );
+    expect(toReleaseTag("0.15.0", ALPHA_RELEASE_LINE)).toBe("v0.15.0-alpha");
+  });
+});
+
+describe("validateReleaseVersion on alpha", () => {
+  it("refuses a typed -alpha suffix, since it is appended automatically", () => {
+    const result = validateReleaseVersion("0.15.0-alpha", "Version");
+    expect(result.valid).toBe(false);
+    expect(result.valid === false && result.message).toContain(
+      "added automatically",
+    );
+  });
+});
+
+describe("toReleaseVersion on alpha-dev", () => {
+  it("strips -alpha-dev", () => {
+    expect(toReleaseVersion("0.15.1-alpha-dev")).toBe("0.15.1");
   });
 });
