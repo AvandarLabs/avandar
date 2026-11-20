@@ -8,8 +8,9 @@ name: CI/CD for alpha-dev
 # Secrets are read from the `staging` GitHub environment so alpha-dev reuses
 # the staging edge function keys instead of keeping a second copy.
 #
-# `ava release` reads the latest completed run of this workflow on `alpha-dev`
-# for the release commit, and only a `success` conclusion counts as green.
+# `ava release` checks the newest run of this workflow for the tip of
+# `alpha-dev`. Only a completed `success` counts as green, so a failing
+# `test-e2e` blocks the release even though it does not block the deploy.
 
 on:
   push:
@@ -17,7 +18,8 @@ on:
       - alpha-dev
   workflow_dispatch:
 
-# Never cancel a deploy halfway through a migration. Pushes queue instead.
+# Never cancel a deploy halfway through a migration. Only the newest push
+# waits for the running deploy: older pending runs are cancelled.
 concurrency:
   group: alpha-dev-deploy
   cancel-in-progress: false
