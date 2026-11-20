@@ -10,9 +10,14 @@ import { Acclimate } from "@avandar/acclimate";
 
 const USAGE = `ava release: publish a new release of the Avandar app.
 
-  main becomes an exact copy of develop (a straight cut, never a merge, so it
-  cannot conflict), tagged vX.Y.Z. develop then moves on to the next -dev
-  version. Run it from develop, with a clean tree and nothing unpushed.
+  Run it on alpha-dev to release alpha (production, app.avandarlabs.com), or
+  on develop to release mainline (main). Any other branch is refused.
+
+  The target branch becomes an exact copy of the source branch (a straight
+  cut, never a merge, so it cannot conflict), tagged vX.Y.Z on mainline or
+  vX.Y.Z-alpha on alpha. The source branch then moves on to its next dev
+  version (-dev on develop, -alpha-dev on alpha-dev). Type versions as
+  X.Y.Z: the suffixes are added for you.
 
 Usage
   ava release get-prod-version                  print the version on origin/main
@@ -24,11 +29,12 @@ Usage
 
 Options
   --version, -v  X.Y.Z to release. Asked for when omitted.
-  --next, -n     X.Y.Z develop moves to; gains -dev. Asked for when omitted.
+  --next, -n     X.Y.Z the source branch moves to; gains -dev or -alpha-dev.
+                 Asked for when omitted.
   --yes, -y      Take every suggestion and skip confirmations.
   --dry-run      Print every mutating command and run none of them. Still
                  makes one real OpenAI call to preview the release notes.
-  --skip-ci-check  Do not check develop's staging CI.
+  --skip-ci-check  Do not check the source branch's CI.
   --skip-changelog  Do not generate or publish GitHub release notes.
   --help, -h     This text.`;
 
@@ -54,10 +60,14 @@ export const ReleaseCli = Acclimate.createCLI("release")
   .addCommand("get-prod-version", GetProdVersionCli)
   .addCommand("notes", ReleaseNotesCli)
   .description(
-    "Release the Avandar app: main becomes an exact copy of develop (a " +
-      "straight cut, never a merge, so it cannot conflict), tagged " +
-      "vX.Y.Z, then develop moves on to the next -dev version. Prompts for " +
-      "any version you do not pass.",
+    "Publish a new release of the Avandar app. Run it on alpha-dev to " +
+      "release alpha (production, app.avandarlabs.com), or on develop to " +
+      "release mainline (main). Any other branch is refused. The target " +
+      "branch becomes an exact copy of the source branch (a straight cut, " +
+      "never a merge, so it cannot conflict), tagged vX.Y.Z on mainline or " +
+      "vX.Y.Z-alpha on alpha. The source branch then moves on to its next " +
+      "dev version (-dev on develop, -alpha-dev on alpha-dev). Type versions " +
+      "as X.Y.Z: the suffixes are added for you.",
   )
   .addOption({
     name: "--version",
@@ -72,8 +82,8 @@ export const ReleaseCli = Acclimate.createCLI("release")
     type: "string",
     required: false,
     description:
-      "Version develop moves to after the release, as X.Y.Z. It gains the " +
-      "-dev suffix automatically. Asked for when omitted.",
+      "X.Y.Z the source branch moves to; gains -dev or -alpha-dev. Asked for " +
+      "when omitted.",
   })
   .addOption({
     name: "--yes",
@@ -99,9 +109,7 @@ export const ReleaseCli = Acclimate.createCLI("release")
     type: "boolean",
     required: false,
     defaultValue: false,
-    description:
-      "Do not check whether develop's staging CI passed for the commit being " +
-      "released.",
+    description: "Do not check the source branch's CI.",
   })
   .addOption({
     name: "--skip-changelog",
