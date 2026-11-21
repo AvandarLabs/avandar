@@ -1,8 +1,8 @@
-import { FitText } from "../../../primitives/FitText/FitText";
+import { propEq } from "@avandar/utils";
 import { PersonGlyph } from "../../../primitives/PersonGlyph/PersonGlyph";
-import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { BookingConnector } from "./BookingConnector";
+import { ClinicPersonLabel } from "./ClinicPersonLabel/ClinicPersonLabel";
 import type { Input } from "../MobileClinicRelocation.schema";
 import type { ReactNode } from "react";
 
@@ -37,9 +37,10 @@ export function ClinicPeople({
       {input.people.map((person, index) => {
         const x = 62 + index * 114;
         const y = 418;
-        const slotIndex = input.slots.findIndex(({ id }) => {
-          return id === person.slotId;
-        });
+        const slotIndex =
+          person.slotId === null
+            ? -1
+            : input.slots.findIndex(propEq("id", person.slotId));
         return (
           <g
             key={person.id}
@@ -52,9 +53,7 @@ export function ClinicPeople({
               <BookingConnector
                 slotId={person.slotId}
                 path={_buildBookingPath({ x, personIndex: index, slotIndex })}
-                frame={frame}
-                index={index}
-                accent={accent}
+                {...{ frame, index, accent }}
               />
             ) : undefined}
             <PersonGlyph
@@ -63,16 +62,7 @@ export function ClinicPeople({
               size={25}
               color={person.slotId === null ? tokens.color.highlight : accent}
             />
-            <FitText
-              text={person.label}
-              x={x - 20}
-              y={y + 27}
-              width={110}
-              fontSize={12}
-              maxLines={3}
-              breakLongWords
-              normalizeWhitespace
-            />
+            <ClinicPersonLabel {...{ person, x, y }} />
           </g>
         );
       })}

@@ -68,7 +68,7 @@ The captions toggle does not add brand or background controls to product films.
 | `avandar-adapter/shims/` | Narrow local substitutes for routing or data/controller dependencies; no product backend. |
 | `avandar-adapter/fixtures.json` | Checked-in adapter data derived from the fictional CSV bundle, preserving source strings and blank cells. |
 | `src/avandar/generated/` | Ignored compiled product bridge, CSS and source hashes. Preview/render rebuild these automatically; do not hand-edit them. |
-| `src/avandar/AvandarScene.tsx` | Storyboard integration and pointer choreography over the product stage. |
+| `src/avandar/AvandarScene/AvandarScene.tsx` | Storyboard integration and pointer choreography over the product stage. |
 | `src/avandar/cursor-targets.json` | Pointer locations measured from rendered `data-video-target` elements. |
 
 `scripts/buildProduct/` resolves product aliases and workspace packages, compiles TypeScript and the product's own Lingui macros (producer code under `src/` has none), processes source CSS modules and Mantine variables, and adds the required Tailwind utilities. Installed dependencies provide the original Mantine, AG Grid, CodeMirror, Puck and MapLibre runtimes. React and Remotion remain shared with the film renderer. The bridge installs the product theme and navigation components, local Figtree font, English Lingui message compiler and fixture router.

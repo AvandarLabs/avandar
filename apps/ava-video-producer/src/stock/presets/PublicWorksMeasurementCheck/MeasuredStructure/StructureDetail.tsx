@@ -1,12 +1,15 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
+
+type Props = { isLowWall: boolean; width: number; accent: string };
+
 /** Courses across a low wall, or posts at both ends of anything else. */
 export function StructureDetail({
   isLowWall,
   width,
   accent,
-}: Readonly<{ isLowWall: boolean; width: number; accent: string }>): ReactNode {
+}: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   if (isLowWall) {

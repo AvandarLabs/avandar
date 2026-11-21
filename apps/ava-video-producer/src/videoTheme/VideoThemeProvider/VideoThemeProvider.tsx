@@ -1,8 +1,8 @@
 import { MantineThemeProvider } from "@mantine/core";
 import { useMemo, type CSSProperties, type ReactNode } from "react";
-import { buildVideoCssVariables } from "../buildVideoCssVariables/buildVideoCssVariables";
 import { makeResolvedVideoThemeFromSource } from "../makeResolvedVideoThemeFromSource/makeResolvedVideoThemeFromSource";
-import { VideoThemeContext } from "../useVideoTheme";
+import { makeVideoCssVariablesFromTheme } from "../makeVideoCssVariablesFromTheme/makeVideoCssVariablesFromTheme";
+import { VideoThemeContext } from "../videoThemeHelpers";
 import type { ResolvedVideoTheme, VideoThemeSource } from "../videoTheme.types";
 
 type Props = Readonly<{
@@ -24,7 +24,7 @@ function _styleFromTheme(theme: ResolvedVideoTheme): CSSProperties {
   }
   const style: CSSProperties = {
     display: "contents",
-    ...buildVideoCssVariables(theme),
+    ...makeVideoCssVariablesFromTheme(theme),
   };
   CSS_STYLES.set(theme, style);
   return style;

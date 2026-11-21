@@ -1,4 +1,4 @@
-import { mix, ramp } from "../../../../motion";
+import { Motion } from "../../../../motion";
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
@@ -32,7 +32,12 @@ export function GrantGate({
         stroke={tokens.color.highlight}
         strokeWidth={scales.stroke(tokens.stroke.emphasis)}
         fill="none"
-        opacity={ramp(frame, 53, motion.whip, motion.reveal.easing)}
+        opacity={Motion.ramp({
+          frame,
+          at: 53,
+          dur: motion.whip,
+          easing: motion.reveal.easing,
+        })}
       />
     </g>
   );

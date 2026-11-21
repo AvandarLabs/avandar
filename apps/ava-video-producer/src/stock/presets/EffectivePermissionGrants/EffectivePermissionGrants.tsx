@@ -1,9 +1,7 @@
-import {
-  getEffectiveRoleFromInput,
-  ROLE_RANK,
-} from "./getEffectiveRoleFromInput";
+import { getEffectiveRoleFromInput } from "./getEffectiveRoleFromInput";
 import { GrantCandidate } from "./GrantCandidate/GrantCandidate";
 import { PermissionLadder } from "./PermissionLadder/PermissionLadder";
+import { PermissionRoles } from "./PermissionRoles";
 import { PermissionSceneHeadings } from "./PermissionSceneHeadings";
 import { PermissionVerdict } from "./PermissionVerdict";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
@@ -18,7 +16,8 @@ export function EffectivePermissionGrants({
   accent,
 }: Readonly<Props>): ReactNode {
   const effective = getEffectiveRoleFromInput(input);
-  const isAllowed = ROLE_RANK[effective] >= ROLE_RANK[input.requiredRole];
+  const isAllowed =
+    PermissionRoles.rank[effective] >= PermissionRoles.rank[input.requiredRole];
   return (
     <g
       data-effective-role={effective}

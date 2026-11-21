@@ -8,7 +8,6 @@ import {
 import { isProductFile } from "./isProductFile";
 import type { Aliases } from "./buildProduct.types";
 import type { OnResolveArgs } from "esbuild";
-
 /** Workspace package names and the source folder each one compiles from. */
 const WORKSPACE_PACKAGES: Readonly<Record<string, string>> = {
   ui: "packages/web/ui/src",
@@ -21,14 +20,12 @@ const WORKSPACE_PACKAGES: Readonly<Record<string, string>> = {
   "query-hooks": "packages/web/query-hooks/src",
   clients: "packages/shared/clients/src",
 };
-
 /** Import prefixes that map straight onto a folder of the product. */
 const PRODUCT_IMPORT_PREFIXES = [
   { prefix: "@/", folder: "src" },
   { prefix: "$/", folder: "shared" },
   { prefix: "@product-assets/", folder: "public" },
 ] as const;
-
 /** The first existing file for a module path, trying TS and index files. */
 async function _locate(base: string): Promise<string> {
   const candidates = [
@@ -57,7 +54,6 @@ async function _locate(base: string): Promise<string> {
   }
   return found;
 }
-
 /** The workspace package folder a `@name` or `@avandar/name` import maps to. */
 async function _getWorkspacePackageFile(
   importPath: string,
@@ -83,7 +79,6 @@ async function _getWorkspacePackageFile(
       : importPath.slice(match.prefix.length + 1);
   return _locate(path.join(PRODUCT_ROOT, match.folder, subpath));
 }
-
 /**
  * Gets the product, alias, or shim file an esbuild import resolves to, or
  * undefined when the import is not ours and esbuild should resolve it.
@@ -91,10 +86,13 @@ async function _getWorkspacePackageFile(
  * Used by the product build's resolve hook, so every product import lands on
  * the worktree's own source.
  */
-export async function getProductSourceFileFromImport(
-  args: Readonly<OnResolveArgs>,
-  aliases: Readonly<Aliases>,
-): Promise<string | undefined> {
+export async function getProductSourceFileFromImport({
+  args,
+  aliases,
+}: Readonly<{
+  args: Readonly<OnResolveArgs>;
+  aliases: Readonly<Aliases>;
+}>): Promise<string | undefined> {
   if (args.path === "@tanstack/react-router") {
     return path.join(ADAPTER_ROOT, "shims/router.ts");
   }
@@ -112,10 +110,7 @@ export async function getProductSourceFileFromImport(
   if (workspaceFile) {
     return workspaceFile;
   }
-  if (isProductFile(args.importer) && args.path.startsWith(".")) {
-    return _locate(path.resolve(path.dirname(args.importer), args.path));
-  }
-  // Let esbuild resolve installed dependencies from their actual importer.
-  // Re-resolving them with a different importer can alter CommonJS interop.
-  return undefined;
+  return isProductFile(args.importer) && args.path.startsWith(".")
+    ? _locate(path.resolve(path.dirname(args.importer), args.path))
+    : undefined;
 }

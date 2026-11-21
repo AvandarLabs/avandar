@@ -1,12 +1,12 @@
 import { TiltedWindowSceneShared } from "./TiltedWindowSceneShared/TiltedWindowSceneShared";
 import { type SizedProps } from "./TiltedWindowSceneShared/TiltedWindowSceneShared.types";
 import { useWindowStage } from "./useWindowStage";
-import { WindowCard } from "./WindowCard";
+import { WindowCard } from "./WindowCard/WindowCard";
 import { WindowMotion } from "./WindowMotion/WindowMotion";
 import type { TiltedWindowSceneProps } from "../scenes.types";
 import type { ReactNode } from "react";
 
-type SecondaryWindowOptions = SizedProps & {
+type Props = SizedProps & {
   secondary: NonNullable<TiltedWindowSceneProps["secondary"]>;
 };
 /** The small second window, whipping in on its cue and out on the exit. */
@@ -17,10 +17,13 @@ export function SecondaryWindow({
   exit,
   secondary,
   chrome,
-}: SecondaryWindowOptions): ReactNode {
+}: Readonly<Props>): ReactNode {
   const stage = useWindowStage();
   const canvas = { width, height };
-  const rect = TiltedWindowSceneShared.toPixels(secondary.box, canvas);
+  const rect = TiltedWindowSceneShared.toPixels({
+    box: secondary.box,
+    canvas,
+  });
   return (
     <WindowCard
       frame={frame}

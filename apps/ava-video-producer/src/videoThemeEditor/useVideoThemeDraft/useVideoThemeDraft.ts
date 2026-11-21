@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { BUILT_IN_VIDEO_THEMES } from "../../videoTheme/builtInVideoThemes/builtInVideoThemes";
+import { BUILT_IN_VIDEO_THEMES } from "../../videoTheme/makeVideoThemeLibraryFromDocuments/makeVideoThemeLibraryFromDocuments";
 import { getBrowserStorage } from "./getBrowserStorage";
 import { useActiveThemeId } from "./useActiveThemeId";
 import { useStoredDraft, type StoredDraftState } from "./useStoredDraft";

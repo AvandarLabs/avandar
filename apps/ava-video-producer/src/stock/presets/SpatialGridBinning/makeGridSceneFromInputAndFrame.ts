@@ -1,5 +1,5 @@
-import { mix } from "../../../motion";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import { Motion } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./SpatialGridBinning.schema";
 /** Data for CountToken. */
 type CountTokenResult = {
@@ -64,7 +64,10 @@ export function makeGridSceneFromInputAndFrame({
   input,
   frame,
   motion,
-}: GridSceneArgs): { points: CountToken[]; cells: CellCount[] } {
+}: GridSceneArgs): {
+  points: CountToken[];
+  cells: CellCount[];
+} {
   const assignments = _getAssignments(input);
   const points = _createCountTokens({
     input: { input, frame, motion },
@@ -100,19 +103,20 @@ function _createCountTokens({
       progress,
       sourceX: 48 + point.x * 3.3,
       sourceY: 164 + point.y * 3.3,
-      x: mix(
-        progress,
-        48 + point.x * 3.3,
-        450 + ((cell % columns) * 420) / columns + 20 + (rank % 4) * 26,
-      ),
-      y: mix(
-        progress,
-        164 + point.y * 3.3,
-        164 +
+      x: Motion.mix({
+        t: progress,
+        from: 48 + point.x * 3.3,
+        to: 450 + ((cell % columns) * 420) / columns + 20 + (rank % 4) * 26,
+      }),
+      y: Motion.mix({
+        t: progress,
+        from: 164 + point.y * 3.3,
+        to:
+          164 +
           (Math.floor(cell / columns) * 300) / rows +
           52 +
           Math.floor(rank / 4) * 18,
-      ),
+      }),
     };
   });
 }

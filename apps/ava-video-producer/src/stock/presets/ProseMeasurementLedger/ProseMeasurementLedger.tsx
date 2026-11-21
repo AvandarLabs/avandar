@@ -1,12 +1,14 @@
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ObservationSlot } from "./ObservationSlot/ObservationSlot";
 import { ProseHeadings } from "./ProseHeadings";
-import { SentenceSpans } from "./SentenceSpans";
+import { SentenceSpans } from "./SentenceSpans/SentenceSpans";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ProseMeasurementLedger.schema";
 import type { ReactNode } from "react";
+
 /** Complete validated authored content and frame palette. */
 export type Props = GraphicProps & { input: Input };
+
 /** Keeps source context, exact semantic spans and review status together. */
 export function ProseMeasurementLedger({
   input,

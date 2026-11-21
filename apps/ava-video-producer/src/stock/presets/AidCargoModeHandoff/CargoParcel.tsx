@@ -1,6 +1,6 @@
-import { SketchedShape } from "../../primitives/SketchedShape";
-import { StockRect } from "../../primitives/StockRect/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { CargoParcelBody } from "./CargoParcelBody/CargoParcelBody";
+import { CargoParcelMechanism } from "./CargoParcelMechanism/CargoParcelMechanism";
 import { getCargoPositionFromInputAndFrame } from "./getCargoPositionFromInputAndFrame";
 import type { Input } from "./AidCargoModeHandoff.schema";
 import type { ReactNode } from "react";
@@ -37,66 +37,14 @@ export function CargoParcel({
   });
   return (
     <g>
-      {position.mechanism ? (
-        <g data-mechanism={position.mechanism}>
-          <SketchedShape
-            shape={{
-              kind: "path",
-              d:
-                position.mechanism === "hoist"
-                  ? `M${position.x} 175 V${position.y - 17}`
-                  : `M${position.x - 20} ${position.y + 20} h40 l5 -10`,
-            }}
-            profile={tokens.sketch.shape}
-            fill="none"
-            stroke={tokens.color.inactive}
-            strokeWidth={scales.stroke(tokens.stroke.default)}
-          />
-          {position.mechanism === "handcart" ? (
-            <circle
-              cx={position.x}
-              cy={position.y + 25}
-              r={4}
-              fill={tokens.color.inactive}
-            />
-          ) : undefined}
-        </g>
-      ) : undefined}
-      <g
-        data-parcel={parcel.id}
-        data-owner={position.owner}
-        data-x={position.x}
-        data-y={position.y}
-        transform={`translate(${position.x} ${position.y})`}
-      >
-        <StockRect
-          x={-18}
-          y={-18}
-          width={36}
-          height={36}
-          rx={scales.corner(tokens.corner.chip)}
-          fill={tokens.color.surface}
-          stroke={accent}
-          strokeWidth={scales.stroke(tokens.stroke.default)}
-        />
-        <SketchedShape
-          shape={{ kind: "path", d: SYMBOLS[parcel.symbol] }}
-          profile={tokens.sketch.shape}
-          fill="none"
-          stroke={accent}
-        />
-        <text
-          x={6}
-          y={10}
-          fontFamily={tokens.text.graphic.value.fontFamily}
-          fontWeight={tokens.text.graphic.value.fontWeight}
-          fontSize={tokens.text.graphic.value.fontSize}
-          fill={tokens.color.text}
-          textAnchor="middle"
-        >
-          {parcelIndex + 1}
-        </text>
-      </g>
+      <CargoParcelMechanism {...{ position, tokens, scales }} />
+      <CargoParcelBody
+        {...{ parcel, position, scales, tokens, accent }}
+        symbols={SYMBOLS}
+        parcelIndex={parcelIndex}
+      />
     </g>
   );
 }
+/** The type of `SYMBOLS` used by CargoParcel. */
+export type CargoParcelSymbolsValue = typeof SYMBOLS;

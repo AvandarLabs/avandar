@@ -1,17 +1,20 @@
-import { StockRect } from "../../../primitives/StockRect/StockRect";
+import { StockRect } from "../../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getMeasurementStripFromFrame } from "../getMeasurementStripFromFrame";
 import type { ReactNode } from "react";
+
+type Props = {
+  scene: ReturnType<typeof getMeasurementStripFromFrame>;
+  cellKey: string;
+  accent: string;
+};
+
 /** The strip's card, keyed to its source cell and resulting observation. */
 export function StripCard({
   scene,
   cellKey,
   accent,
-}: Readonly<{
-  scene: ReturnType<typeof getMeasurementStripFromFrame>;
-  cellKey: string;
-  accent: string;
-}>): ReactNode {
+}: Readonly<Props>): ReactNode {
   const { atomic } = GraphicThemeHooks.useGraphicTheme();
   const tokens = GraphicThemeHooks.useGraphicTokens();
   return (

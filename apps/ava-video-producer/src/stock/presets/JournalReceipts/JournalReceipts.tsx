@@ -1,14 +1,15 @@
-import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { JournalCopy } from "./JournalCopy";
 import { JournalSpineAndPocket } from "./JournalSpineAndPocket";
-import { JournalTab } from "./JournalTab";
+import { JournalTab } from "./JournalTab/JournalTab";
 import { ReceiptHalf } from "./ReceiptHalf";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./JournalReceipts.schema";
 import type { ReactNode } from "react";
+
 /** Complete receipt-controlled journal input. */
 export type Props = GraphicProps & { input: Input };
+
 /**
  * A retained accordion journal closes only obligations matched by authored
  * receipts.

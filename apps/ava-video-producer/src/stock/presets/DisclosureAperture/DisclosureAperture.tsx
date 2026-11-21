@@ -1,13 +1,14 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { AperturePanel } from "./AperturePanel/AperturePanel";
+import { DisclosureApertureFieldsLayer } from "./DisclosureApertureFieldsLayer/DisclosureApertureFieldsLayer";
 import { DisclosureCopies } from "./DisclosureCopies";
 import { DisclosureCopy } from "./DisclosureCopy";
-import { DisclosureField } from "./DisclosureField/DisclosureField";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./DisclosureAperture.schema";
 import type { ReactNode } from "react";
+
 /** Complete authored disclosure policy and source content. */
 export type Props = GraphicProps & { input: Input };
 /**
@@ -49,16 +50,7 @@ export function DisclosureAperture({
         stroke={tokens.color.line}
       />
       <AperturePanel {...{ frame, input, accent }} />
-      {input.fields.map((field, index) => {
-        return (
-          <DisclosureField
-            key={field.id}
-            {...{ field, index, frame, input, accent }}
-            shareIndex={0}
-            isCopy={false}
-          />
-        );
-      })}
+      <DisclosureApertureFieldsLayer {...{ input, frame, accent }} />
       <DisclosureCopies {...{ input, frame, accent }} />
       <DisclosureCopy input={input} />
     </g>

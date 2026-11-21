@@ -1,31 +1,71 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { getMaterialEndpointsFromInput } from "./getMaterialEndpointsFromInput";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./ComponentMaterialReturn.schema";
+
 /** Data for getMaterialPlacementFromInputAndFrame. */
 type GetMaterialPlacementResult = {
   x: number;
   y: number;
   destination: string;
-  source: { x: number; y: number };
-  target: { x: number; y: number };
+  source: {
+    x: number;
+    y: number;
+  };
+  target: {
+    x: number;
+    y: number;
+  };
   start: number;
 };
 
+type SourceOptions = {
+  input: Readonly<{
+    input: Input;
+    index: number;
+    frame: number;
+    motion: VideoMotion;
+  }>["input"];
+  index: Readonly<{
+    input: Input;
+    index: number;
+    frame: number;
+    motion: VideoMotion;
+  }>["index"];
+  frame: Readonly<{
+    input: Input;
+    index: number;
+    frame: number;
+    motion: VideoMotion;
+  }>["frame"];
+  motion: Readonly<{
+    input: Input;
+    index: number;
+    frame: number;
+    motion: VideoMotion;
+  }>["motion"];
+};
+
+type SourceResult = {
+  source: ReturnType<typeof getMaterialEndpointsFromInput>["source"];
+  target: ReturnType<typeof getMaterialEndpointsFromInput>["target"];
+  destination: ReturnType<typeof getMaterialEndpointsFromInput>["destination"];
+  start: number;
+  lift: number;
+  travel: number;
+  land: number;
+};
+
 /**
- * A lifted whole component travels above unchanged neighbors before landing.
+ * Samples the material placement from input and frame source state for the
+ * current authored frame.
  */
-export function getMaterialPlacementFromInputAndFrame({
+function _getMaterialPlacementFromInputAndFrameSourceState({
   input,
   index,
   frame,
   motion,
-}: Readonly<{
-  input: Input;
-  index: number;
-  frame: number;
-  motion: VideoMotion;
-}>): GetMaterialPlacementResult {
+}: Readonly<SourceOptions>): SourceResult {
   const { source, target, destination } = getMaterialEndpointsFromInput({
     input,
     index,
@@ -49,9 +89,48 @@ export function getMaterialPlacementFromInputAndFrame({
     motion.scale(2),
     motion.travel.easing,
   );
+  return { source, target, destination, start, lift, travel, land };
+}
+
+/**
+ * A lifted whole component travels above unchanged neighbors before landing.
+ */
+export function getMaterialPlacementFromInputAndFrame({
+  input,
+  index,
+  frame,
+  motion,
+}: Readonly<{
+  input: Input;
+  index: number;
+  frame: number;
+  motion: VideoMotion;
+}>): GetMaterialPlacementResult {
+  const { source, target, destination, start, lift, travel, land } =
+    _getMaterialPlacementFromInputAndFrameSourceState({
+      input,
+      index,
+      frame,
+      motion,
+    });
   return {
-    x: mix(travel, source.x, target.x),
-    y: frame < start + 6 ? mix(lift, source.y, 265) : mix(land, 265, target.y),
+    x: Motion.mix({
+      t: travel,
+      from: source.x,
+      to: target.x,
+    }),
+    y:
+      frame < start + 6
+        ? Motion.mix({
+            t: lift,
+            from: source.y,
+            to: 265,
+          })
+        : Motion.mix({
+            t: land,
+            from: 265,
+            to: target.y,
+          }),
     destination,
     source,
     target,

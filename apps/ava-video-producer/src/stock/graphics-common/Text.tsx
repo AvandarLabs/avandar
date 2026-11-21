@@ -16,13 +16,12 @@ type Props = {
   mono?: boolean;
 };
 function _textStyle(style: ResolvedTypeStyle): CSSProperties | undefined {
-  if (!style.textTransform && !style.fontVariantNumeric) {
-    return undefined;
-  }
-  return {
-    textTransform: style.textTransform,
-    fontVariantNumeric: style.fontVariantNumeric,
-  };
+  return !style.textTransform && !style.fontVariantNumeric
+    ? undefined
+    : {
+        textTransform: style.textTransform,
+        fontVariantNumeric: style.fontVariantNumeric,
+      };
 }
 /**
  * SVG text in a graphic type role (`body` unless named), for headings,

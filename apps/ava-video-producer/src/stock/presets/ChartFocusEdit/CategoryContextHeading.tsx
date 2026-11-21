@@ -1,4 +1,4 @@
-import { ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { RefinementMotion } from "./RefinementMotion";
@@ -28,12 +28,12 @@ export function CategoryContextHeading({
   // Beside direct labels, the context fades in over the refinement's last
   // whip.
   const opacity = direct
-    ? ramp(
+    ? Motion.ramp({
         frame,
-        RefinementMotion.getRefinementEndFromMotion(motion) - motion.whip,
-        motion.whip,
-        motion.travel.easing,
-      )
+        at: RefinementMotion.getRefinementEndFromMotion(motion) - motion.whip,
+        dur: motion.whip,
+        easing: motion.travel.easing,
+      })
     : RefinementMotion.getRefinementFromFrame({ frame, motion });
   return (
     <g data-context={category.id} opacity={opacity}>

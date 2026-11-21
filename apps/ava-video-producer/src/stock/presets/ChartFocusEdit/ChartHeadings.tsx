@@ -1,6 +1,7 @@
-import { FitText } from "../../primitives/FitText/FitText";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { ChartHeadingSlots } from "./ChartHeadingSlots/ChartHeadingSlots";
 import { RefinementMotion } from "./RefinementMotion";
+import type { FitText } from "../../primitives/FitText/FitText";
 import type { Input } from "./ChartFocusEdit.schema";
 import type { ReactNode, ComponentProps } from "react";
 
@@ -47,19 +48,7 @@ export function ChartHeadings({
   ];
   return (
     <g>
-      {slots.map(({ opacity, ...label }, index) => {
-        return (
-          <g key={index} opacity={opacity}>
-            <FitText
-              {...label}
-              x={64}
-              width={832}
-              breakLongWords
-              normalizeWhitespace
-            />
-          </g>
-        );
-      })}
+      <ChartHeadingSlots slots={slots} />
     </g>
   );
 }

@@ -1,6 +1,6 @@
-import { getStockValueFromPath } from "../../../../stock/copy/getStockValueFromPath";
+import { getStockValueFromPath } from "../../../../stock/data/getStockValueFromPath";
 import { CollectionItem } from "../CollectionItem/CollectionItem";
-import { ContentDraftModule } from "../ContentDraftModule/ContentDraftModule";
+import { AddCollectionItem } from "./AddCollectionItem/AddCollectionItem";
 import styles from "./CollectionField.module.css";
 import type { StockControl } from "../../../../stock/contracts/StockContract.types";
 import type { Props as ContentFieldProps } from "../ContentField/ContentField";
@@ -18,14 +18,8 @@ export type Props = ContentFieldProps & {
   context: ContentFieldContext;
 };
 /** Collection rows use editor-only keys even when content has no ID. */
-export function CollectionField({
-  control,
-  context,
-  preset,
-  state,
-  onChange,
-  ...remainingProps
-}: Readonly<Props>): ReactNode {
+export function CollectionField(props: Readonly<Props>): ReactNode {
+  const { control, context, preset, state, onChange } = props;
   const value = getStockValueFromPath({
     value: state.draft,
     path: context.path,
@@ -44,14 +38,7 @@ export function CollectionField({
       {items.map((item, index) => {
         return (
           <CollectionItem
-            {...{
-              ...remainingProps,
-              control,
-              context,
-              preset,
-              state,
-              onChange,
-            }}
+            {...props}
             key={keys[index]}
             item={item}
             index={index}
@@ -59,21 +46,9 @@ export function CollectionField({
           />
         );
       })}
-      <button
-        disabled={items.length >= control.maxItems}
-        onClick={() => {
-          return onChange(
-            ContentDraftModule.addItem({
-              preset,
-              state,
-              path: context.path,
-              schema: control.itemSchema,
-            }),
-          );
-        }}
-      >
-        Add {label} item
-      </button>
+      <AddCollectionItem
+        {...{ items, control, preset, state, context, onChange, label }}
+      />
     </fieldset>
   );
 }

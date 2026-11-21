@@ -1,12 +1,16 @@
-import { mix } from "../../../motion";
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { Motion } from "../../../motion";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CitationTab } from "./CitationTab";
 import { SummaryCopy } from "./SummaryCopy";
 import type { Input } from "./ProvenancePeelback.schema";
 import type { ReactNode } from "react";
 
-type Props = { input: Input; frame: number; accent: string };
+type Props = {
+  input: Input;
+  frame: number;
+  accent: string;
+};
 /** Lift the statement while keeping its citation aligned to the sheet edge. */
 export function ProvenanceSummary({
   input,
@@ -25,7 +29,15 @@ export function ProvenanceSummary({
   return (
     <g
       data-summary-strip="statement"
-      transform={`translate(${mix(peeling, 100, 64)} ${mix(peeling, 160, 96)})`}
+      transform={`translate(${Motion.mix({
+        t: peeling,
+        from: 100,
+        to: 64,
+      })} ${Motion.mix({
+        t: peeling,
+        from: 160,
+        to: 96,
+      })})`}
       opacity={motion.reveal(frame, 12)}
     >
       <StockRect

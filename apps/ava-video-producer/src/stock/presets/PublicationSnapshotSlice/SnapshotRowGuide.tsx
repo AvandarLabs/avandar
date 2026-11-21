@@ -1,4 +1,5 @@
-import { mix } from "../../../motion";
+import { propEq } from "@avandar/utils";
+import { Motion } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./PublicationSnapshotSlice.schema";
@@ -23,15 +24,15 @@ export function SnapshotRowGuide({
   const duration = 36 / input.selection.rowIds.length,
     departure =
       56 + (input.selection.rowIds.length - 1 - selectedRow) * duration;
-  const sourceRow = input.table.rows.findIndex(({ id }) => {
-    return id === input.selection.rowIds[selectedRow];
-  });
+  const sourceRow = input.table.rows.findIndex(
+    propEq("id", input.selection.rowIds[selectedRow]),
+  );
   const sourceY = 276 + sourceRow * 72,
-    copyY = mix(
-      motion.ramp(frame, departure, duration - 1, motion.travel.easing),
-      240,
-      276 + selectedRow * 72,
-    );
+    copyY = Motion.mix({
+      t: motion.ramp(frame, departure, duration - 1, motion.travel.easing),
+      from: 240,
+      to: 276 + selectedRow * 72,
+    });
   const opacity =
     motion.ramp(frame, departure, motion.scale(1)) *
     (1 - motion.ramp(frame, departure + duration - 1, motion.scale(1)));

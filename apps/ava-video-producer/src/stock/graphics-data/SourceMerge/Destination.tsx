@@ -2,7 +2,7 @@ import { Arrive } from "../../graphics-common/Arrive/Arrive";
 import { GRAPHIC_WIDTH } from "../../graphics-common/graphicCanvas.constants";
 import { Panel } from "../../graphics-common/Panel";
 import { Text } from "../../graphics-common/Text";
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { DestinationSlots } from "./DestinationSlots";
 import { DESTINATION } from "./SourceMerge.constants";
@@ -16,7 +16,10 @@ type Props = Readonly<{
 }>;
 /** The destination panel the merged output lands in. */
 export function Destination({ input, frame, accent }: Props): ReactNode {
-  const style = GraphicThemeHooks.useGraphicProps("SourceMerge", {});
+  const style = GraphicThemeHooks.useGraphicProps({
+    name: "SourceMerge",
+    props: {},
+  });
   const { layout } = GraphicThemeHooks.useGraphicTokens();
   const shapes = GraphicThemeHooks.useGraphicShapeScales();
   const x = GRAPHIC_WIDTH - layout.graphic.margin - DESTINATION.width;

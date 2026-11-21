@@ -1,4 +1,7 @@
-import { useVideoTheme, useVideoTokens } from "../../videoTheme/useVideoTheme";
+import {
+  useVideoTheme,
+  useVideoTokens,
+} from "../../videoTheme/videoThemeHelpers";
 import { Orb } from "../Orb/Orb";
 import { AppFrameShared } from "./AppFrameShared/AppFrameShared";
 import { AppHeaderTitles } from "./AppHeaderTitles";

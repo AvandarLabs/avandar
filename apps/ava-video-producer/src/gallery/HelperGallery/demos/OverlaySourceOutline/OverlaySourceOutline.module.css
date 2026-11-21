@@ -1,0 +1,6 @@
+.overlaySourceOutlineBox {
+  border: var(--demo-stroke-default) dashed var(--demo-line);
+  border-radius: var(--demo-corner-span);
+  box-sizing: border-box;
+  position: absolute;
+}

@@ -1,12 +1,47 @@
 import { propEq } from "@avandar/utils";
-import { mix, ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { RecordedStamp } from "./RecordedStamp";
 import { StampHandling } from "./StampHandling";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./ActorAttributionSplit.schema";
 import type { ReactNode } from "react";
+
+type EventStamp = EventAccount & {
+  onset: number;
+  travelFrames: number;
+  travel: number;
+  x: number;
+  y: number;
+  visible: number;
+};
+
+type EventAccount = {
+  personIndex: number;
+  accountId: string;
+  account: Input["accounts"][number];
+};
+/** Finds the actor and account recorded for the event. */
+function _getEventAccount({
+  input,
+  event,
+}: Readonly<Pick<Props, "input" | "event">>): EventAccount {
+  const personIndex = input.collaborators.findIndex(
+    propEq("id", event.collaboratorId),
+  );
+  const accountId =
+    event.phase === "shared"
+      ? input.sharedAccountId
+      : input.collaborators[personIndex].individualAccountId;
+  const account = input.accounts.find(propEq("id", accountId))!;
+  return { personIndex, accountId, account };
+}
+
+/** Inputs for getEventStamp. */
+type GetEventStampArguments = Omit<Props, "accent"> & {
+  motion: VideoMotion;
+};
 
 type Props = {
   frame: number;
@@ -25,30 +60,31 @@ function _getEventStamp({
   event,
   index,
   motion,
-}: Readonly<Omit<Props, "accent"> & { motion: VideoMotion }>) {
-  const personIndex = input.collaborators.findIndex(
-    propEq("id", event.collaboratorId),
-  );
-  const accountId =
-    event.phase === "shared"
-      ? input.sharedAccountId
-      : input.collaborators[personIndex].individualAccountId;
-  const account = input.accounts.find(propEq("id", accountId))!;
+}: Readonly<GetEventStampArguments>): EventStamp {
+  const { personIndex, accountId, account } = _getEventAccount({
+    input,
+    event,
+  });
   const onset = [12, 37, 96, 118][index];
   const travelFrames = motion.scale(TRAVEL_FRAMES);
-  const travel = ramp(frame, onset, travelFrames, motion.travel.easing);
-  const x = mix(travel, 300, 590),
-    y = mix(
-      travel,
-      event.phase === "shared" ? 275 : 170 + personIndex * 160,
-      170 + index * 82,
-    );
-  const visible = ramp(
+  const travel = Motion.ramp({
     frame,
-    onset,
-    motion.scale(APPEAR_FRAMES),
-    motion.reveal.easing,
-  );
+    at: onset,
+    dur: travelFrames,
+    easing: motion.travel.easing,
+  });
+  const x = Motion.mix({ t: travel, from: 300, to: 590 }),
+    y = Motion.mix({
+      t: travel,
+      from: event.phase === "shared" ? 275 : 170 + personIndex * 160,
+      to: 170 + index * 82,
+    });
+  const visible = Motion.ramp({
+    frame,
+    at: onset,
+    dur: motion.scale(APPEAR_FRAMES),
+    easing: motion.reveal.easing,
+  });
   return {
     personIndex,
     accountId,

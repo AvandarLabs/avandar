@@ -1,4 +1,4 @@
-import { ramp } from "../../../../motion";
+import { Motion } from "../../../../motion";
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { PushdownRow } from "../PushdownRow";
@@ -25,19 +25,19 @@ export function PushdownSourceRow({
   isRejected,
   accent,
 }: Props): ReactNode {
-  const style = GraphicThemeHooks.useGraphicProps(
-    "PredicatePushdownBoundary",
-    {},
-  );
+  const style = GraphicThemeHooks.useGraphicProps({
+    name: "PredicatePushdownBoundary",
+    props: {},
+  });
   const { color, sketch } = GraphicThemeHooks.useGraphicTokens();
   const motion = GraphicThemeHooks.useGraphicMotion();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
-  const gates = ramp(
+  const gates = Motion.ramp({
     frame,
-    GATE_CUE,
-    motion.scale(GATE_FRAMES),
-    motion.travel.easing,
-  );
+    at: GATE_CUE,
+    dur: motion.scale(GATE_FRAMES),
+    easing: motion.travel.easing,
+  });
   return (
     <g>
       <PushdownRow

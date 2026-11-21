@@ -1,4 +1,4 @@
-import { prop } from "@avandar/utils";
+import { prop, propEq } from "@avandar/utils";
 import { z } from "zod";
 import type { StockSemanticRule } from "../../contracts/StockContract.types";
 /** Strict complete authored input with cross-field validation. */
@@ -58,11 +58,7 @@ export const inputSchema = z
     });
     input.jobs.forEach((job) => {
       Array.from(["initialHostId", "finalHostId"] as const).forEach((field) => {
-        if (
-          !input.hosts.some(({ id }) => {
-            return id === job[field];
-          })
-        ) {
+        if (!input.hosts.some(propEq("id", job[field]))) {
           issue("jobs", "Both host references must exist.");
         }
       });

@@ -1,4 +1,4 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
@@ -7,6 +7,75 @@ type Props = {
   piece: "left" | "right" | "continuous";
   isMask: boolean;
 };
+
+type GetFoundationSlabRightOptions = { joining: number };
+
+type GetJoiningFoundationBoundsOptions = { joining: number; reveal: number };
+
+/** Samples the foundation slab right for the current authored frame. */
+function _getFoundationSlabRight(
+  joining: Readonly<Readonly<GetFoundationSlabRightOptions>["joining"]>,
+): {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+} {
+  return {
+    x: Motion.mix({
+      t: joining,
+      from: 530,
+      to: 480,
+    }),
+    y: 390,
+    width: Motion.mix({
+      t: joining,
+      from: 350,
+      to: 400,
+    }),
+    height: 160,
+  };
+}
+
+/** Samples the joining foundation bounds for the current authored frame. */
+function _getJoiningFoundationBounds({
+  joining,
+  reveal,
+}: Readonly<GetJoiningFoundationBoundsOptions>): {
+  left: { x: number; y: number; width: number; height: number };
+  right: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  };
+  continuous: { x: number; y: number; width: number; height: number };
+} {
+  return {
+    left: {
+      x: 80,
+      y: 390,
+      width: Motion.mix({
+        t: joining,
+        from: 350,
+        to: 400,
+      }),
+      height: 160,
+    },
+    right: _getFoundationSlabRight(joining),
+    continuous: {
+      x: 80,
+      y: Motion.mix({
+        t: reveal,
+        from: 550,
+        to: 390,
+      }),
+      width: 800,
+      height: 160 * reveal,
+    },
+  };
+}
+
 /** A foundation section has identical visible and text-reveal geometry. */
 export function FoundationSlab({
   frame,
@@ -22,21 +91,7 @@ export function FoundationSlab({
     motion.travel.easing,
   );
   const reveal = motion.ramp(frame, 48, motion.scale(24));
-  const geometry = {
-    left: { x: 80, y: 390, width: mix(joining, 350, 400), height: 160 },
-    right: {
-      x: mix(joining, 530, 480),
-      y: 390,
-      width: mix(joining, 350, 400),
-      height: 160,
-    },
-    continuous: {
-      x: 80,
-      y: mix(reveal, 550, 390),
-      width: 800,
-      height: 160 * reveal,
-    },
-  }[piece];
+  const geometry = _getJoiningFoundationBounds({ joining, reveal })[piece];
   return (
     <rect
       data-foundation-left={!isMask && piece === "left" ? true : undefined}

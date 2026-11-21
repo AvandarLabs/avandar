@@ -1,14 +1,18 @@
 import { propEq, prop } from "@avandar/utils";
-import { mix } from "../../../../motion";
-import { SketchedShape } from "../../../primitives/SketchedShape";
-import { StockRect } from "../../../primitives/StockRect/StockRect";
+import { Motion } from "../../../../motion";
+import { StockRect } from "../../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { HostLabels } from "../HostLabels";
 import { CapacityGuide } from "./CapacityGuide";
 import type { Input } from "../ComputeCapacityConsolidation.schema";
 import type { ReactNode } from "react";
 
-type Props = { input: Input; index: number; frame: number; accent: string };
+type Props = {
+  input: Input;
+  index: number;
+  frame: number;
+  accent: string;
+};
 /** A common capacity scale persists while truly empty hosts fold. */
 export function HostBay({
   input,
@@ -33,9 +37,9 @@ export function HostBay({
       <StockRect
         data-bay={index}
         x={x}
-        y={370 - mix(fold, capacityHeight, 8)}
+        y={370 - Motion.mix({ t: fold, from: capacityHeight, to: 8 })}
         width={180}
-        height={mix(fold, capacityHeight, 8)}
+        height={Motion.mix({ t: fold, from: capacityHeight, to: 8 })}
         fill={tokens.color.surface}
         stroke={accent}
         strokeWidth={scales.stroke(tokens.stroke.hairline)}
@@ -46,7 +50,7 @@ export function HostBay({
       {input.showCapacityGuides ? (
         <CapacityGuide index={index} x={x} y={370 - capacityHeight} />
       ) : undefined}
-      <HostLabels input={input} index={index} frame={frame} />
+      <HostLabels {...{ input, index, frame }} />
     </g>
   );
 }

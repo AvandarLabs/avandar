@@ -15,7 +15,7 @@ async function _withContracts(action: (root: string) => Promise<void>) {
       recursive: true,
     });
     await fs.writeFile(
-      path.join(root, "src/stock/catalog.ts"),
+      path.join(root, "src/stock/stockEntry.ts"),
       'import { value } from "./nested"; export const STOCK_FPS=30; export const STOCK_CATALOG=[{id:"test",loopFrames:value}];',
     );
     await fs.writeFile(

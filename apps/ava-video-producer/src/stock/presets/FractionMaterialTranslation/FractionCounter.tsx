@@ -1,4 +1,4 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
@@ -26,8 +26,12 @@ export function FractionCounter({
     <SketchedShape
       shape={{
         kind: "circle",
-        cx: mix(progress, -82 + (index % 4) * 54, centerX),
-        cy: mix(progress, index < 4 ? -36 : 36, 0),
+        cx: Motion.mix({
+          t: progress,
+          from: -82 + (index % 4) * 54,
+          to: centerX,
+        }),
+        cy: Motion.mix({ t: progress, from: index < 4 ? -36 : 36, to: 0 }),
         r: 8,
       }}
       profile={tokens.sketch.shape}

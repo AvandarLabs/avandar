@@ -1,20 +1,23 @@
-import { StockRect } from "../../../primitives/StockRect/StockRect";
+import { StockRect } from "../../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getMaterialItemsFromInput } from "../getMaterialItemsFromInput";
 import { ROUTE_CATEGORY_KEYS } from "../routeColors";
 import { SceneLabel } from "../SceneLabel";
-import { MaterialPartsShared } from "./MaterialPartsShared/MaterialPartsShared";
+import { MaterialPartsShared } from "./MaterialPartsShared";
 import type { ReactNode } from "react";
+
+type Props = {
+  item: ReturnType<typeof getMaterialItemsFromInput>[number];
+  index: number;
+  point: Readonly<{ x: number; y: number }>;
+};
+
 /** One numbered part, tinted by the route it takes. */
 export function MaterialPart({
   item,
   index,
   point,
-}: Readonly<{
-  item: ReturnType<typeof getMaterialItemsFromInput>[number];
-  index: number;
-  point: Readonly<{ x: number; y: number }>;
-}>): ReactNode {
+}: Readonly<Props>): ReactNode {
   const { atomic } = GraphicThemeHooks.useGraphicTheme();
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();

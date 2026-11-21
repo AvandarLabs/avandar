@@ -83,24 +83,7 @@ function _getResultBoundsFromMarkup(
 ): GetResultBoundsFromMarkupResult {
   const result = SvgAttributes.fromMarker({ markup, marker: "result" });
   if (result.startsWith("<circle")) {
-    const radius = SvgAttributes.getNumberFromMarkup({
-      attributes: result,
-      name: "r",
-    });
-    return {
-      left:
-        SvgAttributes.getNumberFromMarkup({ attributes: result, name: "cx" }) -
-        radius,
-      right:
-        SvgAttributes.getNumberFromMarkup({ attributes: result, name: "cx" }) +
-        radius,
-      top:
-        SvgAttributes.getNumberFromMarkup({ attributes: result, name: "cy" }) -
-        radius,
-      bottom:
-        SvgAttributes.getNumberFromMarkup({ attributes: result, name: "cy" }) +
-        radius,
-    };
+    return _getCircleResultBounds(result);
   }
   const halfStroke =
     SvgAttributes.getNumberFromMarkup({
@@ -136,3 +119,27 @@ export {
   _getResultBoundsFromMarkup,
 };
 export type { GetResultBoundsFromMarkupResult };
+
+/** Returns the painted result bounds for a circle marker. */
+function _getCircleResultBounds(
+  result: string,
+): GetResultBoundsFromMarkupResult {
+  const radius = SvgAttributes.getNumberFromMarkup({
+    attributes: result,
+    name: "r",
+  });
+  return {
+    left:
+      SvgAttributes.getNumberFromMarkup({ attributes: result, name: "cx" }) -
+      radius,
+    right:
+      SvgAttributes.getNumberFromMarkup({ attributes: result, name: "cx" }) +
+      radius,
+    top:
+      SvgAttributes.getNumberFromMarkup({ attributes: result, name: "cy" }) -
+      radius,
+    bottom:
+      SvgAttributes.getNumberFromMarkup({ attributes: result, name: "cy" }) +
+      radius,
+  };
+}

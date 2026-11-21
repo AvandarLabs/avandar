@@ -1,5 +1,5 @@
 import { propEq } from "@avandar/utils";
-import { ramp } from "../../../../motion";
+import { Motion } from "../../../../motion";
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { getCacheSceneFromFrame } from "../getCacheSceneFromFrame";
@@ -26,16 +26,19 @@ export function RequestedRoutes({
   frame,
   accent,
 }: Props): ReactNode {
-  const style = GraphicThemeHooks.useGraphicProps("QueryColumnCacheGrowth", {});
+  const style = GraphicThemeHooks.useGraphicProps({
+    name: "QueryColumnCacheGrowth",
+    props: {},
+  });
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   const { sketch } = GraphicThemeHooks.useGraphicTokens();
   const motion = GraphicThemeHooks.useGraphicMotion();
-  const progress = ramp(
+  const progress = Motion.ramp({
     frame,
-    ROUTE_CUE,
-    motion.scale(ROUTE_FRAMES),
-    motion.travel.easing,
-  );
+    at: ROUTE_CUE,
+    dur: motion.scale(ROUTE_FRAMES),
+    easing: motion.travel.easing,
+  });
   return input.requests[0].columnIds.map((id) => {
     const index = scene.original.findIndex(propEq("id", id)),
       x = 144 + index * 168;

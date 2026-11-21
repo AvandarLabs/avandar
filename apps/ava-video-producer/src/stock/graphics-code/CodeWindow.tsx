@@ -4,20 +4,21 @@ import { SketchedShape } from "../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
+type Props = {
+  title: string;
+  children: ReactNode;
+};
 const DOT_COUNT = 3;
 const DOT_SPACING = 20;
 /**
  * Shared terminal/editor frame. Exclusive to this directory's preset
  * components.
  */
-export function CodeWindow({
-  title,
-  children,
-}: {
-  title: string;
-  children: ReactNode;
-}): ReactNode {
-  const style = GraphicThemeHooks.useGraphicProps("CodeWindow", {});
+export function CodeWindow({ title, children }: Readonly<Props>): ReactNode {
+  const style = GraphicThemeHooks.useGraphicProps({
+    name: "CodeWindow",
+    props: {},
+  });
   const { color, sketch } = GraphicThemeHooks.useGraphicTokens();
   const shapes = GraphicThemeHooks.useGraphicShapeScales();
   return (

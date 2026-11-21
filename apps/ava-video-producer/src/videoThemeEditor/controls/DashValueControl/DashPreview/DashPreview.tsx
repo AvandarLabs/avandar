@@ -1,4 +1,4 @@
-import { formatDashPattern } from "../../controlValueHelpers/controlValueHelpers";
+import { ControlValues } from "../../ControlValues/ControlValues";
 import css from "./DashPreview.module.css";
 import type { ReactNode } from "react";
 
@@ -18,7 +18,7 @@ export function DashPreview({ pattern }: Props): ReactNode {
         y1={4}
         x2={160}
         y2={4}
-        strokeDasharray={formatDashPattern(pattern)}
+        strokeDasharray={ControlValues.formatDashPattern(pattern)}
       />
     </svg>
   );

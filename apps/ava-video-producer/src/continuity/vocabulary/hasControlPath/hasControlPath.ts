@@ -4,10 +4,13 @@
  * ending in `[]` matches when any element of that array carries the rest of
  * the path.
  */
-export function hasControlPath(
-  value: unknown,
-  path: readonly string[],
-): boolean {
+export function hasControlPath({
+  value,
+  path,
+}: Readonly<{
+  value: unknown;
+  path: readonly string[];
+}>): boolean {
   const [head, ...tail] = path;
   if (!head) {
     return true;
@@ -20,7 +23,14 @@ export function hasControlPath(
   return head.endsWith("[]")
     ? Array.isArray(child) &&
         child.some((item: unknown) => {
-          return hasControlPath(item, tail);
+          return hasControlPath({
+            value: item,
+            path: tail,
+          });
         })
-    : key in value && hasControlPath(child, tail);
+    : key in value &&
+        hasControlPath({
+          value: child,
+          path: tail,
+        });
 }

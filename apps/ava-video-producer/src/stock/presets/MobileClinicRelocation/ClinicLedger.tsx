@@ -1,5 +1,5 @@
-import { FitText } from "../../primitives/FitText/FitText";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { ClinicLedgerValues } from "./ClinicLedgerValues/ClinicLedgerValues";
 import type { Input } from "./MobileClinicRelocation.schema";
 import type { ReactNode } from "react";
 
@@ -35,31 +35,7 @@ export function ClinicLedger({ input, frame }: Readonly<Props>): ReactNode {
     <g
       opacity={motion.ramp(frame, 114, motion.scale(10), motion.reveal.easing)}
     >
-      {rows.map((row, index) => {
-        return row.visible ? (
-          <g key={index}>
-            <FitText
-              text={String(row.value)}
-              x={50 + index * 180}
-              y={495}
-              width={165}
-              fontSize={18}
-              maxLines={1}
-              normalizeWhitespace
-            />
-            <FitText
-              text={row.label}
-              x={50 + index * 180}
-              y={516}
-              width={165}
-              fontSize={12}
-              maxLines={6}
-              breakLongWords
-              normalizeWhitespace
-            />
-          </g>
-        ) : undefined;
-      })}
+      <ClinicLedgerValues rows={rows} />
     </g>
   );
 }

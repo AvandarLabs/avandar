@@ -1,7 +1,8 @@
 import { propEq } from "@avandar/utils";
-import { mix } from "../../../motion";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import { Motion } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./ResidentBudgetBallots.schema";
+
 /** Data for getBallotGeometryFromInputAndFrame. */
 type GetBallotGeometryResult = {
   x: number;
@@ -12,24 +13,86 @@ type GetBallotGeometryResult = {
   cast: number;
   unfold: number;
 };
+
 type BallotGeometryArgs = Readonly<{
   input: Input;
   frame: number;
   index: number;
   motion: VideoMotion;
 }>;
+
+type ColumnWidthOptions = {
+  input: BallotGeometryArgs["input"];
+  frame: BallotGeometryArgs["frame"];
+  index: BallotGeometryArgs["index"];
+  motion: BallotGeometryArgs["motion"];
+};
+
+type ColumnWidthResult = {
+  columnWidth: number;
+  isRows: boolean;
+  targetX: ReturnType<typeof _getTallyTarget>["targetX"];
+  targetY: ReturnType<typeof _getTallyTarget>["targetY"];
+  sourceX: number;
+  cast: number;
+  lift: number;
+  unfold: number;
+};
+
+type GetBallotGeometryFromInputAndFrameYOptions = {
+  targetY: ColumnWidthResult["targetY"];
+  cast: ColumnWidthResult["cast"];
+  lift: ColumnWidthResult["lift"];
+  unfold: ColumnWidthResult["unfold"];
+};
+
+/**
+ * Samples the ballot geometry from input and frame y for the current authored
+ * frame.
+ */
+function _getBallotGeometryFromInputAndFrameY({
+  targetY,
+  cast,
+  lift,
+  unfold,
+}: Readonly<GetBallotGeometryFromInputAndFrameYOptions>): number {
+  return Motion.mix({
+    t: unfold,
+    from: Motion.mix({
+      t: lift,
+      from: Motion.mix({
+        t: cast,
+        from: 118,
+        to: 264,
+      }),
+      to: 206,
+    }),
+    to: targetY,
+  });
+}
+
 /** Where a ballot lands in its project's tally, in rows or a column. */
 function _getTallyTarget({
   input,
   index,
   columnWidth,
-}: Readonly<{ input: Input; index: number; columnWidth: number }>) {
+}: Readonly<{
+  input: Input;
+  index: number;
+  columnWidth: number;
+}>) {
   const ballot = input.ballots[index];
   const column =
     ballot.projectId === null
       ? input.projects.length
       : input.projects.findIndex(
-          propEq<{ id: unknown }, "id", unknown>("id", ballot.projectId),
+          propEq<
+            {
+              id: unknown;
+            },
+            "id",
+            unknown
+          >("id", ballot.projectId),
         );
   const row = input.ballots
     .slice(0, index)
@@ -41,13 +104,17 @@ function _getTallyTarget({
     targetY: 294 + (isRows ? Math.floor(row / 2) * 62 : row * 32),
   };
 }
-/** Paper placement derives from the same authored ballot throughout travel. */
-export function getBallotGeometryFromInputAndFrame({
+
+/**
+ * Samples the ballot geometry from input and frame column width state for the
+ * current authored frame.
+ */
+function _getBallotGeometryFromInputAndFrameColumnWidthState({
   input,
   frame,
   index,
   motion,
-}: BallotGeometryArgs): GetBallotGeometryResult {
+}: Readonly<ColumnWidthOptions>): ColumnWidthResult {
   const ballot = input.ballots[index];
   const columnWidth = 864 / (input.projects.length + 1);
   const isRows = input.tallyArrangement === "rows";
@@ -77,11 +144,44 @@ export function getBallotGeometryFromInputAndFrame({
     motion.scale(10),
     motion.travel.easing,
   );
+  return { columnWidth, isRows, targetX, targetY, sourceX, cast, lift, unfold };
+}
+
+/** Paper placement derives from the same authored ballot throughout travel. */
+export function getBallotGeometryFromInputAndFrame({
+  input,
+  frame,
+  index,
+  motion,
+}: BallotGeometryArgs): GetBallotGeometryResult {
+  const { columnWidth, isRows, targetX, targetY, sourceX, cast, lift, unfold } =
+    _getBallotGeometryFromInputAndFrameColumnWidthState({
+      input,
+      frame,
+      index,
+      motion,
+    });
   return {
-    x: mix(unfold, mix(cast, sourceX, 440 + index * 4), targetX),
-    y: mix(unfold, mix(lift, mix(cast, 118, 264), 206), targetY),
-    width: mix(unfold, 32, isRows ? columnWidth / 2 - 10 : columnWidth - 16),
-    height: mix(unfold, 40, isRows ? 54 : 31),
+    x: Motion.mix({
+      t: unfold,
+      from: Motion.mix({
+        t: cast,
+        from: sourceX,
+        to: 440 + index * 4,
+      }),
+      to: targetX,
+    }),
+    y: _getBallotGeometryFromInputAndFrameY({ targetY, cast, lift, unfold }),
+    width: Motion.mix({
+      t: unfold,
+      from: 32,
+      to: isRows ? columnWidth / 2 - 10 : columnWidth - 16,
+    }),
+    height: Motion.mix({
+      t: unfold,
+      from: 40,
+      to: isRows ? 54 : 31,
+    }),
     sourceX,
     cast,
     unfold,

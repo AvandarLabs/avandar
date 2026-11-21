@@ -1,9 +1,11 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
-type Props = { transfer: number };
+type Props = {
+  transfer: number;
+};
 /** Workshop Bench for the authored scene. */
 export function WorkshopBench({ transfer }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
@@ -11,7 +13,11 @@ export function WorkshopBench({ transfer }: Readonly<Props>): ReactNode {
   return (
     <g
       data-workshop-bench="true"
-      transform={`translate(${mix(transfer, 640, 570)} 388)`}
+      transform={`translate(${Motion.mix({
+        t: transfer,
+        from: 640,
+        to: 570,
+      })} 388)`}
       opacity={transfer}
     >
       <SketchedShape

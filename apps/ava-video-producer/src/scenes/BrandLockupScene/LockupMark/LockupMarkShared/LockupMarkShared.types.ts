@@ -1,4 +1,4 @@
-import type { Rect } from "../../../layout/layout";
+import type { Rect } from "../../../layout/SceneGeometry";
 import type { BrandLockupSceneProps } from "../../../scenes.types";
 /** Inputs shared by the LockupMark visuals. */
 export type MarkColumnsProps = Pick<

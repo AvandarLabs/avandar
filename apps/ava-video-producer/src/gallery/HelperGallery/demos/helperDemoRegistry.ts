@@ -1,74 +1,59 @@
-import { HorizontalBlurDemo, VelocityBlurDemo } from "./BlurDemos/BlurDemos";
-import {
-  BarBeatsDemo,
-  CtaBeatsDemo,
-  FlyThroughDemo,
-  MarkBuildDemo,
-} from "./BuildDemos/BuildDemos";
-import {
-  CameraTrackDemo,
-  DiagramCameraDemo,
-  WindowCameraDemo,
-} from "./CameraDemos/CameraDemos";
-import {
-  AnchoredOverlayDemo,
-  ObjectDepartureDemo,
-  SharedElementDemo,
-} from "./ContinuityDemos";
+import { AnchoredOverlayDemo } from "./AnchoredOverlayDemo/AnchoredOverlayDemo";
+import { HorizontalBlurDemo } from "./BlurDemos/HorizontalBlurDemo/HorizontalBlurDemo";
+import { VelocityBlurDemo } from "./BlurDemos/VelocityBlurDemo/VelocityBlurDemo";
+import { BarBeatsDemo } from "./BuildDemos/BarBeatsDemo/BarBeatsDemo";
+import { CtaBeatsDemo } from "./BuildDemos/CtaBeatsDemo/CtaBeatsDemo";
+import { FlyThroughDemo } from "./BuildDemos/FlyThroughDemo/FlyThroughDemo";
+import { MarkBuildDemo } from "./BuildDemos/MarkBuildDemo/MarkBuildDemo";
+import { CameraTrackDemo } from "./CameraDemos/CameraTrackDemo/CameraTrackDemo";
+import { DiagramCameraDemo } from "./CameraDemos/DiagramCameraDemo/DiagramCameraDemo";
+import { WindowCameraDemo } from "./CameraDemos/WindowCameraDemo/WindowCameraDemo";
 import { createCurveDemo } from "./createCurveDemo";
-import { createDurationDemo } from "./createDurationDemo";
-import { createLineRevealDemo } from "./createLineRevealDemo";
-import { BezierDemo, MotionPresetsDemo } from "./CurveDemos";
-import { StaggerColumnDemo, StaggerDemo } from "./DurationDemos";
-import {
-  EnterAtDemo,
-  EnterDemo,
-  LeaveDemo,
-  PopDemo,
-  PressDemo,
-} from "./EntranceDemos";
-import {
-  CountToDemo,
-  MixTokenDemo,
-  RampDemo,
-} from "./InterpolationDemos/InterpolationDemos";
-import { LoopEnvelopeDemo, LoopPhaseDemo, WaveDemo } from "./LoopDemos";
-import {
-  EraseMaskDemo,
-  EraseScheduleDemo,
-  RoughEdgeDemo,
-  SteppedColumnWipeDemo,
-  WindowRevealDemo,
-} from "./MaskDemos/MaskDemos";
-import { MediaPlaneDemo } from "./MediaDemos";
-import {
-  ClickFeedbackDemo,
-  CursorOnTargetDemo,
-  CursorShutterDemo,
-  TrackPosDemo,
-} from "./PointerDemos/PointerDemos";
-import {
-  ActiveHeadlineDemo,
-  HeadingRevealDemo,
-  StagedExitDemo,
-  TypedDemo,
-  WipeExitDemo,
-} from "./TextDemos";
-import { ThemeStyleDemo } from "./ThemeDemos";
-import {
-  SceneTransitionDemo,
-  ShotTransitionDemo,
-} from "./TransitionDemos/TransitionDemos";
-import {
-  CarouselDemo,
-  FlipSplitDemo,
-  PullBackDemo,
-  ScrollOffsetDemo,
-  SideEntranceDemo,
-  WindowBoxesDemo,
-  WindowTiltDemo,
-  WindowWhipDemo,
-} from "./WindowDemos/WindowDemos";
+import { createDurationDemo } from "./createDurationDemo/createDurationDemo";
+import { createLineRevealDemo } from "./createLineRevealDemo/createLineRevealDemo";
+import { BezierDemo } from "./CurveDemos/BezierDemo/BezierDemo";
+import { MotionPresetsDemo } from "./CurveDemos/MotionPresetsDemo/MotionPresetsDemo";
+import { EnterAtDemo } from "./EntranceDemos/EnterAtDemo/EnterAtDemo";
+import { EnterDemo } from "./EntranceDemos/EnterDemo/EnterDemo";
+import { LeaveDemo } from "./EntranceDemos/LeaveDemo/LeaveDemo";
+import { PopDemo } from "./EntranceDemos/PopDemo/PopDemo";
+import { PressDemo } from "./EntranceDemos/PressDemo/PressDemo";
+import { CountToDemo } from "./InterpolationDemos/CountToDemo/CountToDemo";
+import { MixTokenDemo } from "./InterpolationDemos/MixTokenDemo/MixTokenDemo";
+import { RampDemo } from "./InterpolationDemos/RampDemo/RampDemo";
+import { LoopEnvelopeDemo } from "./LoopEnvelopeDemo/LoopEnvelopeDemo";
+import { LoopPhaseDemo } from "./LoopPhaseDemo/LoopPhaseDemo";
+import { EraseMaskDemo } from "./MaskDemos/EraseMaskDemo/EraseMaskDemo";
+import { EraseScheduleDemo } from "./MaskDemos/EraseScheduleDemo/EraseScheduleDemo";
+import { RoughEdgeDemo } from "./MaskDemos/RoughEdgeDemo/RoughEdgeDemo";
+import { SteppedColumnWipeDemo } from "./MaskDemos/SteppedColumnWipeDemo/SteppedColumnWipeDemo";
+import { WindowRevealDemo } from "./MaskDemos/WindowRevealDemo/WindowRevealDemo";
+import { MediaPlaneDemo } from "./MediaPlaneDemo/MediaPlaneDemo";
+import { ObjectDepartureDemo } from "./ObjectDepartureDemo/ObjectDepartureDemo";
+import { ClickFeedbackDemo } from "./PointerDemos/ClickFeedbackDemo/ClickFeedbackDemo";
+import { CursorOnTargetDemo } from "./PointerDemos/CursorOnTargetDemo/CursorOnTargetDemo";
+import { CursorShutterDemo } from "./PointerDemos/CursorShutterDemo/CursorShutterDemo";
+import { TrackPosDemo } from "./PointerDemos/TrackPosDemo/TrackPosDemo";
+import { SharedElementDemo } from "./SharedElementDemo/SharedElementDemo";
+import { StaggerColumnDemo } from "./StaggerColumnDemo/StaggerColumnDemo";
+import { StaggerDemo } from "./StaggerDemo/StaggerDemo";
+import { ActiveHeadlineDemo } from "./TextDemos/ActiveHeadlineDemo/ActiveHeadlineDemo";
+import { HeadingRevealDemo } from "./TextDemos/HeadingRevealDemo/HeadingRevealDemo";
+import { StagedExitDemo } from "./TextDemos/StagedExitDemo/StagedExitDemo";
+import { TypedDemo } from "./TextDemos/TypedDemo/TypedDemo";
+import { WipeExitDemo } from "./TextDemos/WipeExitDemo/WipeExitDemo";
+import { ThemeStyleDemo } from "./ThemeStyleDemo/ThemeStyleDemo";
+import { SceneTransitionDemo } from "./TransitionDemos/SceneTransitionDemo/SceneTransitionDemo";
+import { ShotTransitionDemo } from "./TransitionDemos/ShotTransitionDemo/ShotTransitionDemo";
+import { WaveDemo } from "./WaveDemo/WaveDemo";
+import { CarouselDemo } from "./WindowDemos/CarouselDemo/CarouselDemo";
+import { FlipSplitDemo } from "./WindowDemos/FlipSplitDemo/FlipSplitDemo";
+import { PullBackDemo } from "./WindowDemos/PullBackDemo/PullBackDemo";
+import { ScrollOffsetDemo } from "./WindowDemos/ScrollOffsetDemo/ScrollOffsetDemo";
+import { SideEntranceDemo } from "./WindowDemos/SideEntranceDemo/SideEntranceDemo";
+import { WindowBoxesDemo } from "./WindowDemos/WindowBoxesDemo/WindowBoxesDemo";
+import { WindowTiltDemo } from "./WindowDemos/WindowTiltDemo/WindowTiltDemo";
+import { WindowWhipDemo } from "./WindowDemos/WindowWhipDemo/WindowWhipDemo";
 import type { HelperDemoId } from "../helperDemoIds";
 import type { HelperDemoProps } from "./helperDemo.types";
 import type { ComponentType } from "react";

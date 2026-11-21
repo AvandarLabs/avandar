@@ -1,10 +1,11 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
+
+type Props = { closure: number };
+
 /** A door swinging shut across the doorway. */
-export function ClosingDoor({
-  closure,
-}: Readonly<{ closure: number }>): ReactNode {
+export function ClosingDoor({ closure }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (

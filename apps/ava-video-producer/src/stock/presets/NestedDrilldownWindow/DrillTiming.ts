@@ -1,5 +1,5 @@
-import { ramp } from "../../../motion";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import { Motion } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 /** The cue the parent selection starts to open on. */
 const PARENT_CUE = 40;
 /** The cue the parent is open and the second selection starts on. */
@@ -12,20 +12,31 @@ const INSET_STROKE = 5;
 function _getParentFromFrame({
   frame,
   motion,
-}: Readonly<{ frame: number; motion: VideoMotion }>): number {
-  return ramp(frame, PARENT_CUE, CHILD_CUE - PARENT_CUE, motion.reveal.easing);
+}: Readonly<{
+  frame: number;
+  motion: VideoMotion;
+}>): number {
+  return Motion.ramp({
+    frame,
+    at: PARENT_CUE,
+    dur: CHILD_CUE - PARENT_CUE,
+    easing: motion.reveal.easing,
+  });
 }
 /** How far the second selection has opened, at the theme's tempo. */
 function _getChildFromFrame({
   frame,
   motion,
-}: Readonly<{ frame: number; motion: VideoMotion }>): number {
-  return ramp(
+}: Readonly<{
+  frame: number;
+  motion: VideoMotion;
+}>): number {
+  return Motion.ramp({
     frame,
-    CHILD_CUE,
-    motion.scale(CHILD_FRAMES),
-    motion.reveal.easing,
-  );
+    at: CHILD_CUE,
+    dur: motion.scale(CHILD_FRAMES),
+    easing: motion.reveal.easing,
+  });
 }
 /** Times the nested parent and child selection windows opening into detail. */
 export const DrillTiming = {

@@ -1,10 +1,11 @@
 import { FoodSymbolShared } from "./FoodSymbolShared/FoodSymbolShared";
-import { type Props } from "./FoodSymbolShared/FoodSymbolShared.types";
+import { type Props as FoodSymbolSharedProps } from "./FoodSymbolShared/FoodSymbolShared.types";
 import type { ReactNode } from "react";
+
+type Props = Pick<FoodSymbolSharedProps, "symbol">;
+
 /** Two grains, or two beans. */
-export function StapleSymbol({
-  symbol,
-}: Readonly<Pick<Props, "symbol">>): ReactNode {
+export function StapleSymbol({ symbol }: Readonly<Props>): ReactNode {
   if (symbol === "grain") {
     return (
       <>

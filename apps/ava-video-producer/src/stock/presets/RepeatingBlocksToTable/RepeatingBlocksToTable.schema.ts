@@ -47,11 +47,7 @@ export const inputSchema = z
       input.blocks.some(({ cells }) => {
         return (
           cells.length !== ids.size ||
-          new Set(
-            cells.map(({ fieldId }) => {
-              return fieldId;
-            }),
-          ).size !== ids.size ||
+          new Set(cells.map(prop("fieldId"))).size !== ids.size ||
           cells.some(({ fieldId }) => {
             return !ids.has(fieldId);
           })

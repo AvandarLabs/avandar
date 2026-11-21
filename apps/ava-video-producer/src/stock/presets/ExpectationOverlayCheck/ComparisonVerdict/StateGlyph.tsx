@@ -1,12 +1,11 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
+
+type Props = { state: string; y: number; accent: string };
+
 /** A bracket on a mismatch, a tick on a match, or a mark when unobserved. */
-export function StateGlyph({
-  state,
-  y,
-  accent,
-}: Readonly<{ state: string; y: number; accent: string }>): ReactNode {
+export function StateGlyph({ state, y, accent }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (

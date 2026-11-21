@@ -1,0 +1,10 @@
+.sourceChartRoot {
+  background: var(--ava-surface-raised);
+  height: 100%;
+  position: relative;
+}
+
+.sourceChartBody {
+  height: calc(100% - 52px);
+  padding: 20px;
+}

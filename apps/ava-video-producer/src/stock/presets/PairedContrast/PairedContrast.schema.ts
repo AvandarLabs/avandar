@@ -1,4 +1,4 @@
-import { prop } from "@avandar/utils";
+import { prop, propEq } from "@avandar/utils";
 import { z } from "zod";
 import type { StockSemanticRule } from "../../contracts/StockContract.types";
 
@@ -40,11 +40,7 @@ export const inputSchema = z
         });
       }
     });
-    if (
-      !input.criteria.some(({ id }) => {
-        return id === input.focusCriterionId;
-      })
-    ) {
+    if (!input.criteria.some(propEq("id", input.focusCriterionId))) {
       context.addIssue({
         code: "custom",
         path: ["focusCriterionId"],

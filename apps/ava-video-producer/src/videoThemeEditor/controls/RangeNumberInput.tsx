@@ -1,6 +1,6 @@
 import { NumberInput, type NumberInputProps } from "@mantine/core";
 import { useRowHasIssue } from "../RowIssueContext/RowIssueContext";
-import { parseNumberInRange } from "./controlValueHelpers/controlValueHelpers";
+import { ControlValues } from "./ControlValues/ControlValues";
 import { useDraftValue } from "./useDraftValue";
 import type { ReactNode } from "react";
 
@@ -34,7 +34,7 @@ export function RangeNumberInput({
       return current;
     },
     parse: (draft) => {
-      return parseNumberInRange({ value: draft, min, max });
+      return ControlValues.parseNumberInRange({ value: draft, min, max });
     },
     onChange,
   });

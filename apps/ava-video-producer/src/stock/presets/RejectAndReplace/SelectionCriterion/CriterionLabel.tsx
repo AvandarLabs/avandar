@@ -1,11 +1,14 @@
 import { FitText } from "../../../primitives/FitText/FitText";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
+
+type Props = { criterion: string; frame: number };
+
 /** The stated criterion, fading in above the selection slot. */
 export function CriterionLabel({
   criterion,
   frame,
-}: Readonly<{ criterion: string; frame: number }>): ReactNode {
+}: Readonly<Props>): ReactNode {
   const motion = GraphicThemeHooks.useGraphicMotion();
   const label = {
     text: criterion,

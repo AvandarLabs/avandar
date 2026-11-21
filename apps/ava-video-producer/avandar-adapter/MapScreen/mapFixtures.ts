@@ -1,18 +1,19 @@
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { makeFeatureCollectionFromRows } from "@/views/GisApp/layers/makeFeatureCollectionFromRows/makeFeatureCollectionFromRows";
-import { makeLayerSpecFromMapLayer } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/makeLayerSpecFromMapLayer/makeLayerSpecFromMapLayer";
 import fixtures from "../fixtures.json";
-import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
 import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
 
 const _noop = () => {
   return undefined;
 };
+/** Pan interaction mode for the map reenactment. */
 export const PAN = { type: "pan" } as const;
 // Resolve the product's own Avandar style through its unchanged BasemapStyle.
 // Real basemap geography supplies context; the overlaid records remain
 // fictional.
+/** The product basemap selection used by the map reenactment. */
 export const BASEMAP = { type: "builtIn", style: "avandar" } as const;
+/** Provider attribution displayed with the reenactment basemap. */
 export const BASEMAP_ATTRIBUTION =
   "OpenFreeMap · © OpenMapTiles · Data from OpenStreetMap";
 
@@ -46,12 +47,14 @@ function _createPointLayer({ name, id, color, radius }: PointLayerOptions) {
   } as MapLayer.Standard;
 }
 
+/** Point layer for fictional Harborfield cases in the map reenactment. */
 export const caseLayer = _createPointLayer({
   name: "Video - Harborfield cases",
   id: "film-cases",
   color: "#228be6",
   radius: 4,
 });
+/** Point layer for fictional Harborfield facilities in the map film. */
 export const facilityLayer = _createPointLayer({
   name: "Video - Harborfield facilities",
   id: "film-facilities",
@@ -63,6 +66,7 @@ const binding = {
   latitudeColumnName: "latitude",
   longitudeColumnName: "longitude",
 } as const;
+/** GeoJSON case features derived from the fictional map fixture rows. */
 export const casePoints = makeFeatureCollectionFromRows({
   rows: fixtures.cases,
   binding,
@@ -72,6 +76,7 @@ export const casePoints = makeFeatureCollectionFromRows({
   // Exact layers never jitter, so no map salt is read.
   jitterSalt: "",
 });
+/** GeoJSON facility features derived from the fictional fixture rows. */
 export const facilityPoints = makeFeatureCollectionFromRows({
   rows: fixtures.facilities,
   binding,
@@ -81,18 +86,20 @@ export const facilityPoints = makeFeatureCollectionFromRows({
   // Exact layers never jitter, so no map salt is read.
   jitterSalt: "",
 });
+/** Facility feature selected in the map reenactment. */
 export const selectedFacility = facilityPoints.featureCollection.features[2]!;
+/** Coordinates of the selected map reenactment facility. */
 export const selectedCoordinates = (selectedFacility.geometry as GeoJSON.Point)
   .coordinates as [number, number];
 
 /**
  * A ready, error-free view state for a layer with `count` rendered features.
  */
-function _createViewState(count: number): MapLayerViewState {
+function _createViewState(numFeatures: number): MapLayerViewState {
   return {
     status: "ready",
     error: undefined,
-    featureCount: count,
+    featureCount: numFeatures,
     droppedRowCount: 0,
     drops: [],
     largestDropReason: undefined,
@@ -100,6 +107,7 @@ function _createViewState(count: number): MapLayerViewState {
     onRetry: _noop,
   };
 }
+/** Initial view state for each fictional map reenactment layer. */
 export const viewStates = new Map([
   [
     caseLayer.id,
@@ -120,47 +128,5 @@ export const MAP_BEATS = [
   { frame: 440, target: "map-facility-point", action: "point" },
   { frame: 540, target: "map-facility-point", action: "click" },
 ] as const;
+/** Duration of the map reenactment, in frames. */
 export const MAP_DURATION = 720;
-
-/**
- * Builds the native MapLibre spec for the given layers, disabling paint
- * transitions for deterministic seeks.
- */
-export function _createSpec(layers: readonly MapLayer.T[]): MapSpec {
-  const specs = layers.map((layer) => {
-    return makeLayerSpecFromMapLayer({
-      layer,
-      featureCollection:
-        layer.id === caseLayer.id
-          ? casePoints.featureCollection
-          : facilityPoints.featureCollection,
-      stats: { valueDomain: undefined },
-    });
-  });
-  return {
-    sources: Object.assign(
-      {},
-      ...specs.map((spec) => {
-        return spec.sources;
-      }),
-    ),
-    layers: specs
-      .flatMap((spec) => {
-        return spec.layers;
-      })
-      .map((layer) => {
-        return {
-          ...layer,
-          // A render seek must never leave native MapLibre paint in a
-          // wall-clock transition. Colors/radii themselves remain the source
-          // layer output.
-          paint: {
-            ...layer.paint,
-            "circle-opacity-transition": { duration: 0, delay: 0 },
-            "circle-color-transition": { duration: 0, delay: 0 },
-            "circle-radius-transition": { duration: 0, delay: 0 },
-          },
-        };
-      }),
-  } as MapSpec;
-}

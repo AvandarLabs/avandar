@@ -1,4 +1,4 @@
-import { useVideoTokens } from "../../../videoTheme/useVideoTheme";
+import { useVideoTokens } from "../../../videoTheme/videoThemeHelpers";
 import { type WindowStage } from "../WindowMotion/WindowMotion.types";
 import { RaceBadge } from "./RaceBadge";
 import { RaceCounter } from "./RaceCounter";

@@ -2,7 +2,7 @@ import { TokenRow } from "../../TokenRow/TokenRow";
 import {
   type TokenRowGroup,
   type TokenRow as TokenRowData,
-} from "../../tokenRows/tokenRows.types";
+} from "../../TokenRows/TokenRows.types";
 import { AddScaleValue } from "./AddScaleValue";
 import type { ReactNode } from "react";
 

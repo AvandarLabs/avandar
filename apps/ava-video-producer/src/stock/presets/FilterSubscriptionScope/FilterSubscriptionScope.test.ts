@@ -16,6 +16,85 @@ import {
 } from "./FilterSubscriptionScope.fixtures";
 import { inputSchema, type Input } from "./FilterSubscriptionScope.schema";
 
+type AssertViewDenominatorsOptions = Readonly<{
+  views: readonly string[];
+  selected: Input["records"];
+  records: Input["records"];
+}>;
+
+function _assertViewDenominators({
+  views,
+  selected,
+  records,
+}: AssertViewDenominatorsOptions): void {
+  assert.deepEqual(
+    views.map((view) => {
+      return [
+        _number({ markup: view, name: "data-count" }),
+        _number({ markup: view, name: "data-sum" }),
+      ];
+    }),
+    [
+      [
+        selected.length,
+        selected.reduce((sum, row) => {
+          return sum + row.value;
+        }, 0),
+      ],
+      [
+        selected.length,
+        selected.reduce((sum, row) => {
+          return sum + row.value;
+        }, 0),
+      ],
+      [
+        records.length,
+        records.reduce((sum, row) => {
+          return sum + row.value;
+        }, 0),
+      ],
+    ],
+  );
+}
+
+function _assertOnlySubscribedViewsChangeTheirDataCount(): void {
+  [DEFAULT_INPUT, fixtures[3].input].forEach((input, index) => {
+    const views = _marks({
+      markup: render({ frame: 150, input: input }),
+      name: "view",
+    });
+    assert.deepEqual(
+      views.map((row) => {
+        return [
+          _number({ markup: row, name: "data-count" }),
+          _number({ markup: row, name: "data-sum" }),
+        ];
+      }),
+      index === 0
+        ? [
+            [2, 5],
+            [2, 5],
+            [3, 10],
+          ]
+        : [
+            [1, 5],
+            [1, 5],
+            [3, 10],
+          ],
+    );
+    views.forEach((view) => {
+      assert.equal(
+        _attribute({ markup: view, name: "data-value-unit" }),
+        input.metric.valueUnit,
+      );
+      assert.equal(
+        _attribute({ markup: view, name: "data-count-unit" }),
+        input.metric.countUnit,
+      );
+    });
+  });
+}
+
 const render = ({
   frame,
   input = DEFAULT_INPUT,
@@ -70,41 +149,7 @@ test("only subscribed views change their row counts and sums", () => {
       [3, 10],
     ],
   );
-  [DEFAULT_INPUT, fixtures[3].input].forEach((input, index) => {
-    const views = _marks({
-      markup: render({ frame: 150, input: input }),
-      name: "view",
-    });
-    assert.deepEqual(
-      views.map((row) => {
-        return [
-          _number({ markup: row, name: "data-count" }),
-          _number({ markup: row, name: "data-sum" }),
-        ];
-      }),
-      index === 0
-        ? [
-            [2, 5],
-            [2, 5],
-            [3, 10],
-          ]
-        : [
-            [1, 5],
-            [1, 5],
-            [3, 10],
-          ],
-    );
-    views.forEach((view) => {
-      assert.equal(
-        _attribute({ markup: view, name: "data-value-unit" }),
-        input.metric.valueUnit,
-      );
-      assert.equal(
-        _attribute({ markup: view, name: "data-count-unit" }),
-        input.metric.countUnit,
-      );
-    });
-  });
+  _assertOnlySubscribedViewsChangeTheirDataCount();
 });
 test("excluded masks travel across only subscribed nonmatching rows", () => {
   const a = _marks({ markup: render({ frame: 91 }), name: "excluded-mask" }),
@@ -210,40 +255,14 @@ test("all-category and zero-value selections retain the independent denominator"
       };
     }),
   ].forEach((records) => {
+    const originalRecords = structuredClone(records);
     const input = { ...DEFAULT_INPUT, records };
     const views = _marks({
       markup: render({ frame: 150, input: input }),
       name: "view",
     });
     const selected = records.filter(propEq("category", input.selectedCategory));
-    assert.deepEqual(
-      views.map((view) => {
-        return [
-          _number({ markup: view, name: "data-count" }),
-          _number({ markup: view, name: "data-sum" }),
-        ];
-      }),
-      [
-        [
-          selected.length,
-          selected.reduce((sum, row) => {
-            return sum + row.value;
-          }, 0),
-        ],
-        [
-          selected.length,
-          selected.reduce((sum, row) => {
-            return sum + row.value;
-          }, 0),
-        ],
-        [
-          records.length,
-          records.reduce((sum, row) => {
-            return sum + row.value;
-          }, 0),
-        ],
-      ],
-    );
+    _assertViewDenominators({ views, selected, records });
     assert.equal(
       _marks({
         markup: render({ frame: 150, input: input }),
@@ -251,7 +270,7 @@ test("all-category and zero-value selections retain the independent denominator"
       }).length,
       records.length * input.views.length,
     );
-    assert.deepEqual(input.records, records);
+    assert.deepEqual(input.records, originalRecords);
   });
 });
 test("empty, Unicode and maximum-length identities preserve exact keys", () => {

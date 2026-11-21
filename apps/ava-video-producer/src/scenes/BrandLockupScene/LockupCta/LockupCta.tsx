@@ -1,5 +1,5 @@
 import { useVideoMotion } from "../../../videoTheme/useVideoMotion";
-import { useVideoTheme } from "../../../videoTheme/useVideoTheme";
+import { useVideoTheme } from "../../../videoTheme/videoThemeHelpers";
 import { BrandLockupMotion } from "../BrandLockupMotion/BrandLockupMotion";
 import { CtaBadge } from "./CtaBadge";
 import { CtaCommand } from "./CtaCommand";

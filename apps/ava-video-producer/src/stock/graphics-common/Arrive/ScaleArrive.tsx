@@ -1,21 +1,27 @@
-import { mix } from "../../../motion";
-import { ArriveShared } from "./ArriveShared/ArriveShared";
+import { Motion } from "../../../motion";
+import { ArriveShared } from "./ArriveShared";
 import type { ReactNode } from "react";
+
+type Props = {
+  progress: number;
+  children: ReactNode;
+};
 /** An entrance that scales up about the children's own centre. */
 export function ScaleArrive({
   progress,
   children,
-}: {
-  progress: number;
-  children: ReactNode;
-}): ReactNode {
+}: Readonly<Props>): ReactNode {
   return (
     <g
       opacity={progress}
       style={{
         transformBox: "fill-box",
         transformOrigin: "center",
-        transform: `scale(${mix(progress, ArriveShared.SCALE_STYLE_START, 1)})`,
+        transform: `scale(${Motion.mix({
+          t: progress,
+          from: ArriveShared.SCALE_STYLE_START,
+          to: 1,
+        })})`,
       }}
     >
       {children}

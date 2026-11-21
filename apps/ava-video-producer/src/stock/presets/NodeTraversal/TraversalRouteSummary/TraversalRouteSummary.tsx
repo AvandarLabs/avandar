@@ -5,7 +5,10 @@ import { getLegacyWidthFromText } from "../../legacy/getLegacyWidthFromText/getL
 import { RouteSummaryCard } from "./RouteSummaryCard";
 import type { ReactNode } from "react";
 
-type Props = { label: string; accent: string };
+type Props = {
+  label: string;
+  accent: string;
+};
 const SUMMARY_TOP = 44;
 const SHORT_PILL_WIDTH = 152;
 const SHORT_TEXT_LIMIT = 140;
@@ -16,12 +19,11 @@ const PILL_TEXT_PADDING = 20;
  * card.
  */
 function _buildPillWidthFromTextWidth(textWidth: number): number | undefined {
-  if (textWidth <= SHORT_TEXT_LIMIT) {
-    return SHORT_PILL_WIDTH;
-  }
-  return textWidth <= LONG_TEXT_LIMIT
-    ? Math.ceil(textWidth + PILL_TEXT_PADDING - 1e-9)
-    : undefined;
+  return textWidth <= SHORT_TEXT_LIMIT
+    ? SHORT_PILL_WIDTH
+    : textWidth <= LONG_TEXT_LIMIT
+      ? Math.ceil(textWidth + PILL_TEXT_PADDING - 1e-9)
+      : undefined;
 }
 /**
  * Keeps short route badges compact and long authored summaries in the header.
@@ -34,7 +36,10 @@ export function TraversalRouteSummary({
   accent,
 }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
-  const card = GraphicThemeHooks.useGraphicProps("Card", {});
+  const card = GraphicThemeHooks.useGraphicProps({
+    name: "Card",
+    props: {},
+  });
   const right = GRAPHIC_WIDTH - tokens.layout.graphic.margin;
   const pillWidth = _buildPillWidthFromTextWidth(
     getLegacyWidthFromText({

@@ -1,7 +1,7 @@
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { BookingTab } from "./BookingTab";
 import { CaseHome } from "./CaseHome";
 import { ContactAttempt } from "./ContactAttempt";
+import { ReconnectBookingOutcome } from "./ReconnectBookingOutcome/ReconnectBookingOutcome";
 import { ReconnectOutcomeMark } from "./ReconnectOutcomeMark";
 import { ReturningPerson } from "./ReturningPerson";
 import type { Input } from "./MissedVisitReconnect.schema";
@@ -29,35 +29,13 @@ export function ReconnectCase({
       opacity={motion.reveal(frame, 12 + index * motion.stagger.list)}
     >
       <CaseHome item={item} y={y} />
-      <ReturningPerson
-        item={item}
-        index={index}
-        y={y}
-        frame={frame}
-        accent={accent}
-      />
-      <ContactAttempt
-        item={item}
-        index={index}
-        y={y}
-        frame={frame}
-        accent={accent}
-      />
-      {item.outcome === "booked" ? (
-        <BookingTab
-          item={item}
-          index={index}
-          y={y}
-          frame={frame}
-          accent={accent}
-        />
-      ) : undefined}
+      <ReturningPerson {...{ item, index, y, frame, accent }} />
+      <ContactAttempt {...{ item, index, y, frame, accent }} />
+      <ReconnectBookingOutcome {...{ item, index, y, frame, accent }} />
       <ReconnectOutcomeMark
         outcome={item.outcome}
         x={395}
-        y={y}
-        frame={frame}
-        accent={accent}
+        {...{ y, frame, accent }}
       />
     </g>
   );

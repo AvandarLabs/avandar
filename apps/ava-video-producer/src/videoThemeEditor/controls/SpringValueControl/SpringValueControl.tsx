@@ -5,6 +5,8 @@ import type { SpringValue } from "../../../videoTheme/videoTheme.types";
 import type { ValueControlProps } from "../valueControl.types";
 import type { ReactNode } from "react";
 
+type Props = ValueControlProps;
+
 const SPRING_FIELDS = [
   { key: "damping", name: "Damping", min: 1, max: 100, step: 1 },
   { key: "stiffness", name: "Stiffness", min: 1, max: 1000, step: 1 },
@@ -19,13 +21,17 @@ export function SpringValueControl({
   label,
   value,
   onChange,
-}: ValueControlProps): ReactNode {
+}: Readonly<Props>): ReactNode {
   const spring: SpringValue = {
     ...getDefaultLiteralFromKind("spring"),
     ...(value as Partial<SpringValue> | undefined),
   };
   return (
-    <div className={css.springValueFields} role="group" aria-label={label}>
+    <div
+      className={css.springValueControlFields}
+      role="group"
+      aria-label={label}
+    >
       {SPRING_FIELDS.map((field) => {
         return (
           <RangeNumberInput

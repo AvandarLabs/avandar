@@ -1,24 +1,50 @@
 import { interpolateFiniteRange } from "../../numeric/interpolateFiniteRange/interpolateFiniteRange";
-import { FitText } from "../../primitives/FitText/FitText";
-import { SketchedShape } from "../../primitives/SketchedShape";
-import { StockRect } from "../../primitives/StockRect/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { AquiferOwnershipKey } from "./AquiferOwnershipKey";
+import { AquiferCutawayRequestedLabel } from "./AquiferCutawayRequestedLabel/AquiferCutawayRequestedLabel";
+import { AquiferCutawayUnallocated } from "./AquiferCutawayUnallocated/AquiferCutawayUnallocated";
+import { AquiferFlowPaths } from "./AquiferFlowPaths/AquiferFlowPaths";
+import { AquiferRequestBoundary } from "./AquiferRequestBoundary/AquiferRequestBoundary";
+import { AquiferReservoirBoundary } from "./AquiferReservoirBoundary/AquiferReservoirBoundary";
+import { AquiferStorageBoundary } from "./AquiferStorageBoundary/AquiferStorageBoundary";
+import { AquiferStorageFill } from "./AquiferStorageFill/AquiferStorageFill";
 import type { Input } from "./AquiferAllocationBalance.schema";
 import type { ReactNode } from "react";
+
+type AquiferStorageState = {
+  flows: Input["flows"];
+  height: number;
+  paths: AquiferFlowPath[];
+};
+type AquiferFlowPath = {
+  key: string;
+  number: number;
+  x: number;
+  y: number;
+  path: string;
+  progress: number;
+  value: number;
+  color: string;
+};
+
 /** Inputs for AquiferCutaway. */
 type Props = { frame: number; accent: string; input: Input };
 const DRAW_ON_LENGTH = 1;
-/** Recharge, pumping and natural outflow cross separate physical boundaries. */
-export function AquiferCutaway({
+
+type GetAquiferStorageStateOptions = {
+  frame: number;
+  accent: string;
+  input: Input;
+  tokens: ReturnType<typeof GraphicThemeHooks.useGraphicTokens>;
+  motion: ReturnType<typeof GraphicThemeHooks.useGraphicMotion>;
+};
+/** Samples the authored aquifer storage state. */
+function _getAquiferStorageState({
   frame,
   accent,
   input,
-}: Readonly<Props>): ReactNode {
-  const { atomic } = GraphicThemeHooks.useGraphicTheme();
-  const tokens = GraphicThemeHooks.useGraphicTokens();
-  const motion = GraphicThemeHooks.useGraphicMotion();
-  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  tokens,
+  motion,
+}: Readonly<GetAquiferStorageStateOptions>): AquiferStorageState {
   const recharge = motion.ramp(
       frame,
       36,
@@ -37,7 +63,25 @@ export function AquiferCutaway({
         progress: recharge,
       });
   const height = 150 * (storage / aquifer.diagramCapacityM3);
-  const paths = [
+  const paths = _createAquiferFlowPathsFromQuantities({
+    flows,
+    recharge,
+    withdraw,
+    accent,
+    tokens,
+  });
+  return { flows, height, paths };
+}
+
+/** Builds the three authored flow paths and their quantity markers. */
+function _createAquiferFlowPathsFromQuantities({
+  flows,
+  recharge,
+  withdraw,
+  accent,
+  tokens,
+}: Readonly<CreateAquiferFlowPathsFromQuantitiesOptions>): AquiferFlowPath[] {
+  return [
     {
       key: "recharge",
       number: 1,
@@ -69,110 +113,48 @@ export function AquiferCutaway({
       color: tokens.color.highlight,
     },
   ];
+}
+
+/** Recharge, pumping and natural outflow cross separate physical boundaries. */
+export function AquiferCutaway({
+  frame,
+  accent,
+  input,
+}: Readonly<Props>): ReactNode {
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const { flows, height, paths } = _getAquiferStorageState({
+    frame,
+    accent,
+    input,
+    tokens,
+    motion,
+  });
   return (
     <g>
-      <SketchedShape
-        shape={{
-          kind: "path",
-          d: "M 280 222 Q 380 202 480 222 T 720 222 V 397 H 280 Z",
-        }}
-        profile={tokens.sketch.shape}
-        fill={tokens.color.surface}
-        stroke={tokens.color.line}
-        strokeWidth={scales.stroke(tokens.stroke.default)}
+      <AquiferReservoirBoundary tokens={tokens} scales={scales} />
+      <AquiferStorageFill {...{ height, accent, tokens }} />
+      <AquiferStorageBoundary tokens={tokens} scales={scales} />
+      <AquiferFlowPaths
+        {...{ paths, tokens, scales, atomic }}
+        drawOnLength={DRAW_ON_LENGTH}
       />
-      <rect
-        data-aquifer-fill="true"
-        x={300}
-        y={380 - height}
-        width={400}
-        height={height}
-        fill={accent}
-        fillOpacity={tokens.alpha.guide}
-      />
-      <SketchedShape
-        shape={{ kind: "path", d: "M 300 230 V 380 H 700 V 230" }}
-        profile={tokens.sketch.shape}
-        stroke={tokens.color.inactive}
-        strokeWidth={scales.stroke(tokens.stroke.default)}
-        fill="none"
-      />
-      {paths.map(({ key, number, x, y, path, progress, value, color }) => {
-        return (
-          <g key={key}>
-            <SketchedShape
-              shape={{ kind: "path", d: path }}
-              profile={tokens.sketch.shape}
-              data-flow-guide={key}
-              stroke={tokens.color.inactive}
-              strokeWidth={scales.stroke(tokens.stroke.hairline)}
-              strokeDasharray={atomic.dash.short.join(" ")}
-              fill="none"
-            />
-            <SketchedShape
-              shape={{ kind: "path", d: path }}
-              profile={tokens.sketch.shape}
-              data-flow={key}
-              data-quantity={value}
-              pathLength={DRAW_ON_LENGTH}
-              strokeDasharray={DRAW_ON_LENGTH}
-              strokeDashoffset={DRAW_ON_LENGTH - progress}
-              opacity={value ? 1 : 0}
-              stroke={color}
-              strokeWidth={scales.stroke(7)}
-              fill="none"
-            />
-            <g data-flow-ownership={key}>
-              <AquiferOwnershipKey number={number} x={x} y={y} />
-            </g>
-          </g>
-        );
-      })}
-      <StockRect
-        x={32}
-        y={320}
-        width={210}
-        height={78}
-        rx={scales.corner(tokens.corner.cell)}
-        fill="none"
-        stroke={tokens.color.inactive}
-        strokeDasharray={atomic.dash.wide.join(" ")}
-      />
-      <FitText
-        text={input.copy.requested}
-        x={44}
-        y={338}
-        width={186}
-        fontSize={12}
-        maxLines={3}
-        breakLongWords
-        normalizeWhitespace
-      />
-      {input.showUnallocatedRequest ? (
-        <>
-          <StockRect
-            data-unallocated="true"
-            data-quantity={
-              flows.requestedWithdrawalM3 - flows.approvedWithdrawalM3
-            }
-            x={35}
-            y={401}
-            width={
-              204 *
-              (flows.requestedWithdrawalM3
-                ? (flows.requestedWithdrawalM3 - flows.approvedWithdrawalM3) /
-                  flows.requestedWithdrawalM3
-                : 0)
-            }
-            height={9}
-            fill="none"
-            stroke={tokens.color.highlight}
-          />
-          <g data-flow-ownership="unallocated">
-            <AquiferOwnershipKey number={4} x={18} y={405.5} />
-          </g>
-        </>
-      ) : undefined}
+      <AquiferRequestBoundary {...{ scales, tokens, atomic }} />
+      <AquiferCutawayRequestedLabel input={input} />
+      <AquiferCutawayUnallocated {...{ input, flows, tokens }} />
     </g>
   );
 }
+
+/** The type of `DRAW_ON_LENGTH` used by AquiferCutaway. */
+export type AquiferCutawayDrawOnLengthValue = typeof DRAW_ON_LENGTH;
+
+type CreateAquiferFlowPathsFromQuantitiesOptions = {
+  flows: Input["flows"];
+  recharge: number;
+  withdraw: number;
+  accent: string;
+  tokens: ReturnType<typeof GraphicThemeHooks.useGraphicTokens>;
+};

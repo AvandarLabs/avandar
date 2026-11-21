@@ -1,13 +1,15 @@
-import { mix } from "../../motion";
+import { Motion } from "../../motion";
 import { StageTheme } from "../StageTheme/StageTheme";
-import type { VideoMotion } from "../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { CSSProperties } from "react";
 
 type GetLineRevealStyleOptions = {
   frame: number;
   at: number;
   mode: Exclude<TextRevealMode, "word-mask">;
-  options?: { rise?: number };
+  options?: {
+    rise?: number;
+  };
   motion?: VideoMotion;
 };
 type GetWipeExitStyleOptions = {
@@ -42,7 +44,7 @@ const KICKER_RISE = 8;
  * `wipe` reveals left to right behind a clip, and `cut` appears on its
  * frame. Both ease on the theme's `motion.rise` curve.
  */
-export function getLineRevealStyle({
+function _getLineRevealStyle({
   frame,
   at,
   mode,
@@ -62,7 +64,11 @@ export function getLineRevealStyle({
   const progress = motion.ramp(frame, at, motion.panel, motion.rise.easing);
   return {
     clipPath: `inset(0 ${_formatPercent(1 - progress)} 0 0)`,
-    transform: `translateX(${mix(progress, WIPE_TRAVEL_PERCENT, 0).toFixed(2)}%)`,
+    transform: `translateX(${Motion.mix({
+      t: progress,
+      from: WIPE_TRAVEL_PERCENT,
+      to: 0,
+    }).toFixed(2)}%)`,
   };
 }
 /**
@@ -70,7 +76,7 @@ export function getLineRevealStyle({
  * a `wipe` reveal, for example a wordmark withdrawing before its mark flies
  * through the frame.
  */
-export function getWipeExitStyle({
+function _getWipeExitStyle({
   frame,
   at,
   durationInFrames,
@@ -102,7 +108,7 @@ export type HeadingReveal = {
  * reveal they rise in from frame 0, the kicker a panel later, as every
  * scene heading always has.
  */
-export function getHeadingRevealStyles({
+function _getHeadingRevealStyles({
   frame,
   reveal,
   motion = StageTheme.getClassicStageMotion(),
@@ -110,19 +116,22 @@ export function getHeadingRevealStyles({
   frame: number;
   reveal: HeadingReveal | undefined;
   motion?: VideoMotion;
-}>): { title: CSSProperties; kicker: CSSProperties } {
+}>): {
+  title: CSSProperties;
+  kicker: CSSProperties;
+} {
   const titleAt = reveal?.atFrame ?? 0;
   const kickerAt = titleAt + (reveal?.staggerFrames ?? motion.panel);
   if (reveal?.mode === "wipe") {
     return {
-      title: getLineRevealStyle({
+      title: _getLineRevealStyle({
         frame,
         at: titleAt,
         mode: "wipe",
         options: {},
         motion,
       }),
-      kicker: getLineRevealStyle({
+      kicker: _getLineRevealStyle({
         frame,
         at: kickerAt,
         mode: "wipe",
@@ -157,7 +166,7 @@ export type StagedExit = {
  * staged exit, each fade on the dissolve curve. No exit leaves the element
  * untouched.
  */
-export function getStagedExitStyle({
+function _getStagedExitStyle({
   frame,
   exit,
   orderIndex,
@@ -181,15 +190,22 @@ export function getStagedExitStyle({
  * `atFrame` fades in at `revealAtFrame` and the lines follow a panel later;
  * an icon with one keeps it, and the lines start at `revealAtFrame`.
  */
-export function getTypographyRevealFrames({
+function _getTypographyRevealFrames({
   revealAtFrame,
   icon,
   motion = StageTheme.getClassicStageMotion(),
 }: Readonly<{
   revealAtFrame: number;
-  icon: { atFrame?: number } | undefined;
+  icon:
+    | {
+        atFrame?: number;
+      }
+    | undefined;
   motion?: VideoMotion;
-}>): { iconAt?: number; linesAt: number } {
+}>): {
+  iconAt?: number;
+  linesAt: number;
+} {
   if (!icon) {
     return { linesAt: revealAtFrame };
   }
@@ -198,3 +214,28 @@ export function getTypographyRevealFrames({
   }
   return { iconAt: icon.atFrame, linesAt: revealAtFrame };
 }
+
+/** Samples themed text entrances and exits for reusable typography scenes. */
+export const TextReveal = {
+  /**
+   * The style of one line, label or icon arriving at frame `at`, shared by
+   * scenes that stage text line by line, for example a headline beside a window
+   * or a wordmark beside a logo.
+   */
+  getLineRevealStyle: _getLineRevealStyle,
+  /**
+   * Retracts a line from the right edge back to its left edge, the reverse of a
+   * `wipe` reveal, for example a wordmark withdrawing before its mark flies
+   * through the frame.
+   */
+  getWipeExitStyle: _getWipeExitStyle,
+  /** The styles of a scene heading's title and kicker at `frame`. */
+  getHeadingRevealStyles: _getHeadingRevealStyles,
+  /**
+   * The opacity of the element at `orderIndex` (0 leaves first) during a staged
+   * exit, each fade on the dissolve curve.
+   */
+  getStagedExitStyle: _getStagedExitStyle,
+  /** When a statement's icon and lines start. */
+  getTypographyRevealFrames: _getTypographyRevealFrames,
+};

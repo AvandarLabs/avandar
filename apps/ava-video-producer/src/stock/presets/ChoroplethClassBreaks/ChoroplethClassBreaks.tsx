@@ -3,15 +3,19 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ClassLegends } from "./ClassLegends";
 import { ClassRuler } from "./ClassRuler";
-import { ClassZone } from "./ClassZone";
+import { ClassZone } from "./ClassZone/ClassZone";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ChoroplethClassBreaks.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
+
 const SCENE_FADE_AT = 0;
+
 const BREAK_AT = 51;
+
 const BREAK_FRAMES = 59;
+
 /** Moving authored thresholds recolor fixed schematic observations. */
 export function ChoroplethClassBreaks({
   frame,

@@ -1,8 +1,18 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { StageTheme } from "../../StageTheme/StageTheme";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
-import type { Rect } from "../../layout/layout";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
+import type { Rect } from "../../layout/SceneGeometry";
 
+type GetFlightColumnRectParameters = {
+  index: number;
+  columns: number;
+  mark: Rect;
+  canvas: {
+    width: number;
+    height: number;
+  };
+  progress: number;
+};
 type GetMarkBuildProgressOptions = {
   frame: number;
   build: MarkBuild | undefined;
@@ -95,13 +105,13 @@ function _getMarkBuildEndFrame({
  * of the mark (progress 0) to its full-height slice of the frame
  * (progress 1), so the columns end covering the whole canvas.
  */
-function _getFlightColumnRect(
-  index: number,
-  columns: number,
-  mark: Rect,
-  canvas: { width: number; height: number },
-  progress: number,
-): Rect {
+function _getFlightColumnRect({
+  index,
+  columns,
+  mark,
+  canvas,
+  progress,
+}: Readonly<GetFlightColumnRectParameters>): Rect {
   const from = {
     x: mark.x + (index * mark.width) / columns,
     y: mark.y,
@@ -115,10 +125,26 @@ function _getFlightColumnRect(
     height: canvas.height,
   };
   return {
-    x: mix(progress, from.x, to.x),
-    y: mix(progress, from.y, to.y),
-    width: mix(progress, from.width, to.width),
-    height: mix(progress, from.height, to.height),
+    x: Motion.mix({
+      t: progress,
+      from: from.x,
+      to: to.x,
+    }),
+    y: Motion.mix({
+      t: progress,
+      from: from.y,
+      to: to.y,
+    }),
+    width: Motion.mix({
+      t: progress,
+      from: from.width,
+      to: to.width,
+    }),
+    height: Motion.mix({
+      t: progress,
+      from: from.height,
+      to: to.height,
+    }),
   };
 }
 /**
@@ -134,7 +160,11 @@ function _getFlightProgress({
   frame: number;
   exit: MarkFlyThrough | undefined;
   motion?: VideoMotion;
-}>): { retract: number; flight: number; cover: number } {
+}>): {
+  retract: number;
+  flight: number;
+  cover: number;
+} {
   if (!exit) {
     return { retract: 0, flight: 0, cover: 0 };
   }

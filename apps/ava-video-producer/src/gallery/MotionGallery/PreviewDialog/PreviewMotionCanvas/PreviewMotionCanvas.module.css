@@ -1,0 +1,7 @@
+.previewMotionCanvasDialogStage {
+  composes: dialog-stage from global;
+}
+
+.previewMotionCanvasDialogCanvas {
+  composes: dialog-canvas from global;
+}

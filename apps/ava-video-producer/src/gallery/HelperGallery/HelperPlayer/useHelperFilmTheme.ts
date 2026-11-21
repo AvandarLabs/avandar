@@ -1,11 +1,7 @@
 import { useEffect, useState } from "react";
-import {
-  createFilmThemeAcknowledgement,
-  parseFilmControlMessage,
-} from "../../../showcase/filmThemeMessageHelpers/filmThemeMessageHelpers";
+import { FilmThemeMessages } from "../../../showcase/FilmThemeMessages/FilmThemeMessages";
 import type { Film } from "../../../showcase/showcase.types";
-import type { VideoThemeSnapshot } from "../../../videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
-
+import type { VideoThemeSnapshot } from "../../../videoTheme/VideoThemeSnapshots/VideoThemeSnapshots";
 /**
  * The theme a helper's live player draws in: the film's own, until the
  * embedding Atlas page posts a `theme` control with its draft. Each posted
@@ -25,15 +21,19 @@ export function useHelperFilmTheme(
         ) {
           return;
         }
-        const control = parseFilmControlMessage(event.data, film.id);
+        const control = FilmThemeMessages.parseFilmControlMessage({
+          data: event.data,
+          id: film.id,
+        });
         if (control?.action !== "theme") {
           return;
         }
-        const { snapshot, message } = createFilmThemeAcknowledgement({
-          id: film.id,
-          value: control.value,
-          requestKey: control.requestKey,
-        });
+        const { snapshot, message } =
+          FilmThemeMessages.makeAcknowledgementFromTheme({
+            id: film.id,
+            value: control.value,
+            requestKey: control.requestKey,
+          });
         if (snapshot) {
           setTheme(snapshot);
         }

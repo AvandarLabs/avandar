@@ -1,14 +1,17 @@
 import { FitText } from "../../../primitives/FitText/FitText";
-import { StockRect } from "../../../primitives/StockRect/StockRect";
+import { StockRect } from "../../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { type Props } from "./ContrastAlternativeShared.types";
+import { type Props as ContrastAlternativeSharedProps } from "./ContrastAlternativeShared.types";
 import type { ReactNode } from "react";
+
+type Props = Omit<ContrastAlternativeSharedProps, "frame">;
+
 /** One alternative's panel with its label at a fixed size. */
 export function AlternativePanel({
   alternative,
   index,
   accent,
-}: Readonly<Omit<Props, "frame">>): ReactNode {
+}: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   const panel = {

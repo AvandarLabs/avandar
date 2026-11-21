@@ -1,16 +1,13 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Locator, type Page } from "@playwright/test";
+import { getFilteredMotionNames } from "../helpers/getFilteredMotionNames";
+import { ShowcaseScreenshots } from "../helpers/ShowcaseScreenshots";
 
 test("preview arrows follow filtered catalog order and keep the dialog open", async ({
   page,
 }) => {
   await page.goto("/motion.html");
-  await page.getByRole("searchbox", { name: "Search motions" }).fill("data");
+  const names = await getFilteredMotionNames({ page, query: "data" });
   const cards = page.getByRole("button", { name: /^Explore / });
-  const names = await cards.evaluateAll((buttons) => {
-    return buttons.map((button) => {
-      return button.getAttribute("aria-label")!.replace(/^Explore /, "");
-    });
-  });
   expect(names.length).toBeGreaterThan(2);
   await cards.first().click();
   const dialog = page.getByRole("dialog");
@@ -92,45 +89,21 @@ test("composition sections share the atlas and offer a fitted keyboard preview",
     const expand = page.getByRole("button", { name: /^Explore / }).first();
     await expand.click();
     const dialog = page.getByRole("dialog");
-    const title = dialog.getByRole("heading", { level: 2 });
-    const firstTitle = await title.textContent();
+    await _returnToFirstCompositionPreview({ page, dialog });
     await expect(
-      dialog.getByRole("button", { name: "Previous preview" }),
-    ).toBeDisabled();
-    await page.keyboard.press("ArrowRight");
-    await expect(title).not.toHaveText(firstTitle!);
-    await page.keyboard.press("ArrowLeft");
-    await expect(title).toHaveText(firstTitle!);
+      dialog.getByRole("button", { name: "Download MP4", exact: true }),
+    ).toBeEnabled();
     await dialog
       .getByRole("checkbox", { name: "Motion blur", exact: true })
       .uncheck();
-    const overflow = await dialog.evaluate((element) => {
-      return {
-        horizontal: element.scrollWidth > element.clientWidth,
-        vertical: element.scrollHeight > element.clientHeight,
-        controlsOutside: Array.from(
-          element.querySelectorAll("button, input, select, iframe"),
-        ).some((control) => {
-          const bounds = control.getBoundingClientRect();
-          return (
-            bounds.left < 0 ||
-            bounds.top < 0 ||
-            bounds.right > innerWidth ||
-            bounds.bottom > innerHeight
-          );
-        }),
-      };
-    });
-    expect(overflow).toEqual({
-      horizontal: false,
-      vertical: false,
-      controlsOutside: false,
-    });
+    await _assertPreviewFitsViewport(dialog);
     await expect(
       dialog.getByRole("button", { name: "Download MP4", exact: true }),
     ).toBeEnabled();
     await page.screenshot({
-      path: `../../.temp/feat-motion-catalog/atlas-${section.replace(" ", "-")}.png`,
+      path: ShowcaseScreenshots.getPathFromFilename({
+        filename: `atlas-${section.replace(" ", "-")}.png`,
+      }),
     });
     await page.keyboard.press("Escape");
     await expect(expand).toBeFocused();
@@ -146,6 +119,7 @@ test("legacy links and filtered composition navigation retain their selection", 
     page.getByRole("link", { name: "Sample films", exact: true }),
   ).toHaveAttribute("aria-current", "page");
   const dialog = page.getByRole("dialog");
+  const filmUrl = await _getFilmApiUrl({ page, dialog });
   const currentTitle = await dialog
     .getByRole("heading", { level: 2 })
     .first()
@@ -155,7 +129,15 @@ test("legacy links and filtered composition navigation retain their selection", 
   await page
     .getByRole("searchbox", { name: "Search films" })
     .fill(currentTitle!);
-  await page.getByRole("button", { name: `Explore ${currentTitle}` }).click();
+  await _waitForFilmAfterAction({
+    page,
+    filmUrl,
+    action: () => {
+      return page
+        .getByRole("button", { name: `Explore ${currentTitle}` })
+        .click();
+    },
+  });
   await expect(page).toHaveURL(/film=qetl-composite/);
   await expect(
     dialog.getByRole("button", { name: "Previous preview" }),
@@ -163,21 +145,14 @@ test("legacy links and filtered composition navigation retain their selection", 
   await expect(
     dialog.getByRole("button", { name: "Next preview" }),
   ).toBeDisabled();
-  await page.setViewportSize({ width: 390, height: 844 });
-  await expect(
-    dialog.getByRole("checkbox", { name: "Camera motion" }),
-  ).toBeInViewport();
-  // The dialog scrolls vertically at phone widths, like the Motions dialog.
-  expect(
-    await dialog.evaluate((element) => {
-      return element.scrollWidth <= element.clientWidth;
-    }),
-  ).toBe(true);
+  await _assertMobilePreviewFits({ page, dialog });
   await expect(
     dialog.getByRole("button", { name: "Download MP4", exact: true }),
   ).toBeEnabled();
   await page.screenshot({
-    path: "../../.temp/feat-motion-catalog/atlas-mobile.png",
+    path: ShowcaseScreenshots.getPathFromFilename({
+      filename: "atlas-mobile.png",
+    }),
   });
 });
 
@@ -239,3 +214,115 @@ test("helpers browse by category as live cards and open in the shared preview", 
   await expect(dialog).toHaveCount(0);
   await expect(page).not.toHaveURL(/helper=/);
 });
+
+async function _assertPreviewFitsViewport(dialog: Locator): Promise<void> {
+  const overflow = await dialog.evaluate((element) => {
+    return {
+      horizontal: element.scrollWidth > element.clientWidth,
+      vertical: element.scrollHeight > element.clientHeight,
+      controlsOutside: Array.from(
+        element.querySelectorAll("button, input, select, iframe"),
+      ).some((control) => {
+        const bounds = control.getBoundingClientRect();
+        return (
+          bounds.left < 0 ||
+          bounds.top < 0 ||
+          bounds.right > innerWidth ||
+          bounds.bottom > innerHeight
+        );
+      }),
+    };
+  });
+  expect(overflow).toEqual({
+    horizontal: false,
+    vertical: false,
+    controlsOutside: false,
+  });
+}
+
+/** Gets the film API URL from the selected preview's guarded iframe source. */
+async function _getFilmApiUrl({
+  page,
+  dialog,
+}: Readonly<{ page: Page; dialog: Locator }>): Promise<string> {
+  const source = await dialog.locator("iframe").getAttribute("src");
+  if (!source) {
+    throw new Error("The preview iframe has no source");
+  }
+  const iframeUrl = new URL(source, page.url());
+  const filmId = iframeUrl.searchParams.get("id");
+  if (
+    !filmId ||
+    iframeUrl.origin !== new URL(page.url()).origin ||
+    iframeUrl.pathname !== "/live.html"
+  ) {
+    throw new Error("The preview iframe has no local film selection");
+  }
+  return new URL(`/api/films/${encodeURIComponent(filmId)}`, iframeUrl).href;
+}
+
+/** Waits for the film requested by an action, including cold narration work. */
+async function _waitForFilmAfterAction({
+  page,
+  filmUrl,
+  action,
+}: Readonly<{
+  page: Page;
+  filmUrl: string;
+  action: () => Promise<unknown>;
+}>): Promise<void> {
+  await Promise.all([
+    page.waitForResponse((response) => {
+      const request = response.request();
+      return (
+        response.url() === filmUrl &&
+        request.method() === "GET" &&
+        !request.frame().isDetached() &&
+        request.frame().parentFrame() === page.mainFrame() &&
+        response.ok()
+      );
+    }),
+    action(),
+  ]);
+}
+
+async function _returnToFirstCompositionPreview({
+  page,
+  dialog,
+}: Readonly<{ page: Page; dialog: Locator }>): Promise<void> {
+  const title = dialog.getByRole("heading", { level: 2 });
+  const firstTitle = await title.textContent();
+  if (!firstTitle) {
+    throw new Error("The preview has no composition title");
+  }
+  const filmUrl = await _getFilmApiUrl({ page, dialog });
+  await expect(
+    dialog.getByRole("button", { name: "Previous preview" }),
+  ).toBeDisabled();
+  await page.keyboard.press("ArrowRight");
+  await expect(title).not.toHaveText(firstTitle);
+  await _waitForFilmAfterAction({
+    page,
+    filmUrl,
+    action: () => {
+      return page.keyboard.press("ArrowLeft");
+    },
+  });
+  await expect(title).toHaveText(firstTitle);
+}
+
+async function _assertMobilePreviewFits({
+  page,
+  dialog,
+}: Readonly<{ page: Page; dialog: Locator }>): Promise<void> {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(
+    dialog.getByRole("checkbox", { name: "Camera motion" }),
+  ).toBeInViewport();
+  // The dialog scrolls vertically at phone widths, like the Motions dialog.
+  expect(
+    await dialog.evaluate((element) => {
+      return element.scrollWidth <= element.clientWidth;
+    }),
+  ).toBe(true);
+}

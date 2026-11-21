@@ -10,6 +10,7 @@ export class CaptureRunError extends Error {
   manifestPath: string;
   manifest: CaptureManifest;
 
+  /** Creates a capture failure with the run result and review manifest. */
   constructor(result: Readonly<CaptureResult>) {
     super(`Capture failed. Review ${result.manifestPath}`);
     this.name = "CaptureRunError";

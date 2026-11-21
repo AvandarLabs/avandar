@@ -1,4 +1,4 @@
-import { useVideoTokens } from "../../../videoTheme/useVideoTheme";
+import { useVideoTokens } from "../../../videoTheme/videoThemeHelpers";
 import type { CSSProperties } from "react";
 /**
  * Each word's type: the caption body or the scene heading role, with
@@ -31,7 +31,10 @@ function useWordStyle({
     };
   };
 }
-/** Shared values and calculations for the TypographyScene visuals. */
+/**
+ * Word styles used by TypographyWords to distinguish headings, captions, and
+ * emphasized terms.
+ */
 export const TypographySceneShared = {
   /** Each word's type: the caption body or the scene heading role, with
     emphasised words in the strong brand colour. */

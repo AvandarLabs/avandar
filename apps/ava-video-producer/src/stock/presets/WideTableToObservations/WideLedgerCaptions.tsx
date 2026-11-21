@@ -49,15 +49,14 @@ export function WideLedgerCaptions({
 }
 /** How many missing cells the ledger records as omitted. */
 function _countOmittedCells(input: Input): number {
-  if (input.missingPolicy !== "omit-with-ledger") {
-    return 0;
-  }
-  return input.subjects.reduce((total, subject) => {
-    return (
-      total +
-      subject.values.filter(({ value }) => {
-        return value === null;
-      }).length
-    );
-  }, 0);
+  return input.missingPolicy === "omit-with-ledger"
+    ? input.subjects.reduce((total, subject) => {
+        return (
+          total +
+          subject.values.filter(({ value }) => {
+            return value === null;
+          }).length
+        );
+      }, 0)
+    : 0;
 }

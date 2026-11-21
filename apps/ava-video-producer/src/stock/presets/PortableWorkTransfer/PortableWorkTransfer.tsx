@@ -1,7 +1,7 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getTransferSceneFromFrame } from "./getTransferSceneFromFrame";
-import { TransferArtifact } from "./TransferArtifact";
+import { TransferArtifact } from "./TransferArtifact/TransferArtifact";
 import { TransferBenches } from "./TransferBenches";
 import { TransferCaptions } from "./TransferCaptions";
 import { TransferFolio } from "./TransferFolio";

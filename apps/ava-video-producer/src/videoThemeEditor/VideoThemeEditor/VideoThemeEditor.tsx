@@ -1,18 +1,14 @@
 import { useMemo, useState, type ReactNode } from "react";
-import { useDraftTheme } from "../resolveDraftTheme/useDraftTheme";
+import { useDraftTheme } from "../DraftThemeResolution/useDraftTheme";
 import {
-  countItemOverrides,
   type ThemeDraft,
   type ThemeEditScope,
-} from "../themeDraft/themeDraft";
+  ThemeDrafts,
+} from "../ThemeDrafts/ThemeDrafts";
 import { TokenEditorContext } from "../TokenEditorContext";
 import { useTokenRowLabel } from "../TokenRow/useTokenRowLabel";
-import {
-  filterTokenRows,
-  listEmptyAtomicScaleGroups,
-  listTokenRows,
-} from "../tokenRows/tokenRows";
-import { type TokenRow } from "../tokenRows/tokenRows.types";
+import { TokenRows } from "../TokenRows/TokenRows";
+import { type TokenRow } from "../TokenRows/TokenRows.types";
 import {
   EditorToolbar,
   type EditorFilters,
@@ -39,14 +35,56 @@ type Props = Readonly<{
   onDraftChange: (draft: ThemeDraft) => void;
   onScopeChange: (scope: ThemeEditScope) => void;
 }>;
-function useVisibleRows(
-  rows: readonly TokenRow[],
-  filters: EditorFilters,
-  usedTokens: readonly string[] | undefined,
-) {
+function useEditorView(
+  options: Props,
+): Readonly<
+  ReturnType<typeof useEditorRows> &
+    ReturnType<typeof useEditorFilters> & { overrideCount: number }
+> {
+  const { library, themeId, draft, scope, item, usedTokens, onDraftChange } =
+    options;
+  const { rows, context } = useEditorRows({
+    library,
+    themeId,
+    draft,
+    scope,
+    item,
+    onDraftChange,
+  });
+  const { filters, setFilters, visibleRows, emptyGroups } = useEditorFilters({
+    rows,
+    usedTokens,
+  });
+  const overrideCount = item
+    ? ThemeDrafts.countItemOverrides({
+        library,
+        themeId,
+        draft,
+        itemId: item.id,
+      })
+    : 0;
+  return {
+    rows,
+    context,
+    filters,
+    setFilters,
+    visibleRows,
+    emptyGroups,
+    overrideCount,
+  };
+}
+function useVisibleRows({
+  rows,
+  filters,
+  usedTokens,
+}: Readonly<{
+  rows: readonly TokenRow[];
+  filters: EditorFilters;
+  usedTokens: readonly string[] | undefined;
+}>) {
   const toLabel = useTokenRowLabel();
   return useMemo(() => {
-    return filterTokenRows({
+    return TokenRows.filterTokenRows({
       rows,
       filter: {
         tiers:
@@ -64,20 +102,27 @@ function useVisibleRows(
  * The search, tier, and usage filters, the rows they leave visible, and the
  * empty atomic scales to offer while the unfiltered atomic tier is open.
  */
-function useEditorFilters(
-  rows: readonly TokenRow[],
-  usedTokens: readonly string[] | undefined,
-) {
+function useEditorFilters({
+  rows,
+  usedTokens,
+}: Readonly<{
+  rows: readonly TokenRow[];
+  usedTokens: readonly string[] | undefined;
+}>) {
   const [filters, setFilters] = useState<EditorFilters>({
     tier: "semantic",
     query: "",
     isUsedOnly: false,
   });
-  const visibleRows = useVisibleRows(rows, filters, usedTokens);
+  const visibleRows = useVisibleRows({
+    rows,
+    filters,
+    usedTokens,
+  });
   const showsEmptyScales =
     filters.tier === "atomic" && !filters.query && !filters.isUsedOnly;
   const emptyGroups = useMemo(() => {
-    return showsEmptyScales ? listEmptyAtomicScaleGroups(rows) : [];
+    return showsEmptyScales ? TokenRows.listEmptyAtomicScaleGroups(rows) : [];
   }, [showsEmptyScales, rows]);
   return { filters, setFilters, visibleRows, emptyGroups };
 }
@@ -111,7 +156,7 @@ function useEditorRows({
   const draftTheme = useDraftTheme({ library, themeId, draft, scope });
   const itemTheme = useItemTheme({ library, themeId, draft, item });
   const rows = useMemo(() => {
-    return listTokenRows({
+    return TokenRows.listTokenRows({
       library,
       themeId,
       draft,
@@ -147,32 +192,17 @@ function useEditorRows({
  * item. It is controlled and knows nothing about the gallery, so any
  * producer surface can host it with a theme library and a draft.
  */
-export function VideoThemeEditor({
-  library,
-  themeId,
-  draft,
-  scope,
-  item,
-  usedTokens,
-  header,
-  onDraftChange,
-  onScopeChange,
-}: Props): ReactNode {
-  const { rows, context } = useEditorRows({
-    library,
-    themeId,
-    draft,
-    scope,
-    item,
-    onDraftChange,
-  });
-  const { filters, setFilters, visibleRows, emptyGroups } = useEditorFilters(
+export function VideoThemeEditor(options: Props): ReactNode {
+  const { scope, item, header, usedTokens, onScopeChange } = options;
+  const {
     rows,
-    usedTokens,
-  );
-  const overrideCount = item
-    ? countItemOverrides({ library, themeId, draft, itemId: item.id })
-    : 0;
+    context,
+    filters,
+    setFilters,
+    visibleRows,
+    emptyGroups,
+    overrideCount,
+  } = useEditorView(options);
   return (
     <TokenEditorContext.Provider value={context}>
       <section className={css.videoThemeEditor} aria-label="Design tokens">

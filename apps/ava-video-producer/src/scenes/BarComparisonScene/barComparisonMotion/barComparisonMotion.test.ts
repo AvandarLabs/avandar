@@ -1,17 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createVideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import { makeVideoMotionFromTokens } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import { StageTheme } from "../../StageTheme/StageTheme";
-import {
-  getBarComparisonBeats,
-  getBarFractions,
-  getEraseStartFrames,
-  getRoughEdgeClipPath,
-  getRowValueLabel,
-} from "./barComparisonMotion";
+import { BarComparisonMotion } from "./BarComparisonMotion";
 
 test("a panel stages its hero, then labels, then bars, then values", () => {
-  const beats = getBarComparisonBeats({
+  const beats = BarComparisonMotion.getBarComparisonBeats({
     revealAtFrame: 10,
     panelIndex: 0,
     panelStaggerFrames: 3,
@@ -22,12 +16,12 @@ test("a panel stages its hero, then labels, then bars, then values", () => {
   assert.ok(beats.valuesAt > beats.barsAt);
 });
 test("a second panel starts its whole staging one panel stagger later", () => {
-  const first = getBarComparisonBeats({
+  const first = BarComparisonMotion.getBarComparisonBeats({
     revealAtFrame: 10,
     panelIndex: 0,
     panelStaggerFrames: 3,
   });
-  const second = getBarComparisonBeats({
+  const second = BarComparisonMotion.getBarComparisonBeats({
     revealAtFrame: 10,
     panelIndex: 1,
     panelStaggerFrames: 3,
@@ -37,15 +31,22 @@ test("a second panel starts its whole staging one panel stagger later", () => {
 });
 test("bar lengths are relative to the longest bar in the panel", () => {
   assert.deepEqual(
-    getBarFractions([{ value: 50 }, { value: 200 }, { value: 0 }]),
+    BarComparisonMotion.getBarFractions([
+      { value: 50 },
+      { value: 200 },
+      { value: 0 },
+    ]),
     [0.25, 1, 0],
   );
 });
 test("a panel of zero values draws no bars instead of dividing by zero", () => {
-  assert.deepEqual(getBarFractions([{ value: 0 }, { value: 0 }]), [0, 0]);
+  assert.deepEqual(
+    BarComparisonMotion.getBarFractions([{ value: 0 }, { value: 0 }]),
+    [0, 0],
+  );
 });
 test("the erase walks the first panel in reading order before the second panel", () => {
-  const starts = getEraseStartFrames({
+  const starts = BarComparisonMotion.getEraseStartFrames({
     atFrame: 100,
     elementCounts: [3, 3],
     staggerFrames: 0.25,
@@ -57,9 +58,24 @@ test("the erase walks the first panel in reading order before the second panel",
   ]);
 });
 test("a rough bar edge stays within its depth and repeats for the same row", () => {
-  const clip = getRoughEdgeClipPath(4, 8);
-  assert.equal(clip, getRoughEdgeClipPath(4, 8));
-  assert.notEqual(clip, getRoughEdgeClipPath(5, 8));
+  const clip = BarComparisonMotion.getRoughEdgeClipPath({
+    seed: 4,
+    depth: 8,
+  });
+  assert.equal(
+    clip,
+    BarComparisonMotion.getRoughEdgeClipPath({
+      seed: 4,
+      depth: 8,
+    }),
+  );
+  assert.notEqual(
+    clip,
+    BarComparisonMotion.getRoughEdgeClipPath({
+      seed: 5,
+      depth: 8,
+    }),
+  );
   const offsets = [...clip.matchAll(/calc\(100% - ([\d.]+)px\)/g)].map(
     (match) => {
       return Number(match[1]);
@@ -73,18 +89,30 @@ test("a rough bar edge stays within its depth and repeats for the same row", () 
   );
 });
 test("a row value without display text keeps the panel's decimal places", () => {
-  assert.equal(getRowValueLabel({ value: 4.2 }, 1), "4.2");
-  assert.equal(getRowValueLabel({ value: 4.2, display: "4.2 s" }, 1), "4.2 s");
+  assert.equal(
+    BarComparisonMotion.rowValueLabel({
+      row: { value: 4.2 },
+      precision: 1,
+    }),
+    "4.2",
+  );
+  assert.equal(
+    BarComparisonMotion.rowValueLabel({
+      row: { value: 4.2, display: "4.2 s" },
+      precision: 1,
+    }),
+    "4.2 s",
+  );
 });
 test("a panel's staging stretches with the theme's tempo", () => {
   const motion = StageTheme.getClassicStageTheme().semantic.motion;
-  const slowest = createVideoMotion({ ...motion, tempo: 0.8 });
-  const classic = getBarComparisonBeats({
+  const slowest = makeVideoMotionFromTokens({ ...motion, tempo: 0.8 });
+  const classic = BarComparisonMotion.getBarComparisonBeats({
     revealAtFrame: 10,
     panelIndex: 0,
     panelStaggerFrames: 3,
   });
-  const slow = getBarComparisonBeats({
+  const slow = BarComparisonMotion.getBarComparisonBeats({
     revealAtFrame: 10,
     panelIndex: 0,
     panelStaggerFrames: 3,

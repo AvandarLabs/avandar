@@ -1,8 +1,8 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { CarbonAccountingOperatingEmissionsLayer } from "./CarbonAccountingOperatingEmissionsLayer/CarbonAccountingOperatingEmissionsLayer";
 import { CarbonNetAccounting } from "./CarbonNetAccounting";
-import { OperatingEmissionRow } from "./OperatingEmissionRow/OperatingEmissionRow";
 import type { Input } from "./CarbonStorageAccounting.schema";
 import type { ReactNode } from "react";
 
@@ -34,23 +34,9 @@ export function CarbonAccounting({
         breakLongWords
         normalizeWhitespace
       />
-      {input.operatingEmissions.map((row, index) => {
-        return (
-          <OperatingEmissionRow
-            key={row.id}
-            row={row}
-            index={index}
-            unit={input.copy.accountingUnit}
-            frame={frame}
-          />
-        );
-      })}
+      <CarbonAccountingOperatingEmissionsLayer input={input} frame={frame} />
       {input.showNetAccounting && frame >= 108 ? (
-        <CarbonNetAccounting
-          input={input}
-          retained={retained}
-          emissions={emissions}
-        />
+        <CarbonNetAccounting {...{ input, retained, emissions }} />
       ) : undefined}
       <SketchedShape
         shape={{ kind: "path", d: "M918 183 V442 H900" }}

@@ -1,12 +1,10 @@
 import type { Page } from "@playwright/test";
-
 /** What the dashboard chart did during two seconds of playback. */
 export type DashboardContinuity = {
   replacements: number;
   emptyFrames: number;
   originalChartConnected: boolean;
 };
-
 /**
  * Runs in the page: watches the chart for 120 animation frames and counts
  * chart replacements and frames drawn without all six bars.
@@ -45,17 +43,19 @@ async function _watchChartInPage(
     originalChartConnected: element.isConnected,
   };
 }
-
 /**
  * Plays the dashboard composition through its real transport and reports
  * whether its chart was replaced or drawn empty during playback. Use it in a
  * spec that asserts a composition keeps its chart mounted, for example while
  * the player runs at double speed.
  */
-export async function getDashboardContinuityFromPlayback(
-  page: Page,
-  baseUrl: string | undefined,
-): Promise<DashboardContinuity> {
+export async function getDashboardContinuityFromPlayback({
+  page,
+  baseUrl,
+}: Readonly<{
+  page: Page;
+  baseUrl: string | undefined;
+}>): Promise<DashboardContinuity> {
   await page.goto(`${baseUrl}/compositions.html?film=qetl-composite`);
   const player = page.frameLocator("iframe");
   await player.locator(".liveFilm").waitFor();

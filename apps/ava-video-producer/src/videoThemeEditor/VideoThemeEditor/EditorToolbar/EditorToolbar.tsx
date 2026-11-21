@@ -2,7 +2,7 @@ import { TextInput } from "@mantine/core";
 import css from "./EditorToolbar.module.css";
 import { ScopeSwitch } from "./ScopeSwitch/ScopeSwitch";
 import { UsageFilter } from "./UsageFilter/UsageFilter";
-import type { ThemeEditScope } from "../../themeDraft/themeDraft";
+import type { ThemeEditScope } from "../../ThemeDrafts/ThemeDrafts";
 import type { ReactNode } from "react";
 
 /** Which tier tab is open. */

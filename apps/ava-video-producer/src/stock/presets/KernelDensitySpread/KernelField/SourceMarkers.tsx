@@ -2,10 +2,11 @@ import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "../KernelDensitySpread.schema";
 import type { ReactNode } from "react";
+
+type Props = { points: Input["points"] };
+
 /** The fixed observations, drawn above the field and the cones. */
-export function SourceMarkers({
-  points,
-}: Readonly<{ points: Input["points"] }>): ReactNode {
+export function SourceMarkers({ points }: Readonly<Props>): ReactNode {
   const { color, stroke, sketch } = GraphicThemeHooks.useGraphicTokens();
   const shapes = GraphicThemeHooks.useGraphicShapeScales();
   return points.map((point) => {

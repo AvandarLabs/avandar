@@ -26,13 +26,15 @@ export function PosterThumbnail({ id, themeId }: Props): ReactNode {
     return !failedSources.has(source);
   });
   if (poster === undefined) {
-    return <span className={css.missing}>{"NO POSTER YET"}</span>;
+    return (
+      <span className={css.posterThumbnailMissing}>{"NO POSTER YET"}</span>
+    );
   }
   return (
     <>
       <img
         key={poster}
-        className={css.poster}
+        className={css.posterThumbnail}
         src={poster}
         alt=""
         loading="lazy"

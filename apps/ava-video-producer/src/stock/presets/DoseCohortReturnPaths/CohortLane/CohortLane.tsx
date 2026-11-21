@@ -1,11 +1,11 @@
 import { propEq } from "@avandar/utils";
-import { mix } from "../../../../motion";
+import { Motion } from "../../../../motion";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CohortPerson } from "../CohortPerson";
 import { CohortRecord } from "../CohortRecord/CohortRecord";
 import { SceneLabel } from "../SceneLabel";
 import { CohortTrack } from "./CohortTrack";
-import type { VideoMotion } from "../../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "../DoseCohortReturnPaths.schema";
 import type { ReactNode } from "react";
 
@@ -29,8 +29,8 @@ function _getPersonPosition({
   return input.visits.reduce((position, visit, visitIndex) => {
     return participant.records.find(propEq("visitId", visit.id))?.state ===
       "recorded"
-      ? mix(
-          motion.ramp(
+      ? Motion.mix({
+          t: motion.ramp(
             frame,
             30 +
               visitIndex * motion.scaleStagger(18) +
@@ -38,9 +38,9 @@ function _getPersonPosition({
             motion.hero,
             motion.travel.easing,
           ),
-          position,
-          380 + visitIndex * 155,
-        )
+          from: position,
+          to: 380 + visitIndex * 155,
+        })
       : position;
   }, 285);
 }

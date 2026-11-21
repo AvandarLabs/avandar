@@ -1,69 +1,53 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { SketchedShape } from "../../primitives/SketchedShape";
-import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { RefreshRecord } from "./RefreshRecord";
+import { RefreshRecord } from "./RefreshRecord/RefreshRecord";
+import { RefreshWriteCount } from "./RefreshWriteCount";
+import { useStatePreservingSourceRefreshPresentation } from "./useStatePreservingSourceRefreshPresentation";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./StatePreservingSourceRefresh.schema";
 import type { ReactNode } from "react";
+
 /** Frame-driven authored study props. */
 export type Props = GraphicProps & { input: Input };
+
 /** One source refresh preserves identities and every human-owned field. */
-export function StatePreservingSourceRefresh({
-  frame,
-  input,
-  accent,
-}: Readonly<Props>): ReactNode {
-  const tokens = GraphicThemeHooks.useGraphicTokens();
-  const scales = GraphicThemeHooks.useGraphicShapeScales();
-  const writes = input.records.filter((record) => {
-    return (
-      input.sourceRows.find(({ id }) => {
-        return id === record.id;
-      })?.label !== record.label
-    );
-  }).length;
+export function StatePreservingSourceRefresh(
+  props: Readonly<Props>,
+): ReactNode {
+  const presentation = useStatePreservingSourceRefreshPresentation(props);
+
   return (
     <g>
       <LabelSlots
         labels={[
-          [input.copy.context, 50, 580, 850, 14, 1],
+          [props.input.copy.context, 50, 580, 850, 14, 1],
           [
-            frame >= 140 ? input.copy.after : input.copy.before,
+            props.frame >= 140
+              ? props.input.copy.after
+              : props.input.copy.before,
             50,
             30,
             850,
             14,
             1,
           ],
-          [input.labels.derived, 220, 58, 350, 14, 3],
-          [input.labels.human, 610, 58, 290, 14, 3],
+          [props.input.labels.derived, 220, 58, 350, 14, 3],
+          [props.input.labels.human, 610, 58, 290, 14, 3],
         ]}
       />
-      {input.records.map((record, index) => {
+      {props.input.records.map((record, index) => {
         return (
           <RefreshRecord
             key={record.id}
-            input={input}
+            input={props.input}
             record={record}
             index={index}
-            frame={frame}
-            accent={accent}
+            frame={props.frame}
+            accent={props.accent}
           />
         );
       })}
-      {input.showWriteCount ? (
-        <g data-write-count={frame >= 139 ? writes : 0}>
-          <SketchedShape
-            shape={{ kind: "path", d: "M720 559 l12 -12 l5 5 l-12 12 l-7 2 Z" }}
-            profile={tokens.sketch.shape}
-            fill="none"
-            stroke={tokens.color.accentAlt}
-            strokeWidth={scales.stroke(tokens.stroke.default)}
-          />
-          <LabelSlots
-            labels={[[String(frame >= 139 ? writes : 0), 755, 566, 145, 16, 1]]}
-          />
-        </g>
+      {props.input.showWriteCount ? (
+        <RefreshWriteCount {...presentation} />
       ) : null}
     </g>
   );

@@ -1,12 +1,15 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
+
+type Props = { fieldId: string; y: number; progress: number };
+
 /** A review bracket for a field whose conflict no source resolves. */
 export function ReviewBracket({
   fieldId,
   y,
   progress,
-}: Readonly<{ fieldId: string; y: number; progress: number }>): ReactNode {
+}: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g data-review-field={fieldId}>

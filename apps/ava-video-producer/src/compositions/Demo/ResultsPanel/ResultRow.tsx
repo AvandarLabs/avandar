@@ -1,25 +1,23 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { useVideoMotion } from "../../../videoTheme/useVideoMotion";
-import { useVideoTheme } from "../../../videoTheme/useVideoTheme";
+import { useVideoTheme } from "../../../videoTheme/videoThemeHelpers";
 import { ROWS_AT } from "../timeline";
 import { ResultRowBar } from "./ResultRowBar";
 import { ResultRowLabel } from "./ResultRowLabel";
 import { ResultsPanelShared } from "./ResultsPanelShared/ResultsPanelShared";
 import { type ResultRowData } from "./ResultsPanelShared/ResultsPanelShared.types";
 import type { ReactNode } from "react";
+
+type Props = {
+  frame: number;
+  row: ResultRowData;
+  index: number;
+};
 /**
  * Animates one channel's count and bar while dimming excluded rows for
  * `Results`.
  */
-export function ResultRow({
-  frame,
-  row,
-  index,
-}: {
-  frame: number;
-  row: ResultRowData;
-  index: number;
-}): ReactNode {
+export function ResultRow({ frame, row, index }: Readonly<Props>): ReactNode {
   const { mantine, atomic } = useVideoTheme();
   const motion = useVideoMotion();
   // Nothing enters as a group. Two frames between siblings is the minimum
@@ -45,7 +43,12 @@ export function ResultRow({
         // and the four below jump up a line; leaving it at a quarter says
         // "excluded" without moving anything.
         opacity:
-          (entrance.opacity as number) * mix(cut, 1, atomic.opacity["26"]),
+          (entrance.opacity as number) *
+          Motion.mix({
+            t: cut,
+            from: 1,
+            to: atomic.opacity["26"],
+          }),
       }}
     >
       <ResultRowLabel row={row} />

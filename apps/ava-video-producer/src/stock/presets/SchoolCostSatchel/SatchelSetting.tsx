@@ -1,7 +1,7 @@
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { SatchelBag } from "./SatchelBag";
+import { SatchelBag } from "./SatchelBag/SatchelBag";
 import type { ReactNode } from "react";
 
 type Props = { frame: number; accent: string };

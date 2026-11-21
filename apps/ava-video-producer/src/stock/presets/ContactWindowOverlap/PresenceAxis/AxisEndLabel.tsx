@@ -1,11 +1,14 @@
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
+
+type Props = { x: number; anchor?: "end"; children: ReactNode };
+
 /** The axis value at one end, above the axis line. */
 export function AxisEndLabel({
   x,
   anchor,
   children,
-}: Readonly<{ x: number; anchor?: "end"; children: ReactNode }>): ReactNode {
+}: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <text

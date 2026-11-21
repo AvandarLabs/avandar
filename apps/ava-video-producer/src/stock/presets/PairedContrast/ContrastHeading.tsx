@@ -1,10 +1,13 @@
-import { ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./PairedContrast.schema";
 import type { ReactNode } from "react";
 
-type Props = { frame: number; input: Input };
+type Props = {
+  frame: number;
+  input: Input;
+};
 /** The same question and caption frame both alternatives. */
 export function ContrastHeading({ frame, input }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
@@ -16,7 +19,12 @@ export function ContrastHeading({ frame, input }: Readonly<Props>): ReactNode {
       fontSize: 24 as const,
       maxLines: 3,
       color: tokens.color.text,
-      opacity: ramp(frame, 18, motion.hero, motion.reveal.easing),
+      opacity: Motion.ramp({
+        frame,
+        at: 18,
+        dur: motion.hero,
+        easing: motion.reveal.easing,
+      }),
     },
     {
       text: input.comparisonLabel,

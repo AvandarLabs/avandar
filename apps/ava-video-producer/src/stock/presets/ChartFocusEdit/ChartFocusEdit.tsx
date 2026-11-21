@@ -1,14 +1,16 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { ChartCategory } from "./ChartCategory";
+import { ChartCategory } from "./ChartCategory/ChartCategory";
 import { ChartHeadings } from "./ChartHeadings";
-import { ChartScale } from "./ChartScale";
+import { ChartScale } from "./ChartScale/ChartScale";
 import { RefinementMotion } from "./RefinementMotion";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ChartFocusEdit.schema";
 import type { ReactNode } from "react";
+
 /** Complete chart props. The shared renderer owns the loop envelope. */
 export type Props = GraphicProps & { input: Input };
+
 /** Refine an already complete chart while preserving its scale and values. */
 export function ChartFocusEdit({
   input,

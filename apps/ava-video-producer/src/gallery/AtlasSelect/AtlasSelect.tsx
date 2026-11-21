@@ -3,8 +3,10 @@ import { useState } from "react";
 import css from "./AtlasSelect.module.css";
 import type { ReactNode } from "react";
 
+type Props = SelectProps;
+
 /** Compact Mantine select whose menu stays inside the native preview dialog. */
-export function AtlasSelect(props: SelectProps): ReactNode {
+export function AtlasSelect(props: Readonly<Props>): ReactNode {
   const [opened, setOpened] = useState(false);
   const closeDropdown = () => {
     setOpened(false);
@@ -12,9 +14,11 @@ export function AtlasSelect(props: SelectProps): ReactNode {
   };
   return (
     <div
-      className={css.control}
+      className={css.atlasSelectControl}
       onBlur={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget)) closeDropdown();
+        if (!event.currentTarget.contains(event.relatedTarget)) {
+          closeDropdown();
+        }
       }}
       onKeyDownCapture={(event) => {
         if (event.key === "Escape" && opened) {
@@ -30,14 +34,7 @@ export function AtlasSelect(props: SelectProps): ReactNode {
         withScrollArea={false}
         comboboxProps={{ withinPortal: false }}
         maxDropdownHeight={280}
-        classNames={{
-          root: css.root,
-          label: css.label,
-          wrapper: css.wrapper,
-          input: css.input,
-          dropdown: css.dropdown,
-          option: css.option,
-        }}
+        classNames={SELECT_CLASSES}
         {...props}
         dropdownOpened={opened}
         onDropdownOpen={() => {
@@ -48,3 +45,12 @@ export function AtlasSelect(props: SelectProps): ReactNode {
     </div>
   );
 }
+
+const SELECT_CLASSES = {
+  root: css.atlasSelectRoot,
+  label: css.atlasSelectLabel,
+  wrapper: css.atlasSelectWrapper,
+  input: css.atlasSelectInput,
+  dropdown: css.atlasSelectDropdown,
+  option: css.atlasSelectOption,
+};

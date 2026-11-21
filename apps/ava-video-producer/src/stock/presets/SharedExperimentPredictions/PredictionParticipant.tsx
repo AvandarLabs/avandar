@@ -1,4 +1,4 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { DistanceBracket } from "./DistanceBracket";
 import { PredictionActor } from "./PredictionActor";
@@ -8,7 +8,12 @@ import { PredictionLabels } from "./PredictionLabels";
 import type { Input } from "./SharedExperimentPredictions.schema";
 import type { ReactNode } from "react";
 
-type Props = { input: Input; index: number; frame: number; accent: string };
+type Props = {
+  input: Input;
+  index: number;
+  frame: number;
+  accent: string;
+};
 /**
  * Each participant carries a keyed flag to an authored position in its own
  * lane.
@@ -30,7 +35,11 @@ export function PredictionParticipant({
     motion.scale(12),
     motion.travel.easing,
   );
-  const flagX = mix(progress, 450, targetX);
+  const flagX = Motion.mix({
+    t: progress,
+    from: 450,
+    to: targetX,
+  });
   const personX = flagX - 25;
   const difference = Math.abs(
     learner.predictionDistance - input.observationDistance,

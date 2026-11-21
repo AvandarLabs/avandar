@@ -19,7 +19,7 @@ export function ExplorerDrawerPanels({
   return (
     <div
       id="demo-explorer-drawer"
-      className={css.explorerDrawerBody}
+      className={css.explorerDrawerPanelsBody}
       style={{ height: drawerHeight * stage.drawerProgress }}
     >
       <Box

@@ -1,7 +1,7 @@
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getServiceSceneFromFrame } from "./getServiceSceneFromFrame";
 import { ServiceCaptions } from "./ServiceCaptions";
-import { ServiceEnclosure } from "./ServiceEnclosure";
+import { ServiceEnclosure } from "./ServiceEnclosure/ServiceEnclosure";
 import { ServiceModule } from "./ServiceModule";
 import { ServiceWorker } from "./ServiceWorker";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";

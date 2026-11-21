@@ -2,7 +2,7 @@ import type {
   CaptureAction,
   CaptureResource,
 } from "../captureAvandar/captureAvandar.types";
-import type { FixtureFile } from "../captureLib/fsSafetyHelpers";
+import type { FixtureFile } from "../captureLib/CaptureFileSafety";
 
 /** One curated screenshot and where it came from. */
 export type CuratedScreenshot = {

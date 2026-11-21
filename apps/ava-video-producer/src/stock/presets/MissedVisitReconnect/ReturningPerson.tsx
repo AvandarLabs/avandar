@@ -1,4 +1,4 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./MissedVisitReconnect.schema";
@@ -22,16 +22,16 @@ export function ReturningPerson({
   const motion = GraphicThemeHooks.useGraphicMotion();
   const x =
     item.outcome === "attended"
-      ? mix(
-          motion.ramp(
+      ? Motion.mix({
+          t: motion.ramp(
             frame,
             91 + index * motion.stagger.list,
             motion.sheet,
             motion.travel.easing,
           ),
-          240,
-          830,
-        )
+          from: 240,
+          to: 830,
+        })
       : 240;
   return (
     <g data-returning-person={item.id} transform={`translate(${x} ${y})`}>

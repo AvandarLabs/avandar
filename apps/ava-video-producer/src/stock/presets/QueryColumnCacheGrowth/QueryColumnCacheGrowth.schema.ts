@@ -5,6 +5,187 @@ import type {
   StockSemanticRule,
 } from "../../contracts/StockContract.types";
 
+type GetColumnReferenceIssueOptions = { index: number };
+type ValidateQueryColumnCacheGrowthConstraintsOptions = {
+  context: Readonly<{ input: Input; context: z.RefinementCtx }>["context"];
+  ids: ReturnType<
+    Readonly<{
+      input: Input;
+      context: z.RefinementCtx;
+    }>["input"]["columns"]["map"]
+  >;
+  columnIdSet: Set<
+    ReturnType<
+      Readonly<{
+        input: Input;
+        context: z.RefinementCtx;
+      }>["input"]["columns"]["map"]
+    >[number]
+  >;
+};
+type CachedColumnIdsOptions = {
+  input: Readonly<{ input: Input; context: z.RefinementCtx }>["input"];
+  context: Readonly<{ input: Input; context: z.RefinementCtx }>["context"];
+  columnIdSet: Set<
+    ReturnType<
+      Readonly<{
+        input: Input;
+        context: z.RefinementCtx;
+      }>["input"]["columns"]["map"]
+    >[number]
+  >;
+  cachedIdSet: Set<
+    Readonly<{
+      input: Input;
+      context: z.RefinementCtx;
+    }>["input"]["cachedColumnIds"][number]
+  >;
+};
+type CachedColumnValidationOptions = {
+  input: Readonly<{ input: Input; context: z.RefinementCtx }>["input"];
+  context: Readonly<{ input: Input; context: z.RefinementCtx }>["context"];
+  columnIdSet: Set<
+    ReturnType<
+      Readonly<{
+        input: Input;
+        context: z.RefinementCtx;
+      }>["input"]["columns"]["map"]
+    >[number]
+  >;
+  cachedIdSet: Set<
+    Readonly<{
+      input: Input;
+      context: z.RefinementCtx;
+    }>["input"]["cachedColumnIds"][number]
+  >;
+};
+type ValidateQueryColumnCacheGrowthKeyColumnIdOptions = {
+  input: Readonly<{ input: Input; context: z.RefinementCtx }>["input"];
+  context: Readonly<{ input: Input; context: z.RefinementCtx }>["context"];
+  columnIdSet: Set<
+    ReturnType<
+      Readonly<{
+        input: Input;
+        context: z.RefinementCtx;
+      }>["input"]["columns"]["map"]
+    >[number]
+  >;
+  cachedIdSet: Set<
+    Readonly<{
+      input: Input;
+      context: z.RefinementCtx;
+    }>["input"]["cachedColumnIds"][number]
+  >;
+};
+/** Checks the first request is cached and the second grows the cache. */
+function _validateRequestCoverage({
+  input,
+  context,
+  cachedIdSet,
+}: Readonly<{
+  input: Input;
+  context: z.RefinementCtx;
+  cachedIdSet: Set<string>;
+}>): void {
+  if (
+    input.requests[0]?.columnIds.some((id) => {
+      return !cachedIdSet.has(id);
+    })
+  ) {
+    context.addIssue({
+      code: "custom",
+      path: ["requests", 0],
+      message: "First request must be covered.",
+    });
+  }
+  if (
+    input.requests[1] &&
+    !input.requests[1].columnIds.some((id) => {
+      return !cachedIdSet.has(id);
+    })
+  ) {
+    context.addIssue({
+      code: "custom",
+      path: ["requests", 1],
+      message: "Second request must add a column.",
+    });
+  }
+}
+
+/** Checks the key column id constraint and records any violations. */
+function _validateQueryColumnCacheGrowthKeyColumnId({
+  input,
+  context,
+  columnIdSet,
+  cachedIdSet,
+}: Readonly<ValidateQueryColumnCacheGrowthKeyColumnIdOptions>): void {
+  if (
+    !columnIdSet.has(input.keyColumnId) ||
+    !cachedIdSet.has(input.keyColumnId)
+  ) {
+    context.addIssue({
+      code: "custom",
+      path: ["keyColumnId"],
+      message: "Key must reference a cached column.",
+    });
+  }
+}
+
+/**
+ * Checks the cached column ids requests column ids constraint and records any
+ * violations.
+ */
+function _validateQueryColumnCacheGrowthCachedColumnIdsRequestsColumnIds({
+  input,
+  context,
+  columnIdSet,
+  cachedIdSet,
+}: Readonly<CachedColumnIdsOptions>): void {
+  [input.cachedColumnIds, ...input.requests.map(prop("columnIds"))].forEach(
+    (refs, index) => {
+      if (
+        (index === 0 ? cachedIdSet : new Set(refs)).size !== refs.length ||
+        refs.some((id) => {
+          return !columnIdSet.has(id);
+        })
+      ) {
+        context.addIssue(_getColumnReferenceIssue(index));
+      }
+    },
+  );
+}
+
+/** Checks the constraints constraint and records any violations. */
+function _validateQueryColumnCacheGrowthConstraints({
+  context,
+  ids,
+  columnIdSet,
+}: Readonly<ValidateQueryColumnCacheGrowthConstraintsOptions>): void {
+  if (columnIdSet.size !== ids.length) {
+    context.addIssue({
+      code: "custom",
+      path: ["columns"],
+      message: "Column IDs must be unique.",
+    });
+  }
+}
+
+/** Samples the column reference issue for the current authored frame. */
+function _getColumnReferenceIssue(
+  index: Readonly<Readonly<GetColumnReferenceIssueOptions>["index"]>,
+): {
+  code: "custom";
+  path: string[] | Array<string | number>;
+  message: string;
+} {
+  return {
+    code: "custom",
+    path:
+      index === 0 ? ["cachedColumnIds"] : ["requests", index - 1, "columnIds"],
+    message: "References must be a unique nonempty subset of columns.",
+  };
+}
+
 const columnIds: z.ZodArray<z.ZodString> = z
   .array(z.string().min(1).max(12))
   .min(1)
@@ -12,107 +193,70 @@ const columnIds: z.ZodArray<z.ZodString> = z
 /**
  * One relation grows by exact column union without changing row occurrences.
  */
-export const inputSchema = z
-  .strictObject({
-    columns: z
-      .array(
-        z.strictObject({
-          id: z.string().min(1).max(12),
-          label: z.string().min(1).max(18),
-          cells: z.array(z.string().max(16)).min(2).max(5),
-        }),
-      )
-      .min(2)
-      .max(5),
-    cachedColumnIds: columnIds,
-    requests: z
-      .array(z.strictObject({ label: z.string().min(1).max(24), columnIds }))
-      .length(2),
-    keyColumnId: z.string().min(1).max(12),
-    showSetNotation: z.boolean(),
-    copy: z.strictObject({
-      context: z.string().min(1).max(38),
-      before: z.string().min(1).max(38),
-      after: z.string().min(1).max(38),
-    }),
-  })
-  .superRefine((input, context) => {
-    const ids = input.columns.map(prop("id"));
-    const columnIdSet = new Set(ids);
-    if (columnIdSet.size !== ids.length) {
-      context.addIssue({
-        code: "custom",
-        path: ["columns"],
-        message: "Column IDs must be unique.",
-      });
-    }
-    if (
-      input.columns.some(({ cells }) => {
-        return cells.length !== input.columns[0]?.cells.length;
-      })
-    ) {
-      context.addIssue({
-        code: "custom",
-        path: ["columns"],
-        message: "All columns must have equal cell lengths.",
-      });
-    }
-    const cachedIdSet = new Set(input.cachedColumnIds);
-    [input.cachedColumnIds, ...input.requests.map(prop("columnIds"))].forEach(
-      (refs, index) => {
-        if (
-          (index === 0 ? cachedIdSet : new Set(refs)).size !== refs.length ||
-          refs.some((id) => {
-            return !columnIdSet.has(id);
-          })
-        ) {
-          context.addIssue({
-            code: "custom",
-            path:
-              index === 0
-                ? ["cachedColumnIds"]
-                : ["requests", index - 1, "columnIds"],
-            message: "References must be a unique nonempty subset of columns.",
-          });
-        }
-      },
-    );
-    if (
-      !columnIdSet.has(input.keyColumnId) ||
-      !cachedIdSet.has(input.keyColumnId)
-    ) {
-      context.addIssue({
-        code: "custom",
-        path: ["keyColumnId"],
-        message: "Key must reference a cached column.",
-      });
-    }
-    if (
-      input.requests[0]?.columnIds.some((id) => {
-        return !cachedIdSet.has(id);
-      })
-    ) {
-      context.addIssue({
-        code: "custom",
-        path: ["requests", 0],
-        message: "First request must be covered.",
-      });
-    }
-    if (
-      input.requests[1] &&
-      !input.requests[1].columnIds.some((id) => {
-        return !cachedIdSet.has(id);
-      })
-    ) {
-      context.addIssue({
-        code: "custom",
-        path: ["requests", 1],
-        message: "Second request must add a column.",
-      });
-    }
-  }) satisfies z.ZodType;
+
+const authoredInputSchema = z.strictObject({
+  columns: z
+    .array(
+      z.strictObject({
+        id: z.string().min(1).max(12),
+        label: z.string().min(1).max(18),
+        cells: z.array(z.string().max(16)).min(2).max(5),
+      }),
+    )
+    .min(2)
+    .max(5),
+  cachedColumnIds: columnIds,
+  requests: z
+    .array(z.strictObject({ label: z.string().min(1).max(24), columnIds }))
+    .length(2),
+  keyColumnId: z.string().min(1).max(12),
+  showSetNotation: z.boolean(),
+  copy: z.strictObject({
+    context: z.string().min(1).max(38),
+    before: z.string().min(1).max(38),
+    after: z.string().min(1).max(38),
+  }),
+});
+/** Validates cross-field relationships in the authored input. */
+function _validateQueryColumnCacheGrowthInput({
+  input,
+  context,
+}: Readonly<{ input: Input; context: z.RefinementCtx }>): void {
+  const ids = input.columns.map(prop("id"));
+  const columnIdSet = new Set(ids);
+  _validateQueryColumnCacheGrowthConstraints({ context, ids, columnIdSet });
+  if (
+    input.columns.some(({ cells }) => {
+      return cells.length !== input.columns[0]?.cells.length;
+    })
+  ) {
+    context.addIssue({
+      code: "custom",
+      path: ["columns"],
+      message: "All columns must have equal cell lengths.",
+    });
+  }
+  const cachedIdSet = new Set(input.cachedColumnIds);
+  _validateQueryColumnCacheGrowthCachedColumnIdsRequestsColumnIds({
+    input,
+    context,
+    columnIdSet,
+    cachedIdSet,
+  });
+  _validateQueryColumnCacheGrowthKeyColumnId({
+    input,
+    context,
+    columnIdSet,
+    cachedIdSet,
+  });
+  _validateRequestCoverage({ input, context, cachedIdSet });
+}
+/** Complete authored input with its runtime semantic constraints. */
+export const inputSchema = authoredInputSchema.superRefine((input, context) => {
+  _validateQueryColumnCacheGrowthInput({ input, context });
+}) satisfies z.ZodType;
 /** Authored output type. */
-export type Input = z.output<typeof inputSchema>;
+export type Input = z.output<typeof authoredInputSchema>;
 /** Structural bounds for data-only editors. */
 export const jsonSchema: StockJsonSchema = z.toJSONSchema(inputSchema);
 /** Exact set and row-grain rules beyond structural JSON Schema. */

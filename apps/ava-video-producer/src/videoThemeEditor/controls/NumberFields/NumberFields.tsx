@@ -3,6 +3,7 @@ import { RangeNumberInput } from "../RangeNumberInput";
 import css from "./NumberFields.module.css";
 import type { ReactNode } from "react";
 
+/** Bounds, step, and label of a numeric theme editor field. */
 export type NumberField = Readonly<{
   key: string;
   name: string;
@@ -10,6 +11,7 @@ export type NumberField = Readonly<{
   max: number;
   step: number;
 }>;
+/** Numeric editor field values indexed by their field keys. */
 export type NumberValues = Readonly<Record<string, number>>;
 
 type Props = Readonly<{

@@ -1,4 +1,5 @@
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { ReconnectLedgerAttemptTotal } from "./ReconnectLedgerAttemptTotal/ReconnectLedgerAttemptTotal";
 import { ReconnectOutcomes } from "./ReconnectOutcomes";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./MissedVisitReconnect.schema";
@@ -35,28 +36,7 @@ export function ReconnectLedger({ input, frame }: Readonly<Props>): ReactNode {
       >
         {input.cases.length}
       </text>
-      {input.showAttemptCount ? (
-        <g>
-          <SceneLabel
-            text={input.copy.attempts}
-            x={510}
-            y={562}
-            width={360}
-            lines={3}
-          />
-          <text
-            data-attempt-total={numAttempts}
-            x={900}
-            y={562}
-            fill={tokens.color.text}
-            fontSize={tokens.text.graphic.label.fontSize}
-            fontFamily={tokens.text.graphic.label.fontFamily}
-            fontWeight={tokens.text.graphic.label.fontWeight}
-          >
-            {numAttempts}
-          </text>
-        </g>
-      ) : undefined}
+      <ReconnectLedgerAttemptTotal {...{ input, numAttempts, tokens }} />
     </g>
   );
 }

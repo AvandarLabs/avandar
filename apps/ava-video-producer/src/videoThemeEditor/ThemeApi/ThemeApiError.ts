@@ -5,6 +5,7 @@ export class ThemeApiError extends Error {
   readonly status: number;
   readonly issues: readonly VideoThemeIssue[];
 
+  /** Creates a theme request error with its HTTP status and token issues. */
   constructor(
     status: number,
     message: string,

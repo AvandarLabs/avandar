@@ -1,6 +1,6 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
@@ -34,7 +34,11 @@ export function DrillParentCompartment({
       opacity={
         isSelected
           ? 1
-          : mix(progress, 1, retainContext ? atomic.opacity["45"] : 0)
+          : Motion.mix({
+              t: progress,
+              from: 1,
+              to: retainContext ? atomic.opacity["45"] : 0,
+            })
       }
       data-parent-context={retainContext && progress === 1 ? group : undefined}
     >
@@ -43,7 +47,11 @@ export function DrillParentCompartment({
         x={44 + index * 292}
         y={174}
         width={284}
-        height={mix(progress, 390, 62)}
+        height={Motion.mix({
+          t: progress,
+          from: 390,
+          to: 62,
+        })}
         rx={scales.corner(GROUP_CORNER)}
         fill={tokens.color.surface}
         stroke={isSelected ? accent : tokens.color.line}

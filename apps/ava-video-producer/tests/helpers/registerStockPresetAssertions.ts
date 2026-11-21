@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { prop } from "@avandar/utils";
+import { assertRenderedLabelGraphemes } from "./assertRenderedLabelGraphemes/assertRenderedLabelGraphemes";
+import { getAccessibleTextFromLabelExpectation } from "./assertRenderedLabelGraphemes/getAccessibleTextFromLabelExpectation";
 import type { StockContract } from "../../src/stock/contracts/StockContract.types";
+import type { RenderedLabelExpectation } from "./assertRenderedLabelGraphemes/RenderedLabelExpectation.types";
 
 /** Shared checks for one complete authored input type. */
 export type PresetAssertions<Input extends object> = Pick<
@@ -17,12 +20,24 @@ export type PresetAssertions<Input extends object> = Pick<
    */
   getVisibleTexts?: (
     options: Readonly<{ input: Input; frame: number }>,
-  ) => string[];
+  ) => RenderedLabelExpectation[];
   /**
    * Frames whose state-specific copy is checked. Defaults to the hold frame.
    */
   textFrames?: readonly number[];
 };
+
+/** Keeps full authored accessible copy required for every representation. */
+function _assertAccessibleLabel({
+  markup,
+  text,
+}: Readonly<{
+  markup: string;
+  text: RenderedLabelExpectation;
+}>): void {
+  const accessibleText = getAccessibleTextFromLabelExpectation(text);
+  assert.ok(markup.includes(`aria-label="${accessibleText}"`), accessibleText);
+}
 
 function _assertFixtureSeeks<Input extends object>({
   inputSchema,
@@ -47,7 +62,7 @@ function _assertFixtureSeeks<Input extends object>({
           excludedFields: excludedTextFields,
         });
       texts.forEach((text) => {
-        return assert.ok(markup.includes(`aria-label="${text}"`), text);
+        return _assertAccessibleLabel({ markup, text });
       });
     });
     [...frames].reverse().forEach((frame) => {
@@ -112,7 +127,10 @@ function _assertTextStress<Input extends object>({
           excludedFields: excludedTextFields,
         });
       texts.forEach((text) => {
-        return assert.ok(markup.includes(`aria-label="${text}"`), text);
+        return _assertAccessibleLabel({ markup, text });
+      });
+      texts.forEach((text) => {
+        assertRenderedLabelGraphemes({ markup, text });
       });
       assert.doesNotMatch(markup, />[\u0300-\u036f\u200d]/u);
     });
@@ -135,10 +153,10 @@ export function registerStockPresetAssertions<Input extends object>(
       );
     });
   });
-  test("complete contracts expose recursive editable inputs and valid bindings", () => {
+  test("complete contracts expose top-level editable inputs and valid bindings", () => {
     _assertContract(options);
   });
-  test("maximum accepted labels preserve whitespace, inefficient packing and whole graphemes", () => {
+  test("maximum accepted labels retain accessible whitespace and whole painted graphemes", () => {
     _assertTextStress(options);
   });
 }

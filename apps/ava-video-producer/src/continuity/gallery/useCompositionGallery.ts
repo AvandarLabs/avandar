@@ -1,17 +1,10 @@
+import { propEq } from "@avandar/utils";
 import { useCallback, useReducer } from "react";
 import { ALL_ATLAS_CATEGORIES } from "../../gallery/AtlasLayout/AtlasCategoryNav/AtlasCategoryNav";
-import { CONTINUITY_CATALOG } from "../continuityCatalog";
-import {
-  countCompositionCategories,
-  filterCompositionEntries,
-  gallerySelectionReducer,
-} from "./gallerySelectionReducer/gallerySelectionReducer";
-import type {
-  ContinuityCatalogEntry,
-  ContinuityFamily,
-} from "../continuityCatalog";
-import type { GallerySelection } from "./gallerySelectionReducer/gallerySelectionReducer";
-
+import { CONTINUITY_CATALOG } from "../isSceneEntry";
+import { CompositionSelection } from "./CompositionSelection/CompositionSelection";
+import type { ContinuityCatalogEntry, ContinuityFamily } from "../isSceneEntry";
+import type { GallerySelection } from "./CompositionSelection/CompositionSelection";
 /** One family's selection, visible entries, open preview, and actions. */
 type CompositionGalleryState = {
   selection: GallerySelection;
@@ -45,9 +38,11 @@ function _createInitialSelection(family: ContinuityFamily): GallerySelection {
     );
   });
   const category = parameters.get("category");
-  const isKnownCategory = countCompositionCategories(family).some((item) => {
-    return item.id === category;
-  });
+  const isKnownCategory =
+    category !== null &&
+    CompositionSelection.countCompositionCategories(family).some(
+      propEq("id", category),
+    );
   return {
     family,
     category: isKnownCategory ? category! : ALL_ATLAS_CATEGORIES,
@@ -73,6 +68,28 @@ function _replaceUrl(
   history.replaceState(null, "", `?${parameters.toString()}`);
 }
 
+/** The open preview and its neighbours within the active catalog filter. */
+function _getPreviewNavigation({
+  selection,
+  entries,
+}: Readonly<{
+  selection: GallerySelection;
+  entries: ContinuityCatalogEntry[];
+}>): Pick<CompositionGalleryState, "open" | "previous" | "next"> {
+  const open =
+    selection.openId === undefined
+      ? undefined
+      : CONTINUITY_CATALOG.find(propEq("id", selection.openId));
+  // Browsing a deep-linked entry outside the current filter still works.
+  const browsable = open && !entries.includes(open) ? [open] : entries;
+  const index = open ? browsable.indexOf(open) : -1;
+  return {
+    open,
+    previous: index > 0 ? browsable[index - 1] : undefined,
+    next: index >= 0 ? browsable[index + 1] : undefined,
+  };
+}
+
 /**
  * One family's gallery: category filter, search, the open preview and its
  * neighbours, with caption state scoped to the open live player.
@@ -81,29 +98,22 @@ export function useCompositionGallery(
   family: ContinuityFamily,
 ): CompositionGalleryState {
   const [selection, dispatch] = useReducer(
-    gallerySelectionReducer,
+    CompositionSelection.gallerySelectionReducer,
     family,
     _createInitialSelection,
   );
-  const entries = filterCompositionEntries(selection);
-  const open = CONTINUITY_CATALOG.find((entry) => {
-    return entry.id === selection.openId;
-  });
-  // Browsing a deep-linked entry outside the current filter still works.
-  const browsable = open && !entries.includes(open) ? [open] : entries;
-  const index = open ? browsable.indexOf(open) : -1;
+  const entries = CompositionSelection.filterCompositionEntries(selection);
+  const navigation = _getPreviewNavigation({ selection, entries });
   const receiveOptions = useCallback(
     (options: { id: string; captions: boolean }) => {
-      dispatch({ type: "captions", ...options });
+      return dispatch({ type: "captions", ...options });
     },
     [dispatch],
   );
   return {
     selection,
     entries,
-    open,
-    previous: index > 0 ? browsable[index - 1] : undefined,
-    next: index >= 0 ? browsable[index + 1] : undefined,
+    ...navigation,
     openEntry: (id: string) => {
       dispatch({ type: "open", id });
       _replaceUrl({ ...selection, openId: id });

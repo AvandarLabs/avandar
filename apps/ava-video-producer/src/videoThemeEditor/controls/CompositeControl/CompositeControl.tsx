@@ -1,10 +1,10 @@
-import { isTokenReference } from "../../../videoTheme/themeReferenceHelpers/themeReferenceHelpers";
+import { ThemeReferences } from "../../../videoTheme/ThemeReferences/ThemeReferences";
 import {
   COMPOSITE_TOKEN_FIELDS,
   type CompositeTokenKind,
   type FieldSpec,
-} from "../../../videoTheme/tokenCatalog/defineTokensHelpers";
-import { type TokenRow } from "../../tokenRows/tokenRows.types";
+} from "../../../videoTheme/tokenCatalog/TokenDefinitions";
+import { type TokenRow } from "../../TokenRows/TokenRows.types";
 import { getCompositeFieldsFromValue } from "../roleValueHelpers/roleValueHelpers";
 import { TypeSpecimen } from "../TypeSpecimen/TypeSpecimen";
 import css from "./CompositeControl.module.css";
@@ -21,15 +21,15 @@ type Props = Readonly<{ row: TokenRow; label: string }>;
  * at another composite, such as a sketch role, is one reference picker.
  */
 export function CompositeControl({ row, label }: Props): ReactNode {
-  if (isTokenReference(row.value)) {
+  if (ThemeReferences.isTokenReference(row.value)) {
     return <CompositeReference row={row} label={label} />;
   }
   const fields: Record<string, FieldSpec> =
     COMPOSITE_TOKEN_FIELDS[row.definition.kind as CompositeTokenKind].fields;
   const value = getCompositeFieldsFromValue(row.value);
   return (
-    <fieldset className={css.composite}>
-      <legend className={css.compositeLegend}>{label}</legend>
+    <fieldset className={css.compositeControl}>
+      <legend className={css.compositeControlLegend}>{label}</legend>
       {row.definition.kind === "typeStyle" ? (
         <TypeSpecimen style={row.resolved as ResolvedTypeStyle | undefined} />
       ) : null}

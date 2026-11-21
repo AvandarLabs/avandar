@@ -25,11 +25,23 @@ test("a flying column starts on its slice of the mark and ends on its slice of t
   const mark = { x: 600, y: 400, width: 400, height: 200 };
   const frame = { width: 1920, height: 1080 };
   assert.deepEqual(
-    BrandLockupMotion.getFlightColumnRect(1, 4, mark, frame, 0),
+    BrandLockupMotion.getFlightColumnRect({
+      index: 1,
+      columns: 4,
+      mark,
+      canvas: frame,
+      progress: 0,
+    }),
     { x: 700, y: 400, width: 100, height: 200 },
   );
   assert.deepEqual(
-    BrandLockupMotion.getFlightColumnRect(1, 4, mark, frame, 1),
+    BrandLockupMotion.getFlightColumnRect({
+      index: 1,
+      columns: 4,
+      mark,
+      canvas: frame,
+      progress: 1,
+    }),
     { x: 480, y: 0, width: 480, height: 1080 },
   );
 });

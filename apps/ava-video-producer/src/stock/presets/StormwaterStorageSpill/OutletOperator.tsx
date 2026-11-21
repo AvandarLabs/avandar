@@ -1,16 +1,23 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
-type Props = { frame: number; accent: string };
+type Props = {
+  frame: number;
+  accent: string;
+};
 /** The operator's hand stays on the outlet handle while setting it. */
 export function OutletOperator({ frame, accent }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const motion = GraphicThemeHooks.useGraphicMotion();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
-  const handleY = mix(motion.reveal(frame, 36), 210, 185);
+  const handleY = Motion.mix({
+    t: motion.reveal(frame, 36),
+    from: 210,
+    to: 185,
+  });
   return (
     <g>
       <PersonGlyph x={270} y={185} size={42} role="worker" color={accent} />

@@ -1,7 +1,8 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { BatchMember } from "./BatchMember";
+import { BatchMember } from "./BatchMember/BatchMember";
 import type { Input } from "./BatchRelease.schema";
 import type { ReactNode } from "react";
+
 /** Data for Props. */
 type PropsLayout = { x: number; y: number; start: number; completeAt: number };
 
@@ -12,6 +13,7 @@ type Props = {
   accent: string;
   layout: PropsLayout;
 };
+
 /** An envelope retains its exact supplied label and member order. */
 export function BatchMembers({
   batch,

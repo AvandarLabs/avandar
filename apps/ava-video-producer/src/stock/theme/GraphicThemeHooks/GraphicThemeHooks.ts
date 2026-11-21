@@ -1,25 +1,23 @@
+import { propEq } from "@avandar/utils";
 import { filterProps } from "@mantine/core";
 import { createContext, useContext, useMemo } from "react";
-import { DEFAULT_VIDEO_THEME_SOURCE } from "../../../videoTheme/builtInVideoThemes/builtInVideoThemes";
-import {
-  createVideoMotion,
-  type VideoMotion,
-} from "../../../videoTheme/createVideoMotion/createVideoMotion";
-import {
-  createVideoShapeScales,
-  type VideoShapeScales,
-} from "../../../videoTheme/createVideoShapeScales/createVideoShapeScales";
 import { makeResolvedVideoThemeFromSource } from "../../../videoTheme/makeResolvedVideoThemeFromSource/makeResolvedVideoThemeFromSource";
+import {
+  makeVideoMotionFromTokens,
+  type VideoMotion,
+} from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
+import {
+  makeVideoShapeScalesFromSemanticTokens,
+  type VideoShapeScales,
+} from "../../../videoTheme/makeVideoShapeScalesFromSemanticTokens/makeVideoShapeScalesFromSemanticTokens";
+import { DEFAULT_VIDEO_THEME_SOURCE } from "../../../videoTheme/makeVideoThemeLibraryFromDocuments/makeVideoThemeLibraryFromDocuments";
 import { SEMANTIC_TOKENS } from "../../../videoTheme/tokenCatalog/semanticTokens/semanticTokens";
 import {
-  createTokenUsageProxy,
   VideoTokenUsageContext,
-} from "../../../videoTheme/tokenUsageHelpers/tokenUsageHelpers";
-import { useVideoThemeContext } from "../../../videoTheme/useVideoTheme";
-import {
-  buildEffectFilterId,
-  listVideoEffectFilters,
-} from "../../../videoTheme/videoEffectFilterHelpers/videoEffectFilterHelpers";
+  TokenUsage,
+} from "../../../videoTheme/TokenUsage/TokenUsage";
+import { VideoEffectFilters } from "../../../videoTheme/VideoEffectFilters/VideoEffectFilters";
+import { useVideoThemeContext } from "../../../videoTheme/videoThemeHelpers";
 import type {
   ResolvedVideoComponents,
   ResolvedVideoSemantic,
@@ -52,7 +50,7 @@ function useGraphicTokens(): ResolvedVideoSemantic {
   const report = useContext(VideoTokenUsageContext);
   return useMemo(() => {
     return report
-      ? createTokenUsageProxy({
+      ? TokenUsage.makeProxyFromTarget({
           value: theme.semantic,
           catalog: SEMANTIC_TOKENS,
           basePath: [],
@@ -70,7 +68,13 @@ function useGraphicTokens(): ResolvedVideoSemantic {
 function useGraphicProps<
   Name extends VideoComponentName,
   Props extends Partial<ResolvedVideoComponents[Name]>,
->(name: Name, props: Props): ResolvedVideoComponents[Name] & Props {
+>({
+  name,
+  props,
+}: Readonly<{
+  name: Name;
+  props: Props;
+}>): ResolvedVideoComponents[Name] & Props {
   const defaults = useGraphicTheme().components[name];
   const report = useContext(VideoTokenUsageContext);
   const given: Readonly<Record<string, unknown>> = filterProps(props);
@@ -111,13 +115,11 @@ function _getFontSizeFromStep({
 function useGraphicFontSize(step: string): number {
   return _getFontSizeFromStep({ theme: useGraphicTheme(), step });
 }
-/**
- * Tempo-scaled motion for a stock shape. See `VideoMotion`.
- */
+/** Tempo-scaled motion for a stock shape. See `VideoMotion`. */
 function useGraphicMotion(): VideoMotion {
   const { motion } = useGraphicTokens();
   return useMemo(() => {
-    return createVideoMotion(motion);
+    return makeVideoMotionFromTokens(motion);
   }, [motion]);
 }
 /**
@@ -128,7 +130,7 @@ function useGraphicMotion(): VideoMotion {
 function useGraphicShapeScales(): VideoShapeScales {
   const { stroke, corner, alpha } = useGraphicTokens();
   return useMemo(() => {
-    return createVideoShapeScales({ stroke, corner, alpha });
+    return makeVideoShapeScalesFromSemanticTokens({ stroke, corner, alpha });
   }, [stroke, corner, alpha]);
 }
 /**
@@ -139,15 +141,16 @@ function useGraphicShapeScales(): VideoShapeScales {
 function useGraphicFilter(path: string): string | undefined {
   const theme = useGraphicTheme();
   const graphicId = useContext(GraphicIdContext);
-  return listVideoEffectFilters(theme).some((filter) => {
-    return filter.path === path;
-  })
-    ? `url(#${buildEffectFilterId(graphicId, path)})`
+  return VideoEffectFilters.listVideoEffectFilters(theme).some(
+    propEq("path", path),
+  )
+    ? `url(#${VideoEffectFilters.makeFilterIdFromTheme({
+        graphicId,
+        path,
+      })})`
     : undefined;
 }
-/**
- * The GraphicThemeHooks helpers and shared values.
- */
+/** The GraphicThemeHooks helpers and shared values. */
 export const GraphicThemeHooks = {
   /**
    * The resolved theme a stock shape draws with: the surrounding theme, or
@@ -181,9 +184,7 @@ export const GraphicThemeHooks = {
    * `getFontSizeFromStep`.
    */
   useGraphicFontSize,
-  /**
-   * Tempo-scaled motion for a stock shape. See `VideoMotion`.
-   */
+  /** Tempo-scaled motion for a stock shape. See `VideoMotion`. */
   useGraphicMotion,
   /**
    * Line weight, corner style, and tint strength for a stock shape, for

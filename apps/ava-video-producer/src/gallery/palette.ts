@@ -1,5 +1,5 @@
-import { DEFAULT_VIDEO_THEME_SOURCE } from "../videoTheme/builtInVideoThemes/builtInVideoThemes";
 import { makeResolvedVideoThemeFromSource } from "../videoTheme/makeResolvedVideoThemeFromSource/makeResolvedVideoThemeFromSource";
+import { DEFAULT_VIDEO_THEME_SOURCE } from "../videoTheme/makeVideoThemeLibraryFromDocuments/makeVideoThemeLibraryFromDocuments";
 import theme from "./theme-colors.json";
 
 /**

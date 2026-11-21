@@ -1,11 +1,14 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
+
+type Props = { isReview: boolean; accent: string };
+
 /** A returning arrow for a review activity, a zigzag for a new one. */
 export function ActivityGlyph({
   isReview,
   accent,
-}: Readonly<{ isReview: boolean; accent: string }>): ReactNode {
+}: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (

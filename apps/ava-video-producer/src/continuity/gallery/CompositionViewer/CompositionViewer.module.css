@@ -1,42 +1,6 @@
-.compositionViewerSummary {
-  display: grid;
-  gap: var(--atlas-space-24);
-  grid-template-columns: 1fr auto;
-  padding-top: var(--atlas-space-16);
-}
-
-.compositionViewerSummary p {
-  color: var(--atlas-color-muted);
-  line-height: 1.5;
-  margin: var(--atlas-space-8) 0;
-  max-width: 66ch;
-}
-
-.compositionViewerDuration {
-  font-size: var(--atlas-font-size-18);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-
-.compositionViewerNotice {
-  border-top: var(--atlas-border-1) solid var(--line);
-  color: var(--atlas-color-muted);
-  font-size: var(--atlas-font-size-14);
-  line-height: 1.5;
-  margin-top: var(--atlas-space-26);
-  padding-top: var(--atlas-space-16);
-}
-
-@media (width <= 900px) {
-  .compositionViewerSummary {
-    gap: 0;
-    grid-template-columns: 1fr;
-  }
-}
-
-.settings,
-.details,
-.guidance {
+.compositionViewerSettings,
+.compositionViewerDetails,
+.compositionViewerGuidance {
   min-height: 0;
   min-width: 0;
 }
@@ -62,18 +26,18 @@
   padding: var(--atlas-space-16);
 }
 
-.details {
+.compositionViewerDetails {
   grid-area: details;
 }
 
-.settings {
+.compositionViewerSettings {
   align-self: start;
   grid-area: settings;
   position: sticky;
   top: 0;
 }
 
-.guidance {
+.compositionViewerGuidance {
   grid-area: guidance;
 }
 
@@ -96,7 +60,7 @@
     padding: var(--atlas-space-10);
   }
 
-  .settings {
+  .compositionViewerSettings {
     position: static;
   }
 }
@@ -106,17 +70,17 @@
  * the viewer. The guidance row takes up the tall panel's extra height, so the
  * stage keeps the player's own height.
  */
-.compositionViewer.isTokenPanel {
+.compositionViewer.compositionViewerIsTokenPanel {
   grid-template-columns: minmax(0, 1fr) 420px;
   grid-template-rows: max-content max-content 1fr;
 }
 
-.isTokenPanel .settings {
+.compositionViewerIsTokenPanel .compositionViewerSettings {
   position: static;
 }
 
 @media (width <= 800px) {
-  .compositionViewer.isTokenPanel {
+  .compositionViewer.compositionViewerIsTokenPanel {
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: repeat(4, max-content);
   }
@@ -130,7 +94,7 @@
  * sizes come from the gallery stylesheet, with the same values as fallbacks.
  */
 @media (width <= 760px) {
-  .compositionViewer.isTokenPanel {
+  .compositionViewer.compositionViewerIsTokenPanel {
     --atlas-pin-offset: calc(
       var(--atlas-header-height, var(--atlas-size-64)) +
         var(--atlas-strip-height, calc(14dvh + var(--atlas-size-48)))
@@ -140,15 +104,15 @@
     flex-direction: column;
   }
 
-  .isTokenPanel .settings {
+  .compositionViewerIsTokenPanel .compositionViewerSettings {
     order: 1;
   }
 
-  .isTokenPanel .details {
+  .compositionViewerIsTokenPanel .compositionViewerDetails {
     order: 2;
   }
 
-  .isTokenPanel .guidance {
+  .compositionViewerIsTokenPanel .compositionViewerGuidance {
     order: 3;
   }
 }

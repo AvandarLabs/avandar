@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 
+/** An absolute-positioned rectangle in canvas pixels. */
 export type Box = { x: number; y: number; w: number; h: number };
 
 /** Absolute-position a box. Compositions lay themselves out in explicit

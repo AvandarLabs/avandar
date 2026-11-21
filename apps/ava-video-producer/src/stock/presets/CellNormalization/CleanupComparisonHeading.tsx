@@ -1,4 +1,4 @@
-import { ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CleanupLaneHeading } from "./CleanupLaneHeading";
 import {
@@ -10,7 +10,10 @@ import {
 import type { Input } from "./CellNormalization.schema";
 import type { ReactNode } from "react";
 
-type Props = { input: Input; frame: number };
+type Props = {
+  input: Input;
+  frame: number;
+};
 /**
  * The right lane holds originals in a rail and edit explanations in ghost
  * mode.
@@ -33,18 +36,18 @@ export function CleanupComparisonHeading({
       y={122}
       opacity={
         inline
-          ? ramp(
+          ? Motion.ramp({
               frame,
-              EXPLANATION_CUE,
-              motion.scale(EXPLANATION_FRAMES),
-              motion.reveal.easing,
-            )
-          : ramp(
+              at: EXPLANATION_CUE,
+              dur: motion.scale(EXPLANATION_FRAMES),
+              easing: motion.reveal.easing,
+            })
+          : Motion.ramp({
               frame,
-              RAIL_CUE,
-              motion.scale(RAIL_FRAMES),
-              motion.reveal.easing,
-            )
+              at: RAIL_CUE,
+              dur: motion.scale(RAIL_FRAMES),
+              easing: motion.reveal.easing,
+            })
       }
     />
   );

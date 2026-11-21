@@ -1,7 +1,7 @@
-import { CONTINUITY_CATALOG, isSceneEntry } from "../../../continuityCatalog";
+import { CONTINUITY_CATALOG, isSceneEntry } from "../../../isSceneEntry";
 import { VocabularyControl } from "./VocabularyControl";
 import css from "./VocabularyGuide.module.css";
-import type { ContinuityVocabularyEntry } from "../../../continuityCatalog";
+import type { ContinuityVocabularyEntry } from "../../../isSceneEntry";
 import type { ReactNode } from "react";
 
 type Props = { entry: ContinuityVocabularyEntry };

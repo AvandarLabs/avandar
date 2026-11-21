@@ -1,19 +1,19 @@
 import { getHorizontalBlurFilter } from "../../motion-components/getHorizontalBlurFilter/getHorizontalBlurFilter";
-import { HorizontalBlurFilter } from "../../motion-components/HorizontalBlur";
+import { HorizontalBlurFilter } from "../../motion-components/HorizontalBlurFilter";
 import { _ShotLayer } from "./_ShotLayer";
 import { type OutgoingShotLayer } from "./getShotTransitionLayers/getShotTransitionLayers";
 import { StoryFilmShared } from "./StoryFilmShared/StoryFilmShared";
 import { type ShotLayerProps } from "./StoryFilmShared/StoryFilmShared.types";
 import type { ReactNode } from "react";
 
-type OutgoingShotLayerOptions = Omit<ShotLayerProps, "frame" | "style"> & {
+type Props = Omit<ShotLayerProps, "frame" | "style"> & {
   layer: OutgoingShotLayer;
 };
 /** The outgoing shot, drifted and blurred by its transition layer. */
 export function _OutgoingShotLayer({
   layer,
   ...props
-}: OutgoingShotLayerOptions): ReactNode {
+}: Readonly<Props>): ReactNode {
   return (
     <>
       <HorizontalBlurFilter
@@ -25,10 +25,10 @@ export function _OutgoingShotLayer({
         frame={layer.frame}
         style={{
           transform: `translateX(${layer.offsetX.toFixed(2)}px)`,
-          filter: getHorizontalBlurFilter(
-            StoryFilmShared.OUTGOING_BLUR_ID,
-            layer.blurX,
-          ),
+          filter: getHorizontalBlurFilter({
+            id: StoryFilmShared.OUTGOING_BLUR_ID,
+            amount: layer.blurX,
+          }),
         }}
       />
     </>

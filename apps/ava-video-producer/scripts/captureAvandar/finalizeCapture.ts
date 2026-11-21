@@ -1,6 +1,6 @@
 import { join } from "node:path";
-import { getArtifactPathFromRunPath } from "../captureLib/manifestHelpers";
-import { makeRedactedTextFromValue } from "../captureLib/sanitizeHelpers";
+import { CaptureManifests } from "../captureLib/CaptureManifests";
+import { CaptureSanitization } from "../captureLib/CaptureSanitization";
 import { getSha256FromFile } from "../lib/getSha256FromFile";
 import type { CaptureRun } from "./captureRun.types";
 
@@ -16,14 +16,13 @@ function _recordTeardownError({
   run.context.manifest.status = "failed";
   run.context.manifest.errors.push({
     stage,
-    message: makeRedactedTextFromValue({
+    message: CaptureSanitization.makeRedactedTextFromValue({
       value: error instanceof Error ? error.message : error,
       secrets: run.secrets,
     }),
     atMs: run.context.elapsed(),
   });
 }
-
 /** Closes the recording context, then saves and hashes its video. */
 async function _saveVideo(run: CaptureRun): Promise<void> {
   const { manifest } = run.context;
@@ -41,13 +40,19 @@ async function _saveVideo(run: CaptureRun): Promise<void> {
     const savedVideo = join(run.runDir, "capture.webm");
     await video.saveAs(savedVideo);
     manifest.video.status = "saved";
-    manifest.video.path = getArtifactPathFromRunPath(run.runDir, savedVideo);
+    manifest.video.path = CaptureManifests.getArtifactPathFromRunPath({
+      root: run.runDir,
+      path: savedVideo,
+    });
     manifest.video.sha256 = await getSha256FromFile(savedVideo);
     manifest.video.rawPath = await (async () => {
       try {
-        return getArtifactPathFromRunPath(run.runDir, await video.path());
+        return CaptureManifests.getArtifactPathFromRunPath({
+          root: run.runDir,
+          path: await video.path(),
+        });
       } catch {
-        return null;
+        return undefined;
       }
     })();
   } catch (error) {
@@ -55,7 +60,6 @@ async function _saveVideo(run: CaptureRun): Promise<void> {
     _recordTeardownError({ run, stage: "video-finalization", error });
   }
 }
-
 /**
  * Closes everything a capture run opened, saves its video, and writes the
  * final manifest. `runCapture` calls it once, whether the run passed or not.

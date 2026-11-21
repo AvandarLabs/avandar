@@ -1,9 +1,9 @@
 import { removeAtIndex } from "@avandar/utils";
-import { Button, Group } from "@mantine/core";
 import { useState } from "react";
-import { elevationToBoxShadow } from "../../../videoTheme/cssValueHelpers/cssValueHelpers";
+import { VideoCssValues } from "../../../videoTheme/VideoCssValues/VideoCssValues";
 import { useTokenEditor } from "../../TokenEditorContext";
 import { DEFAULT_SHADOW_LAYER } from "../effectControls.constants";
+import { ShadowLayerActions } from "./ShadowLayerActions";
 import { ShadowLayers } from "./ShadowLayers";
 import css from "./ShadowValueControl.module.css";
 import type {
@@ -13,17 +13,22 @@ import type {
 import type { ValueControlProps } from "../valueControl.types";
 import type { ReactNode } from "react";
 
+type Props = ValueControlProps;
+
 const MAX_SHADOW_LAYERS = 4;
 
 /**
  * A shadow token: up to four layers, previewed in the theme's shadow colour.
  */
-export function ShadowValueControl({
-  label,
+function useShadowLayers({
   value,
   onChange,
-}: ValueControlProps): ReactNode {
-  const { theme } = useTokenEditor();
+}: Readonly<Pick<Props, "value" | "onChange">>): Readonly<{
+  layerIds: readonly string[];
+  layers: readonly ShadowLayer[];
+  setLayers: (layers: readonly ShadowLayer[]) => void;
+  removeLayer: (index: number) => void;
+}> {
   const [layerIds, setLayerIds] = useState(() => {
     return Array.from({ length: MAX_SHADOW_LAYERS }, () => {
       return crypto.randomUUID();
@@ -39,36 +44,42 @@ export function ShadowValueControl({
     });
     setLayers(removeAtIndex(layers, index));
   };
-  const boxShadow = elevationToBoxShadow({
+  return { layerIds, layers, setLayers, removeLayer };
+}
+/** Edits the ordered shadow layers and previews their combined appearance. */
+export function ShadowValueControl({
+  label,
+  value,
+  onChange,
+}: Readonly<Props>): ReactNode {
+  const { theme } = useTokenEditor();
+  const { layerIds, layers, setLayers, removeLayer } = useShadowLayers({
+    value,
+    onChange,
+  });
+  const boxShadow = VideoCssValues.makeBoxShadowFromElevation({
     layers,
     color: theme.semantic.color.shadowColor,
   });
   return (
-    <div className={css.shadowLayers} role="group" aria-label={label}>
+    <div
+      className={css.shadowValueControlLayers}
+      role="group"
+      aria-label={label}
+    >
       <ShadowLayers
         layers={layers}
         layerIds={layerIds}
         onChange={setLayers}
         onRemove={removeLayer}
       />
-      <Group gap="xs">
-        <Button
-          size="compact-xs"
-          variant="default"
-          disabled={layers.length >= MAX_SHADOW_LAYERS}
-          onClick={() => {
-            return setLayers([...layers, DEFAULT_SHADOW_LAYER]);
-          }}
-        >
-          {"Add layer"}
-        </Button>
-        <span
-          className={css.shadowPreview}
-          style={{ boxShadow }}
-          aria-hidden="true"
-          data-inherit-dim
-        />
-      </Group>
+      <ShadowLayerActions
+        canAdd={layers.length < MAX_SHADOW_LAYERS}
+        boxShadow={boxShadow}
+        onAdd={() => {
+          return setLayers([...layers, DEFAULT_SHADOW_LAYER]);
+        }}
+      />
     </div>
   );
 }

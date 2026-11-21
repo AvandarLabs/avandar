@@ -1,10 +1,11 @@
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CONTEXT_FIELDS } from "./CONTEXT_FIELDS.constants";
-import { ContextWindow } from "./ContextWindow";
+import { ContextWindow } from "./ContextWindow/ContextWindow";
 import type { Input } from "./ChargeReferenceAlignment.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
+
 /** Exact key windows register while unmatched values keep an offset notch. */
 export function ContextWindows({
   input,

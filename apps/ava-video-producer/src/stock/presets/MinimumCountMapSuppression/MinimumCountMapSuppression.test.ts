@@ -19,6 +19,43 @@ import {
 } from "./MinimumCountMapSuppression.fixtures";
 import { inputSchema, type Input } from "./MinimumCountMapSuppression.schema";
 
+function _assertLocalCountClearance(markup: string): { localEnd: number } {
+  const localEnd = markup.indexOf("data-public-map=");
+  const localPaint = SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup(
+    `${markup.slice(0, localEnd).replace(/<g[^>]*$/, "")}</g>`,
+  );
+  const counts = localPaint.filter((item) => {
+    return item.kind === "text" && item.top >= 220 && item.top < 460;
+  });
+  assert.ok(counts.length > 0);
+  SvgPaintAssertions.assertPaintClearance({
+    texts: counts,
+    rectangles: localPaint.filter((item) => {
+      return (
+        item.kind === "rect" &&
+        item.fill !== "none" &&
+        item.opacity * item.fillOpacity === 1
+      );
+    }),
+  });
+  return { localEnd };
+}
+
+function _assertLocalToggleHidesNumericSheetDataReleasedCount(
+  travel: ReturnType<typeof getSvgAttributeMatchesFromMarkup>["tags"][number],
+): void {
+  assert.ok(
+    SvgAttributes.getNumberFromMarkup({ attributes: travel, name: "x" }) >
+      SvgAttributes.getNumberFromMarkup({
+        attributes: getSvgAttributeMatchesFromMarkup({
+          markup: _render({ frame: 106 }),
+          attribute: "data-released-count",
+        }).tags[0],
+        name: "x",
+      }),
+  );
+}
+
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -176,16 +213,7 @@ test("local toggle hides numeric sheet values and shutters precede safe count tr
     markup: _render({ frame: 150 }),
     attribute: "data-released-count",
   }).tags[0];
-  assert.ok(
-    SvgAttributes.getNumberFromMarkup({ attributes: travel, name: "x" }) >
-      SvgAttributes.getNumberFromMarkup({
-        attributes: getSvgAttributeMatchesFromMarkup({
-          markup: _render({ frame: 106 }),
-          attribute: "data-released-count",
-        }).tags[0],
-        name: "x",
-      }),
-  );
+  _assertLocalToggleHidesNumericSheetDataReleasedCount(travel);
   assert.ok(
     SvgAttributes.getNumberFromMarkup({ attributes: travel, name: "x" }) <
       SvgAttributes.getNumberFromMarkup({ attributes: hold, name: "x" }),
@@ -324,24 +352,7 @@ test("local analytical counts stay readable beside closed public-release gates",
     );
 
     const paint = SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup(markup);
-    const localEnd = markup.indexOf("data-public-map=");
-    const localPaint = SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup(
-      `${markup.slice(0, localEnd).replace(/<g[^>]*$/, "")}</g>`,
-    );
-    const counts = localPaint.filter((item) => {
-      return item.kind === "text" && item.top >= 220 && item.top < 460;
-    });
-    assert.ok(counts.length > 0);
-    SvgPaintAssertions.assertPaintClearance({
-      texts: counts,
-      rectangles: localPaint.filter((item) => {
-        return (
-          item.kind === "rect" &&
-          item.fill !== "none" &&
-          item.opacity * item.fillOpacity === 1
-        );
-      }),
-    });
+    const { localEnd } = _assertLocalCountClearance(markup);
     const publicMarkup = markup.slice(localEnd);
     input.cells
       .filter((cell) => {

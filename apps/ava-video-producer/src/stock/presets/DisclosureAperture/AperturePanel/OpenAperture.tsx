@@ -1,12 +1,15 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
+
+type Props = { fieldId: string; index: number; accent: string };
+
 /** An opening in the panel opposite a field while its share passes. */
 export function OpenAperture({
   fieldId,
   index,
   accent,
-}: Readonly<{ fieldId: string; index: number; accent: string }>): ReactNode {
+}: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>

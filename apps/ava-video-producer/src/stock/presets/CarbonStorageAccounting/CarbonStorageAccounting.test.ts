@@ -62,13 +62,7 @@ test("negative, all-released, tiny positive and zero-operation inputs retain exa
     const emissions = markup.match(/<g data-emissions[^>]*>/);
     const net = markup.match(/<g data-net[^>]*>/);
     assert.ok(store && emissions);
-    assert.equal(
-      SvgAttributes.getNumberFromMarkup({
-        attributes: store[0],
-        name: "data-retained",
-      }),
-      retained,
-    );
+    _assertNegativeAllReleasedTinyPositiveAndDataRetained({ store, retained });
     assert.equal(
       SvgAttributes.getNumberFromMarkup({
         attributes: emissions[0],
@@ -93,22 +87,8 @@ test("negative, all-released, tiny positive and zero-operation inputs retain exa
     assert.doesNotMatch(hidden, /data-net=/);
     assert.match(hidden, /data-emissions/);
     assert.match(hidden, /data-boundary/);
-    assert.notEqual(
-      _render({ frame: 24, input: input }).match(
-        /<path\b[^>]*\bdata-operator-arm[^>]*>/,
-      )?.[0],
-      _render({ frame: 52, input: input }).match(
-        /<path\b[^>]*\bdata-operator-arm[^>]*>/,
-      )?.[0],
-    );
-    assert.equal(
-      (
-        _render({ frame: 150, input: input }).match(
-          /data-operation-ribbon=/g,
-        ) ?? []
-      ).length,
-      input.operatingEmissions.length,
-    );
+    _assertNegativeAllReleasedTinyPositiveAndDataOperatorArm(input);
+    _assertNegativeAllReleasedTinyPositiveAndDataOperationRibbon(input);
     assert.match(markup, /data-retained-ribbon/);
     assert.match(markup, /data-released-ribbon/);
   });
@@ -118,6 +98,89 @@ test("negative, all-released, tiny positive and zero-operation inputs retain exa
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { carbonStorageAccountingContract } from "./CarbonStorageAccounting.contract";
 import { inputSchema, type Input } from "./CarbonStorageAccounting.schema";
+
+function _assertBudgetValueCell({
+  markup,
+  value,
+  index,
+}: Readonly<{ markup: string; value: number; index: number }>): void {
+  const cell = [...markup.matchAll(/<text ([^>]*)>(.*?)<\/text>/g)].find(
+    (match) => {
+      return (
+        SvgAttributes.getNumberFromMarkup({
+          attributes: match[1],
+          name: "x",
+        }) ===
+          540 + index * 135 &&
+        SvgAttributes.getNumberFromMarkup({
+          attributes: match[1],
+          name: "y",
+        }) === 510
+      );
+    },
+  );
+  assert.ok(cell);
+  const spans = [
+    ...cell[2].matchAll(/<tspan[^>]*dy="([^"]*)"[^>]*>([^<]*)<\/tspan>/g),
+  ];
+  assert.equal(
+    spans
+      .map((span) => {
+        return span[2];
+      })
+      .join(""),
+    String(value),
+  );
+  assert.ok(
+    510 +
+      spans.reduce((sum, span) => {
+        return sum + Number(span[1]);
+      }, 0) +
+      3.6 <
+      550,
+  );
+}
+
+function _assertNegativeAllReleasedTinyPositiveAndDataRetained({
+  store,
+  retained,
+}: Readonly<{
+  store: NonNullable<RegExpMatchArray | null>;
+  retained: number;
+}>): void {
+  assert.equal(
+    SvgAttributes.getNumberFromMarkup({
+      attributes: store[0],
+      name: "data-retained",
+    }),
+    retained,
+  );
+}
+
+function _assertNegativeAllReleasedTinyPositiveAndDataOperationRibbon(
+  input: (typeof fixtures)[number]["input"],
+): void {
+  assert.equal(
+    (
+      _render({ frame: 150, input: input }).match(/data-operation-ribbon=/g) ??
+      []
+    ).length,
+    input.operatingEmissions.length,
+  );
+}
+
+function _assertNegativeAllReleasedTinyPositiveAndDataOperatorArm(
+  input: (typeof fixtures)[number]["input"],
+): void {
+  assert.notEqual(
+    _render({ frame: 24, input: input }).match(
+      /<path\b[^>]*\bdata-operator-arm[^>]*>/,
+    )?.[0],
+    _render({ frame: 52, input: input }).match(
+      /<path\b[^>]*\bdata-operator-arm[^>]*>/,
+    )?.[0],
+  );
+}
 
 function _getVisibleTexts({
   input,
@@ -193,41 +256,7 @@ test("full finite signed equation values stay readable above the bracket and bes
         return sum + row.tonnesCO2e;
       }, 0);
       [retained, emissions, retained - emissions].forEach((value, index) => {
-        const cell = [...markup.matchAll(/<text ([^>]*)>(.*?)<\/text>/g)].find(
-          (match) => {
-            return (
-              SvgAttributes.getNumberFromMarkup({
-                attributes: match[1],
-                name: "x",
-              }) ===
-                540 + index * 135 &&
-              SvgAttributes.getNumberFromMarkup({
-                attributes: match[1],
-                name: "y",
-              }) === 510
-            );
-          },
-        );
-        assert.ok(cell);
-        const spans = [
-          ...cell[2].matchAll(/<tspan[^>]*dy="([^"]*)"[^>]*>([^<]*)<\/tspan>/g),
-        ];
-        assert.equal(
-          spans
-            .map((span) => {
-              return span[2];
-            })
-            .join(""),
-          String(value),
-        );
-        assert.ok(
-          510 +
-            spans.reduce((sum, span) => {
-              return sum + Number(span[1]);
-            }, 0) +
-            3.6 <
-            550,
-        );
+        _assertBudgetValueCell({ markup, value, index });
       });
     });
 });

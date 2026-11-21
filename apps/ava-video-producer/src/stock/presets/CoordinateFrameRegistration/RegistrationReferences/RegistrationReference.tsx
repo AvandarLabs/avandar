@@ -2,12 +2,13 @@ import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { makeRegisteredLandmarksFromInputAndFrame } from "../makeRegisteredLandmarksFromInputAndFrame";
 import type { ReactNode } from "react";
-/** One reference site: its leader, fixed target ring, and source ghost. */
-export function RegistrationReference({
-  point,
-}: Readonly<{
+
+type Props = {
   point: ReturnType<typeof makeRegisteredLandmarksFromInputAndFrame>[number];
-}>): ReactNode {
+};
+
+/** One reference site: its leader, fixed target ring, and source ghost. */
+export function RegistrationReference({ point }: Readonly<Props>): ReactNode {
   const { atomic } = GraphicThemeHooks.useGraphicTheme();
   const { color, stroke, sketch } = GraphicThemeHooks.useGraphicTokens();
   const shapes = GraphicThemeHooks.useGraphicShapeScales();

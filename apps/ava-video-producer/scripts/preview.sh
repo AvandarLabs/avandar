@@ -1,4 +1,8 @@
 #!/bin/sh
+if [ "${AVA_PRODUCER_ACTIVE_SCRIPT:-}" != "$0" ]; then
+  exec node "$(dirname "$0")/runProducerCommand/runShellCommand.mjs" "preview" "$0" "$@"
+fi
+exec 1>&2
 # Look at the picture before spending a full render on it.
 #
 #   sh scripts/preview.sh <composition-id> [body-frame ...]

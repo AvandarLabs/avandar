@@ -1,0 +1,10 @@
+.mixTokenSwatchesSwatchStrip {
+  display: flex;
+  height: 28px;
+  position: relative;
+  width: 520px;
+}
+
+.mixTokenSwatchesSwatch {
+  flex: 1;
+}

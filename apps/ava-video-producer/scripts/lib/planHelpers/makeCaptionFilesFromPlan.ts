@@ -1,20 +1,18 @@
 import { prop } from "@avandar/utils";
-import {
-  absoluteCues,
-  type Storyboard,
-} from "../../../src/storyboard/schema/schema";
+import { type Storyboard } from "../../../src/storyboard/schema/schema";
+import { StoryboardTimeline } from "../../../src/storyboard/schema/StoryboardTimeline";
 import { makeTimestampFromFrame } from "./makeTimestampFromFrame";
 
 /**
  * Formats a plan's narration into SRT and WebVTT caption files and a plain
- * transcript. Called by `exportPlan` and `createCaptionFilesFromRequest`.
+ * transcript. Called by `exportPlan` and `makeCaptionFilesFromRequest`.
  */
 export function makeCaptionFilesFromPlan(plan: Readonly<Storyboard>): {
   srt: string;
   vtt: string;
   transcript: string;
 } {
-  const cues = absoluteCues(plan);
+  const cues = StoryboardTimeline.absoluteCues(plan);
   const srt = cues
     .map((cue, index) => {
       const start = makeTimestampFromFrame({

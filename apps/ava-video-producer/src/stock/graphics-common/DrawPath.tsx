@@ -1,4 +1,4 @@
-import { ramp } from "../../motion";
+import { Motion } from "../../motion";
 import { SketchedShape } from "../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { Curve } from "./Curve";
@@ -7,7 +7,11 @@ import type { ReactNode } from "react";
 
 type Props = {
   d?: string;
-  curve?: Readonly<{ from: Point; to: Point; bend?: number }>;
+  curve?: Readonly<{
+    from: Point;
+    to: Point;
+    bend?: number;
+  }>;
   frame: number;
   at?: number;
   duration?: number;
@@ -31,20 +35,23 @@ export function DrawPath({
   opacity = 1,
   dashed = false,
 }: Readonly<Props>): ReactNode {
-  const edge = GraphicThemeHooks.useGraphicProps("Edge", {
-    color,
-    strokeWidth: width,
+  const edge = GraphicThemeHooks.useGraphicProps({
+    name: "Edge",
+    props: {
+      color,
+      strokeWidth: width,
+    },
   });
   const motion = GraphicThemeHooks.useGraphicMotion();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   const path =
     d ?? (curve ? Curve({ ...curve, tension: edge.curveTension }) : "");
-  const t = ramp(
+  const t = Motion.ramp({
     frame,
     at,
-    motion.scale(duration ?? edge.drawDuration),
-    motion.curve(edge.drawEasing),
-  );
+    dur: motion.scale(duration ?? edge.drawDuration),
+    easing: motion.curve(edge.drawEasing),
+  });
   return (
     <SketchedShape
       shape={{ kind: "path", d: path }}

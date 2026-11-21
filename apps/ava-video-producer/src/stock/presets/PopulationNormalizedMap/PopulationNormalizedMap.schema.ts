@@ -14,91 +14,110 @@ const polygonSchema: z.ZodArray<z.ZodTuple<[z.ZodNumber, z.ZodNumber], null>> =
       return PlanarPolygon.isSimple({ polygon });
     }, "Requires a simple open polygon.");
 /** Strict count-to-rate input with explicit non-clipping color domains. */
-export const inputSchema = z
-  .strictObject({
-    zones: z
-      .array(
-        z.strictObject({
-          id: z.string().max(12),
-          label: z.string().max(24),
-          polygon: polygonSchema,
-          records: z.number().int().min(0).max(100),
-          population: z.number().int().min(1).max(1000),
-        }),
-      )
-      .min(2)
-      .max(4),
-    rateBase: z.union([
-      z.literal(1),
-      z.literal(10),
-      z.literal(100),
-      z.literal(1000),
-    ]),
-    colorDomains: z.strictObject({
-      countMaximum: z.number().gt(0).max(100000),
-      normalizedMaximum: z.number().gt(0).max(100000),
-    }),
-    periodLabel: z.string().min(1).max(36),
-    copy: z.strictObject({
-      context: z.string().max(40),
-      countLegend: z.string().max(40),
-      normalizedLegend: z.string().max(40),
-      records: z.string().max(40),
-      population: z.string().max(40),
-      per: z.string().max(40),
-    }),
-    keepFractionsVisible: z.boolean(),
-  })
-  .superRefine((input, context) => {
-    if (new Set(input.zones.map(prop("id"))).size !== input.zones.length) {
+
+const authoredInputSchema = z.strictObject({
+  zones: z
+    .array(
+      z.strictObject({
+        id: z.string().max(12),
+        label: z.string().max(24),
+        polygon: polygonSchema,
+        records: z.number().int().min(0).max(100),
+        population: z.number().int().min(1).max(1000),
+      }),
+    )
+    .min(2)
+    .max(4),
+  rateBase: z.union([
+    z.literal(1),
+    z.literal(10),
+    z.literal(100),
+    z.literal(1000),
+  ]),
+  colorDomains: z.strictObject({
+    countMaximum: z.number().gt(0).max(100000),
+    normalizedMaximum: z.number().gt(0).max(100000),
+  }),
+  periodLabel: z.string().min(1).max(36),
+  copy: z.strictObject({
+    context: z.string().max(40),
+    countLegend: z.string().max(40),
+    normalizedLegend: z.string().max(40),
+    records: z.string().max(40),
+    population: z.string().max(40),
+    per: z.string().max(40),
+  }),
+  keepFractionsVisible: z.boolean(),
+});
+type ValidatePopulationNormalizedMapZonesOptions = {
+  input: Readonly<{ input: Input; context: z.RefinementCtx }>["input"];
+  context: Readonly<{ input: Input; context: z.RefinementCtx }>["context"];
+};
+/** Checks the zones constraint and records any violations. */
+function _validatePopulationNormalizedMapZones({
+  input,
+  context,
+}: Readonly<ValidatePopulationNormalizedMapZonesOptions>): void {
+  if (new Set(input.zones.map(prop("id"))).size !== input.zones.length) {
+    context.addIssue({
+      code: "custom",
+      path: ["zones"],
+      message: "Zone IDs must be unique.",
+    });
+  }
+}
+
+/** Validates cross-field relationships in the authored input. */
+function _validatePopulationNormalizedMapInput({
+  input,
+  context,
+}: Readonly<{ input: Input; context: z.RefinementCtx }>): void {
+  _validatePopulationNormalizedMapZones({ input, context });
+  input.zones.forEach((zone, index) => {
+    if (zone.records > zone.population) {
       context.addIssue({
         code: "custom",
-        path: ["zones"],
-        message: "Zone IDs must be unique.",
+        path: ["zones", index, "records"],
+        message: "Unique records cannot exceed population.",
       });
     }
-    input.zones.forEach((zone, index) => {
-      if (zone.records > zone.population) {
-        context.addIssue({
-          code: "custom",
-          path: ["zones", index, "records"],
-          message: "Unique records cannot exceed population.",
-        });
-      }
-      if (
-        zone.records > input.colorDomains.countMaximum ||
-        getPopulationRateFromCounts({ ...zone, rateBase: input.rateBase }) >
-          input.colorDomains.normalizedMaximum
-      ) {
-        context.addIssue({
-          code: "custom",
-          path: ["colorDomains"],
-          message:
-            "Legend domains must cover every supplied and derived value.",
-        });
-      }
-      if (
-        PlanarPolygon.isSimple({ polygon: zone.polygon }) &&
-        input.zones.slice(index + 1).some((other) => {
-          return (
-            PlanarPolygon.isSimple({ polygon: other.polygon }) &&
-            PlanarPolygon.doInteriorsOverlap({
-              firstPolygon: zone.polygon,
-              secondPolygon: other.polygon,
-            })
-          );
-        })
-      ) {
-        context.addIssue({
-          code: "custom",
-          path: ["zones", index],
-          message: "Zone interiors cannot overlap.",
-        });
-      }
-    });
-  }) satisfies z.ZodType;
+    if (
+      zone.records > input.colorDomains.countMaximum ||
+      getPopulationRateFromCounts({ ...zone, rateBase: input.rateBase }) >
+        input.colorDomains.normalizedMaximum
+    ) {
+      context.addIssue({
+        code: "custom",
+        path: ["colorDomains"],
+        message: "Legend domains must cover every supplied and derived value.",
+      });
+    }
+    if (
+      PlanarPolygon.isSimple({ polygon: zone.polygon }) &&
+      input.zones.slice(index + 1).some((other) => {
+        return (
+          PlanarPolygon.isSimple({ polygon: other.polygon }) &&
+          PlanarPolygon.doInteriorsOverlap({
+            firstPolygon: zone.polygon,
+            secondPolygon: other.polygon,
+          })
+        );
+      })
+    ) {
+      context.addIssue({
+        code: "custom",
+        path: ["zones", index],
+        message: "Zone interiors cannot overlap.",
+      });
+    }
+  });
+}
+/** Complete authored input with its runtime semantic constraints. */
+export const inputSchema = authoredInputSchema.superRefine((input, context) => {
+  _validatePopulationNormalizedMapInput({ input, context });
+}) satisfies z.ZodType;
 /** Schema-inferred accepted document. */
-export type Input = z.infer<typeof inputSchema>;
+export type Input = z.infer<typeof authoredInputSchema>;
 /** Geometry, conservation and explicit-domain constraints. */
 export const SEMANTIC_RULES: StockSemanticRule[] = [
   {

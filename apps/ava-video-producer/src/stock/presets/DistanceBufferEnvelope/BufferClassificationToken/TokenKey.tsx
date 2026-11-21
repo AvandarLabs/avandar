@@ -1,13 +1,13 @@
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
-/** The token's stable source key, once it has landed in the ledger. */
-export function TokenKey({
-  point,
-  index,
-}: Readonly<{
+
+type Props = {
   point: Readonly<{ x: number; y: number }>;
   index: number;
-}>): ReactNode {
+};
+
+/** The token's stable source key, once it has landed in the ledger. */
+export function TokenKey({ point, index }: Readonly<Props>): ReactNode {
   const { color, text } = GraphicThemeHooks.useGraphicTokens();
   return (
     <text

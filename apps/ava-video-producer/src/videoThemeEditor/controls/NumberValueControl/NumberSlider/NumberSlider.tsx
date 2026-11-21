@@ -1,5 +1,5 @@
 import { Slider } from "@mantine/core";
-import { useSliderIssueRef } from "../../../RowIssueContext/RowIssueContext";
+import { useSliderIssueRef } from "../../../RowIssueContext/rowIssueHelpers";
 import css from "./NumberSlider.module.css";
 import type { ReactNode } from "react";
 

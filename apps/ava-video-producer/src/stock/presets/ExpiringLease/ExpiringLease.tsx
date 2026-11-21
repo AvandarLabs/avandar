@@ -1,19 +1,72 @@
 import { propEq } from "@avandar/utils";
-import { mix, ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getSocketPointFromIndex } from "./getSocketPointFromIndex";
 import { LeaseCaptions } from "./LeaseCaptions";
+import { LeasePoolDock } from "./LeasePoolDock/LeasePoolDock";
 import { EXPIRY_CUE } from "./leaseShape";
 import { LeaseSocket } from "./LeaseSocket/LeaseSocket";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ExpiringLease.schema";
 import type { ReactNode } from "react";
 
-type Props = GraphicProps & { input: Input };
-const DOCK = { kind: "circle", cx: 480, cy: 430, r: 34 } as const;
+type LeaseToken = {
+  cx: number;
+  cy: number;
+  r: number;
+  fill: string;
+  opacity: number;
+};
+type LeaseTokenState = {
+  holder: ReturnType<typeof getSocketPointFromIndex>;
+  token: LeaseToken;
+  socketProps: Pick<Props, "input" | "frame" | "accent">;
+};
+
+type Props = GraphicProps & {
+  input: Input;
+};
 /** Frames the token takes to return to the dock. */
 const RETURN_FRAMES = 28;
+
+type GetLeaseTokenStateOptions = {
+  frame: number;
+  accent: string;
+  input: Input;
+  motion: ReturnType<typeof GraphicThemeHooks.useGraphicMotion>;
+};
+/** Samples the authored lease token state. */
+function _getLeaseTokenState({
+  frame,
+  accent,
+  input,
+  motion,
+}: Readonly<GetLeaseTokenStateOptions>): LeaseTokenState {
+  const holderIndex = input.participants.findIndex(
+    propEq("id", input.holderId),
+  );
+  const holder = getSocketPointFromIndex({
+    index: holderIndex,
+    numParticipants: input.participants.length,
+  });
+  const returning = Motion.ramp({
+    frame,
+    at: EXPIRY_CUE,
+    dur: motion.scale(RETURN_FRAMES),
+    easing: motion.travel.easing,
+  });
+  const token = {
+    cx: Motion.mix({ t: returning, from: holder.x, to: 480 }),
+    cy: Motion.mix({ t: returning, from: holder.y, to: 430 }),
+    r: 12,
+    fill: accent,
+    opacity: motion.reveal(frame, 18),
+  };
+  const socketProps = { input, frame, accent };
+  return { holder, token, socketProps };
+}
+
 /** One token expires into neutral custody without inferring a successor. */
 export function ExpiringLease({
   frame,
@@ -24,39 +77,15 @@ export function ExpiringLease({
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   const motion = GraphicThemeHooks.useGraphicMotion();
-  const holderIndex = input.participants.findIndex(
-    propEq("id", input.holderId),
-  );
-  const holder = getSocketPointFromIndex({
-    index: holderIndex,
-    numParticipants: input.participants.length,
-  });
-  const returning = ramp(
+  const { holder, token, socketProps } = _getLeaseTokenState({
     frame,
-    EXPIRY_CUE,
-    motion.scale(RETURN_FRAMES),
-    motion.travel.easing,
-  );
-  const token = {
-    cx: mix(returning, holder.x, 480),
-    cy: mix(returning, holder.y, 430),
-    r: 12,
-    fill: accent,
-    opacity: motion.reveal(frame, 18),
-  };
-  const socketProps = { input, frame, accent };
+    accent,
+    input,
+    motion,
+  });
   return (
     <g>
-      <g data-neutral-dock="pool">
-        <SketchedShape
-          shape={DOCK}
-          profile={tokens.sketch.shape}
-          fill={tokens.color.surface}
-          stroke={tokens.color.line}
-          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
-          opacity={motion.reveal(frame, 12)}
-        />
-      </g>
+      <LeasePoolDock {...{ frame, tokens, scales, motion }} />
       <SketchedShape
         shape={{ kind: "path", d: `M${holder.x} ${holder.y} L480 430` }}
         profile={tokens.sketch.shape}

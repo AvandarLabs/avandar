@@ -1,5 +1,5 @@
 import { propEq } from "@avandar/utils";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./ClassroomDayPresence.schema";
 /** Data for makeClassroomStateFromInputAndFrame. */
 type CreateClassroomStateResult = {

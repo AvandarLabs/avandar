@@ -1,11 +1,16 @@
-import { mix } from "../../../../motion";
+import { Motion } from "../../../../motion";
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = {
   roadId: string;
-  source: Readonly<{ x1: number; y1: number; x2: number; y2: number }>;
+  source: Readonly<{
+    x1: number;
+    y1: number;
+    x2: number;
+    y2: number;
+  }>;
   start: number;
   end: number;
   accent: string;
@@ -25,10 +30,26 @@ export function ReachedInterval({
       <SketchedShape
         shape={{
           kind: "line",
-          x1: mix(start, source.x1, source.x2),
-          y1: mix(start, source.y1, source.y2),
-          x2: mix(end, source.x1, source.x2),
-          y2: mix(end, source.y1, source.y2),
+          x1: Motion.mix({
+            t: start,
+            from: source.x1,
+            to: source.x2,
+          }),
+          y1: Motion.mix({
+            t: start,
+            from: source.y1,
+            to: source.y2,
+          }),
+          x2: Motion.mix({
+            t: end,
+            from: source.x1,
+            to: source.x2,
+          }),
+          y2: Motion.mix({
+            t: end,
+            from: source.y1,
+            to: source.y2,
+          }),
         }}
         profile={tokens.sketch.shape}
         stroke={accent}

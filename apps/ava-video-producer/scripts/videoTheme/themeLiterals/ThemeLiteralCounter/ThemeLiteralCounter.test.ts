@@ -199,3 +199,90 @@ test("CSS-wide keywords never count as font literals", () => {
   });
   assert.equal(counts.css, 1);
 });
+
+test("a named ramp with an explicit theme curve has no implicit easing", () => {
+  const counts = _count({
+    source:
+      "ramp({ frame, at, dur: motion.panel, easing: motion.entrance.easing });",
+  });
+  assert.deepEqual([counts.motion, counts.implicitEasing], [0, 0]);
+});
+test("a named ramp without a curve counts implicit easing", () => {
+  const counts = _count({
+    source: "ramp({ frame, at, dur: motion.panel });",
+  });
+  assert.deepEqual([counts.motion, counts.implicitEasing], [0, 1]);
+});
+test("a named ramp with a shorthand curve has no implicit easing", () => {
+  const counts = _count({
+    source: "ramp({ frame, at, dur: motion.panel, easing });",
+  });
+  assert.equal(counts.implicitEasing, 0);
+});
+test("literal durations in named primitive helpers count as motion", () => {
+  const counts = _count({
+    source: `
+      ramp({ frame, at, dur: 18, easing: motion.entrance.easing });
+      pop({ frame, at, durationInFrames: 18, config: { damping: 14 } });
+      countTo({ frame, at, to: 100, dur: 18 });
+      ramp({ frame, at, dur: 48 - index * 3, easing: motion.entrance.easing });
+      ramp({ frame, at, dur: isFirst ? 4 : 3, easing: motion.entrance.easing });
+    `,
+  });
+  assert.deepEqual([counts.motion, counts.implicitEasing], [5, 0]);
+});
+test("named cue windows and scaled durations do not count as motion", () => {
+  const counts = _count({
+    source: `
+      ramp({ frame, at: 88, dur: 92 - 88, easing: motion.entrance.easing });
+      ramp({ frame, at: reviewAt + 8, dur: returnAt - reviewAt - 8, easing });
+      ramp({ frame, at, dur: motion.scale(18), easing });
+      pop({ frame, at, durationInFrames: motion.sheet });
+      countTo({ frame, at, to: 100, dur: duration * 0.4 });
+    `,
+  });
+  assert.deepEqual([counts.motion, counts.implicitEasing], [0, 0]);
+});
+test("literal staggers in named helper cues count as motion", () => {
+  const counts = _count({
+    source: `
+      ramp({ frame, at: 12 + index * 6, dur: motion.panel, easing });
+      enter({ frame, at: base + row.order * 4 });
+      countTo({ frame, at: base + index * 3, to: 100, dur: motion.sheet });
+      ramp({ frame, at: 12 + index * motion.scaleStagger(6), dur: motion.panel, easing });
+      leave({ frame, at: at + index });
+      ramp({ frame, at: at + duration * 0.55, dur: duration * 0.45, easing });
+    `,
+  });
+  assert.deepEqual([counts.motion, counts.implicitEasing], [3, 0]);
+});
+test("nested named entrance options count nonzero literal motion values", () => {
+  const counts = _count({
+    source: `
+      enter({ frame, at, opts: { dur: 9, y: 12, x: 0 } });
+      enterAt({ frame, at, index, opts: { dur: motion.panel, x: -4 } });
+      leave({ frame, at, opts: { y: 0, x: motion.entrance.distance } });
+    `,
+  });
+  assert.deepEqual([counts.motion, counts.implicitEasing], [3, 0]);
+});
+
+test("portable Motion namespace calls retain primitive easing checks", () => {
+  const counts = _count({
+    source: [
+      "Motion.ramp({ frame, at, dur: motion.panel });",
+      "Motion.ramp(frame, at, motion.panel);",
+      "Motion.ramp({ frame, at, dur: motion.panel, easing: motion.entrance.easing });",
+      "motion.ramp({ frame, at, dur: motion.panel });",
+    ].join("\n"),
+  });
+  assert.deepEqual([counts.motion, counts.implicitEasing], [0, 2]);
+});
+
+test("portable namespace and named custom curves retain numeric curve diagnostics", () => {
+  const counts = _count({
+    source:
+      "Motion.bezier({ x1: 0.16, y1: 1, x2: 0.3, y2: 1 }); bezier({ x1: 0.16, y1: 1, x2: 0.3, y2: 1 });",
+  });
+  assert.equal(counts.motion, 2);
+});

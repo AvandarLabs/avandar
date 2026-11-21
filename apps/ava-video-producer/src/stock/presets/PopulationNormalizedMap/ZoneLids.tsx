@@ -1,5 +1,5 @@
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { ZoneLid } from "./ZoneLid";
+import { ZoneLid } from "./ZoneLid/ZoneLid";
 import type { Input } from "./PopulationNormalizedMap.schema";
 import type { ReactNode } from "react";
 

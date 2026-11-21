@@ -1,7 +1,6 @@
-import { createContinuityPlanFromVideoThemeSnapshot } from "../../../../src/continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme";
+import { ContinuityThemePlans } from "../../../../src/continuity/ContinuityThemePlans/ContinuityThemePlans";
 import { getPosterFrameFromPlan } from "../getPosterFrameFromPlan/getPosterFrameFromPlan";
 import type { Film } from "../../../../src/showcase/showcase.types";
-
 /**
  * The frame an Atlas card poster shows for a film, found in the plan the film
  * draws: the theme's camera preset can lengthen beats, so the authored plan's
@@ -12,9 +11,11 @@ export function getPosterFrameFromFilm(
 ): number {
   return film.plan
     ? getPosterFrameFromPlan(
-        createContinuityPlanFromVideoThemeSnapshot(film.plan, film.theme, [
-          film.id,
-        ]),
+        ContinuityThemePlans.fromVideoThemeSnapshot({
+          plan: film.plan,
+          snapshot: film.theme,
+          overrideIds: [film.id],
+        }),
       )
     : 0;
 }

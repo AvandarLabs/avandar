@@ -1,5 +1,5 @@
-import { ramp } from "../../../motion";
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { Motion } from "../../../motion";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CleanupCells } from "./CleanupCells";
 import { CleanupRowCopy } from "./CleanupRowCopy";
@@ -30,12 +30,12 @@ export function CleanupRow({
   const motion = GraphicThemeHooks.useGraphicMotion();
   const edit =
     row.before !== row.after
-      ? ramp(
+      ? Motion.ramp({
           frame,
-          40 + index * motion.stagger.list,
-          motion.scale(EDIT_FRAMES),
-          motion.travel.easing,
-        )
+          at: 40 + index * motion.stagger.list,
+          dur: motion.scale(EDIT_FRAMES),
+          easing: motion.travel.easing,
+        })
       : 0;
   return (
     <g

@@ -15,6 +15,76 @@ import {
 import { inputSchema } from "./ExceptionDetour.schema";
 import type { Input } from "./ExceptionDetour.schema";
 
+function _assertHiddenStandardReference(): void {
+  assert.doesNotMatch(
+    _render({
+      frame: 150,
+      input: { ...DEFAULT_INPUT, showStandardReference: false },
+    }),
+    /data-standard-reference=/,
+  );
+}
+
+function _assertHeldCaseVerticalPosition(
+  held: ReturnType<typeof _render>,
+): void {
+  assert.equal(
+    SvgAttributes.getNumberFromMarkup({
+      attributes: _markedShape({
+        markup: held,
+        marker: "moving-case",
+      }),
+      name: "cy",
+    }),
+    420,
+  );
+}
+
+function _assertHeldCaseHorizontalPosition(
+  held: ReturnType<typeof _render>,
+): void {
+  assert.equal(
+    SvgAttributes.getNumberFromMarkup({
+      attributes: _markedShape({
+        markup: held,
+        marker: "moving-case",
+      }),
+      name: "cx",
+    }),
+    670,
+  );
+}
+
+function _assertEarlyCaseVerticalPosition(
+  early: ReturnType<typeof _render>,
+): void {
+  assert.equal(
+    SvgAttributes.getNumberFromMarkup({
+      attributes: _markedShape({
+        markup: early,
+        marker: "moving-case",
+      }),
+      name: "cy",
+    }),
+    300,
+  );
+}
+
+function _assertEarlyCaseHorizontalPosition(
+  early: ReturnType<typeof _render>,
+): void {
+  assert.equal(
+    SvgAttributes.getNumberFromMarkup({
+      attributes: _markedShape({
+        markup: early,
+        marker: "moving-case",
+      }),
+      name: "cx",
+    }),
+    420,
+  );
+}
+
 /**
  * The shape a marker names: the marked element itself, or the sketch-aware
  * shape inside a marked group.
@@ -74,46 +144,10 @@ test("the exceptional case leaves an intact standard route and mirrors without s
     _markedShape({ markup: above, marker: "standard-route" }),
     standard,
   );
-  assert.equal(
-    SvgAttributes.getNumberFromMarkup({
-      attributes: _markedShape({
-        markup: early,
-        marker: "moving-case",
-      }),
-      name: "cx",
-    }),
-    420,
-  );
-  assert.equal(
-    SvgAttributes.getNumberFromMarkup({
-      attributes: _markedShape({
-        markup: early,
-        marker: "moving-case",
-      }),
-      name: "cy",
-    }),
-    300,
-  );
-  assert.equal(
-    SvgAttributes.getNumberFromMarkup({
-      attributes: _markedShape({
-        markup: held,
-        marker: "moving-case",
-      }),
-      name: "cx",
-    }),
-    670,
-  );
-  assert.equal(
-    SvgAttributes.getNumberFromMarkup({
-      attributes: _markedShape({
-        markup: held,
-        marker: "moving-case",
-      }),
-      name: "cy",
-    }),
-    420,
-  );
+  _assertEarlyCaseHorizontalPosition(early);
+  _assertEarlyCaseVerticalPosition(early);
+  _assertHeldCaseHorizontalPosition(held);
+  _assertHeldCaseVerticalPosition(held);
   assert.equal(
     SvgAttributes.getNumberFromMarkup({
       attributes: _markedShape({
@@ -130,13 +164,7 @@ test("the exceptional case leaves an intact standard route and mirrors without s
     assert.ok(markup.includes(DEFAULT_INPUT.exception.outcome));
   });
   assert.match(held, /data-standard-reference=/);
-  assert.doesNotMatch(
-    _render({
-      frame: 150,
-      input: { ...DEFAULT_INPUT, showStandardReference: false },
-    }),
-    /data-standard-reference=/,
-  );
+  _assertHiddenStandardReference();
   assert.match(held, /data-resolved-bracket="true"><path[^>]*opacity="1"/);
   assert.notEqual(early, held);
 });

@@ -1,5 +1,5 @@
 import { Text } from "../../graphics-common/Text";
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import {
   FIELD_BASELINE,
@@ -31,7 +31,10 @@ export function FieldRow({
   label,
   isPortFirst,
 }: Props): ReactNode {
-  const style = GraphicThemeHooks.useGraphicProps("SchemaMapping", {});
+  const style = GraphicThemeHooks.useGraphicProps({
+    name: "SchemaMapping",
+    props: {},
+  });
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const shapes = GraphicThemeHooks.useGraphicShapeScales();
   const port = <circle cx={portX} cy={y} r={style.dotRadius} fill={color} />;

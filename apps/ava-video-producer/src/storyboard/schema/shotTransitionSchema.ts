@@ -9,9 +9,8 @@ const outgoingSchema = z.enum(["frozen", "playing"]);
 
 /**
  * How one shot replaces the previous one, lasting the shot's
- * `transitionInFrames`. Omit it for the default dissolve (or a hard cut when
- * `transitionInFrames` is 0), so plans written before transition kinds
- * existed render unchanged.
+ * `transitionInFrames`. Omit it for the default dissolve, or a hard cut when
+ * `transitionInFrames` is 0.
  *
  * `cut` is a hard cut declared on purpose, with `transitionInFrames` set to
  * 0. It renders exactly like an undeclared hard cut. The difference is the

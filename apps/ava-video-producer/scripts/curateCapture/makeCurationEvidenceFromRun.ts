@@ -1,22 +1,16 @@
 import { lstat, readFile } from "node:fs/promises";
 import { basename } from "node:path";
-import { validateRelativePath } from "../captureLib/fsSafetyHelpers";
-import {
-  assertSafeManifest,
-  makeRedactedTextFromValue,
-} from "../captureLib/sanitizeHelpers";
-import {
-  makeSourceUrlFromUrl,
-  validateId,
-} from "../captureLib/urlSafetyHelpers";
+import { CaptureFileSafety } from "../captureLib/CaptureFileSafety";
+import { CaptureSanitization } from "../captureLib/CaptureSanitization";
+import { CaptureUrlSafety } from "../captureLib/CaptureUrlSafety/CaptureUrlSafety";
 import { getSha256FromFile } from "../lib/getSha256FromFile";
-import { getPlainPathFromRoot } from "./plainPathHelpers";
+import { PlainPaths } from "./PlainPaths";
 import type {
   CaptureAction,
   CaptureCheckpoint,
   CaptureManifest,
 } from "../captureAvandar/captureAvandar.types";
-import type { FixtureFile } from "../captureLib/fsSafetyHelpers";
+import type { FixtureFile } from "../captureLib/CaptureFileSafety";
 import type {
   CuratedScreenshot,
   CurationEvidence,
@@ -24,7 +18,6 @@ import type {
 
 const HASH = /^[a-f0-9]{64}$/;
 const IMAGE = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*\.(?:png|jpe?g|webp)$/;
-
 /** What `_readScreenshotAndClaimFilename` checks one checkpoint against. */
 type ScreenshotCheck = {
   checkpoint: CaptureCheckpoint;
@@ -32,50 +25,58 @@ type ScreenshotCheck = {
   filenames: Set<string>;
   sourceDirectory: string;
 };
-
-function _readArray<T>(value: readonly T[], label: string): T[] {
+function _readArray<T>({
+  value,
+  label,
+}: Readonly<{
+  value: readonly T[];
+  label: string;
+}>): T[] {
   if (!Array.isArray(value)) {
     throw new Error(`Capture manifest needs ${label}`);
   }
   return [...value];
 }
-
-function _readDigest(value: unknown, label: string): string {
+function _readDigest({
+  value,
+  label,
+}: Readonly<{
+  value: unknown;
+  label: string;
+}>): string {
   if (typeof value !== "string" || !HASH.test(value)) {
     throw new Error(`Invalid SHA-256 for ${label}`);
   }
   return value;
 }
-
 function _readSafeUrl(value: unknown): string {
   if (typeof value !== "string") {
     throw new Error("Capture source URL must be text");
   }
-  const cleanUrl = makeSourceUrlFromUrl(value);
+  const cleanUrl = CaptureUrlSafety.makeSourceUrlFromUrl(value);
   if (cleanUrl.startsWith("[")) {
     throw new Error("Capture source URL must be HTTP(S)");
   }
-  return makeRedactedTextFromValue({ value: cleanUrl });
+  return CaptureSanitization.makeRedactedTextFromValue({ value: cleanUrl });
 }
-
 /** Reads the run's manifest, refusing anything but a passed version 1 run. */
 async function _readPassedManifest(sourceDirectory: string): Promise<{
   manifest: CaptureManifest;
   manifestPath: string;
   manifestSha256: string;
 }> {
-  const manifestPath = await getPlainPathFromRoot({
+  const manifestPath = await PlainPaths.getPlainPathFromRoot({
     root: sourceDirectory,
     name: "manifest.json",
   });
-  if ((await lstat(manifestPath)).size > 10_000_000) {
+  if ((await lstat(manifestPath)).size > 10000000) {
     throw new Error("Capture manifest exceeds 10 MB");
   }
   const manifestSha256 = await getSha256FromFile(manifestPath);
   const manifest: CaptureManifest = JSON.parse(
     await readFile(manifestPath, "utf8"),
   );
-  assertSafeManifest({ value: manifest });
+  CaptureSanitization.assertSafeManifest({ value: manifest });
   if (manifest.schemaVersion !== 1 || manifest.status !== "passed") {
     throw new Error("Only a passed version 1 capture can be curated");
   }
@@ -84,11 +85,16 @@ async function _readPassedManifest(sourceDirectory: string): Promise<{
   }
   return { manifest, manifestPath, manifestSha256 };
 }
-
 function _readPassedFlows(manifest: Readonly<CaptureManifest>): Set<string> {
   const flows = new Set<string>();
-  _readArray(manifest.features, "features").forEach((feature) => {
-    validateId(feature.id, "flow id");
+  _readArray({
+    value: manifest.features,
+    label: "features",
+  }).forEach((feature) => {
+    CaptureUrlSafety.validateId({
+      value: feature.id,
+      name: "flow id",
+    });
     if (feature.status !== "passed" || flows.has(feature.id)) {
       throw new Error("Capture features must be unique and passed");
     }
@@ -99,22 +105,35 @@ function _readPassedFlows(manifest: Readonly<CaptureManifest>): Set<string> {
   }
   return flows;
 }
-
 function _readFixtures(manifest: Readonly<CaptureManifest>): FixtureFile[] {
-  return _readArray(manifest.fixtures, "fixtures").map((fixture) => {
+  return _readArray({
+    value: manifest.fixtures,
+    label: "fixtures",
+  }).map((fixture) => {
     return {
-      path: validateRelativePath(fixture.path, "fixture metadata path"),
-      sha256: _readDigest(fixture.sha256, "fixture"),
+      path: CaptureFileSafety.validateRelativePath({
+        value: fixture.path,
+        name: "fixture metadata path",
+      }),
+      sha256: _readDigest({
+        value: fixture.sha256,
+        label: "fixture",
+      }),
       bytes: fixture.bytes,
     };
   });
 }
-
-function _readActions(
-  manifest: Readonly<CaptureManifest>,
-  flows: ReadonlySet<string>,
-): CaptureAction[] {
-  return _readArray(manifest.actions, "actions").map((action) => {
+function _readActions({
+  manifest,
+  flows,
+}: Readonly<{
+  manifest: Readonly<CaptureManifest>;
+  flows: ReadonlySet<string>;
+}>): CaptureAction[] {
+  return _readArray({
+    value: manifest.actions,
+    label: "actions",
+  }).map((action) => {
     if (action.status !== "passed" || !flows.has(action.flowId)) {
       throw new Error(
         "Every capture action must belong to a passed flow and be passed",
@@ -129,7 +148,6 @@ function _readActions(
     };
   });
 }
-
 /**
  * Validates one checkpoint, checks its screenshot's hash, and adds its
  * filename to the caller's `filenames` set so a duplicate name fails.
@@ -143,21 +161,27 @@ async function _readScreenshotAndClaimFilename(
       "Every checkpoint must belong to a passed flow and be passed",
     );
   }
-  validateId(checkpoint.id, "checkpoint id");
-  const capturePath = validateRelativePath(
-    checkpoint.screenshot?.path,
-    "screenshot path",
-  );
+  CaptureUrlSafety.validateId({
+    value: checkpoint.id,
+    name: "checkpoint id",
+  });
+  const capturePath = CaptureFileSafety.validateRelativePath({
+    value: checkpoint.screenshot?.path,
+    name: "screenshot path",
+  });
   const filename = basename(capturePath);
   if (!IMAGE.test(filename) || filenames.has(filename)) {
     throw new Error("Screenshot filenames must be unique plain image names");
   }
   filenames.add(filename);
-  const source = await getPlainPathFromRoot({
+  const source = await PlainPaths.getPlainPathFromRoot({
     root: options.sourceDirectory,
     name: capturePath,
   });
-  const sha256 = _readDigest(checkpoint.screenshot?.sha256, "screenshot");
+  const sha256 = _readDigest({
+    value: checkpoint.screenshot?.sha256,
+    label: "screenshot",
+  });
   if ((await getSha256FromFile(source)) !== sha256) {
     throw new Error(`Screenshot hash mismatch: ${capturePath}`);
   }
@@ -172,7 +196,6 @@ async function _readScreenshotAndClaimFilename(
     videoAtMs: checkpoint.videoAtMs ?? null,
   };
 }
-
 async function _readScreenshots({
   manifest,
   flows,
@@ -182,7 +205,10 @@ async function _readScreenshots({
   flows: ReadonlySet<string>;
   sourceDirectory: string;
 }>): Promise<CuratedScreenshot[]> {
-  const checkpoints = _readArray(manifest.checkpoints, "checkpoints");
+  const checkpoints = _readArray({
+    value: manifest.checkpoints,
+    label: "checkpoints",
+  });
   if (!checkpoints.length) {
     throw new Error("Capture has no screenshots to curate");
   }
@@ -204,6 +230,27 @@ async function _readScreenshots({
   }
   return screenshots;
 }
+/** The capture resources after every referenced flow has been validated. */
+function _readResources({
+  manifest,
+  flows,
+}: Readonly<{
+  manifest: Readonly<CaptureManifest>;
+  flows: ReadonlySet<string>;
+}>): CurationEvidence["resources"] {
+  const resources = _readArray({
+    value: manifest.resources,
+    label: "resources",
+  });
+  if (
+    resources.some((resource) => {
+      return !flows.has(resource.flowId);
+    })
+  ) {
+    throw new Error("Capture resource refers to an unknown flow");
+  }
+  return resources;
+}
 
 /**
  * Builds the evidence record from a passed run's manifest, refusing a run
@@ -213,7 +260,10 @@ async function _readScreenshots({
 export async function makeCurationEvidenceFromRun({
   sourceDirectory,
   runRelative,
-}: Readonly<{ sourceDirectory: string; runRelative: string }>): Promise<{
+}: Readonly<{
+  sourceDirectory: string;
+  runRelative: string;
+}>): Promise<{
   evidence: CurationEvidence;
   manifestPath: string;
   manifestSha256: string;
@@ -221,16 +271,12 @@ export async function makeCurationEvidenceFromRun({
   const { manifest, manifestPath, manifestSha256 } =
     await _readPassedManifest(sourceDirectory);
   const flows = _readPassedFlows(manifest);
-  const actions = _readActions(manifest, flows);
+  const actions = _readActions({
+    manifest,
+    flows,
+  });
   const fixtures = _readFixtures(manifest);
-  const resources = _readArray(manifest.resources, "resources");
-  if (
-    resources.some((resource) => {
-      return !flows.has(resource.flowId);
-    })
-  ) {
-    throw new Error("Capture resource refers to an unknown flow");
-  }
+  const resources = _readResources({ manifest, flows });
   const screenshots = await _readScreenshots({
     manifest,
     flows,
@@ -253,6 +299,6 @@ export async function makeCurationEvidenceFromRun({
     resources,
     screenshots,
   };
-  assertSafeManifest({ value: evidence });
+  CaptureSanitization.assertSafeManifest({ value: evidence });
   return { evidence, manifestPath, manifestSha256 };
 }

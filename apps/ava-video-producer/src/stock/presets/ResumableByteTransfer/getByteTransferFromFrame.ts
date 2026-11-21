@@ -1,4 +1,4 @@
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./ResumableByteTransfer.schema";
 /** One exact half-open byte interval and its frame-derived transport state. */
 export type TransferChunk = {

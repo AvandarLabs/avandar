@@ -1,7 +1,8 @@
 import type { ATOMIC_TOKENS } from "./tokenCatalog/atomicTokens";
 import type { COMPONENT_TOKENS } from "./tokenCatalog/componentTokens/componentTokens";
 import type { SEMANTIC_TOKENS } from "./tokenCatalog/semanticTokens/semanticTokens";
-import type { VideoFontId } from "./videoFontRegistry/videoFontRegistryHelpers";
+import type { TEXT_TRANSFORMS } from "./tokenCatalog/TokenDefinitions";
+import type { VideoFontId } from "./videoFontRegistry/VideoFonts";
 /*
  * Types shared by the video theme model: authored values, token metadata,
  * theme documents, and the resolved values renderers read.
@@ -23,11 +24,13 @@ export type VideoThemeIssue = Readonly<{ path: string; message: string }>;
 export type EasingValue =
   | readonly [number, number, number, number]
   | Readonly<{ powerInOut: number }>;
+/** Damping, stiffness, and mass parameters of theme spring motion. */
 export type SpringValue = Readonly<{
   damping: number;
   stiffness: number;
   mass: number;
 }>;
+/** Offsets, spread, blur, and alpha for one theme shadow layer. */
 export type ShadowLayer = Readonly<{
   offsetX: number;
   offsetY: number;
@@ -35,25 +38,33 @@ export type ShadowLayer = Readonly<{
   spread: number;
   alpha: number;
 }>;
+/** The ordered shadow layers of a theme token. */
 export type ShadowValue = Readonly<{ layers: readonly ShadowLayer[] }>;
+/** Spread, blur, and opacity parameters of a theme glow. */
 export type GlowValue = Readonly<{
   spread: number;
   blur: number;
   opacity: number;
 }>;
+/** Offsets, blur, and alpha parameters of a theme text shadow. */
 export type TextShadowValue = Readonly<{
   offsetX: number;
   offsetY: number;
   blur: number;
   alpha: number;
 }>;
+/** Two colors and an angle defining a theme gradient. */
 export type GradientValue = Readonly<{ from: string; to: string; deg: number }>;
+/** A shared shade or distinct shades for light and dark modes. */
 export type ShadeValue = number | Readonly<{ light: number; dark: number }>;
 
+/** A resolved solid or gradient fill for rendering. */
 export type ResolvedFill =
   | Readonly<{ type: "solid"; color: string }>
   | Readonly<{ type: "gradient"; from: string; to: string; deg: number }>;
+/** A theme text shadow with its resolved color. */
 export type ResolvedTextShadow = TextShadowValue & Readonly<{ color: string }>;
+/** A theme glow with its resolved color. */
 export type ResolvedGlow = GlowValue & Readonly<{ color: string }>;
 
 /** A text role ready to draw, with its font resolved to a registered stack. */
@@ -65,7 +76,7 @@ export type ResolvedTypeStyle = Readonly<{
   lineHeight?: number;
   /** In em. */
   letterSpacing?: number;
-  textTransform?: "none" | "uppercase" | "lowercase" | "capitalize";
+  textTransform?: (typeof TEXT_TRANSFORMS)[number];
   fontVariantNumeric?: "normal" | "tabular-nums";
   color: string;
   alpha: number;
@@ -73,22 +84,27 @@ export type ResolvedTypeStyle = Readonly<{
   glow?: ResolvedGlow;
   strokeWidth?: number;
 }>;
+/** A resolved color and alpha pair for rendering. */
 export type ResolvedPaint = Readonly<{ color: string; alpha: number }>;
+/** Resolved shadow layers and their shared color. */
 export type ResolvedElevation = Readonly<{
   layers: readonly ShadowLayer[];
   color: string;
 }>;
+/** Resolved geometry variation parameters for sketched shapes. */
 export type ResolvedSketchProfile = Readonly<{
   roughness: number;
   bowing: number;
   seed: number;
   randomness: number;
 }>;
+/** Resolved optional spacing values for box sides and layout gaps. */
 export type ResolvedBox = Readonly<
   Partial<
     Record<"top" | "right" | "bottom" | "left" | "x" | "y" | "gap", number>
   >
 >;
+/** Resolved timing, easing, spring, and distance values for motion. */
 export type ResolvedMotionStep = Readonly<{
   duration?: number;
   easing?: EasingValue;
@@ -98,11 +114,13 @@ export type ResolvedMotionStep = Readonly<{
   rate?: number;
   stagger?: number;
 }>;
+/** Resolved camera speed, shutter, and easing values. */
 export type ResolvedCameraPreset = Readonly<{
   speed: number;
   shutter: number;
   easing: EasingValue;
 }>;
+/** An inclusive numeric range with minimum and maximum values. */
 export type ResolvedRange = Readonly<{ min: number; max: number }>;
 
 /** The resolved value of each token kind. */
@@ -140,7 +158,9 @@ export type TokenKindValues = {
   cameraPreset: ResolvedCameraPreset;
   range: ResolvedRange;
 };
+/** A kind supported by the theme token value map. */
 export type TokenKind = keyof TokenKindValues;
+/** A unit displayed alongside a numeric theme token. */
 export type TokenUnit = "px" | "em" | "%" | "frames" | "deg" | "cps" | "×";
 /** The pixel space a length or text role is measured in. */
 export type TokenSurface = "graphic" | "stage";
@@ -175,8 +195,11 @@ export type TokenDefinition = Readonly<{
    */
   contrastGround?: string;
 }>;
+/** A catalog entry whose scale member defines its token. */
 export type TokenScale = Readonly<{ scale: TokenDefinition }>;
+/** Named child entries in the theme token catalog. */
 export type CatalogGroup = Readonly<{ [key: string]: CatalogNode }>;
+/** A token, scale entry, or nested group in the theme catalog. */
 export type CatalogNode = TokenDefinition | TokenScale | CatalogGroup;
 
 /** The resolved shape of a catalog subtree. */
@@ -194,11 +217,15 @@ export type ResolvedTokenNode<Node> = Node extends {
       : { readonly [Key in keyof Node]: ResolvedTokenNode<Node[Key]> }
     : { readonly [Key in keyof Node]: ResolvedTokenNode<Node[Key]> };
 
+/** Resolved values of the atomic video theme catalog. */
 export type ResolvedVideoAtomic = ResolvedTokenNode<typeof ATOMIC_TOKENS>;
+/** Resolved values of the semantic video theme catalog. */
 export type ResolvedVideoSemantic = ResolvedTokenNode<typeof SEMANTIC_TOKENS>;
+/** Resolved values of the video component theme catalog. */
 export type ResolvedVideoComponents = ResolvedTokenNode<
   typeof COMPONENT_TOKENS
 >;
+/** A component name in the resolved video theme catalog. */
 export type VideoComponentName = keyof ResolvedVideoComponents;
 
 /** A sparse theme fragment: Mantine keys, `other.video`, and `components`. */
@@ -213,6 +240,7 @@ export type VideoThemeDocument = VideoThemePatch &
     extends?: string;
     overrides?: Readonly<Record<string, VideoThemePatch>>;
   }>;
+/** Theme documents indexed by their stable identifiers. */
 export type VideoThemeLibrary = ReadonlyMap<string, VideoThemeDocument>;
 
 /**

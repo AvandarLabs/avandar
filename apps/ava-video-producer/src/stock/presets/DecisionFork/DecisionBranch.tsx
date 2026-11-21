@@ -1,10 +1,11 @@
 import { DrawPath } from "../../graphics-common/DrawPath";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { DecisionCondition } from "./DecisionCondition";
+import { DecisionCondition } from "./DecisionCondition/DecisionCondition";
 import { DecisionGate } from "./DecisionGate";
 import { DecisionOutcome } from "./DecisionOutcome/DecisionOutcome";
 import type { DecisionForkInput } from "./DecisionFork.schema";
 import type { ReactNode } from "react";
+
 /** Shared branch context for private decision geometry components. */
 export type Props = {
   branch: DecisionForkInput["branches"][number];
@@ -15,6 +16,7 @@ export type Props = {
   isSelected: boolean;
   showUnchosenOutcomes: boolean;
 };
+
 /** One labeled alternative closes its gate unless it is the authored choice. */
 export function DecisionBranch({
   branch,
@@ -25,7 +27,10 @@ export function DecisionBranch({
   isSelected,
   ...remainingProps
 }: Readonly<Props>): ReactNode {
-  const style = GraphicThemeHooks.useGraphicProps("DecisionFork", {});
+  const style = GraphicThemeHooks.useGraphicProps({
+    name: "DecisionFork",
+    props: {},
+  });
   const { color } = GraphicThemeHooks.useGraphicTokens();
   return (
     <g data-branch={branch.id} data-selected={isSelected}>

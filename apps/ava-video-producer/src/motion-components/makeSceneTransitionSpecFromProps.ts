@@ -30,8 +30,9 @@ export function makeSceneTransitionSpecFromProps({
     options: props.motion,
     theme,
   });
-  if (duration < 1 || props.kind === "cut")
+  if (duration < 1 || props.kind === "cut") {
     throw new Error("Cuts use adjacent sequences without a Transition element");
+  }
   return {
     timing: linearTiming({
       durationInFrames: duration,

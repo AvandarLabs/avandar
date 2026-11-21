@@ -15,10 +15,24 @@ import { inputSchema } from ".././AquiferAllocationBalance.schema";
 import type { PresetAssertions } from "../../../../../tests/helpers/registerStockPresetAssertions";
 import type { Input } from ".././AquiferAllocationBalance.schema";
 
+type FlowRouteBounds = {
+  bounds: Bounds;
+  startX: string;
+  startY: string;
+  endX: string;
+  endY: string | undefined;
+};
+
+/** Inputs for render. */
+type RenderArguments = { frame: number; input?: Input };
+
+/** Inputs for getVisibleTexts. */
+type GetVisibleTextsArguments = { input: Input };
+
 function _render({
   frame,
   input = DEFAULT_INPUT,
-}: Readonly<{ frame: number; input?: Input }>): string {
+}: Readonly<RenderArguments>): string {
   return renderToStaticMarkup(
     createElement(
       "svg",
@@ -33,7 +47,9 @@ function _render({
   );
 }
 
-function _getVisibleTexts({ input }: Readonly<{ input: Input }>): string[] {
+function _getVisibleTexts({
+  input,
+}: Readonly<GetVisibleTextsArguments>): string[] {
   return [
     ...Object.values(input.boundary),
     ...Object.values(input.decision),
@@ -209,22 +225,7 @@ function _assertRouteOwnership({
     new RegExp(`<path[^>]*data-flow="${owner}"[^>]*>`),
   );
   assert.ok(route, owner);
-  const coordinates = route[0].match(
-    /d="M ([\d.]+) ([\d.]+)(?: V ([\d.]+))? H ([\d.]+)"/,
-  );
-  assert.ok(coordinates, "Expected an orthogonal boundary flow");
-  const [, startX, startY, endY, endX] = coordinates;
-  const width =
-    SvgAttributes.getNumberFromMarkup({
-      attributes: route[0],
-      name: "stroke-width",
-    }) / 2;
-  const bounds = {
-    left: Number(startX) - width,
-    right: Number(endX) + width,
-    top: Math.min(Number(startY), Number(endY ?? startY)) - width,
-    bottom: Math.max(Number(startY), Number(endY ?? startY)) + width,
-  };
+  const { bounds, startX, startY, endX, endY } = _getFlowRouteBounds({ route });
   const local = _getOwnershipGroup({ markup, marker: "flow-ownership", owner });
   const circle = SvgAttributes.fromMarker({
     markup: local,
@@ -269,38 +270,7 @@ function _assertOwnershipClearance(markup: string): void {
       return _getCircleBounds(circle);
     },
   );
-  const rectangles = Array.from(
-    markup.matchAll(/<rect[^>]*>/g),
-    ([rectangle]) => {
-      const stroke = rectangle.includes('stroke="') ? 0.5 : 0;
-      const left = SvgAttributes.getNumberFromMarkup({
-          attributes: rectangle,
-          name: "x",
-        }),
-        top = SvgAttributes.getNumberFromMarkup({
-          attributes: rectangle,
-          name: "y",
-        });
-      return {
-        left: left - stroke,
-        top: top - stroke,
-        right:
-          left +
-          SvgAttributes.getNumberFromMarkup({
-            attributes: rectangle,
-            name: "width",
-          }) +
-          stroke,
-        bottom:
-          top +
-          SvgAttributes.getNumberFromMarkup({
-            attributes: rectangle,
-            name: "height",
-          }) +
-          stroke,
-      };
-    },
-  );
+  const rectangles = _getAquiferRectangleBounds({ markup });
   badges.forEach((badge, index) => {
     badges.slice(index + 1).forEach((other) => {
       return _assertSeparate({ first: badge, second: other });
@@ -335,3 +305,67 @@ export {
   _assertOwnershipClearance,
 };
 export type { Bounds };
+
+type GetFlowRouteBoundsOptions = {
+  route: RegExpMatchArray;
+};
+/** Reads the orthogonal flow endpoints and their stroke-inclusive bounds. */
+function _getFlowRouteBounds({
+  route,
+}: Readonly<GetFlowRouteBoundsOptions>): FlowRouteBounds {
+  const coordinates = route[0].match(
+    /d="M ([\d.]+) ([\d.]+)(?: V ([\d.]+))? H ([\d.]+)"/,
+  );
+  assert.ok(coordinates, "Expected an orthogonal boundary flow");
+  const [, startX, startY, endY, endX] = coordinates;
+  const width =
+    SvgAttributes.getNumberFromMarkup({
+      attributes: route[0],
+      name: "stroke-width",
+    }) / 2;
+  const bounds = {
+    left: Number(startX) - width,
+    right: Number(endX) + width,
+    top: Math.min(Number(startY), Number(endY ?? startY)) - width,
+    bottom: Math.max(Number(startY), Number(endY ?? startY)) + width,
+  };
+  return { bounds, startX, startY, endX, endY };
+}
+
+type GetAquiferRectangleBoundsOptions = {
+  markup: string;
+};
+/** Reads every emitted rectangle envelope used by ownership assertions. */
+function _getAquiferRectangleBounds({
+  markup,
+}: Readonly<GetAquiferRectangleBoundsOptions>): Bounds[] {
+  return Array.from(markup.matchAll(/<rect[^>]*>/g), ([rectangle]) => {
+    const stroke = rectangle.includes('stroke="') ? 0.5 : 0;
+    const left = SvgAttributes.getNumberFromMarkup({
+        attributes: rectangle,
+        name: "x",
+      }),
+      top = SvgAttributes.getNumberFromMarkup({
+        attributes: rectangle,
+        name: "y",
+      });
+    return {
+      left: left - stroke,
+      top: top - stroke,
+      right:
+        left +
+        SvgAttributes.getNumberFromMarkup({
+          attributes: rectangle,
+          name: "width",
+        }) +
+        stroke,
+      bottom:
+        top +
+        SvgAttributes.getNumberFromMarkup({
+          attributes: rectangle,
+          name: "height",
+        }) +
+        stroke,
+    };
+  });
+}

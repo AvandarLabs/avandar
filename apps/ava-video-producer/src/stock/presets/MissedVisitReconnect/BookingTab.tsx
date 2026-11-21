@@ -1,4 +1,4 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./MissedVisitReconnect.schema";
@@ -27,7 +27,7 @@ export function BookingTab({
     motion.scale(14),
     motion.entrance.easing,
   );
-  const fold = mix(progress, 0, 14);
+  const fold = Motion.mix({ t: progress, from: 0, to: 14 });
   return (
     <g
       data-booking={item.id}
@@ -37,7 +37,7 @@ export function BookingTab({
         motion.whip,
         motion.reveal.easing,
       )}
-      transform={`translate(${mix(progress, 310, 560)} ${y})`}
+      transform={`translate(${Motion.mix({ t: progress, from: 310, to: 560 })} ${y})`}
     >
       <SketchedShape
         shape={{

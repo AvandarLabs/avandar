@@ -1,12 +1,14 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { getProductRootFromProducerRoot } from "./productSourceHelpers";
-
+import { ProductSources } from "./ProductSources";
 /** Throws when any path segment below the private root is a symlink. */
-async function _assertNoSymlinks(
-  privateRoot: string,
-  parts: readonly string[],
-): Promise<void> {
+async function _assertNoSymlinks({
+  privateRoot,
+  parts,
+}: Readonly<{
+  privateRoot: string;
+  parts: readonly string[];
+}>): Promise<void> {
   const folders = [
     privateRoot,
     ...parts.map((_, index) => {
@@ -28,19 +30,21 @@ async function _assertNoSymlinks(
     }
   });
 }
-
 /**
  * Returns the workspace folder a plan renders into: its private
  * `.videos/<project>/` folder, or the producer app for tracked plans. The
  * video CLI calls it so private projects keep their outputs beside their
  * plan. Refuses symlinked or malformed private paths.
  */
-export async function getVideoWorkspaceFromPlanPath(
-  producerRoot: string,
-  filename: string,
-): Promise<string> {
+export async function getVideoWorkspaceFromPlanPath({
+  producerRoot,
+  filename,
+}: Readonly<{
+  producerRoot: string;
+  filename: string;
+}>): Promise<string> {
   const privateRoot = path.join(
-    getProductRootFromProducerRoot(producerRoot),
+    ProductSources.getProductRootFromProducerRoot(producerRoot),
     ".videos",
   );
   const relativePlanPath = path.relative(privateRoot, path.resolve(filename));
@@ -54,6 +58,9 @@ export async function getVideoWorkspaceFromPlanPath(
   if (parts.length < 2 || !parts[0] || parts[0].startsWith(".")) {
     throw new Error("Private plans belong in .videos/<project>/.");
   }
-  await _assertNoSymlinks(privateRoot, parts);
+  await _assertNoSymlinks({
+    privateRoot,
+    parts,
+  });
   return path.join(privateRoot, parts[0]);
 }

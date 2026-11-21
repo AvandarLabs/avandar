@@ -1,4 +1,4 @@
-import { mix, ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Props as BranchProps } from "./DecisionBranch";
 import type { ReactNode } from "react";
@@ -12,14 +12,26 @@ export function DecisionGate({
   frame,
   isSelected,
 }: Readonly<Props>): ReactNode {
-  const style = GraphicThemeHooks.useGraphicProps("DecisionFork", {});
+  const style = GraphicThemeHooks.useGraphicProps({
+    name: "DecisionFork",
+    props: {},
+  });
   const { color } = GraphicThemeHooks.useGraphicTokens();
   const motion = GraphicThemeHooks.useGraphicMotion();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   const closed = isSelected
     ? 0
-    : ramp(frame, CLOSE_CUE, motion.sheet, motion.reveal.easing);
-  const spread = mix(closed, 0, style.gateSpread);
+    : Motion.ramp({
+        frame,
+        at: CLOSE_CUE,
+        dur: motion.sheet,
+        easing: motion.reveal.easing,
+      });
+  const spread = Motion.mix({
+    t: closed,
+    from: 0,
+    to: style.gateSpread,
+  });
   return (
     <g
       opacity={closed}

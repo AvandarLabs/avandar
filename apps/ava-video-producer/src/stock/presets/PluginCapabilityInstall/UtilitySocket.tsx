@@ -1,12 +1,16 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { UtilityModule } from "./UtilityModule";
 import type { Input } from "./PluginCapabilityInstall.schema";
 import type { ReactNode } from "react";
 
-type Props = { input: Input; frame: number; accent: string };
+type Props = {
+  input: Input;
+  frame: number;
+  accent: string;
+};
 /** A single utility approaches and enters only the authored install socket. */
 export function UtilitySocket({
   input,
@@ -21,7 +25,11 @@ export function UtilitySocket({
     input.installation.choice === "install"
       ? motion.ramp(frame, 56, motion.scale(34), motion.travel.easing)
       : 0;
-  const y = mix(installation, 78, 197);
+  const y = Motion.mix({
+    t: installation,
+    from: 78,
+    to: 197,
+  });
   const status = _getSocketStatus({ input, frame, installation });
   return (
     <g>
@@ -54,11 +62,14 @@ function _getSocketStatus({
   input,
   frame,
   installation,
-}: Readonly<{ input: Input; frame: number; installation: number }>): string {
-  if (installation === 1) {
-    return input.copy.installed;
-  }
-  return input.installation.choice === "defer" && frame >= 56
-    ? input.copy.deferred
-    : input.copy.emptySocket;
+}: Readonly<{
+  input: Input;
+  frame: number;
+  installation: number;
+}>): string {
+  return installation === 1
+    ? input.copy.installed
+    : input.installation.choice === "defer" && frame >= 56
+      ? input.copy.deferred
+      : input.copy.emptySocket;
 }

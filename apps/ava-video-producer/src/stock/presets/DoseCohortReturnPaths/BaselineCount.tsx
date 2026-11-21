@@ -1,9 +1,12 @@
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
+
+type Props = { count: number };
+
 /** The number of participants beside the baseline caption. */
 export function BaselineCount({
   count: participantCount,
-}: Readonly<{ count: number }>): ReactNode {
+}: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <text

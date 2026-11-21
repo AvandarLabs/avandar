@@ -1,7 +1,7 @@
-import { StockRect } from "../../primitives/StockRect/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { DuplicateCandidateCopy } from "./DuplicateCandidateCopy";
-import { DuplicateCandidateRole } from "./DuplicateCandidateRole";
+import { DuplicateCandidateRole } from "./DuplicateCandidateRole/DuplicateCandidateRole";
+import { DuplicateCandidateSurface } from "./DuplicateCandidateSurface/DuplicateCandidateSurface";
 import { getDuplicateCardLayoutFromGroupAndFrame } from "./getDuplicateCardLayoutFromGroupAndFrame";
 import type { Input } from "./DuplicateReviewStack.schema";
 import type { ReactNode } from "react";
@@ -15,8 +15,13 @@ type Props = {
   index: number;
   accent: string;
 };
+
+/** The type of `CARD_CORNER` used by DuplicateCandidate. */
+export type DuplicateCandidateCardCornerValue = typeof CARD_CORNER;
+
 /** A candidate card's corner before the corner style scales it. */
 const CARD_CORNER = 5;
+
 /**
  * Candidate content stays intact behind the retained face, with exposed IDs.
  */
@@ -44,31 +49,16 @@ export function DuplicateCandidate({
   const { x, y, width, height, isRetained, isFolded } = layout;
   return (
     <g>
-      <StockRect
-        data-candidate-id={record.id}
-        data-group-id={group.id}
-        data-retained-id={isRetained && isFolded ? record.id : undefined}
-        x={x}
-        y={y}
-        width={width}
+      <DuplicateCandidateSurface
+        {...{ record, group, isRetained, isFolded, x, y, width }}
         height={height}
-        rx={scales.corner(CARD_CORNER)}
-        fill={tokens.color.surface}
-        stroke={isRetained ? accent : tokens.color.line}
-      />
-      <DuplicateCandidateCopy
-        input={input}
-        record={record}
-        layout={layout}
+        scales={scales}
+        cardCorner={CARD_CORNER}
+        tokens={tokens}
         accent={accent}
       />
-      <DuplicateCandidateRole
-        frame={frame}
-        input={input}
-        group={group}
-        layout={layout}
-        accent={accent}
-      />
+      <DuplicateCandidateCopy {...{ input, record, layout, accent }} />
+      <DuplicateCandidateRole {...{ frame, input, group, layout, accent }} />
     </g>
   );
 }

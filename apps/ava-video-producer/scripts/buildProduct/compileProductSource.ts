@@ -11,12 +11,14 @@ import { isProductFile } from "./isProductFile";
 import { rememberProductFile } from "./rememberProductFile";
 import type { Aliases, ImportedFiles } from "./buildProduct.types";
 import type { OnLoadArgs, OnLoadResult } from "esbuild";
-
 /** An adapter alias whose product path matches the file being loaded. */
-function _getAliasTarget(
-  file: string,
-  aliases: Readonly<Aliases>,
-): string | undefined {
+function _getAliasTarget({
+  file,
+  aliases,
+}: Readonly<{
+  file: string;
+  aliases: Readonly<Aliases>;
+}>): string | undefined {
   const match = Object.entries(aliases).find(([key]) => {
     const relative = key.startsWith("@/")
       ? `src/${key.slice(2)}`
@@ -30,12 +32,14 @@ function _getAliasTarget(
   });
   return match?.[1];
 }
-
 /** One source file as JSX-preserving JavaScript with its macros expanded. */
-async function _compileWithMacros(
-  file: string,
-  bytes: Readonly<Buffer>,
-): Promise<string> {
+async function _compileWithMacros({
+  file,
+  bytes,
+}: Readonly<{
+  file: string;
+  bytes: Readonly<Buffer>;
+}>): Promise<string> {
   // Strip types with esbuild first, then expand Lingui macros with Babel.
   const typed = await transform(bytes.toString(), {
     loader: file.endsWith("x") ? "tsx" : "ts",
@@ -53,7 +57,6 @@ async function _compileWithMacros(
   });
   return compiled?.code ?? "";
 }
-
 /**
  * Loads one product or adapter source file for the esbuild bundle, with its
  * TypeScript compiled and its Lingui macros expanded. Undefined when the
@@ -61,10 +64,16 @@ async function _compileWithMacros(
  *
  * Used by the product build's load hook for every script file it bundles.
  */
-export async function compileProductSource(
-  args: Readonly<OnLoadArgs>,
-  options: Readonly<{ aliases: Aliases; imported: ImportedFiles }>,
-): Promise<OnLoadResult | undefined> {
+export async function compileProductSource({
+  args,
+  options,
+}: Readonly<{
+  args: Readonly<OnLoadArgs>;
+  options: Readonly<{
+    aliases: Aliases;
+    imported: ImportedFiles;
+  }>;
+}>): Promise<OnLoadResult | undefined> {
   const { aliases, imported } = options;
   if (
     !isProductFile(args.path) &&
@@ -76,7 +85,10 @@ export async function compileProductSource(
   if (isProductFile(args.path)) {
     rememberProductFile({ imported, file: args.path, contents: bytes });
   }
-  const aliasTarget = _getAliasTarget(args.path, aliases);
+  const aliasTarget = _getAliasTarget({
+    file: args.path,
+    aliases,
+  });
   if (aliasTarget) {
     return {
       contents: `export * from ${JSON.stringify(path.join(PRODUCER_ROOT, aliasTarget))};`,
@@ -85,7 +97,10 @@ export async function compileProductSource(
     };
   }
   return {
-    contents: await _compileWithMacros(args.path, bytes),
+    contents: await _compileWithMacros({
+      file: args.path,
+      bytes,
+    }),
     loader: "jsx",
     resolveDir: path.dirname(args.path),
   };

@@ -1,9 +1,9 @@
 import { DatasetColumnMappingCreator } from "../../../../src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator";
 import { ManualEntryAttributesBlock } from "../../../../src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock";
 import {
-  createMappingFormFromFrame,
+  makeMappingFormFromFrame,
   MAPPING_CONCEPT_ID,
-} from "./createMappingFormFromFrame";
+} from "./makeMappingFormFromFrame";
 import type { ComponentProps, ReactNode } from "react";
 
 type Props = { frame: number };
@@ -12,7 +12,7 @@ type Props = { frame: number };
  * Unchanged mapping leaves consuming the checked frame-owned form projection.
  */
 export function MappingFields({ frame }: Props): ReactNode {
-  const projection = createMappingFormFromFrame({
+  const projection = makeMappingFormFromFrame({
     frame,
     defaultManualFieldName: "New field",
   });

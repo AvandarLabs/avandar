@@ -1,13 +1,19 @@
-/**
- * Behavioral checks preserve authored identity, exact quantities and choices.
- */
+import { WorkspaceCapacityExtensionTestState } from "./WorkspaceCapacityExtensionTestState";
+
+const {
+  render: _render,
+  getVisibleTexts: _getVisibleTexts,
+  EXCLUDED_TEXT_FIELDS,
+  assertPendingCaptionClearance: _assertPendingCaptionClearance,
+} = WorkspaceCapacityExtensionTestState;
 import assert from "node:assert/strict";
 import test from "node:test";
-import { propEq, prop } from "@avandar/utils";
-import { createElement } from "react";
-import { renderToStaticMarkup } from "react-dom/server";
+import { registerStockPresetAssertions } from "../../../../../tests/helpers/registerStockPresetAssertions";
+import { registerStockTextLayoutAssertions } from "../../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
+import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
+import { getTextEnvelopesFromMarkup } from "../../SchemaColumnEvolution/getTextEnvelopesFromMarkup";
 import { INVALID_INPUTS } from "../rejectedInputs.constants";
-import { WorkspaceCapacityExtension } from "../WorkspaceCapacityExtension";
+import { workspaceCapacityExtensionContract } from "../WorkspaceCapacityExtension.contract";
 import {
   DEFAULT_INPUT,
   MINIMUM_INPUT,
@@ -15,21 +21,8 @@ import {
   CHANGED_INPUT,
   fixtures,
 } from "../WorkspaceCapacityExtension.fixtures";
-import { inputSchema, type Input } from "../WorkspaceCapacityExtension.schema";
-
-function _render({
-  frame,
-  input = DEFAULT_INPUT,
-}: Readonly<{ frame: number; input?: typeof DEFAULT_INPUT }>): string {
-  return renderToStaticMarkup(
-    createElement(WorkspaceCapacityExtension, {
-      frame,
-      input,
-      accent: "#9fefca",
-      id: "test",
-    }),
-  );
-}
+import { inputSchema } from "../WorkspaceCapacityExtension.schema";
+import { assertExistingTabsRemainIdenticalBefore as _assertExistingTabsRemainIdenticalBefore } from "./assertExistingTabsRemainIdenticalBefore";
 
 test("the same tray preserves existing positions while only expand admits the complete request", () => {
   const before = _render({ frame: 11 });
@@ -53,37 +46,13 @@ test("complete fixture set includes minimum, dense and changed inputs before beh
   );
   assert.equal(fixtures.length, 4);
 });
+
 test("invalid structure and cross-field values are rejected", () => {
   INVALID_INPUTS.forEach((input) => {
     return assert.equal(inputSchema.safeParse(input).success, false);
   });
 });
 
-import { registerStockPresetAssertions } from "../../../../../tests/helpers/registerStockPresetAssertions";
-import { registerStockTextLayoutAssertions } from "../../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
-import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
-import { workspaceCapacityExtensionContract } from "../WorkspaceCapacityExtension.contract";
-
-function _getVisibleTexts({
-  input,
-  frame,
-}: Readonly<{ input: Input; frame: number }>): string[] {
-  const isExpanded = input.choice.decision === "expand" && frame >= 125;
-  return [
-    input.copy.workspace,
-    input.copy.capacity,
-    input.copy.retained,
-    input.copy.example,
-    ...(frame >= 51 ? [input.choice.label] : []),
-    ...(!isExpanded ? [input.copy.pending] : []),
-    ...(input.showResourceLabels
-      ? [...input.existingResources, ...input.requestedResources].map(
-          prop("label"),
-        )
-      : []),
-  ];
-}
-const EXCLUDED_TEXT_FIELDS: string[] = ["id", "decision"];
 registerStockPresetAssertions({
   inputSchema,
   defaultInput: DEFAULT_INPUT,
@@ -94,6 +63,7 @@ registerStockPresetAssertions({
   excludedTextFields: EXCLUDED_TEXT_FIELDS,
   getVisibleTexts: _getVisibleTexts,
 });
+
 registerStockTextLayoutAssertions({
   inputSchema,
   fixtures,
@@ -119,30 +89,9 @@ test("partially revealed new slots stay inside the actually extended tray", () =
     });
   });
 });
+
 test("existing tabs remain at identical positions and only complete expansion seats requests", () => {
-  const before = [
-    ..._render({ frame: 11, input: DENSE_INPUT }).matchAll(
-      /<rect data-resource-tab[^>]*>/g,
-    ),
-  ]
-    .slice(0, 6)
-    .map((match) => {
-      return match[0];
-    });
-  [50, 80, 100, 110, 124, 125, 150].forEach((frame) => {
-    return assert.deepEqual(
-      [
-        ..._render({ frame: frame, input: DENSE_INPUT }).matchAll(
-          /<rect data-resource-tab[^>]*>/g,
-        ),
-      ]
-        .slice(0, 6)
-        .map((match) => {
-          return match[0];
-        }),
-      before,
-    );
-  });
+  _assertExistingTabsRemainIdenticalBefore();
   assert.equal(
     (
       _render({ frame: 124, input: DENSE_INPUT }).match(
@@ -183,22 +132,14 @@ test("existing tabs remain at identical positions and only complete expansion se
   );
 });
 
-import { getTextEnvelopesFromMarkup } from "../../SchemaColumnEvolution/getTextEnvelopesFromMarkup";
-
 test("full resource names remain inside moving tabs and clear framing captions", () => {
   const input = {
     ...DENSE_INPUT,
     existingResources: DENSE_INPUT.existingResources.map((row) => {
-      return {
-        ...row,
-        label: "界 界界界界 界界界界界界界界界界界界界",
-      };
+      return { ...row, label: "界 界界界界 界界界界界界界界界界界界界" };
     }),
     requestedResources: DENSE_INPUT.requestedResources.map((row) => {
-      return {
-        ...row,
-        label: "界 界界界界 界界界界界界界界界界界界界",
-      };
+      return { ...row, label: "界 界界界界 界界界界界界界界界界界界界" };
     }),
   };
   [50, 80, 100, 110, 124, 125, 150].forEach((frame) => {
@@ -224,55 +165,6 @@ test("full resource names remain inside moving tabs and clear framing captions",
     });
   });
 });
-
-function _assertPendingCaptionClearance({
-  input,
-  frame,
-}: {
-  input: Input;
-  frame: number;
-}): void {
-  const markup = _render({ frame: frame, input: input });
-  const caption = getTextEnvelopesFromMarkup(markup).find(
-    propEq("label", input.copy.pending),
-  )!;
-  const tabs = [...markup.matchAll(/<rect data-resource-tab[^>]*>/g)].map(
-    (match) => {
-      return match[0];
-    },
-  );
-  const firstRequest = tabs[input.existingResources.length];
-  const requestX = SvgAttributes.getNumberFromMarkup({
-    attributes: firstRequest,
-    name: "x",
-  });
-  const requestY = SvgAttributes.getNumberFromMarkup({
-    attributes: firstRequest,
-    name: "y",
-  });
-  assert.ok(
-    caption.top >= 400,
-    "pending caption belongs below the retained tray",
-  );
-  assert.ok(
-    caption.right <= requestX - 16,
-    "pending caption sits beside requests",
-  );
-  tabs.forEach((tab) => {
-    const x = SvgAttributes.getNumberFromMarkup({ attributes: tab, name: "x" });
-    const y = SvgAttributes.getNumberFromMarkup({ attributes: tab, name: "y" });
-    assert.ok(
-      caption.right <= x ||
-        caption.x >= x + 78 ||
-        caption.bottom <= y ||
-        caption.top >= y + 132,
-      "caption clears every resource throughout seating",
-    );
-  });
-  const connector = markup.match(/<path [^>]*data-pending-link[^>]*>/)![0];
-  assert.match(connector, /stroke="#[a-fA-F0-9]+"/);
-  assert.ok(connector.includes(`V${requestY + 66} H${requestX}`));
-}
 
 test("pending caption identifies the moving request group and clears its seating path", () => {
   [12.5, 36, 50, 80, 106, 110, 120, 124.99].forEach((frame) => {

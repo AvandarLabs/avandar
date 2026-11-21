@@ -1,9 +1,9 @@
 import { propEq } from "@avandar/utils";
-import { mix, ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./ChosenServiceAccess.schema";
 import type { ReactNode } from "react";
 
@@ -13,7 +13,42 @@ type GetStaffHandOptions = {
   x: number;
   motion: VideoMotion;
 };
-type Props = { input: Input; frame: number; accent: string };
+type Props = {
+  input: Input;
+  frame: number;
+  accent: string;
+};
+
+/** The staff hand: on the moving barrier while it works, else at rest. */
+function _getStaffHand({
+  input,
+  frame,
+  x,
+  motion,
+}: Readonly<GetStaffHandOptions>): { handX: number; handY: number } {
+  const progress = motion.ramp(
+    frame,
+    44,
+    motion.scale(32),
+    motion.travel.easing,
+  );
+  const barrierX =
+    input.accessChange === "clear-entrance"
+      ? x -
+        30 +
+        motion.ramp(frame, 44, motion.scale(32), motion.travel.easing) * 94
+      : x - 42 - 58 * progress;
+  const isHandling = frame >= 44 && frame < 77;
+  return {
+    handX: isHandling ? barrierX : x + 42,
+    handY: isHandling
+      ? input.accessChange === "unfold-ramp"
+        ? Motion.mix({ t: progress, from: 246, to: 356 })
+        : 337
+      : 270,
+  };
+}
+
 /** Staff handles the selected barrier and holds its door without pushing. */
 export function ServiceStaff({
   input,
@@ -43,33 +78,4 @@ export function ServiceStaff({
       <circle data-staff-hand cx={handX} cy={handY} r={3} fill={accent} />
     </g>
   );
-}
-/** The staff hand: on the moving barrier while it works, else at rest. */
-function _getStaffHand({
-  input,
-  frame,
-  x,
-  motion,
-}: Readonly<GetStaffHandOptions>) {
-  const progress = motion.ramp(
-    frame,
-    44,
-    motion.scale(32),
-    motion.travel.easing,
-  );
-  const barrierX =
-    input.accessChange === "clear-entrance"
-      ? x -
-        30 +
-        motion.ramp(frame, 44, motion.scale(32), motion.travel.easing) * 94
-      : x - 42 - 58 * progress;
-  const isHandling = frame >= 44 && frame < 77;
-  return {
-    handX: isHandling ? barrierX : x + 42,
-    handY: isHandling
-      ? input.accessChange === "unfold-ramp"
-        ? mix(progress, 246, 356)
-        : 337
-      : 270,
-  };
 }

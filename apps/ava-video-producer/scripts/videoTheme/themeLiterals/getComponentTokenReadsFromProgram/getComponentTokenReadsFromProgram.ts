@@ -1,5 +1,15 @@
+import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { isDefined } from "@avandar/utils";
 import ts from "typescript";
+
+const VIDEO_PROPS_HOOK_FILE = fileURLToPath(
+  new URL("../../../../src/videoTheme/videoThemeHelpers.ts", import.meta.url),
+);
+
+const VIDEO_COMPONENT_TYPES_FILE = fileURLToPath(
+  new URL("../../../../src/videoTheme/videoTheme.types.ts", import.meta.url),
+);
 
 function _getLiteralFromExpression({
   expression,
@@ -66,28 +76,61 @@ function _getComponentFromType({
     ? _getLiteralFromExpression({ expression: type.indexType.literal, checker })
     : undefined;
 }
+function _getComponentFromHookOptions({
+  expression,
+  checker,
+}: Readonly<{
+  expression: ts.Expression | undefined;
+  checker: ts.TypeChecker;
+}>): string | undefined {
+  if (!expression || !ts.isObjectLiteralExpression(expression)) {
+    return undefined;
+  }
+  const name = expression.properties.find((property) => {
+    return (
+      ts.isPropertyAssignment(property) &&
+      (ts.isIdentifier(property.name) ||
+        ts.isStringLiteralLike(property.name)) &&
+      property.name.text === "name"
+    );
+  });
+  return name && ts.isPropertyAssignment(name)
+    ? _getLiteralFromExpression({ expression: name.initializer, checker })
+    : undefined;
+}
+function _isVideoPropsHook({
+  expression,
+  checker,
+}: Readonly<{
+  expression: ts.Expression;
+  checker: ts.TypeChecker;
+}>): boolean {
+  const reference = checker.getSymbolAtLocation(
+    ts.isPropertyAccessExpression(expression) ? expression.name : expression,
+  );
+  const symbol =
+    reference && reference.flags & ts.SymbolFlags.Alias
+      ? checker.getAliasedSymbol(reference)
+      : reference;
+  return (
+    symbol?.declarations?.some((declaration) => {
+      return (
+        ts.isFunctionDeclaration(declaration) &&
+        declaration.name?.text === "useVideoProps" &&
+        resolve(declaration.getSourceFile().fileName) === VIDEO_PROPS_HOOK_FILE
+      );
+    }) ?? false
+  );
+}
 function _getComponentFromHook({
   expression,
   checker,
 }: Readonly<{ expression: ts.Expression; checker: ts.TypeChecker }>):
   | string
   | undefined {
-  if (
-    !ts.isCallExpression(expression) ||
-    !ts.isIdentifier(expression.expression)
-  ) {
-    return undefined;
-  }
-  const symbol = checker.getSymbolAtLocation(expression.expression);
-  const isHook = symbol?.declarations?.some((declaration) => {
-    return (
-      ts.isImportSpecifier(declaration) &&
-      (declaration.propertyName?.text ?? declaration.name.text) ===
-        "useVideoProps"
-    );
-  });
-  return isHook
-    ? _getLiteralFromExpression({
+  return ts.isCallExpression(expression) &&
+    _isVideoPropsHook({ expression: expression.expression, checker })
+    ? _getComponentFromHookOptions({
         expression: expression.arguments[0],
         checker,
       })
@@ -155,6 +198,68 @@ function _getComponentFromSymbol({
     })
     .find(isDefined);
 }
+function _isCanonicalComponentMap({
+  symbol,
+  checker,
+}: Readonly<{
+  symbol: ts.Symbol | undefined;
+  checker: ts.TypeChecker;
+}>): boolean {
+  return (
+    symbol?.declarations?.some((declaration) => {
+      const type =
+        ts.isPropertySignature(declaration) ||
+        ts.isPropertyDeclaration(declaration) ||
+        ts.isParameter(declaration) ||
+        ts.isVariableDeclaration(declaration)
+          ? declaration.type
+          : undefined;
+      if (!type || !ts.isTypeReferenceNode(type)) {
+        return false;
+      }
+      const reference = checker.getSymbolAtLocation(type.typeName);
+      const target =
+        reference && reference.flags & ts.SymbolFlags.Alias
+          ? checker.getAliasedSymbol(reference)
+          : reference;
+      return (
+        target?.declarations?.some((candidate) => {
+          return (
+            ts.isTypeAliasDeclaration(candidate) &&
+            candidate.name.text === "ResolvedVideoComponents" &&
+            resolve(candidate.getSourceFile().fileName) ===
+              VIDEO_COMPONENT_TYPES_FILE
+          );
+        }) ?? false
+      );
+    }) ?? false
+  );
+}
+function _getComponentFromMapExpression({
+  expression,
+  checker,
+}: Readonly<{
+  expression: ts.Expression;
+  checker: ts.TypeChecker;
+}>): string | undefined {
+  if (
+    !ts.isPropertyAccessExpression(expression) &&
+    !ts.isElementAccessExpression(expression)
+  ) {
+    return undefined;
+  }
+  const component = ts.isPropertyAccessExpression(expression)
+    ? expression.name.text
+    : _getLiteralFromExpression({
+        expression: expression.argumentExpression,
+        checker,
+      });
+  const owner = expression.expression;
+  const symbol = checker.getSymbolAtLocation(
+    ts.isPropertyAccessExpression(owner) ? owner.name : owner,
+  );
+  return _isCanonicalComponentMap({ symbol, checker }) ? component : undefined;
+}
 function _getComponentFromExpression({
   expression,
   checker,
@@ -176,9 +281,11 @@ function _getComponentFromExpression({
       visited,
     });
   }
-  const hook = _getComponentFromHook({ expression, checker });
-  if (hook) {
-    return hook;
+  const directComponent =
+    _getComponentFromHook({ expression, checker }) ??
+    _getComponentFromMapExpression({ expression, checker });
+  if (directComponent) {
+    return directComponent;
   }
   const key = ts.isElementAccessExpression(expression)
     ? _getLiteralFromExpression({

@@ -1,5 +1,5 @@
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ExpectedSheet } from "./ExpectedSheet/ExpectedSheet";
 import type { Input } from "./ExpectationOverlayCheck.schema";

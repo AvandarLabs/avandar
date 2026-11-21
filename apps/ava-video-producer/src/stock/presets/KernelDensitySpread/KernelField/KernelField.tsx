@@ -1,4 +1,4 @@
-import { StockRect } from "../../../primitives/StockRect/StockRect";
+import { StockRect } from "../../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getKernelSamplesFromInput } from "../getKernelSamplesFromInput";
 import { KernelCones } from "../KernelCones/KernelCones";

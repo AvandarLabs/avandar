@@ -2,7 +2,7 @@ import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { PhysicalWaterKeys } from "./PhysicalWaterKeys";
 import { StorageBasin } from "./StorageBasin";
-import { WaterOutlets } from "./WaterOutlets";
+import { WaterOutlets } from "./WaterOutlets/WaterOutlets";
 import { WaterSpill } from "./WaterSpill";
 import type { Input } from "./StormwaterStorageSpill.schema";
 import type { ReactNode } from "react";

@@ -1,25 +1,14 @@
+import { omit } from "@avandar/utils";
 import { DEFAULT_INPUT } from "./defaultInput";
 /** Rejected structural, boundary and cross-field inputs. */
 export const invalidInputs: unknown[] = [
   {},
   { ...DEFAULT_INPUT, extra: true },
-  Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => {
-      return field !== "people";
-    }),
-  ),
+  omit(DEFAULT_INPUT, "people"),
   { ...DEFAULT_INPUT, people: { ...DEFAULT_INPUT.people, extra: true } },
-  Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => {
-      return field !== "languages";
-    }),
-  ),
+  omit(DEFAULT_INPUT, "languages"),
   { ...DEFAULT_INPUT, languages: { ...DEFAULT_INPUT.languages, extra: true } },
-  Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => {
-      return field !== "turns";
-    }),
-  ),
+  omit(DEFAULT_INPUT, "turns"),
   {
     ...DEFAULT_INPUT,
     turns: [
@@ -58,22 +47,10 @@ export const invalidInputs: unknown[] = [
     ...DEFAULT_INPUT,
     turns: [{ ...DEFAULT_INPUT.turns[0], extra: true }, DEFAULT_INPUT.turns[1]],
   },
-  Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => {
-      return field !== "labels";
-    }),
-  ),
+  omit(DEFAULT_INPUT, "labels"),
   { ...DEFAULT_INPUT, labels: { ...DEFAULT_INPUT.labels, extra: true } },
-  Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => {
-      return field !== "showSightlines";
-    }),
-  ),
-  Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => {
-      return field !== "bubbleLayout";
-    }),
-  ),
+  omit(DEFAULT_INPUT, "showSightlines"),
+  omit(DEFAULT_INPUT, "bubbleLayout"),
   {
     ...DEFAULT_INPUT,
     people: {

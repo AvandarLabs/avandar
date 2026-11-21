@@ -1,9 +1,9 @@
 import { useMemo } from "react";
 import {
-  createVideoShapeScales,
+  makeVideoShapeScalesFromSemanticTokens,
   type VideoShapeScales,
-} from "./createVideoShapeScales/createVideoShapeScales";
-import { useVideoTokens } from "./useVideoTheme";
+} from "./makeVideoShapeScalesFromSemanticTokens/makeVideoShapeScalesFromSemanticTokens";
+import { useVideoTokens } from "./videoThemeHelpers";
 
 /**
  * Line weight, corner style, and tint strength for stage components inside
@@ -13,6 +13,6 @@ import { useVideoTokens } from "./useVideoTheme";
 export function useVideoShapeScales(): VideoShapeScales {
   const { stroke, corner, alpha } = useVideoTokens();
   return useMemo(() => {
-    return createVideoShapeScales({ stroke, corner, alpha });
+    return makeVideoShapeScalesFromSemanticTokens({ stroke, corner, alpha });
   }, [stroke, corner, alpha]);
 }

@@ -1,10 +1,13 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
+
+type Props = { isAppliance: boolean };
+
 /** A dial on a returned appliance, or feet on a returned module. */
 export function ReturnedShellDetail({
   isAppliance,
-}: Readonly<{ isAppliance: boolean }>): ReactNode {
+}: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   if (isAppliance) {

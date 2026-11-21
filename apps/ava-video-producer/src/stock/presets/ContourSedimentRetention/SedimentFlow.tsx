@@ -1,11 +1,15 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { SedimentExportRibbon } from "./SedimentExportRibbon/SedimentExportRibbon";
 import { SlopeExit } from "./SlopeExit";
 import { SlopeGround } from "./SlopeGround";
 import type { Input } from "./ContourSedimentRetention.schema";
 import type { ReactNode } from "react";
 
-type Props = { input: Input; frame: number };
+type Props = {
+  input: Input;
+  frame: number;
+};
 /**
  * A persistent sediment ribbon separates behind the strip and past the exit.
  */
@@ -30,19 +34,14 @@ export function SedimentFlow({ input, frame }: Readonly<Props>): ReactNode {
       <SlopeGround />
       <rect
         data-retained-ribbon="physical"
-        x={mix(travel, 140, 510 - retainedWidth)}
-        y={mix(travel, 195, 310)}
+        x={Motion.mix({ t: travel, from: 140, to: 510 - retainedWidth })}
+        y={Motion.mix({ t: travel, from: 195, to: 310 })}
         width={retainedWidth}
-        height={mix(settle, 8, 24)}
+        height={Motion.mix({ t: settle, from: 8, to: 24 })}
         fill={tokens.color.highlight}
       />
-      <rect
-        data-exported-ribbon="physical"
-        x={frame < 70 ? mix(bypass, 300, 350) : mix(outflow, 350, 770)}
-        y={frame < 70 ? mix(bypass, 238, 350) : mix(outflow, 350, 365)}
-        width={exportedWidth}
-        height={mix(settle, 8, 24)}
-        fill={tokens.color.highlight}
+      <SedimentExportRibbon
+        {...{ frame, tokens, bypass, outflow, settle, exportedWidth }}
       />
       <SlopeExit input={input} />
     </g>

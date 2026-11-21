@@ -1,7 +1,8 @@
+import { propEq } from "@avandar/utils";
 import { FitText } from "../../primitives/FitText/FitText";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getHandoverPositionFromInputAndFrame } from "./getHandoverPositionFromInputAndFrame";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./RecipientConfirmedHandover.schema";
 import type { ReactNode } from "react";
 
@@ -65,7 +66,5 @@ function _countReceivedUnits({
         motion,
       });
     },
-  ).filter(({ travel }) => {
-    return travel === 1;
-  }).length;
+  ).filter(propEq("travel", 1)).length;
 }

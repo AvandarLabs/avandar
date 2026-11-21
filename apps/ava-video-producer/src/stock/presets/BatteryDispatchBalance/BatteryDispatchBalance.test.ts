@@ -68,6 +68,65 @@ import { batteryDispatchBalanceContract as contract } from "./BatteryDispatchBal
 import { inputSchema, SEMANTIC_RULES } from "./BatteryDispatchBalance.schema";
 import type { Input } from "./BatteryDispatchBalance.schema";
 
+function _assertFractionalStorageAcrossOrientations(
+  fractional: Readonly<Input>,
+): void {
+  [fractional, ...fixtures.map(prop("input"))].forEach((input) => {
+    ["horizontal", "vertical"].forEach((orientation) => {
+      const variant = inputSchema.parse({ ...input, orientation });
+      const final =
+        variant.battery.initialStoredKwh +
+        variant.cycle.chargeInputKwh -
+        variant.cycle.chargeLossKwh -
+        variant.cycle.deliveredKwh -
+        variant.cycle.dischargeLossKwh;
+      [24, 36, 36.5, 65.5, 66, 72, 79.5, 80, 80.5, 94, 107.5, 108, 150].forEach(
+        (frame) => {
+          const fill = SvgAttributes.fromMarker({
+            markup: _render({ frame: frame, input: variant }),
+            marker: "battery-fill",
+          });
+          const height = SvgAttributes.getNumberFromMarkup({
+              attributes: fill,
+              name: "height",
+            }),
+            y = SvgAttributes.getNumberFromMarkup({
+              attributes: fill,
+              name: "y",
+            });
+          assert.ok(height >= 0 && height <= 150);
+          assert.ok(
+            Math.abs(y + height - (orientation === "vertical" ? 355 : 380)) <
+              1e-9,
+          );
+          if (frame === 150) {
+            assert.equal(height, 150 * (final / variant.battery.capacityKwh));
+          }
+        },
+      );
+    });
+  });
+}
+
+function _assertHandStartsAwayFromDispatchButton({
+  earlier,
+  button,
+}: Readonly<{
+  earlier: ReturnType<typeof _render>;
+  button: ReturnType<typeof SvgAttributes.fromMarker>;
+}>): void {
+  assert.notEqual(
+    SvgAttributes.getNumberFromMarkup({
+      attributes: SvgAttributes.fromMarker({
+        markup: earlier,
+        marker: "dispatch-hand",
+      }),
+      name: "cx",
+    }),
+    SvgAttributes.getNumberFromMarkup({ attributes: button, name: "cx" }),
+  );
+}
+
 function _getVisibleTexts({ input }: Readonly<{ input: Input }>): string[] {
   return [
     ...Object.values(input.windows),
@@ -145,41 +204,7 @@ test("every orientation preserves exact fractional endpoints and bounded fill th
       dischargeLossKwh: 0.1,
     },
   };
-  [fractional, ...fixtures.map(prop("input"))].forEach((input) => {
-    ["horizontal", "vertical"].forEach((orientation) => {
-      const variant = inputSchema.parse({ ...input, orientation });
-      const final =
-        variant.battery.initialStoredKwh +
-        variant.cycle.chargeInputKwh -
-        variant.cycle.chargeLossKwh -
-        variant.cycle.deliveredKwh -
-        variant.cycle.dischargeLossKwh;
-      [24, 36, 36.5, 65.5, 66, 72, 79.5, 80, 80.5, 94, 107.5, 108, 150].forEach(
-        (frame) => {
-          const fill = SvgAttributes.fromMarker({
-            markup: _render({ frame: frame, input: variant }),
-            marker: "battery-fill",
-          });
-          const height = SvgAttributes.getNumberFromMarkup({
-              attributes: fill,
-              name: "height",
-            }),
-            y = SvgAttributes.getNumberFromMarkup({
-              attributes: fill,
-              name: "y",
-            });
-          assert.ok(height >= 0 && height <= 150);
-          assert.ok(
-            Math.abs(y + height - (orientation === "vertical" ? 355 : 380)) <
-              1e-9,
-          );
-          if (frame === 150) {
-            assert.equal(height, 150 * (final / variant.battery.capacityKwh));
-          }
-        },
-      );
-    });
-  });
+  _assertFractionalStorageAcrossOrientations(fractional);
 });
 test("the operator contacts the dispatch control before the delivery path advances", () => {
   const earlier = _render({ frame: 68, input: DEFAULT_INPUT }),
@@ -200,16 +225,7 @@ test("the operator contacts the dispatch control before the delivery path advanc
     SvgAttributes.getNumberFromMarkup({ attributes: hand, name: "cy" }),
     SvgAttributes.getNumberFromMarkup({ attributes: button, name: "cy" }),
   );
-  assert.notEqual(
-    SvgAttributes.getNumberFromMarkup({
-      attributes: SvgAttributes.fromMarker({
-        markup: earlier,
-        marker: "dispatch-hand",
-      }),
-      name: "cx",
-    }),
-    SvgAttributes.getNumberFromMarkup({ attributes: button, name: "cx" }),
-  );
+  _assertHandStartsAwayFromDispatchButton({ earlier, button });
   assert.equal(
     SvgAttributes.getNumberFromMarkup({
       attributes: SvgAttributes.fromMarker({

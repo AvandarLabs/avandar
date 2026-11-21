@@ -20,9 +20,7 @@ const ACTIONS = [
 ];
 const _noop = () => {};
 
-/**
- * Native toolbar actions retain their order, icons and fixture bindings.
- */
+/** Native toolbar actions retain their order, icons and fixture bindings. */
 export function ExplorerToolbarActions(): ReactNode {
   return ACTIONS.map(({ label, variant, Icon, side }) => {
     const icon = <Icon size={16} />;

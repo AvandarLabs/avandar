@@ -2,11 +2,11 @@ import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "../FractionMaterialTranslation.schema";
 import type { ReactNode } from "react";
+
+type Props = { fraction: Input["fraction"]; accent: string };
+
 /** A tick over each counted part of the fraction. */
-export function PartTicks({
-  fraction,
-  accent,
-}: Readonly<{ fraction: Input["fraction"]; accent: string }>): ReactNode {
+export function PartTicks({ fraction, accent }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   return Array.from({ length: fraction.numerator }, (_, part) => {

@@ -1,21 +1,14 @@
 import { useCallback, useMemo, useState } from "react";
 import {
   EMPTY_THEME_DRAFT,
-  isThemeDraftEmpty,
   type ThemeDraft,
-} from "../themeDraft/themeDraft";
+  ThemeDrafts,
+} from "../ThemeDrafts/ThemeDrafts";
 import {
-  readStoredThemeDraft,
-  writeStoredThemeDraft,
   type StoredThemeDraft,
-} from "../themeDraftStorage/themeDraftStorage";
-import {
-  createDiscardedRecord,
-  createEditedRecord,
-  createKeptRecord,
-  createRebasedRecord,
-  isRecordChangedOnDisk,
-} from "./storedDraftRecord/storedDraftRecord";
+  ThemeDraftStorage,
+} from "../ThemeDraftStorage/ThemeDraftStorage";
+import { StoredDraftRecords } from "./StoredDraftRecords/StoredDraftRecords";
 import type { BrowserStorage } from "./getBrowserStorage";
 
 /** One theme's persisted draft and what can be done with it. */
@@ -52,19 +45,23 @@ function useStoredDraftRecord(options: StoredDraftOptions) {
   const [state, setState] = useState(() => {
     return {
       themeId,
-      record: readStoredThemeDraft({ storage, themeId }),
+      record: ThemeDraftStorage.readStoredThemeDraft({ storage, themeId }),
     };
   });
   const record =
     state.themeId === themeId
       ? state.record
-      : readStoredThemeDraft({ storage, themeId });
+      : ThemeDraftStorage.readStoredThemeDraft({ storage, themeId });
   if (state.themeId !== themeId) {
     setState({ themeId, record });
   }
   const store = useCallback(
     (nextRecord: StoredThemeDraft) => {
-      writeStoredThemeDraft({ storage, themeId, stored: nextRecord });
+      ThemeDraftStorage.writeStoredThemeDraft({
+        storage,
+        themeId,
+        stored: nextRecord,
+      });
       setState({ themeId, record: nextRecord });
     },
     [storage, themeId],
@@ -91,7 +88,7 @@ function useStoredDraftActions(
   const setDraft = useCallback(
     (nextDraft: ThemeDraft) => {
       return store(
-        createEditedRecord({
+        StoredDraftRecords.makeEditedRecordFromDraft({
           previousHash: recordHash,
           hadEdits: isDirty,
           fileHash: baseHash,
@@ -102,12 +99,14 @@ function useStoredDraftActions(
     [store, recordHash, isDirty, baseHash],
   );
   const keepDraft = useCallback(() => {
-    return store(createKeptRecord({ fileHash: baseHash, draft }));
+    return store(
+      StoredDraftRecords.makeKeptRecordFromDraft({ fileHash: baseHash, draft }),
+    );
   }, [store, baseHash, draft]);
   const rebaseDraft = useCallback(
     (rebaseOptions: Readonly<{ baseHash: string; draft?: ThemeDraft }>) => {
       return store(
-        createRebasedRecord({
+        StoredDraftRecords.makeRebasedRecordFromDraft({
           baseHash: rebaseOptions.baseHash,
           draft: rebaseOptions.draft ?? draft,
         }),
@@ -116,7 +115,7 @@ function useStoredDraftActions(
     [store, draft],
   );
   const discard = useCallback(() => {
-    return store(createDiscardedRecord(baseHash));
+    return store(StoredDraftRecords.makeDiscardedRecordFromFileHash(baseHash));
   }, [store, baseHash]);
   return { setDraft, keepDraft, rebaseDraft, discard };
 }
@@ -133,7 +132,7 @@ export function useStoredDraft(options: StoredDraftOptions): StoredDraftState {
   const { record, store } = useStoredDraftRecord(options);
   const draft = record?.draft ?? EMPTY_THEME_DRAFT;
   const recordHash = record?.baseHash;
-  const isDirty = !isThemeDraftEmpty(draft);
+  const isDirty = !ThemeDrafts.isThemeDraftEmpty(draft);
   const { setDraft, keepDraft, rebaseDraft, discard } = useStoredDraftActions({
     store,
     draft,
@@ -141,7 +140,10 @@ export function useStoredDraft(options: StoredDraftOptions): StoredDraftState {
     recordHash,
     isDirty,
   });
-  const isChangedOnDisk = isRecordChangedOnDisk({ record, fileHash: baseHash });
+  const isChangedOnDisk = StoredDraftRecords.isRecordChangedOnDisk({
+    record,
+    fileHash: baseHash,
+  });
   return useMemo(() => {
     return {
       draft,

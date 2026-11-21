@@ -1,17 +1,46 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
-import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { makeObservationLayoutFromInput } from "./makeObservationLayoutFromInput";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import { ObservationSamplingHand } from "./ObservationSamplingHand/ObservationSamplingHand";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./EnvironmentalObservationGaps.schema";
 import type { ReactNode } from "react";
+
+type TeamPosition = {
+  x: number;
+  y: number;
+  handX: number;
+  check: ReturnType<typeof makeObservationLayoutFromInput>["checks"][number];
+  index: number;
+  reach: number;
+};
+type TeamPhases = {
+  returnProgress: number;
+  vertical: number;
+  approach: number;
+  reach: number;
+};
+
+/** Inputs for getTeamPosition. */
+type GetTeamPositionArguments = {
+  frame: number;
+  input: Input;
+  motion: VideoMotion;
+};
+
+/** Inputs for getTeamPhases. */
+type GetTeamPhasesArguments = {
+  frame: number;
+  start: number;
+  motion: VideoMotion;
+};
 
 function _getTeamPosition({
   frame,
   input,
   motion,
-}: Readonly<{ frame: number; input: Input; motion: VideoMotion }>) {
+}: Readonly<GetTeamPositionArguments>): TeamPosition | undefined {
   const { checks } = makeObservationLayoutFromInput(input);
   const index = Math.min(
     checks.length - 1,
@@ -31,13 +60,58 @@ function _getTeamPosition({
   const departureX = previous ? previous.x - 20 : 235;
   const x =
     frame < start + 4
-      ? mix(returnProgress, departureX, 235)
-      : mix(approach, 235, check.x - 20);
-  const y = mix(vertical, previous?.y ?? check.y, check.y);
-  return { x, y, handX: x + mix(reach, 6, 20), check, index, reach };
+      ? Motion.mix({ t: returnProgress, from: departureX, to: 235 })
+      : Motion.mix({ t: approach, from: 235, to: check.x - 20 });
+  const y = Motion.mix({
+    t: vertical,
+    from: previous?.y ?? check.y,
+    to: check.y,
+  });
+  return {
+    x,
+    y,
+    handX: x + Motion.mix({ t: reach, from: 6, to: 20 }),
+    check,
+    index,
+    reach,
+  };
 }
 /** Inputs for ObservationFieldTeam. */
-type Props = { frame: number; input: Input };
+type Props = {
+  frame: number;
+  input: Input;
+};
+
+/**
+ * The member's return to the band, move along it, approach to the point, and
+ * reach, each 0 to 1.
+ */
+function _getTeamPhases({
+  frame,
+  start,
+  motion,
+}: Readonly<GetTeamPhasesArguments>): TeamPhases {
+  const step = (offset: number) => {
+    return motion.ramp(
+      frame,
+      start + offset,
+      motion.press.duration,
+      motion.travel.easing,
+    );
+  };
+  return {
+    returnProgress: step(0),
+    vertical: step(4),
+    approach: step(8),
+    reach: motion.ramp(
+      frame,
+      start + 12,
+      motion.scale(2),
+      motion.travel.easing,
+    ),
+  };
+}
+
 /**
  * One team member places each point, travelling only along reserved sampling
  * bands.
@@ -69,59 +143,14 @@ export function ObservationFieldTeam({
         role="participant"
         color={tokens.color.highlight}
       />
-      <SketchedShape
-        shape={{ kind: "path", d: `M ${x + 3} ${y} L ${handX} ${y}` }}
-        profile={tokens.sketch.shape}
-        stroke={tokens.color.highlight}
-        strokeWidth={scales.stroke(tokens.stroke.default)}
-        fill="none"
+      <ObservationSamplingHand
+        {...{ atomic, tokens, scales, x, y, handX, check, reach }}
       />
-      <circle
-        data-sampling-hand="true"
-        data-target={check.id}
-        cx={handX}
-        cy={y}
-        r={2}
-        fill={tokens.color.highlight}
-      />
-      {reach > 0 ? (
-        <circle
-          cx={handX}
-          cy={y}
-          r={4 * reach}
-          fill={tokens.color.highlight}
-          fillOpacity={scales.wash(atomic.opacity["30"])}
-        />
-      ) : undefined}
     </g>
   );
 }
-/**
- * The member's return to the band, move along it, approach to the point, and
- * reach, each 0 to 1.
- */
-function _getTeamPhases({
-  frame,
-  start,
-  motion,
-}: Readonly<{ frame: number; start: number; motion: VideoMotion }>) {
-  const step = (offset: number) => {
-    return motion.ramp(
-      frame,
-      start + offset,
-      motion.press.duration,
-      motion.travel.easing,
-    );
-  };
-  return {
-    returnProgress: step(0),
-    vertical: step(4),
-    approach: step(8),
-    reach: motion.ramp(
-      frame,
-      start + 12,
-      motion.scale(2),
-      motion.travel.easing,
-    ),
-  };
-}
+
+/** Result of the authored ObservationFieldTeam calculation. */
+export type ObservationFieldTeamGetTeamPositionValue = NonNullable<
+  ReturnType<typeof _getTeamPosition>
+>;

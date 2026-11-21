@@ -1,6 +1,6 @@
 import { SegmentedControl } from "@mantine/core";
-import { useRowIssueAriaProps } from "../../RowIssueContext/RowIssueContext";
-import { formatDashPattern } from "../controlValueHelpers/controlValueHelpers";
+import { useRowIssueAriaProps } from "../../RowIssueContext/rowIssueHelpers";
+import { ControlValues } from "../ControlValues/ControlValues";
 import type { ReactNode } from "react";
 
 const DASH_PRESETS: Readonly<Record<string, readonly number[]>> = {
@@ -19,10 +19,10 @@ type Props = Readonly<{
  */
 export function DashPresets({ pattern, onChange }: Props): ReactNode {
   const issueAriaProps = useRowIssueAriaProps();
-  const patternText = formatDashPattern(pattern);
+  const patternText = ControlValues.formatDashPattern(pattern);
   const preset =
     Object.entries(DASH_PRESETS).find(([, dashes]) => {
-      return formatDashPattern(dashes) === patternText;
+      return ControlValues.formatDashPattern(dashes) === patternText;
     })?.[0] ?? "";
   return (
     <SegmentedControl

@@ -4,7 +4,7 @@ import { VideoThemeEditor } from "../../videoThemeEditor/VideoThemeEditor/VideoT
 import { useGalleryVideoTheme } from "../GalleryVideoTheme/useGalleryVideoTheme";
 import { ThemePanelHeader } from "./ThemePanelHeader";
 import css from "./VideoThemePanel.module.css";
-import type { ThemeEditScope } from "../../videoThemeEditor/themeDraft/themeDraft";
+import type { ThemeEditScope } from "../../videoThemeEditor/ThemeDrafts/ThemeDrafts";
 import type { EditorItem } from "../../videoThemeEditor/VideoThemeEditor/EditorToolbar/EditorToolbar";
 import type { ReactNode } from "react";
 

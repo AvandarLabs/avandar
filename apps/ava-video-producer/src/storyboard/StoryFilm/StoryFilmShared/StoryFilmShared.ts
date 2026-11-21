@@ -1,19 +1,19 @@
-import { captionBand } from "../../../scenes/layout/layout";
-import {
-  durationInFrames,
-  timeline,
-  type Storyboard,
-} from "../../schema/schema";
+import { CaptionLayout } from "../../../scenes/layout/CaptionLayout";
+import { type Storyboard } from "../../schema/schema";
+import { StoryboardTimeline } from "../../schema/StoryboardTimeline";
 import { getShotTransitionLayers } from "../getShotTransitionLayers/getShotTransitionLayers";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 
 const OUTGOING_BLUR_ID = "story-film-outgoing-blur";
 /** The shot playing at `frame`, and the one before it, if any. */
 function _findShotsAtFrame({
   plan,
   frame,
-}: Readonly<{ plan: Storyboard; frame: number }>) {
-  const shots = timeline(plan);
+}: Readonly<{
+  plan: Storyboard;
+  frame: number;
+}>) {
+  const shots = StoryboardTimeline.timeline(plan);
   const index = Math.max(
     0,
     shots.findIndex((shot) => {
@@ -33,7 +33,11 @@ function _getShotLayersAtFrame({
   plan,
   frame,
   motion,
-}: Readonly<{ plan: Storyboard; frame: number; motion: VideoMotion }>) {
+}: Readonly<{
+  plan: Storyboard;
+  frame: number;
+  motion: VideoMotion;
+}>) {
   const { shot, previous } = _findShotsAtFrame({ plan, frame });
   const localFrame = frame - shot.startFrame;
   const layers = getShotTransitionLayers({
@@ -54,11 +58,15 @@ function _getLoopOutOpacity({
   plan,
   frame,
   motion,
-}: Readonly<{ plan: Storyboard; frame: number; motion: VideoMotion }>): number {
+}: Readonly<{
+  plan: Storyboard;
+  frame: number;
+  motion: VideoMotion;
+}>): number {
   if (plan.purpose !== "loop") {
     return 1;
   }
-  const total = durationInFrames(plan);
+  const total = StoryboardTimeline.durationInFrames(plan);
   const loopFade = motion.loopFade.film;
   return (
     1 - motion.ramp(frame, total - loopFade, loopFade, motion.dissolve.easing)
@@ -85,7 +93,13 @@ export const StoryFilmShared = {
   getSceneHeight: (plan: Storyboard): number => {
     return (
       plan.height -
-      (plan.captions ? captionBand(plan.narration, plan.width, plan.height) : 0)
+      (plan.captions
+        ? CaptionLayout.captionBand({
+            cues: plan.narration,
+            width: plan.width,
+            height: plan.height,
+          })
+        : 0)
     );
   },
   /** SVG filter id shared by the outgoing shot and its horizontal blur. */

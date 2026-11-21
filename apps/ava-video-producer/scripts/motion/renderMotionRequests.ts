@@ -1,10 +1,10 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { propEq } from "@avandar/utils";
-import { STOCK_LOOP_FRAMES, STOCK_FPS } from "../../src/stock/catalog";
-import { makeResolvedVideoThemeFromSnapshot } from "../../src/videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
+import { STOCK_LOOP_FRAMES, STOCK_FPS } from "../../src/stock/stockEntry";
+import { VideoThemeSnapshots } from "../../src/videoTheme/VideoThemeSnapshots/VideoThemeSnapshots";
 import { getSha256FromFile } from "../lib/getSha256FromFile";
-import { run, probe } from "../lib/mediaHelpers";
+import { MediaHelpers } from "../lib/MediaHelpers/MediaHelpers";
 import { ensureDirectory } from "../lib/planHelpers/planHelpers";
 import {
   type StockFingerprint,
@@ -14,6 +14,34 @@ import { makeFreshMotionDirectory } from "./makeFreshMotionDirectory";
 import { ROOT } from "./motion.constants";
 import type { MotionRequest } from "../MotionRequests/MotionRequests";
 
+async function _renderAndCheckStock({
+  motionRequest,
+  directory,
+  publicDirectory,
+}: Readonly<{
+  motionRequest: MotionRequest;
+  directory: string;
+  publicDirectory: string;
+}>): Promise<{
+  video: string;
+  info: Awaited<ReturnType<typeof _checkStockVideo>>;
+}> {
+  const { entry } = motionRequest;
+  const output = await _renderStock({
+    motionRequest,
+    options: {
+      directory,
+      publicDirectory: publicDirectory,
+    },
+  });
+  await fs.writeFile(path.join(directory, "render.log"), output);
+  const video = path.join(directory, `${entry.id}.mp4`);
+  const info = await _checkStockVideo({
+    video,
+    presetId: entry.id,
+  });
+  return { video, info };
+}
 /** What `_writeDeliveryRecord` needs to describe one delivered preset. */
 type StockDelivery = {
   motionRequest: MotionRequest;
@@ -22,25 +50,30 @@ type StockDelivery = {
   video: string;
   seconds: number;
 };
-
 /** Runs `render.sh` for one preset into `directory`; returns its log. */
-async function _renderStock(
-  motionRequest: Readonly<MotionRequest>,
-  options: Readonly<{ directory: string; publicDirectory: string }>,
-): Promise<string> {
+async function _renderStock({
+  motionRequest,
+  options,
+}: Readonly<{
+  motionRequest: Readonly<MotionRequest>;
+  options: Readonly<{
+    directory: string;
+    publicDirectory: string;
+  }>;
+}>): Promise<string> {
   const propsFile = path.join(options.directory, "inputs.json");
   await fs.writeFile(
     propsFile,
     JSON.stringify({ ...motionRequest.request, theme: motionRequest.theme }),
   );
-  return run(
-    "sh",
-    [
+  return MediaHelpers.run({
+    command: "sh",
+    args: [
       path.join(ROOT, "scripts/render.sh"),
       `stock-${motionRequest.entry.id}`,
       "90",
     ],
-    {
+    options: {
       quiet: true,
       cwd: ROOT,
       env: {
@@ -55,15 +88,17 @@ async function _renderStock(
         RENDER_PUBLIC_DIR: options.publicDirectory,
       },
     },
-  );
+  });
 }
-
 /** Probes a stock render, refusing anything but a 6 s 1280x800 30 fps loop. */
-async function _checkStockVideo(
-  video: string,
-  presetId: string,
-): Promise<Awaited<ReturnType<typeof probe>>> {
-  const info = await probe(video);
+async function _checkStockVideo({
+  video,
+  presetId,
+}: Readonly<{
+  video: string;
+  presetId: string;
+}>): Promise<Awaited<ReturnType<typeof MediaHelpers.probe>>> {
+  const info = await MediaHelpers.probe(video);
   const stream = info.streams.find(propEq("codec_type", "video"));
   if (
     info.duration !== 6 ||
@@ -76,7 +111,6 @@ async function _checkStockVideo(
   }
   return info;
 }
-
 /** Backs up the preset's current delivery, then copies in the new render. */
 async function _replaceDelivery(
   options: Readonly<{
@@ -87,10 +121,10 @@ async function _replaceDelivery(
 ): Promise<void> {
   const { presetId, directory, destination } = options;
   // Existing delivery files stay recoverable even when rerendering one preset.
-  const backup = await ensureDirectory(
-    ROOT,
-    `out/motion/backups/${presetId}-${Date.now()}`,
-  );
+  const backup = await ensureDirectory({
+    root: ROOT,
+    relative: `out/motion/backups/${presetId}-${Date.now()}`,
+  });
   for (const suffix of [".mp4", "-poster.jpg", ".json"]) {
     const deliveredFile = path.join(destination, `${presetId}${suffix}`);
     try {
@@ -113,7 +147,6 @@ async function _replaceDelivery(
     );
   }
 }
-
 /** Writes the delivery record beside a preset's delivered video. */
 async function _writeDeliveryRecord(
   options: Readonly<StockDelivery>,
@@ -125,7 +158,10 @@ async function _writeDeliveryRecord(
     fingerprint,
     request,
     themeId: theme.themeId,
-    themeHash: makeResolvedVideoThemeFromSnapshot(theme, [entry.id]).hash,
+    themeHash: VideoThemeSnapshots.toResolvedTheme({
+      snapshot: theme,
+      overrideIds: [entry.id],
+    }).hash,
     frames: STOCK_LOOP_FRAMES,
     fps: STOCK_FPS,
     width: 1280,
@@ -144,16 +180,18 @@ async function _writeDeliveryRecord(
     `${JSON.stringify(record, null, 2)}\n`,
   );
 }
-
 /** Renders, gates, and delivers one preset under `out/motion/deliveries/`. */
-async function _renderRequest(
-  motionRequest: Readonly<MotionRequest>,
+async function _renderRequest({
+  motionRequest,
+  options,
+}: Readonly<{
+  motionRequest: Readonly<MotionRequest>;
   options: Readonly<{
     digest: string;
     destination: string;
     publicDirectory: string;
-  }>,
-): Promise<void> {
+  }>;
+}>): Promise<void> {
   const { entry, request, sourceHash } = motionRequest;
   const sourceCheck = { root: ROOT, sourceHash: options.digest };
   await StockFingerprintModule.verifySources(sourceCheck);
@@ -165,13 +203,11 @@ async function _renderRequest(
   const directory = await makeFreshMotionDirectory(
     `render/${entry.id}/${fingerprint.configurationHash}`,
   );
-  const output = await _renderStock(motionRequest, {
+  const { video, info } = await _renderAndCheckStock({
+    motionRequest,
     directory,
     publicDirectory: options.publicDirectory,
   });
-  await fs.writeFile(path.join(directory, "render.log"), output);
-  const video = path.join(directory, `${entry.id}.mp4`);
-  const info = await _checkStockVideo(video, entry.id);
   await StockFingerprintModule.verifySources(sourceCheck);
   const { destination } = options;
   await _replaceDelivery({ presetId: entry.id, directory, destination });
@@ -185,7 +221,6 @@ async function _renderRequest(
   console.log(`Rendered and gated: ${entry.id}`);
   await fs.rm(path.join(directory, `${entry.id}-frames`), { recursive: true });
 }
-
 /**
  * Renders, gates, and delivers every request one at a time under
  * `out/motion/deliveries/`, after checking that each has a current preview.
@@ -208,17 +243,23 @@ export async function renderMotionRequests(
       });
     }),
   );
-  const destination = await ensureDirectory(ROOT, "out/motion/deliveries");
-  const publicDirectory = await ensureDirectory(
-    ROOT,
-    "out/motion/empty-public",
-  );
+  const destination = await ensureDirectory({
+    root: ROOT,
+    relative: "out/motion/deliveries",
+  });
+  const publicDirectory = await ensureDirectory({
+    root: ROOT,
+    relative: "out/motion/empty-public",
+  });
   // Renders are serial: Remotion renders run with concurrency 1.
   for (const motionRequest of requests) {
-    await _renderRequest(motionRequest, {
-      digest,
-      destination,
-      publicDirectory,
+    await _renderRequest({
+      motionRequest,
+      options: {
+        digest,
+        destination,
+        publicDirectory,
+      },
     });
   }
 }

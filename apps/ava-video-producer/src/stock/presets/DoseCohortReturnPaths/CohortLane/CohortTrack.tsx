@@ -1,8 +1,11 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
+
+type Props = { y: number };
+
 /** The participant's dashed track across the visits. */
-export function CohortTrack({ y }: Readonly<{ y: number }>): ReactNode {
+export function CohortTrack({ y }: Readonly<Props>): ReactNode {
   const { atomic } = GraphicThemeHooks.useGraphicTheme();
   const tokens = GraphicThemeHooks.useGraphicTokens();
   return (

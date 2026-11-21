@@ -1,13 +1,40 @@
-import { mix } from "../../../../motion";
+import { Motion } from "../../../../motion";
 import { PersonGlyph } from "../../../primitives/PersonGlyph/PersonGlyph";
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { PlannerHand } from "./PlannerHand";
-import type { VideoMotion } from "../../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "../AquiferAllocationBalance.schema";
 import type { ReactNode } from "react";
+/** Inputs for getPlannerReach. */
+type GetPlannerReachArguments = {
+  frame: number;
+  input: Input;
+  motion: VideoMotion;
+};
+
 /** Inputs for AllocationPlanner. */
-type Props = { frame: number; accent: string; input: Input };
+type Props = {
+  frame: number;
+  accent: string;
+  input: Input;
+};
+
+/** Where the approval knob is set and how far the planner's hand reaches. */
+function _getPlannerReach({
+  frame,
+  input,
+  motion,
+}: Readonly<GetPlannerReachArguments>): { knobX: number; handX: number } {
+  const reach = motion.ramp(frame, 28, motion.whip, motion.travel.easing),
+    set = motion.ramp(frame, 36, motion.scale(14), motion.travel.easing);
+  const share = input.flows.requestedWithdrawalM3
+    ? input.flows.approvedWithdrawalM3 / input.flows.requestedWithdrawalM3
+    : 0;
+  const knobX = 220 + 100 * share * set;
+  return { knobX, handX: Motion.mix({ t: reach, from: 190, to: knobX }) };
+}
+
 /**
  * The planner takes hold of the approval control and sets the supplied amount.
  */
@@ -45,18 +72,4 @@ export function AllocationPlanner({
       <PlannerHand handX={handX} />
     </g>
   );
-}
-/** Where the approval knob is set and how far the planner's hand reaches. */
-function _getPlannerReach({
-  frame,
-  input,
-  motion,
-}: Readonly<{ frame: number; input: Input; motion: VideoMotion }>) {
-  const reach = motion.ramp(frame, 28, motion.whip, motion.travel.easing),
-    set = motion.ramp(frame, 36, motion.scale(14), motion.travel.easing);
-  const share = input.flows.requestedWithdrawalM3
-    ? input.flows.approvedWithdrawalM3 / input.flows.requestedWithdrawalM3
-    : 0;
-  const knobX = 220 + 100 * share * set;
-  return { knobX, handX: mix(reach, 190, knobX) };
 }

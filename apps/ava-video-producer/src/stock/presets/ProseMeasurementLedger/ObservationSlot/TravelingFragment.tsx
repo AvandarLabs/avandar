@@ -3,12 +3,13 @@ import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicTheme
 import { getObservationSlotFromFrame } from "../getObservationSlotFromFrame";
 import { roleMessages } from "../ProseMeasurementLedger.controls";
 import type { ReactNode } from "react";
-/** The selected text on its way to the slot, with its role's caption. */
-export function TravelingFragment({
-  scene,
-}: Readonly<{
+
+type Props = {
   scene: ReturnType<typeof getObservationSlotFromFrame>;
-}>): ReactNode {
+};
+
+/** The selected text on its way to the slot, with its role's caption. */
+export function TravelingFragment({ scene }: Readonly<Props>): ReactNode {
   const { atomic } = GraphicThemeHooks.useGraphicTheme();
   const tokens = GraphicThemeHooks.useGraphicTokens();
   return (

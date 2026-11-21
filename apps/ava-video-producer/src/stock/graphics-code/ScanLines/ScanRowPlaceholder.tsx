@@ -2,11 +2,11 @@ import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ScanLinesShared } from "./ScanLinesShared/ScanLinesShared";
 import type { ReactNode } from "react";
+
+type Props = { y: number; index: number };
+
 /** Two sketched placeholder values, their lengths varied by row. */
-export function ScanRowPlaceholder({
-  y,
-  index,
-}: Readonly<{ y: number; index: number }>): ReactNode {
+export function ScanRowPlaceholder({ y, index }: Readonly<Props>): ReactNode {
   const { atomic } = GraphicThemeHooks.useGraphicTheme();
   const { color, sketch } = GraphicThemeHooks.useGraphicTokens();
   const shapes = GraphicThemeHooks.useGraphicShapeScales();

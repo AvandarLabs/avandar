@@ -1,11 +1,11 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
+
+type Props = { x: number; y: number };
+
 /** The practice desk, moving aside with the practice sheet. */
-export function PracticeDesk({
-  x,
-  y,
-}: Readonly<{ x: number; y: number }>): ReactNode {
+export function PracticeDesk({ x, y }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (

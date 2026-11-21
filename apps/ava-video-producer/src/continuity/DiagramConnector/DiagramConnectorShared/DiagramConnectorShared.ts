@@ -15,7 +15,10 @@ function _buildConnectorPath({
 }>): string {
   return `M ${source.x + source.width / 2} ${source.y + source.height / 2} Q ${target.x} ${source.y + source.height / 2} ${target.x + bend.bend} ${target.y + bend.drop}`;
 }
-/** Shared values and calculations for the DiagramConnector visuals. */
+/**
+ * Connector path geometry used by DiagramConnector to join its source and
+ * target.
+ */
 export const DiagramConnectorShared = {
   /** A curve from the source's centre to the active diagram's target. */
   buildConnectorPath: _buildConnectorPath,

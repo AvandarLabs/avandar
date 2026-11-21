@@ -1,4 +1,4 @@
-import { ramp } from "../../../../motion";
+import { Motion } from "../../../../motion";
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ExceptionCondition } from "../ExceptionCondition";
@@ -21,7 +21,12 @@ export function ExceptionRoute({
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   const motion = GraphicThemeHooks.useGraphicMotion();
   const targetY = input.detourSide === "above" ? 180 : 420;
-  const reveal = ramp(frame, 48, motion.hero, motion.reveal.easing);
+  const reveal = Motion.ramp({
+    frame,
+    at: 48,
+    dur: motion.hero,
+    easing: motion.reveal.easing,
+  });
   const path = `M420 300 C560 300 540 ${targetY} 670 ${targetY}`;
   return (
     <g opacity={reveal}>
@@ -37,12 +42,12 @@ export function ExceptionRoute({
           strokeDashoffset={
             ROUTE_LENGTH *
             (1 -
-              ramp(
+              Motion.ramp({
                 frame,
-                DETOUR_CUE,
-                motion.scale(DETOUR_FRAMES),
-                motion.entrance.easing,
-              ))
+                at: DETOUR_CUE,
+                dur: motion.scale(DETOUR_FRAMES),
+                easing: motion.entrance.easing,
+              }))
           }
         />
       </g>

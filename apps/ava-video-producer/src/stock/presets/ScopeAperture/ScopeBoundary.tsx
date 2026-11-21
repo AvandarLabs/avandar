@@ -1,16 +1,55 @@
-import { mix } from "../../../motion";
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { Motion } from "../../../motion";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { FocusedQuestion } from "./FocusedQuestion";
 import { OutsideCaption } from "./OutsideCaption";
 import { ScopeHeading } from "./ScopeHeading";
 import type { Props } from "./ScopeAperture";
 import type { ReactNode } from "react";
+
+type GetScopeBoundaryBoundsOptions = { contraction: number };
+
+type GetScopeBoundaryBoundsResult = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
 /**
- * The aperture draws on as one dash over an outline normalised to this
- * length, so it is geometry, not a theme dash.
+ * The aperture draws on as one dash over an outline normalised to this length,
+ * so it is geometry, not a theme dash.
  */
 const DRAW_ON_LENGTH = 1;
+
+/** Samples the authored scope boundary drawing bounds. */
+function _getScopeBoundaryBounds(
+  contraction: Readonly<Readonly<GetScopeBoundaryBoundsOptions>["contraction"]>,
+): GetScopeBoundaryBoundsResult {
+  return {
+    x: Motion.mix({
+      t: contraction,
+      from: 60,
+      to: 240,
+    }),
+    y: Motion.mix({
+      t: contraction,
+      from: 140,
+      to: 150,
+    }),
+    width: Motion.mix({
+      t: contraction,
+      from: 840,
+      to: 480,
+    }),
+    height: Motion.mix({
+      t: contraction,
+      from: 380,
+      to: 360,
+    }),
+  };
+}
+
 /** The full-field frame contracts around one explicitly authored question. */
 export function ScopeBoundary({
   frame,
@@ -31,10 +70,8 @@ export function ScopeBoundary({
       <ScopeHeading {...{ frame, input, accent, id: "heading" }} />
       <StockRect
         data-aperture="true"
-        x={mix(contraction, 60, 240)}
-        y={mix(contraction, 140, 150)}
-        width={mix(contraction, 840, 480)}
-        height={mix(contraction, 380, 360)}
+        {..._getScopeBoundaryBounds(contraction)}
+
         rx={scales.corner(tokens.corner.cell)}
         fill="none"
         stroke={accent}

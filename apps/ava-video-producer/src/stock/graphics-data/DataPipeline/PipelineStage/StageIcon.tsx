@@ -4,10 +4,17 @@ import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicTheme
 import type { ReactNode } from "react";
 
 const ICON_Y = 284;
-type Props = Readonly<{ x: number; accent: string; active: number }>;
+type Props = Readonly<{
+  x: number;
+  accent: string;
+  active: number;
+}>;
 /** The stage's ring icon, a check that fades in and a dot that fades out. */
 export function StageIcon({ x, accent, active }: Props): ReactNode {
-  const style = GraphicThemeHooks.useGraphicProps("DataPipeline", {});
+  const style = GraphicThemeHooks.useGraphicProps({
+    name: "DataPipeline",
+    props: {},
+  });
   const { sketch } = GraphicThemeHooks.useGraphicTokens();
   const shapes = GraphicThemeHooks.useGraphicShapeScales();
   return (

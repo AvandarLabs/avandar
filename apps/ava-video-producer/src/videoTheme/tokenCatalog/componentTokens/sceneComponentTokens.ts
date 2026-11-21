@@ -1,17 +1,14 @@
-import { token } from "../defineTokensHelpers";
-import {
-  createAlphaToken,
-  createColorToken,
-  createEasingToken,
-  createLengthToken,
-  createStrokeToken,
-} from "./componentTokenHelpers";
+import { TokenDefinitions } from "../TokenDefinitions";
+import { ComponentTokenDefinitions } from "./ComponentTokenDefinitions";
 
 function _degrees({
   label,
   description,
-}: Readonly<{ label: string; description: string }>) {
-  return token({
+}: Readonly<{
+  label: string;
+  description: string;
+}>) {
+  return TokenDefinitions.token({
     kind: "number",
     surface: "stage",
     unit: "deg",
@@ -25,8 +22,11 @@ function _degrees({
 function _perspective({
   label,
   description,
-}: Readonly<{ label: string; description: string }>) {
-  return token({
+}: Readonly<{
+  label: string;
+  description: string;
+}>) {
+  return TokenDefinitions.token({
     kind: "number",
     surface: "stage",
     unit: "px",
@@ -40,8 +40,11 @@ function _perspective({
 function _blur({
   label,
   description,
-}: Readonly<{ label: string; description: string }>) {
-  return token({
+}: Readonly<{
+  label: string;
+  description: string;
+}>) {
+  return TokenDefinitions.token({
     kind: "length",
     surface: "stage",
     unit: "px",
@@ -55,8 +58,11 @@ function _blur({
 function _fraction({
   label,
   description,
-}: Readonly<{ label: string; description: string }>) {
-  return token({
+}: Readonly<{
+  label: string;
+  description: string;
+}>) {
+  return TokenDefinitions.token({
     kind: "number",
     surface: "stage",
     min: 0,
@@ -72,6 +78,19 @@ function _fraction({
  * and the product orb.
  */
 export const SCENE_COMPONENT_TOKENS = {
+  BarComparison: {
+    unitScale: TokenDefinitions.token({
+      kind: "number",
+      surface: "stage",
+      unit: "×",
+      min: 0,
+      max: 1,
+      step: 0.01,
+      label: "Hero unit size",
+      description:
+        "The unit's font size relative to its bar comparison figure.",
+    }),
+  },
   WindowTilt: {
     perspective: _perspective({
       label: "Window perspective",
@@ -117,11 +136,11 @@ export const SCENE_COMPONENT_TOKENS = {
       description:
         "The nearly edge-on turn a joined card starts its flip from.",
     }),
-    chromeRadius: createLengthToken(
-      "Window corner",
-      "Corner radius of a tilted window's chrome.",
-      "stage",
-    ),
+    chromeRadius: ComponentTokenDefinitions.makeLengthToken({
+      label: "Window corner",
+      description: "Corner radius of a tilted window's chrome.",
+      surface: "stage",
+    }),
     titlebarHeight: _fraction({
       label: "Titlebar height",
       description:
@@ -148,7 +167,7 @@ export const SCENE_COMPONENT_TOKENS = {
     }),
   },
   BrandLockup: {
-    flightTilt: token({
+    flightTilt: TokenDefinitions.token({
       kind: "number",
       surface: "stage",
       unit: "deg",
@@ -159,7 +178,7 @@ export const SCENE_COMPONENT_TOKENS = {
       description:
         "Largest rotation of the flying columns, at the middle of a fly-through.",
     }),
-    columnStagger: token({
+    columnStagger: TokenDefinitions.token({
       kind: "number",
       surface: "stage",
       unit: "frames",
@@ -176,7 +195,7 @@ export const SCENE_COMPONENT_TOKENS = {
     }),
   },
   Cursor: {
-    scale: token({
+    scale: TokenDefinitions.token({
       kind: "number",
       surface: "stage",
       unit: "×",
@@ -187,7 +206,7 @@ export const SCENE_COMPONENT_TOKENS = {
       description:
         "How large the pointer draws. Measured hotspots scale with it.",
     }),
-    pressDepth: token({
+    pressDepth: TokenDefinitions.token({
       kind: "number",
       surface: "stage",
       min: 0,
@@ -196,38 +215,40 @@ export const SCENE_COMPONENT_TOKENS = {
       label: "Cursor press depth",
       description: "How far the pointer shrinks on a click.",
     }),
-    trailAlpha: createAlphaToken(
-      "Cursor trail",
-      "Opacity of each motion-blur sample trailing a moving pointer.",
-      "stage",
-    ),
-    trailLimit: createLengthToken(
-      "Cursor trail length",
-      "The farthest a trailing sample may sit behind the pointer.",
-      "stage",
-    ),
-    shadow: token({
+    trailAlpha: ComponentTokenDefinitions.makeAlphaToken({
+      label: "Cursor trail",
+      description:
+        "Opacity of each motion-blur sample trailing a moving pointer.",
+      surface: "stage",
+    }),
+    trailLimit: ComponentTokenDefinitions.makeLengthToken({
+      label: "Cursor trail length",
+      description: "The farthest a trailing sample may sit behind the pointer.",
+      surface: "stage",
+    }),
+    shadow: TokenDefinitions.token({
       kind: "elevation",
       surface: "stage",
       label: "Cursor shadow",
       description: "The drop shadow under the pointer.",
     }),
-    travelEasing: createEasingToken(
-      "Cursor travel curve",
-      "How the pointer accelerates and settles between two positions.",
-      "stage",
-    ),
+    travelEasing: ComponentTokenDefinitions.makeEasingToken({
+      label: "Cursor travel curve",
+      description:
+        "How the pointer accelerates and settles between two positions.",
+      surface: "stage",
+    }),
   },
   Orb: {
-    ringWidth: createStrokeToken(
-      "Orb ring",
-      "Width of the soft ring around the product orb.",
-      "stage",
-    ),
-    ringColor: createColorToken(
-      "Orb ring colour",
-      "Colour of the soft ring around the product orb.",
-      "stage",
-    ),
+    ringWidth: ComponentTokenDefinitions.makeStrokeToken({
+      label: "Orb ring",
+      description: "Width of the soft ring around the product orb.",
+      surface: "stage",
+    }),
+    ringColor: ComponentTokenDefinitions.makeColorToken({
+      label: "Orb ring colour",
+      description: "Colour of the soft ring around the product orb.",
+      surface: "stage",
+    }),
   },
 } as const;

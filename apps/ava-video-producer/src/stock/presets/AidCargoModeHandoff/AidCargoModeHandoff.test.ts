@@ -25,7 +25,7 @@ function _render({
     }),
   );
 }
-test("The exact parcel identities and counts survive every carrier transfer; a parcel occupies one carrier or transfer mechanism at a time without duplication.", () => {
+test("changed handoff input renders two parcels with local ownership at the hold frame", () => {
   const markup = _render({ frame: 150, input: changedInput });
   assert.equal((markup.match(/data-parcel=/g) ?? []).length, 2);
   assert.match(markup, /data-owner="local"/);
@@ -34,6 +34,49 @@ test("The exact parcel identities and counts survive every carrier transfer; a p
 import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { aidCargoModeHandoffContract } from "./AidCargoModeHandoff.contract";
+
+function _assertLoadedCarrierTravel(
+  input: (typeof fixtures)[number]["input"],
+): void {
+  input.carriers.slice(1).forEach((carrier, offset) => {
+    const index = offset + 1;
+    const isMiddle = index < input.carriers.length - 1;
+    const start = index === 1 ? 66 : 112;
+    const end = isMiddle ? 80 : index === 1 ? 96 : 132;
+    const centers = Array.from({ length: end - start + 1 }, (_, step) => {
+      return start + step;
+    }).map((frame) => {
+      const markup = _render({ frame: frame, input: input });
+      const vehicle = [
+        ...markup.matchAll(/<g data-carrier="([^"]*)"[^>]*>/g),
+      ].find((match) => {
+        return match[1] === carrier.id;
+      });
+      assert.ok(vehicle);
+      const center = _getParcelCoordinate({
+        attributes: vehicle[0],
+        axis: "x",
+      });
+      const parcels = [...markup.matchAll(/<g data-parcel="[^"]*"[^>]*>/g)];
+      parcels.forEach(([attributes], parcelIndex) => {
+        assert.ok(attributes.includes(`data-owner="${carrier.id}"`));
+        assert.ok(
+          Math.abs(
+            _getParcelCoordinate({ attributes, axis: "x" }) -
+              center -
+              (parcelIndex - (input.parcels.length - 1) / 2) * 42,
+          ) < 0.000001,
+        );
+        assert.equal(_getParcelCoordinate({ attributes, axis: "y" }), 300);
+      });
+      return center;
+    });
+    assert.ok(
+      centers[centers.length - 1] - centers[0] >= 50,
+      "the loaded carrier must advance before unloading",
+    );
+  });
+}
 
 function _getVisibleTexts({ input }: Readonly<{ input: Input }>): string[] {
   return [
@@ -161,44 +204,7 @@ test("load and carrier collection bounds reject extra objects and incomplete par
 
 test("each loaded carrier advances with an attached intact load before the next handoff", () => {
   fixtures.forEach(({ input }) => {
-    input.carriers.slice(1).forEach((carrier, offset) => {
-      const index = offset + 1;
-      const isMiddle = index < input.carriers.length - 1;
-      const start = index === 1 ? 66 : 112;
-      const end = isMiddle ? 80 : index === 1 ? 96 : 132;
-      const centers = Array.from({ length: end - start + 1 }, (_, step) => {
-        return start + step;
-      }).map((frame) => {
-        const markup = _render({ frame: frame, input: input });
-        const vehicle = [
-          ...markup.matchAll(/<g data-carrier="([^"]*)"[^>]*>/g),
-        ].find((match) => {
-          return match[1] === carrier.id;
-        });
-        assert.ok(vehicle);
-        const center = _getParcelCoordinate({
-          attributes: vehicle[0],
-          axis: "x",
-        });
-        const parcels = [...markup.matchAll(/<g data-parcel="[^"]*"[^>]*>/g)];
-        parcels.forEach(([attributes], parcelIndex) => {
-          assert.ok(attributes.includes(`data-owner="${carrier.id}"`));
-          assert.ok(
-            Math.abs(
-              _getParcelCoordinate({ attributes, axis: "x" }) -
-                center -
-                (parcelIndex - (input.parcels.length - 1) / 2) * 42,
-            ) < 0.000001,
-          );
-          assert.equal(_getParcelCoordinate({ attributes, axis: "y" }), 300);
-        });
-        return center;
-      });
-      assert.ok(
-        centers[centers.length - 1] - centers[0] >= 50,
-        "the loaded carrier must advance before unloading",
-      );
-    });
+    _assertLoadedCarrierTravel(input);
     const first = [112, 150].map((frame) => {
       return [
         ..._render({ frame: frame, input: input }).matchAll(

@@ -1,4 +1,4 @@
-import { mix, ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
@@ -13,18 +13,22 @@ export function ArgumentConclusion({
 }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const motion = GraphicThemeHooks.useGraphicMotion();
-  const conclusion = ramp(
+  const conclusion = Motion.ramp({
     frame,
-    84,
-    motion.scale(RISE_FRAMES),
-    motion.travel.easing,
-  );
+    at: 84,
+    dur: motion.scale(RISE_FRAMES),
+    easing: motion.travel.easing,
+  });
   return (
     <>
       <g
         data-conclusion="true"
         opacity={conclusion}
-        transform={`translate(0 ${mix(conclusion, 18, 0)})`}
+        transform={`translate(0 ${Motion.mix({
+          t: conclusion,
+          from: 18,
+          to: 0,
+        })})`}
       >
         <FitText
           text={input.conclusion}

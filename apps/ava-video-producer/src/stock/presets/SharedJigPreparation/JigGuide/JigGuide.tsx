@@ -1,7 +1,7 @@
 import { FitText } from "../../../primitives/FitText/FitText";
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { JigPattern } from "../JigPattern";
+import { JigPattern } from "../JigPattern/JigPattern";
 import { GuideCarryArm } from "./GuideCarryArm";
 import type { getJigSceneFromFrame } from "../getJigSceneFromFrame";
 import type { Input } from "../SharedJigPreparation.schema";

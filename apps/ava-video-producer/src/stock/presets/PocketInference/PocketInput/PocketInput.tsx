@@ -1,20 +1,27 @@
-import { mix } from "../../../../motion";
+import { Motion } from "../../../../motion";
 import { FitText } from "../../../primitives/FitText/FitText";
 import { SketchedShape } from "../../../primitives/SketchedShape";
-import { StockRect } from "../../../primitives/StockRect/StockRect";
+import { StockRect } from "../../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { InputPlaceholder } from "./InputPlaceholder";
 import type { Input } from "../PocketInference.schema";
 import type { ReactNode } from "react";
 
-type Props = { frame: number; input: Input };
+type Props = {
+  frame: number;
+  input: Input;
+};
 /** The supplied input fold enters a writing area entirely inside the device. */
 export function PocketInput({ frame, input }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const motion = GraphicThemeHooks.useGraphicMotion();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   const progress = motion.ramp(frame, 38, motion.scale(16));
-  const y = mix(progress, 218, 228);
+  const y = Motion.mix({
+    t: progress,
+    from: 218,
+    to: 228,
+  });
   const labels = _createInputLabels({ input, y, color: tokens.color });
   return (
     <g>

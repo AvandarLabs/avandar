@@ -14,7 +14,10 @@ type Props = {
  * The ring on the centre line where a mapping connects, with an optional check.
  */
 export function MatchRing({ y, color, opacity, showCheck }: Props): ReactNode {
-  const style = GraphicThemeHooks.useGraphicProps("SchemaMapping", {});
+  const style = GraphicThemeHooks.useGraphicProps({
+    name: "SchemaMapping",
+    props: {},
+  });
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const shapes = GraphicThemeHooks.useGraphicShapeScales();
   const x = GRAPHIC_WIDTH / 2;

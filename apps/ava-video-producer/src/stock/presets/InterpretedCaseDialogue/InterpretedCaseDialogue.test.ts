@@ -41,6 +41,49 @@ test("supplied utterances appear participant then worker with original speaker a
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { interpretedCaseDialogueContract as contract } from "./InterpretedCaseDialogue.contract";
 
+function _assertDialogueBubblesAreDisjoint(
+  rectangles: Array<{
+    x: ReturnType<typeof SvgAttributes.getNumberFromMarkup>;
+    y: ReturnType<typeof SvgAttributes.getNumberFromMarkup>;
+    w: ReturnType<typeof SvgAttributes.getNumberFromMarkup>;
+    h: ReturnType<typeof SvgAttributes.getNumberFromMarkup>;
+  }>,
+): void {
+  rectangles.forEach((a, index) => {
+    return rectangles.slice(index + 1).forEach((b) => {
+      return assert.ok(
+        a.x + a.w <= b.x ||
+          b.x + b.w <= a.x ||
+          a.y + a.h <= b.y ||
+          b.y + b.h <= a.y,
+      );
+    });
+  });
+}
+
+function _assertDialogueSpeakerAttribution({
+  bubbles,
+  input,
+}: Readonly<{
+  bubbles: RegExpMatchArray[];
+  input: Readonly<Input>;
+}>): void {
+  bubbles.forEach(([, wording, speaker, content]) => {
+    const turn = input.turns[speaker === "participant" ? 0 : 1];
+    assert.ok(
+      content.includes(
+        `aria-label="${wording === "original" ? turn.originalText : turn.interpretedText}"`,
+      ),
+    );
+    assert.ok(
+      content.includes(
+        `aria-label="${input.people[speaker as "participant" | "worker"]}"`,
+      ),
+    );
+    assert.ok(!content.includes('aria-label="通訳者"'));
+  });
+}
+
 function _visible({
   input,
   frame,
@@ -123,20 +166,7 @@ test("both layouts retain all supplied maximum CJK wordings without speaker subs
         ),
       ];
       assert.equal(bubbles.length, 4);
-      bubbles.forEach(([, wording, speaker, content]) => {
-        const turn = input.turns[speaker === "participant" ? 0 : 1];
-        assert.ok(
-          content.includes(
-            `aria-label="${wording === "original" ? turn.originalText : turn.interpretedText}"`,
-          ),
-        );
-        assert.ok(
-          content.includes(
-            `aria-label="${input.people[speaker as "participant" | "worker"]}"`,
-          ),
-        );
-        assert.ok(!content.includes('aria-label="通訳者"'));
-      });
+      _assertDialogueSpeakerAttribution({ bubbles, input });
       const rectangles = [
         ...markup.matchAll(/<rect\b[^>]*\bdata-bubble="[^"]*"[^>]*>/g),
       ].map(([r]) => {
@@ -153,16 +183,7 @@ test("both layouts retain all supplied maximum CJK wordings without speaker subs
           }),
         };
       });
-      rectangles.forEach((a, index) => {
-        return rectangles.slice(index + 1).forEach((b) => {
-          return assert.ok(
-            a.x + a.w <= b.x ||
-              b.x + b.w <= a.x ||
-              a.y + a.h <= b.y ||
-              b.y + b.h <= a.y,
-          );
-        });
-      });
+      _assertDialogueBubblesAreDisjoint(rectangles);
     });
   });
 });

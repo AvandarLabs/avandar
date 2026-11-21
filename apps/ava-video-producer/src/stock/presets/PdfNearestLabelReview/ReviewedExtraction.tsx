@@ -1,4 +1,4 @@
-import { mix, ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ExtractionRow } from "./ExtractionRow";
@@ -7,7 +7,11 @@ import { ReviewChoiceMark } from "./ReviewChoiceMark";
 import type { Input } from "./PdfNearestLabelReview.schema";
 import type { ReactNode } from "react";
 
-type Props = { input: Input; frame: number; accent: string };
+type Props = {
+  input: Input;
+  frame: number;
+  accent: string;
+};
 /** Frames the reviewed extraction takes to slide into place. */
 const EXTRACT_FRAMES = 43;
 /**
@@ -21,13 +25,17 @@ export function ReviewedExtraction({
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const motion = GraphicThemeHooks.useGraphicMotion();
   const association = getAssociationFromInput(input);
-  const progress = ramp(
+  const progress = Motion.ramp({
     frame,
-    96,
-    motion.scale(EXTRACT_FRAMES),
-    motion.travel.easing,
-  );
-  const x = mix(progress, 588, 540);
+    at: 96,
+    dur: motion.scale(EXTRACT_FRAMES),
+    easing: motion.travel.easing,
+  });
+  const x = Motion.mix({
+    t: progress,
+    from: 588,
+    to: 540,
+  });
   return (
     <g
       opacity={progress}

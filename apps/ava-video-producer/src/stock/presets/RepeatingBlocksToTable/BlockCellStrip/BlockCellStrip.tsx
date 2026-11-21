@@ -1,5 +1,6 @@
+import { propEq } from "@avandar/utils";
 import { LabelSlots } from "../../../primitives/LabelSlots/LabelSlots";
-import { StockRect } from "../../../primitives/StockRect/StockRect";
+import { StockRect } from "../../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getBlockCellGeometryFromFrame } from "../getBlockCellGeometryFromFrame";
 import { TransferCell } from "./TransferCell";
@@ -20,9 +21,7 @@ function _getCellText({
   block: Input["blocks"][number];
   fieldId: string;
 }>): string | null {
-  const cell = block.cells.find((candidate) => {
-    return candidate.fieldId === fieldId;
-  });
+  const cell = block.cells.find(propEq("fieldId", fieldId));
   if (!cell) {
     throw new Error(`Missing block cell for field: ${fieldId}`);
   }

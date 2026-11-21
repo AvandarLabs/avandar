@@ -1,11 +1,11 @@
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { PracticeInteriorShared } from "./PracticeInteriorShared/PracticeInteriorShared";
+import { PracticeInteriorShared } from "./PracticeInteriorShared";
 import type { ReactNode } from "react";
+
+type Props = { finalStep: number; accent: string };
+
 /** Footprints marking the practised route, fading in on the final step. */
-export function Footprints({
-  finalStep,
-  accent,
-}: Readonly<{ finalStep: number; accent: string }>): ReactNode {
+export function Footprints({ finalStep, accent }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g opacity={tokens.alpha.ghost * finalStep} fill={accent}>

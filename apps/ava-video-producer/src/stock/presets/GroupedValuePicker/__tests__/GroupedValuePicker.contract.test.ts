@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { prop } from "@avandar/utils";
 import { registerStockDefaultTextAssertions } from "../../../../../tests/helpers/registerStockDefaultTextAssertions";
 import { registerStockPresetAssertions } from "../../../../../tests/helpers/registerStockPresetAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
@@ -12,6 +13,37 @@ import {
   _getMovingCopy,
 } from "./GroupedValuePickerTestHelpers";
 import type { Input } from ".././GroupedValuePicker.schema";
+
+function _assertNumericModeWinsTie(): void {
+  const ties = [
+    { id: "x", value: null },
+    { id: "y", value: 4 },
+    { id: "z", value: -2 },
+  ];
+  assert.match(
+    _render({
+      frame: 150,
+      input: {
+        ...DEFAULT_INPUT,
+        observations: ties,
+        nullPolicy: "include-in-mode",
+      },
+    }),
+    /data-exact-result="-2"/,
+  );
+}
+
+function _assertEveryRuleDisplaysItsHandCalculatedCases(
+  cases: ReadonlyArray<readonly [Input["rule"], number, string]>,
+): void {
+  cases.forEach(([rule, value, text]) => {
+    const input = { ...DEFAULT_INPUT, rule };
+    assert.equal(getPickedValueFromInput(input), value);
+    assert.ok(
+      _render({ frame: 150, input: input }).includes(`aria-label="${text}"`),
+    );
+  });
+}
 
 test("every rule derives its exact result and count uses its own unit", () => {
   const cases = [
@@ -74,22 +106,7 @@ test("mode orders numeric ties before null while first preserves a leading null"
     }),
     /data-exact-result="null"/,
   );
-  const ties = [
-    { id: "x", value: null },
-    { id: "y", value: 4 },
-    { id: "z", value: -2 },
-  ];
-  assert.match(
-    _render({
-      frame: 150,
-      input: {
-        ...DEFAULT_INPUT,
-        observations: ties,
-        nullPolicy: "include-in-mode",
-      },
-    }),
-    /data-exact-result="-2"/,
-  );
+  _assertNumericModeWinsTie();
 });
 
 registerStockPresetAssertions(options);
@@ -106,9 +123,7 @@ registerStockDefaultTextAssertions({
     ["labels", "missing"],
     ["labels", "result"],
   ],
-  suppliedInputs: FIXTURES.map(({ input }) => {
-    return input;
-  }),
+  suppliedInputs: FIXTURES.map(prop("input")),
 });
 
 test("literal source identities and first-selection geometry remain visible after attachment", () => {
@@ -152,13 +167,7 @@ test("every rule displays its hand-calculated result while retaining an unrounde
     ["max", 4, "4"],
     ["count", 3, "3"],
   ] as const;
-  cases.forEach(([rule, value, text]) => {
-    const input = { ...DEFAULT_INPUT, rule };
-    assert.equal(getPickedValueFromInput(input), value);
-    assert.ok(
-      _render({ frame: 150, input: input }).includes(`aria-label="${text}"`),
-    );
-  });
+  _assertEveryRuleDisplaysItsHandCalculatedCases(cases);
   const negative = {
     ...DEFAULT_INPUT,
     observations: [

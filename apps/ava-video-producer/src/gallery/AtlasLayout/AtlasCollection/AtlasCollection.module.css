@@ -1,0 +1,11 @@
+.atlasCollectionLibraryMain {
+  composes: library-main from global;
+}
+
+.atlasCollectionCollection {
+  composes: collection from global;
+}
+
+.atlasCollectionMotionGrid {
+  composes: motion-grid from global;
+}

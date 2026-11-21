@@ -1,5 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getQueueItemLayoutFromInputAndFrame } from "./getQueueItemLayoutFromInputAndFrame";
 import type { Input } from "./QueueRelief.schema";

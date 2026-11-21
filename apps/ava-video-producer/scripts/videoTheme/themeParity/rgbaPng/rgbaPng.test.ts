@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { readRgbaFromPng, writePngFromRgba } from "./rgbaPng";
+import { RgbaPng } from "./RgbaPng";
 
 test("RGBA pixels survive a PNG round trip unchanged", async () => {
   const directory = await fs.mkdtemp(path.join(os.tmpdir(), "rgba-png-"));
@@ -12,12 +12,15 @@ test("RGBA pixels survive a PNG round trip unchanged", async () => {
     const pixels = Uint8Array.from([
       255, 0, 0, 255, 0, 255, 0, 255, 0, 0, 255, 255, 12, 34, 56, 255,
     ]);
-    await writePngFromRgba({
+    await RgbaPng.writePngFromRgba({
       file,
       rgba: pixels,
       size: { width: 2, height: 2 },
     });
-    const decoded = await readRgbaFromPng(file, { width: 2, height: 2 });
+    const decoded = await RgbaPng.readRgbaFromPng({
+      file,
+      size: { width: 2, height: 2 },
+    });
     assert.deepEqual([...decoded], [...pixels]);
   } finally {
     await fs.rm(directory, { recursive: true, force: true });

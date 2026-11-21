@@ -1,10 +1,11 @@
 import { FitText } from "../../../primitives/FitText/FitText";
 import type { Input } from "../PracticeToWorkSample.schema";
 import type { ReactNode } from "react";
+
+type Props = { task: Input["task"] };
+
 /** The measured value and its unit, under the mark. */
-export function MeasurementLabel({
-  task,
-}: Readonly<{ task: Input["task"] }>): ReactNode {
+export function MeasurementLabel({ task }: Readonly<Props>): ReactNode {
   return (
     <FitText
       text={`${task.value} ${task.unit}`}

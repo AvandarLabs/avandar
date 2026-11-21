@@ -1,9 +1,8 @@
 import { useMemo } from "react";
-import { StockRect } from "../../primitives/StockRect/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getJobPlacementFromPlanAndFrame } from "./getJobPlacementFromPlanAndFrame";
 import { makeJobTransfersFromInput } from "./makeJobTransfersFromInput";
-import { SceneLabel } from "./SceneLabel";
+import { WorkBlocksJob } from "./WorkBlocksJob/WorkBlocksJob";
 import type { Input } from "./ComputeCapacityConsolidation.schema";
 import type { ReactNode } from "react";
 
@@ -33,34 +32,15 @@ export function WorkBlocks({ input, frame }: Readonly<Props>): ReactNode {
         const legendX = 55 + (index % 4) * 215;
         const legendY = 437 + Math.floor(index / 4) * 44;
         return (
-          <g key={job.id}>
-            <StockRect
-              data-job={index}
-              data-job-id={job.id}
-              data-quantity={job.cpuHours}
-              x={x}
-              y={y}
-              width={80}
-              height={height}
-              fill={color}
-            />
-            <StockRect
-              x={legendX}
-              y={legendY - 10}
-              width={10}
-              height={10}
-              fill={color}
-            />
-            <SceneLabel
-              text={job.label}
-              x={legendX + 18}
-              y={legendY}
-              width={195}
-              lines={3}
-            />
-          </g>
+          <WorkBlocksJob
+            key={job.id}
+            {...{ job, index, x, y, height, color, legendX, legendY }}
+          />
         );
       })}
     </g>
   );
 }
+
+/** The type of `CATEGORY_KEYS` used by WorkBlocks. */
+export type WorkBlocksCategoryKeysValue = typeof CATEGORY_KEYS;

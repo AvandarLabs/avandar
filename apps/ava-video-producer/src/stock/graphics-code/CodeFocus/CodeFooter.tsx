@@ -3,10 +3,16 @@ import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
-type Props = Readonly<{ footer: string; accent: string }>;
+type Props = Readonly<{
+  footer: string;
+  accent: string;
+}>;
 /** The divider, accent dot, and footer note at the bottom of the window. */
 export function CodeFooter({ footer, accent }: Props): ReactNode {
-  const style = GraphicThemeHooks.useGraphicProps("CodeFocus", {});
+  const style = GraphicThemeHooks.useGraphicProps({
+    name: "CodeFocus",
+    props: {},
+  });
   const { color, sketch } = GraphicThemeHooks.useGraphicTokens();
   const shapes = GraphicThemeHooks.useGraphicShapeScales();
   return (

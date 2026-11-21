@@ -1,9 +1,11 @@
-import { ramp } from "../../../../motion";
+import { Motion } from "../../../../motion";
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { BatchFrameShared } from "./BatchFrameShared/BatchFrameShared";
-import { type Props } from "./BatchFrameShared/BatchFrameShared.types";
+import { type Props as BatchFrameSharedProps } from "./BatchFrameShared/BatchFrameShared.types";
 import type { ReactNode } from "react";
+
+type Props = Omit<BatchFrameSharedProps, "isComplete">;
 /** The envelope's lid, drawn closed over the seal frames before completion. */
 export function EnvelopeSeal({
   batchId,
@@ -13,7 +15,7 @@ export function EnvelopeSeal({
   frame,
   completeAt,
   accent,
-}: Readonly<Omit<Props, "isComplete">>): ReactNode {
+}: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   const motion = GraphicThemeHooks.useGraphicMotion();
@@ -32,7 +34,13 @@ export function EnvelopeSeal({
         strokeDasharray={width + 40}
         strokeDashoffset={
           (width + 40) *
-          (1 - ramp(frame, completeAt - seal, seal, motion.reveal.easing))
+          (1 -
+            Motion.ramp({
+              frame,
+              at: completeAt - seal,
+              dur: seal,
+              easing: motion.reveal.easing,
+            }))
         }
       />
     </g>

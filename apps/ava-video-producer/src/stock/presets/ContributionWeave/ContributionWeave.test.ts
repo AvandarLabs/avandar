@@ -10,6 +10,23 @@ import { contributionWeaveContract } from "./ContributionWeave.contract";
 import { DEFAULT_INPUT, fixtures } from "./ContributionWeave.fixtures";
 import { inputSchema, type Input } from "./ContributionWeave.schema";
 
+function _assertFragmentReferencesResolveOnce({
+  markup,
+  fragmentIds,
+}: Readonly<{
+  markup: ReturnType<typeof renderToStaticMarkup>;
+  fragmentIds: readonly string[];
+}>): void {
+  [...markup.matchAll(/url\(#([^)]+)\)/g)].forEach(([, reference]) => {
+    return assert.equal(
+      fragmentIds.filter((id) => {
+        return id === reference;
+      }).length,
+      1,
+    );
+  });
+}
+
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -261,14 +278,7 @@ test("two render namespaces retain valid unique fragments with empty and Unicode
   fragmentIds.forEach((id) => {
     return assert.match(id, /^instance-[ab]-(band|shuttle)-\d$/);
   });
-  [...markup.matchAll(/url\(#([^)]+)\)/g)].forEach(([, reference]) => {
-    return assert.equal(
-      fragmentIds.filter((id) => {
-        return id === reference;
-      }).length,
-      1,
-    );
-  });
+  _assertFragmentReferencesResolveOnce({ markup, fragmentIds });
   ["", "space Ω", "字 phrase", "👩‍🔬"].forEach((id) => {
     return assert.ok(markup.includes(`data-contributor-end="${id}"`));
   });

@@ -1,4 +1,4 @@
-import { mix } from "../../../../motion";
+import { Motion } from "../../../../motion";
 import { Text } from "../../../graphics-common/Text";
 import { LabelSlots } from "../../../primitives/LabelSlots/LabelSlots";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
@@ -8,7 +8,10 @@ import { LedgerCount } from "./LedgerCount";
 import type { Input } from "../GeometryDetailBudget.schema";
 import type { ReactNode } from "react";
 
-type Props = { input: Input; frame: number };
+type Props = {
+  input: Input;
+  frame: number;
+};
 const COUNT_AT = 111;
 const COUNT_FRAMES = 28;
 const TOLERANCE_SIZE = "md";
@@ -17,8 +20,20 @@ export function DetailLedger({ input, frame }: Readonly<Props>): ReactNode {
   const motion = GraphicThemeHooks.useGraphicMotion();
   const counted = motion.ramp(frame, COUNT_AT, motion.scale(COUNT_FRAMES));
   const { keptIndices, removed } = makeDetailSimplificationFromInput(input);
-  const keptCount = Math.round(mix(counted, 0, keptIndices.length));
-  const removedCount = Math.round(mix(counted, 0, removed.length));
+  const keptCount = Math.round(
+    Motion.mix({
+      t: counted,
+      from: 0,
+      to: keptIndices.length,
+    }),
+  );
+  const removedCount = Math.round(
+    Motion.mix({
+      t: counted,
+      from: 0,
+      to: removed.length,
+    }),
+  );
   return (
     <g>
       <LabelSlots

@@ -1,13 +1,17 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { propEq } from "@avandar/utils";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 import { DisclosureAperture } from "./DisclosureAperture";
+import { disclosureApertureContract } from "./DisclosureAperture.contract";
 import {
   DEFAULT_INPUT,
   fixtures,
   invalidInputs,
 } from "./DisclosureAperture.fixtures";
+import { inputSchema } from "./DisclosureAperture.schema";
 
 function _render({
   frame,
@@ -26,6 +30,7 @@ function _render({
     ),
   );
 }
+
 test("only declared share fields produce outbound copies while every original remains", () => {
   Array.from(fixtures).forEach((fixture) => {
     const markup = _render({ frame: 150, input: fixture.input });
@@ -35,9 +40,7 @@ test("only declared share fields produce outbound copies while every original re
     );
     assert.equal(
       (markup.match(/data-outbound-copy=/g) ?? []).length,
-      fixture.input.fields.filter(({ disclosure }) => {
-        return disclosure === "share";
-      }).length,
+      fixture.input.fields.filter(propEq("disclosure", "share")).length,
     );
     fixture.input.fields.forEach(({ id, disclosure }) => {
       return assert.equal(
@@ -47,6 +50,7 @@ test("only declared share fields produce outbound copies while every original re
     });
   });
 });
+
 test("all-retain creates zero outbound copies or apertures at every frame", () => {
   const input = {
     ...DEFAULT_INPUT,
@@ -72,10 +76,6 @@ test("all-retain creates zero outbound copies or apertures at every frame", () =
   });
 });
 
-import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
-import { disclosureApertureContract } from "./DisclosureAperture.contract";
-import { inputSchema } from "./DisclosureAperture.schema";
-
 registerStockPresetAssertions({
   inputSchema,
   defaultInput: DEFAULT_INPUT,
@@ -85,6 +85,7 @@ registerStockPresetAssertions({
   render: _render,
   excludedTextFields: ["id", "disclosure", "direction"],
 });
+
 test("both directions move real copy transforms across the boundary and close each aperture", () => {
   Array.from(["left-to-right", "right-to-left"] as const).forEach(
     (direction) => {
@@ -112,9 +113,10 @@ test("both directions move real copy transforms across the boundary and close ea
     },
   );
 });
+
 test("all label, value and policy-mark toggles retain exact source and outbound quantities", () => {
   Array.from([true, false]).forEach((showLabels) => {
-    for (const showValues of [true, false])
+    [true, false].forEach((showValues) => {
       Array.from([true, false]).forEach((showPolicyMarks) => {
         const markup = _render({
           frame: 150,
@@ -137,5 +139,6 @@ test("all label, value and policy-mark toggles retain exact source and outbound 
           assert.doesNotMatch(markup, /<text/);
         }
       });
+    });
   });
 });

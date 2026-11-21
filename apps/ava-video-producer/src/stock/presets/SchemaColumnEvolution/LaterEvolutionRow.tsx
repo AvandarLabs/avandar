@@ -1,4 +1,4 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { EvolutionRow } from "./EvolutionRow";
 import type { Input } from "./SchemaColumnEvolution.schema";
@@ -23,7 +23,11 @@ export function LaterEvolutionRow({
   return frame >= 93 ? (
     <g
       opacity={motion.ramp(frame, 93, motion.scale(20))}
-      transform={`translate(0 ${mix(motion.ramp(frame, 93, motion.scale(39), motion.travel.easing), 38, 0)})`}
+      transform={`translate(0 ${Motion.mix({
+        t: motion.ramp(frame, 93, motion.scale(39), motion.travel.easing),
+        from: 38,
+        to: 0,
+      })})`}
     >
       <EvolutionRow
         record={input.laterRecord}

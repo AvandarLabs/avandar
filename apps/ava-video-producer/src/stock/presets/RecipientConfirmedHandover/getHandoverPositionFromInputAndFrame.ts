@@ -1,5 +1,5 @@
-import { mix } from "../../../motion";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import { Motion } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./RecipientConfirmedHandover.schema";
 /** Inputs for getHandoverPositionFromInputAndFrame. */
 type GetHandoverPositionOptions = {
@@ -9,7 +9,6 @@ type GetHandoverPositionOptions = {
   unitIndex: number;
   motion: VideoMotion;
 };
-
 /**
  * Each chosen unit follows the recipient's one-at-a-time pull across the mat.
  */
@@ -39,7 +38,11 @@ export function getHandoverPositionFromInputAndFrame({
         )
       : 0;
   return {
-    x: mix(travel, 205 + unitIndex * 32, 542 + unitIndex * 32),
+    x: Motion.mix({
+      t: travel,
+      from: 205 + unitIndex * 32,
+      to: 542 + unitIndex * 32,
+    }),
     y: 190 + contentIndex * 80,
     travel,
   };

@@ -1,8 +1,8 @@
-import { ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { LedgerEntryText } from "./LedgerEntryText";
-import { LedgerImpression } from "./LedgerImpression";
+import { LedgerImpression } from "./LedgerImpression/LedgerImpression";
 import type { Input } from "./OfflineLedger.schema";
 import type { ReactNode } from "react";
 
@@ -13,12 +13,16 @@ type Props = {
   accent: string;
   input: Input;
 };
+
 /** The cue the first entry is written on. */
 const FIRST_WRITE_CUE = 36;
+
 /** Frames between entries, the fixed writing cadence. */
 const CADENCE_FRAMES = 16;
+
 /** The writing mark's normalized path length, which its dash spans. */
 const MARK_LENGTH = 1;
+
 /**
  * Each writing stroke presses one persistent matching impression beneath its
  * page.
@@ -34,7 +38,12 @@ export function LedgerEntry({
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   const motion = GraphicThemeHooks.useGraphicMotion();
   const writeAt = FIRST_WRITE_CUE + index * CADENCE_FRAMES;
-  const writing = ramp(frame, writeAt, motion.whip, motion.reveal.easing);
+  const writing = Motion.ramp({
+    frame,
+    at: writeAt,
+    dur: motion.whip,
+    easing: motion.reveal.easing,
+  });
   const y = 196 + index * 54;
   return (
     <g>

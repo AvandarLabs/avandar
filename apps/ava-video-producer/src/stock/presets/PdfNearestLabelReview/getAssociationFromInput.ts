@@ -1,3 +1,4 @@
+import { propEq } from "@avandar/utils";
 import type { Input } from "./PdfNearestLabelReview.schema";
 /** Data for getAssociationFromInput. */
 type GetAssociationFromInputResult = {
@@ -24,8 +25,6 @@ export function getAssociationFromInput(
     chosenLabel:
       input.reviewedLabelId === null
         ? undefined
-        : input.labels.find(({ id }) => {
-            return id === input.reviewedLabelId;
-          }),
+        : input.labels.find(propEq("id", input.reviewedLabelId)),
   };
 }

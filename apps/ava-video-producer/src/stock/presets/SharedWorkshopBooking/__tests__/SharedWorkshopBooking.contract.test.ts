@@ -1,4 +1,3 @@
-/** Physical choreography and authored-contract regression assertions. */
 import assert from "node:assert/strict";
 import test from "node:test";
 import { prop } from "@avandar/utils";
@@ -12,6 +11,7 @@ import {
   invalidInputs,
 } from "../SharedWorkshopBooking.fixtures";
 import { inputSchema } from "../SharedWorkshopBooking.schema";
+import { assertWrappedAgreementCaptionStaysKind as _assertWrappedAgreementCaptionStaysKind } from "./assertWrappedAgreementCaptionStaysKind";
 import {
   _render,
   _visible,
@@ -66,10 +66,7 @@ test("all-null choices never use the machine while empty booked IDs remain real 
   const unresolved = {
     ...defaultInput,
     requests: defaultInput.requests.map((request) => {
-      return {
-        ...request,
-        agreedSlotId: null,
-      };
+      return { ...request, agreedSlotId: null };
     }),
   };
   inputSchema.parse(unresolved);
@@ -78,11 +75,7 @@ test("all-null choices never use the machine while empty booked IDs remain real 
       [20, 90, 116, 138, 150, 166].forEach((frame) => {
         const markup = _render({
           frame: frame,
-          input: {
-            ...unresolved,
-            showOriginalRequests,
-            showUsageTurns,
-          },
+          input: { ...unresolved, showOriginalRequests, showUsageTurns },
         });
         assert.doesNotMatch(markup, /data-use-person=|data-agreement=/);
         assert.equal([...markup.matchAll(/data-participant="/g)].length, 2);
@@ -235,30 +228,7 @@ test("agreed caption clears actual dense actors at frame 150", () => {
 
 test("wrapped agreement caption stays clear of names, heads, hands and returning people", () => {
   Array.from(["sewing-machine", "workbench"] as const).forEach((kind) => {
-    Array.from(fixtures).forEach(({ input }) => {
-      const candidate = {
-        ...input,
-        machine: { ...input.machine, kind },
-        labels: { ...input.labels, agreed: "語".repeat(30) },
-      };
-      inputSchema.parse(candidate);
-      [
-        24,
-        36,
-        49.5,
-        66,
-        ...Array.from({ length: 165 }, (_, index) => {
-          return 75 + index / 2;
-        }),
-        167,
-      ].forEach((frame) => {
-        return _assertAgreementClearance({ input: candidate, frame });
-      });
-      assert.match(
-        _render({ frame: 150, input: candidate }),
-        /data-agreed-caption-guide=/,
-      );
-    });
+    return _assertWrappedAgreementCaptionStaysKind(kind);
   });
   Array.from(
     { length: Math.max(0, Math.floor((30 - 1) / 1) + 1) },

@@ -1,7 +1,15 @@
 import { propEq } from "@avandar/utils";
-import { mix } from "../../../motion";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import { Motion } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./CommunityCoordinationTable.schema";
+/** Inputs for getTeamMarkerPoseFromInputAndFrame. */
+type TeamMarkerPoseOptions = {
+  input: Input;
+  index: number;
+  frame: number;
+  motion: VideoMotion;
+};
+
 /** Data for getTeamMarkerPoseFromInputAndFrame. */
 type GetTeamMarkerPoseResult = {
   x: number;
@@ -9,19 +17,13 @@ type GetTeamMarkerPoseResult = {
   moved: boolean;
   lift: number;
 };
-
 /** The sole reassigned team lifts, carries and replaces its own marker. */
 export function getTeamMarkerPoseFromInputAndFrame({
   input,
   index,
   frame,
   motion,
-}: Readonly<{
-  input: Input;
-  index: number;
-  frame: number;
-  motion: VideoMotion;
-}>): GetTeamMarkerPoseResult {
+}: Readonly<TeamMarkerPoseOptions>): GetTeamMarkerPoseResult {
   const team = input.teams[index];
   const origin = input.places.find(propEq("id", team.initialPlaceId))!;
   const destination = input.places.find(propEq("id", team.agreedPlaceId))!;
@@ -39,11 +41,11 @@ export function getTeamMarkerPoseFromInputAndFrame({
   return {
     x:
       340 +
-      mix(progress, origin.x, destination.x) * 270 +
+      Motion.mix({ t: progress, from: origin.x, to: destination.x }) * 270 +
       (index % 2 === 0 ? -8.5 : 8.5),
     y:
       160 +
-      mix(progress, origin.y, destination.y) * 280 +
+      Motion.mix({ t: progress, from: origin.y, to: destination.y }) * 280 +
       (index < 2 ? -10.5 : 10.5) -
       lift,
     moved,

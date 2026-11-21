@@ -1,5 +1,5 @@
-import { mix } from "../../../motion";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import { Motion } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./BenefitShortfallCorrection.schema";
 
 type Options = {
@@ -18,7 +18,6 @@ type GetPaymentUnitGeometryResult = {
   tokenY: number;
   isHandling: boolean;
 };
-
 /** Placement and handling preserve the payment's exact additive quantities. */
 export function getPaymentUnitGeometryFromPayment({
   payment,
@@ -34,21 +33,21 @@ export function getPaymentUnitGeometryFromPayment({
     unitIndex >= payment.receivedUnits &&
     unitIndex < payment.receivedUnits + payment.correctionUnits;
   const tokenY = isOriginal
-    ? mix(
-        motion.ramp(frame, 36, motion.scale(24), motion.travel.easing),
-        y + 4,
-        y + 24,
-      )
-    : mix(
-        motion.ramp(
+    ? Motion.mix({
+        t: motion.ramp(frame, 36, motion.scale(24), motion.travel.easing),
+        from: y + 4,
+        to: y + 24,
+      })
+    : Motion.mix({
+        t: motion.ramp(
           frame,
           72 + index * motion.scaleStagger(4),
           motion.scale(32),
           motion.travel.easing,
         ),
-        y + 92,
-        y + 24,
-      );
+        from: y + 92,
+        to: y + 24,
+      });
   const isHandling =
     isCorrection &&
     unitIndex === payment.receivedUnits &&

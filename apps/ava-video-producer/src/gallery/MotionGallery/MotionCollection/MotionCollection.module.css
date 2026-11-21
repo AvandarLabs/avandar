@@ -1,0 +1,3 @@
+.motionCollectionCollection {
+  composes: collection from global;
+}

@@ -1,10 +1,14 @@
-import { loopPhase } from "../../../../motion";
+import { Motion } from "../../../../motion";
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { LeakPipeShared } from "./LeakPipeShared/LeakPipeShared";
+import { LeakPipeShared } from "./LeakPipeShared";
 import type { ReactNode } from "react";
+
+type Props = {
+  frame: number;
+};
 /** Water running through the pipe and out of the outlet. */
-export function OutletFlow({ frame }: Readonly<{ frame: number }>): ReactNode {
+export function OutletFlow({ frame }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
@@ -15,7 +19,12 @@ export function OutletFlow({ frame }: Readonly<{ frame: number }>): ReactNode {
         stroke={tokens.color.accentAlt}
         strokeWidth={scales.stroke(5)}
         strokeDasharray={LeakPipeShared.FLOW_DASH}
-        strokeDashoffset={-loopPhase(frame, 48) * 48}
+        strokeDashoffset={
+          -Motion.loopPhase({
+            frame,
+            period: 48,
+          }) * 48
+        }
         fill="none"
       />
       <SketchedShape

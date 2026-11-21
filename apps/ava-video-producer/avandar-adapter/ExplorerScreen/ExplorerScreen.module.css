@@ -1,4 +1,4 @@
-.explorerRoot {
+.explorerScreenRoot {
   background: var(--ava-surface-body);
   display: flex;
   flex-direction: column;
@@ -6,28 +6,16 @@
   overflow: hidden;
 }
 
-.explorerCanvas {
-  background: white;
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow: hidden;
-  position: relative;
-}
-
-.explorerSummary {
+.explorerScreenSummary {
   background: white;
   padding: var(--mantine-spacing-xs) var(--mantine-spacing-md);
 }
 
-.explorerSqlGroup {
-  min-width: 0;
-}
-
-.explorerRoot :global(.cm-cursorLayer) {
+.explorerScreenRoot :global(.cm-cursorLayer) {
   animation: none !important;
   opacity: var(--explorer-caret-opacity);
 }
 
-.explorerRoot :global([data-testid="filter-value-scalar"]) {
+.explorerScreenRoot :global([data-testid="filter-value-scalar"]) {
   caret-color: transparent;
 }

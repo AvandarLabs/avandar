@@ -1,11 +1,11 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
+
+type Props = { index: number; accent: string };
+
 /** One writing stroke standing in for a response line. */
-export function ResponseStroke({
-  index,
-  accent,
-}: Readonly<{ index: number; accent: string }>): ReactNode {
+export function ResponseStroke({ index, accent }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (

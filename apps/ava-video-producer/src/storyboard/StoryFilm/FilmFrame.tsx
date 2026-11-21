@@ -1,14 +1,14 @@
 import { AbsoluteFill } from "remotion";
 import { useVideoMotion } from "../../videoTheme/useVideoMotion";
-import { useVideoTokens } from "../../videoTheme/useVideoTheme";
+import { useVideoTokens } from "../../videoTheme/videoThemeHelpers";
 import { _FilmCaptions } from "./_FilmCaptions";
 import { _OutgoingShotLayer } from "./_OutgoingShotLayer";
 import { _ShotLayer } from "./_ShotLayer";
 import { StoryFilmShared } from "./StoryFilmShared/StoryFilmShared";
-import { type Props } from "./StoryFilmShared/StoryFilmShared.types";
+import { type Props as StoryFilmSharedProps } from "./StoryFilmShared/StoryFilmShared.types";
 import type { ReactNode } from "react";
 
-type FilmFrameOptions = Props & { frame: number };
+type Props = StoryFilmSharedProps & { frame: number };
 /**
  * Composes active shots, transitions, captions, and the loop fade for
  * `StoryFilmPicture`.
@@ -18,7 +18,7 @@ export function FilmFrame({
   productScene,
   showCaptions = true,
   frame,
-}: FilmFrameOptions): ReactNode {
+}: Readonly<Props>): ReactNode {
   const motion = useVideoMotion();
   const tokens = useVideoTokens();
   const { shot, previous, localFrame, layers } =

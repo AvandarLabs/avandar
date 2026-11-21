@@ -1,13 +1,13 @@
-import { StockRect } from "../../../primitives/StockRect/StockRect";
+import { StockRect } from "../../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SpliceModuleShared } from "./SpliceModuleShared/SpliceModuleShared";
-import { type Props } from "./SpliceModuleShared/SpliceModuleShared.types";
+import { type Props as SpliceModuleSharedProps } from "./SpliceModuleShared/SpliceModuleShared.types";
 import type { ReactNode } from "react";
+
+type Props = Pick<SpliceModuleSharedProps, "step" | "accent">;
+
 /** The step's card, outlined in the accent if it is the inserted step. */
-export function StepBody({
-  step,
-  accent,
-}: Readonly<Pick<Props, "step" | "accent">>): ReactNode {
+export function StepBody({ step, accent }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (

@@ -1,0 +1,7 @@
+.continuityThesisEmphasisRoot {
+  color: var(--video-text-stage-thesis-emphasis-color);
+  font-family: var(--video-text-stage-thesis-emphasis-font-family);
+  font-size: var(--video-text-stage-thesis-emphasis-font-size);
+  font-weight: var(--video-text-stage-thesis-emphasis-font-weight);
+  margin-top: var(--video-component-thesis-emphasis-gap);
+}

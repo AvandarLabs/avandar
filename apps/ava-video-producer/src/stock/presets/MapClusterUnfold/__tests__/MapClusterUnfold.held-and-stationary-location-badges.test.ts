@@ -10,8 +10,69 @@ import {
   _number,
 } from "./MapClusterUnfoldTestHelpers";
 
-test("held and stationary location badges paint readable counts over their actual markers", () => {
-  [
+function _assertAuthoredPointArrival(authored: Readonly<Input>): void {
+  assert.deepEqual(
+    _marks({
+      markup: render({ frame: 139, input: authored }),
+      name: "point",
+    }).map((point) => {
+      return [
+        _number({ markup: point, name: "cx" }),
+        _number({ markup: point, name: "cy" }),
+      ];
+    }),
+    authored.points.map((point) => {
+      return [48 + point.x * 4.8, 140 + point.y * 3.6];
+    }),
+  );
+}
+
+type AssertOccupiedStationaryBadgeOptions = Readonly<{
+  markup: string;
+  points: ReturnType<typeof _marks>;
+  frame: number;
+}>;
+
+function _assertOccupiedStationaryBadge({
+  markup,
+  points,
+  frame,
+}: AssertOccupiedStationaryBadgeOptions): void {
+  const badges = [
+    ...markup.matchAll(/<g data-location-count="(\d+)">(.*?)<\/g>/g),
+  ];
+  const occupied = badges.find(([, , content]) => {
+    const circle = content.match(/<circle[^>]*>/)![0];
+    return (
+      _number({ markup: circle, name: "cx" }) === 288 &&
+      _number({ markup: circle, name: "cy" }) === 320
+    );
+  });
+  assert.ok(
+    occupied,
+    `Stationary occupied location must remain visible at frame ${frame}`,
+  );
+  const expected = frame === 119 || frame === 67.5 ? 3 : 2;
+  assert.equal(Number(occupied[1]), expected);
+  assert.ok(occupied[2].includes(`>${expected}</text>`));
+  assert.doesNotMatch(
+    occupied[2],
+    /opacity="0"|visibility="hidden"|display="none"/,
+  );
+  if (frame === 119 || frame === 67.5) {
+    points.forEach((point) => {
+      assert.equal(_number({ markup: point, name: "cx" }), 288);
+      assert.equal(_number({ markup: point, name: "cy" }), 320);
+    });
+  }
+}
+
+function _makeHeldBadgeCases(): Array<{
+  input: Input;
+  frames: number[];
+  counts: number[];
+}> {
+  return [
     {
       input: DEFAULT_INPUT,
       frames: Array.from({ length: 18 }, (_, index) => {
@@ -26,7 +87,37 @@ test("held and stationary location badges paint readable counts over their actua
       }),
       counts: [8],
     },
-  ].forEach(({ input, frames, counts }) => {
+  ];
+}
+
+function _assertMixedTrajectoriesRetainTheOccupiedDataPoint(
+  points: ReturnType<typeof _marks>,
+): void {
+  assert.equal(
+    new Set(
+      points.map((point) => {
+        return _attribute({ markup: point, name: "data-point" });
+      }),
+    ).size,
+    3,
+  );
+}
+
+const MIXED_TRAJECTORIES_RETAIN_THE_OCCUPIED_STATIONARY_BADGE_INPUT: Input = {
+  ...DEFAULT_INPUT,
+  points: [
+    { id: "s1", label: "Stationary one", x: 50, y: 50, clusterId: "a" },
+    { id: "s2", label: "Stationary two", x: 50, y: 50, clusterId: "a" },
+    { id: "m", label: "Moving", x: 10, y: 50, clusterId: "b" },
+  ],
+  clusters: [
+    { id: "a", label: "Stationary", x: 50, y: 50 },
+    { id: "b", label: "Moving", x: 90, y: 50 },
+  ],
+};
+
+test("held and stationary location badges paint readable counts over their actual markers", () => {
+  _makeHeldBadgeCases().forEach(({ input, frames, counts }) => {
     return frames.forEach((frame) => {
       const markup = render({ frame: frame, input: input }),
         badges = [
@@ -63,18 +154,9 @@ test("held and stationary location badges paint readable counts over their actua
 });
 
 test("mixed trajectories retain the occupied stationary badge when moving members join", () => {
-  const input: Input = {
-    ...DEFAULT_INPUT,
-    points: [
-      { id: "s1", label: "Stationary one", x: 50, y: 50, clusterId: "a" },
-      { id: "s2", label: "Stationary two", x: 50, y: 50, clusterId: "a" },
-      { id: "m", label: "Moving", x: 10, y: 50, clusterId: "b" },
-    ],
-    clusters: [
-      { id: "a", label: "Stationary", x: 50, y: 50 },
-      { id: "b", label: "Moving", x: 90, y: 50 },
-    ],
-  };
+  const input: Input = structuredClone(
+    MIXED_TRAJECTORIES_RETAIN_THE_OCCUPIED_STATIONARY_BADGE_INPUT,
+  );
   assert.deepEqual(inputSchema.parse(input), input);
   [input, { ...input, points: [...input.points].reverse() }].forEach(
     (authored) => {
@@ -89,14 +171,7 @@ test("mixed trajectories retain the occupied stationary badge when moving member
         const markup = render({ frame: frame, input: authored }),
           points = _marks({ markup, name: "point" });
         assert.equal(points.length, 3);
-        assert.equal(
-          new Set(
-            points.map((point) => {
-              return _attribute({ markup: point, name: "data-point" });
-            }),
-          ).size,
-          3,
-        );
+        _assertMixedTrajectoriesRetainTheOccupiedDataPoint(points);
         points
           .filter((point) => {
             return _attribute({ markup: point, name: "data-point" }) !== "m";
@@ -105,48 +180,9 @@ test("mixed trajectories retain the occupied stationary badge when moving member
             assert.equal(_number({ markup: point, name: "cx" }), 288);
             assert.equal(_number({ markup: point, name: "cy" }), 320);
           });
-        const badges = [
-          ...markup.matchAll(/<g data-location-count="(\d+)">(.*?)<\/g>/g),
-        ];
-        const occupied = badges.find(([, , content]) => {
-          const circle = content.match(/<circle[^>]*>/)![0];
-          return (
-            _number({ markup: circle, name: "cx" }) === 288 &&
-            _number({ markup: circle, name: "cy" }) === 320
-          );
-        });
-        assert.ok(
-          occupied,
-          `Stationary occupied location must remain visible at frame ${frame}`,
-        );
-        const expected = frame === 119 || frame === 67.5 ? 3 : 2;
-        assert.equal(Number(occupied[1]), expected);
-        assert.ok(occupied[2].includes(`>${expected}</text>`));
-        assert.doesNotMatch(
-          occupied[2],
-          /opacity="0"|visibility="hidden"|display="none"/,
-        );
-        if (frame === 119 || frame === 67.5) {
-          points.forEach((point) => {
-            assert.equal(_number({ markup: point, name: "cx" }), 288);
-            assert.equal(_number({ markup: point, name: "cy" }), 320);
-          });
-        }
+        _assertOccupiedStationaryBadge({ markup, points, frame });
       });
-      assert.deepEqual(
-        _marks({
-          markup: render({ frame: 139, input: authored }),
-          name: "point",
-        }).map((point) => {
-          return [
-            _number({ markup: point, name: "cx" }),
-            _number({ markup: point, name: "cy" }),
-          ];
-        }),
-        authored.points.map((point) => {
-          return [48 + point.x * 4.8, 140 + point.y * 3.6];
-        }),
-      );
+      _assertAuthoredPointArrival(authored);
     },
   );
 });

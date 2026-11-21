@@ -1,4 +1,5 @@
-import { mix, ramp } from "../../../motion";
+import { propEq } from "@avandar/utils";
+import { Motion } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getJournalGeometryFromFrame } from "./getJournalGeometryFromFrame";
@@ -8,9 +9,15 @@ import {
   REGISTER_CUE,
 } from "./journalTiming";
 import { ReceiptText } from "./ReceiptText";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./JournalReceipts.schema";
 import type { ReactNode } from "react";
+/** Inputs for getReceiptTravel. */
+type GetReceiptTravelArguments = {
+  frame: number;
+  index: number;
+  motion: VideoMotion;
+};
 
 type Props = {
   receipt: Input["receipts"][number];
@@ -19,6 +26,43 @@ type Props = {
   frame: number;
   accent: string;
 };
+
+/** A receipt's size and the pocket it leaves from, by fold direction. */
+function _getReceiptSize(foldDirection: Input["foldDirection"]): {
+  width: number;
+  height: number;
+  pocketX: number;
+} {
+  const horizontal = foldDirection === "horizontal";
+  return {
+    width: horizontal ? 150 : 260,
+    height: horizontal ? 104 : 62,
+    pocketX: horizontal ? 800 : 690,
+  };
+}
+
+/**
+ * When a receipt leaves its pocket and how far it has travelled, 0 to 1. Each
+ * receipt registers on its entry's cue, as that fold starts to close.
+ */
+function _getReceiptTravel({
+  frame,
+  index,
+  motion,
+}: Readonly<GetReceiptTravelArguments>): { leaveAt: number; progress: number } {
+  const leaveAt =
+    RECEIPT_CUE + index * motion.scaleStagger(RECEIPT_STAGGER_FRAMES);
+  return {
+    leaveAt,
+    progress: Motion.ramp({
+      frame,
+      at: leaveAt,
+      dur: REGISTER_CUE - RECEIPT_CUE,
+      easing: motion.travel.easing,
+    }),
+  };
+}
+
 /**
  * A receipt emerges from a separate pocket and registers at its referenced
  * entry.
@@ -32,9 +76,7 @@ export function ReceiptHalf({
 }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const motion = GraphicThemeHooks.useGraphicMotion();
-  const entryIndex = input.entries.findIndex(({ id }) => {
-    return id === receipt.entryId;
-  });
+  const entryIndex = input.entries.findIndex(propEq("id", receipt.entryId));
   const { receiptX, receiptY } = getJournalGeometryFromFrame({
     index: entryIndex,
     frame,
@@ -51,7 +93,7 @@ export function ReceiptHalf({
       data-receipt={receipt.entryId}
       data-target-x={receiptX}
       data-target-y={receiptY}
-      transform={`translate(${mix(progress, pocketX, receiptX)} ${mix(progress, 280 + index * 12, receiptY)})`}
+      transform={`translate(${Motion.mix({ t: progress, from: pocketX, to: receiptX })} ${Motion.mix({ t: progress, from: 280 + index * 12, to: receiptY })})`}
     >
       <SketchedShape
         shape={{
@@ -65,34 +107,4 @@ export function ReceiptHalf({
       <ReceiptText {...{ receipt, input, accent, width }} />
     </g>
   );
-}
-/** A receipt's size and the pocket it leaves from, by fold direction. */
-function _getReceiptSize(foldDirection: Input["foldDirection"]) {
-  const horizontal = foldDirection === "horizontal";
-  return {
-    width: horizontal ? 150 : 260,
-    height: horizontal ? 104 : 62,
-    pocketX: horizontal ? 800 : 690,
-  };
-}
-/**
- * When a receipt leaves its pocket and how far it has travelled, 0 to 1. Each
- * receipt registers on its entry's cue, as that fold starts to close.
- */
-function _getReceiptTravel({
-  frame,
-  index,
-  motion,
-}: Readonly<{ frame: number; index: number; motion: VideoMotion }>) {
-  const leaveAt =
-    RECEIPT_CUE + index * motion.scaleStagger(RECEIPT_STAGGER_FRAMES);
-  return {
-    leaveAt,
-    progress: ramp(
-      frame,
-      leaveAt,
-      REGISTER_CUE - RECEIPT_CUE,
-      motion.travel.easing,
-    ),
-  };
 }

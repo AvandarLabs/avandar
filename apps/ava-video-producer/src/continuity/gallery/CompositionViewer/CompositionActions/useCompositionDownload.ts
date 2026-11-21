@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FilmDownloads } from "../../../../../showcase/FilmDownloads/FilmDownloads";
-import type { ExportTheme } from "../../../../videoThemeEditor/themeDraft/themeDraft";
-import type { CompositionExportOptions } from "../compositionExportOptions";
+import type { ExportTheme } from "../../../../videoThemeEditor/ThemeDrafts/ThemeDrafts";
+import type { CompositionExportOptions } from "../compositionExportOptions/compositionExportOptions";
 
 /** The selected film's export progress and the action that starts it. */
 type CompositionDownload = {

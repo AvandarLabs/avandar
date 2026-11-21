@@ -1,10 +1,14 @@
-import { ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ACCEPT_CUE, TRANSFER_CUE } from "./custodyShape";
 import type { ReactNode } from "react";
 
-type Props = { frame: number; accepted: boolean; accent: string };
+type Props = {
+  frame: number;
+  accepted: boolean;
+  accent: string;
+};
 /** Acknowledgement becomes visible before responsibility begins crossing. */
 export function CustodyAcceptance({
   frame,
@@ -18,12 +22,12 @@ export function CustodyAcceptance({
     <g
       opacity={
         accepted
-          ? ramp(
+          ? Motion.ramp({
               frame,
-              ACCEPT_CUE,
-              TRANSFER_CUE - ACCEPT_CUE,
-              motion.reveal.easing,
-            )
+              at: ACCEPT_CUE,
+              dur: TRANSFER_CUE - ACCEPT_CUE,
+              easing: motion.reveal.easing,
+            })
           : 0
       }
       data-acknowledgement="seal"

@@ -1,13 +1,13 @@
 import { useVideoMotion } from "../videoTheme/useVideoMotion";
-import { useVideoTheme } from "../videoTheme/useVideoTheme";
+import { useVideoTheme } from "../videoTheme/videoThemeHelpers";
 import { TitleCardShared } from "./TitleCardShared/TitleCardShared";
 import { TitleCardWord } from "./TitleCardWord";
 import type { ReactNode } from "react";
+
+type Props = { name: string; frame: number };
+
 /** The name, one masked word at a time. */
-export function TitleCardWords({
-  name,
-  frame,
-}: Readonly<{ name: string; frame: number }>): ReactNode {
+export function TitleCardWords({ name, frame }: Readonly<Props>): ReactNode {
   const { spacing } = useVideoTheme().mantine;
   const motion = useVideoMotion();
   return (

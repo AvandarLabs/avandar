@@ -5,15 +5,12 @@ function _isNumericLiteral(node: ts.Node | undefined): boolean {
   if (!node) {
     return false;
   }
-  if (ts.isParenthesizedExpression(node)) {
-    return _isNumericLiteral(node.expression);
-  }
-  return (
-    ts.isNumericLiteral(node) ||
-    (ts.isPrefixUnaryExpression(node) &&
-      node.operator === ts.SyntaxKind.MinusToken &&
-      ts.isNumericLiteral(node.operand))
-  );
+  return ts.isParenthesizedExpression(node)
+    ? _isNumericLiteral(node.expression)
+    : ts.isNumericLiteral(node) ||
+        (ts.isPrefixUnaryExpression(node) &&
+          node.operator === ts.SyntaxKind.MinusToken &&
+          ts.isNumericLiteral(node.operand));
 }
 /**
  * The values an expression can take that a reader sees in source: the
@@ -24,12 +21,11 @@ function _valueBranches(node: ts.Expression | undefined): ts.Expression[] {
   if (!node) {
     return [];
   }
-  if (ts.isParenthesizedExpression(node)) {
-    return _valueBranches(node.expression);
-  }
-  return ts.isConditionalExpression(node)
-    ? [..._valueBranches(node.whenTrue), ..._valueBranches(node.whenFalse)]
-    : [node];
+  return ts.isParenthesizedExpression(node)
+    ? _valueBranches(node.expression)
+    : ts.isConditionalExpression(node)
+      ? [..._valueBranches(node.whenTrue), ..._valueBranches(node.whenFalse)]
+      : [node];
 }
 /**
  * Whether a duration starts from a literal, such as `18`, `48 - index * 3`,
@@ -45,10 +41,9 @@ function _leadsWithLiteral(node: ts.Expression): boolean {
       _leadsWithLiteral(node.whenTrue) || _leadsWithLiteral(node.whenFalse)
     );
   }
-  if (ts.isBinaryExpression(node)) {
-    return _leadsWithLiteral(node.left);
-  }
-  return _isNumericLiteral(node);
+  return ts.isBinaryExpression(node)
+    ? _leadsWithLiteral(node.left)
+    : _isNumericLiteral(node);
 }
 /** The terms of a sum, such as `reviewAt` and `8` in `reviewAt + 8`. */
 function _addedTerms(node: ts.Expression): string[] {
@@ -90,16 +85,13 @@ function _holdsLiteralStagger(node: ts.Node): boolean {
   if (ts.isCallExpression(node)) {
     return false;
   }
-  if (
-    ts.isBinaryExpression(node) &&
+  return ts.isBinaryExpression(node) &&
     node.operatorToken.kind === ts.SyntaxKind.AsteriskToken &&
     (ts.isIdentifier(node.left) || ts.isPropertyAccessExpression(node.left)) &&
     ts.isNumericLiteral(node.right) &&
     !node.right.text.includes(".")
-  ) {
-    return true;
-  }
-  return ts.forEachChild(node, _holdsLiteralStagger) ?? false;
+    ? true
+    : (ts.forEachChild(node, _holdsLiteralStagger) ?? false);
 }
 /** A spacing value with a length in it: a non-zero number or a `px` string. */
 function _isSpacingLiteral(node: ts.Expression): boolean {
@@ -126,20 +118,22 @@ function _attributeValue(
   attribute: ts.JsxAttribute,
 ): ts.Expression | undefined {
   const initializer = attribute.initializer;
-  if (!initializer) {
-    return undefined;
-  }
-  return ts.isJsxExpression(initializer) ? initializer.expression : initializer;
+  return !initializer
+    ? undefined
+    : ts.isJsxExpression(initializer)
+      ? initializer.expression
+      : initializer;
 }
 function _attributeName(attribute: ts.JsxAttribute): string {
   return attribute.name.getText();
 }
 /** The helper a call names: `ramp` for `ramp(…)` and `motion.ramp(…)`. */
 function _calleeName(callee: ts.Expression): string | undefined {
-  if (ts.isIdentifier(callee)) {
-    return callee.text;
-  }
-  return ts.isPropertyAccessExpression(callee) ? callee.name.text : undefined;
+  return ts.isIdentifier(callee)
+    ? callee.text
+    : ts.isPropertyAccessExpression(callee)
+      ? callee.name.text
+      : undefined;
 }
 /** Syntax lookups used to identify literal values in renderers. */
 export const LiteralSourceHelpers = {

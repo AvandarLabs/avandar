@@ -1,22 +1,26 @@
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { WeaveBandPattern } from "./WeaveBandPattern";
+import { ContributionWeaveDefinitions } from "./ContributionWeaveDefinitions/ContributionWeaveDefinitions";
+import { ContributionWeaveWarpLayer } from "./ContributionWeaveWarpLayer/ContributionWeaveWarpLayer";
 import { WeaveCaptions } from "./WeaveCaptions";
-import { WeaveShuttle } from "./WeaveShuttle";
-import { WeaveWarp } from "./WeaveWarp";
+import { WeaveShuttle } from "./WeaveShuttle/WeaveShuttle";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ContributionWeave.schema";
 import type { ComponentProps, ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
+
 const LOOM = { x: 320, y: 180, width: 550, height: 300 } satisfies Pick<
   ComponentProps<"rect">,
   "x" | "y" | "width" | "height"
 >;
+
 /** The loom frame's corner before the corner style scales it. */
 const LOOM_CORNER = 6;
+
 /** The loom frame's line weight before the line weight scales it. */
 const LOOM_STROKE = 5;
+
 /** Distinct bands interlock by alternating visible crossing ownership. */
 export function ContributionWeave({
   frame,
@@ -40,28 +44,8 @@ export function ContributionWeave({
         strokeWidth={scales.stroke(LOOM_STROKE)}
         opacity={motion.reveal(frame, 12)}
       />
-      <defs>
-        {[...input.warp, ...input.weft].map((contributor, index) => {
-          return (
-            <WeaveBandPattern
-              key={contributor.id}
-              id={`${id}-band-${index}`}
-              color={colors[index % 3]}
-              pattern={contributor.pattern}
-            />
-          );
-        })}
-      </defs>
-      {input.warp.map((contributor, index) => {
-        return (
-          <WeaveWarp
-            key={contributor.id}
-            contributor={contributor}
-            index={index}
-            {...warpProps}
-          />
-        );
-      })}
+      <ContributionWeaveDefinitions {...{ input, id, colors }} />
+      <ContributionWeaveWarpLayer input={input} warpProps={warpProps} />
       {input.weft.map((contributor, index) => {
         return (
           <WeaveShuttle

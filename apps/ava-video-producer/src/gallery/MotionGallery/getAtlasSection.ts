@@ -1,32 +1,24 @@
-import { CONTINUITY_CATALOG } from "../../continuity/continuityCatalog";
-import type { AtlasSection } from "./AtlasSections/AtlasSections";
-
-/** Every Atlas section, in navigation order. */
-export const ATLAS_SECTIONS: readonly AtlasSection[] = [
-  "motions",
-  "compositions",
-  "films",
-  "helpers",
-];
-
+import { propEq } from "@avandar/utils";
+import { CONTINUITY_CATALOG } from "../../continuity/isSceneEntry";
+import {
+  AtlasSectionNames,
+  type AtlasSectionName,
+} from "./AtlasSections/AtlasSectionNames";
 /**
  * Read deep links, including composition links authored before section routing.
  */
-export function getAtlasSection(): AtlasSection {
+export function getAtlasSection(): AtlasSectionName {
   const parameters = new URLSearchParams(location.search);
-  const entry = CONTINUITY_CATALOG.find((item) => {
-    return item.id === parameters.get("film");
-  });
+  const filmId = parameters.get("film");
+  const entry =
+    filmId === null ? undefined : CONTINUITY_CATALOG.find(propEq("id", filmId));
   if (entry) {
     return entry.family === "films" ? "films" : "compositions";
   }
   const section = parameters.get("section");
-  if (parameters.has("helper")) {
-    return "helpers";
-  }
-  return (
-    ATLAS_SECTIONS.find((item) => {
-      return item === section;
-    }) ?? "motions"
-  );
+  return parameters.has("helper")
+    ? "helpers"
+    : AtlasSectionNames.isValid(section)
+      ? section
+      : "motions";
 }

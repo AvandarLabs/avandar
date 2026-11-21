@@ -1,4 +1,4 @@
-import { ZoneFraction } from "./ZoneFraction";
+import { ZoneFraction } from "./ZoneFraction/ZoneFraction";
 import type { Input } from "./PopulationNormalizedMap.schema";
 import type { ReactNode } from "react";
 

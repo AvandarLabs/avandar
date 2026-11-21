@@ -10,7 +10,6 @@ import type {
   CaptureFlowContext,
 } from "../scripts/captureAvandar/captureAvandar.types";
 import type { FlowContext, FlowRecord } from "./captureFlows.types";
-
 /**
  * Recorded cases per district, as the explorer's aggregate query returns
  * them.
@@ -23,15 +22,19 @@ const DISTRICT_CASE_COUNTS: ReadonlyArray<readonly [string, number]> = [
   ["Ridge", 29],
   ["West Marsh", 25],
 ];
-
-async function _navigate(
-  page: Page,
-  options: Readonly<{ linkName: string; urlSuffix: string }>,
-): Promise<void> {
+async function _navigate({
+  page,
+  options,
+}: Readonly<{
+  page: Page;
+  options: Readonly<{
+    linkName: string;
+    urlSuffix: string;
+  }>;
+}>): Promise<void> {
   await page.getByRole("link", { name: options.linkName, exact: true }).click();
   await expect(page).toHaveURL(new RegExp(options.urlSuffix));
 }
-
 async function _importFlow(context: FlowContext): Promise<void> {
   await ensureDataset({ context, key: "cases", shouldDemonstrate: true });
   // Each import drives the one recording page, so they run in order.
@@ -39,13 +42,18 @@ async function _importFlow(context: FlowContext): Promise<void> {
     await ensureDataset({ context, key });
   }
 }
-
 /** Opens the Data Explorer on the cases dataset in manual query mode. */
 async function _openExplorer(context: FlowContext): Promise<FlowRecord> {
-  const dataset = await ensureFixtureDataset(context, "cases");
-  await _navigate(context.page, {
-    linkName: "Data Explorer",
-    urlSuffix: `/${context.workspace}/data-explorer`,
+  const dataset = await ensureFixtureDataset({
+    context,
+    key: "cases",
+  });
+  await _navigate({
+    page: context.page,
+    options: {
+      linkName: "Data Explorer",
+      urlSuffix: `/${context.workspace}/data-explorer`,
+    },
   });
   await context.page
     .getByRole("heading", { name: "Data Explorer", exact: true })
@@ -71,7 +79,6 @@ async function _openExplorer(context: FlowContext): Promise<FlowRecord> {
     .waitFor({ timeout: 20000 });
   return dataset;
 }
-
 async function _filterEastbank(page: Page): Promise<void> {
   const filters = page.getByTestId("query-filters-field");
   await filters
@@ -87,11 +94,13 @@ async function _filterEastbank(page: Page): Promise<void> {
     .getByText("1 to 50 of 56", { exact: true })
     .waitFor({ timeout: 20000 });
 }
-
-async function _aggregateDistricts(
-  page: Page,
-  datasetId: string,
-): Promise<void> {
+async function _aggregateDistricts({
+  page,
+  datasetId,
+}: Readonly<{
+  page: Page;
+  datasetId: string;
+}>): Promise<void> {
   await page
     .getByRole("radiogroup", { name: "Query editor mode" })
     .getByText("SQL", { exact: true })
@@ -119,7 +128,6 @@ async function _aggregateDistricts(
     },
   );
 }
-
 async function _showBarChart(page: Page): Promise<void> {
   await page.getByRole("tab", { name: "Visualizations", exact: true }).click();
   await page
@@ -140,7 +148,6 @@ async function _showBarChart(page: Page): Promise<void> {
   ).not.toBeVisible();
   await expect(page.locator(".recharts-bar-rectangle")).toHaveCount(6);
 }
-
 async function _explorer(context: FlowContext): Promise<void> {
   const { page, step, checkpoint } = context;
   const dataset = await step("explorer-select-source", () => {
@@ -152,7 +159,10 @@ async function _explorer(context: FlowContext): Promise<void> {
   });
   await checkpoint("explorer-filtered");
   await step("explorer-aggregate-districts", () => {
-    return _aggregateDistricts(page, dataset.id);
+    return _aggregateDistricts({
+      page,
+      datasetId: dataset.id,
+    });
   });
   await checkpoint("explorer-query");
   await step("explorer-bar-chart", () => {
@@ -161,14 +171,16 @@ async function _explorer(context: FlowContext): Promise<void> {
   context.state.explorerUrl = page.url();
   await checkpoint("explorer-chart");
 }
-
 /**
  * Waits for the save form to render the fetched dashboard list or name
  * field.
  */
 async function _waitForDashboardForm(page: Page): Promise<void> {
   const response = await page.waitForResponse((dashboardResponse) => {
-    return isRestListResponse(dashboardResponse, "dashboards");
+    return isRestListResponse({
+      response: dashboardResponse,
+      table: "dashboards",
+    });
   });
   const rows = await response.json();
   if (!Array.isArray(rows)) {
@@ -178,9 +190,14 @@ async function _waitForDashboardForm(page: Page): Promise<void> {
     ? page.getByRole("listbox", { name: "Dashboards", exact: true }).waitFor()
     : page.getByLabel("Dashboard name", { exact: true }).waitFor());
 }
-
 /** Saves the explorer view to the run's dashboard, reusing it if it exists. */
-async function _saveViewToDashboard(page: Page, name: string): Promise<void> {
+async function _saveViewToDashboard({
+  page,
+  name,
+}: Readonly<{
+  page: Page;
+  name: string;
+}>): Promise<void> {
   await page.getByRole("button", { name: "Save", exact: true }).click();
   const fetchedDashboards = _waitForDashboardForm(page);
   await page
@@ -215,7 +232,6 @@ async function _saveViewToDashboard(page: Page, name: string): Promise<void> {
     .getByText(`Created "${name}"`, { exact: true })
     .waitFor({ timeout: 20000 });
 }
-
 async function _dashboards(context: FlowContext): Promise<void> {
   const { page, step, checkpoint, runLabel } = context;
   if (!context.state.explorerUrl) {
@@ -223,17 +239,26 @@ async function _dashboards(context: FlowContext): Promise<void> {
   }
   const name = `Video - Harborfield response overview - ${runLabel}`;
   await step("dashboard-save-view", () => {
-    return _saveViewToDashboard(page, name);
+    return _saveViewToDashboard({
+      page,
+      name,
+    });
   });
   await step("dashboard-open-editor", async () => {
-    await _navigate(page, {
-      linkName: "Dashboards",
-      urlSuffix: `/${context.workspace}/dashboards`,
+    await _navigate({
+      page,
+      options: {
+        linkName: "Dashboards",
+        urlSuffix: `/${context.workspace}/dashboards`,
+      },
     });
     await page.getByText(name, { exact: true }).click();
     await page.getByRole("button", { name: "View", exact: true }).waitFor();
   });
-  const id = getRecordIdFromPageUrl(page, "dashboards");
+  const id = getRecordIdFromPageUrl({
+    page,
+    segment: "dashboards",
+  });
   context.state.dashboard = { id, name };
   await context.recordResource?.({ kind: "dashboard", id, name });
   await checkpoint("dashboard-editor");
@@ -246,7 +271,6 @@ async function _dashboards(context: FlowContext): Promise<void> {
   });
   await checkpoint("dashboard-preview");
 }
-
 /**
  * Flow names are stable CLI identifiers, not product feature availability
  * claims.
@@ -263,10 +287,11 @@ const PRODUCT_FLOWS: Readonly<
     );
   },
   map: async (context) => {
-    return (await import("./casesMap/runMapFlow")).runMapFlow(context);
+    return (await import("./casesMap/runMapFlow/runMapFlow")).runMapFlow(
+      context,
+    );
   },
 };
-
 /**
  * The Avandar capture flows `pnpm capture` runs, by CLI name. `loadFlows`
  * reads it. A failed run retains the actual screen and redacted visible text

@@ -1,4 +1,4 @@
-import { prop } from "@avandar/utils";
+import { prop, propEq } from "@avandar/utils";
 import { z } from "zod";
 import type { StockSemanticRule } from "../../contracts/StockContract.types";
 /** Complete strict authored input and cross-field validation. */
@@ -34,11 +34,7 @@ export const inputSchema = z
     ) {
       issue("services", "Service IDs must be unique.");
     }
-    if (
-      !input.services.some(({ id }) => {
-        return id === input.chosenServiceId;
-      })
-    ) {
+    if (!input.services.some(propEq("id", input.chosenServiceId))) {
       issue(
         "chosenServiceId",
         "Chosen service must exist, including an authored empty ID.",

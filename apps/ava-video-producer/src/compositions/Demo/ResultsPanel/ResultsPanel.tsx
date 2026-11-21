@@ -1,6 +1,12 @@
 import { EmptyState } from "./EmptyState";
 import { Results } from "./Results";
 import type { ReactNode } from "react";
+
+type Props = {
+  frame: number;
+  totalShown: number;
+};
+
 /**
  * The results phase: an empty state that dissolves into the channel
  * breakdown once the query runs, then dims the rows the active filter
@@ -9,10 +15,7 @@ import type { ReactNode } from "react";
 export function ResultsPanel({
   frame,
   totalShown,
-}: {
-  frame: number;
-  totalShown: number;
-}): ReactNode {
+}: Readonly<Props>): ReactNode {
   return (
     <>
       <EmptyState frame={frame} />

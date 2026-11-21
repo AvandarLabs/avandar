@@ -1,6 +1,13 @@
 import assert from "node:assert/strict";
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
 
+type ParticipantCircle = {
+  x: number;
+  y: number;
+  rimRadius: number;
+  radius: number;
+};
+
 /** The stroke width SVG draws when no ancestor sets one. */
 const SVG_INITIAL_STROKE_WIDTH = 1;
 
@@ -96,17 +103,7 @@ function _getServiceParticipantGeometryFromMarkup(
     if (tag.startsWith("<g")) {
       styles.push(style);
     } else if (tag.startsWith("<circle")) {
-      result.circles.push({
-        x: SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "cx" }),
-        y: SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "cy" }),
-        rimRadius: SvgAttributes.getNumberFromMarkup({
-          attributes: tag,
-          name: "r",
-        }),
-        radius:
-          SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "r" }) +
-          (style.hasStroke ? style.strokeWidth / 2 : 0),
-      });
+      result.circles.push(_getParticipantCircleFromTag({ tag, style }));
     } else {
       result.segments.push(
         ..._getServicePathSegmentsFromTag(tag).map((segment) => {
@@ -155,3 +152,25 @@ export const ServiceSvgGeometry = {
   getParticipantGeometryFromMarkup: GetServiceParticipantGeometryFromMarkup;
   getObstaclesFromMarkup: typeof _getServiceObstaclesFromMarkup;
 };
+
+type GetParticipantCircleFromTagOptions = {
+  tag: string;
+  style: Readonly<{ hasStroke: boolean; strokeWidth: number }>;
+};
+/** Reads the circle radius together with its inherited stroke envelope. */
+function _getParticipantCircleFromTag({
+  tag,
+  style,
+}: Readonly<GetParticipantCircleFromTagOptions>): ParticipantCircle {
+  return {
+    x: SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "cx" }),
+    y: SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "cy" }),
+    rimRadius: SvgAttributes.getNumberFromMarkup({
+      attributes: tag,
+      name: "r",
+    }),
+    radius:
+      SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "r" }) +
+      (style.hasStroke ? style.strokeWidth / 2 : 0),
+  };
+}

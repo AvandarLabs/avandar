@@ -1,4 +1,4 @@
-import type { Rect } from "../../layout/layout";
+import type { Rect } from "../../layout/SceneGeometry";
 import type { SizedProps } from "../TiltedWindowSceneShared/TiltedWindowSceneShared.types";
 import type { WindowMotion } from "../WindowMotion/WindowMotion";
 import type {

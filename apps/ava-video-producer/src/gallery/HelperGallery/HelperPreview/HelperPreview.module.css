@@ -1,15 +1,15 @@
-.preview {
+.helperPreviewPreview {
   background: var(--white);
   border: var(--atlas-border-1) solid var(--line);
   border-radius: var(--atlas-radius-8);
   min-width: 0;
 }
 
-.stage {
+.helperPreviewStage {
   padding: var(--atlas-space-16) var(--atlas-space-16) 0;
 }
 
-.player {
+.helperPreviewPlayer {
   aspect-ratio: 1.6;
   background: var(--ava-neutral-9);
   border: 0;
@@ -20,7 +20,7 @@
   width: 100%;
 }
 
-.notice {
+.helperPreviewNotice {
   color: var(--atlas-color-muted);
   font-size: var(--atlas-font-size-13);
   line-height: 1.5;

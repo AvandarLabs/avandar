@@ -1,4 +1,4 @@
-import { ramp } from "../../../../motion";
+import { Motion } from "../../../../motion";
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ByteItemLabels } from "../ByteItemLabels";
@@ -27,12 +27,12 @@ export function ByteItem({
 }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const motion = GraphicThemeHooks.useGraphicMotion();
-  const unfolding = ramp(
+  const unfolding = Motion.ramp({
     frame,
-    49,
-    motion.scale(UNFOLD_FRAMES),
-    motion.travel.easing,
-  );
+    at: 49,
+    dur: motion.scale(UNFOLD_FRAMES),
+    easing: motion.travel.easing,
+  });
   return (
     <g data-item-id={item.id} data-item-bytes={item.bytes}>
       <CountTab itemId={item.id} x={x} y={y} />

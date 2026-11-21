@@ -4,7 +4,7 @@ import { ThemeActions } from "./ThemeActions/ThemeActions";
 import css from "./ThemeBar.module.css";
 import {
   getThemeBarActions,
-  getThemeBarMessage,
+  getThemeBarMessageFromState,
   submitNewThemeName,
   type ThemeBarMessage,
 } from "./themeBarHelpers/themeBarHelpers";
@@ -94,7 +94,7 @@ export function ThemeBar({ barRef, onSaveAsNew, ...state }: Props): ReactNode {
   return (
     <div
       ref={barRef}
-      className={css.bar}
+      className={css.themeBarBar}
       role="group"
       aria-label="Theme controls"
       tabIndex={-1}
@@ -104,7 +104,7 @@ export function ThemeBar({ barRef, onSaveAsNew, ...state }: Props): ReactNode {
         isDisabled={!getThemeBarActions(state).canSwitchTheme}
       />
       {state.isBuiltIn ? (
-        <p className={css.notice}>
+        <p className={css.themeBarNotice}>
           {
             "Changes to a built-in theme are saved as a new theme. The new theme leaves out this theme's settings for single compositions, so each composition uses the theme's own colours."
           }
@@ -127,8 +127,8 @@ export function ThemeBar({ barRef, onSaveAsNew, ...state }: Props): ReactNode {
           }}
         />
       ) : null}
-      <p className={css.status} role="status" aria-live="polite">
-        {statusText(getThemeBarMessage(state))}
+      <p className={css.themeBarStatus} role="status" aria-live="polite">
+        {statusText(getThemeBarMessageFromState(state))}
       </p>
     </div>
   );

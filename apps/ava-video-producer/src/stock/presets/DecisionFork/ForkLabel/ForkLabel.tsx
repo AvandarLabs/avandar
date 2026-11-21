@@ -33,7 +33,11 @@ function _wrap({
   text,
   width,
   fontSize,
-}: Readonly<{ text: string; width: number; fontSize: number }>): string[] {
+}: Readonly<{
+  text: string;
+  width: number;
+  fontSize: number;
+}>): string[] {
   const tokens = text.match(/\S+\s*|\s+/g) ?? [""];
   return tokens.reduce<string[]>((result, token) => {
     return getConservativeWidthFromText({ text: token.trimEnd(), fontSize }) >
@@ -64,7 +68,10 @@ export function ForkLabel({
 }: Readonly<Props>): ReactNode {
   const roleStyle = GraphicThemeHooks.useGraphicTokens().text.graphic[role];
   const fontSize = size ?? roleStyle.fontSize;
-  const { lineGap } = GraphicThemeHooks.useGraphicProps("DecisionFork", {});
+  const { lineGap } = GraphicThemeHooks.useGraphicProps({
+    name: "DecisionFork",
+    props: {},
+  });
   const lines = _wrap({ text, width, fontSize });
   return (
     <g aria-label={text}>
@@ -74,14 +81,7 @@ export function ForkLabel({
           // Wrapped text uses fixed line slots within one fork
           // label. Duplicate lines carry no independent state.
           // react-doctor-disable-next-line no-array-index-as-key
-          <Text key={index}
-            role={role}
-            x={x}
-            y={y + index * (fontSize + lineGap)}
-            fittedSize={fontSize}
-            anchor="middle"
-            fill={fill}
-          >
+          <Text key={index} role={role} x={x} y={y + index * (fontSize + lineGap)} fittedSize={fontSize} anchor="middle" fill={fill}>
             {line}
           </Text>
         );

@@ -1,20 +1,19 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import {
-  captureGlobals,
-  restoreGlobals,
-} from "../__tests__/restoreGlobalsHelpers";
+import { GlobalSnapshots } from "../__tests__/GlobalSnapshots";
 import { watchFilms } from "./watchFilms";
 
 const origin = "http://localhost:4173";
-
 type FilmMessage = {
   type: string;
   action?: string;
   requestId?: string;
 };
 type FakePlayer = {
-  messages: Array<{ message: FilmMessage; targetOrigin: string }>;
+  messages: Array<{
+    message: FilmMessage;
+    targetOrigin: string;
+  }>;
   navigations: string[];
   src: string;
   contentWindow: {
@@ -29,7 +28,10 @@ type FakeStream = {
 type ReloadListener = (event: {
   source: unknown;
   origin: string;
-  data: { type: string; requestId: string };
+  data: {
+    type: string;
+    requestId: string;
+  };
 }) => void;
 type ManualClock = {
   schedule: (callback: () => void, delay: number) => number;
@@ -50,7 +52,6 @@ type WatchEnvironment = {
   ) => void;
   restore: () => void;
 };
-
 function _createPlayer(index: number): FakePlayer {
   let source = `${origin}/live.html?id=film-${index}`;
   const messages: FakePlayer["messages"] = [];
@@ -72,10 +73,15 @@ function _createPlayer(index: number): FakePlayer {
     },
   };
 }
-
 /** A manual clock that fires timers only when a test advances it. */
 function _createClock(): ManualClock {
-  const timers = new Map<number, { callback: () => void; at: number }>();
+  const timers = new Map<
+    number,
+    {
+      callback: () => void;
+      at: number;
+    }
+  >();
   let time = 0;
   let timerId = 0;
   return {
@@ -101,12 +107,14 @@ function _createClock(): ManualClock {
     },
   };
 }
-
 /** Installs a fake EventSource, window, and clock for one gallery. */
-function _installGallery(
-  streams: FakeStream[],
-  listeners: Set<ReloadListener>,
-): ManualClock {
+function _installGallery({
+  streams,
+  listeners,
+}: Readonly<{
+  streams: FakeStream[];
+  listeners: Set<ReloadListener>;
+}>): ManualClock {
   const clock = _createClock();
   Object.assign(globalThis, {
     EventSource: class {
@@ -138,17 +146,19 @@ function _installGallery(
   });
   return clock;
 }
-
-function _createEnvironment(playerCount = 1): WatchEnvironment {
+function _createEnvironment(playerCount: number = 1): WatchEnvironment {
   const streams: FakeStream[] = [];
   const listeners = new Set<ReloadListener>();
-  const originals = captureGlobals([
+  const originals = GlobalSnapshots.captureGlobals([
     "EventSource",
     "window",
     "setTimeout",
     "clearTimeout",
   ]);
-  const clock = _installGallery(streams, listeners);
+  const clock = _installGallery({
+    streams,
+    listeners,
+  });
   const players = Array.from({ length: playerCount }, (_, index) => {
     return _createPlayer(index);
   });
@@ -174,136 +184,157 @@ function _createEnvironment(playerCount = 1): WatchEnvironment {
       });
     },
     restore: () => {
-      restoreGlobals(originals);
+      GlobalSnapshots.restoreGlobals(originals);
     },
   };
 }
-
-function _withWatcher(
-  playerCount: number,
-  verify: (environment: WatchEnvironment, dispose: () => void) => void,
-): void {
+function _withWatcher({
+  playerCount,
+  verify,
+}: Readonly<{
+  playerCount: number;
+  verify: (environment: WatchEnvironment, dispose: () => void) => void;
+}>): void {
   const environment = _createEnvironment(playerCount);
   let dispose: (() => void) | undefined;
   try {
-    dispose = watchFilms(environment.players);
+    dispose = watchFilms({ players: environment.players });
     verify(environment, dispose);
   } finally {
     dispose?.();
     environment.restore();
   }
 }
-
 test("seven players share one source stream and ignore initial or repeated generations", () => {
-  _withWatcher(7, ({ streams, players, notify }) => {
-    assert.equal(streams.length, 1);
-    assert.equal(streams[0].url, "/events");
-    notify("5");
-    notify("5");
-    assert.ok(
-      players.every((player) => {
-        return player.messages.length === 0;
-      }),
-    );
-    notify("6");
-    notify("6");
-    const requestIds = new Set(
-      players.map((player) => {
-        assert.equal(player.messages.length, 1);
-        const { message, targetOrigin } = player.messages[0];
-        assert.equal(message.type, "film-control");
-        assert.equal(message.action, "reload");
-        assert.equal(targetOrigin, origin);
-        return message.requestId;
-      }),
-    );
-    assert.equal(requestIds.size, 7);
+  _withWatcher({
+    playerCount: 7,
+    verify: ({ streams, players, notify }) => {
+      assert.equal(streams.length, 1);
+      assert.equal(streams[0].url, "/events");
+      notify("5");
+      notify("5");
+      assert.ok(
+        players.every((player) => {
+          return player.messages.length === 0;
+        }),
+      );
+      notify("6");
+      notify("6");
+      const requestIds = new Set(
+        players.map((player) => {
+          assert.equal(player.messages.length, 1);
+          const { message, targetOrigin } = player.messages[0];
+          assert.equal(message.type, "film-control");
+          assert.equal(message.action, "reload");
+          assert.equal(targetOrigin, origin);
+          return message.requestId;
+        }),
+      );
+      assert.equal(requestIds.size, 7);
+    },
   });
 });
-
 test("a loading or dead iframe reloads its current source when acknowledgement expires", () => {
-  _withWatcher(1, ({ players, notify, clock }) => {
-    notify("1");
-    notify("2");
-    const source = players[0].src;
-    clock.advance(999);
-    assert.deepEqual(players[0].navigations, []);
-    clock.advance(1);
-    assert.deepEqual(players[0].navigations, [source]);
+  _withWatcher({
+    playerCount: 1,
+    verify: ({ players, notify, clock }) => {
+      notify("1");
+      notify("2");
+      const source = players[0].src;
+      clock.advance(999);
+      assert.deepEqual(players[0].navigations, []);
+      clock.advance(1);
+      assert.deepEqual(players[0].navigations, [source]);
+    },
   });
 });
-
 test("a matching iframe acknowledgement cancels fallback navigation", () => {
-  _withWatcher(1, ({ players, notify, clock, acknowledge }) => {
-    notify("1");
-    notify("2");
-    assert.equal(clock.pending, 1);
-    acknowledge(players[0].messages[0].message.requestId);
-    clock.advance(1000);
-    assert.deepEqual(players[0].navigations, []);
-    assert.equal(clock.pending, 0);
+  _withWatcher({
+    playerCount: 1,
+    verify: ({ players, notify, clock, acknowledge }) => {
+      notify("1");
+      notify("2");
+      assert.equal(clock.pending, 1);
+      acknowledge(players[0].messages[0].message.requestId);
+      clock.advance(1000);
+      assert.deepEqual(players[0].navigations, []);
+      assert.equal(clock.pending, 0);
+    },
   });
 });
-
 test("unrelated origins, windows, and request IDs cannot cancel recovery", () => {
-  _withWatcher(1, ({ players, notify, clock, acknowledge }) => {
-    notify("1");
-    notify("2");
-    const { requestId } = players[0].messages[0].message;
-    acknowledge(requestId, players[0].contentWindow, "https://example.com");
-    acknowledge(requestId, {});
-    acknowledge("unrelated-request");
-    clock.advance(1000);
-    assert.deepEqual(players[0].navigations, [players[0].src]);
+  _withWatcher({
+    playerCount: 1,
+    verify: ({ players, notify, clock, acknowledge }) => {
+      notify("1");
+      notify("2");
+      const { requestId } = players[0].messages[0].message;
+      acknowledge(requestId, players[0].contentWindow, "https://example.com");
+      acknowledge(requestId, {});
+      acknowledge("unrelated-request");
+      clock.advance(1000);
+      assert.deepEqual(players[0].navigations, [players[0].src]);
+    },
   });
 });
-
 test("new generations replace old deadlines and ignore stale acknowledgements", () => {
-  _withWatcher(1, ({ players, notify, clock, acknowledge }) => {
-    notify("1");
-    notify("2");
-    const staleRequestId = players[0].messages[0].message.requestId;
-    clock.advance(500);
-    notify("3");
-    acknowledge(staleRequestId);
-    clock.advance(500);
-    assert.deepEqual(players[0].navigations, []);
-    clock.advance(500);
-    assert.deepEqual(players[0].navigations, [players[0].src]);
+  _withWatcher({
+    playerCount: 1,
+    verify: ({ players, notify, clock, acknowledge }) => {
+      notify("1");
+      notify("2");
+      const staleRequestId = players[0].messages[0].message.requestId;
+      clock.advance(500);
+      notify("3");
+      acknowledge(staleRequestId);
+      clock.advance(500);
+      assert.deepEqual(players[0].navigations, []);
+      clock.advance(500);
+      assert.deepEqual(players[0].navigations, [players[0].src]);
+    },
   });
 });
-
 test("a server restart generation still requests player refresh", () => {
-  _withWatcher(1, ({ players, notify }) => {
-    notify("server-one:24");
-    notify("server-two:0");
-    assert.equal(players[0].messages.length, 1);
+  _withWatcher({
+    playerCount: 1,
+    verify: ({ players, notify }) => {
+      notify("server-one:24");
+      notify("server-two:0");
+      assert.equal(players[0].messages.length, 1);
+    },
   });
 });
-
 test("recovery uses a newly selected source and never navigates a foreign iframe", () => {
-  _withWatcher(2, ({ players, notify, clock }) => {
-    notify("1");
-    notify("2");
-    players[0].src = `${origin}/live.html?id=another-film`;
-    players[1].src = "https://example.com/";
-    clock.advance(1000);
-    assert.deepEqual(players[0].navigations, [players[0].src, players[0].src]);
-    assert.deepEqual(players[1].navigations, ["https://example.com/"]);
+  _withWatcher({
+    playerCount: 2,
+    verify: ({ players, notify, clock }) => {
+      notify("1");
+      notify("2");
+      players[0].src = `${origin}/live.html?id=another-film`;
+      players[1].src = "https://example.com/";
+      clock.advance(1000);
+      assert.deepEqual(players[0].navigations, [
+        players[0].src,
+        players[0].src,
+      ]);
+      assert.deepEqual(players[1].navigations, ["https://example.com/"]);
+    },
   });
 });
-
 test("disposing the watcher clears listeners and pending fallback navigations", () => {
-  _withWatcher(1, ({ streams, players, notify, clock, listeners }, dispose) => {
-    notify("1");
-    notify("2");
-    assert.equal(clock.pending, 1);
-    assert.equal(listeners.size, 1);
-    dispose();
-    clock.advance(1000);
-    assert.equal(streams[0].isClosed, true);
-    assert.equal(listeners.size, 0);
-    assert.equal(clock.pending, 0);
-    assert.deepEqual(players[0].navigations, []);
+  _withWatcher({
+    playerCount: 1,
+    verify: ({ streams, players, notify, clock, listeners }, dispose) => {
+      notify("1");
+      notify("2");
+      assert.equal(clock.pending, 1);
+      assert.equal(listeners.size, 1);
+      dispose();
+      clock.advance(1000);
+      assert.equal(streams[0].isClosed, true);
+      assert.equal(listeners.size, 0);
+      assert.equal(clock.pending, 0);
+      assert.deepEqual(players[0].navigations, []);
+    },
   });
 });

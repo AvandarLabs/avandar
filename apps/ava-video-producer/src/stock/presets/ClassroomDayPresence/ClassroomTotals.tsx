@@ -1,10 +1,9 @@
 import { propEq } from "@avandar/utils";
-import { FitText } from "../../primitives/FitText/FitText";
-import { SketchedShape } from "../../primitives/SketchedShape";
-import { StockRect } from "../../primitives/StockRect/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { ClassroomAttendanceTotal } from "./ClassroomAttendanceTotal/ClassroomAttendanceTotal";
 import type { Input } from "./ClassroomDayPresence.schema";
 import type { ReactNode } from "react";
+
 /** Inputs for ClassroomTotals. */
 type Props = { input: Input; day: Input["days"][number] };
 /** Separate state totals share the unchanged supplied-roster denominator. */
@@ -29,59 +28,11 @@ export function ClassroomTotals({ input, day }: Readonly<Props>): ReactNode {
     >
       {totals.map(({ key, label, value }, index) => {
         return (
-          <g key={key}>
-            {key === "present" ? (
-              <circle
-                cx={39 + index * 232}
-                cy={538}
-                r={5}
-                fill={tokens.color.positive}
-              />
-            ) : key === "absent" ? (
-              <StockRect
-                x={34 + index * 232}
-                y={533}
-                width={10}
-                height={10}
-                stroke={tokens.color.inactive}
-                fill="none"
-              />
-            ) : key === "unknown" ? (
-              <SketchedShape
-                shape={{
-                  kind: "path",
-                  d: `M ${39 + index * 232} 532 l 6 6 l -6 6 l -6 -6 Z`,
-                }}
-                profile={tokens.sketch.shape}
-                stroke={tokens.color.highlight}
-                fill="none"
-              />
-            ) : undefined}
-            <FitText
-              text={label}
-              x={54 + index * 232}
-              y={542}
-              width={194}
-              fontSize={12}
-              maxLines={3}
-              breakLongWords
-              normalizeWhitespace
-            />
-            <FitText
-              text={
-                key === "present"
-                  ? `${value} / ${input.learners.length}`
-                  : String(value)
-              }
-              x={54 + index * 232}
-              y={592}
-              width={194}
-              fontSize={14}
-              maxLines={1}
-              breakLongWords
-              normalizeWhitespace
-            />
-          </g>
+          <ClassroomAttendanceTotal
+            key={key}
+            itemKey={key}
+            {...{ index, tokens, label, value, input }}
+          />
         );
       })}
     </g>

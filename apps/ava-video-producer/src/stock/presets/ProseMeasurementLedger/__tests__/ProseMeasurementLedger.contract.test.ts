@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { prop } from "@avandar/utils";
+import { makeMap, prop } from "@avandar/utils";
 import { registerStockDefaultTextAssertions } from "../../../../../tests/helpers/registerStockDefaultTextAssertions";
 import { registerStockPresetAssertions } from "../../../../../tests/helpers/registerStockPresetAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
@@ -186,14 +186,14 @@ test("connector insertion cannot reuse a semantic role's underline pattern", () 
   ].map((match) => {
     return match[0];
   });
-  const byRole = new Map(
-    paths.map((path) => {
-      return [
-        path.match(/data-source-span="([^"]*)"/)![1],
-        path.match(/stroke-dasharray="([^"]*)"/)![1],
-      ];
-    }),
-  );
+  const byRole = makeMap(paths, {
+    keyFn: (path) => {
+      return path.match(/data-source-span="([^"]*)"/)![1];
+    },
+    valueFn: (path) => {
+      return path.match(/stroke-dasharray="([^"]*)"/)![1];
+    },
+  });
   assert.equal(new Set(byRole.values()).size, 6);
 });
 

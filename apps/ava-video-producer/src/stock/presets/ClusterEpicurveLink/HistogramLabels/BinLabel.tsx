@@ -1,11 +1,11 @@
 import { LabelSlots } from "../../../primitives/LabelSlots/LabelSlots";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
+
+type Props = { label: string; index: number };
+
 /** A time bin's number beside its label, three bins to a row. */
-export function BinLabel({
-  label,
-  index,
-}: Readonly<{ label: string; index: number }>): ReactNode {
+export function BinLabel({ label, index }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const y = 385 + Math.floor(index / 3) * 48;
   return (

@@ -1,9 +1,9 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { StatementContext } from "./StatementContext";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./QualifyApparentConflict.schema";
 import type { ReactNode } from "react";
 
@@ -60,7 +60,11 @@ function _getStatementMotion({
   frame,
   index,
   motion,
-}: Readonly<{ frame: number; index: number; motion: VideoMotion }>) {
+}: Readonly<{
+  frame: number;
+  index: number;
+  motion: VideoMotion;
+}>) {
   const arrival = motion.ramp(
     frame,
     12 + index * motion.scaleStagger(6),
@@ -70,7 +74,15 @@ function _getStatementMotion({
   return {
     arrival,
     x:
-      mix(split, index ? 680 : 280, index ? 710 : 250) +
-      mix(arrival, index ? 14 : -14, 0),
+      Motion.mix({
+        t: split,
+        from: index ? 680 : 280,
+        to: index ? 710 : 250,
+      }) +
+      Motion.mix({
+        t: arrival,
+        from: index ? 14 : -14,
+        to: 0,
+      }),
   };
 }

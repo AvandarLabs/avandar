@@ -1,7 +1,7 @@
-import { ramp } from "../../../../motion";
+import { Motion } from "../../../../motion";
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { ComparisonTagsShared } from "./ComparisonTagsShared/ComparisonTagsShared";
+import { ComparisonTagsShared } from "./ComparisonTagsShared";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -22,12 +22,12 @@ export function ComparisonStroke({
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   const motion = GraphicThemeHooks.useGraphicMotion();
-  const draw = ramp(
+  const draw = Motion.ramp({
     frame,
     at,
-    motion.scale(ComparisonTagsShared.TAG_DRAW_FRAMES),
-    motion.reveal.easing,
-  );
+    dur: motion.scale(ComparisonTagsShared.TAG_DRAW_FRAMES),
+    easing: motion.reveal.easing,
+  });
   return (
     <SketchedShape
       shape={{ kind: "path", d: `M456 ${y} h36` }}

@@ -3,7 +3,7 @@ import { MaskedWord } from "./MaskedWord";
 import { type LineProps } from "./TypographySceneShared/TypographySceneShared.types";
 import type { ReactNode } from "react";
 
-type WordMaskedLineOptions = LineProps & { wordStaggerFrames: number };
+type Props = LineProps & { wordStaggerFrames: number };
 /** Each word rising out from behind its own mask, staggered. */
 export function WordMaskedLine({
   frame,
@@ -13,7 +13,7 @@ export function WordMaskedLine({
   revealAt,
   wordStaggerFrames,
   getWordStyle,
-}: WordMaskedLineOptions): ReactNode {
+}: Readonly<Props>): ReactNode {
   const motion = useVideoMotion();
   return (
     <div

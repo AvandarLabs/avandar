@@ -1,5 +1,5 @@
 import { AbsoluteFill } from "remotion";
-import { useVideoTokens } from "../../videoTheme/useVideoTheme";
+import { useVideoTokens } from "../../videoTheme/videoThemeHelpers";
 import { ShotView } from "./ShotView";
 import { type ShotLayerProps as Props } from "./StoryFilmShared/StoryFilmShared.types";
 import type { ReactNode } from "react";

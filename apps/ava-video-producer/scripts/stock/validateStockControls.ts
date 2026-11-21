@@ -137,27 +137,7 @@ function _validateChildren({
       });
     })
     .with({ kind: "collection" }, (matchedControl) => {
-      const items = _items(context.current);
-      if (!items.length) {
-        throw new Error(
-          `Stock collection has no item schema: ${context.location}`,
-        );
-      }
-      matchedControl.itemControls.forEach((child) => {
-        _validateControl({
-          control: child,
-          context: { ...context, current: items, item: items },
-        });
-        const editorItems = _branches([matchedControl.itemSchema]);
-        _validateControl({
-          control: child,
-          context: {
-            ...context,
-            current: editorItems,
-            item: editorItems,
-          },
-        });
-      });
+      _validateCollection({ control: matchedControl, context });
     })
     .with({ kind: "union" }, (matchedControl) => {
       matchedControl.variants.forEach((variant) => {
@@ -222,6 +202,33 @@ function _validateControl({
   _validateChildren({ control, context: { ...context, current, location } });
 }
 
+function _validateCollection({
+  control: matchedControl,
+  context,
+}: Readonly<{
+  control: Extract<StockControl, { kind: "collection" }>;
+  context: Context;
+}>): void {
+  const items = _items(context.current);
+  if (!items.length) {
+    throw new Error(`Stock collection has no item schema: ${context.location}`);
+  }
+  matchedControl.itemControls.forEach((child) => {
+    _validateControl({
+      control: child,
+      context: { ...context, current: items, item: items },
+    });
+    const editorItems = _branches([matchedControl.itemSchema]);
+    _validateControl({
+      control: child,
+      context: {
+        ...context,
+        current: editorItems,
+        item: editorItems,
+      },
+    });
+  });
+}
 /**
  * Rejects editor paths and dynamic choices absent from their schema contexts.
  */

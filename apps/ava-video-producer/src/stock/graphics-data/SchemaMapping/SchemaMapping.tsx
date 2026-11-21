@@ -4,7 +4,7 @@ import { GRAPHIC_WIDTH } from "../../graphics-common/graphicCanvas.constants";
 import { Text } from "../../graphics-common/Text";
 import { LEGACY_DISPLAY_COPY } from "../../presets/legacy/legacyDisplayCopy";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { MappingRow } from "./MappingRow";
+import { MappingRow } from "./MappingRow/MappingRow";
 import { CAPTION_Y, PANEL_WIDTH } from "./SchemaMapping.constants";
 import { SchemaPanel } from "./SchemaPanel";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";

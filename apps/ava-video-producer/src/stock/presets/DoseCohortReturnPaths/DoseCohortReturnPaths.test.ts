@@ -16,6 +16,107 @@ import {
 import { inputSchema, type Input } from "./DoseCohortReturnPaths.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 
+function _makeRecordColorSampleFromSequence(
+  sequence: Array<
+    Array<Input["participants"][number]["records"][number]["state"]>
+  >[number],
+): {
+  input: Input;
+  expectedColors: string[];
+  markup: ReturnType<typeof _render>;
+  marks: RegExpMatchArray[];
+} {
+  const input = inputSchema.parse({
+    ...DEFAULT_INPUT,
+    emphasis: "missed-and-returned",
+    participants: DEFAULT_INPUT.participants.map((person) => {
+      return {
+        ...person,
+        records: sequence.map((state, index) => {
+          return { visitId: DEFAULT_INPUT.visits[index].id, state };
+        }),
+      };
+    }),
+  });
+  const expectedColors =
+    sequence[1] === "missed"
+      ? ["#728794", "#65d6ad", "#65d6ad"]
+      : ["#728794", "#728794", "#65d6ad"];
+  const markup = _render({ frame: 150, input });
+  const marks = Array.from(
+    markup.matchAll(
+      /data-record-person="[^"]*" data-record-visit="([^"]*)"[\s\S]*?<g transform="[^"]*"><path\b[^>]*\bstroke="([^"]*)"/g,
+    ),
+  );
+  return { input, expectedColors, markup, marks };
+}
+
+function _assertEmphasisPreservesTranslations({
+  translations,
+  input,
+  expected,
+}: Readonly<{
+  translations: (value: string) => string[][];
+  input: (typeof fixtures)[number]["input"];
+  expected: string[][];
+}>): void {
+  ["all-records", "missed-and-returned", "unknown-records"].forEach(
+    (emphasis) => {
+      return assert.deepEqual(
+        translations(
+          _render({
+            frame: 150,
+            input: { ...input, emphasis: emphasis as Input["emphasis"] },
+          }),
+        ),
+        expected,
+      );
+    },
+  );
+}
+
+function _assertRecordedVisitEndpoints({
+  input,
+  expected,
+}: Readonly<{
+  input: (typeof fixtures)[number]["input"];
+  expected: string[][];
+}>): void {
+  input.participants.forEach((person) => {
+    const recorded = input.visits
+      .map((visit, index) => {
+        return person.records.some((record) => {
+          return record.visitId === visit.id && record.state === "recorded";
+        })
+          ? index
+          : -1;
+      })
+      .filter((index) => {
+        return index >= 0;
+      });
+    assert.equal(
+      Number(
+        expected.find(([id]) => {
+          return id === person.id;
+        })?.[1],
+      ),
+      recorded.length ? 380 + Math.max(...recorded) * 155 : 285,
+    );
+  });
+}
+
+function _assertAuthoredVisitMarkOrder({
+  marks,
+  input,
+}: Readonly<{ marks: RegExpMatchArray[]; input: Input }>): void {
+  assert.deepEqual(
+    marks.slice(0, 3).map((match) => {
+      return match[1];
+    }),
+    input.visits.map(prop("id")),
+  );
+}
+
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -29,7 +130,7 @@ function _render({
     }),
   );
 }
-test("Every visit uses the same cohort denominator; recorded, missed, not-yet-due and unknown states remain distinct and changing one visit never creates a new person.", () => {
+test("default dose hold frame retains participant count and reports denominator six for each visit", () => {
   const markup = _render({ frame: 150 });
   assert.equal(
     (markup.match(/data-participant=/g) ?? []).length,
@@ -101,19 +202,11 @@ test("nonrecorded first visits retain the entire denominator and emphasis never 
     });
   };
   const expected = translations(markup);
-  ["all-records", "missed-and-returned", "unknown-records"].forEach(
-    (emphasis) => {
-      return assert.deepEqual(
-        translations(
-          _render({
-            frame: 150,
-            input: { ...input, emphasis: emphasis as Input["emphasis"] },
-          }),
-        ),
-        expected,
-      );
-    },
-  );
+  _assertEmphasisPreservesTranslations({
+    translations,
+    input,
+    expected,
+  });
   [24, 36, 54, 72, 94, 116, 150].forEach((frame) => {
     return translations(_render({ frame, input: fixtures[2].input })).forEach(
       ([, x, y]) => {
@@ -123,27 +216,7 @@ test("nonrecorded first visits retain the entire denominator and emphasis never 
     );
   });
   assert.notDeepEqual(translations(_render({ frame: 24, input })), expected);
-  input.participants.forEach((person) => {
-    const recorded = input.visits
-      .map((visit, index) => {
-        return person.records.some((record) => {
-          return record.visitId === visit.id && record.state === "recorded";
-        })
-          ? index
-          : -1;
-      })
-      .filter((index) => {
-        return index >= 0;
-      });
-    assert.equal(
-      Number(
-        expected.find(([id]) => {
-          return id === person.id;
-        })?.[1],
-      ),
-      recorded.length ? 380 + Math.max(...recorded) * 155 : 285,
-    );
-  });
+  _assertRecordedVisitEndpoints({ input, expected });
 });
 test("missed-and-returned accents only chronologically later records regardless of record array order", () => {
   const states: Array<
@@ -153,34 +226,12 @@ test("missed-and-returned accents only chronologically later records regardless 
     ["recorded", "missed", "recorded"],
   ];
   states.forEach((sequence) => {
-    const input = inputSchema.parse({
-      ...DEFAULT_INPUT,
-      emphasis: "missed-and-returned",
-      participants: DEFAULT_INPUT.participants.map((person) => {
-        return {
-          ...person,
-          records: sequence.map((state, index) => {
-            return { visitId: DEFAULT_INPUT.visits[index].id, state };
-          }),
-        };
-      }),
+    const { input, expectedColors, markup, marks } =
+      _makeRecordColorSampleFromSequence(sequence);
+    _assertAuthoredVisitMarkOrder({
+      marks,
+      input,
     });
-    const expectedColors =
-      sequence[1] === "missed"
-        ? ["#728794", "#65d6ad", "#65d6ad"]
-        : ["#728794", "#728794", "#65d6ad"];
-    const markup = _render({ frame: 150, input });
-    const marks = Array.from(
-      markup.matchAll(
-        /data-record-person="[^"]*" data-record-visit="([^"]*)"[\s\S]*?<g transform="[^"]*"><path\b[^>]*\bstroke="([^"]*)"/g,
-      ),
-    );
-    assert.deepEqual(
-      marks.slice(0, 3).map((match) => {
-        return match[1];
-      }),
-      input.visits.map(prop("id")),
-    );
     assert.deepEqual(
       marks.slice(0, 3).map((match) => {
         return match[2];

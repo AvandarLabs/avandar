@@ -4,12 +4,12 @@ import { MOTION_LAB_LEN } from "../../composition-timing";
 import { useVideoMotion } from "../../videoTheme/useVideoMotion";
 // Registers the bundled faces the theme's text roles name.
 import "../../fonts";
-import { useVideoTheme } from "../../videoTheme/useVideoTheme";
+import { useVideoTheme } from "../../videoTheme/videoThemeHelpers";
 import { BuildingBlocks } from "./BuildingBlocks";
 import { ClickStudy } from "./ClickStudy";
 import { CounterCard } from "./CounterCard";
 import layoutClasses from "./MotionLab.module.css";
-import { MotionLabShared } from "./MotionLabShared/MotionLabShared";
+import { MotionLabShared } from "./MotionLabShared";
 import { SectionLabel } from "./SectionLabel";
 import { TypedCard } from "./TypedCard";
 import type { ReactNode } from "react";
@@ -56,7 +56,7 @@ export function MotionLab(): ReactNode {
           heading="Motion vocabulary"
           sub="The same helpers that power the original demo"
         />
-        <SectionLabel className={layoutClasses.positionedContent}>
+        <SectionLabel className={layoutClasses.motionLabPositionedContent}>
           FOUR BUILDING BLOCKS
         </SectionLabel>
         <BuildingBlocks frame={frame} />

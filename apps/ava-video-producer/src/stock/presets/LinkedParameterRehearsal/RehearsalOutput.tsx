@@ -1,12 +1,20 @@
-import { ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { normalizeFiniteRange } from "../../numeric/normalizeFiniteRange/normalizeFiniteRange";
-import { FitText } from "../../primitives/FitText/FitText";
-import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { evaluateAffineRule } from "./evaluateAffineRule";
-import { RehearsalRuler } from "./RehearsalRuler";
+import { RehearsalOutputCoupling } from "./RehearsalOutputCoupling/RehearsalOutputCoupling";
+import { RehearsalOutputScale } from "./RehearsalOutputScale/RehearsalOutputScale";
+import { RehearsalRuleLabel } from "./RehearsalRuleLabel/RehearsalRuleLabel";
 import type { Input } from "./LinkedParameterRehearsal.schema";
 import type { ReactNode } from "react";
+
+type RehearsalPointerState = {
+  computed: number;
+  pointerX: number;
+  baselineX: number;
+  y: number;
+  color: string;
+};
 
 type Props = {
   output: Input["outputs"][number];
@@ -23,24 +31,24 @@ type Props = {
 const LANE_STAGGER_FRAMES = 3;
 /** Frames an output lane takes to fade in. */
 const LANE_FRAMES = 16;
-/**
- * A pointer follows its direct affine rule with a coupling only when
- * dependent.
- */
-export function RehearsalOutput({
+
+type GetRehearsalPointerStateOptions = {
+  output: Input["outputs"][number];
+  source: Input["source"];
+  value: number;
+  index: number;
+  accent: string;
+  tokens: ReturnType<typeof GraphicThemeHooks.useGraphicTokens>;
+};
+/** Samples the authored rehearsal pointer state. */
+function _getRehearsalPointerState({
   output,
   source,
   value,
   index,
-  frame,
   accent,
-  sourceX,
-  showRules,
-  showBaselineMarkers,
-}: Readonly<Props>): ReactNode {
-  const { atomic } = GraphicThemeHooks.useGraphicTheme();
-  const tokens = GraphicThemeHooks.useGraphicTokens();
-  const motion = GraphicThemeHooks.useGraphicMotion();
+  tokens,
+}: Readonly<GetRehearsalPointerStateOptions>): RehearsalPointerState {
   const computed = evaluateAffineRule({
     source: value,
     multiplier: output.multiplier,
@@ -69,69 +77,53 @@ export function RehearsalOutput({
       });
   const y = 252 + index * 90;
   const color = output.multiplier === 0 ? tokens.color.inactive : accent;
+  return { computed, pointerX, baselineX, y, color };
+}
+
+/**
+ * A pointer follows its direct affine rule with a coupling only when
+ * dependent.
+ */
+export function RehearsalOutput({
+  output,
+  source,
+  value,
+  index,
+  frame,
+  accent,
+  sourceX,
+  showRules,
+  showBaselineMarkers,
+}: Readonly<Props>): ReactNode {
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const { computed, pointerX, baselineX, y, color } = _getRehearsalPointerState(
+    { output, source, value, index, accent, tokens },
+  );
   return (
     <g
-      opacity={ramp(
+      opacity={Motion.ramp({
         frame,
-        16 + index * motion.scaleStagger(LANE_STAGGER_FRAMES),
-        motion.scale(LANE_FRAMES),
-        motion.reveal.easing,
-      )}
+        at: 16 + index * motion.scaleStagger(LANE_STAGGER_FRAMES),
+        dur: motion.scale(LANE_FRAMES),
+        easing: motion.reveal.easing,
+      })}
     >
-      {output.multiplier !== 0 ? (
-        <g data-coupling-id={output.id}>
-          <SketchedShape
-            shape={{
-              kind: "path",
-              d: `M${sourceX} 170 V${192 + index * 5} H${348 + index * 6} V${y} H${pointerX}`,
-            }}
-            profile={tokens.sketch.shape}
-            fill="none"
-            stroke={accent}
-            strokeOpacity={atomic.opacity["24"]}
-          />
-        </g>
-      ) : undefined}
-      <RehearsalRuler
-        label={output.label}
-        unit={output.unit}
-        min={output.min}
-        max={output.max}
-        value={computed}
-        y={y}
+      <RehearsalOutputCoupling
+        {...{ output, sourceX, index, y, pointerX, tokens, accent }}
+        atomic={atomic}
       />
-      {showBaselineMarkers ? (
-        <g data-baseline-id={output.id}>
-          <SketchedShape
-            shape={{ kind: "circle", cx: baselineX, cy: y, r: 9 }}
-            profile={tokens.sketch.shape}
-            fill="none"
-            stroke={color}
-            strokeOpacity={tokens.alpha.guide}
-          />
-        </g>
-      ) : undefined}
-      <circle
-        data-output-id={output.id}
-        data-value={computed}
-        cx={pointerX}
-        cy={y}
-        r={5}
-        fill={color}
+      <RehearsalOutputScale
+        {...{ output, showBaselineMarkers, tokens, computed }}
+        {...{ pointerX, baselineX, y, color }}
       />
-      {showRules ? (
-        <FitText
-          text={`${output.multiplier} × ${source.label} + (${output.offset})`}
-          x={32}
-          y={y + 56}
-          width={896}
-          fontSize={12}
-          maxLines={1}
-          breakLongWords
-          normalizeWhitespace
-          color={tokens.color.textMuted}
-        />
-      ) : undefined}
+      <RehearsalRuleLabel {...{ output, source, showRules, tokens, y }} />
     </g>
   );
 }
+
+/** Result of the authored RehearsalOutput calculation. */
+export type RehearsalOutputGetRehearsalPointerStateValue = ReturnType<
+  typeof _getRehearsalPointerState
+>;

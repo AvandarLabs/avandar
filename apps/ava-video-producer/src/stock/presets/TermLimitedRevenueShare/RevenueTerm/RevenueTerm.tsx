@@ -1,12 +1,15 @@
-import { mix } from "../../../../motion";
 import { LabelSlots } from "../../../primitives/LabelSlots/LabelSlots";
-import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { TermTurn } from "./TermTurn";
+import { RevenueOutletTurn } from "./RevenueOutletTurn";
 import type { Input } from "../TermLimitedRevenueShare.schema";
 import type { ReactNode } from "react";
 
-type Props = { frame: number; input: Input; accent: string };
+type Props = {
+  frame: number;
+  input: Input;
+  accent: string;
+};
+
 /** The authored boundary turns and closes only the distribution outlet. */
 export function RevenueTerm({
   frame,
@@ -26,17 +29,12 @@ export function RevenueTerm({
   const y = input.arrangementLayout === "stacked" ? 240 : 355;
   return (
     <g>
-      <TermTurn x={x} y={y} turning={turning} />
-      <SketchedShape
-        shape={{
-          kind: "path",
-          d: `M${x - 15} ${y + 32} L${x + 15} ${y + 32 - mix(turning, 28, 0)}`,
-        }}
-        profile={tokens.sketch.shape}
-        data-outlet="distribution"
-        data-closed={turning === 1}
-        stroke={tokens.color.highlight}
-        strokeWidth={scales.stroke(5)}
+      <RevenueOutletTurn
+        tokens={tokens}
+        scales={scales}
+        turning={turning}
+        x={x}
+        y={y}
       />
       <LabelSlots
         labels={[

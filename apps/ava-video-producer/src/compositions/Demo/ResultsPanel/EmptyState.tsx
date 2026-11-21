@@ -2,10 +2,13 @@ import { abs } from "../../../chrome/abs";
 import { Orb } from "../../../chrome/chrome";
 import { useVideoMotion } from "../../../videoTheme/useVideoMotion";
 import { useVideoShapeScales } from "../../../videoTheme/useVideoShapeScales";
-import { useVideoTheme } from "../../../videoTheme/useVideoTheme";
+import { useVideoTheme } from "../../../videoTheme/videoThemeHelpers";
 import { APP_IN, RESULTS, ROWS_AT, SIDE } from "../timeline";
 import { ResultsPanelShared } from "./ResultsPanelShared/ResultsPanelShared";
 import type { ReactNode } from "react";
+
+type Props = { frame: number };
+
 /**
  * Without this the clip spends three seconds on a near-black frame with one
  * text field in it, which reads as a broken render rather than as an app
@@ -14,7 +17,7 @@ import type { ReactNode } from "react";
  * incoming one fades up, so fading this out first and the panels in
  * afterwards would put a hole between them.
  */
-export function EmptyState({ frame }: { frame: number }): ReactNode {
+export function EmptyState({ frame }: Readonly<Props>): ReactNode {
   const { semantic, mantine } = useVideoTheme();
   const motion = useVideoMotion();
   const scales = useVideoShapeScales();

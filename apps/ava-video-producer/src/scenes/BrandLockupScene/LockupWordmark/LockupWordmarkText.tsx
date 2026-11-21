@@ -1,8 +1,8 @@
 import { useVideoMotion } from "../../../videoTheme/useVideoMotion";
-import { useVideoTheme } from "../../../videoTheme/useVideoTheme";
+import { useVideoTheme } from "../../../videoTheme/videoThemeHelpers";
 import { StageTheme } from "../../StageTheme/StageTheme";
-import { getLineRevealStyle } from "../../textReveal/textReveal";
-import type { Rect } from "../../layout/layout";
+import { TextReveal } from "../../TextReveal/TextReveal";
+import type { Rect } from "../../layout/SceneGeometry";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -32,7 +32,7 @@ export function LockupWordmarkText({
           fields: ["fontWeight", "letterSpacing"],
         }),
         whiteSpace: "nowrap",
-        ...getLineRevealStyle({
+        ...TextReveal.getLineRevealStyle({
           frame,
           at: atFrame,
           mode: "wipe",

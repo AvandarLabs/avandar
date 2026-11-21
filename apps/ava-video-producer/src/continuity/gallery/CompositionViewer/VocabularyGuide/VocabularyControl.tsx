@@ -1,4 +1,4 @@
-import type { ContinuityControl } from "../../../continuityCatalog";
+import type { ContinuityControl } from "../../../isSceneEntry";
 import type { ReactNode } from "react";
 
 type Props = { control: ContinuityControl };

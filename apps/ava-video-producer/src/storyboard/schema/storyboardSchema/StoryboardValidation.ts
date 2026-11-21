@@ -1,6 +1,7 @@
+import { prop, propEq } from "@avandar/utils";
 import { z } from "zod";
 import { StageTheme } from "../../../scenes/StageTheme/StageTheme";
-import { STEPPED_COLUMN_WIPE_DEFAULTS } from "../../StoryFilm/steppedColumnWipe/steppedColumnWipe";
+import { STEPPED_COLUMN_WIPE_DEFAULTS } from "../../StoryFilm/SteppedColumnWipe/SteppedColumnWipe";
 import { shotSchema } from "../shotSchema";
 import { type TiltedWindowProps } from "./StoryboardValidation.types";
 /** Explains why a shot's transition object cannot render as authored. */
@@ -50,11 +51,6 @@ function _checkTiltedWindow({
 }>): string[] {
   const isPair = props.layout === "pair";
   const windows = props.windows ?? [];
-  const isIncreasing = (frames: number[]) => {
-    return frames.every((value, index) => {
-      return index === 0 || value > frames[index - 1];
-    });
-  };
   return [
     isPair && !props.pair ? "the pair layout needs pair columns" : "",
     isPair && props.windows ? "the pair layout takes pair, not windows" : "",
@@ -66,29 +62,18 @@ function _checkTiltedWindow({
     windows[0]?.atFrame !== undefined
       ? "the first window is on screen from the start; omit its atFrame"
       : "",
-    windows.slice(1).some((window) => {
-      return window.atFrame === undefined;
-    }) ||
-    !isIncreasing(
+    windows.slice(1).some(propEq("atFrame", undefined)) ||
+    !_areFramesIncreasing(
       windows.slice(1).map((window) => {
         return window.atFrame ?? 0;
       }),
     )
       ? "carousel windows need increasing atFrame values"
       : "",
-    !isIncreasing(
-      (props.headlines ?? []).map((headline) => {
-        return headline.atFrame;
-      }),
-    )
+    !_areFramesIncreasing((props.headlines ?? []).map(prop("atFrame")))
       ? "headlines need increasing atFrame values"
       : "",
-    props.camera &&
-    !isIncreasing(
-      props.camera.map((key) => {
-        return key.at;
-      }),
-    )
+    props.camera && !_areFramesIncreasing(props.camera.map(prop("at")))
       ? "camera keys need increasing frames"
       : "",
     (props.pair ?? []).some((column) => {
@@ -108,3 +93,9 @@ export const StoryboardValidation = {
   /** Explains why a tilted-window schedule cannot render as authored. */
   checkTiltedWindow: _checkTiltedWindow,
 } as const;
+
+function _areFramesIncreasing(frames: readonly number[]): boolean {
+  return frames.every((value, index) => {
+    return index === 0 || value > frames[index - 1];
+  });
+}

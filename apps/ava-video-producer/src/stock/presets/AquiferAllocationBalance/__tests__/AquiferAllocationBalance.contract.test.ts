@@ -14,6 +14,7 @@ import {
 import {
   inputSchema,
   SEMANTIC_RULES,
+  type Input,
 } from ".././AquiferAllocationBalance.schema";
 import {
   _render,
@@ -24,7 +25,128 @@ import {
   _assertRouteOwnership,
   _assertOwnershipClearance,
 } from "./AquiferAllocationBalanceTestHelpers";
-import type { Input } from ".././AquiferAllocationBalance.schema";
+
+function _assertUnallocatedFlowOwnership({
+  input,
+  markup,
+}: Readonly<{ input: Input; markup: string }>): void {
+  if (input.showUnallocatedRequest) {
+    _assertOwner({
+      markup,
+      owner: "unallocated",
+      number: 4,
+      label: input.copy.unallocated,
+      quantity:
+        input.flows.requestedWithdrawalM3 - input.flows.approvedWithdrawalM3,
+    });
+    const bracket = SvgAttributes.fromMarker({
+      markup,
+      marker: "unallocated",
+    });
+    assert.match(bracket, /fill="none"/);
+    const key = SvgAttributes.fromMarker({
+      markup: _getOwnershipGroup({
+        markup,
+        marker: "flow-ownership",
+        owner: "unallocated",
+      }),
+      marker: "ownership-key",
+    });
+    _assertVisibleKeysTieEveryAquiferCxX({ key, bracket });
+    assert.ok(
+      _getCircleBounds(key).right <
+        SvgAttributes.getNumberFromMarkup({
+          attributes: bracket,
+          name: "x",
+        }) -
+          0.5,
+    );
+  } else {
+    assert.doesNotMatch(
+      markup,
+      /data-(?:flow-ownership|budget-term)="unallocated"/,
+    );
+  }
+}
+
+function _getVisibleKeysTieEveryAquiferEmptyCaptionsGeometry(): {
+  emptyCaptions: Input;
+  zero: Input;
+} {
+  const emptyCaptions: Input = {
+    ...DEFAULT_INPUT,
+    copy: {
+      ...DEFAULT_INPUT.copy,
+      recharge: "",
+      approved: "",
+      naturalOutflow: "",
+      unallocated: "",
+    },
+  };
+  const zero: Input = {
+    ...DEFAULT_INPUT,
+    flows: {
+      rechargeM3: 0,
+      naturalOutflowM3: 0,
+      requestedWithdrawalM3: 0,
+      approvedWithdrawalM3: 0,
+    },
+  };
+  return { emptyCaptions, zero };
+}
+
+function _assertVisibleKeysTieEveryAquiferCxX({
+  key,
+  bracket,
+}: Readonly<{
+  key: ReturnType<typeof SvgAttributes.fromMarker>;
+  bracket: ReturnType<typeof SvgAttributes.fromMarker>;
+}>): void {
+  assert.ok(
+    Math.abs(
+      SvgAttributes.getNumberFromMarkup({
+        attributes: key,
+        name: "cx",
+      }) -
+        SvgAttributes.getNumberFromMarkup({
+          attributes: bracket,
+          name: "x",
+        }),
+    ) <= 20,
+  );
+}
+
+function _assertVisibleKeysTieEveryAquiferInput({
+  input,
+  markup,
+}: Readonly<{
+  input: Input[][number];
+  markup: ReturnType<typeof _render>;
+}>): void {
+  [
+    {
+      owner: "recharge",
+      number: 1,
+      label: input.copy.recharge,
+      quantity: input.flows.rechargeM3,
+    },
+    {
+      owner: "approved",
+      number: 2,
+      label: input.copy.approved,
+      quantity: input.flows.approvedWithdrawalM3,
+    },
+    {
+      owner: "natural",
+      number: 3,
+      label: input.copy.naturalOutflow,
+      quantity: input.flows.naturalOutflowM3,
+    },
+  ].forEach((term) => {
+    _assertOwner({ markup, ...term });
+    _assertRouteOwnership({ markup, owner: term.owner });
+  });
+}
 
 test("only approved withdrawal leaves storage while the unmet request remains hollow", () => {
   const start = SvgAttributes.fromMarker({
@@ -190,108 +312,15 @@ test("zero approval never turns requested water into an executed path", () => {
 });
 
 test("visible keys tie every aquifer boundary flow and hollow bracket to its caption and quantity", () => {
-  const emptyCaptions: Input = {
-    ...DEFAULT_INPUT,
-    copy: {
-      ...DEFAULT_INPUT.copy,
-      recharge: "",
-      approved: "",
-      naturalOutflow: "",
-      unallocated: "",
-    },
-  };
-  const zero: Input = {
-    ...DEFAULT_INPUT,
-    flows: {
-      rechargeM3: 0,
-      naturalOutflowM3: 0,
-      requestedWithdrawalM3: 0,
-      approvedWithdrawalM3: 0,
-    },
-  };
-  [
-    ...fixtures.map(({ input }) => {
-      return input;
-    }),
-    emptyCaptions,
-    zero,
-  ].forEach((input) => {
+  const { emptyCaptions, zero } =
+    _getVisibleKeysTieEveryAquiferEmptyCaptionsGeometry();
+  [...fixtures.map(prop("input")), emptyCaptions, zero].forEach((input) => {
     inputSchema.parse(input);
     [0, 36, 50, 66, 72, 90, 108, 150, 179].forEach((frame) => {
       const markup = _render({ frame: frame, input: input });
       _assertOwnershipClearance(markup);
-      [
-        {
-          owner: "recharge",
-          number: 1,
-          label: input.copy.recharge,
-          quantity: input.flows.rechargeM3,
-        },
-        {
-          owner: "approved",
-          number: 2,
-          label: input.copy.approved,
-          quantity: input.flows.approvedWithdrawalM3,
-        },
-        {
-          owner: "natural",
-          number: 3,
-          label: input.copy.naturalOutflow,
-          quantity: input.flows.naturalOutflowM3,
-        },
-      ].forEach((term) => {
-        _assertOwner({ markup, ...term });
-        _assertRouteOwnership({ markup, owner: term.owner });
-      });
-      if (input.showUnallocatedRequest) {
-        _assertOwner({
-          markup,
-          owner: "unallocated",
-          number: 4,
-          label: input.copy.unallocated,
-          quantity:
-            input.flows.requestedWithdrawalM3 -
-            input.flows.approvedWithdrawalM3,
-        });
-        const bracket = SvgAttributes.fromMarker({
-          markup,
-          marker: "unallocated",
-        });
-        assert.match(bracket, /fill="none"/);
-        const key = SvgAttributes.fromMarker({
-          markup: _getOwnershipGroup({
-            markup,
-            marker: "flow-ownership",
-            owner: "unallocated",
-          }),
-          marker: "ownership-key",
-        });
-        assert.ok(
-          Math.abs(
-            SvgAttributes.getNumberFromMarkup({
-              attributes: key,
-              name: "cx",
-            }) -
-              SvgAttributes.getNumberFromMarkup({
-                attributes: bracket,
-                name: "x",
-              }),
-          ) <= 20,
-        );
-        assert.ok(
-          _getCircleBounds(key).right <
-            SvgAttributes.getNumberFromMarkup({
-              attributes: bracket,
-              name: "x",
-            }) -
-              0.5,
-        );
-      } else {
-        assert.doesNotMatch(
-          markup,
-          /data-(?:flow-ownership|budget-term)="unallocated"/,
-        );
-      }
+      _assertVisibleKeysTieEveryAquiferInput({ input, markup });
+      _assertUnallocatedFlowOwnership({ input, markup });
       assert.doesNotMatch(markup, /data-flow="requested"/);
     });
   });

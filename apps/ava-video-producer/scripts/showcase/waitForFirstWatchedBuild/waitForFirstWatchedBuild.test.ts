@@ -5,7 +5,6 @@ import {
   type BuildEventWatcher,
   waitForFirstWatchedBuild,
 } from "./waitForFirstWatchedBuild";
-
 /** A watcher that emits the event sequence of one Rollup build cycle. */
 function _createWatcher(): {
   watcher: BuildEventWatcher;
@@ -14,7 +13,10 @@ function _createWatcher(): {
 } {
   const emitter = new EventEmitter();
   const emitCycle = (
-    events: ReadonlyArray<{ code: string; error?: Error }>,
+    events: ReadonlyArray<{
+      code: string;
+      error?: Error;
+    }>,
   ) => {
     [{ code: "START" }, ...events, { code: "END" }].forEach((event) => {
       emitter.emit("event", { ...event, result: { close: async () => {} } });
@@ -30,12 +32,14 @@ function _createWatcher(): {
     },
   };
 }
-
 test("only successful watched builds refresh the showcase", async () => {
   const { watcher, succeed, fail } = _createWatcher();
   let refreshCount = 0;
-  const firstBuild = waitForFirstWatchedBuild(watcher, async () => {
-    refreshCount += 1;
+  const firstBuild = waitForFirstWatchedBuild({
+    watcher,
+    onBuilt: async () => {
+      refreshCount += 1;
+    },
   });
   succeed();
   await firstBuild;
@@ -51,12 +55,14 @@ test("only successful watched builds refresh the showcase", async () => {
   });
   assert.equal(refreshCount, 2);
 });
-
 test("a failed first build rejects without refreshing the showcase", async () => {
   const { watcher, fail } = _createWatcher();
   let refreshCount = 0;
-  const firstBuild = waitForFirstWatchedBuild(watcher, async () => {
-    refreshCount += 1;
+  const firstBuild = waitForFirstWatchedBuild({
+    watcher,
+    onBuilt: async () => {
+      refreshCount += 1;
+    },
   });
   fail(new Error("Unexpected token"));
   await assert.rejects(firstBuild, /Unexpected token/);

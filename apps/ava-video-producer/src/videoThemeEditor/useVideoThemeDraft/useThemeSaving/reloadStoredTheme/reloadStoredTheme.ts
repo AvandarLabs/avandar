@@ -1,4 +1,4 @@
-import { buildFailureStatusFromError } from "../buildFailureStatusFromError";
+import { makeFailureStatusFromError } from "../makeFailureStatusFromError";
 import type { StoredTheme } from "../../../ThemeApi/ThemeApi";
 import type { ThemeSaveStatus } from "../useThemeSaving.types";
 import type { RefObject } from "react";
@@ -35,7 +35,7 @@ export async function reloadStoredTheme(
     setStatus({ kind: "idle" });
     return true;
   } catch (error) {
-    setStatus(buildFailureStatusFromError({ error, kind: "failed" }));
+    setStatus(makeFailureStatusFromError({ error, kind: "failed" }));
     return false;
   } finally {
     inFlight.current = false;

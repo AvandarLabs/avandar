@@ -1,14 +1,14 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { EMPTY_THEME_DRAFT } from "../themeDraft/themeDraft";
-import {
-  getActiveThemeIdFromLocation,
-  readStoredThemeDraft,
-  rememberActiveThemeId,
-  writeStoredThemeDraft,
-} from "./themeDraftStorage";
+import { EMPTY_THEME_DRAFT } from "../ThemeDrafts/ThemeDrafts";
+import { ThemeDraftStorage } from "./ThemeDraftStorage";
 
-function _storage(entries: Record<string, string> = {}) {
+function _storage(entries: Record<string, string> = {}): Pick<
+  Storage,
+  "getItem" | "setItem" | "removeItem"
+> & {
+  values: Map<string, string>;
+} {
   const values = new Map(Object.entries(entries));
   return {
     getItem: (key: string) => {
@@ -31,15 +31,18 @@ const DRAFT = {
 
 test("a stored draft reads back with its base hash", () => {
   const storage = _storage();
-  writeStoredThemeDraft({
+  ThemeDraftStorage.writeStoredThemeDraft({
     storage,
     themeId: "classic",
     stored: { baseHash: "abc", draft: DRAFT },
   });
-  assert.deepEqual(readStoredThemeDraft({ storage, themeId: "classic" }), {
-    baseHash: "abc",
-    draft: DRAFT,
-  });
+  assert.deepEqual(
+    ThemeDraftStorage.readStoredThemeDraft({ storage, themeId: "classic" }),
+    {
+      baseHash: "abc",
+      draft: DRAFT,
+    },
+  );
 });
 
 test("a stored draft that no longer matches the theme schema is ignored", () => {
@@ -57,19 +60,19 @@ test("a stored draft that no longer matches the theme schema is ignored", () => 
     }),
   });
   assert.equal(
-    readStoredThemeDraft({ storage, themeId: "classic" }),
+    ThemeDraftStorage.readStoredThemeDraft({ storage, themeId: "classic" }),
     undefined,
   );
 });
 
 test("storing an empty draft forgets the stored one", () => {
   const storage = _storage();
-  writeStoredThemeDraft({
+  ThemeDraftStorage.writeStoredThemeDraft({
     storage,
     themeId: "classic",
     stored: { baseHash: "abc", draft: DRAFT },
   });
-  writeStoredThemeDraft({
+  ThemeDraftStorage.writeStoredThemeDraft({
     storage,
     themeId: "classic",
     stored: { baseHash: "abc", draft: EMPTY_THEME_DRAFT },
@@ -79,9 +82,9 @@ test("storing an empty draft forgets the stored one", () => {
 
 test("the theme in the URL wins over the remembered one", () => {
   const storage = _storage();
-  rememberActiveThemeId({ storage, themeId: "avandar" });
+  ThemeDraftStorage.rememberActiveThemeId({ storage, themeId: "avandar" });
   assert.equal(
-    getActiveThemeIdFromLocation({
+    ThemeDraftStorage.getActiveThemeIdFromLocation({
       search: "?theme=classic",
       storage,
       available: ["classic", "avandar"],
@@ -92,9 +95,9 @@ test("the theme in the URL wins over the remembered one", () => {
 
 test("an unknown theme in the URL falls back to the remembered theme", () => {
   const storage = _storage();
-  rememberActiveThemeId({ storage, themeId: "avandar" });
+  ThemeDraftStorage.rememberActiveThemeId({ storage, themeId: "avandar" });
   assert.equal(
-    getActiveThemeIdFromLocation({
+    ThemeDraftStorage.getActiveThemeIdFromLocation({
       search: "?theme=missing",
       storage,
       available: ["classic", "avandar"],
@@ -105,7 +108,7 @@ test("an unknown theme in the URL falls back to the remembered theme", () => {
 
 test("with nothing chosen the active theme is classic", () => {
   assert.equal(
-    getActiveThemeIdFromLocation({
+    ThemeDraftStorage.getActiveThemeIdFromLocation({
       search: "",
       storage: _storage(),
       available: ["classic", "avandar"],

@@ -2,11 +2,14 @@ import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { DETOUR_CUE, DETOUR_FRAMES, RESOLVED_CUE } from "../exceptionTiming";
 import type { ReactNode } from "react";
+
+type Props = { frame: number; targetY: number };
+
 /** The bracket that closes around the case once it is resolved. */
 export function ResolvedBracket({
   frame,
   targetY,
-}: Readonly<{ frame: number; targetY: number }>): ReactNode {
+}: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const motion = GraphicThemeHooks.useGraphicMotion();
   return (

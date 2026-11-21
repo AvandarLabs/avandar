@@ -1,7 +1,10 @@
 import { FitText } from "../../../primitives/FitText/FitText";
 import type { ReactNode } from "react";
+
+type Props = { text: string };
+
 /** The case's name, centred under the resolution bracket. */
-export function CaseLabel({ text }: Readonly<{ text: string }>): ReactNode {
+export function CaseLabel({ text }: Readonly<Props>): ReactNode {
   return (
     <FitText
       text={text}

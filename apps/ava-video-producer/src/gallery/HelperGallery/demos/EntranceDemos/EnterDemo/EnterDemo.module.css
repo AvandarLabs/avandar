@@ -1,0 +1,25 @@
+.enterDemoCentered {
+  align-items: center;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+}
+
+.enterDemoCards {
+  display: flex;
+  gap: var(--demo-space-sm);
+  justify-content: center;
+}
+
+.enterDemoCardColumn {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--demo-space-2xs);
+}
+
+.enterDemoCaption {
+  color: var(--demo-muted);
+  font-family: var(--demo-mono);
+  font-size: var(--demo-font-size-2xs);
+}

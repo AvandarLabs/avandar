@@ -4,28 +4,92 @@ import {
   getPublicAssetPathFromAsset,
 } from "../../lib/planHelpers/planHelpers";
 import { type StockFingerprint } from "../../stock/StockFingerprintModule/StockFingerprintModule";
-import {
-  type CaptionFilesResult,
-  createCaptionFilesFromRequest,
-} from "../createCaptionFilesFromRequest/createCaptionFilesFromRequest";
 import { type createExportJobs } from "../createExportJobs/createExportJobs";
 import {
   THEME_FILE_MAX_BYTES,
   type ThemeStore,
 } from "../createThemeStore/createThemeStore";
 import { handleThemeRequest } from "../handleThemeRequest/handleThemeRequest";
+import {
+  type CaptionFilesResult,
+  makeCaptionFilesFromRequest,
+} from "../makeCaptionFilesFromRequest/makeCaptionFilesFromRequest";
 import { withNarration } from "../narrationHelpers/narrationHelpers";
 import { appRoot, ShowcaseFilms } from "../ShowcaseFilms/ShowcaseFilms";
-import { streamFile } from "../staticFileHelpers/staticFileHelpers";
+import { StaticFiles } from "../StaticFiles/StaticFiles";
 import type { Film } from "../../../src/showcase/showcase.types";
 import type { IncomingMessage, ServerResponse } from "node:http";
 
+async function _onReadRequest({
+  request,
+  response,
+  pathname,
+  jobs,
+  media,
+}: Readonly<{
+  request: IncomingMessage;
+  response: ServerResponse;
+  pathname: string;
+  jobs: ApiContext["jobs"];
+  media: ApiContext["media"];
+}>): Promise<void> {
+  const filmMatch =
+    /^\/api\/films\/([^/]+)(?:\/(transcript\.txt|captions\.srt))?$/.exec(
+      pathname,
+    );
+  if (filmMatch) {
+    await _onFilmRequest({ response, match: filmMatch, media });
+    return;
+  }
+  const exportMatch = /^\/api\/exports\/([a-f0-9-]+)(\/download)?$/.exec(
+    pathname,
+  );
+  if (
+    !exportMatch ||
+    !(await _onExportJobRequest({
+      request,
+      response,
+      match: exportMatch,
+      jobs,
+    }))
+  ) {
+    response.writeHead(404).end();
+  }
+}
+async function _startExport({
+  filmRequest,
+  context,
+  response,
+}: Readonly<{
+  filmRequest: NonNullable<Awaited<ReturnType<typeof _readFilmRequest>>>;
+  context: ApiContext;
+  response: ServerResponse;
+}>): Promise<void> {
+  const film = await ShowcaseFilms.load({
+    id: filmRequest.id,
+    rawOptions: filmRequest.options,
+  });
+  ShowcaseFilms.assertExportable(film);
+  const fingerprint =
+    film.kind === "stock"
+      ? await ShowcaseFilms.getFingerprintFromFilm(film)
+      : undefined;
+  const key =
+    fingerprint?.configurationHash ??
+    JSON.stringify({ generation: context.getGeneration(), film });
+  _sendJson({
+    response,
+    status: 202,
+    body: context.jobs.start(key, { film, fingerprint }),
+  });
+}
 /** What one queued export render needs: the film and its stock evidence. */
-export type ExportJobInput = { film: Film; fingerprint?: StockFingerprint };
-
+export type ExportJobInput = {
+  film: Film;
+  fingerprint?: StockFingerprint;
+};
 /** The serialized export renders the showcase server starts and reports. */
 export type ExportJobs = ReturnType<typeof createExportJobs<ExportJobInput>>;
-
 /** The server state the `/api/` routes read, shared with the static routes. */
 export type ApiContext = {
   themeStore: ThemeStore;
@@ -34,12 +98,10 @@ export type ApiContext = {
   media: Map<string, string>;
   getGeneration: () => number;
 };
-
 type FilmRequestOptions = {
   request: IncomingMessage;
   response: ServerResponse;
 };
-
 const requestSchema = z.strictObject({
   id: z.string().max(80),
   options: z.record(z.string(), z.unknown()).optional(),
@@ -48,7 +110,6 @@ const requestSchema = z.strictObject({
  * An export body: the film id, its options, and a theme patch of up to 256 KB.
  */
 const EXPORT_BODY_MAX_BYTES = 8192 + THEME_FILE_MAX_BYTES;
-
 function _sendJson(
   options: Readonly<{
     response: ServerResponse;
@@ -63,12 +124,14 @@ function _sendJson(
     })
     .end(JSON.stringify(options.body));
 }
-
-async function _getPlayerFilmFromId(
-  id: string,
-  media: Map<string, string>,
-): Promise<Film> {
-  const film = await withNarration(await ShowcaseFilms.load(id));
+async function _getPlayerFilmFromId({
+  id,
+  media,
+}: Readonly<{
+  id: string;
+  media: Map<string, string>;
+}>): Promise<Film> {
+  const film = await withNarration(await ShowcaseFilms.load({ id }));
   const assets = film.plan
     ? getAssetReferencesFromPlan(film.plan)
     : film.kind === "helper"
@@ -78,13 +141,15 @@ async function _getPlayerFilmFromId(
     assets.map(async (asset) => {
       return media.set(
         `/${asset}`,
-        await getPublicAssetPathFromAsset(appRoot, asset),
+        await getPublicAssetPathFromAsset({
+          root: appRoot,
+          asset,
+        }),
       );
     }),
   );
   return film;
 }
-
 /**
  * The film id and options of an export or caption request, read under the
  * same origin check, byte cap, and strict schema. Answers the request itself
@@ -131,7 +196,6 @@ async function _readFilmRequest({
     return undefined;
   }
 }
-
 /** Sends a transcript or caption file, or the status its request earned. */
 function _sendCaptionFile({
   response,
@@ -166,14 +230,13 @@ function _sendCaptionFile({
       fileName === "captions.srt" ? result.files.srt : result.files.transcript,
     );
 }
-
 /** Captions timed by the same options and theme an export sends. */
 async function _captionRequest(
   options: Readonly<FilmRequestOptions>,
 ): Promise<void> {
   const filmRequest = await _readFilmRequest(options);
   if (filmRequest) {
-    const result = await createCaptionFilesFromRequest({
+    const result = await makeCaptionFilesFromRequest({
       id: filmRequest.id,
       options: filmRequest.options,
       load: ShowcaseFilms.load,
@@ -185,9 +248,12 @@ async function _captionRequest(
     });
   }
 }
-
 async function _onExportRequest(
-  options: Readonly<FilmRequestOptions & { context: Readonly<ApiContext> }>,
+  options: Readonly<
+    FilmRequestOptions & {
+      context: Readonly<ApiContext>;
+    }
+  >,
 ): Promise<void> {
   const { response, context } = options;
   const filmRequest = await _readFilmRequest(options);
@@ -195,20 +261,7 @@ async function _onExportRequest(
     return;
   }
   try {
-    const film = await ShowcaseFilms.load(filmRequest.id, filmRequest.options);
-    ShowcaseFilms.assertExportable(film);
-    const fingerprint =
-      film.kind === "stock"
-        ? await ShowcaseFilms.getFingerprintFromFilm(film)
-        : undefined;
-    const key =
-      fingerprint?.configurationHash ??
-      JSON.stringify({ generation: context.getGeneration(), film });
-    _sendJson({
-      response,
-      status: 202,
-      body: context.jobs.start(key, { film, fingerprint }),
-    });
+    await _startExport({ filmRequest, context, response });
   } catch (error) {
     const busy =
       error instanceof Error && error.message.includes("already rendering");
@@ -226,7 +279,6 @@ async function _onExportRequest(
     });
   }
 }
-
 /** Answers `GET /api/films/<id>` and its transcript and caption downloads. */
 async function _onFilmRequest({
   response,
@@ -241,13 +293,16 @@ async function _onFilmRequest({
     _sendJson({
       response,
       status: 200,
-      body: await _getPlayerFilmFromId(match[1], media),
+      body: await _getPlayerFilmFromId({
+        id: match[1],
+        media,
+      }),
     });
     return;
   }
   // A plain link downloads the saved film; a draft's captions come from
   // `POST /api/captions` with the export's options.
-  const result = await createCaptionFilesFromRequest({
+  const result = await makeCaptionFilesFromRequest({
     id: match[1],
     options: undefined,
     load: ShowcaseFilms.load,
@@ -258,7 +313,6 @@ async function _onFilmRequest({
     fileName: match[2] === "captions.srt" ? "captions.srt" : "transcript.txt",
   });
 }
-
 /** Answers an export job's status or download; false when it is unknown. */
 async function _onExportJobRequest({
   request,
@@ -274,7 +328,12 @@ async function _onExportJobRequest({
   if (match[2]) {
     const file = jobs.file(match[1]);
     if (file) {
-      await streamFile(request, response, file, true);
+      await StaticFiles.streamFile({
+        req: request,
+        res: response,
+        file,
+        download: true,
+      });
     }
     return Boolean(file);
   }
@@ -284,7 +343,6 @@ async function _onExportJobRequest({
   }
   return Boolean(job);
 }
-
 /**
  * Routes every `/api/` request of the showcase server: themes, exports,
  * captions, and films. It answers the response itself, with a 404 for a path
@@ -324,26 +382,5 @@ export async function handleApiRequest({
     response.writeHead(405).end();
     return;
   }
-  const filmMatch =
-    /^\/api\/films\/([^/]+)(?:\/(transcript\.txt|captions\.srt))?$/.exec(
-      pathname,
-    );
-  if (filmMatch) {
-    await _onFilmRequest({ response, match: filmMatch, media });
-    return;
-  }
-  const exportMatch = /^\/api\/exports\/([a-f0-9-]+)(\/download)?$/.exec(
-    pathname,
-  );
-  if (
-    !exportMatch ||
-    !(await _onExportJobRequest({
-      request,
-      response,
-      match: exportMatch,
-      jobs,
-    }))
-  ) {
-    response.writeHead(404).end();
-  }
+  await _onReadRequest({ request, response, pathname, jobs, media });
 }

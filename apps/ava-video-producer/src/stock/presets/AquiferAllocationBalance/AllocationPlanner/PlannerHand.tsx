@@ -1,8 +1,11 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
+
+type Props = { handX: number };
+
 /** The planner's arm and hand on the approval control. */
-export function PlannerHand({ handX }: Readonly<{ handX: number }>): ReactNode {
+export function PlannerHand({ handX }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (

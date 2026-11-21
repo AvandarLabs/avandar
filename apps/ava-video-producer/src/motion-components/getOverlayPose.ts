@@ -1,5 +1,9 @@
-import { mix } from "../motion";
-import { OverlayCue, MotionRect, getOverlayTimings } from "./getOverlayTimings";
+import { Motion } from "../motion";
+import {
+  type OverlayCue,
+  type MotionRect,
+  getOverlayTimings,
+} from "./getOverlayTimings";
 import { MotionSettings } from "./MotionSettings/MotionSettings";
 import type { MotionSettingsTheme } from "./MotionSettings/MotionSettings";
 
@@ -27,6 +31,50 @@ export function getOverlayPose({
   theme = MotionSettings.getClassicMotionSettingsTheme(),
 }: Readonly<GetOverlayPoseOptions>): OverlayPose {
   const timing = getOverlayTimings({ cue, theme });
+  const travel = _getOverlayTravelFromCue({
+    frame,
+    cue,
+    theme,
+    exit: timing.exit,
+  });
+  const { motion } = theme;
+  const fade = motion.reveal.easing;
+  const originX = source.x + source.width / 2 - cue.target.width / 2;
+  const originY = source.y + source.height / 2 - cue.target.height / 2;
+  return {
+    x: Motion.mix({
+      t: travel,
+      from: originX,
+      to: cue.target.x,
+    }),
+    y: Motion.mix({
+      t: travel,
+      from: originY,
+      to: cue.target.y,
+    }),
+    opacity:
+      motion.ramp(frame, cue.at, timing.fade, fade) *
+      (1 - motion.ramp(frame, cue.until - timing.fade, timing.fade, fade)),
+    scale: Motion.mix({
+      t: travel,
+      from: 0.88,
+      to: 1,
+    }),
+  };
+}
+
+/** Samples an overlay's combined departure and arrival progress. */
+function _getOverlayTravelFromCue({
+  frame,
+  cue,
+  theme,
+  exit,
+}: Readonly<{
+  frame: number;
+  cue: OverlayCue;
+  theme: MotionSettingsTheme;
+  exit: number;
+}>): number {
   const departure = MotionSettings.getMotionProgress({
     frame,
     at: cue.at,
@@ -37,23 +85,11 @@ export function getOverlayPose({
   });
   const arrival = MotionSettings.getMotionProgress({
     frame,
-    at: cue.until - timing.exit,
+    at: cue.until - exit,
     duration: cue.exitFrames ?? 30,
     options: cue.motion,
     fallback: undefined,
     theme,
   });
-  const { motion } = theme;
-  const fade = motion.reveal.easing;
-  const travel = departure * (1 - arrival);
-  const originX = source.x + source.width / 2 - cue.target.width / 2;
-  const originY = source.y + source.height / 2 - cue.target.height / 2;
-  return {
-    x: mix(travel, originX, cue.target.x),
-    y: mix(travel, originY, cue.target.y),
-    opacity:
-      motion.ramp(frame, cue.at, timing.fade, fade) *
-      (1 - motion.ramp(frame, cue.until - timing.fade, timing.fade, fade)),
-    scale: mix(travel, 0.88, 1),
-  };
+  return departure * (1 - arrival);
 }

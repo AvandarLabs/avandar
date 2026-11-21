@@ -3,16 +3,18 @@ import type {
   VideoThemeDocument,
   VideoThemeLibrary,
 } from "../../videoTheme.types";
-
 /**
  * A theme and every theme it extends, root first. Throws a
  * `VideoThemeError` for an unknown theme or an `extends` cycle. Use it to
  * know which documents a theme depends on, for example to snapshot them.
  */
-export function getExtendsChainFromThemeId(
-  library: VideoThemeLibrary,
-  themeId: string,
-): VideoThemeDocument[] {
+export function getExtendsChainFromThemeId({
+  library,
+  themeId,
+}: Readonly<{
+  library: VideoThemeLibrary;
+  themeId: string;
+}>): VideoThemeDocument[] {
   const chain: VideoThemeDocument[] = [];
   const seen = new Set<string>();
   let currentId: string | undefined = themeId;

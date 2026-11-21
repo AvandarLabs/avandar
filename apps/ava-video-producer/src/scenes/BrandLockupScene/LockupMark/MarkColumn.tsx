@@ -1,7 +1,7 @@
 import { Img } from "remotion";
 import { positioned } from "../../positioned";
 import { MarkColumnCover } from "./MarkColumnCover";
-import type { Rect } from "../../layout/layout";
+import type { Rect } from "../../layout/SceneGeometry";
 import type { BrandLockupSceneProps } from "../../scenes.types";
 import type { ReactNode } from "react";
 

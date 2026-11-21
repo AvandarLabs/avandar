@@ -1,6 +1,6 @@
-import { mix, ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { RESULT_CUE, SETTLED_CUE } from "./getEvidenceFromFrame";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./PdfGridReconstruction.schema";
 
 type GetReconstructionColumnXsFromFrameOptions = {
@@ -22,12 +22,21 @@ export function getReconstructionColumnXsFromFrame({
   return input.grid.columnLabels.map((_, columnIndex) => {
     // Columns leave one after another and all settle together.
     const leaveAt = RESULT_CUE + columnIndex * motion.stagger.list;
-    const travel = ramp(
+    const travel = Motion.ramp({
       frame,
-      leaveAt,
-      SETTLED_CUE - leaveAt,
-      motion.travel.easing,
+      at: leaveAt,
+      dur: SETTLED_CUE - leaveAt,
+      easing: motion.travel.easing,
+    });
+    return (
+      (isResult
+        ? Motion.mix({
+            t: travel,
+            from: 548,
+            to: 508,
+          })
+        : 52) +
+      columnIndex * width
     );
-    return (isResult ? mix(travel, 548, 508) : 52) + columnIndex * width;
   });
 }

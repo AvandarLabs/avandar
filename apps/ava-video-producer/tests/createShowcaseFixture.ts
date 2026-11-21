@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { createRealTempDirectory } from "./createRealTempDirectory";
-import { buildLicenseFixture } from "./license-fixture";
+import { LicenseFixtures } from "./LicenseFixtures";
 import { linkAppDependencies } from "./linkAppDependencies";
 
 /**
@@ -11,7 +11,10 @@ import { linkAppDependencies } from "./linkAppDependencies";
  */
 async function _populateShowcaseFixture(root: string): Promise<void> {
   await linkAppDependencies(root);
-  await fs.writeFile(path.join(root, ".env.local"), buildLicenseFixture());
+  await fs.writeFile(
+    path.join(root, ".env.local"),
+    LicenseFixtures.makeFixtureFromDirectory(),
+  );
   await Promise.all(
     [
       "scripts",

@@ -1,3 +1,4 @@
+import { propEq } from "@avandar/utils";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./PdfNearestLabelReview.schema";
@@ -35,10 +36,7 @@ export function ReviewChoiceMark({
               kind: "path",
               d: `M904 ${
                 225 +
-                input.labels.findIndex(({ id }) => {
-                  return id === input.reviewedLabelId;
-                }) *
-                  95
+                input.labels.findIndex(propEq("id", input.reviewedLabelId)) * 95
               } H${rowRight + 8} V440 H${rowRight}`,
             }}
             profile={tokens.sketch.shape}

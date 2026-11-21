@@ -1,13 +1,15 @@
+import { prop } from "@avandar/utils";
 import { Cursor } from "../../chrome/chrome";
 import { useCursorMotion } from "../../chrome/useCursorMotion";
 import {
   type CursorKind,
   CursorMotionHelpers,
 } from "../../CursorMotionHelpers";
-import "../generated/product.css";
-import { measuredPath } from "../choreography";
 import targets from "../cursor-targets.json";
+import "../generated/product.css";
 import { AvandarStage } from "../generated/product";
+import { measuredPath } from "../measuredPath";
+import css from "./AvandarScene.module.css";
 import { ProductBackdrop } from "./ProductBackdrop";
 import type { ProductSceneRenderer } from "../../storyboard/StoryFilm/StoryFilm";
 import type { ReactNode } from "react";
@@ -43,40 +45,12 @@ export function AvandarScene({
 }: Props): ReactNode {
   const productFrame = frame + fromFrame;
   const cursorMotion = useCursorMotion();
-  const offset = mode === "query" ? 290 : mode === "chart" ? 570 : 0;
-  const beats = (
-    (targets as Partial<Record<string, MeasuredBeat[]>>)[feature] ?? []
-  )
-    .filter((b) => {
-      return (
-        mode === "full" ||
-        (mode === "filter" && b.frame < 300) ||
-        (mode === "query" && b.frame >= 300 && b.frame < 620) ||
-        (mode === "chart" && b.frame >= 620)
-      );
-    })
-    .map((b) => {
-      return {
-        ...b,
-        frame: b.frame - offset,
-        holdUntil: (TEXT_HOLDS[b.target] ?? 0) - offset,
-        cursor: (b.target in TEXT_HOLDS
-          ? "text"
-          : b.action === "click"
-            ? "pointer"
-            : "default") as CursorKind,
-      };
-    });
-  const keys = beats.length
-    ? measuredPath(beats, width, height)
-    : [{ at: 0, x: 0, y: 0 }];
-  const clicks = beats
-    .filter((b) => {
-      return b.action === "click" || b.action === "select";
-    })
-    .map((b) => {
-      return b.frame;
-    });
+  const beats = _getMeasuredBeatsFromFeature({ feature, mode });
+  const { keys, clicks } = _getCursorTimelineFromBeats({
+    beats,
+    width,
+    height,
+  });
   const cursor = CursorMotionHelpers.cursorOnTarget({
     frame: productFrame,
     path: keys,
@@ -92,14 +66,7 @@ export function AvandarScene({
         height={height}
         mode={mode}
       />
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          zIndex: 10000,
-          pointerEvents: "none",
-        }}
-      >
+      <div className={css.avandarScenediv1}>
         {beats.length > 0 && (
           <Cursor
             frame={productFrame}
@@ -111,4 +78,60 @@ export function AvandarScene({
       </div>
     </ProductBackdrop>
   );
+}
+
+type CursorBeat = MeasuredBeat & { holdUntil: number; cursor: CursorKind };
+/** Selects measured feature beats and preserves authored typing holds. */
+function _getMeasuredBeatsFromFeature({
+  feature,
+  mode,
+}: Readonly<Pick<Props, "feature" | "mode">>): CursorBeat[] {
+  const offset = mode === "query" ? 290 : mode === "chart" ? 570 : 0;
+  const byFeature: Partial<Record<string, MeasuredBeat[]>> = targets;
+  return (byFeature[feature] ?? [])
+    .filter((b) => {
+      return (
+        mode === "full" ||
+        (mode === "filter" && b.frame < 300) ||
+        (mode === "query" && b.frame >= 300 && b.frame < 620) ||
+        (mode === "chart" && b.frame >= 620)
+      );
+    })
+    .map((b): CursorBeat => {
+      return {
+        ...b,
+        frame: b.frame - offset,
+        holdUntil: (TEXT_HOLDS[b.target] ?? 0) - offset,
+        cursor:
+          b.target in TEXT_HOLDS
+            ? "text"
+            : b.action === "click"
+              ? "pointer"
+              : "default",
+      };
+    });
+}
+/** Derives held pointer keys and click frames from measured beats. */
+function _getCursorTimelineFromBeats({
+  beats,
+  width,
+  height,
+}: Readonly<{ beats: CursorBeat[]; width: number; height: number }>): {
+  keys: ReturnType<typeof measuredPath>;
+  clicks: number[];
+} {
+  const keys = beats.length
+    ? measuredPath({
+        beats,
+        width,
+        height,
+      })
+    : [{ at: 0, x: 0, y: 0 }];
+  const clicks = beats
+    .filter((b) => {
+      return b.action === "click" || b.action === "select";
+    })
+    .map(prop("frame"));
+
+  return { keys, clicks };
 }

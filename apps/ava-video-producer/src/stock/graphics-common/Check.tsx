@@ -2,10 +2,18 @@ import { SketchedShape } from "../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
-type Props = { x: number; y: number; color: string; size: number };
+type Props = {
+  x: number;
+  y: number;
+  color: string;
+  size: number;
+};
 /** A themed check mark in the caller's colour and size. */
 export function Check({ x, y, color, size }: Readonly<Props>): ReactNode {
-  const check = GraphicThemeHooks.useGraphicProps("Check", {});
+  const check = GraphicThemeHooks.useGraphicProps({
+    name: "Check",
+    props: {},
+  });
   const { sketch } = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   const s = size;

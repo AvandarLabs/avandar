@@ -3,7 +3,7 @@ import { useLayoutEffect, useRef } from "react";
 import { uuid } from "../../../../shared/lib/uuid";
 import { ConceptMetaView } from "../../../../src/views/OntologyDesignerApp/ConceptMetaView";
 import { ConceptNavbar } from "../../../../src/views/OntologyDesignerApp/ConceptNavbar";
-import { createOntologyStageFromFrame } from "./createOntologyStageFromFrame/createOntologyStageFromFrame";
+import { makeOntologyStageFromFrame } from "./makeOntologyStageFromFrame/makeOntologyStageFromFrame";
 import css from "./OntologyScreen.module.css";
 import { FixtureConceptContext } from "./useHydratedConcept";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -20,8 +20,7 @@ import type { ReactNode } from "react";
 export {
   ONTOLOGY_BEATS,
   ONTOLOGY_DURATION,
-} from "./createOntologyStageFromFrame/createOntologyStageFromFrame";
-
+} from "./makeOntologyStageFromFrame/makeOntologyStageFromFrame";
 const CONCEPT_IDS = {
   response: uuid<Concept.Id>("00000000-0000-4000-8000-000000000601"),
   facility: uuid<Concept.Id>("00000000-0000-4000-8000-000000000602"),
@@ -42,12 +41,15 @@ const CONCEPTS: readonly OntologyConceptProjection[] = [
     description: "Fictional Harborfield facilities and available supplies.",
   },
 ];
-type Props = { frame: number; width: number; height: number };
-
+type Props = {
+  frame: number;
+  width: number;
+  height: number;
+};
 /** Actual concept and attribute inspection, with fixture hydration only. */
 export function OntologyScreen({ frame, width, height }: Props): ReactNode {
   const root = useRef<HTMLDivElement>(null);
-  const stage = createOntologyStageFromFrame(frame);
+  const stage = makeOntologyStageFromFrame(frame);
   const fixture = useOntologyFixture(stage);
   // These unchanged leaves require complete models, but read only the checked
   // projections. Ownership, timestamps and model branding are not supplied.
@@ -57,7 +59,10 @@ export function OntologyScreen({ frame, width, height }: Props): ReactNode {
     concepts: readonly Concept.T[];
     concept: Concept.T;
   };
-  useOntologyTargets(root, stage.conceptKey);
+  useOntologyTargets({
+    root,
+    conceptKey: stage.conceptKey,
+  });
   return (
     <Flex ref={root} className={css.ontologyScreen} w={width} h={height}>
       <div
@@ -74,9 +79,8 @@ export function OntologyScreen({ frame, width, height }: Props): ReactNode {
     </Flex>
   );
 }
-
 function useOntologyFixture(
-  stage: ReturnType<typeof createOntologyStageFromFrame>,
+  stage: ReturnType<typeof makeOntologyStageFromFrame>,
 ): OntologyFixtureProjection {
   const concept = CONCEPTS[stage.conceptKey === "response" ? 0 : 1]!;
   const sourceName =
@@ -89,9 +93,7 @@ function useOntologyFixture(
       (field, index): OntologyAttributeProjection => {
         return {
           id: uuid<ConceptAttribute.Id>(
-            `00000000-0000-4000-8000-${String(
-              (stage.conceptKey === "response" ? 620 : 630) + index,
-            ).padStart(12, "0")}`,
+            `00000000-0000-4000-8000-${String((stage.conceptKey === "response" ? 620 : 630) + index).padStart(12, "0")}`,
           ),
           name: field.name,
           isIdentifier: field.isIdentifier ?? false,
@@ -104,11 +106,13 @@ function useOntologyFixture(
   };
   return { concepts: CONCEPTS, concept, fullConcept };
 }
-
-function useOntologyTargets(
-  root: React.RefObject<HTMLDivElement | null>,
-  conceptKey: "response" | "facility",
-) {
+function useOntologyTargets({
+  root,
+  conceptKey,
+}: Readonly<{
+  root: React.RefObject<HTMLDivElement | null>;
+  conceptKey: "response" | "facility";
+}>) {
   useLayoutEffect(() => {
     const links = root.current?.querySelectorAll("a") ?? [];
     links.forEach((link, index) => {

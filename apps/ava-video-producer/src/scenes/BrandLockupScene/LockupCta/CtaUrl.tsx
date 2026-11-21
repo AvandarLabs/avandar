@@ -1,5 +1,5 @@
 import { useVideoMotion } from "../../../videoTheme/useVideoMotion";
-import { useVideoTheme } from "../../../videoTheme/useVideoTheme";
+import { useVideoTheme } from "../../../videoTheme/videoThemeHelpers";
 import { StageTheme } from "../../StageTheme/StageTheme";
 import { LockupCtaShared } from "./LockupCtaShared/LockupCtaShared";
 import type {

@@ -18,7 +18,7 @@ export function ColorValueControl({
   return (
     <Group gap="xs" wrap="nowrap" align="center">
       <HexColorInput
-        className={css.colorValueField}
+        className={css.colorValueControlField}
         size="xs"
         aria-label={label}
         value={typeof value === "string" ? value : "#000000"}

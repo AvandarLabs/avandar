@@ -1,3 +1,4 @@
+import { objectValuesMap } from "@avandar/utils";
 import type { Input } from "./DisclosureAperture.schema";
 /** Complete fictional source with an explicit share choice on each field. */
 export const DEFAULT_INPUT: Input = {
@@ -59,11 +60,9 @@ export const fixtures: Array<{ id: string; input: Input }> = [
           disclosure: "share",
         };
       }),
-      copy: Object.fromEntries(
-        Object.keys(DEFAULT_INPUT.copy).map((key) => {
-          return [key, "W".repeat(32)];
-        }),
-      ) as Input["copy"],
+      copy: objectValuesMap(DEFAULT_INPUT.copy, () => {
+        return "W".repeat(32);
+      }) as Input["copy"],
     },
   },
   {

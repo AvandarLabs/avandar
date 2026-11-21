@@ -1,5 +1,5 @@
-import { makeRedactedTextFromValue } from "../../captureLib/sanitizeHelpers";
-import { validateId } from "../../captureLib/urlSafetyHelpers";
+import { CaptureSanitization } from "../../captureLib/CaptureSanitization";
+import { CaptureUrlSafety } from "../../captureLib/CaptureUrlSafety/CaptureUrlSafety";
 import { claimQualifiedId, getPageFromRun } from "./recorderHelpers";
 import type { CaptureAction } from "../captureAvandar.types";
 import type {
@@ -7,6 +7,30 @@ import type {
   CaptureRecorderState,
 } from "./createCaptureContext.types";
 
+function _validateStep({
+  flowId,
+  id,
+  action,
+  actionIds,
+}: Readonly<{
+  flowId: string;
+  id: string;
+  action: unknown;
+  actionIds: Set<string>;
+}>): void {
+  CaptureUrlSafety.validateId({
+    value: id,
+    name: "step id",
+  });
+  if (typeof action !== "function") {
+    throw new Error("step needs an action callback");
+  }
+  claimQualifiedId({
+    usedIds: actionIds,
+    qualifiedId: `${flowId}-${id}`,
+    kind: "step",
+  });
+}
 /**
  * Creates the recorder behind `CaptureContext.step`: it runs one flow action
  * and records its timing, URLs, and outcome in the manifest.
@@ -17,15 +41,7 @@ export function createStepRecorder(
 ): CaptureContext["step"] {
   const actionIds = new Set<string>();
   return async ({ flowId, id, action }) => {
-    validateId(id, "step id");
-    if (typeof action !== "function") {
-      throw new Error("step needs an action callback");
-    }
-    claimQualifiedId({
-      usedIds: actionIds,
-      qualifiedId: `${flowId}-${id}`,
-      kind: "step",
-    });
+    _validateStep({ flowId, id, action, actionIds });
     run.assertPolicy();
     const actionEntry: CaptureAction = {
       id,
@@ -44,7 +60,7 @@ export function createStepRecorder(
       return result;
     } catch (error) {
       actionEntry.status = "failed";
-      actionEntry.error = makeRedactedTextFromValue({
+      actionEntry.error = CaptureSanitization.makeRedactedTextFromValue({
         value: error instanceof Error ? error.message : error,
         secrets: run.secrets,
       });

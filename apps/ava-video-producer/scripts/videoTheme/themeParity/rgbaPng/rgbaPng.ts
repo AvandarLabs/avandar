@@ -1,16 +1,22 @@
 import { spawn } from "node:child_process";
-import { ffmpeg } from "../../../lib/mediaHelpers";
-
+import { MediaHelpers } from "../../../lib/MediaHelpers/MediaHelpers";
 /** The pixel dimensions of a raw frame. */
-type FrameSize = Readonly<{ width: number; height: number }>;
-
+type FrameSize = Readonly<{
+  width: number;
+  height: number;
+}>;
 /** Runs ffmpeg with binary stdin and collects binary stdout. */
-async function _runFfmpeg(
-  args: readonly string[],
-  input: Uint8Array = new Uint8Array(),
-): Promise<Buffer> {
+async function _runFfmpeg({
+  args,
+  input = new Uint8Array(),
+}: Readonly<{
+  args: readonly string[];
+  input?: Uint8Array;
+}>): Promise<Buffer> {
   return new Promise((resolve, reject) => {
-    const child = spawn(ffmpeg, args, { stdio: ["pipe", "pipe", "pipe"] });
+    const child = spawn(MediaHelpers.ffmpeg, args, {
+      stdio: ["pipe", "pipe", "pipe"],
+    });
     const chunks: Buffer[] = [];
     let stderr = "";
     child.stdout.on("data", (chunk: Buffer) => {
@@ -28,36 +34,39 @@ async function _runFfmpeg(
     child.stdin.end(input);
   });
 }
-
 /**
  * Decodes a PNG into raw RGBA bytes, for pixel comparisons such as the theme
  * parity gate. Rejects a PNG whose size is not the expected one.
  */
-export async function readRgbaFromPng(
-  file: string,
-  size: FrameSize,
-): Promise<Uint8Array> {
-  const rgba = await _runFfmpeg([
-    "-v",
-    "error",
-    "-i",
-    file,
-    "-f",
-    "rawvideo",
-    "-pix_fmt",
-    "rgba",
-    "-",
-  ]);
+async function _readRgbaFromPng({
+  file,
+  size,
+}: Readonly<{
+  file: string;
+  size: FrameSize;
+}>): Promise<Uint8Array> {
+  const rgba = await _runFfmpeg({
+    args: [
+      "-v",
+      "error",
+      "-i",
+      file,
+      "-f",
+      "rawvideo",
+      "-pix_fmt",
+      "rgba",
+      "-",
+    ],
+  });
   if (rgba.length !== size.width * size.height * 4) {
     throw new Error(`${file} is not ${size.width}×${size.height}`);
   }
   return rgba;
 }
-
 /**
  * Encodes raw RGBA bytes as a lossless PNG, for example a parity diff image.
  */
-export async function writePngFromRgba({
+async function _writePngFromRgba({
   file,
   rgba,
   size,
@@ -66,8 +75,8 @@ export async function writePngFromRgba({
   rgba: Uint8Array;
   size: FrameSize;
 }>): Promise<void> {
-  await _runFfmpeg(
-    [
+  await _runFfmpeg({
+    args: [
       "-v",
       "error",
       "-y",
@@ -83,6 +92,19 @@ export async function writePngFromRgba({
       "1",
       file,
     ],
-    rgba,
-  );
+    input: rgba,
+  });
 }
+
+/** Reads and writes RGBA PNG images for theme parity measurements. */
+export const RgbaPng = {
+  /**
+   * Decodes a PNG into raw RGBA bytes, for pixel comparisons such as the theme
+   * parity gate.
+   */
+  readRgbaFromPng: _readRgbaFromPng,
+  /**
+   * Encodes raw RGBA bytes as a lossless PNG, for example a parity diff image.
+   */
+  writePngFromRgba: _writePngFromRgba,
+};

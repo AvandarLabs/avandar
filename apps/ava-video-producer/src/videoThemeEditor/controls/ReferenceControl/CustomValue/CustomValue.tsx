@@ -1,12 +1,18 @@
+import { propEq } from "@avandar/utils";
 import { Button } from "@mantine/core";
-import { useState, type ReactNode } from "react";
-import { isTokenReference } from "../../../../videoTheme/themeReferenceHelpers/themeReferenceHelpers";
-import { getTokenDefinitionFromPath } from "../../../../videoTheme/tokenCatalog/tokenCatalogHelpers/tokenCatalogHelpers";
-import { getCustomScaleFromReference } from "../../../customTokenValue/customTokenValue";
 import {
-  isCameraCurveToken,
+  useState,
+  type ReactNode,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
+import { ThemeReferences } from "../../../../videoTheme/ThemeReferences/ThemeReferences";
+import { TokenCatalog } from "../../../../videoTheme/tokenCatalog/TokenCatalog/TokenCatalog";
+import { CustomTokenValues } from "../../../CustomTokenValues/CustomTokenValues";
+import {
   type ReferenceOption,
-} from "../../../referenceOptions/referenceOptions";
+  ReferenceOptions,
+} from "../../../ReferenceOptions/ReferenceOptions";
 import { useTokenEditor } from "../../../TokenEditorContext";
 import { getDefaultLiteralFromKind } from "../../getDefaultLiteralFromKind";
 import { ValueControl } from "../../ValueControl";
@@ -15,8 +21,9 @@ import type { ValueControlProps } from "../../valueControl.types";
 import type { Props as ReferenceControlProps } from "../ReferenceControl";
 
 type Props = ReferenceControlProps &
-  Readonly<{ options: readonly ReferenceOption[] }>;
-
+  Readonly<{
+    options: readonly ReferenceOption[];
+  }>;
 /**
  * The bounds a custom value is edited with: the token's own, or its scale's.
  */
@@ -31,9 +38,8 @@ function _customDefinition(
   const { allowLiteral, definition, kind, scale } = options;
   return allowLiteral
     ? (definition ?? { kind })
-    : (getTokenDefinitionFromPath(`${scale}.custom`) ?? { kind });
+    : (TokenCatalog.getTokenDefinitionFromPath(`${scale}.custom`) ?? { kind });
 }
-
 /**
  * Where a custom value goes: the token itself for a component one-off, or a
  * new named scale entry for a semantic token.
@@ -64,50 +70,19 @@ function useCustomValueWriter(
         });
   };
 }
-
 /** The toggle and editor for a custom value in place of a reference. */
-export function CustomValue({
-  label,
-  tokenPath,
-  fieldPath,
-  kind,
-  value,
-  tokenValue,
-  allowLiteral,
-  definition: tokenDefinition,
-  onChange,
-  options,
-}: Props): ReactNode {
-  const write = useCustomValueWriter({
-    tokenPath,
-    fieldPath,
-    kind,
-    value,
-    tokenValue,
-    allowLiteral,
-    onChange,
-  });
-  const isReference = isTokenReference(value);
-  const scale = allowLiteral
-    ? undefined
-    : getCustomScaleFromReference({ reference: value, kind });
-  const [isOpen, setOpen] = useState(
-    allowLiteral && value !== undefined && !isReference,
-  );
-  if (!allowLiteral && !scale) {
+export function CustomValue(props: Props): ReactNode {
+  const { label, tokenPath, fieldPath, kind } = props;
+  const { write, scale, isReference, isOpen, setOpen } =
+    useCustomValueState(props);
+  if (!props.allowLiteral && !scale) {
     return null;
   }
-  const definition = _customDefinition({
-    allowLiteral,
-    definition: tokenDefinition,
-    kind,
+  const { definition, current } = _getCustomValueFromProps({
+    props,
     scale,
+    isReference,
   });
-  const current = isReference
-    ? options.find((option) => {
-        return option.reference === value;
-      })?.value
-    : value;
   return (
     <div className={css.customValue}>
       <Button
@@ -128,10 +103,60 @@ export function CustomValue({
           definition={definition}
           value={current ?? getDefaultLiteralFromKind(definition.kind)}
           optionKey={fieldPath.at(-1) ?? tokenPath}
-          isCameraCurve={isCameraCurveToken(tokenPath, fieldPath)}
+          isCameraCurve={ReferenceOptions.isCameraCurveToken({
+            tokenPath,
+            fieldPath,
+          })}
           onChange={write}
         />
       ) : null}
     </div>
   );
+}
+
+function useCustomValueState(props: Props): {
+  write: (literal: unknown) => void;
+  scale: string | undefined;
+  isReference: boolean;
+  isOpen: boolean;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+} {
+  const { allowLiteral, value, kind } = props;
+  const write = useCustomValueWriter(props);
+  const isReference = ThemeReferences.isTokenReference(value);
+  const scale = allowLiteral
+    ? undefined
+    : CustomTokenValues.getCustomScaleFromReference({ reference: value, kind });
+  const [isOpen, setOpen] = useState(
+    allowLiteral && value !== undefined && !isReference,
+  );
+
+  return { write, scale, isReference, isOpen, setOpen };
+}
+function _getCustomValueFromProps({
+  props,
+  scale,
+  isReference,
+}: Readonly<{
+  props: Props;
+  scale: string | undefined;
+  isReference: boolean;
+}>): { definition: ValueControlProps["definition"]; current: unknown } {
+  const { kind } = props;
+  const definition = _customDefinition({
+    allowLiteral: props.allowLiteral,
+    definition: props.definition,
+    kind,
+    scale,
+  });
+  const current = isReference
+    ? props.options.find(
+        propEq<Readonly<{ reference: unknown }>, "reference", unknown>(
+          "reference",
+          props.value,
+        ),
+      )?.value
+    : props.value;
+
+  return { definition, current };
 }

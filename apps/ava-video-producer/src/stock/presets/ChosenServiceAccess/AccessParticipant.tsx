@@ -1,24 +1,49 @@
 import { propEq } from "@avandar/utils";
-import { mix } from "../../../motion";
-import { SketchedShape } from "../../primitives/SketchedShape";
+import { Motion } from "../../../motion";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getServiceFloorYFromX } from "./getServiceFloorYFromX";
 import { getServiceWheelCenterYFromWheelGeometry } from "./getServiceWheelCenterYFromWheelGeometry";
+import { ServiceParticipantArm } from "./ServiceParticipantArm/ServiceParticipantArm";
+import { ServiceParticipantBody } from "./ServiceParticipantBody/ServiceParticipantBody";
+import { ServiceParticipantHead } from "./ServiceParticipantHead/ServiceParticipantHead";
+import { ServiceParticipantWheels } from "./ServiceParticipantWheels/ServiceParticipantWheels";
 import type { Input } from "./ChosenServiceAccess.schema";
 import type { ReactNode } from "react";
 
-type Props = { input: Input; frame: number; accent: string };
-/**
- * The participant points, then walks or self-propels through the chosen door.
- */
-export function AccessParticipant({
+type ServiceParticipantPose = ParticipantFloorContacts & {
+  travel: number;
+  x: number;
+  choosing: boolean;
+  handX: number;
+  handY: number;
+};
+type ParticipantFloorContacts = {
+  rearY: number;
+  y: number;
+  frontY: number;
+  leftFootX: number;
+  rightFootX: number;
+  leftFootY: number;
+  rightFootY: number;
+};
+
+type Props = {
+  input: Input;
+  frame: number;
+  accent: string;
+};
+
+type GetServiceParticipantPoseOptions = {
+  input: Input;
+  frame: number;
+  motion: ReturnType<typeof GraphicThemeHooks.useGraphicMotion>;
+};
+/** Samples the authored service participant pose. */
+function _getServiceParticipantPose({
   input,
   frame,
-  accent,
-}: Readonly<Props>): ReactNode {
-  const tokens = GraphicThemeHooks.useGraphicTokens();
-  const motion = GraphicThemeHooks.useGraphicMotion();
-  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  motion,
+}: Readonly<GetServiceParticipantPoseOptions>): ServiceParticipantPose {
   const chosenIndex = input.services.findIndex(
     propEq("id", input.chosenServiceId),
   );
@@ -33,11 +58,37 @@ export function AccessParticipant({
   const entry = motion.ramp(frame, 98, motion.scale(22), motion.travel.easing);
   const x =
     frame < 98
-      ? mix(approach, 60, doorX - 100)
-      : mix(entry, doorX - 100, doorX);
+      ? Motion.mix({ t: approach, from: 60, to: doorX - 100 })
+      : Motion.mix({ t: entry, from: doorX - 100, to: doorX });
   const choosing = frame >= 24 && frame < 44;
   const propulsion = Math.sin(Math.PI * travel) * Math.sin(frame * 0.7) * 8;
   const wheelAngle = -Math.PI / 2 + propulsion * 0.08;
+  const contacts = _getParticipantFloorContacts({
+    x,
+    doorX,
+    input,
+    propulsion,
+  });
+  const handX = choosing
+    ? x + Math.sign(doorX - x) * 50
+    : input.participantMobility === "wheelchair"
+      ? x - 6 + Math.cos(wheelAngle) * 20
+      : x + 12 + propulsion;
+  const handY = choosing
+    ? contacts.y - 70
+    : input.participantMobility === "wheelchair"
+      ? contacts.rearY + Math.sin(wheelAngle) * 20
+      : contacts.y - 29;
+  return { travel, x, choosing, ...contacts, handX, handY };
+}
+
+/** Computes wheel and foot contact from the unchanged access-floor geometry. */
+function _getParticipantFloorContacts({
+  x,
+  doorX,
+  input,
+  propulsion,
+}: Readonly<GetParticipantFloorContactsOptions>): ParticipantFloorContacts {
   const rearY = getServiceWheelCenterYFromWheelGeometry({
     x: x - 6,
     radius: 21,
@@ -66,76 +117,65 @@ export function AccessParticipant({
     doorX,
     accessChange: input.accessChange,
   });
-  const handX = choosing
-    ? x + Math.sign(doorX - x) * 50
-    : input.participantMobility === "wheelchair"
-      ? x - 6 + Math.cos(wheelAngle) * 20
-      : x + 12 + propulsion;
-  const handY = choosing
-    ? y - 70
-    : input.participantMobility === "wheelchair"
-      ? rearY + Math.sin(wheelAngle) * 20
-      : y - 29;
+  return { rearY, y, frontY, leftFootX, rightFootX, leftFootY, rightFootY };
+}
+
+/**
+ * The participant points, then walks or self-propels through the chosen door.
+ */
+export function AccessParticipant({
+  input,
+  frame,
+  accent,
+}: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const {
+    travel,
+    x,
+    choosing,
+    rearY,
+    y,
+    frontY,
+    leftFootX,
+    rightFootX,
+    leftFootY,
+    rightFootY,
+    handX,
+    handY,
+  } = _getServiceParticipantPose({ input, frame, motion });
   return (
     <g
       data-participant-position={travel === 1 ? "inside" : "outside"}
       data-x={x}
       data-y={y}
     >
-      <SketchedShape
-        shape={{ kind: "circle", cx: x, cy: y - 55, r: 8 }}
-        profile={tokens.sketch.shape}
-        fill="none"
-        stroke={accent}
-        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+      <ServiceParticipantHead {...{ accent, tokens, scales, x, y }} />
+      <ServiceParticipantBody
+        {...{ input, x, y, frontY, leftFootX, leftFootY, rightFootX }}
+        {...{ rightFootY, tokens, accent, scales }}
       />
-      <SketchedShape
-        shape={{
-          kind: "path",
-          d:
-            input.participantMobility === "wheelchair"
-              ? `M${x} ${y - 45} V${y - 22} H${x + 20} L${x + 26} ${frontY}`
-              : `M${x} ${y - 45} V${y - 20} L${leftFootX} ${leftFootY} M${x} ${y - 20} L${rightFootX} ${rightFootY}`,
-        }}
-        profile={tokens.sketch.shape}
-        data-participant-body
-        fill="none"
-        stroke={accent}
-        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
-        strokeLinecap="round"
+      <ServiceParticipantWheels
+        {...{ input, accent, scales, tokens, x, rearY, frontY, frame }}
+        travel={travel}
       />
-      {input.participantMobility === "wheelchair" ? (
-        <g
-          fill="none"
-          stroke={accent}
-          strokeWidth={scales.stroke(tokens.stroke.default)}
-        >
-          <circle data-participant-wheel="rear" cx={x - 6} cy={rearY} r={20} />
-          <circle
-            data-participant-wheel="front"
-            cx={x + 27}
-            cy={frontY}
-            r={5}
-          />
-          <path
-            d={`M${x - 6} ${rearY} L${x - 6 + Math.sin(frame * 0.1 * travel) * 15} ${rearY + Math.cos(frame * 0.1 * travel) * 15}`}
-          />
-        </g>
-      ) : undefined}
-      <SketchedShape
-        shape={{
-          kind: "path",
-          d: `M${x} ${y - 41} L${x + (handX - x) * 0.5} ${handY + 6} L${handX} ${handY}`,
-        }}
-        profile={tokens.sketch.shape}
-        data-participant-arm
-        data-choice-point={choosing ? input.chosenServiceId : undefined}
-        fill="none"
-        stroke={accent}
-        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
-        strokeLinecap="round"
+      <ServiceParticipantArm
+        {...{ input, accent, tokens, scales, x, choosing, y, handX }}
+        handY={handY}
       />
-      <circle data-participant-hand cx={handX} cy={handY} r={3} fill={accent} />
     </g>
   );
 }
+
+type GetParticipantFloorContactsOptions = {
+  x: number;
+  doorX: number;
+  input: Input;
+  propulsion: number;
+};
+
+/** Result of the authored AccessParticipant calculation. */
+export type AccessParticipantGetServiceParticipantPoseValue = ReturnType<
+  typeof _getServiceParticipantPose
+>;

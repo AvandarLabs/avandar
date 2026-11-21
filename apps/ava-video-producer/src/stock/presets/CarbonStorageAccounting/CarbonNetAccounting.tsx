@@ -1,6 +1,9 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { CarbonNetAccountingNetLabel } from "./CarbonNetAccountingNetLabel/CarbonNetAccountingNetLabel";
+import { CarbonNetQuantities } from "./CarbonNetQuantities/CarbonNetQuantities";
+import { CarbonNetSubtractionMark } from "./CarbonNetSubtractionMark/CarbonNetSubtractionMark";
 import type { Input } from "./CarbonStorageAccounting.schema";
 import type { ReactNode } from "react";
 
@@ -15,16 +18,7 @@ export function CarbonNetAccounting({
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g data-net={retained - emissions}>
-      <FitText
-        text={input.copy.net}
-        x={540}
-        y={446}
-        width={380}
-        fontSize={14}
-        maxLines={3}
-        breakLongWords
-        normalizeWhitespace
-      />
+      <CarbonNetAccountingNetLabel input={input} />
       <SketchedShape
         shape={{ kind: "path", d: "M535 490 V550 H925 V490" }}
         profile={tokens.sketch.shape}
@@ -32,35 +26,8 @@ export function CarbonNetAccounting({
         stroke={tokens.color.line}
         strokeWidth={scales.stroke(tokens.stroke.default)}
       />
-      {[retained, emissions, retained - emissions].map((value, index) => {
-        return (
-          // prettier-ignore
-          // The three slots always mean retained mass, emissions
-          // and their difference, in that order. Only their values
-          // change.
-          // react-doctor-disable-next-line no-array-index-as-key
-          <FitText key={index}
-            text={String(value)}
-            x={540 + index * 135}
-            y={510}
-            width={110}
-            fontSize={12}
-            maxLines={3}
-            breakLongWords
-            normalizeWhitespace
-          />
-        );
-      })}
-      <text
-        x={658}
-        y={515}
-        fill={tokens.color.text}
-        fontFamily={tokens.text.graphic.secondary.fontFamily}
-        fontWeight={tokens.text.graphic.secondary.fontWeight}
-        fontSize={tokens.text.graphic.secondary.fontSize}
-      >
-        −
-      </text>
+      <CarbonNetQuantities retained={retained} emissions={emissions} />
+      <CarbonNetSubtractionMark tokens={tokens} />
       <text
         x={793}
         y={515}

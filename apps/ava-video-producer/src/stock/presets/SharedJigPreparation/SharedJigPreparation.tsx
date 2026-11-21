@@ -1,81 +1,53 @@
-import { FitText } from "../../primitives/FitText/FitText";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
-import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { getJigSceneFromFrame } from "./getJigSceneFromFrame";
 import { JigGuide } from "./JigGuide/JigGuide";
+import { JigMakerLabel } from "./JigMakerLabel";
 import { JigMakingTool } from "./JigMakingTool";
 import { JigMarkingHand } from "./JigMarkingHand";
-import { JigStation } from "./JigStation";
+import { SharedJigStation } from "./SharedJigStation";
+import { useSharedJigPreparationPresentation } from "./useSharedJigPreparationPresentation";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./SharedJigPreparation.schema";
 import type { ReactNode } from "react";
 /** Inputs for SharedJigPreparation. */
 type Props = GraphicProps & { input: Input };
 /** One prepared guide is physically shared in collection order and retained. */
-export function SharedJigPreparation({
-  frame,
-  input,
-  accent,
-}: Readonly<Props>): ReactNode {
-  const motion = GraphicThemeHooks.useGraphicMotion();
-  const tokens = GraphicThemeHooks.useGraphicTokens();
-  const scene = getJigSceneFromFrame({ motion, frame, input });
-  const action =
-    frame < 49
-      ? input.labels.prepare
-      : frame < 131
-        ? input.labels.apply
-        : input.labels.retained;
+export function SharedJigPreparation(props: Readonly<Props>): ReactNode {
+  const presentation = useSharedJigPreparationPresentation(props);
+
   return (
     <g>
       <LabelSlots
         labels={[
-          [action, 48, 66, 864, 24, 2],
-          [input.labels.example, 48, 24, 864, 14, 1],
+          [presentation.action, 48, 66, 864, 24, 2],
+          [props.input.labels.example, 48, 24, 864, 14, 1],
         ]}
       />
-      {input.collaborators.map((collaborator, index) => {
+      {props.input.collaborators.map((collaborator, index) => {
         return (
-          <JigStation
+          <SharedJigStation
             key={collaborator.id}
+            {...presentation}
             collaborator={collaborator}
-            x={scene.centers[index]}
-            hasApplication={scene.applications[index]}
-            isAligned={
-              scene.activeIndex === index &&
-              scene.guideX === scene.centers[index] - 50
-            }
-            input={input}
-            accent={accent}
+            index={index}
           />
         );
       })}
       <PersonGlyph
-        x={scene.guideX}
+        x={presentation.scene.guideX}
         y={440}
         size={32}
         role="worker"
-        color={tokens.color.highlight}
+        color={presentation.tokens.color.highlight}
       />
-      <FitText
-        text={input.makerLabel}
-        x={Math.min(610, scene.guideX - 40)}
-        y={550}
-        width={300}
-        fontSize={12}
-        maxLines={2}
-        color={tokens.color.highlight}
-        normalizeWhitespace
-        breakLongWords
-      />
-      <JigGuide input={input} scene={scene} />
-      <JigMarkingHand input={input} scene={scene} />
-      {frame < 49 ? (
+      <JigMakerLabel {...presentation} />
+      <JigGuide input={props.input} scene={presentation.scene} />
+      <JigMarkingHand input={props.input} scene={presentation.scene} />
+      {props.frame < 49 ? (
         <JigMakingTool
-          frame={frame}
-          pattern={input.guide.pattern}
-          accent={accent}
+          frame={props.frame}
+          pattern={props.input.guide.pattern}
+          accent={props.accent}
         />
       ) : undefined}
     </g>

@@ -1,12 +1,12 @@
 import { Button } from "@mantine/core";
-import { getTokenDefinitionFromPath } from "../../../videoTheme/tokenCatalog/tokenCatalogHelpers/tokenCatalogHelpers";
+import { TokenCatalog } from "../../../videoTheme/tokenCatalog/TokenCatalog/TokenCatalog";
 import { getDefaultLiteralFromKind } from "../../controls/getDefaultLiteralFromKind";
 import { useTokenEditor } from "../../TokenEditorContext";
-import { buildNextCustomScaleKey } from "../../tokenRows/tokenRows";
+import { TokenRows } from "../../TokenRows/TokenRows";
 import {
   type TokenRowGroup,
   type TokenRow,
-} from "../../tokenRows/tokenRows.types";
+} from "../../TokenRows/TokenRows.types";
 import type { ReactNode } from "react";
 
 type Props = TokenRowGroup &
@@ -18,7 +18,9 @@ type Props = TokenRowGroup &
 export function AddScaleValue({ group, allRows }: Props): ReactNode {
   const editor = useTokenEditor();
   const scalePath = `atomic.${group.split(":")[1]}`;
-  const kind = getTokenDefinitionFromPath(`${scalePath}.entry`)?.kind;
+  const kind = TokenCatalog.getTokenDefinitionFromPath(
+    `${scalePath}.entry`,
+  )?.kind;
   if (!kind) {
     return null;
   }
@@ -28,7 +30,7 @@ export function AddScaleValue({ group, allRows }: Props): ReactNode {
       variant="subtle"
       onClick={() => {
         return editor.setToken(
-          `${scalePath}.${buildNextCustomScaleKey({ rows: allRows, group })}`,
+          `${scalePath}.${TokenRows.makeNextCustomScaleKeyFromRows({ rows: allRows, group })}`,
           getDefaultLiteralFromKind(kind),
         );
       }}

@@ -1,4 +1,4 @@
-import { isMantineTokenRoot } from "../../videoTheme/tokenCatalog/tokenCatalogHelpers/tokenCatalogHelpers";
+import { TokenCatalog } from "../../videoTheme/tokenCatalog/TokenCatalog/TokenCatalog";
 
 /**
  * Where a token lives in a theme file, such as
@@ -16,7 +16,7 @@ export function getDocumentPathFromTokenPath(
     const [name, ...props] = rest;
     return ["components", name, "defaultProps", ...props];
   }
-  return isMantineTokenRoot(root)
+  return TokenCatalog.isMantineTokenRoot(root)
     ? [root, ...rest]
     : ["other", "video", "semantic", root, ...rest];
 }

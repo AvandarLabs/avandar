@@ -1,17 +1,20 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { PlannerPeopleShared } from "./PlannerPeopleShared/PlannerPeopleShared";
+import { PlannerPeopleShared } from "./PlannerPeopleShared";
 import type { ReactNode } from "react";
+
+type Props = {
+  agreement: Readonly<{ x: number; y: number }>;
+  frame: number;
+  accent: string;
+};
+
 /** The agreement check, drawing on beside the agreed appointment. */
 export function AgreementMark({
   agreement,
   frame,
   accent,
-}: Readonly<{
-  agreement: Readonly<{ x: number; y: number }>;
-  frame: number;
-  accent: string;
-}>): ReactNode {
+}: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const motion = GraphicThemeHooks.useGraphicMotion();
   const scales = GraphicThemeHooks.useGraphicShapeScales();

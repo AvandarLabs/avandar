@@ -1,0 +1,27 @@
+.galleryNavigationSidebar {
+  composes: sidebar from global;
+}
+
+.galleryNavigationSidebarTop {
+  composes: sidebar-top from global;
+}
+
+.galleryNavigationEyebrow {
+  composes: eyebrow from global;
+}
+
+.galleryNavigationCategoryCount {
+  composes: category-count from global;
+}
+
+.galleryNavigationSidebarBottom {
+  composes: sidebar-bottom from global;
+}
+
+.galleryNavigationTinyDot {
+  composes: tiny-dot from global;
+}
+
+.galleryNavigationCategoryButton {
+  composes: category-button from global;
+}

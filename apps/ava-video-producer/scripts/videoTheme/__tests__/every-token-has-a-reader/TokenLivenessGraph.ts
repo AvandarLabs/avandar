@@ -1,13 +1,7 @@
-import { BUILT_IN_VIDEO_THEMES } from "../../../../src/videoTheme/builtInVideoThemes/builtInVideoThemes";
 import { getValueAtPath } from "../../../../src/videoTheme/getValueAtPath";
-import {
-  getTargetFromTokenReference,
-  isTokenReference,
-} from "../../../../src/videoTheme/themeReferenceHelpers/themeReferenceHelpers";
-import {
-  isMantineTokenRoot,
-  listTokenDefinitions,
-} from "../../../../src/videoTheme/tokenCatalog/tokenCatalogHelpers/tokenCatalogHelpers";
+import { BUILT_IN_VIDEO_THEMES } from "../../../../src/videoTheme/makeVideoThemeLibraryFromDocuments/makeVideoThemeLibraryFromDocuments";
+import { ThemeReferences } from "../../../../src/videoTheme/ThemeReferences/ThemeReferences";
+import { TokenCatalog } from "../../../../src/videoTheme/tokenCatalog/TokenCatalog/TokenCatalog";
 import type { VideoThemeDocument } from "../../../../src/videoTheme/videoTheme.types";
 
 const PALETTE_GROUPS = [
@@ -15,14 +9,17 @@ const PALETTE_GROUPS = [
   "camera.presets",
   "motion.easingProfiles",
 ];
-const TOKEN_PATHS = listTokenDefinitions()
+
+const TOKEN_PATHS = TokenCatalog.listTokenDefinitions()
   .map((entry) => {
     return entry.path;
   })
   .filter((tokenPath) => {
-    return !isMantineTokenRoot(tokenPath.split(".")[0]);
+    return !TokenCatalog.isMantineTokenRoot(tokenPath.split(".")[0]);
   });
+
 const TOKEN_PATH_SET: ReadonlySet<string> = new Set(TOKEN_PATHS);
+
 /** The raw value of a token in a theme file, before references resolve. */
 function _rawValue({
   document,
@@ -33,20 +30,25 @@ function _rawValue({
 }>): unknown {
   const [root, ...rest] = tokenPath.split(".");
   if (root === "components") {
-    return getValueAtPath(document, [
-      "components",
-      rest[0],
-      "defaultProps",
-      ...rest.slice(1),
-    ]);
+    return getValueAtPath({
+      source: document,
+      path: ["components", rest[0], "defaultProps", ...rest.slice(1)],
+    });
   }
   return root === "atomic"
-    ? getValueAtPath(document, ["other", "video", "atomic", ...rest])
-    : getValueAtPath(document, ["other", "video", "semantic", root, ...rest]);
+    ? getValueAtPath({
+        source: document,
+        path: ["other", "video", "atomic", ...rest],
+      })
+    : getValueAtPath({
+        source: document,
+        path: ["other", "video", "semantic", root, ...rest],
+      });
 }
+
 function _referencedTokenPaths(value: unknown): string[] {
-  if (isTokenReference(value)) {
-    const target = getTargetFromTokenReference(value);
+  if (ThemeReferences.isTokenReference(value)) {
+    const target = ThemeReferences.getTargetFromTokenReference(value);
     if (target.tier === "primary" || target.tier === "mantine") {
       return [];
     }
@@ -65,6 +67,7 @@ function _referencedTokenPaths(value: unknown): string[] {
     ? Object.values(value).flatMap(_referencedTokenPaths)
     : [];
 }
+
 /**
  * A token plus, when it belongs to a menu group, every other choice in that
  * menu.
@@ -79,6 +82,7 @@ function _withPaletteSiblings(tokenPath: string): string[] {
       })
     : [tokenPath];
 }
+
 /**
  * Every token read directly, plus every token a live token references in a
  * built-in theme.
@@ -88,12 +92,12 @@ function _liveTokenPaths(directReads: readonly string[]): Set<string> {
   const live = new Set<string>();
   const pending: string[] = [];
   const markLive = (tokenPath: string) => {
-    for (const member of _withPaletteSiblings(tokenPath)) {
+    Array.from(_withPaletteSiblings(tokenPath)).forEach((member) => {
       if (!live.has(member)) {
         live.add(member);
         pending.push(member);
       }
-    }
+    });
   };
   directReads
     .filter((tokenPath) => {
@@ -119,6 +123,7 @@ function _liveTokenPaths(directReads: readonly string[]): Set<string> {
   }
   return live;
 }
+
 /**
  * Follows references and menu alternatives from directly observed token reads.
  */
@@ -126,6 +131,6 @@ export const TokenLivenessGraph = {
   /** Video-token catalog paths checked for direct or transitive readers. */
   TOKEN_PATHS,
   /** Every token read directly, plus every token a live token references in a
-      built-in theme. */
+        built-in theme. */
   liveTokenPaths: _liveTokenPaths,
 } as const;

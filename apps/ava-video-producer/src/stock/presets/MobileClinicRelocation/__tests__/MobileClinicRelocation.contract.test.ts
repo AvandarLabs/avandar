@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { propEq } from "@avandar/utils";
 import { registerStockPresetAssertions } from "../../../../../tests/helpers/registerStockPresetAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
@@ -21,6 +22,43 @@ import {
   _assertSiteLabelClearance,
   _assertBookingClearsLabels,
 } from "./MobileClinicRelocationTestHelpers";
+
+type GetClinicStagesResult = {
+  first: string;
+  driving: string;
+  last: string;
+};
+
+function _getClinicStages(input: Readonly<Input>): GetClinicStagesResult {
+  const first = _attributes({
+    markup: _render({ frame: 30, input: input }),
+    attribute: "data-clinic",
+    value: "vehicle",
+  });
+  const driving = _attributes({
+    markup: _render({ frame: 72, input: input }),
+    attribute: "data-clinic",
+    value: "vehicle",
+  });
+  const last = _attributes({
+    markup: _render({ frame: 150, input: input }),
+    attribute: "data-clinic",
+    value: "vehicle",
+  });
+  return { first, driving, last };
+}
+
+function _assertTheVehicleBodyMovesWithDataAwning(
+  input: Readonly<Input>,
+): void {
+  assert.ok(
+    _attributes({
+      markup: _render({ frame: 72, input: input }),
+      attribute: "data-awning",
+      value: "clinic",
+    }).includes("M-42 -22 H20 L20 -22 H-42 Z"),
+  );
+}
 
 test("invalid authored inputs reject before rendering", () => {
   invalidInputs.forEach((input) => {
@@ -80,21 +118,7 @@ registerStockTextLayoutAssertions(ASSERTIONS);
 test("the vehicle body moves with its awning folded and preserves both map contexts", () => {
   ["local-map", "globe-to-local"].forEach((view) => {
     const input = { ...DEFAULT_INPUT, view: view as Input["view"] };
-    const first = _attributes({
-      markup: _render({ frame: 30, input: input }),
-      attribute: "data-clinic",
-      value: "vehicle",
-    });
-    const driving = _attributes({
-      markup: _render({ frame: 72, input: input }),
-      attribute: "data-clinic",
-      value: "vehicle",
-    });
-    const last = _attributes({
-      markup: _render({ frame: 150, input: input }),
-      attribute: "data-clinic",
-      value: "vehicle",
-    });
+    const { first, driving, last } = _getClinicStages(input);
     const startTransform = first.match(
       /transform="translate\(([^ ]+) ([^)]+)\)"/,
     );
@@ -114,13 +138,7 @@ test("the vehicle body moves with its awning folded and preserves both map conte
         name: "data-x",
       }) < 388.2,
     );
-    assert.ok(
-      _attributes({
-        markup: _render({ frame: 72, input: input }),
-        attribute: "data-awning",
-        value: "clinic",
-      }).includes("M-42 -22 H20 L20 -22 H-42 Z"),
-    );
+    _assertTheVehicleBodyMovesWithDataAwning(input);
     [30, 150].forEach((frame) => {
       return assert.ok(
         _render({ frame: frame, input: input }).includes(
@@ -258,9 +276,7 @@ bookingLabelInputs.forEach((input, rotation) => {
       });
       const samples = _assertBookingClearsLabels({ path, boxes });
       _assertBookingClearsLabels({ path, boxes, clearance: 3.5 });
-      const slotIndex = input.slots.findIndex(({ id }) => {
-        return id === person.slotId;
-      });
+      const slotIndex = input.slots.findIndex(propEq("id", person.slotId));
       assert.deepEqual(samples[0], { x: 74 + index * 114, y: 418 });
       assert.deepEqual(samples.at(-1), { x: 642, y: 160 + slotIndex * 44 });
       return [path.match(/ d="([^"]+)"/)?.[1]];

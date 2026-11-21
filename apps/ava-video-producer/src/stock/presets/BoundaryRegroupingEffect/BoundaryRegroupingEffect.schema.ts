@@ -1,4 +1,4 @@
-import { propEq, prop } from "@avandar/utils";
+import { prop, propEq, propIsInArray } from "@avandar/utils";
 import { z } from "zod";
 import { OrthogonalGrid } from "../../geometry/OrthogonalGrid/OrthogonalGrid";
 /** Strict authored input structure. */
@@ -64,9 +64,7 @@ function _validGrouping(input: SchemaInput): boolean {
       }) &&
       grouping.zones.every((zone) => {
         return OrthogonalGrid.areCellsConnected(
-          input.cells.filter((cell) => {
-            return zone.cellIds.includes(cell.id);
-          }),
+          input.cells.filter(propIsInArray("id", zone.cellIds)),
         );
       })
     );

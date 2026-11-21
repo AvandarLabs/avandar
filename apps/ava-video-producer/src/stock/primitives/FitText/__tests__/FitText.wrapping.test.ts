@@ -1,9 +1,7 @@
-/**
- * Wrapping rejects overflow instead of shrinking or truncating authored labels.
- */
 import assert from "node:assert/strict";
 import test from "node:test";
 import { wrapTextToLines } from "../wrapTextToLines";
+import { makeOversizedTokensFillResidualCasesFromWide as _makeOversizedTokensFillResidualCasesFromWide } from "./makeOversizedTokensFillResidualCasesFromWide";
 
 test("supported fixed sizes wrap deterministically at the declared line bound", () => {
   const options = {
@@ -214,53 +212,11 @@ test("oversized tokens fill residual line capacity while fitting words and graph
   };
   const emoji = "👩🏽‍💻";
   const accent = "e\u0301";
-  const cases = [
-    {
-      text: `${wide(1)} ${wide(4)}`,
-      width: 60,
-      lines: [`${wide(1)} ${wide(2)}`, wide(2)],
-    },
-    {
-      text: `${wide(2)} ${wide(4)}`,
-      width: 60,
-      lines: [`${wide(2)} ${wide(1)}`, wide(3)],
-    },
-    {
-      text: `${wide(3)} ${wide(4)}`,
-      width: 60,
-      lines: [wide(3), wide(3), wide(1)],
-    },
-    {
-      text: `${wide(1)} ${wide(7)}`,
-      width: 60,
-      lines: [`${wide(1)} ${wide(2)}`, wide(3), wide(2)],
-    },
-    {
-      text: `${wide(1)} ${wide(4)} ok`,
-      width: 60,
-      lines: [`${wide(1)} ${wide(2)}`, `${wide(2)} ok`],
-    },
-    {
-      text: `ok ${wide(4)} ${wide(1)}`,
-      width: 60,
-      lines: [`ok ${wide(2)}`, `${wide(2)} ${wide(1)}`],
-    },
-    {
-      text: `${wide(1)} ${wide(4)} word`,
-      width: 60,
-      lines: [`${wide(1)} ${wide(2)}`, wide(2), "word"],
-    },
-    {
-      text: `${wide(1)} ${emoji.repeat(3)}`,
-      width: 80,
-      lines: [`${wide(1)} ${emoji}`, emoji.repeat(2)],
-    },
-    {
-      text: `${wide(1)} ${accent.repeat(8)}`,
-      width: 60,
-      lines: [`${wide(1)} ${accent.repeat(3)}`, accent.repeat(5)],
-    },
-  ];
+  const cases = _makeOversizedTokensFillResidualCasesFromWide({
+    wide,
+    emoji,
+    accent,
+  });
   cases.forEach(({ text, width, lines }) => {
     const actual = wrapTextToLines({
       text,

@@ -2,19 +2,21 @@ import { PlanarPolygon } from "../../geography/PlanarPolygon/PlanarPolygon";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { GisLabels } from "./GisLabels";
-import { HouseholdMarker } from "./HouseholdMarker/HouseholdMarker";
+import { GisLayerIntersectionTallyHouseholdsLayer } from "./GisLayerIntersectionTallyHouseholdsLayer/GisLayerIntersectionTallyHouseholdsLayer";
 import { LayerGeometry } from "./LayerGeometry";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./GisLayerIntersectionTally.schema";
 import type { ReactNode } from "react";
+/** Inputs for isSelected. */
+type IsSelectedArguments = {
+  input: Input;
+  household: Input["households"][number];
+};
 
 function _isSelected({
   input,
   household,
-}: Readonly<{
-  input: Input;
-  household: Input["households"][number];
-}>): boolean {
+}: Readonly<IsSelectedArguments>): boolean {
   const point: [number, number] = [household.x, household.y];
   const first =
     PlanarPolygon.getPointClassification({
@@ -57,7 +59,7 @@ export function GisLayerIntersectionTally({
   );
   return (
     <g>
-      <LayerGeometry input={input} frame={frame} accent={accent} />
+      <LayerGeometry {...{ input, frame, accent }} />
       <SketchedShape
         shape={{ kind: "path", d: "M565 155 H555 V510 H565" }}
         profile={tokens.sketch.shape}
@@ -66,24 +68,13 @@ export function GisLayerIntersectionTally({
         stroke={accent}
         strokeWidth={scales.stroke(tokens.stroke.default)}
       />
-      {input.households.map((household, index) => {
-        return (
-          <HouseholdMarker
-            key={household.id}
-            household={household}
-            index={index}
-            frame={frame}
-            isSelected={selected[index]}
-            accent={accent}
-          />
-        );
-      })}
-      <GisLabels
-        input={input}
-        selectedQuantity={selectedQuantity}
-        totalQuantity={totalQuantity}
-        frame={frame}
+      <GisLayerIntersectionTallyHouseholdsLayer
+        {...{ input, frame, selected, accent }}
       />
+      <GisLabels {...{ input, selectedQuantity, totalQuantity, frame }} />
     </g>
   );
 }
+
+/** The type of `_isSelected` used by GisLayerIntersectionTally. */
+export type GisLayerIntersectionTallyIsSelectedCallable = typeof _isSelected;

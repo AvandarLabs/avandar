@@ -1,10 +1,11 @@
+import { matchLiteral } from "@avandar/utils";
 import { useMemo } from "react";
 import { z } from "zod";
-import { bezier, ramp } from "../../motion";
+import { Motion } from "../../motion";
 import { StageTheme } from "../../scenes/StageTheme/StageTheme";
-import { createVideoMotion } from "../../videoTheme/createVideoMotion/createVideoMotion";
-import { useVideoThemeContext } from "../../videoTheme/useVideoTheme";
-import type { VideoMotion } from "../../videoTheme/createVideoMotion/createVideoMotion";
+import { makeVideoMotionFromTokens } from "../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
+import { useVideoThemeContext } from "../../videoTheme/videoThemeHelpers";
+import type { VideoMotion } from "../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type {
   ResolvedVideoAtomic,
   ResolvedVideoSemantic,
@@ -98,7 +99,7 @@ export type MotionSettingsTheme = Readonly<{
 /** The motion settings theme of a resolved video theme. */
 function _makeMotionSettingsThemeFromVideoTheme({
   theme,
-  motion = createVideoMotion(theme.semantic.motion),
+  motion = makeVideoMotionFromTokens(theme.semantic.motion),
 }: Readonly<{
   theme: ResolvedVideoTheme;
   motion?: VideoMotion;
@@ -137,7 +138,7 @@ function useMotionSettingsTheme(): MotionSettingsTheme {
  * the options leave out comes from the theme: the preset's speed and shutter
  * from `camera.presets`, the rest from `motionBlur`.
  */
-function _resolveMotionSettings({
+function _buildMotionSettings({
   options = {},
   theme = _getClassicMotionSettingsTheme(),
 }: Readonly<{
@@ -173,7 +174,7 @@ function _getMotionDuration({
   theme?: MotionSettingsTheme;
 }>): number {
   z.number().int().nonnegative().parse(frames);
-  const { speed } = _resolveMotionSettings({ options, theme });
+  const { speed } = _buildMotionSettings({ options, theme });
   return frames === 0 ? 0 : Math.max(1, Math.round(frames / speed));
 }
 /**
@@ -193,23 +194,31 @@ function _getMotionEasing({
   if (!options?.easing && !options?.preset) {
     return fallback ?? theme.motion.travel.easing;
   }
-  const { easing } = _resolveMotionSettings({ options, theme });
-  if (Array.isArray(easing)) return bezier(...easing);
+  const { easing } = _buildMotionSettings({ options, theme });
+  if (Array.isArray(easing)) {
+    const [x1, y1, x2, y2] = easing;
+    return Motion.bezier({ x1, y1, x2, y2 });
+  }
   const curve = theme.motion.curve;
-  switch (easing) {
-    case "linear":
+  return matchLiteral(easing, {
+    ["linear"]: () => {
       return (progress: number) => {
         return progress;
       };
-    case "ease-in":
+    },
+    ["ease-in"]: () => {
       return curve(theme.easing.cssEaseIn);
-    case "ease-out":
+    },
+    ["ease-out"]: () => {
       return curve(theme.easing.cssEaseOut);
-    case "ease-in-out-cubic":
+    },
+    ["ease-in-out-cubic"]: () => {
       return curve(theme.easing.inOutCubic);
-    case "ease-in-out":
+    },
+    ["ease-in-out"]: () => {
       return curve(theme.easing.inOut);
-  }
+    },
+  });
 }
 /**
  * Clamp movement at its endpoints, including fractional shutter-sample frames.
@@ -222,12 +231,12 @@ function _getMotionProgress({
   fallback,
   theme = _getClassicMotionSettingsTheme(),
 }: Readonly<GetMotionProgressOptions>): number {
-  return ramp(
+  return Motion.ramp({
     frame,
     at,
-    _getMotionDuration({ frames: duration, options, theme }),
-    _getMotionEasing({ options, fallback, theme }),
-  );
+    dur: _getMotionDuration({ frames: duration, options, theme }),
+    easing: _getMotionEasing({ options, fallback, theme }),
+  });
 }
 /**
  * Bounded screen-space blur for single-instance overlays and scene movement:
@@ -240,7 +249,7 @@ function _getVelocityBlur({
   maximum,
   theme = _getClassicMotionSettingsTheme(),
 }: Readonly<GetVelocityBlurOptions>): number {
-  const settings = _resolveMotionSettings({ options, theme });
+  const settings = _buildMotionSettings({ options, theme });
   return (
     (Math.min(
       maximum ?? settings.velocityBlurLimit,
@@ -270,7 +279,7 @@ export const MotionSettings = {
    * What the options leave out comes from the theme: the preset's speed and
    * shutter from `camera.presets`, the rest from `motionBlur`.
    */
-  resolveMotionSettings: _resolveMotionSettings,
+  resolveMotionSettings: _buildMotionSettings,
   /**
    * Convert authored travel frames to actual frames. A zero-length cut
    * stays zero.

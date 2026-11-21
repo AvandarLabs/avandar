@@ -3,12 +3,15 @@ import { FitText } from "../../../primitives/FitText/FitText";
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
+
+type Props = { label: string; index: number; isActive: boolean };
+
 /** One numbered day over its rule, emphasised while it is the active day. */
 export function ClassroomDay({
   label,
   index,
   isActive,
-}: Readonly<{ label: string; index: number; isActive: boolean }>): ReactNode {
+}: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (

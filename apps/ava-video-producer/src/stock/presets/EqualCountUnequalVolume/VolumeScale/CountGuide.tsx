@@ -1,13 +1,12 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { type Props } from "./VolumeScaleShared.types";
+import { type Props as VolumeScaleSharedProps } from "./VolumeScaleShared.types";
 import type { ReactNode } from "react";
+
+type Props = Omit<VolumeScaleSharedProps, "input">;
+
 /** A guide beside the group as long as its count of items. */
-export function CountGuide({
-  group,
-  y,
-  accent,
-}: Readonly<Omit<Props, "input">>): ReactNode {
+export function CountGuide({ group, y, accent }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g data-count-guide={group.id}>

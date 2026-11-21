@@ -1,11 +1,15 @@
-import { mix, ramp } from "../../../../motion";
+import { Motion } from "../../../../motion";
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CommitStamps } from "./CommitStamps";
 import type { Input } from "../AtomicOutboxCommit.schema";
 import type { ReactNode } from "react";
 
-type Props = { input: Input; frame: number; accent: string };
+type Props = {
+  input: Input;
+  frame: number;
+  accent: string;
+};
 /** Frames the shared latch takes to close. */
 const LATCH_FRAMES = 54;
 /** One shared latch closes before both commit stamps appear. */
@@ -17,11 +21,16 @@ export function OutboxCommitMarks({
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   const motion = GraphicThemeHooks.useGraphicMotion();
-  const latchY = mix(
-    ramp(frame, 56, motion.scale(LATCH_FRAMES), motion.travel.easing),
-    128,
-    150,
-  );
+  const latchY = Motion.mix({
+    t: Motion.ramp({
+      frame,
+      at: 56,
+      dur: motion.scale(LATCH_FRAMES),
+      easing: motion.travel.easing,
+    }),
+    from: 128,
+    to: 150,
+  });
   return (
     <g>
       {" "}

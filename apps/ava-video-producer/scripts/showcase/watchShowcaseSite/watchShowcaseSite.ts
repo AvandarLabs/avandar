@@ -1,12 +1,10 @@
 import { build } from "vite";
 import { makeShowcaseViteConfigFromAppRoot } from "../makeShowcaseViteConfigFromAppRoot";
 import { waitForFirstWatchedBuild } from "../waitForFirstWatchedBuild/waitForFirstWatchedBuild";
-
 /** A running watched showcase build. */
 export type ShowcaseSiteWatcher = {
   dispose: () => Promise<void>;
 };
-
 /**
  * Watches showcase sources and rebuilds every page after each change. Only a
  * successful build calls `onBuilt`, so open pages refresh after it and never
@@ -26,7 +24,10 @@ export async function watchShowcaseSite({
     throw new Error("The showcase build did not start in watch mode.");
   }
   try {
-    await waitForFirstWatchedBuild(watcher, onBuilt);
+    await waitForFirstWatchedBuild({
+      watcher,
+      onBuilt,
+    });
   } catch (error) {
     await watcher.close();
     throw error;

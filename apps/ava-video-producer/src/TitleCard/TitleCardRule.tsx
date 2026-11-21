@@ -1,12 +1,13 @@
 import { useVideoMotion } from "../videoTheme/useVideoMotion";
 import { useVideoShapeScales } from "../videoTheme/useVideoShapeScales";
-import { useVideoTheme, useVideoTokens } from "../videoTheme/useVideoTheme";
+import { useVideoTheme, useVideoTokens } from "../videoTheme/videoThemeHelpers";
 import { TitleCardShared } from "./TitleCardShared/TitleCardShared";
 import type { ReactNode } from "react";
+
+type Props = { frame: number };
+
 /** Grows the accent rule below the title for `TitleCardContent`. */
-export function TitleCardRule({
-  frame,
-}: Readonly<{ frame: number }>): ReactNode {
+export function TitleCardRule({ frame }: Readonly<Props>): ReactNode {
   const tokens = useVideoTokens();
   const { spacing } = useVideoTheme().mantine;
   const motion = useVideoMotion();

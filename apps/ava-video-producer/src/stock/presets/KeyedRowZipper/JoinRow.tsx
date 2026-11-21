@@ -1,11 +1,11 @@
 import { propEq } from "@avandar/utils";
-import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
-import { StockRect } from "../../primitives/StockRect/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getJoinRowLayoutFromInputAndFrame } from "./getJoinRowLayoutFromInputAndFrame";
 import { getJoinRowVisibility } from "./getJoinRowVisibility";
 import { JoinKeyCell } from "./JoinKeyCell";
-import { JoinMissingPartner } from "./JoinMissingPartner";
+import { JoinRowLiteralValue } from "./JoinRowLiteralValue/JoinRowLiteralValue";
+import { JoinRowMissingPartner } from "./JoinRowMissingPartner/JoinRowMissingPartner";
+import { JoinRowSurface } from "./JoinRowSurface/JoinRowSurface";
 import type { Input } from "./KeyedRowZipper.schema";
 import type { ReactNode } from "react";
 
@@ -53,34 +53,15 @@ export function JoinRow({
   }
   return (
     <g opacity={visibility.opacity}>
-      <StockRect
-        data-side={side}
-        data-result-key={side === "left" && !isContext ? row.key : undefined}
-        data-context-key={isContext ? row.key : undefined}
-        x={x}
-        y={y}
-        width={416}
-        height={height}
-        rx={scales.corner(tokens.corner.chip)}
-        fill={tokens.color.surface}
-        stroke={isContext ? tokens.color.line : accent}
+      <JoinRowSurface
+        {...{ side, isContext, row, x, y, height, scales, tokens }}
+        accent={accent}
       />
       {visibility.showKey ? (
-        <JoinKeyCell value={row.key} x={x} y={y} side={side} accent={accent} />
+        <JoinKeyCell value={row.key} {...{ x, y, side, accent }} />
       ) : undefined}
-      <LiteralDataText
-        value={row.value}
-        x={x + 12}
-        y={y + (isContext ? 33 : 43)}
-      />
-      {visibility.showMissingPartner ? (
-        <JoinMissingPartner
-          rowKey={row.key}
-          y={y}
-          label={input.labels.missing}
-          progress={progress}
-        />
-      ) : undefined}
+      <JoinRowLiteralValue {...{ row, x, y, isContext }} />
+      <JoinRowMissingPartner {...{ visibility, row, y, input, progress }} />
     </g>
   );
 }

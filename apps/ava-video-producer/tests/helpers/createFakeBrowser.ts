@@ -9,7 +9,6 @@ import type {
   Request,
   Route,
 } from "@playwright/test";
-
 /**
  * The subset of a Playwright `Route` the network-policy mock exercises.
  * `request` is narrowed to the inspected fields since the mock never builds a
@@ -18,28 +17,23 @@ import type {
 type FakeRoute = Pick<Route, "continue" | "abort" | "fulfill"> & {
   request: () => Pick<Request, "url" | "method" | "resourceType">;
 };
-
 type FakeRouteHandler = (route: FakeRoute) => Promise<void>;
-
 /** The `route.fulfill()` options the mock actually records. */
 type FakeFulfillOptions = Pick<
   NonNullable<Parameters<Route["fulfill"]>[0]>,
   "status" | "contentType" | "body" | "headers"
 >;
-
 /** What the mock recorded for one request sent through the network guard. */
 export type DispatchResult = {
   continued: boolean;
   aborted: boolean;
   fulfilled?: FakeFulfillOptions;
 };
-
 /** Minimal stand-in for a Playwright `Video`; only `saveAs`/`path` are used. */
 type FakeVideo = {
   saveAs: (path: string) => Promise<void>;
   path: () => Promise<string>;
 };
-
 /**
  * The subset of a Playwright `Page` the capture runner drives: navigation,
  * readiness waits, locator stubs for narration/password masking, and
@@ -49,13 +43,16 @@ type FakePage = Pick<Page, "url" | "waitForTimeout"> & {
   goto: (url: string) => Promise<void>;
   video: () => FakeVideo;
   evaluate: () => Promise<void>;
-  locator: () => { innerText: () => Promise<string> };
+  locator: () => {
+    innerText: () => Promise<string>;
+  };
   getByText: () => Record<string, never>;
   screenshot: (
-    options: Pick<PageScreenshotOptions, "animations"> & { path: string },
+    options: Pick<PageScreenshotOptions, "animations"> & {
+      path: string;
+    },
   ) => Promise<void>;
 };
-
 /**
  * The subset of a Playwright `BrowserContext` the capture runner manages:
  * network routing for the policy guard, storage-state capture, and lifecycle.
@@ -70,11 +67,13 @@ export type FakeContext = Pick<
   dispatchRequest: (url: string, method?: string) => Promise<DispatchResult>;
   newPage: () => Promise<FakePage>;
   storageState: () => Promise<{
-    cookies: Array<{ name: string; value: string }>;
+    cookies: Array<{
+      name: string;
+      value: string;
+    }>;
     origins: unknown[];
   }>;
 };
-
 /**
  * The subset of a Playwright `Browser` the capture runner receives from its
  * caller.
@@ -82,9 +81,14 @@ export type FakeContext = Pick<
 type FakeBrowser = Pick<Browser, "version" | "close"> & {
   newContext: (options?: BrowserContextOptions) => Promise<FakeContext>;
 };
-
 /** A video that may only be saved after its context closed. */
-function _createFakeVideo(events: string[], contextNumber: number): FakeVideo {
+function _createFakeVideo({
+  events,
+  contextNumber,
+}: Readonly<{
+  events: string[];
+  contextNumber: number;
+}>): FakeVideo {
   return {
     saveAs: async (path: string) => {
       assert.ok(
@@ -99,9 +103,14 @@ function _createFakeVideo(events: string[], contextNumber: number): FakeVideo {
     },
   };
 }
-
 /** A page that records waits and writes placeholder screenshots. */
-function _createFakePage(events: string[], video: FakeVideo): FakePage {
+function _createFakePage({
+  events,
+  video,
+}: Readonly<{
+  events: string[];
+  video: FakeVideo;
+}>): FakePage {
   let currentUrl = "about:blank";
   return {
     goto: async (url: string) => {
@@ -135,7 +144,6 @@ function _createFakePage(events: string[], video: FakeVideo): FakePage {
     },
   };
 }
-
 /** Sends one request through the installed guard and records its outcome. */
 async function _dispatchThroughGuard({
   routeHandler,
@@ -174,16 +182,24 @@ async function _dispatchThroughGuard({
   });
   return result;
 }
-
 /** A browser context whose guard requests can be dispatched by hand. */
-function _createFakeContext(
-  events: string[],
-  options: Readonly<{ contextNumber: number; settings: BrowserContextOptions }>,
-): FakeContext {
-  const page = _createFakePage(
+function _createFakeContext({
+  events,
+  options,
+}: Readonly<{
+  events: string[];
+  options: Readonly<{
+    contextNumber: number;
+    settings: BrowserContextOptions;
+  }>;
+}>): FakeContext {
+  const page = _createFakePage({
     events,
-    _createFakeVideo(events, options.contextNumber),
-  );
+    video: _createFakeVideo({
+      events,
+      contextNumber: options.contextNumber,
+    }),
+  });
   let routeHandler: FakeRouteHandler | undefined;
   return {
     options: options.settings,
@@ -210,7 +226,6 @@ function _createFakeContext(
     },
   };
 }
-
 /**
  * Creates a caller-owned fake browser that records lifecycle events and its
  * contexts. Use it to run `runCapture` without launching Chromium. The
@@ -232,9 +247,12 @@ export function createFakeBrowser(): {
       events.push("browser-close");
     },
     newContext: async (settings = {}) => {
-      const context = _createFakeContext(events, {
-        contextNumber: contexts.length,
-        settings,
+      const context = _createFakeContext({
+        events,
+        options: {
+          contextNumber: contexts.length,
+          settings,
+        },
       });
       contexts.push(context);
       return context;

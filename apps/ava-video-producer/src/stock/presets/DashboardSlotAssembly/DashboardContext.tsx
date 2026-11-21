@@ -1,11 +1,14 @@
-import { ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./DashboardSlotAssembly.schema";
 import type { ReactNode } from "react";
 
-type Props = { input: Input; frame: number };
+type Props = {
+  input: Input;
+  frame: number;
+};
 const TITLE = {
   x: 24,
   y: 40,
@@ -51,7 +54,14 @@ export function DashboardContext({ input, frame }: Readonly<Props>): ReactNode {
     <g>
       <FitText {...TITLE} text={input.boardTitle} />
       {input.scopeLabel ? (
-        <g opacity={ramp(frame, 112, motion.hero, motion.reveal.easing)}>
+        <g
+          opacity={Motion.ramp({
+            frame,
+            at: 112,
+            dur: motion.hero,
+            easing: motion.reveal.easing,
+          })}
+        >
           <StockRect
             x={24}
             y={80}

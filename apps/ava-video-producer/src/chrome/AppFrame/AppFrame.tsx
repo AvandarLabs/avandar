@@ -4,6 +4,7 @@ import { AppFrameShared } from "./AppFrameShared/AppFrameShared";
 import { type Props } from "./AppFrameShared/AppFrameShared.types";
 import type { ReactNode } from "react";
 
+/** Vertical offset of the app body below the title and header bars. */
 export const BODY_Y = AppFrameShared.BAR + AppFrameShared.HEAD;
 /**
  * Title bar + header as one unit. Static for the whole clip: a constant

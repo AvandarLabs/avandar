@@ -29,7 +29,9 @@ export function SvgObjectDeparture({
 }: Readonly<Props>): ReactNode {
   const identity = `departure-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
   const theme = MotionSettings.useMotionSettingsTheme();
-  if (frame < flight.at) return children;
+  if (frame < flight.at) {
+    return children;
+  }
   const pose = getObjectFlight({ flight, frame, theme });
   return (
     <>

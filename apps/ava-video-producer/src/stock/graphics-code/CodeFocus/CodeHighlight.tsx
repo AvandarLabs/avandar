@@ -1,12 +1,18 @@
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { FIRST_LINE_Y, LINE_STEP } from "./CodeFocus.constants";
 import type { ReactNode } from "react";
 
-type Props = Readonly<{ line: number; accent: string }>;
+type Props = Readonly<{
+  line: number;
+  accent: string;
+}>;
 /** The tinted band and accent marker behind the focused line. */
 export function CodeHighlight({ line, accent }: Props): ReactNode {
-  const style = GraphicThemeHooks.useGraphicProps("CodeFocus", {});
+  const style = GraphicThemeHooks.useGraphicProps({
+    name: "CodeFocus",
+    props: {},
+  });
   const shapes = GraphicThemeHooks.useGraphicShapeScales();
   const y = FIRST_LINE_Y + line * LINE_STEP;
   return (

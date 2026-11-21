@@ -1,24 +1,24 @@
-/** Behavioral conservation and physical choreography assertions. */
 import assert from "node:assert/strict";
 import test from "node:test";
 import { propEq } from "@avandar/utils";
 import { registerStockPresetAssertions } from "../../../../../tests/helpers/registerStockPresetAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
-import { sharedReadingCirclesContract as contract } from ".././SharedReadingCircles.contract";
+import { sharedReadingCirclesContract as contract } from "../SharedReadingCircles.contract";
 import {
   changedInput,
   DEFAULT_INPUT,
   denseInput,
   minimumInput,
-} from ".././SharedReadingCircles.fixtures";
-import { inputSchema } from ".././SharedReadingCircles.schema";
+} from "../SharedReadingCircles.fixtures";
+import { inputSchema } from "../SharedReadingCircles.schema";
+import { assertFirstReaderPicksUpStartingShelf as _assertFirstReaderPicksUpStartingShelf } from "./assertFirstReaderPicksUpStartingShelf";
+import { assertFourCopiesNonuniformReaderStartingShelf as _assertFourCopiesNonuniformReaderStartingShelf } from "./assertFourCopiesNonuniformReaderStartingShelf";
 import {
   _render,
   options,
   _bookPositions,
   _createCrossingInput,
   _getReaderPosition,
-  _createRouteInputs,
 } from "./SharedReadingCirclesTestHelpers/SharedReadingCirclesTestHelpers";
 
 test("book inventory and reader identities survive shelf-to-table travel", () => {
@@ -33,54 +33,14 @@ test("book inventory and reader identities survive shelf-to-table travel", () =>
     });
   });
 });
+
 registerStockPresetAssertions(options);
+
 registerStockTextLayoutAssertions(options);
+
 test("four copies and nonuniform reader groups survive both shelf positions and hidden counts", () => {
   (["front", "side"] as const).forEach((startingShelf) => {
-    [true, false].forEach((showGroupCounts) => {
-      [denseInput, changedInput, minimumInput].forEach((fixture) => {
-        const input = { ...fixture, startingShelf, showGroupCounts };
-        [
-          0, 24, 43.999, 44, 44.001, 64.5, 93.999, 94, 94.001, 107.999, 108,
-          108.001, 124, 150,
-        ].forEach((frame) => {
-          const markup = _render({ frame, input });
-          assert.equal(_bookPositions(markup).length, input.books.length);
-          _bookPositions(markup).forEach(([, bookY]) => {
-            return assert.ok(
-              bookY - 20 > 188.6,
-              `${input.startingShelf} frame ${frame}: book enters maximum-label roster rail`,
-            );
-          });
-          input.learners.forEach((learner) => {
-            const group = input.readingGroups.find((candidate) => {
-              return candidate.learnerIds.includes(learner.id);
-            })!;
-            assert.equal(
-              markup.split(
-                `data-reader-id="${learner.id}" data-reader-book="${group.bookId}"`,
-              ).length - 1,
-              1,
-            );
-          });
-          _bookPositions(markup).forEach(([x, y], index, positions) => {
-            const halfWidth = frame <= 94 ? 23 : 41;
-            assert.ok(
-              x - halfWidth >= 0 &&
-                x + halfWidth <= 960 &&
-                y - 22 > 180 &&
-                y + 24 < 440,
-            );
-            positions.slice(index + 1).forEach(([otherX, otherY]) => {
-              return assert.ok(
-                Math.abs(x - otherX) >= 2 * halfWidth ||
-                  Math.abs(y - otherY) >= 46,
-              );
-            });
-          });
-        });
-      });
-    });
+    return _assertFourCopiesNonuniformReaderStartingShelf(startingShelf);
   });
   assert.match(
     _render({ frame: 150, input: denseInput }),
@@ -91,60 +51,13 @@ test("four copies and nonuniform reader groups survive both shelf positions and 
     /aria-label="4 \/ 8"/,
   );
 });
+
 test("the first reader picks up and carries the single physical copy with hand contact", () => {
   (["front", "side"] as const).forEach((startingShelf) => {
-    [denseInput, ..._createRouteInputs()].forEach((fixture) => {
-      const input = { ...fixture, startingShelf };
-      input.readingGroups.forEach((group, index) => {
-        const start = 24 + index * 18;
-        const frames =
-          startingShelf === "front"
-            ? [44, 44.001, 64.5, 93.999, 94]
-            : [4, 4.001, 7, 10, 15.5, 19.999, 20, 22.999, 23].map((offset) => {
-                return start + offset;
-              });
-        frames.forEach((frame) => {
-          const markup = _render({ frame, input });
-          const books = _bookPositions(markup);
-          const [readerX, readerY] = _getReaderPosition({
-            markup,
-            id: group.learnerIds[0],
-          });
-          const hand = markup.match(
-            new RegExp(
-              `data-reading-hand="${group.learnerIds[0]}" d="([^"]+)"`,
-            ),
-          );
-          assert.ok(hand);
-          const coordinates = hand[1].match(/-?\d+(?:\.\d+)?/g)!.map(Number);
-          assert.ok(
-            Math.abs(
-              readerX +
-                coordinates.at(-2)! -
-                (books[index][0] + (startingShelf === "front" ? 22 : -22)),
-            ) < 0.001,
-          );
-          assert.ok(
-            Math.abs(readerY + coordinates.at(-1)! - (books[index][1] - 12)) <
-              0.001,
-          );
-        });
-      });
-      assert.notDeepEqual(
-        _bookPositions(_render({ frame: 24, input })),
-        _bookPositions(_render({ frame: 101, input })),
-      );
-      assert.equal(
-        [..._render({ frame: 130, input }).matchAll(/data-page-turn=/g)].length,
-        input.books.length,
-      );
-      assert.equal(
-        [..._render({ frame: 150, input }).matchAll(/data-page-turn=/g)].length,
-        0,
-      );
-    });
+    return _assertFirstReaderPicksUpStartingShelf(startingShelf);
   });
 });
+
 test("every book is assigned once and references do not mutate during stress registration", () => {
   [
     undefined,
@@ -189,6 +102,7 @@ test("every book is assigned once and references do not mutate during stress reg
     }),
   );
 });
+
 test("every moving physical copy has a visible key matching its caption", () => {
   [24, 64.5, 124, 150].forEach((frame) => {
     const markup = _render({
@@ -211,6 +125,7 @@ test("every moving physical copy has a visible key matching its caption", () => 
     });
   });
 });
+
 test("concentrated groups remain intact when the large group changes table position", () => {
   [0, 1, 2, 3].forEach((largeGroupIndex) => {
     const groups = denseInput.readingGroups.slice(1);
@@ -238,6 +153,7 @@ test("concentrated groups remain intact when the large group changes table posit
     });
   });
 });
+
 test("seats physically pivot toward their group book and clear the caption rail", () => {
   const paths = (markup: string) => {
     return [...markup.matchAll(/data-reading-seat="([^"]+)" d="([^"]+)"/g)];
@@ -271,6 +187,7 @@ test("seats physically pivot toward their group book and clear the caption rail"
     });
   });
 });
+
 test("reordered front pickup keeps the exact l0 and l7 heads distinct at frame 36", () => {
   const input = _createCrossingInput();
   assert.deepEqual(inputSchema.parse(input), input);

@@ -1,4 +1,4 @@
-import type { FixtureInventory } from "../../captureLib/fsSafetyHelpers";
+import type { FixtureInventory } from "../../captureLib/CaptureFileSafety";
 import type { NetworkGuardEvent } from "../../captureLib/installNetworkGuard";
 import type {
   CaptureManifest,
@@ -30,7 +30,7 @@ export type CaptureContextOptions = {
 export type CaptureRecorderState = CaptureContextOptions & {
   manifest: CaptureManifest;
   elapsed: () => number;
-  videoElapsed: () => number | null;
+  videoElapsed: () => number | undefined;
   manifestUrl: (value: string) => string;
   persist: () => Promise<void>;
   assertPolicy: () => void;

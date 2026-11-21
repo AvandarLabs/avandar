@@ -2,23 +2,22 @@ import assert from "node:assert/strict";
 import { createServer, type Server } from "node:http";
 import { test, type TestContext } from "node:test";
 import { propEq } from "@avandar/utils";
-import {
-  captureGlobals,
-  restoreGlobals,
-} from "../../__tests__/restoreGlobalsHelpers";
+import { GlobalSnapshots } from "../../__tests__/GlobalSnapshots";
 import { FilmDownloads } from "../FilmDownloads";
-import { createDocumentFixture } from "./FilmDownloads.fixtures";
+import { FilmDownloadFixtures } from "./FilmDownloadFixtures";
 
 type Reply = {
   status?: number;
   wait?: Promise<unknown>;
   body: Record<string, unknown>;
 };
+
 type RecordedRequest = {
   method?: string;
   url?: string;
   body?: unknown;
 };
+
 type ExportService = {
   replies: Reply[];
   requests: RecordedRequest[];
@@ -27,10 +26,13 @@ type ExportService = {
 };
 
 /** A local export service that answers each request with the next reply. */
-function _createReplyServer(
-  replies: Reply[],
-  requests: RecordedRequest[],
-): Server {
+function _createReplyServer({
+  replies,
+  requests,
+}: Readonly<{
+  replies: Reply[];
+  requests: RecordedRequest[];
+}>): Server {
   return createServer(async (request, response) => {
     let body = "";
     for await (const chunk of request) {
@@ -56,7 +58,10 @@ function _createReplyServer(
 }
 
 /** A promise with its resolver, so a test can release it later. */
-function _createGate(): { promise: Promise<void>; resolve: () => void } {
+function _createGate(): {
+  promise: Promise<void>;
+  resolve: () => void;
+} {
   let resolve = () => {};
   const promise = new Promise<void>((settle) => {
     resolve = settle;
@@ -65,43 +70,45 @@ function _createGate(): { promise: Promise<void>; resolve: () => void } {
 }
 
 /** Points fetch and the page globals at the local export service. */
-function _installPage(origin: string, downloads: string[]): void {
+function _installPage({
+  origin,
+  downloads,
+}: Readonly<{
+  origin: string;
+  downloads: string[];
+}>): void {
   const originalFetch = globalThis.fetch;
   Object.assign(globalThis, {
     fetch: (url: string, options?: RequestInit) => {
       return originalFetch(new URL(url, origin), options);
     },
     window: { location: { origin, href: `${origin}/index.html` } },
-    document: createDocumentFixture(downloads),
+    document: FilmDownloadFixtures.makeDocumentFromDownloads(downloads),
   });
 }
 
 test("MP4 download requests", async (suite) => {
-  const service: ExportService = {
-    replies: [],
-    requests: [],
-    downloads: [],
-    origin: "",
-  };
-  const originals = captureGlobals(["fetch", "window", "document"]);
-  const server = _createReplyServer(service.replies, service.requests);
-  await new Promise<void>((resolve) => {
-    server.listen(0, "127.0.0.1", resolve);
-  });
-  const address = server.address();
-  assert.ok(address && typeof address !== "string");
-  const runningService = {
-    ...service,
-    origin: `http://127.0.0.1:${address.port}`,
-  };
-  _installPage(runningService.origin, runningService.downloads);
+  const { originals, server, runningService } =
+    await _createDownloadReplyService();
   try {
-    await _verifyCompletion(suite, runningService);
-    await _verifyRetry(suite, runningService);
-    await _verifyFailure(suite, runningService);
-    await _verifyRefreshQueue(suite, runningService);
+    await _verifyCompletion({
+      suite,
+      service: runningService,
+    });
+    await _verifyRetry({
+      suite,
+      service: runningService,
+    });
+    await _verifyFailure({
+      suite,
+      service: runningService,
+    });
+    await _verifyRefreshQueue({
+      suite,
+      service: runningService,
+    });
   } finally {
-    restoreGlobals(originals);
+    GlobalSnapshots.restoreGlobals(originals);
     await new Promise((resolve) => {
       return server.close(resolve);
     });
@@ -121,10 +128,13 @@ const FIRST_JOB_REPLIES: readonly Reply[] = [
   },
 ];
 
-async function _verifyCompletion(
-  suite: TestContext,
-  service: Readonly<ExportService>,
-): Promise<void> {
+async function _verifyCompletion({
+  suite,
+  service,
+}: Readonly<{
+  suite: TestContext;
+  service: Readonly<ExportService>;
+}>): Promise<void> {
   const { replies, requests, downloads, origin } = service;
   await suite.test(
     "waits for completion and submits the current captions choice once",
@@ -163,10 +173,13 @@ async function _verifyCompletion(
   );
 }
 
-async function _verifyRetry(
-  suite: TestContext,
-  service: Readonly<ExportService>,
-): Promise<void> {
+async function _verifyRetry({
+  suite,
+  service,
+}: Readonly<{
+  suite: TestContext;
+  service: Readonly<ExportService>;
+}>): Promise<void> {
   const { replies, downloads } = service;
   await suite.test(
     "a busy export can be retried without downloading the failed job",
@@ -195,10 +208,13 @@ async function _verifyRetry(
   );
 }
 
-async function _verifyFailure(
-  suite: TestContext,
-  service: Readonly<ExportService>,
-): Promise<void> {
+async function _verifyFailure({
+  suite,
+  service,
+}: Readonly<{
+  suite: TestContext;
+  service: Readonly<ExportService>;
+}>): Promise<void> {
   const { replies, downloads } = service;
   await suite.test(
     "failed rendering never starts a file download",
@@ -221,10 +237,13 @@ async function _verifyFailure(
 }
 
 /** Replies for two overlapping exports whose second completion is gated. */
-function _queueOverlappingReplies(
-  replies: Reply[],
-  secondGate: Promise<unknown>,
-): void {
+function _queueOverlappingReplies({
+  replies,
+  secondGate,
+}: Readonly<{
+  replies: Reply[];
+  secondGate: Promise<unknown>;
+}>): void {
   const reply = (id: string, state: string) => {
     return {
       id,
@@ -243,49 +262,99 @@ function _queueOverlappingReplies(
   );
 }
 
-async function _verifyRefreshQueue(
-  suite: TestContext,
-  service: Readonly<ExportService>,
-): Promise<void> {
+async function _verifyRefreshQueue({
+  suite,
+  service,
+}: Readonly<{
+  suite: TestContext;
+  service: Readonly<ExportService>;
+}>): Promise<void> {
   await suite.test(
     "source refresh also waits for an export started after waiting began",
     async () => {
-      const secondCompletionGate = _createGate();
-      _queueOverlappingReplies(service.replies, secondCompletionGate.promise);
-      const firstStarted = _createGate();
-      const firstDownload = FilmDownloads.downloadFilm({
-        id: "refresh-first",
-        onStatus: (status) => {
-          if (status.id) {
-            firstStarted.resolve();
-          }
-        },
-      });
-      await firstStarted.promise;
-      let isRefreshed = false;
-      const cancel = FilmDownloads.afterDownloads(() => {
-        isRefreshed = true;
-      });
-      const secondDownload = FilmDownloads.downloadFilm({
-        id: "refresh-second",
-      });
-      try {
-        await firstDownload;
-        await new Promise((resolve) => {
-          return setImmediate(resolve);
-        });
-        assert.equal(isRefreshed, false);
-        secondCompletionGate.resolve();
-        await secondDownload;
-        await new Promise((resolve) => {
-          return setImmediate(resolve);
-        });
-        assert.equal(isRefreshed, true);
-      } finally {
-        secondCompletionGate.resolve();
-        await secondDownload;
-        cancel();
-      }
+      await _assertOverlappingRefreshDownloads(service);
     },
   );
+}
+
+async function _createDownloadReplyService(): Promise<
+  Readonly<{
+    originals: ReturnType<typeof GlobalSnapshots.captureGlobals>;
+    server: ReturnType<typeof _createReplyServer>;
+    runningService: ExportService;
+  }>
+> {
+  const service: ExportService = {
+    replies: [],
+    requests: [],
+    downloads: [],
+    origin: "",
+  };
+  const originals = GlobalSnapshots.captureGlobals([
+    "fetch",
+    "window",
+    "document",
+  ]);
+  const server = _createReplyServer({
+    replies: service.replies,
+    requests: service.requests,
+  });
+  await new Promise<void>((resolve) => {
+    server.listen(0, "127.0.0.1", resolve);
+  });
+  const address = server.address();
+  assert.ok(address && typeof address !== "string");
+  const runningService = {
+    ...service,
+    origin: `http://127.0.0.1:${address.port}`,
+  };
+  _installPage({
+    origin: runningService.origin,
+    downloads: runningService.downloads,
+  });
+  return { originals, server, runningService };
+}
+
+async function _assertOverlappingRefreshDownloads(
+  service: Readonly<ExportService>,
+): Promise<void> {
+  const secondCompletionGate = _createGate();
+  _queueOverlappingReplies({
+    replies: service.replies,
+    secondGate: secondCompletionGate.promise,
+  });
+  const firstStarted = _createGate();
+  const firstDownload = FilmDownloads.downloadFilm({
+    id: "refresh-first",
+    onStatus: (status) => {
+      if (status.id) {
+        firstStarted.resolve();
+      }
+    },
+  });
+  await firstStarted.promise;
+  let isRefreshed = false;
+  const cancel = FilmDownloads.afterDownloads(() => {
+    isRefreshed = true;
+  });
+  const secondDownload = FilmDownloads.downloadFilm({
+    id: "refresh-second",
+  });
+  try {
+    await firstDownload;
+    await new Promise((resolve) => {
+      return setImmediate(resolve);
+    });
+    assert.equal(isRefreshed, false);
+    secondCompletionGate.resolve();
+    await secondDownload;
+    await new Promise((resolve) => {
+      return setImmediate(resolve);
+    });
+    assert.equal(isRefreshed, true);
+  } finally {
+    secondCompletionGate.resolve();
+    await secondDownload;
+    cancel();
+  }
 }

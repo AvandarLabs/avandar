@@ -17,7 +17,7 @@ export function ExplorerToolbar(): ReactNode {
       pos="relative"
       className={css.explorerToolbar}
     >
-      <Text size="xs" c="neutral.6" className={css.explorerFictional}>
+      <Text size="xs" c="neutral.6" className={css.explorerToolbarFictional}>
         Fictional demonstration data
       </Text>
       <ExplorerToolbarActions />

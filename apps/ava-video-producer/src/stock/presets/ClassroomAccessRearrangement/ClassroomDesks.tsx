@@ -1,9 +1,11 @@
-import { mix } from "../../../motion";
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { Motion } from "../../../motion";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
-type Props = { progress: number };
+type Props = {
+  progress: number;
+};
 /** Classroom Desks for the authored scene. */
 export function ClassroomDesks({ progress }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
@@ -15,8 +17,16 @@ export function ClassroomDesks({ progress }: Readonly<Props>): ReactNode {
           <StockRect
             key={index}
             data-desk={index}
-            x={mix(progress, 230 + index * 95, index < 2 ? 65 : 625)}
-            y={mix(progress, 335, index % 2 ? 425 : 335)}
+            x={Motion.mix({
+              t: progress,
+              from: 230 + index * 95,
+              to: index < 2 ? 65 : 625,
+            })}
+            y={Motion.mix({
+              t: progress,
+              from: 335,
+              to: index % 2 ? 425 : 335,
+            })}
             width={88}
             height={42}
             rx={scales.corner(5)}

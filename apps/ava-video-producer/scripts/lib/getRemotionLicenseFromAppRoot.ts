@@ -1,17 +1,17 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { parseEnv } from "node:util";
-
 /** The Remotion license pair every producer command needs. */
-export type RemotionLicense = { publicKey: string; privateKey: string };
-
+export type RemotionLicense = {
+  publicKey: string;
+  privateKey: string;
+};
 const SETUP_MESSAGE =
   "Remotion license keys are required. Copy .env.video-producer.example " +
   "to .env.video-producer.local in the workspace root and set " +
   "REMOTION_PUBLIC_KEY and REMOTION_PRIVATE_KEY (or set them in the process " +
   "environment). Producer commands copy that file to " +
   "apps/ava-video-producer/.env.local. Use your own Remotion Automators keys.";
-
 function _readKeys(filename: string): Partial<Record<string, string>> {
   try {
     const values = parseEnv(readFileSync(filename, "utf8"));
@@ -28,17 +28,19 @@ function _readKeys(filename: string): Partial<Record<string, string>> {
     );
   }
 }
-
 /**
  * Reads only the Remotion license pair, without populating `process.env`, so
  * no other dotenv value can reach browser bundles. Use it wherever a
  * producer process needs the keys, for example the license guard or the
  * Remotion configuration. Throws setup guidance when a key is missing.
  */
-export function getRemotionLicenseFromAppRoot(
-  appRoot: string,
-  environment: Readonly<NodeJS.ProcessEnv> = process.env,
-): RemotionLicense {
+export function getRemotionLicenseFromAppRoot({
+  appRoot,
+  environment = process.env,
+}: Readonly<{
+  appRoot: string;
+  environment?: Readonly<NodeJS.ProcessEnv>;
+}>): RemotionLicense {
   const filename = path.resolve(
     appRoot,
     environment.REMOTION_KEYS_FILE ||

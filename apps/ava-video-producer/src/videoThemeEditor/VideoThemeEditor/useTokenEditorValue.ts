@@ -1,13 +1,12 @@
 import { useMemo } from "react";
-import { OPAQUE_HEX_COLOR } from "../controls/controlValueHelpers/controlValueHelpers";
-import { setCustomValueInDraft } from "../customTokenValue/customTokenValue";
+import { OPAQUE_HEX_COLOR } from "../controls/ControlValues/ControlValues";
+import { CustomTokenValues } from "../CustomTokenValues/CustomTokenValues";
 import {
-  resetTokenInDraft,
-  setTokenInDraft,
   type ThemeDraft,
   type ThemeEditScope,
-} from "../themeDraft/themeDraft";
-import { type TokenRow } from "../tokenRows/tokenRows.types";
+  ThemeDrafts,
+} from "../ThemeDrafts/ThemeDrafts";
+import { type TokenRow } from "../TokenRows/TokenRows.types";
 import type {
   ResolvedVideoTheme,
   VideoThemeIssue,
@@ -49,14 +48,18 @@ export function useTokenEditorValue(
       item,
       setToken: (tokenPath, value) => {
         return onDraftChange(
-          setTokenInDraft({ draft, scope, tokenPath, value }),
+          ThemeDrafts.setTokenInDraft({ draft, scope, tokenPath, value }),
         );
       },
       setCustomValue: (request) => {
-        return onDraftChange(setCustomValueInDraft({ draft, scope, request }));
+        return onDraftChange(
+          CustomTokenValues.setCustomValueInDraft({ draft, scope, request }),
+        );
       },
       resetToken: (tokenPath) => {
-        return onDraftChange(resetTokenInDraft({ draft, scope, tokenPath }));
+        return onDraftChange(
+          ThemeDrafts.resetTokenInDraft({ draft, scope, tokenPath }),
+        );
       },
     };
   }, [draft, scope, rows, theme, issues, swatches, item, onDraftChange]);

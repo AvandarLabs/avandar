@@ -4,17 +4,19 @@ import { isProductFile } from "./isProductFile";
 import { rememberProductFile } from "./rememberProductFile";
 import type { ImportedFiles } from "./buildProduct.types";
 import type { OnLoadArgs, OnLoadResult } from "esbuild";
-
 /**
  * Loads one product JSON or image file for the esbuild bundle, as parsed
  * JSON or an inlined data URL. Undefined for a file outside product code.
  *
  * Used by the product build's load hook for each asset it bundles.
  */
-export async function loadProductAsset(
-  args: Readonly<OnLoadArgs>,
-  imported: ImportedFiles,
-): Promise<OnLoadResult | undefined> {
+export async function loadProductAsset({
+  args,
+  imported,
+}: Readonly<{
+  args: Readonly<OnLoadArgs>;
+  imported: ImportedFiles;
+}>): Promise<OnLoadResult | undefined> {
   if (!isProductFile(args.path)) {
     return undefined;
   }

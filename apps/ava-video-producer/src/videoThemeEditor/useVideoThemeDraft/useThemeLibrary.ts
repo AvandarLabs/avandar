@@ -1,8 +1,9 @@
+import { prop, propEq } from "@avandar/utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   BUILT_IN_VIDEO_THEMES,
-  createVideoThemeLibrary,
-} from "../../videoTheme/builtInVideoThemes/builtInVideoThemes";
+  makeVideoThemeLibraryFromDocuments,
+} from "../../videoTheme/makeVideoThemeLibraryFromDocuments/makeVideoThemeLibraryFromDocuments";
 import {
   ThemeApi,
   type StoredTheme,
@@ -49,7 +50,7 @@ const BUILT_IN_COLLECTION: ThemeCollection = {
 export function useThemeLibrary(): ThemeLibraryState {
   const [collection, setCollection] =
     useState<ThemeCollection>(BUILT_IN_COLLECTION);
-  useEffect(function loadThemeCollectionFromApi() {
+  useEffect(() => {
     let isCurrent = true;
     ThemeApi.loadAll().then(
       (loaded) => {
@@ -66,18 +67,14 @@ export function useThemeLibrary(): ThemeLibraryState {
     };
   }, []);
   const library = useMemo(() => {
-    return createVideoThemeLibrary(
-      [...collection.stored.values()].map((entry) => {
-        return entry.document;
-      }),
+    return makeVideoThemeLibraryFromDocuments(
+      [...collection.stored.values()].map(prop("document")),
     );
   }, [collection.stored]);
   const storeTheme = useCallback((stored: StoredTheme) => {
     return setCollection((current) => {
       return {
-        themes: current.themes.some((theme) => {
-          return theme.id === stored.document.id;
-        })
+        themes: current.themes.some(propEq("id", stored.document.id))
           ? current.themes
           : [...current.themes, _summaryFromDocument(stored.document)],
         stored: new Map([...current.stored, [stored.document.id, stored]]),

@@ -1,19 +1,22 @@
 import { match } from "ts-pattern";
 import { SketchedShape } from "../../../primitives/SketchedShape";
-import { StockRect } from "../../../primitives/StockRect/StockRect";
+import { StockRect } from "../../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "../ClassroomDayPresence.schema";
 import type { ReactNode } from "react";
+
+type Props = {
+  state: Input["days"][number]["records"][number]["state"];
+  center: number;
+  y: number;
+};
+
 /** A circle for present, an empty square for absent, a diamond if unknown. */
 export function DayImpressionMark({
   state,
   center,
   y,
-}: Readonly<{
-  state: Input["days"][number]["records"][number]["state"];
-  center: number;
-  y: number;
-}>): ReactNode {
+}: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   return match(state)
     .with("present", () => {

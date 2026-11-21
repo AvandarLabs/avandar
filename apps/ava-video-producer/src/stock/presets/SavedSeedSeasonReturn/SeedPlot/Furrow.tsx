@@ -1,11 +1,11 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
+
+type Props = { frame: number; accent: string };
+
 /** The sowing furrow, drawn across the plot. */
-export function Furrow({
-  frame,
-  accent,
-}: Readonly<{ frame: number; accent: string }>): ReactNode {
+export function Furrow({ frame, accent }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const motion = GraphicThemeHooks.useGraphicMotion();
   const scales = GraphicThemeHooks.useGraphicShapeScales();

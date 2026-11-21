@@ -1,7 +1,9 @@
-import { DEFAULT_VIDEO_THEME_SOURCE } from "../../videoTheme/builtInVideoThemes/builtInVideoThemes";
-import { useVideoThemeContext } from "../../videoTheme/useVideoTheme";
+import { DEFAULT_VIDEO_THEME_SOURCE } from "../../videoTheme/makeVideoThemeLibraryFromDocuments/makeVideoThemeLibraryFromDocuments";
+import { useVideoThemeContext } from "../../videoTheme/videoThemeHelpers";
 import { VideoThemeProvider } from "../../videoTheme/VideoThemeProvider/VideoThemeProvider";
 import type { ReactNode } from "react";
+
+type Props = { children: ReactNode };
 
 /**
  * Gives a stage component a video theme to read wherever it renders. Inside
@@ -9,9 +11,7 @@ import type { ReactNode } from "react";
  * app chrome of a fixed composition, it provides `classic`, so
  * `useVideoTokens`, `useVideoMotion`, and `useVideoProps` never throw.
  */
-export function StageThemeBoundary({
-  children,
-}: Readonly<{ children: ReactNode }>): ReactNode {
+export function StageThemeBoundary({ children }: Readonly<Props>): ReactNode {
   const context = useVideoThemeContext();
   return context ? (
     children

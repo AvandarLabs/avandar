@@ -70,7 +70,9 @@ function _getTransitionClipPath({
     width: width * 0.15,
     height: height / 14,
   };
-  if (!entering) return undefined;
+  if (!entering) {
+    return undefined;
+  }
   return match(kind)
     .with("aperture", () => {
       return `circle(${progress * Math.hypot(width, height) * apertureOverscan}px at ${origin.x}px ${origin.y}px)`;

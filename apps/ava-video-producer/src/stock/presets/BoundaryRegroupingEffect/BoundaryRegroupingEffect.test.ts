@@ -16,6 +16,24 @@ import {
 } from "./BoundaryRegroupingEffect.fixtures";
 import { inputSchema, type Input } from "./BoundaryRegroupingEffect.schema";
 
+function _assertDiagonalOnlyGroupingIsRejected(): void {
+  assert.equal(
+    inputSchema.safeParse({
+      ...DEFAULT_INPUT,
+      groupings: DEFAULT_INPUT.groupings.map((grouping) => {
+        return {
+          ...grouping,
+          zones: [
+            { id: "a", label: "", cellIds: ["nw", "se"] },
+            { id: "b", label: "", cellIds: ["ne", "sw"] },
+          ],
+        };
+      }),
+    }).success,
+    false,
+  );
+}
+
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -190,21 +208,7 @@ test("holes remain empty and diagonal-only zones reject as noncontiguous", () =>
     _render({ frame: 150, input: input }),
     /data-atomic-cell="4"/,
   );
-  assert.equal(
-    inputSchema.safeParse({
-      ...DEFAULT_INPUT,
-      groupings: DEFAULT_INPUT.groupings.map((grouping) => {
-        return {
-          ...grouping,
-          zones: [
-            { id: "a", label: "", cellIds: ["nw", "se"] },
-            { id: "b", label: "", cellIds: ["ne", "sw"] },
-          ],
-        };
-      }),
-    }).success,
-    false,
-  );
+  _assertDiagonalOnlyGroupingIsRejected();
 });
 test("full cell labels leave vertical clearance above their fixed fraction", () => {
   const input = {

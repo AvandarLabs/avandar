@@ -1,8 +1,8 @@
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getEvidenceFromFrame } from "./getEvidenceFromFrame";
-import { RuledGridEvidence } from "./RuledGridEvidence";
+import { RuledGridEvidence } from "./RuledGridEvidence/RuledGridEvidence";
 import { TaggedGridEvidence } from "./TaggedGridEvidence";
-import { WhitespaceGridEvidence } from "./WhitespaceGridEvidence";
+import { WhitespaceGridEvidence } from "./WhitespaceGridEvidence/WhitespaceGridEvidence";
 import type { Input } from "./PdfGridReconstruction.schema";
 import type { ReactNode } from "react";
 

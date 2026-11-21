@@ -1,5 +1,5 @@
 import { Freeze, Img, OffthreadVideo, staticFile } from "remotion";
-import { safePublicPath } from "./layout/layout";
+import { CaptionLayout } from "./layout/CaptionLayout";
 import type { CSSProperties, ReactNode } from "react";
 
 type Props = {
@@ -26,11 +26,10 @@ export function MediaPlane({
   alt,
   style,
 }: Props): ReactNode {
-  const asset = staticFile(safePublicPath(src));
-  if (kind === "image") {
-    return <Img src={asset} alt={alt} style={style} />;
-  }
-  return (
+  const asset = staticFile(CaptionLayout.safePublicPath(src));
+  return kind === "image" ? (
+    <Img src={asset} alt={alt} style={style} />
+  ) : (
     <Freeze frame={Math.max(0, Math.floor(frame))}>
       <OffthreadVideo src={asset} trimBefore={trimBefore} muted style={style} />
     </Freeze>

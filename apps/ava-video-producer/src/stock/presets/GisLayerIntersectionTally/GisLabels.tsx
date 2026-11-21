@@ -1,7 +1,7 @@
-import { FitText } from "../../primitives/FitText/FitText";
-import { type FitTextSize } from "../../primitives/FitText/wrapTextToLines";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { GisCaptionSlots } from "./GisCaptionSlots/GisCaptionSlots";
 import { GisTally } from "./GisTally";
+import type { FitTextSize } from "../../primitives/FitText/wrapTextToLines";
 import type { Input } from "./GisLayerIntersectionTally.schema";
 import type { ReactNode } from "react";
 
@@ -57,16 +57,7 @@ export function GisLabels({
   ];
   return (
     <g>
-      {slots.map(([text, x, y, width, fontSize, maxLines, color]) => {
-        return (
-          <FitText
-            key={`${x}:${y}`}
-            {...{ text, x, y, width, fontSize, maxLines, color }}
-            breakLongWords
-            normalizeWhitespace
-          />
-        );
-      })}
+      <GisCaptionSlots slots={slots} />
       <GisTally {...{ input, frame, selectedQuantity, totalQuantity }} />
     </g>
   );

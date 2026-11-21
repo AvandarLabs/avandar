@@ -1,12 +1,13 @@
 import { join } from "node:path";
 import { performance } from "node:perf_hooks";
-import { writeManifest } from "../../captureLib/manifestHelpers";
-import { makeRedactedTextFromValue } from "../../captureLib/sanitizeHelpers";
-import { makeSourceUrlFromUrl } from "../../captureLib/urlSafetyHelpers";
-import { createCaptureManifest } from "./createCaptureManifest";
+import { CaptureManifests } from "../../captureLib/CaptureManifests";
+import { CaptureSanitization } from "../../captureLib/CaptureSanitization";
+import { CaptureUrlSafety } from "../../captureLib/CaptureUrlSafety/CaptureUrlSafety";
 import { createCheckpointRecorder } from "./createCheckpointRecorder";
+import { createPersistedCaptureManifest } from "./createPersistedCaptureManifest";
 import { createResourceRecorder } from "./createResourceRecorder";
 import { createStepRecorder } from "./createStepRecorder";
+import { makeCaptureManifestFromOptions } from "./makeCaptureManifestFromOptions";
 import type { NetworkGuardEvent } from "../../captureLib/installNetworkGuard";
 import type {
   CaptureContext,
@@ -14,6 +15,9 @@ import type {
   CaptureRecorderState,
 } from "./createCaptureContext.types";
 
+function _roundMs(value: number): number {
+  return Math.round(value * 1000) / 1000;
+}
 /**
  * The shared run state: the manifest plus its clocks, URL scrubber, and
  * writer.
@@ -21,26 +25,23 @@ import type {
 function _createRecorderState(
   options: CaptureContextOptions,
 ): CaptureRecorderState {
-  const manifest = createCaptureManifest(options);
+  const manifest = makeCaptureManifestFromOptions(options);
   const manifestPath = join(options.runDir, "manifest.json");
-  const roundMs = (value: number) => {
-    return Math.round(value * 1000) / 1000;
-  };
   let writes = Promise.resolve();
   return {
     ...options,
     manifest,
     elapsed: () => {
-      return roundMs(performance.now() - options.startedAtMs);
+      return _roundMs(performance.now() - options.startedAtMs);
     },
     videoElapsed: () => {
       return options.live.recordingOrigin === undefined
-        ? null
-        : roundMs(performance.now() - options.live.recordingOrigin);
+        ? undefined
+        : _roundMs(performance.now() - options.live.recordingOrigin);
     },
     manifestUrl: (value) => {
-      return makeRedactedTextFromValue({
-        value: makeSourceUrlFromUrl(value),
+      return CaptureSanitization.makeRedactedTextFromValue({
+        value: CaptureUrlSafety.makeSourceUrlFromUrl(value),
         secrets: options.secrets.filter((secret) => {
           return secret.length >= 8;
         }),
@@ -49,9 +50,9 @@ function _createRecorderState(
     // Writes are queued so the file always ends at the latest manifest.
     persist: () => {
       writes = writes.then(() => {
-        return writeManifest({
+        return CaptureManifests.writeManifest({
           path: manifestPath,
-          manifest,
+          manifest: createPersistedCaptureManifest(manifest),
           secrets: options.secrets,
         });
       });
@@ -66,11 +67,13 @@ function _createRecorderState(
     },
   };
 }
-
-function _createGuardReporter(
-  run: Readonly<CaptureRecorderState>,
-  requestListKey: "blockedRequests" | "suppressedRequests",
-): CaptureContext["reportBlocked"] {
+function _createGuardReporter({
+  run,
+  requestListKey,
+}: Readonly<{
+  run: Readonly<CaptureRecorderState>;
+  requestListKey: "blockedRequests" | "suppressedRequests";
+}>): CaptureContext["reportBlocked"] {
   return async (event: Readonly<NetworkGuardEvent>) => {
     run.manifest.networkPolicy[requestListKey].push({
       ...event,
@@ -81,7 +84,6 @@ function _createGuardReporter(
     await run.persist();
   };
 }
-
 /**
  * Builds a fresh capture manifest plus the `checkpoint`, `step`, and
  * `recordResource` recorders a run uses to record evidence against it.
@@ -100,8 +102,14 @@ export function createCaptureContext(
     videoElapsed: run.videoElapsed,
     manifestUrl: run.manifestUrl,
     persist: run.persist,
-    reportBlocked: _createGuardReporter(run, "blockedRequests"),
-    reportSuppressed: _createGuardReporter(run, "suppressedRequests"),
+    reportBlocked: _createGuardReporter({
+      run,
+      requestListKey: "blockedRequests",
+    }),
+    reportSuppressed: _createGuardReporter({
+      run,
+      requestListKey: "suppressedRequests",
+    }),
     assertPolicy: run.assertPolicy,
     checkpoint: createCheckpointRecorder(run),
     step: createStepRecorder(run),

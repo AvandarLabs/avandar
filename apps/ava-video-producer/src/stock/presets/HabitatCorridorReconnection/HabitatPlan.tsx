@@ -1,10 +1,21 @@
-import { FitText } from "../../primitives/FitText/FitText";
 import { getRoutePointFromProgress } from "../../primitives/RoutePath/getRoutePointFromProgress";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { HabitatCrossingClearance } from "./HabitatCrossingClearance/HabitatCrossingClearance";
+import { HabitatPatchLabels } from "./HabitatPatchLabels/HabitatPatchLabels";
+import { HabitatPlanCorridorRoute } from "./HabitatPlanCorridorRoute/HabitatPlanCorridorRoute";
+import { HabitatPlanIllustrativeTraversal } from "./HabitatPlanIllustrativeTraversal/HabitatPlanIllustrativeTraversal";
 import { makeCorridorRouteFromInputAndFrame } from "./makeCorridorRouteFromInputAndFrame";
 import type { Input } from "./HabitatCorridorReconnection.schema";
 import type { ReactNode } from "react";
+
+type HabitatCorridorState = {
+  path: string;
+  laid: number;
+  crossing: number;
+  marker: ReturnType<typeof getRoutePointFromProgress>;
+};
+
 /** Inputs for HabitatPlan. */
 type Props = {
   frame: number;
@@ -15,6 +26,34 @@ type Props = {
 const ROAD_LINE_DASH = "7 5";
 const PATCH_RADIUS_X = 100;
 const PATCH_RADIUS_Y = 62;
+
+type GetHabitatCorridorStateOptions = {
+  frame: number;
+  input: Input;
+  motion: ReturnType<typeof GraphicThemeHooks.useGraphicMotion>;
+};
+/** Samples the authored habitat corridor state. */
+function _getHabitatCorridorState({
+  frame,
+  input,
+  motion,
+}: Readonly<GetHabitatCorridorStateOptions>): HabitatCorridorState {
+  const { points, path } = makeCorridorRouteFromInputAndFrame({
+    motion,
+    input,
+    frame,
+  });
+  const laid = motion.ramp(frame, 36, motion.scale(22), motion.travel.easing),
+    crossing = motion.ramp(frame, 58, motion.scale(20), motion.travel.easing);
+  const marker = getRoutePointFromProgress({
+    points: points.map((point) => {
+      return { x: point.x / 960, y: point.y / 960 };
+    }),
+    progress: motion.ramp(frame, 82, motion.scale(26), motion.travel.easing),
+  });
+  return { path, laid, crossing, marker };
+}
+
 /**
  * The complete outline or solid route crosses the road before optional
  * illustrative travel.
@@ -30,18 +69,10 @@ export function HabitatPlan({
   const motion = GraphicThemeHooks.useGraphicMotion();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   const background = backgroundColor ?? tokens.color.ground;
-  const { points, path } = makeCorridorRouteFromInputAndFrame({
-    motion,
-    input,
+  const { path, laid, crossing, marker } = _getHabitatCorridorState({
     frame,
-  });
-  const laid = motion.ramp(frame, 36, motion.scale(22), motion.travel.easing),
-    crossing = motion.ramp(frame, 58, motion.scale(20), motion.travel.easing);
-  const marker = getRoutePointFromProgress({
-    points: points.map((point) => {
-      return { x: point.x / 960, y: point.y / 960 };
-    }),
-    progress: motion.ramp(frame, 82, motion.scale(26), motion.travel.easing),
+    input,
+    motion,
   });
   return (
     <g>
@@ -53,102 +84,27 @@ export function HabitatPlan({
         strokeDasharray={ROAD_LINE_DASH}
         fill="none"
       />
-      {input.patches.map((patch, index) => {
-        return (
-          <g key={patch.id}>
-            <SketchedShape
-              shape={{
-                kind: "ellipse",
-                cx: 155 + index * 650,
-                cy: 300,
-                rx: PATCH_RADIUS_X,
-                ry: PATCH_RADIUS_Y,
-              }}
-              profile={tokens.sketch.shape}
-              data-habitat-patch={patch.id}
-              fill={accent}
-              fillOpacity={scales.wash(atomic.opacity["22"])}
-              stroke={accent}
-            />
-            <FitText
-              text={patch.label}
-              x={32 + index * 684}
-              y={200}
-              width={212}
-              fontSize={12}
-              maxLines={3}
-              breakLongWords
-              normalizeWhitespace
-            />
-            <FitText
-              text={String(patch.areaHa)}
-              x={72 + index * 650}
-              y={382}
-              width={180}
-              fontSize={12}
-              maxLines={2}
-              breakLongWords
-              normalizeWhitespace
-            />
-          </g>
-        );
-      })}
-      <SketchedShape
-        shape={{ kind: "path", d: path }}
-        profile={tokens.sketch.shape}
-        stroke={background}
-        strokeWidth={scales.stroke(36)}
-        strokeLinejoin="round"
-        fill="none"
-        opacity={crossing}
+      <HabitatPatchLabels
+        input={input}
+        patchRadiusX={PATCH_RADIUS_X}
+        patchRadiusY={PATCH_RADIUS_Y}
+        {...{ tokens, accent, scales, atomic }}
       />
-      <g opacity={laid}>
-        <SketchedShape
-          shape={{ kind: "path", d: path }}
-          profile={tokens.sketch.shape}
-          data-corridor-route="true"
-          stroke={accent}
-          strokeWidth={scales.stroke(26)}
-          strokeLinejoin="round"
-          fill="none"
-        />
-        {input.decision.stage === "proposal" ? (
-          <SketchedShape
-            shape={{ kind: "path", d: path }}
-            profile={tokens.sketch.shape}
-            data-proposal-interior="true"
-            stroke={background}
-            strokeWidth={scales.stroke(22)}
-            strokeLinejoin="round"
-            fill="none"
-          />
-        ) : undefined}
-        <SketchedShape
-          shape={{
-            kind: "path",
-            d: `M 440 ${300 - 50 * crossing + 18} V 325 M 520 ${300 - 50 * crossing + 18} V 325`,
-          }}
-          profile={tokens.sketch.shape}
-          stroke={tokens.color.inactive}
-          strokeWidth={scales.stroke(tokens.stroke.default)}
-          fill="none"
-        />
-      </g>
-      {input.showIllustrativeTraversal && frame >= 82 ? (
-        <SketchedShape
-          shape={{
-            kind: "circle",
-            cx: marker.x * 960,
-            cy: marker.y * 960,
-            r: 6,
-          }}
-          profile={tokens.sketch.shape}
-          data-illustrative-traversal="true"
-          fill={tokens.color.highlight}
-          stroke={background}
-          strokeWidth={scales.stroke(tokens.stroke.default)}
-        />
-      ) : undefined}
+      <HabitatCrossingClearance
+        {...{ path, tokens, background, scales, crossing }}
+      />
+      <HabitatPlanCorridorRoute
+        {...{ laid, path, tokens, accent, scales, input, background }}
+        crossing={crossing}
+      />
+      <HabitatPlanIllustrativeTraversal
+        {...{ input, frame, marker, tokens, background, scales }}
+      />
     </g>
   );
 }
+/** The type of `PATCH_RADIUS_X` used by HabitatPlan. */
+export type HabitatPlanPatchRadiusXValue = typeof PATCH_RADIUS_X;
+
+/** The type of `PATCH_RADIUS_Y` used by HabitatPlan. */
+export type HabitatPlanPatchRadiusYValue = typeof PATCH_RADIUS_Y;

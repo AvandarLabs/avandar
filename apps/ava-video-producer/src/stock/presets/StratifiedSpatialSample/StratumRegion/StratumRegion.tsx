@@ -1,4 +1,4 @@
-import { propEq } from "@avandar/utils";
+import { propEq, propIsInArray } from "@avandar/utils";
 import { LabelSlots } from "../../../primitives/LabelSlots/LabelSlots";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { StratumBoundary } from "../StratumBoundary/StratumBoundary";
@@ -66,12 +66,6 @@ function _getStratumSites({
   const eligible = input.sites.filter(propEq("stratumId", stratumId));
   return {
     eligible,
-    selected: eligible.filter((site) => {
-      // The validated selection contains at most eight IDs, and this
-      // call scans one bounded stratum. Per-call Set allocation did
-      // not amortize in measurement.
-      // react-doctor-disable-next-line js-set-map-lookups
-      return input.selectedSiteIds.includes(site.id);
-    }),
+    selected: eligible.filter(propIsInArray("id", input.selectedSiteIds)),
   };
 }

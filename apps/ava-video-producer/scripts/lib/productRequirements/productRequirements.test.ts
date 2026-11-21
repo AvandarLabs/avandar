@@ -34,15 +34,18 @@ test("preview sampling includes incoming overlap and resolved poses inside a con
   const plan = readFilm("qetl-motion");
   const shot = plan.shots[0];
   assert.equal(shot.scene, "continuity");
-  if (shot.scene !== "continuity") return;
+  if (shot.scene !== "continuity") {
+    return;
+  }
   const incoming =
     shot.props.beats[0].duration - shot.props.beats[1].transition.frames;
   const frames = getPreviewFramesFromPlan(plan);
-  for (const frame of [
+  [
     incoming - 1,
     incoming,
     incoming + Math.floor(shot.props.beats[1].transition.frames / 2),
     incoming + 180,
-  ])
+  ].forEach((frame) => {
     assert.ok(frames.includes(frame), `Missing nested frame ${frame}`);
+  });
 });

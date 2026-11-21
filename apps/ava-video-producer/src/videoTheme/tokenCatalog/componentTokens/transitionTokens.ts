@@ -1,17 +1,17 @@
-import { token } from "../defineTokensHelpers";
-import { createLengthToken } from "./componentTokenHelpers";
-
+import { TokenDefinitions } from "../TokenDefinitions";
+import { ComponentTokenDefinitions } from "./ComponentTokenDefinitions";
 /** Tokens of the morph and aperture transitions. */
 export const TRANSITION_TOKENS = {
   Morph: {
-    startRadius: createLengthToken(
-      "Morph start radius",
-      "Corner radius a morph transition starts from before it opens to the full frame.",
-      "stage",
-    ),
+    startRadius: ComponentTokenDefinitions.makeLengthToken({
+      label: "Morph start radius",
+      description:
+        "Corner radius a morph transition starts from before it opens to the full frame.",
+      surface: "stage",
+    }),
   },
   Aperture: {
-    overscan: token({
+    overscan: TokenDefinitions.token({
       kind: "number",
       surface: "stage",
       unit: "×",

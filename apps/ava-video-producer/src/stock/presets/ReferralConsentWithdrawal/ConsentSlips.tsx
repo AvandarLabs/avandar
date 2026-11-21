@@ -1,4 +1,4 @@
-import { ConsentSlip } from "./ConsentSlip";
+import { ConsentSlip } from "./ConsentSlip/ConsentSlip";
 import { ConsentTurningHand } from "./ConsentTurningHand";
 import type { Input } from "./ReferralConsentWithdrawal.schema";
 import type { ReactNode } from "react";

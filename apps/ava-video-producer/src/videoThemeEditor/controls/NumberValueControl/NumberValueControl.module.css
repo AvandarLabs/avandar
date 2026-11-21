@@ -1,7 +1,7 @@
-.numberValueRow {
+.numberValueControlRow {
   min-width: 0;
 }
 
-.numberValueInput {
+.numberValueControlInput {
   flex: 0 0 var(--atlas-size-112);
 }

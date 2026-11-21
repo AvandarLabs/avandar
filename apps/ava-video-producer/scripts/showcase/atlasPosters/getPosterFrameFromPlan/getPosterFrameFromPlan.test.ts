@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import { storyboardSchema } from "../../../../src/storyboard/schema/schema";
-import { durationInFrames } from "../../../../src/storyboard/schema/timeline";
+import { StoryboardTimeline } from "../../../../src/storyboard/schema/StoryboardTimeline";
 import { appRoot } from "../../ShowcaseFilms/ShowcaseFilms";
 import { getPosterFrameFromPlan } from "./getPosterFrameFromPlan";
 
@@ -15,7 +15,7 @@ async function _readPlan(relative: string) {
   );
 }
 
-test("a continuity poster holds on the middle beat, clear of both transitions", async () => {
+test("a continuity poster is after the first beat and before the film ends", async () => {
   const plan = await _readPlan("explainers/study-shared-object-handoff.json");
   const frame = getPosterFrameFromPlan(plan);
   const shot = plan.shots[0];
@@ -23,12 +23,12 @@ test("a continuity poster holds on the middle beat, clear of both transitions", 
   // Two beats: the poster shows the second, after the handoff has landed.
   const firstBeat = shot.scene === "continuity" ? shot.props.beats[0] : null;
   assert.ok(firstBeat && frame > firstBeat.duration);
-  assert.ok(frame < durationInFrames(plan));
+  assert.ok(frame < StoryboardTimeline.durationInFrames(plan));
 });
 
-test("a scene-plan poster sits inside the middle shot", async () => {
+test("a scene-plan poster is strictly inside the film", async () => {
   const plan = await _readPlan("shot-vocabulary.json");
   const frame = getPosterFrameFromPlan(plan);
   assert.ok(frame > 0);
-  assert.ok(frame < durationInFrames(plan));
+  assert.ok(frame < StoryboardTimeline.durationInFrames(plan));
 });

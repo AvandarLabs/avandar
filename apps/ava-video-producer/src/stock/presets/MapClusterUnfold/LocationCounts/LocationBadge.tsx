@@ -2,14 +2,17 @@ import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { LocationCountsShared } from "./LocationCountsShared/LocationCountsShared";
 import type { ReactNode } from "react";
+
+type Props = {
+  location: ReturnType<typeof LocationCountsShared.getLocations>[number];
+  accent: string;
+};
+
 /** A location's member count in a ring at its shared position. */
 export function LocationBadge({
   location,
   accent,
-}: Readonly<{
-  location: ReturnType<typeof LocationCountsShared.getLocations>[number];
-  accent: string;
-}>): ReactNode {
+}: Readonly<Props>): ReactNode {
   const { color, stroke, sketch, text } = GraphicThemeHooks.useGraphicTokens();
   const shapes = GraphicThemeHooks.useGraphicShapeScales();
   return (

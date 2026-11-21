@@ -1,9 +1,14 @@
-import { mix } from "../../../motion";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import { Motion } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { getSeedSceneFromFrame } from "./getSeedSceneFromFrame";
 
-type Point = { x: number; y: number };
-type Hand = Point & { action?: "reservation" | "loss" | "furrow" | "sowing" };
+type Point = {
+  x: number;
+  y: number;
+};
+type Hand = Point & {
+  action?: "reservation" | "loss" | "furrow" | "sowing";
+};
 type Travel = {
   frame: number;
   at: number;
@@ -21,7 +26,18 @@ function _travel({
   motion,
 }: Readonly<Travel>): Point {
   const progress = motion.ramp(frame, at, duration, motion.travel.easing);
-  return { x: mix(progress, from.x, to.x), y: mix(progress, from.y, to.y) };
+  return {
+    x: Motion.mix({
+      t: progress,
+      from: from.x,
+      to: to.x,
+    }),
+    y: Motion.mix({
+      t: progress,
+      from: from.y,
+      to: to.y,
+    }),
+  };
 }
 type SowingHandArgs = Readonly<{
   scene: ReturnType<typeof getSeedSceneFromFrame>;
@@ -86,47 +102,56 @@ export function getCultivatorHandFromFrame({
   frame: number;
   motion: VideoMotion;
 }>): Hand {
-  const { reserve, loss, sown, remaining, scale } = scene;
+  const { reserve, scale } = scene;
   if (reserve === 0) {
     return { x: 280, y: 330 };
   }
-  const reserveEnd = { x: 288 + (reserve * scale) / 2, y: 385 };
   const reserveHand = {
     ...scene.reservePosition,
     x: scene.reservePosition.x + (reserve * scale) / 2,
   };
+  return frame < 12
+    ? _travel({
+        frame,
+        at: 0,
+        duration: 12,
+        from: { x: 280, y: 330 },
+        to: reserveHand,
+        motion,
+      })
+    : frame <= 48
+      ? { ...reserveHand, action: "reservation" }
+      : _getHandAfterReservationFromSceneAndFrame({ scene, frame, motion });
+}
+/** The hand moves from its reserved seed to loss handling and sowing. */
+function _getHandAfterReservationFromSceneAndFrame({
+  scene,
+  frame,
+  motion,
+}: Readonly<{
+  scene: ReturnType<typeof getSeedSceneFromFrame>;
+  frame: number;
+  motion: VideoMotion;
+}>): Hand {
+  const { reserve, loss, sown, remaining, scale } = scene;
+  const reserveEnd = { x: 288 + (reserve * scale) / 2, y: 385 };
   const lossStart = { x: 288 + (remaining + sown + loss / 2) * scale, y: 385 };
   const lossEnd =
     loss > 0 ? { x: 518 + (loss * scale) / 2, y: 385 } : reserveEnd;
-  if (frame < 12) {
-    return _travel({
-      frame,
-      at: 0,
-      duration: 12,
-      from: { x: 280, y: 330 },
-      to: reserveHand,
-      motion,
-    });
-  }
-  if (frame <= 48) {
-    return { ...reserveHand, action: "reservation" };
-  }
-  if (frame < 74) {
-    return _travel({
-      frame,
-      at: 68,
-      duration: 6,
-      from: reserveEnd,
-      to: loss > 0 ? lossStart : reserveEnd,
-      motion,
-    });
-  }
-  if (frame <= 100 && loss > 0) {
-    return {
-      x: scene.lossPosition.x + (loss * scale) / 2,
-      y: scene.lossPosition.y,
-      action: "loss",
-    };
-  }
-  return _getSowingHand({ scene, frame, lossEnd, motion });
+  return frame < 74
+    ? _travel({
+        frame,
+        at: 68,
+        duration: 6,
+        from: reserveEnd,
+        to: loss > 0 ? lossStart : reserveEnd,
+        motion,
+      })
+    : frame <= 100 && loss > 0
+      ? {
+          x: scene.lossPosition.x + (loss * scale) / 2,
+          y: scene.lossPosition.y,
+          action: "loss",
+        }
+      : _getSowingHand({ scene, frame, lossEnd, motion });
 }

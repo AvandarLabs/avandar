@@ -7,20 +7,6 @@
 }
 
 /* The caption download posts the export's theme, so it is a button styled as its sibling links. */
-.compositionActionsLink {
-  background: none;
-  border: 0;
-  color: inherit;
-  cursor: pointer;
-  font: inherit;
-  padding: 0;
-  text-decoration: underline;
-}
-
-.compositionActionsLink:disabled {
-  cursor: wait;
-  opacity: var(--atlas-opacity-55);
-}
 
 .compositionActionsStatus {
   margin-top: var(--atlas-space-12);

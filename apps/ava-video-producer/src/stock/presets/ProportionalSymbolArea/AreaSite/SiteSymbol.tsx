@@ -1,7 +1,13 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { type Props } from "./AreaSiteShared.types";
+import { type Props as AreaSiteSharedProps } from "./AreaSiteShared.types";
 import type { ReactNode } from "react";
+
+type Props = Pick<AreaSiteSharedProps, "site" | "input" | "accent"> & {
+  radius: number;
+  progress: number;
+};
+
 /** The site's circle of the same total area, filled once the tiles merge. */
 export function SiteSymbol({
   site,
@@ -9,12 +15,7 @@ export function SiteSymbol({
   radius,
   progress,
   accent,
-}: Readonly<
-  Pick<Props, "site" | "input" | "accent"> & {
-    radius: number;
-    progress: number;
-  }
->): ReactNode {
+}: Readonly<Props>): ReactNode {
   const { atomic } = GraphicThemeHooks.useGraphicTheme();
   const { stroke, sketch } = GraphicThemeHooks.useGraphicTokens();
   const shapes = GraphicThemeHooks.useGraphicShapeScales();

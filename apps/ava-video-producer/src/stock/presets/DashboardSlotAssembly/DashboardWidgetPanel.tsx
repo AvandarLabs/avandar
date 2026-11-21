@@ -1,10 +1,40 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { DashboardWidgetContent } from "./DashboardWidgetContent";
 import { getWidgetRectFromInput } from "./getWidgetRectFromInput";
 import type { Input } from "./DashboardSlotAssembly.schema";
 import type { ReactNode } from "react";
+
+type WidgetPanelStyle = {
+  rx: number;
+  fill: string;
+  stroke: string;
+  strokeWidth: number;
+};
+type WidgetPanelGeometry = {
+  panel: ReturnType<typeof getWidgetRectFromInput> & WidgetPanelStyle;
+  title: WidgetTitle;
+  content: WidgetContent;
+};
+type WidgetTitle = {
+  text: string;
+  x: number;
+  y: number;
+  width: number;
+  fontSize: 14;
+  maxLines: number;
+  breakLongWords: boolean;
+  normalizeWhitespace: boolean;
+};
+type WidgetContent = {
+  widget: Input["widgets"][number];
+  x: number;
+  y: number;
+  width: number;
+  bodyLines: number;
+  accent: string;
+};
 
 type Props = {
   widget: Input["widgets"][number];
@@ -13,19 +43,26 @@ type Props = {
   frame: number;
   accent: string;
 };
-/**
- * Panel geometry resizes while every title and body font size remains fixed.
- */
-export function DashboardWidgetPanel({
+
+type GetWidgetPanelGeometryOptions = {
+  widget: Input["widgets"][number];
+  input: Input;
+  frame: number;
+  accent: string;
+  tokens: ReturnType<typeof GraphicThemeHooks.useGraphicTokens>;
+  scales: ReturnType<typeof GraphicThemeHooks.useGraphicShapeScales>;
+  motion: ReturnType<typeof GraphicThemeHooks.useGraphicMotion>;
+};
+/** Samples the authored widget panel geometry. */
+function _getWidgetPanelGeometry({
   widget,
-  index,
   input,
   frame,
   accent,
-}: Readonly<Props>): ReactNode {
-  const tokens = GraphicThemeHooks.useGraphicTokens();
-  const scales = GraphicThemeHooks.useGraphicShapeScales();
-  const motion = GraphicThemeHooks.useGraphicMotion();
+  tokens,
+  scales,
+  motion,
+}: Readonly<GetWidgetPanelGeometryOptions>): WidgetPanelGeometry {
   const rect = getWidgetRectFromInput({
     input,
     widgetId: widget.id,
@@ -43,7 +80,23 @@ export function DashboardWidgetPanel({
       featured ? tokens.stroke.default : tokens.stroke.outline,
     ),
   };
-  const title = {
+  const title = _createWidgetTitleFromGeometry({ widget, rect, compact });
+  const content = _createWidgetContentFromGeometry({
+    widget,
+    rect,
+    compact,
+    accent,
+  });
+  return { panel, title, content };
+}
+
+/** Builds the title layout while keeping the authored fixed font size. */
+function _createWidgetTitleFromGeometry({
+  widget,
+  rect,
+  compact,
+}: Readonly<CreateWidgetTitleFromGeometryOptions>): WidgetTitle {
+  return {
     text: widget.title,
     x: rect.x + 12,
     y: rect.y + 22,
@@ -53,7 +106,16 @@ export function DashboardWidgetPanel({
     breakLongWords: true,
     normalizeWhitespace: true,
   };
-  const content = {
+}
+
+/** Builds the widget body layout with the authored compact-line limit. */
+function _createWidgetContentFromGeometry({
+  widget,
+  rect,
+  compact,
+  accent,
+}: Readonly<CreateWidgetContentFromGeometryOptions>): WidgetContent {
+  return {
     widget,
     x: rect.x,
     y: rect.y + (compact ? 56 : 84),
@@ -61,6 +123,30 @@ export function DashboardWidgetPanel({
     bodyLines: compact ? 2 : 3,
     accent,
   };
+}
+
+/**
+ * Panel geometry resizes while every title and body font size remains fixed.
+ */
+export function DashboardWidgetPanel({
+  widget,
+  index,
+  input,
+  frame,
+  accent,
+}: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const { panel, title, content } = _getWidgetPanelGeometry({
+    widget,
+    input,
+    frame,
+    accent,
+    tokens,
+    scales,
+    motion,
+  });
   return (
     <g
       data-widget-panel={widget.id}
@@ -76,3 +162,16 @@ export function DashboardWidgetPanel({
     </g>
   );
 }
+
+type CreateWidgetTitleFromGeometryOptions = {
+  widget: Input["widgets"][number];
+  rect: ReturnType<typeof getWidgetRectFromInput>;
+  compact: boolean;
+};
+
+type CreateWidgetContentFromGeometryOptions = {
+  widget: Input["widgets"][number];
+  rect: ReturnType<typeof getWidgetRectFromInput>;
+  compact: boolean;
+  accent: string;
+};

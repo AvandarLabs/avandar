@@ -1,6 +1,6 @@
-import { typed } from "../../../motion";
+import { Motion } from "../../../motion";
 import { useVideoMotion } from "../../../videoTheme/useVideoMotion";
-import { useVideoTheme } from "../../../videoTheme/useVideoTheme";
+import { useVideoTheme } from "../../../videoTheme/videoThemeHelpers";
 import { LockupCtaShared } from "./LockupCtaShared/LockupCtaShared";
 import {
   type CtaLineBox,
@@ -40,7 +40,12 @@ export function CtaCommand({
       }}
     >
       <span style={{ color: scene.mutedForeground }}>$ </span>
-      {typed(frame, beats.typingAt, command, cps)}
+      {Motion.typed({
+        frame,
+        at: beats.typingAt,
+        text: command,
+        cps,
+      })}
       <span
         style={{
           display: "inline-block",

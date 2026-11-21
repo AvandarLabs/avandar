@@ -166,6 +166,7 @@ const extraFixtures: StockContract<Input>["fixtures"] = (
     };
   });
 });
+/** Invalid stock inputs used to check this preset contract rejects bad data. */
 export const invalidInputs: unknown[] = [
   { ...DEFAULT_INPUT, extra: true },
   {

@@ -7,7 +7,9 @@ import { createRoot } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { useCommittedRenderDelay } from "./useCommittedRenderDelay";
 
-function FrameProbe(props: Parameters<typeof useCommittedRenderDelay>[0]) {
+type Props = Parameters<typeof useCommittedRenderDelay>[0];
+
+function FrameProbe(props: Readonly<Props>) {
   useCommittedRenderDelay(props);
   return <span>{props.label}</span>;
 }
@@ -35,32 +37,18 @@ test("uncommitted render work does not leave a Remotion render handle", () => {
     );
     assert.equal(handles.length, 0);
   } finally {
-    if (originalWindow)
+    if (originalWindow) {
       Object.defineProperty(globalThis, "window", originalWindow);
-    else Reflect.deleteProperty(globalThis, "window");
+    } else {
+      Reflect.deleteProperty(globalThis, "window");
+    }
     browser.window.close();
   }
 });
 
 test("StrictMode frame changes release prior barriers and unmount releases pending work", async () => {
-  const browser = new JSDOM("<div id='root'></div>");
-  const originalWindow = Object.getOwnPropertyDescriptor(globalThis, "window");
-  const originalDocument = Object.getOwnPropertyDescriptor(
-    globalThis,
-    "document",
-  );
-  Object.defineProperty(globalThis, "window", {
-    configurable: true,
-    value: browser.window,
-  });
-  Object.defineProperty(globalThis, "document", {
-    configurable: true,
-    value: browser.window.document,
-  });
-  const scope = Object.assign(browser.window, {
-    remotion_delayRenderHandles: [] as number[],
-    remotion_delayRenderTimeouts: {},
-  });
+  const { browser, originalWindow, originalDocument, scope } =
+    _createCommittedFrameEnvironment();
   const completed: Array<() => void> = [];
   let numCleanups = 0;
   const prepare = (complete: () => void) => {
@@ -81,46 +69,96 @@ test("StrictMode frame changes release prior barriers and unmount releases pendi
   assert.ok(container);
   const root = createRoot(container);
   try {
-    await act(() => {
-      return root.render(
-        <StrictMode>
-          <FrameProbe label="frame 1" prepare={prepare} />
-        </StrictMode>,
-      );
-    });
+    await _renderFrameProbe({ root, prepare, label: "frame 1" });
     assert.equal(scope.remotion_delayRenderHandles.length, 1);
-    await act(() => {
-      return root.render(
-        <StrictMode>
-          <FrameProbe label="frame 2" prepare={prepare} />
-        </StrictMode>,
-      );
-    });
+    await _renderFrameProbe({ root, prepare, label: "frame 2" });
     assert.equal(scope.remotion_delayRenderHandles.length, 1);
     assert.equal(numCleanups, 2);
     completed.at(-1)?.();
     assert.equal(scope.remotion_delayRenderHandles.length, 0);
-    await act(() => {
-      return root.render(
-        <StrictMode>
-          <FrameProbe label="frame 3" prepare={prepare} />
-        </StrictMode>,
-      );
-    });
+    await _renderFrameProbe({ root, prepare, label: "frame 3" });
     assert.equal(scope.remotion_delayRenderHandles.length, 1);
   } finally {
     await act(() => {
       return root.unmount();
     });
     assert.equal(scope.remotion_delayRenderHandles.length, 0);
-    for (const [key, descriptor] of [
-      ["window", originalWindow],
-      ["document", originalDocument],
-      ["IS_REACT_ACT_ENVIRONMENT", originalActEnvironment],
-    ] as const) {
-      if (descriptor) Object.defineProperty(globalThis, key, descriptor);
-      else Reflect.deleteProperty(globalThis, key);
-    }
-    browser.window.close();
+    _restoreCommittedFrameEnvironment({
+      browser,
+      originalWindow,
+      originalDocument,
+      originalActEnvironment,
+    });
   }
 });
+
+function _createCommittedFrameEnvironment(): Readonly<{
+  browser: JSDOM;
+  originalWindow: PropertyDescriptor | undefined;
+  originalDocument: PropertyDescriptor | undefined;
+  scope: Readonly<{ remotion_delayRenderHandles: number[] }>;
+}> {
+  const browser = new JSDOM("<div id='root'></div>");
+  const originalWindow = Object.getOwnPropertyDescriptor(globalThis, "window");
+  const originalDocument = Object.getOwnPropertyDescriptor(
+    globalThis,
+    "document",
+  );
+  Object.defineProperty(globalThis, "window", {
+    configurable: true,
+    value: browser.window,
+  });
+  Object.defineProperty(globalThis, "document", {
+    configurable: true,
+    value: browser.window.document,
+  });
+  const delayRenderHandles: number[] = [];
+  const scope = Object.assign(browser.window, {
+    remotion_delayRenderHandles: delayRenderHandles,
+    remotion_delayRenderTimeouts: {},
+  });
+  return { browser, originalWindow, originalDocument, scope };
+}
+
+async function _renderFrameProbe({
+  root,
+  prepare,
+  label,
+}: Readonly<{
+  root: ReturnType<typeof createRoot>;
+  prepare: Props["prepare"];
+  label: string;
+}>): Promise<void> {
+  await act(() => {
+    return root.render(
+      <StrictMode>
+        <FrameProbe label={label} prepare={prepare} />
+      </StrictMode>,
+    );
+  });
+}
+
+function _restoreCommittedFrameEnvironment({
+  browser,
+  originalWindow,
+  originalDocument,
+  originalActEnvironment,
+}: Readonly<{
+  browser: JSDOM;
+  originalWindow: PropertyDescriptor | undefined;
+  originalDocument: PropertyDescriptor | undefined;
+  originalActEnvironment: PropertyDescriptor | undefined;
+}>): void {
+  Array.from([
+    ["window", originalWindow],
+    ["document", originalDocument],
+    ["IS_REACT_ACT_ENVIRONMENT", originalActEnvironment],
+  ] as const).forEach(([key, descriptor]) => {
+    if (descriptor) {
+      Object.defineProperty(globalThis, key, descriptor);
+    } else {
+      Reflect.deleteProperty(globalThis, key);
+    }
+  });
+  browser.window.close();
+}

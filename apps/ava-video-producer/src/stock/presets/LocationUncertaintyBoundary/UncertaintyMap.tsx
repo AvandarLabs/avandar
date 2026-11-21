@@ -1,9 +1,9 @@
 import { propEq } from "@avandar/utils";
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { DistrictFootprint } from "./DistrictFootprint";
 import { getAssignmentsFromLocations } from "./getAssignmentsFromLocations";
-import { UncertainLocation } from "./UncertainLocation";
+import { UncertaintyMapLocationsLayer } from "./UncertaintyMapLocationsLayer/UncertaintyMapLocationsLayer";
 import type { Input } from "./LocationUncertaintyBoundary.schema";
 import type { ReactNode } from "react";
 
@@ -36,30 +36,11 @@ export function UncertaintyMap({
         return (
           <DistrictFootprint
             key={district.id}
-            district={district}
-            index={index}
-            frame={frame}
-            isPossible={isPossible}
-            accent={accent}
+            {...{ district, index, frame, isPossible, accent }}
           />
         );
       })}
-      {input.locations.map((location, index) => {
-        return (
-          <UncertainLocation
-            key={location.id}
-            location={location}
-            index={index}
-            isFocused={location.id === input.focusedLocationId}
-            showFootprint={
-              location.id === input.focusedLocationId ||
-              input.showOtherFootprints
-            }
-            frame={frame}
-            accent={accent}
-          />
-        );
-      })}
+      <UncertaintyMapLocationsLayer {...{ input, frame, accent }} />
     </g>
   );
 }

@@ -1,12 +1,14 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { FoundationApproach } from "./FoundationApproach";
+import { FoundationApproach } from "./FoundationApproach/FoundationApproach";
 import { FoundationBase } from "./FoundationBase/FoundationBase";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./SharedFoundation.schema";
 import type { ReactNode } from "react";
+
 /** Two authored approaches and their single shared principle. */
 export type Props = GraphicProps & { input: Input };
+
 /** Distinct approaches lift to reveal one continuous common foundation. */
 export function SharedFoundation({
   input,

@@ -1,7 +1,7 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SceneLabel } from "./SceneLabel";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./DoseCohortReturnPaths.schema";
 import type { ReactNode } from "react";
 
@@ -61,15 +61,19 @@ function _getColumnShift({
   frame,
   index,
   motion,
-}: Readonly<{ frame: number; index: number; motion: VideoMotion }>): number {
-  return mix(
-    motion.ramp(
+}: Readonly<{
+  frame: number;
+  index: number;
+  motion: VideoMotion;
+}>): number {
+  return Motion.mix({
+    t: motion.ramp(
       frame,
       24 + index * motion.scaleStagger(18),
       motion.scale(24),
       motion.travel.easing,
     ),
-    35,
-    0,
-  );
+    from: 35,
+    to: 0,
+  });
 }

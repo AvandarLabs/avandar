@@ -1,5 +1,5 @@
 import { match } from "ts-pattern";
-import { mix, ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ScaleArrive } from "./ScaleArrive";
 import type { ReactNode } from "react";
@@ -23,12 +23,12 @@ export function Arrive({
 }: Readonly<Props>): ReactNode {
   const motion = GraphicThemeHooks.useGraphicMotion();
   const start = at + index * motion.stagger.list;
-  const progress = ramp(
+  const progress = Motion.ramp({
     frame,
-    start,
-    motion.entrance.duration,
-    motion.entrance.easing,
-  );
+    at: start,
+    dur: motion.entrance.duration,
+    easing: motion.entrance.easing,
+  });
   return match(motion.entranceStyle)
     .with("none", () => {
       return <g opacity={frame >= start ? 1 : 0}>{children}</g>;
@@ -42,7 +42,11 @@ export function Arrive({
           opacity={progress}
           transform={
             entranceStyle === "rise"
-              ? `translate(0 ${mix(progress, motion.entrance.distance, 0)})`
+              ? `translate(0 ${Motion.mix({
+                  t: progress,
+                  from: motion.entrance.distance,
+                  to: 0,
+                })})`
               : undefined
           }
         >

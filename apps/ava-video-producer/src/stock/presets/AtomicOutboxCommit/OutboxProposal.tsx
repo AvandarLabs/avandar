@@ -1,11 +1,12 @@
-import { mix, ramp } from "../../../motion";
+import { prop } from "@avandar/utils";
+import { Motion } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { OutboxProposalSheet } from "./OutboxProposalSheet";
 import { OUTCOME_CUE, UNMOUNT_CUE } from "./outboxShape";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./AtomicOutboxCommit.schema";
 import type { ReactNode } from "react";
 
@@ -36,7 +37,11 @@ export function OutboxProposal({
     <g
       data-provisional-half={side}
       opacity={1 - withdrawal}
-      transform={`translate(0 ${mix(withdrawal, 0, 34)})`}
+      transform={`translate(0 ${Motion.mix({
+        t: withdrawal,
+        from: 0,
+        to: 34,
+      })})`}
     >
       <OutboxProposalSheet x={x} accent={accent} />
       <LabelSlots labels={[[input.labels.pending, x + 12, 402, 296, 12, 3]]} />
@@ -62,30 +67,35 @@ function _getProposalProgress({
   frame,
   side,
   motion,
-}: Readonly<{ frame: number; side: Props["side"]; motion: VideoMotion }>) {
+}: Readonly<{
+  frame: number;
+  side: Props["side"];
+  motion: VideoMotion;
+}>) {
   return {
-    writing: ramp(
+    writing: Motion.ramp({
       frame,
-      13 + (side === "journal" ? motion.stagger.list : 0),
-      motion.scale(WRITE_FRAMES),
-      motion.travel.easing,
-    ),
+      at: 13 + (side === "journal" ? motion.stagger.list : 0),
+      dur: motion.scale(WRITE_FRAMES),
+      easing: motion.travel.easing,
+    }),
     // The halves withdraw until they unmount, so this move keeps its cue span.
-    withdrawal: ramp(
+    withdrawal: Motion.ramp({
       frame,
-      OUTCOME_CUE,
-      UNMOUNT_CUE - OUTCOME_CUE,
-      motion.travel.easing,
-    ),
+      at: OUTCOME_CUE,
+      dur: UNMOUNT_CUE - OUTCOME_CUE,
+      easing: motion.travel.easing,
+    }),
   };
 }
 /** The leading graphemes of `value` written so far. */
 function _buildWrittenValue({
   value,
   writing,
-}: Readonly<{ value: string; writing: number }>): string {
-  const graphemes = Array.from(GRAPHEMES.segment(value), ({ segment }) => {
-    return segment;
-  });
+}: Readonly<{
+  value: string;
+  writing: number;
+}>): string {
+  const graphemes = Array.from(GRAPHEMES.segment(value), prop("segment"));
   return graphemes.slice(0, Math.ceil(writing * graphemes.length)).join("");
 }

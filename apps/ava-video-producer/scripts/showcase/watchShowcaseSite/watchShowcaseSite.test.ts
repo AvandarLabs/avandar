@@ -6,10 +6,7 @@ import test from "node:test";
 import { pathToFileURL } from "node:url";
 import { promisify } from "node:util";
 import { createRealTempDirectory } from "../../../tests/createRealTempDirectory";
-import {
-  buildLicenseFixture,
-  licenseTestEnvironment,
-} from "../../../tests/license-fixture";
+import { LicenseFixtures } from "../../../tests/LicenseFixtures";
 import { linkAppDependencies } from "../../../tests/linkAppDependencies";
 import { SHOWCASE_PAGES } from "../makeShowcaseViteConfigFromAppRoot";
 
@@ -18,7 +15,7 @@ async function _createFailedBuildFixture(root: string): Promise<void> {
   await linkAppDependencies(root);
   await fs.writeFile(
     path.join(root, "test-license.env"),
-    buildLicenseFixture(),
+    LicenseFixtures.makeFixtureFromDirectory(),
   );
   await fs.mkdir(path.join(root, "showcase"), { recursive: true });
   await fs.mkdir(path.join(root, "scripts"), { recursive: true });
@@ -68,7 +65,9 @@ test("a failed first showcase build closes its watcher so the process exits", as
       {
         cwd: root,
         env: {
-          ...licenseTestEnvironment(path.join(root, "test-license.env")),
+          ...LicenseFixtures.licenseTestEnvironment(
+            path.join(root, "test-license.env"),
+          ),
           // The root has no tsconfig, so tsx needs the app's `@utils` paths.
           TSX_TSCONFIG_PATH: path.resolve("tsconfig.json"),
         },

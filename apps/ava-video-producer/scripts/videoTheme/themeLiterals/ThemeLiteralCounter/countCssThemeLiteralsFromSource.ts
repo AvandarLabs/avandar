@@ -1,4 +1,26 @@
 import { LiteralPatterns } from "./LiteralPatterns";
+
+function _countPropertyLiterals({
+  property,
+  value,
+  isVariable,
+}: Readonly<{ property: string; value: string; isVariable: boolean }>): number {
+  return [
+    /^font-(?:size|weight|family)$/.test(property) && !isVariable,
+    property === "letter-spacing" &&
+      !isVariable &&
+      !/^(?:0|normal)$/.test(value.trim()),
+    /^(?:color|background(?:-color)?|fill|stroke|border(?:-\w+)?-color)$/.test(
+      property,
+    ) && /^(?:white|black)$/i.test(value.trim()),
+    /^(?:opacity|fill-opacity|stroke-opacity)$/.test(property) &&
+      /^0?\.\d+$/.test(value.trim()),
+    property === "border-radius" && !isVariable,
+    /^(?:box|text)-shadow$/.test(property) && !isVariable,
+    /^(?:transition|animation)(?:-|$)/.test(property) &&
+      TIMING_LITERAL.test(_removeVariableReads(value)),
+  ].filter(Boolean).length;
+}
 /** Removes `/* … *\/` comments, so a commented-out value is not counted. */
 function _stripCssComments(source: string): string {
   return source.replace(/\/\*[\s\S]*?\*\//g, "");
@@ -58,21 +80,11 @@ export function countCssThemeLiteralsFromSource(source: string): number {
             pattern: /\b\d+(?:\.\d+)?px\b/g,
           })) +
       LiteralPatterns.countMatches({ text: value, pattern: /cubic-bezier\(/g });
-    const propertyCount = [
-      /^font-(?:size|weight|family)$/.test(property) && !isVariable,
-      property === "letter-spacing" &&
-        !isVariable &&
-        !/^(?:0|normal)$/.test(value.trim()),
-      /^(?:color|background(?:-color)?|fill|stroke|border(?:-\w+)?-color)$/.test(
-        property,
-      ) && /^(?:white|black)$/i.test(value.trim()),
-      /^(?:opacity|fill-opacity|stroke-opacity)$/.test(property) &&
-        /^0?\.\d+$/.test(value.trim()),
-      property === "border-radius" && !isVariable,
-      /^(?:box|text)-shadow$/.test(property) && !isVariable,
-      /^(?:transition|animation)(?:-|$)/.test(property) &&
-        TIMING_LITERAL.test(_removeVariableReads(value)),
-    ].filter(Boolean).length;
+    const propertyCount = _countPropertyLiterals({
+      property,
+      value,
+      isVariable,
+    });
     return total + valueCount + propertyCount;
   }, 0);
 }

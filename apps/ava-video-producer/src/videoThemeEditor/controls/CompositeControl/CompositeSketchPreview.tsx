@@ -1,4 +1,4 @@
-import { type TokenRow } from "../../tokenRows/tokenRows.types";
+import { type TokenRow } from "../../TokenRows/TokenRows.types";
 import { SketchPreview } from "../SketchPreview/SketchPreview";
 import type { ResolvedSketchProfile } from "../../../videoTheme/videoTheme.types";
 import type { ReactNode } from "react";

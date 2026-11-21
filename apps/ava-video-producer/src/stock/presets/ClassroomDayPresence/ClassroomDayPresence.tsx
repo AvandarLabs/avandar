@@ -1,13 +1,15 @@
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ClassroomDays } from "./ClassroomDays/ClassroomDays";
-import { ClassroomDesk } from "./ClassroomDesk";
+import { ClassroomDesk } from "./ClassroomDesk/ClassroomDesk";
 import { ClassroomTotals } from "./ClassroomTotals";
 import { makeClassroomStateFromInputAndFrame } from "./makeClassroomStateFromInputAndFrame";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ClassroomDayPresence.schema";
 import type { ReactNode } from "react";
+
 /** Inputs for ClassroomDayPresence. */
 type Props = GraphicProps & { input: Input };
+
 /** Persistent desks keep present, absent and unknown daily records distinct. */
 export function ClassroomDayPresence({
   frame,

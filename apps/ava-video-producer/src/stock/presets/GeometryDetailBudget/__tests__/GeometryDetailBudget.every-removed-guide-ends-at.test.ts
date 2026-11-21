@@ -5,8 +5,74 @@ import { getSvgAttributeMatchesFromMarkup } from "../../../../../tests/helpers/g
 import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
 import { SvgPaintAssertions } from "../../../../../tests/helpers/SvgPaintAssertions/SvgPaintAssertions";
 import { DEFAULT_INPUT, fixtures } from "../GeometryDetailBudget.fixtures";
-import { inputSchema } from "../GeometryDetailBudget.schema";
+import { inputSchema, type Input } from "../GeometryDetailBudget.schema";
 import { _render } from "./GeometryDetailBudgetTestHelpers";
+
+type GetRetainedGuideProjectionOptions = Readonly<{
+  guide: string;
+  kept: readonly number[];
+  input: Input;
+}>;
+
+type GetRetainedGuideProjectionResult = {
+  x: number;
+  y: number;
+  px: number;
+  py: number;
+};
+
+function _getRetainedGuideProjection({
+  guide,
+  kept,
+  input,
+}: GetRetainedGuideProjectionOptions): GetRetainedGuideProjectionResult {
+  const index = SvgAttributes.getNumberFromMarkup({
+    attributes: guide,
+    name: "data-removed-index",
+  });
+  const upper = kept.find((retained) => {
+    return retained > index;
+  })!;
+  const lower = kept[kept.indexOf(upper) - 1];
+  const [x, y] = input.vertices[index];
+  const [ax, ay] = input.vertices[lower];
+  const [bx, by] = input.vertices[upper];
+  const dx = bx - ax;
+  const dy = by - ay;
+  const fraction =
+    dx * dx + dy * dy
+      ? Math.max(
+          0,
+          Math.min(1, ((x - ax) * dx + (y - ay) * dy) / (dx * dx + dy * dy)),
+        )
+      : 0;
+  const px = ax + fraction * dx;
+  const py = ay + fraction * dy;
+  return { x, y, px, py };
+}
+
+function _assertEveryRemovedGuideEndsAtDataSourceVertex({
+  markup,
+  input,
+}: Readonly<{
+  markup: ReturnType<typeof _render>;
+  input: (typeof fixtures)[number]["input"];
+}>): void {
+  assert.deepEqual(
+    getSvgAttributeMatchesFromMarkup({
+      markup: markup,
+      attribute: "data-source-vertex",
+    }).tags.map((tag) => {
+      return [
+        SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "cx" }),
+        SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "cy" }),
+      ];
+    }),
+    input.vertices.map(([x, y]) => {
+      return [60 + x * 3.6, 160 + y * 3.6];
+    }),
+  );
+}
 
 test("every removed guide ends at its own finite retained segment without moving any source vertex", () => {
   fixtures.forEach(({ input }) => {
@@ -20,31 +86,11 @@ test("every removed guide ends at its own finite retained segment without moving
       markup: markup,
       attribute: "data-removed-index",
     }).tags.forEach((guide) => {
-      const index = SvgAttributes.getNumberFromMarkup({
-        attributes: guide,
-        name: "data-removed-index",
+      const { x, y, px, py } = _getRetainedGuideProjection({
+        guide,
+        kept,
+        input,
       });
-      const upper = kept.find((retained) => {
-        return retained > index;
-      })!;
-      const lower = kept[kept.indexOf(upper) - 1];
-      const [x, y] = input.vertices[index];
-      const [ax, ay] = input.vertices[lower];
-      const [bx, by] = input.vertices[upper];
-      const dx = bx - ax;
-      const dy = by - ay;
-      const fraction =
-        dx * dx + dy * dy
-          ? Math.max(
-              0,
-              Math.min(
-                1,
-                ((x - ax) * dx + (y - ay) * dy) / (dx * dx + dy * dy),
-              ),
-            )
-          : 0;
-      const px = ax + fraction * dx;
-      const py = ay + fraction * dy;
       assert.equal(
         SvgAttributes.getNumberFromMarkup({ attributes: guide, name: "x1" }),
         60 + x * 3.6,
@@ -63,20 +109,7 @@ test("every removed guide ends at its own finite retained segment without moving
       );
       assert.ok(Math.hypot(x - px, y - py) <= input.tolerance);
     });
-    assert.deepEqual(
-      getSvgAttributeMatchesFromMarkup({
-        markup: markup,
-        attribute: "data-source-vertex",
-      }).tags.map((tag) => {
-        return [
-          SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "cx" }),
-          SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "cy" }),
-        ];
-      }),
-      input.vertices.map(([x, y]) => {
-        return [60 + x * 3.6, 160 + y * 3.6];
-      }),
-    );
+    _assertEveryRemovedGuideEndsAtDataSourceVertex({ markup, input });
   });
 });
 

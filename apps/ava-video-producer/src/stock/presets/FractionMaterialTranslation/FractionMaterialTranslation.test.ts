@@ -18,6 +18,36 @@ import {
 import { inputSchema, type Input } from "./FractionMaterialTranslation.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 
+type AssertSelectedFractionPiecesOptions = Readonly<{
+  representations: Input["representations"];
+  markup: string;
+  numerator: number;
+}>;
+
+function _assertSelectedFractionPieces({
+  representations,
+  markup,
+  numerator,
+}: AssertSelectedFractionPiecesOptions): void {
+  representations.forEach((representation) => {
+    const pieces = [
+      ...markup.matchAll(
+        new RegExp(
+          `data-piece-owner="${representation.id}" data-selected="(true|false)"`,
+          "g",
+        ),
+      ),
+    ];
+    assert.equal(pieces.length, 8);
+    assert.equal(
+      pieces.filter((piece) => {
+        return piece[1] === "true";
+      }).length,
+      numerator,
+    );
+  });
+}
+
 function _render({
   frame,
   input,
@@ -125,22 +155,10 @@ test("all material choices and arrangements derive selection from one fraction",
               representations,
             };
             const markup = _render({ frame: 150, input });
-            representations.forEach((representation) => {
-              const pieces = [
-                ...markup.matchAll(
-                  new RegExp(
-                    `data-piece-owner="${representation.id}" data-selected="(true|false)"`,
-                    "g",
-                  ),
-                ),
-              ];
-              assert.equal(pieces.length, 8);
-              assert.equal(
-                pieces.filter((piece) => {
-                  return piece[1] === "true";
-                }).length,
-                numerator,
-              );
+            _assertSelectedFractionPieces({
+              representations,
+              markup,
+              numerator,
             });
             assert.equal(
               [

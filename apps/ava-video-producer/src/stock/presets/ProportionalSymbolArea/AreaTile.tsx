@@ -1,4 +1,4 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./ProportionalSymbolArea.schema";
@@ -12,6 +12,19 @@ type Props = {
   accent: string;
   areaPerUnit: number;
 };
+
+type GetAreaTilePointsOptions = {
+  site: Readonly<Props>["site"];
+  unitIndex: Readonly<Props>["unitIndex"];
+  progress: Readonly<Props>["progress"];
+  radius: Readonly<Props>["radius"];
+  side: number;
+  columns: number;
+  rows: number;
+  originX: number;
+  originY: number;
+};
+
 function _getBoundaryPoint(step: number) {
   const distance = step * 4,
     side = Math.floor(distance),
@@ -24,6 +37,51 @@ function _getBoundaryPoint(step: number) {
         ? [0.5 - offset, 0.5]
         : [-0.5, 0.5 - offset];
 }
+
+/** Samples the area tile points for the current authored frame. */
+function _getAreaTilePoints({
+  site,
+  unitIndex,
+  progress,
+  radius,
+  side,
+  columns,
+  rows,
+  originX,
+  originY,
+}: Readonly<GetAreaTilePointsOptions>): string[] {
+  return Array.from({ length: 32 }, (_, vertex) => {
+    const step = vertex / 32,
+      [squareX, squareY] = _getBoundaryPoint(step);
+    const angle =
+      (2 * Math.PI * (unitIndex + Math.max(0, (step - 0.1) / 0.8))) /
+        site.value -
+      Math.PI / 2;
+    const onArc = step >= 0.1 && step <= 0.9,
+      sectorX = onArc ? Math.cos(angle) * radius : 0,
+      sectorY = onArc ? Math.sin(angle) * radius : 0;
+    const sourceX =
+        ((unitIndex % columns) - (columns - 1) / 2 + squareX) * side,
+      sourceY =
+        (Math.floor(unitIndex / columns) - (rows - 1) / 2 + squareY) * side;
+    return `${
+      originX +
+      Motion.mix({
+        t: progress,
+        from: sourceX,
+        to: sectorX,
+      })
+    } ${
+      originY +
+      Motion.mix({
+        t: progress,
+        from: sourceY,
+        to: sectorY,
+      })
+    }`;
+  });
+}
+
 /** Each complete source tile morphs into its own sector of the same symbol. */
 export function AreaTile({
   site,
@@ -41,21 +99,16 @@ export function AreaTile({
     rows = Math.ceil(site.value / columns);
   const originX = 48 + site.x * 4,
     originY = 148 + site.y * 4;
-  const points = Array.from({ length: 32 }, (_, vertex) => {
-    const step = vertex / 32,
-      [squareX, squareY] = _getBoundaryPoint(step);
-    const angle =
-      (2 * Math.PI * (unitIndex + Math.max(0, (step - 0.1) / 0.8))) /
-        site.value -
-      Math.PI / 2;
-    const onArc = step >= 0.1 && step <= 0.9,
-      sectorX = onArc ? Math.cos(angle) * radius : 0,
-      sectorY = onArc ? Math.sin(angle) * radius : 0;
-    const sourceX =
-        ((unitIndex % columns) - (columns - 1) / 2 + squareX) * side,
-      sourceY =
-        (Math.floor(unitIndex / columns) - (rows - 1) / 2 + squareY) * side;
-    return `${originX + mix(progress, sourceX, sectorX)} ${originY + mix(progress, sourceY, sectorY)}`;
+  const points = _getAreaTilePoints({
+    site,
+    unitIndex,
+    progress,
+    radius,
+    side,
+    columns,
+    rows,
+    originX,
+    originY,
   });
   return (
     <SketchedShape

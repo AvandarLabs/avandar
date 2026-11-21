@@ -6,10 +6,12 @@ import { DatasetSourceIcon } from "@/views/DataManagerApp/DatasetSourceIcon";
 import { NAME, SOURCE_NAMES } from "./importFixtures";
 import type { ReactNode } from "react";
 
+type Props = { saved: boolean };
+
 /**
  * The data manager's dataset list rail, with only this film's fixture datasets.
  */
-export function SourceList({ saved }: { saved: boolean }): ReactNode {
+export function SourceList({ saved }: Readonly<Props>): ReactNode {
   return (
     <AppListPane title="Datasets" count={SOURCE_NAMES.length}>
       <NavLinkList

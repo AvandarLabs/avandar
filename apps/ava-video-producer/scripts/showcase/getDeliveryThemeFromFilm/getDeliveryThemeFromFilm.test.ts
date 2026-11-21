@@ -1,14 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { makeSnapshotFromThemeRequest } from "../../../src/videoTheme/makeSnapshotFromThemeRequest";
 import {
   BUILT_IN_VIDEO_THEMES,
-  createVideoThemeLibrary,
-} from "../../../src/videoTheme/builtInVideoThemes/builtInVideoThemes";
-import { createSnapshotFromThemeRequest } from "../../../src/videoTheme/createSnapshotFromThemeRequest";
-import {
-  createVideoThemeSnapshot,
-  makeResolvedVideoThemeFromSnapshot,
-} from "../../../src/videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
+  makeVideoThemeLibraryFromDocuments,
+} from "../../../src/videoTheme/makeVideoThemeLibraryFromDocuments/makeVideoThemeLibraryFromDocuments";
+import { VideoThemeSnapshots } from "../../../src/videoTheme/VideoThemeSnapshots/VideoThemeSnapshots";
 import { getDeliveryThemeFromFilm } from "./getDeliveryThemeFromFilm";
 import type { VideoThemeDocument } from "../../../src/videoTheme/videoTheme.types";
 
@@ -21,15 +18,15 @@ const WARM: VideoThemeDocument = {
   label: "Warm",
   extends: "classic",
 };
-
 test("a film without a theme records classic and classic's hash", () => {
   assert.deepEqual(getDeliveryThemeFromFilm({ id: "occlusion-wipe" }), {
     themeId: "classic",
-    themeHash: makeResolvedVideoThemeFromSnapshot(undefined, ["occlusion-wipe"])
-      .hash,
+    themeHash: VideoThemeSnapshots.toResolvedTheme({
+      snapshot: undefined,
+      overrideIds: ["occlusion-wipe"],
+    }).hash,
   });
 });
-
 test("a themed film records the hash of what it rendered", () => {
   const theme = { themeId: "avandar", documents: [], patches: [] };
   assert.notEqual(
@@ -37,9 +34,8 @@ test("a themed film records the hash of what it rendered", () => {
     getDeliveryThemeFromFilm({ id: "occlusion-wipe" }).themeHash,
   );
 });
-
 test("a built-in theme's draft records the built-in it extends and marks the draft", () => {
-  const theme = createSnapshotFromThemeRequest({
+  const theme = makeSnapshotFromThemeRequest({
     library: BUILT_IN_VIDEO_THEMES,
     id: "avandar",
     patch: GROUND,
@@ -47,17 +43,15 @@ test("a built-in theme's draft records the built-in it extends and marks the dra
   const delivery = getDeliveryThemeFromFilm({ id: "occlusion-wipe", theme });
   assert.deepEqual([delivery.themeId, delivery.themeDraft], ["avandar", true]);
 });
-
 test("a custom theme's draft records the custom theme and marks the draft", () => {
-  const theme = createVideoThemeSnapshot(
-    createVideoThemeLibrary([WARM]),
-    "warm",
-    [GROUND],
-  );
+  const theme = VideoThemeSnapshots.fromLibrary({
+    library: makeVideoThemeLibraryFromDocuments([WARM]),
+    themeId: "warm",
+    patches: [GROUND],
+  });
   const delivery = getDeliveryThemeFromFilm({ id: "occlusion-wipe", theme });
   assert.deepEqual([delivery.themeId, delivery.themeDraft], ["warm", true]);
 });
-
 test("a saved theme records no draft", () => {
   const theme = { themeId: "avandar", documents: [], patches: [] };
   assert.equal(
@@ -65,10 +59,9 @@ test("a saved theme records no draft", () => {
     false,
   );
 });
-
 test("a custom theme sent with an empty patch is marked as a draft", () => {
-  const theme = createSnapshotFromThemeRequest({
-    library: createVideoThemeLibrary([WARM]),
+  const theme = makeSnapshotFromThemeRequest({
+    library: makeVideoThemeLibraryFromDocuments([WARM]),
     id: "warm",
     patch: {},
   });

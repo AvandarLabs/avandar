@@ -1,4 +1,4 @@
-import { ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ComparisonVerdict } from "./ComparisonVerdict/ComparisonVerdict";
@@ -41,12 +41,12 @@ export function ExpectationStation({
     <g
       data-case={item.id}
       data-state={state}
-      opacity={ramp(
+      opacity={Motion.ramp({
         frame,
-        12 + index * motion.scaleStagger(STATION_STAGGER_FRAMES),
-        motion.scale(STATION_FRAMES),
-        motion.reveal.easing,
-      )}
+        at: 12 + index * motion.scaleStagger(STATION_STAGGER_FRAMES),
+        dur: motion.scale(STATION_FRAMES),
+        easing: motion.reveal.easing,
+      })}
     >
       <LabelSlots
         labels={[

@@ -3,13 +3,10 @@ import type {
   StockInputByPreset,
   StockPresetId,
 } from "../../src/stock/contracts/StockContract.types";
-
 /** Lifecycle states reported by the local on-demand export service. */
 export const DOWNLOAD_STATES = ["running", "complete", "failed"] as const;
-
 /** One lifecycle state reported by the local on-demand export service. */
 export type DownloadState = (typeof DOWNLOAD_STATES)[number];
-
 /** Public status from the local, on-demand export service. */
 export type DownloadStatus = {
   id?: string;
@@ -17,7 +14,6 @@ export type DownloadStatus = {
   message: string;
   download?: string;
 };
-
 /** Options the preview player selected for an export. */
 type DownloadFilmOptions = {
   captions?: boolean;
@@ -29,21 +25,24 @@ type DownloadFilmOptions = {
   schemaVersion?: 1;
   input?: StockInputByPreset[StockPresetId];
   /** The saved theme to render with and the unsaved edits on top of it. */
-  theme?: { id: string; patch?: Readonly<Record<string, unknown>> };
+  theme?: {
+    id: string;
+    patch?: Readonly<Record<string, unknown>>;
+  };
 };
-
 const activeDownloads = new Map<string, Promise<DownloadStatus>>();
-
 function _isDownloadState(value: unknown): value is DownloadState {
   return DOWNLOAD_STATES.some((state) => {
     return state === value;
   });
 }
-
-async function _requestJob(
-  url: string,
-  init?: RequestInit,
-): Promise<DownloadStatus> {
+async function _requestJob({
+  url,
+  init,
+}: Readonly<{
+  url: string;
+  init?: RequestInit;
+}>): Promise<DownloadStatus> {
   // The export service returns actionable error messages in JSON.
   // The response.ok branch handles that payload before returning success.
   // react-doctor-disable-next-line no-fetch-response-used-without-status-check
@@ -68,7 +67,6 @@ async function _requestJob(
     ...(typeof body.download === "string" ? { download: body.download } : {}),
   };
 }
-
 function _saveDownload(download: string | undefined): void {
   if (!download) {
     throw new Error("The export finished without a download. Try again.");
@@ -84,12 +82,14 @@ function _saveDownload(download: string | undefined): void {
   link.click();
   link.remove();
 }
-
 /** The export body with object keys sorted, so equal requests share a key. */
-function _buildExportRequest(
-  id: string,
-  options: Readonly<Record<string, unknown>>,
-): string {
+function _buildExportRequest({
+  id,
+  options,
+}: Readonly<{
+  id: string;
+  options: Readonly<Record<string, unknown>>;
+}>): string {
   return JSON.stringify({ id, options }, (_key, value: unknown) => {
     if (!isPlainObject(value)) {
       return value;
@@ -97,7 +97,6 @@ function _buildExportRequest(
     return pick(value, Object.keys(value).sort());
   });
 }
-
 async function _runExport({
   request,
   onStatus,
@@ -106,17 +105,22 @@ async function _runExport({
   onStatus: (status: DownloadStatus) => void;
 }>): Promise<DownloadStatus> {
   onStatus({ state: "running", message: "Preparing MP4…" });
-  let job = await _requestJob("/api/exports", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: request,
+  let job = await _requestJob({
+    url: "/api/exports",
+    init: {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: request,
+    },
   });
   while (job.state === "running") {
     onStatus(job);
     await new Promise((resolve) => {
       return setTimeout(resolve, 1000);
     });
-    job = await _requestJob(`/api/exports/${encodeURIComponent(job.id ?? "")}`);
+    job = await _requestJob({
+      url: `/api/exports/${encodeURIComponent(job.id ?? "")}`,
+    });
   }
   if (job.state === "failed") {
     throw new Error(job.message || "The export failed. Try again.");
@@ -125,7 +129,6 @@ async function _runExport({
   onStatus(job);
   return job;
 }
-
 async function _downloadFilm({
   id,
   options = {},
@@ -135,7 +138,10 @@ async function _downloadFilm({
   options?: DownloadFilmOptions | Readonly<Record<string, unknown>>;
   onStatus?: (status: DownloadStatus) => void;
 }>): Promise<DownloadStatus> {
-  const request = _buildExportRequest(id, options);
+  const request = _buildExportRequest({
+    id,
+    options,
+  });
   const activeDownload = activeDownloads.get(request);
   if (activeDownload) {
     return activeDownload;
@@ -152,7 +158,6 @@ async function _downloadFilm({
   activeDownloads.set(request, pending);
   return pending;
 }
-
 function _afterDownloads(callback: () => void): () => void {
   let isCancelled = false;
   const waitForDownloads = async () => {
@@ -168,16 +173,12 @@ function _afterDownloads(callback: () => void): () => void {
     isCancelled = true;
   };
 }
-
 /**
- * The film export downloads of the showcase pages and the Motion Atlas. Both
- * members read one private registry of in-flight exports, so a source refresh
- * can wait for the downloads that are still being started.
- *
- * Called by the showcase page scripts and by the Atlas hooks that start a film
- * download or refresh a preview when the source changes, such as
- * `useCompositionDownload`, `usePreviewDownload`, `useCompositionPlayer`,
- * `HelperPreview`, and `useMotionGalleryState`.
+ * Coordinates film exports and defers preview refreshes while downloads start.
+ * Its private registry is shared by `_downloadFilmFromCard`, the showcase
+ * `downloadButton` click listener, `useCompositionDownload`,
+ * `usePreviewDownload`, `useCompositionPlayer`, `useMotionRebuild`, and
+ * `HelperPreview`.
  */
 export const FilmDownloads = {
   /**

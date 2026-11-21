@@ -18,6 +18,90 @@ import {
 import { inputSchema, type Input } from "./AtomicOutboxCommit.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 
+function _makeCaptionClearanceInputs(): Input[] {
+  return [
+    DEFAULT_INPUT,
+    fixtures[2].input,
+    {
+      ...fixtures[2].input,
+      change: { ...fixtures[2].input.change, recordLabel: "界".repeat(28) },
+    },
+  ];
+}
+
+type RecordCaptionBounds = {
+  x: ReturnType<typeof SvgAttributes.getNumberFromMarkup>;
+  right: number;
+  top: number;
+  bottom: number;
+};
+
+type LatchCaptionClearanceOptions = Readonly<{
+  right: number;
+  x: ReturnType<typeof SvgAttributes.getNumberFromMarkup>;
+  bottom: number;
+  latchY: ReturnType<typeof SvgAttributes.getNumberFromMarkup>;
+  halfStroke: number;
+  top: number;
+  frame: number[][number];
+}>;
+
+function _getRecordCaptionBounds({
+  markup,
+  input,
+}: Readonly<{
+  markup: ReturnType<typeof _render>;
+  input: Input;
+}>): RecordCaptionBounds {
+  const caption = [...markup.matchAll(/<text[^>]+>/g)]
+    .map(([tag]) => {
+      return tag;
+    })
+    .find((tag) => {
+      return tag.includes(`aria-label="${input.change.recordLabel}"`);
+    });
+  assert.ok(caption);
+  const x = SvgAttributes.getNumberFromMarkup({
+      attributes: caption,
+      name: "x",
+    }),
+    y = SvgAttributes.getNumberFromMarkup({
+      attributes: caption,
+      name: "y",
+    }),
+    fontSize = SvgAttributes.getNumberFromMarkup({
+      attributes: caption,
+      name: "font-size",
+    });
+  const right =
+    x +
+    getConservativeWidthFromText({
+      text: input.change.recordLabel,
+      fontSize,
+    });
+  const top = y - fontSize,
+    bottom = y + fontSize * 0.3;
+  return { x, right, top, bottom };
+}
+
+function _assertLatchCaptionClearance({
+  right,
+  x,
+  bottom,
+  latchY,
+  halfStroke,
+  top,
+  frame,
+}: LatchCaptionClearanceOptions): void {
+  assert.ok(
+    right < 98 ||
+      x > 862 ||
+      bottom < latchY - halfStroke ||
+      top > latchY + halfStroke,
+    `latch crosses caption at ${frame}`,
+  );
+}
+
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -162,46 +246,15 @@ test("literal empty and whitespace values survive commit and abort while hidden 
   assert.doesNotMatch(aborted, /data-durable-ticket=/);
 });
 test("the complete latch stroke and handle remain clear of the record caption throughout closure", () => {
-  [
-    DEFAULT_INPUT,
-    fixtures[2].input,
-    {
-      ...fixtures[2].input,
-      change: { ...fixtures[2].input.change, recordLabel: "界".repeat(28) },
-    },
-  ].forEach((input) => {
+  _makeCaptionClearanceInputs().forEach((input) => {
     Array.from({ length: 221 }, (_, index) => {
       return index / 2;
     }).forEach((frame) => {
       const markup = _render({ frame, input });
-      const caption = [...markup.matchAll(/<text[^>]+>/g)]
-        .map(([tag]) => {
-          return tag;
-        })
-        .find((tag) => {
-          return tag.includes(`aria-label="${input.change.recordLabel}"`);
-        });
-      assert.ok(caption);
-      const x = SvgAttributes.getNumberFromMarkup({
-          attributes: caption,
-          name: "x",
-        }),
-        y = SvgAttributes.getNumberFromMarkup({
-          attributes: caption,
-          name: "y",
-        }),
-        fontSize = SvgAttributes.getNumberFromMarkup({
-          attributes: caption,
-          name: "font-size",
-        });
-      const right =
-        x +
-        getConservativeWidthFromText({
-          text: input.change.recordLabel,
-          fontSize,
-        });
-      const top = y - fontSize,
-        bottom = y + fontSize * 0.3;
+      const { x, right, top, bottom } = _getRecordCaptionBounds({
+        markup,
+        input,
+      });
       const latch = _markedShape({ markup, marker: "commit-latch" });
       const latchY = SvgAttributes.getNumberFromMarkup({
         attributes: latch,
@@ -212,13 +265,15 @@ test("the complete latch stroke and handle remain clear of the record caption th
           attributes: latch,
           name: "stroke-width",
         }) / 2;
-      assert.ok(
-        right < 98 ||
-          x > 862 ||
-          bottom < latchY - halfStroke ||
-          top > latchY + halfStroke,
-        `latch crosses caption at ${frame}`,
-      );
+      _assertLatchCaptionClearance({
+        right,
+        x,
+        bottom,
+        latchY,
+        halfStroke,
+        top,
+        frame,
+      });
       assert.ok(
         right < 463.5 ||
           x > 496.5 ||

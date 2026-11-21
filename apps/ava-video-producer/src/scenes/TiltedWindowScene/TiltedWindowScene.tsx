@@ -1,8 +1,8 @@
-import { SceneShell } from "../SceneShell";
-import { RacePair } from "./RacePair";
+import { SceneShell } from "../SceneShell/SceneShell";
+import { RacePair } from "./RacePair/RacePair";
 import { SingleWindow } from "./SingleWindow";
 import { WindowFootnote } from "./WindowFootnote";
-import { WindowHeadlines } from "./WindowHeadlines";
+import { WindowHeadlines } from "./WindowHeadlines/WindowHeadlines";
 import type { TiltedWindowSceneProps as Props } from "../scenes.types";
 import type { ReactNode } from "react";
 /**

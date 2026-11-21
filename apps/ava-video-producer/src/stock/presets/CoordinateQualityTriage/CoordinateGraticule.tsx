@@ -1,6 +1,6 @@
 import { Text } from "../../graphics-common/Text";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 /** Inclusive latitude and longitude ruler extents remain schematic. */

@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { type CursorMotion, CursorMotionHelpers } from "../CursorMotionHelpers";
 import { useVideoMotion } from "../videoTheme/useVideoMotion";
-import { useVideoProps } from "../videoTheme/useVideoTheme";
+import { useVideoProps } from "../videoTheme/videoThemeHelpers";
 /**
  * The surrounding theme's pointer motion: travel curve, press dip, and
  * trail. Pass it to a pointer helper that runs beside a drawn `Cursor`, for
@@ -10,7 +10,10 @@ import { useVideoProps } from "../videoTheme/useVideoTheme";
  */
 export function useCursorMotion(): CursorMotion {
   const motion = useVideoMotion();
-  const cursor = useVideoProps("Cursor", {});
+  const cursor = useVideoProps({
+    name: "Cursor",
+    props: {},
+  });
   return useMemo(() => {
     return CursorMotionHelpers.makeCursorMotionFromVideoMotionAndCursor({
       motion,

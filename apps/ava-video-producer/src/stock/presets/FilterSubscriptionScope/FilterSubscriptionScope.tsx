@@ -1,12 +1,13 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { SubscriptionSocket } from "./SubscriptionSocket";
-import { SubscriptionView } from "./SubscriptionView";
+import { SubscriptionSocket } from "./SubscriptionSocket/SubscriptionSocket";
+import { SubscriptionView } from "./SubscriptionView/SubscriptionView";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./FilterSubscriptionScope.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
+
 /** A shared category socket reaches only explicitly subscribed views. */
 export function FilterSubscriptionScope({
   frame,

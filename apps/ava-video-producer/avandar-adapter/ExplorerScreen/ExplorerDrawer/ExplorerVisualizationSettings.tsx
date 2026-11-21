@@ -1,6 +1,6 @@
 import { Stack, Text } from "@mantine/core";
 import { SeriesAwareVizForm } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm";
-import { aggregateColumns, barConfig } from "../explorerStage";
+import { aggregateColumns, barConfig } from "../ExplorerTimeline";
 import type { ExplorerDrawerProps } from "./ExplorerDrawer.types";
 import type { ReactNode } from "react";
 

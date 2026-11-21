@@ -1,10 +1,10 @@
 import { VideoThemeScope } from "../../videoTheme/VideoThemeScope/VideoThemeScope";
 import { FilmFrame } from "./FilmFrame";
 import { makeThemePatchesFromTheme } from "./makeThemePatchesFromTheme/makeThemePatchesFromTheme";
-import { type Props } from "./StoryFilmShared/StoryFilmShared.types";
+import { type Props as StoryFilmSharedProps } from "./StoryFilmShared/StoryFilmShared.types";
 import type { ReactNode } from "react";
 
-type StoryFilmPictureOptions = Props & { frame: number };
+type Props = StoryFilmSharedProps & { frame: number };
 /**
  * One frame of `StoryFilm`. The plan theme and each shot theme patch the
  * scene palette of the surrounding video theme (`classic` outside any
@@ -13,7 +13,7 @@ type StoryFilmPictureOptions = Props & { frame: number };
 export function StoryFilmPicture({
   plan,
   ...props
-}: StoryFilmPictureOptions): ReactNode {
+}: Readonly<Props>): ReactNode {
   return (
     <VideoThemeScope
       patches={makeThemePatchesFromTheme(plan.theme)}

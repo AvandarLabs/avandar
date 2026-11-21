@@ -4,6 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
+import { prop, propEq } from "@avandar/utils";
 import { ThemeStoreError } from "../ThemeStoreError";
 import { createThemeStore } from "./createThemeStore";
 
@@ -110,9 +111,7 @@ test("a theme with a broken reference is rejected with its token path", () => {
       return (
         error instanceof ThemeStoreError &&
         error.status === 400 &&
-        error.issues.some((issue) => {
-          return issue.path === "color.accent";
-        })
+        error.issues.some(propEq("path", "color.accent"))
       );
     });
   });
@@ -193,12 +192,7 @@ test("a hand-placed reserved draft theme file is neither listed nor read", () =>
       path.join(directory, "unsaved-draft.theme.json"),
       JSON.stringify({ ...WARM, id: "unsaved-draft" }),
     );
-    assert.deepEqual(
-      (await store.list()).map((summary) => {
-        return summary.id;
-      }),
-      ["classic"],
-    );
+    assert.deepEqual((await store.list()).map(prop("id")), ["classic"]);
     assert.equal(await _statusOf(store.read("unsaved-draft")), 404);
   });
 });
@@ -234,12 +228,7 @@ test("listing skips rejected files and keeps every valid theme", () => {
       path.join(directory, "bar.theme.json"),
       JSON.stringify({ ...WARM, id: "warm" }),
     );
-    assert.deepEqual(
-      (await store.list()).map((summary) => {
-        return summary.id;
-      }),
-      ["classic", "warm"],
-    );
+    assert.deepEqual((await store.list()).map(prop("id")), ["classic", "warm"]);
   });
 });
 

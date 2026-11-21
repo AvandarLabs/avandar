@@ -1,6 +1,7 @@
 import { useId } from "react";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { LayerDefinitions } from "./LayerDefinitions";
+import { LayerGeometryResultGeometry } from "./LayerGeometryResultGeometry/LayerGeometryResultGeometry";
 import { MapSheets } from "./MapSheets";
 import type { Input } from "./GisLayerIntersectionTally.schema";
 import type { ReactNode } from "react";
@@ -36,40 +37,15 @@ export function LayerGeometry({
   const isIntersection = input.operation === "intersection";
   return (
     <g>
-      <LayerDefinitions
-        identity={identity}
-        first={first}
-        second={second}
-        accent={accent}
+      <LayerDefinitions {...{ identity, first, second, accent }} />
+      <MapSheets {...{ input, first, second, registration, frame }} />
+      <LayerGeometryResultGeometry
+        {...{ input, motion, frame, identity, isIntersection, first }}
+        {...{ accent, scales, tokens, second }}
       />
-      <MapSheets
-        input={input}
-        first={first}
-        second={second}
-        registration={registration}
-        frame={frame}
-      />
-      <g
-        data-result-geometry={input.operation}
-        opacity={motion.reveal(frame, 72)}
-        clipPath={`url(#${identity}-a)`}
-      >
-        <g
-          clipPath={isIntersection ? `url(#${identity}-b)` : undefined}
-          mask={isIntersection ? undefined : `url(#${identity}-outside)`}
-        >
-          <path d={first} fill={`url(#${identity}-hatch)`} />
-          <g
-            data-result-boundary={input.operation}
-            fill="none"
-            stroke={accent}
-            strokeWidth={scales.stroke(tokens.stroke.heavy)}
-          >
-            <path d={first} />
-            <path d={second} />
-          </g>
-        </g>
-      </g>
     </g>
   );
 }
+
+/** The type of `_buildPath` used by LayerGeometry. */
+export type LayerGeometryBuildPathCallable = typeof _buildPath;

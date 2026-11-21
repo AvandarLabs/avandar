@@ -1,62 +1,20 @@
-import css from "../HelperDetail.module.css";
-import { SourceLink } from "./SourceLink";
-import { SourceList } from "./SourceList";
+import { DefaultsList } from "./DefaultsList/DefaultsList";
+import css from "./HelperReference.module.css";
+import { SourceList } from "./SourceList/SourceList";
+import { UsedByList } from "./UsedByList/UsedByList";
 import type { HelperEntry } from "../../helperCatalog.types";
 import type { ReactNode } from "react";
 
-/** The helper's named defaults, or a note that it has none. */
-function DefaultsList({ helper }: { helper: HelperEntry }) {
-  if (!helper.defaults.length) {
-    return (
-      <p className={css.muted}>
-        No defaults: the value is fixed or every argument is required.
-      </p>
-    );
-  }
-  return (
-    <dl className={css.defaults}>
-      {helper.defaults.map((item) => {
-        return (
-          <div key={item.name}>
-            <dt>{item.name}</dt>
-            <dd>
-              <code>{item.value}</code>
-            </dd>
-          </div>
-        );
-      })}
-    </dl>
-  );
-}
-
-/** Links to the files that import the helper, or a note that none do. */
-function UsedByList({ helper }: { helper: HelperEntry }) {
-  if (!helper.usedBy.length) {
-    return <p className={css.muted}>No scene imports it yet.</p>;
-  }
-  return (
-    <ul className={css.links}>
-      {helper.usedBy.map((path) => {
-        return (
-          <li key={path}>
-            <SourceLink path={path} />
-          </li>
-        );
-      })}
-    </ul>
-  );
-}
+type Props = {
+  helper: HelperEntry;
+};
 
 /** Exports, defaults, consumers and source of the selected helper. */
-export function HelperReference({
-  helper,
-}: {
-  helper: HelperEntry;
-}): ReactNode {
+export function HelperReference({ helper }: Readonly<Props>): ReactNode {
   return (
-    <aside className={css.reference}>
+    <aside className={css.helperReferenceReference}>
       <h3>Exports</h3>
-      <ul className={css.exports}>
+      <ul className={css.helperReferenceExports}>
         {helper.exports.map((name) => {
           return (
             <li key={name}>

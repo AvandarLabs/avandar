@@ -1,15 +1,14 @@
 import { TextInput } from "@mantine/core";
 import { useRowHasIssue } from "../../RowIssueContext/RowIssueContext";
-import {
-  formatDashPattern,
-  parseDashDraft,
-} from "../controlValueHelpers/controlValueHelpers";
+import { ControlValues } from "../ControlValues/ControlValues";
 import { useDraftValue } from "../useDraftValue";
 import { DashPresets } from "./DashPresets";
 import { DashPreview } from "./DashPreview/DashPreview";
 import css from "./DashValueControl.module.css";
 import type { ValueControlProps } from "../valueControl.types";
 import type { ReactNode } from "react";
+
+type Props = ValueControlProps;
 
 /**
  * A dash pattern: presets plus exact dash and gap lengths, previewed as a line.
@@ -18,7 +17,7 @@ export function DashValueControl({
   label,
   value,
   onChange,
-}: ValueControlProps): ReactNode {
+}: Readonly<Props>): ReactNode {
   const hasIssue = useRowHasIssue();
   const pattern: readonly number[] =
     Array.isArray(value) &&
@@ -29,13 +28,13 @@ export function DashValueControl({
       : [];
   const field = useDraftValue<readonly number[], string>({
     value: pattern,
-    toKey: formatDashPattern,
-    toDraft: formatDashPattern,
-    parse: parseDashDraft,
+    toKey: ControlValues.formatDashPattern,
+    toDraft: ControlValues.formatDashPattern,
+    parse: ControlValues.parseDashDraft,
     onChange,
   });
   return (
-    <div className={css.dashValueStack} role="group" aria-label={label}>
+    <div className={css.dashValueControlStack} role="group" aria-label={label}>
       <DashPresets pattern={pattern} onChange={onChange} />
       <TextInput
         size="xs"

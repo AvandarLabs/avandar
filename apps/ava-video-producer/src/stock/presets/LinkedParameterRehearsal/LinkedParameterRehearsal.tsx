@@ -1,29 +1,43 @@
-import { ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { normalizeFiniteRange } from "../../numeric/normalizeFiniteRange/normalizeFiniteRange";
-import { FitText } from "../../primitives/FitText/FitText";
-import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getRehearsalStateFromInputAndFrame } from "./getRehearsalStateFromInputAndFrame";
-import { RehearsalOutput } from "./RehearsalOutput";
-import { RehearsalRuler } from "./RehearsalRuler";
+import { RehearsalContext } from "./RehearsalContext";
+import { RehearsalOutputs } from "./RehearsalOutputs";
+import { SourceRulerAndBaseline } from "./SourceRulerAndBaseline";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./LinkedParameterRehearsal.schema";
 import type { ReactNode } from "react";
 
-type Props = GraphicProps & { input: Input };
+type Props = GraphicProps & {
+  input: Input;
+};
+
+type ValueOptions = {
+  frame: Readonly<Props>["frame"];
+  input: Readonly<Props>["input"];
+  motion: ReturnType<typeof GraphicThemeHooks.useGraphicMotion>;
+};
+
+type ValueResult = {
+  value: ReturnType<typeof getRehearsalStateFromInputAndFrame>["value"];
+  label: ReturnType<typeof getRehearsalStateFromInputAndFrame>["label"];
+  sourceX: number;
+  baselineX: number;
+};
+
 /** Frames the source lane takes to fade in. */
 const INTRO_FRAMES = 20;
+
 /**
- * Direct dependent pointers rehearse a source change and restore its
- * baseline.
+ * Samples the linked parameter rehearsal value state for the current authored
+ * frame.
  */
-export function LinkedParameterRehearsal({
+function _getLinkedParameterRehearsalValueState({
   frame,
   input,
-  accent,
-}: Readonly<Props>): ReactNode {
-  const tokens = GraphicThemeHooks.useGraphicTokens();
-  const motion = GraphicThemeHooks.useGraphicMotion();
+  motion,
+}: Readonly<ValueOptions>): ValueResult {
   const { value, label } = getRehearsalStateFromInputAndFrame({
     frame,
     input,
@@ -45,55 +59,43 @@ export function LinkedParameterRehearsal({
         min: input.source.min,
         max: input.source.max,
       });
+  return { value, label, sourceX, baselineX };
+}
+
+/**
+ * Direct dependent pointers rehearse a source change and restore its baseline.
+ */
+export function LinkedParameterRehearsal({
+  frame,
+  input,
+  accent,
+}: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const { value, label, sourceX, baselineX } =
+    _getLinkedParameterRehearsalValueState({ frame, input, motion });
+  const drawing = {
+    input,
+    accent,
+    tokens,
+    label,
+    value,
+    baselineX,
+    frame,
+    sourceX,
+  };
   return (
     <g>
       <g
-        opacity={ramp(
+        opacity={Motion.ramp({
           frame,
-          12,
-          motion.scale(INTRO_FRAMES),
-          motion.reveal.easing,
-        )}
+          at: 12,
+          dur: motion.scale(INTRO_FRAMES),
+          easing: motion.reveal.easing,
+        })}
       >
-        <FitText
-          text={input.contextLabel}
-          x={64}
-          y={48}
-          width={832}
-          fontSize={14}
-          maxLines={2}
-          breakLongWords
-          normalizeWhitespace
-          color={tokens.color.textMuted}
-        />
-        <FitText
-          text={label}
-          x={64}
-          y={102}
-          width={832}
-          fontSize={18}
-          maxLines={2}
-          breakLongWords
-          normalizeWhitespace
-          color={accent}
-        />
-        <RehearsalRuler
-          label={input.source.label}
-          unit={input.source.unit}
-          min={input.source.min}
-          max={input.source.max}
-          value={value}
-          y={170}
-        />
-        {input.showBaselineMarkers ? (
-          <SketchedShape
-            shape={{ kind: "circle", cx: baselineX, cy: 170, r: 10 }}
-            profile={tokens.sketch.shape}
-            fill="none"
-            stroke={accent}
-            strokeOpacity={tokens.alpha.guide}
-          />
-        ) : undefined}
+        <RehearsalContext {...drawing} />
+        <SourceRulerAndBaseline {...drawing} />
         <circle
           data-source-pointer="true"
           data-value={value}
@@ -103,22 +105,7 @@ export function LinkedParameterRehearsal({
           fill={accent}
         />
       </g>
-      {input.outputs.map((output, index) => {
-        return (
-          <RehearsalOutput
-            key={output.id}
-            output={output}
-            source={input.source}
-            value={value}
-            index={index}
-            frame={frame}
-            accent={accent}
-            sourceX={sourceX}
-            showRules={input.showRules}
-            showBaselineMarkers={input.showBaselineMarkers}
-          />
-        );
-      })}
+      <RehearsalOutputs {...drawing} />
     </g>
   );
 }

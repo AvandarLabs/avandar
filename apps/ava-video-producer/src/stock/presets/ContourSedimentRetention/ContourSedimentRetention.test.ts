@@ -63,6 +63,78 @@ import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/reg
 import { contourSedimentRetentionContract } from "./ContourSedimentRetention.contract";
 import { inputSchema, type Input } from "./ContourSedimentRetention.schema";
 
+function _assertRetainedMaterialEndpoint(
+  retained: ReturnType<typeof SvgAttributes.fromMarker>,
+): void {
+  assert.equal(
+    SvgAttributes.getNumberFromMarkup({ attributes: retained, name: "x" }) +
+      SvgAttributes.getNumberFromMarkup({
+        attributes: retained,
+        name: "width",
+      }),
+    510,
+  );
+}
+
+function _assertSedimentFractionBalance({
+  retained,
+  exported,
+}: Readonly<{
+  retained: ReturnType<typeof SvgAttributes.fromMarker>;
+  exported: ReturnType<typeof SvgAttributes.fromMarker>;
+}>): void {
+  assert.ok(
+    Math.abs(
+      SvgAttributes.getNumberFromMarkup({
+        attributes: retained,
+        name: "width",
+      }) /
+        160 +
+        SvgAttributes.getNumberFromMarkup({
+          attributes: exported,
+          name: "width",
+        }) /
+          130 -
+        1,
+    ) < 1e-12,
+  );
+}
+
+function _assertRibbonTreatmentClearance({
+  left,
+  width,
+  treatment,
+  top,
+  frame,
+}: Readonly<{
+  left: ReturnType<typeof SvgAttributes.getNumberFromMarkup>;
+  width: ReturnType<typeof SvgAttributes.getNumberFromMarkup>;
+  treatment: ReturnType<typeof SvgAttributes.fromMarker>;
+  top: ReturnType<typeof SvgAttributes.getNumberFromMarkup>;
+  frame: number[][number];
+}>): void {
+  assert.ok(
+    left + width <=
+      SvgAttributes.getNumberFromMarkup({
+        attributes: treatment,
+        name: "x",
+      }) ||
+      left >=
+        SvgAttributes.getNumberFromMarkup({
+          attributes: treatment,
+          name: "x",
+        }) +
+          24 ||
+      top >=
+        SvgAttributes.getNumberFromMarkup({
+          attributes: treatment,
+          name: "y",
+        }) +
+          65,
+    `ribbon intersects treatment at ${frame}`,
+  );
+}
+
 function _getVisibleTexts({
   input,
   frame,
@@ -157,33 +229,15 @@ test("settled retained material stays upstream while export remains past the bou
       markup,
       marker: "exported-ribbon",
     });
-    assert.equal(
-      SvgAttributes.getNumberFromMarkup({ attributes: retained, name: "x" }) +
-        SvgAttributes.getNumberFromMarkup({
-          attributes: retained,
-          name: "width",
-        }),
-      510,
-    );
+    _assertRetainedMaterialEndpoint(retained);
     assert.ok(
       SvgAttributes.getNumberFromMarkup({ attributes: exported, name: "x" }) >
         750,
     );
-    assert.ok(
-      Math.abs(
-        SvgAttributes.getNumberFromMarkup({
-          attributes: retained,
-          name: "width",
-        }) /
-          160 +
-          SvgAttributes.getNumberFromMarkup({
-            attributes: exported,
-            name: "width",
-          }) /
-            130 -
-          1,
-      ) < 1e-12,
-    );
+    _assertSedimentFractionBalance({
+      retained,
+      exported,
+    });
     assert.equal(markup.includes("data-export-tray="), input.showExportTray);
     assert.ok(
       markup.includes(
@@ -258,26 +312,13 @@ test("the entire exported ribbon clears the placed treatment while retained mate
         attributes: ribbon,
         name: "y",
       });
-      assert.ok(
-        left + width <=
-          SvgAttributes.getNumberFromMarkup({
-            attributes: treatment,
-            name: "x",
-          }) ||
-          left >=
-            SvgAttributes.getNumberFromMarkup({
-              attributes: treatment,
-              name: "x",
-            }) +
-              24 ||
-          top >=
-            SvgAttributes.getNumberFromMarkup({
-              attributes: treatment,
-              name: "y",
-            }) +
-              65,
-        `ribbon intersects treatment at ${frame}`,
-      );
+      _assertRibbonTreatmentClearance({
+        left,
+        width,
+        treatment,
+        top,
+        frame,
+      });
     });
   });
 });

@@ -1,4 +1,4 @@
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 /** The cue the first shared copy starts to cross on. */
 const FIRST_CROSSING_CUE = 36;
 /** Frames between neighbouring shared copies starting to cross. */
@@ -12,10 +12,10 @@ const CROSSING_FRAMES = 24;
 export function getCrossingFromShareIndex({
   shareIndex,
   motion,
-}: Readonly<{ shareIndex: number; motion: VideoMotion }>): Readonly<{
+}: Readonly<{ shareIndex: number; motion: VideoMotion }>): {
   at: number;
   duration: number;
-}> {
+} {
   return {
     at:
       FIRST_CROSSING_CUE +

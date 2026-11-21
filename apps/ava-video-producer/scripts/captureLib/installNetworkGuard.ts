@@ -1,18 +1,12 @@
-import {
-  getRequestDecisionFromRequest,
-  makeSourceUrlFromUrl,
-} from "./urlSafetyHelpers";
+import { CaptureUrlSafety } from "./CaptureUrlSafety/CaptureUrlSafety";
 import type { BrowserContext } from "@playwright/test";
-
 /** A request the capture network guard blocked or suppressed. */
 export type NetworkGuardEvent = {
   sourceUrl: string;
   method: string;
   reason: string;
 };
-
 type NetworkGuardListener = (event: NetworkGuardEvent) => Promise<void>;
-
 async function _guardRequests({
   context,
   onBlocked,
@@ -24,7 +18,7 @@ async function _guardRequests({
 }>): Promise<void> {
   await context.route("**/*", async (route) => {
     const request = route.request();
-    const decision = getRequestDecisionFromRequest({
+    const decision = CaptureUrlSafety.getRequestDecisionFromRequest({
       url: request.url(),
       method: request.method(),
       resourceType: request.resourceType(),
@@ -33,7 +27,7 @@ async function _guardRequests({
       return route.continue();
     }
     const event = {
-      sourceUrl: makeSourceUrlFromUrl(request.url()),
+      sourceUrl: CaptureUrlSafety.makeSourceUrlFromUrl(request.url()),
       method: request.method(),
       reason: decision.reason,
     };
@@ -58,16 +52,18 @@ async function _guardRequests({
     return undefined;
   });
 }
-
-async function _guardWebSockets(
-  context: BrowserContext,
-  onBlocked: NetworkGuardListener,
-): Promise<void> {
+async function _guardWebSockets({
+  context,
+  onBlocked,
+}: Readonly<{
+  context: BrowserContext;
+  onBlocked: NetworkGuardListener;
+}>): Promise<void> {
   if (typeof context.routeWebSocket !== "function") {
     throw new Error("Capture requires Playwright WebSocket routing support");
   }
   await context.routeWebSocket("**/*", async (route) => {
-    const decision = getRequestDecisionFromRequest({
+    const decision = CaptureUrlSafety.getRequestDecisionFromRequest({
       url: route.url(),
       method: "GET",
       resourceType: "websocket",
@@ -78,7 +74,7 @@ async function _guardWebSockets(
     }
     try {
       await onBlocked({
-        sourceUrl: makeSourceUrlFromUrl(route.url()),
+        sourceUrl: CaptureUrlSafety.makeSourceUrlFromUrl(route.url()),
         method: "WEBSOCKET",
         reason: decision.reason,
       });
@@ -87,7 +83,6 @@ async function _guardWebSockets(
     }
   });
 }
-
 /**
  * Routes every request and WebSocket of a Playwright context through the
  * capture network policy, reporting each denial to the given listeners.
@@ -103,5 +98,8 @@ export async function installNetworkGuard({
   onSuppressed?: NetworkGuardListener;
 }>): Promise<void> {
   await _guardRequests({ context, onBlocked, onSuppressed });
-  await _guardWebSockets(context, onBlocked);
+  await _guardWebSockets({
+    context,
+    onBlocked,
+  });
 }

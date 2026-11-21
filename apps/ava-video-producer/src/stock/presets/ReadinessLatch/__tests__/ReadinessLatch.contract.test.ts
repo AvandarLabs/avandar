@@ -5,6 +5,8 @@ import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
 import { readinessLatchContract } from "../ReadinessLatch.contract";
 import { DEFAULT_INPUT, fixtures } from "../ReadinessLatch.fixtures";
 import { inputSchema, type Input } from "../ReadinessLatch.schema";
+import { assertFullLabeledResultStaysOrientation as _assertFullLabeledResultStaysOrientation } from "./assertFullLabeledResultStaysOrientation";
+import { assertWorkQuantitiesCompleteOutInput as _assertWorkQuantitiesCompleteOutInput } from "./assertWorkQuantitiesCompleteOutInput";
 import {
   _render,
   _getVisibleTextsFromInput,
@@ -44,10 +46,7 @@ registerStockPresetAssertions({
     {
       ...DEFAULT_INPUT,
       participants: DEFAULT_INPUT.participants.map((participant) => {
-        return {
-          ...participant,
-          workUnits: 0,
-        };
+        return { ...participant, workUnits: 0 };
       }),
     },
     {
@@ -107,31 +106,7 @@ test("work quantities complete out of array order before the common release at 1
     }),
     692,
   );
-  assert.equal(
-    SvgAttributes.getNumberFromMarkup({
-      attributes: _getAttributesFromMarkup({
-        markup: _render({ frame: 50, input }),
-        id: "slow",
-        kind: "pin",
-      }),
-      name: "x1",
-    }),
-    640,
-  );
-  assert.equal(
-    SvgAttributes.getNumberFromMarkup({
-      attributes: _getAttributesFromMarkup({
-        markup: _render({ frame: 112, input }),
-        id: "slow",
-        kind: "ribbon",
-      }),
-      name: "width",
-    }),
-    350,
-  );
-  assert.ok(
-    _getResultBoundsFromMarkup(_render({ frame: 122, input })).right < 650,
-  );
+  _assertWorkQuantitiesCompleteOutInput(input);
   assert.ok(
     _getResultBoundsFromMarkup(_render({ frame: 146, input })).left > 650,
   );
@@ -228,72 +203,6 @@ test("completed work ribbons physically reach the shared latch in both orientati
 
 test("the full labeled result stays upstream until a visible opening clears its path", () => {
   (["horizontal", "vertical"] as const).forEach((orientation) => {
-    const input = { ...DEFAULT_INPUT, orientation };
-    [24, 112, 120, 122, 130].forEach((frame) => {
-      const bounds = _getResultBoundsFromMarkup(_render({ frame, input }));
-      assert.ok(
-        orientation === "horizontal" ? bounds.right < 650 : bounds.bottom < 400,
-      );
-    });
-    const released = _getResultBoundsFromMarkup(_render({ frame: 146, input }));
-    assert.ok(
-      orientation === "horizontal" ? released.left > 650 : released.top > 400,
-    );
-    const moving = _getResultBoundsFromMarkup(_render({ frame: 138, input }));
-    assert.ok(
-      orientation === "horizontal"
-        ? moving.left < 650 && moving.right > 650
-        : moving.top < 400 && moving.bottom > 400,
-    );
-    const markup = _render({ frame: 130, input });
-    const before = _getAttributesFromMarkup({
-      markup,
-      id: "before",
-      kind: "gate",
-    });
-    const after = _getAttributesFromMarkup({
-      markup,
-      id: "after",
-      kind: "gate",
-    });
-    const clearFrom = SvgAttributes.getNumberFromMarkup({
-      attributes: before,
-      name: orientation === "horizontal" ? "y2" : "x2",
-    });
-    const clearTo = SvgAttributes.getNumberFromMarkup({
-      attributes: after,
-      name: orientation === "horizontal" ? "y1" : "x1",
-    });
-    assert.ok(
-      orientation === "horizontal"
-        ? clearFrom + 2.5 < moving.top && clearTo - 2.5 > moving.bottom
-        : clearFrom + 2.5 < moving.left && clearTo - 2.5 > moving.right,
-    );
-    [36, 130, 138, 146].forEach((frame) => {
-      const sample = _render({ frame, input });
-      const bounds = _getResultBoundsFromMarkup(sample);
-      const label = sample.match(
-        new RegExp(`<text aria-label="${input.sharedAction}"[^>]*>`),
-      );
-      assert.ok(label);
-      assert.ok(
-        SvgAttributes.getNumberFromMarkup({
-          attributes: label[0],
-          name: "x",
-        }) >= bounds.left,
-      );
-      assert.ok(
-        SvgAttributes.getNumberFromMarkup({ attributes: label[0], name: "x" }) <
-          bounds.right,
-      );
-      assert.ok(
-        SvgAttributes.getNumberFromMarkup({ attributes: label[0], name: "y" }) >
-          bounds.top,
-      );
-      assert.ok(
-        SvgAttributes.getNumberFromMarkup({ attributes: label[0], name: "y" }) <
-          bounds.bottom,
-      );
-    });
+    return _assertFullLabeledResultStaysOrientation(orientation);
   });
 });

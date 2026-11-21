@@ -10,7 +10,7 @@ import {
   invalidInputs,
 } from "./ParcelSetbackInset.fixtures";
 
-test("Inset every rectangular side by the supplied clearance. Default envelopes are 27 by 52 units. Reject a structure footprint extending beyond its chosen envelope; exhausted unchosen envelopes remain empty, never negative.", () => {
+test("default parcel hold frame reports a 27 by 52 envelope", () => {
   const markup = _render({ frame: 150 });
   assert.match(markup, /data-envelope-width="27" data-envelope-height="52"/);
 });

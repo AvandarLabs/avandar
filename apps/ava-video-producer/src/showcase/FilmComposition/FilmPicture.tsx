@@ -1,93 +1,37 @@
-import {
-  AbsoluteFill,
-  Audio,
-  Sequence,
-  staticFile,
-  useCurrentFrame,
-} from "remotion";
-import { AvandarScene } from "../../avandar/AvandarScene/AvandarScene";
-import { MotionLab } from "../../compositions/MotionLab/MotionLab";
+import { useCurrentFrame } from "remotion";
+import { match } from "ts-pattern";
 import { TitleStudy } from "../../compositions/TitleStudy";
 import { StockGraphic } from "../../stock/StockGraphic/StockGraphic";
-import { absoluteCues } from "../../storyboard/schema/schema";
-import { StoryFilm } from "../../storyboard/StoryFilm/StoryFilm";
-import { TitleCard, TITLE_LEN } from "../../TitleCard/TitleCard";
+import { MotionLabPicture } from "./MotionLabPicture";
+import { StoryboardFilmPicture } from "./StoryboardFilmPicture";
 import type { Film } from "../showcase.types";
 import type { ReactNode } from "react";
 
 type Props = Readonly<{ film: Film; withAudio?: boolean }>;
-/** The film's picture, drawn inside its theme by `FilmComposition`. */
+/** The film's picture, drawn inside its theme by FilmComposition. */
 export function FilmPicture({ film, withAudio = true }: Props): ReactNode {
   const frame = useCurrentFrame();
-  if (film.kind === "stock" && film.preset) {
-    return (
-      <StockGraphic
-        {...film}
-        frame={frame}
-        width={film.width}
-        height={film.height}
-      />
-    );
-  }
-  if (film.kind === "title-study") {
-    return <TitleStudy />;
-  }
-  if (film.kind === "motion-lab") {
-    return (
-      <AbsoluteFill style={{ background: "var(--ground)" }}>
-        {frame < TITLE_LEN ? (
-          <TitleCard
-            name="Motion vocabulary"
-            kicker="Four building blocks, one visual language"
-            frame={frame}
-          />
-        ) : null}
-        <Sequence from={TITLE_LEN}>
-          <MotionLab />
-        </Sequence>
-      </AbsoluteFill>
-    );
-  }
-  if (!film.plan) {
-    throw new Error("Storyboard film requires a plan");
-  }
-  return (
-    <>
-      <StoryFilm
-        plan={film.plan}
-        productScene={AvandarScene}
-        showCaptions={film.showCaptions}
-      />
-      {withAudio
-        ? absoluteCues(film.plan).map((cue) => {
-            return cue.audio ? (
-              <Sequence
-                key={cue.id}
-                from={cue.startFrame}
-                durationInFrames={cue.endFrame - cue.startFrame}
-              >
-                <Audio src={staticFile(cue.audio)} />
-              </Sequence>
-            ) : null;
-          })
-        : null}
-      {withAudio && film.plan.narrationTrack ? (
-        <Sequence from={film.plan.narrationTrack.startFrame}>
-          <Audio
-            src={staticFile(film.plan.narrationTrack.src)}
-            volume={film.plan.narrationTrack.volume}
-          />
-        </Sequence>
-      ) : null}
-      {withAudio
-        ? film.plan.soundEffects.map((sound) => {
-            return (
-              <Sequence key={sound.id} from={sound.atFrame}>
-                <Audio src={staticFile(sound.src)} volume={sound.volume} />
-              </Sequence>
-            );
-          })
-        : null}
-    </>
-  );
+  return match(film)
+    .with({ kind: "stock" }, (matchedFilm) => {
+      return matchedFilm.preset ? (
+        <StockGraphic
+          {...matchedFilm}
+          frame={frame}
+          width={matchedFilm.width}
+          height={matchedFilm.height}
+        />
+      ) : (
+        <StoryboardFilmPicture film={matchedFilm} withAudio={withAudio} />
+      );
+    })
+    .with({ kind: "title-study" }, () => {
+      return <TitleStudy />;
+    })
+    .with({ kind: "motion-lab" }, () => {
+      return <MotionLabPicture frame={frame} />;
+    })
+    .with({ kind: "storyboard" }, { kind: "helper" }, (matchedFilm) => {
+      return <StoryboardFilmPicture film={matchedFilm} withAudio={withAudio} />;
+    })
+    .exhaustive();
 }

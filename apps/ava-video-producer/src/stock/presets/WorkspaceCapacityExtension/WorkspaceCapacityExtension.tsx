@@ -1,13 +1,15 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CapacityTray } from "./CapacityTray";
-import { PendingResources } from "./PendingResources";
+import { PendingResources } from "./PendingResources/PendingResources";
 import { ResourceTab } from "./ResourceTab";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./WorkspaceCapacityExtension.schema";
 import type { ReactNode } from "react";
+
 /** Authored resource collections, allowances and explicit choice. */
 export type Props = GraphicProps & { input: Input };
+
 /** Expand the same workspace only after an authored capacity choice. */
 export function WorkspaceCapacityExtension({
   input,

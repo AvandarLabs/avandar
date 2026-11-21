@@ -32,6 +32,39 @@ function _render({
     ),
   );
 }
+/** Identifiers and source paths serialized by the public semantic contract. */
+const SERIALIZED_SEMANTIC_RULES = [
+  {
+    id: "unique-cells",
+    paths: ["cells.*.id"],
+  },
+  {
+    id: "unique-points",
+    paths: ["fieldChecks.*.id"],
+  },
+  {
+    id: "rectangle",
+    paths: ["cells.*.row", "cells.*.column"],
+  },
+  {
+    id: "metric-range",
+    paths: ["metric.minimum", "metric.maximum"],
+  },
+  {
+    id: "readings",
+    paths: ["cells.*.value", "metric"],
+  },
+  {
+    id: "point-reference-range",
+    paths: [
+      "fieldChecks.*.cellId",
+      "fieldChecks.*.value",
+      "cells.*.id",
+      "metric",
+    ],
+  },
+] as const;
+
 test("point observations retain missing-cell hatches and do not increase observed area", () => {
   const before = _render({ frame: 150, input: DEFAULT_INPUT }),
     after = _render({ frame: 150, input: changedInput });
@@ -75,6 +108,97 @@ import {
   SEMANTIC_RULES,
 } from "./EnvironmentalObservationGaps.schema";
 import type { Input } from "./EnvironmentalObservationGaps.schema";
+
+function _makeCheckLayouts(): { layouts: Input[] } {
+  const layouts = [
+    fixtures[2].input,
+    fixtures.find(propEq("id", "separated-checks"))!.input,
+    {
+      ...fixtures[2].input,
+      fieldChecks: fixtures[2].input.fieldChecks.map((check, index) => {
+        return {
+          ...check,
+          cellId: fixtures[2].input.cells[index].id,
+        };
+      }),
+    },
+  ];
+  return { layouts };
+}
+
+type AssertConcentratedChecksStayDistinctAndDataPointCheckOptions = Readonly<{
+  markup: ReturnType<typeof _render>;
+  x: ReturnType<typeof SvgAttributes.getNumberFromMarkup>;
+  y: ReturnType<typeof SvgAttributes.getNumberFromMarkup>;
+  handX: ReturnType<typeof SvgAttributes.getNumberFromMarkup>;
+  hand: ReturnType<typeof SvgAttributes.fromMarker>;
+}>;
+
+function _assertConcentratedChecksStayDistinctAndCxCxCyCy(
+  points: RegExpMatchArray[],
+): void {
+  points.forEach((point, index) => {
+    return points.slice(index + 1).forEach((other) => {
+      return assert.ok(
+        Math.hypot(
+          SvgAttributes.getNumberFromMarkup({
+            attributes: point[0],
+            name: "cx",
+          }) -
+            SvgAttributes.getNumberFromMarkup({
+              attributes: other[0],
+              name: "cx",
+            }),
+          SvgAttributes.getNumberFromMarkup({
+            attributes: point[0],
+            name: "cy",
+          }) -
+            SvgAttributes.getNumberFromMarkup({
+              attributes: other[0],
+              name: "cy",
+            }),
+        ) >= 36,
+      );
+    });
+  });
+}
+
+function _assertConcentratedChecksStayDistinctAndDataPointCheck({
+  markup,
+  x,
+  y,
+  handX,
+  hand,
+}: AssertConcentratedChecksStayDistinctAndDataPointCheckOptions): void {
+  Array.from(
+    markup.matchAll(/<circle[^>]*data-point-check="([^"]*)"[^>]*>/g),
+  ).forEach((match) => {
+    const pointX = SvgAttributes.getNumberFromMarkup({
+        attributes: match[0],
+        name: "cx",
+      }),
+      pointY = SvgAttributes.getNumberFromMarkup({
+        attributes: match[0],
+        name: "cy",
+      });
+    assert.ok(
+      x + 5 < pointX - 5.5 ||
+        x - 5 > pointX + 5.5 ||
+        y + 9 < pointY - 5.5 ||
+        y - 8 > pointY + 5.5,
+      "full team body clears retained point",
+    );
+    if (Math.abs(pointX - handX) < 1e-9) {
+      assert.equal(
+        pointY,
+        SvgAttributes.getNumberFromMarkup({
+          attributes: hand,
+          name: "cy",
+        }),
+      );
+    }
+  });
+}
 
 function _getVisibleTexts({ input }: Readonly<{ input: Input }>): string[] {
   return [
@@ -130,37 +254,7 @@ test("serialized semantic rules retain every runtime relation", () => {
         return { id, paths };
       },
     ),
-    [
-      {
-        id: "unique-cells",
-        paths: ["cells.*.id"],
-      },
-      {
-        id: "unique-points",
-        paths: ["fieldChecks.*.id"],
-      },
-      {
-        id: "rectangle",
-        paths: ["cells.*.row", "cells.*.column"],
-      },
-      {
-        id: "metric-range",
-        paths: ["metric.minimum", "metric.maximum"],
-      },
-      {
-        id: "readings",
-        paths: ["cells.*.value", "metric"],
-      },
-      {
-        id: "point-reference-range",
-        paths: [
-          "fieldChecks.*.cellId",
-          "fieldChecks.*.value",
-          "cells.*.id",
-          "metric",
-        ],
-      },
-    ],
+    SERIALIZED_SEMANTIC_RULES,
   );
   assert.ok(
     SEMANTIC_RULES.every((rule) => {
@@ -206,19 +300,7 @@ test("offset rectangles retain all cells and point references including empty ID
   );
 });
 test("concentrated checks stay distinct and the team clears all previously placed supports", () => {
-  const layouts = [
-    fixtures[2].input,
-    fixtures.find(propEq("id", "separated-checks"))!.input,
-    {
-      ...fixtures[2].input,
-      fieldChecks: fixtures[2].input.fieldChecks.map((check, index) => {
-        return {
-          ...check,
-          cellId: fixtures[2].input.cells[index].id,
-        };
-      }),
-    },
-  ];
+  const { layouts } = _makeCheckLayouts();
   layouts.forEach((input) => {
     Array.from({ length: 105 }, (_, index) => {
       return 54 + index / 2;
@@ -242,33 +324,12 @@ test("concentrated checks stay distinct and the team clears all previously place
           attributes: hand,
           name: "cx",
         });
-      Array.from(
-        markup.matchAll(/<circle[^>]*data-point-check="([^"]*)"[^>]*>/g),
-      ).forEach((match) => {
-        const pointX = SvgAttributes.getNumberFromMarkup({
-            attributes: match[0],
-            name: "cx",
-          }),
-          pointY = SvgAttributes.getNumberFromMarkup({
-            attributes: match[0],
-            name: "cy",
-          });
-        assert.ok(
-          x + 5 < pointX - 5.5 ||
-            x - 5 > pointX + 5.5 ||
-            y + 9 < pointY - 5.5 ||
-            y - 8 > pointY + 5.5,
-          "full team body clears retained point",
-        );
-        if (Math.abs(pointX - handX) < 1e-9) {
-          assert.equal(
-            pointY,
-            SvgAttributes.getNumberFromMarkup({
-              attributes: hand,
-              name: "cy",
-            }),
-          );
-        }
+      _assertConcentratedChecksStayDistinctAndDataPointCheck({
+        markup,
+        x,
+        y,
+        handX,
+        hand,
       });
     });
     const points = Array.from(
@@ -276,30 +337,7 @@ test("concentrated checks stay distinct and the team clears all previously place
         /<circle[^>]*data-point-check="([^"]*)"[^>]*>/g,
       ),
     );
-    points.forEach((point, index) => {
-      return points.slice(index + 1).forEach((other) => {
-        return assert.ok(
-          Math.hypot(
-            SvgAttributes.getNumberFromMarkup({
-              attributes: point[0],
-              name: "cx",
-            }) -
-              SvgAttributes.getNumberFromMarkup({
-                attributes: other[0],
-                name: "cx",
-              }),
-            SvgAttributes.getNumberFromMarkup({
-              attributes: point[0],
-              name: "cy",
-            }) -
-              SvgAttributes.getNumberFromMarkup({
-                attributes: other[0],
-                name: "cy",
-              }),
-          ) >= 36,
-        );
-      });
-    });
+    _assertConcentratedChecksStayDistinctAndCxCxCyCy(points);
   });
 });
 test("an extreme finite metric yields finite readings without inventing coverage", () => {

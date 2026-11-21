@@ -1,8 +1,8 @@
 import { CompositionActions } from "../CompositionActions/CompositionActions";
 import { CompositionControls } from "../CompositionControls/CompositionControls";
-import type { ExportTheme } from "../../../../videoThemeEditor/themeDraft/themeDraft";
-import type { useCompositionAppearance } from "../useCompositionAppearance";
-import type { useCompositionTheme } from "../useCompositionTheme";
+import type { ExportTheme } from "../../../../videoThemeEditor/ThemeDrafts/ThemeDrafts";
+import type { useCompositionAppearance } from "../useCompositionAppearance/useCompositionAppearance";
+import type { useCompositionTheme } from "../useCompositionTheme/useCompositionTheme";
 import type { ReactNode } from "react";
 
 type Props = Readonly<{

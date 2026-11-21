@@ -1,5 +1,5 @@
 import { DestinationTray } from "./DestinationTray";
-import { ReportHeader } from "./ReportHeader";
+import { ReportHeader } from "./ReportHeader/ReportHeader";
 import { ReportPage } from "./ReportPage/ReportPage";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ReportPageBind.schema";

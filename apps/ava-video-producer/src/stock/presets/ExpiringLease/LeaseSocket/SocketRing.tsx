@@ -1,13 +1,12 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { LeaseSocketShared } from "./LeaseSocketShared/LeaseSocketShared";
+import { LeaseSocketShared } from "./LeaseSocketShared";
 import type { ReactNode } from "react";
+
+type Props = { x: number; y: number; opening: number };
+
 /** The socket's ring, its outline opening by `opening` at expiry. */
-export function SocketRing({
-  x,
-  y,
-  opening,
-}: Readonly<{ x: number; y: number; opening: number }>): ReactNode {
+export function SocketRing({ x, y, opening }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (

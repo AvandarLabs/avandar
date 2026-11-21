@@ -1,14 +1,16 @@
 import { StageTheme } from "../../scenes/StageTheme/StageTheme";
 import { useVideoShapeScales } from "../../videoTheme/useVideoShapeScales";
-import { useVideoTheme, useVideoTokens } from "../../videoTheme/useVideoTheme";
+import {
+  useVideoTheme,
+  useVideoTokens,
+} from "../../videoTheme/videoThemeHelpers";
 import { AppFrameShared } from "./AppFrameShared/AppFrameShared";
 import type { CSSProperties, ReactNode } from "react";
+
+type Props = { w: number; title: string; rule: string };
+
 /** The window title bar: three dots and the window title. */
-export function AppTitleBar({
-  w,
-  title,
-  rule,
-}: Readonly<{ w: number; title: string; rule: string }>): ReactNode {
+export function AppTitleBar({ w, title, rule }: Readonly<Props>): ReactNode {
   const tokens = useVideoTokens();
   const { spacing } = useVideoTheme().mantine;
   const scales = useVideoShapeScales();

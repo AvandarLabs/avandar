@@ -1,13 +1,19 @@
-import { mix } from "../../../../motion";
+import { propEq } from "@avandar/utils";
+import { Motion } from "../../../../motion";
 import { FitText } from "../../../primitives/FitText/FitText";
 import { PersonGlyph } from "../../../primitives/PersonGlyph/PersonGlyph";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { TrayCompartment } from "../TrayCompartment";
+import { TrayCompartment } from "../TrayCompartment/TrayCompartment";
 import { LearnerLabel } from "./LearnerLabel";
 import type { Input } from "../SchoolLunchTrayComposition.schema";
 import type { ReactNode } from "react";
 
-type Props = { input: Input; index: number; frame: number; accent: string };
+type Props = {
+  input: Input;
+  index: number;
+  frame: number;
+  accent: string;
+};
 /**
  * Learner identity stays attached to the same authored tray through serving.
  */
@@ -19,15 +25,13 @@ export function LunchTray({
 }: Readonly<Props>): ReactNode {
   const motion = GraphicThemeHooks.useGraphicMotion();
   const learner = input.learners[index];
-  const tray = input.trays.find(({ learnerId }) => {
-    return learnerId === learner.id;
-  })!;
+  const tray = input.trays.find(propEq("learnerId", learner.id))!;
   const x = 480 + (index - (input.learners.length - 1) / 2) * 150;
-  const y = mix(
-    motion.ramp(frame, 88, motion.scale(20), motion.travel.easing),
-    244,
-    220,
-  );
+  const y = Motion.mix({
+    t: motion.ramp(frame, 88, motion.scale(20), motion.travel.easing),
+    from: 244,
+    to: 220,
+  });
   return (
     <g data-lunch-learner={learner.id} transform={`translate(${x} 0)`}>
       <LearnerLabel text={learner.label} />

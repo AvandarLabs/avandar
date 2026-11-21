@@ -1,4 +1,4 @@
-.sections {
+.atlasSectionsSections {
   background: var(--paper);
   border-bottom: var(--atlas-border-1) solid var(--line);
   display: flex;
@@ -6,7 +6,7 @@
   padding: 0 var(--atlas-space-32);
 }
 
-.section {
+.atlasSectionsSection {
   border-bottom: var(--atlas-border-2) solid transparent;
   color: var(--atlas-color-muted);
   font-size: var(--atlas-font-size-14);
@@ -14,11 +14,11 @@
   text-decoration: none;
 }
 
-.section:hover {
+.atlasSectionsSection:hover {
   color: var(--ink);
 }
 
-.active {
+.atlasSectionsActive {
   border-bottom-color: var(--ava-primary-6);
   color: var(--ink);
 }

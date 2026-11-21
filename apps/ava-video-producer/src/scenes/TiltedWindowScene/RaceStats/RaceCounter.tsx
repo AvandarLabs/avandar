@@ -1,13 +1,13 @@
-import { mix, mixToken } from "../../../motion";
-import { useVideoTokens } from "../../../videoTheme/useVideoTheme";
-import { formatMetric } from "../../layout/layout";
+import { Motion } from "../../../motion";
+import { useVideoTokens } from "../../../videoTheme/videoThemeHelpers";
+import { TextLayout } from "../../layout/TextLayout";
 import { type WindowStage } from "../WindowMotion/WindowMotion.types";
 import { RaceStatsShared } from "./RaceStatsShared/RaceStatsShared";
 import { type StatLineProps } from "./RaceStatsShared/RaceStatsShared.types";
 import type { RaceColumn } from "../../scenes.types";
 import type { ReactNode } from "react";
 
-type RaceCounterOptions = StatLineProps &
+type Props = StatLineProps &
   Readonly<{
     frame: number;
     counter: RaceColumn["counter"];
@@ -19,7 +19,7 @@ export function RaceCounter({
   counter,
   motion,
   ...line
-}: RaceCounterOptions): ReactNode {
+}: Readonly<Props>): ReactNode {
   const scene = useVideoTokens().color.scene;
   const { elapsed, done } = RaceStatsShared.getCounterProgress({
     frame,
@@ -35,14 +35,22 @@ export function RaceCounter({
         fontSize: line.height * 0.1,
         fontWeight: line.fontWeight,
         fontVariantNumeric: "tabular-nums",
-        color: mixToken(done, scene.foreground, scene.brand),
+        color: Motion.mixToken({
+          t: done,
+          from: scene.foreground,
+          to: scene.brand,
+        }),
         ...line.arrive,
       }}
     >
-      {formatMetric(
-        mix(elapsed, counter.from ?? 0, counter.to),
-        counter.precision ?? 1,
-      )}
+      {TextLayout.formatMetric({
+        value: Motion.mix({
+          t: elapsed,
+          from: counter.from ?? 0,
+          to: counter.to,
+        }),
+        precision: counter.precision ?? 1,
+      })}
       {counter.unit ?? ""}
     </div>
   );

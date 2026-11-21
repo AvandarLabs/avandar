@@ -1,4 +1,4 @@
-import { ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CellLiteralValue } from "./CellLiteralValue";
 import { CleanupLaneHeading } from "./CleanupLaneHeading";
@@ -6,7 +6,11 @@ import { RAIL_CUE, RAIL_FRAMES } from "./cleanupTiming";
 import type { Input } from "./CellNormalization.schema";
 import type { ReactNode } from "react";
 
-type Props = { row: Input["rows"][number]; input: Input; frame: number };
+type Props = {
+  row: Input["rows"][number];
+  input: Input;
+  frame: number;
+};
 /** Retained originals use the rail heading or their own inline sublabel. */
 export function CleanupRetainedValue({
   row,
@@ -19,12 +23,12 @@ export function CleanupRetainedValue({
   return (
     <g
       data-original-value={row.before}
-      opacity={ramp(
+      opacity={Motion.ramp({
         frame,
-        RAIL_CUE,
-        motion.scale(RAIL_FRAMES),
-        motion.reveal.easing,
-      )}
+        at: RAIL_CUE,
+        dur: motion.scale(RAIL_FRAMES),
+        easing: motion.reveal.easing,
+      })}
     >
       {inline ? (
         <CleanupLaneHeading

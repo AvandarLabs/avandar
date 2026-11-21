@@ -2,19 +2,16 @@ import { mkdir } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { join } from "node:path";
 import { performance } from "node:perf_hooks";
-import {
-  createRunDirectory,
-  makeFixtureInventoryFromDirectory,
-} from "../captureLib/fsSafetyHelpers";
+import { CaptureFileSafety } from "../captureLib/CaptureFileSafety";
+import { CaptureUrlSafety } from "../captureLib/CaptureUrlSafety/CaptureUrlSafety";
 import { installNetworkGuard } from "../captureLib/installNetworkGuard";
-import { isWorkspaceRoute } from "../captureLib/urlSafetyHelpers";
 import { CaptureRunError } from "./CaptureRunError";
 import { createCaptureContext } from "./createCaptureContext/createCaptureContext";
 import { finalizeCapture } from "./finalizeCapture";
 import { loginViaUi } from "./loginViaUi";
 import { readCaptureSettings } from "./readCaptureSettings";
 import { recordCaptureFailure } from "./recordCaptureFailure";
-import type { FixtureInventory } from "../captureLib/fsSafetyHelpers";
+import type { FixtureInventory } from "../captureLib/CaptureFileSafety";
 import type {
   CaptureFeature,
   CaptureOptions,
@@ -29,7 +26,56 @@ import type {
 import type { Browser, BrowserContext } from "@playwright/test";
 
 const require = createRequire(import.meta.url);
-
+async function _prepareRecordingContext({
+  session,
+  settings,
+  context,
+}: CaptureRun): Promise<void> {
+  if (!session.recordingContext) {
+    throw new Error("Recording context is missing");
+  }
+  _setTimeouts({
+    context: session.recordingContext,
+    timeout: settings.timeout,
+  });
+  await installNetworkGuard({
+    context: session.recordingContext,
+    onBlocked: context.reportBlocked,
+    onSuppressed: context.reportSuppressed,
+  });
+}
+function _makeFlowContext({
+  run,
+  feature,
+  state,
+  fixtureDir,
+}: Readonly<RunFeatureOptions>): import("./captureAvandar.types").CaptureFlowContext {
+  const { settings, context, live } = run;
+  if (!live.page) {
+    throw new Error("Capture flows need the recording page");
+  }
+  return {
+    page: live.page,
+    baseUrl: settings.baseUrl,
+    workspace: settings.workspace,
+    fixtureDir,
+    runLabel: settings.runLabel,
+    state,
+    checkpoint: (id, options) => {
+      return context.checkpoint({
+        flowId: feature.id,
+        id,
+        checkpointOptions: options,
+      });
+    },
+    step: (id, action) => {
+      return context.step({ flowId: feature.id, id, action });
+    },
+    recordResource: (resource) => {
+      return context.recordResource(feature.id, resource);
+    },
+  };
+}
 /** What one flow runs against: its feature, shared state, and fixtures. */
 type RunFeatureOptions = {
   run: CaptureRun;
@@ -37,12 +83,16 @@ type RunFeatureOptions = {
   state: Record<string, unknown>;
   fixtureDir: string;
 };
-
-function _setTimeouts(context: BrowserContext, timeout: number): void {
+function _setTimeouts({
+  context,
+  timeout,
+}: Readonly<{
+  context: BrowserContext;
+  timeout: number;
+}>): void {
   context.setDefaultTimeout(timeout);
-  context.setDefaultNavigationTimeout(Math.max(30_000, timeout));
+  context.setDefaultNavigationTimeout(Math.max(30000, timeout));
 }
-
 /** Logs in through an unrecorded context and returns its storage state. */
 async function _logIn({
   run,
@@ -58,7 +108,10 @@ async function _logIn({
     viewport: settings.viewport,
     serviceWorkers: "block",
   });
-  _setTimeouts(session.loginContext, settings.timeout);
+  _setTimeouts({
+    context: session.loginContext,
+    timeout: settings.timeout,
+  });
   await installNetworkGuard({
     context: session.loginContext,
     onBlocked: context.reportBlocked,
@@ -85,14 +138,16 @@ async function _logIn({
   };
   return authState;
 }
-
 /** Throws unless a page URL sits inside the workspace being captured. */
-function _assertEnteredWorkspace(
-  url: string,
-  settings: Readonly<CaptureSettings>,
-): void {
+function _assertEnteredWorkspace({
+  url,
+  settings,
+}: Readonly<{
+  url: string;
+  settings: Readonly<CaptureSettings>;
+}>): void {
   if (
-    !isWorkspaceRoute({
+    !CaptureUrlSafety.isWorkspaceRoute({
       url,
       baseUrl: settings.baseUrl,
       workspace: settings.workspace,
@@ -103,7 +158,6 @@ function _assertEnteredWorkspace(
     );
   }
 }
-
 /**
  * Opens the recording context with the login's state and enters the
  * workspace.
@@ -131,12 +185,7 @@ async function _startRecording({
     storageState: authState,
     recordVideo: { dir: join(runDir, "raw"), size: settings.viewport },
   });
-  _setTimeouts(session.recordingContext, settings.timeout);
-  await installNetworkGuard({
-    context: session.recordingContext,
-    onBlocked: context.reportBlocked,
-    onSuppressed: context.reportSuppressed,
-  });
+  await _prepareRecordingContext(run);
   live.recordingOrigin = performance.now();
   context.manifest.timing.recordingStartedAtMs = context.elapsed();
   live.page = await session.recordingContext.newPage();
@@ -145,15 +194,20 @@ async function _startRecording({
   await live.page.goto(`${settings.baseUrl}/${settings.workspace}/`, {
     waitUntil: "domcontentloaded",
   });
-  _assertEnteredWorkspace(live.page.url(), settings);
+  _assertEnteredWorkspace({
+    url: live.page.url(),
+    settings,
+  });
   context.assertPolicy();
 }
-
 /** Whether a flow recorded a failed action or checkpoint it then swallowed. */
-function _hasSwallowedFailure(
-  context: CaptureRun["context"],
-  flowId: string,
-): boolean {
+function _hasSwallowedFailure({
+  context,
+  flowId,
+}: Readonly<{
+  context: CaptureRun["context"];
+  flowId: string;
+}>): boolean {
   return (
     context.manifest.actions.some((action) => {
       return action.flowId === flowId && action.status === "failed";
@@ -163,7 +217,6 @@ function _hasSwallowedFailure(
     })
   );
 }
-
 /** Runs one flow against the recording page and marks its feature passed. */
 async function _runFeature({
   run,
@@ -180,29 +233,16 @@ async function _runFeature({
   if (!live.page) {
     throw new Error("Capture flows need the recording page");
   }
-  await settings.flows[feature.id]({
-    page: live.page,
-    baseUrl: settings.baseUrl,
-    workspace: settings.workspace,
-    fixtureDir,
-    runLabel: settings.runLabel,
-    state,
-    checkpoint: (id, options) => {
-      return context.checkpoint({
-        flowId: feature.id,
-        id,
-        checkpointOptions: options,
-      });
-    },
-    step: (id, action) => {
-      return context.step({ flowId: feature.id, id, action });
-    },
-    recordResource: (resource) => {
-      return context.recordResource(feature.id, resource);
-    },
-  });
+  await settings.flows[feature.id](
+    _makeFlowContext({ run, feature, state, fixtureDir }),
+  );
   context.assertPolicy();
-  if (_hasSwallowedFailure(context, feature.id)) {
+  if (
+    _hasSwallowedFailure({
+      context,
+      flowId: feature.id,
+    })
+  ) {
     throw new Error(
       "A flow swallowed a failed action or checkpoint; the feature cannot pass",
     );
@@ -213,7 +253,6 @@ async function _runFeature({
   session.activeFeature = undefined;
   await context.persist();
 }
-
 /** Launches a browser when needed, logs in, records, and runs every flow. */
 async function _recordCapture({
   run,
@@ -244,20 +283,25 @@ async function _recordCapture({
   }
   context.manifest.status = "passed";
 }
-
 /** Prepares the run folder, fixture inventory, and evidence recorders. */
-async function _createRun(
-  settings: CaptureSettings,
-  options: Readonly<CaptureOptions>,
-): Promise<{ run: CaptureRun; fixtures: FixtureInventory }> {
-  const fixtures = await makeFixtureInventoryFromDirectory({
+async function _createRun({
+  settings,
+  options,
+}: Readonly<{
+  settings: CaptureSettings;
+  options: Readonly<CaptureOptions>;
+}>): Promise<{
+  run: CaptureRun;
+  fixtures: FixtureInventory;
+}> {
+  const fixtures = await CaptureFileSafety.makeFixtureInventoryFromDirectory({
     rootPath: settings.root,
     fixtureDir: options.fixtureDir ?? "demo-data",
     fixtureFiles: options.fixtureFiles,
   });
   // Validate and hash all fixtures before creating capture output on disk.
   // react-doctor-disable-next-line server-sequential-independent-await
-  const runDir = await createRunDirectory({
+  const runDir = await CaptureFileSafety.createRunDirectory({
     rootPath: settings.root,
     runLabel: settings.runLabel,
   });
@@ -285,7 +329,6 @@ async function _createRun(
     fixtures,
   };
 }
-
 /**
  * Records the requested capture flows against the local Avandar app: logs in
  * through an unrecorded context, records each flow's evidence, and writes a
@@ -298,7 +341,10 @@ export async function runCapture(
   options: Readonly<CaptureOptions> = {},
 ): Promise<CaptureResult> {
   const settings = await readCaptureSettings(options);
-  const { run, fixtures } = await _createRun(settings, options);
+  const { run, fixtures } = await _createRun({
+    settings,
+    options,
+  });
   await run.context.persist();
   try {
     await _recordCapture({
@@ -307,7 +353,10 @@ export async function runCapture(
       fixtureDir: fixtures.absoluteDir,
     });
   } catch (error) {
-    recordCaptureFailure(run, error);
+    recordCaptureFailure({
+      run,
+      error,
+    });
   } finally {
     await finalizeCapture(run);
   }

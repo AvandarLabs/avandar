@@ -1,8 +1,7 @@
-import { mix } from "../../../../motion";
-import { SketchedShape } from "../../../primitives/SketchedShape";
-import { StockRect } from "../../../primitives/StockRect/StockRect";
+import { Motion } from "../../../../motion";
+import { StockRect } from "../../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { ImpressionLine } from "./ImpressionLine";
+import { RestoredContentLines } from "./RestoredContentLines";
 import type { Input } from "../RevisionRestore.schema";
 import type { ReactNode } from "react";
 
@@ -12,8 +11,51 @@ type Props = {
   frame: number;
   accent: string;
 };
+
+type ImpressionBoundsOptions = {
+  index: Readonly<Props>["index"];
+  progress: number;
+};
+
+type ImpressionBoundsResult = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
 /** The dash of a restore impression's outline. */
 const IMPRESSION_DASH = "8 5";
+
+/** Samples the authored restore impression drawing bounds. */
+function _getRestoreImpressionBounds({
+  index,
+  progress,
+}: Readonly<ImpressionBoundsOptions>): ImpressionBoundsResult {
+  return {
+    x: Motion.mix({
+      t: progress,
+      from: 40 + index * 225,
+      to: 270,
+    }),
+    y: Motion.mix({
+      t: progress,
+      from: 382,
+      to: 140,
+    }),
+    width: Motion.mix({
+      t: progress,
+      from: 205,
+      to: 420,
+    }),
+    height: Motion.mix({
+      t: progress,
+      from: 190,
+      to: 200,
+    }),
+  };
+}
+
 /** A copy lifts from its retained snapshot and aligns over current contents. */
 export function RestoreImpression({
   revision,
@@ -35,10 +77,8 @@ export function RestoreImpression({
       }
     >
       <StockRect
-        x={mix(progress, 40 + index * 225, 270)}
-        y={mix(progress, 382, 140)}
-        width={mix(progress, 205, 420)}
-        height={mix(progress, 190, 200)}
+        {..._getRestoreImpressionBounds({ index, progress })}
+
         rx={scales.corner(tokens.corner.cell)}
         fill={tokens.color.surface}
         fillOpacity={scales.wash(atomic.opacity["22"])}
@@ -46,15 +86,12 @@ export function RestoreImpression({
         strokeWidth={scales.stroke(tokens.stroke.default)}
         strokeDasharray={IMPRESSION_DASH}
       />
-      {revision.content.map((line, lineIndex) => {
-        return (
-          <ImpressionLine
-            key={lineIndex}
-            d={`M${mix(progress, 60 + index * 225, 294)} ${mix(progress, 433 + lineIndex * 43, 174 + lineIndex * 53)} h${Math.min(150, 20 + line.length * 4)}`}
-            accent={accent}
-          />
-        );
-      })}
+      <RestoredContentLines
+        revision={revision}
+        index={index}
+        accent={accent}
+        progress={progress}
+      />
     </g>
   );
 }

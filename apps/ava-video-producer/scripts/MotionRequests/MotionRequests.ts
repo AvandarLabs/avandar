@@ -5,17 +5,18 @@ import {
   STOCK_CATALOG,
   stockEntry,
   type StockEntry,
-} from "../../src/stock/catalog";
+} from "../../src/stock/stockEntry";
 import { safeInputFile } from "../lib/planHelpers/planHelpers";
 import { buildStockContracts } from "../stock/buildStockContracts/buildStockContracts";
 import { loadVideoThemeSnapshot } from "../videoTheme/loadVideoThemeSnapshot/loadVideoThemeSnapshot";
 import type { ResolvedStockRequest } from "../../src/stock/contracts/stockRequestSchema/stockRequestSchema";
-import type { VideoThemeSnapshot } from "../../src/videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
+import type { VideoThemeSnapshot } from "../../src/videoTheme/VideoThemeSnapshots/VideoThemeSnapshots";
 
 const ROOT: string = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "../..",
 );
+/** A stock request with its resolved entry, source hash, and theme. */
 export type MotionRequest = {
   entry: StockEntry;
   request: ResolvedStockRequest;
@@ -24,9 +25,7 @@ export type MotionRequest = {
 };
 const MOTION_USAGE =
   "Usage: pnpm motion -- list | preview [all|preset-id] [--input file.json] [--theme id] | render [all|preset-id] [--input file.json] [--theme id]";
-function _parseFlags(
-  extra: readonly string[],
-): Readonly<Record<string, string>> {
+function _parseFlags(extra: readonly string[]): Record<string, string> {
   const pairs = Array.from(
     { length: Math.ceil(extra.length / 2) },
     (_, pairIndex): [string, string] => {
@@ -96,12 +95,15 @@ async function _makeMotionRequestsFromArgs(
   const { args, root = ROOT } = options;
   const [contracts, theme] = await Promise.all([
     buildStockContracts(root),
-    loadVideoThemeSnapshot({ id: args.themeId }),
+    loadVideoThemeSnapshot({ request: { id: args.themeId } }),
   ]);
   const supplied: unknown = args.inputFile
     ? JSON.parse(
         await fs.readFile(
-          await safeInputFile(path.resolve(root, args.inputFile), [".json"]),
+          await safeInputFile({
+            filename: path.resolve(root, args.inputFile),
+            extensions: [".json"],
+          }),
           "utf8",
         ),
       )

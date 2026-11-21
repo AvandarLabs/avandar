@@ -25,7 +25,7 @@ function _render({
     }),
   );
 }
-test("Contact and booking do not move a person through the clinic door; only the authored attended outcome does, and all original cases retain a final state.", () => {
+test("default missed-visit hold frame retains case count and exposes booked and attended outcomes", () => {
   const markup = _render({ frame: 150 });
   assert.equal(
     (markup.match(/data-case=/g) ?? []).length,
@@ -39,6 +39,35 @@ import { registerStockPresetAssertions } from "../../../../tests/helpers/registe
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { missedVisitReconnectContract } from "./MissedVisitReconnect.contract";
 import { inputSchema, type Input } from "./MissedVisitReconnect.schema";
+
+function _assertAttendanceGeometryAcrossFrames(
+  input: (typeof fixtures)[number]["input"],
+): void {
+  [30, 44, 64, 84, 96, 108, 115, 150].forEach((frame) => {
+    const markup = _render({ frame: frame, input: input });
+    const people = Array.from(
+      markup.matchAll(
+        /data-returning-person="([^"]*)" transform="translate\(([^ ]+) ([^)]+)\)"/g,
+      ),
+    );
+    assert.equal(people.length, 6);
+    people.forEach(([_, id, x, y]) => {
+      const item = input.cases.find(propEq("id", id))!;
+      assert.ok(Number(x) - 8 >= 200 && Number(x) + 8 <= 925);
+      assert.ok(Number(y) - 14 >= 130 && Number(y) + 16 <= 450);
+      if (item.outcome !== "attended" || frame <= 91) {
+        assert.equal(Number(x), 240);
+      }
+      if (frame >= 115 && item.outcome === "attended") {
+        assert.ok(Number(x) - 8 > 760);
+      }
+    });
+    assert.equal(
+      (markup.match(/data-booking=/g) ?? []).length,
+      input.cases.filter(propEq("outcome", "booked")).length,
+    );
+  });
+}
 
 const textLayoutOptions = {
   inputSchema,
@@ -80,30 +109,7 @@ registerStockTextLayoutAssertions(textLayoutOptions);
 
 test("only attendance crosses the complete clinic boundary; booking folds onto its own calendar", () => {
   const input = fixtures[2].input;
-  [30, 44, 64, 84, 96, 108, 115, 150].forEach((frame) => {
-    const markup = _render({ frame: frame, input: input });
-    const people = Array.from(
-      markup.matchAll(
-        /data-returning-person="([^"]*)" transform="translate\(([^ ]+) ([^)]+)\)"/g,
-      ),
-    );
-    assert.equal(people.length, 6);
-    people.forEach(([_, id, x, y]) => {
-      const item = input.cases.find(propEq("id", id))!;
-      assert.ok(Number(x) - 8 >= 200 && Number(x) + 8 <= 925);
-      assert.ok(Number(y) - 14 >= 130 && Number(y) + 16 <= 450);
-      if (item.outcome !== "attended" || frame <= 91) {
-        assert.equal(Number(x), 240);
-      }
-      if (frame >= 115 && item.outcome === "attended") {
-        assert.ok(Number(x) - 8 > 760);
-      }
-    });
-    assert.equal(
-      (markup.match(/data-booking=/g) ?? []).length,
-      input.cases.filter(propEq("outcome", "booked")).length,
-    );
-  });
+  _assertAttendanceGeometryAcrossFrames(input);
   const markup = _render({ frame: 150, input: input });
   assert.match(markup, /data-group-total="6"/);
   assert.match(markup, /data-attempt-total="18"/);

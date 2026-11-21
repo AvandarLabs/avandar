@@ -1,36 +1,21 @@
+import { omit } from "@avandar/utils";
 import { DEFAULT_INPUT } from "./defaultInput";
 /** Rejected structural, boundary and cross-field inputs. */
 export const invalidInputs: unknown[] = [
   {},
   { ...DEFAULT_INPUT, extra: true },
-  Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => {
-      return field !== "structure";
-    }),
-  ),
-  Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => {
-      return field !== "specification";
-    }),
-  ),
+  omit(DEFAULT_INPUT, "structure"),
+  omit(DEFAULT_INPUT, "specification"),
   {
     ...DEFAULT_INPUT,
     specification: { ...DEFAULT_INPUT.specification, extra: true },
   },
-  Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => {
-      return field !== "observation";
-    }),
-  ),
+  omit(DEFAULT_INPUT, "observation"),
   {
     ...DEFAULT_INPUT,
     observation: { ...DEFAULT_INPUT.observation, extra: true },
   },
-  Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => {
-      return field !== "observers";
-    }),
-  ),
+  omit(DEFAULT_INPUT, "observers"),
   {
     ...DEFAULT_INPUT,
     observers: [
@@ -64,16 +49,8 @@ export const invalidInputs: unknown[] = [
       DEFAULT_INPUT.observers[1],
     ],
   },
-  Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => {
-      return field !== "showDifference";
-    }),
-  ),
-  Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => {
-      return field !== "labels";
-    }),
-  ),
+  omit(DEFAULT_INPUT, "showDifference"),
+  omit(DEFAULT_INPUT, "labels"),
   { ...DEFAULT_INPUT, labels: { ...DEFAULT_INPUT.labels, extra: true } },
   { ...DEFAULT_INPUT, structure: "invalid" },
   {

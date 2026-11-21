@@ -1,7 +1,7 @@
 import { Composition } from "remotion";
-import { STOCK_CATALOG, STOCK_FPS, STOCK_LOOP_FRAMES } from "./catalog";
 import { stockRequestSchema } from "./contracts/stockRequestSchema/stockRequestSchema";
 import { StockClip } from "./StockClip";
+import { STOCK_CATALOG, STOCK_FPS, STOCK_LOOP_FRAMES } from "./stockEntry";
 
 /**
  * Media-free registration shared by Studio and the isolated stock render

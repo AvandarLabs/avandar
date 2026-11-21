@@ -1,17 +1,16 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { ReviewLatchShared } from "./ReviewLatchShared/ReviewLatchShared";
+import { ReviewLatchShared } from "./ReviewLatchShared";
 import type { ReactNode } from "react";
-/** One side of the latch, reaching in toward the centre as it closes. */
-export function LatchArm({
-  side,
-  reach,
-  color,
-}: Readonly<{
+
+type Props = {
   side: "left" | "right";
   reach: number;
   color: string;
-}>): ReactNode {
+};
+
+/** One side of the latch, reaching in toward the centre as it closes. */
+export function LatchArm({ side, reach, color }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (

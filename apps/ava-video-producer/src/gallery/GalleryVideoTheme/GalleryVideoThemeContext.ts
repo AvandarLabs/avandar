@@ -1,6 +1,6 @@
 import { createContext } from "react";
 import type { ResolvedVideoTheme } from "../../videoTheme/videoTheme.types";
-import type { ThemeDraft } from "../../videoThemeEditor/themeDraft/themeDraft";
+import type { ThemeDraft } from "../../videoThemeEditor/ThemeDrafts/ThemeDrafts";
 import type { VideoThemeDraftState } from "../../videoThemeEditor/useVideoThemeDraft/useVideoThemeDraft";
 
 /** The gallery's theme state plus what previews and exports need from it. */

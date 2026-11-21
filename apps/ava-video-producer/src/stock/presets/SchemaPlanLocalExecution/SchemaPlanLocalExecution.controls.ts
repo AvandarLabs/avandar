@@ -1,3 +1,4 @@
+import { pick } from "@avandar/utils";
 import { makeStockControlsFromSchema } from "../../contracts/makeStockControlsFromSchema/makeStockControlsFromSchema";
 import { jsonSchema } from "./SchemaPlanLocalExecution.schema";
 import type {
@@ -23,11 +24,7 @@ const compatibleControls: StockControl[] = makeStockControlsFromSchema({
     type: "object",
     additionalProperties: false,
     required: COMPATIBLE_PATHS,
-    properties: Object.fromEntries(
-      COMPATIBLE_PATHS.map((path) => {
-        return [path, properties[path]];
-      }),
-    ),
+    properties: pick(properties, COMPATIBLE_PATHS),
   },
   messageNamespace: NAMESPACE,
   referenceSelects: {

@@ -21,6 +21,18 @@ import {
   EXCLUSIONS,
 } from "./CoordinateQualityTriageTestHelpers";
 
+function _assertHiddenCoordinateValues(
+  markup: ReturnType<typeof _render>,
+): void {
+  assert.equal(
+    getSvgAttributeMatchesFromMarkup({
+      markup: markup,
+      attribute: "data-coordinate-value",
+    }).tags.length,
+    0,
+  );
+}
+
 registerStockPresetAssertions({
   inputSchema,
   defaultInput: DEFAULT_INPUT,
@@ -164,13 +176,7 @@ test("row keys move into actual graticule and rejection trays while hidden value
       440,
   );
   const markup = _render({ frame: 150, input: CHANGED_INPUT });
-  assert.equal(
-    getSvgAttributeMatchesFromMarkup({
-      markup: markup,
-      attribute: "data-coordinate-value",
-    }).tags.length,
-    0,
-  );
+  _assertHiddenCoordinateValues(markup);
   assert.deepEqual(
     getSvgAttributeMatchesFromMarkup({
       markup: markup,

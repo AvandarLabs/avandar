@@ -1,6 +1,6 @@
-import { getFieldName } from "../../tokenCopy/editorCopy";
+import { EditorCopy } from "../../tokenCopy/EditorCopy";
 import { useTokenEditor } from "../../TokenEditorContext";
-import { type TokenRow } from "../../tokenRows/tokenRows.types";
+import { type TokenRow } from "../../TokenRows/TokenRows.types";
 import { ReferenceControl } from "../ReferenceControl/ReferenceControl";
 import type { ColorPair } from "../roleValueHelpers/roleValueHelpers";
 import type { ReactNode } from "react";
@@ -10,7 +10,7 @@ type Props = Readonly<{ row: TokenRow; label: string; pair: ColorPair }>;
 export function ColorPairFields({ row, label, pair }: Props): ReactNode {
   const editor = useTokenEditor();
   return (["onDark", "onLight"] as const).map((side) => {
-    const sideName = getFieldName(side);
+    const sideName = EditorCopy.getFieldName(side);
     return (
       <ReferenceControl
         key={side}

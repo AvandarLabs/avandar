@@ -1,6 +1,6 @@
 import { propEq } from "@avandar/utils";
-import { mix } from "../../../motion";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import { Motion } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./SurveillanceReportingBackfill.schema";
 /** Data for getRecordPlacementsFromInputAndFrame. */
 type GetRecordPlacementsResult = {
@@ -13,13 +13,11 @@ type GetRecordPlacementsResult = {
   eventBinId: string;
   firstSnapshot: 0 | 1;
 };
-
 type RecordPlacementsArgs = Readonly<{
   input: Input;
   frame: number;
   motion: VideoMotion;
 }>;
-
 /** Records from the earlier snapshot first, then by ID. */
 function _sortRecordsBySnapshot(records: Input["records"]): Input["records"] {
   return [...records].sort((first, second) => {
@@ -29,7 +27,6 @@ function _sortRecordsBySnapshot(records: Input["records"]): Input["records"] {
     );
   });
 }
-
 /** Receipt tokens travel to their event bin exactly once. */
 export function getRecordPlacementsFromInputAndFrame({
   input,
@@ -41,9 +38,7 @@ export function getRecordPlacementsFromInputAndFrame({
   return ordered.map((record) => {
     const bin = input.eventBins.findIndex(propEq("id", record.eventBinId));
     const rank = ordered
-      .filter((item) => {
-        return item.eventBinId === record.eventBinId;
-      })
+      .filter(propEq("eventBinId", record.eventBinId))
       .findIndex(propEq("id", record.id));
     const arrival = later.findIndex(propEq("id", record.id));
     const progress =
@@ -58,12 +53,16 @@ export function getRecordPlacementsFromInputAndFrame({
     return {
       ...record,
       progress,
-      x: mix(
-        progress,
-        80 + arrival * 43,
-        68 + ((bin + 0.5) * 480) / input.eventBins.length,
-      ),
-      y: mix(progress, 265, 470 - rank * 18),
+      x: Motion.mix({
+        t: progress,
+        from: 80 + arrival * 43,
+        to: 68 + ((bin + 0.5) * 480) / input.eventBins.length,
+      }),
+      y: Motion.mix({
+        t: progress,
+        from: 265,
+        to: 470 - rank * 18,
+      }),
       key: input.records.findIndex(propEq("id", record.id)) + 1,
     };
   });

@@ -1,7 +1,7 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { BlockCaption } from "./BlockCaption";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./RepeatingBlocksToTable.schema";
 import type { ReactNode } from "react";
 
@@ -11,7 +11,12 @@ type CreateIdentityPosesOptions = {
   frame: number;
   motion: VideoMotion;
 };
-type Props = { input: Input; frame: number; accent: string; index: number };
+type Props = {
+  input: Input;
+  frame: number;
+  accent: string;
+  index: number;
+};
 /** Source block headings retain their identities beside the resulting rows. */
 export function BlockIdentity({
   input,
@@ -61,11 +66,11 @@ function _createIdentityPoses({
     },
     {
       x: 52,
-      y: mix(
-        motion.ramp(frame, departure, duration - 0.5, motion.travel.easing),
-        210,
-        280 + index * 112,
-      ),
+      y: Motion.mix({
+        t: motion.ramp(frame, departure, duration - 0.5, motion.travel.easing),
+        from: 210,
+        to: 280 + index * 112,
+      }),
       width: 224,
       opacity: motion.ramp(frame, departure, motion.scale(0.5)),
     },

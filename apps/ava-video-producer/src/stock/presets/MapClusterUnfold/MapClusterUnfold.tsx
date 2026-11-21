@@ -1,9 +1,9 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ClusterLedger } from "./ClusterLedger";
 import { ClusterPoints } from "./ClusterPoints/ClusterPoints";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./MapClusterUnfold.schema";
 import type { ReactNode } from "react";

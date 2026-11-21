@@ -1,4 +1,4 @@
-import { prop } from "@avandar/utils";
+import { prop, propEq } from "@avandar/utils";
 import { z } from "zod";
 import type { StockSemanticRule } from "../../contracts/StockContract.types";
 /** Strict complete authored input with cross-field validation. */
@@ -59,11 +59,7 @@ export const inputSchema = z
       }
     });
     input.installations.forEach((installation) => {
-      if (
-        !input.zones.some(({ id }) => {
-          return id === installation.zoneId;
-        })
-      ) {
+      if (!input.zones.some(propEq("id", installation.zoneId))) {
         issue(
           "installations",
           "Each installation must reference an existing zone.",
@@ -72,9 +68,7 @@ export const inputSchema = z
     });
     input.zones.forEach((zone) => {
       const added = input.installations
-        .filter(({ zoneId }) => {
-          return zoneId === zone.id;
-        })
+        .filter(propEq("zoneId", zone.id))
         .reduce((sum, item) => {
           return sum + item.addedShadeM2;
         }, 0);

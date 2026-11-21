@@ -1,3 +1,4 @@
+import { prop } from "@avandar/utils";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import { getConservativeWidthFromText } from "../../text/getConservativeWidthFromText";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
@@ -24,9 +25,7 @@ function _width({
 export function GridLiteralCell({ value, x, y }: Readonly<Props>): ReactNode {
   const { fontSize } = GraphicThemeHooks.useGraphicTokens().text.graphic.data;
   const lines = [{ value: "", width: 0 }];
-  Array.from(GRAPHEMES.segment(value), ({ segment }) => {
-    return segment;
-  }).forEach((segment) => {
+  Array.from(GRAPHEMES.segment(value), prop("segment")).forEach((segment) => {
     const width = _width({ value: segment, fontSize });
     const line = lines[lines.length - 1];
     if (line.width + width > 84) {

@@ -1,8 +1,8 @@
 import { useVideoMotion } from "../../../videoTheme/useVideoMotion";
 import { positioned } from "../../positioned";
-import { getWipeExitStyle } from "../../textReveal/textReveal";
+import { TextReveal } from "../../TextReveal/TextReveal";
 import { LockupWordmarkText } from "./LockupWordmarkText";
-import type { Rect } from "../../layout/layout";
+import type { Rect } from "../../layout/SceneGeometry";
 import type { BrandLockupSceneProps } from "../../scenes.types";
 import type { ReactNode } from "react";
 
@@ -27,7 +27,7 @@ export function LockupWordmark({
       style={{
         ...positioned(box),
         ...(exit
-          ? getWipeExitStyle({
+          ? TextReveal.getWipeExitStyle({
               frame,
               at: exit.atFrame,
               durationInFrames: motion.chip,

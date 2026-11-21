@@ -1,6 +1,7 @@
 # Reusable scene API
 
-Import scenes and their TypeScript prop types from `src/scenes/index.ts`.
+Import scenes from their individual source modules and shared prop types from
+`src/scenes/scenes.types.ts`.
 These are reusable editorial scenes. Graphs, flowcharts, and metrics describe
 authored concepts and data; they do not recreate or make claims about Avandar's
 interface. Existing `TitleCard`, `Demo`, `TitleStudy`, and `MotionLab` remain

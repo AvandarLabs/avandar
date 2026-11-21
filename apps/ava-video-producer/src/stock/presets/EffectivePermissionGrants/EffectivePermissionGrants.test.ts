@@ -120,6 +120,21 @@ import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/reg
 import { effectivePermissionGrantsContract } from "./EffectivePermissionGrants.contract";
 import { inputSchema, type Input } from "./EffectivePermissionGrants.schema";
 
+function _assertEmptyResultMarkerPosition(
+  none: ReturnType<typeof _render>,
+): void {
+  assert.equal(
+    SvgAttributes.getNumberFromMarkup({
+      attributes: _markedShape({
+        markup: none,
+        marker: "result-marker",
+      }),
+      name: "cy",
+    }),
+    440,
+  );
+}
+
 function _getVisibleTexts({
   input,
   frame,
@@ -208,14 +223,5 @@ test("hidden excluded grants retain the maximum and requirement comparison for e
       showExcludedGrants: false,
     },
   });
-  assert.equal(
-    SvgAttributes.getNumberFromMarkup({
-      attributes: _markedShape({
-        markup: none,
-        marker: "result-marker",
-      }),
-      name: "cy",
-    }),
-    440,
-  );
+  _assertEmptyResultMarkerPosition(none);
 });

@@ -1,7 +1,7 @@
-import { ramp } from "../../../../motion";
+import { Motion } from "../../../../motion";
 import { LabelSlots } from "../../../primitives/LabelSlots/LabelSlots";
 import { LiteralDataText } from "../../../primitives/LiteralDataText/LiteralDataText";
-import { StockRect } from "../../../primitives/StockRect/StockRect";
+import { StockRect } from "../../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ReviewTiming } from "../ReviewTiming";
 import { DistanceValue } from "./DistanceValue";

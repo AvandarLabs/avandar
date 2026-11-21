@@ -1,12 +1,15 @@
 // Registers the bundled faces the theme's text roles name.
 import "../../fonts";
 import { useVideoMotion } from "../../videoTheme/useVideoMotion";
-import { useVideoTheme } from "../../videoTheme/useVideoTheme";
+import { useVideoTheme } from "../../videoTheme/videoThemeHelpers";
 import { BuildingBlockText } from "./BuildingBlockText";
-import { MotionLabShared } from "./MotionLabShared/MotionLabShared";
+import { MotionLabShared } from "./MotionLabShared";
 import type { ReactNode } from "react";
+
+type Props = { frame: number };
+
 /** Staggers the numbered motion-principle cards into view for `MotionLab`. */
-export function BuildingBlocks({ frame }: { frame: number }): ReactNode {
+export function BuildingBlocks({ frame }: Readonly<Props>): ReactNode {
   const { mantine } = useVideoTheme();
   const motion = useVideoMotion();
   const panel = MotionLabShared.usePanelStyle();

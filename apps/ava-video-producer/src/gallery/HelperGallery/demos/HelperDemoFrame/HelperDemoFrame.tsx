@@ -25,20 +25,24 @@ export function HelperDemoFrame({
 }: Props): ReactNode {
   const themeStyle = DemoTheme.useDemoThemeStyle();
   return (
-    <div className={css.root} style={themeStyle}>
-      <header className={css.header}>
-        <code className={css.label}>{label}</code>
-        <span className={css.counter}>
+    <div className={css.helperDemoFrameRoot} style={themeStyle}>
+      <header className={css.helperDemoFrameHeader}>
+        <code className={css.helperDemoFrameLabel}>{label}</code>
+        <span className={css.helperDemoFrameCounter}>
           frame {String(Math.floor(frame)).padStart(3, "0")} / {frames}
         </span>
       </header>
-      <div className={css.stage}>{children}</div>
-      <footer className={css.readouts}>
+      <div className={css.helperDemoFrameStage}>{children}</div>
+      <footer className={css.helperDemoFrameReadouts}>
         {readouts.map((readout) => {
           return (
-            <span key={readout.name} className={css.readout}>
-              <span className={css.readoutName}>{readout.name}</span>
-              <span className={css.readoutValue}>{readout.value}</span>
+            <span key={readout.name} className={css.helperDemoFrameReadout}>
+              <span className={css.helperDemoFrameReadoutName}>
+                {readout.name}
+              </span>
+              <span className={css.helperDemoFrameReadoutValue}>
+                {readout.value}
+              </span>
             </span>
           );
         })}

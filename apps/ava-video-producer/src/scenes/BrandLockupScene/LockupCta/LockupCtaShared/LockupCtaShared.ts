@@ -21,7 +21,10 @@ function _buildCtaLineStyle({
     whiteSpace: "nowrap",
   };
 }
-/** Shared values and calculations for the LockupCta visuals. */
+/**
+ * Centered CTA line styles used by CtaCommand, CtaUrl, CtaBadge, and
+ * CtaSubtitle.
+ */
 export const LockupCtaShared = {
   /** One centred CTA line at a fraction of the canvas height. */
   buildCtaLineStyle: _buildCtaLineStyle,

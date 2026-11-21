@@ -1,22 +1,27 @@
-import { ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { EffectivePermissionGrantsShared } from "./EffectivePermissionGrantsShared/EffectivePermissionGrantsShared";
+import { EffectivePermissionGrantsShared } from "./EffectivePermissionGrantsShared";
 import type { ReactNode } from "react";
+
+type Props = {
+  label: string;
+  frame: number;
+};
 /** The verdict, appearing once the result has risen. */
 export function PermissionVerdict({
   label,
   frame,
-}: Readonly<{ label: string; frame: number }>): ReactNode {
+}: Readonly<Props>): ReactNode {
   const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g
-      opacity={ramp(
+      opacity={Motion.ramp({
         frame,
-        139,
-        motion.scale(EffectivePermissionGrantsShared.VERDICT_FRAMES),
-        motion.reveal.easing,
-      )}
+        at: 139,
+        dur: motion.scale(EffectivePermissionGrantsShared.VERDICT_FRAMES),
+        easing: motion.reveal.easing,
+      })}
     >
       <LabelSlots labels={[[label, 55, 580, 840, 18, 1]]} />
     </g>

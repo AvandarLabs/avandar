@@ -1,5 +1,5 @@
 import { propEq, prop } from "@avandar/utils";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./ReferralConsentWithdrawal.schema";
 /** Each withdrawn permission turns in authored permission order. */
 export function getConsentTurnFromPermissionsAndFrame({

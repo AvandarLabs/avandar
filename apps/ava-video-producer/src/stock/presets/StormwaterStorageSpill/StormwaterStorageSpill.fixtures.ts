@@ -119,6 +119,7 @@ const extraFixtures: StockContract<typeof DEFAULT_INPUT>["fixtures"] = [
     input: { ...dense, overflowSide: "left" as const, showBalance: false },
   },
 ];
+/** Invalid stock inputs used to check this preset contract rejects bad data. */
 export const invalidInputs: unknown[] = [
   { ...DEFAULT_INPUT, extra: true },
   {

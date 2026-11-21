@@ -1,4 +1,4 @@
-import { mix, ramp } from "../../../../motion";
+import { Motion } from "../../../../motion";
 import { FitText } from "../../../primitives/FitText/FitText";
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
@@ -15,7 +15,14 @@ export function RuleGate({ frame, accent, input }: Readonly<Props>): ReactNode {
   const emphasis = scales.stroke(tokens.stroke.emphasis);
   const side = input.detourSide === "above" ? -1 : 1;
   return (
-    <g opacity={ramp(frame, 12, motion.hero, motion.reveal.easing)}>
+    <g
+      opacity={Motion.ramp({
+        frame,
+        at: 12,
+        dur: motion.hero,
+        easing: motion.reveal.easing,
+      })}
+    >
       <RuleLabel text={input.rule.label} />
       <g data-standard-route="true">
         <SketchedShape

@@ -8,20 +8,16 @@ import type { MeasurementRun } from "./measureAvandar.types";
 function _hash(bytes: Readonly<Buffer>): string {
   return createHash("sha256").update(bytes).digest("hex");
 }
-
-/**
- * Renders `frame` directly and after a non-sequential seek route, compares
- * the two, and records the result in the run. Differing renders are saved
- * as screenshots in the run's report directory.
- */
-export async function checkDeterminism(
-  run: MeasurementRun,
-  options: Readonly<{ url: string; feature: string; frame: number }>,
-): Promise<void> {
-  const { url, feature, frame } = options;
+async function _captureSeekRoute({
+  run,
+  frame,
+}: Readonly<{ run: MeasurementRun; frame: number }>): Promise<{
+  direct: Buffer;
+  directText: string;
+  afterSeeks: Buffer;
+  afterSeeksText: string;
+}> {
   const stage = run.page.locator(".avandar-film");
-  await ReviewPageDriver.load(run, { url, feature });
-  await ReviewPageDriver.seek(run, frame);
   const [direct, directText] = await Promise.all([
     stage.screenshot(),
     stage.innerText(),
@@ -34,7 +30,33 @@ export async function checkDeterminism(
     stage.screenshot(),
     stage.innerText(),
   ]);
-  const pixelComparison = getPixelComparisonFromScreenshots(direct, afterSeeks);
+  return { direct, directText, afterSeeks, afterSeeksText };
+}
+/**
+ * Renders `frame` directly and after a non-sequential seek route, compares
+ * the two, and records the result in the run. Differing renders are saved
+ * as screenshots in the run's report directory.
+ */
+export async function checkDeterminism({
+  run,
+  options,
+}: Readonly<{
+  run: MeasurementRun;
+  options: Readonly<{
+    url: string;
+    feature: string;
+    frame: number;
+  }>;
+}>): Promise<void> {
+  const { url, feature, frame } = options;
+  await ReviewPageDriver.load(run, { url, feature });
+  await ReviewPageDriver.seek(run, frame);
+  const { direct, directText, afterSeeks, afterSeeksText } =
+    await _captureSeekRoute({ run, frame });
+  const pixelComparison = getPixelComparisonFromScreenshots({
+    first: direct,
+    second: afterSeeks,
+  });
   const determinismResult = {
     feature,
     frame,

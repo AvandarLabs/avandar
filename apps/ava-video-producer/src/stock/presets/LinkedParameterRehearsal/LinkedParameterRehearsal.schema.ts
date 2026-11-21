@@ -13,79 +13,58 @@ const outputSchema = z.strictObject({
   unit: z.string().min(1).max(16),
 }) satisfies z.ZodType;
 /** Finite direct affine dependencies with at least one independent constant. */
-export const inputSchema = z
-  .strictObject({
-    source: z.strictObject({
-      label: z.string().min(1).max(28),
-      baseline: z.number(),
-      trial: z.number(),
-      min: z.number(),
-      max: z.number(),
-      unit: z.string().min(1).max(16),
-    }),
-    outputs: z.array(outputSchema).min(2).max(4),
-    phaseLabels: z.strictObject({
-      baseline: z.string().min(1).max(36),
-      trial: z.string().min(1).max(36),
-      restored: z.string().min(1).max(36),
-    }),
-    showRules: z.boolean(),
-    showBaselineMarkers: z.boolean(),
-    contextLabel: z.string().min(1).max(72),
-  })
-  .superRefine((input, context) => {
-    const { source, outputs } = input;
-    if (
-      !(source.min < source.max) ||
-      source.baseline === source.trial ||
-      [source.baseline, source.trial].some((value) => {
-        return value < source.min || value > source.max;
-      })
-    ) {
-      context.addIssue({
-        code: "custom",
-        path: ["source"],
-        message:
-          "Distinct baseline and trial must lie inside increasing source bounds.",
-      });
-    }
-    if (
-      new Set(outputs.map(prop("id"))).size !== outputs.length ||
-      !outputs.some(propEq("multiplier", 0)) ||
-      !outputs.some(propNotEq("multiplier", 0))
-    ) {
-      context.addIssue({
-        code: "custom",
-        path: ["outputs"],
-        message:
-          "Unique outputs require a coupled rule and an independent zero-multiplier rule.",
-      });
-    }
-    outputs.forEach((output, index) => {
-      const values = [source.baseline, source.trial].map((value) => {
-        return evaluateAffineRule({
-          source: value,
-          multiplier: output.multiplier,
-          offset: output.offset,
-        });
-      });
-      if (
-        !(output.min < output.max) ||
-        values.some((value) => {
-          return (
-            !Number.isFinite(value) || value < output.min || value > output.max
-          );
-        })
-      ) {
-        context.addIssue({
-          code: "custom",
-          path: ["outputs", index],
-          message:
-            "Finite computed endpoints must lie inside increasing output bounds.",
-        });
-      }
+/** Structural input before authored cross-field validation. */
+const baseInputSchema = z.strictObject({
+  source: z.strictObject({
+    label: z.string().min(1).max(28),
+    baseline: z.number(),
+    trial: z.number(),
+    min: z.number(),
+    max: z.number(),
+    unit: z.string().min(1).max(16),
+  }),
+  outputs: z.array(outputSchema).min(2).max(4),
+  phaseLabels: z.strictObject({
+    baseline: z.string().min(1).max(36),
+    trial: z.string().min(1).max(36),
+    restored: z.string().min(1).max(36),
+  }),
+  showRules: z.boolean(),
+  showBaselineMarkers: z.boolean(),
+  contextLabel: z.string().min(1).max(72),
+});
+
+/** Validates linked output rules and bounded baseline and trial values. */
+export const inputSchema = baseInputSchema.superRefine((input, context) => {
+  const { source, outputs } = input;
+  if (
+    !(source.min < source.max) ||
+    source.baseline === source.trial ||
+    [source.baseline, source.trial].some((value) => {
+      return value < source.min || value > source.max;
+    })
+  ) {
+    context.addIssue({
+      code: "custom",
+      path: ["source"],
+      message:
+        "Distinct baseline and trial must lie inside increasing source bounds.",
     });
-  }) satisfies z.ZodType;
+  }
+  if (
+    new Set(outputs.map(prop("id"))).size !== outputs.length ||
+    !outputs.some(propEq("multiplier", 0)) ||
+    !outputs.some(propNotEq("multiplier", 0))
+  ) {
+    context.addIssue({
+      code: "custom",
+      path: ["outputs"],
+      message:
+        "Unique outputs require a coupled rule and an independent zero-multiplier rule.",
+    });
+  }
+  _validateOutputEndpoints({ outputs, source, context });
+}) satisfies z.ZodType;
 /** Complete input inferred from strict schema output. */
 export type Input = z.output<typeof inputSchema>;
 /** Affine relationships and collection invariants beyond JSON Schema. */
@@ -114,3 +93,40 @@ export const SEMANTIC_RULES: StockSemanticRule[] = [
       "At least one multiplier is nonzero and at least one is exactly zero.",
   },
 ];
+
+type ValidateOutputEndpointsOptions = {
+  outputs: z.output<typeof baseInputSchema>["outputs"];
+  source: z.output<typeof baseInputSchema>["source"];
+  context: z.RefinementCtx;
+};
+/** Checks affine endpoint values against increasing output bounds. */
+function _validateOutputEndpoints({
+  outputs,
+  source,
+  context,
+}: Readonly<ValidateOutputEndpointsOptions>): void {
+  outputs.forEach((output, index) => {
+    const values = [source.baseline, source.trial].map((value) => {
+      return evaluateAffineRule({
+        source: value,
+        multiplier: output.multiplier,
+        offset: output.offset,
+      });
+    });
+    if (
+      !(output.min < output.max) ||
+      values.some((value) => {
+        return (
+          !Number.isFinite(value) || value < output.min || value > output.max
+        );
+      })
+    ) {
+      context.addIssue({
+        code: "custom",
+        path: ["outputs", index],
+        message:
+          "Finite computed endpoints must lie inside increasing output bounds.",
+      });
+    }
+  });
+}

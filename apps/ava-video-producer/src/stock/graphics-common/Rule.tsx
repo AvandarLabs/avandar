@@ -1,17 +1,18 @@
 import { SketchedShape } from "../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
-/** A themed horizontal divider. */
-export function Rule({
-  x1,
-  x2,
-  y,
-}: {
+
+type Props = {
   x1: number;
   x2: number;
   y: number;
-}): ReactNode {
-  const rule = GraphicThemeHooks.useGraphicProps("Rule", {});
+};
+/** A themed horizontal divider. */
+export function Rule({ x1, x2, y }: Readonly<Props>): ReactNode {
+  const rule = GraphicThemeHooks.useGraphicProps({
+    name: "Rule",
+    props: {},
+  });
   const { sketch } = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (

@@ -12,7 +12,7 @@ import {
   changedInput,
 } from "./StratifiedSpatialSample.fixtures";
 
-test("Default selected/eligible fractions are one of three in the west and one of two in the east. An authored empty selection in one stratum leaves its denominator and unsampled markers visible. Reject sites outside their referenced stratum.", () => {
+test("default stratum hold frame reports one of three west and one of two east selections", () => {
   const markup = _render({ frame: 150 });
   assert.match(markup, /data-stratum="w" data-selected="1" data-eligible="3"/);
   assert.match(markup, /data-stratum="e" data-selected="1" data-eligible="2"/);

@@ -1,7 +1,7 @@
 import { propEq } from "@avandar/utils";
-import { SketchedShape } from "../../primitives/SketchedShape";
-import { StockRect } from "../../primitives/StockRect/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { CoordinationMarkerShape } from "./CoordinationMarkerShape/CoordinationMarkerShape";
+import { CoordinationTeamOrdinal } from "./CoordinationTeamOrdinal/CoordinationTeamOrdinal";
 import { getCoordinationPlaceColorFromIndex } from "./getCoordinationPlaceColorFromIndex";
 import { getTeamMarkerPoseFromInputAndFrame } from "./getTeamMarkerPoseFromInputAndFrame";
 import type { Input } from "./CommunityCoordinationTable.schema";
@@ -38,41 +38,8 @@ export function CoordinationMarker({
       data-x={x}
       data-y={y}
     >
-      {input.markerStyle === "flags" ? (
-        <SketchedShape
-          shape={{
-            kind: "path",
-            d: `M${x - 6} ${y + 9} V${y - 9} H${x + 7} V${y + 7} H${x - 6}`,
-          }}
-          profile={tokens.sketch.shape}
-          fill={tokens.color.surface}
-          stroke={color}
-          strokeWidth={scales.stroke(tokens.stroke.default)}
-        />
-      ) : (
-        <StockRect
-          x={x - 7}
-          y={y - 9}
-          width={14}
-          height={18}
-          rx={scales.corner(tokens.corner.chip)}
-          fill={tokens.color.surface}
-          stroke={color}
-          strokeWidth={scales.stroke(tokens.stroke.default)}
-        />
-      )}
-      <text
-        data-team-key
-        x={x}
-        y={y + 3}
-        fontFamily={tokens.text.graphic.data.fontFamily}
-        fontWeight={tokens.text.graphic.data.fontWeight}
-        fontSize={tokens.text.graphic.data.fontSize}
-        textAnchor="middle"
-        fill={tokens.color.text}
-      >
-        {index + 1}
-      </text>
+      <CoordinationMarkerShape {...{ input, x, y, tokens, color, scales }} />
+      <CoordinationTeamOrdinal {...{ index, tokens, x, y }} />
     </g>
   );
 }

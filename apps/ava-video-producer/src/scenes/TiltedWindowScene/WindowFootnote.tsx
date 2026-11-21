@@ -1,18 +1,21 @@
-import { useVideoTheme } from "../../videoTheme/useVideoTheme";
+import { useVideoTheme } from "../../videoTheme/videoThemeHelpers";
 import { useWindowStage } from "./useWindowStage";
 import { HEADLINE_BOX, WINDOW_BOXES } from "./windowTilt";
 import type { TiltedWindowSceneProps } from "../scenes.types";
 import type { ReactNode } from "react";
+
+type Props = {
+  frame: number;
+  text: string;
+  exit: TiltedWindowSceneProps["exit"];
+};
+
 /** A small muted note at the bottom left that fades out with the exit. */
 export function WindowFootnote({
   frame,
   text,
   exit,
-}: {
-  frame: number;
-  text: string;
-  exit: TiltedWindowSceneProps["exit"];
-}): ReactNode {
+}: Readonly<Props>): ReactNode {
   const theme = useVideoTheme();
   const { motion } = useWindowStage();
   const fade = exit

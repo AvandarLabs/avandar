@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { assertRenderedLabelGraphemes } from "../assertRenderedLabelGraphemes/assertRenderedLabelGraphemes";
+import { getAccessibleTextFromLabelExpectation } from "../assertRenderedLabelGraphemes/getAccessibleTextFromLabelExpectation";
 import { SvgPaintAssertions } from "../SvgPaintAssertions/SvgPaintAssertions";
+import type { RenderedLabelExpectation } from "../assertRenderedLabelGraphemes/RenderedLabelExpectation.types";
 
 type LayoutAssertions<Input extends object> = {
   inputSchema: { parse: (value: unknown) => Input };
@@ -12,7 +15,7 @@ type LayoutAssertions<Input extends object> = {
    */
   getVisibleTexts: (
     options: Readonly<{ input: Input; frame: number }>,
-  ) => string[];
+  ) => RenderedLabelExpectation[];
 };
 type PrefixInput = {
   value: unknown;
@@ -100,7 +103,7 @@ function _escapeAttribute(text: string): string {
 export function registerStockTextLayoutAssertions<Input extends object>(
   options: Readonly<LayoutAssertions<Input>>,
 ): void {
-  test("every accepted two-word prefix length fits without losing authored text", () => {
+  test("every accepted two-word prefix retains accessible copy and whole painted graphemes", () => {
     _forEachPrefix({
       options,
       check: (input, frame) => {
@@ -108,10 +111,13 @@ export function registerStockTextLayoutAssertions<Input extends object>(
         options
           .getVisibleTexts({ input: input, frame: frame })
           .forEach((text) => {
-            return assert.ok(
-              markup.includes(`aria-label="${_escapeAttribute(text)}"`),
-              text,
+            assert.ok(
+              markup.includes(
+                `aria-label="${_escapeAttribute(getAccessibleTextFromLabelExpectation(text))}"`,
+              ),
+              getAccessibleTextFromLabelExpectation(text),
             );
+            assertRenderedLabelGraphemes({ markup, text });
           });
       },
     });

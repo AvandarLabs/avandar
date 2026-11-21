@@ -1,4 +1,4 @@
-import { mix } from "../../../../motion";
+import { Motion } from "../../../../motion";
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ComplaintPlacement } from "../ComplaintPlacement";
@@ -6,7 +6,11 @@ import { WorkerRepairHand } from "./WorkerRepairHand";
 import type { Input } from "../GrievanceRemedyRetest.schema";
 import type { ReactNode } from "react";
 
-type Props = { frame: number; input: Input; accent: string };
+type Props = {
+  frame: number;
+  input: Input;
+  accent: string;
+};
 /** The participant operates and reports; the worker only replaces the part. */
 export function RemedyActions({
   frame,
@@ -28,7 +32,7 @@ export function RemedyActions({
         <SketchedShape
           shape={{
             kind: "path",
-            d: `M200 310 L${mix(reach, 220, 560)} ${mix(reach, 325, 330)}`,
+            d: `M200 310 L${Motion.mix({ t: reach, from: 220, to: 560 })} ${Motion.mix({ t: reach, from: 325, to: 330 })}`,
           }}
           profile={tokens.sketch.shape}
           data-operation={isRetesting ? "retest" : "initial-test"}
@@ -42,7 +46,7 @@ export function RemedyActions({
       {frame >= 44 && frame <= 78 ? (
         <WorkerRepairHand frame={frame} />
       ) : undefined}
-      <ComplaintPlacement frame={frame} input={input} accent={accent} />
+      <ComplaintPlacement {...{ frame, input, accent }} />
     </g>
   );
 }

@@ -1,5 +1,5 @@
-import { ramp } from "../../../../motion";
-import { StockRect } from "../../../primitives/StockRect/StockRect";
+import { Motion } from "../../../../motion";
+import { StockRect } from "../../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ForkLabel } from "../ForkLabel/ForkLabel";
 import { OutcomeCard } from "./OutcomeCard";
@@ -26,10 +26,20 @@ export function DecisionOutcome({
   const { color } = GraphicThemeHooks.useGraphicTokens();
   const motion = GraphicThemeHooks.useGraphicMotion();
   const selected = isSelected
-    ? ramp(frame, SELECTION_CUE, motion.sheet, motion.reveal.easing)
+    ? Motion.ramp({
+        frame,
+        at: SELECTION_CUE,
+        dur: motion.sheet,
+        easing: motion.reveal.easing,
+      })
     : 0;
   const opacity = isSelected
-    ? ramp(frame, HOLD_CUE, motion.chip, motion.reveal.easing)
+    ? Motion.ramp({
+        frame,
+        at: HOLD_CUE,
+        dur: motion.chip,
+        easing: motion.reveal.easing,
+      })
     : 1;
   if (!isSelected && !showUnchosenOutcomes) {
     return null;

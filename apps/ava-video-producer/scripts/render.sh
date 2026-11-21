@@ -1,4 +1,8 @@
 #!/bin/sh
+if [ "${AVA_PRODUCER_ACTIVE_SCRIPT:-}" != "$0" ]; then
+  exec node "$(dirname "$0")/runProducerCommand/runShellCommand.mjs" "render" "$0" "$@"
+fi
+exec 1>&2
 # Render one composition to a delivered mp4 + poster, then gate it.
 #
 #   sh scripts/render.sh <composition-id> [poster-frame]
@@ -37,9 +41,16 @@ GATE_FLAGS=""
 
 OUT="${RENDER_OUT_DIR:-out}"
 OUTPUT_ID="${RENDER_OUTPUT_ID:-$ID}"
-case "$OUTPUT_ID" in
-  ""|*[!a-zA-Z0-9_-]*) echo "Invalid output ID" >&2; exit 1 ;;
-esac
+if [ -n "${RENDER_OUTPUT_ID:-}" ]; then
+  case "$OUTPUT_ID" in
+    ""|*[!a-zA-Z0-9_-]*) echo "Invalid output ID" >&2; exit 1 ;;
+  esac
+else
+  node --input-type=module - "$OUTPUT_ID" <<'NODE'
+import { CompositionIds } from "./scripts/runProducerCommand/CompositionIds.mjs";
+CompositionIds.assert(process.argv[2]);
+NODE
+fi
 mkdir -p "$OUT"
 OUT=$(cd "$OUT" && pwd)
 FRAMES="$OUT/$OUTPUT_ID-frames"
@@ -114,10 +125,10 @@ if node --import tsx scripts/checkFrames.ts "$OUT/$OUTPUT_ID.mp4" $GATE_FLAGS; t
   fi
 else
   echo
-  echo "Gate failed — frames kept for inspection:"
+  echo "Gate failed - frames kept for inspection:"
   echo "  $FRAMES/element-<NNN>.jpeg"
   echo "Open the flagged frame. If the JPEG is already a grid, the encoder is"
-  echo "innocent — see .claude/skills/product-demo/references/render.md."
+  echo "innocent - see .claude/skills/product-demo/references/render.md."
   exit 1
 fi
 
@@ -129,4 +140,4 @@ fi
 echo
 echo "Picture is done. Sound is a separate pass over this file:"
 echo "  bash scripts/add-sfx.sh $ID          # writes $OUT/$ID-sound.mp4"
-echo "Ask before scoring it — see section 7 of the skill for which question."
+echo "Ask before scoring it - see section 7 of the skill for which question."

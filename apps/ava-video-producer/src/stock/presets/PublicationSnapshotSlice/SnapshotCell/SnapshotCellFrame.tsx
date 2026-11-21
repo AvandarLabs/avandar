@@ -1,5 +1,5 @@
-import { mix } from "../../../../motion";
-import { StockRect } from "../../../primitives/StockRect/StockRect";
+import { Motion } from "../../../../motion";
+import { StockRect } from "../../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { type CellFrameProps as Props } from "./SnapshotCellShared.types";
 import type { ReactNode } from "react";
@@ -33,15 +33,15 @@ export function SnapshotCellFrame({
       stroke={scene.selected ? accent : tokens.color.line}
       strokeWidth={scales.stroke(
         scene.selected
-          ? mix(
-              motion.ramp(
+          ? Motion.mix({
+              t: motion.ramp(
                 frame,
                 13 + diagonal * motion.stagger.list,
                 motion.scale(22),
               ),
-              tokens.stroke.hairline,
-              tokens.stroke.default,
-            )
+              from: tokens.stroke.hairline,
+              to: tokens.stroke.default,
+            })
           : tokens.stroke.hairline,
       )}
     />

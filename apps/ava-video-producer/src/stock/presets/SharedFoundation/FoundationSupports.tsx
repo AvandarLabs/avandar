@@ -1,4 +1,4 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Props } from "./SharedFoundation";
@@ -25,7 +25,11 @@ export function FoundationSupports({
               x1: x,
               y1: 330,
               x2: x,
-              y2: mix(reconnect, 330, 390),
+              y2: Motion.mix({
+                t: reconnect,
+                from: 330,
+                to: 390,
+              }),
             }}
             profile={tokens.sketch.shape}
             data-foundation-support={approach.id}

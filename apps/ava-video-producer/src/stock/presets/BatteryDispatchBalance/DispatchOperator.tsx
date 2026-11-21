@@ -1,12 +1,18 @@
-import { mix } from "../../../motion";
-import { FitText } from "../../primitives/FitText/FitText";
+import { Motion } from "../../../motion";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { DispatchButton } from "./DispatchButton/DispatchButton";
+import { DispatchDecisionLabels } from "./DispatchDecisionLabels/DispatchDecisionLabels";
 import type { Input } from "./BatteryDispatchBalance.schema";
 import type { ReactNode } from "react";
+
 /** Inputs for DispatchOperator. */
-type Props = { frame: number; accent: string; input: Input };
+type Props = {
+  frame: number;
+  accent: string;
+  input: Input;
+};
 /**
  * The operator reaches and presses the dispatch cue before stored energy exits.
  */
@@ -20,30 +26,11 @@ export function DispatchOperator({
   const motion = GraphicThemeHooks.useGraphicMotion();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   const reach = motion.ramp(frame, 68, motion.whip, motion.travel.easing);
-  const handX = mix(reach, 449, 480);
-  const handY = mix(reach, 111, 105);
+  const handX = Motion.mix({ t: reach, from: 449, to: 480 });
+  const handY = Motion.mix({ t: reach, from: 111, to: 105 });
   return (
     <g>
-      <FitText
-        text={input.decision.actorLabel}
-        x={32}
-        y={95}
-        width={360}
-        fontSize={12}
-        maxLines={3}
-        breakLongWords
-        normalizeWhitespace
-      />
-      <FitText
-        text={input.decision.actionLabel}
-        x={550}
-        y={95}
-        width={378}
-        fontSize={12}
-        maxLines={3}
-        breakLongWords
-        normalizeWhitespace
-      />
+      <DispatchDecisionLabels input={input} />
       <PersonGlyph
         x={439}
         y={106}
@@ -51,14 +38,7 @@ export function DispatchOperator({
         role="worker"
         color={tokens.color.accentAlt}
       />
-      <circle
-        data-dispatch-button="true"
-        cx={480}
-        cy={105}
-        r={9}
-        fill={accent}
-        fillOpacity={atomic.opacity["20"] + atomic.opacity["60"] * reach}
-      />
+      <DispatchButton {...{ accent, atomic, reach }} />
       <SketchedShape
         shape={{ kind: "path", d: `M 445 106 L ${handX} ${handY}` }}
         profile={tokens.sketch.shape}

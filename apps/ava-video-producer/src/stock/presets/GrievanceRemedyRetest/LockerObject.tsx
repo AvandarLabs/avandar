@@ -1,10 +1,13 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 /** Inputs for LockerObject. */
-type Props = { functioning: number; accent: string };
+type Props = {
+  functioning: number;
+  accent: string;
+};
 /** The locker door stays visibly ajar until a functioning retest. */
 export function LockerObject({
   functioning,
@@ -27,7 +30,7 @@ export function LockerObject({
       <SketchedShape
         shape={{
           kind: "path",
-          d: `M406 237 L${mix(functioning, 490, 574)} ${mix(functioning, 260, 237)} V${mix(functioning, 430, 403)} L406 403 Z`,
+          d: `M406 237 L${Motion.mix({ t: functioning, from: 490, to: 574 })} ${Motion.mix({ t: functioning, from: 260, to: 237 })} V${Motion.mix({ t: functioning, from: 430, to: 403 })} L406 403 Z`,
         }}
         profile={tokens.sketch.shape}
         data-locker-door="operated"

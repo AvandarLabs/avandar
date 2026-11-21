@@ -36,7 +36,10 @@ function _getCounterProgress({
     ),
   };
 }
-/** Shared values and calculations for the RaceStats visuals. */
+/**
+ * Counter progress and label positions used by RaceCounter, RaceLabel,
+ * RaceStat, RaceStats, and RaceBadge.
+ */
 export const RaceStatsShared = {
   /** The left edge of a column's label and counter. */
   getStatLeft: _getStatLeft,

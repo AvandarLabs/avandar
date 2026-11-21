@@ -1,13 +1,17 @@
 // Registers the bundled faces the theme's text roles name.
 import "../../fonts";
-import { typed } from "../../motion";
+import { Motion } from "../../motion";
 import { useVideoMotion } from "../../videoTheme/useVideoMotion";
-import { useVideoTheme } from "../../videoTheme/useVideoTheme";
-import { MotionLabShared } from "./MotionLabShared/MotionLabShared";
+import { useVideoTheme } from "../../videoTheme/videoThemeHelpers";
+import { MotionLabShared } from "./MotionLabShared";
 import { SectionLabel } from "./SectionLabel";
 import type { ReactNode } from "react";
+
+type Props = {
+  frame: number;
+};
 /** Demonstrates a sentence appearing character by character in `MotionLab`. */
-export function TypedCard({ frame }: { frame: number }): ReactNode {
+export function TypedCard({ frame }: Readonly<Props>): ReactNode {
   const { mantine } = useVideoTheme();
   const motion = useVideoMotion();
   const panel = MotionLabShared.usePanelStyle();
@@ -29,12 +33,12 @@ export function TypedCard({ frame }: { frame: number }): ReactNode {
           fontSize: mantine.fontSizes["8xl"],
         }}
       >
-        {typed(
+        {Motion.typed({
           frame,
-          MotionLabShared.TYPE_AT,
-          "Ask a question. Show the answer.",
-          motion.typing.rate,
-        )}
+          at: MotionLabShared.TYPE_AT,
+          text: "Ask a question. Show the answer.",
+          cps: motion.typing.rate,
+        })}
       </div>
     </div>
   );

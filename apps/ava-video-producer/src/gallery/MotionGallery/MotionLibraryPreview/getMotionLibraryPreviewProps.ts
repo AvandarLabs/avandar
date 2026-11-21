@@ -1,5 +1,5 @@
 import type { PreviewDialog } from "../PreviewDialog/PreviewDialog";
-import type { MotionGalleryState } from "../useMotionGalleryState";
+import type { MotionGalleryState } from "../useMotionGalleryState/useMotionGalleryState";
 import type { ComponentProps } from "react";
 
 /** Gallery selection and theme colors supplied to the preview dialog. */

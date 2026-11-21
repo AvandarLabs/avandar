@@ -3,6 +3,7 @@
  * when the owner is not among the members. No backend is contacted.
  */
 export const WorkspaceClient = {
+  /** Returns the empty, nonloading member list for ontology films. */
   useGetUsersForWorkspace: (_params: {
     workspaceId: string;
   }): readonly [readonly never[], false] => {

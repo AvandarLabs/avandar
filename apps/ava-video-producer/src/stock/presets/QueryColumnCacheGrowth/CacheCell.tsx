@@ -1,3 +1,4 @@
+import { prop } from "@avandar/utils";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import type { ReactNode } from "react";
 
@@ -19,9 +20,7 @@ export function CacheCell({
   x,
   y,
 }: Readonly<Props>): ReactNode {
-  const segments = Array.from(GRAPHEMES.segment(value), ({ segment }) => {
-    return segment;
-  });
+  const segments = Array.from(GRAPHEMES.segment(value), prop("segment"));
   const lines = [
     segments.slice(0, 8).join(""),
     ...(segments.length > 8 ? [segments.slice(8).join("")] : []),

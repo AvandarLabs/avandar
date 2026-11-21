@@ -1,9 +1,12 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { GrantCandidateShared } from "./GrantCandidateShared/GrantCandidateShared";
+import { GrantCandidateShared } from "./GrantCandidateShared";
 import type { ReactNode } from "react";
+
+type Props = { x: number };
+
 /** The dashed rail a grant climbs. */
-export function GrantRail({ x }: Readonly<{ x: number }>): ReactNode {
+export function GrantRail({ x }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <SketchedShape

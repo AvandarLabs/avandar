@@ -1,17 +1,21 @@
-import { token } from "../defineTokensHelpers";
+import { TokenDefinitions } from "../TokenDefinitions";
 
 function _cameraPreset(name: string) {
-  return token({
+  return TokenDefinitions.token({
     kind: "cameraPreset",
     label: `${name} camera`,
     description: `Speed, shutter, and curve of the ${name.toLowerCase()} camera preset.`,
   });
 }
-
-function _easing(label: string, description: string) {
-  return token({ kind: "easing", label, description });
+function _easing({
+  label,
+  description,
+}: Readonly<{
+  label: string;
+  description: string;
+}>) {
+  return TokenDefinitions.token({ kind: "easing", label, description });
 }
-
 const CAMERA_PRESET_OPTIONS = [
   "authored",
   "deliberate",
@@ -20,10 +24,9 @@ const CAMERA_PRESET_OPTIONS = [
   "brisk",
   "whip",
 ] as const;
-
 /** Semantic camera presets, curves, and zoom limits. */
 export const CAMERA_TOKENS = {
-  preset: token({
+  preset: TokenDefinitions.token({
     kind: "enum",
     options: CAMERA_PRESET_OPTIONS,
     label: "Camera preset",
@@ -37,14 +40,20 @@ export const CAMERA_TOKENS = {
     whip: _cameraPreset("Whip"),
   },
   easing: {
-    push: _easing("Push curve", "The curve of a camera pushing in."),
-    whip: _easing("Whip curve", "The curve of a fast camera whip."),
-    glide: _easing(
-      "Glide curve",
-      "The curve of a camera gliding between framings.",
-    ),
+    push: _easing({
+      label: "Push curve",
+      description: "The curve of a camera pushing in.",
+    }),
+    whip: _easing({
+      label: "Whip curve",
+      description: "The curve of a fast camera whip.",
+    }),
+    glide: _easing({
+      label: "Glide curve",
+      description: "The curve of a camera gliding between framings.",
+    }),
   },
-  zoom: token({
+  zoom: TokenDefinitions.token({
     kind: "range",
     label: "Zoom limits",
     description: "The smallest and largest camera zoom.",

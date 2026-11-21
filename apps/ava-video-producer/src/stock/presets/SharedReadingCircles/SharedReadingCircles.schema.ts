@@ -1,97 +1,116 @@
 import { propEq, prop } from "@avandar/utils";
 import { z } from "zod";
 import type { StockSemanticRule } from "../../contracts/StockContract.types";
+
 /** Strict complete authored input and runtime cross-field constraints. */
-export const inputSchema = z
-  .strictObject({
-    learners: z
-      .array(
-        z.strictObject({
-          id: z.string().min(1).max(20),
-          label: z.string().min(1).max(16),
-        }),
-      )
-      .min(2)
-      .max(8),
-    books: z
-      .array(
-        z.strictObject({
-          id: z.string().min(1).max(20),
-          label: z.string().min(1).max(22),
-          pageLabel: z.string().min(1).max(28),
-        }),
-      )
-      .min(1)
-      .max(4),
-    readingGroups: z
-      .array(
-        z.strictObject({
-          bookId: z.string().min(1).max(20),
-          learnerIds: z.array(z.string().min(1).max(20)).min(1).max(4),
-        }),
-      )
-      .min(1)
-      .max(4),
-    startingShelf: z.enum(["front", "side"]),
-    labels: z.strictObject({
-      books: z.string().min(1).max(26),
-      readers: z.string().min(1).max(26),
-      class: z.string().min(1).max(26),
-    }),
-    showGroupCounts: z.boolean(),
-    caption: z.string().min(1).max(48),
-  })
-  .superRefine((input, context) => {
-    if (
-      new Set(input.learners.map(prop("id"))).size !== input.learners.length
-    ) {
-      context.addIssue({
-        code: "custom",
-        path: ["learners"],
-        message: "Learner IDs must be unique.",
-      });
-    }
-    if (
-      new Set(input.books.map(prop("id"))).size !== input.books.length ||
-      input.books.length > input.learners.length
-    ) {
-      context.addIssue({
-        code: "custom",
-        path: ["books"],
-        message: "Books require unique IDs and cannot outnumber learners.",
-      });
-    }
-    const bookIds = input.readingGroups.map(prop("bookId"));
-    if (
-      bookIds.length !== input.books.length ||
-      new Set(bookIds).size !== bookIds.length ||
-      bookIds.some((id) => {
-        return !input.books.some(propEq("id", id));
-      })
-    ) {
-      context.addIssue({
-        code: "custom",
-        path: ["readingGroups"],
-        message: "Exactly one reading group must reference each existing book.",
-      });
-    }
-    const learnerIds = input.readingGroups.flatMap(prop("learnerIds"));
-    if (
-      learnerIds.length !== input.learners.length ||
-      new Set(learnerIds).size !== learnerIds.length ||
-      learnerIds.some((id) => {
-        return !input.learners.some(propEq("id", id));
-      })
-    ) {
-      context.addIssue({
-        code: "custom",
-        path: ["readingGroups"],
-        message: "Each known learner belongs to exactly one group.",
-      });
-    }
-  }) satisfies z.ZodType;
+
+const authoredInputSchema = z.strictObject({
+  learners: z
+    .array(
+      z.strictObject({
+        id: z.string().min(1).max(20),
+        label: z.string().min(1).max(16),
+      }),
+    )
+    .min(2)
+    .max(8),
+  books: z
+    .array(
+      z.strictObject({
+        id: z.string().min(1).max(20),
+        label: z.string().min(1).max(22),
+        pageLabel: z.string().min(1).max(28),
+      }),
+    )
+    .min(1)
+    .max(4),
+  readingGroups: z
+    .array(
+      z.strictObject({
+        bookId: z.string().min(1).max(20),
+        learnerIds: z.array(z.string().min(1).max(20)).min(1).max(4),
+      }),
+    )
+    .min(1)
+    .max(4),
+  startingShelf: z.enum(["front", "side"]),
+  labels: z.strictObject({
+    books: z.string().min(1).max(26),
+    readers: z.string().min(1).max(26),
+    class: z.string().min(1).max(26),
+  }),
+  showGroupCounts: z.boolean(),
+  caption: z.string().min(1).max(48),
+});
+type ValidateSharedReadingCirclesLearnersOptions = {
+  input: Readonly<{ input: Input; context: z.RefinementCtx }>["input"];
+  context: Readonly<{ input: Input; context: z.RefinementCtx }>["context"];
+};
+/** Checks the learners constraint and records any violations. */
+function _validateSharedReadingCirclesLearners({
+  input,
+  context,
+}: Readonly<ValidateSharedReadingCirclesLearnersOptions>): void {
+  if (new Set(input.learners.map(prop("id"))).size !== input.learners.length) {
+    context.addIssue({
+      code: "custom",
+      path: ["learners"],
+      message: "Learner IDs must be unique.",
+    });
+  }
+}
+
+/** Validates cross-field relationships in the authored input. */
+function _validateSharedReadingCirclesInput({
+  input,
+  context,
+}: Readonly<{ input: Input; context: z.RefinementCtx }>): void {
+  _validateSharedReadingCirclesLearners({ input, context });
+  if (
+    new Set(input.books.map(prop("id"))).size !== input.books.length ||
+    input.books.length > input.learners.length
+  ) {
+    context.addIssue({
+      code: "custom",
+      path: ["books"],
+      message: "Books require unique IDs and cannot outnumber learners.",
+    });
+  }
+  const bookIds = input.readingGroups.map(prop("bookId"));
+  if (
+    bookIds.length !== input.books.length ||
+    new Set(bookIds).size !== bookIds.length ||
+    bookIds.some((id) => {
+      return !input.books.some(propEq("id", id));
+    })
+  ) {
+    context.addIssue({
+      code: "custom",
+      path: ["readingGroups"],
+      message: "Exactly one reading group must reference each existing book.",
+    });
+  }
+  const learnerIds = input.readingGroups.flatMap(prop("learnerIds"));
+  if (
+    learnerIds.length !== input.learners.length ||
+    new Set(learnerIds).size !== learnerIds.length ||
+    learnerIds.some((id) => {
+      return !input.learners.some(propEq("id", id));
+    })
+  ) {
+    context.addIssue({
+      code: "custom",
+      path: ["readingGroups"],
+      message: "Each known learner belongs to exactly one group.",
+    });
+  }
+}
+/** Complete authored input with its runtime semantic constraints. */
+export const inputSchema = authoredInputSchema.superRefine((input, context) => {
+  _validateSharedReadingCirclesInput({ input, context });
+}) satisfies z.ZodType;
 /** Input inferred from the strict runtime schema. */
-export type Input = z.output<typeof inputSchema>;
+export type Input = z.output<typeof authoredInputSchema>;
 /** Runtime and editorial invariants beyond structural JSON Schema. */
 export const SEMANTIC_RULES: StockSemanticRule[] = [
   {

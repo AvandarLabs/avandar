@@ -1,5 +1,5 @@
 import { MotionRect } from "../../../../motion-components/getOverlayTimings";
-import { DEMO_CANVAS } from "./DemoCanvas";
+import { DEMO_CANVAS } from "./DemoCanvas/DemoCanvas";
 
 type GetCanvasRectOptions = {
   x: number;

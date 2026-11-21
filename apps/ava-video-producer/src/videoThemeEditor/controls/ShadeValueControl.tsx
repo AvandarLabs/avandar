@@ -3,6 +3,8 @@ import { RangeNumberInput } from "./RangeNumberInput";
 import type { ValueControlProps } from "./valueControl.types";
 import type { ReactNode } from "react";
 
+type Props = ValueControlProps;
+
 type Shade = Readonly<{ light: number; dark: number }>;
 
 /** The primary shade: one index for dark grounds and one for light grounds. */
@@ -10,7 +12,7 @@ export function ShadeValueControl({
   label,
   value,
   onChange,
-}: ValueControlProps): ReactNode {
+}: Readonly<Props>): ReactNode {
   const shade: Shade =
     typeof value === "number"
       ? { light: value, dark: value }

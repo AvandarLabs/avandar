@@ -1,12 +1,13 @@
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { makeGridSceneFromInputAndFrame } from "../makeGridSceneFromInputAndFrame";
 import type { ReactNode } from "react";
-/** A faint ghost at each point's source position. */
-export function SourceGhosts({
-  points,
-}: Readonly<{
+
+type Props = {
   points: ReturnType<typeof makeGridSceneFromInputAndFrame>["points"];
-}>): ReactNode {
+};
+
+/** A faint ghost at each point's source position. */
+export function SourceGhosts({ points }: Readonly<Props>): ReactNode {
   const { atomic } = GraphicThemeHooks.useGraphicTheme();
   const { color } = GraphicThemeHooks.useGraphicTokens();
   return points.map((point) => {

@@ -1,4 +1,5 @@
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { isDefined } from "@avandar/utils";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { RevisionCurrentLines } from "./RevisionCurrentLines";
 import type { Input } from "./RevisionRestore.schema";
@@ -31,11 +32,7 @@ export function RevisionDocument({
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g
-      data-current-content={content
-        .filter((line) => {
-          return line !== undefined;
-        })
-        .join("|")}
+      data-current-content={content.filter(isDefined).join("|")}
       data-surface={input.surface}
     >
       <StockRect

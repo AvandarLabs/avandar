@@ -11,6 +11,7 @@ import {
   invalidInputs,
 } from ".././ProseMeasurementLedger.fixtures";
 import { inputSchema, type Input } from ".././ProseMeasurementLedger.schema";
+import type { RenderedLabelExpectation } from "../../../../../tests/helpers/assertRenderedLabelGraphemes/RenderedLabelExpectation.types";
 import type { PresetAssertions } from "../../../../../tests/helpers/registerStockPresetAssertions";
 
 const render = ({
@@ -57,12 +58,15 @@ const EXCLUDED_TEXT_FIELDS: string[] = [
 const getVisibleTexts = ({
   input,
   frame,
-}: Readonly<{ input: Input; frame: number }>): string[] => {
+}: Readonly<{ input: Input; frame: number }>): RenderedLabelExpectation[] => {
   return [
     input.copy.context,
     input.copy.source,
     input.copy.result,
-    input.fragments.map(prop("text")).join(""),
+    {
+      text: input.fragments.map(prop("text")).join(""),
+      representation: { kind: "source-glyph-run" },
+    },
     ...input.fragments
       .filter(({ role }) => {
         return role !== "connector";

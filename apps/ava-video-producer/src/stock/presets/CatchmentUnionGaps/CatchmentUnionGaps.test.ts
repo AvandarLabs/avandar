@@ -11,7 +11,7 @@ import {
   changedInput,
 } from "./CatchmentUnionGaps.fixtures";
 
-test("The default union covers three of four homes and six of eight members, counting the overlapping home once. Removing a catchment recomputes the union and gaps without duplicating or deleting household records.", () => {
+test("default catchment hold frame reports three covered households out of four", () => {
   const markup = _render({ frame: 150 });
   assert.match(markup, /data-covered="3"/);
   assert.match(markup, /data-denominator="4"/);
@@ -22,6 +22,27 @@ import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/reg
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
 import { catchmentUnionGapsContract } from "./CatchmentUnionGaps.contract";
 import { inputSchema, type Input } from "./CatchmentUnionGaps.schema";
+
+function _assertCoincidentHouseholdCount(): void {
+  [defaultInput, changedInput].forEach((input) => {
+    return assert.equal(
+      (_render({ frame: 150, input: input }).match(/data-household=/g) ?? [])
+        .length,
+      4,
+    );
+  });
+}
+
+function _assertOutsideHouseholdEmphasis(outside: Readonly<Input>): void {
+  assert.equal(
+    (
+      _render({ frame: 150, input: outside }).match(
+        /data-uncovered-emphasis=/g,
+      ) ?? []
+    ).length,
+    4,
+  );
+}
 
 function _render({
   frame,
@@ -93,13 +114,7 @@ test("union membership counts a coincident record once and recomputes after remo
     _render({ frame: 150, input: changedInput }),
     /data-covered="5" data-denominator="8"/,
   );
-  [defaultInput, changedInput].forEach((input) => {
-    return assert.equal(
-      (_render({ frame: 150, input: input }).match(/data-household=/g) ?? [])
-        .length,
-      4,
-    );
-  });
+  _assertCoincidentHouseholdCount();
   const duplicate = inputSchema.parse({
     ...defaultInput,
     catchments: [
@@ -129,14 +144,7 @@ test("union membership counts a coincident record once and recomputes after remo
     _render({ frame: 150, input: outside }),
     /data-covered="0" data-denominator="4"/,
   );
-  assert.equal(
-    (
-      _render({ frame: 150, input: outside }).match(
-        /data-uncovered-emphasis=/g,
-      ) ?? []
-    ).length,
-    4,
-  );
+  _assertOutsideHouseholdEmphasis(outside);
 });
 test("duplicate tint disappears while union boundary and stationary homes remain", () => {
   const setup = _render({ frame: 0, input: changedInput });

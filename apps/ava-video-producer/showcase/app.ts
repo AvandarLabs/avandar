@@ -12,7 +12,6 @@ type Clip = Readonly<{
   chapters: readonly Chapter[];
   note: string;
 }>;
-
 const CLIPS: readonly Clip[] = [
   {
     id: "avandar-home",
@@ -61,7 +60,6 @@ const CLIPS: readonly Clip[] = [
     note: "The layout is new. Shared motion helpers, fonts and palette come from the starter; the macOS cursor adds smooth click feedback and subtle motion blur.",
   },
 ];
-
 /** Returns the element a page must contain, or throws when it is missing. */
 function _requireElement<T extends Element>(selector: string): T {
   const element = document.querySelector<T>(selector);
@@ -70,19 +68,31 @@ function _requireElement<T extends Element>(selector: string): T {
   }
   return element;
 }
-
 const player = _requireElement<HTMLIFrameElement>("#player");
 const speed = _requireElement<HTMLSelectElement>("#speed");
 const loop = _requireElement<HTMLInputElement>("#loop");
 const downloadButton = _requireElement<HTMLButtonElement>("#download");
 const exportStatus = _requireElement<HTMLElement>("#export-status");
-const clipOptions = new Map<string, { captions: boolean }>();
+const clipOptions = new Map<
+  string,
+  {
+    captions: boolean;
+  }
+>();
 let currentIndex = 0;
 let isAwaitingPlayer = true;
 let shouldPlayWhenReady = false;
-let pendingControls: Array<{ action: string; value?: number | boolean }> = [];
-
-function _control(action: string, value?: number | boolean): void {
+let pendingControls: Array<{
+  action: string;
+  value?: number | boolean;
+}> = [];
+function _control({
+  action,
+  value,
+}: Readonly<{
+  action: string;
+  value?: number | boolean;
+}>): void {
   if (isAwaitingPlayer) {
     if (!["speed", "loop"].includes(action)) {
       pendingControls.push({ action, value });
@@ -94,7 +104,6 @@ function _control(action: string, value?: number | boolean): void {
     window.location.origin,
   );
 }
-
 function _createChapterButton([time, label]: Chapter): HTMLButtonElement {
   const button = document.createElement("button");
   button.type = "button";
@@ -106,12 +115,14 @@ function _createChapterButton([time, label]: Chapter): HTMLButtonElement {
     `Jump to ${label} at ${time.toFixed(1)} seconds`,
   );
   button.addEventListener("click", () => {
-    _control("seek", Math.round(time * 30));
-    _control("play");
+    _control({
+      action: "seek",
+      value: Math.round(time * 30),
+    });
+    _control({ action: "play" });
   });
   return button;
 }
-
 function _updateDetails(index: number): void {
   const clip = CLIPS[index];
   _requireElement("#clip-count").textContent = `CLIP 0${index + 1} / 03`;
@@ -137,12 +148,16 @@ function _updateDetails(index: number): void {
     ...clip.chapters.map(_createChapterButton),
   );
 }
-
 function _restoreTransport(): void {
-  _control("speed", Number(speed.value));
-  _control("loop", loop.checked);
+  _control({
+    action: "speed",
+    value: Number(speed.value),
+  });
+  _control({
+    action: "loop",
+    value: loop.checked,
+  });
 }
-
 window.addEventListener("message", (event: MessageEvent<unknown>) => {
   if (
     event.origin !== window.location.origin ||
@@ -170,23 +185,25 @@ window.addEventListener("message", (event: MessageEvent<unknown>) => {
     return;
   }
   pendingControls.forEach(({ action, value }) => {
-    _control(action, value);
+    _control({
+      action,
+      value,
+    });
   });
   pendingControls = [];
   if (shouldPlayWhenReady) {
-    _control("play");
+    _control({ action: "play" });
   }
   shouldPlayWhenReady = false;
 });
-
 document.querySelectorAll<HTMLElement>("[data-clip]").forEach((button) => {
   button.addEventListener("click", () => {
     const index = Number(button.dataset.clip);
     if (index === currentIndex) {
-      _control("replay");
+      _control({ action: "replay" });
       return;
     }
-    _control("pause");
+    _control({ action: "pause" });
     currentIndex = index;
     isAwaitingPlayer = true;
     shouldPlayWhenReady = true;
@@ -197,16 +214,21 @@ document.querySelectorAll<HTMLElement>("[data-clip]").forEach((button) => {
   });
 });
 speed.addEventListener("change", () => {
-  _control("speed", Number(speed.value));
+  _control({
+    action: "speed",
+    value: Number(speed.value),
+  });
 });
 loop.addEventListener("change", () => {
-  _control("loop", loop.checked);
+  _control({
+    action: "loop",
+    value: loop.checked,
+  });
 });
 _requireElement("#replay").addEventListener("click", () => {
-  _control("replay");
+  _control({ action: "replay" });
 });
 player.addEventListener("load", _restoreTransport);
-
 downloadButton.addEventListener("click", async () => {
   if (downloadButton.disabled) {
     return;
@@ -233,4 +255,4 @@ downloadButton.addEventListener("click", async () => {
 });
 _updateDetails(0);
 player.src = player.dataset.src ?? "";
-watchFilms([player]);
+watchFilms({ players: [player] });

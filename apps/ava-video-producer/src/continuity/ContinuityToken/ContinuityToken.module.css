@@ -1,0 +1,14 @@
+.continuityToken {
+  align-items: center;
+  background: var(--video-component-shared-object-fill);
+  border: var(--video-component-shared-object-border-width) solid currentcolor;
+  box-sizing: border-box;
+  color: var(--video-text-stage-shared-object-color);
+  display: flex;
+  font-family: var(--video-text-stage-shared-object-font-family);
+  font-size: var(--video-text-stage-shared-object-font-size);
+  font-weight: var(--video-text-stage-shared-object-font-weight);
+  justify-content: center;
+  position: absolute;
+  z-index: 22;
+}

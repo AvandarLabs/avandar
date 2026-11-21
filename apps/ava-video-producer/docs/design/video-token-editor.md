@@ -42,7 +42,7 @@ shape and annotation sketches after the box sketch. The nine category colours
 close the group. Every option opens at its identity value (1, `authored`, or
 `rise`), so the group reads as unedited on a fresh theme, and options use the
 same row, control, and edited-dot states as every other token. The order is
-`ESSENTIAL_TOKEN_PATHS` in `src/videoThemeEditor/tokenRows/tokenRows.ts`.
+`ESSENTIAL_TOKEN_PATHS` in `src/videoThemeEditor/TokenRows/TokenRows.ts`.
 
 ## Density and rhythm
 

@@ -3,6 +3,11 @@ import test from "node:test";
 import { EASE } from "../../motion";
 import { MotionSettings } from "./MotionSettings";
 
+const SEEK_MOTION_OPTIONS = {
+  easing: [0.22, 0.8, 0.35, 1] as [number, number, number, number],
+  speed: 0.5,
+};
+
 test("five presets resolve distinct travel durations and restrained-to-strong shutters", () => {
   const presets = Object.keys(MotionSettings.MOTION_PRESETS) as Array<
     keyof typeof MotionSettings.MOTION_PRESETS
@@ -57,7 +62,7 @@ test("numeric overrides win over presets without modifying their shared definiti
     MotionSettings.resolveMotionSettings({ options: { preset: "whip" } }).speed,
     1.5,
   );
-  for (const options of [
+  [
     { speed: 0 },
     { speed: Infinity },
     { samples: 1 },
@@ -65,12 +70,12 @@ test("numeric overrides win over presets without modifying their shared definiti
     { shutterAngle: 361 },
     { blurStrength: -1 },
     { easing: [0.5, 2, 0.5, 1] },
-  ]) {
+  ].forEach((options) => {
     assert.equal(
       MotionSettings.motionOptionsSchema.safeParse(options).success,
       false,
     );
-  }
+  });
 });
 
 test("named easing distinguishes acceleration, arrival and symmetric travel", () => {
@@ -106,10 +111,7 @@ test("named easing distinguishes acceleration, arrival and symmetric travel", ()
 });
 
 test("custom Bezier curves respect endpoints and deterministic fractional seeks", () => {
-  const motion = {
-    easing: [0.22, 0.8, 0.35, 1] as [number, number, number, number],
-    speed: 0.5,
-  };
+  const motion = SEEK_MOTION_OPTIONS;
   assert.equal(
     MotionSettings.getMotionProgress({
       frame: 0,

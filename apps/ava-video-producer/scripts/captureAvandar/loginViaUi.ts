@@ -1,4 +1,4 @@
-import { isWorkspaceRoute } from "../captureLib/urlSafetyHelpers";
+import { CaptureUrlSafety } from "../captureLib/CaptureUrlSafety/CaptureUrlSafety";
 import type { CaptureLoginOptions } from "./captureAvandar.types";
 
 /**
@@ -18,6 +18,10 @@ export async function loginViaUi({
   await page.getByLabel(/^Password(?: \*)?$/).fill(password);
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await page.waitForURL((url) => {
-    return isWorkspaceRoute({ url: url.href, baseUrl, workspace });
+    return CaptureUrlSafety.isWorkspaceRoute({
+      url: url.href,
+      baseUrl,
+      workspace,
+    });
   });
 }

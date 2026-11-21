@@ -1,7 +1,9 @@
-import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { StockRect } from "../../primitives/StockRect/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { CoordinationPlaceCopyPlaceKey } from "./CoordinationPlaceCopyPlaceKey/CoordinationPlaceCopyPlaceKey";
+import { CoordinationPlaceCopyRequestCard } from "./CoordinationPlaceCopyRequestCard/CoordinationPlaceCopyRequestCard";
+import { CoordinationPlaceName } from "./CoordinationPlaceName/CoordinationPlaceName";
+import { CoordinationRequestLabel } from "./CoordinationRequestLabel/CoordinationRequestLabel";
 import { getCoordinationPlaceColorFromIndex } from "./getCoordinationPlaceColorFromIndex";
 import type { Input } from "./CommunityCoordinationTable.schema";
 import type { ReactNode } from "react";
@@ -36,51 +38,12 @@ export function CoordinationPlaceCopy({
         fill={tokens.color.surface}
         stroke={color}
       />
-      <text
-        data-place-key={place.id}
-        x={25}
-        y={y}
-        textAnchor="middle"
-        fontFamily={tokens.text.graphic.data.fontFamily}
-        fontWeight={tokens.text.graphic.data.fontWeight}
-        fontSize={tokens.text.graphic.data.fontSize}
-        fill={color}
-      >
-        {String.fromCharCode(65 + index)}
-      </text>
-      <FitText
-        text={place.label}
-        x={40}
-        y={y}
-        width={280}
-        fontSize={12}
-        maxLines={3}
-        breakLongWords
-        normalizeWhitespace
+      <CoordinationPlaceCopyPlaceKey {...{ place, y, tokens, color, index }} />
+      <CoordinationPlaceName place={place} y={y} />
+      <CoordinationPlaceCopyRequestCard
+        {...{ place, index, scales, tokens, color, frame, atomic }}
       />
-      <StockRect
-        data-request-card={place.id}
-        x={36}
-        y={158 + 108 * index}
-        width={284}
-        height={54}
-        rx={scales.corner(tokens.corner.chip)}
-        fill="none"
-        stroke={color}
-        strokeOpacity={
-          frame >= 108 ? atomic.opacity["80"] : atomic.opacity["30"]
-        }
-      />
-      <FitText
-        text={place.requestLabel}
-        x={40}
-        y={174 + 108 * index}
-        width={280}
-        fontSize={12}
-        maxLines={3}
-        breakLongWords
-        normalizeWhitespace
-      />
+      <CoordinationRequestLabel place={place} index={index} />
     </g>
   );
 }

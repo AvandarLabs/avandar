@@ -1,8 +1,8 @@
-import { StockRect } from "../../../primitives/StockRect/StockRect";
+import { StockRect } from "../../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CitationUnderline } from "../CitationUnderline";
 import { getSourceSheetGeometryFromSelectionAndFrame } from "../getSourceSheetGeometryFromSelectionAndFrame";
-import { SourcePassageCopy } from "../SourcePassageCopy";
+import { SourcePassageCopy } from "../SourcePassageCopy/SourcePassageCopy";
 import { SourceSheet } from "./SourceSheet";
 import type { Input } from "../ProvenancePeelback.schema";
 import type { ReactNode } from "react";

@@ -1,6 +1,6 @@
 import { propEq } from "@avandar/utils";
-import { mix } from "../../../../motion";
-import { StockRect } from "../../../primitives/StockRect/StockRect";
+import { Motion } from "../../../../motion";
+import { StockRect } from "../../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ApproachTrace } from "../ApproachTrace";
 import { ClassroomBoardText } from "../ClassroomBoardText";

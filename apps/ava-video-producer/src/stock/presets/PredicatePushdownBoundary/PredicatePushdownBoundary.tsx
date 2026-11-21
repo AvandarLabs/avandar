@@ -8,7 +8,9 @@ import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./PredicatePushdownBoundary.schema";
 import type { ReactNode } from "react";
 
-type Props = GraphicProps & { input: Input };
+type Props = GraphicProps & {
+  input: Input;
+};
 const INTRO_FRAMES = 12;
 /** Source gates filter row copies before they cross a transfer boundary. */
 export function PredicatePushdownBoundary({
@@ -16,10 +18,10 @@ export function PredicatePushdownBoundary({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const style = GraphicThemeHooks.useGraphicProps(
-    "PredicatePushdownBoundary",
-    {},
-  );
+  const style = GraphicThemeHooks.useGraphicProps({
+    name: "PredicatePushdownBoundary",
+    props: {},
+  });
   const { color, sketch } = GraphicThemeHooks.useGraphicTokens();
   const motion = GraphicThemeHooks.useGraphicMotion();
   const scales = GraphicThemeHooks.useGraphicShapeScales();

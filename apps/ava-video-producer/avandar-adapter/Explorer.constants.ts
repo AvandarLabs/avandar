@@ -1,20 +1,23 @@
+import { Model } from "@avandar/models";
+import { propEq } from "@avandar/utils";
 import fixtures from "./fixtures.json";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
-
 /**
  * Stable fictional identity used only by the deterministic demo data binding.
  */
 export const EXPLORER_CASES_DATASET_ID = "00000000-0000-4000-8000-000000000240";
+/** Name of the fictional cases dataset in explorer reenactments. */
 export const EXPLORER_CASES_DATASET_NAME = "Video - Harborfield cases";
 
 /**
  * All records come from the validated cases.csv fixture, in its source order.
  */
-export const EXPLORER_CASES = fixtures.cases as Array<
-  Record<string, string | number | null>
->;
+export const EXPLORER_CASES: Array<Record<string, string | number | null>> =
+  fixtures.cases;
+/** Column names in the fictional explorer cases fixture. */
 export const EXPLORER_COLUMN_NAMES = Object.keys(EXPLORER_CASES[0]!);
+/** Ordered columns visible in the explorer reenactment. */
 export const EXPLORER_DISPLAY_COLUMNS = [
   "case_id",
   "case_label",
@@ -36,12 +39,10 @@ export const EXPLORER_COLUMNS = EXPLORER_COLUMN_NAMES.map((name, index) => {
       : ["report_date", "week_start"].includes(name)
         ? "date"
         : "varchar";
-  return {
-    __type: "QueryColumn",
+  return Model.make("QueryColumn", {
     id: `00000000-0000-4000-9000-${String(index + 1).padStart(12, "0")}`,
     aggregation: undefined,
-    baseColumn: {
-      __type: "DatasetColumn",
+    baseColumn: Model.make("DatasetColumn", {
       id: `00000000-0000-4000-a000-${String(index + 1).padStart(12, "0")}`,
       datasetId: EXPLORER_CASES_DATASET_ID,
       workspaceId: "00000000-0000-4000-8000-000000000001",
@@ -54,15 +55,14 @@ export const EXPLORER_COLUMNS = EXPLORER_COLUMN_NAMES.map((name, index) => {
       createdAt: "2026-09-13T00:00:00Z",
       updatedAt: "2026-09-13T00:00:00Z",
       description: undefined,
-    },
-  };
-}) as unknown as QueryColumn.T[];
+    }),
+  });
+}) as QueryColumn.T[];
 
+/** Column models for the ordered explorer display columns. */
 export const EXPLORER_SELECTED_COLUMNS = EXPLORER_DISPLAY_COLUMNS.map(
   (name) => {
-    return EXPLORER_COLUMNS.find((column) => {
-      return column.baseColumn.name === name;
-    })!;
+    return EXPLORER_COLUMNS.find(propEq("baseColumn.name", name))!;
   },
 );
 

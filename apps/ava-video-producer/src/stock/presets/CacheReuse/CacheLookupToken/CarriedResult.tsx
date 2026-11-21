@@ -1,15 +1,18 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CacheLookupTokenShared } from "./CacheLookupTokenShared/CacheLookupTokenShared";
-import { type Props } from "./CacheLookupTokenShared/CacheLookupTokenShared.types";
+import { type Props as CacheLookupTokenSharedProps } from "./CacheLookupTokenShared/CacheLookupTokenShared.types";
 import type { ReactNode } from "react";
+
+type Props = Omit<CacheLookupTokenSharedProps, "accent">;
+
 /** The result impression a returning key carries, fading in and out. */
 export function CarriedResult({
   x,
   y,
   frame,
   input,
-}: Readonly<Omit<Props, "accent">>): ReactNode {
+}: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   const motion = GraphicThemeHooks.useGraphicMotion();

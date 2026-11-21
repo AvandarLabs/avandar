@@ -1,6 +1,6 @@
 import { LabelSlots } from "../../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../../primitives/SketchedShape";
-import { StockRect } from "../../../primitives/StockRect/StockRect";
+import { StockRect } from "../../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getFloorTileGeometryFromInputAndFrame } from "../getFloorTileGeometryFromInputAndFrame";
 import { CutawayLip } from "./CutawayLip";
