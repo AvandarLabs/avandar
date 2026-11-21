@@ -1,6 +1,11 @@
 # Atlas theme coverage review
 
 > This is the audit as of the starting point, before any slice landed. Counts, statuses, and "today" describe that state. For where the work ended, read [the summary](README.md).
+>
+> Tooling update: the ESLint configuration referenced in this historical audit
+> has been replaced by root `.oxlintrc.json`. Oxlint now runs the renderer
+> guards through `eslint/video-theme-restrictions.js`; see the
+> [current enforcement summary](README.md#how-the-guards-work).
 
 Audit date: 2026-11-19. Branch: `chore/atlas-theme-coverage`. Read-only: no
 source file changed with this review.

@@ -106,9 +106,11 @@ The historical migration record is in
 describe the exports and source revisions verified at that time, not fresh
 tests of the current live compositions or product. MP4 files are generated
 locally when needed and are no longer tracked sample inputs.
-The imported frame DSL and fixture code retain scoped style exceptions in the
-workspace ESLint configuration; behavioral checks remain enabled. Generated
-bundles, render outputs, and private projects are excluded from linting.
+The root Oxlint configuration (`.oxlintrc.json`) applies the workspace rules
+to this app, including the imported frame DSL and fixture code. Renderer
+function-length and video-theme guards run through the repo-local JS plugins
+in `eslint/`. Generated bundles, render outputs, and private projects are
+excluded from linting.
 
 The source repository is retained until the migration is reviewed and merged.
 No merge, push, publication, or GitHub repository deletion is performed by any
