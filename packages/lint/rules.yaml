@@ -44,7 +44,7 @@ rules:
     phases:
       - 3
     owner: lint
-    boundary: Native `prefer-template`; supported equivalent expressions only
+    boundary: Native prefer-template changes object coercion and has no operand restriction; disabled and remains fallback
   - id: AF-03
     slug: consistent-type-imports
     class: AF

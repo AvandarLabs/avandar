@@ -211,7 +211,7 @@
         ],
         "no-shadow": "error",
         "curly": ["error", "all"],
-        "prefer-template": "error",
+        "prefer-template": "off",
         "typescript/consistent-type-imports": [
           "error",
           {

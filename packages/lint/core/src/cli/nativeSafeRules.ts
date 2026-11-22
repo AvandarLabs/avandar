@@ -16,13 +16,11 @@ import type { CoverageEvidence, CoverageProbe } from "./coverage.ts";
 
 const CAPABILITIES = [
   ["AF-01", "if-body", "curly"],
-  ["AF-02", "string-concatenation", "prefer-template"],
   ["AF-03", "type-imports", "consistent-type-imports"],
   ["AF-03", "type-exports", "consistent-type-exports"],
   ["AF-04", "literal-assertions", "prefer-as-const"],
 ] as const;
-const JS_SEED =
-  '\nif (Boolean(1)) console.log("coverage");\nconst _avandarSeedMessage = "coverage " + String(1);\n';
+const JS_SEED = '\nif (Boolean(1)) console.log("coverage");';
 const TS_SEED =
   '\nimport { Stats as _AvandarSeedStats } from "node:fs";\nlet _avandarSeedStats: _AvandarSeedStats;\ntype _AvandarSeedShape = { name: string };\nexport { _AvandarSeedShape };\nconst _avandarSeedLiteral = "coverage" as "coverage";\nconst _avandarSeedNumber: number = 1;\nconst _avandarSeedCopy = _avandarSeedNumber as number;\n';
 const UNPROVEN: CoverageEvidence = {
@@ -35,6 +33,7 @@ const UNPROVEN: CoverageEvidence = {
 };
 type Diagnostic = {
   code?: string;
+  severity?: string;
   labels?: Array<{ span?: { offset?: number } }>;
 };
 type Proof = {
@@ -235,6 +234,7 @@ function _createProbe(
       const proof = await getProof(path, cwd);
       const diagnosed = proof.diagnostics.some((diagnostic) => {
         return (
+          diagnostic.severity === "error" &&
           diagnostic.code?.endsWith(`(${nativeRule})`) &&
           diagnostic.labels?.some((label) => {
             return (label.span?.offset ?? -1) >= proof.seedOffset;
@@ -274,9 +274,7 @@ export function createNativeCoverageProbes(): CoverageProbe[] {
   const getProof = _createProofLoader();
   return CAPABILITIES.flatMap((capability) => {
     const languages =
-      capability[0] === "AF-01" || capability[0] === "AF-02"
-        ? ["typescript", "javascript"]
-        : ["typescript"];
+      capability[0] === "AF-01" ? ["typescript", "javascript"] : ["typescript"];
     return languages.map((language) => {
       return _createProbe(capability, language, getProof);
     });

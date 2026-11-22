@@ -163,13 +163,13 @@ export function createSqliteCrudClient<
         // semantics).
         const cols = objectKeys(allRows[0]!);
         const placeholders =
-          `(${
+          "(" +
           cols
             .map(() => {
               return "?";
             })
-            .join(", ")
-          })`;
+            .join(", ") +
+          ")";
         const valuesClause = allRows
           .map(() => {
             return placeholders;
@@ -394,13 +394,13 @@ function _buildInsertSql(args: Readonly<BuildInsertSqlArgs>): string {
   const colsClause = cols.map(_ident).join(", ");
   const values =
     valuesClause ??
-    `(${
+    "(" +
       cols
         .map(() => {
           return "?";
         })
-        .join(", ")
-      })`;
+        .join(", ") +
+      ")";
   let conflict = "";
   if (upsert) {
     assertIsDefined(onConflict, "`onConflict` must be defined when upserting");

@@ -7,7 +7,7 @@ export function writeJson({
   filename: string;
   value: unknown;
 }>): Promise<void> {
-  return fs.writeFile(filename, `${JSON.stringify(value, null, 2)  }\n`, {
+  return fs.writeFile(filename, JSON.stringify(value, null, 2) + "\n", {
     flag: "wx",
   });
 }

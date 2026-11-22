@@ -62,10 +62,10 @@ describe("native safe fixes", () => {
     );
   });
   it.each(["ts", "tsx", "js", "jsx"])(
-    "uses template interpolation in %s",
+    "preserves concatenation in AF-02 fallback in %s",
     (extension) => {
       expect(_fix('const message = "hello " + name;\n', extension)).toBe(
-        "const message = `hello ${  name}`;\n",
+        'const message = "hello " + name;\n',
       );
     },
   );
@@ -194,3 +194,32 @@ it("preserves generic CRUD assertions required by the TS5.9 return contract", ()
   expect(_typeErrors(path)).toContain(2322);
   expect(_fix(source)).toBe(source);
 });
+
+function _runJavascript(source: string): string {
+  const result = spawnSync(
+    process.execPath,
+    ["--input-type=module", "-e", source],
+    { encoding: "utf8" },
+  );
+  expect(result.status, result.stderr).toBe(0);
+  return result.stdout;
+}
+
+it.each([
+  [
+    'const value = { [Symbol.toPrimitive](hint) { return hint; } };\nconsole.log("value=" + value);\n',
+    "value=default\n",
+  ],
+  [
+    'const value = { valueOf() { return 7; }, toString() { return "object"; } };\nconsole.log("value=" + value);\n',
+    "value=7\n",
+  ],
+])(
+  "preserves runtime coercion for ambiguous concatenation %s",
+  (source, output) => {
+    expect(_runJavascript(source)).toBe(output);
+    const fixed = _fix(source, "js");
+    expect(_runJavascript(fixed)).toBe(output);
+    expect(fixed).toBe(source);
+  },
+);

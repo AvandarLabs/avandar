@@ -10,7 +10,7 @@ from `rules.yaml`, validated against `rules.schema.json`.
 | ID | Slug | Requirement | Applicability | Repair | Phases | Owner | Proof boundary |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | AF-01 | curly | Braces around every `if` body | typescript, javascript | safe | 3 | lint | Native `curly`; add braces |
-| AF-02 | prefer-template | Template interpolation instead of concatenation | typescript, javascript | safe | 3 | lint | Native `prefer-template`; supported equivalent expressions only |
+| AF-02 | prefer-template | Template interpolation instead of concatenation | typescript, javascript | safe | 3 | lint | Native prefer-template changes object coercion and has no operand restriction; disabled and remains fallback |
 | AF-03 | consistent-type-imports | `type` on type-only imports and exports | typescript | safe | 3 | lint | Native type imports and type-aware exports; import() annotations remain unchanged |
 | AF-04 | prefer-as-const | `as const` for eligible literals | typescript | safe | 3 | lint | Native `typescript/prefer-as-const` |
 | AF-05 | no-unnecessary-type-assertion | Remove unnecessary type assertions | typescript | safe | 3 | lint | Native assertion fixer breaks TS5.9 generic CRUD contracts; disabled and remains fallback |
@@ -109,11 +109,16 @@ never enabled. Oxlint and `@oxlint/plugins` stay pinned to 1.93.0.
 The root config enables `options.typeAware`; each file uses Oxlint's discovered
 TypeScript project without a local compiler or replacement rule.
 
-`curly` uses `all`, `prefer-template` uses its native safe fixer, and type-only
-imports use separate `import type` declarations. `disallowTypeAnnotations: false`
+`curly` uses `all`, and type-only imports use separate `import type`
+declarations. `disallowTypeAnnotations: false`
 leaves `import()` type annotations unchanged because their diagnostic has no
 safe native fix. Type-only exports and eligible `as const` literals use the
 corresponding native TypeScript rules.
+
+AF-02 remains disabled and in fallback: native `prefer-template` changes object
+coercion from the default hint to the string hint. The installed rule exposes
+no option that restricts repairs to equivalent operands. Root repair preserves
+concatenations, and no local replacement or safe coverage claim is supplied.
 
 AF-05 remains disabled and in fallback: the native assertion fixer removes
 assertions still required by the repository's TypeScript 5.9 generic CRUD
@@ -127,7 +132,8 @@ The production coverage CLI runs the installed root Oxlint command's file
 selection, then inserts diagnostic seeds into an isolated mirror of each exact
 reviewed path. Root and nested configuration, TypeScript project files,
 file-specific overrides, and source disable comments are retained. Only a
-canonical native diagnostic inside the appended seed with a nonzero engine
-status can prove the named capability. Reviewed source is never modified.
+canonical error-severity native diagnostic inside the appended seed with a
+nonzero engine status can prove the named capability. A warning cannot borrow
+another capability's nonzero status. Reviewed source is never modified.
 Unknown commands, missing engines, excluded paths, disabled rules, and
 operational or unsupported outcomes stay fallback.

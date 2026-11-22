@@ -80,7 +80,7 @@ async function _synthesizeSpeech({
 >): Promise<string> {
   const textFile = path.join(directory, `${cueId}.txt`);
   const raw = path.join(directory, `${cueId}.aiff`);
-  await fs.writeFile(textFile, `${text  }\n`, { flag: "wx" });
+  await fs.writeFile(textFile, text + "\n", { flag: "wx" });
   const args = [
     "-r",
     String(rate),

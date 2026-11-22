@@ -486,12 +486,12 @@ const SOCRATA_ENTRY_OVERRIDES: Partial<DataCatalogListing.T> = {
 /** A CSV with a header and `numRows` one-column rows. */
 function _csvWithRows(numRows: number): string {
   return (
-    `${[
+    [
       "id",
       ...Array.from({ length: numRows }, (_, index) => {
         return String(index);
       }),
-    ].join("\n")  }\n`
+    ].join("\n") + "\n"
   );
 }
 

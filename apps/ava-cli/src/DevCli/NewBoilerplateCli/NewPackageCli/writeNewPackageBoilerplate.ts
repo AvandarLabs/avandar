@@ -166,7 +166,7 @@ function _registerNewPackageTsconfigBasePaths(options: {
 
   fs.writeFileSync(
     filePath,
-    `${JSON.stringify(config, undefined, 2)  }\n`,
+    JSON.stringify(config, undefined, 2) + "\n",
     "utf8",
   );
 }
@@ -194,7 +194,7 @@ function _addTsconfigAppInclude(packageSrcDir: string): void {
 
   fs.writeFileSync(
     filePath,
-    `${JSON.stringify(config, undefined, 2)  }\n`,
+    JSON.stringify(config, undefined, 2) + "\n",
     "utf8",
   );
 }
@@ -224,7 +224,7 @@ function _addDenoImportAlias(options: {
   config.imports[options.alias] = options.aliasTarget;
   fs.writeFileSync(
     filePath,
-    `${JSON.stringify(config, undefined, 2)  }\n`,
+    JSON.stringify(config, undefined, 2) + "\n",
     "utf8",
   );
 }
@@ -260,7 +260,7 @@ function _addDenoWorkspaceEntry(packageDir: string): void {
 
   fs.writeFileSync(
     filePath,
-    `${JSON.stringify(config, undefined, 2)  }\n`,
+    JSON.stringify(config, undefined, 2) + "\n",
     "utf8",
   );
 }
@@ -290,7 +290,7 @@ function _addVscodeDenoEnablePath(packageDir: string): void {
 
   fs.writeFileSync(
     filePath,
-    `${JSON.stringify(config, undefined, 2)  }\n`,
+    JSON.stringify(config, undefined, 2) + "\n",
     "utf8",
   );
 }
@@ -320,7 +320,7 @@ function _addEdgeFunctionTemplateImportAlias(options: {
   config.imports[options.alias] = options.aliasTarget;
   fs.writeFileSync(
     filePath,
-    `${JSON.stringify(config, undefined, 2)  }\n`,
+    JSON.stringify(config, undefined, 2) + "\n",
     "utf8",
   );
 }

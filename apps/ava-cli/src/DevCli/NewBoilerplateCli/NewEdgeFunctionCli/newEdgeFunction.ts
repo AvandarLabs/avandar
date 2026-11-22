@@ -105,10 +105,10 @@ export function updateHTTPAPITypes(options: {
   const afterLastImport = content.indexOf("\n", lastImportIndex);
   const insertPosition = afterLastImport + 1;
   content =
-    `${content.slice(0, insertPosition) +
-    importStatement
-    }\n${
-    content.slice(insertPosition)}`;
+    content.slice(0, insertPosition) +
+    importStatement +
+    "\n" +
+    content.slice(insertPosition);
 
   const fullAPIRegex = /(type FullAPI = )(.*?)(;)/s;
   if (!fullAPIRegex.test(content)) {

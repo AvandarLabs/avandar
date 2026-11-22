@@ -67,7 +67,7 @@ export function assertSqlglotAvailable(): void {
  * @returns The transpiled SQLite-flavoured strings, in input order.
  */
 export function transpileToSqlite(statements: readonly string[]): string[] {
-  const joined = `${statements.join(";\n")  };`;
+  const joined = statements.join(";\n") + ";";
   const py = [
     "import sys, sqlglot",
     "sql = sys.stdin.read()",

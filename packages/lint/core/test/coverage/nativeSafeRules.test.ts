@@ -110,7 +110,7 @@ it("proves native TS capabilities through the production CLI", async () => {
   ).toEqual(
     expect.arrayContaining([
       expect.objectContaining({ ruleId: "AF-01", state: "enforced" }),
-      expect.objectContaining({ ruleId: "AF-02", state: "enforced" }),
+      expect.objectContaining({ ruleId: "AF-02", state: "fallback" }),
       expect.objectContaining({
         ruleId: "AF-03",
         capability: "type-imports",
@@ -185,7 +185,7 @@ it("proves JavaScript capabilities independently of TS-only capabilities", async
       expect.objectContaining({
         ruleId: "AF-02",
         language: "javascript",
-        state: "enforced",
+        state: "fallback",
       }),
       expect.objectContaining({ ruleId: "AF-03", state: "not-applicable" }),
     ]),
@@ -269,4 +269,26 @@ process.exit(result.status ?? 1);
   ).toHaveLength(4);
   expect(Math.max(...activeCounts)).toBe(1);
   expect(active).toBe(0);
+});
+
+it("keeps warning-only curly in fallback beside independently blocking seeds", async () => {
+  const directory = _createRepository();
+  const path = join(directory, ".oxlintrc.json");
+  const config = JSON.parse(readFileSync(path, "utf8"));
+  config.overrides.push({
+    files: ["src/reviewed.ts"],
+    rules: { curly: "warn" },
+  });
+  writeFileSync(path, JSON.stringify(config));
+  const outcomes = await _coverage(directory);
+  expect(
+    outcomes.find((entry: { ruleId: string }) => {
+      return entry.ruleId === "AF-01";
+    }),
+  ).toMatchObject({ state: "fallback" });
+  expect(
+    outcomes.find((entry: { ruleId: string }) => {
+      return entry.ruleId === "AF-04";
+    }),
+  ).toMatchObject({ state: "enforced" });
 });

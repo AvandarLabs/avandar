@@ -63,5 +63,5 @@ export function buildCsvFromDatastoreRecords(params: {
       }),
     );
   });
-  return `${[_buildCsvRow(columnIds), ...rows].join("\n")  }\n`;
+  return [_buildCsvRow(columnIds), ...rows].join("\n") + "\n";
 }
