@@ -80,10 +80,13 @@ const EXCLUDED_DIRECTORIES = new Set([
   "coverage",
 ]);
 
-async function _expandPath(path: string): Promise<string[]> {
+async function _expandPath(
+  path: string,
+  isExplicit = false,
+): Promise<string[]> {
   const info = await stat(path);
   if (!info.isDirectory()) {
-    return /\.(md|po|map)$/.test(path) ? [] : [path];
+    return !isExplicit && /\.(md|po|map)$/.test(path) ? [] : [path];
   }
   const entries = await readdir(path, { withFileTypes: true });
   const descendants = await Promise.all(
@@ -255,7 +258,7 @@ export async function collectCoverage(
       (
         await Promise.all(
           input.paths.map((path) => {
-            return _expandPath(resolve(cwd, path));
+            return _expandPath(resolve(cwd, path), true);
           }),
         )
       ).flat(),

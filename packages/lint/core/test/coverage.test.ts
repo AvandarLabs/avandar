@@ -187,6 +187,67 @@ describe("coverage", () => {
     ).toBe("not-applicable");
   });
 
+  it.each(["md", "po", "map"])(
+    "reports fallback for an explicitly reviewed .%s file",
+    async (extension) => {
+      const directory = _createDirectory();
+      const path = join(directory, `reviewed.${extension}`);
+      writeFileSync(path, "reviewed content");
+      const result = await collectCoverage({ catalog, paths: [path] });
+      expect(result.outcomes).toMatchObject([
+        { path, language: "unknown", state: "fallback" },
+      ]);
+      expect(result.summaries).toMatchObject([
+        {
+          language: "unknown",
+          state: "fallback",
+          uncovered: [{ path, capability: "all" }],
+        },
+      ]);
+    },
+  );
+
+  it("retains unsupported explicit paths beside enforced TypeScript paths", async () => {
+    const directory = _createDirectory();
+    const supportedPath = join(directory, "supported.ts");
+    const unsupportedPath = join(directory, "README.md");
+    [supportedPath, unsupportedPath].forEach((path) => {
+      writeFileSync(path, "reviewed content");
+    });
+    const result = await collectCoverage({
+      catalog,
+      paths: [supportedPath, unsupportedPath],
+      probes: [
+        {
+          ruleId: "AF-01",
+          language: "typescript",
+          capability: "if-body",
+          prove: async () => {
+            return {
+              available: true,
+              enabled: true,
+              included: true,
+              operational: true,
+              exitCode: 1,
+              diagnosticRuleIds: ["AF-01"],
+            };
+          },
+        },
+      ],
+    });
+    expect(result.outcomes).toHaveLength(2);
+    expect(
+      result.outcomes.find((outcome) => {
+        return outcome.path === supportedPath;
+      })?.state,
+    ).toBe("enforced");
+    expect(
+      result.outcomes.find((outcome) => {
+        return outcome.path === unsupportedPath;
+      })?.state,
+    ).toBe("fallback");
+  });
+
   it("turns a thrown probe error into an operational fallback", async () => {
     const directory = _createDirectory();
     const path = join(directory, "seed.ts");
