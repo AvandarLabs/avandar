@@ -19,8 +19,28 @@ const CAPABILITIES = [
   ["AF-03", "type-imports", "consistent-type-imports"],
   ["AF-03", "type-exports", "consistent-type-exports"],
   ["AF-04", "literal-assertions", "prefer-as-const"],
+  ["AF-06", "standalone-body-prose", "function-body-line-comments"],
+  ["AF-07", "short-prose-jsdoc", "single-line-short-jsdoc"],
+  ["AF-11", "one-to-one-module-key", "export-key-jsdoc"],
 ] as const;
 const JS_SEED = '\nif (Boolean(1)) console.log("coverage");';
+const COMMENT_SEED = `
+function _avandarBodyCommentSeed() {
+  /** Keep this ordinary. */
+  console.log(1);
+}
+/**
+ * Describe this seed.
+ */
+const _avandarShortCommentSeed = 1;
+`;
+const MODULE_COMMENT_SEED = `
+/** Describe the module member seed. */
+function _avandarModuleCommentSeed() {}
+export const _AvandarSeedCommentModule = {
+  read: _avandarModuleCommentSeed,
+};
+`;
 const TS_SEED =
   '\nimport { Stats as _AvandarSeedStats } from "node:fs";\nlet _avandarSeedStats: _AvandarSeedStats;\ntype _AvandarSeedShape = { name: string };\nexport { _AvandarSeedShape };\nconst _avandarSeedLiteral = "coverage" as "coverage";\nconst _avandarSeedNumber: number = 1;\nconst _avandarSeedCopy = _avandarSeedNumber as number;\n';
 const UNPROVEN: CoverageEvidence = {
@@ -33,6 +53,7 @@ const UNPROVEN: CoverageEvidence = {
 };
 type Diagnostic = {
   code?: string;
+  message?: string;
   severity?: string;
   labels?: Array<{ span?: { offset?: number } }>;
 };
@@ -145,7 +166,9 @@ async function _proveSeed(
   try {
     _mirrorDirectory(cwd, directory, localPath.split(sep));
     const source = readFileSync(path, "utf8");
-    const seed = JS_SEED + (/\.[cm]?tsx?$/.test(path) ? TS_SEED : "");
+    const seed =
+      JS_SEED + COMMENT_SEED +
+      (/\.[cm]?tsx?$/.test(path) ? TS_SEED + MODULE_COMMENT_SEED : "");
     writeFileSync(join(directory, localPath), source + seed);
     const result = await _runSeed(directory, localPath, invocation);
     const diagnostics = _getDiagnostics(result.stdout);
@@ -236,6 +259,9 @@ function _createProbe(
         return (
           diagnostic.severity === "error" &&
           diagnostic.code?.endsWith(`(${nativeRule})`) &&
+          (!["AF-06", "AF-07", "AF-11"].includes(ruleId) ||
+            (diagnostic.code === `avandar(${nativeRule})` &&
+              diagnostic.message?.startsWith(`${ruleId}:`))) &&
           diagnostic.labels?.some((label) => {
             return (label.span?.offset ?? -1) >= proof.seedOffset;
           })
@@ -267,16 +293,32 @@ function _createProofLoader(): (path: string, cwd: string) => Promise<Proof> {
 }
 
 /**
- * Gives `runCli` real native engine proofs for independently seeded safe fixes.
+ * Gives `runCli` real engine proofs for independently seeded safe fixes.
  * Exact reviewed paths retain root and nested config, ignore and project rules.
  */
 export function createNativeCoverageProbes(): CoverageProbe[] {
   const getProof = _createProofLoader();
   return CAPABILITIES.flatMap((capability) => {
     const languages =
-      capability[0] === "AF-01" ? ["typescript", "javascript"] : ["typescript"];
-    return languages.map((language) => {
-      return _createProbe(capability, language, getProof);
+      ["AF-01", "AF-06", "AF-07"].includes(capability[0])
+        ? ["typescript", "javascript"]
+        : ["typescript"];
+    return languages.flatMap((language) => {
+      const probe = _createProbe(capability, language, getProof);
+      if (!["AF-06", "AF-07", "AF-11"].includes(capability[0])) {
+        return [probe];
+      }
+      return [probe, {
+        ruleId: capability[0], language,
+        capability: "unsupported-shapes",
+        prove: async () => {
+          return {
+            ...UNPROVEN,
+            recovery:
+              "Run fallback review for unsupported comment shapes. No exact syntax classifier is installed.",
+          };
+        },
+      }];
     });
   });
 }

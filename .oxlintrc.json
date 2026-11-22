@@ -3,6 +3,10 @@
   "plugins": ["eslint", "import", "react", "jsx-a11y", "typescript"],
   "jsPlugins": [
     {
+      "name": "avandar",
+      "specifier": "@avandar/lint-typescript/oxlint"
+    },
+    {
       "name": "eslint-js",
       "specifier": "oxlint-plugin-eslint"
     },
@@ -37,6 +41,7 @@
     }
   },
   "ignorePatterns": [
+    "**/*.gen.*",
     "**/dist/**",
     ".agents/**",
     ".claude",
@@ -96,8 +101,16 @@
   },
   "overrides": [
     {
+      "files": ["**/*.{ts,tsx}"],
+      "rules": {
+        "avandar/export-key-jsdoc": "error"
+      }
+    },
+    {
       "files": ["**/*.{js,jsx,ts,tsx}"],
       "rules": {
+        "avandar/function-body-line-comments": "error",
+        "avandar/single-line-short-jsdoc": "error",
         "constructor-super": "off",
         "for-direction": "error",
         "getter-return": "off",
@@ -435,6 +448,12 @@
       "files": ["**/*.js"],
       "rules": {
         "typescript/explicit-module-boundary-types": "off"
+      }
+    },
+    {
+      "files": ["packages/lint/typescript/src/oxlint/**/*.js"],
+      "rules": {
+        "import/extensions": ["error", "ignorePackages", { "js": "always" }]
       }
     },
     {

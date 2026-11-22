@@ -10,6 +10,7 @@ export type CoverageEvidence = {
   operational: boolean;
   exitCode: number;
   diagnosticRuleIds: string[];
+  recovery?: string;
 };
 
 /** A proven engine integration for one independently testable capability. */
@@ -107,6 +108,9 @@ function _getRecovery(
 ): string | undefined {
   if (!evidence.operational) {
     return "Run the repository lint command, repair its operational error, then retry coverage.";
+  }
+  if (evidence.recovery) {
+    return evidence.recovery;
   }
   if (!evidence.available) {
     return "Install the required lint engine and plugin, then retry coverage.";

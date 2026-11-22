@@ -24,6 +24,7 @@
     "@oxlint/plugins": "1.93.0"
   },
   "devDependencies": {
+    "eslint": "9.39.3",
     "tsup": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"

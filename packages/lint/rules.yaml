@@ -102,7 +102,7 @@ rules:
       - 3
       - 6
     owner: lint
-    boundary: Rewrite only unattached block/doc comments with an exact ordinary-comment form
+    boundary: TS/JS standalone body prose only; preserve nested declarations, inline comments and directives; unsupported shapes remain fallback
   - id: AF-07
     slug: single-line-doc-comment
     class: AF
@@ -127,7 +127,7 @@ rules:
       - 3
       - 6
     owner: lint
-    boundary: Collapse a tag-free block docstring only when the language has an exact single-line docstring form and the complete result fits
+    boundary: TS/JS plain tag-free starred JSDoc only; full line including indentation fits 80; preserve paragraphs and markup; other shapes remain fallback
   - id: AF-08
     slug: top-level-function-declaration
     class: AF
@@ -178,7 +178,7 @@ rules:
     phases:
       - 3
     owner: lint
-    boundary: Move only a one-to-one local declaration comment with no owning interface
+    boundary: TS direct untyped exported object only; one local declaration reference and static key; no intervening comments or owning interface; other shapes remain fallback
   - id: AF-12
     slug: component-props-name
     class: AF

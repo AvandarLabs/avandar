@@ -11,18 +11,27 @@ import { join, resolve } from "node:path";
 import { expect, it } from "vitest";
 
 /** Source and tarball exports must both remain usable by actual consumers. */
-it("resolves the oxlint source export without a build", () => {
+it("repairs function comments through the source export without a build", () => {
+  const source = "function load() {\n  /* Read once. */\n  console.log(1);\n}";
   const result = spawnSync(
     process.execPath,
     [
       "--input-type=module",
       "-e",
-      "import plugin from '@avandar/lint-typescript/oxlint'; console.log(JSON.stringify(plugin.rules))",
+      `import plugin from '@avandar/lint-typescript/oxlint';
+       import { Linter } from 'eslint';
+       const result = new Linter().verifyAndFix(${JSON.stringify(source)}, [{
+         plugins: { avandar: plugin },
+         rules: { 'avandar/function-body-line-comments': 'error' }
+       }]);
+       console.log(JSON.stringify(result.output));`,
     ],
     { encoding: "utf8" },
   );
   expect(result.status, result.stderr).toBe(0);
-  expect(JSON.parse(result.stdout)).toEqual({});
+  expect(JSON.parse(result.stdout)).toBe(
+    "function load() {\n  // Read once.\n  console.log(1);\n}",
+  );
 });
 
 it("resolves the stylelint source export without a build", () => {

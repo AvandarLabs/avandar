@@ -14,12 +14,12 @@ from `rules.yaml`, validated against `rules.schema.json`.
 | AF-03 | consistent-type-imports | `type` on type-only imports and exports | typescript | safe | 3 | lint | Native type imports and type-aware exports; import() annotations remain unchanged |
 | AF-04 | prefer-as-const | `as const` for eligible literals | typescript | safe | 3 | lint | Native `typescript/prefer-as-const` |
 | AF-05 | no-unnecessary-type-assertion | Remove unnecessary type assertions | typescript | safe | 3 | lint | Native assertion fixer breaks TS5.9 generic CRUD contracts; disabled and remains fallback |
-| AF-06 | no-function-body-doc-comments | Ordinary comments inside function bodies | typescript, javascript, rust, go, java, kotlin, swift, c, cpp, csharp | safe | 3, 6 | lint | Rewrite only unattached block/doc comments with an exact ordinary-comment form |
-| AF-07 | single-line-doc-comment | Single-line short docstring | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql | safe | 3, 6 | lint | Collapse a tag-free block docstring only when the language has an exact single-line docstring form and the complete result fits |
+| AF-06 | no-function-body-doc-comments | Ordinary comments inside function bodies | typescript, javascript, rust, go, java, kotlin, swift, c, cpp, csharp | safe | 3, 6 | lint | TS/JS standalone body prose only; preserve nested declarations, inline comments and directives; unsupported shapes remain fallback |
+| AF-07 | single-line-doc-comment | Single-line short docstring | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql | safe | 3, 6 | lint | TS/JS plain tag-free starred JSDoc only; full line including indentation fits 80; preserve paragraphs and markup; other shapes remain fallback |
 | AF-08 | top-level-function-declaration | Top-level function declarations | typescript, javascript | safe | 3 | lint | Reject lexical binding, hoisting, overload, recursion, and collision changes |
 | AF-09 | nested-arrow-function | Nested arrow functions | typescript, javascript | safe | 3 | lint | Reject function-local lexical binding and hoisting changes |
 | AF-10 | private-helper-prefix | `_` prefix on private top-level helpers | typescript, javascript | safe | 3 | lint | Same-file, non-exported, collision-free symbols only |
-| AF-11 | module-member-jsdoc | Existing JSDoc on an exported module key | typescript | safe | 3 | lint | Move only a one-to-one local declaration comment with no owning interface |
+| AF-11 | module-member-jsdoc | Existing JSDoc on an exported module key | typescript | safe | 3 | lint | TS direct untyped exported object only; one local declaration reference and static key; no intervening comments or owning interface; other shapes remain fallback |
 | AF-12 | component-props-name | Component props type named `Props` | typescript | safe | 3 | lint | Non-exported, one-component, collision-free type only |
 | AF-13 | e2e-acronym | Local `E2E` acronym casing | typescript, javascript | safe | 3 | lint | Non-exported same-file symbols only |
 | AF-14 | jsx-conditional-ternary | JSX conditional rendering uses a ternary | typescript, javascript | safe | 3 | lint | Exact `condition && <Node />` form |
@@ -137,3 +137,37 @@ nonzero engine status can prove the named capability. A warning cannot borrow
 another capability's nonzero status. Reviewed source is never modified.
 Unknown commands, missing engines, excluded paths, disabled rules, and
 operational or unsupported outcomes stay fallback.
+
+## Comment and documentation safe fixes
+
+The `avandar` Oxlint plugin enables three safe comment capabilities. AF-06
+(`standalone-body-prose`) converts whole-line prose blocks inside TS/JS
+function bodies into line comments. Documentation attached to nested
+declarations, inline blocks, directives and tagged comments stays unchanged.
+
+AF-07 (`short-prose-jsdoc`) joins plain tag-free starred JSDoc only when the
+complete line, including indentation at a two-column tab width, fits 80 columns.
+Paragraphs, lists, code blocks, hard breaks and other structured markup remain
+unchanged. Interior explanation belongs to AF-06 instead.
+
+AF-11 (`one-to-one-module-key`) moves existing local documentation to a static
+key in a directly exported untyped TS object. It requires a top-level function
+or single const binding with one reference and rejects annotated, asserted,
+computed, spread, duplicate and ambiguous mappings. An intervening comment
+makes the span unsupported: Oxlint reserves the full remove/insert span, so
+this restriction prevents interference with interior comment fixes. AF-07
+defers exact relocation candidates to AF-11, which inserts their final
+width-checked documentation form. This is stable in one ordinary fix pass.
+
+Only `--fix` is used. Root file selection excludes generated `*.gen.*` files
+and compiled Lingui catalogs. Each safe capability receives an independent
+canonical error diagnostic in the isolated exact-path engine probe. These
+seeds share the existing per-file serialized native engine invocation. No new
+process scheduler or parser is introduced.
+
+Each of these rules also reports an `unsupported-shapes` coverage outcome as
+`fallback`. Without an exact AST classifier, coverage cannot prove the absence
+of unsupported candidates in a reviewed file. Safe capabilities can therefore
+be `enforced` while the rule and language summary remain `fallback`. Review
+tools must retain the rule-level fallback detector and may skip only the
+explicit safe capability. Non-JS languages remain fallback for AF-06/AF-07.

@@ -30,6 +30,8 @@ published build artifacts. Runtime dependencies are installed separately.
 | phase-3-before-package | 11241 | 7622 | 7238 | 7239 | 7104 | 7142 | 7238 | 0, 0, 0, 0, 0, 0 |
 | phase-3-native-safe-rules | 16734 | 16772 | 16618 | 16884 | 16738 | 16784 | 16772 | 0, 0, 0, 0, 0, 0 |
 | phase-3-native-safe-rules-review-fixes | 7292 | 7039 | 7479 | 7292 | 7404 | 7321 | 7321 | 0, 0, 0, 0, 0, 0 |
+| phase-3-comment-fixers | 19907 | 18821 | 19127 | 18915 | 18917 | 19026 | 18917 | 0, 0, 0, 0, 0, 0 |
+| phase-3-comment-fixers-final | 19266 | 19046 | 19093 | 19166 | 19218 | 19067 | 19093 | 0, 0, 0, 0, 0, 0 |
 
 ## Initial native batch profile
 
@@ -79,3 +81,58 @@ six zero exits. It is 9,451 ms below the preceding 16,772 ms median and 83 ms
 made from this timing change. No tests or builds ran alongside the six samples.
 Root lint retains the existing Doctor await-in-loop performance warning; Doctor
 now scans 364 files. **7,321 ms is the preceding warm median for the next batch.**
+
+## Comment and documentation batch
+
+The batch enables AF-06 standalone function-body prose, AF-07 short plain
+JSDoc, and AF-11 unambiguous exported-object documentation relocation. Root
+safe repair changed 305 existing files: nine block-to-line comment repairs and
+426 short JSDoc collapses. No root AF-11 candidate met the narrow boundary.
+Every one of the 435 comment-only hunks preserves prose. Independent TypeScript
+syntax-tree comparisons confirm unchanged code in all 305 files. Generated
+files and compiled Lingui catalogs were excluded. A subsequent whole-root
+ordinary `--fix` pass made no tracked changes and exited zero.
+
+Both comment benchmark rows have six zero exits. The initial warm median is
+18,917 ms. After safety rejection for directive comments, unusual JavaScript
+line terminators and Markdown hard breaks, the final cold sample is 19,266 ms
+and the final warm median is **19,093 ms**. Compared with the preceding 7,321 ms
+baseline, this adds 11,772 ms (160.80%), exceeding both stop thresholds. Batch
+expansion stopped for sequential profiling. The final measurement ran without
+concurrent package builds, tests or dependency installation.
+
+The final profile toggles only the three custom rules in the actual root
+configuration, restores the original bytes afterwards, and holds transformed
+source constant. The plugin remains installed in both configurations.
+
+| Component | Samples ms | Median ms | Exit codes |
+| --- | --- | --- | --- |
+| Oxlint, custom rules enabled | 6,643; 6,300; 6,221 | 6,300 | 0, 0, 0 |
+| Oxlint, custom rules disabled | 6,026; 6,284; 5,934 | 6,026 | 0, 0, 0 |
+| Existing Stylelint command | 1,122 | 1,122 | 0 |
+| Existing React Doctor command | 9,649 | 9,649 | 0 |
+
+The custom visitor increment is 274 ms (4.55%), below both stop thresholds.
+The existing Doctor command now scans 641 files versus the preceding 364,
+because its comparison is against `develop` and includes these comment edits.
+It retains the existing await-in-loop advisory warning. The measurements show
+that the custom visitor increment is small; they do not establish a complete
+causal attribution for the root regression. The root increase remains visible,
+and no Doctor configuration or process scheduler was changed.
+
+Coverage inserts custom diagnostic seeds into the existing serialized per-file
+native proof run. This adds no engine invocations per reviewed file. The known
+per-file serial latency remains. Safe comment capabilities can be enforced,
+but every custom AF rule also retains an explicit `unsupported-shapes`
+fallback. No exact classifier proves their absence, so rule-level review
+fallback IDs must remain active. Non-JS AF-06/AF-07 outcomes also stay fallback.
+
+| Comment batch package | Tarball bytes |
+| --- | --- |
+| `@avandar/lint` | 45,359 |
+| `@avandar/lint-typescript` | 16,944 |
+| `@avandar/lint-css` | 10,139 |
+
+All three built tarballs import successfully together in an isolated consumer.
+The core catalog returns 90 rules and the TypeScript export exposes the three
+comment rules. **19,093 ms is the preceding warm median for the next batch.**
