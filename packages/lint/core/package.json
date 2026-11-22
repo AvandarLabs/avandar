@@ -1,0 +1,61 @@
+{
+  "name": "@avandar/lint",
+  "version": "0.1.0",
+  "description": "Canonical Avandar lint catalog and conservative coverage CLI",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    "./catalog": "./src/catalog/index.ts",
+    "./metadata": "./src/shared/ruleMetadata.ts",
+    "./coverage": "./src/cli/coverage.ts"
+  },
+  "bin": {
+    "avandar-lint": "./src/cli/main.ts"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": "24.x"
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "yaml": "2.9.0",
+    "ajv": "8.20.0"
+  },
+  "devDependencies": {
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      "./catalog": {
+        "types": "./dist/catalog.d.ts",
+        "default": "./dist/catalog.js"
+      },
+      "./metadata": {
+        "types": "./dist/metadata.d.ts",
+        "default": "./dist/metadata.js"
+      },
+      "./coverage": {
+        "types": "./dist/coverage.d.ts",
+        "default": "./dist/coverage.js"
+      }
+    },
+    "bin": {
+      "avandar-lint": "./dist/main.js"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AvandarLabs/avandar.git",
+    "directory": "packages/lint/core"
+  }
+}

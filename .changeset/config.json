@@ -2,7 +2,9 @@
   "$schema": "https://unpkg.com/@changesets/config@3.1.1/schema.json",
   "changelog": [
     "@changesets/changelog-github",
-    { "repo": "AvandarLabs/avandar" }
+    {
+      "repo": "AvandarLabs/avandar"
+    }
   ],
   "commit": false,
   "fixed": [
@@ -17,11 +19,18 @@
       "@avandar/modules",
       "@avandar/ui",
       "@avandar/utils"
+    ],
+    [
+      "@avandar/lint",
+      "@avandar/lint-typescript",
+      "@avandar/lint-css"
     ]
   ],
   "linked": [],
   "access": "public",
   "baseBranch": "develop",
   "updateInternalDependencies": "patch",
-  "ignore": ["@avandar/ava-cli"]
+  "ignore": [
+    "@avandar/ava-cli"
+  ]
 }

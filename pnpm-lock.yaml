@@ -387,6 +387,15 @@ importers:
       '@avandar/acclimate':
         specifier: ^0.4.0
         version: 0.4.0
+      '@avandar/lint':
+        specifier: workspace:*
+        version: link:packages/lint/core
+      '@avandar/lint-css':
+        specifier: workspace:*
+        version: link:packages/lint/css
+      '@avandar/lint-typescript':
+        specifier: workspace:*
+        version: link:packages/lint/typescript
       '@changesets/changelog-github':
         specifier: ^0.7.0
         version: 0.7.0(encoding@0.1.13)
@@ -514,7 +523,7 @@ importers:
         specifier: ^0.64.0
         version: 0.64.0
       oxlint:
-        specifier: ^1.80.0
+        specifier: 1.93.0
         version: 1.93.0
       oxlint-plugin-eslint:
         specifier: ^1.80.0
@@ -915,6 +924,66 @@ importers:
       zod:
         specifier: 'catalog:'
         version: 4.4.3
+
+  packages/lint/core:
+    dependencies:
+      ajv:
+        specifier: 8.20.0
+        version: 8.20.0
+      yaml:
+        specifier: 2.9.0
+        version: 2.9.0
+    devDependencies:
+      tsup:
+        specifier: 'catalog:'
+        version: 8.5.1(@microsoft/api-extractor@7.58.12(@types/node@25.3.4))(jiti@2.7.0)(postcss@8.5.8)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.9.0)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vitest:
+        specifier: 'catalog:'
+        version: 3.2.4(@types/debug@4.1.13)(@types/node@25.3.4)(happy-dom@20.9.0)(jiti@2.7.0)(jsdom@26.1.0)(less@4.5.1)(lightningcss@1.33.0)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0)
+
+  packages/lint/css:
+    dependencies:
+      '@avandar/lint':
+        specifier: workspace:*
+        version: link:../core
+      stylelint:
+        specifier: ^17.4.0
+        version: 17.4.0(typescript@5.9.3)
+    devDependencies:
+      tsup:
+        specifier: 'catalog:'
+        version: 8.5.1(@microsoft/api-extractor@7.58.12(@types/node@25.3.4))(jiti@2.7.0)(postcss@8.5.8)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.9.0)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vitest:
+        specifier: 'catalog:'
+        version: 3.2.4(@types/debug@4.1.13)(@types/node@25.3.4)(happy-dom@20.9.0)(jiti@2.7.0)(jsdom@26.1.0)(less@4.5.1)(lightningcss@1.33.0)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0)
+
+  packages/lint/typescript:
+    dependencies:
+      '@avandar/lint':
+        specifier: workspace:*
+        version: link:../core
+      '@oxlint/plugins':
+        specifier: 1.93.0
+        version: 1.93.0
+      oxlint:
+        specifier: 1.93.0
+        version: 1.93.0
+    devDependencies:
+      tsup:
+        specifier: 'catalog:'
+        version: 8.5.1(@microsoft/api-extractor@7.58.12(@types/node@25.3.4))(jiti@2.7.0)(postcss@8.5.8)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.9.0)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.9.3
+      vitest:
+        specifier: 'catalog:'
+        version: 3.2.4(@types/debug@4.1.13)(@types/node@25.3.4)(happy-dom@20.9.0)(jiti@2.7.0)(jsdom@26.1.0)(less@4.5.1)(lightningcss@1.33.0)(sass@1.97.3)(stylus@0.62.0)(sugarss@5.0.1(postcss@8.5.8))(terser@5.48.0)(tsx@4.21.0)(yaml@2.9.0)
 
   packages/node/etl:
     dependencies:
@@ -13699,6 +13768,10 @@ packages:
 
   zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
+
+  '@oxlint/plugins@1.93.0':
+    resolution: {integrity: sha512-bKWQI1g9jn8bWUZsvhbOLfgva576Fbp1KwoTNSUCMdT9tlTAvQS2JkifX1UrhPPdyN4GHvM20HhvIMqqU1yotQ==}
+    engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
 
 snapshots:
 
@@ -27583,3 +27656,5 @@ snapshots:
       use-sync-external-store: 1.6.0(react@19.2.5)
 
   zwitch@2.0.4: {}
+
+  '@oxlint/plugins@1.93.0': {}
