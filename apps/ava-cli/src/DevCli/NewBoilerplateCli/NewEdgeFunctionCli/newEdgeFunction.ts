@@ -6,9 +6,7 @@ import { template } from "@avandar/utils";
 
 const EDGE_TEMPLATES_DIR = "scripts/edge-functions/newEdgeFunction/templates";
 
-/**
- * Converts a kebab-case or snake_case string to camelCase.
- */
+/** Converts a kebab-case or snake_case string to camelCase. */
 export function toCamelCase(str: string): string {
   return str
     .split(/[-_]/)
@@ -21,9 +19,7 @@ export function toCamelCase(str: string): string {
     .join("");
 }
 
-/**
- * Converts a kebab-case or snake_case string to PascalCase.
- */
+/** Converts a kebab-case or snake_case string to PascalCase. */
 export function toPascalCase(str: string): string {
   return str
     .split(/[-_]/)
@@ -33,9 +29,7 @@ export function toPascalCase(str: string): string {
     .join("");
 }
 
-/**
- * Replaces template placeholders for edge function files.
- */
+/** Replaces template placeholders for edge function files. */
 export function replaceTemplateVariables(
   content: string,
   functionName: string,
@@ -83,9 +77,7 @@ export function updateRootDenoWorkspace(options: {
   return true;
 }
 
-/**
- * Adds the new function API type to `src/types/http-api.types.ts`.
- */
+/** Adds the new function API type to `src/types/http-api.types.ts`. */
 export function updateHTTPAPITypes(options: {
   httpAPITypesPath: string;
   functionName: string;
@@ -127,9 +119,7 @@ type WriteTemplatesOptions = Readonly<{
   functionName: string;
 }>;
 
-/**
- * Writes scaffolded edge function files from repo templates.
- */
+/** Writes scaffolded edge function files from repo templates. */
 export function writeEdgeFunctionTemplateFiles(
   options: WriteTemplatesOptions,
 ): void {
@@ -204,9 +194,7 @@ type RunNewEdgeFunctionOptions = Readonly<{
   functionName: string;
 }>;
 
-/**
- * True when `line` opens a new TOML table (e.g. `[functions.foo]`).
- */
+/** True when `line` opens a new TOML table (e.g. `[functions.foo]`). */
 function _isTOMLSectionHeaderLine(line: string): boolean {
   const trimmed = line.trim();
   return trimmed.startsWith("[") && trimmed.endsWith("]");

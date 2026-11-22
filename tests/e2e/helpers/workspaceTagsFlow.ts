@@ -25,9 +25,7 @@ export async function openWorkspaceSettingsTab(options: {
   await tab.click();
 }
 
-/**
- * Creates a workspace user-group tag from Settings → Tags.
- */
+/** Creates a workspace user-group tag from Settings → Tags. */
 export async function createWorkspaceTagViaSettings(options: {
   page: Page;
   workspaceSlug: string;
@@ -57,9 +55,7 @@ export async function createWorkspaceTagViaSettings(options: {
   await expect(page.getByText(tagName)).toBeVisible({ timeout: MEDIUM_WAIT });
 }
 
-/**
- * Assigns an existing tag to a workspace member via Settings → Members.
- */
+/** Assigns an existing tag to a workspace member via Settings → Members. */
 export async function assignWorkspaceTagToMember(options: {
   page: Page;
   workspaceSlug: string;

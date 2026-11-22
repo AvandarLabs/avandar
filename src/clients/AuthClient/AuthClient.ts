@@ -105,9 +105,7 @@ type AuthClient = {
    */
   isManuallySignedOut: () => boolean;
 
-  /**
-   * Resets the manual sign out flag.
-   */
+  /** Resets the manual sign out flag. */
   resetManualSignOut: () => void;
 
   /**

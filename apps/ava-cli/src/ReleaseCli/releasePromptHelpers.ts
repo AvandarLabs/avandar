@@ -58,9 +58,7 @@ export async function promptForVersion(options: {
   }
 }
 
-/**
- * Asks a yes/no question. Returns the answer; `--yes` never reaches here.
- */
+/** Asks a yes/no question. Returns the answer; `--yes` never reaches here. */
 export async function promptToConfirm(message: string): Promise<boolean> {
   _assertInteractive("A confirmation");
 

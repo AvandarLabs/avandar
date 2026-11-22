@@ -197,9 +197,7 @@ type CleanupOwnedWorkspaceOptions = {
   ownerEmail: string;
 };
 
-/**
- * Best-effort cleanup when the test failed before deletion finished.
- */
+/** Best-effort cleanup when the test failed before deletion finished. */
 async function _cleanupOwnedWorkspaceIfPresent(
   options: Readonly<CleanupOwnedWorkspaceOptions>,
 ): Promise<void> {

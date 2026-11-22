@@ -20,9 +20,7 @@ type IndividualRead = {
   workspaceId: Workspace.Id;
 };
 
-/**
- * CRUD type definitions for the Workspace model.
- */
+/** CRUD type definitions for the Workspace model. */
 export type IndividualModel = SupabaseCrudModelSpec<
   {
     tableName: "individuals";

@@ -45,16 +45,12 @@ export type QueryResultPage<T extends UnknownObject = UnknownObject> =
      */
     totalPages: number;
 
-    /**
-     * The next page number, or undefined if there is no next page
-     */
+    /** The next page number, or undefined if there is no next page */
     nextPage: number | undefined;
 
     /** The current page number */
     pageNum: number;
 
-    /**
-     * The previous page number, or undefined if there is no previous page
-     */
+    /** The previous page number, or undefined if there is no previous page */
     prevPage: number | undefined;
   };

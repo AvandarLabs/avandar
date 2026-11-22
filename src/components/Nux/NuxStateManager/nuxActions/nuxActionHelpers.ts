@@ -17,9 +17,7 @@ export function withoutMilestoneKey(
   });
 }
 
-/**
- * Status after a completion set changes. Dismissal is sticky until restart.
- */
+/** Status after a completion set changes. Dismissal is sticky until restart. */
 export function tutorialStatusAfterCompletions(
   state: NuxAppState,
   completedMilestones: readonly NuxProgress.MilestoneKey[],

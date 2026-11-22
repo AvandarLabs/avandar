@@ -11,9 +11,7 @@ import type { DuckDbSniffableDataType } from "@etl/NodeDuckDb/DuckDbSniffableDat
 
 type UnknownRow = Record<string, unknown>;
 
-/**
- * Promisifies `Connection.all` for a single SQL statement.
- */
+/** Promisifies `Connection.all` for a single SQL statement. */
 function _connectionAll(
   connection: duckdb.Connection,
   sql: string,
@@ -32,9 +30,7 @@ function _connectionAll(
   });
 }
 
-/**
- * Promisifies `Connection.exec`.
- */
+/** Promisifies `Connection.exec`. */
 function _connectionExec(
   connection: duckdb.Connection,
   sql: string,
@@ -50,9 +46,7 @@ function _connectionExec(
   });
 }
 
-/**
- * Promisifies `Connection.close`.
- */
+/** Promisifies `Connection.close`. */
 function _connectionClose(connection: duckdb.Connection): Promise<void> {
   return new Promise((resolve, reject) => {
     connection.close((err: duckdb.DuckDbError | null) => {
@@ -65,9 +59,7 @@ function _connectionClose(connection: duckdb.Connection): Promise<void> {
   });
 }
 
-/**
- * Promisifies `Database.close`.
- */
+/** Promisifies `Database.close`. */
 function _databaseClose(db: duckdb.Database): Promise<void> {
   return new Promise((resolve, reject) => {
     db.close((err: duckdb.DuckDbError | null) => {
@@ -187,9 +179,7 @@ export class NodeDuckDb {
     });
   }
 
-  /**
-   * Executes SQL without returning rows (DDL, COPY, etc.).
-   */
+  /** Executes SQL without returning rows (DDL, COPY, etc.). */
   async execSQL(sql: string): Promise<void> {
     await _connectionExec(this.#connection, sql);
   }
@@ -223,9 +213,7 @@ export class NodeDuckDb {
     });
   }
 
-  /**
-   * Creates or replaces a view that reads a CSV via `read_csv`.
-   */
+  /** Creates or replaces a view that reads a CSV via `read_csv`. */
   async readCsvIntoView(
     options: NodeDuckDbReadCsvIntoViewOptions,
   ): Promise<void> {
@@ -330,9 +318,7 @@ export class NodeDuckDb {
     return { rowCount, columnNames, columnTypeDescriptions };
   }
 
-  /**
-   * Closes the connection and database handle.
-   */
+  /** Closes the connection and database handle. */
   async close(): Promise<void> {
     await _connectionClose(this.#connection);
     await _databaseClose(this.#db);

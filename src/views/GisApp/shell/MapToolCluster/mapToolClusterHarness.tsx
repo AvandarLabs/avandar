@@ -1,6 +1,4 @@
-/**
- * Shared map-tool harnesses for MapToolCluster tests.
- */
+/** Shared map-tool harnesses for MapToolCluster tests. */
 import { useRef, useState } from "react";
 import { useMapToolGestures } from "@/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures";
 import type { createFakeMap } from "@/views/GisApp/shell/MapToolCluster/createFakeMap";

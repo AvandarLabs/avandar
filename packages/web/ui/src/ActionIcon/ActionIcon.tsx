@@ -11,9 +11,7 @@ type Props = {
 } & ActionIconProps &
   React.HTMLAttributes<HTMLElement>;
 
-/**
- * Action icon button with optional tooltip wrapper.
- */
+/** Action icon button with optional tooltip wrapper. */
 export function ActionIcon({
   tooltip,
   tooltipProps,

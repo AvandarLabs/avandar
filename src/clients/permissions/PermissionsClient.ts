@@ -65,9 +65,7 @@ function createPermissionsClient(supabaseClient: AvaSupabaseDBClient) {
     const dbClient = baseClient.getDb();
     const newClient = baseClient.mixin(
       withNewMembers({
-        /**
-         * Loads role groups and their per-app matrices for a workspace.
-         */
+        /** Loads role groups and their per-app matrices for a workspace. */
         getRoleGroupsWithMatrices: async ({
           workspaceId,
         }: {
@@ -93,9 +91,7 @@ function createPermissionsClient(supabaseClient: AvaSupabaseDBClient) {
           return (data ?? []).map(mapRoleGroupRow);
         },
 
-        /**
-         * Loads per-app roles for any workspace member (settings-admin UI).
-         */
+        /** Loads per-app roles for any workspace member (settings-admin UI). */
         getMemberAppRoles: async ({
           workspaceId,
           userId,
@@ -170,9 +166,7 @@ function createPermissionsClient(supabaseClient: AvaSupabaseDBClient) {
           return role;
         },
 
-        /**
-         * Loads workspace user-group tags.
-         */
+        /** Loads workspace user-group tags. */
         getUserGroups: async ({
           workspaceId,
         }: {
@@ -297,9 +291,7 @@ function createPermissionsClient(supabaseClient: AvaSupabaseDBClient) {
           }
         },
 
-        /**
-         * Creates a custom role group with a full per-app matrix.
-         */
+        /** Creates a custom role group with a full per-app matrix. */
         createCustomRoleGroup: async ({
           workspaceId,
           name,
@@ -345,9 +337,7 @@ function createPermissionsClient(supabaseClient: AvaSupabaseDBClient) {
           };
         },
 
-        /**
-         * Replaces name and matrix rows for a non-built-in role group.
-         */
+        /** Replaces name and matrix rows for a non-built-in role group. */
         updateCustomRoleGroup: async ({
           workspaceId,
           roleGroupId,
@@ -427,9 +417,7 @@ function createPermissionsClient(supabaseClient: AvaSupabaseDBClient) {
             .throwOnError();
         },
 
-        /**
-         * Creates or updates a user-group tag.
-         */
+        /** Creates or updates a user-group tag. */
         saveUserGroup: async ({
           workspaceId,
           userGroupId,
@@ -473,9 +461,7 @@ function createPermissionsClient(supabaseClient: AvaSupabaseDBClient) {
           };
         },
 
-        /**
-         * Deletes a user-group tag.
-         */
+        /** Deletes a user-group tag. */
         deleteUserGroup: async ({
           workspaceId,
           userGroupId,

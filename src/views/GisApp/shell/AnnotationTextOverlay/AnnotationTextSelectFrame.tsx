@@ -74,9 +74,7 @@ function useTextSelectPointer(
   );
 }
 
-/**
- * Select-mode chrome for a text annotation: drag to move, handle to resize.
- */
+/** Select-mode chrome for a text annotation: drag to move, handle to resize. */
 export function AnnotationTextSelectFrame({
   map,
   feature,

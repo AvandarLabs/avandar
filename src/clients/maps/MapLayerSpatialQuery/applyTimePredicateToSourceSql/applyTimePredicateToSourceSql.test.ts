@@ -1,6 +1,4 @@
-/**
- * Time-range wrapping for map-layer source SQL.
- */
+/** Time-range wrapping for map-layer source SQL. */
 import { describe, expect, it } from "vitest";
 import { applyTimePredicateToSourceSql } from "./applyTimePredicateToSourceSql";
 

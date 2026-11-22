@@ -47,16 +47,12 @@ export const LOCALE_META: Record<SupportedLocale, LocaleMeta> = {
   },
 };
 
-/**
- * Type guard for narrowing an arbitrary string to a `SupportedLocale`.
- */
+/** Type guard for narrowing an arbitrary string to a `SupportedLocale`. */
 export function isSupportedLocale(value: string): value is SupportedLocale {
   return (SUPPORTED_LOCALES as readonly string[]).includes(value);
 }
 
-/**
- * Returns the writing direction (`"ltr"` or `"rtl"`) for the given locale.
- */
+/** Returns the writing direction (`"ltr"` or `"rtl"`) for the given locale. */
 export function getLocaleDirection(locale: SupportedLocale): "ltr" | "rtl" {
   return LOCALE_META[locale].direction;
 }

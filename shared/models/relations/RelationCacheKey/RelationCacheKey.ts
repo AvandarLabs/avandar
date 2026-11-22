@@ -189,9 +189,7 @@ export async function makePreparedRelationCacheKeyFromKey(
   };
 }
 
-/**
- * Sorts and deduplicates a finite column set. `"all"` is unchanged.
- */
+/** Sorts and deduplicates a finite column set. `"all"` is unchanged. */
 export function normalizeColumns(
   columns: readonly string[] | "all",
 ): readonly string[] | "all" {

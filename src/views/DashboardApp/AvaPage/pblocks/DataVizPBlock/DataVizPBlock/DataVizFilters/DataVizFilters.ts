@@ -141,9 +141,7 @@ function _localFilterToRecord(
   };
 }
 
-/**
- * Defines per-visualization filter defaults and transforms filter state.
- */
+/** Defines per-visualization filter defaults and transforms filter state. */
 export const DataVizFilters = {
   /** Default subscription used by new visualization blocks. */
   defaultGlobalFilterSubscription: DEFAULT_GLOBAL_FILTER_SUBSCRIPTION,

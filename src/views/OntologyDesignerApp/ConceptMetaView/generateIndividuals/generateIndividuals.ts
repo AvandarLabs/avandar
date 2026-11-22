@@ -323,9 +323,7 @@ async function _stageIndividuals(options: {
   Logger.log("Successfully generated all individuals. Starting diff/upsert...");
 }
 
-/**
- * Runs the sync for one concept once its progress job already exists.
- */
+/** Runs the sync for one concept once its progress job already exists. */
 async function _runGenerateIndividuals(
   concept: BuildableConcept,
   jobId: JobId,

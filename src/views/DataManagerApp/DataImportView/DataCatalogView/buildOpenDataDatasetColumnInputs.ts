@@ -70,9 +70,7 @@ export function buildOpenDataDatasetColumnInputs(
   });
 }
 
-/**
- * Stable order for catalog column rows: `display_order` then name.
- */
+/** Stable order for catalog column rows: `display_order` then name. */
 function _sortDataCatalogRelationColumns(
   rows: readonly DataCatalogRelationColumnRead[],
 ): DataCatalogRelationColumnRead[] {

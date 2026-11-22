@@ -51,9 +51,7 @@ async function _generateFeaturebaseJWT(
     .sign(secretKey);
 }
 
-/**
- * This is the route handler for all support endpoints.
- */
+/** This is the route handler for all support endpoints. */
 export const SupportRoutes = defineRoutes<SupportAPI>("support", {
   "/featurebase-jwt": {
     GET: GET("/featurebase-jwt").action(async ({ user, supabaseClient }) => {

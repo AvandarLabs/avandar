@@ -1,9 +1,7 @@
 import { propEq } from "@avandar/utils";
 import type { OfflineChatSchema } from "$/types/offlineChat.types";
 
-/**
- * Restricts schema sent to the SQL pass so the model sees one dataset.
- */
+/** Restricts schema sent to the SQL pass so the model sees one dataset. */
 export function narrowOfflineSchema(
   schema: OfflineChatSchema,
   datasetId: string,

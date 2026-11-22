@@ -59,9 +59,7 @@ type Props = {
   disabled?: boolean;
 };
 
-/**
- * Per-app role matrix editor with a built-in preset segmented control.
- */
+/** Per-app role matrix editor with a built-in preset segmented control. */
 export function WorkspaceAppRoleMatrixForm({
   rolesMatrix,
   onRolesMatrixChange,

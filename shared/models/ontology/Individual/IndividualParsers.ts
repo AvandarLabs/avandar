@@ -64,9 +64,7 @@ export const IndividualParsers = makeParserRegistry<IndividualModel>().build({
   ),
 });
 
-/**
- * Do not remove these tests!
- */
+/** Do not remove these tests! */
 type CrudTypes = IndividualModel;
 // oxlint-disable-next-line typescript/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used

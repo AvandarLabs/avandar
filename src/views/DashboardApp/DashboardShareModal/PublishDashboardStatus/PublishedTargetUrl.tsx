@@ -91,9 +91,7 @@ function ChangeUrlButton({
   );
 }
 
-/**
- * The published URL plus copy, QR, and an inline custom-path editor.
- */
+/** The published URL plus copy, QR, and an inline custom-path editor. */
 export function PublishedTargetUrl({
   targetUrl,
   pathPrefix,

@@ -9,9 +9,7 @@ type Props = {
   className?: string;
 };
 
-/**
- * The stack of property groups that fills an `AppViewBody` rail.
- */
+/** The stack of property groups that fills an `AppViewBody` rail. */
 export function AppViewRail({
   children,
   className,

@@ -3,9 +3,7 @@ import { msg } from "@lingui/core/macro";
 import type { I18n } from "@lingui/core";
 import type { DashboardSlugValidationFailure } from "@sbfn/dashboards/DashboardsRoutes/DashboardsRoutes.types";
 
-/**
- * Turns a server slug rejection into the sentence shown under the field.
- */
+/** Turns a server slug rejection into the sentence shown under the field. */
 export function makeSlugErrorMessageFromValidationFailure(
   options: Readonly<{ failure: DashboardSlugValidationFailure; i18n: I18n }>,
 ): string {

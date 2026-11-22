@@ -17,9 +17,7 @@ const E2E_SUPABASE_CLIENT_OPTIONS = {
   },
 } as const;
 
-/**
- * Supabase JS client with the anon key (RLS applies as the signed-in user).
- */
+/** Supabase JS client with the anon key (RLS applies as the signed-in user). */
 export function createE2ESupabaseAnonClient(): SupabaseClient {
   return createClient(
     getSupabaseUrlFromEnv(),

@@ -5,9 +5,7 @@ import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types.ts";
 
 const WORKSPACE_ID = "00000000-0000-4000-8000-000000000001" as WorkspaceId;
 
-/**
- * Minimal chain mock matching `buildInitialCustomRoleGroupName` queries.
- */
+/** Minimal chain mock matching `buildInitialCustomRoleGroupName` queries. */
 function _createMockRoleGroupsDb(options: {
   nonBuiltinCount: number | null;
   isNameTaken: (name: string) => boolean;

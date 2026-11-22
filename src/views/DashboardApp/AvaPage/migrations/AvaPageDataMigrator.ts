@@ -28,9 +28,7 @@ export type AvaPageDataMigration<
   downgrade: MigrationFunction<UpVersionData, DownVersionData>;
 };
 
-/**
- * A version migrator for AvaPageData objects.
- */
+/** A version migrator for AvaPageData objects. */
 type IAvaPageDataMigrator = {
   /**
    * Registers a list of migrations.

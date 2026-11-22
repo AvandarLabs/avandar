@@ -21,9 +21,7 @@ export const RolesMatrixModule = {
     GlobalViewer: BUILTIN_GLOBAL_VIEWER_MATRIX,
   },
 
-  /**
-   * Maps `role_group_app_roles` rows to a `UserAppRolesMatrix`.
-   */
+  /** Maps `role_group_app_roles` rows to a `UserAppRolesMatrix`. */
   rowsToUserAppRolesMatrix: (
     rows: ReadonlyArray<{ app: AppType; role: RoleLevel }>,
   ): UserAppRolesMatrix => {
@@ -48,9 +46,7 @@ export const RolesMatrixModule = {
     return newMatrix;
   },
 
-  /**
-   * Serializes a matrix to rows for `role_group_app_roles` inserts.
-   */
+  /** Serializes a matrix to rows for `role_group_app_roles` inserts. */
   userAppRolesMatrixToRows(
     userRolesMatrix: UserAppRolesMatrix,
   ): UserAppRolesList {
@@ -146,9 +142,7 @@ export const RolesMatrixModule = {
     return "custom";
   },
 
-  /**
-   * Matrix for a built-in preset segment (not used for `custom`).
-   */
+  /** Matrix for a built-in preset segment (not used for `custom`). */
   roleMatrixFromPresetType(
     presetType: "global_admin" | "global_editor" | "global_viewer",
   ): UserAppRolesMatrix {

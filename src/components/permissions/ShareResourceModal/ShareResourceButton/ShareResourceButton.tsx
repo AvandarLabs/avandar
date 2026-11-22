@@ -15,9 +15,7 @@ type Props = {
   size?: ButtonProps["size"];
 };
 
-/**
- * Opens the share modal when the user has admin on the resource.
- */
+/** Opens the share modal when the user has admin on the resource. */
 export function ShareResourceButton({
   resourceName,
   resourceType,

@@ -19,9 +19,7 @@ const _DEFAULT_TOOLTIP_EVENTS: NonNullable<TooltipProps["events"]> = {
   touch: false,
 };
 
-/**
- * Ensures long unbroken strings (e.g. filenames) wrap inside `maw`.
- */
+/** Ensures long unbroken strings (e.g. filenames) wrap inside `maw`. */
 function _mergeTooltipStyles(
   stylesProp: TooltipProps["styles"] | undefined,
 ): TooltipProps["styles"] {
@@ -55,9 +53,7 @@ function _mergeTooltipStyles(
   };
 }
 
-/**
- * Styled tooltip component with Avandar design defaults.
- */
+/** Styled tooltip component with Avandar design defaults. */
 export function Tooltip({
   children,
   color = "neutral.9",

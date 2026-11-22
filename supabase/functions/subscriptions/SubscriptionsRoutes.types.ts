@@ -3,9 +3,7 @@ import type { Workspace } from "$/models/Workspace/Workspace.ts";
 import type { Tables } from "$/types/database.types.ts";
 import type { APITypeDef } from "@sbfn/_shared/MiniServer/api.types.ts";
 
-/**
- * A subset of the Polar Product type that is served to the frontend.
- */
+/** A subset of the Polar Product type that is served to the frontend. */
 export type AvaPolarProduct = {
   id: string;
   name: string;

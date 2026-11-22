@@ -75,9 +75,7 @@ export async function seedDashboard(
   });
 }
 
-/**
- * Deletes the given dashboards by id (best-effort).
- */
+/** Deletes the given dashboards by id (best-effort). */
 export async function deleteDashboardsByIds(
   options: Readonly<{
     admin: SupabaseClient;

@@ -264,9 +264,7 @@ function _spansToSegments(
   return segments;
 }
 
-/**
- * Build ordered display segments for a SQL string and workspace catalog.
- */
+/** Build ordered display segments for a SQL string and workspace catalog. */
 export function buildSqlDisplaySegments(options: {
   sql: string;
   catalog: SqlDisplayCatalog;

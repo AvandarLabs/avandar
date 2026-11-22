@@ -1,8 +1,6 @@
 const DUCKDB_EMPTY_TOKEN = "(empty)";
 
-/**
- * DuckDB uses `(empty)` in sniff/reject metadata for disabled options.
- */
+/** DuckDB uses `(empty)` in sniff/reject metadata for disabled options. */
 export function isDuckDbEmptyToken(value: string | null | undefined): boolean {
   if (value == null) {
     return true;
@@ -12,9 +10,7 @@ export function isDuckDbEmptyToken(value: string | null | undefined): boolean {
   return trimmed.length === 0 || trimmed === DUCKDB_EMPTY_TOKEN;
 }
 
-/**
- * Normalizes UI / sniff tokens to `undefined` when the option is disabled.
- */
+/** Normalizes UI / sniff tokens to `undefined` when the option is disabled. */
 export function normalizeDuckDbCsvOptionToken(
   value: string | null | undefined,
 ): string | undefined {

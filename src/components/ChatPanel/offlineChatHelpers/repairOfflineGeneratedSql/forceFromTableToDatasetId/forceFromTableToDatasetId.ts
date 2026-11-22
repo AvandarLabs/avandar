@@ -1,6 +1,4 @@
-/**
- * Replaces FROM/JOIN table identifiers that are not workspace dataset ids.
- */
+/** Replaces FROM/JOIN table identifiers that are not workspace dataset ids. */
 export function forceFromTableToDatasetId(args: {
   sql: string;
   datasetTableId: string;

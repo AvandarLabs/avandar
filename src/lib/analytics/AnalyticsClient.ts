@@ -94,7 +94,5 @@ function createAnalyticsClient(): WithLogger<
   });
 }
 
-/**
- * Client for recording product-usage analytics events.
- */
+/** Client for recording product-usage analytics events. */
 export const AnalyticsClient = createAnalyticsClient();

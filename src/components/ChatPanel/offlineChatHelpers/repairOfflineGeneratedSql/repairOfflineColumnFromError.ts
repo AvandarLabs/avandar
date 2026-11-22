@@ -7,9 +7,7 @@ import type {
 
 const COLUMN_ERROR_RE = /(?:Referenced column|column)\s+"([^"]+)"\s+not found/i;
 
-/**
- * Maps common invented column names to likely Schema labels (geo / time).
- */
+/** Maps common invented column names to likely Schema labels (geo / time). */
 const COLUMN_ALIAS_CANDIDATES: Readonly<Record<string, readonly string[]>> = {
   country: ["Country/Region", "country", "country_code", "nation"],
   state: ["Province/State", "state", "region", "administrative_area"],
@@ -37,9 +35,7 @@ function resolveColumnFromAliasDictionary(
     .find(isDefined)?.name;
 }
 
-/**
- * Extracts a missing column name from a DuckDB binder error message.
- */
+/** Extracts a missing column name from a DuckDB binder error message. */
 export function extractMissingColumnFromError(
   error: string,
 ): string | undefined {
@@ -47,9 +43,7 @@ export function extractMissingColumnFromError(
   return match?.[1]?.trim();
 }
 
-/**
- * Replaces a wrong column identifier in SQL when DuckDB reports it missing.
- */
+/** Replaces a wrong column identifier in SQL when DuckDB reports it missing. */
 export function repairOfflineColumnFromError(args: {
   sql: string;
   error: string;

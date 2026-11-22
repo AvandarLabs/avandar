@@ -100,9 +100,7 @@ export const DashboardParsers = makeParserRegistry<DashboardModel>().build({
   ),
 });
 
-/**
- * Do not remove these tests!
- */
+/** Do not remove these tests! */
 type CrudTypes = DashboardModel;
 // oxlint-disable-next-line typescript/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used

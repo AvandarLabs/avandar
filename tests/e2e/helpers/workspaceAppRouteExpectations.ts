@@ -57,9 +57,7 @@ export const WORKSPACE_APP_ROUTES = {
   },
 } as const satisfies Record<string, WorkspaceAppRouteCase>;
 
-/**
- * Asserts the member is redirected to the workspace access-denied page.
- */
+/** Asserts the member is redirected to the workspace access-denied page. */
 export async function expectWorkspaceAppAccessDenied(
   page: Page,
   options: { workspaceSlug: string; appPath: string },
@@ -74,9 +72,7 @@ export async function expectWorkspaceAppAccessDenied(
   ).toBeVisible();
 }
 
-/**
- * Asserts the member can open the app route (not access-denied).
- */
+/** Asserts the member can open the app route (not access-denied). */
 export async function expectWorkspaceAppAccessAllowed(
   page: Page,
   options: {

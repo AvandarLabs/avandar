@@ -150,9 +150,7 @@ export function reviewGeneratedSqlAssumptions(args: {
   };
 }
 
-/**
- * Stable text hashed into consent acks for assumed SQL filter values.
- */
+/** Stable text hashed into consent acks for assumed SQL filter values. */
 export function buildGeneratedSqlAssumptionAckText(
   values: readonly string[],
 ): string {

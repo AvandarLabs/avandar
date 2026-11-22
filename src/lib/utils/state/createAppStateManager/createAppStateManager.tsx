@@ -48,14 +48,10 @@ type AppStateManager<
    */
   useContext: () => AppStateContextTuple<State, ActionRegistry>;
 
-  /**
-   * A `useState` hook which returns the current state.
-   */
+  /** A `useState` hook which returns the current state. */
   useState: () => State;
 
-  /**
-   * A `useDispatch` hook which returns the app state's dispatch functions.
-   */
+  /** A `useDispatch` hook which returns the app state's dispatch functions. */
   useDispatch: () => AppStateContextTuple<State, ActionRegistry>[1];
 
   /**

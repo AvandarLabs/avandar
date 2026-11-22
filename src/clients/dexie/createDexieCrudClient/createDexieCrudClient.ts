@@ -170,9 +170,7 @@ function _createConfiguredDexieCrudClient<
   });
 }
 
-/**
- * Creates a client for a model that maps to a Dexie table.
- */
+/** Creates a client for a model that maps to a Dexie table. */
 export function createDexieCrudClient<
   M extends DexieCrudModelSpec,
   ExtendedQueriesClient extends ClientReturningOnlyPromises = EmptyObject,

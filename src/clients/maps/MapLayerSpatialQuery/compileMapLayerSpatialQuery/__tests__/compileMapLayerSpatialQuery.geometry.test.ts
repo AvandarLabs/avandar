@@ -1,6 +1,4 @@
-/**
- * Direct geometry-column compilation for compileMapLayerSpatialQuery.
- */
+/** Direct geometry-column compilation for compileMapLayerSpatialQuery. */
 import { describe, expect, it } from "vitest";
 import { MapLayerSpatialQueryColumns } from "../../MapLayerSpatialQuery.constants";
 import { compileMapLayerSpatialQuery } from "../compileMapLayerSpatialQuery";

@@ -15,9 +15,7 @@ type SubscriptionUpdatedData = z.infer<
   typeof PolarEventDataSchemas.SubscriptionUpdated
 >;
 
-/**
- * Handles a 'subscription.updated' event from the Polar API.
- */
+/** Handles a 'subscription.updated' event from the Polar API. */
 export async function handleSubscriptionUpdatedEvent(
   options: PolarWebhookHandlerOptions<SubscriptionUpdatedData>,
 ): Promise<WebhookResponse> {

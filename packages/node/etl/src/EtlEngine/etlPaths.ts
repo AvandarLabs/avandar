@@ -88,9 +88,7 @@ export function getEtlLoadDir(
   return join(root, ETL_OUTPUT_BASE_DIR, pipelineName, pipelineRunId, "load");
 }
 
-/**
- * Directory the transform step reads from (extract output for this run).
- */
+/** Directory the transform step reads from (extract output for this run). */
 export function getEtlInputDir(
   pipelineName: string,
   pipelineRunId: PipelineRunId,

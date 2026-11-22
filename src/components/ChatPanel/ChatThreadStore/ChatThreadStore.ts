@@ -45,9 +45,7 @@ function _hasIdentity(options: Readonly<ChatThreadIdentity>): boolean {
   return options.workspaceId.length > 0 && options.userId.length > 0;
 }
 
-/**
- * Persists the live chat thread per workspace and user in localStorage.
- */
+/** Persists the live chat thread per workspace and user in localStorage. */
 export const ChatThreadStore = {
   /** Builds the localStorage key for a workspace-user thread slot. */
   storageKey: (options: Readonly<ChatThreadIdentity>): string => {

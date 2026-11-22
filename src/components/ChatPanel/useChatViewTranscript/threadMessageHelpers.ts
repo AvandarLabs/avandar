@@ -26,9 +26,7 @@ export function makeLikeFromThreadMessage(
   };
 }
 
-/**
- * Converts live thread messages into likes for a thread reset.
- */
+/** Converts live thread messages into likes for a thread reset. */
 export function makeLikesFromThreadMessages(
   messages: readonly ThreadMessageSource[],
 ): ThreadMessageLike[] {

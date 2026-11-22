@@ -12,9 +12,7 @@ import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 
-/**
- * Layer and query-result fixtures for `compileMapSnapshot` tests.
- */
+/** Layer and query-result fixtures for `compileMapSnapshot` tests. */
 
 /** Where the exact school sits, as `[longitude, latitude]`. */
 export const SCHOOL_POSITION: readonly [number, number] = [-73.9812, 40.7514];

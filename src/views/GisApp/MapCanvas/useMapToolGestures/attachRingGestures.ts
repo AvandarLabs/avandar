@@ -133,9 +133,7 @@ function _appendVertexFromClick(
   callbacks.setVertices(nextVertices);
 }
 
-/**
- * Registers AOI drawing: rectangle drag, Shift-lasso, or vertex polygon.
- */
+/** Registers AOI drawing: rectangle drag, Shift-lasso, or vertex polygon. */
 export function attachAoiGestures(
   map: MapLibreMap,
   callbacks: AoiGestureCallbacks,

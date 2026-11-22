@@ -35,9 +35,7 @@ export type UseMutationOptions<
   TError = DefaultError,
   TContext = unknown,
 > = TanstackUseMutationOptions<TData, TError, TFnVariables, TContext> & {
-  /**
-   * Invalidate the specified query after the mutation is successful.
-   */
+  /** Invalidate the specified query after the mutation is successful. */
   queryToInvalidate?: QueryKey;
 
   /**
@@ -46,9 +44,7 @@ export type UseMutationOptions<
    */
   queriesToInvalidate?: readonly QueryKey[];
 
-  /**
-   * Refetch the specified query after the mutation is successful.
-   */
+  /** Refetch the specified query after the mutation is successful. */
   queryToRefetch?: QueryKey;
 
   /**

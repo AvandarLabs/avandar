@@ -37,14 +37,10 @@ type DexieModelTableRecord<M extends DexieCrudModelSpec> = UnionToIntersection<
     : never
 >;
 
-/**
- * A Dexie table representing the 'meta' table.
- */
+/** A Dexie table representing the 'meta' table. */
 type DexieMetaTable = EntityTable<{ key: string; value: string }, "key">;
 
-/**
- * A type representing a Dexie database with a specific union of models.
- */
+/** A type representing a Dexie database with a specific union of models. */
 export type DexieDBType<M extends DexieCrudModelSpec> = Dexie &
   DexieModelTableRecord<M> & {
     meta: DexieMetaTable;

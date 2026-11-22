@@ -6,9 +6,7 @@ import { LONG_WAIT, MEDIUM_WAIT } from "./helpers/timeouts";
 import { createWorkspaceTagViaSettings } from "./helpers/workspaceTagsFlow";
 import type { Page } from "@playwright/test";
 
-/**
- * `idb-keyval` defaults, plus the persister key from `queryPersister.ts`.
- */
+/** `idb-keyval` defaults, plus the persister key from `queryPersister.ts`. */
 const IDB_NAME = "keyval-store";
 const IDB_STORE = "keyval";
 const PERSISTED_CACHE_KEY = "avandar-react-query-cache";

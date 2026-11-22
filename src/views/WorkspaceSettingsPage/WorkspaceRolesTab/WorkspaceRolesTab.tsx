@@ -113,9 +113,7 @@ function _editorReducer(state: EditorState, action: EditorAction): EditorState {
     .exhaustive();
 }
 
-/**
- * Built-in presets (read-only) and CRUD for custom role groups.
- */
+/** Built-in presets (read-only) and CRUD for custom role groups. */
 export function WorkspaceRolesTab(): JSX.Element {
   const { t } = useLingui();
   const workspace = useCurrentWorkspace();

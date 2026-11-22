@@ -37,17 +37,13 @@ import type {
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 
 type Props = {
-  /**
-   * The IDs of the datasets that we can select columns from
-   */
+  /** The IDs of the datasets that we can select columns from */
   datasetIds: readonly DatasetId[];
   value?: DatasetColumnId;
   defaultValue?: DatasetColumnId;
   onChange?: (value: DatasetColumnId) => void;
 
-  /**
-   * The IDs of the columns to exclude from the list
-   */
+  /** The IDs of the columns to exclude from the list */
   excludeColumns?: readonly DatasetColumnId[];
   segmentedControlProps?: Omit<SegmentedControlProps<DatasetColumnId>, "data">;
 };

@@ -4,9 +4,7 @@ import type {
   RoleLevel,
 } from "$/models/Permissions/Permissions.types.ts";
 
-/**
- * Full catalog: each app defines permission keys granted at each role tier.
- */
+/** Full catalog: each app defines permission keys granted at each role tier. */
 type PermissionRegistryType = Readonly<{
   [A in AppType]: {
     readonly [R in RoleLevel]: readonly PermissionKey[];

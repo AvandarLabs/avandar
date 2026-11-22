@@ -1,8 +1,6 @@
 import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
 
-/**
- * Inserts a restricted dataset owned by the first profile in the workspace.
- */
+/** Inserts a restricted dataset owned by the first profile in the workspace. */
 export async function insertE2ERestrictedDataset(options: {
   supabaseAdminClient: AvaSupabaseDBClient;
   workspaceId: string;

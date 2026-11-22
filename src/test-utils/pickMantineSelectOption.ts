@@ -81,9 +81,7 @@ export function pickMantineSelectOption(
   );
 }
 
-/**
- * Returns the Mantine Select dropdown portal for a labeled combobox.
- */
+/** Returns the Mantine Select dropdown portal for a labeled combobox. */
 export function getMantineSelectDropdown(
   comboboxLabel: RegExp | string,
 ): HTMLElement {

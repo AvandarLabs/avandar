@@ -33,9 +33,7 @@ type Props = {
   onOpen: (info: OpenDatasetInfo, rawSql: string) => void;
 };
 
-/**
- * Returns the localized label for a given dataset source type.
- */
+/** Returns the localized label for a given dataset source type. */
 function useSourceTypeLabels(): Record<DatasetSource.SourceType, string> {
   const { t } = useLingui();
   return {

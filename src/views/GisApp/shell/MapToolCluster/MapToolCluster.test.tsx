@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-/**
- * Tool cluster: Area gating, pressed state, Escape, and AOI commit.
- */
+/** Tool cluster: Area gating, pressed state, Escape, and AOI commit. */
 import { uuid } from "$/lib/uuid";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";

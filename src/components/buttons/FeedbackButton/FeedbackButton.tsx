@@ -11,9 +11,7 @@ import {
 } from "./openFeaturebaseFeedbackWidget";
 import { useFeaturebaseInit } from "./useFeaturebaseInit";
 
-/**
- * Button that opens the Featurebase feedback widget (logged-in users only).
- */
+/** Button that opens the Featurebase feedback widget (logged-in users only). */
 export function FeedbackButton(): JSX.Element | null {
   const { user } = RootRoute.useRouteContext();
   const [menuOpened, setMenuOpened] = useState(false);

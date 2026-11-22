@@ -11,9 +11,7 @@ export interface SyncEngine {
   onStatusChange(callback: (status: SyncStatus) => void): Unsubscribe;
 }
 
-/**
- * One pending row-level mutation queued in the desktop outbox.
- */
+/** One pending row-level mutation queued in the desktop outbox. */
 export type SyncMutation = {
   tableName: string;
   rowId: string;
@@ -44,7 +42,5 @@ export type SyncStatus =
       pendingParquets: number;
     };
 
-/**
- * Cancels an event subscription registered via `onStatusChange`.
- */
+/** Cancels an event subscription registered via `onStatusChange`. */
 export type Unsubscribe = () => void;

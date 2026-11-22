@@ -20,9 +20,7 @@ export function tryGetSupabaseUrlFromEnv(): string | undefined {
   return process.env.VITE_SUPABASE_API_URL ?? process.env.SUPABASE_URL;
 }
 
-/**
- * Anon key used by browser-style Supabase clients in E2E tests.
- */
+/** Anon key used by browser-style Supabase clients in E2E tests. */
 export function getSupabaseAnonKeyFromEnv(): string {
   const anonKey = process.env.VITE_SUPABASE_ANON_KEY;
 
@@ -33,9 +31,7 @@ export function getSupabaseAnonKeyFromEnv(): string {
   return anonKey;
 }
 
-/**
- * Service role key for admin Supabase clients in tests.
- */
+/** Service role key for admin Supabase clients in tests. */
 export function getSupabaseServiceRoleKeyFromEnv(): string {
   const serviceRoleKey = tryGetSupabaseServiceRoleKeyFromEnv();
 

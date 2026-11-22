@@ -16,9 +16,7 @@ type AssignResult = {
   insertedCustomRoleGroupId: string | null;
 };
 
-/**
- * Points the secondary E2E user's membership at a built-in role group.
- */
+/** Points the secondary E2E user's membership at a built-in role group. */
 export async function assignE2ESecondaryMemberBuiltinRoleGroup(options: {
   supabaseAdminClient: AvaSupabaseDBClient;
   workspaceId: string;
@@ -50,9 +48,7 @@ export async function assignE2ESecondaryMemberBuiltinRoleGroup(options: {
   return { previousRoleGroupId, insertedCustomRoleGroupId: null };
 }
 
-/**
- * Assigns a custom per-app matrix by inserting a disposable role group.
- */
+/** Assigns a custom per-app matrix by inserting a disposable role group. */
 export async function assignE2ESecondaryMemberCustomMatrix(options: {
   supabaseAdminClient: AvaSupabaseDBClient;
   workspaceId: string;
@@ -111,9 +107,7 @@ export async function assignE2ESecondaryMemberCustomMatrix(options: {
   };
 }
 
-/**
- * Restores membership role group and deletes a disposable custom group.
- */
+/** Restores membership role group and deletes a disposable custom group. */
 export async function restoreE2ESecondaryMemberRoleGroup(options: {
   supabaseAdminClient: AvaSupabaseDBClient;
   workspaceId: string;
@@ -192,9 +186,7 @@ export function createRolesMatrixWithoutApp(app: AppType): UserAppRolesMatrix {
   };
 }
 
-/**
- * Single-app viewer matrix for positive route-guard cases.
- */
+/** Single-app viewer matrix for positive route-guard cases. */
 export function createSingleAppViewerRolesMatrix(
   app: AppType,
 ): UserAppRolesMatrix {
@@ -209,9 +201,7 @@ export function createSingleAppViewerRolesMatrix(
   };
 }
 
-/**
- * Single-app editor matrix (settings has no editor tier in catalog).
- */
+/** Single-app editor matrix (settings has no editor tier in catalog). */
 export function createSingleAppEditorRolesMatrix(
   app: AppType,
 ): UserAppRolesMatrix {
@@ -227,9 +217,7 @@ export function createSingleAppEditorRolesMatrix(
   };
 }
 
-/**
- * Single-app admin matrix (only meaningful for settings in catalog).
- */
+/** Single-app admin matrix (only meaningful for settings in catalog). */
 export function createSingleAppAdminRolesMatrix(
   app: AppType,
 ): UserAppRolesMatrix {

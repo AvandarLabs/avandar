@@ -15,9 +15,7 @@ export const CSV_QUOTE_PROBE_CHUNK_SIZE = 65_536;
  */
 export const CSV_QUOTE_PROBE_OFFSET_FRACTIONS = [0, 0.25, 0.5, 0.75] as const;
 
-/**
- * Resolves quote char from sniff metadata and optional UTF-8 probe chunks.
- */
+/** Resolves quote char from sniff metadata and optional UTF-8 probe chunks. */
 export function inferQuoteCharFromSniffAndProbeTexts(options: {
   sniffQuoteToken: string | null | undefined;
   probeTexts: readonly string[];

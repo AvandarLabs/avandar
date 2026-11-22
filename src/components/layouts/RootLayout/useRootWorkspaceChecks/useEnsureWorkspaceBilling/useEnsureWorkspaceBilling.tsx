@@ -31,9 +31,7 @@ function _openBillingSetupModal(workspace: Workspace.WithSubscription): string {
   });
 }
 
-/**
- * Hook to ensure that the workspace has a billing setup.
- */
+/** Hook to ensure that the workspace has a billing setup. */
 export function useEnsureWorkspaceBilling(): void {
   const workspace = useCurrentWorkspace();
   const { subscription } = workspace;

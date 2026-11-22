@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { vi } from "vitest";
-/**
- * Shared map-tool harness for AnnotateMapTool tests.
- */
+/** Shared map-tool harness for AnnotateMapTool tests. */
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { useMapToolGestures } from "@/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures";
 import { AnnotationFeatureInspector } from "@/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector";

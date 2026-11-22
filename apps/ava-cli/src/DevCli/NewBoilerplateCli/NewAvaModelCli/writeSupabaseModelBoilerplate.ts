@@ -3,9 +3,7 @@ import { TEMPLATES_DIR } from "@ava-cli/DevCli/NewBoilerplateCli/NewAvaModelCli/
 import { writeFileFromTemplate } from "@ava-cli/utils/writeFileFromTemplate/writeFileFromTemplate";
 import { Acclimate } from "@avandar/acclimate";
 
-/**
- * Writes a Supabase-backed model folder with parsers and a client stub.
- */
+/** Writes a Supabase-backed model folder with parsers and a client stub. */
 export function writeSupabaseModelBoilerplate(options: {
   modelName: string;
   modelsDirRelative: string;

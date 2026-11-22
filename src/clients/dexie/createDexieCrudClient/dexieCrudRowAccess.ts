@@ -30,9 +30,7 @@ function _extractPrimaryKeyFromRow(
   }) as IndexableType;
 }
 
-/**
- * Returns whether two rows match on every `onConflict.columnNames` field.
- */
+/** Returns whether two rows match on every `onConflict.columnNames` field. */
 export function rowsMatchOnConflictColumns(
   a: Record<string, unknown>,
   b: Record<string, unknown>,
@@ -56,9 +54,7 @@ export function findConflictingRow<T extends Record<string, unknown>>(
   });
 }
 
-/**
- * Returns whether `columnNames` matches the table primary key path exactly.
- */
+/** Returns whether `columnNames` matches the table primary key path exactly. */
 export function isPrimaryKeyConflictColumns(
   columnNames: readonly string[],
   primKey: IndexSpec,

@@ -72,9 +72,7 @@ export type StructuredQueryRead = Model.Versioned<
      */
     having: QueryFilterGroup;
 
-    /**
-     * JOIN clauses, applied in array order. Empty array means "no joins".
-     */
+    /** JOIN clauses, applied in array order. Empty array means "no joins". */
     joins: readonly QueryJoin[];
 
     /** The offset of the query. */

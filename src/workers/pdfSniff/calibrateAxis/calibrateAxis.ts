@@ -104,9 +104,7 @@ export function calibrateAxis(
   return linear;
 }
 
-/**
- * Reads a value from a calibrated position.
- */
+/** Reads a value from a calibrated position. */
 export function applyCalibration(
   calibration: AxisCalibration,
   position: number,

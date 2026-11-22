@@ -19,9 +19,7 @@ export type LocalFilterStateApi = {
   reset: () => void;
 };
 
-/**
- * Returns viewer-selected values for a visualization's local filters.
- */
+/** Returns viewer-selected values for a visualization's local filters. */
 export function useLocalFilterState(
   localFilters: readonly LocalFilter[],
 ): LocalFilterStateApi {

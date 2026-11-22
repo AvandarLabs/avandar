@@ -41,10 +41,7 @@ type SubmitManualUploadFileParams = {
   noFileMessage: string;
 };
 
-/**
- * Parse, reparse, and preview state for the manual spreadsheet upload
- * view.
- */
+/** Parse, reparse, and preview state for the manual spreadsheet upload view. */
 export type ManualUploadParse = {
   uploadedFile: File | undefined;
   previewRows: UnknownRow[] | undefined;

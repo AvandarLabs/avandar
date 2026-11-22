@@ -1,8 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-/**
- * Deletes resource shares and the dataset row (admin).
- */
+/** Deletes resource shares and the dataset row (admin). */
 export async function deleteDatasetAndShares(options: {
   supabaseAdminClient: SupabaseClient;
   datasetId: string;
@@ -17,9 +15,7 @@ export async function deleteDatasetAndShares(options: {
   await supabaseAdminClient.from("datasets").delete().eq("id", datasetId);
 }
 
-/**
- * Deletes a workspace user group by name (admin).
- */
+/** Deletes a workspace user group by name (admin). */
 export async function deleteWorkspaceTagByName(options: {
   supabaseAdminClient: SupabaseClient;
   workspaceId: string;

@@ -1,7 +1,5 @@
 import { describe, expect, it } from "vitest";
-/**
- * Boundary-join compilation for compileMapLayerSpatialQuery.
- */
+/** Boundary-join compilation for compileMapLayerSpatialQuery. */
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { compileMapLayerSpatialQuery } from "../compileMapLayerSpatialQuery";

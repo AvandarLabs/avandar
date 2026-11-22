@@ -234,21 +234,19 @@ test.describe("PDF manual upload", () => {
     expect(pageErrors).toEqual([]);
   });
 
-  /**
-   * The whole path, in a real browser: upload, draw, classify, extract,
-   * review, correct, save, and read the saved rows back.
-   *
-   * Every step after the upload is otherwise covered only by unit and
-   * component tests, and the two worst defects this feature has had were both
-   * invisible to those. pdf.js installs its own handler on the sniff worker's
-   * port and posts internal traffic to the main thread, which the driver read
-   * as an error, so no PDF could be imported at all while every unit test
-   * passed; under jsdom `importScripts` does not exist, so there is no shared
-   * port to model. And the review grid's corrections lived in component state,
-   * so the save wrote the raw extraction and a user who fixed a row got the
-   * unfixed value. The last assertion here is the one that catches the second
-   * of those: it reads the saved dataset's own rows.
-   */
+  // The whole path, in a real browser: upload, draw, classify, extract,
+  // review, correct, save, and read the saved rows back.
+  //
+  // Every step after the upload is otherwise covered only by unit and
+  // component tests, and the two worst defects this feature has had were both
+  // invisible to those. pdf.js installs its own handler on the sniff worker's
+  // port and posts internal traffic to the main thread, which the driver read
+  // as an error, so no PDF could be imported at all while every unit test
+  // passed; under jsdom `importScripts` does not exist, so there is no shared
+  // port to model. And the review grid's corrections lived in component state,
+  // so the save wrote the raw extraction and a user who fixed a row got the
+  // unfixed value. The last assertion here is the one that catches the second
+  // of those: it reads the saved dataset's own rows.
   test("classifies a drawn map region itself, reviews a row, and saves the reviewed rows", async ({
     page,
     e2eWorkerDb,

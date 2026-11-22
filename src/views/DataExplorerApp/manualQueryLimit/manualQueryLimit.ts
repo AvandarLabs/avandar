@@ -72,9 +72,7 @@ export function shouldAutoLimitLargeDataset(
   );
 }
 
-/**
- * Applies the default manual-query LIMIT to an otherwise empty query.
- */
+/** Applies the default manual-query LIMIT to an otherwise empty query. */
 export function applyDefaultManualQueryLimit(
   query: PartialStructuredQuery,
 ): PartialStructuredQuery {

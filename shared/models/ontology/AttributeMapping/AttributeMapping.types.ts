@@ -4,9 +4,7 @@ import type { Enums } from "$/types/database.types.ts";
 
 export type AttributeMappingType = Enums<"concept_attributes__mapping_type">;
 
-/**
- * Registry that maps mapping types to their CRUD model definitions.
- */
+/** Registry that maps mapping types to their CRUD model definitions. */
 export type AttributeMappingModelRegistry = {
   manual_entry: ManualEntryMappingModel;
   dataset_column: DatasetColumnMappingModel;

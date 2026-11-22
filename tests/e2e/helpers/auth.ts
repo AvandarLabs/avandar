@@ -36,9 +36,7 @@ export async function signInWithEmailPassword(
   await dismissBillingModalIfVisible(page);
 }
 
-/**
- * Opens the workspace user menu and signs out.
- */
+/** Opens the workspace user menu and signs out. */
 export async function signOutViaUserMenu(page: Page): Promise<void> {
   await page
     .getByRole("button", { name: SEEDED_WORKSPACE_MENU_BUTTON_NAME })
@@ -47,9 +45,7 @@ export async function signOutViaUserMenu(page: Page): Promise<void> {
   await expect(page).toHaveURL(/\/signin/, { timeout: LONG_WAIT });
 }
 
-/**
- * Signs out the current user, then signs in as another account.
- */
+/** Signs out the current user, then signs in as another account. */
 export async function switchToWorkspaceUser(
   page: Page,
   options: SignInOptions,

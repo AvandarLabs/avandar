@@ -39,9 +39,7 @@ function _hintsFrom(
   ];
 }
 
-/**
- * Two-point y-axis calibration: click ticks on the page, type their values.
- */
+/** Two-point y-axis calibration: click ticks on the page, type their values. */
 export function PdfAxisCalibration({
   isPicking,
   points,

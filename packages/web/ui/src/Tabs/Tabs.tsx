@@ -21,10 +21,7 @@ export type TabsIndicatorVariant = "underline" | "floating";
 export type TabsSize = "sm" | "md";
 
 type Props<TabId extends string> = {
-  /**
-   * Tab labels to render.
-   * This array cannot be empty.
-   */
+  /** Tab labels to render. This array cannot be empty. */
   tabIds: readonly [TabId, ...TabId[]];
   renderTabHeader:
     | {

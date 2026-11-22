@@ -117,9 +117,7 @@ export async function addShare(options: {
   ).toBeVisible({ timeout: MEDIUM_WAIT });
 }
 
-/**
- * Toggles "Limit to app access" for a group share row (idempotent).
- */
+/** Toggles "Limit to app access" for a group share row (idempotent). */
 export async function toggleRequiresAppAccess(options: {
   page: Page;
   groupLabel: string;

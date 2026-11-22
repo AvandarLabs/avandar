@@ -1,9 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { Stack, Text } from "@mantine/core";
 
-/**
- * Standard offline tooltip copy for gated controls and links.
- */
+/** Standard offline tooltip copy for gated controls and links. */
 export function OfflineUnavailableTooltipLabel(): JSX.Element {
   return (
     <Stack gap={2}>

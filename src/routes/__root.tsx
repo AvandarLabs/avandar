@@ -4,9 +4,7 @@ import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import type { AvaRouterRootContext } from "@/config/AvaRouter";
 
-/**
- * This is the root route of the app. It only renders the <App> component.
- */
+/** This is the root route of the app. It only renders the <App> component. */
 export const Route = createRootRouteWithContext<AvaRouterRootContext>()({
   component: RouterRootComponent,
 });

@@ -7,15 +7,10 @@ import type { ReactNode } from "react";
 type Props = {
   children: ReactNode;
 
-  /**
-   * The starting open or closed state of the item.
-   * Defaults to `false`.
-   */
+  /** The starting open or closed state of the item. Defaults to `false`. */
   defaultOpen?: boolean;
 
-  /**
-   * The label to display for the item.
-   */
+  /** The label to display for the item. */
   label: ReactNode;
 };
 

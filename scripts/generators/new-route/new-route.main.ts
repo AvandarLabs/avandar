@@ -87,9 +87,7 @@ you probably forgot to escape it when running this command.
   }
 }
 
-/**
- * Replaces template variables in a string
- */
+/** Replaces template variables in a string */
 function replaceTemplateVariables(
   content: string,
   variables: Record<string, string>,
@@ -110,9 +108,7 @@ function _routePathToDefaultComponentName(routePath: string): string {
   return `${toPascalCase(cleanPart)}Page`;
 }
 
-/**
- * Reads a template file and replaces variables
- */
+/** Reads a template file and replaces variables */
 function processTemplate(templatePath: string, routePath: string): string {
   const templateContent = readFileSync(templatePath, "utf-8");
   return replaceTemplateVariables(templateContent, {
@@ -121,9 +117,7 @@ function processTemplate(templatePath: string, routePath: string): string {
   });
 }
 
-/**
- * Gets the project root directory
- */
+/** Gets the project root directory */
 function getProjectRoot(): string {
   return execSync("pnpm -s util:get-project-root", {
     encoding: "utf-8",
@@ -149,9 +143,7 @@ function createRouteDirectories(baseDir: string, routePath: string): string {
   return currentPath;
 }
 
-/**
- * Creates a route file in the given directory
- */
+/** Creates a route file in the given directory */
 async function createRouteFile(
   directory: string,
   fileName: string,

@@ -43,9 +43,7 @@ const MantineNavLinkComponent = forwardRef<
 
 const MantineRouterNavLink = createLink(MantineNavLinkComponent);
 
-/**
- * This is a Mantine NavLink that works with our router.
- */
+/** This is a Mantine NavLink that works with our router. */
 // oxlint-disable-next-line react-js/function-component-definition -- typed API
 export const NavLink: LinkComponent<typeof MantineRouterNavLink> = (props) => {
   const [isClicked, setIsClicked] = useState(false);

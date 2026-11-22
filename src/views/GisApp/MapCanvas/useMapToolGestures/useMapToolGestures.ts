@@ -224,9 +224,7 @@ type GestureResult = {
   lastCreatedAnnotationId: AvaMapConfig.AnnotationFeatureId | undefined;
 };
 
-/**
- * Registers map-tool click, close, and Escape-to-Pan gestures.
- */
+/** Registers map-tool click, close, and Escape-to-Pan gestures. */
 export function useMapToolGestures({
   mapRef,
   mapToolMode,

@@ -35,9 +35,7 @@ export function dexieColumnIsIndexed(
   });
 }
 
-/**
- * Throws if any `columnNames` entry is not indexed on `dbTable`.
- */
+/** Throws if any `columnNames` entry is not indexed on `dbTable`. */
 export function assertDexieColumnsAreIndexed(
   tableName: string,
   dbTable: Table,

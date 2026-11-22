@@ -30,9 +30,7 @@ export const FORMAT_TOKEN_ORDER = [
 
 export type FormatToken = (typeof FORMAT_TOKEN_ORDER)[number];
 
-/**
- * Expands `L` macros in a raw format segment (outside `[` `]` brackets).
- */
+/** Expands `L` macros in a raw format segment (outside `[` `]` brackets). */
 export function expandMacrosInRawSegment(raw: string): string {
   return raw
     .replace(/LLLL/g, "dddd, MMMM D, YYYY h:mm A")

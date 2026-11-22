@@ -67,9 +67,7 @@ export function getBasePlanName(fullPlanName: string | undefined): string {
   return fullPlanName.replace(/\s*\([^)]*\)\s*$/, "").trim();
 }
 
-/**
- * Checks if a plan is a Free plan.
- */
+/** Checks if a plan is a Free plan. */
 export function isFreePlan(
   plan: SubscriptionPlan | undefined,
 ): plan is SubscriptionPlan & { priceType: "free" } {
@@ -82,18 +80,14 @@ export function isSeatBasedPlan(
   return plan?.priceType === "seat_based";
 }
 
-/**
- * Checks if a plan is a monthly plan.
- */
+/** Checks if a plan is a monthly plan. */
 export function isMonthlyPaidSeatsPlan(
   plan: SubscriptionPlan | undefined,
 ): plan is MonthlyPaidSeatsPlan {
   return plan?.priceType === "seat_based" && plan?.planInterval === "month";
 }
 
-/**
- * Checks if a plan is an annual plan.
- */
+/** Checks if a plan is an annual plan. */
 export function isAnnualPaidSeatsPlan(
   plan: SubscriptionPlan | undefined,
 ): plan is AnnualPaidSeatsPlan {

@@ -47,17 +47,13 @@ export type JSONLiteral = string | number | boolean | null;
 /** A dataframe with unknown data in row format. */
 export type UnknownDataFrame = Array<Record<string, unknown>>;
 
-/**
- * Matches any valid JSON value
- */
+/** Matches any valid JSON value */
 export type JSONValue =
   | JSONLiteral
   | { [key: string]: JSONValue }
   | JSONValue[];
 
-/**
- * Enum of supported MIME types.
- */
+/** Enum of supported MIME types. */
 export enum MIMEType {
   // Text
   TEXT_PLAIN = "text/plain",
@@ -144,9 +140,7 @@ export enum MIMEType {
   FONT_WOFF2 = "font/woff2",
 }
 
-/**
- * A type that can be used to create a branded type.
- */
+/** A type that can be used to create a branded type. */
 export type Brand<T, B extends string> = T & { __brand: B };
 
 // TODO(jpsyx): move this to avandar/react-state when we have a useExternalStore

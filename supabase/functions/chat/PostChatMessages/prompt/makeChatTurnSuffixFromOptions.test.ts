@@ -1,6 +1,4 @@
-/**
- * Volatile turn suffix vs frozen unified system prefix.
- */
+/** Volatile turn suffix vs frozen unified system prefix. */
 import { unifiedSystemPrefix } from "@sbfn/chat/PostChatMessages/prompt/buildSystemPrompts.ts";
 import { getLastUserPromptFromMessages } from "@sbfn/chat/PostChatMessages/prompt/getLastUserPromptFromMessages.ts";
 import { makeChatTurnSuffixFromOptions } from "@sbfn/chat/PostChatMessages/prompt/makeChatTurnSuffixFromOptions.ts";

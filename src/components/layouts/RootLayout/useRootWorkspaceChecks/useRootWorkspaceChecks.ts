@@ -3,9 +3,7 @@ import { useEnsureLocalStoragePersistence } from "@/components/layouts/RootLayou
 import { useEnsureWorkspaceBilling } from "@/components/layouts/RootLayout/useRootWorkspaceChecks/useEnsureWorkspaceBilling/useEnsureWorkspaceBilling";
 import { useSyncLocalDatasets } from "@/components/layouts/RootLayout/useRootWorkspaceChecks/useSyncLocalDatasets";
 
-/**
- * These are all checks that need to run at the root level of a workspace.
- */
+/** These are all checks that need to run at the root level of a workspace. */
 export function useRootWorkspaceChecks(): void {
   // request persistent local storage to the browser
   useEnsureLocalStoragePersistence();

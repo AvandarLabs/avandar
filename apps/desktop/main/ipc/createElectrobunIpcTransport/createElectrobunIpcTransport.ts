@@ -74,11 +74,9 @@ export function createElectrobunIpcTransport(view: BrowserView): IpcTransport {
       listeners.set(channel, list);
     },
     send(channel, message) {
-      /*
-       * Electrobun's `rpc.send` is a Proxy that resolves message names
-       * lazily on dynamic property access (returns a sender function
-       * for any name). The cast forces TS to acknowledge that.
-       */
+      // Electrobun's `rpc.send` is a Proxy that resolves message names
+      // lazily on dynamic property access (returns a sender function
+      // for any name). The cast forces TS to acknowledge that.
       console.log(`[ipc] bun-main sending "${channel}"`);
       const sender = rpc.send[channel] as
         | ((payload: unknown) => void)

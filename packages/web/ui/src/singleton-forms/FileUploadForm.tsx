@@ -8,9 +8,7 @@ import { TruncatedFileInputValue } from "./TruncatedFileInputValue";
 import type { FileInputProps } from "@mantine/core";
 
 type Props = {
-  /**
-   * Whether the file input should be clearable
-   */
+  /** Whether the file input should be clearable */
   clearable?: boolean;
 
   /**
@@ -19,19 +17,13 @@ type Props = {
    */
   accept: MIMEType | readonly MIMEType[];
 
-  /**
-   * Callback fired when a file is submitted
-   */
+  /** Callback fired when a file is submitted */
   onSubmit: (file: File | undefined) => void;
 
-  /**
-   * Whether the form is currently submitting
-   */
+  /** Whether the form is currently submitting */
   isSubmitting?: boolean;
 
-  /**
-   * Label for the submit button
-   */
+  /** Label for the submit button */
   submitButtonLabel?: string;
 
   /**

@@ -25,9 +25,7 @@ function _isRecoverableRejectErrorType(errorType: string): boolean {
   return RECOVERABLE_REJECT_ERROR_TYPES.has(errorType.trim().toUpperCase());
 }
 
-/**
- * Builds baseline resolved options from user hints before sniffing.
- */
+/** Builds baseline resolved options from user hints before sniffing. */
 export function createCsvParseOptionsFromUserHints(
   hints: CsvParseUserHints,
 ): CsvParseResolvedOptions {
@@ -48,9 +46,7 @@ export function createCsvParseOptionsFromUserHints(
   };
 }
 
-/**
- * Merges `sniff_csv` into resolved options (user hints win when set).
- */
+/** Merges `sniff_csv` into resolved options (user hints win when set). */
 export function mergeSniffCsvRowIntoParseOptions(options: {
   base: CsvParseResolvedOptions;
   sniffRow: DuckDbSniffCsvRow;
@@ -99,9 +95,7 @@ export function mergeSniffCsvRowIntoParseOptions(options: {
   };
 }
 
-/**
- * Applies best-guess fixes after a failed or partial parse.
- */
+/** Applies best-guess fixes after a failed or partial parse. */
 export function refineCsvParseOptionsAfterFailure(options: {
   parseOptions: CsvParseResolvedOptions;
   rejectedRows: readonly DuckDbRejectedRow[];

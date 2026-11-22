@@ -10,9 +10,7 @@ type CreateWorkspaceViaNavbarOptions = {
   displayName?: string;
 };
 
-/**
- * Opens the create-workspace dialog from the navbar and submits it.
- */
+/** Opens the create-workspace dialog from the navbar and submits it. */
 export async function createWorkspaceViaNavbar(
   options: CreateWorkspaceViaNavbarOptions,
 ): Promise<void> {
@@ -62,16 +60,12 @@ export async function createWorkspaceViaNavbar(
   });
 }
 
-/**
- * Returns the billing plan-selection modal opened for new workspaces.
- */
+/** Returns the billing plan-selection modal opened for new workspaces. */
 export function getBillingPlanModal(page: Page): ReturnType<Page["getByRole"]> {
   return page.getByRole("dialog", { name: "Select your plan" });
 }
 
-/**
- * Clicks Select Plan on the plan card with the given heading text.
- */
+/** Clicks Select Plan on the plan card with the given heading text. */
 export async function selectPlanFromBillingModal(options: {
   page: Page;
   planHeading: string;
@@ -118,9 +112,7 @@ export type CheckoutUrlParams = {
   workspaceId: string;
 };
 
-/**
- * Parses workspace and product ids from a checkout-url API response.
- */
+/** Parses workspace and product ids from a checkout-url API response. */
 export function parseCheckoutUrlParams(
   checkoutResponse: Response,
 ): CheckoutUrlParams {
@@ -139,9 +131,7 @@ export function parseCheckoutUrlParams(
   return { productId, userId, workspaceId };
 }
 
-/**
- * Asserts checkout-url succeeded and the browser redirected to Polar.
- */
+/** Asserts checkout-url succeeded and the browser redirected to Polar. */
 export async function finishPolarCheckoutWait(options: {
   checkoutResponsePromise: Promise<Response>;
   navigationPromise: Promise<void>;
@@ -166,9 +156,7 @@ export async function finishPolarCheckoutWait(options: {
 const STRIPE_TEST_CARD = "4242424242424242";
 const STRIPE_TEST_CVC = "123";
 
-/**
- * Finds the iframe that contains the Stripe card fields.
- */
+/** Finds the iframe that contains the Stripe card fields. */
 async function _findPaymentFrame(page: Page): Promise<Frame> {
   for (const frame of page.frames()) {
     const cardField = frame.getByRole("textbox", { name: /card number/i });
@@ -253,9 +241,7 @@ export async function finishPolarPaidCheckoutForE2E(options: {
   return parseCheckoutUrlParams(checkoutResponse);
 }
 
-/**
- * Clicks Select Plan on a settings billing page card.
- */
+/** Clicks Select Plan on a settings billing page card. */
 export async function selectPlanFromSettingsBilling(options: {
   page: Page;
   planHeading: string;

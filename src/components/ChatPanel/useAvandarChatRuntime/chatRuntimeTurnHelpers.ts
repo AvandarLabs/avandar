@@ -111,9 +111,7 @@ export function assumptionNeedsSignInOrApproval(
   return assumptionReview.needsApproval;
 }
 
-/**
- * Appends the SQL-not-applied suffix for the current auth state.
- */
+/** Appends the SQL-not-applied suffix for the current auth state. */
 export function buildSqlNotAppliedAssistantText(
   assistantText: string,
   user: User.T | undefined,

@@ -1,8 +1,6 @@
 import { Model } from "@avandar/models";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-/**
- * Buffer tool: spatial and selection gating, default confirm payload.
- */
+/** Buffer tool: spatial and selection gating, default confirm payload. */
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";

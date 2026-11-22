@@ -30,9 +30,7 @@ export type FnNameReturningPromise<T extends object> = Extract<
   string
 >;
 
-/**
- * Get the first parameter of a function's array of parameters.
- */
+/** Get the first parameter of a function's array of parameters. */
 export type ClientFnFirstParameter<
   Client extends ServiceClient,
   FnName extends keyof Client,

@@ -447,9 +447,7 @@ export type OpenDataAccess =
       expectedFormat: string;
     };
 
-/**
- * CRUD type definitions for the DataCatalogListing model.
- */
+/** CRUD type definitions for the DataCatalogListing model. */
 export type DataCatalogListingModel = SupabaseCrudModelSpec<
   {
     tableName: "data_catalog_listings";

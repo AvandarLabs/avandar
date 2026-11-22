@@ -4,10 +4,7 @@ import type { ObjectPaths } from "@utils/objects/ObjectPaths/ObjectPaths.types.t
 import type { UnknownObject } from "@utils/types/common.types.ts";
 import type { UnknownArray } from "type-fest";
 
-/**
- * Gets the type of a value from an object given a key path in
- * dot notation.
- */
+/** Gets the type of a value from an object given a key path in dot notation. */
 export type PathValue<
   T,
   P extends ObjectPaths<T>,

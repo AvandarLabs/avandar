@@ -27,14 +27,10 @@ type Props = {
   /** What we display for undefined values. */
   renderUndefinedString: NonNullable<ReactNode>;
 
-  /**
-   * The format to use for dates.
-   */
+  /** The format to use for dates. */
   dateFormat: string;
 
-  /**
-   * The timezone to use for dates.
-   */
+  /** The timezone to use for dates. */
   dateTimeZone: FormattableTimezone;
 };
 

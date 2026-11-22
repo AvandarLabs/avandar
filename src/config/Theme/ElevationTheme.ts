@@ -56,9 +56,7 @@ const ELEVATION_SURFACES_LIGHT = {
   panelHeader: NEUTRAL_SHADES[1],
 } as const;
 
-/**
- * Dark mode: each layer is slightly lighter than the one beneath.
- */
+/** Dark mode: each layer is slightly lighter than the one beneath. */
 const ELEVATION_SURFACES_DARK = {
   body: NEUTRAL_SHADES[9],
   raised: NEUTRAL_SHADES[8],

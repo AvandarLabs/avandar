@@ -17,9 +17,7 @@ import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerSt
 import css from "./ChatEmptyState.module.css";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 
-/**
- * Returns the localized label for the page chip shown in the empty state.
- */
+/** Returns the localized label for the page chip shown in the empty state. */
 function usePageLabel(app: ChatPageContext.ChatApp): string {
   const { t } = useLingui();
   return matchLiteral(app, {

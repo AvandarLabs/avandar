@@ -25,9 +25,7 @@ export type RunOfflineChatTurnArgs = {
   onPhase?: (label: string) => void;
 };
 
-/**
- * Runs the full offline chat turn: schema, engine, multi-pass pipeline.
- */
+/** Runs the full offline chat turn: schema, engine, multi-pass pipeline. */
 export async function runOfflineChatTurn(
   args: RunOfflineChatTurnArgs,
 ): Promise<OfflineChatTurnResult> {

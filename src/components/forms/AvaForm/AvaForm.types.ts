@@ -123,9 +123,7 @@ export type TextFieldSchema<
    */
   debounceMs?: number;
 
-  /**
-   * The function to call when the field value changes.
-   */
+  /** The function to call when the field value changes. */
   onChange?: (value: string) => void;
 };
 
@@ -145,9 +143,7 @@ export type SelectFieldSchema<
   /** The data for the select field. */
   data: Data;
 
-  /**
-   * The function to call when the field value changes.
-   */
+  /** The function to call when the field value changes. */
   onChange?: (
     value: ValueOfSelectData<Data> | null,
     option: SelectOption<ValueOfSelectData<Data>>,

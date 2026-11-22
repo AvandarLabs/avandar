@@ -83,9 +83,7 @@ export const AvaScatterPlotVizConfigs = {
     return hydrateScatterSeriesFromQueryResult(vizConfig, columns);
   },
 
-  /**
-   * Convert a scatter config to any other viz type.
-   */
+  /** Convert a scatter config to any other viz type. */
   convertVizConfig: <K extends VizType = VizType>(
     vizConfig: AvaScatterPlotVizConfig,
     newVizType: K,

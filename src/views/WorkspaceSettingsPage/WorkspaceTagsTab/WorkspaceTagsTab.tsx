@@ -20,9 +20,7 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import type { UserGroupRow } from "@/clients/permissions/PermissionsClient";
 
-/**
- * CRUD for workspace user-group tags (names + colors).
- */
+/** CRUD for workspace user-group tags (names + colors). */
 export function WorkspaceTagsTab(): JSX.Element {
   const { t } = useLingui();
   const workspace = useCurrentWorkspace();

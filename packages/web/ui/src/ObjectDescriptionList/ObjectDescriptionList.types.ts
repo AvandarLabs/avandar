@@ -31,9 +31,7 @@ type DescribableObjectOf<T> = {
   [key: string]: T;
 };
 
-/**
- * Options to render a display value and editable value as a specific type.
- */
+/** Options to render a display value and editable value as a specific type. */
 export type RenderAsTypeOptions =
   | "date"
   | "number"
@@ -147,9 +145,7 @@ export type ObjectKeyRenderOptionsMap<
         : PrimitiveValueRenderOptions<unknown, RootData>;
 };
 
-/**
- * Options for how to render an entity object.
- */
+/** Options for how to render an entity object. */
 export type ObjectRenderOptions<
   T extends NonNullable<DescribableObject>,
   RootData extends GenericRootData,
@@ -317,9 +313,7 @@ export type ObjectRowRenderOptions<
   RootData extends GenericRootData,
 > = Omit<ObjectRenderOptions<T, RootData>, "renderObjectKeyLabel">;
 
-/**
- * Extended options for arrays of objects.
- */
+/** Extended options for arrays of objects. */
 export type ObjectArrayRenderOptions<
   T extends NonNullable<DescribableObject>,
   RootData extends GenericRootData,
@@ -347,9 +341,7 @@ export type ObjectArrayRenderOptions<
        */
       renderTableHeader?: (key: keyof T, rootData: RootData) => ReactNode;
 
-      /**
-       * Render options for each object in the array.
-       */
+      /** Render options for each object in the array. */
       itemRenderOptions?: Omit<
         ObjectRenderOptions<T, RootData>,
         "renderObjectKeyLabel"
@@ -386,16 +378,12 @@ export type ObjectArrayRenderOptions<
        */
       titleKey?: StringKeyOf<T>;
 
-      /**
-       * Render options for each object in the array.
-       */
+      /** Render options for each object in the array. */
       itemRenderOptions?: ObjectRenderOptions<T, RootData>;
       renderTableHeader?: undefined;
     });
 
-/**
- * Extended options for nested arrays
- */
+/** Extended options for nested arrays */
 export type NestedArrayRenderOptions<
   T,
   RootData extends GenericRootData,
@@ -404,9 +392,7 @@ export type NestedArrayRenderOptions<
   itemRenderOptions?: DescribableValueArrayRenderOptions<T, RootData>;
 };
 
-/**
- * Common render options for all describable value arrays.
- */
+/** Common render options for all describable value arrays. */
 export type BaseDescribableValueArrayRenderOptions<
   T,
   RootData extends GenericRootData,
@@ -433,15 +419,11 @@ export type BaseDescribableValueArrayRenderOptions<
    */
   maxHeight?: number;
 
-  /**
-   * Maximum number of items to show.
-   */
+  /** Maximum number of items to show. */
   maxItemsCount?: number;
 };
 
-/**
- * Options for how to render an array of values.
- */
+/** Options for how to render an array of values. */
 export type DescribableValueArrayRenderOptions<
   T,
   RootData extends GenericRootData,

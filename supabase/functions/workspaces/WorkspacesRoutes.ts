@@ -23,9 +23,7 @@ import type { WorkspacesAPI } from "@sbfn/workspaces/WorkspacesRoutes.types.ts";
 const SLUG_MIN_LENGTH = 3;
 const SLUG_MAX_LENGTH = 20;
 
-/**
- * This is the route handler for all workspaces endpoints.
- */
+/** This is the route handler for all workspaces endpoints. */
 export const WorkspacesRoutes = defineRoutes<WorkspacesAPI>("workspaces", {
   /**
    * Validate a workspace slug.

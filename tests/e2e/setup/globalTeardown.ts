@@ -6,9 +6,7 @@ import {
 } from "./e2e-credentials";
 import { bestEffortPurgeE2EWorkspacesForOwners } from "./e2eTestWorkspaceLifecycle";
 
-/**
- * Loads `.env.development` from the repository root (same as global setup).
- */
+/** Loads `.env.development` from the repository root (same as global setup). */
 function _loadDevelopmentEnv(): void {
   config({ path: path.resolve(process.cwd(), ".env.development") });
 }

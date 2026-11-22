@@ -31,9 +31,7 @@ const _INTEGER_FAMILY = new Set<string>([
   "UHUGEINT",
 ]);
 
-/**
- * Maps a DuckDB `DESCRIBE` `column_type` string to a sniffable type.
- */
+/** Maps a DuckDB `DESCRIBE` `column_type` string to a sniffable type. */
 export function duckDbDescribeColumnTypeToSniffable(
   columnType: string,
 ): DuckDbSniffableDataType {

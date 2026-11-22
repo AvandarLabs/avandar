@@ -27,14 +27,10 @@ export enum FeatureFlag {
    */
   DisableManualData = "disable-manual-data",
 
-  /**
-   * Disable the Geo Explorer feature.
-   */
+  /** Disable the Geo Explorer feature. */
   DisableGeoExplorer = "disable-geo-explorer",
 
-  /**
-   * Disable the Profile Manager feature.
-   */
+  /** Disable the Profile Manager feature. */
   DisableProfileManager = "disable-profile-manager",
 
   /**

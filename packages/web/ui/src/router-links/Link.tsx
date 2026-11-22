@@ -15,9 +15,7 @@ const MantineLinkComponent = forwardRef<HTMLAnchorElement, NewMantineLinkProps>(
 
 const MantineRouterLink = createLink(MantineLinkComponent);
 
-/**
- * This is a Mantine Anchor Link that works with our router.
- */
+/** This is a Mantine Anchor Link that works with our router. */
 // oxlint-disable-next-line react-js/function-component-definition -- typed API
 export const Link: LinkComponent<typeof MantineRouterLink> = (props) => {
   return <MantineRouterLink {...props} />;

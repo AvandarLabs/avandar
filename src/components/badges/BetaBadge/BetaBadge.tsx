@@ -10,9 +10,7 @@ type Props = BadgeProps & {
   withTooltip?: boolean;
 };
 
-/**
- * Small “Beta” badge; optional tooltip explains the product beta state.
- */
+/** Small “Beta” badge; optional tooltip explains the product beta state. */
 export function BetaBadge({
   style,
   withTooltip = true,

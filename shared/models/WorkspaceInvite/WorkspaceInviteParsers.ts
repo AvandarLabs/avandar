@@ -72,9 +72,7 @@ export const WorkspaceInviteParsers =
     ),
   });
 
-/**
- * Do not remove these tests!
- */
+/** Do not remove these tests! */
 type CRUDTypes = WorkspaceInviteModel;
 // oxlint-disable-next-line typescript/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used

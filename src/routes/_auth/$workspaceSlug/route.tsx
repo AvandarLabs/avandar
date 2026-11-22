@@ -29,9 +29,7 @@ export const Route = createFileRoute("/_auth/$workspaceSlug")({
   },
 });
 
-/**
- * This is the layout for loading a workspace.
- */
+/** This is the layout for loading a workspace. */
 function WorkspaceRootLayout() {
   return <RootLayout mode="workspace" />;
 }

@@ -23,9 +23,7 @@ function _getHost(): string {
   return process.env.HOST ?? "0.0.0.0";
 }
 
-/**
- * This is the main entry point for the Fastify server.
- */
+/** This is the main entry point for the Fastify server. */
 async function main(): Promise<void> {
   const server = Fastify({
     logger: true,

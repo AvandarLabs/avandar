@@ -324,9 +324,7 @@ function _attachAreaGestures(
   });
 }
 
-/**
- * Registers text, arrow, freehand, and area annotation drawing on the map.
- */
+/** Registers text, arrow, freehand, and area annotation drawing on the map. */
 export function attachAnnotateGestures(
   map: MapLibreMap,
   kind: Extract<MapToolMode, { type: "annotate" }>["kind"],

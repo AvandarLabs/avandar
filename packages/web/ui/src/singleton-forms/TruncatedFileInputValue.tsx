@@ -4,9 +4,7 @@ type Props = {
   value: null | File | File[];
 };
 
-/**
- * Renders FileInput value with ellipsis and full-name tooltip when clipped.
- */
+/** Renders FileInput value with ellipsis and full-name tooltip when clipped. */
 export function TruncatedFileInputValue({ value }: Props): JSX.Element | null {
   const label = Array.isArray(value)
     ? value

@@ -95,9 +95,7 @@ function _promoteGroupLabels(partition: TextPartition): TextPartition {
   return { ...partition, xGroupLabels, other };
 }
 
-/**
- * Assigns each visible text item a role relative to `frame`.
- */
+/** Assigns each visible text item a role relative to `frame`. */
 export function partitionTextByFrame(
   region: RegionGeometry,
   frame: PlotFrame,

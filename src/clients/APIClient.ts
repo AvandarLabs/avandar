@@ -60,9 +60,7 @@ async function sendHTTPRequest<
   });
 }
 
-/**
- * HTTP client for making requests to our Supabase edge functions API.
- */
+/** HTTP client for making requests to our Supabase edge functions API. */
 export const APIClient = {
   get: async <Route extends keyof API>(
     options: Omit<HTTPRequestOptions<Route, "GET">, "method">,

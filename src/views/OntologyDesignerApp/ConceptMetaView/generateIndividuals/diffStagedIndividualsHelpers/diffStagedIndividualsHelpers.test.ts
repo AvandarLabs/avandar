@@ -1,6 +1,4 @@
-/**
- * Tests for the pure diff helpers behind incremental individual sync.
- */
+/** Tests for the pure diff helpers behind incremental individual sync. */
 import { describe, expect, it } from "vitest";
 import { uuid } from "$/lib/uuid";
 import {

@@ -8,9 +8,7 @@ type SubscriptionRow = {
   polar_product_id: string | null;
 };
 
-/**
- * Loads the subscription row for a workspace slug (admin client).
- */
+/** Loads the subscription row for a workspace slug (admin client). */
 export async function getSubscriptionRowForWorkspaceSlug(options: {
   supabaseAdminClient: AvaSupabaseDBClient;
   workspaceSlug: string;
@@ -48,9 +46,7 @@ export async function getSubscriptionRowForWorkspaceSlug(options: {
   return subscriptionRow;
 }
 
-/**
- * Asserts a workspace has exactly one native free subscription row.
- */
+/** Asserts a workspace has exactly one native free subscription row. */
 export async function expectNativeFreeSubscription(options: {
   supabaseAdminClient: AvaSupabaseDBClient;
   workspaceSlug: string;

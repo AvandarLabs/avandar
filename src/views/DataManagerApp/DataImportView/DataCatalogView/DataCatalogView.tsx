@@ -388,12 +388,10 @@ export function DataCatalogView({
               })}
             </Stack>
           ) : hasNoMatches ? (
-            /*
-             * One message spanning results and detail rather than a "no
-             * matches" note beside a "pick one" note: the second cannot be
-             * acted on, and two apologies for one situation read as two
-             * situations.
-             */
+            // One message spanning results and detail rather than a "no
+            // matches" note beside a "pick one" note: the second cannot be
+            // acted on, and two apologies for one situation read as two
+            // situations.
             <div className={css.dataCatalogViewNoMatches}>
               <Text size="sm" c="dimmed" ta="center" maw="42ch">
                 <Trans>

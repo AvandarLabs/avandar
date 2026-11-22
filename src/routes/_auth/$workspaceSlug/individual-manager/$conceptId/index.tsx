@@ -23,9 +23,7 @@ export const Route = createFileRoute(
   component: IndividualManagerWithNoIndividualSelected,
 });
 
-/**
- * Default view when a case type is open but no record is selected.
- */
+/** Default view when a case type is open but no record is selected. */
 function IndividualManagerWithNoIndividualSelected(): ReactNode {
   const navigate = useNavigate();
   const workspace = useCurrentWorkspace();

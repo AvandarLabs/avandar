@@ -49,9 +49,7 @@ export type XlsxFileDatasetRead = Model.Base<
   }
 >;
 
-/**
- * CRUD type definitions for the XlsxFileDataset model.
- */
+/** CRUD type definitions for the XlsxFileDataset model. */
 export type XlsxFileDatasetModel = SupabaseCrudModelSpec<
   {
     tableName: "datasets__xlsx_file";

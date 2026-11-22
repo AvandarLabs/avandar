@@ -66,9 +66,7 @@ export async function restrictDatasetWithNoWorkspaceAccess(
   await closeShareModal(page);
 }
 
-/**
- * Asserts the dataset link is absent from the data-manager sidebar.
- */
+/** Asserts the dataset link is absent from the data-manager sidebar. */
 export async function expectDatasetHiddenInDataManager(
   page: Page,
   options: { workspaceSlug: string; datasetName: string },
@@ -79,9 +77,7 @@ export async function expectDatasetHiddenInDataManager(
   ).toHaveCount(0, { timeout: LONG_WAIT });
 }
 
-/**
- * Asserts the dataset link is visible in the data-manager sidebar.
- */
+/** Asserts the dataset link is visible in the data-manager sidebar. */
 export async function expectDatasetVisibleInDataManager(
   page: Page,
   options: { workspaceSlug: string; datasetName: string },
@@ -94,9 +90,7 @@ export async function expectDatasetVisibleInDataManager(
   });
 }
 
-/**
- * Direct navigation: restricted users should not load dataset metadata.
- */
+/** Direct navigation: restricted users should not load dataset metadata. */
 export async function expectDatasetMetaPageDenied(
   page: Page,
   options: { workspaceSlug: string; datasetId: string },
@@ -115,9 +109,7 @@ export async function expectDatasetMetaPageDenied(
   ).toBeVisible({ timeout: LONG_WAIT });
 }
 
-/**
- * Direct navigation: user can open dataset metadata.
- */
+/** Direct navigation: user can open dataset metadata. */
 export async function expectDatasetMetaPageAccessible(
   page: Page,
   options: {

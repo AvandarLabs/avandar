@@ -37,9 +37,7 @@ export type UseQueryOptions<
   }
 >;
 
-/**
- * A tuple containing [data, `isLoading` state, the query result object].
- */
+/** A tuple containing [data, `isLoading` state, the query result object]. */
 export type UseQueryResultTuple<TData> = [
   data: undefined | TData,
   isLoading: boolean,

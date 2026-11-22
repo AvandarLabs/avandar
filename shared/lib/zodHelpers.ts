@@ -43,9 +43,7 @@ export function brandedStringType<
   >;
 }
 
-/**
- * Zod type for MIMEType.
- */
+/** Zod type for MIMEType. */
 export const mimeType: z.ZodType<MIMEType, MIMEType> = z.enum(MIMEType);
 
 /**

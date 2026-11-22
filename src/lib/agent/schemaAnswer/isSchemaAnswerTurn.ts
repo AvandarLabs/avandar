@@ -15,9 +15,7 @@ const SCHEMA_QUESTION_PATTERNS = [
   /\blist (?:the |their |all )?columns\b/i,
 ];
 
-/**
- * A follow-up that reruns the previous turn, rather than a new question.
- */
+/** A follow-up that reruns the previous turn, rather than a new question. */
 const RETRY_PATTERN = /^(?:try again\b|that query failed\b)/i;
 
 /** Whether this text asks about columns or whether datasets can be stacked. */

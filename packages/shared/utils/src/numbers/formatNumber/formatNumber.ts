@@ -81,9 +81,7 @@ type ValidNumberUnit =
   | "kilometer-per-hour"
   | "meter-per-second";
 
-/**
- * Options for how currency is displayed.
- */
+/** Options for how currency is displayed. */
 type FormatCurrencyOptions = {
   /**
    * ISO 4217 currency code used when `style` is "currency".
@@ -120,9 +118,7 @@ type FormatCurrencyOptions = {
   currencySign?: "standard" | "accounting";
 };
 
-/**
- * Options for how the units of a number are displayed.
- */
+/** Options for how the units of a number are displayed. */
 type NumberUnitOptions = {
   /**
    * The unit to display with the number. Only valid ECMA-402 units are

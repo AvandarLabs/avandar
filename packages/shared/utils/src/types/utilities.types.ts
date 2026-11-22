@@ -47,14 +47,10 @@ export type Entries<T> = Array<
   }[keyof T]
 >;
 
-/**
- * A type to remove the brand from a branded type.
- */
+/** A type to remove the brand from a branded type. */
 export type Unbrand<T> = T extends Brand<infer U, string> ? U : T;
 
-/**
- * Recursively removes all `TypeToExclude` types from a type.
- */
+/** Recursively removes all `TypeToExclude` types from a type. */
 export type ExcludeDeep<T, TypeToExclude> =
   T extends Array<infer U>
     ? Array<ExcludeDeep<U, TypeToExclude>>
@@ -107,21 +103,15 @@ export type SwapDeep<T, TypeToSwap, SwapWith> =
 export type UndefinedToNullDeep<T> = SwapDeep<T, undefined, null>;
 export type NullToUndefinedDeep<T> = SwapDeep<T, null, undefined>;
 
-/**
- * Represents any function with inferrable parameters and return types.
- */
+/** Represents any function with inferrable parameters and return types. */
 // oxlint-disable-next-line typescript/no-explicit-any
 export type AnyFunction = (...args: any[]) => any;
 
-/**
- * Represents any function with a given return type.
- */
+/** Represents any function with a given return type. */
 // oxlint-disable-next-line typescript/no-explicit-any
 export type AnyFunctionWithReturn<R> = (...args: any[]) => R;
 
-/**
- * Represents any function with a given argument type.
- */
+/** Represents any function with a given argument type. */
 export type AnyFunctionWithArguments<Params extends unknown[]> = (
   ...args: Params
   // oxlint-disable-next-line typescript/no-explicit-any
@@ -131,9 +121,7 @@ export type AnyFunctionWithSignature<Params extends unknown[], Return> = (
   ...args: Params
 ) => Return;
 
-/**
- * Gets the first parameter of a function.
- */
+/** Gets the first parameter of a function. */
 export type FirstParameter<Func extends AnyFunction> =
   Func extends AnyFunctionWithArguments<infer Args> ? Args[0] : never;
 
@@ -156,9 +144,7 @@ export type TailParameters<Func extends AnyFunction> =
  */
 export type IdentityFnType<T> = (value: T) => T;
 
-/**
- * Get the element type of an array or tuple.
- */
+/** Get the element type of an array or tuple. */
 export type ElementOf<T> = T extends ReadonlyArray<infer U> ? U : never;
 
 /**
@@ -206,16 +192,12 @@ export type Registry<StringLiteralUnion extends string> = {
   [K in StringLiteralUnion]: unknown;
 };
 
-/**
- * Converts a record into a record of arrays of the same type.
- */
+/** Converts a record into a record of arrays of the same type. */
 export type RegistryOfArrays<T extends UnknownObject> = {
   [K in keyof T]: Array<T[K]>;
 };
 
-/**
- * Convert a union of objects into a registry, keyed by a given prop.
- */
+/** Convert a union of objects into a registry, keyed by a given prop. */
 export type ObjectRegistry<
   U extends object,
   KeyProp extends ConditionalKeys<U, string>,

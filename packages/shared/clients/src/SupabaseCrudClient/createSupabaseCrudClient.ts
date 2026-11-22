@@ -37,9 +37,7 @@ type AnySupabaseFilterableQuery = PostgrestFilterBuilder<
 >;
 /* oxlint-enable typescript/no-explicit-any */
 
-/**
- * Creates a client for a model that maps to a Supabase table.
- */
+/** Creates a client for a model that maps to a Supabase table. */
 export function createSupabaseCrudClient<
   M extends AnySupabaseCrudModelSpec,
   ExtendedQueriesClient extends ClientReturningOnlyPromises = EmptyObject,

@@ -304,9 +304,7 @@ function _writeDashboardPublishConfig(
   };
 }
 
-/**
- * Builds publication SQL and persists slice configuration for dashboards.
- */
+/** Builds publication SQL and persists slice configuration for dashboards. */
 export const DashboardSliceBuilder = {
   /** Returns referenced columns for visualizations and filters. */
   extractReferencedColumns: _extractReferencedColumns,

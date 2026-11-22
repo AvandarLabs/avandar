@@ -29,9 +29,7 @@ type DefaultDBPrimaryKey<
   dbTablePrimaryKey: keyof RegisteredSupabaseTableRow<TableName>;
 };
 
-/**
- * A wrapper type to create the Supabase CRUD types for a model.
- */
+/** A wrapper type to create the Supabase CRUD types for a model. */
 export type SupabaseCrudModelSpec<
   ModelTypes extends DefaultModelTypes,
   DBPrimaryKey extends DefaultDBPrimaryKey<ModelTypes["tableName"]>,

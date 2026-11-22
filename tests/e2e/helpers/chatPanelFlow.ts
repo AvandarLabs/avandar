@@ -18,25 +18,19 @@ export async function openChatPanelIfClosed(page: Page): Promise<void> {
   await expect(composer).toBeVisible({ timeout: MEDIUM_WAIT });
 }
 
-/**
- * Locates the chat composer input on Data Explorer or dashboard pages.
- */
+/** Locates the chat composer input on Data Explorer or dashboard pages. */
 export function getChatComposerInput(page: Page): Locator {
   return page.getByPlaceholder(
     /ask about your data|ask me to add a chart to this dashboard/i,
   );
 }
 
-/**
- * Locates the New chat control in the chat panel header.
- */
+/** Locates the New chat control in the chat panel header. */
 export function getNewChatButton(page: Page): Locator {
   return getChatPanel(page).getByRole("button", { name: /new chat/i });
 }
 
-/**
- * Locates the AppShell chat Aside (Ask Avandar panel).
- */
+/** Locates the AppShell chat Aside (Ask Avandar panel). */
 export function getChatPanel(page: Page): Locator {
   return page.getByRole("complementary").filter({ hasText: "Ask Avandar" });
 }

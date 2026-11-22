@@ -8,9 +8,7 @@ type Props = {
   onCreate: () => void;
 };
 
-/**
- * Dashed create card: describe the work in chat, Avandar proposes the type.
- */
+/** Dashed create card: describe the work in chat, Avandar proposes the type. */
 export function NewCaseTypeCard({ onCreate }: Readonly<Props>): ReactNode {
   return (
     <button type="button" className={css.createCard} onClick={onCreate}>

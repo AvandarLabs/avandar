@@ -24,9 +24,7 @@ type Props = {
   dataSource: CsvFileDataset.T | PdfFileDataset.T | XlsxFileDataset.T;
 };
 
-/**
- * A button to toggle the offline-only status of a dataset.
- */
+/** A button to toggle the offline-only status of a dataset. */
 export function ToggleOfflineOnlyButton({
   isInCloudStorage,
   dataSource,

@@ -1,6 +1,4 @@
-/**
- * Token and heuristic scoring helpers for offline dataset name resolution.
- */
+/** Token and heuristic scoring helpers for offline dataset name resolution. */
 
 function _tokenize(text: string): string[] {
   return text
@@ -49,9 +47,7 @@ function _score(args: {
 
 /** Tokenization and scoring for loose offline dataset-name matching. */
 export const OfflineDatasetLabelMatch = {
-  /**
-   * Tokenizes user text for loose label matching (filenames, topic words).
-   */
+  /** Tokenizes user text for loose label matching (filenames, topic words). */
   tokenize: _tokenize,
   /**
    * Scores how well a dataset label matches the user prompt or table reference.

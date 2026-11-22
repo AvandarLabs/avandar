@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
-/**
- * Pinned annotation row: first feature creates it, last delete removes it.
- */
+/** Pinned annotation row: first feature creates it, last delete removes it. */
 import { uuid } from "$/lib/uuid";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";

@@ -62,9 +62,7 @@ export type CsvFileDatasetRead = Model.Base<
   }
 >;
 
-/**
- * CRUD type definitions for the LocalCsvDataset model.
- */
+/** CRUD type definitions for the LocalCsvDataset model. */
 export type CsvFileDatasetModel = SupabaseCrudModelSpec<
   {
     tableName: "datasets__csv_file";

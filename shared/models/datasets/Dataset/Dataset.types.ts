@@ -49,9 +49,7 @@ type DatasetRead = Model.Base<
   }
 >;
 
-/**
- * CRUD type definitions for the Dataset model.
- */
+/** CRUD type definitions for the Dataset model. */
 export type DatasetModel = SupabaseCrudModelSpec<
   {
     tableName: "datasets";

@@ -547,9 +547,7 @@ export enum GPickerFeature {
    */
   MINE_ONLY = "mineOnly",
 
-  /**
-   * Allow user to choose more than one item.
-   */
+  /** Allow user to choose more than one item. */
   MULTISELECT_ENABLED = "multiselectEnabled",
 
   /**
@@ -771,9 +769,7 @@ export interface GPickerDocumentObject {
  * https://developers.google.com/workspace/drive/picker/reference/picker.responseobject
  */
 export interface GPickerResponseObject {
-  /**
-   * A type representing the action taken by the user to dismiss the dialog.
-   */
+  /** A type representing the action taken by the user to dismiss the dialog. */
   action: GPickerAction | string;
 
   /** An array of DocumentObjects selected by the user. */
@@ -804,9 +800,7 @@ export interface GPickerThumbnailObject {
   width: number;
 }
 
-/**
- * The supported ISO 639 language codes for PickerBuilder.setLocale.
- */
+/** The supported ISO 639 language codes for PickerBuilder.setLocale. */
 export type GPickerLocales =
   | "af"
   | "am"

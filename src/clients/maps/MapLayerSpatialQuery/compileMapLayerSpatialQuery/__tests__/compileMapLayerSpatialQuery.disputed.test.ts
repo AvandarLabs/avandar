@@ -1,7 +1,5 @@
 import { describe, expect, it } from "vitest";
-/**
- * Disputed-status property emission for compileMapLayerSpatialQuery.
- */
+/** Disputed-status property emission for compileMapLayerSpatialQuery. */
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { MapLayerSpatialFeatureProperties } from "../../MapLayerSpatialQuery.constants";

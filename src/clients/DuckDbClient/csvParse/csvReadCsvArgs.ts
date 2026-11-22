@@ -8,9 +8,7 @@ function _escapeSqlSingleQuotedLiteral(value: string): string {
   return value.replaceAll("'", "''");
 }
 
-/**
- * Builds comma-separated `read_csv` argument list for DuckDB SQL.
- */
+/** Builds comma-separated `read_csv` argument list for DuckDB SQL. */
 export function buildReadCsvArgList(options: {
   parseOptions: CsvParseResolvedOptions;
   mode: CsvReadCsvMode;
@@ -85,9 +83,7 @@ export function buildReadCsvArgList(options: {
   });
 }
 
-/**
- * `sniff_csv` constraint args from resolved options (re-sniff on retry).
- */
+/** `sniff_csv` constraint args from resolved options (re-sniff on retry). */
 export function buildSniffCsvConstraintArgs(
   parseOptions: CsvParseResolvedOptions,
 ): string[] {

@@ -8,9 +8,7 @@ export type BillingAction =
   | { type: "change_plan" }
   | { type: "billing_error" };
 
-/**
- * Resolves which billing action the plan card should take for a selection.
- */
+/** Resolves which billing action the plan card should take for a selection. */
 export function getBillingActionFromSelectedPlan(options: {
   currentSubscription: SubscriptionRead | undefined;
   currentSubscribedPlan: SubscriptionPlan | undefined;

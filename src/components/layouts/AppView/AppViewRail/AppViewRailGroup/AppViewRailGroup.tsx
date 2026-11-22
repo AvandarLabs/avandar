@@ -12,9 +12,7 @@ type Props = {
   children: ReactNode;
 };
 
-/**
- * One run of related facts under a small label.
- */
+/** One run of related facts under a small label. */
 export function AppViewRailGroup({
   title,
   action,

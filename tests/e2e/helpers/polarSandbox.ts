@@ -4,9 +4,7 @@ import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
 
 type PolarServerType = "sandbox" | "production";
 
-/**
- * Creates a Polar SDK client for e2e cleanup using `.env.development` vars.
- */
+/** Creates a Polar SDK client for e2e cleanup using `.env.development` vars. */
 function _createE2EPolarClient(): Polar | undefined {
   const accessToken = process.env.POLAR_ACCESS_TOKEN;
   const serverType = process.env.POLAR_SERVER_TYPE as
@@ -32,9 +30,7 @@ function _createE2EPolarClient(): Polar | undefined {
   });
 }
 
-/**
- * Revokes a Polar subscription immediately (best-effort).
- */
+/** Revokes a Polar subscription immediately (best-effort). */
 export async function bestEffortRevokePolarSubscription(options: {
   polarSubscriptionId: string;
 }): Promise<void> {
@@ -57,9 +53,7 @@ export async function bestEffortRevokePolarSubscription(options: {
   }
 }
 
-/**
- * Loads the workspace subscription row and revokes Polar if present.
- */
+/** Loads the workspace subscription row and revokes Polar if present. */
 export async function bestEffortRevokePolarSubscriptionForWorkspace(options: {
   supabaseAdminClient: AvaSupabaseDBClient;
   workspaceSlug: string;

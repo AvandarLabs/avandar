@@ -32,9 +32,7 @@ function CopyShareUrlButton({ url }: Readonly<{ url: string }>): ReactNode {
   );
 }
 
-/**
- * Copy and QR actions for a published share URL.
- */
+/** Copy and QR actions for a published share URL. */
 export function ShareUrlActions({ url }: Readonly<Props>): ReactNode {
   const { t } = useLingui();
   const [isQrOpened, setIsQrOpened] = useState(false);

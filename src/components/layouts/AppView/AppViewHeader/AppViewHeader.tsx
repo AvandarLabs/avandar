@@ -66,12 +66,10 @@ export function AppViewHeader({
         {typeof title === "string" ? (
           <h3 className={css.appViewHeaderTitle}>{title}</h3>
         ) : (
-          /*
-           * An inline-editable title renders a paragraph in display mode and
-           * an input in edit mode, neither of which may sit inside a heading
-           * element. The ARIA role gives assistive tech the same structure
-           * without the invalid nesting.
-           */
+          // An inline-editable title renders a paragraph in display mode and
+          // an input in edit mode, neither of which may sit inside a heading
+          // element. The ARIA role gives assistive tech the same structure
+          // without the invalid nesting.
           <div role="heading" aria-level={3} className={css.appViewHeaderTitle}>
             {title}
           </div>

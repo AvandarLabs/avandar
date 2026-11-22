@@ -14,9 +14,7 @@ type Props = {
   roleGroups: readonly RoleGroupWithMatrix[];
 };
 
-/**
- * Drawer for editing a member’s role preset / per-app matrix and tags.
- */
+/** Drawer for editing a member’s role preset / per-app matrix and tags. */
 export function WorkspaceUserPermissionsDrawer({
   isOpen,
   onClose,

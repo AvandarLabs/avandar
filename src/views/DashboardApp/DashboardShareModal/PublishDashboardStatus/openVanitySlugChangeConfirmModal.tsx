@@ -2,9 +2,7 @@ import { t } from "@lingui/core/macro";
 import { Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 
-/**
- * Warns that replacing a live vanity path retires the previous URL.
- */
+/** Warns that replacing a live vanity path retires the previous URL. */
 export function openVanitySlugChangeConfirmModal(
   options: Readonly<{ onConfirm: () => void }>,
 ): void {

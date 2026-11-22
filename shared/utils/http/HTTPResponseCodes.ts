@@ -2,24 +2,16 @@ export const HTTPResponseCodes = {
   /** Standard response for successful HTTP requests. */
   OK: 200,
 
-  /**
-   * The request could not be understood or was missing required parameters.
-   */
+  /** The request could not be understood or was missing required parameters. */
   BAD_REQUEST: 400,
 
-  /**
-   * Authentication is required and has failed or has not yet been provided.
-   */
+  /** Authentication is required and has failed or has not yet been provided. */
   UNAUTHORIZED: 401,
 
-  /**
-   * The request was valid, but the server is refusing action.
-   */
+  /** The request was valid, but the server is refusing action. */
   FORBIDDEN: 403,
 
-  /**
-   * The requested resource could not be found.
-   */
+  /** The requested resource could not be found. */
   NOT_FOUND: 404,
 
   /**
