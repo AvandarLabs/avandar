@@ -1,7 +1,7 @@
 /** Returns exact prose lines, rejecting directives and structured markup. */
 export function getProseLines(comment) {
   const value = comment.value.replace(/^\*/, "");
-  if (/[\u2028\u2029]|\r(?!\n)/.test(value) ||
+  if (value.startsWith("!") || /[\u2028\u2029]|\r(?!\n)/.test(value) ||
     /^\s*(?:globals?|exported|jshint|jslint)\b|sourceURL/.test(value)) {
     return undefined;
   }
@@ -74,7 +74,8 @@ export function isDeclarationComment(sourceCode, comment) {
   let node = token && sourceCode.getNodeByRangeIndex(token.range[0]);
   while (node && node.range[0] === token.range[0]) {
     if (/Declaration$|^(Property|MethodDefinition|PropertyDefinition|AccessorProperty|TSPropertySignature|TSMethodSignature|TSEnumMember|TSAbstractMethodDefinition|TSAbstractPropertyDefinition)$/.test(node.type)) {
-      return /^\s*$/.test(sourceCode.text.slice(comment.range[1], node.range[0]));
+      // Other comments do not remove a declaration's documentation ownership.
+      return true;
     }
     node = node.parent;
   }

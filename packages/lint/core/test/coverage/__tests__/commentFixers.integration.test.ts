@@ -161,6 +161,26 @@ it("safely composes root comment fixes through two ordinary fix passes", () => {
 });
 
 it.each([
+  "function load(): void {\n  /** Nested value docs. */\n  // Implementation note.\n  const value = 1;\n}\n",
+  "function load(): void {\n  /*! Copyright Example */\n  console.log(1);\n}\n",
+  "/** " + "a".repeat(73) + " */\nconst LIMIT = 1;\nexport const Reader = {\n  LIMIT,\n};\n",
+  "/**\n * " + "a".repeat(77) + "\n */\nconst LIMIT = 1;\nexport const Reader = {\n  LIMIT,\n};\n",
+  "/**\n * " + "a".repeat(77) + "\n */\nconst LIMIT = 1;\nexport const Reader = {\n\tLIMIT,\n};\n",
+])("review boundaries remain unchanged through root fixes %s", (source) => {
+  expect(_fix(source)).toBe(source);
+});
+
+it("review width boundary permits an exact 80-column single-line move", () => {
+  const source = "/** " + "a".repeat(71) + " */\nconst LIMIT = 1;\nexport const Reader = {\n  LIMIT,\n};\n";
+  expect(_fix(source)).toBe("const LIMIT = 1;\nexport const Reader = {\n  /** " + "a".repeat(71) + " */\n  LIMIT,\n};\n");
+});
+
+it.each(["  ", "\t"])("review width boundary permits an exact multiline move with %j", (indent) => {
+  const source = "/**\n * " + "a".repeat(75) + "\n */\nconst LIMIT = 1;\nexport const Reader = {\n" + indent + "LIMIT,\n};\n";
+  expect(_fix(source)).toBe("const LIMIT = 1;\nexport const Reader = {\n" + indent + "/**\n" + indent + " * " + "a".repeat(75) + "\n" + indent + " */\n" + indent + "LIMIT,\n};\n");
+});
+
+it.each([
   "function load(): void {\n  interface Shape {\n    /** Visible member. */\n    name: string;\n  }\n  enum Kind {\n    /** Visible enum member. */\n    Value,\n  }\n}\n",
   "/** Read a value. */\nfunction _read(): void {\n  // Existing interior explanation.\n  console.log(1);\n}\nexport const Reader = {\n  read: _read,\n};\n",
   "interface Store {\n  /** Read a value. */\n  read: () => void;\n}\n/** Read a value. */\nfunction _read(): void {}\nexport const Reader: Store = {\n  read: _read,\n};\n",

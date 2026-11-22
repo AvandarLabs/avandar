@@ -47,6 +47,18 @@ function _hasUniqueStaticKeys(object) {
   return !names.includes(undefined) && new Set(names).size === names.length;
 }
 
+function _buildDocumentationFromComment(sourceCode, comment, layout) {
+  const documentation = getCollapsedJsdoc(comment, layout.indent) ??
+    sourceCode.getText(comment);
+  const lines = documentation.split(/\r?\n/);
+  if (lines.some((line) => {
+    return (layout.indent + line).replace(/\t/g, "  ").length > 80;
+  })) {
+    return undefined;
+  }
+  return lines.join(layout.newline + layout.indent);
+}
+
 function _getMove(sourceCode, declaration, property) {
   const comment = _getDocumentation(sourceCode, declaration);
   const layout = getStandaloneLayout(sourceCode, property, true);
@@ -66,10 +78,11 @@ function _getMove(sourceCode, declaration, property) {
   })) {
     return undefined;
   }
-  const documentation = getCollapsedJsdoc(comment, layout.indent) ??
-    sourceCode.getText(comment).split(/\r?\n/).join(
-    layout.newline + layout.indent,
-  );
+  const documentation =
+    _buildDocumentationFromComment(sourceCode, comment, layout);
+  if (!documentation) {
+    return undefined;
+  }
   const end = sourceCode.text.indexOf("\n", comment.range[1]);
   return {
     comment, documentation, layout,

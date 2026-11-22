@@ -19,6 +19,8 @@ tester.run("function-body-line-comments", eslintPlugin.rules![
     "/** Public reader. */\nfunction load() {}",
     "function load() {\n  /** Nested reader. */\n  function read() {}\n}",
     "function load() {\n  /** Nested value. */\n  const value = 1;\n}",
+    "function load() {\n  /** Nested value docs. */\n  // Implementation note.\n  const value = 1;\n}",
+    "function load() {\n  /*! Copyright Example */\n  consume();\n}",
     "function load() { return /* inline */ 1; }",
     "function load() {\n  /* istanbul ignore next */\n  consume();\n}",
     "function load() {\n  /** @type {number} */\n  consume();\n}",
@@ -87,6 +89,9 @@ tester.run("export-key-jsdoc", eslintPlugin.rules![
   "export-key-jsdoc"
 ]!, {
   valid: [
+    "/** " + "a".repeat(73) + " */\nconst LIMIT = 1;\nexport const Reader = {\n  LIMIT,\n};",
+    "/**\n * " + "a".repeat(77) + "\n */\nconst LIMIT = 1;\nexport const Reader = {\n  LIMIT,\n};",
+    "/**\n * " + "a".repeat(77) + "\n */\nconst LIMIT = 1;\nexport const Reader = {\n\tLIMIT,\n};",
     "/** Detached module header. */\n\nconst LIMIT = 1;\nexport const Reader = {\n  LIMIT,\n};",
     "const LIMIT = 1;\nexport const Reader = {\n  /** Smallest value. */\n  LIMIT,\n};",
     "/** Smallest value. */\nexport const LIMIT = 1;\nexport const Reader = { LIMIT };",
@@ -106,6 +111,21 @@ tester.run("export-key-jsdoc", eslintPlugin.rules![
     "/** Smallest value. */\nconst LIMIT = 1;\nexport const Reader = {\n  value: LIMIT,\n  value: 2,\n};",
   ],
   invalid: [
+    {
+      code: "/** " + "a".repeat(71) + " */\nconst LIMIT = 1;\nexport const Reader = {\n  LIMIT,\n};",
+      output: "const LIMIT = 1;\nexport const Reader = {\n  /** " + "a".repeat(71) + " */\n  LIMIT,\n};",
+      errors: [{ messageId: "member" }],
+    },
+    {
+      code: "/**\n * " + "a".repeat(75) + "\n */\nconst LIMIT = 1;\nexport const Reader = {\n  LIMIT,\n};",
+      output: "const LIMIT = 1;\nexport const Reader = {\n  /**\n   * " + "a".repeat(75) + "\n   */\n  LIMIT,\n};",
+      errors: [{ messageId: "member" }],
+    },
+    {
+      code: "/**\n * " + "a".repeat(75) + "\n */\nconst LIMIT = 1;\nexport const Reader = {\n\tLIMIT,\n};",
+      output: "const LIMIT = 1;\nexport const Reader = {\n\t/**\n\t * " + "a".repeat(75) + "\n\t */\n\tLIMIT,\n};",
+      errors: [{ messageId: "member" }],
+    },
     {
       code: "/** Smallest value. */\nconst LIMIT = 1;\nexport const Reader = {\n  LIMIT,\n};",
       output: "const LIMIT = 1;\nexport const Reader = {\n  /** Smallest value. */\n  LIMIT,\n};",
