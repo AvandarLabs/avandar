@@ -8,132 +8,207 @@ Inventory:
 
 ## Intent
 
-Phase 3 establishes the Avandar lint package and moves every current-file
-convention with a behavior-preserving, unambiguous repair into the normal lint
-fix path. A green phase 3 run means `avandar-code-review` no longer spends
-tokens finding the shipped AF violations.
+Phase 3 establishes the polyglot lint umbrella, its canonical rule catalog,
+the core host, TypeScript, and CSS packages, and every TypeScript, JavaScript,
+or CSS current-file convention with a behavior-preserving repair. A green Phase 3 run
+lets `avandar-code-review` skip shipped AF detection only for file and
+capability outcomes whose coverage command proves that the repository enables
+them.
 
 ## Goals
 
-- Publish one Node-only package at `packages/node/lint` as `@avandar/lint`.
-- Export Oxlint and Stylelint plugin entries from the package.
+- Create `packages/lint` as the owner of the complete cross-language catalog.
+- Publish `packages/lint/core` as `@avandar/lint`.
+- Publish the Oxlint entry from `@avandar/lint-typescript` and the Stylelint
+  entry from `@avandar/lint-css`.
+- Add an `avandar-lint coverage` command that reports `enforced`,
+  `not-applicable`, or `fallback` for reviewed paths.
 - Enable native Oxlint safe rules before writing local equivalents.
 - Implement only fixers that can prove their safety boundary.
-- Apply safe fixes through the existing `pnpm lint:ts:fix-changed` and style
-  lint workflows.
-- Delete shipped AF detection from every full and focused review lane.
-- Record cold and warm lint timing plus the package size baseline.
+- Move shipped AF detection from the always-loaded skill into an on-demand
+  deterministic fallback checklist.
+- Record cold and warm lint timing plus the package-size baseline.
 
 ## Non-goals
 
 - Phase 3 does not implement diagnostics whose repair needs judgment.
-- Phase 3 does not add a repository companion process.
-- Phase 3 does not add TypeScript compiler, filesystem graph, Git diff, or SQL
-  analysis.
-- Phase 3 does not run Oxlint suggestions or dangerous fixes automatically.
+- Phase 3 does not add repository, TypeScript compiler, Git diff, SQL, Python,
+  Rust, or universal companion analysis.
+- Phase 3 does not claim non-TypeScript coverage for generic AF-06 or AF-07.
+- Phase 3 does not run suggestions or dangerous fixes automatically.
+- Phase 3 does not delete fallback detection for missing tools, disabled rules,
+  unsupported languages, or repositories that do not install Avandar lint.
 
-## Approaches
+## Selected architecture
 
-### Selected: one public Node tooling package
+### Polyglot umbrella with ecosystem implementations
 
-Create `packages/node/lint`, published as `@avandar/lint`, with
-`@avandar/lint/oxlint` and `@avandar/lint/stylelint` exports. Phase 5 adds the
-companion export and executable to the same package. This keeps rule IDs,
-fixtures, diagnostics, documentation, and versions together.
+The umbrella contains the canonical data and human reference. Runtime-specific
+packages sit beneath it:
 
-### Rejected: separate package per lint engine
+```text
+packages/lint/
+  README.md
+  rules.schema.json
+  rules.yaml
+  docs/rules/
+  core/
+    package.json
+    src/catalog/
+    src/cli/
+  typescript/
+    package.json
+    src/oxlint/
+  css/
+    package.json
+    src/stylelint/
+```
 
-Independent Oxlint, Stylelint, and companion packages isolate dependency
-weight, but they duplicate package infrastructure and make one convention span
-several release versions. Phase 5 may split only the companion if measured
-install size proves that necessary.
+`rules.yaml` is the single machine source. `README.md` contains the complete
+catalog rendered from it. A test regenerates the README section and fails when
+the checked-in content differs.
 
-### Rejected: an app or a shared-runtime package
+The umbrella does not pretend one runtime owns every language. Phase 5 adds
+`sql`; Phase 6 adds `generic`, `python`, and `rust` without moving the catalog.
 
-An app implies a deployed or independently operated runtime that does not
-exist. `packages/shared` promises browser, Node, and Deno reach, while this
-tooling depends on Node, linter runtimes, and eventually filesystem and compiler
-APIs.
+### Rejected: canonical catalog inside the Node package
 
-## Package contract
+Placing the catalog in `packages/lint/core` would make one implementation look
+authoritative over other ecosystems and would force Python and Rust tooling to
+depend conceptually on an npm package.
+
+### Rejected: one mixed-runtime release artifact
+
+One directory can own the system without forcing npm, PyPI, and Cargo
+artifacts into one package. Each ecosystem retains its normal build and release
+metadata under the umbrella.
+
+## Package and catalog contract
 
 | Surface | Contract |
 | --- | --- |
-| Package | `@avandar/lint` in `packages/node/lint` |
-| Oxlint export | `@avandar/lint/oxlint` |
-| Stylelint export | `@avandar/lint/stylelint` |
-| Rule namespace | `avandar/<rule-name>` in both engines |
-| Rule documentation | `packages/node/lint/docs/rules/<rule-name>.md` |
-| Runtime | Node 24.x |
-| Publication | Public package through the existing `packages/**` release workflow |
+| Canonical data | `packages/lint/rules.yaml` validated by `rules.schema.json` |
+| Human catalog | Full generated table in `packages/lint/README.md` |
+| Core package | `@avandar/lint` in `packages/lint/core` |
+| TypeScript package | `@avandar/lint-typescript` in `packages/lint/typescript` |
+| CSS package | `@avandar/lint-css` in `packages/lint/css` |
+| Oxlint export | `@avandar/lint-typescript/oxlint` |
+| Stylelint export | `@avandar/lint-css/stylelint` |
+| Catalog export | `@avandar/lint/catalog` |
+| Rule namespace | `avandar/<rule-name>` in Node lint engines |
+| Rule docs | `packages/lint/docs/rules/<rule-name>.md` |
+| Runtime | Node 24.x with native type stripping for package CLIs |
+| Publication | Existing package release workflow, extended to all npm package directories under `packages/lint` |
 
-The root workspace depends on `@avandar/lint` through `workspace:*` so root
-lint configuration can resolve both plugin entries. `@oxlint/plugins` must
-exactly match the installed Oxlint version while the JavaScript plugin API is
-alpha. Stylelint is an optional peer dependency rather than a bundled runtime.
+The root workspace depends on all three packages through `workspace:*` and
+keeps them in one fixed release group. `@avandar/lint-typescript` and
+`@avandar/lint-css` depend on `@avandar/lint` for catalog and diagnostic
+contracts. `@oxlint/plugins` exactly matches Oxlint while its JavaScript plugin
+API is alpha. Stylelint remains an optional peer of the CSS package.
 
-The Oxlint entry uses `eslintCompatPlugin` and `createOnce` where a shared
-traversal materially reduces work. Tests use the supported Oxlint RuleTester.
-The Stylelint entry uses `stylelint.createPlugin` and declares fixability in
-rule metadata.
+The Oxlint entry uses `eslintCompatPlugin` and `createOnce` when shared
+traversal reduces work. Stylelint uses `stylelint.createPlugin` and declares
+safe fixability in metadata.
+
+## Coverage command
+
+Phase 3 introduces one explicit command:
+
+```text
+avandar-lint coverage [PATH]... [--format stylish|agent|json]
+```
+
+Root and subcommand `-h` and `--help` print complete help to stdout and exit
+zero before configuration, dependency, or repository access. In a terminal, a
+bare `coverage` action starts its full wizard and offers paths, format, and
+visible defaults. With no terminal, omitted optional values use the current
+directory and `stylish`. Fully explicit values never prompt. JSON stdout
+contains only the documented result. Human diagnostics and progress use
+stderr or the controlling terminal.
+
+Coverage is derived from the catalog, detected file languages, enabled root
+lint configuration, plugin availability, and integration-tested engine
+registrations. A declaration in `rules.yaml` cannot prove coverage by itself.
+If configuration cannot be read, a plugin is missing, or a rule is disabled,
+the affected file and capability outcome reports `fallback` with a recovery
+message.
+
+The skill may suppress a detector only when this command returns `enforced`
+or `not-applicable` for the exact rule, language, file, and capability. A
+language summary is enforced only if every applicable file and subpredicate is
+enforced. Mixed supported and unsupported frameworks in the same language
+remain independently visible.
 
 ## Rule scope
 
-Phase 3 owns AF-01 through AF-17, AF-19, and AF-20. AF-18 and AF-21 belong to
-the phase 5 companion because they require type-aware Avandar analysis or SQL
-parsing.
+Phase 3 owns AF-01 through AF-17, AF-19, and AF-20 for their TypeScript,
+JavaScript, JSX, TSX, and CSS scope. AF-18 and AF-21 belong to Phase 5. AF-06
+and AF-07 are generic, so Phase 3 covers only their JavaScript-family syntax
+and leaves every other applicable language in fallback until Phase 6.
 
 | Batch | Inventory | Enforcement |
 | --- | --- | --- |
-| Native Oxlint | AF-01 through AF-05, AF-19 | Configure and test the existing native rules, including native type-aware rules where required |
-| Comment and documentation fixers | AF-06, AF-07, AF-11 | `@avandar/lint/oxlint` |
-| Function, naming, React, and utility fixers | AF-08 through AF-10, AF-12 through AF-17 | `@avandar/lint/oxlint` |
-| CSS comment fixer | AF-20 | `@avandar/lint/stylelint` |
+| Native Oxlint | AF-01 through AF-05, AF-19 | Existing native rules, including type-aware rules when required |
+| Comment and documentation fixers | AF-06, AF-07, AF-11 | `@avandar/lint-typescript/oxlint`; AF-06 and AF-07 coverage limited to TS/JS |
+| Function, naming, React, and utility fixers | AF-08 through AF-10, AF-12 through AF-17 | `@avandar/lint-typescript/oxlint` |
+| CSS comment fixer | AF-20 | `@avandar/lint-css/stylelint` |
 
-Each local fixer reports and edits only its proven syntax subset. Unsupported
-syntax remains unchanged and is reserved for phase 4 guided diagnostics when a
-deterministic gate exists.
+Unsupported syntax remains unchanged. A deterministic but unsafe shape becomes
+a Phase 4 diagnostic; an unsupported language remains a fallback outcome.
 
 ## Safety and test contract
 
 Every fixer has positive, negative, idempotence, and safety-boundary fixtures.
 Symbol renames reject exports, cross-file reach, collisions, computed
-references, and string-based references. Function rewrites reject semantic
-changes involving hoisting, recursion, overloads, lexical bindings, and name
-collisions. Object and array construction rewrites preserve evaluation order
-and control flow.
+references, and string references. Function rewrites reject hoisting,
+recursion, overloads, lexical bindings, and collisions. Object and array
+rewrites preserve evaluation order and control flow.
 
-Ordinary lint repair invokes only Oxlint safe fixes and Stylelint rules whose
-metadata marks the edit safe. `--fix-suggestions` and `--fix-dangerously` are
-not added to normal commands.
+Ordinary repair invokes only Oxlint safe fixes and Stylelint rules whose
+metadata marks the edit safe. Normal commands never use
+`--fix-suggestions` or `--fix-dangerously`.
 
-## Performance and release gates
-
-The phase records a root lint baseline before enabling the package, then cold
-and five-run warm measurements after each rule batch. Stop and profile a batch
-whose warm median adds both more than 25 percent and more than 2 seconds to the
-preceding baseline.
-
-The public package must pass the existing package build and pack verification.
-Its compressed tarball size is recorded as the baseline for phase 5. Add
-`@avandar/lint` to the fixed release group so all Avandar packages remain on a
-coordinated version.
+Coverage fixtures seed one violation per claimed file and capability and invoke
+the same root lint configuration a repository uses. A claim is accepted only
+when the violation produces the canonical rule ID and nonzero status. Mixed
+supported and unsupported capability fixtures prove conservative aggregation.
 
 ## Skill handoff
 
-After a rule is enabled and the complete lint run is green, remove its AF
-search from the main skill, focused packs, find lanes, phase checklists, and
-library or repo-local duplicates. Mixed conventions retain only their JR or
-not-yet-shipped portions. The skill continues to run lint before judgment
-review.
+Phase 3 creates
+`agent-skills/public-skills/skills/avandar-code-review/docs/code-reviews/deterministic-fallback-checklist.md`.
+Shipped AF detection moves there rather than being deleted. The always-loaded
+skill runs lint and coverage first, then loads only the returned fallback IDs
+for the languages in the diff.
+
+Repo-local duplicates may be removed after this repository proves
+`enforced`. Public fallback rules remain available for other repositories and
+unknown languages.
+
+## Performance and release gates
+
+Record a root baseline before enabling the package, then cold and five-run warm
+measurements after each batch. Stop and profile a batch whose warm median adds
+both more than 25 percent and more than 2 seconds to the preceding baseline.
+
+All three packages must pass build, import, and pack verification. Record their
+compressed tarball sizes for Phase 5 and add `@avandar/lint`,
+`@avandar/lint-typescript`, and `@avandar/lint-css` to one fixed release group.
+Update the pnpm workspace to include the package directories beneath
+`packages/lint`.
 
 ## Acceptance criteria
 
-- `@avandar/lint/oxlint` and `@avandar/lint/stylelint` resolve from root lint
-  configuration without a prebuild.
-- Every in-scope AF fixture proves safe, idempotent repair.
-- Repository lint and package verification pass after applying the fixers.
-- No in-scope AF detector remains in `avandar-code-review` after its rule ships.
-- The phase 3 benchmark and package-size baseline are committed.
-- No companion process, compiler program, repository graph, Git diff, or SQL
-  parser is introduced.
+- The umbrella catalog validates and its README cannot drift from
+  `rules.yaml`.
+- `@avandar/lint/catalog`, `@avandar/lint-typescript/oxlint`, and
+  `@avandar/lint-css/stylelint` resolve without a prebuild.
+- `avandar-lint coverage` obeys the help, output, exit, and fail-closed
+  contracts.
+- Every in-scope fixture proves safe, idempotent repair.
+- Root lint and package verification pass after applying the fixers.
+- Covered AF outcomes leave the normal skill path, while uncovered outcomes
+  still load the deterministic fallback.
+- The benchmark and package-size baseline are committed.
+- No compiler program, repository graph, Git diff, SQL parser, Python checker,
+  Rust checker, or universal language parser is introduced.

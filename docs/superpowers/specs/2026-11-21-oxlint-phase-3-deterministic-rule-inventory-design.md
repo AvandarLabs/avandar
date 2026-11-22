@@ -1,360 +1,384 @@
-# Oxlint phases 3 through 5 deterministic rule inventory
+# Oxlint phases 3 through 6 deterministic rule inventory
 
 Implementation plans:
 
 - `docs/superpowers/plans/2026-11-22-oxlint-phase-3-safe-fixers.md`
 - `docs/superpowers/plans/2026-11-22-oxlint-phase-4-guided-diagnostics.md`
 - `docs/superpowers/plans/2026-11-22-oxlint-phase-5-companion-analyzer.md`
+- `docs/superpowers/plans/2026-11-22-oxlint-phase-6-cross-language-parity.md`
 
 ## Outcome
 
-Phase 3 moves every review convention with a deterministic violation test out
-of the judgment-based detection pass. It does not require every repair to be
-automatic. The enforcement system has three outcomes:
+The migration moves every convention with a deterministic violation test out of
+the judgment-based detection pass without weakening any language that
+`avandar-code-review` can review. A rule leaves the active review path only for
+the exact language and repository configuration whose lint coverage is enabled
+and proven.
 
-1. A safe deterministic repair runs under `oxlint --fix` or the corresponding
-   specialized linter fixer.
-2. A deterministic violation with a judgment-based repair is reported by lint
-   with concise, actionable guidance. An agent fixes it before the judgment
-   review starts.
-3. A convention whose violation cannot be decided without judgment remains in
+The enforcement system has three repair outcomes:
+
+1. A behavior-preserving, unambiguous repair runs under the owning linter's
+   normal safe-fix command or `avandar-lint check --fix`.
+2. A deterministic violation whose repair needs judgment is reported with a
+   concise objective and optional on-demand documentation.
+3. A convention whose violation itself requires judgment remains in
    `avandar-code-review`.
 
-This split replaces the old type 1, type 2, and type 3 model. The old model
-incorrectly delayed deterministic diagnostics until a later phase and treated
-several unsafe transformations as ordinary `--fix` operations.
+This replaces the old type 1, type 2, and type 3 model. That model treated
+several unsafe transformations as ordinary fixes and assumed TypeScript
+coverage could replace language-agnostic review.
 
 ## Inventory basis
 
-The 2026-11-21 sweep read the live public skill, every built-in checklist, all
-four focused-review packs and find lanes, every library checklist, the
-repo-local extra checklist and its referenced rulesets, and the canonical
-copies under `docs/rules/`. The inventory also checks the installed Oxlint
-1.93.0 configuration and current Oxlint documentation.
+The inventory reads the live public skill, every built-in and focused
+checklist, every library checklist, the repo-local checklist and its referenced
+rulesets, and the canonical rules under `docs/rules/`. It also records the
+actual language gates in the skill rather than inferring language scope from a
+TypeScript example.
 
-The same convention is often repeated in several places. Rows below describe
-canonical rule families, not duplicate prose. Removing a shipped rule from the
-skill must remove it from all of these surfaces:
+The same convention often appears in several surfaces. Removing a covered
+detector from the normal review path must address all of these surfaces:
 
-- the focused `comments`, `files`, `naming`, and `tests` packs;
+- focused `comments`, `files`, `naming`, and `tests` packs;
 - focused-review find lanes;
 - Most Common Mistakes and General Checks;
-- the phase checklist and its candidate searches;
-- a library checklist or repo-local referenced ruleset.
+- phase checklists and candidate searches;
+- library or repo-local referenced rulesets;
+- the deterministic fallback checklist used when lint coverage is absent.
 
 ## Classification contract
 
 | Class | Violation decision | Repair | Destination |
 | --- | --- | --- | --- |
 | AF | Deterministic | Behavior-preserving and unambiguous | Native or custom safe fixer |
-| GD | Deterministic | Requires naming, decomposition, API, or semantic judgment | Lint diagnostic plus optional on-demand rule doc |
-| RP | Deterministic | May be automatic or guided, but needs a repository graph, filesystem, diff, SQL parser, or CSS parser | Companion repo check or specialized linter |
+| GD | Deterministic | Requires naming, decomposition, API, or semantic judgment | Lint diagnostic plus optional rule documentation |
+| RP | Deterministic | Needs a compiler program, repository graph, filesystem, diff, SQL parser, or cross-file evidence | Companion or specialized linter |
 | JR | Requires judgment | Requires judgment | `avandar-code-review` |
 
-A rule may report only the subset it can prove. If a transformation is safe
-for one syntax shape and unsafe for another, the implementation must use
-separate diagnostics: an AF diagnostic with a fixer for the proven shape and a
-GD diagnostic without a fixer for the rest. It must not attach a speculative
-fixer to the broader rule.
+A rule may report only the subset it can prove. Safe and unsafe syntax shapes
+use separate diagnostics. A speculative or semantics-changing rewrite is never
+attached to an AF diagnostic.
 
-Oxlint defines `--fix` as behavior-preserving. Suggestions and dangerous fixes
-use separate flags. Phase 3 does not put suggestions or dangerous fixes into
-the normal format path.
+## Cross-language coverage contract
+
+`packages/lint` is the umbrella for the complete lint system:
+
+| Path | Responsibility |
+| --- | --- |
+| `packages/lint/rules.yaml` | Machine-readable rule IDs, class, applicability, repair class, phase, and documentation slug |
+| `packages/lint/README.md` | Complete human-readable canonical catalog generated from `rules.yaml` |
+| `packages/lint/core` | `@avandar/lint`, catalog API, CLI, diagnostics, coverage, and companion orchestration |
+| `packages/lint/typescript` | `@avandar/lint-typescript`, Oxlint plugin and TypeScript/JavaScript companion pack |
+| `packages/lint/css` | `@avandar/lint-css`, Stylelint plugin pack |
+| `packages/lint/sql` | `@avandar/lint-sql`, SQL parser and companion pack |
+| `packages/lint/generic` | `@avandar/lint-generic`, universal lexical, syntax, test, and E2E adapters |
+| `packages/lint/python` | `pylint-avandar` Python distribution and custom Pylint checkers |
+| `packages/lint/rust` | `avandar-dylint` Rust lint library for semantic gaps not covered by rustc or Clippy |
+
+The umbrella is the canonical owner. No ecosystem package owns the global rule
+list. A validation test regenerates the README catalog from `rules.yaml` and
+fails on drift.
+
+Coverage is resolved for each analyzed file and independently testable
+subpredicate:
+
+```text
+rule ID + language ID + file path + capability ID + repository configuration + enabled engine
+```
+
+The capability ID identifies the syntax or framework proof boundary, such as
+`pytest`, `unittest`, `playwright-supabase`, or `rust-test`. It is omitted only
+when one implementation covers every applicable shape in the file. A
+language-wide registration is never allowed to hide an unsupported framework,
+parser failure, excluded file, or unsupported subpredicate.
+
+Each outcome resolves to one of these states:
+
+| State | Meaning | Review behavior |
+| --- | --- | --- |
+| `enforced` | A configured lint command proves the rule runs for the language | Skip deterministic review detection |
+| `not-applicable` | The rule has no meaning for that language | Skip it |
+| `fallback` | No active implementation proves coverage | Load the on-demand skill detector |
+
+An implementation registration alone is not coverage. Integration fixtures
+must prove that the repository's normal lint command reports a seeded
+violation. A disabled rule, missing plugin, excluded path, unavailable linter,
+or failed coverage command resolves to `fallback`.
+
+Every engine returns analyzed paths, per-capability outcomes, coverage gaps,
+and an operational status alongside diagnostics. The coverage command
+aggregates conservatively: a rule-language summary is `enforced` only when
+every applicable file and subpredicate is enforced. Any applicable fallback
+outcome keeps the summary in `fallback` and names the uncovered paths and
+capabilities. Mixed supported and unsupported frameworks in one language must
+therefore load fallback only for the unsupported files and subpredicates.
+
+`avandar-code-review` keeps only the lint-first protocol and JR rules in its
+always-loaded instructions. Deterministic fallback detectors move to a separate
+checklist that loads only for uncovered rule-language-file-capability outcomes. If a repository
+does not install Avandar lint, the skill behaves as it does today.
+
+Unknown languages always use the fallback. This preserves the skill's ability
+to review arbitrary repositories without requiring Phase 6 to predict every
+future language.
+
+## Declared language scope
+
+The current skill uses both explicit extension lists and broader phrases such
+as "most C-family languages." The migration makes those gates concrete.
+
+| Language ID | Files or syntax | Current deterministic scope | Phase 6 route |
+| --- | --- | --- | --- |
+| `typescript` | `.ts`, `.tsx` | All TypeScript, TSX, general, and test rules | Oxlint plus TypeScript companion pack |
+| `javascript` | `.js`, `.jsx`, `.mjs`, `.cjs` | JavaScript-compatible comment, function, naming, loop, size, and test rules | Oxlint plus JavaScript companion support |
+| `python` | `.py` | General public API, function, naming, loop, size, comment/docstring, and test rules | Pylint native rules, `pylint-avandar`, then universal companion gaps |
+| `rust` | `.rs` | General public API, function, naming, loop, size, comment/doc, and test rules | rustc, Clippy, `avandar-dylint`, then universal companion gaps |
+| `go` | `.go` | General rules and the explicit file-length gate | Universal Tree-sitter adapter plus native tools where exact |
+| `ruby` | `.rb` | General rules and the explicit file-length gate | Universal Tree-sitter adapter |
+| `java` | `.java` | General and C-family comment rules plus the explicit file-length gate | Universal Tree-sitter adapter |
+| `kotlin` | `.kt`, `.kts` | General and C-family comment rules plus the explicit file-length gate | Universal Tree-sitter adapter |
+| `swift` | `.swift` | General and C-family comment rules plus the explicit file-length gate | Universal Tree-sitter adapter |
+| `c`, `cpp`, `csharp` | C-family source files | General rules and C-family comment rules; no current explicit file-length gate | Universal Tree-sitter adapter |
+| `sql` | `.sql` | General comment rules and SQL-specific rules | SQL pack in Phase 5; generic comment coverage declared in the same manifest |
+| `css` | `.css` | General no-em-dash rule plus CSS-specific comment and styling rules | Stylelint |
+| `shell` | `.sh`, `.bash` and shell shebangs | General rules where syntax applies | Universal adapter because ShellCheck has no external plugin API |
+| `yaml` | `.yaml`, `.yml` | General comment rules where syntax applies | Universal lexical adapter |
+| `jsonc` | `.jsonc` | General comment rules where syntax applies | Universal lexical adapter |
+| `json` | `.json` | No comment rules; structural lint remains outside this inventory | Explicit `not-applicable` entries |
+
+Markdown, PO catalogs, generated files, dependency trees, caches, build
+outputs, and migration file-length checks remain excluded exactly as the live
+skill specifies.
+
+## Generic rule backfill matrix
+
+These deterministic families are genuinely language-agnostic. Their semantics
+remain one canonical rule while their syntax adapters differ.
+
+| ID | Canonical requirement | Direct TypeScript/CSS coverage | Python coverage | Rust coverage | Remaining-language coverage |
+| --- | --- | --- | --- | --- | --- |
+| AF-06 | Documentation-style block comments inside function bodies become ordinary comments when the rewrite is exact | Oxlint fixer | Not applicable to Python docstrings | Universal companion fixer because comments are not reliably represented in HIR | Universal companion syntax adapters |
+| AF-07 | A short, tag-free block docstring that fits uses the language's exact single-line docstring form | Oxlint JSDoc fixer | Universal companion fixer for value-preserving Python docstring shapes | Universal companion fixer for exact Rust doc-comment shapes | Universal companion syntax adapters, including SQL declaration docstrings |
+| GD-01 | Comments contain no U+2014 em dash | Oxlint; Stylelint for CSS | Custom raw/token Pylint checker | Universal lexical adapter | Universal lexical adapters, including SQL, shell, YAML, and JSONC |
+| GD-02 | Comment and docstring lines stay within 80 columns | Existing JS coverage | Custom raw/token Pylint checker | Universal lexical adapter | Universal lexical adapters for applicable comment syntaxes |
+| GD-03 | Public or exported APIs have attached documentation | Oxlint | Native Pylint missing-docstring rules for modules, classes, functions, and methods, plus `pylint-avandar` for public values and constants | Native `missing_docs` plus universal adapter coverage for public values not represented by the native lint | Universal AST adapters for languages with public/export semantics |
+| GD-06 | Functions and methods stay at or below 45 lines | Native Oxlint | Custom Pylint checker because `too-many-statements` is not line count | Native Clippy `too_many_lines` | Universal AST adapters |
+| GD-07 | Reviewed source files stay at or below the 400/500 thresholds | Native Oxlint | Native Pylint `too-many-lines` | Universal file metric because Clippy covers functions, not whole files | Universal file metric for the skill's explicit extension list |
+| GD-09 | Closed vague identifiers are rejected | Native Oxlint | Native Pylint `disallowed-name` configuration | Native Clippy `disallowed_names` | Universal identifier adapters |
+| GD-22 | Imperative collection loops require a reasoned exception | Oxlint native/custom rule | Custom AST Pylint checker | `avandar-dylint` semantic rule | Universal AST adapters |
+| GD-25 | Tests contain an assertion and avoid the closed tautology set | Oxlint test rules | Custom AST Pylint checker for pytest and unittest | `avandar-dylint` for `#[test]` and assertion macros | Universal framework adapters; unknown frameworks fall back |
+| RP-16B | E2E database mutations used as the behavior under test, or mutation paths without visible cleanup, are reported | TypeScript/Playwright companion adapter | Python E2E adapter when configured | Rust E2E adapter when configured | Universal companion framework registry; unknown APIs fall back |
+
+AF-07 has a JSDoc implementation in Phase 3, but its canonical requirement is
+the broader focused-comments rule: a short, tag-free block docstring that fits
+within 80 columns uses the language's single-line docstring form. Phase 6
+preserves that requirement for SQL and every other applicable block-comment or
+docstring language through native rules, syntax adapters, or explicit
+fallback. AF-20 remains CSS-specific. TypeScript module, React, Lingui, model,
+import, and file/directory conventions remain TypeScript-specific even when a
+similar style could be imagined elsewhere.
+
+Pylint custom checkers provide diagnostics but no standard safe-fixer channel.
+Any deterministic Python edit that later qualifies as AF runs through the
+universal companion. Dylint can supply semantic Rust lints, but it uses
+unstable rustc internals. The Rust package pins and tests a toolchain, while
+lexical and file-metric rules remain in the universal companion.
 
 ## Enforcement architecture
 
 | Need | Owner | Reason |
 | --- | --- | --- |
-| Existing JavaScript or TypeScript rule | Native Oxlint first | Rust implementation and established semantics |
-| New current-file JavaScript, TypeScript, or TSX rule | `@avandar/lint/oxlint` | ESLint-compatible JS plugins support AST traversal, scope analysis, diagnostics, and fixers |
-| Type-aware rule already supplied by Oxlint | Native type-aware Oxlint | Custom JS plugins do not receive TypeScript type information |
-| Avandar-specific type-aware rule | Companion TypeScript analyzer | It needs the program and type checker outside the JS plugin API |
-| File layout, import graph, Git diff, or multi-file convention | Companion repo analyzer | A custom JS rule cannot rename files or safely coordinate edits across files |
-| CSS convention | Stylelint or a Stylelint Avandar plugin | CSS is already parsed and linted by Stylelint in this repo |
-| SQL convention | SQL-aware companion analyzer | Oxlint does not parse SQL |
-
-## Package home
-
-All three enforcement engines live in one public Node tooling package:
-`packages/node/lint`, published as `@avandar/lint`.
-
-| Surface | Package entry |
-| --- | --- |
-| Oxlint-compatible JavaScript plugin | `@avandar/lint/oxlint` |
-| Stylelint plugin pack | `@avandar/lint/stylelint` |
-| Companion programmatic API | `@avandar/lint/companion` |
-| Companion executable | `avandar-lint` |
-
-This package belongs under `packages/node`, not `packages/shared`. The tooling
-uses Node, filesystem access, compiler APIs, and linter runtimes. It is not
-browser- or Deno-reachable shared code. It is also not an app because it has no
-deployed service, independent operational lifecycle, or user-facing runtime.
-
-One package keeps rule identifiers, diagnostics, documentation, fixtures, and
-versions together. Separate packages for each engine would duplicate that
-surface and make coordinated rules release independently. If the phase 5 SQL
-parser creates a material install-size problem, the companion may later split
-into `@avandar/lint-companion` while depending on `@avandar/lint`; phase 5 must
-measure the packed size before making that split.
-
-The Oxlint entry is not named `eslint-plugin-avandar`. Its API remains
-ESLint-compatible, but ESLint is no longer the repo's linter.
+| Existing JavaScript or TypeScript rule | Native Oxlint first | Fast Rust implementation and established semantics |
+| New current-file JavaScript, TypeScript, or TSX rule | `@avandar/lint-typescript/oxlint` | ESLint-compatible plugins provide AST, scope, diagnostics, and fixes |
+| Existing Python rule | Native Pylint configuration | Avoids local duplication |
+| New Python diagnostic | `pylint-avandar` | Raw, token, and Astroid checker APIs cover lexical and semantic rules |
+| Existing Rust rule | rustc or Clippy configuration | Stable repository integration and native performance |
+| New semantic Rust rule | `avandar-dylint` | Dylint exposes rustc lint passes for rules that need Rust semantics |
+| Cross-language lexical, file, or unsupported-plugin rule | `@avandar/lint-generic` | One implementation with lazy language adapters prevents ecosystem forks |
+| TypeScript compiler, module graph, or filesystem convention | `@avandar/lint-typescript/companion` | The rule is truly TypeScript-specific and needs repository evidence |
+| CSS convention | Stylelint or `@avandar/lint-css/stylelint` | Stylelint parses CSS and supports fixable plugins |
+| SQL convention | `@avandar/lint-sql` | SQL requires its own parser and repository context |
 
 ## AF inventory: deterministic safe fixes
 
-Each rule below is eligible for the ordinary safe-fix path. A custom rule must
-refuse to report as AF when its safety preconditions are not met.
+Each rule is eligible for the ordinary safe-fix path only inside its proven
+boundary.
 
-| ID | Convention | Detector and safe-fix boundary | Owner |
-| --- | --- | --- | --- |
-| AF-01 | Braces around every `if` body | Existing `curly`; add braces | Native Oxlint |
-| AF-02 | Template interpolation instead of string concatenation | Existing `prefer-template`; convert only supported equivalent expressions | Native Oxlint |
-| AF-03 | `type` on type-only imports and exports | Existing `typescript/consistent-type-imports`; add type-aware `typescript/consistent-type-exports` only after the type-aware benchmark | Native Oxlint |
-| AF-04 | `as const` for eligible literals | Existing `typescript/prefer-as-const`, already enabled | Native Oxlint |
-| AF-05 | Remove unnecessary type assertions | Existing type-aware `typescript/no-unnecessary-type-assertion` | Native type-aware Oxlint |
-| AF-06 | Line comments inside function bodies | Convert a free `/** ... */` or `/* ... */` body comment to equivalent `//` lines; never touch JSDoc attached to a nested declaration | Avandar plugin |
-| AF-07 | Single-line short JSDoc | Collapse tag-free JSDoc when the complete result fits the configured width | Avandar plugin |
-| AF-08 | Top-level function declarations | Convert a function-valued binding only when lexical `this`, `arguments`, `super`, `new.target`, hoisting, overloads, recursion, and name collisions cannot change behavior | Avandar plugin |
-| AF-09 | Nested arrow functions | Convert only non-hoisted, non-recursive functions that do not use function-local `this`, `arguments`, `super`, or `new.target` | Avandar plugin |
-| AF-10 | `_` prefix on private top-level helpers | Rename a non-exported local symbol and all same-file references when no collision or string-based reference exists | Avandar plugin |
-| AF-11 | Existing JSDoc on an exported module key | Relocate an existing comment only when one local declaration maps to one exported key and no typed interface owns the documentation | Avandar plugin |
-| AF-12 | Component props type named `Props` | Rename a non-exported same-file props type and its references when one component owns it and no collision exists | Avandar plugin |
-| AF-13 | Local `E2E` acronym casing | Rename non-exported same-file symbols and references; exported members, files, and serialized keys use GD or RP | Avandar plugin |
-| AF-14 | JSX conditional rendering uses a ternary | Replace `condition && <Node />` with `condition ? <Node /> : null` | Avandar plugin |
-| AF-15 | Exact `prop` and `propEq` callbacks | Replace only syntax shapes proven equivalent to the package helper and insert or merge the import | Avandar plugin |
-| AF-16 | Straight-line object construction | Fold property assignments into one object literal only when control flow, evaluation order, descriptors, aliases, and mutation semantics are unchanged | Avandar plugin |
-| AF-17 | Straight-line optional array candidates | Convert independent conditional pushes to a literal plus `filter(isDefined)` only when ordering and evaluation are equivalent | Avandar plugin |
-| AF-18 | Redundant `instanceof Error` guard | Remove or collapse the guard only when native type information proves the value is already `Error` and both branches remain equivalent | Native type-aware rule if available, otherwise companion analyzer |
-| AF-19 | File-extension convention | Existing `import/extensions` may add or remove extensions only where module resolution proves the target | Native Oxlint |
-| AF-20 | Canonical CSS block comment shape | Normalize only comment delimiters and leading `*` markers | Stylelint Avandar rule |
-| AF-21 | SQL declaration and body comment markers | Convert comment markers only when a SQL parser proves whether the comment documents a declaration or sits inside a statement | SQL analyzer |
+| ID | Scope | Convention | Detector and safe-fix boundary | Owner phase |
+| --- | --- | --- | --- | --- |
+| AF-01 | TS/JS | Braces around every `if` body | Native `curly`; add braces | 3 |
+| AF-02 | TS/JS | Template interpolation instead of concatenation | Native `prefer-template`; supported equivalent expressions only | 3 |
+| AF-03 | TS | `type` on type-only imports and exports | Native consistent-type rules after type-aware benchmark | 3 |
+| AF-04 | TS | `as const` for eligible literals | Native `typescript/prefer-as-const` | 3 |
+| AF-05 | TS | Remove unnecessary type assertions | Native type-aware rule | 3 |
+| AF-06 | Generic C-like syntax | Ordinary comments inside function bodies | Rewrite only unattached block/doc comments with an exact ordinary-comment form | 3 for TS/JS; 6 for remaining languages |
+| AF-07 | Generic docstrings | Single-line short docstring | Collapse a tag-free block docstring only when the language has an exact single-line docstring form and the complete result fits | 3 for JSDoc; 6 for remaining applicable languages |
+| AF-08 | TS/JS | Top-level function declarations | Reject lexical binding, hoisting, overload, recursion, and collision changes | 3 |
+| AF-09 | TS/JS | Nested arrow functions | Reject function-local lexical binding and hoisting changes | 3 |
+| AF-10 | TS/JS | `_` prefix on private top-level helpers | Same-file, non-exported, collision-free symbols only | 3 |
+| AF-11 | TS | Existing JSDoc on an exported module key | Move only a one-to-one local declaration comment with no owning interface | 3 |
+| AF-12 | TSX | Component props type named `Props` | Non-exported, one-component, collision-free type only | 3 |
+| AF-13 | TS/JS | Local `E2E` acronym casing | Non-exported same-file symbols only | 3 |
+| AF-14 | JSX/TSX | JSX conditional rendering uses a ternary | Exact `condition && <Node />` form | 3 |
+| AF-15 | TS/JS with `@avandar/utils` | Exact `prop` and `propEq` callbacks | Proven equivalent callbacks and exact import edit | 3 |
+| AF-16 | TS/JS | Straight-line object construction | Preserve control flow, evaluation order, descriptors, aliases, and mutation | 3 |
+| AF-17 | TS/JS | Straight-line optional array candidates | Preserve order and evaluation with `filter(isDefined)` | 3 |
+| AF-18 | TS | Redundant `instanceof Error` guard | Type information proves the value and branches equivalent | 5 |
+| AF-19 | TS/JS | File-extension convention | Resolver proves the target | 3 |
+| AF-20 | CSS | Canonical CSS block comment shape | Delimiters and leading markers only | 3 |
+| AF-21 | SQL | SQL declaration and body comment markers | SQL parser proves declaration ownership or statement body | 5 |
 
 ## GD inventory: deterministic detection, judgment repair
 
-These rules should stop consuming review-detection tokens. The linter can
-prove the violation, but an agent or developer must choose the repair. The
-normal `--fix` path must not change them.
-
-| ID | Convention | Deterministic gate | Why repair needs judgment | Preferred owner |
+| ID | Scope | Convention | Deterministic gate | Owner phase |
 | --- | --- | --- | --- | --- |
-| GD-01 | No em dashes in comments | A comment contains U+2014 | Correct punctuation may be a period, colon, comma, parentheses, or hyphen | Avandar plugin |
-| GD-02 | Comment and docstring lines stay within 80 columns | Existing comment-aware `max-len` | Prose must be reflowed without damaging meaning, links, or examples | Existing JS plugin until native equivalent fits |
-| GD-03 | Public and exported values have documentation | Export/public AST node lacks attached JSDoc | The documentation must explain purpose and use, not merely exist | Avandar plugin |
-| GD-04 | No file-level comment when a main export exists | Detached block comment plus basename-matching export | Context must be moved or rewritten on the correct member | Avandar plugin |
-| GD-05 | Exported object keys have documentation | Undocumented exported key without a documented owning interface | The agent must write useful documentation or move the contract to an interface | Avandar plugin |
-| GD-06 | Functions stay at or below 45 lines | Existing `max-lines-per-function` with repo exclusions | The correct extraction boundary and names require design judgment | Native Oxlint |
-| GD-07 | Source files stay at or below 400 lines, with 500 hard | Existing `max-lines` with generated and migration exclusions | The correct directory-module split requires architectural judgment | Native Oxlint |
-| GD-08 | Named exports only | Existing `import/no-default-export` | A stable exported name and all import updates are not a safe local rewrite | Native Oxlint |
-| GD-09 | Closed vague-identifier denylist | Existing `id-denylist` for exact names approved by the convention | The business noun cannot be inferred safely | Native Oxlint |
-| GD-10 | Event handlers use `on...` | Existing `react/jsx-handler-names` for JSX-proven handlers; custom detection for other proven callback positions | A public prop or exported symbol may require coordinated API changes | Native Oxlint plus Avandar plugin |
-| GD-11 | Helpers appear before the exports that use them | Same-file dependency order violates the documented exceptions | Moving initializers can alter evaluation order; the correct grouping may be a refactor | Avandar plugin |
-| GD-12 | Function declaration style outside AF-safe shapes | Existing `func-style` or custom diagnostic | Unsafe cases need a manual rewrite or a justified exception | Native Oxlint plus Avandar plugin |
-| GD-13 | Object types prefer `type` over `interface` | Existing `typescript/consistent-type-definitions` | Oxlint marks its conversion dangerous because declaration merging and inheritance can change semantics | Native Oxlint |
-| GD-14 | No explicit `any` | Existing `typescript/no-explicit-any`, already enabled | The replacement type or guard depends on the actual contract | Native Oxlint |
-| GD-15 | No double assertions | AST contains `as unknown as` or `as any as` | The real relationship, parser, or adapter must be designed | Avandar plugin |
-| GD-16 | String unions instead of string enums | A string-only enum declaration | Call sites and runtime-value uses need a coordinated rewrite; numeric and bitflag cases remain exceptions | Avandar plugin |
-| GD-17 | Prefer `undefined` over `null` | A project-owned API or type contains `null`, after externally exact positions are excluded | Boundary compatibility and normalization location require judgment | Type-aware companion analyzer |
-| GD-18 | Large inline object shapes become named types | An eligible inline object type has four or more properties | The type name and ownership cannot be inferred reliably | Avandar plugin |
-| GD-19 | Explicit module-boundary types | Existing `typescript/explicit-module-boundary-types`, already enabled | The useful public type must be written | Native Oxlint |
-| GD-20 | Readonly inputs, mutable outputs, and explicit mutation APIs | Type-aware signature and mutation analysis violates the closed structural contract | Intentional mutation, globally immutable aliases, and the correct API name require judgment | Type-aware companion analyzer |
-| GD-21 | Function signature shape | Multiple positional parameters, a one-property options object, a disallowed object-parameter name, or a one-use small options alias | Changing a callable API and choosing `options`, `params`, or `config` requires context | Avandar plugin plus repo analyzer |
-| GD-22 | Imperative loops and classes require an explicit exception | `for`, `while`, or class syntax appears without a reasoned disable | Async sequencing, early exit, hot paths, and framework constraints decide the repair or exception | Native `no-restricted-syntax` or Avandar plugin |
-| GD-23 | One component per file and no top-level JSX-only render helper | Existing `react/no-multi-comp` plus the documented helper AST shape | Extracted component boundaries, props, hooks, and filenames require judgment | Native Oxlint plus Avandar plugin |
-| GD-24 | Multi-line `useEffect` callbacks are named | Anonymous effect callback exceeds the closed one-line exception | The name must describe the effect | Avandar plugin |
-| GD-25 | Tests contain a meaningful assertion and no closed tautology | Existing `vitest/expect-expect` plus closed patterns such as `typeof x === "function"` and literal self-assertions | The behavioral assertion or decision to delete the test requires judgment | Native Oxlint plus Avandar plugin |
-| GD-26 | Frontend display copy is translated and `t` is not passed across scopes | Literal in a closed display position, or a translation function escapes its macro scope | Choosing `Trans`, `t`, `msg`, `i18n._`, and the right component boundary requires judgment | Avandar plugin |
-| GD-27 | Stateless modules do not use `createModule` | Closure and dataflow analysis proves there is no state, mixin, or mutable capture | Public typing and the clearest object shape still need review | Avandar plugin |
-| GD-28 | Model construction and namespace imports | A model-shaped value bypasses `Model.make`, or an external file imports a model's `*.types.ts` entry | Mapping legacy type names and validating constructor semantics may require several edits | Type-aware companion analyzer plus Avandar plugin |
-| GD-29 | Exhaustive union dispatch uses `matchLiteral` | Type information proves a switch or conditional dispatches on a closed string union | Complex branches and return typing may need a manual conversion | Type-aware companion analyzer |
-| GD-30 | Static UI styles avoid inline styles and Tailwind | Static `style` or `styles`, or a Tailwind-only class token, appears in the closed UI paths | A CSS Module name, file placement, and Mantine token choice require judgment | Avandar plugin plus Stylelint |
-| GD-31 | Supabase `null` is normalized at the boundary | Type-aware dataflow proves a nullable Supabase value crosses into an undefined-based domain type | The correct boundary adapter and fallback behavior require judgment | Type-aware companion analyzer |
+| GD-01 | Generic comments | No em dashes | Comment token contains U+2014 | 4 for TS/JS/CSS; 6 otherwise |
+| GD-02 | Generic comments/docstrings | Lines stay within 80 columns | Comment or docstring token exceeds the configured width | 4 for TS/JS; 6 otherwise |
+| GD-03 | Generic public APIs | Public/exported values have documentation | Public AST node lacks attached documentation | 4 for TS/JS; 6 otherwise |
+| GD-04 | TS/JS | No file-level comment when a main export exists | Detached block plus basename-matching export | 4 |
+| GD-05 | TS | Exported object keys have documentation | Undocumented exported key without documented owner | 4 |
+| GD-06 | Generic functions | Functions stay at or below 45 lines | Function span exceeds 45 lines after exclusions | 4 for TS/JS; 6 otherwise |
+| GD-07 | Explicit source extension list | Files stay at or below 400 lines, with 500 hard | Reviewed source exceeds a threshold after exclusions | 4 for TS/JS; 6 otherwise |
+| GD-08 | TS/JS | Named exports only | Default export AST | 4 |
+| GD-09 | Generic identifiers | Closed vague-identifier denylist | Identifier equals an approved denied name | 4 for TS/JS; 6 otherwise |
+| GD-10 | JSX/TSX | Event handlers use `on...` | Proven handler position uses disallowed name | 4 |
+| GD-11 | TS/JS | Helpers appear before exports that use them | Same-file dependency order violates exceptions | 4 |
+| GD-12 | TS/JS | Function declaration style outside AF shapes | Native/custom function-style diagnostic | 4 |
+| GD-13 | TS | Object types prefer `type` | Native type-definition diagnostic | 4 |
+| GD-14 | TS | No explicit `any` | Native AST diagnostic | 4 |
+| GD-15 | TS | No double assertions | `as unknown as` or `as any as` | 4 |
+| GD-16 | TS | String unions instead of string enums | String-only enum declaration | 4 |
+| GD-17 | TS | Prefer `undefined` over `null` | Project-owned API contains non-boundary `null` | 5 |
+| GD-18 | TS | Large inline shapes become named types | Eligible inline object type has at least four properties | 4 |
+| GD-19 | TS | Explicit module-boundary types | Native rule | 4 |
+| GD-20 | TS | Readonly inputs, mutable outputs, explicit mutation APIs | Type-aware structural contract violation | 5 |
+| GD-21 | TS/JS | Function signature shape | Closed positional/options-object shapes | 4 plus 5 repository evidence |
+| GD-22 | Generic collection code | Imperative collection loops require a reason | Loop over a collection lacks a reasoned disable | 4 for TS/JS; 6 otherwise |
+| GD-23 | React | One component per file and no JSX-only render helper | Native component count plus helper AST shape | 4 |
+| GD-24 | React | Multi-line `useEffect` callbacks are named | Closed callback shape | 4 |
+| GD-25 | Generic tests | Meaningful assertion and no closed tautology | Assertion-free test or closed tautology pattern | 4 for TS/JS; 6 otherwise |
+| GD-26 | TSX/JSX | Display copy is translated and `t` does not escape | Closed display positions and macro scope | 4 |
+| GD-27 | TS | Stateless modules avoid `createModule` | Closure/dataflow proves no state or mutable capture | 4 |
+| GD-28 | TS models | Model construction and namespace imports | Type and import evidence | 5 |
+| GD-29 | TS | Exhaustive union dispatch uses `matchLiteral` | Type information proves a closed string union | 5 |
+| GD-30 | TSX/JSX/CSS | Static UI styles avoid inline styles and Tailwind | Closed UI paths and static style tokens | 4 |
+| GD-31 | TS/Supabase | Supabase `null` is normalized at the boundary | Type-aware dataflow crosses into undefined domain type | 5 |
+| GD-32 | TS/JS | Class declarations require a real constraint and a reasoned exception | Class declaration lacks an approved reasoned disable | 4 |
 
-## RP inventory: deterministic rules outside a current-file Oxlint plugin
+## RP inventory: deterministic repository evidence
 
-These rules can also leave judgment-based detection, but they need a companion
-engine. A standard Oxlint JS fixer edits only the current source file. It
-cannot safely rename files, update an import graph, compare a Git diff, or
-parse SQL and CSS.
-
-| ID | Convention | Required evidence | Repair class | Owner |
+| ID | Scope | Convention | Required evidence | Owner phase |
 | --- | --- | --- | --- | --- |
-| RP-01 | One module per file and filename matches its one main export | File AST plus basename and export set | Guided | Repo analyzer |
-| RP-02 | Same-stem companions use a directory module; single-child same-name directories collapse; casing aligns | Directory tree and import graph | Guided, with safe codemods for proven moves | Repo analyzer |
-| RP-03 | No `-`-prefixed components under `src/routes/` | Path match | Guided move to the correct view | Repo analyzer |
-| RP-04 | No bare `types.ts` or `constants.ts`; type-only files use `.types.ts` | Path plus export kinds | Guided, with safe rename only when all imports are updated | Repo analyzer |
-| RP-05 | Barrels exist only in approved package roots and never use `export *` | Path allowlist, export AST, and module graph | Guided | Native rule where possible plus repo analyzer |
-| RP-06 | Deno extensions, package public-entry imports, allowed package subpaths, and import-map coverage | Import resolver, owning package, Deno reachability, and every `deno.json` | Guided, with safe fixes for resolvable extension-only cases | Native import rules plus repo analyzer |
-| RP-07 | Test filename, aspect label, `__tests__`, integration label, fixture placement, and one-test-per-directory rules | Filesystem, module ownership, and test-file set | Guided, with safe rename for exact lone-test cases | Repo analyzer |
-| RP-08 | A component owns its colocated CSS Module and CSS classes use its domain prefix | TSX import graph, component ownership, and CSS selectors | Guided | Repo analyzer plus Stylelint |
-| RP-09 | Copy functions satisfy mechanical Lingui and return-type tests, have the right caller-count placement, and use copy naming | Type checker, macro AST, call graph, and paths | Guided | Type-aware repo analyzer |
-| RP-10 | New migrations sort last and successive new migrations consolidate | Git diff, migration timestamps, and transaction/storage exclusions | Guided | Repo analyzer |
-| RP-11 | Storage migrations have `_STORAGE`, contain only storage statements, create buckets idempotently, remain seed-reachable, and mirror policies in schema | Git diff, SQL AST, config, and schema comparison | Guided | SQL-aware repo analyzer |
-| RP-12 | Declarative schema indices use numeric dependency layers and no letters | SQL dependency graph and filenames | Guided, with safe rename for closed no-letter cases | SQL-aware repo analyzer |
-| RP-13 | AvaPage migration versions agree and older snapshots do not import live types | Current version constant, folder version, literals, imports, and type comparison | Guided | Type-aware repo analyzer |
-| RP-14 | New models live in an approved model root | Added paths and model structure | Guided move | Repo analyzer |
-| RP-15 | A serialized model-shape change bumps the cache schema | Git diff plus the concrete serializer/parser surface | Guided; only report when the analyzer can prove the serialized shape changed | Type-aware repo analyzer |
-| RP-16 | Closed E2E static rules | Direct third-party `process.env` access, mid-flow `page.goto`, test timeout changes, database mutations without visible cleanup paths | Guided; semantic E2E rules remain JR | Repo analyzer |
-| RP-17 | SQL identifiers, trigger names, and comment forms match closed syntax rules | SQL AST and object context | Guided for renames, AF for comment formatting | SQL-aware repo analyzer |
-| RP-18 | New or changed RLS policies have positive and required negative pgTAP coverage | Schema diff, policy operations, and test inventory | Guided; adequacy of assertions remains JR | SQL-aware repo analyzer |
-| RP-19 | New package subpaths update every Deno import map | Package exports diff and all import maps | Safe config edit when the exact target is known | Repo analyzer |
+| RP-01 | TS/JS | One module per file and filename matches main export | File AST, basename, export set | 5 |
+| RP-02 | TS/JS | Directory-module, same-stem, and casing conventions | Directory tree and import graph | 5 |
+| RP-03 | TS routes | No `-`-prefixed components under `src/routes/` | Paths | 5 |
+| RP-04 | TS | No bare `types.ts` or `constants.ts` | Path plus export kinds | 5 |
+| RP-05 | TS/JS | Barrels only at approved roots and no `export *` | Path allowlist, exports, graph | 5 |
+| RP-06 | TS/Deno | Extensions, public entries, allowed subpaths, import maps | Resolver, package ownership, Deno reachability | 5 |
+| RP-07 | TS/JS tests | Test filename, aspect, integration label, fixture placement | Filesystem and module ownership | 5 |
+| RP-08 | TSX/CSS | Component owns CSS Module and domain-prefixed classes | TSX graph and CSS selectors | 5 |
+| RP-09 | TS/Lingui | Copy functions satisfy mechanical contracts | Type checker, macro AST, call graph, paths | 5 |
+| RP-10 | SQL migrations | New migrations sort last and consolidate | Git diff and timestamps | 5 |
+| RP-11 | SQL/storage | Storage migration shape and schema mirroring | Git diff, SQL AST, config, schema | 5 |
+| RP-12 | SQL/schema | Numeric declarative-schema dependency layers | SQL dependency graph and paths | 5 |
+| RP-13 | TS/AvaPage | Migration versions agree and snapshots avoid live types | Constants, paths, imports, types | 5 |
+| RP-14 | TS models | New models live in approved roots | Added paths and model structure | 5 |
+| RP-15 | TS models | Serialized shape changes bump cache schema | Git diff, types, serializer/parser | 5 |
+| RP-16A | TS/Playwright | Closed Playwright static rules | Playwright AST, paths, fixture APIs | 5 |
+| RP-16B | Generic E2E | Behavior-under-test DB writes and missing cleanup paths | Framework adapter, mutation registry, control flow | 6 |
+| RP-17 | SQL | Closed SQL identifiers, trigger names, comment forms | SQL AST and object context | 5 |
+| RP-18 | SQL/RLS | Changed policies have required pgTAP coverage | Schema diff, policy operations, tests | 5 |
+| RP-19 | TS/Deno | New package subpaths update every import map | Package exports diff and import maps | 5 |
 
 ## JR inventory: judgment stays in `avandar-code-review`
 
-The following families cannot be removed from judgment detection without
-changing their meaning. Linters may produce candidates, but candidates are not
-violations.
-
 | ID | Convention family | Why the gate needs judgment |
 | --- | --- | --- |
-| JR-01 | JSDoc purpose, use cases, caller lists, output, jargon, and length quality | Useful documentation depends on audience and behavior |
-| JR-02 | Historical and roadmap language in comments | Present-day warnings and real code phases are valid exceptions that require meaning, not keyword matching |
-| JR-03 | Inline one-use bindings and avoid unnecessary indirection | Stable identity, opacity, reuse, and readability decide whether the binding helps |
-| JR-04 | Descriptive names, abbreviations, acronym discovery, and conversion source/target naming | The business noun and the semantic source and target are not syntax |
-| JR-05 | Where to split a long function, file, or component | Threshold detection is deterministic; the correct seam is architectural |
-| JR-06 | Positive nesting, ternary readability, IIFEs, and other control-flow style choices | Equivalent syntax can be clearer or worse depending on the branch semantics |
-| JR-07 | Reuse of repo or library utilities | Equivalence and whether the abstraction improves the code require semantic comparison |
-| JR-08 | Module grouping, global bridges, god objects, and one-off integration architecture | Ownership and coupling are architectural decisions |
-| JR-09 | Whether a `useMemo` derivation is trivial or load-bearing | Cost, identity stability, and dependency behavior are contextual |
-| JR-10 | Hook array defaults and `?? []` | Loading state, identity, memoization, and downstream semantics determine the right form |
-| JR-11 | Test names, observable behavior, assertion strength, and placeholder intent | A useful behavioral claim cannot be inferred from syntax alone |
-| JR-12 | E2E behavior-under-test, flake mechanism, locator ambiguity risk, dataset realism, and fresh-browser choice | The relevant user behavior and failure mechanism require investigation |
-| JR-13 | SQL plural nouns, shared versus table function namespaces, enum documentation quality, and RLS security semantics | Domain language and authorization intent are not closed syntax rules |
+| JR-01 | Documentation purpose, use cases, caller lists, output, jargon, and length quality | Useful documentation depends on audience and behavior |
+| JR-02 | Historical and roadmap language in comments | Present-day warnings and real code phases are valid exceptions |
+| JR-03 | Inline one-use bindings and avoid unnecessary indirection | Identity, opacity, reuse, and readability decide whether it helps |
+| JR-04 | Descriptive names, abbreviations, acronym discovery, conversion naming | The business noun and semantic source and target are not syntax |
+| JR-05 | Where to split a long function, file, or component | Threshold detection is deterministic; the seam is architectural |
+| JR-06 | Positive nesting, ternary readability, IIFEs, control-flow style | Equivalent syntax can be clearer or worse in context |
+| JR-07 | Reuse of repo or library utilities | Equivalence and abstraction value require semantic comparison |
+| JR-08 | Module grouping, global bridges, god objects, integration architecture | Ownership and coupling are architectural decisions |
+| JR-09 | Whether a `useMemo` derivation is trivial or load-bearing | Cost and identity stability are contextual |
+| JR-10 | Hook array defaults and `?? []` | Loading state, identity, and downstream behavior decide the form |
+| JR-11 | Test names, observable behavior, assertion strength, placeholder intent | A useful behavioral claim cannot be inferred from syntax alone |
+| JR-12 | E2E behavior, flake mechanism, locator risk, dataset realism, browser isolation | Relevant behavior and failure mechanism require investigation |
+| JR-13 | SQL domain nouns, namespaces, enum docs, and RLS security semantics | Domain language and authorization intent are not closed syntax |
 | JR-14 | Whether related helpers should become a module | Relatedness and public API shape are design judgments |
-| JR-15 | Fresh-read requirements for permission and mutation-owned lists | The linter cannot infer whether another mutation owns the rendered list without a closed hook registry |
-| JR-16 | Composite type reuse and runtime union source-of-truth design | Semantic equivalence and ownership of the canonical values require judgment |
-| JR-17 | Mantine token choice, accessibility beyond existing a11y rules, and dynamic style legitimacy | The appropriate UI semantics and token are contextual |
+| JR-15 | Fresh-read requirements for permission and mutation-owned lists | Mutation ownership needs a closed hook registry or judgment |
+| JR-16 | Composite type reuse and runtime union source of truth | Semantic equivalence and ownership require judgment |
+| JR-17 | Mantine token choice, a11y beyond existing rules, dynamic-style legitimacy | UI semantics and the correct token are contextual |
 
-## Delta from the 2026-08-16 snapshot
+## Token-efficient remediation and fallback
 
-The old Tasks 11 through 19 must not drive implementation. The live inventory
-changes them in four material ways.
+The normal flow is:
 
-### Previously planned safe fixers that are now guided diagnostics
+1. Run safe fixes.
+2. Run every configured linter and `avandar-lint check` in agent format.
+3. Resolve deterministic diagnostics until lint is green.
+4. Run `avandar-lint coverage` for the reviewed paths.
+5. Load deterministic fallback rules only for returned `fallback` outcomes.
+6. Run JR review for the diff's gated phases.
 
-| Old rule | New owner | Reason |
-| --- | --- | --- |
-| Em dash in comments | GD-01 | The correct punctuation is not always a colon or hyphen |
-| Helpers before exports | GD-11 | Moving initializers can change evaluation order and grouping |
-| `handle...` to `on...` | GD-10 outside proven local cases | The binding may be a public prop or not be an event handler |
-| General acronym casing | JR-04; AF-13 only for local `E2E` | Discovering an acronym and coordinating public renames is not a safe local edit |
-| Model `*.types.ts` deep imports | GD-28 | Legacy symbols do not always map to a simple source-string rewrite |
-| Stateless `createModule` | GD-27 | Public typing and method shape can change |
-| `interface` to `type` | GD-13 | Oxlint correctly classifies the conversion as dangerous for some violations |
+Every guided diagnostic identifies the requirement, exact local fact, and
+immediate objective. Branching repairs link one repo-relative page under
+`packages/lint/docs/rules/`. Diagnostics do not repeat tutorials.
 
-### Previously planned fixers that survive only with narrower proof
-
-Top-level function declarations, nested arrows, private-helper renames,
-exported-key JSDoc moves, Props renames, property-helper callbacks, and object
-or array construction rewrites remain AF only for the explicit safety
-boundaries in AF-08 through AF-17. Every other syntax shape receives a GD
-diagnostic or remains JR.
-
-### Native coverage added since the snapshot
-
-Current Oxlint includes relevant native rules for function style, identifier
-denylists, file and function length, one component per file, JSX handler
-names, type-definition style, and unnecessary type assertions. Phase 3 must
-configure and test those implementations before creating a local equivalent.
-
-### Live skill additions absent from the snapshot
-
-The focused `comments`, `files`, `naming`, and `tests` packs now duplicate
-several full-review searches. Test-layout rules, copy qualification and
-placement, Lingui macro scope, cache-schema bumps, fresh-read checks, expanded
-E2E rules, storage migration rules, schema dependency numbering, and AvaPage
-migration rules also expanded the deterministic surface. RP exists because
-many of these rules need more than a current-file JavaScript AST.
-
-## Token-efficient remediation contract
-
-Deterministic diagnostics should not remain in the review skill merely because
-their repairs require judgment. The cheapest accurate flow is:
-
-1. Run safe fixers before review.
-2. Run lint in agent-oriented output mode.
-3. Resolve all remaining deterministic diagnostics.
-4. Start `avandar-code-review` only after lint is green.
-5. Load judgment checklists only for phases touched by the diff.
-
-Each guided rule follows this message contract:
-
-- The diagnostic identifies the violated requirement and the exact local fact.
-- The diagnostic gives the immediate repair objective in one short sentence.
-- It does not embed a long tutorial or every exception.
-- If repair branches, it ends with one repo-relative documentation path under
-  `packages/node/lint/docs/rules/`.
-- The rule documentation contains examples, exceptions, disable criteria, and
-  links to the canonical convention. It is loaded only when needed.
-- A diagnostic whose resolution is obvious from its local facts needs no
-  separate documentation page.
-
-The plugin should require a non-empty reason on every disable of an
-`avandar/*` rule. The disable is the explicit representation of a valid
-exception. Review checks the quality of changed disable reasons, but it does
-not re-run the underlying deterministic search.
-
-`avandar-code-review` should contain one lint-remediation protocol, not copies
-of every lint rule. It should run `pnpm lint` first, fix diagnostics using the
-message or linked rule page, rerun lint, and then load only JR rules. This keeps
-the rule source of truth in lint and avoids paying skill tokens for rules that
-have already passed.
-
-Before adopting the contract broadly, the first guided rule must compare three
-fixture outputs: a detailed repeated message, a terse message with a repeated
-doc path, and a terse message whose rule metadata owns the path. The selected
-format must be visible in Oxlint's `agent` formatter and produce the smallest
-output that still lets an agent repair every fixture correctly.
+Disables of `avandar/*`, `avandar_pylint`, or `avandar_dylint` rules require a
+non-empty reason. Review judges changed reasons but does not rerun a covered
+detector.
 
 ## Phase allocation
 
-The repair boundary and the engine boundary are independent. Phases 3 and 4
-contain only rules that Oxlint or Stylelint can own directly. Every rule that
-needs a compiler program, repository graph, filesystem tree, Git diff, or SQL
-parser moves to the companion in phase 5.
-
 | Phase | Owns | Inventory |
 | --- | --- | --- |
-| 3: safe fixers | Package foundation, native Oxlint safe rules, current-file Oxlint fixers, Stylelint fixers, and removal of shipped AF searches from review | AF-01 through AF-17, AF-19, AF-20. AF-03 and AF-05 may use native type-aware Oxlint because no companion is required |
-| 4: guided diagnostics | Deterministic current-file Oxlint and Stylelint gates whose repairs require judgment, the on-demand documentation contract, disable reasons, and removal of shipped GD searches from review | GD-01 through GD-16, GD-18, GD-19, GD-21 through GD-27, GD-30 |
-| 5: companion analyzer | Type-aware Avandar rules, path and repository graph rules, Git-diff rules, SQL rules, and every remaining deterministic detector | AF-18, AF-21, GD-17, GD-20, GD-28, GD-29, GD-31, RP-01 through RP-19 |
+| 3: safe fixers | Umbrella catalog, core package, TypeScript package, CSS package, coverage registry and command, native TypeScript safe rules, current-file Oxlint fixers, Stylelint fixers, coverage-gated skill fallback | AF-01 through AF-17, AF-19, AF-20 for TS/JS/CSS; AF-06 and AF-07 remain fallback elsewhere |
+| 4: guided diagnostics | Deterministic TypeScript/JavaScript and CSS current-file diagnostics, on-demand rule docs, disable reasons, coverage-gated fallback | GD-01 through GD-16, GD-18, GD-19, current-file GD-21, GD-22 through GD-27, GD-30, and GD-32 for their TS/JS/CSS scope |
+| 5: language-specific companions | Companion host, TypeScript/JavaScript repository and type pack, SQL pack, Git-diff evidence | AF-18, AF-21, repository-aware GD-21, GD-17, GD-20, GD-28, GD-29, GD-31, RP-01 through RP-15, RP-16A, RP-17 through RP-19 |
+| 6: cross-language parity | Pylint package, rustc/Clippy config, Dylint package, universal generic companion adapters, cross-language coverage closure | Remaining AF-06, AF-07, GD-01, GD-02, GD-03, GD-06, GD-07, GD-09, GD-22, GD-25, and RP-16B outcomes |
 
-JR-01 through JR-17 remain in `avandar-code-review` throughout. A phase
-removes a skill detector only after its enforcing rule is enabled and green.
-
-Current Oxlint JavaScript plugins do not expose type information. Native
-type-aware Oxlint rules stay in phases 3 or 4 because Oxlint owns them. Only
-Avandar-specific type-aware analysis belongs to the phase 5 companion.
+JR-01 through JR-17 remain in `avandar-code-review`. No phase may remove a
+fallback detector for an uncovered rule-language-file-capability outcome.
 
 ## Success criteria
 
+- `packages/lint/README.md` contains the complete catalog and cannot drift from
+  `packages/lint/rules.yaml`.
 - Every AF rule has positive, negative, idempotence, and safety-boundary
-  fixtures.
-- `pnpm lint:ts:fix-changed` applies only safe fixes.
-- No normal workflow uses `--fix-suggestions` or `--fix-dangerously`.
-- Every GD and companion diagnostic is actionable without loading the full review
-  skill.
-- A green lint run means focused review packs never search for shipped AF, GD,
-  or companion violations again.
-- The remaining skill checklists contain only JR detection plus disable-reason
-  judgment.
-- Lint runtime is benchmarked before and after each batch, with a rollback
-  threshold recorded in the implementation plan.
+  fixtures for each implemented language.
+- Coverage claims are proven by repository-level integration fixtures, not
+  registration metadata alone.
+- Coverage fixtures include mixed supported and unsupported frameworks in one
+  language and prove file- and capability-level fallback.
+- Missing tools, disabled rules, excluded paths, unsupported frameworks, and
+  unknown languages fall back to the review skill.
+- Every GD and companion diagnostic is actionable without loading the full
+  review skill.
+- Phase benchmarks record cold and warm runtime, package size, and relevant
+  compiler or parser cost.
+- A repository cannot become less protected when a deterministic detector is
+  moved out of the always-loaded skill.
 
-## Current Oxlint constraints used by this design
+## Tool constraints used by this design
 
-- [JS plugins](https://oxc.rs/docs/guide/usage/linter/js-plugins) are
-  ESLint-compatible and support AST traversal, scope analysis, diagnostics,
-  fixes, and suggestions, but not type-aware custom rules.
-- [Automatic fixes](https://oxc.rs/docs/guide/usage/linter/automatic-fixes)
+- [Oxlint JS plugins](https://oxc.rs/docs/guide/usage/linter/js-plugins) support
+  AST traversal, scope analysis, diagnostics, and fixes, but custom rules do
+  not receive TypeScript type information.
+- [Oxlint automatic fixes](https://oxc.rs/docs/guide/usage/linter/automatic-fixes)
   distinguish safe fixes, suggestions, and dangerous fixes.
-- [Type-aware linting](https://oxc.rs/docs/guide/usage/linter/type-aware.html)
-  is available for supported native TypeScript rules.
-- [Multi-file analysis](https://oxc.rs/docs/guide/usage/linter/multi-file-analysis)
-  is implemented by Oxlint core for supported rules. That does not give a
-  local JS plugin a general project graph or multi-file fixer.
-- The [current rules list](https://oxc.rs/docs/guide/usage/linter/rules)
-  includes native coverage used by this inventory, including `curly`,
-  `func-style`, `id-denylist`, `max-lines`, `max-lines-per-function`,
-  `react/no-multi-comp`, `react/jsx-handler-names`,
-  `typescript/consistent-type-definitions`, and
-  `typescript/no-unnecessary-type-assertion`.
+- [Pylint custom checkers](https://pylint.readthedocs.io/en/latest/how_tos/custom_checkers.html)
+  support raw, token, and Astroid analysis.
+- [Clippy configuration](https://doc.rust-lang.org/stable/clippy/lint_configuration.html)
+  supplies native function-length and disallowed-name rules.
+- [Dylint](https://github.com/trailofbits/dylint) runs custom Rust lint libraries,
+  but the [rustc lint API](https://doc.rust-lang.org/nightly/nightly-rustc/rustc_lint/index.html)
+  is completely unstable.
+- [Stylelint plugins](https://stylelint.io/developer-guide/plugins/) support
+  custom rules and safe fixes.
+- [Tree-sitter parsers](https://tree-sitter.github.io/tree-sitter/using-parsers/)
+  provide a common syntax-tree interface for universal adapters.
+- [ShellCheck](https://github.com/koalaman/shellcheck/blob/master/shellcheck.1.md)
+  exposes built-in and optional checks but no external custom-rule plugin API.

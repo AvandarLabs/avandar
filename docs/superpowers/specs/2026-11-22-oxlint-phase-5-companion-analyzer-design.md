@@ -1,4 +1,4 @@
-# Oxlint phase 5 companion analyzer design
+# Oxlint phase 5 language-specific companion analyzer design
 
 Implementation plan:
 `docs/superpowers/plans/2026-11-22-oxlint-phase-5-companion-analyzer.md`.
@@ -8,63 +8,127 @@ Inventory:
 
 ## Intent
 
-Phase 5 moves every remaining deterministic convention into a companion
-analyzer because Oxlint and Stylelint plugins cannot directly own its required
-evidence. The companion covers Avandar-specific type analysis, paths and
-repository graphs, Git diffs, and SQL without pretending those checks are
-single-file lint rules.
+Phase 5 builds the reusable companion host and the analyzers whose conventions
+are truly language- or ecosystem-specific. The first packs cover
+TypeScript/JavaScript repository structure and type-aware Avandar rules, plus
+SQL syntax and migration evidence. Generic cross-language rules stay out of
+these packs and move to Phase 6.
 
 ## Goals
 
-- Add a programmatic companion API and the `avandar-lint` executable to
-  `@avandar/lint`.
-- Build each expensive repository fact once and share it across rules.
-- Report diagnostics through the same identifiers and remediation contract as
-  phases 3 and 4.
-- Integrate the companion into root `pnpm lint` after Oxlint and Stylelint.
-- Remove every shipped companion detector from `avandar-code-review`.
-- Measure runtime, memory, and package installation cost before deciding
-  whether the companion must split into a second package.
+- Add a programmatic companion API and the `avandar-lint check` command to
+  `@avandar/lint` under `packages/lint/core`.
+- Add explicit repository configuration for enabled languages and
+  language-specific packs.
+- Build expensive facts once and share them across rules.
+- Implement TypeScript/JavaScript repository, compiler, path, package, test,
+  and Playwright rules.
+- Implement SQL parser, migration, schema, and Git-diff rules.
+- Report through the same canonical IDs and remediation contract as Phases 3
+  and 4.
+- Integrate the companion into root `pnpm lint`.
+- Move covered companion detectors into the on-demand skill fallback.
+- Measure runtime, memory, and installation cost.
 
 ## Non-goals
 
-- Phase 5 does not reimplement current-file rules already owned by Oxlint or
+- Phase 5 does not reimplement current-file rules owned by Oxlint or
   Stylelint.
+- Phase 5 does not implement generic Python, Rust, Go, Ruby, Java, Kotlin,
+  Swift, C-family, shell, YAML, or JSONC coverage.
+- Phase 5 does not put generic file length, function length, comment,
+  identifier, loop, or test rules inside the TypeScript pack.
+- Phase 5 does not implement RP-16B generic E2E mutation analysis.
 - Phase 5 does not turn JR candidates into deterministic violations.
 - Phase 5 does not mutate production data, run migrations, or reset a database.
-- Phase 5 does not add interactive prompts to lint.
 
-## Approaches
+## Selected architecture
 
-### Selected: one package with a lazily loaded companion entry
+### One host with explicit language-specific packages
 
-Add `@avandar/lint/companion` and the `avandar-lint` binary to
-`packages/node/lint`. Compiler, graph, Git, and SQL dependencies load only when
-the companion entry runs. One package preserves stable rule IDs, one diagnostic
-schema, one documentation tree, and one release version.
+`@avandar/lint/companion` exports the host and shared contracts. The
+TypeScript and SQL packages export pack registrations and lazy evidence
+providers:
 
-### Conditional fallback: split only the companion
+```text
+packages/lint/core/src/companion/
+  host/
+  context/
+packages/lint/typescript/src/companion/
+packages/lint/sql/src/companion/
+```
 
-If `pnpm pack` shows that phase 5 adds more than 10 MiB compressed, or if its
-runtime dependencies install native platform artifacts, split the companion to
-`@avandar/lint-companion`. The new package depends on `@avandar/lint` for rule
-metadata and diagnostics. This is a measured escape hatch, not the default
-architecture.
+Phase 6 adds `packages/lint/generic` without changing the host API. Keeping
+generic rules in their own package prevents TypeScript directory conventions
+from leaking into Python or Rust repositories. The host resolves configured,
+installed pack packages lazily and reports a missing package as a coverage gap.
 
-### Rejected: private script or app
+### Repository configuration
 
-A root script hides a reusable lint interface outside the package release
-system. An app creates a false deployment boundary and cannot be consumed as a
-normal package API.
+Repositories configure the host in `avandar-lint.config.json`:
+
+```json
+{
+  "$schema": "./node_modules/@avandar/lint/avandar-lint.schema.json",
+  "languages": ["typescript", "javascript", "sql"],
+  "packs": ["typescript", "sql"]
+}
+```
+
+`languages` controls which generic language coverage may apply once Phase 6 is
+installed. `packs` opts into truly language-specific conventions. A repository
+can therefore enable Python generic rules later without inheriting TypeScript
+file or directory rules.
+
+Unknown keys, language IDs, pack IDs, or rule IDs are configuration errors.
+Detected supported source that is not listed remains `fallback` in the
+coverage report rather than silently passing.
+
+### Fixed package boundaries
+
+The core host, TypeScript implementation, and SQL implementation remain
+separate packages regardless of measured size. This keeps language parsers and
+compiler dependencies out of repositories that do not enable them. All npm
+packages under `packages/lint` share one fixed release group and depend on
+`@avandar/lint` for the catalog, diagnostics, coverage, and host contracts.
+
+## CLI contract
+
+Phase 5 extends the Phase 3 root CLI with two actions:
+
+```text
+avandar-lint check [PATH]... [--fix] [--format stylish|agent|json]
+avandar-lint coverage [PATH]... [--format stylish|agent|json]
+```
+
+A bare root invocation in an interactive terminal opens the action menu. A
+bare unattended root fails promptly with full usage and an exact
+`avandar-lint check .` recovery command. A bare action in a terminal starts its
+full wizard and offers paths, format, `--fix` where applicable, and visible
+defaults. Fully explicit actions never prompt. Root and subcommand help take
+precedence over configuration, dependency checks, prompts, and repository
+access.
+
+`check` announces work on stderr before analysis starts. JSON stdout contains
+only the result. Errors use the shared CLI error and recovery shape. The
+command is noninteractive once an action and paths are supplied. Root
+`pnpm lint` always invokes the explicit `check` action.
 
 ## Public interface
 
 ```ts
 export type LintFormat = "stylish" | "agent" | "json";
+export type CompanionPackId = "sql" | "typescript";
+export type LanguageId =
+  | "javascript"
+  | "sql"
+  | "typescript";
 
 export interface LintRepositoryOptions {
   readonly cwd: string;
   readonly paths: readonly string[];
+  readonly languages: readonly LanguageId[];
+  readonly packs: readonly CompanionPackId[];
   readonly fix: boolean;
 }
 
@@ -96,96 +160,117 @@ export interface LintDiagnostic {
   readonly fix?: LintFix;
 }
 
+export interface CoverageGap {
+  readonly ruleId: string;
+  readonly languageId: LanguageId;
+  readonly filePath: string;
+  readonly capabilityId?: string;
+  readonly reason: string;
+  readonly recovery?: string;
+}
+
+export type EngineRunResult =
+  | {
+      readonly status: "available";
+      readonly diagnostics: readonly LintDiagnostic[];
+      readonly analyzedPaths: readonly string[];
+      readonly coverageGaps: readonly CoverageGap[];
+    }
+  | {
+      readonly status: "unavailable";
+      readonly reason: string;
+      readonly recovery?: string;
+    };
+
 export function lintRepository(
   options: LintRepositoryOptions,
-): Promise<readonly LintDiagnostic[]>;
+): Promise<EngineRunResult>;
 ```
 
-The executable contract is `avandar-lint [PATH]...`. It supports
-`-h, --help`, `--format stylish|agent|json`, and `--fix`. A bare invocation
-checks the current working directory. Help exits zero before reading repository
-configuration or loading optional analyzers. JSON writes only the result to
-stdout; progress and diagnostics intended for humans use stderr. The command is
-non-interactive and uses nonzero status for findings or operational failure.
-
-`--fix` may apply only companion edits whose exact filesystem or configuration
-change is proven and idempotent. Guided rules remain diagnostics. Normal
-repository lint does not enable speculative edits.
+`--fix` applies only proven, idempotent filesystem or configuration changes.
+Guided rules remain diagnostics. Pack and parser interfaces use the same tagged
+result so a partial parser, unsupported framework, excluded file, or failed
+evidence provider reaches coverage instead of disappearing as an empty
+diagnostic list.
 
 ## Shared repository context
 
-The companion creates one immutable context per run:
+The host creates one immutable context per run:
 
 - a normalized, ignored-path-aware file index;
-- a parsed module and export graph;
-- one TypeScript `Program` and `TypeChecker` for selected projects;
-- one Git diff snapshot when a rule requires changed-file evidence;
-- cached SQL parse results per file;
+- a parsed TypeScript/JavaScript module and export graph;
+- one TypeScript `Program` and `TypeChecker` per selected project;
+- one Git diff snapshot when required;
+- cached SQL documents with source locations;
 - package manifests, exports, Deno import maps, and relevant config files.
 
-Rules declare the evidence they need. The runner does not construct the
-TypeScript program, Git snapshot, or SQL parser unless at least one enabled rule
-requires it.
+Rules declare their evidence. The host does not load a pack, TypeScript
+program, Git snapshot, or SQL parser unless an enabled rule requires it.
 
 ## Rule scope
 
-Phase 5 owns AF-18, AF-21, GD-17, GD-20, GD-28, GD-29, GD-31, and RP-01
-through RP-19.
+Phase 5 owns AF-18, AF-21, the repository-aware subset of GD-21, GD-17, GD-20,
+GD-28, GD-29, GD-31, RP-01 through RP-15, RP-16A, and RP-17 through RP-19.
 
-| Analyzer | Inventory |
+| Pack | Inventory |
 | --- | --- |
-| Filesystem, module graph, tests, and package topology | RP-01 through RP-09, RP-14, RP-16, RP-19 |
-| Type-aware Avandar rules | AF-18, GD-17, GD-20, GD-28, GD-29, GD-31, RP-09, RP-13, RP-15 |
-| Git-diff and migration state | RP-10, RP-11, RP-13, RP-15, RP-18, RP-19 |
-| SQL syntax and dependency graph | AF-21, RP-11, RP-12, RP-17, RP-18 |
+| TypeScript filesystem, module graph, tests, packages, Playwright | RP-01 through RP-09, RP-14, RP-16A, RP-19 |
+| TypeScript type-aware rules | AF-18, repository-aware GD-21, GD-17, GD-20, GD-28, GD-29, GD-31, RP-09, RP-13, RP-15 |
+| SQL and migration state | AF-21, RP-10 through RP-12, RP-17, RP-18 |
+| Shared Git evidence | RP-10, RP-11, RP-13, RP-15, RP-18, RP-19 |
 
-Overlapping rows reuse the same context rather than running a second scan.
-Rules report only violations their evidence proves. For example, RP-15 reports
-a cache-schema omission only when type and serializer evidence proves that a
-serialized shape changed.
+RP-16B moves to the Phase 6 generic pack. Phase 5 Playwright analysis may
+provide reusable framework interfaces, but it cannot claim generic E2E
+coverage.
 
 ## SQL parser gate
 
-Before selecting a parser, run each candidate against all committed declarative
-schema and migration SQL. The selected parser must either parse every file or
-surface unsupported syntax as an explicit analyzer limitation without false
-diagnostics. Record parse coverage, compressed dependency size, native-artifact
-requirements, cold load time, and source-location fidelity.
+Run parser candidates against all committed declarative schema and migration
+SQL. The selected parser must parse every file or surface unsupported syntax as
+an explicit limitation without false diagnostics. Record coverage, compressed
+dependency size, native-artifact requirements, cold load time, and source
+locations.
 
-No regex-only implementation may classify SQL declaration ownership, policy
+Regex-only implementations may not classify SQL declaration ownership, policy
 operations, dependencies, or comment placement.
 
 ## Performance and cache contract
 
-Record cold and five-run warm timings for each analyzer group, peak resident
-memory, TypeScript program construction time, SQL parse time, and complete root
-lint time. Repeated rules must share context. Persistent caches key on tool
-version, configuration, file content, and relevant compiler settings so stale
-facts cannot survive a rule or config change.
+Record cold and five-run warm timings per pack, peak resident memory,
+TypeScript construction time, SQL parse time, and complete root lint time.
+Persistent caches key on tool version, catalog version, configuration, file
+content, and compiler settings.
 
-The final root `pnpm lint` order is Oxlint, Stylelint, companion, then any
-existing advisory diagnostics. Machine-oriented CI output selects a stable
-format explicitly instead of relying on terminal detection.
+Root `pnpm lint` invokes Oxlint, Stylelint, `avandar-lint check`, then existing
+advisory diagnostics. CI selects an explicit format rather than relying on
+terminal detection.
 
 ## Skill handoff
 
-Remove a companion detector from the skill only after its enabled rule passes
-positive, negative, cross-platform path, and repository integration fixtures.
-The skill retains JR-01 through JR-17 and reviews the truthfulness of changed
-disable reasons. It never duplicates a green deterministic scan.
+Coverage for a companion rule becomes `enforced` only after positive,
+negative, cross-platform path, configuration, and repository integration
+fixtures pass. The skill keeps the detector in its on-demand fallback and
+loads it whenever the pack is absent, disabled, or unable to analyze a file.
+
+The always-loaded skill retains JR-01 through JR-17 and the truthfulness review
+for changed disable reasons.
 
 ## Acceptance criteria
 
-- `@avandar/lint/companion` and `avandar-lint` expose the documented API and
-  CLI behavior.
-- Every in-scope deterministic rule uses the minimum required evidence and
-  shares repository context.
-- SQL rules use a parser validated against the complete committed corpus.
+- `@avandar/lint/companion`, `avandar-lint check`, and the configuration schema
+  expose the documented interfaces.
+- `@avandar/lint-typescript/companion` and `@avandar/lint-sql/companion` load
+  only when configured.
+- Generic rule families are absent from the language-specific packs except
+  where a TypeScript or SQL implementation is already owned by an earlier
+  linter phase.
+- Every rule uses minimum evidence and shared repository context.
+- Every pack reports analyzed paths and explicit limitations through
+  `EngineRunResult`; an empty diagnostic list never implies coverage.
+- SQL rules use a parser validated against the committed corpus.
 - JSON output is stable and uncontaminated by progress text.
-- Root lint invokes the companion and returns nonzero when it reports a
-  violation.
-- Shipped companion searches are removed from every review lane.
-- Runtime, memory, cache behavior, compressed package delta, and installation
-  artifacts are measured.
-- The companion splits packages only if the documented size or native-artifact
-  gate is crossed.
+- Root lint returns nonzero for companion findings.
+- Coverage suppresses review only for enabled, proven pack, rule, language,
+  file, and capability outcomes.
+- Runtime, memory, cache behavior, compressed size for each package, and
+  installation artifacts are measured.

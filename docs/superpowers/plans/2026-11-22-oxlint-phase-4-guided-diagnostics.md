@@ -5,14 +5,17 @@
 > superpowers:executing-plans to implement this plan task-by-task. Steps use
 > checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Move every deterministic current-file convention whose repair needs
-judgment into actionable Oxlint or Stylelint diagnostics without adding unsafe
-fixes.
+**Goal:** Move every deterministic TypeScript, JavaScript, JSX, TSX, and CSS
+current-file convention whose repair needs judgment into coverage-gated Oxlint
+or Stylelint diagnostics without adding unsafe fixes.
 
 **Architecture:** Native rules own closed behavior they already implement, and
-`@avandar/lint` supplies the remaining current-file rules. Diagnostics share a
-terse agent-oriented schema and point to package-owned documentation only when
-repair branches. A reason is required for every Avandar rule disable.
+`@avandar/lint-typescript` and `@avandar/lint-css` supply the remaining
+current-file rules while `@avandar/lint` supplies shared diagnostics and
+coverage. Diagnostics share a terse agent-oriented schema and point to
+package-owned documentation only when repair branches. Coverage suppresses
+review only for exact enabled file and capability outcomes, and generic rules
+remain fallback for other languages.
 
 **Tech Stack:** Node 24.x, Oxlint native rules and JavaScript plugins,
 Stylelint plugin API, `@oxlint/plugins`, Vitest, pnpm workspaces.
@@ -22,17 +25,23 @@ Stylelint plugin API, `@oxlint/plugins`, Vitest, pnpm workspaces.
 
 ## Global Constraints
 
-- Phase 4 uses the existing `packages/node/lint` package and adds no companion
-  process.
+- Phase 4 uses the existing core, TypeScript, and CSS packages and adds no
+  companion process.
+- Every coverage claim updates `packages/lint/rules.yaml` and its generated
+  README catalog.
 - A GD rule reports only a deterministic violation and never a candidate.
 - No phase 4 rule is fixable unless its safe AF subset shipped in phase 3.
-- A branching repair points to `packages/node/lint/docs/rules/<rule>.md`.
+- A branching repair points to `packages/lint/docs/rules/<rule>.md`.
 - Every `avandar/*` disable requires a non-empty reason.
+- Before each green root-lint gate, run the newly enabled batch across the
+  complete root lint path set and remediate all diagnostics from that batch.
+  Do not clean unrelated findings.
 - New production behavior follows red-green TDD.
 - Stop and profile a batch whose warm median adds both more than 25 percent
   and more than 2 seconds to the preceding lint baseline.
-- A skill detector is removed only after its replacement is enabled and the
-  complete lint run is green.
+- A skill detector leaves the normal path only after coverage proves its exact
+  rule, language, file, and capability. It remains in the deterministic
+  fallback for missing tools, disabled rules, and other languages.
 
 ## Review Focus
 
@@ -40,8 +49,8 @@ Stylelint plugin API, `@oxlint/plugins`, Vitest, pnpm workspaces.
   Task 1 pins repeated-output size and repair success fixtures.
 - Comment rules must distinguish declarations from detached prose; Task 3
   tests nested exports, overloads, and file headers.
-- Native and custom partial rules must not duplicate diagnostics; Tasks 2, 4,
-  and 5 assert one diagnostic per violation.
+- Native and custom partial rules must not duplicate diagnostics or suppress
+  fallback in another language; Tasks 2, 4, 5, and 6 pin both boundaries.
 - JSX copy and style rules must ignore non-display strings and dynamic styles;
   Task 5 tests logs, errors, IDs, enum values, and computed style values.
 - Disable enforcement must accept supported multiline syntax without allowing
@@ -51,11 +60,14 @@ Stylelint plugin API, `@oxlint/plugins`, Vitest, pnpm workspaces.
 
 | Path | Responsibility |
 | --- | --- |
-| `packages/node/lint/src/shared/diagnosticMessage.ts` | Stable terse diagnostic construction |
-| `packages/node/lint/src/oxlint/rules/*.js` | Guided current-file Oxlint rules |
-| `packages/node/lint/src/stylelint/rules/*.js` | Guided CSS rules and disable enforcement |
-| `packages/node/lint/docs/rules/*.md` | On-demand repair branches and valid exceptions |
-| `packages/node/lint/test/agentOutput.test.ts` | Token size and actionable-output contract |
+| `packages/lint/core/src/shared/diagnosticMessage.ts` | Stable terse diagnostic construction |
+| `packages/lint/typescript/src/oxlint/rules/*.js` | Guided current-file Oxlint rules |
+| `packages/lint/css/src/stylelint/rules/*.js` | Guided CSS rules and disable enforcement |
+| `packages/lint/docs/rules/*.md` | On-demand repair branches and valid exceptions |
+| `packages/lint/rules.yaml` | Canonical applicability and Phase 4 owner registrations |
+| `packages/lint/README.md` | Generated complete rule catalog |
+| `packages/lint/core/test/coverage/phase4.test.ts` | Root-config coverage and fallback integration |
+| `packages/lint/core/test/agentOutput.test.ts` | Token size and actionable-output contract |
 | `docs/lint-benchmarks/oxlint-phase-4.md` | Per-batch cold and warm measurements |
 
 ---
@@ -64,17 +76,19 @@ Stylelint plugin API, `@oxlint/plugins`, Vitest, pnpm workspaces.
 
 **Files:**
 
-- Create: `packages/node/lint/src/shared/diagnosticMessage.ts`
-- Create: `packages/node/lint/src/shared/diagnosticMessage.test.ts`
-- Create: `packages/node/lint/src/oxlint/rules/require-disable-reason.js`
-- Create: `packages/node/lint/src/oxlint/rules/require-disable-reason.test.ts`
-- Create: `packages/node/lint/src/stylelint/rules/require-disable-reason.js`
-- Create: `packages/node/lint/src/stylelint/rules/require-disable-reason.test.ts`
-- Create: `packages/node/lint/test/agentOutput.test.ts`
-- Create: `packages/node/lint/docs/rules/README.md`
+- Create: `packages/lint/core/src/shared/diagnosticMessage.ts`
+- Create: `packages/lint/core/src/shared/diagnosticMessage.test.ts`
+- Create: `packages/lint/typescript/src/oxlint/rules/require-disable-reason.js`
+- Create: `packages/lint/typescript/src/oxlint/rules/require-disable-reason.test.ts`
+- Create: `packages/lint/css/src/stylelint/rules/require-disable-reason.js`
+- Create: `packages/lint/css/src/stylelint/rules/require-disable-reason.test.ts`
+- Create: `packages/lint/core/test/agentOutput.test.ts`
+- Create: `packages/lint/docs/rules/README.md`
 - Create: `docs/lint-benchmarks/oxlint-phase-4.md`
-- Modify: `packages/node/lint/src/oxlint/index.js`
-- Modify: `packages/node/lint/src/stylelint/index.js`
+- Modify: `packages/lint/rules.yaml`
+- Modify: `packages/lint/README.md`
+- Modify: `packages/lint/typescript/src/oxlint/index.js`
+- Modify: `packages/lint/css/src/stylelint/index.js`
 - Modify: `.oxlintrc.json`
 - Modify: `stylelint.config.js`
 
@@ -100,7 +114,7 @@ Stylelint plugin API, `@oxlint/plugins`, Vitest, pnpm workspaces.
 
 - [ ] **Step 3: Run the contract tests to verify they fail**
 
-  Run: `pnpm vitest run packages/node/lint/src/shared/diagnosticMessage.test.ts packages/node/lint/test/agentOutput.test.ts packages/node/lint/src/{oxlint,stylelint}/rules/require-disable-reason.test.ts`
+  Run: `pnpm vitest run packages/lint/core/src/shared/diagnosticMessage.test.ts packages/lint/core/test/agentOutput.test.ts packages/lint/typescript/src/oxlint/rules/require-disable-reason.test.ts packages/lint/css/src/stylelint/rules/require-disable-reason.test.ts`
 
   Expected: FAIL because the shared builder and rules are absent.
 
@@ -113,7 +127,10 @@ Stylelint plugin API, `@oxlint/plugins`, Vitest, pnpm workspaces.
 
 - [ ] **Step 5: Enable both disable rules and verify root lint**
 
-  Run: `pnpm --filter @avandar/lint test && pnpm lint`
+  Run root lint once, repair every newly introduced disable-reason diagnostic
+  across the complete linted path set, then rerun the command below.
+
+  Run: `pnpm --filter @avandar/lint test && pnpm --filter @avandar/lint-typescript test && pnpm --filter @avandar/lint-css test && pnpm lint`
 
   Run: `pnpm lint:benchmark --label phase-4-diagnostic-contract`
 
@@ -122,7 +139,7 @@ Stylelint plugin API, `@oxlint/plugins`, Vitest, pnpm workspaces.
 - [ ] **Step 6: Commit**
 
   ```bash
-  git add packages/node/lint .oxlintrc.json stylelint.config.js docs/lint-benchmarks/oxlint-phase-4.md
+  git add packages/lint .oxlintrc.json stylelint.config.js docs/lint-benchmarks/oxlint-phase-4.md
   git commit -m "feat(lint): add guided diagnostic contract"
   ```
 
@@ -130,18 +147,21 @@ Stylelint plugin API, `@oxlint/plugins`, Vitest, pnpm workspaces.
 
 **Files:**
 
-- Create: `packages/node/lint/src/oxlint/nativeGuidedRules.test.ts`
-- Create: `packages/node/lint/docs/rules/function-length.md`
-- Create: `packages/node/lint/docs/rules/file-length.md`
-- Create: `packages/node/lint/docs/rules/named-exports.md`
-- Create: `packages/node/lint/docs/rules/identifier-names.md`
-- Create: `packages/node/lint/docs/rules/function-style.md`
-- Create: `packages/node/lint/docs/rules/object-type-style.md`
-- Create: `packages/node/lint/docs/rules/explicit-any.md`
-- Create: `packages/node/lint/docs/rules/module-boundary-types.md`
-- Create: `packages/node/lint/docs/rules/imperative-syntax.md`
-- Create: `packages/node/lint/docs/rules/one-component-per-file.md`
-- Create: `packages/node/lint/docs/rules/test-assertions.md`
+- Create: `packages/lint/typescript/src/oxlint/nativeGuidedRules.test.ts`
+- Create: `packages/lint/docs/rules/function-length.md`
+- Create: `packages/lint/docs/rules/file-length.md`
+- Create: `packages/lint/docs/rules/named-exports.md`
+- Create: `packages/lint/docs/rules/identifier-names.md`
+- Create: `packages/lint/docs/rules/function-style.md`
+- Create: `packages/lint/docs/rules/object-type-style.md`
+- Create: `packages/lint/docs/rules/explicit-any.md`
+- Create: `packages/lint/docs/rules/module-boundary-types.md`
+- Create: `packages/lint/docs/rules/imperative-syntax.md`
+- Create: `packages/lint/docs/rules/class-declarations.md`
+- Create: `packages/lint/docs/rules/one-component-per-file.md`
+- Create: `packages/lint/docs/rules/test-assertions.md`
+- Modify: `packages/lint/rules.yaml`
+- Modify: `packages/lint/README.md`
 - Modify: `.oxlintrc.json`
 - Modify: `docs/lint-benchmarks/oxlint-phase-4.md`
 
@@ -149,19 +169,20 @@ Stylelint plugin API, `@oxlint/plugins`, Vitest, pnpm workspaces.
 
 - Consumes: Task 1 diagnostic and documentation contract.
 - Produces: Native enforcement for GD-06 through GD-10, GD-12 through GD-14,
-  GD-19, and native subsets of GD-22, GD-23, and GD-25.
+  GD-19, native subsets of GD-22, GD-23, and GD-25, plus GD-32.
 
 - [ ] **Step 1: Write failing native-rule configuration fixtures**
 
   Pin file and function exclusions, the exact closed identifier denylist,
   handler positions, function-style exceptions, type-definition behavior,
-  explicit-any and boundary behavior, restricted loop and class syntax,
+  explicit-any and boundary behavior, restricted loop syntax, class
+  declarations with reasoned exceptions,
   component counting, and meaningful assertion detection. Assert one diagnostic
   and no fix for each invalid fixture.
 
 - [ ] **Step 2: Run the fixtures to verify current config fails them**
 
-  Run: `pnpm vitest run packages/node/lint/src/oxlint/nativeGuidedRules.test.ts`
+  Run: `pnpm vitest run packages/lint/typescript/src/oxlint/nativeGuidedRules.test.ts`
 
   Expected: FAIL because the rules or required options are not enabled.
 
@@ -172,7 +193,10 @@ Stylelint plugin API, `@oxlint/plugins`, Vitest, pnpm workspaces.
 
 - [ ] **Step 4: Run tests, lint, and benchmark**
 
-  Run: `pnpm vitest run packages/node/lint/src/oxlint/nativeGuidedRules.test.ts && pnpm lint`
+  Run root lint once, remediate every diagnostic introduced by this native
+  batch across the complete linted path set, then rerun the command below.
+
+  Run: `pnpm vitest run packages/lint/typescript/src/oxlint/nativeGuidedRules.test.ts && pnpm lint`
 
   Run: `pnpm lint:benchmark --label phase-4-native-guided-rules`
 
@@ -181,7 +205,7 @@ Stylelint plugin API, `@oxlint/plugins`, Vitest, pnpm workspaces.
 - [ ] **Step 5: Commit**
 
   ```bash
-  git add .oxlintrc.json packages/node/lint/src/oxlint/nativeGuidedRules.test.ts packages/node/lint/docs/rules docs/lint-benchmarks/oxlint-phase-4.md
+  git add .oxlintrc.json packages/lint docs/lint-benchmarks/oxlint-phase-4.md
   git commit -m "feat(lint): enable native guided diagnostics"
   ```
 
@@ -189,22 +213,29 @@ Stylelint plugin API, `@oxlint/plugins`, Vitest, pnpm workspaces.
 
 **Files:**
 
-- Create: `packages/node/lint/src/oxlint/rules/no-comment-em-dash.js`
-- Create: `packages/node/lint/src/oxlint/rules/public-documentation.js`
-- Create: `packages/node/lint/src/oxlint/rules/no-main-export-file-header.js`
-- Create: `packages/node/lint/src/oxlint/rules/export-key-documentation.js`
+- Create: `packages/lint/typescript/src/oxlint/rules/no-comment-em-dash.js`
+- Create: `packages/lint/typescript/src/oxlint/rules/public-documentation.js`
+- Create: `packages/lint/typescript/src/oxlint/rules/no-main-export-file-header.js`
+- Create: `packages/lint/typescript/src/oxlint/rules/export-key-documentation.js`
 - Create: matching `*.test.ts` beside every rule above
-- Create: `packages/node/lint/docs/rules/comment-punctuation.md`
-- Create: `packages/node/lint/docs/rules/public-documentation.md`
-- Modify: `packages/node/lint/src/oxlint/index.js`
+- Create: `packages/lint/css/src/stylelint/rules/no-comment-em-dash.js`
+- Create: `packages/lint/css/src/stylelint/rules/no-comment-em-dash.test.ts`
+- Create: `packages/lint/docs/rules/comment-punctuation.md`
+- Create: `packages/lint/docs/rules/public-documentation.md`
+- Modify: `packages/lint/typescript/src/oxlint/index.js`
+- Modify: `packages/lint/css/src/stylelint/index.js`
+- Modify: `packages/lint/rules.yaml`
+- Modify: `packages/lint/README.md`
 - Modify: `.oxlintrc.json`
+- Modify: `stylelint.config.js`
 - Modify: `docs/lint-benchmarks/oxlint-phase-4.md`
 
 **Interfaces:**
 
 - Consumes: Task 1 diagnostic builder.
-- Produces: GD-01 and GD-03 through GD-05. Existing comment-aware `max-len`
-  continues to own GD-02.
+- Produces: GD-01 and GD-03 through GD-05 for TS/JS, CSS coverage for GD-01,
+  and no non-TS coverage claim. Existing comment-aware `max-len` continues to
+  own TS/JS GD-02.
 
 - [ ] **Step 1: Write failing valid and invalid fixtures**
 
@@ -215,7 +246,7 @@ Stylelint plugin API, `@oxlint/plugins`, Vitest, pnpm workspaces.
 
 - [ ] **Step 2: Run the four rule tests to verify they fail**
 
-  Run: `pnpm vitest run packages/node/lint/src/oxlint/rules/{no-comment-em-dash,public-documentation,no-main-export-file-header,export-key-documentation}.test.ts`
+  Run: `pnpm vitest run packages/lint/typescript/src/oxlint/rules/{no-comment-em-dash,public-documentation,no-main-export-file-header,export-key-documentation}.test.ts packages/lint/css/src/stylelint/rules/no-comment-em-dash.test.ts`
 
   Expected: FAIL because the rules are absent.
 
@@ -226,7 +257,11 @@ Stylelint plugin API, `@oxlint/plugins`, Vitest, pnpm workspaces.
 
 - [ ] **Step 4: Run package tests, lint, and benchmark**
 
-  Run: `pnpm --filter @avandar/lint test && pnpm lint`
+  Run root lint once, remediate every GD-01 through GD-05 diagnostic introduced
+  by this batch across the complete linted path set, then rerun the command
+  below.
+
+  Run: `pnpm --filter @avandar/lint-typescript test && pnpm --filter @avandar/lint-css test && pnpm lint`
 
   Run: `pnpm lint:benchmark --label phase-4-comment-diagnostics`
 
@@ -235,7 +270,7 @@ Stylelint plugin API, `@oxlint/plugins`, Vitest, pnpm workspaces.
 - [ ] **Step 5: Commit**
 
   ```bash
-  git add packages/node/lint .oxlintrc.json docs/lint-benchmarks/oxlint-phase-4.md
+  git add packages/lint .oxlintrc.json stylelint.config.js docs/lint-benchmarks/oxlint-phase-4.md
   git commit -m "feat(lint): add comment diagnostics"
   ```
 
@@ -243,16 +278,18 @@ Stylelint plugin API, `@oxlint/plugins`, Vitest, pnpm workspaces.
 
 **Files:**
 
-- Create: `packages/node/lint/src/oxlint/rules/helper-declaration-order.js`
-- Create: `packages/node/lint/src/oxlint/rules/no-double-assertion.js`
-- Create: `packages/node/lint/src/oxlint/rules/prefer-string-union.js`
-- Create: `packages/node/lint/src/oxlint/rules/name-large-inline-object-type.js`
-- Create: `packages/node/lint/src/oxlint/rules/function-signature-shape.js`
-- Create: `packages/node/lint/src/oxlint/rules/require-imperative-reason.js`
+- Create: `packages/lint/typescript/src/oxlint/rules/helper-declaration-order.js`
+- Create: `packages/lint/typescript/src/oxlint/rules/no-double-assertion.js`
+- Create: `packages/lint/typescript/src/oxlint/rules/prefer-string-union.js`
+- Create: `packages/lint/typescript/src/oxlint/rules/name-large-inline-object-type.js`
+- Create: `packages/lint/typescript/src/oxlint/rules/function-signature-shape.js`
+- Create: `packages/lint/typescript/src/oxlint/rules/require-imperative-reason.js`
 - Create: matching `*.test.ts` beside every rule above
-- Create: one matching Markdown page under `packages/node/lint/docs/rules/` for
+- Create: one matching Markdown page under `packages/lint/docs/rules/` for
   each rule above
-- Modify: `packages/node/lint/src/oxlint/index.js`
+- Modify: `packages/lint/rules.yaml`
+- Modify: `packages/lint/README.md`
+- Modify: `packages/lint/typescript/src/oxlint/index.js`
 - Modify: `.oxlintrc.json`
 - Modify: `docs/lint-benchmarks/oxlint-phase-4.md`
 
@@ -266,12 +303,14 @@ Stylelint plugin API, `@oxlint/plugins`, Vitest, pnpm workspaces.
 
   Pin dependency order exceptions, double-assertion syntax, string-only enums,
   four-property inline object types, positional and one-property options
-  signatures, allowed parameter nouns, one-use options aliases, and reasoned
-  imperative disables. Assert no duplicates with Task 2 native rules.
+  signatures whose complete decision is current-file local, allowed parameter
+  nouns, one-use options aliases, and reasoned imperative disables. Assert no
+  duplicates with Task 2 native rules and leave call-site or public-API
+  evidence for Phase 5.
 
 - [ ] **Step 2: Run the six rule tests to verify they fail**
 
-  Run: `pnpm vitest run packages/node/lint/src/oxlint/rules`
+  Run: `pnpm vitest run packages/lint/typescript/src/oxlint/rules`
 
   Expected: FAIL for the new rule IDs.
 
@@ -282,7 +321,10 @@ Stylelint plugin API, `@oxlint/plugins`, Vitest, pnpm workspaces.
 
 - [ ] **Step 4: Run package tests, lint, and benchmark**
 
-  Run: `pnpm --filter @avandar/lint test && pnpm lint`
+  Run root lint once, remediate every API-shape diagnostic introduced by this
+  batch across the complete linted path set, then rerun the command below.
+
+  Run: `pnpm --filter @avandar/lint-typescript test && pnpm lint`
 
   Run: `pnpm lint:benchmark --label phase-4-typescript-diagnostics`
 
@@ -291,7 +333,7 @@ Stylelint plugin API, `@oxlint/plugins`, Vitest, pnpm workspaces.
 - [ ] **Step 5: Commit**
 
   ```bash
-  git add packages/node/lint .oxlintrc.json docs/lint-benchmarks/oxlint-phase-4.md
+  git add packages/lint .oxlintrc.json docs/lint-benchmarks/oxlint-phase-4.md
   git commit -m "feat(lint): add API shape diagnostics"
   ```
 
@@ -299,20 +341,22 @@ Stylelint plugin API, `@oxlint/plugins`, Vitest, pnpm workspaces.
 
 **Files:**
 
-- Create: `packages/node/lint/src/oxlint/rules/no-jsx-render-helper.js`
-- Create: `packages/node/lint/src/oxlint/rules/named-effect-callback.js`
-- Create: `packages/node/lint/src/oxlint/rules/no-tautological-test.js`
-- Create: `packages/node/lint/src/oxlint/rules/translated-display-copy.js`
-- Create: `packages/node/lint/src/oxlint/rules/no-translation-function-escape.js`
-- Create: `packages/node/lint/src/oxlint/rules/no-stateless-create-module.js`
-- Create: `packages/node/lint/src/oxlint/rules/static-ui-styles.js`
+- Create: `packages/lint/typescript/src/oxlint/rules/no-jsx-render-helper.js`
+- Create: `packages/lint/typescript/src/oxlint/rules/named-effect-callback.js`
+- Create: `packages/lint/typescript/src/oxlint/rules/no-tautological-test.js`
+- Create: `packages/lint/typescript/src/oxlint/rules/translated-display-copy.js`
+- Create: `packages/lint/typescript/src/oxlint/rules/no-translation-function-escape.js`
+- Create: `packages/lint/typescript/src/oxlint/rules/no-stateless-create-module.js`
+- Create: `packages/lint/typescript/src/oxlint/rules/static-ui-styles.js`
 - Create: matching `*.test.ts` beside every rule above
-- Create: `packages/node/lint/src/stylelint/rules/no-tailwind-directives.js`
-- Create: `packages/node/lint/src/stylelint/rules/no-tailwind-directives.test.ts`
-- Create: one matching Markdown page under `packages/node/lint/docs/rules/` for
+- Create: `packages/lint/css/src/stylelint/rules/no-tailwind-directives.js`
+- Create: `packages/lint/css/src/stylelint/rules/no-tailwind-directives.test.ts`
+- Create: one matching Markdown page under `packages/lint/docs/rules/` for
   each rule family above
-- Modify: `packages/node/lint/src/oxlint/index.js`
-- Modify: `packages/node/lint/src/stylelint/index.js`
+- Modify: `packages/lint/rules.yaml`
+- Modify: `packages/lint/README.md`
+- Modify: `packages/lint/typescript/src/oxlint/index.js`
+- Modify: `packages/lint/css/src/stylelint/index.js`
 - Modify: `.oxlintrc.json`
 - Modify: `stylelint.config.js`
 - Modify: `docs/lint-benchmarks/oxlint-phase-4.md`
@@ -333,7 +377,7 @@ Stylelint plugin API, `@oxlint/plugins`, Vitest, pnpm workspaces.
 
 - [ ] **Step 2: Run the new rule tests to verify they fail**
 
-  Run: `pnpm vitest run packages/node/lint/src/{oxlint,stylelint}/rules`
+  Run: `pnpm vitest run packages/lint/typescript/src/oxlint/rules packages/lint/css/src/stylelint/rules`
 
   Expected: FAIL for the new rule IDs.
 
@@ -345,7 +389,11 @@ Stylelint plugin API, `@oxlint/plugins`, Vitest, pnpm workspaces.
 
 - [ ] **Step 4: Run package tests, lint, and benchmark**
 
-  Run: `pnpm --filter @avandar/lint test && pnpm lint`
+  Run root lint once, remediate every React, test, localization, module, and
+  static-style diagnostic introduced by this batch across the complete linted
+  path set, then rerun the command below.
+
+  Run: `pnpm --filter @avandar/lint-typescript test && pnpm --filter @avandar/lint-css test && pnpm lint`
 
   Run: `pnpm lint:benchmark --label phase-4-ui-test-diagnostics`
 
@@ -354,25 +402,27 @@ Stylelint plugin API, `@oxlint/plugins`, Vitest, pnpm workspaces.
 - [ ] **Step 5: Commit**
 
   ```bash
-  git add packages/node/lint .oxlintrc.json stylelint.config.js docs/lint-benchmarks/oxlint-phase-4.md
+  git add packages/lint .oxlintrc.json stylelint.config.js docs/lint-benchmarks/oxlint-phase-4.md
   git commit -m "feat(lint): add UI and test diagnostics"
   ```
 
-### Task 6: Lint-first remediation and review-skill pruning
+### Task 6: Lint-first remediation and coverage-gated skill handoff
 
 **Files:**
 
 - Modify: `agent-skills/public-skills/skills/avandar-code-review/SKILL.md`
 - Modify: Relevant files under
   `agent-skills/public-skills/skills/avandar-code-review/docs/code-reviews/`
+- Create: `packages/lint/core/test/coverage/phase4.test.ts`
 - Modify: `docs/code-reviews/extra-checklist.md`
 - Modify: `docs/lint-benchmarks/oxlint-phase-4.md`
 
 **Interfaces:**
 
 - Consumes: Every enabled phase 4 rule and its package documentation.
-- Produces: A lint-first review skill containing JR detection, phase 5
-  carryover, and changed-disable-reason judgment only.
+- Produces: A lint-first review skill that skips proven TS/JS/CSS outcomes, loads
+  fallback for uncovered languages and configurations, retains Phase 5
+  carryover, and judges changed disable reasons.
 
 - [ ] **Step 1: Load rule-writing and skill-writing instructions**
 
@@ -386,19 +436,34 @@ Stylelint plugin API, `@oxlint/plugins`, Vitest, pnpm workspaces.
   provide enough information as a failing agent-output fixture before changing
   its contract.
 
-- [ ] **Step 3: Remove only shipped phase 4 detectors from the skill**
+- [ ] **Step 3: Move shipped Phase 4 detectors behind coverage gating**
 
-  Remove enabled GD searches from full review, focused packs, find lanes,
-  common checks, phase checklists, library checklists, and repo-local
-  duplicates. Preserve JR-01 through JR-17 and phase 5 rows GD-17, GD-20,
-  GD-28, GD-29, and GD-31. Add the lint-first remediation protocol and review
-  only new or changed disable reasons.
+  Remove enabled GD prose from always-loaded full review, focused packs, find
+  lanes, common checks, and phase checklists. Preserve each deterministic
+  detector under its canonical ID in the fallback checklist. Preserve JR-01
+  through JR-17 and Phase 5 rows GD-17, GD-20, repository-aware GD-21, GD-28,
+  GD-29, and GD-31. Review only new or changed disable reasons after lint is
+  green.
 
-- [ ] **Step 4: Run complete verification and final benchmark**
+- [ ] **Step 4: Prove mixed-language coverage behavior**
+
+  Seed the same generic violation in TypeScript, Python, and Rust fixtures.
+  Assert the configured TypeScript rule is `enforced`, while Python and Rust
+  remain `fallback`. Disable the Oxlint plugin and assert TypeScript returns to
+  fallback. Assert CSS reports only GD-01 and does not claim GD-02. Add two
+  TypeScript test files using supported and unknown framework capabilities and
+  assert that the unknown capability remains fallback without hiding the
+  enforced file.
+
+- [ ] **Step 5: Run complete verification and final benchmark**
 
   Run: `pnpm --filter @avandar/lint test && pnpm --filter @avandar/lint type-check && pnpm --filter @avandar/lint build`
 
-  Run: `.github/scripts/verify-packages.sh`
+  Run: `pnpm --filter @avandar/lint-typescript test && pnpm --filter @avandar/lint-typescript type-check && pnpm --filter @avandar/lint-typescript build`
+
+  Run: `pnpm --filter @avandar/lint-css test && pnpm --filter @avandar/lint-css type-check && pnpm --filter @avandar/lint-css build`
+
+  Run: `pnpm verify:packages`
 
   Run: `pnpm lint`
 
@@ -406,9 +471,9 @@ Stylelint plugin API, `@oxlint/plugins`, Vitest, pnpm workspaces.
 
   Expected: all checks PASS within the stop threshold.
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 6: Commit**
 
   ```bash
-  git add .oxlintrc.json stylelint.config.js packages/node/lint agent-skills/public-skills/skills/avandar-code-review docs/code-reviews docs/lint-benchmarks/oxlint-phase-4.md
-  git commit -m "refactor(review): replace guided convention searches with lint"
+  git add .oxlintrc.json stylelint.config.js packages/lint agent-skills/public-skills/skills/avandar-code-review docs/code-reviews docs/lint-benchmarks/oxlint-phase-4.md
+  git commit -m "refactor(review): gate guided checks on lint coverage"
   ```
