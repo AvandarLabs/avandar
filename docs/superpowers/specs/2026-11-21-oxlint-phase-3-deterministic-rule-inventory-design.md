@@ -1,7 +1,10 @@
-# Oxlint phase 3 deterministic rule inventory
+# Oxlint phases 3 through 5 deterministic rule inventory
 
-Implementation plan:
-`docs/superpowers/plans/2026-11-21-oxlint-phase-3-deterministic-review-rules.md`.
+Implementation plans:
+
+- `docs/superpowers/plans/2026-11-22-oxlint-phase-3-safe-fixers.md`
+- `docs/superpowers/plans/2026-11-22-oxlint-phase-4-guided-diagnostics.md`
+- `docs/superpowers/plans/2026-11-22-oxlint-phase-5-companion-analyzer.md`
 
 ## Outcome
 
@@ -63,16 +66,39 @@ the normal format path.
 | Need | Owner | Reason |
 | --- | --- | --- |
 | Existing JavaScript or TypeScript rule | Native Oxlint first | Rust implementation and established semantics |
-| New current-file JavaScript, TypeScript, or TSX rule | `oxlint-plugin-avandar` | ESLint-compatible JS plugins support AST traversal, scope analysis, diagnostics, and fixers |
+| New current-file JavaScript, TypeScript, or TSX rule | `@avandar/lint/oxlint` | ESLint-compatible JS plugins support AST traversal, scope analysis, diagnostics, and fixers |
 | Type-aware rule already supplied by Oxlint | Native type-aware Oxlint | Custom JS plugins do not receive TypeScript type information |
 | Avandar-specific type-aware rule | Companion TypeScript analyzer | It needs the program and type checker outside the JS plugin API |
 | File layout, import graph, Git diff, or multi-file convention | Companion repo analyzer | A custom JS rule cannot rename files or safely coordinate edits across files |
 | CSS convention | Stylelint or a Stylelint Avandar plugin | CSS is already parsed and linted by Stylelint in this repo |
 | SQL convention | SQL-aware companion analyzer | Oxlint does not parse SQL |
 
-The local plugin is named `oxlint-plugin-avandar`, not
-`eslint-plugin-avandar`. Its API is ESLint-compatible, but ESLint is no longer
-the repo's linter.
+## Package home
+
+All three enforcement engines live in one public Node tooling package:
+`packages/node/lint`, published as `@avandar/lint`.
+
+| Surface | Package entry |
+| --- | --- |
+| Oxlint-compatible JavaScript plugin | `@avandar/lint/oxlint` |
+| Stylelint plugin pack | `@avandar/lint/stylelint` |
+| Companion programmatic API | `@avandar/lint/companion` |
+| Companion executable | `avandar-lint` |
+
+This package belongs under `packages/node`, not `packages/shared`. The tooling
+uses Node, filesystem access, compiler APIs, and linter runtimes. It is not
+browser- or Deno-reachable shared code. It is also not an app because it has no
+deployed service, independent operational lifecycle, or user-facing runtime.
+
+One package keeps rule identifiers, diagnostics, documentation, fixtures, and
+versions together. Separate packages for each engine would duplicate that
+surface and make coordinated rules release independently. If the phase 5 SQL
+parser creates a material install-size problem, the companion may later split
+into `@avandar/lint-companion` while depending on `@avandar/lint`; phase 5 must
+measure the packed size before making that split.
+
+The Oxlint entry is not named `eslint-plugin-avandar`. Its API remains
+ESLint-compatible, but ESLint is no longer the repo's linter.
 
 ## AF inventory: deterministic safe fixes
 
@@ -256,7 +282,7 @@ Each guided rule follows this message contract:
 - The diagnostic gives the immediate repair objective in one short sentence.
 - It does not embed a long tutorial or every exception.
 - If repair branches, it ends with one repo-relative documentation path under
-  `docs/lint-rules/`.
+  `packages/node/lint/docs/rules/`.
 - The rule documentation contains examples, exceptions, disable criteria, and
   links to the canonical convention. It is loaded only when needed.
 - A diagnostic whose resolution is obvious from its local facts needs no
@@ -279,30 +305,25 @@ doc path, and a terse message whose rule metadata owns the path. The selected
 format must be visible in Oxlint's `agent` formatter and produce the smallest
 output that still lets an agent repair every fixture correctly.
 
-## Scope of phase 3
+## Phase allocation
 
-Phase 3 includes:
+The repair boundary and the engine boundary are independent. Phases 3 and 4
+contain only rules that Oxlint or Stylelint can own directly. Every rule that
+needs a compiler program, repository graph, filesystem tree, Git diff, or SQL
+parser moves to the companion in phase 5.
 
-- native AF and GD rules that can be enabled now;
-- current-file AF and GD rules in `oxlint-plugin-avandar`;
-- the lint-remediation message and documentation contract;
-- high-value RP rules in a companion repo analyzer, beginning with module and
-  test layout because those currently consume dedicated focused packs;
-- Stylelint rules for deterministic CSS conventions;
-- deletion of every shipped AF, GD, and RP detector from all skill lanes;
-- a measured before-and-after benchmark for lint runtime and review prompt
-  size.
+| Phase | Owns | Inventory |
+| --- | --- | --- |
+| 3: safe fixers | Package foundation, native Oxlint safe rules, current-file Oxlint fixers, Stylelint fixers, and removal of shipped AF searches from review | AF-01 through AF-17, AF-19, AF-20. AF-03 and AF-05 may use native type-aware Oxlint because no companion is required |
+| 4: guided diagnostics | Deterministic current-file Oxlint and Stylelint gates whose repairs require judgment, the on-demand documentation contract, disable reasons, and removal of shipped GD searches from review | GD-01 through GD-16, GD-18, GD-19, GD-21 through GD-27, GD-30 |
+| 5: companion analyzer | Type-aware Avandar rules, path and repository graph rules, Git-diff rules, SQL rules, and every remaining deterministic detector | AF-18, AF-21, GD-17, GD-20, GD-28, GD-29, GD-31, RP-01 through RP-19 |
 
-Phase 3 does not include speculative type-aware custom JS rules. Current
-Oxlint JS plugins do not expose type information. Native type-aware rules may
-be enabled after a cold and warm benchmark. Avandar-specific type-aware rules
-use the companion analyzer until Oxlint provides an appropriate native custom
-extension mechanism.
+JR-01 through JR-17 remain in `avandar-code-review` throughout. A phase
+removes a skill detector only after its enforcing rule is enabled and green.
 
-SQL enforcement is inventoried here but starts only after the TypeScript,
-React, test-layout, and CSS batches prove the architecture. It needs a SQL
-parser and a separate fixture strategy, not an Oxlint rule pretending SQL is
-text.
+Current Oxlint JavaScript plugins do not expose type information. Native
+type-aware Oxlint rules stay in phases 3 or 4 because Oxlint owns them. Only
+Avandar-specific type-aware analysis belongs to the phase 5 companion.
 
 ## Success criteria
 
@@ -310,10 +331,10 @@ text.
   fixtures.
 - `pnpm lint:ts:fix-changed` applies only safe fixes.
 - No normal workflow uses `--fix-suggestions` or `--fix-dangerously`.
-- Every GD and RP diagnostic is actionable without loading the full review
+- Every GD and companion diagnostic is actionable without loading the full review
   skill.
-- A green lint run means focused review packs never search for AF, GD, or
-  shipped RP violations again.
+- A green lint run means focused review packs never search for shipped AF, GD,
+  or companion violations again.
 - The remaining skill checklists contain only JR detection plus disable-reason
   judgment.
 - Lint runtime is benchmarked before and after each batch, with a rollback

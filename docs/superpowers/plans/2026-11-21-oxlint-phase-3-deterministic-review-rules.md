@@ -1,5 +1,12 @@
 # Oxlint phase 3 deterministic review rules Implementation Plan
 
+> **Superseded on 2026-11-22.** This combined plan is retained as historical
+> context. Use the phase-specific plans instead:
+>
+> - `docs/superpowers/plans/2026-11-22-oxlint-phase-3-safe-fixers.md`
+> - `docs/superpowers/plans/2026-11-22-oxlint-phase-4-guided-diagnostics.md`
+> - `docs/superpowers/plans/2026-11-22-oxlint-phase-5-companion-analyzer.md`
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use
 > superpowers:subagent-driven-development (recommended) or
 > superpowers:executing-plans to implement this plan task-by-task. Steps use

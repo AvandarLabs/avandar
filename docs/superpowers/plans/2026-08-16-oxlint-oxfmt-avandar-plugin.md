@@ -1163,15 +1163,18 @@ EOF
 
 ## Phase 3 — Plugin type 2 (fixers) and skill deletion
 
-> **Superseded on 2026-11-21.** Tasks 9 through 20 below are retained as a
+> **Superseded on 2026-11-22.** Tasks 9 through 20 below are retained as a
 > historical planning record and must not be executed.
 > The live review-skill inventory found that the type 1/type 2 split conflated
 > deterministic detection with safe automatic repair. It also assigned unsafe
 > fixers to several rules and assumed every deterministic convention belonged
 > in a current-file JavaScript plugin. Use the current
 > `docs/superpowers/specs/2026-11-21-oxlint-phase-3-deterministic-rule-inventory-design.md`
-> and
-> `docs/superpowers/plans/2026-11-21-oxlint-phase-3-deterministic-review-rules.md`
+> and these phase-specific plans instead:
+>
+> - `docs/superpowers/plans/2026-11-22-oxlint-phase-3-safe-fixers.md`
+> - `docs/superpowers/plans/2026-11-22-oxlint-phase-4-guided-diagnostics.md`
+> - `docs/superpowers/plans/2026-11-22-oxlint-phase-5-companion-analyzer.md`
 > instead.
 
 Do **not** scaffold the plugin or encode a rule until Task 9 is done.
