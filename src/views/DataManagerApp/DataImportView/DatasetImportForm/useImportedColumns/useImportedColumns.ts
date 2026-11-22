@@ -1,9 +1,9 @@
 import { useMemo } from "react";
 import { match } from "ts-pattern";
-import { ImportedDatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
-import { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
+import type { ImportedDatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
+import type { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
-import { DataSourceMetadata } from "../DatasetImportForm.types";
+import type { DataSourceMetadata } from "../DatasetImportForm.types";
 
 function _duckDbColumnsToImportedColumns(
   columns: DuckDbColumnSchema[],

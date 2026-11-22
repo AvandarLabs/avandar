@@ -1,4 +1,5 @@
-import { useMutation, UseMutationResultTuple } from "@avandar/query-hooks";
+import type { UseMutationResultTuple } from "@avandar/query-hooks";
+import { useMutation } from "@avandar/query-hooks";
 import { ConceptClient } from "@/clients/ontology/ConceptClient";
 import { ConceptStatusClient } from "@/clients/ontology/ConceptStatusClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";

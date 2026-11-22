@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
-import { render } from "./SchemaPlanLocalExecutionTestHelpers";
+import type { render } from "./SchemaPlanLocalExecutionTestHelpers";
 
 /**
  * Asserts all actual raw rows remain inside the device throughout outbound

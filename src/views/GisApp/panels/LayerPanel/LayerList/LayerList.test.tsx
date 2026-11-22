@@ -1,6 +1,6 @@
 import { assertIsDefined } from "@avandar/utils";
 import { move } from "@dnd-kit/helpers";
-import { DragDropProvider } from "@dnd-kit/react";
+import type { DragDropProvider } from "@dnd-kit/react";
 import { describe, expect, it, vi } from "vitest";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { fireEvent, render, screen, within } from "@/test-utils";

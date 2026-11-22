@@ -2,7 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useRef } from "react";
 import { vizTypeLabel } from "$/copy/vizTypeLabel";
-import { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import {
   AvaVizConfigs,
   VizTypes,

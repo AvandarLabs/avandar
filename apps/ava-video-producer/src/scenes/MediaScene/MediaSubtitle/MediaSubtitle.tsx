@@ -21,7 +21,7 @@ export function MediaSubtitle({
   cardTitle,
   subtitle,
 }: Readonly<Props>): ReactNode {
-  if (!subtitle) return null;
+  if (!subtitle) {return null;}
   return (
     <p
       className={css.mediaSubtitlep1}

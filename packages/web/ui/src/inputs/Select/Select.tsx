@@ -1,6 +1,7 @@
+import type {
+  SelectProps as MantineSelectProps} from "@mantine/core";
 import {
   Select as MantineSelect,
-  SelectProps as MantineSelectProps,
   useMantineTheme,
 } from "@mantine/core";
 

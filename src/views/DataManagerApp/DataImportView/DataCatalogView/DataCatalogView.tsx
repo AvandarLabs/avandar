@@ -1,8 +1,9 @@
 import { where } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
+import type {
+  BoxProps} from "@mantine/core";
 import {
   Box,
-  BoxProps,
   Button,
   Drawer,
   Group,

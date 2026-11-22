@@ -1,6 +1,6 @@
 import { noop, prop } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
-import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import css from "@/views/GisApp/panels/LayerPanel/LayerList/LayerList.module.css";
 import { makeLayerPanelItemsFromRows } from "@/views/GisApp/panels/LayerPanel/LayerList/makeLayerPanelItemsFromRows";
 import { OrderedLayerRows } from "@/views/GisApp/panels/LayerPanel/LayerList/OrderedLayerRows";

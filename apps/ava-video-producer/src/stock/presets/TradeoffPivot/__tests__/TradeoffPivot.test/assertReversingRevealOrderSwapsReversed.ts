@@ -3,7 +3,7 @@ import { TradeoffPivotTestState } from "./TradeoffPivotTestState";
 const { render: _render, leaf: _leaf } = TradeoffPivotTestState;
 
 import assert from "node:assert/strict";
-import { DEFAULT_INPUT } from "../../TradeoffPivot.fixtures";
+import type { DEFAULT_INPUT } from "../../TradeoffPivot.fixtures";
 
 /**
  * Asserts reversing reveal order swaps leaf entrances without changing the

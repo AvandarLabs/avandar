@@ -90,7 +90,7 @@ function _readFileArgument({
   argument: string;
 }>): Partial<GateArguments> {
   if (parsed.file)
-    throw new Error(`${FRAME_GATE_USAGE}\nOnly one video file may be checked`);
+    {throw new Error(`${FRAME_GATE_USAGE}\nOnly one video file may be checked`);}
   return _readArguments({
     argv,
     index: index + 1,

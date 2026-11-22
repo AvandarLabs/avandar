@@ -1,7 +1,7 @@
 import { Modal } from "@mantine/core";
 import { ModalsProvider } from "@mantine/modals";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { NuxProgress } from "$/models/NuxProgress/NuxProgress";
+import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 import { NuxProgressClient } from "@/clients/NuxProgressClient/NuxProgressClient";
 import classes from "@/components/Nux/NuxChecklistPanel/NuxChecklistMilestoneRow/NuxChecklistMilestoneRow.module.css";
 import { NuxChecklistPanel } from "@/components/Nux/NuxChecklistPanel/NuxChecklistPanel";

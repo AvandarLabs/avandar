@@ -1,4 +1,4 @@
-import ts from "typescript";
+import type ts from "typescript";
 /** Inputs for counting literals in an object property or JSX attribute. */
 export type CountKeyedValueOptions = {
   key: string;

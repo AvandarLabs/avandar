@@ -1,7 +1,7 @@
 import { AtlasCollection } from "../../AtlasLayout/AtlasCollection/AtlasCollection";
 import { HELPER_CATEGORIES } from "../helperCategoryHelpers";
 import { HelperPlaybackToggle } from "../HelperPlaybackToggle/HelperPlaybackToggle";
-import { useHelperGallery } from "../useHelperGallery";
+import type { useHelperGallery } from "../useHelperGallery";
 import { HelperResultCard } from "./HelperResultCard/HelperResultCard";
 import type { ReactNode, Dispatch, SetStateAction } from "react";
 

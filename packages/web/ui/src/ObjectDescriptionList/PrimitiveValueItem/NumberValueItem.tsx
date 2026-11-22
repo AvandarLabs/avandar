@@ -1,6 +1,6 @@
 import { formatNumber, isNullish } from "@avandar/utils";
 import { NumberInput, Text } from "@mantine/core";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { NullOrUndefinedValueItem } from "./NullOrUndefinedValueItem";
 
 type Props = {

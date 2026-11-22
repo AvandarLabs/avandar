@@ -18,7 +18,7 @@ export function GraphNodeDetail({
   cardTitle,
   detail,
 }: Readonly<Props>): ReactNode {
-  if (!detail) return null;
+  if (!detail) {return null;}
   return (
     <div
       style={{

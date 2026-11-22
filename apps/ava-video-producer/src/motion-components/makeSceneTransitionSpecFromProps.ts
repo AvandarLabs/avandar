@@ -1,5 +1,5 @@
 import { linearTiming } from "@remotion/transitions";
-import { SceneTransitionProps } from "./getSceneTransitionStyle";
+import type { SceneTransitionProps } from "./getSceneTransitionStyle";
 import { MotionSettings } from "./MotionSettings/MotionSettings";
 import { SceneTransition } from "./SceneTransition";
 import type { MotionSettingsTheme } from "./MotionSettings/MotionSettings";

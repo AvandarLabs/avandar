@@ -1,5 +1,6 @@
 import { NavLinkList } from "@avandar/ui";
-import { Box, BoxProps, Loader, ScrollArea } from "@mantine/core";
+import type { BoxProps} from "@mantine/core";
+import { Box, Loader, ScrollArea } from "@mantine/core";
 import { clsx } from "clsx";
 import { useMemo } from "react";
 import { AppLinks } from "@/config/AppLinks/AppLinks";

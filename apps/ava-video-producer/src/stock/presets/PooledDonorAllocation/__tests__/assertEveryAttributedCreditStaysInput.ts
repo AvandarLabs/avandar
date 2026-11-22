@@ -1,4 +1,4 @@
-import { fixtures } from "../PooledDonorAllocation.fixtures";
+import type { fixtures } from "../PooledDonorAllocation.fixtures";
 import { assertEveryAttributedCreditStaysFrame as _assertEveryAttributedCreditStaysFrame } from "./assertEveryAttributedCreditStaysFrame";
 
 /**

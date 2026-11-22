@@ -1,4 +1,4 @@
-import { defaultInput, fixtures } from "../SavedSeedSeasonReturn.fixtures";
+import type { defaultInput, fixtures } from "../SavedSeedSeasonReturn.fixtures";
 import { assertCultivatorHandsTouchActualFrame as _assertCultivatorHandsTouchActualFrame } from "./assertCultivatorHandsTouchActualFrame";
 
 /**

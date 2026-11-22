@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
-import { renderToStaticMarkup } from "react-dom/server";
+import type { renderToStaticMarkup } from "react-dom/server";
 import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
-import { fixtures } from "../UtteranceToModelDraft.fixtures";
+import type { fixtures } from "../UtteranceToModelDraft.fixtures";
 import { assertOriginalSourceCaptionPaintMarkup as _assertOriginalSourceCaptionPaintMarkup } from "./assertOriginalSourceCaptionPaintMarkup";
 
 /**

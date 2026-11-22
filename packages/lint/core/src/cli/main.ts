@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 /* oxlint-disable import/extensions -- Node needs source extensions. */
+import { createNativeCoverageProbes } from "./nativeSafeRules.ts";
 import { collectCoverage } from "./coverage.ts";
 import { createTheme, openTerminal, type PromptIO } from "./terminal.ts";
 
@@ -151,6 +152,7 @@ async function _executeCoverage(
     const { loadRuleCatalog } = await import("../catalog/loadRuleCatalog.ts");
     const result = await collectCoverage({
       catalog: loadRuleCatalog(),
+      probes: createNativeCoverageProbes(),
       paths: options.paths,
       cwd: io.cwd,
     });

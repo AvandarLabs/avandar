@@ -1,4 +1,4 @@
-import { DEFAULT_INPUT, fixtures } from "../../ResidentBudgetBallots.fixtures";
+import type { DEFAULT_INPUT, fixtures } from "../../ResidentBudgetBallots.fixtures";
 import { assertCastPapersRiseThroughBallot as _assertCastPapersRiseThroughBallot } from "./assertCastPapersRiseThroughBallot";
 
 /**

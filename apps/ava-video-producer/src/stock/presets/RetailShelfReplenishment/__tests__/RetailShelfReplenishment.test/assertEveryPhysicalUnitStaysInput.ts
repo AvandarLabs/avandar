@@ -1,4 +1,4 @@
-import { fixtures } from "../../RetailShelfReplenishment.fixtures";
+import type { fixtures } from "../../RetailShelfReplenishment.fixtures";
 import { assertEveryPhysicalUnitStaysFrame as _assertEveryPhysicalUnitStaysFrame } from "./assertEveryPhysicalUnitStaysFrame";
 
 /**

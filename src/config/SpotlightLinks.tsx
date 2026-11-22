@@ -1,5 +1,5 @@
 import { IconPencilPlus, IconUpload, IconUser } from "@tabler/icons-react";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { NavbarLinks } from "@/config/NavbarLinks/NavbarLinks";
 import type { AppLink, AppLinkKey } from "@/config/AppLinks/AppLinks";

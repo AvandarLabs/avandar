@@ -11,9 +11,9 @@ from `rules.yaml`, validated against `rules.schema.json`.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | AF-01 | curly | Braces around every `if` body | typescript, javascript | safe | 3 | lint | Native `curly`; add braces |
 | AF-02 | prefer-template | Template interpolation instead of concatenation | typescript, javascript | safe | 3 | lint | Native `prefer-template`; supported equivalent expressions only |
-| AF-03 | consistent-type-imports | `type` on type-only imports and exports | typescript | safe | 3 | lint | Native consistent-type rules after type-aware benchmark |
+| AF-03 | consistent-type-imports | `type` on type-only imports and exports | typescript | safe | 3 | lint | Native type imports and type-aware exports; import() annotations remain unchanged |
 | AF-04 | prefer-as-const | `as const` for eligible literals | typescript | safe | 3 | lint | Native `typescript/prefer-as-const` |
-| AF-05 | no-unnecessary-type-assertion | Remove unnecessary type assertions | typescript | safe | 3 | lint | Native type-aware rule |
+| AF-05 | no-unnecessary-type-assertion | Remove unnecessary type assertions | typescript | safe | 3 | lint | Native assertion fixer breaks TS5.9 generic CRUD contracts; disabled and remains fallback |
 | AF-06 | no-function-body-doc-comments | Ordinary comments inside function bodies | typescript, javascript, rust, go, java, kotlin, swift, c, cpp, csharp | safe | 3, 6 | lint | Rewrite only unattached block/doc comments with an exact ordinary-comment form |
 | AF-07 | single-line-doc-comment | Single-line short docstring | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql | safe | 3, 6 | lint | Collapse a tag-free block docstring only when the language has an exact single-line docstring form and the complete result fits |
 | AF-08 | top-level-function-declaration | Top-level function declarations | typescript, javascript | safe | 3 | lint | Reject lexical binding, hoisting, overload, recursion, and collision changes |
@@ -27,7 +27,7 @@ from `rules.yaml`, validated against `rules.schema.json`.
 | AF-16 | straight-line-object | Straight-line object construction | typescript, javascript | safe | 3 | lint | Preserve control flow, evaluation order, descriptors, aliases, and mutation |
 | AF-17 | optional-array-candidates | Straight-line optional array candidates | typescript, javascript | safe | 3 | lint | Preserve order and evaluation with `filter(isDefined)` |
 | AF-18 | no-redundant-error-guard | Redundant `instanceof Error` guard | typescript | safe | 5 | lint | Type information proves the value and branches equivalent |
-| AF-19 | import-extensions | File-extension convention | typescript, javascript | safe | 3 | lint | Resolver proves the target |
+| AF-19 | import-extensions | File-extension convention | typescript, javascript | safe | 3 | lint | Native import/extensions detects resolvable targets but has no safe fixer in Oxlint 1.93.0; repair remains fallback |
 | AF-20 | css-block-comment | Canonical CSS block comment shape | css | safe | 3 | lint | Delimiters and leading markers only |
 | AF-21 | sql-comment-markers | SQL declaration and body comment markers | sql | safe | 5 | lint | SQL parser proves declaration ownership or statement body |
 | GD-01 | no-em-dashes | No em dashes | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, css, shell, yaml, jsonc | guided | 4, 6 | lint | Comment token contains U+2014 |
@@ -100,3 +100,34 @@ from `rules.yaml`, validated against `rules.schema.json`.
 | JR-16 | composite-type-reuse-and-runtime-union-source-of-truth | Composite type reuse and runtime union source of truth | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, css, shell, yaml, jsonc, json | judgment | Judgment | avandar-code-review | Semantic equivalence and ownership require judgment. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate. |
 | JR-17 | mantine-token-choice-a11y-beyond-existing-rules-dynamic-style-legitimacy | Mantine token choice, a11y beyond existing rules, dynamic-style legitimacy | typescript, javascript, css | judgment | Judgment | avandar-code-review | UI semantics and the correct token are contextual |
 <!-- catalog:end -->
+
+## Native safe repairs
+
+Normal repair uses only `oxlint --fix`. Suggestions and dangerous fixes are
+never enabled. Oxlint and `@oxlint/plugins` stay pinned to 1.93.0.
+`oxlint-tsgolint` 7.0.2007 supplies Oxlint's native type-aware project support.
+The root config enables `options.typeAware`; each file uses Oxlint's discovered
+TypeScript project without a local compiler or replacement rule.
+
+`curly` uses `all`, `prefer-template` uses its native safe fixer, and type-only
+imports use separate `import type` declarations. `disallowTypeAnnotations: false`
+leaves `import()` type annotations unchanged because their diagnostic has no
+safe native fix. Type-only exports and eligible `as const` literals use the
+corresponding native TypeScript rules.
+
+AF-05 remains disabled and in fallback: the native assertion fixer removes
+assertions still required by the repository's TypeScript 5.9 generic CRUD
+contracts. Native safe metadata alone cannot prove compiler compatibility.
+An isolated primitive fixture proves its native behavior without claiming
+repository-wide coverage. AF-19 remains fallback for repair: the installed
+`import/extensions` rule detects violations but implements no native fixer.
+Unresolved targets and package imports remain unchanged.
+
+The production coverage CLI runs the installed root Oxlint command's file
+selection, then inserts diagnostic seeds into an isolated mirror of each exact
+reviewed path. Root and nested configuration, TypeScript project files,
+file-specific overrides, and source disable comments are retained. Only a
+canonical native diagnostic inside the appended seed with a nonzero engine
+status can prove the named capability. Reviewed source is never modified.
+Unknown commands, missing engines, excluded paths, disabled rules, and
+operational or unsupported outcomes stay fallback.

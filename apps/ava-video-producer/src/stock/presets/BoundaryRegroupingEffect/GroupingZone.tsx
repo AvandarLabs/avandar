@@ -1,7 +1,7 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { getGroupingFromCells } from "./getGroupingFromCells";
+import type { getGroupingFromCells } from "./getGroupingFromCells";
 import type { ComponentProps, ReactNode } from "react";
 
 type Props = {

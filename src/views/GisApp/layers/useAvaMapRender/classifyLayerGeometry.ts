@@ -1,5 +1,5 @@
 import { isNumber, propEq } from "@avandar/utils";
-import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { MapLayerSpatialFeatureProperties } from "@/clients/maps/MapLayerSpatialQuery/MapLayerSpatialQuery.constants";
 import { classifyLayerValues } from "@/views/GisApp/layers/classifyLayerValues/classifyLayerValues";

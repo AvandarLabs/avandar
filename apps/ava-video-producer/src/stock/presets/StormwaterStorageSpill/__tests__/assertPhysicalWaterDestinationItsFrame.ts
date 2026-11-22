@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
-import { fixtures } from "../StormwaterStorageSpill.fixtures";
-import { REVIEW_FIXTURES } from "../StormwaterStorageSpill.reviewFixtures";
+import type { fixtures } from "../StormwaterStorageSpill.fixtures";
+import type { REVIEW_FIXTURES } from "../StormwaterStorageSpill.reviewFixtures";
 import { assertPhysicalWaterDestinationItsCaption as _assertPhysicalWaterDestinationItsCaption } from "./assertPhysicalWaterDestinationItsCaption";
 import { _render } from "./StormwaterStorageSpillTestHelpers";
 

@@ -29,7 +29,7 @@ export function TypographyIcon({
   iconAt,
   fitted,
 }: Readonly<Props>): ReactNode {
-  if (!icon) return null;
+  if (!icon) {return null;}
   return (
     <div
       style={{

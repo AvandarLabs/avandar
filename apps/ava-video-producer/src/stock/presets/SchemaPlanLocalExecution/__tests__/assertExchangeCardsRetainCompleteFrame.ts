@@ -1,4 +1,4 @@
-import { DEFAULT_INPUT } from "../SchemaPlanLocalExecution.fixtures";
+import type { DEFAULT_INPUT } from "../SchemaPlanLocalExecution.fixtures";
 import { assertExchangeCardsRetainCompleteCard as _assertExchangeCardsRetainCompleteCard } from "./assertExchangeCardsRetainCompleteCard";
 import {
   render,

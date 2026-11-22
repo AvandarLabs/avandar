@@ -3,7 +3,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
 import { UtteranceToModelDraft } from "../UtteranceToModelDraft";
-import { fixtures } from "../UtteranceToModelDraft.fixtures";
+import type { fixtures } from "../UtteranceToModelDraft.fixtures";
 import { assertOriginalSourceCaptionPaintMarkupBottom as _assertOriginalSourceCaptionPaintMarkupBottom } from "./assertOriginalSourceCaptionPaintMarkupBottom";
 
 /**

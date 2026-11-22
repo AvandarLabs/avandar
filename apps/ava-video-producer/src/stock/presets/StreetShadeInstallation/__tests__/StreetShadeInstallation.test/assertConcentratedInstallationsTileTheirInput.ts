@@ -3,7 +3,7 @@ import { StreetShadeInstallationTestState } from "./StreetShadeInstallationTestS
 const { render: _render } = StreetShadeInstallationTestState;
 import assert from "node:assert/strict";
 import { SvgAttributes } from "../../../../../../tests/helpers/SvgAttributes";
-import { fixtures } from "../../StreetShadeInstallation.fixtures";
+import type { fixtures } from "../../StreetShadeInstallation.fixtures";
 import { assertConcentratedInstallationsTileTheirFrame as _assertConcentratedInstallationsTileTheirFrame } from "./assertConcentratedInstallationsTileTheirFrame";
 
 /**

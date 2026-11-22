@@ -1,6 +1,6 @@
 import { StockGraphic } from "../../../../stock/StockGraphic/StockGraphic";
 import { VideoTokenUsageContext } from "../../../../videoTheme/TokenUsage/TokenUsage";
-import { useObservedTokenUsage } from "../../../../videoThemeEditor/createObservedTokenUsage/useObservedTokenUsage";
+import type { useObservedTokenUsage } from "../../../../videoThemeEditor/createObservedTokenUsage/useObservedTokenUsage";
 import { GalleryItemTheme } from "../../../GalleryVideoTheme/GalleryItemTheme";
 import css from "./PreviewMotionCanvas.module.css";
 import type { StockRequest } from "../../../../stock/contracts/StockContract.types";

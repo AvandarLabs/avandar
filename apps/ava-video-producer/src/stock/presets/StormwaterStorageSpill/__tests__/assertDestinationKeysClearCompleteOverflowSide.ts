@@ -1,5 +1,5 @@
 import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
-import { fixtures } from "../StormwaterStorageSpill.fixtures";
+import type { fixtures } from "../StormwaterStorageSpill.fixtures";
 import { assertDestinationKeysClearCompleteMarkup as _assertDestinationKeysClearCompleteMarkup } from "./assertDestinationKeysClearCompleteMarkup";
 import { makeDestinationKeysClearCompleteSegmentsFromX as _makeDestinationKeysClearCompleteSegmentsFromX } from "./makeDestinationKeysClearCompleteSegmentsFromX";
 import { _render } from "./StormwaterStorageSpillTestHelpers";

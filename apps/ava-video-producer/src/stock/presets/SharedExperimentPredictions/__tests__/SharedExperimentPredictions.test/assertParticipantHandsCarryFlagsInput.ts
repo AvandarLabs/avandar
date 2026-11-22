@@ -3,7 +3,7 @@ import { SharedExperimentPredictionsTestState } from "./SharedExperimentPredicti
 const { render: _render, flags: _flags } = SharedExperimentPredictionsTestState;
 
 import assert from "node:assert/strict";
-import { denseInput } from "../../SharedExperimentPredictions.fixtures";
+import type { denseInput } from "../../SharedExperimentPredictions.fixtures";
 
 /**
  * Asserts participant hands carry flags with full identity separation across

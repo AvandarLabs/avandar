@@ -2,7 +2,7 @@ import { prop } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Modal } from "@mantine/core";
 import { useRef, useState } from "react";
-import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AddMapToDashboardModal } from "@/views/GisApp/export/AddMapToDashboardModal/AddMapToDashboardModal";
 import { ExportSheet } from "@/views/GisApp/export/ExportSheet/ExportSheet";

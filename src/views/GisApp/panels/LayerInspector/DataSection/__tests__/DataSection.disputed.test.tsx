@@ -1,7 +1,7 @@
 import { Model } from "@avandar/models";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { uuid } from "$/lib/uuid";
-import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn as QueryColumnModel } from "$/models/queries/QueryColumn/QueryColumn";
 import { fireEvent, render, screen } from "@/test-utils";
 import {

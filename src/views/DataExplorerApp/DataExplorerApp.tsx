@@ -1,10 +1,11 @@
 import { Trans, useLingui } from "@lingui/react/macro";
+import type {
+  MantineTheme} from "@mantine/core";
 import {
   Box,
   Button,
   Group,
   LoadingOverlay,
-  MantineTheme,
   Stack,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";

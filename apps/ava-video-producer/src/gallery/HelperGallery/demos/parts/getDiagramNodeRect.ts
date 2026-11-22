@@ -1,4 +1,4 @@
-import { MotionRect } from "../../../../motion-components/getOverlayTimings";
+import type { MotionRect } from "../../../../motion-components/getOverlayTimings";
 import { DIAGRAM_NODE_SIZE, findDiagramNode } from "./findDiagramNode";
 import type { DIAGRAM_NODES } from "./findDiagramNode";
 /** The rect a diagram node occupies, for cut-outs such as a departure. */

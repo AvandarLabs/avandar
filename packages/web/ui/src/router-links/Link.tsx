@@ -1,8 +1,8 @@
 import { Anchor } from "@mantine/core";
-import { createLink, LinkComponent } from "@tanstack/react-router";
+import { createLink } from "@tanstack/react-router";
 import { forwardRef } from "react";
 import type { AnchorProps } from "@mantine/core";
-import type { LinkComponentProps } from "@tanstack/react-router";
+import type { LinkComponentProps , LinkComponent } from "@tanstack/react-router";
 
 // oxlint-disable-next-line typescript/no-empty-object-type -- Mantine props
 interface NewMantineLinkProps extends Omit<AnchorProps, "href"> {}

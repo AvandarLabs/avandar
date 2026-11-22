@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
  * In-place annotation text overlay: focus, select-all, Enter and blur commit.
  */
 import { uuid } from "$/lib/uuid";
-import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { fireEvent, render, screen } from "@/test-utils";
 import { AnnotationTextOverlay } from "@/views/GisApp/shell/AnnotationTextOverlay/AnnotationTextOverlay";
 import {

@@ -1,5 +1,6 @@
-import { Container, ContainerProps, Flex, Paper } from "@mantine/core";
-import { CSSProperties, ReactNode } from "react";
+import type { ContainerProps} from "@mantine/core";
+import { Container, Flex, Paper } from "@mantine/core";
+import type { CSSProperties, ReactNode } from "react";
 import css from "@/components/layouts/AppSlate/AppSlate.module.css";
 import { AppToolbar } from "@/components/layouts/AppSlate/AppToolbar/AppToolbar";
 import { usePlatformInfo } from "@/hooks/usePlatformInfo/usePlatformInfo";

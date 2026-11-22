@@ -105,13 +105,11 @@ function main(): void {
   // every catalog, so refuse rather than produce a plausible wrong result.
   if (otherPaths.length > 0) {
     console.error(
-      `Refusing to run: ${otherPaths.length} conflicted file(s) outside ` +
-        `${CATALOG_DIR}. Resolve these first, then re-run:\n` +
-        otherPaths
+      `Refusing to run: ${otherPaths.length} conflicted file(s) outside ${CATALOG_DIR}. Resolve these first, then re-run:\n${otherPaths
           .map((repoPath) => {
             return `  ${repoPath}`;
           })
-          .join("\n"),
+          .join("\n")}`,
     );
     process.exitCode = 1;
     return;

@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { MapLayerIds } from "@/views/GisApp/layers/MapLayerIds";
-import { useAvaMapEditor } from "@/views/GisApp/useAvaMapEditor/useAvaMapEditor";
-import { useFeatureInspector } from "@/views/GisApp/useFeatureInspector";
+import type { useAvaMapEditor } from "@/views/GisApp/useAvaMapEditor/useAvaMapEditor";
+import type { useFeatureInspector } from "@/views/GisApp/useFeatureInspector";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { ClusterSelection } from "@/views/GisApp/MapCanvas/MapInstanceHelpers/MapInstanceHelpers";

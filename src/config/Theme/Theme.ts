@@ -2,16 +2,13 @@ import {
   ActionIcon,
   Autocomplete,
   Button,
-  ButtonProps,
   Card,
   Combobox,
   createTheme,
-  CSSVariablesResolver,
   DEFAULT_THEME,
   defaultVariantColorsResolver,
   Drawer,
   Input,
-  MantineTheme,
   Menu,
   Modal,
   MultiSelect,
@@ -38,7 +35,10 @@ import { OverlayTheme } from "./OverlayTheme";
 import type {
   VariantColorResolverResult,
   VariantColorsResolverInput,
-} from "@mantine/core";
+
+  ButtonProps,
+  CSSVariablesResolver,
+  MantineTheme} from "@mantine/core";
 
 /**
  * Slate z-index: the raised view that floats on the app shell.

@@ -2,7 +2,7 @@ import { Tooltip } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Checkbox, NumberInput, Select, Text, TextInput } from "@mantine/core";
 import { match } from "ts-pattern";
-import { DataSourceMetadata } from "./DatasetImportForm.types";
+import type { DataSourceMetadata } from "./DatasetImportForm.types";
 import { PdfParseControls } from "./PdfParseControls/PdfParseControls";
 import type { FileParseOptions } from "./useSaveDataset/useSaveDataset";
 

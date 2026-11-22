@@ -2,7 +2,7 @@ import { Model } from "@avandar/models";
 import { useQuery } from "@avandar/query-hooks";
 import { prop, sortObjList } from "@avandar/utils";
 import { match } from "ts-pattern";
-import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { createQueryMetadataProvenance } from "@/clients/queries/createQueryMetadataProvenance";
 import { runStructuredQueryWithMetadata } from "@/clients/queries/runStructuredQuery/runStructuredQueryWithMetadata";
 import { RAW_SQL_KEY_MARKER } from "@/views/DataExplorerApp/useDataQuery/isWorkspaceRawSqlDataQueryKey";

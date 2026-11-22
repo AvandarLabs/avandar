@@ -3,7 +3,7 @@ import { Trans } from "@lingui/react/macro";
 import { Accordion, Badge, Group, Stack, Text, Title } from "@mantine/core";
 import { IconDatabase, IconShieldLock } from "@tabler/icons-react";
 import { useMemo } from "react";
-import { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { DashboardSliceBuilder } from "@/clients/dashboards/DashboardSliceBuilder/DashboardSliceBuilder";
 import { getDatasetIdsFromDashboardConfig } from "@/clients/dashboards/getDatasetIdsFromDashboardConfig/getDatasetIdsFromDashboardConfig";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";

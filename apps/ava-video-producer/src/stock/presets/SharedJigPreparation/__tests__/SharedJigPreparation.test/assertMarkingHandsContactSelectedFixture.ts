@@ -1,4 +1,4 @@
-import { FIXTURES } from "../../SharedJigPreparation.fixtures";
+import type { FIXTURES } from "../../SharedJigPreparation.fixtures";
 import { inputSchema } from "../../SharedJigPreparation.schema";
 import { assertMarkingHandsContactSelectedId as _assertMarkingHandsContactSelectedId } from "./assertMarkingHandsContactSelectedId";
 

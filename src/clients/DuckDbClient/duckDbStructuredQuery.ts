@@ -1,6 +1,6 @@
 import { objectEntries, prop } from "@avandar/utils";
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
-import * as arrow from "apache-arrow";
+import type * as arrow from "apache-arrow";
 import knex from "knex";
 import { match } from "ts-pattern";
 import { DuckDbQueryAggregations } from "$/models/queries/QueryAggregationType/QueryAggregationType";

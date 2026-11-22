@@ -1,4 +1,4 @@
-import { AvaHTTPError } from "@sbfn/_shared/AvaHTTPError.ts";
+import type { AvaHTTPError } from "@sbfn/_shared/AvaHTTPError.ts";
 import { createGeoapifyGeocoder } from "@sbfn/geocode/createGeoapifyGeocoder/createGeoapifyGeocoder.ts";
 import { describe, expect, it, vi } from "vitest";
 

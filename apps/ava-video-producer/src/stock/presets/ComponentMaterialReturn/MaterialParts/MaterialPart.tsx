@@ -1,6 +1,6 @@
 import { StockRect } from "../../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { getMaterialItemsFromInput } from "../getMaterialItemsFromInput";
+import type { getMaterialItemsFromInput } from "../getMaterialItemsFromInput";
 import { ROUTE_CATEGORY_KEYS } from "../routeColors";
 import { SceneLabel } from "../SceneLabel";
 import { MaterialPartsShared } from "./MaterialPartsShared";

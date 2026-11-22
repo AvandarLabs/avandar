@@ -3,7 +3,7 @@ import { RecipientConfirmedHandoverTestState } from "./RecipientConfirmedHandove
 const { render: _render } = RecipientConfirmedHandoverTestState;
 import assert from "node:assert/strict";
 import test from "node:test";
-import { fixtures } from "../RecipientConfirmedHandover.fixtures";
+import type { fixtures } from "../RecipientConfirmedHandover.fixtures";
 import { assertRecipientIndicatesPullsReleasesHand as _assertRecipientIndicatesPullsReleasesHand } from "./assertRecipientIndicatesPullsReleasesHand";
 
 /**

@@ -1,5 +1,6 @@
 import { DangerText } from "@avandar/ui";
-import { UnknownDataFrame, prop } from "@avandar/utils";
+import type { UnknownDataFrame} from "@avandar/utils";
+import { prop } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Box, Flex } from "@mantine/core";
 import { useMemo } from "react";

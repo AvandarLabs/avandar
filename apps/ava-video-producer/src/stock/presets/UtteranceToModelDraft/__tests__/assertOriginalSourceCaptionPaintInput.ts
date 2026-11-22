@@ -1,4 +1,4 @@
-import { fixtures } from "../UtteranceToModelDraft.fixtures";
+import type { fixtures } from "../UtteranceToModelDraft.fixtures";
 import { assertOriginalSourceCaptionPaintFrame as _assertOriginalSourceCaptionPaintFrame } from "./assertOriginalSourceCaptionPaintFrame";
 
 /**

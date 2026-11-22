@@ -1,5 +1,5 @@
 import { TextReveal } from "../../../../../../scenes/TextReveal/TextReveal";
-import { useVideoMotion } from "../../../../../../videoTheme/useVideoMotion";
+import type { useVideoMotion } from "../../../../../../videoTheme/useVideoMotion";
 import css from "./HeadingRevealPanel.module.css";
 import type { ReactNode } from "react";
 

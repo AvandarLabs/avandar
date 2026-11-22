@@ -1,4 +1,4 @@
-import { WindowMotion } from "../../../../scenes/TiltedWindowScene/WindowMotion/WindowMotion";
+import type { WindowMotion } from "../../../../scenes/TiltedWindowScene/WindowMotion/WindowMotion";
 import { type WindowPose } from "../../../../scenes/TiltedWindowScene/WindowMotion/WindowMotion.types";
 import { DemoTheme } from "../DemoTheme";
 import type { DemoReadout } from "../HelperDemoFrame/HelperDemoFrame";

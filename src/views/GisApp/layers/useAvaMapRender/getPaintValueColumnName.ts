@@ -1,5 +1,5 @@
 import { propEq } from "@avandar/utils";
-import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 
 /** Gets the result-column name driving data-dependent point paint. */

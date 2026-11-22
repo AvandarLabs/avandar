@@ -3,7 +3,7 @@ import {
   webhookFailureResponse,
   webhookSuccessResponse,
 } from "@sbfn/polar-public/polarWebhookUtils.ts";
-import { infer as zInfer } from "zod";
+import type { infer as zInfer } from "zod";
 import { Subscription } from "$/models/Subscription/Subscription.ts";
 import type {
   PolarEventDataSchemas,

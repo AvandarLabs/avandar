@@ -1,4 +1,4 @@
-import {
+import type {
   BasicPlanConfig,
   FreePlanConfig,
   PremiumPlanConfig,

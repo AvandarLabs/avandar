@@ -1,4 +1,4 @@
-import { FIXTURES } from "../../PortableWorkTransfer.fixtures";
+import type { FIXTURES } from "../../PortableWorkTransfer.fixtures";
 import { assertUnloadingHandFollowsRigidId as _assertUnloadingHandFollowsRigidId } from "./assertUnloadingHandFollowsRigidId";
 
 /**

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import {
+import type {
   changedInput,
   denseInput,
   minimumInput,

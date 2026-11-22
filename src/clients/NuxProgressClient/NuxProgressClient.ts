@@ -4,7 +4,7 @@ import { withQueryHooks } from "@avandar/query-hooks";
 import { z } from "zod";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { NuxProgress } from "$/models/NuxProgress/NuxProgress";
-import { User } from "$/models/User/User";
+import type { User } from "$/models/User/User";
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";

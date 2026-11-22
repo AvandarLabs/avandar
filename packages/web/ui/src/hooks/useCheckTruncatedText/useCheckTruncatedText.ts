@@ -1,7 +1,7 @@
 import { isArray } from "@avandar/utils";
 import { useIsomorphicEffect } from "@mantine/hooks";
-import { DependencyList, useCallback, useState } from "react";
-import type { RefCallback } from "react";
+import { useCallback, useState } from "react";
+import type { RefCallback , DependencyList} from "react";
 
 /**
  * Tracks whether text in a truncating element is visually clipped.

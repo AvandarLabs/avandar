@@ -1,4 +1,4 @@
-import { QueryClient } from "@tanstack/react-query";
+import type { QueryClient } from "@tanstack/react-query";
 import { createRouter } from "@tanstack/react-router";
 import { AppErrorBoundary } from "@/components/AppErrorBoundary/AppErrorBoundary";
 import { AvaQueryClient } from "@/config/AvaQueryClient";

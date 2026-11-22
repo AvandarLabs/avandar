@@ -1,8 +1,9 @@
 import { useLingui } from "@lingui/react/macro";
-import { CustomField } from "@puckeditor/core";
+import type { CustomField } from "@puckeditor/core";
 import { useMemo } from "react";
+import type {
+  NLQuery} from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField";
 import {
-  NLQuery,
   NLQueryPField,
 } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/NLQueryPField";
 

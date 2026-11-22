@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
-import { DEFAULT_INPUT } from "../SchemaPlanLocalExecution.fixtures";
+import type { DEFAULT_INPUT } from "../SchemaPlanLocalExecution.fixtures";
 import { assertActualRawRowsRemainBoundary as _assertActualRawRowsRemainBoundary } from "./assertActualRawRowsRemainBoundary";
 import { render } from "./SchemaPlanLocalExecutionTestHelpers";
 

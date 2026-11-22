@@ -65,11 +65,11 @@ function _createFakeGit(options: FakeGitOptions = {}): ReleaseCommands {
     dryRun: false,
     readGit: (args) => {
       const joined = args.join(" ");
-      if (joined === "tag --list v* --sort=v:refname") return tags;
-      if (joined.startsWith("log ")) return log;
-      if (joined.startsWith("show --stat --format= ")) return stat;
-      if (joined.startsWith("show --format= ")) return diff;
-      if (joined === "remote get-url origin") return remoteUrl;
+      if (joined === "tag --list v* --sort=v:refname") {return tags;}
+      if (joined.startsWith("log ")) {return log;}
+      if (joined.startsWith("show --stat --format= ")) {return stat;}
+      if (joined.startsWith("show --format= ")) {return diff;}
+      if (joined === "remote get-url origin") {return remoteUrl;}
       if (joined.startsWith("ls-remote --tags origin")) {
         return remoteLsRemoteOutput;
       }

@@ -18,9 +18,8 @@ import { requireServerAuth } from "@pipeline-server/routes/requireServerAuth/req
 import { getEtlRunFailedReport } from "@pipelines/shared/getEtlRunFailedReport/getEtlRunFailedReport";
 import { getOptionalEnvVar } from "@pipelines/shared/getOptionalEnvVar/getOptionalEnvVar";
 import { parsePipelineRunOptions } from "@pipelines/shared/parsePipelineRunOptions/parsePipelineRunOptions";
-import { FastifyPluginAsync } from "fastify";
+import type { FastifyPluginAsync,FastifyReply,FastifyRequest } from "fastify";
 import type { PipelineRunOptions } from "@pipelines/shared/PipelineRunOptions.types";
-import type { FastifyReply, FastifyRequest } from "fastify";
 
 type RunPipelineRequest = FastifyRequest<{
   Params: {

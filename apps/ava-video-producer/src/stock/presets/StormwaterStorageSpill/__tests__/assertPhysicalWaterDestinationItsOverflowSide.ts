@@ -1,5 +1,5 @@
-import { fixtures } from "../StormwaterStorageSpill.fixtures";
-import { REVIEW_FIXTURES } from "../StormwaterStorageSpill.reviewFixtures";
+import type { fixtures } from "../StormwaterStorageSpill.fixtures";
+import type { REVIEW_FIXTURES } from "../StormwaterStorageSpill.reviewFixtures";
 import { assertPhysicalWaterDestinationItsShowBalance as _assertPhysicalWaterDestinationItsShowBalance } from "./assertPhysicalWaterDestinationItsShowBalance";
 
 /**

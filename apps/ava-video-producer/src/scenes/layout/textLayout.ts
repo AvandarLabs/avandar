@@ -182,7 +182,7 @@ function _fitMetricContent({
       detail,
       unit,
     });
-    if (fitted) return fitted;
+    if (fitted) {return fitted;}
   }
   throw new Error(
     "Metric cannot fit legibly; shorten the copy, reduce the unit, or increase the scene height",
@@ -289,7 +289,7 @@ function _getMetricStackFromStep(
 ): MetricContentFit | undefined {
   const { height, paddingX, unit } = options;
   const sizes = _getMetricSizesFromStep(options);
-  if (sizes.numberSize < 48) return undefined;
+  if (sizes.numberSize < 48) {return undefined;}
   let copy: Pick<MetricContentFit, "label" | "detail">;
   try {
     copy = _getMetricCopyFromStep(options);

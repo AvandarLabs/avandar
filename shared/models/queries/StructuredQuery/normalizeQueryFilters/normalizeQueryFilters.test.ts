@@ -1,7 +1,7 @@
 import { Model } from "@avandar/models";
 import { describe, expect, it } from "vitest";
 import { createConceptAttributeQueryColumn } from "$/models/queries/QueryColumn/QueryColumn.fixtures.ts";
-import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import { normalizeQueryFilters } from "$/models/queries/StructuredQuery/normalizeQueryFilters/normalizeQueryFilters.ts";
 /** Column-name rules bind only unique names. Runtime rules require IDs. */
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.ts";

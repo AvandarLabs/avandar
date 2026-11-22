@@ -12,7 +12,6 @@
       "shared/types",
       "shared/lib/types"
     ],
-    "baseUrl": "./",
     "incremental": true,
     "jsx": "react-jsx"
   },

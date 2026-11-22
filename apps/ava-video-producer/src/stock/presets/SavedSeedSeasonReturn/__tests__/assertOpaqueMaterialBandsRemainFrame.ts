@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
-import { fixtures } from "../SavedSeedSeasonReturn.fixtures";
+import type { fixtures } from "../SavedSeedSeasonReturn.fixtures";
 import { assertOpaqueMaterialBandsRemainBands as _assertOpaqueMaterialBandsRemainBands } from "./assertOpaqueMaterialBandsRemainBands";
 import { _render } from "./SavedSeedSeasonReturnTestHelpers";
 

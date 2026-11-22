@@ -1,5 +1,5 @@
 import { transformProps } from "@puckeditor/core";
-import { AvaPageDataMigration } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrator";
+import type { AvaPageDataMigration } from "@/views/DashboardApp/AvaPage/migrations/AvaPageDataMigrator";
 import type {
   V0_AvaPageData,
   V0_AvaPageRootProps,

@@ -23,10 +23,11 @@ import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { ConceptCreatorStore } from "@/views/OntologyDesignerApp/ConceptCreatorView/ConceptCreatorStore/index";
 import css from "@/views/OntologyDesignerApp/ConceptCreatorView/ConceptCreatorView.module.css";
-import {
+import type {
   ConceptFormSubmitValues,
   ConceptFormType,
-  ConceptFormValues,
+  ConceptFormValues} from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
+import {
   getDefaultConceptFormValues,
   makeDefaultDatasetColumnAttribute,
   makeDefaultManualEntryAttribute,

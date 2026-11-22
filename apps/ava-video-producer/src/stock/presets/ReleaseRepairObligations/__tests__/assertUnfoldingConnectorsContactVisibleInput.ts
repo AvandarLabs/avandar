@@ -1,4 +1,4 @@
-import { fixtures } from "../ReleaseRepairObligations.fixtures";
+import type { fixtures } from "../ReleaseRepairObligations.fixtures";
 import { assertUnfoldingConnectorsContactVisibleIssueMarks as _assertUnfoldingConnectorsContactVisibleIssueMarks } from "./assertUnfoldingConnectorsContactVisibleIssueMarks";
 
 /**

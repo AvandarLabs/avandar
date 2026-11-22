@@ -8,7 +8,7 @@ import { useMapToolGestures } from "@/views/GisApp/MapCanvas/useMapToolGestures/
 import { AnnotationFeatureInspector } from "@/views/GisApp/panels/LayerInspector/AnnotationFeatureInspector/AnnotationFeatureInspector";
 import { LayerList } from "@/views/GisApp/panels/LayerPanel/LayerList/LayerList";
 import { AnnotationTextOverlay } from "@/views/GisApp/shell/AnnotationTextOverlay/AnnotationTextOverlay";
-import { createFakeMap } from "@/views/GisApp/shell/MapToolCluster/AnnotateMapTool/annotateMapToolHarness";
+import type { createFakeMap } from "@/views/GisApp/shell/MapToolCluster/AnnotateMapTool/annotateMapToolHarness";
 import { MapToolCluster } from "@/views/GisApp/shell/MapToolCluster/MapToolCluster";
 import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
 import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";

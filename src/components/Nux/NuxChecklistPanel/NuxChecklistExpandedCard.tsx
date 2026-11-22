@@ -1,6 +1,6 @@
 import { Trans } from "@lingui/react/macro";
 import { Button, Card, Portal, Stack, Text } from "@mantine/core";
-import { NuxProgress } from "$/models/NuxProgress/NuxProgress";
+import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 import { NuxChecklistExpandedHeader } from "@/components/Nux/NuxChecklistPanel/NuxChecklistExpandedHeader";
 import { NuxChecklistMilestoneList } from "@/components/Nux/NuxChecklistPanel/NuxChecklistMilestoneList";
 import classes from "@/components/Nux/NuxChecklistPanel/NuxChecklistPanel.module.css";

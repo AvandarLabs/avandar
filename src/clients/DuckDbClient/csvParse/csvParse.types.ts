@@ -1,4 +1,4 @@
-import { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
+import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 
 /** User-provided CSV parse hints (import form / API). */
 export type CsvParseUserHints = {

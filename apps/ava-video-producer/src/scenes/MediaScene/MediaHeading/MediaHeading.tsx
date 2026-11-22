@@ -20,7 +20,7 @@ export function MediaHeading({
   cardTitle,
   heading,
 }: Readonly<Props>): ReactNode {
-  if (!heading) return null;
+  if (!heading) {return null;}
   return (
     <h1
       className={css.mediaHeadingh1}

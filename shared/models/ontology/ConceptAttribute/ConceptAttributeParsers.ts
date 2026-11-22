@@ -10,13 +10,13 @@ import {
 } from "@avandar/utils";
 import { z } from "zod";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
-import { ConceptId } from "$/models/ontology/Concept/Concept.types.ts";
-import {
+import type { ConceptId } from "$/models/ontology/Concept/Concept.types.ts";
+import type {
   ConceptAttributeId,
   ConceptAttributeModel,
 } from "$/models/ontology/ConceptAttribute/ConceptAttribute.types.ts";
 import { ConceptAttributeModule } from "$/models/ontology/ConceptAttribute/ConceptAttributeModule/ConceptAttributeModule.ts";
-import { Workspace } from "$/models/Workspace/Workspace.ts";
+import type { Workspace } from "$/models/Workspace/Workspace.ts";
 import type { Expect } from "@avandar/utils";
 import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";
 

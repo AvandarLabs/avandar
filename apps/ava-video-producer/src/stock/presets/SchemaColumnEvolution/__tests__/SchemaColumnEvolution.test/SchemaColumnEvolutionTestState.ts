@@ -1,6 +1,6 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { getTextEnvelopesFromMarkup } from "../../getTextEnvelopesFromMarkup";
+import type { getTextEnvelopesFromMarkup } from "../../getTextEnvelopesFromMarkup";
 import { SchemaColumnEvolution } from "../../SchemaColumnEvolution";
 import { DEFAULT_INPUT } from "../../SchemaColumnEvolution.fixtures";
 import { type Input } from "../../SchemaColumnEvolution.schema";

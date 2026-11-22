@@ -1,4 +1,4 @@
-import {
+import type {
   DEFAULT_INPUT,
   fixtures,
 } from "../../PeerContributionRecognition.fixtures";

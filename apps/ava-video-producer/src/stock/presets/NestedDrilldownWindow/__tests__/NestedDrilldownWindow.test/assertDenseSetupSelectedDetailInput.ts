@@ -1,4 +1,4 @@
-import { fixtures } from "../../NestedDrilldownWindow.fixtures";
+import type { fixtures } from "../../NestedDrilldownWindow.fixtures";
 import { assertDenseSetupSelectedDetailFrame as _assertDenseSetupSelectedDetailFrame } from "./assertDenseSetupSelectedDetailFrame";
 
 /**

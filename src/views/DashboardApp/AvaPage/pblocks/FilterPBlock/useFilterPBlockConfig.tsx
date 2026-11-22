@@ -1,5 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import { ComponentConfig } from "@puckeditor/core";
+import type { ComponentConfig } from "@puckeditor/core";
 import { FilterPBlock } from "@/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock";
 import type { Props as FilterPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock";
 

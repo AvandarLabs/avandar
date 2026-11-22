@@ -1,4 +1,4 @@
-import { fixtures } from "../SavedSeedSeasonReturn.fixtures";
+import type { fixtures } from "../SavedSeedSeasonReturn.fixtures";
 import { assertOpaqueMaterialBandsRemainFrame as _assertOpaqueMaterialBandsRemainFrame } from "./assertOpaqueMaterialBandsRemainFrame";
 
 /**

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { Permissions } from "$/models/Permissions/Permissions.ts";
-import { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types.ts";
+import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types.ts";
 import { Constants } from "$/types/database.types.ts";
 import type {
   AppType,

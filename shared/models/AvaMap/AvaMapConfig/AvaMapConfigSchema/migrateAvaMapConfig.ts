@@ -1,8 +1,8 @@
-import { z } from "zod";
+import type { z } from "zod";
 import {
   DEFAULT_EXPORT_LAYOUT, // oxfmt-ignore
 } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigModule/exportLayoutUpdaters/exportLayoutUpdaters.ts";
-import {
+import type {
   AvaMapConfigV1LayerSchema,
   AvaMapConfigV1Schema,
 } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV1Schema.ts";

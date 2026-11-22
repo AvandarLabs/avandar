@@ -1,5 +1,5 @@
 import { getOverlayPose } from "./getOverlayPose";
-import { MotionRect, OverlayCue } from "./getOverlayTimings";
+import type { MotionRect, OverlayCue } from "./getOverlayTimings";
 import { MotionSettings } from "./MotionSettings/MotionSettings";
 import type { CSSProperties, ReactNode } from "react";
 

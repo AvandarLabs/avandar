@@ -1,5 +1,5 @@
 import { Heading } from "@react-email/components";
-import { CSSProperties, ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 type Props = {
   children: ReactNode;

@@ -1,5 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import { CustomField } from "@puckeditor/core";
+import type { CustomField } from "@puckeditor/core";
 import { useMemo } from "react";
 import { LocalFiltersPField } from "@/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField";
 import type { StructuredQueryAuth } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";

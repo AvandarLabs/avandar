@@ -1,10 +1,10 @@
-import { formRootRule, useForm as mantineUseForm } from "@mantine/form";
+import { useForm as mantineUseForm } from "@mantine/form";
 import { useKeysAndPropsCallback } from "@ui/hooks/useForm/useKeysAndPropsCallback";
 import type { ObjectPaths, UnknownObject } from "@avandar/utils";
 import type {
   FormErrors,
   UseFormInput as MantineUseFormInput,
-} from "@mantine/form";
+ formRootRule} from "@mantine/form";
 import type { FormType } from "@ui/hooks/useForm/useForm.types";
 import type { Merge } from "type-fest";
 

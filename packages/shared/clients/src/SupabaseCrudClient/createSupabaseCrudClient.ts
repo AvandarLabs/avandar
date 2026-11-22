@@ -2,7 +2,7 @@ import { assertIsDefined, objectEntries } from "@avandar/utils";
 import { withSupabaseClient } from "@clients/mixins/withSupabaseClient.ts";
 import { createModelCrudClient } from "@clients/ModelCrudClient/createModelCrudClient.ts";
 import { match } from "ts-pattern";
-import { EmptyObject } from "type-fest";
+import type { EmptyObject } from "type-fest";
 import type { ILogger } from "@avandar/logger";
 import type {
   FilterOperator,

@@ -1,6 +1,6 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { makeCoordinateTriageFromInputAndFrame } from "../makeCoordinateTriageFromInputAndFrame";
+import type { makeCoordinateTriageFromInputAndFrame } from "../makeCoordinateTriageFromInputAndFrame";
 import { PlottedRowAssociation } from "../PlottedRowAssociation";
 import { TriageTokensShared } from "./TriageTokensShared";
 import type { ReactNode } from "react";

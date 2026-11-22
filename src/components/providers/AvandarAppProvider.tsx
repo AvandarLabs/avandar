@@ -1,7 +1,8 @@
 import { AvaQueryProvider } from "@avandar/query-hooks";
 import { AvaUiProvider } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
-import { ReactNode, useMemo } from "react";
+import type { ReactNode} from "react";
+import { useMemo } from "react";
 import {
   cssVariablesResolver,
   DEFAULT_NOTIFICATIONS_PROPS,

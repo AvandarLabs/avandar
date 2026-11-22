@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
-import { fixtures } from "../UtteranceToModelDraft.fixtures";
+import type { fixtures } from "../UtteranceToModelDraft.fixtures";
 import { assertOnlyOnePhraseCopyFrame as _assertOnlyOnePhraseCopyFrame } from "./assertOnlyOnePhraseCopyFrame";
 import { _render, _attributes } from "./UtteranceToModelDraftTestHelpers";
 

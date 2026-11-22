@@ -13,14 +13,15 @@ import {
 } from "@mantine/core";
 import { IconArrowLeft, IconArrowRight } from "@tabler/icons-react";
 import { useCallback, useMemo, useState } from "react";
-import { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
+import type { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnPickerList } from "@/components/DatasetColumnPickerList";
 import { useMap } from "@/lib/hooks/state/useMap";
 import { removeItemWhere } from "@/lib/utils/arrays/removeItemWhere/removeItemWhere";
-import {
+import type {
   ConceptFormType,
-  ConceptFormValues,
+  ConceptFormValues} from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
+import {
   makeDefaultDatasetColumnAttribute,
 } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
 import { DatasetColumnMappingCreator } from "@/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator";

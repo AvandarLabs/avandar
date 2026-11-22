@@ -1,9 +1,10 @@
 import { useLingui } from "@lingui/react/macro";
-import { CustomField } from "@puckeditor/core";
+import type { CustomField } from "@puckeditor/core";
 import { useMemo } from "react";
+import type {
+  ContainerMaxWidthValue} from "@/views/DashboardApp/AvaPage/pfields/ContainerMaxWidthPField/ContainerMaxWidthPField";
 import {
-  ContainerMaxWidthPField,
-  ContainerMaxWidthValue,
+  ContainerMaxWidthPField
 } from "@/views/DashboardApp/AvaPage/pfields/ContainerMaxWidthPField/ContainerMaxWidthPField";
 
 /**

@@ -1,5 +1,5 @@
-import { denseInput } from "../SharedReadingCircles.fixtures";
-import { _createRouteInputs } from "./SharedReadingCirclesTestHelpers/SharedReadingCirclesTestHelpers";
+import type { denseInput } from "../SharedReadingCircles.fixtures";
+import type { _createRouteInputs } from "./SharedReadingCirclesTestHelpers/SharedReadingCirclesTestHelpers";
 
 /** Inputs consumed by the corresponding rendered assertions. */
 

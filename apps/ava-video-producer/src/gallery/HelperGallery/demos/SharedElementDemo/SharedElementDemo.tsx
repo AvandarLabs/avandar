@@ -1,4 +1,4 @@
-import { MotionRect } from "../../../../motion-components/getOverlayTimings";
+import type { MotionRect } from "../../../../motion-components/getOverlayTimings";
 import { MotionSettings } from "../../../../motion-components/MotionSettings/MotionSettings";
 import { SharedElement } from "../../../../motion-components/SharedElement";
 import { DemoTheme } from "../DemoTheme";

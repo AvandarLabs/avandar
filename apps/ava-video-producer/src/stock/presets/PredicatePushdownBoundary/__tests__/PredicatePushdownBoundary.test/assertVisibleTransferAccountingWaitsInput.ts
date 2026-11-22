@@ -6,7 +6,7 @@ const {
   accounting: _accounting,
 } = PredicatePushdownBoundaryTestState;
 import assert from "node:assert/strict";
-import { DEFAULT_INPUT } from "../../PredicatePushdownBoundary.fixtures";
+import type { DEFAULT_INPUT } from "../../PredicatePushdownBoundary.fixtures";
 import { assertVisibleTransferAccountingWaitsFrame as _assertVisibleTransferAccountingWaitsFrame } from "./assertVisibleTransferAccountingWaitsFrame";
 
 /**

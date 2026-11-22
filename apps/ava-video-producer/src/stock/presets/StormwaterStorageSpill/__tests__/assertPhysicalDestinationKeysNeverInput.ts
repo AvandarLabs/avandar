@@ -1,4 +1,4 @@
-import { REVIEW_FIXTURES } from "../StormwaterStorageSpill.reviewFixtures";
+import type { REVIEW_FIXTURES } from "../StormwaterStorageSpill.reviewFixtures";
 import { assertPhysicalDestinationKeysNeverKey as _assertPhysicalDestinationKeysNeverKey } from "./assertPhysicalDestinationKeysNeverKey";
 import { assertPhysicalDestinationKeysNeverKeys as _assertPhysicalDestinationKeysNeverKeys } from "./assertPhysicalDestinationKeysNeverKeys";
 import { _render } from "./StormwaterStorageSpillTestHelpers";

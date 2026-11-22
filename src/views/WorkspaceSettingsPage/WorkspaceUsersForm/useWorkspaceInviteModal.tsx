@@ -5,7 +5,7 @@ import { modals } from "@mantine/modals";
 import { useRef } from "react";
 import { buildWorkspaceInviteRolePayload } from "$/models/Permissions/inviteRolePayload";
 import { Subscription } from "$/models/Subscription/Subscription";
-import { Workspace } from "$/models/Workspace/Workspace";
+import type { Workspace } from "$/models/Workspace/Workspace";
 import { APIClient } from "@/clients/APIClient";
 import { PermissionsClient } from "@/clients/permissions/PermissionsClient";
 import { WorkspaceInviteClient } from "@/clients/WorkspaceInviteClient";

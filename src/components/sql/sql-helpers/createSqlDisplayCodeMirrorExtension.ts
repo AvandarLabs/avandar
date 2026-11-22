@@ -1,10 +1,12 @@
-import { Extension, RangeSetBuilder } from "@codemirror/state";
-import {
-  Decoration,
+import type { Extension} from "@codemirror/state";
+import { RangeSetBuilder } from "@codemirror/state";
+import type {
   DecorationSet,
   EditorView,
+  ViewUpdate} from "@codemirror/view";
+import {
+  Decoration,
   ViewPlugin,
-  ViewUpdate,
   WidgetType,
 } from "@codemirror/view";
 import { buildSqlDisplaySegments } from "@/components/sql/sql-helpers/buildSqlDisplaySegments/buildSqlDisplaySegments";

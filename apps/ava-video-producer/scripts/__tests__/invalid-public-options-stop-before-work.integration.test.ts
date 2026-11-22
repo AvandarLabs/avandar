@@ -55,7 +55,7 @@ test("invalid public options fail with complete usage and recovery before readin
       assert.match(result.stderr, /\n {2}⚠️/);
       assert.doesNotMatch(result.stderr, /Remotion license keys are required/);
       assert.equal(
-        result.stderr.includes(String.fromCharCode(27) + "["),
+        result.stderr.includes(`${String.fromCharCode(27)  }[`),
         false,
       );
     });

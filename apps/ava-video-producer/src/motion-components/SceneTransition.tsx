@@ -1,6 +1,7 @@
 import { AbsoluteFill } from "remotion";
+import type {
+  SceneTransitionProps} from "./getSceneTransitionStyle";
 import {
-  SceneTransitionProps,
   getSceneTransitionStyle,
 } from "./getSceneTransitionStyle";
 import { MotionSettings } from "./MotionSettings/MotionSettings";

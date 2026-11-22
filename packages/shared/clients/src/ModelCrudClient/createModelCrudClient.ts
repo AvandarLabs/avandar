@@ -1,6 +1,7 @@
 import { withLogger } from "@avandar/logger";
-import { FiltersByColumn, omit } from "@avandar/utils";
-import {
+import type { FiltersByColumn} from "@avandar/utils";
+import { omit } from "@avandar/utils";
+import type {
   ClientReturningOnlyPromises,
   CrudModelSpec,
   ModelCrudClient,

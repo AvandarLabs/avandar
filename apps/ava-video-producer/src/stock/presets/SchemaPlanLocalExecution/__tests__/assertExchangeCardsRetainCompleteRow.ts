@@ -1,6 +1,7 @@
 import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
+import type {
+  _getCardBounds} from "./SchemaPlanLocalExecutionTestHelpers";
 import {
-  _getCardBounds,
   _assertSeparate,
 } from "./SchemaPlanLocalExecutionTestHelpers";
 

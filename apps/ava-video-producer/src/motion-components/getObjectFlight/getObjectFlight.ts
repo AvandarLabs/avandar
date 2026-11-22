@@ -1,4 +1,4 @@
-import { MotionRect } from "../getOverlayTimings";
+import type { MotionRect } from "../getOverlayTimings";
 import { MotionSettings } from "../MotionSettings/MotionSettings";
 import type {
   MotionOptions,

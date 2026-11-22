@@ -1,4 +1,4 @@
-import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { MapLayerSpatialFeatureProperties } from "@/clients/maps/MapLayerSpatialQuery/MapLayerSpatialQuery.constants";
 import type { ExpressionSpecification } from "maplibre-gl";
 

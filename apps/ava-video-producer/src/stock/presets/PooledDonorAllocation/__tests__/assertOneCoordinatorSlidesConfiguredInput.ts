@@ -1,4 +1,4 @@
-import { fixtures } from "../PooledDonorAllocation.fixtures";
+import type { fixtures } from "../PooledDonorAllocation.fixtures";
 import { assertOneCoordinatorSlidesConfiguredHand as _assertOneCoordinatorSlidesConfiguredHand } from "./assertOneCoordinatorSlidesConfiguredHand";
 
 /**

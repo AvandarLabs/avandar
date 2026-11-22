@@ -1,4 +1,5 @@
-import { objectKeys, StringKeyOf } from "@avandar/utils";
+import type { StringKeyOf } from "@avandar/utils";
+import { objectKeys } from "@avandar/utils";
 import { List, Table, Text } from "@mantine/core";
 import { useI18nMessages } from "@ui/i18n/useI18nMessages";
 import { useMemo } from "react";

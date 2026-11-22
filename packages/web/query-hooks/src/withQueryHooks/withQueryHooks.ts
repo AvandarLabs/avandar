@@ -1,5 +1,6 @@
+import type {
+  AnyFunction} from "@avandar/utils";
 import {
-  AnyFunction,
   capitalize,
   excludeDeep,
   isEmptyObject,
@@ -8,10 +9,10 @@ import {
   objectKeys,
   prefix,
 } from "@avandar/utils";
-import { DefaultError, QueryClient, QueryKey } from "@query-hooks/core.types";
+import type { DefaultError, QueryClient, QueryKey } from "@query-hooks/core.types";
 import { useMutation } from "@query-hooks/useMutation/useMutation";
 import { useQuery } from "@query-hooks/useQuery/useQuery";
-import {
+import type {
   ClientFnFirstParameter,
   ClientWithCache,
   ExtraUseClientMutationArgs,

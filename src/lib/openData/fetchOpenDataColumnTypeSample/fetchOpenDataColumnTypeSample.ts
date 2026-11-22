@@ -23,8 +23,8 @@ export function buildOpenDataListingUrl(
   catalogListingId: DataCatalogListing.Id,
 ): string {
   return (
-    `${AvaSupabase.getEdgeFunctionsURL()}/open-data/data-catalog-listings/` +
-    encodeURIComponent(catalogListingId)
+    `${AvaSupabase.getEdgeFunctionsURL()}/open-data/data-catalog-listings/${
+    encodeURIComponent(catalogListingId)}`
   );
 }
 

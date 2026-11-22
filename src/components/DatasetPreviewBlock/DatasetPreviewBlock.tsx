@@ -1,7 +1,8 @@
 import { ObjectDescriptionList } from "@avandar/ui";
 import { prop } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { ScrollArea, Stack, StackProps } from "@mantine/core";
+import type { StackProps } from "@mantine/core";
+import { ScrollArea, Stack } from "@mantine/core";
 import { useMemo } from "react";
 import { avaDataTypeLabel } from "$/copy/avaDataTypeLabel";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";

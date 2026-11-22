@@ -1,12 +1,14 @@
 import { makeObject } from "@avandar/utils";
+import type {
+  TabsProps as MantineTabsProps} from "@mantine/core";
 import {
   FloatingIndicator,
   Tabs as MantineTabs,
-  TabsProps as MantineTabsProps,
   Text,
 } from "@mantine/core";
 import { clsx } from "clsx";
-import { ReactNode, useMemo, useState } from "react";
+import type { ReactNode} from "react";
+import { useMemo, useState } from "react";
 import classes from "./Tabs.module.css";
 
 export type TabsIndicatorVariant = "underline" | "floating";

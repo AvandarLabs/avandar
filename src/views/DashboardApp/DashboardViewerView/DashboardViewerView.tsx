@@ -2,7 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { useEffect, useMemo } from "react";
 import { notifyError } from "@/utils/notifications/notify";
 import "@puckeditor/core/puck.css";
-import { AvaPageGenericData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
+import type { AvaPageGenericData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";
 import { getAvaPageMetadataFromDashboard } from "@/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard/getAvaPageMetadataFromDashboard";
 import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";

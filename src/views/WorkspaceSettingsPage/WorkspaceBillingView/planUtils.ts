@@ -1,5 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import { SegmentedControlItem } from "@mantine/core";
+import type { SegmentedControlItem } from "@mantine/core";
 import { match } from "ts-pattern";
 import {
   BasicPlanConfig,
@@ -8,7 +8,7 @@ import {
 } from "$/config/FeaturePlansConfig";
 import { isOneOf } from "@/lib/utils/guards/guards";
 import { Logger } from "@/utils/Logger";
-import {
+import type {
   AnnualPaidSeatsPlan,
   FeaturePlan,
   FreePlanVariants,

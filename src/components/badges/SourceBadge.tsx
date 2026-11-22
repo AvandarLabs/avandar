@@ -22,7 +22,7 @@ export function SourceBadge({
   size?: number;
 }): JSX.Element | null {
   const { t } = useLingui();
-  if (!sourceType) return null;
+  if (!sourceType) {return null;}
 
   const { Icon, tooltip } = match(sourceType)
     .with("csv_file", () => {

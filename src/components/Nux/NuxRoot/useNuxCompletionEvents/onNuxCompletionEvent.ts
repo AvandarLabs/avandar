@@ -1,7 +1,7 @@
 import { matchLiteral } from "@avandar/utils";
 import { FIRST_DASHBOARD_PREREQUISITES } from "@/components/Nux/NuxPrerequisites/firstDashboard/firstDashboardPrerequisites/firstDashboardPrerequisites";
 import { NuxPrerequisiteJudge } from "@/components/Nux/NuxPrerequisites/NuxPrerequisiteJudge/NuxPrerequisiteJudge";
-import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
+import type { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { NuxEvent } from "@/components/Nux/NuxEvents/NuxEvents";

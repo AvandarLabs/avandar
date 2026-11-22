@@ -1,4 +1,4 @@
-import { _render } from "./SavedSeedSeasonReturnTestHelpers";
+import type { _render } from "./SavedSeedSeasonReturnTestHelpers";
 /** Rendered setup state consumed by the corresponding assertions. */
 export type MakeCultivatorHandsTouchActualFrameFromFrameResult = {
   markup: ReturnType<typeof _render>;

@@ -3,7 +3,7 @@
  */
 import { useRef, useState } from "react";
 import { useMapToolGestures } from "@/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures";
-import { createFakeMap } from "@/views/GisApp/shell/MapToolCluster/createFakeMap";
+import type { createFakeMap } from "@/views/GisApp/shell/MapToolCluster/createFakeMap";
 import { MapToolCluster } from "@/views/GisApp/shell/MapToolCluster/MapToolCluster";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";

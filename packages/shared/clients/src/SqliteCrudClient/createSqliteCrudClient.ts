@@ -7,7 +7,7 @@ import {
 import { withSupabaseClient } from "@clients/mixins/withSupabaseClient.ts";
 import { createModelCrudClient } from "@clients/ModelCrudClient/createModelCrudClient.ts";
 import { match } from "ts-pattern";
-import { EmptyObject } from "type-fest";
+import type { EmptyObject } from "type-fest";
 import type { ILogger } from "@avandar/logger";
 import type { FilterOperator, FiltersByColumn } from "@avandar/utils";
 import type { ModelCrudParserRegistry } from "@clients/makeParserRegistry/makeParserRegistry.ts";
@@ -163,13 +163,13 @@ export function createSqliteCrudClient<
         // semantics).
         const cols = objectKeys(allRows[0]!);
         const placeholders =
-          "(" +
+          `(${
           cols
             .map(() => {
               return "?";
             })
-            .join(", ") +
-          ")";
+            .join(", ")
+          })`;
         const valuesClause = allRows
           .map(() => {
             return placeholders;
@@ -394,13 +394,13 @@ function _buildInsertSql(args: Readonly<BuildInsertSqlArgs>): string {
   const colsClause = cols.map(_ident).join(", ");
   const values =
     valuesClause ??
-    "(" +
+    `(${
       cols
         .map(() => {
           return "?";
         })
-        .join(", ") +
-      ")";
+        .join(", ")
+      })`;
   let conflict = "";
   if (upsert) {
     assertIsDefined(onConflict, "`onConflict` must be defined when upserting");

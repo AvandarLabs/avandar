@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { denseInput } from "../SharedReadingCircles.fixtures";
+import type { denseInput } from "../SharedReadingCircles.fixtures";
 
 /** Asserts each reader retains exactly one authored group-book association. */
 export function assertEachReaderKeepsItsAuthoredBook({

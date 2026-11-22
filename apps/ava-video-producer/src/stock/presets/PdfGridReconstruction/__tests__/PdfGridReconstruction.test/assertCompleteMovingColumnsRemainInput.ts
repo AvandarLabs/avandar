@@ -1,4 +1,4 @@
-import { DEFAULT_INPUT, fixtures } from "../../PdfGridReconstruction.fixtures";
+import type { DEFAULT_INPUT, fixtures } from "../../PdfGridReconstruction.fixtures";
 import { assertCompleteMovingColumnsRemainFrame as _assertCompleteMovingColumnsRemainFrame } from "./assertCompleteMovingColumnsRemainFrame";
 
 /**

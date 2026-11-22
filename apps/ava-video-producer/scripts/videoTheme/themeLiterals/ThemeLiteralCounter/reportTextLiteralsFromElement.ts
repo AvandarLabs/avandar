@@ -1,4 +1,4 @@
-import ts from "typescript";
+import type ts from "typescript";
 import { LiteralSourceHelpers } from "./LiteralSourceHelpers";
 import { type LiteralCountReporter } from "./ThemeLiteralCounter.types";
 

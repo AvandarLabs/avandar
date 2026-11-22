@@ -3,7 +3,7 @@ import { UncertaintyUnfoldTestState } from "./UncertaintyUnfoldTestState";
 const { render } = UncertaintyUnfoldTestState;
 import assert from "node:assert/strict";
 import { SvgAttributes } from "../../../../../../tests/helpers/SvgAttributes";
-import { fixtures } from "../../UncertaintyUnfold.fixtures";
+import type { fixtures } from "../../UncertaintyUnfold.fixtures";
 import { assertOneFixedRulerPositionsFrame as _assertOneFixedRulerPositionsFrame } from "./assertOneFixedRulerPositionsFrame";
 import { assertOneFixedRulerPositionsHold as _assertOneFixedRulerPositionsHold } from "./assertOneFixedRulerPositionsHold";
 

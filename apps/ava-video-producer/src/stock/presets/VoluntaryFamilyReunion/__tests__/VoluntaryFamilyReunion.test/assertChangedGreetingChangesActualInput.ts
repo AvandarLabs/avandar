@@ -2,7 +2,7 @@ import { VoluntaryFamilyReunionTestState } from "./VoluntaryFamilyReunionTestSta
 
 const { render: _render } = VoluntaryFamilyReunionTestState;
 import assert from "node:assert/strict";
-import { fixtures } from "../../VoluntaryFamilyReunion.fixtures";
+import type { fixtures } from "../../VoluntaryFamilyReunion.fixtures";
 import { assertChangedGreetingChangesActualPeople as _assertChangedGreetingChangesActualPeople } from "./assertChangedGreetingChangesActualPeople";
 
 /**

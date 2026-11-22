@@ -1,4 +1,4 @@
-import { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
+import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 import { buildReadCsvPromptFromResolved } from "@/clients/DuckDbClient/csvParse/csvReadCsvArgs";
 import {
   columnsFromSniffRow,

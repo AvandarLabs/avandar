@@ -1,8 +1,8 @@
 import { useLingui } from "@lingui/react/macro";
-import { CustomField } from "@puckeditor/core";
+import type { CustomField } from "@puckeditor/core";
 import { useCallback, useMemo } from "react";
-import { Dashboard } from "$/models/Dashboard/Dashboard";
-import { Workspace } from "$/models/Workspace/Workspace";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { Workspace } from "$/models/Workspace/Workspace";
 import { VizConfigPField } from "@/views/DashboardApp/AvaPage/pfields/VizConfigPField/VizConfigPField";
 import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
 import type { UiVizConfig } from "$/models/vizs/UiVizConfig/UiVizConfig.types";

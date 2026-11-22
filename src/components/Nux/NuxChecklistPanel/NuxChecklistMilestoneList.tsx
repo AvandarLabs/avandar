@@ -1,5 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import { NuxProgress } from "$/models/NuxProgress/NuxProgress";
+import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 import { NuxChecklistMilestoneRow } from "@/components/Nux/NuxChecklistPanel/NuxChecklistMilestoneRow/NuxChecklistMilestoneRow";
 import { nuxSelectors } from "@/components/Nux/NuxStateManager/nuxSelectors/nuxSelectors";
 import { NuxStateManager } from "@/components/Nux/NuxStateManager/NuxStateManager";

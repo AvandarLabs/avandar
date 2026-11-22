@@ -2,7 +2,7 @@ import { AtlasCategoryNav } from "../../AtlasLayout/AtlasCategoryNav/AtlasCatego
 import { HELPER_CATEGORIES } from "../helperCategoryHelpers";
 import { HelperCollection } from "../HelperCollection/HelperCollection";
 import { HELPER_CATALOG } from "../HelperFilmIds";
-import { useHelperGallery } from "../useHelperGallery";
+import type { useHelperGallery } from "../useHelperGallery";
 import css from "./HelperWorkspace.module.css";
 import type { ReactNode, Dispatch, SetStateAction } from "react";
 

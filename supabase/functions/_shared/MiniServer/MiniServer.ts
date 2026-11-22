@@ -2,14 +2,16 @@ import { authMiddleware } from "@sbfn/_shared/authMiddleware.ts";
 import { corsHeaders } from "@sbfn/_shared/cors.ts";
 import { BAD_REQUEST, INTERNAL_SERVER_ERROR } from "@sbfn/_shared/httpCodes.ts";
 import { createDefaultRouteHandler } from "@sbfn/_shared/MiniServer/createServerRouteHandler.ts";
+import type {
+  ValidPathParamsSchemaShape} from "@sbfn/_shared/MiniServer/parseURLPathParams.ts";
 import {
-  parseURLPathParams,
-  ValidPathParamsSchemaShape,
+  parseURLPathParams
 } from "@sbfn/_shared/MiniServer/parseURLPathParams.ts";
 import { isRedirect } from "@sbfn/_shared/MiniServer/redirect.ts";
 import { responseError } from "@sbfn/_shared/MiniServer/responseError.ts";
 import { responseSuccess } from "@sbfn/_shared/MiniServer/responseSuccess.ts";
-import { AvaSupabaseClient, SupabaseAdmin } from "@sbfn/_shared/supabase.ts";
+import type { AvaSupabaseClient} from "@sbfn/_shared/supabase.ts";
+import { SupabaseAdmin } from "@sbfn/_shared/supabase.ts";
 import { z } from "zod";
 import type {
   AnyValidPathParamsRecord,

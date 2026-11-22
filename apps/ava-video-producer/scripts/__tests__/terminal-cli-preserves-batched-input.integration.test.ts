@@ -43,9 +43,9 @@ print(output.decode(errors="replace"))
 
 function _probeSource(): string {
   const root = new URL("../runProducerCommand/", import.meta.url).href;
-  return `import { TerminalSession } from ${JSON.stringify(root + "TerminalSession.mjs")};
-import { PromptView } from ${JSON.stringify(root + "PromptView.mjs")};
-import { prepareCommandInvocation } from ${JSON.stringify(root + "prepareCommandInvocation.mjs")};
+  return `import { TerminalSession } from ${JSON.stringify(`${root  }TerminalSession.mjs`)};
+import { PromptView } from ${JSON.stringify(`${root  }PromptView.mjs`)};
+import { prepareCommandInvocation } from ${JSON.stringify(`${root  }prepareCommandInvocation.mjs`)};
 const mode = process.argv[2];
 let terminal;
 try {

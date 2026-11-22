@@ -1,5 +1,5 @@
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { makeGridSceneFromInputAndFrame } from "../makeGridSceneFromInputAndFrame";
+import type { makeGridSceneFromInputAndFrame } from "../makeGridSceneFromInputAndFrame";
 import type { ReactNode } from "react";
 
 type Props = {

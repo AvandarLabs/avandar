@@ -1,4 +1,5 @@
-import { isArray, MIMEType } from "@avandar/utils";
+import type { MIMEType } from "@avandar/utils";
+import { isArray } from "@avandar/utils";
 import { Box, Button, FileInput, Group } from "@mantine/core";
 import { useForm } from "@ui/hooks/useForm/useForm";
 import { useI18nMessages } from "@ui/i18n/useI18nMessages";

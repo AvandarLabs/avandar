@@ -91,19 +91,19 @@ function _readAdoptArguments(argv: readonly string[]): {
     const argument = argv[index];
     const flag = argument.split("=")[0];
     if (["--curves", "--dry-run", "--mode"].includes(flag)) {
-      if (flags.has(flag)) throw new Error(`Repeated option: ${flag}`);
+      if (flags.has(flag)) {throw new Error(`Repeated option: ${flag}`);}
       flags.add(flag);
       if (flag === "--mode") {
         mode = argument.includes("=")
           ? argument.slice(argument.indexOf("=") + 1)
           : argv[++index];
         if (!["auto", "light", "dark"].includes(mode))
-          throw new Error("--mode requires auto|dark|light");
+          {throw new Error("--mode requires auto|dark|light");}
       } else if (argument.includes("="))
-        throw new Error(`${flag} does not take a value`);
+        {throw new Error(`${flag} does not take a value`);}
     } else if (argument.startsWith("-") || paths.length)
-      throw new Error(`Unexpected argument: ${argument}`);
-    else paths.push(argument);
+      {throw new Error(`Unexpected argument: ${argument}`);}
+    else {paths.push(argument);}
   }
   return { flags, mode, paths };
 }

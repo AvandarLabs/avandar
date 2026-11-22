@@ -3,7 +3,7 @@ import { PortableWorkTransferTestState } from "./PortableWorkTransferTestState";
 const { render } = PortableWorkTransferTestState;
 import assert from "node:assert/strict";
 import { SvgAttributes } from "../../../../../../tests/helpers/SvgAttributes";
-import { FIXTURES } from "../../PortableWorkTransfer.fixtures";
+import type { FIXTURES } from "../../PortableWorkTransfer.fixtures";
 import { assertAcceptedCopiesUnloadCompletelyId as _assertAcceptedCopiesUnloadCompletelyId } from "./assertAcceptedCopiesUnloadCompletelyId";
 
 /**

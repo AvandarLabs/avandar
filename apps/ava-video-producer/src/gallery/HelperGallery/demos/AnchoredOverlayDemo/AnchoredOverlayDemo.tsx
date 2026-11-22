@@ -1,6 +1,6 @@
 import { AnchoredOverlay } from "../../../../motion-components/AnchoredOverlay";
 import { getOverlayPose } from "../../../../motion-components/getOverlayPose";
-import {
+import type {
   MotionRect,
   OverlayCue,
 } from "../../../../motion-components/getOverlayTimings";

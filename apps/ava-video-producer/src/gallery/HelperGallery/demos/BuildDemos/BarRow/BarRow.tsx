@@ -1,4 +1,4 @@
-import { BarComparisonMotion } from "../../../../../scenes/BarComparisonScene/BarComparisonMotion/BarComparisonMotion";
+import type { BarComparisonMotion } from "../../../../../scenes/BarComparisonScene/BarComparisonMotion/BarComparisonMotion";
 import { useVideoMotion } from "../../../../../videoTheme/useVideoMotion";
 import css from "./BarRow.module.css";
 import type { ReactNode } from "react";

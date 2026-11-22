@@ -1,5 +1,5 @@
 import { t } from "@lingui/core/macro";
-import { Key } from "react";
+import type { Key } from "react";
 import type { LinkProps } from "@avandar/ui";
 
 /**

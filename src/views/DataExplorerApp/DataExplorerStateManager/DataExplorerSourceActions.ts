@@ -1,7 +1,7 @@
 import { Model } from "@avandar/models";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { QueryColumnReconciliation } from "$/models/queries/QueryColumn/QueryColumnReconciliation/QueryColumnReconciliation";
-import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
+import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
 import { applyQueryChange } from "@/views/DataExplorerApp/DataExplorerStateManager/dataExplorerStateHelpers";
 import { applyDefaultManualQueryLimit } from "@/views/DataExplorerApp/manualQueryLimit/manualQueryLimit";

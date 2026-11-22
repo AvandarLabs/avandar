@@ -1,10 +1,11 @@
 import assert from "node:assert/strict";
-import { denseInput } from "../SharedReadingCircles.fixtures";
+import type { denseInput } from "../SharedReadingCircles.fixtures";
 import { assertFirstReaderPicksUpGroup as _assertFirstReaderPicksUpGroup } from "./assertFirstReaderPicksUpGroup";
+import type {
+  _createRouteInputs} from "./SharedReadingCirclesTestHelpers/SharedReadingCirclesTestHelpers";
 import {
   _render,
-  _bookPositions,
-  _createRouteInputs,
+  _bookPositions
 } from "./SharedReadingCirclesTestHelpers/SharedReadingCirclesTestHelpers";
 
 /**

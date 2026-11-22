@@ -1,12 +1,12 @@
 import { objectEntries } from "@avandar/utils";
-import { Box, MantineColor, Text } from "@mantine/core";
+import { Box, Text } from "@mantine/core";
 import { IconChevronRight } from "@tabler/icons-react";
 import { clsx } from "clsx";
-import { Key, ReactNode } from "react";
+import type { Key, ReactNode } from "react";
 import { TruncatedText } from "../text/TruncatedText";
 import { NavLink } from "./NavLink";
 import type { NavLinkProps } from "./NavLink";
-import type { BoxProps } from "@mantine/core";
+import type { BoxProps , MantineColor} from "@mantine/core";
 
 type Props = {
   links: ReadonlyArray<

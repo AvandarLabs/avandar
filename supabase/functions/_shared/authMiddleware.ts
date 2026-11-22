@@ -2,18 +2,19 @@ import { AvaHTTPError } from "@sbfn/_shared/AvaHTTPError.ts";
 import { BAD_REQUEST, UNAUTHORIZED } from "@sbfn/_shared/httpCodes.ts";
 import { isRedirect } from "@sbfn/_shared/MiniServer/redirect.ts";
 import { responseError } from "@sbfn/_shared/MiniServer/responseError.ts";
+import type {
+  AvaSupabaseClient} from "@sbfn/_shared/supabase.ts";
 import {
-  AvaSupabaseClient,
   createSupabaseClient,
 } from "@sbfn/_shared/supabase.ts";
 import * as jose from "jsr:@panva/jose@6";
 import type { User } from "@supabase/supabase-js";
 
 const SUPABASE_JWT_ISSUER =
-  Deno.env.get("SB_JWT_ISSUER") ?? Deno.env.get("SUPABASE_URL") + "/auth/v1";
+  Deno.env.get("SB_JWT_ISSUER") ?? `${Deno.env.get("SUPABASE_URL")  }/auth/v1`;
 
 const SUPABASE_JWT_KEYS = jose.createRemoteJWKSet(
-  new URL(Deno.env.get("SUPABASE_URL")! + "/auth/v1/.well-known/jwks.json"),
+  new URL(`${Deno.env.get("SUPABASE_URL")!  }/auth/v1/.well-known/jwks.json`),
 );
 
 function _getAuthToken(req: Request) {

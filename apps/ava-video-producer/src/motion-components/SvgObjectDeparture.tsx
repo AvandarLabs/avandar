@@ -1,6 +1,7 @@
 import { useId } from "react";
+import type {
+  ObjectFlight} from "./getObjectFlight/getObjectFlight";
 import {
-  ObjectFlight,
   getObjectFlight,
 } from "./getObjectFlight/getObjectFlight";
 import { MotionSettings } from "./MotionSettings/MotionSettings";

@@ -13,8 +13,8 @@ import {
   Title,
 } from "@mantine/core";
 import { useMemo } from "react";
-import { Dashboard } from "$/models/Dashboard/Dashboard";
-import { Workspace } from "$/models/Workspace/Workspace";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { Workspace } from "$/models/Workspace/Workspace";
 import { CURRENT_SCHEMA_VERSION } from "@/views/DashboardApp/AvaPage/migrations/config";
 import { useDataVizPBlockConfig } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig";
 import { useFilterPBlockConfig } from "@/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig";

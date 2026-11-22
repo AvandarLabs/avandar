@@ -1,6 +1,6 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { z } from "zod";
-import { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import { DashboardClient } from "@/clients/dashboards/DashboardClient/DashboardClient";
 import { UserClient } from "@/clients/UserClient";
 import { DashboardAccessDeniedView } from "@/views/DashboardApp/DashboardViewerView/DashboardAccessDeniedView/DashboardAccessDeniedView";

@@ -24,6 +24,8 @@
 
     /* Paths aliases */
     "paths": {
+      "scripts/*": ["./scripts/*"],
+      "seed/*": ["./seed/*"],
       "$/*": ["./shared/*"],
       "@/*": ["./src/*"],
 

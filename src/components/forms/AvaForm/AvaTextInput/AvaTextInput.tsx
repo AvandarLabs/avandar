@@ -1,5 +1,6 @@
 import { isDefined, objectKeys, prop } from "@avandar/utils";
-import { TextInput, TextInputProps } from "@mantine/core";
+import type { TextInputProps } from "@mantine/core";
+import { TextInput } from "@mantine/core";
 import { useDebouncedCallback } from "@mantine/hooks";
 import type {
   GenericFormSchemaRecord,

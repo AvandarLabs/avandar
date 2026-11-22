@@ -1,5 +1,5 @@
 import { MIMEType } from "@avandar/utils";
-import * as arrow from "apache-arrow";
+import type * as arrow from "apache-arrow";
 import { uuid } from "$/lib/uuid";
 import { abortDuckDbQuery } from "@/clients/DuckDbClient/abortDuckDbQuery/abortDuckDbQuery";
 import { DatasetDuckDbCoordinator } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";

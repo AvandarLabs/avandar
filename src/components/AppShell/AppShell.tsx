@@ -2,10 +2,11 @@ import { useToggleBoolean } from "@avandar/hooks";
 import { useLingui } from "@lingui/react/macro";
 import { AppShell as MantineAppShell } from "@mantine/core";
 import { useHotkeys } from "@mantine/hooks";
-import {
-  Spotlight,
+import type {
   SpotlightActionData,
-  SpotlightActionGroupData,
+  SpotlightActionGroupData} from "@mantine/spotlight";
+import {
+  Spotlight
 } from "@mantine/spotlight";
 import { IconSearch } from "@tabler/icons-react";
 import { Outlet } from "@tanstack/react-router";

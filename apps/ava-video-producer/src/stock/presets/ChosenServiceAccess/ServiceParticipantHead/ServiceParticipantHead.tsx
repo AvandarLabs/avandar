@@ -1,5 +1,5 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
-import { AccessParticipantGetServiceParticipantPoseValue } from "../AccessParticipant";
+import type { AccessParticipantGetServiceParticipantPoseValue } from "../AccessParticipant";
 import type { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 

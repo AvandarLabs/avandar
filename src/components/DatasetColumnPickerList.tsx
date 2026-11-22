@@ -1,8 +1,9 @@
+import type {
+  SegmentedControlItem,
+  SegmentedControlProps} from "@avandar/ui";
 import {
   makeSegmentedControlItems,
-  SegmentedControl,
-  SegmentedControlItem,
-  SegmentedControlProps,
+  SegmentedControl
 } from "@avandar/ui";
 import {
   isNonEmptyArray,
@@ -23,7 +24,7 @@ import {
 } from "@mantine/core";
 import { usePrevious, useUncontrolled } from "@mantine/hooks";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
-import { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
+import type { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";

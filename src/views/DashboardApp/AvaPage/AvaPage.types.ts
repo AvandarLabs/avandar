@@ -1,6 +1,6 @@
-import { ReactNode } from "react";
-import { Simplify } from "type-fest";
-import { CURRENT_SCHEMA_VERSION } from "@/views/DashboardApp/AvaPage/migrations/config";
+import type { ReactNode } from "react";
+import type { Simplify } from "type-fest";
+import type { CURRENT_SCHEMA_VERSION } from "@/views/DashboardApp/AvaPage/migrations/config";
 import type { Props as DataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 import type { Props as FilterPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock";
 import type { Props as MapPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/MapPBlock/MapPBlock";

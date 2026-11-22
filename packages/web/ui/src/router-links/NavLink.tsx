@@ -1,15 +1,17 @@
 import { noop } from "@avandar/utils";
+import type {
+  MantineColor,
+  NavLinkProps as MantineNavLinkProps} from "@mantine/core";
 import {
   DEFAULT_THEME,
-  MantineColor,
   NavLink as MantineNavLink,
-  NavLinkProps as MantineNavLinkProps,
   useMantineTheme,
 } from "@mantine/core";
 import { useHover, useMergedRef } from "@mantine/hooks";
 import { createLink } from "@tanstack/react-router";
+import type {
+  AnchorHTMLAttributes} from "react";
 import {
-  AnchorHTMLAttributes,
   forwardRef,
   useEffect,
   useMemo,

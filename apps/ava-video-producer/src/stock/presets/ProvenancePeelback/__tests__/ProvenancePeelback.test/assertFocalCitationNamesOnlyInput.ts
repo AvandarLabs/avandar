@@ -4,7 +4,7 @@ const { render: _render } = ProvenancePeelbackTestState;
 import assert from "node:assert/strict";
 import { propEq } from "@avandar/utils";
 import { SvgAttributes } from "../../../../../../tests/helpers/SvgAttributes";
-import { fixtures } from "../../ProvenancePeelback.fixtures";
+import type { fixtures } from "../../ProvenancePeelback.fixtures";
 import { assertFocalCitationNamesOnlyCitation as _assertFocalCitationNamesOnlyCitation } from "./assertFocalCitationNamesOnlyCitation";
 
 /**

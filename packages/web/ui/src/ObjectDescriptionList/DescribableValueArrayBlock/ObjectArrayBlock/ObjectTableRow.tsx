@@ -1,5 +1,5 @@
 import { useBoolean } from "@avandar/hooks";
-import { StringKeyOf } from "@avandar/utils";
+import type { StringKeyOf } from "@avandar/utils";
 import { Button, Group, Table } from "@mantine/core";
 import { useI18nMessages } from "@ui/i18n/useI18nMessages";
 import { useState } from "react";

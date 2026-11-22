@@ -1,5 +1,6 @@
 import { sql } from "@codemirror/lang-sql";
-import { Compartment, EditorState, Extension } from "@codemirror/state";
+import type { Extension } from "@codemirror/state";
+import { Compartment, EditorState } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
 import CodeMirror from "@uiw/react-codemirror";
 import { clsx } from "clsx";

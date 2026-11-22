@@ -4,7 +4,7 @@ import { withNewMembers } from "@avandar/modules";
 import { withQueryHooks } from "@avandar/query-hooks";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { Permissions } from "$/models/Permissions/Permissions";
-import { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
+import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
 import type {
   AppType,
   RoleLevel,

@@ -10,7 +10,7 @@ async function _createProject(): Promise<void> {
   requireLicense();
   const [name, ...extra] = process.argv.slice(2);
   if (!name || !/^[a-z][a-z0-9-]*$/.test(name) || extra.length)
-    throw new Error("Usage: pnpm video:new <project-name>");
+    {throw new Error("Usage: pnpm video:new <project-name>");}
   const root = fileURLToPath(new URL("../../", import.meta.url));
   CliOutput.progress(`Creating private project ${name}.`);
   const project = await createPrivateVideoProject({

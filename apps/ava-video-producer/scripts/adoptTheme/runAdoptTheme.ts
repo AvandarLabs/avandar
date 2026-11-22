@@ -135,5 +135,5 @@ function _writeThemeCss({
   isDryRun,
   css,
 }: Readonly<{ isDryRun: boolean; css: string }>): void {
-  if (!isDryRun) writeFileSync(resolve("src/theme.css"), css);
+  if (!isDryRun) {writeFileSync(resolve("src/theme.css"), css);}
 }

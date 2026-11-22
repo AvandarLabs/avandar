@@ -1,8 +1,9 @@
 import { Callout } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
+import type {
+  ErrorComponentProps} from "@tanstack/react-router";
 import {
   createFileRoute,
-  ErrorComponentProps,
   notFound,
 } from "@tanstack/react-router";
 import { useEffect } from "react";

@@ -1,8 +1,9 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { MultiSelect, Stack, Text } from "@mantine/core";
 import { getHotkeyHandler } from "@mantine/hooks";
+import type {
+  ForwardedRef} from "react";
 import {
-  ForwardedRef,
   forwardRef,
   useImperativeHandle,
   useRef,
@@ -11,7 +12,7 @@ import {
 import { Permissions } from "$/models/Permissions/Permissions";
 import { AvaField } from "@/components/forms/AvaForm/AvaField";
 import { AvaForm } from "@/components/forms/AvaForm/AvaForm";
-import { AvaFormRef } from "@/components/forms/AvaForm/AvaForm.types";
+import type { AvaFormRef } from "@/components/forms/AvaForm/AvaForm.types";
 import { WorkspaceAppRoleMatrixForm } from "@/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm";
 import type {
   BuiltinPresetType,

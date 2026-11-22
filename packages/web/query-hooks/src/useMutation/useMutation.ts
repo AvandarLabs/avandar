@@ -1,13 +1,14 @@
 import { isDevBuild } from "@query-hooks/isDevBuild";
 import { useAvaQueryErrorReporter } from "@query-hooks/useAvaQueryErrorReporter";
-import {
+import type {
   DefaultError,
   QueryKey,
   UseMutateAsyncFunction as TanstackUseMutateAsyncFunction,
   UseMutateFunction as TanstackUseMutateFunction,
-  useMutation as tanstackUseMutation,
   UseMutationOptions as TanstackUseMutationOptions,
-  UseMutationResult as TanstackUseMutationResult,
+  UseMutationResult as TanstackUseMutationResult} from "@tanstack/react-query";
+import {
+  useMutation as tanstackUseMutation,
   useQueryClient,
 } from "@tanstack/react-query";
 import type { Simplify } from "type-fest";

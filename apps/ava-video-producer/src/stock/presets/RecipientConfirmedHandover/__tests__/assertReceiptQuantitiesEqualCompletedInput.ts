@@ -1,4 +1,4 @@
-import { fixtures } from "../RecipientConfirmedHandover.fixtures";
+import type { fixtures } from "../RecipientConfirmedHandover.fixtures";
 import { assertReceiptQuantitiesEqualCompletedFrame as _assertReceiptQuantitiesEqualCompletedFrame } from "./assertReceiptQuantitiesEqualCompletedFrame";
 
 /**

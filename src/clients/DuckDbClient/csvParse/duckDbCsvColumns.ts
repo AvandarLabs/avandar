@@ -1,5 +1,6 @@
+import type {
+  DuckDbDataType} from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 import {
-  DuckDbDataType,
   DuckDbDataTypes,
 } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 import type { DuckDbSniffCsvRow } from "@/clients/DuckDbClient/csvParse/csvParse.types";

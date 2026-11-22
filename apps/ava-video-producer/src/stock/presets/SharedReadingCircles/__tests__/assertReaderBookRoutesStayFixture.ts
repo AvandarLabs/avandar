@@ -1,9 +1,10 @@
 import assert from "node:assert/strict";
+import type {
+  _createRouteInputs} from "./SharedReadingCirclesTestHelpers/SharedReadingCirclesTestHelpers";
 import {
   _render,
   _bookPositions,
-  _getReaderPosition,
-  _createRouteInputs,
+  _getReaderPosition
 } from "./SharedReadingCirclesTestHelpers/SharedReadingCirclesTestHelpers";
 
 /**

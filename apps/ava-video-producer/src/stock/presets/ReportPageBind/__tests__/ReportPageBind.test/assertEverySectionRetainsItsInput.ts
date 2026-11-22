@@ -3,7 +3,7 @@ import { ReportPageBindTestState } from "./ReportPageBindTestState";
 const { render: _render } = ReportPageBindTestState;
 import assert from "node:assert/strict";
 import { SvgAttributes } from "../../../../../../tests/helpers/SvgAttributes";
-import { fixtures } from "../../ReportPageBind.fixtures";
+import type { fixtures } from "../../ReportPageBind.fixtures";
 import { assertEverySectionRetainsItsFinalView as _assertEverySectionRetainsItsFinalView } from "./assertEverySectionRetainsItsFinalView";
 
 /**

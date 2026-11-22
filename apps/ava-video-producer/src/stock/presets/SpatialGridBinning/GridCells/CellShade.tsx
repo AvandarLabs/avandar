@@ -1,6 +1,6 @@
 import { StockRect } from "../../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { makeGridSceneFromInputAndFrame } from "../makeGridSceneFromInputAndFrame";
+import type { makeGridSceneFromInputAndFrame } from "../makeGridSceneFromInputAndFrame";
 import { GridCellsShared } from "./GridCellsShared";
 import type { Input } from "../SpatialGridBinning.schema";
 import type { ReactNode } from "react";

@@ -1,4 +1,4 @@
-import { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
+import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
 import {
   createSupabaseAdminClient,
   getWorkspaceIdBySlug,

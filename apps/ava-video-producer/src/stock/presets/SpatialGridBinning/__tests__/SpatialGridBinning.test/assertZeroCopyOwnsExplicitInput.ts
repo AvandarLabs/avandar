@@ -1,4 +1,4 @@
-import { DEFAULT_INPUT, fixtures } from "../../SpatialGridBinning.fixtures";
+import type { DEFAULT_INPUT, fixtures } from "../../SpatialGridBinning.fixtures";
 import { assertZeroCopyOwnsExplicitFrame as _assertZeroCopyOwnsExplicitFrame } from "./assertZeroCopyOwnsExplicitFrame";
 
 /**

@@ -56,7 +56,7 @@ rules:
     phases:
       - 3
     owner: lint
-    boundary: Native consistent-type rules after type-aware benchmark
+    boundary: Native type imports and type-aware exports; import() annotations remain unchanged
   - id: AF-04
     slug: prefer-as-const
     class: AF
@@ -80,7 +80,7 @@ rules:
     phases:
       - 3
     owner: lint
-    boundary: Native type-aware rule
+    boundary: Native assertion fixer breaks TS5.9 generic CRUD contracts; disabled and remains fallback
   - id: AF-06
     slug: no-function-body-doc-comments
     class: AF
@@ -280,7 +280,7 @@ rules:
     phases:
       - 3
     owner: lint
-    boundary: Resolver proves the target
+    boundary: Native import/extensions detects resolvable targets but has no safe fixer in Oxlint 1.93.0; repair remains fallback
   - id: AF-20
     slug: css-block-comment
     class: AF

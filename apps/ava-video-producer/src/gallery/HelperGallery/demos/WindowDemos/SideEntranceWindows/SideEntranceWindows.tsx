@@ -1,5 +1,5 @@
-import { useWindowStage } from "../../../../../scenes/TiltedWindowScene/useWindowStage";
-import { WindowMotion } from "../../../../../scenes/TiltedWindowScene/WindowMotion/WindowMotion";
+import type { useWindowStage } from "../../../../../scenes/TiltedWindowScene/useWindowStage";
+import type { WindowMotion } from "../../../../../scenes/TiltedWindowScene/WindowMotion/WindowMotion";
 import { PAIR_BOXES } from "../../../../../scenes/TiltedWindowScene/windowTilt";
 import { DemoCanvas } from "../../parts/DemoCanvas/DemoCanvas";
 import { getCanvasRect } from "../../parts/getCanvasRect";

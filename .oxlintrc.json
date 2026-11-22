@@ -210,9 +210,16 @@
           }
         ],
         "no-shadow": "error",
-        "curly": "off",
-        "prefer-template": "off",
-        "typescript/consistent-type-imports": "off",
+        "curly": ["error", "all"],
+        "prefer-template": "error",
+        "typescript/consistent-type-imports": [
+          "error",
+          {
+            "prefer": "type-imports",
+            "fixStyle": "separate-type-imports",
+            "disallowTypeAnnotations": false
+          }
+        ],
         "import/extensions": [
           "error",
           "ignorePackages",
@@ -246,7 +253,9 @@
           {
             "default": "array-simple"
           }
-        ]
+        ],
+        "typescript/consistent-type-exports": "error",
+        "typescript/no-unnecessary-type-assertion": "off"
       },
       "env": {
         "browser": true,
@@ -436,5 +445,8 @@
         "video-theme/no-restricted-syntax": "error"
       }
     }
-  ]
+  ],
+  "options": {
+    "typeAware": true
+  }
 }

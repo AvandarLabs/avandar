@@ -1,4 +1,4 @@
-import { DefaultError, QueryClient, QueryKey } from "@query-hooks/core.types";
+import type { DefaultError, QueryClient, QueryKey } from "@query-hooks/core.types";
 import type {
   CrudModelSpec,
   ModelCrudClient,

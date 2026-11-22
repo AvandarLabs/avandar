@@ -9,7 +9,7 @@ import {
   EMPTY_ANNOTATIONS,
   overlayConfigUpdaters,
 } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigModule/overlayConfigUpdaters/overlayConfigUpdaters.ts";
-import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
 import type {
   AvaMapConfigRead,
   MapBookmark,

@@ -8,7 +8,7 @@ import {
   Preview,
   Section,
 } from "@react-email/components";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { APP_NAME } from "$/config/GlobalAppConfig.ts";
 import { buildRelativeImageURL } from "$/emails/lib/buildRelativeImageURL.ts";
 import { LOGO, THEME } from "$/emails/lib/EmailTheme.ts";

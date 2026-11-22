@@ -1,6 +1,6 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { makeRegisteredLandmarksFromInputAndFrame } from "../makeRegisteredLandmarksFromInputAndFrame";
+import type { makeRegisteredLandmarksFromInputAndFrame } from "../makeRegisteredLandmarksFromInputAndFrame";
 import type { ReactNode } from "react";
 
 type Props = {

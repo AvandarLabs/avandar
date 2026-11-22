@@ -1,7 +1,7 @@
 import { Acclimate } from "@avandar/acclimate";
 import knex from "knex";
-import { QueryResult } from "pg";
-import { UnknownRecord } from "type-fest";
+import type { QueryResult } from "pg";
+import type { UnknownRecord } from "type-fest";
 
 function _getEnvSupabasePostgresURL(): string {
   if (!process.env.SUPABASE_POSTGRES_URL) {

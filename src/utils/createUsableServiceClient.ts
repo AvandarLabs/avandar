@@ -1,11 +1,12 @@
-import { ModelCrudClient } from "@avandar/clients";
-import {
-  DEFAULT_MUTATION_FN_NAMES,
-  DEFAULT_QUERY_FN_NAMES,
+import type { ModelCrudClient } from "@avandar/clients";
+import type {
   DefaultMutationFnName,
   DefaultQueryFnName,
   FnNameReturningPromise,
-  WithQueryHooks,
+  WithQueryHooks} from "@avandar/query-hooks";
+import {
+  DEFAULT_MUTATION_FN_NAMES,
+  DEFAULT_QUERY_FN_NAMES,
   withQueryHooks,
 } from "@avandar/query-hooks";
 

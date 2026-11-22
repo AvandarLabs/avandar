@@ -55,13 +55,13 @@ describe("updateRootDenoWorkspace", () => {
     const denoPath = path.join(tmpRoot, "deno.json");
     fs.writeFileSync(
       denoPath,
-      JSON.stringify(
+      `${JSON.stringify(
         {
           workspace: ["./packages/shared/utils"],
         },
         undefined,
         2,
-      ) + "\n",
+      )  }\n`,
       "utf-8",
     );
 
@@ -82,13 +82,13 @@ describe("updateRootDenoWorkspace", () => {
     const denoPath = path.join(tmpRoot, "deno.json");
     fs.writeFileSync(
       denoPath,
-      JSON.stringify(
+      `${JSON.stringify(
         {
           workspace: ["./supabase/functions/my-fn"],
         },
         undefined,
         2,
-      ) + "\n",
+      )  }\n`,
       "utf-8",
     );
 

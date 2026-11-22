@@ -3,7 +3,7 @@ import { isDefined } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import {
+import type {
   SpotlightActionData,
   SpotlightActionGroupData,
 } from "@mantine/spotlight";

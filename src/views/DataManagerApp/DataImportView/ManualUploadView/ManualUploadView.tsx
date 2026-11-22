@@ -1,6 +1,7 @@
 import { isDefined } from "@avandar/utils";
 import { Trans } from "@lingui/react/macro";
-import { Box, BoxProps, Stack, Text } from "@mantine/core";
+import type { BoxProps} from "@mantine/core";
+import { Box, Stack, Text } from "@mantine/core";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import { NuxEvents } from "@/components/Nux/NuxEvents/NuxEvents";

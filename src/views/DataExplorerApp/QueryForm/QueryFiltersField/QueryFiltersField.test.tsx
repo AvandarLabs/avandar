@@ -4,8 +4,8 @@
  */
 import { Model } from "@avandar/models";
 import { describe, expect, it, vi } from "vitest";
-import { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
-import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { createConceptAttributeQueryColumn } from "$/models/queries/QueryColumn/QueryColumn.fixtures";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";

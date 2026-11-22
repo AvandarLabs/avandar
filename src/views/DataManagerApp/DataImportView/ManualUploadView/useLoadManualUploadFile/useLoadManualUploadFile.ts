@@ -1,16 +1,17 @@
-import { useMutation, UseMutationResultTuple } from "@avandar/query-hooks";
+import type { UseMutationResultTuple } from "@avandar/query-hooks";
+import { useMutation } from "@avandar/query-hooks";
 import { MIMEType } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { useState } from "react";
 import { match } from "ts-pattern";
 import { uuid } from "$/lib/uuid";
-import { Dataset } from "$/models/datasets/Dataset/Dataset";
-import { UserId } from "$/models/User/User.types";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { UserId } from "$/models/User/User.types";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { makeCsvFromPdfTable } from "@/clients/datasets/makeCsvFromPdfTable/makeCsvFromPdfTable";
 import { extractPdfRegions } from "@/clients/datasets/pdfSniff";
-import { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
-import {
+import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
+import type {
   DuckDbColumnSchema,
   DuckDbLoadCsvResult,
   DuckDbLoadXlsxResult,
@@ -18,11 +19,11 @@ import {
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifyError } from "@/utils/notifications/notify";
-import {
+import type {
   BaseLoadResult,
   ManualUploadDataSourceMetadata,
 } from "../../DatasetImportForm/DatasetImportForm.types";
-import {
+import type {
   CsvParseOptions,
   PdfParseOptions,
   XlsxParseOptions,

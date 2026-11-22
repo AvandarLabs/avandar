@@ -1,5 +1,5 @@
 import { FitText } from "../../../primitives/FitText/FitText";
-import { RehearsalOutputGetRehearsalPointerStateValue } from "../RehearsalOutput";
+import type { RehearsalOutputGetRehearsalPointerStateValue } from "../RehearsalOutput";
 import type { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "../LinkedParameterRehearsal.schema";
 import type { ReactNode } from "react";

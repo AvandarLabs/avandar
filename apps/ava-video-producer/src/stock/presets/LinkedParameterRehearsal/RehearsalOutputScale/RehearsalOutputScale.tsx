@@ -1,5 +1,5 @@
 import { RehearsalBaselineMarker } from "../RehearsalBaselineMarker/RehearsalBaselineMarker";
-import { RehearsalOutputGetRehearsalPointerStateValue } from "../RehearsalOutput";
+import type { RehearsalOutputGetRehearsalPointerStateValue } from "../RehearsalOutput";
 import { RehearsalRuler } from "../RehearsalRuler";
 import type { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "../LinkedParameterRehearsal.schema";

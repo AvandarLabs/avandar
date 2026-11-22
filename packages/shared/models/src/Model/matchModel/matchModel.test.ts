@@ -1,5 +1,5 @@
 import { matchModel } from "@models/Model/matchModel/matchModel.ts";
-import { Model } from "@models/Model/Model.ts";
+import type { Model } from "@models/Model/Model.ts";
 import { describe, expect, it } from "vitest";
 
 describe("matchModel", () => {

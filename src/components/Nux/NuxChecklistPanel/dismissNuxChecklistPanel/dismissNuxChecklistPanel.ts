@@ -1,4 +1,4 @@
-import { NuxProgress } from "$/models/NuxProgress/NuxProgress";
+import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 import { nuxSelectors } from "@/components/Nux/NuxStateManager/nuxSelectors/nuxSelectors";
 
 /**
