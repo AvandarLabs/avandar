@@ -89,12 +89,59 @@ describe("canonical catalog", () => {
 
   it("rejects repair classes that disagree with deterministic rule classes", () => {
     const catalog = loadRuleCatalog();
-    expect(() =>
-      {return validateRuleCatalog({
+    expect(() => {
+      return validateRuleCatalog({
         ...catalog,
         rules: [{ ...catalog.rules[0], repair: "judgment" }],
-      })},
-    ).toThrow();
+      });
+    }).toThrow();
+  });
+
+  it("uses the inventory's exact source, TSX, and contextual judgment language gates", () => {
+    const catalog = loadRuleCatalog();
+    const applicability = (id: string): string[] => {
+      return catalog.rules.find((rule) => {
+        return rule.id === id;
+      })!.applicability;
+    };
+    expect(applicability("GD-07")).toEqual([
+      "typescript",
+      "javascript",
+      "python",
+      "rust",
+      "go",
+      "ruby",
+      "java",
+      "kotlin",
+      "swift",
+    ]);
+    expect(applicability("RP-08")).toEqual(["typescript", "css"]);
+    expect(applicability("JR-09")).toEqual(["typescript", "javascript"]);
+    expect(applicability("JR-10")).toEqual(["typescript", "javascript"]);
+    expect(applicability("JR-13")).toEqual(["sql"]);
+    expect(applicability("JR-17")).toEqual(["typescript", "javascript", "css"]);
+  });
+
+  it("keeps unenumerated judgment gates broad with contextual applicability guidance", () => {
+    const catalog = loadRuleCatalog();
+    const broad = catalog.rules.filter((rule) => {
+      return (
+        rule.class === "JR" &&
+        !["JR-09", "JR-10", "JR-13", "JR-17"].includes(rule.id)
+      );
+    });
+    expect(
+      broad.every((rule) => {
+        return rule.applicability.join() === catalog.languages.join();
+      }),
+    ).toBe(true);
+    expect(
+      broad.every((rule) => {
+        return rule.boundary.includes(
+          "Apply only when this judgment family is relevant",
+        );
+      }),
+    ).toBe(true);
   });
 
   it("keeps the complete README catalog equal to deterministic rendering", () => {
