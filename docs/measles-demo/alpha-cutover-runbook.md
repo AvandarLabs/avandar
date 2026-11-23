@@ -302,7 +302,8 @@ read_db "$LOCAL_DB_URL" "$COUNTS_SQL"
 ```
 
 **Expect:** 76 `Applying migration ...` lines with no error, then
-`20261116192935|191` (or the alpha-dev tip's newest migration and count),
+`20261116192935|191` (or the alpha-dev tip's newest migration and count;
+that file is now `20261123200100_add_plugin_data_slots.sql`),
 and the same counts as 2.5.
 **If not:** a failed migration is a cutover blocker. Record its file and
 error, stop, and fix it on `alpha-dev` as a new migration before cutover.

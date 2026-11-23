@@ -11,7 +11,8 @@ written.
 - **Migrations audited:** the 76 files in `supabase/migrations/` that exist on
   `origin/demo/measles` but not on `origin/main`, from
   `20261016200226_add_open_data_catalog_cache_columns.sql` through
-  `20261116192935_add_plugin_data_slots.sql`. All 76 are dated after
+  `20261116192935_add_plugin_data_slots.sql` (now
+  `20261123200100_add_plugin_data_slots.sql`). All 76 are dated after
   production's latest version, so none is out of order.
 - **Production data size:** 333 users, 48 workspaces, 39 dashboards, 85
   datasets, 20,030 dataset columns, 4 case types (`concepts`), 16 records
@@ -105,7 +106,7 @@ Side effects that change existing rows without losing anything:
 | A bucket is created and then removed | `20261016203000`, `20261109030000` | Net effect: no new bucket. |
 | New extension | `20261106223031_add_catalog_listing_search.sql` | Installs `pg_trgm` into `extensions`. Later migrations call `extensions.word_similarity` first so the `pg_trgm.word_similarity_threshold` setting is registered before functions set it. |
 | `--include-all` is not needed | All | Every alpha-only version is later than `20261013212914`. The flag is harmless. |
-| The 8 dictionary, crosswalk, and plugin slot migrations are not on `origin/develop` | `20261112000050` through `20261116192935` | `origin/develop` (`6a08fc815`) has 183 migrations: `main`'s 115 plus the first 68 alpha-only files. When these 8 land on mainline, they must keep the same version numbers, or production records them as unknown remote versions. |
+| The 8 dictionary, crosswalk, and plugin slot migrations are not on `origin/develop` | `20261112000050` through `20261116192935` (the slot file is now `20261123200100`) | `origin/develop` (`6a08fc815`) has 183 migrations: `main`'s 115 plus the first 68 alpha-only files. When these 8 land on mainline, they must keep the same version numbers, or production records them as unknown remote versions. The production cutover renamed the slot file anyway, because neither production nor staging had applied it. |
 | Lock footprint | All | The largest table touched is `dataset_columns` (20,030 rows): one nullable column and one `not valid` foreign key validated over null values. Every other table holds fewer than 650 rows. Expect each migration to finish in well under a second. |
 
 ## Every migration
@@ -190,4 +191,4 @@ current data, after the checks above.
 | 73 | `20261113181028_dictionary_conversions.sql` | low | Adds a nullable `dictionary_binding_id` and a foreign key to `dataset_columns` (20,030 rows, validated over null values). Adds columns to `datasets__virtual`. |
 | 74 | `20261113232435_dictionary_conversion_fixes.sql` | none | Functions only. |
 | 75 | `20261114213908_crosswalks.sql` | none | New tables. |
-| 76 | `20261116192935_add_plugin_data_slots.sql` | none | New tables. |
+| 76 | `20261116192935_add_plugin_data_slots.sql` (now `20261123200100_add_plugin_data_slots.sql`) | none | New tables. |

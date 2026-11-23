@@ -1,4 +1,4 @@
--- Generated from supabase/migrations/20261116222442_harden_plugin_data_slot_bindings.sql by
+-- Generated from supabase/migrations/20261123200200_harden_plugin_data_slot_bindings.sql by
 -- apps/desktop/scripts/gen-sqlite-migrations/. Do not edit by hand
 -- unless the matching `needs hand-edit` warning calls for it.
 -- Schema-shape statements emitted: 1

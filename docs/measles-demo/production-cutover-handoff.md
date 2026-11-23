@@ -59,7 +59,8 @@ Conflicts by area: `src/views` 22, `src/lib` 16, `src/i18n` 16,
 Migrations: 192 on `demo/measles`, 184 on `develop`, 115 on `main`. The 183
 files both branches share are byte-identical. Nine exist only on
 `demo/measles` (`20261112000050` through `20261116222442`: data dictionaries,
-dictionary bindings and conversions, crosswalks, plugin data slots). One
+dictionary bindings and conversions, crosswalks, plugin data slots; the two
+slot files are now `20261123200100` and `20261123200200`). One
 exists only on `develop`: `20261117210525_drop_plugin_installations.sql`.
 
 The alpha line is already on `origin/demo/measles`: `feat/alpha-line` was
