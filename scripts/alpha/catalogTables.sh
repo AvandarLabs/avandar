@@ -259,14 +259,20 @@ looks_like_db_url() {
 # environment only to its own user and root. Sets DB_URL_WITHOUT_PASSWORD, and
 # DB_URL_PASSWORD to the percent-decoded password, empty when the URL has
 # none. Any other connection string passes through unchanged. Returns 1 when
-# the password has an invalid percent-encoding.
+# the password has an invalid percent-encoding, or when the URL's user part
+# has a ":" it cannot split as a password, such as one with an unencoded "/".
+# Neither prints the URL.
 #
 # Usage: split_db_url_password <url>
 split_db_url_password() {
   local pattern='^(postgres(ql)?://[^:@/?#]*):([^@/?#]*)@(.*)$'
   DB_URL_WITHOUT_PASSWORD="$1"
   DB_URL_PASSWORD=""
-  [[ "$1" =~ $pattern ]] || return 0
+  if [[ ! "$1" =~ $pattern ]]; then
+    local rest="${1#*://}"
+    [[ "$1" == postgres*://* && "$rest" == *@* && "${rest%%@*}" == *:* ]] && return 1
+    return 0
+  fi
   DB_URL_WITHOUT_PASSWORD="${BASH_REMATCH[1]}@${BASH_REMATCH[4]}"
   percent_decode "${BASH_REMATCH[3]}" || return 1
   DB_URL_PASSWORD="$PERCENT_DECODED"

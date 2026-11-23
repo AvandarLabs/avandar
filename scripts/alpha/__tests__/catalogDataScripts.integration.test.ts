@@ -364,6 +364,30 @@ const REDACTION_CHECK_LINES = [
 const OPEN_DATA_DATASETS_DELETE =
   "delete from public.datasets where id in (select dataset_id from public.datasets__open_data where catalog_listing_id in (select id from public.data_catalog_listings));";
 
+/**
+ * The whole-table lock: the catalog and `datasets__open_data`, which its
+ * cascade reaches, never `public.datasets` or the tables under it.
+ */
+const CATALOG_LOCK_LINE =
+  "lock table public.pipeline_scope_checkpoints, public.pipeline_execution_scopes, public.pipeline_executions, public.data_catalog_listings__relation_columns, public.data_catalog_listings, public.data_catalog_drives, public.datasets__open_data in share row exclusive mode;";
+
+/** The affected open data datasets' ids, as the wrapper selects them. */
+const AFFECTED_IDS =
+  "select dataset_id from public.datasets__open_data where catalog_listing_id in (select id from public.data_catalog_listings)";
+
+/** The affected datasets' workspaces, as the wrapper selects them. */
+const AFFECTED_WORKSPACES = `select workspace_id from public.datasets where id in (${AFFECTED_IDS})`;
+
+/** The row locks on only the affected datasets, workspaces, and members. */
+const ROW_LOCK_LINES = [
+  "do $locks$ begin",
+  `  perform 1 from public.datasets where id in (${AFFECTED_IDS}) for update;`,
+  `  perform 1 from public.workspaces where id in (${AFFECTED_WORKSPACES}) for update;`,
+  `  perform 1 from public.workspace_memberships where workspace_id in (${AFFECTED_WORKSPACES}) for update;`,
+  `  perform 1 from auth.users where id in (select user_id from public.workspace_memberships where workspace_id in (${AFFECTED_WORKSPACES})) for share;`,
+  "end $locks$;",
+];
+
 /** The wrapper's lines without the multi-line guard block. */
 function _linesWithoutGuard(wrapper: string): string[] {
   const lines = wrapper.trim().split("\n");
@@ -465,6 +489,18 @@ describe("exportCatalogData.sh", SHELL_TEST_OPTIONS, () => {
     expect(run.status).toBe(1);
     expect(run.output).toContain("Pass the source URL in SOURCE_DB_URL");
     expect(run.output).not.toContain("src-s3cret");
+    expect(run.log).toBe("");
+  });
+
+  it("refuses a source password it cannot split, without calling pg_dump or printing it", () => {
+    const run = _runScript("exportCatalogData.sh", [join(workDir, "out.sql")], {
+      SOURCE_DB_URL:
+        "postgresql://postgres.demo-ref:pa/ss-secret@pooler.example.com:5432/postgres",
+    });
+
+    expect(run.status).toBe(1);
+    expect(run.output).toContain("cannot split the password");
+    expect(run.output).not.toContain("ss-secret");
     expect(run.log).toBe("");
   });
 
@@ -969,7 +1005,8 @@ describe("importCatalogData.sh --replace-existing", SHELL_TEST_OPTIONS, () => {
       "\\pset format unaligned",
       "begin;",
       "set local lock_timeout = '10s';",
-      "lock table public.pipeline_scope_checkpoints, public.pipeline_execution_scopes, public.pipeline_executions, public.data_catalog_listings__relation_columns, public.data_catalog_listings, public.data_catalog_drives, public.datasets__open_data, public.datasets in share row exclusive mode;",
+      CATALOG_LOCK_LINE,
+      ...ROW_LOCK_LINES,
       "do $check$ begin",
       expect.stringMatching(
         /^ {2}if \(0 \+ \(select count\(\*\) from \(select \* from public\.datasets__open_data .+\) as affected\) \+ \(select count\(\*\) from \(select \* from public\.datasets where .+\) as affected\)\) <> 8 then$/,
@@ -979,7 +1016,6 @@ describe("importCatalogData.sh --replace-existing", SHELL_TEST_OPTIONS, () => {
       ),
       "  end if;",
       "end $check$;",
-      "lock table public.workspace_memberships in share mode;",
       OPEN_DATA_DATASETS_DELETE,
       "delete from public.pipeline_scope_checkpoints;",
       "delete from public.pipeline_execution_scopes;",
@@ -1010,16 +1046,38 @@ describe("importCatalogData.sh --replace-existing", SHELL_TEST_OPTIONS, () => {
     ).toBeGreaterThan(datasetDelete);
     const guard = lines.slice(guardStart, guardEnd + 1).join("\n");
     expect(guard).toContain("member_count = 0 or other_member_count > 0");
-    expect(guard).toMatch(
-      /perform 1 from auth\.users where id in \(select user_id from public\.workspace_memberships where workspace_id in \(.+\)\) for share;/,
-    );
-    expect(guard.indexOf("for share;")).toBeLessThan(
-      guard.indexOf("select * into blocked"),
-    );
     expect(guard).toContain("like '%@avandarlabs.com'");
     expect(guard).toMatch(
       /raise exception 'Refusing to delete open data dataset % in workspace %: % of its % members have no @avandarlabs\.com email\.'/,
     );
+  });
+
+  it("never locks a whole table that only the open data datasets' cascade reaches", () => {
+    const columnsDependent = [
+      "1",
+      "public.dataset_columns",
+      "dataset_id",
+      "public.datasets",
+      "c",
+      "select * from public.dataset_columns where (dataset_id) in (select id from public.datasets)",
+      "public.datasets",
+    ].join(FIELD_SEPARATOR);
+
+    const run = _runReplace(
+      [
+        ..._confirmedReplaceArgs(
+          _makeBackup([...BACKUP_TABLES, "public.dataset_columns"]),
+        ).slice(0, -1),
+        "12",
+      ],
+      { FAKE_DEPENDENTS: `${OPEN_DATA_DEPENDENT}\n${columnsDependent}\n` },
+    );
+
+    expect(run.status, run.output).toBe(0);
+    const lockLines = run.wrapper.split("\n").filter((line) => {
+      return line.startsWith("lock table");
+    });
+    expect(lockLines).toEqual([CATALOG_LOCK_LINE]);
   });
 
   it("lists each open data dataset, its workspace, its members, and the guard on a dry run", () => {
@@ -1154,7 +1212,7 @@ describe("importCatalogData.sh --replace-existing", SHELL_TEST_OPTIONS, () => {
     const run = _runReplace(_confirmedReplaceArgs().slice(2));
 
     expect(run.output).toContain(
-      'with_db_url "$TARGET_DB_URL" pg_dump --data-only --no-owner --no-privileges',
+      'with_db_url "$TARGET_DB_URL" "$PG_DUMP_BIN" --data-only --no-owner --no-privileges',
     );
     expect(run.output).toContain("--table 'public.datasets__open_data'");
   });
@@ -1229,7 +1287,7 @@ describe("importCatalogData.sh --replace-existing", SHELL_TEST_OPTIONS, () => {
     const run = _runReplace(_confirmedReplaceArgs());
 
     expect(run.output).toContain(
-      '3. Run it with psql 15.14+, 16.10+, 17.6+, or 18+: with_db_url "$TARGET_DB_URL" psql -X',
+      '3. Run it with psql 15.14+, 16.10+, 17.6+, or 18+, which PSQL_BIN names: with_db_url "$TARGET_DB_URL" "$PSQL_BIN" -X',
     );
   });
 

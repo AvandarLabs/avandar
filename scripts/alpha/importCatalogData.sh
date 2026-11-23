@@ -80,7 +80,12 @@
 #
 # Inside the transaction, each lock waits at most 10 seconds, and every
 # catalog table must hold exactly the dump's rows before `commit`. Any error
-# rolls the whole transaction back.
+# rolls the whole transaction back. The catalog tables and the dependents
+# their cascade reaches (`datasets__open_data`) stay locked until `commit`,
+# for the whole load, so a user adding a catalog dataset waits. Of the open
+# data datasets' side, only the affected rows are locked: those datasets,
+# their workspaces, those workspaces' memberships, and their members'
+# `auth.users` rows. Every other dataset and workspace stays writable.
 #
 # `--dry-run` prints the report and the plan, then exits 0 without writing.
 # Row counts are printed before and after the import, and after a failed one
@@ -148,6 +153,10 @@ REWRITE_TARGET_HOST=""
 WORK_DIR=""
 LOAD_FILE=""
 DEPENDENT_TABLES=()
+# The dependent tables the catalog's own cascade reaches, which the import
+# locks whole. Tables reached only from the open data datasets are not
+# locked whole: the import locks just the affected rows.
+LOCKED_DEPENDENT_TABLES=()
 DEPENDENT_COUNT_QUERIES=()
 DEPENDENT_ROW_COUNT=0
 SET_NULL_TABLES=""
@@ -191,7 +200,7 @@ check_target_url() {
     fail "port 6543 is the transaction pooler, where the dump's session settings would leak onto other clients' connections. Use the direct host or the session pooler on 5432."
   TARGET_ID="$TARGET_USER@$TARGET_HOST"
   split_db_url_password "$TARGET_DB_URL" ||
-    fail "the target URL's password has an invalid percent-encoding. Encode each special character as %XX."
+    fail "cannot split the password out of the target URL, or it has an invalid percent-encoding. Percent-encode each special character in it as %XX."
   TARGET_CONNECT_URL="$DB_URL_WITHOUT_PASSWORD"
   TARGET_PASSWORD="$DB_URL_PASSWORD"
 }
@@ -343,7 +352,8 @@ redact_executions() {
 # `datasets__open_data` itself: its rows there are exactly the ones the
 # listings' cascade reaches, which the first root already counts. Each row is
 # the depth, the referencing table and columns, the referenced table, the
-# `confdeltype` action, and a query for the rows the delete reaches there.
+# `confdeltype` action, a query for the rows the delete reaches there, and the
+# root it was reached from.
 dependents_query() {
   local table quoted_tables="" catalog_roots=""
   for table in "${CATALOG_TABLES[@]}"; do
@@ -380,7 +390,7 @@ chain as (
   where chain.action = 'c' and fk.child <> all (chain.path)
     and fk.child <> all ($catalog_array) and chain.depth < 10
 )
-select depth, child, child_columns, parent, action, affected_sql
+select depth, child, child_columns, parent, action, affected_sql, path[1] as root
 from chain order by depth, child, child_columns
 SQL
 }
@@ -451,18 +461,21 @@ record_dependent() {
 }
 
 report_dependents() {
-  local rows depth child columns parent action affected_sql count_query affected_rows
+  local rows depth child columns parent action affected_sql root count_query affected_rows
   rows="$(read_target "$(dependents_query)")"
   echo "Foreign keys outside the catalog that the replace reaches, from the catalog and from the open data datasets it deletes:"
   if [[ -z "$rows" ]]; then
     echo "  none"
     return 0
   fi
-  while IFS="$FIELD_SEPARATOR" read -r -u 3 depth child columns parent action affected_sql; do
+  while IFS="$FIELD_SEPARATOR" read -r -u 3 depth child columns parent action affected_sql root; do
     count_query="select count(*) from ($affected_sql) as affected"
     affected_rows="$(read_target "$count_query")"
     record_dependent "$depth" "$child" "$columns" "$parent" "$action" \
       "$affected_rows" "$count_query"
+    if [[ "$root" != "$DATASETS_TABLE" && " ${LOCKED_DEPENDENT_TABLES[*]:-} " != *" $child "* ]]; then
+      LOCKED_DEPENDENT_TABLES+=("$child")
+    fi
   done 3<<<"$rows"
   record_open_data_datasets
   echo "  The replace deletes or changes $DEPENDENT_ROW_COUNT dependent rows, even for listings the dump brings back under the same id."
@@ -633,9 +646,9 @@ backup_tables() {
 
 # Prints the pg_dump command that makes the backup a replace needs.
 print_backup_command() {
-  echo "Make the backup with a pg_dump at least as new as the target's server, such as /opt/homebrew/opt/libpq@18/bin/pg_dump, through the cutover runbook's with_db_url helper (1.4), which keeps the password out of pg_dump's arguments:"
+  echo "Make the backup with a pg_dump at least as new as the target's server, which PG_DUMP_BIN names (such as /opt/homebrew/opt/libpq@18/bin/pg_dump), through the cutover runbook's with_db_url helper (1.4), which keeps the password out of pg_dump's arguments:"
   # shellcheck disable=SC2016 # The variable is for the reader to fill in.
-  printf '  with_db_url "$TARGET_DB_URL" pg_dump --data-only --no-owner --no-privileges %s--file %s\n' \
+  printf '  with_db_url "$TARGET_DB_URL" "$PG_DUMP_BIN" --data-only --no-owner --no-privileges %s--file %s\n' \
     "$(backup_tables | sed "s/.*/--table '&'/" | tr '\n' ' ')" \
     "'catalog-backup-$TARGET_HOST-$(date +%Y%m%d-%H%M).sql'"
 }
@@ -729,7 +742,7 @@ print_restore_steps() {
   echo "  2. Beside it, write restore.sql, which empties the catalog and puts back every backed-up row the target no longer has, in one transaction:"
   print_restore_sql | sed 's/^/       /'
   # shellcheck disable=SC2016 # The variable is for the reader to fill in.
-  echo "  3. Run it with psql $PSQL_VERSIONS:"' with_db_url "$TARGET_DB_URL" psql -X -P pager=off -v ON_ERROR_STOP=1 --file restore.sql'
+  echo "  3. Run it with psql $PSQL_VERSIONS, which PSQL_BIN names:"' with_db_url "$TARGET_DB_URL" "$PSQL_BIN" -X -P pager=off -v ON_ERROR_STOP=1 --file restore.sql'
   if [[ -n "$SET_NULL_TABLES" ]]; then
     echo "  The delete only nulls rows of: $SET_NULL_TABLES. Their backup rows cannot load over them, so restore those columns by hand."
   fi
@@ -749,13 +762,14 @@ confirm() {
 }
 
 # Writes the statements that, inside the transaction, lock the catalog and
-# its dependents and raise if the delete no longer reaches exactly the rows
-# that were confirmed.
+# the dependents its cascade reaches, lock the open data datasets' rows, and
+# raise if the delete no longer reaches exactly the rows that were confirmed.
 write_cascade_check() {
   local tables recount
-  tables="$( (catalog_tables_children_first && printf '%s\n' ${DEPENDENT_TABLES[@]+"${DEPENDENT_TABLES[@]}"}) |
+  tables="$( (catalog_tables_children_first && printf '%s\n' ${LOCKED_DEPENDENT_TABLES[@]+"${LOCKED_DEPENDENT_TABLES[@]}"}) |
     sed '/^$/d' | paste -s -d, - | sed 's/,/, /g')"
   echo "lock table $tables in share row exclusive mode;"
+  write_open_data_row_locks
   recount="0"
   local query
   for query in ${DEPENDENT_COUNT_QUERIES[@]+"${DEPENDENT_COUNT_QUERIES[@]}"}; do
@@ -794,20 +808,36 @@ end \$storage\$;
 SQL
 }
 
-# Writes the statements that, inside the transaction, stop membership changes
-# and email changes of those workspaces' members, raise unless every member
-# of each open data dataset's workspace has an @avandarlabs.com email (a
-# workspace with no members raises too), and then delete those datasets,
+# Writes the statement that locks only the rows the guard and the delete
+# depend on, once `datasets__open_data` is locked so no dataset can join the
+# affected set: each open data dataset, its workspace (which blocks a new
+# membership there, through the foreign key), the workspace's memberships,
+# and its members' `auth.users` rows (which blocks an email change). Other
+# datasets and workspaces stay writable while the dump loads.
+write_open_data_row_locks() {
+  [[ "$HAS_OPEN_DATA_DATASETS" == true ]] || return 0
+  local workspaces="select workspace_id from $DATASETS_TABLE where id in ($OPEN_DATA_DATASET_IDS_SQL)"
+  cat <<SQL
+do \$locks\$ begin
+  perform 1 from $DATASETS_TABLE where id in ($OPEN_DATA_DATASET_IDS_SQL) for update;
+  perform 1 from public.workspaces where id in ($workspaces) for update;
+  perform 1 from $MEMBERSHIPS_TABLE where workspace_id in ($workspaces) for update;
+  perform 1 from auth.users where id in (select user_id from $MEMBERSHIPS_TABLE where workspace_id in ($workspaces)) for share;
+end \$locks\$;
+SQL
+}
+
+# Writes the statements that, inside the transaction, raise unless every
+# member of each open data dataset's workspace has an @avandarlabs.com email
+# (a workspace with no members raises too), and then delete those datasets,
 # with every row that cascades from them.
 write_open_data_dataset_delete() {
   [[ "$HAS_OPEN_DATA_DATASETS" == true ]] || return 0
-  echo "lock table $MEMBERSHIPS_TABLE in share mode;"
   cat <<SQL
 do \$guard\$
 declare
   blocked record;
 begin
-  perform 1 from auth.users where id in (select user_id from $MEMBERSHIPS_TABLE where workspace_id in (select workspace_id from ($OPEN_DATA_DATASETS_SQL) as dataset)) for share;
   select * into blocked
   from (
 $(open_data_datasets_query)
@@ -884,10 +914,10 @@ print_plan() {
   local step=1
   echo "Plan, in one transaction that rolls back on any error and waits at most $LOCK_TIMEOUT for each lock:"
   if [[ "$IS_REPLACE" == true ]]; then
-    echo "  $step. Lock the catalog and its dependents, and check the delete still reaches $DEPENDENT_ROW_COUNT dependent rows."
+    echo "  $step. Lock the catalog and the tables its cascade reaches${OPEN_DATA_DATASET_SUMMARY:+, and only the rows of the open data datasets, their workspaces, memberships, and members}, and check the delete still reaches $DEPENDENT_ROW_COUNT dependent rows."
     step=$((step + 1))
     if [[ "$HAS_OPEN_DATA_DATASETS" == true ]]; then
-      echo "  $step. Lock $MEMBERSHIPS_TABLE, check every member of each workspace above has an $AVANDAR_EMAIL_DOMAIN email, then delete the $OPEN_DATA_DATASET_SUMMARY added from the catalog, with every row that cascades from them."
+      echo "  $step. Check every member of each workspace above has an $AVANDAR_EMAIL_DOMAIN email, then delete the $OPEN_DATA_DATASET_SUMMARY added from the catalog, with every row that cascades from them."
       step=$((step + 1))
     fi
     echo "  $step. Delete every catalog row, children first. The replace's deletes delete or change $DEPENDENT_ROW_COUNT dependent rows."

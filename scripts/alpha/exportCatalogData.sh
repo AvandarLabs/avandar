@@ -76,7 +76,7 @@ done
 # pg_dump gets the URL without its password, and the password in PGPASSWORD
 # for this one command, so its arguments never carry it.
 split_db_url_password "$SOURCE_DB_URL" || {
-  echo "The source URL's password has an invalid percent-encoding. Encode each special character as %XX." >&2
+  echo "SOURCE_DB_URL: cannot split the password out of the URL, or it has an invalid percent-encoding. Percent-encode each special character in it as %XX." >&2
   exit 1
 }
 if [[ -n "$DB_URL_PASSWORD" ]]; then

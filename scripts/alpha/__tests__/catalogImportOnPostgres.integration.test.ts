@@ -3,6 +3,7 @@ import {
   chmodSync,
   existsSync,
   mkdtempSync,
+  readFileSync,
   rmSync,
   writeFileSync,
 } from "node:fs";
@@ -71,7 +72,8 @@ create table public.datasets (
   id uuid primary key,
   workspace_id uuid not null references public.workspaces (id) on delete cascade,
   name text not null,
-  source_type text not null
+  source_type text not null,
+  description_probe integer
 );
 create table public.dataset_columns (
   id uuid primary key,
@@ -97,8 +99,8 @@ revoke all on function public.data_catalog_facet_counts__refresh () from public;
 
 /**
  * 6 listings, 4 of them used by open data datasets in 2 workspaces whose
- * members all have @avandarlabs.com emails, and a fifth, uploaded dataset.
- * Each dataset has 2 columns.
+ * members all have @avandarlabs.com emails, and a fifth, uploaded dataset in
+ * a third workspace with an outside member. Each dataset has 2 columns.
  */
 const SEED_SQL = `
 truncate public.data_catalog_drives, public.data_catalog_listings,
@@ -116,13 +118,16 @@ insert into auth.users values
   ('10000000-0000-0000-0000-000000000009', 'outsider@example.com');
 insert into public.workspaces values
   ('70000000-0000-0000-0000-000000000000', 'Even'),
-  ('70000000-0000-0000-0000-000000000001', 'Odd');
+  ('70000000-0000-0000-0000-000000000001', 'Odd'),
+  ('70000000-0000-0000-0000-000000000002', 'Other');
 insert into public.workspace_memberships (workspace_id, user_id) values
   ('70000000-0000-0000-0000-000000000000', '10000000-0000-0000-0000-000000000001'),
   ('70000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001'),
-  ('70000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000002');
+  ('70000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000002'),
+  ('70000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000009');
 insert into public.datasets
-select ('e0000000-0000-0000-0000-00000000000' || n)::uuid, ('70000000-0000-0000-0000-00000000000' || (n % 2))::uuid,
+select ('e0000000-0000-0000-0000-00000000000' || n)::uuid,
+  ('70000000-0000-0000-0000-00000000000' || case when n = 5 then 2 else n % 2 end)::uuid,
   'World Development Indicators (WDI)', case when n = 5 then 'csv_file' else 'open_data' end
 from generate_series(1, 5) n;
 insert into public.dataset_columns
@@ -395,6 +400,48 @@ function _writeOutsiderPsql(): string {
 }
 
 /**
+ * Writes a psql stand-in that, in the import transaction, right before the
+ * dump loads, runs writes on a second connection that waits at most 2
+ * seconds for a lock, and records whether each went through.
+ */
+function _writeProbingPsql(resultFile: string): string {
+  const connect = `"${TOOLS!.psql}" -h 127.0.0.1 -p ${port} -U ${OWNER} -d postgres -X -q -v ON_ERROR_STOP=1 -c "set lock_timeout = '2s'"`;
+  const probe = join(clusterDir, "probe.sh");
+  writeFileSync(
+    probe,
+    [
+      "#!/bin/bash",
+      `try() { ${connect} -c "$2" >/dev/null 2>&1 && echo "$1: written" || echo "$1: blocked"; }`,
+      "{",
+      `  try "unaffected dataset update" "update public.datasets set description_probe = 1 where id = 'e0000000-0000-0000-0000-000000000005'"`,
+      `  try "unaffected workspace dataset" "insert into public.datasets values ('e0000000-0000-0000-0000-000000000009', '70000000-0000-0000-0000-000000000002', 'New', 'csv_file')"`,
+      `  try "unaffected workspace member" "insert into public.workspace_memberships (workspace_id, user_id) values ('70000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000001')"`,
+      `  try "affected workspace member" "insert into public.workspace_memberships (workspace_id, user_id) values ('70000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000009')"`,
+      `} > '${resultFile}'`,
+      "",
+    ].join("\n"),
+  );
+  const path = join(clusterDir, "psql-probes");
+  writeFileSync(
+    path,
+    [
+      "#!/bin/bash",
+      'args=("$@")',
+      "for ((i = 0; i < ${#args[@]}; i++)); do",
+      '  if [[ "${args[i]}" == --file ]]; then',
+      `    awk -v probe='${probe}' '/^\\\\i / && !done { print "\\\\! bash " probe; done = 1 } { print }' "\${args[i + 1]}" > "\${args[i + 1]}.probed"`,
+      '    args[i + 1]="${args[i + 1]}.probed"',
+      "  fi",
+      "done",
+      `exec "${TOOLS!.psql}" "\${args[@]}"`,
+      "",
+    ].join("\n"),
+  );
+  chmodSync(path, 0o755);
+  return path;
+}
+
+/**
  * Runs the restore steps the import printed: the `sed` that stages the
  * backup, then restore.sql, from a folder of their own.
  */
@@ -570,6 +617,20 @@ describe.skipIf(TOOLS === undefined)(
       );
       expect(run.output).toContain("its transaction rolled back");
       expect(_targetCounts()).toBe(SEED_COUNTS);
+    });
+
+    it("leaves other datasets and workspaces writable during the load, but not an affected workspace's members", () => {
+      const resultFile = join(clusterDir, "probe-result.txt");
+
+      const run = _runReplace(CATALOG_DUMP, _writeProbingPsql(resultFile));
+
+      expect(run.status, run.output).toBe(0);
+      expect(readFileSync(resultFile, "utf8").trim().split("\n")).toEqual([
+        "unaffected dataset update: written",
+        "unaffected workspace dataset: written",
+        "unaffected workspace member: written",
+        "affected workspace member: blocked",
+      ]);
     });
 
     it("lists the open data datasets and their members on a dry run, changing nothing", () => {
