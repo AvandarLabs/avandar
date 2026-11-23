@@ -135,10 +135,12 @@ async function _provePath(
 
 /**
  * Proves safe CSS marker repairs against the actual repository selection and
- * original filename. Unsupported shapes deliberately keep AF-20 in fallback.
+ * original filename. Serializes children during eager file collection.
+ * Unsupported shapes deliberately keep AF-20 in fallback.
  */
 export function createCssCoverageProbes(): CoverageProbe[] {
   const cache = new Map<string, Promise<CoverageEvidence>>();
+  let preceding: Promise<unknown> = Promise.resolve();
   return [
     {
       ruleId: "AF-20",
@@ -147,7 +149,11 @@ export function createCssCoverageProbes(): CoverageProbe[] {
       prove: ({ path, cwd }) => {
         const key = `${cwd}:${path}`;
         if (!cache.has(key)) {
-          cache.set(key, _provePath(path, cwd));
+          const proof = preceding.then(() => {
+            return _provePath(path, cwd);
+          });
+          preceding = proof.catch(() => {});
+          cache.set(key, proof);
         }
         return cache.get(key)!;
       },

@@ -10,6 +10,9 @@ import {
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { afterEach, expect, it } from "vitest";
+import { loadRuleCatalog } from "../../../src/catalog/loadRuleCatalog";
+import { collectCoverage } from "../../../src/cli/coverage";
+import { createCssCoverageProbes } from "../../../src/cli/cssSafeRules";
 import { runCli } from "../../../src/cli/main";
 
 const ROOT = resolve(import.meta.dirname, "../../../../../..");
@@ -86,12 +89,13 @@ function _setRefusal(directory: string, reason: string) {
 
 async function _coverage(
   directory: string,
-  path = "src/reviewed.css",
+  path: string | readonly string[] = "src/reviewed.css",
   expectedStatus = 0,
 ) {
   const stdout: string[] = [];
+  const paths = typeof path === "string" ? [path] : path;
   const status = await runCli(
-    ["coverage", path, "--format", "json", "--no-prompt"],
+    ["coverage", ...paths, "--format", "json", "--no-prompt"],
     {
       cwd: directory,
       stdout: (value) => {
@@ -207,4 +211,127 @@ it("keeps generated stylesheets outside the root repair coverage", async () => {
       state: "fallback",
     }),
   );
+});
+
+function _instrumentProofProcesses(directory: string) {
+  const log = join(directory, "processes.jsonl");
+  const configPath = join(directory, "stylelint.config.js");
+  const config = readFileSync(configPath, "utf8");
+  writeFileSync(
+    configPath,
+    `
+import { appendFileSync } from "node:fs";
+import { setTimeout as delay } from "node:timers/promises";
+const log = ${JSON.stringify(log)};
+appendFileSync(log, JSON.stringify({ event: "start", pid: process.pid }) + "\\n");
+process.once("exit", () => {
+  appendFileSync(log, JSON.stringify({ event: "end", pid: process.pid }) + "\\n");
+});
+await delay(100);
+${config}
+`,
+  );
+  return log;
+}
+
+function _getProcessActivity(log: string) {
+  const events = readFileSync(log, "utf8")
+    .trim()
+    .split("\n")
+    .map((line) => {
+      return JSON.parse(line) as { event: "start" | "end" };
+    });
+  let active = 0;
+  const activeCounts = events.map(({ event }) => {
+    active += event === "start" ? 1 : -1;
+    return active;
+  });
+  return {
+    started: events.filter(({ event }) => {
+      return event === "start";
+    }).length,
+    maximum: Math.max(...activeCounts),
+    remaining: active,
+  };
+}
+
+function _expectSourceUnchanged(directory: string, paths: readonly string[]) {
+  paths.forEach((path) => {
+    expect(readFileSync(join(directory, path), "utf8")).toBe(SOURCE);
+  });
+}
+
+it("serializes real CSS proof children across eager directory coverage", async () => {
+  const directory = _createRepository();
+  const paths = ["src/reviewed.css", "src/second.css", "src/third.css"];
+  paths.forEach((path) => {
+    writeFileSync(join(directory, path), SOURCE);
+  });
+  const log = _instrumentProofProcesses(directory);
+  const result = await _coverage(directory, ["src", "src/reviewed.css"]);
+  expect(
+    result.outcomes.filter((entry: { ruleId: string; capability: string }) => {
+      return (
+        entry.ruleId === "AF-20" &&
+        entry.capability === "standalone-prose-comments"
+      );
+    }),
+  ).toEqual(
+    paths.map((path) => {
+      return expect.objectContaining({
+        path: join(directory, path),
+        state: "enforced",
+        operational: true,
+      });
+    }),
+  );
+  expect(_getProcessActivity(log)).toEqual({
+    started: 3,
+    maximum: 1,
+    remaining: 0,
+  });
+  _expectSourceUnchanged(directory, paths);
+});
+
+it("continues queued real CSS proofs after a preceding proof rejects", async () => {
+  const brokenDirectory = _createRepository();
+  writeFileSync(join(brokenDirectory, "package.json"), "{ invalid");
+  const directory = _createRepository();
+  const probes = createCssCoverageProbes();
+  const catalog = loadRuleCatalog();
+  const rule = catalog.rules.find((entry) => {
+    return entry.id === "AF-20";
+  })!;
+  const rejectedProof = probes[0]!.prove({
+    cwd: brokenDirectory,
+    path: join(brokenDirectory, "src/reviewed.css"),
+    rule,
+  });
+  const rejection = expect(rejectedProof).rejects.toThrow();
+  const later = collectCoverage({
+    catalog,
+    probes,
+    cwd: directory,
+    paths: ["src"],
+  });
+  await rejection;
+  const result = await later;
+  expect(result.operational).toBe(true);
+  expect(result.outcomes).toContainEqual(
+    expect.objectContaining({
+      ruleId: "AF-20",
+      capability: "standalone-prose-comments",
+      state: "enforced",
+      path: join(directory, "src/reviewed.css"),
+    }),
+  );
+  expect(result.outcomes).toContainEqual(
+    expect.objectContaining({
+      ruleId: "AF-20",
+      capability: "unsupported-shapes",
+      state: "fallback",
+    }),
+  );
+  _expectSourceUnchanged(directory, ["src/reviewed.css"]);
+  _expectSourceUnchanged(brokenDirectory, ["src/reviewed.css"]);
 });
