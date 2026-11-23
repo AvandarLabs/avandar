@@ -267,7 +267,7 @@ the scoped `avandar` object and may be async.
 import { definePlugin } from "@avandar/plugin-sdk";
 import { RegressionModal } from "./RegressionModal/RegressionModal";
 
-// eslint-disable-next-line react-refresh/only-export-components
+// oxlint-disable-next-line react-refresh/only-export-components
 export default definePlugin({
   commands: {
     "regression.linear": (avandar) => {
@@ -506,7 +506,7 @@ import { definePlugin } from "@avandar/plugin-sdk";
 import { makeEpicurveFromRows } from "./epicurve/makeEpicurveFromRows/makeEpicurveFromRows";
 import { RatePlot } from "./ratePlot/RatePlot/RatePlot";
 
-// eslint-disable-next-line react-refresh/only-export-components
+// oxlint-disable-next-line react-refresh/only-export-components
 export default definePlugin({
   vizTypes: {
     epicurve: { transform: makeEpicurveFromRows },
@@ -696,13 +696,15 @@ Plugin code may import only:
 - the approved npm packages: `simple-statistics`, `d3-array`, and `date-fns`
   (including its subpaths)
 
-ESLint enforces this for `plugins/**` (`eslint/plugin-restrictions.js`). Test
+Oxlint enforces this for `plugins/**` through the JS plugin in
+`eslint/plugin-restrictions.js`, wired up in `.oxlintrc.json`. Test
 files are exempt from the package list, since they import the test runner, but
 no plugin file, test or not, may import a file outside its own plugin folder:
 not app code through a relative path, and not another plugin.
 `ava plugin validate` also fails when `package.json` lists a dependency outside
 the approved list. The list is `APPROVED_PLUGIN_DEPENDENCIES` in
-`@avandar/plugin-manifest`, and the ESLint patterns must stay in step with it.
+`@avandar/plugin-manifest`, and `APPROVED_PLUGIN_IMPORT_PATTERNS` in
+`eslint/plugin-restrictions.js` must stay in step with it.
 
 Build plugin UI only from `@avandar/plugin-ui`: `Alert`, `Badge`, `Button`,
 `Divider`, `Group`, `Loader`, `NumberInput`, `SegmentedControl`, `Select`,
