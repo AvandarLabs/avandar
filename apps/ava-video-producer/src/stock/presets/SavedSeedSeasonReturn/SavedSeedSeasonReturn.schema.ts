@@ -33,13 +33,16 @@ export const inputSchema = z
     showQuantities: z.boolean(),
   })
   .refine(
-    (input) =>
-      [
+    (input) => {
+      return [
         input.crop.harvestQuantity,
         input.crop.reservedQuantity,
         input.crop.storageLossQuantity,
         input.crop.sownQuantity,
-      ].every((value) => /^\d+(?:\.\d{1,2})?$/.test(String(value))),
+      ].every((value) => {
+        return /^\d+(?:\.\d{1,2})?$/.test(String(value));
+      });
+    },
     {
       path: ["crop"],
       message: "Quantities require at most two decimal places.",
@@ -59,10 +62,9 @@ export const inputSchema = z
           reservedQuantity,
           storageLossQuantity,
           sownQuantity,
-        ].every(
-          (value) =>
-            /^\d+(?:\.\d{1,2})?$/.test(String(value)) && value <= 10000,
-        )
+        ].every((value) => {
+          return /^\d+(?:\.\d{1,2})?$/.test(String(value)) && value <= 10000;
+        })
       ) {
         return false;
       }

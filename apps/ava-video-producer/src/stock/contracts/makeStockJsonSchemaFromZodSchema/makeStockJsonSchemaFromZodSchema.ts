@@ -15,17 +15,14 @@ export function makeStockJsonSchemaFromZodSchema(
       if (zodSchema._zod.def.type !== "tuple") {
         return;
       }
-      // The discriminant identifies the core tuple definition in Zod's
-      // callback.
-      const { items, rest } = (zodSchema as z.core.$ZodTuple)._zod.def;
+      // The discriminant narrows the core tuple definition in Zod's callback.
+      const { items, rest } = zodSchema._zod.def;
       if (items.length === 0) {
         delete jsonSchema.prefixItems;
       }
-      const minimum = items.reduce(
-        (minimumItems, item, index) =>
-          item._zod.optin === "optional" ? minimumItems : index + 1,
-        0,
-      );
+      const minimum = items.reduce((minimumItems, item, index) => {
+        return item._zod.optin === "optional" ? minimumItems : index + 1;
+      }, 0);
       jsonSchema.minItems = Math.max(jsonSchema.minItems ?? 0, minimum);
       if (!rest) {
         jsonSchema.maxItems = Math.min(

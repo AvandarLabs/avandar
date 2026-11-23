@@ -1,6 +1,6 @@
-import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = { label: string; frame: number; accent: string };
@@ -10,12 +10,18 @@ export function DestinationTray({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
-    <g data-destination="tray" opacity={ramp(frame, 104, 32)}>
-      <path
-        d="M64 544v34h832v-34M80 544h800"
-        fill={STOCK.surface}
-        stroke={STOCK.line}
+    <g
+      data-destination="tray"
+      opacity={motion.ramp(frame, 104, motion.scale(32))}
+    >
+      <SketchedShape
+        shape={{ kind: "path", d: "M64 544v34h832v-34M80 544h800" }}
+        profile={tokens.sketch.shape}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
       />
       <FitText
         text={label}

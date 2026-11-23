@@ -11,6 +11,7 @@ import {
 } from "@mantine/core";
 import { ClarificationAuditEntryClient } from "@/clients/privacy/ClarificationAuditEntryClient/ClarificationAuditEntryClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { PrivacyLogTableHeader } from "./PrivacyLogTableHeader";
 import type { ClarificationAuditEntry } from "@/models/privacy/ClarificationAuditEntry/ClarificationAuditEntry";
 
 type ClarificationOutcome = ClarificationAuditEntry.T["outcome"];
@@ -47,6 +48,7 @@ const LEGACY_OUTCOME_COLOR: Record<string, string> = {
 
 /** Renders clarification metadata recorded on the current device. */
 export function ClarificationLogPanel(): React.ReactNode {
+  const { t } = useLingui();
   const workspace = useCurrentWorkspace();
   const outcomeLabels = useOutcomeLabels();
   const legacyOutcomeLabels = useLegacyOutcomeLabels();
@@ -89,25 +91,9 @@ export function ClarificationLogPanel(): React.ReactNode {
         </Card>
       ) : (
         <Table striped withTableBorder>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>
-                <Trans>When</Trans>
-              </Table.Th>
-              <Table.Th>
-                <Trans>Turn</Trans>
-              </Table.Th>
-              <Table.Th>
-                <Trans>Shape</Trans>
-              </Table.Th>
-              <Table.Th>
-                <Trans>Outcome</Trans>
-              </Table.Th>
-              <Table.Th>
-                <Trans>Time to answer</Trans>
-              </Table.Th>
-            </Table.Tr>
-          </Table.Thead>
+          <PrivacyLogTableHeader
+            labels={[t`When`, t`Turn`, t`Shape`, t`Outcome`, t`Time to answer`]}
+          />
           <Table.Tbody>
             {entries.map((entry) => {
               return (

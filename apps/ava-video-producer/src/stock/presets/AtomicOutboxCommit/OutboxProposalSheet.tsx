@@ -1,18 +1,23 @@
+import { StockRect } from "../../primitives/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = { x: number; accent: string };
 /** A dashed sheet half remains provisional before the shared commit. */
 export function OutboxProposalSheet({ x, accent }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
-    <rect
+    <StockRect
       x={x}
       y={390}
       width={320}
       height={84}
-      rx={4}
+      rx={scales.corner(tokens.corner.chip)}
       stroke={accent}
       fill="none"
-      strokeDasharray="4 5"
+      strokeDasharray={atomic.dash.medium.join(" ")}
     />
   );
 }

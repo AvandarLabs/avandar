@@ -1,4 +1,4 @@
-import { SampleSite } from "./SampleSite";
+import { SampleSite } from "./SampleSite/SampleSite";
 import type { Input } from "./StratifiedSpatialSample.schema";
 import type { ReactNode } from "react";
 
@@ -11,20 +11,23 @@ export function SampleSites({
 }: Readonly<Props>): ReactNode {
   return (
     <g>
-      {input.sites.map((site, index) => (
-        <SampleSite
-          key={site.id}
-          site={site}
-          index={index}
-          frame={frame}
-          accent={accent}
-          selected={input.selectedSiteIds.includes(site.id)}
-          showLabel={
-            input.showUnselectedLabels ||
-            input.selectedSiteIds.includes(site.id)
-          }
-        />
-      ))}
+      {input.sites.map((site, index) => {
+        // Selection has at most eight sites. Reusing this result
+        // avoids duplicate scans without allocating a per-frame Set.
+        // react-doctor-disable-next-line js-set-map-lookups
+        const isSelected = input.selectedSiteIds.includes(site.id);
+        return (
+          <SampleSite
+            key={site.id}
+            site={site}
+            index={index}
+            frame={frame}
+            accent={accent}
+            selected={isSelected}
+            showLabel={input.showUnselectedLabels || isSelected}
+          />
+        );
+      })}
     </g>
   );
 }

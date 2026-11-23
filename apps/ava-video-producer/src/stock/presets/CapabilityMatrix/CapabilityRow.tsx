@@ -1,5 +1,6 @@
-import { ramp } from "../../../motion";
+import { propEq } from "@avandar/utils";
 import { FitText } from "../../primitives/FitText/FitText";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CapabilityCell } from "./CapabilityCell";
 import type { Input } from "./CapabilityMatrix.schema";
 import type { ReactNode } from "react";
@@ -10,6 +11,8 @@ type Props = {
   index: number;
   frame: number;
 };
+/** Frames the scanning rule takes to pass one row, which staggers the rows. */
+const ROW_SCAN_FRAMES = 12;
 /** All alternatives in one row resolve together on matching baselines. */
 export function CapabilityRow({
   input,
@@ -17,6 +20,7 @@ export function CapabilityRow({
   index,
   frame,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const y = 176 + index * 66;
   const columnWidth = 606 / input.options.length;
   const label = {
@@ -28,12 +32,15 @@ export function CapabilityRow({
     maxLines: 3,
   };
   return (
-    <g data-capability={row.id} opacity={ramp(frame, 36 + index * 12, 12)}>
+    <g
+      data-capability={row.id}
+      opacity={motion.reveal(frame, 36 + index * motion.scale(ROW_SCAN_FRAMES))}
+    >
       <g aria-label={row.label}>
         <FitText {...label} breakLongWords normalizeWhitespace />
       </g>
       {input.options.map((option, optionIndex) => {
-        const cell = row.cells.find(({ optionId }) => optionId === option.id)!;
+        const cell = row.cells.find(propEq("optionId", option.id))!;
         return (
           <CapabilityCell
             key={option.id}

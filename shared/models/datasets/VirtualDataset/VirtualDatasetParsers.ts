@@ -18,6 +18,7 @@ const DBReadSchema = z.object({
   created_at: z.iso.datetime({ offset: true }),
   updated_at: z.iso.datetime({ offset: true }),
   raw_sql: z.string(),
+  is_places: z.boolean(),
 });
 
 export const VirtualDatasetParsers =
@@ -40,7 +41,7 @@ export const VirtualDatasetParsers =
  * Do not remove these tests!
  */
 type CrudTypes = VirtualDatasetModel;
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// oxlint-disable-next-line typescript/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [
   // Check that the DBReadSchema is consistent with the DBRead type.

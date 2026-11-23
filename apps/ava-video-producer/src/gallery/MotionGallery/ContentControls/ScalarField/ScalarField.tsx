@@ -1,6 +1,6 @@
 import { match, P } from "ts-pattern";
 import { SelectField } from "../SelectField";
-import styles from "./ScalarField.module.css";
+import { ScalarTextField } from "./ScalarTextField/ScalarTextField";
 import type { StockControl } from "../../../../stock/contracts/StockContract.types";
 import type { Props as ContentFieldProps } from "../ContentField/ContentField";
 import type { ContentFieldContext } from "../useContentField";
@@ -43,7 +43,7 @@ export function ScalarField({
   control,
   context,
   ...remainingProps
-}: Props): ReactNode {
+}: Readonly<Props>): ReactNode {
   return match(control)
     .with({ kind: "select" }, (matchedControl) => {
       return (
@@ -54,32 +54,22 @@ export function ScalarField({
       );
     })
     .with({ kind: "text" }, (matchedControl) => {
-      return (
-        <textarea
-          {...context.field}
-          className={styles.scalarFieldText}
-          value={String(context.value ?? "")}
-          maxLength={matchedControl.maxLength}
-          rows={matchedControl.multiline ? undefined : 1}
-          wrap={matchedControl.multiline ? "soft" : "off"}
-          onChange={(event) => context.update(event.target.value)}
-        />
-      );
+      return <ScalarTextField {...{ context, matchedControl }} />;
     })
     .with({ kind: P.union("number", "boolean") }, (matchedControl) => {
       return (
         <input
           {...context.field}
           {..._inputProps({ control: matchedControl, value: context.value })}
-          onChange={(event) =>
-            context.update(
+          onChange={(event) => {
+            return context.update(
               matchedControl.kind === "boolean"
                 ? event.target.checked
                 : matchedControl.kind === "number" && event.target.value !== ""
                   ? event.target.valueAsNumber
                   : event.target.value,
-            )
-          }
+            );
+          }}
         />
       );
     })

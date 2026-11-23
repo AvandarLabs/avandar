@@ -56,6 +56,7 @@ export type ManualUploadParse = {
   isReparsePending: boolean;
   onFileSubmit: (file: File | undefined) => void;
   onRequestDataReparse: (parseOptions: FileParseOptions) => Promise<void>;
+  clearParsedFile: () => void;
 };
 
 function _fileMimeTypeToSourceType(
@@ -170,7 +171,7 @@ function useAutoParseInitialFile(
     },
     // We intentionally exclude `requestFileParse` from deps - it changes
     // on every render but the ref guards single execution.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // oxlint-disable-next-line react/exhaustive-deps
     [initialFile],
   );
 }
@@ -222,6 +223,10 @@ export function useManualUploadParse(
         requestFileParse,
         setIsReparsePending,
       });
+    },
+    clearParsedFile: () => {
+      setUploadedFile(undefined);
+      manualFileLoad.clearLoadedFile();
     },
   };
 }

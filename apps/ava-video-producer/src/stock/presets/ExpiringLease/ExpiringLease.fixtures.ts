@@ -40,10 +40,12 @@ export const fixtures: Array<{ id: string; input: Input }> = [
     id: "dense",
     input: {
       ...DEFAULT_INPUT,
-      participants: Array.from({ length: 4 }, (_, index) => ({
-        id: `person ${index}`,
-        label: "W".repeat(24),
-      })),
+      participants: Array.from({ length: 4 }, (_, index) => {
+        return {
+          id: `person ${index}`,
+          label: "W".repeat(24),
+        };
+      }),
       holderId: "person 3",
       permissionLabel: "W".repeat(30),
       lifetime: { value: 8, unit: "W".repeat(20) },

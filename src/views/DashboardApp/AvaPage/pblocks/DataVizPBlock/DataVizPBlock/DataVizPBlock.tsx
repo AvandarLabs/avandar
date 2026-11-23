@@ -66,6 +66,7 @@ export function DataVizPBlock(
   const data = result?.data ?? [];
   return (
     <DataVizContent
+      tileId={props.id}
       prompt={props.nlQuery.prompt}
       rawSql={props.nlQuery.rawSql}
       isLoading={isLoading || columnBindings.status === "loading"}

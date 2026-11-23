@@ -5,6 +5,7 @@ import { getRowNumberedViewName } from "@/clients/DuckDbClient/duckDbSqlText";
 import { buildConceptViewSql } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql";
 import { makeConceptAttributeColumnsFromMetadata } from "@/clients/qetl/QueryMediator/conceptRelation/makeConceptAttributeColumnsFromMetadata";
 import { withDuckDb } from "../../../../../../tests/integration/queries/executedDuckDb";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 /**
  * Executed tests for the step that turns a concept's ontology rows into the
  * columns its DuckDB view emits.
@@ -61,6 +62,7 @@ function _attribute(
     isIdentifier: false,
     allowManualEdit: false,
     isArray: false,
+    bucketGrain: undefined,
     ...overrides,
   };
 }
@@ -78,6 +80,9 @@ function _mapping(
     datasetId: Dataset.Id;
     columnName: string;
     ruleType?: DatasetColumnMapping["valuePickerRuleType"];
+    // The column's Ava type. `bigint` by default, a type every rule allows,
+    // so a fixture names one only when its test is about the type.
+    columnDataType?: AvaDataType.T;
   }>,
 ): MappedColumn {
   const datasetColumnId =
@@ -93,6 +98,7 @@ function _mapping(
       valuePickerRuleType: options.ruleType ?? "first",
       datasetId: options.datasetId,
       datasetColumnId,
+      bucketColumnId: undefined,
       createdAt: "2026-08-19T00:00:00Z",
       updatedAt: "2026-08-19T00:00:00Z",
     },
@@ -100,6 +106,7 @@ function _mapping(
       id: datasetColumnId,
       name: options.columnName,
       datasetId: options.datasetId,
+      dataType: options.columnDataType ?? "bigint",
     } as DatasetColumn.T,
   };
 }
@@ -164,6 +171,82 @@ const TAGS_MAPPING = _mapping({
   columnName: "tag",
 });
 
+/** `_metadata` plus dataset columns no mapping reads as its value. */
+function _metadataWithColumns(
+  options: Readonly<{
+    attributes: readonly ConceptAttribute.T[];
+    mappings: readonly MappedColumn[];
+    extraColumns: readonly DatasetColumn.T[];
+  }>,
+): ConceptRelationMetadata {
+  const metadata = _metadata(options);
+  return {
+    ...metadata,
+    datasetColumnsById: {
+      ...metadata.datasetColumnsById,
+      ...Object.fromEntries(
+        options.extraColumns.map((column) => {
+          return [column.id, column];
+        }),
+      ),
+    },
+  };
+}
+
+/** A dataset column with a type, which column resolution checks. */
+function _typedColumn(
+  options: Readonly<{
+    datasetId: Dataset.Id;
+    columnName: string;
+    dataType: DatasetColumn.T["dataType"];
+  }>,
+): DatasetColumn.T {
+  return {
+    id: `col-${options.datasetId}-${options.columnName}` as DatasetColumn.Id,
+    name: options.columnName,
+    datasetId: options.datasetId,
+    dataType: options.dataType,
+  } as DatasetColumn.T;
+}
+
+const AGE_PER_MONTH = _attribute({
+  name: "age per month",
+  dataType: "bigint",
+  isArray: true,
+  bucketGrain: "month",
+});
+const SEEN_ON = _typedColumn({
+  datasetId: DATASET_A,
+  columnName: "seen_on",
+  dataType: "date",
+});
+const TAG_COLUMN = _typedColumn({
+  datasetId: DATASET_A,
+  columnName: "tag",
+  dataType: "varchar",
+});
+const OTHER_DATASET_DATE = _typedColumn({
+  datasetId: DATASET_B,
+  columnName: "seen_on",
+  dataType: "date",
+});
+
+/** The per-month field's mapping: the monthly max of `age_years`. */
+function _agePerMonthMapping(
+  dateColumn: DatasetColumn.T | undefined,
+): MappedColumn {
+  const mapped = _mapping({
+    attributeName: "age per month",
+    datasetId: DATASET_A,
+    columnName: "age_years",
+    ruleType: "max",
+  });
+  return {
+    ...mapped,
+    mapping: { ...mapped.mapping, bucketColumnId: dateColumn?.id },
+  };
+}
+
 /**
  * Builds the fixture world: two contributing datasets as parquet with their
  * `ava_rows_` views, plus the spine.
@@ -180,10 +263,10 @@ async function _seed(connection: DuckDBConnection): Promise<void> {
   await connection.run(`
     COPY (
       SELECT * FROM (VALUES
-        (101, 41, 'blue'),
-        (101, 42, 'green'),
-        (102, 50, 'red')
-      ) AS t(person_id, age_years, tag)
+        (101, 41, 'blue', DATE '2026-01-05'),
+        (101, 42, 'green', DATE '2026-02-10'),
+        (102, 50, 'red', DATE '2026-01-20')
+      ) AS t(person_id, age_years, tag, seen_on)
     ) TO '${pathA}' (FORMAT parquet)
   `);
   await connection.run(`
@@ -203,8 +286,11 @@ async function _seed(connection: DuckDBConnection): Promise<void> {
     CREATE VIEW "${getRowNumberedViewName(DATASET_B)}" AS
       SELECT * FROM read_parquet('${pathB}', file_row_number = true);
     CREATE TABLE "${SPINE}" AS
-      SELECT CAST(external_id AS VARCHAR) AS external_id
-      FROM (VALUES ('101'), ('102'), ('103')) AS t(external_id);
+      SELECT
+        CAST(external_id AS VARCHAR) AS external_id,
+        CAST(status AS VARCHAR) AS status
+      FROM (VALUES ('101', 'Active'), ('102', 'Active'), ('103', 'Inactive'))
+        AS t(external_id, status);
   `);
 }
 
@@ -245,6 +331,40 @@ async function _queryConcept(
   });
 }
 
+/** Builds the view from metadata and reads one field as JSON per record. */
+async function _queryFieldAsJson(
+  options: Readonly<{ metadata: ConceptRelationMetadata; fieldName: string }>,
+): Promise<Array<{ externalId: string; value: unknown; typeName: string }>> {
+  const { attributeColumns } = makeConceptAttributeColumnsFromMetadata(
+    options.metadata,
+  );
+  return await withDuckDb(async (connection) => {
+    await _seed(connection);
+    await connection.run(
+      buildConceptViewSql({
+        viewName: CONCEPT_VIEW,
+        spineTableName: SPINE,
+        attributeColumns,
+      }),
+    );
+    const reader = await connection.runAndReadAll(`
+      SELECT
+        external_id,
+        CAST(to_json("${options.fieldName}") AS VARCHAR) AS field_json,
+        typeof("${options.fieldName}") AS type_name
+      FROM "${CONCEPT_VIEW}"
+      ORDER BY external_id
+    `);
+    return reader.getRowObjectsJson().map((row) => {
+      return {
+        externalId: String(row.external_id),
+        value: JSON.parse(String(row.field_json)),
+        typeName: String(row.type_name),
+      };
+    });
+  });
+}
+
 const FULL_CONCEPT = _metadata({
   attributes: [PERSON_ID, HOUSEHOLD_ID, AGE, REGION, TAGS, NOTE],
   mappings: [
@@ -266,6 +386,7 @@ describe("makeConceptAttributeColumnsFromMetadata", () => {
     expect(rows).toEqual([
       {
         external_id: "101",
+        status: "Active",
         age: 41,
         hh_id: "101",
         note: null,
@@ -275,6 +396,7 @@ describe("makeConceptAttributeColumnsFromMetadata", () => {
       },
       {
         external_id: "102",
+        status: "Active",
         age: 50,
         hh_id: "102",
         note: null,
@@ -284,6 +406,7 @@ describe("makeConceptAttributeColumnsFromMetadata", () => {
       },
       {
         external_id: "103",
+        status: "Inactive",
         age: null,
         hh_id: null,
         note: null,
@@ -306,8 +429,11 @@ describe("makeConceptAttributeColumnsFromMetadata", () => {
       await _seed(connection);
       await connection.run(`
         CREATE OR REPLACE TABLE "${SPINE}" AS
-          SELECT CAST(external_id AS VARCHAR) AS external_id
-          FROM (VALUES ('101'), ('x-9')) AS t(external_id);
+          SELECT
+            CAST(external_id AS VARCHAR) AS external_id,
+            CAST(status AS VARCHAR) AS status
+          FROM (VALUES ('101', 'Active'), ('x-9', 'Active'))
+            AS t(external_id, status);
       `);
       await connection.run(
         buildConceptViewSql({
@@ -383,6 +509,50 @@ describe("makeConceptAttributeColumnsFromMetadata", () => {
     }).toThrow(/does not exist/);
   });
 
+  // A field that keeps one value needs a rule to pick it. Guessing one would
+  // answer with a value nobody chose, so the planner refuses the concept,
+  // naming the field.
+  it("refuses a single-value attribute whose mapping names no value rule", () => {
+    const metadata = _metadata({
+      attributes: [PERSON_ID, AGE],
+      mappings: [
+        PERSON_ID_MAPPING,
+        {
+          ...AGE_MAPPING,
+          mapping: { ...AGE_MAPPING.mapping, valuePickerRuleType: undefined },
+        },
+      ],
+    });
+
+    expect(() => {
+      return makeConceptAttributeColumnsFromMetadata(metadata);
+    }).toThrow(/'age'.*names no value rule/);
+  });
+
+  // A list field created before lists stored no rule still has one. Its
+  // column carries none, so the view keeps every value.
+  it("drops the stored rule of a list attribute from its column", () => {
+    const metadata = _metadata({
+      attributes: [PERSON_ID, TAGS],
+      mappings: [
+        PERSON_ID_MAPPING,
+        {
+          ...TAGS_MAPPING,
+          mapping: { ...TAGS_MAPPING.mapping, valuePickerRuleType: "sum" },
+        },
+      ],
+    });
+
+    const tags = makeConceptAttributeColumnsFromMetadata(
+      metadata,
+    ).attributeColumns.find((column) => {
+      return column.attributeName === "tags";
+    });
+
+    expect(tags).toMatchObject({ kind: "dataset_column", valueShape: "list" });
+    expect(tags).not.toHaveProperty("valuePickerRuleType");
+  });
+
   // `concept_attributes` has no unique constraint on `(concept_id, name)`, so
   // two attributes of one concept really can share a name, and a view with two
   // identically named columns does not compile. The alphabetically first
@@ -415,8 +585,140 @@ describe("makeConceptAttributeColumnsFromMetadata", () => {
     ]);
     expect(rows[0]).toEqual({
       external_id: "101",
+      status: "Active",
       age: 41,
       age_2: 41,
+      person_id: 101,
+    });
+  });
+
+  // A reader maps a view column back to its attribute. Two attributes can
+  // share a name, so mapping by name would hand one attribute's value to the
+  // other once the second is suffixed.
+  it("names each column's attribute by id, through a duplicate-name suffix", () => {
+    const duplicate = _attribute({
+      name: "age",
+      id: "attr-age-2" as ConceptAttribute.Id,
+    });
+    const metadata = _metadata({
+      attributes: [PERSON_ID, AGE, duplicate],
+      mappings: [PERSON_ID_MAPPING, AGE_MAPPING],
+    });
+    metadata.mappings.push({
+      ...AGE_MAPPING.mapping,
+      id: "map-age-2" as DatasetColumnMapping["id"],
+      conceptAttributeId: duplicate.id,
+    });
+
+    const { attributeColumns } =
+      makeConceptAttributeColumnsFromMetadata(metadata);
+
+    expect(
+      attributeColumns.map((column) => {
+        return [column.attributeName, column.attributeId];
+      }),
+    ).toEqual([
+      ["age", AGE.id],
+      ["age_2", duplicate.id],
+      ["person_id", PERSON_ID.id],
+    ]);
+  });
+
+  // `external_id` is the view's record key, read from the spine, and a common
+  // key column name. An attribute of that name is suffixed rather than
+  // dropped, so it still has a column.
+  it("suffixes an attribute named external_id so the record key keeps its name", async () => {
+    const keyAttribute = _attribute({
+      name: "external_id",
+      isIdentifier: true,
+    });
+    const keyMapping = _mapping({
+      attributeName: "external_id",
+      datasetId: DATASET_A,
+      columnName: "person_id",
+    });
+
+    const rows = await _queryConcept(
+      _metadata({
+        attributes: [keyAttribute, AGE],
+        mappings: [keyMapping, AGE_MAPPING],
+      }),
+    );
+
+    expect(rows[0]).toEqual({
+      external_id: "101",
+      status: "Active",
+      age: 41,
+      external_id_2: 101,
+    });
+  });
+
+  // DuckDB column names are case-insensitive, so a name that differs from a
+  // reserved column only by case would be renamed by DuckDB itself, and the
+  // emitted name would no longer match the view's real column.
+  it("suffixes an attribute named EXTERNAL_ID, since column names ignore case", async () => {
+    const keyAttribute = _attribute({
+      name: "EXTERNAL_ID",
+      isIdentifier: true,
+    });
+    const keyMapping = _mapping({
+      attributeName: "EXTERNAL_ID",
+      datasetId: DATASET_A,
+      columnName: "person_id",
+    });
+    const metadata = _metadata({
+      attributes: [keyAttribute, AGE],
+      mappings: [keyMapping, AGE_MAPPING],
+    });
+
+    const { attributeColumns } =
+      makeConceptAttributeColumnsFromMetadata(metadata);
+    const rows = await _queryConcept(metadata);
+
+    expect(
+      attributeColumns.map((column) => {
+        return column.attributeName;
+      }),
+    ).toEqual(["age", "EXTERNAL_ID_2"]);
+    expect(rows[0]).toEqual({
+      external_id: "101",
+      status: "Active",
+      age: 41,
+      EXTERNAL_ID_2: 101,
+    });
+  });
+
+  // Two attribute names that differ only by case are one name to DuckDB, so
+  // the later one is suffixed and its original casing is kept.
+  it("suffixes attribute names that differ only by case", async () => {
+    const upperAge = _attribute({
+      name: "Age",
+      id: "attr-Age" as ConceptAttribute.Id,
+    });
+    const upperAgeMapping = _mapping({
+      attributeName: "Age",
+      datasetId: DATASET_A,
+      columnName: "age_years",
+    });
+    const metadata = _metadata({
+      attributes: [PERSON_ID, AGE, upperAge],
+      mappings: [PERSON_ID_MAPPING, AGE_MAPPING, upperAgeMapping],
+    });
+
+    const { attributeColumns } =
+      makeConceptAttributeColumnsFromMetadata(metadata);
+    const rows = await _queryConcept(metadata);
+
+    expect(
+      attributeColumns.map((column) => {
+        return column.attributeName;
+      }),
+    ).toEqual(["age", "Age_2", "person_id"]);
+    expect(rows[0]).toEqual({
+      external_id: "101",
+      status: "Active",
+      age: 41,
+      Age_2: 41,
       person_id: 101,
     });
   });
@@ -430,16 +732,227 @@ describe("makeConceptAttributeColumnsFromMetadata", () => {
     expect(columns.contributingDatasetIds).toEqual([DATASET_A, DATASET_B]);
   });
 
-  // A manual-entry attribute must not make the whole concept unqueryable, which
-  // is what `getAttributeAssertions` does today. It contributes no dataset.
+  // A manual-entry attribute must not make the whole concept unqueryable. It
+  // contributes no dataset.
   it("emits a manual-entry attribute as a column that reads no dataset", () => {
     const columns = makeConceptAttributeColumnsFromMetadata(
       _metadata({ attributes: [NOTE], mappings: [] }),
     );
 
     expect(columns.attributeColumns).toEqual([
-      { kind: "unmapped", attributeName: "note", duckDbDataType: "VARCHAR" },
+      {
+        kind: "unmapped",
+        attributeId: NOTE.id,
+        attributeName: "note",
+        duckDbDataType: "VARCHAR",
+        valueShape: "single",
+      },
     ]);
     expect(columns.contributingDatasetIds).toEqual([]);
   });
+
+  // `status` belongs to the built-in column the view reads from the spine. An
+  // attribute of that name is suffixed, so both survive and neither shadows
+  // the other.
+  it("suffixes an attribute named status so the built-in status keeps its name", async () => {
+    const statusAttribute = _attribute({
+      name: "status",
+      mappingType: "manual_entry",
+    });
+    const metadata = _metadata({
+      attributes: [PERSON_ID, statusAttribute],
+      mappings: [PERSON_ID_MAPPING],
+    });
+
+    const columns = makeConceptAttributeColumnsFromMetadata(metadata);
+    const rows = await _queryConcept(metadata);
+
+    expect(columns.renamedColumns).toEqual([
+      {
+        attributeId: statusAttribute.id,
+        requestedName: "status",
+        emittedName: "status_2",
+      },
+    ]);
+    expect(rows[0]).toEqual({
+      external_id: "101",
+      status: "Active",
+      status_2: null,
+      person_id: 101,
+    });
+  });
+
+  // A column whose type was changed after the field was made can leave a rule
+  // the new type does not allow. DuckDB would refuse the whole view with an
+  // error that names neither the field nor the rule.
+  it("refuses a sum over a text column", () => {
+    const total = _attribute({ name: "total", dataType: "double" });
+    const metadata = _metadata({
+      attributes: [PERSON_ID, total],
+      mappings: [
+        PERSON_ID_MAPPING,
+        _mapping({
+          attributeName: "total",
+          datasetId: DATASET_A,
+          columnName: "tag",
+          ruleType: "sum",
+          columnDataType: "varchar",
+        }),
+      ],
+    });
+
+    expect(() => {
+      return makeConceptAttributeColumnsFromMetadata(metadata);
+    }).toThrow(
+      /Concept attribute 'total' .* applies 'sum' to dataset column 'tag', whose type 'varchar' does not allow it/,
+    );
+  });
+
+  // A list field keeps every value and applies no rule, so the rule its
+  // mapping happens to store cannot break it.
+  it("reads a list field whose mapping stores a rule its column type does not allow", async () => {
+    const metadata = _metadata({
+      attributes: [PERSON_ID, TAGS],
+      mappings: [
+        PERSON_ID_MAPPING,
+        _mapping({
+          attributeName: "tags",
+          datasetId: DATASET_A,
+          columnName: "tag",
+          ruleType: "sum",
+          columnDataType: "varchar",
+        }),
+      ],
+    });
+
+    const rows = await _queryConcept(metadata);
+
+    expect(
+      rows.map((row) => {
+        return row.tags;
+      }),
+    ).toEqual([["blue", "green"], ["red"], []]);
+  });
+  it("reads a per-month field through its date column", async () => {
+    const rows = await _queryFieldAsJson({
+      metadata: _metadataWithColumns({
+        attributes: [PERSON_ID, AGE_PER_MONTH],
+        mappings: [PERSON_ID_MAPPING, _agePerMonthMapping(SEEN_ON)],
+        extraColumns: [SEEN_ON],
+      }),
+      fieldName: "age per month",
+    });
+
+    expect(
+      rows.map((row) => {
+        return [row.externalId, row.value];
+      }),
+    ).toEqual([
+      [
+        "101",
+        [
+          { bucket: "2026-01-01", value: 41 },
+          { bucket: "2026-02-01", value: 42 },
+        ],
+      ],
+      ["102", [{ bucket: "2026-01-01", value: 50 }]],
+      ["103", []],
+    ]);
+  });
+
+  // The relation's schema must not change shape when a mapping is missing.
+  it("emits a per-month field with no mapping as a typed empty list", async () => {
+    const rows = await _queryFieldAsJson({
+      metadata: _metadata({
+        attributes: [PERSON_ID, AGE_PER_MONTH],
+        mappings: [PERSON_ID_MAPPING],
+      }),
+      fieldName: "age per month",
+    });
+
+    expect(rows[0]).toEqual({
+      externalId: "101",
+      value: [],
+      typeName: 'STRUCT(bucket DATE, "value" BIGINT)[]',
+    });
+  });
+
+  it.each([
+    ["names no date column", undefined, [], /names no date column/],
+    ["names a date column that does not exist", SEEN_ON, [], /does not exist/],
+    [
+      "names a date column of another dataset",
+      OTHER_DATASET_DATE,
+      [OTHER_DATASET_DATE],
+      /not of the dataset it reads/,
+    ],
+    [
+      "names a column that is not a date or timestamp",
+      TAG_COLUMN,
+      [TAG_COLUMN],
+      /not a date or timestamp/,
+    ],
+  ] as const)(
+    "refuses a per-month field whose mapping %s",
+    (_label, dateColumn, extraColumns, message) => {
+      const metadata = _metadataWithColumns({
+        attributes: [PERSON_ID, AGE_PER_MONTH],
+        mappings: [PERSON_ID_MAPPING, _agePerMonthMapping(dateColumn)],
+        extraColumns,
+      });
+
+      expect(() => {
+        return makeConceptAttributeColumnsFromMetadata(metadata);
+      }).toThrow(message);
+    },
+  );
+
+  it("refuses a date column on a field without a period", () => {
+    const metadata = _metadataWithColumns({
+      attributes: [PERSON_ID, AGE],
+      mappings: [
+        PERSON_ID_MAPPING,
+        {
+          ...AGE_MAPPING,
+          mapping: { ...AGE_MAPPING.mapping, bucketColumnId: SEEN_ON.id },
+        },
+      ],
+      extraColumns: [SEEN_ON],
+    });
+
+    expect(() => {
+      return makeConceptAttributeColumnsFromMetadata(metadata);
+    }).toThrow(/has no period/);
+  });
+
+  it.each([
+    ["a timestamp detected with a time zone", "TIMESTAMP_TZ", true],
+    ["a column retyped to timestamp from text", "VARCHAR", false],
+  ] as const)(
+    "reads the date column's zone for %s",
+    (_label, detectedDataType, isZoned) => {
+      const visitedAt = {
+        ..._typedColumn({
+          datasetId: DATASET_A,
+          columnName: "visited_at",
+          dataType: "timestamp",
+        }),
+        detectedDataType,
+      } as DatasetColumn.T;
+
+      const { attributeColumns } = makeConceptAttributeColumnsFromMetadata(
+        _metadataWithColumns({
+          attributes: [PERSON_ID, AGE_PER_MONTH],
+          mappings: [PERSON_ID_MAPPING, _agePerMonthMapping(visitedAt)],
+          extraColumns: [visitedAt],
+        }),
+      );
+
+      expect(
+        attributeColumns.find((column) => {
+          return column.attributeId === AGE_PER_MONTH.id;
+        }),
+      ).toMatchObject({ isBucketColumnZoned: isZoned });
+    },
+  );
 });

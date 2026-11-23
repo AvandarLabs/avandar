@@ -1,4 +1,5 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { Motion } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./SpatialGridBinning.schema";
 /** Data for CountToken. */
 type CountTokenResult = {
@@ -8,8 +9,9 @@ type CountTokenResult = {
   sourceX: number;
   sourceY: number;
 };
-
 type CountToken = Input["points"][number] & CountTokenResult;
+const COUNT_AT = 51;
+const COUNT_FRAMES = 37;
 type CellCount = {
   index: number;
   column: number;
@@ -19,11 +21,12 @@ type CellCount = {
 };
 function _getAssignments(input: Readonly<Input>): number[] {
   const { columns, rows } = input.grid;
-  return input.points.map(
-    (point) =>
+  return input.points.map((point) => {
+    return (
       Math.min(rows - 1, Math.floor((point.y / 100) * rows)) * columns +
-      Math.min(columns - 1, Math.floor((point.x / 100) * columns)),
-  );
+      Math.min(columns - 1, Math.floor((point.x / 100) * columns))
+    );
+  });
 }
 function _createCells({
   input,
@@ -35,34 +38,64 @@ function _createCells({
   points: CountToken[];
 }>): CellCount[] {
   const { columns, rows } = input.grid;
-  return Array.from({ length: columns * rows }, (_, index) => ({
-    index,
-    column: index % columns,
-    row: Math.floor(index / columns),
-    count: assignments.filter((cell) => cell === index).length,
-    arrived: points.filter(
-      (point) => point.cell === index && point.progress === 1,
-    ).length,
-  }));
+  return Array.from({ length: columns * rows }, (_, index) => {
+    return {
+      index,
+      column: index % columns,
+      row: Math.floor(index / columns),
+      count: assignments.filter((cell) => {
+        return cell === index;
+      }).length,
+      arrived: points.filter((point) => {
+        return point.cell === index && point.progress === 1;
+      }).length,
+    };
+  });
 }
+type GridSceneArgs = Readonly<{
+  input: Input;
+  frame: number;
+  motion: Pick<VideoMotion, "ramp" | "scale" | "travel" | "stagger">;
+}>;
 /**
  * Assign each observation once, then move its token to a distinct ledger slot.
  */
 export function makeGridSceneFromInputAndFrame({
   input,
   frame,
-}: Readonly<{ input: Input; frame: number }>): {
+  motion,
+}: GridSceneArgs): {
   points: CountToken[];
   cells: CellCount[];
 } {
-  const { columns, rows } = input.grid;
   const assignments = _getAssignments(input);
-  const points = input.points.map((point, index) => {
+  const points = _createCountTokens({
+    input: { input, frame, motion },
+    assignments,
+  });
+  const cells = _createCells({ input, assignments, points });
+  return { points, cells };
+}
+/** Each observation's token, moving from its source into its cell's slot. */
+function _createCountTokens({
+  input: { input, frame, motion },
+  assignments,
+}: Readonly<{
+  input: GridSceneArgs;
+  assignments: readonly number[];
+}>): CountToken[] {
+  const { columns, rows } = input.grid;
+  return input.points.map((point, index) => {
     const cell = assignments[index];
-    const rank = assignments
-      .slice(0, index)
-      .filter((assigned) => assigned === cell).length;
-    const progress = ramp(frame, 51 + index * 2, 37, EASE.inOut);
+    const rank = assignments.slice(0, index).filter((assigned) => {
+      return assigned === cell;
+    }).length;
+    const progress = motion.ramp(
+      frame,
+      COUNT_AT + index * motion.stagger.list,
+      motion.scale(COUNT_FRAMES),
+      motion.travel.easing,
+    );
     return {
       ...point,
       index,
@@ -70,21 +103,20 @@ export function makeGridSceneFromInputAndFrame({
       progress,
       sourceX: 48 + point.x * 3.3,
       sourceY: 164 + point.y * 3.3,
-      x: mix(
-        progress,
-        48 + point.x * 3.3,
-        450 + ((cell % columns) * 420) / columns + 20 + (rank % 4) * 26,
-      ),
-      y: mix(
-        progress,
-        164 + point.y * 3.3,
-        164 +
+      x: Motion.mix({
+        t: progress,
+        from: 48 + point.x * 3.3,
+        to: 450 + ((cell % columns) * 420) / columns + 20 + (rank % 4) * 26,
+      }),
+      y: Motion.mix({
+        t: progress,
+        from: 164 + point.y * 3.3,
+        to:
+          164 +
           (Math.floor(cell / columns) * 300) / rows +
           52 +
           Math.floor(rank / 4) * 18,
-      ),
+      }),
     };
   });
-  const cells = _createCells({ input, assignments, points });
-  return { points, cells };
 }

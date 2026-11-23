@@ -1,6 +1,6 @@
-import { stockI18n } from "../../i18n/stockI18n/stockI18n";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
+import { StockRect } from "../../primitives/StockRect";
 import { getAssociationFromInput } from "./getAssociationFromInput";
 import { unresolvedMessage } from "./PdfNearestLabelReview.controls";
 import type { Input } from "./PdfNearestLabelReview.schema";
@@ -17,7 +17,7 @@ export function ExtractionRow({
   return (
     <g>
       {" "}
-      <rect
+      <StockRect
         data-extracted-row="true"
         data-original-x={input.figure.x}
         data-original-y={input.figure.y}
@@ -31,7 +31,7 @@ export function ExtractionRow({
       <LabelSlots
         labels={[
           [
-            association.chosenLabel?.text ?? stockI18n._(unresolvedMessage),
+            association.chosenLabel?.text ?? unresolvedMessage.message,
             x + 12,
             464,
             336,

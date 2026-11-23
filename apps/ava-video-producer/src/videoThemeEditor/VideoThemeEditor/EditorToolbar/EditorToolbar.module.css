@@ -1,0 +1,4 @@
+.editorToolbar {
+  display: grid;
+  gap: var(--atlas-space-8);
+}

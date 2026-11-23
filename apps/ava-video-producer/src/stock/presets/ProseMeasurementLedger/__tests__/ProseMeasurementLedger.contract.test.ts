@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { prop } from "@avandar/utils";
-import { registerStockLocalizationAssertions } from "../../../../../tests/helpers/registerStockLocalizationAssertions";
+import { makeMap, prop } from "@avandar/utils";
+import { registerStockDefaultTextAssertions } from "../../../../../tests/helpers/registerStockDefaultTextAssertions";
 import { registerStockPresetAssertions } from "../../../../../tests/helpers/registerStockPresetAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
@@ -74,7 +74,7 @@ registerStockPresetAssertions(options);
 
 registerStockTextLayoutAssertions(options);
 
-registerStockLocalizationAssertions({
+registerStockDefaultTextAssertions({
   contract,
   expectedTextPaths: [
     ["fragments", 0, "text"],
@@ -86,50 +86,6 @@ registerStockLocalizationAssertions({
     ["copy", "context"],
     ["copy", "source"],
     ["copy", "result"],
-  ],
-  boundTranslations: [
-    {
-      path: ["fragments", 0, "text"],
-      template: "<content>Lieu</content> ",
-      text: "Lieu ",
-      start: 0,
-      end: 4,
-    },
-    {
-      path: ["fragments", 1, "text"],
-      template: "<content>env.</content> ",
-      text: "env. ",
-      start: 0,
-      end: 4,
-    },
-    {
-      path: ["fragments", 2, "text"],
-      template: "<content>-0.5</content> ",
-      text: "-0.5 ",
-      start: 0,
-      end: 4,
-    },
-    {
-      path: ["fragments", 3, "text"],
-      template: "<content>boîtes</content> ",
-      text: "boîtes ",
-      start: 0,
-      end: 6,
-    },
-    {
-      path: ["fragments", 4, "text"],
-      template: "<content>reçues</content> ",
-      text: "reçues ",
-      start: 0,
-      end: 6,
-    },
-    {
-      path: ["fragments", 5, "text"],
-      template: "en <content>semaine 3</content>.",
-      text: "en semaine 3.",
-      start: 3,
-      end: 12,
-    },
   ],
   suppliedInputs: fixtures.map(prop("input")),
 });
@@ -146,16 +102,16 @@ test("zero and negative decimal selections keep exact text and qualifiers", () =
   ["0", "-0", "-12.5", ".5", "12."].forEach((value) => {
     const input = inputSchema.parse({
       ...DEFAULT_INPUT,
-      fragments: DEFAULT_INPUT.fragments.map((fragment) =>
-        fragment.role === "value"
+      fragments: DEFAULT_INPUT.fragments.map((fragment) => {
+        return fragment.role === "value"
           ? {
               ...fragment,
               text: `${value} `,
               contentStart: 0,
               contentEnd: value.length,
             }
-          : fragment,
-      ),
+          : fragment;
+      }),
     });
     assert.ok(
       render({ frame: 150, input: input }).includes(
@@ -171,8 +127,8 @@ test("zero and negative decimal selections keep exact text and qualifiers", () =
 
 test("maximum authored source spans preserve whole graphemes and complete envelopes", () => {
   const semanticRoles = ["subject", "metric", "unit", "period", "qualifier"];
-  semanticRoles.forEach((role) =>
-    [
+  semanticRoles.forEach((role) => {
+    return [
       "界".repeat(20),
       "界 界界界界界界界界界界界界界 界界界界",
       "é👩‍🔬".repeat(2),
@@ -180,16 +136,16 @@ test("maximum authored source spans preserve whole graphemes and complete envelo
     ].forEach((text) => {
       const input = inputSchema.parse({
         ...DEFAULT_INPUT,
-        fragments: DEFAULT_INPUT.fragments.map((fragment) =>
-          fragment.role === role
+        fragments: DEFAULT_INPUT.fragments.map((fragment) => {
+          return fragment.role === role
             ? {
                 ...fragment,
                 text: `(${text})`,
                 contentStart: 1,
                 contentEnd: text.length + 1,
               }
-            : fragment,
-        ),
+            : fragment;
+        }),
       });
       [13, 55, 56, 75, 82, 100, 110, 150].forEach((frame) => {
         const markup = render({ frame: frame, input: input });
@@ -201,8 +157,8 @@ test("maximum authored source spans preserve whole graphemes and complete envelo
           ),
         );
       });
-    }),
-  );
+    });
+  });
 });
 
 test("connector insertion cannot reuse a semantic role's underline pattern", () => {
@@ -227,13 +183,17 @@ test("connector insertion cannot reuse a semantic role's underline pattern", () 
     ...render({ frame: 55, input: input }).matchAll(
       /<path[^>]*data-source-span=[^>]*>/g,
     ),
-  ].map((match) => match[0]);
-  const byRole = new Map(
-    paths.map((path) => [
-      path.match(/data-source-span="([^"]*)"/)![1],
-      path.match(/stroke-dasharray="([^"]*)"/)![1],
-    ]),
-  );
+  ].map((match) => {
+    return match[0];
+  });
+  const byRole = makeMap(paths, {
+    keyFn: (path) => {
+      return path.match(/data-source-span="([^"]*)"/)![1];
+    },
+    valueFn: (path) => {
+      return path.match(/stroke-dasharray="([^"]*)"/)![1];
+    },
+  });
   assert.equal(new Set(byRole.values()).size, 6);
 });
 

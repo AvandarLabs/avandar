@@ -1,5 +1,6 @@
-import { StockRect } from "../../primitives/StockRect/StockRect";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -19,6 +20,8 @@ export function EvolutionRowBackdrop({
   accent,
   isLater,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
       <StockRect
@@ -27,16 +30,17 @@ export function EvolutionRowBackdrop({
         y={y}
         width={520 + 260 * expansion}
         height={60}
-        rx={4}
-        fill={STOCK.surface}
-        stroke={isLater ? accent : STOCK.line}
+        rx={scales.corner(tokens.corner.chip)}
+        fill={tokens.color.surface}
+        stroke={isLater ? accent : tokens.color.line}
       />
       {isLater ? (
-        <path
+        <SketchedShape
+          shape={{ kind: "path", d: `M${x - 8} ${y + 8} V${y + 52}` }}
+          profile={tokens.sketch.shape}
           data-later-notch=""
-          d={`M${x - 8} ${y + 8} V${y + 52}`}
           stroke={accent}
-          strokeWidth={3}
+          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
         />
       ) : null}
     </g>

@@ -25,6 +25,7 @@ type Props = {
   onDuplicateLayer: (layerId: MapLayer.Id) => void;
   onZoomToLayer: (layerId: MapLayer.Id) => void;
   onDeleteLayer: (layerId: MapLayer.Id) => void;
+  onOpenFeatureList?: (layerId: MapLayer.Id) => void;
 };
 
 /** Ordered layer list with pointer drag-and-drop. */
@@ -45,6 +46,7 @@ export function OrderedLayerRows({
   onDuplicateLayer,
   onZoomToLayer,
   onDeleteLayer,
+  onOpenFeatureList,
 }: Readonly<Props>): ReactNode {
   return (
     <DragDropProvider
@@ -70,6 +72,7 @@ export function OrderedLayerRows({
           onDuplicateLayer={onDuplicateLayer}
           onZoomToLayer={onZoomToLayer}
           onDeleteLayer={onDeleteLayer}
+          onOpenFeatureList={onOpenFeatureList}
         />
       </ul>
     </DragDropProvider>

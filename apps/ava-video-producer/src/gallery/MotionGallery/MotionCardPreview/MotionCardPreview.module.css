@@ -1,0 +1,11 @@
+.motionCardPreviewCardPreview {
+  composes: card-preview from global;
+}
+
+.motionCardPreviewCardStill {
+  composes: card-still from global;
+}
+
+.motionCardPreviewPreviewOpen {
+  composes: preview-open from global;
+}

@@ -1,11 +1,14 @@
-import { ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { StockRect } from "../../primitives/StockRect/StockRect";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./DashboardSlotAssembly.schema";
 import type { ReactNode } from "react";
 
-type Props = { input: Input; frame: number };
+type Props = {
+  input: Input;
+  frame: number;
+};
 const TITLE = {
   x: 24,
   y: 40,
@@ -30,7 +33,6 @@ const SCOPE = {
   width: 884,
   fontSize: 12 as const,
   maxLines: 1,
-  color: STOCK.muted,
   breakLongWords: true,
   normalizeWhitespace: true,
 } satisfies Pick<
@@ -40,26 +42,39 @@ const SCOPE = {
   | "width"
   | "fontSize"
   | "maxLines"
-  | "color"
   | "breakLongWords"
   | "normalizeWhitespace"
 >;
 /** Shared context settles after panels dock, preserving all supplied copy. */
 export function DashboardContext({ input, frame }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g>
       <FitText {...TITLE} text={input.boardTitle} />
       {input.scopeLabel ? (
-        <g opacity={ramp(frame, 112, 18)}>
+        <g
+          opacity={Motion.ramp({
+            frame,
+            at: 112,
+            dur: motion.hero,
+            easing: motion.reveal.easing,
+          })}
+        >
           <StockRect
             x={24}
             y={80}
             width={912}
             height={28}
-            rx={4}
-            fill={STOCK.elevated}
+            rx={scales.corner(tokens.corner.chip)}
+            fill={tokens.color.elevated}
           />
-          <FitText {...SCOPE} text={input.scopeLabel} />
+          <FitText
+            {...SCOPE}
+            text={input.scopeLabel}
+            color={tokens.color.textMuted}
+          />
         </g>
       ) : undefined}
     </g>

@@ -1,14 +1,5 @@
 .collectionItemRow {
-  border-bottom: 1px solid var(--line);
-  margin: 16px 0;
-  padding: 0 0 14px;
-}
-
-.collectionItemRowHeader {
-  align-items: center;
-  color: var(--muted);
-  display: flex;
-  font-size: 12px;
-  gap: 10px;
-  justify-content: space-between;
+  border-bottom: var(--atlas-border-1) solid var(--line);
+  margin: var(--atlas-space-16) 0;
+  padding: 0 0 var(--atlas-space-14);
 }

@@ -83,7 +83,10 @@ test(
       await page.getByPlaceholder("Search data sources").click();
       await page.getByRole("option", { name: POINT_DATASET_NAME }).click();
 
-      const inspector = page.getByRole("region", { name: "Layer" });
+      const inspector = page.getByRole("region", {
+        name: POINT_DATASET_NAME,
+        exact: true,
+      });
       await _selectOption(
         page,
         inspector,

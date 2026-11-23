@@ -1,5 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./UncertaintyUnfold.schema";
 import type { ReactNode } from "react";
 
@@ -21,6 +22,7 @@ export function UncertaintyValues({
   pointX,
   opacity,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const values = [
     { value: input.estimate.lower, x: lowerX, slot: 100 },
     { value: input.estimate.point, x: pointX, slot: 480 },
@@ -28,22 +30,29 @@ export function UncertaintyValues({
   ];
   return (
     <g opacity={opacity}>
-      {values.map(({ value, x, slot }, index) => (
-        <g key={index}>
-          <path d={`M${x} 326 L${slot} 362`} stroke={STOCK.line} fill="none" />
-          <FitText
-            text={String(value)}
-            x={slot}
-            y={384}
-            width={228}
-            fontSize={12}
-            maxLines={2}
-            anchor={index === 0 ? "start" : index === 2 ? "end" : "middle"}
-            normalizeWhitespace
-            breakLongWords
-          />
-        </g>
-      ))}
+      {values.map(({ value, x, slot }, index) => {
+        return (
+          <g key={index}>
+            <SketchedShape
+              shape={{ kind: "path", d: `M${x} 326 L${slot} 362` }}
+              profile={tokens.sketch.shape}
+              stroke={tokens.color.line}
+              fill="none"
+            />
+            <FitText
+              text={String(value)}
+              x={slot}
+              y={384}
+              width={228}
+              fontSize={12}
+              maxLines={2}
+              anchor={index === 0 ? "start" : index === 2 ? "end" : "middle"}
+              normalizeWhitespace
+              breakLongWords
+            />
+          </g>
+        );
+      })}
     </g>
   );
 }

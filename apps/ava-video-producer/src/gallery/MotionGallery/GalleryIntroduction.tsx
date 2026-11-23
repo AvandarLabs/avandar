@@ -1,51 +1,36 @@
-import { Trans, useLingui as useGalleryLingui } from "@lingui/react/macro";
-import { STOCK_CATALOG, STOCK_CATEGORIES } from "../../stock/catalog";
+import { STOCK_CATALOG, STOCK_CATEGORIES } from "../../stock/stockEntry";
 import type { ReactNode } from "react";
 
 /** Introduction and size of the current motion collection. */
 export function GalleryIntroduction(): ReactNode {
-  const { t } = useGalleryLingui();
-
   return (
     <section className="library-intro" aria-labelledby="page-title">
       <div className="intro-copy">
         <p className="eyebrow">
           <span className="tiny-dot" />
-          <Trans>THE MOTION REFERENCE COLLECTION</Trans>
+          THE MOTION REFERENCE COLLECTION
         </p>
         <h1 id="page-title">
-          <Trans>
-            Motion, with <em>meaning.</em>
-          </Trans>
+          Motion, with <em>meaning.</em>
         </h1>
         <p>
-          <Trans>
-            Small movements. Clear ideas. {STOCK_CATALOG.length} reusable motion
-            presets for the moments a screenshot can’t explain.
-          </Trans>
+          Small movements. Clear ideas. {STOCK_CATALOG.length} reusable motion
+          presets for the moments a screenshot can’t explain.
         </p>
       </div>
       <div
         className="collection-stamp"
-        aria-label={t`${STOCK_CATALOG.length} presets in ${STOCK_CATEGORIES.length} families`}
+        aria-label={`${STOCK_CATALOG.length} presets in ${STOCK_CATEGORIES.length} families`}
       >
-        <span className="stamp-top">
-          <Trans>CURATED COLLECTION</Trans>
-        </span>
+        <span className="stamp-top">CURATED COLLECTION</span>
         <strong>
           {String(STOCK_CATALOG.length).padStart(2, "0")}
-          <span>
-            <Trans>/</Trans>
-          </span>
+          <span>/</span>
         </strong>
         <div>
+          <span>MOTION PRESETS</span>
           <span>
-            <Trans>MOTION PRESETS</Trans>
-          </span>
-          <span>
-            <Trans>
-              {String(STOCK_CATEGORIES.length).padStart(2, "0")} FAMILIES
-            </Trans>
+            {String(STOCK_CATEGORIES.length).padStart(2, "0")} FAMILIES
           </span>
         </div>
       </div>

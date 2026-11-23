@@ -1,8 +1,8 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { RevenueLegend } from "./RevenueLegend";
+import { RevenueLegend } from "./RevenueLegend/RevenueLegend";
 import { RevenuePeriod } from "./RevenuePeriod";
-import { RevenueTerm } from "./RevenueTerm";
-import type { GraphicProps } from "../../graphics-common";
+import { RevenueTerm } from "./RevenueTerm/RevenueTerm";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./TermLimitedRevenueShare.schema";
 import type { ReactNode } from "react";
 /** Frame-driven independent cash-flow comparison. */
@@ -23,16 +23,18 @@ export function TermLimitedRevenueShare({
           [input.copy.example, 60, 580, 840, 12, 2],
         ]}
       />
-      {input.periods.map((period, index) => (
-        <RevenuePeriod
-          key={period.id}
-          period={period}
-          index={index}
-          frame={frame}
-          input={input}
-          accent={accent}
-        />
-      ))}
+      {input.periods.map((period, index) => {
+        return (
+          <RevenuePeriod
+            key={period.id}
+            period={period}
+            index={index}
+            frame={frame}
+            input={input}
+            accent={accent}
+          />
+        );
+      })}
       <RevenueTerm frame={frame} input={input} accent={accent} />
       <RevenueLegend input={input} accent={accent} />
     </g>

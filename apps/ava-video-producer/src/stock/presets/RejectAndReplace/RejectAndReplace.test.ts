@@ -62,7 +62,9 @@ test("the replacement occupies the original selection slot while the rejected ra
     DEFAULT_INPUT.rejected.reason,
     DEFAULT_INPUT.replacement.label,
     DEFAULT_INPUT.replacement.reason,
-  ].forEach((text) => assert.ok(hold.includes(text)));
+  ].forEach((text) => {
+    return assert.ok(hold.includes(text));
+  });
   assert.match(hold, /data-rejection-mark="strike"/);
 });
 
@@ -76,8 +78,11 @@ test("rejection styles change the selection marker rather than striking the rati
       showCriterionLink: false,
     },
   });
-  const path = (markup: string) =>
-    markup.match(/data-rejection-mark="[^"]+"[^>]*><path d="([^"]+)"/)?.[1];
+  const path = (markup: string) => {
+    return markup.match(
+      /data-rejection-mark="[^"]+"[^>]*><path d="([^"]+)"/,
+    )?.[1];
+  };
   assert.ok(path(strike));
   assert.ok(path(cross));
   assert.notEqual(path(strike), path(cross));
@@ -96,30 +101,33 @@ test("default, minimum, dense and changed selections retain complete content dur
   fixtures.forEach(({ input }) => {
     assert.deepEqual(inputSchema.parse(input), input);
     const frames = [0, 30, 60, 90, 150, 179];
-    const samples = frames.map((frame) => _render({ frame, input }));
-    [...frames]
-      .reverse()
-      .forEach((frame) =>
-        assert.equal(_render({ frame, input }), samples[frames.indexOf(frame)]),
+    const samples = frames.map((frame) => {
+      return _render({ frame, input });
+    });
+    [...frames].reverse().forEach((frame) => {
+      return assert.equal(
+        _render({ frame, input }),
+        samples[frames.indexOf(frame)],
       );
+    });
     [
       input.criterion,
       input.rejected.label,
       input.rejected.reason,
       input.replacement.label,
       input.replacement.reason,
-    ].forEach((text) =>
-      assert.ok(
+    ].forEach((text) => {
+      return assert.ok(
         _render({ frame: 150, input }).includes(`aria-label="${text}"`),
-      ),
-    );
+      );
+    });
   });
 });
 
 test("strict choice content rejects missing rationale and extra object keys", () => {
-  invalidInputs.forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  );
+  invalidInputs.forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
   assert.equal(inputSchema.safeParse({}).success, false);
 });
 
@@ -130,9 +138,9 @@ test("the complete contract exposes both rationale objects and valid complete bi
     rejectAndReplaceContract.controls.map(prop("path")),
     Object.keys(DEFAULT_INPUT),
   );
-  rejectAndReplaceContract.bindingExamples.forEach(({ input }) =>
-    assert.equal(inputSchema.safeParse(input).success, true),
-  );
+  rejectAndReplaceContract.bindingExamples.forEach(({ input }) => {
+    return assert.equal(inputSchema.safeParse(input).success, true);
+  });
 });
 
 test("both accepted spaced rationales fit four lines while hard breaks remain in authored input", async () => {
@@ -149,7 +157,11 @@ test("both accepted spaced rationales fit four lines while hard breaks remain in
 
 Array.from(["replacement", "rejected"] as const).forEach((field) => {
   test(`the ${field} rationale packs a short prefix with both oversized tokens`, () => {
-    const text = [1, 16, 16].map((length) => "界".repeat(length)).join(" ");
+    const text = [1, 16, 16]
+      .map((length) => {
+        return "界".repeat(length);
+      })
+      .join(" ");
     const input = {
       ...DEFAULT_INPUT,
       [field]: { ...DEFAULT_INPUT[field], reason: text },

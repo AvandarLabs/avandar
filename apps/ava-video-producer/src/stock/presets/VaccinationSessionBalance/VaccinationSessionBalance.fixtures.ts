@@ -1,4 +1,4 @@
-import { propNotEq } from "@avandar/utils";
+import { objectValuesMap, propNotEq } from "@avandar/utils";
 import type { Input } from "./VaccinationSessionBalance.schema";
 /** Complete fictional default, replaced only as a whole input. */
 export const DEFAULT_INPUT: Input = {
@@ -34,25 +34,29 @@ const minimum: Input = {
 };
 const dense: Input = {
   ...DEFAULT_INPUT,
-  units: Array.from({ length: 12 }, (_, index) => ({
-    id: `u${index}`,
-    outcome: "administered",
-    recipientId: `p${index % 6}`,
-  })),
-  recipients: Array.from({ length: 6 }, (_, index) => ({
-    id: `p${index}`,
-    label: "界".repeat(18),
-  })),
+  units: Array.from({ length: 12 }, (_, index) => {
+    return {
+      id: `u${index}`,
+      outcome: "administered",
+      recipientId: `p${index % 6}`,
+    };
+  }),
+  recipients: Array.from({ length: 6 }, (_, index) => {
+    return {
+      id: `p${index}`,
+      label: "界".repeat(18),
+    };
+  }),
   sceneLabel: "界".repeat(40),
-  copy: Object.fromEntries(
-    Object.keys(DEFAULT_INPUT.copy).map((key) => [key, "界".repeat(42)]),
-  ) as Input["copy"],
+  copy: objectValuesMap(DEFAULT_INPUT.copy, () => {
+    return "界".repeat(42);
+  }) as Input["copy"],
 };
 const changed: Input = {
   ...DEFAULT_INPUT,
-  units: DEFAULT_INPUT.units.map((unit, index) =>
-    index === 1 ? { ...unit, recipientId: "p1" } : unit,
-  ),
+  units: DEFAULT_INPUT.units.map((unit, index) => {
+    return index === 1 ? { ...unit, recipientId: "p1" } : unit;
+  }),
   recipients: DEFAULT_INPUT.recipients.filter(propNotEq("id", "p2")),
 };
 const toggles: Input = {
@@ -70,7 +74,9 @@ export const invalidInputs: unknown[] = [
     { outcome: "administered", recipientId: null },
     { outcome: "administered", recipientId: "" },
     { outcome: "remaining", recipientId: "p1" },
-  ].map((unit) => ({ ...DEFAULT_INPUT, units: [{ id: "u", ...unit }] })),
+  ].map((unit) => {
+    return { ...DEFAULT_INPUT, units: [{ id: "u", ...unit }] };
+  }),
   { ...DEFAULT_INPUT, recipients: DEFAULT_INPUT.recipients.slice(0, 1) },
 ];
 /** Accepted minimum, dense, changed and disabled-display examples. */

@@ -1,7 +1,7 @@
 import { Model } from "@avandar/models";
-import { prop, sortObjList } from "@avandar/utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { uuid } from "$/lib/uuid";
+import { ConceptStatusColumn } from "$/models/queries/ConceptStatusColumn/ConceptStatusColumn";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { runStructuredQuery } from "@/clients/queries/runStructuredQuery/runStructuredQuery";
@@ -10,6 +10,7 @@ import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
+import type { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
 import type { User } from "$/models/User/User";
 import type { UserProfile } from "$/models/User/UserProfile";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -19,13 +20,11 @@ const SNAPSHOT_REVISION = "2026-08-14T01:00:00.000Z";
 const {
   runQueryMock,
   publicRunQueryMock,
-  getConceptExtensionMock,
   makeExecutableQueryFromManualQueryMock,
 } = vi.hoisted(() => {
   return {
     runQueryMock: vi.fn(),
     publicRunQueryMock: vi.fn(),
-    getConceptExtensionMock: vi.fn(),
     makeExecutableQueryFromManualQueryMock: vi.fn(),
   };
 });
@@ -36,16 +35,6 @@ vi.mock("@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession", () => {
 vi.mock("@/clients/qetl/PublicQuerySession/PublicQuerySession", () => {
   return { PublicQuerySession: { runQuery: publicRunQueryMock } };
 });
-vi.mock(
-  "@/clients/ontology/AttributeAssertionClient/AttributeAssertionClient",
-  () => {
-    return {
-      AttributeAssertionClient: {
-        getConceptExtension: getConceptExtensionMock,
-      },
-    };
-  },
-);
 vi.mock(
   "@/views/DataExplorerApp/makeExecutableQueryFromManualQuery/makeExecutableQueryFromManualQuery",
   () => {
@@ -68,6 +57,7 @@ function _createConcept(): Concept.T {
     createdAt: now,
     updatedAt: now,
     allowManualCreation: false,
+    defaultStatusId: uuid<ConceptStatus.Id>(),
   });
 }
 
@@ -91,6 +81,7 @@ function _createConceptAttribute(
     isIdentifier: false,
     allowManualEdit: true,
     isArray: false,
+    bucketGrain: undefined,
   });
 }
 
@@ -115,7 +106,6 @@ function _createDataset(): Dataset.T {
 beforeEach(() => {
   runQueryMock.mockReset();
   publicRunQueryMock.mockReset();
-  getConceptExtensionMock.mockReset();
   // Mirrors the real resolver's behavior for queries that never trip the
   // large-dataset auto-limit guard, which is every query these tests use
   // unless a test overrides this default.
@@ -239,41 +229,138 @@ describe("runStructuredQuery", () => {
     expect(publicRunQueryMock).not.toHaveBeenCalled();
   });
 
-  it("remaps attribute assertions from attribute ids to attribute names", async () => {
+  // A form out of sync with its SQL still compiles to SQL, for a case type as
+  // for a dataset, so filters, grouping, sorting, and status all apply.
+  it("runs an out-of-sync case type query as SQL over the case type's view", async () => {
     const concept = _createConcept();
-    const labelAttribute = _createConceptAttribute(concept.id, "name");
-    const ageField = _createConceptAttribute(concept.id, "age");
-    const nameColumn = QueryColumn.makeFromConceptAttribute(labelAttribute);
-    const ageColumn = QueryColumn.makeFromConceptAttribute(ageField);
-
-    getConceptExtensionMock.mockResolvedValue([
-      { [labelAttribute.id]: "Ada", [ageField.id]: 30 },
-      { [labelAttribute.id]: "Grace", [ageField.id]: 40 },
+    const [ageColumn] = QueryColumn.makeFromConceptAttributes([
+      _createConceptAttribute(concept.id, "age"),
     ]);
+    runQueryMock.mockResolvedValue({
+      id: uuid(),
+      data: [],
+      columns: [],
+      numRows: 0,
+    });
 
-    const result = await runStructuredQuery({
+    await runStructuredQuery({
       auth: "workspace",
       workspaceId,
       query: {
         ...StructuredQuery.makeEmpty(),
         dataSource: concept,
-        queryColumns: [nameColumn, ageColumn],
+        queryColumns: [ageColumn!],
       },
       rawSql: undefined,
       isStructuredQueryInSync: false,
     });
 
-    // `sortedQueryColumns` orders columns by query-column id (a random uuid),
-    // not by name, so compare the returned columns order-independently.
-    const columnsByName = sortObjList(result.columns, { sortBy: prop("name") });
-    expect(columnsByName).toEqual([
-      { name: "age", dataType: "varchar" },
-      { name: "name", dataType: "varchar" },
+    expect(runQueryMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        rawSql: expect.stringContaining(`"concept_${concept.id}"`),
+      }),
+    );
+  });
+
+  it("selects the status column in an out-of-sync case type query", async () => {
+    const concept = _createConcept();
+    const [ageColumn] = QueryColumn.makeFromConceptAttributes([
+      _createConceptAttribute(concept.id, "age"),
     ]);
-    expect(result.data).toEqual([
-      { name: "Ada", age: 30 },
-      { name: "Grace", age: 40 },
+    runQueryMock.mockResolvedValue({
+      id: uuid(),
+      data: [],
+      columns: [],
+      numRows: 0,
+    });
+
+    await runStructuredQuery({
+      auth: "workspace",
+      workspaceId,
+      query: {
+        ...StructuredQuery.makeEmpty(),
+        dataSource: concept,
+        queryColumns: [
+          ageColumn!,
+          QueryColumn.makeFromConceptStatusColumn(
+            ConceptStatusColumn.fromConceptId(concept.id),
+          ),
+        ],
+      },
+      rawSql: undefined,
+      isStructuredQueryInSync: false,
+    });
+
+    const { rawSql } = runQueryMock.mock.calls[0]![0] as { rawSql: string };
+    expect(rawSql).toContain('"status"');
+  });
+
+  // DuckDB compares column names without case, so two result columns named
+  // `age` and `Age` would collide and the second would read as `age:1`.
+  it("gives each of two fields whose names match without case its own result name", async () => {
+    const concept = _createConcept();
+    const [age, secondAge] = QueryColumn.makeFromConceptAttributes([
+      _createConceptAttribute(concept.id, "age"),
+      _createConceptAttribute(concept.id, "Age"),
     ]);
+    runQueryMock.mockResolvedValue({
+      id: uuid(),
+      data: [],
+      columns: [],
+      numRows: 0,
+    });
+
+    await runStructuredQuery({
+      auth: "workspace",
+      workspaceId,
+      query: {
+        ...StructuredQuery.makeEmpty(),
+        dataSource: concept,
+        queryColumns: [age!, secondAge!],
+      },
+      rawSql: undefined,
+      isStructuredQueryInSync: false,
+    });
+
+    const { rawSql } = runQueryMock.mock.calls[0]![0] as { rawSql: string };
+    expect(rawSql).toContain('"age" as "age"');
+    expect(rawSql).toContain('"Age_2" as "Age_2"');
+  });
+
+  // A field named like the record key has the view column `external_id_2`.
+  // Reading `external_id` would read every record's key instead.
+  it("reads a renamed case type field from the column the view emits for it", async () => {
+    const concept = _createConcept();
+    const [keyNamedColumn, ageColumn] = QueryColumn.makeFromConceptAttributes([
+      _createConceptAttribute(concept.id, "external_id"),
+      _createConceptAttribute(concept.id, "age"),
+    ]);
+    runQueryMock.mockResolvedValue({
+      id: uuid(),
+      data: [],
+      columns: [],
+      numRows: 0,
+    });
+
+    await runStructuredQuery({
+      auth: "workspace",
+      workspaceId,
+      query: {
+        ...StructuredQuery.makeEmpty(),
+        dataSource: concept,
+        queryColumns: [keyNamedColumn!, ageColumn!],
+        aggregations: {
+          [keyNamedColumn!.id]: "group_by",
+          [ageColumn!.id]: "count",
+        },
+      },
+      rawSql: undefined,
+      isStructuredQueryInSync: false,
+    });
+
+    const { rawSql } = runQueryMock.mock.calls[0]![0] as { rawSql: string };
+    expect(rawSql).toContain('"external_id_2" as "external_id"');
+    expect(rawSql).toContain('group by "external_id_2"');
   });
 });
 
@@ -333,5 +420,47 @@ describe("runStructuredQueryWithMetadata", () => {
     });
 
     expect(didAutoLimit).toBe(true);
+  });
+
+  it("returns the SQL it compiled and ran for an out-of-sync query", async () => {
+    const concept = _createConcept();
+    const queryColumns = QueryColumn.makeFromConceptAttributes([
+      _createConceptAttribute(concept.id, "age"),
+    ]);
+    runQueryMock.mockResolvedValue({
+      id: uuid(),
+      data: [],
+      columns: [],
+      numRows: 0,
+    });
+
+    const run = await runStructuredQueryWithMetadata({
+      auth: "workspace",
+      workspaceId: uuid<Workspace.Id>(),
+      query: {
+        ...StructuredQuery.makeEmpty(),
+        dataSource: concept,
+        queryColumns,
+      },
+      rawSql: undefined,
+      isStructuredQueryInSync: false,
+    });
+
+    const { rawSql } = runQueryMock.mock.calls[0]![0] as { rawSql: string };
+    expect(run.executedSql).toBe(rawSql);
+  });
+
+  it("reports no SQL when there is nothing to run", async () => {
+    runQueryMock.mockClear();
+
+    const run = await runStructuredQueryWithMetadata({
+      auth: "workspace",
+      workspaceId: uuid<Workspace.Id>(),
+      query: StructuredQuery.makeEmpty(),
+      rawSql: undefined,
+    });
+
+    expect(runQueryMock).not.toHaveBeenCalled();
+    expect(run.executedSql).toBeUndefined();
   });
 });

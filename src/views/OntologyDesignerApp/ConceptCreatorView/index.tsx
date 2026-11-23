@@ -17,6 +17,7 @@ import {
 import { isNotEmpty } from "@mantine/form";
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -29,8 +30,14 @@ import {
   getDefaultConceptFormValues,
   makeDefaultDatasetColumnAttribute,
   makeDefaultManualEntryAttribute,
+  withDefaultValueRule,
+  withFieldDataTypes,
 } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
+import { ConceptStatusesFieldset } from "@/views/OntologyDesignerApp/ConceptCreatorView/ConceptStatusesFieldset/ConceptStatusesFieldset";
+import { createBucketColumnValidator } from "@/views/OntologyDesignerApp/ConceptCreatorView/createBucketColumnValidator/createBucketColumnValidator";
 import { DatasetColumnAttributesBlock } from "@/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/index";
+import { getStatusSetValueFromFormValues } from "@/views/OntologyDesignerApp/ConceptCreatorView/getStatusSetValueFromFormValues/getStatusSetValueFromFormValues";
+import { keepKeyAndLabelFieldsSingle } from "@/views/OntologyDesignerApp/ConceptCreatorView/keepKeyAndLabelFieldsSingle/keepKeyAndLabelFieldsSingle";
 import { ManualEntryAttributesBlock } from "@/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock";
 import { useSubmitConceptCreatorForm } from "@/views/OntologyDesignerApp/ConceptCreatorView/useSubmitConceptCreatorForm";
 
@@ -53,6 +60,33 @@ export function ConceptCreatorView(): JSX.Element {
       labelAttributeId: isNotEmpty(t`Title field is required`),
       sourceDatasets: {
         primaryKeyColumnId: isNotEmpty(t`ID field is required`),
+      },
+      manualEntryAttributes: {
+        name: (name: string) => {
+          return ConceptStatus.isReservedAttributeName(name)
+            ? t`Every case type already has a status. Choose another name.`
+            : null;
+        },
+      },
+      datasetColumnAttributes: {
+        // The field's period controls show this beside the date column. The
+        // rule stops the submit while one is missing.
+        bucketGrain: createBucketColumnValidator(
+          t`Choose the date column for this field`,
+        ),
+      },
+      // The editor shows each problem beside the status it belongs to. This
+      // rule only stops the submit while any problem remains.
+      statuses: (statuses, values) => {
+        const issues = ConceptStatus.findSetIssues({
+          value: getStatusSetValueFromFormValues({
+            statuses,
+            defaultStatusId: values.defaultStatusId,
+          }),
+        });
+        return issues.length > 0
+          ? t`Fix the statuses above before you create this case type.`
+          : null;
       },
     },
 
@@ -80,8 +114,12 @@ export function ConceptCreatorView(): JSX.Element {
 
           if (identifierAttribute) {
             // if the primary key attribute was already added, we want to just
-            // use that same attribute and set `isIdentifier` to true
-            return setValue(identifierAttribute, "isIdentifier", true);
+            // use that same attribute and set `isIdentifier` to true. It also
+            // resets its value rule to the default, since an identifier is
+            // the key itself
+            return withDefaultValueRule(
+              setValue(identifierAttribute, "isIdentifier", true),
+            );
           }
 
           // otherwise, create a datasetColumnAttribute for this primary key
@@ -124,7 +162,13 @@ export function ConceptCreatorView(): JSX.Element {
         });
       return {
         ...values,
-        attributes: allAttributes,
+        attributes: withFieldDataTypes({
+          attributes: keepKeyAndLabelFieldsSingle({
+            attributes: allAttributes,
+            labelAttributeId: values.labelAttributeId,
+          }),
+          sourceDatasets: values.sourceDatasets,
+        }),
       };
     },
   });
@@ -297,6 +341,8 @@ export function ConceptCreatorView(): JSX.Element {
                 label={t`What field should be used as a ${singularConceptName}'s name?`}
                 {...inputProps.labelAttributeId()}
               />
+
+              <ConceptStatusesFieldset conceptForm={conceptForm} />
 
               <Box>
                 <Button type="submit" loading={isSendConceptFormPending}>

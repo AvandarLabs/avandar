@@ -35,23 +35,27 @@ export const inputSchema = z
     closingNote: z.string().min(1).max(46),
   })
   .refine(
-    (input) =>
-      [input.projects, input.ballots].every(
-        (items) =>
+    (input) => {
+      return [input.projects, input.ballots].every((items) => {
+        return (
           new Set(items.map(prop<{ id: string }, "id", string>("id"))).size ===
-          items.length,
-      ),
+          items.length
+        );
+      });
+    },
     { message: "IDs must be unique within each collection." },
   )
   .refine(
-    (input) =>
-      input.ballots.every(
-        (ballot) =>
+    (input) => {
+      return input.ballots.every((ballot) => {
+        return (
           ballot.projectId === null ||
           input.projects.some(
             propEq<{ id: unknown }, "id", unknown>("id", ballot.projectId),
-          ),
-      ),
+          )
+        );
+      });
+    },
     {
       path: ["ballots"],
       message: "Every non-null project reference must exist.",

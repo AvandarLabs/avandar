@@ -1,5 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./SharedExperimentPredictions.schema";
 import type { ReactNode } from "react";
 
@@ -20,14 +21,26 @@ export function PredictionFlag({
   y,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return frame >= 36 + index * 6 ? (
     <g
       data-prediction-id={learner.id}
       data-prediction-distance={learner.predictionDistance}
       transform={`translate(${flagX} ${y})`}
     >
-      <path d="M0 -24 V24" stroke={accent} strokeWidth={2} />
-      <path d="M0 -24 H26 V-3 H0 Z" fill={STOCK.surface} stroke={accent} />
+      <SketchedShape
+        shape={{ kind: "path", d: "M0 -24 V24" }}
+        profile={tokens.sketch.shape}
+        stroke={accent}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
+      />
+      <SketchedShape
+        shape={{ kind: "path", d: "M0 -24 H26 V-3 H0 Z" }}
+        profile={tokens.sketch.shape}
+        fill={tokens.color.surface}
+        stroke={accent}
+      />
       <FitText
         text={String(index + 1)}
         x={13}

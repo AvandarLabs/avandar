@@ -31,9 +31,7 @@ export function useLayerSourceColumns(
       ...(datasetColumns ?? []).map((column) => {
         return QueryColumn.makeFromDatasetColumn(column);
       }),
-      ...(conceptAttributes ?? []).map((attribute) => {
-        return QueryColumn.makeFromConceptAttribute(attribute);
-      }),
+      ...QueryColumn.makeFromConceptAttributes(conceptAttributes ?? []),
     ];
   }, [datasetColumns, conceptAttributes]);
 }

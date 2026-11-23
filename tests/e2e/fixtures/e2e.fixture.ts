@@ -14,6 +14,7 @@ import {
 } from "../setup/e2eTestWorkspaceLifecycle";
 import { ensureAuthUserExists } from "../setup/ensureAuthUser";
 import { installDuckDbExtensionCache } from "../setup/installDuckDbExtensionCache";
+import { stubFeaturebaseSdk } from "../setup/stubFeaturebaseSdk";
 import type { Page, TestInfo } from "@playwright/test";
 
 export { expect } from "@playwright/test";
@@ -108,9 +109,11 @@ async function _attachFreshPageFailureArtifacts(options: {
  */
 export const test = base.extend<E2ETestFixtures, E2EWorkerFixtures>({
   // Every spec's `page` comes from this context, so the DuckDB extension
-  // cache is installed once here rather than per spec.
+  // cache and the Featurebase stub are installed once here rather than per
+  // spec.
   context: async ({ context }, use) => {
     await installDuckDbExtensionCache(context);
+    await stubFeaturebaseSdk(context);
     await use(context);
   },
 
@@ -142,8 +145,9 @@ export const test = base.extend<E2ETestFixtures, E2EWorkerFixtures>({
         reducedMotion: "reduce",
       });
       // This context is built by hand, so it does not inherit the `context`
-      // fixture's routing and needs the cache installed separately.
+      // fixture's routing and needs the cache and stub installed separately.
       await installDuckDbExtensionCache(context);
+      await stubFeaturebaseSdk(context);
 
       const page = await context.newPage();
       try {

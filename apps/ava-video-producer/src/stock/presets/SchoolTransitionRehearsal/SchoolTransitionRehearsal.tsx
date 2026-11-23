@@ -1,8 +1,10 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getRehearsalFromFrame } from "./getRehearsalFromFrame";
-import { PracticeInterior } from "./PracticeInterior";
-import { PracticePeople } from "./PracticePeople";
-import type { GraphicProps } from "../../graphics-common";
+import { PracticeInterior } from "./PracticeInterior/PracticeInterior";
+import { PracticePeople } from "./PracticePeople/PracticePeople";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./SchoolTransitionRehearsal.schema";
 import type { ReactNode } from "react";
 
@@ -15,7 +17,9 @@ export function SchoolTransitionRehearsal({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const scene = getRehearsalFromFrame({ frame, input });
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scene = getRehearsalFromFrame({ frame, input, motion });
   return (
     <g>
       <LabelSlots
@@ -35,11 +39,15 @@ export function SchoolTransitionRehearsal({
         finalStep={scene.finalStep}
       />
       <PracticePeople input={input} scene={scene} accent={accent} />
-      <path
-        d={`M${scene.learnerX} 515 V523 H48 V530 M${scene.companionX} 417 V526 H515 V530`}
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${scene.learnerX} 515 V523 H48 V530 M${scene.companionX} 417 V526 H515 V530`,
+        }}
+        profile={tokens.sketch.shape}
         fill="none"
         stroke={accent}
-        opacity={0.25}
+        opacity={tokens.alpha.ghost}
       />
     </g>
   );

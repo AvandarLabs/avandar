@@ -96,34 +96,38 @@ invalidInputs.push(
   },
   {
     ...DEFAULT_INPUT,
-    cells: DEFAULT_INPUT.cells.map((cell, index) =>
-      index === 1 ? { ...cell, column: 0 } : cell,
-    ),
+    cells: DEFAULT_INPUT.cells.map((cell, index) => {
+      return index === 1 ? { ...cell, column: 0 } : cell;
+    }),
   },
   { ...DEFAULT_INPUT, metric: { ...DEFAULT_INPUT.metric, maximum: 20 } },
 );
 const minimum: Input = {
   ...DEFAULT_INPUT,
-  cells: Array.from({ length: 4 }, (_, index) => ({
-    id: index ? `cell ${index}` : "",
-    label: "",
-    row: 2,
-    column: index,
-    value: null,
-  })),
+  cells: Array.from({ length: 4 }, (_, index) => {
+    return {
+      id: index ? `cell ${index}` : "",
+      label: "",
+      row: 2,
+      column: index,
+      value: null,
+    };
+  }),
   fieldChecks: [],
   context: "schematic-tile",
   showCoverageTotals: false,
 };
 const dense: Input = {
   ...DEFAULT_INPUT,
-  cells: Array.from({ length: 12 }, (_, index) => ({
-    id: index ? `cell ${index} 空` : "",
-    label: "界".repeat(16),
-    row: Math.floor(index / 4),
-    column: index % 4,
-    value: index % 3 ? null : 1e308,
-  })),
+  cells: Array.from({ length: 12 }, (_, index) => {
+    return {
+      id: index ? `cell ${index} 空` : "",
+      label: "界".repeat(16),
+      row: Math.floor(index / 4),
+      column: index % 4,
+      value: index % 3 ? null : 1e308,
+    };
+  }),
   metric: {
     label: "界".repeat(26),
     unit: "界".repeat(12),
@@ -132,12 +136,14 @@ const dense: Input = {
     cellAreaHa: 0.3,
     periodLabel: "界".repeat(38),
   },
-  fieldChecks: Array.from({ length: 3 }, (_, index) => ({
-    id: index ? `check ${index}` : "",
-    label: "界".repeat(22),
-    cellId: "cell 1 空",
-    value: index ? 0 : -1e308,
-  })),
+  fieldChecks: Array.from({ length: 3 }, (_, index) => {
+    return {
+      id: index ? `check ${index}` : "",
+      label: "界".repeat(22),
+      cellId: "cell 1 空",
+      value: index ? 0 : -1e308,
+    };
+  }),
   decision: { actorLabel: "界".repeat(32), actionLabel: "界".repeat(32) },
   copy: {
     map: "界".repeat(34),
@@ -151,13 +157,15 @@ const dense: Input = {
 };
 const shifted: Input = {
   ...DEFAULT_INPUT,
-  cells: Array.from({ length: 4 }, (_, index) => ({
-    id: index ? `shift ${index}` : "",
-    label: `Cell ${index}`,
-    row: 1 + Math.floor(index / 2),
-    column: 2 + (index % 2),
-    value: null,
-  })),
+  cells: Array.from({ length: 4 }, (_, index) => {
+    return {
+      id: index ? `shift ${index}` : "",
+      label: `Cell ${index}`,
+      row: 1 + Math.floor(index / 2),
+      column: 2 + (index % 2),
+      value: null,
+    };
+  }),
   fieldChecks: [{ id: "", label: "Empty ID point", cellId: "", value: 24 }],
 };
 /** Point concentration and shifted rectangles retain their actual supports. */
@@ -171,10 +179,12 @@ export const fixtures: StockContract<typeof DEFAULT_INPUT>["fixtures"] = [
     id: "separated-checks",
     input: {
       ...dense,
-      fieldChecks: dense.fieldChecks.map((check, index) => ({
-        ...check,
-        cellId: dense.cells[index * 5].id,
-      })),
+      fieldChecks: dense.fieldChecks.map((check, index) => {
+        return {
+          ...check,
+          cellId: dense.cells[index * 5].id,
+        };
+      }),
     },
   },
 ];
@@ -182,7 +192,9 @@ invalidInputs.push(
   { ...DEFAULT_INPUT, cells: DEFAULT_INPUT.cells.slice(1) },
   {
     ...DEFAULT_INPUT,
-    cells: DEFAULT_INPUT.cells.map((cell) => ({ ...cell, id: "" })),
+    cells: DEFAULT_INPUT.cells.map((cell) => {
+      return { ...cell, id: "" };
+    }),
   },
   {
     ...DEFAULT_INPUT,

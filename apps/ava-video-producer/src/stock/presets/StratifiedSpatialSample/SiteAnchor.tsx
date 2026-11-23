@@ -1,4 +1,5 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -20,6 +21,7 @@ export function SiteAnchor({
   accent,
   selected,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
       {" "}
@@ -28,15 +30,19 @@ export function SiteAnchor({
         cx={x}
         cy={y}
         r={3}
-        fill={STOCK.muted}
+        fill={tokens.color.inactive}
       />
-      <line x1={x} y1={y} x2={x} y2={y - lift} stroke={accent} />
+      <SketchedShape
+        shape={{ kind: "line", x1: x, y1: y, x2: x, y2: y - lift }}
+        profile={tokens.sketch.shape}
+        stroke={accent}
+      />
       <circle
         data-raised-site={siteId}
         cx={x}
         cy={y - lift}
         r={selected ? 5 : 3}
-        fill={selected ? accent : STOCK.muted}
+        fill={selected ? accent : tokens.color.inactive}
       />
     </g>
   );

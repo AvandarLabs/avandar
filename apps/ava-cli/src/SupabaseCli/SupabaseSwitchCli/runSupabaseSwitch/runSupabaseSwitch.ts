@@ -1,7 +1,4 @@
-import {
-  readExistingSwitchProjectId,
-  startExistingSwitch,
-} from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/startExistingSwitch/startExistingSwitch";
+import { ExistingSwitch } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/ExistingSwitch/ExistingSwitch";
 import { SupabaseLocalEnvironment } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment";
 import { makeSwitchRequestResolutionFromOptions } from "@ava-cli/SupabaseCli/SupabaseSwitchCli/makeSwitchRequestResolutionFromOptions/makeSwitchRequestResolutionFromOptions";
 import type {
@@ -35,11 +32,16 @@ export async function runSupabaseSwitch(
   if (branch === "") {
     throw new Error("Supabase switch requires a named Git branch.");
   }
-  const existingProjectId = await readExistingSwitchProjectId(io);
+  const existingProject = await ExistingSwitch.readProject(io);
+  if (existingProject?.kind === "remote") {
+    throw new Error(
+      `Branch ${branch} is switched to the hosted project ${existingProject.projectId}. Run \`ava supabase restore\` first, then switch to a local project.`,
+    );
+  }
   const resolution = makeSwitchRequestResolutionFromOptions({
     branch,
     requestedProjectId,
-    existingProjectId,
+    existingProjectId: existingProject?.projectId,
   });
   if (resolution.kind === "create") {
     return {
@@ -61,5 +63,5 @@ export async function runSupabaseSwitch(
       existingProjectId: resolution.existingProjectId,
     };
   }
-  return { kind: "switched", result: await startExistingSwitch(io) };
+  return { kind: "switched", result: await ExistingSwitch.start(io) };
 }

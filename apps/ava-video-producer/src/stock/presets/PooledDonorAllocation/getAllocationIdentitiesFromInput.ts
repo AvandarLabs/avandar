@@ -1,3 +1,4 @@
+import { propEq } from "@avandar/utils";
 import type { Input } from "./PooledDonorAllocation.schema";
 /** Data for getAllocationIdentitiesFromInput. */
 type GetAllocationIdentitiesResult = {
@@ -10,7 +11,7 @@ type GetAllocationIdentitiesResult = {
   };
   donorIndex: number;
   unitIndex: number;
-  requestId: string;
+  requestId: string | null;
 };
 
 /**
@@ -22,15 +23,19 @@ export function getAllocationIdentitiesFromInput(
 ): GetAllocationIdentitiesResult[] {
   return input.contributions.flatMap((donor, donorIndex) => {
     const destinations = input.allocations
-      .filter(({ contributionId }) => contributionId === donor.id)
-      .flatMap(({ requestId, credits }) =>
-        Array.from({ length: credits }, () => requestId),
-      );
-    return Array.from({ length: donor.credits }, (_, unitIndex) => ({
-      donor,
-      donorIndex,
-      unitIndex,
-      requestId: destinations[unitIndex] ?? null,
-    }));
+      .filter(propEq("contributionId", donor.id))
+      .flatMap(({ requestId, credits }) => {
+        return Array.from({ length: credits }, () => {
+          return requestId;
+        });
+      });
+    return Array.from({ length: donor.credits }, (_, unitIndex) => {
+      return {
+        donor,
+        donorIndex,
+        unitIndex,
+        requestId: destinations[unitIndex] ?? null,
+      };
+    });
   });
 }

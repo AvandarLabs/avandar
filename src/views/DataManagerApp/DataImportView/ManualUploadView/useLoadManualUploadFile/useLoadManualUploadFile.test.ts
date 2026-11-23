@@ -481,7 +481,7 @@ describe("useLoadManualUploadFile", () => {
   });
 });
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// oxlint-disable-next-line typescript/ban-ts-comment
 // @ts-ignore ignore unused variable warning
 type _TypeTests = [
   /**

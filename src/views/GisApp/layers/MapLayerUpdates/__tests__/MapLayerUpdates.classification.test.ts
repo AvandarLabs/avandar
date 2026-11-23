@@ -28,6 +28,7 @@ describe("classification updates", () => {
         type: "graduated",
         value: { type: "queryColumn", column: valueColumn.id },
         ramp: ["#fee", "#f00"],
+        classLabels: [undefined, undefined],
         classification: { method: "quantile", classCount: 2 },
         normalization: undefined,
         noData: { color: "#ccc", label: "" },

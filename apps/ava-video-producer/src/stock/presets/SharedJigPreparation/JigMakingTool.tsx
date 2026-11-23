@@ -1,5 +1,7 @@
-import { EASE, mix, ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { Motion } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./SharedJigPreparation.schema";
 import type { ReactNode } from "react";
 
@@ -14,33 +16,66 @@ export function JigMakingTool({
   pattern,
   accent,
 }: Readonly<Props>): ReactNode {
-  const progress = ramp(frame, 20, 28, EASE.inOut);
-  const x =
-    pattern === "two-holes"
-      ? mix(ramp(frame, 32, 4, EASE.inOut), 110, 150)
-      : 80 + 22 * progress;
-  const y = pattern === "two-holes" ? 382 : 350 + 22 * progress;
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const { x, y } = _getToolPoint({ frame, pattern, motion });
   return (
     <g>
-      <path
-        d={`M80 440 L40 315 L${x} ${y - 30}`}
+      <SketchedShape
+        shape={{ kind: "path", d: `M80 440 L40 315 L${x} ${y - 30}` }}
+        profile={tokens.sketch.shape}
         fill="none"
-        stroke={STOCK.orange}
-        strokeWidth={3}
+        stroke={tokens.color.highlight}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
       />
-      <path
+      <SketchedShape
+        shape={{ kind: "path", d: `M${x} ${y - 30} V${y}` }}
+        profile={tokens.sketch.shape}
         data-making-tool="true"
-        d={`M${x} ${y - 30} V${y}`}
         stroke={accent}
-        strokeWidth={4}
+        strokeWidth={scales.stroke(tokens.stroke.heavy)}
       />
       <circle
         data-making-hand="true"
         cx={x}
         cy={y - 30}
         r={5}
-        fill={STOCK.orange}
+        fill={tokens.color.highlight}
       />
     </g>
   );
+}
+/** The tool stepping between two holes, or sliding along a corner mark. */
+function _getToolPoint({
+  frame,
+  pattern,
+  motion,
+}: Readonly<{
+  frame: number;
+  pattern: Props["pattern"];
+  motion: VideoMotion;
+}>) {
+  const progress = motion.ramp(
+    frame,
+    20,
+    motion.scale(28),
+    motion.travel.easing,
+  );
+  return {
+    x:
+      pattern === "two-holes"
+        ? Motion.mix({
+            t: motion.ramp(
+              frame,
+              32,
+              motion.press.duration,
+              motion.travel.easing,
+            ),
+            from: 110,
+            to: 150,
+          })
+        : 80 + 22 * progress,
+    y: pattern === "two-holes" ? 382 : 350 + 22 * progress,
+  };
 }

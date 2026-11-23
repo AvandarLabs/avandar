@@ -1,0 +1,18 @@
+{
+  "label": "extract-v2:anthropic/claude-haiku-5.5",
+  "answers": 51,
+  "requiredFound": 63,
+  "requiredTotal": 63,
+  "recall": 1,
+  "useful": 42,
+  "duplicates": 9,
+  "fair": 53,
+  "spurious": 0,
+  "fabricated": 0,
+  "subjectMisses": 0,
+  "unitErrors": 0,
+  "emptyReplies": 0,
+  "errors": 0,
+  "costPerRegion": 0.0004937352941176471,
+  "latencyMedianMs": 2868.1670419999973
+}

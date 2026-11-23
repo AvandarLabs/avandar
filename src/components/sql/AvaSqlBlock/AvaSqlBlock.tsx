@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { buildSqlDisplaySegments } from "@/components/sql/sql-helpers/buildSqlDisplaySegments/buildSqlDisplaySegments";
 import { useSqlDisplayCatalog } from "@/components/sql/sql-helpers/useSqlDisplayCatalog";
 import { SqlEditor } from "@/components/sql/SqlEditor/SqlEditor";

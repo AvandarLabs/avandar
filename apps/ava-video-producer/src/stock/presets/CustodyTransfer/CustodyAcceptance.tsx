@@ -1,29 +1,50 @@
-import { ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { Motion } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { ACCEPT_CUE, TRANSFER_CUE } from "./custodyShape";
 import type { ReactNode } from "react";
 
-type Props = { frame: number; accepted: boolean; accent: string };
+type Props = {
+  frame: number;
+  accepted: boolean;
+  accent: string;
+};
 /** Acknowledgement becomes visible before responsibility begins crossing. */
 export function CustodyAcceptance({
   frame,
   accepted,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
-    <g opacity={accepted ? ramp(frame, 72, 8) : 0} data-acknowledgement="seal">
-      <circle
-        cx={900}
-        cy={230}
-        r={22}
-        fill={STOCK.surface}
+    <g
+      opacity={
+        accepted
+          ? Motion.ramp({
+              frame,
+              at: ACCEPT_CUE,
+              dur: TRANSFER_CUE - ACCEPT_CUE,
+              easing: motion.reveal.easing,
+            })
+          : 0
+      }
+      data-acknowledgement="seal"
+    >
+      <SketchedShape
+        shape={{ kind: "circle", cx: 900, cy: 230, r: 22 }}
+        profile={tokens.sketch.shape}
+        fill={tokens.color.surface}
         stroke={accent}
-        strokeWidth={2}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
-      <path
-        d="M890 230 l7 8 15 -18"
+      <SketchedShape
+        shape={{ kind: "path", d: "M890 230 l7 8 15 -18" }}
+        profile={tokens.sketch.shape}
         fill="none"
         stroke={accent}
-        strokeWidth={3}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
       />
     </g>
   );

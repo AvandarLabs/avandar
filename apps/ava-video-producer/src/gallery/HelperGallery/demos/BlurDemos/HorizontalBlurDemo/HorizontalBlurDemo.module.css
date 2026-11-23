@@ -1,0 +1,19 @@
+.horizontalBlurDemoRails {
+  display: flex;
+  flex-direction: column;
+  gap: var(--demo-space-48);
+  justify-content: center;
+}
+
+.horizontalBlurDemoCardColumn {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--demo-space-2xs);
+}
+
+.horizontalBlurDemoCaption {
+  color: var(--demo-muted);
+  font-family: var(--demo-mono);
+  font-size: var(--demo-font-size-2xs);
+}

@@ -40,13 +40,15 @@ export function makeObservationLayoutFromInput(input: Readonly<Input>): {
     numColumns = Math.max(...columns) - firstColumn + 1;
   const width = 650 / numColumns,
     height = 300 / numRows;
-  const cells = input.cells.map((cell) => ({
-    ...cell,
-    x: 270 + (cell.column - firstColumn) * width,
-    y: 105 + (cell.row - firstRow) * height,
-    width,
-    height,
-  }));
+  const cells = input.cells.map((cell) => {
+    return {
+      ...cell,
+      x: 270 + (cell.column - firstColumn) * width,
+      y: 105 + (cell.row - firstRow) * height,
+      width,
+      height,
+    };
+  });
   const checks = input.fieldChecks.map((check, index) => {
     const cell = cells.find(propEq("id", check.cellId))!;
     const localIndex = input.fieldChecks
@@ -64,8 +66,8 @@ export function makeObservationLayoutFromInput(input: Readonly<Input>): {
   });
   return {
     cells,
-    checks: [...checks].sort(
-      (first, second) => first.y - second.y || second.x - first.x,
-    ),
+    checks: [...checks].sort((first, second) => {
+      return first.y - second.y || second.x - first.x;
+    }),
   };
 }

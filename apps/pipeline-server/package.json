@@ -5,13 +5,15 @@
   "scripts": {
     "dev": "bun --watch src/index.ts",
     "start": "bun src/index.ts",
-    "lint": "eslint .",
+    "lint": "oxlint .",
     "test": "vitest run -c vitest.config.ts"
   },
   "dependencies": {
     "@avandar/etl": "workspace:*",
     "@avandar/utils": "workspace:*",
     "@supabase/supabase-js": "catalog:",
-    "fastify": "^5.6.0"
+    "duckdb": "^1.4.4",
+    "fastify": "^5.6.0",
+    "zod": "catalog:"
   }
 }

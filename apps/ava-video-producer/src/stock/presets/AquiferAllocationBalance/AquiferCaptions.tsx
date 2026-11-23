@@ -31,19 +31,21 @@ export function AquiferCaptions({ input }: Readonly<Props>): ReactNode {
   ];
   return (
     <g>
-      {labels.map(({ text, x, y, width, maxLines }, index) => (
-        <FitText
-          key={index}
-          text={text}
-          x={x}
-          y={y}
-          width={width}
-          fontSize={12}
-          maxLines={maxLines}
-          breakLongWords
-          normalizeWhitespace
-        />
-      ))}
+      {labels.map(({ text, x, y, width, maxLines }) => {
+        return (
+          <FitText
+            key={`${x}:${y}`}
+            text={text}
+            x={x}
+            y={y}
+            width={width}
+            fontSize={12}
+            maxLines={maxLines}
+            breakLongWords
+            normalizeWhitespace
+          />
+        );
+      })}
     </g>
   );
 }

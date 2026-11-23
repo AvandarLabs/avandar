@@ -4,7 +4,7 @@ import * as arrow from "apache-arrow";
 import knex from "knex";
 import { match } from "ts-pattern";
 import { DuckDbQueryAggregations } from "$/models/queries/QueryAggregationType/QueryAggregationType";
-import { arrowTableToJS } from "@/clients/DuckDbClient/duckDbArrowResults";
+import { arrowTableToJS } from "@/clients/DuckDbClient/duckDbArrowResults/duckDbArrowResults";
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import type { QueryAggregationType } from "$/models/queries/QueryAggregationType/QueryAggregationType";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";

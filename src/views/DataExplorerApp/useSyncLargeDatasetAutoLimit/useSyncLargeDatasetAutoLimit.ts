@@ -80,7 +80,7 @@ export function useSyncLargeDatasetAutoLimit(opts: {
       // async callback reads the latest query via `queryRef.current`, so adding
       // `query` here would re-fire on every render without changing behavior.
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // oxlint-disable-next-line react/exhaustive-deps
     [
       datasetId,
       query.aggregations,

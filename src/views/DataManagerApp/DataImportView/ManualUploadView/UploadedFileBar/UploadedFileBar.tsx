@@ -24,11 +24,14 @@ type Props = {
 
   /** True while a file is being read, which disables replacing it. */
   isBusy: boolean;
+
+  /** Returns to the link field so a different address can be pasted. */
+  onUseLink?: () => void;
 };
 
 /**
  * What the dropzone collapses into once a file has been read: the file's
- * identity, and the one action still available on it.
+ * identity, and the actions still available on it.
  *
  * Keeping the full dropzone on screen after a successful parse would leave
  * the largest target on the page pointing at a step already finished.
@@ -38,6 +41,7 @@ export function UploadedFileBar({
   sourceType,
   onReplace,
   isBusy,
+  onUseLink,
 }: Readonly<Props>): ReactNode {
   const { t, i18n } = useLingui();
 
@@ -52,6 +56,17 @@ export function UploadedFileBar({
       <Text size="xs" c="dimmed" className={css.uploadedFileBarSize}>
         {formatFileSize(file.size, { locale: i18n.locale })}
       </Text>
+      {onUseLink ? (
+        <Button
+          variant="subtle"
+          size="compact-sm"
+          color="neutral"
+          disabled={isBusy}
+          onClick={onUseLink}
+        >
+          <Trans>Use a link</Trans>
+        </Button>
+      ) : null}
       <FileButton
         accept={ACCEPTED_MIME_TYPES}
         onChange={(replacementFile) => {

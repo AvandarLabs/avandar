@@ -1,6 +1,8 @@
 import * as arrow from "apache-arrow";
 import { DatasetDuckDbCoordinator } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
+import { TRUSTED_INTERNAL_SQL } from "@/clients/DuckDbClient/duckDbClientOperations";
 import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
+import type { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
 import type { DuckDbClientOperations } from "@/clients/DuckDbClient/duckDbClientOperations";
 
 /** Reads the names of every base table or view in the `main` schema. */
@@ -65,4 +67,44 @@ export async function dropDuckDbTableViewAndFile(
     DatasetDuckDbCoordinator.markDatasetDuckDbTableInvalid(tableOrViewName);
     throw error;
   }
+}
+
+/**
+ * Reads back the columns and row count of a table or view a loader just
+ * created.
+ *
+ * Both reads are marked trusted internal SQL, like the statements that created
+ * the table, because the loader's table name need not be a relation: a concept
+ * spine's name deliberately resolves to none, and the fail-closed analyzer
+ * refuses to read a source it cannot account for. A name that is a dataset is
+ * still analyzed as a read of that dataset, so its lease still applies.
+ *
+ * @returns The table's columns and its number of rows.
+ */
+export async function getLoadedDuckDbTableShape(
+  options: Readonly<{
+    client: DuckDbClientOperations;
+    tableName: string;
+    datasetDuckDbLease: DatasetDuckDbLease;
+  }>,
+): Promise<{ columns: DuckDbColumnSchema[]; rowCount: number }> {
+  const queryOptions = {
+    params: { tableName: options.tableName },
+    datasetDuckDbLease: options.datasetDuckDbLease,
+    [TRUSTED_INTERNAL_SQL]: true,
+  } as const;
+  const [schemaResult, countResult] = await Promise.all([
+    options.client.runRawQuery<DuckDbColumnSchema>(
+      `DESCRIBE "$tableName$"`,
+      queryOptions,
+    ),
+    options.client.runRawQuery<{ count: bigint }>(
+      `SELECT count(*) as count FROM "$tableName$"`,
+      queryOptions,
+    ),
+  ]);
+  return {
+    columns: schemaResult.data,
+    rowCount: Number(countResult.data[0]?.count ?? 0),
+  };
 }

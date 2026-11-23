@@ -1,0 +1,295 @@
+---
+name: animation-observation
+description: Watches a reference video with Gemini Argon 4, writes a motion, composition, and transition spec with a storyboard script, adds any missing Motion Atlas pieces, and rebuilds the film with Avandar content in apps/ava-video-producer. Optionally has Argon compare the copy to the original and fixes the film until the copy is acceptable. Only run when explicitly requested with a video URL or file path.
+disable-model-invocation: true
+argument-hint: <video-url-or-file-path> [evaluate | skip-evaluation]
+metadata:
+  author: jpsyx
+  version: "0.7.0"
+  tags: avandar, video, remotion, motion-atlas, gemini
+---
+
+# Animation observation
+
+Turn someone else's video into an Avandar video that **moves the same way**:
+same motion beats, transitions, composition, pacing, and vibe. Content, copy,
+and colors are Avandar's own. Gemini Argon 4 (`gemini-4-argon`) is the eyes:
+it watches the reference and writes the spec, and later judges the copy.
+Claude is the hands: it maps the spec onto the Motion Atlas, builds what is
+missing, and renders the film.
+
+The goal of this skill is a **one-shot**: one run produces an acceptable copy.
+Acceptable means the core motion, transition, and composition beats land and
+the speed and vibe match. Stylistic tweaks may remain.
+
+## Before anything else
+
+1. **Require a source.** The invocation must name a video URL or a local file
+   path. If it does not, ask for one and stop.
+2. **Ask about evaluation** unless the invocation already said `evaluate` /
+   `skip-evaluation` (or plainly asked to evaluate or skip it). There is no
+   default. Ask in one question, with this one-sentence reminder:
+   > The evaluation phase has Argon 4 compare the rendered copy to the
+   > original, score it, and list the differences, then fixes the film and
+   > re-checks until it is acceptable (costlier: extra renders and Argon
+   > calls).
+3. Read, in this order:
+   - `apps/ava-video-producer/AGENTS.md`
+   - `apps/ava-video-producer/.claude/skills/product-demo/SKILL.md`
+   - [references/argon-to-remotion.md](references/argon-to-remotion.md)
+   - [references/hardening-log.md](references/hardening-log.md) (what earlier
+     runs learned; do not repeat their mistakes)
+
+## Running in phases
+
+A full run is long. When the harness has subagents, run each phase group in
+a fresh subagent that reads this skill and the files the previous group
+wrote: Observe + Inventory, then Build + Film, then Evaluate. Everything a
+later phase needs must be in `.videos/<slug>/research/`, never only in a
+conversation. The orchestrator owns Phase 6.
+
+A phase brief must name: the slug, the evaluation answer, the source path,
+the phase(s) to run and not run, the research files to read and write, and
+the skill-issue file to log problems in. Do not pass your own conclusions
+about the video: the next phase reads the files.
+
+Only the top-level session may split phases into subagents. If you are
+already a subagent, run every phase yourself: a background helper's
+completion notice goes to the top-level session, not to you, so you would
+stop and never resume.
+
+## Secrets
+
+The Gemini key lives in `GEMINI_API_KEY` in the workspace root's
+`.env.video-producer.local`. `scripts/argon.mjs` reads that one line itself.
+Never open, print, cat, grep, or source that file, never echo the key, and
+never write it anywhere. If the script says the key is missing, tell the user
+to add `GEMINI_API_KEY=` to that file and stop.
+
+## Paths
+
+Run everything from the worktree root. `SKILL_DIR` is
+`agent-skills/private-skills/animation-observation`. Name the project with a
+short kebab-case slug, `<slug>`, and create it with
+`pnpm --filter @avandar/ava-video-producer video:new <slug>`. All run
+artifacts live in the ignored `.videos/<slug>/`:
+
+| Path | Holds |
+| --- | --- |
+| `.videos/<slug>/research/source/reference.mp4` | the downloaded reference (untrusted media, its own directory) |
+| `.videos/<slug>/research/motion-spec.draft.md` | Argon's first pass, untouched |
+| `.videos/<slug>/research/motion-spec.raw.md` | Argon's refined pass, untouched |
+| `.videos/<slug>/research/motion-spec.md` | the refined spec plus Claude's verification table and corrections: the build input |
+| `.videos/<slug>/research/frames/` | contact sheets used to verify the spec |
+| `.videos/<slug>/research/inventory.md` | reuse-or-build map from spec ids to atlas pieces |
+| `.videos/<slug>/storyboard.json` | the film |
+| `.videos/<slug>/research/eval/iteration-<n>.json` | Argon's comparison per iteration |
+
+## Phase 1: Observe
+
+1. Get the source into `.videos/<slug>/research/source/reference.mp4`:
+   - A local file: copy it there.
+   - A URL: `node $SKILL_DIR/scripts/fetch-video.mjs <url> .videos/<slug>/research/source/reference.mp4`.
+     It uses the repo's Playwright to find the page's mp4. If it reports no
+     downloadable mp4 (streaming-only sites), ask the user for a local copy
+     of the video and stop until you have one. Do not reach for tools outside
+     this repository on your own.
+   - Probe it: `node $SKILL_DIR/scripts/measure-frame.mjs --video <file> --probe`
+     (fps, duration, frame count, through the repo's bundled ffprobe).
+2. **Draft pass** (whole video, about 10 fps):
+   ```bash
+   node $SKILL_DIR/scripts/argon.mjs \
+     --prompt $SKILL_DIR/prompts/observe.md \
+     --video REFERENCE=.videos/<slug>/research/source/reference.mp4 \
+     --out .videos/<slug>/research/motion-spec.draft.md
+   ```
+   About 3 minutes for a 78 s video. Argon's API samples video at 24 fps at
+   most, and the whole video at 10 fps, so the draft cannot time events
+   shorter than about 9 frames. The refine pass fixes that.
+3. **Refine pass** (whole video, frame-accurate close-ups of every boundary,
+   and one full-resolution still per shot):
+   ```bash
+   node $SKILL_DIR/scripts/argon.mjs \
+     --clips-from .videos/<slug>/research/motion-spec.draft.md \
+     --prompt $SKILL_DIR/prompts/refine.md \
+     --video REFERENCE=.videos/<slug>/research/source/reference.mp4 \
+     --context $SKILL_DIR/prompts/observe.md \
+     --context .videos/<slug>/research/motion-spec.draft.md \
+     --out .videos/<slug>/research/motion-spec.raw.md
+   ```
+   `--clips-from` reads the draft's storyboard script and sends each
+   boundary as a slowed clip in which every sample is one source frame, so
+   Argon counts frames instead of converting timestamps. It also clips camera
+   moves and every motion of 20 frames or less. Check the plan first with
+   `--dry-run` (no API call). About 10 minutes for a 78 s video; the script
+   waits up to 30.
+   Never edit `motion-spec.draft.md` or `motion-spec.raw.md`. The evaluation
+   phase needs them to see what the prompts produced. Copy the raw file to
+   `motion-spec.md` and edit only that copy.
+4. **Verify the spec against frames before building on it.** For every
+   boundary in section 3, every transition `T*`, every item in "Build
+   priorities", and every direction claim, make a labelled contact sheet of
+   the cited frame range and read it:
+   ```bash
+   node $SKILL_DIR/scripts/extract-frames.mjs \
+     --video .videos/<slug>/research/source/reference.mp4 \
+     --out .videos/<slug>/research/frames/<id>.jpg \
+     --from <frame> --to <frame> --step 1 --width 320 --columns 8
+   ```
+   (`--frames a,b,c` picks exact frames; frame numbers are at 30 fps.) Use
+   only this script for frames: it uses the repo's ffmpeg (`ffmpeg-static`,
+   else Remotion's bundled one) and Playwright, and labels frames correctly.
+   Use `--step 1` across transitions: they last only a few frames.
+   Check at least: every boundary frame and class, every transition
+   mechanism, each layer's start and end at each boundary, every short
+   motion's duration and stagger, every count and direction, each shot's
+   composition boxes, cap heights, and line colour roles, and the logo's
+   size. Measure boxes, cap heights, text colours, and luma with
+   `scripts/measure-frame.mjs` rather than by eye (it caught 9 of 23
+   corrections in one run). Count a value as correct within 2 frames, 2% of
+   the frame for positions and boxes, and 10% of its own value for type
+   sizes and cap heights. Use `--width 480` or more on contact sheets of
+   wipes: 320 px cells are too small to read a mask edge.
+   Add a `## Verification` table at the top of `motion-spec.md`: claim,
+   verdict (correct / corrected / unverified), correction. Fix every wrong
+   value in the body too: the body is what gets built, and it wins over the
+   table if they ever disagree. Count the corrections and report the count.
+   About a quarter of a spec's fine detail (cap heights, text colours,
+   exact end frames) typically needs correcting; this step exists to catch
+   it, so do not skip it.
+
+## Phase 2: Inventory
+
+Read `docs/motion-vocabulary.md`, `docs/shared-scene-library.md`,
+`docs/stock-motion-library.md`, `docs/scene-api.md`, and
+`docs/continuity-compositions.md` in `apps/ava-video-producer`. Then write
+`research/inventory.md`: one row per spec id (`C*`, `T*`, `M*`, camera
+moves), with columns `spec id | what it is | existing match (file, preset id,
+scene type, or token) | fit: exact / adapt / missing | plan`.
+
+Rules:
+
+- Reuse before building. "Adapt" means a new prop or option on an existing
+  piece, not a copy of it.
+- A piece is missing only when no existing piece can produce the beat with
+  props. Do not build a near-duplicate.
+- For every shot boundary, note the field change, whether it is a declared
+  cut, and whether the frame gate will still fail it, for example a cut
+  into a near-black frame before a bright entrance (see "The frame gate and
+  hard cuts" in the reference), and
+  carry each element's field colour into any colour-change claim (an accent
+  counter is invisible on an accent field).
+- Missing curves or durations become new tokens in `src/motion.ts` (`EASE`,
+  `DUR`), documented in `docs/motion-vocabulary.md`. Missing design values
+  become tokens too. Never hardcode a one-off value in a scene.
+
+## Phase 3: Build what is missing
+
+Follow [references/argon-to-remotion.md](references/argon-to-remotion.md) for
+where each kind of piece lives and every file that must change with it:
+component, `*.metadata.yaml`, catalog registration, i18n, docs, tests, and
+the Motion Atlas gallery. Then:
+
+- Make each new piece generic and reusable: parameters for counts, durations,
+  direction, and colors (from tokens). Name it for what it does
+  (`stepped-column-wipe`), never for the reference video.
+- Run the producer's typecheck and tests (see the reference) before moving on.
+- Preview each new piece's contact sheet and read it.
+
+## Phase 4: Build the film
+
+1. Write `.videos/<slug>/storyboard.json` from the spec's storyboard script.
+   Keep the spec's shot count, shot lengths (in frames), composition template
+   per shot, transitions at the same boundaries, and camera moves.
+2. Content is Avandar's: real product components or approved captures, and
+   copy about Avandar features. Follow `product-demo` SKILL.md for what may
+   be shown. Never copy the reference's words, logo, or product.
+3. Colors come from Avandar tokens. Keep the reference's color ROLES (dark
+   field vs. accent field vs. light field, one accent vs. many).
+   When the spec says a window's or screen's contents move (typing,
+   scrolling, a cursor, live updates), use product footage, not a still:
+   `tilted-window` and `media` take `kind: "video"` sources, and a tall
+   still with `scrollSteps` only covers stepped scrolling. Record footage
+   through the producer's capture pipeline (`docs/capture-pipeline.md`); if
+   no flow covers it, use the closest still and list the gap in the report.
+4. Validate, preview, and read the contact sheet. Fix what the sheet shows.
+5. Render the mp4 (see the reference for the command). Read a few frames of
+   the render.
+
+If the user skipped evaluation, stop here and report.
+
+## Phase 5: Evaluate
+
+Argon cannot run a browser or a Remotion player: it only takes video files.
+Render an mp4 at the reference's resolution and fps, then:
+
+```bash
+node $SKILL_DIR/scripts/argon.mjs --json --fps 5 --clip-pad 10 \
+  --prompt $SKILL_DIR/prompts/compare.md \
+  --video REFERENCE=.videos/<slug>/research/source/reference.mp4 \
+  --video CANDIDATE=<rendered.mp4> \
+  --clips-from REFERENCE=.videos/<slug>/research/motion-spec.md \
+  --clips-from REFERENCE=.videos/<slug>/storyboard.json \
+  --clips-from CANDIDATE=.videos/<slug>/research/motion-spec.md \
+  --clips-from CANDIDATE=.videos/<slug>/storyboard.json \
+  --context .videos/<slug>/research/motion-spec.md \
+  --context .videos/<slug>/storyboard.json \
+  --out .videos/<slug>/research/eval/iteration-<n>.json
+```
+
+Both videos get frame-accurate clips and one still per shot, so Argon
+compares transitions frame by frame. Both videos get the same windows from
+both the spec and the plan (the film follows the spec's frames), merged and
+with near-duplicate stills dropped, so the two sides are symmetric; the whole videos only carry
+pacing, so 5 fps is enough. Budget: about 270 tokens per sampled frame, and
+the request must stay under about 1M tokens (two 80 s videos at 5 fps plus
+both clip sets at 10-frame padding is about 800k). Check the plan first with `--dry-run` (no API
+call); it prints an estimated token count. If it is too large, lower
+`--clip-pad` before dropping clips.
+
+**Acceptable** = every score (`motion`, `transitions`, `composition`,
+`pacing`, `vibe`) is 7 or more and there is no `critical` difference. The
+JSON's `acceptable` field applies that rule; check it yourself too. It
+judges the copy, not delivery: always report the frame-gate result next to
+it, because an acceptable copy can still be undeliverable.
+
+Spot-check at least four of Argon's differences (including every critical
+and major one) and two of its strengths against frames of both videos, with
+`extract-frames.mjs` and `measure-frame.mjs`. Argon can be wrong about the
+copy as well as the original. Write the verdicts to
+`research/eval/iteration-<n>-review.md`: claim, confirmed / wrong / partly
+right, evidence, and anything Argon missed.
+
+## Phase 6: Fix the film and repeat
+
+When the copy is not acceptable, fix the film, not the skill's prompts:
+
+1. `blame: build`: fix the storyboard or its assets. If the mistake came
+   from unclear guidance, add a general rule to
+   `references/argon-to-remotion.md`.
+2. `blame: platform`: build the missing capability (Phase 3), generically,
+   then rebuild the film.
+3. `blame: spec`: correct `motion-spec.md` from frames (Phase 1 step 4) and
+   rebuild the affected shots. Do **not** edit `prompts/observe.md`,
+   `prompts/refine.md`, or `prompts/compare.md` during a run: tuning them
+   stopped improving spec accuracy after a few runs (see the hardening log),
+   and the frame check catches what they miss. Record the difference in the
+   hardening log instead, so a maintainer can decide whether a prompt change
+   is worth testing across several videos.
+
+Re-run from Phase 4 and re-evaluate. Stop when the copy is acceptable, or
+after three iterations; then report the best iteration, the remaining
+differences, and what blocks acceptance.
+
+Append one entry per run to
+[references/hardening-log.md](references/hardening-log.md): scores, spec
+correction count, top differences, and any skill file changed and why. Name
+runs by number and skill version, never by the reference video, and never
+describe the reference's content. Bump `metadata.version` when a skill file
+changes.
+
+## Report
+
+End with the final scores table per iteration, paths to the spec, inventory,
+storyboard, render, and eval JSON, the list of atlas pieces and tokens added,
+and the skill files changed.

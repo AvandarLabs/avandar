@@ -1,4 +1,6 @@
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { CargoParcelBody } from "./CargoParcelBody/CargoParcelBody";
+import { CargoParcelMechanism } from "./CargoParcelMechanism/CargoParcelMechanism";
 import { getCargoPositionFromInputAndFrame } from "./getCargoPositionFromInputAndFrame";
 import type { Input } from "./AidCargoModeHandoff.schema";
 import type { ReactNode } from "react";
@@ -23,58 +25,26 @@ export function CargoParcel({
   parcelIndex,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const parcel = input.parcels[parcelIndex];
   const position = getCargoPositionFromInputAndFrame({
+    motion,
     input,
     frame,
     parcelIndex,
   });
   return (
     <g>
-      {position.mechanism ? (
-        <g data-mechanism={position.mechanism}>
-          <path
-            d={
-              position.mechanism === "hoist"
-                ? `M${position.x} 175 V${position.y - 17}`
-                : `M${position.x - 20} ${position.y + 20} h40 l5 -10`
-            }
-            fill="none"
-            stroke={STOCK.muted}
-            strokeWidth={2}
-          />
-          {position.mechanism === "handcart" ? (
-            <circle
-              cx={position.x}
-              cy={position.y + 25}
-              r={4}
-              fill={STOCK.muted}
-            />
-          ) : undefined}
-        </g>
-      ) : undefined}
-      <g
-        data-parcel={parcel.id}
-        data-owner={position.owner}
-        data-x={position.x}
-        data-y={position.y}
-        transform={`translate(${position.x} ${position.y})`}
-      >
-        <rect
-          x={-18}
-          y={-18}
-          width={36}
-          height={36}
-          rx={4}
-          fill={STOCK.surface}
-          stroke={accent}
-          strokeWidth={2}
-        />
-        <path d={SYMBOLS[parcel.symbol]} fill="none" stroke={accent} />
-        <text x={6} y={10} fontSize={14} fill={STOCK.text} textAnchor="middle">
-          {parcelIndex + 1}
-        </text>
-      </g>
+      <CargoParcelMechanism {...{ position, tokens, scales }} />
+      <CargoParcelBody
+        {...{ parcel, position, scales, tokens, accent }}
+        symbols={SYMBOLS}
+        parcelIndex={parcelIndex}
+      />
     </g>
   );
 }
+/** The type of `SYMBOLS` used by CargoParcel. */
+export type CargoParcelSymbolsValue = typeof SYMBOLS;

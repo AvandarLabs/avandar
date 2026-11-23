@@ -1,6 +1,6 @@
-import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SavedRevisionLines } from "./SavedRevisionLines";
 import type { Input } from "./RevisionRestore.schema";
 import type { ReactNode } from "react";
@@ -22,19 +22,24 @@ export function SavedRevision({
   showLabel,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const x = 40 + index * 225;
   return (
-    <g opacity={ramp(frame, 16 + index * 3, 12)}>
-      <rect
+    <g opacity={motion.reveal(frame, 16 + index * motion.scaleStagger(3))}>
+      <StockRect
         data-history-id={revision.id}
         x={x}
         y={382}
         width={205}
         height={190}
-        rx={9}
-        fill={STOCK.surface}
-        stroke={selected ? accent : STOCK.line}
-        strokeWidth={selected ? 2 : 1}
+        rx={scales.corner(9)}
+        fill={tokens.color.surface}
+        stroke={selected ? accent : tokens.color.line}
+        strokeWidth={scales.stroke(
+          selected ? tokens.stroke.default : tokens.stroke.hairline,
+        )}
       />
       {showLabel ? (
         <FitText
@@ -46,7 +51,7 @@ export function SavedRevision({
           fontSize={12}
           normalizeWhitespace
           breakLongWords
-          color={selected ? accent : STOCK.text}
+          color={selected ? accent : tokens.color.text}
         />
       ) : undefined}
       <SavedRevisionLines content={revision.content} x={x} />

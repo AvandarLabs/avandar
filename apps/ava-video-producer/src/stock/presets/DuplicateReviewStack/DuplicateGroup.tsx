@@ -1,5 +1,6 @@
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { DuplicateCandidate } from "./DuplicateCandidate";
-import { DuplicateGroupHeading } from "./DuplicateGroupHeading";
+import { DuplicateGroupHeading } from "./DuplicateGroupHeading/DuplicateGroupHeading";
 import { getDuplicateGroupLayoutFromGroupAndFrame } from "./getDuplicateGroupLayoutFromGroupAndFrame";
 import type { Input } from "./DuplicateReviewStack.schema";
 import type { ReactNode } from "react";
@@ -11,6 +12,7 @@ type Props = {
   groupIndex: number;
   accent: string;
 };
+
 /** An unresolved bracket stays open. Retained groups preserve every ID tab. */
 export function DuplicateGroup({
   frame,
@@ -19,12 +21,14 @@ export function DuplicateGroup({
   groupIndex,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const { x, y, isPair, progress, records } =
     getDuplicateGroupLayoutFromGroupAndFrame({
       frame,
       input,
       group,
       groupIndex,
+      motion,
     });
   return (
     <g data-unresolved-group={group.retainedId === null ? group.id : undefined}>
@@ -38,18 +42,20 @@ export function DuplicateGroup({
         progress={progress}
         accent={accent}
       />
-      {records.map((record) => (
-        <DuplicateCandidate
-          key={record.id}
-          frame={frame}
-          input={input}
-          group={group}
-          groupIndex={groupIndex}
-          record={record}
-          index={group.records.indexOf(record)}
-          accent={accent}
-        />
-      ))}
+      {records.map((record) => {
+        return (
+          <DuplicateCandidate
+            key={record.id}
+            frame={frame}
+            input={input}
+            group={group}
+            groupIndex={groupIndex}
+            record={record}
+            index={group.records.indexOf(record)}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

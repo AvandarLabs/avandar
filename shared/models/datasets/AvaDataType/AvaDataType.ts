@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-namespace,import-x/export */
+/* oxlint-disable typescript/no-namespace, import/export */
 import type { AvaDataTypeT } from "$/models/datasets/AvaDataType/AvaDataType.types.ts";
 
 export { AvaDataTypeModule as AvaDataType } from "$/models/datasets/AvaDataType/AvaDataTypeModule.ts";

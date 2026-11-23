@@ -33,7 +33,9 @@ test("refresh changes A label, flags C, and preserves every identity and human f
     ...markup.matchAll(
       /data-record-row="([^"]*)" data-label="([^"]*)" data-status="([^"]*)" data-assignee="([^"]*)" data-missing="([^"]*)"/g,
     ),
-  ].map((match) => match.slice(1));
+  ].map((match) => {
+    return match.slice(1);
+  });
   assert.deepEqual(rows, [
     ["a", "Site A North", "In review", "Worker K", "false"],
     ["b", "Site B", "Open", "Worker M", "false"],
@@ -48,8 +50,9 @@ test("identical complete source rows in reverse order produce zero writes", () =
   );
   const before = _render({ frame: 35, input: DEFAULT_INPUT });
   const hold = _render({ frame: 150, input: DEFAULT_INPUT });
-  const pin = (markup: string) =>
-    SvgAttributes.fromMarker({ markup, marker: "human-pin" });
+  const pin = (markup: string) => {
+    return SvgAttributes.fromMarker({ markup, marker: "human-pin" });
+  };
   assert.equal(
     SvgAttributes.getNumberFromMarkup({ attributes: pin(before), name: "x" }),
     SvgAttributes.getNumberFromMarkup({ attributes: pin(hold), name: "x" }),
@@ -63,7 +66,7 @@ test("identical complete source rows in reverse order produce zero writes", () =
   );
 });
 
-import { registerStockLocalizationAssertions } from "../../../../tests/helpers/registerStockLocalizationAssertions";
+import { registerStockDefaultTextAssertions } from "../../../../tests/helpers/registerStockDefaultTextAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { statePreservingSourceRefreshContract } from "./StatePreservingSourceRefresh.contract";
 import { inputSchema } from "./StatePreservingSourceRefresh.schema";
@@ -77,14 +80,17 @@ function _getVisibleTexts({
     frame >= 140 ? input.copy.after : input.copy.before,
     input.labels.derived,
     input.labels.human,
-    ...input.records.flatMap((record) => [
-      record.status,
-      record.assignee,
-      frame >= 139
-        ? (input.sourceRows.find(({ id }) => id === record.id)?.label ??
-          record.label)
-        : record.label,
-    ]),
+    ...input.records.flatMap((record) => {
+      return [
+        record.status,
+        record.assignee,
+        frame >= 139
+          ? (input.sourceRows.find(({ id }) => {
+              return id === record.id;
+            })?.label ?? record.label)
+          : record.label,
+      ];
+    }),
   ];
 }
 const options = {
@@ -111,7 +117,7 @@ const options = {
 } satisfies PresetAssertions<Input>;
 registerStockPresetAssertions(options);
 registerStockTextLayoutAssertions(options);
-registerStockLocalizationAssertions({
+registerStockDefaultTextAssertions({
   contract: options.contract,
   expectedTextPaths: [
     ["records", 0, "label"],
@@ -137,35 +143,33 @@ registerStockLocalizationAssertions({
 });
 
 test("pinned human regions retain actual text, full geometry and original record order", () => {
-  FIXTURES.forEach(({ input }) =>
-    [13, 50, 80, 104, 120, 139, 150].forEach((frame) => {
+  FIXTURES.forEach(({ input }) => {
+    return [13, 50, 80, 104, 120, 139, 150].forEach((frame) => {
       const markup = _render({ frame: frame, input: input });
       const humanRegions = [
         ...markup.matchAll(/<rect data-human-pin="([^"]*)"([^>]*)>/g),
-      ].map(([, id, attributes]) => [
-        id,
-        SvgAttributes.getNumberFromMarkup({ attributes, name: "x" }),
-        SvgAttributes.getNumberFromMarkup({ attributes, name: "y" }),
-        SvgAttributes.getNumberFromMarkup({ attributes, name: "width" }),
-        SvgAttributes.getNumberFromMarkup({ attributes, name: "height" }),
-      ]);
+      ].map(([, id, attributes]) => {
+        return [
+          id,
+          SvgAttributes.getNumberFromMarkup({ attributes, name: "x" }),
+          SvgAttributes.getNumberFromMarkup({ attributes, name: "y" }),
+          SvgAttributes.getNumberFromMarkup({ attributes, name: "width" }),
+          SvgAttributes.getNumberFromMarkup({ attributes, name: "height" }),
+        ];
+      });
       assert.deepEqual(
         humanRegions,
-        input.records.map(({ id }, index) => [
-          id,
-          610,
-          117 + index * 106,
-          290,
-          88,
-        ]),
+        input.records.map(({ id }, index) => {
+          return [id, 610, 117 + index * 106, 290, 88];
+        }),
       );
-      input.records.forEach(({ status, assignee }) =>
-        [status, assignee].forEach((value) =>
-          assert.ok(markup.includes(`aria-label="${value}"`)),
-        ),
-      );
-    }),
-  );
+      input.records.forEach(({ status, assignee }) => {
+        return [status, assignee].forEach((value) => {
+          return assert.ok(markup.includes(`aria-label="${value}"`));
+        });
+      });
+    });
+  });
   const markup = _render({ frame: 150, input: DEFAULT_INPUT });
   [
     "Site A North",
@@ -174,7 +178,9 @@ test("pinned human regions retain actual text, full geometry and original record
     "Missing from this source",
     "No write needed",
     "2",
-  ].forEach((value) => assert.ok(markup.includes(`aria-label="${value}"`)));
+  ].forEach((value) => {
+    return assert.ok(markup.includes(`aria-label="${value}"`));
+  });
   assert.doesNotMatch(
     _render({ frame: 150, input: { ...DEFAULT_INPUT, showWriteCount: false } }),
     /data-write-count=/,

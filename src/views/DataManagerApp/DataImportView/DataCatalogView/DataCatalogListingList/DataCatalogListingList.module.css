@@ -1,0 +1,84 @@
+.dataCatalogListingList {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+/*
+ * The listbox is one tab stop, so its focus ring is drawn inside the scroll
+ * area where the scroller cannot clip it.
+ */
+.dataCatalogListingList:focus-visible {
+  outline: 2px solid var(--mantine-primary-color-filled);
+  outline-offset: -2px;
+}
+
+.dataCatalogListingListSizer {
+  position: relative;
+  width: 100%;
+}
+
+/*
+ * Rows are separated by a hairline rather than boxed, so a long run of them
+ * reads as one list instead of a stack of cards.
+ */
+.dataCatalogListingListRow {
+  border-bottom: 1px solid var(--ava-border-subtle, var(--ava-border-default));
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  inset-inline: 0;
+  min-width: 0;
+  padding: var(--mantine-spacing-xs) var(--mantine-spacing-md);
+  position: absolute;
+  top: 0;
+  transition: var(--ava-transition-interactive);
+}
+
+/*
+ * Names stay on one line. A flex item's default min-width is the text's own
+ * width, which would wrap or spill into the next row instead of clipping.
+ */
+.dataCatalogListingListRow > * {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.dataCatalogListingListName,
+.dataCatalogListingListFacts {
+  display: block;
+  margin: 0;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dataCatalogListingListRow:hover {
+  background-color: var(--ava-surface-sunken);
+}
+
+/* The keyboard's position, shown only while the listbox has focus. */
+.dataCatalogListingList:focus-visible .dataCatalogListingListRowActive {
+  box-shadow: inset 0 0 0 2px var(--mantine-color-primary-3);
+}
+
+.dataCatalogListingListRowSelected {
+  color: var(--mantine-color-primary-7);
+}
+
+.dataCatalogListingListRowSelected,
+.dataCatalogListingListRowSelected:hover {
+  background-color: var(--mantine-color-primary-0);
+}
+
+/* Under the last loaded row while the next page loads. */
+.dataCatalogListingListMoreLoader {
+  display: flex;
+  justify-content: center;
+  padding-block: var(--mantine-spacing-xs);
+}

@@ -1,0 +1,19 @@
+.galleryToolbarCollectionToolbar {
+  composes: collection-toolbar from global;
+}
+
+.galleryToolbarCollectionHeading {
+  composes: collection-heading from global;
+}
+
+.galleryToolbarResultCount {
+  composes: result-count from global;
+}
+
+.galleryToolbarToolbarTools {
+  composes: toolbar-tools from global;
+}
+
+.galleryToolbarSrOnly {
+  composes: sr-only from global;
+}

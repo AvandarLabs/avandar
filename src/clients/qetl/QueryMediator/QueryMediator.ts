@@ -9,9 +9,13 @@ import type {
   PublicSnapshotDuckDbOwner,
 } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
-import type { ConceptRelationPlan } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
-import type { NeededColumnsByDatasetId } from "@/clients/qetl/QueryMediator/QueryMediator.types";
-import type { Module } from "@avandar/modules";
+import type { ConceptSpineRestriction } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
+import type {
+  DatasetColumnSource,
+  NeededColumnsByDatasetId,
+  QetlRunnerOptions,
+} from "@/clients/qetl/QueryMediator/QueryMediator.types";
+import type { BuilderModule, Module, StateOfModule } from "@avandar/modules";
 
 export type IQueryMediator = Module<
   "QueryMediator",
@@ -22,7 +26,7 @@ export type IQueryMediator = Module<
      * Plan the concept relations the query names, refusing any the caller may
      * not read. Optional: a session with no ontology access supplies none.
      */
-    planConceptRelations?: (rawSql: string) => Promise<ConceptRelationPlan[]>;
+    planConceptRelations?: QetlRunnerOptions["planConceptRelations"];
     /** Expand direct dependencies to every dataset lease the query may need. */
     getDuckDbLeaseDatasetIds?: (
       queryDependencies: readonly Dataset.Id[],
@@ -31,6 +35,11 @@ export type IQueryMediator = Module<
     duckDbReadMode?: "public" | "workspace";
     /** Identifies the public snapshot expected to own final read tables. */
     publicSnapshotDuckDbOwner?: PublicSnapshotDuckDbOwner;
+    /**
+     * Where a relation's column names and types come from: the dataset column
+     * catalog (the default), or the relation's own Parquet.
+     */
+    datasetColumnSource?: DatasetColumnSource;
 
     /** The storage tier this session reads and writes. */
     relationCache: RelationCachePort;
@@ -55,12 +64,14 @@ export type IQueryMediator = Module<
         returnType?: "js";
         signal?: AbortSignal;
         neededColumnsByDatasetId?: NeededColumnsByDatasetId;
+        conceptSpineRestrictions?: readonly ConceptSpineRestriction[];
       }): Promise<QueryResult.T<RowObject>>;
       (params: {
         rawSql: string;
         returnType: "parquet";
         signal?: AbortSignal;
         neededColumnsByDatasetId?: NeededColumnsByDatasetId;
+        conceptSpineRestrictions?: readonly ConceptSpineRestriction[];
       }): Promise<Blob>;
     };
   }
@@ -87,11 +98,18 @@ export type IQueryMediator = Module<
  * it only operates on full datasets rather than doing any filtering of data,
  * relation management, relation loading, or any other optimizations.
  */
-export const QueryMediatorFactory = createModuleFactory<IQueryMediator>(
-  "QueryMediator",
-  {
-    childBuilder: (module) => {
-      return { runQuery: createQetlQueryRunner(module.getState()) };
-    },
+export const QueryMediatorFactory = createModuleFactory("QueryMediator", {
+  defaultState: {
+    planConceptRelations: undefined,
+    getDuckDbLeaseDatasetIds: undefined,
+    duckDbReadMode: undefined,
+    publicSnapshotDuckDbOwner: undefined,
+    datasetColumnSource: undefined,
+    prepareDuckDbDatasets: undefined,
   },
-);
+  builder: (
+    module: BuilderModule<StateOfModule<IQueryMediator>>,
+  ): Pick<IQueryMediator, "runQuery"> => {
+    return { runQuery: createQetlQueryRunner(module.getState()) };
+  },
+});

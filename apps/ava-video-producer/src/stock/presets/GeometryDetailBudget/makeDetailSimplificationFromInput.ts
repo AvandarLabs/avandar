@@ -66,13 +66,15 @@ function _visit({
   if (end - start < 2) {
     return;
   }
-  const candidates = vertices.slice(start + 1, end).map((point, index) => ({
-    ..._project({ point, start: vertices[start], end: vertices[end] }),
-    index: start + 1 + index,
-  }));
-  const farthest = candidates.reduce((maximum, candidate) =>
-    candidate.distance > maximum.distance ? candidate : maximum,
-  );
+  const candidates = vertices.slice(start + 1, end).map((point, index) => {
+    return {
+      ..._project({ point, start: vertices[start], end: vertices[end] }),
+      index: start + 1 + index,
+    };
+  });
+  const farthest = candidates.reduce((maximum, candidate) => {
+    return candidate.distance > maximum.distance ? candidate : maximum;
+  });
   const split = farthest.distance > tolerance;
   events.push({
     start,
@@ -104,12 +106,16 @@ export function makeDetailSimplificationFromInput(input: Readonly<Input>): {
     events,
     kept,
   });
-  const keptIndices = [...kept].sort((left, right) => left - right);
+  const keptIndices = [...kept].sort((left, right) => {
+    return left - right;
+  });
   const removed = input.vertices.flatMap((point, index) => {
     if (kept.has(index)) {
       return [];
     }
-    const end = keptIndices.find((retained) => retained > index)!;
+    const end = keptIndices.find((retained) => {
+      return retained > index;
+    })!;
     const start = keptIndices[keptIndices.indexOf(end) - 1];
     return [
       {

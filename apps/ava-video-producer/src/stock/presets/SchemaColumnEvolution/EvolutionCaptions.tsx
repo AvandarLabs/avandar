@@ -1,5 +1,5 @@
-import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./SchemaColumnEvolution.schema";
 import type { ReactNode } from "react";
 
@@ -9,6 +9,7 @@ export function EvolutionCaptions({
   input,
   frame,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g>
       {input.showVersionLabels ? (
@@ -20,7 +21,7 @@ export function EvolutionCaptions({
         />
       ) : null}
       {input.showVersionLabels && frame >= 132 ? (
-        <g opacity={ramp(frame, 132, 12)}>
+        <g opacity={motion.reveal(frame, 132)}>
           <LabelSlots
             labels={[[input.phaseLabels.later, 80, 520, 800, 16, 1]]}
           />

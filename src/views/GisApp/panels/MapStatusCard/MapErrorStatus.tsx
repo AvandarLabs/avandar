@@ -28,6 +28,9 @@ function _errorDetails(
         aggregateOnlyLayerSpec: i18n._(
           msg`Layer ${error.layerName ?? ""} is aggregate-only and cannot be drawn as individual symbols.`,
         ),
+        jitterRequiresPoints: i18n._(
+          msg`Layer ${error.layerName ?? ""} is set to Displace, which only works for points. Choose another handling option in its Sensitivity settings.`,
+        ),
       })
     : (error?.message ?? "");
 }

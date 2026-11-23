@@ -1,0 +1,17 @@
+{
+  "label": "final:pi:haiku-sonnet#1",
+  "questionCount": 45,
+  "passCount": 45,
+  "needlessQuestions": 0,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 56,
+  "promptTokens": 157322,
+  "cachedPromptTokens": 138463,
+  "completionTokens": 18714,
+  "totalCost": 0.013093954999999997,
+  "costPerQuestion": 0.0002909767777777777,
+  "latencyMedianMs": 2233.5968329999996,
+  "latencyP90Ms": 3241.449249999998,
+  "failedIds": []
+}

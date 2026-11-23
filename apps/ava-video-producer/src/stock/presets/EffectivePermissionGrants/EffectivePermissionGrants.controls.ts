@@ -10,8 +10,8 @@ export const RESTRICTION_MESSAGE: { id: string; message: string } = {
 export const controls: StockControl[] = makeStockControlsFromSchema({
   schema: jsonSchema,
   messageNamespace: "motionAtlas.effective-permission-grants",
-}).map((control) =>
-  control.path === "restricted"
+}).map((control) => {
+  return control.path === "restricted"
     ? { ...control, help: RESTRICTION_MESSAGE }
     : control.path === "requiredRole"
       ? {
@@ -21,5 +21,5 @@ export const controls: StockControl[] = makeStockControlsFromSchema({
             message: "Required role",
           },
         }
-      : control,
-);
+      : control;
+});

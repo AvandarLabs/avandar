@@ -1,4 +1,5 @@
 import { getShelfUnitPoseFromInputAndFrame } from "./getShelfUnitPoseFromInputAndFrame";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./RetailShelfReplenishment.schema";
 /** Data for getShelfUnitsFromInputAndFrame. */
 type GetShelfUnitsResult = {
@@ -20,21 +21,26 @@ type GetShelfUnitsResult = {
 export function getShelfUnitsFromInputAndFrame({
   input,
   frame,
-}: Readonly<{ input: Input; frame: number }>): GetShelfUnitsResult[] {
-  return input.goods.flatMap((good, goodIndex) =>
-    Array.from(
+  motion,
+}: Readonly<{
+  input: Input;
+  frame: number;
+  motion: VideoMotion;
+}>): GetShelfUnitsResult[] {
+  return input.goods.flatMap((good, goodIndex) => {
+    return Array.from(
       { length: good.openingUnits + good.incomingUnits },
       (_, unitIndex) => {
         const incomingIndex =
-          input.goods
-            .slice(0, goodIndex)
-            .reduce((sum, item) => sum + item.incomingUnits, 0) +
+          input.goods.slice(0, goodIndex).reduce((sum, item) => {
+            return sum + item.incomingUnits;
+          }, 0) +
           unitIndex -
           good.openingUnits;
         const selectedIndex =
-          input.goods
-            .slice(0, goodIndex)
-            .reduce((sum, item) => sum + item.selectedUnits, 0) + unitIndex;
+          input.goods.slice(0, goodIndex).reduce((sum, item) => {
+            return sum + item.selectedUnits;
+          }, 0) + unitIndex;
         return {
           good,
           unitIndex,
@@ -45,9 +51,10 @@ export function getShelfUnitsFromInputAndFrame({
             unitIndex,
             incomingIndex,
             selectedIndex,
+            motion,
           }),
         };
       },
-    ),
-  );
+    );
+  });
 }

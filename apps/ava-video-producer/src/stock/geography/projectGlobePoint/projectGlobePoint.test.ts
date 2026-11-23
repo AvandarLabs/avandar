@@ -8,8 +8,12 @@ const VIEW: {
   centerLatitude: number;
   radius: number;
 } = { centerLongitude: 0, centerLatitude: 0, radius: 100 };
-const _near = (actual: number, expected: number): void =>
-  assert.ok(Math.abs(actual - expected) < 1e-9, `${actual} != ${expected}`);
+const _near = (actual: number, expected: number): void => {
+  return assert.ok(
+    Math.abs(actual - expected) < 1e-9,
+    `${actual} != ${expected}`,
+  );
+};
 
 test("center, limb and rear hemisphere markers have independent visibility", () => {
   const center = projectGlobePoint({ ...VIEW, longitude: 0, latitude: 0 });
@@ -59,9 +63,14 @@ test("nonfinite coordinates, invalid latitudes and radii are rejected", () => {
     { centerLatitude: -91 },
     { radius: 0 },
     { radius: Infinity },
-  ].forEach((invalid) =>
-    assert.throws(() =>
-      projectGlobePoint({ ...VIEW, longitude: 0, latitude: 0, ...invalid }),
-    ),
-  );
+  ].forEach((invalid) => {
+    return assert.throws(() => {
+      return projectGlobePoint({
+        ...VIEW,
+        longitude: 0,
+        latitude: 0,
+        ...invalid,
+      });
+    });
+  });
 });

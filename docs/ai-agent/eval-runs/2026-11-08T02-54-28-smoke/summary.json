@@ -1,0 +1,17 @@
+{
+  "label": "smoke",
+  "questionCount": 1,
+  "passCount": 1,
+  "needlessQuestions": 0,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 2,
+  "promptTokens": 5297,
+  "cachedPromptTokens": 0,
+  "completionTokens": 187,
+  "totalCost": 0,
+  "costPerQuestion": 0,
+  "latencyMedianMs": 101386.06362500001,
+  "latencyP90Ms": 101386.06362500001,
+  "failedIds": []
+}

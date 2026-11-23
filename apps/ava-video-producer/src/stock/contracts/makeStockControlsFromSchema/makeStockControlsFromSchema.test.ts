@@ -102,15 +102,49 @@ const expected: StockControl[] = [
     optionsFrom: { path: "people", valueKey: "id", labelKey: "label" },
   },
 ];
-test("supported recursive shapes retain exact bounds, relative paths and stable message identities", () =>
-  assert.deepEqual(
+
+const UNSUPPORTED_SCHEMAS: Array<StockJsonSchema | boolean> = [
+  true,
+  false,
+  { type: "number" },
+  { type: "null" },
+  { anyOf: [{ type: "string" }, { type: "null" }] },
+  { type: "string" },
+  { type: "string", maxLength: 4, pattern: "x" },
+  { type: "string", maxLength: 4, format: "email" },
+  { type: "string", minLength: 5, maxLength: 4 },
+  { type: "string", maxLength: Infinity },
+  { type: "string", enum: [] },
+  { type: "string", enum: ["x", "x"] },
+  { type: "array", maxItems: 2, items: PERSON_SCHEMA },
+  { type: "array", minItems: 1, maxItems: 2, items: true },
+  { type: "array", minItems: 1, maxItems: 2, items: false },
+  {
+    type: "array",
+    minItems: 1,
+    maxItems: 2,
+    items: { type: "string", maxLength: 4 },
+  },
+  { type: "object", additionalProperties: true, properties: {} },
+  {
+    type: "object",
+    additionalProperties: false,
+    properties: { optional: { type: "boolean" } },
+    required: [],
+  },
+  { type: "boolean", const: true },
+];
+
+test("supported recursive shapes retain exact bounds, relative paths and stable message identities", () => {
+  return assert.deepEqual(
     makeStockControlsFromSchema({
       schema,
       messageNamespace: "fixture",
       referenceSelects: REFERENCE_SELECTS,
     }),
     expected,
-  ));
+  );
+});
 test("exact nested reference overrides preserve their root or item scope", () => {
   const controls = makeStockControlsFromSchema({
     schema,
@@ -142,65 +176,32 @@ test("exact nested reference overrides preserve their root or item scope", () =>
   }
 });
 test("unsupported scalar, union, text constraints and unbounded or primitive collections fail explicitly", () => {
-  const unsupported: Array<StockJsonSchema | boolean> = [
-    true,
-    false,
-    { type: "number" },
-    { type: "null" },
-    { anyOf: [{ type: "string" }, { type: "null" }] },
-    { type: "string" },
-    { type: "string", maxLength: 4, pattern: "x" },
-    { type: "string", maxLength: 4, format: "email" },
-    { type: "string", minLength: 5, maxLength: 4 },
-    { type: "string", maxLength: Infinity },
-    { type: "string", enum: [] },
-    { type: "string", enum: ["x", "x"] },
-    { type: "array", maxItems: 2, items: PERSON_SCHEMA },
-    { type: "array", minItems: 1, maxItems: 2, items: true },
-    { type: "array", minItems: 1, maxItems: 2, items: false },
-    {
-      type: "array",
-      minItems: 1,
-      maxItems: 2,
-      items: { type: "string", maxLength: 4 },
-    },
-    { type: "object", additionalProperties: true, properties: {} },
-    {
-      type: "object",
-      additionalProperties: false,
-      properties: { optional: { type: "boolean" } },
-      required: [],
-    },
-    { type: "boolean", const: true },
-  ];
-  unsupported.forEach((node) =>
-    assert.throws(
-      () =>
-        makeStockControlsFromSchema({
-          schema: {
-            type: "object",
-            additionalProperties: false,
-            properties: { value: node },
-            required: ["value"],
-          },
-          messageNamespace: "fixture",
-        }),
-      /Unsupported stock controls schema/,
-    ),
-  );
+  const unsupported: Array<StockJsonSchema | boolean> =
+    structuredClone(UNSUPPORTED_SCHEMAS);
+  unsupported.forEach((node) => {
+    return assert.throws(() => {
+      return makeStockControlsFromSchema({
+        schema: {
+          type: "object",
+          additionalProperties: false,
+          properties: { value: node },
+          required: ["value"],
+        },
+        messageNamespace: "fixture",
+      });
+    }, /Unsupported stock controls schema/);
+  });
 });
 test("unknown or incompatible reference override paths fail explicitly", () => {
-  ["unknown", "enabled", "mode"].forEach((path) =>
-    assert.throws(
-      () =>
-        makeStockControlsFromSchema({
-          schema,
-          messageNamespace: "fixture",
-          referenceSelects: { [path]: REFERENCE_SELECTS.focus },
-        }),
-      /Unsupported stock controls schema/,
-    ),
-  );
+  ["unknown", "enabled", "mode"].forEach((path) => {
+    return assert.throws(() => {
+      return makeStockControlsFromSchema({
+        schema,
+        messageNamespace: "fixture",
+        referenceSelects: { [path]: REFERENCE_SELECTS.focus },
+      });
+    }, /Unsupported stock controls schema/);
+  });
 });
 test("conversion preserves the complete source schema and reference descriptors", () => {
   const before = structuredClone({

@@ -27,13 +27,11 @@ test("label slots preserve authored whitespace while wrapping whole joined graph
 });
 
 test("label slots reject exhausted line capacity instead of dropping or shrinking graphemes", () => {
-  assert.throws(
-    () =>
-      renderToStaticMarkup(
-        createElement(LabelSlots, {
-          labels: [["界界界", 20, 30, 16, 14, 2]],
-        }),
-      ),
-    /line count/,
-  );
+  assert.throws(() => {
+    return renderToStaticMarkup(
+      createElement(LabelSlots, {
+        labels: [["界界界", 20, 30, 16, 14, 2]],
+      }),
+    );
+  }, /line count/);
 });

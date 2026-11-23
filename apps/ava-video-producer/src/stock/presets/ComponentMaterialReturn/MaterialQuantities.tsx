@@ -1,4 +1,4 @@
-import { ramp } from "../../../motion";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getMaterialBalanceFromInput } from "./getMaterialBalanceFromInput";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./ComponentMaterialReturn.schema";
@@ -13,6 +13,7 @@ export function MaterialQuantities({
   frame,
   assembled,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const { returned, replacement, recycle, residue } =
     getMaterialBalanceFromInput(input);
   const values = [
@@ -23,17 +24,19 @@ export function MaterialQuantities({
     { value: residue, x: 730, y: 212, width: 210 },
   ];
   return (
-    <g opacity={ramp(frame, 108, 12)}>
-      {values.map(({ value, x, y, width }, index) => (
-        <SceneLabel
-          key={index}
-          text={`${value} ${input.copy.unit}`}
-          x={x}
-          y={y}
-          width={width}
-          lines={3}
-        />
-      ))}
+    <g opacity={motion.reveal(frame, 108)}>
+      {values.map(({ value, x, y, width }) => {
+        return (
+          <SceneLabel
+            key={`${x}:${y}`}
+            text={`${value} ${input.copy.unit}`}
+            x={x}
+            y={y}
+            width={width}
+            lines={3}
+          />
+        );
+      })}
     </g>
   );
 }

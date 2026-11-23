@@ -1,0 +1,38 @@
+.shutterInsetInset {
+  border: var(--demo-stroke-hairline) solid var(--demo-line);
+  border-radius: var(--demo-corner-pill);
+  height: 160px;
+  position: absolute;
+  right: 20px;
+  top: 10px;
+  width: 160px;
+}
+
+.shutterInsetInsetCenter,
+.shutterInsetInsetSample {
+  border-radius: var(--demo-corner-pill);
+  height: 14px;
+  left: 73px;
+  position: absolute;
+  top: 73px;
+  width: 14px;
+}
+
+.shutterInsetInsetCenter {
+  background: var(--demo-highlight);
+}
+
+.shutterInsetInsetSample {
+  background: var(--demo-accent);
+}
+
+.shutterInsetInsetLabel {
+  bottom: -24px;
+  color: var(--demo-muted);
+  font-family: var(--demo-mono);
+  font-size: var(--demo-font-size-3xs);
+  left: 0;
+  position: absolute;
+  right: 0;
+  text-align: center;
+}

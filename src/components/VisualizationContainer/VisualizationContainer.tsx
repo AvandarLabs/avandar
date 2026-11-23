@@ -6,6 +6,7 @@ import { useMemo } from "react";
 import { match } from "ts-pattern";
 import { array, looseObject, object, prettifyError, string } from "zod";
 import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
+import { useDataGridPeriodFormatters } from "@/components/VisualizationContainer/useDataGridPeriodFormatters/useDataGridPeriodFormatters";
 import { useVizDataLimit } from "@/components/VisualizationContainer/useVizDataLimit/useVizDataLimit";
 import css from "@/components/VisualizationContainer/VisualizationContainer.module.css";
 import { VisualizationRenderError } from "@/components/VisualizationContainer/VisualizationRenderError";
@@ -141,6 +142,16 @@ export function VisualizationContainer({
   const schemas = useVizConfigSchemas();
   const columnNames = rawColumns.map(prop("name"));
   const limitedData = useVizDataLimit(vizConfig.vizType, data);
+  const periodFormatters = useDataGridPeriodFormatters();
+
+  // The period of each per-period column the query builder knew about.
+  const bucketGrains = useMemo(() => {
+    return Object.fromEntries(
+      columns.flatMap((column) => {
+        return column.bucketGrain ? [[column.name, column.bucketGrain]] : [];
+      }),
+    );
+  }, [columns]);
 
   const uiVizConfigConversion = AvaVizConfigs.toUiVizConfig({
     config: vizConfig,
@@ -155,6 +166,8 @@ export function VisualizationContainer({
             data={limitedData}
             dateColumns={dateColumns}
             dateFormat="YYYY-MM-DD HH:mm:ss Z"
+            bucketGrains={bucketGrains}
+            periodFormatters={periodFormatters}
             height="100%"
           />
         </Box>

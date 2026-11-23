@@ -80,15 +80,19 @@ const minimumInput: Input = {
     { id: "a", label: "A" },
     { id: "b", label: "B" },
   ],
-  capabilities: ["first", "second"].map((id) => ({
-    id,
-    label: "",
-    cells: ["a", "b"].map((optionId) => ({
-      optionId,
-      state: "unknown",
-      note: "",
-    })),
-  })),
+  capabilities: ["first", "second"].map((id) => {
+    return {
+      id,
+      label: "",
+      cells: ["a", "b"].map((optionId) => {
+        return {
+          optionId,
+          state: "unknown",
+          note: "",
+        };
+      }),
+    };
+  }),
   focus: { kind: "none", id: "" },
   showNotes: false,
   caption: "",
@@ -137,18 +141,24 @@ export const fixtures: Array<{ id: string; input: Input }> = [
     input: {
       ...DEFAULT_INPUT,
       caption: "界".repeat(48),
-      options: ["a", "b", "c"].map((id) => ({ id, label: "界".repeat(18) })),
-      capabilities: Array.from({ length: 5 }, (_, index) => ({
-        id: `row-${index}`,
-        label: "界".repeat(22),
-        cells: ["a", "b", "c"].map((optionId, cellIndex) => ({
-          optionId,
-          state: (["included", "absent", "conditional", "unknown"] as const)[
-            (index + cellIndex) % 4
-          ],
-          note: "界".repeat(18),
-        })),
-      })),
+      options: ["a", "b", "c"].map((id) => {
+        return { id, label: "界".repeat(18) };
+      }),
+      capabilities: Array.from({ length: 5 }, (_, index) => {
+        return {
+          id: `row-${index}`,
+          label: "界".repeat(22),
+          cells: ["a", "b", "c"].map((optionId, cellIndex) => {
+            return {
+              optionId,
+              state: (
+                ["included", "absent", "conditional", "unknown"] as const
+              )[(index + cellIndex) % 4],
+              note: "界".repeat(18),
+            };
+          }),
+        };
+      }),
       stateLabels: {
         included: "界".repeat(14),
         absent: "界".repeat(14),
@@ -195,13 +205,15 @@ export const invalidInputs: unknown[] = [
       { optionId: "pocket", state: "included", note: "", extra: true },
       { optionId: "desk", state: "unknown", note: "" },
     ],
-  ].map((cells) => ({
-    ...DEFAULT_INPUT,
-    capabilities: [
-      { ...DEFAULT_INPUT.capabilities[0], cells },
-      DEFAULT_INPUT.capabilities[1],
-    ],
-  })),
+  ].map((cells) => {
+    return {
+      ...DEFAULT_INPUT,
+      capabilities: [
+        { ...DEFAULT_INPUT.capabilities[0], cells },
+        DEFAULT_INPUT.capabilities[1],
+      ],
+    };
+  }),
 ];
 
 /**
@@ -215,17 +227,25 @@ export const textRegressionInputs: Array<{
 }> = [
   {
     id: "row-spaced",
-    text: [7, 7, 6].map((length) => "界".repeat(length)).join(" "),
+    text: [7, 7, 6]
+      .map((length) => {
+        return "界".repeat(length);
+      })
+      .join(" "),
     input: {
       ...DEFAULT_INPUT,
-      capabilities: DEFAULT_INPUT.capabilities.map((row, index) =>
-        index
+      capabilities: DEFAULT_INPUT.capabilities.map((row, index) => {
+        return index
           ? row
           : {
               ...row,
-              label: [7, 7, 6].map((length) => "界".repeat(length)).join(" "),
-            },
-      ),
+              label: [7, 7, 6]
+                .map((length) => {
+                  return "界".repeat(length);
+                })
+                .join(" "),
+            };
+      }),
     },
   },
   {
@@ -234,15 +254,21 @@ export const textRegressionInputs: Array<{
     input: {
       ...DEFAULT_INPUT,
       caption: "A\nB\tC\nD\nE",
-      options: DEFAULT_INPUT.options.map((option) => ({
-        ...option,
-        label: "A\nB\tC\nD\nE",
-      })),
-      capabilities: DEFAULT_INPUT.capabilities.map((row) => ({
-        ...row,
-        label: "A\nB\tC\nD\nE",
-        cells: row.cells.map((cell) => ({ ...cell, note: "A\nB\tC\nD\nE" })),
-      })),
+      options: DEFAULT_INPUT.options.map((option) => {
+        return {
+          ...option,
+          label: "A\nB\tC\nD\nE",
+        };
+      }),
+      capabilities: DEFAULT_INPUT.capabilities.map((row) => {
+        return {
+          ...row,
+          label: "A\nB\tC\nD\nE",
+          cells: row.cells.map((cell) => {
+            return { ...cell, note: "A\nB\tC\nD\nE" };
+          }),
+        };
+      }),
       stateLabels: {
         included: "A\nB\tC\nD\nE",
         absent: "A\nB\tC\nD\nE",

@@ -60,9 +60,9 @@ export const inputSchema = z
       });
     }
     if (
-      input.records.some(
-        (row) => !input.categories.some(propEq("id", row.categoryId)),
-      )
+      input.records.some((row) => {
+        return !input.categories.some(propEq("id", row.categoryId));
+      })
     ) {
       context.addIssue({
         code: "custom",

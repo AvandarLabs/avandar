@@ -15,6 +15,92 @@ import {
 import { inputSchema } from "./ExceptionDetour.schema";
 import type { Input } from "./ExceptionDetour.schema";
 
+function _assertHiddenStandardReference(): void {
+  assert.doesNotMatch(
+    _render({
+      frame: 150,
+      input: { ...DEFAULT_INPUT, showStandardReference: false },
+    }),
+    /data-standard-reference=/,
+  );
+}
+
+function _assertHeldCaseVerticalPosition(
+  held: ReturnType<typeof _render>,
+): void {
+  assert.equal(
+    SvgAttributes.getNumberFromMarkup({
+      attributes: _markedShape({
+        markup: held,
+        marker: "moving-case",
+      }),
+      name: "cy",
+    }),
+    420,
+  );
+}
+
+function _assertHeldCaseHorizontalPosition(
+  held: ReturnType<typeof _render>,
+): void {
+  assert.equal(
+    SvgAttributes.getNumberFromMarkup({
+      attributes: _markedShape({
+        markup: held,
+        marker: "moving-case",
+      }),
+      name: "cx",
+    }),
+    670,
+  );
+}
+
+function _assertEarlyCaseVerticalPosition(
+  early: ReturnType<typeof _render>,
+): void {
+  assert.equal(
+    SvgAttributes.getNumberFromMarkup({
+      attributes: _markedShape({
+        markup: early,
+        marker: "moving-case",
+      }),
+      name: "cy",
+    }),
+    300,
+  );
+}
+
+function _assertEarlyCaseHorizontalPosition(
+  early: ReturnType<typeof _render>,
+): void {
+  assert.equal(
+    SvgAttributes.getNumberFromMarkup({
+      attributes: _markedShape({
+        markup: early,
+        marker: "moving-case",
+      }),
+      name: "cx",
+    }),
+    420,
+  );
+}
+
+/**
+ * The shape a marker names: the marked element itself, or the sketch-aware
+ * shape inside a marked group.
+ */
+function _markedShape({
+  markup,
+  marker,
+}: Readonly<{ markup: string; marker: string }>): string {
+  const wrapped = markup.match(
+    new RegExp(
+      `<g [^>]*data-${marker}="[^"]*"[^>]*><(?:line|path|circle|rect|ellipse)\\b[^>]*>`,
+    ),
+  );
+  return wrapped ? wrapped[0] : SvgAttributes.fromMarker({ markup, marker });
+}
+
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -49,58 +135,22 @@ test("the exceptional case leaves an intact standard route and mirrors without s
     frame: 150,
     input: { ...DEFAULT_INPUT, detourSide: "above" },
   });
-  const standard = SvgAttributes.fromMarker({
+  const standard = _markedShape({
     markup: held,
     marker: "standard-route",
   });
   assert.match(standard, /d="M100 300 H880"/);
   assert.equal(
-    SvgAttributes.fromMarker({ markup: above, marker: "standard-route" }),
+    _markedShape({ markup: above, marker: "standard-route" }),
     standard,
   );
+  _assertEarlyCaseHorizontalPosition(early);
+  _assertEarlyCaseVerticalPosition(early);
+  _assertHeldCaseHorizontalPosition(held);
+  _assertHeldCaseVerticalPosition(held);
   assert.equal(
     SvgAttributes.getNumberFromMarkup({
-      attributes: SvgAttributes.fromMarker({
-        markup: early,
-        marker: "moving-case",
-      }),
-      name: "cx",
-    }),
-    420,
-  );
-  assert.equal(
-    SvgAttributes.getNumberFromMarkup({
-      attributes: SvgAttributes.fromMarker({
-        markup: early,
-        marker: "moving-case",
-      }),
-      name: "cy",
-    }),
-    300,
-  );
-  assert.equal(
-    SvgAttributes.getNumberFromMarkup({
-      attributes: SvgAttributes.fromMarker({
-        markup: held,
-        marker: "moving-case",
-      }),
-      name: "cx",
-    }),
-    670,
-  );
-  assert.equal(
-    SvgAttributes.getNumberFromMarkup({
-      attributes: SvgAttributes.fromMarker({
-        markup: held,
-        marker: "moving-case",
-      }),
-      name: "cy",
-    }),
-    420,
-  );
-  assert.equal(
-    SvgAttributes.getNumberFromMarkup({
-      attributes: SvgAttributes.fromMarker({
+      attributes: _markedShape({
         markup: above,
         marker: "moving-case",
       }),
@@ -114,14 +164,8 @@ test("the exceptional case leaves an intact standard route and mirrors without s
     assert.ok(markup.includes(DEFAULT_INPUT.exception.outcome));
   });
   assert.match(held, /data-standard-reference=/);
-  assert.doesNotMatch(
-    _render({
-      frame: 150,
-      input: { ...DEFAULT_INPUT, showStandardReference: false },
-    }),
-    /data-standard-reference=/,
-  );
-  assert.match(held, /data-resolved-bracket="true"[^>]*opacity="1"/);
+  _assertHiddenStandardReference();
+  assert.match(held, /data-resolved-bracket="true"><path[^>]*opacity="1"/);
   assert.notEqual(early, held);
 });
 
@@ -173,16 +217,16 @@ test("the complete exception-route label clears the uninterrupted detour curve o
           }),
         ),
       );
-      const labelLines = paint.filter(
-        (item) => item.kind === "text" && item.left > 350,
-      );
+      const labelLines = paint.filter((item) => {
+        return item.kind === "text" && item.left > 350;
+      });
       assert.ok(labelLines.length > 0);
-      labelLines.forEach((line) =>
-        assert.ok(
+      labelLines.forEach((line) => {
+        return assert.ok(
           detourSide === "above" ? line.bottom < 178 : line.top > 422,
           "The complete route label clears the curve's full vertical extent",
-        ),
-      );
+        );
+      });
       assert.equal(
         paint.filter(propEq("kind", "rect")).length,
         0,

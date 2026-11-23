@@ -1,195 +1,138 @@
-import { Paper } from "@avandar/ui";
-import {
-  isNonNullish,
-  makeIdLookupMap,
-  makeMap,
-  prop,
-  propEq,
-  unknownToString,
-  where,
-} from "@avandar/utils";
-import { Trans, useLingui } from "@lingui/react/macro";
-import { Container, Loader, Stack, Title } from "@mantine/core";
+import { where } from "@avandar/utils";
+import { useLingui } from "@lingui/react/macro";
+import { Group } from "@mantine/core";
 import { useMemo } from "react";
-import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
-import { AttributeAssertionClient } from "@/clients/ontology/AttributeAssertionClient/AttributeAssertionClient";
-import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
-import { ActivityBlock } from "@/views/IndividualManagerApp/SingleIndividualView/ActivityBlock";
-import { RecordAttributesList } from "@/views/IndividualManagerApp/SingleIndividualView/RecordAttributesList";
-import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
-import type { AttributeAssertion } from "$/models/ontology/AttributeAssertion/AttributeAssertion";
+import { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
+import { ConceptStatusClient } from "@/clients/ontology/ConceptStatusClient";
+import { WorkspaceClient } from "@/clients/WorkspaceClient";
+import { AppView } from "@/components/layouts/AppView/AppView";
+import { AppViewBody } from "@/components/layouts/AppView/AppViewBody/AppViewBody";
+import { AppViewHeader } from "@/components/layouts/AppView/AppViewHeader/AppViewHeader";
+import { ALWAYS_REFETCH_ON_MOUNT } from "@/config/queryOptions.constants";
+import { useHasPermission } from "@/hooks/permissions/useHasPermission/useHasPermission";
+import { CaseActivityFeed } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CaseActivityFeed";
+import { CaseDetailsRail } from "@/views/IndividualManagerApp/SingleIndividualView/CaseDetailsRail";
+import { RecordAssigneeControl } from "@/views/IndividualManagerApp/SingleIndividualView/RecordAssigneeControl/RecordAssigneeControl";
+import { RecordFactsGroup } from "@/views/IndividualManagerApp/SingleIndividualView/RecordFactsGroup/RecordFactsGroup";
+import { RecordStatusControl } from "@/views/IndividualManagerApp/SingleIndividualView/RecordStatusControl/RecordStatusControl";
+import css from "@/views/IndividualManagerApp/SingleIndividualView/SingleIndividualView.module.css";
+import { useRecordAssigneeChange } from "@/views/IndividualManagerApp/SingleIndividualView/useRecordAssigneeChange/useRecordAssigneeChange";
+import { useRecordFields } from "@/views/IndividualManagerApp/SingleIndividualView/useRecordFields/useRecordFields";
+import { useRecordStatusChange } from "@/views/IndividualManagerApp/SingleIndividualView/useRecordStatusChange/useRecordStatusChange";
 import type { Concept } from "$/models/ontology/Concept/Concept";
-import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { Individual } from "$/models/ontology/Individual/Individual";
-import type { RecordAttributeRow } from "@/views/IndividualManagerApp/SingleIndividualView/RecordAttributesList";
+import type { UserProfile } from "$/models/User/UserProfile";
 
-type HydratedIndividual = Individual.T & {
-  identifierAttribute?: ConceptAttribute.T;
-  labelAttribute?: ConceptAttribute.T;
-  attributes?: ConceptAttribute.T[];
-  assertions?: Array<
-    AttributeAssertion.T & {
-      attributeName?: string;
-      sourceType?: DatasetSource.SourceType;
-      sourceName?: string;
-    }
-  >;
-  labelValue?: AttributeAssertion.T;
-};
-
-/**
- * Hydrates an individual with its concept attributes and their assertions.
- */
-function useHydratedIndividual({
-  concept,
-  individual,
-}: {
-  concept: Concept.T;
-  individual: Individual.T;
-}): [HydratedIndividual, boolean] {
-  // TODO(jpsyx): move this to a generalized implementation of useHydration
-  const [conceptAttributes, isLoadingConceptAttributes] =
-    ConceptAttributeClient.useGetAll({
-      where: { concept_id: { eq: concept.id } },
-    });
-  const [attributeAssertions, isLoadingAttributeAssertions] =
-    AttributeAssertionClient.withLogger().useGetAttributeAssertions({
-      workspaceId: individual.workspaceId,
-      individualId: individual.id,
-      conceptAttributes: conceptAttributes ?? [],
-    });
-
-  const datasetIds = useMemo(() => {
-    return [
-      ...new Set(
-        (attributeAssertions ?? []).map(prop("datasetId")).filter(isNonNullish),
-      ),
-    ];
-  }, [attributeAssertions]);
-
-  const [datasets] = DatasetClient.useGetAll(where("id", "in", datasetIds));
-
-  const datasetsMap = useMemo(() => {
-    return datasets ? makeMap(datasets, { keyFn: prop("id") }) : undefined;
-  }, [datasets]);
-
-  // TODO(jpsyx): move this to a module that can also use cacheing.
-  const hydratedIndividual = useMemo(() => {
-    let configInfo = undefined;
-    let assertionsInfo = undefined;
-    let attributesById:
-      | Map<ConceptAttribute.Id, ConceptAttribute.T>
-      | undefined = undefined;
-
-    if (conceptAttributes) {
-      const identifierAttribute = conceptAttributes.find(
-        propEq("isIdentifier", true),
-      );
-      const labelAttribute = conceptAttributes.find(propEq("isLabel", true));
-      attributesById = makeIdLookupMap(conceptAttributes);
-      configInfo = {
-        identifierAttribute,
-        labelAttribute,
-        attributes: conceptAttributes,
-      };
-    }
-
-    if (attributeAssertions) {
-      const assertionsByAttributeId = makeMap(attributeAssertions, {
-        keyFn: prop("conceptAttributeId"),
-        valueFn: (assertion) => {
-          const config = attributesById?.get(assertion.conceptAttributeId);
-          const dataset = assertion.datasetId
-            ? datasetsMap?.get(assertion.datasetId)
-            : undefined;
-          return {
-            ...assertion,
-            attributeName: config?.name,
-            sourceType: dataset?.sourceType ?? dataset?.sourceType,
-            sourceName: dataset?.name,
-          };
-        },
-      });
-
-      const labelAttributeId = configInfo?.labelAttribute?.id;
-
-      assertionsInfo = {
-        assertions: [...assertionsByAttributeId.values()],
-        labelValue: labelAttributeId
-          ? assertionsByAttributeId.get(labelAttributeId)
-          : undefined,
-      };
-    }
-
-    return {
-      ...individual,
-      ...configInfo,
-      ...assertionsInfo,
-    };
-  }, [individual, conceptAttributes, attributeAssertions, datasetsMap]);
-
-  return [
-    hydratedIndividual,
-    isLoadingConceptAttributes || isLoadingAttributeAssertions,
-  ];
-}
+/** Stands in for the members until they load, one array for every render. */
+const EMPTY_MEMBERS: readonly UserProfile.WithRole[] = [];
 
 type Props = {
   concept: Concept.T;
   individual: Individual.T;
+
+  /** A comment to scroll to and highlight, from a copied comment link. */
+  highlightedCommentId: string | undefined;
 };
 
+/**
+ * A case's record page: its name, status, and case type in the header band,
+ * its fields and record facts in a fixed band above the activity, and the
+ * activity feed and composer in the scrolling region under that band.
+ *
+ * The fields are read through the case type's concept view, so they show the
+ * values the Data Explorer and chat see. The status control is a menu for a
+ * Case Records editor and a badge for everyone else. A change saves at once
+ * and refreshes every view that shows the record's status, this page's loader
+ * included. The assignee control follows the status control and is a menu of
+ * the workspace's members for the same editors, and plain text for everyone
+ * else.
+ */
 export function SingleIndividualView({
   concept,
   individual,
+  highlightedCommentId,
 }: Props): JSX.Element {
   const { t } = useLingui();
-  const [hydratedIndividual, isLoadingHydratedIndividual] =
-    useHydratedIndividual({
-      concept,
-      individual,
+  const recordFields = useRecordFields({ concept, individual });
+  const [members, isLoadingMembers, membersQuery] =
+    WorkspaceClient.useGetUsersForWorkspace({
+      workspaceId: individual.workspaceId,
+      useQueryOptions: ALWAYS_REFETCH_ON_MOUNT,
     });
-
-  const attributeRows: RecordAttributeRow[] | undefined = useMemo(() => {
-    if (!hydratedIndividual.assertions) {
-      return undefined;
-    }
-    return hydratedIndividual.assertions.map((assertion) => {
-      return {
-        name: assertion.attributeName ?? t`Loading...`,
-        value: assertion.value,
-        sourceType: assertion.sourceType,
-        sourceName: assertion.sourceName,
-      };
-    });
-  }, [hydratedIndividual.assertions, t]);
+  const [statuses] = ConceptStatusClient.useGetAll(
+    where("concept_id", "eq", concept.id),
+  );
+  const canChangeStatus = useHasPermission("case_records__can_edit_record");
+  const { displayedStatusId, isSaving, changeStatus } =
+    useRecordStatusChange(individual);
+  const assignee = useRecordAssigneeChange(individual);
+  const sortedStatuses = useMemo(() => {
+    return statuses ? ConceptStatus.sortByPosition(statuses) : undefined;
+  }, [statuses]);
 
   return (
-    <Container py="md">
-      <Stack gap="lg" maw={720}>
-        <Title order={2} fw={650}>
-          {isLoadingHydratedIndividual ? (
-            <Loader size="sm" />
-          ) : (
-            unknownToString(hydratedIndividual.name)
-          )}
-        </Title>
-        <Paper p="lg">
-          <Stack gap="lg">
-            <Title order={4}>
-              <Trans>Details</Trans>
-            </Title>
-            {attributeRows === undefined ? (
-              <Loader />
-            ) : (
-              <RecordAttributesList attributes={attributeRows} />
-            )}
-          </Stack>
-        </Paper>
-        <Paper p="lg">
-          <ActivityBlock />
-        </Paper>
-      </Stack>
-    </Container>
+    <AppView>
+      <AppViewHeader
+        title={individual.name}
+        titleAccessory={
+          <Group gap="xs" wrap="nowrap">
+            {sortedStatuses ? (
+              <RecordStatusControl
+                statuses={sortedStatuses}
+                currentStatusId={displayedStatusId}
+                canEdit={canChangeStatus}
+                isSaving={isSaving}
+                onChange={changeStatus}
+              />
+            ) : null}
+            <RecordAssigneeControl
+              members={
+                isLoadingMembers ? undefined : (members ?? EMPTY_MEMBERS)
+              }
+              isMembersError={membersQuery.isError}
+              assigneeId={assignee.displayedAssigneeId}
+              canEdit={canChangeStatus}
+              isSaving={assignee.isSaving}
+              onChange={assignee.changeAssignee}
+            />
+          </Group>
+        }
+        facts={[concept.name]}
+      />
+      {
+        // Fill the body and drop its padding. Each region below pays the
+        // gutter itself, and the activity region omits the bottom so the
+        // composer's dock sits flush with the scroller.
+      }
+      <AppViewBody noPadding isFillHeight>
+        <div className={css.column}>
+          <section className={css.detailsBand} aria-label={t`Details`}>
+            <CaseDetailsRail
+              attributes={recordFields.rows}
+              loadError={
+                recordFields.isLoadError
+                  ? {
+                      isRetrying: recordFields.isRetrying,
+                      onRetry: recordFields.retry,
+                    }
+                  : undefined
+              }
+            >
+              <RecordFactsGroup individual={individual} />
+            </CaseDetailsRail>
+          </section>
+          <section className={css.activityPane} aria-label={t`Activity`}>
+            <CaseActivityFeed
+              workspaceId={individual.workspaceId}
+              individualId={individual.id}
+              members={
+                isLoadingMembers ? undefined : (members ?? EMPTY_MEMBERS)
+              }
+              highlightedCommentId={highlightedCommentId}
+            />
+          </section>
+        </div>
+      </AppViewBody>
+    </AppView>
   );
 }

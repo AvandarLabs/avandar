@@ -1,7 +1,7 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { LocalDisplacementMap } from "./LocalDisplacementMap";
 import { PublicDisplacementMap } from "./PublicDisplacementMap";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./BoundedLocationDisplacement.schema";
 import type { ReactNode } from "react";
 
@@ -28,21 +28,23 @@ export function BoundedLocationDisplacement({
           [input.labels.bound, 40, 450, 400, 12, 2],
         ]}
       />
-      {input.locations.map((location, index) => (
-        <LabelSlots
-          key={location.id}
-          labels={[
-            [
-              `${index + 1}· ${Math.hypot(location.offsetX, location.offsetY)} ≤ ${input.radiusUnits}`,
-              40,
-              490 + index * 38,
-              400,
-              12,
-              2,
-            ],
-          ]}
-        />
-      ))}
+      {input.locations.map((location, index) => {
+        return (
+          <LabelSlots
+            key={location.id}
+            labels={[
+              [
+                `${index + 1}· ${Math.hypot(location.offsetX, location.offsetY)} ≤ ${input.radiusUnits}`,
+                40,
+                490 + index * 38,
+                400,
+                12,
+                2,
+              ],
+            ]}
+          />
+        );
+      })}
     </g>
   );
 }

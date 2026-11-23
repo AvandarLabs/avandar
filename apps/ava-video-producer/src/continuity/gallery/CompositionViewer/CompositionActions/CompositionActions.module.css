@@ -2,33 +2,21 @@
   align-items: center;
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
-  margin-top: 20px;
+  gap: var(--atlas-space-16);
+  margin-top: var(--atlas-space-20);
 }
 
-.compositionActionsDownload {
-  background: var(--ava-primary-7);
-  border: 0;
-  border-radius: 5px;
-  color: #fff;
-  cursor: pointer;
-  padding: 12px 18px;
-}
-
-.compositionActionsDownload:disabled {
-  cursor: wait;
-  opacity: 0.55;
-}
+/* The caption download posts the export's theme, so it is a button styled as its sibling links. */
 
 .compositionActionsStatus {
-  margin-top: 12px;
+  margin-top: var(--atlas-space-12);
   min-height: 24px;
 }
 
 :global(dialog:modal) .compositionActionsLinks {
-  font-size: 12px;
-  gap: 12px;
-  margin-top: 12px;
+  font-size: var(--atlas-font-size-12);
+  gap: var(--atlas-space-12);
+  margin-top: var(--atlas-space-12);
 }
 
 :global(dialog:modal) .compositionActionsStatus:empty {

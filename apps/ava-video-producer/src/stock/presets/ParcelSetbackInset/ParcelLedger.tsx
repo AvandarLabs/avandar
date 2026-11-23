@@ -11,14 +11,16 @@ type Props = { input: Input };
 export function ParcelLedger({ input }: Readonly<Props>): ReactNode {
   return (
     <g>
-      {input.parcels.map((parcel, index) => (
-        <g key={parcel.id}>
-          <LabelSlots
-            labels={[[parcel.label, 640, 162 + index * 140, 290, 12, 1]]}
-          />
-          <ParcelMeasurements parcel={parcel} index={index} input={input} />
-        </g>
-      ))}
+      {input.parcels.map((parcel, index) => {
+        return (
+          <g key={parcel.id}>
+            <LabelSlots
+              labels={[[parcel.label, 640, 162 + index * 140, 290, 12, 1]]}
+            />
+            <ParcelMeasurements parcel={parcel} index={index} input={input} />
+          </g>
+        );
+      })}
     </g>
   );
 }

@@ -1,4 +1,4 @@
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -18,12 +18,11 @@ function _valuePresentation({
   showWhitespace: boolean;
 }): string {
   return showWhitespace
-    ? value.replace(
-        /[ \t\n\r]/g,
-        (character) =>
-          ({ " ": "·", "\t": "⇥", "\n": "↵", "\r": "␍" })[character] ??
-          character,
-      )
+    ? value.replace(/[ \t\n\r]/g, (character) => {
+        return (
+          { " ": "·", "\t": "⇥", "\n": "↵", "\r": "␍" }[character] ?? character
+        );
+      })
     : value;
 }
 /**
@@ -34,19 +33,21 @@ export function CellLiteralValue({
   x,
   y,
   showWhitespace,
-  color = STOCK.text,
+  color,
   opacity = 1,
   letterSpacing = 0,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <text
       aria-label={value}
       x={x}
       y={y}
-      fontSize={14}
-      fontFamily="Arial, sans-serif"
+      fontSize={tokens.text.graphic.value.fontSize}
+      fontFamily={tokens.text.graphic.value.fontFamily}
+      fontWeight={tokens.text.graphic.value.fontWeight}
       xmlSpace="preserve"
-      fill={color}
+      fill={color ?? tokens.text.graphic.value.color}
       opacity={opacity}
       letterSpacing={letterSpacing}
     >

@@ -1,9 +1,11 @@
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { RESULT_CUE } from "./getEvidenceFromFrame";
 import { GridEvidence } from "./GridEvidence";
 import { GridSceneHeadings } from "./GridSceneHeadings";
 import { GridSourceLinks } from "./GridSourceLinks";
-import { ReconstructionGrid } from "./ReconstructionGrid";
-import type { GraphicProps } from "../../graphics-common";
+import { ReconstructionGrid } from "./ReconstructionGrid/ReconstructionGrid";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./PdfGridReconstruction.schema";
 import type { ReactNode } from "react";
 /** Frame-driven authored study props. */
@@ -16,18 +18,20 @@ export function PdfGridReconstruction({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
       <GridSceneHeadings input={input} />
-      <rect
+      <StockRect
         data-source-page="true"
         x={40}
         y={192}
         width={424}
         height={372}
-        rx={4}
-        fill={STOCK.surface}
-        stroke={STOCK.line}
+        rx={scales.corner(tokens.corner.chip)}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
       />
       <GridSourceLinks input={input} frame={frame} accent={accent} />
       <GridEvidence input={input} frame={frame} accent={accent} />
@@ -37,7 +41,7 @@ export function PdfGridReconstruction({
         accent={accent}
         isResult={false}
       />
-      {frame >= 106 ? (
+      {frame >= RESULT_CUE ? (
         <ReconstructionGrid
           input={input}
           frame={frame}

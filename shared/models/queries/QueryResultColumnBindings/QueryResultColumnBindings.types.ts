@@ -1,3 +1,4 @@
+import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 
@@ -52,6 +53,12 @@ export type ProjectionDescriptor = {
    * and a projection whose name no result column has is reported missing.
    */
   queryResultColumnName: string;
+
+  /**
+   * The period of a per-period field this projection reads whole, which
+   * binding copies onto the result column. Absent otherwise.
+   */
+  bucketGrain?: ConceptAttribute.BucketGrain;
 };
 
 /**

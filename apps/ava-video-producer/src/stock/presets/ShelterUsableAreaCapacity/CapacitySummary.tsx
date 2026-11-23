@@ -1,5 +1,5 @@
-import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getCapacityFromFloorTiles } from "./getCapacityFromFloorTiles";
 import type { Input } from "./ShelterUsableAreaCapacity.schema";
 import type { ReactNode } from "react";
@@ -7,9 +7,10 @@ import type { ReactNode } from "react";
 type Props = { input: Input; frame: number };
 /** The resolved area-only comparison keeps shortfall and spare separate. */
 export function CapacitySummary({ input, frame }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const values = getCapacityFromFloorTiles(input);
   return (
-    <g data-capacity-summary="" opacity={ramp(frame, 108, 12)}>
+    <g data-capacity-summary="" opacity={motion.reveal(frame, 108)}>
       <LabelSlots
         labels={[
           [input.copy.capacity, 485, 326, 195, 12, 6],

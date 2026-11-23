@@ -24,6 +24,11 @@ export type CteAlias = {
  */
 export type SourceAnalysis = {
   relationTableNames: string[];
+  /**
+   * Names of internal tables the source reads, such as an individuals staging
+   * table. They name no relation, so `relationTableNames` leaves them out.
+   */
+  internalTableNames: string[];
   unsafeReason?: DuckDbUnsafeSqlReason;
   isMutating: boolean;
   mutatedDatasetIds: string[];
@@ -42,18 +47,26 @@ export type IdentifierParts = { endIndex: number; parts: string[] };
 export type DuckDbUnsafeSqlReason =
   | "dynamic-query"
   | "invalid-sql"
-  | "uninspectable-source";
+  | "uninspectable-source"
+  | "unsupported-syntax";
 
 /**
  * Describes the statically proven relation effects of DuckDB SQL. A `read`
  * names every relation it touches, whatever kind each one is, so a caller can
- * resolve a concept table as readily as a dataset table. The `mutating` and
- * `unsafe` variants stay dataset ids: mutation and the fail-closed paths are
- * dataset-only today, and a concept table read by unanalyzable SQL is not
- * reported as a dataset it is not.
+ * resolve a concept table as readily as a dataset table. It also names the
+ * internal tables it reads, which are no relation, so a caller that allows
+ * only relations can refuse them. The `mutating` and `unsafe` variants stay
+ * dataset ids: mutation and the fail-closed paths are dataset-only today, and
+ * a concept table read by unanalyzable SQL is not reported as a dataset it is
+ * not.
  */
 export type DuckDbSqlAnalysis =
-  | { kind: "read"; relations: RelationRef.T[] }
+  | {
+      kind: "read";
+      relations: RelationRef.T[];
+      /** The internal tables the statement reads, which name no relation. */
+      internalTableNames: string[];
+    }
   | {
       kind: "mutating";
       readDatasetIds: string[];

@@ -1,6 +1,6 @@
 import { statusFromOpenDataFailure } from "@sbfn/open-data/statusFromOpenDataFailure/statusFromOpenDataFailure.ts";
 import { describe, expect, it } from "vitest";
-import type { OpenDataAcquisitionFailureCode } from "$/open-data/openDataErrors.ts";
+import type { OpenDataAcquisitionFailureCode } from "$/connectors/open-data/openDataErrors.ts";
 
 /**
  * Every code the failure union carries. Listed rather than derived, so adding a
@@ -17,7 +17,14 @@ const ALL_CODES: readonly OpenDataAcquisitionFailureCode[] = [
   "resource-too-large",
   "resource-host-mismatch",
   "resource-unreachable",
+  "resource-empty",
+  "resource-authorization-required",
+  "ckan-unreachable",
   "access-shape-invalid",
+  "freshness-probe-invalid",
+  "odata-unreachable",
+  "odata-response-invalid",
+  "odata-empty",
 ];
 
 describe("statusFromOpenDataFailure", () => {
@@ -26,11 +33,18 @@ describe("statusFromOpenDataFailure", () => {
     ["resource-too-large", 413],
     ["ckan-action-failed", 502],
     ["resource-unreachable", 502],
+    ["resource-authorization-required", 502],
+    ["ckan-unreachable", 502],
+    ["resource-empty", 409],
     ["resource-is-remote-api", 409],
     ["resource-format-unsupported", 409],
     ["resource-format-changed", 409],
     ["resource-host-mismatch", 409],
     ["access-shape-invalid", 409],
+    ["freshness-probe-invalid", 409],
+    ["odata-unreachable", 502],
+    ["odata-response-invalid", 502],
+    ["odata-empty", 409],
   ] as const)("maps %s to %i", (code, status) => {
     expect(statusFromOpenDataFailure(code)).toBe(status);
   });

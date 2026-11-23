@@ -54,6 +54,47 @@ describe("makeChatToolConfigFromOptions", () => {
       "labelColumnId",
       "attributes",
       "manualEntryAttributes",
+      "statuses",
+      "defaultStatusName",
+    ]);
+  });
+
+  it("limits proposed statuses to 12 with palette colors", () => {
+    const config = makeChatToolConfigFromOptions({
+      clarificationCapReached: false,
+      app: "case-manager",
+    });
+    const tools = config.tools as Array<{
+      function: {
+        name: string;
+        parameters: {
+          properties: {
+            statuses?: {
+              maxItems: number;
+              items: {
+                required: string[];
+                properties: { color: { enum: string[] } };
+              };
+            };
+          };
+        };
+      };
+    }>;
+    const statuses = tools.find((tool) => {
+      return tool.function.name === "proposeCaseType";
+    })?.function.parameters.properties.statuses;
+
+    expect(statuses?.maxItems).toBe(12);
+    expect(statuses?.items.required).toEqual(["name", "description"]);
+    expect(statuses?.items.properties.color.enum).toEqual([
+      "#637c95",
+      "#40c057",
+      "#228be6",
+      "#12b886",
+      "#fab005",
+      "#fd7e14",
+      "#fa5252",
+      "#be4bdb",
     ]);
   });
 
@@ -119,4 +160,90 @@ describe("makeChatToolConfigFromOptions", () => {
       dashboard?.function.parameters.properties.sql?.description,
     ).not.toContain("dataset ids");
   });
+
+  it("tells proposeCaseType which column types sum, avg, max, and min need", () => {
+    const config = makeChatToolConfigFromOptions({
+      clarificationCapReached: false,
+      app: "case-manager",
+    });
+    const tools = config.tools as Array<{
+      function: {
+        name: string;
+        parameters: {
+          properties: {
+            attributes?: {
+              items: {
+                properties: { valuePickerRuleType?: { description: string } };
+              };
+            };
+          };
+        };
+      };
+    }>;
+    const propose = tools.find((tool) => {
+      return tool.function.name === "proposeCaseType";
+    });
+    const ruleDescription =
+      propose?.function.parameters.properties.attributes?.items.properties
+        .valuePickerRuleType?.description;
+
+    expect(ruleDescription).toContain(
+      "sum and avg need a bigint or double column",
+    );
+    expect(ruleDescription).toContain(
+      "max and min never apply to a boolean column",
+    );
+  });
+
+  it("lets proposeCaseType mark a field as keeping every value", () => {
+    const attributeSchema = _getProposeCaseTypeAttributeSchema();
+
+    expect(attributeSchema?.properties.valueShape?.enum).toEqual([
+      "single",
+      "list",
+      "bucketed_list",
+    ]);
+    expect(attributeSchema?.required).toContain("valueShape");
+  });
+
+  it("lets proposeCaseType keep a field per day, week, month, quarter, or year", () => {
+    const attributeSchema = _getProposeCaseTypeAttributeSchema();
+
+    expect(attributeSchema?.properties.bucketGrain?.enum).toEqual([
+      "day",
+      "week",
+      "month",
+      "quarter",
+      "year",
+    ]);
+    expect(attributeSchema?.properties.bucketColumnId?.type).toBe("string");
+    expect(attributeSchema?.required).not.toContain("bucketGrain");
+    expect(attributeSchema?.required).not.toContain("bucketColumnId");
+  });
 });
+
+type _AttributeSchema = {
+  properties: Record<
+    string,
+    { type?: string; enum?: readonly string[] } | undefined
+  >;
+  required: readonly string[];
+};
+
+function _getProposeCaseTypeAttributeSchema(): _AttributeSchema | undefined {
+  const config = makeChatToolConfigFromOptions({
+    clarificationCapReached: false,
+    app: "case-manager",
+  });
+  const tools = config.tools as Array<{
+    function: {
+      name: string;
+      parameters: {
+        properties: { attributes?: { items: _AttributeSchema } };
+      };
+    };
+  }>;
+  return tools.find((tool) => {
+    return tool.function.name === "proposeCaseType";
+  })?.function.parameters.properties.attributes?.items;
+}

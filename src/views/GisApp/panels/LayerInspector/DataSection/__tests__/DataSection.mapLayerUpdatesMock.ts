@@ -181,6 +181,13 @@ function _withGeometryEncoding(options: {
   return _patchGeoBinding(options.layer, { encoding: options.encoding });
 }
 
+function _withGeometrySourceCrs(options: {
+  layer: MapLayer.T;
+  sourceCrs: number | undefined;
+}): MapLayer.T {
+  return _patchGeoBinding(options.layer, { sourceCrs: options.sourceCrs });
+}
+
 function _withGeometryFamily(options: {
   layer: MapLayer.T;
   family: MapLayer.GeometryFamily;
@@ -239,6 +246,7 @@ export function createDataSectionMapLayerUpdatesMock(): {
       withGeometryColumn: _withGeometryColumn,
       withGeometryEncoding: _withGeometryEncoding,
       withGeometryFamily: _withGeometryFamily,
+      withGeometrySourceCrs: _withGeometrySourceCrs,
       withGeometrySimplification: _withGeometrySimplification,
       withBoundaryJoin: _withBoundaryJoin,
       withGridBin: _withGridBin,

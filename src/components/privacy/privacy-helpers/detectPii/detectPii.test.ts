@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { detectPii } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
+import {
+  detectPii,
+  isPersonalDataText,
+} from "@/components/privacy/privacy-helpers/detectPii/detectPii";
 
 describe("detectPii", () => {
   describe("clean cases", () => {
@@ -135,6 +138,19 @@ describe("detectPii", () => {
     it("isMedical=false for non-medical PII", () => {
       expect(detectPii({ columnName: "patient_email" }).isMedical).toBe(true);
       expect(detectPii({ columnName: "email" }).isMedical).toBe(false);
+    });
+  });
+
+  describe("isPersonalDataText", () => {
+    it("flags text with a personal-data value in it", () => {
+      expect(isPersonalDataText("jane.doe@example.com")).toBe(true);
+      expect(isPersonalDataText("Calls to 555-123-4567")).toBe(true);
+    });
+
+    it("passes ordinary text", () => {
+      expect(isPersonalDataText("Texas")).toBe(false);
+      expect(isPersonalDataText("Deaths by state")).toBe(false);
+      expect(isPersonalDataText("")).toBe(false);
     });
   });
 });

@@ -26,7 +26,6 @@
         "title": "From question to query",
         "category": "motion-product",
         "evidence": "Architectural illustration \u00b7 Fictional demonstration data",
-        "accent": "#82c8f2",
         "beats": [
           {
             "id": "intent",
@@ -158,19 +157,19 @@
                     [
                       {
                         "text": "SELECT district_name, COUNT(*)",
-                        "color": "#edf7f4"
+                        "color": "$color.text"
                       }
                     ],
                     [
                       {
                         "text": "FROM harborfield_cases",
-                        "color": "#82c8f2"
+                        "color": "$color.accentAlt"
                       }
                     ],
                     [
                       {
                         "text": "GROUP BY district_name;",
-                        "color": "#9fefca"
+                        "color": "$color.accent"
                       }
                     ]
                   ],

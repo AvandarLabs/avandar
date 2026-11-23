@@ -1,4 +1,4 @@
-import { ConsentSlip } from "./ConsentSlip";
+import { ConsentSlip } from "./ConsentSlip/ConsentSlip";
 import { ConsentTurningHand } from "./ConsentTurningHand";
 import type { Input } from "./ReferralConsentWithdrawal.schema";
 import type { ReactNode } from "react";
@@ -13,16 +13,18 @@ export function ConsentSlips({
   return (
     <g>
       <ConsentTurningHand frame={frame} input={input} accent={accent} />
-      {input.permissions.map((permission, index) => (
-        <ConsentSlip
-          key={permission.id}
-          permission={permission}
-          index={index}
-          frame={frame}
-          input={input}
-          accent={accent}
-        />
-      ))}
+      {input.permissions.map((permission, index) => {
+        return (
+          <ConsentSlip
+            key={permission.id}
+            permission={permission}
+            index={index}
+            frame={frame}
+            input={input}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

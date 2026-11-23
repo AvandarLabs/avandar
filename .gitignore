@@ -29,10 +29,12 @@ dist-ssr
 .env.*
 !.env.example
 !.env.example.edge
+!.env.pipelines.example
+!.env.pipeline-server.prod.example
+!.env.video-producer.example
 *client_secret*
 
-# Ignorable development files 
-.eslintcache
+# Ignorable development files
 __pycache__/
 
 # Supabase

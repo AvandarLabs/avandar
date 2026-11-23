@@ -30,8 +30,23 @@ with public_tables as (
     public_tables
   where
     table_name not in (
-      'catalog_entries__dataset_column',
-      'catalog_entries__open_data',
+      'activity_events',
+      'comment_gadget_refs',
+      'comment_mentions',
+      'comment_revisions',
+      'comments',
+      'connections',
+      'connections__postgres',
+      'data_catalog_drives',
+      'data_catalog_facet_counts',
+      'data_catalog_listings__relation_columns',
+      'data_catalog_listings',
+      'datasets__postgres_table',
+      'map_jitter_salts',
+      -- Service role only: no `authenticated` grant at all.
+      'pipeline_execution_scopes',
+      'pipeline_executions',
+      'pipeline_scope_checkpoints',
       'subscriptions',
       'usage_analytics_events',
       'user_group_memberships',
@@ -46,6 +61,17 @@ with public_tables as (
   from
     public_tables
     cross join unnest(array['DELETE', 'INSERT', 'SELECT', 'UPDATE']) as privileges (privilege_type)
+  where
+    -- Scope rows are insert-only, so the service role has no `UPDATE`.
+    table_name <> 'pipeline_execution_scopes'
+  union all
+  select
+    'pipeline_execution_scopes',
+    'service_role',
+    privilege_type,
+    false
+  from
+    unnest(array['DELETE', 'INSERT', 'SELECT']) as privileges (privilege_type)
   union all
   select
     table_name,
@@ -65,11 +91,27 @@ with public_tables as (
     public_tables
   where
     table_name in (
-      'catalog_entries__dataset_column',
-      'catalog_entries__open_data',
+      'activity_events',
+      'comment_gadget_refs',
+      'comment_mentions',
+      'connections',
+      'connections__postgres',
+      'data_catalog_drives',
+      'data_catalog_facet_counts',
+      'map_jitter_salts',
+      'data_catalog_listings__relation_columns',
+      'data_catalog_listings',
       'subscriptions',
       'usage_analytics_events'
     )
+  union all
+  select
+    'comments',
+    'authenticated',
+    privilege_type,
+    false
+  from
+    unnest(array['INSERT', 'SELECT']) as privileges (privilege_type)
   union all
   select
     'user_group_memberships',
@@ -86,6 +128,16 @@ with public_tables as (
     false
   from
     unnest(array['INSERT', 'SELECT', 'UPDATE']) as privileges (privilege_type)
+  union all
+  -- No `update`: a Postgres satellite row names the table everyone who can
+  -- see its dataset reads, and no signed-in user may change it.
+  select
+    'datasets__postgres_table',
+    'authenticated',
+    privilege_type,
+    false
+  from
+    unnest(array['DELETE', 'INSERT', 'SELECT']) as privileges (privilege_type)
   union all
   select
     'dashboards',
@@ -143,6 +195,22 @@ with expected_column_privileges as (
         'payload',
         'user_id',
         'workspace_id'
+      ]
+    ) as columns (column_name)
+  union all
+  select
+    'comments'::text as table_name,
+    column_name,
+    'authenticated'::text as grantee,
+    'UPDATE'::text as privilege_type,
+    false as is_grantable
+  from
+    unnest(
+      array[
+        'body',
+        'body_schema_version',
+        'body_text',
+        'deleted_at'
       ]
     ) as columns (column_name)
 ), actual_column_privileges as (

@@ -2,7 +2,7 @@ import {
   MarkdownTextPrimitive,
   unstable_memoizeMarkdownComponents as memoizeMarkdownComponents,
 } from "@assistant-ui/react-markdown";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import remarkGfm from "remark-gfm";
 import { MarkdownCodeHeader } from "@/components/ChatPanel/ChatThread/MarkdownCodeHeader/MarkdownCodeHeader";
 import { ChatSyntaxHighlighterRouter } from "./ChatSyntaxHighlighterRouter";

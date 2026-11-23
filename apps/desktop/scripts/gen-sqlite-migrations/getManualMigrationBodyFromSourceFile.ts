@@ -67,7 +67,7 @@ alter table "dashboards" add column "snapshot_transition_prior_revision" text;
 alter table "dashboards" add column "snapshot_transition_prior_visibility" text;
 alter table "dashboards" add column "snapshot_transition_target_visibility" text;
 `,
-  "20260819053812_generalize_open_data_catalog_access.sql": `-- SQLite override. The Postgres migration relaxes three NOT NULL columns, which
+  "20260819130000_generalize_open_data_catalog_access.sql": `-- SQLite override. The Postgres migration relaxes three NOT NULL columns, which
 -- SQLite's ALTER TABLE cannot do: it supports RENAME / ADD COLUMN / DROP COLUMN
 -- only, so the table is rebuilt. The generator routes ALTER COLUMN to
 -- needsHandEdit for exactly this reason.
@@ -184,6 +184,128 @@ create unique index "catalog_entries__open_data__api_resource_unique" on "catalo
 )
 where
   "access_kind" = 'api_resource';
+`,
+  "20261021204651_add_pipeline_scope_checkpoints.sql": `-- SQLite override. The Postgres column is \`text[] not null default '{}'::text[]\`.
+-- sqlglot renders that default as \`CAST('{}' AS ARRAY<TEXT>)\`, and transpile.ts
+-- strips every \`DEFAULT <fn>(...)\`, so the generated column is \`TEXT NOT NULL\`
+-- with no default. SQLite refuses to add a NOT NULL column with no default to a
+-- table that already holds rows. \`data_catalog_listings\` is listed in
+-- apps/desktop/sync/syncable-tables.ts, and the desktop applies migrations to a
+-- saved database that already holds synced listings, so the generated statement
+-- would fail and roll back the whole migration batch on every existing install.
+--
+-- The default is \`'[]'\` rather than \`'{}'\` because the mirror stores arrays as
+-- JSON text: \`_bindValues\` in
+-- apps/desktop/main/services/SnapshotBootstrap/SnapshotBootstrap.ts and
+-- \`_serializeRowValues\` in
+-- packages/shared/clients/src/SqliteCrudClient/createSqliteCrudClient.ts both
+-- \`JSON.stringify\` every array value they write.
+--
+-- The migration's \`pipeline_scope_checkpoints\` table is not created here. It is
+-- in \`EXCLUDED_TABLES\` in apps/desktop/sync/syncable-tables.ts, so its CREATE
+-- TABLE, primary key, RLS, grants, and trigger have no place in the mirror.
+--
+-- apps/desktop/scripts/gen-sqlite-migrations does not flag this case:
+-- partition.ts routes only ADD CONSTRAINT and ALTER COLUMN to needsHandEdit,
+-- and this statement is ADD COLUMN.
+--
+alter table "data_catalog_listings" add column "pipeline_scope_keys" text not null default '[]';
+`,
+  "20261107180000_catalog_field_mapping.sql": `-- SQLite override. The Postgres migration drops \`search_vector\` and its GIN
+-- index before renaming \`external_organization_name\`, because the generated
+-- column reads it, then adds both back. The generator transpiles the drops but
+-- skips the generated column, so SQLite never had \`search_vector\`. It also
+-- emits \`DROP COLUMN IF EXISTS\`, which SQLite rejects as a syntax error, so
+-- the whole migration batch would fail on every install. This body is the
+-- generated output without those two drops.
+--
+-- The foreign key from \`data_catalog_listings.drive_id\` to
+-- \`data_catalog_drives\` is not inlined, the same as every other
+-- \`ADD CONSTRAINT\` the generator reports as needing a hand-edit.
+--
+ALTER TABLE "data_catalog_listings" RENAME COLUMN "external_organization_name" TO "organization1_name";
+
+CREATE TABLE "data_catalog_drives" ("id" UUID NOT NULL, "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "pipeline_name" TEXT NOT NULL, "drive_key" TEXT NOT NULL, "organization1_label" TEXT, "organization2_label" TEXT, "organization3_label" TEXT, "organization4_label" TEXT);
+
+ALTER TABLE "data_catalog_listings" ADD COLUMN "domains" TEXT;
+
+ALTER TABLE "data_catalog_listings" ADD COLUMN "drive_id" UUID;
+
+ALTER TABLE "data_catalog_listings" ADD COLUMN "organization2_name" TEXT;
+
+ALTER TABLE "data_catalog_listings" ADD COLUMN "organization3_name" TEXT;
+
+ALTER TABLE "data_catalog_listings" ADD COLUMN "organization4_name" TEXT;
+
+ALTER TABLE "data_catalog_listings" ADD COLUMN "source_metadata" JSONB;
+
+ALTER TABLE "data_catalog_listings" ADD COLUMN "tags" TEXT;
+
+CREATE UNIQUE INDEX data_catalog_drives__pipeline_drive_unique ON data_catalog_drives(pipeline_name, drive_key);
+
+CREATE UNIQUE INDEX data_catalog_drives_pkey ON data_catalog_drives(id);
+
+CREATE INDEX data_catalog_listings__drive_id ON data_catalog_listings(drive_id);
+
+CREATE INDEX data_catalog_listings__organization_levels ON data_catalog_listings(organization1_name, organization2_name);
+`,
+  "20261109030001_list_field_value_rules.sql": `-- SQLite override. The Postgres migration relaxes NOT NULL on
+-- \`value_picker_rule_type\`, which SQLite's ALTER TABLE cannot do: it supports
+-- RENAME / ADD COLUMN / DROP COLUMN only, so the table is rebuilt. The
+-- generator routes ALTER COLUMN to needsHandEdit for exactly this reason.
+--
+-- Relaxing it is not cosmetic drift. \`attribute_mappings__dataset_column\` is
+-- listed in apps/desktop/sync/syncable-tables.ts, so rows arrive here from
+-- Postgres, and a field that keeps every value stores no value rule. Left NOT
+-- NULL, its insert would fail on the desktop client only.
+--
+-- The rebuilt table keeps the column order, declared types, and index names the
+-- earlier generated migrations gave it. The Postgres function body has no
+-- SQLite equivalent and is dropped, like every other function.
+--
+create table "attribute_mappings__dataset_column__rebuild" (
+  "id" UUID NOT NULL,
+  "workspace_id" UUID NOT NULL,
+  "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "concept_attribute_id" UUID NOT NULL,
+  "value_picker_rule_type" value_extractors__value_picker_rule_type,
+  "dataset_id" UUID NOT NULL,
+  "dataset_column_id" UUID NOT NULL
+);
+
+insert into
+  "attribute_mappings__dataset_column__rebuild" (
+    "id",
+    "workspace_id",
+    "created_at",
+    "updated_at",
+    "concept_attribute_id",
+    "value_picker_rule_type",
+    "dataset_id",
+    "dataset_column_id"
+  )
+select
+  "id",
+  "workspace_id",
+  "created_at",
+  "updated_at",
+  "concept_attribute_id",
+  "value_picker_rule_type",
+  "dataset_id",
+  "dataset_column_id"
+from
+  "attribute_mappings__dataset_column";
+
+drop table "attribute_mappings__dataset_column";
+
+alter table "attribute_mappings__dataset_column__rebuild" rename to "attribute_mappings__dataset_column";
+
+create unique index "value_extractors__dataset_column_value_pkey" on "attribute_mappings__dataset_column" ("id");
+
+create unique index "value_extractors__dataset_column_val_entity_field_config_id_key" on "attribute_mappings__dataset_column" ("concept_attribute_id");
+
+create index "idx_attribute_mappings__dataset_column__attribute_workspace" on "attribute_mappings__dataset_column" ("concept_attribute_id", "workspace_id");
 `,
 };
 

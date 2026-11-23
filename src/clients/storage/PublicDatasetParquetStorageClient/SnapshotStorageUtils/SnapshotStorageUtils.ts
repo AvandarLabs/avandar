@@ -1,3 +1,4 @@
+import type { AvaMap } from "$/models/AvaMap/AvaMap";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
@@ -62,6 +63,27 @@ function _getPublicDatasetParquetStoragePath(
   return `dashboards/${dashboardId}/revisions/${snapshotRevision}/datasets/${datasetId}.parquet`;
 }
 
+/** Gets the folder holding one snapshot generation's map snapshots. */
+function _getPublicMapSnapshotFolder(
+  options: Readonly<{ dashboardId: Dashboard.Id; snapshotRevision: string }>,
+): string {
+  return `dashboards/${options.dashboardId}/revisions/${options.snapshotRevision}/maps`;
+}
+
+/**
+ * Gets the object storage path for a published map snapshot. Maps were never
+ * published before revision folders existed, so there is no legacy form.
+ */
+function _getPublicMapSnapshotStoragePath(
+  options: Readonly<{
+    dashboardId: Dashboard.Id;
+    snapshotRevision: string;
+    mapId: AvaMap.Id;
+  }>,
+): string {
+  return `${_getPublicMapSnapshotFolder(options)}/${options.mapId}.json`;
+}
+
 /** Storage constants and path helpers for immutable dashboard snapshots. */
 export const SnapshotStorageUtils = {
   /** Reserved revision for snapshots stored before generation folders. */
@@ -77,4 +99,8 @@ export const SnapshotStorageUtils = {
   getSnapshotBucketNameFromVisibility: _getSnapshotBucketNameFromVisibility,
   /** Gets the object path for a published dataset parquet file. */
   getPublicDatasetParquetStoragePath: _getPublicDatasetParquetStoragePath,
+  /** Gets the folder holding one generation's map snapshots. */
+  getPublicMapSnapshotFolder: _getPublicMapSnapshotFolder,
+  /** Gets the object path for a published map snapshot. */
+  getPublicMapSnapshotStoragePath: _getPublicMapSnapshotStoragePath,
 };

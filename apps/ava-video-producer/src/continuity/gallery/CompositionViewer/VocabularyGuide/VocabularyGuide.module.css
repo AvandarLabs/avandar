@@ -1,78 +1,78 @@
 .vocabularyGuide {
-  border-top: 1px solid #c8cec4;
-  margin-top: 20px;
-  padding-top: 20px;
+  border-top: var(--atlas-border-1) solid var(--line);
+  margin-top: var(--atlas-space-20);
+  padding-top: var(--atlas-space-20);
 }
 
 .vocabularyGuide h3 {
-  font-size: 22px;
-  font-weight: 500;
-  margin: 0 0 18px;
+  font-size: var(--atlas-font-size-22);
+  font-weight: var(--atlas-font-weight-500);
+  margin: 0 0 var(--atlas-space-18);
 }
 
 .vocabularyGuide h4 {
-  font-size: 17px;
-  font-weight: 600;
-  margin: 24px 0 8px;
+  font-size: var(--atlas-font-size-17);
+  font-weight: var(--atlas-font-weight-600);
+  margin: var(--atlas-space-24) 0 var(--atlas-space-8);
 }
 
 .vocabularyGuide p {
-  color: #4b5b52;
+  color: var(--atlas-color-muted);
   line-height: 1.5;
 }
 
 .vocabularyGuideAdvice {
   display: grid;
-  gap: 28px;
+  gap: var(--atlas-space-28);
   grid-template-columns: 1fr 1fr;
   margin: 0;
 }
 
 .vocabularyGuideAdvice dt {
-  font-weight: 600;
-  margin-bottom: 8px;
+  font-weight: var(--atlas-font-weight-600);
+  margin-bottom: var(--atlas-space-8);
 }
 
 .vocabularyGuideAdvice dd {
-  color: #4b5b52;
+  color: var(--atlas-color-muted);
   line-height: 1.5;
   margin: 0;
 }
 
 .vocabularyGuideControls {
   list-style: none;
-  margin: 16px 0;
+  margin: var(--atlas-space-16) 0;
   padding: 0;
 }
 
 .vocabularyGuideControls li {
-  border-bottom: 1px solid #d5dad1;
-  padding: 14px 0;
+  border-bottom: var(--atlas-border-1) solid var(--line);
+  padding: var(--atlas-space-14) 0;
 }
 
 .vocabularyGuideControls strong {
   display: block;
-  margin-bottom: 6px;
+  margin-bottom: var(--atlas-space-6);
 }
 
 .vocabularyGuideControls code {
-  color: #246650;
+  color: var(--accent);
   display: block;
-  font-size: 13px;
+  font-size: var(--atlas-font-size-13);
   overflow-wrap: anywhere;
 }
 
 .vocabularyGuideControls p {
-  margin: 8px 0 0;
+  margin: var(--atlas-space-8) 0 0;
 }
 
 .vocabularyGuideSource {
-  margin-top: 20px;
+  margin-top: var(--atlas-space-20);
 }
 
 @media (width <= 700px) {
   .vocabularyGuideAdvice {
-    gap: 20px;
+    gap: var(--atlas-space-20);
     grid-template-columns: 1fr;
   }
 }

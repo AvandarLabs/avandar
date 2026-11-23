@@ -1,0 +1,17 @@
+{
+  "label": "d04:h06#4",
+  "questionCount": 1,
+  "passCount": 1,
+  "needlessQuestions": 0,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 1,
+  "promptTokens": 2699,
+  "cachedPromptTokens": 2695,
+  "completionTokens": 610,
+  "totalCost": 0.00033235,
+  "costPerQuestion": 0.00033235,
+  "latencyMedianMs": 2912.899375,
+  "latencyP90Ms": 2912.899375,
+  "failedIds": []
+}

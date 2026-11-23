@@ -141,23 +141,59 @@ Implement functionality using red/green TDD.
 
 ## Supabase
 
-- To update the schema or data models, use the `supabase-declarative-schema` skill.
+To update the schema or data models, use the `supabase-declarative-schema` skill.
 
-### Check the switch BEFORE any database command
+Every worktree uses the shared `avandar` stack by default, and most branches should
+stay there. New local stacks can be built using `ava supabase switch`.
+
+### Switch only when the branch changes what the local stack is built from
+
+Each switch runs a full Supabase Docker stack of its own, so a switch the branch
+does not need only adds load to the machine. So stick to the shared `avandar` stack
+unless an isolated local instance is required (i.e. a 'switch').
+
+Use `ava supabase switch` to create a new switch. This will set up a new local
+Supabase stack and connect the current branch to that stack instead of the shared
+local `avandar` stack.
+
+A switch must be done when you are on a branch other than `develop`,
+and BEFORE you edit a committed file that defines how the local stack is built:
+
+- A migration, or any change under `supabase/schemas/`.
+- Adding or removing a storage bucket, or changing a storage policy. This repo
+  creates buckets in `*_STORAGE-*.sql` migrations that `[db.seed] sql_paths`
+  replays after every reset.
+- A change to `supabase/config.toml`, including the `[functions.*]` block a
+  new edge function adds, or to the `supabase` CLI version in `package.json`,
+  which changes the Docker images the stack runs.
+- A change to the seed definitions under `seed/`, since verifying it takes a
+  `pnpm db:reset` or `pnpm db:seed`.
+
+Writing data is not on this list. Creating, editing, or deleting rows through
+the app, a script, a test, or SQL changes what is stored in the shared
+database, not how the stack is built, so it stays on the shared stack. So do
+app, edge function, and server code changes, `pnpm test:db` (it runs inside
+rolled-back transactions), and end-to-end tests.
+
+`ava supabase status` reads yellow for every unswitched branch other than
+`develop` and advises a switch. On a branch that changes none of the above,
+that yellow line is expected. Do not switch just to clear it.
+
+### Check the switch BEFORE any command that rebuilds, resets, or reseeds
 
 This is a stop condition, not a preference. On any branch other than `develop`,
-before running `pnpm db:new-migration`, `pnpm db:reset`, `pnpm test:db`,
+before running `pnpm db:new-migration`, `pnpm db:reset`, `pnpm db:seed`,
 `supabase start`, `supabase stop`, or `supabase db diff`:
 
 1. Run `ava supabase status`.
 2. Confirm it reports this worktree on its own switched project, not on the
-   shared `avandar` stack. The first line reads yellow when the switch state is
-   wrong for the branch.
-3. If it is not switched, run `ava supabase switch` and re-check. Do not run the
-   command you were about to run until status reads green.
+   shared `avandar` stack.
+3. If it is not switched and the branch makes one of the changes listed above,
+   run `ava supabase switch` and re-check. If the branch makes none of them, it
+   has no reason to run the command: stop and ask the user instead.
 
 **Never run any of those commands from a worktree while it points at the shared
-`avandar` stack.** They stop, rebuild, or reset the one stack that every
+`avandar` stack.** They stop, rebuild, reset, or reseed the one stack that every
 unswitched worktree is using, so the blast radius is every other branch in
 progress, not just this one.
 
@@ -176,9 +212,11 @@ hooks reject a branch-scoped config, and a half-switched worktree points some
 tools at one project and some at another.
 
 A switch rewrites `supabase/config.toml` with a branch project id and its own
-ports. That file must never be staged. Commit the files your change touched by
-path rather than with `git add -A`, and run `ava supabase restore` before any
-authorized merge to `develop`.
+ports. Never stage that rewrite. When the branch also changes `config.toml` on
+purpose, stage only that change: the pre-commit hook rejects a staged
+`config.toml` whose project id or ports are not the standard ones. Commit the
+files your change touched by path rather than with `git add -A`, and run
+`ava supabase restore` before any authorized merge to `develop`.
 
 ### Migrations
 
@@ -194,8 +232,9 @@ authorized merge to `develop`.
   that migration deletes another branch's work, or production's, when it runs.
   A generated migration that drops anything you did not touch is this bug until
   proven otherwise: reset, regenerate, and compare before trusting it.
-- Before any database migration or schema work on a branch other than
-  `develop`, create an isolated local Supabase instance with
+- Before any change to what the local stack is built from (see "Switch only
+  when the branch changes what the local stack is built from") on a branch
+  other than `develop`, create an isolated local Supabase instance with
   `ava supabase switch`, even when no local Supabase instance is running.
   With no project id, the command kebab-cases the current branch: lowercase
   it, replace each run of characters outside `a-z`, `0-9`, and `_` with `-`,
@@ -214,9 +253,10 @@ authorized merge to `develop`.
 - Run `ava supabase status` to see whether the current worktree is on the
   shared `avandar` stack or on a switched project, along with its ports, keys,
   endpoints, and whether the development environment files still match the
-  running stack. Its first line reads green when the switch state is the right
-  one for the branch (`develop` on the shared stack, every other branch
-  switched) and yellow when it is not.
+  running stack. Its first line reads green for `develop` on the shared stack
+  or for a switched branch, and yellow otherwise. A yellow line on an
+  unswitched branch that does not change what the stack is built from is
+  expected.
 - Keep the switched local instance active unless the user explicitly asks to
   merge into `develop`. When an authorized merge to `develop` is requested, run
   `ava supabase restore` before staging, committing, or merging, then verify

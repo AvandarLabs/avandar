@@ -1,8 +1,6 @@
 import { GlobalAppConfig } from "$/config/GlobalAppConfig";
-import { getGoogleSheetVersion } from "@/clients/google/GoogleDriveClient/GoogleDriveClient";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { SourceVersion } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
-import type { GoogleDriveFetch } from "@/clients/google/GoogleDriveClient/GoogleDriveClient.types";
 
 /** One dataset's last known version and when it was read. */
 type FreshnessEntry = { checkedAt: number; version: SourceVersion };
@@ -34,20 +32,22 @@ export const GOOGLE_SHEET_FRESHNESS_CACHE: GoogleSheetFreshnessCache =
  * Reads a Google Sheet's source version, reusing a recent read.
  *
  * Inside the debounce window the last known version is returned without calling
- * Drive. Outside it, Drive is called once and the entry is replaced.
+ * `readVersion`. Outside it, `readVersion` is called once and the entry is
+ * replaced.
  *
- * Nothing here is Sheets-specific beyond the name and the default reader, so a
- * second `version-token` source can reuse the same policy.
+ * Nothing here is Sheets-specific beyond the name, so a second
+ * `version-token` source can reuse the same policy.
  *
- * @param params The dataset and file to check, the cache and clock to check
- * against, and the reader to check with.
+ * @param params The dataset to check, the reader to check it with, and the
+ * cache and clock to check against.
  * @returns The dataset's source version, cached or freshly read.
  */
 export async function getGoogleSheetFreshness(
   params: Readonly<{
     datasetId: DatasetId;
-    fileId: string;
-    accessToken: string;
+
+    /** Reads the dataset's current version, uncached. */
+    readVersion: () => Promise<SourceVersion>;
     cache?: GoogleSheetFreshnessCache;
 
     /**
@@ -56,7 +56,6 @@ export async function getGoogleSheetFreshness(
      */
     now?: () => number;
     debounceMs?: number;
-    driveFetch?: GoogleDriveFetch;
   }>,
 ): Promise<SourceVersion> {
   const cache = params.cache ?? GOOGLE_SHEET_FRESHNESS_CACHE;
@@ -69,17 +68,13 @@ export async function getGoogleSheetFreshness(
     return cached.version;
   }
 
-  const version = await getGoogleSheetVersion({
-    fileId: params.fileId,
-    accessToken: params.accessToken,
-    driveFetch: params.driveFetch,
-  });
+  const version = await params.readVersion();
   cache.set(params.datasetId, { checkedAt: now, version });
   return version;
 }
 
 /**
- * Forgets one dataset's cached version, so the next check calls Drive.
+ * Forgets one dataset's cached version, so the next check reads it again.
  *
  * This is what the explicit "Refresh from Google Sheets" action uses: a user
  * who has just edited a sheet must not be told it is unchanged because they

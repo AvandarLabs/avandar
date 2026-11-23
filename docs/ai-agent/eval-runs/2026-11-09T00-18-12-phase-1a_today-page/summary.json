@@ -1,0 +1,17 @@
+{
+  "label": "phase-1a:today-page",
+  "questionCount": 3,
+  "passCount": 2,
+  "needlessQuestions": 1,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 4,
+  "promptTokens": 46338,
+  "cachedPromptTokens": 0,
+  "completionTokens": 2119,
+  "totalCost": 0.0056933,
+  "costPerQuestion": 0.0018977666666666667,
+  "latencyMedianMs": 6346.279208999997,
+  "latencyP90Ms": 7085.361124999999,
+  "failedIds": ["P01"]
+}

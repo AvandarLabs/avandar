@@ -1,3 +1,5 @@
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -6,6 +8,9 @@ type Props = {
   second: string;
   accent: string;
 };
+/** Luminance mask values that keep or drop a region, not colours. */
+const MASK_SHOWN = "white";
+const MASK_HIDDEN = "black";
 /** Layer Definitions for the authored scene. */
 export function LayerDefinitions({
   identity,
@@ -13,6 +18,8 @@ export function LayerDefinitions({
   second,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <defs>
       <clipPath id={`${identity}-a`}>
@@ -29,8 +36,8 @@ export function LayerDefinitions({
         width={520}
         height={350}
       >
-        <rect x={30} y={140} width={520} height={350} fill="white" />
-        <path d={second} fill="black" />
+        <rect x={30} y={140} width={520} height={350} fill={MASK_SHOWN} />
+        <path d={second} fill={MASK_HIDDEN} />
       </mask>
       <pattern
         id={`${identity}-hatch`}
@@ -38,7 +45,12 @@ export function LayerDefinitions({
         height={8}
         patternUnits="userSpaceOnUse"
       >
-        <path d="M0 8 L8 0" stroke={accent} strokeWidth={1.5} />
+        <SketchedShape
+          shape={{ kind: "path", d: "M0 8 L8 0" }}
+          profile={tokens.sketch.shape}
+          stroke={accent}
+          strokeWidth={scales.stroke(tokens.stroke.outline)}
+        />
       </pattern>
     </defs>
   );

@@ -4,9 +4,13 @@ import { NewBoilerplateCli } from "@ava-cli/DevCli/NewBoilerplateCli/NewBoilerpl
 import { PipelineCli } from "@ava-cli/PipelineCli/PipelineCli";
 import { PolarCli } from "@ava-cli/PolarCli/PolarCli";
 import { ReleaseCli } from "@ava-cli/ReleaseCli/ReleaseCli";
-import { SupabaseCli } from "@ava-cli/SupabaseCli/SupabaseCli";
+import {
+  SUPABASE_COMMAND_HELP_SPECS,
+  SupabaseCli,
+} from "@ava-cli/SupabaseCli/SupabaseCli";
 import { assertCliIsUpToDate } from "@ava-cli/utils/assertCliIsUpToDate/assertCliIsUpToDate";
 import { printError } from "@ava-cli/utils/cliOutput/cliOutput";
+import { CommandHelp } from "@ava-cli/utils/CommandHelp/CommandHelp";
 import { Acclimate } from "@avandar/acclimate";
 
 // Declared globally rather than per command: pointing the CLI at a deployment
@@ -37,6 +41,19 @@ const cli = Acclimate.createCLI("ava")
   .addCommand("polar", PolarCli)
   .addCommand("release", ReleaseCli)
   .addCommand("supabase", SupabaseCli);
+
+// Acclimate runs a command's action for `--help` and drops flags it does not
+// know, so commands with a help spec are handled first: help prints and exits
+// before any check or side effect, and an unknown flag is refused rather than
+// silently ignored. The root's own global options are part of every spec.
+const helpOutcome = CommandHelp.handleArgv({
+  argv: process.argv.slice(2),
+  specs: SUPABASE_COMMAND_HELP_SPECS,
+  rootCli: cli,
+});
+if (helpOutcome !== "continue") {
+  process.exit(helpOutcome === "printedHelp" ? 0 : 1);
+}
 
 // Nothing rebuilds `ava` automatically, so refuse to run stale code against the
 // repository. Acclimate has no pre-command hook, so this guards the entry

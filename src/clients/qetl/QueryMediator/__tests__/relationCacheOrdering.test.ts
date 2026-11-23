@@ -23,6 +23,7 @@ async function _seedCache(datasetId: Dataset.Id): Promise<void> {
     },
     columns: "all",
     payload: new Blob(["cached"]),
+    staleAt: undefined,
   });
 }
 
@@ -131,15 +132,17 @@ beforeAll(async () => {
 async function _runQueryForDependencies(
   dependencies: readonly Dataset.Id[],
 ): Promise<void> {
-  const mediator = QueryMediatorFactory.create({
-    getQueryDependencies: async () => {
-      return [...dependencies];
+  const mediator = QueryMediatorFactory.create("QueryMediator", {
+    state: {
+      getQueryDependencies: async () => {
+        return [...dependencies];
+      },
+      getDuckDbLeaseDatasetIds: async () => {
+        return [...dependencies];
+      },
+      relationCache,
+      principalKey: PRINCIPAL_KEY,
     },
-    getDuckDbLeaseDatasetIds: async () => {
-      return [...dependencies];
-    },
-    relationCache,
-    principalKey: PRINCIPAL_KEY,
   });
   await mediator.runQuery({ rawSql: "SELECT 1" });
 }

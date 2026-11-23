@@ -1,4 +1,4 @@
-import { FundingEnvelope } from "./FundingEnvelope";
+import { FundingEnvelope } from "./FundingEnvelope/FundingEnvelope";
 import type { getAllocationTokensFromInputAndFrame } from "./getAllocationTokensFromInputAndFrame";
 import type { Input } from "./PooledDonorAllocation.schema";
 import type { ReactNode } from "react";
@@ -19,20 +19,22 @@ export function FundingRequests({
 }: Readonly<Props>): ReactNode {
   return (
     <g>
-      {input.requests.map((request, index) => (
-        <FundingEnvelope
-          key={request.id}
-          input={input}
-          index={index}
-          allocatedCredits={
-            tokens.filter(
-              (token) => token.arrived && token.requestId === request.id,
-            ).length
-          }
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {input.requests.map((request, index) => {
+        return (
+          <FundingEnvelope
+            key={request.id}
+            input={input}
+            index={index}
+            allocatedCredits={
+              tokens.filter((token) => {
+                return token.arrived && token.requestId === request.id;
+              }).length
+            }
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

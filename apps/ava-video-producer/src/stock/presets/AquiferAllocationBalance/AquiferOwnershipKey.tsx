@@ -1,25 +1,26 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 /** Inputs for AquiferOwnershipKey. */
 type Props = { number: number; x: number; y: number };
-
 /** A stable visible number connects a physical route to its budget entry. */
 export function AquiferOwnershipKey({
   number,
   x,
   y,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <>
-      <circle
+      <SketchedShape
+        shape={{ kind: "circle", cx: x, cy: y, r: 10 }}
+        profile={tokens.sketch.shape}
         data-ownership-key={number}
-        cx={x}
-        cy={y}
-        r={10}
-        fill={STOCK.ground}
-        stroke={STOCK.muted}
-        strokeWidth={1}
+        fill={tokens.color.ground}
+        stroke={tokens.color.inactive}
+        strokeWidth={scales.stroke(tokens.stroke.hairline)}
       />
       <FitText
         text={String(number)}

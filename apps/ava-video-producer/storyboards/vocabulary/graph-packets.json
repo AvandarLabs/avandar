@@ -1,0 +1,133 @@
+{
+  "version": 1,
+  "id": "graph-packets",
+  "title": "Graph packets",
+  "description": "An editorial diagram whose heading wipes in, whose cards list their items inside corner-tick frames, and whose parallel arrowless edges carry packets in both directions before an arrowed edge delivers the result.",
+  "sourceNotes": [
+    "Scene study extracted from the shot vocabulary film; an illustrative architecture, not a claim about how Avandar moves data.",
+    "Source and entity names are fictional demonstration data."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1920,
+  "height": 1080,
+  "delivery": {
+    "width": 1920,
+    "height": 1080
+  },
+  "captions": false,
+  "shots": [
+    {
+      "id": "diagram",
+      "scene": "graph",
+      "durationInFrames": 210,
+      "transitionInFrames": 0,
+      "theme": {
+        "ground": "$atomic.swatch.slate50",
+        "foreground": "$atomic.swatch.slate900",
+        "muted-foreground": "$atomic.swatch.slate500",
+        "muted": "$atomic.swatch.slate300",
+        "border": "$atomic.swatch.slate300",
+        "card": "$white",
+        "brand-strong": "var(--brand)"
+      },
+      "props": {
+        "title": "An illustrative workspace",
+        "kicker": "Editorial diagram",
+        "headingReveal": {
+          "mode": "wipe",
+          "atFrame": 2,
+          "staggerFrames": 8
+        },
+        "nodes": [
+          {
+            "id": "sources",
+            "label": "Sources",
+            "x": 0,
+            "y": 0.5,
+            "width": 0.26,
+            "frame": "ticks",
+            "items": [
+              "Spreadsheet",
+              "CSV export",
+              "Form responses",
+              "Database table"
+            ]
+          },
+          {
+            "id": "workspace",
+            "label": "Workspace",
+            "x": 0.5,
+            "y": 0.5,
+            "width": 0.26,
+            "frame": "ticks",
+            "items": ["Cases", "Visits", "Facilities", "Districts"]
+          },
+          {
+            "id": "dashboard",
+            "label": "Dashboard",
+            "detail": "A shared view of the model",
+            "x": 1,
+            "y": 0.5,
+            "width": 0.2
+          }
+        ],
+        "edges": [
+          {
+            "id": "rows-a",
+            "from": "sources",
+            "to": "workspace",
+            "offset": -0.5,
+            "arrow": false,
+            "packets": [
+              {
+                "atFrame": 60,
+                "durationInFrames": 18
+              }
+            ]
+          },
+          {
+            "id": "rows-b",
+            "from": "sources",
+            "to": "workspace",
+            "offset": 0,
+            "arrow": false,
+            "packets": [
+              {
+                "atFrame": 96,
+                "durationInFrames": 18
+              }
+            ]
+          },
+          {
+            "id": "query",
+            "from": "sources",
+            "to": "workspace",
+            "offset": 0.5,
+            "arrow": false,
+            "packets": [
+              {
+                "atFrame": 78,
+                "durationInFrames": 21,
+                "direction": "reverse"
+              }
+            ]
+          },
+          {
+            "id": "publish",
+            "from": "workspace",
+            "to": "dashboard",
+            "label": "publishes",
+            "packets": [
+              {
+                "atFrame": 140,
+                "durationInFrames": 20
+              }
+            ]
+          }
+        ],
+        "revealAtFrame": 10
+      }
+    }
+  ]
+}

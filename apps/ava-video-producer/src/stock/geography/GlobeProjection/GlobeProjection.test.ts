@@ -9,21 +9,39 @@ import { geoContains } from "d3-geo";
 import LAND from "../naturalEarthLand.json";
 import { GlobeProjection } from "./GlobeProjection";
 
+function _assertHiddenLineHasNoVisiblePath(): void {
+  assert.equal(
+    GlobeProjection.getPathFromGeometry({
+      ...VIEW,
+      geometry: {
+        type: "LineString",
+        coordinates: [
+          [130, 0],
+          [170, 0],
+        ],
+      },
+    }),
+    undefined,
+  );
+}
+
 const VIEW: {
   centerLongitude: number;
   centerLatitude: number;
   radius: number;
 } = { centerLongitude: 0, centerLatitude: 0, radius: 100 };
-const _coordinates = (path: string): number[][] =>
-  [...path.matchAll(/(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/g)].map((match) => [
-    Number(match[1]),
-    Number(match[2]),
-  ]);
+const _coordinates = (path: string): number[][] => {
+  return [...path.matchAll(/(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/g)].map(
+    (match) => {
+      return [Number(match[1]), Number(match[2])];
+    },
+  );
+};
 const _bounded = (path: string): void => {
   assert.doesNotMatch(path, /NaN|Infinity/);
-  _coordinates(path).forEach(([x, y]) =>
-    assert.ok(Math.hypot(x, y) <= 100.002, `${x},${y}`),
-  );
+  _coordinates(path).forEach(([x, y]) => {
+    return assert.ok(Math.hypot(x, y) <= 100.002, `${x},${y}`);
+  });
 };
 
 test("a limb-crossing polygon is clipped while a fully rear polygon disappears", () => {
@@ -102,19 +120,7 @@ test("holes remain separate rings and crossing geographic routes terminate at th
   assert.ok(route);
   _bounded(route);
   assert.deepEqual(_coordinates(route).at(-1), [100, 0]);
-  assert.equal(
-    GlobeProjection.getPathFromGeometry({
-      ...VIEW,
-      geometry: {
-        type: "LineString",
-        coordinates: [
-          [130, 0],
-          [170, 0],
-        ],
-      },
-    }),
-    undefined,
-  );
+  _assertHiddenLineHasNoVisiblePath();
 });
 test("local land preserves topology, checksum and recognizable containment", () => {
   const bytes = readFileSync(
@@ -135,23 +141,23 @@ test("local land preserves topology, checksum and recognizable containment", () 
     [135, -25],
     [-60, -15],
     [179, 66],
-  ].forEach((point) =>
-    assert.equal(
+  ].forEach((point) => {
+    return assert.equal(
       geoContains(geometry, [point[0], point[1]]),
       true,
       point.join(","),
-    ),
-  );
+    );
+  });
   [
     [-30, 0],
     [-140, 0],
-  ].forEach((point) =>
-    assert.equal(
+  ].forEach((point) => {
+    return assert.equal(
       geoContains(geometry, [point[0], point[1]]),
       false,
       point.join(","),
-    ),
-  );
+    );
+  });
 });
 test("land remains finite and bounded at antimeridian, tilted and polar views after reverse seeks", () => {
   const centers = [
@@ -161,35 +167,35 @@ test("land remains finite and bounded at antimeridian, tilted and polar views af
     [0, 90],
     [0, -90],
   ];
-  const paths = centers.map(([centerLongitude, centerLatitude]) =>
-    GlobeProjection.getLandPathFromView({
+  const paths = centers.map(([centerLongitude, centerLatitude]) => {
+    return GlobeProjection.getLandPathFromView({
       ...VIEW,
       centerLongitude,
       centerLatitude,
-    }),
-  );
+    });
+  });
   paths.forEach((path) => {
     assert.ok(path);
     _bounded(path);
   });
-  [...centers].reverse().forEach(([centerLongitude, centerLatitude], index) =>
-    assert.equal(
+  [...centers].reverse().forEach(([centerLongitude, centerLatitude], index) => {
+    return assert.equal(
       GlobeProjection.getLandPathFromView({
         ...VIEW,
         centerLongitude,
         centerLatitude,
       }),
       paths[paths.length - index - 1],
-    ),
-  );
+    );
+  });
   assert.equal(
     GlobeProjection.getLandPathFromView({ ...VIEW, centerLongitude: 360 }),
     paths[0],
   );
 });
 test("invalid geographic geometry fails before projection", () => {
-  assert.throws(() =>
-    GlobeProjection.getPathFromGeometry({
+  assert.throws(() => {
+    return GlobeProjection.getPathFromGeometry({
       ...VIEW,
       geometry: {
         type: "LineString",
@@ -198,10 +204,10 @@ test("invalid geographic geometry fails before projection", () => {
           [Infinity, 10],
         ],
       },
-    }),
-  );
-  assert.throws(() =>
-    GlobeProjection.getPathFromGeometry({
+    });
+  });
+  assert.throws(() => {
+    return GlobeProjection.getPathFromGeometry({
       ...VIEW,
       geometry: {
         type: "LineString",
@@ -210,6 +216,6 @@ test("invalid geographic geometry fails before projection", () => {
           [10, 100],
         ],
       },
-    }),
-  );
+    });
+  });
 });

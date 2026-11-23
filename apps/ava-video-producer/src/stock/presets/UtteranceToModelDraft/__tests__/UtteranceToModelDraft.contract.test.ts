@@ -4,12 +4,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { prop } from "@avandar/utils";
-import { setupI18n } from "@lingui/core";
 import { registerStockPresetAssertions } from "../../../../../tests/helpers/registerStockPresetAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
-import { makeLocalizedStockDataFromContract } from "../../../i18n/makeLocalizedStockDataFromContract";
-import { StockCopyMessages } from "../../../i18n/StockCopyMessages";
 import { utteranceToModelDraftContract } from ".././UtteranceToModelDraft.contract";
 import {
   DEFAULT_INPUT,
@@ -31,8 +28,9 @@ registerStockTextLayoutAssertions({
   getVisibleTexts: ({
     input,
     frame,
-  }: Readonly<{ input: Input; frame: number }>) =>
-    frame >= 141 ? options.getVisibleTexts({ input: input }) : [],
+  }: Readonly<{ input: Input; frame: number }>) => {
+    return frame >= 141 ? options.getVisibleTexts({ input: input }) : [];
+  },
 });
 
 test("draft references preserve original source and pending never has acceptance", () => {
@@ -128,14 +126,14 @@ test("lexical mapping trims boundaries only and preserves multilingual literal c
   cases.forEach(([text, label, accepted]) => {
     const input = {
       ...DEFAULT_INPUT,
-      sentenceParts: DEFAULT_INPUT.sentenceParts.map((part, index) =>
-        index === 0 ? { ...part, text } : part,
-      ),
+      sentenceParts: DEFAULT_INPUT.sentenceParts.map((part, index) => {
+        return index === 0 ? { ...part, text } : part;
+      }),
       draft: {
         ...DEFAULT_INPUT.draft,
-        entities: DEFAULT_INPUT.draft.entities.map((entity, index) =>
-          index === 0 ? { ...entity, label } : entity,
-        ),
+        entities: DEFAULT_INPUT.draft.entities.map((entity, index) => {
+          return index === 0 ? { ...entity, label } : entity;
+        }),
       },
     };
     assert.equal(
@@ -161,53 +159,37 @@ test("maximum phrase labels remain exact through whitespace and grapheme mapping
     (text) => {
       const input = {
         ...fixtures[1].input,
-        sentenceParts: fixtures[1].input.sentenceParts.map((part) => ({
-          ...part,
-          text,
-        })),
+        sentenceParts: fixtures[1].input.sentenceParts.map((part) => {
+          return {
+            ...part,
+            text,
+          };
+        }),
         draft: {
           ...fixtures[1].input.draft,
-          entities: fixtures[1].input.draft.entities.map((entity) => ({
-            ...entity,
-            label: text,
-          })),
+          entities: fixtures[1].input.draft.entities.map((entity) => {
+            return {
+              ...entity,
+              label: text,
+            };
+          }),
           relationships: fixtures[1].input.draft.relationships.map(
-            (relation) => ({ ...relation, label: text }),
+            (relation) => {
+              return { ...relation, label: text };
+            },
           ),
         },
       };
       assert.equal(inputSchema.safeParse(input).success, true);
-      [0, 48, 49, 80, 105, 150].forEach((frame) =>
-        assert.doesNotThrow(() => _render({ frame: frame, input: input })),
-      );
+      [0, 48, 49, 80, 105, 150].forEach((frame) => {
+        return assert.doesNotThrow(() => {
+          return _render({ frame: frame, input: input });
+        });
+      });
       assert.ok(
         _render({ frame: 150, input: input }).includes(`aria-label="${text}"`),
       );
     },
-  );
-});
-
-test("nested authored default prose is extracted and translated without rewriting inputs", () => {
-  const messageId = "motionAtlas.utterance-to-model-draft.default.review.note";
-  const messages = StockCopyMessages.getMessagesFromContract({
-    [utteranceToModelDraftContract.id]: utteranceToModelDraftContract,
-  });
-  assert.equal(messages[messageId], DEFAULT_INPUT.review.note);
-  const i18n = setupI18n({
-    locale: "es",
-    messages: { es: { [messageId]: "Texto traducido" } },
-    missing: (_locale, id) => id,
-  });
-  const resolved = makeLocalizedStockDataFromContract({
-    contract: utteranceToModelDraftContract,
-    i18n,
-  });
-  assert.equal(resolved.defaultInput.review.note, "Texto traducido");
-  assert.notEqual(DEFAULT_INPUT.review.note, "Texto traducido");
-  assert.ok(
-    _render({ frame: 150 }).includes(
-      `aria-label="${DEFAULT_INPUT.review.note}"`,
-    ),
   );
 });
 
@@ -240,15 +222,19 @@ test("dense optional attributes retain their owner in either model layout", () =
         modelLayout: modelLayout as Input["modelLayout"],
         draft: {
           ...fixtures[2].input.draft,
-          attributes: fixtures[2].input.draft.attributes.map((attribute) => ({
-            ...attribute,
-            entityId: entity.id,
-          })),
+          attributes: fixtures[2].input.draft.attributes.map((attribute) => {
+            return {
+              ...attribute,
+              entityId: entity.id,
+            };
+          }),
         },
       };
-      [0, 48, 49, 80, 105, 150].forEach((frame) =>
-        assert.doesNotThrow(() => _render({ frame: frame, input: input })),
-      );
+      [0, 48, 49, 80, 105, 150].forEach((frame) => {
+        return assert.doesNotThrow(() => {
+          return _render({ frame: frame, input: input });
+        });
+      });
       assert.ok(
         _render({ frame: 150, input: input }).includes(
           `data-attribute-attachment="${entity.id}"`,
@@ -266,7 +252,9 @@ test("opaque model sockets clear every source line during phrase lift", () => {
         ...markup.matchAll(
           /data-source-fragment="[^"]+"><text[^>]+y="([\d.]+)"/g,
         ),
-      ].map((match) => Number(match[1]));
+      ].map((match) => {
+        return Number(match[1]);
+      });
       assert.equal(sourceBaselines.length, input.sentenceParts.length);
       const sourceBottom = Math.max(...sourceBaselines) + 12;
       const sockets = [

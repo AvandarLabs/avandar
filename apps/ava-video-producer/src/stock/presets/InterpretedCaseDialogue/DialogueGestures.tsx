@@ -1,5 +1,5 @@
-import { ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = { frame: number; accent: string };
@@ -8,28 +8,41 @@ export function DialogueGestures({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const first = ramp(frame, 24, 6) * (1 - ramp(frame, 64, 6));
-  const second = ramp(frame, 80, 6) * (1 - ramp(frame, 120, 6));
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const first =
+    motion.ramp(frame, 24, motion.chip) *
+    (1 - motion.ramp(frame, 64, motion.chip));
+  const second =
+    motion.ramp(frame, 80, motion.chip) *
+    (1 - motion.ramp(frame, 120, motion.chip));
   return (
     <g>
       {" "}
-      <path
+      <SketchedShape
+        shape={{ kind: "path", d: `M210 485 L250 ${490 - first * 20}` }}
+        profile={tokens.sketch.shape}
         data-speaking-gesture="participant"
-        d={`M210 485 L250 ${490 - first * 20}`}
         stroke={accent}
-        strokeWidth={3}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
       />
-      <path
+      <SketchedShape
+        shape={{ kind: "path", d: `M750 485 L710 ${490 - second * 20}` }}
+        profile={tokens.sketch.shape}
         data-speaking-gesture="worker"
-        d={`M750 485 L710 ${490 - second * 20}`}
         stroke={accent}
-        strokeWidth={3}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
       />
-      <path
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M480 510 L450 ${510 - (first + second) * 14} M480 510 L510 ${510 - (first + second) * 14}`,
+        }}
+        profile={tokens.sketch.shape}
         data-interpreter-gesture=""
-        d={`M480 510 L450 ${510 - (first + second) * 14} M480 510 L510 ${510 - (first + second) * 14}`}
-        stroke={STOCK.cyan}
-        strokeWidth={3}
+        stroke={tokens.color.accentAlt}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
       />
     </g>
   );

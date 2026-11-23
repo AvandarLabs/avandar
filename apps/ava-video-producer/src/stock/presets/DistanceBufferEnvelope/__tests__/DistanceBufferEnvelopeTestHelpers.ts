@@ -74,16 +74,19 @@ function _getVisibleRowKeys({
   lane: "source" | "included";
 }): string[] {
   return SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup(markup)
-    .filter(
-      (item) =>
+    .filter((item) => {
+      return (
         item.kind === "text" &&
         item.top >= 260 &&
         item.bottom < 560 &&
         item.left >= (lane === "source" ? 438 : 690) &&
         item.right <= (lane === "source" ? 452 : 710) &&
-        /^\d+$/.test(item.text ?? ""),
-    )
-    .map((item) => item.text!);
+        /^\d+$/.test(item.text ?? "")
+      );
+    })
+    .map((item) => {
+      return item.text!;
+    });
 }
 export {
   _render,

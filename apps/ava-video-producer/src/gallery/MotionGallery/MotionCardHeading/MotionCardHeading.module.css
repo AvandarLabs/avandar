@@ -1,0 +1,11 @@
+.motionCardHeadingCardHeading {
+  composes: card-heading from global;
+}
+
+.motionCardHeadingCardTitle {
+  composes: card-title from global;
+}
+
+.motionCardHeadingSaveButton {
+  composes: save-button from global;
+}

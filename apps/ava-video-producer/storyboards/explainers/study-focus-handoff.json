@@ -25,7 +25,6 @@
         "title": "Focus without a connector",
         "category": "composite",
         "evidence": "Architectural illustration \u00b7 Fictional demonstration data",
-        "accent": "#82c8f2",
         "beats": [
           {
             "id": "example-0",

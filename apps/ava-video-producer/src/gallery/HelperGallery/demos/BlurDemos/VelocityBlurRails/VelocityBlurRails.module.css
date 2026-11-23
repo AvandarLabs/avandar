@@ -1,0 +1,38 @@
+.velocityBlurRailsRail {
+  background: var(--demo-panel);
+  border-radius: var(--demo-corner-pill);
+  height: 56px;
+  position: relative;
+}
+
+.velocityBlurRailsRailBlock {
+  background: var(--demo-brand);
+  border-radius: var(--demo-corner-pill);
+  height: 56px;
+  position: absolute;
+  top: 0;
+  width: 56px;
+}
+
+.velocityBlurRailsTimeline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--demo-space-10);
+  height: 100%;
+  justify-content: center;
+  position: relative;
+}
+
+.velocityBlurRailsTimelineRow {
+  align-items: center;
+  display: grid;
+  gap: var(--demo-space-2xs);
+  grid-template-columns: 190px 1fr;
+  height: 40px;
+}
+
+.velocityBlurRailsTimelineName {
+  color: var(--demo-muted);
+  font-family: var(--demo-mono);
+  font-size: var(--demo-font-size-xs);
+}

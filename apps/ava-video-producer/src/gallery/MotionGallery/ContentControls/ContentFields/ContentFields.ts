@@ -1,5 +1,5 @@
 import { match, P } from "ts-pattern";
-import { StockCopyMessages } from "../../../../stock/i18n/StockCopyMessages";
+import { getStockValueFromPath } from "../../../../stock/data/getStockValueFromPath";
 import type {
   StockControl,
   StockJsonValue,
@@ -30,7 +30,7 @@ function _getOptionsFromControl({
     return control.options;
   }
   const source = control.optionsFrom;
-  const values = StockCopyMessages.getValueFromPath({
+  const values = getStockValueFromPath({
     value: source.scope === "item" ? item : root,
     path: source.path.split(".").filter(Boolean),
   });
@@ -38,22 +38,7 @@ function _getOptionsFromControl({
     return [];
   }
   return values.flatMap((value: unknown) => {
-    if (!value || typeof value !== "object") {
-      return [];
-    }
-    const optionValue: unknown = Reflect.get(value, source.valueKey);
-    const label: unknown = Reflect.get(value, source.labelKey);
-    return typeof optionValue === "string" ||
-      typeof optionValue === "number" ||
-      typeof optionValue === "boolean"
-      ? [
-          {
-            value: optionValue,
-            label:
-              typeof label === "string" && label ? label : String(optionValue),
-          },
-        ]
-      : [];
+    return _createDynamicOptions({ value, source });
   });
 }
 /**
@@ -72,8 +57,9 @@ function _getUnionVariantFromValue({
   value: unknown;
 }>): Extract<StockControl, { kind: "union" }>["variants"][number] {
   return (
-    control.variants.find((variant) => variant.valueType === typeof value) ??
-    control.variants[0]
+    control.variants.find((variant) => {
+      return variant.valueType === typeof value;
+    }) ?? control.variants[0]
   );
 }
 /**
@@ -86,10 +72,12 @@ function _getBlankValueFromControl(
   return match(control)
     .with({ kind: "object" }, (matchedControl) => {
       return Object.fromEntries(
-        matchedControl.controls.map((child) => [
-          child.path,
-          child.nullable ? null : _getBlankValueFromControl(child),
-        ]),
+        matchedControl.controls.map((child) => {
+          return [
+            child.path,
+            child.nullable ? null : _getBlankValueFromControl(child),
+          ];
+        }),
       );
     })
     .with({ kind: "boolean" }, () => {
@@ -129,3 +117,31 @@ export const ContentFields = {
   getVariantFromValue: typeof _getUnionVariantFromValue;
   getBlankValueFromControl: typeof _getBlankValueFromControl;
 };
+
+function _createDynamicOptions({
+  value,
+  source,
+}: Readonly<{
+  value: unknown;
+  source: Extract<
+    StockControl,
+    { kind: "select"; optionsFrom: unknown }
+  >["optionsFrom"];
+}>): ReturnType<typeof _getOptionsFromControl> {
+  if (!value || typeof value !== "object") {
+    return [];
+  }
+  const optionValue: unknown = Reflect.get(value, source.valueKey);
+  const label: unknown = Reflect.get(value, source.labelKey);
+  return typeof optionValue === "string" ||
+    typeof optionValue === "number" ||
+    typeof optionValue === "boolean"
+    ? [
+        {
+          value: optionValue,
+          label:
+            typeof label === "string" && label ? label : String(optionValue),
+        },
+      ]
+    : [];
+}

@@ -3,7 +3,10 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { FractionMaterialTranslation } from "./FractionMaterialTranslation";
+import { fractionMaterialTranslationContract as contract } from "./FractionMaterialTranslation.contract";
 import {
   changedInput,
   DEFAULT_INPUT,
@@ -12,7 +15,38 @@ import {
   denseInput,
   minimumInput,
 } from "./FractionMaterialTranslation.fixtures";
+import { inputSchema, type Input } from "./FractionMaterialTranslation.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+
+type AssertSelectedFractionPiecesOptions = Readonly<{
+  representations: Input["representations"];
+  markup: string;
+  numerator: number;
+}>;
+
+function _assertSelectedFractionPieces({
+  representations,
+  markup,
+  numerator,
+}: AssertSelectedFractionPiecesOptions): void {
+  representations.forEach((representation) => {
+    const pieces = [
+      ...markup.matchAll(
+        new RegExp(
+          `data-piece-owner="${representation.id}" data-selected="(true|false)"`,
+          "g",
+        ),
+      ),
+    ];
+    assert.equal(pieces.length, 8);
+    assert.equal(
+      pieces.filter((piece) => {
+        return piece[1] === "true";
+      }).length,
+      numerator,
+    );
+  });
+}
 
 function _render({
   frame,
@@ -39,16 +73,15 @@ test("all physical materials select the same numerator and denominator", () => {
       ),
     ];
     assert.equal(pieces.length, 8);
-    assert.equal(pieces.filter((piece) => piece[1] === "true").length, 8);
+    assert.equal(
+      pieces.filter((piece) => {
+        return piece[1] === "true";
+      }).length,
+      8,
+    );
   });
   assert.equal([...markup.matchAll(/aria-label="8 \/ 8"/g)].length, 4);
 });
-
-import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
-import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
-import { fractionMaterialTranslationContract as contract } from "./FractionMaterialTranslation.contract";
-import { inputSchema, type Input } from "./FractionMaterialTranslation.schema";
-
 function _getVisibleTexts({
   input,
   frame,
@@ -56,10 +89,9 @@ function _getVisibleTexts({
   return [
     input.lessonLabel,
     input.caption,
-    ...input.representations.flatMap((representation) => [
-      representation.learnerLabel,
-      representation.materialLabel,
-    ]),
+    ...input.representations.flatMap((representation) => {
+      return [representation.learnerLabel, representation.materialLabel];
+    }),
   ];
 }
 const options = {
@@ -78,21 +110,25 @@ registerStockTextLayoutAssertions(options);
 test("learner hands actually contact their selected material during the operation", () => {
   const markup = _render({
     frame: 60,
-    input: {
-      ...denseInput,
-      resolvedArrangement: "separate-desks",
-    },
+    input: { ...denseInput, resolvedArrangement: "separate-desks" },
   });
-  const hand = markup.match(/data-material-hand="counters"[^>]*d="([^"]+)"/);
-  const piece = markup.match(
-    /<circle[^>]*data-piece-owner="counters"[^>]*cx="([^"]+)"[^>]*cy="([^"]+)"[^>]*r="([^"]+)"/,
-  );
+  const hand = markup
+    .match(/<path\b[^>]*\bdata-material-hand="counters"[^>]*>/)?.[0]
+    .match(/\bd="([^"]+)"/);
+  const pieceTag = markup.match(
+    /<circle\b[^>]*\bdata-piece-owner="counters"[^>]*>/,
+  )?.[0];
+  const piece = pieceTag
+    ? ["cx", "cy", "r"].map((name) => {
+        return pieceTag.match(new RegExp(` ${name}="([^"]+)"`))?.[1];
+      })
+    : undefined;
   assert.ok(hand);
   assert.ok(piece);
   const numbers = hand[1].match(/-?\d+(?:\.\d+)?/g)!.map(Number);
-  assert.ok(Math.abs(numbers.at(-2)! - (480 + Number(piece[1]))) < 0.001);
+  assert.ok(Math.abs(numbers.at(-2)! - (480 + Number(piece[0]))) < 0.001);
   assert.ok(
-    Math.abs(numbers.at(-1)! - (330 + Number(piece[2]) - Number(piece[3]))) <
+    Math.abs(numbers.at(-1)! - (330 + Number(piece[1]) - Number(piece[2]))) <
       0.001,
   );
 });
@@ -103,11 +139,13 @@ test("all material choices and arrangements derive selection from one fraction",
         [true, false].forEach((showFractionNotation) => {
           [
             denseInput.representations,
-            ...denseInput.representations.map((_, index) =>
-              denseInput.representations.filter(
-                (_representation, otherIndex) => index !== otherIndex,
-              ),
-            ),
+            ...denseInput.representations.map((_, index) => {
+              return denseInput.representations.filter(
+                (_representation, otherIndex) => {
+                  return index !== otherIndex;
+                },
+              );
+            }),
           ].forEach((representations) => {
             const input = {
               ...denseInput,
@@ -116,21 +154,11 @@ test("all material choices and arrangements derive selection from one fraction",
               showFractionNotation,
               representations,
             };
-            const markup = _render({ frame: 150, input: input });
-            representations.forEach((representation) => {
-              const pieces = [
-                ...markup.matchAll(
-                  new RegExp(
-                    `data-piece-owner="${representation.id}" data-selected="(true|false)"`,
-                    "g",
-                  ),
-                ),
-              ];
-              assert.equal(pieces.length, 8);
-              assert.equal(
-                pieces.filter((piece) => piece[1] === "true").length,
-                numerator,
-              );
+            const markup = _render({ frame: 150, input });
+            _assertSelectedFractionPieces({
+              representations,
+              markup,
+              numerator,
             });
             assert.equal(
               [
@@ -149,12 +177,15 @@ test("all material choices and arrangements derive selection from one fraction",
 test("surface motion preserves separate learners and full material clearance", () => {
   const initial = _render({ frame: 24, input: denseInput });
   const resolved = _render({ frame: 150, input: denseInput });
-  const surfaces = (markup: string) =>
-    [
+  const surfaces = (markup: string) => {
+    return [
       ...markup.matchAll(
         /data-work-surface="[^"]+" transform="translate\(([-.\d]+) ([-.\d]+)\)"/g,
       ),
-    ].map((match) => [Number(match[1]), Number(match[2])]);
+    ].map((match) => {
+      return [Number(match[1]), Number(match[2])];
+    });
+  };
   assert.notDeepEqual(surfaces(initial), surfaces(resolved));
   assert.deepEqual(
     surfaces(
@@ -169,7 +200,7 @@ test("surface motion preserves separate learners and full material clearance", (
     0, 35.999, 36, 36.001, 60, 83.999, 84, 84.001, 87.999, 88, 88.001, 100,
     107.999, 108, 108.001, 150,
   ].forEach((frame) => {
-    const markup = _render({ frame: frame, input: denseInput });
+    const markup = _render({ frame, input: denseInput });
     const positions = surfaces(markup);
     assert.equal([...markup.matchAll(/data-fraction-learner=/g)].length, 3);
     positions.forEach(([x, y], index) => {
@@ -196,14 +227,15 @@ test("fraction schemas forbid contradictory equal-part counts and duplicate mate
       fraction: { numerator: 1, denominator: 2, extra: true },
     },
     { ...minimumInput, lessonLabel: "x".repeat(37) },
-  ].forEach((value) =>
-    assert.equal(inputSchema.safeParse(value).success, false),
-  );
+  ].forEach((value) => {
+    return assert.equal(inputSchema.safeParse(value).success, false);
+  });
   assert.ok(
-    contract.semanticRules.some(
-      (rule) =>
+    contract.semanticRules.some((rule) => {
+      return (
         rule.paths.includes("fraction.numerator") &&
-        rule.description.includes("1..denominator"),
-    ),
+        rule.description.includes("1..denominator")
+      );
+    }),
   );
 });

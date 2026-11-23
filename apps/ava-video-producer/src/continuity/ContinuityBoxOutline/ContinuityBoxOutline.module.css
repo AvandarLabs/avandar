@@ -1,0 +1,15 @@
+.continuityBoxOutlineRoot {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.continuityBoxOutlineSize {
+  height: 100%;
+  width: 100%;
+}
+
+.continuityBoxOutlineRoot > span {
+  height: 100%;
+  width: 100%;
+}

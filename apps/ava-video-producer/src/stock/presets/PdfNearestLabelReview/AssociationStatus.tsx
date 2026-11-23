@@ -1,17 +1,21 @@
-import { ramp } from "../../../motion";
-import { stockI18n } from "../../i18n/stockI18n/stockI18n";
+import { Motion } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getAssociationFromInput } from "./getAssociationFromInput";
 import {
   ambiguityMessage,
   ratioMessage,
   unresolvedMessage,
 } from "./PdfNearestLabelReview.controls";
+import { ReviewTiming } from "./ReviewTiming";
 import type { Input } from "./PdfNearestLabelReview.schema";
 import type { ReactNode } from "react";
 
-type Props = { input: Input; frame: number };
+type Props = {
+  input: Input;
+  frame: number;
+};
 /**
  * Uncertainty remains explicit independently of optional numeric annotations.
  */
@@ -19,15 +23,21 @@ export function AssociationStatus({
   input,
   frame,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const association = getAssociationFromInput(input);
   return (
-    <g opacity={ramp(frame, 95, 8)}>
+    <g
+      opacity={Motion.ramp({
+        frame,
+        at: ReviewTiming.STATUS_CUE,
+        dur: motion.whip,
+        easing: motion.reveal.easing,
+      })}
+    >
       {" "}
       {input.showDistanceValues ? (
         <g data-ratio-value="true">
-          <LabelSlots
-            labels={[[stockI18n._(ratioMessage), 60, 510, 400, 14, 2]]}
-          />
+          <LabelSlots labels={[[ratioMessage.message, 60, 510, 400, 14, 2]]} />
           <LiteralDataText
             value={`≈ ${association.ratio.toPrecision(3)}`}
             x={60}
@@ -37,12 +47,12 @@ export function AssociationStatus({
       ) : undefined}
       {association.isAmbiguous ? (
         <LabelSlots
-          labels={[[stockI18n._(ambiguityMessage), 60, 585, 420, 14, 1]]}
+          labels={[[ambiguityMessage.message, 60, 585, 420, 14, 1]]}
         />
       ) : undefined}
       {input.reviewedLabelId === null ? (
         <LabelSlots
-          labels={[[stockI18n._(unresolvedMessage), 540, 580, 360, 14, 1]]}
+          labels={[[unresolvedMessage.message, 540, 580, 360, 14, 1]]}
         />
       ) : undefined}
     </g>

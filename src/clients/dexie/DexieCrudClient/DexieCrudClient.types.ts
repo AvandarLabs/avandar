@@ -100,7 +100,7 @@ export type DexieCrudModelSpec<
     primaryKey: DexieModelPrimaryKey<ModelTypes>;
     primaryKeyType: DexieModelPrimaryKeyType<ModelTypes>;
   } = DefaultModelTypes,
-  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  // oxlint-disable-next-line typescript/no-empty-object-type
   ExtraTypes extends object = {},
 > = Merge<
   CrudModelSpec,

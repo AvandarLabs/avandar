@@ -1,6 +1,6 @@
 import { propEq } from "@avandar/utils";
-import { EASE, ramp } from "../../../motion";
-import { FrontierRoad } from "./FrontierRoad";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { FrontierRoad } from "./FrontierRoad/FrontierRoad";
 import { getTravelCostsFromInput } from "./getTravelCostsFromInput";
 import type { Input } from "./TravelTimeNetworkFrontier.schema";
 import type { ReactNode } from "react";
@@ -12,21 +12,34 @@ export function NetworkRoads({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const nodes = getTravelCostsFromInput(input);
-  const time = input.budgetMinutes * ramp(frame, 46, 64, EASE.inOut);
+  const time =
+    input.budgetMinutes *
+    motion.ramp(frame, 46, motion.scale(64), motion.travel.easing);
   return (
     <g>
-      {input.roads.map((road, index) => (
-        <g key={road.id} opacity={ramp(frame, 13 + index * 2, 18)}>
-          <FrontierRoad
-            road={road}
-            first={nodes.find(propEq("id", road.fromId))!}
-            second={nodes.find(propEq("id", road.toId))!}
-            time={time}
-            accent={accent}
-          />
-        </g>
-      ))}
+      {input.roads.map((road, index) => {
+        return (
+          <g
+            key={road.id}
+            opacity={motion.ramp(
+              frame,
+              13 + index * motion.stagger.list,
+              motion.hero,
+              motion.reveal.easing,
+            )}
+          >
+            <FrontierRoad
+              road={road}
+              first={nodes.find(propEq("id", road.fromId))!}
+              second={nodes.find(propEq("id", road.toId))!}
+              time={time}
+              accent={accent}
+            />
+          </g>
+        );
+      })}
     </g>
   );
 }

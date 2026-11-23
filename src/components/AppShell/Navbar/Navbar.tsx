@@ -29,7 +29,7 @@ import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { Logo } from "@/components/AppShell/Logo";
 import css from "@/components/AppShell/Navbar/Navbar.module.css";
 import { NavbarLinkItem } from "@/components/AppShell/Navbar/NavbarLinkItem";
-import { CreateWorkspaceForm } from "@/components/forms/CreateWorkspaceForm";
+import { CreateWorkspaceForm } from "@/components/forms/CreateWorkspaceForm/CreateWorkspaceForm";
 import { OfflineGated } from "@/components/offline/OfflineGated/OfflineGated";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";

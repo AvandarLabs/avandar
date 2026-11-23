@@ -1,0 +1,20 @@
+.popDemoCentered {
+  align-items: center;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+}
+
+.popDemoSplit {
+  display: grid;
+  gap: var(--demo-space-48);
+  grid-template-columns: 360px 1fr;
+  height: 100%;
+}
+
+.popDemoPlotCell {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  padding-left: var(--demo-space-24);
+}

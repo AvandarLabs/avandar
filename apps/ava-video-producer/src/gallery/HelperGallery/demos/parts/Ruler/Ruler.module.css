@@ -1,0 +1,30 @@
+.rulerTimelineRow {
+  align-items: center;
+  display: grid;
+  gap: var(--demo-space-2xs);
+  grid-template-columns: 190px 1fr;
+  height: 40px;
+}
+
+.ruler {
+  border-top: var(--demo-stroke-hairline) solid var(--demo-line);
+  height: 24px;
+  position: relative;
+}
+
+.rulerTick {
+  background: var(--demo-line);
+  height: 6px;
+  position: absolute;
+  top: 0;
+  width: 1px;
+}
+
+.rulerLabel {
+  color: var(--demo-muted);
+  font-family: var(--demo-mono);
+  font-size: var(--demo-font-size-3xs);
+  position: absolute;
+  top: 8px;
+  transform: translateX(-50%);
+}

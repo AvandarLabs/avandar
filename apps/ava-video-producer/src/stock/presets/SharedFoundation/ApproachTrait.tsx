@@ -1,6 +1,5 @@
-import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./SharedFoundation.schema";
 import type { ReactNode } from "react";
 /** Inputs for ApproachTrait. */
@@ -11,7 +10,6 @@ type Props = {
   x: number;
   showTrait: boolean;
 };
-
 /** A distinguishing trait stays attached to its approach during the reveal. */
 export function ApproachTrait({
   frame,
@@ -20,11 +18,13 @@ export function ApproachTrait({
   x,
   showTrait,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <>
       <g
         {...{ [`data-trait-${index}`]: true }}
-        opacity={showTrait ? 1 : 1 - ramp(frame, 96, 24)}
+        opacity={showTrait ? 1 : 1 - motion.ramp(frame, 96, motion.scale(24))}
       >
         <FitText
           text={approach.distinction}
@@ -34,7 +34,7 @@ export function ApproachTrait({
           fontSize={16}
           maxLines={3}
           anchor="middle"
-          color={STOCK.muted}
+          color={tokens.color.textMuted}
           breakLongWords
           normalizeWhitespace
         />

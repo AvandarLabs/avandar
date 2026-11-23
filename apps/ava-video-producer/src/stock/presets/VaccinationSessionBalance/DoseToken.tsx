@@ -1,6 +1,6 @@
 import { propEq } from "@avandar/utils";
-import { EASE, mix, ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { Motion } from "../../../motion";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./VaccinationSessionBalance.schema";
 import type { ReactNode } from "react";
 
@@ -19,15 +19,65 @@ export function DoseToken({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const peers = input.units.filter(
-    (item) =>
-      item.outcome === unit.outcome &&
-      (unit.outcome !== "administered" ||
-        item.recipientId === unit.recipientId),
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const { destinationX, destinationY } = _getDoseDestination({ input, unit });
+  const progress = motion.ramp(
+    frame,
+    36 + index * motion.stagger.list,
+    motion.scale(50),
+    motion.travel.easing,
   );
+  return (
+    <rect
+      data-dose={unit.id}
+      data-outcome={unit.outcome}
+      data-recipient-id={unit.recipientId ?? undefined}
+      x={Motion.mix({
+        t: progress,
+        from: 60 + (index % 4) * 48,
+        to: destinationX,
+      })}
+      y={Motion.mix({
+        t: progress,
+        from: 225 + Math.floor(index / 4) * 60,
+        to: destinationY,
+      })}
+      width={11}
+      height={16}
+      rx={scales.corner(3)}
+      fill={unit.outcome === "discarded" ? tokens.color.highlight : accent}
+      opacity={motion.reveal(frame, 12 + index * motion.stagger.list)}
+    />
+  );
+}
+/**
+ * Where a dose ends up: beside its recipient if administered, else in the
+ * remaining or discarded tray, packed among the doses sharing that place.
+ */
+function _getDoseDestination({
+  input,
+  unit,
+}: Readonly<{
+  input: Input;
+  unit: Props["unit"];
+}>) {
+  const peers = input.units.filter((item) => {
+    return (
+      item.outcome === unit.outcome &&
+      (unit.outcome !== "administered" || item.recipientId === unit.recipientId)
+    );
+  });
   const position = peers.findIndex(propEq("id", unit.id));
   const recipientIndex = input.recipients.findIndex(
-    propEq<{ id: unknown }, "id", unknown>("id", unit.recipientId),
+    propEq<
+      {
+        id: unknown;
+      },
+      "id",
+      unknown
+    >("id", unit.recipientId),
   );
   const destinationX =
     unit.outcome === "administered"
@@ -40,19 +90,5 @@ export function DoseToken({
         Math.floor(position / 6) * 19
       : (unit.outcome === "remaining" ? 220 : 400) +
         Math.floor(position / 6) * 30;
-  const progress = ramp(frame, 36 + index * 2, 50, EASE.inOut);
-  return (
-    <rect
-      data-dose={unit.id}
-      data-outcome={unit.outcome}
-      data-recipient-id={unit.recipientId ?? undefined}
-      x={mix(progress, 60 + (index % 4) * 48, destinationX)}
-      y={mix(progress, 225 + Math.floor(index / 4) * 60, destinationY)}
-      width={11}
-      height={16}
-      rx={3}
-      fill={unit.outcome === "discarded" ? STOCK.orange : accent}
-      opacity={ramp(frame, 12 + index * 2, 12)}
-    />
-  );
+  return { destinationX, destinationY };
 }

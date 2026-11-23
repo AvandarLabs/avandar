@@ -49,7 +49,9 @@ export const invalidInputs: unknown[] = [
   { ...DEFAULT_INPUT, expenses: [] },
   {
     ...DEFAULT_INPUT,
-    expenses: DEFAULT_INPUT.expenses.map((e) => ({ ...e, amount: 0 })),
+    expenses: DEFAULT_INPUT.expenses.map((e) => {
+      return { ...e, amount: 0 };
+    }),
   },
   {
     ...DEFAULT_INPUT,
@@ -83,12 +85,14 @@ export const minimumInput: Input = {
 export const denseInput: Input = {
   ...DEFAULT_INPUT,
   expenses: (["book", "ticket", "clothing", "meal", "fee-slip"] as const).map(
-    (object, index) => ({
-      id: `cost ${index}`,
-      label: "界".repeat(22),
-      object,
-      amount: 20,
-    }),
+    (object, index) => {
+      return {
+        id: `cost ${index}`,
+        label: "界".repeat(22),
+        object,
+        amount: 20,
+      };
+    },
   ),
   periodLabel: "界".repeat(32),
   unitLabel: "界".repeat(18),

@@ -7,14 +7,20 @@ type Props = { input: Input; accent: string };
 export function ClassLegends({ input, accent }: Readonly<Props>): ReactNode {
   return (
     <g>
-      {input.schemes.map((scheme, index) => (
-        <ClassLegend
-          key={index}
-          {...{ scheme, index, accent }}
-          unitLabel={input.unitLabel}
-          noDataLabel={input.noDataLabel}
-        />
-      ))}
+      {input.schemes.map((scheme, index) => {
+        return (
+          // prettier-ignore
+          // The schema fixes exactly two schemes in before/after
+          // order. A legend belongs to that comparison slot, not
+          // its editable label.
+          // react-doctor-disable-next-line no-array-index-as-key
+          <ClassLegend key={index}
+            {...{ scheme, index, accent }}
+            unitLabel={input.unitLabel}
+            noDataLabel={input.noDataLabel}
+          />
+        );
+      })}
     </g>
   );
 }

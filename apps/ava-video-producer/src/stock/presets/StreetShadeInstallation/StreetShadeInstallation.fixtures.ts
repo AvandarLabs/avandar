@@ -129,19 +129,23 @@ const dense: Input = {
     actionLabel: "W".repeat(32),
   },
   referenceCondition: "W".repeat(42),
-  zones: Array.from({ length: 4 }, (_, index) => ({
-    id: `zone-${index}`,
-    label: "W".repeat(26),
-    areaM2: [100, 200, 300, 400][index],
-    existingShadeM2: 0,
-  })),
-  installations: Array.from({ length: 4 }, (_, index) => ({
-    id: `shade-${index}`,
-    label: "W".repeat(28),
-    zoneId: "zone-0",
-    kind: index % 2 ? "awning" : "tree-canopy",
-    addedShadeM2: 25,
-  })),
+  zones: Array.from({ length: 4 }, (_, index) => {
+    return {
+      id: `zone-${index}`,
+      label: "W".repeat(26),
+      areaM2: [100, 200, 300, 400][index],
+      existingShadeM2: 0,
+    };
+  }),
+  installations: Array.from({ length: 4 }, (_, index) => {
+    return {
+      id: `shade-${index}`,
+      label: "W".repeat(28),
+      zoneId: "zone-0",
+      kind: index % 2 ? "awning" : "tree-canopy",
+      addedShadeM2: 25,
+    };
+  }),
 };
 const extraFixtures: StockContract<typeof DEFAULT_INPUT>["fixtures"] = [
   {
@@ -155,14 +159,17 @@ const extraFixtures: StockContract<typeof DEFAULT_INPUT>["fixtures"] = [
     id: "zero-added",
     input: {
       ...DEFAULT_INPUT,
-      installations: DEFAULT_INPUT.installations.map((item) => ({
-        ...item,
-        addedShadeM2: 0,
-      })),
+      installations: DEFAULT_INPUT.installations.map((item) => {
+        return {
+          ...item,
+          addedShadeM2: 0,
+        };
+      }),
       showAreaBalance: false,
     },
   },
 ];
+/** Invalid stock inputs used to check this preset contract rejects bad data. */
 export const invalidInputs: unknown[] = [
   { ...DEFAULT_INPUT, extra: true },
   {
@@ -175,11 +182,13 @@ export const invalidInputs: unknown[] = [
   },
   {
     ...DEFAULT_INPUT,
-    installations: DEFAULT_INPUT.installations.map((item) => ({
-      ...item,
-      zoneId: "stop",
-      addedShadeM2: 50,
-    })),
+    installations: DEFAULT_INPUT.installations.map((item) => {
+      return {
+        ...item,
+        zoneId: "stop",
+        addedShadeM2: 50,
+      };
+    }),
   },
   { ...DEFAULT_INPUT, zones: [DEFAULT_INPUT.zones[0], DEFAULT_INPUT.zones[0]] },
 ];

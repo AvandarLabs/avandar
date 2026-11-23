@@ -35,7 +35,7 @@ type DefaultDBPrimaryKey<
 export type SupabaseCrudModelSpec<
   ModelTypes extends DefaultModelTypes,
   DBPrimaryKey extends DefaultDBPrimaryKey<ModelTypes["tableName"]>,
-  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  // oxlint-disable-next-line typescript/no-empty-object-type
   ExtraTypes extends object = {},
 > = {
   /** The name of the model */
@@ -69,7 +69,7 @@ export type SupabaseCrudModelSpec<
 } & ExtraTypes;
 
 export type AnySupabaseCrudModelSpec =
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // oxlint-disable-next-line typescript/no-explicit-any
   SupabaseCrudModelSpec<any, any>;
 
 export type SupabaseCrudClient<

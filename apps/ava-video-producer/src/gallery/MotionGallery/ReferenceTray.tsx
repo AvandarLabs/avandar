@@ -1,7 +1,6 @@
-import { Trans, useLingui as useGalleryLingui } from "@lingui/react/macro";
-import { type StockPresetId } from "../../stock/catalog";
+import { type StockPresetId } from "../../stock/stockEntry";
 import { Icon } from "./Icon";
-import { useReferenceBrief } from "./useReferenceBrief";
+import { referenceBrief } from "./referenceBrief";
 import type { Preset } from "./Preset.types";
 import type { ReactNode, Dispatch, SetStateAction } from "react";
 
@@ -22,31 +21,38 @@ export function ReferenceTray({
   background,
   onCopy,
 }: Readonly<Props>): ReactNode {
-  const { t } = useGalleryLingui();
-  const referenceBrief = useReferenceBrief();
   return (
-    <div className="reference-tray" aria-label={t`Saved reference actions`}>
+    <div className="reference-tray" aria-label="Saved reference actions">
       <div className="tray-count">
         <Icon name="bookmark" size={17} />
         <strong>{saved.length}</strong>
         <span>
-          {saved.length === 1 ? t`reference saved` : t`references saved`}
+          {saved.length === 1 ? "reference saved" : "references saved"}
         </span>
       </div>
-      <button className="tray-clear" onClick={() => setSaved([])}>
-        <Trans>Clear</Trans>
+      <button
+        className="tray-clear"
+        onClick={() => {
+          return setSaved([]);
+        }}
+      >
+        Clear
       </button>
       <button
         className="button button-primary"
-        onClick={() =>
-          onCopy(
-            t`Motion Atlas / Creative reference brief\n${saved.length} selected motion references\n\n${savedPresets.map((preset) => referenceBrief({ preset, accent, background })).join("\n\n---\n\n")}`,
-            t`Reference brief copied`,
-          )
-        }
+        onClick={() => {
+          return onCopy(
+            `Motion Atlas / Creative reference brief\n${saved.length} selected motion references\n\n${savedPresets
+              .map((preset) => {
+                return referenceBrief({ preset, accent, background });
+              })
+              .join("\n\n---\n\n")}`,
+            "Reference brief copied",
+          );
+        }}
       >
         <Icon name="copy" size={15} />
-        <Trans>Copy brief</Trans>
+        Copy brief
         <Icon name="arrow" size={16} />
       </button>
     </div>

@@ -1,12 +1,14 @@
 import { useEffect } from "react";
-import { afterDownloads } from "../../../../showcase/download.js";
-import { watchFilms } from "../../../../showcase/watch-films.js";
+import { FilmDownloads } from "../../../../showcase/FilmDownloads/FilmDownloads";
+import { watchFilms } from "../../../../showcase/watchFilms/watchFilms";
 import type { RefObject } from "react";
 
 function _isOptionsMessage(data: unknown): data is {
   type: "film-options";
   id: string;
-  options: { captions: boolean };
+  options: {
+    captions: boolean;
+  };
 } {
   return (
     typeof data === "object" &&
@@ -22,41 +24,64 @@ function _isOptionsMessage(data: unknown): data is {
     typeof data.options.captions === "boolean"
   );
 }
-
-/** One source watcher and caption handshake scoped to the current live iframe. */
+function usePlayerSourceRefresh({
+  id,
+  player,
+}: Readonly<{
+  id: string;
+  player: RefObject<HTMLIFrameElement | null>;
+}>): void {
+  useEffect(
+    function refreshPlayerAfterSourceBuild() {
+      if (!player.current) {
+        return;
+      }
+      let cancelRefresh: (() => void) | undefined;
+      const stopWatching = watchFilms({
+        players: [player.current],
+        onReload: () => {
+          cancelRefresh?.();
+          cancelRefresh = FilmDownloads.afterDownloads(() => {
+            return location.reload();
+          });
+        },
+      });
+      return () => {
+        stopWatching();
+        cancelRefresh?.();
+      };
+    },
+    [id, player],
+  );
+}
+/**
+ * One source watcher and caption handshake scoped to the current live iframe.
+ */
 export function useCompositionPlayer(options: {
   id: string;
   player: RefObject<HTMLIFrameElement | null>;
   onOptions: (options: { id: string; captions: boolean }) => void;
-}) {
+}): void {
   const { id, player, onOptions } = options;
-  useEffect(() => {
-    if (!player.current) {
-      return;
-    }
-    let cancelRefresh: (() => void) | undefined;
-    const stopWatching = watchFilms([player.current], () => {
-      cancelRefresh?.();
-      cancelRefresh = afterDownloads(() => location.reload());
-    });
-    return () => {
-      stopWatching();
-      cancelRefresh?.();
-    };
-  }, [id, player]);
-  useEffect(() => {
-    const receive = (event: MessageEvent<unknown>) => {
-      if (
-        event.origin !== location.origin ||
-        event.source !== player.current?.contentWindow ||
-        !_isOptionsMessage(event.data) ||
-        event.data.id !== id
-      ) {
-        return;
-      }
-      onOptions({ id, captions: event.data.options.captions });
-    };
-    window.addEventListener("message", receive);
-    return () => window.removeEventListener("message", receive);
-  }, [id, onOptions, player]);
+  usePlayerSourceRefresh({ id, player });
+  useEffect(
+    function receivePlayerCaptionOptions() {
+      const receive = (event: MessageEvent<unknown>) => {
+        if (
+          event.origin !== location.origin ||
+          event.source !== player.current?.contentWindow ||
+          !_isOptionsMessage(event.data) ||
+          event.data.id !== id
+        ) {
+          return;
+        }
+        onOptions({ id, captions: event.data.options.captions });
+      };
+      window.addEventListener("message", receive);
+      return () => {
+        return window.removeEventListener("message", receive);
+      };
+    },
+    [id, onOptions, player],
+  );
 }

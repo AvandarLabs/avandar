@@ -75,6 +75,8 @@ describe("disputed status", () => {
         type: "bufferOfLayer",
         layerId: uuid<MapLayer.Id>(),
         distanceMeters: MapLayer.defaultBufferDistanceMeters,
+        distanceUnit: "m",
+        labelColumn: undefined,
         dissolve: false,
       },
     };

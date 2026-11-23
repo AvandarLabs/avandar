@@ -66,6 +66,8 @@ enabled = true
 sql_paths = [
   "./migrations/20260813214231_STORAGE-restore-dropped-object-policies.sql",
   "./migrations/20260816020300_STORAGE-dashboard-snapshot-buckets.sql",
+  "./migrations/20261107220000_STORAGE-opendata-service-role-writes-only.sql",
+  "./migrations/20261109030000_STORAGE-drop-open-data-catalog-bucket.sql",
 ]
 
 [realtime]
@@ -408,6 +410,12 @@ verify_jwt = false
 import_map = "./functions/open-data/deno.json"
 entrypoint = "./functions/open-data/index.ts"
 
+[functions.file-url]
+enabled = true
+verify_jwt = false
+import_map = "./functions/file-url/deno.json"
+entrypoint = "./functions/file-url/index.ts"
+
 [functions.healthz]
 enabled = true
 verify_jwt = false
@@ -429,3 +437,9 @@ entrypoint = "./functions/support/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
 # static_files = [ "./functions/support/*.html" ]
+
+[functions.geocode]
+enabled = true
+verify_jwt = false
+import_map = "./functions/geocode/deno.json"
+entrypoint = "./functions/geocode/index.ts"

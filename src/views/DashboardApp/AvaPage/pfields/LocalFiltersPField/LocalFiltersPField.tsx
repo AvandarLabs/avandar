@@ -2,6 +2,7 @@ import { isDefined, propEq } from "@avandar/utils";
 import { Trans } from "@lingui/react/macro";
 import { Button, Stack, Text } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
+import { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import { LocalFilterEditor } from "@/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFilterEditor";
 import { useDataVizAuthoring } from "../useDataVizAuthoring/useDataVizAuthoring";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
@@ -25,6 +26,45 @@ function createLocalFilter(columnId: QueryColumn.Id): LocalFilter {
   };
 }
 
+type Authoring = ReturnType<typeof useDataVizAuthoring>;
+
+/**
+ * Writes local filters back to the selected block. A block that still saves
+ * its filters by column name gets each filter's column ID turned back into
+ * the column's name.
+ */
+function _saveLocalFilters(
+  options: Readonly<{
+    authoring: Authoring;
+    columns: readonly QueryResult.ColumnWithId[];
+    localFilters: ReadonlyArray<LocalFilter | LegacyLocalFilter>;
+  }>,
+): void {
+  const { authoring, columns, localFilters } = options;
+  if (authoring.props.columnBindingVersion === 0) {
+    const legacyFilters = localFilters.map((filter) => {
+      if ("columnName" in filter) {
+        return filter;
+      }
+      const column = columns.find(propEq("id", filter.columnId));
+      if (!column) {
+        return undefined;
+      }
+      const { columnId: _columnId, ...definition } = filter;
+      return { ...definition, columnName: column.name };
+    });
+    if (legacyFilters.every(isDefined)) {
+      authoring.updateColumnNameProps({ localFilters: legacyFilters });
+    }
+  } else if (
+    localFilters.every((filter): filter is LocalFilter => {
+      return "columnId" in filter;
+    })
+  ) {
+    authoring.update({ localFilters });
+  }
+}
+
 /**
  * Puck side-panel field for managing a DataViz block's local filters.
  *
@@ -41,31 +81,14 @@ export function LocalFiltersPField({ auth }: Props): ReactElement {
       ? authoring.props.localFilters
       : (authoring.runtime?.localFilters ?? []);
   const columns = authoring.schema?.columns ?? [];
+  // A local filter's IN, ILIKE, or = fails on a list column.
+  const filterableColumns = columns.filter((column) => {
+    return !QueryResult.isListColumn(column);
+  });
   const onChange = (
     localFilters: ReadonlyArray<LocalFilter | LegacyLocalFilter>,
   ): void => {
-    if (authoring.props.columnBindingVersion === 0) {
-      const legacyFilters = localFilters.map((filter) => {
-        if ("columnName" in filter) {
-          return filter;
-        }
-        const column = columns.find(propEq("id", filter.columnId));
-        if (!column) {
-          return undefined;
-        }
-        const { columnId: _columnId, ...definition } = filter;
-        return { ...definition, columnName: column.name };
-      });
-      if (legacyFilters.every(isDefined)) {
-        authoring.updateColumnNameProps({ localFilters: legacyFilters });
-      }
-    } else if (
-      localFilters.every((filter): filter is LocalFilter => {
-        return "columnId" in filter;
-      })
-    ) {
-      authoring.update({ localFilters });
-    }
+    _saveLocalFilters({ authoring, columns, localFilters });
   };
 
   const updateFilter = (
@@ -88,7 +111,7 @@ export function LocalFiltersPField({ auth }: Props): ReactElement {
   };
 
   const addFilter = (): void => {
-    const firstColumn = columns[0];
+    const firstColumn = filterableColumns[0];
     if (firstColumn) {
       onChange([...filters, createLocalFilter(firstColumn.id)]);
     }
@@ -110,7 +133,7 @@ export function LocalFiltersPField({ auth }: Props): ReactElement {
               <LocalFilterEditor
                 key={filter.id}
                 filter={filter}
-                columns={columns}
+                columns={filterableColumns}
                 onChange={(updatedFilter) => {
                   updateFilter(filterIndex, updatedFilter);
                 }}
@@ -126,7 +149,7 @@ export function LocalFiltersPField({ auth }: Props): ReactElement {
         size="compact-xs"
         leftSection={<IconPlus size={12} />}
         onClick={addFilter}
-        disabled={columns.length === 0}
+        disabled={filterableColumns.length === 0}
         variant="light"
       >
         <Trans>Add filter</Trans>

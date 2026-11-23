@@ -210,25 +210,33 @@ export const invalidInputs: unknown[] = [
   },
   {
     ...DEFAULT_INPUT,
-    steps: DEFAULT_INPUT.steps.map((step) => ({ ...step, isInserted: false })),
+    steps: DEFAULT_INPUT.steps.map((step) => {
+      return { ...step, isInserted: false };
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    steps: DEFAULT_INPUT.steps.map((step) => ({ ...step, isInserted: true })),
+    steps: DEFAULT_INPUT.steps.map((step) => {
+      return { ...step, isInserted: true };
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    steps: DEFAULT_INPUT.steps.map((step, index) => ({
-      ...step,
-      isInserted: index === 0,
-    })),
+    steps: DEFAULT_INPUT.steps.map((step, index) => {
+      return {
+        ...step,
+        isInserted: index === 0,
+      };
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    steps: DEFAULT_INPUT.steps.map((step, index) => ({
-      ...step,
-      isInserted: index === DEFAULT_INPUT.steps.length - 1,
-    })),
+    steps: DEFAULT_INPUT.steps.map((step, index) => {
+      return {
+        ...step,
+        isInserted: index === DEFAULT_INPUT.steps.length - 1,
+      };
+    }),
   },
   {
     ...DEFAULT_INPUT,

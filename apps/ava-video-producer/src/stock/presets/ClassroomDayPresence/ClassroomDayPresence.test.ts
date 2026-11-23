@@ -108,8 +108,13 @@ registerStockPresetAssertions(assertions);
 registerStockTextLayoutAssertions(assertions);
 test("serialized semantic rules retain every runtime relation", () => {
   assert.deepEqual(
+    // This assertion exercises the JSON serialization boundary of the public
+    // contract.
+    // react-doctor-disable-next-line no-json-parse-stringify-clone
     JSON.parse(JSON.stringify(contract.semanticRules)).map(
-      ({ id, paths }: { id: string; paths: string[] }) => ({ id, paths }),
+      ({ id, paths }: { id: string; paths: string[] }) => {
+        return { id, paths };
+      },
     ),
     [
       {
@@ -127,9 +132,9 @@ test("serialized semantic rules retain every runtime relation", () => {
     ],
   );
   assert.ok(
-    SEMANTIC_RULES.every(
-      (rule) => rule.paths.length && rule.description.length,
-    ),
+    SEMANTIC_RULES.every((rule) => {
+      return rule.paths.length && rule.description.length;
+    }),
   );
 });
 
@@ -149,8 +154,8 @@ test("each day partitions the unchanged roster and preserves one silhouette per 
         (markup.match(/data-desk=/g) || []).length,
         input.learners.length,
       );
-      ["present", "absent", "unknown"].forEach((state) =>
-        assert.equal(
+      ["present", "absent", "unknown"].forEach((state) => {
+        return assert.equal(
           SvgAttributes.getNumberFromMarkup({
             attributes: totals,
             name: `data-${state}`,
@@ -158,8 +163,8 @@ test("each day partitions the unchanged roster and preserves one silhouette per 
           day.records.filter(
             propEq<{ state: unknown }, "state", unknown>("state", state),
           ).length,
-        ),
-      );
+        );
+      });
       assert.equal(
         SvgAttributes.getNumberFromMarkup({
           attributes: totals,
@@ -185,16 +190,18 @@ test("full desk, person, label and impression envelopes remain separate through 
       const markup = _render({ frame: frame, input: input });
       const desks = Array.from(
         markup.matchAll(/<g[^>]*data-desk="[^"]*"[^>]*>/g),
-        (match) => ({
-          x: SvgAttributes.getNumberFromMarkup({
-            attributes: match[0],
-            name: "data-x",
-          }),
-          y: SvgAttributes.getNumberFromMarkup({
-            attributes: match[0],
-            name: "data-y",
-          }),
-        }),
+        (match) => {
+          return {
+            x: SvgAttributes.getNumberFromMarkup({
+              attributes: match[0],
+              name: "data-x",
+            }),
+            y: SvgAttributes.getNumberFromMarkup({
+              attributes: match[0],
+              name: "data-y",
+            }),
+          };
+        },
       );
       desks.forEach((desk, index) => {
         assert.ok(
@@ -203,16 +210,14 @@ test("full desk, person, label and impression envelopes remain separate through 
             desk.y - 22 >= 140 &&
             desk.y + 115 <= 529,
         );
-        desks
-          .slice(index + 1)
-          .forEach((other) =>
-            assert.ok(
-              desk.x + 65 < other.x - 65 ||
-                other.x + 65 < desk.x - 65 ||
-                desk.y + 115 < other.y - 22 ||
-                other.y + 115 < desk.y - 22,
-            ),
+        desks.slice(index + 1).forEach((other) => {
+          return assert.ok(
+            desk.x + 65 < other.x - 65 ||
+              other.x + 65 < desk.x - 65 ||
+              desk.y + 115 < other.y - 22 ||
+              other.y + 115 < desk.y - 22,
           );
+        });
       });
     });
   });

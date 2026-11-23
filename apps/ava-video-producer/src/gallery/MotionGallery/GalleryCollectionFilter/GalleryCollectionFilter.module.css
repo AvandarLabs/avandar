@@ -1,0 +1,3 @@
+.galleryCollectionFilterCollectionFilter {
+  composes: collection-filter from global;
+}

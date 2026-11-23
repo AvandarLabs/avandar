@@ -9,13 +9,13 @@ type PublicCell = {
 };
 /** Sanitized public records never retain the local suppressed numeric value. */
 export function makePublicCellsFromInput(input: Readonly<Input>): PublicCell[] {
-  return input.cells.map(({ id, label, count }, index) => {
+  return input.cells.map(({ id, label, count: numRecords }, index) => {
     const status =
-      count === null
+      numRecords === null
         ? "missing"
-        : count === 0
+        : numRecords === 0
           ? "zero"
-          : count < input.minimum
+          : numRecords < input.minimum
             ? "suppressed"
             : "released";
     return {
@@ -24,8 +24,8 @@ export function makePublicCellsFromInput(input: Readonly<Input>): PublicCell[] {
       index,
       status,
       value:
-        count !== null && (count === 0 || count >= input.minimum)
-          ? count
+        numRecords !== null && (numRecords === 0 || numRecords >= input.minimum)
+          ? numRecords
           : undefined,
     };
   });

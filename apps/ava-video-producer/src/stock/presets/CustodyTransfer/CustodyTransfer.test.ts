@@ -10,6 +10,62 @@ import { custodyTransferContract } from "./CustodyTransfer.contract";
 import { DEFAULT_INPUT, fixtures } from "./CustodyTransfer.fixtures";
 import { inputSchema, type Input } from "./CustodyTransfer.schema";
 
+function _assertSenderSupportAtAcknowledgement(): void {
+  assert.equal(
+    SvgAttributes.getNumberFromMarkup({
+      attributes: _markedShape({
+        markup: _render({ frame: 90 }),
+        marker: "sender-support",
+      }),
+      name: "x2",
+    }),
+    480,
+  );
+}
+
+function _assertRecipientSupportAtContact(
+  contact: ReturnType<typeof _render>,
+): void {
+  assert.equal(
+    SvgAttributes.getNumberFromMarkup({
+      attributes: _markedShape({
+        markup: contact,
+        marker: "recipient-support",
+      }),
+      name: "x1",
+    }),
+    480,
+  );
+}
+
+function _assertRecipientSupportAtSetup(): void {
+  assert.equal(
+    SvgAttributes.getNumberFromMarkup({
+      attributes: _markedShape({
+        markup: _render({ frame: 24 }),
+        marker: "recipient-support",
+      }),
+      name: "x1",
+    }),
+    720,
+  );
+}
+
+/**
+ * The shape a marker names: the marked element itself, or the sketch-aware
+ * shape inside a marked group.
+ */
+function _markedShape({
+  markup,
+  marker,
+}: Readonly<{ markup: string; marker: string }>): string {
+  const wrapped = markup.match(
+    new RegExp(
+      `<g [^>]*data-${marker}="[^"]*"[^>]*><(?:line|path|circle|rect|ellipse)\\b[^>]*>`,
+    ),
+  );
+  return wrapped ? wrapped[0] : SvgAttributes.fromMarker({ markup, marker });
+}
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -66,42 +122,20 @@ registerStockPresetAssertions({
     { ...DEFAULT_INPUT, holders: { ...DEFAULT_INPUT.holders, extra: true } },
   ],
 });
-
 test("sender support persists through acknowledgement before responsibility crosses", () => {
   const contact = _render({ frame: 71 });
   assert.equal(
     SvgAttributes.getNumberFromMarkup({
-      attributes: SvgAttributes.fromMarker({
-        markup: contact,
-        marker: "sender-support",
-      }),
+      attributes: _markedShape({ markup: contact, marker: "sender-support" }),
       name: "x2",
     }),
     480,
   );
+  _assertRecipientSupportAtContact(contact);
+  _assertSenderSupportAtAcknowledgement();
   assert.equal(
     SvgAttributes.getNumberFromMarkup({
-      attributes: SvgAttributes.fromMarker({
-        markup: contact,
-        marker: "recipient-support",
-      }),
-      name: "x1",
-    }),
-    480,
-  );
-  assert.equal(
-    SvgAttributes.getNumberFromMarkup({
-      attributes: SvgAttributes.fromMarker({
-        markup: _render({ frame: 90 }),
-        marker: "sender-support",
-      }),
-      name: "x2",
-    }),
-    480,
-  );
-  assert.equal(
-    SvgAttributes.getNumberFromMarkup({
-      attributes: SvgAttributes.fromMarker({
+      attributes: _markedShape({
         markup: _render({ frame: 90 }),
         marker: "responsibility",
       }),
@@ -111,7 +145,7 @@ test("sender support persists through acknowledgement before responsibility cros
   );
   assert.equal(
     SvgAttributes.getNumberFromMarkup({
-      attributes: SvgAttributes.fromMarker({
+      attributes: _markedShape({
         markup: _render({ frame: 150 }),
         marker: "responsibility",
       }),
@@ -121,7 +155,7 @@ test("sender support persists through acknowledgement before responsibility cros
   );
   assert.equal(
     SvgAttributes.getNumberFromMarkup({
-      attributes: SvgAttributes.fromMarker({
+      attributes: _markedShape({
         markup: _render({ frame: 150 }),
         marker: "sender-support",
       }),
@@ -140,8 +174,8 @@ test("waiting retains sender responsibility and physical support with every obje
     [36, 72, 108, 150, 166].forEach((frame) => {
       assert.equal(
         SvgAttributes.getNumberFromMarkup({
-          attributes: SvgAttributes.fromMarker({
-            markup: _render({ frame: frame, input: input }),
+          attributes: _markedShape({
+            markup: _render({ frame, input }),
             marker: "responsibility",
           }),
           name: "cx",
@@ -150,8 +184,8 @@ test("waiting retains sender responsibility and physical support with every obje
       );
       assert.equal(
         SvgAttributes.getNumberFromMarkup({
-          attributes: SvgAttributes.fromMarker({
-            markup: _render({ frame: frame, input: input }),
+          attributes: _markedShape({
+            markup: _render({ frame, input }),
             marker: "sender-support",
           }),
           name: "x2",
@@ -166,7 +200,6 @@ test("hidden labels and responsibility marker leave the custody supports", () =>
   assert.doesNotMatch(markup, /aria-label=|data-responsibility=/);
   assert.match(markup, /data-sender-support=/);
 });
-
 test("distinct holder names retain accepted packing, whitespace and grapheme text", () => {
   [
     "界".repeat(28),
@@ -178,28 +211,18 @@ test("distinct holder names retain accepted packing, whitespace and grapheme tex
       ...fixtures[2].input,
       holders: { sender, recipient: `R${sender.slice(1)}` },
     });
-    const markup = _render({ frame: 150, input: input });
-    Object.values(input.holders).forEach((holder) =>
-      assert.ok(markup.includes(`aria-label="${holder}"`)),
-    );
+    const markup = _render({ frame: 150, input });
+    Object.values(input.holders).forEach((holder) => {
+      return assert.ok(markup.includes(`aria-label="${holder}"`));
+    });
     assert.doesNotMatch(markup, />[\u0300-\u036f\u200d]/u);
   });
 });
-
 test("setup geometry reaches shared contact before acknowledgement and release", () => {
+  _assertRecipientSupportAtSetup();
   assert.equal(
     SvgAttributes.getNumberFromMarkup({
-      attributes: SvgAttributes.fromMarker({
-        markup: _render({ frame: 24 }),
-        marker: "recipient-support",
-      }),
-      name: "x1",
-    }),
-    720,
-  );
-  assert.equal(
-    SvgAttributes.getNumberFromMarkup({
-      attributes: SvgAttributes.fromMarker({
+      attributes: _markedShape({
         markup: _render({ frame: 24 }),
         marker: "responsibility",
       }),
@@ -208,22 +231,16 @@ test("setup geometry reaches shared contact before acknowledgement and release",
     240,
   );
   assert.match(
-    SvgAttributes.fromMarker({
-      markup: _render({ frame: 72 }),
-      marker: "acknowledgement",
-    }),
+    _markedShape({ markup: _render({ frame: 72 }), marker: "acknowledgement" }),
     /opacity="0"/,
   );
   assert.match(
-    SvgAttributes.fromMarker({
-      markup: _render({ frame: 80 }),
-      marker: "acknowledgement",
-    }),
+    _markedShape({ markup: _render({ frame: 80 }), marker: "acknowledgement" }),
     /opacity="1"/,
   );
   assert.equal(
     SvgAttributes.getNumberFromMarkup({
-      attributes: SvgAttributes.fromMarker({
+      attributes: _markedShape({
         markup: _render({ frame: 100 }),
         marker: "responsibility",
       }),
@@ -233,7 +250,7 @@ test("setup geometry reaches shared contact before acknowledgement and release",
   );
   assert.equal(
     SvgAttributes.getNumberFromMarkup({
-      attributes: SvgAttributes.fromMarker({
+      attributes: _markedShape({
         markup: _render({ frame: 100 }),
         marker: "sender-support",
       }),
@@ -242,14 +259,10 @@ test("setup geometry reaches shared contact before acknowledgement and release",
     480,
   );
 });
-
 test("custody label and marker toggles operate independently", () => {
   const hiddenMarker = _render({
     frame: 150,
-    input: {
-      ...DEFAULT_INPUT,
-      showResponsibilityMarker: false,
-    },
+    input: { ...DEFAULT_INPUT, showResponsibilityMarker: false },
   });
   assert.doesNotMatch(hiddenMarker, /data-responsibility=/);
   assert.match(hiddenMarker, /aria-label="Example morning team"/);
@@ -260,10 +273,9 @@ test("custody label and marker toggles operate independently", () => {
   assert.doesNotMatch(hiddenLabels, /aria-label=/);
   assert.match(hiddenLabels, /data-responsibility=/);
 });
-
 test("each object physically touches the common support line", () => {
   (["folio", "baton", "key"] as const).forEach((objectShape) => {
-    const body = SvgAttributes.fromMarker({
+    const body = _markedShape({
       markup: _render({ frame: 60, input: { ...DEFAULT_INPUT, objectShape } }),
       marker: "object-base",
     });
@@ -278,7 +290,6 @@ test("each object physically touches the common support line", () => {
     assert.equal(bottom, 376);
   });
 });
-
 test("the acceptance seal clears the complete object detail slot", async () => {
   const { custodyTransferContract: correctionContract } =
     await import("./CustodyTransfer.contract");

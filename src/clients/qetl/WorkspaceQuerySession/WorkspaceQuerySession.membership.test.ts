@@ -5,8 +5,11 @@ import { WorkspaceMembershipDenied } from "@/clients/qetl/assertWorkspaceMembers
 import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { UserId } from "$/models/User/User.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { ConceptSpineRestriction } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
+import type { QetlRunnerOptions } from "@/clients/qetl/QueryMediator/QueryMediator.types";
 import type { QueryClient } from "@tanstack/react-query";
 
 const USER_ID = "66666666-6666-4666-8666-666666666666" as UserId;
@@ -17,15 +20,32 @@ const FOREIGN_WORKSPACE_ID =
   "44444444-4444-4444-8444-444444444444" as Workspace.Id;
 
 const WORKSPACES_QUERY_KEY = ["Workspace", "getWorkspacesOfCurrentUser"];
+const CONCEPT_ID = "77777777-7777-4777-8777-777777777777" as Concept.Id;
+const RESTRICTIONS: readonly ConceptSpineRestriction[] = [
+  { conceptId: CONCEPT_ID, externalIds: ["p1"] },
+];
 
-const { fetchWorkspacesMock, getCurrentSessionMock, innerRunQueryMock } =
-  vi.hoisted(() => {
-    return {
-      fetchWorkspacesMock: vi.fn(),
-      getCurrentSessionMock: vi.fn(),
-      innerRunQueryMock: vi.fn(),
-    };
-  });
+const {
+  fetchWorkspacesMock,
+  getConceptRelationPlansFromSqlMock,
+  getCurrentSessionMock,
+  innerRunQueryMock,
+  mediatorStateRef,
+} = vi.hoisted(() => {
+  return {
+    fetchWorkspacesMock: vi.fn(),
+    getConceptRelationPlansFromSqlMock: vi.fn(),
+    getCurrentSessionMock: vi.fn(),
+    innerRunQueryMock: vi.fn(),
+    // The state the session builds its mediator with, so a test can call the
+    // planner the session hands the mediator.
+    mediatorStateRef: {
+      current: undefined as
+        | Pick<QetlRunnerOptions, "planConceptRelations">
+        | undefined,
+    },
+  };
+});
 
 // Mirrors the `staleTime` and `networkMode` that ship in
 // `src/config/AvaQueryClient.ts`, because authorization reads membership
@@ -110,12 +130,25 @@ vi.mock("@/clients/DuckDbClient/DuckDbClient", () => {
 vi.mock("@/clients/qetl/QueryMediator/QueryMediator", () => {
   return {
     QueryMediatorFactory: {
-      create: () => {
+      create: (
+        _name: string,
+        options: { state: Pick<QetlRunnerOptions, "planConceptRelations"> },
+      ) => {
+        mediatorStateRef.current = options.state;
         return { runQuery: innerRunQueryMock };
       },
     },
   };
 });
+
+vi.mock(
+  "@/clients/qetl/QueryMediator/conceptRelation/getConceptRelationPlansFromSql/getConceptRelationPlansFromSql",
+  () => {
+    return {
+      getConceptRelationPlansFromSql: getConceptRelationPlansFromSqlMock,
+    };
+  },
+);
 
 async function getDenialCode(promise: Promise<unknown>): Promise<unknown> {
   const error = await promise.then(
@@ -139,6 +172,7 @@ beforeEach(() => {
   innerRunQueryMock.mockResolvedValue({ data: [] });
   getCurrentSessionMock.mockResolvedValue({ user: { id: USER_ID } });
   fetchWorkspacesMock.mockResolvedValue([{ id: MEMBER_WORKSPACE_ID }]);
+  getConceptRelationPlansFromSqlMock.mockResolvedValue([]);
 });
 
 describe("WorkspaceQuerySession membership authorization", () => {
@@ -225,6 +259,38 @@ describe("WorkspaceQuerySession membership authorization", () => {
     expect(innerRunQueryMock).toHaveBeenCalledTimes(1);
     expect(innerRunQueryMock).toHaveBeenCalledWith(
       expect.objectContaining({ returnType: "parquet" }),
+    );
+  });
+
+  it("passes a member's spine restrictions to the mediator", async () => {
+    await WorkspaceQuerySession.runQuery({
+      rawSql: `SELECT * FROM "concept_${CONCEPT_ID}"`,
+      workspaceId: MEMBER_WORKSPACE_ID,
+      conceptSpineRestrictions: RESTRICTIONS,
+    });
+
+    expect(innerRunQueryMock).toHaveBeenCalledWith(
+      expect.objectContaining({ conceptSpineRestrictions: RESTRICTIONS }),
+    );
+  });
+
+  it("plans concepts with the spine restrictions the mediator hands over", async () => {
+    const rawSql = `SELECT * FROM "concept_${CONCEPT_ID}"`;
+    await WorkspaceQuerySession.runQuery({
+      rawSql,
+      workspaceId: MEMBER_WORKSPACE_ID,
+    });
+
+    await mediatorStateRef.current?.planConceptRelations?.({
+      rawSql,
+      conceptSpineRestrictions: RESTRICTIONS,
+    });
+
+    expect(getConceptRelationPlansFromSqlMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        rawSql,
+        conceptSpineRestrictions: RESTRICTIONS,
+      }),
     );
   });
 });

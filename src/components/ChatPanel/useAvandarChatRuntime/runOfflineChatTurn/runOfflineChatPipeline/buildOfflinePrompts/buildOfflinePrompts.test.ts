@@ -30,6 +30,16 @@ const SCHEMA_WITH_CONCEPT = {
   conceptAttributes: [{ concept_id: CONCEPT_ID, name: "status" }],
 } as const;
 
+const SCHEMA_WITH_STATUSES = {
+  ...SCHEMA,
+  concepts: [{ id: CONCEPT_ID, name: "Case" }],
+  conceptAttributes: [{ concept_id: CONCEPT_ID, name: "district" }],
+  conceptStatuses: [
+    { concept_id: CONCEPT_ID, name: "Confirmed", position: 1 },
+    { concept_id: CONCEPT_ID, name: "Suspected", position: 0 },
+  ],
+} as const;
+
 describe("buildOfflineSqlPrompt", () => {
   it("requires resolved dataset FROM by alias and SQL-only output", () => {
     const prompt = buildOfflineSqlPrompt({
@@ -62,6 +72,87 @@ describe("buildOfflineSqlPrompt", () => {
 
     expect(prompt).toContain("- c0: Case (status)");
     expect(prompt).not.toContain(CONCEPT_ID);
+  });
+
+  it("lists a case type's statuses in position order offline", () => {
+    const prompt = buildOfflineSqlPrompt({
+      schema: SCHEMA_WITH_STATUSES,
+      pageContext: ChatPageContext.createDataExplorerViewContext(),
+      analysisSummary: "Count confirmed cases",
+      lastUserPrompt: "how many confirmed cases",
+    });
+
+    expect(prompt).toContain(
+      "- c0: Case (district, status: Suspected | Confirmed)",
+    );
+  });
+
+  it("marks a list field and explains list SQL offline", () => {
+    const prompt = buildOfflineSqlPrompt({
+      schema: {
+        ...SCHEMA,
+        concepts: [{ id: CONCEPT_ID, name: "Case" }],
+        conceptAttributes: [
+          { concept_id: CONCEPT_ID, name: "Symptoms", is_array: true },
+        ],
+      },
+      pageContext: ChatPageContext.createDataExplorerViewContext(),
+      analysisSummary: "Find cases with a rash",
+      lastUserPrompt: "which cases had a rash",
+    });
+
+    expect(prompt).toContain("- c0: Case (Symptoms (list))");
+    expect(prompt).toContain("list_contains");
+  });
+
+  it("marks a per-month field and explains how to unnest it offline", () => {
+    const prompt = buildOfflineSqlPrompt({
+      schema: {
+        ...SCHEMA,
+        concepts: [{ id: CONCEPT_ID, name: "Case" }],
+        conceptAttributes: [
+          {
+            concept_id: CONCEPT_ID,
+            name: "Temperature",
+            is_array: true,
+            bucket_grain: "month",
+            data_type: "double",
+          },
+        ],
+      },
+      pageContext: ChatPageContext.createDataExplorerViewContext(),
+      analysisSummary: "Average temperature per month",
+      lastUserPrompt: "average temperature per month",
+    });
+
+    expect(prompt).toContain(
+      "- c0: Case (Temperature [per month: STRUCT(bucket DATE, value DOUBLE)[]])",
+    );
+    expect(prompt).toContain("UNNEST");
+    expect(prompt).not.toContain("list_contains");
+  });
+
+  it("lists a field under the column name SQL must use offline", () => {
+    const prompt = buildOfflineSqlPrompt({
+      schema: {
+        ...SCHEMA,
+        concepts: [{ id: CONCEPT_ID, name: "Case" }],
+        conceptAttributes: [
+          {
+            id: "11111111-1111-4111-8111-111111111111",
+            concept_id: CONCEPT_ID,
+            name: "external_id",
+          },
+        ],
+      },
+      pageContext: ChatPageContext.createDataExplorerViewContext(),
+      analysisSummary: "List case ids",
+      lastUserPrompt: "list case ids",
+    });
+
+    expect(prompt).toContain(
+      '- c0: Case (external_id_2 (field "external_id"))',
+    );
   });
 });
 
