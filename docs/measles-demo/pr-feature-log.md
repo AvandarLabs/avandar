@@ -209,7 +209,7 @@ merged in twice since (`56f31f603` and `f920d223c`), so the merge-base is now
 | F137 | Crosswalks at scale: meaning suggestions for mappings, a virtualized layout list past 100 layouts, per-dataset progress while combining, and the 100-dataset materialization measurement | not started | F136 | |
 | F139 | Dashboard blocks from any page, online and offline: `add_dashboard_block`, prompt v6, and the confirm card | not started | F81 to F87, F89 to F91, F128, F22 | |
 | F140 | Try again and parity in the agent: the Try again line, the shared card audit, and the agent's analytics events | not started | F139 | |
-| F141 | Release and deploy hardening kept from the abandoned alpha line: `ava release` preflight and push safety, the production deploy job, and the catalog move scripts | not started | | |
+| F141 | Release and deploy hardening kept from the abandoned alpha line: `ava release` preflight and push safety, the production deploy job, and the catalog move scripts | not started (no PR; reaches `develop` with the `demo/measles` promotion) | | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -693,7 +693,7 @@ Take only your feature's hunks from these files. The last feature in the
 | `src/views/GisApp/useGisApp/MapSourceHydration/useHydratedMapSources/useHydratedMapSources.ts` | F127, F35 | F127: the stable `updateConfig` (plus `d45e26490`'s `HydrationInputs` names, which only PR #321 has). F35: `aad4d700d` moves the config hydration into `useHydratedMapConfig.ts`. |
 | `.github/workflows/pr-develop.yaml` | F127, F96 to F112 | F127: `ubuntu-24.04` and the timeout. F96 to F112: `pnpm check:plugin-bundle`. |
 | `.github/workflows/demo.yaml`, deleted and not replaced | F13, F25, F32, F141 | F13, plus its `2efc74421` addendum (Supabase CLI 2.114.0). F25: `AVA_PIPELINE_SERVER_URL`. F32: the `GEOAPIFY_API_KEY` line. F141: deletes `demo.yaml` (`b6cb5837d`). The `alpha-dev.yaml` that briefly replaced it was deleted on `chore/production-cutover` (`ca358d64c`), so nothing replaces it. |
-| `.github/workflows/production.yaml`, `vercel.json` | F127, F141 | F127: `ubuntu-24.04` and the 70-minute e2e timeout in `production.yaml`. F141's lock-out commits (`39b6b98ae`, `bdcec197c`, `1ca23db7f`) were undone on `chore/production-cutover`, which restored `develop`'s copies of both files (`ca358d64c`). They are then to be given the deploy job written for the alpha workflow. |
+| `.github/workflows/production.yaml`, `vercel.json` | F127, F141 | F127: `ubuntu-24.04` and the 70-minute e2e timeout in `production.yaml`. F141's lock-out commits (`39b6b98ae`, `bdcec197c`, `1ca23db7f`) were undone on `chore/production-cutover`, which restored `develop`'s copies of both files (`ca358d64c`). Both files are to receive the `alpha.yaml` deploy job described in F141. |
 
 ### Data dictionaries (F129 to F138)
 
@@ -1423,17 +1423,16 @@ Add to **Commits to read**:
 | `f1c068132` | chore(demo): remove the local-to-demo data loader | Nothing to port: it deletes `scripts/demo/loadLocalDataIntoDemoBranch.sh`, which F13 already leaves out, and updates this log (branch-only). |
 | `2efc74421` | fix(ci): bump the demo deploy's Supabase CLI to 2.114.0 | All of it. CLI 2.98.2 applied the import map in random order when bundling, so `@avandar/utils/sql` sometimes resolved through `@avandar/utils` and the `connectors` function failed with "Module not found". 2.114.0 matches the `supabase` devDependency. |
 
-**Addendum: replaced on the alpha line (2026-11-20).** F141 deletes
+**Addendum: deleted on the alpha line (2026-11-20).** F141 deletes
 `.github/workflows/demo.yaml` (`b6cb5837d`) and moves
 `scripts/demo/ensureSupabaseBranch.sh` to
 `scripts/alpha-dev/ensureSupabaseBranch.sh` (`a6488b085`, `22bc12611`).
-Both the `alpha-dev` workflow that replaced the demo deploy and
-`scripts/alpha-dev/` were deleted on `chore/production-cutover`
-(`ca358d64c`), so nothing replaces it, and `demo.avandarlabs.com` is
-removed after cutover.
-Read F141 before porting F13: `develop` already holds both F13 files as
-`demo/measles` last had them, and the Verification above (a throwaway
-`demo/*` branch) no longer applies once F141 lands.
+The `alpha-dev` workflow and `scripts/alpha-dev/` were deleted on
+`chore/production-cutover` (`ca358d64c`). Nothing replaces `demo.yaml`,
+and `demo.avandarlabs.com` is removed after cutover.
+The `demo/measles` promotion deletes both F13 files from `develop`, so
+there is nothing to port, and the Verification above (a throwaway
+`demo/*` branch) no longer applies.
 
 ---
 
@@ -12289,8 +12288,8 @@ pnpm vitest run scripts/ai-eval
 The eval commands are in `docs/ai-agent/eval.md#reproducing-every-result`.
 ## F141: Release and deploy hardening kept from the abandoned alpha line
 
-Status: not started for `develop`. Built on `feat/alpha-line` and merged
-into `demo/measles`. The alpha line was abandoned on 2026-11-23: the
+Status: not on `develop`. Built on `feat/alpha-line` and merged into
+`demo/measles`, and reaches `develop` with its promotion. The alpha line was abandoned on 2026-11-23: the
 `alpha-dev` and `alpha` workflows and the two-line release were removed on
 `chore/production-cutover` (`ca358d64c`, `1ac86dd0b`, `53059c412`).
 
@@ -12302,7 +12301,8 @@ on a release line:
   `git symbolic-ref`. Before the version commit it re-checks that HEAD is
   still where preflight found it. The version commit touches `package.json`
   only, and pushes use full refspecs.
-- The deploy job written for the alpha workflow, to be used by
+- The deploy job from `.github/workflows/alpha.yaml` (read it with
+  `git show ca358d64c^:.github/workflows/alpha.yaml`), to be copied into
   `production.yaml` and `staging.yaml`: it refuses to deploy anything but
   the branch tip, checks the configuration, builds before any write, scopes
   credentials to the step that needs them, writes secrets to a single-quoted
@@ -12310,16 +12310,19 @@ on a release line:
 - The catalog move scripts, now under `scripts/catalog-move/` (`3769ba532`),
   move the open data catalog and its Parquet objects between projects.
 
-**Value:** Releases and deploys keep the alpha line's safety checks without
-a second release line.
+**Value:** Releases keep the alpha line's safety checks without a second
+release line, and the staging and production deploys can take its deploy
+job.
 
-**Design:** `docs/measles-demo/production-cutover-plan.md`, sections 8 to
-10. The alpha line's own plan, runbook, and Stage 0 plan are kept as
-history and are superseded. Its migration audit is refreshed for production
-and staging and renamed `production-migration-audit.md` by the cutover.
+**Design:** `docs/measles-demo/production-cutover-plan.md` (its "Deploys",
+"`ava release` without the alpha line", and "The catalog" sections). The
+alpha line's own plan, runbook, and Stage 0 plan are kept as history and
+are superseded. Its migration audit, `alpha-migration-audit.md`, is to be
+refreshed for production and staging and renamed
+`production-migration-audit.md`.
 
 **PR title:** none of its own. It reaches `develop` with the `demo/measles`
-promotion (section 11 of the production cutover plan).
+promotion (the production cutover plan, its "Stages" section).
 
 **Depends on:** no feature in this log. `develop` already has every catalog
 table the catalog move scripts move. No Postgres connector work.
@@ -12368,9 +12371,11 @@ table the catalog move scripts move. No Postgres connector work.
 
 **Schema:** none.
 
-**Deploy:** nothing of its own. `alpha.yaml`, `alpha-dev.yaml`, and
-`scripts/alpha-dev/` are deleted. `production.yaml` and `vercel.json` are
-`develop`'s copies until they take the deploy job.
+**Deploy:** nothing of its own. The promotion deletes `develop`'s
+`demo.yaml` and `scripts/demo/`, so `demo/*` pushes stop deploying.
+`alpha.yaml`, `alpha-dev.yaml`, and `scripts/alpha-dev/` are deleted.
+`production.yaml` and `vercel.json` are `develop`'s copies until they take
+the deploy job.
 
 **Verification:**
 ```sh
