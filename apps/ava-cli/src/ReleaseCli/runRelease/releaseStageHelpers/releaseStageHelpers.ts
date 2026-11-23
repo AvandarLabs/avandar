@@ -1,6 +1,8 @@
 import {
   createReleaseCommit,
   findWorktreeForBranch,
+  getCurrentBranch,
+  getTrackedChanges,
   localTagExists,
   readTreeSha,
   remoteTagExists,
@@ -9,19 +11,19 @@ import {
 } from "@ava-cli/ReleaseCli/releaseGitHelpers";
 import { toDevVersion } from "@ava-cli/ReleaseCli/releaseVersionUtils/releaseVersionUtils";
 import {
-  RELEASE_SOURCE_BRANCH,
-  RELEASE_TARGET_BRANCH,
-} from "@ava-cli/ReleaseCli/runPreflight/runPreflight";
-import {
   printDetail,
   printHeading,
-} from "@ava-cli/ReleaseCli/runRelease/releaseOutputHelpers";
+} from "@ava-cli/ReleaseCli/runRelease/releaseOutputHelpers/releaseOutputHelpers";
 import {
   printError,
   printSuccess,
   printWarn,
 } from "@ava-cli/utils/cliOutput/cliOutput";
-import type { ReleaseCommands } from "@ava-cli/ReleaseCli/createReleaseCommands";
+import type {
+  CommandResult,
+  ReleaseCommands,
+} from "@ava-cli/ReleaseCli/createReleaseCommands";
+import type { ReleaseLine } from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
 
 /**
  * The git/GitHub-mutating stages of a release, in the order `runRelease`
@@ -33,20 +35,47 @@ import type { ReleaseCommands } from "@ava-cli/ReleaseCli/createReleaseCommands"
  * between these live in `releaseConfirmationStages.ts`.
  */
 
-/** The versions and tag a release is being cut with. */
+/**
+ * The line, versions, and tag a release is being cut with, built once by
+ * `runRelease` and read by every stage.
+ */
 export type ReleasePlan = {
-  developVersion: string;
+  /** The line being released, which names every branch a stage touches. */
+  line: ReleaseLine;
+  /** The version on the source branch before the release, e.g. `0.10.2-dev`. */
+  sourceVersion: string;
+  /** The bare `X.Y.Z` being released, without the line's suffix. */
   releaseVersion: string;
+  /** The version written to package.json, e.g. `0.10.2` or `0.15.0-alpha`. */
+  publishedVersion: string;
+  /** The bare `X.Y.Z` the source branch moves to, without the dev suffix. */
   nextVersion: string;
+  /** The git tag, e.g. `v0.10.2` or `v0.15.0-alpha`. */
   releaseTag: string;
 };
+
+/**
+ * Push the checked-out source branch to origin by its full ref, so a tag named
+ * like the branch cannot make the destination ambiguous. Preflight has already
+ * refused any other checked-out branch.
+ */
+function _pushSourceBranch(
+  git: ReleaseCommands,
+  line: ReleaseLine,
+): CommandResult {
+  return git.mutate("git", [
+    "push",
+    "origin",
+    `HEAD:refs/heads/${line.sourceBranch}`,
+  ]);
+}
 
 /** Refuse a tag that already exists locally or on origin. */
 export function assertTagIsUnused(
   git: ReleaseCommands,
-  plan: ReleasePlan,
+  plan: Readonly<ReleasePlan>,
 ): void {
-  const { releaseTag, releaseVersion } = plan;
+  const { releaseTag, publishedVersion } = plan;
 
   if (localTagExists(git, releaseTag)) {
     throw new Error(
@@ -55,50 +84,80 @@ export function assertTagIsUnused(
   }
   if (remoteTagExists(git, releaseTag)) {
     throw new Error(
-      `Tag ${releaseTag} already exists on origin, so ${releaseVersion} has been released.`,
+      `Tag ${releaseTag} already exists on origin, so ${publishedVersion} has been released.`,
     );
   }
 }
 
 /**
- * Put the release version on the source branch and push it, so the released
- * tree is one that exists on that branch under its real version number.
+ * Why the checkout cannot take the release version commit, or undefined when
+ * it can: it must be on the line's source branch, at the commit preflight
+ * resolved, with no tracked changes. Preflight checked all three, but prompts
+ * run between preflight and this commit, and the commit is pushed straight to
+ * the source branch.
+ */
+function _getUnreleasableCheckoutReason(
+  git: ReleaseCommands,
+  options: Readonly<{ line: ReleaseLine; originSourceSha: string }>,
+): string | undefined {
+  const { line, originSourceSha } = options;
+  const currentBranch = getCurrentBranch(git);
+  if (currentBranch !== line.sourceBranch) {
+    return `the checkout is on ${currentBranch ?? "a detached HEAD"}, not ${line.sourceBranch}`;
+  }
+  if (revParse(git, "HEAD") !== originSourceSha) {
+    return `HEAD is no longer at origin/${line.sourceBranch} (${shortSha(originSourceSha)}), where preflight found it`;
+  }
+  return getTrackedChanges(git) === undefined
+    ? undefined
+    : "the working tree has tracked changes";
+}
+
+/**
+ * Put the published release version (`0.10.2`, or `0.15.0-alpha` on alpha) on
+ * the source branch and push it, so the released tree is one that exists on
+ * that branch under its real version number.
  *
  * Returns the commit the release publishes.
  */
-export function commitReleaseVersionOnDevelop(
+export function commitReleaseVersionOnSource(
   git: ReleaseCommands,
-  options: Readonly<{ plan: ReleasePlan; originDevelopSha: string }>,
+  options: Readonly<{ plan: ReleasePlan; originSourceSha: string }>,
 ): string {
-  const { plan, originDevelopSha } = options;
-  const { developVersion, releaseVersion } = plan;
+  const { plan, originSourceSha } = options;
+  const { line, sourceVersion, publishedVersion, releaseTag } = plan;
 
-  printHeading(`Setting ${RELEASE_SOURCE_BRANCH} to ${releaseVersion}`);
-  if (developVersion === releaseVersion) {
+  const unreleasableReason = _getUnreleasableCheckoutReason(git, {
+    line,
+    originSourceSha,
+  });
+  if (unreleasableReason !== undefined) {
+    throw new Error(
+      `Cannot commit ${publishedVersion} on ${line.sourceBranch}: ${unreleasableReason}. Nothing has been released.`,
+    );
+  }
+  printHeading(`Setting ${line.sourceBranch} to ${publishedVersion}`);
+  if (sourceVersion === publishedVersion) {
     printSuccess(
-      `package.json is already ${releaseVersion}; nothing to commit.`,
+      `package.json is already ${publishedVersion}; nothing to commit.`,
     );
   } else {
     _commitVersion(git, {
-      version: releaseVersion,
-      message: `Release: v${releaseVersion} [skip deploy]`,
+      version: publishedVersion,
+      message: `Release: ${releaseTag} [skip deploy]`,
     });
-    const pushResult = git.mutate("git", [
-      "push",
-      "origin",
-      RELEASE_SOURCE_BRANCH,
-    ]);
+    const pushResult = _pushSourceBranch(git, line);
     if (!pushResult.ok) {
       throw new Error(
-        `Could not push ${RELEASE_SOURCE_BRANCH}: ${pushResult.stderr}
+        `Could not push ${line.sourceBranch}: ${pushResult.stderr}
 Nothing has been released. Fix the push and run the command again.`,
       );
     }
   }
   // On a dry run no commit was made, so the release commit is the branch tip.
   return git.dryRun
-    ? originDevelopSha
-    : (revParse(git, "HEAD") ?? originDevelopSha);
+    ? originSourceSha
+    : (revParse(git, "HEAD") ?? originSourceSha);
 }
 
 /**
@@ -108,34 +167,32 @@ Nothing has been released. Fix the push and run the command again.`,
  * Returns the new commit, or `undefined` on a dry run, where there is nothing
  * to tag or push.
  */
-export function publishMainAndTag(
+export function publishTargetAndTag(
   git: ReleaseCommands,
   options: Readonly<{
     plan: ReleasePlan;
     releaseSha: string;
-    originMainSha: string;
+    originTargetSha: string;
   }>,
 ): string | undefined {
-  const { plan, releaseSha, originMainSha } = options;
-  const { releaseTag, releaseVersion, nextVersion } = plan;
+  const { plan, releaseSha, originTargetSha } = options;
+  const { line, releaseTag, nextVersion } = plan;
 
-  printHeading(
-    `Building ${RELEASE_TARGET_BRANCH} from ${RELEASE_SOURCE_BRANCH}`,
-  );
+  printHeading(`Building ${line.targetBranch} from ${line.sourceBranch}`);
   const releaseTreeSha = readTreeSha(git, releaseSha);
   if (releaseTreeSha === undefined) {
     throw new Error(`Could not read the tree of ${shortSha(releaseSha)}.`);
   }
   const releaseCommitSha = createReleaseCommit(git, {
     releaseTreeSha,
-    mainParentSha: originMainSha,
-    developParentSha: releaseSha,
-    message: _releaseCommitMessage(releaseVersion, releaseSha),
+    targetParentSha: originTargetSha,
+    sourceParentSha: releaseSha,
+    message: _buildReleaseCommitMessage({ plan, releaseSha }),
   });
 
   if (git.dryRun) {
     printWarn(
-      `Dry run: stopping before tagging and pushing ${RELEASE_TARGET_BRANCH}. The remaining steps would tag ${releaseTag}, push it with ${RELEASE_TARGET_BRANCH} atomically, then set ${RELEASE_SOURCE_BRANCH} to ${toDevVersion(nextVersion)}.`,
+      `Dry run: stopping before tagging and pushing ${line.targetBranch}. The remaining steps would tag ${releaseTag}, push it with ${line.targetBranch} atomically, then set ${line.sourceBranch} to ${toDevVersion(nextVersion, line)}.`,
     );
     return undefined;
   }
@@ -147,6 +204,18 @@ export function publishMainAndTag(
   return releaseCommitSha;
 }
 
+/** What {@link updateLocalTargetRef} needs to decide whether to move it. */
+type UpdateLocalTargetRefOptions = {
+  /** The line released, which names the target branch. */
+  line: ReleaseLine;
+  /** The target branch's new commit, just pushed. */
+  releaseCommitSha: string;
+  /** Local `<target>` before the release, when it exists. */
+  localTargetSha: string | undefined;
+  /** `origin/<target>` before the release. */
+  originTargetSha: string;
+};
+
 /**
  * Fast-forward the local target-branch ref so the next release starts from a
  * sane place.
@@ -156,70 +225,68 @@ export function publishMainAndTag(
  * and never while another worktree has it checked out, since moving a ref under
  * a worktree makes that worktree report every file as deleted.
  */
-export function updateLocalMainRef(
+export function updateLocalTargetRef(
   git: ReleaseCommands,
-  options: Readonly<{
-    releaseCommitSha: string;
-    localMainSha: string | undefined;
-    originMainSha: string;
-  }>,
+  options: Readonly<UpdateLocalTargetRefOptions>,
 ): void {
-  const { releaseCommitSha, localMainSha, originMainSha } = options;
+  const { line, releaseCommitSha, localTargetSha, originTargetSha } = options;
 
-  const mainWorktree = findWorktreeForBranch(git, RELEASE_TARGET_BRANCH);
-  if (mainWorktree !== undefined) {
+  const targetWorktree = findWorktreeForBranch(git, line.targetBranch);
+  if (targetWorktree !== undefined) {
     printWarn(
-      `Local ${RELEASE_TARGET_BRANCH} is checked out at ${mainWorktree}, so it was left alone. Pull it there.`,
+      `Local ${line.targetBranch} is checked out at ${targetWorktree}, so it was left alone. Pull it there.`,
     );
     return;
   }
-  if (localMainSha === undefined || localMainSha === originMainSha) {
+  if (localTargetSha === undefined || localTargetSha === originTargetSha) {
     git.mutate("git", [
       "update-ref",
-      `refs/heads/${RELEASE_TARGET_BRANCH}`,
+      `refs/heads/${line.targetBranch}`,
       releaseCommitSha,
     ]);
     return;
   }
   printWarn(
-    `Local ${RELEASE_TARGET_BRANCH} has diverged from origin, so it was left alone.`,
+    `Local ${line.targetBranch} has diverged from origin, so it was left alone.`,
   );
 }
 
-/** Move the source branch on to the next `-dev` version and push it. */
-export function bumpDevelopToNextVersion(
+/**
+ * Move the source branch on to the next dev version (`-dev`, or `-alpha-dev`
+ * on alpha) and push it.
+ */
+export function bumpSourceToNextVersion(
   git: ReleaseCommands,
-  plan: ReleasePlan,
+  plan: Readonly<ReleasePlan>,
 ): void {
-  const { nextVersion, releaseTag } = plan;
-  const devVersion = toDevVersion(nextVersion);
+  const { line, nextVersion, releaseTag } = plan;
+  const devVersion = toDevVersion(nextVersion, line);
 
-  printHeading(`Setting ${RELEASE_SOURCE_BRANCH} to ${devVersion}`);
+  printHeading(`Setting ${line.sourceBranch} to ${devVersion}`);
   try {
     _commitVersion(git, {
       version: devVersion,
       message: `Bump version to ${devVersion} [skip deploy]`,
     });
-    const pushResult = git.mutate("git", [
-      "push",
-      "origin",
-      RELEASE_SOURCE_BRANCH,
-    ]);
+    const pushResult = _pushSourceBranch(git, line);
     if (!pushResult.ok) {
       throw new Error(pushResult.stderr);
     }
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
     printError(
-      `${releaseTag} is released, but ${RELEASE_SOURCE_BRANCH} could not be bumped to ${devVersion}: ${message}`,
+      `${releaseTag} is released, but ${line.sourceBranch} could not be bumped to ${devVersion}: ${message}`,
     );
     throw new Error(
-      `Set ${RELEASE_SOURCE_BRANCH} to ${devVersion} and push it yourself.`,
+      `Set ${line.sourceBranch} to ${devVersion} and push it yourself.`,
     );
   }
 }
 
-/** Set the root package.json version and commit it on the current branch. */
+/**
+ * Set the root package.json version and commit only that file on the current
+ * branch, so nothing else in the working tree can reach the version commit.
+ */
 function _commitVersion(
   git: ReleaseCommands,
   options: Readonly<{ version: string; message: string }>,
@@ -237,7 +304,13 @@ function _commitVersion(
     );
   }
 
-  const commitResult = git.mutate("git", ["commit", "-am", message]);
+  const commitResult = git.mutate("git", [
+    "commit",
+    "-m",
+    message,
+    "--",
+    "package.json",
+  ]);
   if (!commitResult.ok) {
     throw new Error(
       `Could not commit the version change: ${commitResult.stderr}`,
@@ -257,7 +330,8 @@ function _tagAndPush(
   options: Readonly<{ plan: ReleasePlan; releaseCommitSha: string }>,
 ): void {
   const { plan, releaseCommitSha } = options;
-  const { releaseTag, releaseVersion, nextVersion } = plan;
+  const { line, releaseTag, releaseVersion, publishedVersion, nextVersion } =
+    plan;
 
   const tagResult = git.mutate("git", [
     "tag",
@@ -270,7 +344,7 @@ function _tagAndPush(
   if (!tagResult.ok) {
     throw new Error(
       `Could not create tag ${releaseTag}: ${tagResult.stderr}
-Nothing has been pushed to ${RELEASE_TARGET_BRANCH}.`,
+Nothing has been pushed to ${line.targetBranch}.`,
     );
   }
 
@@ -278,27 +352,28 @@ Nothing has been pushed to ${RELEASE_TARGET_BRANCH}.`,
     "push",
     "--atomic",
     "origin",
-    `${releaseCommitSha}:refs/heads/${RELEASE_TARGET_BRANCH}`,
-    `refs/tags/${releaseTag}`,
+    `${releaseCommitSha}:refs/heads/${line.targetBranch}`,
+    `refs/tags/${releaseTag}:refs/tags/${releaseTag}`,
   ]);
   if (!pushResult.ok) {
     git.mutateQuietly("git", ["tag", "-d", releaseTag]);
     throw new Error(
-      `Could not push ${RELEASE_TARGET_BRANCH} and ${releaseTag}: ${pushResult.stderr}
-${RELEASE_SOURCE_BRANCH} is already at ${releaseVersion} and pushed, and the local tag has been removed. Retry with --version ${releaseVersion} --next ${nextVersion}.`,
+      `Could not push ${line.targetBranch} and ${releaseTag}: ${pushResult.stderr}
+${line.sourceBranch} is already at ${publishedVersion} and pushed, and the local tag has been removed. Retry with --version ${releaseVersion} --next ${nextVersion}.`,
     );
   }
   printSuccess(
-    `${RELEASE_TARGET_BRANCH} is at ${shortSha(releaseCommitSha)}, tagged ${releaseTag}.`,
+    `${line.targetBranch} is at ${shortSha(releaseCommitSha)}, tagged ${releaseTag}.`,
   );
 }
 
 /** The commit message for the release commit. */
-function _releaseCommitMessage(
-  releaseVersion: string,
-  releaseSha: string,
+function _buildReleaseCommitMessage(
+  options: Readonly<{ plan: ReleasePlan; releaseSha: string }>,
 ): string {
-  return `Release ${releaseVersion}
+  const { plan, releaseSha } = options;
+  const { line, publishedVersion } = plan;
+  return `Release ${publishedVersion}
 
-Sets ${RELEASE_TARGET_BRANCH} to ${RELEASE_SOURCE_BRANCH}'s tree at ${releaseSha} verbatim. Written with git commit-tree, so this is a two-parent merge carrying develop's exact content with no merge resolution. See apps/ava-cli/src/ReleaseCli.`;
+Sets ${line.targetBranch} to ${line.sourceBranch}'s tree at ${releaseSha} verbatim. Written with git commit-tree, so this is a two-parent merge carrying ${line.sourceBranch}'s exact content with no merge resolution. See apps/ava-cli/src/ReleaseCli.`;
 }

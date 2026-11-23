@@ -1,29 +1,29 @@
 #!/bin/bash
 #-------------------------------------------------------------------------------
-# Makes sure the Supabase branch for the current `demo/*` Git branch exists on
-# the staging project, waits for it to be healthy, and prints its connection
-# details as `KEY=value` lines to `$DEMO_ENV_FILE` (stdout when unset).
+# Makes sure the persistent `alpha-dev` Supabase branch exists on the staging
+# project, waits for it to be healthy, and prints its connection details as
+# `KEY=value` lines to `$ALPHA_DEV_ENV_FILE` (stdout when unset).
 #
-# The Supabase branch name is the Git branch name with `/` replaced by `-`, so
-# `demo/measles` maps to `demo-measles`. A branch that does not exist yet is
-# created as a non-persistent branch: it is billed only while it exists and
-# auto-pauses when idle.
+# The only Git branch allowed is `alpha-dev`, and it maps to the Supabase
+# branch of the same name. A branch that does not exist yet is created as a
+# persistent branch, and an existing one is switched to persistent, so it is
+# never paused or removed for inactivity.
 #
 # Usage:
-#   STAGING_PROJECT_ID=<ref> bash scripts/demo/ensureSupabaseBranch.sh <git-branch>
+#   STAGING_PROJECT_ID=<ref> bash scripts/alpha-dev/ensureSupabaseBranch.sh alpha-dev
 #
 # Requires `SUPABASE_ACCESS_TOKEN`, `curl`, and `jq`.
 #
 # Output, one per line:
-#   DEMO_SUPABASE_BRANCH, DEMO_SUPABASE_REF, DEMO_SUPABASE_URL,
-#   DEMO_DB_PASSWORD, DEMO_PUBLISHABLE_KEY, DEMO_SECRET_KEY
+#   ALPHA_DEV_SUPABASE_BRANCH, ALPHA_DEV_SUPABASE_REF, ALPHA_DEV_SUPABASE_URL,
+#   ALPHA_DEV_DB_PASSWORD, ALPHA_DEV_PUBLISHABLE_KEY, ALPHA_DEV_SECRET_KEY
 #
 # Progress goes to stderr. In GitHub Actions every secret value is masked on
 # stdout, where Actions reads workflow commands, before it is written out.
 #-------------------------------------------------------------------------------
 set -euo pipefail
 
-GIT_BRANCH="${1:?Usage: ensureSupabaseBranch.sh <git-branch>}"
+GIT_BRANCH="${1:?Usage: ensureSupabaseBranch.sh alpha-dev (only alpha-dev is accepted)}"
 : "${STAGING_PROJECT_ID:?STAGING_PROJECT_ID must be set}"
 : "${SUPABASE_ACCESS_TOKEN:?SUPABASE_ACCESS_TOKEN must be set}"
 
@@ -31,12 +31,12 @@ GIT_BRANCH="${1:?Usage: ensureSupabaseBranch.sh <git-branch>}"
 WAIT_TIMEOUT_SECONDS=900
 POLL_INTERVAL_SECONDS=15
 
-if [[ "$GIT_BRANCH" != demo/* ]]; then
-  echo "Refusing to manage a Supabase branch for '$GIT_BRANCH': only demo/* branches are allowed." >&2
+if [[ "$GIT_BRANCH" != "alpha-dev" ]]; then
+  echo "Refusing to manage a Supabase branch for '$GIT_BRANCH': only alpha-dev is allowed." >&2
   exit 1
 fi
 
-SUPABASE_BRANCH="${GIT_BRANCH//\//-}"
+SUPABASE_BRANCH="alpha-dev"
 
 log() {
   echo "$@" >&2
@@ -48,9 +48,30 @@ mask() {
   fi
 }
 
+# Prints the JSON for the Supabase branch, or nothing when it does not exist.
+# Fails when the branch list cannot be read, so a failed call is never
+# mistaken for a missing branch.
 find_branch_json() {
-  supabase branches list --project-ref "$STAGING_PROJECT_ID" -o json \
-    | jq -c --arg name "$SUPABASE_BRANCH" '.[] | select(.name == $name)'
+  local branches_json
+  if ! branches_json="$(supabase branches list --project-ref "$STAGING_PROJECT_ID" -o json)"; then
+    log "Could not list the Supabase branches on the staging project."
+    return 1
+  fi
+  jq -c --arg name "$SUPABASE_BRANCH" '.[] | select(.name == $name)' <<<"$branches_json"
+}
+
+# Switches an existing branch to persistent unless it already is. A missing
+# or unreadable `persistent` field still runs the update, which is idempotent.
+ensure_branch_persistent() {
+  local branch_json="$1" is_persistent
+  is_persistent="$(jq -r '.persistent | if . == null then "" else tostring end' <<<"$branch_json" 2>/dev/null || true)"
+  if [[ "$is_persistent" == "true" ]]; then
+    log "Supabase branch '$SUPABASE_BRANCH' is already persistent."
+    return 0
+  fi
+  log "Making Supabase branch '$SUPABASE_BRANCH' persistent (was: ${is_persistent:-unknown})..."
+  supabase branches update "$SUPABASE_BRANCH" --persistent \
+    --project-ref "$STAGING_PROJECT_ID" >&2
 }
 
 create_branch() {
@@ -62,10 +83,10 @@ create_branch() {
   )"
   log "Creating Supabase branch '$SUPABASE_BRANCH' in region '${region:-default}'..."
   if [[ -n "$region" ]]; then
-    supabase branches create "$SUPABASE_BRANCH" \
+    supabase branches create "$SUPABASE_BRANCH" --persistent \
       --project-ref "$STAGING_PROJECT_ID" --region "$region" >&2
   else
-    supabase branches create "$SUPABASE_BRANCH" \
+    supabase branches create "$SUPABASE_BRANCH" --persistent \
       --project-ref "$STAGING_PROJECT_ID" >&2
   fi
 }
@@ -94,10 +115,12 @@ wait_until_healthy() {
   return 1
 }
 
-if [[ -z "$(find_branch_json)" ]]; then
+EXISTING_BRANCH_JSON="$(find_branch_json)"
+if [[ -z "$EXISTING_BRANCH_JSON" ]]; then
   create_branch
 else
   log "Supabase branch '$SUPABASE_BRANCH' already exists."
+  ensure_branch_persistent "$EXISTING_BRANCH_JSON"
 fi
 wait_until_healthy
 
@@ -136,10 +159,10 @@ mask "$PUBLISHABLE_KEY"
 mask "$SECRET_KEY"
 
 {
-  echo "DEMO_SUPABASE_BRANCH=$SUPABASE_BRANCH"
-  echo "DEMO_SUPABASE_REF=$BRANCH_REF"
-  echo "DEMO_SUPABASE_URL=https://$BRANCH_REF.supabase.co"
-  echo "DEMO_DB_PASSWORD=$DB_PASSWORD"
-  echo "DEMO_PUBLISHABLE_KEY=$PUBLISHABLE_KEY"
-  echo "DEMO_SECRET_KEY=$SECRET_KEY"
-} >>"${DEMO_ENV_FILE:-/dev/stdout}"
+  echo "ALPHA_DEV_SUPABASE_BRANCH=$SUPABASE_BRANCH"
+  echo "ALPHA_DEV_SUPABASE_REF=$BRANCH_REF"
+  echo "ALPHA_DEV_SUPABASE_URL=https://$BRANCH_REF.supabase.co"
+  echo "ALPHA_DEV_DB_PASSWORD=$DB_PASSWORD"
+  echo "ALPHA_DEV_PUBLISHABLE_KEY=$PUBLISHABLE_KEY"
+  echo "ALPHA_DEV_SECRET_KEY=$SECRET_KEY"
+} >>"${ALPHA_DEV_ENV_FILE:-/dev/stdout}"

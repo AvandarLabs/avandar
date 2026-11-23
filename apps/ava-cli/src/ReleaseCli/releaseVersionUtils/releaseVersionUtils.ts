@@ -5,11 +5,10 @@
  * testable on their own.
  */
 
+import type { ReleaseLine } from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
+
 /** `X.Y.Z`, with nothing before or after. */
 const RELEASE_VERSION_REGEX = /^\d+\.\d+\.\d+$/;
-
-/** The suffix every in-progress version on `develop` carries. */
-export const DEV_SUFFIX = "-dev";
 
 export type VersionValidationResult =
   | Readonly<{ valid: true }>
@@ -19,8 +18,9 @@ export type VersionValidationResult =
  * Validates a version the user typed or passed as an option.
  *
  * Rejects the two mistakes that are easy to make and expensive to undo: a `v`
- * prefix (the git tag adds that, so `vv0.1.0` would be published) and a `-dev`
- * suffix (only `develop` carries that, and this command appends it itself).
+ * prefix (the git tag adds that, so `vv0.1.0` would be published) and a
+ * `-dev` or `-alpha` suffix (this command adds the suffix from the release
+ * line itself, so a typed one would be doubled).
  */
 export function validateReleaseVersion(
   version: string,
@@ -37,10 +37,10 @@ export function validateReleaseVersion(
       message: `${label} must not start with "v" (the git tag adds it): ${trimmed}`,
     };
   }
-  if (trimmed.endsWith("dev")) {
+  if (trimmed.endsWith("dev") || trimmed.endsWith("alpha")) {
     return {
       valid: false,
-      message: `${label} must not end with "dev" (it is added automatically): ${trimmed}`,
+      message: `${label} must not end with "dev" or "alpha" (it is added automatically): ${trimmed}`,
     };
   }
   if (!RELEASE_VERSION_REGEX.test(trimmed)) {
@@ -53,12 +53,13 @@ export function validateReleaseVersion(
 }
 
 /**
- * Strips any prerelease suffix, so `develop`'s `0.10.2-dev` yields the release
- * it is working towards: `0.10.2`.
+ * Strips any prerelease suffix, so a source branch's `0.10.2-dev` or
+ * `0.15.1-alpha-dev` yields the release it is working towards: `0.10.2` or
+ * `0.15.1`.
  */
-export function toReleaseVersion(developVersion: string): string {
-  const [releaseVersion] = developVersion.trim().split("-");
-  return releaseVersion ?? developVersion.trim();
+export function toReleaseVersion(sourceVersion: string): string {
+  const [releaseVersion] = sourceVersion.trim().split("-");
+  return releaseVersion ?? sourceVersion.trim();
 }
 
 /**
@@ -85,12 +86,23 @@ export function suggestNextVersion(releaseVersion: string): string | undefined {
   return `${major}.${minor}.${patchNumber + 1}`;
 }
 
-/** The version `develop` moves to after the release, e.g. `0.10.3-dev`. */
-export function toDevVersion(version: string): string {
-  return `${version}${DEV_SUFFIX}`;
+/**
+ * The version the line's source branch moves to after a release, e.g.
+ * `0.10.3-dev` on mainline or `0.15.1-alpha-dev` on alpha.
+ */
+export function toDevVersion(version: string, line: ReleaseLine): string {
+  return `${version}${line.devSuffix}`;
 }
 
-/** The git tag for a release version, e.g. `v0.10.2`. */
-export function toReleaseTag(version: string): string {
-  return `v${version}`;
+/**
+ * The version written to package.json on release, e.g. `0.10.2` on mainline
+ * or `0.15.0-alpha` on alpha.
+ */
+export function toPublishedVersion(version: string, line: ReleaseLine): string {
+  return `${version}${line.releaseSuffix}`;
+}
+
+/** The git tag for a release, e.g. `v0.10.2` or `v0.15.0-alpha`. */
+export function toReleaseTag(version: string, line: ReleaseLine): string {
+  return `v${toPublishedVersion(version, line)}`;
 }

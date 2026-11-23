@@ -1,10 +1,15 @@
 import { createReleaseCommands } from "@ava-cli/ReleaseCli/createReleaseCommands";
+import {
+  ALPHA_RELEASE_LINE,
+  MAINLINE_RELEASE_LINE,
+} from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
 import { listSortedReleaseTags } from "@ava-cli/ReleaseCli/releaseChangelog/collectReleaseChangelogCommits/collectReleaseChangelogCommits";
 import { publishReleaseNotes } from "@ava-cli/ReleaseCli/releaseChangelog/publishReleaseNotes/publishReleaseNotes";
 import { wantsHelp } from "@ava-cli/ReleaseCli/releaseFlagUtils/releaseFlagUtils";
 import { promptForVersion } from "@ava-cli/ReleaseCli/releasePromptHelpers";
 import {
   toReleaseTag,
+  toReleaseVersion,
   validateReleaseVersion,
 } from "@ava-cli/ReleaseCli/releaseVersionUtils/releaseVersionUtils";
 import {
@@ -16,6 +21,7 @@ import { findRepoRoot } from "@ava-cli/utils/findRepoRoot";
 import { Acclimate } from "@avandar/acclimate";
 import { match } from "ts-pattern";
 import type { ReleaseCommands } from "@ava-cli/ReleaseCli/createReleaseCommands";
+import type { ReleaseLine } from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
 
 const USAGE = `ava release notes: publish GitHub release notes for an existing release.
 
@@ -27,11 +33,13 @@ const USAGE = `ava release notes: publish GitHub release notes for an existing r
 Usage
   ava release notes --version 0.13.3             publish notes for v0.13.3
   ava release notes --version 0.13.4 --update   replace existing notes
+  ava release notes --version 0.15.0 --alpha    publish notes for v0.15.0-alpha
   ava release notes                               ask for a version
   ava release notes --version 0.13.3 --dry-run   preview without publishing
 
 Options
   --version, -v  X.Y.Z to publish notes for. Asked for when omitted.
+  --alpha        The version is an alpha release, tagged vX.Y.Z-alpha.
   --update       Replace notes on an existing release, preserving other metadata.
   --dry-run      Generate and print the notes, but do not publish them.
   --help, -h     This text.`;
@@ -39,19 +47,44 @@ Options
 /** The parsed `ava release notes` options, as Acclimate hands to the action. */
 type ReleaseNotesCliArgs = {
   version?: string;
+  alpha: boolean;
   dryRun: boolean;
   update?: boolean;
 };
 
-/** Asks which released version to publish notes for; defaults to latest. */
+/**
+ * The bare `X.Y.Z` of the newest tag `line` released, or undefined when it has
+ * none. A tag belongs to a line when the line would tag that version with it,
+ * so `v0.15.0-alpha` is alpha's and `v0.14.2` is mainline's.
+ */
+function _getNewestVersionFromTags(
+  options: Readonly<{ tags: readonly string[]; line: ReleaseLine }>,
+): string | undefined {
+  const { tags, line } = options;
+  const lineVersions = tags
+    .map((tag) => {
+      return { tag, version: toReleaseVersion(tag.replace(/^v/, "")) };
+    })
+    .filter(({ tag, version }) => {
+      return toReleaseTag(version, line) === tag;
+    });
+  return lineVersions.at(-1)?.version;
+}
+
+/**
+ * Asks which released version to publish notes for, suggesting the newest
+ * release on `line` so an alpha default never offers a mainline version.
+ */
 async function _promptForReleasedVersion(
   git: ReleaseCommands,
+  line: ReleaseLine,
 ): Promise<string> {
-  const tags = listSortedReleaseTags(git);
-  const mostRecentTag = tags.at(-1);
   return promptForVersion({
     message: "Which released version should get published notes?",
-    defaultValue: mostRecentTag?.replace(/^v/, ""),
+    defaultValue: _getNewestVersionFromTags({
+      tags: listSortedReleaseTags(git),
+      line,
+    }),
     label: "Version",
   });
 }
@@ -68,12 +101,13 @@ async function _runReleaseNotes(
   }
   const git = createReleaseCommands({ repoRoot, dryRun: args.dryRun });
 
-  const version = args.version ?? (await _promptForReleasedVersion(git));
+  const line = args.alpha ? ALPHA_RELEASE_LINE : MAINLINE_RELEASE_LINE;
+  const version = args.version ?? (await _promptForReleasedVersion(git, line));
   const validation = validateReleaseVersion(version, "Version");
   if (!validation.valid) {
     throw new Error(validation.message);
   }
-  const releaseTag = toReleaseTag(version);
+  const releaseTag = toReleaseTag(version, line);
 
   const outcome = await publishReleaseNotes(git, {
     releaseTag,
@@ -128,6 +162,13 @@ export const ReleaseNotesCli = Acclimate.createCLI("notes")
     required: false,
     description:
       "The X.Y.Z version to publish notes for. Asked for when omitted.",
+  })
+  .addOption({
+    name: "--alpha",
+    type: "boolean",
+    required: false,
+    defaultValue: false,
+    description: "The version is an alpha release, tagged vX.Y.Z-alpha.",
   })
   .addOption({
     name: "--update",

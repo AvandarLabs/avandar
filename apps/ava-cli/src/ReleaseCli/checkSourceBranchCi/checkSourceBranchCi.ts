@@ -1,11 +1,9 @@
 import { describeCommandFailure } from "@ava-cli/ReleaseCli/describeCommandFailure/describeCommandFailure";
 import { propEq } from "@avandar/utils";
 import type { ReleaseCommands } from "@ava-cli/ReleaseCli/createReleaseCommands";
+import type { ReleaseLine } from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
 
-/** The workflow that gates develop. See .github/workflows/staging.yaml. */
-const STAGING_WORKFLOW = "staging.yaml";
-
-/** The staging CI verdict for one commit. */
+/** The source branch's CI verdict for one commit. */
 export type CiStatus =
   /** The run for this exact commit finished successfully. */
   | { kind: "passed"; url: string }
@@ -61,28 +59,29 @@ function _parseRuns(json: string): readonly WorkflowRun[] | undefined {
 }
 
 /**
- * Asks the GitHub CLI for the staging CI verdict on `commitSha`, the commit
- * about to be released.
+ * Asks the GitHub CLI for the source branch's CI verdict on `commitSha`, the
+ * commit about to be released, read from the line's `sourceCiWorkflow` runs on
+ * its `sourceBranch` (`staging.yaml` on `develop`, `alpha-dev.yaml` on
+ * `alpha-dev`).
  *
- * Pushing `main` deploys production and pushes migrations to the production
- * database, so the last chance to notice a red build is before the release. A
- * missing or unusable `gh` is reported as "unknown" rather than treated as a
- * failure: it is a gap in our information, and the caller decides whether to
- * proceed. It is never reported as a pass.
+ * Pushing the target branch deploys, so the last chance to notice a red build
+ * is before the release. A missing or unusable `gh` is reported as "unknown"
+ * rather than treated as a failure: it is a gap in our information, and the
+ * caller decides whether to proceed. It is never reported as a pass.
  */
-export function checkDevelopCi(
+export function checkSourceBranchCi(
   git: ReleaseCommands,
-  options: Readonly<{ commitSha: string; branch: string }>,
+  options: Readonly<{ commitSha: string; line: ReleaseLine }>,
 ): CiStatus {
-  const { commitSha, branch } = options;
+  const { commitSha, line } = options;
 
   const result = git.readCommand("gh", [
     "run",
     "list",
     "--branch",
-    branch,
+    line.sourceBranch,
     "--workflow",
-    STAGING_WORKFLOW,
+    line.sourceCiWorkflow,
     "--limit",
     "20",
     "--json",

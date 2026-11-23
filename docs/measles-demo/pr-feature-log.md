@@ -209,6 +209,7 @@ merged in twice since (`56f31f603` and `f920d223c`), so the merge-base is now
 | F137 | Crosswalks at scale: meaning suggestions for mappings, a virtualized layout list past 100 layouts, per-dataset progress while combining, and the 100-dataset materialization measurement | not started | F136 | |
 | F139 | Dashboard blocks from any page, online and offline: `add_dashboard_block`, prompt v6, and the confirm card | not started | F81 to F87, F89 to F91, F128, F22 | |
 | F140 | Try again and parity in the agent: the Try again line, the shared card audit, and the agent's analytics events | not started | F139 | |
+| F141 | The alpha release line: `ava release` on two lines, the `alpha-dev` and `alpha` workflows, the catalog move scripts, and the cutover docs | not started (built on `feat/alpha-line`, merged into `demo/measles` before cutover) | the lock-out PR (`chore/mainline-lockout`) in `develop` | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -354,6 +355,7 @@ API. It's new work, not something this branch built.
 | after F136 | F137 | Frontend only: F136's migration carries everything it reads. Deploy the frontend; the `chat` function is unchanged (same prompt, same route). |
 | after F128, F131 | F139 | Stores each session's dashboard card statuses beside its thread and tray, and adds the card to F128's panel. Its e2e specs read F128's session tabs. Its prompt `data-agent-v6` is F131's `data-agent-v5` plus the dashboard rules, and its proxy adds the dashboard tool to the plugin AI tools' per-version list, so it ships after F131 and the plugin AI tools. Deploy the `chat` edge function (it serves v6), then the frontend (it asks for v6). |
 | after F139 | F140 | Frontend only: no edge function or migration to deploy first. It changes the agent turn F139 builds and the dashboard paths F139 adds. |
+| after the lock-out PR | F141 | Its `ava release` tells mainline releasers that pushing `main` does not touch production, which is true only once `chore/mainline-lockout` (`chore(ci)!: stop main from deploying production`) is in `develop`. That PR also carries the final `production.yaml` and `vercel.json` this feature's commits reach. |
 | 19 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
@@ -690,7 +692,8 @@ Take only your feature's hunks from these files. The last feature in the
 | `packages/shared/utils/src/types/Empty/Empty.ts` | `develop` (`9a8b24233`, #315), F126, F127 | All three rewrap the same docstring. `develop` already wraps it within 80 columns: F126's `48ad53a7b` and F127's `d45e26490` take `develop`'s wrap. |
 | `src/views/GisApp/useGisApp/MapSourceHydration/useHydratedMapSources/useHydratedMapSources.ts` | F127, F35 | F127: the stable `updateConfig` (plus `d45e26490`'s `HydrationInputs` names, which only PR #321 has). F35: `aad4d700d` moves the config hydration into `useHydratedMapConfig.ts`. |
 | `.github/workflows/pr-develop.yaml` | F127, F96 to F112 | F127: `ubuntu-24.04` and the timeout. F96 to F112: `pnpm check:plugin-bundle`. |
-| `.github/workflows/demo.yaml` | F13, F25 | F13, plus its `2efc74421` addendum (Supabase CLI 2.114.0). F25: `AVA_PIPELINE_SERVER_URL`. |
+| `.github/workflows/demo.yaml`, replaced by `.github/workflows/alpha-dev.yaml` | F13, F25, F32, F141 | F13, plus its `2efc74421` addendum (Supabase CLI 2.114.0). F25: `AVA_PIPELINE_SERVER_URL`. F32: the `GEOAPIFY_API_KEY` line. F141: deletes `demo.yaml` and deploys `alpha-dev` from `alpha-dev.yaml` instead, which keeps the F25 and F32 lines and the 2.114.0 CLI (`b6cb5837d`). |
+| `.github/workflows/production.yaml`, `vercel.json` | F127, the lock-out PR, F141 | F127: `ubuntu-24.04` and the 70-minute e2e timeout in `production.yaml`. The lock-out PR (`chore/mainline-lockout`, off `develop`) replaces the `migrate` job with `deploy-mainline` and turns off Git-integration deploys for `main`, `alpha`, and `alpha-dev`. Its `production.yaml` already has F127's hunks, so whichever of #321 and the lock-out lands second takes the lock-out's file. F141's `39b6b98ae`, `bdcec197c`, and `1ca23db7f` end at the lock-out's exact files: port nothing from them. |
 
 ### Data dictionaries (F129 to F138)
 
@@ -1419,6 +1422,16 @@ Add to **Commits to read**:
 |---|---|---|
 | `f1c068132` | chore(demo): remove the local-to-demo data loader | Nothing to port: it deletes `scripts/demo/loadLocalDataIntoDemoBranch.sh`, which F13 already leaves out, and updates this log (branch-only). |
 | `2efc74421` | fix(ci): bump the demo deploy's Supabase CLI to 2.114.0 | All of it. CLI 2.98.2 applied the import map in random order when bundling, so `@avandar/utils/sql` sometimes resolved through `@avandar/utils` and the `connectors` function failed with "Module not found". 2.114.0 matches the `supabase` devDependency. |
+
+**Addendum: replaced on the alpha line (2026-11-20).** F141 deletes
+`.github/workflows/demo.yaml` (`b6cb5837d`) and moves
+`scripts/demo/ensureSupabaseBranch.sh` to
+`scripts/alpha-dev/ensureSupabaseBranch.sh` (`a6488b085`, `22bc12611`).
+`alpha-dev` now deploys from `.github/workflows/alpha-dev.yaml` to
+`alpha.avandarlabs.com`, and `demo.avandarlabs.com` is removed at cutover.
+Read F141 before porting F13: `develop` already holds both F13 files as
+`demo/measles` last had them, and the Verification above (a throwaway
+`demo/*` branch) no longer applies once F141 lands.
 
 ---
 
@@ -12272,6 +12285,93 @@ pnpm test:frontend
 pnpm vitest run scripts/ai-eval
 ```
 The eval commands are in `docs/ai-agent/eval.md#reproducing-every-result`.
+## F141: The alpha release line
+
+Status: not started for `develop`. Built on `feat/alpha-line` and merged
+into `demo/measles` before cutover, where `demo/measles` becomes `alpha-dev`.
+The lock-out it depends on is its own PR branch, `chore/mainline-lockout`
+(off `develop`: `b3fb7abf2`, `7d2942650`, `01e1975d1`).
+
+**Purpose:** Production moves from `main` to a new `alpha` branch, cut from
+`alpha-dev` (today `demo/measles`). `ava release` releases two lines: on
+`alpha-dev` it sets `alpha` to `alpha-dev`'s tree and tags `vX.Y.Z-alpha`;
+on `develop` it releases `main` as before; on any other branch it refuses.
+`alpha-dev.yaml` deploys `alpha-dev` to `alpha.avandarlabs.com` on a
+persistent `alpha-dev` Supabase branch, and is the CI gate `ava release`
+reads. `alpha.yaml` gates and deploys `alpha` to production, checking the
+tip, the configuration, and the build before it migrates. `scripts/alpha/`
+moves the open data catalog and its Parquet objects between projects.
+**Value:** Production runs the line users already rely on, through a
+release command and a gated deploy, while `develop` and `main` stop
+touching production.
+
+**Design:** `docs/measles-demo/alpha-launch-plan.md`. Audit:
+`docs/measles-demo/alpha-migration-audit.md`. Runbook:
+`docs/measles-demo/alpha-cutover-runbook.md`. Implementation plan:
+`docs/superpowers/plans/2026-11-19-alpha-line-stage-0.md`.
+
+**PR title:** `feat(ci): release and deploy the alpha line`
+
+**Depends on:** the lock-out PR in `develop` (see **Merge order**). No
+feature in this log: `develop`'s release CLI and CI files equal
+`demo/measles`'s before this work, and `develop` already has every catalog
+table `scripts/alpha/` moves. No Postgres connector work.
+
+**Files, by area** (take each file's final content on `feat/alpha-line`):
+
+- Release lines in the CLI (`950ef617a`, `d0df8f676`, `b1db119c0`,
+  `d94e6555e`, `fd89fd8c6`, `600f93fdf`, `6fd6d8a54`, `7179ea969`,
+  `a1809366c`, `899014049`, `61a5a3461`, `9960c97e6`, `bb88a3acf`), under
+  `apps/ava-cli/src/ReleaseCli/`: new `getReleaseLineFromBranch/`
+  (`950ef617a` created it as `releaseLine/`), `checkSourceBranchCi/`
+  (renamed from `checkDevelopCi.ts`), `describeCiStatus/` (moved from
+  `describeCiStatus.ts`), `runRelease/releaseOutputHelpers/` and
+  `runRelease/resolveVersionHelpers/` (each moved into its own folder, with
+  a new test), and edits to `ReleaseCli.{ts,test.ts}`,
+  `ReleaseNotesCli/ReleaseNotesCli.{ts,test.ts}`,
+  `releaseChangelog/collectReleaseChangelogCommits/collectReleaseChangelogCommits.{ts,test.ts}`,
+  `releaseGitHelpers.ts`, `releaseVersionUtils/releaseVersionUtils.{ts,test.ts}`,
+  `runPreflight/runPreflight.{ts,test.ts}`,
+  `runRelease/releaseStageHelpers/{releaseConfirmationStages.ts,releaseStageHelpers.ts,releaseStageHelpers.test.ts}`,
+  and `runRelease/runRelease.ts`.
+- `alpha-dev` deploys (`a6488b085`, `22bc12611`, `b6cb5837d`, `4dc691049`):
+  new `.github/workflows/alpha-dev.yaml`, `.github/workflows/demo.yaml`
+  deleted, `scripts/demo/ensureSupabaseBranch.sh` moved to
+  `scripts/alpha-dev/ensureSupabaseBranch.sh`.
+- `alpha` deploys (`e4cd3a580`, `92f51b148`, `23071851d`): new
+  `.github/workflows/alpha.yaml`.
+- Lock-out on the alpha line (`39b6b98ae`, `bdcec197c`, `1ca23db7f`):
+  `.github/workflows/production.yaml` and `vercel.json`. Port nothing: the
+  lock-out PR carries the same final files.
+- Version (`24afff0dc`): `package.json` set to `0.15.0-alpha-dev`. Port
+  nothing: `develop` keeps its own `-dev` version.
+- Catalog move (`6fb5ac142`, `6dbcdb881`, `9618cc386`, `ad624f57f`,
+  `2c6877063`, `835241f40`): new `scripts/alpha/catalogTables.sh`,
+  `exportCatalogData.sh`, `importCatalogData.sh`,
+  `copyCatalogParquet/copyCatalogParquet.{ts,test.ts}`, and
+  `__tests__/{catalogDataScripts,catalogImportOnPostgres}.integration.test.ts`.
+- Docs (`490f831b5`, `f31c5d483`, `13ec79e36`, `2c42a38fe`, `4a53fc57a`,
+  `64481e88f` on `demo/measles`; `b7b471570` and later on `feat/alpha-line`):
+  `docs/measles-demo/alpha-launch-plan.md`,
+  `docs/measles-demo/alpha-migration-audit.md`,
+  `docs/measles-demo/alpha-cutover-runbook.md`. The Stage 0 plan and handoff
+  (`151093069`, `1de551fc9`, `64481e88f`):
+  `docs/superpowers/plans/2026-11-19-alpha-line-stage-0.md` and
+  `docs/superpowers/2026-11-19-alpha-line-stage-0-handoff.md`.
+
+**Schema:** none.
+
+**Deploy:** nothing deploys from `develop`. `alpha-dev.yaml` runs only on
+`alpha-dev` and `alpha.yaml` only on `alpha`; GitHub, Vercel, and Supabase
+setup is in the runbook.
+
+**Verification:**
+```sh
+pnpm --filter @avandar/ava-cli test
+pnpm vitest run scripts/alpha
+shellcheck -x scripts/alpha/*.sh scripts/alpha-dev/*.sh
+npx --yes actionlint@1.7.7 .github/workflows/alpha.yaml .github/workflows/alpha-dev.yaml
+```
 
 ---
 

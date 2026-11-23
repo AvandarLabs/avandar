@@ -10,10 +10,20 @@ export function shortSha(sha: string): string {
   return sha.slice(0, 8);
 }
 
-/** The branch currently checked out, or undefined on a detached HEAD. */
+/** The prefix every local branch ref carries. */
+const LOCAL_BRANCH_REF_PREFIX = "refs/heads/";
+
+/**
+ * The branch currently checked out, or undefined on a detached HEAD, for
+ * deciding which line to release and naming the branch in a refusal.
+ */
 export function getCurrentBranch(git: ReleaseCommands): string | undefined {
-  const branch = git.readGit(["rev-parse", "--abbrev-ref", "HEAD"]);
-  return branch === "HEAD" ? undefined : branch;
+  // `symbolic-ref` reads HEAD itself. `rev-parse --abbrev-ref HEAD` would
+  // print `heads/main` when a tag is also named `main`.
+  const headRef = git.readGit(["symbolic-ref", "--quiet", "HEAD"]);
+  return headRef?.startsWith(LOCAL_BRANCH_REF_PREFIX)
+    ? headRef.slice(LOCAL_BRANCH_REF_PREFIX.length)
+    : undefined;
 }
 
 /**
@@ -21,8 +31,9 @@ export function getCurrentBranch(git: ReleaseCommands): string | undefined {
  *
  * Untracked files are deliberately excluded: this command never checks out a
  * branch and never cleans, so untracked files cannot reach the release. Tracked
- * modifications and staged changes are a different matter, because the version
- * commits use `git commit -a` and would sweep them in.
+ * modifications and staged changes are a different matter: a change to
+ * package.json would be committed with the new version, and any other one
+ * means the checkout is not the commit being released.
  */
 export function getTrackedChanges(git: ReleaseCommands): string | undefined {
   const changes = git.readGit(["status", "--short", "--untracked-files=no"]);
@@ -146,42 +157,49 @@ export function readTreeSha(
   return git.readGit(["rev-parse", `${revision}^{tree}`]);
 }
 
+/** The tree, parents, and message {@link createReleaseCommit} writes. */
+type ReleaseCommitOptions = {
+  /** The source branch's tree, released verbatim. */
+  releaseTreeSha: string;
+  /** `origin/<target>`, the first parent. */
+  targetParentSha: string;
+  /** The source-branch commit released, the second parent. */
+  sourceParentSha: string;
+  message: string;
+};
+
 /**
- * Builds the release commit: `develop`'s tree verbatim, with `main` and
- * `develop` as its two parents.
+ * Builds the release commit: the source branch's tree verbatim, with the
+ * target branch and the source branch as its two parents (`main` and
+ * `develop` on mainline, `alpha` and `alpha-dev` on alpha).
  *
  * This is the heart of the command, and the reason it cannot conflict. A
- * release is not a content merge; `main` is only ever a published snapshot of
- * `develop`, so the answer is always "take develop's tree, whole". Handing that
- * tree straight to `commit-tree` means no merge algorithm runs at all, so
- * nothing can report a conflict and nothing has to be forced.
+ * release is not a content merge. The target is only ever a published snapshot
+ * of the source, so the answer is always "take the source's tree, whole".
+ * Handing that tree straight to `commit-tree` means no merge algorithm runs at
+ * all, so nothing can report a conflict and nothing has to be forced.
  *
- * Because the commit still records `develop` as a parent, `develop` becomes a
- * true ancestor of `main` and the merge base advances every release. Do not
- * rebuild this as a content merge or a squash: without that second parent the
- * merge base never advances, and every release re-derives conflicts from an
- * ancient one.
+ * Because the commit still records the source as a parent, the source becomes
+ * a true ancestor of the target and the merge base advances every release. Do
+ * not rebuild this as a content merge or a squash: without that second parent
+ * the merge base never advances, and every release re-derives conflicts from
+ * an ancient one.
  *
  * Returns the new commit SHA, or undefined on a dry run (nothing was written).
  */
 export function createReleaseCommit(
   git: ReleaseCommands,
-  options: {
-    releaseTreeSha: string;
-    mainParentSha: string;
-    developParentSha: string;
-    message: string;
-  },
+  options: Readonly<ReleaseCommitOptions>,
 ): string | undefined {
-  const { releaseTreeSha, mainParentSha, developParentSha, message } = options;
+  const { releaseTreeSha, targetParentSha, sourceParentSha, message } = options;
 
   const result = git.mutate("git", [
     "commit-tree",
     releaseTreeSha,
     "-p",
-    mainParentSha,
+    targetParentSha,
     "-p",
-    developParentSha,
+    sourceParentSha,
     "-m",
     message,
   ]);

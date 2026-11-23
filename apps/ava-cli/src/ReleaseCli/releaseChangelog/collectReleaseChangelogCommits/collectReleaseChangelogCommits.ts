@@ -39,10 +39,14 @@ export type ReleaseChangelogCommitInput = Readonly<{
   diff: string;
 }>;
 
-/** Commits `ava release` generates itself: never real release-note material. */
+/**
+ * Commits `ava release` generates itself on either line, never real
+ * release-note material: `Release: v0.13.3` or `v0.15.0-alpha`, and
+ * `Bump version to 0.13.4-dev` or `0.15.1-alpha-dev`.
+ */
 const HOUSEKEEPING_SUBJECT_PATTERNS = [
-  /^Release: v\d+\.\d+\.\d+(?: \[skip deploy\])?$/,
-  /^Bump version to \d+\.\d+\.\d+-dev(?: \[skip deploy\])?$/,
+  /^Release: v\d+\.\d+\.\d+(?:-alpha)?(?: \[skip deploy\])?$/,
+  /^Bump version to \d+\.\d+\.\d+(?:-alpha)?-dev(?: \[skip deploy\])?$/,
 ];
 
 const LOG_FIELD_SEPARATOR = "\x1f";
