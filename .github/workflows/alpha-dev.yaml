@@ -206,19 +206,45 @@ jobs:
           version: ${{ env.SUPABASE_CLI_VERSION }}
 
       - name: Ensure the alpha-dev Supabase branch exists
+        id: supabase_branch
         run: |
-          ALPHA_DEV_ENV_FILE="$GITHUB_ENV" \
+          # The script masks every secret before writing it here. The branch
+          # name, ref, URL, and publishable key go to $GITHUB_ENV for every
+          # later step. The database password and secret key go only to this
+          # step's outputs, so they reach just the steps that name them, never
+          # the Vercel CLI or anything else this job downloads and runs.
+          branch_env_file="$RUNNER_TEMP/alpha-dev-branch.env"
+          trap 'rm -f "$branch_env_file"' EXIT
+          ALPHA_DEV_ENV_FILE="$branch_env_file" \
             bash scripts/alpha-dev/ensureSupabaseBranch.sh "$GITHUB_REF_NAME"
+          while IFS= read -r line; do
+            name="${line%%=*}"
+            value="${line#*=}"
+            case "$name" in
+              ALPHA_DEV_DB_PASSWORD) echo "db_password=$value" >> "$GITHUB_OUTPUT" ;;
+              ALPHA_DEV_SECRET_KEY) echo "secret_key=$value" >> "$GITHUB_OUTPUT" ;;
+              ALPHA_DEV_SUPABASE_BRANCH | ALPHA_DEV_SUPABASE_REF | \
+                ALPHA_DEV_SUPABASE_URL | ALPHA_DEV_PUBLISHABLE_KEY)
+                echo "$line" >> "$GITHUB_ENV"
+                ;;
+              # Fails closed: a new value is never shared job-wide by default.
+              *)
+                echo "Unexpected value from ensureSupabaseBranch.sh: $name" >&2
+                exit 1
+                ;;
+            esac
+          done < "$branch_env_file"
 
       - name: Apply migrations
         env:
-          SUPABASE_DB_PASSWORD: ${{ env.ALPHA_DEV_DB_PASSWORD }}
+          SUPABASE_DB_PASSWORD: ${{ steps.supabase_branch.outputs.db_password }}
         run: |
           supabase link --project-ref "$ALPHA_DEV_SUPABASE_REF"
           supabase db push --include-all
 
       - name: Set edge function secrets
         env:
+          ALPHA_DEV_SECRET_KEY: ${{ steps.supabase_branch.outputs.secret_key }}
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
           POLAR_ACCESS_TOKEN: ${{ secrets.POLAR_ACCESS_TOKEN }}
@@ -234,35 +260,47 @@ jobs:
           GEOAPIFY_API_KEY: ${{ secrets.GEOAPIFY_API_KEY }}
         run: |
           secrets_file="$RUNNER_TEMP/alpha-dev-functions.env"
+          trap 'rm -f "$secrets_file"' EXIT
+          # The CLI parses this file with `dotenv`, which ends an unquoted
+          # value at its first `#`. Single quotes keep every value literal,
+          # so a value with a single quote or a line break is refused.
+          write_secret() {
+            if [[ "$2" == *"'"* || "$2" == *$'\n'* || "$2" == *$'\r'* ]]; then
+              echo "$1 contains a single quote or a line break." >&2
+              exit 1
+            fi
+            printf "%s='%s'\n" "$1" "$2"
+          }
           {
-            echo "SB_SECRET_KEY=$ALPHA_DEV_SECRET_KEY"
-            echo "SB_PUBLISHABLE_KEY=$ALPHA_DEV_PUBLISHABLE_KEY"
-            echo "MODE=staging"
-            echo "VITE_APP_URL=$ALPHA_DEV_APP_URL"
-            echo "GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID"
-            echo "GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET"
-            echo "GOOGLE_REDIRECT_URI=$ALPHA_DEV_SUPABASE_URL/functions/v1/google-auth-callback"
-            echo "POLAR_ACCESS_TOKEN=$POLAR_ACCESS_TOKEN"
-            echo "POLAR_SERVER_TYPE=sandbox"
-            echo "UPSTASH_REDIS_API_URL=$UPSTASH_REDIS_API_URL"
-            echo "UPSTASH_REDIS_REST_API_TOKEN=$UPSTASH_REDIS_REST_API_TOKEN"
-            echo "RESEND_SENDING_API_KEY=$RESEND_SENDING_API_KEY"
-            echo "RESEND_FULL_ACCESS_API_KEY=$RESEND_FULL_ACCESS_API_KEY"
-            echo "RESEND_SITE_IMG_URL=https://avandarlabs.com"
-            echo "OPENAI_API_KEY=$OPENAI_API_KEY"
-            echo "OPEN_ROUTER_API_KEY=$OPEN_ROUTER_API_KEY"
-            echo "FEATUREBASE_JWT_SECRET=$FEATUREBASE_JWT_SECRET"
-            echo "AVA_PIPELINE_SERVER_SECRET=$AVA_PIPELINE_SERVER_SECRET"
-            echo "AVA_PIPELINE_SERVER_URL=$AVA_PIPELINE_SERVER_URL"
+            write_secret SB_SECRET_KEY "$ALPHA_DEV_SECRET_KEY"
+            write_secret SB_PUBLISHABLE_KEY "$ALPHA_DEV_PUBLISHABLE_KEY"
+            write_secret MODE staging
+            write_secret VITE_APP_URL "$ALPHA_DEV_APP_URL"
+            write_secret GOOGLE_CLIENT_ID "$GOOGLE_CLIENT_ID"
+            write_secret GOOGLE_CLIENT_SECRET "$GOOGLE_CLIENT_SECRET"
+            write_secret GOOGLE_REDIRECT_URI \
+              "$ALPHA_DEV_SUPABASE_URL/functions/v1/google-auth-callback"
+            write_secret POLAR_ACCESS_TOKEN "$POLAR_ACCESS_TOKEN"
+            write_secret POLAR_SERVER_TYPE sandbox
+            write_secret UPSTASH_REDIS_API_URL "$UPSTASH_REDIS_API_URL"
+            write_secret UPSTASH_REDIS_REST_API_TOKEN \
+              "$UPSTASH_REDIS_REST_API_TOKEN"
+            write_secret RESEND_SENDING_API_KEY "$RESEND_SENDING_API_KEY"
+            write_secret RESEND_FULL_ACCESS_API_KEY "$RESEND_FULL_ACCESS_API_KEY"
+            write_secret RESEND_SITE_IMG_URL https://avandarlabs.com
+            write_secret OPENAI_API_KEY "$OPENAI_API_KEY"
+            write_secret OPEN_ROUTER_API_KEY "$OPEN_ROUTER_API_KEY"
+            write_secret FEATUREBASE_JWT_SECRET "$FEATUREBASE_JWT_SECRET"
+            write_secret AVA_PIPELINE_SERVER_SECRET "$AVA_PIPELINE_SERVER_SECRET"
+            write_secret AVA_PIPELINE_SERVER_URL "$AVA_PIPELINE_SERVER_URL"
             # Only when the GitHub secret exists: an empty value would
             # overwrite a key set directly on the alpha-dev project.
             if [ -n "$GEOAPIFY_API_KEY" ]; then
-              echo "GEOAPIFY_API_KEY=$GEOAPIFY_API_KEY"
+              write_secret GEOAPIFY_API_KEY "$GEOAPIFY_API_KEY"
             fi
           } > "$secrets_file"
           supabase secrets set --project-ref "$ALPHA_DEV_SUPABASE_REF" \
             --env-file "$secrets_file"
-          rm "$secrets_file"
 
       - name: Deploy edge functions
         run: supabase functions deploy --project-ref "$ALPHA_DEV_SUPABASE_REF"
