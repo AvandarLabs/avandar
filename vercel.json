@@ -1,13 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "pnpm install",
-  "git": {
-    "deploymentEnabled": {
-      "main": false,
-      "alpha": false,
-      "alpha-dev": false
-    }
-  },
   "headers": [
     {
       "source": "/(.*)",
