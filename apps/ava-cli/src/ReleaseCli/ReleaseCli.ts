@@ -21,9 +21,10 @@ const USAGE = `ava release: publish a new release of the Avandar app.
 
   Before anything changes, the source branch's CI verdict on the commit
   being released is checked. On alpha-dev, anything but a pass (failed,
-  pending, missing, or unknown) refuses the release, even with --yes: wait
-  for green, or pass --skip-ci-check to deploy production without it. On
-  develop, a non-passing verdict asks first, and --yes proceeds.
+  pending, missing, or unknown) refuses the release, even with --yes, and
+  refuses --dry-run too: wait for green, or pass --skip-ci-check to deploy
+  production without it. On develop, a non-passing verdict asks first, and
+  --yes proceeds.
 
 Usage
   ava release get-prod-version                  print the version on origin/main
@@ -41,6 +42,8 @@ Options
                  overrides a non-passing alpha-dev CI verdict.
   --dry-run      Print every mutating command and run none of them. Still
                  makes one real OpenAI call to preview the release notes.
+                 On alpha-dev, refused while CI is not green unless
+                 --skip-ci-check is passed.
   --skip-ci-check  Do not check the source branch's CI. On alpha-dev this
                  deploys production without alpha-dev's CI verdict.
   --skip-changelog  Do not generate or publish GitHub release notes.

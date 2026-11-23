@@ -986,7 +986,7 @@ describe("ava release --help", () => {
     vi.restoreAllMocks();
   });
 
-  it("says alpha-dev refuses any CI verdict but a pass, even with --yes", async () => {
+  it("says alpha-dev refuses any CI verdict but a pass, even with --yes or --dry-run", async () => {
     await ReleaseCli.state.action?.({
       version: "",
       next: "",
@@ -996,9 +996,14 @@ describe("ava release --help", () => {
       skipChangelog: false,
     });
 
-    const stdout = _stdoutText();
+    // Collapsed so the assertions survive re-wrapping the help text.
+    const stdout = _stdoutText().replace(/\s+/g, " ");
     expect(stdout).toContain(
-      "On alpha-dev, anything but a pass (failed,\n  pending, missing, or unknown) refuses the release, even with --yes",
+      "On alpha-dev, anything but a pass (failed, pending, missing, or unknown) refuses the release, even with --yes",
+    );
+    expect(stdout).toContain("refuses --dry-run too");
+    expect(stdout).toContain(
+      "On alpha-dev, refused while CI is not green unless --skip-ci-check is passed.",
     );
     expect(stdout).toContain("deploys production without alpha-dev's CI");
   });
