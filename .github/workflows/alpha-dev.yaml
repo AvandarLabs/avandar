@@ -186,8 +186,10 @@ jobs:
     environment:
       name: staging
       deployment: false
+    # SUPABASE_ACCESS_TOKEN is set per step, only where the Supabase CLI or
+    # Management API needs it: it can read back the branch's secret key and
+    # database password, so the Vercel CLI steps must never see it.
     env:
-      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
       STAGING_PROJECT_ID: ${{ secrets.STAGING_PROJECT_ID }}
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
@@ -207,12 +209,15 @@ jobs:
 
       - name: Ensure the alpha-dev Supabase branch exists
         id: supabase_branch
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
         run: |
-          # The script masks every secret before writing it here. The branch
-          # name, ref, URL, and publishable key go to $GITHUB_ENV for every
-          # later step. The database password and secret key go only to this
-          # step's outputs, so they reach just the steps that name them, never
-          # the Vercel CLI or anything else this job downloads and runs.
+          # The script masks the database password, publishable key, and
+          # secret key before writing them to a temporary file. The branch
+          # name, ref, URL, and publishable key go from it to $GITHUB_ENV, so
+          # every later step can read them. The database password and secret
+          # key go only to this step's outputs, which only "Apply migrations"
+          # and "Set edge function secrets" read.
           branch_env_file="$RUNNER_TEMP/alpha-dev-branch.env"
           trap 'rm -f "$branch_env_file"' EXIT
           ALPHA_DEV_ENV_FILE="$branch_env_file" \
@@ -234,9 +239,20 @@ jobs:
                 ;;
             esac
           done < "$branch_env_file"
+          # A missing value would otherwise surface later as an empty
+          # project ref or password. Name the key, never its value.
+          for required_name in ALPHA_DEV_SUPABASE_BRANCH ALPHA_DEV_SUPABASE_REF \
+            ALPHA_DEV_SUPABASE_URL ALPHA_DEV_PUBLISHABLE_KEY \
+            ALPHA_DEV_DB_PASSWORD ALPHA_DEV_SECRET_KEY; do
+            if ! grep -q "^$required_name=." "$branch_env_file"; then
+              echo "ensureSupabaseBranch.sh did not provide $required_name." >&2
+              exit 1
+            fi
+          done
 
       - name: Apply migrations
         env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_DB_PASSWORD: ${{ steps.supabase_branch.outputs.db_password }}
         run: |
           supabase link --project-ref "$ALPHA_DEV_SUPABASE_REF"
@@ -244,6 +260,7 @@ jobs:
 
       - name: Set edge function secrets
         env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           ALPHA_DEV_SECRET_KEY: ${{ steps.supabase_branch.outputs.secret_key }}
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
@@ -303,9 +320,13 @@ jobs:
             --env-file "$secrets_file"
 
       - name: Deploy edge functions
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
         run: supabase functions deploy --project-ref "$ALPHA_DEV_SUPABASE_REF"
 
       - name: Point Supabase Auth at the alpha-dev domain
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
         run: |
           curl --fail-with-body --silent --show-error \
             --request PATCH \
