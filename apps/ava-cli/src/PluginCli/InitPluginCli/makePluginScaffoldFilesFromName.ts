@@ -81,7 +81,7 @@ function _buildEntrySource(displayName: string): string {
     "",
     "// A plugin entry exports its definition, not a component, so there is nothing",
     "// for fast refresh to track.",
-    "// eslint-disable-next-line react-refresh/only-export-components",
+    "// oxlint-disable-next-line react-refresh/only-export-components",
     "export default definePlugin({",
     "  commands: {",
     "    hello: (avandar) => {",
