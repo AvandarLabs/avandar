@@ -729,11 +729,11 @@ empty answer means all). For each plugin it runs:
    referenced `%key%` strings, the entry file, each content file (it exists
    and is at most 1 MiB), Tabler icons, and `package.json` dependencies.
 2. `tsc` on `plugins/<name>/tsconfig.json`.
-3. `eslint` on `plugins/<name>`.
+3. `oxlint` on `plugins/<name>`, which enforces the plugin import rules above.
 
 Steps 2 and 3 are skipped when step 1 fails, and for a plugin with no `entry`,
 which has no code to check: the command prints
-`No plugin code, skipping tsc and eslint.` instead. The command exits nonzero
+`No plugin code, skipping tsc and oxlint.` instead. The command exits nonzero
 when any plugin fails, so CI can use it. The same manifest checks run on every
 `vite build` and `pnpm dev`, and an invalid manifest fails the build.
 
