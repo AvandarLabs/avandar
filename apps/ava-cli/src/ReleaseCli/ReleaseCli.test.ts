@@ -846,6 +846,16 @@ const CI_GATE_PROCEED_CASES: readonly CiGateProceedCase[] = [
     ciStatus: { kind: "failed", conclusion: "failure", url: CI_RUN_URL },
     skipCiCheck: true,
   },
+  {
+    name: "develop with a passed verdict and --yes",
+    sourceBranch: "develop",
+    targetBranch: "main",
+    version: "0.14.2",
+    nextVersion: "0.14.3",
+    releaseTag: "v0.14.2",
+    ciStatus: { kind: "passed", url: CI_RUN_URL },
+    skipCiCheck: false,
+  },
 ];
 
 describe.each(CI_GATE_PROCEED_CASES)("ava release on $name", (proceedCase) => {
@@ -861,6 +871,7 @@ describe.each(CI_GATE_PROCEED_CASES)("ava release on $name", (proceedCase) => {
       sourceBranch: proceedCase.sourceBranch,
     }));
     tipsBefore = _readBranchTips(origin);
+    vi.mocked(checkSourceBranchCi).mockClear();
     vi.mocked(checkSourceBranchCi).mockReturnValue(proceedCase.ciStatus);
   });
 
@@ -892,6 +903,11 @@ describe.each(CI_GATE_PROCEED_CASES)("ava release on $name", (proceedCase) => {
       }),
     ).toBe(tipsAfter[proceedCase.targetBranch]);
     expect(promptToConfirm).not.toHaveBeenCalled();
+    // --skip-ci-check must not read the verdict at all, and every other case
+    // must read it, so the release really went through the CI gate.
+    expect(checkSourceBranchCi).toHaveBeenCalledTimes(
+      proceedCase.skipCiCheck ? 0 : 1,
+    );
   }, 30_000);
 });
 
@@ -939,7 +955,13 @@ describe.each(CI_GATE_STOP_CASES)(
       vi.mocked(promptToConfirm).mockClear();
       originalArgv = process.argv;
       originalExitCode = process.exitCode;
-      process.argv = [process.execPath, "ava", "release", ...stopCase.flags];
+      process.argv = [
+        process.execPath,
+        "ava",
+        "release",
+        ...stopCase.flags,
+        "--skip-changelog",
+      ];
       process.exitCode = undefined;
 
       await ReleaseCli.state.action?.({
@@ -971,6 +993,12 @@ describe.each(CI_GATE_STOP_CASES)(
       expect(stdout).toContain(CI_RUN_URL);
       expect(stdout).toContain("Nothing has been released.");
       expect(stdout).toContain("--skip-ci-check");
+    });
+
+    it("echoes no command that would change state", () => {
+      // Every mutating command is echoed as `$ <command>` before it runs, on
+      // a dry run too, so no echo means the stop came before any of them.
+      expect(_stdoutText()).not.toContain("$ ");
     });
 
     it("moves no ref on origin and creates no v0.14.2 tag", () => {

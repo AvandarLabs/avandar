@@ -430,12 +430,6 @@ function _createFakeCommandsWithCi(verdict: string): {
 }
 
 /**
- * Every verdict other than a pass, which asks before releasing, or stops the
- * release under `--yes`.
- */
-const NON_PASSING_VERDICTS = ["failed", "pending", "missing", "unknown"];
-
-/**
  * Each non-passing verdict with the words that name it, which the `--yes` stop
  * must repeat so the reader knows why nothing was released.
  */
@@ -445,6 +439,14 @@ const NON_PASSING_VERDICT_TEXT: ReadonlyArray<[string, string]> = [
   ["missing", "No staging CI run was found for this commit."],
   ["unknown", "Could not check staging CI: "],
 ];
+
+/**
+ * Every verdict other than a pass, which asks before releasing, or stops the
+ * release under `--yes`.
+ */
+const NON_PASSING_VERDICTS = NON_PASSING_VERDICT_TEXT.map(([verdict]) => {
+  return verdict;
+});
 
 /** The rejection message of a `confirmCiVerdict` call that must stop. */
 async function _readStopMessage(confirmation: Promise<void>): Promise<string> {
@@ -487,18 +489,23 @@ describe("confirmCiVerdict", () => {
     },
   );
 
-  it("proceeds on a passed staging run without asking", async () => {
-    const { git, mutations } = _createFakeCommandsWithCi("passed");
+  it.each([false, true])(
+    "proceeds on a passed staging run without asking (assumeYes: %s)",
+    async (assumeYes) => {
+      const { git, mutations } = _createFakeCommandsWithCi("passed");
 
-    await confirmCiVerdict(git, {
-      commitSha: "source-sha",
-      assumeYes: false,
-      skip: false,
-    });
+      await expect(
+        confirmCiVerdict(git, {
+          commitSha: "source-sha",
+          assumeYes,
+          skip: false,
+        }),
+      ).resolves.toBeUndefined();
 
-    expect(promptToConfirm).not.toHaveBeenCalled();
-    expect(mutations).toEqual([]);
-  });
+      expect(promptToConfirm).not.toHaveBeenCalled();
+      expect(mutations).toEqual([]);
+    },
+  );
 
   it.each(NON_PASSING_VERDICT_TEXT)(
     "stops a release on a %s verdict under --yes, naming it, without asking or changing anything",
@@ -513,7 +520,10 @@ describe("confirmCiVerdict", () => {
         }),
       );
 
-      expect(message).toContain(verdictText);
+      expect(message.startsWith(verdictText)).toBe(true);
+      expect(message).toContain(
+        "--yes does not release unless develop's staging CI passed.",
+      );
       expect(message).toContain("Nothing has been released.");
       expect(message).toContain("--skip-ci-check");
       expect(promptToConfirm).not.toHaveBeenCalled();

@@ -51,7 +51,7 @@ const SKIP_CI_CHECK_WARNING = `Skipping ${RELEASE_SOURCE_BRANCH}'s CI check.`;
  */
 function _buildCiStopMessage(verdict: string): string {
   return `${verdict}
---yes does not release past ${RELEASE_SOURCE_BRANCH}'s CI unless it passed. Nothing has been released. To release anyway, run the command again with --skip-ci-check.`;
+--yes does not release unless ${RELEASE_SOURCE_BRANCH}'s staging CI passed. Nothing has been released. To release anyway, run the command again with --skip-ci-check.`;
 }
 
 /**
