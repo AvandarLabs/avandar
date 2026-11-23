@@ -1,7 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import { Skeleton, Text } from "@mantine/core";
 import { IconLayoutDashboard } from "@tabler/icons-react";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { lazy, Suspense, useId } from "react";
 import { AgentDashboardBlock } from "@/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlock";
 import classes from "@/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.module.css";

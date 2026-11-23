@@ -1,5 +1,5 @@
 import { Text } from "@mantine/core";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { useCheckTruncatedText } from "../hooks/useCheckTruncatedText/useCheckTruncatedText";
 import { Tooltip } from "../Tooltip/Tooltip";
 import css from "./TruncatedText.module.css";

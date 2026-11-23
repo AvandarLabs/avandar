@@ -1,6 +1,6 @@
 import { ActionIcon, UnstyledButton } from "@mantine/core";
 import { IconX } from "@tabler/icons-react";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import css from "./ChatSessionStrip.module.css";
 
 type Props = {

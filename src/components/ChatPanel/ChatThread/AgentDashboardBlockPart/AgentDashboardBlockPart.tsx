@@ -3,7 +3,7 @@ import { useLingui } from "@lingui/react/macro";
 import { Button, Group, Radio, Stack, Text } from "@mantine/core";
 import { IconArrowRight, IconLayoutDashboard } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { useEffect, useId, useRef, useState } from "react";
 import {
   AgentDashboardCardStore,
