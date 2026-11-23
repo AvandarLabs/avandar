@@ -8,9 +8,11 @@
 
 **Tech Stack:** git, TypeScript, Vitest, Acclimate CLI, Oxlint, Lingui, Supabase CLI 2.114.0, Postgres 15 and 17, GitHub Actions, Vercel CLI 64.7.0, bash.
 
-**Not in this plan:** the fix for the crosswalk privacy gap (D4). It needs its own design, spec, and plan. The runbook only gates the release on it.
+**Not in this plan:** the fix for the crosswalk privacy gap. Pablo chose to release with it (D4). It is Linear AVA-611, High priority, and gets its own spec and plan right after the release.
 
-**Written for these answers:** D1 (a) keep plugins, D2 (a) CI deploys production, D3 (a) PR plus an admin fast-forward, D4 (a) fix the privacy gap on `develop` before the release, D5 (a) staging gets the replace import, D6 (a) delete demo resources after seven days, D7 (a) publish review scaffolding and open issues in batches. A different answer to D1 replaces Tasks 9 to 12. A different answer to D2 replaces Task 15. The others change only the runbook (Task 19) and Task 20.
+**Answered by Pablo on 2026-11-23:** D1 keep plugins. D2 CI deploys staging and production, and Vercel's Git integration is removed. D3 a PR, then an admin fast-forward. D4 release with the privacy gap.
+
+**Still open, written for the recommendation:** D5 (a) staging gets the replace import, D6 (a) delete demo resources after seven days, D7 (a) publish review scaffolding and open issues in batches, E1 (a) staging is a preview deploy that CI points the domain at. A different answer to E1 changes Task 16 Step 2 only. The others change only the runbook (Task 19) and Task 20.
 
 ---
 
@@ -21,6 +23,8 @@
 - **Never push, merge into `demo/measles` or `develop`, or open a PR.** Commit locally on `chore/production-cutover`. Pablo pushes.
 - **Never run** `pnpm db:reset`, `pnpm db:seed`, `supabase start`, `supabase stop`, `supabase db diff`, or `pnpm db:new-migration` until `ava supabase status` names this branch's own project on its first line. Task 11 creates the switch.
 - **Never use a `--linked` database command without `SUPABASE_DB_PASSWORD` set.** CLI 2.114.0 creates a temporary write-capable role when it finds no password.
+- **Deployments happen in CI only** (D2). Nothing in this plan relies on Vercel's Git integration, a deploy hook, or a console action.
+- **The repository and its Actions logs are public.** No secret, private hostname, connection string, or user detail goes into a file, a GitHub variable, a commit, or a log line. Workflow steps print names and fixed sentences only. Public documents give aggregate counts only.
 - Follow `AGENTS.md` and `docs/rules/`. No em dashes in comments or docs. Docstrings on every export.
 - Commit messages follow Conventional Commits. End each one with the `Co-Authored-By` trailer of the model that wrote it. Never put session or Slack links in a commit.
 - Verify types with `pnpm exec tsc -b --force --noEmit`. A plain build can report clean from a stale cache.
@@ -46,8 +50,9 @@ Pinned commits:
 | --- | --- | --- |
 | `.github/workflows/alpha.yaml`, `.github/workflows/alpha-dev.yaml`, `scripts/alpha-dev/ensureSupabaseBranch.sh` | Delete | The alpha line's CI |
 | `.github/workflows/production.yaml` | Restore from `develop`, then modify | Gates, then the production deploy job |
-| `vercel.json` | Restore from `develop`, then modify | Git-integration deploys off for `main` only |
-| `.github/workflows/staging.yaml`, `.github/workflows/pr-develop.yaml` | Modify | CLI 2.114.0 and the plugin bundle check |
+| `vercel.json` | Restore from `develop`, then modify | Git-triggered deployments off for every branch |
+| `.github/workflows/staging.yaml` | Modify | Gates, then the staging deploy job |
+| `.github/workflows/pr-develop.yaml` | Modify | CLI 2.114.0 and the plugin bundle check |
 | `apps/ava-cli/src/ReleaseCli/getReleaseLineFromBranch/` | Delete | Replaced by `releaseBranches/` |
 | `apps/ava-cli/src/ReleaseCli/releaseBranches/releaseBranches.ts` | Create | The branch, suffix, and workflow constants of the one release path |
 | `apps/ava-cli/src/ReleaseCli/**` | Modify | No alpha line. Hardening kept. |
@@ -964,21 +969,25 @@ Start from the file as it is (identical to `develop`'s). Take the source for the
 5. Delete the `migrate` job. Add the whole `deploy` job from `alpha.yaml`, then change exactly this:
    - `if: github.ref == 'refs/heads/alpha'` becomes `if: github.ref == 'refs/heads/main'`.
    - The step "Refuse anything but the tip of alpha" becomes "Refuse anything but the tip of main": `refs/heads/alpha` becomes `refs/heads/main`, and both messages say `main`.
+   - Every `${{ vars.AVA_PIPELINE_SERVER_URL }}` becomes `${{ secrets.AVA_PIPELINE_SERVER_URL }}`, in the configuration check and in the secrets step. A private hostname is not a public variable.
    - Nothing else. The job keeps `needs: test-quick`, `environment: production`, `timeout-minutes: 45`, the configuration check, the Vercel pull, the build, "Apply migrations" with `supabase db push --include-all`, the single-quoted secrets file, the function deploy, and the prebuilt deploy.
 
-- [ ] **Step 2: Turn Git-integration deploys off for `main`**
+- [ ] **Step 2: Turn Git-triggered deployments off for every branch**
 
-In `vercel.json`, after `"installCommand"`:
+```bash
+curl -s https://openapi.vercel.sh/vercel.json \
+  | jq '.properties.git.properties.deploymentEnabled'
+```
+
+Expected: the schema allows a boolean. Then in `vercel.json`, after `"installCommand"`:
 
 ```json
   "git": {
-    "deploymentEnabled": {
-      "main": false
-    }
+    "deploymentEnabled": false
   },
 ```
 
-`develop` and every preview branch stay on the Git integration.
+If the schema allows only an object keyed by branch, list `main` and `develop` as `false` instead and say so in the report: other branches then keep building until Pablo disconnects the integration.
 
 - [ ] **Step 3: Lint**
 
@@ -1000,6 +1009,15 @@ grep -c "environment: production" .github/workflows/production.yaml
 
 Expected: no output, then one `db push --include-all` line, then `1`.
 
+Then read what the job can print, since the run log is public:
+
+```bash
+awk '/^  deploy:/,0' .github/workflows/production.yaml | grep -nE "echo|printf|set -x"
+grep -oE "vars\.[A-Z0-9_]+" .github/workflows/production.yaml | sort -u
+```
+
+Every printed value must be a name, a commit, or a fixed sentence. GitHub masks secrets in logs and does not mask variables, so every `vars.` name must be public by nature. Expected: `PRODUCTION_SB_PUBLISHABLE_KEY`, `PRODUCTION_SUPABASE_URL`, and `VITE_GOOGLE_PICKER_APP_ID`, which all ship inside the web app.
+
 - [ ] **Step 5: Check the order**
 
 ```bash
@@ -1020,25 +1038,123 @@ Paste the output into the commit body. Task 19 needs it. Today the `production` 
 
 ```bash
 git add .github/workflows/production.yaml vercel.json
-git commit -m "feat(ci): deploy production from CI, after the build and in one order
+git commit -m "feat(ci): deploy production from CI and turn off git-triggered vercel deploys
 
 <paste the secrets list>"
 ```
 
 ---
 
-### Task 16: Staging and PR workflows
+### Task 16: The staging deploy job
 
-**Risk class:** ordinary.
+**Risk class:** high-risk. It deploys staging and rewrites staging's edge function secrets.
 
 **Files:**
-- Modify: `.github/workflows/staging.yaml`, `.github/workflows/pr-develop.yaml`
+- Modify: `.github/workflows/staging.yaml`
+- Modify: `.github/workflows/pr-develop.yaml`
 
-- [ ] **Step 1:** In both files, add `SUPABASE_CLI_VERSION: 2.114.0` to `env` with the same comment as in `production.yaml`, and replace every `version: 2.98.2` with `version: ${{ env.SUPABASE_CLI_VERSION }}`.
-- [ ] **Step 2:** In `staging.yaml`'s `test-quick`, add `- run: pnpm check:plugin-bundle` after the `prepare-envs` step. Confirm `pr-develop.yaml` already has it.
-- [ ] **Step 3:** Leave `staging.yaml`'s `migrate` job as it is: `supabase db push --include-all`, then `supabase functions deploy`. Staging's secrets stay set by hand. Staging lacks `AVA_PIPELINE_SERVER_URL`, `AVA_PIPELINE_SERVER_SECRET`, and `GEOAPIFY_API_KEY` today (checked by name on 2026-11-23): the runbook has Pablo set them before the promotion lands (Task 19, section 8).
-- [ ] **Step 4:** Run `actionlint .github/workflows/staging.yaml .github/workflows/pr-develop.yaml` and `grep -rn "2.98.2" .github/workflows`. Expected: no findings, no output.
-- [ ] **Step 5:** Commit with `chore(ci): use supabase cli 2.114.0 and check the plugin bundle on staging`.
+Staging gets the same job as production (D2). Task 15 comes first: its `deploy` job is the source.
+
+- [ ] **Step 1: Write the workflow**
+
+1. Header comment: deploys `develop` to staging (https://staging.avandarlabs.com and the staging Supabase project) after lint, type-check, and the quick suite, in the same order as `production.yaml`.
+2. Add `concurrency: { group: staging-deploy, cancel-in-progress: false }`.
+3. `env`: add `SUPABASE_CLI_VERSION: 2.114.0`, `VERCEL_CLI_VERSION: 64.7.0`, and `STAGING_APP_URL: https://staging.avandarlabs.com`.
+4. In the test jobs, `version: 2.98.2` becomes `version: ${{ env.SUPABASE_CLI_VERSION }}`. In `test-quick`, add `- run: pnpm check:plugin-bundle` after the `prepare-envs` step.
+5. Delete the `migrate` job. Copy the `deploy` job from this branch's `production.yaml` and change exactly this:
+
+| In `production.yaml` | In `staging.yaml` |
+| --- | --- |
+| `refs/heads/main`, "tip of main" | `refs/heads/develop`, "tip of develop" |
+| `environment: production` | `environment: staging` |
+| `secrets.PRODUCTION_DB_PASSWORD`, `secrets.PRODUCTION_PROJECT_ID` | `secrets.STAGING_DB_PASSWORD`, `secrets.STAGING_PROJECT_ID` |
+| `PRODUCTION_SB_SECRET_KEY`, `PRODUCTION_SB_PUBLISHABLE_KEY`, `PRODUCTION_SUPABASE_URL`, as names, environment keys, and in messages | `STAGING_SB_SECRET_KEY`, `STAGING_SB_PUBLISHABLE_KEY`, `STAGING_SUPABASE_URL` |
+| `PRODUCTION_APP_URL` | `STAGING_APP_URL` |
+| "production" in step names, comments, and messages | "staging" |
+| `write_secret MODE production` | `write_secret MODE staging` |
+| `write_secret POLAR_SERVER_TYPE production` | `write_secret POLAR_SERVER_TYPE sandbox` |
+| `$RUNNER_TEMP/production-functions.env` | `$RUNNER_TEMP/staging-functions.env` |
+| The three Vercel steps | Step 2 |
+
+- [ ] **Step 2: The Vercel steps for staging (E1, option a)**
+
+Staging is not Vercel's production target. Read the CLI documentation for `pull`, `build`, `deploy`, and `alias` at version 64.7.0 before writing these (https://vercel.com/docs/cli), and follow it where it differs from the lines below.
+
+- Pull: `vercel pull --yes --environment=preview --git-branch=develop --token="$VERCEL_TOKEN"`. The file is `.vercel/.env.preview.local`. Keep both `sed` cleanups from the production step.
+- Build: `vercel build --token="$VERCEL_TOKEN"`, with no `--prod`.
+- Deploy, then point the domain at the deployment:
+
+```yaml
+      - name: Deploy the prebuilt web app to Vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          deployment_url="$(npx --yes "vercel@$VERCEL_CLI_VERSION" deploy --prebuilt \
+            --token="$VERCEL_TOKEN")"
+          if [[ ! "$deployment_url" =~ ^https://[a-z0-9.-]+\.vercel\.app$ ]]; then
+            echo "vercel deploy did not print a deployment URL." >&2
+            exit 1
+          fi
+          npx --yes "vercel@$VERCEL_CLI_VERSION" alias set "$deployment_url" \
+            "${STAGING_APP_URL#https://}" --token="$VERCEL_TOKEN"
+```
+
+If E1 is answered (b), use the three Vercel steps of `git show origin/develop:.github/workflows/demo.yaml` instead, with `VERCEL_ENVIRONMENT: staging`.
+
+- [ ] **Step 3: `pr-develop.yaml`**
+
+Add `SUPABASE_CLI_VERSION: 2.114.0` to `env` with the same comment as in `production.yaml`, and replace every `version: 2.98.2`. Confirm the `pnpm check:plugin-bundle` step is there.
+
+- [ ] **Step 4: Lint and compare with production's job**
+
+```bash
+actionlint .github/workflows/staging.yaml .github/workflows/pr-develop.yaml
+grep -rn "2.98.2" .github/workflows
+awk '/^  deploy:/,0' .github/workflows/staging.yaml | grep -nE "alpha|ALPHA|PRODUCTION|production|DEMO"
+diff <(awk '/^  deploy:/,0' .github/workflows/production.yaml \
+        | sed -E 's/PRODUCTION/STAGING/g; s/production/staging/g; s#refs/heads/main#refs/heads/develop#; s/tip of main/tip of develop/') \
+     <(awk '/^  deploy:/,0' .github/workflows/staging.yaml)
+```
+
+Expected: no findings, no output, no output, and a diff that shows only the Polar server type, the Vercel steps, and messages that name the branch.
+
+- [ ] **Step 5: Compare what CI will write with what staging has, read-only**
+
+The demo deploy wrote the GitHub `staging` environment's values to the `demo-measles` branch, so that branch's digests show what CI will write. `supabase secrets list` returns a digest per name, never a value.
+
+```bash
+DEMO_REF="$(supabase branches list --project-ref frbelerytsmadmmdwgcl -o json \
+  | jq -r '.[] | select(.name=="demo-measles") | .project_ref')"
+supabase secrets list --project-ref "$DEMO_REF" -o json \
+  | jq -r '.[] | "\(.name) \(.value)"' | sort > /tmp/demo-digests.txt
+supabase secrets list --project-ref frbelerytsmadmmdwgcl -o json \
+  | jq -r '.[] | "\(.name) \(.value)"' | sort > /tmp/staging-digests.txt
+join -j1 /tmp/demo-digests.txt /tmp/staging-digests.txt | awk '$2 != $3 { print $1 }'
+rm /tmp/demo-digests.txt /tmp/staging-digests.txt
+```
+
+Expected, as on 2026-11-23: `GOOGLE_REDIRECT_URI`, `SB_PUBLISHABLE_KEY`, `SB_SECRET_KEY`, `VITE_APP_URL`, and the platform's own `SUPABASE_*` names, which differ per project by design, plus `FEATUREBASE_JWT_SECRET`. That last one is a real difference: report it to Pablo, who decides which value is right before the first staging deploy. Report any other name too.
+
+- [ ] **Step 6: List what the `staging` environment still needs**
+
+```bash
+grep -oE "(secrets|vars)\.[A-Z0-9_]+" .github/workflows/staging.yaml | sort -u
+gh secret list --env staging --json name -q '.[].name' | sort
+gh variable list --env staging --json name -q '.[].name' | sort
+```
+
+Expected to be missing: `STAGING_SB_SECRET_KEY` as a secret, `STAGING_SB_PUBLISHABLE_KEY` and `STAGING_SUPABASE_URL` as variables, and `AVA_PIPELINE_SERVER_URL` as a secret (it is a variable today). Paste the three lists into the commit body. Task 19 needs them.
+
+- [ ] **Step 7: Commit**
+
+```bash
+git add .github/workflows/staging.yaml .github/workflows/pr-develop.yaml
+git commit -m "feat(ci): deploy staging from CI in the same order as production
+
+<paste the lists>"
+```
 
 ---
 
@@ -1187,24 +1303,24 @@ Written from what Tasks 1 to 18 built. Every step Pablo runs has an exact comman
 | 2 | Before you start: tools (`supabase` 2.114.0, `psql` and `pg_dump` 17.6, `gh`), shell setup, rules for production access and dumps | Old 1.3 to 1.5 |
 | 3 | Freeze: announce it, list the open PRs into `develop` (5 on 2026-11-23) and the local-only commits to push or drop (`003e2964c` on the first machine) | New |
 | 4 | Rehearsal: dump production, restore into a switched stack at production's version, apply the 79 migrations, open old dashboards, pass criteria | Old 2, minus 2.7 |
-| 5 | GitHub setup: the `production` environment's secrets and variables from Task 15 Step 6, the value rules, the name check, a required reviewer | Old 3.2 to 3.5 |
+| 5 | GitHub setup: the `production` environment's names from Task 15 Step 6 and the `staging` environment's from Task 16 Step 6, `AVA_PIPELINE_SERVER_URL` as a secret in both, the `FEATUREBASE_JWT_SECRET` decision for staging, the value rules, the name check, a required reviewer on `production` | Old 3.2 to 3.5 |
 | 6 | Third parties: production API keys, Google OAuth redirect URI, Polar, pipeline server, no Supabase Git integration on production | Old 5.1 to 5.5 |
-| 7 | Vercel, values and click paths only: confirm Production tracks `main`, review Production's `VITE_*` values including `VITE_AVA_DATA_AGENT`, the same review for the staging environment, delete deploy hooks for `main` | Old 4.4 to 4.6 |
-| 8 | Promote to `develop` (D3): first set staging's three missing edge function secrets (`AVA_PIPELINE_SERVER_URL`, `AVA_PIPELINE_SERVER_SECRET`, `GEOAPIFY_API_KEY`) with `supabase secrets set --project-ref frbelerytsmadmmdwgcl --env-file <file>`, then push `chore/production-cutover` to `demo/measles`, open the PR with the title `feat: promote the measles demo to develop` and the body from `promotion-pr-description.md`, wait for `pr-develop.yaml`, then `git push origin <sha>:refs/heads/develop` as a fast-forward. What to expect: the PR shows merged, `staging.yaml` runs, staging's app is new for about 25 minutes before its database is, and `release-packages.yaml` opens a version PR that publishes nothing until merged | New |
-| 9 | Staging: confirm the 10 migrations applied, load the catalog with `--replace-existing` and copy the Parquet objects, staging checks | Old 6.11, retargeted |
-| 10 | The privacy fix (D4): what must be merged before the release | New |
-| 11 | Back up production, verify the dump restores, choose the rollback basis | Old 5.8, 6.6 |
-| 12 | Release: `pnpm build:ava-cli` on `develop`, `ava release` for `0.15.0`, approve the `deploy` job, what each step of the job prints, the migration window | Old 6.8, 6.10, rewritten for `main` |
-| 13 | Load the catalog into production and copy the Parquet objects | Old 6.11 |
-| 14 | Smoke test: sign in with an existing account, open an old dashboard, browse the catalog, run a query, install the epidemiology plugin in a test workspace, check Cmd+K shows `0.15.0` | Old 6.9 |
-| 15 | Rollback: decide, restore the database, redeploy `main`'s previous functions, promote the previous Vercel deployment | Old 7 |
-| 16 | Publish the review scaffolding (D7) | Task 20 |
+| 7 | Vercel before the cutover, values and click paths only: review the Production and Preview `VITE_*` values including `VITE_AVA_DATA_AGENT`, delete every deploy hook, and note what `staging.avandarlabs.com` is assigned to today | Old 4.4, 4.5 |
+| 8 | Promote to `develop` (D3): push `chore/production-cutover` to `demo/measles`, open the PR with the title `feat: promote the measles demo to develop` and the body from `promotion-pr-description.md`, wait for `pr-develop.yaml`, then `git push origin <sha>:refs/heads/develop` as a fast-forward. What to expect: the PR shows merged, Vercel builds nothing by itself, `staging.yaml` deploys staging step by step, and `release-packages.yaml` opens a version PR that publishes nothing until merged | New |
+| 9 | Staging: confirm the 10 migrations applied and the domain serves the new build, load the catalog with `--replace-existing` and copy the Parquet objects, staging checks | Old 6.11, retargeted |
+| 10 | Back up production, verify the dump restores, choose the rollback basis | Old 5.8, 6.6 |
+| 11 | Release: `pnpm build:ava-cli` on `develop`, `ava release` for `0.15.0`, approve the `deploy` job, what each step of the job prints, the migration window | Old 6.8, 6.10, rewritten for `main` |
+| 12 | Load the catalog into production and copy the Parquet objects | Old 6.11 |
+| 13 | Smoke test: sign in with an existing account, open an old dashboard, browse the catalog, run a query, install the epidemiology plugin in a test workspace, check Cmd+K shows `0.15.0` | Old 6.9 |
+| 14 | Rollback: decide, restore the database, redeploy `main`'s previous functions, promote the previous Vercel deployment | Old 7 |
+| 15 | Remove the Vercel Git integration, after both CI deploys were green: Project `avandar` > **Settings** > **Git** > **Connected Git Repository** > **Disconnect**. What stops (a preview for every branch), how to confirm nothing builds on the next push, and how to reconnect | New |
+| 16 | Publish the review scaffolding (D7), and start the privacy fix (AVA-611) | Task 20 |
 | 17 | Cleanup (D6), seven days later: archive the dump, delete `demo.avandarlabs.com` and the `demo` environment, delete the `demo-measles` Supabase branch, delete `demo/measles` and `chore/production-cutover`, retarget feature branches | Old 8 |
 | 18 | Known gaps | Old 9 |
 
 - [ ] **Step 2: Check it against the spec**
 
-Every numbered step of spec section 11 maps to a runbook section. Every command names a script, flag, or workflow that exists on this branch: run `git grep` for each path. No command mentions `alpha`, `alpha-dev`, or the `mainline` environment.
+Every numbered step of spec section 11 maps to a runbook section. Every command names a script, flag, or workflow that exists on this branch: run `git grep` for each path. No command mentions `alpha`, `alpha-dev`, or the `mainline` environment. The file is public: it holds no secret value, no connection string, and nothing about a user beyond aggregate counts.
 
 - [ ] **Step 3: Copy to Downloads and render**
 
@@ -1431,7 +1547,7 @@ Expected: PASS, then 140: one file per feature row (139) plus `order.md`. Read f
 
 - [ ] **Step 6: Write the promotion PR description**
 
-`docs/measles-demo/promotion-pr-description.md`: what the PR brings (787 commits, features F1 to F141), that most of it was not reviewed, where the reviews will live, the known privacy gap from the top of the feature log and that the release to `main` waits for its fix (D4), the migration notes from spec section 7, and that it lands as a fast-forward so every commit ID is kept.
+`docs/measles-demo/promotion-pr-description.md`: what the PR brings (787 commits, features F1 to F141), that most of it was not reviewed, where the reviews will live, the known privacy gap from the top of the feature log, that the release goes ahead with it because production has no active users, and that the fix follows right after (D4), the migration notes from spec section 7, and that it lands as a fast-forward so every commit ID is kept.
 
 - [ ] **Step 7: Reword the two logs' introductions**
 
@@ -1499,10 +1615,10 @@ The report gives: the tip commit, each check and its result, every deviation fro
 
 ## Review notes for the controller
 
-- **High-risk tasks** (task-level review required): 2, 3, 4, 9, 10, 11, 15, 17, 18, 19. They touch release safety, production deploys, migrations, or data movement.
+- **High-risk tasks** (task-level review required): 2, 3, 4, 9, 10, 11, 15, 16, 17, 18, 19. They touch release safety, production deploys, migrations, or data movement.
 - **Mechanical tasks:** 5, 7.
-- **Ordinary:** 1, 6, 8, 12, 13, 14, 16, 20, 21.
+- **Ordinary:** 1, 6, 8, 12, 13, 14, 20, 21.
 - The tree is not expected to pass its checks between Task 8 and Task 13. Run the full suite and strict lint once before Task 8, in Task 14, and in Task 21.
-- Tasks 8 to 14 run in order, in one worktree, one at a time. Tasks 15 and 16 can follow Task 14 in either order. Task 17 needs Pablo's read-only access and can run alongside Stage C. Task 19 needs every earlier task.
+- Tasks 8 to 14 run in order, in one worktree, one at a time. Task 15 follows Task 14, and Task 16 follows Task 15. Task 17 needs Pablo's read-only access and can run alongside Stage C. Task 19 needs every earlier task.
 - The final branch review covers `2e5a62c7e..HEAD` on `chore/production-cutover`.
 - Stop and ask Pablo when: a tip moved (Tasks 1 and 21), the reset in Task 11 Step 2 does not fail the way the spec predicts, Task 17 finds a blocker, or a step would need a write to production, Vercel, or staging's configuration.
