@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#eeede7" />
+    <meta name="theme-color" content="#f3f8fe" />
     <title>Avandar / Productions</title>
     <meta
       name="description"
@@ -16,7 +16,14 @@
   <body class="productions-page">
     <header class="masthead wrap">
       <a class="brand" href="index.html">
-        <span class="brand-mark" aria-hidden="true">a.</span> AVANDAR
+        <img
+          class="brand-mark"
+          src="/brand/avandar-logo.png"
+          alt=""
+          width="34"
+          height="34"
+        />
+        Avandar
         <span class="brand-divider">/</span>
         <span class="room">Productions</span>
       </a>
@@ -123,6 +130,49 @@
               </div>
               <p
                 id="scene-library-export-status"
+                class="export-status"
+                data-export-status
+                role="status"
+                aria-live="polite"
+                hidden
+              ></p>
+            </div>
+          </article>
+          <article class="production-card" id="shot-vocabulary">
+            <div class="screening-top">
+              <span
+                ><span class="live-dot"></span> ADDITION / SHOT VOCABULARY</span
+              ><span>EDITORIAL STUDY · ADDITION</span>
+            </div>
+            <iframe
+              data-src="/live.html?id=shot-vocabulary"
+              title="Shot vocabulary: live preview"
+              aria-describedby="shot-vocabulary-description"
+              loading="lazy"
+              allowfullscreen
+            ></iframe>
+            <div class="production-copy">
+              <p class="production-label">REUSABLE SHOTS · FICTIONAL DATA</p>
+              <h3 id="shot-vocabulary-title">Shot vocabulary</h3>
+              <p id="shot-vocabulary-description">
+                A brand lockup that builds and flies through the frame, tilted
+                product windows, a racing pair, a bar comparison, a diagram with
+                travelling packets, and stepped column wipes between field
+                colours. An editorial study of the scenes, not a product claim.
+              </p>
+              <div class="production-meta">
+                <span>Live preview</span
+                ><button
+                  type="button"
+                  data-download
+                  aria-label="Download Shot vocabulary as MP4"
+                  aria-describedby="shot-vocabulary-export-status"
+                >
+                  Download MP4 <span aria-hidden="true">↓</span>
+                </button>
+              </div>
+              <p
+                id="shot-vocabulary-export-status"
                 class="export-status"
                 data-export-status
                 role="status"

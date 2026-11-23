@@ -4,7 +4,7 @@ import { OverlapSetting } from "./OverlapSetting";
 import { PresenceAxis } from "./PresenceAxis";
 import { PresenceRibbon } from "./PresenceRibbon";
 import { SceneLabel } from "./SceneLabel";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ContactWindowOverlap.schema";
 import type { ReactNode } from "react";
 

@@ -2,7 +2,7 @@ import { STOCK } from "../../stockPalette";
 import { JournalCopy } from "./JournalCopy";
 import { JournalTab } from "./JournalTab";
 import { ReceiptHalf } from "./ReceiptHalf";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./JournalReceipts.schema";
 import type { ReactNode } from "react";
 /** Complete receipt-controlled journal input. */

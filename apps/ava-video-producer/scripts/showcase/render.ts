@@ -8,6 +8,7 @@ import {
   selectComposition,
   renderFrames,
 } from "@remotion/renderer";
+import { createContinuityPlanFromVideoThemeSnapshot } from "../../src/continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme";
 import { buildProduct } from "../build-avandar.mjs";
 import { ffmpeg, run, mixAudio, probe } from "../lib/mediaHelpers";
 import {
@@ -18,6 +19,7 @@ import {
 import { withWorkspaceAliases } from "../lib/withWorkspaceAliases.mjs";
 import { requireLicense } from "../require-license.mjs";
 import { StockFingerprintModule } from "../stock/StockFingerprintModule/StockFingerprintModule";
+import { getDeliveryThemeFromFilm } from "./getDeliveryThemeFromFilm/getDeliveryThemeFromFilm";
 import { appRoot } from "./ShowcaseFilms/ShowcaseFilms";
 import type { Film } from "../../src/showcase/showcase.types";
 
@@ -123,6 +125,12 @@ export async function renderFilm(
   };
   const browser = await openBrowser("chrome", options);
   const inputProps = { film, withAudio: false };
+  // Preview frames and the audio mix follow the plan the film draws.
+  const plan = film.plan
+    ? createContinuityPlanFromVideoThemeSnapshot(film.plan, film.theme, [
+        film.id,
+      ])
+    : undefined;
   try {
     const composition = await selectComposition({
       serveUrl,
@@ -132,8 +140,8 @@ export async function renderFilm(
       ...options,
       envVariables: {},
     });
-    const samples = film.plan
-      ? previewFrames(film.plan)
+    const samples = plan
+      ? previewFrames(plan)
       : film.kind === "stock"
         ? StockFingerprintModule.SAMPLE_PARAMETERS.samples
         : [0, 30, Math.floor(film.frames / 2), film.frames - 1];
@@ -185,8 +193,8 @@ export async function renderFilm(
   await fs.writeFile(path.join(directory, "frame-check.txt"), gate);
   progress("Adding narration and preparing download…");
   const final = path.join(directory, `${film.id}.mp4`);
-  if (film.plan) {
-    await mixAudio(film.plan, directory, picture, final);
+  if (plan) {
+    await mixAudio(plan, directory, picture, final);
   } else {
     await fs.copyFile(picture, final);
   }
@@ -196,6 +204,7 @@ export async function renderFilm(
     JSON.stringify(
       {
         film: film.id,
+        ...getDeliveryThemeFromFilm(film),
         ...(stockFingerprint ? { fingerprint: stockFingerprint } : {}),
         gate: "passed",
         metadata,

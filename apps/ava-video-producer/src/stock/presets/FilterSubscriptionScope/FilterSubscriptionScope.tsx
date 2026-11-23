@@ -2,7 +2,7 @@ import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SubscriptionSocket } from "./SubscriptionSocket";
 import { SubscriptionView } from "./SubscriptionView";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./FilterSubscriptionScope.schema";
 import type { ReactNode } from "react";
 

@@ -3,7 +3,7 @@ import { CoverStaff } from "./CoverStaff";
 import { getCoverPositionsFromFrame } from "./getCoverPositionsFromFrame";
 import { LearningRooms } from "./LearningRooms";
 import { MentorBoard } from "./MentorBoard";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./TeacherLearningCover.schema";
 import type { ReactNode } from "react";
 

@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { prop } from "@avandar/utils";
-import { stockI18n } from "../i18n/stockI18n/stockI18n";
 import { stockContracts } from "../registry/stockContracts";
 import type {
   StockControl,
@@ -52,16 +51,14 @@ function _flatten({
   return result;
 }
 
-test("every nested editor control and authored option has readable translated copy", () => {
+test("every nested editor control and authored option has readable copy", () => {
   const failures = Object.values(stockContracts).flatMap((contract) =>
     [..._flatten({ controls: contract.controls })].flatMap(([path, control]) =>
       _getControlMessages(control).flatMap((descriptor) => {
-        const translated = stockI18n._(descriptor);
         return !descriptor.message.trim() ||
-          !translated.trim() ||
-          translated === descriptor.id ||
+          descriptor.message === descriptor.id ||
           /(^|\.)PLACE(\.|$)/i.test(descriptor.id)
-          ? [{ preset: contract.id, path, ...descriptor, translated }]
+          ? [{ preset: contract.id, path, ...descriptor }]
           : [];
       }),
     ),

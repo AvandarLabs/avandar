@@ -1,5 +1,5 @@
 .vocabularyGuide {
-  border-top: 1px solid #c8cec4;
+  border-top: 1px solid var(--line);
   margin-top: 20px;
   padding-top: 20px;
 }
@@ -17,7 +17,7 @@
 }
 
 .vocabularyGuide p {
-  color: #4b5b52;
+  color: var(--muted);
   line-height: 1.5;
 }
 
@@ -34,7 +34,7 @@
 }
 
 .vocabularyGuideAdvice dd {
-  color: #4b5b52;
+  color: var(--muted);
   line-height: 1.5;
   margin: 0;
 }
@@ -46,7 +46,7 @@
 }
 
 .vocabularyGuideControls li {
-  border-bottom: 1px solid #d5dad1;
+  border-bottom: 1px solid var(--line);
   padding: 14px 0;
 }
 
@@ -56,7 +56,7 @@
 }
 
 .vocabularyGuideControls code {
-  color: #246650;
+  color: var(--accent);
   display: block;
   font-size: 13px;
   overflow-wrap: anywhere;

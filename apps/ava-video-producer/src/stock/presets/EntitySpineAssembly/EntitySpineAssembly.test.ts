@@ -61,7 +61,7 @@ test("one spine row per entity receives sum or null without source fan-out", () 
   );
 });
 
-import { registerStockLocalizationAssertions } from "../../../../tests/helpers/registerStockLocalizationAssertions";
+import { registerStockDefaultTextAssertions } from "../../../../tests/helpers/registerStockDefaultTextAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { entitySpineAssemblyContract } from "./EntitySpineAssembly.contract";
 import { inputSchema } from "./EntitySpineAssembly.schema";
@@ -114,7 +114,7 @@ const options = {
 } satisfies PresetAssertions<Input>;
 registerStockPresetAssertions(options);
 registerStockTextLayoutAssertions(options);
-registerStockLocalizationAssertions({
+registerStockDefaultTextAssertions({
   contract: options.contract,
   expectedTextPaths: [
     ["entities", 0, "label"],

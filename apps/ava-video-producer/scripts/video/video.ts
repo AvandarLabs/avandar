@@ -1,0 +1,66 @@
+#!/usr/bin/env node
+import path from "node:path";
+import { pathToFileURL } from "node:url";
+import {
+  durationInFrames,
+  type Storyboard,
+} from "../../src/storyboard/schema/schema";
+import { buildProduct } from "../build-avandar.mjs";
+import { readPlan } from "../lib/planHelpers";
+import { productRequirements } from "../lib/productRequirements/productRequirements";
+import { videoWorkspace } from "../lib/video-workspace.mjs";
+import { requireLicense } from "../require-license.mjs";
+import { alignRecording } from "./alignRecording";
+import { buildValidationSummary } from "./buildValidationSummary";
+import { exportPlan } from "./exportPlan";
+import { parseArgs } from "./parseArgs";
+import { runPictureCommand } from "./runPictureCommand";
+import { scratchTts } from "./scratchTts/scratchTts";
+import { validate } from "./validate";
+import { HELP, ROOT } from "./video.constants";
+
+/** Dispatch local pipeline stages; source plans are never edited in place. */
+export async function main(argv = process.argv.slice(2)) {
+  requireLicense();
+  if (argv.length === 1 && ["--help", "-h"].includes(argv[0])) {
+    console.log(HELP);
+    return;
+  }
+  const options = parseArgs(argv);
+  const workspace = await videoWorkspace(ROOT, options.filename);
+  const plan = await readPlan(options.filename);
+  if (
+    ["preview", "render"].includes(options.command) &&
+    productRequirements(plan).needsProduct
+  )
+    await buildProduct();
+  if (options.command === "tts") {
+    console.log(
+      "Derived scratch plan:",
+      await scratchTts(plan, options, workspace),
+    );
+    return;
+  }
+  if (options.command === "align") {
+    console.log(
+      "Derived aligned plan:",
+      await alignRecording(plan, options, workspace),
+    );
+    return;
+  }
+  await validate(plan, workspace);
+  if (options.command === "validate") console.log(buildValidationSummary(plan));
+  else if (options.command === "plan")
+    console.log("Plan artifacts:", await exportPlan(plan, workspace));
+  else await runPictureCommand({ options, plan, workspace });
+}
+
+if (
+  process.argv[1] &&
+  pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url
+) {
+  main().catch((error) => {
+    console.error(error instanceof Error ? error.message : String(error));
+    process.exitCode = 1;
+  });
+}

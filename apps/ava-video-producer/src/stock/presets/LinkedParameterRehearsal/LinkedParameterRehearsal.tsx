@@ -5,7 +5,7 @@ import { STOCK } from "../../stockPalette";
 import { getRehearsalStateFromInputAndFrame } from "./getRehearsalStateFromInputAndFrame";
 import { RehearsalOutput } from "./RehearsalOutput";
 import { RehearsalRuler } from "./RehearsalRuler";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./LinkedParameterRehearsal.schema";
 import type { ReactNode } from "react";
 

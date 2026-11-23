@@ -1,0 +1,22 @@
+.choice {
+  align-items: center;
+  display: grid;
+  gap: 4px 8px;
+  grid-template-columns: max-content minmax(0, 1fr);
+}
+
+.choice > button {
+  justify-self: start;
+}
+
+.choiceNote {
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* On a phone, descriptions are 12px. */
+@media (width <= 760px) {
+  .choice {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

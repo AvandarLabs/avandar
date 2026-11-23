@@ -1,5 +1,8 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import {
+  useGraphicProps,
+  useGraphicTokens,
+} from "../../theme/useGraphicTheme/useGraphicTheme";
 import { CacheCell } from "./CacheCell";
 import type { Input } from "./QueryColumnCacheGrowth.schema";
 import type { ReactNode } from "react";
@@ -21,11 +24,14 @@ export function CacheColumn({
   growth,
   accent,
 }: Readonly<Props>): ReactNode {
+  const style = useGraphicProps("QueryColumnCacheGrowth", {});
+  const { color } = useGraphicTokens();
   return (
     <g data-cache-column={column.id} opacity={isAdded ? growth : 1}>
       <path
         d={`M${60 + index * 168} 260 V${334 + rowCount * 44}`}
-        stroke={isAdded ? accent : STOCK.line}
+        stroke={isAdded ? accent : color.line}
+        strokeWidth={style.gridStrokeWidth}
       />
       <LabelSlots
         labels={[[column.label, 70 + index * 168, 280, 148, 14, 4]]}

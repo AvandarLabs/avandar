@@ -1,5 +1,4 @@
 import { ramp } from "../../../motion";
-import { stockI18n } from "../../i18n/stockI18n/stockI18n";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { audienceMessages } from "./PublicationSnapshotSlice.controls";
 import { SnapshotColumnHeading } from "./SnapshotColumnHeading";
@@ -33,7 +32,7 @@ export function SnapshotHeadings({ input, frame }: Readonly<Props>): ReactNode {
           labels={[
             [input.publication.revision, 508, 558, 400, 14, 2],
             [
-              stockI18n._(audienceMessages[input.publication.audience]),
+              audienceMessages[input.publication.audience].message,
               508,
               596,
               400,

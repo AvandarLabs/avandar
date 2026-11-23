@@ -332,7 +332,14 @@ function createBuildOptions(aliases, outputDirectory, onBuilt) {
       "react/jsx-dev-runtime",
       "remotion",
     ],
-    define: { "process.env.NODE_ENV": '"production"', "import.meta.env": "{}" },
+    // Product code may read a bare `import.meta` (query-hooks' isDevBuild).
+    // Film bundles are classic scripts, where that is a syntax error, so both
+    // become empty objects: the product then sees a production build.
+    define: {
+      "process.env.NODE_ENV": '"production"',
+      "import.meta.env": "{}",
+      "import.meta": "{}",
+    },
     loader: {
       ".woff": "dataurl",
       ".woff2": "dataurl",

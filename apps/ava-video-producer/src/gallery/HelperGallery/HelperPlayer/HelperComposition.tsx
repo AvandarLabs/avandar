@@ -1,0 +1,19 @@
+import { useCurrentFrame, useVideoConfig } from "remotion";
+import { HELPER_DEMOS } from "../demos/helperDemoRegistry";
+import { HELPER_CATALOG } from "../helperCatalog";
+import type { HelperDemoId } from "../helperDemoIds";
+
+/**
+ * One helper's live preview at the player's current frame. The preview
+ * calls the real helper; nothing here reimplements motion.
+ */
+export function HelperComposition({ helperId }: { helperId: string }) {
+  const frame = useCurrentFrame();
+  const { durationInFrames } = useVideoConfig();
+  const helper = HELPER_CATALOG.helpers.find((entry) => entry.id === helperId);
+  if (!helper) {
+    throw new Error(`Unknown helper preview: ${helperId}`);
+  }
+  const Demo = HELPER_DEMOS[helper.demo.id as HelperDemoId];
+  return <Demo frame={frame} frames={durationInFrames} helper={helper} />;
+}

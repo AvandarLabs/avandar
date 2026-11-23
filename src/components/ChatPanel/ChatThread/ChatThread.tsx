@@ -3,7 +3,7 @@ import { CaseTypeDraftBlock } from "@/components/ChatPanel/CaseTypeDraftBlock/Ca
 import { ChatEmptyState } from "@/components/ChatPanel/ChatEmptyState/ChatEmptyState";
 import { AssistantMessage } from "@/components/ChatPanel/ChatThread/AssistantMessage/AssistantMessage";
 import { Composer } from "@/components/ChatPanel/ChatThread/Composer/Composer";
-import { isChatThreadVisiblyEmpty } from "@/components/ChatPanel/ChatThread/isChatThreadVisiblyEmpty";
+import { isChatThreadVisiblyEmpty } from "@/components/ChatPanel/ChatThread/isChatThreadVisiblyEmpty/isChatThreadVisiblyEmpty";
 import { RegenerateErrorBanner } from "@/components/ChatPanel/ChatThread/RegenerateErrorBanner/RegenerateErrorBanner";
 import { UserMessage } from "@/components/ChatPanel/ChatThread/UserMessage/UserMessage";
 import { PendingClarificationBlock } from "@/components/ChatPanel/PendingClarificationBlock/PendingClarificationBlock";

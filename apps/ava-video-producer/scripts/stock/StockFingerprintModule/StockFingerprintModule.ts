@@ -6,6 +6,8 @@ const SOURCE_DIRECTORIES: string[] = [
   "../../packages/shared/utils/src",
   "src/stock",
   "src/showcase",
+  "src/videoTheme",
+  "themes",
   "scripts/stock",
   "scripts/yaml",
   "public/fonts",

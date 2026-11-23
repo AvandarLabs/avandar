@@ -1,7 +1,7 @@
 import { ramp } from "../../../motion";
 import { CleanupHeadings } from "./CleanupHeadings";
 import { CleanupRow } from "./CleanupRow";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./CellNormalization.schema";
 import type { ReactNode } from "react";
 /** Complete cleanup props. The shared renderer owns the loop envelope. */

@@ -2,7 +2,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { ChargeRulers } from "./ChargeRulers";
 import { ContextWindows } from "./ContextWindows";
 import { getComparisonFromInput } from "./getComparisonFromInput";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ChargeReferenceAlignment.schema";
 import type { ReactNode } from "react";
 /** Complete fictional source and reference comparison. */

@@ -1,5 +1,4 @@
 import { ramp } from "../../../motion";
-import { stockI18n } from "../../i18n/stockI18n/stockI18n";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { roleMessages } from "./ProseMeasurementLedger.controls";
 import type { getObservationSlotFromFrame } from "./getObservationSlotFromFrame";
@@ -32,7 +31,7 @@ export function ObservationFrame({
         <LabelSlots
           labels={[
             [
-              stockI18n._(roleMessages[scene.role]),
+              roleMessages[scene.role].message,
               scene.slotX + 12,
               scene.slotY + 20,
               244,

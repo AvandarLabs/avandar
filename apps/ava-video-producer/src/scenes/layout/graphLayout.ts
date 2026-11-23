@@ -1,4 +1,4 @@
-import { DUR, ramp } from "../../motion";
+import { DUR, EASE, mix, ramp } from "../../motion";
 import { assertFrame, assertUnit, type Point, type Rect } from "./geometry";
 import { fitTextLines } from "./textLayout";
 import type {
@@ -44,7 +44,9 @@ export function validateGraph(
 
 /** Normalized centers map inside a safe inset so edge nodes remain on canvas. */
 export function graphNodeRect(node: GraphNode, bounds: Rect): Rect {
-  const width = Math.min(280, bounds.width * 0.205);
+  const width = node.width
+    ? node.width * bounds.width
+    : Math.min(280, bounds.width * 0.205);
   const label = fitTextLines(
     [node.label],
     width - 40,
@@ -60,7 +62,10 @@ export function graphNodeRect(node: GraphNode, bounds: Rect): Rect {
     Math.ceil(
       40 +
         label.lines.length * label.fontSize * 1.22 +
-        (detail ? 10 + detail.lines.length * detail.fontSize * 1.22 : 0),
+        (detail ? 10 + detail.lines.length * detail.fontSize * 1.22 : 0) +
+        (node.items?.length
+          ? GRAPH_ITEM_GAP + node.items.length * GRAPH_ITEM_PITCH
+          : 0),
     ),
   );
   return {
@@ -94,6 +99,71 @@ export function edgeEndpoints(
     return { x: origin.x + x * t, y: origin.y + y * t };
   };
   return { start: intersect(from, a, dx, dy), end: intersect(to, b, -dx, -dy) };
+}
+
+/** Vertical space a node reserves per list item, in pixels. */
+export const GRAPH_ITEM_PITCH = 34;
+/** Space between a node's heading and its first list item, in pixels. */
+export const GRAPH_ITEM_GAP = 14;
+
+/**
+ * Connector endpoints for one of several parallel edges between the same
+ * two cards: `offset` from -1 to 1 shifts the edge sideways by up to half
+ * the shorter card, so the edges run side by side instead of overlapping.
+ */
+export function offsetEdgeEndpoints(
+  from: Rect,
+  to: Rect,
+  offset: number,
+): { start: Point; end: Point } {
+  const a = rectCenter(from);
+  const b = rectCenter(to);
+  const length = Math.hypot(b.x - a.x, b.y - a.y) || 1;
+  const reach = (offset * Math.min(from.height, to.height)) / 2;
+  // Perpendicular to the centre line, so the shift never changes its length.
+  const shiftX = (-(b.y - a.y) / length) * reach;
+  const shiftY = ((b.x - a.x) / length) * reach;
+  const shift = (rect: Rect) => ({
+    ...rect,
+    x: rect.x + shiftX,
+    y: rect.y + shiftY,
+  });
+  return edgeEndpoints(shift(from), shift(to));
+}
+
+/** A dot travelling an edge during its own window of frames. */
+export type GraphPacket = {
+  atFrame: number;
+  durationInFrames: number;
+  direction?: "forward" | "reverse";
+};
+
+/**
+ * Where each packet currently travelling an edge is, for example a request
+ * moving between two services. Packets outside their window are omitted.
+ */
+export function getPacketPositions(
+  frame: number,
+  packets: readonly GraphPacket[],
+  start: Point,
+  end: Point,
+): Point[] {
+  return packets
+    .filter(
+      (packet) =>
+        frame > packet.atFrame &&
+        frame < packet.atFrame + packet.durationInFrames,
+    )
+    .map((packet) => {
+      const travel = ramp(
+        frame,
+        packet.atFrame,
+        packet.durationInFrames,
+        EASE.inOut,
+      );
+      const along = packet.direction === "reverse" ? 1 - travel : travel;
+      return { x: mix(along, start.x, end.x), y: mix(along, start.y, end.y) };
+    });
 }
 
 /** A serpentine grid keeps a simple sequential process connected locally. */

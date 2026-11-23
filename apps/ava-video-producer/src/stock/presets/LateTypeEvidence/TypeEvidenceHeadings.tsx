@@ -1,4 +1,4 @@
-import { Text } from "../../graphics-common";
+import { Text } from "../../graphics-common/Text";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import type { Input } from "./LateTypeEvidence.schema";
 import type { ReactNode } from "react";

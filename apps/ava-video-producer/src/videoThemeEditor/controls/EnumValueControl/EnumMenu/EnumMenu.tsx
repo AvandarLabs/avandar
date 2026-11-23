@@ -1,0 +1,46 @@
+import { AtlasSelect } from "../../../../gallery/AtlasSelect/AtlasSelect";
+import css from "./EnumMenu.module.css";
+import type { OptionCopy } from "../../../tokenCopy/editorCopy";
+
+type EnumOption = OptionCopy & Readonly<{ option: string }>;
+
+type Props = Readonly<{
+  label: string;
+  value: string | undefined;
+  options: readonly EnumOption[];
+  hasIssue: boolean;
+  onChange: (option: string) => void;
+}>;
+
+/** An enum menu whose options show their explanations under their names. */
+export function EnumMenu({ label, value, options, hasIssue, onChange }: Props) {
+  const descriptions = new Map(
+    options.map((entry) => [entry.option, entry.description]),
+  );
+  return (
+    <AtlasSelect
+      aria-label={label}
+      error={hasIssue}
+      value={value ?? null}
+      placeholder="Not set"
+      data={options.map((entry) => ({
+        value: entry.option,
+        label: entry.label,
+      }))}
+      onChange={(selectedOption) => selectedOption && onChange(selectedOption)}
+      renderOption={({ option }) => {
+        const description = descriptions.get(option.value);
+        return (
+          <span className={css.enumMenuOption}>
+            <span>{option.label}</span>
+            {description ? (
+              <span className={css.enumMenuOptionDescription}>
+                {description}
+              </span>
+            ) : null}
+          </span>
+        );
+      }}
+    />
+  );
+}

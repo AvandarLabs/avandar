@@ -1,7 +1,7 @@
 import { DestinationTray } from "./DestinationTray";
 import { ReportHeader } from "./ReportHeader";
 import { ReportPage } from "./ReportPage";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ReportPageBind.schema";
 import type { ReactNode } from "react";
 /**

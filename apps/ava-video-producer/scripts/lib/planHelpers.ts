@@ -47,14 +47,67 @@ export async function publicAsset(
 export function assetReferences(plan: Storyboard): string[] {
   return [
     ...new Set([
-      ...plan.shots.flatMap((shot) =>
-        shot.scene === "media" ? [shot.props.src] : [],
-      ),
+      ...plan.shots.flatMap(_shotAssetReferences),
       ...plan.narration.flatMap((cue) => (cue.audio ? [cue.audio] : [])),
       ...(plan.narrationTrack ? [plan.narrationTrack.src] : []),
       ...plan.soundEffects.map((sound) => sound.src),
     ]),
   ];
+}
+
+/** Every public asset one shot's scene draws, such as stills and logos. */
+function _shotAssetReferences(shot: Storyboard["shots"][number]): string[] {
+  switch (shot.scene) {
+    case "media":
+      return [shot.props.src];
+    case "typography":
+      return shot.props.icon ? [shot.props.icon.src] : [];
+    case "brand-lockup":
+      return [shot.props.logo.src];
+    case "tilted-window":
+      return [
+        ...(shot.props.windows ?? []).map((window) => window.src),
+        ...(shot.props.pair ?? []).map((column) => column.window.src),
+        ...(shot.props.secondary ? [shot.props.secondary.src] : []),
+      ];
+    default:
+      return [];
+  }
+}
+
+/** Frames inside a shot where its scene's own exit or swap is mid-motion. */
+function _sceneBeatFrames(shot: Storyboard["shots"][number]): number[] {
+  const exitAt =
+    "exit" in shot.props && shot.props.exit && "atFrame" in shot.props.exit
+      ? shot.props.exit.atFrame
+      : undefined;
+  const swaps =
+    shot.scene === "tilted-window"
+      ? (shot.props.windows ?? []).flatMap((window) =>
+          window.atFrame === undefined ? [] : [window.atFrame + 2],
+        )
+      : [];
+  return [
+    ...(exitAt === undefined ? [] : [exitAt + 3]),
+    ...swaps,
+    ..._signatureBeatFrames(shot),
+  ];
+}
+
+/** Mid-motion frames of a scene's build, flight or window entrance. */
+function _signatureBeatFrames(shot: Storyboard["shots"][number]): number[] {
+  if (shot.scene === "brand-lockup") {
+    return [
+      ...(shot.props.build ? [(shot.props.build.atFrame ?? 5) + 6] : []),
+      ...(shot.props.exit ? [shot.props.exit.atFrame + 12] : []),
+    ];
+  }
+  if (shot.scene === "tilted-window" && shot.props.enter) {
+    const { enter } = shot.props;
+    const at = enter.atFrame ?? 1;
+    return enter.kind === "pull-back" ? [at + 9] : [at + 4];
+  }
+  return [];
 }
 
 /** Millisecond conversion uses rounded frame boundaries consistently for SRT and VTT. */
@@ -274,13 +327,13 @@ export async function fingerprintPlan(
   }
   for (const extra of [
     "remotion.config.ts",
-    "public/fonts/geist-latin.woff2",
+    "public/fonts/figtree-latin.woff2",
     "../../pnpm-lock.yaml",
     "package.json",
     "scripts/render.sh",
     "scripts/render-sequence.mjs",
     "scripts/check-frames.mjs",
-    "scripts/video.ts",
+    "scripts/lib/frameGate.mjs",
     "scripts/lib/plan.ts",
     "scripts/lib/media.ts",
     "scripts/yaml/compileYaml.cjs",
@@ -293,6 +346,16 @@ export async function fingerprintPlan(
       /* Optional in isolated tests. */
     }
   }
+  files.push(
+    ...(await _rendererFiles(root, "scripts/video").catch(
+      (error: NodeJS.ErrnoException) => {
+        if (error.code === "ENOENT") {
+          return [];
+        }
+        throw error;
+      },
+    )),
+  );
   const hash = createHash("sha256");
   for (const file of files.sort())
     hash.update(`${file}\0${await fileHash(path.join(root, file))}\n`);
@@ -398,6 +461,7 @@ export function previewFrames(plan: Storyboard): number[] {
         (shot.props.countAtFrame ?? 0) +
           (shot.props.countDurationInFrames ?? 36),
       );
+    _sceneBeatFrames(shot).forEach(local);
     if (shot.scene === "media")
       for (const item of shot.props.callouts ?? []) {
         local(item.startFrame + 1);

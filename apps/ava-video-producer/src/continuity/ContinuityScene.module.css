@@ -1,7 +1,7 @@
 .continuityStage {
-  background: var(--continuity-ground, #0b1219);
-  color: var(--continuity-ink, #edf7f4);
-  font-family: var(--font-sans, Arial, sans-serif);
+  background: var(--video-color-ground-fill);
+  color: var(--video-color-text);
+  font-family: var(--video-text-stage-heading-font-family);
   height: 840px;
   left: 0;
   overflow: hidden;
@@ -11,67 +11,80 @@
 }
 
 .continuityBeat {
-  background: var(--continuity-ground, #0b1219);
+  background: var(--video-color-ground-fill);
   inset: 0;
   position: absolute;
 }
 
 .continuityHeading {
-  left: 96px;
+  left: var(--video-layout-stage-heading-inset-x);
   position: absolute;
-  right: 96px;
-  top: 64px;
+  right: var(--video-layout-stage-heading-inset-x);
+  top: var(--video-layout-stage-heading-inset-top);
 }
 
 .continuityHeading h1 {
-  font-size: 48px;
-  font-weight: 600;
-  letter-spacing: -0.025em;
-  line-height: 1.12;
+  color: var(--video-text-stage-heading-color);
+  font-family: var(--video-text-stage-heading-font-family);
+  font-size: var(--video-text-stage-heading-font-size);
+  font-weight: var(--video-text-stage-heading-font-weight);
+  letter-spacing: var(--video-text-stage-heading-letter-spacing);
+  line-height: var(--video-text-stage-heading-line-height);
   margin: 0;
+  text-shadow: var(--video-text-stage-heading-text-shadow, none);
 }
 
 .continuityHeading p {
-  color: var(--continuity-ink, #b3c5cf);
-  font-size: 25px;
-  line-height: 1.35;
-  margin: 18px 0 0;
+  color: var(--video-text-stage-subtitle-color);
+  font-family: var(--video-text-stage-subtitle-font-family);
+  font-size: var(--video-text-stage-subtitle-font-size);
+  font-weight: var(--video-text-stage-subtitle-font-weight);
+  line-height: var(--video-text-stage-subtitle-line-height);
+  margin: var(--video-component-subtitle-gap) 0 0;
+  text-shadow: var(--video-text-stage-subtitle-text-shadow, none);
 }
 
 .continuityGraphic {
-  inset: 192px 60px 70px;
+  inset: var(--video-layout-stage-graphic-inset-top)
+    var(--video-layout-stage-graphic-inset-x)
+    var(--video-layout-stage-graphic-inset-bottom);
   position: absolute;
 }
 
 .continuityEvidence {
-  bottom: 16px;
-  color: var(--continuity-ink, #b3c5cf);
+  bottom: var(--video-layout-stage-evidence-row-bottom);
+  color: var(--video-text-stage-evidence-color);
   display: flex;
-  font-size: 17px;
-  gap: 20px;
+  font-family: var(--video-text-stage-evidence-font-family);
+  font-size: var(--video-text-stage-evidence-font-size);
+  font-weight: var(--video-text-stage-evidence-font-weight);
+  gap: var(--video-layout-stage-evidence-row-gap);
   justify-content: space-between;
-  left: 32px;
+  left: var(--video-layout-stage-evidence-row-x);
   pointer-events: none;
   position: absolute;
-  right: 32px;
+  right: var(--video-layout-stage-evidence-row-x);
   z-index: 30;
 }
 
 .continuityEvidence span {
-  background: var(--continuity-ground, #0b1219);
-  border-radius: 4px;
-  padding: 7px 12px;
+  background: var(--video-color-ground);
+  border-radius: var(--video-corner-chip);
+  padding: var(--video-component-evidence-chip-padding-y)
+    var(--video-component-evidence-chip-padding-x);
 }
 
 .continuityToken {
   align-items: center;
-  background: #101e28;
-  border: 2px solid currentcolor;
-  border-radius: 8px;
+  background: var(--video-component-shared-object-fill);
+  border: var(--video-component-shared-object-border-width) solid currentcolor;
+  border-radius: var(--video-corner-shared-object);
   box-sizing: border-box;
+  color: var(--video-text-stage-shared-object-color);
   display: flex;
-  font-size: 25px;
-  font-weight: 600;
+  font-family: var(--video-text-stage-shared-object-font-family);
+  font-size: var(--video-text-stage-shared-object-font-size);
+  font-weight: var(--video-text-stage-shared-object-font-weight);
   justify-content: center;
   position: absolute;
   z-index: 22;
@@ -80,27 +93,33 @@
 .continuityThesis {
   display: flex;
   flex-direction: column;
-  gap: 26px;
-  inset: 235px 110px 80px;
+  gap: var(--video-component-thesis-gap);
+  inset: var(--video-component-thesis-inset-top)
+    var(--video-component-thesis-inset-x)
+    var(--video-component-thesis-inset-bottom);
   justify-content: center;
   position: absolute;
 }
 
 .continuityThesisLine {
-  font-size: 63px;
-  font-weight: 500;
-  letter-spacing: -0.025em;
-  line-height: 1.12;
+  color: var(--video-text-stage-thesis-color);
+  font-family: var(--video-text-stage-thesis-font-family);
+  font-size: var(--video-text-stage-thesis-font-size);
+  font-weight: var(--video-text-stage-thesis-font-weight);
+  letter-spacing: var(--video-text-stage-thesis-letter-spacing);
+  line-height: var(--video-text-stage-thesis-line-height);
 }
 
 .continuityEmphasis {
-  color: var(--continuity-ink, #b3c5cf);
-  font-size: 30px;
-  margin-top: 20px;
+  color: var(--video-text-stage-thesis-emphasis-color);
+  font-family: var(--video-text-stage-thesis-emphasis-font-family);
+  font-size: var(--video-text-stage-thesis-emphasis-font-size);
+  font-weight: var(--video-text-stage-thesis-emphasis-font-weight);
+  margin-top: var(--video-component-thesis-emphasis-gap);
 }
 
 .continuityProduct {
-  background: #eaeef2;
+  background: var(--video-component-product-frame-backdrop);
   inset: 0;
   isolation: isolate;
   overflow: hidden;
@@ -110,7 +129,6 @@
 
 .continuityProgress {
   bottom: 0;
-  height: 3px;
   left: 0;
   position: absolute;
   z-index: 40;

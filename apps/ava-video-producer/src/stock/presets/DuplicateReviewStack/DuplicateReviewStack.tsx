@@ -1,7 +1,7 @@
 import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { DuplicateGroup } from "./DuplicateGroup";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./DuplicateReviewStack.schema";
 import type { ReactNode } from "react";
 /** Frame, theme and complete validated authored input. */

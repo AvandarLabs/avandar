@@ -80,7 +80,7 @@ test("both proposal halves write beneath one moving latch before one atomic stam
   );
 });
 
-import { registerStockLocalizationAssertions } from "../../../../tests/helpers/registerStockLocalizationAssertions";
+import { registerStockDefaultTextAssertions } from "../../../../tests/helpers/registerStockDefaultTextAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { getConservativeWidthFromText } from "../../text/getConservativeWidthFromText";
 import { atomicOutboxCommitContract } from "./AtomicOutboxCommit.contract";
@@ -117,7 +117,7 @@ const options = {
 } satisfies PresetAssertions<Input>;
 registerStockPresetAssertions(options);
 registerStockTextLayoutAssertions(options);
-registerStockLocalizationAssertions({
+registerStockDefaultTextAssertions({
   contract: atomicOutboxCommitContract,
   expectedTextPaths: [
     ["change", "recordLabel"],

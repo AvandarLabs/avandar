@@ -1,5 +1,5 @@
 import { propEq } from "@avandar/utils";
-import { Text } from "../../graphics-common";
+import { Text } from "../../graphics-common/Text";
 import { STOCK } from "../../stockPalette";
 import type { Input } from "./ClassroomDayPresence.schema";
 import type { ReactNode } from "react";

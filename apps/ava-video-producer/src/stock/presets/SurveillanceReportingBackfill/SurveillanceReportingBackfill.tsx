@@ -2,7 +2,7 @@ import { propEq } from "@avandar/utils";
 import { ramp, mix } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { BackfillChart } from "./BackfillChart";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./SurveillanceReportingBackfill.schema";
 import type { ReactNode } from "react";
 /** Explicit authored scene props. */

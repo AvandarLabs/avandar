@@ -3,7 +3,7 @@ import { GridEvidence } from "./GridEvidence";
 import { GridSceneHeadings } from "./GridSceneHeadings";
 import { GridSourceLinks } from "./GridSourceLinks";
 import { ReconstructionGrid } from "./ReconstructionGrid";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./PdfGridReconstruction.schema";
 import type { ReactNode } from "react";
 /** Frame-driven authored study props. */

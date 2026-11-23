@@ -1,0 +1,142 @@
+{
+  "version": 1,
+  "id": "stepped-column-wipe",
+  "title": "Stepped column wipe",
+  "description": "Three shots handed over by stepped column wipes: rising columns over a frozen frame, falling columns in reverse order, and a slow wipe over a shot that keeps playing while it drifts and blurs away.",
+  "sourceNotes": [
+    "Scene study extracted from the shot vocabulary film; an editorial example, not a claim about Avandar features.",
+    "Window contents are curated fictional Avandar screenshots from public/avandar/screens."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1920,
+  "height": 1080,
+  "delivery": {
+    "width": 1920,
+    "height": 1080
+  },
+  "captions": false,
+  "shots": [
+    {
+      "id": "sources",
+      "scene": "typography",
+      "durationInFrames": 70,
+      "transitionInFrames": 0,
+      "props": {
+        "lines": ["Bring every source", "into one workspace"],
+        "fontSize": 84,
+        "revealAtFrame": 4
+      }
+    },
+    {
+      "id": "model",
+      "scene": "typography",
+      "durationInFrames": 80,
+      "transitionInFrames": 10,
+      "theme": {
+        "ground": "#f8fafc",
+        "foreground": "#0f172a",
+        "muted-foreground": "#64748b",
+        "muted": "#cbd5e1",
+        "border": "#94a3b8",
+        "brand-strong": "var(--brand)"
+      },
+      "transition": {
+        "kind": "stepped-column-wipe",
+        "columns": 8,
+        "staggerFrames": 0.5,
+        "from": "bottom",
+        "order": "left-to-right",
+        "outgoing": "frozen"
+      },
+      "props": {
+        "lines": ["Model cases, visits", "and facilities once"],
+        "emphasis": ["once"],
+        "fontSize": 84,
+        "revealAtFrame": 10
+      }
+    },
+    {
+      "id": "explore",
+      "scene": "tilted-window",
+      "durationInFrames": 120,
+      "transitionInFrames": 14,
+      "transition": {
+        "kind": "stepped-column-wipe",
+        "columns": 6,
+        "staggerFrames": 1,
+        "from": "top",
+        "order": "right-to-left"
+      },
+      "props": {
+        "headlines": [
+          {
+            "atFrame": 14,
+            "lines": ["Explore it", "anywhere"],
+            "subtitle": "Explorer"
+          }
+        ],
+        "windows": [
+          {
+            "kind": "image",
+            "src": "avandar/screens/explorer-explorer-chart.png"
+          }
+        ],
+        "enter": {
+          "kind": "none"
+        },
+        "camera": [
+          {
+            "at": 0,
+            "x": 0.85,
+            "y": 0.5,
+            "zoom": 1
+          },
+          {
+            "at": 90,
+            "x": 0.85,
+            "y": 0.5,
+            "zoom": 1
+          },
+          {
+            "at": 140,
+            "x": 0.85,
+            "y": 0.5,
+            "zoom": 1.25,
+            "ease": "glide"
+          }
+        ],
+        "footnote": "Fictional demonstration data"
+      }
+    },
+    {
+      "id": "share",
+      "scene": "typography",
+      "durationInFrames": 90,
+      "transitionInFrames": 24,
+      "transition": {
+        "kind": "stepped-column-wipe",
+        "columns": 12,
+        "staggerFrames": 1.5,
+        "outgoing": "playing",
+        "outgoingDrift": {
+          "x": -0.2,
+          "blur": 24
+        }
+      },
+      "props": {
+        "lines": ["Share what you find"],
+        "fontSize": 84,
+        "revealAtFrame": 22
+      },
+      "theme": {
+        "ground": "#f8fafc",
+        "foreground": "#0f172a",
+        "muted-foreground": "#64748b",
+        "muted": "#cbd5e1",
+        "border": "#94a3b8",
+        "brand-strong": "var(--brand)"
+      }
+    }
+  ]
+}

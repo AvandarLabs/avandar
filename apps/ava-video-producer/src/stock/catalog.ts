@@ -1,6 +1,5 @@
 import { propEq, prop } from "@avandar/utils";
-import { makeLocalizedStockDataFromContract } from "./i18n/makeLocalizedStockDataFromContract";
-import { stockI18n } from "./i18n/stockI18n/stockI18n";
+import { makeStockDataFromContract } from "./copy/makeStockDataFromContract/makeStockDataFromContract";
 import { stockContracts } from "./registry/stockContracts";
 import type { StockPresetId } from "./contracts/StockContract.types";
 
@@ -29,10 +28,7 @@ export const STOCK_IDS = Object.keys(stockContracts) as StockPresetId[];
 /** Display catalog shares the same definitions as content validation. */
 export const STOCK_CATALOG: readonly StockEntry[] = STOCK_IDS.map((id) => {
   const contract = stockContracts[id];
-  const { metadata } = makeLocalizedStockDataFromContract({
-    contract,
-    i18n: stockI18n,
-  });
+  const { metadata } = makeStockDataFromContract({ contract });
   return {
     id,
     collection: contract.collection,

@@ -2,7 +2,7 @@ import { ShadeHeader } from "./ShadeHeader";
 import { ShadeLegend } from "./ShadeLegend";
 import { ShadeSummary } from "./ShadeSummary";
 import { ShadeZone } from "./ShadeZone";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./StreetShadeInstallation.schema";
 import type { ReactNode } from "react";
 /** Explicit content joins the shared stock frame contract. */

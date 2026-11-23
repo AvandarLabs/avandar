@@ -12,7 +12,8 @@
       "The service-backed CaseTypeActions group is excluded. No record navigation, synchronization, deletion or persistence is demonstrated.",
       "The actual ConceptNavbar is mounted. Its active status, active class and Mantine data-active attribute are driven by the frame because the existing fixture router does not distinguish concept route params.",
       "Concept metadata uses source-typed Pick projections for the exact fields consumed by these presentation leaves. Fixed IDs are validated by the product UUID helper. One documented assertion at the unchanged ConceptNavbar/ConceptMetaView prop seam accounts for absent ownership, timestamps, allowManualCreation and model branding. Fixture hydration remains explicitly projection-typed.",
-      "Response-case inspection occupies frames 0-337. Facility inspection occupies frames 338-599. No case record detail is reused."
+      "Response-case inspection occupies frames 0-337. Facility inspection occupies frames 338-599. No case record detail is reused.",
+      "ConceptMetaView's record count, rail and Statuses section are mounted unchanged with film-only data and permission shims (shims/ontology/): IndividualClient.useGetCount reads as not loaded so the header omits the count, WorkspaceClient lists no members so the rail omits the owner, ConceptStatusClient lists no statuses, and useHasPermission is false so Edit statuses and its modal never mount (the modal is aliased to a shim that throws). The fixtures carry none of these values, so none are invented."
     ]
   },
   "attribute-mapping": {

@@ -4,7 +4,7 @@ import test from "node:test";
 import { prop } from "@avandar/utils";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { registerStockLocalizationAssertions } from "../../../../tests/helpers/registerStockLocalizationAssertions";
+import { registerStockDefaultTextAssertions } from "../../../../tests/helpers/registerStockDefaultTextAssertions";
 import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { PredicatePushdownBoundary } from "./PredicatePushdownBoundary";
@@ -148,7 +148,7 @@ registerStockTextLayoutAssertions({
   excludedTextFields: ["id", "operator"],
   getVisibleTexts,
 });
-registerStockLocalizationAssertions({
+registerStockDefaultTextAssertions({
   contract,
   expectedTextPaths: [
     ["metric", "label"],

@@ -1,0 +1,15 @@
+/*
+ * The theme's own actions stay together, and Copy JSON sits at the end
+ * of the row. When the row is too narrow it drops to a row of its own at the
+ * end, instead of splitting the actions.
+ */
+.themeActions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.themeActionsCopyJson {
+  margin-inline-start: auto;
+}

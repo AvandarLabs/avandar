@@ -1,9 +1,9 @@
 import { EASE, mix, ramp } from "../../../motion";
-import { type GraphicProps } from "../../graphics-common";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { ReconnectCase } from "./ReconnectCase";
 import { ReconnectLedger } from "./ReconnectLedger";
 import { ReconnectSetting } from "./ReconnectSetting";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./MissedVisitReconnect.schema";
 import type { ReactNode } from "react";
 

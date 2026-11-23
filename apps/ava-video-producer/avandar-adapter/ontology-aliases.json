@@ -1,4 +1,9 @@
 {
   "@/views/OntologyDesignerApp/ConceptMetaView/useHydratedConcept": "avandar-adapter/OntologyScreen/useHydratedConcept.tsx",
-  "@/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions": "avandar-adapter/OntologyScreen/CaseTypeActions.tsx"
+  "@/views/OntologyDesignerApp/ConceptMetaView/CaseTypeActions": "avandar-adapter/OntologyScreen/CaseTypeActions.tsx",
+  "@/clients/ontology/IndividualClient": "avandar-adapter/shims/ontology/IndividualClient.ts",
+  "@/clients/WorkspaceClient": "avandar-adapter/shims/ontology/WorkspaceClient.ts",
+  "@/clients/ontology/ConceptStatusClient": "avandar-adapter/shims/ontology/ConceptStatusClient.ts",
+  "@/hooks/permissions/useHasPermission/useHasPermission": "avandar-adapter/shims/ontology/useHasPermission.ts",
+  "@/views/OntologyDesignerApp/ConceptMetaView/EditStatusesModal/EditStatusesModal": "avandar-adapter/shims/ontology/EditStatusesModal.tsx"
 }

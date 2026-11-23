@@ -6,16 +6,18 @@
   margin-top: 20px;
 }
 
-.compositionActionsDownload {
-  background: var(--ava-primary-7);
+/* The caption download posts the export's theme, so it is a button styled as its sibling links. */
+.compositionActionsLink {
+  background: none;
   border: 0;
-  border-radius: 5px;
-  color: #fff;
+  color: inherit;
   cursor: pointer;
-  padding: 12px 18px;
+  font: inherit;
+  padding: 0;
+  text-decoration: underline;
 }
 
-.compositionActionsDownload:disabled {
+.compositionActionsLink:disabled {
   cursor: wait;
   opacity: 0.55;
 }

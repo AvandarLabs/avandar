@@ -3,7 +3,7 @@ import { BasinWater } from "./BasinWater";
 import { OutletOperator } from "./OutletOperator";
 import { SceneLabel } from "./SceneLabel";
 import { WaterDestinations } from "./WaterDestinations";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./StormwaterStorageSpill.schema";
 import type { ReactNode } from "react";
 /** Explicit content joins the shared stock frame contract. */

@@ -2,7 +2,7 @@ import { PlanarPolygon } from "../../geography/PlanarPolygon/PlanarPolygon";
 import { GisLabels } from "./GisLabels";
 import { HouseholdMarker } from "./HouseholdMarker";
 import { LayerGeometry } from "./LayerGeometry";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./GisLayerIntersectionTally.schema";
 import type { ReactNode } from "react";
 

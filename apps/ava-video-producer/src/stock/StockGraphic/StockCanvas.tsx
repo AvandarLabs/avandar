@@ -1,0 +1,75 @@
+import { loopEnvelope } from "../../motion";
+import { fillToCss } from "../../videoTheme/cssValueHelpers/cssValueHelpers";
+import { VideoEffectDefs } from "../../videoTheme/VideoEffectDefs/VideoEffectDefs";
+import { listVideoEffectFilters } from "../../videoTheme/videoEffectFilterHelpers/videoEffectFilterHelpers";
+import { getStockDisplayCopyFromDescriptor } from "../copy/getStockDisplayCopyFromDescriptor/getStockDisplayCopyFromDescriptor";
+import { STOCK_GRAPHIC_COPY } from "../copy/stockGraphicCopy";
+import { stockRenderers } from "../registry/stockRenderers/stockRenderers";
+import {
+  GraphicIdContext,
+  useGraphicTheme,
+  useGraphicTokens,
+} from "../theme/useGraphicTheme/useGraphicTheme";
+import { GroundFill } from "./GroundFill";
+import type { Props as StockGraphicProps } from "./StockGraphic";
+
+type Props = Omit<
+  StockGraphicProps,
+  "accent" | "background" | "schemaVersion"
+> & {
+  id: string;
+};
+
+/** The stock graphic's svg: its ground, effect definitions, and the preset renderer at the clamped frame. */
+export function StockCanvas({
+  preset,
+  frame,
+  width = 960,
+  height = 600,
+  input,
+  transparent = false,
+  id,
+}: Props) {
+  const tokens = useGraphicTokens();
+  const theme = useGraphicTheme();
+  const localFrame = Math.max(
+    0,
+    Math.min(179, Number.isFinite(frame) ? frame : 0),
+  );
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={width}
+      height={height}
+      viewBox="0 0 960 600"
+      role="img"
+      aria-label={getStockDisplayCopyFromDescriptor({
+        descriptor: STOCK_GRAPHIC_COPY,
+        values: { preset: preset.replaceAll("-", " ") },
+      })}
+      style={{
+        display: "block",
+        background: transparent
+          ? "transparent"
+          : fillToCss(tokens.color.groundFill),
+        fontFamily: tokens.text.graphic.body.fontFamily,
+      }}
+    >
+      <VideoEffectDefs graphicId={id} filters={listVideoEffectFilters(theme)} />
+      {transparent ? null : <GroundFill id={id} />}
+      <GraphicIdContext.Provider value={id}>
+        <g opacity={loopEnvelope(localFrame, 180)}>
+          {stockRenderers[preset](
+            {
+              frame: localFrame,
+              accent: tokens.color.accent,
+              background: tokens.color.ground,
+              id,
+            },
+            input,
+          )}
+        </g>
+      </GraphicIdContext.Provider>
+    </svg>
+  );
+}

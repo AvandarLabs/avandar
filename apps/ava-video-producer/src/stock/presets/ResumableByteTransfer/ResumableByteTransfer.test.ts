@@ -90,7 +90,7 @@ test("still pending adds one resumed chunk and keeps a positive remainder with o
   assert.doesNotMatch(hold, /data-offset-label=/);
 });
 
-import { registerStockLocalizationAssertions } from "../../../../tests/helpers/registerStockLocalizationAssertions";
+import { registerStockDefaultTextAssertions } from "../../../../tests/helpers/registerStockDefaultTextAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { getConservativeWidthFromText } from "../../text/getConservativeWidthFromText";
 import { resumableByteTransferContract } from "./ResumableByteTransfer.contract";
@@ -112,7 +112,7 @@ const options = {
 } satisfies PresetAssertions<Input>;
 registerStockPresetAssertions(options);
 registerStockTextLayoutAssertions(options);
-registerStockLocalizationAssertions({
+registerStockDefaultTextAssertions({
   contract: resumableByteTransferContract,
   expectedTextPaths: [
     ["file", "label"],

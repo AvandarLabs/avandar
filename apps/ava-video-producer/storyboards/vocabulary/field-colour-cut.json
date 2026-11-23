@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "id": "field-colour-cut",
+  "title": "Field-colour cut",
+  "description": "Hard cuts that change the whole field colour, from a dark field to the accent and then to a light field, using a per-shot theme instead of a transition.",
+  "sourceNotes": [
+    "Scene study extracted from the shot vocabulary film; an editorial example, not a claim about Avandar features.",
+    "The count is fictional demonstration data."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1920,
+  "height": 1080,
+  "delivery": {
+    "width": 1920,
+    "height": 1080
+  },
+  "captions": false,
+  "shots": [
+    {
+      "id": "dark-field",
+      "scene": "typography",
+      "durationInFrames": 60,
+      "transitionInFrames": 0,
+      "props": {
+        "lines": ["Cases, visits, facilities"],
+        "fontSize": 84,
+        "revealAtFrame": 4
+      }
+    },
+    {
+      "id": "accent-field",
+      "scene": "typography",
+      "durationInFrames": 60,
+      "transitionInFrames": 0,
+      "transition": {
+        "kind": "cut"
+      },
+      "theme": {
+        "ground": "var(--brand)",
+        "foreground": "#0b0f17",
+        "brand-strong": "#ffffff",
+        "muted-foreground": "#1e293b",
+        "background": "#0b0f17",
+        "card": "#1e293b",
+        "border": "#334155"
+      },
+      "props": {
+        "lines": ["One model"],
+        "emphasis": ["model"],
+        "fontSize": 120,
+        "revealAtFrame": 2
+      }
+    },
+    {
+      "id": "light-field",
+      "scene": "metric",
+      "durationInFrames": 90,
+      "transitionInFrames": 0,
+      "transition": {
+        "kind": "cut"
+      },
+      "theme": {
+        "ground": "#f8fafc",
+        "foreground": "#0f172a",
+        "muted-foreground": "#64748b",
+        "muted": "#cbd5e1",
+        "border": "#cbd5e1",
+        "card": "#ffffff",
+        "brand-strong": "var(--brand)"
+      },
+      "props": {
+        "label": "Districts reporting this week",
+        "value": 42,
+        "countAtFrame": 4,
+        "countDurationInFrames": 30,
+        "detail": "Fictional demonstration data"
+      }
+    }
+  ]
+}

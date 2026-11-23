@@ -32,7 +32,7 @@ import { generalStockRenderers } from "./generalStockRenderers";
 import { makeStockRendererFromComponent } from "./makeStockRendererFromComponent";
 import { socialSectorStockRenderers } from "./socialSectorStockRenderers";
 import type { StockPresetId } from "../../contracts/StockContract.types";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 
 /**
  * Each closure validates its own content before invoking its typed renderer.

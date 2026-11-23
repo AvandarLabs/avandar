@@ -1,4 +1,4 @@
-import { Text } from "../../graphics-common";
+import { Text } from "../../graphics-common/Text";
 import type { ReactNode } from "react";
 
 type Props = { x: number; index: number };

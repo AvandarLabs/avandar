@@ -2,7 +2,7 @@ import { CapabilityFocus } from "./CapabilityFocus";
 import { CapabilityGrid } from "./CapabilityGrid";
 import { CapabilityLegend } from "./CapabilityLegend";
 import { CapabilityRow } from "./CapabilityRow";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./CapabilityMatrix.schema";
 import type { ReactNode } from "react";
 /** Frame-controlled categorical matrix with complete authored content. */

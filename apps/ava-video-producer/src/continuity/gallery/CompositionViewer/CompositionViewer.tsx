@@ -1,7 +1,9 @@
+import clsx from "clsx";
 import { useRef } from "react";
-import { useContinuityCopy } from "../../useContinuityCopy";
-import { CompositionActions } from "./CompositionActions/CompositionActions";
-import { CompositionControls } from "./CompositionControls";
+import { useRememberedPanelTab } from "../../../gallery/AtlasLayout/AtlasPanelTabs/useRememberedPanelTab";
+import { isSceneEntry } from "../../continuityCatalog";
+import { CompositionSettings } from "./CompositionSettings/CompositionSettings";
+import { CompositionStage } from "./CompositionStage/CompositionStage";
 import { CompositionSummary } from "./CompositionSummary";
 import css from "./CompositionViewer.module.css";
 import { useCompositionAppearance } from "./useCompositionAppearance";
@@ -15,56 +17,54 @@ type Props = {
   onOptions: (options: { id: string; captions: boolean }) => void;
 };
 
-/** One live composition with matching exports and reusable study guidance. */
+/** One live composition with matching exports, its design tokens, and reusable study guidance. */
 export function CompositionViewer({ selected, captions, onOptions }: Props) {
-  const translate = useContinuityCopy();
   const player = useRef<HTMLIFrameElement>(null);
-  const appearance = useCompositionAppearance(selected.id, player);
+  const isScene = isSceneEntry(selected);
+  const appearance = useCompositionAppearance(selected.id, player, isScene);
+  const [tab, setTab] = useRememberedPanelTab(selected.id);
   useCompositionPlayer({ id: selected.id, player, onOptions });
+  const isTokenPanel = tab === "tokens" && !isScene;
   return (
     <section
-      className={css.compositionViewer}
-      aria-label={translate("Composition screening")}
+      className={clsx(css.compositionViewer, isTokenPanel && css.isTokenPanel)}
+      aria-label="Composition screening"
     >
-      <div className={css.stage}>
-        <iframe
-          key={selected.id}
-          className={css.compositionViewerPlayer}
-          ref={player}
-          src={`/live.html?id=${encodeURIComponent(selected.id)}`}
-          title={translate(selected.title)}
-          onLoad={appearance.loaded}
-          allowFullScreen
-        />
-      </div>
+      <CompositionStage
+        selected={selected}
+        player={player}
+        isTokenPanel={isTokenPanel}
+        onLoad={appearance.loaded}
+      />
       <div className={css.details}>
         <CompositionSummary selected={selected} />
       </div>
       <div className={css.settings}>
-        <CompositionControls appearance={appearance} />
-        <CompositionActions
-          id={selected.id}
+        <CompositionSettings
+          selected={selected}
           captions={captions}
-          options={appearance.options}
+          player={player}
+          appearance={appearance}
+          tab={tab}
+          onTabChange={setTab}
         />
       </div>
       <div className={css.guidance}>
         {selected.family === "vocabulary" && (
           <VocabularyGuide entry={selected} />
         )}
-        <CompositionNotice />
+        <CompositionNotice isScene={isScene} />
       </div>
     </section>
   );
 }
 
-function CompositionNotice() {
-  const translate = useContinuityCopy();
+function CompositionNotice({ isScene }: { isScene: boolean }) {
   return (
     <p className={css.compositionViewerNotice}>
-      {translate(
-        "Live React compositions. Fictional demonstration data. Product states are scripted; architecture diagrams are illustrations. Plugin capabilities are future vision. Downloads render the current composition and caption selection.",
-      )}
+      {isScene
+        ? "Live React storyboard scenes. Fictional demonstration data. Window contents are curated fictional screenshots; figures, timings and diagrams are illustrations. Downloads render the current composition as authored."
+        : "Live React compositions. Fictional demonstration data. Product states are scripted; architecture diagrams are illustrations. Plugin capabilities are future vision. Downloads render the current composition and caption selection."}
     </p>
   );
 }

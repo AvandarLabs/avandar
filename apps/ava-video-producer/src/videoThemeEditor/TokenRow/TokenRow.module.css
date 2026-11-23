@@ -1,0 +1,33 @@
+.tokenRow {
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  gap: 8px;
+  padding-block: 12px;
+}
+
+/* Only non-text parts dim when inherited: chips, swatches, specimens, and previews. */
+.tokenRowInherited [data-inherit-dim] {
+  opacity: 0.6;
+}
+
+.tokenRowMeta {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.tokenRowPath {
+  font: 10px var(--mono);
+}
+
+/* On a phone, descriptions are 12px and token paths 11px. */
+@media (width <= 760px) {
+  .tokenRowMeta {
+    font-size: 12px;
+  }
+
+  .tokenRowPath {
+    font-size: 11px;
+  }
+}

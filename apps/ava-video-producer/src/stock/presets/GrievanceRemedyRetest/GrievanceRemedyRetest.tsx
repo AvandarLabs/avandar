@@ -1,9 +1,10 @@
-import { STOCK, type GraphicProps } from "../../graphics-common";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
+import { STOCK } from "../../stockPalette";
 import { RemedyActions } from "./RemedyActions";
 import { RemedyObject } from "./RemedyObject";
 import { RemedyResponse } from "./RemedyResponse";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./GrievanceRemedyRetest.schema";
 import type { ReactNode } from "react";
 

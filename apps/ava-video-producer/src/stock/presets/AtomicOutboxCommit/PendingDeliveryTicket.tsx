@@ -1,4 +1,3 @@
-import { stockI18n } from "../../i18n/stockI18n/stockI18n";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import { STOCK } from "../../stockPalette";
@@ -24,7 +23,7 @@ export function PendingDeliveryTicket({
         stroke={accent}
       />
       <LabelSlots
-        labels={[[stockI18n._(PENDING_DELIVERY_MESSAGE), 552, 230, 296, 14, 2]]}
+        labels={[[PENDING_DELIVERY_MESSAGE.message, 552, 230, 296, 14, 2]]}
       />
       <LiteralDataText x={552} y={315} value={input.change.after} />
       {input.showIdentifier ? (

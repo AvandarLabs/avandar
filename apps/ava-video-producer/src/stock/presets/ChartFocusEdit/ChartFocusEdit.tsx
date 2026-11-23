@@ -4,7 +4,7 @@ import { STOCK } from "../../stockPalette";
 import { ChartCategory } from "./ChartCategory";
 import { ChartHeadings } from "./ChartHeadings";
 import { ChartScale } from "./ChartScale";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ChartFocusEdit.schema";
 import type { ReactNode } from "react";
 /** Complete chart props. The shared renderer owns the loop envelope. */

@@ -7,7 +7,7 @@ import {
 import { GrantCandidate } from "./GrantCandidate";
 import { PermissionLadder } from "./PermissionLadder";
 import { PermissionSceneHeadings } from "./PermissionSceneHeadings";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./EffectivePermissionGrants.schema";
 import type { ReactNode } from "react";
 /** Frame-driven authored study props. */

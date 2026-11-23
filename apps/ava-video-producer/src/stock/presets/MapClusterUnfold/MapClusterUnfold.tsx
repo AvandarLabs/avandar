@@ -3,7 +3,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { STOCK } from "../../stockPalette";
 import { ClusterLedger } from "./ClusterLedger";
 import { ClusterPoints } from "./ClusterPoints";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./MapClusterUnfold.schema";
 import type { ReactNode } from "react";
 

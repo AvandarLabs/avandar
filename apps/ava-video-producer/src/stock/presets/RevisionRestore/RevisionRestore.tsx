@@ -3,7 +3,7 @@ import { RestoreImpression } from "./RestoreImpression";
 import { RevisionDocument } from "./RevisionDocument";
 import { RevisionHeadings } from "./RevisionHeadings";
 import { RevisionHistory } from "./RevisionHistory";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./RevisionRestore.schema";
 import type { ReactNode } from "react";
 

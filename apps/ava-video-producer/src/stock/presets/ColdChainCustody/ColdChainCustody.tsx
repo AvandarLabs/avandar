@@ -1,9 +1,10 @@
 import { GlobeProjection } from "../../geography/GlobeProjection/GlobeProjection";
-import { STOCK, type GraphicProps } from "../../graphics-common";
+import { STOCK } from "../../stockPalette";
 import { CustodyLane } from "./CustodyLane";
 import { CustodyLegend } from "./CustodyLegend";
 import { CustodyStops } from "./CustodyStops";
 import { SceneLabel } from "./SceneLabel";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ColdChainCustody.schema";
 import type { ReactNode } from "react";
 

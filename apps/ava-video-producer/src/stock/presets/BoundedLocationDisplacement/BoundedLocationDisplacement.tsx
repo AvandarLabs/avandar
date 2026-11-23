@@ -1,7 +1,7 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { LocalDisplacementMap } from "./LocalDisplacementMap";
 import { PublicDisplacementMap } from "./PublicDisplacementMap";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./BoundedLocationDisplacement.schema";
 import type { ReactNode } from "react";
 

@@ -1,7 +1,5 @@
 import { propEq } from "@avandar/utils";
-import { useLingui } from "@lingui/react";
-import { useLingui as useLinguiMacro } from "@lingui/react/macro";
-import { StockCopyMessages } from "../../../stock/i18n/StockCopyMessages";
+import { getStockValueFromPath } from "../../../stock/copy/getStockValueFromPath";
 import { ContentFields } from "./ContentFields/ContentFields";
 import type { StockControl } from "../../../stock/contracts/StockContract.types";
 import type { Props as ContentFieldProps } from "./ContentField/ContentField";
@@ -26,12 +24,10 @@ export function SelectField({
   state,
   itemPath,
 }: Props): ReactNode {
-  const { i18n } = useLingui();
-  const { t } = useLinguiMacro();
   const options = ContentFields.getOptionsFromControl({
     control,
     root: state.draft,
-    item: StockCopyMessages.getValueFromPath({
+    item: getStockValueFromPath({
       value: state.draft,
       path: itemPath,
     }),
@@ -51,12 +47,14 @@ export function SelectField({
       value={selectedIndex < 0 ? "" : `option:${selectedIndex}`}
       onChange={(event) => selectValue(event.target.value)}
     >
-      <option value="" disabled>{t`Choose a value`}</option>
+      <option value="" disabled>
+        {"Choose a value"}
+      </option>
       {options.map((option, index) => (
         <option key={`${option.value}-${index}`} value={`option:${index}`}>
           {typeof option.label === "string"
             ? option.label
-            : i18n._(option.label)}
+            : option.label.message}
         </option>
       ))}
     </select>

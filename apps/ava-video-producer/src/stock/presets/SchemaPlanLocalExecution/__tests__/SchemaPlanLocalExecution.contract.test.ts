@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { prop } from "@avandar/utils";
-import { registerStockLocalizationAssertions } from "../../../../../tests/helpers/registerStockLocalizationAssertions";
+import { registerStockDefaultTextAssertions } from "../../../../../tests/helpers/registerStockDefaultTextAssertions";
 import { registerStockPresetAssertions } from "../../../../../tests/helpers/registerStockPresetAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
@@ -59,7 +59,7 @@ registerStockPresetAssertions(options);
 
 registerStockTextLayoutAssertions(options);
 
-registerStockLocalizationAssertions({
+registerStockDefaultTextAssertions({
   contract: options.contract,
   suppliedInputs: FIXTURES.map(prop("input")),
   expectedTextPaths: [

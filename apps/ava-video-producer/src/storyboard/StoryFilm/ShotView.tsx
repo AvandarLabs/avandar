@@ -1,10 +1,12 @@
 import { ContinuityScene } from "../../continuity/ContinuityScene";
-import { ContinuityI18nProvider } from "../../continuity/i18n/ContinuityI18nProvider/ContinuityI18nProvider";
+import { BarComparisonScene } from "../../scenes/BarComparisonScene/BarComparisonScene";
+import { BrandLockupScene } from "../../scenes/BrandLockupScene/BrandLockupScene";
 import { FlowchartScene } from "../../scenes/FlowchartScene";
 import { GraphScene } from "../../scenes/GraphScene";
 import { MediaScene } from "../../scenes/MediaScene";
 import { MetricScene } from "../../scenes/MetricScene";
 import { StockScene } from "../../scenes/StockScene";
+import { TiltedWindowScene } from "../../scenes/TiltedWindowScene/TiltedWindowScene";
 import { TypographyScene } from "../../scenes/TypographyScene";
 import { TitleCard } from "../../title-card";
 import type { ProductSegment } from "../../continuity/continuitySchema";
@@ -38,13 +40,11 @@ export function ShotView({
   switch (shot.scene) {
     case "continuity":
       return (
-        <ContinuityI18nProvider>
-          <ContinuityScene
-            plan={shot.props}
-            frame={frame}
-            productScene={productScene}
-          />
-        </ContinuityI18nProvider>
+        <ContinuityScene
+          plan={shot.props}
+          frame={frame}
+          productScene={productScene}
+        />
       );
     case "avandar": {
       if (!productScene)
@@ -67,5 +67,11 @@ export function ShotView({
       return <MediaScene {...shot.props} {...common} />;
     case "stock":
       return <StockScene {...shot.props} {...common} />;
+    case "tilted-window":
+      return <TiltedWindowScene {...shot.props} {...common} />;
+    case "brand-lockup":
+      return <BrandLockupScene {...shot.props} {...common} />;
+    case "bar-comparison":
+      return <BarComparisonScene {...shot.props} {...common} />;
   }
 }

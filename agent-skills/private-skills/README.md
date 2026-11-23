@@ -53,3 +53,12 @@ work is an initiative, project, milestone, or issue; triages the backlog; sets
 priorities, owners, and estimates; plans cycles; and writes project and
 initiative status updates. Requires an authenticated Linear MCP server
 connected to the Avandar workspace.
+
+### animation-observation
+
+Watches a reference video with Gemini Argon 4, writes a motion, composition,
+and transition spec with a storyboard script, adds any missing Motion Atlas
+pieces, and rebuilds the film with Avandar content in
+`apps/ava-video-producer`. It never loads on its own: invoke it explicitly
+with a video URL or file path. It reads `GEMINI_API_KEY` from the root
+`.env.video-producer.local`.

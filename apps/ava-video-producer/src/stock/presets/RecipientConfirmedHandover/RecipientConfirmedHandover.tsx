@@ -4,7 +4,7 @@ import { HandoverGoodsRow } from "./HandoverGoodsRow";
 import { HandoverLabels } from "./HandoverLabels";
 import { HandoverReceipt } from "./HandoverReceipt";
 import { HandoverRecipient } from "./HandoverRecipient";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./RecipientConfirmedHandover.schema";
 import type { ReactNode } from "react";
 /** Complete authored handover and shared frame controls. */

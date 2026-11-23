@@ -1,7 +1,7 @@
 import { ContrastAlternative } from "./ContrastAlternative";
 import { ContrastHeading } from "./ContrastHeading";
 import { ContrastRow } from "./ContrastRow";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./PairedContrast.schema";
 import type { ReactNode } from "react";
 /** Frame-controlled paired comparison and complete authored content. */

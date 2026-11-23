@@ -2,7 +2,7 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { AssignmentLedger } from "./AssignmentLedger";
 import { getAssignmentsFromLocations } from "./getAssignmentsFromLocations";
 import { UncertaintyMap } from "./UncertaintyMap";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./LocationUncertaintyBoundary.schema";
 import type { ReactNode } from "react";
 /** Explicit authored scene props. */

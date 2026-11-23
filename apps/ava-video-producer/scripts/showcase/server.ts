@@ -8,12 +8,21 @@ import {
 import path from "node:path";
 import { z } from "zod";
 import { buildAtlas } from "../buildAtlas/buildAtlas.mjs";
-import { assetReferences, publicAsset, captionFiles } from "../lib/planHelpers";
+import { assetReferences, publicAsset } from "../lib/planHelpers";
 import { requireLicense } from "../require-license.mjs";
 import { buildStockContracts } from "../stock/buildStockContracts/buildStockContracts";
 import { type StockFingerprint } from "../stock/StockFingerprintModule/StockFingerprintModule";
 import { buildLivePlayers } from "./build";
+import {
+  type CaptionFilesResult,
+  createCaptionFilesFromRequest,
+} from "./createCaptionFilesFromRequest/createCaptionFilesFromRequest";
 import { createExportJobs } from "./createExportJobs/createExportJobs";
+import {
+  createThemeStore,
+  THEME_FILE_MAX_BYTES,
+} from "./createThemeStore/createThemeStore";
+import { handleThemeRequest } from "./handleThemeRequest/handleThemeRequest";
 import { withNarration } from "./narrationHelpers/narrationHelpers";
 import { renderFilm } from "./render";
 import { appRoot, ShowcaseFilms, PLANS } from "./ShowcaseFilms/ShowcaseFilms";
@@ -22,6 +31,11 @@ import type { Film } from "../../src/showcase/showcase.types";
 
 requireLicense();
 
+/** Brand files from `public/` that showcase pages load, by served path. */
+const PUBLIC_FILES: Record<string, string> = {
+  "/fonts/figtree-latin.woff2": "fonts/figtree-latin.woff2",
+  "/brand/avandar-logo.png": "avandar/logo.png",
+};
 const clients = new Set<ServerResponse>();
 const media = new Map<string, string>();
 const session = randomUUID();
@@ -52,6 +66,23 @@ const plansWatcher = watch(
     }, 200);
   },
 );
+const themeStore = createThemeStore({
+  directory: path.join(appRoot, "themes"),
+});
+let themeTimer: ReturnType<typeof setTimeout> | undefined;
+// A theme saved here or edited on disk republishes, so open galleries reload it.
+const themesWatcher = watch(
+  path.join(appRoot, "themes"),
+  (_event, filename) => {
+    if (!filename?.endsWith(".theme.json") || filename.startsWith(".")) {
+      return;
+    }
+    clearTimeout(themeTimer);
+    themeTimer = setTimeout(() => {
+      publish().catch((error) => console.error("Theme reload failed:", error));
+    }, 200);
+  },
+);
 const jobs: ReturnType<
   typeof createExportJobs<{ film: Film; fingerprint?: StockFingerprint }>
 > = createExportJobs<{ film: Film; fingerprint?: StockFingerprint }>(
@@ -69,12 +100,12 @@ const jobs: ReturnType<
     }
   },
 );
-const requestSchema = z
-  .object({
-    id: z.string().max(80),
-    options: z.record(z.string(), z.unknown()).optional(),
-  })
-  .strict();
+const requestSchema = z.strictObject({
+  id: z.string().max(80),
+  options: z.record(z.string(), z.unknown()).optional(),
+});
+/** An export body: the film id, its options, and a theme patch of up to 256 KB. */
+const EXPORT_BODY_MAX_BYTES = 8192 + THEME_FILE_MAX_BYTES;
 
 function json(res: ServerResponse, status: number, body: unknown) {
   res
@@ -86,29 +117,100 @@ function json(res: ServerResponse, status: number, body: unknown) {
 }
 async function filmForPlayer(id: string) {
   const film = await withNarration(await ShowcaseFilms.load(id));
+  const assets = film.plan
+    ? assetReferences(film.plan)
+    : film.kind === "helper"
+      ? film.assets
+      : [];
   await Promise.all(
-    (film.plan ? assetReferences(film.plan) : []).map(async (asset) =>
+    assets.map(async (asset) =>
       media.set(`/${asset}`, await publicAsset(appRoot, asset)),
     ),
   );
   return film;
 }
-async function exportRequest(req: IncomingMessage, res: ServerResponse) {
+/**
+ * The film id and options of an export or caption request, read under the
+ * same origin check, byte cap, and strict schema. Answers the request itself
+ * and returns undefined when the body is refused.
+ */
+async function _readFilmRequest(
+  req: IncomingMessage,
+  res: ServerResponse,
+): Promise<z.infer<typeof requestSchema> | undefined> {
   if (req.headers.origin !== `http://${req.headers.host}`) {
     json(res, 403, { message: "Use the local showcase to request a render." });
-    return;
+    return undefined;
   }
   let body = "";
+  req.setEncoding("utf8");
   for await (const chunk of req) {
     body += chunk;
-    if (body.length > 8192) {
+    if (Buffer.byteLength(body) > EXPORT_BODY_MAX_BYTES) {
       json(res, 413, { message: "Request too large" });
-      return;
+      return undefined;
     }
   }
   try {
-    const request = requestSchema.parse(JSON.parse(body));
+    return requestSchema.parse(JSON.parse(body));
+  } catch (error) {
+    console.error("Invalid showcase film request:", error);
+    json(res, 400, {
+      message: "Invalid film or export options. Check the showcase terminal.",
+    });
+    return undefined;
+  }
+}
+/** Sends a transcript or caption file, or the status its request earned. */
+function _sendCaptionFile({
+  res,
+  result,
+  fileName,
+}: Readonly<{
+  res: ServerResponse;
+  result: CaptionFilesResult<Film>;
+  fileName: "transcript.txt" | "captions.srt";
+}>) {
+  if (result.status === 404) {
+    res.writeHead(404).end();
+    return;
+  }
+  if (result.status === 400) {
+    json(res, 400, {
+      message:
+        "Invalid theme or camera options for this film. Check the showcase terminal.",
+    });
+    return;
+  }
+  res
+    .writeHead(200, {
+      "Content-Type": "text/plain; charset=utf-8",
+      "Content-Disposition": `attachment; filename="${result.film.id}-${fileName}"`,
+    })
+    .end(
+      fileName === "captions.srt" ? result.files.srt : result.files.transcript,
+    );
+}
+/** Captions timed by the same options and theme an export sends. */
+async function _captionRequest(req: IncomingMessage, res: ServerResponse) {
+  const request = await _readFilmRequest(req, res);
+  if (request) {
+    const result = await createCaptionFilesFromRequest({
+      id: request.id,
+      options: request.options,
+      load: ShowcaseFilms.load,
+    });
+    _sendCaptionFile({ res, result, fileName: "captions.srt" });
+  }
+}
+async function exportRequest(req: IncomingMessage, res: ServerResponse) {
+  const request = await _readFilmRequest(req, res);
+  if (!request) {
+    return;
+  }
+  try {
     const film = await ShowcaseFilms.load(request.id, request.options);
+    ShowcaseFilms.assertExportable(film);
     const fingerprint =
       film.kind === "stock"
         ? await ShowcaseFilms.getFingerprintFromFilm(film)
@@ -134,8 +236,15 @@ async function api(
   res: ServerResponse,
   pathname: string,
 ) {
+  if (await handleThemeRequest({ req, res, pathname, store: themeStore })) {
+    return;
+  }
   if (pathname === "/api/exports" && req.method === "POST") {
     await exportRequest(req, res);
+    return;
+  }
+  if (pathname === "/api/captions" && req.method === "POST") {
+    await _captionRequest(req, res);
     return;
   }
   if (!["GET", "HEAD"].includes(req.method ?? "")) {
@@ -151,26 +260,19 @@ async function api(
       json(res, 200, await filmForPlayer(filmMatch[1]));
       return;
     }
-    const parameters = new URL(req.url ?? "/", "http://localhost").searchParams;
-    const film = await ShowcaseFilms.load(filmMatch[1], {
-      ...(parameters.has("cameraPreset")
-        ? { cameraPreset: parameters.get("cameraPreset") }
-        : {}),
-      ...(parameters.has("cameraMotion")
-        ? { cameraMotion: parameters.get("cameraMotion") !== "false" }
-        : {}),
+    // A plain link downloads the saved film; a draft's captions come from
+    // `POST /api/captions` with the export's options.
+    const result = await createCaptionFilesFromRequest({
+      id: filmMatch[1],
+      options: undefined,
+      load: ShowcaseFilms.load,
     });
-    if (!film.plan) {
-      res.writeHead(404).end();
-      return;
-    }
-    const files = captionFiles(film.plan);
-    res
-      .writeHead(200, {
-        "Content-Type": "text/plain; charset=utf-8",
-        "Content-Disposition": `attachment; filename="${film.id}-${filmMatch[2]}"`,
-      })
-      .end(filmMatch[2] === "captions.srt" ? files.srt : files.transcript);
+    _sendCaptionFile({
+      res,
+      result,
+      fileName:
+        filmMatch[2] === "captions.srt" ? "captions.srt" : "transcript.txt",
+    });
     return;
   }
   const exportMatch = /^\/api\/exports\/([a-f0-9-]+)(\/download)?$/.exec(
@@ -226,8 +328,6 @@ const server = createServer(async (req, res) => {
       return;
     }
     const generated = [
-      "/composition-gallery.js",
-      "/composition-gallery.css",
       "/live-player.js",
       "/live-player.css",
       "/motion-gallery.js",
@@ -235,8 +335,8 @@ const server = createServer(async (req, res) => {
       "/showcase-theme.css",
     ].includes(pathname);
     const file =
-      (pathname === "/fonts/geist-latin.woff2"
-        ? path.join(appRoot, "public/fonts/geist-latin.woff2")
+      (Object.hasOwn(PUBLIC_FILES, pathname)
+        ? path.join(appRoot, "public", PUBLIC_FILES[pathname])
         : media.get(pathname)) ??
       (await servedFile(
         generated ? live.output : path.join(appRoot, "showcase"),
@@ -272,8 +372,10 @@ server.on("error", (error: NodeJS.ErrnoException) => {
 });
 async function close() {
   clearTimeout(planTimer);
+  clearTimeout(themeTimer);
   clients.forEach((client) => client.end());
   plansWatcher.close();
+  themesWatcher.close();
   server.close();
   await live.dispose();
   await atlas?.dispose();

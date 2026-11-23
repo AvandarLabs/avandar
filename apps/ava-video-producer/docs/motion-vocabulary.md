@@ -4,7 +4,7 @@ This is the complete inventory of the motion vocabulary currently implemented in
 
 The code is the source of truth. The rules for using it live in the [product-demo skill](../.claude/skills/product-demo/SKILL.md) and its [motion](../.claude/skills/product-demo/references/motion.md), [title](../.claude/skills/product-demo/references/titles.md), and [rendering](../.claude/skills/product-demo/references/render.md) references. The original primitives in `src/motion.ts` remain unchanged; three periodic helpers were added for Motion Atlas. Scenes and stock graphics share this module, without a second easing vocabulary.
 
-For visual reference, browse [Motion Atlas](../showcase/motion.html), served at **http://localhost:4173/motion.html**. Its [stock catalog](stock-motion-library.md) names 170 registered bounded combinations of these primitives: graphs, node traversal, plexus fields, integrations, code highlighting, charts, and interface motion. A primitive is how something moves; a stock preset is a reusable authored graphic that demonstrates those movements.
+For visual reference, browse [Motion Atlas](../showcase/motion.html), served at **http://localhost:4173/motion.html**. Its **Helpers** section (`motion.html?section=helpers`) previews every helper in this inventory live, one at a time; see [Helpers in the Motion Atlas](#helpers-in-the-motion-atlas). Its [stock catalog](stock-motion-library.md) names 170 registered bounded combinations of these primitives: graphs, node traversal, plexus fields, integrations, code highlighting, charts, and interface motion. A primitive is how something moves; a stock preset is a reusable authored graphic that demonstrates those movements.
 
 ## Time and coordinates
 
@@ -18,7 +18,7 @@ For visual reference, browse [Motion Atlas](../showcase/motion.html), served at 
 
 ## Curves
 
-All five curves are exported through `EASE` in [src/motion.ts](../src/motion.ts). The upstream comment says four; the implemented object contains five.
+All seven curves are exported through `EASE` in [src/motion.ts](../src/motion.ts).
 
 | Token | Definition | Intended use |
 | --- | --- | --- |
@@ -26,7 +26,9 @@ All five curves are exported through `EASE` in [src/motion.ts](../src/motion.ts)
 | `EASE.outBack` | `bezier(0.34, 1.56, 0.64, 1)` | A restrained overshoot when something lands in its slot; use sparingly |
 | `EASE.inOut` | `bezier(0.45, 0, 0.55, 1)` | Something already visible travelling between positions |
 | `EASE.inOutCubic` | `4t³` for the first half; `1 - (-2t + 2)³ / 2` for the second | Pointer travel between targets |
-| `EASE.word` | `bezier(0.22, 1, 0.36, 1)` | Headline words rising out of masks |
+| `EASE.word` | `bezier(0.22, 1, 0.36, 1)` | Masked and staged rises: headline words, line fades, rising wipe columns, growing bars, carousel slides, window camera pushes |
+| `EASE.in` | `bezier(0.55, 0, 1, 0.45)` | Accelerating departures, such as a window whipping off the frame. Never for arrivals |
+| `EASE.surge` | `bezier(0.7, 0, 0.2, 1)` | A fly-through that fills the frame: lingers at rest, surges, settles before the cut |
 
 `bezier(x1, y1, x2, y2)` is also exported. It creates a CSS-style cubic-bezier easing function, returning 0 at inputs at or below 0 and 1 at inputs at or above 1. Curves such as `outBack` can overshoot between those endpoints. The configurable motion components also expose named `ease-in` for accelerating departures, plus bounded custom curves.
 
@@ -42,7 +44,9 @@ All five curves are exported through `EASE` in [src/motion.ts](../src/motion.ts)
 | `DUR.sheet` | 13 | 433 ms | Sheet/column motion; default spring and counter duration |
 | `DUR.hero` | 18 | 600 ms | The main visual beat of a phase |
 | `DUR.word` | 15 | 500 ms | One title word's masked rise |
+| `DUR.whip` | 8 | 267 ms | A whip-out or column wipe, deliberately shorter than a panel entrance |
 | `STAGGER` | 2 | 67 ms | Delay between list siblings |
+| `STAGGER_COLUMN` | 0.5 | 17 ms | Sub-frame delay between columns of a stepped wipe; renderers interpolate, never round |
 
 The full `press()` envelope occupies **8 frames**, twice `DUR.press`. The title card has its own **3-frame word stagger**; it does not use the list's `STAGGER` constant. Longer reading holds and scene lengths are composition decisions, not additional exported duration tokens.
 
@@ -131,9 +135,15 @@ from `motion.ts`. Content and timing props are documented in the
 | `TypographyScene` | Each word rises through its own mask using `EASE.word`; authored emphasis selects a token color | Defaults: first word at frame 6, 3-frame stagger, `DUR.word` duration. Lines wrap at a fitted, stable size. No masked-word opacity or per-letter animation |
 | `MediaScene` | Static image/video framing, entrance fade, timed callout fades | Video is sampled from the explicit scene frame through Remotion `Freeze`; trim is additional. Crop is fixed for the shot. Callouts use `DUR.chip` or a shorter interval for short cues. No sustained camera zoom on captured UI |
 | `CaptionOverlay` | Whole-cue text with a short entrance fade and opaque backing | Selects `startFrame <= frame < endFrame`; fade is at most `DUR.chip`. Text fitting stays fixed during the cue; no word-level speech highlighting |
-| `StoryFilm` | Opaque incoming shot dissolves over the preceding shot held at its last frame | Uses `EASE.inOut` and each shot's `transitionInFrames` (schema default 18). First shot has no incoming dissolve. Loop plans additionally fade to ground over the final 18 frames |
+| `StoryFilm` | Opaque incoming shot dissolves over the preceding shot held at its last frame, or reveals through a `stepped-column-wipe`; `outgoing: "playing"` keeps the outgoing shot advancing | Dissolve uses `EASE.inOut` over `transitionInFrames` (schema default 18). The wipe staggers N columns by `staggerFrames` (default `STAGGER_COLUMN`) with `EASE.word`, each column lasting `transitionInFrames - stagger * (N - 1)`; optional outgoing drift uses `EASE.in` with X-only blur. First shot has no transition. Loop plans additionally fade to ground over the final 18 frames |
+| `TypographyScene` line modes | `line-fade` (`enter()` over `DUR.chip`, `EASE.word`, 12 px rise), `wipe` (clip right inset 100% → 0 with −8% → 0 travel over `DUR.panel`), `cut`; staged exit fades each element in place | `lineStaggerFrames` default 3; an icon fades (no rise) and lines follow `DUR.panel` later; exit stagger 3 and `DUR.chip` per element by default |
+| `TiltedWindowScene` | Whip-in: 110%+ → 0 over `DUR.sheet`, `EASE.out`, rotateY −24° → −13°, X blur 40 → 0. Whip-out: `DUR.whip` (or the exit's `durationInFrames`), `EASE.in`, past the left edge, blur 0 → 40, headline fading in place over `DUR.chip`. Carousel slide: `DUR.chip`, `EASE.word`, incoming on top from +65% with blur 25 → 0, outgoing −28% and −120 px Z, opaque for the first half and fading over the second so the field never shows through both windows. Pull-back: `DUR.hero`, `EASE.word`. Flip-split: `DUR.whip` flip from 80°, split over `DUR.press`. Camera: `getCameraPose()` on normalized window keys with velocity X blur ≤ 12 px | Counters in the pair layout are linear; finishing turns them `--brand` over `DUR.chip` with `mixToken()` |
+| `BrandLockupScene` | Column build: N column masks rise with `EASE.word`, `staggerFrames` 1.5, `DUR.whip` each. Wordmark: `wipe` line mode. Fly-through: wordmark retracts over `DUR.chip`, columns fly `DUR.press` later over `DUR.hero` with `EASE.surge`, a sine-bell rotateY up to 28°, and a token colour covering them by 75% of the flight. CTA: subtitle, URL `DUR.word` later, typed command (`typed()`, 30 cps, block cursor with `caretOn()`), badge `DUR.panel` after typing | The mark is a raster image cut into column masks |
+| `BarComparisonScene` | Hero `enter()` over `DUR.panel` with `EASE.word`; labels `DUR.panel` later, bars `DUR.chip` after labels growing over `DUR.sheet`, values after bars, all rows `STAGGER` apart; a second panel `panelStaggerFrames` (3) later. Erase exit: [getEraseMaskStyle](../src/motion-components/eraseMask.ts) per element over `DUR.press`, elements 0.1 frame apart, panels `STAGGER` apart | Bars are relative to the panel's longest bar |
+| `GraphScene` packets | A dot travels an edge with `EASE.inOut` during each `{atFrame, durationInFrames, direction}` window; list items enter `2 * STAGGER` apart | Packets are drawn only inside their window |
 
-Scene headings follow short `enter()` translations; app and media containers do
+Scene headings follow short `enter()` translations, or with `headingReveal: {mode: "wipe"}` a
+left-to-right `wipe` line reveal per line (`getHeadingRevealStyles()`); app and media containers do
 not receive a lasting scale. Graph card heights and fitted text sizes depend on
 the complete content and available dimensions, never on the current frame.
 Captioned storyboards reserve a stable band below the scene, sized from the
@@ -195,7 +205,7 @@ alignment, and speech-driven word animation are not.
 
 ## Rules for extending the vocabulary
 
-1. Add shared curves, timing tokens, and helpers to `src/motion.ts`, keeping it free of runtime dependencies. Update this inventory with the same change.
+1. Add shared curves, timing tokens, and helpers to `src/motion.ts`, keeping it free of runtime dependencies. Update this inventory with the same change, and add the helper to the [Motion Atlas helper catalog](#add-a-helper-to-the-catalog); the catalog's drift test fails until you do.
 2. Derive animation from frames. CSS transitions, timers, and wall-clock animation do not define a reproducible Remotion timeline.
 3. Use small element travel and sibling stagger. Springs are for landing; ramps are for travel. Spend the main visual beat once per phase.
 4. Keep app chrome stationary during explanation and avoid sustained scaling of UI or title text. A brief press returns to exactly 1. Native-size spatial boundaries and SVG viewBox cameras have separate contracts in the reusable motion API.
@@ -259,7 +269,7 @@ Continuity adds typed cut/dissolve/wipe/aperture/spatial/handoff/morph presentat
 Continuity diagram cameras add ordered glide/push/whip routes, reading holds, ten-sample temporal motion blur, and bounded object departures. Native UI remains unscaled. Anchored overlays use the existing easing functions and measured product coordinates; annotation kinds share draw/hold/retract intervals. Camera, blur, notation and editorial palette choices are available in live previews and explicit exports.
 
 
-Independent annotationRoughness and boxRoughness (0–3) now select seeded sketch treatments without retiming the animation. Zero means smooth, not hidden. The Composition Atlas exposes separate presets and exports the acknowledged values.
+Independent annotationRoughness and boxRoughness (0–3) now select seeded sketch treatments without retiming the animation. Zero means smooth, not hidden. The Atlas Compositions section exposes separate presets and exports the acknowledged values.
 
 ## Configurable motion components
 
@@ -270,3 +280,90 @@ implementations. Five semantic presets combine speed, blur and easing; numeric
 overrides and bounded cubic Beziers are available in JSX and JSON. Camera
 speed preserves reading holds and leaves content clocks unchanged. See the
 [reusable motion API](reusable-motion.md) for timing, precedence and examples.
+
+## Helpers in the Motion Atlas
+
+The Motion Atlas has four sections: Motions (stock presets), Compositions,
+Sample films, and **Helpers**. Helpers is a browsable catalog of the shared
+motion helpers this inventory describes. Like every Atlas section it has a
+category sidebar with counts and a card per helper; each card's thumbnail is
+the helper's real demo rendered live from the gallery clock, and opening it
+shows the looping player, API, usage and guidance in the Atlas preview modal.
+Open it at `motion.html?section=helpers`; an open helper deep links as
+`motion.html?section=helpers&helper=<id>`, and a category filter adds
+`&category=<id>`, for example `?section=helpers&helper=erase-mask&category=masks`.
+
+| Category | Helpers |
+| --- | --- |
+| Curves and durations | Every `EASE` curve plotted with a dot travelling it, `bezier()`, the motion presets, every `DUR` token on one shared timeline, `STAGGER`, `STAGGER_COLUMN` |
+| Interpolation | `ramp()` and `mix()`, `mixToken()`, `countTo()` |
+| Entrances and exits | `enter()`, `enterAt()`, `leave()`, `pop()`, `press()` |
+| Text reveals | Line fade, wipe and cut (`getLineRevealStyle`), `getWipeExitStyle`, `getHeadingRevealStyles`, `getStagedExitStyle`, `typed()` with `caretOn()`, `getActiveHeadline` |
+| Masks and wipes | `getEraseMaskStyle`, `getEraseStartFrames`, the stepped column wipe, the window stepped reveal, `getRoughEdgeClipPath` |
+| Blur | `HorizontalBlurFilter`, `getVelocityBlur` |
+| Camera | `getCameraPose` and the camera track, `DiagramCamera`, `getWindowCamera` |
+| Windows | Whip, side entrance, carousel slide, pull-back, flip and split, scroll offset, the `windowTilt.ts` plane, chrome and box tokens |
+| Media | `MediaPlane` |
+| Transitions | `getShotTransitionLayers` (dissolve, stepped column wipe, declared cut), `SceneTransition` |
+| Continuity | `SharedElement`, `AnchoredOverlay`, `SvgObjectDeparture` |
+| Theme | `createThemeStyleFromTheme` |
+| Pointer | `trackPos` with the shared `Cursor`, `cursorOnTarget`, `downAt` and `cursorScale`, `cursorShutter` |
+| Loops | `loopPhase`, `wave`, `loopEnvelope` |
+| Scene builds | The brand lockup's column build, fly-through and CTA beats; the bar comparison's build beats |
+
+Each entry's detail view shows its API signature, defaults, a copyable usage
+snippet, what it is good for and what to avoid, the files that import it, and
+a link to its source.
+
+### How it is built
+
+- **Catalog.** [helperCatalog.yaml](../src/gallery/HelperGallery/helperCatalog.yaml)
+  holds categories, the source modules the catalog covers, and one entry per
+  helper: `id`, `title`, `category`, `description`, `source`, `exports`
+  (dotted for members, such as `EASE.out`), `signature`, `defaults`, `usage`,
+  `goodFor`, `avoid`, `usedBy` and `demo` (`id`, `frames`, optional public
+  `assets`). [parseHelperCatalog](../src/gallery/HelperGallery/parseHelperCatalog/parseHelperCatalog.ts)
+  validates it strictly with zod.
+- **Drift test.** [helperCatalogDrift.test.ts](../src/gallery/HelperGallery/helperCatalogDrift.test.ts)
+  imports every listed module and fails when a catalogued source or export no
+  longer exists, when a runtime export is neither catalogued nor listed under
+  the module's `excluded` with a reason, when a member of `EASE` or `DUR` has
+  no entry, when a `usedBy` file does not import the helper, when a preview id
+  is unregistered or unused.
+- **Live previews.** Each preview is a small frame-driven React component in
+  [demos/](../src/gallery/HelperGallery/demos/) that calls the real helper and
+  shows the call, a frame counter and the values the helper returns. The
+  gallery embeds `/live.html?id=helper-<id>`: `ShowcaseFilms.load` returns a
+  `helper` film (960 × 600, looping, frames from the catalog), and the live
+  player plays it through `HelperPlayer` and `HelperComposition` instead of
+  `FilmComposition`. Helper previews are live only; the export route refuses
+  them. Colours come from the Avandar theme in `theme-colors.json`.
+- **Copy.** Catalog prose is plain English display copy. The gallery reads the
+  titles, descriptions and guidance straight from the YAML. There is no
+  catalog to regenerate after editing it.
+
+Deliberately excluded: `getTypographyRevealFrames` (TypographyScene's own
+icon-then-lines timing), `getRowValueLabel` (number formatting), and the
+`motionOptionsSchema` / `motionEasingSchema` validators. Scene-internal layout
+code (`src/scenes/layout/`), the stock drawing primitives (inventoried in the
+[shared scene library](shared-scene-library.md#bounded-stock-drawing-primitives))
+and continuity's internal camera and overlay modules are not listed modules.
+
+### Add a helper to the catalog
+
+1. Export the helper from its module and document it in this inventory.
+2. If the module is new to the catalog, add it under `modules` in
+   `helperCatalog.yaml`, listing any exports that are not meant for reuse under
+   `excluded` with a reason.
+3. Add an entry under `helpers` with every field filled in. `usedBy` lists
+   app-relative files that import the helper; leave it empty when nothing does
+   yet.
+4. Add a preview id to [helperDemoIds.ts](../src/gallery/HelperGallery/helperDemoIds.ts),
+   write the preview in the matching `demos/*Demos.tsx` file with
+   `HelperDemoFrame` (call the real helper; never reimplement it), and register
+   it in [helperDemoRegistry.ts](../src/gallery/HelperGallery/demos/helperDemoRegistry.ts).
+   The registry is typed against the id list, so a missing preview fails to
+   compile.
+5. Run `npm run motion:build`, `npm run typecheck`
+   and `npm test`, then open `motion.html?section=helpers&helper=<id>` under
+   `pnpm showcase` and watch the preview loop.

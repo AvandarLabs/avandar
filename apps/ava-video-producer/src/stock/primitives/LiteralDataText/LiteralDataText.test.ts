@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { VideoThemeScope } from "../../../videoTheme/VideoThemeScope/VideoThemeScope";
 import { LiteralDataText } from "./LiteralDataText";
 
 const render = ({ value }: Readonly<{ value: string }>): string =>
@@ -41,4 +42,17 @@ test("substituted whitespace carries a distinct authored color and literal symbo
   );
   assert.doesNotMatch(literal, /<tspan[^>]*fill="#f0ba83"/);
   assert.match(render({ value: "\r\n" }), />␍↵<\/tspan>/);
+});
+
+test("whitespace marks use the theme's highlight colour", () => {
+  const patch = {
+    other: { video: { atomic: { swatch: { orange: "#00ff00" } } } },
+  };
+  const markup = renderToStaticMarkup(
+    createElement(VideoThemeScope, {
+      patches: [patch],
+      children: createElement(LiteralDataText, { value: "a b", x: 0, y: 0 }),
+    }),
+  );
+  assert.match(markup, /fill="#00ff00"/);
 });

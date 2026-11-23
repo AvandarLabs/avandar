@@ -3,7 +3,7 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { DrillBreadcrumb } from "./DrillBreadcrumb";
 import { DrillCompartments } from "./DrillCompartments";
 import { DrillRecord } from "./DrillRecord";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./NestedDrilldownWindow.schema";
 import type { ReactNode } from "react";
 /** Frame, theme and complete validated authored input. */

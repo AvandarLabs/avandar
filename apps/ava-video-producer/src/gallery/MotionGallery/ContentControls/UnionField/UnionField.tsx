@@ -1,6 +1,4 @@
 import { propEq } from "@avandar/utils";
-import { useLingui } from "@lingui/react";
-import { useLingui as useLinguiMacro } from "@lingui/react/macro";
 import { useState } from "react";
 import { ContentField } from "../ContentField/ContentField";
 import { ContentFields } from "../ContentFields/ContentFields";
@@ -28,8 +26,6 @@ export function UnionField({
   context,
   ...remainingProps
 }: Props): ReactNode {
-  const { i18n } = useLingui();
-  const { t } = useLinguiMacro();
   const [selectedType, setSelectedType] = useState(
     () =>
       ContentFields.getVariantFromValue({ control, value: context.value })
@@ -51,7 +47,7 @@ export function UnionField({
   return (
     <>
       <label>
-        <span>{t`Value type for ${context.label}`}</span>
+        <span>{`Value type for ${context.label}`}</span>
         <select
           className={styles.unionFieldVariant}
           value={activeType}
@@ -59,7 +55,7 @@ export function UnionField({
         >
           {control.variants.map((item) => (
             <option key={item.valueType} value={item.valueType}>
-              {i18n._(item.label)}
+              {item.label.message}
             </option>
           ))}
         </select>

@@ -1,4 +1,3 @@
-import { useLingui } from "@lingui/react/macro";
 import { DatasetColumnMappingCreator } from "../../../../src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator";
 import { ManualEntryAttributesBlock } from "../../../../src/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock";
 import {
@@ -11,10 +10,9 @@ type Props = { frame: number };
 
 /** Unchanged mapping leaves consuming the checked frame-owned form projection. */
 export function MappingFields({ frame }: Props) {
-  const { t } = useLingui();
   const projection = createMappingFormFromFrame({
     frame,
-    defaultManualFieldName: t`New field`,
+    defaultManualFieldName: "New field",
   });
   // The unchanged controls accept the complete form type. This seam supplies
   // only the checked read/binding methods they use, with inert write callbacks.

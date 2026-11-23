@@ -4,7 +4,7 @@ import { getAssociationFromInput } from "./getAssociationFromInput";
 import { ReviewedExtraction } from "./ReviewedExtraction";
 import { ReviewLabelRail } from "./ReviewLabelRail";
 import { ReviewSourcePage } from "./ReviewSourcePage";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./PdfNearestLabelReview.schema";
 import type { ReactNode } from "react";
 /** Frame-driven authored study props. */

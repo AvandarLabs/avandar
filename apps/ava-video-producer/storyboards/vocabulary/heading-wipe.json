@@ -1,0 +1,135 @@
+{
+  "version": 1,
+  "id": "heading-wipe",
+  "title": "Heading wipe",
+  "description": "Scene headings that wipe in left to right instead of rising: the title first and the kicker a few frames later, on a metric, a typography statement and a bar comparison.",
+  "sourceNotes": [
+    "Scene study extracted from the shot vocabulary film; an editorial example, not a claim about Avandar features or performance.",
+    "Every figure is fictional demonstration data."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1920,
+  "height": 1080,
+  "delivery": {
+    "width": 1920,
+    "height": 1080
+  },
+  "captions": false,
+  "shots": [
+    {
+      "id": "metric",
+      "scene": "metric",
+      "durationInFrames": 100,
+      "transitionInFrames": 0,
+      "theme": {
+        "ground": "#f8fafc",
+        "foreground": "#0f172a",
+        "muted-foreground": "#64748b",
+        "muted": "#cbd5e1",
+        "border": "#cbd5e1",
+        "card": "#ffffff",
+        "brand-strong": "var(--brand)"
+      },
+      "props": {
+        "title": "Rows ready to explore",
+        "kicker": "A fictional workspace after its first import",
+        "headingReveal": {
+          "mode": "wipe",
+          "atFrame": 2,
+          "staggerFrames": 8
+        },
+        "label": "Rows imported this week",
+        "value": 18240,
+        "countAtFrame": 20,
+        "countDurationInFrames": 36,
+        "detail": "Fictional demonstration data"
+      }
+    },
+    {
+      "id": "statement",
+      "scene": "typography",
+      "durationInFrames": 90,
+      "transitionInFrames": 0,
+      "transition": {
+        "kind": "cut"
+      },
+      "theme": {
+        "ground": "#f8fafc",
+        "foreground": "#0f172a",
+        "muted-foreground": "#64748b",
+        "muted": "#cbd5e1",
+        "border": "#cbd5e1",
+        "card": "#ffffff",
+        "brand-strong": "var(--brand)"
+      },
+      "props": {
+        "title": "Ask before you move data",
+        "kicker": "Query where the data already lives",
+        "headingReveal": {
+          "mode": "wipe",
+          "atFrame": 2,
+          "staggerFrames": 8
+        },
+        "lines": ["Bring the question", "to the source"],
+        "revealMode": "line-fade",
+        "fontSize": 80,
+        "revealAtFrame": 24
+      }
+    },
+    {
+      "id": "bars",
+      "scene": "bar-comparison",
+      "durationInFrames": 110,
+      "transitionInFrames": 0,
+      "transition": {
+        "kind": "cut"
+      },
+      "theme": {
+        "ground": "#f8fafc",
+        "foreground": "#0f172a",
+        "muted-foreground": "#64748b",
+        "muted": "#cbd5e1",
+        "border": "#cbd5e1",
+        "card": "#ffffff",
+        "brand-strong": "var(--brand)"
+      },
+      "props": {
+        "title": "Where the records come from",
+        "kicker": "Share of fictional rows by source",
+        "headingReveal": {
+          "mode": "wipe",
+          "atFrame": 2,
+          "staggerFrames": 8
+        },
+        "panels": [
+          {
+            "value": 58,
+            "unit": "%",
+            "caption": "Rows from spreadsheets",
+            "rows": [
+              {
+                "label": "Spreadsheets",
+                "value": 58,
+                "display": "58%",
+                "highlight": true
+              },
+              {
+                "label": "Form responses",
+                "value": 27,
+                "display": "27%"
+              },
+              {
+                "label": "Database tables",
+                "value": 15,
+                "display": "15%"
+              }
+            ]
+          }
+        ],
+        "revealAtFrame": 18,
+        "footnote": "Fictional demonstration data"
+      }
+    }
+  ]
+}

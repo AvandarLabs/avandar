@@ -4,7 +4,7 @@ import { ScheduleBackdrop } from "./ScheduleBackdrop";
 import { ScheduledTask } from "./ScheduledTask";
 import { ScheduleInterruption } from "./ScheduleInterruption";
 import { ScheduleReserve } from "./ScheduleReserve";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ScheduleBuffer.schema";
 import type { ReactNode } from "react";
 

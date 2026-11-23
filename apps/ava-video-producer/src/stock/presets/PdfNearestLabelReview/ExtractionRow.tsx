@@ -1,4 +1,3 @@
-import { stockI18n } from "../../i18n/stockI18n/stockI18n";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import { getAssociationFromInput } from "./getAssociationFromInput";
@@ -31,7 +30,7 @@ export function ExtractionRow({
       <LabelSlots
         labels={[
           [
-            association.chosenLabel?.text ?? stockI18n._(unresolvedMessage),
+            association.chosenLabel?.text ?? unresolvedMessage.message,
             x + 12,
             464,
             336,

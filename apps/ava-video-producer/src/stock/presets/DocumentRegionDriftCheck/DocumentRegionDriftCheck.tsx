@@ -2,7 +2,7 @@ import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { ContentComparison } from "./ContentComparison";
 import { RegionPage } from "./RegionPage";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./DocumentRegionDriftCheck.schema";
 import type { ReactNode } from "react";
 /** Exact saved locator and authored current comparison content. */

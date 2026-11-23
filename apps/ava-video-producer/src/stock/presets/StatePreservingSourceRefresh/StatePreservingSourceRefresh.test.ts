@@ -63,7 +63,7 @@ test("identical complete source rows in reverse order produce zero writes", () =
   );
 });
 
-import { registerStockLocalizationAssertions } from "../../../../tests/helpers/registerStockLocalizationAssertions";
+import { registerStockDefaultTextAssertions } from "../../../../tests/helpers/registerStockDefaultTextAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { statePreservingSourceRefreshContract } from "./StatePreservingSourceRefresh.contract";
 import { inputSchema } from "./StatePreservingSourceRefresh.schema";
@@ -111,7 +111,7 @@ const options = {
 } satisfies PresetAssertions<Input>;
 registerStockPresetAssertions(options);
 registerStockTextLayoutAssertions(options);
-registerStockLocalizationAssertions({
+registerStockDefaultTextAssertions({
   contract: options.contract,
   expectedTextPaths: [
     ["records", 0, "label"],

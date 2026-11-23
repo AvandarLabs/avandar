@@ -24,6 +24,8 @@ async function _createFailedBuildFixture(root: string): Promise<void> {
     "scripts/yaml/compileYaml.cjs",
     "scripts/require-license.mjs",
     "scripts/lib/readLicense.mjs",
+    "scripts/lib/copyRootEnvFile.mjs",
+    "scripts/lib/product-source.mjs",
   ];
   await Promise.all(
     filenames.map(async (filename) => {
@@ -32,7 +34,7 @@ async function _createFailedBuildFixture(root: string): Promise<void> {
       await fs.copyFile(filename, destination);
     }),
   );
-  // Isolate esbuild's real context lifecycle from translation generation.
+  // Isolate esbuild's real context lifecycle from palette and theme input refreshing.
   await fs.writeFile(
     path.join(root, "scripts/buildAtlas/createGalleryPlugin.mjs"),
     'export function createGalleryPlugin() { return { name: "fixture", setup() {} }; }',

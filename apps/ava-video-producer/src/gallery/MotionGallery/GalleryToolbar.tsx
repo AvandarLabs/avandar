@@ -1,5 +1,4 @@
 import { propEq } from "@avandar/utils";
-import { Trans, useLingui as useGalleryLingui } from "@lingui/react/macro";
 import { STOCK_CATALOG } from "../../stock/catalog";
 import { Icon } from "./Icon";
 import type { Preset } from "./Preset.types";
@@ -26,23 +25,21 @@ export function GalleryToolbar({
   playing,
   setPlaying,
 }: Readonly<Props>): ReactNode {
-  const { t } = useGalleryLingui();
-
   return (
     <div className="collection-toolbar">
       <div className="collection-heading">
         <h2 id="collection-title">
           {category === "All motions"
-            ? t`All motions`
+            ? "All motions"
             : category === "Saved references"
-              ? t`Saved references`
+              ? "Saved references"
               : category}
         </h2>
         <span className="result-count">{results.length}</span>
       </div>
       <div className="toolbar-tools">
         <label className="sr-only" htmlFor="collection-filter">
-          <Trans>Collection</Trans>
+          Collection
         </label>
         <select
           id="collection-filter"
@@ -50,14 +47,10 @@ export function GalleryToolbar({
           value={collection}
           onChange={(event) => setCollection(event.target.value)}
         >
-          <option value="all">
-            <Trans>All collections ({STOCK_CATALOG.length})</Trans>
-          </option>
+          <option value="all">All collections ({STOCK_CATALOG.length})</option>
           {(["general", "social-sector"] as const).map((value) => (
             <option key={value} value={value}>
-              {value === "general"
-                ? t`General and technology`
-                : t`Social sector`}{" "}
+              {value === "general" ? "General and technology" : "Social sector"}{" "}
               {`(${STOCK_CATALOG.filter(propEq("collection", value)).length})`}
             </option>
           ))}
@@ -65,18 +58,18 @@ export function GalleryToolbar({
         <div className="search-field">
           <Icon name="search" size={17} />
           <label className="sr-only" htmlFor="motion-search">
-            <Trans>Search motions</Trans>
+            Search motions
           </label>
           <input
             id="motion-search"
             type="search"
-            placeholder={t`Search motions, ideas…`}
+            placeholder="Search motions, ideas…"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             autoComplete="off"
           />
           {query ? (
-            <button onClick={() => setQuery("")} aria-label={t`Clear search`}>
+            <button onClick={() => setQuery("")} aria-label="Clear search">
               <Icon name="close" size={14} />
             </button>
           ) : null}
@@ -84,12 +77,10 @@ export function GalleryToolbar({
         <button
           className="play-all"
           onClick={() => setPlaying((value) => !value)}
-          aria-label={
-            playing ? t`Pause all animations` : t`Play all animations`
-          }
+          aria-label={playing ? "Pause all animations" : "Play all animations"}
         >
           <Icon name={playing ? "pause" : "play"} size={15} />
-          <span>{playing ? t`Pause all` : t`Play all`}</span>
+          <span>{playing ? "Pause all" : "Play all"}</span>
         </button>
       </div>
     </div>

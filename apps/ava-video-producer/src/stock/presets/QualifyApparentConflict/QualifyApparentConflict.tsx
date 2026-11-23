@@ -1,6 +1,6 @@
 import { ContextResolution } from "./ContextResolution";
 import { ContextStatement } from "./ContextStatement";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./QualifyApparentConflict.schema";
 import type { ReactNode } from "react";
 /** Complete authored context-qualified claims. */

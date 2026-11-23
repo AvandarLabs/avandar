@@ -1,5 +1,5 @@
 import { ramp } from "../../../motion";
-import { Text } from "../../graphics-common";
+import { Text } from "../../graphics-common/Text";
 import { STOCK } from "../../stockPalette";
 import type { makeCoordinateTriageFromInputAndFrame } from "./makeCoordinateTriageFromInputAndFrame";
 import type { ReactNode } from "react";

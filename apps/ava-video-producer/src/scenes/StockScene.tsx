@@ -1,6 +1,6 @@
 import { loopPhase } from "../motion";
 import { STOCK_LOOP_FRAMES } from "../stock/catalog";
-import { StockGraphic } from "../stock/StockGraphic";
+import { StockGraphic } from "../stock/StockGraphic/StockGraphic";
 import { SceneShell } from "./SceneShell";
 import type { StockRequest } from "../stock/contracts/StockContract.types";
 import type { SceneBase } from "./scenes.types";

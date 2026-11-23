@@ -158,8 +158,15 @@ export const EASE = {
    *  a cursor between two targets. Flatter in the middle than `inOut`. */
   inOutCubic: (t: number) =>
     t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2,
-  /** The typographic curve. Titles only. */
+  /** The typographic curve: masked words, staged line fades, and the
+   *  growing or rising parts of a staged build (columns, bars). */
   word: bezier(0.22, 1, 0.36, 1),
+  /** ease-in. An accelerating departure, such as a window whipped off the
+   *  frame. Never for an arrival: it lands at full speed. */
+  in: bezier(0.55, 0, 1, 0.45),
+  /** A strong in-out for a fly-through that fills the frame: it lingers at
+   *  rest, surges through the middle, and settles before the cut. */
+  surge: bezier(0.7, 0, 0.2, 1),
 } as const;
 
 /* Prefer ease-out for arrivals, ease-in for accelerating departures, and
@@ -185,6 +192,9 @@ export const DUR = {
   hero: 18,
   /** 500ms: one word rising out of its mask. */
   word: 15,
+  /** 267ms: a whip-out or a column wipe, deliberately shorter than a panel
+   *  entrance so the boundary reads as a cut with motion in it. */
+  whip: 8,
 } as const;
 
 /** Frames between siblings in a list. ~67ms, the low end of the usual
@@ -192,6 +202,11 @@ export const DUR = {
  *  half a second to finish arriving. Never let a whole group enter on one
  *  frame; that single frame is what makes a UI look pasted in. */
 export const STAGGER = 2;
+
+/** Frames between neighbouring columns of a stepped wipe. Fractional on
+ *  purpose: eight columns cross the frame inside one whip, so renderers must
+ *  interpolate each column at its sub-frame offset instead of rounding. */
+export const STAGGER_COLUMN = 0.5;
 
 /* --------------------------------------------------------------- helpers -- */
 

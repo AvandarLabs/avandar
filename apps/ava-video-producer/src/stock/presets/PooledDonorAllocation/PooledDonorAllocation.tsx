@@ -5,7 +5,7 @@ import { FundingLabels } from "./FundingLabels";
 import { FundingPool } from "./FundingPool";
 import { FundingRequests } from "./FundingRequests";
 import { getAllocationTokensFromInputAndFrame } from "./getAllocationTokensFromInputAndFrame";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./PooledDonorAllocation.schema";
 import type { ReactNode } from "react";
 /** Complete authored funding input and shared frame controls. */

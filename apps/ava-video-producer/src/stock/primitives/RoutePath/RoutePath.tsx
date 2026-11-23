@@ -1,4 +1,4 @@
-import { STOCK } from "../../graphics-common";
+import { STOCK } from "../../stockPalette";
 import {
   type RouteTravel,
   getRoutePointFromProgress,

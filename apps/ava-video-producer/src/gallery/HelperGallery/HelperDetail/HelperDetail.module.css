@@ -1,0 +1,172 @@
+.detail {
+  padding: 24px 0 0;
+}
+
+.summary h2 {
+  font-size: 27px;
+  font-weight: 500;
+  margin: 0 0 10px;
+}
+
+.summary p {
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 0;
+  max-width: 72ch;
+}
+
+.summary .eyebrow {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+
+.columns {
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: 32px;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  margin-top: 24px;
+  padding-top: 8px;
+}
+
+.columns h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 20px 0 8px;
+}
+
+.main,
+.reference {
+  min-width: 0;
+}
+
+.codeBlock {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  position: relative;
+}
+
+.codeBlock pre {
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.55;
+  margin: 0;
+  overflow-wrap: anywhere;
+  overflow-x: auto;
+  padding: 12px 14px;
+  white-space: pre-wrap;
+}
+
+.codeBlock:has(.copyButton) pre {
+  padding-right: 96px;
+}
+
+.copyButton {
+  align-items: center;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  color: var(--ink);
+  cursor: pointer;
+  display: flex;
+  font-size: 12px;
+  gap: 6px;
+  padding: 5px 10px;
+  position: absolute;
+  right: 8px;
+  top: 8px;
+}
+
+.copyButton:hover {
+  background: var(--ava-primary-0);
+}
+
+.advice {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: 1fr 1fr;
+  margin: 24px 0 0;
+}
+
+.advice dt {
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.advice dd {
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.exports,
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.links {
+  flex-direction: column;
+}
+
+.exports code {
+  background: var(--accent-soft);
+  border-radius: 4px;
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 3px 7px;
+}
+
+.defaults {
+  margin: 0;
+}
+
+.defaults div {
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(90px, auto) 1fr;
+  padding: 7px 0;
+}
+
+.defaults dt {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.defaults dd {
+  margin: 0;
+}
+
+.defaults code,
+.reference a code {
+  font-family: var(--mono);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.reference a {
+  color: var(--accent);
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 0;
+}
+
+@media (width <= 900px) {
+  .columns,
+  .advice {
+    grid-template-columns: 1fr;
+  }
+}

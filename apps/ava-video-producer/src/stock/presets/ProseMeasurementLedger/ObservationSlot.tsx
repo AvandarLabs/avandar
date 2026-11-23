@@ -1,4 +1,3 @@
-import { stockI18n } from "../../i18n/stockI18n/stockI18n";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { STOCK } from "../../stockPalette";
 import { getObservationSlotFromFrame } from "./getObservationSlotFromFrame";
@@ -39,7 +38,7 @@ export function ObservationSlot({
           <LabelSlots
             labels={[
               [
-                stockI18n._(roleMessages[scene.role]),
+                roleMessages[scene.role].message,
                 scene.x,
                 scene.y - 22,
                 244,

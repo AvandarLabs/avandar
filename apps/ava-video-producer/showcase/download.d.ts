@@ -11,12 +11,12 @@ type DownloadFilmOptions = {
   cameraMotion?: boolean;
   motionBlur?: boolean;
   annotations?: boolean;
-  annotationRoughness?: number;
-  boxRoughness?: number;
   accent?: string;
   background?: string;
   schemaVersion?: 1;
   input?: import("../src/stock/contracts/StockContract.types").StockInputByPreset[import("../src/stock/contracts/StockContract.types").StockPresetId];
+  /** The saved theme to render with and the unsaved edits on top of it. */
+  theme?: { id: string; patch?: Readonly<Record<string, unknown>> };
 };
 
 /** Render the selected film/options and download only its completed output. */

@@ -19,7 +19,7 @@ import { sharedFoundationContract } from "./SharedFoundation/SharedFoundation.co
 import { TradeoffPivot } from "./TradeoffPivot/TradeoffPivot";
 import { tradeoffPivotContract } from "./TradeoffPivot/TradeoffPivot.contract";
 import type { StockContract } from "../contracts/StockContract.types";
-import type { GraphicProps } from "../graphics-common";
+import type { GraphicProps } from "../graphics-common/graphicCommon.types";
 import type { ComponentType } from "react";
 /** Generic renderer inputs and schema-bound fixture transformations. */
 type UpperBoundsOptions<Input extends object> = {

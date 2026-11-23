@@ -3,12 +3,18 @@ import {
   continuityAppearanceSchema,
   type ContinuityAppearance,
 } from "../../continuityAppearance";
+import { getExportOptionsFromAcknowledgement } from "./compositionExportOptions";
 import { getCompositionTransportUpdates } from "./compositionTransport";
 
-/** Synchronize validated options only with the active, same-origin film. */
+/**
+ * Synchronize validated options only with the active, same-origin film. A
+ * scene study's player plays plain storyboard scenes, so it receives no
+ * appearance and exports only its caption choice.
+ */
 export function useCompositionAppearance(
   id: string,
   player: RefObject<HTMLIFrameElement | null>,
+  isScene: boolean,
 ) {
   const [transport, setTransport] = useState(() => {
     try {
@@ -26,7 +32,7 @@ export function useCompositionAppearance(
   const [draft, setDraft] = useState<ContinuityAppearance>(() => {
     try {
       return continuityAppearanceSchema.parse(
-        JSON.parse(localStorage.getItem("composition-appearance") ?? "{}"),
+        JSON.parse(localStorage.getItem("composition-appearance:v2") ?? "{}"),
       );
     } catch {
       return continuityAppearanceSchema.parse({});
@@ -61,21 +67,21 @@ export function useCompositionAppearance(
       const result = continuityAppearanceSchema.safeParse(event.data.options);
       if (result.success) {
         setAcknowledged({ id, options: result.data });
-        if (JSON.stringify(result.data) !== JSON.stringify(draft))
+        if (!isScene && JSON.stringify(result.data) !== JSON.stringify(draft))
           send("appearance", draft);
       }
     };
     window.addEventListener("message", receive);
     return () => window.removeEventListener("message", receive);
-  }, [id, player, draft, transport, send]);
+  }, [id, player, draft, transport, send, isScene]);
   useEffect(() => {
-    send("appearance", draft);
+    if (!isScene) send("appearance", draft);
     try {
-      localStorage.setItem("composition-appearance", JSON.stringify(draft));
+      localStorage.setItem("composition-appearance:v2", JSON.stringify(draft));
     } catch {
       /* Preferences remain usable when storage is unavailable. */
     }
-  }, [draft, send]);
+  }, [draft, send, isScene]);
   useEffect(() => {
     send("speed", transport.speed);
     send("loop", transport.loop);
@@ -85,11 +91,12 @@ export function useCompositionAppearance(
       /* Preferences remain usable when storage is unavailable. */
     }
   }, [transport, send]);
-  const options =
-    acknowledged?.id === id &&
-    JSON.stringify(acknowledged.options) === JSON.stringify(draft)
-      ? acknowledged.options
-      : undefined;
+  const options = getExportOptionsFromAcknowledgement({
+    id,
+    isScene,
+    draft,
+    acknowledged,
+  });
   return {
     draft,
     transport,
@@ -98,6 +105,8 @@ export function useCompositionAppearance(
     send,
     update: (patch: Partial<ContinuityAppearance>) =>
       setDraft((current) => ({ ...current, ...patch })),
-    loaded: () => send("appearance", draft),
+    loaded: () => {
+      if (!isScene) send("appearance", draft);
+    },
   };
 }

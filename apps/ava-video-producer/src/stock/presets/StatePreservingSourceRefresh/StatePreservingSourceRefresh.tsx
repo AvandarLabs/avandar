@@ -1,7 +1,7 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { STOCK } from "../../stockPalette";
 import { RefreshRecord } from "./RefreshRecord";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./StatePreservingSourceRefresh.schema";
 import type { ReactNode } from "react";
 /** Frame-driven authored study props. */

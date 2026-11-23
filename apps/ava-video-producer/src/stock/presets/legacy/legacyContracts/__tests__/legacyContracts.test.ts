@@ -12,7 +12,9 @@ import { LEGACY_IDS } from "../../../../../../tests/fixtures/legacyStockIds";
 import { parseStockInput } from "../../../../contracts/parseStockInput/parseStockInput";
 import { stockContracts } from "../../../../registry/stockContracts";
 import { stockRenderers } from "../../../../registry/stockRenderers/stockRenderers";
-import { StockGraphic } from "../../../../StockGraphic";
+import { StockGraphic } from "../../../../StockGraphic/StockGraphic";
+import { STOCK } from "../../../../stockPalette";
+import { applyApprovedMoves } from "./legacyApprovedMoves";
 
 const BASELINE: {
   records: Array<{
@@ -51,12 +53,18 @@ const _render = ({
 test("original twenty samples preserve every SVG label and geometry at all sixty gates", () => {
   assert.equal(BASELINE.records.length, 60);
   BASELINE.records.forEach(({ preset, frame, svg }) => {
+    // The test passes the mint accent and the ground explicitly so the output matches the recorded markup.
     const actual = renderToStaticMarkup(
-      createElement(StockGraphic, { preset, frame }),
+      createElement(StockGraphic, {
+        preset,
+        frame,
+        accent: STOCK.mint,
+        background: STOCK.ground,
+      }),
     );
     assert.equal(
       _normalizeSvgIds(actual),
-      _normalizeSvgIds(svg),
+      _normalizeSvgIds(applyApprovedMoves(preset, svg)),
       `${preset} frame ${frame}`,
     );
   });

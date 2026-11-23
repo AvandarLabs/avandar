@@ -1,4 +1,3 @@
-import { stockI18n } from "../../i18n/stockI18n/stockI18n";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { inferredLayoutMessage } from "./PdfGridReconstruction.controls";
 import type { Input } from "./PdfGridReconstruction.schema";
@@ -20,7 +19,7 @@ export function GridSceneHeadings({ input }: Readonly<Props>): ReactNode {
       />
       {input.signal === "whitespace" ? (
         <LabelSlots
-          labels={[[stockI18n._(inferredLayoutMessage), 52, 122, 856, 12, 1]]}
+          labels={[[inferredLayoutMessage.message, 52, 122, 856, 12, 1]]}
         />
       ) : undefined}
     </g>

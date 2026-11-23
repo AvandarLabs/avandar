@@ -1,0 +1,18 @@
+.usageFilter {
+  display: grid;
+  gap: 4px;
+}
+
+.usageFilterHint {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.45;
+  margin: 0;
+}
+
+/* On a phone, descriptions are 12px. */
+@media (width <= 760px) {
+  .usageFilterHint {
+    font-size: 12px;
+  }
+}

@@ -1,7 +1,7 @@
 import { ExperimentLabels } from "./ExperimentLabels";
 import { ExperimentTrack } from "./ExperimentTrack";
 import { PredictionParticipant } from "./PredictionParticipant";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./SharedExperimentPredictions.schema";
 import type { ReactNode } from "react";
 /** Inputs for SharedExperimentPredictions. */

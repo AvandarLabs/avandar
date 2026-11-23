@@ -3,7 +3,7 @@ import test from "node:test";
 import { prop } from "@avandar/utils";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { registerStockLocalizationAssertions } from "../../../../tests/helpers/registerStockLocalizationAssertions";
+import { registerStockDefaultTextAssertions } from "../../../../tests/helpers/registerStockDefaultTextAssertions";
 import { PortableWorkTransfer } from "./PortableWorkTransfer";
 import { portableWorkTransferContract } from "./PortableWorkTransfer.contract";
 import {
@@ -128,7 +128,7 @@ const options = {
 } satisfies PresetAssertions<Input>;
 registerStockPresetAssertions(options);
 registerStockTextLayoutAssertions(options);
-registerStockLocalizationAssertions({
+registerStockDefaultTextAssertions({
   contract: options.contract,
   suppliedInputs: FIXTURES.map(prop("input")),
   expectedTextPaths: [

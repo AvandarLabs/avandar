@@ -1,9 +1,10 @@
-import { STOCK, type GraphicProps } from "../../graphics-common";
+import { STOCK } from "../../stockPalette";
 import { DoseToken } from "./DoseToken";
 import { SessionCarrier } from "./SessionCarrier";
 import { SessionHeadings } from "./SessionHeadings";
 import { SessionRecipients } from "./SessionRecipients";
 import { SessionTotals } from "./SessionTotals";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./VaccinationSessionBalance.schema";
 import type { ReactNode } from "react";
 

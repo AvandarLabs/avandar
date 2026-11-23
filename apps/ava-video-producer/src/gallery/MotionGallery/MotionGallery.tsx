@@ -1,9 +1,13 @@
-import { I18nProvider } from "@lingui/react";
-import { Trans, useLingui as useGalleryLingui } from "@lingui/react/macro";
+import { useMemo } from "react";
 import { createRoot } from "react-dom/client";
 import { CompositionGallery } from "../../continuity/gallery/CompositionGallery/CompositionGallery";
 import { STOCK_CATALOG } from "../../stock/catalog";
-import { galleryI18n } from "../i18n";
+import { makeDraftThemeResultFromDraft } from "../../videoThemeEditor/resolveDraftTheme/resolveDraftTheme";
+import {
+  GalleryVideoTheme,
+  useGalleryVideoTheme,
+} from "../GalleryVideoTheme/GalleryVideoTheme";
+import { HelperGallery } from "../HelperGallery/HelperGallery";
 import { AtlasSections, getAtlasSection } from "./AtlasSections";
 import { GalleryHeader } from "./GalleryHeader";
 import { GalleryIntroduction } from "./GalleryIntroduction";
@@ -11,7 +15,6 @@ import { GalleryNavigation } from "./GalleryNavigation";
 import { GalleryToolbar } from "./GalleryToolbar";
 import { Icon } from "./Icon";
 import { MotionCard } from "./MotionCard";
-import { PaletteControls } from "./PaletteControls";
 import { PreviewDialog } from "./PreviewDialog/PreviewDialog";
 import { ReferenceTray } from "./ReferenceTray";
 import { useMotionGalleryState } from "./useMotionGalleryState";
@@ -21,16 +24,40 @@ const PRESET_INDEX: Map<(typeof STOCK_CATALOG)[number]["id"], number> = new Map(
 );
 
 /**
+ * The accent and ground one motion's preview shows: the theme draft, the
+ * motion's saved overrides, and its own draft. With no motion open it
+ * resolves nothing. It returns undefined then, or while the draft does not
+ * resolve, and the caller falls back to the theme-scope colors.
+ */
+function useItemThemeColors(
+  itemId: string | undefined,
+): { accent: string; background: string } | undefined {
+  const { library, themeId, draft } = useGalleryVideoTheme();
+  return useMemo(() => {
+    if (!itemId) {
+      return undefined;
+    }
+    const result = makeDraftThemeResultFromDraft({
+      library,
+      themeId,
+      draft,
+      scope: { kind: "item", itemId },
+    });
+    return result.ok
+      ? {
+          accent: result.theme.semantic.color.accent,
+          background: result.theme.semantic.color.ground,
+        }
+      : undefined;
+  }, [library, themeId, draft, itemId]);
+}
+
+/**
  * Root of the Motion Atlas showcase: browses, previews, and exports stock
  * motion presets.
  */
 function MotionGallery() {
-  const { t } = useGalleryLingui();
   const {
-    accent,
-    background,
-    setAccent,
-    setBackground,
     category,
     selectCategory,
     saved,
@@ -55,11 +82,15 @@ function MotionGallery() {
     updateContent,
     onClose,
   } = useMotionGalleryState();
+  const { galleryTheme } = useGalleryVideoTheme();
+  const accent = galleryTheme.semantic.color.accent;
+  const background = galleryTheme.semantic.color.ground;
+  const selectedColors = useItemThemeColors(selected?.id);
 
   return (
     <>
       <a className="skip-link" href="#library">
-        <Trans>Skip to motion library</Trans>
+        Skip to motion library
       </a>
       <GalleryHeader />
       <AtlasSections section="motions" />
@@ -85,33 +116,21 @@ function MotionGallery() {
             <div className="collection-subline">
               <span>
                 {category === "Saved references"
-                  ? t`Your references, ready for a creative brief.`
-                  : t`Explore a preset. Scrub the motion. Make it yours.`}
+                  ? "Your references, ready for a creative brief."
+                  : "Explore a preset. Scrub the motion. Make it yours."}
               </span>
               <span className="loop-spec">
-                <Trans>6 SEC LOOPS</Trans>
-                <span>
-                  <Trans>·</Trans>
-                </span>
-                <Trans>30 FPS</Trans>
-                <span>
-                  <Trans>·</Trans>
-                </span>
-                <Trans>LIVE PREVIEWS</Trans>
+                6 SEC LOOPS
+                <span>·</span>
+                30 FPS
+                <span>·</span>
+                LIVE PREVIEWS
               </span>
             </div>
-            <PaletteControls
-              accent={accent}
-              background={background}
-              setAccent={setAccent}
-              setBackground={setBackground}
-            />
             {results.length ? (
               <div className="motion-grid">
                 {results.map((preset) => (
                   <MotionCard
-                    accent={accent}
-                    background={background}
                     key={preset.id}
                     preset={preset}
                     index={PRESET_INDEX.get(preset.id) ?? 0}
@@ -135,32 +154,28 @@ function MotionGallery() {
                 />
                 <h3>
                   {category === "Saved references" && !query
-                    ? t`Keep a little inspiration.`
-                    : t`No matching motions.`}
+                    ? "Keep a little inspiration."
+                    : "No matching motions."}
                 </h3>
                 <p>
                   {category === "Saved references" && !query
-                    ? t`Use the bookmark on any preset to add it to your references.`
-                    : t`Try a different keyword, or explore the full collection.`}
+                    ? "Use the bookmark on any preset to add it to your references."
+                    : "Try a different keyword, or explore the full collection."}
                 </p>
                 <button
                   className="button"
                   onClick={() => selectCategory("All motions")}
                 >
-                  <Trans>Explore all motions</Trans>
+                  Explore all motions
                   <Icon name="arrow" size={16} />
                 </button>
               </div>
             )}
           </section>
           <footer className="library-footer">
-            <p>
-              <Trans>A visual vocabulary for your next explanation.</Trans>
-            </p>
+            <p>A visual vocabulary for your next explanation.</p>
             <span>
-              <Trans>
-                CONCEPTUAL STUDIES / {STOCK_CATALOG.length} PRESETS / VOL. 01
-              </Trans>
+              CONCEPTUAL STUDIES / {STOCK_CATALOG.length} PRESETS / VOL. 01
             </span>
           </footer>
         </main>
@@ -189,10 +204,8 @@ function MotionGallery() {
       </div>
       {selected ? (
         <PreviewDialog
-          accent={accent}
-          background={background}
-          setAccent={setAccent}
-          setBackground={setBackground}
+          accent={selectedColors?.accent ?? accent}
+          background={selectedColors?.background ?? background}
           preset={selected}
           onPrevious={previousPreset ? () => onOpen(previousPreset) : undefined}
           onNext={nextPreset ? () => onOpen(nextPreset) : undefined}
@@ -209,15 +222,24 @@ function MotionGallery() {
     </>
   );
 }
-const root: HTMLElement | null = document.getElementById("motion-root");
-if (root) {
-  createRoot(root).render(
-    <I18nProvider i18n={galleryI18n}>
-      {getAtlasSection() === "motions" ? (
+/** The gallery for the section the URL names; themed sections share one draft. */
+function AtlasSectionRoot() {
+  const section = getAtlasSection();
+  if (section === "helpers") {
+    return <HelperGallery />;
+  }
+  return (
+    <GalleryVideoTheme>
+      {section === "motions" ? (
         <MotionGallery />
       ) : (
-        <CompositionGallery />
+        <CompositionGallery section={section} />
       )}
-    </I18nProvider>,
+    </GalleryVideoTheme>
   );
+}
+
+const root: HTMLElement | null = document.getElementById("motion-root");
+if (root) {
+  createRoot(root).render(<AtlasSectionRoot />);
 }

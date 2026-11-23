@@ -1,0 +1,19 @@
+.compositeField {
+  align-items: start;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 88px minmax(0, 1fr);
+}
+
+.compositeFieldName {
+  color: var(--muted);
+  font-size: 11px;
+  padding-top: 6px;
+}
+
+/* On a phone, descriptions are 12px. */
+@media (width <= 760px) {
+  .compositeFieldName {
+    font-size: 12px;
+  }
+}

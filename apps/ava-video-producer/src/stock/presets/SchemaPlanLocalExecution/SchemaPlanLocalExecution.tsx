@@ -3,7 +3,7 @@ import { ExecutionCaptions } from "./ExecutionCaptions";
 import { LocalQueryResult } from "./LocalQueryResult";
 import { LocalRows } from "./LocalRows";
 import { PlannerExchange } from "./PlannerExchange";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./SchemaPlanLocalExecution.schema";
 import type { ReactNode } from "react";
 /** Inputs for SchemaPlanLocalExecution. */

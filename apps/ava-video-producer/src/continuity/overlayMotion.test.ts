@@ -110,3 +110,18 @@ test("slower overlay travel reaches the target later and keeps its end cue", () 
   assert.equal(getOverlayPose(92, cue, source).x, 400);
   assert.equal(getOverlayPose(300, cue, source).opacity, 0);
 });
+
+test("a longer themed draw-in slows an annotation's arrival", () => {
+  const cue = { at: 0, until: 200 };
+  assert.ok(
+    getAnnotationProgress(9, cue, 36) < getAnnotationProgress(9, cue, 18),
+  );
+});
+
+test("a connector's themed timing sets its draw-in", () => {
+  const linear = (progress: number) => progress;
+  assert.equal(
+    getConnectorProgress(10, "signal", 0, { duration: 20, easing: linear }),
+    0.5,
+  );
+});

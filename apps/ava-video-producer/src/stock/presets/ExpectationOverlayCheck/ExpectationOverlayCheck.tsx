@@ -1,6 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { ExpectationStation } from "./ExpectationStation";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ExpectationOverlayCheck.schema";
 import type { ReactNode } from "react";
 /** Frame-driven expected/observed string comparison. */

@@ -1,10 +1,11 @@
-import { STOCK, type GraphicProps } from "../../graphics-common";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
+import { STOCK } from "../../stockPalette";
 import { ConsentDesk } from "./ConsentDesk";
 import { ConsentSlips } from "./ConsentSlips";
 import { PreparedContacts } from "./PreparedContacts";
 import { SharingHistory } from "./SharingHistory";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ReferralConsentWithdrawal.schema";
 import type { ReactNode } from "react";
 

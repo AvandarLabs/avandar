@@ -1,4 +1,4 @@
-import { Text } from "../../graphics-common";
+import { Text } from "../../graphics-common/Text";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { STOCK } from "../../stockPalette";
 import { DisclosedMarker } from "./DisclosedMarker";

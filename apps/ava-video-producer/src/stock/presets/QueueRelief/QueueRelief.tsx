@@ -1,7 +1,7 @@
 import { ramp } from "../../../motion";
 import { QueueItem } from "./QueueItem";
 import { QueueStructure } from "./QueueStructure";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./QueueRelief.schema";
 import type { ReactNode } from "react";
 /** Frame, theme and complete validated authored input. */

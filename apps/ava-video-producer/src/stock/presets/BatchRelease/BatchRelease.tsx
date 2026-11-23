@@ -1,7 +1,7 @@
 import { ramp } from "../../../motion";
 import { BatchEnvelope } from "./BatchEnvelope";
 import { BatchHeadings } from "./BatchHeadings";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./BatchRelease.schema";
 import type { ReactNode } from "react";
 
