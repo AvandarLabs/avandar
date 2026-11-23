@@ -1,0 +1,55 @@
+.table {
+  border-collapse: collapse;
+  font-size: var(--mantine-font-size-xs);
+  line-height: 1.45;
+  width: 100%;
+}
+
+/* Names the table for assistive technology. The rail's label names it on screen. */
+.caption {
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+.periodHeading,
+.valueHeading {
+  border-bottom: 1px solid var(--ava-border-default);
+  color: var(--mantine-color-neutral-6);
+  font-weight: 500;
+  padding-block-end: 2px;
+}
+
+.periodHeading,
+.period {
+  padding-inline-end: var(--mantine-spacing-xs);
+  text-align: start;
+}
+
+.valueHeading,
+.value {
+  text-align: end;
+}
+
+.period,
+.value {
+  padding-block: 2px;
+}
+
+.period {
+  color: var(--mantine-color-neutral-7);
+  font-weight: 400;
+}
+
+.value {
+  color: var(--mantine-color-neutral-9);
+  font-variant-numeric: tabular-nums;
+}
+
+.toggle {
+  margin-top: var(--mantine-spacing-xxs);
+  padding-inline: 0;
+}

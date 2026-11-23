@@ -48,6 +48,10 @@ export type RelationCacheEntryFields = {
   definitionToken: string;
   /** Sorted, deduplicated column names, or `"all"`. */
   columns: readonly string[] | "all";
-  /** When set, the entry is never served. */
+  /**
+   * Epoch ms from which the entry is no longer served, so a live source is
+   * acquired again; `undefined` for an entry that never goes stale, such as
+   * an uploaded file's rows.
+   */
   staleAt: number | undefined;
 };

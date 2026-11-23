@@ -1,0 +1,3 @@
+.atlasDialogPreviewDialog {
+  composes: preview-dialog from global;
+}

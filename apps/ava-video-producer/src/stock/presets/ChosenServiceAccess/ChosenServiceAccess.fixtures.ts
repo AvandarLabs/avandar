@@ -118,10 +118,12 @@ export const invalidInputs: unknown[] = [
   { ...DEFAULT_INPUT, accessChange: "automatic" },
   {
     ...DEFAULT_INPUT,
-    services: DEFAULT_INPUT.services.map((service) => ({
-      ...service,
-      symbol: "medical",
-    })),
+    services: DEFAULT_INPUT.services.map((service) => {
+      return {
+        ...service,
+        symbol: "medical",
+      };
+    }),
   },
   {
     ...DEFAULT_INPUT,

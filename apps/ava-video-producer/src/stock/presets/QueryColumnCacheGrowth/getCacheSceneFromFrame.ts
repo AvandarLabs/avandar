@@ -1,15 +1,26 @@
-import { EASE, ramp } from "../../../motion";
+import { Motion } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./QueryColumnCacheGrowth.schema";
+
+const GROWTH_CUE = 106;
+const GROWTH_FRAMES = 33;
 /** Data for getCacheSceneFromFrame. */
 type GetCacheSceneFromFrameResult = {
   missingIds: string[];
-  union: Array<{ id: string; label: string; cells: string[] }>;
-  original: Array<{ id: string; label: string; cells: string[] }>;
+  union: Array<{
+    id: string;
+    label: string;
+    cells: string[];
+  }>;
+  original: Array<{
+    id: string;
+    label: string;
+    cells: string[];
+  }>;
   growth: number;
   width: number;
   rowCount: number;
 };
-
 /**
  * Existing column positions and row occurrences survive a single exact
  * column-set union.
@@ -17,16 +28,37 @@ type GetCacheSceneFromFrameResult = {
 export function getCacheSceneFromFrame({
   frame,
   input,
-}: Readonly<{ frame: number; input: Input }>): GetCacheSceneFromFrameResult {
-  const missingIds = input.requests[1].columnIds.filter(
-    (id) => !input.cachedColumnIds.includes(id),
-  );
-  const original = input.columns.filter(({ id }) =>
-    input.cachedColumnIds.includes(id),
-  );
-  const additions = input.columns.filter(({ id }) => missingIds.includes(id));
+  motion,
+}: Readonly<{
+  frame: number;
+  input: Input;
+  motion: Pick<VideoMotion, "scale" | "travel">;
+}>): GetCacheSceneFromFrameResult {
+  const missingIds = input.requests[1].columnIds.filter((id) => {
+    // Both source and subset contain at most five IDs. Measured Set
+    // construction costs more than these bounded scans.
+    // react-doctor-disable-next-line js-set-map-lookups
+    return !input.cachedColumnIds.includes(id);
+  });
+  const original = input.columns.filter(({ id }) => {
+    // Both source and subset contain at most five IDs. Measured Set
+    // construction costs more than these bounded scans.
+    // react-doctor-disable-next-line js-set-map-lookups
+    return input.cachedColumnIds.includes(id);
+  });
+  const additions = input.columns.filter(({ id }) => {
+    // Both source and subset contain at most five IDs. Measured Set
+    // construction costs more than these bounded scans.
+    // react-doctor-disable-next-line js-set-map-lookups
+    return missingIds.includes(id);
+  });
   const union = [...original, ...additions];
-  const growth = ramp(frame, 106, 33, EASE.inOut);
+  const growth = Motion.ramp({
+    frame,
+    at: GROWTH_CUE,
+    dur: motion.scale(GROWTH_FRAMES),
+    easing: motion.travel.easing,
+  });
   return {
     missingIds,
     union,

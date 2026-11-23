@@ -1,0 +1,13 @@
+.eraseScheduleDemoCards {
+  display: flex;
+  gap: var(--demo-space-sm);
+  justify-content: center;
+}
+
+.eraseScheduleDemoList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--demo-space-10);
+  margin: 0 auto;
+  width: 420px;
+}

@@ -1,0 +1,42 @@
+.dataCatalogMetadataChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mantine-spacing-xxs);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/*
+ * A chip is a fill small enough for the pane's ground to swallow, so it takes
+ * the small-fill step, and neutral rather than blue: it narrows the view, it
+ * is not an intent on the listing.
+ */
+.dataCatalogMetadataChip {
+  background-color: var(--mantine-color-neutral-1);
+  border-radius: var(--mantine-radius-sm);
+  color: var(--mantine-color-neutral-9);
+  font-size: var(--mantine-font-size-xs);
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+  padding: 2px var(--mantine-spacing-xs);
+  transition: var(--ava-transition-interactive);
+}
+
+.dataCatalogMetadataChip:hover {
+  background-color: var(--mantine-color-neutral-2);
+}
+
+.dataCatalogMetadataChipsMore {
+  border-radius: var(--mantine-radius-sm);
+  color: var(--mantine-color-neutral-7);
+  font-size: var(--mantine-font-size-xs);
+  font-weight: 500;
+  line-height: 1.4;
+  padding: 2px var(--mantine-spacing-xxs);
+  transition: var(--ava-transition-interactive);
+}
+
+.dataCatalogMetadataChipsMore:hover {
+  color: var(--mantine-color-neutral-9);
+}

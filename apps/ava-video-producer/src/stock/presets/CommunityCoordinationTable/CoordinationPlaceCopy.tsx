@@ -1,5 +1,9 @@
-import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { CoordinationPlaceCopyPlaceKey } from "./CoordinationPlaceCopyPlaceKey/CoordinationPlaceCopyPlaceKey";
+import { CoordinationPlaceCopyRequestCard } from "./CoordinationPlaceCopyRequestCard/CoordinationPlaceCopyRequestCard";
+import { CoordinationPlaceName } from "./CoordinationPlaceName/CoordinationPlaceName";
+import { CoordinationRequestLabel } from "./CoordinationRequestLabel/CoordinationRequestLabel";
 import { getCoordinationPlaceColorFromIndex } from "./getCoordinationPlaceColorFromIndex";
 import type { Input } from "./CommunityCoordinationTable.schema";
 import type { ReactNode } from "react";
@@ -17,52 +21,29 @@ export function CoordinationPlaceCopy({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const color = getCoordinationPlaceColorFromIndex({ index, accent });
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const color = getCoordinationPlaceColorFromIndex({
+    index,
+    accent,
+    color: tokens.color,
+  });
   const y = 120 + 108 * index;
   return (
     <g data-request={place.id} data-request-face={frame >= 108 ? "up" : "edge"}>
-      <circle cx={25} cy={y - 4} r={9} fill={STOCK.surface} stroke={color} />
-      <text
-        data-place-key={place.id}
-        x={25}
-        y={y}
-        textAnchor="middle"
-        fontSize={12}
-        fill={color}
-      >
-        {String.fromCharCode(65 + index)}
-      </text>
-      <FitText
-        text={place.label}
-        x={40}
-        y={y}
-        width={280}
-        fontSize={12}
-        maxLines={3}
-        breakLongWords
-        normalizeWhitespace
-      />
-      <rect
-        data-request-card={place.id}
-        x={36}
-        y={158 + 108 * index}
-        width={284}
-        height={54}
-        rx={4}
-        fill="none"
+      <SketchedShape
+        shape={{ kind: "circle", cx: 25, cy: y - 4, r: 9 }}
+        profile={tokens.sketch.shape}
+        fill={tokens.color.surface}
         stroke={color}
-        strokeOpacity={frame >= 108 ? 0.8 : 0.3}
       />
-      <FitText
-        text={place.requestLabel}
-        x={40}
-        y={174 + 108 * index}
-        width={280}
-        fontSize={12}
-        maxLines={3}
-        breakLongWords
-        normalizeWhitespace
+      <CoordinationPlaceCopyPlaceKey {...{ place, y, tokens, color, index }} />
+      <CoordinationPlaceName place={place} y={y} />
+      <CoordinationPlaceCopyRequestCard
+        {...{ place, index, scales, tokens, color, frame, atomic }}
       />
+      <CoordinationRequestLabel place={place} index={index} />
     </g>
   );
 }

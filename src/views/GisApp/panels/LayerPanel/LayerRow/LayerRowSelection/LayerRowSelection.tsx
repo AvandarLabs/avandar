@@ -59,7 +59,10 @@ export function LayerRowSelection({
       <span className={css.layerRowSelectionText}>
         <span className={css.layerRowSelectionName}>{layer.name}</span>
         <span className={css.layerRowSelectionMeta}>
-          <LayerStatusBadge viewState={viewState} />
+          <LayerStatusBadge
+            viewState={viewState}
+            geoBinding={layer.geoBinding}
+          />
         </span>
       </span>
     </button>

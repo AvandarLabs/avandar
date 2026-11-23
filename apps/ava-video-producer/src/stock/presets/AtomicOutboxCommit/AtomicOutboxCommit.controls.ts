@@ -10,8 +10,8 @@ export const PENDING_DELIVERY_MESSAGE: { id: string; message: string } = {
 export const controls: StockControl[] = makeStockControlsFromSchema({
   schema: jsonSchema,
   messageNamespace: "motionAtlas.atomic-outbox-commit",
-}).map((control) =>
-  control.path === "outcome"
+}).map((control) => {
+  return control.path === "outcome"
     ? { ...control, help: PENDING_DELIVERY_MESSAGE }
-    : control,
-);
+    : control;
+});

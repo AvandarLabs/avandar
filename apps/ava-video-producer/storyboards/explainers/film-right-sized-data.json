@@ -26,7 +26,6 @@
         "title": "The right scale changes the design",
         "category": "motion-motion",
         "evidence": "Architectural illustration \u00b7 Fictional demonstration data",
-        "accent": "#9fefca",
         "beats": [
           {
             "id": "scale",
@@ -145,17 +144,17 @@
                   "lanes": [
                     {
                       "label": "ROWS",
-                      "color": "#82c8f2",
+                      "color": "$color.accentAlt",
                       "offset": 0
                     },
                     {
                       "label": "COLUMNS",
-                      "color": "#9fefca",
+                      "color": "$color.accent",
                       "offset": 28
                     },
                     {
                       "label": "RESULT",
-                      "color": "#f0ba83",
+                      "color": "$color.highlight",
                       "offset": 59
                     }
                   ],

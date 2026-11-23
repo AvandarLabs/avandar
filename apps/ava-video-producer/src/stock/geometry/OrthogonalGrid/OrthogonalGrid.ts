@@ -58,15 +58,14 @@ function _buildExposedCellEdges({
     `M${x} ${y + cellHeight}h${cellWidth}`,
     `M${x} ${y}v${cellHeight}`,
   ];
-  return paths.filter(
-    (_, index) =>
-      !occupied.has(
-        _buildCellKey({
-          column: cell.column + NEIGHBORS[index][0],
-          row: cell.row + NEIGHBORS[index][1],
-        }),
-      ),
-  );
+  return paths.filter((_, index) => {
+    return !occupied.has(
+      _buildCellKey({
+        column: cell.column + NEIGHBORS[index][0],
+        row: cell.row + NEIGHBORS[index][1],
+      }),
+    );
+  });
 }
 /**
  * Build exposed SVG edges, including holes, without filling absent cells.
@@ -78,7 +77,9 @@ function _getOrthogonalGridOutlineFromCells(
 ): string {
   const occupied = new Set(options.cells.map(_buildCellKey));
   return options.cells
-    .flatMap((cell) => _buildExposedCellEdges({ cell, occupied, options }))
+    .flatMap((cell) => {
+      return _buildExposedCellEdges({ cell, occupied, options });
+    })
     .join(" ");
 }
 

@@ -328,7 +328,7 @@ export function MiniServer<API extends GenericRouteAPIRecord>(
                   pattern: `/${functionName}${h.state.path}`,
                   url: r.url,
 
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  // oxlint-disable-next-line typescript/no-explicit-any
                   paramSchema: h.state.pathParamsSchema as any,
                 });
 

@@ -24,11 +24,11 @@ function _getGlobePathFromGeometry({
         );
       }
     },
-    lineStart() {},
-    lineEnd() {},
-    polygonStart() {},
-    polygonEnd() {},
-    sphere() {},
+    lineStart: () => {},
+    lineEnd: () => {},
+    polygonStart: () => {},
+    polygonEnd: () => {},
+    sphere: () => {},
   });
   const projection = geoOrthographic()
     .rotate([-view.centerLongitude, -view.centerLatitude, 0])

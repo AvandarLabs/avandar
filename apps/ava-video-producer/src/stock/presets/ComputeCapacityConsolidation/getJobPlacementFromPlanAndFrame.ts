@@ -1,5 +1,6 @@
 import { propEq } from "@avandar/utils";
-import { mix, ramp, EASE } from "../../../motion";
+import { Motion } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { JobRectangle } from "./findJobRoute";
 import type { JobTransferPlan, JobTransfer } from "./makeJobTransfersFromInput";
 
@@ -27,8 +28,16 @@ function _getTravelPoint({
   const point = transfer.points[segmentIndex + 1];
   const length = Math.abs(point.x - prior.x) + Math.abs(point.y - prior.y);
   return {
-    x: mix(length ? remaining / length : 1, prior.x, point.x),
-    y: mix(length ? remaining / length : 1, prior.y, point.y),
+    x: Motion.mix({
+      t: length ? remaining / length : 1,
+      from: prior.x,
+      to: point.x,
+    }),
+    y: Motion.mix({
+      t: length ? remaining / length : 1,
+      from: prior.y,
+      to: point.y,
+    }),
   };
 }
 /** Intact blocks move one at a time along full-rectangle clearance routes. */
@@ -36,9 +45,19 @@ export function getJobPlacementFromPlanAndFrame({
   plan,
   index,
   frame,
-}: Readonly<{ plan: JobTransferPlan; index: number; frame: number }>):
+  motion,
+}: Readonly<{
+  plan: JobTransferPlan;
+  index: number;
+  frame: number;
+  motion: VideoMotion;
+}>):
   | JobRectangle
-  | { height: number; x: number; y: number } {
+  | {
+      height: number;
+      x: number;
+      y: number;
+    } {
   const slot = plan.slots[index];
   if (!slot.isMoving) {
     return slot.initial;
@@ -46,15 +65,19 @@ export function getJobPlacementFromPlanAndFrame({
   if (frame <= 48) {
     return {
       ...slot.initial,
-      y: slot.initial.y - 160 * ramp(frame, 36, 12, EASE.inOut),
+      y:
+        slot.initial.y -
+        160 * motion.ramp(frame, 36, motion.scale(12), motion.travel.easing),
     };
   }
   const order = plan.transfers.findIndex(propEq("index", index));
-  const preceding = plan.transfers
-    .slice(0, order)
-    .reduce((sum, transfer) => sum + transfer.length, 0);
+  const preceding = plan.transfers.slice(0, order).reduce((sum, transfer) => {
+    return sum + transfer.length;
+  }, 0);
   const distance =
-    plan.totalLength * ramp(frame, 48, 60, EASE.inOut) - preceding;
+    plan.totalLength *
+      motion.ramp(frame, 48, motion.scale(60), motion.travel.easing) -
+    preceding;
   return {
     ..._getTravelPoint({ transfer: plan.transfers[order], distance }),
     height: slot.initial.height,

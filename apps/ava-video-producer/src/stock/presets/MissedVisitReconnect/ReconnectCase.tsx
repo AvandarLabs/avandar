@@ -1,7 +1,7 @@
-import { ramp } from "../../../motion";
-import { BookingTab } from "./BookingTab";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CaseHome } from "./CaseHome";
 import { ContactAttempt } from "./ContactAttempt";
+import { ReconnectBookingOutcome } from "./ReconnectBookingOutcome/ReconnectBookingOutcome";
 import { ReconnectOutcomeMark } from "./ReconnectOutcomeMark";
 import { ReturningPerson } from "./ReturningPerson";
 import type { Input } from "./MissedVisitReconnect.schema";
@@ -20,43 +20,22 @@ export function ReconnectCase({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const y = 160 + index * 48;
   return (
     <g
       data-case={item.id}
       data-outcome={item.outcome}
-      opacity={ramp(frame, 12 + index * 2, 12)}
+      opacity={motion.reveal(frame, 12 + index * motion.stagger.list)}
     >
       <CaseHome item={item} y={y} />
-      <ReturningPerson
-        item={item}
-        index={index}
-        y={y}
-        frame={frame}
-        accent={accent}
-      />
-      <ContactAttempt
-        item={item}
-        index={index}
-        y={y}
-        frame={frame}
-        accent={accent}
-      />
-      {item.outcome === "booked" ? (
-        <BookingTab
-          item={item}
-          index={index}
-          y={y}
-          frame={frame}
-          accent={accent}
-        />
-      ) : undefined}
+      <ReturningPerson {...{ item, index, y, frame, accent }} />
+      <ContactAttempt {...{ item, index, y, frame, accent }} />
+      <ReconnectBookingOutcome {...{ item, index, y, frame, accent }} />
       <ReconnectOutcomeMark
         outcome={item.outcome}
         x={395}
-        y={y}
-        frame={frame}
-        accent={accent}
+        {...{ y, frame, accent }}
       />
     </g>
   );

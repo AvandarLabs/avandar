@@ -31,7 +31,7 @@ import type {
 } from "@sbfn/_shared/MiniServer/parseURLPathParams.ts";
 import type { z } from "npm:zod@4";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// oxlint-disable-next-line typescript/no-explicit-any
 export type AnyZodType = ZodType<any, any>;
 
 export function actionNotImplemented<
@@ -151,7 +151,7 @@ export function createServerRouteHandler<
       return createServerRouteHandler({
         ...state,
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // oxlint-disable-next-line typescript/no-explicit-any
         querySchema: object(newQueryParamsSchemaShape) as any,
 
         // if the query schema is changed AFTER we had already set the action,
@@ -239,7 +239,7 @@ export function createDefaultRouteHandler<
       ? zUndefined()
       : record(string(), zNever())) as unknown as ZodType<
       Method extends "GET" ? undefined : Record<string, never>,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // oxlint-disable-next-line typescript/no-explicit-any
       any
     >,
     action: actionNotImplemented as HTTPMethodActionFn<

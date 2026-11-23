@@ -5,11 +5,13 @@ import { match } from "ts-pattern";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { attachAnnotateGestures } from "@/views/GisApp/MapCanvas/useMapToolGestures/attachAnnotateGestures";
 import { attachEraseGestures } from "@/views/GisApp/MapCanvas/useMapToolGestures/attachEraseGestures";
+import { attachPlaceGestures } from "@/views/GisApp/MapCanvas/useMapToolGestures/attachPlaceGestures/attachPlaceGestures";
 import {
   attachAoiGestures,
   attachMeasureGestures,
 } from "@/views/GisApp/MapCanvas/useMapToolGestures/attachRingGestures";
 import { useMapPanPolicy } from "@/views/GisApp/MapCanvas/useMapToolGestures/useMapPanPolicy";
+import type { PlaceCoordinate } from "@/clients/places/places.types";
 import type {
   AoiGestureCallbacks,
   MeasureGestureCallbacks,
@@ -28,6 +30,8 @@ type Options = {
   onEditingTextFeatureIdChange?: (
     featureId: AvaMapConfig.AnnotationFeatureId | undefined,
   ) => void;
+  /** Receives the point the place tool's click picked. */
+  onPlacePicked?: (coordinate: PlaceCoordinate) => void;
 };
 
 type AnnotateIdSetter = Dispatch<
@@ -46,6 +50,7 @@ function _attachGesturesForMode(
     ) => void;
     textPlaceholder: string;
   },
+  onPlacePicked: (coordinate: PlaceCoordinate) => void,
 ): (() => void) | undefined {
   return match(mapToolMode)
     .with({ type: "aoi" }, () => {
@@ -68,6 +73,12 @@ function _attachGesturesForMode(
     })
     .with({ type: "goto" }, () => {
       return undefined;
+    })
+    .with({ type: "place" }, () => {
+      return attachPlaceGestures(map, {
+        onPlacePicked,
+        onMapToolModeChange: aoiCallbacks.onMapToolModeChange,
+      });
     })
     .with({ type: "erase" }, () => {
       return attachEraseGestures(map, {
@@ -117,6 +128,7 @@ type RegisterToolGesturesOptions = {
   onEditingTextFeatureIdChange: (
     featureId: AvaMapConfig.AnnotationFeatureId | undefined,
   ) => void;
+  onPlacePicked: (coordinate: PlaceCoordinate) => void;
 };
 
 function useRegisterToolGestures(options: RegisterToolGesturesOptions): void {
@@ -132,6 +144,7 @@ function useRegisterToolGestures(options: RegisterToolGesturesOptions): void {
     verticesRef,
     textPlaceholder,
     onEditingTextFeatureIdChange,
+    onPlacePicked,
   } = options;
   useEffect(
     function registerToolGestures() {
@@ -156,6 +169,7 @@ function useRegisterToolGestures(options: RegisterToolGesturesOptions): void {
           onEditingTextFeatureIdChange,
           textPlaceholder,
         },
+        onPlacePicked,
       );
     },
     [
@@ -164,6 +178,7 @@ function useRegisterToolGestures(options: RegisterToolGesturesOptions): void {
       mapToolMode,
       onEditingTextFeatureIdChange,
       onMapToolModeChange,
+      onPlacePicked,
       setInvalidRingStatus,
       setLastCreatedAnnotationId,
       setVertices,
@@ -218,6 +233,7 @@ export function useMapToolGestures({
   onMapToolModeChange,
   updateConfig,
   onEditingTextFeatureIdChange = noop,
+  onPlacePicked = noop,
 }: Options): GestureResult {
   const { t } = useLingui();
   const [vertices, setVertices] = useState<Vertex[]>([]);
@@ -252,6 +268,7 @@ export function useMapToolGestures({
     verticesRef,
     textPlaceholder,
     onEditingTextFeatureIdChange,
+    onPlacePicked,
   });
   return {
     inProgressVertices: _inProgressVerticesForMode(mapToolMode, vertices),

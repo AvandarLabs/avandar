@@ -11,5 +11,8 @@ export const isSingleValueOperator = (
     .with("in", () => {
       return false;
     })
+    .with("is", () => {
+      return false;
+    })
     .exhaustive();
 };

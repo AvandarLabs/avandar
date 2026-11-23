@@ -1,33 +1,169 @@
 import { corsHeaders } from "@sbfn/_shared/cors.ts";
-import { defineRoutes, GET } from "@sbfn/_shared/MiniServer/MiniServer.ts";
-import { statusFromOpenDataFailure } from "@sbfn/open-data/statusFromOpenDataFailure/statusFromOpenDataFailure.ts";
-import { string } from "zod";
-import { OpenDataCatalogEntryParsers } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntryParsers.ts";
-import { acquireOpenDataResource } from "$/open-data/acquireOpenDataResource.ts";
-import { createOpenDataHttp } from "$/open-data/createOpenDataHttp.ts";
-import { OpenDataAcquisitionFailed } from "$/open-data/openDataErrors.ts";
+import {
+  defineRoutes,
+  GET,
+  POST,
+} from "@sbfn/_shared/MiniServer/MiniServer.ts";
+import { SupabaseAdmin } from "@sbfn/_shared/supabase.ts";
+import {
+  CompleteSampleBodySchema,
+  markColumnTypeSampleUnparseable,
+  markListingInvalid,
+  readVouchedCompleteSample,
+  respondWithColumnTypeSample,
+  UnparseableSampleBodySchema,
+  VerifiedColumnTypesBodySchema,
+  writeVerifiedColumnTypes,
+} from "@sbfn/open-data/columnTypeVerification/columnTypeVerification.ts";
+import {
+  parquetCacheAnswerToStatus,
+  requestParquetCache,
+} from "@sbfn/open-data/requestParquetCache/requestParquetCache.ts";
+import { respondWithSampleFailure } from "@sbfn/open-data/respondWithSampleFailure/respondWithSampleFailure.ts";
+import {
+  readPipelineServerTarget,
+  startParquetCopyBuild,
+} from "@sbfn/open-data/startParquetCopyBuild/startParquetCopyBuild.ts";
+import { object, string } from "zod";
+import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
+import { readOpenDataFreshnessToken } from "$/connectors/open-data/readOpenDataFreshnessToken/readOpenDataFreshnessToken.ts";
+import { DataCatalogListingParsers } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListingParsers.ts";
+import { HttpClientFactory } from "$/utils/HttpClientFactory/HttpClientFactory.ts";
+import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.ts";
 import type { OpenDataAPI } from "@sbfn/open-data/OpenDataRoutes.types.ts";
+import type { ParquetCacheDependencies } from "@sbfn/open-data/requestParquetCache/requestParquetCache.ts";
+import type { SupabaseClient } from "@supabase/supabase-js";
+
+/** The largest metadata response the freshness check reads. */
+const MAX_FRESHNESS_RESPONSE_BYTES = 10 * 1024 * 1024;
 
 /**
- * The largest resource this route will relay. Kept well under the response size
- * a Supabase edge function can return, and deliberately smaller than the
- * largest resources HDX hosts, so an oversized dataset is refused with a clear
- * reason rather than by the runtime killing the invocation.
+ * How long a build may run before a request treats it as lost and claims
+ * the listing again. Builds of the largest sources take longer, so this is a
+ * floor for retrying, not a limit on a build.
  */
-const MAX_RESOURCE_BYTES = 25 * 1024 * 1024;
+const LOST_BUILD_AFTER = "30 minutes";
 
 /**
- * Headers the browser is allowed to read off the response. Without this the
- * fetch succeeds and both custom headers are invisible, because a cross-origin
- * response exposes only the CORS-safelisted set.
+ * Records a freshness token the `parquet-cache` route just read from a
+ * listing's source, so its requests in the next few minutes reuse it. Written
+ * with the admin client, since only the service role may record a check.
  */
-const EXPOSED_HEADERS = "X-Ava-Content-Kind, X-Ava-Source-Version";
+async function _recordFreshnessCheck(
+  catalogListingId: string,
+  sourceVersion: string,
+): Promise<void> {
+  const { error } = await SupabaseAdmin.rpc(
+    "rpc_data_catalog_listings__record_freshness_check",
+    {
+      p_catalog_listing_id: catalogListingId,
+      p_source_version: sourceVersion,
+    },
+  );
+  if (error) {
+    throw error;
+  }
+}
 
-function _responseFromFailure(error: OpenDataAcquisitionFailed): Response {
-  return new Response(JSON.stringify({ error: { code: error.failure.code } }), {
-    status: statusFromOpenDataFailure(error.failure.code),
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
+/**
+ * Wires a copy request to its listing's freshness check, the build claim,
+ * and the pipeline server. Claims and failures are written with the admin
+ * client, after the caller's own read showed they may see the listing. A
+ * build started with a complete sample copies the sample instead of the
+ * source.
+ */
+function _createParquetCacheDependencies(
+  entry: Readonly<DataCatalogListing.T>,
+  completeSampleCsv: string | undefined,
+): ParquetCacheDependencies {
+  const target = readPipelineServerTarget((name) => {
+    return Deno.env.get(name);
   });
+  const http = HttpClientFactory.create("OpenDataRouteHttpClient", {
+    state: { maxResponseBytes: MAX_FRESHNESS_RESPONSE_BYTES },
+  });
+  return {
+    canStartBuilds: target !== undefined,
+    readFreshnessToken: () => {
+      return readOpenDataFreshnessToken({ entry, http });
+    },
+    claimBuild: async () => {
+      const { data, error } = await SupabaseAdmin.rpc(
+        "rpc_data_catalog_listings__request_parquet_cache",
+        {
+          p_catalog_listing_id: entry.id,
+          p_lost_build_after: LOST_BUILD_AFTER,
+        },
+      );
+      if (error) {
+        throw error;
+      }
+      return data ?? undefined;
+    },
+    startBuild: async (buildId) => {
+      if (target === undefined) {
+        throw new Error("No pipeline server is configured.");
+      }
+      await startParquetCopyBuild({
+        target,
+        catalogListingId: entry.id,
+        buildId,
+        completeSampleCsv,
+      });
+    },
+    recordStartFailure: async (buildId, failureCode) => {
+      const { error } = await SupabaseAdmin.rpc(
+        "rpc_data_catalog_listings__fail_parquet_cache",
+        {
+          p_catalog_listing_id: entry.id,
+          p_build_id: buildId,
+          p_failure_code: failureCode,
+        },
+      );
+      if (error) {
+        throw error;
+      }
+    },
+    recordFreshnessCheck: (sourceVersion) => {
+      return _recordFreshnessCheck(entry.id, sourceVersion);
+    },
+    now: () => {
+      return new Date();
+    },
+  };
+}
+
+/**
+ * Reads one catalog listing as the caller, so RLS decides whether they may
+ * see it.
+ *
+ * @returns The listing, or a 404 response when there is none to see.
+ */
+async function _readCatalogListing(
+  supabaseClient: SupabaseClient,
+  catalogListingId: string,
+): Promise<DataCatalogListing.T | Response> {
+  const { data, error } = await supabaseClient
+    .from("data_catalog_listings")
+    .select("*")
+    .eq("id", catalogListingId)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+  if (!data) {
+    return new Response(
+      JSON.stringify({ error: { code: "catalog-entry-not-found" } }),
+      {
+        status: 404,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
+  }
+  return DataCatalogListingParsers.fromDBReadToModelRead(
+    DataCatalogListingParsers.DBReadSchema.parse(data),
+  );
 }
 
 /**
@@ -39,66 +175,124 @@ function _responseFromFailure(error: OpenDataAcquisitionFailed): Response {
  * `access-control-allow-origin` names only the CKAN host, so the bytes are
  * unreachable from any other origin. Server-side there is no such restriction.
  *
- * The caller sends a catalog entry id and nothing else. It never sends a URL:
+ * The caller sends a catalog listing id and nothing else. It never sends a URL:
  * the API root comes from the catalog row, the resource URL comes from CKAN's
  * own response, and `getCkanResourceFromPackage` refuses a resource URL whose
  * host is not the catalogued one. That chain is what keeps this from being an
  * open relay for arbitrary server-side requests.
  */
 export const OpenDataRoutes = defineRoutes<OpenDataAPI>("open-data", {
-  "/catalog-entries/:catalogEntryId/resource": {
+  "/data-catalog-listings/:catalogListingId/column-type-sample": {
     GET: GET({
-      path: "/catalog-entries/:catalogEntryId/resource",
-      schema: { catalogEntryId: string().uuid() },
+      path: "/data-catalog-listings/:catalogListingId/column-type-sample",
+      schema: { catalogListingId: string().uuid() },
     }).action(async ({ pathParams, supabaseClient }): Promise<Response> => {
-      const { data, error } = await supabaseClient
-        .from("catalog_entries__open_data")
-        .select("*")
-        .eq("id", pathParams.catalogEntryId)
-        .maybeSingle();
-
-      if (error) {
-        throw error;
-      }
-      if (!data) {
-        return new Response(
-          JSON.stringify({ error: { code: "catalog-entry-not-found" } }),
-          {
-            status: 404,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          },
-        );
-      }
-
-      const entry = OpenDataCatalogEntryParsers.fromDBReadToModelRead(
-        OpenDataCatalogEntryParsers.DBReadSchema.parse(data),
+      const entry = await _readCatalogListing(
+        supabaseClient,
+        pathParams.catalogListingId,
       );
-
+      if (entry instanceof Response) {
+        return entry;
+      }
       try {
-        const acquisition = await acquireOpenDataResource({
-          entry,
-          http: createOpenDataHttp({ maxBytes: MAX_RESOURCE_BYTES }),
-          maxBytes: MAX_RESOURCE_BYTES,
-        });
-
-        return new Response(acquisition.bytes as BodyInit, {
-          status: 200,
-          headers: {
-            ...corsHeaders,
-            "Access-Control-Expose-Headers": EXPOSED_HEADERS,
-            "Content-Type": "application/octet-stream",
-            "X-Ava-Content-Kind": acquisition.contentKind,
-            ...(acquisition.sourceVersion === undefined
-              ? {}
-              : { "X-Ava-Source-Version": acquisition.sourceVersion }),
-          },
-        });
+        return await respondWithColumnTypeSample(entry);
       } catch (caught) {
         if (OpenDataAcquisitionFailed.is(caught)) {
-          return _responseFromFailure(caught);
+          return await respondWithSampleFailure({
+            catalogListingId: entry.id,
+            error: caught,
+            markInvalid: markListingInvalid,
+          });
         }
         throw caught;
       }
     }),
+  },
+  "/data-catalog-listings/:catalogListingId/column-types": {
+    POST: POST({
+      path: "/data-catalog-listings/:catalogListingId/column-types",
+      schema: { catalogListingId: string().uuid() },
+    })
+      .bodySchema(VerifiedColumnTypesBodySchema)
+      .action(
+        async ({ pathParams, body, supabaseClient }): Promise<Response> => {
+          // Read as the caller first, so only a listing they can see is
+          // written.
+          const entry = await _readCatalogListing(
+            supabaseClient,
+            pathParams.catalogListingId,
+          );
+          if (entry instanceof Response) {
+            return entry;
+          }
+          return await writeVerifiedColumnTypes({
+            catalogListingId: entry.id,
+            body,
+          });
+        },
+      ),
+  },
+  "/data-catalog-listings/:catalogListingId/parquet-cache": {
+    POST: POST({
+      path: "/data-catalog-listings/:catalogListingId/parquet-cache",
+      schema: { catalogListingId: string().uuid() },
+    })
+      // Every POST here parses a JSON body, so a caller with no complete
+      // sample to hand back sends `{}`.
+      .bodySchema(
+        object({
+          completeSample: CompleteSampleBodySchema.optional(),
+        }).strict(),
+      )
+      .action(
+        async ({ pathParams, body, supabaseClient }): Promise<Response> => {
+          // Read as the caller first, so only a listing they can see is
+          // built.
+          const entry = await _readCatalogListing(
+            supabaseClient,
+            pathParams.catalogListingId,
+          );
+          if (entry instanceof Response) {
+            return entry;
+          }
+          const completeSampleCsv = await readVouchedCompleteSample({
+            catalogListingId: entry.id,
+            completeSample: body.completeSample,
+          });
+          const answer = await requestParquetCache({
+            listing: entry,
+            deps: _createParquetCacheDependencies(entry, completeSampleCsv),
+            hasCompleteSample: completeSampleCsv !== undefined,
+          });
+          return new Response(JSON.stringify(answer), {
+            status: parquetCacheAnswerToStatus(answer),
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        },
+      ),
+  },
+  "/data-catalog-listings/:catalogListingId/unparseable": {
+    POST: POST({
+      path: "/data-catalog-listings/:catalogListingId/unparseable",
+      schema: { catalogListingId: string().uuid() },
+    })
+      .bodySchema(UnparseableSampleBodySchema)
+      .action(
+        async ({ pathParams, body, supabaseClient }): Promise<Response> => {
+          // Read as the caller first, so only a listing they can see is
+          // marked.
+          const entry = await _readCatalogListing(
+            supabaseClient,
+            pathParams.catalogListingId,
+          );
+          if (entry instanceof Response) {
+            return entry;
+          }
+          return await markColumnTypeSampleUnparseable({
+            catalogListingId: entry.id,
+            body,
+          });
+        },
+      ),
   },
 });

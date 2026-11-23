@@ -97,10 +97,12 @@ const publication: StockControl = {
         key: "controls.publication.audience",
         message: "Audience",
       }),
-      options: Object.entries(audienceMessages).map(([value, label]) => ({
-        value,
-        label,
-      })),
+      options: Object.entries(audienceMessages).map(([value, label]) => {
+        return {
+          value,
+          label,
+        };
+      }),
     },
     _text({
       path: "label",

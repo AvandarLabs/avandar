@@ -1,10 +1,14 @@
-import { assertIsDefined, objectEntries, objectKeys } from "@avandar/utils";
+import { assertIsDefined, objectEntries } from "@avandar/utils";
 import { withSupabaseClient } from "@clients/mixins/withSupabaseClient.ts";
 import { createModelCrudClient } from "@clients/ModelCrudClient/createModelCrudClient.ts";
 import { match } from "ts-pattern";
 import { EmptyObject } from "type-fest";
 import type { ILogger } from "@avandar/logger";
-import type { FilterOperator, FiltersByColumn } from "@avandar/utils";
+import type {
+  FilterOperator,
+  FilterOperatorRecord,
+  FiltersByColumn,
+} from "@avandar/utils";
 import type { ModelCrudParserRegistry } from "@clients/makeParserRegistry/makeParserRegistry.ts";
 import type {
   ClientReturningOnlyPromises,
@@ -21,7 +25,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 /** The maximum page size configured in Supabase */
 const MAXIMUM_PAGE_SIZE = 1000;
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* oxlint-disable typescript/no-explicit-any */
 type AnySupabaseFilterableQuery = PostgrestFilterBuilder<
   any,
   any,
@@ -31,7 +35,7 @@ type AnySupabaseFilterableQuery = PostgrestFilterBuilder<
   any,
   any
 >;
-/* eslint-enable @typescript-eslint/no-explicit-any */
+/* oxlint-enable typescript/no-explicit-any */
 
 /**
  * Creates a client for a model that maps to a Supabase table.
@@ -104,19 +108,29 @@ export function createSupabaseCrudClient<
     Query extends AnySupabaseFilterableQuery,
   >(query: Query, filters: FiltersByColumn<M["DBRead"]>): Query {
     let newQuery = query;
-    objectKeys(filters).forEach((column) => {
-      const filter = filters[column as keyof M["DBRead"]];
+    // Widen to a plain column-keyed record before iterating. Inside this
+    // generic, `M["DBRead"]` resolves to the union of every registered
+    // table's Row, so `keyof M["DBRead"]` is only the columns that every table
+    // shares. That is `never` once any table lacks a common column, which
+    // breaks any cast to or indexed access by that key.
+    const filtersByColumnName: Partial<
+      Record<string, FilterOperatorRecord<unknown>>
+    > = filters;
+    objectEntries(filtersByColumnName).forEach(([column, filter]) => {
       if (filter) {
         objectEntries(filter).forEach(([operator, value]) => {
           // currently we only support `eq` filters
           match(operator as FilterOperator)
             .with("eq", () => {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              // oxlint-disable-next-line typescript/no-explicit-any
               newQuery = query.eq(String(column), value as any);
             })
             .with("in", () => {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              // oxlint-disable-next-line typescript/no-explicit-any
               newQuery = query.in(String(column), value as any);
+            })
+            .with("is", () => {
+              newQuery = query.is(String(column), null);
             })
             .exhaustive();
         });
@@ -148,7 +162,7 @@ export function createSupabaseCrudClient<
         const { data } = await dbClient
           .from(tableName)
           .select("*")
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          // oxlint-disable-next-line typescript/no-explicit-any
           .eq(dbTablePrimaryKey, params.id as any)
           .maybeSingle<M["DBRead"]>()
           .throwOnError();
@@ -175,6 +189,10 @@ export function createSupabaseCrudClient<
 
       getPage: async (params: {
         where?: FiltersByColumn<M["DBRead"]>;
+        orderBy?: ReadonlyArray<{
+          column: keyof M["DBRead"] & string;
+          direction: "asc" | "desc";
+        }>;
         pageSize: number;
         pageNum: number;
         logger: ILogger;
@@ -186,6 +204,12 @@ export function createSupabaseCrudClient<
 
         if (where) {
           query = _applyFiltersToSupabaseQuery(query, where);
+        }
+
+        for (const order of params.orderBy ?? []) {
+          query = query.order(String(order.column), {
+            ascending: order.direction === "asc",
+          });
         }
 
         if (pageSize > MAXIMUM_PAGE_SIZE) {
@@ -215,7 +239,7 @@ export function createSupabaseCrudClient<
           const { columnNames, ignoreDuplicates } = params.onConflict;
           const { data: upsertedData } = await dbClient
             .from(tableName)
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            // oxlint-disable-next-line typescript/no-explicit-any
             .upsert(params.data as any, {
               onConflict: columnNames.join(","),
               ignoreDuplicates,
@@ -228,7 +252,7 @@ export function createSupabaseCrudClient<
 
         const { data: insertedData } = await dbClient
           .from(tableName)
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          // oxlint-disable-next-line typescript/no-explicit-any
           .insert(params.data as any)
           .select()
           .single<M["DBRead"]>()
@@ -250,7 +274,7 @@ export function createSupabaseCrudClient<
           const { columnNames, ignoreDuplicates } = params.onConflict;
           const { data: upsertedRows } = await dbClient
             .from(tableName)
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            // oxlint-disable-next-line typescript/no-explicit-any
             .upsert(params.data as any, {
               onConflict: columnNames.join(","),
               ignoreDuplicates,
@@ -263,7 +287,7 @@ export function createSupabaseCrudClient<
 
         const { data: insertedRows } = await dbClient
           .from(tableName)
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          // oxlint-disable-next-line typescript/no-explicit-any
           .insert(params.data as any)
           .select()
           .overrideTypes<Array<M["DBRead"]>, { merge: false }>()
@@ -278,9 +302,9 @@ export function createSupabaseCrudClient<
       }) => {
         const { data: updatedData } = await dbClient
           .from(tableName)
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          // oxlint-disable-next-line typescript/no-explicit-any
           .update(params.data as any)
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          // oxlint-disable-next-line typescript/no-explicit-any
           .eq(dbTablePrimaryKey, params.id as any)
           .select()
           .single<M["DBRead"]>()
@@ -295,7 +319,7 @@ export function createSupabaseCrudClient<
         await dbClient
           .from(tableName)
           .delete()
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          // oxlint-disable-next-line typescript/no-explicit-any
           .eq(dbTablePrimaryKey, params.id as any)
           .throwOnError();
       },
@@ -307,7 +331,7 @@ export function createSupabaseCrudClient<
         await dbClient
           .from(tableName)
           .delete()
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          // oxlint-disable-next-line typescript/no-explicit-any
           .in(dbTablePrimaryKey, params.ids as any)
           .throwOnError();
       },

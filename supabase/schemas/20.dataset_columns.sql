@@ -64,6 +64,10 @@ select
     )
   );
 
+-- A Postgres dataset's columns are the only ones its rows route reads from the
+-- table it names, through the workspace's saved credential, so adding one
+-- also requires `data_sources` editor in the dataset's own workspace, the role
+-- that picks that table.
 create policy "User can insert dataset_columns in their workspace" on public.dataset_columns for insert to authenticated
 with
   check (
@@ -71,7 +75,8 @@ with
       'dataset',
       public.dataset_columns.dataset_id,
       'editor'
-    )
+    ) and
+    public.datasets__auth_user_may_add_column (public.dataset_columns.dataset_id)
   );
 
 create policy "User can update dataset_columns in their workspace" on public.dataset_columns
@@ -103,3 +108,50 @@ create policy "User can delete dataset_columns in their workspace" on public.dat
 create trigger tr_dataset_columns__set_updated_at before
 update on public.dataset_columns for each row
 execute function public.util__set_updated_at ();
+
+/**
+ * Refuses renaming a Postgres dataset column's `original_name`, or moving a
+ * column into or out of a Postgres dataset or its workspace, whoever makes
+ * the change. A Postgres dataset's
+ * rows route reads exactly these names from the table the dataset names,
+ * through the workspace's saved credential, so editing a column must never
+ * be a way to read a different column of that table.
+ */
+create or replace function public.dataset_columns__prevent_postgres_source_change () returns trigger language plpgsql
+set
+  search_path = public as $$
+begin
+  if
+    (
+      new.original_name is distinct from old.original_name or
+      new.dataset_id is distinct from old.dataset_id or
+      new.workspace_id is distinct from old.workspace_id
+    ) and
+    (
+      public.datasets__is_postgres_table (old.dataset_id) or
+      public.datasets__is_postgres_table (new.dataset_id)
+    )
+  then
+    raise exception 'a Postgres dataset column cannot be renamed at its source'
+      using errcode = '23514';
+  end if;
+
+  return new;
+end;
+$$;
+
+-- Trigger-only. The trigger machinery does not consult EXECUTE, so no
+-- Data API role needs a grant for the trigger to fire.
+revoke
+execute on function public.dataset_columns__prevent_postgres_source_change ()
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+create trigger tr__dataset_columns__prevent_postgres_source_change before
+update of original_name,
+dataset_id,
+workspace_id on public.dataset_columns for each row
+execute function public.dataset_columns__prevent_postgres_source_change ();

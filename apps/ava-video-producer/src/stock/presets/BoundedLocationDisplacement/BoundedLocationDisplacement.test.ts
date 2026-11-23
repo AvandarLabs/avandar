@@ -4,7 +4,7 @@ import { prop, propEq } from "@avandar/utils";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { getSvgAttributeMatchesFromMarkup } from "../../../../tests/helpers/getSvgAttributeMatchesFromMarkup/getSvgAttributeMatchesFromMarkup";
-import { registerStockLocalizationAssertions } from "../../../../tests/helpers/registerStockLocalizationAssertions";
+import { registerStockDefaultTextAssertions } from "../../../../tests/helpers/registerStockDefaultTextAssertions";
 import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
@@ -18,6 +18,34 @@ import {
   invalidInputs,
 } from "./BoundedLocationDisplacement.fixtures";
 import { inputSchema, type Input } from "./BoundedLocationDisplacement.schema";
+
+function _assertHeldPublicPositions(): void {
+  [71, 72, 80, 100, 139, 150, 165].forEach((frame) => {
+    const tags = _tags({
+      markup: _render({ frame: frame }),
+      attribute: "data-public-position",
+    });
+    assert.equal(tags.length, 2);
+    assert.deepEqual(
+      tags.map((tag) => {
+        return SvgAttributes.getNumberFromMarkup({
+          attributes: tag,
+          name: "cx",
+        });
+      }),
+      [500 + 36 * 3.8, 500 + 65 * 3.8],
+    );
+    assert.deepEqual(
+      tags.map((tag) => {
+        return SvgAttributes.getNumberFromMarkup({
+          attributes: tag,
+          name: "cy",
+        });
+      }),
+      [180 + 44 * 2.2, 180 + 63 * 2.2],
+    );
+  });
+}
 
 function _render({
   frame,
@@ -83,7 +111,7 @@ registerStockPresetAssertions({
   getVisibleTexts: _getVisibleTexts,
   textFrames: [36, 150],
 });
-registerStockLocalizationAssertions({
+registerStockDefaultTextAssertions({
   contract,
   expectedTextPaths: [
     ["locations", 0, "label"],
@@ -106,34 +134,16 @@ registerStockTextLayoutAssertions({
   getVisibleTexts: _getVisibleTexts,
 });
 test("public map stays empty before disclosure and every emitted position is exactly displaced", () => {
-  [0, 12, 45, 70].forEach((frame) =>
-    assert.equal(
+  [0, 12, 45, 70].forEach((frame) => {
+    return assert.equal(
       _tags({
         markup: _render({ frame: frame }),
         attribute: "data-public-position",
       }).length,
       0,
-    ),
-  );
-  [71, 72, 80, 100, 139, 150, 165].forEach((frame) => {
-    const tags = _tags({
-      markup: _render({ frame: frame }),
-      attribute: "data-public-position",
-    });
-    assert.equal(tags.length, 2);
-    assert.deepEqual(
-      tags.map((tag) =>
-        SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "cx" }),
-      ),
-      [500 + 36 * 3.8, 500 + 65 * 3.8],
-    );
-    assert.deepEqual(
-      tags.map((tag) =>
-        SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "cy" }),
-      ),
-      [180 + 44 * 2.2, 180 + 63 * 2.2],
     );
   });
+  _assertHeldPublicPositions();
   assert.equal(
     _tags({
       markup: _render({ frame: 150, input: CHANGED_INPUT }),
@@ -198,11 +208,11 @@ test("zero, diagonal, exact-boundary and map-boundary offsets preserve identity 
       _values({ markup, attribute: "data-approximate-label" }).length,
       input.locations.length,
     );
-    input.locations.forEach((location) =>
-      assert.ok(
+    input.locations.forEach((location) => {
+      return assert.ok(
         Math.hypot(location.offsetX, location.offsetY) <= input.radiusUnits,
-      ),
-    );
+      );
+    });
   });
   assert.match(_render({ frame: 150, input: fixtures[1].input }), /1e-12/);
   assert.ok(
@@ -219,9 +229,9 @@ test("disclosure captions and bounded-vector labels remain separate from foregro
     );
     SvgPaintAssertions.assertPaintClearance({
       texts: paint.filter(propEq("kind", "text")),
-      rectangles: paint.filter(
-        (item) => item.kind === "rect" && item.opacity * item.fillOpacity > 0.9,
-      ),
+      rectangles: paint.filter((item) => {
+        return item.kind === "rect" && item.opacity * item.fillOpacity > 0.9;
+      }),
     });
   });
 });
@@ -231,13 +241,14 @@ test("public markers have no source-connected line geometry even with originals 
     const markup = _render({ frame: frame, input: input });
     assert.equal(_tags({ markup, attribute: "data-local-original" }).length, 0);
     getSvgAttributeMatchesFromMarkup({ markup, attribute: "x1" }).tags.forEach(
-      (tag) =>
-        assert.ok(
+      (tag) => {
+        return assert.ok(
           SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "x1" }) <
             450 &&
             SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "x2" }) <
               450,
-        ),
+        );
+      },
     );
     _tags({ markup, attribute: "data-public-position" }).forEach(
       (tag, index) => {

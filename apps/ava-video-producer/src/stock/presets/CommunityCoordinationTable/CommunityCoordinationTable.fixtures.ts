@@ -225,25 +225,31 @@ export const invalidInputs: unknown[] = [
   { ...DEFAULT_INPUT, places: [] },
   {
     ...DEFAULT_INPUT,
-    teams: DEFAULT_INPUT.teams.map((team) => ({
-      ...team,
-      agreedPlaceId: "missing",
-    })),
+    teams: DEFAULT_INPUT.teams.map((team) => {
+      return {
+        ...team,
+        agreedPlaceId: "missing",
+      };
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    teams: DEFAULT_INPUT.teams.map((team) => ({
-      ...team,
-      agreedPlaceId: team.initialPlaceId,
-    })),
+    teams: DEFAULT_INPUT.teams.map((team) => {
+      return {
+        ...team,
+        agreedPlaceId: team.initialPlaceId,
+      };
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    places: DEFAULT_INPUT.places.map((place) => ({
-      ...place,
-      x: 0.25,
-      y: 0.45,
-    })),
+    places: DEFAULT_INPUT.places.map((place) => {
+      return {
+        ...place,
+        x: 0.25,
+        y: 0.45,
+      };
+    }),
   },
   {
     ...DEFAULT_INPUT,

@@ -1,5 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./FictionalConflictGlobe.schema";
 import type { ReactNode } from "react";
 
@@ -9,6 +9,7 @@ type Props = { input: Input };
  * rotation.
  */
 export function GlobeCopy({ input }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
       <FitText
@@ -39,7 +40,7 @@ export function GlobeCopy({ input }: Readonly<Props>): ReactNode {
         fontSize={24}
         maxLines={1}
         anchor="end"
-        color={STOCK.muted}
+        color={tokens.color.textMuted}
         normalizeWhitespace
       />
     </g>

@@ -28,6 +28,26 @@ export const AvaMapClient = createUsableServiceClient(
     tableName: "maps",
     dbTablePrimaryKey: "id",
     parsers: AvaMapParsers,
+    queries: (config) => {
+      return {
+        /**
+         * The map's secret displacement salt, or undefined when the caller
+         * cannot edit the map. The salt lives in its own table that only map
+         * editors can read, so a viewer can never undo a published map's
+         * displacement. Creates the salt for a map that predates salts.
+         */
+        getJitterSalt: async (params: {
+          mapId: AvaMap.Id;
+        }): Promise<string | undefined> => {
+          const { data } = await config.dbClient
+            .rpc("rpc_maps__get_or_create_jitter_salt", {
+              p_map_id: params.mapId,
+            })
+            .throwOnError();
+          return data ?? undefined;
+        },
+      };
+    },
     mutations: (config) => {
       return {
         // Persists a map's name and normalized JSON configuration.
@@ -60,6 +80,7 @@ export const AvaMapClient = createUsableServiceClient(
     },
   }),
   {
+    queryFns: ["getJitterSalt"],
     mutationFns: ["saveMapConfig", "insert", "update", "delete"],
   },
 );

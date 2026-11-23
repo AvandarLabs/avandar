@@ -1,7 +1,7 @@
 import { PopulationLegend } from "./PopulationLegend";
 import { ZoneFractions } from "./ZoneFractions";
 import { ZoneLids } from "./ZoneLids";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./PopulationNormalizedMap.schema";
 import type { ReactNode } from "react";
 /** Inputs for PopulationNormalizedMap. */

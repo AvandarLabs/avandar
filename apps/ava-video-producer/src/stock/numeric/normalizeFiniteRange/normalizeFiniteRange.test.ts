@@ -28,5 +28,9 @@ test("invalid ranges and out-of-domain values fail rather than being clamped", (
     { value: 0, min: 1, max: 1 },
     { value: 0, min: Infinity, max: 2 },
     { value: NaN, min: 0, max: 1 },
-  ].forEach((input) => assert.throws(() => normalizeFiniteRange(input)));
+  ].forEach((input) => {
+    return assert.throws(() => {
+      return normalizeFiniteRange(input);
+    });
+  });
 });

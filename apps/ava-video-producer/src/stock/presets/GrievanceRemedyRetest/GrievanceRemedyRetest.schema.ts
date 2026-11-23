@@ -27,9 +27,12 @@ export const inputSchema = z
     showComplaintMarker: z.boolean(),
   })
   .refine(
-    (input) =>
-      input.participantResponse !== "accepted" ||
-      input.testResults.after === "functioning",
+    (input) => {
+      return (
+        input.participantResponse !== "accepted" ||
+        input.testResults.after === "functioning"
+      );
+    },
     {
       path: ["participantResponse"],
       message: "Acceptance requires a functioning retest.",

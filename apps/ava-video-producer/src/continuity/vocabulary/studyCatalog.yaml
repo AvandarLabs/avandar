@@ -253,6 +253,203 @@
       description:
         Hold on a detail, travel quickly to the next, then restore the wide context.
         Coordinates use the 960 by 600 diagram stage.
+- id: stepped-column-wipe
+  title: Stepped column wipe
+  category: transitions
+  kind: scene
+  description:
+    Hand one shot to the next through vertical columns that rise or drop one after
+    another, over a frozen frame or a shot that keeps playing.
+  frames: 360
+  path: vocabulary/stepped-column-wipe
+  family: vocabulary
+  sourceFilm: shot-vocabulary
+  goodFor:
+    Mark a change of act between statements and product stills with a striped,
+    deliberate handover that echoes a columned brand mark.
+  tags:
+    - column wipe
+    - stepped reveal
+    - shot transition
+    - frozen outgoing frame
+    - playing outgoing shot
+    - outgoing drift
+    - act break
+  creativeDirection:
+    Open on a dark statement, then let eight columns rise left to right half a frame
+    apart onto a light field. Drop six columns from the top, right to left, onto a tilted
+    Explorer window whose camera starts a slow push. Close with twelve columns staggered a
+    frame and a half apart while that push keeps playing underneath, the outgoing shot
+    drifting left and blurring as the columns cover it. Each handover is short and crisp,
+    and the last one is the slow, layered exception.
+  avoid:
+    Two shots share a layout that a dissolve or cut would carry better, or the columns
+    would slice through text the viewer is still reading.
+  controls:
+    - path: transition.columns
+      label: Column count
+      description: Choose how many columns cover the frame; more columns read as a finer stripe.
+    - path: transition.staggerFrames
+      label: Column stagger
+      description:
+        Frames between neighbouring columns. Fractions are interpolated, never rounded,
+        and the last column must start inside the transition.
+    - path: transition.from
+      label: Direction
+      description: Columns rise from the bottom or drop from the top.
+    - path: transition.order
+      label: Column order
+      description: Sweep the columns left to right or right to left.
+    - path: transition.outgoing
+      label: Outgoing shot
+      description:
+        Frozen holds the outgoing shot's last frame. Playing keeps its camera, footage
+        or typing moving under the columns.
+    - path: transition.outgoingDrift
+      label: Outgoing drift
+      description:
+        Slide the outgoing shot by a fraction of the width with horizontal blur while
+        the columns cover it.
+    - path: transitionInFrames
+      label: Wipe length
+      description: The whole handover, including every column's stagger and rise.
+- id: field-colour-cut
+  title: Field-colour cut
+  category: transitions
+  kind: scene
+  description:
+    Change the whole field colour on a hard cut, from a dark field to the accent and on
+    to a light field, with a theme on each shot instead of an animated transition.
+  frames: 210
+  path: vocabulary/field-colour-cut
+  family: vocabulary
+  sourceFilm: shot-vocabulary
+  goodFor:
+    Punctuate a short run of statements and figures so each new idea lands on its own
+    colour, the way launch films alternate dark, accent and light fields.
+  tags:
+    - hard cut
+    - field colour
+    - shot theme
+    - accent field
+    - light field
+    - rhythm
+  creativeDirection:
+    Cut from a dark field naming the entities, to a single large word on the accent
+    field, to a light field where a fictional district count runs up. Every cut is
+    instant and each shot starts its own reveal on its first frames, so the colour change
+    carries the beat and nothing crossfades.
+  avoid:
+    The cuts would come faster than the viewer can read each field, or adjacent shots
+    need a spatial relationship a cut would break.
+  controls:
+    - path: theme.ground
+      label: Field colour
+      description:
+        The shot's background. Use a colour or var(--token) naming another token, such
+        as var(--brand) for the accent field.
+    - path: theme.foreground
+      label: Text colour
+      description: Set a foreground that stays readable on the shot's field.
+    - path: transitionInFrames
+      label: Cut
+      description: Zero frames makes the hard cut between fields.
+    - path: transition.kind
+      label: Declared cut
+      description:
+        cut marks the hard cut as deliberate, so the frame gate accepts the jump in
+        field brightness on that frame. It needs transitionInFrames set to 0.
+- id: fly-through
+  title: Fly-through into colour
+  category: transitions
+  kind: scene
+  description:
+    Send the mark's columns toward the camera until they cover the frame in a token
+    colour, then cut to a shot painted on that same colour.
+  frames: 220
+  path: vocabulary/fly-through
+  family: vocabulary
+  sourceFilm: shot-vocabulary
+  goodFor:
+    Leave an opening brand lockup and arrive on the first content shot without a visible
+    seam, because the exit already fills the frame with the next shot's field.
+  tags:
+    - fly-through
+    - brand lockup exit
+    - token colour
+    - accent field
+    - cut on colour
+    - opening sequence
+  creativeDirection:
+    Build the mark through eight rising columns and wipe the wordmark in beside it. Let
+    the wordmark retract, then send the columns surging through the frame with a slight
+    turn until the accent colour covers everything. Cut on that colour to a tilted Maps
+    window whipping in on an accent field, so the handover reads as one continuous move.
+  avoid:
+    The next shot is not painted on the exit colour, which turns the covered frame into
+    a flash.
+  controls:
+    - path: props.exit.atFrame
+      label: Exit start
+      description: When the wordmark retracts; the columns fly a few frames later.
+    - path: props.exit.durationInFrames
+      label: Flight length
+      description: How long the columns take to cover the frame.
+    - path: props.exit.color
+      label: Cover colour
+      description: The theme token the columns spread into. Paint the next shot's field with it.
+    - path: theme.ground
+      label: Next field
+      description: Set the following shot's ground to the same token, for example var(--brand).
+- id: whip-exit
+  title: Whip exit
+  category: transitions
+  kind: scene
+  description:
+    Whip a tilted window off the left edge into a hard cut, or run a longer whip under
+    a column wipe while the outgoing shot keeps playing.
+  frames: 290
+  path: vocabulary/whip-exit
+  family: vocabulary
+  sourceFilm: shot-vocabulary
+  goodFor:
+    Move briskly between product stills, letting the outgoing window's direction carry
+    the viewer into the next shot.
+  tags:
+    - whip exit
+    - horizontal blur
+    - hard cut
+    - playing outgoing shot
+    - column wipe
+    - product stills
+  creativeDirection:
+    A Cases window whips in, holds, then accelerates off the left edge with growing blur
+    while its headline fades in place, and the film cuts on the empty field. A Maps window
+    whips in the same way, but its exit starts on its last frame and runs longer, so it
+    keeps sliding away under eight columns that rise over the still-playing shot.
+  avoid:
+    The next shot moves in the opposite direction, or the exit starts so early that the
+    empty field holds before the cut.
+  controls:
+    - path: props.exit.atFrame
+      label: Exit start
+      description:
+        Let the whip finish a frame or two before a hard cut, or start it on the
+        shot's last frame when a playing column wipe follows.
+    - path: props.exit.durationInFrames
+      label: Whip length
+      description: Lengthen the whip so it is still moving under the following wipe.
+    - path: transition.outgoing
+      label: Outgoing shot
+      description: Playing keeps the whip moving under the next shot's columns.
+    - path: transitionInFrames
+      label: Handover
+      description: Zero for the hard cut; the longer whip needs the wipe's length.
+    - path: transition.kind
+      label: Handover kind
+      description:
+        cut declares the hard cut after a whip; stepped-column-wipe covers the longer
+        whip with columns.
 - id: causal-signal
   title: Action, signal, consequence
   category: compositing
@@ -526,3 +723,388 @@
     - path: beats[].content.diagrams[].overlay
       label: Floating explanation
       description: Set departure, return, and a settled rectangle clear of the relevant product controls.
+- id: tilted-window
+  title: Tilted product window
+  category: compositions
+  kind: scene
+  description:
+    A headline column beside a product still in a 3D tilted window that scrolls, changes
+    through a carousel, pushes in, and rests in a tall box with a secondary window.
+  frames: 390
+  path: vocabulary/tilted-window
+  family: vocabulary
+  sourceFilm: shot-vocabulary
+  goodFor:
+    Show a sequence of product stills as a confident launch-film beat, with one short
+    headline carrying the point while the screens change.
+  tags:
+    - tilted window
+    - product stills
+    - headline column
+    - carousel
+    - scroll steps
+    - window camera
+    - secondary window
+  creativeDirection:
+    Whip an Import preview in from the right and jump it down the page in two quick
+    scroll steps. Slide a Maps still in over it as the headline changes, cut to a second
+    map, then push the window-only camera in while the headline stays put. Cut to a light
+    field where a Cases list rests in the tall box and a record detail whips in beside it
+    in the same plane. Keep the fictional-data footnote visible under every still.
+  avoid:
+    The window would hold live product UI, which belongs in an unscaled avandar shot, or
+    the headline needs more than three short lines.
+  controls:
+    - path: props.headlines
+      label: Headlines
+      description:
+        One to three short lines per entry. A later entry replaces the earlier one at
+        its atFrame.
+    - path: props.windows[].swap
+      label: Carousel change
+      description: Slide brings the next still in on top from the right; cut swaps at once.
+    - path: props.windows[].atFrame
+      label: Carousel timing
+      description: When each later still replaces the current one. The first has none.
+    - path: props.windows[].scrollSteps
+      label: Scroll steps
+      description:
+        Jump a still that is taller than its window to each offset, a fraction of its
+        height.
+    - path: props.camera
+      label: Window camera
+      description: Zoom keys anchored inside the window. The headline never moves.
+    - path: props.secondary
+      label: Secondary window
+      description: A smaller still in the same plane, placed in canvas fractions, that whips in at its frame.
+    - path: props.windowBox
+      label: Window box
+      description: Default leaves room above and below; tall reaches near the frame edges.
+    - path: props.footnote
+      label: Footnote
+      description: Keep Fictional demonstration data visible under product stills.
+- id: racing-pair
+  title: Racing pair
+  category: compositions
+  kind: scene
+  description:
+    Two tilted windows side by side, each labelled above and timed by a counter below
+    that turns the accent colour when it finishes.
+  frames: 180
+  path: vocabulary/racing-pair
+  family: vocabulary
+  sourceFilm: shot-vocabulary
+  goodFor:
+    Compare two steps or two runs at a glance, letting the finishing order of the
+    counters make the comparison.
+  tags:
+    - racing counters
+    - side by side
+    - pair layout
+    - timed comparison
+    - mirrored tilt
+    - flip-split
+  creativeDirection:
+    On a light field, flip both windows in from edge-on and split them apart into a
+    mirrored tilt. Start both counters together so the shorter one finishes first and
+    turns the accent colour, then hold until the second finishes before both windows whip
+    off to the left. Label the timings as fictional beside each counter and in the footnote.
+  avoid:
+    The figures are presented as measured performance without a source, or the two
+    windows show unrelated screens that invite no comparison.
+  controls:
+    - path: props.pair[].label
+      label: Column labels
+      description: A short label above each window.
+    - path: props.pair[].counter
+      label: Counters
+      description:
+        Value, unit, precision and the start and end frames. The earlier endFrame
+        finishes first.
+    - path: props.pair[].stat
+      label: Stat line
+      description: A small note under each counter, such as the figure's provenance.
+    - path: props.badge
+      label: Badge
+      description: Labels the right-hand column.
+    - path: props.enter.kind
+      label: Entrance
+      description: Flip-split or from-sides; both enter the pair layout only.
+- id: brand-lockup
+  title: Brand lockup and call to action
+  category: compositions
+  kind: scene
+  description:
+    A raster mark built through column masks, a wordmark wipe, and a call-to-action
+    cascade ending in a typed command and a badge.
+  frames: 210
+  path: vocabulary/brand-lockup
+  family: vocabulary
+  sourceFilm: shot-vocabulary
+  goodFor:
+    Open or close a film on the brand, and end on one concrete next step the viewer can
+    type or visit.
+  tags:
+    - brand lockup
+    - column build
+    - wordmark wipe
+    - call to action
+    - typed command
+    - closing card
+  creativeDirection:
+    Raise the Avandar mark through eight column masks left to right, then wipe the
+    wordmark in beside it. Once both settle, cascade the call to action below - the
+    subtitle, a placeholder address, a terminal prompt typing the command that previews
+    this study with a blinking block cursor, and a badge after the typing ends.
+  avoid:
+    The mark would have to be redrawn as vectors, or the command or address is invented
+    for a product that does not offer it.
+  controls:
+    - path: props.build.columns
+      label: Build columns
+      description: How many column masks the mark rises through.
+    - path: props.build.staggerFrames
+      label: Build stagger
+      description: Frames between neighbouring columns; fractions are allowed.
+    - path: props.wordmark
+      label: Wordmark
+      description: Text set beside the mark; it wipes in left to right.
+    - path: props.cta
+      label: Call to action
+      description: Subtitle, address, command and badge, cascading from atFrame.
+    - path: props.cta.commandCharsPerSecond
+      label: Typing speed
+      description: Characters per second for the typed command.
+- id: bar-comparison
+  title: Bar comparison
+  category: compositions
+  kind: scene
+  description:
+    A hero number over ranked bars, in one panel or two, with straight or rough bar
+    edges and an element-by-element erase before the cut.
+  frames: 270
+  path: vocabulary/bar-comparison
+  family: vocabulary
+  sourceFilm: shot-vocabulary
+  goodFor:
+    Land one headline figure and show where it ranks, or set two related figures side
+    by side.
+  tags:
+    - bar chart
+    - hero number
+    - ranked rows
+    - rough edges
+    - erase exit
+    - two panels
+  creativeDirection:
+    On a light field, bring in one hero figure in minutes, then its labels, bars growing
+    from the left with the highlighted row in the accent, and values last. Cut to two
+    panels staged a few frames apart with torn bar edges, hold for reading, then erase
+    every element left to right in reading order, the left panel first. Keep the
+    fictional-data footnote under both.
+  avoid:
+    The figures need axes, scales or negative values, or they are presented as sourced
+    results without a citation.
+  controls:
+    - path: props.panels
+      label: Panels
+      description: One or two hero figures, each with up to eight ranked rows.
+    - path: props.panels[].rows
+      label: Rows
+      description: Label, value, optional display text, and highlight for the accent bar.
+    - path: props.panelStaggerFrames
+      label: Panel stagger
+      description: Delay of the second panel's staging.
+    - path: props.barEdge
+      label: Bar edge
+      description: Straight or a seeded rough, torn edge.
+    - path: props.exit
+      label: Erase exit
+      description: Start the erase inside the shot and cut when it ends.
+    - path: props.footnote
+      label: Footnote
+      description: Keep Fictional demonstration data visible unless the figures are sourced.
+- id: window-entrances
+  title: Window entrances
+  category: entrances-and-reveals
+  kind: scene
+  description:
+    Four ways a tilted window arrives - a whip revealed through rising columns, a
+    full-bleed pull-back into the tall box, a pair from both sides, and a flip-split pair.
+  frames: 460
+  path: vocabulary/window-entrances
+  family: vocabulary
+  sourceFilm: shot-vocabulary
+  goodFor:
+    Choose how a product still enters so the motion matches the beat, from a quick
+    arrival to a reveal of context around a full-screen still.
+  tags:
+    - window entrance
+    - whip in
+    - stepped reveal
+    - pull-back
+    - from the sides
+    - flip-split
+  creativeDirection:
+    Whip an Explorer still in from the right while four columns rise from its bottom
+    edge to reveal it. Cut to a dashboard filling the frame with no tilt, hold, then ease
+    it back into the tall box as the headline appears. On a light field, slide two windows
+    in from opposite edges with horizontal blur. Finish with two dashboard stills flipping
+    in from edge-on and splitting apart.
+  avoid:
+    A full-bleed pull-back starts on a bright still over a dark field with a fast ease,
+    which dims the frame in one step, or a pair entrance is used on a single window.
+  controls:
+    - path: props.enter.kind
+      label: Entrance
+      description: Whip and pull-back enter a single window; from-sides and flip-split enter a pair.
+    - path: props.enter.durationInFrames
+      label: Entrance length
+      description: How long the window takes to land.
+    - path: props.enter.reveal
+      label: Stepped reveal
+      description: Clip a whipping window to columns rising from its bottom edge for the first frames.
+    - path: props.enter.ease
+      label: Pull-back ease
+      description: inOut starts gently, which keeps a bright still from dimming the frame at once.
+    - path: props.windowBox
+      label: Landing box
+      description: Tall is the box a full-bleed pull-back lands in.
+- id: typography-reveals
+  title: Typography line reveals
+  category: entrances-and-reveals
+  kind: scene
+  description:
+    Lines that fade up, wipe in, or cut on, with an icon above, a staged exit, and a small
+    caption size.
+  frames: 275
+  path: vocabulary/typography-reveals
+  family: vocabulary
+  sourceFilm: shot-vocabulary
+  goodFor:
+    Give a statement the right weight - a calm fade under the mark, a brisk wipe, or a
+    quiet caption that simply appears.
+  tags:
+    - line fade
+    - line wipe
+    - cut on
+    - staged exit
+    - icon
+    - caption size
+  creativeDirection:
+    Fade the mark in, then fade two lines up beneath it a few frames apart, and leave
+    line by line before the icon goes. Cut to a light field where two left-aligned lines
+    wipe in from the left with a small leftward travel. End on black with a small
+    regular-weight caption that cuts on after a beat of silence.
+  avoid:
+    Each word needs its own timing, which the default word-mask mode handles, or the
+    lines are long enough that a wipe outlasts the read.
+  controls:
+    - path: props.revealMode
+      label: Reveal mode
+      description: line-fade, wipe or cut. word-mask is the default rising word reveal.
+    - path: props.lineStaggerFrames
+      label: Line stagger
+      description: Frames between lines in the line modes.
+    - path: props.icon
+      label: Icon
+      description: A public image above the lines that fades in first.
+    - path: props.exit
+      label: Staged exit
+      description: Lines fade out top to bottom, then the icon, starting inside the shot.
+    - path: props.size
+      label: Caption size
+      description: caption sets one small regular-weight size and rejects fontSize.
+- id: heading-wipe
+  title: Heading wipe
+  category: entrances-and-reveals
+  kind: scene
+  description:
+    A scene heading whose title and kicker wipe in left to right instead of rising,
+    shown on a metric, a statement and a bar comparison.
+  frames: 300
+  path: vocabulary/heading-wipe
+  family: vocabulary
+  sourceFilm: shot-vocabulary
+  goodFor:
+    Introduce a figure or diagram with a heading that reads like it is being written
+    across the frame, matching wipes elsewhere in the film.
+  tags:
+    - heading reveal
+    - title wipe
+    - kicker
+    - metric
+    - bar comparison
+    - typography heading
+  creativeDirection:
+    On a light field, wipe the title in from the left and the kicker eight frames later,
+    then let the scene's own content follow - a fictional row count running up, a two-line
+    statement fading in, and a single ranked bar panel. The heading settles before the
+    content moves so attention passes from the label to the figure.
+  avoid:
+    The heading is long enough to wrap, or the content starts moving before the heading
+    has finished.
+  controls:
+    - path: props.headingReveal.mode
+      label: Heading reveal
+      description: wipe reveals left to right behind a clip; rise is the default lift.
+    - path: props.headingReveal.atFrame
+      label: Heading start
+      description: When the title starts.
+    - path: props.headingReveal.staggerFrames
+      label: Kicker delay
+      description: Frames between the title and the kicker.
+    - path: props.title
+      label: Title
+      description: Short heading copy fitted at a fixed size.
+    - path: props.kicker
+      label: Kicker
+      description: Supporting line under the title.
+- id: graph-packets
+  title: Graph packets
+  category: entrances-and-reveals
+  kind: scene
+  description:
+    An editorial diagram with item lists inside corner-tick frames and parallel arrowless
+    edges carrying packets both ways.
+  frames: 210
+  path: vocabulary/graph-packets
+  family: vocabulary
+  sourceFilm: shot-vocabulary
+  goodFor:
+    Explain movement between parts of an illustrated system without drawing a single
+    arrow for every exchange.
+  tags:
+    - graph diagram
+    - travelling packets
+    - parallel edges
+    - arrowless edges
+    - node items
+    - corner ticks
+  creativeDirection:
+    Wipe the heading in, then stage three cards - fictional sources, the workspace with
+    its entities, and a dashboard card. Draw three parallel plain lines between the first
+    two, send packets across them, one travelling back, then send a final packet along the
+    arrowed edge to the dashboard. Label the whole diagram as illustrative.
+  avoid:
+    The packets would read as measured telemetry, or the cards need automatic layout
+    rather than authored positions.
+  controls:
+    - path: props.edges[].packets
+      label: Packets
+      description: Each window sends a dot along the edge, forward or in reverse.
+    - path: props.edges[].offset
+      label: Parallel offset
+      description: Shift edges between the same cards sideways so they run in parallel.
+    - path: props.edges[].arrow
+      label: Arrowhead
+      description: false draws a plain line, for example under packets travelling both ways.
+    - path: props.nodes[].items
+      label: Node items
+      description: Up to eight list items inside a card under its label.
+    - path: props.nodes[].frame
+      label: Node frame
+      description: ticks draws four corner ticks with no fill or border.
+    - path: props.nodes[].width
+      label: Node width
+      description: Card width as a fraction of the content width.

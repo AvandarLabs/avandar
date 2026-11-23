@@ -4,6 +4,7 @@
  * `avg_attempt_count`. A miscount there silently misreports how often the
  * ladder fires, so these pin both the stopping point and the count.
  */
+import { OpenRouterUsage } from "@sbfn/chat/PostChatMessages/openRouter/OpenRouterUsage.ts";
 import { runChatAttemptsWithEscalation } from "@sbfn/chat/PostChatMessages/runChatAttemptsWithEscalation/runChatAttemptsWithEscalation.ts";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -52,13 +53,23 @@ function _run(
     priorClarifications: 0,
     datasets,
     concepts,
+    columns: [],
   });
 }
 
 beforeEach(() => {
   sendOpenRouterRequestMock.mockReset();
   parseOpenRouterResponseMock.mockReset();
-  sendOpenRouterRequestMock.mockResolvedValue({ message: {}, text: "" });
+  sendOpenRouterRequestMock.mockResolvedValue({
+    message: {},
+    text: "",
+    usage: {
+      ...OpenRouterUsage.empty,
+      calls: 1,
+      promptTokens: 100,
+      cost: 0.01,
+    },
+  });
 });
 
 describe("runChatAttemptsWithEscalation", () => {
@@ -115,6 +126,15 @@ describe("runChatAttemptsWithEscalation", () => {
     expect(attemptCount).toBe(2);
   });
 
+  it("adds up the tokens and cost of every attempt", async () => {
+    parseOpenRouterResponseMock.mockReturnValue(EMPTY);
+
+    const { usage } = await _run({ model: "m", tools: [{ name: "t" }] });
+
+    expect(usage).toMatchObject({ calls: 3, promptTokens: 300 });
+    expect(usage.cost).toBeCloseTo(0.03);
+  });
+
   it("lets a request failure propagate for the caller to record", async () => {
     const failure = new Error("OpenRouter API error: 500");
     sendOpenRouterRequestMock.mockRejectedValue(failure);
@@ -145,6 +165,31 @@ describe("runChatAttemptsWithEscalation", () => {
 
     expect(parseOpenRouterResponseMock.mock.calls[0]?.[0].concepts).toBe(
       concepts,
+    );
+  });
+
+  it("hands the catalog columns to the parser", async () => {
+    parseOpenRouterResponseMock.mockReturnValue(USABLE);
+    const columns = [
+      {
+        id: "column-1",
+        dataset_id: "dataset-1",
+        name: "revenue",
+        data_type: "varchar",
+      },
+    ];
+
+    await runChatAttemptsWithEscalation({
+      requestBody: { model: "m" },
+      apiKey: "key",
+      referer: "https://example.test",
+      lastUserPrompt: "show revenue",
+      priorClarifications: 0,
+      columns,
+    });
+
+    expect(parseOpenRouterResponseMock).toHaveBeenCalledWith(
+      expect.objectContaining({ columns }),
     );
   });
 });

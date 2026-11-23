@@ -1,4 +1,5 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./DistanceBufferEnvelope.schema";
 import type { ReactNode } from "react";
 
@@ -13,6 +14,10 @@ export function BufferSourceMarker({
   location,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const { color, stroke, sketch } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
+  const hairline = shapes.stroke(stroke.hairline);
   const center = { cx: 48 + location.x * 3.6, cy: 190 + location.y * 3.6 };
   const distance = Math.hypot(
     location.x - input.origin.x,
@@ -21,21 +26,27 @@ export function BufferSourceMarker({
   return (
     <g>
       {input.showDistances ? (
-        <line
-          x1={48 + input.origin.x * 3.6}
-          y1={190 + input.origin.y * 3.6}
-          x2={center.cx}
-          y2={center.cy}
-          stroke={STOCK.line}
-          strokeDasharray="3 4"
+        <SketchedShape
+          shape={{
+            kind: "line",
+            x1: 48 + input.origin.x * 3.6,
+            y1: 190 + input.origin.y * 3.6,
+            x2: center.cx,
+            y2: center.cy,
+          }}
+          profile={sketch.shape}
+          stroke={color.line}
+          strokeDasharray={atomic.dash.short.join(" ")}
+          strokeWidth={hairline}
         />
       ) : undefined}
-      <circle
+      <SketchedShape
         data-location-position={`${location.x},${location.y}`}
-        {...center}
-        r={5}
-        fill={distance <= input.radiusUnits ? accent : STOCK.orange}
-        stroke={STOCK.ground}
+        shape={{ kind: "circle", ...center, r: 5 }}
+        profile={sketch.shape}
+        fill={distance <= input.radiusUnits ? accent : color.highlight}
+        stroke={color.ground}
+        strokeWidth={hairline}
       />
     </g>
   );

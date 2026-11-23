@@ -1,12 +1,14 @@
-import { countTo, ramp, STAGGER } from "../../../motion";
-import { Text } from "../../graphics-common";
+import { Text } from "../../graphics-common/Text";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./StratifiedSpatialSample.schema";
 import type { ReactNode } from "react";
-
+/** How long each aggregate quantity counts up from zero. */
+const COUNT_FRAMES = 28;
 type Props = { input: Input; frame: number };
 /** Captions and aggregate quantities retain the eligible sampling frame. */
 export function SampleCopy({ input, frame }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const selectedCount = input.selectedSiteIds.length;
   const eligibleCount = input.sites.length;
   return (
@@ -21,13 +23,30 @@ export function SampleCopy({ input, frame }: Readonly<Props>): ReactNode {
         ]}
       />
       {[selectedCount, eligibleCount, eligibleCount - selectedCount].map(
-        (quantity, index) => (
-          <g key={index} opacity={ramp(frame, 108 + index * STAGGER)}>
-            <Text x={40 + index * 310} y={552} size={24}>
-              {countTo(frame, 108 + index * STAGGER, quantity, 28)}
-            </Text>
-          </g>
-        ),
+        (quantity, index) => {
+          const countAt = 108 + index * motion.stagger.list;
+          const displayedQuantity = motion.count(
+            frame,
+            countAt,
+            quantity,
+            motion.scale(COUNT_FRAMES),
+          );
+          return (
+            <g
+              key={index}
+              opacity={motion.ramp(
+                frame,
+                countAt,
+                motion.panel,
+                motion.reveal.easing,
+              )}
+            >
+              <Text x={40 + index * 310} y={552} role="question">
+                {displayedQuantity}
+              </Text>
+            </g>
+          );
+        },
       )}
     </g>
   );

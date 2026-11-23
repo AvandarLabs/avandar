@@ -1,4 +1,6 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { propEq } from "@avandar/utils";
+import { Motion } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./ScheduleBuffer.schema";
 /** Data for getScheduleGeometryFromInputAndFrame. */
 type GetScheduleGeometryResult = {
@@ -16,21 +18,25 @@ type GetScheduleGeometryResult = {
   reserveWidth: number;
   remaining: number;
 };
-
 /** Exact duration geometry preserves task widths and the fixed endpoint. */
 export function getScheduleGeometryFromInputAndFrame({
   frame,
   input,
-}: Readonly<{ frame: number; input: Input }>): GetScheduleGeometryResult {
-  const taskUnits = input.tasks.reduce(
-    (total, task) => total + task.duration,
-    0,
-  );
+  motion,
+}: Readonly<ScheduleGeometryOptions>): GetScheduleGeometryResult {
+  const taskUnits = input.tasks.reduce((total, task) => {
+    return total + task.duration;
+  }, 0);
   const scale = 880 / (taskUnits + input.reserveUnits);
   const interruptionIndex = input.tasks.findIndex(
-    ({ id }) => id === input.interruption.afterTaskId,
+    propEq("id", input.interruption.afterTaskId),
   );
-  const progress = ramp(frame, 74, 44, EASE.inOut);
+  const progress = motion.ramp(
+    frame,
+    74,
+    motion.scale(44),
+    motion.travel.easing,
+  );
   const delayWidth = input.interruption.duration * scale;
   let units = 0;
   const tasks = input.tasks.map((task, index) => {
@@ -45,10 +51,21 @@ export function getScheduleGeometryFromInputAndFrame({
     tasks,
     delayWidth,
     delayX: tasks[interruptionIndex].x + tasks[interruptionIndex].width,
-    delayY: mix(progress, 230, 310),
+    delayY: Motion.mix({
+      t: progress,
+      from: 230,
+      to: 310,
+    }),
     reserveX: 40 + taskUnits * scale + delayWidth * progress,
     reserveWidth:
       (input.reserveUnits - input.interruption.duration * progress) * scale,
     remaining: input.reserveUnits - input.interruption.duration * progress,
   };
 }
+
+/** Authored schedule and motion inputs for its frame geometry. */
+type ScheduleGeometryOptions = {
+  frame: number;
+  input: Input;
+  motion: VideoMotion;
+};

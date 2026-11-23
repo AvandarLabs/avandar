@@ -1,3 +1,4 @@
+import { propEq } from "@avandar/utils";
 import type { Input } from "./PdfNearestLabelReview.schema";
 /** Data for getAssociationFromInput. */
 type GetAssociationFromInputResult = {
@@ -11,9 +12,9 @@ type GetAssociationFromInputResult = {
 export function getAssociationFromInput(
   input: Readonly<Input>,
 ): GetAssociationFromInputResult {
-  const distances = input.labels.map((label) =>
-    Math.hypot(label.x - input.figure.x, label.y - input.figure.y),
-  );
+  const distances = input.labels.map((label) => {
+    return Math.hypot(label.x - input.figure.x, label.y - input.figure.y);
+  });
   const nearest = Math.min(...distances);
   const nextNearest = Math.max(...distances);
   const ratio = nearest / nextNearest;
@@ -24,6 +25,6 @@ export function getAssociationFromInput(
     chosenLabel:
       input.reviewedLabelId === null
         ? undefined
-        : input.labels.find(({ id }) => id === input.reviewedLabelId),
+        : input.labels.find(propEq("id", input.reviewedLabelId)),
   };
 }

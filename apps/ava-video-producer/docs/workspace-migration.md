@@ -37,11 +37,13 @@ The review server uses `out/component-review/product/`; rendering uses
 file remains source-controlled. Builds record revision and per-file hashes,
 including uncommitted product changes. Source changes invalidate existing
 preview evidence. The shared pnpm lockfile is included in render fingerprints.
-Live gallery builds use ignored `apps/ava-video-producer/out/showcase/browser/`.
+Live gallery builds use ignored `apps/ava-video-producer/out/showcase/`: Vite
+writes the pages to `browser/`, and the showcase's product bundle lives in
+`product/`.
 
 **Download MP4** renders only when requested, using the current composition and
 selected options. Product films preserve the captions toggle; Atlas exports
-preserve the selected accent and background. The local server reports progress,
+render with the video theme the preview shows, unsaved edits included. The local server reports progress,
 serializes renders, and serves the file only after completion. These generated
 exports remain in ignored
 `apps/ava-video-producer/out/showcase/exports/<job-id>/`. No MP4 files are tracked.

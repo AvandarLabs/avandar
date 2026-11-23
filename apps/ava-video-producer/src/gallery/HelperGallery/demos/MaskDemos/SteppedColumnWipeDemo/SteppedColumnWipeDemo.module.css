@@ -1,0 +1,10 @@
+.steppedColumnWipeDemoMiniStages {
+  align-content: center;
+  display: grid;
+  gap: var(--demo-space-18);
+  height: 100%;
+}
+
+.steppedColumnWipeDemoTwoUp {
+  grid-template-columns: 1fr 1fr;
+}

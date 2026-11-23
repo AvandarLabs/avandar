@@ -1,0 +1,15 @@
+/*
+ * Below the phone breakpoint the list and the detail stack instead of
+ * sharing the row: two columns at this width leave each too narrow to read.
+ */
+@media (width < 48em) {
+  .dataManagerApp .dataManagerAppList {
+    border-inline-end: none;
+    width: 100%;
+  }
+
+  .dataManagerApp[data-phone-pane="detail"] .dataManagerAppList,
+  .dataManagerApp[data-phone-pane="list"] .dataManagerAppDetail {
+    display: none;
+  }
+}

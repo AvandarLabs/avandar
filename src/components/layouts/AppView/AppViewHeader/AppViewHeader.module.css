@@ -32,6 +32,10 @@
   min-width: 0;
 }
 
+.appViewHeaderTitleAccessory {
+  flex-shrink: 0;
+}
+
 .appViewHeaderActions {
   flex-shrink: 0;
   margin-inline-start: auto;

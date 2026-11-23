@@ -1,0 +1,5 @@
+.cameraTrackDemoRow {
+  align-items: center;
+  display: flex;
+  gap: var(--demo-space-24);
+}

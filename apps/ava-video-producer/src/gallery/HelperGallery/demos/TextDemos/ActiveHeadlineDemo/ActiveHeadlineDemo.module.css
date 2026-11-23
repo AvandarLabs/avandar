@@ -1,0 +1,15 @@
+.activeHeadlineDemoHeadline {
+  font-size: var(--demo-font-size-46);
+  font-weight: var(--demo-font-weight-semibold);
+  letter-spacing: var(--demo-tracking-slight);
+  line-height: 1.2;
+  margin: 0;
+}
+
+.activeHeadlineDemoLines {
+  display: flex;
+  flex-direction: column;
+  gap: var(--demo-space-6);
+  justify-content: center;
+  padding-left: var(--demo-space-48);
+}

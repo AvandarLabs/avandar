@@ -92,6 +92,8 @@ describe("TimeColumnSelect", () => {
         type: "bufferOfLayer",
         layerId: sourceId,
         distanceMeters: MapLayer.defaultBufferDistanceMeters,
+        distanceUnit: "m",
+        labelColumn: undefined,
         dissolve: false,
       },
       symbology: MapLayer.createDefaultFillSymbology(),

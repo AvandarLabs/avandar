@@ -1,18 +1,20 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { OPEN_CUE } from "./journalTiming";
 import type { Input } from "./JournalReceipts.schema";
 import type { ReactNode } from "react";
 
 type Props = { frame: number; input: Input };
 /** Supplied state legends keep pending and acknowledged meanings explicit. */
 export function JournalCopy({ frame, input }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   if (!input.showLabels) {
     return undefined;
   }
   const captions = [
     { text: input.copy.journal, x: 480, y: 56, width: 700 },
     {
-      text: frame < 36 ? input.copy.disconnected : input.copy.reconnected,
+      text: frame < OPEN_CUE ? input.copy.disconnected : input.copy.reconnected,
       x: 480,
       y: 92,
       width: 700,
@@ -24,18 +26,20 @@ export function JournalCopy({ frame, input }: Readonly<Props>): ReactNode {
   ];
   return (
     <g>
-      {captions.map(({ text, x, y, width }) => (
-        <FitText
-          key={y + x}
-          {...{ text, x, y, width }}
-          fontSize={14}
-          maxLines={y === 182 ? 3 : 2}
-          anchor="middle"
-          normalizeWhitespace
-          breakLongWords
-          color={STOCK.muted}
-        />
-      ))}
+      {captions.map(({ text, x, y, width }) => {
+        return (
+          <FitText
+            key={y + x}
+            {...{ text, x, y, width }}
+            fontSize={14}
+            maxLines={y === 182 ? 3 : 2}
+            anchor="middle"
+            normalizeWhitespace
+            breakLongWords
+            color={tokens.color.textMuted}
+          />
+        );
+      })}
     </g>
   );
 }

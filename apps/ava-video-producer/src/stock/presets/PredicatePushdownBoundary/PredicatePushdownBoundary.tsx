@@ -1,22 +1,32 @@
-import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { PushdownLedger } from "./PushdownLedger";
-import { PushdownPredicate } from "./PushdownPredicate";
-import { PushdownRows } from "./PushdownRows";
-import type { GraphicProps } from "../../graphics-common";
+import { PushdownPredicate } from "./PushdownPredicate/PushdownPredicate";
+import { PushdownRows } from "./PushdownRows/PushdownRows";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./PredicatePushdownBoundary.schema";
 import type { ReactNode } from "react";
 
-type Props = GraphicProps & { input: Input };
+type Props = GraphicProps & {
+  input: Input;
+};
+const INTRO_FRAMES = 12;
 /** Source gates filter row copies before they cross a transfer boundary. */
 export function PredicatePushdownBoundary({
   frame,
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const style = GraphicThemeHooks.useGraphicProps({
+    name: "PredicatePushdownBoundary",
+    props: {},
+  });
+  const { color, sketch } = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
-    <g opacity={ramp(frame, 0, 12)}>
+    <g opacity={motion.ramp(frame, 0, motion.scale(INTRO_FRAMES))}>
       <LabelSlots
         labels={[
           [input.copy.context, 48, 28, 864, 14, 1],
@@ -27,12 +37,13 @@ export function PredicatePushdownBoundary({
         ]}
       />
       <PushdownPredicate {...{ frame, input, accent }} />
-      <path
+      <SketchedShape
+        shape={{ kind: "path", d: "M500 192 V572" }}
+        profile={sketch.shape}
         data-boundary="true"
-        d="M500 192 V572"
-        stroke={STOCK.line}
-        strokeWidth={2}
-        strokeDasharray="5 7"
+        stroke={color.line}
+        strokeWidth={scales.stroke(style.boundaryWidth)}
+        strokeDasharray={style.boundaryDash.join(" ")}
       />
       <PushdownRows {...{ frame, input, accent }} />
       <PushdownLedger {...{ input, frame }} />

@@ -13,7 +13,7 @@ export default defineConfig({
     alias: {
       ...getAppVitestAliases({
         repoRootDir,
-        include: ["shared"],
+        include: ["shared", "node"],
         moreAliases: {
           "@pipeline-server": "apps/pipeline-server/src",
           "@pipelines": "apps/pipeline-server/pipelines",

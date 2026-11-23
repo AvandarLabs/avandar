@@ -1,0 +1,11 @@
+.motionCardCopyCardCopy {
+  composes: card-copy from global;
+}
+
+.motionCardCopyCardCategory {
+  composes: card-category from global;
+}
+
+.motionCardCopyCardState {
+  composes: card-state from global;
+}

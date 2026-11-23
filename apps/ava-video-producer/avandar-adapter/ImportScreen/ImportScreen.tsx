@@ -1,28 +1,26 @@
-import { Tabs } from "@avandar/ui";
-import { Box, Stack, Text } from "@mantine/core";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
-import { AppView } from "@/components/layouts/AppView/AppView";
-import { AppViewBody } from "@/components/layouts/AppView/AppViewBody/AppViewBody";
-import { AppViewHeader } from "@/components/layouts/AppView/AppViewHeader/AppViewHeader";
-import { FileDropzone } from "@/views/DataManagerApp/DataImportView/ManualUploadView/FileDropzone/FileDropzone";
-import { ramp } from "../../src/motion";
-import { ImportReview } from "./ImportReview";
+import { Motion } from "../../src/motion";
+import { ImportFormView } from "./ImportFormView";
 import css from "./ImportScreen.module.css";
-import { SavedSource } from "./SavedSource";
+import { SavedSource } from "./SavedSource/SavedSource";
 import { SourceList } from "./SourceList";
+import type { ReactNode } from "react";
 
-const _noop = () => {};
-
+type Props = {
+  frame: number;
+  width: number;
+  height: number;
+};
 ModuleRegistry.registerModules([AllCommunityModule]);
-
+/** Duration of the import reenactment, in frames. */
 export const IMPORT_DURATION = 660;
+/** Measured pointer targets and click frames for the import film. */
 export const IMPORT_BEATS = [
   { frame: 45, target: "import-upload", action: "click" },
   { frame: 124, target: "import-name", action: "click" },
   { frame: 205, target: "import-description", action: "click" },
   { frame: 420, target: "import-save", action: "click" },
 ] as const;
-
 /**
  * Frame-controlled assembly of Avandar's real import presentation components.
  * Parent arrangement follows DataImportView, ManualUploadView,
@@ -32,11 +30,7 @@ export function ImportScreen({
   frame,
   width,
   height,
-}: {
-  frame: number;
-  width: number;
-  height: number;
-}) {
+}: Readonly<Props>): ReactNode {
   const saved = frame >= 456;
   return (
     <div
@@ -49,50 +43,8 @@ export function ImportScreen({
       }}
     >
       <SourceList saved={saved} />
-      <div className={css.importBody}>
-        {frame < 474 ? (
-          <AppView>
-            <AppViewHeader
-              title="Import data"
-              description="Upload a file, connect an external source, or browse the open data catalog."
-            />
-            <AppViewBody>
-              <Tabs
-                tabIds={["upload-view", "connectors-view", "open-data-catalog"]}
-                value="upload-view"
-                renderTabHeader={{
-                  "upload-view": "Upload",
-                  "connectors-view": "Connectors",
-                  "open-data-catalog": "Open data",
-                }}
-                renderTabPanel={{
-                  "upload-view": () => (
-                    <Box pt="lg">
-                      {frame < 68 ? (
-                        <Stack gap="xs">
-                          <div
-                            data-video-target="import-upload"
-                            style={{ opacity: 1 - ramp(frame, 52, 16) }}
-                          >
-                            <FileDropzone isLoading={false} onSelect={_noop} />
-                          </div>
-                          <Text size="xs" c="dimmed">
-                            Avandar reads the file in your browser. Nothing
-                            leaves this device until you save the dataset.
-                          </Text>
-                        </Stack>
-                      ) : (
-                        <ImportReview frame={Math.min(frame, 455)} />
-                      )}
-                    </Box>
-                  ),
-                  "connectors-view": () => null,
-                  "open-data-catalog": () => null,
-                }}
-              />
-            </AppViewBody>
-          </AppView>
-        ) : null}
+      <div className={css.importScreenBody}>
+        {frame < 474 ? <ImportFormView frame={frame} /> : null}
         {saved ? (
           <div
             style={{
@@ -100,7 +52,11 @@ export function ImportScreen({
               inset: 0,
               display: "flex",
               background: "var(--ava-surface-raised)",
-              opacity: ramp(frame, 456, 18),
+              opacity: Motion.ramp({
+                frame,
+                at: 456,
+                dur: 18,
+              }),
             }}
           >
             <SavedSource />
@@ -110,5 +66,4 @@ export function ImportScreen({
     </div>
   );
 }
-
 export { ImportScreen as Screen };

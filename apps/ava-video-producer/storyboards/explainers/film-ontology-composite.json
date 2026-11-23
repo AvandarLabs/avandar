@@ -26,7 +26,6 @@
         "title": "Configure the meaning",
         "category": "composite",
         "evidence": "Architectural illustration \u00b7 Fictional demonstration data",
-        "accent": "#82c8f2",
         "beats": [
           {
             "id": "choice",

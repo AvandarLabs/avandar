@@ -83,11 +83,13 @@ export const fixtures: Array<{ id: string; input: DecisionForkInput }> = [
     input: {
       ...DECISION_FORK_DENSE_INPUT,
       prompt: "界".repeat(52),
-      branches: DECISION_FORK_DENSE_INPUT.branches.map((branch) => ({
-        ...branch,
-        condition: "界".repeat(24),
-        outcome: "界".repeat(24),
-      })),
+      branches: DECISION_FORK_DENSE_INPUT.branches.map((branch) => {
+        return {
+          ...branch,
+          condition: "界".repeat(24),
+          outcome: "界".repeat(24),
+        };
+      }),
       scenarioLabel: "界".repeat(32),
       selectionLabel: "界".repeat(32),
     },

@@ -1,15 +1,17 @@
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = { symbol: "bench" | "books" | "garden"; x: number; y: number };
 /** Concrete project symbols preserve the authored choice identity. */
 export function ProjectSymbol({ symbol, x, y }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g
       transform={`translate(${x} ${y})`}
       fill="none"
-      stroke={STOCK.cyan}
-      strokeWidth={3}
+      stroke={tokens.color.accentAlt}
+      strokeWidth={scales.stroke(tokens.stroke.emphasis)}
     >
       {symbol === "bench" ? (
         <path d="M-20 -7 H20 V4 H-20 Z M-16 4 V16 M16 4 V16 M-22 -15 H22" />

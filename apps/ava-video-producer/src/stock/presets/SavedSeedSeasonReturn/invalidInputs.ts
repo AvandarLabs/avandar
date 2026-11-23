@@ -1,42 +1,25 @@
+import { omit } from "@avandar/utils";
 import { DEFAULT_INPUT } from "./defaultInput";
 /** Rejected structural, boundary and cross-field inputs. */
 export const invalidInputs: unknown[] = [
   {},
   { ...DEFAULT_INPUT, extra: true },
-  Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => field !== "crop"),
-  ),
+  omit(DEFAULT_INPUT, "crop"),
   { ...DEFAULT_INPUT, crop: { ...DEFAULT_INPUT.crop, extra: true } },
-  Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => field !== "cultivator"),
-  ),
+  omit(DEFAULT_INPUT, "cultivator"),
   {
     ...DEFAULT_INPUT,
     cultivator: { ...DEFAULT_INPUT.cultivator, extra: true },
   },
-  Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => field !== "seasons"),
-  ),
+  omit(DEFAULT_INPUT, "seasons"),
   { ...DEFAULT_INPUT, seasons: { ...DEFAULT_INPUT.seasons, extra: true } },
-  Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(
-      ([field]) => field !== "balanceLabels",
-    ),
-  ),
+  omit(DEFAULT_INPUT, "balanceLabels"),
   {
     ...DEFAULT_INPUT,
     balanceLabels: { ...DEFAULT_INPUT.balanceLabels, extra: true },
   },
-  Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(
-      ([field]) => field !== "evidenceLabel",
-    ),
-  ),
-  Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(
-      ([field]) => field !== "showQuantities",
-    ),
-  ),
+  omit(DEFAULT_INPUT, "evidenceLabel"),
+  omit(DEFAULT_INPUT, "showQuantities"),
   {
     ...DEFAULT_INPUT,
     crop: { ...DEFAULT_INPUT.crop, label: "WWWWWWWWWWWWWWWWWWWWWWWWW" },

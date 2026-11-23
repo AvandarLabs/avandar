@@ -1,0 +1,12 @@
+.shadowValueControlLayers {
+  display: grid;
+  gap: var(--atlas-space-8);
+}
+
+.shadowValueControlPreview {
+  background: var(--paper);
+  border-radius: var(--atlas-radius-6);
+  display: inline-block;
+  height: 24px;
+  width: 48px;
+}

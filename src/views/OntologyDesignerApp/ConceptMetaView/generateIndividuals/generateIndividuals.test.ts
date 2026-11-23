@@ -28,6 +28,7 @@ import type {
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { BuildableConcept } from "$/models/ontology/Concept/Concept.types";
 import type { ConceptAttributeId } from "$/models/ontology/ConceptAttribute/ConceptAttribute.types";
+import type { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
 import type { IndividualId } from "$/models/ontology/Individual/Individual.types";
 import type { UserId } from "$/models/User/User.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -76,6 +77,7 @@ const STAGING_TABLE = getStagingIndividualsTableName(CONCEPT_ID);
 function _makeDatasetColumn(
   id: DatasetColumnId,
   name: string,
+  dataType: DatasetColumnRead["dataType"] = "varchar",
 ): DatasetColumnRead {
   return Model.make("DatasetColumn", {
     id,
@@ -84,7 +86,7 @@ function _makeDatasetColumn(
     datasetId: DATASET_ID,
     workspaceId: WORKSPACE_ID,
     description: undefined,
-    dataType: "varchar" as const,
+    dataType,
     detectedDataType: "VARCHAR" as const,
     originalDataType: "VARCHAR",
     columnIdx: 0,
@@ -96,15 +98,17 @@ function _makeDatasetColumn(
 function _makeMapping(args: {
   conceptAttributeId: ConceptAttributeId;
   datasetColumnId: DatasetColumnId;
+  valuePickerRuleType?: DatasetColumnMapping["valuePickerRuleType"];
 }): DatasetColumnMapping {
   return {
     id: uuid<DatasetColumnMappingId>(),
     workspaceId: WORKSPACE_ID,
     type: "dataset_column",
     conceptAttributeId: args.conceptAttributeId,
-    valuePickerRuleType: "first",
+    valuePickerRuleType: args.valuePickerRuleType ?? "first",
     datasetId: DATASET_ID,
     datasetColumnId: args.datasetColumnId,
+    bucketColumnId: undefined,
     createdAt: "2026-08-19T00:00:00.000Z",
     updatedAt: "2026-08-19T00:00:00.000Z",
   };
@@ -114,7 +118,9 @@ function _makeMapping(args: {
  * A concept with the minimum `generateIndividuals` reads: one identifier
  * attribute and one label attribute, each mapped to a dataset column.
  */
-function _makeConcept(): BuildableConcept {
+function _makeConcept(
+  labelRuleType?: DatasetColumnMapping["valuePickerRuleType"],
+): BuildableConcept {
   const identifierAttributeId = uuid<ConceptAttributeId>();
   const labelAttributeId = uuid<ConceptAttributeId>();
 
@@ -124,6 +130,7 @@ function _makeConcept(): BuildableConcept {
     isIdentifier: boolean;
     isLabel: boolean;
     datasetColumnId: DatasetColumnId;
+    valuePickerRuleType?: DatasetColumnMapping["valuePickerRuleType"];
   }) => {
     return {
       ...Model.make("ConceptAttribute", {
@@ -140,10 +147,12 @@ function _makeConcept(): BuildableConcept {
         isIdentifier: args.isIdentifier,
         allowManualEdit: false,
         isArray: false,
+        bucketGrain: undefined,
       }),
       mapping: _makeMapping({
         conceptAttributeId: args.id,
         datasetColumnId: args.datasetColumnId,
+        valuePickerRuleType: args.valuePickerRuleType,
       }),
     };
   };
@@ -158,6 +167,7 @@ function _makeConcept(): BuildableConcept {
       createdAt: "2026-08-19T00:00:00.000Z",
       updatedAt: "2026-08-19T00:00:00.000Z",
       allowManualCreation: false,
+      defaultStatusId: uuid<ConceptStatus.Id>(),
     }),
     datasets: [],
     attributes: [
@@ -174,6 +184,7 @@ function _makeConcept(): BuildableConcept {
         isIdentifier: false,
         isLabel: true,
         datasetColumnId: NAME_COLUMN_ID,
+        valuePickerRuleType: labelRuleType,
       }),
     ],
   };
@@ -301,7 +312,29 @@ describe("generateIndividuals", () => {
     ]);
   });
 
-  it("never includes id, status, assigned_to, created_at, or updated_at in an upsert payload", async () => {
+  it("builds an accent- and case-insensitive ordering for a text label under max", async () => {
+    await generateIndividuals(_makeConcept("max"));
+
+    const createSql = _getRunSqlStatements()[0]!;
+    expect(createSql).toContain(
+      `arg_max(dataset."full_name", {'k': lower(strip_accents(CAST(dataset."full_name" AS VARCHAR))), 'v': dataset."full_name"})`,
+    );
+  });
+
+  it("picks a non-text label under max with a plain MAX", async () => {
+    getAllDatasetColumnsMock.mockResolvedValue([
+      _makeDatasetColumn(EXTERNAL_ID_COLUMN_ID, "person_id"),
+      _makeDatasetColumn(NAME_COLUMN_ID, "full_name", "bigint"),
+    ]);
+
+    await generateIndividuals(_makeConcept("max"));
+
+    const createSql = _getRunSqlStatements()[0]!;
+    expect(createSql).toContain('MAX(dataset."full_name")');
+    expect(createSql).not.toContain("strip_accents");
+  });
+
+  it("never includes id, status_id, assigned_to, created_at, or updated_at in an upsert payload", async () => {
     _mockSinglePage([{ external_id: "ext-1", name: "Jane Doe" }]);
 
     await generateIndividuals(_makeConcept());
@@ -310,7 +343,7 @@ describe("generateIndividuals", () => {
     const [{ data }] = bulkInsertMock.mock.calls[0]!;
     (data as Array<Record<string, unknown>>).forEach((row) => {
       expect(row).not.toHaveProperty("id");
-      expect(row).not.toHaveProperty("status");
+      expect(row).not.toHaveProperty("status_id");
       expect(row).not.toHaveProperty("assigned_to");
       expect(row).not.toHaveProperty("created_at");
       expect(row).not.toHaveProperty("updated_at");
@@ -325,7 +358,7 @@ describe("generateIndividuals", () => {
         conceptId: CONCEPT_ID,
         externalId: "ext-1",
         name: "Jane Doe",
-        status: "active",
+        statusId: uuid<ConceptStatus.Id>(),
         assignedTo: undefined,
         missingFromSourceAt: undefined,
         createdAt: "2026-08-19T00:00:00.000Z",
@@ -347,7 +380,7 @@ describe("generateIndividuals", () => {
         conceptId: CONCEPT_ID,
         externalId: "ext-gone",
         name: "Ghost Record",
-        status: "active",
+        statusId: uuid<ConceptStatus.Id>(),
         assignedTo: undefined,
         missingFromSourceAt: undefined,
         createdAt: "2026-08-19T00:00:00.000Z",
@@ -427,5 +460,23 @@ describe("generateIndividuals", () => {
       current: 2,
       total: 3,
     });
+  });
+
+  // The label names each record with one value. A label whose mapping names
+  // no rule cannot pick one, so the sync fails rather than guessing.
+  it("refuses to sync a case type whose label names no value rule", async () => {
+    const concept = _makeConcept();
+    const attributes = concept.attributes.map((attribute) => {
+      return attribute.isLabel && attribute.mapping.type === "dataset_column"
+        ? {
+            ...attribute,
+            mapping: { ...attribute.mapping, valuePickerRuleType: undefined },
+          }
+        : attribute;
+    });
+
+    await expect(
+      generateIndividuals({ ...concept, attributes }),
+    ).rejects.toThrow(/label attribute .full_name.*names no value rule/i);
   });
 });

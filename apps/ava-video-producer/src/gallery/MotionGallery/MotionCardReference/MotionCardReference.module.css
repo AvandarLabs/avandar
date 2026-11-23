@@ -1,0 +1,3 @@
+.motionCardReferenceCardFoot {
+  composes: card-foot from global;
+}

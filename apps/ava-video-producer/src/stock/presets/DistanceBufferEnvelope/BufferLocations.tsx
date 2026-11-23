@@ -15,16 +15,18 @@ export function BufferLocations({
 }: Readonly<Props>): ReactNode {
   return (
     <g>
-      {input.locations.map((location, index) => (
-        <g key={location.id}>
-          <BufferSourceMarker
-            input={input}
-            location={location}
-            accent={accent}
-          />
-          <BufferSourceRow input={input} location={location} index={index} />
-        </g>
-      ))}
+      {input.locations.map((location, index) => {
+        return (
+          <g key={location.id}>
+            <BufferSourceMarker
+              input={input}
+              location={location}
+              accent={accent}
+            />
+            <BufferSourceRow input={input} location={location} index={index} />
+          </g>
+        );
+      })}
       <BufferInclusionLedger input={input} frame={frame} accent={accent} />
     </g>
   );

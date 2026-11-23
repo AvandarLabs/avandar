@@ -1,0 +1,16 @@
+/*
+ * The detail pane is not a scroll container, so a message placed in it
+ * scrolls itself. Auto margins center the message while it fits and, unlike
+ * `justify-content: center`, keep its top reachable once it does not.
+ */
+.pane {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--mantine-spacing-md);
+}
+
+.message {
+  margin: auto;
+}

@@ -1,5 +1,5 @@
 import { propEq } from "@avandar/utils";
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import type { Input } from "./FieldConflictChoice.schema";
 
 type Options = {
@@ -20,7 +20,6 @@ type GetConflictCandidateStateResult = {
   top: number;
   opacity: number;
 };
-
 /** An explicit choice determines lane movement and alternative visibility. */
 export function getConflictCandidateStateFromField({
   source,
@@ -42,11 +41,11 @@ export function getConflictCandidateStateFromField({
     !isChosen &&
     !input.showRetainedAlternatives &&
     progress === 1;
-  const x = mix(
-    progress,
-    44 + sourceIndex * 456,
-    isResolved ? (isChosen ? 44 : 500) : 44 + sourceIndex * 456,
-  );
+  const x = Motion.mix({
+    t: progress,
+    from: 44 + sourceIndex * 456,
+    to: isResolved ? (isChosen ? 44 : 500) : 44 + sourceIndex * 456,
+  });
   const top = y + 30 - Math.sin(progress * Math.PI) * (isChosen ? 6 : 0);
   const opacity =
     isResolved && !isChosen

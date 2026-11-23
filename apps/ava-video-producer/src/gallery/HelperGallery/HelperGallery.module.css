@@ -1,0 +1,3 @@
+.helperGallerySkipLink {
+  composes: skip-link from global;
+}

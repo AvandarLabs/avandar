@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { propEq } from "@avandar/utils";
 import { registerStockPresetAssertions } from "../../../../../tests/helpers/registerStockPresetAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
@@ -22,10 +23,47 @@ import {
   _assertBookingClearsLabels,
 } from "./MobileClinicRelocationTestHelpers";
 
-test("invalid authored inputs reject before rendering", () => {
-  invalidInputs.forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
+type GetClinicStagesResult = {
+  first: string;
+  driving: string;
+  last: string;
+};
+
+function _getClinicStages(input: Readonly<Input>): GetClinicStagesResult {
+  const first = _attributes({
+    markup: _render({ frame: 30, input: input }),
+    attribute: "data-clinic",
+    value: "vehicle",
+  });
+  const driving = _attributes({
+    markup: _render({ frame: 72, input: input }),
+    attribute: "data-clinic",
+    value: "vehicle",
+  });
+  const last = _attributes({
+    markup: _render({ frame: 150, input: input }),
+    attribute: "data-clinic",
+    value: "vehicle",
+  });
+  return { first, driving, last };
+}
+
+function _assertTheVehicleBodyMovesWithDataAwning(
+  input: Readonly<Input>,
+): void {
+  assert.ok(
+    _attributes({
+      markup: _render({ frame: 72, input: input }),
+      attribute: "data-awning",
+      value: "clinic",
+    }).includes("M-42 -22 H20 L20 -22 H-42 Z"),
   );
+}
+
+test("invalid authored inputs reject before rendering", () => {
+  invalidInputs.forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
 });
 
 test("one clinic relocates while authored slot assignments conserve finite capacity", () => {
@@ -80,21 +118,7 @@ registerStockTextLayoutAssertions(ASSERTIONS);
 test("the vehicle body moves with its awning folded and preserves both map contexts", () => {
   ["local-map", "globe-to-local"].forEach((view) => {
     const input = { ...DEFAULT_INPUT, view: view as Input["view"] };
-    const first = _attributes({
-      markup: _render({ frame: 30, input: input }),
-      attribute: "data-clinic",
-      value: "vehicle",
-    });
-    const driving = _attributes({
-      markup: _render({ frame: 72, input: input }),
-      attribute: "data-clinic",
-      value: "vehicle",
-    });
-    const last = _attributes({
-      markup: _render({ frame: 150, input: input }),
-      attribute: "data-clinic",
-      value: "vehicle",
-    });
+    const { first, driving, last } = _getClinicStages(input);
     const startTransform = first.match(
       /transform="translate\(([^ ]+) ([^)]+)\)"/,
     );
@@ -114,20 +138,14 @@ test("the vehicle body moves with its awning folded and preserves both map conte
         name: "data-x",
       }) < 388.2,
     );
-    assert.ok(
-      _attributes({
-        markup: _render({ frame: 72, input: input }),
-        attribute: "data-awning",
-        value: "clinic",
-      }).includes("M-42 -22 H20 L20 -22 H-42 Z"),
-    );
-    [30, 150].forEach((frame) =>
-      assert.ok(
+    _assertTheVehicleBodyMovesWithDataAwning(input);
+    [30, 150].forEach((frame) => {
+      return assert.ok(
         _render({ frame: frame, input: input }).includes(
           'transform="translate(518 418) scale(',
         ),
-      ),
-    );
+      );
+    });
   });
 });
 
@@ -157,43 +175,61 @@ boundaryLabelInputs.forEach((input, index) => {
 });
 
 test("serialized contract exposes collection identity validation", () => {
+  // This assertion exercises the JSON serialization boundary of the public
+  // contract.
+  // react-doctor-disable-next-line no-json-parse-stringify-clone
   const rules = JSON.parse(
     JSON.stringify(mobileClinicRelocationContract.semanticRules),
   ) as typeof mobileClinicRelocationContract.semanticRules;
   const paths = ["sites.*.id", "slots.*.id", "people.*.id"];
-  const rule = rules.find(
-    (candidate) =>
+  const rule = rules.find((candidate) => {
+    return (
       candidate.paths.length === paths.length &&
-      paths.every((path) => candidate.paths.includes(path)),
-  );
+      paths.every((path) => {
+        return candidate.paths.includes(path);
+      })
+    );
+  });
   assert.ok(rule, "Runtime-only rule retains its precise field paths.");
   assert.match(rule.description, /unique within each collection/i);
 });
 
 test("serialized contract exposes site separation validation", () => {
+  // This assertion exercises the JSON serialization boundary of the public
+  // contract.
+  // react-doctor-disable-next-line no-json-parse-stringify-clone
   const rules = JSON.parse(
     JSON.stringify(mobileClinicRelocationContract.semanticRules),
   ) as typeof mobileClinicRelocationContract.semanticRules;
   const paths = ["sites.*.x", "sites.*.y"];
-  const rule = rules.find(
-    (candidate) =>
+  const rule = rules.find((candidate) => {
+    return (
       candidate.paths.length === paths.length &&
-      paths.every((path) => candidate.paths.includes(path)),
-  );
+      paths.every((path) => {
+        return candidate.paths.includes(path);
+      })
+    );
+  });
   assert.ok(rule, "Runtime-only rule retains its precise field paths.");
   assert.match(rule.description, /Euclidean.*at least 0\.4/i);
 });
 
 test("serialized contract exposes booking reference validation", () => {
+  // This assertion exercises the JSON serialization boundary of the public
+  // contract.
+  // react-doctor-disable-next-line no-json-parse-stringify-clone
   const rules = JSON.parse(
     JSON.stringify(mobileClinicRelocationContract.semanticRules),
   ) as typeof mobileClinicRelocationContract.semanticRules;
   const paths = ["people.*.slotId", "slots.*.id"];
-  const rule = rules.find(
-    (candidate) =>
+  const rule = rules.find((candidate) => {
+    return (
       candidate.paths.length === paths.length &&
-      paths.every((path) => candidate.paths.includes(path)),
-  );
+      paths.every((path) => {
+        return candidate.paths.includes(path);
+      })
+    );
+  });
   assert.ok(rule, "Runtime-only rule retains its precise field paths.");
   assert.match(
     rule.description,
@@ -202,15 +238,21 @@ test("serialized contract exposes booking reference validation", () => {
 });
 
 test("serialized contract exposes booking exclusivity validation", () => {
+  // This assertion exercises the JSON serialization boundary of the public
+  // contract.
+  // react-doctor-disable-next-line no-json-parse-stringify-clone
   const rules = JSON.parse(
     JSON.stringify(mobileClinicRelocationContract.semanticRules),
   ) as typeof mobileClinicRelocationContract.semanticRules;
   const paths = ["people.*.slotId"];
-  const rule = rules.find(
-    (candidate) =>
+  const rule = rules.find((candidate) => {
+    return (
       candidate.paths.length === paths.length &&
-      paths.every((path) => candidate.paths.includes(path)),
-  );
+      paths.every((path) => {
+        return candidate.paths.includes(path);
+      })
+    );
+  });
   assert.ok(rule, "Runtime-only rule retains its precise field paths.");
   assert.match(rule.description, /at most one.*assigned.*slot/i);
 });
@@ -219,9 +261,9 @@ bookingLabelInputs.forEach((input, rotation) => {
   test(`occupied slot mapping ${rotation} clears complete site labels`, () => {
     assert.equal(inputSchema.safeParse(input).success, true);
     const markup = _render({ frame: 150, input: input });
-    const boxes = input.sites.flatMap(({ label }) =>
-      _getLabelLineBoxes({ markup: markup, label: label }),
-    );
+    const boxes = input.sites.flatMap(({ label }) => {
+      return _getLabelLineBoxes({ markup: markup, label: label });
+    });
     assert.equal((markup.match(/data-booking=/g) ?? []).length, 6);
     const paths = input.people.flatMap((person, index) => {
       if (person.slotId === null) {
@@ -234,7 +276,7 @@ bookingLabelInputs.forEach((input, rotation) => {
       });
       const samples = _assertBookingClearsLabels({ path, boxes });
       _assertBookingClearsLabels({ path, boxes, clearance: 3.5 });
-      const slotIndex = input.slots.findIndex(({ id }) => id === person.slotId);
+      const slotIndex = input.slots.findIndex(propEq("id", person.slotId));
       assert.deepEqual(samples[0], { x: 74 + index * 114, y: 418 });
       assert.deepEqual(samples.at(-1), { x: 642, y: 160 + slotIndex * 44 });
       return [path.match(/ d="([^"]+)"/)?.[1]];

@@ -1,12 +1,15 @@
 /** Behavioral tests for assistant transcript message visibility. */
 import { screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { AgentQueryResult } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResult";
+import { AgentQueryResultPartLazy } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResultPartLazy";
 import { render } from "@/test-utils";
 import { AssistantMessage } from "./AssistantMessage";
 import type { ReactNode } from "react";
 
-const { messageState } = vi.hoisted(() => {
+const { messageState, partsProps } = vi.hoisted(() => {
   return {
+    partsProps: { current: undefined as unknown },
     messageState: {
       metadata: { custom: {} } as {
         custom: Record<string, unknown>;
@@ -29,7 +32,8 @@ vi.mock("@assistant-ui/react", () => {
       If: ({ children }: { children: ReactNode }) => {
         return <>{children}</>;
       },
-      Parts: () => {
+      Parts: (props: unknown) => {
+        partsProps.current = props;
         return <span>Message content</span>;
       },
     },
@@ -73,5 +77,16 @@ describe("AssistantMessage", () => {
     render(<AssistantMessage />);
 
     expect(screen.getByTestId("message-root")).toBeVisible();
+  });
+
+  it("draws agent query results with the lazily loaded result part", () => {
+    render(<AssistantMessage />);
+
+    const props = partsProps.current as {
+      components: { data: { by_name: Record<string, unknown> } };
+    };
+    expect(props.components.data.by_name[AgentQueryResult.PART_NAME]).toBe(
+      AgentQueryResultPartLazy,
+    );
   });
 });

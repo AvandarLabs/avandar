@@ -1,6 +1,20 @@
 #!/usr/bin/env python3
 """Build the fictional Harborfield import fixtures without network or dependencies."""
 
+import sys
+
+# Public CLI routing precedes license reads, fixture reads and writes.
+if __name__ == "__main__":
+    import os
+    import sys
+    import subprocess
+    from pathlib import Path
+    if os.environ.get("AVA_PRODUCER_ACTIVE_PYTHON") != str(Path(__file__).resolve()):
+        launcher = Path(__file__).resolve().parent.parent / "scripts/runProducerCommand/runPythonCommand.mjs"
+        raise SystemExit(subprocess.call(["node", str(launcher), "data:generate", str(Path(__file__).resolve()), *sys.argv[1:]]))
+
+
+
 import argparse
 import csv
 import hashlib
@@ -194,10 +208,10 @@ def main():
             path.write_bytes(content)
     if mismatches:
         raise SystemExit("Regeneration mismatch: " + ", ".join(mismatches))
-    print("Fixture regeneration matches." if args.check else "Generated five CSVs and manifest.json.")
+    print("Fixture regeneration matches." if args.check else "Generated five CSVs and manifest.json.", file=sys.stderr)
 
 
 if __name__ == "__main__":
     import subprocess
-    subprocess.run(["node", str(Path(__file__).resolve().parent.parent / "scripts/require-license.mjs")], check=True)
+    subprocess.run(["node", "--import", "tsx", str(Path(__file__).resolve().parent.parent / "scripts/requireLicense.ts")], check=True)
     main()

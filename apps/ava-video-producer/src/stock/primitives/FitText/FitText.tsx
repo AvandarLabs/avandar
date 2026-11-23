@@ -1,4 +1,5 @@
-import { STOCK } from "../../stockPalette";
+import { getLetterSpacingFromTypeStyle } from "../../graphics-common/getLetterSpacingFromTypeStyle";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { type TextBounds, wrapTextToLines } from "./wrapTextToLines";
 import type { ReactNode } from "react";
 /** Data for Props. */
@@ -8,10 +9,14 @@ type PropsResult = {
   color?: string;
   anchor?: "start" | "middle" | "end";
 };
-
 type Props = TextBounds & PropsResult;
-
-/** Renders every authored word at one fixed size or fails before drawing. */
+/**
+ * Renders every authored word at one fixed size or fails before drawing.
+ * The size is content, validated against measured widths; the family,
+ * weight, tracking, colour, and line spacing come from the
+ * `text.graphic.data` role. Widths are measured at regular weight with no
+ * tracking, so a heavier or wider data role can run past them.
+ */
 export function FitText({
   text,
   width,
@@ -21,9 +26,11 @@ export function FitText({
   normalizeWhitespace = false,
   x,
   y,
-  color = STOCK.text,
+  color,
   anchor = "start",
 }: Readonly<Props>): ReactNode {
+  const data = GraphicThemeHooks.useGraphicTokens().text.graphic.data;
+  const lineHeight = data.lineHeight ?? 1.3;
   const lines = wrapTextToLines({
     text,
     width,
@@ -37,16 +44,20 @@ export function FitText({
       aria-label={normalizeWhitespace ? text : undefined}
       x={x}
       y={y}
-      fill={color}
+      fill={color ?? data.color}
       fontSize={fontSize}
-      fontFamily="Arial, sans-serif"
+      fontWeight={data.fontWeight}
+      fontFamily={data.fontFamily}
+      letterSpacing={getLetterSpacingFromTypeStyle({ style: data, fontSize })}
       textAnchor={anchor}
     >
-      {lines.map((line, index) => (
-        <tspan key={index} x={x} dy={index ? fontSize * 1.3 : 0}>
-          {line}
-        </tspan>
-      ))}
+      {lines.map((line, index) => {
+        return (
+          <tspan key={index} x={x} dy={index ? fontSize * lineHeight : 0}>
+            {line}
+          </tspan>
+        );
+      })}
     </text>
   );
 }

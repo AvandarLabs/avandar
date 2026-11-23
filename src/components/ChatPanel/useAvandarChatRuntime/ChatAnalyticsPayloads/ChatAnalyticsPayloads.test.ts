@@ -43,20 +43,18 @@ const EDITOR_STATE_WITH_TWO_BLOCKS: DashboardEditorAppState = {
 };
 
 describe("ChatAnalyticsPayloads", () => {
-  it("describes the initially selected local route", () => {
+  it("describes a turn that runs on the offline models as local", () => {
     expect(
       ChatAnalyticsPayloads.fromMessage({
         content: "show monthly sales",
         pageContext: ChatPageContext.createDataExplorerViewContext({
           openDatasetId: "dataset-1",
         }),
-        selectedModelId: "offline:qwen-1.5b",
-        runtimeMode: { kind: "local", localChatModelId: "qwen-1.5b" },
+        runtimeMode: { kind: "local" },
       }),
     ).toEqual({
       promptChars: 18,
       pageApp: "data-explorer",
-      modelId: "offline:qwen-1.5b",
       runtimeMode: "local",
       hasOpenDataset: true,
     });
@@ -75,6 +73,28 @@ describe("ChatAnalyticsPayloads", () => {
       runtimeMode: "cloud",
       hasOpenDataset: false,
     });
+  });
+
+  it("counts mentions and attached items, never names", () => {
+    const payload = ChatAnalyticsPayloads.fromMessage({
+      content: 'Show @"US deaths"',
+      pageContext: ChatPageContext.createDashboardsViewContext({
+        dashboardId: "dashboard-1",
+      }),
+      runtimeMode: { kind: "cloud" },
+      mentionCount: 1,
+      attachedCount: 2,
+    });
+
+    expect(payload).toEqual({
+      promptChars: 17,
+      pageApp: "dashboards",
+      runtimeMode: "cloud",
+      hasOpenDataset: false,
+      mentionCount: 1,
+      attachedCount: 2,
+    });
+    expect(JSON.stringify(payload)).not.toContain("US deaths");
   });
 
   it("counts SQL without retaining SQL", () => {

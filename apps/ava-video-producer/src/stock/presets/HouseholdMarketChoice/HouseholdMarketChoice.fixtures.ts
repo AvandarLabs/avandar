@@ -132,10 +132,12 @@ export const fixtures: Array<{ id: string; input: Input }> = [
     id: "rightmost-selections",
     input: {
       ...DENSE_INPUT,
-      products: DENSE_INPUT.products.map((product, index) => ({
-        ...product,
-        chosen: index >= 2,
-      })),
+      products: DENSE_INPUT.products.map((product, index) => {
+        return {
+          ...product,
+          chosen: index >= 2,
+        };
+      }),
     },
   },
   {

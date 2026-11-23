@@ -1,4 +1,6 @@
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -18,6 +20,8 @@ export function ReadingPerson({
   handX,
   handY,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <>
       <PersonGlyph
@@ -28,13 +32,18 @@ export function ReadingPerson({
         color={accent}
       />
       {hasHand ? (
-        <path
-          data-reading-hand={learnerId}
-          d={`M0 0 L${handX / 2} ${handY / 2} L${handX} ${handY}`}
-          fill="none"
-          stroke={accent}
-          strokeWidth={2.5}
-        />
+        <g data-reading-hand={learnerId}>
+          <SketchedShape
+            shape={{
+              kind: "path",
+              d: `M0 0 L${handX / 2} ${handY / 2} L${handX} ${handY}`,
+            }}
+            profile={tokens.sketch.shape}
+            fill="none"
+            stroke={accent}
+            strokeWidth={scales.stroke(2.5)}
+          />
+        </g>
       ) : undefined}
     </>
   );

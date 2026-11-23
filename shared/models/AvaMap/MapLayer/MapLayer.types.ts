@@ -52,6 +52,9 @@ export type PopupConfig = {
   action: PopupLinkAction | undefined;
 };
 
+/** Another layer whose polygons a layer's features must intersect. */
+export type MapLayerSpatialFilter = { layerId: MapLayerId };
+
 type MapLayerCommon = {
   id: MapLayerId;
   name: string;
@@ -68,6 +71,9 @@ type MapLayerCommon = {
 
   /** Whether features outside the map's AOI are excluded. */
   applyAoiFilter: boolean;
+
+  /** Keeps only features that intersect another layer's output. */
+  spatialFilter: MapLayerSpatialFilter | undefined;
 
   /** Column carrying disputed-boundary status, or unset when all settled. */
   disputedStatusColumn: DisputedStatusRef | undefined;

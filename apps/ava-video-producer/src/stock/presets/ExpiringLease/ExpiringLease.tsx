@@ -1,40 +1,48 @@
 import { propEq } from "@avandar/utils";
-import { EASE, mix, ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { Motion } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getSocketPointFromIndex } from "./getSocketPointFromIndex";
 import { LeaseCaptions } from "./LeaseCaptions";
-import { LeaseSocket } from "./LeaseSocket";
-import type { GraphicProps } from "../../graphics-common";
+import { LeasePoolDock } from "./LeasePoolDock/LeasePoolDock";
+import { EXPIRY_CUE } from "./leaseShape";
+import { LeaseSocket } from "./LeaseSocket/LeaseSocket";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ExpiringLease.schema";
-import type { ComponentProps, ReactNode } from "react";
+import type { ReactNode } from "react";
 
-type Props = GraphicProps & { input: Input };
-const DOCK = {
-  cx: 480,
-  cy: 430,
-  r: 34,
-  fill: STOCK.surface,
-  stroke: STOCK.line,
-  strokeWidth: 3,
-} satisfies Pick<
-  ComponentProps<"circle">,
-  "cx" | "cy" | "r" | "fill" | "stroke" | "strokeWidth"
->;
-const ROUTE = {
-  fill: "none",
-  stroke: STOCK.line,
-  strokeWidth: 2,
-  strokeDasharray: "4 8",
-} satisfies Pick<
-  ComponentProps<"path">,
-  "fill" | "stroke" | "strokeWidth" | "strokeDasharray"
->;
-/** One token expires into neutral custody without inferring a successor. */
-export function ExpiringLease({
+type LeaseToken = {
+  cx: number;
+  cy: number;
+  r: number;
+  fill: string;
+  opacity: number;
+};
+type LeaseTokenState = {
+  holder: ReturnType<typeof getSocketPointFromIndex>;
+  token: LeaseToken;
+  socketProps: Pick<Props, "input" | "frame" | "accent">;
+};
+
+type Props = GraphicProps & {
+  input: Input;
+};
+/** Frames the token takes to return to the dock. */
+const RETURN_FRAMES = 28;
+
+type GetLeaseTokenStateOptions = {
+  frame: number;
+  accent: string;
+  input: Input;
+  motion: ReturnType<typeof GraphicThemeHooks.useGraphicMotion>;
+};
+/** Samples the authored lease token state. */
+function _getLeaseTokenState({
   frame,
   accent,
   input,
-}: Readonly<Props>): ReactNode {
+  motion,
+}: Readonly<GetLeaseTokenStateOptions>): LeaseTokenState {
   const holderIndex = input.participants.findIndex(
     propEq("id", input.holderId),
   );
@@ -42,36 +50,61 @@ export function ExpiringLease({
     index: holderIndex,
     numParticipants: input.participants.length,
   });
-  const returning = ramp(frame, 108, 28, EASE.inOut);
-  const route = {
-    d: `M${holder.x} ${holder.y} L480 430`,
-    ...ROUTE,
-    opacity: ramp(frame, 24, 12),
-  };
+  const returning = Motion.ramp({
+    frame,
+    at: EXPIRY_CUE,
+    dur: motion.scale(RETURN_FRAMES),
+    easing: motion.travel.easing,
+  });
   const token = {
-    cx: mix(returning, holder.x, 480),
-    cy: mix(returning, holder.y, 430),
+    cx: Motion.mix({ t: returning, from: holder.x, to: 480 }),
+    cy: Motion.mix({ t: returning, from: holder.y, to: 430 }),
     r: 12,
     fill: accent,
-    opacity: ramp(frame, 18, 12),
+    opacity: motion.reveal(frame, 18),
   };
   const socketProps = { input, frame, accent };
+  return { holder, token, socketProps };
+}
+
+/** One token expires into neutral custody without inferring a successor. */
+export function ExpiringLease({
+  frame,
+  accent,
+  input,
+}: Readonly<Props>): ReactNode {
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const { holder, token, socketProps } = _getLeaseTokenState({
+    frame,
+    accent,
+    input,
+    motion,
+  });
   return (
     <g>
-      <circle
-        data-neutral-dock="pool"
-        {...DOCK}
-        opacity={ramp(frame, 12, 12)}
+      <LeasePoolDock {...{ frame, tokens, scales, motion }} />
+      <SketchedShape
+        shape={{ kind: "path", d: `M${holder.x} ${holder.y} L480 430` }}
+        profile={tokens.sketch.shape}
+        fill="none"
+        stroke={tokens.color.line}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
+        strokeDasharray={atomic.dash.airy.join(" ")}
+        opacity={motion.reveal(frame, 24)}
       />
-      <path {...route} />
-      {input.participants.map((participant, index) => (
-        <LeaseSocket
-          key={participant.id}
-          participant={participant}
-          index={index}
-          {...socketProps}
-        />
-      ))}
+      {input.participants.map((participant, index) => {
+        return (
+          <LeaseSocket
+            key={participant.id}
+            participant={participant}
+            index={index}
+            {...socketProps}
+          />
+        );
+      })}
       <circle data-permission-token="single" {...token} />
       {input.showLabels ? (
         <LeaseCaptions input={input} frame={frame} />

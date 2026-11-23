@@ -1,9 +1,15 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { propEq } from "@avandar/utils";
+import { Motion } from "../../../motion";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./OutreachHouseholdRevisits.schema";
 import type { ReactNode } from "react";
 
-type Props = { input: Input; frame: number; accent: string };
+type Props = {
+  input: Input;
+  frame: number;
+  accent: string;
+};
 /**
  * A single worker follows the authored order, including stationary revisits.
  */
@@ -12,39 +18,12 @@ export function OutreachWorker({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const duration = 72 / input.visits.length;
-  const eventIndex = Math.min(
-    input.visits.length - 1,
-    Math.max(0, Math.floor((frame - 36) / duration)),
-  );
-  const household = input.households.find(
-    ({ id }) => id === input.visits[eventIndex].householdId,
-  );
-  const previous =
-    eventIndex > 0
-      ? input.households.find(
-          ({ id }) => id === input.visits[eventIndex - 1].householdId,
-        )
-      : undefined;
-  if (!household || (eventIndex > 0 && !previous)) {
-    throw new Error("Visit references must resolve to supplied households.");
-  }
-  const progress = ramp(
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const { x, y } = _getWorkerPositionFromInputAndFrame({
+    input,
     frame,
-    36 + eventIndex * duration,
-    duration,
-    EASE.inOut,
-  );
-  const x = mix(
-    progress,
-    previous ? 80 + previous.x * 480 : 70,
-    80 + household.x * 480,
-  );
-  const y = mix(
-    progress,
-    previous ? 120 + previous.y * 270 : 380,
-    120 + household.y * 270,
-  );
+    motion,
+  });
   return (
     <g data-worker="worker" data-x={x} data-y={y}>
       <PersonGlyph
@@ -57,4 +36,50 @@ export function OutreachWorker({
       />
     </g>
   );
+}
+
+/** The worker interpolates between the current and preceding visit. */
+function _getWorkerPositionFromInputAndFrame({
+  input,
+  frame,
+  motion,
+}: Readonly<
+  Pick<Props, "input" | "frame"> & {
+    motion: ReturnType<typeof GraphicThemeHooks.useGraphicMotion>;
+  }
+>): { x: number; y: number } {
+  const duration = 72 / input.visits.length;
+  const eventIndex = Math.min(
+    input.visits.length - 1,
+    Math.max(0, Math.floor((frame - 36) / duration)),
+  );
+  const household = input.households.find(
+    propEq("id", input.visits[eventIndex].householdId),
+  );
+  const previous =
+    eventIndex > 0
+      ? input.households.find(
+          propEq("id", input.visits[eventIndex - 1].householdId),
+        )
+      : undefined;
+  if (!household || (eventIndex > 0 && !previous)) {
+    throw new Error("Visit references must resolve to supplied households.");
+  }
+  const progress = motion.ramp(
+    frame,
+    36 + eventIndex * duration,
+    duration,
+    motion.travel.easing,
+  );
+  const x = Motion.mix({
+    t: progress,
+    from: previous ? 80 + previous.x * 480 : 70,
+    to: 80 + household.x * 480,
+  });
+  const y = Motion.mix({
+    t: progress,
+    from: previous ? 120 + previous.y * 270 : 380,
+    to: 120 + household.y * 270,
+  });
+  return { x, y };
 }

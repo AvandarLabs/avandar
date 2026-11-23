@@ -1,0 +1,4 @@
+.referenceControl {
+  display: grid;
+  gap: var(--atlas-space-4);
+}

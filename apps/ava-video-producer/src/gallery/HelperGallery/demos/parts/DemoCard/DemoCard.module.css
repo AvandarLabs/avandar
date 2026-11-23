@@ -1,0 +1,31 @@
+.demoCardCard {
+  background: var(--demo-panel);
+  border: var(--demo-stroke-hairline) solid var(--demo-line);
+  border-radius: var(--demo-corner-label);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--demo-space-10);
+  height: 96px;
+  padding: var(--demo-space-2xs) var(--demo-space-18);
+  width: 240px;
+}
+
+.demoCardCardTitle {
+  color: var(--demo-text);
+  font-size: var(--demo-font-size-xl);
+  font-weight: var(--demo-font-weight-semibold);
+}
+
+.demoCardCardBar {
+  background: var(--demo-line);
+  border-radius: var(--demo-corner-chip);
+  height: 10px;
+}
+
+.demoCardCardBarShort {
+  /* The composed name is a class reference, not a CSS keyword, so its case must match. */
+  /* stylelint-disable-next-line value-keyword-case */
+  composes: demoCardCardBar;
+  width: 60%;
+}

@@ -1,0 +1,15 @@
+.atlasCollectionToolbarCollectionToolbar {
+  composes: collection-toolbar from global;
+}
+
+.atlasCollectionToolbarCollectionHeading {
+  composes: collection-heading from global;
+}
+
+.atlasCollectionToolbarResultCount {
+  composes: result-count from global;
+}
+
+.atlasCollectionToolbarToolbarTools {
+  composes: toolbar-tools from global;
+}

@@ -5,11 +5,15 @@ type Props = { count: number; x: number; y: number };
 /**
  * Analytical numerical copy stays readable independently of public suppression.
  */
-export function LocalCountValue({ count, x, y }: Readonly<Props>): ReactNode {
+export function LocalCountValue({
+  count: numRecords,
+  x,
+  y,
+}: Readonly<Props>): ReactNode {
   return (
     <g>
       <FitText
-        text={String(count)}
+        text={String(numRecords)}
         x={x + 85}
         y={y + 78}
         width={80}
@@ -18,7 +22,7 @@ export function LocalCountValue({ count, x, y }: Readonly<Props>): ReactNode {
         anchor="middle"
       />
       <rect
-        data-local-count={count}
+        data-local-count={numRecords}
         x={x + 60}
         y={y + 58}
         width={50}

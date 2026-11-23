@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { assertRenderedLabelGraphemes } from "../assertRenderedLabelGraphemes/assertRenderedLabelGraphemes";
+import { getAccessibleTextFromLabelExpectation } from "../assertRenderedLabelGraphemes/getAccessibleTextFromLabelExpectation";
 import { SvgPaintAssertions } from "../SvgPaintAssertions/SvgPaintAssertions";
+import type { RenderedLabelExpectation } from "../assertRenderedLabelGraphemes/RenderedLabelExpectation.types";
 
 type LayoutAssertions<Input extends object> = {
   inputSchema: { parse: (value: unknown) => Input };
@@ -12,7 +15,7 @@ type LayoutAssertions<Input extends object> = {
    */
   getVisibleTexts: (
     options: Readonly<{ input: Input; frame: number }>,
-  ) => string[];
+  ) => RenderedLabelExpectation[];
 };
 type PrefixInput = {
   value: unknown;
@@ -35,21 +38,28 @@ function _createPrefixInput({
         );
   }
   if (Array.isArray(value)) {
-    return value.map((item) =>
-      _createPrefixInput({ value: item, wordLength, excludedTextFields, key }),
-    );
+    return value.map((item) => {
+      return _createPrefixInput({
+        value: item,
+        wordLength,
+        excludedTextFields,
+        key,
+      });
+    });
   }
   if (value && typeof value === "object") {
     return Object.fromEntries(
-      Object.entries(value).map(([field, item]) => [
-        field,
-        _createPrefixInput({
-          value: item,
-          wordLength,
-          excludedTextFields,
-          key: field,
-        }),
-      ]),
+      Object.entries(value).map(([field, item]) => {
+        return [
+          field,
+          _createPrefixInput({
+            value: item,
+            wordLength,
+            excludedTextFields,
+            key: field,
+          }),
+        ];
+      }),
     );
   }
   return value;
@@ -61,7 +71,9 @@ function _forEachPrefix<Input extends object>({
   options: LayoutAssertions<Input>;
   check: (input: Input, frame: number) => void;
 }>): void {
-  Array.from({ length: 40 }, (_, index) => index + 1).forEach((wordLength) => {
+  Array.from({ length: 40 }, (_, index) => {
+    return index + 1;
+  }).forEach((wordLength) => {
     const input = options.inputSchema.parse(
       _createPrefixInput({
         value: options.fixtures[2].input,
@@ -69,7 +81,9 @@ function _forEachPrefix<Input extends object>({
         excludedTextFields: options.excludedTextFields,
       }),
     );
-    [24, 72, 150].forEach((frame) => check(input, frame));
+    [24, 72, 150].forEach((frame) => {
+      return check(input, frame);
+    });
   });
 }
 function _escapeAttribute(text: string): string {
@@ -89,36 +103,42 @@ function _escapeAttribute(text: string): string {
 export function registerStockTextLayoutAssertions<Input extends object>(
   options: Readonly<LayoutAssertions<Input>>,
 ): void {
-  test("every accepted two-word prefix length fits without losing authored text", () => {
+  test("every accepted two-word prefix retains accessible copy and whole painted graphemes", () => {
     _forEachPrefix({
       options,
       check: (input, frame) => {
         const markup = options.render({ frame: frame, input: input });
         options
           .getVisibleTexts({ input: input, frame: frame })
-          .forEach((text) =>
+          .forEach((text) => {
             assert.ok(
-              markup.includes(`aria-label="${_escapeAttribute(text)}"`),
-              text,
-            ),
-          );
+              markup.includes(
+                `aria-label="${_escapeAttribute(getAccessibleTextFromLabelExpectation(text))}"`,
+              ),
+              getAccessibleTextFromLabelExpectation(text),
+            );
+            assertRenderedLabelGraphemes({ markup, text });
+          });
       },
     });
   });
   test("actual visible text stays inside the canvas during setup, staggered travel and hold", () => {
-    options.fixtures.forEach(({ input }) =>
-      Array.from({ length: 90 }, (_, index) => index * 2).forEach((frame) =>
-        SvgPaintAssertions.assertTextCanvasBounds({
+    options.fixtures.forEach(({ input }) => {
+      return Array.from({ length: 90 }, (_, index) => {
+        return index * 2;
+      }).forEach((frame) => {
+        return SvgPaintAssertions.assertTextCanvasBounds({
           markup: options.render({ frame: frame, input: input }),
-        }),
-      ),
-    );
+        });
+      });
+    });
     _forEachPrefix({
       options,
-      check: (input, frame) =>
-        SvgPaintAssertions.assertTextCanvasBounds({
+      check: (input, frame) => {
+        return SvgPaintAssertions.assertTextCanvasBounds({
           markup: options.render({ frame: frame, input: input }),
-        }),
+        });
+      },
     });
   });
 }

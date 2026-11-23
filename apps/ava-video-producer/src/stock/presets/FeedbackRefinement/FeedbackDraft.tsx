@@ -1,5 +1,8 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { FeedbackDraftDefinitions } from "./FeedbackDraftDefinitions/FeedbackDraftDefinitions";
+import { FeedbackDraftDraftLabel } from "./FeedbackDraftDraftLabel/FeedbackDraftDraftLabel";
 import type { getFeedbackStateFromInputAndFrame } from "./getFeedbackStateFromInputAndFrame";
 import type { ReactNode } from "react";
 
@@ -14,45 +17,24 @@ export function FeedbackDraft({
   accent,
   id,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const { x, round, revision } = state;
   const clipId = `feedback-${encodeURIComponent(id)}`;
   return (
     <g>
-      <defs>
-        <clipPath id={`${clipId}-draft`}>
-          <rect
-            x={x + 16 + 268 * revision}
-            y={230}
-            width={268 * (1 - revision)}
-            height={84}
-          />
-        </clipPath>
-        <clipPath id={`${clipId}-revision`}>
-          <rect x={x + 16} y={230} width={268 * revision} height={84} />
-        </clipPath>
-      </defs>
-      <rect
+      <FeedbackDraftDefinitions {...{ clipId, x, revision }} />
+      <StockRect
         data-draft={revision === 1 ? round.revised : round.draft}
         x={x}
         y={220}
         width={300}
         height={100}
-        rx={8}
-        fill={STOCK.surface}
+        rx={scales.corner(tokens.corner.cell)}
+        fill={tokens.color.surface}
         stroke={accent}
       />
-      <g clipPath={`url(#${clipId}-draft)`}>
-        <FitText
-          text={round.draft}
-          x={x + 16}
-          y={247}
-          width={268}
-          fontSize={18}
-          maxLines={3}
-          breakLongWords
-          normalizeWhitespace
-        />
-      </g>
+      <FeedbackDraftDraftLabel {...{ clipId, round, x }} />
       <g clipPath={`url(#${clipId}-revision)`}>
         <FitText
           text={round.revised}

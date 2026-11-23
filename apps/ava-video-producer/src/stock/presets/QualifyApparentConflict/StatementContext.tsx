@@ -1,6 +1,5 @@
-import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./QualifyApparentConflict.schema";
 import type { ReactNode } from "react";
 /** Inputs for StatementContext. */
@@ -11,7 +10,6 @@ type Props = {
   index: number;
   contextY: number;
 };
-
 /** One original claim receives its own authored context label. */
 export function StatementContext({
   frame,
@@ -20,12 +18,18 @@ export function StatementContext({
   index,
   contextY,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <>
       <g
         {...{ [`data-context-${index}`]: true }}
         data-y={contextY}
-        opacity={ramp(frame, 60 + index * 4, 24)}
+        opacity={motion.ramp(
+          frame,
+          60 + index * motion.scaleStagger(4),
+          motion.scale(24),
+        )}
       >
         <FitText
           text={statement.context}
@@ -35,7 +39,7 @@ export function StatementContext({
           fontSize={16}
           maxLines={3}
           anchor="middle"
-          color={index ? STOCK.mint : accent}
+          color={index ? tokens.color.positive : accent}
           breakLongWords
           normalizeWhitespace
         />

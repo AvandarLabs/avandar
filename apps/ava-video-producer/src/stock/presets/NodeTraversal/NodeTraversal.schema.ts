@@ -27,9 +27,9 @@ export const nodeTraversalInputSchema = z
     route: z.array(z.number().int().min(0).max(6)).min(2).max(7),
     showRouteLabel: z.boolean(),
   })
-  .superRefine((input, context) =>
-    validateGraph({ input, context }),
-  ) satisfies z.ZodType;
+  .superRefine((input, context) => {
+    return validateGraph({ input, context });
+  }) satisfies z.ZodType;
 
 /** Schema-inferred content supplied to the renderer. */
 export type NodeTraversalInput = z.output<typeof nodeTraversalInputSchema>;

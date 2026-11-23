@@ -1,0 +1,38 @@
+.tokenRowIssue {
+  align-items: flex-start;
+  color: var(--mantine-color-red-9);
+  display: flex;
+  font-size: var(--atlas-font-size-11);
+  gap: var(--atlas-space-6);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.tokenRowIssueIcon {
+  color: var(--mantine-color-red-6);
+  flex: 0 0 auto;
+  margin-block-start: var(--atlas-space-1);
+}
+
+.tokenRowIssueSentence {
+  margin: 0;
+}
+
+/* The resolver's own message is detail, so it is muted and small. */
+.tokenRowIssueMessage {
+  color: var(--atlas-color-muted);
+  display: block;
+  font: var(--atlas-font-size-10) var(--mono);
+  overflow-wrap: anywhere;
+}
+
+/* On a phone, descriptions are 12px and the resolver's message 11px. */
+@media (width <= 760px) {
+  .tokenRowIssue {
+    font-size: var(--atlas-font-size-12);
+  }
+
+  .tokenRowIssueMessage {
+    font-size: var(--atlas-font-size-11);
+  }
+}

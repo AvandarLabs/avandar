@@ -1,5 +1,6 @@
-import { ramp, mix } from "../../../../motion";
 import { LabelSlots } from "../../../primitives/LabelSlots/LabelSlots";
+import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { AccountingBracket } from "./AccountingBracket";
 import { FocusedRecord } from "./FocusedRecord";
 import type { getAssignmentsFromLocations } from "../getAssignmentsFromLocations";
 import type { ReactNode } from "react";
@@ -11,6 +12,7 @@ type Props = {
   accent: string;
   isFocused: boolean;
 };
+
 /**
  * The focused record row mirrors the map's ring without changing accounting.
  */
@@ -21,6 +23,8 @@ export function AssignmentRow({
   accent,
   isFocused,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g data-assignment={location.id} data-district-index={location.district}>
       {isFocused ? (
@@ -40,11 +44,13 @@ export function AssignmentRow({
           ],
         ]}
       />
-      <path
-        data-accounting-bracket={location.id}
-        d={`M${location.district < 0 ? mix(ramp(frame, 72, 36), 850, 880) : 850} ${318 + index * 31}h12v20h-12`}
-        fill="none"
-        stroke={accent}
+      <AccountingBracket
+        location={location}
+        index={index}
+        frame={frame}
+        accent={accent}
+        tokens={tokens}
+        motion={motion}
       />
     </g>
   );

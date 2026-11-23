@@ -14,7 +14,7 @@ export function useHydratedConcept({
   concept,
 }: {
   concept: OntologyConceptProjection;
-}) {
+}): readonly [OntologyHydrationProjection, false] {
   const fullConcept = useContext(FixtureConceptContext);
   if (!fullConcept || fullConcept.id !== concept.id) {
     throw new Error(

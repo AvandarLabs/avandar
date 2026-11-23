@@ -1,4 +1,5 @@
 import { propEq } from "@avandar/utils";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getConsentTurnFromPermissionsAndFrame } from "./getConsentTurnFromPermissionsAndFrame";
 import { PreparedContact } from "./PreparedContact";
 import type { Input } from "./ReferralConsentWithdrawal.schema";
@@ -11,28 +12,32 @@ export function PreparedContacts({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const held = input.plannedContacts.filter(
-    (contact) =>
-      input.permissions.find(propEq("id", contact.permissionId))?.withdrawn,
-  );
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const held = input.plannedContacts.filter((contact) => {
+    return input.permissions.find(propEq("id", contact.permissionId))
+      ?.withdrawn;
+  });
   return (
     <g>
-      {input.plannedContacts.map((contact, index) => (
-        <PreparedContact
-          key={contact.id}
-          contact={contact}
-          index={index}
-          order={held.indexOf(contact)}
-          permissionTurn={getConsentTurnFromPermissionsAndFrame({
-            frame,
-            permissions: input.permissions,
-            permissionId: contact.permissionId,
-          })}
-          frame={frame}
-          labels={input.labels}
-          accent={accent}
-        />
-      ))}
+      {input.plannedContacts.map((contact, index) => {
+        return (
+          <PreparedContact
+            key={contact.id}
+            contact={contact}
+            index={index}
+            order={held.indexOf(contact)}
+            permissionTurn={getConsentTurnFromPermissionsAndFrame({
+              frame,
+              permissions: input.permissions,
+              permissionId: contact.permissionId,
+              motion,
+            })}
+            frame={frame}
+            labels={input.labels}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

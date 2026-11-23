@@ -17,12 +17,15 @@
  *
  * Today's split (every entry is a judgment call, review in the PR):
  *   - ACTIVE: dataset definitions and their per-format detail rows,
- *     catalog entries, dashboards, concepts + their attributes + attribute
- *     mappings, individuals, user profile, plus `workspaces` and
- *     `workspace_memberships` so the workspace picker renders offline.
+ *     catalog listings and their drives, dashboards, concepts + their
+ *     statuses, attributes, and attribute mappings, individuals, user
+ *     profile, plus `workspaces` and `workspace_memberships` so the
+ *     workspace picker renders offline.
  *   - EXCLUDED: collaborative invitation state, permissions tables,
  *     billing, sensitive OAuth tokens, admin-only signups, legacy role
- *     tables, the web-only `dexie_dbs` tracker, and web GIS `maps`.
+ *     tables, the web-only `dexie_dbs` tracker, web GIS `maps`, and case
+ *     activity (`comments`, `comment_reactions`, `comment_mentions`,
+ *     `comment_gadget_refs`, `comment_revisions`, `activity_events`).
  */
 
 /**
@@ -38,10 +41,13 @@ const ACTIVE_TABLES = [
   "datasets__pdf_file",
   "datasets__virtual",
   "datasets__xlsx_file",
-  "catalog_entries__open_data",
-  "catalog_entries__dataset_column",
+  "datasets__postgres_table",
+  "data_catalog_listings",
+  "data_catalog_listings__relation_columns",
+  "data_catalog_drives",
   "dashboards",
   "concepts",
+  "concept_statuses",
   "concept_attributes",
   "attribute_mappings__dataset_column",
   "attribute_mappings__manual_entry",
@@ -107,6 +113,20 @@ const DEPRECATED_TABLES = [
   "entities",
   "value_extractors__dataset_column_value",
   "value_extractors__manual_entry",
+  // Renamed by 20261017112819 ("rename catalog_entries to
+  // catalog_listings") and then by 20261017121944 ("rename catalog_listings
+  // to data_catalog_listings"). The old names have to stay recognisable so
+  // the whole pre-rename history, and both rename ALTER TABLEs themselves,
+  // partition cleanly:
+  //   catalog_entries__open_data      -> catalog_listings__open_data
+  //                                   -> data_catalog_listings
+  //   catalog_entries__dataset_column -> catalog_listings__dataset_column
+  //                                   -> data_catalog_listings
+  //                                      __relation_columns
+  "catalog_entries__open_data",
+  "catalog_entries__dataset_column",
+  "catalog_listings__open_data",
+  "catalog_listings__dataset_column",
 ] as const;
 
 /**
@@ -155,6 +175,37 @@ export const EXCLUDED_TABLES = [
   "resource_shares",
   // Web GIS maps are not mirrored to desktop SQLite yet.
   "maps",
+  // A map's displacement salt: server-only, and readable only by map editors.
+  "map_jitter_salts",
+  // Web-only first-run tutorial/onboarding progress; nothing the desktop
+  // needs to render offline.
+  "user_nux_progress",
+  // Case activity: collaborative, server-of-truth, and audit data. The
+  // desktop does not render case comments offline.
+  "activity_events",
+  "comment_gadget_refs",
+  "comment_mentions",
+  "comment_reactions",
+  "comment_revisions",
+  "comments",
+  // A saved connection's secret pointer is meaningless offline, and the
+  // desktop shell cannot proxy a live Postgres connection either.
+  "connections",
+  "connections__postgres",
+  // Pipeline crawl state, written by the pipeline server with the service
+  // role. Nothing the desktop renders.
+  "pipeline_scope_checkpoints",
+  // Pipeline execution history, written with the service role for audit and
+  // debugging. Nothing the desktop renders.
+  "pipeline_executions",
+  "pipeline_execution_scopes",
+  // Dropped by 20261117210525 ("drop_plugin_installations"). Retained because
+  // 20261109035052 still contains its DDL.
+  "plugin_installations",
+  // The open data catalog's unfiltered facet counts, recounted on the server
+  // after each pipeline run. Derived from `data_catalog_listings`, which the
+  // desktop already mirrors and can count itself.
+  "data_catalog_facet_counts",
 ] as const;
 
 /**

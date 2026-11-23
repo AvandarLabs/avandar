@@ -134,7 +134,7 @@ async function _sendForwardedRequest(options: {
         ...headers,
         "x-avandar-fanout": "1",
       },
-      body,
+      body: body === undefined ? undefined : new Uint8Array(body),
       signal: AbortSignal.timeout(5_000),
     });
 

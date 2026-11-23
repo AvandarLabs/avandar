@@ -1,6 +1,7 @@
 import type { DatasetModel } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type { AttributeMapping } from "$/models/ontology/AttributeMapping/AttributeMapping.types.ts";
 import type { ConceptAttributeModel } from "$/models/ontology/ConceptAttribute/ConceptAttribute.types.ts";
+import type { ConceptStatusId } from "$/models/ontology/ConceptStatus/ConceptStatus.types.ts";
 import type { SupabaseCrudModelSpec } from "$/models/SupabaseCrudModelSpec.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
@@ -41,6 +42,9 @@ type ConceptRead = Model.Base<
 
     /** Whether users can manually create individuals of this concept */
     allowManualCreation: boolean;
+
+    /** Status new records of this concept start in */
+    defaultStatusId: ConceptStatusId;
   }
 >;
 

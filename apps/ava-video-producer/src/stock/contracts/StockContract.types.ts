@@ -2,7 +2,8 @@ import type { stockContracts } from "../registry/stockContracts";
 import type { z } from "zod";
 
 /**
- * Serializable translation copy resolved by a consumer, never during import.
+ * Serializable display copy. The message is the English text. The id is the
+ * stable slot name.
  */
 export type StockMessageDescriptor = {
   id: string;
@@ -131,17 +132,6 @@ export type StockMetadata = {
 };
 
 /**
- * One translated default string with an explicitly marked UTF-16 source span.
- */
-export type StockDefaultSpanBinding = {
-  textPath: Array<string | number>;
-  startPath: Array<string | number>;
-  endPath: Array<string | number>;
-  /** Exactly one <content> pair replaces the raw default translation unit. */
-  template: string;
-};
-
-/**
  * One preset's runtime validation, examples, editor data, and public metadata.
  */
 export type StockContract<Input> = {
@@ -165,10 +155,6 @@ export type StockContract<Input> = {
   displayCopy?: Record<string, StockMessageDescriptor>;
   /** Visible default-copy segments, with numeric collection item indices. */
   defaultTextPaths: Array<Array<string | number>>;
-  /**
-   * Optional marked defaults keep translated text and authored spans together.
-   */
-  defaultSpanBindings?: StockDefaultSpanBinding[];
   controls: StockControl[];
   bindingExamples: Array<{
     sourceText: StockMessageDescriptor;

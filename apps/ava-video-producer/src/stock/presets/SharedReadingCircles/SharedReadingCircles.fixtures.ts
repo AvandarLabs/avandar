@@ -106,15 +106,19 @@ export const minimumInput: Input = {
 /** Four books and eight readers with deliberately unequal groups. */
 export const denseInput: Input = {
   ...DEFAULT_INPUT,
-  learners: Array.from({ length: 8 }, (_, index) => ({
-    id: `reader ${index}`,
-    label: "界".repeat(16),
-  })),
-  books: Array.from({ length: 4 }, (_, index) => ({
-    id: `book ${index}`,
-    label: "界".repeat(22),
-    pageLabel: "界".repeat(28),
-  })),
+  learners: Array.from({ length: 8 }, (_, index) => {
+    return {
+      id: `reader ${index}`,
+      label: "界".repeat(16),
+    };
+  }),
+  books: Array.from({ length: 4 }, (_, index) => {
+    return {
+      id: `book ${index}`,
+      label: "界".repeat(22),
+      pageLabel: "界".repeat(28),
+    };
+  }),
   readingGroups: [
     {
       bookId: "book 0",

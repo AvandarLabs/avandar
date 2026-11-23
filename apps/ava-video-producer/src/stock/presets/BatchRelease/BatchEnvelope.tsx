@@ -1,7 +1,9 @@
-import { mix, ramp, EASE } from "../../../motion";
-import { BatchFrame } from "./BatchFrame";
+import { Motion } from "../../../motion";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { BatchFrame } from "./BatchFrame/BatchFrame";
 import { BatchMembers } from "./BatchMembers";
 import { BatchReleaseCaption } from "./BatchReleaseCaption";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./BatchRelease.schema";
 import type { ReactNode } from "react";
 
@@ -12,6 +14,12 @@ type Props = {
   frame: number;
   accent: string;
 };
+/** Frames the first batch takes to cross the dispatch boundary. */
+const FIRST_DISPATCH_FRAMES = 30;
+/** Frames the later batch takes to cross the dispatch boundary. */
+const LATER_DISPATCH_FRAMES = 18;
+/** How far before its first member a batch starts to fade in. */
+const LEAD_IN_FRAMES = 6;
 /**
  * The open cradle closes only when all its members have reached their slots.
  */
@@ -22,22 +30,17 @@ export function BatchEnvelope({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const start = index ? 94 : 18;
-  const completeAt = index ? 124 : 68;
-  const dispatchAt = index ? 128 : 82;
-  const dispatchDuration = index ? 18 : 30;
-  const x = mix(ramp(frame, dispatchAt, dispatchDuration, EASE.inOut), 70, 560);
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const { start, completeAt, x } = _getBatchLayout({ frame, index, motion });
   const y = 210 + index * 200;
-  const width = 360;
-  const isComplete = frame >= completeAt;
   return (
-    <g opacity={ramp(frame, start - 6, 12)}>
+    <g opacity={motion.reveal(frame, start - LEAD_IN_FRAMES)}>
       <BatchFrame
         batchId={batch.id}
-        isComplete={isComplete}
+        isComplete={frame >= completeAt}
         x={x}
         y={y}
-        width={width}
+        width={360}
         frame={frame}
         completeAt={completeAt}
         accent={accent}
@@ -58,4 +61,33 @@ export function BatchEnvelope({
       />
     </g>
   );
+}
+/** A batch's cues and its position as it crosses the dispatch boundary. */
+function _getBatchLayout({
+  frame,
+  index,
+  motion,
+}: Readonly<{
+  frame: number;
+  index: number;
+  motion: VideoMotion;
+}>) {
+  const dispatchAt = index ? 128 : 82;
+  const dispatchDuration = motion.scale(
+    index ? LATER_DISPATCH_FRAMES : FIRST_DISPATCH_FRAMES,
+  );
+  return {
+    start: index ? 94 : 18,
+    completeAt: index ? 124 : 68,
+    x: Motion.mix({
+      t: Motion.ramp({
+        frame,
+        at: dispatchAt,
+        dur: dispatchDuration,
+        easing: motion.travel.easing,
+      }),
+      from: 70,
+      to: 560,
+    }),
+  };
 }

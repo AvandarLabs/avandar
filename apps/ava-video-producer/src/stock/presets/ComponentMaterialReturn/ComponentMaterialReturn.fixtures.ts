@@ -129,35 +129,44 @@ const dense: Input = {
     actorLabel: "W".repeat(34),
     actionLabel: "W".repeat(34),
   },
-  parts: Array.from({ length: 6 }, (_, index) => ({
-    id: `part-${index}`,
-    label: "W".repeat(22),
-    massKg: index + 0.25,
-    route: index % 2 ? "repair" : "reuse",
-  })),
-  replacementInputs: Array.from({ length: 3 }, (_, index) => ({
-    id: `new-${index}`,
-    label: "W".repeat(26),
-    massKg: index + 0.5,
-  })),
+  parts: Array.from({ length: 6 }, (_, index) => {
+    return {
+      id: `part-${index}`,
+      label: "W".repeat(22),
+      massKg: index + 0.25,
+      route: index % 2 ? "repair" : "reuse",
+    };
+  }),
+  replacementInputs: Array.from({ length: 3 }, (_, index) => {
+    return {
+      id: `new-${index}`,
+      label: "W".repeat(26),
+      massKg: index + 0.5,
+    };
+  }),
 };
 const extraFixtures: StockContract<Input>["fixtures"] = (
   ["appliance", "equipment-module"] as const
-).flatMap((assemblyShape) =>
-  (["reuse", "repair", "recycle", "residue"] as const).map((route) => ({
-    id: `${assemblyShape}-${route}`,
-    input: {
-      ...dense,
-      assemblyShape,
-      parts: dense.parts.map((part) => ({ ...part, route })),
-      replacementInputs:
-        route === "recycle" || route === "residue"
-          ? []
-          : dense.replacementInputs,
-      showMassEquation: false,
-    },
-  })),
-);
+).flatMap((assemblyShape) => {
+  return (["reuse", "repair", "recycle", "residue"] as const).map((route) => {
+    return {
+      id: `${assemblyShape}-${route}`,
+      input: {
+        ...dense,
+        assemblyShape,
+        parts: dense.parts.map((part) => {
+          return { ...part, route };
+        }),
+        replacementInputs:
+          route === "recycle" || route === "residue"
+            ? []
+            : dense.replacementInputs,
+        showMassEquation: false,
+      },
+    };
+  });
+});
+/** Invalid stock inputs used to check this preset contract rejects bad data. */
 export const invalidInputs: unknown[] = [
   { ...DEFAULT_INPUT, extra: true },
   {
@@ -167,7 +176,9 @@ export const invalidInputs: unknown[] = [
   { ...DEFAULT_INPUT, parts: [DEFAULT_INPUT.parts[0], DEFAULT_INPUT.parts[0]] },
   {
     ...DEFAULT_INPUT,
-    parts: DEFAULT_INPUT.parts.map((part) => ({ ...part, massKg: 0 })),
+    parts: DEFAULT_INPUT.parts.map((part) => {
+      return { ...part, massKg: 0 };
+    }),
   },
 ];
 

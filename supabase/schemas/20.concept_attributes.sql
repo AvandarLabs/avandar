@@ -17,7 +17,28 @@ create table public.concept_attributes (
   is_label boolean not null,
   is_identifier boolean not null,
   is_array boolean not null,
-  allow_manual_edit boolean not null
+  allow_manual_edit boolean not null,
+  -- Set only on a field that keeps one value per period of a date column.
+  -- Its dataset-column mapping names that column in `bucket_column_id`.
+  bucket_grain public.concept_attributes__bucket_grain,
+  -- The Data Explorer gives every case type a built-in `status` column, and
+  -- DuckDB identifiers ignore case, so no attribute may take that name.
+  constraint concept_attributes__name_not_reserved check (lower(btrim(name)) <> 'status'),
+  -- A per-period field is a list of (period, value) pairs.
+  constraint concept_attributes__bucket_grain_requires_array check (
+    bucket_grain is null or
+    is_array
+  ),
+  -- Only dataset rows can be grouped by period, and a list can neither name
+  -- a record nor match its rows across datasets.
+  constraint concept_attributes__bucket_grain_dataset_value_only check (
+    bucket_grain is null or
+    (
+      mapping_type = 'dataset_column' and
+      not is_label and
+      not is_identifier
+    )
+  )
 );
 
 -- Enable row level security
@@ -46,16 +67,17 @@ select
     )
   );
 
+-- Attributes are part of a case type's design, so every write requires
+-- `case_types` editor.
 create policy "
   User can INSERT concept_attributes
 " on public.concept_attributes for insert to authenticated
 with
   check (
-    public.concept_attributes.workspace_id = any (
-      array(
-        select
-          public.util__get_auth_user_workspaces ()
-      )
+    public.util__auth_user_meets_min_app_role (
+      public.concept_attributes.workspace_id,
+      'case_types'::public.app_type,
+      'editor'::public.role_level
     )
   );
 
@@ -63,25 +85,29 @@ create policy "
   User can UPDATE concept_attributes
 " on public.concept_attributes
 for update
-  to authenticated
+  to authenticated using (
+    public.util__auth_user_meets_min_app_role (
+      public.concept_attributes.workspace_id,
+      'case_types'::public.app_type,
+      'editor'::public.role_level
+    )
+  )
 with
   check (
-    public.concept_attributes.workspace_id = any (
-      array(
-        select
-          public.util__get_auth_user_workspaces ()
-      )
+    public.util__auth_user_meets_min_app_role (
+      public.concept_attributes.workspace_id,
+      'case_types'::public.app_type,
+      'editor'::public.role_level
     )
   );
 
 create policy "
   User can DELETE concept_attributes
 " on public.concept_attributes for delete to authenticated using (
-  public.concept_attributes.workspace_id = any (
-    array(
-      select
-        public.util__get_auth_user_workspaces ()
-    )
+  public.util__auth_user_meets_min_app_role (
+    public.concept_attributes.workspace_id,
+    'case_types'::public.app_type,
+    'editor'::public.role_level
   )
 );
 
@@ -139,8 +165,8 @@ from
 
 -- Deliberately `after insert or update`. A concept's attributes are inserted in
 -- bulk after the concept row itself, so a `before` trigger would count zero
--- attributes and raise. The cost is that a failure here has to be undone by the
--- caller: the frontend rolls the partial write back with DELETE requests.
+-- attributes and raise. `rpc_concepts__create` writes the concept and its
+-- attributes in one transaction, so a failure here leaves nothing behind.
 create trigger tr_concept_attributes__validate_label_and_identifiers
 after insert or
 update on public.concept_attributes for each row

@@ -208,7 +208,7 @@ The app is a fixed full-height shell, not a scrolling page. `AppSlate` occupies 
 
 **The Tablet Downshift Rule.** Avandar's UI is designed for desktop. Rather than reflowing at tablet widths, the whole system shrinks: `--mantine-scale` drops to `0.8` between 48em and 75em and `0.9` between 75em and 88em, which rescales every spacing, font size, radius, shadow, and shell width in one place. Never hand-tune a component for tablet. If it is 25% oversized on an iPad, the scale is doing its job and your override will fight it.
 
-**The Gutter Rule.** The slate keeps its 8px frame of shell background on all four sides. Taking the gutter off, or letting a parent clip it, collapses the central metaphor.
+**The Gutter Rule.** The slate keeps its 8px frame of shell background on all four sides. Taking the gutter off, or letting a parent clip it, collapses the central metaphor. The one exception is the open chat aside, which fuses to the slate's inline-end edge and carries the gutter on its own outer edges, so the pair is still framed as one object.
 
 ## Elevation & Depth
 
@@ -231,7 +231,7 @@ Every step is a stacked pair: one tight low-offset layer plus one softer, larger
 - **md** (`0 2px 3px /.10, 0 4px 10px /.07`): menus, popovers, combobox dropdowns, notifications.
 - **lg** (`0 3px 4px /.11, 0 8px 20px /.08`) and **xl** (`0 4px 6px /.12, 0 14px 32px /.10`): reserved; rare in current UI.
 
-**The slate's own shadow is not from this scale.** It uses a stronger neutral.7 edge and `0 1px 2px rgb(0 0 0 / 20%), 0 8px 24px rgb(0 0 0 / 25%)` because it has to read as floating on a dark field rather than lifting off a light one. That shadow deliberately spills past the gutter onto the sidebar and the chat aside, which is why the slate is raised to `APP_SLATE_Z_INDEX` (150). Clipping it back to the gutter is a bug, not a tidy-up.
+**The slate's own shadow is not from this scale.** It uses a stronger neutral.7 edge and `0 1px 2px rgb(0 0 0 / 20%), 0 8px 24px rgb(0 0 0 / 25%)` because it has to read as floating on a dark field rather than lifting off a light one. That shadow deliberately spills past the gutter onto the sidebar, which is why the slate is raised to `APP_SLATE_Z_INDEX` (150). The open chat aside is fused to the slate rather than shadowed by it: it carries the same edge, corner, and shadow, sits one tier higher (`APP_CHAT_ASIDE_Z_INDEX`), and draws the light hairline between them where the slate drops its inline-end border. Clipping it back to the gutter is a bug, not a tidy-up.
 
 **Overlays.** Full-screen dim is `rgb(15 23 42 / 38%)` with `blur(6px) saturate(140%)`. The elevated panel on top uses a deep lift plus a 1px inset white highlight (`0 25px 50px -12px rgb(15 23 42 / 35%), 0 0 0 1px rgb(255 255 255 / 50%) inset`) at radius `xl`. This is the one place the system goes dramatic, and it is reserved for modals and the import drop overlay.
 
@@ -311,6 +311,8 @@ Modals are centered at radius `xl`, with a transparent Mantine overlay replaced 
 
 The raised view that holds the current app. A `Paper` on the Tinted Cool Paper body surface, `8px 8px 12px` corners, a `neutral.7` edge, its own two-layer shadow, and `z-index: 150`. It is the only region that changes on navigation, and every app view lives inside one.
 
+The `neutral.7` edge needs a hook to reach the screen. The theme paints every `Paper` border `--ava-border-default` through its `styles`, which Mantine renders inline, so a `border-color` in a CSS module silently loses. The theme reads `--ava-paper-border-color` first, and the slate sets it. Any other `Paper` that needs a different edge does the same.
+
 The z-index is load-bearing. Mantine paints the navbar and aside above content left in normal flow, so an unraised slate has its shadow chopped into a hard vertical line at the sidebar edge. Raise the slate's paper and never `AppShell.Main`, whose box bleeds over the navbar and would swallow sidebar clicks.
 
 ### Motion
@@ -331,7 +333,7 @@ Five durations (`instant` 80ms, `fast` 140ms, `normal` 200ms, `moderate` 270ms, 
 - **Do** put every app view inside `AppSlate` so it gets the slate, the toolbar, and the gutter.
 - **Do** pair an `--ava-border-*` token with the matching `--ava-surface-*` token and an elevation step, rather than picking neutral shades by hand.
 - **Do** default to `radius="sm"` (6px) and `color="neutral"`, and spend Brand Blue only on filled actions, current selection, and focus.
-- **Do** call a County a County and a case type a case type. Use the user's nouns in every label, placeholder, and empty state.
+- **Do** call a County a County and a case type a case type. Use the user's nouns in every label, placeholder, and empty state. This extends to internal entity names that differ from what a user thinks they're doing: a Postgres connector's saved credential is a "connection" in the schema, but the user is "adding a database," never "creating a connection" - write for a low-tech (not non-tech) audience's mental model, and let each connector pick its own noun (see `AGENTS.md`'s "Copy and nomenclature").
 - **Do** use the Data Sources list pane as the spatial template for any new master-detail surface.
 - **Do** keep empty states instructional: what this is, and the one next move.
 - **Do** let `--mantine-scale` handle tablet sizing.
@@ -342,6 +344,7 @@ Five durations (`instant` 80ms, `fast` 140ms, `normal` 200ms, `moderate` 270ms, 
 - **Don't** leave `AppShell.Main` unpainted so shell background shows through where the slate should be.
 - **Don't** take the gutter or the drop shadow off the slate, or let another layer clip them.
 - **Don't** say "slate" when you mean a color, or "canvas" when you mean the slate. "Canvas" means a real `<canvas>` element.
+- **Don't** let an internal schema or model name leak into copy because it's convenient. "Database" reads correctly to a user even though the backend calls it a "connection"; match their model of the task, not the table name.
 - **Don't** use `Callout color="info"` for a selection or empty state. Build an empty state instead.
 - **Don't** say "entity", "profile manager", "concept", or "Sync data!" in the UI, or title a list "{name} Manager".
 - **Don't** give list rows a left accent stripe, or a hover color equal to the pane background.

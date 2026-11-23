@@ -1,5 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./ChargeReferenceAlignment.schema";
 import type { getComparisonFromInput } from "./getComparisonFromInput";
 import type { ReactNode } from "react";
@@ -25,23 +26,23 @@ export function AmountRuler({
   precision,
   accent,
 }: Readonly<Props>): ReactNode {
-  const x = comparison.isMatched ? 290 : 290 + index * 320;
-  const y = comparison.isMatched ? 425 + index * 39 : 425;
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const { x, y, labelX, labelY } = _getRulerPlacement({ comparison, index });
   const amountLabel = (total / input.money.minorUnitsPerUnit).toFixed(
     precision,
   );
-  const labelX = comparison.isMatched ? 60 : x;
-  const labelY = comparison.isMatched ? y + 5 : y + 44;
   return (
     <g
       key={index}
       data-total-minor={total}
       data-currency-scale={comparison.domain}
     >
-      <path
-        d={`M${x} ${y - 9} v28 h${width}`}
+      <SketchedShape
+        shape={{ kind: "path", d: `M${x} ${y - 9} v28 h${width}` }}
+        profile={tokens.sketch.shape}
         fill="none"
-        stroke={STOCK.line}
+        stroke={tokens.color.line}
       />
       <rect
         data-amount-ruler={index}
@@ -53,10 +54,27 @@ export function AmountRuler({
           width *
           (comparison.isMatched ? progress : 1)
         }
-        fill={index === 0 ? accent : STOCK.cyan}
-        fillOpacity={input.focus === "amounts" ? 1 : 0.7}
+        fill={index === 0 ? accent : tokens.color.accentAlt}
+        fillOpacity={input.focus === "amounts" ? 1 : atomic.opacity["70"]}
       />
       <LabelSlots labels={[[amountLabel, labelX, labelY, 200, 14, 1]]} />
     </g>
   );
+}
+/**
+ * Matched rulers stack on one shared scale with labels to their left;
+ * unmatched ones sit side by side with labels below.
+ */
+function _getRulerPlacement({
+  comparison,
+  index,
+}: Readonly<{ comparison: Props["comparison"]; index: number }>) {
+  const x = comparison.isMatched ? 290 : 290 + index * 320;
+  const y = comparison.isMatched ? 425 + index * 39 : 425;
+  return {
+    x,
+    y,
+    labelX: comparison.isMatched ? 60 : x,
+    labelY: comparison.isMatched ? y + 5 : y + 44,
+  };
 }

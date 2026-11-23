@@ -1,4 +1,5 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { Motion } from "../../../motion";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { EvolutionRow } from "./EvolutionRow";
 import type { Input } from "./SchemaColumnEvolution.schema";
 import type { ReactNode } from "react";
@@ -18,10 +19,15 @@ export function LaterEvolutionRow({
   accent,
   expansion,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return frame >= 93 ? (
     <g
-      opacity={ramp(frame, 93, 20)}
-      transform={`translate(0 ${mix(ramp(frame, 93, 39, EASE.inOut), 38, 0)})`}
+      opacity={motion.ramp(frame, 93, motion.scale(20))}
+      transform={`translate(0 ${Motion.mix({
+        t: motion.ramp(frame, 93, motion.scale(39), motion.travel.easing),
+        from: 38,
+        to: 0,
+      })})`}
     >
       <EvolutionRow
         record={input.laterRecord}

@@ -1,0 +1,41 @@
+.offlineModeControl {
+  align-items: center;
+  display: flex;
+  flex-shrink: 0;
+  gap: 2px;
+  min-width: 0;
+}
+
+.offlineModeTrigger {
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
+/*
+ * Progress digits keep one width as they count up, so the button does not
+ * jitter while the offline models download.
+ */
+.offlineModeProgress {
+  font-variant-numeric: tabular-nums;
+}
+
+.offlineModeDialogFact {
+  color: var(--mantine-color-neutral-9);
+}
+
+.offlineModeDialogFactLabel {
+  line-height: 1.45;
+}
+
+.offlineModeDialogFactIcon {
+  color: var(--mantine-color-neutral-6);
+  flex-shrink: 0;
+}
+
+.offlineModeDialogNote {
+  color: var(--mantine-color-neutral-7);
+}
+
+.offlineModeDialogReady {
+  color: var(--mantine-color-success-8);
+}

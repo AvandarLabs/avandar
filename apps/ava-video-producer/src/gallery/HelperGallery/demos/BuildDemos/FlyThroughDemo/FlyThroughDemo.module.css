@@ -1,0 +1,10 @@
+.flyThroughDemoWordmark {
+  color: var(--demo-text);
+  font-size: var(--demo-font-size-36);
+  font-weight: var(--demo-font-weight-bold);
+  left: 400px;
+  margin: 0;
+  position: absolute;
+  top: 174px;
+  white-space: nowrap;
+}

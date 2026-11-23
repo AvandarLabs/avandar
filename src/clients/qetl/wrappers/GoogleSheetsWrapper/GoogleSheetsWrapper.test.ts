@@ -4,11 +4,14 @@
  */
 
 import { describe, expect, it, vi } from "vitest";
+import { GlobalAppConfig } from "$/config/GlobalAppConfig";
 import { createGoogleSheetsWrapper } from "@/clients/qetl/wrappers/GoogleSheetsWrapper/GoogleSheetsWrapper";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { EdgeFunctionFetch } from "@/clients/fetchEdgeFunctionRoute/fetchEdgeFunctionRoute";
 import type { ILogger } from "@avandar/logger";
+import type { Mock } from "vitest";
 
 const DATASET_REF = {
   kind: "dataset",
@@ -38,42 +41,76 @@ vi.mock("@/clients/datasets/DatasetColumnClient", () => {
   };
 });
 
-const TAB_LIST_BODY = JSON.stringify({
-  sheets: [
-    { properties: { sheetId: 0, title: "Colombia", index: 0 } },
-    { properties: { sheetId: 77, title: "Kenya", index: 1 } },
-  ],
+vi.mock("$/db/supabase/AvaSupabase", async () => {
+  return (
+    await import("@/test-utils/createAvaSupabaseSessionMock")
+  ).createAvaSupabaseSessionMock();
 });
 
-/** Answers the version read, the tab list, and the per-tab CSV download. */
-function _driveFetch(version: string) {
-  return async (url: string): Promise<Response> => {
-    if (url.includes("fields=version")) {
-      return new Response(JSON.stringify({ version }), { status: 200 });
-    }
-    if (url.includes("sheets.googleapis.com")) {
-      return new Response(TAB_LIST_BODY, { status: 200 });
-    }
-    const gid = new URL(url).searchParams.get("gid") ?? "0";
-    return new Response(`city\r\ntab-${gid}\r\n`, { status: 200 });
-  };
+const { apiGetMock } = vi.hoisted(() => {
+  return { apiGetMock: vi.fn() };
+});
+
+vi.mock("@/clients/APIClient", () => {
+  return { APIClient: { get: apiGetMock } };
+});
+
+/** Answers the dataset's CSV route with one tab at version `version`. */
+function _makeDatasetFetch(version: string): Mock<EdgeFunctionFetch> {
+  return vi.fn<EdgeFunctionFetch>(async () => {
+    return new Response("city\r\ntab-77\r\n", {
+      status: 200,
+      headers: { "Content-Type": "text/csv", "X-Ava-Source-Version": version },
+    });
+  });
 }
 
 describe("GoogleSheetsWrapper", () => {
-  it("acquires the named tab as parquet and reports the Drive version", async () => {
+  it("acquires the dataset's tab through its edge route and reports the Drive version", async () => {
     const parquetBlob = new Blob(["sheet-parquet"]);
     const readCsv = vi.fn().mockResolvedValue({ parquetBlob });
-    const getSheetSource = vi.fn().mockResolvedValue({
-      googleDocumentId: "1sheetFileId",
-      sheetName: "Kenya",
-      googleAccountId: "google-account-1",
+    const datasetFetch = _makeDatasetFetch("42");
+    const wrapper = createGoogleSheetsWrapper({ readCsv, datasetFetch });
+
+    const acquired = await wrapper.acquire!(
+      { ref: DATASET_REF, columns: "all" },
+      CONTEXT,
+    );
+
+    expect(datasetFetch).toHaveBeenCalledWith(
+      `https://edge.test/functions/v1/google-sheets/datasets/${DATASET_REF.id}/csv`,
+      expect.anything(),
+    );
+    expect(readCsv).toHaveBeenCalledWith({
+      datasetId: DATASET_REF.id,
+      csvText: "city\r\ntab-77\r\n",
+      // A sheet declares no column types, so they are inferred.
+      columnTypes: "inferred",
     });
-    const getAccessToken = vi.fn().mockResolvedValue("ya29.test-token");
+    expect(acquired).toMatchObject({
+      ref: DATASET_REF,
+      parquetBlob,
+      sourceVersion: "42",
+    });
+  });
+
+  it("never asks for a Google token of its own, so a viewer who never connected Google can read the sheet", async () => {
     const wrapper = createGoogleSheetsWrapper({
-      getSheetSource,
-      getAccessToken,
-      readCsv,
-      driveFetch: _driveFetch("42"),
+      readCsv: vi.fn().mockResolvedValue({ parquetBlob: new Blob([]) }),
+      datasetFetch: _makeDatasetFetch("42"),
+    });
+
+    await wrapper.acquire!({ ref: DATASET_REF, columns: "all" }, CONTEXT);
+
+    expect(apiGetMock).not.toHaveBeenCalled();
+  });
+
+  it("marks acquired rows stale after the live-source max age", async () => {
+    const wrapper = createGoogleSheetsWrapper({
+      readCsv: async () => {
+        return { parquetBlob: new Blob([]) };
+      },
+      datasetFetch: _makeDatasetFetch("42"),
     });
 
     const acquired = await wrapper.acquire!(
@@ -81,42 +118,24 @@ describe("GoogleSheetsWrapper", () => {
       CONTEXT,
     );
 
-    // The stored tab's gid, not the first tab's: the CSV names the gid it came
-    // from, so a download that ignored the tab cannot satisfy this.
-    expect(readCsv).toHaveBeenCalledWith({
-      datasetId: DATASET_REF.id,
-      csvText: "city\r\ntab-77\r\n",
-    });
-    expect(acquired).toEqual({
-      ref: DATASET_REF,
-      parquetBlob,
-      sourceVersion: "42",
-    });
+    expect(acquired?.maxAgeMs).toBe(
+      GlobalAppConfig.timing.liveRelationMaxAgeMs,
+    );
   });
 
-  it("reads the first tab when the stored tab is null", async () => {
-    const readCsv = vi.fn().mockResolvedValue({ parquetBlob: new Blob([]) });
-    const wrapper = createGoogleSheetsWrapper({
-      getSheetSource: async () => {
-        return {
-          googleDocumentId: "1sheetFileId",
-          sheetName: null,
-          googleAccountId: "google-account-1",
-        };
-      },
-      getAccessToken: async () => {
-        return "ya29.test-token";
-      },
-      readCsv,
-      driveFetch: _driveFetch("1"),
+  it("reads freshness from the dataset's version route", async () => {
+    const datasetFetch = vi.fn<EdgeFunctionFetch>(async () => {
+      return Response.json({ sourceVersion: "9" });
     });
+    const wrapper = createGoogleSheetsWrapper({ datasetFetch });
 
-    await wrapper.acquire!({ ref: DATASET_REF, columns: "all" }, CONTEXT);
-
-    expect(readCsv).toHaveBeenCalledWith({
-      datasetId: DATASET_REF.id,
-      csvText: "city\r\ntab-0\r\n",
-    });
+    await expect(wrapper.readFreshness!(DATASET_REF, CONTEXT)).resolves.toBe(
+      "9",
+    );
+    expect(datasetFetch).toHaveBeenCalledWith(
+      `https://edge.test/functions/v1/google-sheets/datasets/${DATASET_REF.id}/version`,
+      expect.anything(),
+    );
   });
 
   it("describes a sheet from its stored columns", async () => {

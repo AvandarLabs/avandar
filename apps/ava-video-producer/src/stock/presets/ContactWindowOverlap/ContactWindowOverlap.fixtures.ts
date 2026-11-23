@@ -1,3 +1,4 @@
+import { objectValuesMap } from "@avandar/utils";
 import type { Input } from "./ContactWindowOverlap.schema";
 /** Complete fictional default, replaced only as a whole input. */
 export const DEFAULT_INPUT: Input = {
@@ -41,12 +42,14 @@ const BOUNDS: Array<[number | null, number | null]> = [
 ];
 const dense: Input = {
   ...DEFAULT_INPUT,
-  records: BOUNDS.map(([start, end], index) => ({
-    id: `p${index}`,
-    label: "界".repeat(18),
-    start,
-    end,
-  })),
+  records: BOUNDS.map(([start, end], index) => {
+    return {
+      id: `p${index}`,
+      label: "界".repeat(18),
+      start,
+      end,
+    };
+  }),
   investigationWindow: {
     ...DEFAULT_INPUT.investigationWindow,
     label: "界".repeat(28),
@@ -57,9 +60,9 @@ const dense: Input = {
     venueLabel: "界".repeat(24),
   },
   sceneLabel: "界".repeat(40),
-  copy: Object.fromEntries(
-    Object.keys(DEFAULT_INPUT.copy).map((key) => [key, "界".repeat(42)]),
-  ) as Input["copy"],
+  copy: objectValuesMap(DEFAULT_INPUT.copy, () => {
+    return "界".repeat(42);
+  }) as Input["copy"],
 };
 const changed: Input = {
   ...DEFAULT_INPUT,
@@ -83,13 +86,15 @@ export const invalidInputs: unknown[] = [
     [null, 4],
     [4, 4],
     [0, 11],
-  ].map(([start, end]) => ({
-    ...DEFAULT_INPUT,
-    records: [
-      { ...DEFAULT_INPUT.records[0], start, end },
-      DEFAULT_INPUT.records[1],
-    ],
-  })),
+  ].map(([start, end]) => {
+    return {
+      ...DEFAULT_INPUT,
+      records: [
+        { ...DEFAULT_INPUT.records[0], start, end },
+        DEFAULT_INPUT.records[1],
+      ],
+    };
+  }),
 ];
 /** Accepted minimum, dense, changed and disabled-display examples. */
 export const fixtures: Array<{ id: string; input: Input }> = [

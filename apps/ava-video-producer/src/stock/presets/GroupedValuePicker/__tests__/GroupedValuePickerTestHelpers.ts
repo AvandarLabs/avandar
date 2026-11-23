@@ -2,6 +2,9 @@ import assert from "node:assert/strict";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
+import { makeResolvedVideoThemeFromSource } from "../../../../videoTheme/makeResolvedVideoThemeFromSource/makeResolvedVideoThemeFromSource";
+import { makeVideoMotionFromTokens } from "../../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
+import { DEFAULT_VIDEO_THEME_SOURCE } from "../../../../videoTheme/makeVideoThemeLibraryFromDocuments/makeVideoThemeLibraryFromDocuments";
 import { getPickerCopyFromFrame } from ".././getPickerCopyFromFrame";
 import { getPickerGroupsFromInput } from ".././getPickerGroupsFromInput";
 import { GroupedValuePicker } from ".././GroupedValuePicker";
@@ -14,11 +17,20 @@ import {
 import { inputSchema } from ".././GroupedValuePicker.schema";
 import type { PresetAssertions } from "../../../../../tests/helpers/registerStockPresetAssertions";
 import type { Input } from ".././GroupedValuePicker.schema";
+/** Inputs for render. */
+type RenderArguments = { frame: number; input: Input };
 
-function _render({
-  frame,
-  input,
-}: Readonly<{ frame: number; input: Input }>): string {
+/** Inputs for getVisibleTexts. */
+type GetVisibleTextsArguments = { input: Input; frame: number };
+
+/** Inputs for getMovingCopy. */
+type GetMovingCopyArguments = { markup: string; id: string };
+
+const CLASSIC_MOTION = makeVideoMotionFromTokens(
+  makeResolvedVideoThemeFromSource(DEFAULT_VIDEO_THEME_SOURCE).semantic.motion,
+);
+
+function _render({ frame, input }: Readonly<RenderArguments>): string {
   return renderToStaticMarkup(
     createElement(GroupedValuePicker, {
       frame,
@@ -32,7 +44,7 @@ function _render({
 function _getVisibleTexts({
   input,
   frame,
-}: Readonly<{ input: Input; frame: number }>): string[] {
+}: Readonly<GetVisibleTextsArguments>): string[] {
   return [input.labels.entity, input.labels.field, input.labels.result];
 }
 
@@ -59,10 +71,19 @@ const options = {
   textFrames: [30, 90, 150],
 } satisfies PresetAssertions<Input>;
 
+/** The rendered position, size, and markup of one moving value copy. */
+type MovingCopy = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  body: string;
+};
+
 function _getMovingCopy({
   markup,
   id,
-}: Readonly<{ markup: string; id: string }>) {
+}: Readonly<GetMovingCopyArguments>): MovingCopy {
   const body = markup.match(
     new RegExp(`<g data-picker-copy="${id}"[^>]*>([\\s\\S]*?</text>)`),
   )?.[1];
@@ -99,35 +120,41 @@ function _assertCardClearance({
 }: {
   copies: readonly AssertCardClearanceCopies[];
   message: string;
-}) {
-  copies.forEach((first, index) =>
-    copies
-      .slice(index + 1)
-      .forEach((second) =>
-        assert.ok(
-          first.x + first.width <= second.x ||
-            second.x + second.width <= first.x ||
-            first.y + first.height <= second.y ||
-            second.y + second.height <= first.y,
-          message,
-        ),
-      ),
-  );
+}): void {
+  copies.forEach((first, index) => {
+    return copies.slice(index + 1).forEach((second) => {
+      return assert.ok(
+        first.x + first.width <= second.x ||
+          second.x + second.width <= first.x ||
+          first.y + first.height <= second.y ||
+          second.y + second.height <= first.y,
+        message,
+      );
+    });
+  });
 }
 
-function _assertReusedColumnClearance(values: ReadonlyArray<number | null>) {
+function _assertReusedColumnClearance(
+  values: ReadonlyArray<number | null>,
+): void {
   const input = inputSchema.parse({
     ...DEFAULT_INPUT,
     nullPolicy: values.includes(null) ? "include-in-mode" : "exclude-from-mode",
-    observations: values.map((value, index) => ({ id: String(index), value })),
+    observations: values.map((value, index) => {
+      return { id: String(index), value };
+    }),
   });
-  Array.from({ length: 161 }, (_, index) => 56 + index / 4).forEach((frame) => {
+  Array.from({ length: 161 }, (_, index) => {
+    return 56 + index / 4;
+  }).forEach((frame) => {
     const markup = _render({ frame: frame, input: input });
     const copies = input.observations.map(({ id, value }) => {
       const copy = _getMovingCopy({ markup, id });
       assert.equal(
         [...copy.body.matchAll(/<tspan[^>]*>([^<]*)<\/tspan>/g)]
-          .map(([, text]) => text)
+          .map(([, text]) => {
+            return text;
+          })
           .join(""),
         value === null ? "∅" : String(value),
       );
@@ -148,7 +175,7 @@ function _assertReusedColumnClearance(values: ReadonlyArray<number | null>) {
   _assertModeArrival(input);
 }
 
-function _assertModeArrival(input: Input) {
+function _assertModeArrival(input: Input): void {
   const arrivedMarkup = _render({ frame: 96, input: input });
   input.observations.forEach(({ id, value }, index) => {
     const start = _getMovingCopy({
@@ -192,30 +219,43 @@ function _assertModeArrival(input: Input) {
   });
 }
 
-function _getPermutedOrders(values: ReadonlyArray<number | null>) {
+function _getPermutedOrders(
+  values: ReadonlyArray<number | null>,
+): Array<Array<number | null>> {
   return values.reduce<Array<Array<number | null>>>(
-    (orders, value) =>
-      orders.flatMap((order) =>
-        Array.from({ length: order.length + 1 }, (_, index) => [
-          ...order.slice(0, index),
-          value,
-          ...order.slice(index),
-        ]),
-      ),
+    (orders, value) => {
+      return orders.flatMap((order) => {
+        return Array.from({ length: order.length + 1 }, (_, index) => {
+          return [...order.slice(0, index), value, ...order.slice(index)];
+        });
+      });
+    },
     [[]],
   );
 }
 
-function _assertPermutedCopyClearance(order: ReadonlyArray<number | null>) {
+function _assertPermutedCopyClearance(
+  order: ReadonlyArray<number | null>,
+): void {
   const input: Input = {
     ...DEFAULT_INPUT,
     nullPolicy: "include-in-mode",
-    observations: order.map((value, index) => ({ id: String(index), value })),
+    observations: order.map((value, index) => {
+      return { id: String(index), value };
+    }),
   };
   const groups = getPickerGroupsFromInput(input);
-  Array.from({ length: 161 }, (_, index) => 56 + index / 4).forEach((frame) => {
+  Array.from({ length: 161 }, (_, index) => {
+    return 56 + index / 4;
+  }).forEach((frame) => {
     const copies = order.map((value, index) => {
-      const copy = getPickerCopyFromFrame({ input, index, frame, groups });
+      const copy = getPickerCopyFromFrame({
+        input,
+        index,
+        frame,
+        groups,
+        motion: CLASSIC_MOTION,
+      });
       assert.ok(copy);
       if (frame >= 59) {
         assert.equal(copy.opacity, 1);

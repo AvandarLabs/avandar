@@ -7,7 +7,7 @@ declare global {
    * `JSX.Element` rather than `React.JSX.Element` every time.
    */
   namespace JSX {
-    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+    // oxlint-disable-next-line typescript/no-empty-object-type
     interface Element extends React.JSX.Element {}
   }
 }

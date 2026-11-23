@@ -47,6 +47,35 @@ function _hasApplicableUpdate(
   });
 }
 
+/** Applies every legend update whose fingerprint still matches its layer. */
+function _withLegendUpdates(
+  options: Readonly<{
+    mapConfig: AvaMapConfig.T;
+    legendUpdates: ReadonlyMap<MapLayer.Id, LayerLegendUpdate>;
+  }>,
+): AvaMapConfig.T {
+  const layers = options.mapConfig.layers.map((layer) => {
+    const update = options.legendUpdates.get(layer.id);
+    if (
+      !update ||
+      update.layerFingerprint !== _makeFingerprintFromMapLayer(layer) ||
+      _isLegendEqual(layer, update)
+    ) {
+      return layer;
+    }
+    return {
+      ...layer,
+      legend: {
+        ...layer.legend,
+        breaks: update.breaks,
+        entries: update.entries,
+        sizeStops: update.sizeStops,
+      },
+    } as MapLayer.T;
+  });
+  return { ...options.mapConfig, layers };
+}
+
 function usePersistedLayerLegends(options: Options): void {
   const { legendUpdates, mapConfig, updateConfig } = options;
   useEffect(
@@ -55,26 +84,7 @@ function usePersistedLayerLegends(options: Options): void {
         return;
       }
       updateConfig((current) => {
-        const layers = current.layers.map((layer) => {
-          const update = legendUpdates.get(layer.id);
-          if (
-            !update ||
-            update.layerFingerprint !== _makeFingerprintFromMapLayer(layer) ||
-            _isLegendEqual(layer, update)
-          ) {
-            return layer;
-          }
-          return {
-            ...layer,
-            legend: {
-              ...layer.legend,
-              breaks: update.breaks,
-              entries: update.entries,
-              sizeStops: update.sizeStops,
-            },
-          } as MapLayer.T;
-        });
-        return { ...current, layers };
+        return _withLegendUpdates({ mapConfig: current, legendUpdates });
       });
     },
     [legendUpdates, mapConfig, updateConfig],
@@ -85,4 +95,6 @@ function usePersistedLayerLegends(options: Options): void {
 export const PersistedLayerLegends = {
   makeFingerprintFromMapLayer: _makeFingerprintFromMapLayer,
   usePersistedLayerLegends,
+  /** Applies matching legend updates to a config without persisting them. */
+  withLegendUpdates: _withLegendUpdates,
 };

@@ -11,7 +11,7 @@ import {
   TextInput,
 } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { PdfAxisCalibration } from "./PdfAxisCalibration/PdfAxisCalibration";
 import css from "./PdfRegionCard.module.css";
 import { getCoverageFlagFromTable } from "./runRegionModelAssist/runRegionModelAssist";

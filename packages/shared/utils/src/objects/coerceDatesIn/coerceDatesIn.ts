@@ -23,7 +23,7 @@ export function coerceDatesIn<T extends UnknownObject, K extends keyof T>(
 } {
   const newObj = { ...obj };
   keys.forEach((key) => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // oxlint-disable-next-line typescript/ban-ts-comment
     // @ts-expect-error
     newObj[key] =
       obj[key] === undefined

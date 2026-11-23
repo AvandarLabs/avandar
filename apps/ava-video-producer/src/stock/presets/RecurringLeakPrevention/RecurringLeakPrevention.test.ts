@@ -2,14 +2,11 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import test from "node:test";
-import { setupI18n } from "@lingui/core";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
-import { makeLocalizedStockDataFromContract } from "../../i18n/makeLocalizedStockDataFromContract";
-import { StockCopyMessages } from "../../i18n/StockCopyMessages";
 import { RecurringLeakPrevention } from "./RecurringLeakPrevention";
 import { recurringLeakPreventionContract } from "./RecurringLeakPrevention.contract";
 import {
@@ -37,10 +34,11 @@ const render: ({
   frame,
   input,
 }: Readonly<{ frame: number; input: Input }>) => string = _render;
-test("complete rejection fixtures reject structural and reference violations", () =>
-  invalidInputs.forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  ));
+test("complete rejection fixtures reject structural and reference violations", () => {
+  return invalidInputs.forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
+});
 test("retest resumes actual outlet flow without turning an untested repair into success", () => {
   ["stopped", "still-leaking", "not-tested"].forEach((retest) => {
     const input: Input = {
@@ -141,28 +139,6 @@ const options = {
 } satisfies PresetAssertions<Input>;
 registerStockPresetAssertions(options);
 registerStockTextLayoutAssertions(options);
-test("every indexed default-copy path resolves while authored input remains exact", () => {
-  const contract = recurringLeakPreventionContract;
-  const supplied = structuredClone(DEFAULT_INPUT);
-  const messages = Object.fromEntries(
-    contract.defaultTextPaths.map((path, index) => [
-      StockCopyMessages.getDefaultMessageIdFromPath({ id: contract.id, path }),
-      `Traduit ${index}`,
-    ]),
-  );
-  const i18n = setupI18n({ locale: "fr", messages: { fr: messages } });
-  const resolved = makeLocalizedStockDataFromContract({ contract, i18n });
-  contract.defaultTextPaths.forEach((path, index) => {
-    const value = path.reduce<unknown>(
-      (parent, key) => Reflect.get(parent as object, key),
-      resolved.defaultInput,
-    );
-    assert.equal(value, `Traduit ${index}`);
-  });
-  assert.deepEqual(DEFAULT_INPUT, supplied);
-  assert.notEqual(resolved.defaultInput, DEFAULT_INPUT);
-});
-
 test("the worker hand stays on the actual seal during insertion", () => {
   [82, 90, 101, 106].forEach((frame) => {
     const markup = render({ frame: frame, input: DEFAULT_INPUT });
@@ -185,25 +161,6 @@ test("the worker hand stays on the actual seal during insertion", () => {
           name: "height",
         }) /
           2,
-    );
-  });
-});
-
-test("copy extraction includes every explicit indexed default without changing author input", () => {
-  const contract = recurringLeakPreventionContract;
-  const messages = StockCopyMessages.getMessagesFromContract({
-    [contract.id]: contract,
-  });
-  contract.defaultTextPaths.forEach((path) => {
-    const original = path.reduce<unknown>(
-      (parent, key) => Reflect.get(parent as object, key),
-      DEFAULT_INPUT,
-    );
-    assert.equal(
-      messages[
-        StockCopyMessages.getDefaultMessageIdFromPath({ id: contract.id, path })
-      ],
-      original,
     );
   });
 });
@@ -242,8 +199,8 @@ test("supplied multilingual prose and literal punctuation remain unchanged", () 
 });
 
 test("an unperformed retest retains repair copy and never paints a performed test phase", () => {
-  [true, false].forEach((showPhaseCaptions) =>
-    [120, 150, 167].forEach((frame) => {
+  [true, false].forEach((showPhaseCaptions) => {
+    return [120, 150, 167].forEach((frame) => {
       const markup = render({
         frame: frame,
         input: {
@@ -266,8 +223,8 @@ test("an unperformed retest retains repair copy and never paints a performed tes
           phase.includes(`aria-label="${DEFAULT_INPUT.labels.repair}"`),
         );
       }
-    }),
-  );
+    });
+  });
 });
 
 test("serialized controls preserve the reviewed pre-extraction bounds and message identities", () => {

@@ -1,3 +1,4 @@
+import { objectValuesMap } from "@avandar/utils";
 import type { Input } from "./DoseCohortReturnPaths.schema";
 /** Complete fictional default, replaced only as a whole input. */
 export const DEFAULT_INPUT: Input = {
@@ -80,14 +81,16 @@ const minimum: Input = {
     { id: "", label: "" },
     { id: "v2", label: "" },
   ],
-  participants: ["", "界 space"].map((id) => ({
-    id,
-    label: "",
-    records: [
-      { visitId: "", state: "unknown" },
-      { visitId: "v2", state: "not-due" },
-    ],
-  })),
+  participants: ["", "界 space"].map((id) => {
+    return {
+      id,
+      label: "",
+      records: [
+        { visitId: "", state: "unknown" },
+        { visitId: "v2", state: "not-due" },
+      ],
+    };
+  }),
 };
 const STATES: readonly ["recorded", "missed", "not-due", "unknown"] = [
   "recorded",
@@ -97,33 +100,41 @@ const STATES: readonly ["recorded", "missed", "not-due", "unknown"] = [
 ] as const;
 const dense: Input = {
   ...DEFAULT_INPUT,
-  visits: Array.from({ length: 4 }, (_, index) => ({
-    id: `v${index}`,
-    label: "界".repeat(18),
-  })),
-  participants: Array.from({ length: 8 }, (_, index) => ({
-    id: `p${index}`,
-    label: "界".repeat(18),
-    records: Array.from({ length: 4 }, (unusedVisit, visitIndex) => ({
-      visitId: `v${visitIndex}`,
-      state: STATES[(index + visitIndex) % 4],
-    })),
-  })),
+  visits: Array.from({ length: 4 }, (_, index) => {
+    return {
+      id: `v${index}`,
+      label: "界".repeat(18),
+    };
+  }),
+  participants: Array.from({ length: 8 }, (_, index) => {
+    return {
+      id: `p${index}`,
+      label: "界".repeat(18),
+      records: Array.from({ length: 4 }, (unusedVisit, visitIndex) => {
+        return {
+          visitId: `v${visitIndex}`,
+          state: STATES[(index + visitIndex) % 4],
+        };
+      }),
+    };
+  }),
   sceneLabel: "界".repeat(40),
-  copy: Object.fromEntries(
-    Object.keys(DEFAULT_INPUT.copy).map((key) => [key, "界".repeat(42)]),
-  ) as Input["copy"],
+  copy: objectValuesMap(DEFAULT_INPUT.copy, () => {
+    return "界".repeat(42);
+  }) as Input["copy"],
 };
 const changed: Input = {
   ...DEFAULT_INPUT,
-  participants: DEFAULT_INPUT.participants.map((person, index) => ({
-    ...person,
-    records: person.records.map((record, visitIndex) =>
-      visitIndex === 0 && index < 3
-        ? { ...record, state: STATES[index + 1] }
-        : record,
-    ),
-  })),
+  participants: DEFAULT_INPUT.participants.map((person, index) => {
+    return {
+      ...person,
+      records: person.records.map((record, visitIndex) => {
+        return visitIndex === 0 && index < 3
+          ? { ...record, state: STATES[index + 1] }
+          : record;
+      }),
+    };
+  }),
 };
 const toggles: Input = {
   ...changed,
@@ -141,16 +152,16 @@ export const invalidInputs: unknown[] = [
   },
   {
     ...DEFAULT_INPUT,
-    participants: DEFAULT_INPUT.participants.map((person, index) =>
-      index
+    participants: DEFAULT_INPUT.participants.map((person, index) => {
+      return index
         ? person
         : {
             ...person,
-            records: person.records.map((record, visitIndex) =>
-              visitIndex ? record : { ...record, visitId: "absent" },
-            ),
-          },
-    ),
+            records: person.records.map((record, visitIndex) => {
+              return visitIndex ? record : { ...record, visitId: "absent" };
+            }),
+          };
+    }),
   },
 ];
 /** Accepted minimum, dense, changed and disabled-display examples. */

@@ -1,5 +1,6 @@
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SceneText } from "./SceneText";
 import type { Input } from "./TeacherLearningCover.schema";
 import type { ReactNode } from "react";
@@ -7,6 +8,8 @@ import type { ReactNode } from "react";
 type Props = { input: Input };
 /** Draws the scene's ClassroomLearners group with fixed authored geometry. */
 export function ClassroomLearners({ input }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <>
       {input.learners.map((learner, index) => {
@@ -19,12 +22,13 @@ export function ClassroomLearners({ input }: Readonly<Props>): ReactNode {
               y={y}
               size={44}
               posture="seated"
-              color={STOCK.muted}
+              color={tokens.color.textMuted}
             />
-            <path
-              d={`M${x - 24} ${y + 28} H${x + 24}`}
-              stroke={STOCK.line}
-              strokeWidth={3}
+            <SketchedShape
+              shape={{ kind: "path", d: `M${x - 24} ${y + 28} H${x + 24}` }}
+              profile={tokens.sketch.shape}
+              stroke={tokens.color.line}
+              strokeWidth={scales.stroke(tokens.stroke.emphasis)}
             />
             <SceneText
               text={learner.label}

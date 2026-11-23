@@ -1,4 +1,5 @@
 import { propEq } from "@avandar/utils";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { BackfillBar } from "./BackfillBar";
 import { getRecordPlacementsFromInputAndFrame } from "./getRecordPlacementsFromInputAndFrame";
 import { ReceiptToken } from "./ReceiptToken";
@@ -12,7 +13,12 @@ export function BackfillChart({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const records = getRecordPlacementsFromInputAndFrame({ input, frame });
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const records = getRecordPlacementsFromInputAndFrame({
+    input,
+    frame,
+    motion,
+  });
   return (
     <g>
       {input.eventBins.map((bin, index) => {
@@ -26,15 +32,17 @@ export function BackfillChart({
             width={480 / input.eventBins.length}
             prior={items.filter(propEq("firstSnapshot", 0)).length}
             revised={items.length}
-            height={items.reduce((sum, item) => sum + 18 * item.progress, 0)}
+            height={items.reduce((sum, item) => {
+              return sum + 18 * item.progress;
+            }, 0)}
             showPrior={input.showPriorOutline}
             accent={accent}
           />
         );
       })}
-      {records.map((record) => (
-        <ReceiptToken key={record.id} record={record} accent={accent} />
-      ))}
+      {records.map((record) => {
+        return <ReceiptToken key={record.id} record={record} accent={accent} />;
+      })}
     </g>
   );
 }

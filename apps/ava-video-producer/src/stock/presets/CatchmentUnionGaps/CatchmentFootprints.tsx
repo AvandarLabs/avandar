@@ -1,3 +1,4 @@
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getCatchmentShapesFromInput } from "./getCatchmentShapesFromInput";
 import { IndividualFootprints } from "./IndividualFootprints";
 import type { Input } from "./CatchmentUnionGaps.schema";
@@ -16,6 +17,7 @@ export function CatchmentFootprints({
   accent,
   definitionId,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
   return (
     <g>
       <IndividualFootprints input={input} progress={progress} accent={accent} />
@@ -27,16 +29,16 @@ export function CatchmentFootprints({
         height={320}
         mask={`url(#${definitionId}-union)`}
         fill={accent}
-        opacity={0.25 * progress}
+        opacity={atomic.opacity["25"] * progress}
       />
       <g
         data-union-boundary=""
         filter={`url(#${definitionId}-edge)`}
         opacity={progress}
       >
-        {getCatchmentShapesFromInput(input).map((shape) => (
-          <polygon key={shape.id} points={shape.points} fill={accent} />
-        ))}
+        {getCatchmentShapesFromInput(input).map((shape) => {
+          return <polygon key={shape.id} points={shape.points} fill={accent} />;
+        })}
       </g>
     </g>
   );

@@ -10,16 +10,18 @@ export function ShelterRoleLegend({ input }: Readonly<Props>): ReactNode {
   return (
     <g>
       {(["sleeping", "circulation", "storage", "closed"] as const).map(
-        (role, index) => (
-          <LabelSlots
-            key={role}
-            labels={[
-              [String(index + 1), 480, 80 + index * 60, 24, 12, 1],
-              [input.copy[role], 515, 80 + index * 60, 310, 12, 4],
-              [String(roleAreas[role]), 850, 80 + index * 60, 70, 14, 1],
-            ]}
-          />
-        ),
+        (role, index) => {
+          return (
+            <LabelSlots
+              key={role}
+              labels={[
+                [String(index + 1), 480, 80 + index * 60, 24, 12, 1],
+                [input.copy[role], 515, 80 + index * 60, 310, 12, 4],
+                [String(roleAreas[role]), 850, 80 + index * 60, 70, 14, 1],
+              ]}
+            />
+          );
+        },
       )}
     </g>
   );

@@ -85,6 +85,9 @@ const options = {
 
 type TextBounds = { left: number; top: number; right: number; bottom: number };
 
+/** A card's bounds plus the markup inside its group. */
+type CardBounds = TextBounds & { markup: string };
+
 function _getTextLineBounds({
   markup,
   x = 0,
@@ -130,7 +133,7 @@ function _getCardBounds({
 }: {
   markup: string;
   kind: "inbound" | "outbound";
-}) {
+}): CardBounds {
   const group = markup.match(
     new RegExp(`<g data-${kind}="true"[^>]*>([\\s\\S]*?)<\\/g>`),
   );

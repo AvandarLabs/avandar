@@ -8,14 +8,24 @@
 .root {
   background-color: var(--mantine-navbar-background);
 
-  --ava-chat-composer-width: min(64vw, 960px);
-
   /* Set overflow-x to clip so that the horizontal bleed from AppShell.Main's
    * negative margins is visually clipped without creating a scroll container.
    * Otherwise wheel events are absorbed by .root before reaching the window,
    * because overflow: hidden creates a scroll container that is always at its
    * scroll boundary and prevents event propagation. */
   overflow-x: clip;
+}
+
+/*
+ * Chat open beside the slate: the slate and the chat aside become one
+ * surface. The slate drops its inline-end gutter, border, and corners there,
+ * and the chat aside draws the hairline between the view and the chat.
+ * AppSlate.module.css reads these; ChatPanel.module.css draws the other half.
+ */
+.root[data-chat-fused] {
+  --ava-slate-gutter-inline-end: 0px;
+  --ava-slate-inline-end-radius: 0px;
+  --ava-slate-inline-end-border-width: 0px;
 }
 
 /*

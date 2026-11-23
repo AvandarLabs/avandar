@@ -1,12 +1,9 @@
 import { match, P } from "ts-pattern";
 import { CollectionField } from "../CollectionField/CollectionField";
-import {
-  ContentField,
-  type Props as ContentFieldProps,
-} from "../ContentField/ContentField";
-import { ScalarField } from "../ScalarField/ScalarField";
+import { type Props as ContentFieldProps } from "../ContentField/ContentField";
 import { UnionField } from "../UnionField/UnionField";
-import styles from "./ContentFieldBody.module.css";
+import { LabeledScalarField } from "./LabeledScalarField/LabeledScalarField";
+import { ObjectContentField } from "./ObjectContentField/ObjectContentField";
 import type { ContentFieldContext } from "../useContentField";
 import type { ReactNode } from "react";
 
@@ -18,24 +15,11 @@ export function ContentFieldBody({
   control,
   context,
   ...remainingProps
-}: Props): ReactNode {
+}: Readonly<Props>): ReactNode {
   return match(control)
     .with({ kind: "object" }, (matchedControl) => {
       return (
-        <fieldset
-          className={styles.contentFieldBodyObject}
-          aria-describedby={context.field["aria-describedby"]}
-        >
-          <legend>{context.label}</legend>
-          {matchedControl.controls.map((child) => (
-            <ContentField
-              {...{ ...remainingProps, control: matchedControl, context }}
-              key={child.path}
-              control={child}
-              parentPath={context.path}
-            />
-          ))}
-        </fieldset>
+        <ObjectContentField {...{ matchedControl, context, remainingProps }} />
       );
     })
     .with({ kind: "collection" }, (matchedControl) => {
@@ -58,13 +42,9 @@ export function ContentFieldBody({
       { kind: P.union("text", "number", "boolean", "select") },
       (matchedControl) => {
         return (
-          <>
-            <label htmlFor={context.field.id}>{context.label}</label>
-            <ScalarField
-              {...{ ...remainingProps, control: matchedControl, context }}
-              control={matchedControl}
-            />
-          </>
+          <LabeledScalarField
+            {...{ matchedControl, context, remainingProps }}
+          />
         );
       },
     )

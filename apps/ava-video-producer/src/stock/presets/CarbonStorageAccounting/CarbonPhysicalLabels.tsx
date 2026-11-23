@@ -21,20 +21,22 @@ export function CarbonPhysicalLabels({ input }: Readonly<Props>): ReactNode {
   ];
   return (
     <g>
-      {copies.map(([text, x, y, width, maxLines, anchor], index) => (
-        <FitText
-          key={index}
-          text={text}
-          x={x}
-          y={y}
-          width={width}
-          fontSize={12}
-          maxLines={maxLines}
-          anchor={anchor}
-          breakLongWords
-          normalizeWhitespace
-        />
-      ))}
+      {copies.map(([text, x, y, width, maxLines, anchor]) => {
+        return (
+          <FitText
+            key={`${x}:${y}`}
+            text={text}
+            x={x}
+            y={y}
+            width={width}
+            fontSize={12}
+            maxLines={maxLines}
+            anchor={anchor}
+            breakLongWords
+            normalizeWhitespace
+          />
+        );
+      })}
     </g>
   );
 }

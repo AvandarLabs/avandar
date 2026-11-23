@@ -1,8 +1,8 @@
 import { ContourLabels } from "./ContourLabels";
-import { ContourTreatment } from "./ContourTreatment";
+import { ContourTreatment } from "./ContourTreatment/ContourTreatment";
 import { SedimentFlow } from "./SedimentFlow";
 import { SedimentQuantities } from "./SedimentQuantities";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ContourSedimentRetention.schema";
 import type { ReactNode } from "react";
 /** Explicit content joins the shared stock frame contract. */

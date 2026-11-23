@@ -1,16 +1,19 @@
-import { STOCK, type GraphicProps } from "../../graphics-common";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getShelfUnitsFromInputAndFrame } from "./getShelfUnitsFromInputAndFrame";
 import { DEFAULT_INPUT } from "./RetailShelfReplenishment.fixtures";
-import { ShelfActors } from "./ShelfActors";
-import { ShelfCarrier } from "./ShelfCarrier";
-import { ShelfLabels } from "./ShelfLabels";
+import { ShelfActors } from "./ShelfActors/ShelfActors";
+import { ShelfCarrier } from "./ShelfCarrier/ShelfCarrier";
+import { ShelfLabels } from "./ShelfLabels/ShelfLabels";
 import { ShelfOrder } from "./ShelfOrder";
 import { ShelfStructure } from "./ShelfStructure";
-import { ShelfUnit } from "./ShelfUnit";
+import { ShelfUnit } from "./ShelfUnit/ShelfUnit";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./RetailShelfReplenishment.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
+
 /**
  * Exact replenishment and shopper selection, without duplicated product units.
  */
@@ -19,30 +22,39 @@ export function RetailShelfReplenishment({
   accent,
   input = DEFAULT_INPUT,
 }: Readonly<Props>): ReactNode {
-  const units = getShelfUnitsFromInputAndFrame({ input, frame });
-  const shelfQuantities = input.goods.map(
-    (good) =>
-      units.filter((unit) => unit.good.id === good.id && unit.owner === "shelf")
-        .length,
-  );
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const units = getShelfUnitsFromInputAndFrame({ input, frame, motion });
+  const shelfQuantities = input.goods.map((good) => {
+    return units.filter((unit) => {
+      return unit.good.id === good.id && unit.owner === "shelf";
+    }).length;
+  });
   return (
-    <g color={STOCK.text}>
+    <g color={tokens.color.text}>
       <ShelfStructure input={input} />
       <ShelfCarrier input={input} frame={frame} accent={accent} />
-      <path
-        d="M700 463 L710 498 H830 L840 463 M715 463 Q770 428 825 463"
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: "M700 463 L710 498 H830 L840 463 M715 463 Q770 428 825 463",
+        }}
+        profile={tokens.sketch.shape}
         fill="none"
         stroke={accent}
-        strokeWidth={2}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
       <ShelfOrder input={input} frame={frame} />
-      {units.map((unit) => (
-        <ShelfUnit
-          key={`${unit.good.id}:${unit.unitIndex}`}
-          {...unit}
-          accent={accent}
-        />
-      ))}
+      {units.map((unit) => {
+        return (
+          <ShelfUnit
+            key={`${unit.good.id}:${unit.unitIndex}`}
+            {...unit}
+            accent={accent}
+          />
+        );
+      })}
       <ShelfActors input={input} frame={frame} accent={accent} />
       <ShelfLabels input={input} shelfQuantities={shelfQuantities} />
     </g>

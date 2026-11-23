@@ -72,10 +72,26 @@ export const SubscriptionModule = {
   /**
    * Whether the workspace still needs billing onboarding (no row or inactive).
    */
-  shouldPromptForBillingSetup: (
-    subscription: SubscriptionRead | undefined,
-  ): boolean => {
+  needsBillingSetup: (subscription: SubscriptionRead | undefined): boolean => {
     return !doesSubscriptionGrantEntitlements(subscription);
+  },
+
+  /**
+   * Whether to prompt the user to upgrade because the workspace cannot add
+   * another dataset. A workspace that still needs billing setup already gets
+   * the blocking plan-selection prompt, so this only applies to a workspace
+   * whose active plan is at its dataset cap.
+   */
+  shouldPromptForDatasetLimitUpgrade: (
+    options: Readonly<{
+      subscription: SubscriptionRead | undefined;
+      isAddAllowed: boolean;
+    }>,
+  ): boolean => {
+    return (
+      !options.isAddAllowed &&
+      !SubscriptionModule.needsBillingSetup(options.subscription)
+    );
   },
 
   /**

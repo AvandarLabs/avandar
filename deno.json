@@ -12,6 +12,11 @@
     "@avandar/utils/sql": "./packages/shared/utils/src/sql/index.ts",
     "@avandar/utils/zod": "./packages/shared/utils/src/zod/index.ts",
     "@clients/": "./packages/shared/clients/src/",
+    "@earendil-works/pi-agent-core": "npm:@earendil-works/pi-agent-core@1.5.0",
+    "@earendil-works/pi-ai": "npm:@earendil-works/pi-ai@1.5.0",
+    "@earendil-works/pi-schema": "npm:@earendil-works/pi-schema@1.5.0",
+    "@earendil-works/pi-ai/models": "npm:@earendil-works/pi-ai@1.5.0/models",
+    "@earendil-works/pi-ai/providers/openrouter": "npm:@earendil-works/pi-ai@1.5.0/providers/openrouter",
     "@logger/": "./packages/shared/logger/src/",
     "@models/": "./packages/shared/models/src/",
     "@modules/": "./packages/shared/modules/src/",
@@ -23,9 +28,11 @@
     "@upstash/ratelimit": "npm:@upstash/ratelimit@2",
     "@upstash/redis": "npm:@upstash/redis@1",
     "@utils/": "./packages/shared/utils/src/",
+    "bottleneck": "npm:bottleneck@2",
     "google-auth-library": "npm:google-auth-library@10",
     "googleapis": "npm:googleapis@154",
     "jose": "jsr:@panva/jose@6",
+    "postgres": "npm:postgres@3",
     "react": "npm:react@19",
     "resend": "npm:resend@6",
     "ts-pattern": "npm:ts-pattern@5",
@@ -47,5 +54,6 @@
     "strict": true,
     "types": ["react", "react/jsx-runtime"]
   },
+  "exclude": ["packages/**/dist/"],
   "lock": false
 }

@@ -33,9 +33,9 @@ export const inputSchema = z
         message: "Collection IDs must be unique.",
       });
     }
-    const insertedIndices = input.steps.flatMap((step, index) =>
-      step.isInserted ? [index] : [],
-    );
+    const insertedIndices = input.steps.flatMap((step, index) => {
+      return step.isInserted ? [index] : [];
+    });
     if (
       insertedIndices.length !== 1 ||
       insertedIndices[0] === 0 ||

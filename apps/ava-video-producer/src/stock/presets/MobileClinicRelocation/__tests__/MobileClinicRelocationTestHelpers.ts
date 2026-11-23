@@ -14,20 +14,35 @@ import {
 import { inputSchema, type Input } from ".././MobileClinicRelocation.schema";
 import type { PresetAssertions } from "../../../../../tests/helpers/registerStockPresetAssertions";
 
+/**
+ * Rendered markup with each marked sketch-aware shape read as one element.
+ * `SketchedShape` draws its plain shape inside a group that carries the
+ * shape's markers (`data-*`, `aria-label`, `transform`), so the group's
+ * attributes move onto the shape these assertions read.
+ */
+function _joinMarkedShapes(markup: string): string {
+  return markup.replace(
+    /<g((?:\s+(?:data-[\w-]+|aria-label|transform)="[^"]*")+)><(path|line|circle|rect|ellipse)\b([^>]*)><\/\2><\/g>/g,
+    "<$2$1$3></$2>",
+  );
+}
+
 function _render({
   frame,
   input,
 }: Readonly<{ frame: number; input: Input }>): string {
-  return renderToStaticMarkup(
-    createElement(
-      "svg",
-      {},
-      createElement(MobileClinicRelocation, {
-        frame,
-        input,
-        accent: "#9fefca",
-        id: "test",
-      }),
+  return _joinMarkedShapes(
+    renderToStaticMarkup(
+      createElement(
+        "svg",
+        {},
+        createElement(MobileClinicRelocation, {
+          frame,
+          input,
+          accent: "#9fefca",
+          id: "test",
+        }),
+      ),
     ),
   );
 }
@@ -41,9 +56,9 @@ function _attributes({
   attribute: string;
   value: string;
 }): string {
-  const element = markup
-    .match(/<[^>]+>/g)
-    ?.find((tag) => tag.includes(`${attribute}="${value}"`));
+  const element = markup.match(/<[^>]+>/g)?.find((tag) => {
+    return tag.includes(`${attribute}="${value}"`);
+  });
   assert.ok(element, `${attribute}=${value}`);
   return element;
 }
@@ -51,9 +66,15 @@ function _attributes({
 function _getVisibleTexts({ input }: Readonly<{ input: Input }>): string[] {
   return [
     input.sceneLabel,
-    ...input.sites.map(({ label }) => label),
-    ...input.slots.map(({ label }) => label),
-    ...input.people.map(({ label }) => label),
+    ...input.sites.map(({ label }) => {
+      return label;
+    }),
+    ...input.slots.map(({ label }) => {
+      return label;
+    }),
+    ...input.people.map(({ label }) => {
+      return label;
+    }),
     input.copy.map,
     input.copy.clinic,
     input.copy.people,
@@ -75,13 +96,23 @@ const ASSERTIONS = {
   textFrames: [24, 72, 150],
 } satisfies PresetAssertions<Input>;
 
+/** The left, right, top, and bottom edges of a painted region. */
+type ClearanceBox = {
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
+};
+
 function _getLabelLineBoxes({
   markup,
   label,
-}: Readonly<{ markup: string; label: string }>) {
+}: Readonly<{ markup: string; label: string }>): ClearanceBox[] {
   const element = markup
     .match(/<text\b[^>]*>[\s\S]*?<\/text>/g)
-    ?.find((text) => text.includes(`aria-label="${label}"`));
+    ?.find((text) => {
+      return text.includes(`aria-label="${label}"`);
+    });
   assert.ok(element, "Complete authored label remains present.");
   const fontSize = SvgAttributes.getNumberFromMarkup({
     attributes: element,
@@ -94,7 +125,9 @@ function _getLabelLineBoxes({
   const lines = Array.from(element.matchAll(/<tspan([^>]*)>([^<]*)<\/tspan>/g));
   assert.equal(
     lines
-      .map(([, , text]) => text)
+      .map(([, , text]) => {
+        return text;
+      })
       .join("")
       .replace(/\s/g, ""),
     label.replace(/\s/g, ""),
@@ -112,7 +145,7 @@ function _getLabelLineBoxes({
   return boxes;
 }
 
-function _getOpenVehicleEnvelope(markup: string) {
+function _getOpenVehicleEnvelope(markup: string): ClearanceBox {
   const vehicle = _attributes({
     markup,
     attribute: "data-clinic",
@@ -140,7 +173,7 @@ function _assertClearance({
   box: ReturnType<typeof _getOpenVehicleEnvelope>;
   other: ReturnType<typeof _getOpenVehicleEnvelope>;
   label: string;
-}) {
+}): void {
   assert.ok(
     box.right + 6 <= other.left ||
       other.right + 6 <= box.left ||
@@ -156,24 +189,34 @@ function _assertSiteLabelClearance({
 }: {
   input: Input;
   markup: string;
-}) {
+}): void {
   const envelope = _getOpenVehicleEnvelope(markup);
   const neighboringCopy = [
     input.sceneLabel,
     input.copy.map,
     input.copy.clinic,
-    ...input.slots.map(({ label }) => label),
-    ...input.people.map(({ label }) => label),
+    ...input.slots.map(({ label }) => {
+      return label;
+    }),
+    ...input.people.map(({ label }) => {
+      return label;
+    }),
   ];
   input.sites.forEach(({ label }) => {
     const neighbors = [
       ...neighboringCopy,
-      ...input.sites.filter((site) => site.label !== label).map(prop("label")),
-    ].flatMap((text) => _getLabelLineBoxes({ markup: markup, label: text }));
+      ...input.sites
+        .filter((site) => {
+          return site.label !== label;
+        })
+        .map(prop("label")),
+    ].flatMap((text) => {
+      return _getLabelLineBoxes({ markup: markup, label: text });
+    });
     _getLabelLineBoxes({ markup: markup, label: label }).forEach((box) => {
-      neighbors.forEach((other) =>
-        _assertClearance({ box, other, label: "Neighboring text" }),
-      );
+      neighbors.forEach((other) => {
+        return _assertClearance({ box, other, label: "Neighboring text" });
+      });
       _assertClearance({ box, other: envelope, label: "Open clinic vehicle" });
     });
   });
@@ -255,7 +298,7 @@ function _assertBookingClearsLabels({
   path: string;
   boxes: ReturnType<typeof _getLabelLineBoxes>;
   clearance?: number;
-}) {
+}): Point[] {
   const dash = path.match(/stroke-dasharray="([\d.]+) ([\d.]+)"/);
   assert.ok(dash, "Booking remains a painted dashed connection.");
   assert.equal(

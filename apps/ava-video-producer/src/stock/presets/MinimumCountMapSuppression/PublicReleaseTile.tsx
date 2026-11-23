@@ -1,5 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { PublicCellSymbol } from "./PublicCellSymbol";
 import type { makePublicCellsFromInput } from "./makePublicCellsFromInput";
 import type { Input } from "./MinimumCountMapSuppression.schema";
@@ -16,19 +17,21 @@ export function PublicReleaseTile({
   labels,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const x = 550 + (cell.index % 2) * 190;
   const y = 170 + Math.floor(cell.index / 2) * 100;
   return (
     <g data-public-state={cell.status}>
-      <rect
+      <StockRect
         data-public-tile={cell.id}
         x={x}
         y={y}
         width={170}
         height={88}
-        rx={8}
+        rx={scales.corner(tokens.corner.cell)}
         fill="none"
-        stroke={cell.status === "released" ? accent : STOCK.line}
+        stroke={cell.status === "released" ? accent : tokens.color.line}
       />
       <LabelSlots labels={[[cell.label, x + 12, y + 20, 146, 12, 3]]} />
       <PublicCellSymbol status={cell.status} labels={labels} x={x} y={y} />

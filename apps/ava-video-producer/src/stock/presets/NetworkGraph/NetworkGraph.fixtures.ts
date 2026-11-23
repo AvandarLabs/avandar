@@ -35,9 +35,9 @@ export const networkGraphDenseInput: NetworkGraphInput = {
 /** A complete smaller or differently selected authored example. */
 export const networkGraphChangedInput: NetworkGraphInput = {
   ...NETWORK_GRAPH_DEFAULT_INPUT,
-  nodes: NETWORK_GRAPH_DEFAULT_INPUT.nodes
-    .slice(0, 2)
-    .map((node, index) => ({ ...node, label: index ? "East" : "West" })),
+  nodes: NETWORK_GRAPH_DEFAULT_INPUT.nodes.slice(0, 2).map((node, index) => {
+    return { ...node, label: index ? "East" : "West" };
+  }),
   edges: [[0, 1]],
   showPackets: false,
 };

@@ -1,6 +1,33 @@
-import { prop } from "@avandar/utils";
+import { prop, propEq } from "@avandar/utils";
 import { z } from "zod";
 import type { StockSemanticRule } from "../../contracts/StockContract.types";
+
+/** Checks relationship endpoints and attribute owners reference entities. */
+function _validateDraftEntityReferences({
+  input,
+  context,
+}: Readonly<{ input: Input; context: z.RefinementCtx }>): void {
+  const entities = new Set(input.draft.entities.map(prop("id")));
+  if (
+    input.draft.relationships.some((item) => {
+      return (
+        !entities.has(item.fromEntityId) ||
+        !entities.has(item.toEntityId) ||
+        item.fromEntityId === item.toEntityId
+      );
+    }) ||
+    input.draft.attributes.some((item) => {
+      return !entities.has(item.entityId);
+    })
+  ) {
+    context.addIssue({
+      code: "custom",
+      message:
+        "Relationship endpoints are distinct valid entities and attributes attach to an existing entity.",
+      path: ["draft"],
+    });
+  }
+}
 
 function _unique(items: ReadonlyArray<{ id: string }>): boolean {
   return new Set(items.map(prop("id"))).size === items.length;
@@ -10,121 +37,116 @@ function _normalizePhrase(text: string): string {
   return trimmed.replace(/^(?:a|an|the)\s+/iu, "").toLowerCase();
 }
 /** Strict complete authored input and cross-field domain rules. */
-export const inputSchema = z
-  .strictObject({
-    sentenceParts: z
+
+const authoredInputSchema = z.strictObject({
+  sentenceParts: z
+    .array(
+      z.strictObject({
+        id: z.string().min(1).max(16),
+        text: z.string().min(1).max(28),
+      }),
+    )
+    .min(3)
+    .max(7),
+  draft: z.strictObject({
+    entities: z
       .array(
         z.strictObject({
-          id: z.string().min(1).max(16),
-          text: z.string().min(1).max(28),
+          id: z.string().min(1).max(20),
+          label: z.string().min(1).max(24),
+          partId: z.string(),
         }),
       )
-      .min(3)
-      .max(7),
-    draft: z.strictObject({
-      entities: z
-        .array(
-          z.strictObject({
-            id: z.string().min(1).max(20),
-            label: z.string().min(1).max(24),
-            partId: z.string(),
-          }),
-        )
-        .min(2)
-        .max(2),
-      relationships: z
-        .array(
-          z.strictObject({
-            id: z.string().min(1).max(20),
-            label: z.string().min(1).max(24),
-            partId: z.string(),
-            fromEntityId: z.string(),
-            toEntityId: z.string(),
-          }),
-        )
-        .min(1)
-        .max(1),
-      attributes: z
-        .array(
-          z.strictObject({
-            id: z.string().min(1).max(20),
-            label: z.string().min(1).max(24),
-            partId: z.string(),
-            entityId: z.string(),
-          }),
-        )
-        .min(0)
-        .max(1),
-    }),
-    review: z.strictObject({
-      outcome: z.enum(["accept", "pending"]),
-      reviewerLabel: z.string().min(1).max(28),
-      note: z.string().min(1).max(44),
-    }),
-    copy: z.strictObject({
-      source: z.string().min(1).max(48),
-      draft: z.string().min(1).max(48),
-      entity: z.string().min(1).max(18),
-      relationship: z.string().min(1).max(18),
-      attribute: z.string().min(1).max(18),
-      accepted: z.string().min(1).max(48),
-      pending: z.string().min(1).max(48),
-      example: z.string().min(1).max(48),
-    }),
-    showSourceGuides: z.boolean(),
-    modelLayout: z.enum(["horizontal", "stacked"]),
-  })
-  .superRefine((input, context) => {
-    const items = [
-      ...input.draft.entities,
-      ...input.draft.relationships,
-      ...input.draft.attributes,
-    ];
-    if (
-      !_unique(input.sentenceParts) ||
-      input.sentenceParts.map(prop("text")).join("").length > 90 ||
-      !_unique(items) ||
-      new Set(items.map(prop("partId"))).size !== items.length
-    ) {
-      context.addIssue({
-        code: "custom",
-        message:
-          "Unique source/model identities and distinct part references need a sentence of at most 90 characters.",
-        path: ["sentenceParts"],
-      });
-    }
-    items.forEach((item) => {
-      const part = input.sentenceParts.find(({ id }) => id === item.partId);
-      const label = _normalizePhrase(item.label);
-      if (!part || !label || !_normalizePhrase(part.text).includes(label)) {
-        context.addIssue({
-          code: "custom",
-          message:
-            "Each label must match its referenced authored fragment under the documented lexical rule.",
-          path: ["draft"],
-        });
-      }
+      .min(2)
+      .max(2),
+    relationships: z
+      .array(
+        z.strictObject({
+          id: z.string().min(1).max(20),
+          label: z.string().min(1).max(24),
+          partId: z.string(),
+          fromEntityId: z.string(),
+          toEntityId: z.string(),
+        }),
+      )
+      .min(1)
+      .max(1),
+    attributes: z
+      .array(
+        z.strictObject({
+          id: z.string().min(1).max(20),
+          label: z.string().min(1).max(24),
+          partId: z.string(),
+          entityId: z.string(),
+        }),
+      )
+      .min(0)
+      .max(1),
+  }),
+  review: z.strictObject({
+    outcome: z.enum(["accept", "pending"]),
+    reviewerLabel: z.string().min(1).max(28),
+    note: z.string().min(1).max(44),
+  }),
+  copy: z.strictObject({
+    source: z.string().min(1).max(48),
+    draft: z.string().min(1).max(48),
+    entity: z.string().min(1).max(18),
+    relationship: z.string().min(1).max(18),
+    attribute: z.string().min(1).max(18),
+    accepted: z.string().min(1).max(48),
+    pending: z.string().min(1).max(48),
+    example: z.string().min(1).max(48),
+  }),
+  showSourceGuides: z.boolean(),
+  modelLayout: z.enum(["horizontal", "stacked"]),
+});
+/** Validates cross-field relationships in the authored input. */
+function _validateUtteranceToModelDraftInput({
+  input,
+  context,
+}: Readonly<{ input: Input; context: z.RefinementCtx }>): void {
+  const items = [
+    ...input.draft.entities,
+    ...input.draft.relationships,
+    ...input.draft.attributes,
+  ];
+  if (
+    !_unique(input.sentenceParts) ||
+    input.sentenceParts.map(prop("text")).join("").length > 90 ||
+    !_unique(items) ||
+    new Set(items.map(prop("partId"))).size !== items.length
+  ) {
+    context.addIssue({
+      code: "custom",
+      message:
+        "Unique source/model identities and distinct part references need a sentence of at most 90 characters.",
+      path: ["sentenceParts"],
     });
-    const entities = new Set(input.draft.entities.map(prop("id")));
-    if (
-      input.draft.relationships.some(
-        (item) =>
-          !entities.has(item.fromEntityId) ||
-          !entities.has(item.toEntityId) ||
-          item.fromEntityId === item.toEntityId,
-      ) ||
-      input.draft.attributes.some((item) => !entities.has(item.entityId))
-    ) {
+  }
+  items.forEach((item) => {
+    const part = input.sentenceParts.find(propEq("id", item.partId));
+    const label = _normalizePhrase(item.label);
+    // _normalizePhrase returns a string. This is substring matching,
+    // not array membership.
+    // react-doctor-disable-next-line js-set-map-lookups
+    if (!part || !label || !_normalizePhrase(part.text).includes(label)) {
       context.addIssue({
         code: "custom",
         message:
-          "Relationship endpoints are distinct valid entities and attributes attach to an existing entity.",
+          "Each label must match its referenced authored fragment under the documented lexical rule.",
         path: ["draft"],
       });
     }
-  }) satisfies z.ZodType;
+  });
+  _validateDraftEntityReferences({ input, context });
+}
+/** Complete authored input with its runtime semantic constraints. */
+export const inputSchema = authoredInputSchema.superRefine((input, context) => {
+  _validateUtteranceToModelDraftInput({ input, context });
+}) satisfies z.ZodType;
 /** Accepted input inferred from the schema. */
-export type Input = z.output<typeof inputSchema>;
+export type Input = z.output<typeof authoredInputSchema>;
 /** Runtime cross-field constraints beyond structural JSON Schema. */
 export const SEMANTIC_RULES: StockSemanticRule[] = [
   {

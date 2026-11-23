@@ -1,5 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getDrillRecordLayoutFromInputAndFrame } from "./getDrillRecordLayoutFromInputAndFrame";
 import type { Input } from "./NestedDrilldownWindow.schema";
 import type { ReactNode } from "react";
@@ -17,23 +18,26 @@ export function DrillRecord({
   record,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const { x, y, width, height, isDetail, opacity, isSettled } =
-    getDrillRecordLayoutFromInputAndFrame({ frame, input, record });
+    getDrillRecordLayoutFromInputAndFrame({ frame, input, record, motion });
   if (opacity === 0) {
     return undefined;
   }
   return (
     <g opacity={opacity}>
-      <rect
+      <StockRect
         data-record-id={record.id}
         data-detail-id={isDetail && isSettled ? record.id : undefined}
         x={x}
         y={y}
         width={width}
         height={height}
-        rx={4}
-        fill={STOCK.elevated}
-        stroke={isDetail ? accent : STOCK.line}
+        rx={scales.corner(tokens.corner.chip)}
+        fill={tokens.color.elevated}
+        stroke={isDetail ? accent : tokens.color.line}
       />
       <FitText
         text={record.label}

@@ -34,7 +34,7 @@ export async function createWorkspaceViaNavbar(
     (response) => {
       return (
         response.request().method() === "POST" &&
-        response.url().includes("validate-slug")
+        response.url().includes("rpc/rpc_workspaces__is_slug_available")
       );
     },
     { timeout: LONG_WAIT },

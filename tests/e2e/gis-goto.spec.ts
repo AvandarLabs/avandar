@@ -95,7 +95,10 @@ test(
       await page.getByPlaceholder("Search data sources").click();
       await page.getByRole("option", { name: DATASET_NAME }).click();
 
-      const inspector = page.getByRole("region", { name: "Layer" });
+      const inspector = page.getByRole("region", {
+        name: DATASET_NAME,
+        exact: true,
+      });
       const geometry = inspector.getByRole("combobox", { name: "Geometry" });
       await expect(async () => {
         if ((await geometry.getAttribute("aria-expanded")) !== "true") {

@@ -57,6 +57,9 @@ export type SubscriptionsAPI = APITypeDef<
         queryParams: {
           /** The Avandar ID of the user to look up subscriptions for. */
           userId: string;
+
+          /** Only sync the subscriptions that belong to this workspace. */
+          workspaceId?: string;
         };
         returnType: {
           subscriptions: Array<Tables<"subscriptions">>;

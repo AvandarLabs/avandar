@@ -1,14 +1,12 @@
 /** Pins mediator column projection: subset hits, wider misses, growFrom. */
 
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import {
-  clearQueryableRelationColumns,
-  rememberQueryableColumns,
-} from "@/clients/qetl/QueryMediator/queryableRelationColumns/queryableRelationColumns";
+import { QueryableRelationColumns } from "@/clients/qetl/QueryMediator/QueryableRelationColumns/QueryableRelationColumns";
 import { createInMemoryRelationCache } from "@/clients/qetl/RelationCache/__tests__/createInMemoryRelationCache";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { RelationCacheKey } from "$/models/relations/RelationCacheKey/RelationCacheKey.types";
 import type { QueryMediatorFactory as QueryMediatorFactoryType } from "@/clients/qetl/QueryMediator/QueryMediator";
+import type { DatasetColumnSource } from "@/clients/qetl/QueryMediator/QueryMediator.types";
 
 const DATASET_ID = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa" as Dataset.Id;
 const PRINCIPAL_KEY = "w:11111111-1111-4111-8111-111111111111:user";
@@ -157,6 +155,7 @@ async function _seedCache(columns: readonly string[] | "all"): Promise<void> {
     },
     columns,
     payload: new Blob(["cached"]),
+    staleAt: undefined,
   });
 }
 
@@ -171,15 +170,17 @@ async function _runSelect(columnNames: readonly string[]): Promise<void> {
       return `"${columnName}"`;
     })
     .join(", ");
-  const mediator = QueryMediatorFactory.create({
-    getQueryDependencies: async () => {
-      return [DATASET_ID];
+  const mediator = QueryMediatorFactory.create("QueryMediator", {
+    state: {
+      getQueryDependencies: async () => {
+        return [DATASET_ID];
+      },
+      getDuckDbLeaseDatasetIds: async () => {
+        return [DATASET_ID];
+      },
+      relationCache,
+      principalKey: PRINCIPAL_KEY,
     },
-    getDuckDbLeaseDatasetIds: async () => {
-      return [DATASET_ID];
-    },
-    relationCache,
-    principalKey: PRINCIPAL_KEY,
   });
   await mediator.runQuery({
     rawSql: `SELECT ${selectList} FROM "${DATASET_ID}"`,
@@ -189,15 +190,17 @@ async function _runSelect(columnNames: readonly string[]): Promise<void> {
 async function _runCreateTableAs(
   neededColumnsByDatasetId?: Record<string, readonly string[] | "all">,
 ): Promise<void> {
-  const mediator = QueryMediatorFactory.create({
-    getQueryDependencies: async () => {
-      return [DATASET_ID];
+  const mediator = QueryMediatorFactory.create("QueryMediator", {
+    state: {
+      getQueryDependencies: async () => {
+        return [DATASET_ID];
+      },
+      getDuckDbLeaseDatasetIds: async () => {
+        return [DATASET_ID];
+      },
+      relationCache,
+      principalKey: PRINCIPAL_KEY,
     },
-    getDuckDbLeaseDatasetIds: async () => {
-      return [DATASET_ID];
-    },
-    relationCache,
-    principalKey: PRINCIPAL_KEY,
   });
   await mediator.runQuery({
     rawSql: `CREATE TABLE "ava_staging_individuals_${CONCEPT_ID}" AS (
@@ -224,7 +227,7 @@ function _mockAcquirableCsvSource(): void {
 beforeEach(() => {
   vi.clearAllMocks();
   relationCache = createInMemoryRelationCache();
-  clearQueryableRelationColumns();
+  QueryableRelationColumns.clear();
   getTableOrViewNamesMock.mockResolvedValue([]);
   datasetGetAllMock.mockResolvedValue([]);
   sourceDatasetGetAllMock.mockResolvedValue([]);
@@ -286,21 +289,83 @@ describe("QueryMediator relation cache projection", () => {
 
   it("does not skip storage when a queryable table is too narrow", async () => {
     getTableOrViewNamesMock.mockResolvedValue([DATASET_ID]);
-    rememberQueryableColumns(DATASET_ID, ["a"]);
+    QueryableRelationColumns.remember({
+      datasetId: DATASET_ID,
+      columns: ["a"],
+      staleAt: undefined,
+    });
 
     await _runSelect(["a", "b"]);
 
     expect(datasetGetAllMock).toHaveBeenCalledTimes(1);
   });
 
+  it("runs a query that names no dataset without reading dataset columns", async () => {
+    const mediator = QueryMediatorFactory.create("QueryMediator", {
+      state: {
+        getQueryDependencies: async () => {
+          return [];
+        },
+        relationCache,
+        principalKey: PRINCIPAL_KEY,
+      },
+    });
+
+    await mediator.runQuery({
+      rawSql: "SELECT * FROM (VALUES ('a', 1)) AS literal_rows(label, total)",
+    });
+
+    expect(datasetColumnGetAllMock).not.toHaveBeenCalled();
+    expect(runRawQueryMock).toHaveBeenCalledTimes(1);
+  });
+
   it("serves a covering queryable table without reading a dataset record", async () => {
     getTableOrViewNamesMock.mockResolvedValue([DATASET_ID]);
-    rememberQueryableColumns(DATASET_ID, ["a"]);
+    QueryableRelationColumns.remember({
+      datasetId: DATASET_ID,
+      columns: ["a"],
+      staleAt: undefined,
+    });
 
     await _runSelect(["a"]);
 
     expect(datasetGetAllMock).not.toHaveBeenCalled();
   });
+  it("marks acquired rows stale once the source's max age has passed, in both the stored copy and DuckDB's record", async () => {
+    const maxAgeMs = 60_000;
+    _mockAcquirableCsvSource();
+    acquireMock.mockResolvedValue({
+      ref: { kind: "dataset", id: DATASET_ID },
+      parquetBlob: new Blob(["acquired"]),
+      sourceVersion: undefined,
+      maxAgeMs,
+    });
+
+    const queryStartedAt = Date.now();
+    await _runSelect(["a"]);
+    const queryFinishedAt = Date.now();
+
+    const { hits } = await relationCache.probe([_cacheKey(["a"])]);
+    expect(hits[0]?.entry.staleAt).toBeGreaterThanOrEqual(
+      queryStartedAt + maxAgeMs,
+    );
+    expect(hits[0]?.entry.staleAt).toBeLessThanOrEqual(
+      queryFinishedAt + maxAgeMs,
+    );
+    expect(
+      QueryableRelationColumns.isStale({
+        datasetId: DATASET_ID,
+        now: queryStartedAt + maxAgeMs - 1,
+      }),
+    ).toBe(false);
+    expect(
+      QueryableRelationColumns.isStale({
+        datasetId: DATASET_ID,
+        now: queryFinishedAt + maxAgeMs,
+      }),
+    ).toBe(true);
+  });
+
   // A `CREATE TABLE AS SELECT` has no top-level select list, so inference
   // cannot read one and fails wide. Individual generation is exactly that
   // shape, which is why it acquired every column of every dataset it named.
@@ -329,5 +394,84 @@ describe("QueryMediator relation cache projection", () => {
       expect.objectContaining({ columns: ["a"] }),
     );
     expect(await _heldColumns()).toEqual(["a"]);
+  });
+});
+
+/** A catalog row that renames the stored column `region_raw` to `region`. */
+const RENAMED_COLUMN = {
+  datasetId: DATASET_ID,
+  originalName: "region_raw",
+  name: "region",
+  detectedDataType: "VARCHAR",
+  dataType: "varchar",
+};
+
+async function _runRegionSelect(
+  datasetColumnSource: DatasetColumnSource | undefined,
+): Promise<void> {
+  const mediator = QueryMediatorFactory.create("QueryMediator", {
+    state: {
+      getQueryDependencies: async () => {
+        return [DATASET_ID];
+      },
+      getDuckDbLeaseDatasetIds: async () => {
+        return [DATASET_ID];
+      },
+      relationCache,
+      principalKey: PRINCIPAL_KEY,
+      datasetColumnSource,
+    },
+  });
+  await mediator.runQuery({
+    rawSql: `SELECT "region", COUNT(*) FROM "${DATASET_ID}" GROUP BY 1`,
+  });
+}
+
+describe("QueryMediator dataset column source", () => {
+  it("renames a stored relation's columns from the catalog by default", async () => {
+    datasetColumnGetAllMock.mockResolvedValue([RENAMED_COLUMN]);
+    await _seedCache("all");
+
+    await _runRegionSelect(undefined);
+
+    expect(loadParquetMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        columnReplacements: {
+          region_raw: expect.objectContaining({ alias: "region" }),
+        },
+      }),
+    );
+  });
+
+  it("serves a preloaded table without reading dataset columns when columns are stored", async () => {
+    // A public snapshot table is loaded whole before any tile queries it, so
+    // DuckDB already holds every column the query names.
+    getTableOrViewNamesMock.mockResolvedValue([DATASET_ID]);
+
+    await _runRegionSelect("stored");
+
+    expect(datasetColumnGetAllMock).not.toHaveBeenCalled();
+    expect(runRawQueryMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("loads a cached relation as stored when the catalog is unreadable", async () => {
+    // Any read of `dataset_columns` rejects here, as it does for a caller
+    // with no grant on it. The table is missing from DuckDB, so the relation
+    // comes from the storage tier. This runs the mediator without the public
+    // session's owner check, which refuses a table its snapshot did not load,
+    // so it pins the `stored` load path rather than a public query flow.
+    datasetColumnGetAllMock.mockRejectedValue(
+      new Error("permission denied for table dataset_columns"),
+    );
+    await _seedCache("all");
+
+    await _runRegionSelect("stored");
+
+    expect(datasetColumnGetAllMock).not.toHaveBeenCalled();
+    expect(loadParquetMock).toHaveBeenCalledTimes(1);
+    expect(loadParquetMock).toHaveBeenCalledWith(
+      expect.objectContaining({ columnReplacements: {} }),
+    );
+    expect(runRawQueryMock).toHaveBeenCalledTimes(1);
   });
 });

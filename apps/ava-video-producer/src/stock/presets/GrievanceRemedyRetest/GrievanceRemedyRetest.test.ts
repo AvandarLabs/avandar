@@ -109,8 +109,9 @@ registerStockPresetAssertions({
   invalidInputs: INVALID_INPUTS,
   render: _render,
   excludedTextFields: EXCLUDED_TEXT_FIELDS,
-  getVisibleTexts: ({ input, frame }) =>
-    _visible({ input: input, frame: frame }).map(_escape),
+  getVisibleTexts: ({ input, frame }) => {
+    return _visible({ input: input, frame: frame }).map(_escape);
+  },
 });
 registerStockTextLayoutAssertions({
   inputSchema,

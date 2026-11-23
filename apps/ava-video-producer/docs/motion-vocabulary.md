@@ -2,47 +2,51 @@
 
 This is the complete inventory of the motion vocabulary currently implemented in this workspace. Motion vocabulary describes **how things move**: curves, durations, entrances, state changes, typing, counting, and pointer choreography. The [shared scene library](shared-scene-library.md) describes **what gets assembled on screen**. The [architecture assessment](agent-architecture.md) distinguishes shipped capabilities from work still to build.
 
-The code is the source of truth. The rules for using it live in the [product-demo skill](../.claude/skills/product-demo/SKILL.md) and its [motion](../.claude/skills/product-demo/references/motion.md), [title](../.claude/skills/product-demo/references/titles.md), and [rendering](../.claude/skills/product-demo/references/render.md) references. The original primitives in `src/motion.ts` remain unchanged; three periodic helpers were added for Motion Atlas. Scenes and stock graphics share this module, without a second easing vocabulary.
+The code is the source of truth. The rules for using it live in the [product-demo skill](../.claude/skills/product-demo/SKILL.md) and its [motion](../.claude/skills/product-demo/references/motion.md), [title](../.claude/skills/product-demo/references/titles.md), and [rendering](../.claude/skills/product-demo/references/render.md) references. The `Motion` plain object in `src/motion.ts` groups the pure frame primitives. Its methods take named parameter objects, except `Motion.caretOn(frame)`. Three periodic helpers support Motion Atlas. Scenes and stock graphics share this module, without a second easing vocabulary.
 
-For visual reference, browse [Motion Atlas](../showcase/motion.html), served at **http://localhost:4173/motion.html**. Its [stock catalog](stock-motion-library.md) names 170 registered bounded combinations of these primitives: graphs, node traversal, plexus fields, integrations, code highlighting, charts, and interface motion. A primitive is how something moves; a stock preset is a reusable authored graphic that demonstrates those movements.
+For visual reference, browse [Motion Atlas](../showcase/motion.html), served at **http://localhost:4173/motion.html**. Its **Helpers** section (`motion.html?section=helpers`) previews every helper in this inventory live, one at a time; see [Helpers in the Motion Atlas](#helpers-in-the-motion-atlas). Its [stock catalog](stock-motion-library.md) names 170 registered bounded combinations of these primitives: graphs, node traversal, plexus fields, integrations, code highlighting, charts, and interface motion. A primitive is how something moves; a stock preset is a reusable authored graphic that demonstrates those movements.
 
 ## Time and coordinates
 
 - The current timeline is **30 fps**. One frame is approximately 33.3 ms. Durations and beat positions are frame counts unless explicitly stated otherwise.
 - Helpers are deterministic functions of a frame number. They do not schedule animations or depend on wall-clock time. The caller supplies the frame, normally from Remotion's `useCurrentFrame()`.
 - Frames inside a Remotion `Sequence` are local to that sequence. The `Clip` wrapper starts its body at `TITLE_LEN = 66`; body frame 0 is therefore film frame 66. Do not manually add that offset to body click beats or pointer keys.
-- FPS is separately defined in [Root.tsx](../src/Root.tsx), [motion.ts](../src/motion.ts), and the render/audio scripts. Changing the composition FPS alone does not retime typing, caret blinking, encoding, or sound scoring.
+- FPS is separately defined in [Root defaults](../src/Root/RootDefaults.ts), [motion.ts](../src/motion.ts), and the render/audio scripts. Changing the composition FPS alone does not retime typing, caret blinking, encoding, or sound scoring.
 - The original canvas is 1600 × 1000, delivered at 1536 × 960. `story-film` derives canvas and delivery dimensions from its plan, with the same aspect ratio. Pointer coordinates belong to the composition canvas, not the scaled delivery file.
 - `StoryFilm` passes each scene its local frame directly. Narration cues are shot-relative in the plan and converted to absolute film frames for captions/audio. Transitions occupy the beginning of an incoming shot without changing total duration.
 - Browser capture is a separate timebase: native Playwright video is 25 fps and logged actions use monotonic milliseconds. Normalize or verify source timing before choosing 30 fps film trims; do not treat browser action timestamps as exact rendered-frame keys.
 
 ## Curves
 
-All five curves are exported through `EASE` in [src/motion.ts](../src/motion.ts). The upstream comment says four; the implemented object contains five.
+All seven curves are exported through `EASE` in [src/motion.ts](../src/motion.ts).
 
-| Token | Definition | Intended use |
-| --- | --- | --- |
-| `EASE.out` | `bezier(0.16, 1, 0.3, 1)` | Default entrances, exits, and state responses |
-| `EASE.outBack` | `bezier(0.34, 1.56, 0.64, 1)` | A restrained overshoot when something lands in its slot; use sparingly |
-| `EASE.inOut` | `bezier(0.45, 0, 0.55, 1)` | Something already visible travelling between positions |
-| `EASE.inOutCubic` | `4t³` for the first half; `1 - (-2t + 2)³ / 2` for the second | Pointer travel between targets |
-| `EASE.word` | `bezier(0.22, 1, 0.36, 1)` | Headline words rising out of masks |
+| Token             | Definition                                                    | Intended use                                                                                                                  |
+| ----------------- | ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `EASE.out`        | `bezier(0.16, 1, 0.3, 1)`                                     | Default entrances, exits, and state responses                                                                                 |
+| `EASE.outBack`    | `bezier(0.34, 1.56, 0.64, 1)`                                 | A restrained overshoot when something lands in its slot; use sparingly                                                        |
+| `EASE.inOut`      | `bezier(0.45, 0, 0.55, 1)`                                    | Something already visible travelling between positions                                                                        |
+| `EASE.inOutCubic` | `4t³` for the first half; `1 - (-2t + 2)³ / 2` for the second | Pointer travel between targets                                                                                                |
+| `EASE.word`       | `bezier(0.22, 1, 0.36, 1)`                                    | Masked and staged rises: headline words, line fades, rising wipe columns, growing bars, carousel slides, window camera pushes |
+| `EASE.in`         | `bezier(0.55, 0, 1, 0.45)`                                    | Accelerating departures, such as a window whipping off the frame. Never for arrivals                                          |
+| `EASE.surge`      | `bezier(0.7, 0, 0.2, 1)`                                      | A fly-through that fills the frame: lingers at rest, surges, settles before the cut                                           |
 
-`bezier(x1, y1, x2, y2)` is also exported. It creates a CSS-style cubic-bezier easing function, returning 0 at inputs at or below 0 and 1 at inputs at or above 1. Curves such as `outBack` can overshoot between those endpoints. The configurable motion components also expose named `ease-in` for accelerating departures, plus bounded custom curves.
+`Motion.bezier({ x1, y1, x2, y2 })` is also exported. It creates a CSS-style cubic-bezier easing function, returning 0 at inputs at or below 0 and 1 at inputs at or above 1. Curves such as `outBack` can overshoot between those endpoints. The configurable motion components also expose named `ease-in` for accelerating departures, plus bounded custom curves.
 
 ## Duration scale
 
 `DUR` and `STAGGER` are exported from [src/motion.ts](../src/motion.ts).
 
-| Token | Frames | Time at 30 fps | Intended use |
-| --- | ---: | ---: | --- |
-| `DUR.press` | 4 | 133 ms | One half of the press response |
-| `DUR.chip` | 6 | 200 ms | Chip/state changes and default exits |
-| `DUR.panel` | 9 | 300 ms | Row, card, or panel entrance; default ramp duration |
-| `DUR.sheet` | 13 | 433 ms | Sheet/column motion; default spring and counter duration |
-| `DUR.hero` | 18 | 600 ms | The main visual beat of a phase |
-| `DUR.word` | 15 | 500 ms | One title word's masked rise |
-| `STAGGER` | 2 | 67 ms | Delay between list siblings |
+| Token            | Frames | Time at 30 fps | Intended use                                                                          |
+| ---------------- | -----: | -------------: | ------------------------------------------------------------------------------------- |
+| `DUR.press`      |      4 |         133 ms | One half of the press response                                                        |
+| `DUR.chip`       |      6 |         200 ms | Chip/state changes and default exits                                                  |
+| `DUR.panel`      |      9 |         300 ms | Row, card, or panel entrance; default ramp duration                                   |
+| `DUR.sheet`      |     13 |         433 ms | Sheet/column motion; default spring and counter duration                              |
+| `DUR.hero`       |     18 |         600 ms | The main visual beat of a phase                                                       |
+| `DUR.word`       |     15 |         500 ms | One title word's masked rise                                                          |
+| `DUR.whip`       |      8 |         267 ms | A whip-out or column wipe, deliberately shorter than a panel entrance                 |
+| `STAGGER`        |      2 |          67 ms | Delay between list siblings                                                           |
+| `STAGGER_COLUMN` |    0.5 |          17 ms | Sub-frame delay between columns of a stepped wipe; renderers interpolate, never round |
 
 The full `press()` envelope occupies **8 frames**, twice `DUR.press`. The title card has its own **3-frame word stagger**; it does not use the list's `STAGGER` constant. Longer reading holds and scene lengths are composition decisions, not additional exported duration tokens.
 
@@ -50,37 +54,77 @@ The full `press()` envelope occupies **8 frames**, twice `DUR.press`. The title 
 
 These are all the exported functions in [src/motion.ts](../src/motion.ts), including the easing constructor described above.
 
-| API | Returns / behavior | Defaults and limits |
-| --- | --- | --- |
-| `bezier(x1, y1, x2, y2)` | An easing function | CSS cubic-bezier control points; permits an overshooting curve |
-| `ramp(frame, at, dur?, easing?)` | Progress through a timed interval | `dur = DUR.panel`, `easing = EASE.out`; clamps input progress to 0…1, but an overshooting easing can produce values outside that range |
-| `mix(t, from, to)` | Numeric interpolation: `from + (to - from) * t` | Does not clamp `t`; combine with `ramp()` for timed style values |
-| `mixToken(t, from, to)` | An OKLab CSS `color-mix()` string | Clamps `t` to 0…1 and rounds to whole percentages; pass token references such as `var(--border)` and `var(--brand)` |
-| `enter(frame, at, opts?)` | `opacity` plus a translation and optional scale, ending at rest | Defaults: 9 frames, `x: 0`, `y: 12`, `scale: 1`, `EASE.out`. Options: `dur`, `x`, `y`, `scale`, `easing` |
-| `enterAt(frame, at, index, opts?)` | The same entrance, delayed by `index * STAGGER` | Use for sibling rows/cards; options match `enter()` |
-| `leave(frame, at, opts?)` | Opacity from 1 to 0, translating away from rest | Defaults: 6 frames, `x: 0`, `y: 12`, `EASE.out`. Although it accepts the shared options type, it does **not** apply `scale` |
-| `pop(frame, at, config?, durationInFrames?)` | A spring value anchored at a frame, settling at 1 | Defaults: damping 14, stiffness 120, mass 0.8, duration 13 frames. Returns 0 before/start and 1 at/after the duration. Keep damping at least 14 under the skill's rules |
-| `press(frame, at, depth?)` | A brief scale dip followed by a return to exactly 1 | Default depth 0.04, approximately a 4% dip; 8-frame envelope; returns 1 outside it |
-| `countTo(frame, at, to, dur?)` | A rounded integer counting from zero to `to` | Default 13 frames, `EASE.out`. For a change between two nonzero values, use `Math.round(mix(ramp(...), from, to))` |
-| `caretOn(frame)` | A blinking caret's visibility | On/off in alternating 15-frame intervals, a one-second full cycle |
-| `typed(frame, at, text, cps?)` | A progressively longer slice of `text` | Default 28 characters per second; empty at/before `at`. This simulates typing, not speech or caption timing |
+| API                                          | Returns / behavior                                              | Defaults and limits                                                                                                                                                     |
+| -------------------------------------------- | --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Motion.bezier({ x1, y1, x2, y2 })`                     | An easing function                                              | CSS cubic-bezier control points; permits an overshooting curve                                                                                                          |
+| `Motion.ramp({ frame, at, dur?, easing? })`             | Progress through a timed interval                               | `dur = DUR.panel`, `easing = EASE.out`; clamps input progress to 0…1, but an overshooting easing can produce values outside that range                                  |
+| `Motion.mix({ t, from, to })`                           | Numeric interpolation: `from + (to - from) * t`                 | Does not clamp `t`; combine with `ramp()` for timed style values                                                                                                        |
+| `Motion.mixToken({ t, from, to })`                      | An OKLab CSS `color-mix()` string                               | Clamps `t` to 0…1 and rounds to whole percentages; pass token references such as `var(--border)` and `var(--brand)`                                                     |
+| `Motion.enter({ frame, at, opts? })`                    | `opacity` plus a translation and optional scale, ending at rest | Defaults: 9 frames, `x: 0`, `y: 12`, `scale: 1`, `EASE.out`. Options: `dur`, `x`, `y`, `scale`, `easing`                                                                |
+| `Motion.enterAt({ frame, at, index, opts? })`           | The same entrance, delayed by `index * STAGGER`                 | Use for sibling rows/cards; options match `enter()`                                                                                                                     |
+| `Motion.leave({ frame, at, opts? })`                    | Opacity from 1 to 0, translating away from rest                 | Defaults: 6 frames, `x: 0`, `y: 12`, `EASE.out`. Although it accepts the shared options type, it does **not** apply `scale`                                             |
+| `Motion.pop({ frame, at, config?, durationInFrames? })` | A spring value anchored at a frame, settling at 1               | Defaults: damping 14, stiffness 120, mass 0.8, duration 13 frames. Returns 0 before/start and 1 at/after the duration. Keep damping at least 14 under the skill's rules |
+| `Motion.press({ frame, at, depth? })`                   | A brief scale dip followed by a return to exactly 1             | Default depth 0.04, approximately a 4% dip; 8-frame envelope; returns 1 outside it                                                                                      |
+| `Motion.countTo({ frame, at, to, dur? })`               | A rounded integer counting from zero to `to`                    | Default 13 frames, `EASE.out`. For a change between two nonzero values, use `Math.round(mix(ramp(...), from, to))`                                                      |
+| `Motion.caretOn(frame)`                             | A blinking caret's visibility                                   | On/off in alternating 15-frame intervals, a one-second full cycle                                                                                                       |
+| `Motion.typed({ frame, at, text, cps? })`               | A progressively longer slice of `text`                          | Default 28 characters per second; empty at/before `at`. This simulates typing, not speech or caption timing                                                             |
 
-`span`, `oscillator`, and `settleTime` are private implementation helpers. `SpringConfig` and `EnterOpts` are internal types, not exported APIs. The module has no runtime imports; its React `CSSProperties` import is type-only.
+`SpringConfig` and `EntranceOptions` are internal types, not exported APIs. The module has no runtime imports; its React `CSSProperties` import is type-only.
+
+The established `src/motion.ts` entry remains a single portable file. Copied compositions can take it without runtime dependencies or missing companion types. The curve-adoption writer and stock fingerprints also address that exact path. Splitting runtime math or local option types would break that standalone copy contract, so the source keeps its cohesive math and compatibility facade together.
+
+Maintained app consumers import `Motion` and call its named methods. Existing copied and private films may keep importing the free helper names: each accepts both its original positional signature and the named parameter object. These compatibility exports preserve the existing defaults, frame boundaries, arithmetic, and return values. `EASE`, `DUR`, `STAGGER`, and `STAGGER_COLUMN` remain public constants.
 
 `enter()` and `leave()` return complete `transform` strings. A later `transform` property in the same style object replaces them; explicitly combine transforms or use a suitable inner element when another motion must coexist.
 
+## Themed motion
+
+Renderers read motion from the [video theme](video-theme.md), not from the `motion.ts` constants, so tempo, the easing curves, and the Look and feel options reach them. `useGraphicMotion()` (stock shapes) and `useVideoMotion()` (the stage) return `VideoMotion`, built by `makeVideoMotionFromTokens` from the theme's `motion.*` tokens. Its durations and staggers are already divided by the tempo; cue frames and loop lengths stay as authored.
+
+| `VideoMotion` member                               | What it is                                                                                                | `classic` value                                                         |
+| -------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| `panel`, `chip`, `whip`, `sheet`, `word`, `hero`   | The duration ladder, tempo-scaled                                                                         | `DUR`                                                                   |
+| `entrance`, `exit`, `drawOn`, `travel`, `emphasis` | Steps with a tempo-scaled duration, a curve function, and a distance or spring                            | `EASE.out` entrances and exits, `EASE.inOut` travel and draw-on         |
+| `reveal`                                           | A function `reveal(frame, at)` that fades in on its cue, with `reveal.duration` and `reveal.easing`       | 12 frames, `EASE.out`: the stock `opacity={ramp(frame, cue, 12)}` idiom |
+| `rise`                                             | Duration, curve, and stagger of words, lines, bars, and columns rising in                                 | `DUR.word`, `EASE.word`, 3 frames                                       |
+| `depart`, `surge`, `dissolve`                      | An accelerating departure, a fly-through surge, and a shot or loop dissolve                               | `EASE.in` over `DUR.whip`, `EASE.surge`, `EASE.inOut`                   |
+| `loopFade`                                         | `graphic` and `film` loop fade lengths. Tempo never changes them                                          | 12 and 18 frames                                                        |
+| `pressDepth`, `caret.halfPeriod`, `entranceStyle`  | Press dip, caret blink, and what `enter()` animates besides opacity                                       | 0.04, 15 frames, `rise`                                                 |
+| `stagger.list`, `stagger.edge`, `stagger.column`   | Staggers, tempo-scaled and multiplied by the stagger option                                               | `STAGGER`, `STAGGER`, `STAGGER_COLUMN`                                  |
+| `scale(frames)`                                    | Divides an authored length by the tempo. Never use it on a cue frame                                      |                                                                         |
+| `scaleStagger(frames)`                             | Divides a preset's own stagger by the tempo and multiplies it by the stagger option, as `stagger.list` is |                                                                         |
+| `curve(easing)`                                    | An easing token as a function                                                                             |                                                                         |
+
+`VideoMotion` also carries the `motion.ts` helpers with the theme's values as their defaults. Each takes the same arguments as its namesake, so `classic` draws exactly what `motion.ts` draws (`makeVideoMotionFromTokens.test.ts` holds them equal frame by frame):
+
+| Themed helper                                                               | Defaults it takes from the theme                                                                                                                                                                     |
+| --------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `motion.ramp(frame, at, dur?, easing?)`                                     | `dur = motion.panel`, `easing = motion.reveal.easing`. Pass a literal duration through `motion.scale()`                                                                                              |
+| `motion.reveal(frame, at)`                                                  | `motion.reveal.duration` and `motion.reveal.easing`                                                                                                                                                  |
+| `motion.enter(frame, at, opts?)`, `motion.enterAt(frame, at, index, opts?)` | Entrance duration, distance, and curve; the list stagger; the entrance style (`rise`, `fade`, `scale` from `motion.entranceScale`, 0.96 in `classic`, or `none`, which shows the element on its cue) |
+| `motion.leave(frame, at, opts?)`                                            | Exit duration, distance, and curve                                                                                                                                                                   |
+| `motion.pop(frame, at, dur?)`                                               | The emphasis spring and duration                                                                                                                                                                     |
+| `motion.press(frame, at, depth?)`                                           | `motion.pressDepth`, over twice `motion.press.duration`                                                                                                                                              |
+| `motion.count(frame, at, to, dur?)`                                         | `dur = motion.sheet` on the entrance curve, rounded to a whole number. `classic` counts like `countTo`                                                                                               |
+| `motion.caretOn(frame)`                                                     | `motion.caret.halfPeriod`                                                                                                                                                                            |
+| `motion.loopEnvelope(frame, duration, fadeFrames?)`                         | `motion.loopFade.graphic` on the dissolve curve. `StockCanvas` fades every stock loop with it                                                                                                        |
+
+Three Look and feel options change motion globally, each at an identity default: **Easing family** (`motion.easingProfile`: `authored`, or `smooth`, `snappy`, `gentle`, whose curve from `motion.easingProfiles` replaces the entrance, exit, travel, rise, and reveal curves), **Stagger** (`motion.staggerScale`), and **Entrance style** (`motion.entranceStyle`).
+
+Line weight, corner style, and tint strength are not motion, but renderers apply them the same way: `useGraphicShapeScales()` and `useVideoShapeScales()` return `stroke(width)`, `corner(radius)`, and `wash(alpha)`, which multiply by `stroke.scale`, `corner.scale`, and `alpha.washScale`. Pass token reads and a preset's own named constants through them, for example `scales.corner(STAMP_CORNER)`.
+
 ## Pointer and click vocabulary
 
-The pointer helpers live in [src/cursor-motion.ts](../src/cursor-motion.ts). `trackPos` and `downAt` are also re-exported from [src/chrome.tsx](../src/chrome/chrome.tsx), which renders the shared `Cursor`.
+The pointer helpers live in [src/CursorMotionHelpers.ts](../src/CursorMotionHelpers.ts). [src/chrome.tsx](../src/chrome/chrome.tsx) renders the shared `Cursor`.
 
-| API | Behavior |
-| --- | --- |
-| `trackPos(frame, keys)` | Interpolates `{at, x, y}` keys using `EASE.inOutCubic`, preserves subpixel coordinates, and holds the last position. Supply a nonempty array in chronological order |
-| `downAt(frame, beats)` | Returns true from each click beat through the following six-frame window: `beat <= frame < beat + 6` |
-| `Cursor({frame, path, clicks?, cursor?})` | Renders bundled macOS assets at 1.4× their native size, anchored to the measured hotspot. An eight-frame `press()` envelope compresses by at most 7%. Three trailing subframe samples add restrained motion blur (at most 4 px), disappearing at rest |
-| `cursorOnTarget(frame, path, targets)` | Uses the target’s cursor shape only after the pointer reaches its measured location; uses the arrow during travel |
-| `cursorScale(frame, clicks)` / `cursorShutter(frame, path)` | Deterministic press envelope and bounded subframe blur samples, independent of playback history |
-| `press(frame, clickAt)` | Makes the clicked element respond on the same beat; this is separate from the pointer's own dip |
+| API                                                         | Behavior                                                                                                                                                                                                                                              |
+| ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `CursorMotionHelpers.trackPos({ frame, keys, motion? })`                                     | Interpolates `{at, x, y}` keys using `EASE.inOutCubic`, preserves subpixel coordinates, and holds the last position. Supply a nonempty array in chronological order                                                                                   |
+| `CursorMotionHelpers.downAt({ frame, beats })`                                      | Returns true from each click beat through the following six-frame window: `beat <= frame < beat + 6`                                                                                                                                                  |
+| `Cursor({frame, path, clicks?, cursor?})`                   | Renders bundled macOS assets at 1.4× their native size, anchored to the measured hotspot. An eight-frame `press()` envelope compresses by at most 7%. Three trailing subframe samples add restrained motion blur (at most 4 px), disappearing at rest |
+| `CursorMotionHelpers.cursorOnTarget({ frame, path, targets, motion? })`                      | Uses the target’s cursor shape only after the pointer reaches its measured location; uses the arrow during travel                                                                                                                                     |
+| `CursorMotionHelpers.cursorScale({ frame, clicks, motion? })` / `CursorMotionHelpers.cursorShutter({ frame, path, motion? })` | Deterministic press envelope and bounded subframe blur samples, independent of playback history                                                                                                                                                       |
+| `Motion.press({ frame, at: clickAt })`                                     | Makes the clicked element respond on the same beat; this is separate from the pointer's own dip                                                                                                                                                       |
 
 Cursor assets come from [`@remotion/mac-cursors`](https://www.remotion.dev/docs/mac-cursors/mac-os-cursor), pinned to the same version as the renderer. The shared wrapper keeps shape changes, click compression and shutter sampling deterministic under arbitrary frame seeks.
 
@@ -88,14 +132,14 @@ Measure targets from a rendered frame. Give each target an arrival key and anoth
 
 ## Title choreography
 
-[TitleCard](../src/title-card.tsx) is the original reusable title scene built from this vocabulary. It accepts `{name, kicker, frame}` and spans `TITLE_LEN = 66` frames (2.2 seconds).
+[TitleCard](../src/TitleCard/TitleCard.tsx) is the original reusable title scene built from this vocabulary. It accepts `{name, kicker, frame}` and spans `TITLE_LEN = 66` frames (2.2 seconds).
 
-| Event | Local frame / duration | Motion |
-| --- | --- | --- |
-| Headline words | Start at `6 + wordIndex * 3`; 15 frames each | `translateY(110%)` to 0 through a separate hard mask per word, using `EASE.word`; no individual word opacity animation |
-| Kicker | Start 22; 13 frames | Rise 10 px and fade to opacity 0.68 |
-| Accent rule | Start 26; 13 frames | Center-origin `scaleX` from 0 to 1 on a 120 × 3 px rule |
-| Entire card exits | Start 54; 12 frames | Fade onto the shared dark ground |
+| Event             | Local frame / duration                       | Motion                                                                                                                 |
+| ----------------- | -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Headline words    | Start at `6 + wordIndex * 3`; 15 frames each | `translateY(110%)` to 0 through a separate hard mask per word, using `EASE.word`; no individual word opacity animation |
+| Kicker            | Start 22; 13 frames                          | Rise 10 px and fade to opacity 0.68                                                                                    |
+| Accent rule       | Start 26; 13 frames                          | Center-origin `scaleX` from 0 to 1 on a 120 × 3 px rule                                                                |
+| Entire card exits | Start 54; 12 frames                          | Fade onto the shared dark ground                                                                                       |
 
 This original title uses a fixed single-line arrangement at 92 px; it has no automatic fitting or multiline layout. The new `TypographyScene` provides a separate multiline/fitting contract without changing `TitleCard`. `Clip` starts the app body at frame 66 using a `Sequence`; it does not automatically add an outro or make an arbitrary body loop cleanly.
 
@@ -103,16 +147,16 @@ This original title uses a fixed single-line arrangement at 92 px; it has no aut
 
 These are combinations of the helpers above, not extra exported functions or reusable scenes.
 
-| Pattern | Current implementation | Example |
-| --- | --- | --- |
-| Staggered rows and cards | `enterAt()` on each sibling | [Demo](../src/compositions/Demo/Demo.tsx), [MotionLab](../src/compositions/MotionLab.tsx) |
-| Typed input and blinking caret | `typed()` plus `caretOn()` | Demo; MotionLab demonstrates typing |
-| Counter and recount | `countTo()`, or rounded `mix()` driven by a `ramp()` | Demo, MotionLab |
-| Bars/progress filling | Width driven by `ramp()` and numeric interpolation | Demo's result bars, MotionLab's progress bar |
-| Filter/focus/selection changes | `mixToken()` for colors plus numeric ramps for related styles | Demo's field/chips, MotionLab's button |
-| Press and confirmation | `press()` on the target; timed state change; `pop()` for the toast landing | Demo; MotionLab demonstrates the button response |
-| Opening and closing a body | Local entrance/exit ramps against `var(--ground)` | Demo, MotionLab |
-| Repeated title cards | Local frame reset for each title | [TitleStudy](../src/compositions/TitleStudy.tsx) |
+| Pattern                        | Current implementation                                                     | Example                                                                                   |
+| ------------------------------ | -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Staggered rows and cards       | `enterAt()` on each sibling                                                | [Demo](../src/compositions/Demo/Demo.tsx), [MotionLab](../src/compositions/MotionLab/MotionLab.tsx) |
+| Typed input and blinking caret | `typed()` plus `caretOn()`                                                 | Demo; MotionLab demonstrates typing                                                       |
+| Counter and recount            | `countTo()`, or rounded `mix()` driven by a `ramp()`                       | Demo, MotionLab                                                                           |
+| Bars/progress filling          | Width driven by `ramp()` and numeric interpolation                         | Demo's result bars, MotionLab's progress bar                                              |
+| Filter/focus/selection changes | `mixToken()` for colors plus numeric ramps for related styles              | Demo's field/chips, MotionLab's button                                                    |
+| Press and confirmation         | `press()` on the target; timed state change; `pop()` for the toast landing | Demo; MotionLab demonstrates the button response                                          |
+| Opening and closing a body     | Local entrance/exit ramps against `var(--ground)`                          | Demo, MotionLab                                                                           |
+| Repeated title cards           | Local frame reset for each title                                           | [TitleStudy](../src/compositions/TitleStudy.tsx)                                          |
 
 The skill also specifies phase transitions: keep the outgoing phase visible while an **opaque incoming phase** fades over it. Give the incoming root its own background and keep the finished state mounted during its reading hold. `StoryFilm` now implements that rule for storyboard shots. There is still no separately exported `PhaseTransition` component for arbitrary nested phases.
 
@@ -123,17 +167,30 @@ from `motion.ts`. Content and timing props are documented in the
 [scene API](scene-api.md); reusable boundaries are in the
 [scene inventory](shared-scene-library.md).
 
-| Scene / renderer | Implemented motion | Timing and limits |
-| --- | --- | --- |
-| `GraphScene` | Cards use `enterAt()`; directed paths draw with SVG dash progress from `ramp()`; node borders/backgrounds use `mixToken()`; traversed edges remain highlighted | Default first card at frame 10, siblings use `STAGGER`; edges reveal after both endpoint cards enter with `DUR.sheet`; current-node transitions use `DUR.chip`. No graph camera or automatic routing |
-| `FlowchartScene` | Uses graph entrances/connectors on a serpentine step layout | Default activations at `revealAtFrame + DUR.sheet + index * 60`; explicit increasing `stepAtFrames` or one fixed `activeStep` override. Straight explicit branches can cross |
-| `MetricScene` | `mix(ramp(...), from, value)` animates finite values with fixed precision; short entrance translations and a later detail reveal | Defaults: count at frame 18 for 36 frames. The complete label, endpoints/unit, detail and spacing fit together before counting; sizes stay fixed across frames, with no numeric text scale |
-| `TypographyScene` | Each word rises through its own mask using `EASE.word`; authored emphasis selects a token color | Defaults: first word at frame 6, 3-frame stagger, `DUR.word` duration. Lines wrap at a fitted, stable size. No masked-word opacity or per-letter animation |
-| `MediaScene` | Static image/video framing, entrance fade, timed callout fades | Video is sampled from the explicit scene frame through Remotion `Freeze`; trim is additional. Crop is fixed for the shot. Callouts use `DUR.chip` or a shorter interval for short cues. No sustained camera zoom on captured UI |
-| `CaptionOverlay` | Whole-cue text with a short entrance fade and opaque backing | Selects `startFrame <= frame < endFrame`; fade is at most `DUR.chip`. Text fitting stays fixed during the cue; no word-level speech highlighting |
-| `StoryFilm` | Opaque incoming shot dissolves over the preceding shot held at its last frame | Uses `EASE.inOut` and each shot's `transitionInFrames` (schema default 18). First shot has no incoming dissolve. Loop plans additionally fade to ground over the final 18 frames |
+The table names timing by its `motion.ts` name, which is its `classic` value.
+Every scene reads the step from the [themed motion](#themed-motion) instead:
+`DUR.<step>` is `motion.<step>`, tempo-scaled; `EASE.<name>` is the theme's
+curve of that name (`atomic.easing.<name>`, through the step that uses it,
+such as `motion.entrance.easing`); `STAGGER` is `motion.stagger.list` and
+`STAGGER_COLUMN` is `motion.stagger.column`.
 
-Scene headings follow short `enter()` translations; app and media containers do
+| Scene / renderer             | Implemented motion                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Timing and limits                                                                                                                                                                                                                                                                                                                                                                          |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `GraphScene`                 | Cards use `enterAt()`; directed paths draw with SVG dash progress from `ramp()`; node borders/backgrounds use `mixToken()`; traversed edges remain highlighted                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | Default first card at frame 10, siblings use `STAGGER`; edges reveal after both endpoint cards enter with `DUR.sheet`; current-node transitions use `DUR.chip`. No graph camera or automatic routing                                                                                                                                                                                       |
+| `FlowchartScene`             | Uses graph entrances/connectors on a serpentine step layout                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  | Default activations at `revealAtFrame + DUR.sheet + index * 60`; explicit increasing `stepAtFrames` or one fixed `activeStep` override. Straight explicit branches can cross                                                                                                                                                                                                               |
+| `MetricScene`                | `mix(ramp(...), from, value)` animates finite values with fixed precision; short entrance translations and a later detail reveal                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | Defaults: count at frame 18 for 36 frames. The complete label, endpoints/unit, detail and spacing fit together before counting; sizes stay fixed across frames, with no numeric text scale                                                                                                                                                                                                 |
+| `TypographyScene`            | Each word rises through its own mask using `EASE.word`; authored emphasis selects a token color                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | Defaults: first word at frame 6, 3-frame stagger, `DUR.word` duration. Lines wrap at a fitted, stable size. No masked-word opacity or per-letter animation                                                                                                                                                                                                                                 |
+| `MediaScene`                 | Static image/video framing, entrance fade, timed callout fades                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | Video is sampled from the explicit scene frame through Remotion `Freeze`; trim is additional. Crop is fixed for the shot. Callouts use `DUR.chip` or a shorter interval for short cues. No sustained camera zoom on captured UI                                                                                                                                                            |
+| `CaptionOverlay`             | Whole-cue text with a short entrance fade and opaque backing                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Selects `startFrame <= frame < endFrame`; fade is at most `DUR.chip`. Text fitting stays fixed during the cue; no word-level speech highlighting                                                                                                                                                                                                                                           |
+| `StoryFilm`                  | Opaque incoming shot dissolves over the preceding shot held at its last frame, or reveals through a `stepped-column-wipe`; `outgoing: "playing"` keeps the outgoing shot advancing                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Dissolve uses `EASE.inOut` over `transitionInFrames` (schema default 18). The wipe staggers N columns by `staggerFrames` (default `STAGGER_COLUMN`) with `EASE.word`, each column lasting `transitionInFrames - stagger * (N - 1)`; optional outgoing drift uses `EASE.in` with X-only blur. First shot has no transition. Loop plans additionally fade to ground over the final 18 frames |
+| `TypographyScene` line modes | `line-fade` (`enter()` over `DUR.chip`, `EASE.word`, 12 px rise), `wipe` (clip right inset 100% → 0 with −8% → 0 travel over `DUR.panel`), `cut`; staged exit fades each element in place                                                                                                                                                                                                                                                                                                                                                                                                                                                    | `lineStaggerFrames` default 3; an icon fades (no rise) and lines follow `DUR.panel` later; exit stagger 3 and `DUR.chip` per element by default                                                                                                                                                                                                                                            |
+| `TiltedWindowScene`          | Whip-in: 110%+ → 0 over `DUR.sheet`, `EASE.out`, rotateY −24° → −13°, X blur 40 → 0. Whip-out: `DUR.whip` (or the exit's `durationInFrames`), `EASE.in`, past the left edge, blur 0 → 40, headline fading in place over `DUR.chip`. Carousel slide: `DUR.chip`, `EASE.word`, incoming on top from +65% with blur 25 → 0, outgoing −28% and −120 px Z, opaque for the first half and fading over the second so the field never shows through both windows. Pull-back: `DUR.hero`, `EASE.word`. Flip-split: `DUR.whip` flip from 80°, split over `DUR.press`. Camera: `CameraTrack.getPose()` on normalized window keys with velocity X blur ≤ 12 px | Counters in the pair layout are linear; finishing turns them `--brand` over `DUR.chip` with `mixToken()`                                                                                                                                                                                                                                                                                   |
+| `BrandLockupScene`           | Column build: N column masks rise with `EASE.word`, `staggerFrames` 1.5, `DUR.whip` each. Wordmark: `wipe` line mode. Fly-through: wordmark retracts over `DUR.chip`, columns fly `DUR.press` later over `DUR.hero` with `EASE.surge`, a sine-bell rotateY up to 28°, and a token colour covering them by 75% of the flight. CTA: subtitle, URL `DUR.word` later, typed command (`typed()`, 30 cps, block cursor with `caretOn()`), badge `DUR.panel` after typing                                                                                                                                                                           | The mark is a raster image cut into column masks                                                                                                                                                                                                                                                                                                                                           |
+| `BarComparisonScene`         | Hero `enter()` over `DUR.panel` with `EASE.word`; labels `DUR.panel` later, bars `DUR.chip` after labels growing over `DUR.sheet`, values after bars, all rows `STAGGER` apart; a second panel `panelStaggerFrames` (3) later. Erase exit: [getEraseMaskStyle](../src/motion-components/getEraseMaskStyle.ts) per element over `DUR.press`, elements 0.1 frame apart, panels `STAGGER` apart                                                                                                                                                                                                                                                         | Bars are relative to the panel's longest bar                                                                                                                                                                                                                                                                                                                                               |
+| `GraphScene` packets         | A dot travels an edge with `EASE.inOut` during each `{atFrame, durationInFrames, direction}` window; list items enter `2 * STAGGER` apart                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | Packets are drawn only inside their window                                                                                                                                                                                                                                                                                                                                                 |
+
+Scene headings follow short `enter()` translations, or with `headingReveal: {mode: "wipe"}` a
+left-to-right `wipe` line reveal per line (`TextReveal.getHeadingRevealStyles()`); app and media containers do
 not receive a lasting scale. Graph card heights and fitted text sizes depend on
 the complete content and available dimensions, never on the current frame.
 Captioned storyboards reserve a stable band below the scene, sized from the
@@ -145,11 +202,11 @@ the plan's duration must leave time after each final action or word reveal.
 
 ## Periodic stock motion
 
-| API in `src/motion.ts` | Behavior | Limits |
-| --- | --- | --- |
-| `loopPhase(frame, period, offset = 0)` | Normalized 0 to less than 1 cycle, with positive modulo for negative frames/offsets | Finite inputs and positive period; the phase itself resets at the cycle boundary |
-| `wave(frame, period, offset = 0)` | Smooth cosine pulse from 0 to 1 and back to 0 | Same input limits; useful for subtle halos and proximity emphasis |
-| `loopEnvelope(frame, duration, fadeFrames = 12)` | Existing `EASE.inOut` ramps reveal a graphic and return to ground exactly at `duration - 1` | Duration must exceed twice the positive fade length; does not repeat by itself |
+| API in `src/motion.ts`                           | Behavior                                                                                    | Limits                                                                                                                                                                  |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Motion.loopPhase({frame, period, offset?})`           | Normalized 0 to less than 1 cycle, with positive modulo for negative frames/offsets         | Finite inputs and positive period; the phase itself resets at the cycle boundary                                                                                        |
+| `Motion.wave({frame, period, offset?})`                | Smooth cosine pulse from 0 to 1 and back to 0                                               | Same input limits; useful for subtle halos and proximity emphasis                                                                                                       |
+| `Motion.loopEnvelope({frame, duration, fadeFrames?})` | Existing `EASE.inOut` ramps reveal a graphic and return to ground exactly at `duration - 1` | Duration must exceed twice the positive fade length; does not repeat by itself. Renderers use the themed `motion.loopEnvelope`, whose fade is `motion.loopFade.graphic` |
 
 `StockGraphic` uses a 180-frame, 30 fps loop. Authored particles follow seeded
 deterministic positions and periodic paths; edges reveal with SVG dash progress;
@@ -167,18 +224,18 @@ library, preserving the starter theme and real product captures.
 
 The optional [add-sfx.sh](../scripts/add-sfx.sh) pass scores a finished video. It synthesizes placeholder WAV files under ignored `out/sfx/` on first use; those files can be replaced while retaining the score. There are nine semantic sound categories plus the `whoosh_soft` variant.
 
-| Sound name | Event it marks | Motion tier |
-| --- | --- | --- |
-| `key` | A character typed | Typing |
-| `click` | A user press | `DUR.press` |
-| `tick` | A state flip | `DUR.chip` |
-| `pop` | An element arrival | `DUR.panel` |
-| `swipe` | An element travelling | `DUR.sheet` |
-| `whoosh` | A screen change | Phase transition |
-| `whoosh_soft` | A softer screen-change cue | Variant of `whoosh` |
-| `impact` | A weighted landing | `DUR.hero` |
-| `riser` | Anticipation before an event | Lead-in |
-| `fold` | Everything collapsing away | Exit |
+| Sound name    | Event it marks               | Motion tier         |
+| ------------- | ---------------------------- | ------------------- |
+| `key`         | A character typed            | Typing              |
+| `click`       | A user press                 | `DUR.press`         |
+| `tick`        | A state flip                 | `DUR.chip`          |
+| `pop`         | An element arrival           | `DUR.panel`         |
+| `swipe`       | An element travelling        | `DUR.sheet`         |
+| `whoosh`      | A screen change              | Phase transition    |
+| `whoosh_soft` | A softer screen-change cue   | Variant of `whoosh` |
+| `impact`      | A weighted landing           | `DUR.hero`          |
+| `riser`       | Anticipation before an event | Lead-in             |
+| `fold`        | Everything collapsing away   | Exit                |
 
 Scores live in `scripts/beats/<id>.txt`; only [demo.txt](../scripts/beats/demo.txt) currently ships. Rows specify `frame sound volume pitch [note]`. Bare frame numbers use body coordinates with a default 66-frame title offset; `tN` means absolute film frame N. The directive `type <first> <count> <step> <vol>` expands a typing run into key events, with `first` and `step` measured in frames. Set `TITLE_OFFSET=0` for a composition without a separate opening title.
 
@@ -195,7 +252,7 @@ alignment, and speech-driven word animation are not.
 
 ## Rules for extending the vocabulary
 
-1. Add shared curves, timing tokens, and helpers to `src/motion.ts`, keeping it free of runtime dependencies. Update this inventory with the same change.
+1. Add shared curves, timing tokens, and helpers to `src/motion.ts`, keeping it free of runtime dependencies. Update this inventory with the same change, and add the helper to the [Motion Atlas helper catalog](#add-a-helper-to-the-catalog); the catalog's drift test fails until you do. A renderer reaches a curve or a duration through a theme token and the [themed motion](#themed-motion), never through `EASE`, `DUR`, or `STAGGER` directly, and passes a curve to every `ramp()`. The renderer ESLint restrictions enforce this in every renderer directory.
 2. Derive animation from frames. CSS transitions, timers, and wall-clock animation do not define a reproducible Remotion timeline.
 3. Use small element travel and sibling stagger. Springs are for landing; ramps are for travel. Spend the main visual beat once per phase.
 4. Keep app chrome stationary during explanation and avoid sustained scaling of UI or title text. A brief press returns to exactly 1. Native-size spatial boundaries and SVG viewBox cameras have separate contracts in the reusable motion API.
@@ -216,7 +273,7 @@ easing vocabulary to actual product controls. Frame-driven adapters type into
 Avandar's inputs and CodeMirror editor, reveal query drawers, change filtered
 rows, reveal real chart bars, and open record and dashboard views.
 `src/avandar/cursor-targets.json` contains rendered measurements;
-`scripts/measure-avandar.mjs` regenerates them from the review player.
+`scripts/measureAvandar/measureAvandar.ts` regenerates them from the review player.
 Map movement uses the native map camera, with frame-controlled center and zoom.
 Product text and application chrome remain at native scale.
 
@@ -235,11 +292,9 @@ dashboard support staging, without inventing new helper APIs.
 
 **2026-10-18 evidence update:** All 170 contracts/renderers are implemented. Completed historical 167-file MP4 and 166-poster evidence retains actual 498c/source 2ad identities. R67's isolated spatial-sampling correction is reported at e5aeb3e7c/source 38c12b84; changed-scene verification and R68 continuity are complete as recorded below; whole-branch review remains pending. See [implementation evidence](motion-atlas/implementation-validation.md).
 
-
 ## Historical delivered media and pending current-source verification: 2026-10-18
 
 The [completed media record](motion-atlas/implementation-media-validation-498c717d.md) preserves 167 original decoded deliveries, 166 standalone posters, the separate HTTP preview, all retained findings and corrected custody/N6 prose at actual 498c/source 2ad identities. R67's isolated spatial-sampling correction is reported at e5aeb3e7c/source 38c12b84. R67 source/media verification and R68 complete unaffected-fixture continuity are now verified. Final whole-branch review remains pending; the dated final scoped record below supersedes earlier pending wording. No historical output is relabeled as latest. These documentation updates preserve prior approved contract wording, defaults, IDs, bindings and bounds.
-
 
 ## Final scoped source verification and evidence custody: 2026-10-18
 
@@ -251,15 +306,13 @@ R69 keeps exact raw reports, callback/clock traces, session/capture material and
 
 See [current scoped verification](motion-atlas/implementation-sampling-correction-controller-verification.json) and its linked compact continuity/delivery records.
 
-
 ## Continuity compositions
 
 Continuity adds typed cut/dissolve/wipe/aperture/spatial/handoff/morph presentations, persistent rectangular identity, stock reveal-and-hold sampling, and deterministic rough-notation emphasis. These use the existing easing helpers and nested TransitionSeries timing. See [continuity compositions](continuity-compositions.md) for the API, film matrix, editorial guidance and evidence limits.
 
 Continuity diagram cameras add ordered glide/push/whip routes, reading holds, ten-sample temporal motion blur, and bounded object departures. Native UI remains unscaled. Anchored overlays use the existing easing functions and measured product coordinates; annotation kinds share draw/hold/retract intervals. Camera, blur, notation and editorial palette choices are available in live previews and explicit exports.
 
-
-Independent annotationRoughness and boxRoughness (0–3) now select seeded sketch treatments without retiming the animation. Zero means smooth, not hidden. The Composition Atlas exposes separate presets and exports the acknowledged values.
+Independent annotationRoughness and boxRoughness (0–3) now select seeded sketch treatments without retiming the animation. Zero means smooth, not hidden. The Atlas Compositions section exposes separate presets and exports the acknowledged values.
 
 ## Configurable motion components
 
@@ -270,3 +323,96 @@ implementations. Five semantic presets combine speed, blur and easing; numeric
 overrides and bounded cubic Beziers are available in JSX and JSON. Camera
 speed preserves reading holds and leaves content clocks unchanged. See the
 [reusable motion API](reusable-motion.md) for timing, precedence and examples.
+
+## Helpers in the Motion Atlas
+
+The Motion Atlas has four sections: Motions (stock presets), Compositions,
+Sample films, and **Helpers**. Helpers is a browsable catalog of the shared
+motion helpers this inventory describes. Like every Atlas section it has a
+category sidebar with counts and a card per helper; each card's thumbnail is
+the helper's real demo rendered live from the gallery clock, and opening it
+shows the looping player, API, usage and guidance in the Atlas preview modal.
+Open it at `motion.html?section=helpers`; an open helper deep links as
+`motion.html?section=helpers&helper=<id>`, and a category filter adds
+`&category=<id>`, for example `?section=helpers&helper=erase-mask&category=masks`.
+
+| Category             | Helpers                                                                                                                                                             |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Curves and durations | Every `EASE` curve plotted with a dot travelling it, `bezier()`, the motion presets, every `DUR` token on one shared timeline, `STAGGER`, `STAGGER_COLUMN`          |
+| Interpolation        | `ramp()` and `mix()`, `mixToken()`, `countTo()`                                                                                                                     |
+| Entrances and exits  | `enter()`, `enterAt()`, `leave()`, `pop()`, `press()`                                                                                                               |
+| Text reveals         | Line fade, wipe and cut (`TextReveal.getLineRevealStyle`), `TextReveal.getWipeExitStyle`, `TextReveal.getHeadingRevealStyles`, `TextReveal.getStagedExitStyle`, `typed()` with `caretOn()`, `WindowMotion.getActiveHeadline` |
+| Masks and wipes      | `getEraseMaskStyle`, `BarComparisonMotion.getEraseStartFrames`, the stepped column wipe, the window stepped reveal, `BarComparisonMotion.getRoughEdgeClipPath`                                              |
+| Blur                 | `HorizontalBlurFilter`, `getVelocityBlur`                                                                                                                           |
+| Camera               | `CameraTrack.getPose` and the camera track, `DiagramCamera`, `WindowMotion.getWindowCamera`                                                                                            |
+| Windows              | Whip, side entrance, carousel slide, pull-back, flip and split, scroll offset, the `windowTilt.ts` plane, chrome and box tokens                                     |
+| Media                | `MediaPlane`                                                                                                                                                        |
+| Transitions          | `getShotTransitionLayers` (dissolve, stepped column wipe, declared cut), `SceneTransition`                                                                          |
+| Continuity           | `SharedElement`, `AnchoredOverlay`, `SvgObjectDeparture`                                                                                                            |
+| Theme                | `makeThemeStyleFromTheme`                                                                                                                                         |
+| Pointer              | `trackPos` with the shared `Cursor`, `cursorOnTarget`, `downAt` and `cursorScale`, `cursorShutter`                                                                  |
+| Loops                | `loopPhase`, `wave`, `loopEnvelope`                                                                                                                                 |
+| Scene builds         | The brand lockup's column build, fly-through and CTA beats; the bar comparison's build beats                                                                        |
+
+Each entry's detail view shows its API signature, defaults, a copyable usage
+snippet, what it is good for and what to avoid, the files that import it, and
+a link to its source.
+
+The curve, duration, and stagger entries document the portable `motion.ts`
+vocabulary, so their snippets read `EASE`, `DUR`, and `STAGGER` and no
+renderer imports them. A renderer reads the same steps from the themed
+motion (`useVideoMotion()` or `useGraphicMotion()`), whose `classic` values
+they are; ESLint bans the `motion.ts` constants in renderer directories.
+
+### How it is built
+
+- **Catalog.** [helperCatalog.yaml](../src/gallery/HelperGallery/helperCatalog.yaml)
+  holds categories, the source modules the catalog covers, and one entry per
+  helper: `id`, `title`, `category`, `description`, `source`, `exports`
+  (dotted for members, such as `EASE.out`), `signature`, `defaults`, `usage`,
+  `goodFor`, `avoid`, `usedBy` and `demo` (`id`, `frames`, optional public
+  `assets`). [parseHelperCatalog](../src/gallery/HelperGallery/parseHelperCatalog/parseHelperCatalog.ts)
+  validates it strictly with zod.
+- **Drift test.** [helper-catalog drift test](../src/gallery/HelperGallery/__tests__/helper-catalog-matches-preview-exports.integration.test.ts)
+  imports every listed module and fails when a catalogued source or export no
+  longer exists, when a runtime export is neither catalogued nor listed under
+  the module's `excluded` with a reason, when a member of `EASE` or `DUR` has
+  no entry, when a `usedBy` file does not import the helper, when a preview id
+  is unregistered or unused.
+- **Live previews.** Each preview is a small frame-driven React component in
+  [demos/](../src/gallery/HelperGallery/demos/) that calls the real helper and
+  shows the call, a frame counter and the values the helper returns. The
+  gallery embeds `/live.html?id=helper-<id>`: `ShowcaseFilms.load` returns a
+  `helper` film (960 × 600, looping, frames from the catalog), and the live
+  player plays it through `HelperPlayer` and `HelperComposition` instead of
+  `FilmComposition`. Helper previews are live only; the export route refuses
+  them. Colours come from the Avandar theme in `theme-colors.json`.
+- **Copy.** Catalog prose is plain English display copy. The gallery reads the
+  titles, descriptions and guidance straight from the YAML. There is no
+  catalog to regenerate after editing it.
+
+Deliberately excluded: `TextReveal.getTypographyRevealFrames` (TypographyScene's own
+icon-then-lines timing), `BarComparisonMotion.rowValueLabel` (number formatting), and the
+`MotionSettings.motionOptionsSchema` / `MotionSettings.motionEasingSchema` validators. Scene-internal layout
+code (`src/scenes/layout/`), the stock drawing primitives (inventoried in the
+[shared scene library](shared-scene-library.md#bounded-stock-drawing-primitives))
+and continuity's internal camera and overlay modules are not listed modules.
+
+### Add a helper to the catalog
+
+1. Export the helper from its module and document it in this inventory.
+2. If the module is new to the catalog, add it under `modules` in
+   `helperCatalog.yaml`, listing any exports that are not meant for reuse under
+   `excluded` with a reason.
+3. Add an entry under `helpers` with every field filled in. `usedBy` lists
+   app-relative files that import the helper; leave it empty when nothing does
+   yet.
+4. Add a preview id to [helperDemoIds.ts](../src/gallery/HelperGallery/helperDemoIds.ts),
+   write the preview in the matching `demos/*Demos.tsx` file with
+   `HelperDemoFrame` (call the real helper; never reimplement it), and register
+   it in [helperDemoRegistry.ts](../src/gallery/HelperGallery/demos/helperDemoRegistry.ts).
+   The registry is typed against the id list, so a missing preview fails to
+   compile.
+5. Run `npm run motion:build`, `npm run typecheck`
+   and `npm test`, then open `motion.html?section=helpers&helper=<id>` under
+   `pnpm showcase` and watch the preview loop.

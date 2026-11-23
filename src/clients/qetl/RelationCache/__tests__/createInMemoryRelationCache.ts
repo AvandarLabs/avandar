@@ -1,7 +1,9 @@
 import {
   coversColumns,
+  isFreshAt,
   normalizeColumns,
 } from "$/models/relations/RelationCacheKey/RelationCacheKey";
+import { getRelationFreshnessNow } from "@/clients/qetl/RelationCache/getRelationFreshnessNow/getRelationFreshnessNow";
 import type {
   RelationCacheEntry,
   RelationCachePort,
@@ -45,7 +47,14 @@ export function createInMemoryRelationCache(): RelationCachePort & {
       }> = [];
       keys.forEach((key) => {
         const stored = entriesByKey.get(toKey(key.principal, key.relation.id));
-        if (stored === undefined) {
+        // A stale entry is neither served nor grown, same as the Dexie port.
+        if (
+          stored === undefined ||
+          !isFreshAt({
+            staleAt: stored.entry.staleAt,
+            now: getRelationFreshnessNow(),
+          })
+        ) {
           misses.push({ key, growFrom: undefined });
           return;
         }
@@ -81,7 +90,7 @@ export function createInMemoryRelationCache(): RelationCachePort & {
           tableName: write.identity.relation.id,
           definitionToken: "",
           columns: normalizeColumns(write.columns),
-          staleAt: undefined,
+          staleAt: write.staleAt,
         },
         payload: write.payload,
       });

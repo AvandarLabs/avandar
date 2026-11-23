@@ -18,8 +18,11 @@ export function createLabelSchema({
     .max(maxLength)
     .regex(/^[^\r\n\t]*$/)
     .refine(
-      (text) =>
-        !bounds || getLegacyWidthFromText({ text, ...bounds }) <= bounds.width,
+      (text) => {
+        return (
+          !bounds || getLegacyWidthFromText({ text, ...bounds }) <= bounds.width
+        );
+      },
       { message: "The label cannot fit its fixed authored SVG slot." },
     );
 }

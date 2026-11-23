@@ -85,7 +85,7 @@ export function PlatformProvider({
  *
  * @returns The {@link PlatformImpls} resolved at provider mount time.
  */
-// eslint-disable-next-line react-refresh/only-export-components
+// oxlint-disable-next-line react-refresh/only-export-components
 export function usePlatform(): PlatformImpls {
   const ctx = useContext(PlatformContext);
   if (ctx === undefined) {

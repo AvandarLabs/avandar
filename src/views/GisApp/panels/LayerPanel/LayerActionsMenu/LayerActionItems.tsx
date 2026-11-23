@@ -3,6 +3,7 @@ import { Menu } from "@mantine/core";
 import {
   IconCopy,
   IconPencil,
+  IconTable,
   IconTrash,
   IconZoomScan,
 } from "@tabler/icons-react";
@@ -13,14 +14,17 @@ type Props = {
   onDuplicate: () => void;
   onZoomToLayer: () => void;
   onDelete: () => void;
+  /** Opens the layer's feature list; the item is hidden when unset. */
+  onOpenFeatureList?: () => void;
 };
 
-/** Renders the rename, zoom, duplicate, and delete layer actions. */
+/** Renders the rename, zoom, feature list, duplicate, and delete actions. */
 export function LayerActionItems({
   onRename,
   onDuplicate,
   onZoomToLayer,
   onDelete,
+  onOpenFeatureList,
 }: Props): ReactNode {
   const { t } = useLingui();
   return (
@@ -37,6 +41,14 @@ export function LayerActionItems({
       >
         {t`Zoom to layer`}
       </Menu.Item>
+      {onOpenFeatureList ? (
+        <Menu.Item
+          leftSection={<IconTable size={14} stroke={1.5} />}
+          onClick={onOpenFeatureList}
+        >
+          {t`Feature list`}
+        </Menu.Item>
+      ) : null}
       <Menu.Item
         leftSection={<IconCopy size={14} stroke={1.5} />}
         onClick={onDuplicate}

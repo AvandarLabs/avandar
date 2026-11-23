@@ -1,8 +1,8 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { CoordinateRows } from "./CoordinateRows";
 import { TriagePlane } from "./TriagePlane";
-import { TriageTokens } from "./TriageTokens";
-import type { GraphicProps } from "../../graphics-common";
+import { TriageTokens } from "./TriageTokens/TriageTokens";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./CoordinateQualityTriage.schema";
 import type { ReactNode } from "react";
 

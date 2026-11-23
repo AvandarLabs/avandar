@@ -1,4 +1,3 @@
-import { Trans } from "@lingui/react/macro";
 import { ContentFields } from "../ContentFields/ContentFields";
 import styles from "./NullableField.module.css";
 import type { StockControl } from "../../../../stock/contracts/StockContract.types";
@@ -21,15 +20,15 @@ export function NullableField({
         type="checkbox"
         checked={context.value === null}
         aria-describedby={context.field["aria-describedby"]}
-        onChange={(event) =>
-          context.update(
+        onChange={(event) => {
+          return context.update(
             event.target.checked
               ? null
               : ContentFields.getBlankValueFromControl(control),
-          )
-        }
+          );
+        }}
       />
-      <Trans>Empty value for {context.label}</Trans>
+      Empty value for {context.label}
     </label>
   );
 }

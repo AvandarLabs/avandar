@@ -1,0 +1,29 @@
+.helperPreviewPreview {
+  background: var(--white);
+  border: var(--atlas-border-1) solid var(--line);
+  border-radius: var(--atlas-radius-8);
+  min-width: 0;
+}
+
+.helperPreviewStage {
+  padding: var(--atlas-space-16) var(--atlas-space-16) 0;
+}
+
+.helperPreviewPlayer {
+  aspect-ratio: 1.6;
+  background: var(--ava-neutral-9);
+  border: 0;
+  border-radius: var(--atlas-radius-6);
+  display: block;
+  margin: 0 auto;
+  max-width: calc((100dvh - 190px) * 1.6);
+  width: 100%;
+}
+
+.helperPreviewNotice {
+  color: var(--atlas-color-muted);
+  font-size: var(--atlas-font-size-13);
+  line-height: 1.5;
+  margin: 0;
+  padding: var(--atlas-space-10) var(--atlas-space-16) var(--atlas-space-14);
+}

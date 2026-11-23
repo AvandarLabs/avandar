@@ -108,4 +108,41 @@ describe("useChatPanelComposerAutoFocus", () => {
 
     expect(focus).not.toHaveBeenCalled();
   });
+  it.each([
+    ["an editable", "true", 1],
+    ["a read-only", "false", 0],
+  ] as const)(
+    "focuses %s rich text composer only when it takes input",
+    (_label, contentEditable, expectedFocusCount) => {
+      const focus = vi.fn();
+      const aside = _createAsideWithTransition();
+      const panel = document.createElement("div");
+      const editingArea = document.createElement("div");
+      editingArea.setAttribute("contenteditable", contentEditable);
+      editingArea.focus = focus;
+      aside.append(panel);
+      panel.append(editingArea);
+
+      const { rerender } = renderHook(
+        ({ isOpen }: { isOpen: boolean }) => {
+          const panelRef = useRef(panel);
+          const composerInputRef = useRef<HTMLElement>(editingArea);
+          useChatPanelComposerAutoFocus({
+            isOpen,
+            panelRef,
+            composerInputRef,
+          });
+        },
+        { initialProps: { isOpen: false } },
+      );
+
+      rerender({ isOpen: true });
+
+      act(() => {
+        _dispatchAsideTransformTransitionEnd(aside);
+      });
+
+      expect(focus).toHaveBeenCalledTimes(expectedFocusCount);
+    },
+  );
 });

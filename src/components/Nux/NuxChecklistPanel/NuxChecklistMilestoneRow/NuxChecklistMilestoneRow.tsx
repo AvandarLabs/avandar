@@ -1,6 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { Group, Stack, Text, Tooltip, UnstyledButton } from "@mantine/core";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { NuxChecklistMilestoneCheck } from "@/components/Nux/NuxChecklistPanel/NuxChecklistMilestoneRow/NuxChecklistMilestoneCheck";
 import classes from "@/components/Nux/NuxChecklistPanel/NuxChecklistMilestoneRow/NuxChecklistMilestoneRow.module.css";
 import type { NuxMilestone } from "@/components/Nux/tutorials/NuxTutorial.types";

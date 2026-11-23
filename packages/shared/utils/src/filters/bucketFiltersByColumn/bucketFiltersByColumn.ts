@@ -30,8 +30,13 @@ export function bucketFiltersByColumn<T extends UnknownObject>(
           filtersByColumn[column] = {} as FilterOperatorRecord<T[keyof T]>;
         }
 
+        if (operator === "is") {
+          filtersByColumn[column].is = null;
+          return;
+        }
+
         if (isSingleValueOperator(operator) && !isArray(value)) {
-          filtersByColumn[column][operator] = value;
+          filtersByColumn[column][operator] = value as T[keyof T] | undefined;
         } else if (isArrayValueOperator(operator) && isArray(value)) {
           filtersByColumn[column][operator] = value;
         }

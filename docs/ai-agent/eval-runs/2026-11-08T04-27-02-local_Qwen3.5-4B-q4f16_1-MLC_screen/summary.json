@@ -1,0 +1,29 @@
+{
+  "label": "local:Qwen3.5-4B-q4f16_1-MLC:screen",
+  "questionCount": 20,
+  "passCount": 9,
+  "needlessQuestions": 0,
+  "missedQuestions": 1,
+  "consentPrompts": 0,
+  "modelCalls": 46,
+  "promptTokens": 40358,
+  "cachedPromptTokens": 0,
+  "completionTokens": 5648,
+  "totalCost": 0,
+  "costPerQuestion": 0,
+  "latencyMedianMs": 15533.562791000004,
+  "latencyP90Ms": 77140.13845900001,
+  "failedIds": [
+    "B01",
+    "B05",
+    "H01",
+    "H03",
+    "H09",
+    "I01",
+    "I03",
+    "I05",
+    "I07",
+    "I09",
+    "N04"
+  ]
+}

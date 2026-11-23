@@ -1,0 +1,21 @@
+.clickFeedbackTargetClickFeedbackDemoButton {
+  align-items: center;
+  background: var(--demo-brand);
+  border-radius: var(--demo-corner-label);
+  color: var(--demo-text);
+  display: flex;
+  font-size: var(--demo-font-size-4xl);
+  font-weight: var(--demo-font-weight-semibold);
+  height: 64px;
+  justify-content: center;
+  width: 220px;
+}
+
+.clickFeedbackTargetClickFeedbackDemoAbsolute {
+  position: absolute;
+}
+
+.clickFeedbackTargetClickFeedbackDemoPressTarget {
+  left: 340px;
+  top: 200px;
+}

@@ -111,9 +111,11 @@ export const invalidInputs: unknown[] = [
   },
   {
     ...DEFAULT_INPUT,
-    locations: DEFAULT_INPUT.locations.map((location) => ({
-      ...location,
-      id: "",
-    })),
+    locations: DEFAULT_INPUT.locations.map((location) => {
+      return {
+        ...location,
+        id: "",
+      };
+    }),
   },
 ];

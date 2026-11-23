@@ -144,7 +144,7 @@ export function useMutation<
     queryClient,
   );
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // oxlint-disable-next-line typescript/no-explicit-any
   (mutationObj.mutate as any).async = mutationObj.mutateAsync;
 
   return [

@@ -23,8 +23,8 @@ create table public.usage_analytics_events (
   -- can group by `event_name` over time.
   event_name text not null,
   -- Optional app surface where the event originated (data_sources,
-  -- data_explorer, dashboards, gis, settings). Null for events that aren't
-  -- bound to a specific app surface.
+  -- data_explorer, dashboards, gis, case_types, case_records, settings). Null
+  -- for events that aren't bound to a specific app surface.
   app public.app_type,
   -- Optional free-form JSON payload. Keep payloads small and scrubbed of
   -- PII. RLS allows anything that lands here to be readable by workspace

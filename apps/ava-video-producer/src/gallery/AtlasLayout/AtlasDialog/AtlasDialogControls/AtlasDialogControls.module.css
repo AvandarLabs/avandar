@@ -1,0 +1,14 @@
+.atlasDialogControlsControls {
+  display: flex;
+  flex-shrink: 0;
+  gap: var(--atlas-space-4);
+}
+
+.atlasDialogControlsControls > button {
+  height: 44px;
+  width: 44px;
+}
+
+.atlasDialogControlsIconButton {
+  composes: icon-button from global;
+}

@@ -1,5 +1,7 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -21,9 +23,11 @@ export function ServiceModule({
   isRemoved = false,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
-      <rect
+      <StockRect
         data-module={isReplacement ? undefined : module.id}
         data-replacement={isReplacement ? module.id : undefined}
         data-removed-original={isRemoved ? module.id : undefined}
@@ -31,17 +35,18 @@ export function ServiceModule({
         y={y}
         width={136}
         height={128}
-        rx={6}
-        fill={STOCK.surface}
-        stroke={isReplacement ? accent : STOCK.line}
-        strokeWidth={2}
+        rx={scales.corner(6)}
+        fill={tokens.color.surface}
+        stroke={isReplacement ? accent : tokens.color.line}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
       <LabelSlots labels={[[module.label, x + 10, y + 24, 116, 14, 5]]} />
-      <path
-        d={`M${x + 60} ${y} v-8 h16 v8`}
+      <SketchedShape
+        shape={{ kind: "path", d: `M${x + 60} ${y} v-8 h16 v8` }}
+        profile={tokens.sketch.shape}
         fill="none"
-        stroke={STOCK.cyan}
-        strokeWidth={3}
+        stroke={tokens.color.accentAlt}
+        strokeWidth={scales.stroke(tokens.stroke.emphasis)}
       />
     </g>
   );
