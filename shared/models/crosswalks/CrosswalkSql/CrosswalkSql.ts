@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-namespace,import-x/export */
+/* oxlint-disable typescript/no-namespace, import/export */
 import type {
   CrosswalkSqlCodeLists,
   CrosswalkSqlColumn,

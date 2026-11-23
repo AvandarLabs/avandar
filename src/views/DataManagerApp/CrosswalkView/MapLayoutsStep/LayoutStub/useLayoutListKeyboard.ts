@@ -77,7 +77,7 @@ function useScrollActiveIntoView(
       ?.scrollIntoView?.({ block: "nearest" });
     // Only a change of the active option scrolls. `getOptionId` and
     // `scrollToLayout` stand for the same rows in the meantime.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // oxlint-disable-next-line react/exhaustive-deps
   }, [activeLayoutId]);
 }
 

@@ -71,7 +71,7 @@ function useLoadedPluginVizCode(
   return useQuery({
     // The plugin id identifies the entry. Its other fields are the chunk
     // loaders, which do not change what the query loads.
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    // oxlint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: ["plugins", "vizCode", entry.id],
     queryFn: () => {
       return _loadPluginVizCode(entry);

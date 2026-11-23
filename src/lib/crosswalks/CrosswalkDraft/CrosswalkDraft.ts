@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-namespace,import-x/export */
+/* oxlint-disable typescript/no-namespace */
 import { CrosswalkLayout } from "$/models/crosswalks/CrosswalkLayout/CrosswalkLayout";
 import type { Crosswalk } from "$/models/crosswalks/Crosswalk/Crosswalk";
 import type { CrosswalkColumn } from "$/models/crosswalks/CrosswalkColumn/CrosswalkColumn";

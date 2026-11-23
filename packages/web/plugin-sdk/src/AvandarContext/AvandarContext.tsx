@@ -31,7 +31,7 @@ export function AvandarProvider({ api, children }: Readonly<Props>): ReactNode {
  * `PluginError` when called outside an `AvandarProvider`. Inside a plugin
  * chart the error names the chart type, because charts get only `useT`.
  */
-// eslint-disable-next-line react-refresh/only-export-components
+// oxlint-disable-next-line react-refresh/only-export-components
 export function useAvandar(): AvandarApi {
   const api = useContext(AvandarApiContext);
   const chart = usePluginVizContext();
@@ -52,7 +52,7 @@ export function useAvandar(): AvandarApi {
  * chart. Throws a `PluginError` outside both an `AvandarProvider` and a
  * `PluginVizProvider`.
  */
-// eslint-disable-next-line react-refresh/only-export-components
+// oxlint-disable-next-line react-refresh/only-export-components
 export function useT(): AvandarApi["i18n"]["t"] {
   const api = useContext(AvandarApiContext);
   const chart = usePluginVizContext();

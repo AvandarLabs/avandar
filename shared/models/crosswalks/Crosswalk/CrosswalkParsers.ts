@@ -105,7 +105,7 @@ export const CrosswalkParsers = makeParserRegistry<CrosswalkModel>().build({
 
 /** Keeps the database schema and CRUD row types aligned. */
 type CrudTypes = CrosswalkModel;
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// oxlint-disable-next-line typescript/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [
   Expect<

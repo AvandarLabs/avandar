@@ -47,7 +47,7 @@ export function useTaggedRead<Result>(
       isCurrent = false;
     };
     // `key` stands for everything `read` reads.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // oxlint-disable-next-line react/exhaustive-deps
   }, [key]);
   return tagged.key === key ? tagged.read : { status: "reading" };
 }

@@ -5,7 +5,7 @@ import type {
   ColumnProfileT,
   ColumnProfileValue,
 } from "$/models/dataDictionaries/ColumnProfile/ColumnProfile.types.ts";
-/* eslint-disable @typescript-eslint/no-namespace,import-x/export */
+/* oxlint-disable typescript/no-namespace, import/export */
 import type { NameScorer as NameScorerT } from "$/models/dataDictionaries/ColumnProfile/ColumnProfileModule/columnNameHelpers.ts";
 
 export { ColumnProfileModule as ColumnProfile } from "$/models/dataDictionaries/ColumnProfile/ColumnProfileModule/ColumnProfileModule.ts";

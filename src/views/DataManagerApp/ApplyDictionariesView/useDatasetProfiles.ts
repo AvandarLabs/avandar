@@ -162,7 +162,7 @@ export function useDatasetProfiles(
       },
     });
     // `key` stands for the dataset and the columns to profile.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // oxlint-disable-next-line react/exhaustive-deps
   }, [key, workspace.id]);
   return read.key === key ? read.profiles : { status: "reading" };
 }

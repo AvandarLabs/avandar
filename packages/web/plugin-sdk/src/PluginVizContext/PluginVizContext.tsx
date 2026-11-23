@@ -43,7 +43,7 @@ export function PluginVizProvider({
  * The chart type id and translator of the nearest `PluginVizProvider`, or
  * undefined outside one. Read by `useT` and `useAvandar`.
  */
-// eslint-disable-next-line react-refresh/only-export-components
+// oxlint-disable-next-line react-refresh/only-export-components
 export function usePluginVizContext(): PluginVizProviderValue | undefined {
   return useContext(PluginVizProviderContext);
 }
