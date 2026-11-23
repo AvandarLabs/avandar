@@ -20,9 +20,9 @@ from `rules.yaml`, validated against `rules.schema.json`.
 | AF-09 | nested-arrow-function | Nested arrow functions | typescript, javascript | safe | 3 | lint | Module-only unique nested declarations called directly after initialization in the same function body; refuse recursion, overloads, escapes, lexical bindings, nested functions, comments and competing repairs; unsupported shapes remain fallback |
 | AF-10 | private-helper-prefix | `_` prefix on private top-level helpers | typescript, javascript | safe | 3 | lint | Module-only unique private helpers called exclusively by the immediately adjacent exported function; reject scope and unresolved-name collisions, exports, escapes, string contracts, nested functions, comments and competing repairs; unsupported shapes remain fallback |
 | AF-11 | module-member-jsdoc | Existing JSDoc on an exported module key | typescript | safe | 3 | lint | TS direct untyped exported object only; one local declaration reference and static key; no intervening comments or owning interface; other shapes remain fallback |
-| AF-12 | component-props-name | Component props type named `Props` | typescript | safe | 3 | lint | Non-exported, one-component, collision-free type only |
-| AF-13 | e2e-acronym | Local `E2E` acronym casing | typescript, javascript | safe | 3 | lint | Non-exported same-file symbols only |
-| AF-14 | jsx-conditional-ternary | JSX conditional rendering uses a ternary | typescript, javascript | safe | 3 | lint | Exact `condition && <Node />` form |
+| AF-12 | component-props-name | Component props type named `Props` | typescript | safe | 3 | lint | TSX adjacent private object alias after a module marker with one JSX owner and parameter reference; no exports, collisions, comments, arrays or intervening repairs; other shapes remain fallback |
+| AF-13 | local-e2e-casing | Local `E2e` acronym casing | typescript, javascript | safe | 3 | lint | Scope-resolved private const primitive after a module marker with immediate plain reads; PascalCase E2e, uppercase constants and external contracts unchanged; other shapes remain fallback |
+| AF-14 | jsx-conditional-ternary | JSX conditional rendering uses a ternary | typescript, javascript | safe | 3 | lint | Boolean comparison or negation in declaration-owned JSX children with an attribute-free self-closing element; exact false arm preserves child values; other shapes remain fallback |
 | AF-15 | prefer-prop-callback | Exact `prop` and `propEq` callbacks | typescript, javascript | safe | 3 | lint | Proven equivalent callbacks and exact import edit |
 | AF-16 | straight-line-object | Straight-line object construction | typescript, javascript | safe | 3 | lint | Preserve control flow, evaluation order, descriptors, aliases, and mutation |
 | AF-17 | optional-array-candidates | Straight-line optional array candidates | typescript, javascript | safe | 3 | lint | Preserve order and evaluation with `filter(isDefined)` |
@@ -171,3 +171,42 @@ of unsupported candidates in a reviewed file. Safe capabilities can therefore
 be `enforced` while the rule and language summary remain `fallback`. Review
 tools must retain the rule-level fallback detector and may skip only the
 explicit safe capability. Non-JS languages remain fallback for AF-06/AF-07.
+
+### Component and local naming repairs
+
+AF-12 (`single-component-props`) names an adjacent module-private TSX object alias
+`Props` when its sole scope-resolved reference annotates the single component's
+parameter. A preceding import/export establishes the module boundary. Other
+JSX owners, exported, shared, generic, interface, collision, array and comment
+shapes stay unchanged. The alias must immediately precede the component, so
+its rename envelope cannot reserve an unrelated native or comment repair.
+
+AF-13 (`local-primitive-bindings`) spells the PascalCase acronym `E2e`, following
+the canonical review checklist. It renames only scope-resolved module-private
+`const` primitives after an import/export, with all reads in the immediately
+following expression, or
+in the sole return of a two-statement exported function body. Script globals,
+exports, uppercase constants and environment keys, string contracts, computed
+or shorthand keys, reflective function names, aliases, writes, collisions and
+interleaved statements stay unchanged. Lowercase `e2e` stays unchanged.
+
+AF-14 (`boolean-jsx-children`) converts a boolean negation or comparison child
+`condition && <Node />` into `(condition) ? <Node /> : false`. Keeping `false`
+preserves the precise child observed by custom components. The condition is
+evaluated once, including comparison coercion, and element creation remains
+lazy. Unknown scalar conditions can return `0`, an empty string, `null`, or
+`undefined`, so they remain unchanged. The supported subset requires plain
+operands, a top-level function declaration owner and an attribute-free,
+self-closing child. Nested conditionals, comments, member reads, calls,
+fragments and arrow owners remain fallback. Edits also defer when they would
+introduce an overflow on a line within the root 80-column limit.
+
+The exact-path native proof seeds these three capabilities into the existing
+serialized, cached engine run. AF-12 is seeded only for TSX; AF-14 only for
+JSX/TSX. Other file syntax remains fallback. Canonical error diagnostics and a
+nonzero engine status are required. Every new rule also retains explicit
+`unsupported-shapes` fallback, so no rule-level detector can be skipped merely
+because its narrow safe capability is enforced. Source that interferes with a
+seed conservatively remains fallback. Module-private seeds precede all synthetic
+imports/exports and introduce none themselves. A preceding AST module marker
+must therefore come from the original file; strings and comments cannot qualify.

@@ -169,3 +169,37 @@ path, plus explicit `unsupported-shapes` fallback. The existing serialized
 proof scheduler and cache are unchanged.
 
 **7,550 ms is the preceding warm median for the next batch.**
+
+## Component props, local acronym and JSX ternaries
+
+This batch enables AF-12, AF-13 and AF-14 for their narrow proved subsets.
+The complete-root ordinary application changes one source file: the private
+`EditableProps` alias and its parameter reference become `Props`. It applies
+no existing AF-13 or AF-14 candidates. Unknown scalar JSX conditions retain
+exact values, and the supported boolean ternary uses `false` as its false arm.
+
+The preceding warm median is **7,550 ms**. Samples below run sequentially
+without concurrent tests, package builds or dependency installation. The
+existing Doctor configuration is unchanged.
+
+| Label | Cold ms | Warm 1 | Warm 2 | Warm 3 | Warm 4 | Warm 5 | Warm median ms | Exit codes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| phase-3-component-fixers | 18869 | 7593 | 7604 | 7452 | 7490 | 7400 | 7490 | 0, 0, 0, 0, 0, 0 |
+
+The warm median is **7,490 ms**, 60 ms (0.79%) below the preceding 7,550 ms.
+All six exits are zero, so neither stop threshold is crossed and no separate
+visitor profiling is required. The cold sample includes a fresh Doctor scan
+of 653 files; warm samples reuse its existing cache. The existing await-loop
+advisory remains, and Doctor configuration is unchanged. These timings do not
+establish causal attribution for the small median difference.
+
+The final ordinary root repair was byte-identical across all 10,285 selected
+files. Package tests pass with 181 TypeScript cases and 222 core cases,
+including the new 104-case native safety/context matrix. Both lint packages
+build and type-check, and the main TypeScript build passes. Module-private
+coverage seeds now precede synthetic module markers and introduce none;
+TSX shares one JSX owner between its props and rendering probes. Exact
+unsupported-shape fallback and the existing per-file cache/serial engine
+scheduler remain intact.
+
+**7,490 ms is the preceding warm median for the next batch.**

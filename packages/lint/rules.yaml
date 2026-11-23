@@ -190,11 +190,11 @@ rules:
     phases:
       - 3
     owner: lint
-    boundary: Non-exported, one-component, collision-free type only
+    boundary: TSX adjacent private object alias after a module marker with one JSX owner and parameter reference; no exports, collisions, comments, arrays or intervening repairs; other shapes remain fallback
   - id: AF-13
-    slug: e2e-acronym
+    slug: local-e2e-casing
     class: AF
-    title: Local `E2E` acronym casing
+    title: Local `E2e` acronym casing
     scope: TS/JS
     applicability:
       - typescript
@@ -203,7 +203,7 @@ rules:
     phases:
       - 3
     owner: lint
-    boundary: Non-exported same-file symbols only
+    boundary: Scope-resolved private const primitive after a module marker with immediate plain reads; PascalCase E2e, uppercase constants and external contracts unchanged; other shapes remain fallback
   - id: AF-14
     slug: jsx-conditional-ternary
     class: AF
@@ -216,7 +216,7 @@ rules:
     phases:
       - 3
     owner: lint
-    boundary: Exact `condition && <Node />` form
+    boundary: Boolean comparison or negation in declaration-owned JSX children with an attribute-free self-closing element; exact false arm preserves child values; other shapes remain fallback
   - id: AF-15
     slug: prefer-prop-callback
     class: AF

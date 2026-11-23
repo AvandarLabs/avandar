@@ -25,7 +25,16 @@ const CAPABILITIES = [
   ["AF-09", "direct-nested-calls", "nested-arrow-functions"],
   ["AF-10", "private-direct-calls", "private-helper-prefix"],
   ["AF-11", "one-to-one-module-key", "export-key-jsdoc"],
+  ["AF-12", "single-component-props", "component-props-name"],
+  ["AF-13", "local-primitive-bindings", "local-e2e-casing"],
+  ["AF-14", "boolean-jsx-children", "jsx-conditional-ternary"],
 ] as const;
+const CUSTOM_RULE_IDS: readonly string[] = [
+  "AF-06", "AF-07", "AF-08", "AF-09", "AF-10", "AF-11", "AF-12", "AF-13", "AF-14",
+];
+const JS_RULE_IDS: readonly string[] = [
+  "AF-01", "AF-06", "AF-07", "AF-08", "AF-09", "AF-10", "AF-13", "AF-14",
+];
 const JS_SEED = '\nif (Boolean(1)) console.log("coverage");';
 const COMMENT_SEED = `
 function _avandarBodyCommentSeed() {
@@ -55,6 +64,21 @@ _avandarNestedDeclarationSeed();
 function avandarPrivateHelperSeed() { return 1; }
 export function _avandarPrivateCallerSeed() {
   return avandarPrivateHelperSeed();
+}
+`;
+const LOCAL_ACRONYM_SEED = `
+const _avandarE2ECount = 1;
+console.log(_avandarE2ECount);
+`;
+const PROPS_SEED = `
+type AvandarSeedCardProps = { count: number };
+function AvandarSeedCard(props: AvandarSeedCardProps) {
+  return <div>{!_avandarReadySeed && <span />}</div>;
+}
+`;
+const JSX_SEED = `
+function _avandarJsxSeed() {
+  return <>{!_avandarReadySeed && <span />}</>;
 }
 `;
 const TS_SEED =
@@ -183,8 +207,10 @@ async function _proveSeed(
     _mirrorDirectory(cwd, directory, localPath.split(sep));
     const source = readFileSync(path, "utf8");
     const seed =
+      LOCAL_ACRONYM_SEED + (/\.tsx$/.test(path) ? PROPS_SEED : "") +
       JS_SEED + COMMENT_SEED + FUNCTION_SEED +
-      (/\.[cm]?tsx?$/.test(path) ? TS_SEED + MODULE_COMMENT_SEED : "");
+      (/\.[cm]?tsx?$/.test(path) ? TS_SEED + MODULE_COMMENT_SEED : "") +
+      (/\.jsx$/.test(path) ? JSX_SEED : "");
     writeFileSync(join(directory, localPath), source + seed);
     const result = await _runSeed(directory, localPath, invocation);
     const diagnostics = _getDiagnostics(result.stdout);
@@ -275,7 +301,7 @@ function _createProbe(
         return (
           diagnostic.severity === "error" &&
           diagnostic.code?.endsWith(`(${nativeRule})`) &&
-          (!["AF-06", "AF-07", "AF-08", "AF-09", "AF-10", "AF-11"].includes(ruleId) ||
+          (!CUSTOM_RULE_IDS.includes(ruleId) ||
             (diagnostic.code === `avandar(${nativeRule})` &&
               diagnostic.message?.startsWith(`${ruleId}:`))) &&
           diagnostic.labels?.some((label) => {
@@ -316,12 +342,12 @@ export function createNativeCoverageProbes(): CoverageProbe[] {
   const getProof = _createProofLoader();
   return CAPABILITIES.flatMap((capability) => {
     const languages =
-      ["AF-01", "AF-06", "AF-07", "AF-08", "AF-09", "AF-10"].includes(capability[0])
+      JS_RULE_IDS.includes(capability[0])
         ? ["typescript", "javascript"]
         : ["typescript"];
     return languages.flatMap((language) => {
       const probe = _createProbe(capability, language, getProof);
-      if (!["AF-06", "AF-07", "AF-08", "AF-09", "AF-10", "AF-11"].includes(capability[0])) {
+      if (!CUSTOM_RULE_IDS.includes(capability[0])) {
         return [probe];
       }
       return [probe, {

@@ -9,7 +9,7 @@ import type { SqlPillClickInfo } from "@/components/sql/sql-helpers/createSqlDis
 import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
 import type { ReactNode } from "react";
 
-type EditableProps = {
+type Props = {
   value: string;
   catalog: SqlDisplayCatalog;
   onChange: (next: string) => void;
@@ -25,7 +25,7 @@ export function AvaSqlBlockEditable({
   minRows,
   className,
   dataTestId,
-}: EditableProps): ReactNode {
+}: Props): ReactNode {
   const editorViewRef = useRef<EditorView | null>(null);
   const [activePill, setActivePill] = useState<SqlPillClickInfo | null>(null);
 

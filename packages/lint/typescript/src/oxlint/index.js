@@ -6,7 +6,11 @@ import topLevelFunctionDeclarations from "./rules/top-level-function-declaration
 import nestedArrowFunctions from "./rules/nested-arrow-functions.js";
 import privateHelperPrefix from "./rules/private-helper-prefix.js";
 
-/** Oxlint plugin entry with safe comment and function repairs. */
+import componentPropsName from "./rules/component-props-name.js";
+import localE2eCasing from "./rules/local-e2e-casing.js";
+import jsxConditionalTernary from "./rules/jsx-conditional-ternary.js";
+
+/** Oxlint plugin entry with safe current-file repairs. */
 const plugin = eslintCompatPlugin({
   meta: { name: "@avandar/lint-typescript" },
   rules: {
@@ -16,6 +20,9 @@ const plugin = eslintCompatPlugin({
     "top-level-function-declarations": topLevelFunctionDeclarations,
     "nested-arrow-functions": nestedArrowFunctions,
     "private-helper-prefix": privateHelperPrefix,
+    "component-props-name": componentPropsName,
+    "local-e2e-casing": localE2eCasing,
+    "jsx-conditional-ternary": jsxConditionalTernary,
   },
 });
 export default plugin;
