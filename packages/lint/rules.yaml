@@ -229,7 +229,7 @@ rules:
     phases:
       - 3
     owner: lint
-    boundary: Proven equivalent callbacks and exact import edit
+    boundary: Anonymous ordinary callbacks on literal plain-data arrays with dot-free identifier keys and literal strict equality; existing leading runtime utils imports, capture-safe helper bindings and isolated import edits; other shapes remain fallback
   - id: AF-16
     slug: straight-line-object
     class: AF
@@ -242,7 +242,7 @@ rules:
     phases:
       - 3
     owner: lint
-    boundary: Preserve control flow, evaluation order, descriptors, aliases, and mutation
+    boundary: Unannotated fresh local data objects with consecutive primitive writes and a final spread return after the declaration; existing own keys or explicit null prototype, scope-proved no escape; annotated bindings and other shapes remain fallback
   - id: AF-17
     slug: optional-array-candidates
     class: AF
@@ -255,7 +255,7 @@ rules:
     phases:
       - 3
     owner: lint
-    boundary: Preserve order and evaluation with `filter(isDefined)`
+    boundary: TS/TSX explicitly typed primitive or literal arrays excluding undefined, consecutive multiline parameter guards and a final filtered spread return; existing resolved isDefined and ordinary Array intrinsics; JS, evolving arrays, missing helpers and other shapes remain fallback
   - id: AF-18
     slug: no-redundant-error-guard
     class: AF

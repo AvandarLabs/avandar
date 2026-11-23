@@ -28,12 +28,16 @@ const CAPABILITIES = [
   ["AF-12", "single-component-props", "component-props-name"],
   ["AF-13", "local-primitive-bindings", "local-e2e-casing"],
   ["AF-14", "boolean-jsx-children", "jsx-conditional-ternary"],
+  ["AF-15", "literal-property-map", "property-helper-callbacks"],
+  ["AF-15", "literal-property-equality", "property-helper-callbacks"],
+  ["AF-16", "fresh-data-object", "straight-line-object-construction"],
+  ["AF-17", "optional-parameter-candidates", "optional-array-candidates"],
 ] as const;
 const CUSTOM_RULE_IDS: readonly string[] = [
-  "AF-06", "AF-07", "AF-08", "AF-09", "AF-10", "AF-11", "AF-12", "AF-13", "AF-14",
+  "AF-06", "AF-07", "AF-08", "AF-09", "AF-10", "AF-11", "AF-12", "AF-13", "AF-14", "AF-15", "AF-16", "AF-17",
 ];
 const JS_RULE_IDS: readonly string[] = [
-  "AF-01", "AF-06", "AF-07", "AF-08", "AF-09", "AF-10", "AF-13", "AF-14",
+  "AF-01", "AF-06", "AF-07", "AF-08", "AF-09", "AF-10", "AF-13", "AF-14", "AF-15", "AF-16", "AF-17",
 ];
 const JS_SEED = '\nif (Boolean(1)) console.log("coverage");';
 const COMMENT_SEED = `
@@ -81,6 +85,30 @@ function _avandarJsxSeed() {
   return <>{!_avandarReadySeed && <span />}</>;
 }
 `;
+const UTILITY_SEEDS = [
+  ["literal-property-map", `
+[{ _avandarId: 1 }].map(function(row) { return row._avandarId; });
+`],
+  ["literal-property-equality", `
+[{ _avandarId: 1 }].filter(function(row) { return row._avandarId === 1; });
+`],
+  ["fresh-data-object", `
+function _avandarObjectSeed() {
+  const result = { count: 0 };
+  result.count = 1;
+  return result;
+}
+`],
+  ["optional-parameter-candidates", `
+function _avandarCandidatesSeed(candidate: number | undefined) {
+  const result: number[] = [];
+  if (candidate !== undefined) {
+    result.push(candidate);
+  }
+  return result;
+}
+`],
+] as const;
 const TS_SEED =
   '\nimport { Stats as _AvandarSeedStats } from "node:fs";\nlet _avandarSeedStats: _AvandarSeedStats;\ntype _AvandarSeedShape = { name: string };\nexport { _AvandarSeedShape };\nconst _avandarSeedLiteral = "coverage" as "coverage";\nconst _avandarSeedNumber: number = 1;\nconst _avandarSeedCopy = _avandarSeedNumber as number;\n';
 const UNPROVEN: CoverageEvidence = {
@@ -101,6 +129,7 @@ type Proof = {
   evidence: CoverageEvidence;
   diagnostics: Diagnostic[];
   seedOffset: number;
+  capabilityRanges?: Record<string, { start: number; end: number }>;
 };
 
 function _getInvocation(
@@ -196,6 +225,25 @@ async function _provePath(path: string, cwd: string): Promise<Proof> {
   return _proveSeed(path, cwd, localPath, invocation);
 }
 
+function _createUtilitySeed(
+  path: string,
+  sourceBytes: number,
+): { seed: string; capabilityRanges: NonNullable<Proof["capabilityRanges"]> } {
+  const utilitySeeds = UTILITY_SEEDS.filter(([capability]) => {
+    return capability !== "optional-parameter-candidates" || /\.tsx?$/.test(path);
+  });
+  const utilitySeed = utilitySeeds.map(([, text]) => { return text; }).join("");
+  let utilityOffset = sourceBytes;
+  const capabilityRanges = Object.fromEntries(utilitySeeds.map(
+    ([capability, text]) => {
+      const start = utilityOffset;
+      utilityOffset += Buffer.byteLength(text);
+      return [capability, { start, end: utilityOffset }];
+    },
+  ));
+  return { seed: utilitySeed, capabilityRanges };
+}
+
 async function _proveSeed(
   path: string,
   cwd: string,
@@ -206,7 +254,9 @@ async function _proveSeed(
   try {
     _mirrorDirectory(cwd, directory, localPath.split(sep));
     const source = readFileSync(path, "utf8");
-    const seed =
+    const { seed: utilitySeed, capabilityRanges } =
+      _createUtilitySeed(path, Buffer.byteLength(source));
+    const seed = utilitySeed +
       LOCAL_ACRONYM_SEED + (/\.tsx$/.test(path) ? PROPS_SEED : "") +
       JS_SEED + COMMENT_SEED + FUNCTION_SEED +
       (/\.[cm]?tsx?$/.test(path) ? TS_SEED + MODULE_COMMENT_SEED : "") +
@@ -216,6 +266,7 @@ async function _proveSeed(
     const diagnostics = _getDiagnostics(result.stdout);
     return {
       diagnostics: diagnostics ?? [],
+      capabilityRanges,
       seedOffset: Buffer.byteLength(source),
       evidence: {
         available: true,
@@ -305,7 +356,10 @@ function _createProbe(
             (diagnostic.code === `avandar(${nativeRule})` &&
               diagnostic.message?.startsWith(`${ruleId}:`))) &&
           diagnostic.labels?.some((label) => {
-            return (label.span?.offset ?? -1) >= proof.seedOffset;
+            const offset = label.span?.offset ?? -1;
+            const range = proof.capabilityRanges?.[capability];
+            return range ? offset >= range.start && offset < range.end
+              : offset >= proof.seedOffset;
           })
         );
       });

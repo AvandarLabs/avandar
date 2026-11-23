@@ -203,3 +203,39 @@ unsupported-shape fallback and the existing per-file cache/serial engine
 scheduler remain intact.
 
 **7,490 ms is the preceding warm median for the next batch.**
+
+## Property helpers and straight-line collections
+
+This batch enables AF-15, AF-16 and AF-17 for their documented conservative
+subsets. The complete root ordinary safe-fix application finds no eligible
+existing source candidates in any family. All 10,293 selected files are
+byte-identical across consecutive ordinary fix passes. The 193 tracked
+generated and compiled Lingui catalog files remain unchanged and excluded.
+
+The preceding warm median is **7,490 ms**. Samples run sequentially without
+concurrent tests, builds or dependency installation. Doctor configuration and
+its existing await-loop advisory remain unchanged.
+
+| Label | Cold ms | Warm 1 | Warm 2 | Warm 3 | Warm 4 | Warm 5 | Warm median ms | Exit codes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| phase-3-utility-fixers | 16390 | 7468 | 7639 | 7402 | 7548 | 7370 | 7468 | 0, 0, 0, 0, 0, 0 |
+
+The warm median is **7,468 ms**, 22 ms (0.29%) below the preceding 7,490 ms.
+All six exits are zero, so neither stop threshold is crossed. Warm Doctor scans
+reuse its cache and retain the existing await-loop advisory. These timings do
+not establish causal attribution for the small median difference.
+
+The completed measurement precedes the final declaration-envelope correction.
+Native keyword normalization reserves the entire declaration. Both construction
+rules therefore retain the initializer and construct at the final return,
+keeping all custom fix spans after the declaration. AF-16 rejects annotated
+bindings. AF-17 now requires typed TS/TSX primitive arrays, an existing helper,
+and ordinary Array intrinsics. The same visitors and serialized proof scheduler
+remain, with no additional engine invocations. The single completed benchmark
+is retained for this narrow correction; root correctness gates were refreshed.
+
+AF-15 map and equality probes have independent seed spans. Utility seeds add no
+imports or module markers, and AF-17 seeds satisfy the explicit array-type
+boundary only for TS/TSX. Unsupported shapes retain fallback throughout.
+
+**7,468 ms is the preceding warm median for the next batch.**

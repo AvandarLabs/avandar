@@ -10,6 +10,10 @@ import componentPropsName from "./rules/component-props-name.js";
 import localE2eCasing from "./rules/local-e2e-casing.js";
 import jsxConditionalTernary from "./rules/jsx-conditional-ternary.js";
 
+import propertyHelperCallbacks from "./rules/property-helper-callbacks.js";
+import straightLineObjectConstruction from "./rules/straight-line-object-construction.js";
+import optionalArrayCandidates from "./rules/optional-array-candidates.js";
+
 /** Oxlint plugin entry with safe current-file repairs. */
 const plugin = eslintCompatPlugin({
   meta: { name: "@avandar/lint-typescript" },
@@ -23,6 +27,9 @@ const plugin = eslintCompatPlugin({
     "component-props-name": componentPropsName,
     "local-e2e-casing": localE2eCasing,
     "jsx-conditional-ternary": jsxConditionalTernary,
+    "property-helper-callbacks": propertyHelperCallbacks,
+    "straight-line-object-construction": straightLineObjectConstruction,
+    "optional-array-candidates": optionalArrayCandidates,
   },
 });
 export default plugin;
