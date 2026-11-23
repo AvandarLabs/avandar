@@ -18,9 +18,10 @@ traceability, excluded from comparisons.
 | `@avandar/lint-typescript` | 43,078 |
 | `@avandar/lint-css` | 13,689 |
 
-These are the final `pnpm pack` archive sizes, including the repository license
-file and published build artifacts. Earlier batch tables below are historical.
-Runtime dependencies are installed separately; exact final contents are below.
+These historical `pnpm pack` sizes include the repository license file and
+published build artifacts. Runtime dependencies are installed separately.
+The [final review fixes](#final-review-fixes) record the latest archive sizes,
+contents and verification order. Earlier batch tables remain historical.
 
 ## Lint samples
 
@@ -407,7 +408,7 @@ is used. Complete-root Oxlint and Stylelint safe repairs are applied, with final
 staged idempotence checked separately. Generated files and compiled catalogs
 remain unchanged.
 
-### Final compressed archive contents
+### Compressed archive contents before final review fixes
 
 Every archive contains only its manifest, license, README and published `dist`
 artifacts. The generated tarballs are removed after inspection.
@@ -483,3 +484,73 @@ and `pnpm --filter @avandar/lint pack --pack-destination <owned internal temp>`.
 Its 18 entries remain the same manifest, LICENSE, README and published `dist`
 files listed above. Both ecosystem archives are unchanged. The new archive was
 inspected and removed after measurement; no archive is a retained artifact.
+
+## Final review fixes
+
+The consolidated final fix wave closes CSS implementation-identity and test
+isolation gaps. CSS coverage requires the same compatible installed official
+static source or published entry in core and the consumer, matching package
+version, official rule-function identity and final registration precedence.
+Narrower replacements, including ones registered after the official plugin,
+named-module and object-default wrappers, static package wrappers, conditional
+exports and version mismatches retain fallback. Accepted warnings belong to the
+selected nonignored result and have finite, nonempty closed ranges wholly inside
+the seed. Original cwd/path, selection, severity, disableFix, suppression and
+operational contracts remain; native evidence stays independent.
+
+The CSS fixer also refuses mixed LF/CRLF within a prose comment, preserving its
+exact bytes. Homogeneous LF/CRLF support remains. AF-17 refusal fixtures now use
+typed native inputs, existing `isDefined` and valid primitive annotations, with
+an eligible positive and explicit JavaScript fallback. All four named oversized
+source/test units, including the native adapter, were split at behavior boundaries.
+Extracted AF-05/06/16 fallback pointers now link to their contextual rules.
+
+Cleanup assertions now inspect only fixture-owned mirror paths. Core test setup
+copies source/config into owned temporary packages, builds and packs the three
+lint packages sequentially, and provides fresh public artifacts before consumer
+tests run. It neither reads stale repository distributions nor rebuilds shared
+output during parallel tests. Default file parallelism remains enabled.
+
+### Verification order
+
+These are completed verification results from the final fix wave, recorded
+without another test, build, pack or benchmark run for this documentation update.
+
+| Command or check | Actual result and boundary |
+| --- | --- |
+| `pnpm --filter @avandar/lint test` | Exit 0: 448 tests in 25 files, 73.49 seconds, ordinary default parallel command. Includes owned cleanup, fresh public artifacts and the module/test splits. |
+| Final focused CSS proof command | `pnpm --filter @avandar/lint test test/coverage/__tests__/cssProofIdentity.integration.test.ts test/coverage/__tests__/cssCommentFixer.integration.test.ts`: exit 0, 34 tests in 2 files. Ran after the final static-wrapper and named-module/object-default identity refinements, with fresh source/packed positives, precedence negatives, closed spans, queue recovery and source preservation. The earlier 448-test run does not cover those later producer refinements. |
+| `pnpm --filter @avandar/lint-typescript test` | Exit 0: 246 tests in 6 files. The obsolete JS refusal matrix was replaced by the meaningful typed native cases in core. |
+| `pnpm --filter @avandar/lint-css test` | Exit 0: 40 tests, including both mixed-ending refusals. |
+| All three lint package `type-check` and `build` commands | Exit 0 each. Core types/build were refreshed after the final producer refinements. |
+| `pnpm verify:packages` | Exit 0: all packages verified. |
+| `pnpm lint` | Exit 0 after the final producer edits. The existing Doctor await-loop advisory remains. |
+| `pnpm exec oxlint --fix .`, then `pnpm lint:css:fix` | Exit 0 each. Before/after source comparison found no changed files. |
+
+The regressions were observed failing before their fixes: original CSS proof
+produced 12 failures with 2 positive controls passing; static-wrapper identity
+produced 1 failure; named-module/object-default registration produced 2 failures
+with the official-final positive passing. The unrelated-mirror fixture failed
+the old global temporary inventory assertion. Both mixed-ending fixtures failed
+before refusal was added. Removing AF-17 undefined/candidate guard clauses caused
+3 expected typed-fixture failures; the production rule was restored unchanged.
+
+### Latest measured compressed archives
+
+These supersede the earlier archive sizes. Measurements use the completed final
+distributions and `pnpm pack --pack-destination <owned-temp>` from each package.
+Every pack command exited 0. Every entry was inspected, and all generated
+archives and their owned temporary directory were removed.
+
+| Package | Tarball bytes | Entries | Final contents |
+| --- | ---: | ---: | --- |
+| `@avandar/lint` | 66,662 | 18 | Same manifest, LICENSE, README and published `dist` paths listed in the earlier core archive contents, including `RuleCatalog.types-C1KQfq6n.d.ts`, catalog/schema data, declarations, JavaScript and maps. |
+| `@avandar/lint-typescript` | 43,078 | 6 | Manifest, LICENSE, README, `dist/oxlint.d.ts`, `dist/oxlint.js` and `dist/oxlint.js.map`. |
+| `@avandar/lint-css` | 13,741 | 6 | Manifest, LICENSE, README, `dist/stylelint.d.ts`, `dist/stylelint.js` and `dist/stylelint.js.map`. |
+
+Public exports and package version alignment remain intact. This is local
+artifact verification, with no publication or remote integration performed.
+No new timing samples were collected for these fixes: the 7,678 ms median above
+is historical evidence from before them. The existing 28 video casing
+diagnostics and Doctor advisory remain disclosed; Deno was not reached by the
+earlier aggregate type gate. No application/E2E/database rerun was added.
