@@ -292,3 +292,65 @@ records that existing engine behavior rather than claiming whole-command
 annotation preservation.
 
 **8,384 ms is the preceding warm median for the next batch.**
+
+## Exact coverage proof and inclusion caching
+
+Coverage accepts only the pinned Oxlint JSON envelope and normal lint statuses.
+A proof requires the exact mirrored filename, canonical engine namespace, error
+severity and a nonempty UTF-8 label contained entirely in that capability's
+seed range. Unknown envelopes, truncation indicators, runtime/configuration
+errors, stderr, unexpected exits and incomplete output fail closed. The engine's
+nested-config output can legitimately report `number_of_rules: null`.
+
+AF-08/09/10 additionally require the early AF-13 error diagnostic as a witness
+of an original AST import/export marker. This witness precedes every synthetic
+module marker. A script, textual marker, disabled/warning/suppressed AF-13 rule,
+or missing witness leaves those function capabilities in fallback with context
+recovery. Function fixer behavior is unchanged. Every custom rule still has its
+independent `unsupported-shapes` fallback.
+
+One factory lifetime caches the source-workspace inclusion listing by accepted
+command and cwd, and proof promises by cwd and exact path. The existing serial,
+rejection-safe loader still runs strictly isolated one-file mirrors. Each
+selected file retains original siblings and imports. Supported strict-JSON
+configs rebase relative plugin entries to original source paths and inherited
+config references to their original files. Aliases, overrides and rule settings
+are preserved without flattening. Root/nested string/object plugin fixtures
+also review the plugin and its helper, proving that seeded copies never execute
+as engine plugins. Unsupported copied JSONC/dynamic/symlink configuration and
+selected symlink paths remain fallback.
+
+| Bounded mixed-language coverage fixture | Before cache | After cache |
+| --- | --- | --- |
+| Six initial paths, one late path, one cached repeat | 7 unique proofs | 7 unique proofs |
+| Source inclusion children | 7 | 1 |
+| Isolated seed children | 7 | 7 |
+| Total children | 14 | 8 |
+| Maximum active native engine child | 1 | 1 |
+| Measured wall time, ms | 5,093 | 3,204 |
+
+These are bounded single-run coverage measurements against the actual engine,
+including an instrumenting process wrapper. They establish a 42.9% child-count
+reduction and an observed 37.1% wall-time reduction for this fixture. They are
+not a root-lint benchmark or a general latency guarantee. The later full suite
+also exercises the same process-count assertion. No builds, tests or benchmarks
+overlap these runs, and original source bytes and temporary-mirror cleanup are
+checked.
+
+Native proofs retain a 30-second timeout and 8 MiB output bound per captured
+stream, and add a 1 MiB selected-source and 16 KiB selected-path argument bound.
+Mirrors are created only when their serialized proof starts and removed in
+`finally`. Missing/malformed output, overflow, signal and a real timeout are
+covered by focused process-failure tests. Root/subcommand help remains lazy and
+JSON stdout remains machine-clean.
+
+Shared multi-file seed batching is deliberately not enabled. Its closed
+AF-03 dependency and cross-seeded config/plugin/import independence gates have
+not been established. Isolated proofs avoid batch poisoning and preserve
+conservative semantics, but still pay one engine startup and one mirror per
+native path. CSS is unchanged: its provider starts at most one Node proof child
+at a time, and each CSS path still repeats Stylelint's full root selection in
+that child. Native and CSS providers can each have one active child. No second
+CSS scheduler or inclusion cache is introduced here. Normal root lint behavior
+is unchanged, so the preceding accepted 8,384 ms warm median remains the root
+baseline and no additional six-run root benchmark was performed.

@@ -266,7 +266,7 @@ process.exit(result.status ?? 1);
     events.filter(({ event }) => {
       return event === "start";
     }),
-  ).toHaveLength(4);
+  ).toHaveLength(3);
   expect(Math.max(...activeCounts)).toBe(1);
   expect(active).toBe(0);
 });

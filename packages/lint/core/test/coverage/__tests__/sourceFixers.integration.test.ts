@@ -100,6 +100,51 @@ it.each(["disabled", "source-disabled", "warning", "nested", "excluded", "missin
   },
 );
 
+it.each(["ts", "js"])("refuses synthetic module context for original %s scripts", async (extension) => {
+  const directory = _createRepository(extension);
+  const source = 'const externalValue = 1;\nconsume(externalValue);\n';
+  writeFileSync(join(directory, `src/reviewed.${extension}`), source);
+  const result = await _coverage(directory, extension);
+  SAFE.forEach(([ruleId, capability]) => {
+    expect(result.outcomes).toContainEqual(expect.objectContaining({
+      ruleId, capability, state: "fallback", recovery: expect.stringContaining("original module context"),
+    }));
+  });
+  expect(readFileSync(join(directory, `src/reviewed.${extension}`), "utf8")).toBe(source);
+});
+
+it.each([
+  ['const marker = "export {};";\nconsume(marker);\n', "fake textual marker"],
+  ['// export {};\nconst externalValue = 1;\nconsume(externalValue);\n', "comment marker"],
+  ['export {};\n', "disabled witness"],
+  ['export {};\n', "warning witness"],
+  ['/* eslint-disable avandar/local-e2e-casing */\nexport {};\n', "suppressed witness"],
+])("refuses unproved original module context: %s (%s)", async (source, reason) => {
+  const directory = _createRepository();
+  writeFileSync(join(directory, "src/reviewed.ts"), source);
+  if (reason.endsWith("witness") && reason !== "suppressed witness") {
+    const path = join(directory, ".oxlintrc.json");
+    const config = JSON.parse(readFileSync(path, "utf8"));
+    config.rules["avandar/local-e2e-casing"] = reason === "warning witness" ? "warn" : "off";
+    writeFileSync(path, JSON.stringify(config));
+  }
+  const result = await _coverage(directory);
+  SAFE.forEach(([ruleId, capability]) => {
+    expect(result.outcomes).toContainEqual(expect.objectContaining({
+      ruleId, capability, state: "fallback", recovery: expect.stringContaining("original module context"),
+    }));
+  });
+});
+
+it("accepts an original module marker at the end of a Unicode prefix", async () => {
+  const directory = _createRepository();
+  writeFileSync(join(directory, "src/reviewed.ts"), 'const label = "😀 é";\nconsume(label);\nexport {};\n');
+  const result = await _coverage(directory);
+  SAFE.forEach(([ruleId, capability]) => {
+    expect(result.outcomes).toContainEqual(expect.objectContaining({ ruleId, capability, state: "enforced" }));
+  });
+});
+
 function _fix(source: string, extension = "ts", rules: string[] = SAFE.map(([, , name]) => { return name; }), root = false) {
   const directory = _createRepository(extension);
   const path = join(directory, `src/reviewed.${extension}`);
