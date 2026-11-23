@@ -1,12 +1,16 @@
-import { DEFAULT_ENV_NAME } from "@ava-cli/AvaEnv/AvaEnv";
+import {
+  expectRefusalWithoutCall,
+  runAvaThroughRealParser,
+  waitForFirstCall,
+} from "@ava-cli/ReleaseCli/__tests__/runAvaThroughRealParser";
 import * as collectReleaseChangelogCommitsModule from "@ava-cli/ReleaseCli/releaseChangelog/collectReleaseChangelogCommits/collectReleaseChangelogCommits";
 import * as publishReleaseNotesModule from "@ava-cli/ReleaseCli/releaseChangelog/publishReleaseNotes/publishReleaseNotes";
-import { ReleaseCli } from "@ava-cli/ReleaseCli/ReleaseCli";
 import { ReleaseNotesCli } from "@ava-cli/ReleaseCli/ReleaseNotesCli/ReleaseNotesCli";
 import * as releasePromptHelpersModule from "@ava-cli/ReleaseCli/releasePromptHelpers";
 import * as findRepoRootModule from "@ava-cli/utils/findRepoRoot";
 import { Acclimate } from "@avandar/acclimate";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { PublishReleaseNotesOptions } from "@ava-cli/ReleaseCli/releaseChangelog/publishReleaseNotes/publishReleaseNotes";
 
 vi.mock(
   "@ava-cli/ReleaseCli/releaseChangelog/publishReleaseNotes/publishReleaseNotes",
@@ -325,24 +329,9 @@ describe("ava release notes", () => {
   });
 });
 
-/**
- * Run `ava release notes <flags>` through Acclimate's real argument parser,
- * from a root CLI cut down to what routes the command: the global `--env`
- * option `main.ts` declares and the `release` command. Acclimate does not
- * hand back a promise, so the caller waits for the outcome it expects.
- */
+/** Run `ava release notes <flags>` through Acclimate's real argument parser. */
 function _runAvaReleaseNotes(flags: readonly string[]): void {
-  process.argv = [process.execPath, "ava", "release", "notes", ...flags];
-  Acclimate.run(
-    Acclimate.createCLI("ava")
-      .addGlobalOption({
-        name: "--env",
-        type: "string",
-        required: false,
-        defaultValue: DEFAULT_ENV_NAME,
-      })
-      .addCommand("release", ReleaseCli),
-  );
+  runAvaThroughRealParser(["release", "notes", ...flags]);
 }
 
 describe("ava release notes through the real argument parser", () => {
@@ -373,23 +362,23 @@ describe("ava release notes through the real argument parser", () => {
 
   /** Wait for the action to refuse, then prove it published nothing. */
   const _expectRefusal = async (expectedText: string): Promise<void> => {
-    await vi.waitFor(() => {
-      expect(process.exitCode).toBe(1);
+    await expectRefusalWithoutCall({
+      expectedText,
+      readOutput: () => {
+        return _loggedText(logSpy);
+      },
+      guardedFunction: vi.mocked(publishReleaseNotesModule.publishReleaseNotes),
     });
-    expect(_loggedText(logSpy)).toContain(expectedText);
-    expect(
-      publishReleaseNotesModule.publishReleaseNotes,
-    ).not.toHaveBeenCalled();
   };
 
   /** Wait for the action to call the publisher, and return what it passed. */
-  const _waitForPublishOptions = async (): Promise<unknown> => {
-    await vi.waitFor(() => {
-      expect(publishReleaseNotesModule.publishReleaseNotes).toHaveBeenCalled();
-    });
-    return vi.mocked(publishReleaseNotesModule.publishReleaseNotes).mock
-      .calls[0]?.[1];
-  };
+  const _waitForPublishOptions =
+    async (): Promise<PublishReleaseNotesOptions> => {
+      const [, publishOptions] = await waitForFirstCall(
+        vi.mocked(publishReleaseNotesModule.publishReleaseNotes),
+      );
+      return publishOptions;
+    };
 
   it("parses --dry-run as dryRun: true", async () => {
     _runAvaReleaseNotes(["--version", "0.13.3", "--dry-run"]);
@@ -404,16 +393,36 @@ describe("ava release notes through the real argument parser", () => {
   it("refuses --dry-run=true with exit code 1, publishing nothing", async () => {
     _runAvaReleaseNotes(["--version", "0.13.3", "--dry-run=true"]);
 
-    await _expectRefusal("--dry-run=true");
+    await _expectRefusal(
+      "`--dry-run=true`: `--dry-run` takes no value. Pass it to turn it " +
+        "on, or leave it out.",
+    );
+  });
+
+  it("refuses --update=false, telling the user to leave --update out", async () => {
+    _runAvaReleaseNotes(["--version", "0.13.3", "--update=false"]);
+
+    await _expectRefusal(
+      "`--update=false`: `--update` takes no value. Pass it to turn it on, " +
+        "or leave it out.",
+    );
   });
 
   it("refuses --update dry-run, which would otherwise publish for real", async () => {
     _runAvaReleaseNotes(["--version", "0.13.3", "--update", "dry-run"]);
 
-    await _expectRefusal("dry-run");
+    await _expectRefusal("Unexpected word: dry-run.");
   });
 
-  it("refuses a flag typed with a long dash after --update", async () => {
+  it("names the notes command's value options when refusing a stray word", async () => {
+    _runAvaReleaseNotes(["--version", "0.13.3", "--update", "dry-run"]);
+
+    await _expectRefusal(
+      "only these options take a value: `--version`, `-v`, `--env`.",
+    );
+  });
+
+  it("refuses an option typed with a long dash after --update", async () => {
     // An em dash, as an editor's autocorrect turns a pasted `--` into.
     const token = "\u2014dry-run";
     _runAvaReleaseNotes(["--version", "0.13.3", "--update", token]);

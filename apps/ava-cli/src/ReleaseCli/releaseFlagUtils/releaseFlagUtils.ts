@@ -1,3 +1,5 @@
+import { objectKeys } from "@avandar/utils";
+
 /**
  * Flag handling that Acclimate does not do for us.
  *
@@ -23,35 +25,10 @@
  */
 export const AVA_GLOBAL_FLAGS = ["--env"] as const;
 
-/** Every flag `ava release` accepts, including aliases. */
-export const RELEASE_FLAGS = [
-  "--version",
-  "-v",
-  "--next",
-  "-n",
-  "--yes",
-  "-y",
-  "--dry-run",
-  "--skip-ci-check",
-  "--skip-changelog",
-  "--help",
-  "-h",
-  ...AVA_GLOBAL_FLAGS,
-] as const;
-
-/** The flags `ava release` accepts that take a value, including aliases. */
-export const RELEASE_VALUE_FLAGS = [
-  "--version",
-  "-v",
-  "--next",
-  "-n",
-  ...AVA_GLOBAL_FLAGS,
-] as const;
-
 /**
  * One argv token a release command refuses, found by
- * {@link findUnknownReleaseFlags} and explained by
- * {@link describeUnknownReleaseFlags}.
+ * {@link getReleaseFlagProblemsFromArgv} and explained by
+ * {@link describeReleaseFlagProblems}.
  *
  * - `unknown-flag`: starts with `-` but is not an accepted flag, such as
  *   `--dryrun` or `--nope=1`.
@@ -75,10 +52,48 @@ export type ReleaseFlagProblem =
   | { kind: "unicode-dash-flag"; token: string };
 
 /** The accepted spellings a release command checks argv against. */
-type ReleaseFlagSpec = {
+export type ReleaseFlagSpec = {
   acceptedFlags: readonly string[];
   valueFlags: readonly string[];
 };
+
+/** One option as an Acclimate CLI declares it in `state.optionArgs`. */
+type ReleaseOptionDeclaration = Readonly<{
+  name: string;
+  type: string;
+  aliases?: readonly string[];
+}>;
+
+/**
+ * The spellings a release command accepts, derived from the options it
+ * declares to Acclimate, such as `ReleaseCli.state.optionArgs`. A boolean
+ * option is a switch and takes no value. Every other option, its aliases, and
+ * each of {@link AVA_GLOBAL_FLAGS} takes one.
+ */
+export function createReleaseFlagSpecFromOptions(
+  optionArgs: Readonly<Record<string, ReleaseOptionDeclaration>>,
+): ReleaseFlagSpec {
+  const options = Object.values(optionArgs);
+  const toSpellings = (option: ReleaseOptionDeclaration): string[] => {
+    return [option.name, ...(option.aliases ?? [])];
+  };
+  return {
+    acceptedFlags: [
+      ...options.flatMap(toSpellings),
+      "--help",
+      "-h",
+      ...AVA_GLOBAL_FLAGS,
+    ],
+    valueFlags: [
+      ...options
+        .filter((option) => {
+          return option.type !== "boolean";
+        })
+        .flatMap(toSpellings),
+      ...AVA_GLOBAL_FLAGS,
+    ],
+  };
+}
 
 /** An en dash, em dash, or minus sign at the start of a token. */
 const UNICODE_DASH_PATTERN = /^[\u2013\u2014\u2212]/;
@@ -108,14 +123,32 @@ function _getProblemFromFlagToken(
 }
 
 /**
+ * Whether the word after `token` is that option's value: it is when `token`
+ * takes a value, and when it is an unknown `--option` with no `=`, since
+ * Acclimate would read the word as its value too. Reading it that way leaves
+ * a mistyped `--verison 0.11.0` with one error, not two.
+ */
+function _isValueExpectedAfter(
+  token: string,
+  problem: ReleaseFlagProblem | undefined,
+  spec: Readonly<ReleaseFlagSpec>,
+): boolean {
+  if (problem?.kind === "unknown-flag") {
+    return !token.includes("=");
+  }
+  return spec.valueFlags.includes(token);
+}
+
+/**
  * Tokens in `argv` that a release command must refuse before it changes
  * anything, in argv order. Empty when every token is safe to hand Acclimate.
  *
- * The words before the first flag are command words, such as `release
+ * The words before the first option are command words, such as `release
  * notes`. After that, a word is allowed only as the one value directly after
- * a flag in `valueFlags`, such as the `0.11.0` in `--version 0.11.0`.
+ * an option in `valueFlags`, such as the `0.11.0` in `--version 0.11.0`, or
+ * after an unknown option, which is refused on its own.
  */
-export function findUnknownReleaseFlags(
+export function getReleaseFlagProblemsFromArgv(
   options: Readonly<{
     argv: readonly string[];
     acceptedFlags: readonly string[];
@@ -140,7 +173,7 @@ export function findUnknownReleaseFlags(
         problems.push(problem);
       }
       isPastCommandWords = true;
-      isValueExpected = spec.valueFlags.includes(token);
+      isValueExpected = _isValueExpectedAfter(token, problem, spec);
       return;
     }
     if (isPastCommandWords && !isValueExpected) {
@@ -151,75 +184,113 @@ export function findUnknownReleaseFlags(
   return problems;
 }
 
-/** `Label: a, b.`, with an `s` on the label when there are several tokens. */
+/** The problems of one kind, as a sentence builder receives them. */
+type ReleaseFlagProblemsOfKind<TKind extends ReleaseFlagProblem["kind"]> =
+  ReadonlyArray<Extract<ReleaseFlagProblem, { kind: TKind }>>;
+
+/** `Label: a, b.`, with an `s` on the label when there are several problems. */
 function _buildTokenListSentence(
   label: string,
-  tokens: readonly string[],
-): string | undefined {
-  if (tokens.length === 0) {
-    return undefined;
-  }
+  problems: readonly ReleaseFlagProblem[],
+): string {
+  const tokens = problems.map((problem) => {
+    return problem.token;
+  });
   return `${label}${tokens.length > 1 ? "s" : ""}: ${tokens.join(", ")}.`;
 }
 
-/** The sentence telling the user how to rewrite one `--flag=value` token. */
+/** The sentence telling the user how to rewrite one `--option=value` token. */
 function _buildInlineValueSentence(
   problem: Extract<ReleaseFlagProblem, { kind: "inline-value" }>,
 ): string {
+  const { flag, token, value } = problem;
   return problem.takesValue
-    ? `Write \`${problem.flag} ${problem.value}\`, not \`${problem.token}\`.`
-    : `Pass \`${problem.flag}\` on its own, not \`${problem.token}\`.`;
+    ? `Write \`${flag} ${value}\`, not \`${token}\`.`
+    : [
+        `\`${token}\`: \`${flag}\` takes no value.`,
+        "Pass it to turn it on, or leave it out.",
+      ].join(" ");
 }
 
-/** The tokens of every problem of one kind. */
-function _getTokensOfKind(
-  problems: readonly ReleaseFlagProblem[],
-  kind: ReleaseFlagProblem["kind"],
-): string[] {
-  return problems
-    .filter((problem) => {
-      return problem.kind === kind;
+/** The sentence naming stray words and the options that do take a value. */
+function _buildStrayValueSentence(
+  problems: ReleaseFlagProblemsOfKind<"stray-value">,
+  valueFlags: readonly string[],
+): string {
+  const valueFlagList = valueFlags
+    .map((flag) => {
+      return `\`${flag}\``;
     })
-    .map((problem) => {
-      return problem.token;
-    });
+    .join(", ");
+  const valueFlagClause =
+    valueFlags.length === 0
+      ? "no option here takes a value"
+      : `only these options take a value: ${valueFlagList}`;
+  return [
+    _buildTokenListSentence("Unexpected word", problems),
+    `An option starts with \`--\`, and ${valueFlagClause}.`,
+  ].join(" ");
 }
 
 /**
- * The refusal message for the problems {@link findUnknownReleaseFlags} found,
- * one sentence per kind of problem. A release command prints it, then says
- * what it did not do.
+ * How {@link describeReleaseFlagProblems} words each kind of problem, in the
+ * order its sentences appear. Keyed by every kind, so a new kind fails to
+ * compile until it has a sentence.
  */
-export function describeUnknownReleaseFlags(
-  problems: readonly ReleaseFlagProblem[],
-): string {
-  const strayValueSentence = _buildTokenListSentence(
-    "Unexpected word",
-    _getTokensOfKind(problems, "stray-value"),
-  );
-  const inlineValueSentences = problems.flatMap((problem) => {
-    return problem.kind === "inline-value"
-      ? [_buildInlineValueSentence(problem)]
-      : [];
-  });
-
-  return [
-    _buildTokenListSentence(
-      "Unknown option",
-      _getTokensOfKind(problems, "unknown-flag"),
-    ),
-    _buildTokenListSentence(
+const RELEASE_FLAG_SENTENCE_BUILDERS: {
+  [TKind in ReleaseFlagProblem["kind"]]: (
+    problems: ReleaseFlagProblemsOfKind<TKind>,
+    valueFlags: readonly string[],
+  ) => string;
+} = {
+  "unknown-flag": (problems) => {
+    return _buildTokenListSentence("Unknown option", problems);
+  },
+  "unicode-dash-flag": (problems) => {
+    return _buildTokenListSentence(
       "Retype the dashes as plain hyphens (-)",
-      _getTokensOfKind(problems, "unicode-dash-flag"),
-    ),
-    strayValueSentence === undefined
-      ? undefined
-      : `${strayValueSentence} A flag starts with \`--\`, and only an ` +
-        "option such as `--version` takes a value.",
-    ...inlineValueSentences,
-  ]
-    .filter((sentence) => {
-      return sentence !== undefined;
+      problems,
+    );
+  },
+  "stray-value": _buildStrayValueSentence,
+  "inline-value": (problems) => {
+    return problems.map(_buildInlineValueSentence).join(" ");
+  },
+};
+
+/** The sentence for one kind of problem, or undefined if there are none. */
+function _buildSentenceForKind<TKind extends ReleaseFlagProblem["kind"]>(
+  kind: TKind,
+  options: Readonly<{
+    problems: readonly ReleaseFlagProblem[];
+    valueFlags: readonly string[];
+  }>,
+): string | undefined {
+  const problemsOfKind = options.problems.filter(
+    (problem): problem is Extract<ReleaseFlagProblem, { kind: TKind }> => {
+      return problem.kind === kind;
+    },
+  );
+  return problemsOfKind.length === 0
+    ? undefined
+    : RELEASE_FLAG_SENTENCE_BUILDERS[kind](problemsOfKind, options.valueFlags);
+}
+
+/**
+ * The refusal message for the problems {@link getReleaseFlagProblemsFromArgv}
+ * found, one sentence per kind of problem. `valueFlags` are the command's
+ * options that take a value, named when a stray word is refused. A release
+ * command prints it, then says what it did not do.
+ */
+export function describeReleaseFlagProblems(
+  options: Readonly<{
+    problems: readonly ReleaseFlagProblem[];
+    valueFlags: readonly string[];
+  }>,
+): string {
+  return objectKeys(RELEASE_FLAG_SENTENCE_BUILDERS)
+    .flatMap((kind) => {
+      return _buildSentenceForKind(kind, options) ?? [];
     })
     .join(" ");
 }

@@ -1,25 +1,26 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import { ReleaseCli } from "@ava-cli/ReleaseCli/ReleaseCli";
 import {
   AVA_GLOBAL_FLAGS,
-  describeUnknownReleaseFlags,
-  findUnknownReleaseFlags,
-  RELEASE_FLAGS,
-  RELEASE_VALUE_FLAGS,
+  createReleaseFlagSpecFromOptions,
+  describeReleaseFlagProblems,
+  getReleaseFlagProblemsFromArgv,
   wantsHelp,
 } from "@ava-cli/ReleaseCli/releaseFlagUtils/releaseFlagUtils";
 import { describe, expect, it } from "vitest";
 import type { ReleaseFlagProblem } from "@ava-cli/ReleaseCli/releaseFlagUtils/releaseFlagUtils";
 
-/** `findUnknownReleaseFlags` against the flags `ava release` accepts. */
-function _findUnknownFlagsForRelease(
+/** The options `ava release` declares, as the release filter sees them. */
+const RELEASE_FLAG_SPEC = createReleaseFlagSpecFromOptions(
+  ReleaseCli.state.optionArgs,
+);
+
+/** `getReleaseFlagProblemsFromArgv` against the options `ava release` takes. */
+function _getReleaseFlagProblemsForRelease(
   argv: readonly string[],
 ): readonly ReleaseFlagProblem[] {
-  return findUnknownReleaseFlags({
-    argv,
-    acceptedFlags: RELEASE_FLAGS,
-    valueFlags: RELEASE_VALUE_FLAGS,
-  });
+  return getReleaseFlagProblemsFromArgv({ argv, ...RELEASE_FLAG_SPEC });
 }
 
 /**
@@ -29,8 +30,59 @@ function _findUnknownFlagsForRelease(
  */
 const UNICODE_DASHES = ["\u2013", "\u2014", "\u2212"] as const;
 
-describe("findUnknownReleaseFlags", () => {
-  it("accepts every supported flag and alias", () => {
+/** One problem of every kind, so a new kind must be added here to compile. */
+const PROBLEM_OF_EACH_KIND: Record<
+  ReleaseFlagProblem["kind"],
+  ReleaseFlagProblem
+> = {
+  "unknown-flag": { kind: "unknown-flag", token: "--dryrun" },
+  "inline-value": {
+    kind: "inline-value",
+    token: "--yes=false",
+    flag: "--yes",
+    value: "false",
+    takesValue: false,
+  },
+  "stray-value": { kind: "stray-value", token: "dry-run" },
+  "unicode-dash-flag": { kind: "unicode-dash-flag", token: "\u2013dry-run" },
+};
+
+describe("createReleaseFlagSpecFromOptions", () => {
+  const OPTIONS = {
+    "--version": {
+      name: "--version",
+      aliases: ["-v"],
+      type: "string",
+    },
+    "--count": { name: "--count", type: "number" },
+    "--yes": { name: "--yes", aliases: ["-y"], type: "boolean" },
+  } as const;
+
+  it("takes a value only after a non-boolean option, its aliases, or a global option", () => {
+    expect(createReleaseFlagSpecFromOptions(OPTIONS).valueFlags).toEqual([
+      "--version",
+      "-v",
+      "--count",
+      ...AVA_GLOBAL_FLAGS,
+    ]);
+  });
+
+  it("accepts every declared option and alias, the help options, and the global options", () => {
+    expect(createReleaseFlagSpecFromOptions(OPTIONS).acceptedFlags).toEqual([
+      "--version",
+      "-v",
+      "--count",
+      "--yes",
+      "-y",
+      "--help",
+      "-h",
+      ...AVA_GLOBAL_FLAGS,
+    ]);
+  });
+});
+
+describe("getReleaseFlagProblemsFromArgv", () => {
+  it("accepts every supported option and alias", () => {
     const argv = [
       "release",
       "--version",
@@ -43,24 +95,30 @@ describe("findUnknownReleaseFlags", () => {
       "--skip-changelog",
     ];
 
-    expect(_findUnknownFlagsForRelease(argv)).toEqual([]);
+    expect(_getReleaseFlagProblemsForRelease(argv)).toEqual([]);
   });
 
   it("accepts the global --env option and its value", () => {
     expect(
-      _findUnknownFlagsForRelease(["release", "--env", "staging"]),
+      _getReleaseFlagProblemsForRelease(["release", "--env", "staging"]),
     ).toEqual([]);
   });
 
   it("accepts the value after each value-taking alias", () => {
     expect(
-      _findUnknownFlagsForRelease(["release", "-v", "0.15.0", "-n", "0.15.1"]),
+      _getReleaseFlagProblemsForRelease([
+        "release",
+        "-v",
+        "0.15.0",
+        "-n",
+        "0.15.1",
+      ]),
     ).toEqual([]);
   });
 
-  it("accepts the command words before the first flag", () => {
+  it("accepts the command words before the first option", () => {
     expect(
-      findUnknownReleaseFlags({
+      getReleaseFlagProblemsFromArgv({
         argv: ["release", "notes", "--update"],
         acceptedFlags: ["--update"],
         valueFlags: [],
@@ -68,24 +126,53 @@ describe("findUnknownReleaseFlags", () => {
     ).toEqual([]);
   });
 
-  it("catches a mistyped flag, which would otherwise be ignored silently", () => {
-    expect(_findUnknownFlagsForRelease(["release", "--dryrun"])).toEqual([
+  it("catches a mistyped option, which would otherwise be ignored silently", () => {
+    expect(_getReleaseFlagProblemsForRelease(["release", "--dryrun"])).toEqual([
       { kind: "unknown-flag", token: "--dryrun" },
     ]);
     expect(
-      _findUnknownFlagsForRelease(["release", "--dry_run", "--yes"]),
+      _getReleaseFlagProblemsForRelease(["release", "--dry_run", "--yes"]),
     ).toEqual([{ kind: "unknown-flag", token: "--dry_run" }]);
   });
 
-  it("does not mistake an option value for a flag", () => {
+  it("reports only the unknown option when a word follows it, as its value", () => {
     expect(
-      _findUnknownFlagsForRelease(["release", "--version", "0.11.0"]),
+      _getReleaseFlagProblemsForRelease(["release", "--verison", "0.11.0"]),
+    ).toEqual([{ kind: "unknown-flag", token: "--verison" }]);
+  });
+
+  it("refuses a second word after an unknown option", () => {
+    expect(
+      _getReleaseFlagProblemsForRelease([
+        "release",
+        "--verison",
+        "0.11.0",
+        "extra",
+      ]),
+    ).toEqual([
+      { kind: "unknown-flag", token: "--verison" },
+      { kind: "stray-value", token: "extra" },
+    ]);
+  });
+
+  it("refuses a word after an unknown --option=value token", () => {
+    expect(
+      _getReleaseFlagProblemsForRelease(["release", "--nope=1", "extra"]),
+    ).toEqual([
+      { kind: "unknown-flag", token: "--nope=1" },
+      { kind: "stray-value", token: "extra" },
+    ]);
+  });
+
+  it("does not mistake an option value for an option", () => {
+    expect(
+      _getReleaseFlagProblemsForRelease(["release", "--version", "0.11.0"]),
     ).toEqual([]);
   });
 
-  it("does not read a value containing = as a --flag=value token", () => {
+  it("does not read a value containing = as an --option=value token", () => {
     expect(
-      _findUnknownFlagsForRelease(["release", "--version", "a=b"]),
+      _getReleaseFlagProblemsForRelease(["release", "--version", "a=b"]),
     ).toEqual([]);
   });
 
@@ -93,14 +180,14 @@ describe("findUnknownReleaseFlags", () => {
     "refuses a bare word after the switch %s, which would become its value",
     (switchFlag) => {
       expect(
-        _findUnknownFlagsForRelease(["release", switchFlag, "dry-run"]),
+        _getReleaseFlagProblemsForRelease(["release", switchFlag, "dry-run"]),
       ).toEqual([{ kind: "stray-value", token: "dry-run" }]);
     },
   );
 
   it("refuses a bare word after ava release notes --update", () => {
     expect(
-      findUnknownReleaseFlags({
+      getReleaseFlagProblemsFromArgv({
         argv: ["release", "notes", "--update", "dry-run"],
         acceptedFlags: ["--version", "--update", "--dry-run"],
         valueFlags: ["--version"],
@@ -108,42 +195,47 @@ describe("findUnknownReleaseFlags", () => {
     ).toEqual([{ kind: "stray-value", token: "dry-run" }]);
   });
 
-  it("refuses a second word after a value-taking flag's value", () => {
+  it("refuses a second word after a value-taking option's value", () => {
     expect(
-      _findUnknownFlagsForRelease(["release", "--version", "0.15.0", "0.15.1"]),
+      _getReleaseFlagProblemsForRelease([
+        "release",
+        "--version",
+        "0.15.0",
+        "0.15.1",
+      ]),
     ).toEqual([{ kind: "stray-value", token: "0.15.1" }]);
   });
 
   it.each(UNICODE_DASHES)(
-    "refuses a flag whose dashes became the long dash %s",
+    "refuses an option whose dashes became the long dash %s",
     (dash) => {
       const token = `${dash}dry-run`;
 
-      expect(_findUnknownFlagsForRelease(["release", "--yes", token])).toEqual([
-        { kind: "unicode-dash-flag", token },
-      ]);
+      expect(
+        _getReleaseFlagProblemsForRelease(["release", "--yes", token]),
+      ).toEqual([{ kind: "unicode-dash-flag", token }]);
     },
   );
 
-  it("refuses a long-dash flag in place of the first flag", () => {
+  it("refuses a long-dash option in place of the first option", () => {
     const token = "\u2013dry-run";
 
-    expect(_findUnknownFlagsForRelease(["release", token])).toEqual([
+    expect(_getReleaseFlagProblemsForRelease(["release", token])).toEqual([
       { kind: "unicode-dash-flag", token },
     ]);
   });
 
-  it("does not take a long-dash flag as a value-taking flag's value", () => {
+  it("does not take a long-dash option as a value-taking option's value", () => {
     const token = "\u2014yes";
 
     expect(
-      _findUnknownFlagsForRelease(["release", "--version", token]),
+      _getReleaseFlagProblemsForRelease(["release", "--version", token]),
     ).toEqual([{ kind: "unicode-dash-flag", token }]);
   });
 
   it("refuses --dry-run=true as an inline value even though --dry-run is accepted", () => {
     expect(
-      _findUnknownFlagsForRelease(["release", "--dry-run=true", "--yes"]),
+      _getReleaseFlagProblemsForRelease(["release", "--dry-run=true", "--yes"]),
     ).toEqual([
       {
         kind: "inline-value",
@@ -155,69 +247,84 @@ describe("findUnknownReleaseFlags", () => {
     ]);
   });
 
-  it("refuses --version=1.0.0 as an inline value of a value-taking flag", () => {
-    expect(_findUnknownFlagsForRelease(["release", "--version=1.0.0"])).toEqual(
-      [
-        {
-          kind: "inline-value",
-          token: "--version=1.0.0",
-          flag: "--version",
-          value: "1.0.0",
-          takesValue: true,
-        },
-      ],
-    );
+  it("refuses --yes=false as an inline value of a switch", () => {
+    expect(
+      _getReleaseFlagProblemsForRelease(["release", "--yes=false"]),
+    ).toEqual([
+      {
+        kind: "inline-value",
+        token: "--yes=false",
+        flag: "--yes",
+        value: "false",
+        takesValue: false,
+      },
+    ]);
   });
 
-  it("refuses an unsupported --flag=value token whole, as an unknown flag", () => {
-    expect(_findUnknownFlagsForRelease(["release", "--nope=1"])).toEqual([
+  it("refuses --version=1.0.0 as an inline value of a value-taking option", () => {
+    expect(
+      _getReleaseFlagProblemsForRelease(["release", "--version=1.0.0"]),
+    ).toEqual([
+      {
+        kind: "inline-value",
+        token: "--version=1.0.0",
+        flag: "--version",
+        value: "1.0.0",
+        takesValue: true,
+      },
+    ]);
+  });
+
+  it("refuses an unsupported --option=value token whole, as an unknown option", () => {
+    expect(_getReleaseFlagProblemsForRelease(["release", "--nope=1"])).toEqual([
       { kind: "unknown-flag", token: "--nope=1" },
     ]);
   });
 
-  it("uses the given acceptedFlags, not RELEASE_FLAGS", () => {
+  it("uses the given acceptedFlags, not the ones ava release takes", () => {
     expect(
-      findUnknownReleaseFlags({
+      getReleaseFlagProblemsFromArgv({
         argv: ["notes", "--update", "--next", "0.1.1"],
         acceptedFlags: ["--update"],
         valueFlags: [],
       }),
-    ).toEqual([
-      { kind: "unknown-flag", token: "--next" },
-      { kind: "stray-value", token: "0.1.1" },
-    ]);
+    ).toEqual([{ kind: "unknown-flag", token: "--next" }]);
   });
 });
 
-describe("describeUnknownReleaseFlags", () => {
-  it("names a single unknown flag", () => {
-    expect(
-      describeUnknownReleaseFlags([
-        { kind: "unknown-flag", token: "--dryrun" },
-      ]),
-    ).toBe("Unknown option: --dryrun.");
+describe("describeReleaseFlagProblems", () => {
+  /** The refusal for `problems` when `--version` and `-v` take a value. */
+  function _describe(problems: readonly ReleaseFlagProblem[]): string {
+    return describeReleaseFlagProblems({
+      problems,
+      valueFlags: ["--version", "-v"],
+    });
+  }
+
+  it("names a single unknown option", () => {
+    expect(_describe([{ kind: "unknown-flag", token: "--dryrun" }])).toBe(
+      "Unknown option: --dryrun.",
+    );
   });
 
-  it("names several unknown flags in the plural", () => {
+  it("names several unknown options in the plural", () => {
     expect(
-      describeUnknownReleaseFlags([
+      _describe([
         { kind: "unknown-flag", token: "--dryrun" },
         { kind: "unknown-flag", token: "--alpha" },
       ]),
     ).toBe("Unknown options: --dryrun, --alpha.");
   });
 
-  it("calls an unknown --flag=value token an unknown option", () => {
-    expect(
-      describeUnknownReleaseFlags([
-        { kind: "unknown-flag", token: "--nope=1" },
-      ]),
-    ).toBe("Unknown option: --nope=1.");
+  it("calls an unknown --option=value token an unknown option", () => {
+    expect(_describe([{ kind: "unknown-flag", token: "--nope=1" }])).toBe(
+      "Unknown option: --nope=1.",
+    );
   });
 
-  it("tells the user to pass a switch on its own", () => {
+  it("tells the user a switch given true takes no value", () => {
     expect(
-      describeUnknownReleaseFlags([
+      _describe([
         {
           kind: "inline-value",
           token: "--dry-run=true",
@@ -226,12 +333,32 @@ describe("describeUnknownReleaseFlags", () => {
           takesValue: false,
         },
       ]),
-    ).toBe("Pass `--dry-run` on its own, not `--dry-run=true`.");
+    ).toBe(
+      "`--dry-run=true`: `--dry-run` takes no value. Pass it to turn it " +
+        "on, or leave it out.",
+    );
   });
 
-  it("tells the user to write a value-taking flag and its value as two words", () => {
+  it("tells the user to leave out a switch given false, not to pass it", () => {
     expect(
-      describeUnknownReleaseFlags([
+      _describe([
+        {
+          kind: "inline-value",
+          token: "--yes=false",
+          flag: "--yes",
+          value: "false",
+          takesValue: false,
+        },
+      ]),
+    ).toBe(
+      "`--yes=false`: `--yes` takes no value. Pass it to turn it on, or " +
+        "leave it out.",
+    );
+  });
+
+  it("tells the user to write a value-taking option and its value as two words", () => {
+    expect(
+      _describe([
         {
           kind: "inline-value",
           token: "--version=1.0.0",
@@ -243,26 +370,43 @@ describe("describeUnknownReleaseFlags", () => {
     ).toBe("Write `--version 1.0.0`, not `--version=1.0.0`.");
   });
 
-  it("names a stray word and says which flags take a value", () => {
-    expect(
-      describeUnknownReleaseFlags([{ kind: "stray-value", token: "dry-run" }]),
-    ).toBe(
-      "Unexpected word: dry-run. A flag starts with `--`, and only an " +
-        "option such as `--version` takes a value.",
+  it("names a stray word and the command's options that take a value", () => {
+    expect(_describe([{ kind: "stray-value", token: "dry-run" }])).toBe(
+      "Unexpected word: dry-run. An option starts with `--`, and only " +
+        "these options take a value: `--version`, `-v`.",
     );
   });
 
-  it("tells the user to retype a long-dash flag with plain hyphens", () => {
+  it("names a stray word in a command with no option that takes a value", () => {
+    expect(
+      describeReleaseFlagProblems({
+        problems: [{ kind: "stray-value", token: "dry-run" }],
+        valueFlags: [],
+      }),
+    ).toBe(
+      "Unexpected word: dry-run. An option starts with `--`, and no " +
+        "option here takes a value.",
+    );
+  });
+
+  it("tells the user to retype a long-dash option with plain hyphens", () => {
     const token = "\u2013dry-run";
 
-    expect(
-      describeUnknownReleaseFlags([{ kind: "unicode-dash-flag", token }]),
-    ).toBe(`Retype the dashes as plain hyphens (-): ${token}.`);
+    expect(_describe([{ kind: "unicode-dash-flag", token }])).toBe(
+      `Retype the dashes as plain hyphens (-): ${token}.`,
+    );
   });
+
+  it.each(Object.values(PROBLEM_OF_EACH_KIND))(
+    "never describes a $kind problem with an empty message",
+    (problem) => {
+      expect(_describe([problem])).not.toBe("");
+    },
+  );
 
   it("reports each kind of problem in its own sentence", () => {
     expect(
-      describeUnknownReleaseFlags([
+      _describe([
         { kind: "unknown-flag", token: "--dryrun" },
         {
           kind: "inline-value",
@@ -274,9 +418,12 @@ describe("describeUnknownReleaseFlags", () => {
         { kind: "stray-value", token: "yes" },
       ]),
     ).toBe(
-      "Unknown option: --dryrun. Unexpected word: yes. A flag starts with " +
-        "`--`, and only an option such as `--version` takes a value. " +
+      [
+        "Unknown option: --dryrun.",
+        "Unexpected word: yes. An option starts with `--`, and only these",
+        "options take a value: `--version`, `-v`.",
         "Write `--version 1.0.0`, not `--version=1.0.0`.",
+      ].join(" "),
     );
   });
 });
@@ -299,7 +446,7 @@ describe("AVA_GLOBAL_FLAGS", () => {
 });
 
 describe("wantsHelp", () => {
-  it("detects both help flags", () => {
+  it("detects both help options", () => {
     expect(wantsHelp(["release", "--help"])).toBe(true);
     expect(wantsHelp(["release", "-h"])).toBe(true);
   });

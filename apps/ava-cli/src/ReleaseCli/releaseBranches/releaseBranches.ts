@@ -10,8 +10,11 @@ export const DEV_VERSION_SUFFIX = "-dev";
 /** The workflow whose verdict on `develop` gates a release. */
 export const SOURCE_CI_WORKFLOW = "staging.yaml";
 
-/** The workflow that runs when `main` is pushed. */
+/** The workflow that runs when the release target branch is pushed. */
 export const TARGET_DEPLOY_WORKFLOW = "production.yaml";
 
-/** What pushing `main` does, warned about before the last confirmation. */
+/**
+ * What pushing the release target branch does, warned about before the last
+ * confirmation.
+ */
 export const DEPLOY_WARNING = `Pushing ${RELEASE_TARGET_BRANCH} deploys production and migrates the production database.`;

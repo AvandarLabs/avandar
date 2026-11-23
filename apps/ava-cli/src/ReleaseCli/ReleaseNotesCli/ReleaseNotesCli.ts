@@ -2,9 +2,9 @@ import { createReleaseCommands } from "@ava-cli/ReleaseCli/createReleaseCommands
 import { listSortedReleaseTags } from "@ava-cli/ReleaseCli/releaseChangelog/collectReleaseChangelogCommits/collectReleaseChangelogCommits";
 import { publishReleaseNotes } from "@ava-cli/ReleaseCli/releaseChangelog/publishReleaseNotes/publishReleaseNotes";
 import {
-  AVA_GLOBAL_FLAGS,
-  describeUnknownReleaseFlags,
-  findUnknownReleaseFlags,
+  createReleaseFlagSpecFromOptions,
+  describeReleaseFlagProblems,
+  getReleaseFlagProblemsFromArgv,
   wantsHelp,
 } from "@ava-cli/ReleaseCli/releaseFlagUtils/releaseFlagUtils";
 import { promptForVersion } from "@ava-cli/ReleaseCli/releasePromptHelpers";
@@ -48,31 +48,6 @@ type ReleaseNotesCliArgs = {
   dryRun: boolean;
   update?: boolean;
 };
-
-/**
- * Every flag `ava release notes` accepts, including aliases. Acclimate drops an
- * option it does not recognise, so any other flag is refused: a removed or
- * mistyped flag would otherwise publish notes the user did not ask for.
- */
-const RELEASE_NOTES_FLAGS = [
-  "--version",
-  "-v",
-  "--update",
-  "--dry-run",
-  "--help",
-  "-h",
-  ...AVA_GLOBAL_FLAGS,
-] as const;
-
-/**
- * The flags `ava release notes` accepts that take a value, so a word after
- * any other flag is refused rather than silently becoming that flag's value.
- */
-const RELEASE_NOTES_VALUE_FLAGS = [
-  "--version",
-  "-v",
-  ...AVA_GLOBAL_FLAGS,
-] as const;
 
 /**
  * The bare `X.Y.Z` of the newest release tag, or undefined when there is none.
@@ -199,15 +174,23 @@ export const ReleaseNotesCli = Acclimate.createCLI("notes")
       printInfo(USAGE);
       return undefined;
     }
-    const flagProblems = findUnknownReleaseFlags({
+    // Acclimate drops an option it does not recognise, so any other option
+    // is refused: a mistyped one would otherwise publish notes the user did
+    // not ask for.
+    const flagSpec = createReleaseFlagSpecFromOptions(
+      ReleaseNotesCli.state.optionArgs,
+    );
+    const flagProblems = getReleaseFlagProblemsFromArgv({
       argv,
-      acceptedFlags: RELEASE_NOTES_FLAGS,
-      valueFlags: RELEASE_NOTES_VALUE_FLAGS,
+      ...flagSpec,
     });
     if (flagProblems.length > 0) {
+      const problemText = describeReleaseFlagProblems({
+        problems: flagProblems,
+        valueFlags: flagSpec.valueFlags,
+      });
       printError(
-        `${describeUnknownReleaseFlags(flagProblems)} Nothing was published; ` +
-          "run `ava release notes --help`.",
+        `${problemText} Nothing was published; run \`ava release notes --help\`.`,
       );
       process.exitCode = 1;
       return undefined;

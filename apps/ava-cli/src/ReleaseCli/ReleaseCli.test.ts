@@ -8,12 +8,15 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { DEFAULT_ENV_NAME } from "@ava-cli/AvaEnv/AvaEnv";
+import {
+  expectRefusalWithoutCall,
+  runAvaThroughRealParser,
+  waitForFirstCall,
+} from "@ava-cli/ReleaseCli/__tests__/runAvaThroughRealParser";
 import { checkSourceBranchCi } from "@ava-cli/ReleaseCli/checkSourceBranchCi/checkSourceBranchCi";
 import { ReleaseCli } from "@ava-cli/ReleaseCli/ReleaseCli";
 import { promptToConfirm } from "@ava-cli/ReleaseCli/releasePromptHelpers";
 import { runRelease } from "@ava-cli/ReleaseCli/runRelease/runRelease";
-import { Acclimate } from "@avandar/acclimate";
 import { noop } from "@avandar/utils";
 import {
   afterAll,
@@ -926,28 +929,8 @@ describe("ava release --help", () => {
   });
 });
 
-/**
- * Run `ava release <flags>` through Acclimate's real argument parser, from a
- * root CLI cut down to what routes the command: the global `--env` option
- * `main.ts` declares and the `release` command. Acclimate does not hand back a
- * promise, so the caller waits for the outcome it expects.
- */
-function _runAvaRelease(flags: readonly string[]): void {
-  process.argv = [process.execPath, "ava", "release", ...flags];
-  Acclimate.run(
-    Acclimate.createCLI("ava")
-      .addGlobalOption({
-        name: "--env",
-        type: "string",
-        required: false,
-        defaultValue: DEFAULT_ENV_NAME,
-      })
-      .addCommand("release", ReleaseCli),
-  );
-}
-
 /** What `ava release` hands `runRelease` when only `overrides` were passed. */
-function _buildReleaseOptions(
+function _createReleaseOptions(
   overrides: Readonly<Partial<ReleaseOptions>>,
 ): ReleaseOptions {
   return {
@@ -959,6 +942,11 @@ function _buildReleaseOptions(
     skipChangelog: false,
     ...overrides,
   };
+}
+
+/** Run `ava release <flags>` through Acclimate's real argument parser. */
+function _runAvaRelease(flags: readonly string[]): void {
+  runAvaThroughRealParser(["release", ...flags]);
 }
 
 describe("ava release through the real argument parser", () => {
@@ -985,42 +973,76 @@ describe("ava release through the real argument parser", () => {
 
   /** Wait for the action to refuse, then prove no release started. */
   const _expectRefusal = async (expectedText: string): Promise<void> => {
-    await vi.waitFor(() => {
-      expect(process.exitCode).toBe(1);
+    await expectRefusalWithoutCall({
+      expectedText,
+      readOutput: _stdoutText,
+      guardedFunction: vi.mocked(runRelease),
     });
-    expect(_stdoutText()).toContain(expectedText);
-    expect(runRelease).not.toHaveBeenCalled();
   };
 
   /** Wait for the action to start the release, and return its options. */
-  const _waitForReleaseOptions = async (): Promise<unknown> => {
-    await vi.waitFor(() => {
-      expect(runRelease).toHaveBeenCalled();
-    });
-    return vi.mocked(runRelease).mock.calls[0]?.[0];
+  const _waitForReleaseOptions = async (): Promise<ReleaseOptions> => {
+    const [releaseOptions] = await waitForFirstCall(vi.mocked(runRelease));
+    return releaseOptions;
   };
 
   it("parses --dry-run as dryRun: true", async () => {
     _runAvaRelease(["--dry-run"]);
 
     expect(await _waitForReleaseOptions()).toEqual(
-      _buildReleaseOptions({ dryRun: true }),
+      _createReleaseOptions({ dryRun: true }),
     );
   });
 
   it("refuses --dry-run=true --yes with exit code 1, starting no release", async () => {
     _runAvaRelease(["--dry-run=true", "--yes"]);
 
-    await _expectRefusal("--dry-run=true");
+    await _expectRefusal(
+      "`--dry-run=true`: `--dry-run` takes no value. Pass it to turn it on, " +
+        "or leave it out.",
+    );
+  });
+
+  it("refuses --yes=false, telling the user to leave --yes out", async () => {
+    _runAvaRelease(["--yes=false"]);
+
+    await _expectRefusal(
+      "`--yes=false`: `--yes` takes no value. Pass it to turn it on, or " +
+        "leave it out.",
+    );
+  });
+
+  it("refuses --dry-run=false, telling the user to leave --dry-run out", async () => {
+    _runAvaRelease(["--dry-run=false"]);
+
+    await _expectRefusal(
+      "`--dry-run=false`: `--dry-run` takes no value. Pass it to turn it " +
+        "on, or leave it out.",
+    );
   });
 
   it("refuses --yes dry-run, which would otherwise release for real", async () => {
     _runAvaRelease(["--yes", "dry-run"]);
 
-    await _expectRefusal("dry-run");
+    await _expectRefusal("Unexpected word: dry-run.");
   });
 
-  it("refuses a flag typed with a long dash after --yes", async () => {
+  it("names the release's value options when refusing a stray word", async () => {
+    _runAvaRelease(["--yes", "dry-run"]);
+
+    await _expectRefusal(
+      "only these options take a value: `--version`, `-v`, `--next`, `-n`, " +
+        "`--env`.",
+    );
+  });
+
+  it("refuses a mistyped --verison 0.11.0 with only the unknown option", async () => {
+    _runAvaRelease(["--verison", "0.11.0"]);
+
+    await _expectRefusal("Unknown option: --verison. Nothing was released;");
+  });
+
+  it("refuses an option typed with a long dash after --yes", async () => {
     // An en dash, as an editor's autocorrect turns a pasted `--` into.
     const token = "\u2013dry-run";
     _runAvaRelease(["--yes", token]);
@@ -1032,7 +1054,7 @@ describe("ava release through the real argument parser", () => {
     _runAvaRelease(["--version", "0.15.0"]);
 
     expect(await _waitForReleaseOptions()).toEqual(
-      _buildReleaseOptions({ version: "0.15.0" }),
+      _createReleaseOptions({ version: "0.15.0" }),
     );
   });
 
@@ -1040,7 +1062,7 @@ describe("ava release through the real argument parser", () => {
     _runAvaRelease(["--env", "staging", "--dry-run"]);
 
     expect(await _waitForReleaseOptions()).toEqual(
-      _buildReleaseOptions({ dryRun: true }),
+      _createReleaseOptions({ dryRun: true }),
     );
     expect(process.exitCode).toBeUndefined();
   });
