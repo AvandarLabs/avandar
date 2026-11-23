@@ -135,6 +135,14 @@ file-specific overrides, and source disable comments are retained. Only a
 canonical error-severity native diagnostic inside the appended seed with a
 nonzero engine status can prove the named capability. A warning cannot borrow
 another capability's nonzero status. Reviewed source is never modified.
+Original native/custom and Stylelint disable directives also retain affected
+whole-file capabilities in fallback, including regions that are later re-enabled
+and line/next-line directives. A tail seed proves only its own location. Named
+directives preserve independent rule names; namespace aliases are matched
+conservatively. Blanket or ambiguous directive payloads retain all applicable
+detectors. The conservative text scan can also
+match directive-like strings or unusual comments. It does not parse source,
+classify regions, edit directives or inject enables.
 Unknown commands, missing engines, excluded paths, disabled rules, and
 operational or unsupported outcomes stay fallback.
 

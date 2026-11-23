@@ -15,6 +15,8 @@ import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve, sep } from "node:path";
 // oxlint-disable-next-line import/extensions -- Node needs source extensions.
 import { getNativePluginContext } from "./getNativePluginContext.ts";
+// oxlint-disable-next-line import/extensions -- Node needs source extensions.
+import { getSuppressedRuleNames } from "./getSuppressedRuleNames.ts";
 import type { CoverageEvidence, CoverageProbe } from "./coverage.ts";
 
 const CAPABILITIES = [
@@ -188,6 +190,7 @@ type Listing = { paths: Set<string>; operational: boolean };
 type Invocation = { binary: string; args: string[] };
 type PluginContext = ReturnType<typeof getNativePluginContext>;
 type Proof = {
+  suppressedRuleNames?: string[];
   hasProvenPluginContext?: boolean;
   evidence: CoverageEvidence;
   diagnostics: Diagnostic[];
@@ -581,6 +584,7 @@ function _createProofFromEngine(
   localPath: string,
   capabilityRanges: Proof["capabilityRanges"],
   context: PluginContext,
+  suppressedRuleNames: string[],
 ): Proof {
   const diagnostics = _getDiagnostics(result.stdout);
   const operational =
@@ -593,6 +597,7 @@ function _createProofFromEngine(
         return diagnostic.severity === "error";
       });
   return {
+    suppressedRuleNames,
     hasProvenPluginContext:
       context.isSupported && context.hasOfficialRegistration,
     diagnostics: diagnostics ?? [],
@@ -629,6 +634,7 @@ async function _proveSeed(
       localPath,
       capabilityRanges,
       context,
+      getSuppressedRuleNames(source, "native"),
     );
   } catch (error) {
     if (!(error instanceof UnsupportedProofContext)) {
@@ -777,7 +783,12 @@ function _createProbe(
         ? `avandar(${nativeRule})`
         : NATIVE_CODES[nativeRule]!;
       const hasProvenContext = _hasProvenRuleContext(proof, ruleId, path);
+      const hasSuppression =
+        proof.suppressedRuleNames?.some((name) => {
+          return name === "*" || name === nativeRule;
+        }) === true;
       const diagnosed =
+        !hasSuppression &&
         hasProvenContext &&
         (!requiresOriginalModule || hasOriginalModule) &&
         _hasDiagnostic(
@@ -786,8 +797,9 @@ function _createProbe(
           code,
           CUSTOM_RULE_IDS.includes(ruleId) ? `${ruleId}:` : undefined,
         );
-      const recovery =
-        !hasProvenContext && proof.mirrorPath && proof.evidence.operational
+      const recovery = hasSuppression
+        ? "Run fallback review for original suppression contexts. A tail seed cannot prove enforcement in disabled regions or lines, even after re-enable."
+        : !hasProvenContext && proof.mirrorPath && proof.evidence.operational
           ? "Run fallback review for this plugin runtime context. Only the matching installed official Avandar implementation with supported registrations and original filename boundaries has proven mirrored applicability."
           : requiresOriginalModule &&
               !hasOriginalModule &&

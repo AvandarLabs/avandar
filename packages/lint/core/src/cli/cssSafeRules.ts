@@ -3,6 +3,8 @@ import { existsSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { join, relative, sep } from "node:path";
 import { pathToFileURL } from "node:url";
+// oxlint-disable-next-line import/extensions -- Node needs source extensions.
+import { getSuppressedRuleNames } from "./getSuppressedRuleNames.ts";
 import type { CoverageEvidence, CoverageProbe } from "./coverage.ts";
 
 const UNPROVEN: CoverageEvidence = {
@@ -130,7 +132,22 @@ async function _provePath(
   } catch {
     return UNPROVEN;
   }
-  return _runProof({ engine, files, path, cwd });
+  const suppressed = getSuppressedRuleNames(
+    readFileSync(path, "utf8"),
+    "css",
+  ).some((name) => {
+    return name === "*" || name === "canonical-block-comments";
+  });
+  const evidence = await _runProof({ engine, files, path, cwd });
+  return suppressed
+    ? {
+        ...evidence,
+        enabled: false,
+        diagnosticRuleIds: [],
+        recovery:
+          "Run fallback review for original CSS suppression contexts. A tail seed cannot prove enforcement in disabled regions or lines, even after re-enable.",
+      }
+    : evidence;
 }
 
 /**

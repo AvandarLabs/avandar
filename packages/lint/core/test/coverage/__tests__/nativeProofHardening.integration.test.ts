@@ -595,11 +595,11 @@ it("keeps same basenames independent under error warning and disabled overrides"
 });
 
 it.each([false, true])(
-  "preserves source directives with reenabled=%s",
+  "retains suppression fallback and source bytes with reenabled=%s",
   async (reenabled) => {
     const directory = _repository();
     const source =
-      "export {};\nif (Boolean(1)) consume();\n/* eslint-disable curly */\n" +
+      "export {};\n/* eslint-disable curly */\nif (Boolean(1)) consume();\n" +
       (reenabled ? "/* eslint-enable curly */\n" : "");
     writeFileSync(join(directory, "src/reviewed.tsx"), source);
     const result = await collectCoverage({
@@ -612,7 +612,7 @@ it.each([false, true])(
     expect(result.outcomes).toContainEqual(
       expect.objectContaining({
         ruleId: "AF-01",
-        state: reenabled ? "enforced" : "fallback",
+        state: "fallback",
       }),
     );
     expect(readFileSync(join(directory, "src/reviewed.tsx"), "utf8")).toBe(

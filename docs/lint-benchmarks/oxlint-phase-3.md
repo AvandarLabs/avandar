@@ -456,3 +456,30 @@ package/dist/oxlint.js
 package/dist/oxlint.js.map
 package/package.json
 ```
+
+
+### Original suppression-context limit
+
+Coverage's appended errors prove their own locations. An original native/custom
+`eslint-disable` or `oxlint-disable`, or a CSS `stylelint-disable`, therefore
+retains the affected whole-file capability in fallback even after re-enable.
+Line and next-line forms have the same boundary. Named directives preserve
+unaffected capabilities; blanket and ambiguous directives retain all applicable
+detectors. A conservative text scan may also match directive-like strings or
+unusual comments. No parser, region contract, source mutation or injected enable
+is introduced. The public handoff receives explicit affected fallback rows and
+uncovered summaries, so it cannot omit those manual checks.
+
+This producer-only correction adds no engine children or selection scans. Native
+and CSS provider serialization and time/output limits remain unchanged. The
+normal root lint median above is retained; no root benchmark was repeated for
+this loader-only change. The core archive record below supersedes the earlier
+core size because the compiled producer artifact changed. Ecosystem rule
+artifacts are unchanged.
+
+
+Refreshed `@avandar/lint` archive: **63,795 bytes**, from the final core build
+and `pnpm --filter @avandar/lint pack --pack-destination <owned internal temp>`.
+Its 18 entries remain the same manifest, LICENSE, README and published `dist`
+files listed above. Both ecosystem archives are unchanged. The new archive was
+inspected and removed after measurement; no archive is a retained artifact.
