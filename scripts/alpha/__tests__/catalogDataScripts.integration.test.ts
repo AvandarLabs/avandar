@@ -26,6 +26,8 @@ const SCRIPTS_DIR = resolve(__dirname, "..");
 const TARGET_URL =
   "postgresql://postgres:s3cret-pass@db.example-ref.supabase.co:5432/postgres";
 const TARGET_ID = "postgres@db.example-ref.supabase.co";
+const SOURCE_URL =
+  "postgresql://postgres.demo-ref:src-s3cret@pooler.example.com:5432/postgres";
 const SOURCE_STORAGE_HOST = "demo-ref.supabase.co";
 const TARGET_STORAGE_HOST = "example-ref.supabase.co";
 
@@ -84,8 +86,8 @@ c2\tl1
 c3\tl2
 \\.
 
-COPY public.pipeline_executions (id, pipeline_name) FROM stdin;
-e1\tsocrata
+COPY public.pipeline_executions (id, pipeline_name, cli_argv, actor, host) FROM stdin;
+e1\tsocrata\t{run,--all}\tdeveloper@laptop.local\tlaptop.local
 \\.
 
 COPY public.pipeline_execution_scopes (id, execution_id, pipeline_name) FROM stdin;
@@ -108,7 +110,41 @@ const BACKUP_TABLES = [
   ...CATALOG_TABLES,
   "public.data_catalog_facet_counts",
   "public.datasets__open_data",
+  "public.datasets",
 ];
+
+/**
+ * The open data datasets a replace deletes, as the guard query prints them:
+ * dataset id, name, workspace id, name, member count, members without an
+ * @avandarlabs.com email, and the @avandarlabs.com emails.
+ */
+function _openDataDatasetRow(
+  datasetId: string,
+  workspaceId: string,
+  memberCount: number,
+  otherMemberCount: number,
+): string {
+  return [
+    datasetId,
+    "World Development Indicators (WDI)",
+    workspaceId,
+    `Workspace ${workspaceId}`,
+    String(memberCount),
+    String(otherMemberCount),
+    memberCount > otherMemberCount ? "pablo@avandarlabs.com" : "",
+  ].join(FIELD_SEPARATOR);
+}
+
+/** 4 open data datasets in 2 workspaces whose only member is Avandar's. */
+const AVANDAR_OPEN_DATA_DATASETS = [
+  _openDataDatasetRow("ds1", "ws1", 1, 0),
+  _openDataDatasetRow("ds2", "ws1", 1, 0),
+  _openDataDatasetRow("ds3", "ws2", 1, 0),
+  _openDataDatasetRow("ds4", "ws2", 1, 0),
+].join("\n");
+
+/** The cascade total: 4 `datasets__open_data` rows and 4 datasets. */
+const CASCADE_ROWS = "8";
 
 /** The ids 1 to 6, one per line, as the fake target reports them. */
 const SIX_IDS = "1\n2\n3\n4\n5\n6\n";
@@ -152,6 +188,12 @@ while (($#)); do
   case "$1" in
     --file)
       cp "$2" "$FAKE_STATE/wrapper.sql"
+      while IFS= read -r line; do
+        if [[ "$line" == "\\\\i '"*"'" ]]; then
+          loaded="\${line#"\\\\i '"}"
+          cp "\${loaded%"'"}" "$FAKE_STATE/loaded.sql"
+        fi
+      done < "$2"
       # A failed import rolls back, so only a successful one changes counts.
       exit_code="\${FAKE_IMPORT_EXIT:-0}"
       [[ "$exit_code" != 0 ]] || touch "$FAKE_STATE/imported"
@@ -163,14 +205,18 @@ while (($#)); do
 done
 case "$query" in
   *pg_constraint*) printf '%s' "\${FAKE_DEPENDENTS:-}" ;;
+  *"avandarlabs.com"*) printf '%s' "\${FAKE_OPEN_DATA_DATASETS:-}" ;;
   *pg_attribute*) echo 1 ;;
-  *"count(distinct dataset_id)"*) echo "$FAKE_ORPHANS" ;;
+  *"count(distinct dataset.id)"*) echo "$FAKE_ORPHANS" ;;
   *"source_type = 'open_data'"*) echo "$FAKE_ORPHANS" ;;
   "select count(*) from ("*) echo "\${FAKE_DEPENDENT_ROWS:-0}" ;;
   "select id::text from public.data_catalog_listings"*)
     printf '%s' "\${FAKE_TARGET_IDS:-}"
     ;;
   "select id::text from "*) printf '%s' "\${FAKE_DEPENDENT_IDS:-}" ;;
+  *"id::text in"*)
+    if [[ -f "$FAKE_STATE/imported" ]]; then echo 0; else echo "\${FAKE_REMAINING_DATASETS:-4}"; fi
+    ;;
   "select count(*) from "*)
     table="\${query#select count(*) from }"
     if [[ -f "$FAKE_STATE/imported" ]]; then
@@ -212,6 +258,8 @@ function _runScript(
       FAKE_DUMP_CONTENT: CATALOG_DUMP,
       FAKE_ORPHANS: `4${FIELD_SEPARATOR}2`,
       CATALOG_TABLES_SH: join(SCRIPTS_DIR, "catalogTables.sh"),
+      TARGET_DB_URL: TARGET_URL,
+      SOURCE_DB_URL: SOURCE_URL,
       ...env,
     },
   });
@@ -221,6 +269,7 @@ function _runScript(
     log: _readIfPresent(join(workDir, "calls.log")),
     psqlEnv: _readIfPresent(join(workDir, "env.log")),
     wrapper: _readIfPresent(join(workDir, "wrapper.sql")),
+    loaded: _readIfPresent(join(workDir, "loaded.sql")),
   };
 }
 
@@ -243,13 +292,7 @@ function _runImport(
 ) {
   return _runScript(
     "importCatalogData.sh",
-    [
-      TARGET_URL,
-      _writeDump(dump),
-      "--yes-i-know-the-target",
-      TARGET_ID,
-      ...extraArgs,
-    ],
+    [_writeDump(dump), "--yes-i-know-the-target", TARGET_ID, ...extraArgs],
     env,
   );
 }
@@ -270,13 +313,14 @@ function _runReplace(
 ) {
   return _runScript(
     "importCatalogData.sh",
-    [TARGET_URL, _writeDump(), "--replace-existing", ...extraArgs],
+    [_writeDump(), "--replace-existing", ...extraArgs],
     {
       FAKE_TARGET_ROWS: "6",
       FAKE_TARGET_IDS: SIX_IDS,
       FAKE_DEPENDENT_IDS: SIX_IDS,
       FAKE_DEPENDENTS: `${OPEN_DATA_DEPENDENT}\n`,
       FAKE_DEPENDENT_ROWS: "4",
+      FAKE_OPEN_DATA_DATASETS: `${AVANDAR_OPEN_DATA_DATASETS}\n`,
       ...env,
     },
   );
@@ -290,7 +334,7 @@ function _confirmedReplaceArgs(backup: string = _makeBackup()): string[] {
     "--yes-i-know-the-target",
     TARGET_ID,
     "--yes-i-know-the-cascade",
-    "4",
+    CASCADE_ROWS,
   ];
 }
 
@@ -310,6 +354,54 @@ function _rowCountCheckLines(): string[] {
   ];
 }
 
+/** The wrapper lines that refuse to commit a developer's command line. */
+const REDACTION_CHECK_LINES = [
+  "do $redacted$ begin",
+  "  if exists (select 1 from public.pipeline_executions where cli_argv is not null or actor is not null or host is not null) then",
+  "    raise exception 'public.pipeline_executions still holds a command line, actor, or host after the load.';",
+  "  end if;",
+  "end $redacted$;",
+];
+
+/** The statement that deletes every dataset added from the catalog. */
+const OPEN_DATA_DATASETS_DELETE =
+  "delete from public.datasets where id in (select dataset_id from public.datasets__open_data where catalog_listing_id in (select id from public.data_catalog_listings));";
+
+/**
+ * The whole-table lock: the catalog and `datasets__open_data`, which its
+ * cascade reaches, never `public.datasets` or the tables under it.
+ */
+const CATALOG_LOCK_LINE =
+  "lock table public.pipeline_scope_checkpoints, public.pipeline_execution_scopes, public.pipeline_executions, public.data_catalog_listings__relation_columns, public.data_catalog_listings, public.data_catalog_drives, public.datasets__open_data in share row exclusive mode;";
+
+/** The affected open data datasets' ids, as the wrapper selects them. */
+const AFFECTED_IDS =
+  "select dataset_id from public.datasets__open_data where catalog_listing_id in (select id from public.data_catalog_listings)";
+
+/** The affected datasets' workspaces, as the wrapper selects them. */
+const AFFECTED_WORKSPACES = `select workspace_id from public.datasets where id in (${AFFECTED_IDS})`;
+
+/** The row locks on only the affected datasets, workspaces, and members. */
+const ROW_LOCK_LINES = [
+  "do $locks$ begin",
+  `  perform 1 from public.datasets where id in (${AFFECTED_IDS}) for update;`,
+  `  perform 1 from public.workspaces where id in (${AFFECTED_WORKSPACES}) for update;`,
+  `  perform 1 from public.workspace_memberships where workspace_id in (${AFFECTED_WORKSPACES}) for update;`,
+  `  perform 1 from auth.users where id in (select user_id from public.workspace_memberships where workspace_id in (${AFFECTED_WORKSPACES})) for share;`,
+  "end $locks$;",
+];
+
+/** The wrapper's lines without the multi-line guard block. */
+function _linesWithoutGuard(wrapper: string): string[] {
+  const lines = wrapper.trim().split("\n");
+  const start = lines.indexOf("do $guard$");
+  const end = lines.indexOf("end $guard$;");
+  if (start === -1) {
+    return lines;
+  }
+  return [...lines.slice(0, start), ...lines.slice(end + 1)];
+}
+
 beforeEach(() => {
   workDir = mkdtempSync(join(tmpdir(), "catalog-data-scripts-"));
   _writeExecutable("pg_dump", FAKE_PG_DUMP);
@@ -322,10 +414,7 @@ afterEach(() => {
 
 describe("exportCatalogData.sh", SHELL_TEST_OPTIONS, () => {
   it("dumps data only, without disabling triggers", () => {
-    const run = _runScript("exportCatalogData.sh", [
-      "postgres://src",
-      join(workDir, "out.sql"),
-    ]);
+    const run = _runScript("exportCatalogData.sh", [join(workDir, "out.sql")]);
 
     expect(run.log).toMatch(/--data-only/);
     expect(run.log).not.toContain("--disable-triggers");
@@ -334,7 +423,7 @@ describe("exportCatalogData.sh", SHELL_TEST_OPTIONS, () => {
   it("dumps exactly the catalog tables", () => {
     const outFile = join(workDir, "out.sql");
 
-    const run = _runScript("exportCatalogData.sh", ["postgres://src", outFile]);
+    const run = _runScript("exportCatalogData.sh", [outFile]);
 
     expect(run.log.match(/--table public\.[a-z_]+/g)).toEqual(
       CATALOG_TABLES.map((table) => {
@@ -344,10 +433,7 @@ describe("exportCatalogData.sh", SHELL_TEST_OPTIONS, () => {
   });
 
   it("prints each table's row count from the dump", () => {
-    const run = _runScript("exportCatalogData.sh", [
-      "postgres://src",
-      join(workDir, "out.sql"),
-    ]);
+    const run = _runScript("exportCatalogData.sh", [join(workDir, "out.sql")]);
 
     expect(run.output).toContain("public.data_catalog_listings: 2");
     expect(run.output).toContain(
@@ -359,7 +445,7 @@ describe("exportCatalogData.sh", SHELL_TEST_OPTIONS, () => {
   it("drops the transaction_timeout setting that Postgres before 17 rejects", () => {
     const outFile = join(workDir, "out.sql");
 
-    _runScript("exportCatalogData.sh", ["postgres://src", outFile]);
+    _runScript("exportCatalogData.sh", [outFile]);
 
     const dump = readFileSync(outFile, "utf8");
     expect(dump).toContain("SET statement_timeout = 0;");
@@ -369,7 +455,7 @@ describe("exportCatalogData.sh", SHELL_TEST_OPTIONS, () => {
   it("refuses to overwrite an existing file without calling pg_dump", () => {
     const outFile = _writeDump("keep me");
 
-    const run = _runScript("exportCatalogData.sh", ["postgres://src", outFile]);
+    const run = _runScript("exportCatalogData.sh", [outFile]);
 
     expect(run.status).toBe(1);
     expect(run.log).toBe("");
@@ -377,25 +463,17 @@ describe("exportCatalogData.sh", SHELL_TEST_OPTIONS, () => {
   });
 
   it("fails when the dump holds a table outside the catalog", () => {
-    const run = _runScript(
-      "exportCatalogData.sh",
-      ["postgres://src", join(workDir, "out.sql")],
-      {
-        FAKE_DUMP_EXTRA: "COPY public.workspaces (id) FROM stdin;\nw1\n\\.\n",
-      },
-    );
+    const run = _runScript("exportCatalogData.sh", [join(workDir, "out.sql")], {
+      FAKE_DUMP_EXTRA: "COPY public.workspaces (id) FROM stdin;\nw1\n\\.\n",
+    });
 
     expect(run.status).toBe(1);
   });
 
   it("deletes a rejected dump, leaving no output file", () => {
-    const run = _runScript(
-      "exportCatalogData.sh",
-      ["postgres://src", join(workDir, "out.sql")],
-      {
-        FAKE_DUMP_EXTRA: "COPY public.workspaces (id) FROM stdin;\nw1\n\\.\n",
-      },
-    );
+    const run = _runScript("exportCatalogData.sh", [join(workDir, "out.sql")], {
+      FAKE_DUMP_EXTRA: "COPY public.workspaces (id) FROM stdin;\nw1\n\\.\n",
+    });
 
     expect(run.output).toContain("Deleted the rejected dump");
     expect(
@@ -405,20 +483,83 @@ describe("exportCatalogData.sh", SHELL_TEST_OPTIONS, () => {
     ).toEqual([]);
   });
 
+  it("refuses a source URL passed as an argument, without calling pg_dump or printing it", () => {
+    const run = _runScript("exportCatalogData.sh", [
+      SOURCE_URL,
+      join(workDir, "out.sql"),
+    ]);
+
+    expect(run.status).toBe(1);
+    expect(run.output).toContain("Pass the source URL in SOURCE_DB_URL");
+    expect(run.output).not.toContain("src-s3cret");
+    expect(run.log).toBe("");
+  });
+
+  it("refuses a source password it cannot split, without calling pg_dump or printing it", () => {
+    const run = _runScript("exportCatalogData.sh", [join(workDir, "out.sql")], {
+      SOURCE_DB_URL:
+        "postgresql://postgres.demo-ref:pa/ss-secret@pooler.example.com:5432/postgres",
+    });
+
+    expect(run.status).toBe(1);
+    expect(run.output).toContain("cannot split the password");
+    expect(run.output).not.toContain("ss-secret");
+    expect(run.log).toBe("");
+  });
+
+  it("refuses a source password with a raw @, without calling pg_dump or printing it", () => {
+    const run = _runScript("exportCatalogData.sh", [join(workDir, "out.sql")], {
+      SOURCE_DB_URL:
+        "postgresql://postgres.demo-ref:p@ss-secret@pooler.example.com:5432/postgres",
+    });
+
+    expect(run.status).toBe(1);
+    expect(run.output).toContain("cannot split the password");
+    expect(run.output).not.toContain("ss-secret");
+    expect(run.log).toBe("");
+  });
+
+  it("refuses when SOURCE_DB_URL is not set, without calling pg_dump", () => {
+    const run = _runScript("exportCatalogData.sh", [join(workDir, "out.sql")], {
+      SOURCE_DB_URL: "",
+    });
+
+    expect(run.status).toBe(1);
+    expect(run.output).toContain("SOURCE_DB_URL is not set");
+    expect(run.log).toBe("");
+  });
+
+  it("passes the source password in PGPASSWORD, never on pg_dump's command line", () => {
+    _writeExecutable(
+      "pg_dump",
+      `#!/bin/bash\nenv | grep -E '^PG[A-Z]+=' > "$FAKE_STATE/env.log"\n${FAKE_PG_DUMP.replace("#!/bin/bash\n", "")}`,
+    );
+
+    const run = _runScript("exportCatalogData.sh", [join(workDir, "out.sql")], {
+      SOURCE_DB_URL:
+        "postgresql://postgres.demo-ref:p%40ss-word@pooler.example.com:5432/postgres",
+    });
+
+    expect(run.status).toBe(0);
+    expect(run.log).not.toContain("p%40ss-word");
+    expect(run.log).toContain(
+      "postgresql://postgres.demo-ref@pooler.example.com:5432/postgres --data-only",
+    );
+    expect(_readIfPresent(join(workDir, "env.log"))).toBe(
+      "PGPASSWORD=p@ss-word\n",
+    );
+  });
+
   it("starts pg_dump with no PG* variable that could pick another host", () => {
     _writeExecutable(
       "pg_dump",
       `#!/bin/bash\nenv | grep -E '^PG[A-Z]+=' > "$FAKE_STATE/env.log"\n${FAKE_PG_DUMP.replace("#!/bin/bash\n", "")}`,
     );
 
-    _runScript(
-      "exportCatalogData.sh",
-      ["postgres://src", join(workDir, "out.sql")],
-      {
-        PGHOSTADDR: "10.0.0.9",
-        PGSERVICE: "elsewhere",
-      },
-    );
+    _runScript("exportCatalogData.sh", [join(workDir, "out.sql")], {
+      PGHOSTADDR: "10.0.0.9",
+      PGSERVICE: "elsewhere",
+    });
 
     expect(_readIfPresent(join(workDir, "env.log"))).not.toMatch(
       /PGHOSTADDR|PGSERVICE/,
@@ -443,7 +584,81 @@ describe(
       });
 
       expect(run.status).toBe(0);
-      expect(run.psqlEnv).toBe("");
+      expect(
+        run.psqlEnv.split("\n").filter((line) => {
+          return line !== "" && !line.startsWith("PGPASSWORD=");
+        }),
+      ).toEqual([]);
+    });
+
+    it("refuses a target URL passed as an argument, without connecting or printing it", () => {
+      const run = _runScript("importCatalogData.sh", [
+        TARGET_URL,
+        _writeDump(),
+        "--yes-i-know-the-target",
+        TARGET_ID,
+      ]);
+
+      expect(run.status).toBe(1);
+      expect(run.output).toContain("Pass the target URL in TARGET_DB_URL");
+      expect(run.output).not.toContain("s3cret-pass");
+      expect(run.log).toBe("");
+    });
+
+    it("refuses when TARGET_DB_URL is not set, without connecting", () => {
+      const run = _runScript(
+        "importCatalogData.sh",
+        [_writeDump(), "--yes-i-know-the-target", TARGET_ID],
+        { TARGET_DB_URL: "" },
+      );
+
+      expect(run.status).toBe(1);
+      expect(run.output).toContain("TARGET_DB_URL is not set");
+      expect(run.log).toBe("");
+    });
+
+    it("starts no process with the password in its arguments on a replace", () => {
+      const run = _runReplace(_confirmedReplaceArgs());
+
+      expect(run.status).toBe(0);
+      expect(run.log).not.toContain("s3cret");
+      expect(run.output).not.toContain("s3cret");
+    });
+
+    it("passes the password in PGPASSWORD, never on psql's command line", () => {
+      const run = _runImport();
+
+      expect(run.status).toBe(0);
+      expect(run.log).not.toContain("s3cret-pass");
+      expect(run.log).toContain(
+        "postgresql://postgres@db.example-ref.supabase.co:5432/postgres -X",
+      );
+      expect(run.psqlEnv.split("\n")).toContain("PGPASSWORD=s3cret-pass");
+    });
+
+    it("percent-decodes the password it passes in PGPASSWORD", () => {
+      const run = _runScript(
+        "importCatalogData.sh",
+        [_writeDump(), "--yes-i-know-the-target", TARGET_ID],
+        {
+          TARGET_DB_URL: TARGET_URL.replace("s3cret-pass", "s3cret%40pass%2Fx"),
+        },
+      );
+
+      expect(run.status).toBe(0);
+      expect(run.log).not.toContain("s3cret");
+      expect(run.psqlEnv.split("\n")).toContain("PGPASSWORD=s3cret@pass/x");
+    });
+
+    it("refuses a password with an invalid percent-encoding, without connecting", () => {
+      const run = _runScript("importCatalogData.sh", [_writeDump()], {
+        TARGET_DB_URL: TARGET_URL.replace("s3cret-pass", "s3cret%zzpass"),
+      });
+
+      expect(run.status).toBe(1);
+      expect(run.output).toContain("invalid percent-encoding");
+      expect(run.output).not.toContain("s3cret");
+      expect(run.log).toBe("");
     });
 
     it.each([
@@ -468,7 +683,9 @@ describe(
         "postgresql://postgres:p@ss@db.example-ref.supabase.co/postgres",
       ],
     ])("refuses a target URL with %s, without connecting", (_name, url) => {
-      const run = _runScript("importCatalogData.sh", [url, _writeDump()]);
+      const run = _runScript("importCatalogData.sh", [_writeDump()], {
+        TARGET_DB_URL: url,
+      });
 
       expect(run.status).toBe(1);
       expect(run.output).toContain("the target URL must be exactly");
@@ -476,10 +693,9 @@ describe(
     });
 
     it("refuses a connect_timeout query, saying how to strip it, without connecting", () => {
-      const run = _runScript("importCatalogData.sh", [
-        `${TARGET_URL}?connect_timeout=10`,
-        _writeDump(),
-      ]);
+      const run = _runScript("importCatalogData.sh", [_writeDump()], {
+        TARGET_DB_URL: `${TARGET_URL}?connect_timeout=10`,
+      });
 
       expect(run.status).toBe(1);
       expect(run.output).toContain('TARGET_DB_URL="${TARGET_DB_URL%%\\?*}"');
@@ -487,10 +703,9 @@ describe(
     });
 
     it("refuses the transaction pooler's port 6543, without connecting", () => {
-      const run = _runScript("importCatalogData.sh", [
-        TARGET_URL.replace(":5432", ":6543"),
-        _writeDump(),
-      ]);
+      const run = _runScript("importCatalogData.sh", [_writeDump()], {
+        TARGET_DB_URL: TARGET_URL.replace(":5432", ":6543"),
+      });
 
       expect(run.status).toBe(1);
       expect(run.output).toContain("transaction pooler");
@@ -498,12 +713,18 @@ describe(
     });
 
     it("accepts a session pooler URL with sslmode=require", () => {
-      const run = _runScript("importCatalogData.sh", [
-        "postgresql://postgres.example-ref:pw@aws-0-us-east-1.pooler.supabase.com:5432/postgres?sslmode=require",
-        _writeDump(),
-        "--yes-i-know-the-target",
-        "postgres.example-ref@aws-0-us-east-1.pooler.supabase.com",
-      ]);
+      const run = _runScript(
+        "importCatalogData.sh",
+        [
+          _writeDump(),
+          "--yes-i-know-the-target",
+          "postgres.example-ref@aws-0-us-east-1.pooler.supabase.com",
+        ],
+        {
+          TARGET_DB_URL:
+            "postgresql://postgres.example-ref:pw@aws-0-us-east-1.pooler.supabase.com:5432/postgres?sslmode=require",
+        },
+      );
 
       expect(run.status).toBe(0);
     });
@@ -574,10 +795,21 @@ describe(
         "set local lock_timeout = '10s';",
         expect.stringMatching(/^\\i '\/.+\/catalog\.sql'$/),
         "set local lock_timeout = '10s';",
+        ...REDACTION_CHECK_LINES,
         ..._rowCountCheckLines(),
         "select public.data_catalog_facet_counts__refresh();",
         "commit;",
       ]);
+    });
+
+    it("loads pipeline executions with no command line, actor, or host", () => {
+      const run = _runImport();
+
+      expect(run.status).toBe(0);
+      expect(run.loaded).toContain(
+        "COPY public.pipeline_executions (id, pipeline_name, cli_argv, actor, host) FROM stdin;\ne1\tsocrata\t\\N\t\\N\t\\N\n\\.",
+      );
+      expect(run.loaded).not.toContain("laptop.local");
     });
 
     it("loads a private copy of the dump, not the file it was given", () => {
@@ -608,12 +840,15 @@ describe(
     });
 
     it("refuses a confirmation that names another target, without connecting", () => {
-      const run = _runScript("importCatalogData.sh", [
-        TARGET_URL,
-        _writeDump(),
-        "--yes-i-know-the-target",
-        "postgres@db.other-ref.supabase.co",
-      ]);
+      const run = _runScript(
+        "importCatalogData.sh",
+        [
+          _writeDump(),
+          "--yes-i-know-the-target",
+          "postgres@db.other-ref.supabase.co",
+        ],
+        { TARGET_DB_URL: TARGET_URL },
+      );
 
       expect(run.status).toBe(1);
       expect(run.output).toContain(`but the target is ${TARGET_ID}`);
@@ -621,10 +856,9 @@ describe(
     });
 
     it("refuses without a confirmation when there is no terminal to ask on", () => {
-      const run = _runScript("importCatalogData.sh", [
-        TARGET_URL,
-        _writeDump(),
-      ]);
+      const run = _runScript("importCatalogData.sh", [_writeDump()], {
+        TARGET_DB_URL: TARGET_URL,
+      });
 
       expect(run.status).toBe(1);
       expect(run.output).toContain(
@@ -780,22 +1014,24 @@ describe("importCatalogData.sh --replace-existing", SHELL_TEST_OPTIONS, () => {
     const run = _runReplace(_confirmedReplaceArgs());
 
     expect(run.status).toBe(0);
-    expect(run.wrapper.trim().split("\n")).toEqual([
+    expect(_linesWithoutGuard(run.wrapper)).toEqual([
       "\\set ON_ERROR_STOP on",
       "\\pset tuples_only on",
       "\\pset format unaligned",
       "begin;",
       "set local lock_timeout = '10s';",
-      "lock table public.pipeline_scope_checkpoints, public.pipeline_execution_scopes, public.pipeline_executions, public.data_catalog_listings__relation_columns, public.data_catalog_listings, public.data_catalog_drives, public.datasets__open_data in share row exclusive mode;",
+      CATALOG_LOCK_LINE,
+      ...ROW_LOCK_LINES,
       "do $check$ begin",
       expect.stringMatching(
-        /^ {2}if \(0 \+ \(select count\(\*\) from \(select \* from public\.datasets__open_data .+\) as affected\)\) <> 4 then$/,
+        /^ {2}if \(0 \+ \(select count\(\*\) from \(select \* from public\.datasets__open_data .+\) as affected\) \+ \(select count\(\*\) from \(select \* from public\.datasets where .+\) as affected\)\) <> 8 then$/,
       ),
       expect.stringMatching(
-        /^ {4}raise exception 'The delete now reaches % dependent rows, not the 4 confirmed\.'/,
+        /^ {4}raise exception 'The delete now reaches % dependent rows, not the 8 confirmed\.'/,
       ),
       "  end if;",
       "end $check$;",
+      OPEN_DATA_DATASETS_DELETE,
       "delete from public.pipeline_scope_checkpoints;",
       "delete from public.pipeline_execution_scopes;",
       "delete from public.pipeline_executions;",
@@ -804,10 +1040,133 @@ describe("importCatalogData.sh --replace-existing", SHELL_TEST_OPTIONS, () => {
       "delete from public.data_catalog_drives;",
       expect.stringMatching(/^\\i '\/.+\/catalog\.sql'$/),
       "set local lock_timeout = '10s';",
+      ...REDACTION_CHECK_LINES,
       ..._rowCountCheckLines(),
       "select public.data_catalog_facet_counts__refresh();",
       "commit;",
     ]);
+  });
+
+  it("checks the @avandarlabs.com guard after the cascade check and before deleting the datasets", () => {
+    const lines = _runReplace(_confirmedReplaceArgs()).wrapper.split("\n");
+
+    const checkEnd = lines.indexOf("end $check$;");
+    const guardStart = lines.indexOf("do $guard$");
+    const guardEnd = lines.indexOf("end $guard$;");
+    const datasetDelete = lines.indexOf(OPEN_DATA_DATASETS_DELETE);
+    expect(guardStart).toBeGreaterThan(checkEnd);
+    expect(datasetDelete).toBeGreaterThan(guardEnd);
+    expect(
+      lines.indexOf("delete from public.data_catalog_listings;"),
+    ).toBeGreaterThan(datasetDelete);
+    const guard = lines.slice(guardStart, guardEnd + 1).join("\n");
+    expect(guard).toContain("member_count = 0 or other_member_count > 0");
+    expect(guard).toContain("like '%@avandarlabs.com'");
+    expect(guard).toMatch(
+      /raise exception 'Refusing to delete open data dataset % in workspace %: % of its % members have no @avandarlabs\.com email\.'/,
+    );
+  });
+
+  it("never locks a whole table that only the open data datasets' cascade reaches", () => {
+    const columnsDependent = [
+      "1",
+      "public.dataset_columns",
+      "dataset_id",
+      "public.datasets",
+      "c",
+      "select * from public.dataset_columns where (dataset_id) in (select id from public.datasets)",
+      "public.datasets",
+    ].join(FIELD_SEPARATOR);
+
+    const run = _runReplace(
+      [
+        ..._confirmedReplaceArgs(
+          _makeBackup([...BACKUP_TABLES, "public.dataset_columns"]),
+        ).slice(0, -1),
+        "12",
+      ],
+      { FAKE_DEPENDENTS: `${OPEN_DATA_DEPENDENT}\n${columnsDependent}\n` },
+    );
+
+    expect(run.status, run.output).toBe(0);
+    const lockLines = run.wrapper.split("\n").filter((line) => {
+      return line.startsWith("lock table");
+    });
+    expect(lockLines).toEqual([CATALOG_LOCK_LINE]);
+  });
+
+  it("lists each open data dataset, its workspace, its members, and the guard on a dry run", () => {
+    const run = _runReplace(["--dry-run"]);
+
+    expect(run.status).toBe(0);
+    expect(run.output).toContain(
+      'dataset ds1 "World Development Indicators (WDI)" in workspace ws1 "Workspace ws1"',
+    );
+    expect(run.output).toContain(
+      "members: pablo@avandarlabs.com (1 of 1 have an @avandarlabs.com email), guard passes",
+    );
+    expect(run.output).toContain(
+      "The @avandarlabs.com guard passes for all 4 open data datasets.",
+    );
+    expect(run.log).not.toContain("--file");
+  });
+
+  it("refuses a replace when a workspace has a member outside @avandarlabs.com, naming counts, not emails", () => {
+    const run = _runReplace(_confirmedReplaceArgs(), {
+      FAKE_OPEN_DATA_DATASETS: `${AVANDAR_OPEN_DATA_DATASETS}\n${_openDataDatasetRow("ds5", "ws3", 3, 2)}\n`,
+    });
+
+    expect(run.status).toBe(1);
+    expect(run.output).toContain(
+      "open data dataset ds5 in workspace ws3 has 2 of its 3 members without an @avandarlabs.com email",
+    );
+    expect(run.log).not.toContain("--file");
+  });
+
+  it("refuses a replace when a workspace has no members", () => {
+    const run = _runReplace(_confirmedReplaceArgs(), {
+      FAKE_OPEN_DATA_DATASETS: `${_openDataDatasetRow("ds5", "ws3", 0, 0)}\n`,
+    });
+
+    expect(run.status).toBe(1);
+    expect(run.output).toContain(
+      "open data dataset ds5 in workspace ws3 has no members",
+    );
+    expect(run.log).not.toContain("--file");
+  });
+
+  it("says on a dry run that the guard would refuse, and writes nothing", () => {
+    const run = _runReplace(["--dry-run"], {
+      FAKE_OPEN_DATA_DATASETS: `${_openDataDatasetRow("ds5", "ws3", 3, 2)}\n`,
+    });
+
+    expect(run.status).toBe(0);
+    expect(run.output).toContain("guard fails");
+    expect(run.output).toMatch(
+      /The import would refuse: open data dataset ds5/,
+    );
+    expect(run.log).not.toContain("--file");
+  });
+
+  it("prints the pg_dump backup command on a replace dry run", () => {
+    const run = _runReplace(["--dry-run"]);
+
+    expect(run.output).toContain("--table 'public.datasets'");
+    expect(run.output).toContain("--table 'public.datasets__open_data'");
+  });
+
+  it("prints restore steps that stage the backup and keep rows the target still has", () => {
+    const run = _runReplace(_confirmedReplaceArgs());
+
+    expect(run.output).toContain(
+      "create table catalog_restore.datasets (like public.datasets);",
+    );
+    expect(run.output).toContain(
+      "insert into public.datasets (id) overriding system value select id from catalog_restore.datasets on conflict do nothing;",
+    );
+    expect(run.output.indexOf("into public.datasets (id)")).toBeLessThan(
+      run.output.indexOf("into public.datasets__open_data (id)"),
+    );
   });
 
   it("reports each dependent table and the rows the cascade deletes", () => {
@@ -818,13 +1177,41 @@ describe("importCatalogData.sh --replace-existing", SHELL_TEST_OPTIONS, () => {
     );
   });
 
-  it("names the datasets the cascade orphans in the report, the plan, and the prompt note", () => {
+  it("counts the open data datasets it deletes in the report and the plan", () => {
     const run = _runReplace(_confirmedReplaceArgs());
 
-    const orphanLines = run.output.split("\n").filter((line) => {
-      return line.includes("4 public.datasets rows in 2 workspaces");
+    expect(run.output).toContain(
+      "  public.datasets: 4 rows deleted, every dataset added from the catalog, in 2 workspaces",
+    );
+    expect(run.output).toMatch(
+      /delete the 4 public\.datasets rows in 2 workspaces added from the catalog/,
+    );
+    expect(run.output).toContain("delete or change 8 dependent rows");
+  });
+
+  it("checks by id that the deleted open data datasets are gone after the import", () => {
+    const run = _runReplace(_confirmedReplaceArgs());
+
+    expect(run.output).toContain(
+      "Open data datasets the replace deleted that remain, by id: 0 of 4.",
+    );
+  });
+
+  it("says a failed replace rolled back when every affected dataset is still there", () => {
+    const run = _runReplace(_confirmedReplaceArgs(), { FAKE_IMPORT_EXIT: "3" });
+
+    expect(run.status).toBe(1);
+    expect(run.output).toContain("its transaction rolled back");
+  });
+
+  it("says a failed replace needs a check when an affected dataset is gone", () => {
+    const run = _runReplace(_confirmedReplaceArgs(), {
+      FAKE_IMPORT_EXIT: "3",
+      FAKE_REMAINING_DATASETS: "3",
     });
-    expect(orphanLines).toHaveLength(3);
+
+    expect(run.status).toBe(1);
+    expect(run.output).toContain("Check the target now.");
   });
 
   it("counts the orphaned datasets again after the import", () => {
@@ -865,7 +1252,7 @@ describe("importCatalogData.sh --replace-existing", SHELL_TEST_OPTIONS, () => {
     const run = _runReplace(_confirmedReplaceArgs().slice(2));
 
     expect(run.output).toContain(
-      'pg_dump "$TARGET_DB_URL" --data-only --no-owner --no-privileges',
+      'with_db_url "$TARGET_DB_URL" "$PG_DUMP_BIN" --data-only --no-owner --no-privileges',
     );
     expect(run.output).toContain("--table 'public.datasets__open_data'");
   });
@@ -889,7 +1276,7 @@ describe("importCatalogData.sh --replace-existing", SHELL_TEST_OPTIONS, () => {
       "--yes-i-know-the-target",
       TARGET_ID,
       "--yes-i-know-the-cascade",
-      "4",
+      CASCADE_ROWS,
     ]);
 
     expect(run.status).toBe(1);
@@ -902,9 +1289,7 @@ describe("importCatalogData.sh --replace-existing", SHELL_TEST_OPTIONS, () => {
     );
 
     expect(run.status).toBe(1);
-    expect(run.output).toContain(
-      "has no rows block for public.datasets__open_data",
-    );
+    expect(run.output).toContain("has no rows block for public.datasets");
     expect(run.log).not.toContain("--file");
   });
 
@@ -942,7 +1327,7 @@ describe("importCatalogData.sh --replace-existing", SHELL_TEST_OPTIONS, () => {
     const run = _runReplace(_confirmedReplaceArgs());
 
     expect(run.output).toContain(
-      "3. Run it with psql 15.14+, 16.10+, 17.6+, or 18+:",
+      '3. Run it with psql 15.14+, 16.10+, 17.6+, or 18+, which PSQL_BIN names: with_db_url "$TARGET_DB_URL" "$PSQL_BIN" -X',
     );
   });
 
@@ -963,7 +1348,7 @@ describe("importCatalogData.sh --replace-existing", SHELL_TEST_OPTIONS, () => {
 
     expect(run.status).toBe(1);
     expect(run.output).toContain(
-      "--yes-i-know-the-cascade says 3, but it must be 4",
+      "--yes-i-know-the-cascade says 3, but it must be 8",
     );
   });
 
@@ -972,7 +1357,7 @@ describe("importCatalogData.sh --replace-existing", SHELL_TEST_OPTIONS, () => {
 
     expect(run.status).toBe(1);
     expect(run.output).toContain(
-      "no terminal to confirm on. Pass --yes-i-know-the-cascade 4",
+      "no terminal to confirm on. Pass --yes-i-know-the-cascade 8",
     );
   });
 

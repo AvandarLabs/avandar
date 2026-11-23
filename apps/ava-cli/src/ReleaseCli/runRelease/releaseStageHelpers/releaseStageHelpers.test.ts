@@ -4,6 +4,7 @@ import {
 } from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
 import { promptToConfirm } from "@ava-cli/ReleaseCli/releasePromptHelpers";
 import {
+  confirmCiVerdict,
   confirmReleasePlan,
   printReleaseSummary,
   reportReleaseNotesOutcome,
@@ -460,6 +461,234 @@ describe("reportReleaseNotesOutcome", () => {
     expect(_getLoggedText()).toContain(
       "Release notes already exist for v0.15.0-alpha",
     );
+  });
+});
+
+/** A run URL the fake `gh run list` reports, so a test can find it. */
+const CI_RUN_URL = "https://github.com/AvandarLabs/avandar/actions/runs/1";
+
+/**
+ * What the fake `gh run list` answers for each verdict on `source-sha`: the
+ * runs JSON, or a failed command for the verdict that cannot be checked.
+ */
+const GH_RESULT_BY_VERDICT: Readonly<Record<string, CommandResult>> = {
+  passed: {
+    ok: true,
+    stdout: JSON.stringify([
+      {
+        headSha: "source-sha",
+        status: "completed",
+        conclusion: "success",
+        url: CI_RUN_URL,
+      },
+    ]),
+    stderr: "",
+  },
+  failed: {
+    ok: true,
+    stdout: JSON.stringify([
+      {
+        headSha: "source-sha",
+        status: "completed",
+        conclusion: "failure",
+        url: CI_RUN_URL,
+      },
+    ]),
+    stderr: "",
+  },
+  pending: {
+    ok: true,
+    stdout: JSON.stringify([
+      {
+        headSha: "source-sha",
+        status: "in_progress",
+        conclusion: "",
+        url: CI_RUN_URL,
+      },
+    ]),
+    stderr: "",
+  },
+  missing: { ok: true, stdout: "[]", stderr: "" },
+  unknown: { ok: false, stdout: "", stderr: "gh: not logged in" },
+};
+
+/**
+ * Fake commands whose `gh run list` reports `verdict` for `source-sha`, plus
+ * every non-git command they were asked to read.
+ */
+function _createFakeCommandsWithCi(verdict: string): {
+  git: ReleaseCommands;
+  mutations: string[];
+  readCommands: string[];
+} {
+  const { git, mutations } = _createFakeCommands();
+  const readCommands: string[] = [];
+  const ghResult = GH_RESULT_BY_VERDICT[verdict] ?? OK;
+  return {
+    git: {
+      ...git,
+      readCommand: (command: string, args: readonly string[]) => {
+        readCommands.push([command, ...args].join(" "));
+        return ghResult;
+      },
+    },
+    mutations,
+    readCommands,
+  };
+}
+
+/** Every verdict other than a pass, which the alpha line refuses. */
+const NON_PASSING_VERDICTS = ["failed", "pending", "missing", "unknown"];
+
+describe("confirmCiVerdict", () => {
+  beforeEach(() => {
+    vi.spyOn(Acclimate, "log").mockImplementation(() => {
+      return undefined;
+    });
+    vi.mocked(promptToConfirm).mockResolvedValue(true);
+  });
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.mocked(promptToConfirm).mockReset();
+  });
+
+  describe.each(NON_PASSING_VERDICTS)(
+    "on the alpha line with a %s verdict",
+    (verdict) => {
+      it.each([true, false])(
+        "refuses with assumeYes %s, without asking or mutating",
+        async (assumeYes) => {
+          const { git, mutations } = _createFakeCommandsWithCi(verdict);
+
+          await expect(
+            confirmCiVerdict(git, {
+              commitSha: "source-sha",
+              line: ALPHA_RELEASE_LINE,
+              assumeYes,
+              skip: false,
+            }),
+          ).rejects.toThrow(`"${verdict}"`);
+
+          expect(promptToConfirm).not.toHaveBeenCalled();
+          expect(mutations).toEqual([]);
+        },
+      );
+
+      it("names the way out: wait for green or pass --skip-ci-check", async () => {
+        const { git } = _createFakeCommandsWithCi(verdict);
+
+        await expect(
+          confirmCiVerdict(git, {
+            commitSha: "source-sha",
+            line: ALPHA_RELEASE_LINE,
+            assumeYes: true,
+            skip: false,
+          }),
+        ).rejects.toThrow(/--skip-ci-check/);
+      });
+    },
+  );
+
+  it.each(["failed", "pending"])(
+    "names the run URL when a %s run exists",
+    async (verdict) => {
+      const { git } = _createFakeCommandsWithCi(verdict);
+
+      await expect(
+        confirmCiVerdict(git, {
+          commitSha: "source-sha",
+          line: ALPHA_RELEASE_LINE,
+          assumeYes: true,
+          skip: false,
+        }),
+      ).rejects.toThrow(CI_RUN_URL);
+    },
+  );
+
+  it("proceeds on a passed alpha-dev run without asking", async () => {
+    const { git, mutations } = _createFakeCommandsWithCi("passed");
+
+    await confirmCiVerdict(git, {
+      commitSha: "source-sha",
+      line: ALPHA_RELEASE_LINE,
+      assumeYes: false,
+      skip: false,
+    });
+
+    expect(promptToConfirm).not.toHaveBeenCalled();
+    expect(mutations).toEqual([]);
+  });
+
+  it("skips the alpha check with --skip-ci-check, warning that production deploys without it", async () => {
+    const { git, readCommands } = _createFakeCommandsWithCi("failed");
+
+    await confirmCiVerdict(git, {
+      commitSha: "source-sha",
+      line: ALPHA_RELEASE_LINE,
+      assumeYes: true,
+      skip: true,
+    });
+
+    expect(readCommands).toEqual([]);
+    expect(_getLoggedText()).toContain(
+      "PRODUCTION will deploy without alpha-dev's CI",
+    );
+  });
+
+  it.each(NON_PASSING_VERDICTS)(
+    "proceeds on a mainline %s verdict with assumeYes, without asking",
+    async (verdict) => {
+      const { git } = _createFakeCommandsWithCi(verdict);
+
+      await confirmCiVerdict(git, {
+        commitSha: "source-sha",
+        line: MAINLINE_RELEASE_LINE,
+        assumeYes: true,
+        skip: false,
+      });
+
+      expect(promptToConfirm).not.toHaveBeenCalled();
+    },
+  );
+
+  it("asks before a mainline release on a failed verdict", async () => {
+    const { git } = _createFakeCommandsWithCi("failed");
+
+    await confirmCiVerdict(git, {
+      commitSha: "source-sha",
+      line: MAINLINE_RELEASE_LINE,
+      assumeYes: false,
+      skip: false,
+    });
+
+    expect(promptToConfirm).toHaveBeenCalledExactlyOnceWith("Release anyway?");
+  });
+
+  it("aborts a mainline release when the reviewer declines a failed verdict", async () => {
+    vi.mocked(promptToConfirm).mockResolvedValue(false);
+    const { git } = _createFakeCommandsWithCi("failed");
+
+    await expect(
+      confirmCiVerdict(git, {
+        commitSha: "source-sha",
+        line: MAINLINE_RELEASE_LINE,
+        assumeYes: false,
+        skip: false,
+      }),
+    ).rejects.toThrow("Aborted.");
+  });
+
+  it("keeps the plain mainline --skip-ci-check warning", async () => {
+    const { git } = _createFakeCommandsWithCi("failed");
+
+    await confirmCiVerdict(git, {
+      commitSha: "source-sha",
+      line: MAINLINE_RELEASE_LINE,
+      assumeYes: true,
+      skip: true,
+    });
+
+    expect(_getLoggedText()).toContain("Skipping develop's CI check.");
   });
 });
 

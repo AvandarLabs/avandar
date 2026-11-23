@@ -30,7 +30,7 @@ How to read it:
 | 6 | Create `alpha` | 6.7 | Pablo: laptop | No `all checks passed` line |
 | 7 | **Release: writes to production** | **6.8**, with 6.6 taken while the `deploy` job waits for approval | Pablo: laptop, GitHub approval | 6.6's restore test fails: do not approve |
 | 8 | Smoke test | 6.9 | Pablo: browser | Anything fails: section 7 |
-| 9 | **Catalog into production: writes to production** | **6.11** for production | Pablo: laptop | The dry run would refuse, or names another Storage host |
+| 9 | **Catalog into production: writes to production** | **6.11** for production | Pablo: laptop | The dry run would refuse, names another Storage host, or lists other datasets than the 4 WDI ones |
 | 10 | Cleanup | 8 | Pablo | |
 
 The rollback basis (5.8) is decided before phase 7: PITR on, or a release
@@ -87,8 +87,34 @@ mkdir -p "$D" "$CUTOVER_DIR/catalog" && chmod 700 "$CUTOVER_DIR"
 unset PGHOST PGHOSTADDR PGPORT PGDATABASE PGUSER PGPASSWORD PGPASSFILE \
   PGSERVICE PGSERVICEFILE PGSYSCONFDIR PGOPTIONS PGTARGETSESSIONATTRS \
   PGSSLMODE PGREQUIRESSL
+# with_db_url <url> <command> [args...]: runs the command with the URL, minus
+# its password, as its first argument, and the password in PGPASSWORD for
+# that one command. `ps` shows every process's arguments to every user, but
+# a process's environment only to its own user and root. A shell function's
+# own arguments never reach `ps`. A URL whose user part has a ":" it cannot
+# split is refused, never passed on whole. Works in bash and zsh.
+with_db_url() {
+  local url="$1" rest userinfo password
+  shift
+  rest="${url#*://}"
+  userinfo="${rest%%@*}"
+  local authority="${rest#*@}"
+  authority="${authority%%[/?#]*}"
+  if [[ "$url" == postgres*://* && "$rest" == *@* && "$userinfo" == *:* && "$userinfo" != */* && "$authority" != *@* ]]; then
+    password="${userinfo#*:}"
+    PGPASSWORD="$(printf '%b' "${password//\%/\\x}")" "$1" \
+      "${url%%://*}://${userinfo%%:*}@${rest#*@}" "${@:2}"
+  elif [[ "$rest" == *@* && "$userinfo" == *:* ]]; then
+    # A password it cannot split, such as one with an unencoded "/" or "@".
+    # Never print the URL.
+    echo "with_db_url: cannot split the password out of the URL. Percent-encode it. Not running $1." >&2
+    return 1
+  else
+    "$1" "$url" "${@:2}"
+  fi
+}
 # One read-only transaction per query.
-read_db() { "$PSQL_BIN" "$1" -X -P pager=off -q -t -A -v ON_ERROR_STOP=1 \
+read_db() { with_db_url "$1" "$PSQL_BIN" -X -P pager=off -q -t -A -v ON_ERROR_STOP=1 \
   -c 'begin transaction read only' -c "$2" -c 'rollback'; }
 COUNTS_SQL="select (select count(*) from auth.users) as users, (select count(*) from public.workspaces) as workspaces, (select count(*) from public.dashboards) as dashboards, (select count(*) from public.datasets) as datasets"
 AUTH_SEED_EXCLUDES=(-x auth.sessions -x auth.refresh_tokens -x auth.one_time_tokens -x auth.flow_state -x auth.audit_log_entries -x auth.mfa_amr_claims)
@@ -130,16 +156,23 @@ The CLI then creates a temporary login role in the project with write
 access, and after 3 failed connection retries deletes the project's network
 bans. `--db-url` never takes that path, so every production dump here goes
 through `--db-url "$PROD_DB_URL"`, with the password in the URL, and this
-runbook runs no `--linked` command.
+runbook runs no `--linked` command. That puts the password in the
+`supabase` process's arguments, where `ps` shows it to every user of the
+machine, so run the cutover on a laptop only you are logged in to. Every
+`psql` and `pg_dump` here, and the catalog scripts, keep it out of their
+arguments instead: `psql` and `pg_dump` run through `with_db_url` (1.4),
+and the catalog scripts read the URL from `SOURCE_DB_URL` or
+`TARGET_DB_URL`.
 
 | Connects to production | Steps | What it does there |
 | --- | --- | --- |
 | `read_db "$PROD_DB_URL" ...` | 1.4, 2.2, 6.6, 6.11 | Queries in a read-only transaction |
 | `supabase db dump --db-url "$PROD_DB_URL" ...` | 2.2, 6.6 | `pg_dump` over the session pooler as `postgres`: reads only |
 | `supabase projects api-keys`, `branches list`, `backups list`, `secrets list`, `functions list`, with `--project-ref "$PROD_REF"` | 3.3, 5.1, 5.5, 5.8, 6.6, 6.9 | Management API reads |
-| `supabase storage cp ... --project-ref "$PROD_REF"` (optional) | 2.8 | Storage downloads |
-| `"$PG_DUMP_BIN" "$PROD_DB_URL" ...`, `importCatalogData.sh ... --dry-run` | 6.11.4, 6.11.5 | Reads only (the importer's report runs in read-only transactions) |
-| **Writes to production** | 5.1 (only if keys are missing), 5.8 (only if you turn PITR on), 6.8, 6.11.6, 6.11.7, section 7 | As each step says |
+| `supabase storage cp ... --project-ref "$PROD_REF"` (optional), `supabase storage ls ... --project-ref "$PROD_REF"` | 2.8, 6.11.7, 6.11.9 | Storage downloads and listings |
+| `with_db_url "$PROD_DB_URL" "$PG_DUMP_BIN" ...` | 6.11.5 | Reads only |
+| `TARGET_DB_URL="$PROD_DB_URL" importCatalogData.sh ... --dry-run` | 6.11.4 | Reads only (the importer's report runs in read-only transactions) |
+| **Writes to production** | 5.1 (only if keys are missing), 5.8 (only if you turn PITR on), 6.8, 6.11.6 (deletes the 4 WDI datasets with the catalog), 6.11.7, 6.11.9 (`supabase storage rm`, and its restore's `supabase storage cp` upload if you ever run it), section 7 | As each step says |
 
 The dumps hold real user data. The sensitive tables:
 
@@ -242,7 +275,7 @@ and check it against the audit.
 ### 2.5 Load production's roles and data
 
 ```bash
-"$PSQL_BIN" "$LOCAL_DB_URL" -X -P pager=off --single-transaction --set ON_ERROR_STOP=1 \
+with_db_url "$LOCAL_DB_URL" "$PSQL_BIN" -X -P pager=off --single-transaction --set ON_ERROR_STOP=1 \
   --file "$D/prod-rehearsal-roles.sql" \
   --file "$D/prod-rehearsal-data-auth.sql" \
   --file "$D/prod-rehearsal-data-public.sql"
@@ -311,7 +344,7 @@ you sign in with Google in production, set a local-only password first. This
 writes to the local stack only, after 2.7 already took the seed:
 
 ```bash
-"$PSQL_BIN" "$LOCAL_DB_URL" -X -P pager=off -v ON_ERROR_STOP=1 -c "update auth.users set encrypted_password = extensions.crypt('<a local-only password>', extensions.gen_salt('bf')) where email = '<your production email>'"
+with_db_url "$LOCAL_DB_URL" "$PSQL_BIN" -X -P pager=off -v ON_ERROR_STOP=1 -c "update auth.users set encrypted_password = extensions.crypt('<a local-only password>', extensions.gen_salt('bf')) where email = '<your production email>'"
 ```
 
 Open each as `<VITE_APP_URL>/<slug>/dashboards/edit/<id>` and record it:
@@ -913,7 +946,7 @@ match.
 **6.5.2 Load roles, then auth, then public.**
 
 ```bash
-"$PSQL_BIN" "$ALPHA_DEV_DB_URL" -X -P pager=off --single-transaction --set ON_ERROR_STOP=1 \
+with_db_url "$ALPHA_DEV_DB_URL" "$PSQL_BIN" -X -P pager=off --single-transaction --set ON_ERROR_STOP=1 \
   --file "$D/prod-rehearsal-roles.sql" \
   --file "$D/alpha-dev-seed-auth.sql" \
   --file "$D/alpha-dev-seed-public.sql"
@@ -929,7 +962,7 @@ the auth rows as production dumped them instead, which the branch's hosted
 Auth reads:
 
 ```bash
-"$PSQL_BIN" "$ALPHA_DEV_DB_URL" -X -P pager=off --single-transaction --set ON_ERROR_STOP=1 \
+with_db_url "$ALPHA_DEV_DB_URL" "$PSQL_BIN" -X -P pager=off --single-transaction --set ON_ERROR_STOP=1 \
   --file "$D/prod-rehearsal-roles.sql" \
   --file "$D/prod-rehearsal-data-auth.sql" \
   --file "$D/alpha-dev-seed-public.sql"
@@ -941,7 +974,31 @@ tables.
 
 **6.5.3 Load the catalog** into `alpha-dev` with 6.11, target `alpha-dev`.
 
-**6.5.4 Check the site.** Sign in at `https://alpha.avandarlabs.com` with
+**6.5.4 Rehearse the catalog restore on `alpha-dev`** (writes to
+`alpha-dev`, a staging branch, not production). Run the restore 6.11.6
+printed for `alpha-dev`, from its log, then load the catalog again:
+
+```bash
+mkdir -p "$CUTOVER_DIR/catalog/restore-rehearsal" && cd "$CUTOVER_DIR/catalog/restore-rehearsal"
+LOG="$CUTOVER_DIR/catalog/import-$ALPHA_DEV_REF.log"
+bash -c "$(grep '^       sed ' "$LOG" | sed 's/^ *//')"
+sed -n '/^       begin;$/,/^       commit;$/s/^       //p' "$LOG" > restore.sql
+with_db_url "$ALPHA_DEV_DB_URL" "$PSQL_BIN" -X -P pager=off -v ON_ERROR_STOP=1 --file restore.sql
+read_db "$ALPHA_DEV_DB_URL" "select (select count(*) from public.data_catalog_listings), (select count(*) from public.datasets__open_data), (select count(*) from public.datasets)"
+cd "$REPO"
+```
+
+**Expect:** `restore-rows.sql` is written, psql ends with `COMMIT`, and the
+counts equal the `data_catalog_listings`, `datasets__open_data`, and
+`datasets` rows under `The target holds, per table:` at the top of the log
+(the state before the import). Then run 6.11.4 to 6.11.6 for `alpha-dev`
+again, with a new backup, and 6.11.7 once more: it must copy 0 and replace
+0.
+**If not:** a psql error rolls the restore back and changes nothing: keep
+the folder and the error, and do not run the production import until the
+restore works here.
+
+**6.5.5 Check the site.** Sign in at `https://alpha.avandarlabs.com` with
 your production account and open the 5 dashboards from 2.8 (no data files:
 Storage is not copied). From here `alpha-dev` holds real users' emails:
 anything there that sends email can reach them.
@@ -1003,11 +1060,11 @@ ava supabase status      # must name chore-alpha-rehearsal
 supabase db reset --local --no-seed --version 20261013212914
 export LOCAL_DB_URL="$(supabase status -o json | jq -er '.DB_URL')"
 [[ "$LOCAL_DB_URL" == postgresql://*@127.0.0.1:* ]] &&
-  "$PSQL_BIN" "$LOCAL_DB_URL" -X -P pager=off --single-transaction --set ON_ERROR_STOP=1 \
+  with_db_url "$LOCAL_DB_URL" "$PSQL_BIN" -X -P pager=off --single-transaction --set ON_ERROR_STOP=1 \
     --file "$D/prod-rehearsal-roles.sql" \
     --file "$D/prod-rehearsal-data-auth.sql" \
     --file "$D/prod-rehearsal-data-public.sql" &&
-  "$PSQL_BIN" "$LOCAL_DB_URL" -X -P pager=off --single-transaction --set ON_ERROR_STOP=1 \
+  with_db_url "$LOCAL_DB_URL" "$PSQL_BIN" -X -P pager=off --single-transaction --set ON_ERROR_STOP=1 \
     --file "$CUTOVER_DIR/rollback-truncate.sql" \
     --file "$D/prod-$BACKUP_T-data-app.sql" &&
   read_db "$LOCAL_DB_URL" "$COUNTS_SQL"
@@ -1119,9 +1176,10 @@ PRODUCTION (app.avandarlabs.com).`; the plan below with your versions; a
 `Dry run: stopping before tagging and pushing alpha` warning. Nothing
 changes.
 
-**6.8.3 Release.** Never pass `--yes`: it releases on a CI verdict other than
-a pass without asking. Pass `--skip-changelog` (section 9: the first alpha
-notes would cover about 2,000 commits).
+**6.8.3 Release.** On the alpha line, a CI verdict other than a pass
+refuses the release, and `--yes` does not override it: only
+`--skip-ci-check` does, and never pass it here. Pass `--skip-changelog`
+(section 9: the first alpha notes would cover about 2,000 commits).
 
 ```bash
 ava release --skip-changelog
@@ -1133,7 +1191,7 @@ ava release --skip-changelog
 | `What version number do you want for this release? (-alpha is added automatically)` | Release version, bare `X.Y.Z` | Enter for `0.15.0` |
 | `Which version should alpha-dev move to next?` | Next dev version | Enter for `0.15.1` |
 | `alpha-dev CI passed.` | `alpha-dev.yaml` passed for the tip | |
-| Anything else, then `Release anyway?` | CI did not pass for the tip | `n`, then fix CI |
+| `Refusing to release: alpha-dev's CI verdict is "<verdict>", not "passed".` (exit 1) | CI did not pass for the tip, so nothing was released | Wait for `alpha-dev.yaml` to pass on the tip, or fix CI, then run `ava release` again. Never `--skip-ci-check` |
 | Plan: `1. alpha-dev: 0.15.0-alpha-dev to 0.15.0-alpha, pushed`, `2. alpha: set to alpha-dev@<sha>'s tree, tagged v0.15.0-alpha`, `3. alpha-dev: 0.15.0-alpha to 0.15.1-alpha-dev, pushed` | What it will do | |
 | `Pushing alpha deploys PRODUCTION ...`, then `Release 0.15.0-alpha to PRODUCTION?` | Last chance | `y` |
 
@@ -1238,13 +1296,52 @@ every row of the catalog tables (`data_catalog_drives`,
 `pipeline_executions`, `pipeline_execution_scopes`,
 `pipeline_scope_checkpoints`), loads the `demo-measles` catalog, rewrites its
 Storage links, and recounts `data_catalog_facet_counts`.
-`datasets__open_data.catalog_listing_id` is `on delete cascade`, so every
-workspace dataset added from the catalog loses its `datasets__open_data`
-row, even when the new catalog brings back a listing with the same id. The
-`datasets` rows, their columns, and dashboards that use them stay, but the
-importer says it plainly: those datasets "stay listed but can no longer
-load". Production has 4. Check on `alpha-dev` what a user then sees (open one
-of the 4 there) before you run it on production.
+`datasets__open_data.catalog_listing_id` is `on delete cascade`, so deleting
+the listings would strip every workspace dataset added from the catalog of
+its `datasets__open_data` row, even when the new catalog brings back a
+listing with the same id, and leave it unable to load. So, in the same
+transaction and before it deletes the catalog, the importer deletes those
+`public.datasets` rows, and every row that cascades from them (their
+`datasets__open_data` and `dataset_columns` rows, and any other table with
+an `on delete cascade` foreign key to `datasets`).
+
+It deletes them only when every member of each dataset's workspace has an
+`@avandarlabs.com` email (case-insensitive). A workspace with no members, or
+with any member outside `@avandarlabs.com`, stops the whole transaction: the
+refusal names the dataset id, the workspace id, and how many members are
+outside (never their emails), and nothing changes. The check runs once in
+the read-only report and again inside the transaction, after it locks the
+affected rows: the 4 datasets, their workspaces, those workspaces'
+memberships, and their members' `auth.users` rows. A member added before
+that lock stops the import; one added after it waits for the import to
+finish, and a sign-in by one of those members may wait too. Edits and new
+datasets elsewhere do not wait, but deleting any dataset or workspace does
+(6.11.6).
+
+Production has 4 such datasets, all named "World Development Indicators
+(WDI)", one each in the workspaces ChangeNOW Demo, ICT4D, Mytest, and New
+test workspace, whose only member is `pablo@avandarlabs.com`. Pablo approved
+deleting them. Their legacy Parquet objects are deleted separately, in
+6.11.9.
+
+Deleting each dataset fires `tr__datasets__log_deleted_analytics_event`,
+which adds one `usage_analytics_events` row per dataset: 4 on production.
+Restoring the backup puts the datasets back but does not remove those rows.
+
+**Before the production run, the importer's local Postgres suite must
+pass.** CI skips it: it needs Homebrew `postgresql@14`, `@16`, or `@17`
+(`initdb`, `pg_ctl`, `pg_dump`) and `libpq@18`'s psql on this machine. It
+runs the real delete, guard, rollback, and restore on a throwaway cluster:
+
+```bash
+cd "$REPO"
+pnpm vitest run scripts/alpha/__tests__/catalogImportOnPostgres.integration.test.ts
+```
+
+**Expect:** all tests passed and none skipped: `Tests  10 passed (10)` when
+this was written. A higher count is fine if it equals the total.
+**If not:** skipped tests mean the tools above are missing: install them and
+run it again. A failure: stop, and do not import into production.
 
 **6.11.1 Export the catalog (once, reads staging).** Check 5.7 first:
 
@@ -1254,9 +1351,9 @@ supabase branches list --project-ref "$STAGING_REF" -o json \
   | jq '.[] | select(.name=="demo-measles") | {persistent, preview_project_status}'
 export SOURCE_REF="$(supabase branches list --project-ref "$STAGING_REF" -o json | jq -r '.[] | select(.name == "demo-measles") | .project_ref')"
 SOURCE_DB_URL="$(supabase branches get demo-measles --project-ref "$STAGING_REF" -o env | grep '^POSTGRES_URL_NON_POOLING=' | cut -d= -f2- | tr -d '"')"
-SOURCE_DB_URL="${SOURCE_DB_URL%%\?*}"
+export SOURCE_DB_URL="${SOURCE_DB_URL%%\?*}"
 export CATALOG_DUMP="$CUTOVER_DIR/catalog/catalog-$(date +%Y%m%d).sql"
-bash scripts/alpha/exportCatalogData.sh "$SOURCE_DB_URL" "$CATALOG_DUMP"
+bash scripts/alpha/exportCatalogData.sh "$CATALOG_DUMP"
 grep -nE 'sb_secret_|sb_publishable_|eyJhbGci|service_role|password' "$CATALOG_DUMP" | cut -c1-160 | head -20
 ```
 
@@ -1270,7 +1367,8 @@ with anything but catalog rows.
 **Fallback source.** If `demo-measles` is gone after `alpha-dev`'s own 6.11
 run, export from `alpha-dev` instead: it then holds the whole catalog and,
 after 6.11.7, every Parquet object. Set `SOURCE_REF="$ALPHA_DEV_REF"` and
-`SOURCE_DB_URL="$ALPHA_DEV_DB_URL"` and run the export with a new file name.
+`export SOURCE_DB_URL="$ALPHA_DEV_DB_URL"` and run the export with a new
+file name.
 The rest of 6.11 reads `SOURCE_REF` either way.
 
 **6.11.2 Set the target.** For `alpha-dev`:
@@ -1278,8 +1376,9 @@ The rest of 6.11 reads `SOURCE_REF` either way.
 production: `export TARGET_REF="$PROD_REF" TARGET_DB_URL="$PROD_DB_URL"`. The
 URL must be the direct host or the session pooler on 5432 (never 6543), with
 a percent-encoded password and no query parameter but `sslmode`: 6.5.1
-already stripped `connect_timeout`. The importer needs psql 15.14, 16.10,
-17.6, 18, or newer (`PSQL_BIN`, 1.4).
+already stripped `connect_timeout`. The importer reads it from
+`TARGET_DB_URL` and refuses a URL passed as an argument. It needs psql
+15.14, 16.10, 17.6, 18, or newer (`PSQL_BIN`, 1.4).
 
 **6.11.3 Read-only target checks.**
 
@@ -1308,67 +1407,157 @@ seconds for each lock and rolls back if it cannot get one.
 **6.11.4 Dry run.**
 
 ```bash
-bash scripts/alpha/importCatalogData.sh "$TARGET_DB_URL" "$CATALOG_DUMP" \
+bash scripts/alpha/importCatalogData.sh "$CATALOG_DUMP" \
   --replace-existing --rewrite-storage-host "$SOURCE_REF.supabase.co" "$TARGET_REF.supabase.co" \
   --dry-run
 ```
 
 **Expect:** `Target: postgres...@<host>`; the dump's rows; under Storage
 hosts, only `<SOURCE_REF>.supabase.co`; under foreign keys,
-`public.datasets__open_data.(catalog_listing_id) -> public.data_catalog_listings: on delete cascade, 4 rows deleted`;
-`The cascade leaves 4 public.datasets rows in <N> workspaces`; the listing
-ids a replace drops; the plan; and `Dry run: nothing was written.` with no
-"would refuse" after it.
+`public.datasets__open_data.(catalog_listing_id) -> public.data_catalog_listings: on delete cascade, 4 rows deleted`,
+a line for each table that cascades from `public.datasets` (at least
+`public.dataset_columns.(dataset_id) -> public.datasets`), and
+`public.datasets: 4 rows deleted, every dataset added from the catalog, in 4 workspaces`.
+Then, under `Open data datasets the replace deletes`, for production, 4
+entries like:
+
+```text
+  dataset <id> "World Development Indicators (WDI)" in workspace <id> "ChangeNOW Demo"
+    members: pablo@avandarlabs.com (1 of 1 have an @avandarlabs.com email), guard passes
+```
+
+one each for ChangeNOW Demo, ICT4D, Mytest, and New test workspace, and
+`The @avandarlabs.com guard passes for all 4 open data datasets.` Members
+outside `@avandarlabs.com` are only counted, never listed. Then the target's
+row counts, the listing ids a replace drops, the `pg_dump` command for the
+backup (6.11.5), the plan (its step 2 deletes the 4 datasets), and
+`Dry run: nothing was written.` with no "would refuse" after it.
 **If not:** another Storage host means a listing points outside the source
-project: stop. A "would refuse" names the reason. A refusal about
+project: stop. A "would refuse" names the reason. `guard fails`, or other
+datasets, workspaces, or members than the ones above: stop and raise it.
+Never edit a workspace's members to make the guard pass. A refusal about
 `connect_timeout` means the URL kept its query: strip it as in 6.5.1.
 
-**6.11.5 Back up the target's catalog (reads the target).**
+**6.11.5 Back up the target's catalog and the datasets it deletes (reads
+the target).** The dry run printed the command under `Make the backup with`:
+`with_db_url "$TARGET_DB_URL" "$PG_DUMP_BIN" ...`, with one `--table` for
+each catalog table, the facet counts, `public.datasets`, and every table the
+replace reaches from it. Run it with `--file "$BACKUP_FILE"` in place of its
+`--file`:
 
 ```bash
 export BACKUP_FILE="$CUTOVER_DIR/catalog/catalog-backup-$TARGET_REF-$(date +%Y%m%d-%H%M).sql"
-"$PG_DUMP_BIN" "$TARGET_DB_URL" --data-only --no-owner --no-privileges \
-  --table 'public.data_catalog_drives' --table 'public.data_catalog_listings' \
-  --table 'public.data_catalog_listings__relation_columns' \
-  --table 'public.pipeline_executions' --table 'public.pipeline_execution_scopes' \
-  --table 'public.pipeline_scope_checkpoints' --table 'public.data_catalog_facet_counts' \
-  --table 'public.datasets__open_data' --file "$BACKUP_FILE"
+with_db_url "$TARGET_DB_URL" "$PG_DUMP_BIN" --data-only --no-owner --no-privileges \
+  <the --table arguments the dry run printed> --file "$BACKUP_FILE"
+grep -c '^COPY ' "$BACKUP_FILE"
 ```
 
-These are the catalog, the facet counts, and the one dependent table the dry
-run reported. If 6.11.6 refuses the backup, it prints the exact `pg_dump`
-command to use instead. The backup must be under 24 hours old.
+**Expect:** the `COPY` count equals the number of `--table` arguments. The
+backup holds every row of `public.datasets` and of each dependent table, not
+only the deleted ones: the restore steps 6.11.6 prints stage it and put back
+only the rows the target no longer has. If 6.11.6 refuses the backup, it
+prints the exact command again. The backup must be under 24 hours old.
 
 **6.11.6 Import** (**Writes to production** when the target is production).
+Run it in a quiet window. Until it commits, minutes for the full catalog,
+the import holds whole-table locks on the catalog tables and
+`datasets__open_data`. Until then, a user adding a catalog dataset waits,
+and so does deleting any dataset or workspace, since the delete cascades
+into `datasets__open_data`. A sign-in by a member of the 4 affected
+workspaces may wait too, since their `auth.users` rows are locked.
 
 ```bash
-bash scripts/alpha/importCatalogData.sh "$TARGET_DB_URL" "$CATALOG_DUMP" \
+bash scripts/alpha/importCatalogData.sh "$CATALOG_DUMP" \
   --replace-existing --backup-file "$BACKUP_FILE" \
   --rewrite-storage-host "$SOURCE_REF.supabase.co" "$TARGET_REF.supabase.co" \
   | tee "$CUTOVER_DIR/catalog/import-$TARGET_REF.log"
 ```
 
-It prints how to restore the backup (keep that log), the plan, then asks you
-to type `<user>@<host>` and `delete <N> dependent rows`.
+It prints the same report as the dry run, how to restore the backup (keep
+that log: 6.5.4 reads the restore from it), the plan, then asks you to type
+`<user>@<host>` and
+`delete <N> dependent rows`, noting that the replace deletes the 4
+`public.datasets` rows added from the catalog. Inside the transaction it
+checks the guard again, deletes the 4 datasets, then the catalog, and loads
+the dump with every `pipeline_executions.cli_argv`, `actor`, and `host`
+null.
 **Expect:** `Rewrote the Storage URLs of <n> listings.`, catalog counts equal
-to the dump's, and `Open data datasets with no open data details now: 4
-public.datasets rows in <N> workspaces.`
-**If not:** `The import failed and its transaction rolled back: every count
-matches the report.` means nothing changed: fix and run again. Counts that
-differ from the report: stop and check the target.
+to the dump's, `Open data datasets the replace deleted that remain, by id: 0
+of 4.`, and `Open data datasets with no open data details now: 0
+public.datasets rows in 0 workspaces.` The whole `public.datasets` count is
+not checked: users can add datasets elsewhere during the load.
+The printed restore deletes the whole catalog the import loaded, which
+cascades to the `datasets__open_data` rows of every catalog dataset users
+added since. Use it only right after a wrong import, before users add
+catalog datasets, never as a later rollback.
+**If not:** `The import failed and its transaction rolled back: every
+catalog count matches the report, and all 4 open data datasets are still
+there.` means nothing changed: fix and run again. A
+`Refusing to delete open data dataset ...` error is the guard: a member
+outside `@avandarlabs.com` joined one of the workspaces; stop and raise it.
+Counts that differ from the report: stop and check the target.
 
 ```bash
 read_db "$TARGET_DB_URL" "select count(*) from public.data_catalog_facet_counts"
 read_db "$TARGET_DB_URL" "select count(*) from public.data_catalog_listings l where l::text like '%$SOURCE_REF%'"
 read_db "$TARGET_DB_URL" "select count(*) from public.data_catalog_listings"
+read_db "$TARGET_DB_URL" "select count(*) from public.datasets d where d.name = 'World Development Indicators (WDI)'"
+read_db "$TARGET_DB_URL" "select count(*) from public.pipeline_executions where cli_argv is not null or actor is not null or host is not null"
 ```
 
 **Expect:** more than 0; then 0; then the listing count (keep it for
-6.11.7).
+6.11.7); then 0; then 0.
 
 **6.11.7 Copy the Parquet files** (**Writes to production** Storage when the
-target is production). Keys come from the environment only, and the copy
-runs only when both keys look right:
+target is production).
+
+**Production only, first: check and back up the legacy WDI objects (reads
+production).** The 4 datasets 6.11.6 deleted read 6 Parquet objects in
+bucket `opendata` under `world-bank__wdi/datasets/`, which 6.11.9 deletes.
+The WDI pipeline writes to these same paths, and the copy overwrites an
+object at a listing's path, so before the copy confirm the new catalog does
+not use them, and back them up:
+
+```bash
+cd "$REPO"
+read_db "$PROD_DB_URL" "select count(*) from public.data_catalog_listings l where l::text like '%world-bank__wdi%'"
+read_db "$PROD_DB_URL" "select count(*) from public.datasets__open_data o join public.data_catalog_listings l on l.id = o.catalog_listing_id where l::text like '%world-bank__wdi%'"
+WDI_BACKUP="$CUTOVER_DIR/storage/wdi-legacy"
+mkdir -p "$WDI_BACKUP"
+read_db "$PROD_DB_URL" "select substr(name, length('world-bank__wdi/datasets/') + 1), metadata->>'size', metadata->>'mimetype', metadata->>'cacheControl' from storage.objects where bucket_id = 'opendata' and name like 'world-bank__wdi/%' order by name" | tee "$WDI_BACKUP/objects.txt"
+supabase storage ls "ss:///opendata/world-bank__wdi/datasets/" --project-ref "$PROD_REF" --experimental
+```
+
+`objects.txt` records each object's name, size, content type, and cache
+time, as `name|size|mimetype|cacheControl`; 6.11.9 rechecks against it and its restore reads it.
+**Expect:** `0`; `0`; exactly these 6 objects, each
+`application/vnd.apache.parquet` with `max-age=3600` when this was written,
+and no other object under `world-bank__wdi/` (sizes in bytes):
+`WDICSV.parquet` 61201614, `WDICountry.parquet` 29967,
+`WDIcountry-series.parquet` 47694, `WDIfootnote.parquet` 3460561,
+`WDISeries.parquet` 422408, `WDIseries-time.parquet` 1947; and `ls` lists
+the same 6 names.
+**If not:** a listing that mentions `world-bank__wdi` means the new catalog
+uses these paths, so the copy below would overwrite these objects: stop and
+raise it. Any other object: stop and raise it.
+
+Back them up (a Storage read), and check the copies:
+
+```bash
+WDI_FILES=(WDIcountry-series.parquet WDICountry.parquet WDIseries-time.parquet WDISeries.parquet WDICSV.parquet WDIfootnote.parquet)
+for file in "${WDI_FILES[@]}"; do
+  supabase storage cp "ss:///opendata/world-bank__wdi/datasets/$file" \
+    "$WDI_BACKUP/$file" --project-ref "$PROD_REF" --experimental || echo "FAILED $file"
+done
+ls -l "$WDI_BACKUP"
+```
+
+**Expect:** no `FAILED` line, and 6 files whose sizes match the listing
+above. **If not:** re-run the download for the failed file. Do not start the
+Parquet copy below until all 6 are backed up.
+
+Then the copy. Keys come from the environment only, and the copy runs only
+when both keys look right:
 
 ```bash
 cd "$REPO"
@@ -1407,6 +1596,56 @@ workspace, with the browser's network panel open. **Expect:** the data loads,
 and every Storage request goes to `<TARGET_REF>.supabase.co`, none to
 `<SOURCE_REF>.supabase.co`. Keep the `demo-measles` branch until this passes
 on production (section 8).
+
+**6.11.9 Delete the legacy WDI Parquet objects** (production only,
+**Writes to production** Storage, after 6.11.8 passes). The 4 datasets 6.11.6
+deleted read 6 Parquet objects in bucket `opendata` under
+`world-bank__wdi/datasets/`. 6.11.7 checked them and backed them up into
+`$WDI_BACKUP` before the copy. In a new terminal, set it again:
+`WDI_BACKUP="$CUTOVER_DIR/storage/wdi-legacy"`.
+
+Recheck that the 6 objects are the ones 6.11.7 backed up, unchanged, and
+that the catalog still does not use their paths (reads production):
+
+```bash
+read_db "$PROD_DB_URL" "select count(*) from public.data_catalog_listings l where l::text like '%world-bank__wdi%'"
+read_db "$PROD_DB_URL" "select substr(name, length('world-bank__wdi/datasets/') + 1), metadata->>'size', metadata->>'mimetype', metadata->>'cacheControl' from storage.objects where bucket_id = 'opendata' and name like 'world-bank__wdi/%' order by name" | diff - "$WDI_BACKUP/objects.txt" && echo "unchanged"
+ls -l "$WDI_BACKUP"
+```
+
+**Expect:** `0`, then `unchanged`, and the 6 backup files.
+**If not:** stop, and do not delete.
+
+Delete them:
+
+```bash
+supabase storage rm \
+  "ss:///opendata/world-bank__wdi/datasets/WDIcountry-series.parquet" \
+  "ss:///opendata/world-bank__wdi/datasets/WDICountry.parquet" \
+  "ss:///opendata/world-bank__wdi/datasets/WDIseries-time.parquet" \
+  "ss:///opendata/world-bank__wdi/datasets/WDISeries.parquet" \
+  "ss:///opendata/world-bank__wdi/datasets/WDICSV.parquet" \
+  "ss:///opendata/world-bank__wdi/datasets/WDIfootnote.parquet" \
+  --project-ref "$PROD_REF" --experimental
+read_db "$PROD_DB_URL" "select count(*) from storage.objects where bucket_id = 'opendata' and name like 'world-bank__wdi/%'"
+```
+
+`supabase storage rm` may ask you to confirm the delete: read the names it
+lists and answer at the prompt. Never add `--yes` to a production `rm`.
+**Expect:** the CLI reports the 6 objects deleted, then `0`.
+**If not:** a partial delete: re-run the `rm` with the names the count still
+finds. To restore (**Writes to production** Storage), upload the backup with
+each object's recorded content type and cache time:
+
+```bash
+while IFS='|' read -r file size mimetype cache_control; do
+  supabase storage cp "$WDI_BACKUP/$file" "ss:///opendata/world-bank__wdi/datasets/$file" \
+    --content-type "$mimetype" --cache-control "$cache_control" \
+    --project-ref "$PROD_REF" --experimental </dev/null
+done < "$WDI_BACKUP/objects.txt"
+```
+
+Keep `$WDI_BACKUP` until section 8 deletes `$CUTOVER_DIR`.
 
 ## 7. Rollback
 
@@ -1461,7 +1700,7 @@ pre-migration schema:
 ```bash
 [[ "$(read_db "$PROD_DB_URL" "select max(version) from supabase_migrations.schema_migrations")" == 20261013212914 ]] &&
   echo "pre-migration schema" &&
-  "$PSQL_BIN" "$PROD_DB_URL" -X -P pager=off --single-transaction --set ON_ERROR_STOP=1 \
+  with_db_url "$PROD_DB_URL" "$PSQL_BIN" -X -P pager=off --single-transaction --set ON_ERROR_STOP=1 \
     --file "$CUTOVER_DIR/rollback-truncate.sql" \
     --file "$D/prod-$BACKUP_T-data-app.sql" &&
   read_db "$PROD_DB_URL" "$COUNTS_SQL"
@@ -1477,7 +1716,7 @@ guard refuses production's URL:
 ```bash
 read -rs EMPTY_DB_URL      # the new project's session pooler URI
 [[ -n "$EMPTY_DB_URL" && "$EMPTY_DB_URL" != *"$PROD_REF"* ]] &&
-  "$PSQL_BIN" "$EMPTY_DB_URL" -X -P pager=off --single-transaction --set ON_ERROR_STOP=1 \
+  with_db_url "$EMPTY_DB_URL" "$PSQL_BIN" -X -P pager=off --single-transaction --set ON_ERROR_STOP=1 \
     --file "$D/prod-$BACKUP_T-roles.sql" \
     --file "$D/prod-$BACKUP_T-schema.sql" \
     --command 'SET session_replication_role = replica' \

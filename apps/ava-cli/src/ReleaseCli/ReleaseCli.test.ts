@@ -8,7 +8,9 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { checkSourceBranchCi } from "@ava-cli/ReleaseCli/checkSourceBranchCi/checkSourceBranchCi";
 import { ReleaseCli } from "@ava-cli/ReleaseCli/ReleaseCli";
+import { promptToConfirm } from "@ava-cli/ReleaseCli/releasePromptHelpers";
 import { runRelease } from "@ava-cli/ReleaseCli/runRelease/runRelease";
 import { noop } from "@avandar/utils";
 import {
@@ -21,6 +23,13 @@ import {
   it,
   vi,
 } from "vitest";
+import type { CiStatus } from "@ava-cli/ReleaseCli/checkSourceBranchCi/checkSourceBranchCi";
+
+// The real check asks GitHub, which these fixture repositories are not on.
+// Every test that reaches it sets the verdict it needs.
+vi.mock("@ava-cli/ReleaseCli/checkSourceBranchCi/checkSourceBranchCi");
+// A prompt would wait on stdin. Every test that reaches one says so.
+vi.mock("@ava-cli/ReleaseCli/releasePromptHelpers");
 
 /** Run a Git command in the given directory and return trimmed stdout. */
 function _git(
@@ -783,3 +792,219 @@ describe.each(END_TO_END_RELEASE_CASES)(
     });
   },
 );
+
+/** The run URL the mocked CI check reports, for a refusal to name. */
+const CI_RUN_URL = "https://github.com/AvandarLabs/avandar/actions/runs/7";
+
+/** Each verdict other than a pass, as the mocked CI check returns it. */
+const NON_PASSING_CI_STATUSES: readonly CiStatus[] = [
+  { kind: "failed", conclusion: "failure", url: CI_RUN_URL },
+  { kind: "pending", status: "in_progress", url: CI_RUN_URL },
+  { kind: "missing" },
+  { kind: "unknown", reason: "the gh CLI is not logged in" },
+];
+
+describe("ava release on alpha-dev with a non-passing CI verdict", () => {
+  let directory: string;
+  let origin: string;
+  let checkout: string;
+
+  beforeAll(() => {
+    directory = mkdtempSync(join(tmpdir(), "ava-release-ci-refusal-"));
+    _isolateFromUserConfig(directory);
+    ({ origin, checkout } = _checkOutFreshSourceBranch({
+      directory,
+      sourceBranch: "alpha-dev",
+    }));
+    // Fetched first, so the release's own fetch has nothing left to move.
+    _git({ cwd: checkout, args: ["fetch", "--prune", "--tags", "origin"] });
+  });
+
+  afterEach(() => {
+    vi.mocked(console.log).mockClear();
+    vi.mocked(promptToConfirm).mockReset();
+    vi.mocked(checkSourceBranchCi).mockReset();
+  });
+
+  afterAll(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllEnvs();
+    rmSync(directory, { recursive: true, force: true });
+  });
+
+  describe.each(NON_PASSING_CI_STATUSES)("($kind)", (ciStatus) => {
+    it.each([true, false])(
+      "refuses with --yes %s before any mutating command, without asking",
+      async (yes) => {
+        vi.mocked(checkSourceBranchCi).mockReturnValue(ciStatus);
+        const originRefsBefore = _listRefs(origin);
+        const checkoutRefsBefore = _listRefs(checkout);
+
+        await expect(
+          runRelease({
+            version: "0.15.0",
+            nextVersion: "0.15.1",
+            yes,
+            dryRun: false,
+            skipCiCheck: false,
+            skipChangelog: true,
+          }),
+        ).rejects.toThrow(`"${ciStatus.kind}"`);
+
+        expect(promptToConfirm).not.toHaveBeenCalled();
+        expect(_listRefs(origin)).toBe(originRefsBefore);
+        expect(_listRefs(checkout)).toBe(checkoutRefsBefore);
+        expect(_git({ cwd: checkout, args: ["status", "--short"] })).toBe("");
+        // Every mutating command is echoed as `$ <command>` before it runs.
+        expect(_stdoutText()).not.toContain("$ ");
+      },
+    );
+  });
+
+  it("names the run URL and --skip-ci-check in the refusal", async () => {
+    vi.mocked(checkSourceBranchCi).mockReturnValue(
+      NON_PASSING_CI_STATUSES[0] as CiStatus,
+    );
+
+    const release = runRelease({
+      version: "0.15.0",
+      nextVersion: "0.15.1",
+      yes: true,
+      dryRun: false,
+      skipCiCheck: false,
+      skipChangelog: true,
+    });
+
+    await expect(release).rejects.toThrow(CI_RUN_URL);
+    await expect(release).rejects.toThrow("--skip-ci-check");
+  });
+});
+
+/** One release the CI gate must let through, and the verdict it sees. */
+type CiGateProceedCase = {
+  name: string;
+  sourceBranch: string;
+  targetBranch: string;
+  version: string;
+  nextVersion: string;
+  releaseTag: string;
+  ciStatus: CiStatus;
+  skipCiCheck: boolean;
+};
+
+const CI_GATE_PROCEED_CASES: readonly CiGateProceedCase[] = [
+  {
+    name: "alpha-dev with a passed verdict",
+    sourceBranch: "alpha-dev",
+    targetBranch: "alpha",
+    version: "0.15.0",
+    nextVersion: "0.15.1",
+    releaseTag: "v0.15.0-alpha",
+    ciStatus: { kind: "passed", url: CI_RUN_URL },
+    skipCiCheck: false,
+  },
+  {
+    name: "alpha-dev with a failed verdict and --skip-ci-check",
+    sourceBranch: "alpha-dev",
+    targetBranch: "alpha",
+    version: "0.15.0",
+    nextVersion: "0.15.1",
+    releaseTag: "v0.15.0-alpha",
+    ciStatus: { kind: "failed", conclusion: "failure", url: CI_RUN_URL },
+    skipCiCheck: true,
+  },
+  {
+    name: "develop with a failed verdict and --yes",
+    sourceBranch: "develop",
+    targetBranch: "main",
+    version: "0.14.2",
+    nextVersion: "0.14.3",
+    releaseTag: "v0.14.2",
+    ciStatus: { kind: "failed", conclusion: "failure", url: CI_RUN_URL },
+    skipCiCheck: false,
+  },
+];
+
+describe.each(CI_GATE_PROCEED_CASES)("ava release on $name", (proceedCase) => {
+  let directory: string;
+  let origin: string;
+  let tipsBefore: Record<string, string>;
+
+  beforeAll(() => {
+    directory = mkdtempSync(join(tmpdir(), "ava-release-ci-proceed-"));
+    _isolateFromUserConfig(directory);
+    ({ origin } = _checkOutFreshSourceBranch({
+      directory,
+      sourceBranch: proceedCase.sourceBranch,
+    }));
+    tipsBefore = _readBranchTips(origin);
+    vi.mocked(checkSourceBranchCi).mockReturnValue(proceedCase.ciStatus);
+  });
+
+  afterAll(() => {
+    vi.mocked(checkSourceBranchCi).mockReset();
+    vi.restoreAllMocks();
+    vi.unstubAllEnvs();
+    rmSync(directory, { recursive: true, force: true });
+  });
+
+  it(`publishes ${proceedCase.targetBranch} and tags ${proceedCase.releaseTag}`, async () => {
+    await runRelease({
+      version: proceedCase.version,
+      nextVersion: proceedCase.nextVersion,
+      yes: true,
+      dryRun: false,
+      skipCiCheck: proceedCase.skipCiCheck,
+      skipChangelog: true,
+    });
+
+    const tipsAfter = _readBranchTips(origin);
+    expect(tipsAfter[proceedCase.targetBranch]).not.toBe(
+      tipsBefore[proceedCase.targetBranch],
+    );
+    expect(
+      _git({
+        cwd: origin,
+        args: ["rev-parse", `refs/tags/${proceedCase.releaseTag}^{commit}`],
+      }),
+    ).toBe(tipsAfter[proceedCase.targetBranch]);
+    expect(promptToConfirm).not.toHaveBeenCalled();
+  }, 30_000);
+});
+
+describe("ava release --help", () => {
+  let originalArgv: string[];
+
+  beforeEach(() => {
+    originalArgv = process.argv;
+    process.argv = [process.execPath, "ava", "release", "--help"];
+    vi.spyOn(console, "log").mockImplementation(noop);
+  });
+
+  afterEach(() => {
+    process.argv = originalArgv;
+    vi.restoreAllMocks();
+  });
+
+  it("says alpha-dev refuses any CI verdict but a pass, even with --yes or --dry-run", async () => {
+    await ReleaseCli.state.action?.({
+      version: "",
+      next: "",
+      yes: false,
+      dryRun: false,
+      skipCiCheck: false,
+      skipChangelog: false,
+    });
+
+    // Collapsed so the assertions survive re-wrapping the help text.
+    const stdout = _stdoutText().replace(/\s+/g, " ");
+    expect(stdout).toContain(
+      "On alpha-dev, anything but a pass (failed, pending, missing, or unknown) refuses the release, even with --yes",
+    );
+    expect(stdout).toContain("refuses --dry-run too");
+    expect(stdout).toContain(
+      "On alpha-dev, refused while CI is not green unless --skip-ci-check is passed.",
+    );
+    expect(stdout).toContain("deploys production without alpha-dev's CI");
+  });
+});
