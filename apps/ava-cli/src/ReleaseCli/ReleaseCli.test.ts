@@ -8,10 +8,12 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { DEFAULT_ENV_NAME } from "@ava-cli/AvaEnv/AvaEnv";
 import { checkSourceBranchCi } from "@ava-cli/ReleaseCli/checkSourceBranchCi/checkSourceBranchCi";
 import { ReleaseCli } from "@ava-cli/ReleaseCli/ReleaseCli";
 import { promptToConfirm } from "@ava-cli/ReleaseCli/releasePromptHelpers";
 import { runRelease } from "@ava-cli/ReleaseCli/runRelease/runRelease";
+import { Acclimate } from "@avandar/acclimate";
 import { noop } from "@avandar/utils";
 import {
   afterAll,
@@ -24,12 +26,22 @@ import {
   vi,
 } from "vitest";
 import type { CiStatus } from "@ava-cli/ReleaseCli/checkSourceBranchCi/checkSourceBranchCi";
+import type { ReleaseOptions } from "@ava-cli/ReleaseCli/runRelease/runRelease";
 
 // The real check asks GitHub, which these fixture repositories are not on.
 // Every test that reaches it sets the verdict it needs.
 vi.mock("@ava-cli/ReleaseCli/checkSourceBranchCi/checkSourceBranchCi");
 // A prompt would wait on stdin. Every test that reaches one says so.
 vi.mock("@ava-cli/ReleaseCli/releasePromptHelpers");
+// The real release runs by default. Tests that only check how argv is parsed
+// stub it, so a parsing bug cannot start a release.
+vi.mock("@ava-cli/ReleaseCli/runRelease/runRelease", async (importOriginal) => {
+  const actualModule =
+    await importOriginal<
+      typeof import("@ava-cli/ReleaseCli/runRelease/runRelease")
+    >();
+  return { ...actualModule, runRelease: vi.fn(actualModule.runRelease) };
+});
 
 /** Run a Git command in the given directory and return trimmed stdout. */
 function _git(
@@ -219,12 +231,12 @@ function _stdoutText(): string {
  * refusal regressed.
  */
 async function _runRelease(
-  options: Readonly<{ dryRun: boolean }>,
+  options: Readonly<{ dryRun: boolean; yes?: boolean }>,
 ): Promise<void> {
   await ReleaseCli.state.action?.({
     version: "0.15.0",
     next: "0.15.1",
-    yes: false,
+    yes: options.yes ?? false,
     dryRun: options.dryRun,
     skipCiCheck: false,
     skipChangelog: false,
@@ -294,35 +306,6 @@ describe("ava release on a branch that is not a source branch", () => {
     expect(_stdoutText()).not.toContain("$ ");
   });
 
-  it("refuses --dry-run=true --yes before the release starts, with exit code 1", async () => {
-    const origin = join(directory, "origin");
-    const refsBefore = _listRefs(repoRoot);
-    const originRefsBefore = _listRefs(origin);
-    process.argv.push("--dry-run=true", "--yes");
-
-    // Acclimate reads `--dry-run=true` as an unknown option named
-    // `--dry-run=true`, so the action sees a real, unconfirmed release.
-    await ReleaseCli.state.action?.({
-      version: "0.15.0",
-      next: "0.15.1",
-      yes: true,
-      dryRun: false,
-      skipCiCheck: false,
-      skipChangelog: false,
-    });
-
-    const stdout = _stdoutText();
-    expect(stdout).toContain(
-      'Use "--flag value", not "--flag=value": --dry-run=true.',
-    );
-    // The branch check is the release's first step, so its refusal not
-    // appearing proves the release never started.
-    expect(stdout).not.toContain("Releases are cut from");
-    expect(_listRefs(repoRoot)).toBe(refsBefore);
-    expect(_listRefs(origin)).toBe(originRefsBefore);
-    expect(process.exitCode).toBe(1);
-  });
-
   it("accepts the global --env option and reaches the branch check", async () => {
     process.argv.push("--env", "staging");
 
@@ -353,7 +336,7 @@ describe("ava release on a branch that is not a source branch", () => {
   });
 });
 
-describe("ava release on a source branch", () => {
+describe("ava release on develop", () => {
   let directory: string;
   let repoRoot: string;
   let originalArgv: string[];
@@ -362,6 +345,7 @@ describe("ava release on a source branch", () => {
   beforeEach(() => {
     directory = mkdtempSync(join(tmpdir(), "ava-release-source-"));
     ({ repoRoot } = _createRepos(directory));
+    vi.mocked(runRelease).mockClear();
     originalArgv = process.argv;
     originalExitCode = process.exitCode;
     process.argv = [process.execPath, "ava", "release", "--dry-run"];
@@ -387,6 +371,32 @@ describe("ava release on a source branch", () => {
 
     const stdout = _stdoutText();
     expect(stdout).toContain("The working tree has tracked changes");
+    expect(process.exitCode).toBe(1);
+  });
+
+  it("refuses --dry-run=true --yes before the release starts, with exit code 1", async () => {
+    _git({ cwd: repoRoot, args: ["switch", "-c", "develop"] });
+    const origin = join(directory, "origin");
+    const refsBefore = _listRefs(repoRoot);
+    const originRefsBefore = _listRefs(origin);
+    process.argv = [
+      process.execPath,
+      "ava",
+      "release",
+      "--dry-run=true",
+      "--yes",
+    ];
+
+    // Acclimate reads `--dry-run=true` as an unknown option named
+    // `--dry-run=true`, so the action sees a real, unconfirmed release.
+    await _runRelease({ dryRun: false, yes: true });
+
+    expect(_stdoutText()).toContain("--dry-run=true");
+    expect(runRelease).not.toHaveBeenCalled();
+    // On develop a release that started would fetch, moving origin/main to
+    // origin's newer commit, so unmoved refs also prove it never ran.
+    expect(_listRefs(repoRoot)).toBe(refsBefore);
+    expect(_listRefs(origin)).toBe(originRefsBefore);
     expect(process.exitCode).toBe(1);
   });
 });
@@ -550,7 +560,7 @@ type EndToEndReleaseCase = {
   version: string;
   nextVersion: string;
   /** package.json on the target branch after the release. */
-  publishedVersion: string;
+  releaseVersion: string;
   releaseTag: string;
   /** The tag the retired line would have used, which must not appear. */
   retiredLineTag: string;
@@ -565,7 +575,7 @@ const END_TO_END_RELEASE_CASES: readonly EndToEndReleaseCase[] = [
     retiredLineBranches: ["alpha", "alpha-dev"],
     version: "0.14.2",
     nextVersion: "0.14.3",
-    publishedVersion: "0.14.2",
+    releaseVersion: "0.14.2",
     releaseTag: "v0.14.2",
     retiredLineTag: "v0.14.2-alpha",
     nextDevVersion: "0.14.3-dev",
@@ -671,13 +681,13 @@ describe.each(END_TO_END_RELEASE_CASES)(
       );
     });
 
-    it(`publishes package.json at ${releaseCase.publishedVersion} on ${targetBranch}`, () => {
+    it(`publishes package.json at ${releaseCase.releaseVersion} on ${targetBranch}`, () => {
       expect(
         _readPackageVersion({
           repoRoot: origin,
           revision: tipsAfter[targetBranch] ?? "",
         }),
-      ).toBe(releaseCase.publishedVersion);
+      ).toBe(releaseCase.releaseVersion);
     });
 
     it(`tags ${targetBranch} with the annotated tag ${releaseTag}`, () => {
@@ -913,5 +923,125 @@ describe("ava release --help", () => {
       "--skip-ci-check Do not check develop's staging CI.",
     );
     expect(stdout).not.toMatch(/alpha/i);
+  });
+});
+
+/**
+ * Run `ava release <flags>` through Acclimate's real argument parser, from a
+ * root CLI cut down to what routes the command: the global `--env` option
+ * `main.ts` declares and the `release` command. Acclimate does not hand back a
+ * promise, so the caller waits for the outcome it expects.
+ */
+function _runAvaRelease(flags: readonly string[]): void {
+  process.argv = [process.execPath, "ava", "release", ...flags];
+  Acclimate.run(
+    Acclimate.createCLI("ava")
+      .addGlobalOption({
+        name: "--env",
+        type: "string",
+        required: false,
+        defaultValue: DEFAULT_ENV_NAME,
+      })
+      .addCommand("release", ReleaseCli),
+  );
+}
+
+/** What `ava release` hands `runRelease` when only `overrides` were passed. */
+function _buildReleaseOptions(
+  overrides: Readonly<Partial<ReleaseOptions>>,
+): ReleaseOptions {
+  return {
+    version: undefined,
+    nextVersion: undefined,
+    yes: false,
+    dryRun: false,
+    skipCiCheck: false,
+    skipChangelog: false,
+    ...overrides,
+  };
+}
+
+describe("ava release through the real argument parser", () => {
+  let originalArgv: string[];
+  let originalExitCode: typeof process.exitCode;
+
+  beforeEach(() => {
+    originalArgv = process.argv;
+    originalExitCode = process.exitCode;
+    process.exitCode = undefined;
+    vi.mocked(runRelease).mockReset();
+    vi.mocked(runRelease).mockResolvedValue(undefined);
+    vi.spyOn(console, "log").mockImplementation(noop);
+    vi.spyOn(console, "error").mockImplementation(noop);
+  });
+
+  afterEach(() => {
+    process.argv = originalArgv;
+    process.exitCode = originalExitCode;
+    // Puts back the real release for the tests that run it.
+    vi.mocked(runRelease).mockReset();
+    vi.restoreAllMocks();
+  });
+
+  /** Wait for the action to refuse, then prove no release started. */
+  const _expectRefusal = async (expectedText: string): Promise<void> => {
+    await vi.waitFor(() => {
+      expect(process.exitCode).toBe(1);
+    });
+    expect(_stdoutText()).toContain(expectedText);
+    expect(runRelease).not.toHaveBeenCalled();
+  };
+
+  /** Wait for the action to start the release, and return its options. */
+  const _waitForReleaseOptions = async (): Promise<unknown> => {
+    await vi.waitFor(() => {
+      expect(runRelease).toHaveBeenCalled();
+    });
+    return vi.mocked(runRelease).mock.calls[0]?.[0];
+  };
+
+  it("parses --dry-run as dryRun: true", async () => {
+    _runAvaRelease(["--dry-run"]);
+
+    expect(await _waitForReleaseOptions()).toEqual(
+      _buildReleaseOptions({ dryRun: true }),
+    );
+  });
+
+  it("refuses --dry-run=true --yes with exit code 1, starting no release", async () => {
+    _runAvaRelease(["--dry-run=true", "--yes"]);
+
+    await _expectRefusal("--dry-run=true");
+  });
+
+  it("refuses --yes dry-run, which would otherwise release for real", async () => {
+    _runAvaRelease(["--yes", "dry-run"]);
+
+    await _expectRefusal("dry-run");
+  });
+
+  it("refuses a flag typed with a long dash after --yes", async () => {
+    // An en dash, as an editor's autocorrect turns a pasted `--` into.
+    const token = "\u2013dry-run";
+    _runAvaRelease(["--yes", token]);
+
+    await _expectRefusal(token);
+  });
+
+  it("accepts --version 0.15.0", async () => {
+    _runAvaRelease(["--version", "0.15.0"]);
+
+    expect(await _waitForReleaseOptions()).toEqual(
+      _buildReleaseOptions({ version: "0.15.0" }),
+    );
+  });
+
+  it("accepts the global --env staging", async () => {
+    _runAvaRelease(["--env", "staging", "--dry-run"]);
+
+    expect(await _waitForReleaseOptions()).toEqual(
+      _buildReleaseOptions({ dryRun: true }),
+    );
+    expect(process.exitCode).toBeUndefined();
   });
 });

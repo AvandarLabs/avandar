@@ -1,5 +1,7 @@
+import { DEFAULT_ENV_NAME } from "@ava-cli/AvaEnv/AvaEnv";
 import * as collectReleaseChangelogCommitsModule from "@ava-cli/ReleaseCli/releaseChangelog/collectReleaseChangelogCommits/collectReleaseChangelogCommits";
 import * as publishReleaseNotesModule from "@ava-cli/ReleaseCli/releaseChangelog/publishReleaseNotes/publishReleaseNotes";
+import { ReleaseCli } from "@ava-cli/ReleaseCli/ReleaseCli";
 import { ReleaseNotesCli } from "@ava-cli/ReleaseCli/ReleaseNotesCli/ReleaseNotesCli";
 import * as releasePromptHelpersModule from "@ava-cli/ReleaseCli/releasePromptHelpers";
 import * as findRepoRootModule from "@ava-cli/utils/findRepoRoot";
@@ -38,7 +40,7 @@ const MIXED_RELEASE_TAGS = [
 ];
 
 /** The boolean options Acclimate parses out of one accepted-flag case. */
-type ReleaseNotesFlagCase = { dryRun: boolean; update: boolean };
+type ParsedReleaseNotesFlags = { dryRun: boolean; update: boolean };
 
 function _loggedText(logSpy: ReturnType<typeof vi.spyOn>): string {
   return logSpy.mock.calls
@@ -145,13 +147,11 @@ describe("ava release notes", () => {
     expect(
       publishReleaseNotesModule.publishReleaseNotes,
     ).not.toHaveBeenCalled();
-    expect(_loggedText(logSpy)).toContain(
-      'Use "--flag value", not "--flag=value": --dry-run=true.',
-    );
+    expect(_loggedText(logSpy)).toContain("--dry-run=true");
     expect(process.exitCode).toBe(1);
   });
 
-  it.each<[string, readonly string[], ReleaseNotesFlagCase]>([
+  it.each<[string, readonly string[], ParsedReleaseNotesFlags]>([
     ["--version", ["--version", "0.13.3"], { dryRun: false, update: false }],
     ["-v", ["-v", "0.13.3"], { dryRun: false, update: false }],
     [
@@ -322,5 +322,123 @@ describe("ava release notes", () => {
         expect.objectContaining({ defaultValue: "0.14.2" }),
       );
     });
+  });
+});
+
+/**
+ * Run `ava release notes <flags>` through Acclimate's real argument parser,
+ * from a root CLI cut down to what routes the command: the global `--env`
+ * option `main.ts` declares and the `release` command. Acclimate does not
+ * hand back a promise, so the caller waits for the outcome it expects.
+ */
+function _runAvaReleaseNotes(flags: readonly string[]): void {
+  process.argv = [process.execPath, "ava", "release", "notes", ...flags];
+  Acclimate.run(
+    Acclimate.createCLI("ava")
+      .addGlobalOption({
+        name: "--env",
+        type: "string",
+        required: false,
+        defaultValue: DEFAULT_ENV_NAME,
+      })
+      .addCommand("release", ReleaseCli),
+  );
+}
+
+describe("ava release notes through the real argument parser", () => {
+  let originalArgv: string[];
+  let originalExitCode: typeof process.exitCode;
+  let logSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    originalArgv = process.argv;
+    originalExitCode = process.exitCode;
+    process.exitCode = undefined;
+    vi.mocked(findRepoRootModule.findRepoRoot).mockReturnValue("/fake/repo");
+    vi.mocked(publishReleaseNotesModule.publishReleaseNotes).mockReset();
+    vi.mocked(publishReleaseNotesModule.publishReleaseNotes).mockResolvedValue({
+      kind: "previewed",
+      notes: "preview",
+    });
+    logSpy = vi.spyOn(Acclimate, "log").mockImplementation(() => {
+      return undefined;
+    });
+  });
+
+  afterEach(() => {
+    process.argv = originalArgv;
+    process.exitCode = originalExitCode;
+    vi.restoreAllMocks();
+  });
+
+  /** Wait for the action to refuse, then prove it published nothing. */
+  const _expectRefusal = async (expectedText: string): Promise<void> => {
+    await vi.waitFor(() => {
+      expect(process.exitCode).toBe(1);
+    });
+    expect(_loggedText(logSpy)).toContain(expectedText);
+    expect(
+      publishReleaseNotesModule.publishReleaseNotes,
+    ).not.toHaveBeenCalled();
+  };
+
+  /** Wait for the action to call the publisher, and return what it passed. */
+  const _waitForPublishOptions = async (): Promise<unknown> => {
+    await vi.waitFor(() => {
+      expect(publishReleaseNotesModule.publishReleaseNotes).toHaveBeenCalled();
+    });
+    return vi.mocked(publishReleaseNotesModule.publishReleaseNotes).mock
+      .calls[0]?.[1];
+  };
+
+  it("parses --dry-run as dryRun: true", async () => {
+    _runAvaReleaseNotes(["--version", "0.13.3", "--dry-run"]);
+
+    expect(await _waitForPublishOptions()).toEqual({
+      releaseTag: "v0.13.3",
+      dryRun: true,
+      update: false,
+    });
+  });
+
+  it("refuses --dry-run=true with exit code 1, publishing nothing", async () => {
+    _runAvaReleaseNotes(["--version", "0.13.3", "--dry-run=true"]);
+
+    await _expectRefusal("--dry-run=true");
+  });
+
+  it("refuses --update dry-run, which would otherwise publish for real", async () => {
+    _runAvaReleaseNotes(["--version", "0.13.3", "--update", "dry-run"]);
+
+    await _expectRefusal("dry-run");
+  });
+
+  it("refuses a flag typed with a long dash after --update", async () => {
+    // An em dash, as an editor's autocorrect turns a pasted `--` into.
+    const token = "\u2014dry-run";
+    _runAvaReleaseNotes(["--version", "0.13.3", "--update", token]);
+
+    await _expectRefusal(token);
+  });
+
+  it("accepts --version 0.15.0", async () => {
+    _runAvaReleaseNotes(["--version", "0.15.0"]);
+
+    expect(await _waitForPublishOptions()).toEqual({
+      releaseTag: "v0.15.0",
+      dryRun: false,
+      update: false,
+    });
+  });
+
+  it("accepts the global --env staging", async () => {
+    _runAvaReleaseNotes(["--version", "0.13.3", "--env", "staging"]);
+
+    expect(await _waitForPublishOptions()).toEqual({
+      releaseTag: "v0.13.3",
+      dryRun: false,
+      update: false,
+    });
+    expect(process.exitCode).toBeUndefined();
   });
 });

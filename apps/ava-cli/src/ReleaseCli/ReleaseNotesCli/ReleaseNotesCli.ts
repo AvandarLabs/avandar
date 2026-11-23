@@ -65,6 +65,16 @@ const RELEASE_NOTES_FLAGS = [
 ] as const;
 
 /**
+ * The flags `ava release notes` accepts that take a value, so a word after
+ * any other flag is refused rather than silently becoming that flag's value.
+ */
+const RELEASE_NOTES_VALUE_FLAGS = [
+  "--version",
+  "-v",
+  ...AVA_GLOBAL_FLAGS,
+] as const;
+
+/**
  * The bare `X.Y.Z` of the newest release tag, or undefined when there is none.
  * A tag counts when a release would tag that version with it, so `v0.14.2`
  * counts and a suffixed tag such as `v0.15.0-rc` does not.
@@ -189,13 +199,14 @@ export const ReleaseNotesCli = Acclimate.createCLI("notes")
       printInfo(USAGE);
       return undefined;
     }
-    const unknownFlags = findUnknownReleaseFlags({
+    const flagProblems = findUnknownReleaseFlags({
       argv,
       acceptedFlags: RELEASE_NOTES_FLAGS,
+      valueFlags: RELEASE_NOTES_VALUE_FLAGS,
     });
-    if (unknownFlags.length > 0) {
+    if (flagProblems.length > 0) {
       printError(
-        `${describeUnknownReleaseFlags(unknownFlags)} Nothing was published; ` +
+        `${describeUnknownReleaseFlags(flagProblems)} Nothing was published; ` +
           "run `ava release notes --help`.",
       );
       process.exitCode = 1;
