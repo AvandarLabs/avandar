@@ -10,21 +10,9 @@ import { Acclimate } from "@avandar/acclimate";
 
 const USAGE = `ava release: publish a new release of the Avandar app.
 
-  Run it on alpha-dev to release alpha (production, app.avandarlabs.com), or
-  on develop to release mainline (main). Any other branch is refused.
-
-  The target branch becomes an exact copy of the source branch (a straight
-  cut, never a merge, so it cannot conflict), tagged vX.Y.Z on mainline or
-  vX.Y.Z-alpha on alpha. The source branch then moves on to its next dev
-  version (-dev on develop, -alpha-dev on alpha-dev). Type versions as
-  X.Y.Z: the suffixes are added for you.
-
-  Before anything changes, the source branch's CI verdict on the commit
-  being released is checked. On alpha-dev, anything but a pass (failed,
-  pending, missing, or unknown) refuses the release, even with --yes, and
-  refuses --dry-run too: wait for green, or pass --skip-ci-check to deploy
-  production without it. On develop, a non-passing verdict asks first, and
-  --yes proceeds.
+  main becomes an exact copy of develop (a straight cut, never a merge, so it
+  cannot conflict), tagged vX.Y.Z. develop then moves on to the next -dev
+  version. Run it from develop, with a clean tree and nothing unpushed.
 
 Usage
   ava release get-prod-version                  print the version on origin/main
@@ -36,16 +24,11 @@ Usage
 
 Options
   --version, -v  X.Y.Z to release. Asked for when omitted.
-  --next, -n     X.Y.Z the source branch moves to; gains -dev or -alpha-dev.
-                 Asked for when omitted.
-  --yes, -y      Take every suggestion and skip confirmations. Never
-                 overrides a non-passing alpha-dev CI verdict.
+  --next, -n     X.Y.Z develop moves to; gains -dev. Asked for when omitted.
+  --yes, -y      Take every suggestion and skip confirmations.
   --dry-run      Print every mutating command and run none of them. Still
                  makes one real OpenAI call to preview the release notes.
-                 On alpha-dev, refused while CI is not green unless
-                 --skip-ci-check is passed.
-  --skip-ci-check  Do not check the source branch's CI. On alpha-dev this
-                 deploys production without alpha-dev's CI verdict.
+  --skip-ci-check  Do not check develop's staging CI.
   --skip-changelog  Do not generate or publish GitHub release notes.
   --help, -h     This text.`;
 
@@ -71,14 +54,10 @@ export const ReleaseCli = Acclimate.createCLI("release")
   .addCommand("get-prod-version", GetProdVersionCli)
   .addCommand("notes", ReleaseNotesCli)
   .description(
-    "Publish a new release of the Avandar app. Run it on alpha-dev to " +
-      "release alpha (production, app.avandarlabs.com), or on develop to " +
-      "release mainline (main). Any other branch is refused. The target " +
-      "branch becomes an exact copy of the source branch (a straight cut, " +
-      "never a merge, so it cannot conflict), tagged vX.Y.Z on mainline or " +
-      "vX.Y.Z-alpha on alpha. The source branch then moves on to its next " +
-      "dev version (-dev on develop, -alpha-dev on alpha-dev). Type versions " +
-      "as X.Y.Z: the suffixes are added for you.",
+    "Release the Avandar app: main becomes an exact copy of develop (a " +
+      "straight cut, never a merge, so it cannot conflict), tagged " +
+      "vX.Y.Z, then develop moves on to the next -dev version. Prompts for " +
+      "any version you do not pass.",
   )
   .addOption({
     name: "--version",
@@ -93,8 +72,8 @@ export const ReleaseCli = Acclimate.createCLI("release")
     type: "string",
     required: false,
     description:
-      "X.Y.Z the source branch moves to; gains -dev or -alpha-dev. Asked for " +
-      "when omitted.",
+      "Version develop moves to after the release, as X.Y.Z. It gains the " +
+      "-dev suffix automatically. Asked for when omitted.",
   })
   .addOption({
     name: "--yes",
@@ -104,8 +83,7 @@ export const ReleaseCli = Acclimate.createCLI("release")
     defaultValue: false,
     description:
       "Take every suggested version and skip all confirmations. " +
-      "This releases without asking anything, except that it never " +
-      "overrides a non-passing alpha-dev CI verdict.",
+      "This releases without asking anything.",
   })
   .addOption({
     name: "--dry-run",
@@ -122,9 +100,8 @@ export const ReleaseCli = Acclimate.createCLI("release")
     required: false,
     defaultValue: false,
     description:
-      "Do not check the source branch's CI. On alpha-dev, which refuses " +
-      "any verdict but a pass, this deploys production without " +
-      "alpha-dev's CI verdict.",
+      "Do not check whether develop's staging CI passed for the commit being " +
+      "released.",
   })
   .addOption({
     name: "--skip-changelog",

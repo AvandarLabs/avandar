@@ -1,10 +1,6 @@
 import { createReleaseCommands } from "@ava-cli/ReleaseCli/createReleaseCommands";
-import { getReleaseLineFromBranch } from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
 import { publishReleaseNotes } from "@ava-cli/ReleaseCli/releaseChangelog/publishReleaseNotes/publishReleaseNotes";
-import {
-  getCurrentBranch,
-  readVersionAtRevision,
-} from "@ava-cli/ReleaseCli/releaseGitHelpers";
+import { readVersionAtRevision } from "@ava-cli/ReleaseCli/releaseGitHelpers";
 import {
   suggestNextVersion,
   toPublishedVersion,
@@ -14,7 +10,6 @@ import {
 import { runPreflight } from "@ava-cli/ReleaseCli/runPreflight/runPreflight";
 import {
   printHeading,
-  printReleaseBanner,
   printVersionReference,
 } from "@ava-cli/ReleaseCli/runRelease/releaseOutputHelpers/releaseOutputHelpers";
 import {
@@ -46,7 +41,7 @@ export type ReleaseOptions = {
   version: string | undefined;
   /**
    * Version the source branch moves to. It gains the line's dev suffix
-   * (`-dev` or `-alpha-dev`). Asked for if omitted.
+   * (`-dev`). Asked for if omitted.
    */
   nextVersion: string | undefined;
   /** Accept every default and skip confirmations. */
@@ -79,9 +74,9 @@ type FinishPublishedReleaseOptions = {
 };
 
 /**
- * Release one line: the target branch (`main` or `alpha`) becomes an exact
- * copy of the source branch (`develop` or `alpha-dev`), tagged, and the source
- * branch moves to its next dev version. The checked-out branch picks the line.
+ * Release `develop`: `main` becomes an exact copy of `develop`, tagged, and
+ * `develop` moves to its next dev version. Any other checked-out branch is
+ * refused.
  *
  * The release is a straight cut, not a content merge, so it cannot conflict.
  * See `createReleaseCommit` for how that is achieved. Throws with a message
@@ -93,7 +88,6 @@ export async function runRelease(
   const { dryRun, skipChangelog } = options;
 
   const git = createReleaseCommands({ repoRoot: _requireRepoRoot(), dryRun });
-  _printBannerForCheckedOutBranch(git);
   if (dryRun) {
     printWarn("Dry run: no local or remote state will change.");
   }
@@ -249,18 +243,6 @@ function _requireRepoRoot(): string {
     );
   }
   return repoRoot;
-}
-
-/**
- * Print the banner for the line the checked-out branch releases, before
- * anything else, so the reviewer sees which line and deploy this is. A branch
- * no line is released from gets no banner: preflight refuses it next.
- */
-function _printBannerForCheckedOutBranch(git: ReleaseCommands): void {
-  const line = getReleaseLineFromBranch(getCurrentBranch(git));
-  if (line !== undefined) {
-    printReleaseBanner(line);
-  }
 }
 
 /** The satisfied preflight, or a thrown error carrying its refusal. */

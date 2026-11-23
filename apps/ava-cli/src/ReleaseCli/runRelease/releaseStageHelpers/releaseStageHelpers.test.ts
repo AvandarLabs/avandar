@@ -1,7 +1,4 @@
-import {
-  ALPHA_RELEASE_LINE,
-  MAINLINE_RELEASE_LINE,
-} from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
+import { MAINLINE_RELEASE_LINE } from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
 import { promptToConfirm } from "@ava-cli/ReleaseCli/releasePromptHelpers";
 import {
   confirmCiVerdict,
@@ -119,17 +116,10 @@ function _createFakeCommands(checkout: Readonly<FakeCheckout> = {}): {
   return { git, mutations };
 }
 
-/** Each line's test plan versions: 0.15.0 on alpha, 0.14.2 on mainline. */
+/** The line's test plan versions: 0.14.2 on mainline. */
 const PLAN_VERSIONS_BY_KIND: Readonly<
   Record<ReleaseLine["kind"], Omit<ReleasePlan, "line">>
 > = {
-  alpha: {
-    sourceVersion: "0.15.0-alpha-dev",
-    releaseVersion: "0.15.0",
-    publishedVersion: "0.15.0-alpha",
-    nextVersion: "0.15.1",
-    releaseTag: "v0.15.0-alpha",
-  },
   mainline: {
     sourceVersion: "0.14.2-dev",
     releaseVersion: "0.14.2",
@@ -168,26 +158,10 @@ describe("release stages", () => {
     vi.restoreAllMocks();
   });
 
-  it("sets alpha-dev to 0.15.0-alpha and pushes it by full ref on the alpha line", () => {
-    const { git, mutations } = _createFakeCommands({ branch: "alpha-dev" });
-
-    const releaseSha = commitReleaseVersionOnSource(git, {
-      plan: _createPlan(ALPHA_RELEASE_LINE),
-      originSourceSha: "source-sha",
-    });
-
-    expect(mutations).toEqual([
-      "pnpm version 0.15.0-alpha --no-git-tag-version",
-      "git commit -m Release: v0.15.0-alpha [skip deploy] -- package.json",
-      "git push origin HEAD:refs/heads/alpha-dev",
-    ]);
-    expect(releaseSha).toBe("version-commit-sha");
-  });
-
   it("sets develop to 0.14.2 and pushes it by full ref on the mainline", () => {
     const { git, mutations } = _createFakeCommands({ branch: "develop" });
 
-    commitReleaseVersionOnSource(git, {
+    const releaseSha = commitReleaseVersionOnSource(git, {
       plan: _createPlan(MAINLINE_RELEASE_LINE),
       originSourceSha: "source-sha",
     });
@@ -197,15 +171,16 @@ describe("release stages", () => {
       "git commit -m Release: v0.14.2 [skip deploy] -- package.json",
       "git push origin HEAD:refs/heads/develop",
     ]);
+    expect(releaseSha).toBe("version-commit-sha");
   });
 
-  it("commits nothing when alpha-dev is already at 0.15.0-alpha", () => {
-    const { git, mutations } = _createFakeCommands({ branch: "alpha-dev" });
+  it("commits nothing when develop is already at 0.14.2", () => {
+    const { git, mutations } = _createFakeCommands({ branch: "develop" });
 
     const releaseSha = commitReleaseVersionOnSource(git, {
       plan: {
-        ..._createPlan(ALPHA_RELEASE_LINE),
-        sourceVersion: "0.15.0-alpha",
+        ..._createPlan(MAINLINE_RELEASE_LINE),
+        sourceVersion: "0.14.2",
       },
       originSourceSha: "source-sha",
     });
@@ -215,12 +190,12 @@ describe("release stages", () => {
   });
 
   it.each<[string, FakeCheckout]>([
-    ["HEAD moved since preflight", { branch: "alpha-dev", head: "moved-sha" }],
-    ["the checkout is on another branch", { branch: "develop" }],
+    ["HEAD moved since preflight", { branch: "develop", head: "moved-sha" }],
+    ["the checkout is on another branch", { branch: "main" }],
     ["the checkout is a detached HEAD", {}],
     [
       "a tracked file is modified",
-      { branch: "alpha-dev", trackedChanges: " M src/app.ts" },
+      { branch: "develop", trackedChanges: " M src/app.ts" },
     ],
   ])(
     "refuses to commit the release version, running nothing, when %s",
@@ -229,25 +204,13 @@ describe("release stages", () => {
 
       expect(() => {
         return commitReleaseVersionOnSource(git, {
-          plan: _createPlan(ALPHA_RELEASE_LINE),
+          plan: _createPlan(MAINLINE_RELEASE_LINE),
           originSourceSha: "source-sha",
         });
       }).toThrow(/Nothing has been released\.$/);
       expect(mutations).toEqual([]);
     },
   );
-
-  it("bumps alpha-dev to 0.15.1-alpha-dev and pushes it by full ref", () => {
-    const { git, mutations } = _createFakeCommands();
-
-    bumpSourceToNextVersion(git, _createPlan(ALPHA_RELEASE_LINE));
-
-    expect(mutations).toEqual([
-      "pnpm version 0.15.1-alpha-dev --no-git-tag-version",
-      "git commit -m Bump version to 0.15.1-alpha-dev [skip deploy] -- package.json",
-      "git push origin HEAD:refs/heads/alpha-dev",
-    ]);
-  });
 
   it("bumps develop to 0.14.3-dev and pushes it by full ref", () => {
     const { git, mutations } = _createFakeCommands();
@@ -261,49 +224,20 @@ describe("release stages", () => {
     ]);
   });
 
-  it("publishes refs/heads/alpha and tag v0.15.0-alpha atomically on the alpha line", () => {
+  it("publishes refs/heads/main and tag v0.14.2 atomically on the mainline", () => {
     const { git, mutations } = _createFakeCommands();
 
     const releaseCommitSha = publishTargetAndTag(git, {
-      plan: _createPlan(ALPHA_RELEASE_LINE),
+      plan: _createPlan(MAINLINE_RELEASE_LINE),
       releaseSha: "release-sha",
       originTargetSha: "target-sha",
     });
 
     expect(releaseCommitSha).toBe("release-commit-sha");
     expect(mutations.slice(1)).toEqual([
-      "git tag -a v0.15.0-alpha -m v0.15.0-alpha release-commit-sha",
-      "git push --atomic origin release-commit-sha:refs/heads/alpha refs/tags/v0.15.0-alpha:refs/tags/v0.15.0-alpha",
-    ]);
-  });
-
-  it("publishes refs/heads/main and tag v0.14.2 atomically on the mainline", () => {
-    const { git, mutations } = _createFakeCommands();
-
-    publishTargetAndTag(git, {
-      plan: _createPlan(MAINLINE_RELEASE_LINE),
-      releaseSha: "release-sha",
-      originTargetSha: "target-sha",
-    });
-
-    expect(mutations.slice(1)).toEqual([
       "git tag -a v0.14.2 -m v0.14.2 release-commit-sha",
       "git push --atomic origin release-commit-sha:refs/heads/main refs/tags/v0.14.2:refs/tags/v0.14.2",
     ]);
-  });
-
-  it("builds the alpha release commit from alpha-dev's tree on top of origin/alpha", () => {
-    const { git, mutations } = _createFakeCommands();
-
-    publishTargetAndTag(git, {
-      plan: _createPlan(ALPHA_RELEASE_LINE),
-      releaseSha: "release-sha",
-      originTargetSha: "target-sha",
-    });
-
-    expect(mutations[0]).toBe(
-      "git commit-tree release-sha-tree -p target-sha -p release-sha -m Release 0.15.0-alpha\n\nSets alpha to alpha-dev's tree at release-sha verbatim. Written with git commit-tree, so this is a two-parent merge carrying alpha-dev's exact content with no merge resolution. See apps/ava-cli/src/ReleaseCli.",
-    );
   });
 
   it("titles the mainline release commit Release 0.14.2, carrying develop's tree onto main", () => {
@@ -320,28 +254,28 @@ describe("release stages", () => {
     );
   });
 
-  it("fast-forwards local alpha, not main, after an alpha release", () => {
+  it("fast-forwards local main after a release", () => {
     const { git, mutations } = _createFakeCommands();
 
     updateLocalTargetRef(git, {
-      line: ALPHA_RELEASE_LINE,
+      line: MAINLINE_RELEASE_LINE,
       releaseCommitSha: "release-commit-sha",
       localTargetSha: "target-sha",
       originTargetSha: "target-sha",
     });
 
     expect(mutations).toEqual([
-      "git update-ref refs/heads/alpha release-commit-sha",
+      "git update-ref refs/heads/main release-commit-sha",
     ]);
   });
 
-  it("leaves local alpha alone while a worktree has it checked out", () => {
+  it("leaves local main alone while a worktree has it checked out", () => {
     const { git, mutations } = _createFakeCommands({
-      worktreeList: "worktree /tmp/alpha-checkout\nbranch refs/heads/alpha",
+      worktreeList: "worktree /tmp/main-checkout\nbranch refs/heads/main",
     });
 
     updateLocalTargetRef(git, {
-      line: ALPHA_RELEASE_LINE,
+      line: MAINLINE_RELEASE_LINE,
       releaseCommitSha: "release-commit-sha",
       localTargetSha: "target-sha",
       originTargetSha: "target-sha",
@@ -353,7 +287,6 @@ describe("release stages", () => {
 
 describe("reportReleaseNotesOutcome", () => {
   const MAINLINE_PLAN = _createPlan(MAINLINE_RELEASE_LINE);
-  const ALPHA_PLAN = _createPlan(ALPHA_RELEASE_LINE);
 
   beforeEach(() => {
     vi.spyOn(Acclimate, "log").mockImplementation(() => {
@@ -396,7 +329,6 @@ describe("reportReleaseNotesOutcome", () => {
     );
     expect(_getLoggedText()).toContain("network error");
     expect(_getLoggedText()).toContain("ava release notes --version 0.14.2");
-    expect(_getLoggedText()).not.toContain("--alpha");
   });
 
   it("warns when a release already exists, without a retry hint", () => {
@@ -437,30 +369,6 @@ describe("reportReleaseNotesOutcome", () => {
       { plan: MAINLINE_PLAN, dryRun: true },
     );
     expect(_getLoggedText()).not.toContain("ava release notes");
-  });
-
-  it("names the -alpha tag and retries with --alpha on the alpha line", () => {
-    reportReleaseNotesOutcome(
-      { kind: "tag-not-found" },
-      { plan: ALPHA_PLAN, dryRun: false },
-    );
-    expect(_getLoggedText()).toContain("Could not find tag v0.15.0-alpha");
-    expect(_getLoggedText()).toContain(
-      "ava release notes --version 0.15.0 --alpha",
-    );
-  });
-
-  it("names the -alpha tag when alpha release notes already exist", () => {
-    reportReleaseNotesOutcome(
-      {
-        kind: "already-exists",
-        url: "https://github.com/x/y/releases/tag/v0.15.0-alpha",
-      },
-      { plan: ALPHA_PLAN, dryRun: false },
-    );
-    expect(_getLoggedText()).toContain(
-      "Release notes already exist for v0.15.0-alpha",
-    );
   });
 });
 
@@ -537,7 +445,7 @@ function _createFakeCommandsWithCi(verdict: string): {
   };
 }
 
-/** Every verdict other than a pass, which the alpha line refuses. */
+/** Every verdict other than a pass, which asks before releasing. */
 const NON_PASSING_VERDICTS = ["failed", "pending", "missing", "unknown"];
 
 describe("confirmCiVerdict", () => {
@@ -552,87 +460,34 @@ describe("confirmCiVerdict", () => {
     vi.mocked(promptToConfirm).mockReset();
   });
 
-  describe.each(NON_PASSING_VERDICTS)(
-    "on the alpha line with a %s verdict",
-    (verdict) => {
-      it.each([true, false])(
-        "refuses with assumeYes %s, without asking or mutating",
-        async (assumeYes) => {
-          const { git, mutations } = _createFakeCommandsWithCi(verdict);
-
-          await expect(
-            confirmCiVerdict(git, {
-              commitSha: "source-sha",
-              line: ALPHA_RELEASE_LINE,
-              assumeYes,
-              skip: false,
-            }),
-          ).rejects.toThrow(`"${verdict}"`);
-
-          expect(promptToConfirm).not.toHaveBeenCalled();
-          expect(mutations).toEqual([]);
-        },
-      );
-
-      it("names the way out: wait for green or pass --skip-ci-check", async () => {
-        const { git } = _createFakeCommandsWithCi(verdict);
-
-        await expect(
-          confirmCiVerdict(git, {
-            commitSha: "source-sha",
-            line: ALPHA_RELEASE_LINE,
-            assumeYes: true,
-            skip: false,
-          }),
-        ).rejects.toThrow(/--skip-ci-check/);
-      });
-    },
-  );
-
   it.each(["failed", "pending"])(
     "names the run URL when a %s run exists",
     async (verdict) => {
       const { git } = _createFakeCommandsWithCi(verdict);
 
-      await expect(
-        confirmCiVerdict(git, {
-          commitSha: "source-sha",
-          line: ALPHA_RELEASE_LINE,
-          assumeYes: true,
-          skip: false,
-        }),
-      ).rejects.toThrow(CI_RUN_URL);
+      await confirmCiVerdict(git, {
+        commitSha: "source-sha",
+        line: MAINLINE_RELEASE_LINE,
+        assumeYes: true,
+        skip: false,
+      });
+
+      expect(_getLoggedText()).toContain(CI_RUN_URL);
     },
   );
 
-  it("proceeds on a passed alpha-dev run without asking", async () => {
+  it("proceeds on a passed staging run without asking", async () => {
     const { git, mutations } = _createFakeCommandsWithCi("passed");
 
     await confirmCiVerdict(git, {
       commitSha: "source-sha",
-      line: ALPHA_RELEASE_LINE,
+      line: MAINLINE_RELEASE_LINE,
       assumeYes: false,
       skip: false,
     });
 
     expect(promptToConfirm).not.toHaveBeenCalled();
     expect(mutations).toEqual([]);
-  });
-
-  it("skips the alpha check with --skip-ci-check, warning that production deploys without it", async () => {
-    const { git, readCommands } = _createFakeCommandsWithCi("failed");
-
-    await confirmCiVerdict(git, {
-      commitSha: "source-sha",
-      line: ALPHA_RELEASE_LINE,
-      assumeYes: true,
-      skip: true,
-    });
-
-    expect(readCommands).toEqual([]);
-    expect(_getLoggedText()).toContain(
-      "PRODUCTION will deploy without alpha-dev's CI",
-    );
   });
 
   it.each(NON_PASSING_VERDICTS)(
@@ -678,8 +533,8 @@ describe("confirmCiVerdict", () => {
     ).rejects.toThrow("Aborted.");
   });
 
-  it("keeps the plain mainline --skip-ci-check warning", async () => {
-    const { git } = _createFakeCommandsWithCi("failed");
+  it("warns that --skip-ci-check skips develop's CI check, without checking it", async () => {
+    const { git, readCommands } = _createFakeCommandsWithCi("failed");
 
     await confirmCiVerdict(git, {
       commitSha: "source-sha",
@@ -688,6 +543,7 @@ describe("confirmCiVerdict", () => {
       skip: true,
     });
 
+    expect(readCommands).toEqual([]);
     expect(_getLoggedText()).toContain("Skipping develop's CI check.");
   });
 });
@@ -703,22 +559,7 @@ describe("confirmReleasePlan", () => {
     vi.restoreAllMocks();
   });
 
-  it("asks to release 0.15.0-alpha to PRODUCTION on the alpha line", async () => {
-    const { git } = _createFakeCommands();
-
-    await confirmReleasePlan(git, {
-      plan: _createPlan(ALPHA_RELEASE_LINE),
-      originSourceSha: "source-sha",
-      originTargetSha: "target-sha",
-      assumeYes: false,
-    });
-
-    expect(promptToConfirm).toHaveBeenCalledExactlyOnceWith(
-      "Release 0.15.0-alpha to PRODUCTION?",
-    );
-  });
-
-  it("asks to release 0.14.2, without a destination, on the mainline", async () => {
+  it("asks to release 0.14.2", async () => {
     const { git } = _createFakeCommands();
 
     await confirmReleasePlan(git, {
@@ -731,17 +572,19 @@ describe("confirmReleasePlan", () => {
     expect(promptToConfirm).toHaveBeenCalledExactlyOnceWith("Release 0.14.2?");
   });
 
-  it("warns that pushing alpha deploys production before asking", async () => {
+  it("warns that pushing main deploys production before asking", async () => {
     const { git } = _createFakeCommands();
 
     await confirmReleasePlan(git, {
-      plan: _createPlan(ALPHA_RELEASE_LINE),
+      plan: _createPlan(MAINLINE_RELEASE_LINE),
       originSourceSha: "source-sha",
       originTargetSha: "target-sha",
       assumeYes: false,
     });
 
-    expect(_getLoggedText()).toContain(ALPHA_RELEASE_LINE.deployWarning);
+    expect(_getLoggedText()).toContain(
+      "Pushing main deploys production and migrates the production database.",
+    );
   });
 
   it("aborts when the reviewer declines", async () => {
@@ -750,7 +593,7 @@ describe("confirmReleasePlan", () => {
 
     await expect(
       confirmReleasePlan(git, {
-        plan: _createPlan(ALPHA_RELEASE_LINE),
+        plan: _createPlan(MAINLINE_RELEASE_LINE),
         originSourceSha: "source-sha",
         originTargetSha: "target-sha",
         assumeYes: false,
@@ -769,24 +612,6 @@ describe("printReleaseSummary", () => {
     vi.restoreAllMocks();
   });
 
-  it("links the alpha.yaml deploy run and the -alpha tag on the alpha line", () => {
-    const { git } = _createFakeCommands({
-      remoteUrl: "git@github.com:AvandarLabs/avandar.git",
-    });
-
-    printReleaseSummary(git, {
-      plan: _createPlan(ALPHA_RELEASE_LINE),
-      releaseSha: "release-sha",
-    });
-
-    expect(_getLoggedText()).toContain(
-      "Deploy run: https://github.com/AvandarLabs/avandar/actions/workflows/alpha.yaml",
-    );
-    expect(_getLoggedText()).toContain(
-      "https://github.com/AvandarLabs/avandar/releases/tag/v0.15.0-alpha",
-    );
-  });
-
   it("links the production.yaml deploy run on the mainline", () => {
     const { git } = _createFakeCommands({
       remoteUrl: "git@github.com:AvandarLabs/avandar.git",
@@ -799,6 +624,9 @@ describe("printReleaseSummary", () => {
 
     expect(_getLoggedText()).toContain(
       "Deploy run: https://github.com/AvandarLabs/avandar/actions/workflows/production.yaml",
+    );
+    expect(_getLoggedText()).toContain(
+      "https://github.com/AvandarLabs/avandar/releases/tag/v0.14.2",
     );
   });
 });

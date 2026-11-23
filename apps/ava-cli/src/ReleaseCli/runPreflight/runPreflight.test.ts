@@ -1,7 +1,4 @@
-import {
-  ALPHA_RELEASE_LINE,
-  MAINLINE_RELEASE_LINE,
-} from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
+import { MAINLINE_RELEASE_LINE } from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
 import { runPreflight } from "@ava-cli/ReleaseCli/runPreflight/runPreflight";
 import { describe, expect, it } from "vitest";
 import type {
@@ -29,14 +26,14 @@ type FakeRepoState = {
   localSource?: string;
   /**
    * A tag named like the checked-out branch, or `undefined` for none. As in
-   * git, a bare `develop` or `alpha-dev` then resolves to the tag.
+   * git, a bare `develop` then resolves to the tag.
    */
   sourceTag?: string | undefined;
   /** Tip of the local target branch (`refs/heads/<target>`). */
   localTarget?: string;
   /**
    * A tag named like the target branch, or `undefined` for none. As in git, a
-   * bare `main` or `alpha` then resolves to the tag, not the branch.
+   * bare `main` then resolves to the tag, not the branch.
    */
   targetTag?: string | undefined;
   /** The `origin` URL, which decides whether the permission check applies. */
@@ -47,27 +44,28 @@ type FakeRepoState = {
 
 const OK: CommandResult = { ok: true, stdout: "", stderr: "" };
 
-/** Each source branch's target, so the fake can answer for either line. */
+/** The source branch's target, so the fake can answer for the release line. */
 const TARGET_BRANCH_BY_SOURCE: Readonly<Record<string, string>> = {
   develop: "main",
-  "alpha-dev": "alpha",
 };
 
 /**
- * Branches preflight must refuse. Besides the target branches and a feature
- * branch, these are near-misses of a source branch, so a prefix, suffix, or
- * substring match on `develop` or `alpha-dev` turns these tests red.
+ * Branches preflight must refuse. Besides the target branch, a feature
+ * branch, and the retired source and target branches, these are near-misses
+ * of `develop`, so a prefix, suffix, or substring match on it turns these
+ * tests red.
  */
 const REFUSED_BRANCHES: readonly string[] = [
   "main",
+  "alpha-dev",
   "alpha",
   "feat/something",
   "demo/measles",
-  "alpha-dev-old",
-  "alpha-dev/x",
+  "develop-old",
+  "develop/x",
   "develop2",
-  "heads/alpha-dev",
-  "origin/alpha-dev",
+  "heads/develop",
+  "origin/develop",
 ];
 
 /**
@@ -106,7 +104,7 @@ function _fillRepoStateDefaults(
 
 /**
  * What `rev-parse` answers for `revision` in the fake repo. Keys are exact,
- * since `origin/alpha` is a prefix of `origin/alpha-dev`. As in git, a bare
+ * so a near-miss of a ref never resolves. As in git, a bare
  * branch name resolves to a same-named tag when one exists. Nothing resolves
  * on a branch with no target, which preflight refuses before any lookup.
  */
@@ -258,60 +256,18 @@ describe("runPreflight", () => {
     expect(result.ok === true && result.line).toBe(MAINLINE_RELEASE_LINE);
   });
 
-  it("resolves the alpha release line on alpha-dev", () => {
-    const { git } = _createFakeCommands({
-      branch: ALPHA_RELEASE_LINE.sourceBranch,
-    });
+  it("reads the local target branch, not a tag with the same name", () => {
+    const { git } = _createFakeCommands({ targetTag: "tag-sha" });
 
     const result = runPreflight(git);
 
-    expect(result.ok === true && result.line).toBe(ALPHA_RELEASE_LINE);
-  });
-
-  it("reads alpha-dev's release refs from origin/alpha-dev, origin/alpha, and local alpha", () => {
-    const { git } = _createFakeCommands({
-      branch: ALPHA_RELEASE_LINE.sourceBranch,
-    });
-
-    const result = runPreflight(git);
-
-    expect(result.ok === true && result.originSourceSha).toBe("source-sha");
-    expect(result.ok === true && result.originTargetSha).toBe("target-sha");
     expect(result.ok === true && result.localTargetSha).toBe(
       "local-target-sha",
     );
   });
 
-  it.each([
-    MAINLINE_RELEASE_LINE.sourceBranch,
-    ALPHA_RELEASE_LINE.sourceBranch,
-  ])(
-    "reads the local target branch on %s, not a tag with the same name",
-    (branch) => {
-      const { git } = _createFakeCommands({ branch, targetTag: "tag-sha" });
-
-      const result = runPreflight(git);
-
-      expect(result.ok === true && result.localTargetSha).toBe(
-        "local-target-sha",
-      );
-    },
-  );
-
   it("reports no local target branch on a fresh clone", () => {
     const { git } = _createFakeCommands({ localTargetExists: false });
-
-    const result = runPreflight(git);
-
-    expect(result.ok).toBe(true);
-    expect(result.ok === true && result.localTargetSha).toBeUndefined();
-  });
-
-  it("reports no local alpha branch on a fresh clone of alpha-dev", () => {
-    const { git } = _createFakeCommands({
-      branch: ALPHA_RELEASE_LINE.sourceBranch,
-      localTargetExists: false,
-    });
 
     const result = runPreflight(git);
 
@@ -330,29 +286,23 @@ describe("runPreflight", () => {
     },
   );
 
-  it.each(REFUSED_BRANCHES)(
-    "names %s and both source branches in the refusal",
-    (branch) => {
-      const { git } = _createFakeCommands({ branch });
+  it.each(REFUSED_BRANCHES)("names %s and develop in the refusal", (branch) => {
+    const { git } = _createFakeCommands({ branch });
 
-      const result = runPreflight(git);
+    const result = runPreflight(git);
 
-      // The offending branch has to reach the message the reviewer reads.
-      expect(result.ok === false && result.message).toContain(`"${branch}"`);
-      expect(result.ok === false && result.message).toContain(
-        '"alpha-dev" or "develop"',
-      );
-    },
-  );
+    expect(result.ok === false && result.message).toBe(
+      `Releases are cut from "develop" (currently on "${branch}").`,
+    );
+  });
 
-  it("names a detached HEAD and both source branches in the refusal", () => {
+  it("names a detached HEAD and develop in the refusal", () => {
     const { git } = _createFakeCommands({ branch: "HEAD" });
 
     const result = runPreflight(git);
 
-    expect(result.ok === false && result.message).toContain("detached HEAD");
-    expect(result.ok === false && result.message).toContain(
-      '"alpha-dev" or "develop"',
+    expect(result.ok === false && result.message).toBe(
+      'Releases are cut from "develop" (currently on "a detached HEAD").',
     );
   });
 
@@ -465,39 +415,18 @@ describe("runPreflight", () => {
     );
   });
 
-  it("refuses when alpha-dev is out of sync with origin/alpha-dev", () => {
+  it("refuses unpushed develop commits even when a same-named tag matches origin", () => {
     const { git } = _createFakeCommands({
-      branch: ALPHA_RELEASE_LINE.sourceBranch,
-      localSource: "some-other-sha",
+      localSource: "unpushed-sha",
+      sourceTag: "source-sha",
     });
 
     const result = runPreflight(git);
 
     expect(result.ok === false && result.reason).toBe("out-of-sync");
-    expect(result.ok === false && result.message).toContain(
-      `origin/${ALPHA_RELEASE_LINE.sourceBranch}`,
-    );
   });
 
-  it.each([
-    MAINLINE_RELEASE_LINE.sourceBranch,
-    ALPHA_RELEASE_LINE.sourceBranch,
-  ])(
-    "refuses unpushed %s commits even when a same-named tag matches origin",
-    (branch) => {
-      const { git } = _createFakeCommands({
-        branch,
-        localSource: "unpushed-sha",
-        sourceTag: "source-sha",
-      });
-
-      const result = runPreflight(git);
-
-      expect(result.ok === false && result.reason).toBe("out-of-sync");
-    },
-  );
-
-  it("refuses when origin/main is missing, without the alpha hint", () => {
+  it("refuses when origin/main is missing", () => {
     const { git } = _createFakeCommands({ originTarget: undefined });
 
     const result = runPreflight(git);
@@ -505,20 +434,6 @@ describe("runPreflight", () => {
     expect(result.ok === false && result.reason).toBe("missing-ref");
     expect(result.ok === false && result.message).toBe(
       "origin/main does not exist.",
-    );
-  });
-
-  it("refuses when origin/alpha is missing, giving the command to create it", () => {
-    const { git } = _createFakeCommands({
-      branch: ALPHA_RELEASE_LINE.sourceBranch,
-      originTarget: undefined,
-    });
-
-    const result = runPreflight(git);
-
-    expect(result.ok === false && result.reason).toBe("missing-ref");
-    expect(result.ok === false && result.message).toBe(
-      "origin/alpha does not exist. For the first alpha release, create it at main's commit first: git push origin refs/remotes/origin/main:refs/heads/alpha",
     );
   });
 

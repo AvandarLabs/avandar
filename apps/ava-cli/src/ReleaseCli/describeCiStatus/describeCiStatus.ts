@@ -2,19 +2,18 @@ import type { CiStatus } from "@ava-cli/ReleaseCli/checkSourceBranchCi/checkSour
 import type { ReleaseLine } from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
 
 /**
- * How each line's source-branch CI is named, at the start of a sentence and
+ * How the line's source-branch CI is named, at the start of a sentence and
  * inside one.
  */
 const CI_NAME_BY_LINE_KIND: Readonly<
   Record<ReleaseLine["kind"], Readonly<{ leading: string; inline: string }>>
 > = {
   mainline: { leading: "Staging CI", inline: "staging CI" },
-  alpha: { leading: "alpha-dev CI", inline: "alpha-dev CI" },
 };
 
 /**
  * A one-line description of the source branch's CI verdict, ready to print,
- * naming whose CI it is (`staging` on mainline, `alpha-dev` on alpha).
+ * naming whose CI it is (`staging` on mainline).
  *
  * Every case names the verdict plus the run URL where one exists, so a reviewer
  * deciding whether to release anyway can open the run without hunting for it.

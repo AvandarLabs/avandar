@@ -125,19 +125,13 @@ describe("collectReleaseChangelogCommits", () => {
     "Release: v0.13.3",
     "Bump version to 0.13.4-dev [skip deploy]",
     "Bump version to 0.13.4-dev",
-    "Release: v0.15.0-alpha [skip deploy]",
-    "Release: v0.15.0-alpha",
-    "Bump version to 0.15.1-alpha-dev [skip deploy]",
-    "Bump version to 0.15.1-alpha-dev",
   ])("drops the release's own commit %s", (subject) => {
     expect(_collectSingleSubject(subject)).toEqual([]);
   });
 
   it.each([
     "Release: v0.15.0-beta [skip deploy]",
-    "Bump version to 0.15.1-alpha [skip deploy]",
     "Bump version to 0.15.1 [skip deploy]",
-    "Release: v0.15.0-alpha-dev [skip deploy]",
   ])("keeps %s, which the release never writes", (subject) => {
     expect(_collectSingleSubject(subject)).toHaveLength(1);
   });

@@ -1,8 +1,5 @@
 import { checkSourceBranchCi } from "@ava-cli/ReleaseCli/checkSourceBranchCi/checkSourceBranchCi";
-import {
-  ALPHA_RELEASE_LINE,
-  MAINLINE_RELEASE_LINE,
-} from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
+import { MAINLINE_RELEASE_LINE } from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
 import { describe, expect, it } from "vitest";
 import type {
   CommandResult,
@@ -53,31 +50,6 @@ const PASSED_RUN_JSON = JSON.stringify([
 ]);
 
 describe("checkSourceBranchCi", () => {
-  it("asks for alpha-dev.yaml runs on alpha-dev on the alpha line", () => {
-    const { git, ghCalls } = _createFakeGh(PASSED_RUN_JSON);
-
-    checkSourceBranchCi(git, {
-      commitSha: "release-sha",
-      line: ALPHA_RELEASE_LINE,
-    });
-
-    expect(ghCalls).toEqual([
-      [
-        "gh",
-        "run",
-        "list",
-        "--branch",
-        "alpha-dev",
-        "--workflow",
-        "alpha-dev.yaml",
-        "--limit",
-        "20",
-        "--json",
-        "headSha,status,conclusion,url",
-      ],
-    ]);
-  });
-
   it("asks for staging.yaml runs on develop on the mainline", () => {
     const { git, ghCalls } = _createFakeGh(PASSED_RUN_JSON);
 
@@ -109,13 +81,13 @@ describe("checkSourceBranchCi", () => {
     expect(
       checkSourceBranchCi(git, {
         commitSha: "release-sha",
-        line: ALPHA_RELEASE_LINE,
+        line: MAINLINE_RELEASE_LINE,
       }),
     ).toEqual({ kind: "passed", url: "https://github.com/x/y/actions/runs/1" });
     expect(
       checkSourceBranchCi(git, {
         commitSha: "another-sha",
-        line: ALPHA_RELEASE_LINE,
+        line: MAINLINE_RELEASE_LINE,
       }),
     ).toEqual({ kind: "missing" });
   });

@@ -16,20 +16,20 @@ vi.mock(
 vi.mock("@ava-cli/ReleaseCli/releasePromptHelpers");
 
 /** Run `ava release notes --dry-run` with no `--version`, as typed. */
-async function _runWithoutVersion(
-  options: Readonly<{ alpha: boolean }>,
-): Promise<void> {
+async function _runWithoutVersion(): Promise<void> {
   await ReleaseNotesCli.state.action?.({
     // Acclimate types every declared option as present, but hands the action
     // `undefined` for an omitted `--version`, which is the case under test.
     version: undefined as unknown as string,
-    alpha: options.alpha,
     dryRun: true,
     update: false,
   });
 }
 
-/** Both lines' tags, sorted the way `git tag --sort=v:refname` sorts them. */
+/**
+ * Release tags as `git tag --sort=v:refname` sorts them, including suffixed
+ * tags from a retired release line that are not mainline releases.
+ */
 const MIXED_RELEASE_TAGS = [
   "v0.14.1",
   "v0.14.2",
@@ -77,7 +77,6 @@ describe("ava release notes", () => {
 
     await ReleaseNotesCli.state.action?.({
       version: "0.13.3",
-      alpha: false,
       dryRun: false,
       update: false,
     });
@@ -91,7 +90,6 @@ describe("ava release notes", () => {
 
     await ReleaseNotesCli.state.action?.({
       version: "0.13.3",
-      alpha: false,
       dryRun: false,
       update: false,
     });
@@ -103,7 +101,6 @@ describe("ava release notes", () => {
   it("rejects an invalid version before calling publishReleaseNotes", async () => {
     await ReleaseNotesCli.state.action?.({
       version: "v0.13.3",
-      alpha: false,
       dryRun: false,
       update: false,
     });
@@ -115,6 +112,22 @@ describe("ava release notes", () => {
     expect(process.exitCode).toBe(1);
   });
 
+  it("does not accept --alpha", async () => {
+    process.argv.push("--version", "0.15.0", "--alpha");
+
+    await ReleaseNotesCli.state.action?.({
+      version: "0.15.0",
+      dryRun: false,
+      update: false,
+    });
+
+    expect(
+      publishReleaseNotesModule.publishReleaseNotes,
+    ).not.toHaveBeenCalled();
+    expect(_loggedText(logSpy)).toContain("--alpha");
+    expect(process.exitCode).toBe(1);
+  });
+
   it("publishes and prints success", async () => {
     vi.mocked(publishReleaseNotesModule.publishReleaseNotes).mockResolvedValue({
       kind: "published",
@@ -123,7 +136,6 @@ describe("ava release notes", () => {
 
     await ReleaseNotesCli.state.action?.({
       version: "0.13.3",
-      alpha: false,
       dryRun: false,
       update: false,
     });
@@ -141,31 +153,12 @@ describe("ava release notes", () => {
     });
     await ReleaseNotesCli.state.action?.({
       version: "0.13.4",
-      alpha: false,
       dryRun: true,
       update: true,
     });
     expect(publishReleaseNotesModule.publishReleaseNotes).toHaveBeenCalledWith(
       expect.anything(),
       { releaseTag: "v0.13.4", dryRun: true, update: true },
-    );
-    expect(process.exitCode).toBeUndefined();
-  });
-
-  it("targets the -alpha tag for an alpha release", async () => {
-    vi.mocked(publishReleaseNotesModule.publishReleaseNotes).mockResolvedValue({
-      kind: "previewed",
-      notes: "preview",
-    });
-    await ReleaseNotesCli.state.action?.({
-      version: "0.15.0",
-      alpha: true,
-      dryRun: true,
-      update: false,
-    });
-    expect(publishReleaseNotesModule.publishReleaseNotes).toHaveBeenCalledWith(
-      expect.anything(),
-      { releaseTag: "v0.15.0-alpha", dryRun: true, update: false },
     );
     expect(process.exitCode).toBeUndefined();
   });
@@ -178,7 +171,6 @@ describe("ava release notes", () => {
 
     await ReleaseNotesCli.state.action?.({
       version: "0.13.3",
-      alpha: false,
       dryRun: false,
       update: false,
     });
@@ -194,7 +186,6 @@ describe("ava release notes", () => {
 
     await ReleaseNotesCli.state.action?.({
       version: "9.9.9",
-      alpha: false,
       dryRun: false,
       update: false,
     });
@@ -210,7 +201,6 @@ describe("ava release notes", () => {
 
     await ReleaseNotesCli.state.action?.({
       version: "0.13.3",
-      alpha: false,
       dryRun: false,
       update: false,
     });
@@ -227,7 +217,6 @@ describe("ava release notes", () => {
 
     await ReleaseNotesCli.state.action?.({
       version: "0.13.3",
-      alpha: false,
       dryRun: false,
       update: false,
     });
@@ -244,7 +233,6 @@ describe("ava release notes", () => {
 
     await ReleaseNotesCli.state.action?.({
       version: "0.13.3",
-      alpha: false,
       dryRun: true,
       update: false,
     });
@@ -268,44 +256,11 @@ describe("ava release notes", () => {
       ).mockResolvedValue({ kind: "previewed", notes: "preview" });
     });
 
-    it("suggests the newest mainline version, skipping newer alpha tags", async () => {
-      await _runWithoutVersion({ alpha: false });
+    it("suggests the newest mainline version, skipping newer suffixed tags", async () => {
+      await _runWithoutVersion();
 
       expect(releasePromptHelpersModule.promptForVersion).toHaveBeenCalledWith(
         expect.objectContaining({ defaultValue: "0.14.2" }),
-      );
-    });
-
-    it("suggests the newest alpha version without its suffix with --alpha", async () => {
-      await _runWithoutVersion({ alpha: true });
-
-      expect(releasePromptHelpersModule.promptForVersion).toHaveBeenCalledWith(
-        expect.objectContaining({ defaultValue: "0.15.1" }),
-      );
-    });
-
-    it("publishes the newest alpha tag when the alpha suggestion is accepted", async () => {
-      await _runWithoutVersion({ alpha: true });
-
-      expect(
-        publishReleaseNotesModule.publishReleaseNotes,
-      ).toHaveBeenCalledWith(expect.anything(), {
-        releaseTag: "v0.15.1-alpha",
-        dryRun: true,
-        update: false,
-      });
-      expect(process.exitCode).toBeUndefined();
-    });
-
-    it("offers no suggestion when the line has no tags yet", async () => {
-      vi.mocked(
-        collectReleaseChangelogCommitsModule.listSortedReleaseTags,
-      ).mockReturnValue(["v0.14.1", "v0.14.2"]);
-
-      await _runWithoutVersion({ alpha: true });
-
-      expect(releasePromptHelpersModule.promptForVersion).toHaveBeenCalledWith(
-        expect.objectContaining({ defaultValue: undefined }),
       );
     });
   });

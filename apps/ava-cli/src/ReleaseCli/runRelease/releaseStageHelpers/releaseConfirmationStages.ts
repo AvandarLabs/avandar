@@ -16,7 +16,6 @@ import {
   printSuccess,
   printWarn,
 } from "@ava-cli/utils/cliOutput/cliOutput";
-import type { CiStatus } from "@ava-cli/ReleaseCli/checkSourceBranchCi/checkSourceBranchCi";
 import type { ReleaseCommands } from "@ava-cli/ReleaseCli/createReleaseCommands";
 import type { ReleaseLine } from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
 import type { PublishReleaseNotesOutcome } from "@ava-cli/ReleaseCli/releaseChangelog/publishReleaseNotes/publishReleaseNotes";
@@ -34,56 +33,20 @@ type ConfirmCiVerdictOptions = {
   commitSha: string;
   /** The line released, which names the branch and workflow to check. */
   line: ReleaseLine;
-  /**
-   * Release on anything other than a pass without asking. Only the mainline
-   * honors it: the alpha line refuses every verdict but a pass regardless.
-   */
+  /** Release on anything other than a pass without asking (`--yes`). */
   assumeYes: boolean;
   /** Skip the check entirely (`--skip-ci-check`). */
   skip: boolean;
 };
 
-/**
- * What each line does with a source-branch CI verdict other than a pass:
- * the mainline asks (or proceeds under `--yes`), while the alpha line, which
- * deploys production, refuses outright so `--yes` can never release a red
- * or unverified build to production.
- */
-const NON_PASSING_CI_POLICY_BY_LINE_KIND: Readonly<
-  Record<ReleaseLine["kind"], "ask" | "refuse">
-> = {
-  alpha: "refuse",
-  mainline: "ask",
-};
-
 /** The warning printed when `--skip-ci-check` skips the line's CI check. */
 function _buildSkipCiCheckWarning(line: ReleaseLine): string {
-  const skipping = `Skipping ${line.sourceBranch}'s CI check.`;
-  return line.kind === "alpha"
-    ? `${skipping} PRODUCTION will deploy without ${line.sourceBranch}'s CI verdict on this commit.`
-    : skipping;
-}
-
-/**
- * The refusal for a non-passing verdict on a line that refuses one, naming
- * the verdict, its description (with the run URL when a run exists), and the
- * two ways forward.
- */
-function _buildCiRefusalMessage(
-  options: Readonly<{ status: CiStatus; line: ReleaseLine; verdict: string }>,
-): string {
-  const { status, line, verdict } = options;
-  return [
-    `Refusing to release: ${line.sourceBranch}'s CI verdict is "${status.kind}", not "passed".`,
-    verdict,
-    `Wait for ${line.sourceBranch}'s CI to pass on this commit, or pass --skip-ci-check to release without it. --yes does not override this.`,
-  ].join("\n");
+  return `Skipping ${line.sourceBranch}'s CI check.`;
 }
 
 /**
  * Report the source branch's CI verdict for the commit being released. A pass
- * proceeds. Anything else refuses on the alpha line, whatever `--yes` says,
- * and asks (or proceeds under `--yes`) on the mainline.
+ * proceeds. Anything else asks, or proceeds under `--yes`.
  */
 export async function confirmCiVerdict(
   git: ReleaseCommands,
@@ -104,31 +67,14 @@ export async function confirmCiVerdict(
     return;
   }
   printWarn(verdict);
-  if (NON_PASSING_CI_POLICY_BY_LINE_KIND[line.kind] === "refuse") {
-    throw new Error(
-      _buildCiRefusalMessage({ status: ciStatus, line, verdict }),
-    );
-  }
   if (!assumeYes && !(await promptToConfirm("Release anyway?"))) {
     throw new Error("Aborted.");
   }
 }
 
-/**
- * What the last-chance prompt adds after the version, by line, so the prompt
- * on the line that deploys production says so.
- */
-const CONFIRM_PROMPT_DESTINATION: Readonly<
-  Record<ReleaseLine["kind"], string>
-> = {
-  alpha: " to PRODUCTION",
-  mainline: "",
-};
-
-/** The last-chance prompt, e.g. `Release 0.15.0-alpha to PRODUCTION?`. */
+/** The last-chance prompt, e.g. `Release 0.15.0?`. */
 function _buildConfirmPrompt(plan: Readonly<ReleasePlan>): string {
-  const { line, publishedVersion } = plan;
-  return `Release ${publishedVersion}${CONFIRM_PROMPT_DESTINATION[line.kind]}?`;
+  return `Release ${plan.publishedVersion}?`;
 }
 
 /** Print the three numbered steps the release will take. */
@@ -192,19 +138,9 @@ export async function confirmReleasePlan(
   }
 }
 
-/**
- * The flag `ava release notes` needs to find each line's tag, so the retry
- * hint names the tag this release actually created.
- */
-const RELEASE_NOTES_LINE_FLAG: Readonly<Record<ReleaseLine["kind"], string>> = {
-  alpha: " --alpha",
-  mainline: "",
-};
-
 /** The `ava release notes` command that retries this release's notes. */
 function _buildReleaseNotesRetryHint(plan: Readonly<ReleasePlan>): string {
-  const { line, releaseVersion } = plan;
-  return `Retry publishing release notes: ava release notes --version ${releaseVersion}${RELEASE_NOTES_LINE_FLAG[line.kind]}`;
+  return `Retry publishing release notes: ava release notes --version ${plan.releaseVersion}`;
 }
 
 /**

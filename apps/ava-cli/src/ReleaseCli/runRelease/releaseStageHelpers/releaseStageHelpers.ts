@@ -46,11 +46,11 @@ export type ReleasePlan = {
   sourceVersion: string;
   /** The bare `X.Y.Z` being released, without the line's suffix. */
   releaseVersion: string;
-  /** The version written to package.json, e.g. `0.10.2` or `0.15.0-alpha`. */
+  /** The version written to package.json, e.g. `0.10.2`. */
   publishedVersion: string;
   /** The bare `X.Y.Z` the source branch moves to, without the dev suffix. */
   nextVersion: string;
-  /** The git tag, e.g. `v0.10.2` or `v0.15.0-alpha`. */
+  /** The git tag, e.g. `v0.10.2`. */
   releaseTag: string;
 };
 
@@ -114,9 +114,9 @@ function _getUnreleasableCheckoutReason(
 }
 
 /**
- * Put the published release version (`0.10.2`, or `0.15.0-alpha` on alpha) on
- * the source branch and push it, so the released tree is one that exists on
- * that branch under its real version number.
+ * Put the published release version (`0.10.2`) on the source branch and push
+ * it, so the released tree is one that exists on that branch under its real
+ * version number.
  *
  * Returns the commit the release publishes.
  */
@@ -252,8 +252,7 @@ export function updateLocalTargetRef(
 }
 
 /**
- * Move the source branch on to the next dev version (`-dev`, or `-alpha-dev`
- * on alpha) and push it.
+ * Move the source branch on to the next dev version (`-dev`) and push it.
  */
 export function bumpSourceToNextVersion(
   git: ReleaseCommands,

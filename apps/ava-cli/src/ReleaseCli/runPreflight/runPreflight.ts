@@ -1,6 +1,5 @@
 import { describeCommandFailure } from "@ava-cli/ReleaseCli/describeCommandFailure/describeCommandFailure";
 import {
-  ALPHA_RELEASE_LINE,
   getReleaseLineFromBranch,
   MAINLINE_RELEASE_LINE,
 } from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
@@ -48,22 +47,20 @@ export type PreflightResult =
 
 /**
  * The line released from the checked-out branch, or the refusal when releases
- * may not be cut from it. Only a source branch qualifies: a target branch
- * (`main`, `alpha`), a feature branch, and a detached HEAD are all refused.
+ * may not be cut from it. Only `develop` qualifies: the target branch
+ * (`main`), any other branch, and a detached HEAD are all refused.
  */
 function _getReleaseLineOrRefusal(
   git: ReleaseCommands,
 ): { ok: true; line: ReleaseLine } | ({ ok: false } & PreflightRefusal) {
   const currentBranch = getCurrentBranch(git);
   const line = getReleaseLineFromBranch(currentBranch);
-  const alphaSource = ALPHA_RELEASE_LINE.sourceBranch;
-  const mainlineSource = MAINLINE_RELEASE_LINE.sourceBranch;
   return line !== undefined
     ? { ok: true, line }
     : {
         ok: false,
         reason: "wrong-branch",
-        message: `Releases are cut from "${alphaSource}" or "${mainlineSource}" (currently on "${currentBranch ?? "a detached HEAD"}"). Run it on ${alphaSource} to release alpha, or on ${mainlineSource} to release mainline.`,
+        message: `Releases are cut from "${MAINLINE_RELEASE_LINE.sourceBranch}" (currently on "${currentBranch ?? "a detached HEAD"}").`,
       };
 }
 
@@ -91,9 +88,9 @@ function _refuseDirtyTree(git: ReleaseCommands): PreflightRefusal | undefined {
  * `undefined` when they can.
  *
  * A release pushes both of its line's branches, and pushing the target branch
- * deploys it (production, on the alpha line), so it refuses here rather than
- * half-way through: without this, the first thing to fail is the `push` after
- * a local version commit has already been made.
+ * deploys production, so it refuses here rather than half-way through:
+ * without this, the first thing to fail is the `push` after a local version
+ * commit has already been made.
  */
 function _refuseWithoutPushPermission(
   git: ReleaseCommands,
@@ -174,19 +171,9 @@ function _refuseOutOfSyncSourceBranch(
   };
 }
 
-/**
- * What the missing-target refusal adds, by line. On the alpha line a missing
- * `origin/alpha` is expected before the first release, so the hint carries the
- * command that creates `alpha` at `main`'s commit.
- */
-const MISSING_TARGET_HINT: Readonly<Record<ReleaseLine["kind"], string>> = {
-  alpha: ` For the first alpha release, create it at ${MAINLINE_RELEASE_LINE.targetBranch}'s commit first: git push origin refs/remotes/origin/${MAINLINE_RELEASE_LINE.targetBranch}:refs/heads/${ALPHA_RELEASE_LINE.targetBranch}`,
-  mainline: "",
-};
-
 /** The `_readReleaseRefs` refusal message when `origin/<target>` is missing. */
 function _buildMissingTargetMessage(line: ReleaseLine): string {
-  return `origin/${line.targetBranch} does not exist.${MISSING_TARGET_HINT[line.kind]}`;
+  return `origin/${line.targetBranch} does not exist.`;
 }
 
 /**
@@ -229,7 +216,7 @@ function _readReleaseRefs(
     return { ok: false, ...outOfSync };
   }
 
-  // Fully qualified, so a tag named `main` or `alpha` cannot win the lookup.
+  // Fully qualified, so a tag named `main` cannot win the lookup.
   const localTargetRef = `refs/heads/${line.targetBranch}`;
   const localTargetSha = refExists(git, localTargetRef)
     ? revParse(git, localTargetRef)
@@ -240,8 +227,8 @@ function _readReleaseRefs(
 /**
  * Whether the repository is in a state a release may be cut from, and which
  * line it releases. `runRelease` calls it before anything else, so a release
- * on `alpha-dev` cuts alpha, one on `develop` cuts mainline, and any other
- * branch is refused before a single network call.
+ * on `develop` cuts mainline, and any other branch is refused before a single
+ * network call.
  *
  * Every check refuses. None of them fixes anything. A release must never be
  * the thing that discovers a branch was stale, and it must never quietly

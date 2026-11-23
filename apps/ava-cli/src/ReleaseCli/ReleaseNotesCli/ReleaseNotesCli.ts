@@ -1,8 +1,5 @@
 import { createReleaseCommands } from "@ava-cli/ReleaseCli/createReleaseCommands";
-import {
-  ALPHA_RELEASE_LINE,
-  MAINLINE_RELEASE_LINE,
-} from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
+import { MAINLINE_RELEASE_LINE } from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
 import { listSortedReleaseTags } from "@ava-cli/ReleaseCli/releaseChangelog/collectReleaseChangelogCommits/collectReleaseChangelogCommits";
 import { publishReleaseNotes } from "@ava-cli/ReleaseCli/releaseChangelog/publishReleaseNotes/publishReleaseNotes";
 import { wantsHelp } from "@ava-cli/ReleaseCli/releaseFlagUtils/releaseFlagUtils";
@@ -33,13 +30,11 @@ const USAGE = `ava release notes: publish GitHub release notes for an existing r
 Usage
   ava release notes --version 0.13.3             publish notes for v0.13.3
   ava release notes --version 0.13.4 --update   replace existing notes
-  ava release notes --version 0.15.0 --alpha    publish notes for v0.15.0-alpha
   ava release notes                               ask for a version
   ava release notes --version 0.13.3 --dry-run   preview without publishing
 
 Options
   --version, -v  X.Y.Z to publish notes for. Asked for when omitted.
-  --alpha        The version is an alpha release, tagged vX.Y.Z-alpha.
   --update       Replace notes on an existing release, preserving other metadata.
   --dry-run      Generate and print the notes, but do not publish them.
   --help, -h     This text.`;
@@ -47,15 +42,38 @@ Options
 /** The parsed `ava release notes` options, as Acclimate hands to the action. */
 type ReleaseNotesCliArgs = {
   version?: string;
-  alpha: boolean;
   dryRun: boolean;
   update?: boolean;
 };
 
+/** Every flag `ava release notes` accepts, including aliases. */
+const RELEASE_NOTES_FLAGS: ReadonlySet<string> = new Set([
+  "--version",
+  "-v",
+  "--update",
+  "--dry-run",
+  "--help",
+  "-h",
+]);
+
+/**
+ * Flags in `argv` that `ava release notes` does not accept. Acclimate drops an
+ * option it does not recognise, so without this a removed or mistyped flag
+ * would publish notes for a tag the user did not ask for.
+ */
+function _findUnknownReleaseNotesFlags(
+  argv: readonly string[],
+): readonly string[] {
+  return argv.filter((token) => {
+    const [flag] = token.split("=");
+    return token.startsWith("-") && !RELEASE_NOTES_FLAGS.has(flag ?? token);
+  });
+}
+
 /**
  * The bare `X.Y.Z` of the newest tag `line` released, or undefined when it has
- * none. A tag belongs to a line when the line would tag that version with it,
- * so `v0.15.0-alpha` is alpha's and `v0.14.2` is mainline's.
+ * none. A tag belongs to the line when the line would tag that version with
+ * it, so `v0.14.2` counts and a suffixed tag such as `v0.15.0-rc` does not.
  */
 function _getNewestVersionFromTags(
   options: Readonly<{ tags: readonly string[]; line: ReleaseLine }>,
@@ -73,7 +91,7 @@ function _getNewestVersionFromTags(
 
 /**
  * Asks which released version to publish notes for, suggesting the newest
- * release on `line` so an alpha default never offers a mainline version.
+ * release on `line`.
  */
 async function _promptForReleasedVersion(
   git: ReleaseCommands,
@@ -101,7 +119,7 @@ async function _runReleaseNotes(
   }
   const git = createReleaseCommands({ repoRoot, dryRun: args.dryRun });
 
-  const line = args.alpha ? ALPHA_RELEASE_LINE : MAINLINE_RELEASE_LINE;
+  const line = MAINLINE_RELEASE_LINE;
   const version = args.version ?? (await _promptForReleasedVersion(git, line));
   const validation = validateReleaseVersion(version, "Version");
   if (!validation.valid) {
@@ -164,13 +182,6 @@ export const ReleaseNotesCli = Acclimate.createCLI("notes")
       "The X.Y.Z version to publish notes for. Asked for when omitted.",
   })
   .addOption({
-    name: "--alpha",
-    type: "boolean",
-    required: false,
-    defaultValue: false,
-    description: "The version is an alpha release, tagged vX.Y.Z-alpha.",
-  })
-  .addOption({
     name: "--update",
     type: "boolean",
     required: false,
@@ -185,8 +196,19 @@ export const ReleaseNotesCli = Acclimate.createCLI("notes")
     description: "Generate and print the notes, but do not publish them.",
   })
   .action((args: Readonly<ReleaseNotesCliArgs>) => {
-    if (wantsHelp(process.argv.slice(2))) {
+    const argv = process.argv.slice(2);
+    if (wantsHelp(argv)) {
       printInfo(USAGE);
+      return undefined;
+    }
+    const unknownFlags = _findUnknownReleaseNotesFlags(argv);
+    if (unknownFlags.length > 0) {
+      printError(
+        `Unknown option${unknownFlags.length > 1 ? "s" : ""}: ` +
+          `${unknownFlags.join(", ")}. Nothing was published; ` +
+          "run `ava release notes --help`.",
+      );
+      process.exitCode = 1;
       return undefined;
     }
     return _runReleaseNotes(args).catch((error: unknown) => {

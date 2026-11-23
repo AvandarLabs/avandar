@@ -4,33 +4,9 @@ import { isDefined } from "@avandar/utils";
 import type { ReleaseLine } from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
 
 /**
- * Terminal output helpers shared by the release stages: the opening banner,
- * headings, aligned label/value detail rows, and the version reference block.
+ * Terminal output helpers shared by the release stages: headings, aligned
+ * label/value detail rows, and the version reference block.
  */
-
-/** What a line's deploy reaches, for the banner. */
-const BANNER_DEPLOY_NOTE: Readonly<Record<ReleaseLine["kind"], string>> = {
-  alpha: "Deploys PRODUCTION (app.avandarlabs.com).",
-  mainline: "Deploys the mainline test URL, not production.",
-};
-
-/**
- * The colored first line of `ava release`, naming the line being released and
- * what its deploy reaches, so a reviewer on the wrong branch notices before
- * answering any prompt.
- */
-export function buildBannerFromReleaseLine(line: ReleaseLine): string {
-  return `|${line.bannerColor}|${line.bannerTitle}|reset|: ${line.sourceBranch} to ${line.targetBranch}. ${BANNER_DEPLOY_NOTE[line.kind]}`;
-}
-
-/**
- * Print the banner from {@link buildBannerFromReleaseLine}. `runRelease` calls
- * it first, before the dry-run warning and preflight, so the line and what its
- * deploy reaches are the first thing on screen.
- */
-export function printReleaseBanner(line: ReleaseLine): void {
-  Acclimate.log(buildBannerFromReleaseLine(line));
-}
 
 /** A label/value pair rendered as one aligned detail row. */
 export type ReleaseDetail = readonly [label: string, value: string];

@@ -61,8 +61,7 @@ function _parseRuns(json: string): readonly WorkflowRun[] | undefined {
 /**
  * Asks the GitHub CLI for the source branch's CI verdict on `commitSha`, the
  * commit about to be released, read from the line's `sourceCiWorkflow` runs on
- * its `sourceBranch` (`staging.yaml` on `develop`, `alpha-dev.yaml` on
- * `alpha-dev`).
+ * its `sourceBranch` (`staging.yaml` on `develop`).
  *
  * Pushing the target branch deploys, so the last chance to notice a red build
  * is before the release. A missing or unusable `gh` is reported as "unknown"

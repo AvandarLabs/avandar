@@ -265,13 +265,19 @@ describe("ava release on a branch that is not a source branch", () => {
     rmSync(directory, { recursive: true, force: true });
   });
 
-  it("refuses main with exit code 1, naming both source branches", async () => {
-    await _runRelease({ dryRun: false });
+  it.each(["main", "alpha-dev"])(
+    "refuses %s with exit code 1, naming develop",
+    async (branch) => {
+      _git({ cwd: repoRoot, args: ["switch", "-C", branch] });
 
-    expect(process.exitCode).toBe(1);
-    expect(_stdoutText()).toContain('"alpha-dev" or "develop"');
-    expect(_stdoutText()).toContain('(currently on "main")');
-  });
+      await _runRelease({ dryRun: false });
+
+      expect(process.exitCode).toBe(1);
+      expect(_stdoutText()).toContain(
+        `Releases are cut from "develop" (currently on "${branch}").`,
+      );
+    },
+  );
 
   it("refuses main before fetching, committing, or pushing anything", async () => {
     const origin = join(directory, "origin");
@@ -286,13 +292,6 @@ describe("ava release on a branch that is not a source branch", () => {
     expect(_git({ cwd: repoRoot, args: ["status", "--short"] })).toBe("");
     // Every mutating command is echoed as `$ <command>` before it runs.
     expect(_stdoutText()).not.toContain("$ ");
-  });
-
-  it("prints no release banner on a refused branch", async () => {
-    await _runRelease({ dryRun: false });
-
-    expect(_stdoutText()).not.toContain("MAINLINE release");
-    expect(_stdoutText()).not.toContain("ALPHA release");
   });
 
   it("names the branch, not heads/main, when a tag is also named main", async () => {
@@ -320,7 +319,7 @@ describe("ava release on a source branch", () => {
   let originalExitCode: typeof process.exitCode;
 
   beforeEach(() => {
-    directory = mkdtempSync(join(tmpdir(), "ava-release-banner-"));
+    directory = mkdtempSync(join(tmpdir(), "ava-release-source-"));
     ({ repoRoot } = _createRepos(directory));
     originalArgv = process.argv;
     originalExitCode = process.exitCode;
@@ -338,33 +337,18 @@ describe("ava release on a source branch", () => {
     rmSync(directory, { recursive: true, force: true });
   });
 
-  it.each([
-    [
-      "alpha-dev",
-      ": alpha-dev to alpha. Deploys PRODUCTION (app.avandarlabs.com).",
-    ],
-    [
-      "develop",
-      ": develop to main. Deploys the mainline test URL, not production.",
-    ],
-  ])(
-    "prints the %s banner before preflight runs",
-    async (branch, bannerText) => {
-      _git({ cwd: repoRoot, args: ["switch", "-c", branch] });
-      // A tracked change makes preflight refuse locally, before any fetch.
-      writeFileSync(join(repoRoot, "package.json"), '{"version":"dirty"}\n');
+  it("runs preflight on develop, with no banner first", async () => {
+    _git({ cwd: repoRoot, args: ["switch", "-c", "develop"] });
+    // A tracked change makes preflight refuse locally, before any fetch.
+    writeFileSync(join(repoRoot, "package.json"), '{"version":"dirty"}\n');
 
-      await _runRelease({ dryRun: true });
+    await _runRelease({ dryRun: true });
 
-      const stdout = _stdoutText();
-      expect(stdout).toContain(bannerText);
-      expect(stdout.indexOf(bannerText)).toBeLessThan(
-        stdout.indexOf("Preflight"),
-      );
-      expect(stdout).toContain("The working tree has tracked changes");
-      expect(process.exitCode).toBe(1);
-    },
-  );
+    const stdout = _stdoutText();
+    expect(stdout).not.toContain("develop to main.");
+    expect(stdout).toContain("The working tree has tracked changes");
+    expect(process.exitCode).toBe(1);
+  });
 });
 
 /**
@@ -417,9 +401,10 @@ function _isolateFromUserConfig(directory: string): void {
 }
 
 /**
- * Push the three line branches from `seed` to origin: `develop` at
- * `0.14.2-dev` and `alpha-dev` at `0.15.0-alpha-dev`, each one commit past
- * `main`, and `alpha` at `main`, along with every `BRANCH_NAMED_TAGS` tag.
+ * Push `develop` at `0.14.2-dev`, one commit past `main`, from `seed` to
+ * origin, along with every `BRANCH_NAMED_TAGS` tag. A retired release line's
+ * branches are pushed too, `alpha-dev` one commit past `main` and `alpha` at
+ * `main`, so a release can prove it leaves branches it does not own alone.
  */
 function _pushLineBranches(seed: string): void {
   _git({ cwd: seed, args: ["switch", "-c", "develop"] });
@@ -455,7 +440,7 @@ function _pushLineBranches(seed: string): void {
 }
 
 /**
- * A bare origin holding both release lines, and a configured clone of it to
+ * A bare origin holding the release branches, and a configured clone of it to
  * release from. The origin is bare so a release can push to any branch.
  */
 function _createReleaseRepos(directory: string): {
@@ -520,31 +505,20 @@ type EndToEndReleaseCase = {
   sourceBranch: string;
   /** The branch the release publishes to. */
   targetBranch: string;
-  /** The other line's branches, which the release must not touch. */
+  /** The retired line's branches, which the release must not touch. */
   otherLineBranches: string[];
   version: string;
   nextVersion: string;
   /** package.json on the target branch after the release. */
   publishedVersion: string;
   releaseTag: string;
-  /** The tag the other line would have used, which must not appear. */
+  /** The tag the retired line would have used, which must not appear. */
   otherLineTag: string;
   /** package.json on the source branch after the release. */
   nextDevVersion: string;
 };
 
 const END_TO_END_RELEASE_CASES: readonly EndToEndReleaseCase[] = [
-  {
-    sourceBranch: "alpha-dev",
-    targetBranch: "alpha",
-    otherLineBranches: ["main", "develop"],
-    version: "0.15.0",
-    nextVersion: "0.15.1",
-    publishedVersion: "0.15.0-alpha",
-    releaseTag: "v0.15.0-alpha",
-    otherLineTag: "v0.15.0",
-    nextDevVersion: "0.15.1-alpha-dev",
-  },
   {
     sourceBranch: "develop",
     targetBranch: "main",
@@ -796,90 +770,6 @@ describe.each(END_TO_END_RELEASE_CASES)(
 /** The run URL the mocked CI check reports, for a refusal to name. */
 const CI_RUN_URL = "https://github.com/AvandarLabs/avandar/actions/runs/7";
 
-/** Each verdict other than a pass, as the mocked CI check returns it. */
-const NON_PASSING_CI_STATUSES: readonly CiStatus[] = [
-  { kind: "failed", conclusion: "failure", url: CI_RUN_URL },
-  { kind: "pending", status: "in_progress", url: CI_RUN_URL },
-  { kind: "missing" },
-  { kind: "unknown", reason: "the gh CLI is not logged in" },
-];
-
-describe("ava release on alpha-dev with a non-passing CI verdict", () => {
-  let directory: string;
-  let origin: string;
-  let checkout: string;
-
-  beforeAll(() => {
-    directory = mkdtempSync(join(tmpdir(), "ava-release-ci-refusal-"));
-    _isolateFromUserConfig(directory);
-    ({ origin, checkout } = _checkOutFreshSourceBranch({
-      directory,
-      sourceBranch: "alpha-dev",
-    }));
-    // Fetched first, so the release's own fetch has nothing left to move.
-    _git({ cwd: checkout, args: ["fetch", "--prune", "--tags", "origin"] });
-  });
-
-  afterEach(() => {
-    vi.mocked(console.log).mockClear();
-    vi.mocked(promptToConfirm).mockReset();
-    vi.mocked(checkSourceBranchCi).mockReset();
-  });
-
-  afterAll(() => {
-    vi.restoreAllMocks();
-    vi.unstubAllEnvs();
-    rmSync(directory, { recursive: true, force: true });
-  });
-
-  describe.each(NON_PASSING_CI_STATUSES)("($kind)", (ciStatus) => {
-    it.each([true, false])(
-      "refuses with --yes %s before any mutating command, without asking",
-      async (yes) => {
-        vi.mocked(checkSourceBranchCi).mockReturnValue(ciStatus);
-        const originRefsBefore = _listRefs(origin);
-        const checkoutRefsBefore = _listRefs(checkout);
-
-        await expect(
-          runRelease({
-            version: "0.15.0",
-            nextVersion: "0.15.1",
-            yes,
-            dryRun: false,
-            skipCiCheck: false,
-            skipChangelog: true,
-          }),
-        ).rejects.toThrow(`"${ciStatus.kind}"`);
-
-        expect(promptToConfirm).not.toHaveBeenCalled();
-        expect(_listRefs(origin)).toBe(originRefsBefore);
-        expect(_listRefs(checkout)).toBe(checkoutRefsBefore);
-        expect(_git({ cwd: checkout, args: ["status", "--short"] })).toBe("");
-        // Every mutating command is echoed as `$ <command>` before it runs.
-        expect(_stdoutText()).not.toContain("$ ");
-      },
-    );
-  });
-
-  it("names the run URL and --skip-ci-check in the refusal", async () => {
-    vi.mocked(checkSourceBranchCi).mockReturnValue(
-      NON_PASSING_CI_STATUSES[0] as CiStatus,
-    );
-
-    const release = runRelease({
-      version: "0.15.0",
-      nextVersion: "0.15.1",
-      yes: true,
-      dryRun: false,
-      skipCiCheck: false,
-      skipChangelog: true,
-    });
-
-    await expect(release).rejects.toThrow(CI_RUN_URL);
-    await expect(release).rejects.toThrow("--skip-ci-check");
-  });
-});
-
 /** One release the CI gate must let through, and the verdict it sees. */
 type CiGateProceedCase = {
   name: string;
@@ -893,26 +783,6 @@ type CiGateProceedCase = {
 };
 
 const CI_GATE_PROCEED_CASES: readonly CiGateProceedCase[] = [
-  {
-    name: "alpha-dev with a passed verdict",
-    sourceBranch: "alpha-dev",
-    targetBranch: "alpha",
-    version: "0.15.0",
-    nextVersion: "0.15.1",
-    releaseTag: "v0.15.0-alpha",
-    ciStatus: { kind: "passed", url: CI_RUN_URL },
-    skipCiCheck: false,
-  },
-  {
-    name: "alpha-dev with a failed verdict and --skip-ci-check",
-    sourceBranch: "alpha-dev",
-    targetBranch: "alpha",
-    version: "0.15.0",
-    nextVersion: "0.15.1",
-    releaseTag: "v0.15.0-alpha",
-    ciStatus: { kind: "failed", conclusion: "failure", url: CI_RUN_URL },
-    skipCiCheck: true,
-  },
   {
     name: "develop with a failed verdict and --yes",
     sourceBranch: "develop",
@@ -986,7 +856,7 @@ describe("ava release --help", () => {
     vi.restoreAllMocks();
   });
 
-  it("says alpha-dev refuses any CI verdict but a pass, even with --yes or --dry-run", async () => {
+  it("says main becomes an exact copy of develop, with no other line", async () => {
     await ReleaseCli.state.action?.({
       version: "",
       next: "",
@@ -998,13 +868,10 @@ describe("ava release --help", () => {
 
     // Collapsed so the assertions survive re-wrapping the help text.
     const stdout = _stdoutText().replace(/\s+/g, " ");
+    expect(stdout).toContain("main becomes an exact copy of develop");
     expect(stdout).toContain(
-      "On alpha-dev, anything but a pass (failed, pending, missing, or unknown) refuses the release, even with --yes",
+      "--skip-ci-check Do not check develop's staging CI.",
     );
-    expect(stdout).toContain("refuses --dry-run too");
-    expect(stdout).toContain(
-      "On alpha-dev, refused while CI is not green unless --skip-ci-check is passed.",
-    );
-    expect(stdout).toContain("deploys production without alpha-dev's CI");
+    expect(stdout).not.toMatch(/alpha/i);
   });
 });

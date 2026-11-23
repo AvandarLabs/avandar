@@ -171,7 +171,7 @@ type ReleaseCommitOptions = {
 /**
  * Builds the release commit: the source branch's tree verbatim, with the
  * target branch and the source branch as its two parents (`main` and
- * `develop` on mainline, `alpha` and `alpha-dev` on alpha).
+ * `develop`).
  *
  * This is the heart of the command, and the reason it cannot conflict. A
  * release is not a content merge. The target is only ever a published snapshot

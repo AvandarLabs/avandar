@@ -20,15 +20,9 @@ type ResolveVersionOptions = {
   assumeYes: boolean;
 };
 
-/**
- * The release-version prompt. A line whose releases carry a suffix (`-alpha`)
- * says it is added, so the reviewer types a bare `X.Y.Z`.
- */
-function _buildReleaseVersionPrompt(line: ReleaseLine): string {
-  const question = "What version number do you want for this release?";
-  return line.releaseSuffix.length > 0
-    ? `${question} (${line.releaseSuffix} is added automatically)`
-    : question;
+/** The release-version prompt. */
+function _buildReleaseVersionPrompt(): string {
+  return "What version number do you want for this release?";
 }
 
 /**
@@ -38,7 +32,7 @@ function _buildReleaseVersionPrompt(line: ReleaseLine): string {
 export async function resolveReleaseVersion(
   options: Readonly<ResolveVersionOptions & { suggested: string }>,
 ): Promise<string> {
-  const { line, provided, suggested, assumeYes } = options;
+  const { provided, suggested, assumeYes } = options;
 
   if (provided !== undefined) {
     return _requireValidVersion(provided, "The release version");
@@ -46,7 +40,7 @@ export async function resolveReleaseVersion(
   return assumeYes
     ? suggested
     : promptForVersion({
-        message: _buildReleaseVersionPrompt(line),
+        message: _buildReleaseVersionPrompt(),
         defaultValue: suggested,
         label: "The release version",
       });
