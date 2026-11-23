@@ -30,7 +30,9 @@ afterEach(() => {
   });
 });
 
-function _createRepository(extension = "ts", source = PROOF_IMPORT) {
+function _createRepository(
+  extension = "ts", source = PROOF_IMPORT, files: Record<string, string> = {},
+) {
   const directory = mkdtempSync(join(tmpdir(), "utility-coverage-"));
   directories.push(directory);
   ["node_modules", "eslint"].forEach((name) => { symlinkSync(join(ROOT, name), join(directory, name)); });
@@ -41,11 +43,17 @@ function _createRepository(extension = "ts", source = PROOF_IMPORT) {
   writeFileSync(join(directory, ".oxlintrc.json"), readFileSync(join(ROOT, ".oxlintrc.json")));
   writeFileSync(join(directory, "tsconfig.json"), JSON.stringify({ compilerOptions: { strict: true, noEmit: true, module: "preserve", moduleResolution: "bundler", target: "ESNext", types: [], skipLibCheck: true, allowImportingTsExtensions: true, paths: { "@utils/*": [join(ROOT, "packages/shared/utils/src/*")] } }, include: ["src"] }));
   writeFileSync(join(directory, `src/reviewed.${extension}`), source);
+  Object.entries(files).forEach(([name, content]) => {
+    writeFileSync(join(directory, "src", name), content);
+  });
   return directory;
 }
 
-function _fix(source: string, extension = "ts", root = false, disabled?: string) {
-  const directory = _createRepository(extension, source);
+function _fix(
+  source: string, extension = "ts", root = false, disabled?: string,
+  files: Record<string, string> = {},
+) {
+  const directory = _createRepository(extension, source, files);
   const config = JSON.parse(readFileSync(join(directory, ".oxlintrc.json"), "utf8"));
   if (!root) {
     config.rules = Object.fromEntries(SAFE.map(([, , name]) => { return [`avandar/${name}`, "error"]; }));
@@ -66,8 +74,10 @@ function _fix(source: string, extension = "ts", root = false, disabled?: string)
   return { fixed, directory };
 }
 
-function _getTypeDiagnostics(source: string) {
-  const directory = _createRepository("ts", source);
+function _getTypeDiagnostics(
+  source: string, files: Record<string, string> = {},
+) {
+  const directory = _createRepository("ts", source, files);
   const result = spawnSync(join(ROOT, "node_modules/.bin/tsc"), ["--project", directory, "--pretty", "false"], { cwd: directory, encoding: "utf8" });
   expect(result.error).toBeUndefined();
   return { status: result.status, diagnostics: result.stdout + result.stderr };
@@ -423,4 +433,97 @@ it("preserves inferred object return contracts without casts", () => {
   const fixed = _fix(source).fixed;
   expect(fixed).not.toBe(source);
   expect(_getTypeDiagnostics(fixed)).toEqual({ status: 0, diagnostics: "" });
+});
+
+it("review R1 preserves an inferred null filter predicate and existing contract", () => {
+  const source = [
+    'import { propEq } from "@avandar/utils";',
+    'export const result = [{ id: null }, { id: 1 }].filter(function(row) {',
+    '  return row.id === null;', '});',
+    'export const contract: { id: null }[] = result;',
+  ].join("\n");
+  expect(_getTypeDiagnostics(source)).toEqual({ status: 0, diagnostics: "" });
+  const fixed = _fix(source).fixed;
+  expect(_getTypeDiagnostics(fixed)).toEqual({ status: 0, diagnostics: "" });
+  expect(fixed).toBe(source);
+});
+
+it.each([
+  'export const result = [{ id: 1 }].map(function(row: { id?: number }) { return row.id; });\nresult.push(undefined);',
+  'export const result = [{ id: null }, { id: 1 }].filter(function(row): row is { id: null } { return row.id === null; });\nexport const contract: { id: null }[] = result;',
+  'export const result = [{ id: 1 }].map(function<T extends { id: number }>(row: T) { return row.id; });',
+])("review R1 preserves explicit callback contracts: %s", (body) => {
+  const source = PROOF_IMPORT + body;
+  expect(_getTypeDiagnostics(source)).toEqual({ status: 0, diagnostics: "" });
+  const fixed = _fix(source).fixed;
+  expect(fixed).toBe(source);
+  expect(_getTypeDiagnostics(fixed)).toEqual({ status: 0, diagnostics: "" });
+});
+
+it.each(["local", "imported", "interface"])("review R2 preserves the compiler contract of a %s Array binding", (binding) => {
+  const files = { "arrayTypes.ts": 'export type Array<T> = (T | undefined)[];' };
+  const declaration = binding === "local" ? 'type Array<T> = (T | undefined)[];'
+    : binding === "imported" ? 'import type { Array } from "./arrayTypes";'
+    : 'interface Array<T> extends ReadonlyArray<T | undefined> { push(...items: (T | undefined)[]): number; }';
+  const source = [
+    'import { isDefined } from "@avandar/utils";', declaration,
+    'export function build(first: number | undefined) {',
+    '  const values: Array<number> = [];',
+    '  if (first !== undefined) {', '    values.push(first);', '  }',
+    '  return values;', '}',
+    'export const response = build(1);', 'response.push(undefined);',
+  ].join("\n");
+  expect(_getTypeDiagnostics(source, files)).toEqual({ status: 0, diagnostics: "" });
+  const fixed = _fix(source, "ts", false, undefined, files).fixed;
+  expect(_getTypeDiagnostics(fixed, files)).toEqual({ status: 0, diagnostics: "" });
+  expect(fixed).toBe(source);
+});
+
+it.each(["Array<number>", "number[]"])("review R2 rejects outer Array type parameters for %s", (annotation) => {
+  const source = [
+    'import { isDefined } from "@avandar/utils";',
+    'export function outer<Array>() {',
+    '  function build(first: number | undefined) {',
+    `    const values: ${annotation} = [];`,
+    '    if (first !== undefined) {', '      values.push(first);', '    }',
+    '    return values;', '  }', '  return build;', '}',
+  ].join("\n");
+  // A type parameter is not a generic constructor. T[] is the valid compiler
+  // fixture, while Array<number> also needs an unchanged syntax refusal.
+  if (annotation === "number[]") {
+    expect(_getTypeDiagnostics(source)).toEqual({ status: 0, diagnostics: "" });
+  }
+  expect(_fix(source).fixed).toBe(source);
+});
+
+it.each(["local", "imported", "value"])("review R2 keeps T[] refused with a resolved %s Array binding", (binding) => {
+  const files = { "arrayTypes.ts": 'export type Array<T> = (T | undefined)[];' };
+  const declaration = binding === "local" ? 'type Array<T> = (T | undefined)[];'
+    : binding === "imported" ? 'import type { Array } from "./arrayTypes";'
+    : 'const Array = 1;';
+  const source = [
+    'import { isDefined } from "@avandar/utils";', declaration,
+    'export function build(first: number | undefined) {',
+    '  const values: number[] = [];',
+    '  if (first !== undefined) {', '    values.push(first);', '  }',
+    '  return values;', '}',
+  ].join("\n");
+  expect(_getTypeDiagnostics(source, files)).toEqual({ status: 0, diagnostics: "" });
+  expect(_fix(source, "ts", false, undefined, files).fixed).toBe(source);
+});
+
+it("review R2 stays refused after native Array<T> normalization", () => {
+  const files = { "arrayTypes.ts": 'export type Array<T> = (T | undefined)[];' };
+  const source = [
+    'import { isDefined } from "@avandar/utils";',
+    'import type { Array } from "./arrayTypes";', '',
+    'function build(first: number | undefined) {',
+    '  const values: Array<number> = [];',
+    '  if (first !== undefined) {', '    values.push(first);', '  }',
+    '  return values;', '}', 'export const response = build(1);',
+  ].join("\n");
+  const native = _fix(source, "ts", true, "optional-array-candidates", files).fixed;
+  expect(native).toContain('const values: number[] = [];');
+  expect(native).toContain('import type { Array }');
+  expect(_fix(source, "ts", true, undefined, files).fixed).toBe(native);
 });

@@ -19,7 +19,8 @@ function _getCallbackShape(call) {
   const returned = callback.body.body[0].argument;
   const isEquality = method.property.name === "filter";
   if (!returned || (isEquality && (returned.type !== "BinaryExpression" ||
-    returned.operator !== "===" || !isPrimitiveConstant(returned.right)))) {
+    returned.operator !== "===" || !isPrimitiveConstant(returned.right) ||
+    returned.right.value === null))) {
     return undefined;
   }
   const member = isEquality ? returned.left : returned;

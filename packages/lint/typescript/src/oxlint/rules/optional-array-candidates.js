@@ -59,9 +59,9 @@ function _getCandidate(statement, construction) {
   return { name: test.left.name, identifier: push.callee.object };
 }
 
-function _hasUndefinedBinding(scope) {
-  return Boolean(scope && (scope.set.get("undefined")?.defs.length ||
-    _hasUndefinedBinding(scope.upper)));
+function _hasLocalBinding(scope, name) {
+  return Boolean(scope && (scope.set.get(name)?.defs.length ||
+    _hasLocalBinding(scope.upper, name)));
 }
 
 function _getArrayPlan(sourceCode, block) {
@@ -75,7 +75,8 @@ function _getArrayPlan(sourceCode, block) {
     })) {
     return undefined;
   }
-  if (_hasUndefinedBinding(sourceCode.getScope(block))) {
+  if (_hasLocalBinding(sourceCode.getScope(block), "undefined") ||
+    _hasLocalBinding(sourceCode.getScope(block), "Array")) {
     return undefined;
   }
   const candidates = construction.operations.map((operation) => {

@@ -132,3 +132,8 @@ it.each(["let", "var"])("folds an unreassigned %s local without editing its keyw
   expect(_fix(source, [names[1]]))
     .toBe(`export function build() { ${kind} result = { count: 0 };  return { ...result, count: 2 }; }`);
 });
+
+it("review R1 retains null comparisons that can infer filter predicates", () => {
+  const source = 'import { propEq } from "@avandar/utils";\nexport const result = [{ id: null }, { id: 1 }].filter(function(row) { return row.id === null; });';
+  expect(_fix(source, [names[0]])).toBe(source);
+});

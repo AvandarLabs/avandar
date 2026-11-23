@@ -23,6 +23,10 @@ is unobservable because the original array has no other references or writes.
 Automatic repair is limited to TS/TSX with explicit ordinary `T[]` or `Array<T>`
 annotations. Element types must be primitive keywords, primitive literal types,
 or unions of those, excluding undefined, any, unknown, aliases and generics.
+Any resolved source binding named `Array`, including a local alias/interface,
+import, value binding or outer type parameter, leaves both annotation forms in
+fallback. This enclosing-scope boundary remains after native `Array<T>` syntax
+normalization. Ordinary global Array annotations remain supported.
 Parameter types use the same primitive/literal boundary and may include
 undefined. Defaults, rest syntax and destructuring are unsupported. Evolving
 unannotated arrays and all JavaScript candidates remain fallback. The fixer

@@ -11,11 +11,13 @@ arrays of plain data objects with the public `prop` and `propEq` helpers.
 The receiver must be a nonempty literal array whose rows contain only unique
 identifier keys and primitive constant values. Each row must own the selected
 key. The anonymous ordinary function must have one untyped parameter and one
-return statement. Strict equality accepts only a primitive constant on its
-right. This preserves equality semantics and prevents moving a mutable capture
-from callback execution into helper creation. Computed keys, dotted paths,
-getters, spreads, optional access, arrows, extra statements and unknown array
-receivers receive no repair.
+return statement. Strict equality accepts only a non-null primitive constant
+on its right. This preserves equality semantics and prevents moving a mutable
+capture from callback execution into helper creation. Null and undefined
+comparisons remain fallback because replacing an inferred type predicate with
+the boolean helper can broaden the result type. Computed keys, dotted paths,
+getters, spreads, optional access, arrows, callback parameter/return annotations,
+generics, extra statements and unknown array receivers receive no repair.
 
 Helper bindings require a leading original runtime `@avandar/utils` import.
 Existing named aliases and namespace bindings are reused only when scope proves
