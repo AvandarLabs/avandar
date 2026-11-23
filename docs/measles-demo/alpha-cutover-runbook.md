@@ -30,7 +30,7 @@ How to read it:
 | 6 | Create `alpha` | 6.7 | Pablo: laptop | No `all checks passed` line |
 | 7 | **Release: writes to production** | **6.8**, with 6.6 taken while the `deploy` job waits for approval | Pablo: laptop, GitHub approval | 6.6's restore test fails: do not approve |
 | 8 | Smoke test | 6.9 | Pablo: browser | Anything fails: section 7 |
-| 9 | **Catalog into production: writes to production** | **6.11** for production | Pablo: laptop | The dry run would refuse, or names another Storage host |
+| 9 | **Catalog into production: writes to production** | **6.11** for production | Pablo: laptop | The dry run would refuse, names another Storage host, or lists other datasets than the 4 WDI ones |
 | 10 | Cleanup | 8 | Pablo | |
 
 The rollback basis (5.8) is decided before phase 7: PITR on, or a release
@@ -137,9 +137,9 @@ runbook runs no `--linked` command.
 | `read_db "$PROD_DB_URL" ...` | 1.4, 2.2, 6.6, 6.11 | Queries in a read-only transaction |
 | `supabase db dump --db-url "$PROD_DB_URL" ...` | 2.2, 6.6 | `pg_dump` over the session pooler as `postgres`: reads only |
 | `supabase projects api-keys`, `branches list`, `backups list`, `secrets list`, `functions list`, with `--project-ref "$PROD_REF"` | 3.3, 5.1, 5.5, 5.8, 6.6, 6.9 | Management API reads |
-| `supabase storage cp ... --project-ref "$PROD_REF"` (optional) | 2.8 | Storage downloads |
+| `supabase storage cp ... --project-ref "$PROD_REF"` (optional), `supabase storage ls ... --project-ref "$PROD_REF"` | 2.8, 6.11.9 | Storage downloads and listings |
 | `"$PG_DUMP_BIN" "$PROD_DB_URL" ...`, `importCatalogData.sh ... --dry-run` | 6.11.4, 6.11.5 | Reads only (the importer's report runs in read-only transactions) |
-| **Writes to production** | 5.1 (only if keys are missing), 5.8 (only if you turn PITR on), 6.8, 6.11.6, 6.11.7, section 7 | As each step says |
+| **Writes to production** | 5.1 (only if keys are missing), 5.8 (only if you turn PITR on), 6.8, 6.11.6 (deletes the 4 WDI datasets with the catalog), 6.11.7, 6.11.9 (`supabase storage rm`), section 7 | As each step says |
 
 The dumps hold real user data. The sensitive tables:
 
@@ -1238,13 +1238,28 @@ every row of the catalog tables (`data_catalog_drives`,
 `pipeline_executions`, `pipeline_execution_scopes`,
 `pipeline_scope_checkpoints`), loads the `demo-measles` catalog, rewrites its
 Storage links, and recounts `data_catalog_facet_counts`.
-`datasets__open_data.catalog_listing_id` is `on delete cascade`, so every
-workspace dataset added from the catalog loses its `datasets__open_data`
-row, even when the new catalog brings back a listing with the same id. The
-`datasets` rows, their columns, and dashboards that use them stay, but the
-importer says it plainly: those datasets "stay listed but can no longer
-load". Production has 4. Check on `alpha-dev` what a user then sees (open one
-of the 4 there) before you run it on production.
+`datasets__open_data.catalog_listing_id` is `on delete cascade`, so deleting
+the listings would strip every workspace dataset added from the catalog of
+its `datasets__open_data` row, even when the new catalog brings back a
+listing with the same id, and leave it unable to load. So, in the same
+transaction and before it deletes the catalog, the importer deletes those
+`public.datasets` rows, and every row that cascades from them (their
+`datasets__open_data` and `dataset_columns` rows, and any other table with
+an `on delete cascade` foreign key to `datasets`).
+
+It deletes them only when every member of each dataset's workspace has an
+`@avandarlabs.com` email (case-insensitive). A workspace with no members, or
+with any member outside `@avandarlabs.com`, stops the whole transaction: the
+refusal names the dataset id, the workspace id, and how many members are
+outside (never their emails), and nothing changes. The check runs once in
+the read-only report and again inside the transaction, with
+`workspace_memberships` locked, so a member added in between also stops it.
+
+Production has 4 such datasets, all named "World Development Indicators
+(WDI)", one each in the workspaces ChangeNOW Demo, ICT4D, Mytest, and New
+test workspace, whose only member is `pablo@avandarlabs.com`. Pablo approved
+deleting them. Their legacy Parquet objects are deleted separately, in
+6.11.9.
 
 **6.11.1 Export the catalog (once, reads staging).** Check 5.7 first:
 
@@ -1315,29 +1330,48 @@ bash scripts/alpha/importCatalogData.sh "$TARGET_DB_URL" "$CATALOG_DUMP" \
 
 **Expect:** `Target: postgres...@<host>`; the dump's rows; under Storage
 hosts, only `<SOURCE_REF>.supabase.co`; under foreign keys,
-`public.datasets__open_data.(catalog_listing_id) -> public.data_catalog_listings: on delete cascade, 4 rows deleted`;
-`The cascade leaves 4 public.datasets rows in <N> workspaces`; the listing
-ids a replace drops; the plan; and `Dry run: nothing was written.` with no
-"would refuse" after it.
+`public.datasets__open_data.(catalog_listing_id) -> public.data_catalog_listings: on delete cascade, 4 rows deleted`,
+a line for each table that cascades from `public.datasets` (at least
+`public.dataset_columns.(dataset_id) -> public.datasets`), and
+`public.datasets: 4 rows deleted, every dataset added from the catalog, in 4 workspaces`.
+Then, under `Open data datasets the replace deletes`, for production, 4
+entries like:
+
+```text
+  dataset <id> "World Development Indicators (WDI)" in workspace <id> "ChangeNOW Demo"
+    members: pablo@avandarlabs.com (1 of 1 have an @avandarlabs.com email), guard passes
+```
+
+one each for ChangeNOW Demo, ICT4D, Mytest, and New test workspace, and
+`The @avandarlabs.com guard passes for all 4 open data datasets.` Members
+outside `@avandarlabs.com` are only counted, never listed. Then the target's
+row counts, the listing ids a replace drops, the `pg_dump` command for the
+backup (6.11.5), the plan (its step 2 deletes the 4 datasets), and
+`Dry run: nothing was written.` with no "would refuse" after it.
 **If not:** another Storage host means a listing points outside the source
-project: stop. A "would refuse" names the reason. A refusal about
+project: stop. A "would refuse" names the reason. `guard fails`, or other
+datasets, workspaces, or members than the ones above: stop and raise it.
+Never edit a workspace's members to make the guard pass. A refusal about
 `connect_timeout` means the URL kept its query: strip it as in 6.5.1.
 
-**6.11.5 Back up the target's catalog (reads the target).**
+**6.11.5 Back up the target's catalog and the datasets it deletes (reads
+the target).** The dry run printed the command under `Make the backup with`:
+one `--table` for each catalog table, the facet counts, `public.datasets`,
+and every table the replace reaches from it. Run it with `"$PG_DUMP_BIN"` in
+place of `pg_dump` and `--file "$BACKUP_FILE"` in place of its `--file`:
 
 ```bash
 export BACKUP_FILE="$CUTOVER_DIR/catalog/catalog-backup-$TARGET_REF-$(date +%Y%m%d-%H%M).sql"
 "$PG_DUMP_BIN" "$TARGET_DB_URL" --data-only --no-owner --no-privileges \
-  --table 'public.data_catalog_drives' --table 'public.data_catalog_listings' \
-  --table 'public.data_catalog_listings__relation_columns' \
-  --table 'public.pipeline_executions' --table 'public.pipeline_execution_scopes' \
-  --table 'public.pipeline_scope_checkpoints' --table 'public.data_catalog_facet_counts' \
-  --table 'public.datasets__open_data' --file "$BACKUP_FILE"
+  <the --table arguments the dry run printed> --file "$BACKUP_FILE"
+grep -c '^COPY ' "$BACKUP_FILE"
 ```
 
-These are the catalog, the facet counts, and the one dependent table the dry
-run reported. If 6.11.6 refuses the backup, it prints the exact `pg_dump`
-command to use instead. The backup must be under 24 hours old.
+**Expect:** the `COPY` count equals the number of `--table` arguments. The
+backup holds every row of `public.datasets` and of each dependent table, not
+only the deleted ones: the restore steps 6.11.6 prints stage it and put back
+only the rows the target no longer has. If 6.11.6 refuses the backup, it
+prints the exact command again. The backup must be under 24 hours old.
 
 **6.11.6 Import** (**Writes to production** when the target is production).
 
@@ -1348,23 +1382,32 @@ bash scripts/alpha/importCatalogData.sh "$TARGET_DB_URL" "$CATALOG_DUMP" \
   | tee "$CUTOVER_DIR/catalog/import-$TARGET_REF.log"
 ```
 
-It prints how to restore the backup (keep that log), the plan, then asks you
-to type `<user>@<host>` and `delete <N> dependent rows`.
+It prints the same report as the dry run, how to restore the backup (keep
+that log), the plan, then asks you to type `<user>@<host>` and
+`delete <N> dependent rows`, noting that the replace deletes the 4
+`public.datasets` rows added from the catalog. Inside the transaction it
+checks the guard again, deletes the 4 datasets, then the catalog, and loads
+the dump with every `pipeline_executions.cli_argv` and `actor` null.
 **Expect:** `Rewrote the Storage URLs of <n> listings.`, catalog counts equal
-to the dump's, and `Open data datasets with no open data details now: 4
-public.datasets rows in <N> workspaces.`
+to the dump's, `public.datasets` 4 lower than the report, and `Open data
+datasets with no open data details now: 0 public.datasets rows in 0
+workspaces.`
 **If not:** `The import failed and its transaction rolled back: every count
-matches the report.` means nothing changed: fix and run again. Counts that
-differ from the report: stop and check the target.
+matches the report.` means nothing changed: fix and run again. A
+`Refusing to delete open data dataset ...` error is the guard: a member
+outside `@avandarlabs.com` joined one of the workspaces; stop and raise it.
+Counts that differ from the report: stop and check the target.
 
 ```bash
 read_db "$TARGET_DB_URL" "select count(*) from public.data_catalog_facet_counts"
 read_db "$TARGET_DB_URL" "select count(*) from public.data_catalog_listings l where l::text like '%$SOURCE_REF%'"
 read_db "$TARGET_DB_URL" "select count(*) from public.data_catalog_listings"
+read_db "$TARGET_DB_URL" "select count(*) from public.datasets d where d.name = 'World Development Indicators (WDI)'"
+read_db "$TARGET_DB_URL" "select count(*) from public.pipeline_executions where cli_argv is not null or actor is not null"
 ```
 
 **Expect:** more than 0; then 0; then the listing count (keep it for
-6.11.7).
+6.11.7); then 0; then 0.
 
 **6.11.7 Copy the Parquet files** (**Writes to production** Storage when the
 target is production). Keys come from the environment only, and the copy
@@ -1407,6 +1450,76 @@ workspace, with the browser's network panel open. **Expect:** the data loads,
 and every Storage request goes to `<TARGET_REF>.supabase.co`, none to
 `<SOURCE_REF>.supabase.co`. Keep the `demo-measles` branch until this passes
 on production (section 8).
+
+**6.11.9 Delete the legacy WDI Parquet objects** (production only,
+**Writes to production** Storage, after 6.11.8 passes). The 4 datasets 6.11.6
+deleted read 6 Parquet objects in bucket `opendata` under
+`world-bank__wdi/datasets/`. Nothing reads them now, but the WDI pipeline
+writes to these same paths, so first confirm the new catalog does not use
+them (reads production):
+
+```bash
+cd "$REPO"
+read_db "$PROD_DB_URL" "select count(*) from public.data_catalog_listings l where l::text like '%world-bank__wdi%'"
+read_db "$PROD_DB_URL" "select count(*) from public.datasets__open_data o join public.data_catalog_listings l on l.id = o.catalog_listing_id where l::text like '%world-bank__wdi%'"
+read_db "$PROD_DB_URL" "select name, metadata->>'size' from storage.objects where bucket_id = 'opendata' and name like 'world-bank__wdi/%' order by name"
+supabase storage ls "ss:///opendata/world-bank__wdi/datasets/" --project-ref "$PROD_REF" --experimental
+```
+
+**Expect:** `0`; `0`; exactly these 6 objects, and no other object under
+`world-bank__wdi/` (sizes when this was written in bytes):
+`WDICSV.parquet` 61201614, `WDICountry.parquet` 29967,
+`WDIcountry-series.parquet` 47694, `WDIfootnote.parquet` 3460561,
+`WDISeries.parquet` 422408, `WDIseries-time.parquet` 1947; and `ls` lists
+the same 6 names.
+**If not:** a listing that mentions `world-bank__wdi` means the new catalog
+uses these paths: stop, and do not delete. Any other object: stop and raise
+it.
+
+Back them up (a Storage read), and check the copies:
+
+```bash
+WDI_FILES=(WDIcountry-series.parquet WDICountry.parquet WDIseries-time.parquet WDISeries.parquet WDICSV.parquet WDIfootnote.parquet)
+WDI_BACKUP="$CUTOVER_DIR/storage/wdi-legacy"
+mkdir -p "$WDI_BACKUP"
+for file in "${WDI_FILES[@]}"; do
+  supabase storage cp "ss:///opendata/world-bank__wdi/datasets/$file" \
+    "$WDI_BACKUP/$file" --project-ref "$PROD_REF" --experimental || echo "FAILED $file"
+done
+ls -l "$WDI_BACKUP"
+```
+
+**Expect:** no `FAILED` line, and 6 files whose sizes match the listing
+above. **If not:** do not delete; re-run the copy for the failed file.
+
+Delete them:
+
+```bash
+supabase storage rm \
+  "ss:///opendata/world-bank__wdi/datasets/WDIcountry-series.parquet" \
+  "ss:///opendata/world-bank__wdi/datasets/WDICountry.parquet" \
+  "ss:///opendata/world-bank__wdi/datasets/WDIseries-time.parquet" \
+  "ss:///opendata/world-bank__wdi/datasets/WDISeries.parquet" \
+  "ss:///opendata/world-bank__wdi/datasets/WDICSV.parquet" \
+  "ss:///opendata/world-bank__wdi/datasets/WDIfootnote.parquet" \
+  --project-ref "$PROD_REF" --experimental
+read_db "$PROD_DB_URL" "select count(*) from storage.objects where bucket_id = 'opendata' and name like 'world-bank__wdi/%'"
+```
+
+**Expect:** the CLI reports the 6 objects deleted, then `0`.
+**If not:** a partial delete: re-run the `rm` with the names the count still
+finds. To restore, upload the backup with the content type and cache time
+the objects had:
+
+```bash
+for file in "${WDI_FILES[@]}"; do
+  supabase storage cp "$WDI_BACKUP/$file" "ss:///opendata/world-bank__wdi/datasets/$file" \
+    --content-type application/vnd.apache.parquet --cache-control "max-age=3600" \
+    --project-ref "$PROD_REF" --experimental
+done
+```
+
+Keep `$WDI_BACKUP` until section 8 deletes `$CUTOVER_DIR`.
 
 ## 7. Rollback
 
