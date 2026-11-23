@@ -1,4 +1,7 @@
-import { RELEASE_SOURCE_BRANCH } from "@ava-cli/ReleaseCli/releaseBranches/releaseBranches";
+import {
+  RELEASE_SOURCE_BRANCH,
+  RELEASE_TARGET_BRANCH,
+} from "@ava-cli/ReleaseCli/releaseBranches/releaseBranches";
 import { runPreflight } from "@ava-cli/ReleaseCli/runPreflight/runPreflight";
 import { describe, expect, it } from "vitest";
 import type {
@@ -43,11 +46,6 @@ type FakeRepoState = {
 };
 
 const OK: CommandResult = { ok: true, stdout: "", stderr: "" };
-
-/** The source branch's target, so the fake can answer for the release line. */
-const TARGET_BRANCH_BY_SOURCE: Readonly<Record<string, string>> = {
-  develop: "main",
-};
 
 /**
  * Branches preflight must refuse. Besides the target branch, a feature
@@ -106,23 +104,23 @@ function _fillRepoStateDefaults(
  * What `rev-parse` answers for `revision` in the fake repo. Keys are exact,
  * so a near-miss of a ref never resolves. As in git, a bare
  * branch name resolves to a same-named tag when one exists. Nothing resolves
- * on a branch with no target, which preflight refuses before any lookup.
+ * on a branch other than the source branch, which preflight refuses before
+ * any lookup.
  */
 function _getShaFromRevision(
   state: Readonly<FilledRepoState>,
   revision: string,
 ): string | undefined {
-  const targetBranch = TARGET_BRANCH_BY_SOURCE[state.branch];
-  if (targetBranch === undefined) {
+  if (state.branch !== RELEASE_SOURCE_BRANCH) {
     return undefined;
   }
   const tipByRevision: Record<string, string | undefined> = {
     [`refs/remotes/origin/${state.branch}`]: state.originSource,
-    [`refs/remotes/origin/${targetBranch}`]: state.originTarget,
+    [`refs/remotes/origin/${RELEASE_TARGET_BRANCH}`]: state.originTarget,
     [`refs/heads/${state.branch}`]: state.localSource,
     [state.branch]: state.sourceTag ?? state.localSource,
-    [`refs/heads/${targetBranch}`]: state.localTarget,
-    [targetBranch]: state.targetTag ?? state.localTarget,
+    [`refs/heads/${RELEASE_TARGET_BRANCH}`]: state.localTarget,
+    [RELEASE_TARGET_BRANCH]: state.targetTag ?? state.localTarget,
   };
   return tipByRevision[revision];
 }
@@ -169,7 +167,7 @@ function _createTryGit(
     }
     // `refExists` runs `rev-parse --verify --quiet <ref>` through here.
     const looksUpLocalTarget = args.some((arg) => {
-      return arg === `refs/heads/${TARGET_BRANCH_BY_SOURCE[state.branch]}`;
+      return arg === `refs/heads/${RELEASE_TARGET_BRANCH}`;
     });
     return looksUpLocalTarget && !state.localTargetExists
       ? { ok: false, stdout: "", stderr: "" }

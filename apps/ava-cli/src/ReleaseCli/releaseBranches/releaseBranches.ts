@@ -14,5 +14,4 @@ export const SOURCE_CI_WORKFLOW = "staging.yaml";
 export const TARGET_DEPLOY_WORKFLOW = "production.yaml";
 
 /** What pushing `main` does, warned about before the last confirmation. */
-export const DEPLOY_WARNING =
-  "Pushing main deploys production and migrates the production database.";
+export const DEPLOY_WARNING = `Pushing ${RELEASE_TARGET_BRANCH} deploys production and migrates the production database.`;
