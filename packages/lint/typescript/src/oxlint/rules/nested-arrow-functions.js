@@ -15,6 +15,7 @@ const rule = {
     return { FunctionDeclaration(node) {
       const sourceCode = context.sourceCode;
       if (!node.id || node.parent.type !== "BlockStatement" ||
+        node.returnType?.typeAnnotation?.asserts ||
         !/Function/.test(node.parent.parent?.type) ||
         node.parent.parent.body !== node.parent ||
         !hasOrdinarySignature(sourceCode, node, node.range[0])) {

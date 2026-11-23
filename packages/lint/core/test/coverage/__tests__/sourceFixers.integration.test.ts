@@ -181,3 +181,55 @@ it.each([
 ])("preserves exact adjacent export collision and identity contracts: %s", (source) => {
   expect(_fix(source)).toBe(source);
 });
+
+function _getTypeDiagnostics(source: string) {
+  const directory = _createRepository();
+  writeFileSync(join(directory, "src/reviewed.ts"), source);
+  writeFileSync(join(directory, "tsconfig.json"), JSON.stringify({
+    compilerOptions: {
+      strict: true, noEmit: true, module: "preserve", target: "ESNext",
+      types: [], skipLibCheck: true,
+    },
+    include: ["src"],
+  }));
+  const result = spawnSync(join(ROOT, "node_modules/.bin/tsc"),
+    ["--project", directory, "--pretty", "false"],
+    { cwd: directory, encoding: "utf8" });
+  expect(result.error).toBeUndefined();
+  return { status: result.status, diagnostics: result.stdout + result.stderr };
+}
+
+it.each(["asserts candidate", "asserts candidate is number"])(
+  "preserves declaration narrowing and zero TypeScript errors for %s",
+  (assertion) => {
+    const source = [
+      `declare function check(candidate: unknown): ${assertion};`,
+      "export function load(value: number | undefined): number {",
+      "  function read(",
+      "    candidate: number | undefined,",
+      `  ): ${assertion} {`,
+      "    check(candidate);",
+      "  }",
+      "  read(value);",
+      "  return value;",
+      "}",
+    ].join("\n");
+    expect(_getTypeDiagnostics(source)).toEqual({ status: 0, diagnostics: "" });
+    const fixed = _fix(source, "ts", undefined, true);
+    expect(_getTypeDiagnostics(fixed)).toEqual({ status: 0, diagnostics: "" });
+    expect(fixed).toBe(source);
+  },
+);
+
+it("preserves the TypeScript pseudo-this parameter through native root repair", () => {
+  const source = [
+    "export function load(): number {",
+    "  function read(this: void): number { return 1; }",
+    "  return read();",
+    "}",
+  ].join("\n");
+  expect(_getTypeDiagnostics(source)).toEqual({ status: 0, diagnostics: "" });
+  const fixed = _fix(source, "ts", undefined, true);
+  expect(fixed).toBe(source);
+  expect(_getTypeDiagnostics(fixed)).toEqual({ status: 0, diagnostics: "" });
+});
