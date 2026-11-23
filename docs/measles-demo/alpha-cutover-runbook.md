@@ -1,5 +1,7 @@
 # Alpha cutover runbook
 
+> **Superseded on 2026-11-23** by [production-cutover-plan.md](production-cutover-plan.md). The alpha line was abandoned, and a new runbook replaces this one.
+
 How Pablo turns `demo/measles` into the alpha line and moves production
 (`app.avandarlabs.com`, Supabase project `Avandar`) from `main` to `alpha`.
 The spec is Stage 1 of [alpha-launch-plan.md](alpha-launch-plan.md); section

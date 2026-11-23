@@ -1,5 +1,7 @@
 # Alpha launch plan
 
+> **Superseded on 2026-11-23** by [production-cutover-plan.md](production-cutover-plan.md). The alpha line was abandoned.
+
 How `demo/measles` becomes the alpha line, with `alpha` serving
 `app.avandarlabs.com` and `alpha-dev` as its staging branch, and what
 hardening follows. Written 2026-11-19.
