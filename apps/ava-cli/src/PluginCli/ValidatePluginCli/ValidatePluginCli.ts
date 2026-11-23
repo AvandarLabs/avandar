@@ -26,7 +26,7 @@ type CommandResult = Readonly<{ isOk: boolean; output: string }>;
 /**
  * Runs an external command in `cwd` and reports whether it succeeded along
  * with everything it printed. `validatePluginCommand` takes one so a test can
- * stand in for `tsc` and `eslint`.
+ * stand in for `tsc` and `oxlint`.
  */
 type RunCommand = (
   command: string,
@@ -34,7 +34,7 @@ type RunCommand = (
   cwd: string,
 ) => CommandResult;
 
-// `tsc` and `eslint` can print far more than the 1 MB spawnSync default on a
+// `tsc` and `oxlint` can print far more than the 1 MB spawnSync default on a
 // plugin with many errors, and an overflow would read as a failed check with
 // no explanation.
 const MAX_COMMAND_OUTPUT_BYTES = 64 * 1024 * 1024;
@@ -49,7 +49,7 @@ const VALIDATE_PLUGIN_HELP: PluginCommandHelp = {
   command: "ava plugin validate",
   purpose:
     "Validate a plugin's manifest, locales, icons, approved dependencies, " +
-    "types (tsc), and import lint (eslint). Validates every bundled plugin " +
+    "types (tsc), and import lint (oxlint). Validates every bundled plugin " +
     "when no name is given.",
   usage: "ava plugin validate [name] [--help]",
   positionalArgs: [{ label: "[name]", description: NAME_DESCRIPTION }],
@@ -108,15 +108,22 @@ function _getToolProblems(options: {
     ["exec", "tsc", "-p", `plugins/${folderName}/tsconfig.json`, "--noEmit"],
     repoRoot,
   );
-  printInfo("  Running eslint...");
+  printInfo("  Running oxlint...");
+  // Same flags as the root `lint` script, so a plugin that passes here also
+  // passes `pnpm lint`, including the `plugin-restrictions` import rules.
   const lint = runCommand(
     "pnpm",
-    ["exec", "eslint", `plugins/${folderName}`],
+    [
+      "exec",
+      "oxlint",
+      "--report-unused-disable-directives-severity=error",
+      `plugins/${folderName}`,
+    ],
     repoRoot,
   );
   return [
     ...(typeCheck.isOk ? [] : [`tsc:\n${typeCheck.output}`]),
-    ...(lint.isOk ? [] : [`eslint:\n${lint.output}`]),
+    ...(lint.isOk ? [] : [`oxlint:\n${lint.output}`]),
   ];
 }
 
@@ -132,11 +139,11 @@ function _validateOnePlugin(options: {
   );
   const { plugin, problems } = _readPluginOrProblems({ folderName, repoRoot });
   if (plugin === undefined) {
-    printWarn("  ⚠️ Skipped tsc and eslint: fix the manifest problems first.");
+    printWarn("  ⚠️ Skipped tsc and oxlint: fix the manifest problems first.");
     return problems;
   }
   if (plugin.entryPath === undefined) {
-    printInfo("  No plugin code, skipping tsc and eslint.");
+    printInfo("  No plugin code, skipping tsc and oxlint.");
     return [];
   }
   return _getToolProblems(options);

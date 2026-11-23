@@ -37,7 +37,7 @@ function _writeValidPlugin(name: string): void {
 }
 
 // A plugin folder with no entry that only bundles one content file, so it
-// has no code for tsc or eslint to check.
+// has no code for tsc or oxlint to check.
 function _writeContentOnlyPlugin(name: string): void {
   _writeRepoFile(
     `plugins/${name}/ava.yaml`,
@@ -105,7 +105,7 @@ afterEach(() => {
 });
 
 describe("validatePluginCommand", () => {
-  it("runs tsc and eslint on the named plugin and reports it valid", () => {
+  it("runs tsc and oxlint on the named plugin and reports it valid", () => {
     _writeValidPlugin("case-tools");
     const runCommand = _makePassingRunCommand();
     validatePluginCommand({ name: "case-tools", repoRoot, runCommand });
@@ -116,7 +116,12 @@ describe("validatePluginCommand", () => {
     );
     expect(runCommand).toHaveBeenCalledWith(
       "pnpm",
-      ["exec", "eslint", "plugins/case-tools"],
+      [
+        "exec",
+        "oxlint",
+        "--report-unused-disable-directives-severity=error",
+        "plugins/case-tools",
+      ],
       repoRoot,
     );
     expect(_getLoggedLines().join("\n")).toContain(
@@ -130,14 +135,14 @@ describe("validatePluginCommand", () => {
     _writeBundledList(["case-tools", "lab-tools"]);
     const runCommand = _makePassingRunCommand();
     validatePluginCommand({ repoRoot, runCommand });
-    const eslintTargets = runCommand.mock.calls
+    const oxlintTargets = runCommand.mock.calls
       .filter(([, args]) => {
-        return args[1] === "eslint";
+        return args[1] === "oxlint";
       })
       .map(([, args]) => {
-        return args[2];
+        return args.at(-1);
       });
-    expect(eslintTargets).toEqual(["plugins/case-tools", "plugins/lab-tools"]);
+    expect(oxlintTargets).toEqual(["plugins/case-tools", "plugins/lab-tools"]);
   });
 
   it("warns and passes when no plugin is bundled", () => {
@@ -166,6 +171,27 @@ describe("validatePluginCommand", () => {
     expect(output).toContain("error TS2322");
   });
 
+  it("throws and prints the tool output when oxlint fails", () => {
+    _writeValidPlugin("case-tools");
+    const runCommand = vi.fn().mockImplementation((_command, args) => {
+      return args[1] === "oxlint"
+        ? { isOk: false, output: "plugin-restrictions(no-restricted-imports)" }
+        : { isOk: true, output: "" };
+    });
+    expect(() => {
+      return validatePluginCommand({
+        name: "case-tools",
+        repoRoot,
+        runCommand,
+      });
+    }).toThrow(/1 plugin failed validation/);
+    const output = _getLoggedLines().join("\n");
+    expect(output).toContain("plugins/case-tools failed validation");
+    expect(output).toContain(
+      "oxlint:\nplugin-restrictions(no-restricted-imports)",
+    );
+  });
+
   it("counts every failing plugin when several fail", () => {
     _writeValidPlugin("case-tools");
     _writeValidPlugin("lab-tools");
@@ -176,23 +202,25 @@ describe("validatePluginCommand", () => {
     }).toThrow(/2 plugins failed validation/);
   });
 
-  it("lists the manifest problems and skips tsc and eslint when the manifest is invalid", () => {
+  it("lists the manifest problems and skips tsc and oxlint when the manifest is invalid", () => {
     _writeBundledList(["case-tools"]);
     const runCommand = _makePassingRunCommand();
     expect(() => {
       return validatePluginCommand({ repoRoot, runCommand });
     }).toThrow(/1 plugin failed validation/);
     expect(runCommand).not.toHaveBeenCalled();
-    expect(_getLoggedLines().join("\n")).toContain("ava.yaml not found");
+    const output = _getLoggedLines().join("\n");
+    expect(output).toContain("ava.yaml not found");
+    expect(output).toContain("Skipped tsc and oxlint");
   });
 
-  it("skips tsc and eslint for a plugin with no code and reports it valid", () => {
+  it("skips tsc and oxlint for a plugin with no code and reports it valid", () => {
     _writeContentOnlyPlugin("boundaries");
     const runCommand = _makePassingRunCommand();
     validatePluginCommand({ name: "boundaries", repoRoot, runCommand });
     expect(runCommand).not.toHaveBeenCalled();
     const output = _getLoggedLines().join("\n");
-    expect(output).toContain("No plugin code, skipping tsc and eslint.");
+    expect(output).toContain("No plugin code, skipping tsc and oxlint.");
     expect(output).toContain("plugins/boundaries is valid.");
   });
 
@@ -228,14 +256,14 @@ describe("runValidatePluginCli", () => {
     vi.spyOn(Acclimate, "requestInput").mockResolvedValueOnce("lab-tools");
     const runCommand = _makePassingRunCommand();
     await runValidatePluginCli({ isInteractive: true, repoRoot, runCommand });
-    const eslintTargets = runCommand.mock.calls
+    const oxlintTargets = runCommand.mock.calls
       .filter(([, args]) => {
-        return args[1] === "eslint";
+        return args[1] === "oxlint";
       })
       .map(([, args]) => {
-        return args[2];
+        return args.at(-1);
       });
-    expect(eslintTargets).toEqual(["plugins/lab-tools"]);
+    expect(oxlintTargets).toEqual(["plugins/lab-tools"]);
   });
 
   it("validates every bundled plugin when the prompt is left empty", async () => {
