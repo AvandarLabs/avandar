@@ -8,7 +8,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import {
   APPROVED_PLUGIN_IMPORT_PATTERNS,
   UNAPPROVED_PLUGIN_IMPORT_REGEX,
-} from "./plugin-restrictions.js";
+} from "./plugin-restrictions";
 
 /**
  * Verifies that `eslint/plugin-restrictions.js` stays synchronized with

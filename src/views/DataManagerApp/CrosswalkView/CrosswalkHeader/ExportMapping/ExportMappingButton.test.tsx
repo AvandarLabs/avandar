@@ -159,7 +159,7 @@ function _makeContext(kingsName = "Kings line list 2026-03"): CrosswalkContext {
 }
 
 function _exportedText(): string {
-  return (mocks.downloadTextFile.mock.calls[0]?.[0] as { text: string }).text;
+  return (mocks.downloadTextFile.mock.calls[0]![0] as { text: string }).text;
 }
 
 describe("ExportMappingButton", () => {

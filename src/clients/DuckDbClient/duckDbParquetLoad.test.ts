@@ -144,7 +144,7 @@ describe("loadParquetIntoDuckDb", () => {
       });
 
       expect(
-        (publicView?.[1] as { params: { replaceClause: string } }).params
+        (publicView![1] as { params: { replaceClause: string } }).params
           .replaceClause,
       ).toContain(`AS ENUM('Low', 'High', '7')) AS "ses_level"`);
     });
@@ -166,7 +166,7 @@ describe("loadParquetIntoDuckDb", () => {
         runRawQuery.mock.calls.indexOf(drop!),
       );
       expect(
-        (create?.[1] as { params: Record<string, string> }).params,
+        (create![1] as { params: Record<string, string> }).params,
       ).toMatchObject({
         excludeClause: 'EXCLUDE ("SES")',
         replaceClause: ', "SES" AS "ses_level"',
