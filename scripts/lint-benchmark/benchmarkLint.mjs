@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { spawn } from "node:child_process";
-import { appendFile, mkdir, access, writeFile } from "node:fs/promises";
+import { appendFile, mkdir, access, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { performance } from "node:perf_hooks";
@@ -75,10 +75,17 @@ async function _recordMeasurement(result) {
       "# Lint benchmark\n\nFirst run is cold; warm samples follow without cache eviction. Durations are\nwall-clock milliseconds. A failed lint run is not a passing performance baseline.\n\n| Label | Cold ms | Warm 1 | Warm 2 | Warm 3 | Warm 4 | Warm 5 | Warm median ms | Exit codes |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- |\n",
     );
   }
-  await appendFile(
-    destination,
-    `| ${result.label} | ${result.coldMs} | ${result.warmMs.join(" | ")} | ${result.warmMedianMs} | ${result.exitCodes.join(", ")} |\n`,
-  );
+  const row = `| ${result.label} | ${result.coldMs} | ${result.warmMs.join(" | ")} | ${result.warmMedianMs} | ${result.exitCodes.join(", ")} |\n`;
+  const document = await readFile(destination, "utf8");
+  const table = /^\| Label \|[^\n]*\n\| ---[^\n]*\n(?:\|[^\n]*\n)*/m.exec(document);
+  if (table) {
+    const end = table.index + table[0].length;
+    await writeFile(
+      destination, document.slice(0, end) + row + document.slice(end),
+    );
+  } else {
+    await appendFile(destination, row);
+  }
 }
 
 /** Gets the explicit or wizard-selected label for one lint measurement. */

@@ -87,28 +87,6 @@ try to substitute an unrelated tool.
   }
   ```
 
-- Use ternaries for conditional rendering instead of short-circuited `&&`
-  evaluations.
-
-  **Find candidates** (JSX `{cond && ...}` blocks):
-
-  ```bash
-  grep -rEn '\{[^{}]*&&[^{}]*<' --include="*.tsx" .
-  ```
-
-  Non-exhaustive: multi-line `{cond && (\n <jsx>\n)}` patterns are
-  missed. Also scan diff hunks for those by eye.
-
-- React component prop types should always be named `Props`.
-
-  **Find candidates** (prop type aliases whose name is not literally
-  `Props`):
-
-  ```bash
-  grep -rEn '^(export )?type [A-Z][a-zA-Z]*Props\b' --include="*.tsx" . \
-    | grep -Ev '\btype Props\b'
-  ```
-
 - Always destructure props in the component parameter, regardless of how many
   props there are.
 

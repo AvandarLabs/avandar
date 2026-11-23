@@ -101,23 +101,10 @@ when the gate matches.
 - **Gate:** the diff modifies a `.ts` file under `supabase/functions/`,
   `shared/`, or `packages/shared/`. Skip if none of those directories
   are touched.
-- **Rule:** in this repo, those three directories are the
-  Deno-reachable code paths. Imports inside them must include explicit
-  file extensions (`./foo.ts`, not `./foo`). This is the repo-specific
-  expansion of the general "Deno-reachable code needs file extensions"
-  rule in the skill's TypeScript checklist.
-
-  **Find candidates** (relative imports that omit a file extension):
-
-  ```bash
-  grep -rEn 'from "(\.|\.\.)/[^"]+"' \
-    supabase/functions/ shared/ packages/shared/ \
-    --include="*.ts" \
-    | grep -Ev '\.(ts|tsx|js|jsx|json|css)"$'
-  ```
-
-  Misses imports under path aliases (`@something/foo`) that resolve into
-  Deno-reachable code. Spot-check alias imports in the diff by eye.
+- **Path facts:** those three directories are Deno-reachable. Supply these
+  facts to the public AF-19 fallback when its exact coverage outcome requires
+  detection. Package entry points and import-map aliases retain their existing
+  resolver checks; extension repair is not proven by the native detector.
 
 ### Phase: model directory layout
 

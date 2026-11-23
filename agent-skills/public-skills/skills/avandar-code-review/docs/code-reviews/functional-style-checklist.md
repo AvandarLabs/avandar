@@ -12,7 +12,7 @@ library-gated phase.
   second pass (e.g. `.map().filter()`). The full rule, its **only** exceptions
   (async sequencing, early-exit-for-performance, and large N — ~100,000+ — in a
   hot path), and the note that raw string-character scanning is out of scope
-  live in the "Most Common Mistakes" section of this skill's `SKILL.md`. Do not
+  live in the "Most Common Mistakes" section of `common-and-general-checklist.md`. Do not
   flag a `.map().filter()` two-pass as a performance problem below that
   threshold.
 
@@ -123,134 +123,10 @@ library-gated phase.
   return isOpen ? "open" : undefined;
   ```
 
-- Construct objects as a single literal at the end of the function,
-  not by declaring an empty object and mutating fields onto it. Compute
-  each field as its own `const` above (using ternaries, `??`,
-  short helper calls, or IIFEs from the earlier rule) and then assemble
-  the object in one place. The final shape is then visible in one
-  expression instead of scattered across `if` blocks the reader has to
-  re-execute mentally.
-
-  The bad pattern below reads like a script: you have to walk every
-  branch to know what fields the returned object will actually have,
-  and the type annotation does the talking instead of the literal.
-
-  This is bad:
-
-  ```ts
-  function buildRequestBody(
-    payloadParts: PayloadPart[],
-    requestContext: RequestContext,
-    options: {
-      priority?: "low" | "normal" | "high";
-      retry?: { reason?: string; attempts: number };
-    },
-  ): RequestBody {
-    const body: RequestBody = {
-      parts: payloadParts,
-      context: requestContext,
-    };
-    if (options.priority) {
-      body.priority = options.priority;
-    }
-    if (options.retry?.reason) {
-      body.retry = options.retry;
-    }
-    if (payloadParts.length > 20) {
-      body.compact = true;
-    }
-    return body;
-  }
-  ```
-
-  This is good:
-
-  ```ts
-  function buildRequestBody(
-    payloadParts: PayloadPart[],
-    requestContext: RequestContext,
-    options: {
-      priority?: "low" | "normal" | "high";
-      retry?: { reason?: string; attempts: number };
-    },
-  ): RequestBody {
-    const retry =
-      options.retry?.reason ?
-        options.retry
-      : undefined;
-    const compact = payloadParts.length > 20 ? true : undefined;
-
-    return {
-      parts: payloadParts,
-      context: requestContext,
-      priority: options.priority,
-      retry,
-      compact,
-    };
-  }
-  ```
-
-  Notes:
-
-  - Optional fields whose value is `undefined` can stay inline on the
-    literal (TypeScript treats `{ foo: undefined }` and `{}` as
-    structurally identical for an optional `foo?: T`). When that
-    bothers a downstream consumer that distinguishes them, use a
-    conditional spread (`...(cond ? { foo } : {})`) instead; it still
-    keeps the construction inside one literal.
-  - If a field's computation needs multiple intermediate names or a
-    try/catch, extract it into the IIFE form from the "IIFE for
-    computed value" rule above. The point is the same: every field
-    lands in the final literal, no field is bolted on with mutation.
-
-  **Find candidates** (variables initialized to an empty object literal,
-  which is the canonical smell for this pattern):
-
-  ```bash
-  grep -rEn '= *\{\s*\}( as [A-Z][^=;]*)?\s*;?\s*$' \
-    --include="*.ts" --include="*.tsx" .
-  ```
-
-  Each hit is a candidate. Inspect the lines that follow: if the
-  variable gets `foo.bar = ...` assignments inside `if` blocks, flag
-  and propose the field-then-literal refactor above. Legitimate uses
-  of `= {}` exist (passing a fresh empty options bag into a library
-  call, seeding a `useState({})`, etc.); filter those out first.
-
-- Build variable-length arrays by listing every candidate inline with a
-  conditional that evaluates to `undefined`, then filter out the
-  `undefined`s with the codebase's `isDefined` / `isNonNullish` helper (or
-  the equivalent from a standard utility library). Avoid imperative
-  `push`-with-`if` style, which is harder to scan and loses the visual
-  one-to-one mapping between source positions and output positions.
-
-  This is bad:
-
-  ```ts
-  const sections: Array<{ type: "text"; text: string }> = [
-    { type: "text", text: response.summary },
-  ];
-  if (response.details) {
-    sections.push({
-      type: "text",
-      text: response.details,
-    });
-  }
-  ```
-
-  This is good:
-
-  ```ts
-  const sections = [
-    { type: "text" as const, text: response.summary },
-    response.details
-      ? {
-          type: "text" as const,
-          text: response.details,
-        }
-      : undefined,
-  ].filter(isDefined);
-  ```
+- Review object-field computations and optional-array choices for readability
+  and behavior: absent versus undefined fields, evaluation order, identity,
+  and meaningful grouping remain contextual judgments. Select AF-16/17 syntax
+  detection only through the deterministic fallback handoff.
 
 - Use an immediately-invoked arrow function (IIFE) to compute a value when
   the computation needs its own try/catch, multiple intermediate names, or

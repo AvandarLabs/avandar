@@ -35,237 +35,18 @@ Review Runs**.
 
 ## Additional Checklist File
 
-This skill ships with a template at
-`skills/avandar-code-review/docs/code-reviews/extra-checklist.md`.
-
-The actual repo-local checklist used during reviews lives at
-`docs/code-reviews/extra-checklist.md` in the repo under review.
-
-- Use the repo-local file as a final phase after finishing the built-in
-  phases in this skill. **Skip it entirely on a focused review.**
-- Only consult the repo-local file if it exists. If it does not exist, do
-  nothing.
-- Treat the repo-local file as additional repo-specific rules that
-  supplement this skill without replacing the main checklists.
-- **`extra-checklist.md` is an extensible ENTRY POINT, not necessarily a
-  single flat file to scan.** It may declare several repo-local phases, and
-  any phase may delegate to a further ruleset file (for example under
-  `docs/code-reviews/references/`). When it points to other files, follow
-  every reference and run each referenced ruleset as its own phase, exactly
-  like the skill's built-in phases. A repo can grow its review arbitrarily
-  this way: `extra-checklist.md` stays the one file this skill opens, and any
-  number of additional phases hang off it by reference. On a **full review**,
-  these repo-local phases count as real phases, so they also feed the fan-out
-  decision (see "When To Fan Out") and each fans out as its own find lane.
-  On a focused review they do not run and do not count.
-- If the user says to add a new common mistake, says "remember this in the
-  future", says "add this to common mistakes", or says "add this to my
-  review checklist":
-  - If the rule is **general** (applies to any TypeScript / React / CSS
-    project), the rule belongs in this skill. Add it to the appropriate
-    sub-checklist under
-    `skills/avandar-code-review/docs/code-reviews/` and update the phase
-    list in this file if it warrants a new phase.
-  - If the rule is **library-specific** (tied to one of the
-    `@avandar/*` packages or another installable package), add it to the
-    matching file under `docs/code-reviews/libraries/` in this skill, or
-    create a new library-gated phase there.
-  - If the rule is **repo-specific** (mentions paths or conventions
-    unique to one codebase), add it to the repo-local
-    `docs/code-reviews/extra-checklist.md`.
-- When creating the repo-local file for the first time, use the packaged
-  template from this skill as the starting structure.
+On full reviews, read [Repo-local routing](docs/code-reviews/repo-local-routing.md)
+and follow every gated phase declared by the repository's extra checklist.
+Focused reviews skip those phases. The reference also governs placement when
+adding a rule and creating a repo-local checklist from the packaged template.
 
 ## Focused Reviews
 
-A focused review is a concatenatable subset of this skill. It still
-reviews the **entire** eligible diff, but applies **only** the named
-packs. Use it when the user wants comments, file layout, naming, or
-test quality in isolation instead of a full review.
-
-### Invocation
-
-Parse the words after `avandar-code-review` (or an equivalent "run this
-skill" invocation). Matching is case-insensitive. Order does not matter.
-Duplicate tokens collapse. The recognized pack tokens are:
-
-| Token | Pack |
-|-------|------|
-| `comments` | every comment: docstrings, comment blocks, and inline comments |
-| `docstrings` | alias for `comments`, kept so the older token still works |
-| `files` | file hierarchy, directories, coupling, file names, single main export |
-| `naming` | variable, function, and module-object naming |
-| `tests` | test quality: tautologies, placeholders, observable behavior, e2e UI vs DB |
-
-Examples:
-
-- `avandar-code-review comments`
-- `avandar-code-review files`
-- `avandar-code-review naming`
-- `avandar-code-review tests`
-- `avandar-code-review files naming`
-- `avandar-code-review files naming comments`
-- `avandar-code-review files naming comments tests`
-
-If at least one pack token is present, this is a focused review:
-
-1. **Skip every phase and every bullet that is not in the selected
-   packs.** That includes Most Common Mistakes and General Checks except
-   the bullets listed below, every other language-specific phase, every
-   library-gated phase, and the repo-local `extra-checklist.md` phases.
-   Exclusive means exclusive.
-2. Still apply **Base Branch Detection**, **Files To Skip**, **Review
-   Scope** (`+` lines only), and the **Finish protocol**. Re-verify only
-   the selected packs. Do not run `react-doctor` or any other phase that
-   was not selected.
-
-If no pack token is present, this is a full review. Follow **How The
-Review Runs** and **Review Order** as written.
-
-Unknown extra words that are not pack tokens or an explicit base branch
-do not start a focused review on their own. Ignore them, including the
-retired mode words `auto`, `report`, and `pair review`: the skill has
-only one way of running.
-
-### Pack: `comments`
-
-Gate: the diff includes any source file that supports a block comment
-and a line comment (same gate as Phase: comments), which includes `.sql`.
-
-Apply **only**:
-
-- The entire **Phase: comments** checklist
-  (`docs/code-reviews/comments-checklist.md`).
-- For a `.sql` file, the **Comments** section of
-  `docs/code-reviews/sql-checklist.md`, which is where the SQL comment
-  forms (`/** ... */` for declaration docstrings, `--` everywhere else)
-  are defined.
-- **Most Common Mistakes:** Planning comments.
-- **General Checks:** comments should not use em dashes; exported or
-  public interfaces, constants, objects, functions, and classes should
-  have block comments or docstrings; function docstrings should explain
-  the function's purpose and output, not its interior implementation.
-- From `docs/code-reviews/typescript-checklist.md`, only the comment and
-  docstring bullets: JSDoc for public classes and methods; comment and
-  docstring lines at 80 characters or fewer; if a docstring fits on one
-  line within 80 characters, keep it single-line, without ever cutting
-  content to make it fit; all exported classes,
-  objects, and functions need docstrings; if an exported object defines
-  top-level methods inline, those methods need docstrings too; function
-  docstrings should explain purpose and output, not interior
-  implementation.
-
-Do not apply any other TypeScript, module, naming, React, SQL, or
-library rule.
-
-### Pack: `files`
-
-Gate: the diff includes at least one `.ts` or `.tsx` file (same gate as
-Phase: module hierarchy).
-
-Apply **only**:
-
-- The entire **Phase: module hierarchy** checklist
-  (`docs/code-reviews/module-checklist.md`): one module per file, file
-  name matches the single main non-type export, `Helpers`/`Utils`
-  collections, directory modules, same-base-name grouping, and directory
-  coupling.
-- **General Checks:** treat a source file over 400 lines as monolithic
-  and split it into a directory module (the 400/500-line thresholds, the
-  migration and generated-file exceptions, and the "directory module,
-  never a sibling file" fix).
-- From `docs/code-reviews/typescript-checklist.md`, only the file-layout
-  bullets: do not add barrel files except in repo-approved directories;
-  files that export only types use the `.types.ts` filename suffix;
-  acronyms in **file and directory names** use PascalCase, whatever their
-  length (`Url`, `Sql`, `Cli`, `Io`, not `URL`, `SQL`, `CLI`, `IO`).
-  Identifier acronyms belong to `naming`, not this pack.
-
-Do not apply variable or function identifier naming, comment rules, or
-any other TypeScript / React / SQL / library rule.
-
-### Pack: `naming`
-
-Gate: the diff includes at least one `.ts` or `.tsx` file.
-
-Apply **only**:
-
-- **Most Common Mistakes:** Variable naming (no vague `matrix`,
-  `count`, `next`, `prev`, `val`, or `n`; use a business noun; `idx` is
-  the one acceptable short form).
-- **General Checks:** follow language naming conventions; descriptive
-  variable names with auxiliary verbs (`isLoading`, `hasError`); avoid
-  abbreviations; avoid vague placeholders; a function that turns one
-  value into another must name both sides (`to` / `get` / `from` /
-  `make{Target}From{Source}`).
-- From `docs/code-reviews/typescript-checklist.md`, only the identifier
-  naming bullets: PascalCase for React components, classes, singleton
-  instances, and module objects; camelCase for variables, functions, and
-  methods; UPPERCASE for environment variables and hard-coded constants;
-  event handlers named `on...`, not `handle...`; conversion-function
-  shapes including the retired `resolve` / `compute` / `build` /
-  `create` prefixes and the copy-function exemption; React component
-  prop types named `Props`; acronyms in **identifiers and type names**
-  use PascalCase, whatever their length and with no exceptions (`Url`,
-  `Cli`, `Id`, `Db`, `Ci`, `Io`, `E2e`), while `UPPERCASE` constants and
-  env var names are unaffected; non-exported top-level helper functions
-  prefixed with `_`. File-name acronyms and the `.types.ts` suffix belong
-  to `files`, not this pack.
-
-Test names are not identifiers and belong to the `tests` pack, which
-judges them against what the test asserts. Do not flag them here.
-
-"Module naming" here means the identifier of an exported module object
-(PascalCase, `create*Module` builders, conversion methods on the
-receiver). The file that holds that export matching the export name is
-the `files` pack.
-
-Do not apply comment rules, directory-module rules, function-shape
-rules, import/export form, or any other phase.
-
-### Pack: `tests`
-
-Gate: the diff adds or modifies a test file (`*.test.ts`, `*.test.tsx`,
-`*.spec.ts`, `*.spec.tsx`, or the repo's equivalent unit/integration
-test naming). Same gate as Phase: tests.
-
-Apply **only**:
-
-- The entire **Phase: tests** checklist
-  (`docs/code-reviews/tests-checklist.md`): test names that describe
-  activity instead of the claim the test asserts, tautological and
-  assertion-free tests, observable-behavior assertions, placeholder
-  tests, runtime assertions that restate the type system, e2e specs
-  that write the behavior under test through the database instead of
-  the UI, test files named after no module beside them, aspect labels on
-  a module's only test file, `__tests__/` layout once a module has two or
-  more test files, integration-test placement in a `__tests__/`
-  directory, and the `.integration` label on integration tests.
-
-This pack does not pull extra bullets from Most Common Mistakes,
-General Checks, or the TypeScript checklist. Running the tests
-themselves stays in the **Finish protocol**
-("Testing At The End Of Review"); this pack reviews test *code*.
-
-Do not apply comment rules, directory-module rules, identifier naming,
-or any other TypeScript / React / SQL / library rule.
-
-### Focused-review find lanes
-
-Each selected pack is one phase and one find lane. Do not load
-`common-and-general`, `comments-and-module`, `typescript`, or any other
-full-review lane.
-
-| Lane | Pack | Gate |
-|------|------|------|
-| `focused-comments` | `comments` | comments gate |
-| `focused-files` | `files` | `.ts` / `.tsx` in the diff |
-| `focused-naming` | `naming` | `.ts` / `.tsx` in the diff |
-| `focused-tests` | `tests` | test-file gate (`*.test.*` / `*.spec.*`) |
-
-Fan-out uses the same threshold: fewer than 3 selected packs run
-inline; 3 or more selected packs fan out. Repo-local extra-checklist
-phases do **not** count (they do not run).
+When pack tokens are present, read
+[Focused review packs](docs/code-reviews/focused-reviews.md) completely before
+selecting phases. It preserves `comments`/`docstrings`, `files`, `naming`,
+`tests`, concatenation, exclusive gates and focused find lanes. Full reviews
+skip that reference. Both modes run **Automation coverage handoff** first.
 
 ## How The Review Runs
 
@@ -374,6 +155,54 @@ modified by the author under review). Do not flag issues on context lines
   signature is unchanged but its body was modified), only flag it if the
   violation is locatable on one or more `+` lines.
 
+## Automation coverage handoff
+
+Run this before selecting deterministic detectors for full **and** focused
+reviews. Keep a required routing record: lint command/status, coverage
+command/status, exact reviewed paths, and retained/omitted
+`ruleId | language | path | capability | state | reason` rows.
+
+1. Read the repo's configured lint scripts and run available configured lint.
+   Record failures and repair operational errors under the finish protocol.
+2. If the repository provides `avandar-lint`, run its local command for the
+   exact filtered reviewed paths, for example:
+   `pnpm exec avandar-lint coverage src/view.tsx src/theme.css --format json --no-prompt`.
+   Read `operational` and every exact `outcomes` row. Supplied current command
+   evidence may be reused in a routing-only exercise; state which evidence
+   was supplied. A real review reruns after source/config changes.
+3. Partition each relevant AF capability using the table below. When no usable
+   exact outcome exists, retain the applicable detector. Installed packages,
+   green lint and language summaries alone leave every capability unresolved.
+4. Load only retained AF IDs from
+   [Deterministic fallback](docs/code-reviews/deterministic-fallback-checklist.md).
+   Match the ID's language, path and capability inside that file. Preserve
+   partial families: an enforced safe capability omits only itself, while an
+   explicit `unsupported-shapes` fallback still runs for the same path.
+5. Continue every normal JR/semantic, guided, contextual, AF-18/21 and selected
+   pack obligation. Coverage subtraction applies only to proven deterministic
+   capabilities. Recompute this record after changing source or lint config.
+
+| Observable evidence for the exact tuple | Next detector action |
+| --- | --- |
+| Successful operational report, exact operational `enforced` outcome | Omit only that capability on that path/language. |
+| Successful operational report, exact operational `not-applicable` outcome | Omit only that inapplicable capability. |
+| Exact `fallback`, partial or unsupported capability | Retain that capability and load its AF ID. |
+| Missing command/package/plugin/rule, disabled/excluded path, config/operational error, absent row or summary-only report | Retain applicable detector obligations. |
+| Unknown extension/language | Retain fallback; assess actual language applicability before choosing native syntax. |
+
+Full reviews select all relevant shipped AF IDs. Focused reviews select only
+IDs assigned to their packs in the focused reference. AF-02/05/19, unsupported
+AF-17 JS shapes, and any missing proof remain fallback. Generic AF-06/07
+fallback assesses the actual language; it does not impose JS syntax on an
+unknown language. AF-20 applies to **plain CSS and CSS Modules** independently
+of the CSS-module gate, including in a focused `comments` review.
+
+Example: for one TSX path, AF-06 `standalone-body-prose: enforced` omits that
+capability; AF-06 `unsupported-shapes: fallback` retains only the unsupported
+shapes. An AF-01 `if-body: enforced` row omits that exact detector. An AF-20
+fallback on plain CSS loads AF-20; an unknown-language AF-06 fallback first
+checks that language's comment forms. Summary-only evidence omits none.
+
 ## Review Order
 
 1. Determine the base branch and compute the diff (see **Base Branch
@@ -381,7 +210,8 @@ modified by the author under review). Do not flag issues on context lines
    are the only lines eligible for findings in every subsequent phase.
 2. Apply the **Files To Skip** filter above and narrow the diff to only
    reviewable files before doing anything else.
-3. Determine which phases fire for this diff, then execute the review
+3. Complete **Automation coverage handoff**, then determine which phases
+   fire for this diff and execute the review
    using the **Execution Model With Sub-Agents** section below. Fan out
    to read-only find sub-agents when 3 or more phases fire; otherwise run
    the phases inline in this agent.
@@ -393,13 +223,14 @@ modified by the author under review). Do not flag issues on context lines
 
    **Full review:** gate each phase by file type, package presence, and
    whether `extra-checklist.md` exists. The phase order is:
-   1. **Most Common Mistakes** (this file, always runs).
-   2. **General Checks** (this file, always runs).
-   3. Each **language-specific phase** under "Phase Checklists", in the
+   1. **Most Common Mistakes** (common/general reference, always runs).
+   2. **General Checks** (same reference, always runs).
+   3. **Deterministic fallback** for retained AF capabilities.
+   4. Each **language-specific phase** under "Phase Checklists", in the
       order listed, gated on the diff.
-   4. Each **library-gated phase** under "Library-Gated Phases", gated on
+   5. Each **library-gated phase** under "Library-Gated Phases", gated on
       package presence.
-   5. The repo-local `docs/code-reviews/extra-checklist.md` phases, if the
+   6. The repo-local `docs/code-reviews/extra-checklist.md` phases, if the
       file exists (always last). Treat `extra-checklist.md` as an entry
       point: run every phase it declares and every further ruleset it
       references (for example under `docs/code-reviews/references/`) as its
@@ -417,170 +248,11 @@ context.
 
 ## Execution Model With Sub-Agents
 
-The phases in this skill are independent: each applies an orthogonal rule
-set to the same read-only diff, and no phase consumes another phase's
-output. That makes the review parallelizable. When enough phases fire,
-fan them out across read-only sub-agents instead of running them
-sequentially in one context.
-
-Priorities, in order:
-
-1. **Accuracy is first.** A single agent carrying every checklist plus a
-   large diff loses rules in the middle of its context. Giving each
-   sub-agent one focused checklist against only the relevant slice keeps
-   every rule under full attention, so fewer rules are forgotten.
-2. **Review latency is second.** Fanned-out phases run concurrently, so
-   wall-clock time is the slowest single lane, not the sum of all lanes.
-3. **Token usage is a distant third.** This model re-sends diff slices to
-   several agents and adds a verify pass, so it spends more tokens. That
-   trade is acceptable: it buys both accuracy and speed.
-
-### When To Fan Out
-
-Count the phases that actually fire for this diff (after gating).
-
-**Focused review:** count only the selected packs. Do not open
-`extra-checklist.md`. Do not count library-gated or other
-language-specific phases. Fewer than 3 selected packs run inline; 3 or
-more fan out.
-
-**Full review:** this count MUST include the repo-local phases: every
-phase declared in `extra-checklist.md` plus every further ruleset it
-references (see "Additional Checklist File"), not only this skill's
-built-in phases. Open `extra-checklist.md` and resolve its referenced
-phases BEFORE deciding whether to fan out, so the repo's own rules are
-never the reason the count is undercounted. A diff that trips only one
-built-in phase but three repo-local phases still fans out.
-
-- **Fewer than 3 phases fire:** do NOT fan out. Run the phases inline and
-  sequentially in this agent. Spawning sub-agents for one or two small
-  phases costs more in spawn and merge overhead than it saves. A SQL-only
-  or CSS-only diff runs inline.
-- **3 or more phases fire:** fan out using the four-stage pipeline below.
-  A diff spanning, for example, TypeScript, React, and SQL fans out.
-
-### Four Stages: Find → Verify → Merge → Apply
-
-Run the review as **Find (parallel) → Verify (parallel) → Merge (serial)
-→ Apply (serial)**. Only the final Apply stage edits files, and only this
-orchestrator agent performs it. **Sub-agents are strictly read-only and
-must never edit a file.** Because every edit happens in one serial
-orchestrator pass after all finding is done, two writers never touch the
-same file at once. This is how the model avoids simultaneous edits.
-
-#### Stage 1: Find (parallel, read-only)
-
-Spawn one find sub-agent per lane below whose gate matches the diff.
-**Focused review:** spawn only the `focused-*` lanes for the selected
-packs (see **Focused Reviews**). Do not spawn `common-and-general`,
-`comments-and-module`, `typescript`, or any other full-review lane.
-
-Give each agent only:
-
-- the diff slice for the files its gate covers (not the whole diff, except
-  the `common-and-general` lane, which covers all reviewable files),
-- the shared review constraints it must respect (Review Scope: flag only
-  `+` lines; Files To Skip),
-- its own checklist.
-
-Each find agent is READ-ONLY. It returns structured findings, one record
-per finding: `{ file, lines, phase, severity, description,
-recommendedFix }`. It must not modify code.
-
-**Find lanes:**
-
-The table below is the **full-review** set. A focused review uses only
-the `focused-*` lanes in **Focused Reviews**; do not spawn any row
-below for a focused review.
-
-| Lane | Checklist(s) | Gate |
-|------|--------------|------|
-| `common-and-general` | Most Common Mistakes + General Checks (this file) | full review (always) |
-| `comments-and-module` | comments + module hierarchy | full review; diff has `.ts`/`.tsx` |
-| `code-smells` | code-smells-checklist | full review; diff has `.ts`/`.tsx` |
-| `typescript` | typescript-checklist | full review; diff has `.ts`/`.tsx` |
-| `types` | types-checklist | full review; diff has `.ts`/`.tsx` |
-| `functional-style` | functional-style-checklist | full review; diff has `.ts`/`.tsx` |
-| `react` | react-checklist (plus `react-doctor` if available) | full review; diff has a `.tsx` component |
-| `react-hooks` | react-hooks-checklist | full review; diff uses hooks |
-| `css-modules` | css-modules-checklist | full review; diff touches `*.module.css` |
-| `sql` | sql-checklist | full review; diff has `.sql` |
-| `tests` | tests-checklist | full review; diff has a `*.test.*` / `*.spec.*` file |
-| `lib:@avandar/utils` | libraries/avandar-utils-checklist | full review; package present |
-| `lib:@avandar/models` | libraries/avandar-models-checklist | full review; package present |
-| `lib:@avandar/modules` | libraries/avandar-modules-checklist | full review; package present |
-| `lib:supabase` | libraries/supabase-checklist (+ the `supabase-declarative-schema` skill when available) | full review; repo has `supabase/migrations/` or `supabase/schemas/` and the diff touches one |
-| `extra-checklist:<phase>` (one lane per repo-local phase, including each referenced ruleset) | that phase's section in repo-local `extra-checklist.md` and any file it references | full review; that phase's own gate matches |
-
-On a **full review**, repo-local phases fan out too. Spawn one find lane
-per phase declared in `extra-checklist.md` (and per ruleset it
-references), each gated independently, exactly like a built-in lane. Do
-not collapse several firing repo-local phases into a single
-`extra-checklist` agent: the repo's own rules get the same accuracy
-treatment as the built-ins, and they count toward the fan-out threshold
-in "When To Fan Out". On a focused review they do not run.
-
-On a **full review**, the TypeScript rule family is deliberately split
-across four lanes (`typescript`, `types`, `functional-style`,
-`comments-and-module`) rather than run as one agent. `typescript`,
-`types`, and `functional-style` are each large enough to saturate a
-single agent's attention, so keeping them apart is the highest-value
-accuracy split in the review. **Do not merge those three into one
-agent.** `types` carries a distinct lens from `typescript`: the type
-system itself (declarations, assertions and escape hatches, absence,
-literal unions, readonly contracts) rather than naming, module and file
-structure, function shape, and import/export form. `comments` and
-`module` are small and mechanical, so they share one lane on a full
-review. A focused `comments` / `files` / `naming` review splits them
-into the `focused-*` lanes instead, because the point of those packs is
-to apply one subset in isolation. Each lane reads its full file slice as
-context but applies only its own rule lens.
-
-#### Stage 2: Verify (parallel, adversarial)
-
-Parallel finding maximizes recall, which raises false positives. For every
-finding from Stage 1, spawn an adversarial verifier whose job is to
-**refute** the finding, not confirm it. Each verifier checks:
-
-- Is the flagged line actually a `+` line in the diff? Context and `-`
-  lines are out of scope and must be dropped.
-- Does the cited rule genuinely apply, or is this a documented exception
-  (for example the `for`-loop exceptions, or the `null`-over-`undefined`
-  exception)?
-- Is the recommended alternative (a helper, a library util) actually
-  present in this repo?
-- For an unneeded-cast finding, did the verifier delete the cast and run
-  the type checker? Settle it by the compiler's output, never by reading
-  the code: a clean type check confirms the finding.
-
-Default to refuted when uncertain. A finding survives only if the verifier
-cannot refute it. For high-severity findings, use three verifiers with
-distinct lenses (scope, rule-applicability, exception) and drop the
-finding if a majority refute it.
-
-#### Stage 3: Merge (serial, orchestrator)
-
-Collect the surviving findings in this orchestrator. Deduplicate overlaps
-(the same code flagged by more than one lane, such as a vague name caught
-by both `common-and-general` and `typescript`). Order by severity. This is
-a plain reasoning step; do not spawn a sub-agent for it.
-
-#### Stage 4: Apply (serial, orchestrator)
-
-Only the orchestrator edits, only here, one file at a time. Sub-agents
-edited nothing, so there is no write contention.
-
-Apply **every** surviving fix (never defer one as a follow-up), grouped by
-file, then run the **Finish protocol** defined under "How The Review Runs"
-(format → lint and typecheck with zero errors → targeted tests → re-verify
-no reviewed line still breaks a rule). Do not ask the user anything.
-
-### Inline Fallback
-
-When fewer than 3 phases fire, skip the sub-agents entirely. Run the firing
-phases in this agent, in the order given in **Review Order**, and fix
-each finding as in Stage 4. Everything else in this skill (gates,
-scope, Files To Skip, testing, output) applies unchanged.
+Before deciding whether to fan out, read
+[Review execution](docs/code-reviews/review-execution.md) completely. It defines
+phase counting, focused/full find lanes, read-only Find/Verify and serial
+Merge/Apply, plus the inline fallback. Supply every lane its exact coverage
+partition; only the deterministic-fallback lane loads selected AF detectors.
 
 ## Testing At The End Of Review
 
@@ -634,194 +306,28 @@ the targeted tests. Inspect the repo's `package.json` `scripts` object first:
 If `pnpm lint` runs, its final result must contain zero lint errors. If a
 typecheck script runs, its final result must contain zero typecheck errors.
 
-## Most Common Mistakes
+## Most Common Mistakes And General Checks
 
-Check these first because they are the most frequent review findings:
-
-- Functional style: for iterating a **collection** (array/iterable of data),
-  avoid `for` and `while` loops. Prefer functional, declarative utilities such
-  as `map`, `filter`, `reduce`, `forEach`, and `flatMap`. This is a strong
-  default: a second pass over an array (e.g. `.map().filter()`) is a negligible
-  cost until N gets very large, so clarity wins. The **only** exceptions where
-  an imperative loop is acceptable:
-  1. **Async sequencing**: you must `await` each iteration in order. `for...of`
-     with `await` is correct; `.map(async …)` + `Promise.all` runs in parallel
-     (different semantics) and an awaiting `reduce` is unreadable.
-  2. **Early exit for performance**: you can stop before the end and the input
-     is large enough that scanning it fully matters. Prefer `.find` / `.some` /
-     `.every` (they already short-circuit) when they express the intent; reach
-     for a raw `for` + `break` only when those cannot.
-  3. **Large N in a hot path**: when N can realistically reach **~100,000+**
-     AND the code runs in a latency-sensitive path (event handler, render,
-     keystroke), collapse a multi-pass chain (`.map().filter().map()`) into a
-     single `for...of` / `reduce`. Below ~100k the extra pass is well under
-     ~50ms even on a mid-range mobile CPU; the doubled-pass cost only
-     approaches the ~200ms "user notices lag in a click" threshold around
-     N ≈ 0.5–1M. Default to functional clarity below the threshold, and only
-     invoke this exception when a comment or the surrounding code makes it
-     plausible that N is actually that large.
-  - Not an exception, just out of scope: scanning the **characters of a raw
-    string** by index is not collection iteration (array utilities do not
-    apply), so a `for` over string indices there is fine and needs no
-    justification.
-  - Note: some linters (e.g. react-doctor's `js-combine-iterations`) flag
-    `.map().filter()` as "two passes, use a loop." That advice inverts this
-    rule; this repo prefers the functional form and disables that lint (see the
-    repo's `doctor.config.ts`). Do not raise a two-pass finding on those
-    grounds.
-- Readonly wrappers: do not use per-property `readonly` keys when the real
-  contract is "this input object is readonly". Prefer wrapping the function
-  parameter in `Readonly<...>` or `readonly T[]`.
-- Readonly placement: apply `Readonly<...>` to the function input parameter,
-  not to the shared type alias itself, unless the alias is intentionally meant
-  to be globally immutable. Keep the alias mutable so input contravariance
-  still works.
-- Validation: type checking must pass.
-- Validation: linting must pass.
-- Utility reuse: avoid hand-writing common utility or data-transformation
-  logic when a first-party package or installed library already provides it.
-  Common examples include property mapping, bucketing, partitions, object
-  reshaping, filtering helpers, and lookup builders. Before introducing a
-  bespoke helper, check only packages and imported libraries that are
-  actually present in the repo for an existing equivalent. If the repo
-  depends on `@avandar/utils`, see the library phase under
-  `libraries/avandar-utils-checklist.md` for specific helpers worth
-  preferring. If it does not, skip every `@avandar/utils`-specific rule.
-- Variable naming: avoid vague names like `matrix`, `count`, `next`, `prev`,
-  `val`, or `n`. Use a business noun that explains what the value represents,
-  such as `rolesMatrix`, `numUsers`, or `nextVizConfig`. The one acceptable
-  short form is `idx` for functional-programming array indices.
-- Planning comments: if comments mention future work, do not refer to internal
-  "phases". Write in present/future terms that make sense to any engineer, such
-  as "For now..." and "Soon..." instead.
-
-## General Checks
-
-- Comments should not use em dashes. Prefer a colon or a hyphen.
-- In SQL, a docstring on a `create type` / `table` / `view` / `function` /
-  `schema` uses a `/** ... */` block, never a run of `--` lines; every
-  other comment uses `--`. See the **Comments** section of
-  `docs/code-reviews/sql-checklist.md`.
-- Exported or public interfaces, constants, objects, functions, and classes
-  should have block comments or docstrings.
-- Function docstrings should explain the function's purpose and output, not
-  its interior implementation details. Use `//` comments inside the function
-  body for how the function works.
-- Functions should stay short, ideally 45 lines or fewer.
-- If a function is getting too long or contains reusable logic, extract a
-  utility function.
-- Avoid unnecessary indirection: when a member or helper is small, used once,
-  or consists of a single statement, inline it into the containing object or
-  use site instead of extracting a separate constant or top-level function.
-  Extract it when reuse, meaningful naming, independent testing, or complex
-  logic makes the separate abstraction clearer.
-- **Treat a source file over 400 lines as monolithic and split it.** A file
-  that long stops being one unit a reader can hold at once: unrelated
-  concerns share a scroll buffer, every edit touches the same file, and the
-  seams between responsibilities stop being visible in the directory
-  listing. Thresholds:
-  - **400 lines or fewer:** fine, no finding.
-  - **401 to 500 lines:** flag it and ask for a split attempt. Accept the
-    file as-is only when the author shows there is no clean seam, for
-    example one exhaustive generated union or a single algorithm whose
-    steps cannot be named independently.
-  - **Over 500 lines:** always a finding. "No clean seam" is not an
-    accepted answer at this size.
-
-  **Exception: database migration files are never a finding, at any
-  length.** A migration is one unit by construction: it is applied as a
-  single step, its statements are ordered by dependency, and splitting it
-  changes what runs. This covers `supabase/migrations/`, and the
-  equivalent directory for any other migration runner.
-
-  **Exception: nothing outside reviewed source counts.** Dependency trees,
-  build output, and caches are never findings at any length:
-  `node_modules/`, `dist/`, `build/`, `out/`, `coverage/`, `.next/`,
-  Cargo's `target/` and `vendor/`, Python's `__pycache__/`, `.venv/`,
-  `venv/`, and `site-packages/`.
-
-  **The fix is always a directory module, never a sibling file.** The file
-  becomes a directory of the same name, the original file becomes the
-  entry point inside it, and each extracted unit becomes its own file
-  nested in that directory. Then apply the directory rules recursively: an
-  extracted unit that has its own child dependencies, or its own co-named
-  siblings such as a `.test` or `.module.css` file, becomes a directory in
-  turn.
-
-  This is bad:
-
-  ```text
-  SupabaseLocalEnvironment.ts        (1479 lines)
-  ```
-
-  This is good:
-
-  ```text
-  SupabaseLocalEnvironment/
-    SupabaseLocalEnvironment.ts      entry point
-    SupabaseLocalEnvironment.test.ts
-    SupabaseBackupManifest/
-      SupabaseBackupManifest.ts
-      SupabaseBackupManifest.test.ts
-  ```
-
-  **Find candidates** (every file the diff adds or modifies, longest
-  first, with anything at or under the threshold dropped):
-
-  ```bash
-  git diff --name-only --diff-filter=ACM <base>...HEAD \
-    | grep -E '\.(ts|tsx|js|jsx|mjs|cjs|py|go|rs|rb|java|kt|swift)$' \
-    | grep -Ev '(^|/)(migrations|node_modules|dist|build|out|coverage|target|vendor|__pycache__|\.venv|venv|site-packages|\.next)/' \
-    | while read -r f; do
-        [ -f "$f" ] || continue
-        n=$(wc -l < "$f" | tr -d ' ')
-        [ "$n" -gt 400 ] && printf '%s\t%s\n' "$n" "$f"
-      done \
-    | sort -rn
-  ```
-
-  The extension whitelist keeps lock files, data, and markup out; the
-  second filter drops migrations, dependency trees, build output, and
-  caches. Add the repo's own equivalents if it uses different directory
-  names. Every printed file is a candidate. Report those over 500 lines as
-  findings outright, and those between 401 and 500 as a split attempt to
-  justify or make. Drop generated files (see "Files To Skip") before
-  flagging: a checked-in
-  type-generation output or a database migration is one unit by
-  construction and is never a monolith finding.
-- Follow normal language naming conventions for the file's language.
-- Variable names should be descriptive, including auxiliary verbs when useful,
-  such as `isLoading` or `hasError`.
-- Avoid abbreviations unless the full word would create a naming collision.
-  For example, prefer `value` over `val`.
-- Avoid vague placeholders like `next`, `prev`, or `n` without a business noun.
-- A function that turns one value into another must name both sides, counting
-  the receiver as part of the name. A receiver that is itself the source or the
-  target supplies that half, so the method drops it: `[Source].to{Target}`,
-  `[Source].get{Target}`, or `[Target].from{Source}`. Use `to` for a
-  conversion and `get` for a fetch, filter, or lookup. A receiver that names
-  neither side supplies nothing, so the method spells out both halves just as a
-  free function does: `make{Target}From{Source}` or `get{Target}From{Source}`.
-  See the naming rule in `docs/code-reviews/typescript-checklist.md` for the
-  full rule, including why `resolve...` is never one of them.
-- Prefer reusing existing repo-local helpers, first-party packages, or
-  installed libraries over introducing bespoke local helpers when an
-  equivalent shared abstraction already exists.
-- For UI code: keep accessibility strong with native semantics and ARIA where
-  needed.
-- For UI code in repos that use Mantine: prefer theme tokens and shorthand
-  props instead of ad hoc styling. Skip this rule when Mantine is absent.
-- For UI code: prefer CSS Modules over inline `style={}` or `styles={}` unless
-  the styles are dynamically computed.
-- For UI code in repos that use `clsx`: use it for conditional classes.
-  Skip this rule when `clsx` is absent.
-- For UI code: never introduce TailwindCSS.
+On full reviews, read and apply
+[Common and general checks](docs/code-reviews/common-and-general-checklist.md)
+completely. Focused reviews apply only their pack's named subsets. All JR,
+semantic, guided and repo-local obligations retain their original gates.
 
 ## Phase Checklists
 
 Run each phase below only when its gate matches the diff. Phase files
 live under `skills/avandar-code-review/docs/code-reviews/` next to this
 SKILL file.
+
+### Phase: deterministic fallback
+
+- **Gate:** the handoff retains at least one AF capability for a reviewed path.
+- **Reference:** load only selected IDs from
+  [deterministic-fallback-checklist.md](docs/code-reviews/deterministic-fallback-checklist.md).
+- **Find lane:** one selected-capability lane on full reviews; selected pack
+  lanes carry their own partition on focused reviews. Count it only when used.
+- **Applicability:** all reviewed source languages, including unknown-language
+  assessment and plain CSS. CSS Modules are not the AF-20 applicability gate.
 
 ### Phase: comments
 
@@ -975,8 +481,7 @@ sub-checklist file.
   `propEq`, `matchLiteral`, `isDefined`, or `isNonNullish`.
 - **Reference:**
   [`docs/code-reviews/libraries/avandar-utils-checklist.md`](docs/code-reviews/libraries/avandar-utils-checklist.md)
-- **Covers:** preferring `prop` / `propEq` over inline lambdas;
-  exhaustive union dispatch via `matchLiteral` (or `ts-pattern`'s
+- **Covers:** exhaustive union dispatch via `matchLiteral` (or `ts-pattern`'s
   `match().exhaustive()` when available); reusing helpers from the
   `@avandar/utils` README instead of hand-rolling them.
 

@@ -14,12 +14,13 @@ traceability, excluded from comparisons.
 
 | Package | Tarball bytes |
 | --- | --- |
-| `@avandar/lint` | 35,839 |
-| `@avandar/lint-typescript` | 10,198 |
-| `@avandar/lint-css` | 10,139 |
+| `@avandar/lint` | 61,948 |
+| `@avandar/lint-typescript` | 43,078 |
+| `@avandar/lint-css` | 13,689 |
 
-These are `pnpm pack` archive sizes, including the repository license file and
-published build artifacts. Runtime dependencies are installed separately.
+These are the final `pnpm pack` archive sizes, including the repository license
+file and published build artifacts. Earlier batch tables below are historical.
+Runtime dependencies are installed separately; exact final contents are below.
 
 ## Lint samples
 
@@ -33,6 +34,7 @@ published build artifacts. Runtime dependencies are installed separately.
 | phase-3-comment-fixers | 19907 | 18821 | 19127 | 18915 | 18917 | 19026 | 18917 | 0, 0, 0, 0, 0, 0 |
 | phase-3-comment-fixers-final | 19266 | 19046 | 19093 | 19166 | 19218 | 19067 | 19093 | 0, 0, 0, 0, 0, 0 |
 | phase-3-function-fixers | 7691 | 7672 | 7346 | 7550 | 7665 | 7509 | 7550 | 0, 0, 0, 0, 0, 0 |
+| phase-3-complete | 7745 | 7678 | 7692 | 7829 | 7654 | 7522 | 7678 | 0, 0, 0, 0, 0, 0 |
 
 ## Initial native batch profile
 
@@ -360,3 +362,97 @@ that child. Native and CSS providers can each have one active child. No second
 CSS scheduler or inclusion cache is introduced here. Normal root lint behavior
 is unchanged, so the preceding accepted 8,384 ms warm median remains the root
 baseline and no additional six-run root benchmark was performed.
+
+## Coverage-gated review handoff and final release gates
+
+The public review skill runs configured lint and exact-path coverage before
+selecting deterministic detectors. Exact operational enforced/not-applicable
+outcomes omit only the matching rule, language, file and capability. Missing,
+partial, unsupported, disabled, excluded, operationally failed, unknown-language
+and summary-only evidence retains fallback. Native AF-02/05/19 and JS AF-17
+remain outside safe repair. Plain CSS gets AF-20 fallback independently of the
+CSS-module review phase. All JR/contextual obligations and AF-18/21 remain.
+
+The core skill is 569 lines after coherent extraction of its existing focused
+packs, execution pipeline, common/general checks and repo-local routing.
+Detectors, scanners and duplicate examples live in the on-demand fallback.
+Four public-CLI fixtures pass against enabled TSX/plain-CSS, plugin-disabled,
+missing-package and unknown-language consumers. Five fresh-agent application
+reports make the correct routing decisions. Four were correct on first report;
+the fifth needed a bounded reread of the unchanged scenario. Three over-read
+fallback reference text while applying only the correct retained detectors.
+These are recorded context-loading limits, not five flawless first attempts.
+
+The final cold sample is **7,745 ms** and the warm median is **7,678 ms**,
+706 ms (8.42%) below the preceding 8,384 ms baseline. All six exits are zero;
+neither stop threshold is crossed. The six lint samples run without concurrent
+tests, builds, packing or installation. Doctor configuration and its existing
+await-loop advisory are unchanged. These timings do not establish causal
+attribution. The benchmark recorder now inserts rows into the samples table;
+a real-CLI regression failed before that minimal fix and passes afterward.
+
+Final package gates pass: core 394 tests in serial-file mode, TypeScript 260,
+CSS 38, all three package type checks/builds, consumer manifest/type resolution
+verification, and the main application build. Root lint passes. The default
+core suite's file parallelism produced 16 temporary-mirror inventory assertion
+failures; the complete serial-file run passes all 394. No adapter or test
+refactor is included to address that separate cross-file assertion hazard.
+
+Root type checking completes the main application check, then stops on 28 video
+producer TS1261/TS1149 casing diagnostics. The exact file/line/code set matches
+the saved earlier Task 2 output, which also contains 28; an earlier narrative
+recorded 25. No video producer source changed in this final unit. Deno checking
+is not reached by the short-circuiting root command. No E2E or database command
+is used. Complete-root Oxlint and Stylelint safe repairs are applied, with final
+staged idempotence checked separately. Generated files and compiled catalogs
+remain unchanged.
+
+### Final compressed archive contents
+
+Every archive contains only its manifest, license, README and published `dist`
+artifacts. The generated tarballs are removed after inspection.
+
+`@avandar/lint`: **61,948 bytes**.
+
+```text
+package/LICENSE
+package/README.md
+package/dist/RuleCatalog.types-C1KQfq6n.d.ts
+package/dist/catalog.d.ts
+package/dist/catalog.js
+package/dist/catalog.js.map
+package/dist/coverage.d.ts
+package/dist/coverage.js
+package/dist/coverage.js.map
+package/dist/main.d.ts
+package/dist/main.js
+package/dist/main.js.map
+package/dist/metadata.d.ts
+package/dist/metadata.js
+package/dist/metadata.js.map
+package/dist/rules.schema.json
+package/dist/rules.yaml
+package/package.json
+```
+
+`@avandar/lint-css`: **13,689 bytes**.
+
+```text
+package/LICENSE
+package/README.md
+package/dist/stylelint.d.ts
+package/dist/stylelint.js
+package/dist/stylelint.js.map
+package/package.json
+```
+
+`@avandar/lint-typescript`: **43,078 bytes**.
+
+```text
+package/LICENSE
+package/README.md
+package/dist/oxlint.d.ts
+package/dist/oxlint.js
+package/dist/oxlint.js.map
+package/package.json
+```
