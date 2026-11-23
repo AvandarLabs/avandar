@@ -37,6 +37,9 @@ const MIXED_RELEASE_TAGS = [
   "v0.15.1-alpha",
 ];
 
+/** The boolean options Acclimate parses out of one accepted-flag case. */
+type ReleaseNotesFlagCase = { dryRun: boolean; update: boolean };
+
 function _loggedText(logSpy: ReturnType<typeof vi.spyOn>): string {
   return logSpy.mock.calls
     .map((call) => {
@@ -126,6 +129,62 @@ describe("ava release notes", () => {
     ).not.toHaveBeenCalled();
     expect(_loggedText(logSpy)).toContain("--alpha");
     expect(process.exitCode).toBe(1);
+  });
+
+  it("refuses --dry-run=true with exit code 1, publishing nothing", async () => {
+    // Acclimate reads `--dry-run=true` as an unknown option named
+    // `--dry-run=true`, so the action sees `dryRun: false`.
+    process.argv.push("--version", "0.13.3", "--dry-run=true");
+
+    await ReleaseNotesCli.state.action?.({
+      version: "0.13.3",
+      dryRun: false,
+      update: false,
+    });
+
+    expect(
+      publishReleaseNotesModule.publishReleaseNotes,
+    ).not.toHaveBeenCalled();
+    expect(_loggedText(logSpy)).toContain(
+      'Use "--flag value", not "--flag=value": --dry-run=true.',
+    );
+    expect(process.exitCode).toBe(1);
+  });
+
+  it.each<[string, readonly string[], ReleaseNotesFlagCase]>([
+    ["--version", ["--version", "0.13.3"], { dryRun: false, update: false }],
+    ["-v", ["-v", "0.13.3"], { dryRun: false, update: false }],
+    [
+      "--update",
+      ["--version", "0.13.3", "--update"],
+      { dryRun: false, update: true },
+    ],
+    [
+      "--dry-run",
+      ["--version", "0.13.3", "--dry-run"],
+      { dryRun: true, update: false },
+    ],
+    [
+      "--env <value>",
+      ["--version", "0.13.3", "--env", "staging"],
+      { dryRun: false, update: false },
+    ],
+  ])("accepts %s and publishes v0.13.3", async (_flag, flags, parsedFlags) => {
+    vi.mocked(publishReleaseNotesModule.publishReleaseNotes).mockResolvedValue({
+      kind: "published",
+      url: "https://github.com/org/repo/releases/tag/v0.13.3",
+    });
+    process.argv.push(...flags);
+
+    await ReleaseNotesCli.state.action?.({ version: "0.13.3", ...parsedFlags });
+
+    expect(
+      publishReleaseNotesModule.publishReleaseNotes,
+    ).toHaveBeenCalledExactlyOnceWith(expect.anything(), {
+      releaseTag: "v0.13.3",
+      ...parsedFlags,
+    });
+    expect(process.exitCode).toBeUndefined();
   });
 
   it("publishes and prints success", async () => {

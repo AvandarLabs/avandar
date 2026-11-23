@@ -1,6 +1,8 @@
 import { GetProdVersionCli } from "@ava-cli/ReleaseCli/GetProdVersionCli";
 import {
+  describeUnknownReleaseFlags,
   findUnknownReleaseFlags,
+  RELEASE_FLAGS,
   wantsHelp,
 } from "@ava-cli/ReleaseCli/releaseFlagUtils/releaseFlagUtils";
 import { ReleaseNotesCli } from "@ava-cli/ReleaseCli/ReleaseNotesCli/ReleaseNotesCli";
@@ -119,11 +121,13 @@ export const ReleaseCli = Acclimate.createCLI("release")
       printInfo(USAGE);
       return undefined;
     }
-    const unknownFlags = findUnknownReleaseFlags(argv);
+    const unknownFlags = findUnknownReleaseFlags({
+      argv,
+      acceptedFlags: RELEASE_FLAGS,
+    });
     if (unknownFlags.length > 0) {
       printError(
-        `Unknown option${unknownFlags.length > 1 ? "s" : ""}: ` +
-          `${unknownFlags.join(", ")}. Nothing was released; ` +
+        `${describeUnknownReleaseFlags(unknownFlags)} Nothing was released; ` +
           "run `ava release --help`.",
       );
       process.exitCode = 1;

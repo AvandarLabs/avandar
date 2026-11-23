@@ -294,6 +294,47 @@ describe("ava release on a branch that is not a source branch", () => {
     expect(_stdoutText()).not.toContain("$ ");
   });
 
+  it("refuses --dry-run=true --yes before the release starts, with exit code 1", async () => {
+    const origin = join(directory, "origin");
+    const refsBefore = _listRefs(repoRoot);
+    const originRefsBefore = _listRefs(origin);
+    process.argv.push("--dry-run=true", "--yes");
+
+    // Acclimate reads `--dry-run=true` as an unknown option named
+    // `--dry-run=true`, so the action sees a real, unconfirmed release.
+    await ReleaseCli.state.action?.({
+      version: "0.15.0",
+      next: "0.15.1",
+      yes: true,
+      dryRun: false,
+      skipCiCheck: false,
+      skipChangelog: false,
+    });
+
+    const stdout = _stdoutText();
+    expect(stdout).toContain(
+      'Use "--flag value", not "--flag=value": --dry-run=true.',
+    );
+    // The branch check is the release's first step, so its refusal not
+    // appearing proves the release never started.
+    expect(stdout).not.toContain("Releases are cut from");
+    expect(_listRefs(repoRoot)).toBe(refsBefore);
+    expect(_listRefs(origin)).toBe(originRefsBefore);
+    expect(process.exitCode).toBe(1);
+  });
+
+  it("accepts the global --env option and reaches the branch check", async () => {
+    process.argv.push("--env", "staging");
+
+    await _runRelease({ dryRun: false });
+
+    const stdout = _stdoutText();
+    expect(stdout).not.toContain("Unknown option");
+    expect(stdout).toContain(
+      'Releases are cut from "develop" (currently on "main").',
+    );
+  });
+
   it("names the branch, not heads/main, when a tag is also named main", async () => {
     _git({ cwd: repoRoot, args: ["tag", "main"] });
 
@@ -766,7 +807,7 @@ describe.each(END_TO_END_RELEASE_CASES)(
   },
 );
 
-/** The run URL the mocked CI check reports, for a refusal to name. */
+/** The run URL the mocked CI check reports, which the CI warning names. */
 const CI_RUN_URL = "https://github.com/AvandarLabs/avandar/actions/runs/7";
 
 /** One release the CI gate must let through, and the verdict it sees. */

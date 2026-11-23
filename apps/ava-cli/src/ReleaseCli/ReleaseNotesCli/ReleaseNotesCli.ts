@@ -1,7 +1,12 @@
 import { createReleaseCommands } from "@ava-cli/ReleaseCli/createReleaseCommands";
 import { listSortedReleaseTags } from "@ava-cli/ReleaseCli/releaseChangelog/collectReleaseChangelogCommits/collectReleaseChangelogCommits";
 import { publishReleaseNotes } from "@ava-cli/ReleaseCli/releaseChangelog/publishReleaseNotes/publishReleaseNotes";
-import { wantsHelp } from "@ava-cli/ReleaseCli/releaseFlagUtils/releaseFlagUtils";
+import {
+  AVA_GLOBAL_FLAGS,
+  describeUnknownReleaseFlags,
+  findUnknownReleaseFlags,
+  wantsHelp,
+} from "@ava-cli/ReleaseCli/releaseFlagUtils/releaseFlagUtils";
 import { promptForVersion } from "@ava-cli/ReleaseCli/releasePromptHelpers";
 import {
   toReleaseTag,
@@ -44,29 +49,20 @@ type ReleaseNotesCliArgs = {
   update?: boolean;
 };
 
-/** Every flag `ava release notes` accepts, including aliases. */
-const RELEASE_NOTES_FLAGS: ReadonlySet<string> = new Set([
+/**
+ * Every flag `ava release notes` accepts, including aliases. Acclimate drops an
+ * option it does not recognise, so any other flag is refused: a removed or
+ * mistyped flag would otherwise publish notes the user did not ask for.
+ */
+const RELEASE_NOTES_FLAGS = [
   "--version",
   "-v",
   "--update",
   "--dry-run",
   "--help",
   "-h",
-]);
-
-/**
- * Flags in `argv` that `ava release notes` does not accept. Acclimate drops an
- * option it does not recognise, so without this a removed or mistyped flag
- * would publish notes for a tag the user did not ask for.
- */
-function _findUnknownReleaseNotesFlags(
-  argv: readonly string[],
-): readonly string[] {
-  return argv.filter((token) => {
-    const [flag] = token.split("=");
-    return token.startsWith("-") && !RELEASE_NOTES_FLAGS.has(flag ?? token);
-  });
-}
+  ...AVA_GLOBAL_FLAGS,
+] as const;
 
 /**
  * The bare `X.Y.Z` of the newest release tag, or undefined when there is none.
@@ -193,11 +189,13 @@ export const ReleaseNotesCli = Acclimate.createCLI("notes")
       printInfo(USAGE);
       return undefined;
     }
-    const unknownFlags = _findUnknownReleaseNotesFlags(argv);
+    const unknownFlags = findUnknownReleaseFlags({
+      argv,
+      acceptedFlags: RELEASE_NOTES_FLAGS,
+    });
     if (unknownFlags.length > 0) {
       printError(
-        `Unknown option${unknownFlags.length > 1 ? "s" : ""}: ` +
-          `${unknownFlags.join(", ")}. Nothing was published; ` +
+        `${describeUnknownReleaseFlags(unknownFlags)} Nothing was published; ` +
           "run `ava release notes --help`.",
       );
       process.exitCode = 1;

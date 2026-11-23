@@ -487,16 +487,50 @@ describe("confirmCiVerdict", () => {
     },
   );
 
-  it("asks before a release on a failed verdict", async () => {
-    const { git } = _createFakeCommandsWithCi("failed");
+  it.each(NON_PASSING_VERDICTS)(
+    "asks before a release on a %s verdict",
+    async (verdict) => {
+      const { git } = _createFakeCommandsWithCi(verdict);
 
-    await confirmCiVerdict(git, {
-      commitSha: "source-sha",
-      assumeYes: false,
-      skip: false,
-    });
+      await confirmCiVerdict(git, {
+        commitSha: "source-sha",
+        assumeYes: false,
+        skip: false,
+      });
 
-    expect(promptToConfirm).toHaveBeenCalledExactlyOnceWith("Release anyway?");
+      expect(promptToConfirm).toHaveBeenCalledExactlyOnceWith(
+        "Release anyway?",
+      );
+    },
+  );
+
+  it("refuses a failed verdict with no terminal to ask on, changing nothing", async () => {
+    const actualPromptHelpers = await vi.importActual<
+      typeof import("@ava-cli/ReleaseCli/releasePromptHelpers")
+    >("@ava-cli/ReleaseCli/releasePromptHelpers");
+    vi.mocked(promptToConfirm).mockImplementation(
+      actualPromptHelpers.promptToConfirm,
+    );
+    const requestInput = vi.spyOn(Acclimate, "requestInput");
+    const originalIsTTY = process.stdin.isTTY;
+    process.stdin.isTTY = false;
+    const { git, mutations } = _createFakeCommandsWithCi("failed");
+
+    try {
+      await expect(
+        confirmCiVerdict(git, {
+          commitSha: "source-sha",
+          assumeYes: false,
+          skip: false,
+        }),
+      ).rejects.toThrow(
+        "A confirmation was not provided and there is no terminal to ask on.",
+      );
+    } finally {
+      process.stdin.isTTY = originalIsTTY;
+    }
+    expect(requestInput).not.toHaveBeenCalled();
+    expect(mutations).toEqual([]);
   });
 
   it("aborts a release when the reviewer declines a failed verdict", async () => {
