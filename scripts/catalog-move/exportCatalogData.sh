@@ -1,12 +1,12 @@
 #!/bin/bash
 #-------------------------------------------------------------------------------
 # Dumps the open data catalog tables, data only, from a source database to a
-# file. Used to move the catalog built on demo-measles into alpha-dev and
+# file. Used to move the catalog built on demo-measles into staging and
 # production without re-running every pipeline. Only reads the source.
 #
 # Usage:
 #   SOURCE_DB_URL=<source-db-url> \
-#     bash scripts/alpha/exportCatalogData.sh <out-file.sql>
+#     bash scripts/catalog-move/exportCatalogData.sh <out-file.sql>
 #
 # The source URL comes from the SOURCE_DB_URL environment variable, never an
 # argument, since `ps` shows every process's arguments to every user. A URL
@@ -39,7 +39,7 @@ unset PGHOST PGHOSTADDR PGPORT PGDATABASE PGUSER PGPASSFILE PGSERVICE \
 USAGE="Usage: SOURCE_DB_URL=<source-db-url> exportCatalogData.sh <out-file.sql>"
 PG_DUMP_BIN="${PG_DUMP_BIN:-pg_dump}"
 
-# shellcheck source=scripts/alpha/catalogTables.sh
+# shellcheck source=scripts/catalog-move/catalogTables.sh
 source "$(dirname "${BASH_SOURCE[0]}")/catalogTables.sh"
 
 for argument in "$@"; do

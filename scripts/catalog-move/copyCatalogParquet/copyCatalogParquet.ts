@@ -508,7 +508,7 @@ function _createRecorder(
  * Supabase project's `opendata` bucket to the same paths in another's: the
  * build folder each prebuilt copy's `parquet_cache_folder_path` names, and
  * each `pipeline_parquet` listing's `metadata.storage_object_path`. Moves
- * the catalog into `alpha-dev` and production after `importCatalogData.sh`
+ * the catalog into staging and production after `importCatalogData.sh`
  * has loaded the listings, and throws when the target has none yet.
  *
  * Reads the source only. Uploads to the target with `upsert: false`, so an
@@ -521,7 +521,7 @@ function _createRecorder(
  * `SOURCE_SUPABASE_URL`, `SOURCE_SECRET_KEY`, `TARGET_SUPABASE_URL`, and
  * `TARGET_SECRET_KEY`:
  *
- *   node scripts/alpha/copyCatalogParquet/copyCatalogParquet.ts \
+ *   node scripts/catalog-move/copyCatalogParquet/copyCatalogParquet.ts \
  *     [--yes-i-know-the-target <target-host>]
  *
  * It prints both hosts, asks for the target host unless the flag names it,

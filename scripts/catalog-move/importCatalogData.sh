@@ -3,11 +3,11 @@
 # Loads a catalog dump written by exportCatalogData.sh into a target
 # database, then recounts `data_catalog_facet_counts`, all in one explicit
 # `begin` ... `commit` transaction that stops on the first error. Used to
-# move the catalog built on demo-measles into alpha-dev and production.
+# move the catalog built on demo-measles into staging and production.
 #
 # Usage:
 #   TARGET_DB_URL=<target-db-url> \
-#     bash scripts/alpha/importCatalogData.sh <dump.sql> \
+#     bash scripts/catalog-move/importCatalogData.sh <dump.sql> \
 #     [--dry-run] [--yes-i-know-the-target <user@host>] \
 #     [--rewrite-storage-host <source-storage-host> <target-storage-host>] \
 #     [--replace-existing --backup-file <backup.sql> \
@@ -147,7 +147,7 @@ LOCK_TIMEOUT="10s"
 # How many missing listing ids the report prints before summarizing.
 MAX_LISTED_IDS=50
 
-# shellcheck source=scripts/alpha/catalogTables.sh
+# shellcheck source=scripts/catalog-move/catalogTables.sh
 source "$(dirname "${BASH_SOURCE[0]}")/catalogTables.sh"
 
 IS_DRY_RUN=false
