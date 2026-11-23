@@ -5,7 +5,8 @@
 # production without re-running every pipeline. Only reads the source.
 #
 # Usage:
-#   SOURCE_DB_URL=<source-db-url> bash scripts/alpha/exportCatalogData.sh <out-file.sql>
+#   SOURCE_DB_URL=<source-db-url> \
+#     bash scripts/alpha/exportCatalogData.sh <out-file.sql>
 #
 # The source URL comes from the SOURCE_DB_URL environment variable, never an
 # argument, since `ps` shows every process's arguments to every user. A URL

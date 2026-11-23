@@ -289,12 +289,7 @@ function _runImport(
 ) {
   return _runScript(
     "importCatalogData.sh",
-    [
-      _writeDump(dump),
-      "--yes-i-know-the-target",
-      TARGET_ID,
-      ...extraArgs,
-    ],
+    [_writeDump(dump), "--yes-i-know-the-target", TARGET_ID, ...extraArgs],
     env,
   );
 }
@@ -441,25 +436,17 @@ describe("exportCatalogData.sh", SHELL_TEST_OPTIONS, () => {
   });
 
   it("fails when the dump holds a table outside the catalog", () => {
-    const run = _runScript(
-      "exportCatalogData.sh",
-      [join(workDir, "out.sql")],
-      {
-        FAKE_DUMP_EXTRA: "COPY public.workspaces (id) FROM stdin;\nw1\n\\.\n",
-      },
-    );
+    const run = _runScript("exportCatalogData.sh", [join(workDir, "out.sql")], {
+      FAKE_DUMP_EXTRA: "COPY public.workspaces (id) FROM stdin;\nw1\n\\.\n",
+    });
 
     expect(run.status).toBe(1);
   });
 
   it("deletes a rejected dump, leaving no output file", () => {
-    const run = _runScript(
-      "exportCatalogData.sh",
-      [join(workDir, "out.sql")],
-      {
-        FAKE_DUMP_EXTRA: "COPY public.workspaces (id) FROM stdin;\nw1\n\\.\n",
-      },
-    );
+    const run = _runScript("exportCatalogData.sh", [join(workDir, "out.sql")], {
+      FAKE_DUMP_EXTRA: "COPY public.workspaces (id) FROM stdin;\nw1\n\\.\n",
+    });
 
     expect(run.output).toContain("Deleted the rejected dump");
     expect(
@@ -518,14 +505,10 @@ describe("exportCatalogData.sh", SHELL_TEST_OPTIONS, () => {
       `#!/bin/bash\nenv | grep -E '^PG[A-Z]+=' > "$FAKE_STATE/env.log"\n${FAKE_PG_DUMP.replace("#!/bin/bash\n", "")}`,
     );
 
-    _runScript(
-      "exportCatalogData.sh",
-      [join(workDir, "out.sql")],
-      {
-        PGHOSTADDR: "10.0.0.9",
-        PGSERVICE: "elsewhere",
-      },
-    );
+    _runScript("exportCatalogData.sh", [join(workDir, "out.sql")], {
+      PGHOSTADDR: "10.0.0.9",
+      PGSERVICE: "elsewhere",
+    });
 
     expect(_readIfPresent(join(workDir, "env.log"))).not.toMatch(
       /PGHOSTADDR|PGSERVICE/,
@@ -605,12 +588,10 @@ describe(
     it("percent-decodes the password it passes in PGPASSWORD", () => {
       const run = _runScript(
         "importCatalogData.sh",
-        [
-        _writeDump(),
-        "--yes-i-know-the-target",
-        TARGET_ID,
-        ],
-        { TARGET_DB_URL: TARGET_URL.replace("s3cret-pass", "s3cret%40pass%2Fx") },
+        [_writeDump(), "--yes-i-know-the-target", TARGET_ID],
+        {
+          TARGET_DB_URL: TARGET_URL.replace("s3cret-pass", "s3cret%40pass%2Fx"),
+        },
       );
 
       expect(run.status).toBe(0);
@@ -619,13 +600,9 @@ describe(
     });
 
     it("refuses a password with an invalid percent-encoding, without connecting", () => {
-      const run = _runScript(
-        "importCatalogData.sh",
-        [
-        _writeDump(),
-        ],
-        { TARGET_DB_URL: TARGET_URL.replace("s3cret-pass", "s3cret%zzpass") },
-      );
+      const run = _runScript("importCatalogData.sh", [_writeDump()], {
+        TARGET_DB_URL: TARGET_URL.replace("s3cret-pass", "s3cret%zzpass"),
+      });
 
       expect(run.status).toBe(1);
       expect(run.output).toContain("invalid percent-encoding");
@@ -665,13 +642,9 @@ describe(
     });
 
     it("refuses a connect_timeout query, saying how to strip it, without connecting", () => {
-      const run = _runScript(
-        "importCatalogData.sh",
-        [
-        _writeDump(),
-        ],
-        { TARGET_DB_URL: `${TARGET_URL}?connect_timeout=10` },
-      );
+      const run = _runScript("importCatalogData.sh", [_writeDump()], {
+        TARGET_DB_URL: `${TARGET_URL}?connect_timeout=10`,
+      });
 
       expect(run.status).toBe(1);
       expect(run.output).toContain('TARGET_DB_URL="${TARGET_DB_URL%%\\?*}"');
@@ -679,13 +652,9 @@ describe(
     });
 
     it("refuses the transaction pooler's port 6543, without connecting", () => {
-      const run = _runScript(
-        "importCatalogData.sh",
-        [
-        _writeDump(),
-        ],
-        { TARGET_DB_URL: TARGET_URL.replace(":5432", ":6543") },
-      );
+      const run = _runScript("importCatalogData.sh", [_writeDump()], {
+        TARGET_DB_URL: TARGET_URL.replace(":5432", ":6543"),
+      });
 
       expect(run.status).toBe(1);
       expect(run.output).toContain("transaction pooler");
@@ -696,11 +665,14 @@ describe(
       const run = _runScript(
         "importCatalogData.sh",
         [
-        _writeDump(),
-        "--yes-i-know-the-target",
-        "postgres.example-ref@aws-0-us-east-1.pooler.supabase.com",
+          _writeDump(),
+          "--yes-i-know-the-target",
+          "postgres.example-ref@aws-0-us-east-1.pooler.supabase.com",
         ],
-        { TARGET_DB_URL: "postgresql://postgres.example-ref:pw@aws-0-us-east-1.pooler.supabase.com:5432/postgres?sslmode=require" },
+        {
+          TARGET_DB_URL:
+            "postgresql://postgres.example-ref:pw@aws-0-us-east-1.pooler.supabase.com:5432/postgres?sslmode=require",
+        },
       );
 
       expect(run.status).toBe(0);
@@ -779,7 +751,7 @@ describe(
       ]);
     });
 
-    it("loads pipeline executions with no command line or actor", () => {
+    it("loads pipeline executions with no command line, actor, or host", () => {
       const run = _runImport();
 
       expect(run.status).toBe(0);
@@ -820,9 +792,9 @@ describe(
       const run = _runScript(
         "importCatalogData.sh",
         [
-        _writeDump(),
-        "--yes-i-know-the-target",
-        "postgres@db.other-ref.supabase.co",
+          _writeDump(),
+          "--yes-i-know-the-target",
+          "postgres@db.other-ref.supabase.co",
         ],
         { TARGET_DB_URL: TARGET_URL },
       );
@@ -833,13 +805,9 @@ describe(
     });
 
     it("refuses without a confirmation when there is no terminal to ask on", () => {
-      const run = _runScript(
-        "importCatalogData.sh",
-        [
-        _writeDump(),
-        ],
-        { TARGET_DB_URL: TARGET_URL },
-      );
+      const run = _runScript("importCatalogData.sh", [_writeDump()], {
+        TARGET_DB_URL: TARGET_URL,
+      });
 
       expect(run.status).toBe(1);
       expect(run.output).toContain(
@@ -1037,9 +1005,9 @@ describe("importCatalogData.sh --replace-existing", SHELL_TEST_OPTIONS, () => {
     const datasetDelete = lines.indexOf(OPEN_DATA_DATASETS_DELETE);
     expect(guardStart).toBeGreaterThan(checkEnd);
     expect(datasetDelete).toBeGreaterThan(guardEnd);
-    expect(lines.indexOf("delete from public.data_catalog_listings;")).toBeGreaterThan(
-      datasetDelete,
-    );
+    expect(
+      lines.indexOf("delete from public.data_catalog_listings;"),
+    ).toBeGreaterThan(datasetDelete);
     const guard = lines.slice(guardStart, guardEnd + 1).join("\n");
     expect(guard).toContain("member_count = 0 or other_member_count > 0");
     expect(guard).toMatch(
@@ -1101,7 +1069,9 @@ describe("importCatalogData.sh --replace-existing", SHELL_TEST_OPTIONS, () => {
 
     expect(run.status).toBe(0);
     expect(run.output).toContain("guard fails");
-    expect(run.output).toMatch(/The import would refuse: open data dataset ds5/);
+    expect(run.output).toMatch(
+      /The import would refuse: open data dataset ds5/,
+    );
     expect(run.log).not.toContain("--file");
   });
 
@@ -1259,7 +1229,7 @@ describe("importCatalogData.sh --replace-existing", SHELL_TEST_OPTIONS, () => {
     const run = _runReplace(_confirmedReplaceArgs());
 
     expect(run.output).toContain(
-      "3. Run it with psql 15.14+, 16.10+, 17.6+, or 18+: with_db_url \"$TARGET_DB_URL\" psql -X",
+      '3. Run it with psql 15.14+, 16.10+, 17.6+, or 18+: with_db_url "$TARGET_DB_URL" psql -X',
     );
   });
 

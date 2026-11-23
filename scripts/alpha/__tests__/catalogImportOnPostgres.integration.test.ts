@@ -586,7 +586,7 @@ describe.skipIf(TOOLS === undefined)(
       expect(_targetCounts()).toBe(SEED_COUNTS);
     });
 
-    it("loads pipeline executions with no command line or actor", () => {
+    it("loads pipeline executions with no command line, actor, or host", () => {
       const run = _runReplace(CATALOG_DUMP);
 
       expect(run.status, run.output).toBe(0);

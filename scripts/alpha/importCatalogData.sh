@@ -6,7 +6,8 @@
 # move the catalog built on demo-measles into alpha-dev and production.
 #
 # Usage:
-#   TARGET_DB_URL=<target-db-url> bash scripts/alpha/importCatalogData.sh <dump.sql> \
+#   TARGET_DB_URL=<target-db-url> \
+#     bash scripts/alpha/importCatalogData.sh <dump.sql> \
 #     [--dry-run] [--yes-i-know-the-target <user@host>] \
 #     [--rewrite-storage-host <source-storage-host> <target-storage-host>] \
 #     [--replace-existing --backup-file <backup.sql> \
@@ -321,8 +322,9 @@ prepare_dump() {
   redact_executions
 }
 
-# Nulls the developer command lines and actors in the private copy of the
-# dump, so they never reach the target. Only the columns the dump has.
+# Nulls the command line, actor, and host of every execution in the private
+# copy of the dump, so they never reach the target. Only the columns the
+# dump has.
 redact_executions() {
   local header column
   header=", $(print_dump_header_columns "$LOAD_FILE" "$EXECUTIONS_TABLE"), "
@@ -793,9 +795,10 @@ SQL
 }
 
 # Writes the statements that, inside the transaction, stop membership changes
-# and email changes of those workspaces' members, raise unless every member of each open data dataset's workspace has an
-# @avandarlabs.com email (a workspace with no members raises too), and then
-# delete those datasets, with every row that cascades from them.
+# and email changes of those workspaces' members, raise unless every member
+# of each open data dataset's workspace has an @avandarlabs.com email (a
+# workspace with no members raises too), and then delete those datasets,
+# with every row that cascades from them.
 write_open_data_dataset_delete() {
   [[ "$HAS_OPEN_DATA_DATASETS" == true ]] || return 0
   echo "lock table $MEMBERSHIPS_TABLE in share mode;"
@@ -823,7 +826,7 @@ SQL
 }
 
 # Writes the statement that raises while any loaded execution still has a
-# command line or actor, so neither can commit.
+# command line, actor, or host, so none of them can commit.
 write_redaction_check() {
   ((${#DUMP_REDACTED_COLUMNS[@]})) || return 0
   local column condition=""

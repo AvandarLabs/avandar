@@ -91,7 +91,8 @@ unset PGHOST PGHOSTADDR PGPORT PGDATABASE PGUSER PGPASSWORD PGPASSFILE \
 # its password, as its first argument, and the password in PGPASSWORD for
 # that one command. `ps` shows every process's arguments to every user, but
 # a process's environment only to its own user and root. A shell function's
-# own arguments never reach `ps`. Works in bash and zsh.
+# own arguments never reach `ps`. A URL whose user part has a ":" it cannot
+# split is refused, never passed on whole. Works in bash and zsh.
 with_db_url() {
   local url="$1" rest userinfo password
   shift
@@ -101,6 +102,11 @@ with_db_url() {
     password="${userinfo#*:}"
     PGPASSWORD="$(printf '%b' "${password//\%/\\x}")" "$1" \
       "${url%%://*}://${userinfo%%:*}@${rest#*@}" "${@:2}"
+  elif [[ "$rest" == *@* && "$userinfo" == *:* ]]; then
+    # A password it cannot split, such as one with an unencoded "/". Never
+    # print the URL.
+    echo "with_db_url: cannot split the password out of the URL. Percent-encode it. Not running $1." >&2
+    return 1
   else
     "$1" "$url" "${@:2}"
   fi
@@ -1433,7 +1439,8 @@ that log), the plan, then asks you to type `<user>@<host>` and
 `delete <N> dependent rows`, noting that the replace deletes the 4
 `public.datasets` rows added from the catalog. Inside the transaction it
 checks the guard again, deletes the 4 datasets, then the catalog, and loads
-the dump with every `pipeline_executions.cli_argv` and `actor` null.
+the dump with every `pipeline_executions.cli_argv`, `actor`, and `host`
+null.
 **Expect:** `Rewrote the Storage URLs of <n> listings.`, catalog counts equal
 to the dump's, `public.datasets` 4 lower than the report, and `Open data
 datasets with no open data details now: 0 public.datasets rows in 0
@@ -1449,7 +1456,7 @@ read_db "$TARGET_DB_URL" "select count(*) from public.data_catalog_facet_counts"
 read_db "$TARGET_DB_URL" "select count(*) from public.data_catalog_listings l where l::text like '%$SOURCE_REF%'"
 read_db "$TARGET_DB_URL" "select count(*) from public.data_catalog_listings"
 read_db "$TARGET_DB_URL" "select count(*) from public.datasets d where d.name = 'World Development Indicators (WDI)'"
-read_db "$TARGET_DB_URL" "select count(*) from public.pipeline_executions where cli_argv is not null or actor is not null"
+read_db "$TARGET_DB_URL" "select count(*) from public.pipeline_executions where cli_argv is not null or actor is not null or host is not null"
 ```
 
 **Expect:** more than 0; then 0; then the listing count (keep it for
