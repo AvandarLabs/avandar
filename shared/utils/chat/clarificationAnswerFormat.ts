@@ -63,8 +63,7 @@ export function parseClarificationAnswerBody(
 ): string | undefined {
   const noteLineStart = content.lastIndexOf("\n");
   const answerLine =
-    noteLineStart > 0 &&
-    content.slice(0, noteLineStart).endsWith(ANSWER_SUFFIX)
+    noteLineStart > 0 && content.slice(0, noteLineStart).endsWith(ANSWER_SUFFIX)
       ? content.slice(0, noteLineStart)
       : content;
   if (
