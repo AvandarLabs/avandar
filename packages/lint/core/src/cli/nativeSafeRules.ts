@@ -21,6 +21,9 @@ const CAPABILITIES = [
   ["AF-04", "literal-assertions", "prefer-as-const"],
   ["AF-06", "standalone-body-prose", "function-body-line-comments"],
   ["AF-07", "short-prose-jsdoc", "single-line-short-jsdoc"],
+  ["AF-08", "direct-top-level-calls", "top-level-function-declarations"],
+  ["AF-09", "direct-nested-calls", "nested-arrow-functions"],
+  ["AF-10", "private-direct-calls", "private-helper-prefix"],
   ["AF-11", "one-to-one-module-key", "export-key-jsdoc"],
 ] as const;
 const JS_SEED = '\nif (Boolean(1)) console.log("coverage");';
@@ -40,6 +43,19 @@ function _avandarModuleCommentSeed() {}
 export const _AvandarSeedCommentModule = {
   read: _avandarModuleCommentSeed,
 };
+`;
+const FUNCTION_SEED = `
+const _avandarTopDeclarationSeed = () => { console.log(1); return 1; };
+_avandarTopDeclarationSeed();
+function _avandarNestedDeclarationSeed() {
+  function nestedSeed() { return 1; }
+  return nestedSeed();
+}
+_avandarNestedDeclarationSeed();
+function avandarPrivateHelperSeed() { return 1; }
+export function _avandarPrivateCallerSeed() {
+  return avandarPrivateHelperSeed();
+}
 `;
 const TS_SEED =
   '\nimport { Stats as _AvandarSeedStats } from "node:fs";\nlet _avandarSeedStats: _AvandarSeedStats;\ntype _AvandarSeedShape = { name: string };\nexport { _AvandarSeedShape };\nconst _avandarSeedLiteral = "coverage" as "coverage";\nconst _avandarSeedNumber: number = 1;\nconst _avandarSeedCopy = _avandarSeedNumber as number;\n';
@@ -167,7 +183,7 @@ async function _proveSeed(
     _mirrorDirectory(cwd, directory, localPath.split(sep));
     const source = readFileSync(path, "utf8");
     const seed =
-      JS_SEED + COMMENT_SEED +
+      JS_SEED + COMMENT_SEED + FUNCTION_SEED +
       (/\.[cm]?tsx?$/.test(path) ? TS_SEED + MODULE_COMMENT_SEED : "");
     writeFileSync(join(directory, localPath), source + seed);
     const result = await _runSeed(directory, localPath, invocation);
@@ -259,7 +275,7 @@ function _createProbe(
         return (
           diagnostic.severity === "error" &&
           diagnostic.code?.endsWith(`(${nativeRule})`) &&
-          (!["AF-06", "AF-07", "AF-11"].includes(ruleId) ||
+          (!["AF-06", "AF-07", "AF-08", "AF-09", "AF-10", "AF-11"].includes(ruleId) ||
             (diagnostic.code === `avandar(${nativeRule})` &&
               diagnostic.message?.startsWith(`${ruleId}:`))) &&
           diagnostic.labels?.some((label) => {
@@ -300,12 +316,12 @@ export function createNativeCoverageProbes(): CoverageProbe[] {
   const getProof = _createProofLoader();
   return CAPABILITIES.flatMap((capability) => {
     const languages =
-      ["AF-01", "AF-06", "AF-07"].includes(capability[0])
+      ["AF-01", "AF-06", "AF-07", "AF-08", "AF-09", "AF-10"].includes(capability[0])
         ? ["typescript", "javascript"]
         : ["typescript"];
     return languages.flatMap((language) => {
       const probe = _createProbe(capability, language, getProof);
-      if (!["AF-06", "AF-07", "AF-11"].includes(capability[0])) {
+      if (!["AF-06", "AF-07", "AF-08", "AF-09", "AF-10", "AF-11"].includes(capability[0])) {
         return [probe];
       }
       return [probe, {
@@ -315,7 +331,7 @@ export function createNativeCoverageProbes(): CoverageProbe[] {
           return {
             ...UNPROVEN,
             recovery:
-              "Run fallback review for unsupported comment shapes. No exact syntax classifier is installed.",
+              "Run fallback review for unsupported syntax shapes. No exact syntax classifier is installed.",
           };
         },
       }];

@@ -140,7 +140,7 @@ rules:
     phases:
       - 3
     owner: lint
-    boundary: Reject lexical binding, hoisting, overload, recursion, and collision changes
+    boundary: Module-only unique private direct calls after declaration in the same activation; ordinary function expressions or block arrows excluding single-return blocks; refuse exports, recursion, escapes, lexical bindings, comments and competing repairs; unsupported shapes remain fallback
   - id: AF-09
     slug: nested-arrow-function
     class: AF
@@ -153,7 +153,7 @@ rules:
     phases:
       - 3
     owner: lint
-    boundary: Reject function-local lexical binding and hoisting changes
+    boundary: Module-only unique nested declarations called directly after initialization in the same function body; refuse recursion, overloads, escapes, lexical bindings, nested functions, comments and competing repairs; unsupported shapes remain fallback
   - id: AF-10
     slug: private-helper-prefix
     class: AF
@@ -166,7 +166,7 @@ rules:
     phases:
       - 3
     owner: lint
-    boundary: Same-file, non-exported, collision-free symbols only
+    boundary: Module-only unique private helpers called exclusively by the immediately adjacent exported function; reject scope and unresolved-name collisions, exports, escapes, string contracts, nested functions, comments and competing repairs; unsupported shapes remain fallback
   - id: AF-11
     slug: module-member-jsdoc
     class: AF

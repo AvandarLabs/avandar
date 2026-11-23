@@ -32,6 +32,7 @@ published build artifacts. Runtime dependencies are installed separately.
 | phase-3-native-safe-rules-review-fixes | 7292 | 7039 | 7479 | 7292 | 7404 | 7321 | 7321 | 0, 0, 0, 0, 0, 0 |
 | phase-3-comment-fixers | 19907 | 18821 | 19127 | 18915 | 18917 | 19026 | 18917 | 0, 0, 0, 0, 0, 0 |
 | phase-3-comment-fixers-final | 19266 | 19046 | 19093 | 19166 | 19218 | 19067 | 19093 | 0, 0, 0, 0, 0, 0 |
+| phase-3-function-fixers | 7691 | 7672 | 7346 | 7550 | 7665 | 7509 | 7550 | 0, 0, 0, 0, 0, 0 |
 
 ## Initial native batch profile
 
@@ -136,3 +137,35 @@ fallback IDs must remain active. Non-JS AF-06/AF-07 outcomes also stay fallback.
 All three built tarballs import successfully together in an isolated consumer.
 The core catalog returns 90 rules and the TypeScript export exposes the three
 comment rules. **19,093 ms is the preceding warm median for the next batch.**
+
+## Function declarations and private helpers
+
+The function batch enables AF-08, AF-09, and AF-10 for narrowly proved direct
+call shapes. The complete root ordinary safe-fix pass found **zero eligible
+existing source candidates**. No application, generated, or compiled catalog
+files changed. Every changed and new file was byte-identical after the next
+whole-root ordinary fix pass.
+
+The cold sample is 7,691 ms and the five-run warm median is **7,550 ms**, with
+six zero exits. This is 11,543 ms (60.46%) below the preceding 19,093 ms median,
+so neither stop threshold is crossed. No tests, builds, or installation ran
+alongside the samples. React Doctor reused its existing cache, reporting 647
+files in 33-36 ms for these samples; its configuration and existing await-loop
+warning are unchanged. These measurements do not establish causal attribution
+for the timing decrease.
+
+A subsequent safety tightening rejects escaped string/template contracts. Its
+covering TypeScript and native tests pass, as do the refreshed root fix and
+main TypeScript build checks. The completed timing row is retained rather than
+repeating six samples for this small additional refusal check.
+
+AF-08 and AF-09 reject hoisting, recursion, overloads, escapes, lexical bindings,
+and competing repair syntax. AF-10 requires scope-proved calls inside the
+immediately adjacent exported function and rejects unresolved-name capture.
+These stable boundaries keep native fixes, comment fixes, and independently
+disabled function rules separate in one ordinary native fix invocation. Each
+new safe capability has a canonical error-seed proof on the exact reviewed
+path, plus explicit `unsupported-shapes` fallback. The existing serialized
+proof scheduler and cache are unchanged.
+
+**7,550 ms is the preceding warm median for the next batch.**
