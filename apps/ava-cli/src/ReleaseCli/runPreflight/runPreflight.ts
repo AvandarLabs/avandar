@@ -1,8 +1,8 @@
 import { describeCommandFailure } from "@ava-cli/ReleaseCli/describeCommandFailure/describeCommandFailure";
 import {
-  getReleaseLineFromBranch,
-  MAINLINE_RELEASE_LINE,
-} from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
+  RELEASE_SOURCE_BRANCH,
+  RELEASE_TARGET_BRANCH,
+} from "@ava-cli/ReleaseCli/releaseBranches/releaseBranches";
 import {
   getCurrentBranch,
   getDivergence,
@@ -12,7 +12,6 @@ import {
   revParse,
 } from "@ava-cli/ReleaseCli/releaseGitHelpers";
 import type { ReleaseCommands } from "@ava-cli/ReleaseCli/createReleaseCommands";
-import type { ReleaseLine } from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
 
 /** Why a release was refused, for callers that need more than the message. */
 export type PreflightRefusalReason =
@@ -34,8 +33,6 @@ export type PreflightRefusal = {
 export type PreflightResult =
   | {
       ok: true;
-      /** The line being released, from the checked-out branch. */
-      line: ReleaseLine;
       /** Tip of origin/<source>: the commit the release is built from. */
       originSourceSha: string;
       /** Tip of origin/<target>: the first parent of the release commit. */
@@ -46,21 +43,19 @@ export type PreflightResult =
   | ({ ok: false } & PreflightRefusal);
 
 /**
- * The line released from the checked-out branch, or the refusal when releases
- * may not be cut from it. Only `develop` qualifies: the target branch
- * (`main`), any other branch, and a detached HEAD are all refused.
+ * The refusal when the checkout is not on the source branch, or `undefined`
+ * when it is. Only `develop` qualifies: the target branch (`main`), any other
+ * branch, and a detached HEAD are all refused.
  */
-function _getReleaseLineOrRefusal(
+function _refuseWrongBranch(
   git: ReleaseCommands,
-): { ok: true; line: ReleaseLine } | ({ ok: false } & PreflightRefusal) {
+): PreflightRefusal | undefined {
   const currentBranch = getCurrentBranch(git);
-  const line = getReleaseLineFromBranch(currentBranch);
-  return line !== undefined
-    ? { ok: true, line }
+  return currentBranch === RELEASE_SOURCE_BRANCH
+    ? undefined
     : {
-        ok: false,
         reason: "wrong-branch",
-        message: `Releases are cut from "${MAINLINE_RELEASE_LINE.sourceBranch}" (currently on "${currentBranch ?? "a detached HEAD"}").`,
+        message: `Releases are cut from "${RELEASE_SOURCE_BRANCH}" (currently on "${currentBranch ?? "a detached HEAD"}").`,
       };
 }
 
@@ -87,14 +82,13 @@ function _refuseDirtyTree(git: ReleaseCommands): PreflightRefusal | undefined {
  * The refusal when the person running this cannot push to the repository, or
  * `undefined` when they can.
  *
- * A release pushes both of its line's branches, and pushing the target branch
+ * A release pushes both of its branches, and pushing the target branch
  * deploys production, so it refuses here rather than half-way through:
  * without this, the first thing to fail is the `push` after a local version
  * commit has already been made.
  */
 function _refuseWithoutPushPermission(
   git: ReleaseCommands,
-  line: ReleaseLine,
 ): PreflightRefusal | undefined {
   // A non-GitHub origin (a local bare remote, say) has nobody to ask.
   const repoSlug = getGitHubRepoSlug(git);
@@ -112,12 +106,12 @@ function _refuseWithoutPushPermission(
   return !pushPermissionResult.ok
     ? {
         reason: "unverified-push-permission",
-        message: `Could not confirm you can push to ${repoSlug}: ${describeCommandFailure(pushPermissionResult, "the gh CLI could not answer")}. Releases push ${line.sourceBranch} and ${line.targetBranch}, so this refuses rather than guess. Run \`gh auth login\` and try again.`,
+        message: `Could not confirm you can push to ${repoSlug}: ${describeCommandFailure(pushPermissionResult, "the gh CLI could not answer")}. Releases push ${RELEASE_SOURCE_BRANCH} and ${RELEASE_TARGET_BRANCH}, so this refuses rather than guess. Run \`gh auth login\` and try again.`,
       }
     : pushPermissionResult.stdout.trim() !== "true"
       ? {
           reason: "no-push-permission",
-          message: `You do not have push access to ${repoSlug}, so this release would fail once it tried to push ${line.sourceBranch}. Ask whoever owns the repo to cut the release.`,
+          message: `You do not have push access to ${repoSlug}, so this release would fail once it tried to push ${RELEASE_SOURCE_BRANCH}. Ask whoever owns the repo to cut the release.`,
         }
       : undefined;
 }
@@ -144,17 +138,16 @@ function _refuseFailedFetch(
  */
 function _refuseOutOfSyncSourceBranch(
   git: ReleaseCommands,
-  options: Readonly<{ line: ReleaseLine; originSha: string }>,
+  originSha: string,
 ): PreflightRefusal | undefined {
-  const { line, originSha } = options;
   // Fully qualified: the fetch brings in tags, and a tag named like the source
   // branch would otherwise shadow it and hide unpushed commits.
-  const localSourceRef = `refs/heads/${line.sourceBranch}`;
+  const localSourceRef = `refs/heads/${RELEASE_SOURCE_BRANCH}`;
   const localSourceSha = revParse(git, localSourceRef);
   if (localSourceSha === undefined) {
     return {
       reason: "missing-ref",
-      message: `Could not resolve ${line.sourceBranch}.`,
+      message: `Could not resolve ${RELEASE_SOURCE_BRANCH}.`,
     };
   }
   if (localSourceSha === originSha) {
@@ -163,92 +156,75 @@ function _refuseOutOfSyncSourceBranch(
   const { ahead, behind } = getDivergence(
     git,
     localSourceRef,
-    `refs/remotes/origin/${line.sourceBranch}`,
+    `refs/remotes/origin/${RELEASE_SOURCE_BRANCH}`,
   );
   return {
     reason: "out-of-sync",
-    message: `${line.sourceBranch} is out of sync with origin/${line.sourceBranch} (${ahead} ahead, ${behind} behind). Push or pull it, then release.`,
+    message: `${RELEASE_SOURCE_BRANCH} is out of sync with origin/${RELEASE_SOURCE_BRANCH} (${ahead} ahead, ${behind} behind). Push or pull it, then release.`,
   };
-}
-
-/** The `_readReleaseRefs` refusal message when `origin/<target>` is missing. */
-function _buildMissingTargetMessage(line: ReleaseLine): string {
-  return `origin/${line.targetBranch} does not exist.`;
 }
 
 /**
  * The refs the release will be built from, or a refusal when one is missing or
  * the source branch is out of sync with origin.
  */
-function _readReleaseRefs(
-  git: ReleaseCommands,
-  line: ReleaseLine,
-): PreflightResult {
+function _readReleaseRefs(git: ReleaseCommands): PreflightResult {
   const originSourceSha = revParse(
     git,
-    `refs/remotes/origin/${line.sourceBranch}`,
+    `refs/remotes/origin/${RELEASE_SOURCE_BRANCH}`,
   );
   if (originSourceSha === undefined) {
     return {
       ok: false,
       reason: "missing-ref",
-      message: `origin/${line.sourceBranch} does not exist.`,
+      message: `origin/${RELEASE_SOURCE_BRANCH} does not exist.`,
     };
   }
 
   const originTargetSha = revParse(
     git,
-    `refs/remotes/origin/${line.targetBranch}`,
+    `refs/remotes/origin/${RELEASE_TARGET_BRANCH}`,
   );
   if (originTargetSha === undefined) {
     return {
       ok: false,
       reason: "missing-ref",
-      message: _buildMissingTargetMessage(line),
+      message: `origin/${RELEASE_TARGET_BRANCH} does not exist.`,
     };
   }
 
-  const outOfSync = _refuseOutOfSyncSourceBranch(git, {
-    line,
-    originSha: originSourceSha,
-  });
+  const outOfSync = _refuseOutOfSyncSourceBranch(git, originSourceSha);
   if (outOfSync !== undefined) {
     return { ok: false, ...outOfSync };
   }
 
   // Fully qualified, so a tag named `main` cannot win the lookup.
-  const localTargetRef = `refs/heads/${line.targetBranch}`;
+  const localTargetRef = `refs/heads/${RELEASE_TARGET_BRANCH}`;
   const localTargetSha = refExists(git, localTargetRef)
     ? revParse(git, localTargetRef)
     : undefined;
-  return { ok: true, line, originSourceSha, originTargetSha, localTargetSha };
+  return { ok: true, originSourceSha, originTargetSha, localTargetSha };
 }
 
 /**
- * Whether the repository is in a state a release may be cut from, and which
- * line it releases. `runRelease` calls it before anything else, so a release
- * on `develop` cuts mainline, and any other branch is refused before a single
- * network call.
+ * Whether the repository is in a state a release may be cut from.
+ * `runRelease` calls it before anything else, so any branch other than
+ * `develop` is refused before a single network call.
  *
  * Every check refuses. None of them fixes anything. A release must never be
  * the thing that discovers a branch was stale, and it must never quietly
  * repair state on the way to a deploy.
  */
 export function runPreflight(git: ReleaseCommands): PreflightResult {
-  // The branch decides everything else, so nothing runs on a refused one.
-  const lineOrRefusal = _getReleaseLineOrRefusal(git);
-  if (!lineOrRefusal.ok) {
-    return lineOrRefusal;
-  }
-  const { line } = lineOrRefusal;
-
-  // Cheapest first: a local check, then the permission call, then the fetch.
+  // Cheapest first: two local checks, then the permission call, then the fetch.
+  // The branch check runs first, so nothing runs on a refused branch.
   const refusal =
+    _refuseWrongBranch(git) ??
     _refuseDirtyTree(git) ??
-    _refuseWithoutPushPermission(git, line) ??
+    _refuseWithoutPushPermission(git) ??
     _refuseFailedFetch(git);
   if (refusal !== undefined) {
     return { ok: false, ...refusal };
   }
-  return _readReleaseRefs(git, line);
+  return _readReleaseRefs(git);
 }

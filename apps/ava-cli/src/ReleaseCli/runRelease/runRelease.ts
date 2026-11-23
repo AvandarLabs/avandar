@@ -1,9 +1,9 @@
 import { createReleaseCommands } from "@ava-cli/ReleaseCli/createReleaseCommands";
+import { RELEASE_SOURCE_BRANCH } from "@ava-cli/ReleaseCli/releaseBranches/releaseBranches";
 import { publishReleaseNotes } from "@ava-cli/ReleaseCli/releaseChangelog/publishReleaseNotes/publishReleaseNotes";
 import { readVersionAtRevision } from "@ava-cli/ReleaseCli/releaseGitHelpers";
 import {
   suggestNextVersion,
-  toPublishedVersion,
   toReleaseTag,
   toReleaseVersion,
 } from "@ava-cli/ReleaseCli/releaseVersionUtils/releaseVersionUtils";
@@ -39,10 +39,7 @@ import type { ReleasePlan } from "@ava-cli/ReleaseCli/runRelease/releaseStageHel
 export type ReleaseOptions = {
   /** Version to release. Prompted for when omitted. */
   version: string | undefined;
-  /**
-   * Version the source branch moves to. It gains the line's dev suffix
-   * (`-dev`). Asked for if omitted.
-   */
+  /** Version the source branch moves to; gains `-dev`. Asked for if omitted. */
   nextVersion: string | undefined;
   /** Accept every default and skip confirmations. */
   yes: boolean;
@@ -137,13 +134,12 @@ async function _buildConfirmedPlan(
 ): Promise<ReleasePlan> {
   const { releaseOptions, preflight } = options;
   const { yes, skipCiCheck } = releaseOptions;
-  const { line, originSourceSha, originTargetSha } = preflight;
+  const { originSourceSha, originTargetSha } = preflight;
 
   const plan = await _buildPlan(git, options);
   assertTagIsUnused(git, plan);
   await confirmCiVerdict(git, {
     commitSha: originSourceSha,
-    line,
     assumeYes: yes,
     skip: skipCiCheck,
   });
@@ -191,7 +187,6 @@ function _finishPublishedRelease(
   const { plan, preflight, releaseSha, releaseCommitSha } = options;
 
   updateLocalTargetRef(git, {
-    line: plan.line,
     releaseCommitSha,
     localTargetSha: preflight.localTargetSha,
     originTargetSha: preflight.originTargetSha,
@@ -252,28 +247,26 @@ function _requirePreflight(git: ReleaseCommands): SatisfiedPreflight {
   if (!preflight.ok) {
     throw new Error(preflight.message);
   }
-  const { sourceBranch } = preflight.line;
   printSuccess(
-    `On ${sourceBranch}, clean, in sync with origin/${sourceBranch}.`,
+    `On ${RELEASE_SOURCE_BRANCH}, clean, in sync with origin/${RELEASE_SOURCE_BRANCH}.`,
   );
   return preflight;
 }
 
 /**
- * The line, versions, and tag this release is cut with, printing the reference
- * block and asking for whatever was not passed as an option.
+ * The versions and tag this release is cut with, printing the reference block
+ * and asking for whatever was not passed as an option.
  */
 async function _buildPlan(
   git: ReleaseCommands,
   options: Readonly<PlanSourceOptions>,
 ): Promise<ReleasePlan> {
   const { version, nextVersion, yes } = options.releaseOptions;
-  const { line, originTargetSha } = options.preflight;
+  const { originTargetSha } = options.preflight;
 
   const sourceVersion = _requireSourceVersion(git, options.preflight);
   const suggestedRelease = toReleaseVersion(sourceVersion);
   printVersionReference({
-    line,
     targetVersion: readVersionAtRevision(git, originTargetSha),
     sourceVersion,
     suggestedRelease,
@@ -283,23 +276,19 @@ async function _buildPlan(
   });
 
   const releaseVersion = await resolveReleaseVersion({
-    line,
     provided: version,
     suggested: suggestedRelease,
     assumeYes: yes,
   });
   return {
-    line,
     sourceVersion,
     releaseVersion,
     nextVersion: await resolveNextVersion({
-      line,
       provided: nextVersion,
       releaseVersion,
       assumeYes: yes,
     }),
-    publishedVersion: toPublishedVersion(releaseVersion, line),
-    releaseTag: toReleaseTag(releaseVersion, line),
+    releaseTag: toReleaseTag(releaseVersion),
   };
 }
 
@@ -311,7 +300,7 @@ function _requireSourceVersion(
   const sourceVersion = readVersionAtRevision(git, preflight.originSourceSha);
   if (sourceVersion === undefined) {
     throw new Error(
-      `Could not read the version from package.json on ${preflight.line.sourceBranch}.`,
+      `Could not read the version from package.json on ${RELEASE_SOURCE_BRANCH}.`,
     );
   }
   return sourceVersion;

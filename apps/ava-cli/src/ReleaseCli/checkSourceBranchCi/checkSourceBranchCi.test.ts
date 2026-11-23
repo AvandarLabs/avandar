@@ -1,5 +1,4 @@
 import { checkSourceBranchCi } from "@ava-cli/ReleaseCli/checkSourceBranchCi/checkSourceBranchCi";
-import { MAINLINE_RELEASE_LINE } from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
 import { describe, expect, it } from "vitest";
 import type {
   CommandResult,
@@ -50,13 +49,10 @@ const PASSED_RUN_JSON = JSON.stringify([
 ]);
 
 describe("checkSourceBranchCi", () => {
-  it("asks for staging.yaml runs on develop on the mainline", () => {
+  it("asks for staging.yaml runs on develop", () => {
     const { git, ghCalls } = _createFakeGh(PASSED_RUN_JSON);
 
-    checkSourceBranchCi(git, {
-      commitSha: "release-sha",
-      line: MAINLINE_RELEASE_LINE,
-    });
+    checkSourceBranchCi(git, { commitSha: "release-sha" });
 
     expect(ghCalls).toEqual([
       [
@@ -78,17 +74,12 @@ describe("checkSourceBranchCi", () => {
   it("passes only when the run for the released commit succeeded", () => {
     const { git } = _createFakeGh(PASSED_RUN_JSON);
 
-    expect(
-      checkSourceBranchCi(git, {
-        commitSha: "release-sha",
-        line: MAINLINE_RELEASE_LINE,
-      }),
-    ).toEqual({ kind: "passed", url: "https://github.com/x/y/actions/runs/1" });
-    expect(
-      checkSourceBranchCi(git, {
-        commitSha: "another-sha",
-        line: MAINLINE_RELEASE_LINE,
-      }),
-    ).toEqual({ kind: "missing" });
+    expect(checkSourceBranchCi(git, { commitSha: "release-sha" })).toEqual({
+      kind: "passed",
+      url: "https://github.com/x/y/actions/runs/1",
+    });
+    expect(checkSourceBranchCi(git, { commitSha: "another-sha" })).toEqual({
+      kind: "missing",
+    });
   });
 });

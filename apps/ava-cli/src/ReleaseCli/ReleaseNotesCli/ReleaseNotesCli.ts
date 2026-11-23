@@ -1,5 +1,4 @@
 import { createReleaseCommands } from "@ava-cli/ReleaseCli/createReleaseCommands";
-import { MAINLINE_RELEASE_LINE } from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
 import { listSortedReleaseTags } from "@ava-cli/ReleaseCli/releaseChangelog/collectReleaseChangelogCommits/collectReleaseChangelogCommits";
 import { publishReleaseNotes } from "@ava-cli/ReleaseCli/releaseChangelog/publishReleaseNotes/publishReleaseNotes";
 import { wantsHelp } from "@ava-cli/ReleaseCli/releaseFlagUtils/releaseFlagUtils";
@@ -18,7 +17,6 @@ import { findRepoRoot } from "@ava-cli/utils/findRepoRoot";
 import { Acclimate } from "@avandar/acclimate";
 import { match } from "ts-pattern";
 import type { ReleaseCommands } from "@ava-cli/ReleaseCli/createReleaseCommands";
-import type { ReleaseLine } from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
 
 const USAGE = `ava release notes: publish GitHub release notes for an existing release.
 
@@ -71,38 +69,33 @@ function _findUnknownReleaseNotesFlags(
 }
 
 /**
- * The bare `X.Y.Z` of the newest tag `line` released, or undefined when it has
- * none. A tag belongs to the line when the line would tag that version with
- * it, so `v0.14.2` counts and a suffixed tag such as `v0.15.0-rc` does not.
+ * The bare `X.Y.Z` of the newest release tag, or undefined when there is none.
+ * A tag counts when a release would tag that version with it, so `v0.14.2`
+ * counts and a suffixed tag such as `v0.15.0-rc` does not.
  */
 function _getNewestVersionFromTags(
-  options: Readonly<{ tags: readonly string[]; line: ReleaseLine }>,
+  tags: readonly string[],
 ): string | undefined {
-  const { tags, line } = options;
-  const lineVersions = tags
+  const releasedVersions = tags
     .map((tag) => {
       return { tag, version: toReleaseVersion(tag.replace(/^v/, "")) };
     })
     .filter(({ tag, version }) => {
-      return toReleaseTag(version, line) === tag;
+      return toReleaseTag(version) === tag;
     });
-  return lineVersions.at(-1)?.version;
+  return releasedVersions.at(-1)?.version;
 }
 
 /**
  * Asks which released version to publish notes for, suggesting the newest
- * release on `line`.
+ * release.
  */
 async function _promptForReleasedVersion(
   git: ReleaseCommands,
-  line: ReleaseLine,
 ): Promise<string> {
   return promptForVersion({
     message: "Which released version should get published notes?",
-    defaultValue: _getNewestVersionFromTags({
-      tags: listSortedReleaseTags(git),
-      line,
-    }),
+    defaultValue: _getNewestVersionFromTags(listSortedReleaseTags(git)),
     label: "Version",
   });
 }
@@ -119,13 +112,12 @@ async function _runReleaseNotes(
   }
   const git = createReleaseCommands({ repoRoot, dryRun: args.dryRun });
 
-  const line = MAINLINE_RELEASE_LINE;
-  const version = args.version ?? (await _promptForReleasedVersion(git, line));
+  const version = args.version ?? (await _promptForReleasedVersion(git));
   const validation = validateReleaseVersion(version, "Version");
   if (!validation.valid) {
     throw new Error(validation.message);
   }
-  const releaseTag = toReleaseTag(version, line);
+  const releaseTag = toReleaseTag(version);
 
   const outcome = await publishReleaseNotes(git, {
     releaseTag,

@@ -1,9 +1,9 @@
+import { RELEASE_SOURCE_BRANCH } from "@ava-cli/ReleaseCli/releaseBranches/releaseBranches";
 import { promptForVersion } from "@ava-cli/ReleaseCli/releasePromptHelpers";
 import {
   suggestNextVersion,
   validateReleaseVersion,
 } from "@ava-cli/ReleaseCli/releaseVersionUtils/releaseVersionUtils";
-import type { ReleaseLine } from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
 
 /**
  * Resolving the two versions a release needs, from the command line when they
@@ -12,23 +12,17 @@ import type { ReleaseLine } from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/g
 
 /** How a version was arrived at: an option, a suggestion, or an answer. */
 type ResolveVersionOptions = {
-  /** The line being released, which words the prompts. */
-  line: ReleaseLine;
   /** The value passed on the command line, when there was one. */
   provided: string | undefined;
   /** Accept every suggestion without asking. */
   assumeYes: boolean;
 };
 
-/** The release-version prompt. */
-function _buildReleaseVersionPrompt(): string {
-  return "What version number do you want for this release?";
-}
+/** The question asked when the release version was not passed as an option. */
+const RELEASE_VERSION_PROMPT =
+  "What version number do you want for this release?";
 
-/**
- * Resolve the version being released, as a bare `X.Y.Z`. The line's release
- * suffix is added later, when the version is written and tagged.
- */
+/** Resolve the version being released. */
 export async function resolveReleaseVersion(
   options: Readonly<ResolveVersionOptions & { suggested: string }>,
 ): Promise<string> {
@@ -40,7 +34,7 @@ export async function resolveReleaseVersion(
   return assumeYes
     ? suggested
     : promptForVersion({
-        message: _buildReleaseVersionPrompt(),
+        message: RELEASE_VERSION_PROMPT,
         defaultValue: suggested,
         label: "The release version",
       });
@@ -50,7 +44,7 @@ export async function resolveReleaseVersion(
 export async function resolveNextVersion(
   options: Readonly<ResolveVersionOptions & { releaseVersion: string }>,
 ): Promise<string> {
-  const { line, provided, releaseVersion, assumeYes } = options;
+  const { provided, releaseVersion, assumeYes } = options;
 
   if (provided !== undefined) {
     return _requireValidVersion(provided, "The next version");
@@ -66,7 +60,7 @@ export async function resolveNextVersion(
     return suggested;
   }
   return promptForVersion({
-    message: `Which version should ${line.sourceBranch} move to next?`,
+    message: `Which version should ${RELEASE_SOURCE_BRANCH} move to next?`,
     defaultValue: suggested,
     label: "The next version",
   });

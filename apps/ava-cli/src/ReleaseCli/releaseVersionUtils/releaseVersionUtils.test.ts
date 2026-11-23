@@ -1,8 +1,6 @@
-import { MAINLINE_RELEASE_LINE } from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
 import {
   suggestNextVersion,
   toDevVersion,
-  toPublishedVersion,
   toReleaseTag,
   toReleaseVersion,
   validateReleaseVersion,
@@ -95,10 +93,9 @@ describe("suggestNextVersion", () => {
   });
 });
 
-describe("toDevVersion, toPublishedVersion, and toReleaseTag", () => {
-  it("uses no release suffix and -dev on mainline", () => {
-    expect(toDevVersion("0.10.3", MAINLINE_RELEASE_LINE)).toBe("0.10.3-dev");
-    expect(toPublishedVersion("0.10.2", MAINLINE_RELEASE_LINE)).toBe("0.10.2");
-    expect(toReleaseTag("0.10.2", MAINLINE_RELEASE_LINE)).toBe("v0.10.2");
+describe("toDevVersion and toReleaseTag", () => {
+  it("formats the develop version and the tag", () => {
+    expect(toDevVersion("0.10.3")).toBe("0.10.3-dev");
+    expect(toReleaseTag("0.10.2")).toBe("v0.10.2");
   });
 });

@@ -28,7 +28,7 @@ async function _runWithoutVersion(): Promise<void> {
 
 /**
  * Release tags as `git tag --sort=v:refname` sorts them, including suffixed
- * tags from a retired release line that are not mainline releases.
+ * tags from a retired release line that are not releases.
  */
 const MIXED_RELEASE_TAGS = [
   "v0.14.1",
@@ -112,7 +112,7 @@ describe("ava release notes", () => {
     expect(process.exitCode).toBe(1);
   });
 
-  it("does not accept --alpha", async () => {
+  it("refuses --alpha with exit code 1, publishing nothing", async () => {
     process.argv.push("--version", "0.15.0", "--alpha");
 
     await ReleaseNotesCli.state.action?.({
@@ -256,7 +256,7 @@ describe("ava release notes", () => {
       ).mockResolvedValue({ kind: "previewed", notes: "preview" });
     });
 
-    it("suggests the newest mainline version, skipping newer suffixed tags", async () => {
+    it("suggests the newest release version, skipping newer suffixed tags", async () => {
       await _runWithoutVersion();
 
       expect(releasePromptHelpersModule.promptForVersion).toHaveBeenCalledWith(

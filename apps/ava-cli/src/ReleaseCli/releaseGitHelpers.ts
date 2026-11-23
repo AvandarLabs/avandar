@@ -15,7 +15,7 @@ const LOCAL_BRANCH_REF_PREFIX = "refs/heads/";
 
 /**
  * The branch currently checked out, or undefined on a detached HEAD, for
- * deciding which line to release and naming the branch in a refusal.
+ * refusing any branch other than `develop` and naming it in a refusal.
  */
 export function getCurrentBranch(git: ReleaseCommands): string | undefined {
   // `symbolic-ref` reads HEAD itself. `rev-parse --abbrev-ref HEAD` would

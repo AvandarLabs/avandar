@@ -1,7 +1,10 @@
 import { describeCommandFailure } from "@ava-cli/ReleaseCli/describeCommandFailure/describeCommandFailure";
+import {
+  RELEASE_SOURCE_BRANCH,
+  SOURCE_CI_WORKFLOW,
+} from "@ava-cli/ReleaseCli/releaseBranches/releaseBranches";
 import { propEq } from "@avandar/utils";
 import type { ReleaseCommands } from "@ava-cli/ReleaseCli/createReleaseCommands";
-import type { ReleaseLine } from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
 
 /** The source branch's CI verdict for one commit. */
 export type CiStatus =
@@ -60,8 +63,8 @@ function _parseRuns(json: string): readonly WorkflowRun[] | undefined {
 
 /**
  * Asks the GitHub CLI for the source branch's CI verdict on `commitSha`, the
- * commit about to be released, read from the line's `sourceCiWorkflow` runs on
- * its `sourceBranch` (`staging.yaml` on `develop`).
+ * commit about to be released, read from the `staging.yaml` runs on
+ * `develop`.
  *
  * Pushing the target branch deploys, so the last chance to notice a red build
  * is before the release. A missing or unusable `gh` is reported as "unknown"
@@ -70,17 +73,17 @@ function _parseRuns(json: string): readonly WorkflowRun[] | undefined {
  */
 export function checkSourceBranchCi(
   git: ReleaseCommands,
-  options: Readonly<{ commitSha: string; line: ReleaseLine }>,
+  options: Readonly<{ commitSha: string }>,
 ): CiStatus {
-  const { commitSha, line } = options;
+  const { commitSha } = options;
 
   const result = git.readCommand("gh", [
     "run",
     "list",
     "--branch",
-    line.sourceBranch,
+    RELEASE_SOURCE_BRANCH,
     "--workflow",
-    line.sourceCiWorkflow,
+    SOURCE_CI_WORKFLOW,
     "--limit",
     "20",
     "--json",

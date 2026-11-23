@@ -1,4 +1,3 @@
-import { MAINLINE_RELEASE_LINE } from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
 import { promptForVersion } from "@ava-cli/ReleaseCli/releasePromptHelpers";
 import {
   resolveNextVersion,
@@ -18,7 +17,6 @@ describe("version prompts", () => {
 
   it("asks for the release version", async () => {
     await resolveReleaseVersion({
-      line: MAINLINE_RELEASE_LINE,
       provided: undefined,
       suggested: "0.14.2",
       assumeYes: false,
@@ -33,7 +31,6 @@ describe("version prompts", () => {
 
   it("names develop when asking for the next version", async () => {
     await resolveNextVersion({
-      line: MAINLINE_RELEASE_LINE,
       provided: undefined,
       releaseVersion: "0.15.0",
       assumeYes: false,

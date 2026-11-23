@@ -337,7 +337,7 @@ describe("ava release on a source branch", () => {
     rmSync(directory, { recursive: true, force: true });
   });
 
-  it("runs preflight on develop, with no banner first", async () => {
+  it("refuses a dirty develop in preflight", async () => {
     _git({ cwd: repoRoot, args: ["switch", "-c", "develop"] });
     // A tracked change makes preflight refuse locally, before any fetch.
     writeFileSync(join(repoRoot, "package.json"), '{"version":"dirty"}\n');
@@ -345,7 +345,6 @@ describe("ava release on a source branch", () => {
     await _runRelease({ dryRun: true });
 
     const stdout = _stdoutText();
-    expect(stdout).not.toContain("develop to main.");
     expect(stdout).toContain("The working tree has tracked changes");
     expect(process.exitCode).toBe(1);
   });
@@ -506,14 +505,14 @@ type EndToEndReleaseCase = {
   /** The branch the release publishes to. */
   targetBranch: string;
   /** The retired line's branches, which the release must not touch. */
-  otherLineBranches: string[];
+  retiredLineBranches: string[];
   version: string;
   nextVersion: string;
   /** package.json on the target branch after the release. */
   publishedVersion: string;
   releaseTag: string;
   /** The tag the retired line would have used, which must not appear. */
-  otherLineTag: string;
+  retiredLineTag: string;
   /** package.json on the source branch after the release. */
   nextDevVersion: string;
 };
@@ -522,12 +521,12 @@ const END_TO_END_RELEASE_CASES: readonly EndToEndReleaseCase[] = [
   {
     sourceBranch: "develop",
     targetBranch: "main",
-    otherLineBranches: ["alpha", "alpha-dev"],
+    retiredLineBranches: ["alpha", "alpha-dev"],
     version: "0.14.2",
     nextVersion: "0.14.3",
     publishedVersion: "0.14.2",
     releaseTag: "v0.14.2",
-    otherLineTag: "v0.14.2-alpha",
+    retiredLineTag: "v0.14.2-alpha",
     nextDevVersion: "0.14.3-dev",
   },
 ];
@@ -594,8 +593,8 @@ describe.each(END_TO_END_RELEASE_CASES)(
       });
     };
 
-    it(`leaves ${releaseCase.otherLineBranches.join(" and ")} on origin untouched`, () => {
-      releaseCase.otherLineBranches.forEach((branch) => {
+    it(`leaves ${releaseCase.retiredLineBranches.join(" and ")} on origin untouched`, () => {
+      releaseCase.retiredLineBranches.forEach((branch) => {
         expect(tipsAfter[branch]).toBe(tipsBefore[branch]);
       });
     });
@@ -655,11 +654,11 @@ describe.each(END_TO_END_RELEASE_CASES)(
       ).toBe(tipsAfter[targetBranch]);
     });
 
-    it(`creates no ${releaseCase.otherLineTag} tag`, () => {
+    it(`creates no ${releaseCase.retiredLineTag} tag`, () => {
       expect(
         _git({
           cwd: origin,
-          args: ["tag", "--list", releaseCase.otherLineTag],
+          args: ["tag", "--list", releaseCase.retiredLineTag],
         }),
       ).toBe("");
     });

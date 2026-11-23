@@ -1,6 +1,12 @@
 import { checkSourceBranchCi } from "@ava-cli/ReleaseCli/checkSourceBranchCi/checkSourceBranchCi";
 import { describeCiStatus } from "@ava-cli/ReleaseCli/describeCiStatus/describeCiStatus";
 import {
+  DEPLOY_WARNING,
+  RELEASE_SOURCE_BRANCH,
+  RELEASE_TARGET_BRANCH,
+  TARGET_DEPLOY_WORKFLOW,
+} from "@ava-cli/ReleaseCli/releaseBranches/releaseBranches";
+import {
   getGitHubRepoSlug,
   readTreeSha,
   shortSha,
@@ -17,7 +23,6 @@ import {
   printWarn,
 } from "@ava-cli/utils/cliOutput/cliOutput";
 import type { ReleaseCommands } from "@ava-cli/ReleaseCli/createReleaseCommands";
-import type { ReleaseLine } from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
 import type { PublishReleaseNotesOutcome } from "@ava-cli/ReleaseCli/releaseChangelog/publishReleaseNotes/publishReleaseNotes";
 import type { ReleasePlan } from "@ava-cli/ReleaseCli/runRelease/releaseStageHelpers/releaseStageHelpers";
 
@@ -31,18 +36,14 @@ import type { ReleasePlan } from "@ava-cli/ReleaseCli/runRelease/releaseStageHel
 type ConfirmCiVerdictOptions = {
   /** The source-branch commit being released. */
   commitSha: string;
-  /** The line released, which names the branch and workflow to check. */
-  line: ReleaseLine;
   /** Release on anything other than a pass without asking (`--yes`). */
   assumeYes: boolean;
   /** Skip the check entirely (`--skip-ci-check`). */
   skip: boolean;
 };
 
-/** The warning printed when `--skip-ci-check` skips the line's CI check. */
-function _buildSkipCiCheckWarning(line: ReleaseLine): string {
-  return `Skipping ${line.sourceBranch}'s CI check.`;
-}
+/** The warning printed when `--skip-ci-check` skips the source branch's CI. */
+const SKIP_CI_CHECK_WARNING = `Skipping ${RELEASE_SOURCE_BRANCH}'s CI check.`;
 
 /**
  * Report the source branch's CI verdict for the commit being released. A pass
@@ -52,15 +53,15 @@ export async function confirmCiVerdict(
   git: ReleaseCommands,
   options: Readonly<ConfirmCiVerdictOptions>,
 ): Promise<void> {
-  const { commitSha, line, assumeYes, skip } = options;
+  const { commitSha, assumeYes, skip } = options;
 
   if (skip) {
-    printWarn(_buildSkipCiCheckWarning(line));
+    printWarn(SKIP_CI_CHECK_WARNING);
     return;
   }
   printHeading("CI");
-  const ciStatus = checkSourceBranchCi(git, { commitSha, line });
-  const verdict = `${describeCiStatus({ status: ciStatus, line })} (${shortSha(commitSha)})`;
+  const ciStatus = checkSourceBranchCi(git, { commitSha });
+  const verdict = `${describeCiStatus(ciStatus)} (${shortSha(commitSha)})`;
 
   if (ciStatus.kind === "passed") {
     printSuccess(verdict);
@@ -74,7 +75,7 @@ export async function confirmCiVerdict(
 
 /** The last-chance prompt, e.g. `Release 0.15.0?`. */
 function _buildConfirmPrompt(plan: Readonly<ReleasePlan>): string {
-  return `Release ${plan.publishedVersion}?`;
+  return `Release ${plan.releaseVersion}?`;
 }
 
 /** Print the three numbered steps the release will take. */
@@ -82,22 +83,21 @@ function _printPlanSteps(
   options: Readonly<{ plan: ReleasePlan; originSourceSha: string }>,
 ): void {
   const { plan, originSourceSha } = options;
-  const { line, sourceVersion, publishedVersion, nextVersion, releaseTag } =
-    plan;
+  const { sourceVersion, releaseVersion, nextVersion, releaseTag } = plan;
 
   printHeading("Plan");
   printDetails([
     [
-      `1. ${line.sourceBranch}:`,
-      `${sourceVersion} to ${publishedVersion}, pushed`,
+      `1. ${RELEASE_SOURCE_BRANCH}:`,
+      `${sourceVersion} to ${releaseVersion}, pushed`,
     ],
     [
-      `2. ${line.targetBranch}:`,
-      `set to ${line.sourceBranch}@${shortSha(originSourceSha)}'s tree, tagged ${releaseTag}`,
+      `2. ${RELEASE_TARGET_BRANCH}:`,
+      `set to ${RELEASE_SOURCE_BRANCH}@${shortSha(originSourceSha)}'s tree, tagged ${releaseTag}`,
     ],
     [
-      `3. ${line.sourceBranch}:`,
-      `${publishedVersion} to ${toDevVersion(nextVersion, line)}, pushed`,
+      `3. ${RELEASE_SOURCE_BRANCH}:`,
+      `${releaseVersion} to ${toDevVersion(nextVersion)}, pushed`,
     ],
   ]);
 }
@@ -119,15 +119,14 @@ export async function confirmReleasePlan(
   options: Readonly<ConfirmReleasePlanOptions>,
 ): Promise<void> {
   const { plan, originSourceSha, originTargetSha, assumeYes } = options;
-  const { line } = plan;
 
   _printPlanSteps({ plan, originSourceSha });
   if (readTreeSha(git, originSourceSha) === readTreeSha(git, originTargetSha)) {
     printWarn(
-      `${line.sourceBranch} and ${line.targetBranch} already have identical content: this release ships no changes.`,
+      `${RELEASE_SOURCE_BRANCH} and ${RELEASE_TARGET_BRANCH} already have identical content: this release ships no changes.`,
     );
   }
-  printWarn(line.deployWarning);
+  printWarn(DEPLOY_WARNING);
 
   if (
     !git.dryRun &&
@@ -202,20 +201,20 @@ export function printReleaseSummary(
   options: Readonly<{ plan: ReleasePlan; releaseSha: string }>,
 ): void {
   const { plan, releaseSha } = options;
-  const { line, publishedVersion, nextVersion, releaseTag } = plan;
+  const { releaseVersion, nextVersion, releaseTag } = plan;
 
-  printHeading(`Released ${publishedVersion}`);
+  printHeading(`Released ${releaseVersion}`);
   printSuccess(
-    `${line.targetBranch} = ${line.sourceBranch}@${shortSha(releaseSha)}, tagged ${releaseTag}`,
+    `${RELEASE_TARGET_BRANCH} = ${RELEASE_SOURCE_BRANCH}@${shortSha(releaseSha)}, tagged ${releaseTag}`,
   );
-  printSuccess(`${line.sourceBranch} = ${toDevVersion(nextVersion, line)}`);
+  printSuccess(`${RELEASE_SOURCE_BRANCH} = ${toDevVersion(nextVersion)}`);
 
   const repoSlug = getGitHubRepoSlug(git);
   if (repoSlug === undefined) {
     return;
   }
   printInfo(
-    `Deploy run: https://github.com/${repoSlug}/actions/workflows/${line.targetDeployWorkflow}`,
+    `Deploy run: https://github.com/${repoSlug}/actions/workflows/${TARGET_DEPLOY_WORKFLOW}`,
   );
   printInfo(
     `Tag:        https://github.com/${repoSlug}/releases/tag/${releaseTag}`,

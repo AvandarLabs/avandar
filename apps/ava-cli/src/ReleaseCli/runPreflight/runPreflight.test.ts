@@ -1,4 +1,4 @@
-import { MAINLINE_RELEASE_LINE } from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
+import { RELEASE_SOURCE_BRANCH } from "@ava-cli/ReleaseCli/releaseBranches/releaseBranches";
 import { runPreflight } from "@ava-cli/ReleaseCli/runPreflight/runPreflight";
 import { describe, expect, it } from "vitest";
 import type {
@@ -85,7 +85,7 @@ function _fillRepoStateDefaults(
   state: Readonly<FakeRepoState>,
 ): FilledRepoState {
   return {
-    branch: MAINLINE_RELEASE_LINE.sourceBranch,
+    branch: RELEASE_SOURCE_BRANCH,
     trackedChanges: "",
     pushPermission: { ok: true, stdout: "true", stderr: "" },
     fetchOk: true,
@@ -246,16 +246,6 @@ describe("runPreflight", () => {
     );
   });
 
-  it("resolves the mainline release line on develop", () => {
-    const { git } = _createFakeCommands({
-      branch: MAINLINE_RELEASE_LINE.sourceBranch,
-    });
-
-    const result = runPreflight(git);
-
-    expect(result.ok === true && result.line).toBe(MAINLINE_RELEASE_LINE);
-  });
-
   it("reads the local target branch, not a tag with the same name", () => {
     const { git } = _createFakeCommands({ targetTag: "tag-sha" });
 
@@ -411,7 +401,7 @@ describe("runPreflight", () => {
 
     expect(result.ok === false && result.reason).toBe("out-of-sync");
     expect(result.ok === false && result.message).toContain(
-      `origin/${MAINLINE_RELEASE_LINE.sourceBranch}`,
+      `origin/${RELEASE_SOURCE_BRANCH}`,
     );
   });
 

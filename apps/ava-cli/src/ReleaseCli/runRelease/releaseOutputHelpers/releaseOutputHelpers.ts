@@ -1,7 +1,10 @@
+import {
+  RELEASE_SOURCE_BRANCH,
+  RELEASE_TARGET_BRANCH,
+} from "@ava-cli/ReleaseCli/releaseBranches/releaseBranches";
 import { toDevVersion } from "@ava-cli/ReleaseCli/releaseVersionUtils/releaseVersionUtils";
 import { Acclimate } from "@avandar/acclimate";
 import { isDefined } from "@avandar/utils";
-import type { ReleaseLine } from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
 
 /**
  * Terminal output helpers shared by the release stages: headings, aligned
@@ -38,8 +41,6 @@ export function printDetails(details: readonly ReleaseDetail[]): void {
 
 /** What the version reference block needs in order to be useful. */
 export type VersionReferenceOptions = {
-  /** The line being released, which names the branches in each row. */
-  line: ReleaseLine;
   /** The version on the release target branch, if it could be read. */
   targetVersion: string | undefined;
   /** The version currently on the source branch, e.g. `0.10.2-dev`. */
@@ -65,7 +66,6 @@ export function printVersionReference(
   options: Readonly<VersionReferenceOptions>,
 ): void {
   const {
-    line,
     targetVersion,
     sourceVersion,
     suggestedRelease,
@@ -82,18 +82,18 @@ export function printVersionReference(
     needsNextVersion && isDefined(suggestedNext)
       ? ([
           "suggested next:",
-          `${suggestedNext} (patch bump, becomes ${toDevVersion(suggestedNext, line)})`,
+          `${suggestedNext} (patch bump, becomes ${toDevVersion(suggestedNext)})`,
         ] as const)
       : undefined;
   const details = [
     needsReleaseVersion
       ? ([
-          `current on ${line.targetBranch}:`,
+          `current on ${RELEASE_TARGET_BRANCH}:`,
           targetVersion ?? "unknown",
         ] as const)
       : undefined,
     needsReleaseVersion
-      ? ([`current on ${line.sourceBranch}:`, sourceVersion] as const)
+      ? ([`current on ${RELEASE_SOURCE_BRANCH}:`, sourceVersion] as const)
       : undefined,
     needsReleaseVersion
       ? (["suggested release:", suggestedRelease] as const)

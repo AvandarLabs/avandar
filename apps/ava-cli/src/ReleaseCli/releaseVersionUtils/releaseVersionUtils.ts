@@ -5,7 +5,7 @@
  * testable on their own.
  */
 
-import type { ReleaseLine } from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
+import { DEV_VERSION_SUFFIX } from "@ava-cli/ReleaseCli/releaseBranches/releaseBranches";
 
 /** `X.Y.Z`, with nothing before or after. */
 const RELEASE_VERSION_REGEX = /^\d+\.\d+\.\d+$/;
@@ -18,9 +18,8 @@ export type VersionValidationResult =
  * Validates a version the user typed or passed as an option.
  *
  * Rejects the two mistakes that are easy to make and expensive to undo: a `v`
- * prefix (the git tag adds that, so `vv0.1.0` would be published) and a
- * `-dev` suffix (this command adds it from the release line itself, so a
- * typed one would be doubled).
+ * prefix (the git tag adds that, so `vv0.1.0` would be published) and a `-dev`
+ * suffix (only `develop` carries that, and this command appends it itself).
  */
 export function validateReleaseVersion(
   version: string,
@@ -85,20 +84,12 @@ export function suggestNextVersion(releaseVersion: string): string | undefined {
   return `${major}.${minor}.${patchNumber + 1}`;
 }
 
-/**
- * The version the line's source branch moves to after a release, e.g.
- * `0.10.3-dev`.
- */
-export function toDevVersion(version: string, line: ReleaseLine): string {
-  return `${version}${line.devSuffix}`;
+/** The version `develop` moves to after the release, e.g. `0.10.3-dev`. */
+export function toDevVersion(version: string): string {
+  return `${version}${DEV_VERSION_SUFFIX}`;
 }
 
-/** The version written to package.json on release, e.g. `0.10.2`. */
-export function toPublishedVersion(version: string, line: ReleaseLine): string {
-  return `${version}${line.releaseSuffix}`;
-}
-
-/** The git tag for a release, e.g. `v0.10.2`. */
-export function toReleaseTag(version: string, line: ReleaseLine): string {
-  return `v${toPublishedVersion(version, line)}`;
+/** The git tag for a release version, e.g. `v0.10.2`. */
+export function toReleaseTag(version: string): string {
+  return `v${version}`;
 }

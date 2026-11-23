@@ -1,4 +1,3 @@
-import { MAINLINE_RELEASE_LINE } from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
 import { promptToConfirm } from "@ava-cli/ReleaseCli/releasePromptHelpers";
 import {
   confirmCiVerdict,
@@ -18,7 +17,6 @@ import type {
   CommandResult,
   ReleaseCommands,
 } from "@ava-cli/ReleaseCli/createReleaseCommands";
-import type { ReleaseLine } from "@ava-cli/ReleaseCli/getReleaseLineFromBranch/getReleaseLineFromBranch";
 import type { ReleasePlan } from "@ava-cli/ReleaseCli/runRelease/releaseStageHelpers/releaseStageHelpers";
 
 vi.mock("@ava-cli/ReleaseCli/releasePromptHelpers");
@@ -116,23 +114,13 @@ function _createFakeCommands(checkout: Readonly<FakeCheckout> = {}): {
   return { git, mutations };
 }
 
-/** The line's test plan versions: 0.14.2 on mainline. */
-const PLAN_VERSIONS_BY_KIND: Readonly<
-  Record<ReleaseLine["kind"], Omit<ReleasePlan, "line">>
-> = {
-  mainline: {
-    sourceVersion: "0.14.2-dev",
-    releaseVersion: "0.14.2",
-    publishedVersion: "0.14.2",
-    nextVersion: "0.14.3",
-    releaseTag: "v0.14.2",
-  },
+/** The plan the tests release: 0.14.2, with develop moving to 0.14.3-dev. */
+const RELEASE_PLAN: Readonly<ReleasePlan> = {
+  sourceVersion: "0.14.2-dev",
+  releaseVersion: "0.14.2",
+  nextVersion: "0.14.3",
+  releaseTag: "v0.14.2",
 };
-
-/** A plan for releasing `line` at its versions in `PLAN_VERSIONS_BY_KIND`. */
-function _createPlan(line: ReleaseLine): ReleasePlan {
-  return { line, ...PLAN_VERSIONS_BY_KIND[line.kind] };
-}
 
 /** Everything a spied `Acclimate.log` printed, one call per line. */
 function _getLoggedText(): string {
@@ -158,11 +146,11 @@ describe("release stages", () => {
     vi.restoreAllMocks();
   });
 
-  it("sets develop to 0.14.2 and pushes it by full ref on the mainline", () => {
+  it("sets develop to 0.14.2 and pushes it by full ref", () => {
     const { git, mutations } = _createFakeCommands({ branch: "develop" });
 
     const releaseSha = commitReleaseVersionOnSource(git, {
-      plan: _createPlan(MAINLINE_RELEASE_LINE),
+      plan: RELEASE_PLAN,
       originSourceSha: "source-sha",
     });
 
@@ -179,7 +167,7 @@ describe("release stages", () => {
 
     const releaseSha = commitReleaseVersionOnSource(git, {
       plan: {
-        ..._createPlan(MAINLINE_RELEASE_LINE),
+        ...RELEASE_PLAN,
         sourceVersion: "0.14.2",
       },
       originSourceSha: "source-sha",
@@ -204,7 +192,7 @@ describe("release stages", () => {
 
       expect(() => {
         return commitReleaseVersionOnSource(git, {
-          plan: _createPlan(MAINLINE_RELEASE_LINE),
+          plan: RELEASE_PLAN,
           originSourceSha: "source-sha",
         });
       }).toThrow(/Nothing has been released\.$/);
@@ -215,7 +203,7 @@ describe("release stages", () => {
   it("bumps develop to 0.14.3-dev and pushes it by full ref", () => {
     const { git, mutations } = _createFakeCommands();
 
-    bumpSourceToNextVersion(git, _createPlan(MAINLINE_RELEASE_LINE));
+    bumpSourceToNextVersion(git, RELEASE_PLAN);
 
     expect(mutations).toEqual([
       "pnpm version 0.14.3-dev --no-git-tag-version",
@@ -224,11 +212,11 @@ describe("release stages", () => {
     ]);
   });
 
-  it("publishes refs/heads/main and tag v0.14.2 atomically on the mainline", () => {
+  it("publishes refs/heads/main and tag v0.14.2 atomically", () => {
     const { git, mutations } = _createFakeCommands();
 
     const releaseCommitSha = publishTargetAndTag(git, {
-      plan: _createPlan(MAINLINE_RELEASE_LINE),
+      plan: RELEASE_PLAN,
       releaseSha: "release-sha",
       originTargetSha: "target-sha",
     });
@@ -240,11 +228,11 @@ describe("release stages", () => {
     ]);
   });
 
-  it("titles the mainline release commit Release 0.14.2, carrying develop's tree onto main", () => {
+  it("titles the release commit Release 0.14.2, carrying develop's tree onto main", () => {
     const { git, mutations } = _createFakeCommands();
 
     publishTargetAndTag(git, {
-      plan: _createPlan(MAINLINE_RELEASE_LINE),
+      plan: RELEASE_PLAN,
       releaseSha: "release-sha",
       originTargetSha: "target-sha",
     });
@@ -258,7 +246,6 @@ describe("release stages", () => {
     const { git, mutations } = _createFakeCommands();
 
     updateLocalTargetRef(git, {
-      line: MAINLINE_RELEASE_LINE,
       releaseCommitSha: "release-commit-sha",
       localTargetSha: "target-sha",
       originTargetSha: "target-sha",
@@ -275,7 +262,6 @@ describe("release stages", () => {
     });
 
     updateLocalTargetRef(git, {
-      line: MAINLINE_RELEASE_LINE,
       releaseCommitSha: "release-commit-sha",
       localTargetSha: "target-sha",
       originTargetSha: "target-sha",
@@ -286,8 +272,6 @@ describe("release stages", () => {
 });
 
 describe("reportReleaseNotesOutcome", () => {
-  const MAINLINE_PLAN = _createPlan(MAINLINE_RELEASE_LINE);
-
   beforeEach(() => {
     vi.spyOn(Acclimate, "log").mockImplementation(() => {
       return undefined;
@@ -300,7 +284,7 @@ describe("reportReleaseNotesOutcome", () => {
   it("prints nothing when notes were published", () => {
     reportReleaseNotesOutcome(
       { kind: "published", url: "https://github.com/x/y/releases/tag/v0.14.2" },
-      { plan: MAINLINE_PLAN, dryRun: false },
+      { plan: RELEASE_PLAN, dryRun: false },
     );
     expect(Acclimate.log).not.toHaveBeenCalled();
   });
@@ -308,7 +292,7 @@ describe("reportReleaseNotesOutcome", () => {
   it("prints the preview notes on a dry run without a retry hint", () => {
     reportReleaseNotesOutcome(
       { kind: "previewed", notes: "- Did a thing" },
-      { plan: MAINLINE_PLAN, dryRun: false },
+      { plan: RELEASE_PLAN, dryRun: false },
     );
     expect(_getLoggedText()).toContain("Did a thing");
     expect(_getLoggedText()).not.toContain("ava release notes");
@@ -317,7 +301,7 @@ describe("reportReleaseNotesOutcome", () => {
   it("prints an informational line for no-changes", () => {
     reportReleaseNotesOutcome(
       { kind: "no-changes" },
-      { plan: MAINLINE_PLAN, dryRun: false },
+      { plan: RELEASE_PLAN, dryRun: false },
     );
     expect(_getLoggedText()).toContain("No commits found");
   });
@@ -325,7 +309,7 @@ describe("reportReleaseNotesOutcome", () => {
   it("warns and prints the retry command when publishing failed", () => {
     reportReleaseNotesOutcome(
       { kind: "failed", reason: "network error" },
-      { plan: MAINLINE_PLAN, dryRun: false },
+      { plan: RELEASE_PLAN, dryRun: false },
     );
     expect(_getLoggedText()).toContain("network error");
     expect(_getLoggedText()).toContain("ava release notes --version 0.14.2");
@@ -337,7 +321,7 @@ describe("reportReleaseNotesOutcome", () => {
         kind: "already-exists",
         url: "https://github.com/x/y/releases/tag/v0.14.2",
       },
-      { plan: MAINLINE_PLAN, dryRun: false },
+      { plan: RELEASE_PLAN, dryRun: false },
     );
     expect(_getLoggedText()).toContain(
       "Release notes already exist for v0.14.2",
@@ -348,7 +332,7 @@ describe("reportReleaseNotesOutcome", () => {
   it("warns and prints the retry command when the tag can't be found", () => {
     reportReleaseNotesOutcome(
       { kind: "tag-not-found" },
-      { plan: MAINLINE_PLAN, dryRun: false },
+      { plan: RELEASE_PLAN, dryRun: false },
     );
     expect(_getLoggedText()).toContain("Could not find tag v0.14.2");
     expect(_getLoggedText()).toContain("ava release notes --version 0.14.2");
@@ -357,7 +341,7 @@ describe("reportReleaseNotesOutcome", () => {
   it("suppresses the retry hint for a failed outcome on a dry run", () => {
     reportReleaseNotesOutcome(
       { kind: "failed", reason: "network error" },
-      { plan: MAINLINE_PLAN, dryRun: true },
+      { plan: RELEASE_PLAN, dryRun: true },
     );
     expect(_getLoggedText()).toContain("network error");
     expect(_getLoggedText()).not.toContain("ava release notes");
@@ -366,7 +350,7 @@ describe("reportReleaseNotesOutcome", () => {
   it("suppresses the retry hint for tag-not-found on a dry run", () => {
     reportReleaseNotesOutcome(
       { kind: "tag-not-found" },
-      { plan: MAINLINE_PLAN, dryRun: true },
+      { plan: RELEASE_PLAN, dryRun: true },
     );
     expect(_getLoggedText()).not.toContain("ava release notes");
   });
@@ -467,7 +451,6 @@ describe("confirmCiVerdict", () => {
 
       await confirmCiVerdict(git, {
         commitSha: "source-sha",
-        line: MAINLINE_RELEASE_LINE,
         assumeYes: true,
         skip: false,
       });
@@ -481,7 +464,6 @@ describe("confirmCiVerdict", () => {
 
     await confirmCiVerdict(git, {
       commitSha: "source-sha",
-      line: MAINLINE_RELEASE_LINE,
       assumeYes: false,
       skip: false,
     });
@@ -491,13 +473,12 @@ describe("confirmCiVerdict", () => {
   });
 
   it.each(NON_PASSING_VERDICTS)(
-    "proceeds on a mainline %s verdict with assumeYes, without asking",
+    "proceeds on a %s verdict with assumeYes, without asking",
     async (verdict) => {
       const { git } = _createFakeCommandsWithCi(verdict);
 
       await confirmCiVerdict(git, {
         commitSha: "source-sha",
-        line: MAINLINE_RELEASE_LINE,
         assumeYes: true,
         skip: false,
       });
@@ -506,12 +487,11 @@ describe("confirmCiVerdict", () => {
     },
   );
 
-  it("asks before a mainline release on a failed verdict", async () => {
+  it("asks before a release on a failed verdict", async () => {
     const { git } = _createFakeCommandsWithCi("failed");
 
     await confirmCiVerdict(git, {
       commitSha: "source-sha",
-      line: MAINLINE_RELEASE_LINE,
       assumeYes: false,
       skip: false,
     });
@@ -519,14 +499,13 @@ describe("confirmCiVerdict", () => {
     expect(promptToConfirm).toHaveBeenCalledExactlyOnceWith("Release anyway?");
   });
 
-  it("aborts a mainline release when the reviewer declines a failed verdict", async () => {
+  it("aborts a release when the reviewer declines a failed verdict", async () => {
     vi.mocked(promptToConfirm).mockResolvedValue(false);
     const { git } = _createFakeCommandsWithCi("failed");
 
     await expect(
       confirmCiVerdict(git, {
         commitSha: "source-sha",
-        line: MAINLINE_RELEASE_LINE,
         assumeYes: false,
         skip: false,
       }),
@@ -538,7 +517,6 @@ describe("confirmCiVerdict", () => {
 
     await confirmCiVerdict(git, {
       commitSha: "source-sha",
-      line: MAINLINE_RELEASE_LINE,
       assumeYes: true,
       skip: true,
     });
@@ -563,7 +541,7 @@ describe("confirmReleasePlan", () => {
     const { git } = _createFakeCommands();
 
     await confirmReleasePlan(git, {
-      plan: _createPlan(MAINLINE_RELEASE_LINE),
+      plan: RELEASE_PLAN,
       originSourceSha: "source-sha",
       originTargetSha: "target-sha",
       assumeYes: false,
@@ -576,7 +554,7 @@ describe("confirmReleasePlan", () => {
     const { git } = _createFakeCommands();
 
     await confirmReleasePlan(git, {
-      plan: _createPlan(MAINLINE_RELEASE_LINE),
+      plan: RELEASE_PLAN,
       originSourceSha: "source-sha",
       originTargetSha: "target-sha",
       assumeYes: false,
@@ -593,7 +571,7 @@ describe("confirmReleasePlan", () => {
 
     await expect(
       confirmReleasePlan(git, {
-        plan: _createPlan(MAINLINE_RELEASE_LINE),
+        plan: RELEASE_PLAN,
         originSourceSha: "source-sha",
         originTargetSha: "target-sha",
         assumeYes: false,
@@ -612,13 +590,13 @@ describe("printReleaseSummary", () => {
     vi.restoreAllMocks();
   });
 
-  it("links the production.yaml deploy run on the mainline", () => {
+  it("links the production.yaml deploy run", () => {
     const { git } = _createFakeCommands({
       remoteUrl: "git@github.com:AvandarLabs/avandar.git",
     });
 
     printReleaseSummary(git, {
-      plan: _createPlan(MAINLINE_RELEASE_LINE),
+      plan: RELEASE_PLAN,
       releaseSha: "release-sha",
     });
 
