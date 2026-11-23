@@ -167,7 +167,7 @@ and the catalog scripts read the URL from `SOURCE_DB_URL` or
 | `read_db "$PROD_DB_URL" ...` | 1.4, 2.2, 6.6, 6.11 | Queries in a read-only transaction |
 | `supabase db dump --db-url "$PROD_DB_URL" ...` | 2.2, 6.6 | `pg_dump` over the session pooler as `postgres`: reads only |
 | `supabase projects api-keys`, `branches list`, `backups list`, `secrets list`, `functions list`, with `--project-ref "$PROD_REF"` | 3.3, 5.1, 5.5, 5.8, 6.6, 6.9 | Management API reads |
-| `supabase storage cp ... --project-ref "$PROD_REF"` (optional), `supabase storage ls ... --project-ref "$PROD_REF"` | 2.8, 6.11.9 | Storage downloads and listings |
+| `supabase storage cp ... --project-ref "$PROD_REF"` (optional), `supabase storage ls ... --project-ref "$PROD_REF"` | 2.8, 6.11.7, 6.11.9 | Storage downloads and listings |
 | `with_db_url "$PROD_DB_URL" "$PG_DUMP_BIN" ...` | 6.11.5 | Reads only |
 | `TARGET_DB_URL="$PROD_DB_URL" importCatalogData.sh ... --dry-run` | 6.11.4 | Reads only (the importer's report runs in read-only transactions) |
 | **Writes to production** | 5.1 (only if keys are missing), 5.8 (only if you turn PITR on), 6.8, 6.11.6 (deletes the 4 WDI datasets with the catalog), 6.11.7, 6.11.9 (`supabase storage rm`, and its restore's `supabase storage cp` upload if you ever run it), section 7 | As each step says |
@@ -972,7 +972,31 @@ tables.
 
 **6.5.3 Load the catalog** into `alpha-dev` with 6.11, target `alpha-dev`.
 
-**6.5.4 Check the site.** Sign in at `https://alpha.avandarlabs.com` with
+**6.5.4 Rehearse the catalog restore on `alpha-dev`** (writes to
+`alpha-dev`, a staging branch, not production). Run the restore 6.11.6
+printed for `alpha-dev`, from its log, then load the catalog again:
+
+```bash
+mkdir -p "$CUTOVER_DIR/catalog/restore-rehearsal" && cd "$CUTOVER_DIR/catalog/restore-rehearsal"
+LOG="$CUTOVER_DIR/catalog/import-$ALPHA_DEV_REF.log"
+bash -c "$(grep '^       sed ' "$LOG" | sed 's/^ *//')"
+sed -n '/^       begin;$/,/^       commit;$/s/^       //p' "$LOG" > restore.sql
+with_db_url "$ALPHA_DEV_DB_URL" "$PSQL_BIN" -X -P pager=off -v ON_ERROR_STOP=1 --file restore.sql
+read_db "$ALPHA_DEV_DB_URL" "select (select count(*) from public.data_catalog_listings), (select count(*) from public.datasets__open_data), (select count(*) from public.datasets)"
+cd "$REPO"
+```
+
+**Expect:** `restore-rows.sql` is written, psql ends with `COMMIT`, and the
+counts equal the `data_catalog_listings`, `datasets__open_data`, and
+`datasets` rows under `The target holds, per table:` at the top of the log
+(the state before the import). Then run 6.11.4 to 6.11.6 for `alpha-dev`
+again, with a new backup, and 6.11.7 once more: it must copy 0 and replace
+0.
+**If not:** a psql error rolls the restore back and changes nothing: keep
+the folder and the error, and do not run the production import until the
+restore works here.
+
+**6.5.5 Check the site.** Sign in at `https://alpha.avandarlabs.com` with
 your production account and open the 5 dashboards from 2.8 (no data files:
 Storage is not copied). From here `alpha-dev` holds real users' emails:
 anything there that sends email can reach them.
@@ -1150,9 +1174,10 @@ PRODUCTION (app.avandarlabs.com).`; the plan below with your versions; a
 `Dry run: stopping before tagging and pushing alpha` warning. Nothing
 changes.
 
-**6.8.3 Release.** Never pass `--yes`: it releases on a CI verdict other than
-a pass without asking. Pass `--skip-changelog` (section 9: the first alpha
-notes would cover about 2,000 commits).
+**6.8.3 Release.** On the alpha line, a CI verdict other than a pass
+refuses the release, and `--yes` does not override it: only
+`--skip-ci-check` does, and never pass it here. Pass `--skip-changelog`
+(section 9: the first alpha notes would cover about 2,000 commits).
 
 ```bash
 ava release --skip-changelog
@@ -1164,7 +1189,7 @@ ava release --skip-changelog
 | `What version number do you want for this release? (-alpha is added automatically)` | Release version, bare `X.Y.Z` | Enter for `0.15.0` |
 | `Which version should alpha-dev move to next?` | Next dev version | Enter for `0.15.1` |
 | `alpha-dev CI passed.` | `alpha-dev.yaml` passed for the tip | |
-| Anything else, then `Release anyway?` | CI did not pass for the tip | `n`, then fix CI |
+| `Refusing to release: alpha-dev's CI verdict is "<verdict>", not "passed".` (exit 1) | CI did not pass for the tip, so nothing was released | Wait for `alpha-dev.yaml` to pass on the tip, or fix CI, then run `ava release` again. Never `--skip-ci-check` |
 | Plan: `1. alpha-dev: 0.15.0-alpha-dev to 0.15.0-alpha, pushed`, `2. alpha: set to alpha-dev@<sha>'s tree, tagged v0.15.0-alpha`, `3. alpha-dev: 0.15.0-alpha to 0.15.1-alpha-dev, pushed` | What it will do | |
 | `Pushing alpha deploys PRODUCTION ...`, then `Release 0.15.0-alpha to PRODUCTION?` | Last chance | `y` |
 
@@ -1283,8 +1308,11 @@ It deletes them only when every member of each dataset's workspace has an
 with any member outside `@avandarlabs.com`, stops the whole transaction: the
 refusal names the dataset id, the workspace id, and how many members are
 outside (never their emails), and nothing changes. The check runs once in
-the read-only report and again inside the transaction, with
-`workspace_memberships` locked, so a member added in between also stops it.
+the read-only report and again inside the transaction, after it locks the
+affected rows: the 4 datasets, their workspaces, those workspaces'
+memberships, and their members' `auth.users` rows. A member added before
+that lock stops the import; one added after it waits for the import to
+finish. Every other dataset and workspace stays writable.
 
 Production has 4 such datasets, all named "World Development Indicators
 (WDI)", one each in the workspaces ChangeNOW Demo, ICT4D, Mytest, and New
@@ -1407,10 +1435,10 @@ Never edit a workspace's members to make the guard pass. A refusal about
 
 **6.11.5 Back up the target's catalog and the datasets it deletes (reads
 the target).** The dry run printed the command under `Make the backup with`:
-`with_db_url "$TARGET_DB_URL" pg_dump ...`, with one `--table` for each
-catalog table, the facet counts, `public.datasets`, and every table the
-replace reaches from it. Run it with `"$PG_DUMP_BIN"` in place of `pg_dump`
-and `--file "$BACKUP_FILE"` in place of its `--file`:
+`with_db_url "$TARGET_DB_URL" "$PG_DUMP_BIN" ...`, with one `--table` for
+each catalog table, the facet counts, `public.datasets`, and every table the
+replace reaches from it. Run it with `--file "$BACKUP_FILE"` in place of its
+`--file`:
 
 ```bash
 export BACKUP_FILE="$CUTOVER_DIR/catalog/catalog-backup-$TARGET_REF-$(date +%Y%m%d-%H%M).sql"
@@ -1426,6 +1454,10 @@ only the rows the target no longer has. If 6.11.6 refuses the backup, it
 prints the exact command again. The backup must be under 24 hours old.
 
 **6.11.6 Import** (**Writes to production** when the target is production).
+Run it in a quiet window. Until it commits, minutes for the full catalog,
+the import holds whole-table locks on the catalog tables and
+`datasets__open_data`, so a user adding a catalog dataset, or anything else
+that writes those tables, waits until it finishes.
 
 ```bash
 bash scripts/alpha/importCatalogData.sh "$CATALOG_DUMP" \
@@ -1435,7 +1467,7 @@ bash scripts/alpha/importCatalogData.sh "$CATALOG_DUMP" \
 ```
 
 It prints the same report as the dry run, how to restore the backup (keep
-that log), the plan, then asks you to type `<user>@<host>` and
+that log: 6.5.4 reads the restore from it), the plan, then asks you to type `<user>@<host>` and
 `delete <N> dependent rows`, noting that the replace deletes the 4
 `public.datasets` rows added from the catalog. Inside the transaction it
 checks the guard again, deletes the 4 datasets, then the catalog, and loads
@@ -1445,6 +1477,10 @@ null.
 to the dump's, `public.datasets` 4 lower than the report, and `Open data
 datasets with no open data details now: 0 public.datasets rows in 0
 workspaces.`
+The printed restore deletes the whole catalog the import loaded, which
+cascades to the `datasets__open_data` rows of every catalog dataset users
+added since. Use it only right after a wrong import, before users add
+catalog datasets, never as a later rollback.
 **If not:** `The import failed and its transaction rolled back: every count
 matches the report.` means nothing changed: fix and run again. A
 `Refusing to delete open data dataset ...` error is the guard: a member
@@ -1463,8 +1499,55 @@ read_db "$TARGET_DB_URL" "select count(*) from public.pipeline_executions where 
 6.11.7); then 0; then 0.
 
 **6.11.7 Copy the Parquet files** (**Writes to production** Storage when the
-target is production). Keys come from the environment only, and the copy
-runs only when both keys look right:
+target is production).
+
+**Production only, first: check and back up the legacy WDI objects (reads
+production).** The 4 datasets 6.11.6 deleted read 6 Parquet objects in
+bucket `opendata` under `world-bank__wdi/datasets/`, which 6.11.9 deletes.
+The WDI pipeline writes to these same paths, and the copy overwrites an
+object at a listing's path, so before the copy confirm the new catalog does
+not use them, and back them up:
+
+```bash
+cd "$REPO"
+read_db "$PROD_DB_URL" "select count(*) from public.data_catalog_listings l where l::text like '%world-bank__wdi%'"
+read_db "$PROD_DB_URL" "select count(*) from public.datasets__open_data o join public.data_catalog_listings l on l.id = o.catalog_listing_id where l::text like '%world-bank__wdi%'"
+WDI_BACKUP="$CUTOVER_DIR/storage/wdi-legacy"
+mkdir -p "$WDI_BACKUP"
+read_db "$PROD_DB_URL" "select substr(name, length('world-bank__wdi/datasets/') + 1), metadata->>'size', metadata->>'mimetype', metadata->>'cacheControl' from storage.objects where bucket_id = 'opendata' and name like 'world-bank__wdi/%' order by name" | tee "$WDI_BACKUP/objects.txt"
+supabase storage ls "ss:///opendata/world-bank__wdi/datasets/" --project-ref "$PROD_REF" --experimental
+```
+
+`objects.txt` records each object's name, size, content type, and cache
+time, as `name|size|mimetype|cacheControl`; 6.11.9 rechecks against it and its restore reads it.
+**Expect:** `0`; `0`; exactly these 6 objects, each
+`application/vnd.apache.parquet` with `max-age=3600` when this was written,
+and no other object under `world-bank__wdi/` (sizes in bytes):
+`WDICSV.parquet` 61201614, `WDICountry.parquet` 29967,
+`WDIcountry-series.parquet` 47694, `WDIfootnote.parquet` 3460561,
+`WDISeries.parquet` 422408, `WDIseries-time.parquet` 1947; and `ls` lists
+the same 6 names.
+**If not:** a listing that mentions `world-bank__wdi` means the new catalog
+uses these paths, so the copy below would overwrite these objects: stop and
+raise it. Any other object: stop and raise it.
+
+Back them up (a Storage read), and check the copies:
+
+```bash
+WDI_FILES=(WDIcountry-series.parquet WDICountry.parquet WDIseries-time.parquet WDISeries.parquet WDICSV.parquet WDIfootnote.parquet)
+for file in "${WDI_FILES[@]}"; do
+  supabase storage cp "ss:///opendata/world-bank__wdi/datasets/$file" \
+    "$WDI_BACKUP/$file" --project-ref "$PROD_REF" --experimental || echo "FAILED $file"
+done
+ls -l "$WDI_BACKUP"
+```
+
+**Expect:** no `FAILED` line, and 6 files whose sizes match the listing
+above. **If not:** re-run the download for the failed file. Do not start the
+Parquet copy below until all 6 are backed up.
+
+Then the copy. Keys come from the environment only, and the copy runs only
+when both keys look right:
 
 ```bash
 cd "$REPO"
@@ -1507,46 +1590,21 @@ on production (section 8).
 **6.11.9 Delete the legacy WDI Parquet objects** (production only,
 **Writes to production** Storage, after 6.11.8 passes). The 4 datasets 6.11.6
 deleted read 6 Parquet objects in bucket `opendata` under
-`world-bank__wdi/datasets/`. Nothing reads them now, but the WDI pipeline
-writes to these same paths, so first confirm the new catalog does not use
-them (reads production):
+`world-bank__wdi/datasets/`. 6.11.7 checked them and backed them up into
+`$WDI_BACKUP` before the copy. In a new terminal, set it again:
+`WDI_BACKUP="$CUTOVER_DIR/storage/wdi-legacy"`.
+
+Recheck that the 6 objects are the ones 6.11.7 backed up, unchanged, and
+that the catalog still does not use their paths (reads production):
 
 ```bash
-cd "$REPO"
 read_db "$PROD_DB_URL" "select count(*) from public.data_catalog_listings l where l::text like '%world-bank__wdi%'"
-read_db "$PROD_DB_URL" "select count(*) from public.datasets__open_data o join public.data_catalog_listings l on l.id = o.catalog_listing_id where l::text like '%world-bank__wdi%'"
-WDI_BACKUP="$CUTOVER_DIR/storage/wdi-legacy"
-mkdir -p "$WDI_BACKUP"
-read_db "$PROD_DB_URL" "select substr(name, length('world-bank__wdi/datasets/') + 1), metadata->>'size', metadata->>'mimetype', metadata->>'cacheControl' from storage.objects where bucket_id = 'opendata' and name like 'world-bank__wdi/%' order by name" | tee "$WDI_BACKUP/objects.txt"
-supabase storage ls "ss:///opendata/world-bank__wdi/datasets/" --project-ref "$PROD_REF" --experimental
-```
-
-`objects.txt` records each object's name, size, content type, and cache
-time, as `name|size|mimetype|cacheControl`; the restore below reads it.
-**Expect:** `0`; `0`; exactly these 6 objects, each
-`application/vnd.apache.parquet` with `max-age=3600` when this was written,
-and no other object under `world-bank__wdi/` (sizes in bytes):
-`WDICSV.parquet` 61201614, `WDICountry.parquet` 29967,
-`WDIcountry-series.parquet` 47694, `WDIfootnote.parquet` 3460561,
-`WDISeries.parquet` 422408, `WDIseries-time.parquet` 1947; and `ls` lists
-the same 6 names.
-**If not:** a listing that mentions `world-bank__wdi` means the new catalog
-uses these paths: stop, and do not delete. Any other object: stop and raise
-it.
-
-Back them up (a Storage read), and check the copies:
-
-```bash
-WDI_FILES=(WDIcountry-series.parquet WDICountry.parquet WDIseries-time.parquet WDISeries.parquet WDICSV.parquet WDIfootnote.parquet)
-for file in "${WDI_FILES[@]}"; do
-  supabase storage cp "ss:///opendata/world-bank__wdi/datasets/$file" \
-    "$WDI_BACKUP/$file" --project-ref "$PROD_REF" --experimental || echo "FAILED $file"
-done
+read_db "$PROD_DB_URL" "select substr(name, length('world-bank__wdi/datasets/') + 1), metadata->>'size', metadata->>'mimetype', metadata->>'cacheControl' from storage.objects where bucket_id = 'opendata' and name like 'world-bank__wdi/%' order by name" | diff - "$WDI_BACKUP/objects.txt" && echo "unchanged"
 ls -l "$WDI_BACKUP"
 ```
 
-**Expect:** no `FAILED` line, and 6 files whose sizes match the listing
-above. **If not:** do not delete; re-run the copy for the failed file.
+**Expect:** `0`, then `unchanged`, and the 6 backup files.
+**If not:** stop, and do not delete.
 
 Delete them:
 
@@ -1573,7 +1631,7 @@ each object's recorded content type and cache time:
 while IFS='|' read -r file size mimetype cache_control; do
   supabase storage cp "$WDI_BACKUP/$file" "ss:///opendata/world-bank__wdi/datasets/$file" \
     --content-type "$mimetype" --cache-control "$cache_control" \
-    --project-ref "$PROD_REF" --experimental
+    --project-ref "$PROD_REF" --experimental </dev/null
 done < "$WDI_BACKUP/objects.txt"
 ```
 
