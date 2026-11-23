@@ -5,12 +5,14 @@ import type { GradientValue } from "../../videoTheme/videoTheme.types";
 import type { ValueControlProps } from "./valueControl.types";
 import type { ReactNode } from "react";
 
+type Props = ValueControlProps;
+
 /** A gradient token: two colours and an angle. */
 export function GradientValueControl({
   label,
   value,
   onChange,
-}: ValueControlProps): ReactNode {
+}: Readonly<Props>): ReactNode {
   const gradient = value as GradientValue;
   const colorField = (side: "from" | "to", name: string) => {
     return (

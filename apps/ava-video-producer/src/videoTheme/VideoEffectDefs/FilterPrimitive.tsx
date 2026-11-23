@@ -1,5 +1,6 @@
+import { match } from "ts-pattern";
 import { GlowEffect } from "./GlowEffect";
-import type { EffectPrimitive } from "../videoEffectFilterHelpers/videoEffectFilterHelpers";
+import type { EffectPrimitive } from "../VideoEffectFilters/VideoEffectFilters";
 import type { ReactNode } from "react";
 
 type Props = Readonly<{
@@ -18,27 +19,37 @@ export function FilterPrimitive({
   input,
   result,
 }: Props): ReactNode {
-  if (primitive.kind === "dropShadow") {
-    return (
-      <feDropShadow
-        dx={primitive.dx}
-        dy={primitive.dy}
-        stdDeviation={primitive.stdDeviation}
-        floodColor={primitive.color}
-        floodOpacity={primitive.opacity}
-        in={input}
-        result={result}
-      />
-    );
-  }
-  if (primitive.kind === "blur") {
-    return (
-      <feGaussianBlur
-        in={input}
-        stdDeviation={primitive.stdDeviation}
-        result={result}
-      />
-    );
-  }
-  return <GlowEffect primitive={primitive} input={input} result={result} />;
+  return match(primitive)
+    .with({ kind: "dropShadow" }, (matchedPrimitive) => {
+      return (
+        <feDropShadow
+          dx={matchedPrimitive.dx}
+          dy={matchedPrimitive.dy}
+          stdDeviation={matchedPrimitive.stdDeviation}
+          floodColor={matchedPrimitive.color}
+          floodOpacity={matchedPrimitive.opacity}
+          in={input}
+          result={result}
+        />
+      );
+    })
+    .with({ kind: "blur" }, (matchedPrimitive) => {
+      return (
+        <feGaussianBlur
+          in={input}
+          stdDeviation={matchedPrimitive.stdDeviation}
+          result={result}
+        />
+      );
+    })
+    .with({ kind: "glow" }, (matchedPrimitive) => {
+      return (
+        <GlowEffect
+          primitive={matchedPrimitive}
+          input={input}
+          result={result}
+        />
+      );
+    })
+    .exhaustive();
 }

@@ -1,6 +1,6 @@
-import { type StockPresetId } from "../../stock/catalog";
-import { buildReferenceBrief } from "./buildReferenceBrief";
+import { type StockPresetId } from "../../stock/stockEntry";
 import { Icon } from "./Icon";
+import { referenceBrief } from "./referenceBrief";
 import type { Preset } from "./Preset.types";
 import type { ReactNode, Dispatch, SetStateAction } from "react";
 
@@ -44,7 +44,7 @@ export function ReferenceTray({
           return onCopy(
             `Motion Atlas / Creative reference brief\n${saved.length} selected motion references\n\n${savedPresets
               .map((preset) => {
-                return buildReferenceBrief({ preset, accent, background });
+                return referenceBrief({ preset, accent, background });
               })
               .join("\n\n---\n\n")}`,
             "Reference brief copied",

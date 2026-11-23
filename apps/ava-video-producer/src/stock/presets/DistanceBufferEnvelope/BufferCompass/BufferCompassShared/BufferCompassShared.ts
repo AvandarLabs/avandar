@@ -1,5 +1,5 @@
 import { type Props } from "./BufferCompassShared.types";
-import type { VideoMotion } from "../../../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 
 const RULER_AT = 13;
 const RULER_FRAMES = 37;

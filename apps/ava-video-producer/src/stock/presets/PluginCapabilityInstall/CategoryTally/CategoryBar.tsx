@@ -1,5 +1,5 @@
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { CategoryTallyShared } from "./CategoryTallyShared/CategoryTallyShared";
+import { CategoryTallyShared } from "./CategoryTallyShared";
 import type { ReactNode } from "react";
 
 type Props = {

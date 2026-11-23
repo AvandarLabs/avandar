@@ -1,74 +1,67 @@
+import { makeObjectFromEntries } from "@avandar/utils";
 import { luminance, type MantineTheme } from "@mantine/core";
 import { getValueAtPath } from "../../getValueAtPath";
 import { normalizeTokenValue } from "../../normalizeTokenValue/normalizeTokenValue";
-import {
-  getTargetFromTokenReference,
-  isTokenReference,
-} from "../../themeReferenceHelpers/themeReferenceHelpers";
+import { ThemeReferences } from "../../ThemeReferences/ThemeReferences";
+import { VIDEO_TOKEN_CATALOG } from "../../tokenCatalog/TokenCatalog/TokenCatalog";
 import {
   COMPOSITE_TOKEN_FIELDS,
-  isCompositeTokenKind,
-  isTokenDefinition,
-  isTokenScale,
   type CompositeTokenKind,
   type FieldSpec,
-} from "../../tokenCatalog/defineTokensHelpers";
-import { VIDEO_TOKEN_CATALOG } from "../../tokenCatalog/tokenCatalogHelpers/tokenCatalogHelpers";
-import {
-  VIDEO_FONT_REGISTRY,
-  type VideoFontId,
-} from "../../videoFontRegistry/videoFontRegistryHelpers";
+  TokenDefinitions,
+} from "../../tokenCatalog/TokenDefinitions";
+import { createGroundContext } from "./createGroundContext";
+import { finishTypeStyleFromFields } from "./finishTypeStyleFromFields";
+import { getValueFromTokenReference } from "./getValueFromTokenReference";
 import { ResolvedShadowScaling } from "./ResolvedShadowScaling";
 import { ResolvedTokenGuards } from "./ResolvedTokenGuards";
 import {
   type ResolutionContext,
-  type UnknownRecord,
   type PickPairByContrastColorOptions,
   type BuildTokenFromDefinitionOptions,
   type ResolvedTokenTiers,
 } from "./ResolvedTokenTiers.types";
 import type {
   CatalogNode,
-  GlowValue,
-  TextShadowValue,
   TokenReference,
   VideoThemeIssue,
   VideoThemePatch,
 } from "../../videoTheme.types";
 
-function _primaryColor(context: ResolutionContext): unknown {
-  const shade = context.mantine.primaryShade;
-  const index =
-    typeof shade === "number"
-      ? shade
-      : context.isDarkGround
-        ? shade.dark
-        : shade.light;
-  return context.mantine.colors[context.mantine.primaryColor]?.[index];
-}
-function _lookup(
-  context: ResolutionContext,
-  reference: TokenReference,
-): unknown {
-  const target = getTargetFromTokenReference(reference);
-  if (target.tier === "primary") {
-    return _primaryColor(context);
-  }
-  const source =
-    target.tier === "mantine"
-      ? context.mantine
-      : target.tier === "atomic"
-        ? context.atomic
-        : context.semantic;
-  return getValueAtPath(source, target.path);
-}
-function _buildValueFromReference(
-  context: ResolutionContext,
-  reference: TokenReference,
-  field: FieldSpec,
-  path: string,
-  stack: readonly string[],
-): unknown {
+type BuildValueFromReferenceParameters = {
+  context: ResolutionContext;
+  reference: TokenReference;
+  field: FieldSpec;
+  path: string;
+  stack: readonly string[];
+};
+type BuildValueFromRawParameters = {
+  context: ResolutionContext;
+  raw: unknown;
+  field: FieldSpec;
+  path: string;
+  stack: readonly string[];
+};
+type BuildCompositeFromFieldsParameters = {
+  context: ResolutionContext;
+  kind: CompositeTokenKind;
+  raw: unknown;
+  path: string;
+  stack: readonly string[];
+};
+type BuildNodeFromCatalogParameters = {
+  context: ResolutionContext;
+  node: CatalogNode;
+  raw: unknown;
+  path: string;
+};
+function _buildValueFromReference({
+  context,
+  reference,
+  field,
+  path,
+  stack,
+}: Readonly<BuildValueFromReferenceParameters>): unknown {
   if (stack.includes(reference)) {
     context.issues.push({
       path,
@@ -76,7 +69,10 @@ function _buildValueFromReference(
     });
     return undefined;
   }
-  const target = _lookup(context, reference);
+  const target = getValueFromTokenReference({
+    context,
+    reference,
+  });
   if (target === undefined) {
     context.issues.push({
       path,
@@ -84,20 +80,29 @@ function _buildValueFromReference(
     });
     return undefined;
   }
-  return _buildValueFromRaw(context, target, field, path, [
-    ...stack,
-    reference,
-  ]);
+  return _buildValueFromRaw({
+    context,
+    raw: target,
+    field,
+    path,
+    stack: [...stack, reference],
+  });
 }
-function _buildValueFromRaw(
-  context: ResolutionContext,
-  raw: unknown,
-  field: FieldSpec,
-  path: string,
-  stack: readonly string[],
-): unknown {
-  if (isTokenReference(raw)) {
-    return _buildValueFromReference(context, raw, field, path, stack);
+function _buildValueFromRaw({
+  context,
+  raw,
+  field,
+  path,
+  stack,
+}: Readonly<BuildValueFromRawParameters>): unknown {
+  if (ThemeReferences.isTokenReference(raw)) {
+    return _buildValueFromReference({
+      context,
+      reference: raw,
+      field,
+      path,
+      stack,
+    });
   }
   if (field.kind === "color" && ResolvedTokenGuards.isColorPair(raw)) {
     if (context.forbidColorPairs) {
@@ -107,63 +112,48 @@ function _buildValueFromRaw(
       });
       return undefined;
     }
-    return _buildValueFromRaw(
+    return _buildValueFromRaw({
       context,
-      context.isDarkGround ? raw.onDark : raw.onLight,
+      raw: context.isDarkGround ? raw.onDark : raw.onLight,
       field,
       path,
       stack,
-    );
+    });
   }
-  if (isCompositeTokenKind(field.kind)) {
-    return _buildCompositeFromFields(context, field.kind, raw, path, stack);
+  if (TokenDefinitions.isCompositeTokenKind(field.kind)) {
+    return _buildCompositeFromFields({
+      context,
+      kind: field.kind,
+      raw,
+      path,
+      stack,
+    });
   }
-  const normalized = normalizeTokenValue(field, raw);
+  return _getNormalizedRawValue({ context, raw, field, path });
+}
+function _getNormalizedRawValue(
+  options: Readonly<Omit<BuildValueFromRawParameters, "stack">>,
+): unknown {
+  const normalized = normalizeTokenValue({
+    field: options.field,
+    value: options.raw,
+  });
   if (!normalized.ok) {
-    context.issues.push({ path, message: normalized.message });
+    options.context.issues.push({
+      path: options.path,
+      message: normalized.message,
+    });
     return undefined;
   }
   return normalized.value;
 }
-function _finishTypeStyle(fields: UnknownRecord): unknown {
-  const fontId = fields.family as VideoFontId | undefined;
-  if (fontId === undefined) {
-    return undefined;
-  }
-  const color = fields.color as string;
-  const textShadow = fields.textShadow as TextShadowValue | undefined;
-  const glow = fields.glow as GlowValue | undefined;
-  return {
-    fontId,
-    fontFamily: VIDEO_FONT_REGISTRY[fontId].stack,
-    fontSize: fields.size,
-    fontWeight: fields.weight,
-    ...(fields.lineHeight === undefined
-      ? {}
-      : { lineHeight: fields.lineHeight }),
-    ...(fields.letterSpacing === undefined
-      ? {}
-      : { letterSpacing: fields.letterSpacing }),
-    ...(fields.transform === undefined
-      ? {}
-      : { textTransform: fields.transform }),
-    ...(fields.numeric === undefined
-      ? {}
-      : { fontVariantNumeric: fields.numeric }),
-    color,
-    alpha: fields.alpha ?? 1,
-    ...(textShadow ? { textShadow: { ...textShadow, color } } : {}),
-    ...(glow ? { glow: { ...glow, color } } : {}),
-    ...(fields.stroke === undefined ? {} : { strokeWidth: fields.stroke }),
-  };
-}
-function _buildCompositeFromFields(
-  context: ResolutionContext,
-  kind: CompositeTokenKind,
-  raw: unknown,
-  path: string,
-  stack: readonly string[],
-): unknown {
+function _buildCompositeFromFields({
+  context,
+  kind,
+  raw,
+  path,
+  stack,
+}: Readonly<BuildCompositeFromFieldsParameters>): unknown {
   if (!ResolvedTokenGuards.isRecord(raw)) {
     context.issues.push({ path, message: `Expected a ${kind}` });
     return undefined;
@@ -171,7 +161,7 @@ function _buildCompositeFromFields(
   const spec = COMPOSITE_TOKEN_FIELDS[kind];
   const required = new Set<string>(spec.required);
   const fields: Readonly<Record<string, FieldSpec>> = spec.fields;
-  const resolved = Object.fromEntries(
+  const resolved = makeObjectFromEntries(
     Object.entries(fields).flatMap(([name, field]) => {
       if (raw[name] === undefined) {
         if (required.has(name)) {
@@ -182,23 +172,22 @@ function _buildCompositeFromFields(
       return [
         [
           name,
-          _buildValueFromRaw(
+          _buildValueFromRaw({
             context,
-            raw[name],
+            raw: raw[name],
             field,
-            `${path}.${name}`,
+            path: `${path}.${name}`,
             stack,
-          ),
+          }),
         ],
       ];
     }),
   );
-  if (kind === "typeStyle") {
-    return _finishTypeStyle(resolved);
-  }
-  return kind === "elevation"
-    ? ResolvedShadowScaling.finishElevation(resolved)
-    : resolved;
+  return kind === "typeStyle"
+    ? finishTypeStyleFromFields(resolved)
+    : kind === "elevation"
+      ? ResolvedShadowScaling.finishElevation(resolved)
+      : resolved;
 }
 /**
  * The pair value a colour token picks by another colour's luminance, such as
@@ -211,13 +200,16 @@ function _pickPairByContrastColor({
   path,
 }: Readonly<PickPairByContrastColorOptions>): unknown {
   const contrastPath = definition.contrastWith ?? "";
-  const contrastColor = _buildValueFromRaw(
+  const contrastColor = _buildValueFromRaw({
     context,
-    getValueAtPath(context.semantic, contrastPath.split(".")),
-    { kind: "color" },
-    contrastPath,
-    [path],
-  );
+    raw: getValueAtPath({
+      source: context.semantic,
+      path: contrastPath.split("."),
+    }),
+    field: { kind: "color" },
+    path: contrastPath,
+    stack: [path],
+  });
   if (typeof contrastColor !== "string") {
     return undefined;
   }
@@ -244,91 +236,93 @@ function _buildTokenFromDefinition({
     const picked = _pickPairByContrastColor({ context, definition, raw, path });
     return picked === undefined
       ? undefined
-      : _buildValueFromRaw(context, picked, definition, path, []);
+      : _buildValueFromRaw({
+          context,
+          raw: picked,
+          field: definition,
+          path,
+          stack: [],
+        });
   }
-  return _buildValueFromRaw(context, raw, definition, path, []);
+  return _buildValueFromRaw({
+    context,
+    raw,
+    field: definition,
+    path,
+    stack: [],
+  });
 }
-function _buildNodeFromCatalog(
-  context: ResolutionContext,
-  node: CatalogNode,
-  raw: unknown,
-  path: string,
-): unknown {
-  if (isTokenDefinition(node)) {
+function _buildNodeFromCatalog({
+  context,
+  node,
+  raw,
+  path,
+}: Readonly<BuildNodeFromCatalogParameters>): unknown {
+  if (TokenDefinitions.isTokenDefinition(node)) {
     return _buildTokenFromDefinition({ context, definition: node, raw, path });
   }
-  if (isTokenScale(node)) {
+  if (TokenDefinitions.isTokenScale(node)) {
     const entries = ResolvedTokenGuards.isRecord(raw)
       ? Object.entries(raw)
       : [];
-    return Object.fromEntries(
+    return makeObjectFromEntries(
       entries.map(([key, value]) => {
         return [
           key,
-          _buildValueFromRaw(context, value, node.scale, `${path}.${key}`, []),
+          _buildValueFromRaw({
+            context,
+            raw: value,
+            field: node.scale,
+            path: `${path}.${key}`,
+            stack: [],
+          }),
         ];
       }),
     );
   }
-  return Object.fromEntries(
+  return makeObjectFromEntries(
     Object.entries(node).map(([key, child]) => {
       return [
         key,
-        _buildNodeFromCatalog(
+        _buildNodeFromCatalog({
           context,
-          child,
-          ResolvedTokenGuards.isRecord(raw) ? raw[key] : undefined,
-          path ? `${path}.${key}` : key,
-        ),
+          node: child,
+          raw: ResolvedTokenGuards.isRecord(raw) ? raw[key] : undefined,
+          path: path ? `${path}.${key}` : key,
+        }),
       ];
     }),
   );
 }
 function _buildComponentsFromCatalog(context: ResolutionContext): unknown {
-  return Object.fromEntries(
+  return makeObjectFromEntries(
     Object.entries(VIDEO_TOKEN_CATALOG.components).map(([name, group]) => {
       return [
         name,
-        _buildNodeFromCatalog(
+        _buildNodeFromCatalog({
           context,
-          group,
-          getValueAtPath(context.components, [name, "defaultProps"]),
-          `components.${name}`,
-        ),
+          node: group,
+          raw: getValueAtPath({
+            source: context.components,
+            path: [name, "defaultProps"],
+          }),
+          path: `components.${name}`,
+        }),
       ];
     }),
   );
 }
-/** The context that resolves the ground colour, before the ground is known. */
-function _createGroundContext({
-  options,
-  issues,
-}: Readonly<{
-  options: Readonly<{
-    merged: VideoThemePatch;
-    mantine: MantineTheme;
-  }>;
-  issues: VideoThemeIssue[];
-}>): ResolutionContext {
-  const video = getValueAtPath(options.merged, ["other", "video"]);
-  return {
-    atomic: getValueAtPath(video, ["atomic"]),
-    semantic: getValueAtPath(video, ["semantic"]),
-    components: options.merged.components,
-    mantine: options.mantine,
-    isDarkGround: true,
-    forbidColorPairs: true,
-    issues,
-  };
-}
 function _isGroundDark(groundContext: ResolutionContext): boolean {
-  const ground = _buildValueFromRaw(
-    groundContext,
-    getValueAtPath(groundContext.semantic, ["color", "ground"]),
-    { kind: "color" },
-    "color.ground",
-    [],
-  );
+  const ground = _buildValueFromRaw({
+    context: groundContext,
+    raw: getValueAtPath({
+      source: groundContext.semantic,
+      path: ["color", "ground"],
+    }),
+    field: { kind: "color" },
+    path: "color.ground",
+    stack: [],
+  });
   return typeof ground === "string"
     ? luminance(ground) < groundContext.mantine.luminanceThreshold
     : true;
@@ -348,28 +342,28 @@ export function makeResolvedTokenTiersFromMergedTheme(
   }>,
 ): ResolvedTokenTiers {
   const issues: VideoThemeIssue[] = [];
-  const groundContext = _createGroundContext({ options, issues });
+  const groundContext = createGroundContext({ options, issues });
   const isDarkGround = _isGroundDark(groundContext);
   const context: ResolutionContext = {
     ...groundContext,
     isDarkGround,
     forbidColorPairs: false,
   };
-  const semantic = _buildNodeFromCatalog(
+  const semantic = _buildNodeFromCatalog({
     context,
-    VIDEO_TOKEN_CATALOG.semantic,
-    context.semantic,
-    "",
-  );
+    node: VIDEO_TOKEN_CATALOG.semantic,
+    raw: context.semantic,
+    path: "",
+  });
   const components = _buildComponentsFromCatalog(context);
   const strength = ResolvedShadowScaling.getShadowStrength(semantic);
   return {
-    atomic: _buildNodeFromCatalog(
+    atomic: _buildNodeFromCatalog({
       context,
-      VIDEO_TOKEN_CATALOG.atomic,
-      context.atomic,
-      "atomic",
-    ),
+      node: VIDEO_TOKEN_CATALOG.atomic,
+      raw: context.atomic,
+      path: "atomic",
+    }),
     semantic: ResolvedShadowScaling.scaleShadowsByStrength({
       node: VIDEO_TOKEN_CATALOG.semantic,
       value: semantic,

@@ -1,11 +1,32 @@
 /** Runtime-versus-structural acceptance witnesses for tuple export. */
 import assert from "node:assert/strict";
 import test from "node:test";
-import { prop } from "@avandar/utils";
+import { prop, propEq } from "@avandar/utils";
 import { z } from "zod";
 import { stockContracts } from "../../registry/stockContracts";
 import { makeStockJsonSchemaFromZodSchema } from "./makeStockJsonSchemaFromZodSchema";
 import type { StockJsonSchema } from "../StockContract.types";
+
+function _acceptsObject({
+  schema,
+  value,
+}: Readonly<{ schema: StockJsonSchema; value: unknown }>): boolean {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return false;
+  }
+  const record = value as Record<string, unknown>;
+  return (
+    (schema.required ?? []).every((key) => {
+      return Object.hasOwn(record, key);
+    }) &&
+    Object.entries(schema.properties ?? {}).every(([key, child]) => {
+      return (
+        !Object.hasOwn(record, key) ||
+        _accepts({ schema: child, value: record[key] })
+      );
+    })
+  );
+}
 
 function _acceptsArray({
   schema,
@@ -53,21 +74,7 @@ function _accepts({
     return _acceptsArray({ schema, value });
   }
   if (schema.type === "object") {
-    if (!value || typeof value !== "object" || Array.isArray(value)) {
-      return false;
-    }
-    const record = value as Record<string, unknown>;
-    return (
-      (schema.required ?? []).every((key) => {
-        return Object.hasOwn(record, key);
-      }) &&
-      Object.entries(schema.properties ?? {}).every(([key, child]) => {
-        return (
-          !Object.hasOwn(record, key) ||
-          _accepts({ schema: child, value: record[key] })
-        );
-      })
-    );
+    return _acceptsObject({ schema, value });
   }
   if (schema.type === "null") {
     return value === null;
@@ -205,9 +212,7 @@ test("registry tuple dimensions and coordinates reject missing or extra members"
 
 test("editor coordinate item schemas reject missing and extra coordinates", () => {
   const control = stockContracts["geometry-detail-budget"].controls.find(
-    ({ path }) => {
-      return path === "vertices";
-    },
+    propEq("path", "vertices"),
   );
   assert.ok(control?.kind === "collection");
   const structural = control.itemSchema;
@@ -222,7 +227,7 @@ function _tupleSchemas(value: unknown): StockJsonSchema[] {
   }
   const record = value as Record<string, unknown>;
   return [
-    ...(Array.isArray(record.prefixItems) ? [record as StockJsonSchema] : []),
+    ...(Array.isArray(record.prefixItems) ? [record] : []),
     ...Object.values(record).flatMap(_tupleSchemas),
   ];
 }

@@ -1,4 +1,4 @@
-import { mix } from "../../../../motion";
+import { Motion } from "../../../../motion";
 import { LabelSlots } from "../../../primitives/LabelSlots/LabelSlots";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SnapshotHeading } from "./SnapshotHeading";

@@ -201,6 +201,26 @@ function _assertBalanceCaptions({
       return `${amount} ${input.crop.unitLabel}`;
     }),
   );
+  _assertSownArrivalCaption({ markup, input, frame });
+}
+export {
+  _render,
+  _visible,
+  _escape,
+  EXCLUDED_TEXT_FIELDS as excludedTextFields,
+  _lid,
+  _lossInputs,
+  captionCases,
+  _assertBalanceCaptions,
+};
+export type { CaptionCase };
+
+/** Checks the final caption changes at the whole-band sowing arrival. */
+function _assertSownArrivalCaption({
+  markup,
+  input,
+  frame,
+}: Readonly<{ markup: string; input: Input; frame: number }>): void {
   const sown = SvgAttributes.fromMarker({ markup, marker: "seed-sown" });
   if (input.crop.sownQuantity > 0) {
     const arrived =
@@ -215,14 +235,3 @@ function _assertBalanceCaptions({
     );
   }
 }
-export {
-  _render,
-  _visible,
-  _escape,
-  EXCLUDED_TEXT_FIELDS as excludedTextFields,
-  _lid,
-  _lossInputs,
-  captionCases,
-  _assertBalanceCaptions,
-};
-export type { CaptionCase };

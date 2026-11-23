@@ -1,0 +1,7 @@
+.cursorShutterDemoFootnote {
+  bottom: 0;
+  color: var(--demo-muted);
+  font-size: var(--demo-font-size-2xs);
+  position: absolute;
+  right: 0;
+}

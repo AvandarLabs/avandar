@@ -3,7 +3,7 @@ import {
   type WindowStage,
   type WindowPose,
 } from "../WindowMotion/WindowMotion.types";
-import type { Rect } from "../../layout/layout";
+import type { Rect } from "../../layout/SceneGeometry";
 import type { TiltedWindowSceneProps } from "../../scenes.types";
 import type { CSSProperties } from "react";
 
@@ -70,24 +70,27 @@ function _getBasePose({
       stage,
     });
   }
-  if (enter === undefined || enter.kind === "whip") {
-    return WindowMotion.getWhipEntrance({
-      frame,
-      at: enter?.atFrame ?? 1,
-      canvas: { width: props.width },
-      box,
-      durationInFrames: enter?.durationInFrames,
-      stage,
-    });
-  }
-  return WindowMotion.getRestingPose(stage);
+  return enter === undefined || enter.kind === "whip"
+    ? WindowMotion.getWhipEntrance({
+        frame,
+        at: enter?.atFrame ?? 1,
+        canvas: { width: props.width },
+        box,
+        durationInFrames: enter?.durationInFrames,
+        stage,
+      })
+    : WindowMotion.getRestingPose(stage);
 }
 /** Layers a carousel slide over the whole window's entrance or exit. */
-function _combinePoses(
-  base: WindowPose,
-  slide: WindowPose,
-  cameraBlur: number,
-): WindowPose {
+function _combinePoses({
+  base,
+  slide,
+  cameraBlur,
+}: Readonly<{
+  base: WindowPose;
+  slide: WindowPose;
+  cameraBlur: number;
+}>): WindowPose {
   return {
     translateX: base.translateX + slide.translateX,
     translateZ: base.translateZ + slide.translateZ,
@@ -96,10 +99,16 @@ function _combinePoses(
     blurX: Math.max(base.blurX, slide.blurX, cameraBlur),
   };
 }
-function _toPixels(
-  box: ToPixelsOptions,
-  canvas: { width: number; height: number },
-): Rect {
+function _toPixels({
+  box,
+  canvas,
+}: Readonly<{
+  box: ToPixelsOptions;
+  canvas: {
+    width: number;
+    height: number;
+  };
+}>): Rect {
   return {
     x: box.x * canvas.width,
     y: box.y * canvas.height,

@@ -1,11 +1,12 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
+
+type Props = { accent: string };
+
 /** The delivery table and the recipient's basket mat. */
-export function HandoverFurniture({
-  accent,
-}: Readonly<{ accent: string }>): ReactNode {
+export function HandoverFurniture({ accent }: Readonly<Props>): ReactNode {
   const { atomic } = GraphicThemeHooks.useGraphicTheme();
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();

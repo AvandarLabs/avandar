@@ -1,11 +1,11 @@
 /** Input boundaries preserve authored content without mixing in examples. */
 import assert from "node:assert/strict";
 import test from "node:test";
-import { prop } from "@avandar/utils";
+import { prop, propEq } from "@avandar/utils";
 import { LEGACY_IDS } from "../../../../tests/fixtures/legacyStockIds";
-import { STOCK_CATALOG, STOCK_IDS } from "../../catalog";
 import { DECISION_FORK_DEFAULT_INPUT } from "../../presets/DecisionFork/DecisionFork.fixtures";
 import { stockContracts } from "../../registry/stockContracts";
+import { STOCK_CATALOG, STOCK_IDS } from "../../stockEntry";
 import { parseStockInput } from "./parseStockInput";
 import type { StockJsonValue } from "../StockContract.types";
 
@@ -31,10 +31,9 @@ function _getValueFromPath(
     if (Array.isArray(value)) {
       return typeof segment === "number" ? value[segment] : undefined;
     }
-    if (value && typeof value === "object" && typeof segment === "string") {
-      return value[segment];
-    }
-    return undefined;
+    return value && typeof value === "object" && typeof segment === "string"
+      ? value[segment]
+      : undefined;
   }, options.value);
 }
 
@@ -284,9 +283,7 @@ test("every named DecisionFork fixture and binding retains a valid selection", (
     });
     assert.deepEqual(parsed, input);
     assert.equal(
-      parsed.branches.filter(({ id }) => {
-        return id === parsed.selectedBranchId;
-      }).length,
+      parsed.branches.filter(propEq("id", parsed.selectedBranchId)).length,
       1,
     );
   });

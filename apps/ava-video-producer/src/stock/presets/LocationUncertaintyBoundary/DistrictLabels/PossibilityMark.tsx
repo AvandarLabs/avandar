@@ -1,16 +1,19 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
+
+type Props = {
+  districtId: string;
+  index: number;
+  isPossible: boolean;
+};
+
 /** A tick for a possible district, a dash for one ruled out. */
 export function PossibilityMark({
   districtId,
   index,
   isPossible,
-}: Readonly<{
-  districtId: string;
-  index: number;
-  isPossible: boolean;
-}>): ReactNode {
+}: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (

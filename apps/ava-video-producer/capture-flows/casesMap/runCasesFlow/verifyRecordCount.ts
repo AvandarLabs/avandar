@@ -6,6 +6,29 @@ import { getRecordLinks } from "./getRecordLinks";
 import type { FlowContext } from "../../captureFlows.types";
 import type { FixtureRow } from "./runCasesFlow.types";
 
+async function _collectRecordLabels(
+  options: Readonly<Parameters<typeof _addRenderedRecords>[0]>,
+): Promise<void> {
+  const { context, links, viewport, records, expectedCount } = options;
+  // The pane virtualizes its rows, so read and scroll one step at a time.
+  for (let scroll = 0; scroll < 80; scroll += 1) {
+    if (
+      await _addRenderedRecords({
+        context,
+        links,
+        viewport,
+        records,
+        expectedCount,
+      })
+    ) {
+      break;
+    }
+    await _scrollRecordPane({
+      links,
+      viewport,
+    });
+  }
+}
 /** What one pass over the rendered record links reads and adds to. */
 type RenderedRecordsRead = {
   context: FlowContext;
@@ -14,7 +37,6 @@ type RenderedRecordsRead = {
   records: Map<string | undefined, string>;
   expectedCount: number;
 };
-
 /**
  * Adds the rendered record links to `records`; true once every record has
  * loaded.
@@ -49,12 +71,14 @@ async function _addRenderedRecords(
     !(await loadingMoreIndicator.count())
   );
 }
-
 /** Scrolls the record pane one step and waits for other records to render. */
-async function _scrollRecordPane(
-  links: Locator,
-  viewport: Locator,
-): Promise<void> {
+async function _scrollRecordPane({
+  links,
+  viewport,
+}: Readonly<{
+  links: Locator;
+  viewport: Locator;
+}>): Promise<void> {
   const renderedRecords = () => {
     return links.evaluateAll((elements) => {
       return elements
@@ -74,40 +98,36 @@ async function _scrollRecordPane(
     .poll(renderedRecords, { timeout: WAIT })
     .not.toBe(renderedHrefsBeforeScroll);
 }
-
 /**
  * Scrolls the virtualized record pane until every record has rendered, checks
  * their labels match the fixture rows, and reloads to restore a clean view.
  *
  * Called by the `cases-verify-240-records` step of `runCasesFlow`.
  */
-export async function verifyRecordCount(
-  context: FlowContext,
-  expectedRows: readonly FixtureRow[],
-): Promise<void> {
+export async function verifyRecordCount({
+  context,
+  expectedRows,
+}: Readonly<{
+  context: FlowContext;
+  expectedRows: readonly FixtureRow[];
+}>): Promise<void> {
   const caseType = getCaseType(context);
-  const links = getRecordLinks(context.page, caseType.id);
+  const links = getRecordLinks({
+    page: context.page,
+    caseTypeId: caseType.id,
+  });
   const viewport = context.page
     .locator(".mantine-ScrollArea-viewport")
     .filter({ has: links.first() });
   await expect(viewport).toHaveCount(1);
   const records = new Map<string | undefined, string>();
-  // The pane virtualizes its rows, so read and scroll one step at a time.
-  for (let scroll = 0; scroll < 80; scroll += 1) {
-    const expectedCount = expectedRows.length;
-    if (
-      await _addRenderedRecords({
-        context,
-        links,
-        viewport,
-        records,
-        expectedCount,
-      })
-    ) {
-      break;
-    }
-    await _scrollRecordPane(links, viewport);
-  }
+  await _collectRecordLabels({
+    context,
+    links,
+    viewport,
+    records,
+    expectedCount: expectedRows.length,
+  });
   expect([...records.values()].sort()).toEqual(
     expectedRows.map(prop("case_label")).sort(),
   );

@@ -4,10 +4,10 @@ import { prop } from "@avandar/utils";
 import { FilmDownloads } from "../FilmDownloads";
 import {
   configuredExportRequest,
-  createMemoryExports,
   type ExportRequest,
   type MemoryExports,
-} from "./FilmDownloads.fixtures";
+  FilmDownloadFixtures,
+} from "./FilmDownloadFixtures";
 
 type OverlappingRequestCase = {
   suite: TestContext;
@@ -54,7 +54,7 @@ const DISTINCT_OPTION_CHANGES: ReadonlyArray<
 ];
 
 test("configured MP4 request ownership", async (suite) => {
-  const exports = createMemoryExports(suite);
+  const exports = FilmDownloadFixtures.makeMemoryExports(suite);
   for (const [name, change] of DISTINCT_OPTION_CHANGES) {
     await _verifyOverlappingRequests({
       suite,
@@ -126,7 +126,7 @@ async function _verifyIdenticalRequests({
     "coalesces identical separately allocated requests",
     async () => {
       const first = exports.start(request);
-      const duplicate = exports.start(JSON.parse(JSON.stringify(request)));
+      const duplicate = exports.start(structuredClone(request));
       assert.equal(exports.requests.length, 1);
       exports.complete({ index: 0, id: "shared" });
       assert.equal((await first).id, "shared");

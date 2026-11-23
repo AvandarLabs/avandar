@@ -1,21 +1,34 @@
-import { mix } from "../../../motion";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import { propEq } from "@avandar/utils";
+import { Motion } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./ServiceablePanelSwap.schema";
 /** Data for getServiceSceneFromFrame. */
 type GetServiceSceneFromFrameResult = {
   targetIndex: number;
   slotX: number;
-  original: { x: number; y: number };
-  replacement: { x: number; y: number };
+  original: {
+    x: number;
+    y: number;
+  };
+  replacement: {
+    x: number;
+    y: number;
+  };
   latchOpen: number;
-  hand: { x: number; y: number };
+  hand: {
+    x: number;
+    y: number;
+  };
 };
 type ServiceSceneArgs = Readonly<{
   frame: number;
   input: Input;
   motion: VideoMotion;
 }>;
-type Point = { x: number; y: number };
+type Point = {
+  x: number;
+  y: number;
+};
 /**
  * The hand on the latch, then carrying the original out and the
  * replacement in, then back on the latch.
@@ -32,15 +45,13 @@ function _getServiceHand({
     replacement: Point;
   }>;
 }>): Point {
-  if (frame < 79) {
-    return { x: slotX + 136, y: 223 - 38 * latchOpen };
-  }
-  if (frame < 95) {
-    return { x: original.x + 136, y: original.y };
-  }
-  return frame < 111
-    ? { x: replacement.x + 136, y: replacement.y }
-    : { x: slotX + 136, y: 223 - 38 * latchOpen };
+  return frame < 79
+    ? { x: slotX + 136, y: 223 - 38 * latchOpen }
+    : frame < 95
+      ? { x: original.x + 136, y: original.y }
+      : frame < 111
+        ? { x: replacement.x + 136, y: replacement.y }
+        : { x: slotX + 136, y: 223 - 38 * latchOpen };
 }
 /** One fixed slot owns the latch, connector and complete replacement action. */
 export function getServiceSceneFromFrame({
@@ -48,33 +59,33 @@ export function getServiceSceneFromFrame({
   input,
   motion,
 }: ServiceSceneArgs): GetServiceSceneFromFrameResult {
-  const targetIndex = input.modules.findIndex(({ id }) => {
-    return id === input.replacement.targetModuleId;
-  });
+  const targetIndex = input.modules.findIndex(
+    propEq("id", input.replacement.targetModuleId),
+  );
   const slotX = 180 + targetIndex * 170;
   const original = {
-    x: mix(
-      motion.ramp(frame, 86, motion.whip, motion.travel.easing),
-      slotX,
-      60,
-    ),
-    y: mix(
-      motion.ramp(frame, 79, motion.scale(7), motion.travel.easing),
-      235,
-      430,
-    ),
+    x: Motion.mix({
+      t: motion.ramp(frame, 86, motion.whip, motion.travel.easing),
+      from: slotX,
+      to: 60,
+    }),
+    y: Motion.mix({
+      t: motion.ramp(frame, 79, motion.scale(7), motion.travel.easing),
+      from: 235,
+      to: 430,
+    }),
   };
   const replacement = {
-    x: mix(
-      motion.ramp(frame, 95, motion.whip, motion.travel.easing),
-      750,
-      slotX,
-    ),
-    y: mix(
-      motion.ramp(frame, 103, motion.scale(7), motion.travel.easing),
-      430,
-      235,
-    ),
+    x: Motion.mix({
+      t: motion.ramp(frame, 95, motion.whip, motion.travel.easing),
+      from: 750,
+      to: slotX,
+    }),
+    y: Motion.mix({
+      t: motion.ramp(frame, 103, motion.scale(7), motion.travel.easing),
+      from: 430,
+      to: 235,
+    }),
   };
   const latchOpen =
     motion.ramp(frame, 43, motion.scale(35), motion.travel.easing) *

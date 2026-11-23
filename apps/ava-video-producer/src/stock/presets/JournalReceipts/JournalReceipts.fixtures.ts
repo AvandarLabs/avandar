@@ -1,3 +1,4 @@
+import { objectValuesMap } from "@avandar/utils";
 import type { Input } from "./JournalReceipts.schema";
 /** Complete fictional journal with one intentionally unacknowledged entry. */
 export const DEFAULT_INPUT: Input = {
@@ -51,11 +52,9 @@ export const fixtures: Array<{ id: string; input: Input }> = [
           label: "W".repeat(20),
         };
       }),
-      copy: Object.fromEntries(
-        Object.keys(DEFAULT_INPUT.copy).map((key) => {
-          return [key, "W".repeat(32)];
-        }),
-      ) as Input["copy"],
+      copy: objectValuesMap(DEFAULT_INPUT.copy, () => {
+        return "W".repeat(32);
+      }) as Input["copy"],
     },
   },
   {

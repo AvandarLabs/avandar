@@ -54,13 +54,16 @@ export default defineConfig({
   },
 
   supplyChain: {
-    // Socket's score gate stays on, but advisory rather than blocking. Its
-    // current finding shows why an automatic fail is the wrong default here:
-    // it scores `supabase` 0/100 from a GitHub malware advisory that has since
-    // been withdrawn (`pnpm audit` reports nothing for it). That is not
-    // something an engineer can act on mid-change, and a blocking gate on a
-    // third-party score turns an unrelated `package.json` edit into a red
-    // build. Findings still print, so a genuine malware alert is still seen.
+    // Keep every dependency's security scores visible, including vetted CLI
+    // packages. Socket reports supabase@2.114.0 at supplyChain 0 despite an
+    // empty alert list and vulnerability 100 (reviewed 2026-11-20):
+    // https://firewall-api.socket.dev/purl/pkg:npm/supabase@2.114.0
+    // Its npm provenance identifies supabase/cli's release.yml workflow, and
+    // its launcher executes the matching @supabase/cli-* optional binary:
+    // https://registry.npmjs.org/-/npm/v1/attestations/supabase@2.114.0
+    // No install lifecycle script is declared. Reassess on version changes
+    // or new Socket alerts. Do not suppress this rule for all package.json
+    // dependencies: the scanner has no package/version-scoped exception.
     severity: "warning",
   },
 });

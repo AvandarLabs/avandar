@@ -5,7 +5,6 @@ import {
   type RemotionLicense,
   getRemotionLicenseFromAppRoot,
 } from "./lib/getRemotionLicenseFromAppRoot";
-
 /**
  * The license guard every producer entry point runs before doing work. It
  * copies the workspace root's `.env.video-producer.local` into this app, so
@@ -16,11 +15,16 @@ export function requireLicense(
   environment: Readonly<NodeJS.ProcessEnv> = process.env,
 ): RemotionLicense {
   const appRoot = fileURLToPath(new URL("../", import.meta.url));
-  copyRootEnvFile(appRoot, environment);
-  return getRemotionLicenseFromAppRoot(appRoot, environment);
+  copyRootEnvFile({
+    appRoot,
+    environment,
+  });
+  return getRemotionLicenseFromAppRoot({
+    appRoot,
+    environment,
+  });
 }
-
-// Run directly, as every package script does first, it only checks the keys.
+// Run directly, it checks the keys before a command body can do work.
 if (
   process.argv[1] &&
   pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url

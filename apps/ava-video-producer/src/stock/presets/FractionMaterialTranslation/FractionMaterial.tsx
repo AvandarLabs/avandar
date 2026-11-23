@@ -1,4 +1,4 @@
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { FractionUnit } from "./FractionUnit";
 import type { Input } from "./FractionMaterialTranslation.schema";
@@ -39,8 +39,12 @@ export function FractionMaterial({
       ) : undefined}
       {Array.from({ length: fraction.denominator }, (_, index) => {
         return (
-          <FractionUnit
-            key={index}
+          // prettier-ignore
+          // These generated marks represent numerator-independent
+          // fixed partition slots of the denominator, with no item
+          // data to reorder.
+          // react-doctor-disable-next-line no-array-index-as-key
+          <FractionUnit key={index}
             representation={representation}
             fraction={fraction}
             index={index}

@@ -16,6 +16,41 @@ import {
 import { inputSchema, type Input } from "./ColdChainCustody.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 
+function _assertContainerGeometryAcrossFrames(
+  input: (typeof fixtures)[number]["input"],
+): void {
+  [32, 52, 72, 92, 116, 150].forEach((frame) => {
+    const markup = _render({ frame, input });
+    const containers = Array.from(
+      markup.matchAll(
+        /<g data-moving-container="([^"]*)" transform="translate\(([^ ]+) ([^)]+)\)"/g,
+      ),
+    );
+    assert.deepEqual(
+      containers.map((match) => {
+        return match[1];
+      }),
+      input.crates.map(prop("id")),
+    );
+    containers.forEach((match) => {
+      assert.ok(Number(match[2]) - 15 >= 265);
+      assert.ok(Number(match[2]) + 207 <= 947);
+      assert.ok(Number(match[3]) - 15 >= 150);
+      assert.ok(Number(match[3]) + 28 < 405);
+    });
+    if (frame === 32) {
+      containers.forEach((match) => {
+        return assert.equal(Number(match[2]), 280);
+      });
+    }
+    if (frame >= 116) {
+      containers.forEach((match) => {
+        return assert.equal(Number(match[2]), 740);
+      });
+    }
+  });
+}
+
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -29,7 +64,7 @@ function _render({
     }),
   );
 }
-test("Container IDs persist through every stop; missing acknowledgements, unknown seals and monitoring-review states remain separately visible after receipt and never become success markers implicitly.", () => {
+test("default custody hold frame retains every crate and exposes unacknowledged and unknown-seal states", () => {
   const markup = _render({ frame: 150 });
   assert.equal(
     (markup.match(/data-container=/g) ?? []).length,
@@ -86,36 +121,7 @@ registerStockPresetAssertions({
 registerStockTextLayoutAssertions(textLayoutOptions);
 test("the same containers cross the three stops with independent final facts", () => {
   const input = fixtures[3].input;
-  [32, 52, 72, 92, 116, 150].forEach((frame) => {
-    const markup = _render({ frame, input });
-    const containers = Array.from(
-      markup.matchAll(
-        /<g data-moving-container="([^"]*)" transform="translate\(([^ ]+) ([^)]+)\)"/g,
-      ),
-    );
-    assert.deepEqual(
-      containers.map((match) => {
-        return match[1];
-      }),
-      input.crates.map(prop("id")),
-    );
-    containers.forEach((match) => {
-      assert.ok(Number(match[2]) - 15 >= 265);
-      assert.ok(Number(match[2]) + 207 <= 947);
-      assert.ok(Number(match[3]) - 15 >= 150);
-      assert.ok(Number(match[3]) + 28 < 405);
-    });
-    if (frame === 32) {
-      containers.forEach((match) => {
-        return assert.equal(Number(match[2]), 280);
-      });
-    }
-    if (frame >= 116) {
-      containers.forEach((match) => {
-        return assert.equal(Number(match[2]), 740);
-      });
-    }
-  });
+  _assertContainerGeometryAcrossFrames(input);
   const markup = _render({ frame: 150, input });
   assert.match(
     markup,

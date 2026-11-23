@@ -1,6 +1,6 @@
-import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { ReceiptLabelSlots } from "./ReceiptLabelSlots/ReceiptLabelSlots";
 import type { Input } from "./JournalReceipts.schema";
 import type { ReactNode } from "react";
 
@@ -51,19 +51,7 @@ export function ReceiptText({
   ];
   return (
     <g>
-      {labels.map((label) => {
-        return (
-          <FitText
-            key={label.y}
-            {...label}
-            x={10}
-            width={width - 20}
-            fontSize={12}
-            normalizeWhitespace
-            breakLongWords
-          />
-        );
-      })}
+      <ReceiptLabelSlots labels={labels} width={width} />
     </g>
   );
 }

@@ -256,37 +256,7 @@ function _assertReaderSeparation({
   const bounds = input.learners.map((learner, index) => {
     return _getReaderBounds({ markup, id: learner.id, key: String(index + 1) });
   });
-  bounds.forEach((reader, index) => {
-    _bookPositions(markup).forEach(([bookX, bookY]) => {
-      const openingStart = input.startingShelf === "front" ? 94 : 104;
-      const halfWidth = frame <= openingStart ? 23 : 41;
-      reader.identityBounds.forEach((identity) => {
-        return assert.ok(
-          identity.right <= bookX - halfWidth ||
-            identity.left >= bookX + halfWidth ||
-            identity.bottom <= bookY - 22 ||
-            identity.top >= bookY + 24,
-          `${input.startingShelf} frame ${frame}: book obscures reader ${index + 1} head or key`,
-        );
-      });
-    });
-    assert.ok(
-      reader.left >= 0 &&
-        reader.right <= 960 &&
-        reader.top > 188.6 &&
-        reader.bottom < 435,
-      `${frame}: reader ${index + 1} outside scene lane ${JSON.stringify(reader)}`,
-    );
-    bounds.slice(index + 1).forEach((other, offset) => {
-      assert.ok(
-        reader.right <= other.left ||
-          other.right <= reader.left ||
-          reader.bottom <= other.top ||
-          other.bottom <= reader.top,
-        `${input.startingShelf} frame ${frame}: reader ${index + 1} and ${index + offset + 2} envelopes overlap ${JSON.stringify([reader, other])}`,
-      );
-    });
-  });
+  _assertReaderSceneClearance({ input, frame, markup, bounds });
 }
 function _createRouteInputs(): Input[] {
   const exact = _createCrossingInput();
@@ -324,24 +294,7 @@ function _createRouteInputs(): Input[] {
       return { ...denseInput, readingGroups };
     }),
     ...groups.map((members) => {
-      return {
-        ...exact,
-        learners: exact.learners.map((learner) => {
-          return { ...learner, label: "界".repeat(16) };
-        }),
-        books: books.map((book) => {
-          return {
-            ...book,
-            label: "界".repeat(22),
-            pageLabel: "界".repeat(28),
-          };
-        }),
-        labels: denseInput.labels,
-        caption: denseInput.caption,
-        readingGroups: members.map((learnerIds, index) => {
-          return { bookId: `b${3 - index}`, learnerIds };
-        }),
-      };
+      return _createGroupedReadingRoute({ exact, books, members });
     }),
   ];
 }
@@ -361,3 +314,80 @@ export {
   _createRouteInputs,
 };
 export type { Bounds };
+
+/** Checks reader envelopes clear moving books and one another. */
+function _assertReaderSceneClearance(
+  scene: Readonly<ReaderSceneClearanceOptions>,
+): void {
+  const { input, frame, markup, bounds } = scene;
+
+  bounds.forEach((reader, index) => {
+    _bookPositions(markup).forEach(([bookX, bookY]) => {
+      const openingStart = input.startingShelf === "front" ? 94 : 104;
+      const halfWidth = frame <= openingStart ? 23 : 41;
+      reader.identityBounds.forEach((identity) => {
+        return assert.ok(
+          identity.right <= bookX - halfWidth ||
+            identity.left >= bookX + halfWidth ||
+            identity.bottom <= bookY - 22 ||
+            identity.top >= bookY + 24,
+          `${input.startingShelf} frame ${frame}: book obscures reader ${index + 1} head or key`,
+        );
+      });
+    });
+    assert.ok(
+      reader.left >= 0 &&
+        reader.right <= 960 &&
+        reader.top > 188.6 &&
+        reader.bottom < 435,
+      `${frame}: reader ${index + 1} outside scene lane ${JSON.stringify(reader)}`,
+    );
+    bounds.slice(index + 1).forEach((other, offset) => {
+      assert.ok(
+        reader.right <= other.left ||
+          other.right <= reader.left ||
+          reader.bottom <= other.top ||
+          other.bottom <= reader.top,
+        `${input.startingShelf} frame ${frame}: reader ${index + 1} and ${index + offset + 2} envelopes overlap ${JSON.stringify([reader, other])}`,
+      );
+    });
+  });
+}
+
+/** Reader envelopes and the scene state used for collision assertions. */
+type ReaderSceneClearanceOptions = {
+  input: Input;
+  frame: number;
+  markup: string;
+  bounds: Array<ReturnType<typeof _getReaderBounds>>;
+};
+
+/** Returns one dense route while retaining the supplied group order. */
+function _createGroupedReadingRoute({
+  exact,
+  books,
+  members,
+}: Readonly<{
+  exact: Input;
+  books: Input["books"];
+  members: string[][];
+}>): Input {
+  return {
+    ...exact,
+    learners: exact.learners.map((learner) => {
+      return { ...learner, label: "界".repeat(16) };
+    }),
+    books: books.map((book) => {
+      return {
+        ...book,
+        label: "界".repeat(22),
+        pageLabel: "界".repeat(28),
+      };
+    }),
+    labels: denseInput.labels,
+    caption: denseInput.caption,
+    readingGroups: members.map((learnerIds, index) => {
+      return { bookId: `b${3 - index}`, learnerIds };
+    }),
+  };
+}

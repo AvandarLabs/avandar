@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { prop } from "@avandar/utils";
+import { objectValuesMap, prop } from "@avandar/utils";
 import { registerStockDefaultTextAssertions } from "../../../../../tests/helpers/registerStockDefaultTextAssertions";
 import { registerStockPresetAssertions } from "../../../../../tests/helpers/registerStockPresetAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
@@ -11,6 +11,8 @@ import {
   invalidInputs,
 } from "../SchemaPlanLocalExecution.fixtures";
 import { inputSchema } from "../SchemaPlanLocalExecution.schema";
+import { assertActualRawRowsRemainShowRows as _assertActualRawRowsRemainShowRows } from "./assertActualRawRowsRemainShowRows";
+import { assertExchangeCardsRetainCompleteInput as _assertExchangeCardsRetainCompleteInput } from "./assertExchangeCardsRetainCompleteInput";
 import {
   render,
   options,
@@ -80,50 +82,7 @@ registerStockDefaultTextAssertions({
 
 test("all actual raw rows remain inside the device throughout outbound and inbound travel", () => {
   [true, false].forEach((showRows) => {
-    const input = { ...FIXTURES[2].input, showRows };
-    [13, 34.5, 55, 56, 78.5, 100, 120, 150].forEach((frame) => {
-      const markup = render({ frame: frame, input: input }),
-        boundary = SvgAttributes.fromMarker({
-          markup,
-          marker: "local-boundary",
-        });
-      const edge =
-        SvgAttributes.getNumberFromMarkup({ attributes: boundary, name: "x" }) +
-        SvgAttributes.getNumberFromMarkup({
-          attributes: boundary,
-          name: "width",
-        });
-      [...markup.matchAll(/<rect[^>]*data-row-body="[^"]*"[^>]*>/g)].forEach(
-        ([row]) => {
-          assert.ok(
-            SvgAttributes.getNumberFromMarkup({ attributes: row, name: "x" }) >=
-              SvgAttributes.getNumberFromMarkup({
-                attributes: boundary,
-                name: "x",
-              }),
-          );
-          assert.ok(
-            SvgAttributes.getNumberFromMarkup({ attributes: row, name: "x" }) +
-              SvgAttributes.getNumberFromMarkup({
-                attributes: row,
-                name: "width",
-              }) <
-              edge,
-          );
-        },
-      );
-      const start = markup.indexOf('<g data-outbound="true"');
-      const end = markup.indexOf('<g data-inbound="true"');
-      const outbound = markup.slice(start, end);
-      assert.doesNotMatch(
-        outbound,
-        /data-raw-value=|data-local-row=|data-literal-value=/,
-      );
-      assert.ok(outbound.includes(`aria-label="${input.request.question}"`));
-      assert.ok(outbound.includes(`aria-label="${input.columns.category}"`));
-      assert.ok(outbound.includes(`aria-label="${input.columns.measure}"`));
-      assert.equal((markup.match(/data-row-body=/g) || []).length, 6);
-    });
+    return _assertActualRawRowsRemainShowRows(showRows);
   });
 });
 
@@ -215,87 +174,12 @@ test("exchange cards retain complete wrapped text and avoid other cards, caption
       ...FIXTURES[2].input,
       columns: { category: words.slice(0, 20), measure: "V".repeat(20) },
       request: { ...FIXTURES[2].input.request, planLabel: words.slice(0, 38) },
-      boundaryLabels: Object.fromEntries(
-        Object.keys(DEFAULT_INPUT.boundaryLabels).map((key) => {
-          return [key, words.slice(0, 30)];
-        }),
-      ),
+      boundaryLabels: objectValuesMap(DEFAULT_INPUT.boundaryLabels, () => {
+        return words.slice(0, 30);
+      }),
     });
   });
   [...FIXTURES.map(prop("input")), ...stress].forEach((input) => {
-    Array.from(
-      { length: Math.max(0, Math.floor((167 - 56) / 3) + 1) },
-      (_, sampleIndex) => {
-        return 56 + sampleIndex * 3;
-      },
-    ).forEach((frame) => {
-      const markup = render({ frame: frame, input: input }),
-        inbound = _getCardBounds({ markup, kind: "inbound" }),
-        outbound = _getCardBounds({ markup, kind: "outbound" });
-      _assertSeparate({
-        first: inbound,
-        second: outbound,
-        context: `frame ${frame}: exchange cards`,
-      });
-      [inbound, outbound].forEach((card) => {
-        const lines = _getTextLineBounds({
-          markup: card.markup,
-          x: card.left,
-          y: card.top,
-        });
-        assert.ok(lines.length);
-        lines.forEach((line) => {
-          return assert.ok(
-            line.left >= card.left &&
-              line.right <= card.right &&
-              line.top >= card.top &&
-              line.bottom <= card.bottom,
-            `frame ${frame}: complete card text ${JSON.stringify(line)}`,
-          );
-        });
-        const tableStart = markup.indexOf('data-local-table="true"');
-        _getTextLineBounds({ markup: markup.slice(0, tableStart) }).forEach(
-          (caption) => {
-            return _assertSeparate({
-              first: card,
-              second: caption,
-              context: `frame ${frame}: card/caption`,
-            });
-          },
-        );
-        [...markup.matchAll(/<rect[^>]*data-row-body="[^"]*"[^>]*>/g)].forEach(
-          ([row]) => {
-            const left = SvgAttributes.getNumberFromMarkup({
-                attributes: row,
-                name: "x",
-              }),
-              top = SvgAttributes.getNumberFromMarkup({
-                attributes: row,
-                name: "y",
-              });
-            _assertSeparate({
-              first: card,
-              second: {
-                left,
-                top,
-                right:
-                  left +
-                  SvgAttributes.getNumberFromMarkup({
-                    attributes: row,
-                    name: "width",
-                  }),
-                bottom:
-                  top +
-                  SvgAttributes.getNumberFromMarkup({
-                    attributes: row,
-                    name: "height",
-                  }),
-              },
-              context: `frame ${frame}: retained row`,
-            });
-          },
-        );
-      });
-    });
+    return _assertExchangeCardsRetainCompleteInput(input);
   });
 });

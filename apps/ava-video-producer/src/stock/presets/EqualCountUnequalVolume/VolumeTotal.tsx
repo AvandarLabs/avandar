@@ -1,4 +1,4 @@
-import { ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getByteLabelFromBytes } from "./getByteLabelFromBytes";
@@ -26,12 +26,12 @@ export function VolumeTotal({
   }, 0);
   return frame >= 111 ? (
     <g
-      opacity={ramp(
+      opacity={Motion.ramp({
         frame,
-        111,
-        motion.scale(TOTAL_FRAMES),
-        motion.reveal.easing,
-      )}
+        at: 111,
+        dur: motion.scale(TOTAL_FRAMES),
+        easing: motion.reveal.easing,
+      })}
       data-total-bytes={total}
     >
       <LabelSlots

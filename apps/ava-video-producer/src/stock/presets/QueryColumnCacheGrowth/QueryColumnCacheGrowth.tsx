@@ -1,6 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { CachedRelation } from "./CachedRelation";
+import { CachedRelation } from "./CachedRelation/CachedRelation";
 import { CacheRequests } from "./CacheRequests";
 import { getCacheSceneFromFrame } from "./getCacheSceneFromFrame";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";

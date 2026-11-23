@@ -1,11 +1,14 @@
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
+
+type Props = { x: number; anchor?: "end"; children: ReactNode };
+
 /** The ruler's value at one end. */
 export function RulerEndLabel({
   x,
   anchor,
   children,
-}: Readonly<{ x: number; anchor?: "end"; children: ReactNode }>): ReactNode {
+}: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <text

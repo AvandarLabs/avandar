@@ -1,3 +1,4 @@
+import { propIsInArray } from "@avandar/utils";
 import type { Input } from "./BoundaryRegroupingEffect.schema";
 /** Data for getGroupingFromCells. */
 type GetGroupingFromCellsResult = {
@@ -24,9 +25,7 @@ export function getGroupingFromCells({
   index,
 }: Readonly<{ input: Input; index: number }>): GetGroupingFromCellsResult[] {
   return input.groupings[index].zones.map((zone, zoneIndex) => {
-    const cells = input.cells.filter((cell) => {
-      return zone.cellIds.includes(cell.id);
-    });
+    const cells = input.cells.filter(propIsInArray("id", zone.cellIds));
     const records = cells.reduce((total, cell) => {
       return total + cell.records;
     }, 0);

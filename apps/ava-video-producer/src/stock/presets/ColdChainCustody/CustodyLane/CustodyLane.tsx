@@ -1,12 +1,40 @@
-import { mix } from "../../../../motion";
+import { Motion } from "../../../../motion";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CustodyCheckpoint } from "../CustodyCheckpoint";
 import { SceneLabel } from "../SceneLabel";
-import { type Props } from "./CustodyLaneShared.types";
 import { LaneTrack } from "./LaneTrack";
 import { MovingContainer } from "./MovingContainer";
-import type { VideoMotion } from "../../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
+import type { Props } from "./CustodyLaneShared.types";
 import type { ReactNode } from "react";
+/** Inputs for getContainerX. */
+type GetContainerXArguments = {
+  frame: number;
+  index: number;
+  motion: VideoMotion;
+};
+
+/** The container's position on its two legs between stops. */
+function _getContainerX({
+  frame,
+  index,
+  motion,
+}: Readonly<GetContainerXArguments>): number {
+  const first = motion.ramp(
+    frame,
+    36 + index * motion.scaleStagger(2),
+    motion.scale(30),
+    motion.travel.easing,
+  );
+  const second = motion.ramp(
+    frame,
+    72 + index * motion.scaleStagger(2),
+    motion.scale(35),
+    motion.travel.easing,
+  );
+  return Motion.mix({ t: first, from: 280, to: 510 }) + 230 * second;
+}
+
 /** One persistent container and three independent checkpoint facts per stop. */
 export function CustodyLane({
   crate,
@@ -31,9 +59,7 @@ export function CustodyLane({
             checkpoint={checkpoint}
             stopIndex={stopIndex}
             crateIndex={index}
-            y={y}
-            frame={frame}
-            accent={accent}
+            {...{ y, frame, accent }}
             showMonitoring={input.showMonitoring}
           />
         );
@@ -47,24 +73,4 @@ export function CustodyLane({
       />
     </g>
   );
-}
-/** The container's position on its two legs between stops. */
-function _getContainerX({
-  frame,
-  index,
-  motion,
-}: Readonly<{ frame: number; index: number; motion: VideoMotion }>): number {
-  const first = motion.ramp(
-    frame,
-    36 + index * motion.scaleStagger(2),
-    motion.scale(30),
-    motion.travel.easing,
-  );
-  const second = motion.ramp(
-    frame,
-    72 + index * motion.scaleStagger(2),
-    motion.scale(35),
-    motion.travel.easing,
-  );
-  return mix(first, 280, 510) + 230 * second;
 }

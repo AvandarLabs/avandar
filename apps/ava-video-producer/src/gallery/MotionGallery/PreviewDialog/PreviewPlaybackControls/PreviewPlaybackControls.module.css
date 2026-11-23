@@ -1,0 +1,15 @@
+.previewPlaybackControlsPlayerControls {
+  composes: player-controls from global;
+}
+
+.previewPlaybackControlsSrOnly {
+  composes: sr-only from global;
+}
+
+.previewPlaybackControlsFrameScrubber {
+  composes: frame-scrubber from global;
+}
+
+.previewPlaybackControlsScrubberLabels {
+  composes: scrubber-labels from global;
+}

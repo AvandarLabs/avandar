@@ -1,7 +1,7 @@
-import { propEq } from "@avandar/utils";
-import { mix } from "../../../motion";
+import { propEq, propNotEq } from "@avandar/utils";
+import { Motion } from "../../../motion";
 import { DuplicateTiming } from "./DuplicateTiming";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./DuplicateReviewStack.schema";
 
 type Options = {
@@ -38,11 +38,11 @@ export function getDuplicateCardLayoutFromGroupAndFrame({
     fold = DuplicateTiming.getFoldFromFrame({ frame, motion });
   const isRetained = group.retainedId === record.id;
   const isPair = input.finalView === "comparison-pair";
-  const alternativeIndex = group.records
-    .filter((candidate) => {
-      return candidate.id !== group.retainedId;
-    })
-    .findIndex(propEq("id", record.id));
+  const alternatives =
+    group.retainedId === null
+      ? group.records
+      : group.records.filter(propNotEq("id", group.retainedId));
+  const alternativeIndex = alternatives.findIndex(propEq("id", record.id));
   const stackOffset = isRetained ? 0 : (alternativeIndex + 1) * 28;
   const sourceX = 44 + groupIndex * 456;
   const sourceY = 200 + index * 124;
@@ -55,13 +55,13 @@ export function getDuplicateCardLayoutFromGroupAndFrame({
       ? sourceY
       : 200 + stackOffset;
   return {
-    x: mix(
-      fold,
-      mix(align, sourceX + index * 8, sourceX),
-      isPair || group.retainedId !== null ? targetX : sourceX,
-    ),
-    y: mix(fold, sourceY, targetY),
-    width: mix(isPair ? fold : 0, 400, 296),
+    x: Motion.mix({
+      t: fold,
+      from: Motion.mix({ t: align, from: sourceX + index * 8, to: sourceX }),
+      to: isPair || group.retainedId !== null ? targetX : sourceX,
+    }),
+    y: Motion.mix({ t: fold, from: sourceY, to: targetY }),
+    width: Motion.mix({ t: isPair ? fold : 0, from: 400, to: 296 }),
     height: 112,
     isRetained,
     isFolded: fold === 1,

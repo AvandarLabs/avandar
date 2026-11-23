@@ -1,15 +1,8 @@
 import { propEq, prop } from "@avandar/utils";
 import { z } from "zod";
+import { ProseSemanticRoles } from "./ProseSemanticRoles";
 import type { StockSemanticRule } from "../../contracts/StockContract.types";
 
-const SEMANTIC_ROLES: readonly [
-  "subject",
-  "metric",
-  "value",
-  "unit",
-  "period",
-  "qualifier",
-] = ["subject", "metric", "value", "unit", "period", "qualifier"] as const;
 function _validFragment(
   fragment: Readonly<z.infer<typeof fragmentSchema>>,
 ): boolean {
@@ -32,7 +25,7 @@ function _validFragment(
 const fragmentSchema = z.strictObject({
   id: z.string().min(1).max(12),
   text: z.string().min(1).max(30),
-  role: z.enum([...SEMANTIC_ROLES, "connector"]),
+  role: z.enum([...ProseSemanticRoles.values, "connector"]),
   contentStart: z.number().int().min(0).max(30),
   contentEnd: z.number().int().min(0).max(30),
 }) satisfies z.ZodType;
@@ -56,7 +49,7 @@ export const inputSchema = z
       input.fragments.reduce((total, { text }) => {
         return total + text.length;
       }, 0) > 110 ||
-      SEMANTIC_ROLES.some((role) => {
+      ProseSemanticRoles.values.some((role) => {
         return input.fragments.filter(propEq("role", role)).length !== 1;
       }) ||
       input.fragments.some((f) => {

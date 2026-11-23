@@ -2,12 +2,15 @@ import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getReadingSeatPathFromFrame } from "../getReadingSeatPathFromFrame";
 import type { ReactNode } from "react";
+
+type Props = { learnerId: string; frame: number; angle: number };
+
 /** The learner's seat, turning toward the circle. */
 export function ReadingSeat({
   learnerId,
   frame,
   angle,
-}: Readonly<{ learnerId: string; frame: number; angle: number }>): ReactNode {
+}: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   const motion = GraphicThemeHooks.useGraphicMotion();

@@ -1,4 +1,4 @@
-import { ramp } from "../../../../motion";
+import { Motion } from "../../../../motion";
 import { FitText } from "../../../primitives/FitText/FitText";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getSocketPointFromIndex } from "../getSocketPointFromIndex";
@@ -50,7 +50,12 @@ export function LeaseSocket({
   });
   const isHolder = participant.id === input.holderId;
   const opening = isHolder
-    ? ramp(frame, EXPIRY_CUE, motion.scale(OPEN_FRAMES), motion.exit.easing)
+    ? Motion.ramp({
+        frame,
+        at: EXPIRY_CUE,
+        dur: motion.scale(OPEN_FRAMES),
+        easing: motion.exit.easing,
+      })
     : 0;
   const collarProps = { input, frame, x, y, accent };
   return (

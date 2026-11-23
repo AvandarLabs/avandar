@@ -1,6 +1,6 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { KernelConesShared } from "./KernelConesShared/KernelConesShared";
+import { KernelConesShared } from "./KernelConesShared";
 import type { ReactNode } from "react";
 
 type Props = {

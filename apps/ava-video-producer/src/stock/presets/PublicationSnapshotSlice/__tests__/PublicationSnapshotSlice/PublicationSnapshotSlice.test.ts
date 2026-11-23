@@ -13,6 +13,7 @@ import {
   fixtures,
 } from "../../PublicationSnapshotSlice.fixtures";
 import { inputSchema } from "../../PublicationSnapshotSlice.schema";
+import { assertReversedArbitraryStringCopiesNumColumns as _assertReversedArbitraryStringCopiesNumColumns } from "./assertReversedArbitraryStringCopiesNumColumns";
 import { PublicationSnapshotTestHelpers } from "./PublicationSnapshotTestHelpers";
 
 test("selected cells retain pre-edit values and revision while the live source changes", () => {
@@ -30,6 +31,7 @@ test("selected cells retain pre-edit values and revision while the live source c
   assert.match(reversed, /data-live-cell="a:items" data-value=""/);
   assert.match(reversed, /data-audience="public"/);
 });
+
 test("selected value copies cross into a separate snapshot before only the live cell is edited", () => {
   const start = PublicationSnapshotTestHelpers.marker({
       markup: PublicationSnapshotTestHelpers.render({ frame: 56 }),
@@ -63,8 +65,11 @@ test("selected value copies cross into a separate snapshot before only the live 
     /data-live-cell="a:items" data-value="12"/,
   );
 });
+
 registerStockPresetAssertions(PublicationSnapshotTestHelpers.options);
+
 registerStockTextLayoutAssertions(PublicationSnapshotTestHelpers.options);
+
 registerStockDefaultTextAssertions({
   contract,
   expectedTextPaths: [
@@ -86,6 +91,7 @@ registerStockDefaultTextAssertions({
   ],
   suppliedInputs: fixtures.map(prop("input")),
 });
+
 test("every required top-level field rejects omission", () => {
   Object.keys(DEFAULT_INPUT).forEach((key) => {
     const incomplete = { ...DEFAULT_INPUT };
@@ -93,6 +99,7 @@ test("every required top-level field rejects omission", () => {
     assert.equal(inputSchema.safeParse(incomplete).success, false, key);
   });
 });
+
 test("one-cell and full-table selections preserve selected order and exact pre-edit values", () => {
   const minimum = PublicationSnapshotTestHelpers.render({
     frame: 150,
@@ -125,6 +132,7 @@ test("one-cell and full-table selections preserve selected order and exact pre-e
       SvgAttributes.getNumberFromMarkup({ attributes: last, name: "y" }),
   );
 });
+
 test("hidden excluded cells cannot enter the snapshot for either explicit audience", () => {
   ["internal", "public"].forEach((audience) => {
     const input = inputSchema.parse({
@@ -141,6 +149,7 @@ test("hidden excluded cells cannot enter the snapshot for either explicit audien
     assert.ok(markup.includes(`data-audience="${audience}"`));
   });
 });
+
 test("the live write cue never changes the frozen snapshot or an unedited source cell", () => {
   [96, 109, 116, 117, 130, 139, 150].forEach((frame) => {
     const snapshot = getSnapshotCellFromFrame({
@@ -165,6 +174,7 @@ test("the live write cue never changes the frozen snapshot or an unedited source
     assert.equal(otherCell.isEditTarget, false);
   });
 });
+
 test("reversed full-table snapshot travel preserves visible text and foreground clearance at frame 83", () => {
   PublicationSnapshotTestHelpers.assertReadablePaint(
     PublicationSnapshotTestHelpers.render({
@@ -173,6 +183,7 @@ test("reversed full-table snapshot travel preserves visible text and foreground 
     }),
   );
 });
+
 test("PublicationSnapshotSlice transfer sampling preserves visible text and foreground clearance", () => {
   [DEFAULT_INPUT, fixtures[2].input, fixtures[3].input].forEach((input) => {
     Array.from({ length: 111 }, (_, index) => {
@@ -187,90 +198,13 @@ test("PublicationSnapshotSlice transfer sampling preserves visible text and fore
     });
   });
 });
+
 test("reversed arbitrary-string copies retain readable destination column attribution from first copy through settling", () => {
   [2, 4].forEach((numColumns) => {
-    const columnIds = Array.from({ length: numColumns }, (_, index) => {
-      return `column${index}`;
-    });
-    const input = inputSchema.parse({
-      ...DEFAULT_INPUT,
-      table: {
-        columns: columnIds.map((id, index) => {
-          return { id, label: `${"W".repeat(16)}${index}X` };
-        }),
-        rows: ["first", "second"].map((id, rowIndex) => {
-          return {
-            id,
-            cells: columnIds.map((_, columnIndex) => {
-              return `v${rowIndex}${columnIndex}`;
-            }),
-          };
-        }),
-      },
-      selection: {
-        rowIds: ["second", "first"],
-        columnIds: [...columnIds].reverse(),
-      },
-      liveEdit: { rowId: "first", columnId: columnIds[0], value: "changed" },
-    });
-    [
-      83,
-      ...Array.from({ length: 87 }, (_, index) => {
-        return 56.5 + index / 2;
-      }),
-    ].forEach((frame) => {
-      const markup = PublicationSnapshotTestHelpers.render({ frame, input }),
-        paint = SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup(markup);
-      input.selection.columnIds.forEach((columnId, selectedColumn) => {
-        const columnIndex = input.table.columns.findIndex(
-            propEq("id", columnId),
-          ),
-          column = input.table.columns[columnIndex];
-        const left = 508 + (selectedColumn * 400) / numColumns,
-          right = left + 400 / numColumns;
-        const labels = paint.filter((item) => {
-          return (
-            item.kind === "text" &&
-            item.ariaLabel === column.label &&
-            item.left >= left &&
-            item.right <= right
-          );
-        });
-        assert.ok(
-          labels.length > 0,
-          `Missing visible column attribution for ${columnId} at reversed frame${frame}.`,
-        );
-        assert.equal(labels.map(prop("text")).join(""), column.label);
-        input.table.rows
-          .filter((row) => {
-            return row.id === "first" || frame > 74;
-          })
-          .forEach((row) => {
-            const value = paint.find((item) => {
-              return (
-                item.kind === "text" &&
-                item.text === row.cells[columnIndex] &&
-                item.left >= left &&
-                item.right <= right
-              );
-            });
-            assert.ok(
-              value,
-              `Expected visible arbitrary copy ${row.cells[columnIndex]}.`,
-            );
-            assert.ok(
-              labels.every((label) => {
-                return label.bottom < value.top;
-              }),
-              "The readable heading must precede its actual values in the same column.",
-            );
-          });
-      });
-      SvgPaintAssertions.assertTextCanvasBounds({ markup });
-      PublicationSnapshotTestHelpers.assertReadablePaint(markup);
-    });
+    return _assertReversedArbitraryStringCopiesNumColumns(numColumns);
   });
 });
+
 test("snapshot transfer heading envelopes clear the retained top border stroke", () => {
   [DEFAULT_INPUT, fixtures[2].input, fixtures[3].input].forEach((input) => {
     Array.from({ length: 87 }, (_, index) => {

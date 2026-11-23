@@ -1,8 +1,8 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { DraftModel } from "./DraftModel";
+import { DraftModel } from "./DraftModel/DraftModel";
 import { DraftReview } from "./DraftReview";
-import { SourceSentence } from "./SourceSentence";
+import { SourceSentence } from "./SourceSentence/SourceSentence";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./UtteranceToModelDraft.schema";
 import type { ReactNode } from "react";

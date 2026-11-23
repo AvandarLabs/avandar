@@ -1,8 +1,11 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
+
+type Props = { y: number };
+
 /** The dashed track the container travels along. */
-export function LaneTrack({ y }: Readonly<{ y: number }>): ReactNode {
+export function LaneTrack({ y }: Readonly<Props>): ReactNode {
   const { atomic } = GraphicThemeHooks.useGraphicTheme();
   const tokens = GraphicThemeHooks.useGraphicTokens();
   return (

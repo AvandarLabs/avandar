@@ -1,9 +1,10 @@
 import { normalizeFiniteRange } from "../../numeric/normalizeFiniteRange/normalizeFiniteRange";
-import { FitText } from "../../primitives/FitText/FitText";
-import { StockRect } from "../../primitives/StockRect/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { ObservationCellCopy } from "./ObservationCellCopy/ObservationCellCopy";
+import { ObservationCellMissingCell } from "./ObservationCellMissingCell/ObservationCellMissingCell";
 import type { Input } from "./EnvironmentalObservationGaps.schema";
 import type { ReactNode } from "react";
+
 /** Data for Props. */
 type PropsCell = { x: number; y: number; width: number; height: number };
 type Props = {
@@ -36,40 +37,20 @@ export function ObservationCell({
         });
   return (
     <g data-observation-cell={cell.id}>
-      <StockRect
-        data-missing-cell={value === null ? cell.id : undefined}
-        x={cell.x}
-        y={cell.y}
-        width={cell.width}
-        height={cell.height}
-        fill={value === null ? `url(#${patternId})` : accent}
-        fillOpacity={
-          value === null
-            ? 1
-            : scales.wash(OBSERVED_TINT_FLOOR + strength * OBSERVED_TINT_RANGE)
-        }
-        stroke={tokens.color.line}
+      <ObservationCellMissingCell
+        {...{ value, cell, patternId, accent, scales }}
+        observedTintFloor={OBSERVED_TINT_FLOOR}
+        strength={strength}
+        observedTintRange={OBSERVED_TINT_RANGE}
+        tokens={tokens}
       />
-      <FitText
-        text={cell.label}
-        x={cell.x + 10}
-        y={cell.y + 14}
-        width={cell.width - 20}
-        fontSize={12}
-        maxLines={3}
-        breakLongWords
-        normalizeWhitespace
-      />
-      <FitText
-        text={value === null ? "?" : String(value)}
-        x={cell.x + 10}
-        y={cell.y + 58}
-        width={cell.width - 20}
-        fontSize={12}
-        maxLines={2}
-        breakLongWords
-        normalizeWhitespace
-      />
+      <ObservationCellCopy cell={cell} value={value} />
     </g>
   );
 }
+
+/** The type of `OBSERVED_TINT_FLOOR` used by ObservationCell. */
+export type ObservationCellObservedTintFloorValue = typeof OBSERVED_TINT_FLOOR;
+
+/** The type of `OBSERVED_TINT_RANGE` used by ObservationCell. */
+export type ObservationCellObservedTintRangeValue = typeof OBSERVED_TINT_RANGE;

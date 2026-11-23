@@ -1,11 +1,11 @@
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "../RecipientConfirmedHandover.schema";
 import type { ReactNode } from "react";
+
+type Props = { content: Input["contents"][number]; index: number };
+
 /** Offered units against selected units for one good. */
-export function QuantityLine({
-  content,
-  index,
-}: Readonly<{ content: Input["contents"][number]; index: number }>): ReactNode {
+export function QuantityLine({ content, index }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <text

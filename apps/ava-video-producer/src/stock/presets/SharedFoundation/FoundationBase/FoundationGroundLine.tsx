@@ -1,11 +1,14 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
+
+type Props = { joining: number; accent: string };
+
 /** The ground line the pieces join along. */
 export function FoundationGroundLine({
   joining,
   accent,
-}: Readonly<{ joining: number; accent: string }>): ReactNode {
+}: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (

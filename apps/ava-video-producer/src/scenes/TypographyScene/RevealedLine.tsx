@@ -1,11 +1,11 @@
 import { useVideoMotion } from "../../videoTheme/useVideoMotion";
-import { useVideoTheme } from "../../videoTheme/useVideoTheme";
-import { getLineRevealStyle } from "../textReveal/textReveal";
+import { useVideoTheme } from "../../videoTheme/videoThemeHelpers";
+import { TextReveal } from "../TextReveal/TextReveal";
 import { type LineProps } from "./TypographySceneShared/TypographySceneShared.types";
-import type { TextRevealMode } from "../textReveal/textReveal";
+import type { TextRevealMode } from "../TextReveal/TextReveal";
 import type { ReactNode } from "react";
 
-type RevealedLineOptions = LineProps & {
+type Props = LineProps & {
   revealMode: Exclude<TextRevealMode, "word-mask">;
 };
 /** The whole line revealed at once by a line reveal style. */
@@ -17,7 +17,7 @@ export function RevealedLine({
   revealAt,
   revealMode,
   getWordStyle,
-}: RevealedLineOptions): ReactNode {
+}: Readonly<Props>): ReactNode {
   const motion = useVideoMotion();
   const lineHeight = useVideoTheme().mantine.lineHeights["108"];
   return (
@@ -28,7 +28,7 @@ export function RevealedLine({
         gap: fontSize * 0.3,
         lineHeight,
         paddingBottom: fontSize * 0.07,
-        ...getLineRevealStyle({
+        ...TextReveal.getLineRevealStyle({
           frame,
           at: revealAt,
           mode: revealMode,

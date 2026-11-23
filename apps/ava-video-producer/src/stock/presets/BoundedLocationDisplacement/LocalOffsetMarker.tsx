@@ -1,10 +1,24 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { Text } from "../../graphics-common/Text";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./BoundedLocationDisplacement.schema";
 import type { ReactNode } from "react";
+
+type OffsetPoint = { cx: number; cy: number };
+type OffsetVector = { x1: number; y1: number; x2: number; y2: number };
+type OffsetGeometry = {
+  progress: number;
+  source: OffsetPoint;
+  displaced: OffsetPoint;
+  vector: OffsetVector;
+};
+
+/** Inputs for getOffsetGeometry. */
+type GetOffsetGeometryArguments = Pick<Props, "location" | "frame"> & {
+  motion: VideoMotion;
+};
 
 type Props = {
   location: Input["locations"][number];
@@ -17,7 +31,7 @@ function _getOffsetGeometry({
   location,
   frame,
   motion,
-}: Readonly<Pick<Props, "location" | "frame"> & { motion: VideoMotion }>) {
+}: Readonly<GetOffsetGeometryArguments>): OffsetGeometry {
   const progress = motion.ramp(
     frame,
     13,
@@ -32,8 +46,8 @@ function _getOffsetGeometry({
   const vector = {
     x1: source.cx,
     y1: source.cy,
-    x2: mix(progress, source.cx, displaced.cx),
-    y2: mix(progress, source.cy, displaced.cy),
+    x2: Motion.mix({ t: progress, from: source.cx, to: displaced.cx }),
+    y2: Motion.mix({ t: progress, from: source.cy, to: displaced.cy }),
   };
   return { progress, source, displaced, vector };
 }

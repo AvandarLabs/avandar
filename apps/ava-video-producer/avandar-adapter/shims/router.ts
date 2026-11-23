@@ -19,45 +19,45 @@ type VideoRouter = {
 
 /** The product's plain anchor link, routed through `createLink`. */
 export const Link = createLink("a");
-const _noop = () => {};
+function _noop(): void {}
 
 /** Always resolves to a no-op; no fixture flow navigates imperatively. */
-export const useNavigate = (): (() => void) => {
+export function useNavigate(): () => void {
   return _noop;
-};
+}
 
 /**
  * A minimal router handle exposing the same shape the product reads from
  * TanStack Router.
  */
-export const useRouter = (): VideoRouter => {
+export function useRouter(): VideoRouter {
   return {
     navigate: _noop,
     invalidate: _noop,
     state: { location: { pathname: "/" } },
   };
-};
+}
 
 /** The fixed route params every fixture screen renders under. */
-export const useParams = (): VideoRouteParams => {
+export function useParams(): VideoRouteParams {
   return {
     workspaceSlug: "avandar-labs",
     dashboardId: "video-dashboard",
   };
-};
+}
 
 /** No fixture screen reads search params, so this is always empty. */
-export const useSearch = (): Record<never, never> => {
+export function useSearch(): Record<never, never> {
   return {};
-};
+}
 
 /**
  * The current pathname, driven by `VideoRouteContext` instead of real
  * navigation.
  */
-export const useLocation = (): VideoLocation => {
+export function useLocation(): VideoLocation {
   return { pathname: useContext(VideoRouteContext) };
-};
+}
 
 /**
  * The subset of TanStack Router's `useRouterState` actually used: an optional
@@ -71,16 +71,16 @@ export function useRouterState(options?: {
 }
 
 /** A minimal match object carrying the same fixed params as `useParams`. */
-export const useMatch = (): { params: VideoRouteParams } => {
+export function useMatch(): { params: VideoRouteParams } {
   return { params: useParams() };
-};
+}
 
 /**
  * Returns the same `useParams`/`useSearch` shims a real route API would expose.
  */
-export const getRouteApi = (): {
+export function getRouteApi(): {
   useParams: typeof useParams;
   useSearch: typeof useSearch;
-} => {
+} {
   return { useParams, useSearch };
-};
+}

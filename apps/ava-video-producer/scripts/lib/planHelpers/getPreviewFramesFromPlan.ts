@@ -1,17 +1,13 @@
 import { matchLiteral } from "@avandar/utils";
 import { match, P } from "ts-pattern";
 import cursorTargets from "../../../src/avandar/cursor-targets.json";
-import { getContinuityTimeline } from "../../../src/continuity/continuityTimeline";
+import { ContinuityTimeline } from "../../../src/continuity/ContinuityTimeline/ContinuityTimeline";
 import { MotionSettings } from "../../../src/motion-components/MotionSettings/MotionSettings";
-import {
-  absoluteCues,
-  timeline,
-  durationInFrames,
-  type Storyboard,
-} from "../../../src/storyboard/schema/schema";
+import { type Storyboard } from "../../../src/storyboard/schema/schema";
+import { StoryboardTimeline } from "../../../src/storyboard/schema/StoryboardTimeline";
 
 /** One timeline shot, with its absolute start frame. */
-type TimelineShot = ReturnType<typeof timeline>[number];
+type TimelineShot = ReturnType<typeof StoryboardTimeline.timeline>[number];
 
 /** Mid-motion frames of a scene's build, flight, or window entrance. */
 function _signatureBeatFrames(shot: Storyboard["shots"][number]): number[] {
@@ -53,7 +49,7 @@ function _getContinuityOffsets(shot: Readonly<TimelineShot>): number[] {
   if (shot.scene !== "continuity") {
     return [];
   }
-  const positions = getContinuityTimeline(shot.props.beats);
+  const positions = ContinuityTimeline.getContinuityTimeline(shot.props.beats);
   return shot.props.beats.flatMap((beat, index) => {
     const start = positions[index].start;
     const overlap = MotionSettings.getMotionDuration({
@@ -178,8 +174,8 @@ function _getShotSampleOffsets(shot: Readonly<TimelineShot>): number[] {
  * `renderPreviewStills`, showcase `renderFilm`, and `parityTargets`.
  */
 export function getPreviewFramesFromPlan(plan: Readonly<Storyboard>): number[] {
-  const totalFrames = durationInFrames(plan);
-  const frames = timeline(plan).flatMap((shot) => {
+  const totalFrames = StoryboardTimeline.durationInFrames(plan);
+  const frames = StoryboardTimeline.timeline(plan).flatMap((shot) => {
     return [
       shot.startFrame - 1,
       // Offsets stay inside the shot, so a late beat samples its last frame.
@@ -191,7 +187,7 @@ export function getPreviewFramesFromPlan(plan: Readonly<Storyboard>): number[] {
       }),
     ];
   });
-  const cueMiddles = absoluteCues(plan).map((cue) => {
+  const cueMiddles = StoryboardTimeline.absoluteCues(plan).map((cue) => {
     return Math.floor((cue.startFrame + cue.endFrame) / 2);
   });
   return [

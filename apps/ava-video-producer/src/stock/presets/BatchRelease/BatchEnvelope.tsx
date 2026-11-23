@@ -1,9 +1,9 @@
-import { mix, ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { BatchFrame } from "./BatchFrame/BatchFrame";
 import { BatchMembers } from "./BatchMembers";
 import { BatchReleaseCaption } from "./BatchReleaseCaption";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./BatchRelease.schema";
 import type { ReactNode } from "react";
 
@@ -67,7 +67,11 @@ function _getBatchLayout({
   frame,
   index,
   motion,
-}: Readonly<{ frame: number; index: number; motion: VideoMotion }>) {
+}: Readonly<{
+  frame: number;
+  index: number;
+  motion: VideoMotion;
+}>) {
   const dispatchAt = index ? 128 : 82;
   const dispatchDuration = motion.scale(
     index ? LATER_DISPATCH_FRAMES : FIRST_DISPATCH_FRAMES,
@@ -75,10 +79,15 @@ function _getBatchLayout({
   return {
     start: index ? 94 : 18,
     completeAt: index ? 124 : 68,
-    x: mix(
-      ramp(frame, dispatchAt, dispatchDuration, motion.travel.easing),
-      70,
-      560,
-    ),
+    x: Motion.mix({
+      t: Motion.ramp({
+        frame,
+        at: dispatchAt,
+        dur: dispatchDuration,
+        easing: motion.travel.easing,
+      }),
+      from: 70,
+      to: 560,
+    }),
   };
 }

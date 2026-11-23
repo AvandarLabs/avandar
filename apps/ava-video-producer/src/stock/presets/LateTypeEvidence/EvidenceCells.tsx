@@ -1,7 +1,7 @@
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { EvidenceOutputCell } from "./EvidenceOutputCell";
-import { EvidenceSourceCell } from "./EvidenceSourceCell";
+import { EvidenceSourceCell } from "./EvidenceSourceCell/EvidenceSourceCell";
 import type { Input } from "./LateTypeEvidence.schema";
 import type { ReactNode } from "react";
 
@@ -11,6 +11,7 @@ type Props = {
   accent: string;
   background: string;
 };
+
 /** Two separate column slots retain all authored rows through type review. */
 export function EvidenceCells({
   input,

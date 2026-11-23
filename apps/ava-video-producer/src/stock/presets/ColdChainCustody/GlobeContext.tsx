@@ -2,10 +2,11 @@ import { GlobeProjection } from "../../geography/GlobeProjection/GlobeProjection
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
+
+type Props = { accent: string };
+
 /** A small globe placing the schematic route in its world. */
-export function GlobeContext({
-  accent,
-}: Readonly<{ accent: string }>): ReactNode {
+export function GlobeContext({ accent }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g data-globe="context" transform="translate(900 50)">

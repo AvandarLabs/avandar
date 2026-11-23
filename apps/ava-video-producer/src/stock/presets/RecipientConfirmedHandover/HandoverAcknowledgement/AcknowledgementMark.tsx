@@ -1,13 +1,16 @@
 import { FitText } from "../../../primitives/FitText/FitText";
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { type Props } from "./HandoverAcknowledgementShared.types";
+import { type Props as HandoverAcknowledgementSharedProps } from "./HandoverAcknowledgementShared.types";
 import type { ReactNode } from "react";
+
+type Props = Omit<HandoverAcknowledgementSharedProps, "frame">;
+
 /** The recipient's initials, or a tick when no initials are authored. */
 export function AcknowledgementMark({
   input,
   accent,
-}: Readonly<Omit<Props, "frame">>): ReactNode {
+}: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   if (input.acknowledgementMark === "initials") {

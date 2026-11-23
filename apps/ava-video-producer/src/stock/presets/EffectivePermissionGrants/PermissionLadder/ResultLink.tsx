@@ -1,8 +1,8 @@
-import { ramp } from "../../../../motion";
+import { Motion } from "../../../../motion";
 import { LabelSlots } from "../../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { PermissionLadderShared } from "./PermissionLadderShared/PermissionLadderShared";
+import { PermissionLadderShared } from "./PermissionLadderShared";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -20,12 +20,12 @@ export function ResultLink({
 }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const motion = GraphicThemeHooks.useGraphicMotion();
-  const link = ramp(
+  const link = Motion.ramp({
     frame,
-    132,
-    motion.scale(PermissionLadderShared.LINK_FRAMES),
-    motion.reveal.easing,
-  );
+    at: 132,
+    dur: motion.scale(PermissionLadderShared.LINK_FRAMES),
+    easing: motion.reveal.easing,
+  });
   return (
     <>
       <SketchedShape

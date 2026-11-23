@@ -1,5 +1,11 @@
-import { useVideoProps } from "../../videoTheme/useVideoTheme";
+import { useVideoProps } from "../../videoTheme/videoThemeHelpers";
 import type { ReactNode } from "react";
+
+type Props = {
+  width: number;
+  height: number;
+  children: ReactNode;
+};
 /**
  * The product stage's box, painted with `components.ProductFrame.backdrop`
  * behind the product UI.
@@ -8,12 +14,11 @@ export function ProductBackdrop({
   width,
   height,
   children,
-}: {
-  width: number;
-  height: number;
-  children: ReactNode;
-}): ReactNode {
-  const { backdrop } = useVideoProps("ProductFrame", {});
+}: Readonly<Props>): ReactNode {
+  const { backdrop } = useVideoProps({
+    name: "ProductFrame",
+    props: {},
+  });
   return (
     <div
       style={{

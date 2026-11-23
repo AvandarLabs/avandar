@@ -1,7 +1,10 @@
-import { useVideoTheme } from "../../../videoTheme/useVideoTheme";
+import { useVideoTheme } from "../../../videoTheme/videoThemeHelpers";
 import type { ReactNode } from "react";
+
+type Props = { shown: number };
+
 /** Displays the formatted matching-result total for `SidePanel`. */
-export function MatchedCount({ shown }: { shown: number }): ReactNode {
+export function MatchedCount({ shown }: Readonly<Props>): ReactNode {
   const { atomic, mantine } = useVideoTheme();
   return (
     <div

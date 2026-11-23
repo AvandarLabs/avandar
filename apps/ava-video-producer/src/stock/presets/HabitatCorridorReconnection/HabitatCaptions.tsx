@@ -1,7 +1,8 @@
 import { isDefined } from "@avandar/utils";
-import { FitText } from "../../primitives/FitText/FitText";
+import { HabitatCaptionSlots } from "./HabitatCaptionSlots/HabitatCaptionSlots";
 import type { Input } from "./HabitatCorridorReconnection.schema";
 import type { ReactNode } from "react";
+
 /** Inputs for HabitatCaptions. */
 type Props = { input: Input };
 
@@ -29,32 +30,12 @@ export function HabitatCaptions({ input }: Readonly<Props>): ReactNode {
     { text: input.copy.barrier, x: 350, y: 394, width: 260, maxLines: 3 },
     { text: input.copy.disclaimer, x: 32, y: 588, width: 896, maxLines: 1 },
     input.showIllustrativeTraversal
-      ? {
-          text: input.copy.traversal,
-          x: 32,
-          y: 441,
-          width: 896,
-          maxLines: 1,
-        }
+      ? { text: input.copy.traversal, x: 32, y: 441, width: 896, maxLines: 1 }
       : undefined,
   ].filter(isDefined);
   return (
     <g>
-      {labels.map(({ text, x, y, width, maxLines }, index) => {
-        return (
-          <FitText
-            key={index}
-            text={text}
-            x={x}
-            y={y}
-            width={width}
-            fontSize={12}
-            maxLines={maxLines}
-            breakLongWords
-            normalizeWhitespace
-          />
-        );
-      })}
+      <HabitatCaptionSlots labels={labels} />
     </g>
   );
 }

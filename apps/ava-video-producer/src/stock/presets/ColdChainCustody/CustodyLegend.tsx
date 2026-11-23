@@ -1,5 +1,6 @@
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CustodyLegendEntry } from "./CustodyLegendEntry";
+import { CustodyLegendLedger } from "./CustodyLegendLedger/CustodyLegendLedger";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./ColdChainCustody.schema";
 import type { ReactNode } from "react";
@@ -20,39 +21,12 @@ export function CustodyLegend({
           return (
             <CustodyLegendEntry
               key={`${column}-${row}`}
-              input={input}
-              frame={frame}
-              accent={accent}
-              column={column}
-              row={row}
+              {...{ input, frame, accent, column, row }}
             />
           );
         });
       })}
-      {input.showLedger ? (
-        <g
-          data-ledger="custody"
-          opacity={motion.ramp(frame, 116, motion.scale(10))}
-        >
-          <SceneLabel
-            text={input.copy.total}
-            x={32}
-            y={562}
-            width={280}
-            lines={3}
-          />
-          <text
-            x={315}
-            y={562}
-            fill={tokens.color.text}
-            fontFamily={tokens.text.graphic.value.fontFamily}
-            fontWeight={tokens.text.graphic.value.fontWeight}
-            fontSize={tokens.text.graphic.value.fontSize}
-          >
-            {input.crates.length}
-          </text>
-        </g>
-      ) : undefined}
+      <CustodyLegendLedger {...{ input, motion, frame, tokens }} />
       <g
         data-physical-receipt={input.crates.length}
         opacity={motion.ramp(frame, 116, motion.scale(10))}

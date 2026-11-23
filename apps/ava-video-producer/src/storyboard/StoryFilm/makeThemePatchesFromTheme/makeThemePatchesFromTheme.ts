@@ -34,14 +34,15 @@ export function makeThemePatchesFromTheme(
       ? []
       : [[_tokenKeyFromName(name), _tokenValueFromThemeValue(value)]];
   });
-  if (entries.length === 0) {
-    return [];
-  }
-  return [
-    {
-      other: {
-        video: { semantic: { color: { scene: Object.fromEntries(entries) } } },
-      },
-    },
-  ];
+  return entries.length === 0
+    ? []
+    : [
+        {
+          other: {
+            video: {
+              semantic: { color: { scene: Object.fromEntries(entries) } },
+            },
+          },
+        },
+      ];
 }

@@ -18,6 +18,94 @@ import {
   _createPairInput,
 } from "./DuplicateReviewStackTestHelpers";
 
+type AssertCardsAreDisjointOptions = Readonly<{
+  rect: string;
+  other: string;
+  x: number;
+  y: number;
+  ox: number;
+  oy: number;
+}>;
+
+type GetCardOriginResult = {
+  x: number;
+  y: number;
+};
+
+function _assertCardsAreDisjoint({
+  rect,
+  other,
+  x,
+  y,
+  ox,
+  oy,
+}: AssertCardsAreDisjointOptions): void {
+  assert.ok(
+    x +
+      SvgAttributes.getNumberFromMarkup({
+        attributes: rect,
+        name: "width",
+      }) <=
+      ox ||
+      ox +
+        SvgAttributes.getNumberFromMarkup({
+          attributes: other,
+          name: "width",
+        }) <=
+        x ||
+      y +
+        SvgAttributes.getNumberFromMarkup({
+          attributes: rect,
+          name: "height",
+        }) <=
+        oy ||
+      oy +
+        SvgAttributes.getNumberFromMarkup({
+          attributes: other,
+          name: "height",
+        }) <=
+        y,
+  );
+}
+
+function _getCardOrigin(rect: string): GetCardOriginResult {
+  const x = SvgAttributes.getNumberFromMarkup({
+      attributes: rect,
+      name: "x",
+    }),
+    y = SvgAttributes.getNumberFromMarkup({
+      attributes: rect,
+      name: "y",
+    });
+  return { x, y };
+}
+
+function _assertDenseVariantsKeepCardsBoundedXYWidthHeight(
+  rects: ReturnType<typeof _cards>,
+): void {
+  rects.forEach((rect) => {
+    const { x, y } = _getCardOrigin(rect);
+    assert.ok(
+      x >= 0 &&
+        x +
+          SvgAttributes.getNumberFromMarkup({
+            attributes: rect,
+            name: "width",
+          }) <=
+          960,
+    );
+    assert.ok(
+      y >= 0 &&
+        y +
+          SvgAttributes.getNumberFromMarkup({
+            attributes: rect,
+            name: "height",
+          }) <=
+          600,
+    );
+  });
+}
+
 registerStockPresetAssertions({
   inputSchema,
   defaultInput: DEFAULT_INPUT,
@@ -219,34 +307,7 @@ test("dense variants keep cards bounded and comparison-pair final cards disjoint
         render({ frame: frame, input: { ...fixtures[2].input, finalView } }),
       );
       assert.equal(rects.length, 6);
-      rects.forEach((rect) => {
-        const x = SvgAttributes.getNumberFromMarkup({
-            attributes: rect,
-            name: "x",
-          }),
-          y = SvgAttributes.getNumberFromMarkup({
-            attributes: rect,
-            name: "y",
-          });
-        assert.ok(
-          x >= 0 &&
-            x +
-              SvgAttributes.getNumberFromMarkup({
-                attributes: rect,
-                name: "width",
-              }) <=
-              960,
-        );
-        assert.ok(
-          y >= 0 &&
-            y +
-              SvgAttributes.getNumberFromMarkup({
-                attributes: rect,
-                name: "height",
-              }) <=
-              600,
-        );
-      });
+      _assertDenseVariantsKeepCardsBoundedXYWidthHeight(rects);
       if (finalView === "comparison-pair" && frame === 150) {
         rects.forEach((rect, index) => {
           return rects.slice(index + 1).forEach((other) => {
@@ -266,32 +327,7 @@ test("dense variants keep cards bounded and comparison-pair final cards disjoint
                 attributes: other,
                 name: "y",
               });
-            assert.ok(
-              x +
-                SvgAttributes.getNumberFromMarkup({
-                  attributes: rect,
-                  name: "width",
-                }) <=
-                ox ||
-                ox +
-                  SvgAttributes.getNumberFromMarkup({
-                    attributes: other,
-                    name: "width",
-                  }) <=
-                  x ||
-                y +
-                  SvgAttributes.getNumberFromMarkup({
-                    attributes: rect,
-                    name: "height",
-                  }) <=
-                  oy ||
-                oy +
-                  SvgAttributes.getNumberFromMarkup({
-                    attributes: other,
-                    name: "height",
-                  }) <=
-                  y,
-            );
+            _assertCardsAreDisjoint({ rect, other, x, y, ox, oy });
           });
         });
       }

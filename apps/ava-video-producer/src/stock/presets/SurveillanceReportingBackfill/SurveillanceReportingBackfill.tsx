@@ -1,5 +1,5 @@
 import { propEq } from "@avandar/utils";
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";

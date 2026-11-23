@@ -212,6 +212,7 @@ const extraFixtures: StockContract<typeof swap>["fixtures"] = [
     input: { ...dense, emptyHostState: "available" as const },
   },
 ];
+/** Invalid stock inputs used to check this preset contract rejects bad data. */
 export const invalidInputs: unknown[] = [
   { ...DEFAULT_INPUT, extra: true },
   {

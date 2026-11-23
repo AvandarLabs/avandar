@@ -11,7 +11,10 @@ type Props = Readonly<{
 }>;
 /** The tilted ellipse a body travels along. */
 export function BodyOrbit({ rx, ry, angle, color }: Props): ReactNode {
-  const style = GraphicThemeHooks.useGraphicProps("OrbitalSystem", {});
+  const style = GraphicThemeHooks.useGraphicProps({
+    name: "OrbitalSystem",
+    props: {},
+  });
   const { sketch } = GraphicThemeHooks.useGraphicTokens();
   const shapes = GraphicThemeHooks.useGraphicShapeScales();
   return (

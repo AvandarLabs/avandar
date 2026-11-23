@@ -1,6 +1,6 @@
 import { LabelSlots } from "../../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../../primitives/SketchedShape";
-import { StockRect } from "../../../primitives/StockRect/StockRect";
+import { StockRect } from "../../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { GapPointer } from "./GapPointer";
 import { type Props } from "./PaymentTrayShared.types";

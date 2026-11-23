@@ -1,13 +1,16 @@
-import { mix } from "../../../../motion";
+import { Motion } from "../../../../motion";
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { EnvelopeCover } from "../EnvelopeCover";
-import { FinalFlap } from "./FinalFlap";
-import { FlapCreases } from "./FlapCreases";
+import { EnvelopeSideFlaps } from "./EnvelopeSideFlaps";
 import type { Input } from "../SealedHandoff.schema";
 import type { ReactNode } from "react";
 
-type Props = { frame: number; input: Input; accent: string };
+type Props = {
+  frame: number;
+  input: Input;
+  accent: string;
+};
+
 /** Physical flaps finish in an opaque cover before travel can begin. */
 export function EnvelopeFlaps({
   frame,
@@ -29,26 +32,24 @@ export function EnvelopeFlaps({
       <SketchedShape
         shape={{
           kind: "path",
-          d: `M0 266 L268 ${mix(lower * (1 - opening), 350, 134)} L536 266 z`,
+          d: `M0 266 L268 ${Motion.mix({
+            t: lower * (1 - opening),
+            from: 350,
+            to: 134,
+          })} L536 266 z`,
         }}
         profile={tokens.sketch.shape}
         fill={tokens.color.elevated}
         stroke={tokens.color.line}
       />
-      <SketchedShape
-        shape={{
-          kind: "path",
-          d: `M0 0 L${mix(sides * (1 - opening), -36, 268)} 133 L0 266 z M536 0 L${mix(sides * (1 - opening), 572, 268)} 133 L536 266 z`,
-        }}
-        profile={tokens.sketch.shape}
-        fill={tokens.color.surface}
-        stroke={tokens.color.line}
+      <EnvelopeSideFlaps
+        frame={frame}
+        accent={accent}
+        tokens={tokens}
+        sides={sides}
+        final={final}
+        opening={opening}
       />
-      {frame >= 66 ? <EnvelopeCover opening={opening} /> : undefined}
-      {frame >= 56 ? (
-        <FinalFlap fold={final * (1 - opening)} accent={accent} />
-      ) : undefined}
-      {frame >= 66 && opening === 0 ? <FlapCreases /> : undefined}
     </g>
   );
 }

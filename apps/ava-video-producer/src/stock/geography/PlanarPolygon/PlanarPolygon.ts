@@ -1,34 +1,14 @@
 import { binary64ToInteger } from "./binary64ToInteger";
+import { doCollinearEdgesShareInterior } from "./doCollinearEdgesShareInterior";
+import { getOrientationFromTriangle } from "./getOrientationFromTriangle";
+import { isFinitePlanarPoint } from "./isFinitePlanarPoint";
+import { isPointOnSegment } from "./isPointOnSegment";
 
 type Point = readonly [number, number];
 
 type Ring = readonly Point[];
 
 type Triangle = { first: Point; second: Point; third: Point };
-
-function _isFinitePoint(point: Point): boolean {
-  return point.length === 2 && point.every(Number.isFinite);
-}
-
-function _orientation({ first, second, third }: Readonly<Triangle>): number {
-  const [firstX, firstY] = first.map(binary64ToInteger);
-  const [secondX, secondY] = second.map(binary64ToInteger);
-  const [thirdX, thirdY] = third.map(binary64ToInteger);
-  const determinant =
-    (secondX - firstX) * (thirdY - firstY) -
-    (secondY - firstY) * (thirdX - firstX);
-  return determinant > 0n ? 1 : determinant < 0n ? -1 : 0;
-}
-
-function _onSegment({ first, second, third }: Readonly<Triangle>): boolean {
-  return (
-    _orientation({ first, second, third }) === 0 &&
-    third[0] >= Math.min(first[0], second[0]) &&
-    third[0] <= Math.max(first[0], second[0]) &&
-    third[1] >= Math.min(first[1], second[1]) &&
-    third[1] <= Math.max(first[1], second[1])
-  );
-}
 
 function _segmentsMeet({
   first,
@@ -37,17 +17,17 @@ function _segmentsMeet({
   fourth,
 }: Readonly<Triangle & { fourth: Point }>): boolean {
   const signs = [
-    _orientation({ first, second, third }),
-    _orientation({ first, second, third: fourth }),
-    _orientation({ first: third, second: fourth, third: first }),
-    _orientation({ first: third, second: fourth, third: second }),
+    getOrientationFromTriangle({ first, second, third }),
+    getOrientationFromTriangle({ first, second, third: fourth }),
+    getOrientationFromTriangle({ first: third, second: fourth, third: first }),
+    getOrientationFromTriangle({ first: third, second: fourth, third: second }),
   ];
   return (
     (signs[0] * signs[1] < 0 && signs[2] * signs[3] < 0) ||
-    _onSegment({ first, second, third }) ||
-    _onSegment({ first, second, third: fourth }) ||
-    _onSegment({ first: third, second: fourth, third: first }) ||
-    _onSegment({ first: third, second: fourth, third: second })
+    isPointOnSegment({ first, second, third }) ||
+    isPointOnSegment({ first, second, third: fourth }) ||
+    isPointOnSegment({ first: third, second: fourth, third: first }) ||
+    isPointOnSegment({ first: third, second: fourth, third: second })
   );
 }
 
@@ -56,8 +36,8 @@ function _hasInvalidEdges(polygon: Ring): boolean {
     const second = polygon[(index + 1) % polygon.length];
     const third = polygon[(index + 2) % polygon.length];
     if (
-      _onSegment({ first, second, third }) ||
-      _onSegment({ first: second, second: third, third: first })
+      isPointOnSegment({ first, second, third }) ||
+      isPointOnSegment({ first: second, second: third, third: first })
     ) {
       return true;
     }
@@ -85,7 +65,7 @@ function _hasInvalidEdges(polygon: Ring): boolean {
  * Exact binary64 determinant signs impose no minimum area or tolerance band.
  */
 function _isSimplePolygon({ polygon }: Readonly<{ polygon: Ring }>): boolean {
-  if (polygon.length < 3 || !polygon.every(_isFinitePoint)) {
+  if (polygon.length < 3 || !polygon.every(isFinitePlanarPoint)) {
     return false;
   }
   const identities = polygon.map(([x, y]) => {
@@ -100,7 +80,7 @@ function _isSimplePolygon({ polygon }: Readonly<{ polygon: Ring }>): boolean {
  * Classifies a finite point against an already validated simple open ring.
  * Callers choose their own boundary policy. No epsilon widens the boundary.
  * Nonfinite points or rings with fewer than three vertices throw. Simplicity
- * must be validated by the caller with isSimplePolygon before classification.
+ * must be validated by the caller with PlanarPolygon.isSimple first.
  */
 function _getPointClassificationFromPolygon({
   point,
@@ -110,31 +90,37 @@ function _getPointClassificationFromPolygon({
   | "outside"
   | "boundary" {
   if (
-    !_isFinitePoint(point) ||
+    !isFinitePlanarPoint(point) ||
     polygon.length < 3 ||
-    !polygon.every(_isFinitePoint)
+    !polygon.every(isFinitePlanarPoint)
   ) {
     throw new Error(
       "Point classification requires finite geometry and a validated simple ring.",
     );
   }
-  let isInside = false;
-  for (let index = 0; index < polygon.length; index += 1) {
-    const first = polygon[index];
-    const second = polygon[(index + 1) % polygon.length];
-    if (_onSegment({ first, second, third: point })) {
-      return "boundary";
-    }
-    if (first[1] > point[1] !== second[1] > point[1]) {
-      const sign = _orientation({ first, second, third: point });
-      if (
-        (second[1] > first[1] && sign > 0) ||
-        (second[1] < first[1] && sign < 0)
-      ) {
-        isInside = !isInside;
-      }
-    }
+  const edges = Array.from(polygon, (first, index) => {
+    return {
+      first,
+      second: polygon[(index + 1) % polygon.length],
+    };
+  });
+  if (
+    edges.some(({ first, second }) => {
+      return isPointOnSegment({ first, second, third: point });
+    })
+  ) {
+    return "boundary";
   }
+  const isInside = edges.reduce((wasInside, { first, second }) => {
+    if (first[1] > point[1] !== second[1] > point[1]) {
+      const sign = getOrientationFromTriangle({ first, second, third: point });
+      return (second[1] > first[1] && sign > 0) ||
+        (second[1] < first[1] && sign < 0)
+        ? !wasInside
+        : wasInside;
+    }
+    return wasInside;
+  }, false);
   return isInside ? "inside" : "outside";
 }
 
@@ -208,7 +194,7 @@ function _hasInteriorEdge({
       first,
       second,
       ...secondPolygon.filter((third) => {
-        return _onSegment({ first, second, third });
+        return isPointOnSegment({ first, second, third });
       }),
     ].sort((left, right) => {
       return left[axis] - right[axis];
@@ -231,14 +217,18 @@ function _edgesShareInterior({
   firstWinding,
   secondWinding,
 }: Readonly<OrientedEdges>): boolean {
-  const firstSign = _orientation({ first, second, third });
-  const secondSign = _orientation({ first, second, third: fourth });
-  const thirdSign = _orientation({
+  const firstSign = getOrientationFromTriangle({ first, second, third });
+  const secondSign = getOrientationFromTriangle({
+    first,
+    second,
+    third: fourth,
+  });
+  const thirdSign = getOrientationFromTriangle({
     first: third,
     second: fourth,
     third: first,
   });
-  const fourthSign = _orientation({
+  const fourthSign = getOrientationFromTriangle({
     first: third,
     second: fourth,
     third: second,
@@ -249,31 +239,21 @@ function _edgesShareInterior({
   if (firstSign !== 0 || secondSign !== 0) {
     return false;
   }
-  const axis = first[0] === second[0] ? 1 : 0;
-  const overlaps =
-    Math.max(
-      Math.min(first[axis], second[axis]),
-      Math.min(third[axis], fourth[axis]),
-    ) <
-    Math.min(
-      Math.max(first[axis], second[axis]),
-      Math.max(third[axis], fourth[axis]),
-    );
-  const sameDirection =
-    second[axis] > first[axis] === fourth[axis] > third[axis];
-  return (
-    overlaps &&
-    (sameDirection
-      ? firstWinding === secondWinding
-      : firstWinding !== secondWinding)
-  );
+  return doCollinearEdgesShareInterior({
+    first,
+    second,
+    third,
+    fourth,
+    firstWinding,
+    secondWinding,
+  });
 }
 
 /**
  * Detects interior overlap of already validated simple finite open rings.
  * Shared borders or vertices alone are allowed. Exact binary64 predicates
  * and rational midpoint probes preserve subnormal and concave interiors.
- * Callers must validate each ring with isSimplePolygon first.
+ * Callers must validate each ring with PlanarPolygon.isSimple first.
  */
 function _doPolygonInteriorsOverlap({
   firstPolygon,
@@ -366,7 +346,10 @@ function _getDiskClassificationFromPolygon({
   return pointState === "inside" ? "inside" : "outside";
 }
 
-/** Related planar polygon operations. */
+/**
+ * Validates polygon rings and classifies points, disks, and overlap for spatial
+ * diagrams, such as catchment membership or location uncertainty.
+ */
 export const PlanarPolygon = {
   /**
    * Validates a finite simple open ring, with no repeated closing vertex.
@@ -378,14 +361,14 @@ export const PlanarPolygon = {
    * Classifies a finite point against an already validated simple open ring.
    * Callers choose their own boundary policy. No epsilon widens the boundary.
    * Nonfinite points or rings with fewer than three vertices throw. Simplicity
-   * must be validated by the caller with isSimplePolygon before classification.
+   * must be validated by the caller with PlanarPolygon.isSimple first.
    */
   getPointClassification: _getPointClassificationFromPolygon,
   /**
    * Detects interior overlap of already validated simple finite open rings.
    * Shared borders or vertices alone are allowed. Exact binary64 predicates
    * and rational midpoint probes preserve subnormal and concave interiors.
-   * Callers must validate each ring with isSimplePolygon first.
+   * Callers must validate each ring with PlanarPolygon.isSimple first.
    */
   doInteriorsOverlap: _doPolygonInteriorsOverlap,
   /**

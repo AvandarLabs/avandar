@@ -1,10 +1,10 @@
 import { getOverlayPose } from "../../motion-components/getOverlayPose";
 import { useVideoMotion } from "../../videoTheme/useVideoMotion";
-import { useVideoProps } from "../../videoTheme/useVideoTheme";
-import { getConnectorProgress } from "../overlayMotion/overlayMotion";
-import { ConnectorLine } from "./ConnectorLine";
+import { useVideoProps } from "../../videoTheme/videoThemeHelpers";
+import { OverlayMotion } from "../OverlayMotion/OverlayMotion";
+import { ConnectorLine } from "./ConnectorLine/ConnectorLine";
 import { type Props } from "./DiagramConnectorShared/DiagramConnectorShared.types";
-import { DiagramSpotlight } from "./DiagramSpotlight";
+import { DiagramSpotlight } from "./DiagramSpotlight/DiagramSpotlight";
 import type { ReactNode } from "react";
 /**
  * The spotlight around the source and the connector line to the active
@@ -20,9 +20,12 @@ export function DiagramConnector({ content, frame, accent }: Props): ReactNode {
         .opacity
     : 0;
   const { source } = content;
-  const connector = useVideoProps("Connector", {});
+  const connector = useVideoProps({
+    name: "Connector",
+    props: {},
+  });
   const motion = useVideoMotion();
-  const signal = getConnectorProgress({
+  const signal = OverlayMotion.getConnectorProgress({
     frame,
     effect: content.effect,
     signalAt: content.signalAt,

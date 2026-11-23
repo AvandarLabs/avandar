@@ -1,9 +1,9 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { DeviceCopy } from "./DeviceCopy";
 import { InternalWriting } from "./InternalWriting";
-import { ModelCartridge } from "./ModelCartridge";
+import { ModelCartridge } from "./ModelCartridge/ModelCartridge";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./PocketInference.schema";
 import type { ReactNode } from "react";

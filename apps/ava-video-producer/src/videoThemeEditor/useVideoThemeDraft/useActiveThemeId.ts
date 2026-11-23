@@ -1,8 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  getActiveThemeIdFromLocation,
-  rememberActiveThemeId,
-} from "../themeDraftStorage/themeDraftStorage";
+import { ThemeDraftStorage } from "../ThemeDraftStorage/ThemeDraftStorage";
 import type { VideoThemeLibrary } from "../../videoTheme/videoTheme.types";
 import type { BrowserStorage } from "./getBrowserStorage";
 
@@ -19,31 +16,28 @@ export function useActiveThemeId(
   const availableKey = [...library.keys()].join(",");
   const hasChosen = useRef(false);
   const [themeId, setThemeId] = useState(() => {
-    return getActiveThemeIdFromLocation({
+    return ThemeDraftStorage.getActiveThemeIdFromLocation({
       search: location.search,
       storage,
       available: availableKey.split(","),
     });
   });
-  useEffect(
-    function adoptActiveThemeIdFromLocation() {
-      if (!hasChosen.current) {
-        setThemeId(
-          getActiveThemeIdFromLocation({
-            search: location.search,
-            storage,
-            available: availableKey.split(","),
-          }),
-        );
-      }
-    },
-    [availableKey, storage],
-  );
+  useEffect(() => {
+    if (!hasChosen.current) {
+      setThemeId(
+        ThemeDraftStorage.getActiveThemeIdFromLocation({
+          search: location.search,
+          storage,
+          available: availableKey.split(","),
+        }),
+      );
+    }
+  }, [availableKey, storage]);
   const selectTheme = useCallback(
     (id: string) => {
       hasChosen.current = true;
       setThemeId(id);
-      rememberActiveThemeId({ storage, themeId: id });
+      ThemeDraftStorage.rememberActiveThemeId({ storage, themeId: id });
       const url = new URL(location.href);
       url.searchParams.set("theme", id);
       try {

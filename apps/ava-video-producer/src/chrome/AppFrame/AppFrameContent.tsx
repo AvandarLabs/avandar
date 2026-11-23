@@ -1,5 +1,5 @@
 import { useVideoShapeScales } from "../../videoTheme/useVideoShapeScales";
-import { useVideoTokens } from "../../videoTheme/useVideoTheme";
+import { useVideoTokens } from "../../videoTheme/videoThemeHelpers";
 import { type Props } from "./AppFrameShared/AppFrameShared.types";
 import { AppHeader } from "./AppHeader";
 import { AppTitleBar } from "./AppTitleBar";

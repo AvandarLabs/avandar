@@ -19,6 +19,42 @@ import {
 } from "./CoordinateFrameRegistration.fixtures";
 import { inputSchema, type Input } from "./CoordinateFrameRegistration.schema";
 
+function _assertHiddenCoordinatePairs(): void {
+  assert.equal(
+    getSvgAttributeMatchesFromMarkup({
+      markup: _render({ frame: 150, input: CHANGED_INPUT }),
+      attribute: "data-coordinate-pair",
+    }).tags.length,
+    0,
+  );
+}
+
+function _assertAuthoredLandmarkTargets(
+  markup: ReturnType<typeof _render>,
+): void {
+  assert.deepEqual(
+    getSvgAttributeMatchesFromMarkup({
+      markup: markup,
+      attribute: "data-landmark",
+    }).tags.map((tag) => {
+      return [
+        SvgAttributes.getNumberFromMarkup({
+          attributes: tag,
+          name: "data-target-x",
+        }),
+        SvgAttributes.getNumberFromMarkup({
+          attributes: tag,
+          name: "data-target-y",
+        }),
+      ];
+    }),
+    [
+      [0, 0],
+      [100, 100],
+    ],
+  );
+}
+
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -127,27 +163,7 @@ test("every landmark uses both affine coefficients with unchanged identity and e
     }).values,
     ["", "界".repeat(12)],
   );
-  assert.deepEqual(
-    getSvgAttributeMatchesFromMarkup({
-      markup: markup,
-      attribute: "data-landmark",
-    }).tags.map((tag) => {
-      return [
-        SvgAttributes.getNumberFromMarkup({
-          attributes: tag,
-          name: "data-target-x",
-        }),
-        SvgAttributes.getNumberFromMarkup({
-          attributes: tag,
-          name: "data-target-y",
-        }),
-      ];
-    }),
-    [
-      [0, 0],
-      [100, 100],
-    ],
-  );
+  _assertAuthoredLandmarkTargets(markup);
   assert.equal(
     inputSchema.safeParse({
       ...input,
@@ -190,13 +206,7 @@ test("source representations travel continuously to stationary matched targets w
     attribute: "data-stationary-target",
   }).tags;
   assert.deepEqual(targetStart, targetHold);
-  assert.equal(
-    getSvgAttributeMatchesFromMarkup({
-      markup: _render({ frame: 150, input: CHANGED_INPUT }),
-      attribute: "data-coordinate-pair",
-    }).tags.length,
-    0,
-  );
+  _assertHiddenCoordinatePairs();
   Object.values(DEFAULT_INPUT.frames).forEach((text) => {
     return assert.ok(_render({ frame: 80 }).includes(`aria-label="${text}"`));
   });

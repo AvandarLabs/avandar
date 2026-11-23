@@ -1,5 +1,4 @@
 import type { Rollup } from "vite";
-
 /**
  * The part of a Rollup watcher `waitForFirstWatchedBuild` listens to. A real
  * `Rollup.RollupWatcher` satisfies it, and so does a plain event emitter.
@@ -10,7 +9,6 @@ export type BuildEventWatcher = {
     listener: (event: Rollup.RollupWatcherEvent) => void,
   ) => unknown;
 };
-
 /**
  * Settles after the watcher's first build: resolves once it succeeds and
  * rejects with its error when it fails. Calls `onBuilt` after every
@@ -20,10 +18,13 @@ export type BuildEventWatcher = {
  * exists, for example a dev server that refreshes open pages after each
  * rebuild.
  */
-export function waitForFirstWatchedBuild(
-  watcher: Readonly<BuildEventWatcher>,
-  onBuilt: () => Promise<void>,
-): Promise<void> {
+export function waitForFirstWatchedBuild({
+  watcher,
+  onBuilt,
+}: Readonly<{
+  watcher: Readonly<BuildEventWatcher>;
+  onBuilt: () => Promise<void>;
+}>): Promise<void> {
   return new Promise((resolve, reject) => {
     let isFirstBuild = true;
     // Rollup reports `END` after a failed cycle too, so each cycle tracks

@@ -1,25 +1,27 @@
-import { ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CellNormalizationShared } from "./CellNormalizationShared/CellNormalizationShared";
-import { type Props } from "./CellNormalizationShared/CellNormalizationShared.types";
+import { type Props as CellNormalizationSharedProps } from "./CellNormalizationShared/CellNormalizationShared.types";
 import { RAIL_CUE, RAIL_FRAMES } from "./cleanupTiming";
 import type { ReactNode } from "react";
+
+type Props = Pick<CellNormalizationSharedProps, "frame" | "input" | "accent">;
 /** The rail beside or across the rows that keeps the original values. */
 export function OriginalValueRail({
   frame,
   input,
   accent,
-}: Readonly<Pick<Props, "frame" | "input" | "accent">>): ReactNode {
+}: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   const motion = GraphicThemeHooks.useGraphicMotion();
-  const rail = ramp(
+  const rail = Motion.ramp({
     frame,
-    RAIL_CUE,
-    motion.scale(RAIL_FRAMES),
-    motion.reveal.easing,
-  );
+    at: RAIL_CUE,
+    dur: motion.scale(RAIL_FRAMES),
+    easing: motion.reveal.easing,
+  });
   return (
     <g data-original-rail={input.comparison} opacity={rail}>
       <SketchedShape

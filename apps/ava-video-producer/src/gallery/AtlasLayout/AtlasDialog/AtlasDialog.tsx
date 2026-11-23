@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
-import { Icon } from "../../MotionGallery/Icon";
 import { usePreviewKeys } from "../../MotionGallery/usePreviewKeys";
 import css from "./AtlasDialog.module.css";
+import { AtlasDialogHeader } from "./AtlasDialogHeader/AtlasDialogHeader";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -113,12 +113,12 @@ export function AtlasDialog({
   onPrevious,
   onNext,
   children,
-}: Props): ReactNode {
+}: Readonly<Props>): ReactNode {
   const dialog = useModalDialog(onClose);
   usePreviewKeys({ enabled: true, onPrevious, onNext, onClose, frame: dialog });
   return (
     <dialog
-      className="preview-dialog"
+      className={css.atlasDialogPreviewDialog}
       ref={dialog}
       aria-labelledby="dialog-title"
       aria-describedby={describedBy}
@@ -127,50 +127,17 @@ export function AtlasDialog({
         onClose();
       }}
     >
-      <div className={`dialog-header ${css.header}`}>
-        <div className={css.heading}>
-          <h2 id="dialog-title" aria-live="polite" title={title}>
-            {title}
-          </h2>
-          {subtitle ? <span>{subtitle}</span> : null}
-        </div>
-        <div
-          className={css.controls}
-          role="group"
-          aria-label="Preview controls"
-        >
-          <button
-            type="button"
-            className="icon-button"
-            onClick={onPrevious}
-            disabled={!onPrevious}
-            aria-label={previousLabel}
-            title={previousLabel}
-          >
-            <Icon name="previous" />
-          </button>
-          <button
-            type="button"
-            className="icon-button"
-            onClick={onNext}
-            disabled={!onNext}
-            aria-label={nextLabel}
-            title={nextLabel}
-          >
-            <Icon name="arrow" />
-          </button>
-          <button
-            type="button"
-            className="icon-button"
-            onClick={onClose}
-            aria-label="Close preview"
-            title="Close preview"
-            autoFocus
-          >
-            <Icon name="close" />
-          </button>
-        </div>
-      </div>
+      <AtlasDialogHeader
+        {...{
+          title,
+          subtitle,
+          previousLabel,
+          nextLabel,
+          onPrevious,
+          onNext,
+          onClose,
+        }}
+      />
       {children}
     </dialog>
   );

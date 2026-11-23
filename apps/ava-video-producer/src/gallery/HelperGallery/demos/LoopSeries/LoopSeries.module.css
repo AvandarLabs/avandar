@@ -1,0 +1,5 @@
+.loopSeriesLoopPlot {
+  border-bottom: var(--demo-stroke-hairline) solid var(--demo-line);
+  border-left: var(--demo-stroke-hairline) solid var(--demo-line);
+  overflow: visible;
+}

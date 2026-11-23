@@ -17,7 +17,7 @@ test("a caption download posts the export's options and theme and saves the file
       requests.push({ url: String(url), body: JSON.parse(String(init?.body)) });
       return new Response("1\n00:00:00,000 --> 00:00:01,000\nHi\n");
     },
-    saveFile: (text, fileName) => {
+    saveFile: ({ text, fileName }) => {
       return saved.push({ text, fileName });
     },
   });
@@ -47,7 +47,7 @@ test("a refused caption download saves nothing and fails", async () => {
       fetchFile: async () => {
         return new Response("{}", { status: 400 });
       },
-      saveFile: (text) => {
+      saveFile: ({ text }) => {
         return saved.push(text);
       },
     }),

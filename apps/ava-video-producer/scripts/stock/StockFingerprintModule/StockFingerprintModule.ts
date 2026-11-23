@@ -1,23 +1,29 @@
 import { createHash } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
+import { isDefined } from "@avandar/utils";
 
-const SOURCE_DIRECTORIES: string[] = [
+const SOURCE_DIRECTORIES = [
   "../../packages/shared/utils/src",
   "src/stock",
   "src/showcase",
   "src/videoTheme",
   "themes",
   "scripts/stock",
+  "scripts/showcase",
+  "scripts/checkFrames",
+  "scripts/buildProduct",
+  "scripts/runProducerCommand",
+  "scripts/videoTheme",
+  // Shared render, media and gate helpers can be extracted within this root.
+  "scripts/lib",
   "scripts/motion",
   "scripts/yaml",
   "public/fonts",
   "public/stock",
-];
-const SOURCE_FILES: string[] = [
+] as const;
+const SOURCE_FILES = [
   "../../packages/shared/utils/package.json",
-  "scripts/lib/getAvandarUtilsDirectoryFromRoot.ts",
-  "scripts/lib/makeWorkspaceWebpackConfigFromConfig.ts",
   "tsconfig.json",
   "src/stock-entry.tsx",
   "src/motion.ts",
@@ -27,9 +33,9 @@ const SOURCE_FILES: string[] = [
   "../../pnpm-lock.yaml",
   "scripts/render.sh",
   "scripts/renderSequence.ts",
+  "scripts/requireLicense.ts",
   "scripts/checkFrames.ts",
-  "scripts/showcase/render.ts",
-];
+] as const;
 /** Frame samples and fixed canvas geometry used for stock fingerprinting. */
 type StockSampleParameters = {
   samples: number[];
@@ -183,32 +189,31 @@ async function _sourceFiles(
  */
 async function _getStockSourceHashFromRoot(root: string): Promise<string> {
   root = await fs.realpath(root);
-  const discovered = await Promise.all(
-    SOURCE_DIRECTORIES.map((directory) => {
-      return _sourceFiles({ root, relative: directory });
-    }),
-  );
-  const optional = await Promise.all(
-    SOURCE_FILES.map(async (file) => {
-      try {
-        await fs.lstat(path.join(root, file));
-        return file;
-      } catch (error) {
-        if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
-          throw error;
+  const [discovered, optional] = await Promise.all([
+    Promise.all(
+      SOURCE_DIRECTORIES.map((directory) => {
+        return _sourceFiles({ root, relative: directory });
+      }),
+    ),
+    Promise.all(
+      SOURCE_FILES.map(async (file) => {
+        try {
+          await fs.lstat(path.join(root, file));
+          return file;
+        } catch (error) {
+          if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
+            throw error;
+          }
+          return undefined;
         }
-        return undefined;
-      }
-    }),
-  );
-  const files = [
-    ...discovered.flat(),
-    ...optional.filter((file): file is string => {
-      return file !== undefined;
-    }),
-  ].sort();
+      }),
+    ),
+  ]);
+  const files = [...discovered.flat(), ...optional.filter(isDefined)].sort();
   const hash = createHash("sha256");
   await files.reduce(async (previous, file) => {
+    // Each callback waits for the prior update of this shared, order-sensitive
+    // hash.
     await previous;
     const filename = path.join(root, file);
     const resolved = await fs.realpath(filename);

@@ -1,6 +1,6 @@
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { DuplicateCandidate } from "./DuplicateCandidate";
-import { DuplicateGroupHeading } from "./DuplicateGroupHeading";
+import { DuplicateGroupHeading } from "./DuplicateGroupHeading/DuplicateGroupHeading";
 import { getDuplicateGroupLayoutFromGroupAndFrame } from "./getDuplicateGroupLayoutFromGroupAndFrame";
 import type { Input } from "./DuplicateReviewStack.schema";
 import type { ReactNode } from "react";
@@ -12,6 +12,7 @@ type Props = {
   groupIndex: number;
   accent: string;
 };
+
 /** An unresolved bracket stays open. Retained groups preserve every ID tab. */
 export function DuplicateGroup({
   frame,

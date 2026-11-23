@@ -1,5 +1,5 @@
-import { ramp } from "../../../motion";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import { Motion } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 /** The cue the result columns start to unfold beside the page on. */
 export const RESULT_CUE = 106;
 /** The cue every result column has settled on. */
@@ -12,11 +12,14 @@ const EVIDENCE_FRAMES = 42;
 export function getEvidenceFromFrame({
   frame,
   motion,
-}: Readonly<{ frame: number; motion: VideoMotion }>): number {
-  return ramp(
+}: Readonly<{
+  frame: number;
+  motion: VideoMotion;
+}>): number {
+  return Motion.ramp({
     frame,
-    EVIDENCE_CUE,
-    motion.scale(EVIDENCE_FRAMES),
-    motion.reveal.easing,
-  );
+    at: EVIDENCE_CUE,
+    dur: motion.scale(EVIDENCE_FRAMES),
+    easing: motion.reveal.easing,
+  });
 }

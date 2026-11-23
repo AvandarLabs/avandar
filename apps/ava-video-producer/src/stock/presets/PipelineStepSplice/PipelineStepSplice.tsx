@@ -1,12 +1,14 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { PipelineStrip } from "./PipelineStrip";
-import { SplicePreview } from "./SplicePreview";
+import { PipelineStrip } from "./PipelineStrip/PipelineStrip";
+import { SplicePreview } from "./SplicePreview/SplicePreview";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./PipelineStepSplice.schema";
 import type { ReactNode } from "react";
+
 /** Complete splice props. The shared renderer owns the loop envelope. */
 export type Props = GraphicProps & { input: Input };
+
 /** Fit a single authored operation into the requested middle gap. */
 export function PipelineStepSplice({
   input,

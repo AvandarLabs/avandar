@@ -1,5 +1,5 @@
-import { mix } from "../../../motion";
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { Motion } from "../../../motion";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { GridLiteralCell } from "./GridLiteralCell";
 import type { ReactNode } from "react";
@@ -44,7 +44,17 @@ export function ReconstructionCell({
         <GridLiteralCell
           value={value}
           x={x + 8}
-          y={y + 17 + (!isResult ? mix(registration, 8, 0) : 0)}
+          y={
+            y +
+            17 +
+            (!isResult
+              ? Motion.mix({
+                  t: registration,
+                  from: 8,
+                  to: 0,
+                })
+              : 0)
+          }
         />
       </g>
     </g>

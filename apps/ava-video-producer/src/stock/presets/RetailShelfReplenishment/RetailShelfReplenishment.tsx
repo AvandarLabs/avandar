@@ -2,17 +2,18 @@ import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getShelfUnitsFromInputAndFrame } from "./getShelfUnitsFromInputAndFrame";
 import { DEFAULT_INPUT } from "./RetailShelfReplenishment.fixtures";
-import { ShelfActors } from "./ShelfActors";
+import { ShelfActors } from "./ShelfActors/ShelfActors";
 import { ShelfCarrier } from "./ShelfCarrier/ShelfCarrier";
-import { ShelfLabels } from "./ShelfLabels";
+import { ShelfLabels } from "./ShelfLabels/ShelfLabels";
 import { ShelfOrder } from "./ShelfOrder";
 import { ShelfStructure } from "./ShelfStructure";
-import { ShelfUnit } from "./ShelfUnit";
+import { ShelfUnit } from "./ShelfUnit/ShelfUnit";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./RetailShelfReplenishment.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
+
 /**
  * Exact replenishment and shopper selection, without duplicated product units.
  */

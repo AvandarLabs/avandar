@@ -1,6 +1,6 @@
-import { mix, ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
@@ -24,13 +24,17 @@ export function ContrastBand({
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   const motion = GraphicThemeHooks.useGraphicMotion();
-  const focus = ramp(
+  const focus = Motion.ramp({
     frame,
-    96,
-    motion.scale(FOCUS_FRAMES),
-    motion.travel.easing,
-  );
-  const width = mix(focus, 168, 848);
+    at: 96,
+    dur: motion.scale(FOCUS_FRAMES),
+    easing: motion.travel.easing,
+  });
+  const width = Motion.mix({
+    t: focus,
+    from: 168,
+    to: 848,
+  });
   const band = { x: 480 - width / 2, y: y - 30, width, height: 100 };
   return (
     <g>

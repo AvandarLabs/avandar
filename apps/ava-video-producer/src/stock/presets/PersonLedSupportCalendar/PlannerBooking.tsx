@@ -1,4 +1,4 @@
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { PlannerBookingLabel } from "./PlannerBookingLabel";
 import type { Input } from "./PersonLedSupportCalendar.schema";

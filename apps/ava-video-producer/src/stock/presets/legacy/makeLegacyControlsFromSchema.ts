@@ -41,15 +41,14 @@ function _createControl({
       controls: _createTupleControls({ id, path, items: schema.prefixItems }),
     };
   }
-  if (schema.type === "array") {
-    return _createCollectionControl({ id, copy, schema });
-  }
-  return {
-    ...copy,
-    kind: "text",
-    minLength: schema.minLength ?? 0,
-    maxLength: schema.maxLength ?? 20,
-  };
+  return schema.type === "array"
+    ? _createCollectionControl({ id, copy, schema })
+    : {
+        ...copy,
+        kind: "text",
+        minLength: schema.minLength ?? 0,
+        maxLength: schema.maxLength ?? 20,
+      };
 }
 
 /** Builds data-only editors from each bounded legacy structural schema. */

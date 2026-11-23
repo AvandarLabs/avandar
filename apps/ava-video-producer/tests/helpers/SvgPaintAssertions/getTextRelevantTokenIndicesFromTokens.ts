@@ -1,5 +1,14 @@
 import assert from "node:assert/strict";
 
+/** SVG tags whose visible content requires ancestor layout validation. */
+const TEXT_RELEVANT_TAGS = [
+  "text",
+  "tspan",
+  "use",
+  "foreignObject",
+  "textPath",
+] as const;
+
 /** Marks text-bearing ancestors after validating balanced SVG traversal. */
 export function getTextRelevantTokenIndicesFromTokens({
   tokens,
@@ -25,17 +34,7 @@ export function getTextRelevantTokenIndicesFromTokens({
     const isInert =
       Boolean(stack.at(-1)?.isInert) ||
       ["defs", "clipPath", "mask", "symbol"].includes(tag);
-    if (
-      !isInert &&
-      [
-        "text",
-        "tspan",
-        "use",
-        "foreignObject",
-        "textPath",
-        ...extraTags,
-      ].includes(tag)
-    ) {
+    if (!isInert && [...TEXT_RELEVANT_TAGS, ...extraTags].includes(tag)) {
       relevant.add(index);
       stack.forEach((ancestor) => {
         return relevant.add(ancestor.index);

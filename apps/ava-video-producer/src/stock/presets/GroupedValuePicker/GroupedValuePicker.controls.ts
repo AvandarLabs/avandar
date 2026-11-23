@@ -1,4 +1,4 @@
-import { propEq } from "@avandar/utils";
+import { pick, propEq } from "@avandar/utils";
 import { makeStockControlsFromSchema } from "../../contracts/makeStockControlsFromSchema/makeStockControlsFromSchema";
 import { jsonSchema } from "./GroupedValuePicker.schema";
 import type { StockControl } from "../../contracts/StockContract.types";
@@ -14,11 +14,7 @@ const compatible: StockControl[] = makeStockControlsFromSchema({
     type: "object",
     additionalProperties: false,
     required: COMPATIBLE_PATHS,
-    properties: Object.fromEntries(
-      COMPATIBLE_PATHS.map((path) => {
-        return [path, jsonSchema.properties![path]];
-      }),
-    ),
+    properties: pick(jsonSchema.properties!, COMPATIBLE_PATHS),
   },
   messageNamespace: "motionAtlas.grouped-value-picker",
   referenceSelects: {},

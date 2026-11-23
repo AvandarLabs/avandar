@@ -1,17 +1,16 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { type Props } from "./PaymentTrayShared.types";
+import { type Props as PaymentTraySharedProps } from "./PaymentTrayShared.types";
 import type { ReactNode } from "react";
-/** The participant's pointer to the first stated position with no token. */
-export function GapPointer({
-  payment,
-  y,
-  accent,
-}: Readonly<{
-  payment: Props["payment"];
+
+type Props = {
+  payment: PaymentTraySharedProps["payment"];
   y: number;
   accent: string;
-}>): ReactNode {
+};
+
+/** The participant's pointer to the first stated position with no token. */
+export function GapPointer({ payment, y, accent }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   const targetX = 330 + payment.receivedUnits * 68;

@@ -1,0 +1,22 @@
+.themeStyleDemoThemedShot {
+  align-items: center;
+  border: var(--demo-stroke-hairline) solid var(--demo-line);
+  border-radius: var(--demo-corner-label);
+  display: flex;
+  gap: var(--demo-space-sm);
+  height: 100%;
+  justify-content: center;
+}
+
+.themeStyleDemoThemedCard {
+  border-radius: var(--demo-corner-label);
+  font-size: var(--demo-font-size-8xl);
+  font-weight: var(--demo-font-weight-semibold);
+  padding: var(--demo-space-sm) var(--demo-space-40);
+}
+
+.themeStyleDemoThemedAccent {
+  border-radius: var(--demo-corner-pill);
+  height: 96px;
+  width: 96px;
+}

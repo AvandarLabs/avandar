@@ -1,11 +1,12 @@
 import { ExecutionBoundaries } from "./ExecutionBoundaries";
 import { ExecutionCaptions } from "./ExecutionCaptions";
 import { LocalQueryResult } from "./LocalQueryResult";
-import { LocalRows } from "./LocalRows";
-import { PlannerExchange } from "./PlannerExchange";
+import { LocalRows } from "./LocalRows/LocalRows";
+import { PlannerExchange } from "./PlannerExchange/PlannerExchange";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./SchemaPlanLocalExecution.schema";
 import type { ReactNode } from "react";
+
 /** Inputs for SchemaPlanLocalExecution. */
 type Props = GraphicProps & { input: Input };
 

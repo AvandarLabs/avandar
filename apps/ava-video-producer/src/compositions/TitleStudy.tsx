@@ -3,7 +3,7 @@ import "../fonts";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { TITLE_STUDY_LEN } from "../composition-timing";
 import { TitleCard, TITLE_LEN } from "../TitleCard/TitleCard";
-import { useVideoTokens } from "../videoTheme/useVideoTheme";
+import { useVideoTokens } from "../videoTheme/videoThemeHelpers";
 import type { ReactNode } from "react";
 
 export { TITLE_STUDY_LEN } from "../composition-timing";

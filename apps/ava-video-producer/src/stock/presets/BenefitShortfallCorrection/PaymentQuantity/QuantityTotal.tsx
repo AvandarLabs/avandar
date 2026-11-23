@@ -1,13 +1,13 @@
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
+
+type Props = { index: number; total: number };
+
 /**
  * Prints an independently counted payment quantity below its key for
  * `PaymentQuantity`.
  */
-export function QuantityTotal({
-  index,
-  total,
-}: Readonly<{ index: number; total: number }>): ReactNode {
+export function QuantityTotal({ index, total }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <text

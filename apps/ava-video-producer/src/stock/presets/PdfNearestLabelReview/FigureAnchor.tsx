@@ -1,11 +1,15 @@
-import { ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./PdfNearestLabelReview.schema";
 import type { ReactNode } from "react";
 
-type Props = { input: Input; frame: number; accent: string };
+type Props = {
+  input: Input;
+  frame: number;
+  accent: string;
+};
 /** Frames the source token and its anchor take to appear. */
 const REVEAL_FRAMES = 37;
 /** The dash of the rail from the token to its page anchor. */
@@ -18,12 +22,12 @@ export function FigureAnchor({
 }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const motion = GraphicThemeHooks.useGraphicMotion();
-  const reveal = ramp(
+  const reveal = Motion.ramp({
     frame,
-    13,
-    motion.scale(REVEAL_FRAMES),
-    motion.reveal.easing,
-  );
+    at: 13,
+    dur: motion.scale(REVEAL_FRAMES),
+    easing: motion.reveal.easing,
+  });
   const figureX = 100 + input.figure.x * 3,
     figureY = 170 + input.figure.y * 3;
   return (

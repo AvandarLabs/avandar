@@ -1,15 +1,20 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { prop } from "@avandar/utils";
+import { prop, propEq } from "@avandar/utils";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+import { registerStockDefaultTextAssertions } from "../../../../tests/helpers/registerStockDefaultTextAssertions";
+import {
+  registerStockPresetAssertions,
+  type PresetAssertions,
+} from "../../../../tests/helpers/registerStockPresetAssertions";
+import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
 import { EntitySpineAssembly } from "./EntitySpineAssembly";
+import { entitySpineAssemblyContract } from "./EntitySpineAssembly.contract";
 import { DEFAULT_INPUT, FIXTURES } from "./EntitySpineAssembly.fixtures";
+import { type Input, inputSchema } from "./EntitySpineAssembly.schema";
 import { INVALID_INPUTS } from "./rejectedInputs.constants";
-import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
-import type { Input } from "./EntitySpineAssembly.schema";
 
 function _render({
   frame,
@@ -24,6 +29,7 @@ function _render({
     }),
   );
 }
+
 test("one spine row per entity receives sum or null without source fan-out", () => {
   const getRows = (input: Input) => {
     return [
@@ -64,11 +70,6 @@ test("one spine row per entity receives sum or null without source fan-out", () 
   );
 });
 
-import { registerStockDefaultTextAssertions } from "../../../../tests/helpers/registerStockDefaultTextAssertions";
-import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
-import { entitySpineAssemblyContract } from "./EntitySpineAssembly.contract";
-import { inputSchema } from "./EntitySpineAssembly.schema";
-
 function _getVisibleTexts({
   input,
   frame,
@@ -82,9 +83,7 @@ function _getVisibleTexts({
       ? [
           input.field.unit,
           ...(input.entities.some((entity) => {
-            return !input.observations.some(({ entityId }) => {
-              return entityId === entity.id;
-            });
+            return !input.observations.some(propEq("entityId", entity.id));
           })
             ? [input.field.missingLabel]
             : []),
@@ -92,6 +91,7 @@ function _getVisibleTexts({
       : []),
   ];
 }
+
 const options = {
   inputSchema,
   defaultInput: DEFAULT_INPUT,
@@ -114,8 +114,11 @@ const options = {
   getVisibleTexts: _getVisibleTexts,
   textFrames: [30, 90, 150],
 } satisfies PresetAssertions<Input>;
+
 registerStockPresetAssertions(options);
+
 registerStockTextLayoutAssertions(options);
+
 registerStockDefaultTextAssertions({
   contract: options.contract,
   expectedTextPaths: [
@@ -162,6 +165,7 @@ test("observation IDs preserve the accepted empty, Unicode, whitespace and 12-ch
     false,
   );
 });
+
 test("every literal entity key stays on the same four-row spine through a seven-row concentration", () => {
   const input = FIXTURES[2].input;
   [48, 72, 105, 120, 150].forEach((frame) => {
@@ -211,6 +215,7 @@ function _getContribution({
     body,
   };
 }
+
 test("numeric values move into a foreground entity stack and converge into its sum", () => {
   const start = _getContribution({
     markup: _render({ frame: 49, input: DEFAULT_INPUT }),
@@ -235,6 +240,7 @@ test("numeric values move into a foreground entity stack and converge into its s
   const collapsed = _render({ frame: 105, input: DEFAULT_INPUT });
   assert.match(collapsed, /<g data-spine-sum="a"[^>]*>[\s\S]*?aria-label="5"/);
 });
+
 test("all seven concentrated numeric contributions remain separate and readable before collapse", () => {
   const input = FIXTURES[2].input,
     markup = _render({ frame: 82, input: input });

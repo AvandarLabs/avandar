@@ -1,5 +1,5 @@
 import { propEq } from "@avandar/utils";
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { DashboardContext } from "./DashboardContext";
 import { DashboardGuides } from "./DashboardGuides";

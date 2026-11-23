@@ -1,17 +1,19 @@
-import { mix, ramp } from "../../../../motion";
+import { Motion } from "../../../../motion";
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import {
-  getEffectiveRoleFromInput,
-  ROLE_RANK,
-} from "../getEffectiveRoleFromInput";
+import { getEffectiveRoleFromInput } from "../getEffectiveRoleFromInput";
 import { PermissionRanks } from "../PermissionRanks";
+import { PermissionRoles } from "../PermissionRoles";
 import { LadderMarks } from "./LadderMarks";
 import { ResultLink } from "./ResultLink";
 import type { Input } from "../EffectivePermissionGrants.schema";
 import type { ReactNode } from "react";
 
-type Props = { input: Input; frame: number; accent: string };
+type Props = {
+  input: Input;
+  frame: number;
+  accent: string;
+};
 /** Frames the result marker takes to rise to the effective rank. */
 const RISE_FRAMES = 38;
 /** A result marker rises separately from the fixed action-requirement notch. */
@@ -23,12 +25,17 @@ export function PermissionLadder({
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const motion = GraphicThemeHooks.useGraphicMotion();
   const effective = getEffectiveRoleFromInput(input);
-  const resultY = mix(
-    ramp(frame, 101, motion.scale(RISE_FRAMES), motion.travel.easing),
-    440,
-    440 - ROLE_RANK[effective] * 90,
-  );
-  const requiredY = 440 - ROLE_RANK[input.requiredRole] * 90;
+  const resultY = Motion.mix({
+    t: Motion.ramp({
+      frame,
+      at: 101,
+      dur: motion.scale(RISE_FRAMES),
+      easing: motion.travel.easing,
+    }),
+    from: 440,
+    to: 440 - PermissionRoles.rank[effective] * 90,
+  });
+  const requiredY = 440 - PermissionRoles.rank[input.requiredRole] * 90;
   return (
     <g>
       <PermissionRanks input={input} />

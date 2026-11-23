@@ -67,9 +67,10 @@ const STOCK_PALETTE_PATTERN = {
  * reaches it.
  */
 const DURATION_ARGUMENTS = [
-  { helper: "ramp", position: 3 },
-  { helper: "pop", position: 3 },
-  { helper: "count", position: 4 },
+  { helper: "ramp", position: 3, parameter: "dur" },
+  { helper: "pop", position: 3, parameter: "durationInFrames" },
+  { helper: "count", position: 4, parameter: "dur" },
+  { helper: "countTo", position: 4, parameter: "dur" },
 ];
 
 const LITERAL_MESSAGE =
@@ -83,12 +84,16 @@ const DURATION_MESSAGE =
  * frames, such as `92 - 88`, stays as authored, like the cues.
  */
 function _durationSelectors() {
-  return DURATION_ARGUMENTS.flatMap(({ helper, position }) => {
+  return DURATION_ARGUMENTS.flatMap(({ helper, position, parameter }) => {
     const call = `CallExpression:matches([callee.name='${helper}'], [callee.property.name='${helper}'])`;
+    const namedDuration = `${call}[arguments.length=1] > ObjectExpression > Property:matches([key.name='${parameter}'], [key.value='${parameter}'])`;
     return [
       `${call} > Literal:nth-child(${position})`,
       `${call} > BinaryExpression:nth-child(${position})[left.type='Literal']:not([operator='-'][right.type='Literal'])`,
       `${call} > ConditionalExpression:nth-child(${position}) > Literal`,
+      `${namedDuration} > Literal.value`,
+      `${namedDuration} > BinaryExpression.value[left.type='Literal']:not([operator='-'][right.type='Literal'])`,
+      `${namedDuration} > ConditionalExpression.value > Literal`,
     ].map((selector) => {
       return { selector, message: DURATION_MESSAGE };
     });
@@ -160,7 +165,14 @@ const RENDERER_IMPORT_OPTIONS = [
 
 const RENDERER_SYNTAX_OPTIONS = [
   {
-    selector: "CallExpression[callee.name='ramp'][arguments.length<4]",
+    selector:
+      "CallExpression:matches([callee.name='ramp'], [callee.object.name='Motion'][callee.property.name='ramp'])[arguments.length<4]:not([arguments.0.type='ObjectExpression'])",
+    message:
+      "Pass the theme's curve to ramp(), or use the themed motion's ramp, so easing edits reach it.",
+  },
+  {
+    selector:
+      "CallExpression:matches([callee.name='ramp'], [callee.object.name='Motion'][callee.property.name='ramp'])[arguments.length=1] > ObjectExpression:not(:has(> Property:matches([key.name='easing'], [key.value='easing'])))",
     message:
       "Pass the theme's curve to ramp(), or use the themed motion's ramp, so easing edits reach it.",
   },

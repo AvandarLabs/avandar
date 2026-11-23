@@ -1,11 +1,13 @@
+import { prop } from "@avandar/utils";
 import { SegmentedControl } from "@mantine/core";
 import { useRowHasIssue } from "../../RowIssueContext/RowIssueContext";
-import { getOptionCopy } from "../../tokenCopy/editorCopy";
-import { getEnumSelection } from "../controlValueHelpers/controlValueHelpers";
+import { EditorCopy } from "../../tokenCopy/EditorCopy";
+import { ControlValues } from "../ControlValues/ControlValues";
 import { EnumMenu } from "./EnumMenu/EnumMenu";
 import type { ValueControlProps } from "../valueControl.types";
 import type { ReactNode } from "react";
 
+type Props = ValueControlProps;
 /**
  * An enum token: segments for up to three options, otherwise a menu with
  * explanations.
@@ -16,32 +18,27 @@ export function EnumValueControl({
   value,
   onChange,
   optionKey = "",
-}: ValueControlProps): ReactNode {
+}: Readonly<Props>): ReactNode {
   const hasIssue = useRowHasIssue();
   const options = (definition.options ?? []).map((option) => {
     return {
       option,
-      ...getOptionCopy({ key: optionKey, option }),
+      ...EditorCopy.getOptionCopy({ key: optionKey, option }),
     };
   });
-  const selection = getEnumSelection(
+  const selection = ControlValues.getEnumSelection({
     value,
-    options.map((entry) => {
-      return entry.option;
-    }),
-  );
-  if (options.length > 3) {
-    return (
-      <EnumMenu
-        label={label}
-        value={selection}
-        options={options}
-        hasIssue={hasIssue}
-        onChange={onChange}
-      />
-    );
-  }
-  return (
+    options: options.map(prop("option")),
+  });
+  return options.length > 3 ? (
+    <EnumMenu
+      label={label}
+      value={selection}
+      options={options}
+      hasIssue={hasIssue}
+      onChange={onChange}
+    />
+  ) : (
     <SegmentedControl
       size="xs"
       fullWidth

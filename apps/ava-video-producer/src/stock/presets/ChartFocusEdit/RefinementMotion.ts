@@ -1,5 +1,5 @@
-import { ramp } from "../../../motion";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import { Motion } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 /** The cue the chart starts to refine on. */
 const REFINE_CUE = 40;
 /** Frames the refinement takes. */
@@ -12,13 +12,16 @@ function _getRefinementEndFromMotion(motion: VideoMotion): number {
 function _getRefinementFromFrame({
   frame,
   motion,
-}: Readonly<{ frame: number; motion: VideoMotion }>): number {
-  return ramp(
+}: Readonly<{
+  frame: number;
+  motion: VideoMotion;
+}>): number {
+  return Motion.ramp({
     frame,
-    REFINE_CUE,
-    motion.scale(REFINE_FRAMES),
-    motion.travel.easing,
-  );
+    at: REFINE_CUE,
+    dur: motion.scale(REFINE_FRAMES),
+    easing: motion.travel.easing,
+  });
 }
 /** Samples chart refinement progress and its theme-scaled completion frame. */
 export const RefinementMotion = {

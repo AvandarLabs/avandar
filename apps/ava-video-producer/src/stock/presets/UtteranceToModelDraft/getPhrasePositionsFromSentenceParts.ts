@@ -31,14 +31,12 @@ export function getPhrasePositionsFromSentenceParts(
     );
     const candidate = previous ? previous.x + previous.width : 60;
     const wraps = candidate + width > 900;
-    return [
-      ...placed,
-      {
-        ...part,
-        width,
-        x: wraps ? 60 : candidate,
-        y: (previous?.y ?? 115) + (wraps ? 38 : 0),
-      },
-    ];
+    placed.push({
+      ...part,
+      width,
+      x: wraps ? 60 : candidate,
+      y: (previous?.y ?? 115) + (wraps ? 38 : 0),
+    });
+    return placed;
   }, []);
 }

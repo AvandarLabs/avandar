@@ -1,13 +1,10 @@
 import { useVideoMotion } from "../../../videoTheme/useVideoMotion";
-import { useVideoTheme } from "../../../videoTheme/useVideoTheme";
+import { useVideoTheme } from "../../../videoTheme/videoThemeHelpers";
 import { DemoTheme } from "./DemoTheme";
 import { getCurveTime } from "./getCurveTime";
 import { HelperDemoFrame } from "./HelperDemoFrame/HelperDemoFrame";
-import { EasingStage } from "./parts/EasingStage";
-import type {
-  EasingValue,
-  ResolvedVideoTheme,
-} from "../../../videoTheme/videoTheme.types";
+import { EasingStage } from "./parts/EasingStage/EasingStage";
+import type { ResolvedVideoTheme } from "../../../videoTheme/videoTheme.types";
 import type { HelperDemoProps } from "./helperDemo.types";
 import type { ReactNode } from "react";
 /** A named curve of the theme's easing scale, as `EASE` names it. */

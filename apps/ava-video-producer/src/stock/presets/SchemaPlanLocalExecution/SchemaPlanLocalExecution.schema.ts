@@ -1,4 +1,4 @@
-import { prop } from "@avandar/utils";
+import { prop, propEq } from "@avandar/utils";
 import { z } from "zod";
 import type {
   StockJsonSchema,
@@ -55,11 +55,7 @@ export const inputSchema = z
         message: "Row IDs must be unique.",
       });
     }
-    if (
-      !input.rows.some(({ category }) => {
-        return category === input.request.selectedCategory;
-      })
-    ) {
+    if (!input.rows.some(propEq("category", input.request.selectedCategory))) {
       context.addIssue({
         code: "custom",
         path: ["request", "selectedCategory"],

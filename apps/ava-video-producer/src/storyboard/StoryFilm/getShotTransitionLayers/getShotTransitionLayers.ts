@@ -1,7 +1,7 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { StageTheme } from "../../../scenes/StageTheme/StageTheme";
-import { getSteppedColumnWipeStyle } from "../steppedColumnWipe/steppedColumnWipe";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import { SteppedColumnWipe } from "../SteppedColumnWipe/SteppedColumnWipe";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { ShotTransition } from "../../schema/shotTransitionSchema";
 import type { CSSProperties } from "react";
 
@@ -79,10 +79,18 @@ function _createSteppedWipeLayers({
   return {
     outgoing: {
       frame,
-      offsetX: mix(drift, 0, (transition.outgoingDrift?.x ?? 0) * width),
-      blurX: mix(drift, 0, transition.outgoingDrift?.blur ?? 0),
+      offsetX: Motion.mix({
+        t: drift,
+        from: 0,
+        to: (transition.outgoingDrift?.x ?? 0) * width,
+      }),
+      blurX: Motion.mix({
+        t: drift,
+        from: 0,
+        to: transition.outgoingDrift?.blur ?? 0,
+      }),
     },
-    incoming: getSteppedColumnWipeStyle({
+    incoming: SteppedColumnWipe.getSteppedColumnWipeStyle({
       frame: localFrame,
       durationInFrames: transitionInFrames,
       options: transition,

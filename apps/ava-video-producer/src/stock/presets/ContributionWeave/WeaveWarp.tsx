@@ -1,4 +1,4 @@
-import { ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./ContributionWeave.schema";
@@ -33,23 +33,23 @@ export function WeaveWarp({
     width: 48,
     height:
       300 *
-      ramp(
+      Motion.ramp({
         frame,
-        18 + index * motion.stagger.list,
-        motion.scale(TENSION_FRAMES),
-        motion.entrance.easing,
-      ),
+        at: 18 + index * motion.stagger.list,
+        dur: motion.scale(TENSION_FRAMES),
+        easing: motion.entrance.easing,
+      }),
     fill: `url(#${id}-band-${index})`,
   };
   const end = { ...band, y: 150, height: 30 };
   return (
     <g
-      opacity={ramp(
+      opacity={Motion.ramp({
         frame,
-        14 + index * motion.stagger.list,
-        motion.scale(FADE_FRAMES),
-        motion.reveal.easing,
-      )}
+        at: 14 + index * motion.stagger.list,
+        dur: motion.scale(FADE_FRAMES),
+        easing: motion.reveal.easing,
+      })}
     >
       <rect data-warp-band={contributor.id} {...band} />
       {input.showContributorEnds ? (
@@ -62,7 +62,13 @@ export function WeaveWarp({
   );
 }
 /** The contributor's label, centred above its warp band. */
-function _createWarpLabel({ text, x }: Readonly<{ text: string; x: number }>) {
+function _createWarpLabel({
+  text,
+  x,
+}: Readonly<{
+  text: string;
+  x: number;
+}>) {
   return {
     text,
     x,

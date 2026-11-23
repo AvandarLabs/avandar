@@ -1,14 +1,14 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
-/** The contributor's arm and the hand tipping the tray. */
-export function DonorArm({
-  tray,
-  donorIndex,
-}: Readonly<{
+
+type Props = {
   tray: Readonly<{ x: number; y: number }>;
   donorIndex: number;
-}>): ReactNode {
+};
+
+/** The contributor's arm and the hand tipping the tray. */
+export function DonorArm({ tray, donorIndex }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (

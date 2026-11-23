@@ -61,16 +61,16 @@ export function ChangedOnDiskBanner({
       color="yellow"
       title="This theme changed on disk"
       classNames={{
-        title: css.bannerTitle,
-        message: css.bannerMessage,
+        title: css.changedOnDiskBannerTitle,
+        message: css.changedOnDiskBannerMessage,
       }}
     >
-      <p className={css.bannerText}>
+      <p className={css.changedOnDiskBannerText}>
         {
           "The theme file changed after you started editing. Choose what happens to your unsaved edits. Saving waits until you do."
         }
       </p>
-      <ul className={css.bannerChoices}>
+      <ul className={css.changedOnDiskBannerChoices}>
         {choices.map((choice) => {
           return (
             <Choice

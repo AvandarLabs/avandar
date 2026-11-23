@@ -1,19 +1,12 @@
+import { omit } from "@avandar/utils";
 import { DEFAULT_INPUT } from "./defaultInput";
 /** Rejected structural, boundary and cross-field inputs. */
 export const invalidInputs: unknown[] = [
   {},
   { ...DEFAULT_INPUT, extra: true },
-  Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => {
-      return field !== "machine";
-    }),
-  ),
+  omit(DEFAULT_INPUT, "machine"),
   { ...DEFAULT_INPUT, machine: { ...DEFAULT_INPUT.machine, extra: true } },
-  Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => {
-      return field !== "timeSlots";
-    }),
-  ),
+  omit(DEFAULT_INPUT, "timeSlots"),
   {
     ...DEFAULT_INPUT,
     timeSlots: [
@@ -60,11 +53,7 @@ export const invalidInputs: unknown[] = [
       DEFAULT_INPUT.timeSlots[2],
     ],
   },
-  Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => {
-      return field !== "requests";
-    }),
-  ),
+  omit(DEFAULT_INPUT, "requests"),
   {
     ...DEFAULT_INPUT,
     requests: [
@@ -112,22 +101,10 @@ export const invalidInputs: unknown[] = [
       DEFAULT_INPUT.requests[1],
     ],
   },
-  Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => {
-      return field !== "labels";
-    }),
-  ),
+  omit(DEFAULT_INPUT, "labels"),
   { ...DEFAULT_INPUT, labels: { ...DEFAULT_INPUT.labels, extra: true } },
-  Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => {
-      return field !== "showOriginalRequests";
-    }),
-  ),
-  Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => {
-      return field !== "showUsageTurns";
-    }),
-  ),
+  omit(DEFAULT_INPUT, "showOriginalRequests"),
+  omit(DEFAULT_INPUT, "showUsageTurns"),
   { ...DEFAULT_INPUT, machine: { ...DEFAULT_INPUT.machine, kind: "invalid" } },
   {
     ...DEFAULT_INPUT,

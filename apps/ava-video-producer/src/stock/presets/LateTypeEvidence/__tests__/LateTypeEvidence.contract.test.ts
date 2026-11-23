@@ -28,6 +28,48 @@ import {
   _assertStationaryStrokeShielding,
 } from "./LateTypeEvidenceTestHelpers";
 
+function _assertLateCellMovesVertically({
+  entering,
+  arrived,
+}: Readonly<{
+  entering: ReturnType<typeof _tags>[number];
+  arrived: ReturnType<typeof _tags>[number];
+}>): void {
+  assert.notEqual(
+    SvgAttributes.getNumberFromMarkup({ attributes: entering, name: "y" }),
+    SvgAttributes.getNumberFromMarkup({ attributes: arrived, name: "y" }),
+  );
+}
+
+function _assertFourArrivedSourceValues(): void {
+  assert.equal(
+    _values({ markup: _render({ frame: 100 }), attribute: "data-source-value" })
+      .length,
+    4,
+  );
+}
+
+function _assertThreeEarlySourceValues(): void {
+  assert.equal(
+    _values({ markup: _render({ frame: 55 }), attribute: "data-source-value" })
+      .length,
+    3,
+  );
+}
+
+function _assertReviewBracketTracksArrival(): void {
+  assert.notEqual(
+    _tags({
+      markup: _render({ frame: 60 }),
+      attribute: "data-review-bracket",
+    })[0],
+    _tags({
+      markup: _render({ frame: 100 }),
+      attribute: "data-review-bracket",
+    })[0],
+  );
+}
+
 registerStockPresetAssertions({
   inputSchema,
   defaultInput: DEFAULT_INPUT,
@@ -123,16 +165,8 @@ test("three and six rows preserve negative, zero and exact lexical numeric forms
 });
 
 test("late cell physically appends and review bracket opens before values move to retained output slots", () => {
-  assert.equal(
-    _values({ markup: _render({ frame: 55 }), attribute: "data-source-value" })
-      .length,
-    3,
-  );
-  assert.equal(
-    _values({ markup: _render({ frame: 100 }), attribute: "data-source-value" })
-      .length,
-    4,
-  );
+  _assertThreeEarlySourceValues();
+  _assertFourArrivedSourceValues();
   const entering = _tags({
       markup: _render({ frame: 72 }),
       attribute: "data-late-cell",
@@ -141,10 +175,7 @@ test("late cell physically appends and review bracket opens before values move t
       markup: _render({ frame: 100 }),
       attribute: "data-late-cell",
     })[0];
-  assert.notEqual(
-    SvgAttributes.getNumberFromMarkup({ attributes: entering, name: "y" }),
-    SvgAttributes.getNumberFromMarkup({ attributes: arrived, name: "y" }),
-  );
+  _assertLateCellMovesVertically({ entering, arrived });
   const initial = _tags({
       markup: _render({
         frame: 101,
@@ -174,16 +205,7 @@ test("late cell physically appends and review bracket opens before values move t
     SvgAttributes.getNumberFromMarkup({ attributes: moving, name: "x" }) <
       SvgAttributes.getNumberFromMarkup({ attributes: hold, name: "x" }),
   );
-  assert.notEqual(
-    _tags({
-      markup: _render({ frame: 60 }),
-      attribute: "data-review-bracket",
-    })[0],
-    _tags({
-      markup: _render({ frame: 100 }),
-      attribute: "data-review-bracket",
-    })[0],
-  );
+  _assertReviewBracketTracksArrival();
 });
 
 test("all preserved cells and source-state headings avoid dense foreground overprint", () => {

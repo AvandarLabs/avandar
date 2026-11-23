@@ -1,10 +1,10 @@
-import { propEq, prop } from "@avandar/utils";
-import { CONTINUITY_CATALOG } from "../../../../src/continuity/continuityCatalog";
+import { prop, propEq } from "@avandar/utils";
+import { CONTINUITY_CATALOG } from "../../../../src/continuity/isSceneEntry";
 import {
   DEFAULT_ACCENT,
   DEFAULT_BACKGROUND,
 } from "../../../../src/gallery/palette";
-import { STOCK_IDS } from "../../../../src/stock/catalog";
+import { STOCK_IDS } from "../../../../src/stock/stockEntry";
 import { getPreviewFramesFromPlan } from "../../../lib/planHelpers/getPreviewFramesFromPlan";
 import { StockFingerprintModule } from "../../../stock/StockFingerprintModule/StockFingerprintModule";
 import type { Film } from "../../../../src/showcase/showcase.types";
@@ -154,10 +154,11 @@ function _listAllParityTargets(): ParityTarget[] {
  * preset, and the storyboard preview frames for a composition.
  */
 function _getParityFramesFromFilm(film: Pick<Film, "kind" | "plan">): number[] {
-  if (film.kind === "stock") {
-    return StockFingerprintModule.SAMPLE_PARAMETERS.samples;
-  }
-  return film.plan ? getPreviewFramesFromPlan(film.plan) : [0];
+  return film.kind === "stock"
+    ? StockFingerprintModule.SAMPLE_PARAMETERS.samples
+    : film.plan
+      ? getPreviewFramesFromPlan(film.plan)
+      : [0];
 }
 /**
  * Allowed regions for one target, scaled from design units to the rendered
@@ -171,16 +172,16 @@ function _getAllowedRegionsFromFilm({
   film: Pick<Film, "kind" | "width" | "height">;
 }>): ParityRegion[] {
   const scale = film.kind === "stock" ? film.width / STOCK_VIEWBOX_WIDTH : 1;
-  const regions = PARITY_ALLOWANCES.filter((allowance) => {
-    return allowance.id === id;
-  }).map(({ region }) => {
-    return {
-      x: Math.floor(region.x * scale),
-      y: Math.floor(region.y * scale),
-      width: Math.ceil(region.width * scale),
-      height: Math.ceil(region.height * scale),
-    };
-  });
+  const regions = PARITY_ALLOWANCES.filter(propEq("id", id)).map(
+    ({ region }) => {
+      return {
+        x: Math.floor(region.x * scale),
+        y: Math.floor(region.y * scale),
+        width: Math.ceil(region.width * scale),
+        height: Math.ceil(region.height * scale),
+      };
+    },
+  );
   const starterRounding = STARTER_HEX_ROUNDING[id];
   return starterRounding === undefined
     ? regions

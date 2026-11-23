@@ -1,6 +1,6 @@
 import { useMemo, type ReactNode } from "react";
-import { DEFAULT_VIDEO_THEME_SOURCE } from "../builtInVideoThemes/builtInVideoThemes";
-import { useVideoThemeContext } from "../useVideoTheme";
+import { DEFAULT_VIDEO_THEME_SOURCE } from "../makeVideoThemeLibraryFromDocuments/makeVideoThemeLibraryFromDocuments";
+import { useVideoThemeContext } from "../videoThemeHelpers";
 import { VideoThemeProvider } from "../VideoThemeProvider/VideoThemeProvider";
 import { getScopedVideoThemeSource } from "./getScopedVideoThemeSource/getScopedVideoThemeSource";
 import type { VideoThemePatch } from "../videoTheme.types";
@@ -11,7 +11,6 @@ type Props = Readonly<{
   children?: ReactNode;
   element?: "div" | "none";
 }>;
-
 /**
  * Re-themes a subtree for one item: the surrounding theme plus that item's
  * overrides and patches. Outside any provider it starts from `classic`, so
@@ -29,7 +28,10 @@ export function VideoThemeScope({
   // stable.
   const scopeKey = JSON.stringify({ overrideIds, patches });
   const source = useMemo(() => {
-    return getScopedVideoThemeSource(outer, JSON.parse(scopeKey));
+    return getScopedVideoThemeSource({
+      outer,
+      inner: JSON.parse(scopeKey),
+    });
   }, [outer, scopeKey]);
   return (
     <VideoThemeProvider source={source} element={element}>

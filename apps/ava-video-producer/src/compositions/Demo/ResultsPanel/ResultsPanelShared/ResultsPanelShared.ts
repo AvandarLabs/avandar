@@ -1,5 +1,5 @@
 import { REFILTER_AT, ROWS_AT } from "../../timeline";
-import type { VideoMotion } from "../../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 
 type RowProgressOptions = {
   frame: number;
@@ -42,7 +42,10 @@ function _rowProgress({
         ),
   };
 }
-/** Shared values and calculations for the ResultsPanel visuals. */
+/**
+ * Arrival, bar growth, and filter timing used by Results, ResultRow,
+ * ResultRowBar, ResultRowLabel, ResultsTotal, and EmptyState.
+ */
 export const ResultsPanelShared = {
   /** Cues after the app arrives and the rows land, in frames. */
   CUES,

@@ -14,112 +14,150 @@ const polygonSchema: z.ZodArray<z.ZodTuple<[z.ZodNumber, z.ZodNumber], null>> =
       return PlanarPolygon.isSimple({ polygon });
     }, "Requires a simple open polygon.");
 /** Strict authored geographic sampling frame and selection. */
-export const inputSchema = z
-  .strictObject({
-    strata: z
-      .array(
-        z.strictObject({
-          id: identifier,
-          label: z.string().max(24),
-          polygon: polygonSchema,
-        }),
-      )
-      .min(2)
-      .max(4),
-    sites: z
-      .array(
-        z.strictObject({
-          id: identifier,
-          label: z.string().max(20),
-          stratumId: identifier,
-          x: coordinate,
-          y: coordinate,
-        }),
-      )
-      .min(4)
-      .max(12),
-    selectedSiteIds: z.array(identifier).min(1).max(8),
-    copy: z.strictObject({
-      context: z.string().max(40),
-      selected: z.string().max(40),
-      eligible: z.string().max(40),
-      unsampled: z.string().max(40),
-      unit: z.string().max(40),
-    }),
-    showUnselectedLabels: z.boolean(),
-  })
-  .superRefine((input, context) => {
-    [
-      input.strata.map(prop("id")),
-      input.sites.map(prop("id")),
-      input.selectedSiteIds,
-    ].forEach((ids, index) => {
-      if (new Set(ids).size !== ids.length) {
-        context.addIssue({
-          code: "custom",
-          path: [["strata", "sites", "selectedSiteIds"][index]],
-          message: "IDs must be unique.",
-        });
-      }
-    });
-    input.strata.forEach((stratum, index) => {
-      if (!input.sites.some(propEq("stratumId", stratum.id))) {
-        context.addIssue({
-          code: "custom",
-          path: ["strata", index],
-          message: "Every stratum requires eligible sites.",
-        });
-      }
-      if (
-        PlanarPolygon.isSimple({ polygon: stratum.polygon }) &&
-        input.strata.slice(index + 1).some((other) => {
-          return (
-            PlanarPolygon.isSimple({ polygon: other.polygon }) &&
-            PlanarPolygon.doInteriorsOverlap({
-              firstPolygon: stratum.polygon,
-              secondPolygon: other.polygon,
-            })
-          );
-        })
-      ) {
-        context.addIssue({
-          code: "custom",
-          path: ["strata", index],
-          message: "Stratum interiors cannot overlap.",
-        });
-      }
-    });
-    input.sites.forEach((site, index) => {
-      const stratum = input.strata.find(propEq("id", site.stratumId));
-      if (
-        !stratum ||
-        (PlanarPolygon.isSimple({ polygon: stratum.polygon }) &&
-          PlanarPolygon.getPointClassification({
-            point: [site.x, site.y],
-            polygon: stratum.polygon,
-          }) !== "inside")
-      ) {
-        context.addIssue({
-          code: "custom",
-          path: ["sites", index],
-          message: "A site must be strictly inside its referenced stratum.",
-        });
-      }
-    });
+
+const authoredInputSchema = z.strictObject({
+  strata: z
+    .array(
+      z.strictObject({
+        id: identifier,
+        label: z.string().max(24),
+        polygon: polygonSchema,
+      }),
+    )
+    .min(2)
+    .max(4),
+  sites: z
+    .array(
+      z.strictObject({
+        id: identifier,
+        label: z.string().max(20),
+        stratumId: identifier,
+        x: coordinate,
+        y: coordinate,
+      }),
+    )
+    .min(4)
+    .max(12),
+  selectedSiteIds: z.array(identifier).min(1).max(8),
+  copy: z.strictObject({
+    context: z.string().max(40),
+    selected: z.string().max(40),
+    eligible: z.string().max(40),
+    unsampled: z.string().max(40),
+    unit: z.string().max(40),
+  }),
+  showUnselectedLabels: z.boolean(),
+});
+type SampleValidationOptions = {
+  input: Readonly<{ input: Input; context: z.RefinementCtx }>["input"];
+  context: Readonly<{ input: Input; context: z.RefinementCtx }>["context"];
+};
+type ValidateStratifiedSpatialSampleStrataOptions = {
+  input: Readonly<{ input: Input; context: z.RefinementCtx }>["input"];
+  context: Readonly<{ input: Input; context: z.RefinementCtx }>["context"];
+};
+/** Checks the strata constraint and records any violations. */
+function _validateStratifiedSpatialSampleStrata({
+  input,
+  context,
+}: Readonly<ValidateStratifiedSpatialSampleStrataOptions>): void {
+  input.strata.forEach((stratum, index) => {
+    if (!input.sites.some(propEq("stratumId", stratum.id))) {
+      context.addIssue({
+        code: "custom",
+        path: ["strata", index],
+        message: "Every stratum requires eligible sites.",
+      });
+    }
     if (
-      input.selectedSiteIds.some((id) => {
-        return !input.sites.some(propEq("id", id));
+      PlanarPolygon.isSimple({ polygon: stratum.polygon }) &&
+      input.strata.slice(index + 1).some((other) => {
+        return (
+          PlanarPolygon.isSimple({ polygon: other.polygon }) &&
+          PlanarPolygon.doInteriorsOverlap({
+            firstPolygon: stratum.polygon,
+            secondPolygon: other.polygon,
+          })
+        );
       })
     ) {
       context.addIssue({
         code: "custom",
-        path: ["selectedSiteIds"],
-        message: "Selected IDs must reference sites.",
+        path: ["strata", index],
+        message: "Stratum interiors cannot overlap.",
       });
     }
-  }) satisfies z.ZodType;
+  });
+}
+
+/**
+ * Checks the strata sites selected site ids constraint and records any
+ * violations.
+ */
+function _validateStratifiedSpatialSampleStrataSitesSelectedSiteIds({
+  input,
+  context,
+}: Readonly<SampleValidationOptions>): void {
+  [
+    input.strata.map(prop("id")),
+    input.sites.map(prop("id")),
+    input.selectedSiteIds,
+  ].forEach((ids, index) => {
+    if (new Set(ids).size !== ids.length) {
+      context.addIssue({
+        code: "custom",
+        path: [["strata", "sites", "selectedSiteIds"][index]],
+        message: "IDs must be unique.",
+      });
+    }
+  });
+}
+
+/** Validates cross-field relationships in the authored input. */
+function _validateStratifiedSpatialSampleInput({
+  input,
+  context,
+}: Readonly<{ input: Input; context: z.RefinementCtx }>): void {
+  _validateStratifiedSpatialSampleStrataSitesSelectedSiteIds({
+    input,
+    context,
+  });
+  _validateStratifiedSpatialSampleStrata({ input, context });
+  input.sites.forEach((site, index) => {
+    const stratum = input.strata.find(propEq("id", site.stratumId));
+    if (
+      !stratum ||
+      (PlanarPolygon.isSimple({ polygon: stratum.polygon }) &&
+        PlanarPolygon.getPointClassification({
+          point: [site.x, site.y],
+          polygon: stratum.polygon,
+        }) !== "inside")
+    ) {
+      context.addIssue({
+        code: "custom",
+        path: ["sites", index],
+        message: "A site must be strictly inside its referenced stratum.",
+      });
+    }
+  });
+  if (
+    input.selectedSiteIds.some((id) => {
+      return !input.sites.some(propEq("id", id));
+    })
+  ) {
+    context.addIssue({
+      code: "custom",
+      path: ["selectedSiteIds"],
+      message: "Selected IDs must reference sites.",
+    });
+  }
+}
+/** Complete authored input with its runtime semantic constraints. */
+export const inputSchema = authoredInputSchema.superRefine((input, context) => {
+  _validateStratifiedSpatialSampleInput({ input, context });
+}) satisfies z.ZodType;
 /** Schema-inferred accepted document. */
-export type Input = z.infer<typeof inputSchema>;
+export type Input = z.infer<typeof authoredInputSchema>;
 /** Exact geometric, identity and denominator constraints. */
 export const SEMANTIC_RULES: StockSemanticRule[] = [
   {

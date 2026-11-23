@@ -1,5 +1,5 @@
 import { StageTheme } from "../../../scenes/StageTheme/StageTheme";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { CSSProperties } from "react";
 
 type GetColumnWipeProgressOptions = {
@@ -24,6 +24,7 @@ export const STEPPED_COLUMN_WIPE_DEFAULTS = {
   order: "left-to-right",
 } as const;
 
+/** Column count, stagger, direction, and order of a stepped wipe. */
 export type SteppedColumnWipeOptions = {
   columns?: number;
   staggerFrames?: number;
@@ -37,7 +38,7 @@ export type SteppedColumnWipeOptions = {
  * staggering.
  */
 /** Geometry of a stepped column wipe, as authored on a shot transition. */
-export function getColumnWipeProgress({
+function _getColumnWipeProgress({
   frame,
   durationInFrames,
   options,
@@ -64,7 +65,7 @@ export function getColumnWipeProgress({
  * transition frame: a staircase polygon whose steps are the columns. Returns
  * no clip once the transition has finished, so the shot renders unclipped.
  */
-export function getSteppedColumnWipeStyle({
+function _getSteppedColumnWipeStyle({
   frame,
   durationInFrames,
   options,
@@ -73,7 +74,7 @@ export function getSteppedColumnWipeStyle({
   if (frame >= durationInFrames) {
     return {};
   }
-  const progress = getColumnWipeProgress({
+  const progress = _getColumnWipeProgress({
     frame,
     durationInFrames,
     options,
@@ -97,3 +98,17 @@ export function getSteppedColumnWipeStyle({
 function _formatPercent(value: number): string {
   return `${Number(value.toFixed(3))}%`;
 }
+
+/** Samples column wipe progress and clipping for StoryFilm transitions. */
+export const SteppedColumnWipe = {
+  /**
+   * How far each column has crossed the frame, 0 to 1, in screen order from
+   * left to right, each rising on `motion.rise`.
+   */
+  getColumnWipeProgress: _getColumnWipeProgress,
+  /**
+   * The clip that reveals the incoming shot of a stepped column wipe at one
+   * transition frame: a staircase polygon whose steps are the columns.
+   */
+  getSteppedColumnWipeStyle: _getSteppedColumnWipeStyle,
+};

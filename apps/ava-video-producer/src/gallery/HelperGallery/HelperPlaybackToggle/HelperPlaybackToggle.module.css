@@ -1,0 +1,3 @@
+.helperPlaybackTogglePlayAll {
+  composes: play-all from global;
+}

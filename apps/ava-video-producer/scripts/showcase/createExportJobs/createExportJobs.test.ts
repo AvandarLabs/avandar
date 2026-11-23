@@ -48,26 +48,15 @@ test("failed render never exposes a downloadable file and allows retry", async (
 });
 
 test("different stock content cannot reuse an active export while equivalent requests coalesce", async () => {
-  const film = await ShowcaseFilms.load("stock-decision-fork");
-  const denseFilm = await ShowcaseFilms.load("stock-decision-fork", {
-    input: DECISION_FORK_DENSE_INPUT,
-  });
-  const { appRoot } = await import("../ShowcaseFilms/ShowcaseFilms");
-  const original = await StockFingerprintModule.fromRequest({
-    root: appRoot,
-    request: film,
-  });
-  const equivalent = await StockFingerprintModule.fromRequest({
-    root: appRoot,
-    request: Object.fromEntries(Object.entries(film).reverse()),
-  });
-  const dense = await StockFingerprintModule.fromRequest({
-    root: appRoot,
-    request: denseFilm,
-  });
+  const { film, denseFilm, original, equivalent, dense } =
+    await _getStockExportFingerprintFixtures();
   let finish!: (filename: string) => void;
   const jobs = createExportJobs(
-    async ({ input: snapshot }: Readonly<{ input: typeof film }>) => {
+    async ({
+      input: snapshot,
+    }: Readonly<{
+      input: typeof film;
+    }>) => {
       const release = ShowcaseFilms.retainContracts(snapshot);
       try {
         assert.ok(Object.isFrozen(snapshot.input));
@@ -95,18 +84,7 @@ test("a source edit during an active stock job prevents a downloadable completed
   context.mock.method(console, "error", () => {});
   const root = await fs.mkdtemp(path.join(os.tmpdir(), "stock-job-"));
   try {
-    await fs.mkdir(path.join(root, "src/stock/presets/Nested"), {
-      recursive: true,
-    });
-    const source = path.join(root, "src/stock/presets/Nested/input.ts");
-    await fs.writeFile(source, "export const value = 1;");
-    const fingerprint = await StockFingerprintModule.fromRequest({
-      root,
-      request: {
-        preset: "test",
-        input: [1],
-      },
-    });
+    const { source, fingerprint } = await _createActiveStockSourceFixture(root);
     let finish!: () => void;
     let settle!: () => void;
     const settled = new Promise<void>((resolve) => {
@@ -139,3 +117,56 @@ test("a source edit during an active stock job prevents a downloadable completed
     await fs.rm(root, { recursive: true, force: true });
   }
 });
+
+async function _getStockExportFingerprintFixtures(): Promise<
+  Readonly<{
+    film: Awaited<ReturnType<typeof ShowcaseFilms.load>>;
+    denseFilm: Awaited<ReturnType<typeof ShowcaseFilms.load>>;
+    original: Awaited<ReturnType<typeof StockFingerprintModule.fromRequest>>;
+    equivalent: Awaited<ReturnType<typeof StockFingerprintModule.fromRequest>>;
+    dense: Awaited<ReturnType<typeof StockFingerprintModule.fromRequest>>;
+  }>
+> {
+  const film = await ShowcaseFilms.load({ id: "stock-decision-fork" });
+  const denseFilm = await ShowcaseFilms.load({
+    id: "stock-decision-fork",
+    rawOptions: {
+      input: DECISION_FORK_DENSE_INPUT,
+    },
+  });
+  const { appRoot } = await import("../ShowcaseFilms/ShowcaseFilms");
+  const original = await StockFingerprintModule.fromRequest({
+    root: appRoot,
+    request: film,
+  });
+  const equivalent = await StockFingerprintModule.fromRequest({
+    root: appRoot,
+    request: Object.fromEntries(Object.entries(film).reverse()),
+  });
+  const dense = await StockFingerprintModule.fromRequest({
+    root: appRoot,
+    request: denseFilm,
+  });
+  return { film, denseFilm, original, equivalent, dense };
+}
+
+async function _createActiveStockSourceFixture(root: string): Promise<
+  Readonly<{
+    source: string;
+    fingerprint: Awaited<ReturnType<typeof StockFingerprintModule.fromRequest>>;
+  }>
+> {
+  await fs.mkdir(path.join(root, "src/stock/presets/Nested"), {
+    recursive: true,
+  });
+  const source = path.join(root, "src/stock/presets/Nested/input.ts");
+  await fs.writeFile(source, "export const value = 1;");
+  const fingerprint = await StockFingerprintModule.fromRequest({
+    root,
+    request: {
+      preset: "test",
+      input: [1],
+    },
+  });
+  return { source, fingerprint };
+}

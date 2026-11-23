@@ -1,12 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
-import { DEFAULT_VIDEO_THEME_SOURCE } from "../builtInVideoThemes/builtInVideoThemes";
-import {
-  createTokenUsageCollector,
-  VideoTokenUsageContext,
-} from "../tokenUsageHelpers/tokenUsageHelpers";
-import { useVideoProps, useVideoTokens } from "../useVideoTheme";
+import { DEFAULT_VIDEO_THEME_SOURCE } from "../makeVideoThemeLibraryFromDocuments/makeVideoThemeLibraryFromDocuments";
+import { VideoTokenUsageContext, TokenUsage } from "../TokenUsage/TokenUsage";
+import { useVideoProps, useVideoTokens } from "../videoThemeHelpers";
 import { VideoThemeProvider } from "./VideoThemeProvider";
 
 function TokenProbe() {
@@ -17,18 +14,18 @@ function TokenProbe() {
     </span>
   );
 }
-
 function BarProbe({ height }: { height?: number }) {
-  const props = useVideoProps("ProgressBar", { height });
+  const props = useVideoProps({
+    name: "ProgressBar",
+    props: { height },
+  });
   return <span>{props.height}</span>;
 }
-
 test("reading tokens outside a provider fails loudly", () => {
   assert.throws(() => {
     return renderToStaticMarkup(<TokenProbe />);
   }, /VideoThemeProvider/);
 });
-
 test("the provider sets video CSS variables on its wrapper", () => {
   const markup = renderToStaticMarkup(
     <VideoThemeProvider source={DEFAULT_VIDEO_THEME_SOURCE}>
@@ -37,7 +34,6 @@ test("the provider sets video CSS variables on its wrapper", () => {
   );
   assert.match(markup, /--video-color-ground:#0b1219/);
 });
-
 test("useVideoTokens reads resolved semantic tokens", () => {
   const markup = renderToStaticMarkup(
     <VideoThemeProvider source={DEFAULT_VIDEO_THEME_SOURCE} element="none">
@@ -46,9 +42,8 @@ test("useVideoTokens reads resolved semantic tokens", () => {
   );
   assert.equal(markup, "<span>#51a7ff|48</span>");
 });
-
 test("useVideoProps returns theme defaults and reports the ones it used", () => {
-  const collector = createTokenUsageCollector();
+  const collector = TokenUsage.makeCollector();
   const markup = renderToStaticMarkup(
     <VideoTokenUsageContext.Provider value={collector.report}>
       <VideoThemeProvider source={DEFAULT_VIDEO_THEME_SOURCE} element="none">
@@ -62,9 +57,8 @@ test("useVideoProps returns theme defaults and reports the ones it used", () => 
     "components.ProgressBar.paint",
   ]);
 });
-
 test("a prop given to a themed component wins and is not reported", () => {
-  const collector = createTokenUsageCollector();
+  const collector = TokenUsage.makeCollector();
   const markup = renderToStaticMarkup(
     <VideoTokenUsageContext.Provider value={collector.report}>
       <VideoThemeProvider source={DEFAULT_VIDEO_THEME_SOURCE} element="none">

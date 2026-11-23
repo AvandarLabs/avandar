@@ -1,12 +1,12 @@
-import { useVideoTokens } from "../../../videoTheme/useVideoTheme";
+import { useVideoTokens } from "../../../videoTheme/videoThemeHelpers";
 import { type StatLineProps } from "./RaceStatsShared/RaceStatsShared.types";
 import type { ReactNode } from "react";
 
-type RaceBadgeOptions = StatLineProps & Readonly<{ badge: string }>;
+type Props = StatLineProps & Readonly<{ badge: string }>;
 /**
  * Places the comparison badge beside the arriving statistics in `RaceStats`.
  */
-export function RaceBadge({ badge, ...line }: RaceBadgeOptions): ReactNode {
+export function RaceBadge({ badge, ...line }: Readonly<Props>): ReactNode {
   const tokens = useVideoTokens();
   return (
     <div

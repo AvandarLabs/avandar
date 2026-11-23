@@ -1,6 +1,6 @@
 import { Arrive } from "../../graphics-common/Arrive/Arrive";
 import { DrawPath } from "../../graphics-common/DrawPath";
-import { Packet } from "../../graphics-common/Packet";
+import { Packet } from "../../graphics-common/Packet/Packet";
 import { Panel } from "../../graphics-common/Panel";
 import { Text } from "../../graphics-common/Text";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
@@ -36,7 +36,10 @@ export function SourceRow({
   color,
   showPackets,
 }: Props): ReactNode {
-  const style = GraphicThemeHooks.useGraphicProps("SourceMerge", {});
+  const style = GraphicThemeHooks.useGraphicProps({
+    name: "SourceMerge",
+    props: {},
+  });
   const { layout } = GraphicThemeHooks.useGraphicTokens();
   const x = layout.graphic.margin;
   const y = SOURCE_TOP + index * SOURCE_STEP;

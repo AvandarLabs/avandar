@@ -1,18 +1,23 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { prop } from "@avandar/utils";
+import { prop, propEq } from "@avandar/utils";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+import { registerStockDefaultTextAssertions } from "../../../../tests/helpers/registerStockDefaultTextAssertions";
+import {
+  registerStockPresetAssertions,
+  type PresetAssertions,
+} from "../../../../tests/helpers/registerStockPresetAssertions";
+import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
 import { WideTableToObservations } from "./WideTableToObservations";
+import { wideTableToObservationsContract as contract } from "./WideTableToObservations.contract";
 import {
   DEFAULT_INPUT,
   fixtures,
   invalidInputs,
 } from "./WideTableToObservations.fixtures";
 import { inputSchema, type Input } from "./WideTableToObservations.schema";
-import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 
 const render = ({
   frame,
@@ -27,6 +32,7 @@ const render = ({
     }),
   );
 };
+
 function _marker({
   markup,
   key,
@@ -58,6 +64,7 @@ test("measurement pairs retain provenance while missing omission conserves sourc
   assert.match(empty, /data-omitted="4"/);
   assert.match(empty, /4/);
 });
+
 test("measure strips carry subject copies from wide cells to long rows", () => {
   const start = _marker({
       markup: render({ frame: 51 }),
@@ -88,11 +95,8 @@ test("measure strips carry subject copies from wide cells to long rows", () => {
   );
 });
 
-import { registerStockDefaultTextAssertions } from "../../../../tests/helpers/registerStockDefaultTextAssertions";
-import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
-import { wideTableToObservationsContract as contract } from "./WideTableToObservations.contract";
-
 const EXCLUDED_TEXT_FIELDS: string[] = ["id", "measureId", "missingPolicy"];
+
 const getVisibleTexts = ({
   input,
   frame,
@@ -106,9 +110,7 @@ const getVisibleTexts = ({
           return (
             frame < 100 ||
             input.missingPolicy === "retain-missing-row" ||
-            subject.values.find(({ measureId }) => {
-              return measureId === measure.id;
-            })!.value !== null
+            subject.values.find(propEq("measureId", measure.id))!.value !== null
           );
         })
         .flatMap((subject) => {
@@ -117,6 +119,7 @@ const getVisibleTexts = ({
     }),
   ];
 };
+
 const options = {
   inputSchema,
   defaultInput: DEFAULT_INPUT,
@@ -127,8 +130,11 @@ const options = {
   excludedTextFields: EXCLUDED_TEXT_FIELDS,
   getVisibleTexts,
 } satisfies PresetAssertions<Input>;
+
 registerStockPresetAssertions(options);
+
 registerStockTextLayoutAssertions(options);
+
 registerStockDefaultTextAssertions({
   contract,
   expectedTextPaths: [
@@ -144,6 +150,7 @@ registerStockDefaultTextAssertions({
   ],
   suppliedInputs: fixtures.map(prop("input")),
 });
+
 test("every required top-level field rejects omission", () => {
   Object.keys(DEFAULT_INPUT).forEach((key) => {
     const incomplete = { ...DEFAULT_INPUT };
@@ -168,6 +175,7 @@ test("all-null policies preserve all four source measurements with an explicit z
     0,
   );
 });
+
 test("reversed measurement arrays and duplicate subject labels retain zero, negative values and units", () => {
   const input = inputSchema.parse({
     ...fixtures[1].input,
@@ -189,6 +197,7 @@ test("reversed measurement arrays and duplicate subject labels retain zero, nega
   assert.match(markup, /aria-label="u"/);
   assert.match(markup, /aria-label="v"/);
 });
+
 test("measure strips occupy disjoint row envelopes before moving horizontally", () => {
   const markup = render({ frame: 110, input: fixtures[2].input });
   const strips = [
@@ -248,9 +257,7 @@ test("every rendered observation pair traces to exactly one authored source cell
         .filter((subject) => {
           return (
             input.missingPolicy === "retain-missing-row" ||
-            subject.values.find(({ measureId }) => {
-              return measureId === measure.id;
-            })!.value !== null
+            subject.values.find(propEq("measureId", measure.id))!.value !== null
           );
         })
         .map((subject) => {
@@ -260,6 +267,7 @@ test("every rendered observation pair traces to exactly one authored source cell
     assert.deepEqual(pairs, expected);
   });
 });
+
 test("source-guide hiding changes visible provenance keys without changing observations", () => {
   const visible = render({ frame: 150 }),
     hidden = render({

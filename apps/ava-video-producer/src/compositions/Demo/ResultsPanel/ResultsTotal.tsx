@@ -1,18 +1,21 @@
 import { useVideoMotion } from "../../../videoTheme/useVideoMotion";
-import { useVideoTheme } from "../../../videoTheme/useVideoTheme";
+import { useVideoTheme } from "../../../videoTheme/videoThemeHelpers";
 import { ROWS_AT } from "../timeline";
 import { ResultsPanelShared } from "./ResultsPanelShared/ResultsPanelShared";
 import type { ReactNode } from "react";
+
+type Props = {
+  frame: number;
+  totalShown: number;
+  rule: string;
+};
+
 /** Introduces the formatted sum beneath the channel breakdown for `Results`. */
 export function ResultsTotal({
   frame,
   totalShown,
   rule,
-}: {
-  frame: number;
-  totalShown: number;
-  rule: string;
-}): ReactNode {
+}: Readonly<Props>): ReactNode {
   const { semantic, mantine, atomic } = useVideoTheme();
   const motion = useVideoMotion();
   return (

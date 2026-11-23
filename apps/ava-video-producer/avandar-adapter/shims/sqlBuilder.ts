@@ -7,7 +7,7 @@ export const sqlBuilder = new Proxy(
     throw new Error("SQL execution is outside the film adapter");
   },
   {
-    get() {
+    get: () => {
       throw new Error("SQL execution is outside the film adapter");
     },
   },

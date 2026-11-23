@@ -1,7 +1,6 @@
-import { mix } from "../../../../motion";
 import { LabelSlots } from "../../../primitives/LabelSlots/LabelSlots";
-import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { AccountingBracket } from "./AccountingBracket";
 import { FocusedRecord } from "./FocusedRecord";
 import type { getAssignmentsFromLocations } from "../getAssignmentsFromLocations";
 import type { ReactNode } from "react";
@@ -13,6 +12,7 @@ type Props = {
   accent: string;
   isFocused: boolean;
 };
+
 /**
  * The focused record row mirrors the map's ring without changing accounting.
  */
@@ -44,15 +44,13 @@ export function AssignmentRow({
           ],
         ]}
       />
-      <SketchedShape
-        shape={{
-          kind: "path",
-          d: `M${location.district < 0 ? mix(motion.ramp(frame, 72, motion.scale(36)), 850, 880) : 850} ${318 + index * 31}h12v20h-12`,
-        }}
-        profile={tokens.sketch.shape}
-        data-accounting-bracket={location.id}
-        fill="none"
-        stroke={accent}
+      <AccountingBracket
+        location={location}
+        index={index}
+        frame={frame}
+        accent={accent}
+        tokens={tokens}
+        motion={motion}
       />
     </g>
   );

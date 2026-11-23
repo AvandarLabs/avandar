@@ -1,10 +1,14 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
-type Props = { hasTable: boolean; progress: number; accent: string };
+type Props = {
+  hasTable: boolean;
+  progress: number;
+  accent: string;
+};
 /** Classroom Table for the authored scene. */
 export function ClassroomTable({
   hasTable,
@@ -16,7 +20,15 @@ export function ClassroomTable({
   return (
     <g
       data-shared-table={hasTable}
-      transform={`translate(380 370) rotate(${hasTable ? mix(progress, -12, 0) : -12})`}
+      transform={`translate(380 370) rotate(${
+        hasTable
+          ? Motion.mix({
+              t: progress,
+              from: -12,
+              to: 0,
+            })
+          : -12
+      })`}
     >
       <StockRect
         x={-95}

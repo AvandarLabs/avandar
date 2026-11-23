@@ -1,4 +1,4 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { MotionSettings } from "../../../motion-components/MotionSettings/MotionSettings";
 import { StageTheme } from "../../StageTheme/StageTheme";
 import {
@@ -52,11 +52,17 @@ function _getActiveHeadline({
   const index = headlines.reduce((latest, headline, position) => {
     return position > 0 && headline.atFrame <= frame ? position : latest;
   }, 0);
-  const next = headlines[index + 1];
+  const nextHeadline = headlines[index + 1];
   const { motion } = stage;
   const fade = motion.press.duration;
-  const opacity = next
-    ? 1 - motion.ramp(frame, next.atFrame - fade, fade, motion.dissolve.easing)
+  const opacity = nextHeadline
+    ? 1 -
+      motion.ramp(
+        frame,
+        nextHeadline.atFrame - fade,
+        fade,
+        motion.dissolve.easing,
+      )
     : 1;
   return { index, opacity };
 }
@@ -75,16 +81,16 @@ function _getScrollOffset({
 }>): number {
   const { motion } = stage;
   return steps.reduce((offset, step) => {
-    return mix(
-      motion.ramp(
+    return Motion.mix({
+      t: motion.ramp(
         frame,
         step.atFrame,
         motion.press.duration,
         motion.entrance.easing,
       ),
-      offset,
-      step.offset,
-    );
+      from: offset,
+      to: step.offset,
+    });
   }, 0);
 }
 /**

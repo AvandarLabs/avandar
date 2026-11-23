@@ -5,10 +5,11 @@ import type {
 import type { ResolvedStockRequest } from "../stock/contracts/stockRequestSchema/stockRequestSchema";
 import type { Storyboard } from "../storyboard/schema/schema";
 import type { VideoThemePatch } from "../videoTheme/videoTheme.types";
-import type { VideoThemeSnapshot } from "../videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
+import type { VideoThemeSnapshot } from "../videoTheme/VideoThemeSnapshots/VideoThemeSnapshots";
+import type { FilmKind } from "./FilmKinds";
 /** Data for Film. */
 type FilmResult = {
-  kind: "storyboard" | "title-study" | "motion-lab";
+  kind: Exclude<FilmKind, "stock" | "helper">;
   preset?: never;
   input?: never;
   schemaVersion?: never;

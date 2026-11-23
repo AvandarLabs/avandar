@@ -15,7 +15,7 @@
   "!src/continuity/gallery/**",
   "src/avandar/AvandarScene/**",
   "src/compositions/**",
-  "src/Root.tsx",
+  "src/Root/**",
   "src/gallery/HelperGallery/demos/**",
   "src/gallery/HelperGallery/HelperPlayer/**"
 ]

@@ -1,6 +1,6 @@
 import { DrawPath } from "../../../graphics-common/DrawPath";
 import { FitText } from "../../../primitives/FitText/FitText";
-import { StockRect } from "../../../primitives/StockRect/StockRect";
+import { StockRect } from "../../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CriterionLabel } from "./CriterionLabel";
 import { CriterionLink } from "./CriterionLink";

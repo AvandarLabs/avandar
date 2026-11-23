@@ -36,7 +36,9 @@ export function getObjectFlight({
   frame: number;
   theme?: MotionSettingsTheme;
 }>): ObjectFlightPose {
-  if (frame < flight.at) return { x: 0, y: 0, opacity: 1, active: false };
+  if (frame < flight.at) {
+    return { x: 0, y: 0, opacity: 1, active: false };
+  }
   const { motion } = theme;
   const duration = MotionSettings.getMotionDuration({
     frames: flight.duration,

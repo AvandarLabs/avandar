@@ -1,12 +1,15 @@
 import { propEq } from "@avandar/utils";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./QueryColumnCacheGrowth.schema";
 import type { ReactNode } from "react";
 
-type Props = { input: Input; missingIds: string[] };
+type Props = {
+  input: Input;
+  missingIds: string[];
+};
 /**
  * Missing column labels remain explicit independently of set-notation display.
  */
@@ -14,7 +17,10 @@ export function MissingCacheColumns({
   input,
   missingIds,
 }: Readonly<Props>): ReactNode {
-  const style = GraphicThemeHooks.useGraphicProps("QueryColumnCacheGrowth", {});
+  const style = GraphicThemeHooks.useGraphicProps({
+    name: "QueryColumnCacheGrowth",
+    props: {},
+  });
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   const { color, sketch } = GraphicThemeHooks.useGraphicTokens();
   return (

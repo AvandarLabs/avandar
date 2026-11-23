@@ -1,4 +1,4 @@
-import { token } from "../defineTokensHelpers";
+import { TokenDefinitions } from "../TokenDefinitions";
 import { CODE_FOCUS_TOKENS } from "./codeFocusTokens";
 import { CODE_WINDOW_TOKENS } from "./codeWindowTokens";
 import { DATA_PIPELINE_TOKENS } from "./dataPipelineTokens";
@@ -43,7 +43,7 @@ export const COMPONENT_TOKENS = {
   SourceMerge: SOURCE_MERGE_TOKENS,
   DecisionFork: DECISION_FORK_TOKENS,
   ProgressBar: {
-    height: token({
+    height: TokenDefinitions.token({
       kind: "length",
       surface: "stage",
       unit: "px",
@@ -54,7 +54,7 @@ export const COMPONENT_TOKENS = {
       description:
         "Thickness of the beat progress bar along the bottom of the stage.",
     }),
-    paint: token({
+    paint: TokenDefinitions.token({
       kind: "paint",
       surface: "stage",
       label: "Progress bar colour",

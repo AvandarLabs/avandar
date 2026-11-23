@@ -1,0 +1,6 @@
+.connectorLine {
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 18;
+}

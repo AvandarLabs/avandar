@@ -178,7 +178,9 @@ function _getSegmentsFromBracket(path: string): number[][] {
     } else {
       if (command.toUpperCase() === "H") {
         x = command === "h" ? x + value : value;
-      } else y = command === "v" ? y + value : value;
+      } else {
+        y = command === "v" ? y + value : value;
+      }
       segments.push([previousX, previousY, x, y]);
     }
   });

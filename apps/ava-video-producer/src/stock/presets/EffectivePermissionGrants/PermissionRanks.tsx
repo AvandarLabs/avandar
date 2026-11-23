@@ -1,7 +1,7 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { ROLE_RANK } from "./getEffectiveRoleFromInput";
+import { PermissionRoles } from "./PermissionRoles";
 import type { Input } from "./EffectivePermissionGrants.schema";
 import type { ReactNode } from "react";
 
@@ -12,13 +12,13 @@ export function PermissionRanks({ input }: Readonly<Props>): ReactNode {
   return (
     <g>
       {" "}
-      {(["none", "viewer", "editor", "admin"] as const).map((role) => {
+      {PermissionRoles.values.map((role) => {
         return (
           <g key={role}>
             <SketchedShape
               shape={{
                 kind: "path",
-                d: `M210 ${440 - ROLE_RANK[role] * 90} H820`,
+                d: `M210 ${440 - PermissionRoles.rank[role] * 90} H820`,
               }}
               profile={tokens.sketch.shape}
               stroke={tokens.color.line}
@@ -28,7 +28,7 @@ export function PermissionRanks({ input }: Readonly<Props>): ReactNode {
                 [
                   input.labels[role],
                   55,
-                  440 - ROLE_RANK[role] * 90 + 5,
+                  440 - PermissionRoles.rank[role] * 90 + 5,
                   145,
                   14,
                   5,

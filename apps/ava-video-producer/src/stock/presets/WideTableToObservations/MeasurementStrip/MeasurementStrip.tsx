@@ -1,4 +1,4 @@
-import { StockRect } from "../../../primitives/StockRect/StockRect";
+import { StockRect } from "../../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getMeasurementStripFromFrame } from "../getMeasurementStripFromFrame";
 import { MeasurementStripLabels } from "../MeasurementStripLabels";

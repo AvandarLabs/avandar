@@ -14,14 +14,18 @@ type Props = Readonly<{
   onRemove: (index: number) => void;
 }>;
 
-/** The editable layers of a shadow, each with its own remove action. */
-export function ShadowLayers({
+function _getLayerEntries({
   layers,
   layerIds,
-  onChange,
-  onRemove,
-}: Props): ReactNode {
-  const entries = layers.map((layer, position) => {
+}: Readonly<Pick<Props, "layers" | "layerIds">>): ReadonlyArray<
+  Readonly<{
+    id: string;
+    layer: ShadowLayer;
+    position: number;
+    layerNumber: number;
+  }>
+> {
+  return layers.map((layer, position) => {
     return {
       id: layerIds[position] ?? `layer-${position + 1}`,
       layer,
@@ -29,6 +33,15 @@ export function ShadowLayers({
       layerNumber: position + 1,
     };
   });
+}
+/** The editable layers of a shadow, each with its own remove action. */
+export function ShadowLayers({
+  layers,
+  layerIds,
+  onChange,
+  onRemove,
+}: Props): ReactNode {
+  const entries = _getLayerEntries({ layers, layerIds });
   return entries.map(({ id, layer, position, layerNumber }) => {
     return (
       <NumberFields

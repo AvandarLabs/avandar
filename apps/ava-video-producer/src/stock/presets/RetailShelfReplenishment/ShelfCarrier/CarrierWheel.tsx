@@ -1,11 +1,11 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
+
+type Props = { cx: number; isBike: boolean };
+
 /** A wheel: large on a cargo bike, small on a trolley. */
-export function CarrierWheel({
-  cx,
-  isBike,
-}: Readonly<{ cx: number; isBike: boolean }>): ReactNode {
+export function CarrierWheel({ cx, isBike }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (

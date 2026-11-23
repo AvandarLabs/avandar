@@ -9,6 +9,48 @@ import { CustodyTransfer } from "./CustodyTransfer";
 import { custodyTransferContract } from "./CustodyTransfer.contract";
 import { DEFAULT_INPUT, fixtures } from "./CustodyTransfer.fixtures";
 import { inputSchema, type Input } from "./CustodyTransfer.schema";
+
+function _assertSenderSupportAtAcknowledgement(): void {
+  assert.equal(
+    SvgAttributes.getNumberFromMarkup({
+      attributes: _markedShape({
+        markup: _render({ frame: 90 }),
+        marker: "sender-support",
+      }),
+      name: "x2",
+    }),
+    480,
+  );
+}
+
+function _assertRecipientSupportAtContact(
+  contact: ReturnType<typeof _render>,
+): void {
+  assert.equal(
+    SvgAttributes.getNumberFromMarkup({
+      attributes: _markedShape({
+        markup: contact,
+        marker: "recipient-support",
+      }),
+      name: "x1",
+    }),
+    480,
+  );
+}
+
+function _assertRecipientSupportAtSetup(): void {
+  assert.equal(
+    SvgAttributes.getNumberFromMarkup({
+      attributes: _markedShape({
+        markup: _render({ frame: 24 }),
+        marker: "recipient-support",
+      }),
+      name: "x1",
+    }),
+    720,
+  );
+}
+
 /**
  * The shape a marker names: the marked element itself, or the sketch-aware
  * shape inside a marked group.
@@ -89,26 +131,8 @@ test("sender support persists through acknowledgement before responsibility cros
     }),
     480,
   );
-  assert.equal(
-    SvgAttributes.getNumberFromMarkup({
-      attributes: _markedShape({
-        markup: contact,
-        marker: "recipient-support",
-      }),
-      name: "x1",
-    }),
-    480,
-  );
-  assert.equal(
-    SvgAttributes.getNumberFromMarkup({
-      attributes: _markedShape({
-        markup: _render({ frame: 90 }),
-        marker: "sender-support",
-      }),
-      name: "x2",
-    }),
-    480,
-  );
+  _assertRecipientSupportAtContact(contact);
+  _assertSenderSupportAtAcknowledgement();
   assert.equal(
     SvgAttributes.getNumberFromMarkup({
       attributes: _markedShape({
@@ -195,16 +219,7 @@ test("distinct holder names retain accepted packing, whitespace and grapheme tex
   });
 });
 test("setup geometry reaches shared contact before acknowledgement and release", () => {
-  assert.equal(
-    SvgAttributes.getNumberFromMarkup({
-      attributes: _markedShape({
-        markup: _render({ frame: 24 }),
-        marker: "recipient-support",
-      }),
-      name: "x1",
-    }),
-    720,
-  );
+  _assertRecipientSupportAtSetup();
   assert.equal(
     SvgAttributes.getNumberFromMarkup({
       attributes: _markedShape({

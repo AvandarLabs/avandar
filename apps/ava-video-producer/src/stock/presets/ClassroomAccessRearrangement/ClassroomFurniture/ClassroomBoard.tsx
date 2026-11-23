@@ -1,17 +1,19 @@
-import { mix } from "../../../../motion";
-import { StockRect } from "../../../primitives/StockRect/StockRect";
+import { Motion } from "../../../../motion";
+import { StockRect } from "../../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
+
+type Props = {
+  hasBoard: boolean;
+  progress: number;
+  accent: string;
+};
 /** The board, outlined more heavily as a large-print adaptation lands. */
 export function ClassroomBoard({
   hasBoard,
   progress,
   accent,
-}: Readonly<{
-  hasBoard: boolean;
-  progress: number;
-  accent: string;
-}>): ReactNode {
+}: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
@@ -25,7 +27,11 @@ export function ClassroomBoard({
       fill={tokens.color.surface}
       stroke={hasBoard ? accent : tokens.color.line}
       strokeWidth={scales.stroke(
-        mix(progress, tokens.stroke.hairline, tokens.stroke.emphasis),
+        Motion.mix({
+          t: progress,
+          from: tokens.stroke.hairline,
+          to: tokens.stroke.emphasis,
+        }),
       )}
     />
   );

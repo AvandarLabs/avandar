@@ -1,0 +1,36 @@
+.columnWipePreviewCaption {
+  color: var(--demo-muted);
+  font-family: var(--demo-mono);
+  font-size: var(--demo-font-size-2xs);
+}
+
+.columnWipePreviewColumns {
+  display: flex;
+  gap: var(--demo-space-10);
+  height: 100%;
+  justify-content: center;
+  padding: 0 var(--demo-space-120);
+}
+
+.columnWipePreviewColumnCell {
+  align-items: center;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--demo-space-8);
+}
+
+.columnWipePreviewColumnTrack {
+  align-items: flex-end;
+  background: var(--demo-panel);
+  border-radius: var(--demo-corner-chip);
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  width: 100%;
+}
+
+.columnWipePreviewColumnFill {
+  background: var(--demo-brand);
+  width: 100%;
+}

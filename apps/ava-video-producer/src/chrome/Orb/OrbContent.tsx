@@ -1,10 +1,20 @@
 import { useVideoShapeScales } from "../../videoTheme/useVideoShapeScales";
-import { useVideoProps, useVideoTokens } from "../../videoTheme/useVideoTheme";
-import { OrbShared } from "./OrbShared/OrbShared";
+import {
+  useVideoProps,
+  useVideoTokens,
+} from "../../videoTheme/videoThemeHelpers";
+import { OrbShared } from "./OrbShared";
 import type { ReactNode } from "react";
+
+type Props = {
+  size: number;
+};
 /** Draws the themed circular brand mark and outline for `Orb`. */
-export function OrbContent({ size }: { size: number }): ReactNode {
-  const { ringWidth, ringColor } = useVideoProps("Orb", {});
+export function OrbContent({ size }: Readonly<Props>): ReactNode {
+  const { ringWidth, ringColor } = useVideoProps({
+    name: "Orb",
+    props: {},
+  });
   const tokens = useVideoTokens();
   const scales = useVideoShapeScales();
   const ring = `0 0 0 ${scales.stroke(ringWidth)}px ${ringColor}`;

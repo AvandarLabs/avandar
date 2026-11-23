@@ -72,6 +72,34 @@ import {
 } from "./HabitatCorridorReconnection.schema";
 import type { Input } from "./HabitatCorridorReconnection.schema";
 
+type GetTraversalCircleResult = {
+  x: number;
+  y: number;
+  radius: number;
+};
+
+function _getTraversalCircle(marker: string): GetTraversalCircleResult {
+  const x = SvgAttributes.getNumberFromMarkup({
+      attributes: marker,
+      name: "cx",
+    }),
+    y = SvgAttributes.getNumberFromMarkup({
+      attributes: marker,
+      name: "cy",
+    }),
+    radius =
+      SvgAttributes.getNumberFromMarkup({
+        attributes: marker,
+        name: "r",
+      }) +
+      SvgAttributes.getNumberFromMarkup({
+        attributes: marker,
+        name: "stroke-width",
+      }) /
+        2;
+  return { x, y, radius };
+}
+
 function _getVisibleTexts({ input }: Readonly<{ input: Input }>): string[] {
   return [
     ...input.patches.map(prop("label")),
@@ -116,6 +144,9 @@ registerStockPresetAssertions(assertions);
 registerStockTextLayoutAssertions(assertions);
 test("serialized semantic rules retain every runtime relation", () => {
   assert.deepEqual(
+    // This assertion exercises the JSON serialization boundary of the public
+    // contract.
+    // react-doctor-disable-next-line no-json-parse-stringify-clone
     JSON.parse(JSON.stringify(contract.semanticRules)).map(
       ({ id, paths }: { id: string; paths: string[] }) => {
         return { id, paths };
@@ -165,24 +196,7 @@ test("the entire illustrative marker clears the unchanged road through both rout
           markup,
           marker: "illustrative-traversal",
         });
-      const x = SvgAttributes.getNumberFromMarkup({
-          attributes: marker,
-          name: "cx",
-        }),
-        y = SvgAttributes.getNumberFromMarkup({
-          attributes: marker,
-          name: "cy",
-        }),
-        radius =
-          SvgAttributes.getNumberFromMarkup({
-            attributes: marker,
-            name: "r",
-          }) +
-          SvgAttributes.getNumberFromMarkup({
-            attributes: marker,
-            name: "stroke-width",
-          }) /
-            2;
+      const { x, y, radius } = _getTraversalCircle(marker);
       assert.ok(
         x - radius >= 233 &&
           x + radius <= 727 &&

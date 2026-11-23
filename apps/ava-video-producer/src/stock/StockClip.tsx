@@ -1,21 +1,24 @@
 import { useCurrentFrame } from "remotion";
 import { VideoThemeProvider } from "../videoTheme/VideoThemeProvider/VideoThemeProvider";
-import { createVideoThemeSourceFromSnapshot } from "../videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
+import { VideoThemeSnapshots } from "../videoTheme/VideoThemeSnapshots/VideoThemeSnapshots";
 import { StockGraphic } from "./StockGraphic/StockGraphic";
-import type { VideoThemeSnapshot } from "../videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
+import type { VideoThemeSnapshot } from "../videoTheme/VideoThemeSnapshots/VideoThemeSnapshots";
 import type { StockRequest } from "./contracts/StockContract.types";
 import type { ReactNode } from "react";
-
 /** A stock request and the theme the `motion` CLI renders it in. */
-export type Props = StockRequest & { theme?: VideoThemeSnapshot };
-
+export type Props = StockRequest & {
+  theme?: VideoThemeSnapshot;
+};
 /**
  * Standalone composition picture shares the gallery's validated SVG renderer.
  */
 export function StockClip({ theme, ...request }: Props): ReactNode {
   return (
     <VideoThemeProvider
-      source={createVideoThemeSourceFromSnapshot(theme, [request.preset])}
+      source={VideoThemeSnapshots.toSource({
+        snapshot: theme,
+        overrideIds: [request.preset],
+      })}
       element="none"
     >
       <StockGraphic

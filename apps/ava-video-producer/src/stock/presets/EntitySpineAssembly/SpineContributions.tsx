@@ -1,8 +1,7 @@
-import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getSpineContributionFromFrame } from "./getSpineContributionFromFrame";
-import { SpineContribution } from "./SpineContribution";
-import { SpineSum } from "./SpineSum";
+import { SpineContributionsEntitiesLayer } from "./SpineContributionsEntitiesLayer/SpineContributionsEntitiesLayer";
+import { SpineObservationContribution } from "./SpineObservationContribution/SpineObservationContribution";
 import type { Input } from "./EntitySpineAssembly.schema";
 import type { ReactNode } from "react";
 
@@ -37,42 +36,14 @@ export function SpineContributions({
           motion,
         });
         return (
-          <g key={observation.id}>
-            {isFirst && frame >= 82 && frame < 106 ? (
-              <LiteralDataText
-                value={observation.entityId}
-                x={235}
-                y={groupStart + 14}
-              />
-            ) : null}
-            {frame < 105 ? (
-              <SpineContribution
-                input={input}
-                observation={observation}
-                index={index}
-                frame={frame}
-                accent={accent}
-              />
-            ) : null}
-          </g>
+          <SpineObservationContribution
+            key={observation.id}
+            {...{ observation, isFirst, frame, groupStart, input, index }}
+            accent={accent}
+          />
         );
       })}
-      {frame >= 100
-        ? input.entities.map((entity) => {
-            const index = observations.findIndex(({ entityId }) => {
-              return entityId === entity.id;
-            });
-            return index >= 0 ? (
-              <SpineSum
-                key={entity.id}
-                input={input}
-                observation={observations[index]}
-                index={index}
-                frame={frame}
-              />
-            ) : null;
-          })
-        : null}
+      <SpineContributionsEntitiesLayer {...{ frame, input, observations }} />
     </g>
   );
 }

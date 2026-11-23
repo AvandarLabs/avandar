@@ -2,9 +2,9 @@ import { RaceStatsShared } from "./RaceStatsShared/RaceStatsShared";
 import { type StatLineProps } from "./RaceStatsShared/RaceStatsShared.types";
 import type { ReactNode } from "react";
 
-type RaceLabelOptions = StatLineProps & Readonly<{ label: string }>;
+type Props = StatLineProps & Readonly<{ label: string }>;
 /** Labels a comparison column as its statistics arrive in `RaceStats`. */
-export function RaceLabel({ label, ...line }: RaceLabelOptions): ReactNode {
+export function RaceLabel({ label, ...line }: Readonly<Props>): ReactNode {
   return (
     <div
       style={{

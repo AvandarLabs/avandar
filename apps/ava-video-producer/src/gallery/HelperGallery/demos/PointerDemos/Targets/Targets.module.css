@@ -1,0 +1,30 @@
+.targetsButton {
+  align-items: center;
+  background: var(--demo-brand);
+  border-radius: var(--demo-corner-label);
+  color: var(--demo-text);
+  display: flex;
+  font-size: var(--demo-font-size-4xl);
+  font-weight: var(--demo-font-weight-semibold);
+  height: 64px;
+  justify-content: center;
+  width: 220px;
+}
+
+.targetsAbsolute {
+  position: absolute;
+}
+
+.targetsLayer {
+  inset: 0;
+  position: absolute;
+}
+
+.targetsField {
+  background: var(--demo-panel);
+  border: var(--demo-stroke-default) solid var(--demo-line);
+  border-radius: var(--demo-corner-cell);
+  height: 52px;
+  position: absolute;
+  width: 280px;
+}

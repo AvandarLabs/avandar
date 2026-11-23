@@ -1,4 +1,4 @@
-import { mix } from "../../../../motion";
+import { Motion } from "../../../../motion";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { HouseholdBadge } from "../HouseholdBadge";
 import { HouseholdCaption } from "../HouseholdCaption";
@@ -30,8 +30,12 @@ export function HouseholdMarker({
     : 0;
   const mapX = 110 + household.x * 3.8;
   const mapY = 180 + household.y * 2.7;
-  const x = mix(progress, 125 + (index % 4) * 112, 580);
-  const y = mix(progress, 205 + Math.floor(index / 4) * 105, 174 + index * 28);
+  const x = Motion.mix({ t: progress, from: 125 + (index % 4) * 112, to: 580 });
+  const y = Motion.mix({
+    t: progress,
+    from: 205 + Math.floor(index / 4) * 105,
+    to: 174 + index * 28,
+  });
   return (
     <g>
       <HouseholdAnchor
@@ -41,13 +45,7 @@ export function HouseholdMarker({
         color={isSelected ? accent : tokens.color.inactive}
       />
       <HouseholdBadge
-        household={household}
-        index={index}
-        frame={frame}
-        isSelected={isSelected}
-        x={x}
-        y={y}
-        accent={accent}
+        {...{ household, index, frame, isSelected, x, y, accent }}
       />
       <HouseholdCaption household={household} index={index} />
     </g>

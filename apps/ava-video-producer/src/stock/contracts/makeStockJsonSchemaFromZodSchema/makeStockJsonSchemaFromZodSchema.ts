@@ -15,9 +15,8 @@ export function makeStockJsonSchemaFromZodSchema(
       if (zodSchema._zod.def.type !== "tuple") {
         return;
       }
-      // The discriminant identifies the core tuple definition in Zod's
-      // callback.
-      const { items, rest } = (zodSchema as z.core.$ZodTuple)._zod.def;
+      // The discriminant narrows the core tuple definition in Zod's callback.
+      const { items, rest } = zodSchema._zod.def;
       if (items.length === 0) {
         delete jsonSchema.prefixItems;
       }

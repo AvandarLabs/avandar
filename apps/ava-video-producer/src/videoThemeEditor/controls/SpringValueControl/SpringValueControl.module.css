@@ -1,4 +1,4 @@
-.springValueFields {
+.springValueControlFields {
   display: grid;
   gap: var(--atlas-space-6) var(--atlas-space-8);
   grid-template-columns: repeat(2, minmax(0, 1fr));

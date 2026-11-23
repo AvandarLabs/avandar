@@ -1,7 +1,7 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { getJarOpeningFromFrame } from "./getJarOpeningFromFrame";
 import { getSeedBalancesFromInput } from "./getSeedBalancesFromInput";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./SavedSeedSeasonReturn.schema";
 
 type Transfer = {
@@ -22,11 +22,11 @@ function _transfer({
 }: Readonly<Transfer>) {
   const third = duration / 3;
   return {
-    x: mix(
-      motion.ramp(frame, start + third, third, motion.travel.easing),
-      fromX,
-      toX,
-    ),
+    x: Motion.mix({
+      t: motion.ramp(frame, start + third, third, motion.travel.easing),
+      from: fromX,
+      to: toX,
+    }),
     y:
       385 -
       110 * motion.ramp(frame, start, third, motion.travel.easing) +
@@ -35,9 +35,18 @@ function _transfer({
 }
 /** Data for getSeedSceneFromFrame. */
 type GetSeedSceneFromFrameResult = {
-  reservePosition: { x: number; y: number };
-  lossPosition: { x: number; y: number };
-  sownPosition: { x: number; y: number };
+  reservePosition: {
+    x: number;
+    y: number;
+  };
+  lossPosition: {
+    x: number;
+    y: number;
+  };
+  sownPosition: {
+    x: number;
+    y: number;
+  };
   hasCompletedSowing: boolean;
   lidOpen: number;
   harvest: number;
@@ -48,7 +57,6 @@ type GetSeedSceneFromFrameResult = {
   remaining: number;
   scale: number;
 };
-
 /**
  * Exact balances drive one common mass scale and opening-first transfer paths.
  */

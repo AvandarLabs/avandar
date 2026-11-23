@@ -1,17 +1,17 @@
 import { useVideoMotion } from "../../../videoTheme/useVideoMotion";
-import { useVideoTokens } from "../../../videoTheme/useVideoTheme";
+import { useVideoTokens } from "../../../videoTheme/videoThemeHelpers";
 import { BrandLockupMotion } from "../BrandLockupMotion/BrandLockupMotion";
 import { LockupMarkShared } from "./LockupMarkShared/LockupMarkShared";
 import type { BrandLockupSceneProps } from "../../scenes.types";
 import type { ReactNode } from "react";
-/** The flight colour fading over a column as the flight covers the frame. */
-export function MarkColumnCover({
-  frame,
-  exit,
-}: Readonly<{
+
+type Props = {
   frame: number;
   exit: BrandLockupSceneProps["exit"];
-}>): ReactNode {
+};
+
+/** The flight colour fading over a column as the flight covers the frame. */
+export function MarkColumnCover({ frame, exit }: Readonly<Props>): ReactNode {
   const tokens = useVideoTokens();
   const motion = useVideoMotion();
   return (

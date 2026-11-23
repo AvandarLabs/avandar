@@ -8,7 +8,7 @@ import { yamlPlugin } from "../../yaml/yamlPlugin";
 import { StockFingerprintModule } from "../StockFingerprintModule/StockFingerprintModule";
 
 type Contracts = Pick<
-  typeof import("../../../src/stock/catalog"),
+  typeof import("../../../src/stock/stockEntry"),
   "STOCK_CATALOG" | "STOCK_FPS"
 > &
   Pick<
@@ -22,7 +22,6 @@ type StockContractGenerationResult = {
   sourceHash: string;
   retain: () => () => Promise<void>;
 };
-
 /** Immutable renderer-free defaults and validators, retained by active jobs. */
 export type StockContractGeneration = Contracts & StockContractGenerationResult;
 type GenerationInput = {
@@ -41,14 +40,22 @@ const pendingLifecycleOperations: Map<string, Promise<unknown>> = new Map<
 >();
 const generations: Map<
   string,
-  { latest: string; entries: Map<string, GenerationState> }
+  {
+    latest: string;
+    entries: Map<string, GenerationState>;
+  }
 > = new Map<
   string,
-  { latest: string; entries: Map<string, GenerationState> }
+  {
+    latest: string;
+    entries: Map<string, GenerationState>;
+  }
 >();
-
 function _enqueueLifecycleOperation<Result>(
-  options: Readonly<{ root: string; action: () => Promise<Result> }>,
+  options: Readonly<{
+    root: string;
+    action: () => Promise<Result>;
+  }>,
 ): Promise<Result> {
   const previous =
     pendingLifecycleOperations.get(options.root) ?? Promise.resolve();
@@ -56,7 +63,6 @@ function _enqueueLifecycleOperation<Result>(
   pendingLifecycleOperations.set(options.root, pending);
   return pending;
 }
-
 async function _cleanup(root: string): Promise<void> {
   const state = generations.get(root)!;
   await Promise.all(
@@ -68,9 +74,11 @@ async function _cleanup(root: string): Promise<void> {
     }),
   );
 }
-
 function _retainGeneration(
-  options: Readonly<{ root: string; entry: GenerationState }>,
+  options: Readonly<{
+    root: string;
+    entry: GenerationState;
+  }>,
 ): () => Promise<void> {
   const { root, entry } = options;
   entry.references += 1;
@@ -88,12 +96,14 @@ function _retainGeneration(
     }
   };
 }
-
 async function _createGeneration(
   options: Readonly<GenerationInput>,
 ): Promise<GenerationState> {
   const { root, hash, contents, sourceHash } = options;
-  const directory = await ensureDirectory(root, "out/showcase/contracts");
+  const directory = await ensureDirectory({
+    root,
+    relative: "out/showcase/contracts",
+  });
   const filename = path.join(directory, `${hash}.mjs`);
   const temporary = path.join(directory, `${hash}-${randomUUID()}.tmp`);
   await fs.writeFile(temporary, contents, { flag: "wx" });
@@ -113,7 +123,6 @@ async function _createGeneration(
   };
   return entry;
 }
-
 async function _loadGeneration(
   options: Readonly<GenerationInput>,
 ): Promise<StockContractGeneration> {
@@ -140,13 +149,11 @@ async function _loadGeneration(
   await _cleanup(root);
   return entry.generation;
 }
-
 /**
  * Directories a stock contract may import from. Content colour fields read
  * the semantic colour roles from the video theme's token catalog.
  */
 const CONTRACT_SOURCE_DIRECTORIES = ["src/stock", "src/videoTheme"] as const;
-
 async function _dependencyHash(
   options: Readonly<{
     root: string;
@@ -162,6 +169,9 @@ async function _dependencyHash(
     })
     .sort()
     .reduce(async (previous, file) => {
+      // Each callback waits for the prior update of this shared,
+      // order-sensitive hash.
+      // react-doctor-disable-next-line async-await-in-loop
       await previous;
       const filename = await fs.realpath(path.resolve(root, file));
       const isInsideContractSources = CONTRACT_SOURCE_DIRECTORIES.some(
@@ -181,16 +191,18 @@ async function _dependencyHash(
     }, Promise.resolve());
   return hash.update(contents).digest("hex");
 }
-
 async function _buildGeneration(
   root: string,
 ): Promise<StockContractGeneration> {
   const sourceHash = await StockFingerprintModule.getSourceHashFromRoot(root);
+  // Fingerprint before bundling and verify it afterwards to detect source
+  // changes during the build.
+  // react-doctor-disable-next-line server-sequential-independent-await
   const result = await build({
     absWorkingDir: root,
     stdin: {
       contents:
-        'export { STOCK_CATALOG, STOCK_FPS } from "./src/stock/catalog"; export { stockRequestSchema } from "./src/stock/contracts/stockRequestSchema/stockRequestSchema";',
+        'export { STOCK_CATALOG, STOCK_FPS } from "./src/stock/stockEntry"; export { stockRequestSchema } from "./src/stock/contracts/stockRequestSchema/stockRequestSchema";',
       resolveDir: root,
       sourcefile: "stock-contract-generation.ts",
     },
@@ -212,7 +224,6 @@ async function _buildGeneration(
   await StockFingerprintModule.verifySources({ root, sourceHash });
   return _loadGeneration({ root, hash, contents, sourceHash });
 }
-
 /**
  * Bundle nested contract dependencies into one content-addressed Node module.
  */

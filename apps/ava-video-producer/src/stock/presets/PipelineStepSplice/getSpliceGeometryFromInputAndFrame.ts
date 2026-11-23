@@ -1,7 +1,7 @@
 import { prop } from "@avandar/utils";
-import { mix, ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { getSeparationFromFrame } from "./getSeparationFromFrame";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./PipelineStepSplice.schema";
 /** Data for getSpliceGeometryFromInputAndFrame. */
 type GetSpliceGeometryResult = {
@@ -24,12 +24,12 @@ export function getSpliceGeometryFromInputAndFrame({
   motion: VideoMotion;
 }>): GetSpliceGeometryResult[] {
   const separation = getSeparationFromFrame({ frame, motion });
-  const insertion = ramp(
+  const insertion = Motion.ramp({
     frame,
-    62,
-    motion.scale(INSERT_FRAMES),
-    motion.travel.easing,
-  );
+    at: 62,
+    dur: motion.scale(INSERT_FRAMES),
+    easing: motion.travel.easing,
+  });
   const insertedIndex = input.steps.findIndex(prop("isInserted"));
   const numSteps = input.steps.length;
   return input.steps.map((step, index) => {
@@ -39,8 +39,20 @@ export function getSpliceGeometryFromInputAndFrame({
       (960 - ((numSteps - 2) * 170 + 140)) / 2 + originalIndex * 170;
     return {
       ...step,
-      x: step.isInserted ? finalX : mix(separation, originalX, finalX),
-      y: step.isInserted ? mix(insertion, 154, 290) : 290,
+      x: step.isInserted
+        ? finalX
+        : Motion.mix({
+            t: separation,
+            from: originalX,
+            to: finalX,
+          }),
+      y: step.isInserted
+        ? Motion.mix({
+            t: insertion,
+            from: 154,
+            to: 290,
+          })
+        : 290,
     };
   });
 }

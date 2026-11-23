@@ -1,4 +1,4 @@
-import { ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
@@ -21,7 +21,14 @@ export function BatchReleaseCaption({
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const motion = GraphicThemeHooks.useGraphicMotion();
   return (
-    <g opacity={ramp(frame, completeAt, motion.whip, motion.reveal.easing)}>
+    <g
+      opacity={Motion.ramp({
+        frame,
+        at: completeAt,
+        dur: motion.whip,
+        easing: motion.reveal.easing,
+      })}
+    >
       <FitText
         text={text}
         x={x + 15}

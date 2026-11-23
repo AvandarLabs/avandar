@@ -1,15 +1,15 @@
-.control {
+.atlasSelectControl {
   flex: 1 1 auto;
   min-width: 0;
 }
 
-.root {
+.atlasSelectRoot {
   align-items: center;
   display: flex;
   gap: var(--atlas-space-8);
 }
 
-.label {
+.atlasSelectLabel {
   color: var(--ink);
   flex-shrink: 0;
   font-size: var(--atlas-font-size-12);
@@ -18,33 +18,33 @@
   padding: 0;
 }
 
-.wrapper {
+.atlasSelectWrapper {
   flex: 1;
   min-width: 80px;
 }
 
-.input {
+.atlasSelectInput {
   background: var(--paper);
   border-color: var(--line);
   color: var(--ink);
   font-size: var(--atlas-font-size-12);
 }
 
-.dropdown {
+.atlasSelectDropdown {
   background: var(--paper);
   border-color: var(--line);
   color: var(--ink);
 }
 
-.option {
+.atlasSelectOption {
   font-size: var(--atlas-font-size-12);
 }
 
-.option[data-combobox-selected] {
+.atlasSelectOption[data-combobox-selected] {
   background: var(--ava-primary-0);
   color: var(--ink);
 }
 
-.option[data-combobox-active] {
+.atlasSelectOption[data-combobox-active] {
   background: var(--ava-neutral-1);
 }

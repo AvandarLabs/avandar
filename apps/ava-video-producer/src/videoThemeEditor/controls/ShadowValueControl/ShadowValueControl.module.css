@@ -1,9 +1,9 @@
-.shadowLayers {
+.shadowValueControlLayers {
   display: grid;
   gap: var(--atlas-space-8);
 }
 
-.shadowPreview {
+.shadowValueControlPreview {
   background: var(--paper);
   border-radius: var(--atlas-radius-6);
   display: inline-block;

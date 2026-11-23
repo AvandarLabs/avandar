@@ -1,24 +1,20 @@
-import { mix } from "../../../motion";
-import { FitText } from "../../primitives/FitText/FitText";
-import { SketchedShape } from "../../primitives/SketchedShape";
-import { StockRect } from "../../primitives/StockRect/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getWorkPartitionFromInput } from "./getWorkPartitionFromInput";
-import { WorkCutLines } from "./WorkCutLines";
-import { WorkPiece } from "./WorkPiece";
+import { OriginalWorkSlab } from "./OriginalWorkSlab";
+import { WorkCutLinesAndParentLabel } from "./WorkCutLinesAndParentLabel";
+import { WorkGroupingLabel } from "./WorkGroupingLabel";
+import { WorkSlabBrackets } from "./WorkSlabBrackets";
+import { WorkUnitAndEffortLabels } from "./WorkUnitAndEffortLabels";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./WorkDecomposition.schema";
 import type { ReactNode } from "react";
 
-type Props = GraphicProps & { input: Input };
+type Props = GraphicProps & {
+  input: Input;
+};
+
 /**
- * The tint of the whole piece before it splits, before the theme's tint
- * strength.
- */
-const WHOLE_TINT = 0.16;
-/**
- * A conserved slab becomes proportionally weighted, externally labeled
- * pieces.
+ * A conserved slab becomes proportionally weighted, externally labeled pieces.
  */
 export function WorkDecomposition({
   frame,
@@ -35,96 +31,31 @@ export function WorkDecomposition({
   }, 0);
   return (
     <g opacity={motion.ramp(frame, 12, motion.scale(26))}>
-      <StockRect
-        data-original-slab="true"
-        x={90}
-        y={230}
-        width={500}
-        height={270}
-        fill={accent}
-        fillOpacity={
-          scales.wash(WHOLE_TINT) *
-          (1 - motion.ramp(frame, 38, motion.scale(2)))
-        }
-        stroke={accent}
-        strokeOpacity={tokens.alpha.ghost}
-      />
-      <SketchedShape
-        shape={{
-          kind: "path",
-          d: "M66 222 V206 H614 V222 M66 508 V524 H614 V508",
-        }}
-        profile={tokens.sketch.shape}
-        stroke={tokens.color.line}
-        fill="none"
-      />
-      <g opacity={motion.ramp(frame, 38, motion.scale(2))}>
-        {pieces.map((piece, index) => {
-          return (
-            <WorkPiece
-              key={piece.id}
-              piece={piece}
-              index={index}
-              frame={frame}
-              accent={accent}
-              parentLabel={input.parentLabel}
-              showEffortValues={input.showEffortValues}
-            />
-          );
-        })}
-      </g>
-      <WorkCutLines
+      <OriginalWorkSlab
         frame={frame}
-        pieces={pieces}
-        layout={input.partitionLayout}
         accent={accent}
+        tokens={tokens}
+        scales={scales}
+        motion={motion}
       />
-      <FitText
-        text={input.parentLabel}
-        x={340}
-        y={mix(separation, 340, 120)}
-        width={540}
-        fontSize={20}
-        maxLines={2}
-        anchor="middle"
-        breakLongWords
-        normalizeWhitespace
+      <WorkSlabBrackets
+        frame={frame}
+        input={input}
+        accent={accent}
+        tokens={tokens}
+        motion={motion}
+        pieces={pieces}
+      />
+      <WorkCutLinesAndParentLabel
+        frame={frame}
+        input={input}
+        accent={accent}
+        separation={separation}
+        pieces={pieces}
       />
       <g opacity={separation}>
-        <FitText
-          text={input.groupingLabel}
-          x={660}
-          y={146}
-          width={264}
-          fontSize={16}
-          maxLines={3}
-          breakLongWords
-          normalizeWhitespace
-          color={accent}
-        />
-        <FitText
-          text={input.unitLabel}
-          x={340}
-          y={564}
-          width={400}
-          fontSize={14}
-          maxLines={1}
-          anchor="middle"
-          breakLongWords
-          normalizeWhitespace
-        />
-        {input.showEffortValues ? (
-          <FitText
-            text={String(total)}
-            x={100}
-            y={564}
-            width={60}
-            fontSize={16}
-            maxLines={1}
-            normalizeWhitespace
-            color={accent}
-          />
-        ) : undefined}
+        <WorkGroupingLabel input={input} accent={accent} />
+        <WorkUnitAndEffortLabels input={input} accent={accent} total={total} />
       </g>
     </g>
   );

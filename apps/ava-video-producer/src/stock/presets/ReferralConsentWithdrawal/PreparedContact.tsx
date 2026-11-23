@@ -1,8 +1,8 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ContactCard } from "./ContactCard";
 import { ContactHandling } from "./ContactHandling";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./ReferralConsentWithdrawal.schema";
 import type { ReactNode } from "react";
 
@@ -87,7 +87,11 @@ function _getPreparation({
         );
   return {
     progress,
-    x: mix(progress, 520, 560),
+    x: Motion.mix({
+      t: progress,
+      from: 520,
+      to: 560,
+    }),
     y: 194 + index * 102 - 20 * Math.sin(progress * Math.PI),
     isHandling:
       order >= 0 &&

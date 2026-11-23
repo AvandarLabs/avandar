@@ -1,6 +1,7 @@
-import { mix } from "../../../motion";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import { Motion } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./RetryBackoff.schema";
+
 /** Data for getBackoffStateFromInputAndFrame. */
 type GetBackoffStateMarkers = {
   x: number;
@@ -14,15 +15,11 @@ type GetBackoffStateMarkers = {
   index: number;
 };
 
-/** Proportional waiting geometry and the operation's bounded retry journey. */
-export function getBackoffStateFromInputAndFrame({
-  frame,
-  input,
-  motion,
-}: Readonly<{ frame: number; input: Input; motion: VideoMotion }>): {
+/** Places every attempt marker along its proportional authored wait. */
+function _getAttemptMarkers(input: Readonly<Input>): {
   markers: GetBackoffStateMarkers[];
-  tokenX: number;
-  tokenY: number;
+  waitFrames: number;
+  totalDelay: number;
 } {
   const waits = input.attempts.slice(0, -1);
   const totalDelay = waits.reduce((total, attempt) => {
@@ -43,6 +40,24 @@ export function getBackoffStateFromInputAndFrame({
     at += 12 + (waitFrames * attempt.delayAfter) / totalDelay;
     return marker;
   });
+  return { markers, waitFrames, totalDelay };
+}
+
+/** Proportional waiting geometry and the operation's bounded retry journey. */
+export function getBackoffStateFromInputAndFrame({
+  frame,
+  input,
+  motion,
+}: Readonly<{
+  frame: number;
+  input: Input;
+  motion: VideoMotion;
+}>): {
+  markers: GetBackoffStateMarkers[];
+  tokenX: number;
+  tokenY: number;
+} {
+  const { markers, waitFrames, totalDelay } = _getAttemptMarkers(input);
   const active =
     [...markers].reverse().find((marker) => {
       return frame >= marker.at;
@@ -62,6 +77,10 @@ export function getBackoffStateFromInputAndFrame({
   return {
     markers,
     tokenX: active.x + active.width * travel,
-    tokenY: mix(excursion, 310, 258),
+    tokenY: Motion.mix({
+      t: excursion,
+      from: 310,
+      to: 258,
+    }),
   };
 }

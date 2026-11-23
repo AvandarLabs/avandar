@@ -6,22 +6,20 @@ import css from "./ContrastBadge.module.css";
 import type { ResolvedTypeStyle } from "../../../videoTheme/videoTheme.types";
 import type { ReactNode } from "react";
 
+type Props = {
+  color: string;
+  style?: Pick<ResolvedTypeStyle, "fontSize" | "fontWeight">;
+};
 /**
  * The WCAG contrast of a text colour against the theme's ground, as a badge.
  */
-export function ContrastBadge({
-  color,
-  style,
-}: Readonly<{
-  color: string;
-  style?: Pick<ResolvedTypeStyle, "fontSize" | "fontWeight">;
-}>): ReactNode {
+export function ContrastBadge({ color, style }: Readonly<Props>): ReactNode {
   const { theme } = useTokenEditor();
-  const { level, ratio } = getContrastSummaryFromColors(
+  const { level, ratio } = getContrastSummaryFromColors({
     color,
-    theme.semantic.color.ground,
+    ground: theme.semantic.color.ground,
     style,
-  );
+  });
   const isFailing = level === "fail";
   return (
     <Badge

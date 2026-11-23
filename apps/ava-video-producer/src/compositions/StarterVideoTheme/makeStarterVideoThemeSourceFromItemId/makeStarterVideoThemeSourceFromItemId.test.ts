@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { BUILT_IN_VIDEO_THEMES } from "../../../videoTheme/builtInVideoThemes/builtInVideoThemes";
 import { makeResolvedVideoThemeFromSource } from "../../../videoTheme/makeResolvedVideoThemeFromSource/makeResolvedVideoThemeFromSource";
+import { BUILT_IN_VIDEO_THEMES } from "../../../videoTheme/makeVideoThemeLibraryFromDocuments/makeVideoThemeLibraryFromDocuments";
 import { mergeVideoThemePatches } from "../../../videoTheme/mergeVideoThemeLayers/mergeVideoThemePatches/mergeVideoThemePatches";
 import {
   makeStarterVideoThemeSourceFromItemId,

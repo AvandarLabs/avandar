@@ -1,4 +1,4 @@
-import { mix, ramp } from "../../../../motion";
+import { Motion } from "../../../../motion";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { AlternativePanel } from "./AlternativePanel";
 import { type Props } from "./ContrastAlternativeShared.types";
@@ -13,17 +13,21 @@ export function ContrastAlternative({
   index,
 }: Readonly<Props>): ReactNode {
   const motion = GraphicThemeHooks.useGraphicMotion();
-  const separation = ramp(
+  const separation = Motion.ramp({
     frame,
-    12,
-    motion.scale(SEPARATE_FRAMES),
-    motion.travel.easing,
-  );
+    at: 12,
+    dur: motion.scale(SEPARATE_FRAMES),
+    easing: motion.travel.easing,
+  });
   return (
     <g
       data-alternative={alternative.id}
       opacity={separation}
-      transform={`translate(${mix(separation, index ? -100 : 100, 0)} 0)`}
+      transform={`translate(${Motion.mix({
+        t: separation,
+        from: index ? -100 : 100,
+        to: 0,
+      })} 0)`}
     >
       <AlternativePanel
         alternative={alternative}

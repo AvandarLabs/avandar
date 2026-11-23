@@ -1,4 +1,4 @@
-import { StockRect } from "../../../primitives/StockRect/StockRect";
+import { StockRect } from "../../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
@@ -15,7 +15,10 @@ export function OutcomeCard({
   stroke,
   strokeOpacity,
 }: Readonly<Props>): ReactNode {
-  const style = GraphicThemeHooks.useGraphicProps("DecisionFork", {});
+  const style = GraphicThemeHooks.useGraphicProps({
+    name: "DecisionFork",
+    props: {},
+  });
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <StockRect

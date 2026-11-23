@@ -1,6 +1,7 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { type FitTextSize } from "../../primitives/FitText/wrapTextToLines";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { MarketCaptionSlots } from "./MarketCaptionSlots/MarketCaptionSlots";
+import type { FitTextSize } from "../../primitives/FitText/wrapTextToLines";
 import type { Input } from "./HouseholdMarketChoice.schema";
 import type { ReactNode } from "react";
 
@@ -15,21 +16,7 @@ export function MarketLabels({ input }: Readonly<Props>): ReactNode {
   ];
   return (
     <g>
-      {labels.map(([text, x, y, width, fontSize], index) => {
-        return (
-          <FitText
-            key={index}
-            text={text}
-            x={x}
-            y={y}
-            width={width}
-            fontSize={fontSize}
-            maxLines={3}
-            normalizeWhitespace
-            breakLongWords
-          />
-        );
-      })}
+      <MarketCaptionSlots labels={labels} />
       {input.products.map((product, index) => {
         return (
           <g key={product.id}>

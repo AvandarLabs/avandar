@@ -1,5 +1,5 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
-import { StockRect } from "../../../primitives/StockRect/StockRect";
+import { StockRect } from "../../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getCrossingFromShareIndex } from "../getCrossingFromShareIndex";
 import { OpenAperture } from "./OpenAperture";
@@ -38,10 +38,8 @@ export function AperturePanel({
           shareIndex: numSharedFields++,
           motion,
         });
-        if (frame < crossing.at || frame >= crossing.at + crossing.duration) {
-          return undefined;
-        }
-        return (
+        return frame < crossing.at ||
+          frame >= crossing.at + crossing.duration ? undefined : (
           <OpenAperture
             key={field.id}
             fieldId={field.id}

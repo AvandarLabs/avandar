@@ -15,6 +15,18 @@ import {
 } from "./FeedbackRefinement.fixtures";
 import { inputSchema, type Input } from "./FeedbackRefinement.schema";
 
+function _assertReturnedNoteStartsClipped(
+  clips: (frame: number) => Array<RegExpMatchArray[][number][number]>,
+): void {
+  assert.equal(
+    SvgAttributes.getNumberFromMarkup({
+      attributes: clips(62)[1],
+      name: "width",
+    }),
+    0,
+  );
+}
+
 const render = ({
   frame,
   input = DEFAULT_INPUT,
@@ -154,13 +166,7 @@ test("the returned note stays tethered before physically detaching into the revi
       return match[1];
     });
   };
-  assert.equal(
-    SvgAttributes.getNumberFromMarkup({
-      attributes: clips(62)[1],
-      name: "width",
-    }),
-    0,
-  );
+  _assertReturnedNoteStartsClipped(clips);
   assert.ok(
     SvgAttributes.getNumberFromMarkup({
       attributes: clips(82)[1],

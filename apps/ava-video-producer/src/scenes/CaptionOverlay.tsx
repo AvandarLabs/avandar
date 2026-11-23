@@ -1,25 +1,42 @@
 import { useVideoMotion } from "../videoTheme/useVideoMotion";
 import { useVideoShapeScales } from "../videoTheme/useVideoShapeScales";
-import { useVideoTokens } from "../videoTheme/useVideoTheme";
-import {
-  activeCaption,
-  captionGeometry,
-  validateCaptions,
-} from "./layout/layout";
+import { useVideoTokens } from "../videoTheme/videoThemeHelpers";
+import { CaptionLayout } from "./layout/CaptionLayout";
 import { StageTheme } from "./StageTheme/StageTheme";
-import type { VideoMotion } from "../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { CaptionOverlayProps as Props } from "./scenes.types";
 import type { CSSProperties, ReactNode } from "react";
 /**
  * The caption box, hung from the bottom centre of the canvas and sized by
  * its fitted geometry, through its line height.
  */
+function _getCaptionGeometry({
+  options,
+  tokens,
+  scales,
+  text,
+}: Readonly<{
+  options: Props;
+  tokens: ReturnType<typeof useVideoTokens>;
+  scales: ReturnType<typeof useVideoShapeScales>;
+  text: string;
+}>): ReturnType<typeof CaptionLayout.captionGeometry> {
+  const caption = tokens.text.stage.caption;
+  return CaptionLayout.captionGeometry({
+    text,
+    width: options.width ?? 1600,
+    height: options.height ?? 1000,
+    fontSize: options.fontSize ?? caption.fontSize,
+    bottom: options.bottom ?? 48,
+    borderWidth: scales.stroke(tokens.stroke.hairline),
+  });
+}
 function _buildCaptionBoxStyle({
   geometry,
   tokens,
   toCorner,
 }: Readonly<{
-  geometry: ReturnType<typeof captionGeometry>;
+  geometry: ReturnType<typeof CaptionLayout.captionGeometry>;
   tokens: ReturnType<typeof useVideoTokens>;
   toCorner: (radius: number) => number;
 }>): CSSProperties {
@@ -51,7 +68,10 @@ function _getCueFadeIn({
   motion,
 }: Readonly<{
   frame: number;
-  cue: Readonly<{ startFrame: number; endFrame: number }>;
+  cue: Readonly<{
+    startFrame: number;
+    endFrame: number;
+  }>;
   motion: VideoMotion;
 }>): number {
   const fadeDuration = Math.min(
@@ -70,28 +90,24 @@ function _getCueFadeIn({
  * Type is `text.stage.caption`, its size the default the fit starts from,
  * on a box in the scene palette with the scene corner.
  */
-export function CaptionOverlay({
-  frame,
-  cues,
-  width = 1600,
-  height = 1000,
-  bottom = 48,
-  fontSize,
-}: Props): ReactNode {
+export function CaptionOverlay(options: Props): ReactNode {
+  const { frame, cues } = options;
   const tokens = useVideoTokens();
   const motion = useVideoMotion();
   const scales = useVideoShapeScales();
-  const caption = tokens.text.stage.caption;
-  validateCaptions(cues);
-  const cue = activeCaption(frame, cues);
-  if (!cue) return null;
-  const geometry = captionGeometry({
+  CaptionLayout.validateCaptions(cues);
+  const cue = CaptionLayout.activeCaption({
+    frame,
+    cues,
+  });
+  if (!cue) {
+    return null;
+  }
+  const geometry = _getCaptionGeometry({
+    options,
+    tokens,
+    scales,
     text: cue.text,
-    width,
-    height,
-    fontSize: fontSize ?? caption.fontSize,
-    bottom,
-    borderWidth: scales.stroke(tokens.stroke.hairline),
   });
   return (
     <div
@@ -104,6 +120,11 @@ export function CaptionOverlay({
       }}
     >
       {geometry.lines.map((line, index) => {
+        // prettier-ignore
+        // These stateless text nodes are fixed wrapped-line slots.
+        // Duplicate lines are valid and carry no independent item
+        // state.
+        // react-doctor-disable-next-line no-array-index-as-key
         return <div key={index}>{line}</div>;
       })}
     </div>

@@ -2,17 +2,19 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import type { FlowContext } from "../../captureFlows.types";
 import type { FixtureRow } from "./runCasesFlow.types";
-
 /**
  * Reads a generated fixture CSV into rows keyed by column name, so the cases
  * flow can compare what the product shows against what was imported.
  *
  * Called by `runCasesFlow` for the cases and visits fixtures.
  */
-export async function readFixtureRows(
-  context: Readonly<FlowContext>,
-  key: string,
-): Promise<FixtureRow[]> {
+export async function readFixtureRows({
+  context,
+  key,
+}: Readonly<{
+  context: Readonly<FlowContext>;
+  key: string;
+}>): Promise<FixtureRow[]> {
   const csv = await readFile(
     path.join(context.fixtureDir, `${key}.csv`),
     "utf8",

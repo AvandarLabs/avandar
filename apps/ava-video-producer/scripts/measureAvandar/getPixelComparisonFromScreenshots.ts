@@ -8,7 +8,6 @@ import type { Rect } from "./measureAvandar.types";
 const ffmpeg =
   process.env.FFMPEG_BIN ||
   (ffmpegStatic && existsSync(ffmpegStatic) ? ffmpegStatic : "ffmpeg");
-
 function _decodeRgba(input: Readonly<Buffer>): Buffer {
   return execFileSync(
     ffmpeg,
@@ -26,16 +25,34 @@ function _decodeRgba(input: Readonly<Buffer>): Buffer {
     { input, maxBuffer: 16 * 1024 * 1024 },
   );
 }
-
+function _getChangedPixelBounds(
+  changed: ReadonlyArray<Readonly<{ pixel: number; delta: number }>>,
+): Rect {
+  const xs = changed.map(({ pixel }) => {
+    return pixel % STAGE.width;
+  });
+  const ys = changed.map(({ pixel }) => {
+    return Math.floor(pixel / STAGE.width);
+  });
+  return {
+    x: Math.min(...xs),
+    y: Math.min(...ys),
+    width: Math.max(...xs) - Math.min(...xs) + 1,
+    height: Math.max(...ys) - Math.min(...ys) + 1,
+  };
+}
 /**
  * Compares two screenshots of the film stage pixel by pixel, counting every
  * difference, including compositor antialiasing at rounded edges. Use it to
  * decide whether two renders of the same frame are identical.
  */
-export function getPixelComparisonFromScreenshots(
-  first: Readonly<Buffer>,
-  second: Readonly<Buffer>,
-): {
+export function getPixelComparisonFromScreenshots({
+  first,
+  second,
+}: Readonly<{
+  first: Readonly<Buffer>;
+  second: Readonly<Buffer>;
+}>): {
   changedPixels: number;
   maxChannelDelta: number;
   bounds: Rect | undefined;
@@ -62,18 +79,7 @@ export function getPixelComparisonFromScreenshots(
   if (!changed.length) {
     return { changedPixels: 0, maxChannelDelta: 0, bounds: undefined };
   }
-  const xs = changed.map(({ pixel }) => {
-    return pixel % STAGE.width;
-  });
-  const ys = changed.map(({ pixel }) => {
-    return Math.floor(pixel / STAGE.width);
-  });
-  const bounds = {
-    x: Math.min(...xs),
-    y: Math.min(...ys),
-    width: Math.max(...xs) - Math.min(...xs) + 1,
-    height: Math.max(...ys) - Math.min(...ys) + 1,
-  };
+  const bounds = _getChangedPixelBounds(changed);
   return {
     changedPixels: changed.length,
     maxChannelDelta: Math.max(...changed.map(prop("delta"))),

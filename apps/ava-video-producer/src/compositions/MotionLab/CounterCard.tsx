@@ -1,14 +1,18 @@
 // Registers the bundled faces the theme's text roles name.
 import "../../fonts";
-import { mix } from "../../motion";
+import { Motion } from "../../motion";
 import { useVideoMotion } from "../../videoTheme/useVideoMotion";
-import { useVideoTheme } from "../../videoTheme/useVideoTheme";
+import { useVideoTheme } from "../../videoTheme/videoThemeHelpers";
 import { CounterProgressBar } from "./CounterProgressBar";
-import { MotionLabShared } from "./MotionLabShared/MotionLabShared";
+import { MotionLabShared } from "./MotionLabShared";
 import { SectionLabel } from "./SectionLabel";
 import type { ReactNode } from "react";
+
+type Props = {
+  frame: number;
+};
 /** Demonstrates a rising total and matching progress bar in `MotionLab`. */
-export function CounterCard({ frame }: { frame: number }): ReactNode {
+export function CounterCard({ frame }: Readonly<Props>): ReactNode {
   const { atomic, mantine } = useVideoTheme();
   const motion = useVideoMotion();
   const panel = MotionLabShared.usePanelStyle();
@@ -40,9 +44,13 @@ export function CounterCard({ frame }: { frame: number }): ReactNode {
           letterSpacing: `${atomic.letterSpacing.largeCounter}em`,
         }}
       >
-        {Math.round(mix(progress, 0, MotionLabShared.COUNT_TO)).toLocaleString(
-          "en-US",
-        )}
+        {Math.round(
+          Motion.mix({
+            t: progress,
+            from: 0,
+            to: MotionLabShared.COUNT_TO,
+          }),
+        ).toLocaleString("en-US")}
       </div>
       <CounterProgressBar progress={progress} />
     </div>

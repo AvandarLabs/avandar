@@ -21,8 +21,14 @@ const CLASSIC_COLORS: ReadonlySet<string> = new Set(
       SentinelThemeData.record([...SentinelThemeData.ATOMIC, "swatch"]),
     ),
     ...Object.values(SentinelThemeData.record(["colors"])).flat(),
-    getValueAtPath(SentinelThemeData.CLASSIC, ["white"]),
-    getValueAtPath(SentinelThemeData.CLASSIC, ["black"]),
+    getValueAtPath({
+      source: SentinelThemeData.CLASSIC,
+      path: ["white"],
+    }),
+    getValueAtPath({
+      source: SentinelThemeData.CLASSIC,
+      path: ["black"],
+    }),
   ]
     .filter((value): value is string => {
       return typeof value === "string";

@@ -1,8 +1,8 @@
 import {
-  buildEffectFilterId,
   type EffectPrimitive,
   type VideoEffectFilter,
-} from "../videoEffectFilterHelpers/videoEffectFilterHelpers";
+  VideoEffectFilters,
+} from "../VideoEffectFilters/VideoEffectFilters";
 import { FilterPrimitive } from "./FilterPrimitive";
 import type { ReactNode } from "react";
 
@@ -10,14 +10,12 @@ type Props = Readonly<{
   graphicId: string;
   filters: readonly VideoEffectFilter[];
 }>;
-
 type KeyedPrimitive = {
   key: string;
   primitive: EffectPrimitive;
   input: string;
   result: string;
 };
-
 function _buildKeyedPrimitives(
   primitives: readonly EffectPrimitive[],
 ): KeyedPrimitive[] {
@@ -33,7 +31,6 @@ function _buildKeyedPrimitives(
     };
   });
 }
-
 /**
  * One SVG `<defs>` holding the filters a stock graphic's theme defines, each
  * under `buildEffectFilterId(graphicId, tokenPath)`. Renders nothing when the
@@ -49,7 +46,10 @@ export function VideoEffectDefs({ graphicId, filters }: Props): ReactNode {
         return (
           <filter
             key={filter.path}
-            id={buildEffectFilterId(graphicId, filter.path)}
+            id={VideoEffectFilters.makeFilterIdFromTheme({
+              graphicId,
+              path: filter.path,
+            })}
             x="-50%"
             y="-50%"
             width="200%"

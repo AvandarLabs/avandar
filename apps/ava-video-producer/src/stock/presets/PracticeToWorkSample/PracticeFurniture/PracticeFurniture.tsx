@@ -1,13 +1,15 @@
-import { mix } from "../../../../motion";
-import { SketchedShape } from "../../../primitives/SketchedShape";
+import { Motion } from "../../../../motion";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { MeasuredArtifact } from "../MeasuredArtifact/MeasuredArtifact";
-import { WorkshopBench } from "../WorkshopBench";
-import { PracticeDesk } from "./PracticeDesk";
+import { PracticeDeskAndWorkshop } from "./PracticeDeskAndWorkshop";
 import type { Input } from "../PracticeToWorkSample.schema";
 import type { ReactNode } from "react";
 
-type Props = { input: Input; frame: number; accent: string };
+type Props = {
+  input: Input;
+  frame: number;
+  accent: string;
+};
+
 /**
  * Furniture changes around the retained learner and measured practice sheet.
  */
@@ -23,32 +25,25 @@ export function PracticeFurniture({
     motion.scale(22),
     motion.travel.easing,
   );
-  const practiceX = mix(transfer, 370, 100);
-  const practiceY = mix(transfer, 270, 320);
+  const practiceX = Motion.mix({
+    t: transfer,
+    from: 370,
+    to: 100,
+  });
+  const practiceY = Motion.mix({
+    t: transfer,
+    from: 270,
+    to: 320,
+  });
   return (
-    <g>
-      <PracticeDesk x={practiceX - 20} y={practiceY + 118} />
-      <WorkshopBench transfer={transfer} />
-      {input.showFirstArtifactAtHold || frame < 112 ? (
-        <MeasuredArtifact
-          input={input}
-          x={practiceX}
-          y={practiceY}
-          progress={motion.ramp(frame, 32, motion.hero, motion.travel.easing)}
-          isPractice
-          accent={accent}
-        />
-      ) : undefined}
-      <g opacity={transfer}>
-        <MeasuredArtifact
-          input={input}
-          x={590}
-          y={270}
-          progress={motion.ramp(frame, 90, motion.hero, motion.travel.easing)}
-          isPractice={false}
-          accent={accent}
-        />
-      </g>
-    </g>
+    <PracticeDeskAndWorkshop
+      input={input}
+      frame={frame}
+      accent={accent}
+      motion={motion}
+      transfer={transfer}
+      practiceX={practiceX}
+      practiceY={practiceY}
+    />
   );
 }

@@ -2,10 +2,11 @@ import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
+
+type Props = { accent: string };
+
 /** The shelf, the retailer behind it, and the shopper's basket. */
-export function MarketScenery({
-  accent,
-}: Readonly<{ accent: string }>): ReactNode {
+export function MarketScenery({ accent }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (

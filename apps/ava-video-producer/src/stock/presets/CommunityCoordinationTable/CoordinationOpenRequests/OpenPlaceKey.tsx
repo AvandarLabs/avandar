@@ -2,12 +2,11 @@ import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getCoordinationPlaceColorFromIndex } from "../getCoordinationPlaceColorFromIndex";
 import type { ReactNode } from "react";
+
+type Props = { index: number; x: number; accent: string };
+
 /** The open place's letter in a ring of its place colour. */
-export function OpenPlaceKey({
-  index,
-  x,
-  accent,
-}: Readonly<{ index: number; x: number; accent: string }>): ReactNode {
+export function OpenPlaceKey({ index, x, accent }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const color = getCoordinationPlaceColorFromIndex({
     index,

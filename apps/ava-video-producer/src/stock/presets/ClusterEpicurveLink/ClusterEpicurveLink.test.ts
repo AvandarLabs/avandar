@@ -6,7 +6,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
-import { createThemePatchFromStockColors } from "../../../videoTheme/createThemePatchFromStockColors/createThemePatchFromStockColors";
+import { makeThemePatchFromStockColors } from "../../../videoTheme/makeThemePatchFromStockColors/makeThemePatchFromStockColors";
 import { VideoThemeScope } from "../../../videoTheme/VideoThemeScope/VideoThemeScope";
 import { ClusterEpicurveLink } from "./ClusterEpicurveLink";
 import { clusterEpicurveLinkContract } from "./ClusterEpicurveLink.contract";
@@ -18,7 +18,7 @@ import {
 } from "./ClusterEpicurveLink.fixtures";
 import { inputSchema, type Input } from "./ClusterEpicurveLink.schema";
 
-test("The default investigation group contains three cases, including one unknown onset. Each case maps to exactly one histogram bin or the unknown compartment. Focusing a time bin highlights precisely its case IDs on the map.", () => {
+test("default cluster hold frame renders five histogram cases and investigation count three", () => {
   const markup = _render({ frame: 150 });
   assert.equal((markup.match(/data-histogram-case=/g) ?? []).length, 5);
   assert.match(markup, /data-investigation-count="3"/);
@@ -263,7 +263,7 @@ test("selected histogram identities keep at least 4.5 contrast under light and d
     (accent) => {
       const markup = renderToStaticMarkup(
         createElement(VideoThemeScope, {
-          patches: [createThemePatchFromStockColors({ accent })],
+          patches: [makeThemePatchFromStockColors({ accent })],
           children: createElement(HistogramSegments, {
             input: identityInput,
             frame: 150,

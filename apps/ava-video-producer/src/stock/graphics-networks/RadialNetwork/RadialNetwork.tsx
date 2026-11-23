@@ -3,7 +3,7 @@ import { Caption } from "../../graphics-common/Caption";
 import { Eyebrow } from "../../graphics-common/Eyebrow";
 import { Guide } from "../../graphics-common/Guide";
 import { LEGACY_DISPLAY_COPY } from "../../presets/legacy/legacyDisplayCopy";
-import { RadialHub } from "./RadialHub";
+import { RadialHub } from "./RadialHub/RadialHub";
 import { CENTER, ORBIT } from "./RadialNetwork.constants";
 import { RadialSpoke } from "./RadialSpoke";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";

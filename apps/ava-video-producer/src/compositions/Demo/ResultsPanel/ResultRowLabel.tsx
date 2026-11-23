@@ -1,8 +1,11 @@
-import { useVideoTheme } from "../../../videoTheme/useVideoTheme";
+import { useVideoTheme } from "../../../videoTheme/videoThemeHelpers";
 import { type ResultRowData } from "./ResultsPanelShared/ResultsPanelShared.types";
 import type { ReactNode } from "react";
+
+type Props = { row: ResultRowData };
+
 /** Pairs a channel name with its formatted result count for `ResultRow`. */
-export function ResultRowLabel({ row }: { row: ResultRowData }): ReactNode {
+export function ResultRowLabel({ row }: Readonly<Props>): ReactNode {
   const { semantic, mantine } = useVideoTheme();
   return (
     <div

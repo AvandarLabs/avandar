@@ -1,7 +1,7 @@
 import { useVideoMotion } from "../../videoTheme/useVideoMotion";
-import { useVideoProps } from "../../videoTheme/useVideoTheme";
-import { textUnits } from "../layout/layout";
-import { SceneShell } from "../SceneShell";
+import { useVideoProps } from "../../videoTheme/videoThemeHelpers";
+import { TextLayout } from "../layout/TextLayout";
+import { SceneShell } from "../SceneShell/SceneShell";
 import { BrandLockupMotion } from "./BrandLockupMotion/BrandLockupMotion";
 import { LockupCta } from "./LockupCta/LockupCta";
 import { LockupMark } from "./LockupMark/LockupMark";
@@ -19,9 +19,16 @@ import type { ReactNode } from "react";
 export function BrandLockupScene(props: Props): ReactNode {
   const { frame, width = 1600, height = 1000, wordmark, cta } = props;
   const motion = useVideoMotion();
-  const { columnStagger } = useVideoProps("BrandLockup", {});
+  const { columnStagger } = useVideoProps({
+    name: "BrandLockup",
+    props: {},
+  });
   const buildMotion = { motion, columnStagger };
-  const geometry = _getLockupGeometry(props, width, height);
+  const geometry = _getLockupGeometry({
+    props,
+    width,
+    height,
+  });
   const wordmarkAt =
     props.wordmarkAtFrame ??
     BrandLockupMotion.getMarkBuildEndFrame({
@@ -52,17 +59,21 @@ export function BrandLockupScene(props: Props): ReactNode {
   );
 }
 /** Pixel boxes of the mark and wordmark, centred together as one lockup. */
-function _getLockupGeometry(
-  { logo, wordmark, cta }: Props,
-  width: number,
-  height: number,
-) {
+function _getLockupGeometry({
+  props: { logo, wordmark, cta },
+  width,
+  height,
+}: Readonly<{
+  props: Props;
+  width: number;
+  height: number;
+}>) {
   const markHeight = logo.height ?? Math.round(height * 0.167);
   const markWidth = markHeight * (logo.aspectRatio ?? 1);
   const wordmarkFontSize = markHeight * 0.72;
   const gap = markHeight * 0.22;
   const wordmarkWidth = wordmark
-    ? textUnits(wordmark) * wordmarkFontSize * 1.05
+    ? TextLayout.textUnits(wordmark) * wordmarkFontSize * 1.05
     : 0;
   const groupWidth = markWidth + (wordmark ? gap + wordmarkWidth : 0);
   const left = (width - groupWidth) / 2;

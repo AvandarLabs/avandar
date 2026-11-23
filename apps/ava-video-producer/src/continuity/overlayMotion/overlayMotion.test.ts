@@ -3,13 +3,16 @@ import { readFileSync, readdirSync } from "node:fs";
 import { test } from "node:test";
 import { getOverlayPose } from "../../motion-components/getOverlayPose";
 import { StageTheme } from "../../scenes/StageTheme/StageTheme";
-import { continuitySchema } from "../continuitySchema";
-import { getAnnotationProgress, getConnectorProgress } from "./overlayMotion";
+import { continuitySchema } from "../continuitySchema/continuitySchema";
+import { OverlayMotion } from "./OverlayMotion";
 
 const motion = StageTheme.getClassicStageMotion();
+
 /** The draw timings the continuity stage passes in `classic`. */
 const ANNOTATION = { duration: 18, easing: motion.reveal.easing };
+
 const CONNECTOR = { duration: 30, easing: motion.travel.easing };
+
 test("floating explanation leaves its measured source, settles safely, then returns", () => {
   const source = { x: 387, y: 279, width: 153, height: 323 };
   const target = { x: 680, y: 220, width: 760, height: 400 };
@@ -26,56 +29,76 @@ test("floating explanation leaves its measured source, settles safely, then retu
   assert.equal(getOverlayPose({ frame: 300, cue, source }).opacity, 0);
   assert.equal(getOverlayPose({ frame: 300, cue, source }).x, start.x);
 });
+
 test("notation draws after its cue and disappears at its authored end", () => {
   const cue = { at: 100, until: 200 };
   assert.equal(
-    getAnnotationProgress({ frame: 99, cue, timing: ANNOTATION }),
+    OverlayMotion.getAnnotationProgress({ frame: 99, cue, timing: ANNOTATION }),
     0,
   );
-  assert.ok(getAnnotationProgress({ frame: 109, cue, timing: ANNOTATION }) > 0);
+  assert.ok(
+    OverlayMotion.getAnnotationProgress({
+      frame: 109,
+      cue,
+      timing: ANNOTATION,
+    }) > 0,
+  );
   assert.equal(
-    getAnnotationProgress({ frame: 150, cue, timing: ANNOTATION }),
+    OverlayMotion.getAnnotationProgress({
+      frame: 150,
+      cue,
+      timing: ANNOTATION,
+    }),
     1,
   );
   assert.equal(
-    getAnnotationProgress({ frame: 200, cue, timing: ANNOTATION }),
+    OverlayMotion.getAnnotationProgress({
+      frame: 200,
+      cue,
+      timing: ANNOTATION,
+    }),
     0,
   );
 });
+
 test("all authored overlays stay in safe stage space and clear their measured source", () => {
   const folder = new URL("../../../storyboards/explainers/", import.meta.url);
-  for (const file of readdirSync(folder).filter((name) => {
-    return name.endsWith(".json");
-  })) {
+  Array.from(
+    readdirSync(folder).filter((name) => {
+      return name.endsWith(".json");
+    }),
+  ).forEach((file) => {
     const document = JSON.parse(readFileSync(new URL(file, folder), "utf8"));
     const plan = continuitySchema.parse(document.shots[0].props);
-    for (const beat of plan.beats) {
+    Array.from(plan.beats).forEach((beat) => {
       const content = beat.content;
-      if (content.kind !== "composite") continue;
-      for (const diagram of content.diagrams) {
-        assert.ok(diagram.overlay, `${file} has a timed overlay`);
-        const { target, at, until } = diagram.overlay;
-        assert.ok(at > 0 && until < beat.duration, file);
-        assert.ok(target.x >= 32 && target.y >= 90, file);
-        assert.ok(
-          target.x + target.width <= 1568 && target.y + target.height <= 780,
-          file,
-        );
-        const source = content.source;
-        assert.ok(
-          target.x >= source.x + source.width ||
-            target.y >= source.y + source.height ||
-            target.x + target.width <= source.x ||
-            target.y + target.height <= source.y,
-          file,
-        );
+      if (content.kind === "composite") {
+        content.diagrams.forEach((diagram) => {
+          assert.ok(diagram.overlay, `${file} has a timed overlay`);
+          const { target, at, until } = diagram.overlay;
+          assert.ok(at > 0 && until < beat.duration, file);
+          assert.ok(target.x >= 32 && target.y >= 90, file);
+          assert.ok(
+            target.x + target.width <= 1568 && target.y + target.height <= 780,
+            file,
+          );
+          const source = content.source;
+          assert.ok(
+            target.x >= source.x + source.width ||
+              target.y >= source.y + source.height ||
+              target.x + target.width <= source.x ||
+              target.y + target.height <= source.y,
+            file,
+          );
+        });
       }
-    }
-  }
+    });
+  });
 });
+
 test("focus and bracket treatments never emit a causal connector", () => {
   assert.equal(
-    getConnectorProgress({
+    OverlayMotion.getConnectorProgress({
       frame: 300,
       effect: "focus",
       signalAt: 100,
@@ -84,7 +107,7 @@ test("focus and bracket treatments never emit a causal connector", () => {
     0,
   );
   assert.equal(
-    getConnectorProgress({
+    OverlayMotion.getConnectorProgress({
       frame: 300,
       effect: "bracket",
       signalAt: 100,
@@ -93,9 +116,10 @@ test("focus and bracket treatments never emit a causal connector", () => {
     0,
   );
 });
+
 test("causal connector starts only at its authored signal cue", () => {
   assert.equal(
-    getConnectorProgress({
+    OverlayMotion.getConnectorProgress({
       frame: 99,
       effect: "signal",
       signalAt: 100,
@@ -104,7 +128,7 @@ test("causal connector starts only at its authored signal cue", () => {
     0,
   );
   assert.equal(
-    getConnectorProgress({
+    OverlayMotion.getConnectorProgress({
       frame: 100,
       effect: "signal",
       signalAt: 100,
@@ -113,7 +137,7 @@ test("causal connector starts only at its authored signal cue", () => {
     0,
   );
   assert.ok(
-    getConnectorProgress({
+    OverlayMotion.getConnectorProgress({
       frame: 115,
       effect: "signal",
       signalAt: 100,
@@ -121,7 +145,7 @@ test("causal connector starts only at its authored signal cue", () => {
     }) > 0,
   );
   assert.equal(
-    getConnectorProgress({
+    OverlayMotion.getConnectorProgress({
       frame: 130,
       effect: "signal",
       signalAt: 100,
@@ -130,6 +154,7 @@ test("causal connector starts only at its authored signal cue", () => {
     1,
   );
 });
+
 test("composites reject diagrams with no visible overlay placement", () => {
   const document = JSON.parse(
     readFileSync(
@@ -155,6 +180,7 @@ test("composites reject diagrams with no visible overlay placement", () => {
     false,
   );
 });
+
 test("slower overlay travel reaches the target later and keeps its end cue", () => {
   const source = { x: 0, y: 0, width: 100, height: 100 };
   const cue = {
@@ -167,22 +193,29 @@ test("slower overlay travel reaches the target later and keeps its end cue", () 
   assert.equal(getOverlayPose({ frame: 92, cue, source }).x, 400);
   assert.equal(getOverlayPose({ frame: 300, cue, source }).opacity, 0);
 });
+
 test("a longer themed draw-in slows an annotation's arrival", () => {
   const cue = { at: 0, until: 200 };
   assert.ok(
-    getAnnotationProgress({
+    OverlayMotion.getAnnotationProgress({
       frame: 9,
       cue,
       timing: { ...ANNOTATION, duration: 36 },
-    }) < getAnnotationProgress({ frame: 9, cue, timing: ANNOTATION }),
+    }) <
+      OverlayMotion.getAnnotationProgress({
+        frame: 9,
+        cue,
+        timing: ANNOTATION,
+      }),
   );
 });
+
 test("a connector's themed timing sets its draw-in", () => {
   const linear = (progress: number) => {
     return progress;
   };
   assert.equal(
-    getConnectorProgress({
+    OverlayMotion.getConnectorProgress({
       frame: 10,
       effect: "signal",
       signalAt: 0,

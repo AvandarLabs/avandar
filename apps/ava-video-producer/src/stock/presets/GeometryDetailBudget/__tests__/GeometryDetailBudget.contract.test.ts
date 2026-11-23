@@ -21,6 +21,19 @@ import {
   EXCLUSIONS,
 } from "./GeometryDetailBudgetTestHelpers";
 
+function _assertActiveSegmentAdvances(): void {
+  assert.notEqual(
+    getSvgAttributeMatchesFromMarkup({
+      markup: _render({ frame: 53 }),
+      attribute: "data-active-segment",
+    }).values[0],
+    getSvgAttributeMatchesFromMarkup({
+      markup: _render({ frame: 102 }),
+      attribute: "data-active-segment",
+    }).values[0],
+  );
+}
+
 registerStockPresetAssertions({
   inputSchema,
   defaultInput: DEFAULT_INPUT,
@@ -206,16 +219,7 @@ test("recursive chords and deviation guides use actual evaluated segment endpoin
     }),
     3,
   );
-  assert.notEqual(
-    getSvgAttributeMatchesFromMarkup({
-      markup: _render({ frame: 53 }),
-      attribute: "data-active-segment",
-    }).values[0],
-    getSvgAttributeMatchesFromMarkup({
-      markup: _render({ frame: 102 }),
-      attribute: "data-active-segment",
-    }).values[0],
-  );
+  _assertActiveSegmentAdvances();
   assert.equal(
     getSvgAttributeMatchesFromMarkup({
       markup: _render({ frame: 150, input: CHANGED_INPUT }),

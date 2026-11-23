@@ -1,12 +1,18 @@
-import { buildProduct } from "../buildProduct/buildProduct";
-import { requireLicense } from "../requireLicense";
-import { buildShowcaseSite } from "./buildShowcaseSite/buildShowcaseSite";
-import { makeShowcasePathsFromAppRoot } from "./makeShowcasePathsFromAppRoot";
-import { appRoot } from "./ShowcaseFilms/ShowcaseFilms";
+import { pathToFileURL } from "node:url";
+import { ProducerCli } from "../runProducerCommand/ProducerCli/ProducerCli.mjs";
 
-// `pnpm motion:build`: build the Motion Atlas and every other showcase page.
-requireLicense();
-await buildProduct({
-  outputDirectory: makeShowcasePathsFromAppRoot(appRoot).product,
+await ProducerCli.prepare({
+  commandName: "motion:build",
+  moduleUrl: import.meta.url,
 });
-await buildShowcaseSite(appRoot);
+
+if (
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(process.argv[1]).href
+) {
+  process.env.AVA_PRODUCER_WORKER_ENTRY = new URL(
+    "./runBuildShowcase.ts",
+    import.meta.url,
+  ).href;
+  await import("./runBuildShowcase.ts");
+}

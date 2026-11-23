@@ -2,8 +2,8 @@ import { createWriteStream } from "node:fs";
 import { stat } from "node:fs/promises";
 import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
+import { ReadableStream } from "node:stream/web";
 import { createGzip } from "node:zlib";
-import type { ReadableStream as NodeReadableStream } from "node:stream/web";
 
 /** A download the source refused, with the status it answered. */
 export class SourceDownloadFailedError extends Error {
@@ -44,9 +44,10 @@ export async function streamUrlToFile(
   if (!response.ok || response.body === null) {
     throw new SourceDownloadFailedError(response.status);
   }
-  const body = Readable.fromWeb(
-    response.body as NodeReadableStream<Uint8Array>,
-  );
+  if (!(response.body instanceof ReadableStream)) {
+    throw new TypeError("Expected a Node-compatible response stream.");
+  }
+  const body = Readable.fromWeb(response.body);
   const file = createWriteStream(options.filePath);
   await (options.isGzipped
     ? pipeline(body, createGzip(), file)

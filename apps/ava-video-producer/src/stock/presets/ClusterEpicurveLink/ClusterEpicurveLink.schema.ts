@@ -2,6 +2,26 @@ import { prop } from "@avandar/utils";
 import { z } from "zod";
 import type { StockSemanticRule } from "../../contracts/StockContract.types";
 
+function _assertUniqueIds({
+  path,
+  ids,
+  uniqueIds,
+  context,
+}: Readonly<{
+  path: string;
+  ids: readonly string[];
+  uniqueIds: ReadonlySet<string>;
+  context: z.RefinementCtx;
+}>): void {
+  if (uniqueIds.size !== ids.length) {
+    context.addIssue({
+      code: "custom",
+      path: [path],
+      message: "IDs must be unique.",
+    });
+  }
+}
+
 const identifier: z.ZodString = z.string().max(12);
 /** Complete authored case identities, selections and ordered onset bins. */
 export const inputSchema = z
@@ -38,21 +58,21 @@ export const inputSchema = z
   .superRefine((input, context) => {
     const caseIds = input.cases.map(prop("id"));
     const binIds = input.timeBins.map(prop("id"));
+    const caseIdSet = new Set(caseIds);
+    const binIdSet = new Set(binIds);
     [
-      ["cases", caseIds],
-      ["timeBins", binIds],
-      ["investigationCaseIds", input.investigationCaseIds],
-    ].forEach(([path, ids]) => {
-      if (new Set(ids).size !== ids.length) {
-        context.addIssue({
-          code: "custom",
-          path: [String(path)],
-          message: "IDs must be unique.",
-        });
-      }
+      { path: "cases", ids: caseIds, uniqueIds: caseIdSet },
+      { path: "timeBins", ids: binIds, uniqueIds: binIdSet },
+      {
+        path: "investigationCaseIds",
+        ids: input.investigationCaseIds,
+        uniqueIds: new Set(input.investigationCaseIds),
+      },
+    ].forEach(({ path, ids, uniqueIds }) => {
+      _assertUniqueIds({ path, ids, uniqueIds, context });
     });
     input.cases.forEach((item, index) => {
-      if (item.onsetBinId !== null && !binIds.includes(item.onsetBinId)) {
+      if (item.onsetBinId !== null && !binIdSet.has(item.onsetBinId)) {
         context.addIssue({
           code: "custom",
           path: ["cases", index, "onsetBinId"],
@@ -60,7 +80,7 @@ export const inputSchema = z
         });
       }
     });
-    if (input.focusedBinId !== null && !binIds.includes(input.focusedBinId)) {
+    if (input.focusedBinId !== null && !binIdSet.has(input.focusedBinId)) {
       context.addIssue({
         code: "custom",
         path: ["focusedBinId"],
@@ -69,7 +89,7 @@ export const inputSchema = z
     }
     if (
       input.investigationCaseIds.some((id) => {
-        return !caseIds.includes(id);
+        return !caseIdSet.has(id);
       })
     ) {
       context.addIssue({

@@ -1,9 +1,9 @@
 import { useMemo } from "react";
 import {
-  createVideoMotion,
+  makeVideoMotionFromTokens,
   type VideoMotion,
-} from "./createVideoMotion/createVideoMotion";
-import { useVideoTokens } from "./useVideoTheme";
+} from "./makeVideoMotionFromTokens/makeVideoMotionFromTokens";
+import { useVideoTokens } from "./videoThemeHelpers";
 
 /**
  * Tempo-scaled motion for stage components inside a video theme provider,
@@ -12,6 +12,6 @@ import { useVideoTokens } from "./useVideoTheme";
 export function useVideoMotion(): VideoMotion {
   const { motion } = useVideoTokens();
   return useMemo(() => {
-    return createVideoMotion(motion);
+    return makeVideoMotionFromTokens(motion);
   }, [motion]);
 }

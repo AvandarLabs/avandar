@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createObservedTokenUsage } from "./observedTokenUsage";
+import { createObservedTokenUsage } from "../createObservedTokenUsage/createObservedTokenUsage";
 
 test("reports during one render notify subscribers once with sorted unique paths", async () => {
   const usage = createObservedTokenUsage();

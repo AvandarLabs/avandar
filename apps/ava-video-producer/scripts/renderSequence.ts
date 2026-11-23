@@ -12,12 +12,10 @@ import {
 import { BrowserSafeApis } from "@remotion/renderer/client";
 import { makeWorkspaceWebpackConfigFromConfig } from "./lib/makeWorkspaceWebpackConfigFromConfig";
 import { requireLicense } from "./requireLicense";
-
 // Renders one composition's frames serially to JPEG for `render.sh`, which
 // then encodes and gates them.
 // Usage: node --import tsx scripts/renderSequence.ts <composition-id>
 //          <frame-dir>
-
 /** The Chrome binary to render with: a supplied one, or Remotion's shell. */
 function _getBrowserOptions(): Pick<
   NonNullable<Parameters<typeof openBrowser>[1]>,
@@ -30,7 +28,6 @@ function _getBrowserOptions(): Pick<
       }
     : { chromeMode: "headless-shell" };
 }
-
 /** Whether `value` names a GL renderer Remotion can launch Chromium with. */
 function _isOpenGlRenderer(
   value: string,
@@ -39,7 +36,6 @@ function _isOpenGlRenderer(
     value,
   );
 }
-
 /** Headless Chromium, with the GL backend `RENDER_GL` names, if any. */
 function _getChromiumOptions(): ChromiumOptions {
   const renderGl = process.env.RENDER_GL;
@@ -53,7 +49,6 @@ function _getChromiumOptions(): ChromiumOptions {
   }
   return { headless: true, gl: renderGl };
 }
-
 async function _bundleEntry(root: string): Promise<string> {
   return bundle({
     webpackOverride: makeWorkspaceWebpackConfigFromConfig,
@@ -65,7 +60,6 @@ async function _bundleEntry(root: string): Promise<string> {
     publicDir: process.env.RENDER_PUBLIC_DIR || path.join(root, "public"),
   });
 }
-
 /** Reads and validates `REMOTION_PROPS_FILE` as a plain input-props object. */
 async function _readInputProps(
   propsFile: string | undefined,
@@ -81,16 +75,18 @@ async function _readInputProps(
   }
   return parsed;
 }
-
 /** Renders the composition's frames serially to JPEG in `outputDir`. */
-async function _renderFrames(
+async function _renderFrames({
+  session,
+  outputDir,
+}: Readonly<{
   session: Readonly<
     Parameters<typeof selectComposition>[0] & {
       inputProps: Record<string, unknown>;
     }
-  >,
-  outputDir: string,
-): Promise<void> {
+  >;
+  outputDir: string;
+}>): Promise<void> {
   const composition = await selectComposition(session);
   // The API accepts hidden parent directories such as .videos. Every frame
   // is still rendered serially to JPEG, then encoded and gated by render.sh.
@@ -113,7 +109,6 @@ async function _renderFrames(
     },
   });
 }
-
 /** Renders every frame of `id` serially into `outputDir`. */
 async function _renderSequence(options: {
   id: string;
@@ -121,6 +116,8 @@ async function _renderSequence(options: {
 }): Promise<void> {
   const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
   const inputProps = await _readInputProps(process.env.REMOTION_PROPS_FILE);
+  // Reject invalid input props before starting the expensive renderer bundle.
+  // react-doctor-disable-next-line server-sequential-independent-await
   const serveUrl = await _bundleEntry(root);
   const browserOptions = _getBrowserOptions();
   const chromiumOptions = _getChromiumOptions();
@@ -130,8 +127,8 @@ async function _renderSequence(options: {
     logLevel: "error",
   });
   try {
-    await _renderFrames(
-      {
+    await _renderFrames({
+      session: {
         id: options.id,
         serveUrl,
         inputProps,
@@ -141,13 +138,12 @@ async function _renderSequence(options: {
         envVariables: {},
         logLevel: "error",
       },
-      options.outputDir,
-    );
+      outputDir: options.outputDir,
+    });
   } finally {
     await browser.close({ silent: true });
   }
 }
-
 requireLicense();
 const [id, outputDir] = process.argv.slice(2);
 if (!id || !outputDir) {

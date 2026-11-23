@@ -2,10 +2,13 @@ import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./JournalReceipts.schema";
 import type { ReactNode } from "react";
+
+type Props = { foldDirection: Input["foldDirection"] };
+
 /** The journal's spine and the separate pocket the receipts come from. */
 export function JournalSpineAndPocket({
   foldDirection,
-}: Readonly<{ foldDirection: Input["foldDirection"] }>): ReactNode {
+}: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   const pocketPath =

@@ -1,7 +1,7 @@
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SceneLabel } from "./SceneLabel";
-import { ShadeFootprint } from "./ShadeFootprint";
+import { ShadeFootprint } from "./ShadeFootprint/ShadeFootprint";
 import type { Input } from "./StreetShadeInstallation.schema";
 import type { ReactNode } from "react";
 

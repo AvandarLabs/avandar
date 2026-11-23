@@ -1,12 +1,12 @@
-import { StockRect } from "../../../primitives/StockRect/StockRect";
+import { StockRect } from "../../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { DisclosureFieldShared } from "./DisclosureFieldShared/DisclosureFieldShared";
+import { DisclosureFieldShared } from "./DisclosureFieldShared";
 import type { ReactNode } from "react";
+
+type Props = { isCopy: boolean; accent: string };
+
 /** The field's row, raised and outlined in the accent while it is a copy. */
-export function FieldOutline({
-  isCopy,
-  accent,
-}: Readonly<{ isCopy: boolean; accent: string }>): ReactNode {
+export function FieldOutline({ isCopy, accent }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (

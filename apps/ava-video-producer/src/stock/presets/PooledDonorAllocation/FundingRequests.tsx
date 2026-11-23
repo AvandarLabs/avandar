@@ -1,4 +1,4 @@
-import { FundingEnvelope } from "./FundingEnvelope";
+import { FundingEnvelope } from "./FundingEnvelope/FundingEnvelope";
 import type { getAllocationTokensFromInputAndFrame } from "./getAllocationTokensFromInputAndFrame";
 import type { Input } from "./PooledDonorAllocation.schema";
 import type { ReactNode } from "react";

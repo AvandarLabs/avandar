@@ -1,6 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { ResolvedVideoSemantic } from "../../../videoTheme/videoTheme.types";
 import type { Input } from "./RejectAndReplace.schema";
 import type { ReactNode } from "react";

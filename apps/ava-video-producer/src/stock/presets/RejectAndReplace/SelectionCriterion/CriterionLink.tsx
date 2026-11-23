@@ -1,11 +1,11 @@
 import { DrawPath } from "../../../graphics-common/DrawPath";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
+
+type Props = { frame: number; accent: string };
+
 /** The link from the criterion to the replacement it selected. */
-export function CriterionLink({
-  frame,
-  accent,
-}: Readonly<{ frame: number; accent: string }>): ReactNode {
+export function CriterionLink({ frame, accent }: Readonly<Props>): ReactNode {
   const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g data-criterion-link="replacement" opacity={motion.reveal(frame, 108)}>

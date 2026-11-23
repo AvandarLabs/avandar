@@ -1,12 +1,15 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { type Props } from "./SelectionMarkerShared.types";
+import { type Props as SelectionMarkerSharedProps } from "./SelectionMarkerShared.types";
 import type { ReactNode } from "react";
+
+type Props = Pick<SelectionMarkerSharedProps, "frame" | "rejectionMark">;
+
 /** A cross or a single strike through a rejected marker. */
 export function RejectionMark({
   frame,
   rejectionMark,
-}: Readonly<Pick<Props, "frame" | "rejectionMark">>): ReactNode {
+}: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const motion = GraphicThemeHooks.useGraphicMotion();
   const scales = GraphicThemeHooks.useGraphicShapeScales();

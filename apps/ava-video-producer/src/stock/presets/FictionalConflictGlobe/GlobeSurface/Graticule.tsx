@@ -3,16 +3,17 @@ import { GlobeProjection } from "../../../geography/GlobeProjection/GlobeProject
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
-/** Ten-degree graticules, clipped to the visible hemisphere. */
-export function Graticule({
-  view,
-}: Readonly<{
+
+type Props = {
   view: Readonly<{
     centerLongitude: number;
     centerLatitude: number;
     radius: number;
   }>;
-}>): ReactNode {
+};
+
+/** Ten-degree graticules, clipped to the visible hemisphere. */
+export function Graticule({ view }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (

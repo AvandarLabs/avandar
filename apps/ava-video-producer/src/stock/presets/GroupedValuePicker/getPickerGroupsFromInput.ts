@@ -1,4 +1,4 @@
-import { prop } from "@avandar/utils";
+import { isNonNullish, prop } from "@avandar/utils";
 import type { Input } from "./GroupedValuePicker.schema";
 /** A value group owns a disjoint stack bay and all of its repeated values. */
 export type PickerValueGroup = {
@@ -8,21 +8,18 @@ export type PickerValueGroup = {
   y: number;
   height: number;
 };
-/** Arrange frequency groups in bounded bays with room for complete values. */
-export function getPickerGroupsFromInput(
-  input: Readonly<Input>,
-): PickerValueGroup[] {
-  const values = input.observations.map(prop("value"));
-  const candidates = [
-    ...new Set(
-      input.nullPolicy === "include-in-mode"
-        ? values
-        : values.filter((value) => {
-            return value !== null;
-          }),
-    ),
-  ];
-  const counted = candidates
+
+/**
+ * Counts candidates and preserves the numeric-then-null frequency tie break.
+ */
+function _countPickerCandidatesFromValues({
+  candidates,
+  values,
+}: Readonly<CountPickerCandidatesFromValuesOptions>): Array<{
+  value: number | null;
+  count: number;
+}> {
+  return candidates
     .map((value) => {
       return {
         value,
@@ -41,6 +38,21 @@ export function getPickerGroupsFromInput(
             : first.value - second.value)
       );
     });
+}
+
+/** Arrange frequency groups in bounded bays with room for complete values. */
+export function getPickerGroupsFromInput(
+  input: Readonly<Input>,
+): PickerValueGroup[] {
+  const values = input.observations.map(prop("value"));
+  const candidates = [
+    ...new Set(
+      input.nullPolicy === "include-in-mode"
+        ? values
+        : values.filter(isNonNullish),
+    ),
+  ];
+  const counted = _countPickerCandidatesFromValues({ candidates, values });
   return counted.reduce<{ bottoms: number[]; groups: PickerValueGroup[] }>(
     (layout, group) => {
       const column = layout.bottoms.indexOf(Math.min(...layout.bottoms));
@@ -58,3 +70,8 @@ export function getPickerGroupsFromInput(
     { bottoms: [330, 330, 330], groups: [] },
   ).groups;
 }
+
+type CountPickerCandidatesFromValuesOptions = {
+  candidates: ReadonlyArray<number | null>;
+  values: ReadonlyArray<number | null>;
+};

@@ -1,12 +1,15 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
+
+type Props = { ballotId: string; path: string; accent: string };
+
 /** The resident's hand on their paper while marking and casting. */
 export function BallotHand({
   ballotId,
   path,
   accent,
-}: Readonly<{ ballotId: string; path: string; accent: string }>): ReactNode {
+}: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (

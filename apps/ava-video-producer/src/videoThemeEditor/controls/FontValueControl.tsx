@@ -2,10 +2,12 @@ import { AtlasSelect } from "../../gallery/AtlasSelect/AtlasSelect";
 import {
   VIDEO_FONT_IDS,
   VIDEO_FONT_REGISTRY,
-} from "../../videoTheme/videoFontRegistry/videoFontRegistryHelpers";
+} from "../../videoTheme/videoFontRegistry/VideoFonts";
 import { useRowHasIssue } from "../RowIssueContext/RowIssueContext";
 import type { ValueControlProps } from "./valueControl.types";
 import type { ReactNode } from "react";
+
+type Props = ValueControlProps;
 
 /**
  * A font token: one of the registered families, marked when its glyph widths
@@ -16,7 +18,7 @@ export function FontValueControl({
   definition,
   value,
   onChange,
-}: ValueControlProps): ReactNode {
+}: Readonly<Props>): ReactNode {
   const hasIssue = useRowHasIssue();
   const data = VIDEO_FONT_IDS.map((id) => {
     const font = VIDEO_FONT_REGISTRY[id];

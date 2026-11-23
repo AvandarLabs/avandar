@@ -1,4 +1,4 @@
-import { createVideoThemeJsonSchema } from "../../../src/videoTheme/videoThemeSchemaHelpers/videoThemeSchemaHelpers";
+import { VideoThemeSchemas } from "../../../src/videoTheme/VideoThemeSchemas/VideoThemeSchemas";
 import {
   THEME_FILE_MAX_BYTES,
   type ThemeStore,
@@ -7,14 +7,12 @@ import { ThemeStoreError } from "../ThemeStoreError";
 import type { IncomingMessage, ServerResponse } from "node:http";
 
 const THEME_ROUTE = /^\/api\/themes(?:\/([^/]+))?$/;
-
 type ThemeRequest = Readonly<{
   req: IncomingMessage;
   res: ServerResponse;
   pathname: string;
   store: ThemeStore;
 }>;
-
 function _send({
   res,
   status,
@@ -31,7 +29,6 @@ function _send({
     })
     .end(JSON.stringify(body));
 }
-
 async function _readJsonBody(req: IncomingMessage): Promise<unknown> {
   let body = "";
   req.setEncoding("utf8");
@@ -47,17 +44,18 @@ async function _readJsonBody(req: IncomingMessage): Promise<unknown> {
     throw new ThemeStoreError(400, "The request body is not valid JSON");
   }
 }
-
 function _assertSameOrigin(req: IncomingMessage): void {
   if (req.headers.origin !== `http://${req.headers.host}`) {
     throw new ThemeStoreError(403, "Use the local showcase to change themes.");
   }
 }
-
-async function _route(
-  { req, res, store }: ThemeRequest,
-  id: string | undefined,
-): Promise<void> {
+async function _route({
+  themeRequest: { req, res, store },
+  id,
+}: Readonly<{
+  themeRequest: ThemeRequest;
+  id: string | undefined;
+}>): Promise<void> {
   const method = req.method ?? "GET";
   if (id === undefined && method === "GET") {
     return _send({ res, status: 200, body: await store.list() });
@@ -72,7 +70,11 @@ async function _route(
     });
   }
   if (id === "schema.json" && method === "GET") {
-    return _send({ res, status: 200, body: createVideoThemeJsonSchema() });
+    return _send({
+      res,
+      status: 200,
+      body: VideoThemeSchemas.makeJsonSchema(),
+    });
   }
   if (id !== undefined && method === "GET") {
     return _send({ res, status: 200, body: await store.read(id) });
@@ -88,7 +90,6 @@ async function _route(
   }
   res.writeHead(405).end();
 }
-
 /**
  * Serves `/api/themes`: list, read, the JSON Schema, create (POST), and save
  * (PUT with `If-Match`). Writes require a same-origin request. Returns false
@@ -102,7 +103,10 @@ export async function handleThemeRequest(
     return false;
   }
   try {
-    await _route(request, match[1]);
+    await _route({
+      themeRequest: request,
+      id: match[1],
+    });
   } catch (error) {
     if (error instanceof ThemeStoreError) {
       _send({

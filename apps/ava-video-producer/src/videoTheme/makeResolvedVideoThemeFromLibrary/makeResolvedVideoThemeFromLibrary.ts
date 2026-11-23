@@ -1,16 +1,17 @@
+import { makeObjectFromEntries, omit } from "@avandar/utils";
 import {
   DEFAULT_THEME,
   mergeMantineTheme,
   type MantineTheme,
 } from "@mantine/core";
-import { elevationToBoxShadow } from "../cssValueHelpers/cssValueHelpers";
 import { getResolvedTokenValue } from "../getResolvedTokenValue";
-import { buildVideoThemeHashFromContent } from "../hashVideoThemeHelpers/hashVideoThemeHelpers";
 import { isCameraSafeEasing } from "../isCameraSafeEasing/isCameraSafeEasing";
 import { mergeVideoThemeLayers } from "../mergeVideoThemeLayers/mergeVideoThemeLayers";
-import { listTokenDefinitions } from "../tokenCatalog/tokenCatalogHelpers/tokenCatalogHelpers";
-import { VIDEO_FONT_REGISTRY } from "../videoFontRegistry/videoFontRegistryHelpers";
+import { TokenCatalog } from "../tokenCatalog/TokenCatalog/TokenCatalog";
+import { VideoCssValues } from "../VideoCssValues/VideoCssValues";
+import { VIDEO_FONT_REGISTRY } from "../videoFontRegistry/VideoFonts";
 import { VideoThemeError } from "../VideoThemeError";
+import { VideoThemeHashes } from "../VideoThemeHashes/VideoThemeHashes";
 import { makeResolvedTokenTiersFromMergedTheme } from "./makeResolvedTokenTiersFromMergedTheme/makeResolvedTokenTiersFromMergedTheme";
 import type {
   ResolvedTypeStyle,
@@ -26,11 +27,7 @@ import type {
 
 const MANTINE_SHADOW_KEYS = ["xs", "sm", "md", "lg", "xl"] as const;
 function _createMantineTheme(merged: VideoThemePatch) {
-  const mantineKeys = Object.fromEntries(
-    Object.entries(merged).filter(([key]) => {
-      return key !== "other" && key !== "components";
-    }),
-  );
+  const mantineKeys = omit(merged, ["other", "components"]);
   try {
     return mergeMantineTheme(DEFAULT_THEME, mantineKeys);
   } catch (error) {
@@ -49,16 +46,17 @@ function _findUnmeasuredGraphicText(
     components: ResolvedVideoComponents;
   }>,
 ): VideoThemeIssue[] {
-  return listTokenDefinitions()
+  return TokenCatalog.listTokenDefinitions()
     .filter(({ definition }) => {
       return (
         definition.kind === "typeStyle" && definition.surface === "graphic"
       );
     })
     .flatMap(({ path }) => {
-      const style = getResolvedTokenValue(tiers, path) as
-        | ResolvedTypeStyle
-        | undefined;
+      const style = getResolvedTokenValue({
+        theme: tiers,
+        path,
+      }) as ResolvedTypeStyle | undefined;
       if (!style || VIDEO_FONT_REGISTRY[style.fontId].measured) {
         return [];
       }
@@ -93,12 +91,26 @@ function _findUnsafeCameraCurves(
       };
     });
 }
-function _deriveMantineShadows(atomic: ResolvedVideoAtomic, color: string) {
+function _deriveMantineShadows({
+  atomic,
+  color,
+}: Readonly<{
+  atomic: ResolvedVideoAtomic;
+  color: string;
+}>) {
   return Object.fromEntries(
     MANTINE_SHADOW_KEYS.flatMap((key) => {
       const shadow = atomic.shadow[key];
       return shadow
-        ? [[key, elevationToBoxShadow({ layers: shadow.layers, color })]]
+        ? [
+            [
+              key,
+              VideoCssValues.makeBoxShadowFromElevation({
+                layers: shadow.layers,
+                color,
+              }),
+            ],
+          ]
         : [];
     }),
   );
@@ -115,16 +127,19 @@ function _findRuleIssues(content: ResolvedContent): VideoThemeIssue[] {
     ..._findUnsafeCameraCurves(content.semantic),
   ];
 }
-function _buildMantineFromContent(
-  mantine: MantineTheme,
-  content: ResolvedContent,
-): MantineTheme {
+function _buildMantineFromContent({
+  mantine,
+  content,
+}: Readonly<{
+  mantine: MantineTheme;
+  content: ResolvedContent;
+}>): MantineTheme {
   return mergeMantineTheme(mantine, {
-    shadows: _deriveMantineShadows(
-      content.atomic,
-      content.semantic.color.shadowColor,
-    ),
-    components: Object.fromEntries(
+    shadows: _deriveMantineShadows({
+      atomic: content.atomic,
+      color: content.semantic.color.shadowColor,
+    }),
+    components: makeObjectFromEntries(
       Object.entries(content.components).map(([name, defaultProps]) => {
         return [name, { defaultProps }];
       }),
@@ -132,32 +147,9 @@ function _buildMantineFromContent(
     other: { video: { atomic: content.atomic, semantic: content.semantic } },
   });
 }
-/**
- * Resolves a theme for one item: merges its layers (see
- * `mergeVideoThemeLayers`), resolves every token, enforces measured fonts
- * for graphic text, and returns concrete values plus a Mantine theme whose
- * `components` carry each themed shape's `defaultProps` and whose
- * `other.video` carries the resolved tiers. Throws a `VideoThemeError`
- * listing every problem. It is pure and DOM-free, so the gallery, the live
- * player, renders, and the save route all resolve the same way.
- */
-export function makeResolvedVideoThemeFromLibrary(
-  library: VideoThemeLibrary,
-  themeId: string,
-  scope: VideoThemeScope = {},
-): ResolvedVideoTheme {
-  const document = library.get(themeId);
-  if (!document) {
-    throw new VideoThemeError([
-      { path: "id", message: `Unknown theme "${themeId}"` },
-    ]);
-  }
-  const merged = mergeVideoThemeLayers(library, themeId, scope);
-  const mantine = _createMantineTheme(merged);
-  const tiers = makeResolvedTokenTiersFromMergedTheme({ merged, mantine });
-  if (tiers.issues.length > 0) {
-    throw new VideoThemeError(tiers.issues);
-  }
+function _getResolvedContent(
+  tiers: ReturnType<typeof makeResolvedTokenTiersFromMergedTheme>,
+): ResolvedContent {
   const content: ResolvedContent = {
     atomic: tiers.atomic as ResolvedVideoAtomic,
     semantic: tiers.semantic as ResolvedVideoSemantic,
@@ -168,11 +160,51 @@ export function makeResolvedVideoThemeFromLibrary(
   if (ruleIssues.length > 0) {
     throw new VideoThemeError(ruleIssues);
   }
+  return content;
+}
+/**
+ * Resolves a theme for one item: merges its layers (see
+ * `mergeVideoThemeLayers`), resolves every token, enforces measured fonts
+ * for graphic text, and returns concrete values plus a Mantine theme whose
+ * `components` carry each themed shape's `defaultProps` and whose
+ * `other.video` carries the resolved tiers. Throws a `VideoThemeError`
+ * listing every problem. It is pure and DOM-free, so the gallery, the live
+ * player, renders, and the save route all resolve the same way.
+ */
+export function makeResolvedVideoThemeFromLibrary({
+  library,
+  themeId,
+  scope = {},
+}: Readonly<{
+  library: VideoThemeLibrary;
+  themeId: string;
+  scope?: VideoThemeScope;
+}>): ResolvedVideoTheme {
+  const document = library.get(themeId);
+  if (!document) {
+    throw new VideoThemeError([
+      { path: "id", message: `Unknown theme "${themeId}"` },
+    ]);
+  }
+  const merged = mergeVideoThemeLayers({
+    library,
+    themeId,
+    scope,
+  });
+  const mantine = _createMantineTheme(merged);
+  const tiers = makeResolvedTokenTiersFromMergedTheme({ merged, mantine });
+  if (tiers.issues.length > 0) {
+    throw new VideoThemeError(tiers.issues);
+  }
+  const content = _getResolvedContent(tiers);
   return {
     id: themeId,
     label: document.label,
-    hash: buildVideoThemeHashFromContent(content),
+    hash: VideoThemeHashes.fromContent(content),
     ...content,
-    mantine: _buildMantineFromContent(mantine, content),
+    mantine: _buildMantineFromContent({
+      mantine,
+      content,
+    }),
   };
 }

@@ -1,4 +1,4 @@
-import { prop } from "@avandar/utils";
+import { prop, propEq } from "@avandar/utils";
 import type { Input } from "./ComputeCapacityConsolidation.schema";
 /** Data for getJobSlotFromInput. */
 type GetJobSlotResult = { width: number; x: number; y: number; height: number };
@@ -14,9 +14,7 @@ export function getJobSlotFromInput({
   }
 >): GetJobSlotResult {
   const job = input.jobs[index];
-  const hostIndex = input.hosts.findIndex(({ id }) => {
-    return id === job[placement];
-  });
+  const hostIndex = input.hosts.findIndex(propEq("id", job[placement]));
   const maxCapacity = Math.max(...input.hosts.map(prop("capacityCpuHours")));
   const unchanged = input.jobs.filter((item) => {
     return (

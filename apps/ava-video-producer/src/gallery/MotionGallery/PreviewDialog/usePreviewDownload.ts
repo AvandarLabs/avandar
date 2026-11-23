@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { FilmDownloads } from "../../../../showcase/FilmDownloads/FilmDownloads";
-import { createExportThemeFromDraft } from "../../../videoThemeEditor/themeDraft/themeDraft";
+import { ThemeDrafts } from "../../../videoThemeEditor/ThemeDrafts/ThemeDrafts";
 import { useGalleryVideoTheme } from "../../GalleryVideoTheme/useGalleryVideoTheme";
-import type { Props as PreviewProps } from "./PreviewDialogContent";
+import type { Props as PreviewProps } from "./PreviewDialogContent/PreviewDialogContent";
 
 /**
  * Tracks an MP4 download of the previewed motion with the theme the preview
@@ -29,7 +29,7 @@ export function usePreviewDownload({
         options: {
           schemaVersion: 1,
           input: contentState.resolvedInput,
-          theme: createExportThemeFromDraft({
+          theme: ThemeDrafts.toExportTheme({
             library,
             themeId,
             draft: validDraft,

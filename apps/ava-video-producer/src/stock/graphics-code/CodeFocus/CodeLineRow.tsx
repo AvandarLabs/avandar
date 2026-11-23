@@ -7,7 +7,11 @@ import type { CodeFocusInput } from "../../presets/CodeFocus/CodeFocus.schema";
 import type { ReactNode } from "react";
 
 type CodeLine = CodeFocusInput["lines"][number];
-type Props = Readonly<{ codeTokens: CodeLine; index: number; accent: string }>;
+type Props = Readonly<{
+  codeTokens: CodeLine;
+  index: number;
+  accent: string;
+}>;
 /**
  * One numbered code line. A token in the legacy accent hex keeps meaning the
  * graphic's accent.
@@ -33,10 +37,11 @@ export function CodeLineRow({ codeTokens, index, accent }: Props): ReactNode {
           return (
             <tspan
               key={j}
-              fill={getContentColorFromValue(
-                token.color === LEGACY_ACCENT_HEX ? "accent" : token.color,
-                { tokens, accent },
-              )}
+              fill={getContentColorFromValue({
+                value:
+                  token.color === LEGACY_ACCENT_HEX ? "accent" : token.color,
+                options: { tokens, accent },
+              })}
             >
               {token.text}
             </tspan>

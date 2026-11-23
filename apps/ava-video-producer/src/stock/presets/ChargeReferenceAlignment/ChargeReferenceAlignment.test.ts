@@ -166,65 +166,46 @@ test("every independent context mismatch suppresses numeric and physical discrep
   });
 });
 test("zero, equal, positive and negative totals use exact shared ruler geometry", () => {
-  [
-    { billed: 0, reference: 0, difference: 0, widths: [0, 0] },
-    { billed: 60, reference: 60, difference: 0, widths: [600, 600] },
-    { billed: 84, reference: 60, difference: 24, widths: [600, 3000 / 7] },
-    { billed: 60, reference: 84, difference: -24, widths: [3000 / 7, 600] },
-    {
-      billed: 1000000,
-      reference: 0,
-      difference: 5000000,
-      widths: [600, 0],
-      quantity: 5,
-    },
-  ].forEach((row) => {
-    const input = {
-      ...DEFAULT_INPUT,
-      invoice: {
-        ...DEFAULT_INPUT.invoice,
-        quantity: row.quantity ?? 1,
-        unitPriceMinor: row.billed,
-      },
-      reference: {
-        ...DEFAULT_INPUT.reference,
-        quantity: row.quantity ?? 1,
-        unitPriceMinor: row.reference,
-      },
-    };
-    const markup = _render({ frame: 150, input: input });
-    assert.match(
-      markup,
-      new RegExp(`data-difference-minor="${row.difference}"`),
-    );
-    const rulers = [
-      ...markup.matchAll(/<rect\b[^>]*\bdata-amount-ruler[^>]*>/g),
-    ];
-    assert.equal(
-      SvgAttributes.getNumberFromMarkup({
-        attributes: rulers[0][0],
-        name: "x",
-      }),
-      SvgAttributes.getNumberFromMarkup({
-        attributes: rulers[1][0],
-        name: "x",
-      }),
-    );
-    rulers.forEach((ruler, index) => {
-      return assert.ok(
-        Math.abs(
-          SvgAttributes.getNumberFromMarkup({
-            attributes: ruler[0],
-            name: "width",
-          }) - row.widths[index],
-        ) < 1e-10,
+  structuredClone(ZERO_EQUAL_POSITIVE_AND_NEGATIVE_TOTALS_USE_CASES).forEach(
+    (row) => {
+      const input = {
+        ...DEFAULT_INPUT,
+        invoice: {
+          ...DEFAULT_INPUT.invoice,
+          quantity: row.quantity ?? 1,
+          unitPriceMinor: row.billed,
+        },
+        reference: {
+          ...DEFAULT_INPUT.reference,
+          quantity: row.quantity ?? 1,
+          unitPriceMinor: row.reference,
+        },
+      };
+      const markup = _render({ frame: 150, input: input });
+      assert.match(
+        markup,
+        new RegExp(`data-difference-minor="${row.difference}"`),
       );
-    });
-    assert.doesNotMatch(
-      _render({ frame: 150, input: { ...input, showDifference: false } }),
-      /data-difference-minor=|data-difference-bracket=/,
-    );
-  });
+      const rulers = [
+        ...markup.matchAll(/<rect\b[^>]*\bdata-amount-ruler[^>]*>/g),
+      ];
+      _assertRulersShareOrigin(rulers);
+      rulers.forEach((ruler, index) => {
+        return assert.ok(
+          Math.abs(
+            SvgAttributes.getNumberFromMarkup({
+              attributes: ruler[0],
+              name: "width",
+            }) - row.widths[index],
+          ) < 1e-10,
+        );
+      });
+      assert.doesNotMatch(
+        _render({ frame: 150, input: { ...input, showDifference: false } }),
+        /data-difference-minor=|data-difference-bracket=/,
+      );
+    },
+  );
 });
 test("full literal context values fit inside their actual source windows", () => {
   const keys = {
@@ -261,6 +242,19 @@ test("full literal context values fit inside their actual source windows", () =>
     }),
   );
   assert.equal(windows.length, fields.length * 2);
+  _assertContextWindowFields({ windows, fields });
+  _assertLiteralTextFitsWindows({ literalTexts, windows });
+});
+
+import { getTextEnvelopesFromMarkup } from "../SchemaColumnEvolution/getTextEnvelopesFromMarkup";
+
+function _assertContextWindowFields({
+  windows,
+  fields,
+}: Readonly<{
+  windows: readonly RegExpMatchArray[];
+  fields: readonly string[];
+}>): void {
   assert.deepEqual(
     windows.map(([window]) => {
       return window
@@ -274,6 +268,15 @@ test("full literal context values fit inside their actual source windows", () =>
       ];
     }),
   );
+}
+
+function _assertLiteralTextFitsWindows({
+  literalTexts,
+  windows,
+}: Readonly<{
+  literalTexts: readonly RegExpMatchArray[];
+  windows: readonly RegExpMatchArray[];
+}>): void {
   literalTexts.forEach((text, index) => {
     const left = SvgAttributes.getNumberFromMarkup({
       attributes: text[0],
@@ -293,9 +296,34 @@ test("full literal context values fit inside their actual source windows", () =>
           5,
     );
   });
-});
+}
 
-import { getTextEnvelopesFromMarkup } from "../SchemaColumnEvolution/getTextEnvelopesFromMarkup";
+function _assertRulersShareOrigin(rulers: readonly RegExpMatchArray[]): void {
+  assert.equal(
+    SvgAttributes.getNumberFromMarkup({
+      attributes: rulers[0][0],
+      name: "x",
+    }),
+    SvgAttributes.getNumberFromMarkup({
+      attributes: rulers[1][0],
+      name: "x",
+    }),
+  );
+}
+
+const ZERO_EQUAL_POSITIVE_AND_NEGATIVE_TOTALS_USE_CASES = [
+  { billed: 0, reference: 0, difference: 0, widths: [0, 0] },
+  { billed: 60, reference: 60, difference: 0, widths: [600, 600] },
+  { billed: 84, reference: 60, difference: 24, widths: [600, 3000 / 7] },
+  { billed: 60, reference: 84, difference: -24, widths: [3000 / 7, 600] },
+  {
+    billed: 1000000,
+    reference: 0,
+    difference: 5000000,
+    widths: [600, 0],
+    quantity: 5,
+  },
+];
 
 test("wrapped source captions clear actual context windows and currency clears amounts", () => {
   const input = {

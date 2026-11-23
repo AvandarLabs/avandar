@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { propEq } from "@avandar/utils";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
@@ -13,6 +14,100 @@ import {
   invalidInputs,
 } from "./JournalReceipts.fixtures";
 import { inputSchema } from "./JournalReceipts.schema";
+
+type GetReceiptFaceResult = {
+  receipt: RegExpMatchArray;
+  face: RegExpMatchArray;
+  x: number;
+  y: number;
+};
+
+type AssertReceiptTargetsOptions = Readonly<{
+  receipts: readonly RegExpMatchArray[];
+  foldDirection: string;
+  frame: number;
+}>;
+
+function _getReceiptFace({
+  markup,
+  entryId,
+}: Readonly<{ markup: string; entryId: string }>): GetReceiptFaceResult {
+  const receipt = markup.match(
+    new RegExp(`<g([^>]*data-receipt="${entryId}"[^>]*)>(.*?)</g>`),
+  );
+  assert.ok(receipt);
+  const position = receipt[1].match(/transform="translate\(([^ ]+) ([^)]+)\)"/);
+  const face = receipt[2].match(/<path d="M0 0 h([^ ]+) v([^ ]+)/);
+  assert.ok(position);
+  assert.ok(face);
+  const x = Number(position[1]),
+    y = Number(position[2]);
+  return { receipt, face, x, y };
+}
+
+function _assertReceiptTargets({
+  receipts,
+  foldDirection,
+  frame,
+}: AssertReceiptTargetsOptions): void {
+  receipts.forEach(([receipt]) => {
+    const position = receipt.match(/transform="translate\(([^ ]+) ([^)]+)\)"/);
+    assert.ok(position);
+    assert.deepEqual(
+      position.slice(1).map(Number),
+      ["x", "y"].map((axis) => {
+        return Number(
+          receipt.match(new RegExp(`data-target-${axis}="([^"]+)"`))?.[1],
+        );
+      }),
+      `${foldDirection} frame ${frame}: receipt has not reached its target`,
+    );
+  });
+}
+
+type AssertDenseVerticalReceiptsAndTheirFontSizeXOptions = Readonly<{
+  textElements: RegExpMatchArray[];
+  x: number;
+  receiptIndex: number;
+  frame: number[][number];
+}>;
+
+function _assertDenseVerticalReceiptsAndTheirFontSizeX({
+  textElements,
+  x,
+  receiptIndex,
+  frame,
+}: AssertDenseVerticalReceiptsAndTheirFontSizeXOptions): void {
+  textElements.forEach(([, attributes, content]) => {
+    const fontSize = SvgAttributes.getNumberFromMarkup({
+      attributes,
+      name: "font-size",
+    });
+    const localX = SvgAttributes.getNumberFromMarkup({
+      attributes,
+      name: "x",
+    });
+    assert.ok(x + localX >= 0);
+    [...content.matchAll(/<tspan[^>]*>(.*?)<\/tspan>/g)].forEach(([, text]) => {
+      assert.ok(
+        x + localX + getConservativeWidthFromText({ text, fontSize }) <= 960,
+        `text clipped for receipt ${receiptIndex} frame ${frame}`,
+      );
+    });
+  });
+}
+
+function _assertTheCompletedHoldBeginsExactlyDataTabRise(
+  beforeHold: ReturnType<typeof _render>,
+): void {
+  assert.ok(
+    [...beforeHold.matchAll(/data-tab-rise="([^"]+)"/g)].some(([, rise]) => {
+      return Number(rise) > 0;
+    }),
+    "The frame before the completed hold must still contain a closing tab.",
+  );
+}
+
 /** Inputs for render. */
 type RenderInput = {
   entries: Array<{ id: string; label: string }>;
@@ -30,6 +125,7 @@ type RenderInput = {
   showIdentifiers: boolean;
   showLabels: boolean;
 };
+
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -50,6 +146,7 @@ function _render({
     ),
   );
 }
+
 test("only identity-matched receipts flatten tabs while unacknowledged journal entries remain", () => {
   Array.from(fixtures).forEach((fixture) => {
     const markup = _render({ frame: 150, input: fixture.input });
@@ -61,11 +158,7 @@ test("only identity-matched receipts flatten tabs while unacknowledged journal e
       assert.ok(
         tab.includes(
           `data-tab-rise="${
-            fixture.input.receipts.some(({ entryId }) => {
-              return entryId === id;
-            })
-              ? 0
-              : 28
+            fixture.input.receipts.some(propEq("entryId", id)) ? 0 : 28
           }"`,
         ),
       );
@@ -75,6 +168,7 @@ test("only identity-matched receipts flatten tabs while unacknowledged journal e
   assert.match(initial, /data-tab-rise="28"/);
   assert.doesNotMatch(initial, /data-receipt=/);
 });
+
 test("both accordion directions align actual receipt geometry to its entry after arrival", () => {
   Array.from(["horizontal", "vertical"] as const).forEach((foldDirection) => {
     const markup = _render({
@@ -119,21 +213,15 @@ test("both accordion directions align actual receipt geometry to its entry after
     });
   });
 });
+
 test("the completed hold begins exactly when every dense receipt tab has settled", () => {
-  const dense = fixtures.find(({ id }) => {
-    return id === "dense";
-  })!.input;
+  const dense = fixtures.find(propEq("id", "dense"))!.input;
   const [, action, hold] = journalReceiptsContract.metadata.motionBeats;
   assert.equal(action.endFrame + 1, hold.startFrame);
   Array.from(["horizontal", "vertical"] as const).forEach((foldDirection) => {
     const input = { ...dense, foldDirection };
     const beforeHold = _render({ frame: hold.startFrame - 1, input });
-    assert.ok(
-      [...beforeHold.matchAll(/data-tab-rise="([^"]+)"/g)].some(([, rise]) => {
-        return Number(rise) > 0;
-      }),
-      "The frame before the completed hold must still contain a closing tab.",
-    );
+    _assertTheCompletedHoldBeginsExactlyDataTabRise(beforeHold);
     Array.from(
       {
         length: Math.max(
@@ -158,24 +246,11 @@ test("the completed hold begins exactly when every dense receipt tab has settled
         ...markup.matchAll(/<g[^>]*data-receipt="[^"]+"[^>]*>/g),
       ];
       assert.equal(receipts.length, dense.receipts.length);
-      receipts.forEach(([receipt]) => {
-        const position = receipt.match(
-          /transform="translate\(([^ ]+) ([^)]+)\)"/,
-        );
-        assert.ok(position);
-        assert.deepEqual(
-          position.slice(1).map(Number),
-          ["x", "y"].map((axis) => {
-            return Number(
-              receipt.match(new RegExp(`data-target-${axis}="([^"]+)"`))?.[1],
-            );
-          }),
-          `${foldDirection} frame ${frame}: receipt has not reached its target`,
-        );
-      });
+      _assertReceiptTargets({ receipts, foldDirection, frame });
     });
   });
 });
+
 registerStockPresetAssertions({
   inputSchema,
   defaultInput: DEFAULT_INPUT,
@@ -218,6 +293,7 @@ registerStockPresetAssertions({
     ];
   },
 });
+
 test("identifier and label toggles preserve the retained folds and receipt matching", () => {
   const noIdentifiers = _render({
     frame: 150,
@@ -233,6 +309,7 @@ test("identifier and label toggles preserve the retained folds and receipt match
   assert.equal((hidden.match(/data-journal-entry=/g) ?? []).length, 3);
   assert.equal((hidden.match(/data-tab-rise="0"/g) ?? []).length, 2);
 });
+
 test("dense vertical receipts and their painted text remain inside the canvas throughout emergence", () => {
   const input = { ...fixtures[2].input, foldDirection: "vertical" as const };
   input.receipts.forEach(({ entryId }, receiptIndex) => {
@@ -249,18 +326,7 @@ test("dense vertical receipts and their painted text remain inside the canvas th
       },
     ).forEach((frame) => {
       const markup = _render({ frame, input });
-      const receipt = markup.match(
-        new RegExp(`<g([^>]*data-receipt="${entryId}"[^>]*)>(.*?)</g>`),
-      );
-      assert.ok(receipt);
-      const position = receipt[1].match(
-        /transform="translate\(([^ ]+) ([^)]+)\)"/,
-      );
-      const face = receipt[2].match(/<path d="M0 0 h([^ ]+) v([^ ]+)/);
-      assert.ok(position);
-      assert.ok(face);
-      const x = Number(position[1]),
-        y = Number(position[2]);
+      const { receipt, face, x, y } = _getReceiptFace({ markup, entryId });
       if (frame === 60 + receiptIndex * 12) {
         const pocket = markup.match(/<path d="M([^ ]+) 224 h([^ ]+) v256/);
         assert.ok(pocket);
@@ -277,25 +343,11 @@ test("dense vertical receipts and their painted text remain inside the canvas th
         ...receipt[2].matchAll(/<text([^>]*)>(.*?)<\/text>/g),
       ];
       assert.equal(textElements.length, 2);
-      textElements.forEach(([, attributes, content]) => {
-        const fontSize = SvgAttributes.getNumberFromMarkup({
-          attributes,
-          name: "font-size",
-        });
-        const localX = SvgAttributes.getNumberFromMarkup({
-          attributes,
-          name: "x",
-        });
-        assert.ok(x + localX >= 0);
-        [...content.matchAll(/<tspan[^>]*>(.*?)<\/tspan>/g)].forEach(
-          ([, text]) => {
-            assert.ok(
-              x + localX + getConservativeWidthFromText({ text, fontSize }) <=
-                960,
-              `text clipped for receipt ${receiptIndex} frame ${frame}`,
-            );
-          },
-        );
+      _assertDenseVerticalReceiptsAndTheirFontSizeX({
+        textElements,
+        x,
+        receiptIndex,
+        frame,
       });
     });
   });

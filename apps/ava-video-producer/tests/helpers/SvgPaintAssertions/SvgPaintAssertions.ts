@@ -1,14 +1,7 @@
 import assert from "node:assert/strict";
-import { getConservativeWidthFromText } from "../../../src/stock/text/getConservativeWidthFromText";
 import { getTextRelevantTokenIndicesFromTokens } from "./getTextRelevantTokenIndicesFromTokens";
-import {
-  getSvgNumber,
-  decodeSvgEntities,
-  getSvgAttributes,
-  createSvgFrame,
-  type Attributes,
-  type Frame,
-} from "./SvgFrameHelpers";
+import { type Attributes, type Frame, SvgFrames } from "./SvgFrames";
+import { SvgTextWidth } from "./SvgTextWidth/SvgTextWidth";
 
 /** Conservative painted text/rectangle bounds with explicit SVG paint facts. */
 export type SvgPaintEnvelope = {
@@ -26,50 +19,18 @@ export type SvgPaintEnvelope = {
   attributes: Record<string, string>;
 };
 
-const GRAPHEMES: Intl.Segmenter = new Intl.Segmenter("und", {
-  granularity: "grapheme",
-});
+/** Accumulated frame state and the current text paint token. */
+type TextPaintInput = {
+  frame: Frame;
+  token: string;
+  paintIndex: number;
+};
 
-// Widths share the reviewed Arial advances with production text fitting, so
-// this
-// is not an independent font oracle. Rendered strings, coordinates, transforms,
-// baselines and layout rejection remain independently checked from SVG output.
-function _estimateWidth({
-  text,
-  fontSize,
-}: {
-  text: string;
-  fontSize: number;
-}): number {
-  return Array.from(GRAPHEMES.segment(text)).reduce((sum, { segment }) => {
-    const bases = Array.from(segment).filter((character) => {
-      return !/[\p{Nonspacing_Mark}\p{Enclosing_Mark}\p{Default_Ignorable_Code_Point}\p{Emoji_Modifier}]/u.test(
-        character,
-      );
-    });
-    const advance = getConservativeWidthFromText({
-      text: bases.join(""),
-      fontSize,
-    });
-    const needsFallbackFloor =
-      !bases.length ||
-      /[\p{Extended_Pictographic}\p{Regional_Indicator}\u20e3\ufe0f]/u.test(
-        segment,
-      );
-    return (
-      sum +
-      Math.max(advance, needsFallbackFloor ? Math.ceil(fontSize * 1.1) : 0)
-    );
-  }, 0);
-}
+/** Visible text paint geometry, absent for inert or empty text. */
+type TextPaintResult = SvgPaintEnvelope | undefined;
 
-function _getTextEnvelope({
-  frame,
-  token,
-  paintIndex,
-}: Readonly<{ frame: Frame; token: string; paintIndex: number }>):
-  | SvgPaintEnvelope
-  | undefined {
+function _getTextEnvelope(options: Readonly<TextPaintInput>): TextPaintResult {
+  const { frame, token, paintIndex } = options;
   if (
     frame.isInert ||
     frame.opacity === 0 ||
@@ -78,7 +39,7 @@ function _getTextEnvelope({
   ) {
     return undefined;
   }
-  const text = decodeSvgEntities(token);
+  const text = SvgFrames.makeDecodedTextFromSvgEntities(token);
   if (!text) {
     return undefined;
   }
@@ -86,7 +47,7 @@ function _getTextEnvelope({
     frame.anchor === "start" || !frame.cursor.hasText,
     "Unsupported anchored continuation without an absolute x reset.",
   );
-  const width = _estimateWidth({ text, fontSize: frame.fontSize });
+  const width = SvgTextWidth.fromText({ text, fontSize: frame.fontSize });
   const offset =
     frame.anchor === "middle" ? width / 2 : frame.anchor === "end" ? width : 0;
   const firstX = frame.translateX + frame.scaleX * (frame.cursor.x - offset),
@@ -122,10 +83,10 @@ function _getRectangleEnvelope({
   attributes: Attributes;
   paintIndex: number;
 }>): SvgPaintEnvelope {
-  const x = getSvgNumber({ value: attributes.x, fallback: 0 }),
-    y = getSvgNumber({ value: attributes.y, fallback: 0 }),
-    width = getSvgNumber({ value: attributes.width, fallback: 0 }),
-    height = getSvgNumber({ value: attributes.height, fallback: 0 });
+  const x = SvgFrames.getSvgNumber({ value: attributes.x, fallback: 0 }),
+    y = SvgFrames.getSvgNumber({ value: attributes.y, fallback: 0 }),
+    width = SvgFrames.getSvgNumber({ value: attributes.width, fallback: 0 }),
+    height = SvgFrames.getSvgNumber({ value: attributes.height, fallback: 0 });
   assert.ok(
     width >= 0 && height >= 0,
     "Unsupported negative rectangle extent.",
@@ -219,8 +180,8 @@ function _visitToken({
   }
   const opening = token.match(/^<([\w:-]+)\b/);
   assert.ok(opening, "Unsupported SVG markup token.");
-  const attributes = getSvgAttributes(token);
-  const frame = createSvgFrame({
+  const attributes = SvgFrames.getSvgAttributes(token);
+  const frame = SvgFrames.makeFrameFromSvg({
     parent,
     tag: opening[1],
     attributes,

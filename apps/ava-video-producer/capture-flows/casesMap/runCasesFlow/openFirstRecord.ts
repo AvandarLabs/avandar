@@ -5,16 +5,18 @@ import { getCaseType } from "./getCaseType";
 import { getRecordLinks } from "./getRecordLinks";
 import type { FlowContext } from "../../captureFlows.types";
 import type { CaseSources, FixtureRow } from "./runCasesFlow.types";
-
 /** Checks each record field's value and the dataset it is read from. */
-async function _expectRecordFields(
-  context: Readonly<FlowContext>,
+async function _expectRecordFields({
+  context,
+  options,
+}: Readonly<{
+  context: Readonly<FlowContext>;
   options: Readonly<{
     expected: FixtureRow;
     kits: number;
     sources: CaseSources;
-  }>,
-): Promise<void> {
+  }>;
+}>): Promise<void> {
   const { expected, kits, sources } = options;
   // The record fields in their order on screen. Each check reads the one
   // recording page, so they run in order.
@@ -45,13 +47,18 @@ async function _expectRecordFields(
       .locator("p:last-child"),
   ).toHaveText([expected.case_id, expected.case_id]);
 }
-
 /** Scrolls the record list back to the top and checks the record is in view. */
-async function _scrollRecordIntoView(
-  context: FlowContext,
-  name: string,
-): Promise<void> {
-  const links = getRecordLinks(context.page, getCaseType(context).id);
+async function _scrollRecordIntoView({
+  context,
+  name,
+}: Readonly<{
+  context: FlowContext;
+  name: string;
+}>): Promise<void> {
+  const links = getRecordLinks({
+    page: context.page,
+    caseTypeId: getCaseType(context).id,
+  });
   const pane = context.page
     .locator(".mantine-ScrollArea-viewport")
     .filter({ has: links.first() });
@@ -60,24 +67,26 @@ async function _scrollRecordIntoView(
   });
   await expect(links.filter({ hasText: name }).first()).toBeInViewport();
 }
-
 /**
  * Opens the first record and checks its fields against the fixtures.
  *
  * Called by the `cases-open-record` step of `runCasesFlow`.
  */
-export async function openFirstRecord(
-  context: FlowContext,
+export async function openFirstRecord({
+  context,
+  options,
+}: Readonly<{
+  context: FlowContext;
   options: Readonly<{
     sources: CaseSources;
     expectedRows: readonly FixtureRow[];
     expectedVisits: readonly FixtureRow[];
-  }>,
-): Promise<void> {
-  const firstRecordLink = getRecordLinks(
-    context.page,
-    getCaseType(context).id,
-  ).first();
+  }>;
+}>): Promise<void> {
+  const firstRecordLink = getRecordLinks({
+    page: context.page,
+    caseTypeId: getCaseType(context).id,
+  }).first();
   const name = (await firstRecordLink.innerText()).trim();
   const expected = options.expectedRows.find(propEq("case_label", name));
   if (!expected) {
@@ -93,12 +102,18 @@ export async function openFirstRecord(
   await context.page
     .getByRole("heading", { name: "Details", exact: true })
     .waitFor();
-  await _expectRecordFields(context, {
-    expected,
-    kits,
-    sources: options.sources,
+  await _expectRecordFields({
+    context,
+    options: {
+      expected,
+      kits,
+      sources: options.sources,
+    },
   });
   getCaseType(context).recordName = name;
   getCaseType(context).recordUrl = context.page.url();
-  await _scrollRecordIntoView(context, name);
+  await _scrollRecordIntoView({
+    context,
+    name,
+  });
 }

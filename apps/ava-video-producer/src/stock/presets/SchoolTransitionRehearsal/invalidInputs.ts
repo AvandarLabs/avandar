@@ -1,19 +1,12 @@
+import { omit } from "@avandar/utils";
 import { DEFAULT_INPUT } from "./defaultInput";
 /** Rejected structural, boundary and cross-field inputs. */
 export const invalidInputs: unknown[] = [
   {},
   { ...DEFAULT_INPUT, extra: true },
-  Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => {
-      return field !== "people";
-    }),
-  ),
+  omit(DEFAULT_INPUT, "people"),
   { ...DEFAULT_INPUT, people: { ...DEFAULT_INPUT.people, extra: true } },
-  Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => {
-      return field !== "stops";
-    }),
-  ),
+  omit(DEFAULT_INPUT, "stops"),
   {
     ...DEFAULT_INPUT,
     stops: [
@@ -52,27 +45,11 @@ export const invalidInputs: unknown[] = [
     ...DEFAULT_INPUT,
     stops: [{ ...DEFAULT_INPUT.stops[0], extra: true }, DEFAULT_INPUT.stops[1]],
   },
-  Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => {
-      return field !== "finalStepSupport";
-    }),
-  ),
-  Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => {
-      return field !== "showPracticeStrip";
-    }),
-  ),
-  Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => {
-      return field !== "labels";
-    }),
-  ),
+  omit(DEFAULT_INPUT, "finalStepSupport"),
+  omit(DEFAULT_INPUT, "showPracticeStrip"),
+  omit(DEFAULT_INPUT, "labels"),
   { ...DEFAULT_INPUT, labels: { ...DEFAULT_INPUT.labels, extra: true } },
-  Object.fromEntries(
-    Object.entries(DEFAULT_INPUT).filter(([field]) => {
-      return field !== "showFootprints";
-    }),
-  ),
+  omit(DEFAULT_INPUT, "showFootprints"),
   {
     ...DEFAULT_INPUT,
     people: { ...DEFAULT_INPUT.people, learner: "WWWWWWWWWWWWWWWWWWWWWWWWWWW" },

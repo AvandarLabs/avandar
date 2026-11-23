@@ -11,7 +11,10 @@ import path from "node:path";
 import test from "node:test";
 import { RendererFiles } from "../../videoTheme/themeLiterals/RendererFiles";
 import rendererGlobs from "../../videoTheme/themeLiterals/rendererGlobs.json";
-import allowlist from "../longFunctionAllowlist.json";
+import rawAllowlist from "../longFunctionAllowlist.json";
+
+/** Immutable renderer-exception keys normalized at the JSON policy boundary. */
+const allowlist: readonly string[] = rawAllowlist;
 /**
  * The allowlist's size when it was generated. Lower it as entries are
  * removed; never raise it. A new long function is split into helpers.

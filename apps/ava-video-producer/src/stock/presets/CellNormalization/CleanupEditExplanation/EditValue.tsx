@@ -1,12 +1,15 @@
 import { FitText } from "../../../primitives/FitText/FitText";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { type Props } from "./CleanupEditExplanationShared.types";
+import { type Props as CleanupEditExplanationSharedProps } from "./CleanupEditExplanationShared.types";
 import type { ReactNode } from "react";
+
+type Props = {
+  row: CleanupEditExplanationSharedProps["row"];
+  isInline: boolean;
+};
+
 /** The row's edit explanation, inline beside the ghost or under its lane. */
-export function EditValue({
-  row,
-  isInline,
-}: Readonly<{ row: Props["row"]; isInline: boolean }>): ReactNode {
+export function EditValue({ row, isInline }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g data-edit-value={row.id}>

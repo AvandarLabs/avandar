@@ -1,4 +1,4 @@
-import { StockRect } from "../../../primitives/StockRect/StockRect";
+import { StockRect } from "../../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { DialogueWording } from "../DialogueWording";
 import { BubbleOutline } from "./BubbleOutline";

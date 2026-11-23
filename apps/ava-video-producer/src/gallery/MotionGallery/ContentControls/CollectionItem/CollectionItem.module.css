@@ -3,12 +3,3 @@
   margin: var(--atlas-space-16) 0;
   padding: 0 0 var(--atlas-space-14);
 }
-
-.collectionItemRowHeader {
-  align-items: center;
-  color: var(--atlas-color-muted);
-  display: flex;
-  font-size: var(--atlas-font-size-12);
-  gap: var(--atlas-space-10);
-  justify-content: space-between;
-}

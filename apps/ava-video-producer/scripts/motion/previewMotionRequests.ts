@@ -7,7 +7,7 @@ import {
   selectComposition,
 } from "@remotion/renderer";
 import { makeWorkspaceWebpackConfigFromConfig } from "../lib/makeWorkspaceWebpackConfigFromConfig";
-import { run, ffmpeg } from "../lib/mediaHelpers";
+import { MediaHelpers } from "../lib/MediaHelpers/MediaHelpers";
 import { ensureDirectory } from "../lib/planHelpers/planHelpers";
 import { requireLicense } from "../requireLicense";
 import {
@@ -17,20 +17,18 @@ import {
 import { makeFreshMotionDirectory } from "./makeFreshMotionDirectory";
 import { ROOT, SAMPLES } from "./motion.constants";
 import type { MotionRequest } from "../MotionRequests/MotionRequests";
-
 /** The open browser and stock bundle every preview in one run shares. */
 type PreviewSession = {
   browser: Awaited<ReturnType<typeof openBrowser>>;
   serveUrl: string;
   digest: string;
 };
-
 /** Bundles the stock renderer once into a fresh temporary folder. */
 async function _bundleStockRenderer(temporary: string): Promise<string> {
-  const publicDir = await ensureDirectory(
-    ROOT,
-    "out/motion/bundle/empty-public",
-  );
+  const publicDir = await ensureDirectory({
+    root: ROOT,
+    relative: "out/motion/bundle/empty-public",
+  });
   return bundle({
     webpackOverride: makeWorkspaceWebpackConfigFromConfig,
     entryPoint: path.join(ROOT, "src/stock-entry.tsx"),
@@ -39,12 +37,17 @@ async function _bundleStockRenderer(temporary: string): Promise<string> {
     publicDir,
   });
 }
-
 /** Renders every sample frame of one request as a still, in order. */
-async function _renderSampleStills(
-  session: Readonly<PreviewSession>,
-  options: Readonly<{ motionRequest: MotionRequest; directory: string }>,
-): Promise<void> {
+async function _renderSampleStills({
+  session,
+  options,
+}: Readonly<{
+  session: Readonly<PreviewSession>;
+  options: Readonly<{
+    motionRequest: MotionRequest;
+    directory: string;
+  }>;
+}>): Promise<void> {
   const { entry, request, theme } = options.motionRequest;
   const inputProps = { ...request, theme };
   const shared = {
@@ -60,6 +63,9 @@ async function _renderSampleStills(
   });
   // One browser renders the stills in order.
   for (const [index, frame] of SAMPLES.entries()) {
+    // The shared Chromium renderer must run serially to avoid wrapped-frame
+    // flicker.
+    // react-doctor-disable-next-line async-await-in-loop
     await renderStill({
       ...shared,
       composition,
@@ -74,12 +80,11 @@ async function _renderSampleStills(
     });
   }
 }
-
 /** Tiles the sample stills into one contact sheet for review. */
 async function _writeContactSheet(directory: string): Promise<void> {
-  await run(
-    ffmpeg,
-    [
+  await MediaHelpers.run({
+    command: MediaHelpers.ffmpeg,
+    args: [
       "-y",
       "-loglevel",
       "error",
@@ -93,10 +98,9 @@ async function _writeContactSheet(directory: string): Promise<void> {
       "2",
       path.join(directory, "contact-sheet.jpg"),
     ],
-    { quiet: true },
-  );
+    options: { quiet: true },
+  });
 }
-
 /** Records a completed preview and points the preset's index at it. */
 async function _writePreviewManifest(
   options: Readonly<{
@@ -130,12 +134,14 @@ async function _writePreviewManifest(
     `${JSON.stringify({ configurationHash: fingerprint.configurationHash })}\n`,
   );
 }
-
 /** Previews one request: sample stills, contact sheet, and manifest. */
-async function _previewRequest(
-  session: Readonly<PreviewSession>,
-  motionRequest: Readonly<MotionRequest>,
-): Promise<void> {
+async function _previewRequest({
+  session,
+  motionRequest,
+}: Readonly<{
+  session: Readonly<PreviewSession>;
+  motionRequest: Readonly<MotionRequest>;
+}>): Promise<void> {
   const { entry, request, sourceHash, theme } = motionRequest;
   const fingerprint = await StockFingerprintModule.fromRequest({
     root: ROOT,
@@ -147,13 +153,15 @@ async function _previewRequest(
   const directory = await makeFreshMotionDirectory(
     `preview/${entry.id}/${fingerprint.configurationHash}`,
   );
-  await _renderSampleStills(session, { motionRequest, directory });
+  await _renderSampleStills({
+    session,
+    options: { motionRequest, directory },
+  });
   await _writeContactSheet(directory);
   await StockFingerprintModule.verifySources(sourceCheck);
   await _writePreviewManifest({ motionRequest, directory, fingerprint });
   console.log(`Preview ready: ${entry.id}`);
 }
-
 /**
  * Previews every request: sample stills, a contact sheet, and a manifest for
  * each, under `out/motion/preview/`. Use it to inspect presets before they
@@ -168,13 +176,22 @@ export async function previewMotionRequests(
     }),
   );
   const digest = await StockFingerprintModule.getSourceHashFromRoot(ROOT);
+  // Validate the source fingerprint before creating a renderer output
+  // directory.
+  // react-doctor-disable-next-line server-sequential-independent-await
   const temporary = await makeFreshMotionDirectory("bundle");
   const serveUrl = await _bundleStockRenderer(temporary);
+  // Open the owned browser only after bundling succeeds so a failed bundle
+  // cannot leak it.
+  // react-doctor-disable-next-line server-sequential-independent-await
   const browser = await openBrowser("chrome", { logLevel: "error" });
   try {
     // Previews share one browser, so they run one after another.
     for (const motionRequest of requests) {
-      await _previewRequest({ browser, serveUrl, digest }, motionRequest);
+      await _previewRequest({
+        session: { browser, serveUrl, digest },
+        motionRequest,
+      });
     }
   } finally {
     await browser.close({ silent: true });

@@ -1,6 +1,7 @@
 import ts from "typescript";
 import { LiteralPatterns } from "./LiteralPatterns";
 import { LiteralSourceHelpers } from "./LiteralSourceHelpers";
+import { reportMotionLiteralsFromCall } from "./reportMotionLiteralsFromCall/reportMotionLiteralsFromCall";
 import { reportTextLiteralsFromElement } from "./reportTextLiteralsFromElement";
 import {
   type LiteralCountReporter,
@@ -37,28 +38,6 @@ const SPACING_KEY =
 const SHADOW_KEYS = new Set(["boxShadow", "textShadow"]);
 const MOTION_CONSTANTS = new Set(["EASE", "DUR"]);
 const STAGGER_NAMES = new Set(["STAGGER", "STAGGER_COLUMN"]);
-const ENTRANCE_HELPERS = new Set(["enter", "enterAt", "leave"]);
-const ENTRANCE_KEYS = new Set(["dur", "x", "y"]);
-/**
- * Themed motion helpers by the index of the argument that holds their
- * duration. A literal there ignores tempo unless `scale` wraps it.
- */
-const DURATION_ARGUMENT: Readonly<Record<string, number>> = {
-  ramp: 2,
-  pop: 2,
-  count: 3,
-};
-/** Themed motion helpers whose second argument is the frame they start on. */
-const CUE_HELPERS = new Set([
-  "ramp",
-  "reveal",
-  "enter",
-  "enterAt",
-  "leave",
-  "pop",
-  "count",
-  "press",
-]);
 /** A duration or blur radius written into an inline style string. */
 const INLINE_EFFECT_PATTERN = /\bblur\(\s*\d|\b\d*\.?\d+m?s\b/;
 /** One branch of a keyed value: a line, opacity, or spacing literal. */
@@ -209,76 +188,6 @@ function _countPropertyAssignment({
   }
   _countKeyedValue({ key, value: node.initializer, count: onLiteralCount });
 }
-function _countEntranceOptions({
-  node,
-  count: onLiteralCount,
-}: Readonly<{
-  node: ts.CallExpression;
-  count: LiteralCountReporter;
-}>): void {
-  node.arguments.filter(ts.isObjectLiteralExpression).forEach((options) => {
-    options.properties.filter(ts.isPropertyAssignment).forEach((property) => {
-      if (
-        ENTRANCE_KEYS.has(property.name.getText()) &&
-        LiteralSourceHelpers.isNumericLiteral(property.initializer) &&
-        property.initializer.getText() !== "0"
-      ) {
-        onLiteralCount("motion");
-      }
-    });
-  });
-}
-function _countCall({
-  node,
-  count: onLiteralCount,
-}: Readonly<{
-  node: ts.CallExpression;
-  count: LiteralCountReporter;
-}>): void {
-  const callee = node.expression;
-  const name = LiteralSourceHelpers.calleeName(callee);
-  if (
-    ts.isIdentifier(callee) &&
-    name === "ramp" &&
-    node.arguments.length <= 3
-  ) {
-    onLiteralCount("implicitEasing");
-  }
-  const durationIndex =
-    name === undefined ? undefined : DURATION_ARGUMENT[name];
-  const duration =
-    durationIndex === undefined ? undefined : node.arguments[durationIndex];
-  const cue = node.arguments[1];
-  if (
-    duration &&
-    cue &&
-    LiteralSourceHelpers.leadsWithLiteral(duration) &&
-    !LiteralSourceHelpers.isCueWindow({ duration, cue })
-  ) {
-    onLiteralCount("motion");
-  }
-  if (
-    ts.isPropertyAccessExpression(callee) &&
-    name !== undefined &&
-    CUE_HELPERS.has(name) &&
-    cue &&
-    LiteralSourceHelpers.holdsLiteralStagger(cue)
-  ) {
-    onLiteralCount("motion");
-  }
-  if (
-    name === "bezier" &&
-    LiteralSourceHelpers.isNumericLiteral(node.arguments[0])
-  ) {
-    onLiteralCount("motion");
-  }
-  if (name === "spring") {
-    onLiteralCount("motion");
-  }
-  if (name !== undefined && ENTRANCE_HELPERS.has(name)) {
-    _countEntranceOptions({ node, count: onLiteralCount });
-  }
-}
 function _countIdentifier({
   node,
   count: onLiteralCount,
@@ -357,7 +266,7 @@ export function reportScriptLiteralsFromNode({
   } else if (ts.isPropertyAssignment(node)) {
     _countPropertyAssignment({ node, count: onLiteralCount });
   } else if (ts.isCallExpression(node)) {
-    _countCall({ node, count: onLiteralCount });
+    reportMotionLiteralsFromCall({ node, count: onLiteralCount });
   } else if (ts.isIdentifier(node)) {
     _countIdentifier({ node, count: onLiteralCount });
   } else if (

@@ -1,5 +1,5 @@
 import { ExperimentLabels } from "./ExperimentLabels";
-import { ExperimentTrack } from "./ExperimentTrack";
+import { ExperimentTrack } from "./ExperimentTrack/ExperimentTrack";
 import { PredictionParticipant } from "./PredictionParticipant";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./SharedExperimentPredictions.schema";

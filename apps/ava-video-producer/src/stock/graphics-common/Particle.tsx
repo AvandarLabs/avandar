@@ -1,4 +1,4 @@
-import { wave } from "../../motion";
+import { Motion } from "../../motion";
 import { GraphicThemeHooks } from "../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
@@ -21,11 +21,22 @@ export function Particle({
   haloColor,
   isLarge,
 }: Readonly<Props>): ReactNode {
-  const particle = GraphicThemeHooks.useGraphicProps("Particle", {});
+  const particle = GraphicThemeHooks.useGraphicProps({
+    name: "Particle",
+    props: {},
+  });
   const floor = particle.twinkleFloor;
   return (
     <g
-      opacity={floor + wave(frame, particle.twinklePeriod, phase) * (1 - floor)}
+      opacity={
+        floor +
+        Motion.wave({
+          frame,
+          period: particle.twinklePeriod,
+          offset: phase,
+        }) *
+          (1 - floor)
+      }
     >
       {isLarge ? (
         <circle

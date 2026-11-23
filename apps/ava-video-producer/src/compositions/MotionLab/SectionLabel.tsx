@@ -1,15 +1,18 @@
-import { useVideoTheme } from "../../videoTheme/useVideoTheme";
+import { useVideoTheme } from "../../videoTheme/videoThemeHelpers";
 import type { CSSProperties, ReactNode } from "react";
+
+type Props = {
+  style?: CSSProperties;
+  className?: string;
+  children: ReactNode;
+};
+
 /** The tracked capitals that head each part of the study. */
 export function SectionLabel({
   style,
   className,
   children,
-}: {
-  style?: CSSProperties;
-  className?: string;
-  children: ReactNode;
-}): ReactNode {
+}: Readonly<Props>): ReactNode {
   const { semantic, mantine, atomic } = useVideoTheme();
   return (
     <div

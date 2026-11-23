@@ -1,9 +1,9 @@
-import { mix, ramp } from "../../../../motion";
+import { Motion } from "../../../../motion";
 import { LiteralDataText } from "../../../primitives/LiteralDataText/LiteralDataText";
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { HingedSheet } from "./HingedSheet";
-import type { VideoMotion } from "../../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "../ExpectationOverlayCheck.schema";
 import type { ReactNode } from "react";
 
@@ -26,24 +26,30 @@ function _getSheetGeometry({
   state,
   motion,
 }: Readonly<
-  Pick<Props, "frame" | "y" | "input" | "state"> & { motion: VideoMotion }
+  Pick<Props, "frame" | "y" | "input" | "state"> & {
+    motion: VideoMotion;
+  }
 >) {
-  const registration = ramp(
+  const registration = Motion.ramp({
     frame,
-    43,
-    motion.scale(REGISTER_FRAMES),
-    motion.travel.easing,
-  );
-  const separation = ramp(
+    at: 43,
+    dur: motion.scale(REGISTER_FRAMES),
+    easing: motion.travel.easing,
+  });
+  const separation = Motion.ramp({
     frame,
-    89,
-    motion.scale(SEPARATE_FRAMES),
-    motion.travel.easing,
-  );
+    at: 89,
+    dur: motion.scale(SEPARATE_FRAMES),
+    easing: motion.travel.easing,
+  });
   const top =
     (input.sheetMotion === "hinge"
       ? y + 20
-      : mix(registration, y - 45, y + 20)) -
+      : Motion.mix({
+          t: registration,
+          from: y - 45,
+          to: y + 20,
+        })) -
     (state === "match" ? 0 : 39) * separation;
   const scale =
     input.sheetMotion === "hinge"

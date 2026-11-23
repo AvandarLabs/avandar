@@ -294,7 +294,7 @@ makes them the first to migrate within their slice.
 ### 2.3 Compositions (36)
 
 The continuity renderer itself is theme-driven (plan builder plus `--video-*`
-CSS variables) apart from one fallback curve (`src/continuity/overlayMotion/overlayMotion.ts:12`,
+CSS variables) apart from one fallback curve (`src/continuity/OverlayMotion/OverlayMotion.ts:12`,
 `:35-36`) and 4 implicit-easing `ramp()` calls. Scene studies render through
 `src/scenes/` and `StoryFilm`, which read the starter palette and `motion.ts`
 directly. "(a) literals" adds the renderer, the storyboard plan colours, and
@@ -473,9 +473,9 @@ type, spacing, radius, and shadow values are literal.
   `src/scenes/GraphScene.tsx` (14), `src/compositions/Demo/` (37),
   `src/chrome/AppFrame.tsx` (8). `StoryFilm.tsx:67-68` and `:130-131` set
   `background: var(--ground)` and layer plan and shot colours over it through
-  `createThemeStyleFromTheme.ts`. Result: the Accent, Ground, and Text rows of
+  `makeThemeStyleFromTheme.ts`. Result: the Accent, Ground, and Text rows of
   Look and feel do nothing to any scene study or title card. The theme emits
-  only `--video-*` names (`src/videoTheme/buildVideoCssVariables/buildVideoCssVariables.ts:128-129`).
+  only `--video-*` names (`src/videoTheme/makeVideoCssVariablesFromTheme/makeVideoCssVariablesFromTheme.ts:128-129`).
 - **(a2) Literal plan colours.** 130 literal colours in storyboard `theme`
   blocks: `storyboards/shot-vocabulary.json` (34), `vocabulary/heading-wipe.json`
   (18), `vocabulary/field-colour-cut.json` (12), `vocabulary/stepped-column-wipe.json`
@@ -604,11 +604,11 @@ type, spacing, radius, and shadow values are literal.
   `EASE.inOutCubic` (cursor travel, camera) have atomic curves but no semantic
   consumer; see the new `motion.rise`, `motion.depart`, `motion.surge` tokens.
   Stage references: `src/scenes/TiltedWindowScene/WindowMotion/WindowMotion.ts:46-301`
-  (9 curves), `src/scenes/textReveal/textReveal.ts:34-132`,
+  (9 curves), `src/scenes/TextReveal/TextReveal.ts:34-132`,
   `src/scenes/BrandLockupScene/BrandLockupMotion/BrandLockupMotion.ts:49-115`,
   `src/storyboard/StoryFilm/getShotTransitionLayers/getShotTransitionLayers.ts:56`, `:61`,
-  `src/storyboard/StoryFilm/steppedColumnWipe/steppedColumnWipe.ts:39`, `src/CursorMotionHelpers.ts:30`,
-  `src/motion-components/cameraTrack/cameraTrack.ts:102`,
+  `src/storyboard/StoryFilm/SteppedColumnWipe/SteppedColumnWipe.ts:39`, `src/CursorMotionHelpers.ts:30`,
+  `src/motion-components/CameraTrack/CameraTrack.ts:102`,
   `src/motion-components/SvgObjectDeparture.tsx:43`.
 - **(a1) Implicit easing.** `ramp(frame, at, duration)` with no fourth
   argument uses `EASE.out` from `src/motion.ts:220`. 524 such calls in stock
@@ -623,7 +623,7 @@ type, spacing, radius, and shadow values are literal.
   constant wrapped in `motion.scale()`, the precedent set by the parity
   presets, so tempo reaches it.
 - **(a1) Direct `DUR` and `STAGGER`.** 63 `DUR` and `STAGGER` reads in scenes
-  (for example `src/scenes/BarComparisonScene/barComparisonMotion/barComparisonMotion.ts:5-26`,
+  (for example `src/scenes/BarComparisonScene/BarComparisonMotion/BarComparisonMotion.ts:5-26`,
   `src/scenes/TiltedWindowScene/WindowMotion/WindowMotion.ts:44-301`), 21 in the fixed
   compositions, 6 in the title card, 4 in `src/Root.tsx`, 29 in helper
   demos. These skip tempo. `index * 2` (59 uses in
@@ -649,13 +649,13 @@ type, spacing, radius, and shadow values are literal.
   film loop fade). Both bound a loop, so they are not tempo-scaled.
 - **(a2) Title card.** `src/TitleCard/TitleCard.tsx:13`, `:47`, `:71-72`, `:127`,
   `:140-142`: word rise, 12-frame exit, rule and kicker entrances.
-- **(a3) Continuity fallbacks.** `src/continuity/overlayMotion/overlayMotion.ts:12` and
+- **(a3) Continuity fallbacks.** `src/continuity/OverlayMotion/OverlayMotion.ts:12` and
   `:35-36` default to 18 frames and 30 frames with `EASE.inOut` when unthemed.
   Every caller is themed; drop the defaults so a missing theme fails loudly.
-  `src/motion-components/cameraTrack/cameraTrack.ts:99-102` does the same for the named
+  `src/motion-components/CameraTrack/CameraTrack.ts:99-102` does the same for the named
   camera eases (`push`, `whip`, `glide`): the theme's `camera.easing.*` reach
   it only through the continuity plan builder
-  (`src/continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme.ts:101-103`),
+  (`src/continuity/ContinuityThemePlans/ContinuityThemePlans.ts:101-103`),
   so a JSX consumer of
   `DiagramCamera` falls back to `EASE`.
 
@@ -738,7 +738,7 @@ Every default equals today's literal, so `classic` renders the same pixels.
 "Control" names the editor control the catalog kind already provides. New
 atomic steps go in `classic` only; `avandar` extends `classic` and inherits
 them. Every new text role must pass the AA check in
-`src/videoTheme/textContrastHelpers/textContrastHelpers.test.ts`.
+`src/videoTheme/TextContrast/TextContrast.test.ts`.
 
 | Tier | Path | Kind and unit | Bounds | Control | `classic` default | Replaces |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -797,7 +797,7 @@ Existing tokens that only need a reader: `color.ground` (`StockScene.tsx:40`),
 
 ## 5. New toggleable options
 
-Each option sits in Look and feel (`src/videoThemeEditor/tokenRows/tokenRows.ts:69-78`)
+Each option sits in Look and feel (`src/videoThemeEditor/TokenRows/TokenRows.ts:69-78`)
 and has an identity default, so adding it changes nothing until a producer
 moves it.
 
@@ -861,7 +861,7 @@ guard fails when a new literal lands. Proposed, in order of value:
 
 | Id | Change | Risk | Mitigation |
 | --- | --- | --- | --- |
-| R1 | Starter palette moves from oklch in `theme.css` to hex swatches | Theme colours are hex only (`src/videoTheme/tokenValueSchemas.ts:13-18`); an oklch to hex conversion can differ from Chrome's quantisation by one level | Take each hex from a rendered pixel of today's output; run `pnpm theme:parity compare` on every scene study |
+| R1 | Starter palette moves from oklch in `theme.css` to hex swatches | Theme colours are hex only (`src/videoTheme/makeValueSchemaFromDefinition.ts:13-18`); an oklch to hex conversion can differ from Chrome's quantisation by one level | Take each hex from a rendered pixel of today's output; run `pnpm theme:parity compare` on every scene study |
 | R2 | Stock text onto graphic roles | `eyebrow` adds 0.171 em tracking; Courier roles change the face | Map only to roles with the same family, weight, and tracking (3.2) |
 | R3 | `SceneShell` heading onto `text.stage.heading` | Tracking is -1.2 px today and -0.025 em in the token; equal only at 48 px, and the scene size is fitted | Give `sceneHeading` its own role, or accept tracking that scales with size after review |
 | R4 | `color.onAccent` | Today's threshold is 0.179; the theme's `luminanceThreshold` is 0.3. Accents with luminance between them flip label colour | Keep 0.179 as the role's own threshold, or record a parity allowance |
@@ -880,7 +880,7 @@ guard fails when a new literal lands. Proposed, in order of value:
 Nine slices, each owning a disjoint file set. The size column counts (a)
 literals plus implicit easing and sketch bypass, from section 2. **S1 lands
 first** and is the only slice that edits shared theme files: `themes/classic.theme.json`, the
-token catalog, the theme types, `createVideoMotion`, the CSS variable builder,
+token catalog, the theme types, `makeVideoMotionFromTokens`, the CSS variable builder,
 `builtInVideoThemes.ts`, the theme tests, the parity targets, and the theme
 docs. After S1 merges, S2 to S8 run in parallel. S9 touches no theme file and
 can start at any time. A slice that discovers it needs a new token stops and
@@ -890,7 +890,7 @@ which S1 seeds and the slice lowers to zero.
 
 | Slice | Owns | Work | Size |
 | --- | --- | --- | --- |
-| S1 Foundation | `themes/classic.theme.json`; `src/videoTheme/**`; `src/stock/theme/**`; `src/stock/stockPalette.ts`; `src/stock/primitives/**`; `src/stock/graphics-common/**`; `src/gallery/palette.ts`; `src/videoThemeEditor/tokenRows/tokenRows.ts`; `scripts/videoTheme/**`; `docs/video-theme.md`; `docs/motion-vocabulary.md`; `docs/design/video-token-editor.md` | Every token in section 4 with its catalog entry and `classic` default, including the per-item overrides for the 9 plan-wide storyboard colours; the themed `VideoMotion` facade (`ramp`, `enter`, `leave`, `pop`, `press`, `reveal`, stroke and corner scale helpers); emitting the 11 starter names from `color.scene.*`; the Look and feel options; the 7 stock primitives (so most new tokens have a reader); the guards in section 6 with per-slice budget files seeded from today's counts; widened reader, tempo, and parity scopes. Run `pnpm theme:sync-avandar` only if the sync output changes | 21 primitive literals plus the foundation |
+| S1 Foundation | `themes/classic.theme.json`; `src/videoTheme/**`; `src/stock/theme/**`; `src/stock/stockPalette.ts`; `src/stock/primitives/**`; `src/stock/graphics-common/**`; `src/gallery/palette.ts`; `src/videoThemeEditor/TokenRows/TokenRows.ts`; `scripts/videoTheme/**`; `docs/video-theme.md`; `docs/motion-vocabulary.md`; `docs/design/video-token-editor.md` | Every token in section 4 with its catalog entry and `classic` default, including the per-item overrides for the 9 plan-wide storyboard colours; the themed `VideoMotion` facade (`ramp`, `enter`, `leave`, `pop`, `press`, `reveal`, stroke and corner scale helpers); emitting the 11 starter names from `color.scene.*`; the Look and feel options; the 7 stock primitives (so most new tokens have a reader); the guards in section 6 with per-slice budget files seeded from today's counts; widened reader, tempo, and parity scopes. Run `pnpm theme:sync-avandar` only if the sync output changes | 21 primitive literals plus the foundation |
 | S2 Original stock families and maps | `src/stock/graphics-{charts,code,data,interface,networks}/**`; the 20 original presets' folders under `src/stock/presets/` (schemas, fixtures, controls) and `src/stock/presets/legacy/`; the 9 geospatial preset folders | 11 literal original presets, implicit easing and sketch bypass in the parity families, content colour schemas and fixtures (3.1), geospatial presets | 29 presets, 512 |
 | S3 General presets A to Pi | 39 folders: `actor-attribution-split` to `pipeline-step-splice` (includes `decision-fork`, `cache-reuse`, `capability-matrix`, `contribution-weave`, `dashboard-slot-assembly`, `entity-spine-assembly`, `grouped-value-picker`, `keyed-row-zipper`) | Stock migration (colour, type, line, motion, implicit easing, sketch bypass); composition presets first | 1,147 |
 | S4 General presets Pl to Z | 38 folders: `plugin-capability-install` to `workspace-capacity-extension` (includes `predicate-pushdown-boundary`, `query-column-cache-growth`, `provenance-peelback`, `schema-column-evolution`, `schema-plan-local-execution`, `scope-aperture`) | As S3 | 1,201 |

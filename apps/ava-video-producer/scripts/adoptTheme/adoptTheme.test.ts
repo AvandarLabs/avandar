@@ -5,20 +5,16 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
+import { CssCustomProperties } from "./CssCustomProperties";
 import {
-  getCustomPropertiesFromCss,
-  makeInlinedPaletteFromPalette,
-} from "./cssCustomPropertyHelpers";
-import {
-  PLACEHOLDER,
   makeThemeCssFromTokens,
   getEasingsFromPalette,
   makeKitTokensFromPalette,
-} from "./themeOutputHelpers";
+} from "./themeOutputHelpers/themeOutputHelpers";
+import { PLACEHOLDER } from "./themeOutputHelpers/themeOutputPalette";
 import type { Palette } from "./adoptTheme.types";
 
 const APP_ROOT = fileURLToPath(new URL("../../", import.meta.url));
-
 /** A shadcn-style stylesheet: bare channels, a dark block, and Tailwind 4. */
 const STYLESHEET = `
 /* comment { --ignored: 1 } */
@@ -44,9 +40,9 @@ const STYLESHEET = `
 }
 .button { color: hsl(var(--primary)); }
 `;
-
 test("getCustomPropertiesFromCss reads root, dark, @theme, and media blocks without self-references", () => {
-  const { light, dark } = getCustomPropertiesFromCss(STYLESHEET);
+  const { light, dark } =
+    CssCustomProperties.getCustomPropertiesFromCss(STYLESHEET);
   assert.equal(light["--background"], "0 0% 100%");
   assert.equal(light["--ease-out-expo"], "cubic-bezier(0.16, 1, 0.3, 1)");
   assert.equal(light["--color-border"], "214 32% 91%");
@@ -54,35 +50,38 @@ test("getCustomPropertiesFromCss reads root, dark, @theme, and media blocks with
   assert.equal(dark["--background"], "222 47% 11%");
   assert.equal(dark["--muted"], "217 33% 17%");
 });
-
 test("makeInlinedPaletteFromPalette follows var() pointers within the map and its fallback", () => {
-  const light = makeInlinedPaletteFromPalette(
-    getCustomPropertiesFromCss(STYLESHEET).light,
-  );
+  const light = CssCustomProperties.makeInlinedPaletteFromPalette({
+    palette: CssCustomProperties.getCustomPropertiesFromCss(STYLESHEET).light,
+  });
   assert.equal(light["--card"], "0 0% 100%");
-  const dark = makeInlinedPaletteFromPalette(
-    { "--x": "var(--y, red)", "--z": "var(--background)" },
-    light,
-  );
+  const dark = CssCustomProperties.makeInlinedPaletteFromPalette({
+    palette: { "--x": "var(--y, red)", "--z": "var(--background)" },
+    fallback: light,
+  });
   assert.equal(dark["--x"], "red");
   assert.equal(dark["--z"], "0 0% 100%");
 });
-
 /** The primary palette `adoptTheme` reads from `STYLESHEET` in dark mode. */
 function _makePrimaryPaletteFromStylesheet(): Palette {
-  const { light, dark } = getCustomPropertiesFromCss(STYLESHEET);
+  const { light, dark } =
+    CssCustomProperties.getCustomPropertiesFromCss(STYLESHEET);
   return {
-    ...makeInlinedPaletteFromPalette(light),
-    ...makeInlinedPaletteFromPalette(
-      dark,
-      makeInlinedPaletteFromPalette(light),
-    ),
+    ...CssCustomProperties.makeInlinedPaletteFromPalette({ palette: light }),
+    ...CssCustomProperties.makeInlinedPaletteFromPalette({
+      palette: dark,
+      fallback: CssCustomProperties.makeInlinedPaletteFromPalette({
+        palette: light,
+      }),
+    }),
   };
 }
-
 test("makeKitTokensFromPalette wraps bare channels in hsl(), derives brand and ground variants, and reports placeholders", () => {
   const { resolved, report, wrapper, numWrappedValues } =
-    makeKitTokensFromPalette(_makePrimaryPaletteFromStylesheet(), STYLESHEET);
+    makeKitTokensFromPalette({
+      primary: _makePrimaryPaletteFromStylesheet(),
+      stylesheetCss: STYLESHEET,
+    });
   assert.equal(wrapper, "hsl");
   assert.equal(resolved["--background"], "hsl(222 47% 11%)");
   assert.equal(resolved["--brand"], "hsl(221 83% 53%)");
@@ -113,12 +112,11 @@ test("makeKitTokensFromPalette wraps bare channels in hsl(), derives brand and g
     PLACEHOLDER["--muted-foreground"],
   );
 });
-
 test("makeThemeCssFromTokens writes each resolved token as a declaration", () => {
-  const { resolved } = makeKitTokensFromPalette(
-    _makePrimaryPaletteFromStylesheet(),
-    STYLESHEET,
-  );
+  const { resolved } = makeKitTokensFromPalette({
+    primary: _makePrimaryPaletteFromStylesheet(),
+    stylesheetCss: STYLESHEET,
+  });
   assert.equal(
     makeThemeCssFromTokens({
       relativeStylesheetPath: "app.css",
@@ -133,13 +131,11 @@ test("makeThemeCssFromTokens writes each resolved token as a declaration", () =>
     "  --brand: hsl(221 83% 53%);",
   );
 });
-
 test("getEasingsFromPalette reads each cubic-bezier easing as its four control points", () => {
   assert.deepEqual(getEasingsFromPalette(_makePrimaryPaletteFromStylesheet()), [
     { name: "--ease-out-expo", controlPoints: [0.16, 1, 0.3, 1] },
   ]);
 });
-
 test("a dry run reports the adopted palette and rewrites neither src/theme.css nor src/motion.ts", async () => {
   const directory = await fs.mkdtemp(path.join(os.tmpdir(), "adopt-theme-"));
   try {

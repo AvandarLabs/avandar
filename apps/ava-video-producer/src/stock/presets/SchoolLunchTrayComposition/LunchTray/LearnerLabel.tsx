@@ -1,7 +1,10 @@
 import { FitText } from "../../../primitives/FitText/FitText";
 import type { ReactNode } from "react";
+
+type Props = { text: string };
+
 /** Names a learner below their meal tray for `LunchTray`. */
-export function LearnerLabel({ text }: Readonly<{ text: string }>): ReactNode {
+export function LearnerLabel({ text }: Readonly<Props>): ReactNode {
   return (
     <FitText
       text={text}

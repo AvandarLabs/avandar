@@ -2,16 +2,19 @@ import { PersonGlyph } from "../../../primitives/PersonGlyph/PersonGlyph";
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
+
+type Props = {
+  destination: Readonly<{ x: number; y: number }>;
+  frame: number;
+  accent: string;
+};
+
 /** The receiving gate, its arm lifting for the convoy, with its keeper. */
 export function ArrivalGate({
   destination,
   frame,
   accent,
-}: Readonly<{
-  destination: Readonly<{ x: number; y: number }>;
-  frame: number;
-  accent: string;
-}>): ReactNode {
+}: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const motion = GraphicThemeHooks.useGraphicMotion();
   const scales = GraphicThemeHooks.useGraphicShapeScales();

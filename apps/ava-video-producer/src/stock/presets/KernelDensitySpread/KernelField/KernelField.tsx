@@ -1,4 +1,4 @@
-import { StockRect } from "../../../primitives/StockRect/StockRect";
+import { StockRect } from "../../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getKernelSamplesFromInput } from "../getKernelSamplesFromInput";
 import { KernelCones } from "../KernelCones/KernelCones";
@@ -20,10 +20,10 @@ export function KernelField({
   const { radius, cells } = getKernelSamplesFromInput({ input, frame, motion });
   return (
     <g>
-      {cells.map((cell, index) => {
+      {cells.map((cell) => {
         return (
           <StockRect
-            key={index}
+            key={`${cell.x}:${cell.y}`}
             data-cell-intensity={cell.intensity}
             x={180 + (cell.x - 50 / input.gridSize) * 2.8}
             y={200 + (cell.y - 50 / input.gridSize) * 2.8}

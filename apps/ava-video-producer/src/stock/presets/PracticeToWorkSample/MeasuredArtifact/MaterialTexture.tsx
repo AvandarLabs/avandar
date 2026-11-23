@@ -1,10 +1,11 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
+
+type Props = { material: string };
+
 /** Wood grain or a fabric seam allowance; a plain sheet has neither. */
-export function MaterialTexture({
-  material,
-}: Readonly<{ material: string }>): ReactNode {
+export function MaterialTexture({ material }: Readonly<Props>): ReactNode {
   const { atomic } = GraphicThemeHooks.useGraphicTheme();
   const tokens = GraphicThemeHooks.useGraphicTokens();
   return (

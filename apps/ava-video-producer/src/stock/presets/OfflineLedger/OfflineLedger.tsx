@@ -1,17 +1,20 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { LedgerCasing } from "./LedgerCasing";
-import { LedgerConnection } from "./LedgerConnection";
+import { LedgerConnection } from "./LedgerConnection/LedgerConnection";
 import { LedgerCopy } from "./LedgerCopy";
 import { LedgerEntry } from "./LedgerEntry";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./OfflineLedger.schema";
 import type { ReactNode } from "react";
+
 /** Complete notebook rendering input. */
 export type Props = GraphicProps & { input: Input };
+
 /** The page's corner before the corner style scales it. */
 const PAGE_CORNER = 3;
+
 /** Writing continues at a fixed cadence after the connection arc collapses. */
 export function OfflineLedger({
   frame,

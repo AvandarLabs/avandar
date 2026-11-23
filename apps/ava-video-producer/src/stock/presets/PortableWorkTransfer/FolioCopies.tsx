@@ -1,4 +1,4 @@
-import { TransferArtifact } from "./TransferArtifact";
+import { TransferArtifact } from "./TransferArtifact/TransferArtifact";
 import type { getTransferSceneFromFrame } from "./getTransferSceneFromFrame";
 import type { Input } from "./PortableWorkTransfer.schema";
 import type { ReactNode } from "react";

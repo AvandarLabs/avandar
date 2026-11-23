@@ -1,11 +1,11 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
+
+type Props = { deck: number; accent: string };
+
 /** Brackets at both ends of the deck when the premises are necessary. */
-export function RequiredBrackets({
-  deck,
-  accent,
-}: Readonly<{ deck: number; accent: string }>): ReactNode {
+export function RequiredBrackets({ deck, accent }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (

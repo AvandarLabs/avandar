@@ -1,9 +1,9 @@
-.easing {
+.easingValueControl {
   display: grid;
   gap: var(--atlas-space-8);
 }
 
-.easingBody {
+.easingValueControlBody {
   align-items: start;
   display: grid;
   gap: var(--atlas-space-12);

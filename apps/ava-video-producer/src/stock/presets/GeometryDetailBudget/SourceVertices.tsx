@@ -1,10 +1,14 @@
-import { mixToken } from "../../../motion";
+import { Motion } from "../../../motion";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { makeDetailSimplificationFromInput } from "./makeDetailSimplificationFromInput";
 import type { Input } from "./GeometryDetailBudget.schema";
 import type { ReactNode } from "react";
 
-type Props = { input: Input; frame: number; accent: string };
+type Props = {
+  input: Input;
+  frame: number;
+  accent: string;
+};
 const VERTEX_AT = 13;
 const VERTEX_FRAMES = 23;
 const KEPT_AT = 111;
@@ -35,7 +39,11 @@ export function SourceVertices({
             r={5}
             fill={
               kept.has(index)
-                ? mixToken(keptT, color.inactive, accent)
+                ? Motion.mixToken({
+                    t: keptT,
+                    from: color.inactive,
+                    to: accent,
+                  })
                 : color.inactive
             }
             opacity={motion.ramp(

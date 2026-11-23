@@ -1,5 +1,6 @@
-import { mix } from "../../../motion";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import { propEq } from "@avandar/utils";
+import { Motion } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./ScheduleBuffer.schema";
 /** Data for getScheduleGeometryFromInputAndFrame. */
 type GetScheduleGeometryResult = {
@@ -17,24 +18,19 @@ type GetScheduleGeometryResult = {
   reserveWidth: number;
   remaining: number;
 };
-
 /** Exact duration geometry preserves task widths and the fixed endpoint. */
 export function getScheduleGeometryFromInputAndFrame({
   frame,
   input,
   motion,
-}: Readonly<{
-  frame: number;
-  input: Input;
-  motion: VideoMotion;
-}>): GetScheduleGeometryResult {
+}: Readonly<ScheduleGeometryOptions>): GetScheduleGeometryResult {
   const taskUnits = input.tasks.reduce((total, task) => {
     return total + task.duration;
   }, 0);
   const scale = 880 / (taskUnits + input.reserveUnits);
-  const interruptionIndex = input.tasks.findIndex(({ id }) => {
-    return id === input.interruption.afterTaskId;
-  });
+  const interruptionIndex = input.tasks.findIndex(
+    propEq("id", input.interruption.afterTaskId),
+  );
   const progress = motion.ramp(
     frame,
     74,
@@ -55,10 +51,21 @@ export function getScheduleGeometryFromInputAndFrame({
     tasks,
     delayWidth,
     delayX: tasks[interruptionIndex].x + tasks[interruptionIndex].width,
-    delayY: mix(progress, 230, 310),
+    delayY: Motion.mix({
+      t: progress,
+      from: 230,
+      to: 310,
+    }),
     reserveX: 40 + taskUnits * scale + delayWidth * progress,
     reserveWidth:
       (input.reserveUnits - input.interruption.duration * progress) * scale,
     remaining: input.reserveUnits - input.interruption.duration * progress,
   };
 }
+
+/** Authored schedule and motion inputs for its frame geometry. */
+type ScheduleGeometryOptions = {
+  frame: number;
+  input: Input;
+  motion: VideoMotion;
+};

@@ -2,9 +2,9 @@ import assert from "node:assert/strict";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
-import { DEFAULT_VIDEO_THEME_SOURCE } from "../../../../videoTheme/builtInVideoThemes/builtInVideoThemes";
-import { createVideoMotion } from "../../../../videoTheme/createVideoMotion/createVideoMotion";
 import { makeResolvedVideoThemeFromSource } from "../../../../videoTheme/makeResolvedVideoThemeFromSource/makeResolvedVideoThemeFromSource";
+import { makeVideoMotionFromTokens } from "../../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
+import { DEFAULT_VIDEO_THEME_SOURCE } from "../../../../videoTheme/makeVideoThemeLibraryFromDocuments/makeVideoThemeLibraryFromDocuments";
 import { getPickerCopyFromFrame } from ".././getPickerCopyFromFrame";
 import { getPickerGroupsFromInput } from ".././getPickerGroupsFromInput";
 import { GroupedValuePicker } from ".././GroupedValuePicker";
@@ -17,15 +17,20 @@ import {
 import { inputSchema } from ".././GroupedValuePicker.schema";
 import type { PresetAssertions } from "../../../../../tests/helpers/registerStockPresetAssertions";
 import type { Input } from ".././GroupedValuePicker.schema";
+/** Inputs for render. */
+type RenderArguments = { frame: number; input: Input };
 
-const CLASSIC_MOTION = createVideoMotion(
+/** Inputs for getVisibleTexts. */
+type GetVisibleTextsArguments = { input: Input; frame: number };
+
+/** Inputs for getMovingCopy. */
+type GetMovingCopyArguments = { markup: string; id: string };
+
+const CLASSIC_MOTION = makeVideoMotionFromTokens(
   makeResolvedVideoThemeFromSource(DEFAULT_VIDEO_THEME_SOURCE).semantic.motion,
 );
 
-function _render({
-  frame,
-  input,
-}: Readonly<{ frame: number; input: Input }>): string {
+function _render({ frame, input }: Readonly<RenderArguments>): string {
   return renderToStaticMarkup(
     createElement(GroupedValuePicker, {
       frame,
@@ -39,7 +44,7 @@ function _render({
 function _getVisibleTexts({
   input,
   frame,
-}: Readonly<{ input: Input; frame: number }>): string[] {
+}: Readonly<GetVisibleTextsArguments>): string[] {
   return [input.labels.entity, input.labels.field, input.labels.result];
 }
 
@@ -78,7 +83,7 @@ type MovingCopy = {
 function _getMovingCopy({
   markup,
   id,
-}: Readonly<{ markup: string; id: string }>): MovingCopy {
+}: Readonly<GetMovingCopyArguments>): MovingCopy {
   const body = markup.match(
     new RegExp(`<g data-picker-copy="${id}"[^>]*>([\\s\\S]*?</text>)`),
   )?.[1];

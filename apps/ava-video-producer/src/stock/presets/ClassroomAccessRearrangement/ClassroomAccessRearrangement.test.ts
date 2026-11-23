@@ -18,6 +18,52 @@ import {
 import { inputSchema, type Input } from "./ClassroomAccessRearrangement.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 
+type ParticipantTableGeometryOptions = Readonly<{
+  x: Readonly<ClearsTableOptions>["x"];
+  left: Readonly<ClearsTableOptions>["left"];
+  y: Readonly<ClearsTableOptions>["y"];
+  top: Readonly<ClearsTableOptions>["top"];
+  right: Readonly<ClearsTableOptions>["right"];
+  bottom: Readonly<ClearsTableOptions>["bottom"];
+  angle: Readonly<ClearsTableOptions>["angle"];
+}>;
+
+function _makeParticipantTableGeometry({
+  x,
+  left,
+  y,
+  top,
+  right,
+  bottom,
+  angle,
+}: ParticipantTableGeometryOptions): {
+  corners: number[][];
+  cosine: number;
+  sine: number;
+  table: number[][];
+} {
+  const corners = [
+    [x + left, y + top],
+    [x + right, y + top],
+    [x + right, y + bottom],
+    [x + left, y + bottom],
+  ];
+  const cosine = Math.cos((angle * Math.PI) / 180),
+    sine = Math.sin((angle * Math.PI) / 180);
+  const table = [
+    [-96, -36],
+    [96, -36],
+    [96, 36],
+    [-96, 36],
+  ].map(([horizontal, vertical]) => {
+    return [
+      380 + horizontal * cosine - vertical * sine,
+      370 + horizontal * sine + vertical * cosine,
+    ];
+  });
+  return { corners, cosine, sine, table };
+}
+
 function _render({
   frame,
   input,
@@ -226,24 +272,14 @@ function _clearsTable({
   bottom,
   angle,
 }: Readonly<ClearsTableOptions>): boolean {
-  const corners = [
-    [x + left, y + top],
-    [x + right, y + top],
-    [x + right, y + bottom],
-    [x + left, y + bottom],
-  ];
-  const cosine = Math.cos((angle * Math.PI) / 180),
-    sine = Math.sin((angle * Math.PI) / 180);
-  const table = [
-    [-96, -36],
-    [96, -36],
-    [96, 36],
-    [-96, 36],
-  ].map(([horizontal, vertical]) => {
-    return [
-      380 + horizontal * cosine - vertical * sine,
-      370 + horizontal * sine + vertical * cosine,
-    ];
+  const { corners, cosine, sine, table } = _makeParticipantTableGeometry({
+    x,
+    left,
+    y,
+    top,
+    right,
+    bottom,
+    angle,
   });
   return [
     [1, 0],

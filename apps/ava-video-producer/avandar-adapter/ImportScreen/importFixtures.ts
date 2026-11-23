@@ -1,3 +1,4 @@
+import { Model } from "@avandar/models";
 import { EXPLORER_CASES_DATASET_ID } from "../Explorer.constants";
 import fixtureData from "../fixtures.json";
 import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";
@@ -42,7 +43,7 @@ export const columnNames = Object.keys(cases[0]!);
 // Fixture records carry only the fields this film shows. Filling the rest of
 // the product type would put invented values on screen, so the cast stays.
 export const columns = columnNames.map((name, index) => {
-  return {
+  return Model.make("DatasetColumn", {
     id: `film-case-column-${index}`,
     name,
     description: undefined,
@@ -53,14 +54,13 @@ export const columns = columnNames.map((name, index) => {
           ? "bigint"
           : "double"
         : "varchar",
-  };
-}) as unknown as DatasetColumn.T[];
+  });
+}) as DatasetColumn.T[];
 
 /** The saved dataset record this screen's "saved" phase displays. */
 // Fixture records carry only the fields this film shows. Filling the rest of
 // the product type would put invented values on screen, so the cast stays.
-export const dataset = {
-  __type: "Dataset",
+export const dataset = Model.make("Dataset", {
   id: EXPLORER_CASES_DATASET_ID,
   name: NAME,
   description: DESCRIPTION,
@@ -68,13 +68,12 @@ export const dataset = {
   createdAt: "2026-10-14T21:53:32Z",
   isRestricted: false,
   dateOfLastSync: undefined,
-} as unknown as Dataset.T;
+}) as Dataset.T;
 
 /** The CSV source configuration backing `dataset`. */
 // Fixture records carry only the fields this film shows. Filling the rest of
 // the product type would put invented values on screen, so the cast stays.
-export const source = {
-  __type: "CsvFileDataset",
+export const source = Model.make("CsvFileDataset", {
   sizeInBytes: 26703,
   delimiter: ",",
   hasHeader: true,
@@ -82,7 +81,7 @@ export const source = {
   dateFormat: "%Y-%m-%d",
   timestampFormat: undefined,
   isInCloudStorage: true,
-} as unknown as CsvFileDataset.T;
+}) as CsvFileDataset.T;
 
 /** The parse metadata shown in the import review's preview controls. */
 // Fixture records carry only the fields this film shows. Filling the rest of

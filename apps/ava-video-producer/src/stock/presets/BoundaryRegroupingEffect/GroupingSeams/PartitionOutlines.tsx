@@ -1,22 +1,25 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { buildZoneOutlineFromCells } from "../buildZoneOutlineFromCells";
 import { getGroupingFromCells } from "../getGroupingFromCells";
+import { makeZoneOutlineFromCells } from "../makeZoneOutlineFromCells";
 import type { Input } from "../BoundaryRegroupingEffect.schema";
 import type { ReactNode } from "react";
+
+type Props = { input: Input; index: number; accent: string };
+
 /** The outline of every zone in one grouping of the grid. */
 export function PartitionOutlines({
   input,
   index,
   accent,
-}: Readonly<{ input: Input; index: number; accent: string }>): ReactNode {
+}: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   return getGroupingFromCells({ input, index }).map((zone) => {
     return (
       <SketchedShape
         key={zone.id}
-        shape={{ kind: "path", d: buildZoneOutlineFromCells(zone.cells) }}
+        shape={{ kind: "path", d: makeZoneOutlineFromCells(zone.cells) }}
         profile={tokens.sketch.shape}
         data-zone-outline={zone.id}
         fill="none"

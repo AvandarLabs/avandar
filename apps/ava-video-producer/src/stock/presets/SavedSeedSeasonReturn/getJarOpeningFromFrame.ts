@@ -1,4 +1,4 @@
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 /** Nonzero loss opens a bounded storage interval after the initial closure. */
 export function getJarOpeningFromFrame({
   frame,

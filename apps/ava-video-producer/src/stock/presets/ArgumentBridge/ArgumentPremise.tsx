@@ -1,8 +1,8 @@
-import { mix, ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { PremiseStrip } from "./PremiseStrip";
 import { PremiseSupport } from "./PremiseSupport/PremiseSupport";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./ArgumentBridge.schema";
 import type { ReactNode } from "react";
 
@@ -27,12 +27,12 @@ export function ArgumentPremise({
   accent,
   premise,
   index,
-  count,
+  count: numPremises,
   showSupport,
   relationship,
 }: Readonly<Props>): ReactNode {
   const motion = GraphicThemeHooks.useGraphicMotion();
-  const slotWidth = 900 / count;
+  const slotWidth = 900 / numPremises;
   const x = 30 + index * slotWidth;
   const center = x + slotWidth / 2;
   const { arrival, joining } = _getPremiseProgress({ frame, index, motion });
@@ -40,7 +40,11 @@ export function ArgumentPremise({
     <g
       data-premise={premise.id}
       opacity={arrival}
-      transform={`translate(0 ${mix(arrival, 12, 0)})`}
+      transform={`translate(0 ${Motion.mix({
+        t: arrival,
+        from: 12,
+        to: 0,
+      })})`}
     >
       <PremiseStrip {...{ premise, x, center, slotWidth }} />
       <PremiseSupport
@@ -63,19 +67,23 @@ function _getPremiseProgress({
   frame,
   index,
   motion,
-}: Readonly<{ frame: number; index: number; motion: VideoMotion }>) {
+}: Readonly<{
+  frame: number;
+  index: number;
+  motion: VideoMotion;
+}>) {
   return {
-    arrival: ramp(
+    arrival: Motion.ramp({
       frame,
-      12 + index * motion.scaleStagger(ARRIVAL_STAGGER_FRAMES),
-      motion.hero,
-      motion.entrance.easing,
-    ),
-    joining: ramp(
+      at: 12 + index * motion.scaleStagger(ARRIVAL_STAGGER_FRAMES),
+      dur: motion.hero,
+      easing: motion.entrance.easing,
+    }),
+    joining: Motion.ramp({
       frame,
-      48 + index * motion.scaleStagger(JOIN_STAGGER_FRAMES),
-      motion.scale(JOIN_FRAMES),
-      motion.travel.easing,
-    ),
+      at: 48 + index * motion.scaleStagger(JOIN_STAGGER_FRAMES),
+      dur: motion.scale(JOIN_FRAMES),
+      easing: motion.travel.easing,
+    }),
   };
 }

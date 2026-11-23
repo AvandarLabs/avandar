@@ -23,8 +23,9 @@ export function parseCssPixels(value: unknown): number | undefined {
     return Number(pixels[1]);
   }
   const rem = REM_PATTERN.exec(text) ?? MANTINE_REM_PATTERN.exec(text);
-  if (rem) {
-    return Number(rem[1]) * 16;
-  }
-  return NUMBER_PATTERN.test(text) ? Number(text) : undefined;
+  return rem
+    ? Number(rem[1]) * 16
+    : NUMBER_PATTERN.test(text)
+      ? Number(text)
+      : undefined;
 }

@@ -1,10 +1,11 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import type { Input } from "./DuplicateReviewStack.schema";
 import type { ReactNode } from "react";
+
+type Props = { input: Input };
+
 /** The review's title over the field the candidates are compared on. */
-export function ReviewHeadings({
-  input,
-}: Readonly<{ input: Input }>): ReactNode {
+export function ReviewHeadings({ input }: Readonly<Props>): ReactNode {
   return (
     <>
       <FitText

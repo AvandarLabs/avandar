@@ -1,5 +1,5 @@
 import { resolve } from "node:path";
-import { validateBaseUrl, validateId } from "../captureLib/urlSafetyHelpers";
+import { CaptureUrlSafety } from "../captureLib/CaptureUrlSafety/CaptureUrlSafety";
 import { loadFlows } from "./loadFlows";
 import type { CaptureOptions, CaptureViewport } from "./captureAvandar.types";
 import type { CaptureSettings } from "./captureRun.types";
@@ -11,7 +11,6 @@ const DEFAULT_FLOWS = [
   "cases",
   "map",
 ] as const;
-
 function _readFlowIds(flowIds: unknown): string[] {
   if (
     !Array.isArray(flowIds) ||
@@ -21,10 +20,12 @@ function _readFlowIds(flowIds: unknown): string[] {
     throw new Error("flowIds must be a nonempty unique list");
   }
   return flowIds.map((id) => {
-    return validateId(id, "flow id");
+    return CaptureUrlSafety.validateId({
+      value: id,
+      name: "flow id",
+    });
   });
 }
-
 function _readViewport(viewport: Readonly<CaptureViewport>): CaptureViewport {
   if (
     !Number.isInteger(viewport.width) ||
@@ -40,7 +41,6 @@ function _readViewport(viewport: Readonly<CaptureViewport>): CaptureViewport {
   }
   return { ...viewport };
 }
-
 /** The login credentials, from options, the environment, or seed defaults. */
 function _readCredentials(
   options: Readonly<CaptureOptions>,
@@ -59,12 +59,11 @@ function _readCredentials(
   }
   return { email, password };
 }
-
 function _readTimings(
   options: Readonly<CaptureOptions>,
 ): Pick<CaptureSettings, "timeout" | "checkpointSettleMs"> {
-  const timeout = options.actionTimeoutMs ?? 20_000;
-  if (!Number.isInteger(timeout) || timeout < 1000 || timeout > 120_000) {
+  const timeout = options.actionTimeoutMs ?? 20000;
+  if (!Number.isInteger(timeout) || timeout < 1000 || timeout > 120000) {
     throw new Error("actionTimeoutMs must be 1000 to 120000 milliseconds");
   }
   const checkpointSettleMs = options.checkpointSettleMs ?? 600;
@@ -77,7 +76,6 @@ function _readTimings(
   }
   return { timeout, checkpointSettleMs };
 }
-
 /**
  * Validates every capture option and fills its default, so `runCapture`
  * works from one checked `CaptureSettings` value.
@@ -86,12 +84,17 @@ export async function readCaptureSettings(
   options: Readonly<CaptureOptions>,
 ): Promise<CaptureSettings> {
   const root = resolve(options.root ?? process.cwd());
-  const baseUrl = validateBaseUrl(options.baseUrl ?? "http://localhost:5173");
-  const workspace = validateId(
-    options.workspace ?? "avandar-labs",
-    "workspace",
+  const baseUrl = CaptureUrlSafety.validateBaseUrl(
+    options.baseUrl ?? "http://localhost:5173",
   );
-  const runLabel = validateId(options.runLabel ?? "harborfield", "runLabel");
+  const workspace = CaptureUrlSafety.validateId({
+    value: options.workspace ?? "avandar-labs",
+    name: "workspace",
+  });
+  const runLabel = CaptureUrlSafety.validateId({
+    value: options.runLabel ?? "harborfield",
+    name: "runLabel",
+  });
   const flowIds = _readFlowIds(options.flowIds ?? DEFAULT_FLOWS);
   const flows = options.flowMap ?? (await loadFlows(root));
   flowIds.forEach((id) => {

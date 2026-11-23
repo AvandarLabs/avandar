@@ -1,11 +1,15 @@
-import { mix } from "../../../../motion";
+import { Motion } from "../../../../motion";
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CarrierWheel } from "./CarrierWheel";
 import type { Input } from "../RetailShelfReplenishment.schema";
 import type { ReactNode } from "react";
 
-type Props = { input: Input; frame: number; accent: string };
+type Props = {
+  input: Input;
+  frame: number;
+  accent: string;
+};
 /** The intact carrier advances with its authored incoming load. */
 export function ShelfCarrier({
   input,
@@ -15,11 +19,11 @@ export function ShelfCarrier({
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const motion = GraphicThemeHooks.useGraphicMotion();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
-  const carrierX = mix(
-    motion.ramp(frame, 38, motion.hero, motion.travel.easing),
-    100,
-    0,
-  );
+  const carrierX = Motion.mix({
+    t: motion.ramp(frame, 38, motion.hero, motion.travel.easing),
+    from: 100,
+    to: 0,
+  });
   return (
     <g data-carrier={input.deliveryMode} transform={`translate(${carrierX} 0)`}>
       <SketchedShape

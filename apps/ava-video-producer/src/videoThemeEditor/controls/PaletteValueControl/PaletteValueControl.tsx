@@ -3,6 +3,8 @@ import css from "./PaletteValueControl.module.css";
 import type { ValueControlProps } from "../valueControl.types";
 import type { ReactNode } from "react";
 
+type Props = ValueControlProps;
+
 function _buildShadeEntries(shades: readonly string[]) {
   return shades.map((shade, shadeSlot) => {
     return {
@@ -18,14 +20,18 @@ export function PaletteValueControl({
   label,
   value,
   onChange,
-}: ValueControlProps): ReactNode {
+}: Readonly<Props>): ReactNode {
   const shades = Array.isArray(value)
     ? value.filter((entry): entry is string => {
         return typeof entry === "string";
       })
     : [];
   return (
-    <div className={css.paletteValueGrid} role="group" aria-label={label}>
+    <div
+      className={css.paletteValueControlGrid}
+      role="group"
+      aria-label={label}
+    >
       {_buildShadeEntries(shades).map(({ key, shadeSlot, shade }) => {
         return (
           <HexColorInput

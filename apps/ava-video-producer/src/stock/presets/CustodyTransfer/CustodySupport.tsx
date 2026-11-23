@@ -1,8 +1,8 @@
-import { mix, ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SUPPORT_STROKE, WITHDRAW_CUE } from "./custodyShape";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { ReactNode } from "react";
 
 type CreateSupportLineOptions = {
@@ -72,24 +72,36 @@ function _createSupportLine({
   accepted,
   motion,
 }: Readonly<CreateSupportLineOptions>) {
-  const contact = ramp(
+  const contact = Motion.ramp({
     frame,
-    36,
-    motion.scale(CONTACT_FRAMES),
-    motion.travel.easing,
-  );
+    at: 36,
+    dur: motion.scale(CONTACT_FRAMES),
+    easing: motion.travel.easing,
+  });
   const withdraw = accepted
-    ? ramp(
+    ? Motion.ramp({
         frame,
-        WITHDRAW_CUE,
-        motion.scale(WITHDRAW_FRAMES),
-        motion.travel.easing,
-      )
+        at: WITHDRAW_CUE,
+        dur: motion.scale(WITHDRAW_FRAMES),
+        easing: motion.travel.easing,
+      })
     : 0;
   return {
     kind: "line",
-    x1: recipient ? mix(contact, 720, 480) : 240,
-    x2: recipient ? 720 : mix(withdraw, 480, 240),
+    x1: recipient
+      ? Motion.mix({
+          t: contact,
+          from: 720,
+          to: 480,
+        })
+      : 240,
+    x2: recipient
+      ? 720
+      : Motion.mix({
+          t: withdraw,
+          from: 480,
+          to: 240,
+        }),
     y1: 376,
     y2: 376,
   } as const;

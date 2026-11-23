@@ -1,11 +1,15 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { normalizeFiniteRange } from "../../numeric/normalizeFiniteRange/normalizeFiniteRange";
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./ContactWindowOverlap.schema";
 import type { ReactNode } from "react";
 
-type Props = { input: Input; frame: number; accent: string };
+type Props = {
+  input: Input;
+  frame: number;
+  accent: string;
+};
 /** The supplied window lowers onto the same axis as each presence ribbon. */
 export function InvestigationStencil({
   input,
@@ -36,11 +40,11 @@ export function InvestigationStencil({
     <StockRect
       data-window="stencil"
       x={start}
-      y={mix(
-        motion.ramp(frame, 36, motion.scale(60), motion.travel.easing),
-        85,
-        195,
-      )}
+      y={Motion.mix({
+        t: motion.ramp(frame, 36, motion.scale(60), motion.travel.easing),
+        from: 85,
+        to: 195,
+      })}
       width={end - start}
       height={270}
       fill={accent}

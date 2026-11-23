@@ -1,3 +1,4 @@
+import { propEq } from "@avandar/utils";
 import { LabelSlots } from "../../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
@@ -16,9 +17,9 @@ export function SpineObservation({
 }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const motion = GraphicThemeHooks.useGraphicMotion();
-  const entityIndex = input.entities.findIndex(({ id }) => {
-      return id === observation.entityId;
-    }),
+  const entityIndex = input.entities.findIndex(
+      propEq("id", observation.entityId),
+    ),
     sourceY = 104 + index * 60;
   const targetY = 164 + entityIndex * 100;
   return (

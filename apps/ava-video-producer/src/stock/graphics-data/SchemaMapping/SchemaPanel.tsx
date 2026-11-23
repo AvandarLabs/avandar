@@ -13,10 +13,18 @@ import {
 } from "./SchemaMapping.constants";
 import type { ReactNode } from "react";
 
-type Props = { x: number; title: string; frame: number; index: number };
+type Props = {
+  x: number;
+  title: string;
+  frame: number;
+  index: number;
+};
 /** One side panel of the mapping: its title and the divider under it. */
 export function SchemaPanel({ x, title, frame, index }: Props): ReactNode {
-  const style = GraphicThemeHooks.useGraphicProps("SchemaMapping", {});
+  const style = GraphicThemeHooks.useGraphicProps({
+    name: "SchemaMapping",
+    props: {},
+  });
   const { color, sketch } = GraphicThemeHooks.useGraphicTokens();
   const shapes = GraphicThemeHooks.useGraphicShapeScales();
   return (

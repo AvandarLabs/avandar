@@ -1,36 +1,40 @@
 import { useCallback, useMemo, type ReactNode } from "react";
 import { makeResolvedVideoThemeFromLibrary } from "../../videoTheme/makeResolvedVideoThemeFromLibrary/makeResolvedVideoThemeFromLibrary";
-import { VideoThemeContext } from "../../videoTheme/useVideoTheme";
-import { buildThemeJsonFromDraft } from "../../videoThemeEditor/buildThemeJsonFromDraft/buildThemeJsonFromDraft";
-import { useDraftTheme } from "../../videoThemeEditor/resolveDraftTheme/useDraftTheme";
-import { useValidThemeDraft } from "../../videoThemeEditor/resolveDraftTheme/useValidThemeDraft";
+import { VideoThemeContext } from "../../videoTheme/videoThemeHelpers";
+import { useDraftTheme } from "../../videoThemeEditor/DraftThemeResolution/useDraftTheme";
+import { useValidThemeDraft } from "../../videoThemeEditor/DraftThemeResolution/useValidThemeDraft";
+import { makeThemeJsonFromDraft } from "../../videoThemeEditor/makeThemeJsonFromDraft/makeThemeJsonFromDraft";
 import {
   useVideoThemeDraft,
   type VideoThemeDraftState,
 } from "../../videoThemeEditor/useVideoThemeDraft/useVideoThemeDraft";
-import { copyTextToClipboard } from "../copyText";
+import { copyTextToClipboard } from "../copyTextToClipboard";
 import { GalleryVideoThemeContext } from "./GalleryVideoThemeContext";
 import type { GalleryVideoThemeValue } from "./GalleryVideoThemeContext";
 
+type Props = {
+  children: ReactNode;
+};
 const THEME_SCOPE = { kind: "theme" } as const;
-
 /** Copies the active theme and its draft as the JSON a save would write. */
 function useCopyThemeJson(state: VideoThemeDraftState): () => Promise<void> {
   const { library, themeId, draft, setCopyStatus } = state;
   return useCallback(async () => {
-    const json = buildThemeJsonFromDraft({ library, themeId, draft });
+    const json = makeThemeJsonFromDraft({ library, themeId, draft });
     if (json === undefined) {
       return;
     }
     try {
-      await copyTextToClipboard(json, "Theme JSON");
+      await copyTextToClipboard({
+        value: json,
+        label: "Theme JSON",
+      });
       setCopyStatus("copied");
     } catch {
       setCopyStatus("failed");
     }
   }, [library, themeId, draft, setCopyStatus]);
 }
-
 /**
  * Owns the one theme draft every Atlas modal edits, and makes the saved
  * active theme the ambient video theme source. It sets no Mantine theme:
@@ -39,9 +43,7 @@ function useCopyThemeJson(state: VideoThemeDraftState): () => Promise<void> {
  * Helpers sections in it. Its value keeps its identity until the draft state
  * or the resolved draft changes, so consumers skip unrelated renders.
  */
-export function GalleryVideoTheme({
-  children,
-}: Readonly<{ children: ReactNode }>): ReactNode {
+export function GalleryVideoTheme({ children }: Readonly<Props>): ReactNode {
   const state = useVideoThemeDraft();
   const { library, themeId, draft } = state;
   const draftTheme = useDraftTheme({
@@ -53,7 +55,10 @@ export function GalleryVideoTheme({
   const valid = useValidThemeDraft({ library, themeId, draft });
   const copyThemeJson = useCopyThemeJson(state);
   const savedTheme = useMemo(() => {
-    return makeResolvedVideoThemeFromLibrary(library, themeId);
+    return makeResolvedVideoThemeFromLibrary({
+      library,
+      themeId,
+    });
   }, [library, themeId]);
   const videoContext = useMemo(() => {
     return { theme: savedTheme, source: { library, themeId } };

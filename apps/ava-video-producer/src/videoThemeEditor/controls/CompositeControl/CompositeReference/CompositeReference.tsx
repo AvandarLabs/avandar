@@ -1,5 +1,5 @@
 import { useTokenEditor } from "../../../TokenEditorContext";
-import { type TokenRow } from "../../../tokenRows/tokenRows.types";
+import { type TokenRow } from "../../../TokenRows/TokenRows.types";
 import { ReferenceControl } from "../../ReferenceControl/ReferenceControl";
 import { CompositeSketchPreview } from "../CompositeSketchPreview";
 import css from "./CompositeReference.module.css";

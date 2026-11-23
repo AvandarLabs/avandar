@@ -1,7 +1,7 @@
 import { propEq } from "@avandar/utils";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getReadingGeometryFromInput } from "../getReadingGeometryFromInput";
-import { PhysicalReadingBook } from "../PhysicalReadingBook";
+import { PhysicalReadingBook } from "../PhysicalReadingBook/PhysicalReadingBook";
 import { ReadingBookLabels } from "../ReadingBookLabels";
 import { ReadingTable } from "./ReadingTable";
 import type { Input } from "../SharedReadingCircles.schema";

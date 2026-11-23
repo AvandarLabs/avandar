@@ -1,13 +1,19 @@
 import { LiteralDataText } from "../../../primitives/LiteralDataText/LiteralDataText";
-import { StockRect } from "../../../primitives/StockRect/StockRect";
+import { StockRect } from "../../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { type Props } from "./SpineObservationShared.types";
+import { type Props as SpineObservationSharedProps } from "./SpineObservationShared.types";
 import type { ReactNode } from "react";
+
+type Props = {
+  observation: SpineObservationSharedProps["observation"];
+  y: number;
+};
+
 /** The observation's card with its own ID over the entity it names. */
 export function ObservationCard({
   observation,
   y,
-}: Readonly<{ observation: Props["observation"]; y: number }>): ReactNode {
+}: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (

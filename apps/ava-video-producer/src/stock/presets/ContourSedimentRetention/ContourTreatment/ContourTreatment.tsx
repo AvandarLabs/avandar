@@ -1,13 +1,16 @@
-import { mix } from "../../../../motion";
-import { SketchedShape } from "../../../primitives/SketchedShape";
-import { StockRect } from "../../../primitives/StockRect/StockRect";
+import { Motion } from "../../../../motion";
+import { StockRect } from "../../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { LandSteward } from "../LandSteward";
 import { TreatmentDetail } from "./TreatmentDetail";
 import type { Input } from "../ContourSedimentRetention.schema";
 import type { ReactNode } from "react";
 
-type Props = { input: Input; frame: number; accent: string };
+type Props = {
+  input: Input;
+  frame: number;
+  accent: string;
+};
 /** A steward carries the selected barrier into contact with the slope. */
 export function ContourTreatment({
   input,
@@ -19,8 +22,8 @@ export function ContourTreatment({
   const motion = GraphicThemeHooks.useGraphicMotion();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   const place = motion.ramp(frame, 36, motion.scale(24), motion.travel.easing);
-  const x = mix(place, 300, 510);
-  const y = mix(place, 155, 275);
+  const x = Motion.mix({ t: place, from: 300, to: 510 });
+  const y = Motion.mix({ t: place, from: 155, to: 275 });
   return (
     <g>
       <StockRect
@@ -39,11 +42,9 @@ export function ContourTreatment({
       />
       <TreatmentDetail
         isVegetated={input.intervention.kind === "vegetated-strip"}
-        x={x}
-        y={y}
-        accent={accent}
+        {...{ x, y, accent }}
       />
-      <LandSteward x={x} y={y} accent={accent} />
+      <LandSteward {...{ x, y, accent }} />
     </g>
   );
 }

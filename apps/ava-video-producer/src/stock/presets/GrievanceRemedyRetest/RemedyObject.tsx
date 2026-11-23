@@ -1,12 +1,16 @@
-import { mix } from "../../../motion";
-import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { LampObject } from "./LampObject";
 import { LockerObject } from "./LockerObject";
+import { RemedyReplacementPart } from "./RemedyReplacementPart/RemedyReplacementPart";
+import { RemedyRetestContact } from "./RemedyRetestContact/RemedyRetestContact";
 import type { Input } from "./GrievanceRemedyRetest.schema";
 import type { ReactNode } from "react";
 
-type Props = { frame: number; input: Input; accent: string };
+type Props = {
+  frame: number;
+  input: Input;
+  accent: string;
+};
 /** A latch closes or a lamp lights only for the supplied functioning retest. */
 export function RemedyObject({
   frame,
@@ -36,35 +40,11 @@ export function RemedyObject({
       ) : (
         <LockerObject functioning={functioning} accent={accent} />
       )}
-      <SketchedShape
-        shape={{
-          kind: "path",
-          d: `M${mix(replacement, 560, 615)} ${mix(replacement, 322, 410)} l-10 16`,
-        }}
-        profile={tokens.sketch.shape}
-        data-old-part="retained"
-        stroke={tokens.color.highlight}
-        strokeWidth={scales.stroke(6)}
+      <RemedyReplacementPart
+        {...{ frame, tokens, motion, scales, replacement }}
       />
-      <rect
-        data-replacement-part="worker"
-        x={mix(replacement, 730, 550)}
-        y={mix(replacement, 365, 321)}
-        width={24}
-        height={18}
-        rx={scales.corner(3)}
-        fill={tokens.color.accentAlt}
-        opacity={motion.ramp(frame, 44, motion.whip)}
-      />
-      <SketchedShape
-        shape={{
-          kind: "path",
-          d: `M560 330 l${isLamp ? 12 : 14} ${mix(functioning, 12, 0) - attempt}`,
-        }}
-        profile={tokens.sketch.shape}
-        data-object-operation="handle"
-        stroke={accent}
-        strokeWidth={scales.stroke(tokens.stroke.heavy)}
+      <RemedyRetestContact
+        {...{ accent, tokens, scales, functioning, attempt, isLamp }}
       />
     </g>
   );

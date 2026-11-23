@@ -1,5 +1,6 @@
 import { Text } from "../../graphics-common/Text";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { BinnedPointIdentity } from "./BinnedPointIdentity";
 import { GridCells } from "./GridCells/GridCells";
 import { GridTokens } from "./GridTokens/GridTokens";
 import { ZeroCountLegend } from "./ZeroCountLegend";
@@ -8,6 +9,7 @@ import type { Input } from "./SpatialGridBinning.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
+
 /** Exact point-to-cell counting with a source identity legend. */
 export function SpatialGridBinning({
   input,
@@ -33,27 +35,7 @@ export function SpatialGridBinning({
       </Text>
       {input.points.map((point, index) => {
         return (
-          <g key={point.id}>
-            <Text
-              x={40 + (index % 4) * 220}
-              y={534 + Math.floor(index / 4) * 28}
-              role="data"
-            >
-              {index + 1}·
-            </Text>
-            <LabelSlots
-              labels={[
-                [
-                  point.id,
-                  68 + (index % 4) * 220,
-                  534 + Math.floor(index / 4) * 28,
-                  180,
-                  12,
-                  1,
-                ],
-              ]}
-            />
-          </g>
+          <BinnedPointIdentity key={point.id} point={point} index={index} />
         );
       })}
     </g>

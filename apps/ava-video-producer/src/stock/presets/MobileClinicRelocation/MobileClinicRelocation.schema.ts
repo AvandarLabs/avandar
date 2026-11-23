@@ -1,4 +1,4 @@
-import { prop } from "@avandar/utils";
+import { prop, propEq } from "@avandar/utils";
 import { z } from "zod";
 import type { StockSemanticRule } from "../../contracts/StockContract.types";
 /** Complete authored input with bounded collections and semantic validation. */
@@ -75,9 +75,7 @@ export const inputSchema = z
     if (
       new Set(assigned).size !== assigned.length ||
       assigned.some((slotId) => {
-        return !input.slots.some(({ id }) => {
-          return id === slotId;
-        });
+        return !input.slots.some(propEq("id", slotId));
       })
     ) {
       context.addIssue({

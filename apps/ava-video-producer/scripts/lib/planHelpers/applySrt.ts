@@ -1,12 +1,17 @@
 import { propEq } from "@avandar/utils";
 import {
   storyboardSchema,
-  timeline,
   type Storyboard,
 } from "../../../src/storyboard/schema/schema";
-
+import { StoryboardTimeline } from "../../../src/storyboard/schema/StoryboardTimeline";
 /** The frame an SRT timestamp such as `00:01:02,500` falls on at `fps`. */
-function _getFrameFromSrtTimestamp(value: string, fps: number): number {
+function _getFrameFromSrtTimestamp({
+  value,
+  fps,
+}: Readonly<{
+  value: string;
+  fps: number;
+}>): number {
   const match = /^(\d{2,}):(\d{2}):(\d{2})[,.](\d{3})$/.exec(value);
   if (!match || Number(match[2]) > 59 || Number(match[3]) > 59) {
     throw new Error(`Invalid SRT timestamp: ${value}`);
@@ -19,7 +24,6 @@ function _getFrameFromSrtTimestamp(value: string, fps: number): number {
       fps,
   );
 }
-
 /** One narration cue retimed from its SRT block, checked against its text. */
 function _makeCueFromSrtBlock(options: {
   plan: Readonly<Storyboard>;
@@ -42,18 +46,25 @@ function _makeCueFromSrtBlock(options: {
   if (normalize(lines.join(" ")) !== normalize(cue.text)) {
     throw new Error(`SRT text differs from narration cue ${cue.id}`);
   }
-  const shot = timeline(plan).find(propEq("id", cue.shotId))!;
+  const shot = StoryboardTimeline.timeline(plan).find(
+    propEq("id", cue.shotId),
+  )!;
   const { audio: _audio, ...withoutAudio } = cue;
   return {
     ...withoutAudio,
     beatId: undefined,
     startFrame:
-      _getFrameFromSrtTimestamp(cueTimestamps[0], plan.fps) - shot.startFrame,
+      _getFrameFromSrtTimestamp({
+        value: cueTimestamps[0],
+        fps: plan.fps,
+      }) - shot.startFrame,
     endFrame:
-      _getFrameFromSrtTimestamp(cueTimestamps[1], plan.fps) - shot.startFrame,
+      _getFrameFromSrtTimestamp({
+        value: cueTimestamps[1],
+        fps: plan.fps,
+      }) - shot.startFrame,
   };
 }
-
 /**
  * Retimes a storyboard's narration cues from manually aligned SRT blocks with
  * exact text verification, attaching `audio` as `narrationTrack`. Performs no

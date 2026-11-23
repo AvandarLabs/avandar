@@ -4,7 +4,7 @@ import { WordMaskedLine } from "./WordMaskedLine";
 import type { TypographySceneProps } from "../scenes.types";
 import type { ReactNode } from "react";
 
-type TypographyLineOptions = TypographySceneProps & {
+type Props = TypographySceneProps & {
   line: string;
   fontSize: number;
   isCaption: boolean;
@@ -27,7 +27,7 @@ export function TypographyLine({
   emphasis = [],
   revealMode = "word-mask",
   wordStaggerFrames = 3,
-}: TypographyLineOptions): ReactNode {
+}: Readonly<Props>): ReactNode {
   const getWordStyle = TypographySceneShared.useWordStyle({
     fontSize,
     isCaption,
@@ -35,16 +35,13 @@ export function TypographyLine({
   });
   const words = line.split(/\s+/);
   const lineProps = { frame, words, fontSize, isCentered, revealAt };
-  if (revealMode !== "word-mask") {
-    return (
-      <RevealedLine
-        {...lineProps}
-        revealMode={revealMode}
-        getWordStyle={getWordStyle}
-      />
-    );
-  }
-  return (
+  return revealMode !== "word-mask" ? (
+    <RevealedLine
+      {...lineProps}
+      revealMode={revealMode}
+      getWordStyle={getWordStyle}
+    />
+  ) : (
     <WordMaskedLine
       {...lineProps}
       wordStaggerFrames={wordStaggerFrames}

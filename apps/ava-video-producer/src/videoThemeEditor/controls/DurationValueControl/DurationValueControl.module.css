@@ -1,12 +1,12 @@
-.durationValueRow {
+.durationValueControlRow {
   min-width: 0;
 }
 
-.durationValueInput {
+.durationValueControlInput {
   flex: 0 0 var(--atlas-size-112);
 }
 
-.durationValueReadout {
+.durationValueControlReadout {
   color: var(--atlas-color-muted);
   font: var(--atlas-font-size-11) var(--mono);
   white-space: nowrap;
@@ -14,7 +14,7 @@
 
 /* On a phone, descriptions are 12px. */
 @media (width <= 760px) {
-  .durationValueReadout {
+  .durationValueControlReadout {
     font-size: var(--atlas-font-size-12);
   }
 }

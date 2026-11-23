@@ -48,11 +48,7 @@ export const inputSchema = z
       input.subjects.some(({ values }) => {
         return (
           values.length !== ids.size ||
-          new Set(
-            values.map(({ measureId }) => {
-              return measureId;
-            }),
-          ).size !== ids.size ||
+          new Set(values.map(prop("measureId"))).size !== ids.size ||
           values.some(({ measureId }) => {
             return !ids.has(measureId);
           })

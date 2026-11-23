@@ -1,17 +1,17 @@
 import { useVideoMotion } from "../../../videoTheme/useVideoMotion";
-import { useVideoTheme } from "../../../videoTheme/useVideoTheme";
+import { useVideoTheme } from "../../../videoTheme/videoThemeHelpers";
 import { CHIP_CLICK, CHIPS, LIT_CHIP } from "../timeline";
 import { FilterChip } from "./FilterChip";
-import { SidePanelShared } from "./SidePanelShared/SidePanelShared";
+import { SidePanelShared } from "./SidePanelShared";
 import type { ReactNode } from "react";
-/** Animates the handoff from all channels to paid channels for `SidePanel`. */
-export function FilterChips({
-  frame,
-  chipOn,
-}: {
+
+type Props = {
   frame: number;
   chipOn: number;
-}): ReactNode {
+};
+
+/** Animates the handoff from all channels to paid channels for `SidePanel`. */
+export function FilterChips({ frame, chipOn }: Readonly<Props>): ReactNode {
   const { mantine } = useVideoTheme();
   const motion = useVideoMotion();
   const chipPress = motion.press(

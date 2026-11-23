@@ -1,12 +1,15 @@
-import { StockRect } from "../../../primitives/StockRect/StockRect";
+import { StockRect } from "../../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { MaterialBoundaryShared } from "./MaterialBoundaryShared/MaterialBoundaryShared";
+import { MaterialBoundaryShared } from "./MaterialBoundaryShared";
 import type { ReactNode } from "react";
+
+type Props = { frame: number; isAppliance: boolean };
+
 /** The output assembly's own shell, appearing once parts are assembled. */
 export function OutputShell({
   frame,
   isAppliance,
-}: Readonly<{ frame: number; isAppliance: boolean }>): ReactNode {
+}: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const motion = GraphicThemeHooks.useGraphicMotion();
   const scales = GraphicThemeHooks.useGraphicShapeScales();

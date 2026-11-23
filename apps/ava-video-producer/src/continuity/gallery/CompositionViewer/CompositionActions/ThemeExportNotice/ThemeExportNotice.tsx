@@ -3,7 +3,7 @@ import css from "./ThemeExportNotice.module.css";
 import type {
   ThemeExportState,
   ThemeRefusalReason,
-} from "../../themeExportStateHelpers/themeExportStateHelpers";
+} from "../../ThemeExportState/ThemeExportState";
 import type { ReactNode } from "react";
 
 type Props = Readonly<{

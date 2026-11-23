@@ -1,4 +1,4 @@
-import { mix } from "../../../../motion";
+import { Motion } from "../../../../motion";
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getReachedIntervalsFromRoad } from "../getReachedIntervalsFromRoad";

@@ -1,19 +1,21 @@
 // Registers the bundled faces the theme's text roles name.
 import "../../fonts";
-import { mixToken } from "../../motion";
+import { Motion } from "../../motion";
 import { useVideoMotion } from "../../videoTheme/useVideoMotion";
 import { useVideoShapeScales } from "../../videoTheme/useVideoShapeScales";
-import { useVideoTheme } from "../../videoTheme/useVideoTheme";
-import { MotionLabShared } from "./MotionLabShared/MotionLabShared";
+import { useVideoTheme } from "../../videoTheme/videoThemeHelpers";
+import { MotionLabShared } from "./MotionLabShared";
 import type { ReactNode } from "react";
+
+type Props = {
+  frame: number;
+  active: number;
+};
 /** The button the click study presses, softening to its brand once active. */
 export function PreviewMotionButton({
   frame,
   active,
-}: {
-  frame: number;
-  active: number;
-}): ReactNode {
+}: Readonly<Props>): ReactNode {
   const { semantic, mantine, atomic } = useVideoTheme();
   const motion = useVideoMotion();
   const scales = useVideoShapeScales();
@@ -27,7 +29,11 @@ export function PreviewMotionButton({
         width: 340,
         height: 74,
         borderRadius: scales.corner(semantic.corner.card),
-        background: mixToken(active, scene.brand, scene.brandSoft),
+        background: Motion.mixToken({
+          t: active,
+          from: scene.brand,
+          to: scene.brandSoft,
+        }),
         border: `${scales.stroke(semantic.stroke.hairline)}px solid ${scene.brand}`,
         display: "flex",
         alignItems: "center",

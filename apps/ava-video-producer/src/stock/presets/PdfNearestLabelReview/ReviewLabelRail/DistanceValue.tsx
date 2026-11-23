@@ -1,10 +1,15 @@
-import { ramp } from "../../../../motion";
+import { Motion } from "../../../../motion";
 import { LiteralDataText } from "../../../primitives/LiteralDataText/LiteralDataText";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ReviewTiming } from "../ReviewTiming";
 import type { ReactNode } from "react";
 
-type Props = { labelId: string; distance: number; y: number; frame: number };
+type Props = {
+  labelId: string;
+  distance: number;
+  y: number;
+  frame: number;
+};
 /** The measured distance, shown while the measure holds. */
 export function DistanceValue({
   labelId,
@@ -16,12 +21,12 @@ export function DistanceValue({
   return (
     <g
       data-distance-value={labelId}
-      opacity={ramp(
+      opacity={Motion.ramp({
         frame,
-        ReviewTiming.MEASURE_CUE,
-        ReviewTiming.STATUS_CUE - ReviewTiming.MEASURE_CUE,
-        motion.reveal.easing,
-      )}
+        at: ReviewTiming.MEASURE_CUE,
+        dur: ReviewTiming.STATUS_CUE - ReviewTiming.MEASURE_CUE,
+        easing: motion.reveal.easing,
+      })}
     >
       <LiteralDataText
         value={`≈ ${distance.toPrecision(3)}`}

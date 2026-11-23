@@ -1,4 +1,4 @@
-import { useVideoTheme } from "../../../videoTheme/useVideoTheme";
+import { useVideoTheme } from "../../../videoTheme/videoThemeHelpers";
 import type { ReactNode } from "react";
 /** States the publication result and audience size for `PublishedToast`. */
 export function PublishedToastText(): ReactNode {

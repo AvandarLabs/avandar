@@ -1,14 +1,15 @@
-import { FitText } from "../../primitives/FitText/FitText";
-import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { ReunionInvitation } from "./ReunionInvitation";
-import { ReunionMember } from "./ReunionMember";
+import { InvitationAndGroupMembers } from "./InvitationAndGroupMembers";
+import { MeetingPlaceAndLabel } from "./MeetingPlaceAndLabel";
+import { ReunionGroupCaption } from "./ReunionGroupCaption";
+import { ReunionScenarioCaption } from "./ReunionScenarioCaption";
 import { DEFAULT_INPUT } from "./VoluntaryFamilyReunion.fixtures";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./VoluntaryFamilyReunion.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
+
 /**
  * Independent voluntary acceptance precedes travel and an individual greeting.
  */
@@ -25,72 +26,28 @@ export function VoluntaryFamilyReunion({
   const halfWidth = (numMembers - 1) * 45 + 35;
   return (
     <g>
-      <SketchedShape
-        shape={{
-          kind: "path",
-          d: `M70 405 H890 M${480 - halfWidth} 340 V405 M${480 + halfWidth} 340 V405 M${470 - halfWidth} 340 L480 310 L${490 + halfWidth} 340`,
-        }}
-        profile={tokens.sketch.shape}
-        fill="none"
-        stroke={tokens.color.line}
-        strokeWidth={scales.stroke(tokens.stroke.default)}
-      />
-      <FitText
-        text={input.meetingLabel}
-        x={480}
-        y={62}
-        width={820}
-        fontSize={16}
-        maxLines={2}
-        anchor="middle"
-        breakLongWords
-        normalizeWhitespace
+      <MeetingPlaceAndLabel
+        input={input}
+        tokens={tokens}
+        scales={scales}
+        halfWidth={halfWidth}
       />
       {input.groups.map((group, groupIndex) => {
         return (
           <g key={group.id}>
-            <FitText
-              text={group.label}
-              x={groupIndex === 0 ? 60 : 580}
-              y={132}
-              width={320}
-              fontSize={14}
-              maxLines={3}
-              breakLongWords
-              normalizeWhitespace
-            />
-            <ReunionInvitation
+            <ReunionGroupCaption group={group} groupIndex={groupIndex} />
+            <InvitationAndGroupMembers
               input={input}
-              groupIndex={groupIndex}
               frame={frame}
-              accent={groupIndex === 0 ? accent : tokens.color.highlight}
+              accent={accent}
+              tokens={tokens}
+              group={group}
+              groupIndex={groupIndex}
             />
-            {group.members.map((member, index) => {
-              return (
-                <ReunionMember
-                  key={member.id}
-                  member={member}
-                  index={index}
-                  groupIndex={groupIndex}
-                  input={input}
-                  frame={frame}
-                  accent={groupIndex === 0 ? accent : tokens.color.highlight}
-                />
-              );
-            })}
           </g>
         );
       })}
-      <FitText
-        text={input.scenarioCaption}
-        x={50}
-        y={570}
-        width={860}
-        fontSize={12}
-        maxLines={2}
-        breakLongWords
-        normalizeWhitespace
-      />
+      <ReunionScenarioCaption input={input} />
     </g>
   );
 }

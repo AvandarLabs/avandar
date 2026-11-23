@@ -1,5 +1,5 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { FolioCopies } from "./FolioCopies";
 import { FolioCover } from "./FolioCover";

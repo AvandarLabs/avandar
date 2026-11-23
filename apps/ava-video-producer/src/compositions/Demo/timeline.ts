@@ -7,20 +7,33 @@ export const DEMO_LEN = 414;
 
 /* ------------------------------------------------------------ beat sheet -- */
 
+/** Frame when the demo app starts arriving. */
 export const APP_IN = 0;
+/** Frame when the demo pointer clicks the prompt field. */
 export const FIELD_CLICK = 20;
+/** Frame when the demo prompt starts typing. */
 export const TYPE_AT = 26;
+/** Frame when the demo pointer clicks the run button. */
 export const RUN_CLICK = 88;
+/** Frame when the demo result rows start arriving. */
 export const ROWS_AT = 96;
+/** Frame when the demo result counter begins. */
 export const COUNT_AT = 100;
+/** Frame when the demo pointer selects the paid-channel filter. */
 export const CHIP_CLICK = 184;
+/** Frame when the demo result rows begin applying the filter. */
 export const REFILTER_AT = 190;
+/** Frame when the demo pointer clicks the publish button. */
 export const PUBLISH_CLICK = 274;
+/** Frame when the demo publication toast starts appearing. */
 export const TOAST_AT = 282;
+/** Frame when the demo app begins leaving. */
 export const OUT_AT = 380;
 
+/** Fictional query typed into the demo prompt field. */
 export const PROMPT = "Revenue by channel, last quarter";
 
+/** Frames that trigger demo pointer click feedback. */
 export const CLICKS = [FIELD_CLICK, RUN_CLICK, CHIP_CLICK, PUBLISH_CLICK];
 
 /* The pointer path. Keys are absolute frames; trackPos eases between them,
@@ -48,6 +61,7 @@ export const CLICKS = [FIELD_CLICK, RUN_CLICK, CHIP_CLICK, PUBLISH_CLICK];
 const HOLD = 8; // press() runs DUR.press * 2 = 8 frames; outlast it
 
 /* Targets measured off a rendered frame, not estimated from the CSS. */
+/** Position keys and click holds for the demo pointer choreography. */
 export const POINTER = [
   { at: 0, x: 860, y: 700 },
   { at: FIELD_CLICK - 14, x: 420, y: 194 },
@@ -62,15 +76,21 @@ export const POINTER = [
 
 /* ------------------------------------------------------------- geometry -- */
 
+/** Canvas width of the generic demo composition. */
 export const W = 1600;
+/** Bounds of the demo prompt field in canvas pixels. */
 export const FIELD = { x: 48, y: BODY_Y + 50, w: 1504, h: 72 };
+/** Bounds of the demo results panel in canvas pixels. */
 export const RESULTS = { x: 48, y: 262, w: 980, h: 596 };
+/** Bounds of the demo side panel in canvas pixels. */
 export const SIDE = { x: 1060, y: 262, w: 492, h: 596 };
+/** Bounds of the demo publish button in canvas pixels. */
 export const PUBLISH = { x: 1060, y: 884, w: 492, h: 68 };
 
 /* Bars are proportional to the figures beside them: 0.92 is the widest, and
  * every other bar is n/1204 of it. A chart whose bars disagree with its own
  * numbers is the kind of thing a viewer cannot name but does register. */
+/** Ordered fictional channel results displayed by the demo. */
 export const ROWS = [
   { label: "Organic search", bar: 0.92, n: 1204, paid: false },
   { label: "Paid social", bar: 0.6, n: 786, paid: true },
@@ -79,8 +99,12 @@ export const ROWS = [
   { label: "Referral", bar: 0.13, n: 171, paid: false },
 ];
 
+/** Displayed total across all fictional demo channel results. */
 export const TOTAL_ALL = 3062; // the five rows above
+/** Displayed total across paid fictional demo channel results. */
 export const TOTAL_PAID = 1298; // the two marked paid
 
+/** Ordered channel filter labels displayed by the demo. */
 export const CHIPS = ["All channels", "Paid only", "Organic"];
+/** Index of the selected paid-channel filter in the demo. */
 export const LIT_CHIP = 1;

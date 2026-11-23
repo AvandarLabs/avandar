@@ -1,0 +1,11 @@
+.objectDepartureDemoCentered {
+  align-items: center;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+}
+
+.objectDepartureDemoDiagramFrame {
+  border: var(--demo-stroke-hairline) solid var(--demo-line);
+  border-radius: var(--demo-corner-cell);
+}

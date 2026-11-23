@@ -20,10 +20,10 @@ export function HandoverLabels({ input }: Readonly<Props>): ReactNode {
   ];
   return (
     <g>
-      {labels.map(([text, x, y, width, fontSize, maxLines], index) => {
+      {labels.map(([text, x, y, width, fontSize, maxLines]) => {
         return (
           <FitText
-            key={index}
+            key={`${x}:${y}`}
             text={text}
             x={x}
             y={y}

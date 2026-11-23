@@ -1,15 +1,13 @@
-import { loopPhase } from "../motion";
-import { STOCK_LOOP_FRAMES } from "../stock/catalog";
+import { Motion } from "../motion";
+import { STOCK_LOOP_FRAMES } from "../stock/stockEntry";
 import { StockGraphic } from "../stock/StockGraphic/StockGraphic";
-import { useVideoTokens } from "../videoTheme/useVideoTheme";
-import { SceneShell } from "./SceneShell";
+import { useVideoTokens } from "../videoTheme/videoThemeHelpers";
+import { SceneShell } from "./SceneShell/SceneShell";
 import type { StockRequest } from "../stock/contracts/StockContract.types";
 import type { SceneBase } from "./scenes.types";
 import type { ReactNode } from "react";
-
 /** Storyboard heading and frame context around a typed stock request. */
 export type Props = SceneBase & StockRequest;
-
 /**
  * Conceptual stock graphics repeat their six-second cycle; authored content is
  * preserved. The graphic sits on the request's background, or the theme's
@@ -45,7 +43,12 @@ export function StockScene({
       >
         <StockGraphic
           {...request}
-          frame={loopPhase(frame, STOCK_LOOP_FRAMES) * STOCK_LOOP_FRAMES}
+          frame={
+            Motion.loopPhase({
+              frame,
+              period: STOCK_LOOP_FRAMES,
+            }) * STOCK_LOOP_FRAMES
+          }
           width={width}
           height={height - top}
         />

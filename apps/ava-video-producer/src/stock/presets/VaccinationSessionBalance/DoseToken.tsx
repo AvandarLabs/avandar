@@ -1,5 +1,5 @@
 import { propEq } from "@avandar/utils";
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./VaccinationSessionBalance.schema";
 import type { ReactNode } from "react";
@@ -34,8 +34,16 @@ export function DoseToken({
       data-dose={unit.id}
       data-outcome={unit.outcome}
       data-recipient-id={unit.recipientId ?? undefined}
-      x={mix(progress, 60 + (index % 4) * 48, destinationX)}
-      y={mix(progress, 225 + Math.floor(index / 4) * 60, destinationY)}
+      x={Motion.mix({
+        t: progress,
+        from: 60 + (index % 4) * 48,
+        to: destinationX,
+      })}
+      y={Motion.mix({
+        t: progress,
+        from: 225 + Math.floor(index / 4) * 60,
+        to: destinationY,
+      })}
       width={11}
       height={16}
       rx={scales.corner(3)}
@@ -51,7 +59,10 @@ export function DoseToken({
 function _getDoseDestination({
   input,
   unit,
-}: Readonly<{ input: Input; unit: Props["unit"] }>) {
+}: Readonly<{
+  input: Input;
+  unit: Props["unit"];
+}>) {
   const peers = input.units.filter((item) => {
     return (
       item.outcome === unit.outcome &&
@@ -60,7 +71,13 @@ function _getDoseDestination({
   });
   const position = peers.findIndex(propEq("id", unit.id));
   const recipientIndex = input.recipients.findIndex(
-    propEq<{ id: unknown }, "id", unknown>("id", unit.recipientId),
+    propEq<
+      {
+        id: unknown;
+      },
+      "id",
+      unknown
+    >("id", unit.recipientId),
   );
   const destinationX =
     unit.outcome === "administered"

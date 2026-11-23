@@ -1,18 +1,21 @@
 import { test, expect } from "@playwright/test";
+import { ShowcaseScreenshots } from "../helpers/ShowcaseScreenshots";
 import { getDashboardContinuityFromPlayback } from "./helpers/getDashboardContinuityFromPlayback";
 
 test("the dashboard retains all six bars during continuous composition playback", async ({
   page,
   baseURL,
 }) => {
-  const result = await getDashboardContinuityFromPlayback(page, baseURL);
+  const result = await getDashboardContinuityFromPlayback({
+    page,
+    baseUrl: baseURL,
+  });
   expect(result).toEqual({
     replacements: 0,
     emptyFrames: 0,
     originalChartConnected: true,
   });
 });
-
 test("composition search finds retrieval tags and shows creative direction", async ({
   page,
 }) => {
@@ -37,13 +40,14 @@ test("composition search finds retrieval tags and shows creative direction", asy
     "Keep the movement purposeful and traceable",
   );
   await guide.locator("dl").screenshot({
-    path: "../../.temp/feat-motion-catalog/composition-reuse-metadata.png",
+    path: ShowcaseScreenshots.getPathFromFilename({
+      filename: "composition-reuse-metadata.png",
+    }),
   });
   await page.keyboard.press("Escape");
   await search.fill("purposeful and traceable");
   await expect(cards).toHaveCount(1);
 });
-
 test("composition categories filter the cards and count their entries", async ({
   page,
 }) => {

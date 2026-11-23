@@ -1,13 +1,12 @@
-import { StockRect } from "../../../primitives/StockRect/StockRect";
+import { StockRect } from "../../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { ByteItemShared } from "./ByteItemShared/ByteItemShared";
+import { ByteItemShared } from "./ByteItemShared";
 import type { ReactNode } from "react";
+
+type Props = { itemId: string; x: number; y: number };
+
 /** The item's identity tab, kept even when it holds zero bytes. */
-export function CountTab({
-  itemId,
-  x,
-  y,
-}: Readonly<{ itemId: string; x: number; y: number }>): ReactNode {
+export function CountTab({ itemId, x, y }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (

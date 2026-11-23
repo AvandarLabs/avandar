@@ -1,5 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getDrillRecordLayoutFromInputAndFrame } from "./getDrillRecordLayoutFromInputAndFrame";
 import type { Input } from "./NestedDrilldownWindow.schema";

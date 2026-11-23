@@ -5,7 +5,9 @@ import { WINDOW_BOXES } from "../windowTilt";
 import { WindowMotion } from "./WindowMotion";
 
 const canvas = { width: 1920, height: 1080 };
+
 const box = { x: 678, y: 188, width: 1158, height: 724 };
+
 test("a whip entrance starts beyond the right edge and settles at the resting tilt", () => {
   const start = WindowMotion.getWhipEntrance({ frame: 1, at: 1, canvas, box });
   assert.ok(box.x + start.translateX >= canvas.width);
@@ -23,6 +25,7 @@ test("a whip entrance starts beyond the right edge and settles at the resting ti
   );
   assert.equal(settled.blurX, 0);
 });
+
 test("a whip exit accelerates past the left edge with growing blur", () => {
   assert.equal(
     WindowMotion.getWhipExit({ frame: 99, at: 100, box }).translateX,
@@ -39,6 +42,7 @@ test("a whip exit accelerates past the left edge with growing blur", () => {
       0,
   );
 });
+
 test("a whip exit with a longer duration is still on screen when the default would be gone", () => {
   const offscreen = (frame: number, durationInFrames?: number) => {
     return (
@@ -58,14 +62,16 @@ test("a whip exit with a longer duration is still on screen when the default wou
       WindowMotion.getWhipExit({ frame: 105, at: 100, box }).translateX,
   );
 });
+
 test("the tall window box is taller than the default box and stays on the canvas", () => {
   assert.ok(WINDOW_BOXES.tall.height > WINDOW_BOXES.default.height);
   assert.ok(WINDOW_BOXES.tall.y < WINDOW_BOXES.default.y);
-  for (const windowBox of Object.values(WINDOW_BOXES)) {
+  Object.values(WINDOW_BOXES).forEach((windowBox) => {
     assert.ok(windowBox.x + windowBox.width <= 1);
     assert.ok(windowBox.y + windowBox.height <= 1);
-  }
+  });
 });
+
 test("the carousel slides the next window in on top and swaps a cut window at once", () => {
   const windows = [
     {},
@@ -85,6 +91,7 @@ test("the carousel slides the next window in on top and swaps a cut window at on
     progress: 1,
   });
 });
+
 test("a carousel's outgoing window stays opaque until the incoming one mostly covers it", () => {
   assert.equal(
     WindowMotion.getCarouselPoses({ progress: 0.3, box }).outgoing.opacity,
@@ -106,6 +113,7 @@ test("a carousel's outgoing window stays opaque until the incoming one mostly co
       0,
   );
 });
+
 test("a pull-back holds the footage full-bleed until it starts, then lands in the box", () => {
   const enter = { kind: "pull-back" as const, atFrame: 30 };
   const before = WindowMotion.getPullBack({ frame: 29, enter, canvas, box });
@@ -115,6 +123,7 @@ test("a pull-back holds the footage full-bleed until it starts, then lands in th
   assert.deepEqual(landed.rect, box);
   assert.equal(landed.tilt, 1);
 });
+
 test("a flip-split card is hidden before it starts", () => {
   assert.equal(
     WindowMotion.getFlipSplit({ frame: 0, at: 1, canvasWidth: canvas.width })
@@ -122,6 +131,7 @@ test("a flip-split card is hidden before it starts", () => {
     0,
   );
 });
+
 test("a flip-split card turns in nearly edge-on, then splits into two windows", () => {
   const start = WindowMotion.getFlipSplit({
     frame: 1,
@@ -143,6 +153,7 @@ test("a flip-split card turns in nearly edge-on, then splits into two windows", 
     1,
   );
 });
+
 test("a window camera scales the window about its anchor and blurs only while moving", () => {
   const keys = [
     { at: 0, x: 0, y: 0.5, zoom: 1 },
@@ -157,6 +168,7 @@ test("a window camera scales the window about its anchor and blurs only while mo
   assert.equal(held.blurX, 0);
   assert.equal(held.originX, 0);
 });
+
 test("a later headline replaces the earlier one, which fades out just before it", () => {
   const headlines = [{ atFrame: 1 }, { atFrame: 60 }];
   assert.deepEqual(WindowMotion.getActiveHeadline({ frame: 30, headlines }), {
@@ -171,6 +183,7 @@ test("a later headline replaces the earlier one, which fades out just before it"
     1,
   );
 });
+
 test("scroll steps jump the content to each authored offset in turn", () => {
   const steps = [
     { atFrame: 20, offset: 0.3 },
@@ -180,6 +193,7 @@ test("scroll steps jump the content to each authored offset in turn", () => {
   assert.equal(WindowMotion.getScrollOffset({ frame: 40, steps }), 0.3);
   assert.equal(WindowMotion.getScrollOffset({ frame: 80, steps }), 0.6);
 });
+
 test("a whip entrance lands after its authored duration", () => {
   const moving = WindowMotion.getWhipEntrance({
     frame: 18,
@@ -199,6 +213,7 @@ test("a whip entrance lands after its authored duration", () => {
   assert.equal(landed.translateX, 0);
   assert.equal(landed.blurX, 0);
 });
+
 test("side entrances bring the left window from the left edge and the right one from the right", () => {
   const left = { x: 67, y: 194, width: 791, height: 664 };
   const right = { x: 1060, y: 194, width: 791, height: 664 };
@@ -240,6 +255,7 @@ test("side entrances bring the left window from the left edge and the right one 
     }).translateX > 0,
   );
 });
+
 test("a stepped reveal clips the window to rising columns, then lets go", () => {
   const reveal = { columns: 4, durationInFrames: 4 };
   assert.match(
@@ -260,6 +276,7 @@ test("a stepped reveal clips the window to rising columns, then lets go", () => 
     {},
   );
 });
+
 test("an in-out pull-back starts gently and passes the halfway box at its midpoint", () => {
   const word = { kind: "pull-back" as const, atFrame: 0, durationInFrames: 10 };
   const inOut = { ...word, ease: "inOut" as const };

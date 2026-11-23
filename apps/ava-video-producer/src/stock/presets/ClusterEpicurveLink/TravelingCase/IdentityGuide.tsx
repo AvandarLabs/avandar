@@ -1,12 +1,15 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { type Props } from "./TravelingCaseShared.types";
+import { type Props as TravelingCaseSharedProps } from "./TravelingCaseShared.types";
 import type { ReactNode } from "react";
+
+type Props = Pick<TravelingCaseSharedProps, "position" | "accent">;
+
 /** The dashed guide from a case's map record to its histogram segment. */
 export function IdentityGuide({
   position: { record, mapX, mapY, histogramX, histogramY },
   accent,
-}: Readonly<Pick<Props, "position" | "accent">>): ReactNode {
+}: Readonly<Props>): ReactNode {
   const { atomic } = GraphicThemeHooks.useGraphicTheme();
   const tokens = GraphicThemeHooks.useGraphicTokens();
   return (

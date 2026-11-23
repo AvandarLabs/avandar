@@ -1,6 +1,6 @@
 import { mkdir, readdir, readFile, rm } from "node:fs/promises";
 import path from "node:path";
-import { getProductRootFromProducerRoot } from "../lib/productSourceHelpers";
+import { ProductSources } from "../lib/ProductSources";
 import { refreshPalette } from "./refreshPalette";
 import type { Alias, Plugin } from "vite";
 
@@ -52,7 +52,7 @@ export function makePublicFileAliasesFromAppRoot(appRoot: string): Alias[] {
 
 /** Avandar theme sources whose edits refresh the gallery palette. */
 async function _findThemeSourceFiles(appRoot: string): Promise<string[]> {
-  const product = getProductRootFromProducerRoot(appRoot);
+  const product = ProductSources.getProductRootFromProducerRoot(appRoot);
   const themeDirectory = path.join(product, "src/config/Theme");
   const entries = await readdir(themeDirectory, {
     withFileTypes: true,

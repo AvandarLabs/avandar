@@ -19,8 +19,12 @@ export function LabelSlots({ labels }: Readonly<Props>): ReactNode {
     <g>
       {labels.map(([text, x, y, width, fontSize, maxLines], index) => {
         return (
-          <FitText
-            key={index}
+          // prettier-ignore
+          // Callers supply ordered physical label slots, including
+          // moving slots. Copy and coordinates change while the
+          // slot identity remains fixed.
+          // react-doctor-disable-next-line no-array-index-as-key
+          <FitText key={index}
             text={text}
             x={x}
             y={y}

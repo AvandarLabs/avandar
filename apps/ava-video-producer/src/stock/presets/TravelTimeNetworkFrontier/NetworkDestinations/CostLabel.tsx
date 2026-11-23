@@ -1,14 +1,14 @@
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getTravelCostsFromInput } from "../getTravelCostsFromInput";
 import type { ReactNode } from "react";
-/** The destination's shortest travel cost, right-aligned in the ledger. */
-export function CostLabel({
-  node,
-  index,
-}: Readonly<{
+
+type Props = {
   node: ReturnType<typeof getTravelCostsFromInput>[number];
   index: number;
-}>): ReactNode {
+};
+
+/** The destination's shortest travel cost, right-aligned in the ledger. */
+export function CostLabel({ node, index }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <text

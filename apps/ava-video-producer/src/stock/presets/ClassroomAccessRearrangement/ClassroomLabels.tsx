@@ -46,10 +46,10 @@ export function ClassroomLabels({ input, frame }: Readonly<Props>): ReactNode {
   ];
   return (
     <g>
-      {slots.map(([text, x, y, width, fontSize, maxLines, color], index) => {
+      {slots.map(([text, x, y, width, fontSize, maxLines, color]) => {
         return (
           <FitText
-            key={index}
+            key={`${x}:${y}`}
             {...{ text, x, y, width, fontSize, maxLines, color }}
             breakLongWords
             normalizeWhitespace

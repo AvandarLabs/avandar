@@ -1,8 +1,7 @@
-import { FitText } from "../../primitives/FitText/FitText";
-import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getExclusionFromFrame } from "./getExclusionFromFrame";
 import { SubscriptionMask } from "./SubscriptionMask";
+import { SubscriptionSourceValue } from "./SubscriptionSourceValue/SubscriptionSourceValue";
 import type { Input } from "./FilterSubscriptionScope.schema";
 import type { ReactNode } from "react";
 
@@ -41,32 +40,11 @@ export function SubscriptionRecord({
       : 1;
   return (
     <g>
-      <g
-        data-source-record={record.id}
-        data-excluded-row={excluded ? record.id : undefined}
-        opacity={opacity}
-      >
-        <text
-          x={x + 9}
-          y={y}
-          fill={accent}
-          fontSize={tokens.text.graphic.data.fontSize}
-          fontWeight={tokens.text.graphic.data.fontWeight}
-        >
-          {rowIndex + 1}
-        </text>
-        <LiteralDataText value={record.category} x={x + 30} y={y} />
-        <FitText
-          text={String(record.value)}
-          x={x + 30}
-          y={y + 18}
-          width={width - 42}
-          fontSize={12}
-          maxLines={2}
-          normalizeWhitespace
-          breakLongWords
-        />
-      </g>
+      <SubscriptionSourceValue
+        {...{ record, excluded, opacity, x, y, accent, tokens }}
+        rowIndex={rowIndex}
+        width={width}
+      />
       {excluded ? (
         <SubscriptionMask
           id={record.id}

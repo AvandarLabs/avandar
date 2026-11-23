@@ -1,8 +1,8 @@
-import { mix } from "../../motion";
+import { Motion } from "../../motion";
 import { StageTheme } from "../StageTheme/StageTheme";
-import { assertFrame, assertUnit, type Point, type Rect } from "./geometry";
-import { fitTextLines } from "./textLayout";
-import type { VideoMotion } from "../../videoTheme/createVideoMotion/createVideoMotion";
+import { type Point, type Rect, SceneGeometry } from "./SceneGeometry";
+import { TextLayout } from "./TextLayout";
+import type { VideoMotion } from "../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type {
   FlowStep,
   GraphEdge,
@@ -29,55 +29,68 @@ type EdgeHighlightOptions = {
   traversal: TraversalBeat[];
   motion?: VideoMotion;
 };
-export function validateGraph(
-  nodes: GraphNode[],
-  edges: GraphEdge[],
-  traversal: TraversalBeat[] = [],
-): void {
-  if (!nodes.length || nodes.length > 12)
-    throw new Error("GraphScene needs 1 to 12 nodes");
-  const ids = new Set<string>();
-  nodes.forEach((node) => {
-    if (!node.id || ids.has(node.id))
-      throw new Error(`Duplicate or empty graph node id: ${node.id}`);
-    if (!node.label.trim())
-      throw new Error(`Graph node ${node.id} needs a label`);
-    ids.add(node.id);
-    assertUnit(node.x, `${node.id}.x`);
-    assertUnit(node.y, `${node.id}.y`);
-  });
+/** Rejects invalid graph content and references before scene layout. */
+function _validateGraph({
+  nodes,
+  edges,
+  traversal = [],
+}: Readonly<{
+  nodes: GraphNode[];
+  edges: GraphEdge[];
+  traversal?: TraversalBeat[];
+}>): void {
+  const ids = _getValidatedGraphNodeIds(nodes);
   const edgeIds = new Set<string>();
   edges.forEach((edge) => {
-    if (!edge.id || edgeIds.has(edge.id))
+    if (!edge.id || edgeIds.has(edge.id)) {
       throw new Error(`Duplicate or empty edge id: ${edge.id}`);
-    if (!ids.has(edge.from) || !ids.has(edge.to) || edge.from === edge.to)
+    }
+    if (!ids.has(edge.from) || !ids.has(edge.to) || edge.from === edge.to) {
       throw new Error(`Invalid graph edge: ${edge.id}`);
+    }
     edgeIds.add(edge.id);
   });
   traversal.forEach((beat, index) => {
-    assertFrame(beat.atFrame, "traversal.atFrame");
-    if (!ids.has(beat.nodeId))
+    SceneGeometry.assertFrame({
+      value: beat.atFrame,
+      name: "traversal.atFrame",
+    });
+    if (!ids.has(beat.nodeId)) {
       throw new Error(`Unknown traversal node: ${beat.nodeId}`);
-    if (index && beat.atFrame <= traversal[index - 1].atFrame)
+    }
+    if (index && beat.atFrame <= traversal[index - 1].atFrame) {
       throw new Error("Traversal frames must be strictly increasing");
+    }
   });
 }
 /**
  * Normalized centers map inside a safe inset so edge nodes remain on canvas.
  */
-export function graphNodeRect(node: GraphNode, bounds: Rect): Rect {
+function _graphNodeRect({
+  node,
+  bounds,
+}: Readonly<{
+  node: GraphNode;
+  bounds: Rect;
+}>): Rect {
   const width = node.width
     ? node.width * bounds.width
     : Math.min(280, bounds.width * 0.205);
-  const label = fitTextLines(
-    [node.label],
-    width - 40,
-    node.detail ? 70 : 130,
-    25,
-    19,
-  );
+  const label = TextLayout.fitTextLines({
+    lines: [node.label],
+    width: width - 40,
+    height: node.detail ? 70 : 130,
+    requested: 25,
+    minimum: 19,
+  });
   const detail = node.detail
-    ? fitTextLines([node.detail], width - 40, 68, 19, 16)
+    ? TextLayout.fitTextLines({
+        lines: [node.detail],
+        width: width - 40,
+        height: 68,
+        requested: 19,
+        minimum: 16,
+      })
     : undefined;
   const height = Math.max(
     128,
@@ -97,20 +110,28 @@ export function graphNodeRect(node: GraphNode, bounds: Rect): Rect {
     height,
   };
 }
-export function rectCenter(rect: Rect): Point {
+/** Returns the center point of a scene canvas rectangle. */
+function _rectCenter(rect: Rect): Point {
   return { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
 }
 /** Ray/rectangle intersection keeps every connector out of the node text. */
-export function edgeEndpoints(
-  from: Rect,
-  to: Rect,
-): { start: Point; end: Point } {
-  const a = rectCenter(from);
-  const b = rectCenter(to);
+function _edgeEndpoints({
+  from,
+  to,
+}: Readonly<{
+  from: Rect;
+  to: Rect;
+}>): {
+  start: Point;
+  end: Point;
+} {
+  const a = _rectCenter(from);
+  const b = _rectCenter(to);
   const dx = b.x - a.x;
   const dy = b.y - a.y;
-  if (!dx && !dy)
+  if (!dx && !dy) {
     throw new Error("Connected graph nodes cannot share a center");
+  }
   const intersect = (box: Rect, origin: Point, x: number, y: number): Point => {
     const t = Math.min(
       x === 0 ? Infinity : box.width / 2 / Math.abs(x),
@@ -129,13 +150,20 @@ export const GRAPH_ITEM_GAP = 14;
  * two cards: `offset` from -1 to 1 shifts the edge sideways by up to half
  * the shorter card, so the edges run side by side instead of overlapping.
  */
-export function offsetEdgeEndpoints(
-  from: Rect,
-  to: Rect,
-  offset: number,
-): { start: Point; end: Point } {
-  const a = rectCenter(from);
-  const b = rectCenter(to);
+function _offsetEdgeEndpoints({
+  from,
+  to,
+  offset,
+}: Readonly<{
+  from: Rect;
+  to: Rect;
+  offset: number;
+}>): {
+  start: Point;
+  end: Point;
+} {
+  const a = _rectCenter(from);
+  const b = _rectCenter(to);
   const length = Math.hypot(b.x - a.x, b.y - a.y) || 1;
   const reach = (offset * Math.min(from.height, to.height)) / 2;
   // Perpendicular to the centre line, so the shift never changes its length.
@@ -144,7 +172,10 @@ export function offsetEdgeEndpoints(
   const shift = (rect: Rect) => {
     return { ...rect, x: rect.x + shiftX, y: rect.y + shiftY };
   };
-  return edgeEndpoints(shift(from), shift(to));
+  return _edgeEndpoints({
+    from: shift(from),
+    to: shift(to),
+  });
 }
 /** A dot travelling an edge during its own window of frames. */
 export type GraphPacket = {
@@ -156,7 +187,7 @@ export type GraphPacket = {
  * Where each packet currently travelling an edge is, for example a request
  * moving between two services. Packets outside their window are omitted.
  */
-export function getPacketPositions({
+function _getPacketPositions({
   frame,
   packets,
   start,
@@ -178,13 +209,25 @@ export function getPacketPositions({
         motion.travel.easing,
       );
       const along = packet.direction === "reverse" ? 1 - travel : travel;
-      return { x: mix(along, start.x, end.x), y: mix(along, start.y, end.y) };
+      return {
+        x: Motion.mix({
+          t: along,
+          from: start.x,
+          to: end.x,
+        }),
+        y: Motion.mix({
+          t: along,
+          from: start.y,
+          to: end.y,
+        }),
+      };
     });
 }
 /** A serpentine grid keeps a simple sequential process connected locally. */
-export function flowNodes(steps: FlowStep[]): GraphNode[] {
-  if (!steps.length || steps.length > 6)
+function _flowNodes(steps: FlowStep[]): GraphNode[] {
+  if (!steps.length || steps.length > 6) {
     throw new Error("FlowchartScene needs 1 to 6 steps");
+  }
   const columns = Math.min(3, steps.length);
   const rows = Math.ceil(steps.length / columns);
   return steps.map((step, index) => {
@@ -201,7 +244,7 @@ export function flowNodes(steps: FlowStep[]): GraphNode[] {
  * How lit a node is, 0 to 1: it lights over the chip duration when the
  * traversal reaches it and dims as the traversal moves on.
  */
-export function nodeHighlight({
+function _nodeHighlight({
   frame,
   nodeId,
   traversal,
@@ -230,7 +273,7 @@ export function nodeHighlight({
  * How far the traversal has drawn along an edge, 0 to 1, over the sheet
  * duration once it moves from the edge's source to its target.
  */
-export function edgeHighlight({
+function _edgeHighlight({
   frame,
   edge,
   traversal,
@@ -251,3 +294,67 @@ export function edgeHighlight({
   });
   return amount;
 }
+
+/** Validates authored nodes and returns their unique identities. */
+function _getValidatedGraphNodeIds(nodes: GraphNode[]): Set<string> {
+  if (!nodes.length || nodes.length > 12) {
+    throw new Error("GraphScene needs 1 to 12 nodes");
+  }
+  const ids = new Set<string>();
+  nodes.forEach((node) => {
+    if (!node.id || ids.has(node.id)) {
+      throw new Error(`Duplicate or empty graph node id: ${node.id}`);
+    }
+    if (!node.label.trim()) {
+      throw new Error(`Graph node ${node.id} needs a label`);
+    }
+    ids.add(node.id);
+    SceneGeometry.assertUnit({
+      value: node.x,
+      name: `${node.id}.x`,
+    });
+    SceneGeometry.assertUnit({
+      value: node.y,
+      name: `${node.id}.y`,
+    });
+  });
+
+  return ids;
+}
+
+/** Positions graph nodes, edges, packets, and highlights for diagram scenes. */
+export const GraphLayout = {
+  /** Rejects invalid graph content and references before scene layout. */
+  validateGraph: _validateGraph,
+  /**
+   * Normalized centers map inside a safe inset so edge nodes remain on canvas.
+   */
+  graphNodeRect: _graphNodeRect,
+  /** Returns the center point of a scene canvas rectangle. */
+  rectCenter: _rectCenter,
+  /** Ray/rectangle intersection keeps every connector out of the node text. */
+  edgeEndpoints: _edgeEndpoints,
+  /**
+   * Connector endpoints for one of several parallel edges between the same two
+   * cards: `offset` from -1 to 1 shifts the edge sideways by up to half the
+   * shorter card, so the edges run side by side instead of overlapping.
+   */
+  offsetEdgeEndpoints: _offsetEdgeEndpoints,
+  /**
+   * Where each packet currently travelling an edge is, for example a request
+   * moving between two services.
+   */
+  getPacketPositions: _getPacketPositions,
+  /** A serpentine grid keeps a simple sequential process connected locally. */
+  flowNodes: _flowNodes,
+  /**
+   * How lit a node is, 0 to 1: it lights over the chip duration when the
+   * traversal reaches it and dims as the traversal moves on.
+   */
+  nodeHighlight: _nodeHighlight,
+  /**
+   * How far the traversal has drawn along an edge, 0 to 1, over the sheet
+   * duration once it moves from the edge's source to its target.
+   */
+  edgeHighlight: _edgeHighlight,
+};

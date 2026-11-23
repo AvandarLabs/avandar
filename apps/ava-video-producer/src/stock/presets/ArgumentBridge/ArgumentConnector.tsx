@@ -1,4 +1,4 @@
-import { ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Props } from "./ArgumentBridge";
@@ -14,7 +14,12 @@ export function ArgumentConnector({
     <>
       <g
         data-connector="true"
-        opacity={ramp(frame, 60, motion.hero, motion.reveal.easing)}
+        opacity={Motion.ramp({
+          frame,
+          at: 60,
+          dur: motion.hero,
+          easing: motion.reveal.easing,
+        })}
       >
         <FitText
           text={input.connectorText}

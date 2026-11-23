@@ -25,10 +25,10 @@ export function MaterialQuantities({
   ];
   return (
     <g opacity={motion.reveal(frame, 108)}>
-      {values.map(({ value, x, y, width }, index) => {
+      {values.map(({ value, x, y, width }) => {
         return (
           <SceneLabel
-            key={index}
+            key={`${x}:${y}`}
             text={`${value} ${input.copy.unit}`}
             x={x}
             y={y}

@@ -1,20 +1,20 @@
 import { useVideoMotion } from "../../../videoTheme/useVideoMotion";
 import { useVideoShapeScales } from "../../../videoTheme/useVideoShapeScales";
-import { useVideoTheme } from "../../../videoTheme/useVideoTheme";
+import { useVideoTheme } from "../../../videoTheme/videoThemeHelpers";
 import { ROWS_AT } from "../timeline";
-import { SidePanelShared } from "./SidePanelShared/SidePanelShared";
+import { SidePanelShared } from "./SidePanelShared";
 import { TopChannelValue } from "./TopChannelValue/TopChannelValue";
 import type { ReactNode } from "react";
+
+type Props = {
+  frame: number;
+  refilter: number;
+};
+
 /**
  * Shows the period and current top channel beneath the count for `SidePanel`.
  */
-export function Facts({
-  frame,
-  refilter,
-}: {
-  frame: number;
-  refilter: number;
-}): ReactNode {
+export function Facts({ frame, refilter }: Readonly<Props>): ReactNode {
   const { semantic, mantine } = useVideoTheme();
   const motion = useVideoMotion();
   const scales = useVideoShapeScales();

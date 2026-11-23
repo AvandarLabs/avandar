@@ -1,13 +1,18 @@
 import { propEq } from "@avandar/utils";
-import { makeRedactedTextFromValue } from "../captureLib/sanitizeHelpers";
+import { CaptureSanitization } from "../captureLib/CaptureSanitization";
 import type { CaptureRun } from "./captureRun.types";
-
 /**
  * Marks a run, its active feature, and its remaining features failed, and
  * records the redacted error. `runCapture` calls it when a flow or the login
  * throws.
  */
-export function recordCaptureFailure(run: CaptureRun, error: unknown): void {
+export function recordCaptureFailure({
+  run,
+  error,
+}: Readonly<{
+  run: CaptureRun;
+  error: unknown;
+}>): void {
   const { manifest, elapsed, videoElapsed } = run.context;
   const { activeFeature } = run.session;
   manifest.status = "failed";
@@ -17,7 +22,7 @@ export function recordCaptureFailure(run: CaptureRun, error: unknown): void {
       (manifest.authentication.status === "passed"
         ? "capture"
         : "authentication"),
-    message: makeRedactedTextFromValue({
+    message: CaptureSanitization.makeRedactedTextFromValue({
       value: error instanceof Error ? error.message : error,
       secrets: run.secrets,
     }),

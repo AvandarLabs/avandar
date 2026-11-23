@@ -1,6 +1,6 @@
-import { mix, ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { TRANSFER_CUE } from "./evidenceTiming";
 import type { Input } from "./LateTypeEvidence.schema";
@@ -28,13 +28,17 @@ export function EvidenceOutputCell({
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const motion = GraphicThemeHooks.useGraphicMotion();
   const value = input.values[index];
-  const progress = ramp(
+  const progress = Motion.ramp({
     frame,
-    TRANSFER_CUE + index * motion.stagger.list,
-    motion.scale(TRANSFER_FRAMES),
-    motion.travel.easing,
-  );
-  const x = mix(progress, 88, 564),
+    at: TRANSFER_CUE + index * motion.stagger.list,
+    dur: motion.scale(TRANSFER_FRAMES),
+    easing: motion.travel.easing,
+  });
+  const x = Motion.mix({
+      t: progress,
+      from: 88,
+      to: 564,
+    }),
     y = 225 + index * 50;
   return frame >= TRANSFER_CUE ? (
     <g data-output-value={value} x={x} y={y + 26}>

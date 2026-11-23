@@ -1,4 +1,4 @@
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./PooledDonorAllocation.schema";
 /** Data for getDonorTrayFromInputAndFrame. */
 type GetDonorTrayResult = {

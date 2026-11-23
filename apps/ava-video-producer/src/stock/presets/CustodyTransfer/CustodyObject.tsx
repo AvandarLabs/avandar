@@ -47,8 +47,12 @@ export function CustodyObject({
           <FitText {...label} />
           {input.object.details.map((text, index) => {
             return (
-              <FitText
-                key={index}
+              // prettier-ignore
+              // Detail text occupies fixed stacked lines
+              // inside one object. Duplicate detail text is
+              // valid and has no independent state.
+              // react-doctor-disable-next-line no-array-index-as-key
+              <FitText key={index}
                 {...DETAILS}
                 text={text}
                 y={260 + index * 35}

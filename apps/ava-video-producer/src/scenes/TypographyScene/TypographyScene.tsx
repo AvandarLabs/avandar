@@ -1,20 +1,11 @@
-import { Img, staticFile } from "remotion";
 import { useVideoMotion } from "../../videoTheme/useVideoMotion";
-import { useVideoTheme } from "../../videoTheme/useVideoTheme";
-import {
-  assertFrame,
-  fitTextLines,
-  safePublicPath,
-  sceneBounds,
-} from "../layout/layout";
-import { positioned } from "../positioned";
-import { SceneShell } from "../SceneShell";
-import {
-  getLineRevealStyle,
-  getStagedExitStyle,
-  getTypographyRevealFrames,
-} from "../textReveal/textReveal";
-import { TypographyLine } from "./TypographyLine";
+import { useVideoTheme } from "../../videoTheme/videoThemeHelpers";
+import { SceneGeometry } from "../layout/SceneGeometry";
+import { TextLayout } from "../layout/TextLayout";
+import { SceneShell } from "../SceneShell/SceneShell";
+import { TextReveal } from "../TextReveal/TextReveal";
+import { TypographyContent } from "./TypographyContent/TypographyContent";
+import type { Rect } from "../layout/SceneGeometry";
 import type { TypographySceneProps as Props } from "../scenes.types";
 import type { ReactNode } from "react";
 /** Largest font size a `caption` typography shot uses. */
@@ -29,7 +20,11 @@ const ICON_SIZE = 160;
  * under an icon and leaving in a staged exit. A `caption` size sets one
  * small line, for example a teaser on an empty field.
  */
-export function TypographyScene(props: Props): ReactNode {
+export function TypographyScene({
+  lines,
+  ...scene
+}: Readonly<Props>): ReactNode {
+  const props = { lines, ...scene };
   const {
     frame,
     width = 1600,
@@ -37,7 +32,6 @@ export function TypographyScene(props: Props): ReactNode {
     title,
     kicker,
     headingReveal,
-    lines,
     align = "center",
     revealAtFrame = 6,
     wordStaggerFrames = 3,
@@ -47,106 +41,30 @@ export function TypographyScene(props: Props): ReactNode {
   _validate(props);
   const motion = useVideoMotion();
   const { spacing } = useVideoTheme().mantine;
-  const bounds = sceneBounds(width, height, Boolean(title || kicker));
-  const iconSize = icon ? (icon.size ?? ICON_SIZE) : 0;
-  const isCaption = size === "caption";
-  const fitted = fitTextLines(
-    lines,
-    bounds.width,
-    bounds.height - 56 - (icon ? iconSize + 48 : 0),
-    isCaption ? CAPTION_FONT_SIZE : (props.fontSize ?? 92),
-    isCaption ? CAPTION_MIN_FONT_SIZE : undefined,
-  );
-  const isCentered = align === "center";
-  const { iconAt = revealAtFrame, linesAt } = getTypographyRevealFrames({
+  const input = {
+    ...props,
+    width,
+    height,
+    align,
     revealAtFrame,
-    icon,
-    motion,
-  });
-  const wordStarts = _countWordsBefore(fitted.lines);
+    wordStaggerFrames,
+    size,
+  };
+  const layout = _getTypographyLayoutFromScene({ input, motion });
   return (
     <SceneShell {...{ frame, width, height, title, kicker, headingReveal }}>
-      <div
-        aria-label={lines.join(" ")}
-        style={{
-          ...positioned(bounds),
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: isCentered ? "center" : "flex-start",
-          gap: fitted.fontSize * 0.15,
-        }}
-      >
-        {icon ? (
-          <div
-            style={{
-              marginBottom: spacing["48"],
-              ...getStagedExitStyle({
-                frame,
-                exit: props.exit,
-                orderIndex: fitted.lines.length,
-                motion,
-              }),
-            }}
-          >
-            <Img
-              src={staticFile(safePublicPath(icon.src))}
-              alt=""
-              style={{
-                display: "block",
-                height: iconSize,
-                width: "auto",
-                ...getLineRevealStyle({
-                  frame,
-                  at: iconAt,
-                  mode: "line-fade",
-                  options: { rise: 0 },
-                  motion,
-                }),
-              }}
-            />
-          </div>
-        ) : null}
-        {fitted.lines.map((line, row) => {
-          return (
-            <div
-              key={row}
-              style={{
-                maxWidth: "100%",
-                ...getStagedExitStyle({
-                  frame,
-                  exit: props.exit,
-                  orderIndex: row,
-                  motion,
-                }),
-              }}
-            >
-              <TypographyLine
-                {...props}
-                line={line}
-                fontSize={fitted.fontSize}
-                isCaption={isCaption}
-                isCentered={isCentered}
-                revealAt={
-                  props.revealMode === undefined ||
-                  props.revealMode === "word-mask"
-                    ? linesAt + wordStarts[row] * wordStaggerFrames
-                    : linesAt +
-                      row * (props.lineStaggerFrames ?? motion.rise.stagger)
-                }
-              />
-            </div>
-          );
-        })}
-      </div>
+      <TypographyContent
+        {...layout}
+        {...{ frame, props, lines, motion, spacing, icon, wordStaggerFrames }}
+      />
     </SceneShell>
   );
 }
 /** The index of each line's first word across all lines. */
 function _countWordsBefore(lines: string[]): number[] {
   return lines.map((_, row) => {
-    return lines.slice(0, row).reduce((count, line) => {
-      return count + line.split(/\s+/).length;
+    return lines.slice(0, row).reduce((numWords, line) => {
+      return numWords + line.split(/\s+/).length;
     }, 0);
   });
 }
@@ -166,12 +84,82 @@ function _validate({
   ) {
     throw new Error("TypographyScene needs 1 to 6 nonempty lines");
   }
-  assertFrame(revealAtFrame, "revealAtFrame");
-  assertFrame(wordStaggerFrames, "wordStaggerFrames");
+  SceneGeometry.assertFrame({
+    value: revealAtFrame,
+    name: "revealAtFrame",
+  });
+  SceneGeometry.assertFrame({
+    value: wordStaggerFrames,
+    name: "wordStaggerFrames",
+  });
   if (wordStaggerFrames < 2) {
     throw new Error("wordStaggerFrames must be at least 2");
   }
   if (size === "caption" && fontSize !== undefined) {
     throw new Error("A caption size sets its own font size");
   }
+}
+
+type TypographyInput = Props &
+  Required<
+    Pick<
+      Props,
+      | "width"
+      | "height"
+      | "align"
+      | "revealAtFrame"
+      | "wordStaggerFrames"
+      | "size"
+    >
+  >;
+type TypographyLayout = {
+  bounds: Rect;
+  iconSize: number;
+  isCaption: boolean;
+  fitted: ReturnType<typeof TextLayout.fitTextLines>;
+  isCentered: boolean;
+  iconAt: number;
+  linesAt: number;
+  wordStarts: number[];
+};
+/** Fits statement copy, icon space and staged reveal offsets together. */
+function _getTypographyLayoutFromScene({
+  input,
+  motion,
+}: Readonly<{
+  input: TypographyInput;
+  motion: ReturnType<typeof useVideoMotion>;
+}>): TypographyLayout {
+  const bounds = SceneGeometry.sceneBounds({
+    width: input.width,
+    height: input.height,
+    hasHeading: Boolean(input.title || input.kicker),
+  });
+  const iconSize = input.icon ? (input.icon.size ?? ICON_SIZE) : 0;
+  const isCaption = input.size === "caption";
+  const fitted = TextLayout.fitTextLines({
+    lines: input.lines,
+    width: bounds.width,
+    height: bounds.height - 56 - (input.icon ? iconSize + 48 : 0),
+    requested: isCaption ? CAPTION_FONT_SIZE : (input.fontSize ?? 92),
+    minimum: isCaption ? CAPTION_MIN_FONT_SIZE : undefined,
+  });
+  const isCentered = input.align === "center";
+  const { iconAt = input.revealAtFrame, linesAt } =
+    TextReveal.getTypographyRevealFrames({
+      revealAtFrame: input.revealAtFrame,
+      icon: input.icon,
+      motion,
+    });
+  const wordStarts = _countWordsBefore(fitted.lines);
+  return {
+    bounds,
+    iconSize,
+    isCaption,
+    fitted,
+    isCentered,
+    iconAt,
+    linesAt,
+    wordStarts,
+  };
 }

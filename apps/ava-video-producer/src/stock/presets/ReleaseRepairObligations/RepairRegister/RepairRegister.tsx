@@ -1,8 +1,7 @@
 import { LabelSlots } from "../../../primitives/LabelSlots/LabelSlots";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getVisibleReleaseIssueRowsFromInput } from "../getVisibleReleaseIssueRowsFromInput";
-import { ObligationUnfold } from "./ObligationUnfold";
-import { RegisterEntry } from "./RegisterEntry";
+import { RepairRegisterRegisterIssue } from "./RepairRegisterRegisterIssue";
 import type { Input } from "../ReleaseRepairObligations.schema";
 import type { ReactNode } from "react";
 
@@ -12,6 +11,7 @@ type Props = {
   accent: string;
   artifactX: number;
 };
+
 /**
  * Open follow-ups unfold into keyed owner and due entries without resolution.
  */
@@ -40,30 +40,20 @@ export function RepairRegister({
               motion.scale(43),
             );
             return (
-              <g key={issue.id} data-register-issue={issue.id} opacity={unfold}>
-                <ObligationUnfold
-                  issueId={issue.id}
-                  source={{
-                    x: artifactX - (input.issueMarks === "tabs" ? 8 : 0),
-                    y: y - (input.issueMarks === "tabs" ? 0 : 12),
-                  }}
-                  lane={{
-                    x: 16 + index * 8,
-                    y: 420 + (followUps.length - 1 - index) * 3,
-                  }}
-                  x={60 + index * 220}
-                  opacity={
-                    (1 - motion.ramp(frame, 88, motion.scale(3))) * unfold
-                  }
-                  accent={accent}
-                />
-                <RegisterEntry
-                  issue={issue}
-                  ordinal={ordinal}
-                  x={60 + index * 220}
-                  accent={accent}
-                />
-              </g>
+              <RepairRegisterRegisterIssue
+                key={issue.id}
+                input={input}
+                frame={frame}
+                accent={accent}
+                artifactX={artifactX}
+                motion={motion}
+                followUps={followUps}
+                issue={issue}
+                y={y}
+                ordinal={ordinal}
+                index={index}
+                unfold={unfold}
+              />
             );
           })
         : undefined}

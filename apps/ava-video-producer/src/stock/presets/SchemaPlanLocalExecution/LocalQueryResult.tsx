@@ -1,3 +1,4 @@
+import { propEq } from "@avandar/utils";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
@@ -15,9 +16,7 @@ export function LocalQueryResult({
 }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const result = input.rows
-    .filter(({ category }) => {
-      return category === input.request.selectedCategory;
-    })
+    .filter(propEq("category", input.request.selectedCategory))
     .reduce((sum, { value }) => {
       return sum + value;
     }, 0);

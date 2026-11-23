@@ -7,9 +7,10 @@ type ProductionFilm = {
   player: HTMLIFrameElement;
   button: HTMLButtonElement;
   status: HTMLElement;
-  options: { captions?: boolean };
+  options: {
+    captions?: boolean;
+  };
 };
-
 /** Reads one production card's player, download button, and status line. */
 function _createFilmFromCard(card: HTMLElement): ProductionFilm {
   const player = card.querySelector<HTMLIFrameElement>("iframe");
@@ -20,11 +21,9 @@ function _createFilmFromCard(card: HTMLElement): ProductionFilm {
   }
   return { id: card.id, player, button, status, options: {} };
 }
-
 const films = [
   ...document.querySelectorAll<HTMLElement>(".production-card"),
 ].map(_createFilmFromCard);
-
 window.addEventListener("message", (event) => {
   if (event.origin !== window.location.origin || !event.data) {
     return;
@@ -50,7 +49,6 @@ window.addEventListener("message", (event) => {
     }
   });
 });
-
 async function _downloadFilmFromCard(film: ProductionFilm): Promise<void> {
   if (film.button.disabled) {
     return;
@@ -74,11 +72,10 @@ async function _downloadFilmFromCard(film: ProductionFilm): Promise<void> {
     film.button.removeAttribute("aria-busy");
   }
 }
-
 films.forEach((film) => {
   film.button.addEventListener("click", () => {
     return _downloadFilmFromCard(film);
   });
   film.player.src = film.player.dataset.src ?? "";
 });
-watchFilms(films.map(prop("player")));
+watchFilms({ players: films.map(prop("player")) });

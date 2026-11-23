@@ -1,7 +1,7 @@
 /** Observable semantic and motion assertions for the authored scene. */
 import assert from "node:assert/strict";
 import test from "node:test";
-import { propEq, prop } from "@avandar/utils";
+import { prop, propEq } from "@avandar/utils";
 import { registerStockDefaultTextAssertions } from "../../../../../tests/helpers/registerStockDefaultTextAssertions";
 import { registerStockPresetAssertions } from "../../../../../tests/helpers/registerStockPresetAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
@@ -20,28 +20,90 @@ import {
   getVisibleTexts,
 } from "./MapClusterUnfoldTestHelpers";
 
-test("grouping preserves every identity and returns to authored coordinates", () => {
-  [DEFAULT_INPUT, fixtures[2].input, fixtures[3].input].forEach((input) => {
-    [52, 75, 98, 120, 139, 150].forEach((frame) => {
-      const markup = render({ frame: frame, input: input });
-      const points = _marks({ markup, name: "point" });
-      assert.equal(points.length, input.points.length);
+function _assertPointsRetainAuthoredPositions({
+  initial,
+  final,
+  input,
+}: Readonly<{
+  initial: ReturnType<typeof _marks>;
+  final: ReturnType<typeof _marks>;
+  input: Readonly<Input>;
+}>): void {
+  initial.forEach((mark, i) => {
+    assert.equal(
+      _number({ markup: final[i], name: "cx" }),
+      _number({ markup: mark, name: "cx" }),
+    );
+    assert.equal(
+      _number({ markup: final[i], name: "cy" }),
+      _number({ markup: mark, name: "cy" }),
+    );
+    const point = input.points[i];
+    assert.equal(_number({ markup: final[i], name: "cx" }), 48 + point.x * 4.8);
+    assert.equal(
+      _number({ markup: final[i], name: "cy" }),
+      140 + point.y * 3.6,
+    );
+  });
+}
+
+function _assertPointIdentityAcrossFrames(input: Readonly<Input>): void {
+  [52, 75, 98, 120, 139, 150].forEach((frame) => {
+    const markup = render({ frame: frame, input: input });
+    const points = _marks({ markup, name: "point" });
+    assert.equal(points.length, input.points.length);
+    assert.equal(
+      new Set(
+        points.map((mark) => {
+          return _attribute({ markup: mark, name: "data-point" });
+        }),
+      ).size,
+      input.points.length,
+    );
+    assert.equal(
+      _number({
+        markup: _marks({ markup, name: "total" })[0],
+        name: "data-total",
+      }),
+      input.points.length,
+    );
+  });
+}
+
+function _assertGroupedLocationBadges(): void {
+  Array.from({ length: 18 }, (_, index) => {
+    return 82 + index;
+  }).forEach((frame) => {
+    const markup = render({ frame: frame }),
+      badges = _marks({ markup, name: "location-count" });
+    assert.deepEqual(
+      badges.map((badge) => {
+        return _number({ markup: badge, name: "data-location-count" });
+      }),
+      [2, 2],
+      `frame ${frame}`,
+    );
+    DEFAULT_INPUT.points.forEach((point, index) => {
+      const cluster = DEFAULT_INPUT.clusters.find(
+        propEq("id", point.clusterId),
+      )!;
+      const marker = _marks({ markup, name: "point" })[index];
       assert.equal(
-        new Set(
-          points.map((mark) => {
-            return _attribute({ markup: mark, name: "data-point" });
-          }),
-        ).size,
-        input.points.length,
+        _number({ markup: marker, name: "cx" }),
+        48 + cluster.x * 4.8,
       );
       assert.equal(
-        _number({
-          markup: _marks({ markup, name: "total" })[0],
-          name: "data-total",
-        }),
-        input.points.length,
+        _number({ markup: marker, name: "cy" }),
+        140 + cluster.y * 3.6,
       );
     });
+    assert.equal(_marks({ markup, name: "roster-point" }).length, 4);
+  });
+}
+
+test("grouping preserves every identity and returns to authored coordinates", () => {
+  [DEFAULT_INPUT, fixtures[2].input, fixtures[3].input].forEach((input) => {
+    _assertPointIdentityAcrossFrames(input);
     const grouped = _marks({
       markup: render({ frame: 98, input: input }),
       name: "cluster",
@@ -66,25 +128,7 @@ test("grouping preserves every identity and returns to authored coordinates", ()
         markup: render({ frame: 139, input: input }),
         name: "point",
       });
-    initial.forEach((mark, i) => {
-      assert.equal(
-        _number({ markup: final[i], name: "cx" }),
-        _number({ markup: mark, name: "cx" }),
-      );
-      assert.equal(
-        _number({ markup: final[i], name: "cy" }),
-        _number({ markup: mark, name: "cy" }),
-      );
-      const point = input.points[i];
-      assert.equal(
-        _number({ markup: final[i], name: "cx" }),
-        48 + point.x * 4.8,
-      );
-      assert.equal(
-        _number({ markup: final[i], name: "cy" }),
-        140 + point.y * 3.6,
-      );
-    });
+    _assertPointsRetainAuthoredPositions({ initial, final, input });
     if (input === DEFAULT_INPUT) {
       assert.notEqual(
         _number({ markup: initial[0], name: "cx" }),
@@ -201,34 +245,7 @@ test("roster leaders remain attached to each moving point identity", () => {
 });
 
 test("grouped map badges remain visible for every reviewed hold frame", () => {
-  Array.from({ length: 18 }, (_, index) => {
-    return 82 + index;
-  }).forEach((frame) => {
-    const markup = render({ frame: frame }),
-      badges = _marks({ markup, name: "location-count" });
-    assert.deepEqual(
-      badges.map((badge) => {
-        return _number({ markup: badge, name: "data-location-count" });
-      }),
-      [2, 2],
-      `frame ${frame}`,
-    );
-    DEFAULT_INPUT.points.forEach((point, index) => {
-      const cluster = DEFAULT_INPUT.clusters.find(
-        propEq("id", point.clusterId),
-      )!;
-      const marker = _marks({ markup, name: "point" })[index];
-      assert.equal(
-        _number({ markup: marker, name: "cx" }),
-        48 + cluster.x * 4.8,
-      );
-      assert.equal(
-        _number({ markup: marker, name: "cy" }),
-        140 + cluster.y * 3.6,
-      );
-    });
-    assert.equal(_marks({ markup, name: "roster-point" }).length, 4);
-  });
+  _assertGroupedLocationBadges();
   [81, 100].forEach((frame) => {
     assert.equal(
       _marks({
@@ -288,9 +305,9 @@ test("fractional cluster anchors hold exact coordinates and complete grouped cou
       [2, 2],
     );
     _marks({ markup, name: "point" }).forEach((mark, index) => {
-      const cluster = input.clusters.find((item) => {
-        return item.id === input.points[index].clusterId;
-      })!;
+      const cluster = input.clusters.find(
+        propEq("id", input.points[index].clusterId),
+      )!;
       assert.equal(_number({ markup: mark, name: "cx" }), 48 + cluster.x * 4.8);
       assert.equal(
         _number({ markup: mark, name: "cy" }),

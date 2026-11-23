@@ -1,4 +1,4 @@
-import { ramp } from "../../../../motion";
+import { Motion } from "../../../../motion";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CleanupLaneHeading } from "../CleanupLaneHeading";
 import { EXPLANATION_CUE, EXPLANATION_FRAMES } from "../cleanupTiming";
@@ -19,12 +19,12 @@ export function CleanupEditExplanation({
   return (
     <g
       data-edit-explanation={row.id}
-      opacity={ramp(
+      opacity={Motion.ramp({
         frame,
-        EXPLANATION_CUE,
-        motion.scale(EXPLANATION_FRAMES),
-        motion.reveal.easing,
-      )}
+        at: EXPLANATION_CUE,
+        dur: motion.scale(EXPLANATION_FRAMES),
+        easing: motion.reveal.easing,
+      })}
     >
       {inline ? undefined : (
         <CleanupLaneHeading

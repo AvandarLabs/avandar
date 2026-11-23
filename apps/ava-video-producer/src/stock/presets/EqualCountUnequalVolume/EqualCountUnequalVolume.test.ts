@@ -3,10 +3,15 @@
  */
 import assert from "node:assert/strict";
 import test from "node:test";
-import { propEq, prop } from "@avandar/utils";
+import { prop, propEq } from "@avandar/utils";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
+import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
+import { getTextEnvelopesFromMarkup } from "../SchemaColumnEvolution/getTextEnvelopesFromMarkup";
 import { EqualCountUnequalVolume } from "./EqualCountUnequalVolume";
+import { equalCountUnequalVolumeContract } from "./EqualCountUnequalVolume.contract";
 import {
   DEFAULT_INPUT,
   MINIMUM_INPUT,
@@ -52,16 +57,12 @@ test("complete fixture set includes minimum, dense and changed inputs before beh
   );
   assert.equal(fixtures.length, 4);
 });
+
 test("invalid structure and cross-field values are rejected", () => {
   invalidInputs.forEach((input) => {
     return assert.equal(inputSchema.safeParse(input).success, false);
   });
 });
-
-import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
-import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
-import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
-import { equalCountUnequalVolumeContract } from "./EqualCountUnequalVolume.contract";
 
 function _getVisibleTexts({
   input,
@@ -79,7 +80,9 @@ function _getVisibleTexts({
     ...(frame >= 111 ? [input.copy.total] : []),
   ];
 }
+
 const EXCLUDED_TEXT_FIELDS: string[] = ["id", "itemKind", "displayUnit"];
+
 registerStockPresetAssertions({
   inputSchema,
   defaultInput: DEFAULT_INPUT,
@@ -90,6 +93,7 @@ registerStockPresetAssertions({
   excludedTextFields: EXCLUDED_TEXT_FIELDS,
   getVisibleTexts: _getVisibleTexts,
 });
+
 registerStockTextLayoutAssertions({
   inputSchema,
   fixtures,
@@ -126,6 +130,35 @@ test("byte strips unfold from the same physical zero with exact input-weighted w
       ) < 1e-10,
     );
   });
+  _assertDisplayUnitsPreserveByteStrips();
+});
+
+test("count-guide and item-size toggles do not alter byte geometry or totals", () => {
+  const visible = _render({ frame: 150, input: DEFAULT_INPUT });
+  const hidden = _render({
+    frame: 150,
+    input: {
+      ...DEFAULT_INPUT,
+      showCountGuides: false,
+      showItemSizes: false,
+    },
+  });
+  assert.deepEqual(
+    [...visible.matchAll(/<rect data-byte-strip[^>]*>/g)].map((match) => {
+      return match[0];
+    }),
+    [...hidden.matchAll(/<rect data-byte-strip[^>]*>/g)].map((match) => {
+      return match[0];
+    }),
+  );
+  assert.doesNotMatch(hidden, /data-count-guide=/);
+  assert.match(hidden, /data-total-bytes="2200"/);
+  assert.ok(
+    _render({ frame: 150, input: CHANGED_INPUT }).includes('aria-label="rows"'),
+  );
+});
+
+function _assertDisplayUnitsPreserveByteStrips(): void {
   ["B", "KiB", "MiB"].forEach((displayUnit) => {
     const input = {
       ...MINIMUM_INPUT,
@@ -153,33 +186,7 @@ test("byte strips unfold from the same physical zero with exact input-weighted w
       2,
     );
   });
-});
-test("count-guide and item-size toggles do not alter byte geometry or totals", () => {
-  const visible = _render({ frame: 150, input: DEFAULT_INPUT });
-  const hidden = _render({
-    frame: 150,
-    input: {
-      ...DEFAULT_INPUT,
-      showCountGuides: false,
-      showItemSizes: false,
-    },
-  });
-  assert.deepEqual(
-    [...visible.matchAll(/<rect data-byte-strip[^>]*>/g)].map((match) => {
-      return match[0];
-    }),
-    [...hidden.matchAll(/<rect data-byte-strip[^>]*>/g)].map((match) => {
-      return match[0];
-    }),
-  );
-  assert.doesNotMatch(hidden, /data-count-guide=/);
-  assert.match(hidden, /data-total-bytes="2200"/);
-  assert.ok(
-    _render({ frame: 150, input: CHANGED_INPUT }).includes('aria-label="rows"'),
-  );
-});
-
-import { getTextEnvelopesFromMarkup } from "../SchemaColumnEvolution/getTextEnvelopesFromMarkup";
+}
 
 test("first collection total clears the second shelf label and strips clear item copy", () => {
   const input = {
@@ -195,9 +202,7 @@ test("first collection total clears the second shelf label and strips clear item
   const markup = _render({ frame: 150, input: input });
   const texts = getTextEnvelopesFromMarkup(markup);
   const firstTotal = texts.find(propEq("label", input.copy.total))!;
-  const secondTitle = texts.find((text) => {
-    return text.label === input.groups[1].label;
-  })!;
+  const secondTitle = texts.find(propEq("label", input.groups[1].label))!;
   assert.ok(firstTotal.bottom + 4 <= secondTitle.top);
   const itemTexts = texts.filter((text) => {
     return DENSE_INPUT.groups.some((group) => {

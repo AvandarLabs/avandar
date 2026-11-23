@@ -2,10 +2,18 @@ import { SketchedShape } from "../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
-type Props = { cx: number; cy: number; rx: number; ry: number };
+type Props = {
+  cx: number;
+  cy: number;
+  rx: number;
+  ry: number;
+};
 /** A themed dashed guide ellipse, such as an orbit. */
 export function Guide({ cx, cy, rx, ry }: Readonly<Props>): ReactNode {
-  const guide = GraphicThemeHooks.useGraphicProps("Guide", {});
+  const guide = GraphicThemeHooks.useGraphicProps({
+    name: "Guide",
+    props: {},
+  });
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <SketchedShape

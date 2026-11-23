@@ -1,6 +1,6 @@
-import { formatMetric } from "../../layout/layout";
+import { TextLayout } from "../../layout/TextLayout";
 import { StageTheme } from "../../StageTheme/StageTheme";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 
 type GetBarComparisonBeatsOptions = {
   revealAtFrame: number;
@@ -20,7 +20,7 @@ type GetEraseStartFramesOptions = {
  * `panelStaggerFrames` later each, so two charts read left to right. Gaps
  * between layers are the theme's durations, so they follow its tempo.
  */
-export function getBarComparisonBeats({
+function _getBarComparisonBeats({
   revealAtFrame,
   panelIndex,
   panelStaggerFrames,
@@ -44,8 +44,10 @@ export function getBarComparisonBeats({
   };
 }
 /** Each row's bar length as a fraction of the panel's longest bar. */
-export function getBarFractions(
-  rows: ReadonlyArray<{ value: number }>,
+function _getBarFractions(
+  rows: ReadonlyArray<{
+    value: number;
+  }>,
 ): number[] {
   const longest = Math.max(
     0,
@@ -62,7 +64,7 @@ export function getBarFractions(
  * within a panel and panel by panel. Fractional frames are kept so a long
  * list still erases inside a short exit.
  */
-export function getEraseStartFrames({
+function _getEraseStartFrames({
   atFrame,
   elementCounts,
   staggerFrames,
@@ -82,7 +84,13 @@ const ROUGH_EDGE_STEPS = 9;
  * A torn, brush-like right edge for a bar, as a clip path. The jitter is
  * seeded by the row so every frame of a render draws the same edge.
  */
-export function getRoughEdgeClipPath(seed: number, depth: number): string {
+function _getRoughEdgeClipPath({
+  seed,
+  depth,
+}: Readonly<{
+  seed: number;
+  depth: number;
+}>): string {
   const points = Array.from({ length: ROUGH_EDGE_STEPS }, (_, step) => {
     const noise = _seededUnit(seed * 31 + step * 7 + 1);
     const y = (step / (ROUGH_EDGE_STEPS - 1)) * 100;
@@ -97,9 +105,47 @@ function _seededUnit(seed: number): number {
 }
 /** The text at a row's end: its display text, or its value at the panel's
  *  precision, so a value is never shown rounded to a different number. */
-export function getRowValueLabel(
-  row: { value: number; display?: string },
-  precision: number,
-): string {
-  return row.display ?? formatMetric(row.value, precision);
+function _rowValueLabel({
+  row,
+  precision,
+}: Readonly<{
+  row: {
+    value: number;
+    display?: string;
+  };
+  precision: number;
+}>): string {
+  return (
+    row.display ??
+    TextLayout.formatMetric({
+      value: row.value,
+      precision,
+    })
+  );
 }
+
+/**
+ * Samples comparison beats, bar reveals, and row labels for
+ * BarComparisonScene.
+ */
+export const BarComparisonMotion = {
+  /**
+   * When each layer of one `BarComparisonScene` panel starts: the hero number,
+   * the row labels, the bars and the row values.
+   */
+  getBarComparisonBeats: _getBarComparisonBeats,
+  /** Each row's bar length as a fraction of the panel's longest bar. */
+  getBarFractions: _getBarFractions,
+  /**
+   * The frame each element of each panel starts erasing, in reading order
+   * within a panel and panel by panel.
+   */
+  getEraseStartFrames: _getEraseStartFrames,
+  /** A torn, brush-like right edge for a bar, as a clip path. */
+  getRoughEdgeClipPath: _getRoughEdgeClipPath,
+  /**
+   * The text at a row's end: its display text, or its value at the panel's
+   * precision, so a value is never shown rounded to a different number.
+   */
+  rowValueLabel: _rowValueLabel,
+};

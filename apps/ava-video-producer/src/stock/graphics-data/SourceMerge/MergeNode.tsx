@@ -7,10 +7,16 @@ import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHoo
 import { MERGE, MERGE_GLYPH } from "./SourceMerge.constants";
 import type { ReactNode } from "react";
 
-type Props = Readonly<{ frame: number; accent: string }>;
+type Props = Readonly<{
+  frame: number;
+  accent: string;
+}>;
 /** The node where every source edge meets, with its glyph and label. */
 export function MergeNode({ frame, accent }: Props): ReactNode {
-  const style = GraphicThemeHooks.useGraphicProps("SourceMerge", {});
+  const style = GraphicThemeHooks.useGraphicProps({
+    name: "SourceMerge",
+    props: {},
+  });
   const { color, sketch } = GraphicThemeHooks.useGraphicTokens();
   const shapes = GraphicThemeHooks.useGraphicShapeScales();
   return (

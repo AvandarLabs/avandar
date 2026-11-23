@@ -1,4 +1,4 @@
-import { StockRect } from "../primitives/StockRect/StockRect";
+import { StockRect } from "../primitives/StockRect";
 import { GraphicThemeHooks } from "../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
@@ -19,7 +19,10 @@ export function Card({
   color,
   children,
 }: Readonly<Props>): ReactNode {
-  const card = GraphicThemeHooks.useGraphicProps("Card", {});
+  const card = GraphicThemeHooks.useGraphicProps({
+    name: "Card",
+    props: {},
+  });
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>

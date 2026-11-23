@@ -3,7 +3,6 @@ import { expect, type Page } from "@playwright/test";
 import { closeChat } from "./closeChat";
 import { getRecordIdFromPageUrl } from "./getRecordIdFromPageUrl";
 import type { FlowContext, FlowRecord } from "./captureFlows.types";
-
 /** The fixture datasets the flows import, by fixture file name. */
 const FIXTURE_NAMES: Readonly<Record<string, string>> = {
   cases: "Video - Harborfield cases",
@@ -12,7 +11,6 @@ const FIXTURE_NAMES: Readonly<Record<string, string>> = {
   districts: "Video - Harborfield districts",
   weekly_reports: "Video - Harborfield weekly reports",
 };
-
 /** One fixture upload: its file key, dataset name, and how to run it. */
 type FixtureUpload = {
   key: string;
@@ -20,11 +18,9 @@ type FixtureUpload = {
   doesDatasetExist: boolean;
   shouldDemonstrate: boolean;
 };
-
 function _createDatasetRoutePattern(workspace: string): RegExp {
   return new RegExp(`/${workspace}/data-manager/[0-9a-f-]+$`);
 }
-
 /** Opens the data sources list, waiting until every dataset link has loaded. */
 async function _openSourceList({
   context,
@@ -57,7 +53,6 @@ async function _openSourceList({
   ).toHaveCount(Number(await datasetCountText.innerText()));
   await closeChat(page);
 }
-
 /**
  * Closes the dataset-limit dialog when previewing a dataset that already
  * exists, and refuses a new upload the workspace has no room for.
@@ -84,12 +79,14 @@ async function _dismissDatasetLimit({
   await page.keyboard.press("Escape");
   await expect(datasetLimitDialog).not.toBeVisible();
 }
-
 /** Uploads a fixture CSV and fills its name and description, ready to save. */
-async function _uploadFixture(
-  context: Readonly<FlowContext>,
-  options: Readonly<FixtureUpload>,
-): Promise<void> {
+async function _uploadFixture({
+  context,
+  options,
+}: Readonly<{
+  context: Readonly<FlowContext>;
+  options: Readonly<FixtureUpload>;
+}>): Promise<void> {
   const { page, workspace } = context;
   if (!options.shouldDemonstrate) {
     await page.goto(`${context.baseUrl}/${workspace}/data-manager/data-import`);
@@ -119,16 +116,18 @@ async function _uploadFixture(
     page.getByRole("button", { name: "Save Dataset", exact: true }),
   ).toBeEnabled({ timeout: 30000 });
 }
-
 /** Saves a new upload, or opens the existing dataset with the same name. */
-async function _saveOrReuseDataset(
-  context: Readonly<FlowContext>,
+async function _saveOrReuseDataset({
+  context,
+  options,
+}: Readonly<{
+  context: Readonly<FlowContext>;
   options: Readonly<{
     stepKey: string;
     name: string;
     doesDatasetExist: boolean;
-  }>,
-): Promise<void> {
+  }>;
+}>): Promise<void> {
   const { page, workspace } = context;
   const existingDatasetLink = page.getByRole("link", {
     name: options.name,
@@ -151,12 +150,14 @@ async function _saveOrReuseDataset(
     await page.waitForURL(_createDatasetRoutePattern(workspace));
   });
 }
-
 /** Uploads (or previews) and saves or reuses one fixture dataset. */
-async function _importFixture(
-  context: FlowContext,
-  options: Readonly<Pick<FixtureUpload, "key" | "name" | "shouldDemonstrate">>,
-): Promise<void> {
+async function _importFixture({
+  context,
+  options,
+}: Readonly<{
+  context: FlowContext;
+  options: Readonly<Pick<FixtureUpload, "key" | "name" | "shouldDemonstrate">>;
+}>): Promise<void> {
   const { page } = context;
   const existingDatasetLink = page.getByRole("link", {
     name: options.name,
@@ -173,7 +174,10 @@ async function _importFixture(
     return;
   }
   await context.step(`upload-${stepKey}`, async () => {
-    await _uploadFixture(context, { ...options, doesDatasetExist });
+    await _uploadFixture({
+      context,
+      options: { ...options, doesDatasetExist },
+    });
   });
   if (options.shouldDemonstrate) {
     await page
@@ -181,13 +185,15 @@ async function _importFixture(
       .waitFor({ state: "hidden", timeout: 15000 });
     await context.checkpoint("import-preview");
   }
-  await _saveOrReuseDataset(context, {
-    stepKey,
-    name: options.name,
-    doesDatasetExist,
+  await _saveOrReuseDataset({
+    context,
+    options: {
+      stepKey,
+      name: options.name,
+      doesDatasetExist,
+    },
   });
 }
-
 /**
  * Makes sure a fixture dataset exists, uploading it on first use, and caches
  * it on the run state so later flows reuse it. It reuses the fixture datasets
@@ -212,8 +218,14 @@ export async function ensureDataset({
     throw new Error(`Unknown fixture: ${key}`);
   }
   await _openSourceList({ context, shouldShowImport: shouldDemonstrate });
-  await _importFixture(context, { key, name, shouldDemonstrate });
-  const id = getRecordIdFromPageUrl(page, "data-manager");
+  await _importFixture({
+    context,
+    options: { key, name, shouldDemonstrate },
+  });
+  const id = getRecordIdFromPageUrl({
+    page,
+    segment: "data-manager",
+  });
   state.datasets[key] = { id, name };
   await context.recordResource?.({ kind: "dataset", id, name });
   if (shouldDemonstrate) {

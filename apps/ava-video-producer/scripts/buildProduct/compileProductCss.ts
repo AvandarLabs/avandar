@@ -7,17 +7,19 @@ import { isProductFile } from "./isProductFile";
 import { rememberProductFile } from "./rememberProductFile";
 import type { ImportedFiles } from "./buildProduct.types";
 import type { OnLoadArgs, OnLoadResult } from "esbuild";
-
 /**
  * Loads one stylesheet for the esbuild bundle, with Mantine's breakpoint
  * variables and mixins processed, as a global or local (module) CSS file.
  *
  * Used by the product build's load hook for each `.css` file it bundles.
  */
-export async function compileProductCss(
-  args: Readonly<OnLoadArgs>,
-  imported: ImportedFiles,
-): Promise<OnLoadResult> {
+export async function compileProductCss({
+  args,
+  imported,
+}: Readonly<{
+  args: Readonly<OnLoadArgs>;
+  imported: ImportedFiles;
+}>): Promise<OnLoadResult> {
   const bytes = await fs.readFile(args.path);
   if (isProductFile(args.path)) {
     rememberProductFile({ imported, file: args.path, contents: bytes });

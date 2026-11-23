@@ -1,5 +1,5 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { SeedBalanceCaptions } from "./SeedBalanceCaptions";
+import { SeedBalanceCaptions } from "./SeedBalanceCaptions/SeedBalanceCaptions";
 import type { getSeedSceneFromFrame } from "./getSeedSceneFromFrame";
 import type { Input } from "./SavedSeedSeasonReturn.schema";
 import type { ReactNode } from "react";

@@ -1,16 +1,17 @@
-import { StockRect } from "../../../../stock/primitives/StockRect/StockRect";
+import { StockRect } from "../../../../stock/primitives/StockRect";
 import { useVideoShapeScales } from "../../../../videoTheme/useVideoShapeScales";
 import { DemoTheme } from "../DemoTheme";
-import { DemoDiagram } from "../parts/DemoDiagram";
+import { DemoDiagram } from "../parts/DemoDiagram/DemoDiagram";
 import { CameraDemosShared } from "./CameraDemosShared/CameraDemosShared";
 import type { ReactNode } from "react";
+
+type Props = {
+  pose: { x: number; y: number; zoom: number };
+};
+
 /** An overview with the camera's viewport beside what the camera sees. */
 /** The whole diagram with the camera's viewport outlined on it. */
-export function CameraOverview({
-  pose,
-}: {
-  pose: { x: number; y: number; zoom: number };
-}): ReactNode {
+export function CameraOverview({ pose }: Readonly<Props>): ReactNode {
   const scales = useVideoShapeScales();
   const { highlight } = DemoTheme.useDemoColors();
   const viewWidth = 960 / pose.zoom;

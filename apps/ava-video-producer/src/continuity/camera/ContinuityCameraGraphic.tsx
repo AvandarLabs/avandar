@@ -1,11 +1,11 @@
 import { useCurrentFrame } from "remotion";
-import { isCameraMoving } from "../../motion-components/cameraTrack/cameraTrack";
-import { DiagramCamera } from "../../motion-components/DiagramCamera";
+import { CameraTrack } from "../../motion-components/CameraTrack/CameraTrack";
+import { DiagramCamera } from "../../motion-components/DiagramCamera/DiagramCamera";
 import { getObjectFlight } from "../../motion-components/getObjectFlight/getObjectFlight";
 import { MotionSettings } from "../../motion-components/MotionSettings/MotionSettings";
-import { useContinuityAppearance } from "../ContinuityAppearanceContext";
+import { useContinuityAppearance } from "../ContinuityAppearanceContext/useContinuityAppearance";
 import { ContinuityGraphicObjects } from "./ContinuityGraphicObjects";
-import type { ContinuityBeat } from "../continuitySchema";
+import type { ContinuityBeat } from "../continuitySchema/continuitySchema";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -28,7 +28,7 @@ export function ContinuityCameraGraphic({ content }: Props): ReactNode {
   const useFlightBlur =
     flightActive &&
     content.flight?.motion &&
-    !isCameraMoving({
+    !CameraTrack.isMoving({
       keys: content.camera,
       frame,
       options: content.cameraOptions,

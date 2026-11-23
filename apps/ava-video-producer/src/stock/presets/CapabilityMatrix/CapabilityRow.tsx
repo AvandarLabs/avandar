@@ -1,3 +1,4 @@
+import { propEq } from "@avandar/utils";
 import { FitText } from "../../primitives/FitText/FitText";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CapabilityCell } from "./CapabilityCell";
@@ -39,9 +40,7 @@ export function CapabilityRow({
         <FitText {...label} breakLongWords normalizeWhitespace />
       </g>
       {input.options.map((option, optionIndex) => {
-        const cell = row.cells.find(({ optionId }) => {
-          return optionId === option.id;
-        })!;
+        const cell = row.cells.find(propEq("optionId", option.id))!;
         return (
           <CapabilityCell
             key={option.id}

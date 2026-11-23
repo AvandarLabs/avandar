@@ -1,6 +1,7 @@
-import { mix } from "../../../motion";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import { Motion } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./SharedJigPreparation.schema";
+
 /** Data for getJigSceneFromFrame. */
 type GetJigSceneFromFrameResult = {
   centers: number[];
@@ -10,22 +11,36 @@ type GetJigSceneFromFrameResult = {
   applications: boolean[];
   activeIndex: number;
 };
+
 type JigSceneArgs = Readonly<{
   frame: number;
   input: Input;
   motion: VideoMotion;
 }>;
-/** Frame-derived guide position and one application beat per collaborator. */
-export function getJigSceneFromFrame({
+
+type DurationOptions = {
+  frame: JigSceneArgs["frame"];
+  input: JigSceneArgs["input"];
+  motion: JigSceneArgs["motion"];
+  centers: number[];
+};
+
+type DurationResult = {
+  duration: number;
+  activeIndex: number;
+  guideX: number;
+};
+
+/**
+ * Samples the jig scene from frame duration state for the current authored
+ * frame.
+ */
+function _getJigSceneFromFrameDurationState({
   frame,
   input,
   motion,
-}: JigSceneArgs): GetJigSceneFromFrameResult {
-  const centers = input.collaborators.map((_, index) => {
-    return input.collaborators.length === 1
-      ? 610
-      : 350 + (index * 500) / (input.collaborators.length - 1);
-  });
+  centers,
+}: Readonly<DurationOptions>): DurationResult {
   const duration = 73 / input.collaborators.length;
   const activeIndex = Math.min(
     input.collaborators.length - 1,
@@ -38,15 +53,39 @@ export function getJigSceneFromFrame({
     duration * 0.4,
     motion.travel.easing,
   );
-  const travellingX = mix(arriving, previousX, centers[activeIndex] - 50);
+  const travellingX = Motion.mix({
+    t: arriving,
+    from: previousX,
+    to: centers[activeIndex] - 50,
+  });
   const guideX =
     frame < 49
       ? 80
-      : mix(
-          motion.ramp(frame, 122, motion.whip, motion.travel.easing),
-          travellingX,
-          80,
-        );
+      : Motion.mix({
+          t: motion.ramp(frame, 122, motion.whip, motion.travel.easing),
+          from: travellingX,
+          to: 80,
+        });
+  return { duration, activeIndex, guideX };
+}
+
+/** Frame-derived guide position and one application beat per collaborator. */
+export function getJigSceneFromFrame({
+  frame,
+  input,
+  motion,
+}: JigSceneArgs): GetJigSceneFromFrameResult {
+  const centers = input.collaborators.map((_, index) => {
+    return input.collaborators.length === 1
+      ? 610
+      : 350 + (index * 500) / (input.collaborators.length - 1);
+  });
+  const { duration, activeIndex, guideX } = _getJigSceneFromFrameDurationState({
+    frame,
+    input,
+    motion,
+    centers,
+  });
   return {
     centers,
     guideX,

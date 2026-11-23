@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { mix } from "../../motion";
+import { Motion } from "../../motion";
 import { MotionSettings } from "../MotionSettings/MotionSettings";
 import type {
   MotionOptions,
@@ -11,7 +11,10 @@ type GetCameraPoseOptions = {
   frame: number;
   enabled?: boolean;
   options?: MotionOptions;
-  viewport?: { width: number; height: number };
+  viewport?: {
+    width: number;
+    height: number;
+  };
   theme?: MotionSettingsTheme;
 };
 type IsCameraMovingOptions = {
@@ -32,7 +35,11 @@ type CameraTrackSchema = z.ZodArray<
         z.ZodUnion<
           readonly [
             typeof MotionSettings.motionEasingSchema,
-            z.ZodEnum<{ glide: "glide"; push: "push"; whip: "whip" }>,
+            z.ZodEnum<{
+              glide: "glide";
+              push: "push";
+              whip: "whip";
+            }>,
           ]
         >
       >;
@@ -41,16 +48,19 @@ type CameraTrackSchema = z.ZodArray<
   >
 >;
 /** Create a validated camera route for a vector canvas of any positive size. */
-export function createCameraTrackSchema(
+function _makeSchemaFromViewport({
   width = 960,
   height = 600,
-): CameraTrackSchema {
+}: Readonly<{
+  width?: number;
+  height?: number;
+}> = {}): CameraTrackSchema {
   z.number().positive().parse(width);
   z.number().positive().parse(height);
   return z
     .array(
       z
-        .object({
+        .strictObject({
           at: z.number().int().nonnegative(),
           x: z.number().min(0).max(width),
           y: z.number().min(0).max(height),
@@ -62,7 +72,6 @@ export function createCameraTrackSchema(
             ])
             .default("glide"),
         })
-        .strict()
         .refine((key) => {
           return (
             key.x >= width / 2 / key.zoom &&
@@ -84,7 +93,7 @@ export function createCameraTrackSchema(
     }, "Camera keys must start at zero and increase");
 }
 /** Default camera contract for the 960 by 600 Motion Atlas canvas. */
-export const cameraTrackSchema = createCameraTrackSchema();
+export const cameraTrackSchema: CameraTrackSchema = _makeSchemaFromViewport({});
 /** An authored stop. A duplicate pose creates a reading hold. */
 export type CameraKeyframe = z.input<typeof cameraTrackSchema>[number];
 /** Camera center and magnification, independent of render order. */
@@ -92,7 +101,7 @@ export type CameraPose = Pick<CameraKeyframe, "x" | "y" | "zoom">;
 /**
  * Stretch only travel intervals; preserve every authored reading hold exactly.
  */
-export function retimeCameraTrack({
+function _retime({
   keys,
   options,
   theme = MotionSettings.getClassicMotionSettingsTheme(),
@@ -103,7 +112,9 @@ export function retimeCameraTrack({
 }>): CameraKeyframe[] {
   let at = 0;
   return keys.map((key, index) => {
-    if (index === 0) return { ...key };
+    if (index === 0) {
+      return { ...key };
+    }
     const previous = keys[index - 1];
     const duration = key.at - previous.at;
     const isHold =
@@ -125,7 +136,7 @@ function _getKeyEasing({
   key: CameraKeyframe;
   options: MotionOptions | undefined;
   theme: MotionSettingsTheme;
-}>) {
+}>): (progress: number) => number {
   const ease = key.ease ?? "glide";
   const named =
     ease === "push" || ease === "whip" || ease === "glide"
@@ -147,7 +158,7 @@ function _getKeyEasing({
  * frame. Named eases and omitted settings come from the theme (`classic`
  * unless one is given).
  */
-export function getCameraPose({
+function _getPose({
   keys,
   frame,
   enabled = true,
@@ -155,9 +166,10 @@ export function getCameraPose({
   viewport = { width: 960, height: 600 },
   theme = MotionSettings.getClassicMotionSettingsTheme(),
 }: Readonly<GetCameraPoseOptions>): CameraPose {
-  if (!enabled || !keys?.length)
+  if (!enabled || !keys?.length) {
     return { x: viewport.width / 2, y: viewport.height / 2, zoom: 1 };
-  const route = retimeCameraTrack({ keys, options, theme });
+  }
+  const route = _retime({ keys, options, theme });
   const destinationIndex = route.findIndex((key) => {
     return key.at > frame;
   });
@@ -180,21 +192,17 @@ export function getCameraPose({
   const progress = _getKeyEasing({ key: destination, options, theme })(
     fraction,
   );
-  return {
-    x: mix(progress, origin.x, destination.x),
-    y: mix(progress, origin.y, destination.y),
-    zoom: mix(progress, origin.zoom, destination.zoom),
-  };
+  return _makeCameraPoseFromProgress({ origin, destination, progress });
 }
 /** Blur is active only while the retimed camera changes pose. */
-export function isCameraMoving({
+function _isMoving({
   keys,
   frame,
   options,
   theme = MotionSettings.getClassicMotionSettingsTheme(),
 }: Readonly<IsCameraMovingOptions>): boolean {
   const viewport = { width: 960, height: 600 };
-  const before = getCameraPose({
+  const before = _getPose({
     keys,
     frame: frame - 0.3,
     enabled: true,
@@ -202,7 +210,7 @@ export function isCameraMoving({
     viewport,
     theme,
   });
-  const after = getCameraPose({
+  const after = _getPose({
     keys,
     frame: frame + 0.3,
     enabled: true,
@@ -217,3 +225,52 @@ export function isCameraMoving({
     0.05
   );
 }
+
+/** Interpolates the center and magnification between two camera stops. */
+function _makeCameraPoseFromProgress({
+  origin,
+  destination,
+  progress,
+}: Readonly<{
+  origin: CameraPose;
+  destination: CameraPose;
+  progress: number;
+}>): CameraPose {
+  return {
+    x: Motion.mix({
+      t: progress,
+      from: origin.x,
+      to: destination.x,
+    }),
+    y: Motion.mix({
+      t: progress,
+      from: origin.y,
+      to: destination.y,
+    }),
+    zoom: Motion.mix({
+      t: progress,
+      from: origin.zoom,
+      to: destination.zoom,
+    }),
+  };
+}
+
+/** Validates and samples camera routes for diagram and continuity films. */
+export const CameraTrack = {
+  /**
+   * Create a validated camera route for a vector canvas of any positive size.
+   */
+  makeSchemaFromViewport: _makeSchemaFromViewport,
+  /**
+   * Stretch only travel intervals; preserve every authored reading hold
+   * exactly.
+   */
+  retime: _retime,
+  /**
+   * Sample camera time only; callers continue rendering their content at the
+   * real frame.
+   */
+  getPose: _getPose,
+  /** Blur is active only while the retimed camera changes pose. */
+  isMoving: _isMoving,
+};

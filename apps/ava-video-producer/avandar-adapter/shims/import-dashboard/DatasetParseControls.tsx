@@ -17,8 +17,9 @@ export function DatasetParseControls({
   ...csvProps
 }: Props): ReactNode {
   const { parseOptions } = csvProps;
-  if (csvProps.sourceType !== "csv_file")
+  if (csvProps.sourceType !== "csv_file") {
     throw new Error("The import film only demonstrates CSV.");
+  }
   return (
     <>
       <NumberInput

@@ -1,5 +1,5 @@
 import { ObjectGlyph } from "../../primitives/ObjectGlyph/ObjectGlyph";
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./MissedVisitReconnect.schema";

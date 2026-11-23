@@ -1,6 +1,6 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { buildFloorOutlineFromTiles } from "./buildFloorOutlineFromTiles";
+import { makeFloorOutlineFromTiles } from "./makeFloorOutlineFromTiles";
 import { ShelterTile } from "./ShelterTile/ShelterTile";
 import type { Input } from "./ShelterUsableAreaCapacity.schema";
 import type { ReactNode } from "react";
@@ -21,7 +21,7 @@ export function ShelterFloor({
           <SketchedShape
             shape={{
               kind: "path",
-              d: buildFloorOutlineFromTiles(input.floorTiles),
+              d: makeFloorOutlineFromTiles(input.floorTiles),
             }}
             profile={tokens.sketch.shape}
             fill="none"

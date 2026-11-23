@@ -1,12 +1,33 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { LeakPipe } from "./LeakPipe/LeakPipe";
-import { LeakRepairWorker } from "./LeakRepairWorker";
+import { LeakRepairWorker } from "./LeakRepairWorker/LeakRepairWorker";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./RecurringLeakPrevention.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
+
+/** The retest's observation and the caption of the current phase. */
+function _getLeakCaptions({
+  input,
+  frame,
+}: Readonly<{ input: Input; frame: number }>) {
+  const observation =
+    input.retest === "stopped"
+      ? input.labels.stopped
+      : input.retest === "still-leaking"
+        ? input.labels.continued
+        : input.labels.untested;
+  const phase =
+    frame < 63
+      ? input.labels.containment
+      : frame < 107 || input.retest === "not-tested"
+        ? input.labels.repair
+        : input.labels.test;
+  return { observation, phase };
+}
+
 /**
  * Containment, source repair and observed retest remain separate physical
  * beats.
@@ -47,23 +68,4 @@ export function RecurringLeakPrevention({
       </g>
     </g>
   );
-}
-/** The retest's observation and the caption of the current phase. */
-function _getLeakCaptions({
-  input,
-  frame,
-}: Readonly<{ input: Input; frame: number }>) {
-  const observation =
-    input.retest === "stopped"
-      ? input.labels.stopped
-      : input.retest === "still-leaking"
-        ? input.labels.continued
-        : input.labels.untested;
-  const phase =
-    frame < 63
-      ? input.labels.containment
-      : frame < 107 || input.retest === "not-tested"
-        ? input.labels.repair
-        : input.labels.test;
-  return { observation, phase };
 }

@@ -1,6 +1,6 @@
 import { propEq } from "@avandar/utils";
-import { mix } from "../../../motion";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import { Motion } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { JobRectangle } from "./findJobRoute";
 import type { JobTransferPlan, JobTransfer } from "./makeJobTransfersFromInput";
 
@@ -28,8 +28,16 @@ function _getTravelPoint({
   const point = transfer.points[segmentIndex + 1];
   const length = Math.abs(point.x - prior.x) + Math.abs(point.y - prior.y);
   return {
-    x: mix(length ? remaining / length : 1, prior.x, point.x),
-    y: mix(length ? remaining / length : 1, prior.y, point.y),
+    x: Motion.mix({
+      t: length ? remaining / length : 1,
+      from: prior.x,
+      to: point.x,
+    }),
+    y: Motion.mix({
+      t: length ? remaining / length : 1,
+      from: prior.y,
+      to: point.y,
+    }),
   };
 }
 /** Intact blocks move one at a time along full-rectangle clearance routes. */
@@ -43,7 +51,13 @@ export function getJobPlacementFromPlanAndFrame({
   index: number;
   frame: number;
   motion: VideoMotion;
-}>): JobRectangle | { height: number; x: number; y: number } {
+}>):
+  | JobRectangle
+  | {
+      height: number;
+      x: number;
+      y: number;
+    } {
   const slot = plan.slots[index];
   if (!slot.isMoving) {
     return slot.initial;

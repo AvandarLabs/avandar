@@ -1,5 +1,5 @@
 import { match, P } from "ts-pattern";
-import { getStockValueFromPath } from "../../../../stock/copy/getStockValueFromPath";
+import { getStockValueFromPath } from "../../../../stock/data/getStockValueFromPath";
 import type {
   StockControl,
   StockJsonValue,
@@ -38,22 +38,7 @@ function _getOptionsFromControl({
     return [];
   }
   return values.flatMap((value: unknown) => {
-    if (!value || typeof value !== "object") {
-      return [];
-    }
-    const optionValue: unknown = Reflect.get(value, source.valueKey);
-    const label: unknown = Reflect.get(value, source.labelKey);
-    return typeof optionValue === "string" ||
-      typeof optionValue === "number" ||
-      typeof optionValue === "boolean"
-      ? [
-          {
-            value: optionValue,
-            label:
-              typeof label === "string" && label ? label : String(optionValue),
-          },
-        ]
-      : [];
+    return _createDynamicOptions({ value, source });
   });
 }
 /**
@@ -132,3 +117,31 @@ export const ContentFields = {
   getVariantFromValue: typeof _getUnionVariantFromValue;
   getBlankValueFromControl: typeof _getBlankValueFromControl;
 };
+
+function _createDynamicOptions({
+  value,
+  source,
+}: Readonly<{
+  value: unknown;
+  source: Extract<
+    StockControl,
+    { kind: "select"; optionsFrom: unknown }
+  >["optionsFrom"];
+}>): ReturnType<typeof _getOptionsFromControl> {
+  if (!value || typeof value !== "object") {
+    return [];
+  }
+  const optionValue: unknown = Reflect.get(value, source.valueKey);
+  const label: unknown = Reflect.get(value, source.labelKey);
+  return typeof optionValue === "string" ||
+    typeof optionValue === "number" ||
+    typeof optionValue === "boolean"
+    ? [
+        {
+          value: optionValue,
+          label:
+            typeof label === "string" && label ? label : String(optionValue),
+        },
+      ]
+    : [];
+}

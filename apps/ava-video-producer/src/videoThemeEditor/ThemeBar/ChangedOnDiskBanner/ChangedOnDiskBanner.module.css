@@ -2,18 +2,18 @@
  * Mantine paints a light yellow alert's heading and body in an orange that is
  * under 4.5:1 on its pale yellow ground, so the banner states its own ink.
  */
-.bannerTitle,
-.bannerMessage {
+.changedOnDiskBannerTitle,
+.changedOnDiskBannerMessage {
   color: var(--ink);
 }
 
-.bannerText {
+.changedOnDiskBannerText {
   font-size: var(--atlas-font-size-12);
   line-height: 1.45;
   margin: 0 0 var(--atlas-space-8);
 }
 
-.bannerChoices {
+.changedOnDiskBannerChoices {
   display: grid;
   gap: var(--atlas-space-8);
   list-style: none;

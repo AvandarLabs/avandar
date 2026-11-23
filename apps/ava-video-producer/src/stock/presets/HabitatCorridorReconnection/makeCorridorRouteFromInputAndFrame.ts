@@ -1,5 +1,5 @@
-import { mix } from "../../../motion";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import { Motion } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./HabitatCorridorReconnection.schema";
 /**
  * Connected schematic waypoints overlap both patch envelopes and rise over the
@@ -9,15 +9,22 @@ export function makeCorridorRouteFromInputAndFrame({
   input,
   frame,
   motion,
-}: Readonly<{ input: Input; frame: number; motion: VideoMotion }>): {
-  points: Array<{ x: number; y: number }>;
+}: Readonly<{
+  input: Input;
+  frame: number;
+  motion: VideoMotion;
+}>): {
+  points: Array<{
+    x: number;
+    y: number;
+  }>;
   path: string;
 } {
-  const raisedY = mix(
-    motion.ramp(frame, 58, motion.scale(20), motion.travel.easing),
-    300,
-    250,
-  );
+  const raisedY = Motion.mix({
+    t: motion.ramp(frame, 58, motion.scale(20), motion.travel.easing),
+    from: 300,
+    to: 250,
+  });
   const forward = [
     { x: 240, y: 300 },
     { x: 410, y: 300 },

@@ -1,10 +1,10 @@
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { RESULT_CUE } from "./getEvidenceFromFrame";
 import { GridEvidence } from "./GridEvidence";
 import { GridSceneHeadings } from "./GridSceneHeadings";
 import { GridSourceLinks } from "./GridSourceLinks";
-import { ReconstructionGrid } from "./ReconstructionGrid";
+import { ReconstructionGrid } from "./ReconstructionGrid/ReconstructionGrid";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./PdfGridReconstruction.schema";
 import type { ReactNode } from "react";

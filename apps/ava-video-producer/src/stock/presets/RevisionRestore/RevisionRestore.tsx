@@ -1,3 +1,4 @@
+import { propEq } from "@avandar/utils";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { RestoreImpression } from "./RestoreImpression/RestoreImpression";
 import { RevisionDocument } from "./RevisionDocument";
@@ -17,9 +18,9 @@ export function RevisionRestore({
   accent,
 }: Readonly<Props>): ReactNode {
   const motion = GraphicThemeHooks.useGraphicMotion();
-  const selectedIndex = input.revisions.findIndex(({ id }) => {
-    return id === input.restoreRevisionId;
-  });
+  const selectedIndex = input.revisions.findIndex(
+    propEq("id", input.restoreRevisionId),
+  );
   const selected = input.revisions[selectedIndex];
   const previous = input.revisions.at(-1)!.content;
   const numLines = Math.max(previous.length, selected.content.length);

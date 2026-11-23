@@ -1,7 +1,15 @@
-import { StockRect } from "../../../primitives/StockRect/StockRect";
+import { StockRect } from "../../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { type Props } from "./PresenceRibbonShared.types";
+import { type Props as PresenceRibbonSharedProps } from "./PresenceRibbonShared.types";
 import type { ReactNode } from "react";
+
+type Props = Omit<PresenceRibbonSharedProps, "input"> & {
+  y: number;
+  start: number;
+  end: number;
+  axisEnd: number;
+};
+
 /** The part of a ribbon inside the investigation window. */
 export function OverlapBand({
   record,
@@ -12,14 +20,7 @@ export function OverlapBand({
   start,
   end,
   axisEnd,
-}: Readonly<
-  Omit<Props, "input"> & {
-    y: number;
-    start: number;
-    end: number;
-    axisEnd: number;
-  }
->): ReactNode {
+}: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const motion = GraphicThemeHooks.useGraphicMotion();
   const scales = GraphicThemeHooks.useGraphicShapeScales();

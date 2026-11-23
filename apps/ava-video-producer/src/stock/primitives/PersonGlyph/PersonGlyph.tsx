@@ -1,4 +1,5 @@
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { PersonRoles, type PersonRole } from "./PersonRoles";
 import type { ReactNode } from "react";
 /** A person's line weight before the theme's line weight scales it. */
 const PERSON_STROKE = 2.5;
@@ -7,7 +8,7 @@ type Props = {
   y: number;
   size?: number;
   posture?: "standing" | "seated" | "walking";
-  role?: "participant" | "facilitator" | "worker";
+  role?: PersonRole;
   /** Defaults to the theme's positive colour. */
   color?: string;
 };
@@ -28,7 +29,7 @@ function _validatePresentation({
     size < 8 ||
     size > 160 ||
     !(posture in POSTURES) ||
-    !["participant", "facilitator", "worker"].includes(role)
+    !PersonRoles.isValid(role)
   ) {
     throw new Error(
       "Person glyph placement, size, posture or role is unsupported.",

@@ -3,16 +3,20 @@
  * undefined. Array indexes are keys too, so `["colors", "primary", "4"]`
  * reads a palette shade.
  */
-export function getValueAtPath(
-  source: unknown,
-  path: readonly string[],
-): unknown {
+export function getValueAtPath({
+  source,
+  path,
+}: Readonly<{
+  source: unknown;
+  path: readonly string[];
+}>): unknown {
   let value: unknown = source;
-  for (const key of path) {
-    if (typeof value !== "object" || value === null) {
-      return undefined;
+  const failedSegmentIndex = path.findIndex((key) => {
+    const isMissingContainer = typeof value !== "object" || value === null;
+    if (!isMissingContainer) {
+      value = (value as Readonly<Record<string, unknown>>)[key];
     }
-    value = (value as Readonly<Record<string, unknown>>)[key];
-  }
-  return value;
+    return isMissingContainer;
+  });
+  return failedSegmentIndex === -1 ? value : undefined;
 }

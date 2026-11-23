@@ -1,10 +1,18 @@
-import { mix, ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { SketchedShape } from "../../primitives/SketchedShape";
-import { StockRect } from "../../primitives/StockRect/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { FeedbackNoteFeedbackRound } from "./FeedbackNoteFeedbackRound/FeedbackNoteFeedbackRound";
+import { FeedbackNoteTether } from "./FeedbackNoteTether/FeedbackNoteTether";
 import type { Input } from "./FeedbackRefinement.schema";
 import type { ReactNode } from "react";
+
+type FeedbackNoteTravel = {
+  detach: number;
+  draftX: number;
+  x: number;
+  y: number;
+  opacity: number;
+};
 
 type Props = {
   frame: number;
@@ -17,6 +25,56 @@ type Props = {
 const DETACH_FRAMES = 16;
 /** A note's corner before the corner style scales it. */
 const NOTE_CORNER = 6;
+
+type GetFeedbackNoteTravelOptions = {
+  frame: number;
+  index: number;
+  numRounds: number;
+  showReviewTrail: boolean;
+  motion: ReturnType<typeof GraphicThemeHooks.useGraphicMotion>;
+};
+/** Samples the authored feedback note travel. */
+function _getFeedbackNoteTravel({
+  frame,
+  index,
+  numRounds,
+  showReviewTrail,
+  motion,
+}: Readonly<GetFeedbackNoteTravelOptions>): FeedbackNoteTravel {
+  const start = 32 + index * 56,
+    reviewAt = numRounds === 1 ? 62 : start + 20,
+    returnAt = numRounds === 1 ? 94 : start + 56;
+  const outward = Motion.ramp({
+      frame,
+      at: start,
+      dur: reviewAt - start,
+      easing: motion.travel.easing,
+    }),
+    returning = Motion.ramp({
+      frame,
+      at: reviewAt,
+      dur: returnAt - reviewAt,
+      easing: motion.travel.easing,
+    });
+  const detach = Motion.ramp({
+    frame,
+    at: returnAt,
+    dur: motion.scale(DETACH_FRAMES),
+    easing: motion.entrance.easing,
+  });
+  const draftX = 100 + 460 * (outward - returning);
+  const x = Motion.mix({ t: detach, from: draftX - 10, to: 80 + index * 410 }),
+    y = Motion.mix({ t: detach, from: 350, to: 500 });
+  const opacity =
+    Motion.ramp({
+      frame,
+      at: reviewAt - motion.whip,
+      dur: motion.whip,
+      easing: motion.reveal.easing,
+    }) * (showReviewTrail ? 1 : 1 - detach);
+  return { detach, draftX, x, y, opacity };
+}
+
 /** A returned feedback tab detaches into its own reserved trail slot. */
 export function FeedbackNote({
   frame,
@@ -29,48 +87,21 @@ export function FeedbackNote({
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   const motion = GraphicThemeHooks.useGraphicMotion();
-  const start = 32 + index * 56,
-    reviewAt = numRounds === 1 ? 62 : start + 20,
-    returnAt = numRounds === 1 ? 94 : start + 56;
-  const outward = ramp(frame, start, reviewAt - start, motion.travel.easing),
-    returning = ramp(
-      frame,
-      reviewAt,
-      returnAt - reviewAt,
-      motion.travel.easing,
-    );
-  const detach = ramp(
+  const { detach, draftX, x, y, opacity } = _getFeedbackNoteTravel({
     frame,
-    returnAt,
-    motion.scale(DETACH_FRAMES),
-    motion.entrance.easing,
-  );
-  const draftX = 100 + 460 * (outward - returning);
-  const x = mix(detach, draftX - 10, 80 + index * 410),
-    y = mix(detach, 350, 500);
-  const opacity =
-    ramp(frame, reviewAt - motion.whip, motion.whip, motion.reveal.easing) *
-    (showReviewTrail ? 1 : 1 - detach);
+    index,
+    numRounds,
+    showReviewTrail,
+    motion,
+  });
   return (
     <g opacity={opacity}>
-      <g data-feedback-tether={index}>
-        <SketchedShape
-          shape={{ kind: "path", d: `M${draftX + 150} 320 L${x + 160} ${y}` }}
-          profile={tokens.sketch.shape}
-          stroke={tokens.color.highlight}
-          opacity={1 - detach}
-        />
-      </g>
-      <StockRect
-        data-feedback-round={index}
-        x={x}
-        y={y}
-        width={mix(detach, 320, 390)}
-        height={78}
-        rx={scales.corner(NOTE_CORNER)}
-        fill={tokens.color.elevated}
-        stroke={tokens.color.highlight}
-        strokeOpacity={mix(detach, 1, atomic.opacity["40"])}
+      <FeedbackNoteTether {...{ index, tokens, detach, draftX, x, y }} />
+      <FeedbackNoteFeedbackRound
+        {...{ index, x, y, detach, scales }}
+        noteCorner={NOTE_CORNER}
+        tokens={tokens}
+        atomic={atomic}
       />
       <FitText
         text={round.feedback}
@@ -86,3 +117,11 @@ export function FeedbackNote({
     </g>
   );
 }
+
+/** The type of `NOTE_CORNER` used by FeedbackNote. */
+export type FeedbackNoteNoteCornerValue = typeof NOTE_CORNER;
+
+/** Result of the authored FeedbackNote calculation. */
+export type FeedbackNoteGetFeedbackNoteTravelValue = ReturnType<
+  typeof _getFeedbackNoteTravel
+>;

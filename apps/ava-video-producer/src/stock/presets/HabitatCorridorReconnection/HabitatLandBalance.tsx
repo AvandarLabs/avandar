@@ -1,8 +1,11 @@
-import { FitText } from "../../primitives/FitText/FitText";
-import { QuantityBand } from "../../primitives/QuantityBand/QuantityBand";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { HabitatCurrentLandBand } from "./HabitatCurrentLandBand/HabitatCurrentLandBand";
+import { HabitatLandBalanceAreaUnitLabel } from "./HabitatLandBalanceAreaUnitLabel/HabitatLandBalanceAreaUnitLabel";
+import { HabitatLandBalanceTerms } from "./HabitatLandBalanceTerms/HabitatLandBalanceTerms";
+import { HabitatOriginalLandBand } from "./HabitatOriginalLandBand/HabitatOriginalLandBand";
 import type { Input } from "./HabitatCorridorReconnection.schema";
 import type { ReactNode } from "react";
+
 /** Inputs for HabitatLandBalance. */
 type Props = { frame: number; accent: string; input: Input };
 /**
@@ -31,18 +34,7 @@ export function HabitatLandBalance({
     ),
     currentHabitat = habitat + corridor * progress;
   if (!input.showLandBalance) {
-    return (
-      <FitText
-        text={input.copy.areaUnit}
-        x={32}
-        y={467}
-        width={896}
-        fontSize={12}
-        maxLines={1}
-        breakLongWords
-        normalizeWhitespace
-      />
-    );
+    return <HabitatLandBalanceAreaUnitLabel input={input} />;
   }
   const terms = [
     { label: input.copy.habitat, value: `${habitat} → ${afterHabitat}` },
@@ -56,57 +48,9 @@ export function HabitatLandBalance({
       data-habitat-after={afterHabitat}
       data-other-after={afterOther}
     >
-      <QuantityBand
-        values={[
-          { value: habitat, color: accent },
-          { value: other, color: tokens.color.line },
-        ]}
-        denominator={input.landBoundaryHa}
-        x={32}
-        y={456}
-        width={896}
-        height={12}
-      />
-      <QuantityBand
-        values={[
-          { value: currentHabitat, color: accent },
-          {
-            value: input.landBoundaryHa - currentHabitat,
-            color: tokens.color.line,
-          },
-        ]}
-        denominator={input.landBoundaryHa}
-        x={32}
-        y={480}
-        width={896}
-        height={12}
-      />
-      {terms.map(({ label, value }, index) => {
-        return (
-          <g key={index}>
-            <FitText
-              text={label}
-              x={32 + index * 310}
-              y={512}
-              width={276}
-              fontSize={12}
-              maxLines={3}
-              breakLongWords
-              normalizeWhitespace
-            />
-            <FitText
-              text={value}
-              x={32 + index * 310}
-              y={555}
-              width={276}
-              fontSize={12}
-              maxLines={2}
-              breakLongWords
-              normalizeWhitespace
-            />
-          </g>
-        );
-      })}
+      <HabitatOriginalLandBand {...{ habitat, accent, other, tokens, input }} />
+      <HabitatCurrentLandBand {...{ currentHabitat, accent, input, tokens }} />
+      <HabitatLandBalanceTerms terms={terms} />
     </g>
   );
 }

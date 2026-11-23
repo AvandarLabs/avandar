@@ -1,9 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { prop } from "@avandar/utils";
+import { prop, propEq } from "@avandar/utils";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+import {
+  registerStockPresetAssertions,
+  type PresetAssertions,
+} from "../../../../tests/helpers/registerStockPresetAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import classicTheme from "../../../../themes/classic.theme.json";
 import { SchoolLunchTrayComposition } from "./SchoolLunchTrayComposition";
@@ -17,7 +20,6 @@ import {
   invalidInputs,
 } from "./SchoolLunchTrayComposition.fixtures";
 import { inputSchema, type Input } from "./SchoolLunchTrayComposition.schema";
-import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 
 function _render({
   frame,
@@ -37,6 +39,7 @@ function _render({
     ),
   );
 }
+
 test("Only supplied served components fill compartments and the complete numerator uses every planned tray", () => {
   const setup = _render({ frame: 24, input: DEFAULT_INPUT });
   const hold = _render({ frame: 150, input: DEFAULT_INPUT });
@@ -71,6 +74,7 @@ function _getVisibleTexts({
       : []),
   ];
 }
+
 const options = {
   inputSchema,
   defaultInput: DEFAULT_INPUT,
@@ -82,7 +86,9 @@ const options = {
   getVisibleTexts: _getVisibleTexts,
   textFrames: [24, 72, 150],
 } satisfies PresetAssertions<Input>;
+
 registerStockPresetAssertions(options);
+
 registerStockTextLayoutAssertions(options);
 
 test("empty and full served subsets retain every compartment for six reordered trays", () => {
@@ -121,6 +127,7 @@ test("empty and full served subsets retain every compartment for six reordered t
     });
   });
 });
+
 test("spoons physically contact served food while names and neighboring trays stay clear", () => {
   [minimumInput, denseInput, changedInput].forEach((input) => {
     return [
@@ -218,9 +225,7 @@ function _assertOutlineTreatment({
   outlines.forEach((outline, index) => {
     const learner =
       input.learners[Math.floor(index / input.plannedComponents.length)];
-    const tray = input.trays.find(({ learnerId }) => {
-      return learnerId === learner.id;
-    })!;
+    const tray = input.trays.find(propEq("learnerId", learner.id))!;
     const isMissing = !tray.componentIds.includes(outline.componentId);
     const isEmphasis =
       input.emphasizeMissingComponents &&
@@ -252,6 +257,7 @@ const emptyTrays: Array<{ componentIds: never[]; learnerId: string }> =
       componentIds: [],
     };
   });
+
 const fullTrays: Array<{ componentIds: string[]; learnerId: string }> =
   denseInput.trays.map((tray) => {
     return {
@@ -259,6 +265,7 @@ const fullTrays: Array<{ componentIds: string[]; learnerId: string }> =
       componentIds: denseInput.plannedComponents.map(prop("id")),
     };
   });
+
 [
   {
     name: "mixed served subsets",

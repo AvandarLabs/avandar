@@ -1,50 +1,28 @@
-import { Switch } from "@mantine/core";
-import {
-  useRowHasIssue,
-  useRowIssueAriaProps,
-} from "../../RowIssueContext/RowIssueContext";
 import { useTokenEditor } from "../../TokenEditorContext";
-import { type TokenRow } from "../../tokenRows/tokenRows.types";
+import { type TokenRow } from "../../TokenRows/TokenRows.types";
 import { ContrastBadge } from "../ContrastBadge/ContrastBadge";
 import { ReferenceControl } from "../ReferenceControl/ReferenceControl";
-import {
-  canPairColorRole,
-  isColorPair,
-  setColorPairing,
-} from "../roleValueHelpers/roleValueHelpers";
+import { isColorPair } from "../roleValueHelpers/roleValueHelpers";
 import { ColorPairFields } from "./ColorPairFields";
+import { ColorPairingSwitch } from "./ColorPairingSwitch";
 import css from "./ColorRoleControl.module.css";
 import type { ReactNode } from "react";
 
 const TEXT_COLOR_PATHS = new Set(["color.text", "color.textMuted"]);
-type Props = Readonly<{ row: TokenRow; label: string }>;
+type Props = Readonly<{
+  row: TokenRow;
+  label: string;
+}>;
 /**
  * A colour role: one reference, or one for dark grounds and one for light
  * grounds. Text colours show their contrast against the ground.
  */
 export function ColorRoleControl({ row, label }: Props): ReactNode {
   const editor = useTokenEditor();
-  const hasIssue = useRowHasIssue();
-  const issueAriaProps = useRowIssueAriaProps();
   const pair = isColorPair(row.value) ? row.value : undefined;
-  const canPair = canPairColorRole(row.value);
   return (
-    <div className={css.colorRoleStack}>
-      <Switch
-        size="xs"
-        label="Use another colour on light backgrounds"
-        error={hasIssue}
-        {...issueAriaProps}
-        checked={pair !== undefined}
-        disabled={!canPair}
-        description={canPair ? undefined : "Pick a colour first."}
-        onChange={(event) => {
-          return editor.setToken(
-            row.path,
-            setColorPairing(row.value, event.currentTarget.checked),
-          );
-        }}
-      />
+    <div className={css.colorRoleControlStack}>
+      <ColorPairingSwitch row={row} />
       {pair ? (
         <ColorPairFields row={row} label={label} pair={pair} />
       ) : (

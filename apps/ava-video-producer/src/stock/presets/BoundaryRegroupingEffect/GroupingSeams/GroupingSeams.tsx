@@ -1,7 +1,7 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { buildZoneOutlineFromCells } from "../buildZoneOutlineFromCells";
 import { getGroupingFromCells } from "../getGroupingFromCells";
+import { makeZoneOutlineFromCells } from "../makeZoneOutlineFromCells";
 import { PartitionOutlines } from "./PartitionOutlines";
 import type { Input } from "../BoundaryRegroupingEffect.schema";
 import type { ReactNode } from "react";

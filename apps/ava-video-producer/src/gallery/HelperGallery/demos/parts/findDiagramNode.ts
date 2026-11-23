@@ -1,3 +1,4 @@
+import { propEq } from "@avandar/utils";
 /** Node centres of the preview diagram, on the 960 by 600 Atlas canvas. */
 export const DIAGRAM_NODES = [
   { id: "source", x: 150, y: 170 },
@@ -13,7 +14,7 @@ export const DIAGRAM_NODE_SIZE = { width: 150, height: 64 };
 
 /** The preview diagram node with the given id. */
 export function findDiagramNode(id: string): (typeof DIAGRAM_NODES)[number] {
-  return DIAGRAM_NODES.find((node) => {
-    return node.id === id;
-  })!;
+  return DIAGRAM_NODES.find(
+    propEq<Readonly<{ id: string }>, "id", string>("id", id),
+  )!;
 }

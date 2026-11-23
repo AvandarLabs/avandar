@@ -1,4 +1,4 @@
-import { ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
@@ -12,7 +12,10 @@ import { ReviewTiming } from "./ReviewTiming";
 import type { Input } from "./PdfNearestLabelReview.schema";
 import type { ReactNode } from "react";
 
-type Props = { input: Input; frame: number };
+type Props = {
+  input: Input;
+  frame: number;
+};
 /**
  * Uncertainty remains explicit independently of optional numeric annotations.
  */
@@ -24,12 +27,12 @@ export function AssociationStatus({
   const association = getAssociationFromInput(input);
   return (
     <g
-      opacity={ramp(
+      opacity={Motion.ramp({
         frame,
-        ReviewTiming.STATUS_CUE,
-        motion.whip,
-        motion.reveal.easing,
-      )}
+        at: ReviewTiming.STATUS_CUE,
+        dur: motion.whip,
+        easing: motion.reveal.easing,
+      })}
     >
       {" "}
       {input.showDistanceValues ? (

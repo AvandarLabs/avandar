@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { prop } from "@avandar/utils";
+import { prop, propEq } from "@avandar/utils";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { CapabilityMatrix } from "./CapabilityMatrix";
@@ -11,6 +11,7 @@ import {
   invalidInputs,
 } from "./CapabilityMatrix.fixtures";
 import { inputSchema } from "./CapabilityMatrix.schema";
+
 /** Inputs for render. */
 type RenderInput = {
   options: Array<{ id: string; label: string }>;
@@ -54,6 +55,7 @@ function _render({
     ),
   );
 }
+
 function _cells(markup: string): string[] {
   return [...markup.matchAll(/data-cell="([^"]+)" data-state="([^"]+)"/g)].map(
     (match) => {
@@ -109,9 +111,7 @@ test("row and column emphasis preserve every explicit capability value", () => {
 });
 
 test("local querying, remote invitations and optional sync retain independently authored availability", () => {
-  const input = fixtures.find(({ id }) => {
-    return id === "changed";
-  })!.input;
+  const input = fixtures.find(propEq("id", "changed"))!.input;
   const markup = _render({ frame: 150, input });
   assert.ok(markup.includes('data-cell="query:local" data-state="included"'));
   assert.ok(markup.includes('data-cell="invite:local" data-state="absent"'));

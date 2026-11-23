@@ -1,0 +1,10 @@
+.shotTransitionDemoMiniStages {
+  align-content: center;
+  display: grid;
+  gap: var(--demo-space-18);
+  height: 100%;
+}
+
+.shotTransitionDemoThreeUp {
+  grid-template-columns: 1fr 1fr 1fr;
+}

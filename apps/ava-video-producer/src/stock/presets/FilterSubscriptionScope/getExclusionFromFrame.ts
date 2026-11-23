@@ -1,5 +1,5 @@
-import { ramp } from "../../../motion";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import { Motion } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 /** The cue subscribed views start to exclude other categories on. */
 const EXCLUDE_CUE = 91;
 /** Frames the exclusion sweep takes. */
@@ -8,11 +8,14 @@ const EXCLUDE_FRAMES = 48;
 export function getExclusionFromFrame({
   frame,
   motion,
-}: Readonly<{ frame: number; motion: VideoMotion }>): number {
-  return ramp(
+}: Readonly<{
+  frame: number;
+  motion: VideoMotion;
+}>): number {
+  return Motion.ramp({
     frame,
-    EXCLUDE_CUE,
-    motion.scale(EXCLUDE_FRAMES),
-    motion.reveal.easing,
-  );
+    at: EXCLUDE_CUE,
+    dur: motion.scale(EXCLUDE_FRAMES),
+    easing: motion.reveal.easing,
+  });
 }

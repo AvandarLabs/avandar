@@ -1,6 +1,7 @@
 import { propEq } from "@avandar/utils";
-import { getStockValueFromPath } from "../../../stock/copy/getStockValueFromPath";
+import { getStockValueFromPath } from "../../../stock/data/getStockValueFromPath";
 import { ContentFields } from "./ContentFields/ContentFields";
+import { SelectOptions } from "./SelectOptions";
 import type { StockControl } from "../../../stock/contracts/StockContract.types";
 import type { Props as ContentFieldProps } from "./ContentField/ContentField";
 import type { ContentFieldContext } from "./useContentField";
@@ -23,15 +24,8 @@ export function SelectField({
   context,
   state,
   itemPath,
-}: Props): ReactNode {
-  const options = ContentFields.getOptionsFromControl({
-    control,
-    root: state.draft,
-    item: getStockValueFromPath({
-      value: state.draft,
-      path: itemPath,
-    }),
-  });
+}: Readonly<Props>): ReactNode {
+  const options = _getFieldOptions({ control, state, itemPath });
   const selectedIndex = options.findIndex(
     propEq<{ value: unknown }, "value", unknown>("value", context.value),
   );
@@ -54,15 +48,24 @@ export function SelectField({
       <option value="" disabled>
         {"Choose a value"}
       </option>
-      {options.map((option, index) => {
-        return (
-          <option key={`${option.value}-${index}`} value={`option:${index}`}>
-            {typeof option.label === "string"
-              ? option.label
-              : option.label.message}
-          </option>
-        );
-      })}
+      <SelectOptions options={options} />
     </select>
   );
+}
+
+function _getFieldOptions({
+  control,
+  state,
+  itemPath,
+}: Readonly<Pick<Props, "control" | "state" | "itemPath">>): ReturnType<
+  typeof ContentFields.getOptionsFromControl
+> {
+  return ContentFields.getOptionsFromControl({
+    control,
+    root: state.draft,
+    item: getStockValueFromPath({
+      value: state.draft,
+      path: itemPath,
+    }),
+  });
 }

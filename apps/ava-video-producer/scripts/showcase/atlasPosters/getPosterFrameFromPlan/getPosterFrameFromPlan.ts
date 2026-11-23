@@ -1,6 +1,6 @@
-import { getContinuityTimeline } from "../../../../src/continuity/continuityTimeline";
+import { ContinuityTimeline } from "../../../../src/continuity/ContinuityTimeline/ContinuityTimeline";
 import { MotionSettings } from "../../../../src/motion-components/MotionSettings/MotionSettings";
-import { timeline } from "../../../../src/storyboard/schema/timeline";
+import { StoryboardTimeline } from "../../../../src/storyboard/schema/StoryboardTimeline";
 import type { Storyboard } from "../../../../src/storyboard/schema/schema";
 /**
  * The frame an Atlas card poster shows: the middle of the middle beat's
@@ -9,14 +9,14 @@ import type { Storyboard } from "../../../../src/storyboard/schema/schema";
  * storyboard render takes its poster from.
  */
 export function getPosterFrameFromPlan(plan: Storyboard): number {
-  const shots = timeline(plan);
+  const shots = StoryboardTimeline.timeline(plan);
   const shot = shots[Math.floor(shots.length / 2)];
   if (shot.scene !== "continuity") {
     return shot.startFrame + Math.floor(shot.durationInFrames * 0.65);
   }
   const beats = shot.props.beats;
   const index = Math.floor(beats.length / 2);
-  const { start, end } = getContinuityTimeline(beats)[index];
+  const { start, end } = ContinuityTimeline.getContinuityTimeline(beats)[index];
   const incoming =
     index === 0
       ? 0

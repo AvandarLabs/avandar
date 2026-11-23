@@ -1,9 +1,9 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ActiveDeviation } from "./ActiveDeviation";
+import { DetailActiveRecursiveSplit } from "./DetailActiveRecursiveSplit/DetailActiveRecursiveSplit";
 import { makeCompletedDetailPathFromInputAndFrame } from "./makeCompletedDetailPathFromInputAndFrame";
 import { makeDetailSimplificationFromInput } from "./makeDetailSimplificationFromInput";
-import { RecursiveSplit } from "./RecursiveSplit";
 import type { Input } from "./GeometryDetailBudget.schema";
 import type { ReactNode } from "react";
 
@@ -44,23 +44,14 @@ export function DetailRecursion({
       />
       {frame < 111 ? (
         <ActiveDeviation
-          input={input}
-          event={event}
-          frame={frame}
+          {...{ input, event, frame }}
           at={51 + activeIndex * span}
           duration={span}
         />
       ) : undefined}
-      {frame < 111 && event.split ? (
-        <RecursiveSplit
-          input={input}
-          event={event}
-          frame={frame}
-          at={51 + activeIndex * span}
-          duration={span}
-          accent={accent}
-        />
-      ) : undefined}
+      <DetailActiveRecursiveSplit
+        {...{ frame, event, input, activeIndex, span, accent }}
+      />
     </g>
   );
 }

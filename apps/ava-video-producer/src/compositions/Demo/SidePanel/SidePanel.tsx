@@ -1,13 +1,13 @@
 import { abs } from "../../../chrome/abs";
 import { useVideoMotion } from "../../../videoTheme/useVideoMotion";
 import { useVideoShapeScales } from "../../../videoTheme/useVideoShapeScales";
-import { useVideoTheme } from "../../../videoTheme/useVideoTheme";
+import { useVideoTheme } from "../../../videoTheme/videoThemeHelpers";
 import { ROWS_AT, SIDE } from "../timeline";
 import { Facts } from "./Facts";
 import { FilterChips } from "./FilterChips";
 import { MatchedCount } from "./MatchedCount";
 import { PublishedToast } from "./PublishedToast";
-import { SidePanelShared } from "./SidePanelShared/SidePanelShared";
+import { SidePanelShared } from "./SidePanelShared";
 import type { ReactNode } from "react";
 
 type Props = {

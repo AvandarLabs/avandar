@@ -1,7 +1,6 @@
 import { STAGE } from "./measureAvandar.constants";
 import type { MeasurementRun, ReviewWindow } from "./measureAvandar.types";
 import type { Page } from "@playwright/test";
-
 /** Measured bounds of one `[data-video-target]` element in a snapshot. */
 type ReviewTargetSnapshot = {
   target: string | undefined;
@@ -10,7 +9,6 @@ type ReviewTargetSnapshot = {
   width: number;
   height: number;
 };
-
 /** The page's frame, readiness, and every target's bounds at one moment. */
 type ReviewSnapshot = {
   frame: number;
@@ -18,7 +16,6 @@ type ReviewSnapshot = {
   handles: number;
   targets: ReviewTargetSnapshot[];
 };
-
 /** The page's current frame, readiness, and every target's bounds. */
 async function _readSnapshot(page: Page): Promise<ReviewSnapshot> {
   return page.evaluate(() => {
@@ -42,15 +39,17 @@ async function _readSnapshot(page: Page): Promise<ReviewSnapshot> {
     };
   });
 }
-
 /**
  * Waits until three consecutive snapshots at `frame` agree, so late widget
  * rerenders cannot move a target after it is measured.
  */
-async function _waitForStableTargets(
-  page: Page,
-  frame: number,
-): Promise<ReviewSnapshot> {
+async function _waitForStableTargets({
+  page,
+  frame,
+}: Readonly<{
+  page: Page;
+  frame: number;
+}>): Promise<ReviewSnapshot> {
   let previousFingerprint: string | undefined;
   let stableSamples = 0;
   let snapshot: ReviewSnapshot | undefined;
@@ -76,7 +75,6 @@ async function _waitForStableTargets(
   }
   return snapshot;
 }
-
 /**
  * Drives the `component:review` page for the measurement run: opening it,
  * switching feature, and seeking to a frame once it is stable. Used by the
@@ -86,7 +84,10 @@ export const ReviewPageDriver = {
   /** Opens the review page, optionally switching it to a feature. */
   load: async (
     run: Readonly<MeasurementRun>,
-    options: Readonly<{ url: string; feature?: string }>,
+    options: Readonly<{
+      url: string;
+      feature?: string;
+    }>,
   ): Promise<void> => {
     const { page } = run;
     const { url, feature } = options;
@@ -108,7 +109,6 @@ export const ReviewPageDriver = {
       throw new Error("Review stage must be exactly 1600 by 840.");
     }
   },
-
   /** Seeks to a frame, waits until stable, and records the seek in the run. */
   seek: async (run: MeasurementRun, frame: number): Promise<void> => {
     const { page } = run;
@@ -140,7 +140,10 @@ export const ReviewPageDriver = {
     await page.waitForFunction(isReady, frame);
     await page.waitForTimeout(run.settleMs);
     await page.waitForFunction(isReady, frame);
-    const snapshot = await _waitForStableTargets(page, frame);
+    const snapshot = await _waitForStableTargets({
+      page,
+      frame,
+    });
     run.seeks.push({
       frame,
       elapsedMs: Math.round(performance.now() - started),

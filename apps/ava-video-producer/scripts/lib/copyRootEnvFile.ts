@@ -1,12 +1,10 @@
 import { readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { getProductRootFromProducerRoot } from "./productSourceHelpers";
-
+import { ProductSources } from "./ProductSources";
 /**
  * The producer's env file in the workspace root, next to every other env file.
  */
 export const ROOT_ENV_FILENAME = ".env.video-producer.local";
-
 function _readOptionalFile(filename: string): Buffer | undefined {
   try {
     return readFileSync(filename);
@@ -17,7 +15,6 @@ function _readOptionalFile(filename: string): Buffer | undefined {
     throw error;
   }
 }
-
 /**
  * Copies the workspace root's `.env.video-producer.local` to this app's
  * `.env.local`, the file the license loader reads. The license guard calls
@@ -29,10 +26,13 @@ function _readOptionalFile(filename: string): Buffer | undefined {
  * An app file that already matches is not rewritten, which keeps its
  * modification time stable for file watchers.
  */
-export function copyRootEnvFile(
-  appRoot: string,
-  environment: Readonly<NodeJS.ProcessEnv> = process.env,
-): void {
+export function copyRootEnvFile({
+  appRoot,
+  environment = process.env,
+}: Readonly<{
+  appRoot: string;
+  environment?: Readonly<NodeJS.ProcessEnv>;
+}>): void {
   if (
     environment.REMOTION_KEYS_FILE ||
     environment.AVANDAR_REMOTION_KEYS_FILE
@@ -40,7 +40,10 @@ export function copyRootEnvFile(
     return;
   }
   const contents = _readOptionalFile(
-    path.join(getProductRootFromProducerRoot(appRoot), ROOT_ENV_FILENAME),
+    path.join(
+      ProductSources.getProductRootFromProducerRoot(appRoot),
+      ROOT_ENV_FILENAME,
+    ),
   );
   if (contents === undefined) {
     return;

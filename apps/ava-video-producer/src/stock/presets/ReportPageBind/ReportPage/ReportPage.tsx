@@ -1,10 +1,8 @@
-import { mix } from "../../../../motion";
+import { Motion } from "../../../../motion";
 import { SketchedShape } from "../../../primitives/SketchedShape";
-import { StockRect } from "../../../primitives/StockRect/StockRect";
-import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { getReportPageGeometryFromInputAndFrame } from "../getReportPageGeometryFromInputAndFrame";
-import { ReportPageCopy } from "../ReportPageCopy";
+import { ReportPageCopy } from "../ReportPageCopy/ReportPageCopy";
 import { PagePaper } from "./PagePaper";
+import { useReportPagePresentation } from "./useReportPagePresentation";
 import type { Input } from "../ReportPageBind.schema";
 import type { ReactNode } from "react";
 
@@ -16,44 +14,38 @@ type Props = {
   accent: string;
 };
 /** A section keeps its page identity while paper margins extend around it. */
-export function ReportPage({
-  section,
-  index,
-  frame,
-  input,
-  accent,
-}: Readonly<Props>): ReactNode {
-  const tokens = GraphicThemeHooks.useGraphicTokens();
-  const motion = GraphicThemeHooks.useGraphicMotion();
-  const scales = GraphicThemeHooks.useGraphicShapeScales();
-  const { x, y, margins } = getReportPageGeometryFromInputAndFrame({
-    motion,
-    input,
-    frame,
-    index,
-  });
+export function ReportPage(props: Readonly<Props>): ReactNode {
+  const presentation = useReportPagePresentation(props);
+
   return (
     <g
-      data-page={section.id}
-      transform={`translate(${x} ${y})`}
-      opacity={motion.reveal(frame, 12 + index * motion.stagger.list)}
+      data-page={props.section.id}
+      transform={`translate(${presentation.x} ${presentation.y})`}
+      opacity={presentation.motion.reveal(
+        props.frame,
+        12 + props.index * presentation.motion.stagger.list,
+      )}
     >
-      <PagePaper sectionId={section.id} margins={margins} />
+      <PagePaper sectionId={props.section.id} margins={presentation.margins} />
       <SketchedShape
         shape={{ kind: "path", d: "M0 6V108" }}
-        profile={tokens.sketch.shape}
-        stroke={accent}
-        strokeWidth={scales.stroke(
-          mix(margins, tokens.stroke.hairline, tokens.stroke.emphasis),
+        profile={presentation.tokens.sketch.shape}
+        stroke={props.accent}
+        strokeWidth={presentation.scales.stroke(
+          Motion.mix({
+            t: presentation.margins,
+            from: presentation.tokens.stroke.hairline,
+            to: presentation.tokens.stroke.emphasis,
+          }),
         )}
-        opacity={margins}
+        opacity={presentation.margins}
       />
       <ReportPageCopy
-        section={section}
-        index={index}
-        showPageNumbers={input.showPageNumbers}
-        margins={margins}
-        accent={accent}
+        section={props.section}
+        index={props.index}
+        showPageNumbers={props.input.showPageNumbers}
+        margins={presentation.margins}
+        accent={props.accent}
       />
     </g>
   );

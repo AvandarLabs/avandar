@@ -1,3 +1,4 @@
+import { objectValuesMap } from "@avandar/utils";
 import type { Input } from "./DoseCohortReturnPaths.schema";
 /** Complete fictional default, replaced only as a whole input. */
 export const DEFAULT_INPUT: Input = {
@@ -118,11 +119,9 @@ const dense: Input = {
     };
   }),
   sceneLabel: "界".repeat(40),
-  copy: Object.fromEntries(
-    Object.keys(DEFAULT_INPUT.copy).map((key) => {
-      return [key, "界".repeat(42)];
-    }),
-  ) as Input["copy"],
+  copy: objectValuesMap(DEFAULT_INPUT.copy, () => {
+    return "界".repeat(42);
+  }) as Input["copy"],
 };
 const changed: Input = {
   ...DEFAULT_INPUT,

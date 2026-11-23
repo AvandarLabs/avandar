@@ -24,8 +24,12 @@ export function CursorShutterTrail({
   return CursorMotionHelpers.cursorShutter({ frame, path, motion }).map(
     (sample, index) => {
       return sample.opacity > 0 ? (
-        <MacOSCursor
-          key={index}
+        // prettier-ignore
+        // Each key identifies a fixed shutter-sample slot. Position
+        // and opacity vary each frame, while the sampling order
+        // remains fixed.
+        // react-doctor-disable-next-line no-array-index-as-key
+        <MacOSCursor key={index}
           cursor={cursor}
           showInTimeline={false}
           style={{

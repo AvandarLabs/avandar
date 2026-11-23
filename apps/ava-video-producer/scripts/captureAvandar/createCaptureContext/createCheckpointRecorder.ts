@@ -1,8 +1,8 @@
 import { writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { getArtifactPathFromRunPath } from "../../captureLib/manifestHelpers";
-import { makeRedactedTextFromValue } from "../../captureLib/sanitizeHelpers";
-import { validateId } from "../../captureLib/urlSafetyHelpers";
+import { CaptureManifests } from "../../captureLib/CaptureManifests";
+import { CaptureSanitization } from "../../captureLib/CaptureSanitization";
+import { CaptureUrlSafety } from "../../captureLib/CaptureUrlSafety/CaptureUrlSafety";
 import { getSha256FromFile } from "../../lib/getSha256FromFile";
 import { claimQualifiedId, getPageFromRun } from "./recorderHelpers";
 import type {
@@ -14,7 +14,6 @@ import type {
   CaptureRecorderState,
 } from "./createCaptureContext.types";
 import type { Page } from "@playwright/test";
-
 /** What a checkpoint recorder needs to fill one running checkpoint entry. */
 type CheckpointCompletion = {
   run: CaptureRecorderState;
@@ -23,7 +22,6 @@ type CheckpointCompletion = {
   qualifiedId: string;
   checkpointOptions: Readonly<CheckpointOptions>;
 };
-
 /** Saves the checkpoint screenshot, masking credential fields. */
 async function _captureScreenshot({
   run,
@@ -48,7 +46,6 @@ async function _captureScreenshot({
   });
   return imagePath;
 }
-
 /**
  * Saves the page's visible text, redacted, beside the checkpoint
  * screenshot.
@@ -66,12 +63,11 @@ async function _captureVisibleText({
   const visibleText = await page.locator("body").innerText();
   await writeFile(
     textPath,
-    `${makeRedactedTextFromValue({ value: visibleText, secrets: run.secrets, limit: 50_000 })}\n`,
+    `${CaptureSanitization.makeRedactedTextFromValue({ value: visibleText, secrets: run.secrets, limit: 50000 })}\n`,
     { flag: "wx", mode: 0o600 },
   );
   return textPath;
 }
-
 /** Fills a running checkpoint entry with its screenshot and optional text. */
 async function _completeCheckpoint(
   options: Readonly<CheckpointCompletion>,
@@ -88,13 +84,19 @@ async function _completeCheckpoint(
   entry.videoAtMs = run.videoElapsed();
   const imagePath = await _captureScreenshot({ run, page, qualifiedId });
   entry.screenshot = {
-    path: getArtifactPathFromRunPath(run.runDir, imagePath),
+    path: CaptureManifests.getArtifactPathFromRunPath({
+      root: run.runDir,
+      path: imagePath,
+    }),
     sha256: await getSha256FromFile(imagePath),
   };
   if (options.checkpointOptions.text === true) {
     const textPath = await _captureVisibleText({ run, page, qualifiedId });
     entry.text = {
-      path: getArtifactPathFromRunPath(run.runDir, textPath),
+      path: CaptureManifests.getArtifactPathFromRunPath({
+        root: run.runDir,
+        path: textPath,
+      }),
       sha256: await getSha256FromFile(textPath),
     };
   }
@@ -103,7 +105,6 @@ async function _completeCheckpoint(
   await run.persist();
   return entry.screenshot.path;
 }
-
 /**
  * Creates the recorder behind `CaptureContext.checkpoint`: it screenshots the
  * recording page, optionally saves its text, and records the result in the
@@ -114,7 +115,10 @@ export function createCheckpointRecorder(
 ): CaptureContext["checkpoint"] {
   const checkpointIds = new Set<string>();
   return async ({ flowId, id, checkpointOptions = {} }) => {
-    validateId(id, "checkpoint id");
+    CaptureUrlSafety.validateId({
+      value: id,
+      name: "checkpoint id",
+    });
     const qualifiedId = `${flowId}-${id}`;
     claimQualifiedId({
       usedIds: checkpointIds,
@@ -142,7 +146,7 @@ export function createCheckpointRecorder(
       });
     } catch (error) {
       entry.status = "failed";
-      entry.error = makeRedactedTextFromValue({
+      entry.error = CaptureSanitization.makeRedactedTextFromValue({
         value: error instanceof Error ? error.message : error,
         secrets: run.secrets,
       });

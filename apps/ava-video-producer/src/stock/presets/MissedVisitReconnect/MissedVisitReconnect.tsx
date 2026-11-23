@@ -1,15 +1,17 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ReconnectCase } from "./ReconnectCase";
 import { ReconnectLedger } from "./ReconnectLedger";
 import { ReconnectSetting } from "./ReconnectSetting";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./MissedVisitReconnect.schema";
 import type { ReactNode } from "react";
 
-type Props = GraphicProps & { input: Input };
+type Props = GraphicProps & {
+  input: Input;
+};
 /** A worker contacts the fixed group; only attended people enter the clinic. */
 export function MissedVisitReconnect({
   frame,
@@ -53,17 +55,21 @@ function _getWorkerY({
   input,
   frame,
   motion,
-}: Readonly<{ input: Input; frame: number; motion: VideoMotion }>): number {
+}: Readonly<{
+  input: Input;
+  frame: number;
+  motion: VideoMotion;
+}>): number {
   return input.cases.reduce((position, _, index) => {
-    return mix(
-      motion.ramp(
+    return Motion.mix({
+      t: motion.ramp(
         frame,
         39 + index * motion.scaleStagger(9),
         motion.scale(7),
         motion.travel.easing,
       ),
-      position,
-      160 + index * 48,
-    );
+      from: position,
+      to: 160 + index * 48,
+    });
   }, 160);
 }

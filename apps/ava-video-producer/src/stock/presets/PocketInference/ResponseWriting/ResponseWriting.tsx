@@ -40,6 +40,11 @@ export function ResponseWriting({ input, accent }: Readonly<Props>): ReactNode {
             );
           })
         : input.response.lines.map((_, index) => {
+            // prettier-ignore
+            // This branch draws fixed decorative stroke slots,
+            // not the response-line data. Only the slot index
+            // determines its geometry.
+            // react-doctor-disable-next-line no-array-index-as-key
             return <ResponseStroke key={index} index={index} accent={accent} />;
           })}
     </g>

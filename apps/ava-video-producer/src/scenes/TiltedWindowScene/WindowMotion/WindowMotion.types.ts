@@ -1,7 +1,7 @@
 import { type MotionSettingsTheme } from "../../../motion-components/MotionSettings/MotionSettings";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { ResolvedVideoComponents } from "../../../videoTheme/videoTheme.types";
-import type { Rect } from "../../layout/layout";
+import type { Rect } from "../../layout/SceneGeometry";
 /** Inputs for sampling a window's blurred entrance from the right. */
 export type GetWhipEntranceOptions = {
   frame: number;

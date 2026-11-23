@@ -1,13 +1,16 @@
-import { StockRect } from "../../../primitives/StockRect/StockRect";
+import { StockRect } from "../../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { ExpectedSheetShared } from "./ExpectedSheetShared/ExpectedSheetShared";
+import { ExpectedSheetShared } from "./ExpectedSheetShared";
 import type { ReactNode } from "react";
+
+type Props = { isHinge: boolean; scale: number; accent: string };
+
 /** The expected sheet itself, folded flat on its hinge until it registers. */
 export function HingedSheet({
   isHinge,
   scale,
   accent,
-}: Readonly<{ isHinge: boolean; scale: number; accent: string }>): ReactNode {
+}: Readonly<Props>): ReactNode {
   const { atomic } = GraphicThemeHooks.useGraphicTheme();
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();

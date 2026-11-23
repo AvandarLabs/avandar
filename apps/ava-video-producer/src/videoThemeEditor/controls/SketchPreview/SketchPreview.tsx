@@ -3,13 +3,13 @@ import rough from "roughjs";
 import css from "./SketchPreview.module.css";
 import type { ResolvedSketchProfile } from "../../../videoTheme/videoTheme.types";
 
+type Props = { profile: ResolvedSketchProfile | undefined };
+
 /**
  * A small box drawn with a sketch profile, so roughness, bowing, and seed can
  * be judged by eye.
  */
-export function SketchPreview({
-  profile,
-}: Readonly<{ profile: ResolvedSketchProfile | undefined }>): ReactNode {
+export function SketchPreview({ profile }: Readonly<Props>): ReactNode {
   const paths = useMemo(() => {
     if (!profile) {
       return [];

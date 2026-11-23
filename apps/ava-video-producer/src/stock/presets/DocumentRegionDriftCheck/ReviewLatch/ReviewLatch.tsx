@@ -1,6 +1,6 @@
-import { mix, ramp } from "../../../../motion";
-import { LabelSlots } from "../../../primitives/LabelSlots/LabelSlots";
+import { Motion } from "../../../../motion";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { DocumentReviewStatus } from "./DocumentReviewStatus/DocumentReviewStatus";
 import { LatchArm } from "./LatchArm";
 import type { Input } from "../DocumentRegionDriftCheck.schema";
 import type { ReactNode } from "react";
@@ -24,13 +24,15 @@ export function ReviewLatch({
 }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const motion = GraphicThemeHooks.useGraphicMotion();
-  const closure = ramp(
+  const closure = Motion.ramp({
       frame,
-      101,
-      motion.scale(CLOSE_FRAMES),
-      motion.entrance.easing,
-    ),
-    gap = matched ? mix(closure, 32, 18) : mix(closure, 32, 0);
+      at: 101,
+      dur: motion.scale(CLOSE_FRAMES),
+      easing: motion.entrance.easing,
+    }),
+    gap = matched
+      ? Motion.mix({ t: closure, from: 32, to: 18 })
+      : Motion.mix({ t: closure, from: 32, to: 0 });
   return (
     <g>
       {(["left", "right"] as const).map((side) => {
@@ -43,20 +45,7 @@ export function ReviewLatch({
           />
         );
       })}
-      <g opacity={closure}>
-        <LabelSlots
-          labels={[
-            [
-              matched ? input.labels.matched : input.labels.review,
-              52,
-              500,
-              856,
-              18,
-              2,
-            ],
-          ]}
-        />
-      </g>
+      <DocumentReviewStatus {...{ input, matched, closure }} />
     </g>
   );
 }

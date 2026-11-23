@@ -1,8 +1,8 @@
 import { Text } from "../../graphics-common/Text";
-import { FitText } from "../../primitives/FitText/FitText";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { makeRegisteredLandmarksFromInputAndFrame } from "./makeRegisteredLandmarksFromInputAndFrame";
+import { RegistrationLedgerCoordinatePair } from "./RegistrationLedgerCoordinatePair/RegistrationLedgerCoordinatePair";
 import type { Input } from "./CoordinateFrameRegistration.schema";
 import type { ReactNode } from "react";
 
@@ -34,30 +34,7 @@ export function RegistrationLedger({
                 [point.id, 40 + point.index * 220, 493, 210, 12, 1],
               ]}
             />
-            {input.showCoordinatePairs ? (
-              <g data-coordinate-pair={point.id}>
-                <FitText
-                  text={`○ (${point.x}, ${point.y})`}
-                  x={40 + point.index * 220}
-                  y={516}
-                  width={210}
-                  fontSize={12}
-                  maxLines={3}
-                  breakLongWords
-                  normalizeWhitespace
-                />
-                <FitText
-                  text={`◇ (${point.targetX}, ${point.targetY})`}
-                  x={40 + point.index * 220}
-                  y={562}
-                  width={210}
-                  fontSize={12}
-                  maxLines={3}
-                  breakLongWords
-                  normalizeWhitespace
-                />
-              </g>
-            ) : undefined}
+            <RegistrationLedgerCoordinatePair input={input} point={point} />
           </g>
         );
       })}

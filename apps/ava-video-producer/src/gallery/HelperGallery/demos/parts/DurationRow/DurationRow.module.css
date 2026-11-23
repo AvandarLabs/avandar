@@ -1,0 +1,17 @@
+.durationRowTimelineRow {
+  align-items: center;
+  display: grid;
+  gap: var(--demo-space-2xs);
+  grid-template-columns: 190px 1fr;
+  height: 40px;
+}
+
+.durationRowTimelineName {
+  color: var(--demo-muted);
+  font-family: var(--demo-mono);
+  font-size: var(--demo-font-size-xs);
+}
+
+.durationRowTimelineNameActive {
+  color: var(--demo-text);
+}

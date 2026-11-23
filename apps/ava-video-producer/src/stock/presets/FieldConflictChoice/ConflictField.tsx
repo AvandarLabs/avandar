@@ -1,4 +1,4 @@
-import { ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ConflictCandidate } from "./ConflictCandidate";
 import { ConflictChoiceMark } from "./ConflictChoiceMark/ConflictChoiceMark";
@@ -27,12 +27,12 @@ export function ConflictField({
 }: Readonly<Props>): ReactNode {
   const motion = GraphicThemeHooks.useGraphicMotion();
   const y = 106 + index * 122;
-  const progress = ramp(
+  const progress = Motion.ramp({
     frame,
-    42,
-    motion.scale(CHOOSE_FRAMES),
-    motion.travel.easing,
-  );
+    at: 42,
+    dur: motion.scale(CHOOSE_FRAMES),
+    easing: motion.travel.easing,
+  });
   const lane = { field, input, y, progress };
   return (
     <g>

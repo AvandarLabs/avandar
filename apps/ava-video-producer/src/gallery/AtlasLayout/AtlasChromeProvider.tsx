@@ -2,6 +2,8 @@ import "@mantine/core/styles.layer.css";
 import { MantineProvider } from "@mantine/core";
 import type { ReactNode } from "react";
 
+type Props = { children: ReactNode };
+
 const ATLAS_CHROME_THEME = {
   fontFamily: "Figtree, ui-sans-serif, system-ui, sans-serif",
 } as const;
@@ -11,9 +13,7 @@ const ATLAS_CHROME_THEME = {
  * modals such as the Details / Design tokens tabs and the token editor. It
  * never carries video tokens; previews get theirs from `GalleryItemTheme`.
  */
-export function AtlasChromeProvider({
-  children,
-}: Readonly<{ children: ReactNode }>): ReactNode {
+export function AtlasChromeProvider({ children }: Readonly<Props>): ReactNode {
   return (
     <MantineProvider theme={ATLAS_CHROME_THEME}>{children}</MantineProvider>
   );

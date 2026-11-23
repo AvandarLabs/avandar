@@ -1,5 +1,5 @@
 import { StageThemeBoundary } from "../../scenes/StageTheme/StageThemeBoundary";
-import { CursorContent } from "./CursorContent";
+import { CursorContent } from "./CursorContent/CursorContent";
 import { type Props } from "./CursorShared.types";
 import type { ReactNode } from "react";
 /**

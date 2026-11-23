@@ -22,7 +22,10 @@ export function CacheColumn({
   growth,
   accent,
 }: Readonly<Props>): ReactNode {
-  const style = GraphicThemeHooks.useGraphicProps("QueryColumnCacheGrowth", {});
+  const style = GraphicThemeHooks.useGraphicProps({
+    name: "QueryColumnCacheGrowth",
+    props: {},
+  });
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   const { color, sketch } = GraphicThemeHooks.useGraphicTokens();
   return (

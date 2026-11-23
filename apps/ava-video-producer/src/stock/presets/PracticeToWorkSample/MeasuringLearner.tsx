@@ -1,13 +1,17 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { MeasuringTools } from "./MeasuringTools";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import { MeasuringTools } from "./MeasuringTools/MeasuringTools";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./PracticeToWorkSample.schema";
 import type { ReactNode } from "react";
 
-type Props = { input: Input; frame: number; accent: string };
+type Props = {
+  input: Input;
+  frame: number;
+  accent: string;
+};
 /**
  * One learner physically holds a ruler and repeats a pencil marking gesture.
  */
@@ -59,7 +63,11 @@ function _getMeasuringPose({
   input,
   frame,
   motion,
-}: Readonly<{ input: Input; frame: number; motion: VideoMotion }>) {
+}: Readonly<{
+  input: Input;
+  frame: number;
+  motion: VideoMotion;
+}>) {
   const transfer = motion.ramp(
     frame,
     56,
@@ -76,13 +84,17 @@ function _getMeasuringPose({
     motion.travel.easing,
   );
   return {
-    x: mix(transfer, 330, 550),
+    x: Motion.mix({
+      t: transfer,
+      from: 330,
+      to: 550,
+    }),
     isApplication,
-    rulerY: mix(
-      motion.ramp(frame, at, motion.whip, motion.travel.easing),
-      275,
-      330,
-    ),
+    rulerY: Motion.mix({
+      t: motion.ramp(frame, at, motion.whip, motion.travel.easing),
+      from: 275,
+      to: 330,
+    }),
     origin,
     pencilX: origin + input.task.value * 12 * progress,
   };

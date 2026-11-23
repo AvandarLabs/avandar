@@ -1,65 +1,59 @@
-import { token } from "../defineTokensHelpers";
-import {
-  createColorToken,
-  createDurationToken,
-  createEasingToken,
-  createLengthToken,
-  createStrokeToken,
-} from "./componentTokenHelpers";
-
+import { TokenDefinitions } from "../TokenDefinitions";
+import { ComponentTokenDefinitions } from "./ComponentTokenDefinitions";
 /**
  * Tokens of the stage: heading, subtitle, shared object, evidence chip, and
  * product frame.
  */
 export const STAGE_TOKENS = {
   Heading: {
-    entranceDuration: createDurationToken(
-      "Heading entrance duration",
-      "How long a beat heading takes to arrive.",
-      "stage",
-    ),
-    entranceEasing: createEasingToken(
-      "Heading entrance curve",
-      "The curve of a beat heading arriving.",
-      "stage",
-    ),
-    entranceDistance: createLengthToken(
-      "Heading rise",
-      "How far a beat heading rises as it arrives.",
-      "stage",
-    ),
+    entranceDuration: ComponentTokenDefinitions.makeDurationToken({
+      label: "Heading entrance duration",
+      description: "How long a beat heading takes to arrive.",
+      surface: "stage",
+    }),
+    entranceEasing: ComponentTokenDefinitions.makeEasingToken({
+      label: "Heading entrance curve",
+      description: "The curve of a beat heading arriving.",
+      surface: "stage",
+    }),
+    entranceDistance: ComponentTokenDefinitions.makeLengthToken({
+      label: "Heading rise",
+      description: "How far a beat heading rises as it arrives.",
+      surface: "stage",
+    }),
   },
   Subtitle: {
-    gap: createLengthToken(
-      "Subtitle gap",
-      "Space between a beat heading and its subtitle.",
-      "stage",
-    ),
+    gap: ComponentTokenDefinitions.makeLengthToken({
+      label: "Subtitle gap",
+      description: "Space between a beat heading and its subtitle.",
+      surface: "stage",
+    }),
   },
   SharedObject: {
-    borderWidth: createStrokeToken(
-      "Shared object border",
-      "Border width of an object that travels between motions.",
-      "stage",
-    ),
-    fill: createColorToken(
-      "Shared object fill",
-      "Fill of an object that travels between motions.",
-      "stage",
-    ),
-    fadeIn: createDurationToken(
-      "Shared object fade-in",
-      "How long a shared object takes to appear.",
-      "stage",
-    ),
-    outlineFade: createDurationToken(
-      "Outline fade",
-      "How long an outline-only shared object takes to fade after it lands.",
-      "stage",
-    ),
+    borderWidth: ComponentTokenDefinitions.makeStrokeToken({
+      label: "Shared object border",
+      description: "Border width of an object that travels between motions.",
+      surface: "stage",
+    }),
+    fill: ComponentTokenDefinitions.makeColorToken({
+      label: "Shared object fill",
+      description: "Fill of an object that travels between motions.",
+      surface: "stage",
+    }),
+    fadeIn: ComponentTokenDefinitions.makeDurationToken({
+      label: "Shared object fade-in",
+      description: "How long a shared object takes to appear.",
+      surface: "stage",
+    }),
+    outlineFade: ComponentTokenDefinitions.makeDurationToken({
+      label: "Outline fade",
+      description:
+        "How long an outline-only shared object takes to fade after it lands.",
+      surface: "stage",
+    }),
   },
   EvidenceChip: {
-    padding: token({
+    padding: TokenDefinitions.token({
       kind: "box",
       surface: "stage",
       label: "Evidence chip padding",
@@ -68,10 +62,10 @@ export const STAGE_TOKENS = {
     }),
   },
   ProductFrame: {
-    backdrop: createColorToken(
-      "Reenactment backdrop",
-      "The backdrop drawn around a reenactment on the stage.",
-      "stage",
-    ),
+    backdrop: ComponentTokenDefinitions.makeColorToken({
+      label: "Reenactment backdrop",
+      description: "The backdrop drawn around a reenactment on the stage.",
+      surface: "stage",
+    }),
   },
 } as const;

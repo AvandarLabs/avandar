@@ -3,7 +3,7 @@ import { IconArrowBackUp } from "@tabler/icons-react";
 import { clsx } from "clsx";
 import { formatTokenValue } from "../../formatTokenValue/formatTokenValue";
 import { useTokenEditor } from "../../TokenEditorContext";
-import { type TokenRow } from "../../tokenRows/tokenRows.types";
+import { type TokenRow } from "../../TokenRows/TokenRows.types";
 import { OverrideDot } from "./OverrideDot/OverrideDot";
 import css from "./TokenRowHeader.module.css";
 import type { ReactNode } from "react";
@@ -22,17 +22,6 @@ export function TokenRowHeader({
   hasIssue,
 }: Props): ReactNode {
   const editor = useTokenEditor();
-  const kind = row.definition.kind;
-  const value = formatTokenValue({ kind, value: row.resolved });
-  const itemValue =
-    row.itemOverride &&
-    formatTokenValue({ kind, value: row.itemOverride.resolved });
-  const toValueText = (): string => {
-    if (hasIssue) {
-      return `Last working value: ${value}`;
-    }
-    return itemValue ? `Used here: ${itemValue}` : value;
-  };
   return (
     <div className={css.tokenRowHeader}>
       <span
@@ -49,7 +38,9 @@ export function TokenRowHeader({
           {"Same as the theme"}
         </span>
       ) : null}
-      <span className={css.tokenRowHeaderValue}>{toValueText()}</span>
+      <span className={css.tokenRowHeaderValue}>
+        {_valueText({ row, hasIssue })}
+      </span>
       {row.overrideState === "draft" ? (
         <ActionIcon
           size="sm"
@@ -65,4 +56,21 @@ export function TokenRowHeader({
       ) : null}
     </div>
   );
+}
+
+function _valueText({
+  row,
+  hasIssue,
+}: Readonly<Pick<Props, "row" | "hasIssue">>): string {
+  const kind = row.definition.kind;
+  const value = formatTokenValue({ kind, value: row.resolved });
+  const itemValue =
+    row.itemOverride &&
+    formatTokenValue({ kind, value: row.itemOverride.resolved });
+
+  return hasIssue
+    ? `Last working value: ${value}`
+    : itemValue
+      ? `Used here: ${itemValue}`
+      : value;
 }

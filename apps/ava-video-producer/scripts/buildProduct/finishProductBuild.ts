@@ -15,12 +15,20 @@ type FinishedBuild = {
   outputDirectory: string;
   onBuilt: () => Promise<void>;
 };
-
 /** Appends the Tailwind utilities the imported product sources use. */
-async function _appendTailwindUtilities(
-  imported: ReadonlyMap<string, { path: string; sha256: string }>,
-  outputDirectory: string,
-): Promise<void> {
+async function _appendTailwindUtilities({
+  imported,
+  outputDirectory,
+}: Readonly<{
+  imported: ReadonlyMap<
+    string,
+    {
+      path: string;
+      sha256: string;
+    }
+  >;
+  outputDirectory: string;
+}>): Promise<void> {
   const content = [
     "avandar-adapter/**/*.{ts,tsx}",
     ...Array.from(imported.keys())
@@ -36,7 +44,6 @@ async function _appendTailwindUtilities(
   ]).process("@tailwind utilities;", { from: undefined });
   await fs.appendFile(path.join(outputDirectory, "product.css"), utilities.css);
 }
-
 /**
  * Completes a successful product build: adds the Tailwind utilities to the
  * stylesheet, writes `build.json` listing every product source file and the
@@ -52,7 +59,10 @@ export async function finishProductBuild(
   if (result.errors.length) {
     return;
   }
-  await _appendTailwindUtilities(imported, outputDirectory);
+  await _appendTailwindUtilities({
+    imported,
+    outputDirectory,
+  });
   const revision = execFileSync("git", ["rev-parse", "HEAD"], {
     cwd: PRODUCT_ROOT,
     encoding: "utf8",

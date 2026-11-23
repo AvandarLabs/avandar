@@ -11,43 +11,33 @@ import {
   continuityAppearanceSchema,
   createContinuityPlanFromOptions,
   type ContinuityAppearance,
-} from "../continuity/continuityAppearance";
-import { createContinuityPlanFromVideoThemeSnapshot } from "../continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme";
-import { durationInFrames } from "../storyboard/schema/timeline";
-import { VideoTokenUsageContext } from "../videoTheme/tokenUsageHelpers/tokenUsageHelpers";
-import { useObservedTokenUsage } from "../videoThemeEditor/observedTokenUsage/useObservedTokenUsage";
+} from "../continuity/continuityAppearance/continuityAppearance";
+import { ContinuityThemePlans } from "../continuity/ContinuityThemePlans/ContinuityThemePlans";
+import { StoryboardTimeline } from "../storyboard/schema/StoryboardTimeline";
+import { VideoTokenUsageContext } from "../videoTheme/TokenUsage/TokenUsage";
+import { useObservedTokenUsage } from "../videoThemeEditor/createObservedTokenUsage/useObservedTokenUsage";
 import { CaptionToggle } from "./CaptionToggle";
 import { LiveFilm } from "./LiveFilm";
 import { LIVE_FILM_ID } from "./liveFilmId";
 import { postToParentGallery } from "./postToParentGallery";
+import { readSavedPlayback } from "./readSavedPlayback/readSavedPlayback";
 import { useFilmControl } from "./useFilmControl";
-import type { VideoThemeSnapshot } from "../videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
+import type { VideoThemeSnapshot } from "../videoTheme/VideoThemeSnapshots/VideoThemeSnapshots";
 import type { Film } from "./showcase.types";
 
-type SavedPlayback = Readonly<{
-  frame: number;
-  playing: boolean;
-  captions: boolean;
-  speed?: number;
-  loop?: boolean;
-}>;
+type Props = {
+  film: Film;
+};
 type ContinuityShot = Extract<
   NonNullable<Film["plan"]>["shots"][number],
-  { scene: "continuity" }
->;
-
-function _readSaved(): SavedPlayback | undefined {
-  try {
-    return (
-      (JSON.parse(
-        sessionStorage.getItem(`film:${LIVE_FILM_ID}`) ?? "null",
-      ) as SavedPlayback | null) ?? undefined
-    );
-  } catch {
-    return undefined;
+  {
+    scene: "continuity";
   }
-}
-const saved = _readSaved();
+>;
+const saved = readSavedPlayback({
+  storage: sessionStorage,
+  key: `film:${LIVE_FILM_ID}`,
+});
 let savePlayback = () => {};
 window.addEventListener("message", (event) => {
   if (
@@ -61,7 +51,7 @@ window.addEventListener("message", (event) => {
   try {
     savePlayback();
   } catch {
-    /* Storage can be unavailable in a restricted browser. */
+    // Storage can be unavailable in a restricted browser.
   }
   postToParentGallery({
     type: "film-reloading",
@@ -69,14 +59,37 @@ window.addEventListener("message", (event) => {
   });
   location.reload();
 });
-
+function useFilmPlayerControls({
+  player,
+  state,
+  isContinuity,
+  previewFrames,
+  usedTokens,
+}: Readonly<{
+  player: RefObject<PlayerRef | null>;
+  state: ReturnType<typeof useLiveFilmState>;
+  isContinuity: boolean;
+  previewFrames: number;
+  usedTokens: readonly string[];
+}>): void {
+  useSavedPlayback({
+    player,
+    state: { captions: state.captions, speed: state.speed, loop: state.loop },
+  });
+  useLiveFilmControl({
+    player,
+    isContinuity: isContinuity,
+    state,
+    previewFrames,
+    usedTokens: usedTokens,
+  });
+}
 function _findContinuityShot(film: Film): ContinuityShot | undefined {
   const shot = film.plan?.shots.find((candidate) => {
     return candidate.scene === "continuity";
   });
   return shot?.scene === "continuity" ? shot : undefined;
 }
-
 function _getInitialAppearance(
   shot: ContinuityShot | undefined,
 ): ContinuityAppearance {
@@ -90,55 +103,59 @@ function _getInitialAppearance(
       : {},
   );
 }
-
 function _getInitialFrame(previewFrames: number): number {
   const fallbackFrame =
     LIVE_FILM_ID === "avandar-home" ? 490 : Math.min(100, previewFrames - 1);
   return Math.min(previewFrames - 1, saved?.frame ?? fallbackFrame);
 }
-
-function useSavedPlayback(
-  player: RefObject<PlayerRef | null>,
-  state: Readonly<{ captions: boolean; speed: number; loop: boolean }>,
-) {
+function useSavedPlayback({
+  player,
+  state,
+}: Readonly<{
+  player: RefObject<PlayerRef | null>;
+  state: Readonly<{
+    captions: boolean;
+    speed: number;
+    loop: boolean;
+  }>;
+}>) {
   const { captions, speed, loop } = state;
-  useEffect(
-    function rememberPlaybackForReload() {
-      savePlayback = () => {
-        return sessionStorage.setItem(
-          `film:${LIVE_FILM_ID}`,
-          JSON.stringify({
-            frame: player.current?.getCurrentFrame() ?? 0,
-            playing: player.current?.isPlaying() ?? false,
-            captions,
-            speed,
-            loop,
-          }),
-        );
-      };
-    },
-    [player, captions, speed, loop],
-  );
-  useEffect(
-    function registerPlayEventListener() {
-      const current = player.current;
-      const play = () => {
-        postToParentGallery({ type: "film-playing", id: LIVE_FILM_ID });
-      };
-      current?.addEventListener("play", play);
-      return () => {
-        current?.removeEventListener("play", play);
-      };
-    },
-    [player],
-  );
+  useEffect(() => {
+    savePlayback = () => {
+      return sessionStorage.setItem(
+        `film:${LIVE_FILM_ID}`,
+        JSON.stringify({
+          frame: player.current?.getCurrentFrame() ?? 0,
+          playing: player.current?.isPlaying() ?? false,
+          captions,
+          speed,
+          loop,
+        }),
+      );
+    };
+  }, [player, captions, speed, loop]);
+  useEffect(() => {
+    const current = player.current;
+    const play = () => {
+      postToParentGallery({ type: "film-playing", id: LIVE_FILM_ID });
+    };
+    current?.addEventListener("play", play);
+    return () => {
+      current?.removeEventListener("play", play);
+    };
+  }, [player]);
 }
-
 /**
  * The live film's appearance, theme, and transport, seeded from the film and
  * the playback saved before a source reload.
  */
-function useLiveFilmState(film: Film, continuity: ContinuityShot | undefined) {
+function useLiveFilmState({
+  film,
+  continuity,
+}: Readonly<{
+  film: Film;
+  continuity: ContinuityShot | undefined;
+}>) {
   const [appearance, setAppearance] = useState(() => {
     return _getInitialAppearance(continuity);
   });
@@ -161,7 +178,6 @@ function useLiveFilmState(film: Film, continuity: ContinuityShot | undefined) {
     setLoop,
   };
 }
-
 type UsePreviewTimingOptions = {
   film: Film;
   appearance: ContinuityAppearance;
@@ -179,23 +195,27 @@ function usePreviewTiming(options: UsePreviewTimingOptions) {
     // The film keeps its unthemed plan: FilmComposition applies the theme.
     () => {
       return film.plan && isContinuity
-        ? createContinuityPlanFromOptions(film.plan, appearance)
+        ? createContinuityPlanFromOptions({
+            plan: film.plan,
+            raw: appearance,
+          })
         : film.plan;
     },
     [film, appearance, isContinuity],
   );
   const previewFrames = useMemo(() => {
     return previewPlan
-      ? durationInFrames(
-          createContinuityPlanFromVideoThemeSnapshot(previewPlan, theme, [
-            film.id,
-          ]),
+      ? StoryboardTimeline.durationInFrames(
+          ContinuityThemePlans.fromVideoThemeSnapshot({
+            plan: previewPlan,
+            snapshot: theme,
+            overrideIds: [film.id],
+          }),
         )
       : film.frames;
   }, [previewPlan, theme, film.id, film.frames]);
   return { previewPlan, previewFrames };
 }
-
 type LiveFilmControlOptions = Readonly<{
   player: RefObject<PlayerRef | null>;
   isContinuity: boolean;
@@ -203,7 +223,6 @@ type LiveFilmControlOptions = Readonly<{
   previewFrames: number;
   usedTokens: readonly string[];
 }>;
-
 /** Lets the embedding gallery drive this film's state through messages. */
 function useLiveFilmControl(options: LiveFilmControlOptions) {
   const { state } = options;
@@ -226,15 +245,17 @@ function useLiveFilmControl(options: LiveFilmControlOptions) {
     onLoop: state.setLoop,
   });
 }
-
 /**
  * The embedded live preview: plays a film, follows the gallery's transport,
  * appearance, and theme messages, and reports the tokens its film reads.
  */
-export function LiveFilmPlayer({ film }: { film: Film }): ReactNode {
+export function LiveFilmPlayer({ film }: Readonly<Props>): ReactNode {
   const player = useRef<PlayerRef>(null);
   const continuity = _findContinuityShot(film);
-  const state = useLiveFilmState(film, continuity);
+  const state = useLiveFilmState({
+    film,
+    continuity,
+  });
   const { appearance, theme, captions, speed, loop } = state;
   const usage = useObservedTokenUsage();
   const { previewPlan, previewFrames } = usePreviewTiming({
@@ -243,11 +264,10 @@ export function LiveFilmPlayer({ film }: { film: Film }): ReactNode {
     theme,
     isContinuity: Boolean(continuity),
   });
-  useSavedPlayback(player, { captions, speed, loop });
-  useLiveFilmControl({
+  useFilmPlayerControls({
     player,
-    isContinuity: Boolean(continuity),
     state,
+    isContinuity: Boolean(continuity),
     previewFrames,
     usedTokens: usage.paths,
   });

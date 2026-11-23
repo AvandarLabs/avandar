@@ -9,8 +9,12 @@ export function ClassLegends({ input, accent }: Readonly<Props>): ReactNode {
     <g>
       {input.schemes.map((scheme, index) => {
         return (
-          <ClassLegend
-            key={index}
+          // prettier-ignore
+          // The schema fixes exactly two schemes in before/after
+          // order. A legend belongs to that comparison slot, not
+          // its editable label.
+          // react-doctor-disable-next-line no-array-index-as-key
+          <ClassLegend key={index}
             {...{ scheme, index, accent }}
             unitLabel={input.unitLabel}
             noDataLabel={input.noDataLabel}

@@ -2,11 +2,14 @@ import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
+
+type Props = { label: string; accent: string };
+
 /** The operation's name over the faint timeline its attempts sit on. */
 export function OperationHeading({
   label,
   accent,
-}: Readonly<{ label: string; accent: string }>): ReactNode {
+}: Readonly<Props>): ReactNode {
   const { atomic } = GraphicThemeHooks.useGraphicTheme();
   const tokens = GraphicThemeHooks.useGraphicTokens();
   return (

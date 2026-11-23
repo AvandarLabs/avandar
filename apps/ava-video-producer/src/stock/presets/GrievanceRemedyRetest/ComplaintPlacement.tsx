@@ -1,10 +1,14 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./GrievanceRemedyRetest.schema";
 import type { ReactNode } from "react";
 /** Inputs for ComplaintPlacement. */
-type Props = { frame: number; input: Input; accent: string };
+type Props = {
+  frame: number;
+  input: Input;
+  accent: string;
+};
 /** The participant places an optional persistent complaint marker. */
 export function ComplaintPlacement({
   frame,
@@ -23,8 +27,8 @@ export function ComplaintPlacement({
           <SketchedShape
             shape={{
               kind: "circle",
-              cx: mix(complaint, 220, 320),
-              cy: mix(complaint, 325, 415),
+              cx: Motion.mix({ t: complaint, from: 220, to: 320 }),
+              cy: Motion.mix({ t: complaint, from: 325, to: 415 }),
               r: 14,
             }}
             profile={tokens.sketch.shape}
@@ -37,7 +41,7 @@ export function ComplaintPlacement({
             <SketchedShape
               shape={{
                 kind: "path",
-                d: `M200 310 L${mix(complaint, 220, 320)} ${mix(complaint, 325, 415)}`,
+                d: `M200 310 L${Motion.mix({ t: complaint, from: 220, to: 320 })} ${Motion.mix({ t: complaint, from: 325, to: 415 })}`,
               }}
               profile={tokens.sketch.shape}
               data-complaint-hand="participant"

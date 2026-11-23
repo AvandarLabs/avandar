@@ -1,11 +1,11 @@
-import { useVideoTokens } from "../../../videoTheme/useVideoTheme";
+import { useVideoTokens } from "../../../videoTheme/videoThemeHelpers";
 import { PAIR_BOXES } from "../windowTilt";
 import { type StatLineProps } from "./RaceStatsShared/RaceStatsShared.types";
 import type { ReactNode } from "react";
 
-type RaceStatOptions = StatLineProps & Readonly<{ stat: string }>;
+type Props = StatLineProps & Readonly<{ stat: string }>;
 /** The stat under the window, right-aligned to its edge. */
-export function RaceStat({ stat, ...line }: RaceStatOptions): ReactNode {
+export function RaceStat({ stat, ...line }: Readonly<Props>): ReactNode {
   const tokens = useVideoTokens();
   const box = PAIR_BOXES[line.side];
   return (

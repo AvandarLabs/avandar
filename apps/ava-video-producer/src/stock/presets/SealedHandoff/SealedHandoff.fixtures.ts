@@ -1,3 +1,4 @@
+import { objectValuesMap } from "@avandar/utils";
 import type { Input } from "./SealedHandoff.schema";
 /** Fictional brief and deliberately visible exterior routing information. */
 export const DEFAULT_INPUT: Input = {
@@ -49,11 +50,9 @@ export const fixtures: Array<{ id: string; input: Input }> = [
         recipient: "W".repeat(28),
         reference: "W".repeat(28),
       },
-      copy: Object.fromEntries(
-        Object.keys(DEFAULT_INPUT.copy).map((key) => {
-          return [key, "W".repeat(34)];
-        }),
-      ) as Input["copy"],
+      copy: objectValuesMap(DEFAULT_INPUT.copy, () => {
+        return "W".repeat(34);
+      }) as Input["copy"],
     },
   },
   {

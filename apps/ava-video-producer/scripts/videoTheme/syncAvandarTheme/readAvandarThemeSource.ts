@@ -1,6 +1,6 @@
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import type { AvandarThemeSource } from "./createAvandarTheme/createAvandarTheme";
+import type { AvandarThemeSource } from "./AvandarThemeConversion/AvandarThemeConversion";
 
 const APP_ROOT = fileURLToPath(new URL("../../..", import.meta.url));
 
@@ -10,11 +10,12 @@ const APP_ROOT = fileURLToPath(new URL("../../..", import.meta.url));
  * drift test that keeps `avandar.theme.json` current.
  */
 export function readAvandarThemeSource(): AvandarThemeSource {
-  return JSON.parse(
+  const source: AvandarThemeSource = JSON.parse(
     execFileSync(
       process.execPath,
       ["--import", "tsx", "scripts/readTheme.ts", "--for-video"],
       { cwd: APP_ROOT, encoding: "utf8" },
     ),
-  ) as AvandarThemeSource;
+  );
+  return source;
 }

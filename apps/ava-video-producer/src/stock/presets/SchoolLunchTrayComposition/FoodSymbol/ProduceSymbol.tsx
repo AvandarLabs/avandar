@@ -1,11 +1,12 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { type Props } from "./FoodSymbolShared/FoodSymbolShared.types";
+import { type Props as FoodSymbolSharedProps } from "./FoodSymbolShared/FoodSymbolShared.types";
 import type { ReactNode } from "react";
+
+type Props = Pick<FoodSymbolSharedProps, "symbol">;
+
 /** A fruit with its stem, or a vegetable with its rib. */
-export function ProduceSymbol({
-  symbol,
-}: Readonly<Pick<Props, "symbol">>): ReactNode {
+export function ProduceSymbol({ symbol }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   if (symbol === "fruit") {
     return (

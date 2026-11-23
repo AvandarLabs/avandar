@@ -1,9 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { prop } from "@avandar/utils";
+import { prop, propEq } from "@avandar/utils";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { ConvoyRouteDetour } from "./ConvoyRouteDetour";
+import { convoyRouteDetourContract } from "./ConvoyRouteDetour.contract";
 import {
   changedInput,
   DEFAULT_INPUT,
@@ -26,7 +29,8 @@ function _render({
     }),
   );
 }
-test("The vehicle stops before the blocked segment and uses the authored detour; the obstruction remains visible after arrival and the vehicle never traverses the closed edge.", () => {
+
+test("changed convoy hold frame retains the cargo-bike vehicle and bridge-closure obstruction", () => {
   assert.match(
     _render({ frame: 150, input: changedInput }),
     /data-vehicle="cargo-bike"/,
@@ -37,10 +41,6 @@ test("The vehicle stops before the blocked segment and uses the authored detour;
   );
 });
 
-import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
-import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
-import { convoyRouteDetourContract } from "./ConvoyRouteDetour.contract";
-
 function _getVisibleTexts({ input }: Readonly<{ input: Input }>): string[] {
   return [
     input.scenarioCaption,
@@ -49,7 +49,9 @@ function _getVisibleTexts({ input }: Readonly<{ input: Input }>): string[] {
     ...(input.showRouteLabels ? input.routes.map(prop("label")) : []),
   ];
 }
+
 const EXCLUDED_TEXT_FIELDS: string[] = ["id", "role", "kind", "vehicle"];
+
 registerStockPresetAssertions({
   inputSchema,
   defaultInput: DEFAULT_INPUT,
@@ -60,6 +62,7 @@ registerStockPresetAssertions({
   excludedTextFields: EXCLUDED_TEXT_FIELDS,
   getVisibleTexts: _getVisibleTexts,
 });
+
 registerStockTextLayoutAssertions({
   inputSchema,
   fixtures,
@@ -78,6 +81,7 @@ function _getVehiclePoint(markup: string) {
     y: (Number(match[2]) - 180) / 280,
   };
 }
+
 function _distanceToSegment({
   point,
   from,
@@ -105,6 +109,7 @@ function _distanceToSegment({
     point.y - from.y - fraction * dy,
   );
 }
+
 test("the actual vehicle follows authored edges and never occupies the closed interior", () => {
   fixtures.forEach(({ input }) => {
     const blocked = input.routes.find(({ role }) => {
@@ -145,6 +150,7 @@ test("the actual vehicle follows authored edges and never occupies the closed in
     );
   });
 });
+
 test("crossings and positive-length overlap are rejected while shared endpoints and degenerate routes remain accepted", () => {
   const crossing = {
     ...DEFAULT_INPUT,
@@ -179,9 +185,7 @@ test("crossings and positive-length overlap are rejected while shared endpoints 
   assert.equal(inputSchema.safeParse(MINIMUM_INPUT).success, true);
   assert.equal(
     inputSchema.safeParse(
-      fixtures.find(({ id }) => {
-        return id === "stationary-closure";
-      })!.input,
+      fixtures.find(propEq("id", "stationary-closure"))!.input,
     ).success,
     true,
   );

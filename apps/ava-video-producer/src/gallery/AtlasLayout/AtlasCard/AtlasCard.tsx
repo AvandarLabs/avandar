@@ -1,5 +1,6 @@
 import { memo } from "react";
 import { Icon } from "../../MotionGallery/Icon";
+import { AtlasCardCopy } from "./AtlasCardCopy/AtlasCardCopy";
 import type { ReactNode, Ref } from "react";
 
 type Props = {
@@ -31,7 +32,7 @@ export const AtlasCard = memo(function AtlasCard({
   badge,
   previewRef,
   onOpen,
-}: Props) {
+}: Readonly<Props>) {
   return (
     <article className="motion-card">
       <button
@@ -46,29 +47,9 @@ export const AtlasCard = memo(function AtlasCard({
           <Icon name="arrow" size={21} />
         </span>
       </button>
-      <div className="card-copy">
-        <div className="card-category">
-          <span>{category}</span>
-          {badge}
-        </div>
-        <div className="card-heading">
-          <button type="button" className="card-title" onClick={onOpen}>
-            {title}
-          </button>
-        </div>
-        <p>{description}</p>
-        <div className="card-foot">
-          <code>{reference}</code>
-          <button
-            type="button"
-            onClick={onOpen}
-            aria-label={`View ${title} details`}
-          >
-            <span>Explore</span>
-            <Icon name="arrow" size={15} />
-          </button>
-        </div>
-      </div>
+      <AtlasCardCopy
+        {...{ title, category, description, reference, badge, onOpen }}
+      />
     </article>
   );
 });

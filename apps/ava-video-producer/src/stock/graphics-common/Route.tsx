@@ -1,4 +1,4 @@
-import { mix } from "../../motion";
+import { Motion } from "../../motion";
 import { SketchedShape } from "../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Point } from "./graphicCommon.types";
@@ -21,7 +21,10 @@ export function Route({
   at,
   color,
 }: Readonly<Props>): ReactNode {
-  const route = GraphicThemeHooks.useGraphicProps("Route", {});
+  const route = GraphicThemeHooks.useGraphicProps({
+    name: "Route",
+    props: {},
+  });
   const motion = GraphicThemeHooks.useGraphicMotion();
   const { sketch } = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
@@ -31,8 +34,16 @@ export function Route({
         kind: "line",
         x1: from.x,
         y1: from.y,
-        x2: mix(progress, from.x, to.x),
-        y2: mix(progress, from.y, to.y),
+        x2: Motion.mix({
+          t: progress,
+          from: from.x,
+          to: to.x,
+        }),
+        y2: Motion.mix({
+          t: progress,
+          from: from.y,
+          to: to.y,
+        }),
       }}
       profile={sketch.shape}
       stroke={color}

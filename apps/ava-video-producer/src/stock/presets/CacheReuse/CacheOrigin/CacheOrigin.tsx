@@ -1,6 +1,6 @@
 import { FitText } from "../../../primitives/FitText/FitText";
 import { LiteralDataText } from "../../../primitives/LiteralDataText/LiteralDataText";
-import { StockRect } from "../../../primitives/StockRect/StockRect";
+import { StockRect } from "../../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { PANEL_CORNER } from "../cacheReuseShape";
 import { OriginText } from "./OriginText";

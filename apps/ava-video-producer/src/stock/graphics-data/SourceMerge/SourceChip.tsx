@@ -1,14 +1,22 @@
 import { Text } from "../../graphics-common/Text";
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { SourceMergeInput } from "../../presets/SourceMerge/SourceMerge.schema";
 import type { ReactNode } from "react";
 
 type Source = SourceMergeInput["sources"][number];
-type Props = Readonly<{ source: Source; x: number; y: number; color: string }>;
+type Props = Readonly<{
+  source: Source;
+  x: number;
+  y: number;
+  color: string;
+}>;
 /** The source's kind badge inside its row panel. */
 export function SourceChip({ source, x, y, color }: Props): ReactNode {
-  const style = GraphicThemeHooks.useGraphicProps("SourceMerge", {});
+  const style = GraphicThemeHooks.useGraphicProps({
+    name: "SourceMerge",
+    props: {},
+  });
   const shapes = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <>

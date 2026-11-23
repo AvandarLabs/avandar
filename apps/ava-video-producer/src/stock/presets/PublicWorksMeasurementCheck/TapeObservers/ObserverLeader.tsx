@@ -1,12 +1,15 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
+
+type Props = { personX: number; index: number; accent: string };
+
 /** The faint leader from an observer down to their name. */
 export function ObserverLeader({
   personX,
   index,
   accent,
-}: Readonly<{ personX: number; index: number; accent: string }>): ReactNode {
+}: Readonly<Props>): ReactNode {
   const { atomic } = GraphicThemeHooks.useGraphicTheme();
   const tokens = GraphicThemeHooks.useGraphicTokens();
   return (

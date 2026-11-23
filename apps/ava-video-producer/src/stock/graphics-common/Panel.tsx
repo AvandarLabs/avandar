@@ -1,4 +1,4 @@
-import { StockRect } from "../primitives/StockRect/StockRect";
+import { StockRect } from "../primitives/StockRect";
 import { GraphicThemeHooks } from "../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
@@ -23,10 +23,13 @@ export function Panel({
   fill,
   radius,
 }: Readonly<Props>): ReactNode {
-  const panel = GraphicThemeHooks.useGraphicProps("Panel", {
-    stroke,
-    fill,
-    radius,
+  const panel = GraphicThemeHooks.useGraphicProps({
+    name: "Panel",
+    props: {
+      stroke,
+      fill,
+      radius,
+    },
   });
   const filter = GraphicThemeHooks.useGraphicFilter(
     "components.Panel.elevation",

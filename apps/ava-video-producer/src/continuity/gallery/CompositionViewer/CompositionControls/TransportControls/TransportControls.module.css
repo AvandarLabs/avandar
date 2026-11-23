@@ -1,0 +1,75 @@
+.transportControls {
+  align-items: center;
+  background: var(--paper, var(--atlas-color-white));
+  border: var(--atlas-border-1) solid var(--line);
+  border-radius: var(--atlas-radius-7);
+  color: var(--ink);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: var(--atlas-font-size-12);
+  gap: var(--atlas-space-12) var(--atlas-space-18);
+  padding: var(--atlas-space-16);
+}
+
+.transportControls > button {
+  background: transparent;
+  border: var(--atlas-border-1) solid var(--line);
+  border-radius: var(--atlas-radius-5);
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: var(--atlas-space-8) var(--atlas-space-12);
+}
+
+.transportControls > button:hover {
+  background: var(--ava-neutral-1);
+}
+
+.transportControls label {
+  align-items: center;
+  display: flex;
+  gap: var(--atlas-space-7);
+}
+
+.transportControls input {
+  accent-color: var(--ava-primary-6);
+}
+
+.transportControls :focus-visible {
+  outline: var(--atlas-border-2) solid var(--ava-primary-7);
+  outline-offset: var(--atlas-space-3);
+}
+
+@media (width <= 600px) {
+  .transportControls {
+    gap: var(--atlas-space-12);
+  }
+
+  .transportControls label {
+    flex: 1 1 var(--atlas-size-130);
+  }
+}
+
+:global(dialog:modal) .transportControls {
+  gap: var(--atlas-space-10) var(--atlas-space-14);
+  padding: var(--atlas-space-10);
+}
+
+:global(dialog:modal) .transportControls > button {
+  padding: var(--atlas-space-6) var(--atlas-space-8);
+}
+
+@media (width <= 800px) {
+  :global(dialog:modal) .transportControls {
+    gap: var(--atlas-space-6) var(--atlas-space-10);
+  }
+
+  :global(dialog:modal) .transportControls label {
+    flex: initial;
+  }
+}
+
+.transportControls :global(.mantine-Checkbox-label) {
+  color: var(--ink);
+  font-size: var(--atlas-font-size-12);
+}

@@ -4,6 +4,10 @@ import { useHelperFilmTheme } from "./useHelperFilmTheme";
 import type { Film } from "../../../showcase/showcase.types";
 import type { ReactNode } from "react";
 
+type Props = {
+  film: Extract<Film, { kind: "helper" }>;
+};
+
 /**
  * The Remotion player sizes itself through inline styles, so the full-width
  * fill has to be passed the same way; a class is overridden.
@@ -22,11 +26,7 @@ function _isReducedMotionPreferred(): boolean {
  * frame controls, autoplaying unless the viewer prefers reduced motion. It
  * draws in the theme the embedding Atlas page posts, else the film's theme.
  */
-export function HelperPlayer({
-  film,
-}: {
-  film: Extract<Film, { kind: "helper" }>;
-}): ReactNode {
+export function HelperPlayer({ film }: Readonly<Props>): ReactNode {
   const theme = useHelperFilmTheme(film);
   return (
     <div className="liveFilm">

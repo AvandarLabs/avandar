@@ -15,6 +15,148 @@ import {
 } from "./LocationUncertaintyBoundary.fixtures";
 import { inputSchema, type Input } from "./LocationUncertaintyBoundary.schema";
 
+function _makeEqualRadiusInput({
+  focusedLocationId,
+  showOtherFootprints,
+}: Readonly<{ focusedLocationId: string; showOtherFootprints: boolean }>): {
+  input: Input;
+} {
+  const input = inputSchema.parse({
+    ...DEFAULT_INPUT,
+    focusedLocationId,
+    showOtherFootprints,
+    locations: DEFAULT_INPUT.locations.map((location) => {
+      return {
+        ...location,
+        radius: 3,
+      };
+    }),
+  });
+  return { input };
+}
+
+function _makeConcaveNotchInput(): { input: Input } {
+  const input = inputSchema.parse({
+    ...DEFAULT_INPUT,
+    districts: [
+      {
+        id: "w",
+        label: "",
+        polygon: [
+          [0, 0],
+          [40, 0],
+          [40, 100],
+          [25, 100],
+          [25, 40],
+          [15, 40],
+          [15, 100],
+          [0, 100],
+        ],
+      },
+      {
+        id: "e",
+        label: "",
+        polygon: [
+          [60, 0],
+          [100, 0],
+          [100, 100],
+          [60, 100],
+        ],
+      },
+    ],
+    locations: [
+      { id: "a", label: "", x: 20, y: 30, radius: 10 },
+      { id: "b", label: "", x: 50, y: 50, radius: 0 },
+      { id: "c", label: "", x: 75, y: 65, radius: 4 },
+    ],
+  });
+  return { input };
+}
+
+function _assertEqualRadiusRecordsVisiblyOwnTheY({
+  highlight,
+  focusedLocationId,
+}: Readonly<{
+  highlight: ReturnType<typeof SvgAttributes.fromMarker>;
+  focusedLocationId: string[][number];
+}>): void {
+  assert.equal(
+    SvgAttributes.getNumberFromMarkup({ attributes: highlight, name: "y" }),
+    focusedLocationId === "a" ? 315 : 377,
+  );
+}
+
+function _assertEqualRadiusRecordsVisiblyOwnTheDataPossibility({
+  markup,
+  focusedLocationId,
+}: Readonly<{
+  markup: ReturnType<typeof _render>;
+  focusedLocationId: string[][number];
+}>): void {
+  assert.ok(
+    markup.includes(
+      `data-possibility="${focusedLocationId === "a" ? "w" : "e"}" data-is-possible="true"`,
+    ),
+  );
+}
+
+function _assertEqualRadiusRecordsVisiblyOwnTheRTheFocusedPinHasAVisible(
+  focusedPin: NonNullable<RegExpMatchArray[][number] | undefined>[number],
+): void {
+  assert.equal(
+    SvgAttributes.getNumberFromMarkup({
+      attributes: focusedPin,
+      name: "r",
+    }),
+    5,
+    "The focused pin has a visible persistent ring",
+  );
+}
+
+function _assertEqualRadiusRecordsVisiblyOwnTheR({
+  pins,
+  focusedLocationId,
+}: Readonly<{
+  pins: RegExpMatchArray[];
+  focusedLocationId: string[][number];
+}>): void {
+  pins
+    .filter((pin) => {
+      return pin[1] !== focusedLocationId;
+    })
+    .forEach((pin) => {
+      return assert.equal(
+        SvgAttributes.getNumberFromMarkup({
+          attributes: pin[0],
+          name: "r",
+        }),
+        3,
+      );
+    });
+}
+
+function _assertConcaveNotchesOutsideRecordsAndDataDefinite(
+  input: Input,
+): void {
+  assert.match(
+    _render({ frame: 150, input: input }),
+    /data-definite="1" data-unresolved="2"/,
+  );
+}
+
+function _assertTouchingAndZeroRadiusBoundaryPinsFootprintR(): void {
+  assert.equal(
+    SvgAttributes.getNumberFromMarkup({
+      attributes: SvgAttributes.fromMarker({
+        markup: _render({ frame: 0 }),
+        marker: "footprint",
+      }),
+      name: "r",
+    }),
+    0,
+  );
+}
+
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -107,16 +249,7 @@ test("touching and zero-radius boundary pins stay unresolved regardless of footp
     ).length,
     3,
   );
-  assert.equal(
-    SvgAttributes.getNumberFromMarkup({
-      attributes: SvgAttributes.fromMarker({
-        markup: _render({ frame: 0 }),
-        marker: "footprint",
-      }),
-      name: "r",
-    }),
-    0,
-  );
+  _assertTouchingAndZeroRadiusBoundaryPinsFootprintR();
   assert.equal(
     SvgAttributes.getNumberFromMarkup({
       attributes: SvgAttributes.fromMarker({
@@ -129,44 +262,8 @@ test("touching and zero-radius boundary pins stay unresolved regardless of footp
   );
 });
 test("concave notches, outside records and overlapping disks use whole-footprint containment", () => {
-  const input = inputSchema.parse({
-    ...DEFAULT_INPUT,
-    districts: [
-      {
-        id: "w",
-        label: "",
-        polygon: [
-          [0, 0],
-          [40, 0],
-          [40, 100],
-          [25, 100],
-          [25, 40],
-          [15, 40],
-          [15, 100],
-          [0, 100],
-        ],
-      },
-      {
-        id: "e",
-        label: "",
-        polygon: [
-          [60, 0],
-          [100, 0],
-          [100, 100],
-          [60, 100],
-        ],
-      },
-    ],
-    locations: [
-      { id: "a", label: "", x: 20, y: 30, radius: 10 },
-      { id: "b", label: "", x: 50, y: 50, radius: 0 },
-      { id: "c", label: "", x: 75, y: 65, radius: 4 },
-    ],
-  });
-  assert.match(
-    _render({ frame: 150, input: input }),
-    /data-definite="1" data-unresolved="2"/,
-  );
+  const { input } = _makeConcaveNotchInput();
+  _assertConcaveNotchesOutsideRecordsAndDataDefinite(input);
   const overlap = inputSchema.parse({
     ...DEFAULT_INPUT,
     locations: DEFAULT_INPUT.locations.map((item) => {
@@ -220,16 +317,9 @@ test("possible-district marks distinguish touched districts from excluded distri
 test("equal-radius records visibly own the focused explanation with either footprint toggle", () => {
   [true, false].forEach((showOtherFootprints) => {
     ["a", "c"].forEach((focusedLocationId) => {
-      const input = inputSchema.parse({
-        ...DEFAULT_INPUT,
+      const { input } = _makeEqualRadiusInput({
         focusedLocationId,
         showOtherFootprints,
-        locations: DEFAULT_INPUT.locations.map((location) => {
-          return {
-            ...location,
-            radius: 3,
-          };
-        }),
       });
       const markup = _render({ frame: 150, input: input });
       const pins = [
@@ -238,28 +328,11 @@ test("equal-radius records visibly own the focused explanation with either footp
       const focusedPin = pins.find((pin) => {
         return pin[1] === focusedLocationId;
       })![0];
-      assert.equal(
-        SvgAttributes.getNumberFromMarkup({
-          attributes: focusedPin,
-          name: "r",
-        }),
-        5,
-        "The focused pin has a visible persistent ring",
+      _assertEqualRadiusRecordsVisiblyOwnTheRTheFocusedPinHasAVisible(
+        focusedPin,
       );
       assert.match(focusedPin, /stroke-width="2"/);
-      pins
-        .filter((pin) => {
-          return pin[1] !== focusedLocationId;
-        })
-        .forEach((pin) => {
-          return assert.equal(
-            SvgAttributes.getNumberFromMarkup({
-              attributes: pin[0],
-              name: "r",
-            }),
-            3,
-          );
-        });
+      _assertEqualRadiusRecordsVisiblyOwnTheR({ pins, focusedLocationId });
       const highlight = SvgAttributes.fromMarker({
         markup,
         marker: "focused-record",
@@ -267,21 +340,17 @@ test("equal-radius records visibly own the focused explanation with either footp
       assert.ok(
         highlight.includes(`data-focused-record="${focusedLocationId}"`),
       );
-      assert.equal(
-        SvgAttributes.getNumberFromMarkup({ attributes: highlight, name: "y" }),
-        focusedLocationId === "a" ? 315 : 377,
-      );
+      _assertEqualRadiusRecordsVisiblyOwnTheY({ highlight, focusedLocationId });
       assert.match(highlight, /stroke="#46dbc9"/);
       assert.equal((markup.match(/data-focused-record=/g) ?? []).length, 1);
       assert.equal(
         (markup.match(/data-footprint=/g) ?? []).length,
         showOtherFootprints ? 3 : 1,
       );
-      assert.ok(
-        markup.includes(
-          `data-possibility="${focusedLocationId === "a" ? "w" : "e"}" data-is-possible="true"`,
-        ),
-      );
+      _assertEqualRadiusRecordsVisiblyOwnTheDataPossibility({
+        markup,
+        focusedLocationId,
+      });
       assert.match(markup, /data-definite="2" data-unresolved="1"/);
     });
   });

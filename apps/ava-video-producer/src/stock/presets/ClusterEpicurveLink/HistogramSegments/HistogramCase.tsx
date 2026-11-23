@@ -1,4 +1,4 @@
-import { mix } from "../../../../motion";
+import { Motion } from "../../../../motion";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { type CaseProps as Props } from "./HistogramSegmentsShared.types";
 import type { ReactNode } from "react";
@@ -26,11 +26,11 @@ export function HistogramCase({
         fill={isLit ? accent : tokens.color.accentAlt}
         fillOpacity={
           isInvestigated
-            ? mix(
-                motion.ramp(frame, 36, motion.scale(48)),
-                atomic.opacity["45"],
-                1,
-              )
+            ? Motion.mix({
+                t: motion.ramp(frame, 36, motion.scale(48)),
+                from: atomic.opacity["45"],
+                to: 1,
+              })
             : tokens.alpha.dimmed
         }
       />

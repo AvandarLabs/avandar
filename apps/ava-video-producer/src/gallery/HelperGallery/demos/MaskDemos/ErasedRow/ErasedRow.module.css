@@ -1,0 +1,24 @@
+.erasedRowListRow {
+  align-items: center;
+  background: var(--demo-panel);
+  border: var(--demo-stroke-hairline) solid var(--demo-line);
+  border-radius: var(--demo-corner-cell);
+  display: flex;
+  gap: var(--demo-space-14);
+  height: 52px;
+  padding: 0 var(--demo-space-2xs);
+}
+
+.erasedRowListDot {
+  background: var(--demo-brand);
+  border-radius: var(--demo-corner-pill);
+  flex: none;
+  height: 14px;
+  width: 14px;
+}
+
+.erasedRowListBar {
+  background: var(--demo-line);
+  border-radius: var(--demo-corner-chip);
+  height: 10px;
+}

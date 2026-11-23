@@ -1,4 +1,4 @@
-import type { EffectPrimitive } from "../videoEffectFilterHelpers/videoEffectFilterHelpers";
+import type { EffectPrimitive } from "../VideoEffectFilters/VideoEffectFilters";
 import type { ReactNode } from "react";
 
 type Props = Readonly<{

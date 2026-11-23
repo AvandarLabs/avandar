@@ -1,6 +1,6 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { ExpenseAmounts } from "./ExpenseAmounts";
+import { ExpenseAmounts } from "./ExpenseAmounts/ExpenseAmounts";
 import { ExpenseObject } from "./ExpenseObject";
 import type { Input } from "./SchoolCostSatchel.schema";
 import type { ReactNode } from "react";
@@ -32,8 +32,10 @@ export function SatchelExpense({
     motion.travel.easing,
   );
   const targetX = 380 + index * (490 / Math.max(1, numExpenses - 1));
-  const x = mix(travel, 285, targetX);
-  const y = mix(travel, 263, 270) - Math.sin(travel * Math.PI) * 70;
+  const x = Motion.mix({ t: travel, from: 285, to: targetX });
+  const y =
+    Motion.mix({ t: travel, from: 263, to: 270 }) -
+    Math.sin(travel * Math.PI) * 70;
   const revealed = frame >= 62 + index * motion.scaleStagger(9);
   return (
     <g data-expense-id={expense.id} data-amount={expense.amount}>
@@ -45,13 +47,7 @@ export function SatchelExpense({
         <ExpenseObject kind={expense.object} color={accent} />
       </g>
       {revealed ? (
-        <ExpenseAmounts
-          expense={expense}
-          targetX={targetX}
-          total={total}
-          accent={accent}
-          showShares={showShares}
-        />
+        <ExpenseAmounts {...{ expense, targetX, total, accent, showShares }} />
       ) : undefined}
     </g>
   );

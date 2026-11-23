@@ -22,79 +22,57 @@ export const capabilitySchema = z.strictObject({
   cells: z.array(cellSchema).min(2).max(3),
 }) satisfies z.ZodType;
 /** Complete matrix with exact option coverage and an authored focus. */
-export const inputSchema = z
-  .strictObject({
-    options: z.array(optionSchema).min(2).max(3),
-    capabilities: z.array(capabilitySchema).min(2).max(5),
-    stateLabels: z.strictObject({
-      included: z.string().min(1).max(14),
-      absent: z.string().min(1).max(14),
-      conditional: z.string().min(1).max(14),
-      unknown: z.string().min(1).max(14),
-    }),
-    focus: z.strictObject({
-      kind: z.enum(["row", "column", "none"]),
-      id: z.string().max(20),
-    }),
-    showNotes: z.boolean(),
-    caption: z.string().max(48),
-  })
-  .superRefine((input, context) => {
-    const optionIds = input.options.map(prop("id"));
-    Array.from(["options", "capabilities"] as const).forEach((field) => {
-      if (
-        new Set(input[field].map(prop<{ id: string }, "id", string>("id")))
-          .size !== input[field].length
-      ) {
-        context.addIssue({
-          code: "custom",
-          path: [field],
-          message: "IDs must be unique within their collection.",
-        });
-      }
-    });
-    input.capabilities.forEach((row, index) => {
-      const cellIds = row.cells.map(prop("optionId"));
-      if (
-        cellIds.length !== optionIds.length ||
-        new Set(cellIds).size !== cellIds.length ||
-        cellIds.some((id) => {
-          return !optionIds.includes(id);
-        })
-      ) {
-        context.addIssue({
-          code: "custom",
-          path: ["capabilities", index, "cells"],
-          message: "Each row needs exactly one cell for each authored option.",
-        });
-      }
-      row.cells.forEach((cell, cellIndex) => {
-        if (cell.state === "conditional" && !cell.note.trim()) {
-          context.addIssue({
-            code: "custom",
-            path: ["capabilities", index, "cells", cellIndex, "note"],
-            message: "Conditional support requires an authored qualification.",
-          });
-        }
-      });
-    });
-    const focusIds =
-      input.focus.kind === "row"
-        ? input.capabilities.map(prop("id"))
-        : optionIds;
+/** Structural input before authored cross-field validation. */
+const baseInputSchema = z.strictObject({
+  options: z.array(optionSchema).min(2).max(3),
+  capabilities: z.array(capabilitySchema).min(2).max(5),
+  stateLabels: z.strictObject({
+    included: z.string().min(1).max(14),
+    absent: z.string().min(1).max(14),
+    conditional: z.string().min(1).max(14),
+    unknown: z.string().min(1).max(14),
+  }),
+  focus: z.strictObject({
+    kind: z.enum(["row", "column", "none"]),
+    id: z.string().max(20),
+  }),
+  showNotes: z.boolean(),
+  caption: z.string().max(48),
+});
+
+/** Validates capability cells and the selected matrix row or column. */
+export const inputSchema = baseInputSchema.superRefine((input, context) => {
+  const optionIds = input.options.map(prop("id"));
+  const optionIdSet = new Set(optionIds);
+  Array.from(["options", "capabilities"] as const).forEach((field) => {
     if (
-      input.focus.kind === "none"
-        ? input.focus.id !== ""
-        : !focusIds.includes(input.focus.id)
+      (field === "options"
+        ? optionIdSet
+        : new Set(input[field].map(prop("id")))
+      ).size !== input[field].length
     ) {
       context.addIssue({
         code: "custom",
-        path: ["focus", "id"],
-        message:
-          "Focus must reference its row or column, or be empty for none.",
+        path: [field],
+        message: "IDs must be unique within their collection.",
       });
     }
-  }) satisfies z.ZodType;
+  });
+  _validateCapabilityCells({ input, context, optionIds, optionIdSet });
+  const focusIds =
+    input.focus.kind === "row" ? input.capabilities.map(prop("id")) : optionIds;
+  if (
+    input.focus.kind === "none"
+      ? input.focus.id !== ""
+      : !focusIds.includes(input.focus.id)
+  ) {
+    context.addIssue({
+      code: "custom",
+      path: ["focus", "id"],
+      message: "Focus must reference its row or column, or be empty for none.",
+    });
+  }
+}) satisfies z.ZodType;
 /** Schema-inferred authored matrix input. */
 export type Input = z.output<typeof inputSchema>;
 /** Collection relationships and source qualification rules. */
@@ -123,3 +101,43 @@ export const SEMANTIC_RULES: StockSemanticRule[] = [
       "Row or column focus references that collection. None has an empty ID.",
   },
 ];
+
+type ValidateCapabilityCellsOptions = {
+  input: z.output<typeof baseInputSchema>;
+  context: z.RefinementCtx;
+  optionIds: readonly string[];
+  optionIdSet: ReadonlySet<string>;
+};
+/** Checks option coverage and authored conditional-support notes. */
+function _validateCapabilityCells({
+  input,
+  context,
+  optionIds,
+  optionIdSet,
+}: Readonly<ValidateCapabilityCellsOptions>): void {
+  input.capabilities.forEach((row, index) => {
+    const cellIds = row.cells.map(prop("optionId"));
+    if (
+      cellIds.length !== optionIds.length ||
+      new Set(cellIds).size !== cellIds.length ||
+      cellIds.some((id) => {
+        return !optionIdSet.has(id);
+      })
+    ) {
+      context.addIssue({
+        code: "custom",
+        path: ["capabilities", index, "cells"],
+        message: "Each row needs exactly one cell for each authored option.",
+      });
+    }
+    row.cells.forEach((cell, cellIndex) => {
+      if (cell.state === "conditional" && !cell.note.trim()) {
+        context.addIssue({
+          code: "custom",
+          path: ["capabilities", index, "cells", cellIndex, "note"],
+          message: "Conditional support requires an authored qualification.",
+        });
+      }
+    });
+  });
+}

@@ -1,12 +1,13 @@
 import { useVideoShapeScales } from "../../videoTheme/useVideoShapeScales";
-import { useVideoTheme } from "../../videoTheme/useVideoTheme";
+import { useVideoTheme } from "../../videoTheme/videoThemeHelpers";
 import type { CSSProperties, ReactNode } from "react";
-/** Shows the animated count's progress toward its target in `CounterCard`. */
-export function CounterProgressBar({
-  progress,
-}: {
+
+type Props = {
   progress: number;
-}): ReactNode {
+};
+
+/** Shows the animated count's progress toward its target in `CounterCard`. */
+export function CounterProgressBar({ progress }: Readonly<Props>): ReactNode {
   const { semantic, mantine } = useVideoTheme();
   const scales = useVideoShapeScales();
   const pill = scales.corner(semantic.corner.pill);

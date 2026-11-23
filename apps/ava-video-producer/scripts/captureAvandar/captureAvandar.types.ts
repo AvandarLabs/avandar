@@ -1,4 +1,4 @@
-import type { FixtureFile } from "../captureLib/fsSafetyHelpers";
+import type { FixtureFile } from "../captureLib/CaptureFileSafety";
 import type { Browser, Page } from "@playwright/test";
 
 /** A file a capture wrote, by its path inside the run folder and its hash. */
@@ -11,9 +11,9 @@ export type CaptureAction = {
   status: string;
   sourceUrl: string;
   startedAtMs: number;
-  videoStartedAtMs: number | null;
+  videoStartedAtMs: number | undefined;
   endedAtMs?: number;
-  videoEndedAtMs?: number | null;
+  videoEndedAtMs?: number | undefined;
   resultUrl?: string;
   error?: string;
 };
@@ -26,7 +26,7 @@ export type CaptureCheckpoint = {
   sourceUrl: string;
   startedAtMs: number;
   atMs?: number;
-  videoAtMs?: number | null;
+  videoAtMs?: number | undefined;
   completedAtMs?: number;
   screenshot?: CaptureArtifact;
   text?: CaptureArtifact;
@@ -39,8 +39,8 @@ export type CaptureFeature = {
   status: string;
   startedAtMs?: number;
   endedAtMs?: number;
-  videoStartedAtMs?: number | null;
-  videoEndedAtMs?: number | null;
+  videoStartedAtMs?: number | undefined;
+  videoEndedAtMs?: number | undefined;
 };
 
 /** A request the network guard blocked or suppressed, with its timing. */
@@ -49,7 +49,7 @@ export type BlockedRequest = {
   method: string;
   reason: string;
   atMs: number;
-  videoAtMs: number | null;
+  videoAtMs: number | undefined;
 };
 
 /**
@@ -105,7 +105,7 @@ export type CaptureVideoRecord = {
   originalFps: number;
   fpsBasis: string;
   normalizationRequired: boolean;
-  rawPath: string | null;
+  rawPath: string | undefined;
   path?: string;
   sha256?: string;
 };
@@ -132,7 +132,7 @@ export type CaptureManifest = {
   fixtures: FixtureFile[];
   browser: {
     engine: string;
-    version: string | null;
+    version: string | undefined;
     playwrightVersion: string;
   };
   authentication: { status: string; recorded: boolean; completedAtMs?: number };

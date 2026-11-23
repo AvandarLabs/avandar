@@ -1,4 +1,4 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CellLiteralValue } from "./CellLiteralValue";
@@ -31,7 +31,11 @@ export function CleanupCells({
           {...bounds}
           value={row.before}
           opacity={changed ? 1 - edit : 1}
-          letterSpacing={mix(edit, BEFORE_SPACING, 0)}
+          letterSpacing={Motion.mix({
+            t: edit,
+            from: BEFORE_SPACING,
+            to: 0,
+          })}
         />
       </g>
       {changed ? (

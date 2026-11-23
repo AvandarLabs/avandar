@@ -1,5 +1,5 @@
 import { useVideoMotion } from "../../../videoTheme/useVideoMotion";
-import { useVideoTheme } from "../../../videoTheme/useVideoTheme";
+import { useVideoTheme } from "../../../videoTheme/videoThemeHelpers";
 import { LockupCtaShared } from "./LockupCtaShared/LockupCtaShared";
 import {
   type CtaLineBox,

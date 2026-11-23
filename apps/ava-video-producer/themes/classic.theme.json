@@ -1017,6 +1017,7 @@
     }
   },
   "components": {
+    "BarComparison": { "defaultProps": { "unitScale": 0.43 } },
     "Node": {
       "defaultProps": {
         "radiusXs": 22,

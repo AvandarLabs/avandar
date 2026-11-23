@@ -14,6 +14,117 @@ import {
 import { inputSchema, type Input } from "../ChartFocusEdit.schema";
 import { _render, _assertContextPlacement } from "./ChartFocusEditTestHelpers";
 
+function _assertCategoryRowOwnership({
+  input,
+  markup,
+}: Readonly<{
+  input: Input;
+  markup: string;
+}>): void {
+  input.categories.forEach((category, index) => {
+    const label = markup.match(
+      new RegExp(
+        `data-category-label="${category.id}" transform="translate\\(([^ ]*) ([^)]*)\\)"`,
+      ),
+    );
+    const value = markup.match(
+      new RegExp(`data-value-label="${category.id}"[^>]*\\sy="([^"]*)"`),
+    );
+    assert.ok(label && value);
+    const centerY = 184 + index * 72;
+    assert.ok(
+      Math.abs(Number(label[2]) - centerY) <= 14,
+      "Category belongs to its bar row",
+    );
+    assert.ok(
+      Math.abs(Number(value[1]) - centerY) <= 6,
+      "Value belongs to its bar row",
+    );
+  });
+}
+
+function _assertEditorialTreatmentsPreserveEachBarBars({
+  bars,
+  hold,
+  input,
+}: Readonly<{
+  bars: (
+    markup: string,
+  ) => Array<Array<ReturnType<typeof SvgAttributes.getNumberFromMarkup>>>;
+  hold: ReturnType<typeof _render>;
+  input: (typeof fixtures)[number]["input"];
+}>): void {
+  assert.equal(
+    bars(hold)[0][2],
+    (input.categories[0].value / input.axisMaximum) * 400,
+  );
+}
+
+function _assertBarGridOpacity(hold: ReturnType<typeof _render>): void {
+  assert.equal(
+    SvgAttributes.getNumberFromMarkup({
+      attributes: SvgAttributes.fromMarker({
+        markup: hold,
+        marker: "minor-grid",
+      }),
+      name: "opacity",
+    }),
+    0.06,
+  );
+}
+
+function _assertEditorialTreatmentsPreserveEachBarMinorGridOpacity(
+  setup: ReturnType<typeof _render>,
+): void {
+  assert.equal(
+    SvgAttributes.getNumberFromMarkup({
+      attributes: SvgAttributes.fromMarker({
+        markup: setup,
+        marker: "minor-grid",
+      }),
+      name: "opacity",
+    }),
+    0.5,
+  );
+}
+
+function _assertFocusSelectionChangesEmphasisWhileFocused(
+  focused: (markup: string) => Array<RegExpMatchArray[][number][number]>,
+): void {
+  assert.deepEqual(
+    focused(
+      _render({
+        frame: 150,
+        input: {
+          ...DEFAULT_INPUT,
+          treatment: "direct-labels",
+          focusId: null,
+        },
+      }),
+    ),
+    ["paper", "ink", "labels"],
+  );
+}
+
+function _assertFocusedCategoryEmphasis(): void {
+  assert.equal(
+    SvgAttributes.fromMarker({
+      markup: _render({
+        frame: 36,
+        input: { ...DEFAULT_INPUT, treatment: "focus" },
+      }),
+      marker: "category-label",
+    }),
+    SvgAttributes.fromMarker({
+      markup: _render({
+        frame: 150,
+        input: { ...DEFAULT_INPUT, treatment: "focus" },
+      }),
+      marker: "category-label",
+    }),
+  );
+}
+
 registerStockPresetAssertions({
   contract,
   inputSchema,
@@ -52,21 +163,9 @@ test("editorial treatments preserve each bar length and the common scale", () =>
     assert.equal(bars(setup).length, input.categories.length);
     assert.deepEqual(bars(setup), bars(middle));
     assert.deepEqual(bars(setup), bars(hold));
-    assert.equal(
-      bars(hold)[0][2],
-      (input.categories[0].value / input.axisMaximum) * 400,
-    );
+    _assertEditorialTreatmentsPreserveEachBarBars({ bars, hold, input });
     assert.ok(hold.includes(`data-axis-maximum="${input.axisMaximum}"`));
-    assert.equal(
-      SvgAttributes.getNumberFromMarkup({
-        attributes: SvgAttributes.fromMarker({
-          markup: setup,
-          marker: "minor-grid",
-        }),
-        name: "opacity",
-      }),
-      0.5,
-    );
+    _assertEditorialTreatmentsPreserveEachBarMinorGridOpacity(setup);
     assert.ok(
       SvgAttributes.getNumberFromMarkup({
         attributes: SvgAttributes.fromMarker({
@@ -76,16 +175,7 @@ test("editorial treatments preserve each bar length and the common scale", () =>
         name: "opacity",
       }) < 0.5,
     );
-    assert.equal(
-      SvgAttributes.getNumberFromMarkup({
-        attributes: SvgAttributes.fromMarker({
-          markup: hold,
-          marker: "minor-grid",
-        }),
-        name: "opacity",
-      }),
-      0.06,
-    );
+    _assertBarGridOpacity(hold);
   });
 });
 
@@ -108,19 +198,7 @@ test("focus selection changes emphasis while direct-labels alone only move label
   };
   assert.deepEqual(focused(both), ["ink"]);
   assert.deepEqual(focused(other), ["paper"]);
-  assert.deepEqual(
-    focused(
-      _render({
-        frame: 150,
-        input: {
-          ...DEFAULT_INPUT,
-          treatment: "direct-labels",
-          focusId: null,
-        },
-      }),
-    ),
-    ["paper", "ink", "labels"],
-  );
+  _assertFocusSelectionChangesEmphasisWhileFocused(focused);
   assert.notEqual(
     SvgAttributes.fromMarker({
       markup: _render({ frame: 36 }),
@@ -128,22 +206,7 @@ test("focus selection changes emphasis while direct-labels alone only move label
     }),
     SvgAttributes.fromMarker({ markup: both, marker: "category-label" }),
   );
-  assert.equal(
-    SvgAttributes.fromMarker({
-      markup: _render({
-        frame: 36,
-        input: { ...DEFAULT_INPUT, treatment: "focus" },
-      }),
-      marker: "category-label",
-    }),
-    SvgAttributes.fromMarker({
-      markup: _render({
-        frame: 150,
-        input: { ...DEFAULT_INPUT, treatment: "focus" },
-      }),
-      marker: "category-label",
-    }),
-  );
+  _assertFocusedCategoryEmphasis();
   assert.doesNotMatch(
     _render({
       frame: 150,
@@ -242,26 +305,7 @@ test("refined chart copy retains category and value association with each bar", 
         id: "correction",
       }),
     );
-    input.categories.forEach((category, index) => {
-      const label = markup.match(
-        new RegExp(
-          `data-category-label="${category.id}" transform="translate\\(([^ ]*) ([^)]*)\\)"`,
-        ),
-      );
-      const value = markup.match(
-        new RegExp(`data-value-label="${category.id}"[^>]*\\sy="([^"]*)"`),
-      );
-      assert.ok(label && value);
-      const centerY = 184 + index * 72;
-      assert.ok(
-        Math.abs(Number(label[2]) - centerY) <= 14,
-        "Category belongs to its bar row",
-      );
-      assert.ok(
-        Math.abs(Number(value[1]) - centerY) <= 6,
-        "Value belongs to its bar row",
-      );
-    });
+    _assertCategoryRowOwnership({ input, markup });
 
     const stageLabels = SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup(
       markup,

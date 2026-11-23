@@ -1,13 +1,16 @@
-import { mix } from "../../../../motion";
+import { Motion } from "../../../../motion";
 import { FitText } from "../../../primitives/FitText/FitText";
 import { SketchedShape } from "../../../primitives/SketchedShape";
-import { StockRect } from "../../../primitives/StockRect/StockRect";
+import { StockRect } from "../../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { BriefLinePlaceholder } from "./BriefLinePlaceholder";
 import type { Input } from "../SealedHandoff.schema";
 import type { ReactNode } from "react";
 
-type Props = { frame: number; input: Input };
+type Props = {
+  frame: number;
+  input: Input;
+};
 /**
  * The intact brief slides into its enclosure. Its text never fades to simulate
  * concealment.
@@ -15,7 +18,11 @@ type Props = { frame: number; input: Input };
 export function HandoffBrief({ frame, input }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const motion = GraphicThemeHooks.useGraphicMotion();
-  const y = mix(motion.reveal(frame, 36), -54, 16);
+  const y = Motion.mix({
+    t: motion.reveal(frame, 36),
+    from: -54,
+    to: 16,
+  });
   return (
     <g data-brief-content="retained">
       <StockRect

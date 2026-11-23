@@ -2,12 +2,13 @@ import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getAllocationHandlingFromTokens } from "../getAllocationHandlingFromTokens";
 import type { ReactNode } from "react";
-/** The coordinator's arm and the hand holding the scoop. */
-export function CoordinatorArm({
-  pose,
-}: Readonly<{
+
+type Props = {
   pose: ReturnType<typeof getAllocationHandlingFromTokens>;
-}>): ReactNode {
+};
+
+/** The coordinator's arm and the hand holding the scoop. */
+export function CoordinatorArm({ pose }: Readonly<Props>): ReactNode {
   const graphicTokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (

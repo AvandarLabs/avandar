@@ -3,9 +3,9 @@ import { prop, propEq } from "@avandar/utils";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { SvgPaintAssertions } from "../../../../../../tests/helpers/SvgPaintAssertions/SvgPaintAssertions";
-import { DEFAULT_VIDEO_THEME_SOURCE } from "../../../../../videoTheme/builtInVideoThemes/builtInVideoThemes";
-import { createVideoMotion } from "../../../../../videoTheme/createVideoMotion/createVideoMotion";
 import { makeResolvedVideoThemeFromSource } from "../../../../../videoTheme/makeResolvedVideoThemeFromSource/makeResolvedVideoThemeFromSource";
+import { makeVideoMotionFromTokens } from "../../../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
+import { DEFAULT_VIDEO_THEME_SOURCE } from "../../../../../videoTheme/makeVideoThemeLibraryFromDocuments/makeVideoThemeLibraryFromDocuments";
 import { PublicationSnapshotSlice } from "../../PublicationSnapshotSlice";
 import { publicationSnapshotSliceContract as contract } from "../../PublicationSnapshotSlice.contract";
 import {
@@ -94,7 +94,7 @@ const options = {
   excludedTextFields: EXCLUDED_TEXT_FIELDS,
   getVisibleTexts,
 } satisfies PresetAssertions<Input>;
-const CLASSIC_MOTION = createVideoMotion(
+const CLASSIC_MOTION = makeVideoMotionFromTokens(
   makeResolvedVideoThemeFromSource(DEFAULT_VIDEO_THEME_SOURCE).semantic.motion,
 );
 function _assertReadablePaint(markup: string): void {

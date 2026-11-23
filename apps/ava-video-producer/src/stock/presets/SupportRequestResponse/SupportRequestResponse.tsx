@@ -1,13 +1,14 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { SupportParticipants } from "./SupportParticipants";
-import { SupportWords } from "./SupportWords";
-import { SupportWorktable } from "./SupportWorktable";
+import { SupportParticipants } from "./SupportParticipants/SupportParticipants";
+import { SupportWords } from "./SupportWords/SupportWords";
+import { SupportWorktable } from "./SupportWorktable/SupportWorktable";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./SupportRequestResponse.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
+
 /**
  * An authored reply changes participation without transferring task ownership.
  */

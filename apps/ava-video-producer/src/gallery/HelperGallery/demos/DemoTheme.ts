@@ -1,8 +1,9 @@
-import { buildColorWithAlpha } from "../../../videoTheme/cssValueHelpers/cssValueHelpers";
+import { makeObjectFromEntries } from "@avandar/utils";
 import { useVideoShapeScales } from "../../../videoTheme/useVideoShapeScales";
-import { useVideoTheme } from "../../../videoTheme/useVideoTheme";
-import { VIDEO_FONT_REGISTRY } from "../../../videoTheme/videoFontRegistry/videoFontRegistryHelpers";
-import type { VideoShapeScales } from "../../../videoTheme/createVideoShapeScales/createVideoShapeScales";
+import { VideoCssValues } from "../../../videoTheme/VideoCssValues/VideoCssValues";
+import { VIDEO_FONT_REGISTRY } from "../../../videoTheme/videoFontRegistry/VideoFonts";
+import { useVideoTheme } from "../../../videoTheme/videoThemeHelpers";
+import type { VideoShapeScales } from "../../../videoTheme/makeVideoShapeScalesFromSemanticTokens/makeVideoShapeScalesFromSemanticTokens";
 import type { ResolvedVideoTheme } from "../../../videoTheme/videoTheme.types";
 import type { CSSProperties } from "react";
 /** The colours a helper preview draws with, by the part they paint. */
@@ -65,10 +66,10 @@ function _scaleVariables({
 function _shapeVariables({
   theme,
   scales,
-}: Readonly<{ theme: ResolvedVideoTheme; scales: VideoShapeScales }>): Record<
-  string,
-  string
-> {
+}: Readonly<{
+  theme: ResolvedVideoTheme;
+  scales: VideoShapeScales;
+}>): Record<string, string> {
   const { corner, stroke } = theme.semantic;
   const strokes = {
     hairline: stroke.hairline,
@@ -121,10 +122,10 @@ function useDemoThemeStyle(): CSSProperties {
         return [`--demo-${name}`, value];
       }),
     ),
-    "--demo-brand-wash": buildColorWithAlpha(
-      colors.brand,
-      scales.wash(ACTIVE_CELL_WASH),
-    ),
+    "--demo-brand-wash": VideoCssValues.makeColorFromAlpha({
+      color: colors.brand,
+      alpha: scales.wash(ACTIVE_CELL_WASH),
+    }),
     "--demo-font": theme.semantic.text.stage.appBody.fontFamily,
     "--demo-mono":
       VIDEO_FONT_REGISTRY[theme.atomic.fontFamily.systemMono].stack,
@@ -136,7 +137,7 @@ function useDemoThemeStyle(): CSSProperties {
     ..._scaleVariables({ prefix: "space", scale: theme.mantine.spacing }),
     ..._scaleVariables({
       prefix: "tracking",
-      scale: Object.fromEntries(
+      scale: makeObjectFromEntries(
         Object.entries(theme.atomic.letterSpacing).map(([key, value]) => {
           return [key, `${value}em`];
         }),
@@ -149,7 +150,10 @@ function useDemoThemeStyle(): CSSProperties {
 function _formatReadout({
   value,
   digits = 2,
-}: Readonly<{ value: number; digits?: number }>): string {
+}: Readonly<{
+  value: number;
+  digits?: number;
+}>): string {
   return value.toFixed(digits);
 }
 /**
@@ -161,14 +165,14 @@ export const DemoTheme = {
   /** The preview palette of the video theme in effect. */
   useDemoColors,
   /** Custom properties for the preview CSS modules, all from the video theme:
-    the preview palette (`--demo-ground`, `--demo-brand`, ...), the stage and
-    monospace faces, the type, weight, and spacing scales
-    (`--demo-font-size-lg`, `--demo-font-weight-semibold`,
-    `--demo-space-2xs`), the tracking steps (`--demo-tracking-headline`), and
-    corners and strokes through the Look and feel
-    scales (`--demo-corner-card`, `--demo-stroke-hairline`), and the guide
-    dash (`--demo-dash-guide`). Set on every
-    preview root by `HelperDemoFrame`. */
+      the preview palette (`--demo-ground`, `--demo-brand`, ...), the stage and
+      monospace faces, the type, weight, and spacing scales
+      (`--demo-font-size-lg`, `--demo-font-weight-semibold`,
+      `--demo-space-2xs`), the tracking steps (`--demo-tracking-headline`), and
+      corners and strokes through the Look and feel
+      scales (`--demo-corner-card`, `--demo-stroke-hairline`), and the guide
+      dash (`--demo-dash-guide`). Set on every
+      preview root by `HelperDemoFrame`. */
   useDemoThemeStyle,
   /** Formats a live readout value with a fixed number of decimals. */
   formatReadout: _formatReadout,

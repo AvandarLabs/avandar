@@ -25,7 +25,7 @@ function _render({
     }),
   );
 }
-test("Only actual interval intersections with the investigation window are highlighted; touching nonoverlapping intervals and unknown records do not become confirmed contacts.", () => {
+test("default contact hold frame has two overlapping records and an unknown state", () => {
   const markup = _render({ frame: 150 });
   assert.equal((markup.match(/data-overlap="true"/g) ?? []).length, 2);
   assert.match(markup, /data-state="unknown"/);
@@ -35,6 +35,22 @@ import { registerStockPresetAssertions } from "../../../../tests/helpers/registe
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { contactWindowOverlapContract } from "./ContactWindowOverlap.contract";
 import { inputSchema, type Input } from "./ContactWindowOverlap.schema";
+
+function _assertRecordGeometryAcrossFrames(
+  input: (typeof fixtures)[number]["input"],
+): void {
+  [24, 36, 60, 84, 108, 150].forEach((frame) => {
+    const scene = _render({ frame: frame, input: input });
+    Array.from(
+      scene.matchAll(
+        /<rect[^>]* x="([^"]*)" y="([^"]*)" width="([^"]*)" height="([^"]*)"/g,
+      ),
+    ).forEach(([, x, y, width, height]) => {
+      assert.ok(Number(x) >= 280 && Number(x) + Number(width) <= 910);
+      assert.ok(Number(y) >= 85 && Number(y) + Number(height) <= 465);
+    });
+  });
+}
 
 const textLayoutOptions = {
   inputSchema,
@@ -99,17 +115,7 @@ test("partial, containing and exact intersections have correct geometry while en
     _render({ frame: 150, input: fixtures[1].input }),
     /data-overlap="true"|data-interval=/,
   );
-  [24, 36, 60, 84, 108, 150].forEach((frame) => {
-    const scene = _render({ frame: frame, input: input });
-    Array.from(
-      scene.matchAll(
-        /<rect[^>]* x="([^"]*)" y="([^"]*)" width="([^"]*)" height="([^"]*)"/g,
-      ),
-    ).forEach(([, x, y, width, height]) => {
-      assert.ok(Number(x) >= 280 && Number(x) + Number(width) <= 910);
-      assert.ok(Number(y) >= 85 && Number(y) + Number(height) <= 465);
-    });
-  });
+  _assertRecordGeometryAcrossFrames(input);
   const stencil = (frame: number) => {
     return _render({ frame: frame, input: input }).match(
       /data-window="stencil" x="[^"]*" y="([^"]*)"/,

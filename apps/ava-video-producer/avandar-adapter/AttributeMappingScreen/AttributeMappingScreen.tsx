@@ -2,17 +2,19 @@ import { Stack, Text, Title } from "@mantine/core";
 import { useLayoutEffect, useRef } from "react";
 import { ConceptCreatorStore } from "../../../../src/views/OntologyDesignerApp/ConceptCreatorView/ConceptCreatorStore";
 import css from "./AttributeMappingScreen.module.css";
-import { createMappingStageFromFrame } from "./createMappingStageFromFrame/createMappingStageFromFrame";
+import { makeMappingStageFromFrame } from "./makeMappingStageFromFrame/makeMappingStageFromFrame";
 import { MappingFields } from "./MappingFields";
 import type { ReactNode } from "react";
 
-type Props = { frame: number; width: number; height: number };
-
+type Props = {
+  frame: number;
+  width: number;
+  height: number;
+};
 export {
   ATTRIBUTE_MAPPING_BEATS,
   ATTRIBUTE_MAPPING_DURATION,
-} from "./createMappingStageFromFrame/createMappingStageFromFrame";
-
+} from "./makeMappingStageFromFrame/makeMappingStageFromFrame";
 /** Original dataset mapping and manual field leaves with frame-owned values. */
 export function AttributeMappingScreen({
   frame,
@@ -20,7 +22,10 @@ export function AttributeMappingScreen({
   height,
 }: Props): ReactNode {
   const root = useRef<HTMLDivElement>(null);
-  useMappingTargets(root, frame);
+  useMappingTargets({
+    root,
+    frame,
+  });
   return (
     <ConceptCreatorStore.Provider
       initialStateOverrides={{
@@ -49,7 +54,6 @@ export function AttributeMappingScreen({
     </ConceptCreatorStore.Provider>
   );
 }
-
 function _selectManualFieldName(options: {
   nameInput: HTMLInputElement | null | undefined;
   frame: number;
@@ -63,18 +67,20 @@ function _selectManualFieldName(options: {
     return;
   }
   const isSelected =
-    createMappingStageFromFrame(frame).manualField?.isNameSelected;
+    makeMappingStageFromFrame(frame).manualField?.isNameSelected;
   nameInput.focus({ preventScroll: true });
   nameInput.setSelectionRange(
     isSelected ? 0 : nameInput.value.length,
     nameInput.value.length,
   );
 }
-
-function useMappingTargets(
-  root: React.RefObject<HTMLDivElement | null>,
-  frame: number,
-) {
+function useMappingTargets({
+  root,
+  frame,
+}: Readonly<{
+  root: React.RefObject<HTMLDivElement | null>;
+  frame: number;
+}>) {
   useLayoutEffect(() => {
     // The switch's "One value" segment: the label that names its radio input.
     const singleValueInput = root.current?.querySelector<HTMLInputElement>(

@@ -18,6 +18,123 @@ import {
 import { inputSchema, type Input } from "./GisLayerIntersectionTally.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 
+function _makeSetOperationPolygons(): {
+  square: Array<[number, number]>;
+  concave: Array<[number, number]>;
+  small: Array<[number, number]>;
+  disjoint: Array<[number, number]>;
+} {
+  const square: Array<[number, number]> = [
+    [10, 10],
+    [90, 10],
+    [90, 90],
+    [10, 90],
+  ];
+  const concave: Array<[number, number]> = [
+    [10, 10],
+    [90, 10],
+    [90, 90],
+    [60, 90],
+    [60, 40],
+    [40, 40],
+    [40, 90],
+    [10, 90],
+  ];
+  const small: Array<[number, number]> = [
+    [15, 15],
+    [30, 15],
+    [30, 35],
+    [15, 35],
+  ];
+  const disjoint: Array<[number, number]> = [
+    [91, 91],
+    [99, 91],
+    [99, 99],
+    [91, 99],
+  ];
+  return { square, concave, small, disjoint };
+}
+
+type SetOperationGeometryOptions = Readonly<{
+  cases: Array<
+    [Array<[number, number]>, Array<[number, number]>, string[], string[]]
+  >;
+  homes: Array<{
+    id: string;
+    label: string;
+    x: number;
+    y: number;
+    members: number;
+  }>;
+}>;
+
+function _assertSetOperationGeometry({
+  cases,
+  homes,
+}: SetOperationGeometryOptions): void {
+  cases.forEach(([first, second, intersection, difference]) => {
+    return [false, true].forEach((reverse) => {
+      const layers = [
+        {
+          id: "",
+          label: "First",
+          polygon: reverse ? [...first].reverse() : first,
+        },
+        {
+          id: "b",
+          label: "Second",
+          polygon: reverse ? [...second].reverse() : second,
+        },
+      ];
+      (["intersection", "first-minus-second"] as const).forEach((operation) => {
+        const input = {
+          ...DEFAULT_INPUT,
+          layers,
+          households: homes,
+          operation,
+          showLayerOutlines: false,
+        };
+        assert.deepEqual(inputSchema.parse(input), input);
+        const markup = _render({ frame: 150, input: input });
+        assert.deepEqual(
+          _selected(markup),
+          operation === "intersection" ? intersection : difference,
+        );
+        assert.ok(markup.includes(`data-result-boundary="${operation}"`));
+        assert.match(markup, /data-total-quantity="6"/);
+        assert.match(markup, /stroke-opacity="0"/);
+        if (operation === "intersection") {
+          assert.match(markup, /clip-path="url\(#[^)]+-b\)"/);
+        } else {
+          assert.match(markup, /mask="url\(#[^)]+-outside\)"/);
+        }
+      });
+    });
+  });
+}
+
+function _assertEdgeAndVertexHouseholdsAreSlice(): void {
+  [
+    [10, 30],
+    [10, 10],
+    [65, 80],
+    [40, 40],
+  ]
+    .slice(0, 3)
+    .forEach(([x, y]) => {
+      return assert.equal(
+        inputSchema.safeParse({
+          ...DEFAULT_INPUT,
+          households: [
+            { ...DEFAULT_INPUT.households[0], x, y },
+            ...DEFAULT_INPUT.households.slice(1),
+          ],
+        }).success,
+        false,
+      );
+    });
+}
+
 function _render({
   frame,
   input,
@@ -116,34 +233,7 @@ test("changing measure preserves selected identities including twelve coincident
   );
 });
 test("concavity winding and disjoint containing identical layers retain ordered set semantics", () => {
-  const square: Array<[number, number]> = [
-    [10, 10],
-    [90, 10],
-    [90, 90],
-    [10, 90],
-  ];
-  const concave: Array<[number, number]> = [
-    [10, 10],
-    [90, 10],
-    [90, 90],
-    [60, 90],
-    [60, 40],
-    [40, 40],
-    [40, 90],
-    [10, 90],
-  ];
-  const small: Array<[number, number]> = [
-    [15, 15],
-    [30, 15],
-    [30, 35],
-    [15, 35],
-  ];
-  const disjoint: Array<[number, number]> = [
-    [91, 91],
-    [99, 91],
-    [99, 99],
-    [91, 99],
-  ];
+  const { square, concave, small, disjoint } = _makeSetOperationPolygons();
   const homes = [
     { id: "", label: "Coincident A", x: 20, y: 30, members: 2 },
     { id: "b", label: "Coincident B", x: 20, y: 30, members: 3 },
@@ -158,45 +248,7 @@ test("concavity winding and disjoint containing identical layers retain ordered 
     [square, square, ["", "b", "c"], []],
     [square, disjoint, [], ["", "b", "c"]],
   ];
-  cases.forEach(([first, second, intersection, difference]) => {
-    return [false, true].forEach((reverse) => {
-      const layers = [
-        {
-          id: "",
-          label: "First",
-          polygon: reverse ? [...first].reverse() : first,
-        },
-        {
-          id: "b",
-          label: "Second",
-          polygon: reverse ? [...second].reverse() : second,
-        },
-      ];
-      (["intersection", "first-minus-second"] as const).forEach((operation) => {
-        const input = {
-          ...DEFAULT_INPUT,
-          layers,
-          households: homes,
-          operation,
-          showLayerOutlines: false,
-        };
-        assert.deepEqual(inputSchema.parse(input), input);
-        const markup = _render({ frame: 150, input: input });
-        assert.deepEqual(
-          _selected(markup),
-          operation === "intersection" ? intersection : difference,
-        );
-        assert.ok(markup.includes(`data-result-boundary="${operation}"`));
-        assert.match(markup, /data-total-quantity="6"/);
-        assert.match(markup, /stroke-opacity="0"/);
-        if (operation === "intersection") {
-          assert.match(markup, /clip-path="url\(#[^)]+-b\)"/);
-        } else {
-          assert.match(markup, /mask="url\(#[^)]+-outside\)"/);
-        }
-      });
-    });
-  });
+  _assertSetOperationGeometry({ cases, homes });
 });
 test("map anchors never move and every lifted record owns its visible caption key", () => {
   const mapPoints = (markup: string) => {
@@ -242,25 +294,7 @@ test("map anchors never move and every lifted record owns its visible caption ke
   });
 });
 test("edge and vertex households are rejected without excluding near-boundary locations", () => {
-  [
-    [10, 30],
-    [10, 10],
-    [65, 80],
-    [40, 40],
-  ]
-    .slice(0, 3)
-    .forEach(([x, y]) => {
-      return assert.equal(
-        inputSchema.safeParse({
-          ...DEFAULT_INPUT,
-          households: [
-            { ...DEFAULT_INPUT.households[0], x, y },
-            ...DEFAULT_INPUT.households.slice(1),
-          ],
-        }).success,
-        false,
-      );
-    });
+  _assertEdgeAndVertexHouseholdsAreSlice();
   assert.equal(
     inputSchema.safeParse({
       ...DEFAULT_INPUT,

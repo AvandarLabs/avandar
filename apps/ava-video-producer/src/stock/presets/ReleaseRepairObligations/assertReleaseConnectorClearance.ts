@@ -3,46 +3,80 @@ import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
 import { getConservativeWidthFromText } from "../../text/getConservativeWidthFromText";
 
 type Point = { x: number; y: number };
+
 type Bounds = { left: number; right: number; top: number; bottom: number };
-function _intersects({
-  first,
-  second,
-}: {
-  first: Bounds;
-  second: Bounds;
-}): boolean {
-  return (
-    first.left < second.right &&
-    first.right > second.left &&
-    first.top < second.bottom &&
-    first.bottom > second.top
-  );
+
+type GetAssertReleaseConnectorClearanceArtifactStateOptions = {
+  markup: string;
+};
+
+type GetAssertReleaseConnectorClearanceArtifactStateResult = {
+  artifact: ReturnType<typeof SvgAttributes.fromMarker>;
+  rectangle: Bounds;
+  bayBounds: Bounds;
+  textBounds: Bounds[];
+};
+
+/** Restores each emitted line position including cumulative tspan offsets. */
+function _getEmittedTextLines({
+  body,
+  attributes,
+  baseline,
+}: Readonly<{ body: string; attributes: string; baseline: number }>): Array<{
+  x: number;
+  y: number;
+  line: string;
+}> {
+  const spans = [...body.matchAll(/<tspan([^>]*)>([^<]*)<\/tspan>/g)];
+  const lines = spans.length
+    ? spans.map(([, span, line], index) => {
+        return {
+          x: SvgAttributes.getNumberFromMarkup({
+            attributes: span,
+            name: "x",
+          }),
+          y:
+            baseline +
+            spans.slice(0, index + 1).reduce((offset, [, spanAttributes]) => {
+              return (
+                offset + Number(spanAttributes.match(/ dy="([^"]*)"/)?.[1] ?? 0)
+              );
+            }, 0),
+          line,
+        };
+      })
+    : [
+        {
+          x: SvgAttributes.getNumberFromMarkup({ attributes, name: "x" }),
+          y: baseline,
+          line: body,
+        },
+      ];
+  return lines;
 }
-function _getPoints(attributes: string): Point[] {
-  const path = attributes.match(/ d="([^"]+)"/);
-  assert.ok(path);
-  assert.match(path[1], /^[MVH\d. +\-e]+$/i);
-  return [...path[1].matchAll(/([MVH])([^MVH]*)/g)].reduce<Point[]>(
-    (points, match) => {
-      const values = match[2].trim().split(/\s+/).map(Number);
-      const prior = points.at(-1) ?? { x: 0, y: 0 };
-      const point =
-        match[1] === "M"
-          ? { x: values[0], y: values[1] }
-          : match[1] === "V"
-            ? { x: prior.x, y: values[0] }
-            : { x: values[0], y: prior.y };
-      assert.ok(Number.isFinite(point.x + point.y));
-      return [...points, point];
-    },
-    [],
-  );
+
+function _getRectangleBounds(attributes: string): Bounds {
+  const left = SvgAttributes.getNumberFromMarkup({ attributes, name: "x" });
+  const top = SvgAttributes.getNumberFromMarkup({
+    attributes: attributes,
+    name: "y",
+  });
+  return {
+    left,
+    right:
+      left + SvgAttributes.getNumberFromMarkup({ attributes, name: "width" }),
+    top,
+    bottom:
+      top + SvgAttributes.getNumberFromMarkup({ attributes, name: "height" }),
+  };
 }
+
 function _decodeText(text: string): string {
   return text.replace(/&(amp|lt|gt|quot|#x27);/g, (_, entity: string) => {
     return { amp: "&", lt: "<", gt: ">", quot: '"', "#x27": "'" }[entity]!;
   });
 }
+
 function _getTextBounds(markup: string): Bounds[] {
   return [...markup.matchAll(/<text([^>]*)>([\s\S]*?)<\/text>/g)].flatMap(
     ([, attributes, body]) => {
@@ -54,34 +88,7 @@ function _getTextBounds(markup: string): Bounds[] {
         attributes,
         name: "y",
       });
-      const spans = [...body.matchAll(/<tspan([^>]*)>([^<]*)<\/tspan>/g)];
-      const lines = spans.length
-        ? spans.map(([, span, line], index) => {
-            return {
-              x: SvgAttributes.getNumberFromMarkup({
-                attributes: span,
-                name: "x",
-              }),
-              y:
-                baseline +
-                spans
-                  .slice(0, index + 1)
-                  .reduce((offset, [, spanAttributes]) => {
-                    return (
-                      offset +
-                      Number(spanAttributes.match(/ dy="([^"]*)"/)?.[1] ?? 0)
-                    );
-                  }, 0),
-              line,
-            };
-          })
-        : [
-            {
-              x: SvgAttributes.getNumberFromMarkup({ attributes, name: "x" }),
-              y: baseline,
-              line: body,
-            },
-          ];
+      const lines = _getEmittedTextLines({ body, attributes, baseline });
       return lines.map(({ x, y, line }) => {
         const text = _decodeText(line);
         const width = getConservativeWidthFromText({ text, fontSize });
@@ -98,21 +105,65 @@ function _getTextBounds(markup: string): Bounds[] {
     },
   );
 }
-function _getRectangleBounds(attributes: string): Bounds {
-  const left = SvgAttributes.getNumberFromMarkup({ attributes, name: "x" });
-  const top = SvgAttributes.getNumberFromMarkup({
-    attributes: attributes,
-    name: "y",
+
+/**
+ * Samples the assert release connector clearance artifact state for the current
+ * authored frame.
+ */
+function _getAssertReleaseConnectorClearanceArtifactState(
+  markup: Readonly<
+    Readonly<GetAssertReleaseConnectorClearanceArtifactStateOptions>["markup"]
+  >,
+): GetAssertReleaseConnectorClearanceArtifactStateResult {
+  const artifact = SvgAttributes.fromMarker({
+    markup,
+    marker: "release-artifact",
   });
-  return {
-    left,
-    right:
-      left + SvgAttributes.getNumberFromMarkup({ attributes, name: "width" }),
-    top,
-    bottom:
-      top + SvgAttributes.getNumberFromMarkup({ attributes, name: "height" }),
-  };
+  const rectangle = _getRectangleBounds(artifact);
+  const bayBounds = _getRectangleBounds(
+    SvgAttributes.fromMarker({ markup, marker: "recipient-bay" }),
+  );
+  const textBounds = _getTextBounds(markup);
+  return { artifact, rectangle, bayBounds, textBounds };
 }
+
+function _intersects({
+  first,
+  second,
+}: {
+  first: Bounds;
+  second: Bounds;
+}): boolean {
+  return (
+    first.left < second.right &&
+    first.right > second.left &&
+    first.top < second.bottom &&
+    first.bottom > second.top
+  );
+}
+
+function _getPoints(attributes: string): Point[] {
+  const path = attributes.match(/ d="([^"]+)"/);
+  assert.ok(path);
+  assert.match(path[1], /^[MVH\d. +\-e]+$/i);
+  return [...path[1].matchAll(/([MVH])([^MVH]*)/g)].reduce<Point[]>(
+    (points, match) => {
+      const values = match[2].trim().split(/\s+/).map(Number);
+      const prior = points.at(-1) ?? { x: 0, y: 0 };
+      const point =
+        match[1] === "M"
+          ? { x: values[0], y: values[1] }
+          : match[1] === "V"
+            ? { x: prior.x, y: values[0] }
+            : { x: values[0], y: prior.y };
+      assert.ok(Number.isFinite(point.x + point.y));
+      points.push(point);
+      return points;
+    },
+    [],
+  );
+}
+
 function _getSegmentBounds({
   prior,
   point,
@@ -127,6 +178,7 @@ function _getSegmentBounds({
     bottom: Math.max(point.y, prior.y),
   };
 }
+
 function _assertPortContact({
   markup,
   id,
@@ -145,20 +197,14 @@ function _assertPortContact({
       SvgAttributes.getNumberFromMarkup({ attributes: port, name: "r" }),
   });
 }
+
 /**
  * Checks actual orthogonal connector paint against full text and artifact
  * bounds.
  */
 export function assertReleaseConnectorClearance(markup: string): void {
-  const artifact = SvgAttributes.fromMarker({
-    markup,
-    marker: "release-artifact",
-  });
-  const rectangle = _getRectangleBounds(artifact);
-  const bayBounds = _getRectangleBounds(
-    SvgAttributes.fromMarker({ markup, marker: "recipient-bay" }),
-  );
-  const textBounds = _getTextBounds(markup);
+  const { artifact, rectangle, bayBounds, textBounds } =
+    _getAssertReleaseConnectorClearanceArtifactState(markup);
   [...markup.matchAll(/<path data-obligation-unfold="([^"]*)"[^>]*>/g)].forEach(
     ([attributes, id], _, matches) => {
       const points = _getPoints(attributes);

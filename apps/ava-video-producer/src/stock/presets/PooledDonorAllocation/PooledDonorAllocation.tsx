@@ -1,8 +1,9 @@
+import { propEq } from "@avandar/utils";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { AllocationCoordinator } from "./AllocationCoordinator/AllocationCoordinator";
-import { DonorToken } from "./DonorToken";
+import { DonorToken } from "./DonorToken/DonorToken";
 import { DonorTray } from "./DonorTray/DonorTray";
-import { FundingLabels } from "./FundingLabels";
+import { FundingLabels } from "./FundingLabels/FundingLabels";
 import { FundingPool } from "./FundingPool";
 import { FundingRequests } from "./FundingRequests";
 import { getAllocationTokensFromInputAndFrame } from "./getAllocationTokensFromInputAndFrame";
@@ -29,16 +30,7 @@ export function PooledDonorAllocation({
         frame={frame}
         accent={accent}
       />
-      {input.contributions.map((donor, donorIndex) => {
-        return (
-          <DonorTray
-            key={donor.id}
-            input={input}
-            frame={frame}
-            donorIndex={donorIndex}
-          />
-        );
-      })}
+      {_getDonorTraysFromInputAndFrame({ input, frame })}
       <AllocationCoordinator input={input} frame={frame} tokens={tokens} />
       {tokens.map((token) => {
         return (
@@ -46,9 +38,11 @@ export function PooledDonorAllocation({
             key={`${token.donorIndex}:${token.unitIndex}`}
             token={token}
             requestOrdinal={
-              input.requests.findIndex(({ id }) => {
-                return id === token.donor.earmarkedRequestId;
-              }) + 1
+              token.donor.earmarkedRequestId === null
+                ? 0
+                : input.requests.findIndex(
+                    propEq("id", token.donor.earmarkedRequestId),
+                  ) + 1
             }
             accent={accent}
           />
@@ -56,4 +50,21 @@ export function PooledDonorAllocation({
       })}
     </g>
   );
+}
+
+/** Each authored donor keeps its original tray identity and ordinal. */
+function _getDonorTraysFromInputAndFrame({
+  input,
+  frame,
+}: Readonly<Pick<Props, "input" | "frame">>): ReactNode {
+  return input.contributions.map((donor, donorIndex) => {
+    return (
+      <DonorTray
+        key={donor.id}
+        input={input}
+        frame={frame}
+        donorIndex={donorIndex}
+      />
+    );
+  });
 }

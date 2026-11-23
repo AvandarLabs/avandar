@@ -1,12 +1,11 @@
+import { AbsoluteFill, useCurrentFrame } from "remotion";
 // Registers the bundled faces the theme's text roles name.
 import "../../fonts";
-import { AbsoluteFill, useCurrentFrame } from "remotion";
-import { AppFrame, Cursor } from "../../chrome/chrome";
-import { useCursorMotion } from "../../chrome/useCursorMotion";
-import { CursorMotionHelpers } from "../../CursorMotionHelpers";
-import { mix, typed } from "../../motion";
+import { AppFrame } from "../../chrome/chrome";
+import { Motion } from "../../motion";
 import { useVideoMotion } from "../../videoTheme/useVideoMotion";
-import { useVideoTokens } from "../../videoTheme/useVideoTheme";
+import { useVideoTokens } from "../../videoTheme/videoThemeHelpers";
+import { DemoCursor } from "./DemoCursor";
 import { PromptField } from "./PromptField";
 import { PublishButton } from "./PublishButton";
 import { ResultsPanel } from "./ResultsPanel/ResultsPanel";
@@ -14,13 +13,10 @@ import { SidePanel } from "./SidePanel/SidePanel";
 import {
   APP_IN,
   CHIP_CLICK,
-  CLICKS,
   COUNT_AT,
   FIELD_CLICK,
   OUT_AT,
-  POINTER,
   PROMPT,
-  PUBLISH_CLICK,
   REFILTER_AT,
   RUN_CLICK,
   TOTAL_ALL,
@@ -28,10 +24,27 @@ import {
   TYPE_AT,
   W,
 } from "./timeline";
-import type { VideoMotion } from "../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { ReactNode } from "react";
 
 export { DEMO_LEN } from "./timeline";
+function _getMatchedCount({
+  frame,
+  motion,
+  stateEasing,
+}: Readonly<{
+  frame: number;
+  motion: VideoMotion;
+  stateEasing: (progress: number) => number;
+}>): number {
+  return Math.round(
+    Motion.mix({
+      t: motion.ramp(frame, COUNT_AT, motion.sheet, stateEasing),
+      from: 0,
+      to: MATCHED_ALL,
+    }),
+  );
+}
 /** Frames the app takes to fade out at the end of the clip, at tempo 1. */
 const APP_OUT_FRAMES = 20;
 /** The matched-rows figure the counter lands on before the filter. */
@@ -42,24 +55,27 @@ const MATCHED_PAID = 312;
 function _counts({
   frame,
   motion,
-}: Readonly<{ frame: number; motion: VideoMotion }>) {
+}: Readonly<{
+  frame: number;
+  motion: VideoMotion;
+}>): Readonly<{ shown: number; refilter: number; totalShown: number }> {
   const stateEasing = motion.reveal.easing;
   // Two counters in sequence. The first counts up from nothing when the
   // results land; the second travels from that value to the filtered one
   // when the chip is clicked. A number that jumps between the two is the
   // loudest teleport on screen, because the eye is already reading it.
-  const matched = Math.round(
-    mix(
-      motion.ramp(frame, COUNT_AT, motion.sheet, stateEasing),
-      0,
-      MATCHED_ALL,
-    ),
-  );
+  const matched = _getMatchedCount({ frame, motion, stateEasing });
   const refilter = motion.ramp(frame, REFILTER_AT, motion.sheet, stateEasing);
   const shown =
     frame < REFILTER_AT
       ? matched
-      : Math.round(mix(refilter, MATCHED_ALL, MATCHED_PAID));
+      : Math.round(
+          Motion.mix({
+            t: refilter,
+            from: MATCHED_ALL,
+            to: MATCHED_PAID,
+          }),
+        );
   // The filter has to act on the thing it filters. A chip lighting up while
   // five channels sit there untouched, Organic search among them, under a
   // "Paid only" filter, is the clip contradicting itself, and it does it in
@@ -68,7 +84,13 @@ function _counts({
   const totalShown =
     frame < REFILTER_AT
       ? TOTAL_ALL
-      : Math.round(mix(refilter, TOTAL_ALL, TOTAL_PAID));
+      : Math.round(
+          Motion.mix({
+            t: refilter,
+            from: TOTAL_ALL,
+            to: TOTAL_PAID,
+          }),
+        );
   return { shown, refilter, totalShown };
 }
 /** The beat values of one frame: what is visible, typed, and counted. */
@@ -90,7 +112,12 @@ function useDemoBeats(frame: number) {
   const focus =
     motion.ramp(frame, FIELD_CLICK, motion.chip, stateEasing) *
     (1 - motion.ramp(frame, RUN_CLICK, motion.chip, stateEasing));
-  const text = typed(frame, TYPE_AT, PROMPT, motion.typing.rate);
+  const text = Motion.typed({
+    frame,
+    at: TYPE_AT,
+    text: PROMPT,
+    cps: motion.typing.rate,
+  });
   const typing = text.length > 0 && text.length < PROMPT.length;
   const { shown, refilter, totalShown } = _counts({ frame, motion });
   const chipOn = motion.ramp(frame, CHIP_CLICK, motion.chip, stateEasing);
@@ -124,7 +151,6 @@ function useDemoBeats(frame: number) {
 export function Demo(): ReactNode {
   const frame = useCurrentFrame();
   const tokens = useVideoTokens();
-  const cursorMotion = useCursorMotion();
   const { app, focus, text, typing, shown, refilter, totalShown, chipOn } =
     useDemoBeats(frame);
   return (
@@ -154,22 +180,7 @@ export function Demo(): ReactNode {
         />
         <PublishButton frame={frame} />
 
-        <Cursor
-          frame={frame}
-          path={POINTER}
-          clicks={CLICKS}
-          cursor={CursorMotionHelpers.cursorOnTarget({
-            frame,
-            path: POINTER,
-            targets: [
-              { frame: FIELD_CLICK, x: 420, y: 194, cursor: "text" },
-              { frame: RUN_CLICK, x: 1484, y: 194, cursor: "pointer" },
-              { frame: CHIP_CLICK, x: 1285, y: 465, cursor: "pointer" },
-              { frame: PUBLISH_CLICK, x: 1305, y: 917, cursor: "pointer" },
-            ],
-            motion: cursorMotion,
-          })}
-        />
+        <DemoCursor frame={frame} />
       </AbsoluteFill>
     </AbsoluteFill>
   );

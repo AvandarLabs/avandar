@@ -1,6 +1,6 @@
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { FitText } from "../FitText/FitText";
-import { StockRect } from "../StockRect/StockRect";
+import { StockRect } from "../StockRect";
 import type { ReactNode } from "react";
 
 type Props = {

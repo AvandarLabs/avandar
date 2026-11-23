@@ -1,9 +1,11 @@
 import { abs } from "../../chrome/abs";
 import { useVideoMotion } from "../../videoTheme/useVideoMotion";
 import { useVideoShapeScales } from "../../videoTheme/useVideoShapeScales";
-import { useVideoTheme } from "../../videoTheme/useVideoTheme";
+import { useVideoTheme } from "../../videoTheme/videoThemeHelpers";
 import { PUBLISH, PUBLISH_CLICK, ROWS_AT } from "./timeline";
 import type { ReactNode } from "react";
+
+type Props = { frame: number };
 
 /** Frames after the rows land that the button arrives. A cue, not a length. */
 const PUBLISH_DELAY = 10;
@@ -12,7 +14,7 @@ const PUBLISH_RISE = 10;
 
 /** The publish phase: the button entering with the side panel, then
  *  answering the click that sends the report. */
-export function PublishButton({ frame }: { frame: number }): ReactNode {
+export function PublishButton({ frame }: Readonly<Props>): ReactNode {
   const { semantic, mantine, atomic } = useVideoTheme();
   const motion = useVideoMotion();
   const scales = useVideoShapeScales();

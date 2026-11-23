@@ -1,6 +1,6 @@
 import { BrandLockupMotion } from "../../BrandLockupMotion/BrandLockupMotion";
 import type { ThemeTokenName } from "../../../../storyboard/schema/themeSchema";
-import type { VideoMotion } from "../../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { ResolvedVideoSemantic } from "../../../../videoTheme/videoTheme.types";
 import type { BrandLockupSceneProps } from "../../../scenes.types";
 
@@ -56,7 +56,10 @@ function _getColumnFlights({
     }).flight;
   });
 }
-/** Shared values and calculations for the LockupMark visuals. */
+/**
+ * Column flight progress, tilt, and scene colors used by MarkColumns and
+ * MarkColumnCover.
+ */
 export const LockupMarkShared = {
   /** Each column's flight progress, staggered by the column stagger. */
   getColumnFlights: _getColumnFlights,

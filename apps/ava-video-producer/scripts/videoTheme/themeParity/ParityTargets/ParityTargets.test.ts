@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { prop } from "@avandar/utils";
-import { CONTINUITY_CATALOG } from "../../../../src/continuity/continuityCatalog";
-import { STOCK_IDS } from "../../../../src/stock/catalog";
+import { CONTINUITY_CATALOG } from "../../../../src/continuity/isSceneEntry";
+import { STOCK_IDS } from "../../../../src/stock/stockEntry";
 import { ParityTargets } from "./ParityTargets";
 
 test("the default parity targets are the fast base list", () => {

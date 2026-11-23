@@ -1,13 +1,15 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { ReferralLane } from "./ReferralLane";
-import { ReferralLedger } from "./ReferralLedger";
+import { ReceivingServiceAndGuide } from "./ReceivingServiceAndGuide";
+import { ReferralLedger } from "./ReferralLedger/ReferralLedger";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ReferralReturnAcknowledgement.schema";
 import type { ReactNode } from "react";
+
 /** Explicit referral facts and local frame. */
 export type Props = GraphicProps & { input: Input };
+
 /** Attendance travels outward while independent communication returns. */
 export function ReferralReturnAcknowledgement({
   input,
@@ -47,28 +49,7 @@ export function ReferralReturnAcknowledgement({
         breakLongWords
         normalizeWhitespace
       />
-      <FitText
-        text={input.services.receiving}
-        x={600}
-        y={95}
-        width={275}
-        fontSize={16}
-        maxLines={3}
-        breakLongWords
-        normalizeWhitespace
-      />
-      {input.referrals.map((referral, index) => {
-        return (
-          <ReferralLane
-            key={referral.id}
-            referral={referral}
-            index={index}
-            frame={frame}
-            input={input}
-            accent={accent}
-          />
-        );
-      })}
+      <ReceivingServiceAndGuide input={input} frame={frame} accent={accent} />
       {input.showLedger ? (
         <ReferralLedger input={input} frame={frame} />
       ) : undefined}

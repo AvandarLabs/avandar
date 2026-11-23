@@ -1,7 +1,7 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./SharedJigPreparation.schema";
 import type { ReactNode } from "react";
 
@@ -65,11 +65,16 @@ function _getToolPoint({
   return {
     x:
       pattern === "two-holes"
-        ? mix(
-            motion.ramp(frame, 32, motion.press.duration, motion.travel.easing),
-            110,
-            150,
-          )
+        ? Motion.mix({
+            t: motion.ramp(
+              frame,
+              32,
+              motion.press.duration,
+              motion.travel.easing,
+            ),
+            from: 110,
+            to: 150,
+          })
         : 80 + 22 * progress,
     y: pattern === "two-holes" ? 382 : 350 + 22 * progress,
   };

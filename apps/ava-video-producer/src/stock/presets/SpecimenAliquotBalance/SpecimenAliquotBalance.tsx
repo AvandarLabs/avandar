@@ -2,8 +2,8 @@ import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHoo
 import { AliquotCaption } from "./AliquotCaption";
 import { AliquotEquation } from "./AliquotEquation";
 import { AliquotLedger } from "./AliquotLedger";
-import { AliquotTube } from "./AliquotTube";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import { AliquotTube } from "./AliquotTube/AliquotTube";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./SpecimenAliquotBalance.schema";
 import type { ReactNode } from "react";

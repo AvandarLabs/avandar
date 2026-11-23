@@ -19,6 +19,7 @@ test("scene factory applies duration and easing to the same transition", () => {
     });
   }, /Cuts/);
 });
+
 test("native UI scene movement has bounded blur, exact rests and an opaque outgoing dissolve", () => {
   const props = {
     kind: "spatial" as const,
@@ -46,6 +47,41 @@ test("native UI scene movement has bounded blur, exact rests and an opaque outgo
     }).filter,
     undefined,
   );
+  _assertNonSpatialTransitionStyles({ props });
+});
+
+test("a spatial transition's peak blur comes from the motion options", () => {
+  const style = getSceneTransitionStyle({
+    progress: 0.5,
+    entering: true,
+    props: { kind: "spatial", motion: { transitionBlur: 24 } },
+  });
+  assert.equal(style.filter, "blur(24px)");
+});
+
+test("a morph starts from its themed radius and an aperture opens to its themed overscan", () => {
+  const morph = getSceneTransitionStyle({
+    progress: 0.5,
+    entering: true,
+    props: { kind: "morph", morphRadius: 24 },
+  });
+  assert.match(String(morph.clipPath), /round 12px\)$/);
+  const aperture = getSceneTransitionStyle({
+    progress: 1,
+    entering: true,
+    props: { kind: "aperture", apertureOverscan: 1 },
+  });
+  assert.equal(
+    aperture.clipPath,
+    `circle(${Math.hypot(1600, 840)}px at 800px 420px)`,
+  );
+});
+
+function _assertNonSpatialTransitionStyles({
+  props,
+}: Readonly<{
+  props: Parameters<typeof getSceneTransitionStyle>[0]["props"];
+}>): void {
   assert.equal(
     getSceneTransitionStyle({
       progress: 0.5,
@@ -70,29 +106,4 @@ test("native UI scene movement has bounded blur, exact rests and an opaque outgo
     }).transform,
     undefined,
   );
-});
-test("a spatial transition's peak blur comes from the motion options", () => {
-  const style = getSceneTransitionStyle({
-    progress: 0.5,
-    entering: true,
-    props: { kind: "spatial", motion: { transitionBlur: 24 } },
-  });
-  assert.equal(style.filter, "blur(24px)");
-});
-test("a morph starts from its themed radius and an aperture opens to its themed overscan", () => {
-  const morph = getSceneTransitionStyle({
-    progress: 0.5,
-    entering: true,
-    props: { kind: "morph", morphRadius: 24 },
-  });
-  assert.match(String(morph.clipPath), /round 12px\)$/);
-  const aperture = getSceneTransitionStyle({
-    progress: 1,
-    entering: true,
-    props: { kind: "aperture", apertureOverscan: 1 },
-  });
-  assert.equal(
-    aperture.clipPath,
-    `circle(${Math.hypot(1600, 840)}px at 800px 420px)`,
-  );
-});
+}

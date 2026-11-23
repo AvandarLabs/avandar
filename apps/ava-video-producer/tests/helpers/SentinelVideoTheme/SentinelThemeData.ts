@@ -1,15 +1,7 @@
-import { BUILT_IN_VIDEO_THEMES } from "../../../src/videoTheme/builtInVideoThemes/builtInVideoThemes";
 import { getValueAtPath } from "../../../src/videoTheme/getValueAtPath";
+import { BUILT_IN_VIDEO_THEMES } from "../../../src/videoTheme/makeVideoThemeLibraryFromDocuments/makeVideoThemeLibraryFromDocuments";
 import type { VideoThemePatch } from "../../../src/videoTheme/videoTheme.types";
-/*
- * The sentinel theme the "follow a sentinel theme" tests render every Atlas
- * item under. It moves every swatch, palette shade, white, black, radius,
- * stroke width, dash step, opacity step, glow opacity, type scale step, font
- * weight, tracking step, and the identity multiplier to an improbable value.
- * A renderer that reads the theme then draws no `classic` value, so any
- * `classic` value left in its markup is a literal, even one routed through a
- * constant the pattern scan cannot see.
- */
+
 const CLASSIC = BUILT_IN_VIDEO_THEMES.get("classic");
 /** Picked so no product of a sentinel and a classic constant is classic. */
 const SENTINEL_STROKE = 0.7;
@@ -20,10 +12,13 @@ const SENTINEL_OPACITY = 0.4321;
 const SENTINEL_FONT_SIZE = "41px";
 const SENTINEL_FONT_WEIGHT = 900;
 const SENTINEL_TRACKING = 0.315;
-function _record(path: readonly string[]): Readonly<Record<string, unknown>> {
-  const value = getValueAtPath(CLASSIC, path);
+function _record(path: readonly string[]): Record<string, unknown> {
+  const value = getValueAtPath({
+    source: CLASSIC,
+    path,
+  });
   return typeof value === "object" && value !== null
-    ? (value as Readonly<Record<string, unknown>>)
+    ? Object.fromEntries(Object.entries(value))
     : {};
 }
 function _sentinelColor(index: number): string {
@@ -153,8 +148,13 @@ export const SentinelThemeData = {
   /** The document path containing classic atomic scales. */
   ATOMIC: ATOMIC,
   /**
-   * The appearance patch that replaces classic values during coverage
-   * renders.
+   * The sentinel theme the "follow a sentinel theme" tests render every Atlas
+   * item under. It moves every swatch, palette shade, white, black, radius,
+   * stroke width, dash step, opacity step, glow opacity, type scale step, font
+   * weight, tracking step, and the identity multiplier to an improbable value.
+   * A renderer that reads the theme then draws no `classic` value, so any
+   * `classic` value left in its markup is a literal, even one routed through a
+   * constant the pattern scan cannot see.
    */
   SENTINEL_THEME: SENTINEL_THEME,
 } as const;

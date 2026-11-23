@@ -5,12 +5,14 @@ import type {
   TargetCandidate,
   TargetSnapshot,
 } from "./measureAvandar.types";
-
 /** Why a candidate cannot be measured, or undefined when it can. */
-function _getRejectionFromCandidate(
-  candidate: Readonly<TargetCandidate>,
-  stage: Readonly<StageBounds>,
-): string | undefined {
+function _getRejectionFromCandidate({
+  candidate,
+  stage,
+}: Readonly<{
+  candidate: Readonly<TargetCandidate>;
+  stage: Readonly<StageBounds>;
+}>): string | undefined {
   const x = candidate.rect.x + candidate.rect.width / 2;
   const y = candidate.rect.y + candidate.rect.height / 2;
   if (candidate.isHidden) {
@@ -23,7 +25,6 @@ function _getRejectionFromCandidate(
     ? `Center occluded by ${candidate.occluder}`
     : undefined;
 }
-
 /**
  * Gets the first visible, unoccluded candidate's centre and bounds relative
  * to the film stage, or the reasons no candidate qualified. Use it to turn
@@ -31,13 +32,24 @@ function _getRejectionFromCandidate(
  */
 export function getMeasuredTargetFromSnapshot(
   snapshot: Readonly<TargetSnapshot> | undefined,
-): { x: number; y: number; rect: Rect } | { reason: string } {
+):
+  | {
+      x: number;
+      y: number;
+      rect: Rect;
+    }
+  | {
+      reason: string;
+    } {
   if (!snapshot) {
     return { reason: "Film stage is absent" };
   }
   const { stage, candidates } = snapshot;
   const rejections = candidates.map((candidate) => {
-    return _getRejectionFromCandidate(candidate, stage);
+    return _getRejectionFromCandidate({
+      candidate,
+      stage,
+    });
   });
   const index = rejections.findIndex(isUndefined);
   if (index < 0) {

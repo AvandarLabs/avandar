@@ -1,7 +1,7 @@
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ClassroomLearners } from "./ClassroomLearners";
-import { CoverStaff } from "./CoverStaff";
+import { CoverStaff } from "./CoverStaff/CoverStaff";
 import { getCoverPositionsFromFrame } from "./getCoverPositionsFromFrame";
 import { LearningRooms } from "./LearningRooms";
 import { MentorBoard } from "./MentorBoard";

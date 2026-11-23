@@ -1,12 +1,12 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { type Props } from "./CoordinateRowSourceShared.types";
+import { type Props as CoordinateRowSourceSharedProps } from "./CoordinateRowSourceShared.types";
 import type { ReactNode } from "react";
+
+type Props = { row: CoordinateRowSourceSharedProps["row"]; y: number };
+
 /** The row's number in a ring at the head of its line. */
-export function RowKey({
-  row,
-  y,
-}: Readonly<{ row: Props["row"]; y: number }>): ReactNode {
+export function RowKey({ row, y }: Readonly<Props>): ReactNode {
   const { color, stroke, sketch, text } = GraphicThemeHooks.useGraphicTokens();
   const shapes = GraphicThemeHooks.useGraphicShapeScales();
   const data = text.graphic.data;

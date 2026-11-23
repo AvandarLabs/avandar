@@ -1,7 +1,7 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { ByteChunk } from "./ByteChunk";
+import { ByteChunk } from "./ByteChunk/ByteChunk";
 import { ByteCounters } from "./ByteCounters";
 import { getByteTransferFromFrame } from "./getByteTransferFromFrame";
 import { RetryCheckpoint } from "./RetryCheckpoint";

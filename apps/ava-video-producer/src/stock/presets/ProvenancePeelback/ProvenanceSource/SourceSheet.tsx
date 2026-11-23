@@ -1,12 +1,15 @@
-import { StockRect } from "../../../primitives/StockRect/StockRect";
+import { StockRect } from "../../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
+
+type Props = { height: number; angle: number; stroke: string };
+
 /** The sheet itself, turned open by `angle` about its centre. */
 export function SourceSheet({
   height,
   angle,
   stroke,
-}: Readonly<{ height: number; angle: number; stroke: string }>): ReactNode {
+}: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (

@@ -1,12 +1,8 @@
+import { propEq } from "@avandar/utils";
 import { useState } from "react";
-import { HELPER_CATALOG } from "./helperCatalog";
-import {
-  buildHelperSearch,
-  filterHelpers,
-  getHelperSelectionFromSearch,
-} from "./helperSelection/helperSelection";
+import { HELPER_CATALOG } from "./HelperFilmIds";
+import { HelperSelection } from "./HelperSelection/HelperSelection";
 import type { HelperEntry } from "./helperCatalog.types";
-import type { HelperSelection } from "./helperSelection/helperSelection";
 
 /** The helper gallery's selection, its filtered helpers and its actions. */
 type HelperGalleryState = {
@@ -20,21 +16,30 @@ type HelperGalleryState = {
   chooseCategory: (category: string) => void;
   setQuery: (query: string) => void;
 };
-
 /** Keeps the deep link in step with the open helper and category filter. */
 function _replaceUrl(selection: HelperSelection): void {
-  history.replaceState(null, "", buildHelperSearch(selection));
+  history.replaceState(
+    null,
+    "",
+    HelperSelection.makeSearchFromSelection(selection),
+  );
 }
-
 /** Helper filters, the open preview and its neighbours, deep linked. */
 export function useHelperGallery(): HelperGalleryState {
   const [selection, setSelection] = useState(() => {
-    return getHelperSelectionFromSearch(location.search, HELPER_CATALOG);
+    return HelperSelection.getHelperSelectionFromSearch({
+      search: location.search,
+      catalog: HELPER_CATALOG,
+    });
   });
-  const entries = filterHelpers(HELPER_CATALOG.helpers, selection);
-  const open = HELPER_CATALOG.helpers.find((helper) => {
-    return helper.id === selection.helperId;
+  const entries = HelperSelection.filterHelpers({
+    helpers: HELPER_CATALOG.helpers,
+    options: selection,
   });
+  const open =
+    selection.helperId === undefined
+      ? undefined
+      : HELPER_CATALOG.helpers.find(propEq("id", selection.helperId));
   // Browsing a deep-linked helper outside the current filter still works.
   const browsable = open && !entries.includes(open) ? [open] : entries;
   const index = open ? browsable.indexOf(open) : -1;

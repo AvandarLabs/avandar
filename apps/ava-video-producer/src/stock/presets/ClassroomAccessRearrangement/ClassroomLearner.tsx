@@ -1,8 +1,8 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./ClassroomAccessRearrangement.schema";
 import type { ReactNode } from "react";
 
@@ -18,41 +18,64 @@ type GetHorseshoeBackPositionOptions = {
   motion: VideoMotion;
   input: Position;
 };
-type Props = { input: Input; index: number; frame: number; accent: string };
+type Props = {
+  input: Input;
+  index: number;
+  frame: number;
+  accent: string;
+};
 function _getPosition({
   input,
   index,
   frame,
   motion,
-}: Readonly<Omit<Props, "accent"> & { motion: VideoMotion }>): Position {
+}: Readonly<
+  Omit<Props, "accent"> & {
+    motion: VideoMotion;
+  }
+>): Position {
   const position =
     index < 3
       ? _getSeatedPosition({ index, frame, motion })
       : _getEnteringPosition({ index, frame, motion });
-  if (input.resolvedLayout !== "open-horseshoe") {
-    return position;
-  }
-  return index < 3
-    ? _getHorseshoeFrontPosition({ index, frame, motion, input: position })
-    : _getHorseshoeBackPosition({ index, frame, motion, input: position });
+  return input.resolvedLayout === "open-horseshoe"
+    ? index < 3
+      ? _getHorseshoeFrontPosition({ index, frame, motion, input: position })
+      : _getHorseshoeBackPosition({ index, frame, motion, input: position })
+    : position;
 }
-type Position = { x: number; y: number };
+type Position = {
+  x: number;
+  y: number;
+};
 /** The first three learners rise from their desks, then move to a column. */
 function _getSeatedPosition({
   index,
   frame,
   motion,
-}: Readonly<{ index: number; frame: number; motion: VideoMotion }>): Position {
+}: Readonly<{
+  index: number;
+  frame: number;
+  motion: VideoMotion;
+}>): Position {
   const column = index % 3;
-  const y = mix(
-    motion.ramp(frame, 36, motion.scale(24), motion.travel.easing),
-    250,
-    225,
-  );
+  const y = Motion.mix({
+    t: motion.ramp(frame, 36, motion.scale(24), motion.travel.easing),
+    from: 250,
+    to: 225,
+  });
   const progress = motion.ramp(frame, 88, motion.whip, motion.travel.easing);
   return {
-    x: mix(progress, 110 + index * 90, 210 + column * 170),
-    y: mix(progress, y, 280),
+    x: Motion.mix({
+      t: progress,
+      from: 110 + index * 90,
+      to: 210 + column * 170,
+    }),
+    y: Motion.mix({
+      t: progress,
+      from: y,
+      to: 280,
+    }),
   };
 }
 /** The other learners step into a lane, then walk down to their column. */
@@ -60,27 +83,35 @@ function _getEnteringPosition({
   index,
   frame,
   motion,
-}: Readonly<{ index: number; frame: number; motion: VideoMotion }>): Position {
+}: Readonly<{
+  index: number;
+  frame: number;
+  motion: VideoMotion;
+}>): Position {
   const column = index % 3;
   const lane = [210, 550, 600][column];
-  let x = mix(
-    motion.ramp(frame, 80, motion.press.duration, motion.travel.easing),
-    110 + index * 90,
-    lane,
-  );
-  x = mix(
-    motion.ramp(frame, 90, motion.chip, motion.travel.easing),
-    x,
-    210 + column * 170,
-  );
-  const y = mix(
-    motion.ramp(frame, 76, motion.press.duration, motion.travel.easing),
-    250,
-    285,
-  );
+  let x = Motion.mix({
+    t: motion.ramp(frame, 80, motion.press.duration, motion.travel.easing),
+    from: 110 + index * 90,
+    to: lane,
+  });
+  x = Motion.mix({
+    t: motion.ramp(frame, 90, motion.chip, motion.travel.easing),
+    from: x,
+    to: 210 + column * 170,
+  });
+  const y = Motion.mix({
+    t: motion.ramp(frame, 76, motion.press.duration, motion.travel.easing),
+    from: 250,
+    to: 285,
+  });
   return {
     x,
-    y: mix(motion.ramp(frame, 84, motion.chip, motion.travel.easing), y, 450),
+    y: Motion.mix({
+      t: motion.ramp(frame, 84, motion.chip, motion.travel.easing),
+      from: y,
+      to: 450,
+    }),
   };
 }
 /** In the open horseshoe, the first two learners step around the table. */
@@ -90,19 +121,23 @@ function _getHorseshoeFrontPosition({
   motion,
   input: { x, y },
 }: Readonly<GetHorseshoeFrontPositionOptions>): Position {
-  const step = (at: number) => {
+  const step = (at: number): number => {
     return motion.ramp(frame, at, motion.press.duration, motion.travel.easing);
   };
-  if (index === 0) {
-    return { x: mix(step(104), mix(step(96), x, 200), 210), y };
-  }
-  if (index === 1) {
-    return {
-      x: mix(step(104), mix(step(96), x, 250), 210),
-      y: mix(step(100), y, 365),
-    };
-  }
-  return { x, y };
+  return index === 0 || index === 1
+    ? {
+        x: Motion.mix({
+          t: step(104),
+          from: Motion.mix({
+            t: step(96),
+            from: x,
+            to: index === 0 ? 200 : 250,
+          }),
+          to: 210,
+        }),
+        y: index === 1 ? Motion.mix({ t: step(100), from: y, to: 365 }) : y,
+      }
+    : { x, y };
 }
 /** In the open horseshoe, three of the back learners close the curve. */
 function _getHorseshoeBackPosition({
@@ -117,13 +152,14 @@ function _getHorseshoeBackPosition({
     motion.scale(12),
     motion.travel.easing,
   );
-  if (index === 3) {
-    return { x: mix(progress, x, 290), y };
-  }
-  if (index === 4) {
-    return { x: mix(progress, x, 470), y };
-  }
-  return index === 5 ? { x, y: mix(progress, y, 365) } : { x, y };
+  return index === 3 || index === 4
+    ? {
+        x: Motion.mix({ t: progress, from: x, to: index === 3 ? 290 : 470 }),
+        y,
+      }
+    : index === 5
+      ? { x, y: Motion.mix({ t: progress, from: y, to: 365 }) }
+      : { x, y };
 }
 /** Stable walking or wheeled icons enter the same shared activity footprint. */
 export function ClassroomLearner({

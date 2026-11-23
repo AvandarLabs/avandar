@@ -19,6 +19,34 @@ import {
 } from "./BoundedLocationDisplacement.fixtures";
 import { inputSchema, type Input } from "./BoundedLocationDisplacement.schema";
 
+function _assertHeldPublicPositions(): void {
+  [71, 72, 80, 100, 139, 150, 165].forEach((frame) => {
+    const tags = _tags({
+      markup: _render({ frame: frame }),
+      attribute: "data-public-position",
+    });
+    assert.equal(tags.length, 2);
+    assert.deepEqual(
+      tags.map((tag) => {
+        return SvgAttributes.getNumberFromMarkup({
+          attributes: tag,
+          name: "cx",
+        });
+      }),
+      [500 + 36 * 3.8, 500 + 65 * 3.8],
+    );
+    assert.deepEqual(
+      tags.map((tag) => {
+        return SvgAttributes.getNumberFromMarkup({
+          attributes: tag,
+          name: "cy",
+        });
+      }),
+      [180 + 44 * 2.2, 180 + 63 * 2.2],
+    );
+  });
+}
+
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -115,31 +143,7 @@ test("public map stays empty before disclosure and every emitted position is exa
       0,
     );
   });
-  [71, 72, 80, 100, 139, 150, 165].forEach((frame) => {
-    const tags = _tags({
-      markup: _render({ frame: frame }),
-      attribute: "data-public-position",
-    });
-    assert.equal(tags.length, 2);
-    assert.deepEqual(
-      tags.map((tag) => {
-        return SvgAttributes.getNumberFromMarkup({
-          attributes: tag,
-          name: "cx",
-        });
-      }),
-      [500 + 36 * 3.8, 500 + 65 * 3.8],
-    );
-    assert.deepEqual(
-      tags.map((tag) => {
-        return SvgAttributes.getNumberFromMarkup({
-          attributes: tag,
-          name: "cy",
-        });
-      }),
-      [180 + 44 * 2.2, 180 + 63 * 2.2],
-    );
-  });
+  _assertHeldPublicPositions();
   assert.equal(
     _tags({
       markup: _render({ frame: 150, input: CHANGED_INPUT }),

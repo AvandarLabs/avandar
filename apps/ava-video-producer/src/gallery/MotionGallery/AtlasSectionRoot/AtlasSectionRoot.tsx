@@ -2,7 +2,7 @@ import { CompositionGallery } from "../../../continuity/gallery/CompositionGalle
 import { GalleryVideoTheme } from "../../GalleryVideoTheme/GalleryVideoTheme";
 import { HelperGallery } from "../../HelperGallery/HelperGallery";
 import { getAtlasSection } from "../getAtlasSection";
-import { MotionLibrary } from "../MotionLibrary";
+import { MotionLibrary } from "../MotionLibrary/MotionLibrary";
 import { AtlasSection } from "./AtlasSection";
 import type { ReactNode } from "react";
 /**

@@ -1,10 +1,11 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
+
+type Props = { guideX: number };
+
 /** The arm and hand holding the guide. */
-export function GuideCarryArm({
-  guideX,
-}: Readonly<{ guideX: number }>): ReactNode {
+export function GuideCarryArm({ guideX }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (

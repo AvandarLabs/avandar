@@ -1,13 +1,20 @@
 import type { Point } from "./graphicCommon.types";
 
+type CubicPointParameters = {
+  a: Point;
+  b: Point;
+  c: Point;
+  d: Point;
+  t: number;
+};
 /** Geometry only: the shared frame helpers supply the motion. */
-export function cubicPoint(
-  a: Point,
-  b: Point,
-  c: Point,
-  d: Point,
-  t: number,
-): Point {
+export function cubicPoint({
+  a,
+  b,
+  c,
+  d,
+  t,
+}: Readonly<CubicPointParameters>): Point {
   const u = 1 - t;
   return {
     x:

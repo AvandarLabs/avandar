@@ -2,6 +2,8 @@ import { prop } from "@avandar/utils";
 import { FitText } from "../../primitives/FitText/FitText";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { MarketBalance } from "./MarketBalance";
+import { MarketCheckoutTotal } from "./MarketCheckoutTotal/MarketCheckoutTotal";
+import { MarketCheckoutUnitLabel } from "./MarketCheckoutUnitLabel/MarketCheckoutUnitLabel";
 import { MarketTender } from "./MarketTender/MarketTender";
 import type { Input } from "./HouseholdMarketChoice.schema";
 import type { ReactNode } from "react";
@@ -23,17 +25,8 @@ export function MarketCheckout({
   const balance = input.availableCredits - paid;
   return (
     <g>
-      <MarketTender input={input} frame={frame} accent={accent} total={total} />
-      <FitText
-        text={input.labels.unit}
-        x={640}
-        y={521}
-        width={190}
-        fontSize={12}
-        maxLines={3}
-        normalizeWhitespace
-        breakLongWords
-      />
+      <MarketTender {...{ input, frame, accent, total }} />
+      <MarketCheckoutUnitLabel input={input} />
       <FitText
         text={input.labels.total}
         x={280}
@@ -44,18 +37,8 @@ export function MarketCheckout({
         normalizeWhitespace
         breakLongWords
       />
-      <text
-        data-total={total}
-        x={550}
-        y={521}
-        fill={accent}
-        fontFamily={tokens.text.graphic.secondary.fontFamily}
-        fontWeight={tokens.text.graphic.secondary.fontWeight}
-        fontSize={tokens.text.graphic.secondary.fontSize}
-      >
-        {total}
-      </text>
-      <MarketBalance input={input} balance={balance} accent={accent} />
+      <MarketCheckoutTotal {...{ total, accent, tokens }} />
+      <MarketBalance {...{ input, balance, accent }} />
       <FitText
         text={input.labels.tender}
         x={40}

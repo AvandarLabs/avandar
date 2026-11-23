@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   getThemeBarActions,
-  getThemeBarMessage,
+  getThemeBarMessageFromState,
   getThemeLabelFromInput,
   reloadThenFocus,
   submitNewThemeName,
@@ -23,25 +23,33 @@ function _failed(status: number) {
 
 test("each finished theme action has its own status message", () => {
   assert.equal(
-    getThemeBarMessage({ ...QUIET, status: { kind: "saving" } }),
+    getThemeBarMessageFromState({ ...QUIET, status: { kind: "saving" } }),
     "saving",
   );
   assert.equal(
-    getThemeBarMessage({ ...QUIET, status: { kind: "saved" } }),
+    getThemeBarMessageFromState({ ...QUIET, status: { kind: "saved" } }),
     "saved",
   );
 });
 
 test("a finished copy has its own message", () => {
   assert.equal(
-    getThemeBarMessage({ ...QUIET, status: IDLE, copyStatus: "copied" }),
+    getThemeBarMessageFromState({
+      ...QUIET,
+      status: IDLE,
+      copyStatus: "copied",
+    }),
     "copied",
   );
 });
 
 test("a copy that failed says the copy failed, not that the save did", () => {
   assert.equal(
-    getThemeBarMessage({ ...QUIET, status: IDLE, copyStatus: "failed" }),
+    getThemeBarMessageFromState({
+      ...QUIET,
+      status: IDLE,
+      copyStatus: "failed",
+    }),
     "copyFailed",
   );
 });
@@ -52,7 +60,7 @@ test("a copy finishing during a save does not hide the save or unlock its action
     status: { kind: "saving" },
     copyStatus: "copied",
   } as const;
-  assert.equal(getThemeBarMessage(input), "saving");
+  assert.equal(getThemeBarMessageFromState(input), "saving");
   const actions = getThemeBarActions(input);
   assert.deepEqual(
     [actions.canSave, actions.canSaveAsNew, actions.canDiscard],
@@ -62,26 +70,26 @@ test("a copy finishing during a save does not hide the save or unlock its action
 
 test("a refused save is explained by its HTTP status", () => {
   assert.equal(
-    getThemeBarMessage({ ...QUIET, status: _failed(400) }),
+    getThemeBarMessageFromState({ ...QUIET, status: _failed(400) }),
     "invalidTheme",
   );
   assert.equal(
-    getThemeBarMessage({ ...QUIET, status: _failed(403) }),
+    getThemeBarMessageFromState({ ...QUIET, status: _failed(403) }),
     "readOnlyTheme",
   );
   assert.equal(
-    getThemeBarMessage({ ...QUIET, status: _failed(409) }),
+    getThemeBarMessageFromState({ ...QUIET, status: _failed(409) }),
     "changedOnDisk",
   );
   assert.equal(
-    getThemeBarMessage({ ...QUIET, status: _failed(413) }),
+    getThemeBarMessageFromState({ ...QUIET, status: _failed(413) }),
     "themeTooLarge",
   );
 });
 
 test("a conflict shown by the changed-on-disk banner points at its actions, not a reload", () => {
   assert.equal(
-    getThemeBarMessage({
+    getThemeBarMessageFromState({
       ...QUIET,
       isChangedOnDisk: true,
       status: _failed(409),
@@ -92,11 +100,11 @@ test("a conflict shown by the changed-on-disk banner points at its actions, not 
 
 test("a save that failed for any other reason gets the generic message", () => {
   assert.equal(
-    getThemeBarMessage({ ...QUIET, status: _failed(500) }),
+    getThemeBarMessageFromState({ ...QUIET, status: _failed(500) }),
     "saveFailed",
   );
   assert.equal(
-    getThemeBarMessage({ ...QUIET, status: _failed(0) }),
+    getThemeBarMessageFromState({ ...QUIET, status: _failed(0) }),
     "saveFailed",
   );
 });
@@ -107,15 +115,18 @@ test("a save refused with token issues points at the marked tokens", () => {
     status: 422,
     issues: [{ path: "color.accent", message: "bad" }],
   } as const;
-  assert.equal(getThemeBarMessage({ ...QUIET, status }), "invalidTheme");
+  assert.equal(
+    getThemeBarMessageFromState({ ...QUIET, status }),
+    "invalidTheme",
+  );
 });
 
 test("while idle, the status line says why saving is unavailable", () => {
   assert.equal(
-    getThemeBarMessage({ ...QUIET, hasIssues: true, status: IDLE }),
+    getThemeBarMessageFromState({ ...QUIET, hasIssues: true, status: IDLE }),
     "fixIssuesFirst",
   );
-  assert.equal(getThemeBarMessage({ ...QUIET, status: IDLE }), "none");
+  assert.equal(getThemeBarMessageFromState({ ...QUIET, status: IDLE }), "none");
 });
 
 test("save needs unsaved, valid changes to a custom theme", () => {
@@ -237,11 +248,15 @@ test("Save is available again once the banner is answered", () => {
 
 test("while the banner waits, the status line points at it before any token problem", () => {
   assert.equal(
-    getThemeBarMessage({ ...QUIET, status: IDLE, isChangedOnDisk: true }),
+    getThemeBarMessageFromState({
+      ...QUIET,
+      status: IDLE,
+      isChangedOnDisk: true,
+    }),
     "changedOnDiskUseBanner",
   );
   assert.equal(
-    getThemeBarMessage({
+    getThemeBarMessageFromState({
       ...QUIET,
       status: IDLE,
       isChangedOnDisk: true,
@@ -257,11 +272,11 @@ function _createFailed(status: number) {
 
 test("a new theme refused because its name is taken says so, not that the file changed", () => {
   assert.equal(
-    getThemeBarMessage({ ...QUIET, status: _createFailed(409) }),
+    getThemeBarMessageFromState({ ...QUIET, status: _createFailed(409) }),
     "themeNameTaken",
   );
   assert.equal(
-    getThemeBarMessage({
+    getThemeBarMessageFromState({
       ...QUIET,
       isChangedOnDisk: true,
       status: _createFailed(409),
@@ -279,15 +294,15 @@ test("a name clash offers no Reload from file", () => {
 
 test("a new theme refused for another reason is explained like a refused save", () => {
   assert.equal(
-    getThemeBarMessage({ ...QUIET, status: _createFailed(400) }),
+    getThemeBarMessageFromState({ ...QUIET, status: _createFailed(400) }),
     "invalidTheme",
   );
   assert.equal(
-    getThemeBarMessage({ ...QUIET, status: _createFailed(413) }),
+    getThemeBarMessageFromState({ ...QUIET, status: _createFailed(413) }),
     "themeTooLarge",
   );
   assert.equal(
-    getThemeBarMessage({ ...QUIET, status: _createFailed(0) }),
+    getThemeBarMessageFromState({ ...QUIET, status: _createFailed(0) }),
     "saveFailed",
   );
 });

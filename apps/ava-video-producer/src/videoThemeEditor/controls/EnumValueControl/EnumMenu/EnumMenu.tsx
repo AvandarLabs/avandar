@@ -1,6 +1,7 @@
+import { makeMap } from "@avandar/utils";
 import { AtlasSelect } from "../../../../gallery/AtlasSelect/AtlasSelect";
 import css from "./EnumMenu.module.css";
-import type { OptionCopy } from "../../../tokenCopy/editorCopy";
+import type { OptionCopy } from "../../../tokenCopy/EditorCopy";
 import type { ReactNode } from "react";
 
 type EnumOption = OptionCopy & Readonly<{ option: string }>;
@@ -21,11 +22,10 @@ export function EnumMenu({
   hasIssue,
   onChange,
 }: Props): ReactNode {
-  const descriptions = new Map(
-    options.map((entry) => {
-      return [entry.option, entry.description];
-    }),
-  );
+  const descriptions = makeMap(options, {
+    key: "option",
+    valueKey: "description",
+  });
   return (
     <AtlasSelect
       aria-label={label}

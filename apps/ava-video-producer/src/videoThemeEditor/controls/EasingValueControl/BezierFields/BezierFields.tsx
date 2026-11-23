@@ -3,16 +3,21 @@ import css from "./BezierFields.module.css";
 import type { ReactNode } from "react";
 
 type Bezier = readonly [number, number, number, number];
-
 type Props = Readonly<{
   points: Bezier;
   isCameraCurve: boolean;
   onChange: (points: Bezier) => void;
 }>;
-
 const BEZIER_FIELD_NAMES = ["Start x", "Start y", "End x", "End y"] as const;
-
-function _withPoint(points: Bezier, index: number, value: number): Bezier {
+function _withPoint({
+  points,
+  index,
+  value,
+}: Readonly<{
+  points: Bezier;
+  index: number;
+  value: number;
+}>): Bezier {
   const [x1, y1, x2, y2] = points;
   return [
     index === 0 ? value : x1,
@@ -21,7 +26,6 @@ function _withPoint(points: Bezier, index: number, value: number): Bezier {
     index === 3 ? value : y2,
   ];
 }
-
 /** The four Bezier control values. A camera curve keeps every point in 0..1. */
 export function BezierFields({
   points,
@@ -42,7 +46,13 @@ export function BezierFields({
             decimalScale={3}
             value={point}
             onChange={(pointValue) => {
-              return onChange(_withPoint(points, index, pointValue));
+              return onChange(
+                _withPoint({
+                  points,
+                  index,
+                  value: pointValue,
+                }),
+              );
             }}
           />
         );

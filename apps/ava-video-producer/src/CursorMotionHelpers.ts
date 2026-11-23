@@ -1,6 +1,6 @@
-import { ramp } from "./motion";
+import { Motion } from "./motion";
 import { StageTheme } from "./scenes/StageTheme/StageTheme";
-import type { VideoMotion } from "./videoTheme/createVideoMotion/createVideoMotion";
+import type { VideoMotion } from "./videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { ResolvedVideoComponents } from "./videoTheme/videoTheme.types";
 
 type CursorOnTargetOptions = {
@@ -9,7 +9,13 @@ type CursorOnTargetOptions = {
   targets: readonly CursorTarget[];
   motion?: CursorMotion;
 };
-export type CursorKey = { at: number; x: number; y: number };
+/** A frame and position key for scripted pointer motion. */
+export type CursorKey = {
+  at: number;
+  x: number;
+  y: number;
+};
+/** Cursor artwork available to scripted pointer targets. */
 export type CursorKind =
   | "default"
   | "pointer"
@@ -17,6 +23,7 @@ export type CursorKind =
   | "grab"
   | "grabbing"
   | "zoom-in";
+/** A frame, position, and cursor shape for a pointer target. */
 export type CursorTarget = {
   frame: number;
   x: number;
@@ -75,17 +82,38 @@ function _trackPos({
   frame: number;
   keys: readonly CursorKey[];
   motion?: CursorMotion;
-}>): { x: number; y: number } {
-  if (!keys.length) throw new Error("Cursor paths need at least one key");
-  let i = 0;
-  while (i < keys.length - 1 && frame >= keys[i + 1].at) i += 1;
+}>): {
+  x: number;
+  y: number;
+} {
+  if (!keys.length) {
+    throw new Error("Cursor paths need at least one key");
+  }
+  const firstLaterIndex = keys.findIndex((key, index) => {
+    return index > 0 && !(frame >= key.at);
+  });
+  const i = firstLaterIndex < 0 ? keys.length - 1 : firstLaterIndex - 1;
   const a = keys[i];
   const b = keys[Math.min(i + 1, keys.length - 1)];
-  const t = a.at === b.at ? 0 : ramp(frame, a.at, b.at - a.at, motion.travel);
+  const t =
+    a.at === b.at
+      ? 0
+      : Motion.ramp({
+          frame,
+          at: a.at,
+          dur: b.at - a.at,
+          easing: motion.travel,
+        });
   return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
 }
 /** Kept for consumers that need a button-down state; Cursor uses press(). */
-function _downAt(frame: number, beats: readonly number[]): boolean {
+function _downAt({
+  frame,
+  beats,
+}: Readonly<{
+  frame: number;
+  beats: readonly number[];
+}>): boolean {
   return beats.some((b) => {
     return frame >= b && frame < b + 6;
   });
@@ -129,7 +157,7 @@ function _cursorOnTarget({
   );
 }
 /** When the trail samples sit, in frames before the current one. */
-const SHUTTER_OFFSETS = [0.45, 0.3, 0.15];
+const SHUTTER_OFFSETS = [0.45, 0.3, 0.15] as const;
 /** Below this travel, in pixels, a sample draws nothing. */
 const SHUTTER_MIN_DISTANCE = 0.25;
 /**
@@ -144,7 +172,11 @@ function _cursorShutter({
   frame: number;
   path: readonly CursorKey[];
   motion?: CursorMotion;
-}>): Array<{ x: number; y: number; opacity: number }> {
+}>): Array<{
+  x: number;
+  y: number;
+  opacity: number;
+}> {
   const current = _trackPos({ frame, keys: path, motion });
   return SHUTTER_OFFSETS.map((offset) => {
     const previous = _trackPos({ frame: frame - offset, keys: path, motion });

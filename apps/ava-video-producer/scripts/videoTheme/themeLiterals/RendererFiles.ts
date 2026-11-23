@@ -32,10 +32,9 @@ function _isFileMatchedByGlobs({
   file,
 }: Readonly<{ globs: readonly string[]; file: string }>): boolean {
   return globs.reduce((isMatched, glob) => {
-    if (glob.startsWith("!")) {
-      return isMatched && !path.matchesGlob(file, glob.slice(1));
-    }
-    return isMatched || path.matchesGlob(file, glob);
+    return glob.startsWith("!")
+      ? isMatched && !path.matchesGlob(file, glob.slice(1))
+      : isMatched || path.matchesGlob(file, glob);
   }, false);
 }
 function _listSourceFiles(): string[] {

@@ -1,8 +1,15 @@
-import { mix } from "../../../../motion";
+import { Motion } from "../../../../motion";
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { type Props } from "./CohortRecordShared.types";
+import { type Props as CohortRecordSharedProps } from "./CohortRecordShared.types";
 import type { ReactNode } from "react";
+
+type Props = Pick<
+  CohortRecordSharedProps,
+  "participant" | "visit" | "visitIndex" | "y" | "frame"
+> & {
+  x: number;
+};
 /** The arch of a recorded visit, sliding into place under its column. */
 export function VisitArch({
   participant,
@@ -11,23 +18,19 @@ export function VisitArch({
   x,
   y,
   frame,
-}: Readonly<
-  Pick<Props, "participant" | "visit" | "visitIndex" | "y" | "frame"> & {
-    x: number;
-  }
->): ReactNode {
+}: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const motion = GraphicThemeHooks.useGraphicMotion();
-  const shift = mix(
-    motion.ramp(
+  const shift = Motion.mix({
+    t: motion.ramp(
       frame,
       24 + visitIndex * motion.scaleStagger(18),
       motion.scale(24),
       motion.travel.easing,
     ),
-    35,
-    0,
-  );
+    from: 35,
+    to: 0,
+  });
   return (
     <SketchedShape
       shape={{

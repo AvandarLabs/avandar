@@ -1,7 +1,7 @@
 import { AtlasCard } from "../../../gallery/AtlasLayout/AtlasCard/AtlasCard";
-import { isSceneEntry } from "../../continuityCatalog";
+import { isSceneEntry } from "../../isSceneEntry";
 import { PosterThumbnail } from "./PosterThumbnail/PosterThumbnail";
-import type { ContinuityCatalogEntry } from "../../continuityCatalog";
+import type { ContinuityCatalogEntry } from "../../isSceneEntry";
 import type { ReactNode } from "react";
 
 type Props = {

@@ -1,12 +1,14 @@
-import { mix, ramp } from "../../../../motion";
+import { Motion } from "../../../../motion";
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
+
+type Props = {
+  frame: number;
+  side: number;
+};
 /** The latch that swings open to the detour side for the exception. */
-export function SideLatch({
-  frame,
-  side,
-}: Readonly<{ frame: number; side: number }>): ReactNode {
+export function SideLatch({ frame, side }: Readonly<Props>): ReactNode {
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   const motion = GraphicThemeHooks.useGraphicMotion();
@@ -14,7 +16,11 @@ export function SideLatch({
   return (
     <g
       data-side-latch="true"
-      transform={`rotate(${mix(opening, 0, side * 62)} 420 300)`}
+      transform={`rotate(${Motion.mix({
+        t: opening,
+        from: 0,
+        to: side * 62,
+      })} 420 300)`}
     >
       <SketchedShape
         shape={{ kind: "path", d: "M420 300 H462" }}

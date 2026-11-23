@@ -1,4 +1,4 @@
-import { mix } from "../../../../motion";
+import { Motion } from "../../../../motion";
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getShopperPoseFromInputAndFrame } from "../getShopperPoseFromInputAndFrame";
@@ -6,7 +6,12 @@ import { TenderTotal } from "./TenderTotal";
 import type { Input } from "../HouseholdMarketChoice.schema";
 import type { ReactNode } from "react";
 
-type Props = { input: Input; frame: number; accent: string; total: number };
+type Props = {
+  input: Input;
+  frame: number;
+  accent: string;
+  total: number;
+};
 /**
  * Authored tender stays in the shopper's free hand, then crosses below the
  * basket.
@@ -25,8 +30,16 @@ export function MarketTender({
     frame: Math.min(frame, 108),
   });
   const payment = motion.ramp(frame, 108, motion.hero, motion.travel.easing);
-  const x = mix(Math.max(0, payment * 2 - 1), shopper.x + 45, 790);
-  const y = mix(Math.min(1, payment * 2), shopper.y + 10, 484);
+  const x = Motion.mix({
+    t: Math.max(0, payment * 2 - 1),
+    from: shopper.x + 45,
+    to: 790,
+  });
+  const y = Motion.mix({
+    t: Math.min(1, payment * 2),
+    from: shopper.y + 10,
+    to: 484,
+  });
   return (
     <g
       data-tender={input.tender}

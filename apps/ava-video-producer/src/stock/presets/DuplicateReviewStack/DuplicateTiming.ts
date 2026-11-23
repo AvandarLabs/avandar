@@ -1,5 +1,5 @@
-import { ramp } from "../../../motion";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import { Motion } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 /** The cue the candidates start to align by comparison value on. */
 const ALIGN_CUE = 42;
 /** The cue the aligned candidates start to fold on. */
@@ -10,20 +10,31 @@ const FOLD_FRAMES = 30;
 function _getAlignFromFrame({
   frame,
   motion,
-}: Readonly<{ frame: number; motion: VideoMotion }>): number {
-  return ramp(frame, ALIGN_CUE, FOLD_CUE - ALIGN_CUE, motion.entrance.easing);
+}: Readonly<{
+  frame: number;
+  motion: VideoMotion;
+}>): number {
+  return Motion.ramp({
+    frame,
+    at: ALIGN_CUE,
+    dur: FOLD_CUE - ALIGN_CUE,
+    easing: motion.entrance.easing,
+  });
 }
 /** How far the candidates have folded, at the theme's tempo. */
 function _getFoldFromFrame({
   frame,
   motion,
-}: Readonly<{ frame: number; motion: VideoMotion }>): number {
-  return ramp(
+}: Readonly<{
+  frame: number;
+  motion: VideoMotion;
+}>): number {
+  return Motion.ramp({
     frame,
-    FOLD_CUE,
-    motion.scale(FOLD_FRAMES),
-    motion.entrance.easing,
-  );
+    at: FOLD_CUE,
+    dur: motion.scale(FOLD_FRAMES),
+    easing: motion.entrance.easing,
+  });
 }
 /** Times duplicate candidates aligning and folding into a stack or pair. */
 export const DuplicateTiming = {

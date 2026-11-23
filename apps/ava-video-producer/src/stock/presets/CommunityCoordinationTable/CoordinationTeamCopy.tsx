@@ -1,8 +1,11 @@
 import { propEq } from "@avandar/utils";
-import { FitText } from "../../primitives/FitText/FitText";
-import { SketchedShape } from "../../primitives/SketchedShape";
-import { StockRect } from "../../primitives/StockRect/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { CoordinationAssignmentConnector } from "./CoordinationAssignmentConnector/CoordinationAssignmentConnector";
+import { CoordinationTeamCopyAssignmentKey } from "./CoordinationTeamCopyAssignmentKey/CoordinationTeamCopyAssignmentKey";
+import { CoordinationTeamCopyTeamLegendKey } from "./CoordinationTeamCopyTeamLegendKey/CoordinationTeamCopyTeamLegendKey";
+import { CoordinationTeamLegendMarker } from "./CoordinationTeamLegendMarker/CoordinationTeamLegendMarker";
+import { CoordinationTeamName } from "./CoordinationTeamName/CoordinationTeamName";
+import { CoordinationTeamServiceLabel } from "./CoordinationTeamServiceLabel/CoordinationTeamServiceLabel";
 import { getCoordinationPlaceColorFromIndex } from "./getCoordinationPlaceColorFromIndex";
 import type { Input } from "./CommunityCoordinationTable.schema";
 import type { ReactNode } from "react";
@@ -31,76 +34,14 @@ export function CoordinationTeamCopy({
   const y = 130 + 100 * index;
   return (
     <g data-team-legend={team.id} data-assignment-place={reference}>
-      <StockRect
-        x={634}
-        y={y - 14}
-        width={16}
-        height={18}
-        rx={
-          input.markerStyle === "flags" ? 0 : scales.corner(tokens.corner.chip)
-        }
-        fill={tokens.color.surface}
-        stroke={color}
+      <CoordinationTeamLegendMarker {...{ y, input, scales, tokens, color }} />
+      <CoordinationTeamCopyTeamLegendKey {...{ y, tokens, index }} />
+      <CoordinationAssignmentConnector {...{ tokens, color, y }} />
+      <CoordinationTeamCopyAssignmentKey
+        {...{ y, tokens, color, placeIndex }}
       />
-      <text
-        data-team-legend-key
-        x={642}
-        y={y}
-        textAnchor="middle"
-        fontFamily={tokens.text.graphic.data.fontFamily}
-        fontWeight={tokens.text.graphic.data.fontWeight}
-        fontSize={tokens.text.graphic.data.fontSize}
-        fill={tokens.color.text}
-      >
-        {index + 1}
-      </text>
-      <SketchedShape
-        shape={{
-          kind: "path",
-          d: `M642 ${y + 9} V${y + 23} l-3 -4 m3 4 l3 -4`,
-        }}
-        profile={tokens.sketch.shape}
-        fill="none"
-        stroke={color}
-      />
-      <SketchedShape
-        shape={{ kind: "circle", cx: 642, cy: y + 43, r: 9 }}
-        profile={tokens.sketch.shape}
-        fill={tokens.color.surface}
-        stroke={color}
-      />
-      <text
-        data-assignment-key
-        x={642}
-        y={y + 47}
-        textAnchor="middle"
-        fontFamily={tokens.text.graphic.data.fontFamily}
-        fontWeight={tokens.text.graphic.data.fontWeight}
-        fontSize={tokens.text.graphic.data.fontSize}
-        fill={color}
-      >
-        {String.fromCharCode(65 + placeIndex)}
-      </text>
-      <FitText
-        text={team.label}
-        x={660}
-        y={y}
-        width={260}
-        fontSize={12}
-        maxLines={3}
-        breakLongWords
-        normalizeWhitespace
-      />
-      <FitText
-        text={team.serviceLabel}
-        x={660}
-        y={y + 47}
-        width={260}
-        fontSize={12}
-        maxLines={3}
-        breakLongWords
-        normalizeWhitespace
-      />
+      <CoordinationTeamName team={team} y={y} />
+      <CoordinationTeamServiceLabel team={team} y={y} />
     </g>
   );
 }

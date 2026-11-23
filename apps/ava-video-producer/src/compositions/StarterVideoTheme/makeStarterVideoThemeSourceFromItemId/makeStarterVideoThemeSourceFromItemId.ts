@@ -1,4 +1,4 @@
-import { BUILT_IN_VIDEO_THEMES } from "../../../videoTheme/builtInVideoThemes/builtInVideoThemes";
+import { BUILT_IN_VIDEO_THEMES } from "../../../videoTheme/makeVideoThemeLibraryFromDocuments/makeVideoThemeLibraryFromDocuments";
 import type { VideoThemeSource } from "../../../videoTheme/videoTheme.types";
 
 /** The id of the built-in theme the fixed compositions default to. */

@@ -1,13 +1,15 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { AttributionActors } from "./AttributionActors";
+import { AttributionActors } from "./AttributionActors/AttributionActors";
 import { AttributionEvent } from "./AttributionEvent";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ActorAttributionSplit.schema";
 import type { ReactNode } from "react";
+
 /** Frame-driven account-attribution scene. */
 export type Props = GraphicProps & { input: Input };
+
 /** Keeps historical shared-account records intact after account separation. */
 export function ActorAttributionSplit({
   frame,

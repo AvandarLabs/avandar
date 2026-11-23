@@ -1,10 +1,14 @@
-import { ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./DashboardSlotAssembly.schema";
 import type { ReactNode } from "react";
 
-type Props = { layout: Input["layout"]; frame: number; accent: string };
+type Props = {
+  layout: Input["layout"];
+  frame: number;
+  accent: string;
+};
 /** Frames the alignment guide takes to extend across the board. */
 const EXTEND_FRAMES = 16;
 /** Alignment extends from the featured slot, then withdraws after docking. */
@@ -17,19 +21,25 @@ export function DashboardGuides({
   const tokens = GraphicThemeHooks.useGraphicTokens();
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   const motion = GraphicThemeHooks.useGraphicMotion();
-  const progress = ramp(
+  const progress = Motion.ramp({
     frame,
-    48,
-    motion.scale(EXTEND_FRAMES),
-    motion.reveal.easing,
-  );
+    at: 48,
+    dur: motion.scale(EXTEND_FRAMES),
+    easing: motion.reveal.easing,
+  });
   const guide =
     layout === "feature-left"
       ? { x1: 426, x2: 426, y1: 132, y2: 132 + 444 * progress }
       : { x1: 24, x2: 24 + 912 * progress, y1: 336, y2: 336 };
   const opacity =
     motion.reveal(frame, 48) *
-    (1 - ramp(frame, 112, motion.hero, motion.exit.easing));
+    (1 -
+      Motion.ramp({
+        frame,
+        at: 112,
+        dur: motion.hero,
+        easing: motion.exit.easing,
+      }));
   return (
     <g data-alignment-guides="temporary" opacity={opacity}>
       <SketchedShape

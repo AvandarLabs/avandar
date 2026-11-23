@@ -1,5 +1,5 @@
-import { ramp } from "../../../motion";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import { Motion } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 /** The cue the distance guides start to reach their labels on. */
 const MEASURE_CUE = 51;
 /** The cue the association is stated on, once every distance is measured. */
@@ -10,26 +10,33 @@ const CANDIDATE_FRAMES = 35;
 function _getMeasureFromFrame({
   frame,
   motion,
-}: Readonly<{ frame: number; motion: VideoMotion }>): number {
-  return ramp(
+}: Readonly<{
+  frame: number;
+  motion: VideoMotion;
+}>): number {
+  return Motion.ramp({
     frame,
-    MEASURE_CUE,
-    STATUS_CUE - MEASURE_CUE,
-    motion.travel.easing,
-  );
+    at: MEASURE_CUE,
+    dur: STATUS_CUE - MEASURE_CUE,
+    easing: motion.travel.easing,
+  });
 }
 /** How far the candidate at `index` has faded in, on the list stagger. */
 function _getCandidateFromFrame({
   frame,
   index,
   motion,
-}: Readonly<{ frame: number; index: number; motion: VideoMotion }>): number {
-  return ramp(
+}: Readonly<{
+  frame: number;
+  index: number;
+  motion: VideoMotion;
+}>): number {
+  return Motion.ramp({
     frame,
-    13 + index * motion.stagger.list,
-    motion.scale(CANDIDATE_FRAMES),
-    motion.reveal.easing,
-  );
+    at: 13 + index * motion.stagger.list,
+    dur: motion.scale(CANDIDATE_FRAMES),
+    easing: motion.reveal.easing,
+  });
 }
 /** Times label candidates, distance measurement, and the association status. */
 export const ReviewTiming = {

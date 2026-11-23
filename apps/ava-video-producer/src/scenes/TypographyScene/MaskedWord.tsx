@@ -1,5 +1,8 @@
-import { mix } from "../../motion";
-import { useVideoTheme, useVideoTokens } from "../../videoTheme/useVideoTheme";
+import { Motion } from "../../motion";
+import {
+  useVideoTheme,
+  useVideoTokens,
+} from "../../videoTheme/videoThemeHelpers";
 import type { CSSProperties, ReactNode } from "react";
 
 type Props = {
@@ -28,7 +31,11 @@ export function MaskedWord({
       <span
         style={{
           ...style,
-          transform: `translateY(${mix(progress, 110, 0).toFixed(2)}%)`,
+          transform: `translateY(${Motion.mix({
+            t: progress,
+            from: 110,
+            to: 0,
+          }).toFixed(2)}%)`,
         }}
       >
         {children}

@@ -1,9 +1,6 @@
 import path from "node:path";
-import {
-  declaredCutFrames,
-  timeline,
-} from "../../../src/storyboard/schema/schema";
-import { run } from "../../lib/mediaHelpers";
+import { StoryboardTimeline } from "../../../src/storyboard/schema/StoryboardTimeline";
+import { MediaHelpers } from "../../lib/MediaHelpers/MediaHelpers";
 import { productRequirements } from "../../lib/productRequirements/productRequirements";
 import { ROOT } from "../video.constants";
 import type { Storyboard } from "../../../src/storyboard/schema/schema";
@@ -14,7 +11,6 @@ type Props = Readonly<{
   props: string;
   publicDir: string;
 }>;
-
 /**
  * Runs the shared render script, which renders, encodes, and gates the picture.
  */
@@ -24,12 +20,12 @@ export async function runPictureRender({
   props,
   publicDir,
 }: Props): Promise<void> {
-  const last = timeline(plan).at(-1)!;
+  const last = StoryboardTimeline.timeline(plan).at(-1)!;
   const poster = last.startFrame + Math.floor(last.durationInFrames * 0.65);
-  await run(
-    "sh",
-    [path.join(ROOT, "scripts/render.sh"), "story-film", String(poster)],
-    {
+  await MediaHelpers.run({
+    command: "sh",
+    args: [path.join(ROOT, "scripts/render.sh"), "story-film", String(poster)],
+    options: {
       cwd: ROOT,
       env: {
         ...process.env,
@@ -44,9 +40,9 @@ export async function runPictureRender({
         DELIVER: `${plan.delivery.width}:${plan.delivery.height}`,
         STANDALONE: plan.purpose === "standalone" ? "1" : "0",
         // Always set, even empty, so an exported value never leaks in.
-        DECLARED_CUTS: declaredCutFrames(plan).join(","),
+        DECLARED_CUTS: StoryboardTimeline.declaredCutFrames(plan).join(","),
         KEEP_RENDER_FRAMES: "1",
       },
     },
-  );
+  });
 }

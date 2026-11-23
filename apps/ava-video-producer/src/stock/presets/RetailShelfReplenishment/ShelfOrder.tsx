@@ -1,6 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getOrderSlipPoseFromFrame } from "./getOrderSlipPoseFromFrame";
 import type { Input } from "./RetailShelfReplenishment.schema";

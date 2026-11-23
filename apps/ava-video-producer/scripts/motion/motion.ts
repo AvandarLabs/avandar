@@ -1,37 +1,18 @@
-#!/usr/bin/env node
-import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { MotionRequests } from "../MotionRequests/MotionRequests";
-import { requireLicense } from "../requireLicense";
-import { previewMotionRequests } from "./previewMotionRequests";
-import { renderMotionRequests } from "./renderMotionRequests";
+import { ProducerCli } from "../runProducerCommand/ProducerCli/ProducerCli.mjs";
 
-async function _main(): Promise<void> {
-  requireLicense();
-  const args = MotionRequests.parseArgs(process.argv.slice(2));
-  const { command, entries } = args;
-  if (command === "list") {
-    entries.forEach((entry) => {
-      return console.log(
-        `${entry.id.padEnd(20)} ${entry.category.padEnd(12)} ${entry.name}`,
-      );
-    });
-  } else {
-    const requests = await MotionRequests.fromArgs({ args });
-    if (command === "preview") {
-      await previewMotionRequests(requests);
-    } else {
-      await renderMotionRequests(requests);
-    }
-  }
-}
+await ProducerCli.prepare({
+  commandName: "motion",
+  moduleUrl: import.meta.url,
+});
 
 if (
   process.argv[1] &&
-  import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
+  import.meta.url === pathToFileURL(process.argv[1]).href
 ) {
-  _main().catch((error: unknown) => {
-    console.error(error instanceof Error ? error.message : String(error));
-    process.exitCode = 1;
-  });
+  process.env.AVA_PRODUCER_WORKER_ENTRY = new URL(
+    "./runMotionCommand.ts",
+    import.meta.url,
+  ).href;
+  await import("./runMotionCommand.ts");
 }

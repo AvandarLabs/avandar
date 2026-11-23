@@ -1,4 +1,4 @@
-import { ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ConflictField } from "./ConflictField";
@@ -6,7 +6,9 @@ import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./FieldConflictChoice.schema";
 import type { ReactNode } from "react";
 /** Frame, theme and complete validated authored input. */
-export type Props = GraphicProps & { input: Input };
+export type Props = GraphicProps & {
+  input: Input;
+};
 /** Frames the whole record takes to fade in. */
 const INTRO_FRAMES = 20;
 /**
@@ -20,12 +22,12 @@ export function FieldConflictChoice({
   const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g
-      opacity={ramp(
+      opacity={Motion.ramp({
         frame,
-        12,
-        motion.scale(INTRO_FRAMES),
-        motion.reveal.easing,
-      )}
+        at: 12,
+        dur: motion.scale(INTRO_FRAMES),
+        easing: motion.reveal.easing,
+      })}
     >
       <FitText
         text={input.recordTitle}

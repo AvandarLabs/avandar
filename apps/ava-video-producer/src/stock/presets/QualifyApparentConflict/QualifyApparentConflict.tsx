@@ -1,10 +1,12 @@
-import { ContextResolution } from "./ContextResolution";
+import { ContextResolution } from "./ContextResolution/ContextResolution";
 import { ContextStatement } from "./ContextStatement";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./QualifyApparentConflict.schema";
 import type { ReactNode } from "react";
+
 /** Complete authored context-qualified claims. */
 export type Props = GraphicProps & { input: Input };
+
 /** Two original claims resolve into distinct explicitly authored contexts. */
 export function QualifyApparentConflict({
   input,

@@ -240,32 +240,7 @@ function _assertAgreementClearance({
     return text.includes(`aria-label="${_escape(input.labels.agreed)}"`);
   });
   assert.ok(caption, "the complete authored agreement caption is present");
-  const obstacles = [
-    ...[
-      ...markup.matchAll(/<rect data-(?:original-)?request="[^"]*"[^>]*>/g),
-    ].map(([rect]) => {
-      return _rectBounds(rect);
-    }),
-    ...[...markup.matchAll(/<line data-request-hand="[^"]*"[^>]*>/g)].map(
-      ([line]) => {
-        return _lineBounds(line);
-      },
-    ),
-    ..._actorBounds(markup),
-    ...texts
-      .filter((text) => {
-        return text !== caption;
-      })
-      .flatMap(_textBounds),
-    ...[
-      ...markup
-        .slice(markup.indexOf("<g data-machine="))
-        .split("</g>")[0]
-        .matchAll(/<path[^>]*>/g),
-    ].map(([path]) => {
-      return _pathBounds({ path, x: 0, y: 0, padding: 2.5 });
-    }),
-  ];
+  const obstacles = _getAgreementObstacles({ markup, texts, caption });
   assert.equal(_actorBounds(markup).length, input.requests.length * 2);
   _textBounds(caption).forEach((line) => {
     return obstacles.forEach((obstacle) => {
@@ -291,3 +266,41 @@ export {
   _assertAgreementClearance,
 };
 export type { Bounds, PathBoundsOptions };
+
+/** Returns request, actor, text and machine bounds around the agreement. */
+function _getAgreementObstacles({
+  markup,
+  texts,
+  caption,
+}: Readonly<{
+  markup: string;
+  texts: readonly string[];
+  caption: string;
+}>): Bounds[] {
+  return [
+    ...[
+      ...markup.matchAll(/<rect data-(?:original-)?request="[^"]*"[^>]*>/g),
+    ].map(([rect]) => {
+      return _rectBounds(rect);
+    }),
+    ...[...markup.matchAll(/<line data-request-hand="[^"]*"[^>]*>/g)].map(
+      ([line]) => {
+        return _lineBounds(line);
+      },
+    ),
+    ..._actorBounds(markup),
+    ...texts
+      .filter((text) => {
+        return text !== caption;
+      })
+      .flatMap(_textBounds),
+    ...[
+      ...markup
+        .slice(markup.indexOf("<g data-machine="))
+        .split("</g>")[0]
+        .matchAll(/<path[^>]*>/g),
+    ].map(([path]) => {
+      return _pathBounds({ path, x: 0, y: 0, padding: 2.5 });
+    }),
+  ];
+}

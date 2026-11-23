@@ -1,11 +1,8 @@
-/** Behavioral conservation and physical choreography assertions. */
 import assert from "node:assert/strict";
 import test from "node:test";
-import { inputSchema } from ".././SharedReadingCircles.schema";
+import { inputSchema } from "../SharedReadingCircles.schema";
+import { assertReaderBookRoutesStayFixture as _assertReaderBookRoutesStayFixture } from "./assertReaderBookRoutesStayFixture";
 import {
-  _render,
-  _bookPositions,
-  _getReaderPosition,
   _assertReaderSeparation,
   _createRouteInputs,
 } from "./SharedReadingCirclesTestHelpers/SharedReadingCirclesTestHelpers";
@@ -47,6 +44,7 @@ test("crossing and concentrated routes retain full reader and key envelopes on b
     });
   });
 });
+
 test("reader and book routes stay continuous across fractional phase joins", () => {
   const joins = [
     24,
@@ -63,44 +61,6 @@ test("reader and book routes stay continuous across fractional phase joins", () 
     }),
   ];
   _createRouteInputs().forEach((fixture) => {
-    (["front", "side"] as const).forEach((startingShelf) => {
-      const input = { ...fixture, startingShelf };
-      joins.forEach((frame) => {
-        const before = _render({ frame: frame - 0.001, input });
-        const after = _render({ frame: frame + 0.001, input });
-        const startPoints = [
-          ..._bookPositions(before),
-          ...input.learners.map(({ id }) => {
-            return _getReaderPosition({ markup: before, id });
-          }),
-        ];
-        const endPoints = [
-          ..._bookPositions(after),
-          ...input.learners.map(({ id }) => {
-            return _getReaderPosition({ markup: after, id });
-          }),
-        ];
-        startPoints.forEach(([x, y], index) => {
-          return assert.ok(
-            Math.hypot(x - endPoints[index][0], y - endPoints[index][1]) < 0.5,
-            `${startingShelf} frame ${frame}: discontinuous object ${index}`,
-          );
-        });
-      });
-      assert.notDeepEqual(
-        input.learners.map(({ id }) => {
-          return _getReaderPosition({
-            markup: _render({ frame: 0, input }),
-            id,
-          });
-        }),
-        input.learners.map(({ id }) => {
-          return _getReaderPosition({
-            markup: _render({ frame: 150, input }),
-            id,
-          });
-        }),
-      );
-    });
+    return _assertReaderBookRoutesStayFixture({ fixture, joins });
   });
 });

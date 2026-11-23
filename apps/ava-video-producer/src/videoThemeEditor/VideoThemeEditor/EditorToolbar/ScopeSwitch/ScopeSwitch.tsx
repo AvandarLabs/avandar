@@ -1,6 +1,6 @@
 import { Badge, SegmentedControl } from "@mantine/core";
 import css from "./ScopeSwitch.module.css";
-import type { ThemeEditScope } from "../../../themeDraft/themeDraft";
+import type { ThemeEditScope } from "../../../ThemeDrafts/ThemeDrafts";
 import type { EditorItem } from "../EditorToolbar";
 import type { ReactNode } from "react";
 

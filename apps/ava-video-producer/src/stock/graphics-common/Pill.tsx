@@ -1,4 +1,4 @@
-import { StockRect } from "../primitives/StockRect/StockRect";
+import { StockRect } from "../primitives/StockRect";
 import { GraphicThemeHooks } from "../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { Text } from "./Text";
 import type { ReactNode } from "react";
@@ -12,7 +12,10 @@ type Props = {
 };
 /** A themed pill-shaped tag in the caller's colour and width. */
 export function Pill({ x, y, text, color, width }: Readonly<Props>): ReactNode {
-  const pill = GraphicThemeHooks.useGraphicProps("Pill", {});
+  const pill = GraphicThemeHooks.useGraphicProps({
+    name: "Pill",
+    props: {},
+  });
   const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>

@@ -9,6 +9,22 @@ import { geoContains } from "d3-geo";
 import LAND from "../naturalEarthLand.json";
 import { GlobeProjection } from "./GlobeProjection";
 
+function _assertHiddenLineHasNoVisiblePath(): void {
+  assert.equal(
+    GlobeProjection.getPathFromGeometry({
+      ...VIEW,
+      geometry: {
+        type: "LineString",
+        coordinates: [
+          [130, 0],
+          [170, 0],
+        ],
+      },
+    }),
+    undefined,
+  );
+}
+
 const VIEW: {
   centerLongitude: number;
   centerLatitude: number;
@@ -104,19 +120,7 @@ test("holes remain separate rings and crossing geographic routes terminate at th
   assert.ok(route);
   _bounded(route);
   assert.deepEqual(_coordinates(route).at(-1), [100, 0]);
-  assert.equal(
-    GlobeProjection.getPathFromGeometry({
-      ...VIEW,
-      geometry: {
-        type: "LineString",
-        coordinates: [
-          [130, 0],
-          [170, 0],
-        ],
-      },
-    }),
-    undefined,
-  );
+  _assertHiddenLineHasNoVisiblePath();
 });
 test("local land preserves topology, checksum and recognizable containment", () => {
   const bytes = readFileSync(

@@ -1,18 +1,21 @@
+import { makeObjectFromEntries } from "@avandar/utils";
 import { getValueAtPath } from "../../getValueAtPath";
-import {
-  isTokenDefinition,
-  isTokenScale,
-} from "../../tokenCatalog/defineTokensHelpers";
+import { TokenDefinitions } from "../../tokenCatalog/TokenDefinitions";
 import { ResolvedTokenGuards } from "./ResolvedTokenGuards";
 import { type UnknownRecord } from "./ResolvedTokenTiers.types";
 import type { CatalogNode } from "../../videoTheme.types";
+/** The catalog location and resolved value whose shadow strength is applied. */
+type ShadowScaleOptions = {
+  node: CatalogNode;
+  value: unknown;
+  strength: number;
+};
 
 function _finishElevation(fields: UnknownRecord): unknown {
   const shadow = fields.shadow;
-  if (!ResolvedTokenGuards.isRecord(shadow) || fields.color === undefined) {
-    return undefined;
-  }
-  return { layers: shadow.layers, color: fields.color };
+  return !ResolvedTokenGuards.isRecord(shadow) || fields.color === undefined
+    ? undefined
+    : { layers: shadow.layers, color: fields.color };
 }
 /**
  * Every resolved shadow and elevation under a catalog node with its layer
@@ -23,15 +26,14 @@ function _scaleShadows({
   node,
   value,
   strength,
-}: Readonly<{
-  node: CatalogNode;
-  value: unknown;
-  strength: number;
-}>): unknown {
-  if (isTokenScale(node) || !ResolvedTokenGuards.isRecord(value)) {
+}: Readonly<ShadowScaleOptions>): unknown {
+  if (
+    TokenDefinitions.isTokenScale(node) ||
+    !ResolvedTokenGuards.isRecord(value)
+  ) {
     return value;
   }
-  if (isTokenDefinition(node)) {
+  if (TokenDefinitions.isTokenDefinition(node)) {
     if (
       (node.kind !== "elevation" && node.kind !== "shadow") ||
       !Array.isArray(value.layers)
@@ -50,7 +52,7 @@ function _scaleShadows({
       }),
     };
   }
-  return Object.fromEntries(
+  return makeObjectFromEntries(
     Object.entries(value).map(([key, child]) => {
       const childNode = node[key];
       return [
@@ -63,7 +65,10 @@ function _scaleShadows({
   );
 }
 function _getShadowStrength(semantic: unknown): number {
-  const strength = getValueAtPath(semantic, ["elevation", "strength"]);
+  const strength = getValueAtPath({
+    source: semantic,
+    path: ["elevation", "strength"],
+  });
   return typeof strength === "number" ? strength : 1;
 }
 /** `_scaleShadows`, skipped at strength 1 so the value is returned as is. */
@@ -71,11 +76,7 @@ function _scaleShadowsByStrength({
   node,
   value,
   strength,
-}: Readonly<{
-  node: CatalogNode;
-  value: unknown;
-  strength: number;
-}>): unknown {
+}: Readonly<ShadowScaleOptions>): unknown {
   return strength === 1 ? value : _scaleShadows({ node, value, strength });
 }
 /**

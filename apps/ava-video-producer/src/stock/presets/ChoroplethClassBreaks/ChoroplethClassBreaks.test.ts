@@ -16,6 +16,65 @@ import {
 } from "./ChoroplethClassBreaks.fixtures";
 import { inputSchema, type Input } from "./ChoroplethClassBreaks.schema";
 
+function _assertMissingClassLegends({
+  legends,
+  input,
+}: Readonly<{ legends: readonly string[]; input: Input }>): void {
+  legends.forEach((legend, index) => {
+    const missing = _marks({ markup: legend, name: "missing-class-key" });
+    assert.equal(missing.length, 1);
+    assert.equal(_attribute({ markup: missing[0], name: "fill" }), "#728794");
+    assert.equal(_number({ markup: missing[0], name: "fill-opacity" }), 0.15);
+    assert.equal(_attribute({ markup: missing[0], name: "stroke" }), "#728794");
+    assert.equal(
+      _attribute({ markup: missing[0], name: "stroke-dasharray" }),
+      "4 5",
+    );
+    assert.ok(legend.includes(`aria-label="${input.noDataLabel}"`));
+    assert.ok(legend.includes(`aria-label="${input.unitLabel}"`));
+    const breaks = input.schemes[index].breaks;
+    assert.ok(legend.includes(`aria-label="[${breaks[0]}, ${breaks[1]})"`));
+    assert.ok(legend.includes(`aria-label="[${breaks[1]}, ${breaks[2]}]"`));
+  });
+}
+
+function _assertMovingClassBreaksReclassifyOnlyDataValue(): void {
+  [51, 60, 70, 80, 90, 110, 150].forEach((frame) => {
+    const markup = render({ frame: frame });
+    const threshold = _number({
+      markup: _marks({ markup, name: "threshold" })[0],
+      name: "data-value",
+    });
+    assert.ok(threshold >= 3 && threshold <= 5);
+    _marks({ markup, name: "zone" }).forEach((mark, i) => {
+      const value = DEFAULT_INPUT.zones[i].value;
+      assert.equal(
+        _attribute({ markup: mark, name: "data-value" }),
+        value === null ? "null" : String(value),
+      );
+      assert.equal(
+        _attribute({ markup: mark, name: "data-class" }),
+        value === null ? "missing" : value < threshold ? "low" : "high",
+      );
+    });
+  });
+}
+
+const UNCHANGED_AND_EXTREME_FINITE_SCHEMES_RETAIN_EXACT_CASES = [
+  {
+    ...DEFAULT_INPUT,
+    schemes: [{ label: "x", breaks: [0, 5] }, DEFAULT_INPUT.schemes[1]],
+  },
+  {
+    ...DEFAULT_INPUT,
+    zones: [
+      DEFAULT_INPUT.zones[0],
+      DEFAULT_INPUT.zones[0],
+      DEFAULT_INPUT.zones[1],
+    ],
+  },
+];
+
 const render = ({
   frame,
   input = DEFAULT_INPUT,
@@ -70,25 +129,7 @@ test("moving class breaks reclassify only values crossing the current threshold"
     }),
     ["low", "high", "high", "missing"],
   );
-  [51, 60, 70, 80, 90, 110, 150].forEach((frame) => {
-    const markup = render({ frame: frame });
-    const threshold = _number({
-      markup: _marks({ markup, name: "threshold" })[0],
-      name: "data-value",
-    });
-    assert.ok(threshold >= 3 && threshold <= 5);
-    _marks({ markup, name: "zone" }).forEach((mark, i) => {
-      const value = DEFAULT_INPUT.zones[i].value;
-      assert.equal(
-        _attribute({ markup: mark, name: "data-value" }),
-        value === null ? "null" : String(value),
-      );
-      assert.equal(
-        _attribute({ markup: mark, name: "data-class" }),
-        value === null ? "missing" : value < threshold ? "low" : "high",
-      );
-    });
-  });
+  _assertMovingClassBreaksReclassifyOnlyDataValue();
   assert.notEqual(
     _number({
       markup: _marks({ markup: render({ frame: 75 }), name: "threshold" })[0],
@@ -221,20 +262,9 @@ test("unchanged and extreme finite schemes retain exact missing and value states
       return _attribute({ markup: mark, name: "data-class" });
     }),
   );
-  [
-    {
-      ...DEFAULT_INPUT,
-      schemes: [{ label: "x", breaks: [0, 5] }, DEFAULT_INPUT.schemes[1]],
-    },
-    {
-      ...DEFAULT_INPUT,
-      zones: [
-        DEFAULT_INPUT.zones[0],
-        DEFAULT_INPUT.zones[0],
-        DEFAULT_INPUT.zones[1],
-      ],
-    },
-  ].forEach((value) => {
+  structuredClone(
+    UNCHANGED_AND_EXTREME_FINITE_SCHEMES_RETAIN_EXACT_CASES,
+  ).forEach((value) => {
     return assert.equal(inputSchema.safeParse(value).success, false);
   });
 });
@@ -257,31 +287,7 @@ test("each scheme legend owns its missing key, supplied label and unit", () => {
         input.zones.filter(propEq("value", null)).length + 2,
       );
       assert.equal(legends.length, 2);
-      legends.forEach((legend, index) => {
-        const missing = _marks({ markup: legend, name: "missing-class-key" });
-        assert.equal(missing.length, 1);
-        assert.equal(
-          _attribute({ markup: missing[0], name: "fill" }),
-          "#728794",
-        );
-        assert.equal(
-          _number({ markup: missing[0], name: "fill-opacity" }),
-          0.15,
-        );
-        assert.equal(
-          _attribute({ markup: missing[0], name: "stroke" }),
-          "#728794",
-        );
-        assert.equal(
-          _attribute({ markup: missing[0], name: "stroke-dasharray" }),
-          "4 5",
-        );
-        assert.ok(legend.includes(`aria-label="${input.noDataLabel}"`));
-        assert.ok(legend.includes(`aria-label="${input.unitLabel}"`));
-        const breaks = input.schemes[index].breaks;
-        assert.ok(legend.includes(`aria-label="[${breaks[0]}, ${breaks[1]})"`));
-        assert.ok(legend.includes(`aria-label="[${breaks[1]}, ${breaks[2]}]"`));
-      });
+      _assertMissingClassLegends({ legends, input });
     });
   });
 });

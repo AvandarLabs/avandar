@@ -1,0 +1,3 @@
+.motionCard {
+  composes: motion-card from global;
+}

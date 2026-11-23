@@ -1,13 +1,13 @@
 /*
- * The esbuild entry `scripts/build-avandar.mjs` bundles into the generated
+ * The `buildProduct` entry bundles these exports into the generated
  * `product.js` bridge that films and the review harness import. It re-exports
  * the stage first so the stage's CSS and setup run before anything else.
  */
-export { AvandarStage } from "./AvandarStage";
+export { AvandarStage } from "./AvandarStage/AvandarStage";
 import { ATTRIBUTE_MAPPING_BEATS } from "./AttributeMappingScreen/AttributeMappingScreen";
 import { CASES_BEATS } from "./CasesScreen/CasesScreen";
 import { DASHBOARD_BEATS } from "./DashboardScreen/DashboardScreen";
-import { EXPLORER_BEATS } from "./ExplorerScreen/explorerStage";
+import { EXPLORER_BEATS } from "./ExplorerScreen/ExplorerTimeline";
 import { IMPORT_BEATS } from "./ImportScreen/ImportScreen";
 import { MAP_BEATS } from "./MapScreen/MapScreen";
 import { ONTOLOGY_BEATS } from "./OntologyScreen/OntologyScreen";

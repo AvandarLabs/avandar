@@ -1,4 +1,4 @@
-import { mix } from "../../../../motion";
+import { Motion } from "../../../../motion";
 import { FitText } from "../../../primitives/FitText/FitText";
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
@@ -27,9 +27,17 @@ export function UncertaintyReference({
             shape={{
               kind: "line",
               x1: referenceX,
-              y1: mix(referenceProgress, 200, 264),
+              y1: Motion.mix({
+                t: referenceProgress,
+                from: 200,
+                to: 264,
+              }),
               x2: referenceX,
-              y2: mix(referenceProgress, 256, 336),
+              y2: Motion.mix({
+                t: referenceProgress,
+                from: 256,
+                to: 336,
+              }),
             }}
             profile={tokens.sketch.shape}
             data-reference-blade="true"

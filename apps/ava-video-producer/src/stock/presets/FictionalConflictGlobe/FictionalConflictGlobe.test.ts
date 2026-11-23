@@ -17,6 +17,83 @@ import {
 import { inputSchema, type Input } from "./FictionalConflictGlobe.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 
+function _getIncidentMarks(markup: string): { marks: RegExpMatchArray[] } {
+  const marks = [
+    ...markup.matchAll(
+      /data-incident-id="([^"]*)" data-x="([^"]*)" data-y="([^"]*)"/g,
+    ),
+  ];
+  return { marks };
+}
+
+type AssertUnrelatedMarkerClearanceOptions = Readonly<{
+  points: ReadonlyArray<readonly number[]>;
+  index: number;
+  endX: number;
+  endY: number;
+  marks: readonly RegExpMatchArray[];
+  id: string;
+  markerX: string;
+  markerY: string;
+}>;
+
+function _getLeaderPoints(leader: string): { points: number[][] } {
+  const points = [...leader.matchAll(/[ML]([\d.e+-]+) ([\d.e+-]+)/g)].map(
+    ([, x, y]) => {
+      return [Number(x), Number(y)];
+    },
+  );
+  return { points };
+}
+
+function _assertUnrelatedMarkerClearance({
+  points,
+  index,
+  endX,
+  endY,
+  marks,
+  id,
+  markerX,
+  markerY,
+}: AssertUnrelatedMarkerClearanceOptions): void {
+  const [startX, startY] = points[index],
+    deltaX = endX - startX,
+    deltaY = endY - startY;
+  const progress = Math.max(
+    0,
+    Math.min(
+      1,
+      ((Number(markerX) - startX) * deltaX +
+        (Number(markerY) - startY) * deltaY) /
+        (deltaX ** 2 + deltaY ** 2),
+    ),
+  );
+  const own = marks.find((mark) => {
+    return mark[1] === id;
+  })!;
+  if (own[2] !== markerX || own[3] !== markerY) {
+    assert.ok(
+      Math.hypot(
+        Number(markerX) - startX - progress * deltaX,
+        Number(markerY) - startY - progress * deltaY,
+      ) >= 14,
+      "The actual continuous leader clears every unrelated X footprint",
+    );
+  }
+}
+
+function _assertSurfaceCoordinatesObeyFrontBackOcclusionDataTotalIncidents(
+  input: (typeof fixtures)[number]["input"],
+): void {
+  [24, 72, 150].forEach((frame) => {
+    return assert.ok(
+      _render({ frame: frame, input: input }).includes(
+        'data-total-incidents="4"',
+      ),
+    );
+  });
+}
+
 function _render({
   frame,
   input,
@@ -72,13 +149,7 @@ test("surface coordinates obey front-back occlusion while authored incident tota
   );
   assert.ok(!after.includes('data-incident-id="rear"'));
   assert.ok(after.includes('data-incident-id="coincident"'));
-  [24, 72, 150].forEach((frame) => {
-    return assert.ok(
-      _render({ frame: frame, input: input }).includes(
-        'data-total-incidents="4"',
-      ),
-    );
-  });
+  _assertSurfaceCoordinatesObeyFrontBackOcclusionDataTotalIncidents(input);
   const across = _render({ frame: 76, input: changedInput });
   const longitude = SvgAttributes.getNumberFromMarkup({
     attributes: _attributes({
@@ -169,6 +240,9 @@ test("actual X paths project authored latitude and longitude without spreading c
 });
 
 test("serialized contract exposes incident identity validation", () => {
+  // This assertion exercises the JSON serialization boundary of the public
+  // contract.
+  // react-doctor-disable-next-line no-json-parse-stringify-clone
   const rules = JSON.parse(
     JSON.stringify(fictionalConflictGlobeContract.semanticRules),
   ) as typeof fictionalConflictGlobeContract.semanticRules;
@@ -186,6 +260,9 @@ test("serialized contract exposes incident identity validation", () => {
 });
 
 test("serialized contract exposes shortest sweep validation", () => {
+  // This assertion exercises the JSON serialization boundary of the public
+  // contract.
+  // react-doctor-disable-next-line no-json-parse-stringify-clone
   const rules = JSON.parse(
     JSON.stringify(fictionalConflictGlobeContract.semanticRules),
   ) as typeof fictionalConflictGlobeContract.semanticRules;
@@ -203,6 +280,9 @@ test("serialized contract exposes shortest sweep validation", () => {
 });
 
 test("serialized contract exposes endpoint visibility validation", () => {
+  // This assertion exercises the JSON serialization boundary of the public
+  // contract.
+  // react-doctor-disable-next-line no-json-parse-stringify-clone
   const rules = JSON.parse(
     JSON.stringify(fictionalConflictGlobeContract.semanticRules),
   ) as typeof fictionalConflictGlobeContract.semanticRules;
@@ -235,11 +315,7 @@ test("continuous incident leaders bend clear of unrelated geographic crosses", a
   ].forEach((input) => {
     return [90, 150].forEach((frame) => {
       const markup = _render({ frame: frame, input: input });
-      const marks = [
-        ...markup.matchAll(
-          /data-incident-id="([^"]*)" data-x="([^"]*)" data-y="([^"]*)"/g,
-        ),
-      ];
+      const { marks } = _getIncidentMarks(markup);
       const leaders = [
         ...markup.matchAll(/data-leader="([^"]*)" d="([^"]*)"/g),
       ];
@@ -249,11 +325,7 @@ test("continuous incident leaders bend clear of unrelated geographic crosses", a
           1,
           "A continuous bend replaces collinear marker gaps",
         );
-        const points = [...leader.matchAll(/[ML]([\d.e+-]+) ([\d.e+-]+)/g)].map(
-          ([, x, y]) => {
-            return [Number(x), Number(y)];
-          },
-        );
+        const { points } = _getLeaderPoints(leader);
         assert.ok(points.length >= 2);
         points.slice(1).forEach(([endX, endY], index) => {
           return marks
@@ -261,30 +333,16 @@ test("continuous incident leaders bend clear of unrelated geographic crosses", a
               return other !== id;
             })
             .forEach(([, , markerX, markerY]) => {
-              const [startX, startY] = points[index],
-                deltaX = endX - startX,
-                deltaY = endY - startY;
-              const progress = Math.max(
-                0,
-                Math.min(
-                  1,
-                  ((Number(markerX) - startX) * deltaX +
-                    (Number(markerY) - startY) * deltaY) /
-                    (deltaX ** 2 + deltaY ** 2),
-                ),
-              );
-              const own = marks.find((mark) => {
-                return mark[1] === id;
-              })!;
-              if (own[2] !== markerX || own[3] !== markerY) {
-                assert.ok(
-                  Math.hypot(
-                    Number(markerX) - startX - progress * deltaX,
-                    Number(markerY) - startY - progress * deltaY,
-                  ) >= 14,
-                  "The actual continuous leader clears every unrelated X footprint",
-                );
-              }
+              _assertUnrelatedMarkerClearance({
+                points,
+                index,
+                endX,
+                endY,
+                marks,
+                id,
+                markerX,
+                markerY,
+              });
             });
         });
       });

@@ -1,20 +1,16 @@
 import { propEq } from "@avandar/utils";
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { getSentenceGlyphsFromInput } from "./getSentenceGlyphsFromInput";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import {
+  ProseSemanticRoles,
+  type ProseSemanticRole,
+} from "./ProseSemanticRoles";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./ProseMeasurementLedger.schema";
 
-const ROLES: readonly [
-  "subject",
-  "metric",
-  "value",
-  "unit",
-  "period",
-  "qualifier",
-] = ["subject", "metric", "value", "unit", "period", "qualifier"] as const;
 /** Data for getObservationSlotFromFrame. */
 type GetObservationSlotFromFrameResult = {
-  role: "value" | "unit" | "qualifier" | "metric" | "period" | "subject";
+  role: ProseSemanticRole;
   progress: number;
   slotX: number;
   slotY: number;
@@ -42,7 +38,7 @@ export function getObservationSlotFromFrame({
   index,
   motion,
 }: ObservationSlotArgs): GetObservationSlotFromFrameResult {
-  const role = ROLES[index],
+  const role = ProseSemanticRoles.values[index],
     fragment = input.fragments.find(propEq("role", role))!;
   const origin = _findFragmentOrigin({ input, fragment });
   const departure = 56 + ((index + 3) % 6) * 8.5;
@@ -63,8 +59,16 @@ export function getObservationSlotFromFrame({
     captionOpacity: motion.ramp(frame, departure + 8, motion.scale(2)),
     movingCaptionOpacity:
       1 - motion.ramp(frame, departure + 7, motion.scale(1)),
-    x: mix(alignment, Math.min(origin.x, 664), slotX + 12),
-    y: mix(descent, 238, slotY + 49),
+    x: Motion.mix({
+      t: alignment,
+      from: Math.min(origin.x, 664),
+      to: slotX + 12,
+    }),
+    y: Motion.mix({
+      t: descent,
+      from: 238,
+      to: slotY + 49,
+    }),
     value: fragment.text
       .slice(fragment.contentStart, fragment.contentEnd)
       .trim(),
@@ -74,7 +78,10 @@ export function getObservationSlotFromFrame({
 function _findFragmentOrigin({
   input,
   fragment,
-}: Readonly<{ input: Input; fragment: Input["fragments"][number] }>) {
+}: Readonly<{
+  input: Input;
+  fragment: Input["fragments"][number];
+}>) {
   const fragmentIndex = input.fragments.indexOf(fragment),
     start =
       input.fragments.slice(0, fragmentIndex).reduce((total, item) => {
@@ -89,7 +96,11 @@ function _getTravelPhases({
   frame,
   departure,
   motion,
-}: Readonly<{ frame: number; departure: number; motion: VideoMotion }>) {
+}: Readonly<{
+  frame: number;
+  departure: number;
+  motion: VideoMotion;
+}>) {
   return {
     progress: motion.ramp(frame, departure, motion.whip, motion.travel.easing),
     alignment: motion.ramp(

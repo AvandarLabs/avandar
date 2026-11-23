@@ -2,18 +2,17 @@ import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { makeCoordinateTriageFromInputAndFrame } from "../makeCoordinateTriageFromInputAndFrame";
 import { PlottedRowAssociation } from "../PlottedRowAssociation";
-import { TriageTokensShared } from "./TriageTokensShared/TriageTokensShared";
+import { TriageTokensShared } from "./TriageTokensShared";
 import type { ReactNode } from "react";
-/** A plotted row's association to its point, and the point itself. */
-export function PlottedRow({
-  row,
-  frame,
-  accent,
-}: Readonly<{
+
+type Props = {
   row: ReturnType<typeof makeCoordinateTriageFromInputAndFrame>["rows"][number];
   frame: number;
   accent: string;
-}>): ReactNode {
+};
+
+/** A plotted row's association to its point, and the point itself. */
+export function PlottedRow({ row, frame, accent }: Readonly<Props>): ReactNode {
   const { stroke, sketch } = GraphicThemeHooks.useGraphicTokens();
   const shapes = GraphicThemeHooks.useGraphicShapeScales();
   const motion = GraphicThemeHooks.useGraphicMotion();

@@ -1,11 +1,23 @@
 import { propEq, propNotEq } from "@avandar/utils";
-import { mix, ramp } from "../../../motion";
-import type { VideoMotion } from "../../../videoTheme/createVideoMotion/createVideoMotion";
+import { Motion } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./DashboardSlotAssembly.schema";
+/** Inputs for getWidgetRectFromInput. */
+type GetWidgetRectFromInputArguments = SlotOptions & {
+  frame: number;
+  motion: VideoMotion;
+};
 
-type Rect = { x: number; y: number; width: number; height: number };
-type SlotOptions = { input: Input; widgetId: string };
-
+type Rect = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+type SlotOptions = {
+  input: Input;
+  widgetId: string;
+};
 /** Frames a panel takes to travel into its slot. */
 const DOCK_FRAMES = 24;
 /** Frames between supporting panels docking one after another. */
@@ -16,7 +28,6 @@ const LOOSE_PANELS: Rect[] = [
   { x: 48, y: 348, width: 408, height: 240 },
   { x: 496, y: 368, width: 440, height: 220 },
 ];
-
 function _getLooseWidgetRectFromInput({
   input,
   widgetId,
@@ -60,33 +71,35 @@ export function getWidgetRectFromInput({
   widgetId,
   frame,
   motion,
-}: Readonly<SlotOptions & { frame: number; motion: VideoMotion }>): Rect {
+}: Readonly<GetWidgetRectFromInputArguments>): Rect {
   const slot = _getWidgetSlotFromInput({ input, widgetId });
   const featured = widgetId === input.featuredWidgetId;
   const position = input.widgets
-    .filter((widget) => {
-      return widget.id !== input.featuredWidgetId;
-    })
+    .filter(propNotEq("id", input.featuredWidgetId))
     .findIndex(propEq("id", widgetId));
   const dock = motion.scale(DOCK_FRAMES);
-  const progress = ramp(
+  const progress = Motion.ramp({
     frame,
-    featured ? 40 : 64 + position * motion.scaleStagger(DOCK_STAGGER_FRAMES),
-    dock,
-    motion.travel.easing,
-  );
+    at: featured
+      ? 40
+      : 64 + position * motion.scaleStagger(DOCK_STAGGER_FRAMES),
+    dur: dock,
+    easing: motion.travel.easing,
+  });
   const loose = _getLooseWidgetRectFromInput({ input, widgetId });
-  const staging = featured ? 0 : ramp(frame, 40, dock, motion.travel.easing);
+  const staging = featured
+    ? 0
+    : Motion.ramp({ frame, at: 40, dur: dock, easing: motion.travel.easing });
   const initial = {
-    x: mix(staging, loose.x, slot.x + 8),
-    y: mix(staging, loose.y, slot.y + 4),
-    width: mix(staging, loose.width, slot.width),
-    height: mix(staging, loose.height, slot.height),
+    x: Motion.mix({ t: staging, from: loose.x, to: slot.x + 8 }),
+    y: Motion.mix({ t: staging, from: loose.y, to: slot.y + 4 }),
+    width: Motion.mix({ t: staging, from: loose.width, to: slot.width }),
+    height: Motion.mix({ t: staging, from: loose.height, to: slot.height }),
   };
   return {
-    x: mix(progress, initial.x, slot.x),
-    y: mix(progress, initial.y, slot.y),
-    width: mix(progress, initial.width, slot.width),
-    height: mix(progress, initial.height, slot.height),
+    x: Motion.mix({ t: progress, from: initial.x, to: slot.x }),
+    y: Motion.mix({ t: progress, from: initial.y, to: slot.y }),
+    width: Motion.mix({ t: progress, from: initial.width, to: slot.width }),
+    height: Motion.mix({ t: progress, from: initial.height, to: slot.height }),
   };
 }

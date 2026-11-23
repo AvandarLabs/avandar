@@ -1,4 +1,4 @@
-import type { ContinuityBeat } from "../../continuitySchema";
+import type { ContinuityBeat } from "../../continuitySchema/continuitySchema";
 /** Inputs shared by the DiagramConnector visuals. */
 export type Props = Readonly<{
   content: Extract<ContinuityBeat["content"], { kind: "composite" }>;

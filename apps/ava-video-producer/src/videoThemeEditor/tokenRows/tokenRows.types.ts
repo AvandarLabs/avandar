@@ -1,4 +1,7 @@
-import { type ThemeDraft, type ThemeEditScope } from "../themeDraft/themeDraft";
+import {
+  type ThemeDraft,
+  type ThemeEditScope,
+} from "../ThemeDrafts/ThemeDrafts";
 import type {
   ResolvedVideoTheme,
   TokenDefinition,

@@ -1,0 +1,7 @@
+.galleryMotionSearchSearchField {
+  composes: search-field from global;
+}
+
+.galleryMotionSearchSrOnly {
+  composes: sr-only from global;
+}

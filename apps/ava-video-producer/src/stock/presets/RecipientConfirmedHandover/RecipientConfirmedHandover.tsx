@@ -1,6 +1,6 @@
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
 import { SketchedShape } from "../../primitives/SketchedShape";
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { StockRect } from "../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { HandoverFurniture } from "./HandoverFurniture";
 import { HandoverGoodsRow } from "./HandoverGoodsRow/HandoverGoodsRow";

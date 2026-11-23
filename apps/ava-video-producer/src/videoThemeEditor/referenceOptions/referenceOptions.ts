@@ -1,7 +1,9 @@
+import { propEq } from "@avandar/utils";
+import { match, P } from "ts-pattern";
 import { isCameraSafeEasing } from "../../videoTheme/isCameraSafeEasing/isCameraSafeEasing";
-import { getTokenDefinitionFromPath } from "../../videoTheme/tokenCatalog/tokenCatalogHelpers/tokenCatalogHelpers";
-import { isCustomScaleKey } from "../customScaleKey/customScaleKey";
-import { type TokenRow } from "../tokenRows/tokenRows.types";
+import { TokenCatalog } from "../../videoTheme/tokenCatalog/TokenCatalog/TokenCatalog";
+import { CustomScaleKeys } from "../CustomScaleKeys/CustomScaleKeys";
+import { type TokenRow } from "../TokenRows/TokenRows.types";
 import type {
   EasingValue,
   ResolvedVideoTheme,
@@ -9,6 +11,40 @@ import type {
   TokenKind,
   TokenReference,
 } from "../../videoTheme/videoTheme.types";
+
+const UNCHANGED_REFERENCE_KINDS = [
+  "color",
+  "colorTuple",
+  "paletteName",
+  "shade",
+  "gradient",
+  "fontStack",
+  "length",
+  "number",
+  "opacity",
+  "duration",
+  "letterSpacing",
+  "fontWeight",
+  "easing",
+  "spring",
+  "shadow",
+  "glow",
+  "textShadow",
+  "dash",
+  "fontFamily",
+  "enum",
+  "boolean",
+  "fill",
+  "typeStyle",
+  "paint",
+  "elevation",
+  "sketchProfile",
+  "box",
+  "motionStep",
+  "cameraPreset",
+  "range",
+] as const;
+
 /** One token a reference can point at, with what it currently holds. */
 export type ReferenceOption = Readonly<{
   reference: TokenReference;
@@ -24,19 +60,20 @@ export type ReferenceOption = Readonly<{
  * What an option is, for naming it: Mantine's primary colour, a value the
  * producer typed in (a generated custom scale entry), or a named entry.
  */
-export function getReferenceOptionRole(
+function _getReferenceOptionRole(
   option: ReferenceOption,
 ): "primary" | "custom" | "named" {
-  if (option.path === "primary") {
-    return "primary";
-  }
-  return isCustomScaleKey(option.key) ? "custom" : "named";
+  return option.path === "primary"
+    ? "primary"
+    : CustomScaleKeys.isCustomScaleKey(option.key)
+      ? "custom"
+      : "named";
 }
 /**
  * The reference a value holds when no option offers it, such as a swatch that
  * was deleted. Undefined for a literal, an unset value, or a listed reference.
  */
-export function getUnresolvedReference(
+function _getUnresolvedReference(
   options: Readonly<{
     value: unknown;
     referenceOptions: readonly ReferenceOption[];
@@ -45,23 +82,35 @@ export function getUnresolvedReference(
   const { value, referenceOptions } = options;
   return typeof value === "string" &&
     value.startsWith("$") &&
-    !referenceOptions.some((option) => {
-      return option.reference === value;
-    })
+    !referenceOptions.some(
+      propEq<Readonly<{ reference: string }>, "reference", string>(
+        "reference",
+        value,
+      ),
+    )
     ? (value as TokenReference)
     : undefined;
 }
 function _effectiveKind(
-  options: Readonly<{ path: string; kind: TokenKind }>,
+  options: Readonly<{
+    path: string;
+    kind: TokenKind;
+  }>,
 ): TokenKind {
   const { path, kind } = options;
-  if (kind === "cssLength") {
-    return "length";
-  }
-  if (kind === "cssNumber") {
-    return path.endsWith("fontWeight") ? "fontWeight" : "number";
-  }
-  return kind;
+  return match(kind)
+    .with("cssLength", (): TokenKind => {
+      return "length";
+    })
+    .with("cssNumber", () => {
+      return path.endsWith("fontWeight")
+        ? ("fontWeight" as const)
+        : ("number" as const);
+    })
+    .with(P.union(...UNCHANGED_REFERENCE_KINDS), (matchedKind) => {
+      return matchedKind;
+    })
+    .exhaustive();
 }
 function _primaryOption(theme: ResolvedVideoTheme): ReferenceOption {
   const shade = theme.mantine.primaryShade;
@@ -80,7 +129,9 @@ function _primaryOption(theme: ResolvedVideoTheme): ReferenceOption {
 }
 function _paletteOptions(theme: ResolvedVideoTheme): ReferenceOption[] {
   return Object.entries(theme.mantine.colors).flatMap(([name, shades]) => {
-    const definition = getTokenDefinitionFromPath(`colors.${name}`);
+    const definition = TokenCatalog.getTokenDefinitionFromPath(
+      `colors.${name}`,
+    );
     return definition
       ? shades.map((value, index) => {
           return {
@@ -101,10 +152,13 @@ function _paletteOptions(theme: ResolvedVideoTheme): ReferenceOption[] {
  * The resolver reports any of them that `isCameraSafeEasing` refuses, so the
  * editor offers only camera-safe curves there.
  */
-export function isCameraCurveToken(
-  tokenPath: string,
-  fieldPath: readonly string[] = [],
-): boolean {
+function _isCameraCurveToken({
+  tokenPath,
+  fieldPath = [],
+}: Readonly<{
+  tokenPath: string;
+  fieldPath?: readonly string[];
+}>): boolean {
   const path = [tokenPath, ...fieldPath].join(".");
   return (
     path.startsWith("camera.easing.") ||
@@ -117,7 +171,7 @@ export function isCameraCurveToken(
  * and every palette shade. Component tokens are never targets. For a camera
  * curve (`isCameraCurve`), only curves `isCameraSafeEasing` accepts.
  */
-export function listReferenceOptions(
+function _listReferenceOptions(
   options: Readonly<{
     kind: TokenKind;
     excludePath?: string;
@@ -168,7 +222,7 @@ function _scaleOf(path: string): string {
  * Options with those from the current reference's scale first, the likeliest
  * picks.
  */
-export function orderReferenceOptions(
+function _orderReferenceOptions(
   options: Readonly<{
     referenceOptions: readonly ReferenceOption[];
     current: unknown;
@@ -188,3 +242,33 @@ export function orderReferenceOptions(
     }),
   ];
 }
+
+/** Lists compatible token references for the video theme editor pickers. */
+export const ReferenceOptions = {
+  /**
+   * What an option is, for naming it: Mantine's primary colour, a value the
+   * producer typed in (a generated custom scale entry), or a named entry.
+   */
+  getReferenceOptionRole: _getReferenceOptionRole,
+  /**
+   * The reference a value holds when no option offers it, such as a swatch that
+   * was deleted.
+   */
+  getUnresolvedReference: _getUnresolvedReference,
+  /**
+   * Whether a token, or one field of a composite token, holds a curve that
+   * drives the camera: the named camera curves and each camera preset's curve.
+   */
+  isCameraCurveToken: _isCameraCurveToken,
+  /**
+   * Tokens a reference of one kind may point at: atomic and Mantine values,
+   * semantic tokens of the same kind, and for colours Mantine's primary colour
+   * and every palette shade.
+   */
+  listReferenceOptions: _listReferenceOptions,
+  /**
+   * Options with those from the current reference's scale first, the likeliest
+   * picks.
+   */
+  orderReferenceOptions: _orderReferenceOptions,
+};

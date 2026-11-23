@@ -5,11 +5,9 @@ import { match, P } from "ts-pattern";
 import {
   storyboardSchema,
   assetPathSchema,
-  timeline,
-  durationInFrames,
   type Storyboard,
 } from "../../../src/storyboard/schema/schema";
-
+import { StoryboardTimeline } from "../../../src/storyboard/schema/StoryboardTimeline";
 /** Every public asset one shot's scene draws, such as stills and logos. */
 function _shotAssetReferences(shot: Storyboard["shots"][number]): string[] {
   return match(shot)
@@ -48,7 +46,6 @@ function _shotAssetReferences(shot: Storyboard["shots"][number]): string[] {
     )
     .exhaustive();
 }
-
 /**
  * Reads and validates a storyboard plan from a JSON file, refusing hidden or
  * non-JSON inputs. The video CLI calls it before planning, previewing, or
@@ -57,20 +54,28 @@ function _shotAssetReferences(shot: Storyboard["shots"][number]): string[] {
 export async function readPlan(filename: string): Promise<Storyboard> {
   return storyboardSchema.parse(
     JSON.parse(
-      await fs.readFile(await safeInputFile(filename, [".json"]), "utf8"),
+      await fs.readFile(
+        await safeInputFile({
+          filename,
+          extensions: [".json"],
+        }),
+        "utf8",
+      ),
     ),
   );
 }
-
 /**
  * Resolves a public asset path inside `public/` without following symlinks
  * outside `public/`. Returns the verified real path for validation, preview
  * staging, media probing, and showcase bundling.
  */
-export async function getPublicAssetPathFromAsset(
-  root: string,
-  asset: string,
-): Promise<string> {
+export async function getPublicAssetPathFromAsset({
+  root,
+  asset,
+}: Readonly<{
+  root: string;
+  asset: string;
+}>): Promise<string> {
   assetPathSchema.parse(asset);
   const publicRoot = await fs.realpath(path.join(root, "public"));
   const filename = await fs.realpath(path.join(publicRoot, asset));
@@ -85,7 +90,6 @@ export async function getPublicAssetPathFromAsset(
   );
   return filename;
 }
-
 /**
  * Every public asset a plan uses, once each: shot stills and logos,
  * narration audio, and sound effects. Use it to hash or copy a film's media,
@@ -105,14 +109,13 @@ export function getAssetReferencesFromPlan(
     ]),
   ];
 }
-
 /**
  * A Markdown shot list for a plan: each shot's timing, scene, on-screen
  * summary, and narration, with the plan's evidence notes. The video CLI
  * writes it beside a plan for review.
  */
 export function makeShotListFromPlan(plan: Readonly<Storyboard>): string {
-  const lines = timeline(plan).map((shot) => {
+  const lines = StoryboardTimeline.timeline(plan).map((shot) => {
     const cues = plan.narration
       .filter(propEq("shotId", shot.id))
       .map(prop("text"))
@@ -125,22 +128,24 @@ export function makeShotListFromPlan(plan: Readonly<Storyboard>): string {
           shot.scene));
     return `| ${shot.startFrame} | ${(shot.startFrame / plan.fps).toFixed(2)} s | ${shot.id} | ${shot.scene} | ${shot.durationInFrames} | ${summary.replaceAll("|", "\\|")} | ${cues.replaceAll("|", "\\|")} |`;
   });
-  return `# ${plan.title}\n\n${plan.description}\n\n${durationInFrames(plan)} frames at ${plan.fps} fps (${(durationInFrames(plan) / plan.fps).toFixed(2)} seconds). ${plan.purpose}.\n\n| Start frame | Time | Shot | Scene | Frames | On screen | Narration |\n| ---: | ---: | --- | --- | ---: | --- | --- |\n${lines.join("\n")}\n\n## Evidence\n\n${plan.sourceNotes
+  return `# ${plan.title}\n\n${plan.description}\n\n${StoryboardTimeline.durationInFrames(plan)} frames at ${plan.fps} fps (${(StoryboardTimeline.durationInFrames(plan) / plan.fps).toFixed(2)} seconds). ${plan.purpose}.\n\n| Start frame | Time | Shot | Scene | Frames | On screen | Narration |\n| ---: | ---: | --- | --- | ---: | --- | --- |\n${lines.join("\n")}\n\n## Evidence\n\n${plan.sourceNotes
     .map((note) => {
       return `- ${note}`;
     })
     .join("\n")}\n`;
 }
-
 /**
  * Rejects hidden names, `.env` segments, and disallowed extensions before
  * returning the input file's real path. Used by `readPlan`, `fingerprintPlan`,
  * and `alignRecording` before reading user-supplied files.
  */
-export async function safeInputFile(
-  filename: string,
-  extensions: readonly string[],
-): Promise<string> {
+export async function safeInputFile({
+  filename,
+  extensions,
+}: Readonly<{
+  filename: string;
+  extensions: readonly string[];
+}>): Promise<string> {
   const allowed = (value: string) => {
     return (
       !path.basename(value).startsWith(".") &&
@@ -161,16 +166,18 @@ export async function safeInputFile(
   }
   return resolved;
 }
-
 /**
  * Creates owned output directories one segment at a time, never traversing
  * symlinks, and returns the resolved directory path. Used by `freshStage`,
  * `alignRecording`, and `scratchTts` when staging build outputs.
  */
-export async function ensureDirectory(
-  root: string,
-  relative: string,
-): Promise<string> {
+export async function ensureDirectory({
+  root,
+  relative,
+}: Readonly<{
+  root: string;
+  relative: string;
+}>): Promise<string> {
   const parts = relative.split("/");
   if (
     path.isAbsolute(relative) ||

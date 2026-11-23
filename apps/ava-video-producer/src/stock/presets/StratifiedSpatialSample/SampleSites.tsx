@@ -12,6 +12,10 @@ export function SampleSites({
   return (
     <g>
       {input.sites.map((site, index) => {
+        // Selection has at most eight sites. Reusing this result
+        // avoids duplicate scans without allocating a per-frame Set.
+        // react-doctor-disable-next-line js-set-map-lookups
+        const isSelected = input.selectedSiteIds.includes(site.id);
         return (
           <SampleSite
             key={site.id}
@@ -19,11 +23,8 @@ export function SampleSites({
             index={index}
             frame={frame}
             accent={accent}
-            selected={input.selectedSiteIds.includes(site.id)}
-            showLabel={
-              input.showUnselectedLabels ||
-              input.selectedSiteIds.includes(site.id)
-            }
+            selected={isSelected}
+            showLabel={input.showUnselectedLabels || isSelected}
           />
         );
       })}

@@ -1,6 +1,6 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import { CandidateAnchorGuidesShared } from "./CandidateAnchorGuidesShared/CandidateAnchorGuidesShared";
+import { CandidateAnchorGuidesShared } from "./CandidateAnchorGuidesShared";
 import type { ReactNode } from "react";
 
 type Props = {

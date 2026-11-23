@@ -1,7 +1,7 @@
 import { ColorInput, type ColorInputProps } from "@mantine/core";
 import { useMemo, useState, type ReactNode } from "react";
 import { useRowHasIssue } from "../RowIssueContext/RowIssueContext";
-import { parseHexDraft } from "./controlValueHelpers/controlValueHelpers";
+import { ControlValues } from "./ControlValues/ControlValues";
 import {
   isColorPopoverOpenAfter,
   type ColorPopoverEvent,
@@ -23,15 +23,12 @@ type Props = Omit<
     allowAlpha: boolean;
     onChange: (color: string) => void;
   }>;
-
 type PopoverHandlerProps = Pick<
   ColorInputProps,
   "onChange" | "onFocus" | "onClick" | "onKeyDown" | "onBlur"
 >;
-
 // The colour chip is a non-text part, so an inherited token row dims it.
 const ATTRIBUTES = { colorPreview: { "data-inherit-dim": true } } as const;
-
 /**
  * The keydown handler of the colour field. Enter and Escape close the picker.
  * While it is open, Escape stops here so the preview dialog does not close
@@ -61,7 +58,6 @@ function _createKeyDownHandler(
     onKeyDown?.(event);
   };
 }
-
 /**
  * Whether the picker is open, and the field handlers that open and close it.
  */
@@ -110,7 +106,6 @@ function useColorPopoverHandlers(
   };
   return { popoverProps, handlers };
 }
-
 /**
  * A Mantine colour field that keeps hand-typed hex text while it is
  * incomplete, emits a lowercased colour once it is valid, and puts back the
@@ -119,6 +114,32 @@ function useColorPopoverHandlers(
  * it is open, Escape is handled here and does not reach the dialog. For
  * example, the colour, palette, and gradient token controls use it.
  */
+function useHexColorDraft({
+  value,
+  allowAlpha,
+  onChange,
+}: Readonly<Pick<Props, "value" | "allowAlpha" | "onChange">>): ReturnType<
+  typeof useDraftValue<string, string>
+> {
+  return useDraftValue<string, string>({
+    value,
+    toKey: (color) => {
+      return color;
+    },
+    toDraft: (color) => {
+      return color;
+    },
+    parse: (draft) => {
+      return ControlValues.parseHexDraft({
+        text: draft,
+        options: { allowAlpha },
+      });
+    },
+    onChange,
+  });
+}
+
+/** Edits a hexadecimal colour while preserving incomplete draft input. */
 export function HexColorInput({
   value,
   allowAlpha,
@@ -131,19 +152,7 @@ export function HexColorInput({
   ...props
 }: Props): ReactNode {
   const hasIssue = useRowHasIssue();
-  const field = useDraftValue<string, string>({
-    value,
-    toKey: (color) => {
-      return color;
-    },
-    toDraft: (color) => {
-      return color;
-    },
-    parse: (draft) => {
-      return parseHexDraft(draft, { allowAlpha });
-    },
-    onChange,
-  });
+  const field = useHexColorDraft({ value, allowAlpha, onChange });
   const { popoverProps, handlers } = useColorPopoverHandlers({
     field,
     onFocus,

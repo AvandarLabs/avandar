@@ -4,18 +4,26 @@ import { readTargetCandidatesInPage } from "./readTargetCandidatesInPage";
 import { ReviewPageDriver } from "./ReviewPageDriver";
 import type { ProductBeat } from "../../src/avandar/generated/product";
 import type { MeasurementRun } from "./measureAvandar.types";
-
 /**
  * Measures one beat's target at its frame or a neighbouring one, recording
  * the measurement in the run or, when no frame works, the beat as unresolved
  * with a screenshot.
  */
-export async function measureBeat(
-  run: MeasurementRun,
-  options: Readonly<{ feature: string; beat: Readonly<ProductBeat> }>,
-): Promise<void> {
+export async function measureBeat({
+  run,
+  options,
+}: Readonly<{
+  run: MeasurementRun;
+  options: Readonly<{
+    feature: string;
+    beat: Readonly<ProductBeat>;
+  }>;
+}>): Promise<void> {
   const { feature, beat } = options;
-  const attempts: Array<{ frame: number; reason: string }> = [];
+  const attempts: Array<{
+    frame: number;
+    reason: string;
+  }> = [];
   const frames = [
     ...new Set([Math.max(0, beat.frame - 1), beat.frame, beat.frame + 1]),
   ];

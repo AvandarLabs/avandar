@@ -1,6 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { LiteralDataText } from "../../primitives/LiteralDataText/LiteralDataText";
-import { StockRect } from "../../primitives/StockRect/StockRect";
+import { StockRect } from "../../primitives/StockRect";
 import { getAssociationFromInput } from "./getAssociationFromInput";
 import { unresolvedMessage } from "./PdfNearestLabelReview.controls";
 import type { Input } from "./PdfNearestLabelReview.schema";

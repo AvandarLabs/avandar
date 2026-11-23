@@ -1,19 +1,19 @@
-import { isCompositeTokenKind } from "../videoTheme/tokenCatalog/defineTokensHelpers";
+import { TokenDefinitions } from "../videoTheme/tokenCatalog/TokenDefinitions";
 import { ColorRoleControl } from "./controls/ColorRoleControl/ColorRoleControl";
 import { CompositeControl } from "./controls/CompositeControl/CompositeControl";
 import { ReferenceControl } from "./controls/ReferenceControl/ReferenceControl";
 import { ValueControl } from "./controls/ValueControl";
 import { useTokenEditor } from "./TokenEditorContext";
-import { type TokenRow } from "./tokenRows/tokenRows.types";
+import { type TokenRow } from "./TokenRows/TokenRows.types";
 import type { ReactNode } from "react";
+
+type Props = { row: TokenRow; label: string };
+
 /**
  * The control for a token row: literal values in the atomic and Mantine
  * tiers (and for enums and switches anywhere), references above them.
  */
-export function TokenControl({
-  row,
-  label,
-}: Readonly<{ row: TokenRow; label: string }>): ReactNode {
+export function TokenControl({ row, label }: Readonly<Props>): ReactNode {
   const editor = useTokenEditor();
   const kind = row.definition.kind;
   const write = (value: unknown) => {
@@ -38,7 +38,7 @@ export function TokenControl({
   if (kind === "color") {
     return <ColorRoleControl row={row} label={label} />;
   }
-  if (isCompositeTokenKind(kind)) {
+  if (TokenDefinitions.isCompositeTokenKind(kind)) {
     return <CompositeControl row={row} label={label} />;
   }
   return (

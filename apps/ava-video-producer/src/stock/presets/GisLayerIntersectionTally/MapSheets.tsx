@@ -1,4 +1,4 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { SketchedShape } from "../../primitives/SketchedShape";
 import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./GisLayerIntersectionTally.schema";
@@ -26,7 +26,7 @@ export function MapSheets({
       <g
         key={index}
         data-map-layer={input.layers[index].id}
-        transform={`translate(${mix(registration, index ? 24 : -24, 0)} ${mix(registration, index ? -18 : 18, 0)})`}
+        transform={`translate(${Motion.mix({ t: registration, from: index ? 24 : -24, to: 0 })} ${Motion.mix({ t: registration, from: index ? -18 : 18, to: 0 })})`}
       >
         <SketchedShape
           shape={{ kind: "path", d: path }}

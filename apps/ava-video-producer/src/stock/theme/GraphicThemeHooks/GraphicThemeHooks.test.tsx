@@ -2,9 +2,9 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import {
-  createTokenUsageCollector,
   VideoTokenUsageContext,
-} from "../../../videoTheme/tokenUsageHelpers/tokenUsageHelpers";
+  TokenUsage,
+} from "../../../videoTheme/TokenUsage/TokenUsage";
 import { VideoThemeScope } from "../../../videoTheme/VideoThemeScope/VideoThemeScope";
 import { GraphicThemeHooks } from "./GraphicThemeHooks";
 
@@ -14,7 +14,12 @@ function AccentProbe() {
 function BarProbe({ height }: { height?: number }) {
   return (
     <span>
-      {GraphicThemeHooks.useGraphicProps("ProgressBar", { height }).height}
+      {
+        GraphicThemeHooks.useGraphicProps({
+          name: "ProgressBar",
+          props: { height },
+        }).height
+      }
     </span>
   );
 }
@@ -41,7 +46,7 @@ test("a given prop wins over the component default", () => {
   assert.equal(renderToStaticMarkup(<BarProbe height={6} />), "<span>6</span>");
 });
 test("only the defaults a shape relies on are reported", () => {
-  const collector = createTokenUsageCollector();
+  const collector = TokenUsage.makeCollector();
   renderToStaticMarkup(
     <VideoTokenUsageContext.Provider value={collector.report}>
       <BarProbe height={6} />
