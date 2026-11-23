@@ -87,8 +87,26 @@ mkdir -p "$D" "$CUTOVER_DIR/catalog" && chmod 700 "$CUTOVER_DIR"
 unset PGHOST PGHOSTADDR PGPORT PGDATABASE PGUSER PGPASSWORD PGPASSFILE \
   PGSERVICE PGSERVICEFILE PGSYSCONFDIR PGOPTIONS PGTARGETSESSIONATTRS \
   PGSSLMODE PGREQUIRESSL
+# with_db_url <url> <command> [args...]: runs the command with the URL, minus
+# its password, as its first argument, and the password in PGPASSWORD for
+# that one command. `ps` shows every process's arguments to every user, but
+# a process's environment only to its own user and root. A shell function's
+# own arguments never reach `ps`. Works in bash and zsh.
+with_db_url() {
+  local url="$1" rest userinfo password
+  shift
+  rest="${url#*://}"
+  userinfo="${rest%%@*}"
+  if [[ "$url" == postgres*://* && "$rest" == *@* && "$userinfo" == *:* && "$userinfo" != */* ]]; then
+    password="${userinfo#*:}"
+    PGPASSWORD="$(printf '%b' "${password//\%/\\x}")" "$1" \
+      "${url%%://*}://${userinfo%%:*}@${rest#*@}" "${@:2}"
+  else
+    "$1" "$url" "${@:2}"
+  fi
+}
 # One read-only transaction per query.
-read_db() { "$PSQL_BIN" "$1" -X -P pager=off -q -t -A -v ON_ERROR_STOP=1 \
+read_db() { with_db_url "$1" "$PSQL_BIN" -X -P pager=off -q -t -A -v ON_ERROR_STOP=1 \
   -c 'begin transaction read only' -c "$2" -c 'rollback'; }
 COUNTS_SQL="select (select count(*) from auth.users) as users, (select count(*) from public.workspaces) as workspaces, (select count(*) from public.dashboards) as dashboards, (select count(*) from public.datasets) as datasets"
 AUTH_SEED_EXCLUDES=(-x auth.sessions -x auth.refresh_tokens -x auth.one_time_tokens -x auth.flow_state -x auth.audit_log_entries -x auth.mfa_amr_claims)
@@ -130,7 +148,13 @@ The CLI then creates a temporary login role in the project with write
 access, and after 3 failed connection retries deletes the project's network
 bans. `--db-url` never takes that path, so every production dump here goes
 through `--db-url "$PROD_DB_URL"`, with the password in the URL, and this
-runbook runs no `--linked` command.
+runbook runs no `--linked` command. That puts the password in the
+`supabase` process's arguments, where `ps` shows it to every user of the
+machine, so run the cutover on a laptop only you are logged in to. Every
+`psql` and `pg_dump` here, and the catalog scripts, keep it out of their
+arguments instead: `psql` and `pg_dump` run through `with_db_url` (1.4),
+and the catalog scripts read the URL from `SOURCE_DB_URL` or
+`TARGET_DB_URL`.
 
 | Connects to production | Steps | What it does there |
 | --- | --- | --- |
@@ -138,8 +162,9 @@ runbook runs no `--linked` command.
 | `supabase db dump --db-url "$PROD_DB_URL" ...` | 2.2, 6.6 | `pg_dump` over the session pooler as `postgres`: reads only |
 | `supabase projects api-keys`, `branches list`, `backups list`, `secrets list`, `functions list`, with `--project-ref "$PROD_REF"` | 3.3, 5.1, 5.5, 5.8, 6.6, 6.9 | Management API reads |
 | `supabase storage cp ... --project-ref "$PROD_REF"` (optional), `supabase storage ls ... --project-ref "$PROD_REF"` | 2.8, 6.11.9 | Storage downloads and listings |
-| `"$PG_DUMP_BIN" "$PROD_DB_URL" ...`, `importCatalogData.sh ... --dry-run` | 6.11.4, 6.11.5 | Reads only (the importer's report runs in read-only transactions) |
-| **Writes to production** | 5.1 (only if keys are missing), 5.8 (only if you turn PITR on), 6.8, 6.11.6 (deletes the 4 WDI datasets with the catalog), 6.11.7, 6.11.9 (`supabase storage rm`), section 7 | As each step says |
+| `with_db_url "$PROD_DB_URL" "$PG_DUMP_BIN" ...` | 6.11.5 | Reads only |
+| `TARGET_DB_URL="$PROD_DB_URL" importCatalogData.sh ... --dry-run` | 6.11.4 | Reads only (the importer's report runs in read-only transactions) |
+| **Writes to production** | 5.1 (only if keys are missing), 5.8 (only if you turn PITR on), 6.8, 6.11.6 (deletes the 4 WDI datasets with the catalog), 6.11.7, 6.11.9 (`supabase storage rm`, and its restore's `supabase storage cp` upload if you ever run it), section 7 | As each step says |
 
 The dumps hold real user data. The sensitive tables:
 
@@ -242,7 +267,7 @@ and check it against the audit.
 ### 2.5 Load production's roles and data
 
 ```bash
-"$PSQL_BIN" "$LOCAL_DB_URL" -X -P pager=off --single-transaction --set ON_ERROR_STOP=1 \
+with_db_url "$LOCAL_DB_URL" "$PSQL_BIN" -X -P pager=off --single-transaction --set ON_ERROR_STOP=1 \
   --file "$D/prod-rehearsal-roles.sql" \
   --file "$D/prod-rehearsal-data-auth.sql" \
   --file "$D/prod-rehearsal-data-public.sql"
@@ -311,7 +336,7 @@ you sign in with Google in production, set a local-only password first. This
 writes to the local stack only, after 2.7 already took the seed:
 
 ```bash
-"$PSQL_BIN" "$LOCAL_DB_URL" -X -P pager=off -v ON_ERROR_STOP=1 -c "update auth.users set encrypted_password = extensions.crypt('<a local-only password>', extensions.gen_salt('bf')) where email = '<your production email>'"
+with_db_url "$LOCAL_DB_URL" "$PSQL_BIN" -X -P pager=off -v ON_ERROR_STOP=1 -c "update auth.users set encrypted_password = extensions.crypt('<a local-only password>', extensions.gen_salt('bf')) where email = '<your production email>'"
 ```
 
 Open each as `<VITE_APP_URL>/<slug>/dashboards/edit/<id>` and record it:
@@ -913,7 +938,7 @@ match.
 **6.5.2 Load roles, then auth, then public.**
 
 ```bash
-"$PSQL_BIN" "$ALPHA_DEV_DB_URL" -X -P pager=off --single-transaction --set ON_ERROR_STOP=1 \
+with_db_url "$ALPHA_DEV_DB_URL" "$PSQL_BIN" -X -P pager=off --single-transaction --set ON_ERROR_STOP=1 \
   --file "$D/prod-rehearsal-roles.sql" \
   --file "$D/alpha-dev-seed-auth.sql" \
   --file "$D/alpha-dev-seed-public.sql"
@@ -929,7 +954,7 @@ the auth rows as production dumped them instead, which the branch's hosted
 Auth reads:
 
 ```bash
-"$PSQL_BIN" "$ALPHA_DEV_DB_URL" -X -P pager=off --single-transaction --set ON_ERROR_STOP=1 \
+with_db_url "$ALPHA_DEV_DB_URL" "$PSQL_BIN" -X -P pager=off --single-transaction --set ON_ERROR_STOP=1 \
   --file "$D/prod-rehearsal-roles.sql" \
   --file "$D/prod-rehearsal-data-auth.sql" \
   --file "$D/alpha-dev-seed-public.sql"
@@ -1003,11 +1028,11 @@ ava supabase status      # must name chore-alpha-rehearsal
 supabase db reset --local --no-seed --version 20261013212914
 export LOCAL_DB_URL="$(supabase status -o json | jq -er '.DB_URL')"
 [[ "$LOCAL_DB_URL" == postgresql://*@127.0.0.1:* ]] &&
-  "$PSQL_BIN" "$LOCAL_DB_URL" -X -P pager=off --single-transaction --set ON_ERROR_STOP=1 \
+  with_db_url "$LOCAL_DB_URL" "$PSQL_BIN" -X -P pager=off --single-transaction --set ON_ERROR_STOP=1 \
     --file "$D/prod-rehearsal-roles.sql" \
     --file "$D/prod-rehearsal-data-auth.sql" \
     --file "$D/prod-rehearsal-data-public.sql" &&
-  "$PSQL_BIN" "$LOCAL_DB_URL" -X -P pager=off --single-transaction --set ON_ERROR_STOP=1 \
+  with_db_url "$LOCAL_DB_URL" "$PSQL_BIN" -X -P pager=off --single-transaction --set ON_ERROR_STOP=1 \
     --file "$CUTOVER_DIR/rollback-truncate.sql" \
     --file "$D/prod-$BACKUP_T-data-app.sql" &&
   read_db "$LOCAL_DB_URL" "$COUNTS_SQL"
@@ -1261,6 +1286,24 @@ test workspace, whose only member is `pablo@avandarlabs.com`. Pablo approved
 deleting them. Their legacy Parquet objects are deleted separately, in
 6.11.9.
 
+Deleting each dataset fires `tr__datasets__log_deleted_analytics_event`,
+which adds one `usage_analytics_events` row per dataset: 4 on production.
+Restoring the backup puts the datasets back but does not remove those rows.
+
+**Before the production run, the importer's local Postgres suite must
+pass.** CI skips it: it needs Homebrew `postgresql@14`, `@16`, or `@17`
+(`initdb`, `pg_ctl`, `pg_dump`) and `libpq@18`'s psql on this machine. It
+runs the real delete, guard, rollback, and restore on a throwaway cluster:
+
+```bash
+cd "$REPO"
+pnpm vitest run scripts/alpha/__tests__/catalogImportOnPostgres.integration.test.ts
+```
+
+**Expect:** `Tests  9 passed (9)`, with none skipped.
+**If not:** skipped tests mean the tools above are missing: install them and
+run it again. A failure: stop, and do not import into production.
+
 **6.11.1 Export the catalog (once, reads staging).** Check 5.7 first:
 
 ```bash
@@ -1269,9 +1312,9 @@ supabase branches list --project-ref "$STAGING_REF" -o json \
   | jq '.[] | select(.name=="demo-measles") | {persistent, preview_project_status}'
 export SOURCE_REF="$(supabase branches list --project-ref "$STAGING_REF" -o json | jq -r '.[] | select(.name == "demo-measles") | .project_ref')"
 SOURCE_DB_URL="$(supabase branches get demo-measles --project-ref "$STAGING_REF" -o env | grep '^POSTGRES_URL_NON_POOLING=' | cut -d= -f2- | tr -d '"')"
-SOURCE_DB_URL="${SOURCE_DB_URL%%\?*}"
+export SOURCE_DB_URL="${SOURCE_DB_URL%%\?*}"
 export CATALOG_DUMP="$CUTOVER_DIR/catalog/catalog-$(date +%Y%m%d).sql"
-bash scripts/alpha/exportCatalogData.sh "$SOURCE_DB_URL" "$CATALOG_DUMP"
+bash scripts/alpha/exportCatalogData.sh "$CATALOG_DUMP"
 grep -nE 'sb_secret_|sb_publishable_|eyJhbGci|service_role|password' "$CATALOG_DUMP" | cut -c1-160 | head -20
 ```
 
@@ -1285,7 +1328,8 @@ with anything but catalog rows.
 **Fallback source.** If `demo-measles` is gone after `alpha-dev`'s own 6.11
 run, export from `alpha-dev` instead: it then holds the whole catalog and,
 after 6.11.7, every Parquet object. Set `SOURCE_REF="$ALPHA_DEV_REF"` and
-`SOURCE_DB_URL="$ALPHA_DEV_DB_URL"` and run the export with a new file name.
+`export SOURCE_DB_URL="$ALPHA_DEV_DB_URL"` and run the export with a new
+file name.
 The rest of 6.11 reads `SOURCE_REF` either way.
 
 **6.11.2 Set the target.** For `alpha-dev`:
@@ -1293,8 +1337,9 @@ The rest of 6.11 reads `SOURCE_REF` either way.
 production: `export TARGET_REF="$PROD_REF" TARGET_DB_URL="$PROD_DB_URL"`. The
 URL must be the direct host or the session pooler on 5432 (never 6543), with
 a percent-encoded password and no query parameter but `sslmode`: 6.5.1
-already stripped `connect_timeout`. The importer needs psql 15.14, 16.10,
-17.6, 18, or newer (`PSQL_BIN`, 1.4).
+already stripped `connect_timeout`. The importer reads it from
+`TARGET_DB_URL` and refuses a URL passed as an argument. It needs psql
+15.14, 16.10, 17.6, 18, or newer (`PSQL_BIN`, 1.4).
 
 **6.11.3 Read-only target checks.**
 
@@ -1323,7 +1368,7 @@ seconds for each lock and rolls back if it cannot get one.
 **6.11.4 Dry run.**
 
 ```bash
-bash scripts/alpha/importCatalogData.sh "$TARGET_DB_URL" "$CATALOG_DUMP" \
+bash scripts/alpha/importCatalogData.sh "$CATALOG_DUMP" \
   --replace-existing --rewrite-storage-host "$SOURCE_REF.supabase.co" "$TARGET_REF.supabase.co" \
   --dry-run
 ```
@@ -1356,13 +1401,14 @@ Never edit a workspace's members to make the guard pass. A refusal about
 
 **6.11.5 Back up the target's catalog and the datasets it deletes (reads
 the target).** The dry run printed the command under `Make the backup with`:
-one `--table` for each catalog table, the facet counts, `public.datasets`,
-and every table the replace reaches from it. Run it with `"$PG_DUMP_BIN"` in
-place of `pg_dump` and `--file "$BACKUP_FILE"` in place of its `--file`:
+`with_db_url "$TARGET_DB_URL" pg_dump ...`, with one `--table` for each
+catalog table, the facet counts, `public.datasets`, and every table the
+replace reaches from it. Run it with `"$PG_DUMP_BIN"` in place of `pg_dump`
+and `--file "$BACKUP_FILE"` in place of its `--file`:
 
 ```bash
 export BACKUP_FILE="$CUTOVER_DIR/catalog/catalog-backup-$TARGET_REF-$(date +%Y%m%d-%H%M).sql"
-"$PG_DUMP_BIN" "$TARGET_DB_URL" --data-only --no-owner --no-privileges \
+with_db_url "$TARGET_DB_URL" "$PG_DUMP_BIN" --data-only --no-owner --no-privileges \
   <the --table arguments the dry run printed> --file "$BACKUP_FILE"
 grep -c '^COPY ' "$BACKUP_FILE"
 ```
@@ -1376,7 +1422,7 @@ prints the exact command again. The backup must be under 24 hours old.
 **6.11.6 Import** (**Writes to production** when the target is production).
 
 ```bash
-bash scripts/alpha/importCatalogData.sh "$TARGET_DB_URL" "$CATALOG_DUMP" \
+bash scripts/alpha/importCatalogData.sh "$CATALOG_DUMP" \
   --replace-existing --backup-file "$BACKUP_FILE" \
   --rewrite-storage-host "$SOURCE_REF.supabase.co" "$TARGET_REF.supabase.co" \
   | tee "$CUTOVER_DIR/catalog/import-$TARGET_REF.log"
@@ -1462,12 +1508,17 @@ them (reads production):
 cd "$REPO"
 read_db "$PROD_DB_URL" "select count(*) from public.data_catalog_listings l where l::text like '%world-bank__wdi%'"
 read_db "$PROD_DB_URL" "select count(*) from public.datasets__open_data o join public.data_catalog_listings l on l.id = o.catalog_listing_id where l::text like '%world-bank__wdi%'"
-read_db "$PROD_DB_URL" "select name, metadata->>'size' from storage.objects where bucket_id = 'opendata' and name like 'world-bank__wdi/%' order by name"
+WDI_BACKUP="$CUTOVER_DIR/storage/wdi-legacy"
+mkdir -p "$WDI_BACKUP"
+read_db "$PROD_DB_URL" "select substr(name, length('world-bank__wdi/datasets/') + 1), metadata->>'size', metadata->>'mimetype', metadata->>'cacheControl' from storage.objects where bucket_id = 'opendata' and name like 'world-bank__wdi/%' order by name" | tee "$WDI_BACKUP/objects.txt"
 supabase storage ls "ss:///opendata/world-bank__wdi/datasets/" --project-ref "$PROD_REF" --experimental
 ```
 
-**Expect:** `0`; `0`; exactly these 6 objects, and no other object under
-`world-bank__wdi/` (sizes when this was written in bytes):
+`objects.txt` records each object's name, size, content type, and cache
+time, as `name|size|mimetype|cacheControl`; the restore below reads it.
+**Expect:** `0`; `0`; exactly these 6 objects, each
+`application/vnd.apache.parquet` with `max-age=3600` when this was written,
+and no other object under `world-bank__wdi/` (sizes in bytes):
 `WDICSV.parquet` 61201614, `WDICountry.parquet` 29967,
 `WDIcountry-series.parquet` 47694, `WDIfootnote.parquet` 3460561,
 `WDISeries.parquet` 422408, `WDIseries-time.parquet` 1947; and `ls` lists
@@ -1480,8 +1531,6 @@ Back them up (a Storage read), and check the copies:
 
 ```bash
 WDI_FILES=(WDIcountry-series.parquet WDICountry.parquet WDIseries-time.parquet WDISeries.parquet WDICSV.parquet WDIfootnote.parquet)
-WDI_BACKUP="$CUTOVER_DIR/storage/wdi-legacy"
-mkdir -p "$WDI_BACKUP"
 for file in "${WDI_FILES[@]}"; do
   supabase storage cp "ss:///opendata/world-bank__wdi/datasets/$file" \
     "$WDI_BACKUP/$file" --project-ref "$PROD_REF" --experimental || echo "FAILED $file"
@@ -1506,17 +1555,19 @@ supabase storage rm \
 read_db "$PROD_DB_URL" "select count(*) from storage.objects where bucket_id = 'opendata' and name like 'world-bank__wdi/%'"
 ```
 
+`supabase storage rm` may ask you to confirm the delete: read the names it
+lists and answer at the prompt. Never add `--yes` to a production `rm`.
 **Expect:** the CLI reports the 6 objects deleted, then `0`.
 **If not:** a partial delete: re-run the `rm` with the names the count still
-finds. To restore, upload the backup with the content type and cache time
-the objects had:
+finds. To restore (**Writes to production** Storage), upload the backup with
+each object's recorded content type and cache time:
 
 ```bash
-for file in "${WDI_FILES[@]}"; do
+while IFS='|' read -r file size mimetype cache_control; do
   supabase storage cp "$WDI_BACKUP/$file" "ss:///opendata/world-bank__wdi/datasets/$file" \
-    --content-type application/vnd.apache.parquet --cache-control "max-age=3600" \
+    --content-type "$mimetype" --cache-control "$cache_control" \
     --project-ref "$PROD_REF" --experimental
-done
+done < "$WDI_BACKUP/objects.txt"
 ```
 
 Keep `$WDI_BACKUP` until section 8 deletes `$CUTOVER_DIR`.
@@ -1574,7 +1625,7 @@ pre-migration schema:
 ```bash
 [[ "$(read_db "$PROD_DB_URL" "select max(version) from supabase_migrations.schema_migrations")" == 20261013212914 ]] &&
   echo "pre-migration schema" &&
-  "$PSQL_BIN" "$PROD_DB_URL" -X -P pager=off --single-transaction --set ON_ERROR_STOP=1 \
+  with_db_url "$PROD_DB_URL" "$PSQL_BIN" -X -P pager=off --single-transaction --set ON_ERROR_STOP=1 \
     --file "$CUTOVER_DIR/rollback-truncate.sql" \
     --file "$D/prod-$BACKUP_T-data-app.sql" &&
   read_db "$PROD_DB_URL" "$COUNTS_SQL"
@@ -1590,7 +1641,7 @@ guard refuses production's URL:
 ```bash
 read -rs EMPTY_DB_URL      # the new project's session pooler URI
 [[ -n "$EMPTY_DB_URL" && "$EMPTY_DB_URL" != *"$PROD_REF"* ]] &&
-  "$PSQL_BIN" "$EMPTY_DB_URL" -X -P pager=off --single-transaction --set ON_ERROR_STOP=1 \
+  with_db_url "$EMPTY_DB_URL" "$PSQL_BIN" -X -P pager=off --single-transaction --set ON_ERROR_STOP=1 \
     --file "$D/prod-$BACKUP_T-roles.sql" \
     --file "$D/prod-$BACKUP_T-schema.sql" \
     --command 'SET session_replication_role = replica' \
