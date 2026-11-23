@@ -317,8 +317,14 @@ configs rebase relative plugin entries to original source paths and inherited
 config references to their original files. Aliases, overrides and rule settings
 are preserved without flattening. Root/nested string/object plugin fixtures
 also review the plugin and its helper, proving that seeded copies never execute
-as engine plugins. Unsupported copied JSONC/dynamic/symlink configuration and
-selected symlink paths remain fallback.
+as engine plugins. Import origins alone do not establish runtime applicability:
+custom AF proofs also require the actual host-resolved, version-matched official
+Avandar implementation, a static public export and explicit canonical alias.
+Conditional/package wrappers, ambiguous declaration groups and inherited custom
+plugin contexts remain fallback. The official extension and utility-directory
+filename boundaries are preserved; native rule evidence remains independent.
+Unsupported copied JSONC/dynamic/symlink configuration and selected symlink paths
+remain fallback.
 
 | Bounded mixed-language coverage fixture | Before cache | After cache |
 | --- | --- | --- |

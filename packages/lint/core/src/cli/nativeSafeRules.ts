@@ -13,6 +13,8 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve, sep } from "node:path";
+// oxlint-disable-next-line import/extensions -- Node needs source extensions.
+import { getNativePluginContext } from "./getNativePluginContext.ts";
 import type { CoverageEvidence, CoverageProbe } from "./coverage.ts";
 
 const CAPABILITIES = [
@@ -184,7 +186,9 @@ type EngineResult = {
 };
 type Listing = { paths: Set<string>; operational: boolean };
 type Invocation = { binary: string; args: string[] };
+type PluginContext = ReturnType<typeof getNativePluginContext>;
 type Proof = {
+  hasProvenPluginContext?: boolean;
   evidence: CoverageEvidence;
   diagnostics: Diagnostic[];
   directory?: string;
@@ -299,7 +303,7 @@ function _rebaseConfig(config: unknown, origin: string): unknown {
   };
 }
 
-function _copyConfig(origin: string, target: string): void {
+function _copyConfig(origin: string, target: string): PluginContext {
   let config: unknown;
   try {
     config = JSON.parse(readFileSync(origin, "utf8"));
@@ -309,13 +313,15 @@ function _copyConfig(origin: string, target: string): void {
     );
   }
   writeFileSync(target, JSON.stringify(_rebaseConfig(config, origin)));
+  return getNativePluginContext(config, origin);
 }
 
 function _mirrorDirectory(
   source: string,
   destination: string,
   segments: string[],
-): void {
+): PluginContext {
+  const contexts: PluginContext[] = [];
   mkdirSync(destination, { recursive: true });
   readdirSync(source, { withFileTypes: true }).forEach((entry) => {
     const origin = join(source, entry.name);
@@ -332,14 +338,14 @@ function _mirrorDirectory(
     }
     if (entry.name === segments[0]) {
       if (segments.length > 1) {
-        _mirrorDirectory(origin, target, segments.slice(1));
+        contexts.push(_mirrorDirectory(origin, target, segments.slice(1)));
       }
     } else if (
       entry.isFile() &&
       /^(?:\.oxlintrc|tsconfig).*\.jsonc?$/.test(entry.name)
     ) {
       if (/^\.oxlintrc/.test(entry.name)) {
-        _copyConfig(origin, target);
+        contexts.push(_copyConfig(origin, target));
       } else {
         copyFileSync(origin, target);
       }
@@ -347,6 +353,14 @@ function _mirrorDirectory(
       symlinkSync(origin, target);
     }
   });
+  return {
+    isSupported: contexts.every((context) => {
+      return context.isSupported;
+    }),
+    hasOfficialRegistration: contexts.some((context) => {
+      return context.hasOfficialRegistration;
+    }),
+  };
 }
 
 function _isRecord(value: unknown): value is Record<string, unknown> {
@@ -566,6 +580,7 @@ function _createProofFromEngine(
   directory: string,
   localPath: string,
   capabilityRanges: Proof["capabilityRanges"],
+  context: PluginContext,
 ): Proof {
   const diagnostics = _getDiagnostics(result.stdout);
   const operational =
@@ -578,6 +593,8 @@ function _createProofFromEngine(
         return diagnostic.severity === "error";
       });
   return {
+    hasProvenPluginContext:
+      context.isSupported && context.hasOfficialRegistration,
     diagnostics: diagnostics ?? [],
     capabilityRanges,
     directory,
@@ -601,7 +618,7 @@ async function _proveSeed(
 ): Promise<Proof> {
   const directory = mkdtempSync(join(tmpdir(), "avandar-native-proof-"));
   try {
-    _mirrorDirectory(cwd, directory, localPath.split(sep));
+    const context = _mirrorDirectory(cwd, directory, localPath.split(sep));
     const source = readFileSync(path, "utf8");
     const { seed, capabilityRanges } = _createSeed(path, source);
     writeFileSync(join(directory, localPath), source + seed);
@@ -611,6 +628,7 @@ async function _proveSeed(
       directory,
       localPath,
       capabilityRanges,
+      context,
     );
   } catch (error) {
     if (!(error instanceof UnsupportedProofContext)) {
@@ -711,11 +729,32 @@ function _hasDiagnostic(
 }
 
 function _hasOriginalModule(proof: Readonly<Proof>): boolean {
-  return _hasDiagnostic(
-    proof,
-    "local-primitive-bindings",
-    "avandar(local-e2e-casing)",
-    "AF-13:",
+  return (
+    proof.hasProvenPluginContext === true &&
+    _hasDiagnostic(
+      proof,
+      "local-primitive-bindings",
+      "avandar(local-e2e-casing)",
+      "AF-13:",
+    )
+  );
+}
+
+function _hasProvenRuleContext(
+  proof: Readonly<Proof>,
+  ruleId: string,
+  path: string,
+): boolean {
+  if (!CUSTOM_RULE_IDS.includes(ruleId)) {
+    return true;
+  }
+  const isUtility = ["AF-15", "AF-17"].includes(ruleId);
+  const isExcludedUtility =
+    /\/(?:packages\/shared\/utils|node_modules\/@avandar\/utils)\//.test(
+      path.replaceAll("\\", "/"),
+    );
+  return (
+    proof.hasProvenPluginContext === true && (!isUtility || !isExcludedUtility)
   );
 }
 
@@ -737,7 +776,9 @@ function _createProbe(
       const code = CUSTOM_RULE_IDS.includes(ruleId)
         ? `avandar(${nativeRule})`
         : NATIVE_CODES[nativeRule]!;
+      const hasProvenContext = _hasProvenRuleContext(proof, ruleId, path);
       const diagnosed =
+        hasProvenContext &&
         (!requiresOriginalModule || hasOriginalModule) &&
         _hasDiagnostic(
           proof,
@@ -746,12 +787,14 @@ function _createProbe(
           CUSTOM_RULE_IDS.includes(ruleId) ? `${ruleId}:` : undefined,
         );
       const recovery =
-        requiresOriginalModule &&
-        !hasOriginalModule &&
-        proof.mirrorPath &&
-        proof.evidence.operational
-          ? "Run fallback review. Exact early AF-13 error evidence could not establish original module context. Enable the context witness at error severity and preserve an original AST import/export marker before retrying."
-          : proof.evidence.recovery;
+        !hasProvenContext && proof.mirrorPath && proof.evidence.operational
+          ? "Run fallback review for this plugin runtime context. Only the matching installed official Avandar implementation with supported registrations and original filename boundaries has proven mirrored applicability."
+          : requiresOriginalModule &&
+              !hasOriginalModule &&
+              proof.mirrorPath &&
+              proof.evidence.operational
+            ? "Run fallback review. Exact early AF-13 error evidence could not establish original module context. Enable the context witness at error severity and preserve an original AST import/export marker before retrying."
+            : proof.evidence.recovery;
       return {
         ...proof.evidence,
         recovery,
