@@ -36,7 +36,7 @@ import type { ReleasePlan } from "@ava-cli/ReleaseCli/runRelease/releaseStageHel
 type ConfirmCiVerdictOptions = {
   /** The source-branch commit being released. */
   commitSha: string;
-  /** Release on anything other than a pass without asking (`--yes`). */
+  /** Stop on anything other than a pass instead of asking (`--yes`). */
   assumeYes: boolean;
   /** Skip the check entirely (`--skip-ci-check`). */
   skip: boolean;
@@ -46,8 +46,18 @@ type ConfirmCiVerdictOptions = {
 const SKIP_CI_CHECK_WARNING = `Skipping ${RELEASE_SOURCE_BRANCH}'s CI check.`;
 
 /**
+ * The refusal `--yes` gives on a CI verdict other than a pass, which pushing
+ * the target branch would otherwise deploy to production unreviewed.
+ */
+function _buildCiStopMessage(verdict: string): string {
+  return `${verdict}
+--yes does not release past ${RELEASE_SOURCE_BRANCH}'s CI unless it passed. Nothing has been released. To release anyway, run the command again with --skip-ci-check.`;
+}
+
+/**
  * Report the source branch's CI verdict for the commit being released. A pass
- * proceeds. Anything else asks, or proceeds under `--yes`.
+ * proceeds. Anything else asks, or under `--yes` throws before anything is
+ * committed, tagged, or pushed. `--skip-ci-check` is the only override.
  */
 export async function confirmCiVerdict(
   git: ReleaseCommands,
@@ -67,8 +77,11 @@ export async function confirmCiVerdict(
     printSuccess(verdict);
     return;
   }
+  if (assumeYes) {
+    throw new Error(_buildCiStopMessage(verdict));
+  }
   printWarn(verdict);
-  if (!assumeYes && !(await promptToConfirm("Release anyway?"))) {
+  if (!(await promptToConfirm("Release anyway?"))) {
     throw new Error("Aborted.");
   }
 }

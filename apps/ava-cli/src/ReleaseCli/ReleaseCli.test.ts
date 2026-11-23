@@ -837,14 +837,14 @@ type CiGateProceedCase = {
 
 const CI_GATE_PROCEED_CASES: readonly CiGateProceedCase[] = [
   {
-    name: "develop with a failed verdict and --yes",
+    name: "develop with a failed verdict, --skip-ci-check and --yes",
     sourceBranch: "develop",
     targetBranch: "main",
     version: "0.14.2",
     nextVersion: "0.14.3",
     releaseTag: "v0.14.2",
     ciStatus: { kind: "failed", conclusion: "failure", url: CI_RUN_URL },
-    skipCiCheck: false,
+    skipCiCheck: true,
   },
 ];
 
@@ -894,6 +894,102 @@ describe.each(CI_GATE_PROCEED_CASES)("ava release on $name", (proceedCase) => {
     expect(promptToConfirm).not.toHaveBeenCalled();
   }, 30_000);
 });
+
+/** One `ava release --yes` the CI gate must stop on a failed verdict. */
+type CiGateStopCase = {
+  name: string;
+  dryRun: boolean;
+  /** The flags on the command line, which the action checks before it runs. */
+  flags: readonly string[];
+};
+
+const CI_GATE_STOP_CASES: readonly CiGateStopCase[] = [
+  { name: "--yes", dryRun: false, flags: ["--yes"] },
+  { name: "--dry-run --yes", dryRun: true, flags: ["--dry-run", "--yes"] },
+];
+
+describe.each(CI_GATE_STOP_CASES)(
+  "ava release $name on develop with a failed verdict",
+  (stopCase) => {
+    let directory: string;
+    let origin: string;
+    let checkout: string;
+    let originRefsBefore: string;
+    let checkoutRefsBefore: string;
+    let originalArgv: string[];
+    let originalExitCode: typeof process.exitCode;
+    let exitCode: typeof process.exitCode;
+
+    beforeAll(async () => {
+      directory = mkdtempSync(join(tmpdir(), "ava-release-ci-stop-"));
+      _isolateFromUserConfig(directory);
+      ({ origin, checkout } = _checkOutFreshSourceBranch({
+        directory,
+        sourceBranch: "develop",
+      }));
+      // Fetched first, so the release's own fetch has nothing left to move.
+      _git({ cwd: checkout, args: ["fetch", "--prune", "--tags", "origin"] });
+      originRefsBefore = _listRefs(origin);
+      checkoutRefsBefore = _listRefs(checkout);
+      vi.mocked(checkSourceBranchCi).mockReturnValue({
+        kind: "failed",
+        conclusion: "failure",
+        url: CI_RUN_URL,
+      });
+      vi.mocked(promptToConfirm).mockClear();
+      originalArgv = process.argv;
+      originalExitCode = process.exitCode;
+      process.argv = [process.execPath, "ava", "release", ...stopCase.flags];
+      process.exitCode = undefined;
+
+      await ReleaseCli.state.action?.({
+        version: "0.14.2",
+        next: "0.14.3",
+        yes: true,
+        dryRun: stopCase.dryRun,
+        skipCiCheck: false,
+        skipChangelog: true,
+      });
+      exitCode = process.exitCode;
+    }, 30_000);
+
+    afterAll(() => {
+      process.argv = originalArgv;
+      process.exitCode = originalExitCode;
+      vi.mocked(checkSourceBranchCi).mockReset();
+      vi.restoreAllMocks();
+      vi.unstubAllEnvs();
+      rmSync(directory, { recursive: true, force: true });
+    });
+
+    it("exits with code 1", () => {
+      expect(exitCode).toBe(1);
+    });
+
+    it("says nothing was released and that --skip-ci-check overrides it", () => {
+      const stdout = _stdoutText();
+      expect(stdout).toContain(CI_RUN_URL);
+      expect(stdout).toContain("Nothing has been released.");
+      expect(stdout).toContain("--skip-ci-check");
+    });
+
+    it("moves no ref on origin and creates no v0.14.2 tag", () => {
+      expect(_listRefs(origin)).toBe(originRefsBefore);
+      expect(_git({ cwd: origin, args: ["tag", "--list", "v0.14.2"] })).toBe(
+        "",
+      );
+    });
+
+    it("moves no ref in the checkout and leaves it clean", () => {
+      expect(_listRefs(checkout)).toBe(checkoutRefsBefore);
+      expect(_git({ cwd: checkout, args: ["status", "--short"] })).toBe("");
+    });
+
+    it("asks nothing", () => {
+      expect(promptToConfirm).not.toHaveBeenCalled();
+    });
+  },
+);
 
 describe("ava release --help", () => {
   let originalArgv: string[];

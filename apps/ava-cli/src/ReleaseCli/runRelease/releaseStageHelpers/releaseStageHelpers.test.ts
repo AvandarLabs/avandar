@@ -429,8 +429,36 @@ function _createFakeCommandsWithCi(verdict: string): {
   };
 }
 
-/** Every verdict other than a pass, which asks before releasing. */
+/**
+ * Every verdict other than a pass, which asks before releasing, or stops the
+ * release under `--yes`.
+ */
 const NON_PASSING_VERDICTS = ["failed", "pending", "missing", "unknown"];
+
+/**
+ * Each non-passing verdict with the words that name it, which the `--yes` stop
+ * must repeat so the reader knows why nothing was released.
+ */
+const NON_PASSING_VERDICT_TEXT: ReadonlyArray<[string, string]> = [
+  ["failed", `Staging CI did not pass (failure): ${CI_RUN_URL}`],
+  ["pending", `Staging CI has not finished (in_progress): ${CI_RUN_URL}`],
+  ["missing", "No staging CI run was found for this commit."],
+  ["unknown", "Could not check staging CI: "],
+];
+
+/** The rejection message of a `confirmCiVerdict` call that must stop. */
+async function _readStopMessage(confirmation: Promise<void>): Promise<string> {
+  const error = await confirmation.then(
+    () => {
+      return undefined;
+    },
+    (rejection: unknown) => {
+      return rejection;
+    },
+  );
+  expect(error).toBeInstanceOf(Error);
+  return error instanceof Error ? error.message : "";
+}
 
 describe("confirmCiVerdict", () => {
   beforeEach(() => {
@@ -451,7 +479,7 @@ describe("confirmCiVerdict", () => {
 
       await confirmCiVerdict(git, {
         commitSha: "source-sha",
-        assumeYes: true,
+        assumeYes: false,
         skip: false,
       });
 
@@ -472,20 +500,41 @@ describe("confirmCiVerdict", () => {
     expect(mutations).toEqual([]);
   });
 
-  it.each(NON_PASSING_VERDICTS)(
-    "proceeds on a %s verdict with assumeYes, without asking",
-    async (verdict) => {
-      const { git } = _createFakeCommandsWithCi(verdict);
+  it.each(NON_PASSING_VERDICT_TEXT)(
+    "stops a release on a %s verdict under --yes, naming it, without asking or changing anything",
+    async (verdict, verdictText) => {
+      const { git, mutations } = _createFakeCommandsWithCi(verdict);
 
-      await confirmCiVerdict(git, {
-        commitSha: "source-sha",
-        assumeYes: true,
-        skip: false,
-      });
+      const message = await _readStopMessage(
+        confirmCiVerdict(git, {
+          commitSha: "source-sha",
+          assumeYes: true,
+          skip: false,
+        }),
+      );
 
+      expect(message).toContain(verdictText);
+      expect(message).toContain("Nothing has been released.");
+      expect(message).toContain("--skip-ci-check");
       expect(promptToConfirm).not.toHaveBeenCalled();
+      expect(mutations).toEqual([]);
     },
   );
+
+  it("stops a dry run under --yes on a failed verdict, as the real release would", async () => {
+    const { git, mutations } = _createFakeCommandsWithCi("failed");
+
+    const message = await _readStopMessage(
+      confirmCiVerdict(
+        { ...git, dryRun: true },
+        { commitSha: "source-sha", assumeYes: true, skip: false },
+      ),
+    );
+
+    expect(message).toContain("Nothing has been released.");
+    expect(promptToConfirm).not.toHaveBeenCalled();
+    expect(mutations).toEqual([]);
+  });
 
   it.each(NON_PASSING_VERDICTS)(
     "asks before a release on a %s verdict",
