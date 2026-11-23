@@ -108,7 +108,7 @@ function _buildReplacement(comment) {
     return undefined;
   }
   const body = source.token.slice(2, -2);
-  if (_isProtected(body)) {
+  if (_isProtected(body) || (body.includes("\r\n") && /(?<!\r)\n/.test(body))) {
     return undefined;
   }
   const prose = _getProse(body);

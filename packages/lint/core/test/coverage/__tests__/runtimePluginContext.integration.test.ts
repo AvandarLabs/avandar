@@ -1,6 +1,5 @@
 import { spawnSync } from "node:child_process";
 import {
-  cpSync,
   existsSync,
   mkdirSync,
   mkdtempSync,
@@ -16,6 +15,7 @@ import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { afterEach, expect, it } from "vitest";
 import { runCli } from "../../../src/cli/main";
+import { installPublicPackages } from "./publicPackages.fixtures";
 
 const ROOT = resolve(import.meta.dirname, "../../../../../..");
 const ORIGINAL =
@@ -339,19 +339,7 @@ it("proves the official packed entry from a standalone core package", async () =
       join(directory, "node_modules/@oxlint"),
     );
   }
-  ["core", "typescript"].forEach((name) => {
-    const source = join(ROOT, "packages/lint", name);
-    const manifest = JSON.parse(
-      readFileSync(join(source, "package.json"), "utf8"),
-    );
-    const target = join(directory, "node_modules", manifest.name);
-    mkdirSync(target);
-    cpSync(join(source, "dist"), join(target, "dist"), { recursive: true });
-    writeFileSync(
-      join(target, "package.json"),
-      JSON.stringify({ ...manifest, exports: manifest.publishConfig.exports }),
-    );
-  });
+  installPublicPackages(directory, ["core", "typescript"]);
   const result = spawnSync(
     process.execPath,
     [

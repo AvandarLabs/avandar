@@ -2,7 +2,7 @@
 /* oxlint-disable import/extensions -- Node needs source extensions. */
 import { collectCoverage } from "./coverage.ts";
 import { createCssCoverageProbes } from "./cssSafeRules.ts";
-import { createNativeCoverageProbes } from "./nativeSafeRules.ts";
+import { createNativeCoverageProbes } from "./nativeSafeRules/nativeSafeRules.ts";
 import { createTheme, openTerminal, type PromptIO } from "./terminal.ts";
 
 export { getMenuSelection } from "./terminal.ts";

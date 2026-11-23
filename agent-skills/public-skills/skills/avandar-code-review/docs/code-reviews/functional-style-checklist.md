@@ -128,6 +128,8 @@ library-gated phase.
   and meaningful grouping remain contextual judgments. Select AF-16/17 syntax
   detection only through the deterministic fallback handoff.
 
+<a id="iife-for-computed-values"></a>
+
 - Use an immediately-invoked arrow function (IIFE) to compute a value when
   the computation needs its own try/catch, multiple intermediate names, or
   a small local branch, and would otherwise leak setup variables into the

@@ -1,14 +1,9 @@
 import { spawnSync } from "node:child_process";
-import {
-  mkdtempSync,
-  readdirSync,
-  rmSync,
-  mkdirSync,
-  symlinkSync,
-} from "node:fs";
+import { mkdtempSync, rmSync, symlinkSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { expect, it } from "vitest";
+import { installPublicPackages } from "./coverage/__tests__/publicPackages.fixtures";
 
 /** Source and tarball exports must both remain usable by actual consumers. */
 it("repairs function comments through the source export without a build", () => {
@@ -55,35 +50,7 @@ it("repairs CSS comments through the source export without a build", () => {
 it("resolves the catalog export from the packed tarball", () => {
   const directory = mkdtempSync(join(tmpdir(), "avandar-lint-pack-"));
   try {
-    const root = resolve(import.meta.dirname, "..");
-    const build = spawnSync("pnpm", ["build"], { cwd: root, encoding: "utf8" });
-    expect(build.status, build.stdout + build.stderr).toBe(0);
-    const pack = spawnSync("pnpm", ["pack", "--pack-destination", directory], {
-      cwd: root,
-      encoding: "utf8",
-    });
-    expect(pack.status, pack.stderr).toBe(0);
-    const unpack = spawnSync(
-      "tar",
-      [
-        "-xzf",
-        join(
-          directory,
-          readdirSync(directory).find((name) => {
-            return name.endsWith(".tgz");
-          })!,
-        ),
-        "-C",
-        directory,
-      ],
-      { encoding: "utf8" },
-    );
-    expect(unpack.status, unpack.stderr).toBe(0);
-    mkdirSync(join(directory, "node_modules/@avandar"), { recursive: true });
-    symlinkSync(
-      join(directory, "package"),
-      join(directory, "node_modules/@avandar/lint"),
-    );
+    installPublicPackages(directory, ["core"]);
     ["ajv", "yaml"].forEach((dependency) => {
       symlinkSync(
         resolve(import.meta.dirname, "../node_modules", dependency),

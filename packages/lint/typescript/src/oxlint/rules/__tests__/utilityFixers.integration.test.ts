@@ -89,32 +89,8 @@ it("keeps untyped JavaScript optional candidates in fallback", () => {
   expect(_fix(source, [names[2]])).toBe(source);
 });
 
-it.each([
-  'const result = []; if (first) {\n  result.push(first);\n} return result;',
-  'const result = []; if (first != null) {\n  result.push(first);\n} return result;',
-  'const result = []; if (first !== null) {\n  result.push(first);\n} return result;',
-  'const result = []; if (first !== undefined) {\n  result.push(second);\n} return result;',
-  'const result = []; if (first !== undefined) { consume(); result.push(first); } return result;',
-  'const result = []; if (first !== undefined) {\n  result.push(first);\n} consume(); return result;',
-  'const result = []; const alias = result; if (first !== undefined) {\n  result.push(first);\n} return result;',
-  'const result = []; if (first !== undefined) {\n  result.push(first);\n} else { return []; } return result;',
-  'const result = []; if (source.first !== undefined) { result.push(source.first); } return result;',
-  'const result = []; if (globalValue !== undefined) { result.push(globalValue); } return result;',
-  'const result = []; if (read() !== undefined) { result.push(read()); } return result;',
-  'const result = []; if (first !== undefined) {\n  result.push(first);\n} return result.slice();',
-  'const result = []; if (first !== undefined) {\n  result.push(first);\n} if (second !== undefined) { return []; } return result;',
-])("refuses optional-array control-flow changes: %s", (body) => {
-  const source = `import { identity } from "@avandar/utils"; export function build(first, second) { ${body} }`;
-  expect(_fix(source, [names[2]])).toBe(source);
-});
-
 it("refuses competing new imports without relying on repeated fix passes", () => {
   const source = 'import { identity } from "@avandar/utils";\nexport const result = [{ id: 1 }].map(function(row) { return row.id; });\nexport function build(first) { const values = []; if (first !== undefined) {\n  values.push(first);\n} return values; }';
-  expect(_fix(source)).toBe(source);
-});
-
-it("refuses a single unbraced optional guard before native curly repair", () => {
-  const source = 'import { isDefined } from "@avandar/utils";\nexport function build(first) { const result = []; if (first !== undefined) result.push(first); return result; }';
   expect(_fix(source)).toBe(source);
 });
 

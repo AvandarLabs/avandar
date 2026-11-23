@@ -106,6 +106,8 @@ applies the comment bullets listed under **Focused Reviews** in
   export function getQueryColumnIdFromQueryResultColumnName(
   ```
 
+<a id="file-level-comments"></a>
+
 - Do not use file-level comments in a file that has a main export. A file-level
   comment is a detached block comment describing the file as a whole rather than
   a specific member; it counts whether it sits at the very top of the file or

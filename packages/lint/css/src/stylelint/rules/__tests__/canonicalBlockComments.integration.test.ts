@@ -71,6 +71,18 @@ it("reports the canonical error ID and the original comment range", async () => 
 });
 
 it.each([
+  "/* First sentence.\r\n   Second sentence.\n   Third sentence. */\n",
+  "/* First sentence.\n   Second sentence.\r\n   Third sentence. */\r\n",
+])(
+  "preserves mixed line endings inside a prose comment: %s",
+  async (source) => {
+    const result = await _lint(source);
+    expect(result.code).toBe(source);
+    expect(result.results[0]!.warnings).toEqual([]);
+  },
+);
+
+it.each([
   "/** Declaration docs.\n * Preserve this shape. */\n.a {}\n",
   "/*! Copyright Example.\n All rights reserved. */\n",
   "/*@ sourceURL=app.css */\n",

@@ -117,7 +117,8 @@ Literal const assertions retain the intended literal type without repeating its 
   the reader "TypeScript cannot prove this", so a cast that proves nothing
   sends them looking for a problem that does not exist, and it silences the
   check that would catch a future mismatch. This applies to every single
-  `as T`, not only the `as unknown as T` double cast above.
+  `as T`, not only the
+  [`as unknown as T` double cast](types-checklist.md#double-casts).
 
   **The gate is mechanical, never a judgement call.** For every added line
   containing a cast, delete the cast and re-run the type checker. Do not
@@ -184,8 +185,10 @@ Line comments distinguish implementation prose from API documentation.
 
 - Use block comments (`/** ... */`) only as documentation attached to an
   identifier (functions, types, exports, etc.). Do not use file-level header
-  comments (see the file-level-comment rule below). Any comment inside a
-  function body must use `//` line comments, even when it spans multiple lines.
+  comments (see the
+  [file-level-comment rule](comments-checklist.md#file-level-comments)).
+  Any comment inside a function body must use `//` line comments, even when it
+  spans multiple lines.
 
   This is bad:
 
@@ -395,8 +398,9 @@ An explicit false branch avoids rendering non-boolean falsy values. Preserve exa
 - Construct objects as a single literal at the end of the function,
   not by declaring an empty object and mutating fields onto it. Compute
   each field as its own `const` above (using ternaries, `??`,
-  short helper calls, or IIFEs from the earlier rule) and then assemble
-  the object in one place. The final shape is then visible in one
+  short helper calls, or
+  [IIFEs](functional-style-checklist.md#iife-for-computed-values)) and then
+  assemble the object in one place. The final shape is then visible in one
   expression instead of scattered across `if` blocks the reader has to
   re-execute mentally.
 
@@ -468,9 +472,10 @@ An explicit false branch avoids rendering non-boolean falsy values. Preserve exa
     conditional spread (`...(cond ? { foo } : {})`) instead; it still
     keeps the construction inside one literal.
   - If a field's computation needs multiple intermediate names or a
-    try/catch, extract it into the IIFE form from the "IIFE for
-    computed value" rule above. The point is the same: every field
-    lands in the final literal, no field is bolted on with mutation.
+    try/catch, extract it into the
+    [IIFE form](functional-style-checklist.md#iife-for-computed-values).
+    The point is the same: every field lands in the final literal, no field
+    is bolted on with mutation.
 
   **Find candidates** (variables initialized to an empty object literal,
   which is the canonical smell for this pattern):

@@ -15,6 +15,8 @@ contracts. Naming, module structure, comments, and function shape live in
     --include="*.ts" --include="*.tsx" .
   ```
 
+<a id="double-casts"></a>
+
 - Never write `as unknown as T`. The double cast silences every
   assignability check between the source and the target type, so a real
   mismatch (a renamed field, a widened union, a changed generic argument)

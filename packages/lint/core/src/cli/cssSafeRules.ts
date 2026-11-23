@@ -4,6 +4,8 @@ import { createRequire } from "node:module";
 import { join, relative, sep } from "node:path";
 import { pathToFileURL } from "node:url";
 // oxlint-disable-next-line import/extensions -- Node needs source extensions.
+import { getCssPluginEntry } from "./getCssPluginEntry.ts";
+// oxlint-disable-next-line import/extensions -- Node needs source extensions.
 import { getSuppressedRuleNames } from "./getSuppressedRuleNames.ts";
 import type { CoverageEvidence, CoverageProbe } from "./coverage.ts";
 
@@ -17,8 +19,9 @@ const UNPROVEN: CoverageEvidence = {
 };
 // Keep dynamic config imports in the original repository.
 const PROOF_SCRIPT = `
-import { readFileSync } from 'node:fs';
-const { engine, files, path, cwd } = JSON.parse(process.argv[1]);
+import { readFileSync, realpathSync } from 'node:fs';
+import { pathToFileURL } from 'node:url';
+const { engine, files, path, cwd, officialEntry } = JSON.parse(process.argv[1]);
 const { default: stylelint } = await import(engine);
 const ruleName = 'avandar/canonical-block-comments';
 const result = { available: true, enabled: false, included: false,
@@ -27,6 +30,44 @@ function hasErrors(entries) {
   return entries.some((entry) => entry.parseErrors.length ||
     entry.invalidOptionWarnings.length || entry.warnings.some((warning) =>
       warning.rule === 'CssSyntaxError' || warning.text.startsWith('Unknown rule ')));
+}
+async function hasOfficialRule(config) {
+  if (!officialEntry || !Array.isArray(config?.plugins)) { return false; }
+  const official = (await import(pathToFileURL(officialEntry).href)).default;
+  const expected = [official].flat().find((definition) => definition.ruleName === ruleName);
+  if (typeof expected?.rule !== 'function') { return false; }
+  let winningRule;
+  let winningEntry;
+  for (const plugin of config.plugins) {
+    const imported = typeof plugin === 'string'
+      ? await import(pathToFileURL(plugin).href) : plugin;
+    for (const definition of [imported?.default || imported].flat()) {
+      if (typeof definition?.ruleName !== 'string' || typeof definition.rule !== 'function') {
+        return false;
+      }
+      if (definition.ruleName === ruleName) {
+        winningRule = definition.rule;
+        winningEntry = typeof plugin === 'string' ? realpathSync(plugin) : undefined;
+      }
+    }
+  }
+  return winningEntry === officialEntry && winningRule === expected.rule;
+}
+function getOffset(code, line, column) {
+  if (!Number.isSafeInteger(line) || !Number.isSafeInteger(column) || line < 1 || column < 1) {
+    return undefined;
+  }
+  const lines = code.split('\\n');
+  const text = lines[line - 1]?.replace(/\\r$/, '');
+  if (text === undefined || column > text.length + 1) { return undefined; }
+  return lines.slice(0, line - 1).reduce((offset, text) => offset + text.length + 1, 0) + column - 1;
+}
+function isSeedWarning(warning, code, start, end) {
+  const from = getOffset(code, warning.line, warning.column);
+  const to = getOffset(code, warning.endLine, warning.endColumn);
+  return warning.rule === ruleName && warning.severity === 'error' &&
+    warning.text.startsWith('AF-20:') && from !== undefined && to !== undefined &&
+    from >= start && to > from && to <= end;
 }
 try {
   const listing = await stylelint.lint({ files, cwd, fix: false, allowEmptyInput: true });
@@ -38,11 +79,13 @@ try {
     const seed = '\\n/* Avandar coverage first sentence.\\n   Avandar coverage second sentence. */\\n';
     const seeded = await stylelint.lint({ code: source + seed, codeFilename: path, cwd, fix: false });
     result.operational = !hasErrors(seeded.results);
-    const seedLine = source.split('\\n').length + 1;
-    result.enabled = !config?.customSyntax && !config?.rules?.[ruleName]?.[1]?.disableFix &&
-      seeded.results.some((entry) => entry.warnings.some((warning) =>
-        warning.rule === ruleName && warning.severity === 'error' &&
-        warning.text.startsWith('AF-20:') && warning.line === seedLine));
+    const hasIdentity = await hasOfficialRule(config);
+    result.enabled = hasIdentity && !config?.customSyntax && !config?.rules?.[ruleName]?.[1]?.disableFix &&
+      seeded.results.some((entry) => entry.source === path && !entry.ignored &&
+        entry.warnings.some((warning) => isSeedWarning(warning, source + seed, source.length + 1, source.length + seed.length)));
+    if (!hasIdentity) {
+      result.recovery = 'Run fallback review for this CSS plugin runtime context. The effective canonical rule must be the matching installed official static public entry.';
+    }
     result.exitCode = seeded.errored ? 2 : 0;
     result.diagnosticRuleIds = result.enabled ? ['AF-20'] : [];
   }
@@ -84,6 +127,7 @@ function _runProof(
     files: string[];
     path: string;
     cwd: string;
+    officialEntry?: string;
   }>,
 ): Promise<CoverageEvidence> {
   return new Promise((resolveResult) => {
@@ -138,7 +182,13 @@ async function _provePath(
   ).some((name) => {
     return name === "*" || name === "canonical-block-comments";
   });
-  const evidence = await _runProof({ engine, files, path, cwd });
+  const evidence = await _runProof({
+    engine,
+    files,
+    path,
+    cwd,
+    officialEntry: getCssPluginEntry(cwd),
+  });
   return suppressed
     ? {
         ...evidence,
