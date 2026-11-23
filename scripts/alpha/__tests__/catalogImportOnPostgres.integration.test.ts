@@ -1,5 +1,11 @@
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import {
+  chmodSync,
+  existsSync,
+  mkdtempSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import { createServer } from "node:net";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
@@ -38,7 +44,13 @@ create table public.data_catalog_facet_counts (
   facet text not null,
   listing_count bigint not null
 );
-create table public.pipeline_executions (id uuid primary key, pipeline_name text not null, unique (id, pipeline_name));
+create table public.pipeline_executions (
+  id uuid primary key,
+  pipeline_name text not null,
+  cli_argv text[],
+  actor text,
+  unique (id, pipeline_name)
+);
 create table public.pipeline_execution_scopes (
   id uuid primary key,
   execution_id uuid not null,
@@ -46,7 +58,25 @@ create table public.pipeline_execution_scopes (
   foreign key (execution_id, pipeline_name) references public.pipeline_executions (id, pipeline_name) on delete cascade
 );
 create table public.pipeline_scope_checkpoints (pipeline_name text, drive_key text, scope_key text, primary key (pipeline_name, drive_key, scope_key));
-create table public.datasets (id uuid primary key, workspace_id uuid not null, source_type text not null);
+create schema auth;
+create table auth.users (id uuid primary key, email text);
+create table public.workspaces (id uuid primary key, name text not null);
+create table public.workspace_memberships (
+  id uuid primary key default gen_random_uuid(),
+  workspace_id uuid not null references public.workspaces (id) on delete cascade,
+  user_id uuid not null references auth.users (id) on delete cascade
+);
+create table public.datasets (
+  id uuid primary key,
+  workspace_id uuid not null references public.workspaces (id) on delete cascade,
+  name text not null,
+  source_type text not null
+);
+create table public.dataset_columns (
+  id uuid primary key,
+  dataset_id uuid not null references public.datasets (id) on delete cascade,
+  name text not null
+);
 create table public.datasets__open_data (
   id uuid primary key,
   dataset_id uuid not null unique references public.datasets (id) on delete cascade,
@@ -64,19 +94,39 @@ $$ language plpgsql volatile security definer set search_path = '';
 revoke all on function public.data_catalog_facet_counts__refresh () from public;
 `;
 
-/** 6 listings, 4 of them used by open data datasets in 2 workspaces. */
+/**
+ * 6 listings, 4 of them used by open data datasets in 2 workspaces whose
+ * members all have @avandarlabs.com emails, and a fifth, uploaded dataset.
+ * Each dataset has 2 columns.
+ */
 const SEED_SQL = `
 truncate public.data_catalog_drives, public.data_catalog_listings,
   public.data_catalog_listings__relation_columns, public.pipeline_executions,
   public.pipeline_execution_scopes, public.pipeline_scope_checkpoints,
-  public.data_catalog_facet_counts, public.datasets__open_data, public.datasets;
+  public.data_catalog_facet_counts, public.datasets__open_data, public.datasets,
+  public.dataset_columns, public.workspace_memberships, public.workspaces, auth.users;
 insert into public.data_catalog_drives values ('d0000000-0000-0000-0000-000000000001', 'wdi');
 insert into public.data_catalog_listings (id, display_name, drive_id)
 select ('a0000000-0000-0000-0000-00000000000' || n)::uuid, 'old ' || n, 'd0000000-0000-0000-0000-000000000001'
 from generate_series(1, 6) n;
+insert into auth.users values
+  ('10000000-0000-0000-0000-000000000001', 'Pablo@AvandarLabs.com'),
+  ('10000000-0000-0000-0000-000000000002', 'jp@avandarlabs.com'),
+  ('10000000-0000-0000-0000-000000000009', 'outsider@example.com');
+insert into public.workspaces values
+  ('70000000-0000-0000-0000-000000000000', 'Even'),
+  ('70000000-0000-0000-0000-000000000001', 'Odd');
+insert into public.workspace_memberships (workspace_id, user_id) values
+  ('70000000-0000-0000-0000-000000000000', '10000000-0000-0000-0000-000000000001'),
+  ('70000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001'),
+  ('70000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000002');
 insert into public.datasets
-select ('e0000000-0000-0000-0000-00000000000' || n)::uuid, ('70000000-0000-0000-0000-00000000000' || (n % 2))::uuid, 'open_data'
-from generate_series(1, 4) n;
+select ('e0000000-0000-0000-0000-00000000000' || n)::uuid, ('70000000-0000-0000-0000-00000000000' || (n % 2))::uuid,
+  'World Development Indicators (WDI)', case when n = 5 then 'csv_file' else 'open_data' end
+from generate_series(1, 5) n;
+insert into public.dataset_columns
+select gen_random_uuid(), ('e0000000-0000-0000-0000-00000000000' || n)::uuid, 'column ' || c
+from generate_series(1, 5) n, generate_series(1, 2) c;
 insert into public.datasets__open_data
 select ('f0000000-0000-0000-0000-00000000000' || n)::uuid, ('e0000000-0000-0000-0000-00000000000' || n)::uuid,
   ('70000000-0000-0000-0000-00000000000' || (n % 2))::uuid, ('a0000000-0000-0000-0000-00000000000' || n)::uuid
@@ -107,7 +157,8 @@ COPY public.data_catalog_listings__relation_columns (id, catalog_listing_id) FRO
 c1000000-0000-0000-0000-000000000001\tb0000000-0000-0000-0000-000000000001
 \\.
 
-COPY public.pipeline_executions (id, pipeline_name) FROM stdin;
+COPY public.pipeline_executions (id, pipeline_name, cli_argv, actor) FROM stdin;
+e1000000-0000-0000-0000-000000000001\tsocrata\t{run,--all}\tdeveloper@laptop.local
 \\.
 
 COPY public.pipeline_execution_scopes (id, execution_id, pipeline_name) FROM stdin;
@@ -130,7 +181,15 @@ const BACKUP_TABLES = [
   "public.pipeline_scope_checkpoints",
   "public.data_catalog_facet_counts",
   "public.datasets__open_data",
+  "public.datasets",
+  "public.dataset_columns",
 ];
+
+/**
+ * The rows the replace deletes outside the catalog: 4 `datasets__open_data`
+ * rows, the 4 open data datasets, and their 8 columns.
+ */
+const CASCADE_ROWS = "16";
 
 /** psql versions that know pg_dump's `\restrict`, by major version. */
 const MINIMUM_PSQL_MINOR: Record<number, number> = { 15: 14, 16: 10, 17: 6 };
@@ -251,7 +310,15 @@ function _writeBackup(): string {
   return path;
 }
 
-function _runReplace(dump: string) {
+/**
+ * Runs a replace import of a dump with these extra arguments, through
+ * PSQL_BIN, the real psql unless a test passes a stand-in.
+ */
+function _runImport(
+  dump: string,
+  extraArgs: readonly string[],
+  psqlBin: string = TOOLS!.psql,
+) {
   const result = spawnSync(
     "bash",
     [
@@ -259,29 +326,108 @@ function _runReplace(dump: string) {
       `postgresql://${OWNER}@127.0.0.1:${port}/postgres`,
       _writeFile("catalog.sql", dump),
       "--replace-existing",
-      "--backup-file",
-      _writeBackup(),
       "--rewrite-storage-host",
       SOURCE_STORAGE,
       TARGET_STORAGE,
-      "--yes-i-know-the-target",
-      TARGET_ID,
-      "--yes-i-know-the-cascade",
-      "4",
+      ...extraArgs,
     ],
     {
       encoding: "utf8",
       stdio: ["pipe", "pipe", "pipe"],
-      env: { PATH: process.env.PATH ?? "", PSQL_BIN: TOOLS!.psql },
+      env: { PATH: process.env.PATH ?? "", PSQL_BIN: psqlBin },
     },
   );
   return { status: result.status, output: `${result.stdout}${result.stderr}` };
 }
 
+function _runReplace(dump: string, psqlBin?: string) {
+  return _runImport(
+    dump,
+    [
+      "--backup-file",
+      _writeBackup(),
+      "--yes-i-know-the-target",
+      TARGET_ID,
+      "--yes-i-know-the-cascade",
+      CASCADE_ROWS,
+    ],
+    psqlBin,
+  );
+}
+
 function _targetCounts(): string {
   return _query(
-    "select (select count(*) from public.data_catalog_listings) || ' listings, ' || (select count(*) from public.datasets__open_data) || ' open data rows, ' || (select count(*) from public.datasets) || ' datasets, facets ' || (select string_agg(facet || ':' || listing_count, ',') from public.data_catalog_facet_counts)",
+    "select (select count(*) from public.data_catalog_listings) || ' listings, ' || (select count(*) from public.datasets__open_data) || ' open data rows, ' || (select count(*) from public.datasets) || ' datasets, ' || (select count(*) from public.dataset_columns) || ' columns, facets ' || (select string_agg(facet || ':' || listing_count, ',') from public.data_catalog_facet_counts)",
   );
+}
+
+/** The seed's counts, which a refused or rolled-back import leaves alone. */
+const SEED_COUNTS =
+  "6 listings, 4 open data rows, 5 datasets, 10 columns, facets old:99";
+
+/** Adds a member without an @avandarlabs.com email to the Odd workspace. */
+const ADD_OUTSIDER_SQL =
+  "insert into public.workspace_memberships (workspace_id, user_id) values ('70000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000009')";
+
+/**
+ * Writes a psql stand-in that adds the outsider member right before the
+ * import transaction, after the read-only report saw only Avandar members.
+ */
+function _writeOutsiderPsql(): string {
+  const path = join(clusterDir, "psql-adds-outsider");
+  writeFileSync(
+    path,
+    [
+      "#!/bin/bash",
+      'if [[ " $* " == *" --file "* ]]; then',
+      `  "${TOOLS!.psql}" "$1" -X -q -v ON_ERROR_STOP=1 -c "${ADD_OUTSIDER_SQL}" >/dev/null || exit 9`,
+      "fi",
+      `exec "${TOOLS!.psql}" "$@"`,
+      "",
+    ].join("\n"),
+  );
+  chmodSync(path, 0o755);
+  return path;
+}
+
+/**
+ * Runs the restore steps the import printed: the `sed` that stages the
+ * backup, then restore.sql, from a folder of their own.
+ */
+function _runPrintedRestore(output: string): void {
+  const lines = output.split("\n");
+  const sedLine = lines.find((line) => {
+    return line.startsWith("       sed ");
+  });
+  const begin = lines.indexOf("       begin;");
+  const commit = lines.indexOf("       commit;");
+  const restoreDir = mkdtempSync(join(clusterDir, "restore-"));
+  _run("bash", ["-c", `cd '${restoreDir}' && ${sedLine!.trim()}`]);
+  writeFileSync(
+    join(restoreDir, "restore.sql"),
+    lines
+      .slice(begin, commit + 1)
+      .map((line) => {
+        return line.slice(7);
+      })
+      .join("\n"),
+  );
+  _run(TOOLS!.psql, [
+    "-h",
+    "127.0.0.1",
+    "-p",
+    String(port),
+    "-U",
+    OWNER,
+    "-d",
+    "postgres",
+    "-X",
+    "-q",
+    "-v",
+    "ON_ERROR_STOP=1",
+    "--file",
+    join(restoreDir, "restore.sql"),
+  ]);
 }
 
 /**
@@ -348,7 +494,7 @@ describe.skipIf(TOOLS === undefined)(
 
       expect(run.status, run.output).toBe(0);
       expect(_targetCounts()).toBe(
-        "3 listings, 0 open data rows, 4 datasets, facets catalog:3",
+        "3 listings, 0 open data rows, 1 datasets, 2 columns, facets catalog:3",
       );
       expect(
         _query(
@@ -369,9 +515,77 @@ describe.skipIf(TOOLS === undefined)(
 
       expect(run.status).toBe(1);
       expect(run.output).toContain("its transaction rolled back");
-      expect(_targetCounts()).toBe(
-        "6 listings, 4 open data rows, 4 datasets, facets old:99",
+      expect(_targetCounts()).toBe(SEED_COUNTS);
+    });
+
+    it("deletes only the open data datasets, and their columns, when every member is Avandar's", () => {
+      const run = _runReplace(CATALOG_DUMP);
+
+      expect(run.status, run.output).toBe(0);
+      expect(
+        _query("select string_agg(id::text, ',') from public.datasets"),
+      ).toBe("e0000000-0000-0000-0000-000000000005");
+      expect(run.output).toContain(
+        "The @avandarlabs.com guard passes for all 4 open data datasets.",
       );
+    });
+
+    it("refuses a replace, changing nothing, when a workspace has a member outside @avandarlabs.com", () => {
+      _query(ADD_OUTSIDER_SQL);
+
+      const run = _runReplace(CATALOG_DUMP);
+
+      expect(run.status).toBe(1);
+      expect(run.output).toMatch(
+        /Refusing to import: open data dataset e0000000-0000-0000-0000-00000000000[13] in workspace 70000000-0000-0000-0000-000000000001 has 1 of its 3 members without an @avandarlabs\.com email/,
+      );
+      expect(run.output).not.toContain("outsider@example.com");
+      expect(_targetCounts()).toBe(SEED_COUNTS);
+    });
+
+    it("rolls the whole transaction back when an outside member joins after the report", () => {
+      const run = _runReplace(CATALOG_DUMP, _writeOutsiderPsql());
+
+      expect(run.status).toBe(1);
+      expect(run.output).toMatch(
+        /Refusing to delete open data dataset e0000000-0000-0000-0000-00000000000[13] in workspace 70000000-0000-0000-0000-000000000001: 1 of its 3 members have no @avandarlabs\.com email/,
+      );
+      expect(run.output).toContain("its transaction rolled back");
+      expect(_targetCounts()).toBe(SEED_COUNTS);
+    });
+
+    it("lists the open data datasets and their members on a dry run, changing nothing", () => {
+      const run = _runImport(CATALOG_DUMP, ["--dry-run"]);
+
+      expect(run.status, run.output).toBe(0);
+      expect(run.output).toContain(
+        'dataset e0000000-0000-0000-0000-000000000001 "World Development Indicators (WDI)" in workspace 70000000-0000-0000-0000-000000000001 "Odd"',
+      );
+      expect(run.output).toContain(
+        "members: Pablo@AvandarLabs.com, jp@avandarlabs.com (2 of 2 have an @avandarlabs.com email), guard passes",
+      );
+      expect(run.output).toContain("Dry run: nothing was written.");
+      expect(_targetCounts()).toBe(SEED_COUNTS);
+    });
+
+    it("loads pipeline executions with no command line or actor", () => {
+      const run = _runReplace(CATALOG_DUMP);
+
+      expect(run.status, run.output).toBe(0);
+      expect(
+        _query(
+          "select count(*) || ' executions, ' || count(cli_argv) || ' command lines, ' || count(actor) || ' actors' from public.pipeline_executions",
+        ),
+      ).toBe("1 executions, 0 command lines, 0 actors");
+    });
+
+    it("restores the catalog and the deleted datasets from the printed restore steps", () => {
+      const run = _runReplace(CATALOG_DUMP);
+      expect(run.status, run.output).toBe(0);
+
+      _runPrintedRestore(run.output);
+
+      expect(_targetCounts()).toBe(SEED_COUNTS);
     });
   },
 );

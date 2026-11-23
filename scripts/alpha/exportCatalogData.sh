@@ -16,6 +16,9 @@
 # fails on the foreign key triggers. It is not needed either: pg_dump writes
 # parents before children, and the catalog's own triggers fire on update only.
 #
+# pg_dump gets the URL without its password, and the password in PGPASSWORD,
+# so `ps` never shows it.
+#
 # PG_DUMP_BIN overrides the pg_dump binary. Its major version must be at
 # least the source server's.
 #-------------------------------------------------------------------------------
@@ -50,8 +53,19 @@ for table in "${CATALOG_TABLES[@]}"; do
   table_args+=(--table "$table")
 done
 
-"$PG_DUMP_BIN" "$SOURCE_DB_URL" --data-only --no-owner --no-privileges \
-  "${table_args[@]}" --file "$TEMP_FILE"
+# pg_dump gets the URL without its password, and the password in PGPASSWORD
+# for this one command, so `ps` never shows it.
+split_db_url_password "$SOURCE_DB_URL" || {
+  echo "The source URL's password has an invalid percent-encoding. Encode each special character as %XX." >&2
+  exit 1
+}
+if [[ -n "$DB_URL_PASSWORD" ]]; then
+  PGPASSWORD="$DB_URL_PASSWORD" "$PG_DUMP_BIN" "$DB_URL_WITHOUT_PASSWORD" \
+    --data-only --no-owner --no-privileges "${table_args[@]}" --file "$TEMP_FILE"
+else
+  "$PG_DUMP_BIN" "$DB_URL_WITHOUT_PASSWORD" --data-only --no-owner \
+    --no-privileges "${table_args[@]}" --file "$TEMP_FILE"
+fi
 
 # pg_dump 17 and later write `SET transaction_timeout = 0;`, which Postgres
 # before 17 rejects, and the import stops on the first error. The setting

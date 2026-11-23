@@ -12,6 +12,9 @@
 # `data_catalog_facet_counts` is left out on purpose: it is derived from the
 # listings, so the import recounts it with
 # `data_catalog_facet_counts__refresh()` instead of copying the source's.
+#
+# It also holds split_db_url_password, which both scripts use to keep a
+# database password off the `psql` and `pg_dump` command lines.
 #-------------------------------------------------------------------------------
 
 # Parents before children, so the import order satisfies foreign keys.
@@ -173,4 +176,89 @@ print_unexpected_dump_lines() {
     /^\\(un)?restrict [A-Za-z0-9]+$/ { next }
     { printf "line %d: %s\n", NR, substr($0, 1, 120) }
   ' "$1"
+}
+
+# Prints the column list of a dump's `COPY` header for one table, such as
+# `id, pipeline_name`, or nothing when the dump has no block for it.
+#
+# Usage: print_dump_header_columns <dump.sql> <schema.table>
+print_dump_header_columns() {
+  awk -v table="$2" '
+    $1 == "COPY" && $2 == table && $NF == "stdin;" {
+      header = $0
+      sub(/^[^(]*\(/, "", header)
+      sub(/\) FROM stdin;$/, "", header)
+      print header
+      exit
+    }
+  ' "$1"
+}
+
+# Prints a dump with every value of some columns of one table set to `\N`,
+# null. Only that table's rows change; every other line prints as it is.
+#
+# Usage: redact_dump_columns <dump.sql> <schema.table> <column>...
+redact_dump_columns() {
+  local dump="$1" table="$2"
+  shift 2
+  awk -F '\t' -v OFS='\t' -v table="$table" -v redacted="$*" '
+    BEGIN { split(redacted, names, " "); for (i in names) is_redacted[names[i]] = 1 }
+    !inside && $0 ~ /^COPY [^\t]* FROM stdin;$/ {
+      inside = 1
+      split($0, words, " ")
+      is_table = words[2] == table
+      split("", positions)
+      if (is_table) {
+        header = $0
+        sub(/^[^(]*\(/, "", header)
+        sub(/\).*$/, "", header)
+        count = split(header, columns, ", ")
+        for (i = 1; i <= count; i++) { if (columns[i] in is_redacted) { positions[i] = 1 } }
+      }
+      print
+      next
+    }
+    inside && $0 == "\\." { inside = 0; is_table = 0; print; next }
+    inside && is_table { for (i in positions) { $i = "\\N" } print; next }
+    { print }
+  ' "$dump"
+}
+
+# Decodes a URL's `%XX` escapes into PERCENT_DECODED, as libpq does, and
+# returns 1 for a `%` not followed by two hex digits. It sets a variable
+# instead of printing, so a decoded trailing newline survives.
+#
+# Usage: percent_decode <text>
+percent_decode() {
+  local encoded="$1" index=0 character hex
+  PERCENT_DECODED=""
+  while ((index < ${#encoded})); do
+    character="${encoded:index:1}"
+    index=$((index + 1))
+    if [[ "$character" == % ]]; then
+      hex="${encoded:index:2}"
+      [[ "$hex" =~ ^[0-9A-Fa-f]{2}$ ]] || return 1
+      printf -v character '%b' "\\x$hex"
+      index=$((index + 2))
+    fi
+    PERCENT_DECODED+="$character"
+  done
+}
+
+# Splits the password out of a `postgres://` or `postgresql://` URL, so a
+# command line can carry the URL without it while the password travels in
+# PGPASSWORD, which `ps` does not show. Sets DB_URL_WITHOUT_PASSWORD, and
+# DB_URL_PASSWORD to the percent-decoded password, empty when the URL has
+# none. Any other connection string passes through unchanged. Returns 1 when
+# the password has an invalid percent-encoding.
+#
+# Usage: split_db_url_password <url>
+split_db_url_password() {
+  local pattern='^(postgres(ql)?://[^:@/?#]*):([^@/?#]*)@(.*)$'
+  DB_URL_WITHOUT_PASSWORD="$1"
+  DB_URL_PASSWORD=""
+  [[ "$1" =~ $pattern ]] || return 0
+  DB_URL_WITHOUT_PASSWORD="${BASH_REMATCH[1]}@${BASH_REMATCH[4]}"
+  percent_decode "${BASH_REMATCH[3]}" || return 1
+  DB_URL_PASSWORD="$PERCENT_DECODED"
 }
