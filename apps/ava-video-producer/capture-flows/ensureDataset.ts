@@ -42,7 +42,7 @@ async function _openSourceList({
   // The visible count is absent while loading, including when cached
   // requests do not fire.
   const datasetCountText = page
-    .getByRole("heading", { name: "Datasets", exact: true })
+    .getByRole("heading", { name: "All data", exact: true })
     .locator("..")
     .locator("p");
   await expect(datasetCountText).toHaveText(/^\d+$/);
