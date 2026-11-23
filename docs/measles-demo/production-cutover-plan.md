@@ -6,9 +6,8 @@ which serves `app.avandarlabs.com`. Written 2026-11-23. It replaces
 [2026-11-23-production-cutover.md](../superpowers/plans/2026-11-23-production-cutover.md).
 
 **Status:** waiting for Pablo's approval. Nothing in this document has been
-executed. Pablo answered D1 to D4 on 2026-11-23 (section 2). D5 to D7 and E1
-in section 4 are open, and the plan is written for the recommended option of
-each.
+executed. Pablo answered D1 to D7 and E1 on 2026-11-23 (section 2). No
+decision is open.
 
 ## 1. The decision
 
@@ -39,6 +38,10 @@ review gets a public post-commit review.
 | D2 | How staging and production deploy | **CI deploys everything, for `develop` and `main` alike, and Vercel's Git integration is removed.** In Pablo's words: "Deployments should be handled purely through CI/CD now with no integration magic handled by web portals. We want to handle things via code as much as possible, without ever leaking private, sensitive, or secret data that the general public has no business knowing." |
 | D3 | How the promotion lands on `develop` under the squash-only ruleset | **A PR for CI and the public record, then Pablo fast-forwards `develop`** to the PR head with the admin bypass. |
 | D4 | The crosswalk privacy gap | **Release with it and fix forward.** Production has no active users, and the release is needed for marketing. Tracked as Linear AVA-611, High priority. |
+| D5 | Does staging get the catalog through the same replace import as production | **Yes, staging first**, as the rehearsal of the production load. |
+| D6 | When the demo domain, the Vercel `demo` environment, the `demo-measles` Supabase branch, and `demo/measles` are deleted | **Seven days after the production smoke test passes** and the catalog dump is archived. |
+| D7 | Creating the public review labels, board, and issues | **All 139 issues are opened together, and only on Pablo's approval.** Nothing is created automatically. The runbook holds a prompt Pablo pastes into a new agent session when he is ready. |
+| E1 | How CI addresses the staging site in Vercel | **The Vercel environment named `staging`.** It already exists, with staging's variables pointing at the staging Supabase project. |
 
 Carried over from the alpha plan, still true:
 
@@ -158,14 +161,7 @@ not a task of the cutover plan.
 
 ## 4. Decisions for Pablo
 
-D1 to D4 are answered and recorded in section 2.
-
-| ID | Decision | Options | Recommendation |
-| --- | --- | --- | --- |
-| D5 | Does staging's default database get the catalog through the same replace import as production | (a) Yes, first, as the rehearsal of the production load. (b) No, staging keeps the catalog rows it has. | **(a).** It is the only full test of the import and the Parquet copy before production, and staging then shows the catalog users will see. |
-| D6 | When the demo domain, the Vercel `demo` environment, and the `demo-measles` Supabase branch are deleted | (a) Seven days after the production smoke test passes and the catalog dump is archived. (b) Right after the production catalog load. (c) After the retroactive reviews finish. | **(a).** A week keeps a working reference for comparison while the release settles, without paying for the branch for months. |
-| D7 | Creating the public review issues, label, and board | (a) Create the label, template, and board with the promotion PR, then open issues in risk-ordered batches, security first. (b) Open all 139 at once. (c) Hold everything until after the release. | **(a).** The policy is public from day one, and the tracker is not flooded with 139 issues before anyone can work them. It is outward-facing, so nothing is created without this approval. |
-| E1 | How CI addresses the staging site in Vercel, now that the Git integration goes away (D2) | (a) Deploy a preview build and point `staging.avandarlabs.com` at it with `vercel alias`, from CI. (b) A custom Vercel environment named `staging`, created once in the console, the shape the demo deploy used. | **(a).** It needs no console setup, which is what D2 asks for. It has not run in this repository yet, so the first staging deploy proves it before production. Option (b) can hit the Vercel plan's limit on custom environments while `demo` still exists. |
+None open. D1 to D7 and E1 are answered and recorded in section 2.
 
 ## 5. Rules that hold
 
@@ -285,8 +281,12 @@ a later cleanup, not something to do right before a release.
 One consequence: Vercel stops building a preview for every pull request
 branch. A CI preview job can be added later.
 
-How CI addresses the staging site in Vercel, once nothing is tied to a Git
-branch, is decision E1.
+Staging deploys to the Vercel environment named `staging`, which already
+exists with staging's variables (E1). Production deploys to Vercel's
+production target. The three values the build takes from GitHub
+(`VITE_SUPABASE_API_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_APP_URL`) are
+dropped from what Vercel returns, on staging as on production, so one source
+decides which database a build points at.
 
 What Pablo adds, once:
 
@@ -352,7 +352,7 @@ replace breaks no other user's data. The import backs the old rows up first.
 | C | Agent | CI deploys for staging and production: `production.yaml`, `staging.yaml`, `vercel.json`, `pr-develop.yaml`. |
 | D | Agent | Refresh the migration audit, read-only, for production and staging. |
 | E | Agent | The cutover runbook for Pablo, and the catalog export dry run. |
-| F | Agent | Retroactive review scaffolding: policy document, issue template, generated issue drafts, the promotion PR description. Nothing is published. |
+| F | Agent | Retroactive review scaffolding: policy document, issue template, the script that drafts the issues, the publishing prompt for the runbook, the promotion PR description. Nothing is published. |
 | G | Pablo | The cutover, from the runbook. |
 
 Stage G in order:
@@ -370,8 +370,9 @@ Stage G in order:
    secrets, deploys functions, and deploys the app.
 7. Load the catalog into production. Smoke test.
 8. Disconnect the Git integration in Vercel.
-9. Publish the review scaffolding (D7). Start the privacy fix (AVA-611).
-   Clean up (D6).
+9. Start the privacy fix (AVA-611). When Pablo is ready, he pastes the
+   runbook's prompt into a new agent session, which publishes the review
+   backlog (D7). Clean up seven days after the smoke test (D6).
 
 **Rollback.** Before step 6 production is untouched: stop. After step 6,
 restore the database backup, redeploy `main`'s previous functions, and
@@ -387,6 +388,11 @@ that already landed, and history is never rewritten.
   It stops being a porting list and becomes the review backlog.
 - **One public issue per feature**, from a `retro-review` template and label,
   on a public board: not reviewed, in review, findings open, reviewed.
+- **All 139 issues are opened together, on Pablo's approval** (D7). No agent
+  creates a label, a board, or an issue as part of the cutover. The runbook
+  holds a prompt that Pablo pastes into a new agent session when he is ready.
+  The issue template and the policy document are repository files, so they
+  arrive with the promotion PR.
 - **Findings cite permalinks** at a pinned commit.
 - **Fixes are normal PRs into `develop`.** Database fixes are new migrations.
 - **Order by risk:** RLS and the 33 functions `anon` can execute, then

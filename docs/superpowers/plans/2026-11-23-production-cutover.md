@@ -12,7 +12,7 @@
 
 **Answered by Pablo on 2026-11-23:** D1 keep plugins. D2 CI deploys staging and production, and Vercel's Git integration is removed. D3 a PR, then an admin fast-forward. D4 release with the privacy gap.
 
-**Still open, written for the recommendation:** D5 (a) staging gets the replace import, D6 (a) delete demo resources after seven days, D7 (a) publish review scaffolding and open issues in batches, E1 (a) staging is a preview deploy that CI points the domain at. A different answer to E1 changes Task 16 Step 2 only. The others change only the runbook (Task 19) and Task 20.
+**Also answered on 2026-11-23:** D5 staging gets the replace import first. D6 demo resources are deleted seven days after the smoke test. D7 all 139 review issues are opened together, only on Pablo's approval, by a new agent from a prompt in the runbook. E1 staging deploys to the existing Vercel environment named `staging`. No decision is open.
 
 ---
 
@@ -1076,32 +1076,21 @@ Staging gets the same job as production (D2). Task 15 comes first: its `deploy` 
 | `$RUNNER_TEMP/production-functions.env` | `$RUNNER_TEMP/staging-functions.env` |
 | The three Vercel steps | Step 2 |
 
-- [ ] **Step 2: The Vercel steps for staging (E1, option a)**
+- [ ] **Step 2: The Vercel steps for staging (E1)**
 
-Staging is not Vercel's production target. Read the CLI documentation for `pull`, `build`, `deploy`, and `alias` at version 64.7.0 before writing these (https://vercel.com/docs/cli), and follow it where it differs from the lines below.
+Staging deploys to the Vercel environment named `staging`. Pablo confirmed it exists, with staging's variables. Keep production's three steps and their order (pull, build before the migrations, deploy last), and change only how each command names its target. The `demo` deploy already targeted a named environment with this CLI version, so take the flags from it, not from memory:
 
-- Pull: `vercel pull --yes --environment=preview --git-branch=develop --token="$VERCEL_TOKEN"`. The file is `.vercel/.env.preview.local`. Keep both `sed` cleanups from the production step.
-- Build: `vercel build --token="$VERCEL_TOKEN"`, with no `--prod`.
-- Deploy, then point the domain at the deployment:
-
-```yaml
-      - name: Deploy the prebuilt web app to Vercel
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-        run: |
-          deployment_url="$(npx --yes "vercel@$VERCEL_CLI_VERSION" deploy --prebuilt \
-            --token="$VERCEL_TOKEN")"
-          if [[ ! "$deployment_url" =~ ^https://[a-z0-9.-]+\.vercel\.app$ ]]; then
-            echo "vercel deploy did not print a deployment URL." >&2
-            exit 1
-          fi
-          npx --yes "vercel@$VERCEL_CLI_VERSION" alias set "$deployment_url" \
-            "${STAGING_APP_URL#https://}" --token="$VERCEL_TOKEN"
+```bash
+git show origin/develop:.github/workflows/demo.yaml | grep -nE "vercel@|--environment|env_file="
 ```
 
-If E1 is answered (b), use the three Vercel steps of `git show origin/develop:.github/workflows/demo.yaml` instead, with `VERCEL_ENVIRONMENT: staging`.
+| Step | In `production.yaml` | In `staging.yaml` |
+| --- | --- | --- |
+| Pull | `pull --yes --environment=production` and `.vercel/.env.production.local` | `pull --yes --environment=staging` and `.vercel/.env.staging.local` |
+| Build | `build --prod` | `build --environment=staging`, the flag `demo.yaml` passes to `build` |
+| Deploy | `deploy --prebuilt --prod` | `deploy --prebuilt --environment=staging`, the flag `demo.yaml` passes to `deploy` |
+
+Keep both `sed` cleanups in the pull step. The first one deletes `VITE_SUPABASE_API_URL`, `VITE_SUPABASE_ANON_KEY`, and `VITE_APP_URL` from what Vercel returns, so the build takes them from GitHub, as on production. Do not copy `demo.yaml`'s check that fails when those three are set in Vercel: the `staging` environment has them on purpose.
 
 - [ ] **Step 3: `pr-develop.yaml`**
 
@@ -1305,7 +1294,7 @@ Written from what Tasks 1 to 18 built. Every step Pablo runs has an exact comman
 | 4 | Rehearsal: dump production, restore into a switched stack at production's version, apply the 79 migrations, open old dashboards, pass criteria | Old 2, minus 2.7 |
 | 5 | GitHub setup: the `production` environment's names from Task 15 Step 6 and the `staging` environment's from Task 16 Step 6, `AVA_PIPELINE_SERVER_URL` as a secret in both, the `FEATUREBASE_JWT_SECRET` decision for staging, the value rules, the name check, a required reviewer on `production` | Old 3.2 to 3.5 |
 | 6 | Third parties: production API keys, Google OAuth redirect URI, Polar, pipeline server, no Supabase Git integration on production | Old 5.1 to 5.5 |
-| 7 | Vercel before the cutover, values and click paths only: review the Production and Preview `VITE_*` values including `VITE_AVA_DATA_AGENT`, delete every deploy hook, and note what `staging.avandarlabs.com` is assigned to today | Old 4.4, 4.5 |
+| 7 | Vercel before the cutover, values and click paths only: confirm `staging.avandarlabs.com` is attached to the environment named `staging`, review the `VITE_*` values of Production and of `staging` including `VITE_AVA_DATA_AGENT`, and delete every deploy hook | Old 4.4, 4.5 |
 | 8 | Promote to `develop` (D3): push `chore/production-cutover` to `demo/measles`, open the PR with the title `feat: promote the measles demo to develop` and the body from `promotion-pr-description.md`, wait for `pr-develop.yaml`, then `git push origin <sha>:refs/heads/develop` as a fast-forward. What to expect: the PR shows merged, Vercel builds nothing by itself, `staging.yaml` deploys staging step by step, and `release-packages.yaml` opens a version PR that publishes nothing until merged | New |
 | 9 | Staging: confirm the 10 migrations applied and the domain serves the new build, load the catalog with `--replace-existing` and copy the Parquet objects, staging checks | Old 6.11, retargeted |
 | 10 | Back up production, verify the dump restores, choose the rollback basis | Old 5.8, 6.6 |
@@ -1314,7 +1303,7 @@ Written from what Tasks 1 to 18 built. Every step Pablo runs has an exact comman
 | 13 | Smoke test: sign in with an existing account, open an old dashboard, browse the catalog, run a query, install the epidemiology plugin in a test workspace, check Cmd+K shows `0.15.0` | Old 6.9 |
 | 14 | Rollback: decide, restore the database, redeploy `main`'s previous functions, promote the previous Vercel deployment | Old 7 |
 | 15 | Remove the Vercel Git integration, after both CI deploys were green: Project `avandar` > **Settings** > **Git** > **Connected Git Repository** > **Disconnect**. What stops (a preview for every branch), how to confirm nothing builds on the next push, and how to reconnect | New |
-| 16 | Publish the review scaffolding (D7), and start the privacy fix (AVA-611) | Task 20 |
+| 16 | Start the privacy fix (AVA-611). Then "Publish the review backlog" (D7): a prompt Pablo pastes into a new agent session when he is ready. Task 20 Step 8 writes this section | Task 20 |
 | 17 | Cleanup (D6), seven days later: archive the dump, delete `demo.avandarlabs.com` and the `demo` environment, delete the `demo-measles` Supabase branch, delete `demo/measles` and `chore/production-cutover`, retarget feature branches | Old 8 |
 | 18 | Known gaps | Old 9 |
 
@@ -1344,7 +1333,7 @@ git commit -m "docs(cutover): add the production cutover runbook"
 
 ### Task 20: Review scaffolding
 
-**Risk class:** ordinary. Nothing here is published. Creating the label, the board, and the issues is a runbook step that needs D7.
+**Risk class:** ordinary. Nothing here is published. The labels, the board, and the 139 issues are created later by a new agent, only when Pablo pastes the runbook's prompt (D7).
 
 **Files:**
 - Create: `docs/reviews/README.md`
@@ -1353,6 +1342,7 @@ git commit -m "docs(cutover): add the production cutover runbook"
 - Test: `scripts/reviews/buildRetroReviewIssues/buildRetroReviewIssues.test.ts`
 - Create: `docs/measles-demo/promotion-pr-description.md`
 - Modify: the introductions of `docs/measles-demo/pr-feature-log.md` and `docs/measles-demo/bug-log.md`
+- Modify: `docs/measles-demo/production-cutover-runbook.md` (section 16)
 
 - [ ] **Step 1: Write the failing test**
 
@@ -1553,7 +1543,55 @@ Expected: PASS, then 140: one file per feature row (139) plus `order.md`. Read f
 
 `pr-feature-log.md`: the first paragraph after the warning says the log is now the review backlog, not a porting list, and links `docs/reviews/README.md`. `bug-log.md`: one line at the top says every fix it lists reaches `develop` with the promotion, so its rows need no separate PR.
 
-- [ ] **Step 8: Commit**
+- [ ] **Step 8: Put the publishing prompt in the runbook**
+
+In `docs/measles-demo/production-cutover-runbook.md`, section 16 gets the heading "Publish the review backlog", one sentence saying that nothing in it runs until Pablo pastes the prompt into a new agent session, and this prompt in a fenced block, verbatim:
+
+```text
+You are publishing the retroactive review backlog for the public repository
+AvandarLabs/avandar. Pablo has approved creating public labels, a public
+project board, and 139 public issues. Create nothing else.
+
+1. Read docs/reviews/README.md and section 12 of
+   docs/measles-demo/production-cutover-plan.md.
+2. Confirm the promotion has landed:
+   git fetch origin && git merge-base --is-ancestor origin/demo/measles origin/develop
+   If that fails, stop and tell Pablo.
+3. Work from origin/develop in a new worktree. Pin the commit:
+   PIN="$(git rev-parse origin/develop)"
+4. Generate the drafts:
+   pnpm vite-script scripts/reviews/buildRetroReviewIssues/buildRetroReviewIssues.ts \
+     --sha "$PIN" --out .temp/retro-review-issues
+   Expect 139 JSON files and order.md.
+5. Show Pablo order.md and three drafts, one from each tier. Wait for him to
+   say go in this session before creating anything on GitHub.
+6. Create the labels that do not exist yet: retro-review,
+   retro-review:security, retro-review:data, retro-review:ui.
+7. Create a public project board named "Retroactive review" under
+   AvandarLabs, with a Status field holding: Not reviewed, In review,
+   Findings open, Reviewed. If gh lacks the project scope, ask Pablo to run
+   gh auth refresh -s project. If the CLI cannot set the Status options,
+   give Pablo the click path and wait.
+8. Create the issues in order.md's order, one gh issue create per draft,
+   with the draft's title, body, and labels. Add each to the board as
+   "Not reviewed". Before creating one, search for an open or closed issue
+   whose title starts with "Retro review F<n>:" and skip it if found, so a
+   second run is safe. Pause one second between issues.
+9. Report the number created, the number skipped, the board's URL, and every
+   failure with its output. Do not edit code, do not close or change any
+   other issue, and do not push.
+```
+
+Then refresh the Downloads copy:
+
+```bash
+D="$(jpsyx config get downloads_dir)/avandar_production-cutover/production-cutover"
+cp docs/measles-demo/production-cutover-runbook.md "$D/"
+trash "$D/production-cutover-runbook.pdf"
+markdown-to-pdf "$D/production-cutover-runbook.md" --out "$D/production-cutover-runbook.pdf" --compact
+```
+
+- [ ] **Step 9: Commit**
 
 ```bash
 git add docs/reviews .github/ISSUE_TEMPLATE scripts/reviews docs/measles-demo
