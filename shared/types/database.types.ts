@@ -3569,6 +3569,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      rpc_workspaces__is_slug_available: {
+        Args: { p_workspace_slug: string }
+        Returns: boolean
+      }
       rpc_workspaces__private_resource_counts: {
         Args: { p_workspace_id: string }
         Returns: {
