@@ -1,22 +1,49 @@
-import { ramp, EASE } from "../../../motion";
 import { interpolateFiniteRange } from "../../numeric/interpolateFiniteRange/interpolateFiniteRange";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { BatteryCasing } from "./BatteryCasing/BatteryCasing";
+import { BatteryLossChannels } from "./BatteryLossChannels/BatteryLossChannels";
+import { BatteryStorageFill } from "./BatteryStorageFill/BatteryStorageFill";
+import { BatteryTerminal } from "./BatteryTerminal/BatteryTerminal";
+import { BatteryVesselChargePath } from "./BatteryVesselChargePath/BatteryVesselChargePath";
+import { BatteryVesselDeliveryPath } from "./BatteryVesselDeliveryPath/BatteryVesselDeliveryPath";
 import type { Input } from "./BatteryDispatchBalance.schema";
 import type { ReactNode } from "react";
+
+type BatteryChargeState = {
+  charge: number;
+  dispatch: number;
+  cycle: Input["cycle"];
+  x: number;
+  y: number;
+  fillHeight: number;
+  paths: BatteryPaths;
+};
+type BatteryPaths = {
+  charge: string;
+  delivery: string;
+  chargeLoss: string;
+  dischargeLoss: string;
+};
+
 /** Inputs for BatteryVessel. */
 type Props = { frame: number; accent: string; input: Input };
+const DRAW_ON_LENGTH = 1;
+const CHANNEL_WIDTH = 8;
+const LOSS_CHANNEL_WIDTH = 5;
 
-/**
- * Charge and dispatch paths have distinct boundaries and separately timed
- * losses.
- */
-export function BatteryVessel({
+type GetBatteryChargeStateOptions = {
+  frame: number;
+  input: Input;
+  motion: ReturnType<typeof GraphicThemeHooks.useGraphicMotion>;
+};
+/** Samples the authored battery charge state. */
+function _getBatteryChargeState({
   frame,
-  accent,
   input,
-}: Readonly<Props>): ReactNode {
-  const charge = ramp(frame, 36, 30, EASE.inOut),
-    dispatch = ramp(frame, 80, 28, EASE.inOut);
+  motion,
+}: Readonly<GetBatteryChargeStateOptions>): BatteryChargeState {
+  const charge = motion.ramp(frame, 36, motion.scale(30), motion.travel.easing),
+    dispatch = motion.ramp(frame, 80, motion.scale(28), motion.travel.easing);
   const { battery, cycle } = input;
   const peak =
     battery.initialStoredKwh + cycle.chargeInputKwh - cycle.chargeLossKwh;
@@ -32,7 +59,15 @@ export function BatteryVessel({
     x = vertical ? 320 : 398,
     y = vertical ? 195 : 220;
   const fillHeight = 150 * (stored / battery.capacityKwh);
-  const paths = vertical
+  const paths = _createBatteryPathsFromOrientation({ vertical });
+  return { charge, dispatch, cycle, x, y, fillHeight, paths };
+}
+
+/** Builds the charge, delivery and loss routes for the selected orientation. */
+function _createBatteryPathsFromOrientation({
+  vertical,
+}: Readonly<CreateBatteryPathsFromOrientationOptions>): BatteryPaths {
+  return vertical
     ? {
         charge: "M 400 165 V 195",
         delivery: "M 400 365 V 400",
@@ -45,81 +80,62 @@ export function BatteryVessel({
         chargeLoss: "M 310 290 Q 340 290 340 345 H 280",
         dischargeLoss: "M 650 290 Q 620 290 620 345 H 680",
       };
+}
+
+/**
+ * Charge and dispatch paths have distinct boundaries and separately timed
+ * losses.
+ */
+export function BatteryVessel({
+  frame,
+  accent,
+  input,
+}: Readonly<Props>): ReactNode {
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const { charge, dispatch, cycle, x, y, fillHeight, paths } =
+    _getBatteryChargeState({ frame, input, motion });
   return (
     <g>
-      <rect x={x + 58} y={y - 8} width={48} height={8} fill={STOCK.line} />
-      <rect
-        x={x}
-        y={y}
-        width={164}
-        height={170}
-        rx={12}
-        fill={STOCK.surface}
-        stroke={STOCK.muted}
-        strokeWidth={2}
+      <BatteryTerminal {...{ x, y, tokens }} />
+      <BatteryCasing {...{ x, y, scales, tokens }} />
+      <BatteryStorageFill {...{ x, y, fillHeight, accent, atomic }} />
+      <BatteryVesselChargePath
+        paths={paths}
+        tokens={tokens}
+        drawOnLength={DRAW_ON_LENGTH}
+        {...{ charge, accent, scales, cycle }}
+        channelWidth={CHANNEL_WIDTH}
+        atomic={atomic}
       />
-      <rect
-        data-battery-fill="true"
-        x={x + 10}
-        y={y + 160 - fillHeight}
-        width={144}
-        height={fillHeight}
-        fill={accent}
-        fillOpacity={0.65}
+      <BatteryVesselDeliveryPath
+        paths={paths}
+        tokens={tokens}
+        drawOnLength={DRAW_ON_LENGTH}
+        {...{ dispatch, scales, cycle }}
+        channelWidth={CHANNEL_WIDTH}
+        atomic={atomic}
       />
-      <path
-        data-charge-path="true"
-        d={paths.charge}
-        pathLength={1}
-        strokeDasharray={1}
-        strokeDashoffset={1 - charge}
-        stroke={accent}
-        strokeWidth={cycle.chargeInputKwh ? 8 : 1}
-        opacity={cycle.chargeInputKwh ? 1 : 0.2}
-        fill="none"
+      <BatteryLossChannels
+        {...{ input, paths, charge, cycle, dispatch, tokens }}
+        drawOnLength={DRAW_ON_LENGTH}
+        scales={scales}
+        lossChannelWidth={LOSS_CHANNEL_WIDTH}
       />
-      <path
-        data-delivery-path="true"
-        d={paths.delivery}
-        pathLength={1}
-        strokeDasharray={1}
-        strokeDashoffset={1 - dispatch}
-        stroke={STOCK.cyan}
-        strokeWidth={cycle.deliveredKwh ? 8 : 1}
-        opacity={cycle.deliveredKwh ? 1 : 0.2}
-        fill="none"
-      />
-      {input.showLossChannels ? (
-        <g>
-          {[
-            {
-              key: "charge",
-              path: paths.chargeLoss,
-              progress: charge,
-              value: cycle.chargeLossKwh,
-            },
-            {
-              key: "discharge",
-              path: paths.dischargeLoss,
-              progress: dispatch,
-              value: cycle.dischargeLossKwh,
-            },
-          ].map(({ key, path, progress, value }) => (
-            <path
-              key={key}
-              data-loss-channel={key}
-              d={path}
-              pathLength={1}
-              strokeDasharray={1}
-              strokeDashoffset={1 - progress}
-              stroke={STOCK.orange}
-              strokeWidth={5}
-              opacity={value ? 1 : 0}
-              fill="none"
-            />
-          ))}
-        </g>
-      ) : undefined}
     </g>
   );
 }
+
+/** The type of `DRAW_ON_LENGTH` used by BatteryVessel. */
+export type BatteryVesselDrawOnLengthValue = typeof DRAW_ON_LENGTH;
+
+/** The type of `CHANNEL_WIDTH` used by BatteryVessel. */
+export type BatteryVesselChannelWidthValue = typeof CHANNEL_WIDTH;
+/** The type of `LOSS_CHANNEL_WIDTH` used by BatteryVessel. */
+export type BatteryVesselLossChannelWidthValue = typeof LOSS_CHANNEL_WIDTH;
+
+type CreateBatteryPathsFromOrientationOptions = {
+  vertical: boolean;
+};

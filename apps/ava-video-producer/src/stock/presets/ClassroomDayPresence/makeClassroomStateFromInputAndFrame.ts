@@ -1,5 +1,5 @@
 import { propEq } from "@avandar/utils";
-import { ramp } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./ClassroomDayPresence.schema";
 /** Data for makeClassroomStateFromInputAndFrame. */
 type CreateClassroomStateResult = {
@@ -29,11 +29,16 @@ type CreateClassroomStateResult = {
 export function makeClassroomStateFromInputAndFrame({
   frame,
   input,
-}: Readonly<{ frame: number; input: Input }>): CreateClassroomStateResult {
+  motion,
+}: Readonly<{
+  frame: number;
+  input: Input;
+  motion: VideoMotion;
+}>): CreateClassroomStateResult {
   const activeIndex =
     input.days.length === 3 && frame >= 98 ? 2 : frame >= 52 ? 1 : 0;
   const transition = activeIndex
-    ? ramp(frame, activeIndex === 1 ? 52 : 98, 12)
+    ? motion.reveal(frame, activeIndex === 1 ? 52 : 98)
     : 1;
   const previous = input.days[Math.max(0, activeIndex - 1)],
     day = input.days[activeIndex];

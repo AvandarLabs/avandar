@@ -9,8 +9,16 @@ const APP_SHELL_ASIDE_TRANSITION_FALLBACK_MS =
 type Options = {
   isOpen: boolean;
   panelRef: RefObject<HTMLElement | null>;
-  composerInputRef: RefObject<HTMLTextAreaElement | null>;
+  /** The textarea, or a rich text editor's editing area. */
+  composerInputRef: RefObject<HTMLElement | null>;
 };
+
+/** Whether the composer takes no input: a disabled field or locked editor. */
+function _isInputOff(input: HTMLElement): boolean {
+  return input instanceof HTMLTextAreaElement
+    ? input.disabled
+    : input.getAttribute("contenteditable") === "false";
+}
 
 function _focusComposer(
   parameters: Readonly<{
@@ -22,7 +30,7 @@ function _focusComposer(
   const { panelRef, composerInputRef, hasAutoFocusedThisOpenRef } = parameters;
   const panel = panelRef.current;
   const input = composerInputRef.current;
-  if (!panel || !input || input.disabled) {
+  if (!panel || !input || _isInputOff(input)) {
     hasAutoFocusedThisOpenRef.current = true;
     return;
   }

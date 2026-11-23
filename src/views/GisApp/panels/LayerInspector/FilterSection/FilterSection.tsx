@@ -2,13 +2,17 @@ import { useLingui } from "@lingui/react/macro";
 import { QueryFiltersField } from "@/views/DataExplorerApp/QueryForm/QueryFiltersField/QueryFiltersField";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
 import { ApplyAoiFilterSwitch } from "@/views/GisApp/panels/LayerInspector/FilterSection/ApplyAoiFilterSwitch";
+import { SpatialFilterSelect } from "@/views/GisApp/panels/LayerInspector/FilterSection/SpatialFilterSelect";
 import { InspectorSection } from "@/views/GisApp/panels/LayerInspector/InspectorSection/InspectorSection";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { ReactNode } from "react";
 
+const EMPTY_LAYERS: readonly MapLayer.T[] = [];
+
 type Props = {
   layer: MapLayer.T;
+  layers?: readonly MapLayer.T[];
   onLayerChange: LayerChangeHandler;
   focusRequest?: number;
   showApplyAoiFilterSwitch?: boolean;
@@ -17,6 +21,7 @@ type Props = {
 /** Renders the source filter tree and its top-level rule count. */
 export function FilterSection({
   layer,
+  layers = EMPTY_LAYERS,
   onLayerChange,
   focusRequest,
   showApplyAoiFilterSwitch = true,
@@ -39,7 +44,14 @@ export function FilterSection({
       }
     >
       {showSwitch ? (
-        <ApplyAoiFilterSwitch layer={layer} onLayerChange={onLayerChange} />
+        <>
+          <ApplyAoiFilterSwitch layer={layer} onLayerChange={onLayerChange} />
+          <SpatialFilterSelect
+            layer={layer}
+            layers={layers}
+            onLayerChange={onLayerChange}
+          />
+        </>
       ) : null}
       <QueryFiltersField
         columns={layer.source.sourceColumns ?? []}

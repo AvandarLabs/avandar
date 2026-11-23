@@ -1,4 +1,4 @@
-import { Text } from "../../graphics-common";
+import { Text } from "../../graphics-common/Text";
 import type { ReactNode } from "react";
 
 type Props = { x: number; index: number };
@@ -6,13 +6,13 @@ type Props = { x: number; index: number };
 export function RegistrationAxes({ x, index }: Readonly<Props>): ReactNode {
   return (
     <g>
-      <Text x={x - 20} y={185} size={12} anchor="end">
+      <Text x={x - 20} y={185} role="data" anchor="end">
         0
       </Text>
-      <Text x={x - 20} y={425} size={12} anchor="end">
+      <Text x={x - 20} y={425} role="data" anchor="end">
         100
       </Text>
-      <Text x={x - 20} y={167} size={12} anchor="end">
+      <Text x={x - 20} y={167} role="data" anchor="end">
         {index ? "◇" : "○"}
       </Text>
     </g>

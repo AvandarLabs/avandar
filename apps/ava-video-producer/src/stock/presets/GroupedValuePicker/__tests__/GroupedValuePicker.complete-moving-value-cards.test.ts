@@ -25,34 +25,36 @@ test("complete moving value cards stay disjoint through crossed mode assignments
       { id: "f", value: null },
     ],
   };
-  Array.from({ length: 145 }, (_, index) => 56 + index / 4).forEach((frame) => {
+  Array.from({ length: 145 }, (_, index) => {
+    return 56 + index / 4;
+  }).forEach((frame) => {
     const cards = [
       ..._render({ frame: frame, input: input }).matchAll(
         /<rect data-picker-copy-body="[^"]*"([^>]*)>/g,
       ),
-    ].map(([, attributes]) => ({
-      x: SvgAttributes.getNumberFromMarkup({ attributes, name: "x" }),
-      y: SvgAttributes.getNumberFromMarkup({ attributes, name: "y" }),
-      width: SvgAttributes.getNumberFromMarkup({ attributes, name: "width" }),
-      height: SvgAttributes.getNumberFromMarkup({
-        attributes: attributes,
-        name: "height",
-      }),
-    }));
+    ].map(([, attributes]) => {
+      return {
+        x: SvgAttributes.getNumberFromMarkup({ attributes, name: "x" }),
+        y: SvgAttributes.getNumberFromMarkup({ attributes, name: "y" }),
+        width: SvgAttributes.getNumberFromMarkup({ attributes, name: "width" }),
+        height: SvgAttributes.getNumberFromMarkup({
+          attributes: attributes,
+          name: "height",
+        }),
+      };
+    });
     assert.equal(cards.length, 6);
-    cards.forEach((first, index) =>
-      cards
-        .slice(index + 1)
-        .forEach((second) =>
-          assert.ok(
-            first.x + first.width <= second.x ||
-              second.x + second.width <= first.x ||
-              first.y + first.height <= second.y ||
-              second.y + second.height <= first.y,
-            `Value cards overlap at ${frame}.`,
-          ),
-        ),
-    );
+    cards.forEach((first, index) => {
+      return cards.slice(index + 1).forEach((second) => {
+        return assert.ok(
+          first.x + first.width <= second.x ||
+            second.x + second.width <= first.x ||
+            first.y + first.height <= second.y ||
+            second.y + second.height <= first.y,
+          `Value cards overlap at ${frame}.`,
+        );
+      });
+    });
   });
 });
 
@@ -101,14 +103,18 @@ test("all six-distinct numeric and included-null permutations preserve full-card
 test("concentrated long numeric values and five included nulls fit their complete stack bays", () => {
   const longValue = 0.0000010000000000000002;
   [
-    Array.from({ length: 6 }, (_, index) => ({
-      id: String(index),
-      value: longValue,
-    })),
-    Array.from({ length: 6 }, (_, index) => ({
-      id: String(index),
-      value: index === 0 ? 0 : null,
-    })),
+    Array.from({ length: 6 }, (_, index) => {
+      return {
+        id: String(index),
+        value: longValue,
+      };
+    }),
+    Array.from({ length: 6 }, (_, index) => {
+      return {
+        id: String(index),
+        value: index === 0 ? 0 : null,
+      };
+    }),
   ].forEach((observations) => {
     const input: Input = {
       ...DEFAULT_INPUT,
@@ -118,19 +124,21 @@ test("concentrated long numeric values and five included nulls fit their complet
     const markup = _render({ frame: 96, input: input });
     SvgPaintAssertions.assertTextCanvasBounds({ markup });
     const bays = [...markup.matchAll(/<rect data-mode-bay="[^"]*"([^>]*)>/g)];
-    bays.forEach(([, attributes]) =>
-      assert.ok(
+    bays.forEach(([, attributes]) => {
+      return assert.ok(
         SvgAttributes.getNumberFromMarkup({ attributes, name: "y" }) +
           SvgAttributes.getNumberFromMarkup({ attributes, name: "height" }) <=
           600,
-      ),
-    );
+      );
+    });
     observations.forEach(({ id, value }) => {
       const copy = _getMovingCopy({ markup, id });
       const drawnValue = [
         ...copy.body.matchAll(/<tspan[^>]*>([^<]*)<\/tspan>/g),
       ]
-        .map(([, text]) => text)
+        .map(([, text]) => {
+          return text;
+        })
         .join("");
       assert.equal(drawnValue, value === null ? "∅" : String(value));
     });

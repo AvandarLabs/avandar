@@ -1,6 +1,5 @@
 import { SupabaseLocalEnvironment } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment";
 import {
-  CONFIG_PATH,
   EDGE_ENV_PATH,
   ENV_PATH,
   ORIGINAL_ENV,
@@ -59,7 +58,7 @@ describe("SupabaseLocalEnvironment.restore (manifest validation)", () => {
     expect(fake.operations).toEqual([]);
   });
 
-  it("refuses a manifest project id that differs from the active config", async () => {
+  it("refuses a manifest project id that differs from the active project", async () => {
     const fake = createFakeIo();
     seedActiveBackup(fake);
     writeFakeManifest(fake)({
@@ -68,39 +67,7 @@ describe("SupabaseLocalEnvironment.restore (manifest validation)", () => {
     });
 
     await expect(SupabaseLocalEnvironment.restore(fake.io)).rejects.toThrow(
-      "does not match the active Supabase config",
-    );
-    expect(fake.commands).toEqual([]);
-    expect(fake.operations).toEqual([]);
-  });
-
-  it("refuses a manifest that omits the config backup", async () => {
-    const fake = createFakeIo();
-    seedActiveBackup(fake);
-    const manifest = readFakeManifest(fake);
-    writeFakeManifest(fake)({
-      ...manifest,
-      files: manifest.files.filter(propNotEq("sourcePath", CONFIG_PATH)),
-    });
-
-    await expect(SupabaseLocalEnvironment.restore(fake.io)).rejects.toThrow(
-      "complete deterministic file set",
-    );
-    expect(fake.commands).toEqual([]);
-  });
-
-  it("refuses paired deletion of the config manifest row and backup", async () => {
-    const fake = createFakeIo();
-    seedActiveBackup(fake);
-    const manifest = readFakeManifest(fake);
-    writeFakeManifest(fake)({
-      ...manifest,
-      files: manifest.files.filter(propNotEq("sourcePath", CONFIG_PATH)),
-    });
-    fake.files.delete(makeBackupPath(CONFIG_PATH));
-
-    await expect(SupabaseLocalEnvironment.restore(fake.io)).rejects.toThrow(
-      "must include the config backup",
+      "does not match the active Supabase project",
     );
     expect(fake.commands).toEqual([]);
     expect(fake.operations).toEqual([]);

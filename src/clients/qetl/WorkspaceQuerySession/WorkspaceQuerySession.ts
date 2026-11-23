@@ -18,6 +18,7 @@ import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { UserId } from "$/models/User/User.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
+import type { ConceptSpineRestriction } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
 import type { IQueryMediator } from "@/clients/qetl/QueryMediator/QueryMediator";
 import type { NeededColumnsByDatasetId } from "@/clients/qetl/QueryMediator/QueryMediator.types";
 import type { Module } from "@avandar/modules";
@@ -35,6 +36,7 @@ export type IWorkspaceQetlClient = Module<
           returnType?: "js";
           signal?: AbortSignal;
           neededColumnsByDatasetId?: NeededColumnsByDatasetId;
+          conceptSpineRestrictions?: readonly ConceptSpineRestriction[];
         }>,
       ): Promise<QueryResult.T<RowObject>>;
       (
@@ -44,6 +46,7 @@ export type IWorkspaceQetlClient = Module<
           returnType: "parquet";
           signal?: AbortSignal;
           neededColumnsByDatasetId?: NeededColumnsByDatasetId;
+          conceptSpineRestrictions?: readonly ConceptSpineRestriction[];
         }>,
       ): Promise<Blob>;
     };
@@ -117,39 +120,42 @@ function _createWorkspaceQetlClient(
   const getAllDatasetIds = async (): Promise<Dataset.Id[]> => {
     return await _getAllWorkspaceDatasetIds(options.workspaceId);
   };
-  return QueryMediatorFactory.create({
-    // The per-relation half of authorization. Membership is checked once per
-    // `runQuery` above; this checks what the statement actually named, and
-    // refuses rather than silently dropping a reference the workspace does not
-    // own.
-    getQueryDependencies: async (rawSql) => {
-      return await assertWorkspaceRelations({
-        workspaceId: options.workspaceId,
-        referencedDatasetIds:
-          DuckDbSqlAnalyzer.getReadDatasetIdsFromSql(rawSql),
-      });
-    },
-    planConceptRelations: async (rawSql) => {
-      return await getConceptRelationPlansFromSql({
-        rawSql,
-        allowlist: {
-          getAllowedConceptIds: async () => {
-            return await _getAllWorkspaceConceptIds(options.workspaceId);
+  return QueryMediatorFactory.create("QueryMediator", {
+    state: {
+      // The per-relation half of authorization. Membership is checked once per
+      // `runQuery` above; this checks what the statement actually named, and
+      // refuses rather than silently dropping a reference the workspace does
+      // not own.
+      getQueryDependencies: async (rawSql) => {
+        return await assertWorkspaceRelations({
+          workspaceId: options.workspaceId,
+          referencedDatasetIds:
+            DuckDbSqlAnalyzer.getReadDatasetIdsFromSql(rawSql),
+        });
+      },
+      planConceptRelations: async ({ rawSql, conceptSpineRestrictions }) => {
+        return await getConceptRelationPlansFromSql({
+          rawSql,
+          conceptSpineRestrictions,
+          allowlist: {
+            getAllowedConceptIds: async () => {
+              return await _getAllWorkspaceConceptIds(options.workspaceId);
+            },
+            getAllowedDatasetIds: getAllDatasetIds,
           },
-          getAllowedDatasetIds: getAllDatasetIds,
-        },
-      });
+        });
+      },
+      getDuckDbLeaseDatasetIds: getAllDatasetIds,
+      // The workspace tier, scoped to this workspace and this user. A public
+      // session holds `LocalPublicDatasetRelationCache` instead, so neither can
+      // reach the other's entries by construction rather than by a predicate.
+      relationCache: DexieRelationCache,
+      principalKey: makePrincipalKeyFromWorkspaceSession({
+        workspaceId: options.workspaceId,
+        userId: options.userId,
+      }),
+      prepareDuckDbDatasets: _prepareWorkspaceDatasets,
     },
-    getDuckDbLeaseDatasetIds: getAllDatasetIds,
-    // The workspace tier, scoped to this workspace and this user. A public
-    // session holds `LocalPublicDatasetRelationCache` instead, so neither can
-    // reach the other's entries by construction rather than by a predicate.
-    relationCache: DexieRelationCache,
-    principalKey: makePrincipalKeyFromWorkspaceSession({
-      workspaceId: options.workspaceId,
-      userId: options.userId,
-    }),
-    prepareDuckDbDatasets: _prepareWorkspaceDatasets,
   });
 }
 
@@ -183,12 +189,14 @@ export const WorkspaceQuerySession = createModule("WorkspaceQuerySession", {
         returnType = "js",
         signal,
         neededColumnsByDatasetId,
+        conceptSpineRestrictions,
       }: Readonly<{
         rawSql: string;
         workspaceId: Workspace.Id;
         returnType?: "js" | "parquet";
         signal?: AbortSignal;
         neededColumnsByDatasetId?: NeededColumnsByDatasetId;
+        conceptSpineRestrictions?: readonly ConceptSpineRestriction[];
       }>): Promise<QueryResult.T<RowObject> | Blob> => {
         // The assertion owns the session read and hands back the principal it
         // verified, so a query costs one session read rather than two. That
@@ -204,6 +212,7 @@ export const WorkspaceQuerySession = createModule("WorkspaceQuerySession", {
             returnType: "parquet",
             signal,
             neededColumnsByDatasetId,
+            conceptSpineRestrictions,
           });
         }
 
@@ -212,6 +221,7 @@ export const WorkspaceQuerySession = createModule("WorkspaceQuerySession", {
           returnType: "js",
           signal,
           neededColumnsByDatasetId,
+          conceptSpineRestrictions,
         });
       },
     };

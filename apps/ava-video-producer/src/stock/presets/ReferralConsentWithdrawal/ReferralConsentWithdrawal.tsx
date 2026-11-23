@@ -1,10 +1,11 @@
-import { STOCK, type GraphicProps } from "../../graphics-common";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ConsentDesk } from "./ConsentDesk";
 import { ConsentSlips } from "./ConsentSlips";
 import { PreparedContacts } from "./PreparedContacts";
 import { SharingHistory } from "./SharingHistory";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ReferralConsentWithdrawal.schema";
 import type { ReactNode } from "react";
 
@@ -17,6 +18,7 @@ export function ReferralConsentWithdrawal({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
       <LabelSlots
@@ -27,7 +29,12 @@ export function ReferralConsentWithdrawal({
         ]}
       />
       <PersonGlyph x={200} y={150} color={accent} />
-      <PersonGlyph x={760} y={150} role="worker" color={STOCK.cyan} />
+      <PersonGlyph
+        x={760}
+        y={150}
+        role="worker"
+        color={tokens.color.accentAlt}
+      />
       <ConsentDesk />
       <ConsentSlips frame={frame} input={input} accent={accent} />
       <PreparedContacts frame={frame} input={input} accent={accent} />

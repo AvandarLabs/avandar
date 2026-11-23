@@ -1,4 +1,8 @@
 #!/bin/sh
+if [ "${AVA_PRODUCER_ACTIVE_SCRIPT:-}" != "$0" ]; then
+  exec node "$(dirname "$0")/runProducerCommand/runShellCommand.mjs" "preview" "$0" "$@"
+fi
+exec 1>&2
 # Look at the picture before spending a full render on it.
 #
 #   sh scripts/preview.sh <composition-id> [body-frame ...]
@@ -9,7 +13,7 @@
 #
 # WHY THIS EXISTS, and why it is not the gate.
 #
-# check-frames.mjs measures two things per frame: how well the left half of a
+# checkFrames.ts measures two things per frame: how well the left half of a
 # frame matches its right half, and the frame's average luminance. That is all
 # it can see. A panel laid over the header, a phase that renders empty, a
 # counter cut off before it lands, a cursor pressing a number instead of the
@@ -27,7 +31,7 @@
 # the finished mp4 still gets watched.
 set -e
 cd "$(dirname "$0")/.."
-node scripts/require-license.mjs
+node --import tsx scripts/requireLicense.ts
 
 ID="${1:-demo}"
 shift 2>/dev/null || true

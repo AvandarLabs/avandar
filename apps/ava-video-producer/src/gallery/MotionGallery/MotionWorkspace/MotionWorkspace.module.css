@@ -1,0 +1,7 @@
+.motionWorkspaceWorkspace {
+  composes: workspace from global;
+}
+
+.motionWorkspaceLibraryMain {
+  composes: library-main from global;
+}

@@ -20,19 +20,21 @@ export function HandoverLabels({ input }: Readonly<Props>): ReactNode {
   ];
   return (
     <g>
-      {labels.map(([text, x, y, width, fontSize, maxLines], index) => (
-        <FitText
-          key={index}
-          text={text}
-          x={x}
-          y={y}
-          width={width}
-          fontSize={fontSize}
-          maxLines={maxLines}
-          normalizeWhitespace
-          breakLongWords
-        />
-      ))}
+      {labels.map(([text, x, y, width, fontSize, maxLines]) => {
+        return (
+          <FitText
+            key={`${x}:${y}`}
+            text={text}
+            x={x}
+            y={y}
+            width={width}
+            fontSize={fontSize}
+            maxLines={maxLines}
+            normalizeWhitespace
+            breakLongWords
+          />
+        );
+      })}
     </g>
   );
 }

@@ -11,6 +11,13 @@ type Props = {
   columns: readonly QueryResult.ColumnWithId[];
   data: UnknownDataFrame;
   vizConfig: AvaVizConfig.T;
+
+  /**
+   * The column the canvas splits the chart by, drawing one series per value.
+   * Undefined when the chart is drawn as configured.
+   */
+  splitColumnName: string | undefined;
+
   onVizConfigChange: (vizConfig: AvaVizConfig.T) => void;
 };
 
@@ -18,12 +25,15 @@ type Props = {
  * Body of the drawer's Visualizations tab. Renders the settings for the active
  * visualization type across columns, or an explanation when there is nothing
  * to configure. The type picker itself lives in the drawer rail, because
- * changing it replaces every control below.
+ * changing it replaces every control below. When the canvas splits the chart
+ * by a column, a note above the settings says so, since the series list
+ * still shows the one series the split came from.
  */
 export function VizTabPanel({
   columns,
   data,
   vizConfig,
+  splitColumnName,
   onVizConfigChange,
 }: Props): ReactNode {
   if (columns.length === 0) {
@@ -55,12 +65,22 @@ export function VizTabPanel({
   }
 
   return (
-    <VizSettingsFormBody
-      columns={columns}
-      data={data}
-      vizConfig={vizConfig}
-      onVizConfigChange={onVizConfigChange}
-      layout="columns"
-    />
+    <>
+      {splitColumnName === undefined ? null : (
+        <Text size="xs" c="neutral.6" className={css.splitNote}>
+          <Trans>
+            Drawn as one series per {splitColumnName}. Colors are set for you.
+            Adding a second series turns this off.
+          </Trans>
+        </Text>
+      )}
+      <VizSettingsFormBody
+        columns={columns}
+        data={data}
+        vizConfig={vizConfig}
+        onVizConfigChange={onVizConfigChange}
+        layout="columns"
+      />
+    </>
   );
 }

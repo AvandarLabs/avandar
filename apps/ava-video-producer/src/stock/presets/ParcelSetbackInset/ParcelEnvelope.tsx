@@ -1,4 +1,5 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { makeParcelEnvelopeGeometryFromParcel } from "./makeParcelEnvelopeGeometryFromParcel";
 import { ParcelDimensions } from "./ParcelDimensions";
 import { ParcelShapes } from "./ParcelShapes";
@@ -27,6 +28,7 @@ export function ParcelEnvelope({
   hatchId,
   showDimensions,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const geometry = makeParcelEnvelopeGeometryFromParcel({
     parcel,
     setback,
@@ -40,11 +42,15 @@ export function ParcelEnvelope({
         accent={accent}
         hatchId={hatchId}
       />
-      <path
-        d={`M${geometry.original.x} ${geometry.original.y} L620 ${168 + index * 140}`}
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${geometry.original.x} ${geometry.original.y} L620 ${168 + index * 140}`,
+        }}
+        profile={tokens.sketch.shape}
         fill="none"
-        stroke={STOCK.muted}
-        strokeOpacity={0.25}
+        stroke={tokens.color.inactive}
+        strokeOpacity={tokens.alpha.ghost}
       />
       {showDimensions ? (
         <ParcelDimensions

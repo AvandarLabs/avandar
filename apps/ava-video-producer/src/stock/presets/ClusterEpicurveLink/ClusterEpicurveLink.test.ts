@@ -3,26 +3,26 @@ import test from "node:test";
 import { prop, propEq } from "@avandar/utils";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
+import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
+import { makeThemePatchFromStockColors } from "../../../videoTheme/makeThemePatchFromStockColors/makeThemePatchFromStockColors";
+import { VideoThemeScope } from "../../../videoTheme/VideoThemeScope/VideoThemeScope";
 import { ClusterEpicurveLink } from "./ClusterEpicurveLink";
+import { clusterEpicurveLinkContract } from "./ClusterEpicurveLink.contract";
 import {
+  invalidInputs,
   defaultInput,
   fixtures,
-  invalidInputs,
   changedInput,
 } from "./ClusterEpicurveLink.fixtures";
+import { inputSchema, type Input } from "./ClusterEpicurveLink.schema";
 
-test("The default investigation group contains three cases, including one unknown onset. Each case maps to exactly one histogram bin or the unknown compartment. Focusing a time bin highlights precisely its case IDs on the map.", () => {
+test("default cluster hold frame renders five histogram cases and investigation count three", () => {
   const markup = _render({ frame: 150 });
   assert.equal((markup.match(/data-histogram-case=/g) ?? []).length, 5);
   assert.match(markup, /data-investigation-count="3"/);
 });
-
-import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
-import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
-import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
-import { clusterEpicurveLinkContract } from "./ClusterEpicurveLink.contract";
-import { inputSchema, type Input } from "./ClusterEpicurveLink.schema";
-
 function _render({
   frame,
   input = defaultInput,
@@ -85,7 +85,9 @@ test("every case occupies one ordered bin or the unknown compartment, independen
   assert.deepEqual(
     [
       ...markup.matchAll(/data-focused-case="([^"]*)" data-is-focused="true"/g),
-    ].map((match) => match[1]),
+    ].map((match) => {
+      return match[1];
+    }),
     ["b", "d"],
   );
   assert.equal(
@@ -153,34 +155,41 @@ test("case schemas reject foreign onset, focus and investigation references", ()
     { ...defaultInput, investigationCaseIds: ["missing"] },
     {
       ...defaultInput,
-      cases: defaultInput.cases.map((record) => ({
-        ...record,
-        onsetBinId: "missing",
-      })),
+      cases: defaultInput.cases.map((record) => {
+        return { ...record, onsetBinId: "missing" };
+      }),
     },
-  ].forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  );
+  ].forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
 });
 test("twelve unknown cases retain twelve non-overlapping keyed histogram units", () => {
   const input = inputSchema.parse({
     ...fixtures[2].input,
-    cases: fixtures[2].input.cases.map((record) => ({
-      ...record,
-      onsetBinId: null,
-    })),
+    cases: fixtures[2].input.cases.map((record) => {
+      return { ...record, onsetBinId: null };
+    }),
   });
-  const markup = _render({ frame: 150, input: input });
+  const markup = _render({ frame: 150, input });
   const segments = [
     ...markup.matchAll(/data-unknown-onset="true"><rect([^>]+)>/g),
-  ].map((match) => match[1]);
+  ].map((match) => {
+    return match[1];
+  });
   assert.equal(segments.length, 12);
   const bounds = segments
-    .map((attributes) => ({
-      y: SvgAttributes.getNumberFromMarkup({ attributes, name: "y" }),
-      height: SvgAttributes.getNumberFromMarkup({ attributes, name: "height" }),
-    }))
-    .sort((a, b) => a.y - b.y);
+    .map((attributes) => {
+      return {
+        y: SvgAttributes.getNumberFromMarkup({ attributes, name: "y" }),
+        height: SvgAttributes.getNumberFromMarkup({
+          attributes,
+          name: "height",
+        }),
+      };
+    })
+    .sort((a, b) => {
+      return a.y - b.y;
+    });
   bounds.forEach((bound, index) => {
     assert.ok(bound.y >= 130);
     if (index) {
@@ -189,7 +198,6 @@ test("twelve unknown cases retain twelve non-overlapping keyed histogram units",
   });
   assert.equal((markup.match(/data-map-case=/g) ?? []).length, 12);
 });
-
 test("selected histogram identity numerals contrast against their bright blocks", async () => {
   const { clusterEpicurveLinkContract: correctionContract } =
     await import("./ClusterEpicurveLink.contract");
@@ -215,7 +223,9 @@ test("selected histogram identity numerals contrast against their bright blocks"
     ];
     assert.equal(groups.length, input.cases.length);
     groups
-      .filter(([, id]) => input.investigationCaseIds.includes(id))
+      .filter(([, id]) => {
+        return input.investigationCaseIds.includes(id);
+      })
       .forEach(([, , rect, text]) => {
         const fill = rect.match(/fill="([^"]*)"/)![1];
         const textFill = text.match(/fill="([^"]*)"/)![1];
@@ -228,38 +238,44 @@ test("selected histogram identity numerals contrast against their bright blocks"
       });
   });
 });
-
 test("selected histogram identities keep at least 4.5 contrast under light and dark accents", async () => {
-  const { HistogramSegments } = await import("./HistogramSegments");
+  const { HistogramSegments } =
+    await import("./HistogramSegments/HistogramSegments");
   const { defaultInput: identityInput } =
     await import("./ClusterEpicurveLink.fixtures");
-  const luminance = (color: string) =>
-    color
+  const luminance = (color: string) => {
+    return color
       .slice(1)
       .match(/../g)!
-      .map((channel) => Number.parseInt(channel, 16) / 255)
-      .map((channel) =>
-        channel <= 0.04045
+      .map((channel) => {
+        return Number.parseInt(channel, 16) / 255;
+      })
+      .map((channel) => {
+        return channel <= 0.04045
           ? channel / 12.92
-          : ((channel + 0.055) / 1.055) ** 2.4,
-      )
-      .reduce(
-        (sum, channel, index) =>
-          sum + channel * [0.2126, 0.7152, 0.0722][index],
-        0,
-      );
+          : ((channel + 0.055) / 1.055) ** 2.4;
+      })
+      .reduce((sum, channel, index) => {
+        return sum + channel * [0.2126, 0.7152, 0.0722][index];
+      }, 0);
+  };
   ["#9fefca", "#3caeff", "#15151a", "#ffffff", "#ff0000", "#777777"].forEach(
     (accent) => {
       const markup = renderToStaticMarkup(
-        createElement(HistogramSegments, {
-          input: identityInput,
-          frame: 150,
-          accent,
+        createElement(VideoThemeScope, {
+          patches: [makeThemePatchFromStockColors({ accent })],
+          children: createElement(HistogramSegments, {
+            input: identityInput,
+            frame: 150,
+            accent,
+          }),
         }),
       );
       const identityFill = markup.match(/<text[^>]*fill="([^"]*)"/)![1];
       const values = [luminance(identityFill), luminance(accent)].sort(
-        (first, second) => first - second,
+        (first, second) => {
+          return first - second;
+        },
       );
       assert.ok((values[1] + 0.05) / (values[0] + 0.05) >= 4.5, accent);
     },

@@ -90,15 +90,19 @@ const denseInput: Input = {
     { id: "site A", label: "W".repeat(22), x: 0.15, y: 0.85 },
     { id: "site B", label: "W".repeat(22), x: 0.85, y: 0.15 },
   ],
-  slots: Array.from({ length: 6 }, (_, index) => ({
-    id: `slot ${index}`,
-    label: "W".repeat(14),
-  })),
-  people: Array.from({ length: 8 }, (_, index) => ({
-    id: `person ${index}`,
-    label: "W".repeat(16),
-    slotId: index < 6 ? `slot ${index}` : null,
-  })),
+  slots: Array.from({ length: 6 }, (_, index) => {
+    return {
+      id: `slot ${index}`,
+      label: "W".repeat(14),
+    };
+  }),
+  people: Array.from({ length: 8 }, (_, index) => {
+    return {
+      id: `person ${index}`,
+      label: "W".repeat(16),
+      slotId: index < 6 ? `slot ${index}` : null,
+    };
+  }),
   sceneLabel: "W".repeat(40),
   copy: {
     map: "W".repeat(42),
@@ -113,7 +117,9 @@ const denseInput: Input = {
 /** All authored people remain present when none has a booking. */
 export const changedInput: Input = {
   ...DEFAULT_INPUT,
-  people: DEFAULT_INPUT.people.map((person) => ({ ...person, slotId: null })),
+  people: DEFAULT_INPUT.people.map((person) => {
+    return { ...person, slotId: null };
+  }),
 };
 const toggledInput: Input = {
   ...denseInput,
@@ -121,35 +127,44 @@ const toggledInput: Input = {
   showSlotLedger: false,
 };
 /** Accepted boundary sites stress complete labels beside an open clinic. */
-export const boundaryLabelInputs: Input[] = [false, true].map((isReversed) => ({
-  ...DEFAULT_INPUT,
-  sites: [
-    { id: "upper-left", label: "界".repeat(22), x: 0.15, y: 0.15 },
-    { id: "lower-right", label: "地".repeat(22), x: 0.85, y: 0.85 },
-  ].map((_, index, sites) => sites[isReversed ? 1 - index : index]),
-}));
+export const boundaryLabelInputs: Input[] = [false, true].map((isReversed) => {
+  return {
+    ...DEFAULT_INPUT,
+    sites: [
+      { id: "upper-left", label: "界".repeat(22), x: 0.15, y: 0.15 },
+      { id: "lower-right", label: "地".repeat(22), x: 0.85, y: 0.85 },
+    ].map((_, index, sites) => {
+      return sites[isReversed ? 1 - index : index];
+    }),
+  };
+});
 /**
  * Dense booking rotations exercise every person-to-slot mapping beside full
  * labels.
  */
 export const bookingLabelInputs: Input[] = ["CJK", "ASCII"].flatMap(
-  (alphabet) =>
-    Array.from({ length: 8 }, (_, rotation) => ({
-      ...denseInput,
-      sites: boundaryLabelInputs[rotation % 2].sites.map((site, index) => ({
-        ...site,
-        label: (alphabet === "CJK" ? ["界", "地"] : ["M", "W"])[index].repeat(
-          22,
-        ),
-      })),
-      people: denseInput.people.map((person, index) => {
-        const slotIndex = (index + rotation) % 8;
-        return {
-          ...person,
-          slotId: slotIndex < 6 ? denseInput.slots[slotIndex].id : null,
-        };
-      }),
-    })),
+  (alphabet) => {
+    return Array.from({ length: 8 }, (_, rotation) => {
+      return {
+        ...denseInput,
+        sites: boundaryLabelInputs[rotation % 2].sites.map((site, index) => {
+          return {
+            ...site,
+            label: (alphabet === "CJK" ? ["界", "地"] : ["M", "W"])[
+              index
+            ].repeat(22),
+          };
+        }),
+        people: denseInput.people.map((person, index) => {
+          const slotIndex = (index + rotation) % 8;
+          return {
+            ...person,
+            slotId: slotIndex < 6 ? denseInput.slots[slotIndex].id : null,
+          };
+        }),
+      };
+    });
+  },
 );
 /**
  * Missing or double-assigned slots and invalid site separation are rejected.
@@ -161,7 +176,9 @@ export const invalidInputs: unknown[] = [
   { ...DEFAULT_INPUT, people: [{ id: "x", label: "P", slotId: "missing" }] },
   {
     ...DEFAULT_INPUT,
-    people: DEFAULT_INPUT.people.map((person) => ({ ...person, slotId: "s1" })),
+    people: DEFAULT_INPUT.people.map((person) => {
+      return { ...person, slotId: "s1" };
+    }),
   },
   { ...DEFAULT_INPUT, sites: [DEFAULT_INPUT.sites[0], DEFAULT_INPUT.sites[0]] },
   {
@@ -181,8 +198,10 @@ export const fixtures: StockContract<typeof DEFAULT_INPUT>["fixtures"] = [
   { id: "dense", input: denseInput },
   { id: "changed", input: changedInput },
   { id: "toggled", input: toggledInput },
-  ...boundaryLabelInputs.map((input, index) => ({
-    id: `boundary-label-${index}`,
-    input,
-  })),
+  ...boundaryLabelInputs.map((input, index) => {
+    return {
+      id: `boundary-label-${index}`,
+      input,
+    };
+  }),
 ];

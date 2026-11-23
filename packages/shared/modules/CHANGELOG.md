@@ -1,5 +1,16 @@
 # @avandar/modules
 
+## 0.2.0
+
+### Minor Changes
+
+- Replace prettier with oxfmt ([#289](https://github.com/AvandarLabs/avandar/issues/289))
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @avandar/utils@0.2.0
+
 ## 0.1.2
 
 ### Patch Changes

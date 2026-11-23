@@ -16,5 +16,5 @@
       "@utils/*": ["../../packages/shared/utils/src/*"]
     }
   },
-  "include": ["src"]
+  "include": ["src", "showcase"]
 }

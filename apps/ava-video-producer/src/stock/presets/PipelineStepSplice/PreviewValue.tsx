@@ -1,5 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -15,8 +15,10 @@ export function PreviewValue({
   isOutput,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const y = isOutput ? 516 : 441;
-  const color = isOutput ? accent : STOCK.text;
+  const valueStyle = tokens.text.graphic.value;
+  const color = isOutput ? accent : valueStyle.color;
   return (
     <g>
       <FitText
@@ -28,7 +30,7 @@ export function PreviewValue({
         maxLines={1}
         breakLongWords
         normalizeWhitespace
-        color={isOutput ? accent : STOCK.muted}
+        color={isOutput ? accent : tokens.color.textMuted}
       />
       <text
         data-preview-input={isOutput ? undefined : value}
@@ -36,8 +38,9 @@ export function PreviewValue({
         aria-label={value}
         x={88}
         y={y + 27}
-        fontFamily="Arial, sans-serif"
-        fontSize={14}
+        fontFamily={valueStyle.fontFamily}
+        fontWeight={valueStyle.fontWeight}
+        fontSize={valueStyle.fontSize}
         xmlSpace="preserve"
         fill={color}
       >

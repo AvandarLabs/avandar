@@ -1,0 +1,20 @@
+.enumMenuOption {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--atlas-space-6);
+}
+
+.enumMenuOptionDescription {
+  color: var(--atlas-color-muted);
+  flex-basis: 100%;
+  font-size: var(--atlas-font-size-11);
+  line-height: 1.4;
+}
+
+/* On a phone, descriptions are 12px. */
+@media (width <= 760px) {
+  .enumMenuOptionDescription {
+    font-size: var(--atlas-font-size-12);
+  }
+}

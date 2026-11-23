@@ -1,8 +1,6 @@
 import { SupabaseLocalEnvironment } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment";
 import {
-  CONFIG_PATH,
   ENV_PATH,
-  ORIGINAL_CONFIG,
   SupabaseLocalEnvironmentFakeIo,
 } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIo/SupabaseLocalEnvironmentFakeIo";
 import { describe, expect, it } from "vitest";
@@ -63,7 +61,9 @@ describe("SupabaseLocalEnvironment.switch (seeding)", () => {
       projectId: "analytics-p2-temp",
       seed: { state: "failed", message: "seed job blew up" },
     });
-    expect(fake.files.get(CONFIG_PATH)).not.toBe(ORIGINAL_CONFIG);
+    expect(fake.files.get(ENV_PATH)).toContain(
+      "SUPABASE_PROJECT_ID=analytics-p2-temp",
+    );
     expect(fake.removedResources).toEqual([]);
   });
 

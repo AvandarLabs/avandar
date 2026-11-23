@@ -1,66 +1,46 @@
 import { useMemo } from "react";
-import { StockRect } from "../../primitives/StockRect/StockRect";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getJobPlacementFromPlanAndFrame } from "./getJobPlacementFromPlanAndFrame";
 import { makeJobTransfersFromInput } from "./makeJobTransfersFromInput";
-import { SceneLabel } from "./SceneLabel";
+import { WorkBlocksJob } from "./WorkBlocksJob/WorkBlocksJob";
 import type { Input } from "./ComputeCapacityConsolidation.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number };
-const COLORS: string[] = [
-  STOCK.mint,
-  STOCK.cyan,
-  STOCK.orange,
-  "#df95aa",
-  "#b7a3e8",
-  "#e7b792",
-  "#87bac7",
-  "#bfc790",
-];
+/** One stable categorical swatch per job, in job order. */
+const CATEGORY_KEYS = [1, 2, 3, 4, 5, 6, 7, 8] as const;
 /** Stable swatches associate intact work blocks with a reserved legend rail. */
 export function WorkBlocks({ input, frame }: Readonly<Props>): ReactNode {
-  const plan = useMemo(() => makeJobTransfersFromInput(input), [input]);
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const palette = CATEGORY_KEYS.map((key) => {
+    return tokens.color.categorical[key];
+  });
+  const plan = useMemo(() => {
+    return makeJobTransfersFromInput(input);
+  }, [input]);
   return (
     <g>
       {input.jobs.map((job, index) => {
         const { x, y, height } = getJobPlacementFromPlanAndFrame({
+          motion,
           plan,
           index,
           frame,
         });
-        const color = COLORS[index];
+        const color = palette[index];
         const legendX = 55 + (index % 4) * 215;
         const legendY = 437 + Math.floor(index / 4) * 44;
         return (
-          <g key={job.id}>
-            <StockRect
-              data-job={index}
-              data-job-id={job.id}
-              data-quantity={job.cpuHours}
-              x={x}
-              y={y}
-              width={80}
-              height={height}
-              fill={color}
-            />
-            <StockRect
-              x={legendX}
-              y={legendY - 10}
-              width={10}
-              height={10}
-              fill={color}
-            />
-            <SceneLabel
-              text={job.label}
-              x={legendX + 18}
-              y={legendY}
-              width={195}
-              lines={3}
-            />
-          </g>
+          <WorkBlocksJob
+            key={job.id}
+            {...{ job, index, x, y, height, color, legendX, legendY }}
+          />
         );
       })}
     </g>
   );
 }
+
+/** The type of `CATEGORY_KEYS` used by WorkBlocks. */
+export type WorkBlocksCategoryKeysValue = typeof CATEGORY_KEYS;

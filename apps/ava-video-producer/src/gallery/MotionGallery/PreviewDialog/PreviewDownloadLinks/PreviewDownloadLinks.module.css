@@ -1,0 +1,3 @@
+.previewDownloadLinksDetailLinks {
+  composes: detail-links from global;
+}

@@ -44,7 +44,9 @@ export const fixtures: Array<{ id: string; input: Input }> = [
       holders: { sender: "M".repeat(28), recipient: "W".repeat(28) },
       object: {
         label: "M".repeat(28),
-        details: Array.from({ length: 3 }, () => "W".repeat(28)),
+        details: Array.from({ length: 3 }, () => {
+          return "W".repeat(28);
+        }),
       },
       copy: {
         offered: "M".repeat(30),

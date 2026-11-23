@@ -1,5 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./GisLayerIntersectionTally.schema";
 import type { ReactNode } from "react";
 
@@ -22,6 +23,8 @@ export function HouseholdBadge({
   y,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g
       data-household-marker={household.id}
@@ -30,11 +33,12 @@ export function HouseholdBadge({
       }
       transform={`translate(${x} ${y})`}
     >
-      <circle
-        r={11}
-        fill={STOCK.surface}
-        stroke={isSelected ? accent : STOCK.muted}
-        strokeWidth={2}
+      <SketchedShape
+        shape={{ kind: "circle", cx: 0, cy: 0, r: 11 }}
+        profile={tokens.sketch.shape}
+        fill={tokens.color.surface}
+        stroke={isSelected ? accent : tokens.color.inactive}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
       <FitText
         text={String(index + 1)}

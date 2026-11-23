@@ -1,0 +1,13 @@
+.countToDemoCentered {
+  align-items: center;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+}
+
+.countToDemoBigNumber {
+  font-size: var(--demo-font-size-140);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--demo-font-weight-semibold);
+  letter-spacing: var(--demo-tracking-headline);
+}

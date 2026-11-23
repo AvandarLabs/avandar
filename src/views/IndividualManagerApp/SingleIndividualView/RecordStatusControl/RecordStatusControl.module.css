@@ -1,0 +1,21 @@
+/*
+ * The trigger reads as the badge itself plus a chevron. The fill only
+ * appears on hover and while the menu is open, like a subtle button.
+ */
+.recordStatusControlTrigger {
+  align-items: center;
+  border-radius: var(--mantine-radius-sm);
+  display: inline-flex;
+  gap: var(--mantine-spacing-xxs);
+  padding: 2px var(--mantine-spacing-xxs) 2px 2px;
+  transition: var(--ava-transition-interactive);
+}
+
+.recordStatusControlTrigger:hover,
+.recordStatusControlTrigger[data-expanded] {
+  background-color: var(--mantine-color-neutral-1);
+}
+
+.recordStatusControlChevron {
+  color: var(--mantine-color-neutral-6);
+}

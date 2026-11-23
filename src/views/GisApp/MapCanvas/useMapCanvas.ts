@@ -8,6 +8,7 @@ import { useMapStyleSync } from "@/views/GisApp/MapCanvas/useMapStyleSync";
 import { useMapToolGestures } from "@/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures";
 import { useMapViewSync } from "@/views/GisApp/MapCanvas/useMapViewSync/useMapViewSync";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import type { PlaceCoordinate } from "@/clients/places/places.types";
 import type { MapSpec } from "@/views/GisApp/layers/makeMapSpecFromLayerSpecs/MapSpec.types";
 import type { FitBoundsRequest } from "@/views/GisApp/MapCanvas/FitMapBounds/FitMapBounds";
 import type {
@@ -54,6 +55,9 @@ export type MapCanvasOptions = {
   onEditingTextFeatureIdChange?: (
     featureId: AvaMapConfig.AnnotationFeatureId | undefined,
   ) => void;
+
+  /** Receives the point the "Add a place" tool's click picked. */
+  onPlacePicked?: (coordinate: PlaceCoordinate) => void;
 };
 
 /** References owned by the live map canvas controller. */
@@ -75,6 +79,7 @@ type CanvasToolOverlayOptions = {
   onEditingTextFeatureIdChange: (
     featureId: AvaMapConfig.AnnotationFeatureId | undefined,
   ) => void;
+  onPlacePicked: (coordinate: PlaceCoordinate) => void;
 };
 
 function useMapCanvasToolOverlays(options: CanvasToolOverlayOptions): {
@@ -94,6 +99,7 @@ function useMapCanvasToolOverlays(options: CanvasToolOverlayOptions): {
     onMapToolModeChange: options.onMapToolModeChange,
     updateConfig: options.updateConfig,
     onEditingTextFeatureIdChange: options.onEditingTextFeatureIdChange,
+    onPlacePicked: options.onPlacePicked,
   });
   useMapChromeOverlays({
     mapInstance: options.mapInstance,
@@ -121,6 +127,7 @@ export function useMapCanvas({
   aoi,
   updateConfig = noop,
   onEditingTextFeatureIdChange = noop,
+  onPlacePicked = noop,
 }: Readonly<MapCanvasOptions>): MapCanvasController {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapInstance = useMapInstance({
@@ -141,6 +148,7 @@ export function useMapCanvas({
       onMapToolModeChange,
       updateConfig,
       onEditingTextFeatureIdChange,
+      onPlacePicked,
     });
   useMapStyleSync({ mapInstance, basemap });
   useMapSpecSync({ mapInstance, spec });

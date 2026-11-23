@@ -1,0 +1,25 @@
+.mixTokenDemoCentered {
+  align-items: center;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+}
+
+.mixTokenDemoCardColumn {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--demo-space-2xs);
+}
+
+.mixTokenDemoChip {
+  align-items: center;
+  border: var(--demo-stroke-emphasis) solid;
+  border-radius: var(--demo-corner-pill);
+  display: flex;
+  font-size: var(--demo-font-size-6xl);
+  font-weight: var(--demo-font-weight-semibold);
+  height: 72px;
+  justify-content: center;
+  width: 260px;
+}

@@ -4,7 +4,7 @@ import { prop, propEq } from "@avandar/utils";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { getSvgAttributeMatchesFromMarkup } from "../../../../tests/helpers/getSvgAttributeMatchesFromMarkup/getSvgAttributeMatchesFromMarkup";
-import { registerStockLocalizationAssertions } from "../../../../tests/helpers/registerStockLocalizationAssertions";
+import { registerStockDefaultTextAssertions } from "../../../../tests/helpers/registerStockDefaultTextAssertions";
 import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
@@ -18,6 +18,43 @@ import {
   INVALID_INPUTS,
 } from "./MinimumCountMapSuppression.fixtures";
 import { inputSchema, type Input } from "./MinimumCountMapSuppression.schema";
+
+function _assertLocalCountClearance(markup: string): { localEnd: number } {
+  const localEnd = markup.indexOf("data-public-map=");
+  const localPaint = SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup(
+    `${markup.slice(0, localEnd).replace(/<g[^>]*$/, "")}</g>`,
+  );
+  const counts = localPaint.filter((item) => {
+    return item.kind === "text" && item.top >= 220 && item.top < 460;
+  });
+  assert.ok(counts.length > 0);
+  SvgPaintAssertions.assertPaintClearance({
+    texts: counts,
+    rectangles: localPaint.filter((item) => {
+      return (
+        item.kind === "rect" &&
+        item.fill !== "none" &&
+        item.opacity * item.fillOpacity === 1
+      );
+    }),
+  });
+  return { localEnd };
+}
+
+function _assertLocalToggleHidesNumericSheetDataReleasedCount(
+  travel: ReturnType<typeof getSvgAttributeMatchesFromMarkup>["tags"][number],
+): void {
+  assert.ok(
+    SvgAttributes.getNumberFromMarkup({ attributes: travel, name: "x" }) >
+      SvgAttributes.getNumberFromMarkup({
+        attributes: getSvgAttributeMatchesFromMarkup({
+          markup: _render({ frame: 106 }),
+          attribute: "data-released-count",
+        }).tags[0],
+        name: "x",
+      }),
+  );
+}
 
 function _render({
   frame,
@@ -55,7 +92,7 @@ registerStockPresetAssertions({
   excludedTextFields: EXCLUSIONS,
   getVisibleTexts: _getVisibleTexts,
 });
-registerStockLocalizationAssertions({
+registerStockDefaultTextAssertions({
   contract,
   expectedTextPaths: [
     ["cells", 0, "label"],
@@ -121,10 +158,12 @@ test("threshold equality releases while minimum-minus-one and all small positive
   );
   const allSuppressed = {
     ...DEFAULT_INPUT,
-    cells: DEFAULT_INPUT.cells.map((cell, index) => ({
-      ...cell,
-      count: index + 1,
-    })),
+    cells: DEFAULT_INPUT.cells.map((cell, index) => {
+      return {
+        ...cell,
+        count: index + 1,
+      };
+    }),
     minimum: 20,
   };
   const publicMarkup = _render({ frame: 150, input: allSuppressed }).split(
@@ -174,16 +213,7 @@ test("local toggle hides numeric sheet values and shutters precede safe count tr
     markup: _render({ frame: 150 }),
     attribute: "data-released-count",
   }).tags[0];
-  assert.ok(
-    SvgAttributes.getNumberFromMarkup({ attributes: travel, name: "x" }) >
-      SvgAttributes.getNumberFromMarkup({
-        attributes: getSvgAttributeMatchesFromMarkup({
-          markup: _render({ frame: 106 }),
-          attribute: "data-released-count",
-        }).tags[0],
-        name: "x",
-      }),
-  );
+  _assertLocalToggleHidesNumericSheetDataReleasedCount(travel);
   assert.ok(
     SvgAttributes.getNumberFromMarkup({ attributes: travel, name: "x" }) <
       SvgAttributes.getNumberFromMarkup({ attributes: hold, name: "x" }),
@@ -196,23 +226,31 @@ test("local toggle hides numeric sheet values and shutters precede safe count tr
 test("upper-only cell IDs permit one empty ID and preserve maximum IDs", () => {
   const input = inputSchema.parse({
     ...DEFAULT_INPUT,
-    cells: DEFAULT_INPUT.cells.map((cell, index) => ({
-      ...cell,
-      id: index ? `${"界".repeat(11)}${index}` : "",
-    })),
+    cells: DEFAULT_INPUT.cells.map((cell, index) => {
+      return {
+        ...cell,
+        id: index ? `${"界".repeat(11)}${index}` : "",
+      };
+    }),
   });
-  assert.doesNotThrow(() => _render({ frame: 150, input: input }));
+  assert.doesNotThrow(() => {
+    return _render({ frame: 150, input: input });
+  });
   assert.equal(input.cells[0].id, "");
 });
 test("released count travel clears neighboring local counts and every complete cell caption", () => {
   const input = {
     ...fixtures[2].input,
-    cells: fixtures[2].input.cells.map((cell, index) => ({
-      ...cell,
-      count: 80 + index,
-    })),
+    cells: fixtures[2].input.cells.map((cell, index) => {
+      return {
+        ...cell,
+        count: 80 + index,
+      };
+    }),
   };
-  Array.from({ length: 65 }, (_, index) => 106 + index / 2).forEach((frame) => {
+  Array.from({ length: 65 }, (_, index) => {
+    return 106 + index / 2;
+  }).forEach((frame) => {
     const markup = _render({ frame: frame, input: input });
     const copies = getSvgAttributeMatchesFromMarkup({
       markup: markup,
@@ -250,15 +288,16 @@ test("complete authored captions remain clear of other captions and opaque foreg
         _render({ frame: frame, input: input }),
       );
       SvgPaintAssertions.assertPaintClearance({
-        texts: paint.filter(
-          (item) => item.kind === "text" && item.ariaLabel !== undefined,
-        ),
-        rectangles: paint.filter(
-          (item) =>
+        texts: paint.filter((item) => {
+          return item.kind === "text" && item.ariaLabel !== undefined;
+        }),
+        rectangles: paint.filter((item) => {
+          return (
             item.kind === "rect" &&
             item.fill !== "none" &&
-            item.opacity * item.fillOpacity > 0.9,
-        ),
+            item.opacity * item.fillOpacity > 0.9
+          );
+        }),
       });
     });
   });
@@ -266,23 +305,28 @@ test("complete authored captions remain clear of other captions and opaque foreg
 test("fractional public count copies clear full dense cell-label paint", () => {
   const input = {
     ...fixtures[2].input,
-    cells: fixtures[2].input.cells.map((cell, index) => ({
-      ...cell,
-      label: "界 界界界界界界界界界 界界界界",
-      count: 80 + index,
-    })),
+    cells: fixtures[2].input.cells.map((cell, index) => {
+      return {
+        ...cell,
+        label: "界 界界界界界界界界界 界界界界",
+        count: 80 + index,
+      };
+    }),
   };
-  Array.from({ length: 67 }, (_, index) => 106 + index / 2).forEach((frame) => {
+  Array.from({ length: 67 }, (_, index) => {
+    return 106 + index / 2;
+  }).forEach((frame) => {
     const paint = SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup(
       _render({ frame: frame, input: input }),
     );
     SvgPaintAssertions.assertPaintClearance({
-      texts: paint.filter(
-        (item) =>
+      texts: paint.filter((item) => {
+        return (
           item.kind === "text" &&
           (item.ariaLabel !== undefined ||
-            item.attributes["data-released-count"] !== undefined),
-      ),
+            item.attributes["data-released-count"] !== undefined)
+        );
+      }),
       rectangles: [],
     });
   });
@@ -308,33 +352,18 @@ test("local analytical counts stay readable beside closed public-release gates",
     );
 
     const paint = SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup(markup);
-    const localEnd = markup.indexOf("data-public-map=");
-    const localPaint = SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup(
-      `${markup.slice(0, localEnd).replace(/<g[^>]*$/, "")}</g>`,
-    );
-    const counts = localPaint.filter(
-      (item) => item.kind === "text" && item.top >= 220 && item.top < 460,
-    );
-    assert.ok(counts.length > 0);
-    SvgPaintAssertions.assertPaintClearance({
-      texts: counts,
-      rectangles: localPaint.filter(
-        (item) =>
-          item.kind === "rect" &&
-          item.fill !== "none" &&
-          item.opacity * item.fillOpacity === 1,
-      ),
-    });
+    const { localEnd } = _assertLocalCountClearance(markup);
     const publicMarkup = markup.slice(localEnd);
     input.cells
-      .filter(
-        (cell) =>
-          cell.count !== null && cell.count > 0 && cell.count < input.minimum,
-      )
-      .forEach((cell) =>
-        assert.ok(
+      .filter((cell) => {
+        return (
+          cell.count !== null && cell.count > 0 && cell.count < input.minimum
+        );
+      })
+      .forEach((cell) => {
+        return assert.ok(
           !publicMarkup.includes(`data-released-count="${cell.count}"`),
-        ),
-      );
+        );
+      });
   });
 });

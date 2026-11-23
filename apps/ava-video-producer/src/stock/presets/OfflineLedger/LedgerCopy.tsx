@@ -1,11 +1,12 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./OfflineLedger.schema";
 import type { ReactNode } from "react";
 
 type Props = { frame: number; input: Input };
 /** Captions change with connectivity while the completed work remains. */
 export function LedgerCopy({ frame, input }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   if (!input.showLabels) {
     return undefined;
   }
@@ -18,21 +19,23 @@ export function LedgerCopy({ frame, input }: Readonly<Props>): ReactNode {
   ];
   return (
     <g>
-      {captions.map(({ text, y }) => (
-        <FitText
-          key={y}
-          text={text}
-          x={480}
-          y={y}
-          width={600}
-          fontSize={14}
-          maxLines={2}
-          anchor="middle"
-          normalizeWhitespace
-          breakLongWords
-          color={y === 580 ? STOCK.muted : STOCK.text}
-        />
-      ))}
+      {captions.map(({ text, y }) => {
+        return (
+          <FitText
+            key={y}
+            text={text}
+            x={480}
+            y={y}
+            width={600}
+            fontSize={14}
+            maxLines={2}
+            anchor="middle"
+            normalizeWhitespace
+            breakLongWords
+            color={y === 580 ? tokens.color.textMuted : tokens.color.text}
+          />
+        );
+      })}
     </g>
   );
 }

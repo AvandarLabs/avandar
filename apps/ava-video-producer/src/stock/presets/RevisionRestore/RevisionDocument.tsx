@@ -1,4 +1,6 @@
-import { STOCK } from "../../stockPalette";
+import { isDefined } from "@avandar/utils";
+import { StockRect } from "../../primitives/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { RevisionCurrentLines } from "./RevisionCurrentLines";
 import type { Input } from "./RevisionRestore.schema";
 import type { ReactNode } from "react";
@@ -11,6 +13,10 @@ type Props = {
   frame: number;
   accent: string;
 };
+/** A page document's corner, before the theme's corner style. */
+const PAGE_CORNER = 5;
+/** A canvas document's corner, before the theme's corner style. */
+const CANVAS_CORNER = 22;
 /**
  * The current document replaces positional lines and removes change notches.
  */
@@ -22,22 +28,24 @@ export function RevisionDocument({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g
-      data-current-content={content
-        .filter((line) => line !== undefined)
-        .join("|")}
+      data-current-content={content.filter(isDefined).join("|")}
       data-surface={input.surface}
     >
-      <rect
+      <StockRect
         x={270}
         y={140}
         width={420}
         height={200}
-        rx={input.surface === "page" ? 5 : 22}
-        fill={STOCK.surface}
+        rx={scales.corner(
+          input.surface === "page" ? PAGE_CORNER : CANVAS_CORNER,
+        )}
+        fill={tokens.color.surface}
         stroke={accent}
-        strokeWidth={2}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
       <RevisionCurrentLines
         input={input}

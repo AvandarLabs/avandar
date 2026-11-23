@@ -7,6 +7,7 @@ import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset";
 import type { OpenDataDataset } from "$/models/datasets/OpenDataDataset/OpenDataDataset";
 import type { PdfFileDataset } from "$/models/datasets/PdfFileDataset/PdfFileDataset";
+import type { PostgresTableDataset } from "$/models/datasets/PostgresTableDataset/PostgresTableDataset";
 import type { VirtualDataset } from "$/models/datasets/VirtualDataset/VirtualDataset";
 import type { XlsxFileDataset } from "$/models/datasets/XlsxFileDataset/XlsxFileDataset";
 import type { ReactNode } from "react";
@@ -16,6 +17,7 @@ export type DatasetSourceRecord =
   | GoogleSheetsDataset.T
   | OpenDataDataset.T
   | PdfFileDataset.T
+  | PostgresTableDataset.T
   | VirtualDataset.T
   | XlsxFileDataset.T;
 
@@ -114,6 +116,18 @@ export function DatasetSourceRail({
           {sheet.rowsToSkip > 0
             ? optionalFact(t`Rows skipped`, sheet.rowsToSkip)
             : null}
+        </>
+      );
+    })
+    .with({ __type: "PostgresTableDataset" }, (table) => {
+      return (
+        <>
+          <AppViewRail.Fact label={t`Schema`}>
+            {table.schemaName}
+          </AppViewRail.Fact>
+          <AppViewRail.Fact label={t`Table`}>
+            {table.tableName}
+          </AppViewRail.Fact>
         </>
       );
     })

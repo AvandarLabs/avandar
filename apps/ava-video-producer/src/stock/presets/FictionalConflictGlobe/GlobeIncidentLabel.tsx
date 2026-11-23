@@ -1,4 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./FictionalConflictGlobe.schema";
 import type { ReactNode } from "react";
 
@@ -17,8 +18,12 @@ export function GlobeIncidentLabel({
   visible,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
   return (
-    <g data-incident-label={incident.id} opacity={visible ? 1 : 0.45}>
+    <g
+      data-incident-label={incident.id}
+      opacity={visible ? 1 : atomic.opacity["45"]}
+    >
       <FitText
         text={String(index + 1)}
         x={616}

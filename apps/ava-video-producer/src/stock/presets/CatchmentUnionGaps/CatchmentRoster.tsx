@@ -15,23 +15,26 @@ export function CatchmentRoster({
 }: Readonly<Props>): ReactNode {
   return (
     <g>
-      {input.households.map((household, index) => (
-        <HouseholdRecord
-          key={household.id}
-          household={household}
-          index={index}
-          progress={progress}
-          accent={accent}
-          gapEmphasis={input.gapEmphasis}
-          covered={input.catchments.some(
-            ({ polygon }) =>
-              PlanarPolygon.getPointClassification({
-                point: [household.x, household.y],
-                polygon,
-              }) === "inside",
-          )}
-        />
-      ))}
+      {input.households.map((household, index) => {
+        return (
+          <HouseholdRecord
+            key={household.id}
+            household={household}
+            index={index}
+            progress={progress}
+            accent={accent}
+            gapEmphasis={input.gapEmphasis}
+            covered={input.catchments.some(({ polygon }) => {
+              return (
+                PlanarPolygon.getPointClassification({
+                  point: [household.x, household.y],
+                  polygon,
+                }) === "inside"
+              );
+            })}
+          />
+        );
+      })}
     </g>
   );
 }

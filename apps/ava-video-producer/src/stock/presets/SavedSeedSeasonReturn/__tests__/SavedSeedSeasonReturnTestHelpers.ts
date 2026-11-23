@@ -8,17 +8,32 @@ import { SavedSeedSeasonReturn } from ".././SavedSeedSeasonReturn";
 import { defaultInput, fixtures } from ".././SavedSeedSeasonReturn.fixtures";
 import { type Input } from ".././SavedSeedSeasonReturn.schema";
 
+/**
+ * Rendered markup with each marked sketch-aware shape read as one element.
+ * `SketchedShape` draws its plain shape inside a group that carries the
+ * shape's markers (`data-*`, `aria-label`, `transform`), so the group's
+ * attributes move onto the shape these assertions read.
+ */
+function _joinMarkedShapes(markup: string): string {
+  return markup.replace(
+    /<g((?:\s+(?:data-[\w-]+|aria-label|transform)="[^"]*")+)><(path|line|circle|rect|ellipse)\b([^>]*)><\/\2><\/g>/g,
+    "<$2$1$3></$2>",
+  );
+}
+
 function _render({
   frame,
   input = defaultInput,
 }: Readonly<{ frame: number; input?: Input }>): string {
-  return renderToStaticMarkup(
-    createElement(SavedSeedSeasonReturn, {
-      frame,
-      input,
-      accent: "#67e8c2",
-      id: "packet20",
-    }),
+  return _joinMarkedShapes(
+    renderToStaticMarkup(
+      createElement(SavedSeedSeasonReturn, {
+        frame,
+        input,
+        accent: "#67e8c2",
+        id: "packet20",
+      }),
+    ),
   );
 }
 
@@ -161,10 +176,14 @@ function _assertBalanceCaptions({
   const markup = _render({ frame: frame, input: input });
   const labels = [
     ...markup.matchAll(/<text aria-label="([^"]*)"[^>]*y="450"[^>]*>/g),
-  ].map((match) => match[1]);
+  ].map((match) => {
+    return match[1];
+  });
   const quantities = [
     ...markup.matchAll(/<text aria-label="([^"]*)"[^>]*y="535"[^>]*>/g),
-  ].map((match) => match[1]);
+  ].map((match) => {
+    return match[1];
+  });
   assert.deepEqual(labels, [
     input.balanceLabels.currentUse,
     frame < 144 ? input.balanceLabels.reserved : input.balanceLabels.remaining,
@@ -178,8 +197,30 @@ function _assertBalanceCaptions({
       frame < 144 ? value.reserve : value.remaining,
       value.loss,
       frame < 144 ? "0" : value.sown,
-    ].map((amount) => `${amount} ${input.crop.unitLabel}`),
+    ].map((amount) => {
+      return `${amount} ${input.crop.unitLabel}`;
+    }),
   );
+  _assertSownArrivalCaption({ markup, input, frame });
+}
+export {
+  _render,
+  _visible,
+  _escape,
+  EXCLUDED_TEXT_FIELDS as excludedTextFields,
+  _lid,
+  _lossInputs,
+  captionCases,
+  _assertBalanceCaptions,
+};
+export type { CaptionCase };
+
+/** Checks the final caption changes at the whole-band sowing arrival. */
+function _assertSownArrivalCaption({
+  markup,
+  input,
+  frame,
+}: Readonly<{ markup: string; input: Input; frame: number }>): void {
   const sown = SvgAttributes.fromMarker({ markup, marker: "seed-sown" });
   if (input.crop.sownQuantity > 0) {
     const arrived =
@@ -194,14 +235,3 @@ function _assertBalanceCaptions({
     );
   }
 }
-export {
-  _render,
-  _visible,
-  _escape,
-  EXCLUDED_TEXT_FIELDS as excludedTextFields,
-  _lid,
-  _lossInputs,
-  captionCases,
-  _assertBalanceCaptions,
-};
-export type { CaptionCase };

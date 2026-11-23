@@ -1,13 +1,14 @@
 import { propEq } from "@avandar/utils";
-import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { ClassroomAttendanceTotal } from "./ClassroomAttendanceTotal/ClassroomAttendanceTotal";
 import type { Input } from "./ClassroomDayPresence.schema";
 import type { ReactNode } from "react";
+
 /** Inputs for ClassroomTotals. */
 type Props = { input: Input; day: Input["days"][number] };
-
 /** Separate state totals share the unchanged supplied-roster denominator. */
 export function ClassroomTotals({ input, day }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const present = day.records.filter(propEq("state", "present")).length,
     absent = day.records.filter(propEq("state", "absent")).length,
     unknown = day.records.filter(propEq("state", "unknown")).length;
@@ -25,52 +26,15 @@ export function ClassroomTotals({ input, day }: Readonly<Props>): ReactNode {
       data-unknown={unknown}
       data-roster={input.learners.length}
     >
-      {totals.map(({ key, label, value }, index) => (
-        <g key={key}>
-          {key === "present" ? (
-            <circle cx={39 + index * 232} cy={538} r={5} fill={STOCK.mint} />
-          ) : key === "absent" ? (
-            <rect
-              x={34 + index * 232}
-              y={533}
-              width={10}
-              height={10}
-              stroke={STOCK.muted}
-              fill="none"
-            />
-          ) : key === "unknown" ? (
-            <path
-              d={`M ${39 + index * 232} 532 l 6 6 l -6 6 l -6 -6 Z`}
-              stroke={STOCK.orange}
-              fill="none"
-            />
-          ) : undefined}
-          <FitText
-            text={label}
-            x={54 + index * 232}
-            y={542}
-            width={194}
-            fontSize={12}
-            maxLines={3}
-            breakLongWords
-            normalizeWhitespace
+      {totals.map(({ key, label, value }, index) => {
+        return (
+          <ClassroomAttendanceTotal
+            key={key}
+            itemKey={key}
+            {...{ index, tokens, label, value, input }}
           />
-          <FitText
-            text={
-              key === "present"
-                ? `${value} / ${input.learners.length}`
-                : String(value)
-            }
-            x={54 + index * 232}
-            y={592}
-            width={194}
-            fontSize={14}
-            maxLines={1}
-            breakLongWords
-            normalizeWhitespace
-          />
-        </g>
-      ))}
+        );
+      })}
     </g>
   );
 }

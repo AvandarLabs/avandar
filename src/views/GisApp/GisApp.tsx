@@ -4,14 +4,18 @@ import { GisAppMapShell } from "@/views/GisApp/GisAppMapShell";
 import { useGisApp } from "@/views/GisApp/useGisApp/useGisApp";
 import { useRequestSpatialExtension } from "@/views/GisApp/useRequestSpatialExtension/useRequestSpatialExtension";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
-import "maplibre-gl/dist/maplibre-gl.css";
+import "@/views/GisApp/setUpMapLibre/setUpMapLibre";
 import type { ReactNode } from "react";
 
-type Props = { avaMap: AvaMap.T };
+type Props = {
+  avaMap: AvaMap.T;
+  /** The salt that displaces the map's jittered points. */
+  jitterSalt: string;
+};
 
 /** Coordinates the editable map state with the GIS application shell. */
-export function GisApp({ avaMap }: Props): ReactNode {
-  const app = useGisApp(avaMap);
+export function GisApp({ avaMap, jitterSalt }: Props): ReactNode {
+  const app = useGisApp(avaMap, jitterSalt);
   // Starts the Spatial fetch as the map opens rather than when the geometry
   // picker first renders. DuckDB loads Spatial only when something asks, so
   // this screen has to ask. The extension is ~6MB over the wire (~22MB

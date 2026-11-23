@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { useMemo } from "react";
 import css from "@/components/CanvasDrawer/CanvasDrawer.module.css";
 import { CanvasDrawerBody } from "@/components/CanvasDrawer/CanvasDrawerBody/CanvasDrawerBody";

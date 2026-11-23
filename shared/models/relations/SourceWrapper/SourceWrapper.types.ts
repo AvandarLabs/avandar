@@ -1,3 +1,4 @@
+import type { Dataset } from "$/models/datasets/Dataset/Dataset.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 import type {
   RelationCapabilities,
@@ -17,11 +18,46 @@ export type WrapperContext = {
   logger: ILogger;
 };
 
+/**
+ * Where the types of a relation's columns come from when its rows are
+ * acquired as CSV, which carries no types of its own. Every wrapper that
+ * acquires CSV has to choose, and the reader types the columns as told.
+ *
+ * - `source-schema`: the source declares each column's type in its own
+ *   schema, as a database table does. Those types were read from the schema
+ *   when the dataset was imported and stored with it, so each column is read
+ *   as text and cast to its stored type. Nothing is guessed from the values,
+ *   so a number column is always a number and a zip code like `02134` keeps
+ *   its leading zero.
+ * - `inferred`: the source declares no types, as a spreadsheet does, so
+ *   DuckDB infers each column's type from its values.
+ */
+export type CsvColumnTypes = "source-schema" | "inferred";
+
+/**
+ * Reads one dataset's acquired CSV text into Parquet, typing its columns as
+ * `columnTypes` says. Injected into each wrapper, already bound to the
+ * caller's DuckDB lease, so wrappers stay free of DuckDB.
+ */
+export type RelationCsvReader = (
+  params: Readonly<{
+    datasetId: Dataset.Id;
+    csvText: string;
+    columnTypes: CsvColumnTypes;
+  }>,
+) => Promise<{ parquetBlob: Blob }>;
+
 /** One relation's bytes, ready to load into the queryable relation cache. */
 export type AcquiredRelation = {
   ref: RelationRef.T;
   parquetBlob: Blob;
   sourceVersion: SourceVersion | undefined;
+  /**
+   * How long these rows may be served from a cache before the source is
+   * acquired again, in ms. Omitted for a source whose rows never change
+   * under the dataset, such as an uploaded file.
+   */
+  maxAgeMs?: number;
 };
 
 /** A request to fetch a relation's rows. */

@@ -1,4 +1,6 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CellLiteralValue } from "./CellLiteralValue";
 import type { Input } from "./CellNormalization.schema";
 import type { ReactNode } from "react";
@@ -9,6 +11,8 @@ type Props = {
   showWhitespace: boolean;
   accent: string;
 };
+/** Extra letter spacing the original value loosens from as it is replaced. */
+const BEFORE_SPACING = 1;
 /** Only explicitly different pairs get an authored replacement and brackets. */
 export function CleanupCells({
   row,
@@ -16,6 +20,8 @@ export function CleanupCells({
   showWhitespace,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const changed = row.before !== row.after;
   const bounds = { x: 88, y: 22, showWhitespace };
   return (
@@ -25,19 +31,28 @@ export function CleanupCells({
           {...bounds}
           value={row.before}
           opacity={changed ? 1 - edit : 1}
-          letterSpacing={mix(edit, 1, 0)}
+          letterSpacing={Motion.mix({
+            t: edit,
+            from: BEFORE_SPACING,
+            to: 0,
+          })}
         />
       </g>
       {changed ? (
         <g data-replacement={row.id} opacity={edit}>
           <CellLiteralValue {...bounds} value={row.after} color={accent} />
-          <path
-            data-edit-bracket={row.id}
-            d="M80 6h-5v26h5M468 6h5v26h-5"
-            fill="none"
-            stroke={accent}
-            opacity={Math.sin(edit * Math.PI) * 0.7 + edit * 0.3}
-          />
+          <g data-edit-bracket={row.id}>
+            <SketchedShape
+              shape={{ kind: "path", d: "M80 6h-5v26h5M468 6h5v26h-5" }}
+              profile={tokens.sketch.shape}
+              fill="none"
+              stroke={accent}
+              opacity={
+                Math.sin(edit * Math.PI) * atomic.opacity["70"] +
+                edit * atomic.opacity["30"]
+              }
+            />
+          </g>
         </g>
       ) : undefined}
     </g>

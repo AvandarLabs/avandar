@@ -2,7 +2,7 @@ import { BookingRequest } from "./BookingRequest";
 import { SharedMachine } from "./SharedMachine";
 import { WorkshopCaptions } from "./WorkshopCaptions";
 import { WorkshopTimeRuler } from "./WorkshopTimeRuler";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./SharedWorkshopBooking.schema";
 import type { ReactNode } from "react";
 
@@ -20,15 +20,17 @@ export function SharedWorkshopBooking({
       <WorkshopCaptions input={input} />
       <WorkshopTimeRuler input={input} />{" "}
       <SharedMachine input={input} accent={accent} />
-      {input.requests.map((request, index) => (
-        <BookingRequest
-          key={request.id}
-          input={input}
-          frame={frame}
-          index={index}
-          accent={accent}
-        />
-      ))}
+      {input.requests.map((request, index) => {
+        return (
+          <BookingRequest
+            key={request.id}
+            input={input}
+            frame={frame}
+            index={index}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

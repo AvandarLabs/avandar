@@ -1,14 +1,16 @@
 import { prop } from "@avandar/utils";
-import { ramp } from "../../../motion";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./ComputeCapacityConsolidation.schema";
 import type { ReactNode } from "react";
 /** Inputs for ComputeSummary. */
 type Props = { input: Input; frame: number };
-
 /** Resolved quantities retain their supplied denominator and copy. */
 export function ComputeSummary({ input, frame }: Readonly<Props>): ReactNode {
-  const total = input.jobs.reduce((sum, job) => sum + job.cpuHours, 0);
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const total = input.jobs.reduce((sum, job) => {
+    return sum + job.cpuHours;
+  }, 0);
   const occupied = new Set(input.jobs.map(prop("finalHostId"))).size;
   return (
     <g>
@@ -20,7 +22,7 @@ export function ComputeSummary({ input, frame }: Readonly<Props>): ReactNode {
           width={425}
         />
       </g>
-      <g opacity={ramp(frame, 108, 12)}>
+      <g opacity={motion.reveal(frame, 108)}>
         <SceneLabel
           text={`${input.copy.occupied}: ${occupied} · ${input.copy[input.emptyHostState]}: ${input.hosts.length - occupied}`}
           x={500}

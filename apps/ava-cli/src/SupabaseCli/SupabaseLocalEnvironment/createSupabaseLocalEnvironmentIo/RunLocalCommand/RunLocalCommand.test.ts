@@ -78,3 +78,34 @@ describe("RunLocalCommand.run", () => {
     });
   });
 });
+
+describe("RunLocalCommand.runOrThrow", () => {
+  it("returns the command's trimmed stdout when it succeeds", async () => {
+    await expect(
+      RunLocalCommand.runOrThrow({
+        command: process.execPath,
+        args: ["-e", 'process.stdout.write("one\\ntwo\\n")'],
+        cwd: process.cwd(),
+      }),
+    ).resolves.toBe("one\ntwo");
+  });
+
+  it("throws the command and its stderr when it fails", async () => {
+    await expect(
+      RunLocalCommand.runOrThrow({
+        command: process.execPath,
+        args: ["-e", 'process.stderr.write("broke"); process.exitCode = 3;'],
+        cwd: process.cwd(),
+      }),
+    ).rejects.toThrow("failed: broke");
+  });
+});
+
+describe("RunLocalCommand.getLinesFromOutput", () => {
+  it("drops blank lines from command output", () => {
+    expect(RunLocalCommand.getLinesFromOutput("a\n\n  \nb\n")).toEqual([
+      "a",
+      "b",
+    ]);
+  });
+});

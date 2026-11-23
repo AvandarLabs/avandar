@@ -1,0 +1,51 @@
+.demoWindowWindow {
+  background: var(--demo-panel);
+  border: var(--demo-stroke-hairline) solid var(--demo-line);
+  border-radius: var(--demo-corner-label);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  width: 100%;
+}
+
+.demoWindowTitlebar {
+  align-items: center;
+  background: var(--demo-ground);
+  display: flex;
+  flex: none;
+  gap: var(--demo-space-6);
+  height: 22px;
+  padding: 0 var(--demo-space-10);
+}
+
+.demoWindowTitlebarDot {
+  background: var(--demo-line);
+  border-radius: var(--demo-corner-pill);
+  height: 8px;
+  width: 8px;
+}
+
+.demoWindowWindowBody {
+  align-items: flex-end;
+  display: flex;
+  flex: 1;
+  gap: 8%;
+  padding: 10% 10% 12%;
+  position: relative;
+}
+
+.demoWindowWindowLabel {
+  color: var(--demo-text);
+  font-size: var(--demo-font-size-2xl);
+  font-weight: var(--demo-font-weight-semibold);
+  left: 10%;
+  position: absolute;
+  top: 10%;
+}
+
+.demoWindowWindowBar {
+  border-radius: var(--demo-corner-chip) var(--demo-corner-chip) 0 0;
+  flex: 1;
+}

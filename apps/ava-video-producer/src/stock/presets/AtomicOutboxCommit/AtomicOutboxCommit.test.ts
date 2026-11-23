@@ -3,15 +3,104 @@ import test from "node:test";
 import { prop } from "@avandar/utils";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { registerStockDefaultTextAssertions } from "../../../../tests/helpers/registerStockDefaultTextAssertions";
 import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
+import { getConservativeWidthFromText } from "../../text/getConservativeWidthFromText";
 import { AtomicOutboxCommit } from "./AtomicOutboxCommit";
+import { atomicOutboxCommitContract } from "./AtomicOutboxCommit.contract";
 import {
   DEFAULT_INPUT,
   fixtures,
   invalidInputs,
 } from "./AtomicOutboxCommit.fixtures";
+import { inputSchema, type Input } from "./AtomicOutboxCommit.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
+
+function _makeCaptionClearanceInputs(): Input[] {
+  return [
+    DEFAULT_INPUT,
+    fixtures[2].input,
+    {
+      ...fixtures[2].input,
+      change: { ...fixtures[2].input.change, recordLabel: "界".repeat(28) },
+    },
+  ];
+}
+
+type RecordCaptionBounds = {
+  x: ReturnType<typeof SvgAttributes.getNumberFromMarkup>;
+  right: number;
+  top: number;
+  bottom: number;
+};
+
+type LatchCaptionClearanceOptions = Readonly<{
+  right: number;
+  x: ReturnType<typeof SvgAttributes.getNumberFromMarkup>;
+  bottom: number;
+  latchY: ReturnType<typeof SvgAttributes.getNumberFromMarkup>;
+  halfStroke: number;
+  top: number;
+  frame: number[][number];
+}>;
+
+function _getRecordCaptionBounds({
+  markup,
+  input,
+}: Readonly<{
+  markup: ReturnType<typeof _render>;
+  input: Input;
+}>): RecordCaptionBounds {
+  const caption = [...markup.matchAll(/<text[^>]+>/g)]
+    .map(([tag]) => {
+      return tag;
+    })
+    .find((tag) => {
+      return tag.includes(`aria-label="${input.change.recordLabel}"`);
+    });
+  assert.ok(caption);
+  const x = SvgAttributes.getNumberFromMarkup({
+      attributes: caption,
+      name: "x",
+    }),
+    y = SvgAttributes.getNumberFromMarkup({
+      attributes: caption,
+      name: "y",
+    }),
+    fontSize = SvgAttributes.getNumberFromMarkup({
+      attributes: caption,
+      name: "font-size",
+    });
+  const right =
+    x +
+    getConservativeWidthFromText({
+      text: input.change.recordLabel,
+      fontSize,
+    });
+  const top = y - fontSize,
+    bottom = y + fontSize * 0.3;
+  return { x, right, top, bottom };
+}
+
+function _assertLatchCaptionClearance({
+  right,
+  x,
+  bottom,
+  latchY,
+  halfStroke,
+  top,
+  frame,
+}: LatchCaptionClearanceOptions): void {
+  assert.ok(
+    right < 98 ||
+      x > 862 ||
+      bottom < latchY - halfStroke ||
+      top > latchY + halfStroke,
+    `latch crosses caption at ${frame}`,
+  );
+}
 
 function _render({
   frame,
@@ -26,7 +115,6 @@ function _render({
     }),
   );
 }
-
 test("a committed local edit has exactly one matching pending durable ticket", () => {
   const hold = _render({ frame: 150 });
   assert.match(hold, /data-local-value="Count 3"/);
@@ -36,20 +124,18 @@ test("a committed local edit has exactly one matching pending durable ticket", (
 test("abort retains the before value without durable tickets or visible proposals", () => {
   const hold = _render({
     frame: 150,
-    input: {
-      ...DEFAULT_INPUT,
-      outcome: "abort",
-      showIdentifier: false,
-    },
+    input: { ...DEFAULT_INPUT, outcome: "abort", showIdentifier: false },
   });
   assert.match(hold, /data-local-value="Count 2"/);
   assert.doesNotMatch(hold, /data-durable-ticket=/);
   assert.doesNotMatch(hold, /data-provisional-half=/);
 });
 test("every sampled frame commits both durable halves or neither", () => {
-  fixtures.forEach(({ input }) =>
-    Array.from({ length: 180 }, (_, frame) => frame).forEach((frame) => {
-      const markup = _render({ frame: frame, input: input });
+  fixtures.forEach(({ input }) => {
+    return Array.from({ length: 180 }, (_, frame) => {
+      return frame;
+    }).forEach((frame) => {
+      const markup = _render({ frame, input });
       const committed = markup.includes('data-local-durable="true"');
       const tickets = (markup.match(/data-durable-ticket=/g) ?? []).length;
       assert.equal(
@@ -57,35 +143,45 @@ test("every sampled frame commits both durable halves or neither", () => {
         committed ? 1 : 0,
         `${input.outcome} frame ${frame}`,
       );
-    }),
-  );
+    });
+  });
 });
 test("both proposal halves write beneath one moving latch before one atomic stamp", () => {
   const early = _render({ frame: 20 }),
     written = _render({ frame: 55 });
   assert.equal((written.match(/data-provisional-half=/g) ?? []).length, 2);
   assert.notEqual(early, written);
-  const y = (frame: number) =>
-    SvgAttributes.getNumberFromMarkup({
-      attributes: SvgAttributes.fromMarker({
-        markup: _render({ frame: frame }),
+  const y = (frame: number) => {
+    return SvgAttributes.getNumberFromMarkup({
+      attributes: _markedShape({
+        markup: _render({ frame }),
         marker: "commit-latch",
       }),
       name: "y1",
     });
+  };
   assert.ok(y(80) > y(56) && y(80) < y(110));
   assert.equal(
     (_render({ frame: 139 }).match(/data-commit-stamp=/g) ?? []).length,
     2,
   );
 });
-
-import { registerStockLocalizationAssertions } from "../../../../tests/helpers/registerStockLocalizationAssertions";
-import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
-import { getConservativeWidthFromText } from "../../text/getConservativeWidthFromText";
-import { atomicOutboxCommitContract } from "./AtomicOutboxCommit.contract";
-import { inputSchema, type Input } from "./AtomicOutboxCommit.schema";
-
+/**
+ * A marker group and the sketch-aware shape it wraps, since the marker sits
+ * on the group around the shape.
+ */
+function _markedShape({
+  markup,
+  marker,
+}: Readonly<{ markup: string; marker: string }>): string {
+  const match = markup.match(
+    new RegExp(
+      `<g [^>]*data-${marker}="[^"]*"[^>]*><(?:line|path|circle|rect|ellipse)\\b[^>]*>`,
+    ),
+  );
+  assert.ok(match, marker);
+  return match[0];
+}
 function _getVisibleTexts({
   input,
   frame,
@@ -117,7 +213,7 @@ const options = {
 } satisfies PresetAssertions<Input>;
 registerStockPresetAssertions(options);
 registerStockTextLayoutAssertions(options);
-registerStockLocalizationAssertions({
+registerStockDefaultTextAssertions({
   contract: atomicOutboxCommitContract,
   expectedTextPaths: [
     ["change", "recordLabel"],
@@ -150,46 +246,16 @@ test("literal empty and whitespace values survive commit and abort while hidden 
   assert.doesNotMatch(aborted, /data-durable-ticket=/);
 });
 test("the complete latch stroke and handle remain clear of the record caption throughout closure", () => {
-  [
-    DEFAULT_INPUT,
-    fixtures[2].input,
-    {
-      ...fixtures[2].input,
-      change: { ...fixtures[2].input.change, recordLabel: "界".repeat(28) },
-    },
-  ].forEach((input) => {
-    Array.from({ length: 221 }, (_, index) => index / 2).forEach((frame) => {
-      const markup = _render({ frame: frame, input: input });
-      const caption = [...markup.matchAll(/<text[^>]+>/g)]
-        .map(([tag]) => tag)
-        .find((tag) =>
-          tag.includes(`aria-label="${input.change.recordLabel}"`),
-        );
-      assert.ok(caption);
-      const x = SvgAttributes.getNumberFromMarkup({
-          attributes: caption,
-          name: "x",
-        }),
-        y = SvgAttributes.getNumberFromMarkup({
-          attributes: caption,
-          name: "y",
-        }),
-        fontSize = SvgAttributes.getNumberFromMarkup({
-          attributes: caption,
-          name: "font-size",
-        });
-      const right =
-        x +
-        getConservativeWidthFromText({
-          text: input.change.recordLabel,
-          fontSize,
-        });
-      const top = y - fontSize,
-        bottom = y + fontSize * 0.3;
-      const latch = SvgAttributes.fromMarker({
+  _makeCaptionClearanceInputs().forEach((input) => {
+    Array.from({ length: 221 }, (_, index) => {
+      return index / 2;
+    }).forEach((frame) => {
+      const markup = _render({ frame, input });
+      const { x, right, top, bottom } = _getRecordCaptionBounds({
         markup,
-        marker: "commit-latch",
+        input,
       });
+      const latch = _markedShape({ markup, marker: "commit-latch" });
       const latchY = SvgAttributes.getNumberFromMarkup({
         attributes: latch,
         name: "y1",
@@ -199,13 +265,15 @@ test("the complete latch stroke and handle remain clear of the record caption th
           attributes: latch,
           name: "stroke-width",
         }) / 2;
-      assert.ok(
-        right < 98 ||
-          x > 862 ||
-          bottom < latchY - halfStroke ||
-          top > latchY + halfStroke,
-        `latch crosses caption at ${frame}`,
-      );
+      _assertLatchCaptionClearance({
+        right,
+        x,
+        bottom,
+        latchY,
+        halfStroke,
+        top,
+        frame,
+      });
       assert.ok(
         right < 463.5 ||
           x > 496.5 ||

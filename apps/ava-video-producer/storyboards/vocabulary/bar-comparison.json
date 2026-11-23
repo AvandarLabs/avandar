@@ -1,0 +1,118 @@
+{
+  "version": 1,
+  "id": "bar-comparison",
+  "title": "Bar comparison",
+  "description": "A hero number over ranked bars, first as one straight-edged panel, then as two panels with rough bar edges that erase element by element before the cut.",
+  "sourceNotes": [
+    "Scene study extracted from the shot vocabulary film; an editorial example, not a claim about Avandar features or performance.",
+    "Every figure is fictional demonstration data."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1920,
+  "height": 1080,
+  "delivery": {
+    "width": 1920,
+    "height": 1080
+  },
+  "captions": false,
+  "shots": [
+    {
+      "id": "one-panel",
+      "scene": "bar-comparison",
+      "durationInFrames": 120,
+      "transitionInFrames": 0,
+      "props": {
+        "panels": [
+          {
+            "value": 6,
+            "unit": "min",
+            "caption": "Minutes from a new spreadsheet to a first chart",
+            "rows": [
+              {
+                "label": "Spreadsheet",
+                "value": 6,
+                "highlight": true
+              },
+              {
+                "label": "CSV export",
+                "value": 9
+              },
+              {
+                "label": "Form responses",
+                "value": 14
+              },
+              {
+                "label": "Database table",
+                "value": 21
+              }
+            ]
+          }
+        ],
+        "footnote": "Fictional demonstration data"
+      }
+    },
+    {
+      "id": "two-panels",
+      "scene": "bar-comparison",
+      "durationInFrames": 150,
+      "transitionInFrames": 0,
+      "transition": {
+        "kind": "cut"
+      },
+      "props": {
+        "panels": [
+          {
+            "value": 86,
+            "unit": "%",
+            "caption": "Visits linked to a case",
+            "rows": [
+              {
+                "label": "North district",
+                "value": 86,
+                "display": "86%",
+                "highlight": true
+              },
+              {
+                "label": "Harbor district",
+                "value": 74,
+                "display": "74%"
+              },
+              {
+                "label": "Valley district",
+                "value": 61,
+                "display": "61%"
+              }
+            ]
+          },
+          {
+            "value": 312,
+            "caption": "Duplicate records flagged",
+            "rows": [
+              {
+                "label": "North district",
+                "value": 98
+              },
+              {
+                "label": "Harbor district",
+                "value": 131,
+                "highlight": true
+              },
+              {
+                "label": "Valley district",
+                "value": 83
+              }
+            ]
+          }
+        ],
+        "panelStaggerFrames": 6,
+        "barEdge": "rough",
+        "footnote": "Fictional demonstration data",
+        "exit": {
+          "kind": "erase",
+          "atFrame": 134
+        }
+      }
+    }
+  ]
+}

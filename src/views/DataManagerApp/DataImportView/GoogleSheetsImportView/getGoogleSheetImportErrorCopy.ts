@@ -1,5 +1,5 @@
 import { msg } from "@lingui/core/macro";
-import { GoogleDriveError } from "@/clients/google/GoogleDriveClient/GoogleDriveError";
+import { GoogleDriveError } from "$/connectors/googleSheets/GoogleDriveClient/GoogleDriveError";
 import type { I18n, MessageDescriptor } from "@lingui/core";
 
 /** The notification a failed Google Sheets import shows. */
@@ -56,6 +56,11 @@ function _getCopyDescriptors(error: unknown): CopyDescriptors {
       return {
         title: msg`Your Google connection expired`,
         message: msg`Reconnect your Google account and try again.`,
+      };
+    case "owner-reconnect-required":
+      return {
+        title: msg`This sheet can't be read right now`,
+        message: msg`The person who added this sheet needs to reconnect their Google account. Ask them to reconnect it, then try again.`,
       };
     case "rate-limited":
       return {

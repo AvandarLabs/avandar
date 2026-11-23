@@ -1,4 +1,5 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -74,14 +75,14 @@ function _buildBodyPath({
 }: Readonly<Pick<Props, "vehicle" | "heading">>) {
   const outlines = VEHICLE_OUTLINES[vehicle];
   return outlines
-    .map((points) =>
-      points
+    .map((points) => {
+      return points
         .map(([x, y], index) => {
           const point = _getRotatedPoint({ x, y, heading });
           return `${index ? "L" : "M"}${point.x} ${point.y}`;
         })
-        .join(" "),
-    )
+        .join(" ");
+    })
     .join(" ");
 }
 /** Delivery silhouette turns with the supplied safe journey. */
@@ -93,29 +94,31 @@ export function ConvoyVehicle({
   phase,
   heading,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g
       data-vehicle={vehicle}
       data-phase={phase}
       transform={`translate(${x} ${y})`}
     >
-      <path
-        d={_buildBodyPath({ vehicle, heading })}
-        fill={STOCK.surface}
+      <SketchedShape
+        shape={{ kind: "path", d: _buildBodyPath({ vehicle, heading }) }}
+        profile={tokens.sketch.shape}
+        fill={tokens.color.surface}
         stroke={accent}
-        strokeWidth={2}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
       {[-14, 16].map((wheel) => {
         const center = _getRotatedPoint({ x: wheel, y: 10, heading });
         return (
-          <circle
+          <SketchedShape
             key={wheel}
-            cx={center.x}
-            cy={center.y}
-            r={6}
-            fill={STOCK.ground}
+            shape={{ kind: "circle", cx: center.x, cy: center.y, r: 6 }}
+            profile={tokens.sketch.shape}
+            fill={tokens.color.ground}
             stroke={accent}
-            strokeWidth={2}
+            strokeWidth={scales.stroke(tokens.stroke.default)}
           />
         );
       })}

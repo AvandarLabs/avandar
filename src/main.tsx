@@ -29,7 +29,7 @@ registerOfflineServiceWorker();
 
 AuthClient.registerSessionExpiredHandler();
 
-// eslint-disable-next-line react-refresh/only-export-components
+// oxlint-disable-next-line react-refresh/only-export-components
 function MainWrapper() {
   const { user } = useAuth(AvaRouter);
   const context: AvaRouterRootContext = useMemo(() => {

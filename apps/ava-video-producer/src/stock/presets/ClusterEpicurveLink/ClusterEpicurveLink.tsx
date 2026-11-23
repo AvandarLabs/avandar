@@ -2,7 +2,7 @@ import { CaseCopy } from "./CaseCopy";
 import { CaseHistogram } from "./CaseHistogram";
 import { CaseIdentityGuides } from "./CaseIdentityGuides";
 import { CaseMap } from "./CaseMap";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ClusterEpicurveLink.schema";
 import type { ReactNode } from "react";
 /** Inputs for ClusterEpicurveLink. */

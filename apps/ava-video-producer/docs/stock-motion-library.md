@@ -94,8 +94,8 @@ The [gallery palette](../src/gallery/palette.ts) selects tokens from the current
 Avandar theme. `motion:build` reads `shared/config/Theme.ts`,
 `src/config/Theme/Theme.ts`, and `src/config/Theme/ElevationTheme.ts` directly,
 then bundles only their palette values. `showcase` builds and watches those
-inputs while serving live previews. The same build generates
-`showcase-theme.css` with primary and neutral CSS variables shared by Motion
+inputs while serving live previews. The same build generates the
+`showcase-theme.css` stylesheet with primary and neutral CSS variables shared by Motion
 Atlas, the starter showcase, and Productions. Showcase actions and selected
 states use the product blue, while the existing warm paper surfaces and
 editorial red accents remain part of the showcase's presentation.
@@ -137,7 +137,7 @@ ground. Collections determine their own counts.
 | --- | --- |
 | `preset` | One registered `StockPresetId`. IDs remain stable |
 | `schemaVersion` | Optional literal `1`, default `1`. Other versions fail |
-| `input` | Optional complete input for that preset. Only omission resolves a cloned, localized complete fictional default. Partial input and `null` fail rather than merging with defaults |
+| `input` | Optional complete input for that preset. Only omission resolves a cloned complete fictional default. Partial input and `null` fail rather than merging with defaults |
 | `accent` | Optional six-digit hex color. Direct renderer/CLI default `#9fefca` |
 | `background` | Optional six-digit hex color. Default `#0b1219`. Supported by React, storyboards, gallery downloads and CLI |
 | `frame` | `StockGraphic` local frame. Direct values are clamped to 0..179 and nonfinite values become 0 |
@@ -154,7 +154,7 @@ are checked by the runtime schema. Structural JSON Schema does not replace them.
 dot-separated input path. `stockRequestSchema` validates the strict envelope and
 reports content failures under `input`. Unknown fields/presets, invalid version
 or palette values and bad content are errors. Supplied authored copy is retained
-exactly; the renderer does not infer, translate or complete missing facts.
+exactly; the renderer does not infer or complete missing facts.
 
 ### Configured React example
 
@@ -163,7 +163,7 @@ at the producer app root. The data describes a fictional qualitative comparison,
 not measured review speed or a product capability.
 
 ```tsx
-import { StockGraphic } from "./src/stock/StockGraphic";
+import { StockGraphic } from "./src/stock/StockGraphic/StockGraphic";
 import type { StockRequest } from "./src/stock/contracts/StockContract";
 
 const request = {
@@ -290,11 +290,11 @@ serialize the configured input. Saved references persist preset IDs in browser
 storage. To retain or share exact content, save the configured JSON separately.
 
 Fixed metadata, control labels, default-copy paths and renderer `displayCopy`
-use the local Lingui boundary. Only omitted default input is localized. Optional
-`defaultSpanBindings` pairs a marked translation template with text and UTF-16
-offset paths so translated default spans stay aligned. Marker decoding never
-touches supplied input, even when it contains literal `<content>` characters.
-There is no automatic translation service or shipped non-English stock locale.
+are plain English descriptors. Each descriptor's `message` is the text a reader
+sees, and its `id` is a stable slot name. Only omitted input resolves a default,
+and that default is a clone of the contract's `defaultInput`. Supplied input is
+never rewritten. The stock library has no message catalogs, translation hooks or
+locale folders. Write new copy as plain English.
 
 ### Content and geography limits
 
@@ -346,8 +346,9 @@ The `--input` JSON document includes the selected preset, schemaVersion, complet
 input and optional palette. Its preset must match the selected CLI ID. The flag
 is rejected for `all` and `list`. The CLI validates before bundling.
 
-The gallery bundle is generated locally with `esbuild`, a project dependency.
-It contains React and the same stock sources used by Remotion. It uses no
+The gallery is built locally with Vite, a project dependency, in the same build
+as every other showcase page. It contains React and the same stock sources used
+by Remotion. It uses no
 external font, asset, or service at runtime. The running showcase watches stock
 source, metadata, theme inputs, and gallery logic and refreshes after successful
 rebuilds. `motion:build` remains available for an explicit local build. Browser
@@ -400,16 +401,16 @@ references for art direction, never substitutes for verifying the actual product
 Each of the 170 motion presets owns a canonical
 `src/stock/presets/<Preset>/<Preset>.metadata.yaml` file. Edit descriptive copy
 there: name, description, good uses, tags, creative direction, intent, domains,
-aliases, exclusions, distinction, and motion beats. Translation descriptors keep
-their stable IDs and source messages in YAML. The adjacent TypeScript module
+aliases, exclusions, distinction, and motion beats. Descriptors keep
+their stable IDs and English messages in YAML. The adjacent TypeScript module
 loads and validates this data; renderers, executable input schemas, fixtures,
 controls, and bindings remain TypeScript.
 
-The Atlas, CLI, message generator, and Remotion build read YAML directly. Normal
+The Atlas, CLI, and Remotion build read YAML directly. Normal
 showcase rebuilds consume YAML edits, with no catalog export or generated JSON
 copy required. Future embedding jobs can read these same files. The Atlas does
 not generate embeddings. For direct Node test invocations that import catalogs,
-use `node --import ./scripts/yaml/registerYaml.mjs --import tsx --test <test>`
+use `node --import tsx --import ./scripts/yaml/registerYaml.ts --test <test>`
 from this app; package scripts configure this automatically.
 
 Search text uses this semantic order: name, description, intent, creative

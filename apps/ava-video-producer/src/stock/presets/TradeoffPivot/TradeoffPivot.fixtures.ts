@@ -43,14 +43,18 @@ export const fixtures: Array<{ id: string; input: Input }> = [
     id: "dense",
     input: {
       approach: "界".repeat(40),
-      gains: Array.from({ length: 3 }, (_, index) => ({
-        id: `gain-${index}`,
-        label: "界".repeat(32),
-      })),
-      concessions: Array.from({ length: 3 }, (_, index) => ({
-        id: `cost-${index}`,
-        label: "界".repeat(32),
-      })),
+      gains: Array.from({ length: 3 }, (_, index) => {
+        return {
+          id: `gain-${index}`,
+          label: "界".repeat(32),
+        };
+      }),
+      concessions: Array.from({ length: 3 }, (_, index) => {
+        return {
+          id: `cost-${index}`,
+          label: "界".repeat(32),
+        };
+      }),
       sideLabels: { gain: "界".repeat(22), concession: "界".repeat(22) },
       priorityStatement: "界".repeat(58),
       revealOrder: "gain-first",

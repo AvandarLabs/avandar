@@ -1,15 +1,16 @@
 import { FitText } from "../../primitives/FitText/FitText";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./HouseholdMarketChoice.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; balance: number; accent: string };
-
 /** The household keeps the exact unspent demo credits beside its label. */
 export function MarketBalance({
   input,
   balance,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   if (!input.showRemainingBalance) {
     return null;
   }
@@ -31,7 +32,9 @@ export function MarketBalance({
         y={521}
         textAnchor="end"
         fill={accent}
-        fontSize={16}
+        fontFamily={tokens.text.graphic.secondary.fontFamily}
+        fontWeight={tokens.text.graphic.secondary.fontWeight}
+        fontSize={tokens.text.graphic.secondary.fontSize}
       >
         {balance}
       </text>

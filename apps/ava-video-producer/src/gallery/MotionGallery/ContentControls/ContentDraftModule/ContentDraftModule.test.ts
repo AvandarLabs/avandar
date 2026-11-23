@@ -15,7 +15,11 @@ test("invalid drafts retain the last valid preview and disable export", () => {
   });
   assert.equal(invalid.isValid, false);
   assert.deepEqual(invalid.resolvedInput, initial.resolvedInput);
-  assert.ok(invalid.issues.some((issue) => issue.path.join(".") === "prompt"));
+  assert.ok(
+    invalid.issues.some((issue) => {
+      return issue.path.join(".") === "prompt";
+    }),
+  );
 });
 test("reset restores the complete independent default", () => {
   const initial = ContentDraftModule.fromPreset("decision-fork");
@@ -42,11 +46,15 @@ test("removing the selected branch reports a dangling reference without changing
   });
   assert.equal(removed.isValid, false);
   assert.ok(
-    removed.issues.some((issue) => issue.path.join(".") === "selectedBranchId"),
+    removed.issues.some((issue) => {
+      return issue.path.join(".") === "selectedBranchId";
+    }),
   );
   assert.deepEqual(
     (removed.draft as typeof input).branches,
-    input.branches.filter((_, position) => position !== index),
+    input.branches.filter((_, position) => {
+      return position !== index;
+    }),
   );
 });
 test("one preset's edits cannot mutate another draft or the canonical defaults", () => {
@@ -65,11 +73,12 @@ test("one preset's edits cannot mutate another draft or the canonical defaults",
 test("adding a blank branch updates valid resolved content with a unique ID", () => {
   const initial = ContentDraftModule.fromPreset("decision-fork");
   const control = stockContracts["decision-fork"].controls.find(
-    (item): item is Extract<typeof item, { kind: "collection" }> =>
-      propEq<typeof item, "kind", (typeof item)["kind"]>(
+    (item): item is Extract<typeof item, { kind: "collection" }> => {
+      return propEq<typeof item, "kind", (typeof item)["kind"]>(
         "kind",
         "collection",
-      )(item),
+      )(item);
+    },
   )!;
   assert.equal(control.kind, "collection");
   if (control.kind !== "collection") {

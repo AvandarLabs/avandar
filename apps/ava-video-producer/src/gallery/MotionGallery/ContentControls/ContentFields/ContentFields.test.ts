@@ -8,46 +8,7 @@ const LABEL: Record<"id" | "message", string> = {
   message: "Value",
 };
 test("nullable controls distinguish explicit null from empty authored values", () => {
-  const controls: StockControl[] = [
-    {
-      kind: "text",
-      path: "",
-      label: LABEL,
-      minLength: 0,
-      maxLength: 20,
-      nullable: true,
-    },
-    {
-      kind: "number",
-      path: "",
-      label: LABEL,
-      min: 0,
-      max: 10,
-      nullable: true,
-    },
-    {
-      kind: "select",
-      path: "",
-      label: LABEL,
-      nullable: true,
-      options: [],
-    },
-    {
-      kind: "object",
-      path: "",
-      label: LABEL,
-      nullable: true,
-      controls: [
-        {
-          kind: "text",
-          path: "label",
-          label: LABEL,
-          minLength: 1,
-          maxLength: 20,
-        },
-      ],
-    },
-  ];
+  const controls = _createNullableControls();
   assert.deepEqual(controls.map(ContentFields.getBlankValueFromControl), [
     "",
     "",
@@ -103,6 +64,71 @@ test("union selection preserves numeric strings as authored text", () => {
   assert.equal(ContentFields.getBlankValueFromControl(control), "");
 });
 test("item-relative reference options stay inside the current group's records", () => {
+  const { control, first, second, root } = _createReferenceGroups();
+  assert.deepEqual(
+    ContentFields.getOptionsFromControl({ control, root, item: first }),
+    [
+      {
+        value: "a",
+        label: "First group",
+      },
+    ],
+  );
+  assert.deepEqual(
+    ContentFields.getOptionsFromControl({ control, root, item: second }),
+    [
+      {
+        value: "b",
+        label: "Second group",
+      },
+    ],
+  );
+});
+
+function _createNullableControls(): StockControl[] {
+  const controls: StockControl[] = [
+    {
+      kind: "text",
+      path: "",
+      label: LABEL,
+      minLength: 0,
+      maxLength: 20,
+      nullable: true,
+    },
+    {
+      kind: "number",
+      path: "",
+      label: LABEL,
+      min: 0,
+      max: 10,
+      nullable: true,
+    },
+    {
+      kind: "select",
+      path: "",
+      label: LABEL,
+      nullable: true,
+      options: [],
+    },
+    {
+      kind: "object",
+      path: "",
+      label: LABEL,
+      nullable: true,
+      controls: [
+        {
+          kind: "text",
+          path: "label",
+          label: LABEL,
+          minLength: 1,
+          maxLength: 20,
+        },
+      ],
+    },
+  ];
+  return controls;
+}
+function _createReferenceGroups() {
   const control: StockControl = {
     kind: "select",
     path: "retainedId",
@@ -139,22 +165,5 @@ test("item-relative reference options stay inside the current group's records", 
       },
     ],
   };
-  assert.deepEqual(
-    ContentFields.getOptionsFromControl({ control, root, item: first }),
-    [
-      {
-        value: "a",
-        label: "First group",
-      },
-    ],
-  );
-  assert.deepEqual(
-    ContentFields.getOptionsFromControl({ control, root, item: second }),
-    [
-      {
-        value: "b",
-        label: "Second group",
-      },
-    ],
-  );
-});
+  return { control, first, second, root };
+}

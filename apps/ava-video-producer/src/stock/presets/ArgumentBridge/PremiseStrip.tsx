@@ -1,5 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./ArgumentBridge.schema";
 import type { ReactNode } from "react";
 /** Inputs for PremiseStrip. */
@@ -9,7 +10,6 @@ type Props = {
   center: number;
   slotWidth: number;
 };
-
 /** A fixed-size strip keeps the complete premise readable below the deck. */
 export function PremiseStrip({
   premise,
@@ -17,16 +17,18 @@ export function PremiseStrip({
   center,
   slotWidth,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <>
-      <rect
+      <StockRect
         x={x + 4}
         y={410}
         width={slotWidth - 8}
         height={142}
-        rx={8}
-        fill={STOCK.surface}
-        stroke={STOCK.line}
+        rx={scales.corner(tokens.corner.cell)}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
       />
       <FitText
         text={premise.text}

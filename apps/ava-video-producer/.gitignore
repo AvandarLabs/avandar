@@ -18,6 +18,7 @@ scripts/beats/athana-launch.txt
 .env.*
 *.log
 .temp/
+*.tsbuildinfo
 .playwright-mcp/
 playwright-report/
 test-results/
@@ -36,4 +37,3 @@ src/gallery/theme-colors.json
 
 # Videos are generated on demand. Never track encoded exports.
 *.mp4
-showcase/motion-gallery.js

@@ -1,5 +1,5 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CoordinateGraticule } from "./CoordinateGraticule";
 import { makeCoordinateTriageFromInputAndFrame } from "./makeCoordinateTriageFromInputAndFrame";
 import { TriageOutcome } from "./TriageOutcome";
@@ -9,7 +9,13 @@ import type { ReactNode } from "react";
 type Props = { input: Input; frame: number };
 /** Numeric graticule, diagnostic trays and reconciled outcome counts. */
 export function TriagePlane({ input, frame }: Readonly<Props>): ReactNode {
-  const { counts } = makeCoordinateTriageFromInputAndFrame({ input, frame });
+  const body = GraphicThemeHooks.useGraphicTokens().text.graphic.body;
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const { counts } = makeCoordinateTriageFromInputAndFrame({
+    input,
+    frame,
+    motion,
+  });
   return (
     <g>
       <CoordinateGraticule />
@@ -23,19 +29,22 @@ export function TriagePlane({ input, frame }: Readonly<Props>): ReactNode {
         data-row-total={input.rows.length}
         x={880}
         y={553}
-        fontSize={20}
-        fill={STOCK.text}
+        fontSize={body.fontSize}
+        fontWeight={body.fontWeight}
+        fill={body.color}
       >
         <tspan>{input.rows.length}</tspan>
       </text>
-      {counts.map((outcome, index) => (
-        <TriageOutcome
-          key={outcome.reason}
-          outcome={outcome}
-          index={index}
-          labels={input.labels}
-        />
-      ))}
+      {counts.map((outcome, index) => {
+        return (
+          <TriageOutcome
+            key={outcome.reason}
+            outcome={outcome}
+            index={index}
+            labels={input.labels}
+          />
+        );
+      })}
     </g>
   );
 }

@@ -10,8 +10,8 @@ import { type Input } from "../MapClusterUnfold.schema";
 const render = ({
   frame,
   input = DEFAULT_INPUT,
-}: Readonly<{ frame: number; input?: Input }>): string =>
-  renderToStaticMarkup(
+}: Readonly<{ frame: number; input?: Input }>): string => {
+  return renderToStaticMarkup(
     createElement(
       "svg",
       {},
@@ -23,11 +23,14 @@ const render = ({
       }),
     ),
   );
+};
 
 function _marks({ markup, name }: { markup: string; name: string }): string[] {
   return [
     ...markup.matchAll(new RegExp(`<[^>]*data-${name}="[^"]*"[^>]*>`, "g")),
-  ].map((match) => match[0]);
+  ].map((match) => {
+    return match[0];
+  });
 }
 
 function _attribute({
@@ -49,14 +52,17 @@ function _number({ markup, name }: { markup: string; name: string }): number {
 const getVisibleTexts = ({
   input,
   frame,
-}: Readonly<{ input: Input; frame: number }>): string[] => [
-  ...Object.values(input.copy),
-  frame > 53 && frame < 139 ? input.labels.clusters : input.labels.points,
-  ...input.points.map(
-    (point, index) =>
-      `${index + 1} · ${point.label} → ${input.clusters.findIndex(propEq("id", point.clusterId)) + 1}`,
-  ),
-  ...input.clusters.map((cluster, index) => `${index + 1} · ${cluster.label}`),
-  `${input.labels.total}: ${input.points.length}`,
-];
+}: Readonly<{ input: Input; frame: number }>): string[] => {
+  return [
+    ...Object.values(input.copy),
+    frame > 53 && frame < 139 ? input.labels.clusters : input.labels.points,
+    ...input.points.map((point, index) => {
+      return `${index + 1} · ${point.label} → ${input.clusters.findIndex(propEq("id", point.clusterId)) + 1}`;
+    }),
+    ...input.clusters.map((cluster, index) => {
+      return `${index + 1} · ${cluster.label}`;
+    }),
+    `${input.labels.total}: ${input.points.length}`,
+  ];
+};
 export { render, _marks, _attribute, _number, getVisibleTexts };

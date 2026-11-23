@@ -1,5 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { HouseholdAnchor } from "./HouseholdAnchor";
 import { HouseholdGlyph } from "./HouseholdGlyph";
 import type { Input } from "./CatchmentUnionGaps.schema";
@@ -24,17 +25,20 @@ export function HouseholdRecord({
   gapEmphasis,
   covered,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const x = 70 + household.x * 4.8;
   const y = 160 + household.y * 2.8;
   const railY = 154 + index * 26;
-  const color = covered ? accent : STOCK.orange;
+  const color = covered ? accent : tokens.color.highlight;
   return (
     <g data-household={household.id} data-covered-home={covered}>
-      <path
-        d={`M${x} ${y} L610 ${railY} L628 ${railY}`}
+      <SketchedShape
+        shape={{ kind: "path", d: `M${x} ${y} L610 ${railY} L628 ${railY}` }}
+        profile={tokens.sketch.shape}
         fill="none"
         stroke={color}
-        strokeOpacity={0.22}
+        strokeOpacity={atomic.opacity["22"]}
       />
       <HouseholdAnchor
         householdId={household.id}

@@ -63,7 +63,7 @@ function _number({
   };
 }
 
-/** Localized semantic slot headings also serve the role selector. */
+/** Semantic slot headings also serve the role selector. */
 export const roleMessages: Record<
   | "subject"
   | "metric"
@@ -142,10 +142,12 @@ export const controls: StockControl[] = [
         path: "role",
         kind: "select",
         label: _message({ key: "controls.fragments.role", message: "Role" }),
-        options: Object.entries(roleMessages).map(([value, label]) => ({
-          value,
-          label,
-        })),
+        options: Object.entries(roleMessages).map(([value, label]) => {
+          return {
+            value,
+            label,
+          };
+        }),
       },
       _number({
         path: "contentStart",
@@ -168,19 +170,23 @@ export const controls: StockControl[] = [
     path: "method",
     kind: "select",
     label: _message({ key: "controls.method", message: "Method" }),
-    options: Object.entries(methodMessages).map(([value, label]) => ({
-      value,
-      label,
-    })),
+    options: Object.entries(methodMessages).map(([value, label]) => {
+      return {
+        value,
+        label,
+      };
+    }),
   },
   {
     path: "reviewState",
     kind: "select",
     label: _message({ key: "controls.reviewState", message: "Review state" }),
-    options: Object.entries(reviewMessages).map(([value, label]) => ({
-      value,
-      label,
-    })),
+    options: Object.entries(reviewMessages).map(([value, label]) => {
+      return {
+        value,
+        label,
+      };
+    }),
   },
   supported[1],
 ];

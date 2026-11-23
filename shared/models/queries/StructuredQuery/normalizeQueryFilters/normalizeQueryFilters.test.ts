@@ -1,5 +1,6 @@
 import { Model } from "@avandar/models";
 import { describe, expect, it } from "vitest";
+import { createConceptAttributeQueryColumn } from "$/models/queries/QueryColumn/QueryColumn.fixtures.ts";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import { normalizeQueryFilters } from "$/models/queries/StructuredQuery/normalizeQueryFilters/normalizeQueryFilters.ts";
 /** Column-name rules bind only unique names. Runtime rules require IDs. */
@@ -77,5 +78,54 @@ describe("normalizeQueryFilters", () => {
     });
     expect(result.filter.rules).toEqual([]);
     expect(result.issues).toEqual([{ nodeId: "rule", reason: "missing" }]);
+  });
+  it("drops a rule on a list column and reports it as unsupported", () => {
+    const listColumn = createConceptAttributeQueryColumn({
+      name: "Symptoms",
+      isArray: true,
+    });
+    const result = normalizeQueryFilters({
+      filter: {
+        type: "group",
+        id: "group",
+        combinator: "AND",
+        rules: [
+          {
+            type: "rule",
+            id: "rule",
+            columnId: listColumn.id,
+            columnDataType: "varchar",
+            operator: "contains",
+            value: "Fever",
+          },
+        ],
+      },
+      columns: [listColumn],
+      clause: "where",
+    });
+    expect(result.filter.rules).toEqual([]);
+    expect(result.issues).toEqual([{ nodeId: "rule", reason: "unsupported" }]);
+  });
+
+  it("keeps a having rule on a list column that is counted", () => {
+    const listColumn = {
+      ...createConceptAttributeQueryColumn({ name: "Symptoms", isArray: true }),
+      aggregation: "count" as const,
+    };
+    const rule = {
+      type: "rule" as const,
+      id: "rule",
+      columnId: listColumn.id,
+      columnDataType: "bigint" as const,
+      operator: ">" as const,
+      value: 1,
+    };
+    const result = normalizeQueryFilters({
+      filter: { type: "group", id: "group", combinator: "AND", rules: [rule] },
+      columns: [listColumn],
+      clause: "having",
+    });
+    expect(result.filter.rules).toEqual([rule]);
+    expect(result.issues).toEqual([]);
   });
 });

@@ -23,6 +23,17 @@ describe("countClarificationAnswersInThread", () => {
 });
 
 describe("collectApprovedClarificationValues", () => {
+  it("collects an automatically matched answer that carries a note line", () => {
+    const approved = collectApprovedClarificationValues([
+      {
+        role: "user",
+        content:
+          "[Clarification answer: New York]\n(Matched automatically to your candidate values.)",
+      },
+    ]);
+    expect([...approved]).toEqual(["new york"]);
+  });
+
   it("collects preset and custom answers but not none-of-above", () => {
     const approved = collectApprovedClarificationValues([
       { role: "user", content: "[Clarification answer: North, South]" },

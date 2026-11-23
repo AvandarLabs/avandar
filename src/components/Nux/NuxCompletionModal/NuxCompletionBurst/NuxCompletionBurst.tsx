@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { clsx } from "clsx";
 import css from "@/components/Nux/NuxCompletionModal/NuxCompletionBurst/NuxCompletionBurst.module.css";
 import type { CSSProperties, ReactElement } from "react";
 

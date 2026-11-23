@@ -13,17 +13,26 @@ export function SummaryCopy({ summary, accent }: Readonly<Props>): ReactNode {
       x: 16,
       y: 28,
       width: 368,
-      fontSize: 18,
+      fontSize: 18 as const,
       maxLines: 3,
       color: accent,
     },
-    { text: summary.text, x: 16, y: 96, width: 368, fontSize: 14, maxLines: 7 },
+    {
+      text: summary.text,
+      x: 16,
+      y: 96,
+      width: 368,
+      fontSize: 14 as const,
+      maxLines: 7,
+    },
   ];
   return (
     <g data-copy-block="summary" data-bottom={212}>
-      {slots.map((slot) => (
-        <FitText key={slot.y} {...slot} breakLongWords normalizeWhitespace />
-      ))}
+      {slots.map((slot) => {
+        return (
+          <FitText key={slot.y} {...slot} breakLongWords normalizeWhitespace />
+        );
+      })}
     </g>
   );
 }

@@ -37,19 +37,25 @@ export const inputSchema = z
     showUsageTurns: z.boolean(),
   })
   .refine(
-    (input) =>
-      new Set(input.timeSlots.map(prop("id"))).size === input.timeSlots.length,
+    (input) => {
+      return (
+        new Set(input.timeSlots.map(prop("id"))).size === input.timeSlots.length
+      );
+    },
     { path: ["timeSlots"], message: "Slot IDs must be unique." },
   )
   .refine(
-    (input) =>
-      new Set(input.requests.map(prop("id"))).size === input.requests.length,
+    (input) => {
+      return (
+        new Set(input.requests.map(prop("id"))).size === input.requests.length
+      );
+    },
     { path: ["requests"], message: "Request IDs must be unique." },
   )
   .refine(
-    (input) =>
-      input.requests.every(
-        (request) =>
+    (input) => {
+      return input.requests.every((request) => {
+        return (
           input.timeSlots.some(propEq("id", request.requestedSlotId)) &&
           (request.agreedSlotId === null ||
             input.timeSlots.some(
@@ -57,8 +63,10 @@ export const inputSchema = z
                 "id",
                 request.agreedSlotId,
               ),
-            )),
-      ),
+            ))
+        );
+      });
+    },
     { path: ["requests"], message: "Slot references must exist." },
   )
   .refine(
@@ -71,9 +79,12 @@ export const inputSchema = z
     { path: ["requests"], message: "Agreed slots must be distinct." },
   )
   .refine(
-    (input) =>
-      new Set(input.requests.map(prop("requestedSlotId"))).size <
-      input.requests.length,
+    (input) => {
+      return (
+        new Set(input.requests.map(prop("requestedSlotId"))).size <
+        input.requests.length
+      );
+    },
     {
       path: ["requests"],
       message: "At least two requested slots must overlap.",

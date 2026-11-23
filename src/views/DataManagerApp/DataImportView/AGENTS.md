@@ -12,10 +12,20 @@ preview, and hands the result to
 name, adjust and save. `ManualUploadView` and `GoogleSheetsImportView` are
 both of these, and any new connector will be too.
 
-`OpenDataCatalogView` is deliberately not one. It adds an already-modeled
-catalog entry to the workspace, so it never sniffs, never previews, and never
-renders `DatasetImportForm`. Do not force it into the shape below, and do not
-take it as the example to copy.
+`DataCatalogView` is deliberately not one. It adds an already-modeled
+catalog entry to the workspace, so it never renders `DatasetImportForm`. It
+does show a read-only preview of a listing's first rows
+(`useCatalogListingPreview`), but that preview is for browsing: nothing it
+reads is saved as the dataset. The one exception is a preview sample that
+held the whole source, which adding the listing hands back to build the
+listing's shared Parquet copy from. Do not force it into
+the shape below, and do not take it as the example to copy.
+
+A pasted link on `ManualUploadView` is still a manual upload. Avandar's
+server downloads the public file, the browser sniffs the bytes, and the
+review form is the same one a dropped file uses. The link is not stored and
+a refresh does not fetch it again. An archive or a portal page with more
+than one data file stops to ask which one, then continues as a single file.
 
 ## The shape
 
@@ -138,5 +148,9 @@ drives real workbook bytes through a real sniff for this reason, and the
 4. Write the unit test against real bytes, and an e2e spec. Tag the spec
    `@third-party` only if it reaches a real external service, and read
    [`docs/rules/e2e-testing.md`](../../../../docs/rules/e2e-testing.md) first.
+   Importing is only the first of the flows a new source needs tests for:
+   [`docs/qetl-architecture.md` section 10.3](../../../../docs/qetl-architecture.md#103-required-tests)
+   lists the rest (dashboards, publishing, refresh, column types, and
+   someone other than the importer reading it).
 5. Update the side-by-side table above, so this file keeps describing every
    view rather than the two that were here first.

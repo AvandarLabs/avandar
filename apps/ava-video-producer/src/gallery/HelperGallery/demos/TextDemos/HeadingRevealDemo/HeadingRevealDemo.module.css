@@ -1,0 +1,5 @@
+.headingRevealDemoCards {
+  display: flex;
+  gap: var(--demo-space-sm);
+  justify-content: center;
+}

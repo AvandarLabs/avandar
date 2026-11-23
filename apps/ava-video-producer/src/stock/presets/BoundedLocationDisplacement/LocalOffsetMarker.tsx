@@ -1,8 +1,24 @@
-import { ramp, mix, EASE } from "../../../motion";
-import { Text } from "../../graphics-common";
-import { STOCK } from "../../stockPalette";
+import { Motion } from "../../../motion";
+import { Text } from "../../graphics-common/Text";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./BoundedLocationDisplacement.schema";
 import type { ReactNode } from "react";
+
+type OffsetPoint = { cx: number; cy: number };
+type OffsetVector = { x1: number; y1: number; x2: number; y2: number };
+type OffsetGeometry = {
+  progress: number;
+  source: OffsetPoint;
+  displaced: OffsetPoint;
+  vector: OffsetVector;
+};
+
+/** Inputs for getOffsetGeometry. */
+type GetOffsetGeometryArguments = Pick<Props, "location" | "frame"> & {
+  motion: VideoMotion;
+};
 
 type Props = {
   location: Input["locations"][number];
@@ -14,8 +30,14 @@ type Props = {
 function _getOffsetGeometry({
   location,
   frame,
-}: Readonly<Pick<Props, "location" | "frame">>) {
-  const progress = ramp(frame, 13, 57, EASE.inOut);
+  motion,
+}: Readonly<GetOffsetGeometryArguments>): OffsetGeometry {
+  const progress = motion.ramp(
+    frame,
+    13,
+    motion.scale(57),
+    motion.travel.easing,
+  );
   const source = { cx: 60 + location.x * 3.2, cy: 180 + location.y * 2.2 };
   const displaced = {
     cx: 60 + (location.x + location.offsetX) * 3.2,
@@ -24,8 +46,8 @@ function _getOffsetGeometry({
   const vector = {
     x1: source.cx,
     y1: source.cy,
-    x2: mix(progress, source.cx, displaced.cx),
-    y2: mix(progress, source.cy, displaced.cy),
+    x2: Motion.mix({ t: progress, from: source.cx, to: displaced.cx }),
+    y2: Motion.mix({ t: progress, from: source.cy, to: displaced.cy }),
   };
   return { progress, source, displaced, vector };
 }
@@ -37,35 +59,37 @@ export function LocalOffsetMarker({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { progress, source, displaced, vector } = _getOffsetGeometry({
-    location,
-    frame,
-  });
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const offset = _getOffsetGeometry({ location, frame, motion });
   return (
     <g>
       {showOriginal ? (
         <circle
           data-local-original={location.id}
-          {...source}
+          {...offset.source}
           r={5}
-          fill={STOCK.orange}
+          fill={tokens.color.highlight}
         />
       ) : undefined}
-      <line
+      <SketchedShape
+        shape={{ kind: "line", ...offset.vector }}
+        profile={tokens.sketch.shape}
         data-local-offset={location.id}
-        {...vector}
         stroke={accent}
-        strokeWidth={2}
-        opacity={progress}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
+        opacity={offset.progress}
       />
-      <circle
-        {...displaced}
-        r={7}
+      <SketchedShape
+        shape={{ kind: "circle", ...offset.displaced, r: 7 }}
+        profile={tokens.sketch.shape}
         fill="none"
         stroke={accent}
-        opacity={progress}
+        strokeWidth={scales.stroke(tokens.stroke.hairline)}
+        opacity={offset.progress}
       />
-      <Text x={displaced.cx} y={displaced.cy + 4} size={12}>
+      <Text x={offset.displaced.cx} y={offset.displaced.cy + 4} role="data">
         {index + 1}
       </Text>
     </g>

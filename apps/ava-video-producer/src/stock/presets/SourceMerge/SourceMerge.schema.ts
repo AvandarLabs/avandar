@@ -1,13 +1,17 @@
 import { z } from "zod";
+import { contentColorSchema } from "../../theme/getContentColorFromValue/getContentColorFromValue";
 import { createLabelSchema } from "../legacy/createLabelSchema";
-import { legacyColorSchema } from "../legacy/legacyColorSchema.constants";
 
 /** Strict authored content within the fixed SourceMerge layout. */
 export const sourceMergeInputSchema: z.ZodObject<
   {
     sources: z.ZodArray<
       z.ZodObject<
-        { name: z.ZodString; kind: z.ZodString; color: z.ZodString },
+        {
+          name: z.ZodString;
+          kind: z.ZodString;
+          color: typeof contentColorSchema;
+        },
         z.core.$strict
       >
     >;
@@ -30,7 +34,7 @@ export const sourceMergeInputSchema: z.ZodObject<
           maxLength: 3,
           bounds: { fontSize: 13, width: 40, mono: true },
         }),
-        color: legacyColorSchema,
+        color: contentColorSchema,
       }),
     )
     .min(1)

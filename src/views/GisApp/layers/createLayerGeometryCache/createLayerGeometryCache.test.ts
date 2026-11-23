@@ -23,6 +23,7 @@ function _inputs(
     sensitivity: { mode: "exact" } as const,
     propertyColumnNames: "all" as const,
     rows: ROWS,
+    jitterSalt: "map-salt",
     ...overrides,
   };
 }
@@ -62,6 +63,18 @@ describe("createLayerGeometryCache", () => {
     const first = cache.get(_inputs());
     const second = cache.get(_inputs({ propertyColumnNames: ["caseId"] }));
     expect(second.featureCollection).not.toBe(first.featureCollection);
+  });
+
+  it("recomputes when the map's jitter salt changes", () => {
+    const cache = createLayerGeometryCache();
+    const jitter = { mode: "jitter", radiusMeters: 500 } as const;
+    const first = cache.get(_inputs({ sensitivity: jitter }));
+    const second = cache.get(
+      _inputs({ sensitivity: jitter, jitterSalt: "another-map-salt" }),
+    );
+    expect(second.featureCollection.features[0]?.geometry).not.toEqual(
+      first.featureCollection.features[0]?.geometry,
+    );
   });
 
   it("returns an empty collection and no error before the rows arrive", () => {

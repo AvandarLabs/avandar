@@ -44,11 +44,13 @@ export const inputSchema = z
   })
   .superRefine((input, context) => {
     const learnerIds = input.learners.map(prop("id"));
+    const learnerIdSet = new Set(learnerIds);
     const componentIds = input.plannedComponents.map(prop("id"));
+    const componentIdSet = new Set(componentIds);
     const trayIds = input.trays.map(prop("learnerId"));
     if (
-      new Set(learnerIds).size !== learnerIds.length ||
-      new Set(componentIds).size !== componentIds.length
+      learnerIdSet.size !== learnerIds.length ||
+      componentIdSet.size !== componentIds.length
     ) {
       context.addIssue({
         code: "custom",
@@ -59,7 +61,9 @@ export const inputSchema = z
     if (
       trayIds.length !== learnerIds.length ||
       new Set(trayIds).size !== trayIds.length ||
-      trayIds.some((id) => !learnerIds.includes(id))
+      trayIds.some((id) => {
+        return !learnerIdSet.has(id);
+      })
     ) {
       context.addIssue({
         code: "custom",
@@ -70,7 +74,9 @@ export const inputSchema = z
     input.trays.forEach((tray, index) => {
       if (
         new Set(tray.componentIds).size !== tray.componentIds.length ||
-        tray.componentIds.some((id) => !componentIds.includes(id))
+        tray.componentIds.some((id) => {
+          return !componentIdSet.has(id);
+        })
       ) {
         context.addIssue({
           code: "custom",

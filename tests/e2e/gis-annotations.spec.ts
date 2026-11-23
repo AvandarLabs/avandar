@@ -8,6 +8,7 @@ import {
 } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT, MEDIUM_WAIT, SHORT_WAIT } from "./helpers/timeouts";
 import type { Page } from "@playwright/test";
+import type { FillLayerSpecification } from "maplibre-gl";
 
 const MAP_NAME = "E2E GIS annotations";
 const ANNOTATION_TEXT = "E2E note";
@@ -15,7 +16,7 @@ const ANNOTATION_TEXT = "E2E note";
 type AnnotationSnapshot = {
   featureCount: number;
   kinds: string[];
-  fillVisibility: string | undefined;
+  fillVisibility: NonNullable<FillLayerSpecification["layout"]>["visibility"];
 };
 
 /** Clicks a canvas fraction so annotation tools miss the empty-map overlay. */
@@ -82,7 +83,7 @@ async function _dragCanvasFraction(
 
 /** Draws a rectangle in the upper canvas so the empty-map card is missed. */
 async function _drawAnnotationArea(page: Page): Promise<void> {
-  await page.getByRole("heading", { name: "Layers", exact: true }).click();
+  await page.getByRole("heading", { name: "Annotations", exact: true }).click();
   await page.keyboard.press("Escape");
   const annotate = page.getByRole("button", {
     name: "Annotate the map",
@@ -178,7 +179,7 @@ test("persists text and area annotations and hides them from the row", async ({
       )
       .toBe(true);
     await expect(
-      page.getByRole("region", { name: "Layers" }).getByText("Annotations"),
+      page.getByRole("region", { name: "Annotations", exact: true }),
     ).toBeVisible({ timeout: MEDIUM_WAIT });
     await expect(
       page.getByRole("status", { name: "All changes saved" }),

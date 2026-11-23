@@ -26,39 +26,37 @@ test("cell placement, explicit missing label and two-line text remain visible", 
   assert.doesNotMatch(markup, /undefined|null/);
 });
 test("table cells reject unreadable overflow and invalid dimensions", () => {
-  assert.throws(() =>
-    renderToStaticMarkup(
+  assert.throws(() => {
+    return renderToStaticMarkup(
       createElement(TableCell, {
         x: 0,
         y: 0,
         width: 120,
         text: "W".repeat(24),
       }),
-    ),
-  );
-  assert.throws(() =>
-    renderToStaticMarkup(
+    );
+  });
+  assert.throws(() => {
+    return renderToStaticMarkup(
       createElement(TableCell, {
         x: Infinity,
         y: 0,
         width: 120,
         text: "value",
       }),
-    ),
-  );
+    );
+  });
 });
 
 test("wide lowercase text is rejected before escaping the inner cell width", () => {
-  assert.throws(
-    () =>
-      renderToStaticMarkup(
-        createElement(TableCell, {
-          x: 0,
-          y: 0,
-          width: 200,
-          text: "m".repeat(16),
-        }),
-      ),
-    /fit/,
-  );
+  assert.throws(() => {
+    return renderToStaticMarkup(
+      createElement(TableCell, {
+        x: 0,
+        y: 0,
+        width: 200,
+        text: "m".repeat(16),
+      }),
+    );
+  }, /fit/);
 });

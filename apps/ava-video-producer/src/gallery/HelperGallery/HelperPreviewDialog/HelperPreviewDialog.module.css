@@ -1,0 +1,14 @@
+/* The open helper's preview and reference scroll inside the Atlas modal. */
+.helperPreviewDialogModalBody {
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--atlas-space-16) var(--atlas-space-24) var(--atlas-space-32);
+}
+
+/* At phone widths the whole Atlas dialog scrolls, so the body does not. */
+@media (width <= 760px) {
+  .helperPreviewDialogModalBody {
+    overflow-y: visible;
+    padding: var(--atlas-space-12) var(--atlas-space-16) var(--atlas-space-24);
+  }
+}

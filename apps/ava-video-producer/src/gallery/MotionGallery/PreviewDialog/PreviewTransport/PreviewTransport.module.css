@@ -1,0 +1,19 @@
+.previewTransportTransportRow {
+  composes: transport-row from global;
+}
+
+.previewTransportTransportButton {
+  composes: transport-button from global;
+}
+
+.previewTransportIconButton {
+  composes: icon-button from global;
+}
+
+.previewTransportTimeCode {
+  composes: time-code from global;
+}
+
+.previewTransportFrameRate {
+  composes: frame-rate from global;
+}

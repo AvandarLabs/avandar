@@ -1,23 +1,15 @@
-import { spawnSync } from "node:child_process";
-import { requireLicense } from "../require-license.mjs";
-import { enumerateProducerTests } from "./enumerateProducerTests/enumerateProducerTests";
+import { pathToFileURL } from "node:url";
+import { ProducerCli } from "../runProducerCommand/ProducerCli/ProducerCli.mjs";
 
-requireLicense();
-const files: string[] = await enumerateProducerTests(process.cwd());
-const result: ReturnType<typeof spawnSync> = spawnSync(
-  process.execPath,
-  [
-    "--import",
-    "tsx",
-    "--import",
-    "./scripts/yaml/registerYaml.mjs",
-    "--test",
-    ...process.argv.slice(2),
-    ...files,
-  ],
-  { stdio: "inherit" },
-);
-if (result.error) {
-  throw result.error;
+await ProducerCli.prepare({ commandName: "test", moduleUrl: import.meta.url });
+
+if (
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(process.argv[1]).href
+) {
+  process.env.AVA_PRODUCER_WORKER_ENTRY = new URL(
+    "./runProducerTestsCommand.ts",
+    import.meta.url,
+  ).href;
+  await import("./runProducerTestsCommand.ts");
 }
-process.exitCode = result.status ?? 1;

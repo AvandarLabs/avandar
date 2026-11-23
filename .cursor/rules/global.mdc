@@ -27,7 +27,7 @@ Libraries:
 - Querying: Tanstack Query v5
 - Schema validation: Zod v4
 - Database and Auth: Supabase JS v2
-- Linter: ESLint v9
+- Linter: Oxlint
 - Formatter: Oxfmt (Prettier v3 for SQL schemas only)
 - CSS Styles: TailwindCSS v3
 - Icons: Tabler Icons v3

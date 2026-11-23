@@ -278,7 +278,7 @@ centre stack, and "Add to dashboard" sits in the export sheet's footer.
 
 | Feature | Why unplaced | Decision needed |
 | --- | --- | --- |
-| Isochrone travel-time access | It needs an external routing service, and the spec marks it a Wave E stretch item. It is shaped like a tool (draw a start point) but its output is a polygon layer that must be styleable and savable, so it is shaped like a layer too. | Whether an isochrone is a tool-cluster tool that writes a layer, matching Buffer, or a geo-binding type. The Buffer precedent in §3.7 argues for a tool, but Buffer's input is an existing layer while an isochrone's input is a point the user places, which no other tool does. Resolve before Wave D fixes the tool cluster's shape. |
+| Isochrone travel-time access | It needs an external routing service, and the spec marks it a Wave E stretch item. It is shaped like a tool (draw a start point) but its output is a polygon layer that must be styleable and savable, so it is shaped like a layer too. | Resolved for point input by "Add a place" (`docs/measles-demo/workflow-b-map-features-design.md` §4.4): a tool-cluster tool whose input is a point the user places writes rows into a dataset and makes sure a layer shows that dataset, rather than becoming a geo-binding type. The tool arms `MapToolMode` `{ type: "place" }`, and one map click, typed coordinates, or an address result sets the point. An isochrone follows the same shape: a tool that takes a placed point and writes a polygon layer, as Buffer writes one from a layer. |
 
 Open questions that are not placement questions live in
 `docs/superpowers/specs/2026-08-12-gis-shell-design.md` §11.

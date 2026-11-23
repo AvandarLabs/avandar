@@ -9,7 +9,10 @@ import {
   ORIGINAL_ENV,
   PROJECT_ROOT,
 } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIo/SupabaseLocalEnvironmentFakeIo";
-import type { SupabaseBackupManifest } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
+import type {
+  SupabaseBackupManifest,
+  SupabaseLocalBackupManifest,
+} from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
 import type { FakeHarness } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIo/SupabaseLocalEnvironmentFakeIo";
 
 function _makeBackupDirectory(
@@ -41,15 +44,28 @@ function _makeBackupHierarchy(
   ];
 }
 
-function _seedActiveBackup(fake: FakeHarness): void {
-  const backupDirectory = _makeBackupDirectory();
-  const manifest: SupabaseBackupManifest = {
+/** The `.env.development` a switch to `analytics-p2-temp` leaves behind. */
+const SWITCHED_ENV = `VITE_SUPABASE_API_URL=temp
+
+# >>> ava supabase switch >>>
+SUPABASE_PROJECT_ID=analytics-p2-temp
+SUPABASE_API_PORT=55321
+SUPABASE_DB_PORT=55322
+# <<< ava supabase switch <<<
+`;
+
+function _seedBackupFiles(
+  options: Readonly<{ fake: FakeHarness; sourcePaths: readonly string[] }>,
+): void {
+  const { fake, sourcePaths } = options;
+  const manifest: SupabaseLocalBackupManifest = {
+    kind: "local",
     branch: BRANCH,
     worktreePath: PROJECT_ROOT,
     temporaryProjectId: "analytics-p2-temp",
     basePort: 55321,
     derivedPorts: { "api.port": 55321, "db.port": 55322 },
-    files: [CONFIG_PATH, ENV_PATH, EDGE_ENV_PATH].map((sourcePath) => {
+    files: sourcePaths.map((sourcePath) => {
       return {
         sourcePath,
         backupPath: _makeBackupPathFromSourcePath(sourcePath),
@@ -60,30 +76,52 @@ function _seedActiveBackup(fake: FakeHarness): void {
   _makeBackupHierarchy().forEach((directoryPath) => {
     fake.directories.add(directoryPath);
   });
-  fake.files.set(_makeBackupPathFromSourcePath(CONFIG_PATH), ORIGINAL_CONFIG);
-  fake.files.set(_makeBackupPathFromSourcePath(ENV_PATH), ORIGINAL_ENV);
+  const originalContents: Record<string, string> = {
+    [CONFIG_PATH]: ORIGINAL_CONFIG,
+    [ENV_PATH]: ORIGINAL_ENV,
+    [EDGE_ENV_PATH]: ORIGINAL_EDGE_ENV,
+  };
+  sourcePaths.forEach((sourcePath) => {
+    fake.files.set(
+      _makeBackupPathFromSourcePath(sourcePath),
+      originalContents[sourcePath] ?? "",
+    );
+  });
   fake.files.set(
-    _makeBackupPathFromSourcePath(EDGE_ENV_PATH),
-    ORIGINAL_EDGE_ENV,
-  );
-  fake.files.set(
-    `${backupDirectory}/manifest.json`,
+    `${_makeBackupDirectory()}/manifest.json`,
     `${JSON.stringify(manifest, null, 2)}\n`,
   );
+  fake.files.set(EDGE_ENV_PATH, "SB_SECRET_KEY=temp\n");
+}
+
+function _seedActiveBackup(fake: FakeHarness): void {
+  _seedBackupFiles({ fake, sourcePaths: [ENV_PATH, EDGE_ENV_PATH] });
+  fake.files.set(ENV_PATH, SWITCHED_ENV);
+}
+
+function _seedLegacyActiveBackup(fake: FakeHarness): void {
+  _seedBackupFiles({
+    fake,
+    sourcePaths: [CONFIG_PATH, ENV_PATH, EDGE_ENV_PATH],
+  });
   fake.files.set(
     CONFIG_PATH,
     ORIGINAL_CONFIG.replace('"avandar"', '"analytics-p2-temp"'),
   );
   fake.files.set(ENV_PATH, "VITE_SUPABASE_API_URL=temp\n");
-  fake.files.set(EDGE_ENV_PATH, "SB_SECRET_KEY=temp\n");
 }
 
+/** Reads the seeded manifest, which the fixtures always write as local. */
 function _readFakeManifest(
   fake: Readonly<FakeHarness>,
-): SupabaseBackupManifest {
-  return JSON.parse(
-    fake.files.get(`${_makeBackupDirectory()}/manifest.json`) ?? "{}",
-  ) as SupabaseBackupManifest;
+): SupabaseLocalBackupManifest {
+  const manifestContents = fake.files.get(
+    `${_makeBackupDirectory()}/manifest.json`,
+  );
+  if (manifestContents === undefined) {
+    throw new Error("The fake harness has no seeded manifest.");
+  }
+  return JSON.parse(manifestContents);
 }
 
 function _writeFakeManifest(
@@ -130,8 +168,14 @@ export const SupabaseLocalEnvironmentFixtures = {
   /** Returns every directory in a branch-scoped backup hierarchy. */
   makeBackupHierarchy: _makeBackupHierarchy,
 
-  /** Seeds an active backup and switched local environment. */
+  /** Seeds an active switch whose overrides live in `.env.development`. */
   seedActiveBackup: _seedActiveBackup,
+
+  /**
+   * Seeds an active switch that rewrote `supabase/config.toml` instead, the
+   * way worktrees switched by an older `ava` still look on disk.
+   */
+  seedLegacyActiveBackup: _seedLegacyActiveBackup,
 
   /** Reads the current manifest from a fake harness. */
   readFakeManifest: _readFakeManifest,

@@ -1,0 +1,3 @@
+.galleryPlaybackTogglePlayAll {
+  composes: play-all from global;
+}

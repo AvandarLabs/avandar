@@ -1,0 +1,18 @@
+.curvePlotAxesPlotAxis {
+  fill: none;
+  stroke: var(--demo-line);
+  stroke-width: var(--demo-stroke-outline, 1.5);
+}
+
+.curvePlotAxesPlotGuide {
+  fill: none;
+  stroke: var(--demo-line);
+  stroke-dasharray: var(--demo-dash-guide, 4 6);
+  stroke-width: var(--demo-stroke-hairline, 1);
+}
+
+.curvePlotAxesPlotText {
+  fill: var(--demo-muted);
+  font-family: var(--demo-mono);
+  font-size: var(--demo-font-size-2xs);
+}

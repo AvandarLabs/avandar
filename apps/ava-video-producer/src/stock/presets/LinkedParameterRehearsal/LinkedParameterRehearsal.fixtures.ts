@@ -65,12 +65,14 @@ const dense: Input = {
       max: 10,
       unit: "units",
     },
-  ].map((output, index) => ({
-    ...output,
-    id: `output ${index}`,
-    label: "W".repeat(28),
-    unit: "W".repeat(16),
-  })),
+  ].map((output, index) => {
+    return {
+      ...output,
+      id: `output ${index}`,
+      label: "W".repeat(28),
+      unit: "W".repeat(16),
+    };
+  }),
   phaseLabels: {
     baseline: "A".repeat(36),
     trial: "B".repeat(36),
@@ -170,23 +172,25 @@ export const invalidInputs: unknown[] = [
   { ...DEFAULT_INPUT, outputs: DEFAULT_INPUT.outputs.slice(0, 2) },
   {
     ...DEFAULT_INPUT,
-    outputs: DEFAULT_INPUT.outputs.map((output) => ({
-      ...output,
-      multiplier: 0,
-      offset: 1,
-    })),
+    outputs: DEFAULT_INPUT.outputs.map((output) => {
+      return {
+        ...output,
+        multiplier: 0,
+        offset: 1,
+      };
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    outputs: DEFAULT_INPUT.outputs.map((output, index) =>
-      index === 0 ? { ...output, max: 7 } : output,
-    ),
+    outputs: DEFAULT_INPUT.outputs.map((output, index) => {
+      return index === 0 ? { ...output, max: 7 } : output;
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    outputs: DEFAULT_INPUT.outputs.map((output, index) =>
-      index === 0 ? { ...output, id: "" } : output,
-    ),
+    outputs: DEFAULT_INPUT.outputs.map((output, index) => {
+      return index === 0 ? { ...output, id: "" } : output;
+    }),
   },
   {
     ...DEFAULT_INPUT,
@@ -194,15 +198,17 @@ export const invalidInputs: unknown[] = [
   },
   {
     ...DEFAULT_INPUT,
-    outputs: DEFAULT_INPUT.outputs.map((output, index) =>
-      index === 0 ? { ...output, multiplier: 1e308 } : output,
-    ),
+    outputs: DEFAULT_INPUT.outputs.map((output, index) => {
+      return index === 0 ? { ...output, multiplier: 1e308 } : output;
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    outputs: DEFAULT_INPUT.outputs.map((output) => ({
-      ...output,
-      max: Infinity,
-    })),
+    outputs: DEFAULT_INPUT.outputs.map((output) => {
+      return {
+        ...output,
+        max: Infinity,
+      };
+    }),
   },
 ];

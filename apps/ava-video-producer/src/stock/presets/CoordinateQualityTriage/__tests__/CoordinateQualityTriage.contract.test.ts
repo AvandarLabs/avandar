@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { prop } from "@avandar/utils";
 import { getSvgAttributeMatchesFromMarkup } from "../../../../../tests/helpers/getSvgAttributeMatchesFromMarkup/getSvgAttributeMatchesFromMarkup";
-import { registerStockLocalizationAssertions } from "../../../../../tests/helpers/registerStockLocalizationAssertions";
+import { registerStockDefaultTextAssertions } from "../../../../../tests/helpers/registerStockDefaultTextAssertions";
 import { registerStockPresetAssertions } from "../../../../../tests/helpers/registerStockPresetAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
@@ -21,6 +21,18 @@ import {
   EXCLUSIONS,
 } from "./CoordinateQualityTriageTestHelpers";
 
+function _assertHiddenCoordinateValues(
+  markup: ReturnType<typeof _render>,
+): void {
+  assert.equal(
+    getSvgAttributeMatchesFromMarkup({
+      markup: markup,
+      attribute: "data-coordinate-value",
+    }).tags.length,
+    0,
+  );
+}
+
 registerStockPresetAssertions({
   inputSchema,
   defaultInput: DEFAULT_INPUT,
@@ -32,7 +44,7 @@ registerStockPresetAssertions({
   getVisibleTexts: _getVisibleTexts,
 });
 
-registerStockLocalizationAssertions({
+registerStockDefaultTextAssertions({
   contract,
   expectedTextPaths: [
     ["labels", "plotted"],
@@ -112,10 +124,12 @@ test("inclusive coordinate boundaries and zero plot without coercion or swaps", 
   }).tags;
   assert.equal(points.length, 3);
   assert.deepEqual(
-    points.map((tag) => [
-      SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "cx" }),
-      SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "cy" }),
-    ]),
+    points.map((tag) => {
+      return [
+        SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "cx" }),
+        SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "cy" }),
+      ];
+    }),
     [
       [50, 390],
       [390, 180],
@@ -162,13 +176,7 @@ test("row keys move into actual graticule and rejection trays while hidden value
       440,
   );
   const markup = _render({ frame: 150, input: CHANGED_INPUT });
-  assert.equal(
-    getSvgAttributeMatchesFromMarkup({
-      markup: markup,
-      attribute: "data-coordinate-value",
-    }).tags.length,
-    0,
-  );
+  _assertHiddenCoordinateValues(markup);
   assert.deepEqual(
     getSvgAttributeMatchesFromMarkup({
       markup: markup,
@@ -189,15 +197,16 @@ test("complete authored captions remain clear of other captions and opaque foreg
         _render({ frame: frame, input: input }),
       );
       SvgPaintAssertions.assertPaintClearance({
-        texts: paint.filter(
-          (item) => item.kind === "text" && item.ariaLabel !== undefined,
-        ),
-        rectangles: paint.filter(
-          (item) =>
+        texts: paint.filter((item) => {
+          return item.kind === "text" && item.ariaLabel !== undefined;
+        }),
+        rectangles: paint.filter((item) => {
+          return (
             item.kind === "rect" &&
             item.fill !== "none" &&
-            item.opacity * item.fillOpacity > 0.9,
-        ),
+            item.opacity * item.fillOpacity > 0.9
+          );
+        }),
       });
     });
   });
@@ -212,16 +221,18 @@ test("outcome counts accrue only when row keys physically reach their destinatio
     ["0", "0", "0", "0"],
   );
   [90, 93, 96, 99, 105].forEach((frame) => {
-    const expected = DEFAULT_INPUT.rows.filter(
-      (_, index) => frame >= 90 + index * 3,
-    ).length;
+    const expected = DEFAULT_INPUT.rows.filter((_, index) => {
+      return frame >= 90 + index * 3;
+    }).length;
     assert.equal(
       getSvgAttributeMatchesFromMarkup({
         markup: _render({ frame: frame }),
         attribute: "data-outcome-count",
       })
         .values.map(Number)
-        .reduce((sum, numCoordinates) => sum + numCoordinates, 0),
+        .reduce((sum, numCoordinates) => {
+          return sum + numCoordinates;
+        }, 0),
       expected,
     );
   });
@@ -231,11 +242,13 @@ test("accepted ten-control-character literals remain complete and clear in six s
   const input = inputSchema.parse({
     ...fixtures[2].input,
     showValues: true,
-    rows: Array.from({ length: 6 }, (_, index) => ({
-      id: index ? `${"界".repeat(11)}${index}` : "",
-      latitude: "\u0001".repeat(10),
-      longitude: "\ud800".repeat(10),
-    })),
+    rows: Array.from({ length: 6 }, (_, index) => {
+      return {
+        id: index ? `${"界".repeat(11)}${index}` : "",
+        latitude: "\u0001".repeat(10),
+        longitude: "\ud800".repeat(10),
+      };
+    }),
   });
   [36, 80, 150].forEach((frame) => {
     const markup = _render({ frame: frame, input: input });
@@ -246,7 +259,9 @@ test("accepted ten-control-character literals remain complete and clear in six s
     ].forEach((literal) => {
       assert.equal(
         paint
-          .filter((item) => item.kind === "text" && item.ariaLabel === literal)
+          .filter((item) => {
+            return item.kind === "text" && item.ariaLabel === literal;
+          })
           .map(prop("text"))
           .join("")
           .includes(literal),
@@ -254,9 +269,9 @@ test("accepted ten-control-character literals remain complete and clear in six s
       );
     });
     SvgPaintAssertions.assertPaintClearance({
-      texts: paint.filter(
-        (item) => item.kind === "text" && item.ariaLabel !== undefined,
-      ),
+      texts: paint.filter((item) => {
+        return item.kind === "text" && item.ariaLabel !== undefined;
+      }),
       rectangles: [],
     });
   });

@@ -1,7 +1,7 @@
-import { Text } from "../../graphics-common";
-import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { DisclosedMarker } from "./DisclosedMarker";
+import { PublicDisplacementMapApproximateLabel } from "./PublicDisplacementMapApproximateLabel/PublicDisplacementMapApproximateLabel";
 import type { Input } from "./BoundedLocationDisplacement.schema";
 import type { ReactNode } from "react";
 
@@ -12,40 +12,28 @@ export function PublicDisplacementMap({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g data-display-map="">
-      <rect
+      <StockRect
         x={485}
         y={174}
         width={410}
         height={245}
         fill="none"
-        stroke={STOCK.line}
+        stroke={tokens.color.line}
       />
       {frame >= 71
-        ? input.locations.map((location, index) => (
-            <DisclosedMarker
-              key={location.id}
-              location={location}
-              index={index}
-              frame={frame}
-              accent={accent}
-            />
-          ))
+        ? input.locations.map((location, index) => {
+            return (
+              <DisclosedMarker
+                key={location.id}
+                {...{ location, index, frame, accent }}
+              />
+            );
+          })
         : undefined}
-      {input.locations.map((location, index) => (
-        <g key={location.id} data-approximate-label={location.id}>
-          <Text x={485} y={440 + index * 52} size={12}>
-            {index + 1}·
-          </Text>
-          <LabelSlots
-            labels={[
-              [location.label, 510, 440 + index * 52, 165, 12, 3],
-              [input.labels.approximate, 695, 440 + index * 52, 220, 12, 3],
-            ]}
-          />
-        </g>
-      ))}
+      <PublicDisplacementMapApproximateLabel input={input} />
     </g>
   );
 }

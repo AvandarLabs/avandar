@@ -35,6 +35,62 @@ type Props = {
   onChange: (nextFilterGroup: StructuredQuery.FilterGroup) => void;
 };
 
+type FilterableColumns = {
+  filterableColumns: readonly QueryColumn.T[];
+  columnTypes: QueryFilterColumnTypes;
+  fields: Field[];
+};
+
+/**
+ * The columns a filter can target, with their data types and the fields the
+ * query builder offers. Most filter operators fail on a list in DuckDB, so a
+ * field that keeps every value is left out.
+ */
+function useFilterableColumns(
+  columns: readonly QueryColumn.T[],
+): FilterableColumns {
+  const filterableColumns = useMemo(() => {
+    return columns.filter((column) => {
+      return !QueryColumn.isList(column);
+    });
+  }, [columns]);
+
+  const columnTypes: QueryFilterColumnTypes = useMemo(() => {
+    return makeObject(filterableColumns, {
+      keyFn: prop("id"),
+      valueFn: prop("baseColumn.dataType"),
+    });
+  }, [filterableColumns]);
+
+  const fields: Field[] = useMemo(() => {
+    return filterableColumns.map((column) => {
+      return {
+        name: column.id,
+        label: column.baseColumn.name,
+      };
+    });
+  }, [filterableColumns]);
+
+  return { filterableColumns, columnTypes, fields };
+}
+
+/** Says why there is nothing to filter on. */
+function NoFilterableColumns({
+  hasColumns,
+}: Readonly<{ hasColumns: boolean }>): ReactNode {
+  return (
+    <Stack gap="xs">
+      <Text size="sm" c="neutral.6">
+        {hasColumns ? (
+          <Trans>Fields that keep every value cannot be filtered on.</Trans>
+        ) : (
+          <Trans>Select a data source to add filters.</Trans>
+        )}
+      </Text>
+    </Stack>
+  );
+}
+
 /**
  * Recursive filter UI for the manual query form. Wraps `react-querybuilder`
  * with our own controls and holds the tree locally while the user edits, so
@@ -64,21 +120,8 @@ export function QueryFiltersField({
     };
   }, [t]);
 
-  const columnTypes: QueryFilterColumnTypes = useMemo(() => {
-    return makeObject(columns, {
-      keyFn: prop("id"),
-      valueFn: prop("baseColumn.dataType"),
-    });
-  }, [columns]);
-
-  const fields: Field[] = useMemo(() => {
-    return columns.map((column) => {
-      return {
-        name: column.id,
-        label: column.baseColumn.name,
-      };
-    });
-  }, [columns]);
+  const { filterableColumns, columnTypes, fields } =
+    useFilterableColumns(columns);
 
   const { query, matchCaseById, onQueryChange, commitNow, setMatchCase } =
     useFilterTreeState({ value, columnTypes, onChange });
@@ -107,14 +150,8 @@ export function QueryFiltersField({
     return { columnTypes, matchCaseById, setMatchCase, commitNow };
   }, [columnTypes, matchCaseById, setMatchCase, commitNow]);
 
-  if (columns.length === 0) {
-    return (
-      <Stack gap="xs">
-        <Text size="sm" c="neutral.6">
-          <Trans>Select a data source to add filters.</Trans>
-        </Text>
-      </Stack>
-    );
+  if (filterableColumns.length === 0) {
+    return <NoFilterableColumns hasColumns={columns.length > 0} />;
   }
 
   return (

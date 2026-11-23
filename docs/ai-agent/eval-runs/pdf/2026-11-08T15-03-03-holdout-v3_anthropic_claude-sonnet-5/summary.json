@@ -1,0 +1,19 @@
+{
+  "label": "holdout-v3:anthropic/claude-sonnet-5",
+  "answers": 121,
+  "requiredFound": 0,
+  "requiredTotal": 0,
+  "recall": 1,
+  "useful": 0,
+  "duplicates": 0,
+  "fair": 0,
+  "spurious": 396,
+  "fabricated": 0,
+  "yearLike": 0,
+  "subjectMisses": 0,
+  "unitErrors": 0,
+  "emptyReplies": 0,
+  "errors": 2,
+  "costPerRegion": 0.014630413223140504,
+  "latencyMedianMs": 2980.7544159999998
+}

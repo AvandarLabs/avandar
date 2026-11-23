@@ -20,10 +20,15 @@ export const lineTraceInputSchema = z
     }),
     showReference: z.boolean(),
   })
-  .refine((input) => input.points.length === input.reference.length, {
-    path: ["reference"],
-    message: "The reference must have the same number of sample periods.",
-  }) satisfies z.ZodType;
+  .refine(
+    (input) => {
+      return input.points.length === input.reference.length;
+    },
+    {
+      path: ["reference"],
+      message: "The reference must have the same number of sample periods.",
+    },
+  ) satisfies z.ZodType;
 
 /** Schema-inferred content supplied to the renderer. */
 export type LineTraceInput = z.output<typeof lineTraceInputSchema>;

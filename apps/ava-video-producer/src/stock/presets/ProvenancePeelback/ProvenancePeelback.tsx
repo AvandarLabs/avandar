@@ -1,8 +1,10 @@
 import { propEq, propNotEq } from "@avandar/utils";
-import { ramp } from "../../../motion";
-import { ProvenanceSource } from "./ProvenanceSource";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { FocalCitation } from "./FocalCitation";
+import { ProvenanceSource } from "./ProvenanceSource/ProvenanceSource";
 import { ProvenanceSummary } from "./ProvenanceSummary";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ProvenancePeelback.schema";
 import type { ReactNode } from "react";
 /** Complete provenance props. The shared renderer owns the loop envelope. */
@@ -19,33 +21,26 @@ export function ProvenancePeelback({
   );
   return (
     <g>
-      {[...remaining, selected].map((source) => (
-        <ProvenanceSource
-          key={source.id}
-          source={source}
-          index={input.sources.indexOf(source)}
-          otherIndex={remaining.indexOf(source)}
-          input={input}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {[...remaining, selected].map((source) => {
+        return (
+          <ProvenanceSource
+            key={source.id}
+            source={source}
+            index={input.sources.indexOf(source)}
+            otherIndex={remaining.indexOf(source)}
+            input={input}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
       <ProvenanceSummary input={input} frame={frame} accent={accent} />
-      <g
-        data-focal-citation="authored"
-        data-source-id={selected.id}
-        data-excerpt={selected.excerpt}
-        data-locator={input.showLocators ? selected.locator : undefined}
-        opacity={ramp(frame, 82, 22)}
-      >
-        <path
-          data-citation-link="selected-passage"
-          d="M464 330H480V192H512"
-          fill="none"
-          stroke={accent}
-          strokeWidth={1}
-        />
-      </g>
+      <FocalCitation
+        selected={selected}
+        showLocators={input.showLocators}
+        frame={frame}
+        accent={accent}
+      />
     </g>
   );
 }

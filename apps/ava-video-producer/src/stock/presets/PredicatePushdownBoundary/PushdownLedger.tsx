@@ -5,11 +5,11 @@ import type { ReactNode } from "react";
 type Props = { input: Input; frame: number };
 /** Original, excluded and arrived row counts own separate stateful captions. */
 export function PushdownLedger({ input, frame }: Readonly<Props>): ReactNode {
-  const numSelected = input.rows.filter((row) =>
-    input.predicate.operator === ">="
+  const numSelected = input.rows.filter((row) => {
+    return input.predicate.operator === ">="
       ? row.value >= input.predicate.threshold
-      : row.value <= input.predicate.threshold,
-  ).length;
+      : row.value <= input.predicate.threshold;
+  }).length;
   const hasExcluded = frame >= 95,
     hasArrived = frame >= 139;
   return (

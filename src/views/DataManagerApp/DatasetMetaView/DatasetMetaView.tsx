@@ -8,6 +8,7 @@ import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
+import { DatasetPreviewSection } from "@/components/DatasetPreviewSection/DatasetPreviewSection";
 import { AppView } from "@/components/layouts/AppView/AppView";
 import { AppViewBody } from "@/components/layouts/AppView/AppViewBody/AppViewBody";
 import { AppViewHeader } from "@/components/layouts/AppView/AppViewHeader/AppViewHeader";
@@ -15,11 +16,11 @@ import { AppViewSection } from "@/components/layouts/AppView/AppViewSection/AppV
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import { NuxEvents } from "@/components/Nux/NuxEvents/NuxEvents";
 import { ShareResourceButton } from "@/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton";
+import { useDatasetSourceLabels } from "@/hooks/datasets/useDatasetSourceLabels";
 import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles/useUserAppRoles";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
-import { DatasetActionsMenu } from "@/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu";
+import { DatasetActionsMenu } from "@/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu";
 import { DatasetMetadataList } from "@/views/DataManagerApp/DatasetMetaView/DatasetMetadataList";
 import css from "@/views/DataManagerApp/DatasetMetaView/DatasetMetaView.module.css";
 import { DatasetSourceRail } from "@/views/DataManagerApp/DatasetMetaView/DatasetSourceRail";
@@ -28,7 +29,6 @@ import { DatasetColumnOutline } from "@/views/DataManagerApp/DatasetMetaView/Dat
 import { DatasetSummaryView } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetSummaryView";
 import { ToggleOfflineOnlyButton } from "@/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { ReactNode } from "react";
 
 const DATASET_TAB_IDS = ["dataset-metadata", "dataset-summary"] as const;
@@ -52,19 +52,7 @@ type Props = {
 export function DatasetMetaView({ dataset }: Readonly<Props>): ReactNode {
   const { t, i18n } = useLingui();
   const workspace = useCurrentWorkspace();
-  // The user-facing name of every source type, keyed by the stored enum
-  // value. Inline because this view is the only thing that names a single
-  // dataset's origin.
-  const sourceLabels = useMemo((): Record<DatasetSource.SourceType, string> => {
-    return {
-      csv_file: t`CSV file`,
-      google_sheets: t`Google Sheets`,
-      open_data: t`Open data`,
-      pdf_file: t`PDF file`,
-      virtual: t`Derived dataset`,
-      xlsx_file: t`Excel file`,
-    };
-  }, [t]);
+  const sourceLabels = useDatasetSourceLabels();
   const [appRoles] = useUserAppRoles();
   // True when the user has no data_sources app role; in that case the dataset
   // is visible only through a resource share. We mark it in the header; it
@@ -252,14 +240,7 @@ export function DatasetMetaView({ dataset }: Readonly<Props>): ReactNode {
               resourceType="dataset"
               resourceId={dataset.id}
             />
-            <DatasetActionsMenu
-              dataset={dataset}
-              googleSheetSource={
-                sourceDataset?.__type === "GoogleSheetsDataset"
-                  ? sourceDataset
-                  : undefined
-              }
-            />
+            <DatasetActionsMenu dataset={dataset} />
           </>
         }
       />
@@ -321,25 +302,15 @@ export function DatasetMetaView({ dataset }: Readonly<Props>): ReactNode {
                       />
                     </AppViewSection>
 
-                    <AppViewSection
-                      title={<Trans>Data preview</Trans>}
-                      meta={
-                        previewData === undefined
-                          ? undefined
-                          : t`First ${previewData.length} rows`
+                    <DatasetPreviewSection
+                      columnNames={datasetColumnNames}
+                      rows={previewData}
+                      maxPreviewRows={
+                        GlobalAppConfig.dataManagerApp.maxPreviewRows
                       }
-                    >
-                      {isLoadingPreviewData ? (
-                        <Skeleton height={320} radius="sm" />
-                      ) : previewData ? (
-                        <DataGrid
-                          columnNames={datasetColumnNames}
-                          data={previewData}
-                          dateColumns={dateColumnNames}
-                          dateFormat="YYYY-MM-DD"
-                        />
-                      ) : null}
-                    </AppViewSection>
+                      dateColumnNames={dateColumnNames}
+                      isLoading={isLoadingPreviewData}
+                    />
                   </Stack>
                 );
               },

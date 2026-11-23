@@ -1,0 +1,9 @@
+.continuitySceneStage {
+  background: var(--video-color-ground-fill);
+  color: var(--video-color-text);
+  font-family: var(--video-text-stage-heading-font-family);
+  left: 0;
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+}

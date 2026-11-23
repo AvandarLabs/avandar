@@ -2,9 +2,9 @@ import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { AssociationStatus } from "./AssociationStatus";
 import { getAssociationFromInput } from "./getAssociationFromInput";
 import { ReviewedExtraction } from "./ReviewedExtraction";
-import { ReviewLabelRail } from "./ReviewLabelRail";
+import { ReviewLabelRail } from "./ReviewLabelRail/ReviewLabelRail";
 import { ReviewSourcePage } from "./ReviewSourcePage";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./PdfNearestLabelReview.schema";
 import type { ReactNode } from "react";
 /** Frame-driven authored study props. */
@@ -30,15 +30,17 @@ export function PdfNearestLabelReview({
         ]}
       />
       <ReviewSourcePage input={input} frame={frame} accent={accent} />
-      {input.labels.map((label, index) => (
-        <ReviewLabelRail
-          key={label.id}
-          input={input}
-          index={index}
-          frame={frame}
-          distance={association.distances[index]}
-        />
-      ))}
+      {input.labels.map((label, index) => {
+        return (
+          <ReviewLabelRail
+            key={label.id}
+            input={input}
+            index={index}
+            frame={frame}
+            distance={association.distances[index]}
+          />
+        );
+      })}
       {frame >= 96 ? (
         <ReviewedExtraction input={input} frame={frame} accent={accent} />
       ) : undefined}

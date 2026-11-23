@@ -1,4 +1,4 @@
-import { CleanupEditExplanation } from "./CleanupEditExplanation";
+import { CleanupEditExplanation } from "./CleanupEditExplanation/CleanupEditExplanation";
 import { CleanupRetainedValue } from "./CleanupRetainedValue";
 import type { Input } from "./CellNormalization.schema";
 import type { ReactNode } from "react";

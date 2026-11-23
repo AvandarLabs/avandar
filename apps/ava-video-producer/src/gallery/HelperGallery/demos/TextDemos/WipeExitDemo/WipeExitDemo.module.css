@@ -1,0 +1,14 @@
+.wipeExitDemoCentered {
+  align-items: center;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+}
+
+.wipeExitDemoHeadline {
+  font-size: var(--demo-font-size-46);
+  font-weight: var(--demo-font-weight-semibold);
+  letter-spacing: var(--demo-tracking-slight);
+  line-height: 1.2;
+  margin: 0;
+}

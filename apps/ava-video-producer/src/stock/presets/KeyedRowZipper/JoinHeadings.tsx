@@ -1,13 +1,19 @@
-import { ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { JoinSourceHeadings } from "./JoinSourceHeadings";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { JoinSourceHeadings } from "./JoinSourceHeadings/JoinSourceHeadings";
 import type { Input } from "./KeyedRowZipper.schema";
 import type { ReactNode } from "react";
+
 /** Inputs for JoinHeadings. */
-type Props = { frame: number; input: Input };
+type Props = {
+  frame: number;
+  input: Input;
+};
 
 /** Result and unmatched headings belong to their distinct final regions. */
 export function JoinHeadings({ frame, input }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g>
       {frame < 108 ? (
@@ -25,7 +31,14 @@ export function JoinHeadings({ frame, input }: Readonly<Props>): ReactNode {
         />
       )}
       {input.showUnmatchedTray && frame >= 90 ? (
-        <g opacity={ramp(frame, 90, 18)}>
+        <g
+          opacity={Motion.ramp({
+            frame,
+            at: 90,
+            dur: motion.hero,
+            easing: motion.reveal.easing,
+          })}
+        >
           <FitText
             text={input.labels.unmatched}
             x={44}

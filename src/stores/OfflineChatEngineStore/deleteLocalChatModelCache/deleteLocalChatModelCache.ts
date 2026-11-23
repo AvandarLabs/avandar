@@ -1,12 +1,10 @@
-import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel";
-
 /**
- * Deletes WebLLM weight/config cache for a model from the browser cache.
+ * Deletes a WebLLM model's weights and config from the browser cache, for
+ * example when the user removes the offline models to free disk space.
  */
 export async function deleteLocalChatModelCache(
-  modelId: LocalChatModel.Id,
+  modelId: string,
 ): Promise<void> {
-  const { mlcModelId } = LocalChatModel.Catalog.find(modelId);
   const { deleteModelAllInfoInCache } = await import("@mlc-ai/web-llm");
-  await deleteModelAllInfoInCache(mlcModelId);
+  await deleteModelAllInfoInCache(modelId);
 }

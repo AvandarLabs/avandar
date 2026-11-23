@@ -1,5 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./OfflineLedger.schema";
 import type { ReactNode } from "react";
 
@@ -14,28 +15,33 @@ export function LedgerEntryText({
   y,
   showLabels,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const labels = [
     { text: entry.label, x: 232, width: 220 },
     { text: entry.value, x: 472, width: 280 },
   ];
   return showLabels ? (
     <g>
-      {labels.map(({ text, x, width }) => (
-        <FitText
-          key={x}
-          {...{ text, x, width, y }}
-          fontSize={14}
-          maxLines={2}
-          normalizeWhitespace
-          breakLongWords
-        />
-      ))}
+      {labels.map(({ text, x, width }) => {
+        return (
+          <FitText
+            key={x}
+            {...{ text, x, width, y }}
+            fontSize={14}
+            maxLines={2}
+            normalizeWhitespace
+            breakLongWords
+          />
+        );
+      })}
     </g>
   ) : (
-    <path
-      d={`M232 ${y - 7} H420 M472 ${y - 7} H718`}
-      stroke={STOCK.muted}
-      strokeWidth={3}
+    <SketchedShape
+      shape={{ kind: "path", d: `M232 ${y - 7} H420 M472 ${y - 7} H718` }}
+      profile={tokens.sketch.shape}
+      stroke={tokens.color.inactive}
+      strokeWidth={scales.stroke(tokens.stroke.emphasis)}
     />
   );
 }

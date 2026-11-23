@@ -41,7 +41,12 @@ function _assertKeys({
     !node ||
     typeof node !== "object" ||
     Array.isArray(node) ||
-    Object.keys(node).some((key) => !keys.includes(key))
+    Object.keys(node).some((key) => {
+      // Every caller supplies a fixed allowlist of two to five schema
+      // keywords. A Set allocation is slower for these bounded scans.
+      // react-doctor-disable-next-line js-set-map-lookups
+      return !keys.includes(key);
+    })
   ) {
     _fail(path);
   }
@@ -90,10 +95,15 @@ function _validateObject({
     _fail(prefix);
   }
   const keys = Object.keys(properties);
+  const requiredKeys = new Set(node.required);
   if (
-    keys.some((key) => !key.length || key.includes(".")) ||
+    keys.some((key) => {
+      return !key.length || key.includes(".");
+    }) ||
     keys.length !== (node.required?.length ?? 0) ||
-    keys.some((key) => !node.required?.includes(key))
+    keys.some((key) => {
+      return !requiredKeys.has(key);
+    })
   ) {
     _fail(prefix);
   }
@@ -110,7 +120,9 @@ function _createEnum({
   if (
     node.type !== "string" ||
     !values?.length ||
-    values.some((value) => typeof value !== "string") ||
+    values.some((value) => {
+      return typeof value !== "string";
+    }) ||
     new Set(values).size !== values.length
   ) {
     _fail(prefix);
@@ -119,13 +131,15 @@ function _createEnum({
     path,
     label: { id: `${messageNamespace}.controls.${prefix}`, message: path },
     kind: "select",
-    options: values.map((value) => ({
-      value: String(value),
-      label: {
-        id: `${messageNamespace}.controls.${prefix}.${value}`,
-        message: String(value),
-      },
-    })),
+    options: values.map((value) => {
+      return {
+        value: String(value),
+        label: {
+          id: `${messageNamespace}.controls.${prefix}.${value}`,
+          message: String(value),
+        },
+      };
+    }),
   };
 }
 function _createText({
@@ -180,15 +194,15 @@ function _createCollection(field: Readonly<ObjectField>): StockControl {
     minItems: node.minItems,
     maxItems: maximum,
     itemSchema: items,
-    itemControls: Object.entries(properties).map(([key, child]) =>
-      _createField({
+    itemControls: Object.entries(properties).map(([key, child]) => {
+      return _createField({
         path: key,
         prefix: `${prefix}.${key}`,
         node: child,
         messageNamespace,
         referenceSelects,
-      }),
-    ),
+      });
+    }),
   };
 }
 function _createField(field: Readonly<Field>): StockControl {
@@ -220,15 +234,15 @@ function _createField(field: Readonly<Field>): StockControl {
     path,
     label,
     kind: "object",
-    controls: Object.entries(properties).map(([key, child]) =>
-      _createField({
+    controls: Object.entries(properties).map(([key, child]) => {
+      return _createField({
         path: key,
         prefix: `${prefix}.${key}`,
         node: child,
         messageNamespace,
         referenceSelects,
-      }),
-    ),
+      });
+    }),
   };
 }
 function _getControlPaths({
@@ -263,17 +277,21 @@ export function makeStockControlsFromSchema({
   referenceSelects?: Readonly<Record<string, ReferenceSelect>>;
 }>): StockControl[] {
   const properties = _validateObject({ schemaNode: schema, prefix: "" });
-  const controls = Object.entries(properties).map(([path, node]) =>
-    _createField({
+  const controls = Object.entries(properties).map(([path, node]) => {
+    return _createField({
       path,
       prefix: path,
       node,
       messageNamespace,
       referenceSelects,
-    }),
-  );
-  const paths = _getControlPaths({ controls });
-  if (Object.keys(referenceSelects).some((path) => !paths.includes(path))) {
+    });
+  });
+  const paths = new Set(_getControlPaths({ controls }));
+  if (
+    Object.keys(referenceSelects).some((path) => {
+      return !paths.has(path);
+    })
+  ) {
     _fail("referenceSelects");
   }
   return controls;

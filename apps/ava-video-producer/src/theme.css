@@ -1,14 +1,22 @@
-/* Placeholder palette. Swap these for your product's tokens and every
+/*
+ * Placeholder palette. Swap these for your product's tokens and every
  * composition follows: nothing downstream hardcodes a colour.
  *
- * Why tokens and not hex: mixToken() in motion.ts blends two of these
- * through color-mix(in oklab, …), which is what lets a state change ramp
- * instead of snapping. Pass it var(--token) strings; a hex defeats it.
+ * VideoThemeProvider emits these same names from the video theme's scene
+ * palette (color.scene.*), so inside a provider the theme's values win and
+ * storyboard scenes, the title card and the app chrome read the theme
+ * directly. These values are what a composition drawn outside any provider
+ * reads, and the theme's starter swatches reproduce them. Scenes take
+ * their corner from corner.scene, which reproduces --radius.
+ *
+ * mixToken() in motion.ts blends two colours through color-mix(in oklab, …),
+ * which is what lets a state change ramp instead of snapping.
  *
  * --ground is the dark field the title card and the loop seam both sit on.
  * Keep it close in luminance to --background if your app UI is dark, or
- * accept a dissolve between them if it is light. check-frames.mjs measures
- * that seam and fails the render if it strobes. */
+ * accept a dissolve between them if it is light. checkFrames.ts measures
+ * that seam and fails the render if it strobes.
+ */
 
 :root {
   /* app surfaces */

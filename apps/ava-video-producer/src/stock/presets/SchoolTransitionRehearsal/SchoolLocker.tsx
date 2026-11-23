@@ -1,4 +1,5 @@
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./SchoolTransitionRehearsal.schema";
 import type { ReactNode } from "react";
 
@@ -9,24 +10,25 @@ export function SchoolLocker({
   doorWidth,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
       {" "}
-      <rect
+      <StockRect
         x={345}
         y={235}
         width={110}
         height={145}
-        fill={STOCK.surface}
-        stroke={STOCK.muted}
+        fill={tokens.color.surface}
+        stroke={tokens.color.inactive}
       />
-      <rect
+      <StockRect
         data-locker-door={input.stops[0].id}
         x={345}
         y={235}
         width={doorWidth}
         height={145}
-        fill={STOCK.surface}
+        fill={tokens.color.surface}
         stroke={accent}
       />
       <circle

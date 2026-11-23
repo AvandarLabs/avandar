@@ -1,0 +1,18 @@
+{
+  "label": "extract-v2:anthropic/claude-sonnet-5",
+  "answers": 51,
+  "requiredFound": 60,
+  "requiredTotal": 63,
+  "recall": 0.9523809523809523,
+  "useful": 39,
+  "duplicates": 7,
+  "fair": 40,
+  "spurious": 0,
+  "fabricated": 0,
+  "subjectMisses": 0,
+  "unitErrors": 0,
+  "emptyReplies": 3,
+  "errors": 0,
+  "costPerRegion": 0.006838941176470589,
+  "latencyMedianMs": 1420.9242909999994
+}

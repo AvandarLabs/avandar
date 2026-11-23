@@ -30,6 +30,28 @@
   min-width: 0;
 }
 
+/*
+ * The label is the width of the row, so the name inside it is the box that
+ * clips. Hover then tells a clipped name from one that already fits.
+ */
+.datasetNavbarLink :global(.mantine-NavLink-label) {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/*
+ * Fills the row, and the space beside an offline badge. min-width: 0 lets
+ * the name shrink so the ellipsis is on this element, which is what the
+ * full-name tooltip measures.
+ */
+.datasetNavbarName {
+  display: block;
+  flex: 1 1 auto;
+  max-width: 100%;
+  min-width: 0;
+}
+
 .datasetNavbarLink :global(.mantine-NavLink-section) {
   color: var(--mantine-color-neutral-6);
 }

@@ -1,6 +1,7 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { DialogueGestures } from "./DialogueGestures";
 import type { Input } from "./InterpretedCaseDialogue.schema";
 import type { ReactNode } from "react";
@@ -12,27 +13,34 @@ export function DialoguePeople({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
-      <path
-        d="M300 500 H660 M330 500 V540 M630 500 V540"
-        stroke={STOCK.muted}
-        strokeWidth={5}
+      <SketchedShape
+        shape={{ kind: "path", d: "M300 500 H660 M330 500 V540 M630 500 V540" }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.inactive}
+        strokeWidth={scales.stroke(5)}
       />
       {input.showSightlines ? (
-        <line
+        <SketchedShape
+          shape={{ kind: "line", x1: 220, y1: 467, x2: 740, y2: 467 }}
+          profile={tokens.sketch.shape}
           data-sightline=""
-          x1={220}
-          y1={467}
-          x2={740}
-          y2={467}
-          stroke={STOCK.muted}
-          strokeDasharray="4 6"
+          stroke={tokens.color.inactive}
+          strokeDasharray={atomic.dash.spaced.join(" ")}
         />
       ) : undefined}
       <PersonGlyph x={210} y={485} posture="seated" color={accent} />
       <PersonGlyph x={750} y={485} posture="seated" color={accent} />
-      <PersonGlyph x={480} y={510} posture="seated" color={STOCK.cyan} />
+      <PersonGlyph
+        x={480}
+        y={510}
+        posture="seated"
+        color={tokens.color.accentAlt}
+      />
       <DialogueGestures frame={frame} accent={accent} />{" "}
       <LabelSlots
         labels={[

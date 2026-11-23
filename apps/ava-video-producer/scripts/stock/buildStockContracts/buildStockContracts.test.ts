@@ -15,7 +15,7 @@ async function _withContracts(action: (root: string) => Promise<void>) {
       recursive: true,
     });
     await fs.writeFile(
-      path.join(root, "src/stock/catalog.ts"),
+      path.join(root, "src/stock/stockEntry.ts"),
       'import { value } from "./nested"; export const STOCK_FPS=30; export const STOCK_CATALOG=[{id:"test",loopFrames:value}];',
     );
     await fs.writeFile(
@@ -119,13 +119,17 @@ async function _startRebuildAtRootBoundary(
       return result;
     },
   );
-  const replacement = buildStockContracts(options.root).then((generation) => ({
-    generation,
-    release: generation.retain(),
-  }));
+  const replacement = buildStockContracts(options.root).then((generation) => {
+    return {
+      generation,
+      release: generation.retain(),
+    };
+  });
   await resolvedRoot.pending;
   // Drain promise continuations after the controlled root-resolution boundary.
-  await new Promise((resolve) => setImmediate(resolve));
+  await new Promise((resolve) => {
+    return setImmediate(resolve);
+  });
   return { replacement, hasStartedBeforeRemoval: numRootLookups > 1 };
 }
 
@@ -226,11 +230,11 @@ test("a pending release cannot delete a recreated retained generation after a so
           assert.equal(current.generation.filename, original.filename);
           await fs.access(current.generation.filename);
           assert.deepEqual(
-            [original, changed, current.generation].map(
-              (generation) =>
-                generation.stockRequestSchema.parse({ preset: "decision-fork" })
-                  .input,
-            ),
+            [original, changed, current.generation].map((generation) => {
+              return generation.stockRequestSchema.parse({
+                preset: "decision-fork",
+              }).input;
+            }),
             [180, 240, 180],
           );
         } finally {

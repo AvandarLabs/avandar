@@ -48,21 +48,32 @@ test("shared edges disappear once while six exterior edges remain unique", () =>
   ]);
   const edges = path.split(" M");
   assert.equal(edges.length, 6);
-  assert.equal(new Set(edges.map((edge) => edge.replace(/^M/, ""))).size, 6);
+  assert.equal(
+    new Set(
+      edges.map((edge) => {
+        return edge.replace(/^M/, "");
+      }),
+    ).size,
+    6,
+  );
   assert.doesNotMatch(path, /M1 0v1/);
   assert.equal(path, "M0 0h1 M0 1h1 M0 0v1 M1 0h1 M2 0v1 M1 1h1");
 });
 test("a connected ring retains all four hole edges without inventing a center cell", () => {
-  const cells = Array.from({ length: 9 }, (_, index) => ({
-    column: index % 3,
-    row: Math.floor(index / 3),
-  })).filter((cell) => cell.column !== 1 || cell.row !== 1);
+  const cells = Array.from({ length: 9 }, (_, index) => {
+    return {
+      column: index % 3,
+      row: Math.floor(index / 3),
+    };
+  }).filter((cell) => {
+    return cell.column !== 1 || cell.row !== 1;
+  });
   const path = _outline(cells);
   assert.equal(OrthogonalGrid.areCellsConnected(cells), true);
   assert.equal(path.split(" M").length, 16);
-  ["M1 1h1", "M1 1v1", "M2 1v1", "M1 2h1"].forEach((edge) =>
-    assert.ok(path.includes(edge), edge),
-  );
+  ["M1 1h1", "M1 1v1", "M2 1v1", "M1 2h1"].forEach((edge) => {
+    return assert.ok(path.includes(edge), edge);
+  });
 });
 test("outline placement applies caller origin and unequal cell dimensions exactly", () => {
   assert.equal(

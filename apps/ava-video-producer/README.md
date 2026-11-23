@@ -85,7 +85,7 @@ has a stable link such as `motion.html#plexus-field`.
 The live gallery and Remotion use the same deterministic React/SVG renderer. These are conceptual graphics with fixed illustrative content, separate from recorded product evidence. The [stock motion catalog](docs/stock-motion-library.md) lists every ID, usage boundary, and reuse command. `StockScene` also supports these presets in the storyboard pipeline.
 
 ```bash
-npm run motion:build                 # Build the ignored browser bundle
+npm run motion:build                 # Build the ignored showcase pages with Vite
 npm run motion -- list
 npm run motion -- preview all        # Inspect out/motion/preview/<id>/contact-sheet.jpg
 npm run motion -- render all         # Matching previews, serial renders, unchanged frame gate
@@ -182,14 +182,24 @@ Motion vocabulary describes how elements move; scenes assemble content, layout, 
 
 ## License keys
 
-Before running any producer command, create the ignored
-`apps/ava-video-producer/.env.local` in this worktree with your own Remotion
-Automators key pair:
+Avandar keeps every env file in the workspace root. Before running any producer
+command, copy the root `.env.video-producer.example` to the ignored
+`.env.video-producer.local` and fill in your own Remotion Automators key pair:
+
+```bash
+cp .env.video-producer.example .env.video-producer.local # from the workspace root
+```
 
 ```dotenv
 REMOTION_PUBLIC_KEY=rm_pub_REPLACE_WITH_YOUR_PUBLIC_KEY
 REMOTION_PRIVATE_KEY=REPLACE_WITH_YOUR_COMPLETE_PRIVATE_KEY
 ```
+
+The license guard at the start of every producer command, including
+`pnpm showcase`, copies that file to the ignored
+`apps/ava-video-producer/.env.local`, which the loader reads. Edit the root
+file, not the copy: the next command overwrites the copy. Without a root file,
+an existing `apps/ava-video-producer/.env.local` is used unchanged.
 
 All package commands, direct runtime scripts, build/review servers, and the
 Remotion CLI config require both keys. Missing or blank keys, the `free-license`
@@ -236,7 +246,7 @@ The original demo flow, typography, theme, title card, and window chrome are ret
 
 ## Troubleshooting
 
-Use Node 22+ for the combined Avandar workflow. The first render downloads Chrome Headless Shell. The starter Geist font is bundled locally with its SIL Open Font License, so it does not require a font-CDN request. On npm 12, the package manifest allows the pinned `esbuild` and `ffmpeg-static` install scripts.
+Use Node 22+ for the combined Avandar workflow. The first render downloads Chrome Headless Shell. The Avandar brand font, Figtree, is bundled locally with its SIL Open Font License, so it does not require a font-CDN request. On npm 12, the package manifest allows the pinned `esbuild` and `ffmpeg-static` install scripts.
 
 If npm 12 leaves the local FFmpeg binary missing despite `allowScripts`, run `node node_modules/ffmpeg-static/install.js` from this checkout, then retry the command. This installs the project dependency's binary without a global package.
 

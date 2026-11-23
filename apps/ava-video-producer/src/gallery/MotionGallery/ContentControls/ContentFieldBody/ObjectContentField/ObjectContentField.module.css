@@ -1,0 +1,12 @@
+.objectContentFieldContentFieldBodyObject > legend {
+  color: var(--ink);
+  font-size: var(--atlas-font-size-12);
+  font-weight: var(--atlas-font-weight-600);
+}
+
+.objectContentFieldContentFieldBodyObject {
+  border: 0;
+  margin: var(--atlas-space-20) 0;
+  min-width: 0;
+  padding: 0;
+}

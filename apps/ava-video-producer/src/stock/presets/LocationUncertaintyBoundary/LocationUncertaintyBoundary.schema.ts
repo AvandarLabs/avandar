@@ -45,47 +45,47 @@ const structure = z.strictObject({
 
 type SchemaInput = z.infer<typeof structure>;
 function _validDistricts(input: SchemaInput): boolean {
-  return input.districts.every(
-    (district, index) =>
+  return input.districts.every((district, index) => {
+    return (
       PlanarPolygon.isSimple({ polygon: district.polygon }) &&
-      input.districts.slice(index + 1).every(
-        (other) =>
+      input.districts.slice(index + 1).every((other) => {
+        return (
           PlanarPolygon.isSimple({ polygon: other.polygon }) &&
           !PlanarPolygon.doInteriorsOverlap({
             firstPolygon: district.polygon,
             secondPolygon: other.polygon,
-          }),
-      ),
-  );
+          })
+        );
+      })
+    );
+  });
 }
 /** Strict simple disjoint districts and bounded uncertainty disks. */
 export const inputSchema = structure
-  .refine(
-    (input) =>
+  .refine((input) => {
+    return (
       new Set(input.districts.map(prop("id"))).size ===
         input.districts.length &&
-      new Set(input.locations.map(prop("id"))).size === input.locations.length,
-    "District and location IDs must be unique.",
-  )
+      new Set(input.locations.map(prop("id"))).size === input.locations.length
+    );
+  }, "District and location IDs must be unique.")
   .refine(
     _validDistricts,
     "Districts must be simple polygons with disjoint interiors.",
   )
-  .refine(
-    (input) => input.locations.some(propEq("id", input.focusedLocationId)),
-    "The focused location must exist.",
-  )
-  .refine(
-    (input) =>
-      input.locations.every(
-        (item) =>
-          item.radius <= item.x &&
-          item.radius <= item.y &&
-          item.radius <= 100 - item.x &&
-          item.radius <= 100 - item.y,
-      ),
-    "Entire footprints must fit inside the map extent.",
-  ) satisfies z.ZodType;
+  .refine((input) => {
+    return input.locations.some(propEq("id", input.focusedLocationId));
+  }, "The focused location must exist.")
+  .refine((input) => {
+    return input.locations.every((item) => {
+      return (
+        item.radius <= item.x &&
+        item.radius <= item.y &&
+        item.radius <= 100 - item.x &&
+        item.radius <= 100 - item.y
+      );
+    });
+  }, "Entire footprints must fit inside the map extent.") satisfies z.ZodType;
 /** Schema-inferred accepted document. */
 export type Input = z.infer<typeof inputSchema>;
 /** Runtime-only semantic constraints. */

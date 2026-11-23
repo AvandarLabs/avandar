@@ -1,14 +1,7 @@
 import assert from "node:assert/strict";
-import { getConservativeWidthFromText } from "../../../src/stock/text/getConservativeWidthFromText";
 import { getTextRelevantTokenIndicesFromTokens } from "./getTextRelevantTokenIndicesFromTokens";
-import {
-  getSvgNumber,
-  decodeSvgEntities,
-  getSvgAttributes,
-  createSvgFrame,
-  type Attributes,
-  type Frame,
-} from "./SvgFrameHelpers";
+import { type Attributes, type Frame, SvgFrames } from "./SvgFrames";
+import { SvgTextWidth } from "./SvgTextWidth/SvgTextWidth";
 
 /** Conservative painted text/rectangle bounds with explicit SVG paint facts. */
 export type SvgPaintEnvelope = {
@@ -26,51 +19,18 @@ export type SvgPaintEnvelope = {
   attributes: Record<string, string>;
 };
 
-const GRAPHEMES: Intl.Segmenter = new Intl.Segmenter("und", {
-  granularity: "grapheme",
-});
+/** Accumulated frame state and the current text paint token. */
+type TextPaintInput = {
+  frame: Frame;
+  token: string;
+  paintIndex: number;
+};
 
-// Widths share the reviewed Arial advances with production text fitting, so
-// this
-// is not an independent font oracle. Rendered strings, coordinates, transforms,
-// baselines and layout rejection remain independently checked from SVG output.
-function _estimateWidth({
-  text,
-  fontSize,
-}: {
-  text: string;
-  fontSize: number;
-}): number {
-  return Array.from(GRAPHEMES.segment(text)).reduce((sum, { segment }) => {
-    const bases = Array.from(segment).filter(
-      (character) =>
-        !/[\p{Nonspacing_Mark}\p{Enclosing_Mark}\p{Default_Ignorable_Code_Point}\p{Emoji_Modifier}]/u.test(
-          character,
-        ),
-    );
-    const advance = getConservativeWidthFromText({
-      text: bases.join(""),
-      fontSize,
-    });
-    const needsFallbackFloor =
-      !bases.length ||
-      /[\p{Extended_Pictographic}\p{Regional_Indicator}\u20e3\ufe0f]/u.test(
-        segment,
-      );
-    return (
-      sum +
-      Math.max(advance, needsFallbackFloor ? Math.ceil(fontSize * 1.1) : 0)
-    );
-  }, 0);
-}
+/** Visible text paint geometry, absent for inert or empty text. */
+type TextPaintResult = SvgPaintEnvelope | undefined;
 
-function _getTextEnvelope({
-  frame,
-  token,
-  paintIndex,
-}: Readonly<{ frame: Frame; token: string; paintIndex: number }>):
-  | SvgPaintEnvelope
-  | undefined {
+function _getTextEnvelope(options: Readonly<TextPaintInput>): TextPaintResult {
+  const { frame, token, paintIndex } = options;
   if (
     frame.isInert ||
     frame.opacity === 0 ||
@@ -79,7 +39,7 @@ function _getTextEnvelope({
   ) {
     return undefined;
   }
-  const text = decodeSvgEntities(token);
+  const text = SvgFrames.makeDecodedTextFromSvgEntities(token);
   if (!text) {
     return undefined;
   }
@@ -87,7 +47,7 @@ function _getTextEnvelope({
     frame.anchor === "start" || !frame.cursor.hasText,
     "Unsupported anchored continuation without an absolute x reset.",
   );
-  const width = _estimateWidth({ text, fontSize: frame.fontSize });
+  const width = SvgTextWidth.fromText({ text, fontSize: frame.fontSize });
   const offset =
     frame.anchor === "middle" ? width / 2 : frame.anchor === "end" ? width : 0;
   const firstX = frame.translateX + frame.scaleX * (frame.cursor.x - offset),
@@ -123,10 +83,10 @@ function _getRectangleEnvelope({
   attributes: Attributes;
   paintIndex: number;
 }>): SvgPaintEnvelope {
-  const x = getSvgNumber({ value: attributes.x, fallback: 0 }),
-    y = getSvgNumber({ value: attributes.y, fallback: 0 }),
-    width = getSvgNumber({ value: attributes.width, fallback: 0 }),
-    height = getSvgNumber({ value: attributes.height, fallback: 0 });
+  const x = SvgFrames.getSvgNumber({ value: attributes.x, fallback: 0 }),
+    y = SvgFrames.getSvgNumber({ value: attributes.y, fallback: 0 }),
+    width = SvgFrames.getSvgNumber({ value: attributes.width, fallback: 0 }),
+    height = SvgFrames.getSvgNumber({ value: attributes.height, fallback: 0 });
   assert.ok(
     width >= 0 && height >= 0,
     "Unsupported negative rectangle extent.",
@@ -220,8 +180,8 @@ function _visitToken({
   }
   const opening = token.match(/^<([\w:-]+)\b/);
   assert.ok(opening, "Unsupported SVG markup token.");
-  const attributes = getSvgAttributes(token);
-  const frame = createSvgFrame({
+  const attributes = SvgFrames.getSvgAttributes(token);
+  const frame = SvgFrames.makeFrameFromSvg({
     parent,
     tag: opening[1],
     attributes,
@@ -256,14 +216,14 @@ function _assertSvgTextCanvasBounds({
   const stack: Frame[] = [_createRootFrame()];
   const tokens = markup.match(/<!--[\s\S]*?-->|<[^>]+>|[^<]+/g) ?? [];
   const relevant = getTextRelevantTokenIndicesFromTokens({ tokens });
-  tokens.forEach((token, index) =>
-    _visitToken({
+  tokens.forEach((token, index) => {
+    return _visitToken({
       stack,
       token,
       canvas: { width, height },
       hasRelevantText: relevant.has(index),
-    }),
-  );
+    });
+  });
   assert.equal(stack.length, 1, "Unbalanced SVG markup.");
 }
 
@@ -300,16 +260,16 @@ function _getSvgVisiblePaintEnvelopesFromMarkup(
     tokens,
     extraTags: ["rect"],
   });
-  tokens.forEach((token, index) =>
-    _visitToken({
+  tokens.forEach((token, index) => {
+    return _visitToken({
       stack,
       token,
       canvas: undefined,
       hasRelevantText: relevant.has(index),
       paint,
       paintIndex: index,
-    }),
-  );
+    });
+  });
   assert.equal(stack.length, 1, "Unbalanced SVG markup.");
   return paint;
 }
@@ -342,36 +302,41 @@ function _assertSvgPaintClearance({
 }>): void {
   assert.ok(texts.length > 0, "Expected visible text paint.");
   texts.forEach((text, index) => {
-    texts
-      .slice(index + 1)
-      .forEach((other) =>
-        assert.equal(
-          _paintOverlaps({ first: text, second: other }),
-          false,
-          `Text overprint: ${text.text} / ${other.text} at ${JSON.stringify([text, other])}`,
-        ),
+    texts.slice(index + 1).forEach((other) => {
+      return assert.equal(
+        _paintOverlaps({ first: text, second: other }),
+        false,
+        `Text overprint: ${text.text} / ${other.text} at ${JSON.stringify([text, other])}`,
       );
+    });
     rectangles
-      .filter((rectangle) => rectangle.paintIndex > text.paintIndex)
-      .forEach((rectangle) =>
-        assert.equal(
+      .filter((rectangle) => {
+        return rectangle.paintIndex > text.paintIndex;
+      })
+      .forEach((rectangle) => {
+        return assert.equal(
           _paintOverlaps({ first: text, second: rectangle }),
           false,
           `Foreground covers ${text.text}: ${JSON.stringify([text, rectangle])}`,
-        ),
-      );
+        );
+      });
   });
 }
+
+type GetVisiblePaintEnvelopesFromMarkup =
+  typeof _getSvgVisiblePaintEnvelopesFromMarkup;
 
 /** Related SvgPaintAssertions operations. */
 export const SvgPaintAssertions = {
   /**
    * Estimate visible SVG text bounds from attributes in a 960 by 600 canvas.
    * Supports inherited translate/scale, opacity, anchors, font size and scalar
-   * text/tspan coordinates. Middle/end anchored spans require absolute x resets.
+   * text/tspan coordinates. Middle/end anchored spans require absolute x
+   * resets.
    * Anchored continuation chunks and other layout features are rejected. Defs
    * are inert.
-   * Width uses reviewed per-base Arial advances and conservative grapheme floors.
+   * Width uses reviewed per-base Arial advances and conservative grapheme
+   * floors.
    * Geometry-only subtrees are ignored after checking balanced markup.
    * Complete grapheme clusters remain intact.
    * This is conservative geometry estimation, not browser font measurement,
@@ -382,17 +347,20 @@ export const SvgPaintAssertions = {
    * Extracts conservative actual text lines and rectangle interiors in paint
    * order.
    * Opacity and fill facts are explicit. Hidden/definition subtrees are absent.
-   * Rectangle stroke, rounded corners and browser rasterization are not modeled.
+   * Rectangle stroke, rounded corners and browser rasterization are not
+   * modeled.
    * Existing visible-text transform/layout guards remain enforced.
    */
   getVisiblePaintEnvelopesFromMarkup: _getSvgVisiblePaintEnvelopesFromMarkup,
   /**
-   * Checks caller-selected text against other text and later rectangle interiors.
-   * Conservative envelopes support focused regressions, not general occlusion QA.
+   * Checks caller-selected text against other text and later rectangle
+   * interiors.
+   * Conservative envelopes support focused regressions, not general occlusion
+   * QA.
    */
   assertPaintClearance: _assertSvgPaintClearance,
 } satisfies {
   assertTextCanvasBounds: typeof _assertSvgTextCanvasBounds;
-  getVisiblePaintEnvelopesFromMarkup: typeof _getSvgVisiblePaintEnvelopesFromMarkup;
+  getVisiblePaintEnvelopesFromMarkup: GetVisiblePaintEnvelopesFromMarkup;
   assertPaintClearance: typeof _assertSvgPaintClearance;
 };

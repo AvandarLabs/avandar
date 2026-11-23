@@ -1,0 +1,19 @@
+.atlasCardCopyCardCopy {
+  composes: card-copy from global;
+}
+
+.atlasCardCopyCardCategory {
+  composes: card-category from global;
+}
+
+.atlasCardCopyCardHeading {
+  composes: card-heading from global;
+}
+
+.atlasCardCopyCardTitle {
+  composes: card-title from global;
+}
+
+.atlasCardCopyCardFoot {
+  composes: card-foot from global;
+}

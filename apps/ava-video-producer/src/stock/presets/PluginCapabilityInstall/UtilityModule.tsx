@@ -1,5 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./PluginCapabilityInstall.schema";
 import type { ReactNode } from "react";
 
@@ -10,17 +11,19 @@ export function UtilityModule({
   y,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
       {" "}
-      <rect
+      <StockRect
         data-utility-body=""
         x={508}
         y={y}
         width={379}
         height={100}
-        rx={10}
-        fill={STOCK.surface}
+        rx={scales.corner(tokens.corner.label)}
+        fill={tokens.color.surface}
         stroke={accent}
       />
       <LabelSlots

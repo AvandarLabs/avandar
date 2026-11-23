@@ -1,5 +1,6 @@
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
+import { parseDashboardIdFromEditorUrl } from "./helpers/parseDashboardIdFromEditorUrl";
 import { deleteDashboardsByIds } from "./helpers/seedDashboard";
 import { createSupabaseAdminClient } from "./helpers/supabaseAdminClient";
 import { LONG_WAIT } from "./helpers/timeouts";
@@ -32,10 +33,7 @@ test.describe("Dashboards — create via UI", () => {
         { timeout: LONG_WAIT },
       );
 
-      const dashboardEditUrlMatch = page
-        .url()
-        .match(/dashboards\/edit\/([0-9a-f-]{36})/i);
-      const dashboardId = dashboardEditUrlMatch?.[1];
+      const dashboardId = parseDashboardIdFromEditorUrl(page.url());
       if (dashboardId) {
         createdDashboardIds.push(dashboardId);
       }

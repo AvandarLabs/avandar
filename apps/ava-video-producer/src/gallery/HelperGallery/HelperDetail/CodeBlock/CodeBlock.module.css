@@ -1,0 +1,41 @@
+.codeBlock {
+  background: var(--white);
+  border: var(--atlas-border-1) solid var(--line);
+  border-radius: var(--atlas-radius-6);
+  position: relative;
+}
+
+.codeBlock pre {
+  font-family: var(--mono);
+  font-size: var(--atlas-font-size-13);
+  line-height: 1.55;
+  margin: 0;
+  overflow-wrap: anywhere;
+  overflow-x: auto;
+  padding: var(--atlas-space-12) var(--atlas-space-14);
+  white-space: pre-wrap;
+}
+
+.codeBlock:has(.codeBlockCopyButton) pre {
+  padding-right: var(--atlas-space-96);
+}
+
+.codeBlockCopyButton {
+  align-items: center;
+  background: var(--paper);
+  border: var(--atlas-border-1) solid var(--line);
+  border-radius: var(--atlas-radius-5);
+  color: var(--ink);
+  cursor: pointer;
+  display: flex;
+  font-size: var(--atlas-font-size-12);
+  gap: var(--atlas-space-6);
+  padding: var(--atlas-space-5) var(--atlas-space-10);
+  position: absolute;
+  right: 8px;
+  top: 8px;
+}
+
+.codeBlockCopyButton:hover {
+  background: var(--ava-primary-0);
+}

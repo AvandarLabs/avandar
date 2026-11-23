@@ -25,7 +25,7 @@ function _render({
     }),
   );
 }
-test("Only actual interval intersections with the investigation window are highlighted; touching nonoverlapping intervals and unknown records do not become confirmed contacts.", () => {
+test("default contact hold frame has two overlapping records and an unknown state", () => {
   const markup = _render({ frame: 150 });
   assert.equal((markup.match(/data-overlap="true"/g) ?? []).length, 2);
   assert.match(markup, /data-state="unknown"/);
@@ -36,19 +36,37 @@ import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/reg
 import { contactWindowOverlapContract } from "./ContactWindowOverlap.contract";
 import { inputSchema, type Input } from "./ContactWindowOverlap.schema";
 
+function _assertRecordGeometryAcrossFrames(
+  input: (typeof fixtures)[number]["input"],
+): void {
+  [24, 36, 60, 84, 108, 150].forEach((frame) => {
+    const scene = _render({ frame: frame, input: input });
+    Array.from(
+      scene.matchAll(
+        /<rect[^>]* x="([^"]*)" y="([^"]*)" width="([^"]*)" height="([^"]*)"/g,
+      ),
+    ).forEach(([, x, y, width, height]) => {
+      assert.ok(Number(x) >= 280 && Number(x) + Number(width) <= 910);
+      assert.ok(Number(y) >= 85 && Number(y) + Number(height) <= 465);
+    });
+  });
+}
+
 const textLayoutOptions = {
   inputSchema,
   fixtures,
   render: _render,
   excludedTextFields: ["id"],
-  getVisibleTexts: ({ input }: Readonly<{ input: Input }>) => [
-    input.sceneLabel,
-    input.axis.venueLabel,
-    input.axis.unitLabel,
-    input.investigationWindow.label,
-    ...input.records.map(prop("label")),
-    ...Object.values(input.copy),
-  ],
+  getVisibleTexts: ({ input }: Readonly<{ input: Input }>) => {
+    return [
+      input.sceneLabel,
+      input.axis.venueLabel,
+      input.axis.unitLabel,
+      input.investigationWindow.label,
+      ...input.records.map(prop("label")),
+      ...Object.values(input.copy),
+    ];
+  },
 } satisfies Pick<
   PresetAssertions<Input>,
   | "inputSchema"
@@ -70,19 +88,25 @@ test("partial, containing and exact intersections have correct geometry while en
   const markup = _render({ frame: 150, input: input });
   const spans = Array.from(
     markup.matchAll(
-      /<rect data-overlap="true" data-overlap-person="([^"]*)" x="([^"]*)" y="([^"]*)" width="([^"]*)" height="20"/g,
+      /<rect\b[^>]*\bdata-overlap="true" data-overlap-person="([^"]*)" x="([^"]*)" y="([^"]*)" width="([^"]*)" height="20"/g,
     ),
   );
   assert.deepEqual(
-    spans.map((match) => match[1]),
+    spans.map((match) => {
+      return match[1];
+    }),
     ["p0", "p1", "p2"],
   );
   assert.deepEqual(
-    spans.map((match) => Number(match[4])),
+    spans.map((match) => {
+      return Number(match[4]);
+    }),
     [63, 189, 189],
   );
   assert.deepEqual(
-    spans.map((match) => Number(match[2])),
+    spans.map((match) => {
+      return Number(match[2]);
+    }),
     [469, 469, 469],
   );
   assert.equal((markup.match(/data-state="none"/g) ?? []).length, 2);
@@ -91,21 +115,12 @@ test("partial, containing and exact intersections have correct geometry while en
     _render({ frame: 150, input: fixtures[1].input }),
     /data-overlap="true"|data-interval=/,
   );
-  [24, 36, 60, 84, 108, 150].forEach((frame) => {
-    const scene = _render({ frame: frame, input: input });
-    Array.from(
-      scene.matchAll(
-        /<rect[^>]* x="([^"]*)" y="([^"]*)" width="([^"]*)" height="([^"]*)"/g,
-      ),
-    ).forEach(([, x, y, width, height]) => {
-      assert.ok(Number(x) >= 280 && Number(x) + Number(width) <= 910);
-      assert.ok(Number(y) >= 85 && Number(y) + Number(height) <= 465);
-    });
-  });
-  const stencil = (frame: number) =>
-    _render({ frame: frame, input: input }).match(
+  _assertRecordGeometryAcrossFrames(input);
+  const stencil = (frame: number) => {
+    return _render({ frame: frame, input: input }).match(
       /data-window="stencil" x="[^"]*" y="([^"]*)"/,
     )?.[1];
+  };
   assert.equal(stencil(36), "85");
   assert.equal(stencil(108), "195");
   assert.doesNotMatch(

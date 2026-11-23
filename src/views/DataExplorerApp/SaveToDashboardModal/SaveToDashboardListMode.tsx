@@ -14,7 +14,7 @@ import {
   IconPlus,
   IconSearch,
 } from "@tabler/icons-react";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { useMemo, useState } from "react";
 import { formatDashboardDate } from "@/views/DashboardApp/DashboardListView/formatDashboardDate";
 import css from "@/views/DataExplorerApp/SaveToDashboardModal/SaveToDashboardModal.module.css";

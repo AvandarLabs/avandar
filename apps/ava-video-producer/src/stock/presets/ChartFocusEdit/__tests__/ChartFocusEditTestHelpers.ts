@@ -43,16 +43,20 @@ function _contextBox(markup: string): TextBox {
       name: "font-size",
     });
   const lines = [...markup.matchAll(/<tspan[^>]*>([^<]*)<\/tspan>/g)].map(
-    (match) => match[1],
+    (match) => {
+      return match[1];
+    },
   );
   const leading = [...markup.matchAll(/<tspan[^>]* dy="([^"]*)"/g)].reduce(
-    (sum, match) => sum + Number(match[1]),
+    (sum, match) => {
+      return sum + Number(match[1]);
+    },
     0,
   );
   const width = Math.max(
-    ...lines.map((line) =>
-      getConservativeWidthFromText({ text: line, fontSize }),
-    ),
+    ...lines.map((line) => {
+      return getConservativeWidthFromText({ text: line, fontSize });
+    }),
   );
   return {
     x,
@@ -144,7 +148,9 @@ function _assertContextPlacement({
   }
   const box = _contextBox(contexts[0][3]);
   const bars = [...markup.matchAll(/<rect data-chart-bar="([^"]*)"[^>]*>/g)];
-  const selected = bars.find((bar) => bar[1] === input.focusId)![0],
+  const selected = bars.find((bar) => {
+      return bar[1] === input.focusId;
+    })![0],
     barX = SvgAttributes.getNumberFromMarkup({
       attributes: selected,
       name: "x",

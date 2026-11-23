@@ -1,13 +1,17 @@
 import { z } from "zod";
+import { contentColorSchema } from "../../theme/getContentColorFromValue/getContentColorFromValue";
 import { createLabelSchema } from "../legacy/createLabelSchema";
-import { legacyColorSchema } from "../legacy/legacyColorSchema.constants";
 
 /** Strict authored content within the fixed StaggerCards layout. */
 export const staggerCardsInputSchema: z.ZodObject<
   {
     cards: z.ZodArray<
       z.ZodObject<
-        { label: z.ZodString; detail: z.ZodString; color: z.ZodString },
+        {
+          label: z.ZodString;
+          detail: z.ZodString;
+          color: typeof contentColorSchema;
+        },
         z.core.$strict
       >
     >;
@@ -27,7 +31,7 @@ export const staggerCardsInputSchema: z.ZodObject<
           maxLength: 24,
           bounds: { fontSize: 16, width: 190 },
         }),
-        color: legacyColorSchema,
+        color: contentColorSchema,
       }),
     )
     .min(1)

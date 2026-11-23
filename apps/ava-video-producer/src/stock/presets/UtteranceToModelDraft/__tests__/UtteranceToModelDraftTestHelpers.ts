@@ -38,23 +38,25 @@ const options = {
     "label",
     "text",
   ],
-  getVisibleTexts: ({ input }: Readonly<{ input: Input }>) => [
-    input.copy.source,
-    input.copy.draft,
-    input.copy.entity,
-    input.copy.relationship,
-    ...(input.draft.attributes.length ? [input.copy.attribute] : []),
-    input.copy.example,
-    input.review.reviewerLabel,
-    input.review.note,
-    input.review.outcome === "accept"
-      ? input.copy.accepted
-      : input.copy.pending,
-    ...input.sentenceParts.map(prop("text")),
-    ...input.draft.entities.map(prop("label")),
-    ...input.draft.relationships.map(prop("label")),
-    ...input.draft.attributes.map(prop("label")),
-  ],
+  getVisibleTexts: ({ input }: Readonly<{ input: Input }>) => {
+    return [
+      input.copy.source,
+      input.copy.draft,
+      input.copy.entity,
+      input.copy.relationship,
+      ...(input.draft.attributes.length ? [input.copy.attribute] : []),
+      input.copy.example,
+      input.review.reviewerLabel,
+      input.review.note,
+      input.review.outcome === "accept"
+        ? input.copy.accepted
+        : input.copy.pending,
+      ...input.sentenceParts.map(prop("text")),
+      ...input.draft.entities.map(prop("label")),
+      ...input.draft.relationships.map(prop("label")),
+      ...input.draft.attributes.map(prop("label")),
+    ];
+  },
 } satisfies Pick<
   PresetAssertions<Input>,
   | "inputSchema"
@@ -73,6 +75,8 @@ function _attributes({
 }): string[] {
   return [
     ...markup.matchAll(new RegExp(`<[^>]+data-${marker}="[^>]+>`, "g")),
-  ].map((match) => match[0]);
+  ].map((match) => {
+    return match[0];
+  });
 }
 export { _render, options, _attributes };

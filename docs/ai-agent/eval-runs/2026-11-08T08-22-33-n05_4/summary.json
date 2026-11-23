@@ -1,0 +1,17 @@
+{
+  "label": "n05#4",
+  "questionCount": 1,
+  "passCount": 1,
+  "needlessQuestions": 0,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 2,
+  "promptTokens": 5594,
+  "cachedPromptTokens": 5366,
+  "completionTokens": 425,
+  "totalCost": 0.00029451,
+  "costPerQuestion": 0.00029451,
+  "latencyMedianMs": 3149.0764169999998,
+  "latencyP90Ms": 3149.0764169999998,
+  "failedIds": []
+}

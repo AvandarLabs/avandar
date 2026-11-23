@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { SnapshotStorageUtils } from "@/clients/storage/PublicDatasetParquetStorageClient/SnapshotStorageUtils/SnapshotStorageUtils";
+import type { AvaMap } from "$/models/AvaMap/AvaMap";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
@@ -51,5 +52,19 @@ describe("snapshot bucket routing", () => {
         snapshotRevision: SnapshotStorageUtils.LEGACY_SNAPSHOT_REVISION,
       }),
     ).toBe(`dashboards/${DASHBOARD_ID}/datasets/${DATASET_ID}.parquet`);
+  });
+});
+
+describe("map snapshot paths", () => {
+  it("names a map snapshot inside its revision's maps folder", () => {
+    expect(
+      SnapshotStorageUtils.getPublicMapSnapshotStoragePath({
+        dashboardId: DASHBOARD_ID,
+        snapshotRevision: SNAPSHOT_REVISION,
+        mapId: "44444444-4444-4444-8444-444444444444" as AvaMap.Id,
+      }),
+    ).toBe(
+      `dashboards/${DASHBOARD_ID}/revisions/${SNAPSHOT_REVISION}/maps/44444444-4444-4444-8444-444444444444.json`,
+    );
   });
 });

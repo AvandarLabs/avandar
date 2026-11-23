@@ -1,0 +1,15 @@
+.atlasCollectionIntroLibraryIntro {
+  composes: library-intro from global;
+}
+
+.atlasCollectionIntroIntroCopy {
+  composes: intro-copy from global;
+}
+
+.atlasCollectionIntroEyebrow {
+  composes: eyebrow from global;
+}
+
+.atlasCollectionIntroTinyDot {
+  composes: tiny-dot from global;
+}

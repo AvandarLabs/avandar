@@ -1,0 +1,23 @@
+.barBeatsDemoHeadline {
+  font-size: var(--demo-font-size-46);
+  font-weight: var(--demo-font-weight-semibold);
+  letter-spacing: var(--demo-tracking-slight);
+  line-height: 1.2;
+  margin: 0;
+}
+
+.barBeatsDemoFootnote {
+  bottom: 0;
+  color: var(--demo-muted);
+  font-size: var(--demo-font-size-2xs);
+  position: absolute;
+  right: 0;
+}
+
+.barBeatsDemoBarPanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--demo-space-12);
+  justify-content: center;
+  padding-left: var(--demo-space-48);
+}

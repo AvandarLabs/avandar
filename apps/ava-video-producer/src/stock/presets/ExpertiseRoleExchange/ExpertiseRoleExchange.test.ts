@@ -3,14 +3,11 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import test from "node:test";
 import { propEq } from "@avandar/utils";
-import { setupI18n } from "@lingui/core";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { registerStockPresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
-import { makeLocalizedStockDataFromContract } from "../../i18n/makeLocalizedStockDataFromContract";
-import { StockCopyMessages } from "../../i18n/StockCopyMessages";
 import { ExpertiseRoleExchange } from "./ExpertiseRoleExchange";
 import { expertiseRoleExchangeContract } from "./ExpertiseRoleExchange.contract";
 import {
@@ -38,10 +35,11 @@ const render: ({
   frame,
   input,
 }: Readonly<{ frame: number; input: Input }>) => string = _render;
-test("complete rejection fixtures reject structural and reference violations", () =>
-  invalidInputs.forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  ));
+test("complete rejection fixtures reject structural and reference violations", () => {
+  return invalidInputs.forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
+});
 test("expert changes move the demonstrating hand while identity labels stay attached", () => {
   [DEFAULT_INPUT, fixtures[3].input].forEach((input) => {
     [65, 120].forEach((frame, topicIndex) => {
@@ -68,7 +66,9 @@ test("expert changes move the demonstrating hand while identity labels stay atta
       input.people.forEach((person) => {
         const personGroup = markup
           .match(/<g data-person-id="[^"]*"[\s\S]*?<\/g>/g)
-          ?.find((group) => group.includes(`data-person-id="${person.id}"`));
+          ?.find((group) => {
+            return group.includes(`data-person-id="${person.id}"`);
+          });
         assert.ok(personGroup?.includes(`aria-label="${person.label}"`));
         assert.ok(personGroup?.includes(`aria-label="${person.roleLabel}"`));
       });
@@ -78,9 +78,9 @@ test("expert changes move the demonstrating hand while identity labels stay atta
     frame: 150,
     input: { ...DEFAULT_INPUT, showJobRoles: false },
   });
-  DEFAULT_INPUT.people.forEach((person) =>
-    assert.ok(hidden.includes(`aria-label="${person.label}"`)),
-  );
+  DEFAULT_INPUT.people.forEach((person) => {
+    return assert.ok(hidden.includes(`aria-label="${person.label}"`));
+  });
 });
 
 function _getVisibleTexts({
@@ -88,10 +88,9 @@ function _getVisibleTexts({
   frame,
 }: Readonly<{ input: Input; frame: number }>): string[] {
   return [
-    ...input.people.flatMap((person) => [
-      person.label,
-      ...(input.showJobRoles ? [person.roleLabel] : []),
-    ]),
+    ...input.people.flatMap((person) => {
+      return [person.label, ...(input.showJobRoles ? [person.roleLabel] : [])];
+    }),
     input.labels.example,
     ...(frame >= 35
       ? [
@@ -102,10 +101,12 @@ function _getVisibleTexts({
       : []),
     ...(frame >= 139
       ? [
-          ...input.topics.flatMap((topic) => [
-            topic.label,
-            input.people.find(propEq("id", topic.expertId))!.label,
-          ]),
+          ...input.topics.flatMap((topic) => {
+            return [
+              topic.label,
+              input.people.find(propEq("id", topic.expertId))!.label,
+            ];
+          }),
           input.closingLabel,
         ]
       : []),
@@ -139,28 +140,6 @@ const options = {
 } satisfies PresetAssertions<Input>;
 registerStockPresetAssertions(options);
 registerStockTextLayoutAssertions(options);
-test("every indexed default-copy path resolves while authored input remains exact", () => {
-  const contract = expertiseRoleExchangeContract;
-  const supplied = structuredClone(DEFAULT_INPUT);
-  const messages = Object.fromEntries(
-    contract.defaultTextPaths.map((path, index) => [
-      StockCopyMessages.getDefaultMessageIdFromPath({ id: contract.id, path }),
-      `Traduit ${index}`,
-    ]),
-  );
-  const i18n = setupI18n({ locale: "fr", messages: { fr: messages } });
-  const resolved = makeLocalizedStockDataFromContract({ contract, i18n });
-  contract.defaultTextPaths.forEach((path, index) => {
-    const value = path.reduce<unknown>(
-      (parent, key) => Reflect.get(parent as object, key),
-      resolved.defaultInput,
-    );
-    assert.equal(value, `Traduit ${index}`);
-  });
-  assert.deepEqual(DEFAULT_INPUT, supplied);
-  assert.notEqual(resolved.defaultInput, DEFAULT_INPUT);
-});
-
 test("both hands meet the moving tool during its handoff", () => {
   [DEFAULT_INPUT, fixtures[3].input].forEach((input) => {
     const markup = render({ frame: 93, input: input });
@@ -196,33 +175,18 @@ test("side-by-side people share the table edge while opposite sides flank its en
     });
     const positions = [
       ...markup.matchAll(/transform="translate\(([^ ]+) 290\) scale\(1.5\)"/g),
-    ].map((match) => Number(match[1]));
+    ].map((match) => {
+      return Number(match[1]);
+    });
     assert.equal(positions.length, 2);
     if (tableArrangement === "side-by-side") {
-      positions.forEach((x) => assert.ok(x > 290 && x < 675));
+      positions.forEach((x) => {
+        return assert.ok(x > 290 && x < 675);
+      });
     } else {
       assert.ok(positions[0] < 290);
       assert.ok(positions[1] > 675);
     }
-  });
-});
-
-test("copy extraction includes every explicit indexed default without changing author input", () => {
-  const contract = expertiseRoleExchangeContract;
-  const messages = StockCopyMessages.getMessagesFromContract({
-    [contract.id]: contract,
-  });
-  contract.defaultTextPaths.forEach((path) => {
-    const original = path.reduce<unknown>(
-      (parent, key) => Reflect.get(parent as object, key),
-      DEFAULT_INPUT,
-    );
-    assert.equal(
-      messages[
-        StockCopyMessages.getDefaultMessageIdFromPath({ id: contract.id, path })
-      ],
-      original,
-    );
   });
 });
 

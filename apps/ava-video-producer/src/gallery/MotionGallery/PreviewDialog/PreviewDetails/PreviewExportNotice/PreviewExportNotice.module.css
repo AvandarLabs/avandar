@@ -1,0 +1,3 @@
+.previewExportNoticeDialogNotice {
+  composes: dialog-notice from global;
+}

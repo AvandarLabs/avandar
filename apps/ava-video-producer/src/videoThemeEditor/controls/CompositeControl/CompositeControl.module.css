@@ -1,0 +1,17 @@
+.compositeControl {
+  border: 0;
+  display: grid;
+  gap: var(--atlas-space-8);
+  margin: 0;
+  min-width: 0;
+  padding: 0;
+}
+
+.compositeControlLegend {
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}

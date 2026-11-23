@@ -8,6 +8,7 @@ import {
   getParquetBlobFromStagingFiles,
   registerCsvFile,
 } from "@/clients/DuckDbClient/duckDbFileRegistry";
+import { getLoadedDuckDbTableShape } from "@/clients/DuckDbClient/duckDbTableIntrospection";
 import { Logger } from "@/utils/Logger";
 import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 import type { CsvParseUserHints } from "@/clients/DuckDbClient/csvParse/csvParse.types";
@@ -52,16 +53,12 @@ async function _getCsvLoadResult(
     blob: options.parquetData,
     datasetDuckDbLease: options.datasetDuckDbLease,
   });
-  const [tableColumns, csvRowCount] = await Promise.all([
-    client.getTableSchema({
+  const { columns: tableColumns, rowCount: csvRowCount } =
+    await getLoadedDuckDbTableShape({
+      client,
       tableName: options.tableName,
       datasetDuckDbLease: options.datasetDuckDbLease,
-    }),
-    client.getTableRowCount({
-      tableName: options.tableName,
-      datasetDuckDbLease: options.datasetDuckDbLease,
-    }),
-  ]);
+    });
   if (csvRowCount === 0) {
     throw new Error(
       "CSV load produced zero rows. The file may use quotes or column types that differ from the sniff sample.",

@@ -14,7 +14,7 @@ import {
 import { useDebouncedValue } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { IconSearch, IconTrash } from "@tabler/icons-react";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { useMemo, useState } from "react";
 import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
@@ -44,6 +44,7 @@ function useSourceTypeLabels(): Record<DatasetSource.SourceType, string> {
     pdf_file: t`PDF`,
     google_sheets: t`Google Sheets`,
     open_data: t`Open data`,
+    postgres_table: t`Database`,
     virtual: t`Derived`,
   };
 }
@@ -157,6 +158,7 @@ export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
         "pdf_file",
         "google_sheets",
         "open_data",
+        "postgres_table",
         () => {
           openAsRawPreview(selectedDataset);
         },

@@ -16,7 +16,7 @@
  * `CompositeChart` since composite mode triggers different rendering
  * logic internally.
  */
-import { formatDate, propEq } from "@avandar/utils";
+import { propEq } from "@avandar/utils";
 import { Box } from "@mantine/core";
 import { Fragment, useId, useMemo } from "react";
 import {
@@ -33,6 +33,7 @@ import { getAreaStackingFromLayout } from "@/lib/ui/viz/axis/getAreaStackingFrom
 import { useAreaChartStyleProps } from "@/lib/ui/viz/axis/useAreaChartStyleProps";
 import { X_AXIS_PADDING } from "@/lib/ui/viz/ChartConstants";
 import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
+import { formatQueryResultDate } from "@/lib/ui/viz/formatQueryResultDate/formatQueryResultDate";
 import { renderXYComposite } from "@/lib/ui/viz/renderXYComposite";
 import type { AreaSeries } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 import type { AreaLayout } from "@/lib/ui/viz/axis/getAreaStackingFromLayout/getAreaStackingFromLayout";
@@ -87,7 +88,7 @@ export function AreaChart({
       return undefined;
     }
     return (value: unknown): string => {
-      return formatDate(value, { format: dateFormat, zone: timezone });
+      return formatQueryResultDate(value, { format: dateFormat, timezone });
     };
   }, [isDateAxis, dateFormat, timezone]);
 
@@ -114,7 +115,7 @@ export function AreaChart({
       return undefined;
     }
     return (label: unknown): string => {
-      return formatDate(label, { format: dateFormat, zone: timezone });
+      return formatQueryResultDate(label, { format: dateFormat, timezone });
     };
   }, [isDateAxis, dateFormat, timezone]);
 

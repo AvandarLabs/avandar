@@ -49,8 +49,7 @@ export function useEnsureWorkspaceBilling(): void {
     },
   });
   const shouldOpenBillingModal =
-    !isInCheckoutRoute &&
-    SubscriptionModule.shouldPromptForBillingSetup(subscription);
+    !isInCheckoutRoute && SubscriptionModule.needsBillingSetup(subscription);
 
   // A paid plan whose sync was missed should not be asked to pick a plan
   // again, so the modal waits for this sync to settle

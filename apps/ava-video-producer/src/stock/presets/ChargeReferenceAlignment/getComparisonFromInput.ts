@@ -13,9 +13,9 @@ type GetComparisonFromInputResult = {
 export function getComparisonFromInput(
   input: Readonly<Input>,
 ): GetComparisonFromInputResult {
-  const isMatched = CONTEXT_FIELDS.every(
-    ([key]) => input.invoice[key] === input.reference[key],
-  );
+  const isMatched = CONTEXT_FIELDS.every(([key]) => {
+    return input.invoice[key] === input.reference[key];
+  });
   const billed = input.invoice.quantity * input.invoice.unitPriceMinor;
   const reference = input.reference.quantity * input.reference.unitPriceMinor;
   return {

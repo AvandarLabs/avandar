@@ -1,0 +1,11 @@
+.previewDetailsDialogDetails {
+  composes: dialog-details from global;
+}
+
+.previewDetailsDialogDescription {
+  composes: dialog-description from global;
+}
+
+.previewDetailsDetailSection {
+  composes: detail-section from global;
+}

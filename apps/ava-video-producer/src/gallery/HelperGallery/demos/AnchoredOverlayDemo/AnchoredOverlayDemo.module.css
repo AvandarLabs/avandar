@@ -1,0 +1,27 @@
+.anchoredOverlayDemoTableRow {
+  display: flex;
+  gap: var(--demo-space-12);
+  left: 60px;
+  position: absolute;
+}
+
+.anchoredOverlayDemoTableCell {
+  background: var(--demo-panel);
+  border: var(--demo-stroke-hairline) solid var(--demo-line);
+  border-radius: var(--demo-corner-chip);
+  height: 44px;
+  width: 160px;
+}
+
+.anchoredOverlayDemoCallout {
+  align-items: center;
+  background: var(--demo-highlight);
+  border-radius: var(--demo-corner-card);
+  color: var(--demo-ground);
+  display: flex;
+  font-size: var(--demo-font-size-6xl);
+  font-weight: var(--demo-font-weight-semibold);
+  justify-content: center;
+  padding: 0 var(--demo-space-24);
+  text-align: center;
+}

@@ -1,4 +1,7 @@
-/** Palette JSON emitted from the worktree's Avandar theme by buildAtlas(). */
+/**
+ * Palette JSON emitted from the worktree's Avandar theme by the showcase
+ * theme plugin.
+ */
 declare const theme: Record<
   | "primary"
   | "neutral"

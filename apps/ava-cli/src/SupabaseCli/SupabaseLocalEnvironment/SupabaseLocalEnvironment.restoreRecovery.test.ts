@@ -4,7 +4,6 @@ import {
   CONFIG_PATH,
   EDGE_ENV_PATH,
   ENV_PATH,
-  ORIGINAL_CONFIG,
   ORIGINAL_ENV,
   SupabaseLocalEnvironmentFakeIo,
 } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironmentFakeIo/SupabaseLocalEnvironmentFakeIo";
@@ -31,7 +30,7 @@ describe("SupabaseLocalEnvironment.restore (interrupted-switch recovery)", () =>
       [`${backupDirectory}/files`]: `${retargetedDirectory}/files`,
       [`${backupDirectory}/manifest.json`]: `${retargetedDirectory}/manifest.json`,
     };
-    [CONFIG_PATH, ENV_PATH, EDGE_ENV_PATH].forEach((sourcePath) => {
+    [ENV_PATH, EDGE_ENV_PATH].forEach((sourcePath) => {
       canonicalPaths[makeBackupPath(sourcePath)] =
         `${retargetedDirectory}/files/${path.basename(makeBackupPath(sourcePath))}`;
     });
@@ -45,16 +44,15 @@ describe("SupabaseLocalEnvironment.restore (interrupted-switch recovery)", () =>
     expect(fake.operations).toEqual([]);
   });
 
-  it("recovers a switching backup when the active config is missing", async () => {
+  it("recovers a switching backup when .env.development is missing", async () => {
     const fake = createFakeIo();
     seedActiveBackup(fake);
     markBackupSwitching(fake);
-    fake.files.delete(CONFIG_PATH);
+    fake.files.delete(ENV_PATH);
 
     await expect(SupabaseLocalEnvironment.restore(fake.io)).rejects.toThrow(
       "ownership could not be safely proven",
     );
-    expect(fake.files.get(CONFIG_PATH)).toBe(ORIGINAL_CONFIG);
     expect(fake.files.get(ENV_PATH)).toBe(ORIGINAL_ENV);
     expect(fake.commands).toEqual([]);
     await expect(fake.io.pathExists(makeBackupDirectory())).resolves.toBe(
@@ -71,7 +69,7 @@ describe("SupabaseLocalEnvironment.restore (interrupted-switch recovery)", () =>
     await expect(SupabaseLocalEnvironment.restore(fake.io)).rejects.toThrow(
       "ownership could not be safely proven",
     );
-    expect(fake.files.get(CONFIG_PATH)).toBe(ORIGINAL_CONFIG);
+    expect(fake.files.get(ENV_PATH)).toBe(ORIGINAL_ENV);
     expect(fake.commands).toEqual([]);
     await expect(fake.io.pathExists(makeBackupDirectory())).resolves.toBe(
       false,
@@ -82,12 +80,12 @@ describe("SupabaseLocalEnvironment.restore (interrupted-switch recovery)", () =>
     const fake = createFakeIo();
     seedActiveBackup(fake);
     markBackupSwitching(fake);
-    fake.files.set(CONFIG_PATH, ORIGINAL_CONFIG);
+    fake.files.set(ENV_PATH, ORIGINAL_ENV);
 
     await expect(SupabaseLocalEnvironment.restore(fake.io)).rejects.toThrow(
       "ownership could not be safely proven",
     );
-    expect(fake.files.get(CONFIG_PATH)).toBe(ORIGINAL_CONFIG);
+    expect(fake.files.get(ENV_PATH)).toBe(ORIGINAL_ENV);
     expect(fake.commands).toEqual([]);
     await expect(fake.io.pathExists(makeBackupDirectory())).resolves.toBe(
       false,
@@ -98,16 +96,15 @@ describe("SupabaseLocalEnvironment.restore (interrupted-switch recovery)", () =>
     const fake = createFakeIo();
     seedActiveBackup(fake);
     markBackupSwitching(fake);
-    fake.files.delete(CONFIG_PATH);
-    fake.files.delete(makeBackupPath(CONFIG_PATH));
+    fake.files.delete(makeBackupPath(ENV_PATH));
     const manifest = readFakeManifest(fake);
     writeFakeManifest(fake)({
       ...manifest,
-      files: manifest.files.filter(propNotEq("sourcePath", CONFIG_PATH)),
+      files: manifest.files.filter(propNotEq("sourcePath", ENV_PATH)),
     });
 
     await expect(SupabaseLocalEnvironment.restore(fake.io)).rejects.toThrow(
-      "must include the config backup",
+      "must include every current development environment",
     );
     expect(fake.commands).toEqual([]);
     expect(fake.operations).toEqual([]);

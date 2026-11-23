@@ -2,10 +2,18 @@ import { Model } from "@avandar/models";
 import { isDefined, propEq } from "@avandar/utils";
 import { uuid } from "$/lib/uuid.ts";
 import {
+  getBufferDistanceFromMeters,
+  getMetersFromBufferDistance,
+} from "$/models/AvaMap/MapLayer/MapLayerModule/bufferDistanceHelpers.ts";
+import {
   areDisputedStatusValuesDisjoint,
   canBindDisputedStatus,
   EMPTY_DISPUTED_STATUS_VALUES,
 } from "$/models/AvaMap/MapLayer/MapLayerModule/disputedStatusHelpers.ts";
+import {
+  getGraduatedClassCount,
+  resampleColorRamp,
+} from "$/models/AvaMap/MapLayer/MapLayerModule/graduatedColorHelpers.ts";
 import {
   QueryColumn, // oxfmt-ignore
 } from "$/models/queries/QueryColumn/QueryColumn.ts";
@@ -88,6 +96,14 @@ function _isAreaGeoBinding(
   );
 }
 
+/** True when a binding draws one point per row. */
+function _isPointGeoBinding(binding: MapLayerRead["geoBinding"]): boolean {
+  return (
+    binding?.type === "latLngColumns" ||
+    (binding?.type === "geometryColumn" && binding.family === "point")
+  );
+}
+
 /** Constructors, defaults, and binding helpers for map layers. */
 export const MapLayerModule = {
   /** Fallback symbol color when the author has not picked one. */
@@ -127,6 +143,30 @@ export const MapLayerModule = {
   areDisputedStatusValuesDisjoint,
 
   /**
+   * True when a binding outputs polygons, for example to decide whether a
+   * layer can filter another layer by location.
+   */
+  isAreaGeoBinding: _isAreaGeoBinding,
+
+  /**
+   * True when a binding draws one point per row, for example to offer a
+   * layer as the target of "Filter another layer by this buffer".
+   */
+  isPointGeoBinding: _isPointGeoBinding,
+
+  /** Whole meters for a distance typed in a buffer distance unit. */
+  getMetersFromBufferDistance,
+
+  /** A meter distance restated in a buffer distance unit. */
+  getBufferDistanceFromMeters,
+
+  /** Resamples a color ramp to one evenly spaced color per class. */
+  resampleColorRamp,
+
+  /** How many classes a graduated classification asks for. */
+  getGraduatedClassCount,
+
+  /**
    * A new, unbound layer: visible, exact, drawn as a flat circle, with no
    * geometry columns picked yet.
    * @param name The layer's display name, already localized by the caller.
@@ -148,6 +188,7 @@ export const MapLayerModule = {
       sensitivity: { mode: "exact" },
       timeColumn: undefined,
       applyAoiFilter: true,
+      spatialFilter: undefined,
       popup: { columnIds: "all", action: undefined },
       legend: {
         title: name,

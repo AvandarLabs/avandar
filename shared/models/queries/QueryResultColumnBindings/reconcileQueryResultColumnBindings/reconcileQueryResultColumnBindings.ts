@@ -125,6 +125,9 @@ function _bindProjection({
           ? matched.expressionKey
           : projection.expressionKey,
       sqlExpressionKey: projection.sqlExpressionKey,
+      ...(projection.bucketGrain
+        ? { bucketGrain: projection.bucketGrain }
+        : {}),
     },
   };
 }
@@ -163,7 +166,8 @@ function _reuseColumns({
       prior.name === column.name &&
       prior.dataType === column.dataType &&
       prior.expressionKey === column.expressionKey &&
-      prior.sqlExpressionKey === column.sqlExpressionKey
+      prior.sqlExpressionKey === column.sqlExpressionKey &&
+      prior.bucketGrain === column.bucketGrain
       ? prior
       : column;
   });

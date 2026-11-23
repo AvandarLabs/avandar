@@ -1,9 +1,16 @@
-import { EASE, ramp } from "../../../motion";
+import { Motion } from "../../../motion";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CleanupLaneHeading } from "./CleanupLaneHeading";
 import type { Input } from "./CellNormalization.schema";
 import type { ReactNode } from "react";
 
-type Props = { input: Input; frame: number; accent: string };
+type Props = {
+  input: Input;
+  frame: number;
+  accent: string;
+};
+/** Frames the lane heading takes to turn from original to result. */
+const REFINE_FRAMES = 72;
 /**
  * The main lane is original at setup and prepared once replacement resolves.
  */
@@ -12,7 +19,13 @@ export function CleanupPrimaryHeading({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const refinement = ramp(frame, 40, 72, EASE.inOut);
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const refinement = Motion.ramp({
+    frame,
+    at: 40,
+    dur: motion.scale(REFINE_FRAMES),
+    easing: motion.travel.easing,
+  });
   const bounds = { x: 88, y: 122, placement: "primary" as const };
   return (
     <g>

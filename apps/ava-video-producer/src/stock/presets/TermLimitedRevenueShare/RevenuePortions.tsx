@@ -1,4 +1,4 @@
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { RevenueAmount } from "./RevenueAmount";
 import type { Input } from "./TermLimitedRevenueShare.schema";
 import type { ReactNode } from "react";
@@ -18,14 +18,19 @@ export function RevenuePortions({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
       {amounts.map((amount, portion) => {
         const offset =
-          (amounts.slice(0, portion).reduce((sum, value) => sum + value, 0) *
+          (amounts.slice(0, portion).reduce((sum, value) => {
+            return sum + value;
+          }, 0) *
             340) /
           receipts;
-        const color = [STOCK.cyan, STOCK.orange, accent][portion];
+        const color = [tokens.color.accentAlt, tokens.color.highlight, accent][
+          portion
+        ];
         return (
           <g key={portion}>
             <rect

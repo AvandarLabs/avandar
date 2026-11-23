@@ -1,5 +1,5 @@
 import { prop } from "@avandar/utils";
-import { STOCK } from "../../graphics-common";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getQuantitySegmentsFromValues } from "./getQuantitySegmentsFromValues";
 import type { ReactNode } from "react";
 
@@ -11,7 +11,6 @@ type Props = {
   width: number;
   height: number;
 };
-
 /** Draws proportional authored quantities against an explicit common whole. */
 export function QuantityBand({
   values,
@@ -21,6 +20,7 @@ export function QuantityBand({
   width,
   height,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   if (
     ![x, y, width, height].every(Number.isFinite) ||
     width <= 0 ||
@@ -34,17 +34,25 @@ export function QuantityBand({
   });
   return (
     <g>
-      <rect x={x} y={y} width={width} height={height} fill={STOCK.line} />
-      {segments.map((segment, index) => (
-        <rect
-          key={index}
-          x={x + segment.start * width}
-          y={y}
-          width={segment.fraction * width}
-          height={height}
-          fill={values[index].color}
-        />
-      ))}
+      <rect
+        x={x}
+        y={y}
+        width={width}
+        height={height}
+        fill={tokens.color.line}
+      />
+      {segments.map((segment, index) => {
+        return (
+          <rect
+            key={index}
+            x={x + segment.start * width}
+            y={y}
+            width={segment.fraction * width}
+            height={height}
+            fill={values[index].color}
+          />
+        );
+      })}
     </g>
   );
 }

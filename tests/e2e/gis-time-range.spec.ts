@@ -129,7 +129,10 @@ test("filters dated points to the dragged range and keeps it after reload", asyn
     await page.getByPlaceholder("Search data sources").click();
     await page.getByRole("option", { name: DATASET_NAME }).click();
 
-    const inspector = page.getByRole("region", { name: "Layer" });
+    const inspector = page.getByRole("region", {
+      name: DATASET_NAME,
+      exact: true,
+    });
     await expect(inspector.getByText("9 of 9 rows mapped")).toBeVisible({
       timeout: LONG_WAIT,
     });

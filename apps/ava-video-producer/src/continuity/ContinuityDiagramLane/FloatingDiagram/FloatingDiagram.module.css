@@ -1,0 +1,21 @@
+.floatingDiagram {
+  color: var(--video-color-text);
+  pointer-events: none;
+  position: absolute;
+  z-index: 20;
+}
+
+.floatingDiagramLabel {
+  background: var(--video-color-ground);
+  border: var(--video-component-floating-label-border-width) solid currentcolor;
+  bottom: calc(100% + var(--video-component-floating-label-offset));
+  display: inline-block;
+  font-family: var(--video-text-stage-floating-label-font-family);
+  font-size: var(--video-text-stage-floating-label-font-size);
+  line-height: var(--video-text-stage-floating-label-line-height);
+  margin: 0;
+  max-width: 90%;
+  padding: var(--video-component-floating-label-padding-y)
+    var(--video-component-floating-label-padding-x);
+  position: absolute;
+}

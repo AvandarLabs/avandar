@@ -39,9 +39,9 @@ test("cost total and share widths use each supplied expense exactly once", () =>
     ),
   ];
   assert.equal(widths.length, 3);
-  widths.forEach((match) =>
-    assert.equal(Number(match[2]), match[1] === "zero" ? 0 : 44),
-  );
+  widths.forEach((match) => {
+    return assert.equal(Number(match[2]), match[1] === "zero" ? 0 : 44);
+  });
   assert.ok(
     markup.indexOf('data-expense-id="meal"') <
       markup.indexOf('data-expense-id="fare"'),
@@ -64,7 +64,9 @@ function _getVisibleTexts({
 }: Readonly<{ input: Input; frame: number }>): string[] {
   const ordered =
     input.unpackOrder === "largest-first"
-      ? [...input.expenses].sort((left, right) => right.amount - left.amount)
+      ? [...input.expenses].sort((left, right) => {
+          return right.amount - left.amount;
+        })
       : input.expenses;
   return [
     input.periodLabel,
@@ -73,7 +75,11 @@ function _getVisibleTexts({
     input.sceneLabels.learner,
     input.caption,
     ...(frame >= 108 ? [input.sceneLabels.total] : []),
-    ...ordered.filter((_, index) => frame >= 62 + index * 9).map(prop("label")),
+    ...ordered
+      .filter((_, index) => {
+        return frame >= 62 + index * 9;
+      })
+      .map(prop("label")),
   ];
 }
 const options = {
@@ -95,27 +101,28 @@ test("zero costs, equal tuples and both orders retain exact totals without multi
       const authored = { ...input, unpackOrder };
       assert.deepEqual(inputSchema.parse(authored), authored);
       const markup = _render({ frame: 150, input: authored });
-      const total = input.expenses.reduce(
-        (sum, expense) => sum + expense.amount,
-        0,
-      );
+      const total = input.expenses.reduce((sum, expense) => {
+        return sum + expense.amount;
+      }, 0);
       assert.match(markup, new RegExp(`data-total="${total}"`));
       const ids = [...markup.matchAll(/data-expense-id="([^"]+)"/g)].map(
-        (match) => match[1],
+        (match) => {
+          return match[1];
+        },
       );
       const expected =
         unpackOrder === "input-order"
           ? input.expenses
-          : [...input.expenses].sort(
-              (left, right) => right.amount - left.amount,
-            );
+          : [...input.expenses].sort((left, right) => {
+              return right.amount - left.amount;
+            });
       assert.deepEqual(ids, expected.map(prop("id")));
-      input.expenses.forEach((expense) =>
-        assert.equal(
+      input.expenses.forEach((expense) => {
+        return assert.equal(
           markup.split(`data-expense-id="${expense.id}"`).length - 1,
           1,
-        ),
-      );
+        );
+      });
     });
   });
   assert.doesNotMatch(
@@ -136,7 +143,9 @@ test("every object silhouette clears canvas, neighboring final objects and capti
         ),
       ];
       positions
-        .filter((position) => Number(position[3]) > 0)
+        .filter((position) => {
+          return Number(position[3]) > 0;
+        })
         .forEach((position) => {
           const x = Number(position[1]);
           const y = Number(position[2]);
@@ -145,11 +154,11 @@ test("every object silhouette clears canvas, neighboring final objects and capti
           );
         });
       if (frame === 150) {
-        positions
-          .slice(1)
-          .forEach((position, index) =>
-            assert.ok(Number(position[1]) - Number(positions[index][1]) > 64),
+        positions.slice(1).forEach((position, index) => {
+          return assert.ok(
+            Number(position[1]) - Number(positions[index][1]) > 64,
           );
+        });
       }
     });
   });
@@ -171,23 +180,27 @@ test("schema and serialized semantic rules preserve the exact authoring contract
       ...DEFAULT_INPUT,
       sceneLabels: { ...DEFAULT_INPUT.sceneLabels, extra: "x" },
     },
-  ].forEach((value) =>
-    assert.equal(inputSchema.safeParse(value).success, false),
-  );
+  ].forEach((value) => {
+    return assert.equal(inputSchema.safeParse(value).success, false);
+  });
+  // This assertion exercises the JSON serialization boundary of the public
+  // contract.
+  // react-doctor-disable-next-line no-json-parse-stringify-clone
   const rules = JSON.parse(
     JSON.stringify(contract.semanticRules),
   ) as typeof contract.semanticRules;
   assert.ok(
-    rules.some(
-      (rule) =>
+    rules.some((rule) => {
+      return (
         rule.paths.includes("expenses.*.amount") &&
-        rule.description.includes("positive"),
-    ),
+        rule.description.includes("positive")
+      );
+    }),
   );
   assert.ok(
-    rules.some((rule) =>
-      rule.description.includes("Equal label/object/amount tuples"),
-    ),
+    rules.some((rule) => {
+      return rule.description.includes("Equal label/object/amount tuples");
+    }),
   );
 });
 test("the complete total label clears the amount-gathering bracket", () => {

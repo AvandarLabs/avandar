@@ -1,18 +1,18 @@
 import { where } from "@avandar/utils";
-import { Trans, useLingui } from "@lingui/react/macro";
+import { Trans } from "@lingui/react/macro";
+import { VisuallyHidden } from "@mantine/core";
 import { useState } from "react";
 import { SubscriptionModule } from "$/models/Subscription/SubscriptionModule/SubscriptionModule";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { SubscriptionPermissionsClient } from "@/clients/SubscriptionPermissionsClient";
 import { AppView } from "@/components/layouts/AppView/AppView";
 import { AppViewBody } from "@/components/layouts/AppView/AppViewBody/AppViewBody";
-import { AppViewHeader } from "@/components/layouts/AppView/AppViewHeader/AppViewHeader";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { DataImportTabs } from "@/views/DataManagerApp/DataImportView/DataImportTabs";
+import { DataImportTabs } from "@/views/DataManagerApp/DataImportView/DataImportTabs/DataImportTabs";
 import { DatasetLimitReachedModal } from "@/views/DataManagerApp/DataImportView/DatasetLimitReachedModal/DatasetLimitReachedModal";
+import type { DataImportTabId } from "@/views/DataManagerApp/DataImportView/DataImportTabs/DataImportTabs";
 
 export function DataImportView(): JSX.Element {
-  const { t } = useLingui();
   const workspace = useCurrentWorkspace();
   const [allDatasets = []] = DatasetClient.useGetAll(
     where("workspace_id", "eq", workspace.id),
@@ -30,26 +30,35 @@ export function DataImportView(): JSX.Element {
       numDatasetsInWorkspace: allDatasets.length,
     });
   const [isLimitModalDismissed, setIsLimitModalDismissed] = useState(false);
+  const [activeTabId, setActiveTabId] =
+    useState<DataImportTabId>("upload-view");
 
   return (
     <AppView>
-      <AppViewHeader
-        title={t`Import data`}
-        description={
-          <Trans>
-            Upload a file, connect an external source, or browse the open data
-            catalog.
-          </Trans>
-        }
-      />
+      {
+        // No visible header band: the tabs already name each way in, so a
+        // title and a sentence restating them only push the work down. The
+        // page keeps its name for screen readers.
+      }
+      <VisuallyHidden component="h1">
+        <Trans>Import data</Trans>
+      </VisuallyHidden>
 
       {
         // No rail here. Import is a task, not a record: there are no
         // properties to park beside it, and the review step below wants every
         // pixel of width for its preview grid.
       }
-      <AppViewBody>
-        <DataImportTabs isAddAllowed={isAddAllowed} />
+      {
+        // The open data catalog scrolls inside its own panes, so while it is
+        // showing the body is held to the visible height instead of growing
+        // with the catalog.
+      }
+      <AppViewBody isFillHeight={activeTabId === "open-data-catalog"}>
+        <DataImportTabs
+          isAddAllowed={isAddAllowed}
+          onTabChange={setActiveTabId}
+        />
       </AppViewBody>
 
       {
@@ -64,7 +73,12 @@ export function DataImportView(): JSX.Element {
       }
       <DatasetLimitReachedModal
         subscription={workspace.subscription}
-        isOpened={!isAddAllowed && !isLimitModalDismissed}
+        isOpened={
+          SubscriptionModule.shouldPromptForDatasetLimitUpgrade({
+            subscription: workspace.subscription,
+            isAddAllowed,
+          }) && !isLimitModalDismissed
+        }
         onClose={() => {
           setIsLimitModalDismissed(true);
         }}

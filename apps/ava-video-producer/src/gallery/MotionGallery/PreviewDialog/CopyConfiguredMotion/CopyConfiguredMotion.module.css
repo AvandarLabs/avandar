@@ -1,0 +1,3 @@
+.copyConfiguredMotionButton {
+  composes: button from global;
+}

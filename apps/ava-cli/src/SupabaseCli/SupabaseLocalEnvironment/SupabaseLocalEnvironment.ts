@@ -1,13 +1,15 @@
 import { DevServerPort } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/DevServerPort/DevServerPort";
 import { SupabaseBackupStore } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseBackupStore";
 import { SupabaseConfig } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseConfig/SupabaseConfig";
+import { SupabaseConfigOverrides } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseConfigOverrides/SupabaseConfigOverrides";
 import { SupabaseDockerCleanup } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseDockerCleanup";
+import { SupabaseRemoteSwitch } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseRemoteSwitch/SupabaseRemoteSwitch";
 import { SupabaseRestorePreparation } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseRestorePreparation";
 import { SupabaseSwitchPreparation } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseSwitchPreparation";
 import type {
   CommandResult,
   RestorePreparation,
-  SupabaseBackupManifest,
+  SupabaseLocalBackupManifest,
   SupabaseLocalEnvironmentIo,
   SupabaseLocalStatus,
   SupabaseSeedOutcome,
@@ -18,7 +20,7 @@ import type {
 type RollbackSwitchOptions = {
   io: SupabaseLocalEnvironmentIo;
   backupDirectory: string;
-  manifest: SupabaseBackupManifest;
+  manifest: SupabaseLocalBackupManifest;
   switchError: unknown;
 };
 
@@ -128,6 +130,27 @@ async function _rollbackSwitch(
   throw options.switchError;
 }
 
+/** Points the Supabase CLI at the new project before it starts. */
+async function _writeProjectOverrides(
+  options: Readonly<{
+    io: SupabaseLocalEnvironmentIo;
+    preparation: SwitchPreparation;
+    temporaryProjectId: string;
+  }>,
+): Promise<void> {
+  const { io, preparation } = options;
+  await io.writeTextFile({
+    filePath: preparation.developmentEnvPath,
+    contents: SupabaseConfigOverrides.makeEnvContentsWithOverrides({
+      envContents: await io.readTextFile(preparation.developmentEnvPath),
+      overrides: SupabaseConfigOverrides.fromLocalProject({
+        projectId: options.temporaryProjectId,
+        ports: preparation.manifest.derivedPorts,
+      }),
+    }),
+  });
+}
+
 async function _activateSwitch(
   options: Readonly<{
     io: SupabaseLocalEnvironmentIo;
@@ -141,14 +164,7 @@ async function _activateSwitch(
   status: SupabaseLocalStatus;
 }> {
   const { io, preparation, temporaryProjectId } = options;
-  await io.writeTextFile({
-    filePath: preparation.configPath,
-    contents: SupabaseConfig.makeConfigContentsFromBasePort({
-      configContents: preparation.configContents,
-      projectId: temporaryProjectId,
-      basePort: preparation.manifest.basePort,
-    }),
-  });
+  await _writeProjectOverrides(options);
   _requireCommandSuccess({
     result: await io.runSupabase(["start"], { outputMode: "stream" }),
     stage: "Supabase start",
@@ -268,7 +284,7 @@ async function _removeRestoredBackup(
       : [backupError];
     throw new AggregateError(
       errors,
-      `Files were restored, but backup removal failed at ${options.preparation.backupDirectory}.${_manualCleanupSuffix({ temporaryProjectId: options.preparation.manifest.temporaryProjectId, cleanupError: options.cleanupError })}`,
+      `Files were restored, but backup removal failed at ${options.preparation.backupDirectory}.${_manualCleanupSuffix({ temporaryProjectId: SupabaseBackupStore.getProjectIdFromManifest(options.preparation.manifest), cleanupError: options.cleanupError })}`,
     );
   }
 }
@@ -280,14 +296,20 @@ async function _restoreCleanupError(
   }>,
 ): Promise<Error | undefined> {
   const { io, preparation } = options;
+  const { manifest } = preparation;
+  // A hosted project owns no local Docker resources, so there is nothing to
+  // clean up and nothing whose ownership needs proving.
+  if (manifest.kind === "remote") {
+    return undefined;
+  }
   if (!preparation.hasProvenOwnership) {
     return new Error(
-      `Temporary project ownership could not be safely proven; manual cleanup is required for ${preparation.manifest.temporaryProjectId}.`,
+      `Temporary project ownership could not be safely proven; manual cleanup is required for ${manifest.temporaryProjectId}. Delete it with \`pnpm exec supabase stop --project-id ${manifest.temporaryProjectId} --no-backup\`.`,
     );
   }
   return await SupabaseDockerCleanup.cleanupTemporaryProject({
     io,
-    temporaryProjectId: preparation.manifest.temporaryProjectId,
+    temporaryProjectId: manifest.temporaryProjectId,
   });
 }
 
@@ -314,13 +336,13 @@ async function _restore(
     const errors = cleanupError ? [cleanupError, restoreError] : [restoreError];
     throw new AggregateError(
       errors,
-      `Supabase file restoration failed. Backup retained at ${preparation.backupDirectory}.${_manualCleanupSuffix({ temporaryProjectId: preparation.manifest.temporaryProjectId, cleanupError })}`,
+      `Supabase file restoration failed. Backup retained at ${preparation.backupDirectory}.${_manualCleanupSuffix({ temporaryProjectId: SupabaseBackupStore.getProjectIdFromManifest(preparation.manifest), cleanupError })}`,
     );
   }
   await _removeRestoredBackup({ io, preparation, cleanupError });
   if (cleanupError) {
     throw new Error(
-      `Files were restored, but ${preparation.manifest.temporaryProjectId} requires manual cleanup: ${cleanupError.message}`,
+      `Files were restored, but ${SupabaseBackupStore.getProjectIdFromManifest(preparation.manifest)} requires manual cleanup: ${cleanupError.message}`,
     );
   }
 }
@@ -333,6 +355,15 @@ export const SupabaseLocalEnvironment = {
    */
   switch: _switch,
 
-  /** Stops the current branch's temporary project and restores local files. */
+  /**
+   * Points the current branch's development env files at a hosted Supabase
+   * project. No local project is started or stopped.
+   */
+  switchRemote: SupabaseRemoteSwitch.switchRemote,
+
+  /**
+   * Restores the env files a local or remote switch rewrote, and removes the
+   * Docker project a local switch started.
+   */
   restore: _restore,
 };

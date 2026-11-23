@@ -6,18 +6,16 @@ import {
   makeGoogleSheetFreshnessCache,
 } from "@/clients/google/GoogleDriveClient/googleSheetFreshness";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
-import type { GoogleDriveFetch } from "@/clients/google/GoogleDriveClient/GoogleDriveClient.types";
+import type { SourceVersion } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
 
 const DATASET_ID = "11111111-1111-4111-8111-111111111111" as DatasetId;
 const OTHER_DATASET_ID = "22222222-2222-4222-8222-222222222222" as DatasetId;
-const FILE_ID = "1AbCdEfGhIjKlMnOpQrStUvWxYz0123456789";
-const ACCESS_TOKEN = "ya29.test-access-token";
 
 const { googleSheetFreshnessDebounceMs: WINDOW_MS } = GlobalAppConfig.timing;
 
-/** A transport that counts calls and answers with a new version each time. */
-function _makeCountingFetch(): {
-  driveFetch: GoogleDriveFetch;
+/** A version reader that counts calls and answers a new version each time. */
+function _makeCountingReader(): {
+  readVersion: () => Promise<SourceVersion>;
   callCount: () => number;
 } {
   let calls = 0;
@@ -25,12 +23,9 @@ function _makeCountingFetch(): {
     callCount: () => {
       return calls;
     },
-    driveFetch: async () => {
+    readVersion: async () => {
       calls += 1;
-      return new Response(JSON.stringify({ version: String(calls) }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      });
+      return String(calls);
     },
   };
 }
@@ -49,19 +44,17 @@ function _makeClock(): { now: () => number; advance: (ms: number) => void } {
 }
 
 describe("getGoogleSheetFreshness", () => {
-  it("calls Drive on the first check", async () => {
+  it("reads the version on the first check", async () => {
     // Positive control for every "does not call" assertion below.
-    const { driveFetch, callCount } = _makeCountingFetch();
+    const { readVersion, callCount } = _makeCountingReader();
     const cache = makeGoogleSheetFreshnessCache();
     const clock = _makeClock();
 
     const version = await getGoogleSheetFreshness({
       datasetId: DATASET_ID,
-      fileId: FILE_ID,
-      accessToken: ACCESS_TOKEN,
       cache,
       now: clock.now,
-      driveFetch,
+      readVersion,
     });
 
     expect(version).toBe("1");
@@ -69,17 +62,15 @@ describe("getGoogleSheetFreshness", () => {
   });
 
   it("reuses the cached version inside the window", async () => {
-    const { driveFetch, callCount } = _makeCountingFetch();
+    const { readVersion, callCount } = _makeCountingReader();
     const cache = makeGoogleSheetFreshnessCache();
     const clock = _makeClock();
     const check = () => {
       return getGoogleSheetFreshness({
         datasetId: DATASET_ID,
-        fileId: FILE_ID,
-        accessToken: ACCESS_TOKEN,
         cache,
         now: clock.now,
-        driveFetch,
+        readVersion,
       });
     };
 
@@ -91,18 +82,16 @@ describe("getGoogleSheetFreshness", () => {
     expect(second).toBe("1");
   });
 
-  it("calls Drive again once the window has elapsed", async () => {
-    const { driveFetch, callCount } = _makeCountingFetch();
+  it("reads the version again once the window has elapsed", async () => {
+    const { readVersion, callCount } = _makeCountingReader();
     const cache = makeGoogleSheetFreshnessCache();
     const clock = _makeClock();
     const check = () => {
       return getGoogleSheetFreshness({
         datasetId: DATASET_ID,
-        fileId: FILE_ID,
-        accessToken: ACCESS_TOKEN,
         cache,
         now: clock.now,
-        driveFetch,
+        readVersion,
       });
     };
 
@@ -117,25 +106,21 @@ describe("getGoogleSheetFreshness", () => {
   });
 
   it("keeps a separate window per dataset", async () => {
-    const { driveFetch, callCount } = _makeCountingFetch();
+    const { readVersion, callCount } = _makeCountingReader();
     const cache = makeGoogleSheetFreshnessCache();
     const clock = _makeClock();
 
     await getGoogleSheetFreshness({
       datasetId: DATASET_ID,
-      fileId: FILE_ID,
-      accessToken: ACCESS_TOKEN,
       cache,
       now: clock.now,
-      driveFetch,
+      readVersion,
     });
     await getGoogleSheetFreshness({
       datasetId: OTHER_DATASET_ID,
-      fileId: FILE_ID,
-      accessToken: ACCESS_TOKEN,
       cache,
       now: clock.now,
-      driveFetch,
+      readVersion,
     });
 
     expect(callCount()).toBe(2);
@@ -143,18 +128,16 @@ describe("getGoogleSheetFreshness", () => {
 });
 
 describe("clearGoogleSheetFreshness", () => {
-  it("forces the next check to call Drive, even inside the window", async () => {
-    const { driveFetch, callCount } = _makeCountingFetch();
+  it("forces the next check to read the version, even inside the window", async () => {
+    const { readVersion, callCount } = _makeCountingReader();
     const cache = makeGoogleSheetFreshnessCache();
     const clock = _makeClock();
     const check = () => {
       return getGoogleSheetFreshness({
         datasetId: DATASET_ID,
-        fileId: FILE_ID,
-        accessToken: ACCESS_TOKEN,
         cache,
         now: clock.now,
-        driveFetch,
+        readVersion,
       });
     };
 
@@ -167,17 +150,15 @@ describe("clearGoogleSheetFreshness", () => {
   });
 
   it("leaves other datasets cached", async () => {
-    const { driveFetch, callCount } = _makeCountingFetch();
+    const { readVersion, callCount } = _makeCountingReader();
     const cache = makeGoogleSheetFreshnessCache();
     const clock = _makeClock();
     const check = (datasetId: DatasetId) => {
       return getGoogleSheetFreshness({
         datasetId,
-        fileId: FILE_ID,
-        accessToken: ACCESS_TOKEN,
         cache,
         now: clock.now,
-        driveFetch,
+        readVersion,
       });
     };
 

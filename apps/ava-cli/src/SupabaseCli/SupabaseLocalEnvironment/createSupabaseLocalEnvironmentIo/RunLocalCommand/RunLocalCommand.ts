@@ -14,6 +14,8 @@ type RunCommandOptions = {
   args: readonly string[];
   cwd: string;
   env?: Readonly<Record<string, string>>;
+  /** Inherited variables the child must not see, such as stale overrides. */
+  shouldOmitEnvKey?: (envKey: string) => boolean;
   outputMode?: CommandOutputMode;
   transformStreamLine?: (line: string) => string;
 };
@@ -73,6 +75,27 @@ function _flushOutputForwarders(
   outputForwarders.stderr.flush();
 }
 
+/**
+ * The child's environment, or undefined to inherit `process.env` unchanged.
+ *
+ * Leave `env` unset when nothing changes: passing a copy is a different call
+ * than every caller without overrides makes.
+ */
+function _makeChildEnv(
+  options: Readonly<RunCommandOptions>,
+): NodeJS.ProcessEnv | undefined {
+  const { env, shouldOmitEnvKey } = options;
+  if (env === undefined && shouldOmitEnvKey === undefined) {
+    return undefined;
+  }
+  const inheritedEnv = Object.fromEntries(
+    Object.entries(process.env).filter(([envKey]) => {
+      return !shouldOmitEnvKey?.(envKey);
+    }),
+  );
+  return { ...inheritedEnv, ...env };
+}
+
 function _runStreamingCommand(
   options: Readonly<RunCommandOptions>,
 ): Promise<CommandResult> {
@@ -85,7 +108,7 @@ function _runStreamingCommand(
     );
     const childProcess = spawn(options.command, [...options.args], {
       cwd: options.cwd,
-      env: options.env ? { ...process.env, ...options.env } : undefined,
+      env: _makeChildEnv(options),
       stdio: ["ignore", "pipe", "pipe"],
     });
     childProcess.stdout.setEncoding("utf8");
@@ -129,14 +152,12 @@ async function _runCommand(
     return await _runStreamingCommand(options);
   }
   try {
+    const childEnv = _makeChildEnv(options);
     const result = await execFileAsync(options.command, [...options.args], {
       cwd: options.cwd,
       encoding: "utf8",
       maxBuffer: 10 * 1024 * 1024,
-      // Only set `env` when there is something to override: passing it always
-      // would replace the inherited environment with a copy, which is a
-      // different call than every existing caller makes.
-      ...(options.env ? { env: { ...process.env, ...options.env } } : {}),
+      ...(childEnv ? { env: childEnv } : {}),
     });
     return {
       ok: true,
@@ -203,4 +224,28 @@ export const RunLocalCommand = {
   isPortAvailable: _isPortAvailable,
 
   run: _runCommand,
+
+  /**
+   * Runs a command whose output is the result, and throws naming the command
+   * and its stderr when it fails. Use it for a lookup such as listing Git
+   * branches or Docker volumes, where a failure leaves nothing to work with.
+   */
+  runOrThrow: async (
+    options: Readonly<Omit<RunCommandOptions, "outputMode">>,
+  ): Promise<string> => {
+    const result = await _runCommand(options);
+    if (!result.ok) {
+      throw new Error(
+        `${options.command} ${options.args.slice(0, 2).join(" ")} failed: ${result.stderr || "unknown error"}`,
+      );
+    }
+    return result.stdout;
+  },
+
+  /** The non-blank lines of a command's output. */
+  getLinesFromOutput: (output: string): string[] => {
+    return output.split("\n").filter((line) => {
+      return line.trim() !== "";
+    });
+  },
 };

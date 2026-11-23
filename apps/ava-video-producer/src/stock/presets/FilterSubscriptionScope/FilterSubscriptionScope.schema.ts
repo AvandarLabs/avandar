@@ -57,7 +57,9 @@ export const inputSchema = baseSchema.superRefine((input, context) => {
   }
   if (
     !input.views.some(prop("subscribed")) ||
-    !input.views.some((view) => !view.subscribed)
+    !input.views.some((view) => {
+      return !view.subscribed;
+    })
   ) {
     context.addIssue({
       code: "custom",

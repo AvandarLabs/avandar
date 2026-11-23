@@ -1,13 +1,12 @@
-import { STOCK } from "../../stockPalette";
 import type { StockContract } from "../../contracts/StockContract.types";
 import type { PacketStreamInput } from "./PacketStream.schema";
 
 /** Complete fictional example used only when input is omitted. */
 export const packetStreamDefaultInput: PacketStreamInput = {
   lanes: [
-    { label: "STREAM A", color: STOCK.cyan, offset: 0 },
-    { label: "STREAM B", color: STOCK.mint, offset: 28 },
-    { label: "STREAM C", color: STOCK.orange, offset: 59 },
+    { label: "STREAM A", color: "$color.accentAlt", offset: 0 },
+    { label: "STREAM B", color: "$color.positive", offset: 28 },
+    { label: "STREAM C", color: "$color.highlight", offset: 59 },
   ],
   packetsPerLane: 4,
   heading: "Signals in motion",
@@ -23,7 +22,7 @@ export const packetStreamDenseInput: PacketStreamInput = {
 /** A complete smaller or differently selected authored example. */
 export const packetStreamChangedInput: PacketStreamInput = {
   ...packetStreamDefaultInput,
-  lanes: [{ label: "AUTHORED", color: STOCK.cyan, offset: 10 }],
+  lanes: [{ label: "AUTHORED", color: "$color.accentAlt", offset: 10 }],
   packetsPerLane: 2,
   heading: "One authored lane",
   showReceipts: false,

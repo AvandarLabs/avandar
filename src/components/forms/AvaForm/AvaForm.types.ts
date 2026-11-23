@@ -37,7 +37,7 @@ export type ValuesOfFieldRecord<FieldSchemaRecord extends UnknownRecord> = {
 export type GenericFormSchemaRecord<
   FormValues extends AnyFormValues = AnyFormValues,
 > = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // oxlint-disable-next-line typescript/no-explicit-any
   [K in Extract<keyof FormValues, string>]: any;
 };
 

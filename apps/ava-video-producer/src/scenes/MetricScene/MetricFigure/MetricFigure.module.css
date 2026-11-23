@@ -1,0 +1,8 @@
+.metricFigurediv1 {
+  align-items: baseline;
+  display: flex;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+  justify-content: center;
+  white-space: nowrap;
+}

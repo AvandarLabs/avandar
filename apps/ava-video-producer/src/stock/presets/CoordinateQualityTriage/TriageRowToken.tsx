@@ -1,6 +1,6 @@
-import { ramp } from "../../../motion";
-import { Text } from "../../graphics-common";
-import { STOCK } from "../../stockPalette";
+import { Text } from "../../graphics-common/Text";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { makeCoordinateTriageFromInputAndFrame } from "./makeCoordinateTriageFromInputAndFrame";
 import type { ReactNode } from "react";
 
@@ -15,21 +15,24 @@ export function TriageRowToken({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { color, stroke, sketch } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const opacity =
     row.reason === "plotted" && row.representativeIndex !== row.index
-      ? 1 - ramp(frame, 90 + row.index * 3, 6)
+      ? 1 - motion.ramp(frame, row.arrivedAt, motion.chip)
       : 1;
   return (
     <g data-moving-row-key={row.id} opacity={opacity}>
-      <circle
+      <SketchedShape
         data-row-token={row.id}
-        cx={row.x}
-        cy={row.y}
-        r={9}
-        fill={STOCK.surface}
-        stroke={row.reason === "plotted" ? accent : STOCK.orange}
+        shape={{ kind: "circle", cx: row.x, cy: row.y, r: 9 }}
+        profile={sketch.shape}
+        fill={color.surface}
+        stroke={row.reason === "plotted" ? accent : color.highlight}
+        strokeWidth={shapes.stroke(stroke.hairline)}
       />
-      <Text x={row.x} y={row.y + 4} size={12} anchor="middle">
+      <Text role="data" x={row.x} y={row.y + 4} anchor="middle">
         {row.index + 1}
       </Text>
     </g>
