@@ -1,4 +1,4 @@
-import { ZoneFraction } from "./ZoneFraction";
+import { ZoneFraction } from "./ZoneFraction/ZoneFraction";
 import type { Input } from "./PopulationNormalizedMap.schema";
 import type { ReactNode } from "react";
 
@@ -13,16 +13,18 @@ export function ZoneFractions({
 }: Readonly<Props>): ReactNode {
   return (
     <g>
-      {input.zones.map((zone, index) => (
-        <ZoneFraction
-          key={zone.id}
-          zone={zone}
-          index={index}
-          input={input}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {input.zones.map((zone, index) => {
+        return (
+          <ZoneFraction
+            key={zone.id}
+            zone={zone}
+            index={index}
+            input={input}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

@@ -1,6 +1,6 @@
 import { Tooltip } from "@avandar/ui";
 import { Box } from "@mantine/core";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { Children, cloneElement, isValidElement } from "react";
 import css from "@/components/offline/OfflineGated/OfflineGated.module.css";
 import { OfflineUnavailableTooltipLabel } from "@/components/offline/OfflineUnavailableTooltipLabel";

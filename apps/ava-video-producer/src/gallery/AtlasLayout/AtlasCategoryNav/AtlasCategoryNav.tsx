@@ -1,4 +1,5 @@
-import { Icon, type IconName } from "../../MotionGallery/Icon";
+import { type IconName } from "../../MotionGallery/Icon";
+import { CategoryButton } from "./CategoryButton/CategoryButton";
 import type { ReactNode } from "react";
 
 /** One sidebar filter: a category id, its display label and item count. */
@@ -39,7 +40,7 @@ export function AtlasCategoryNav({
   selected,
   onSelect,
   children,
-}: Props) {
+}: Readonly<Props>): ReactNode {
   return (
     <aside className="sidebar" aria-label={label}>
       <div className="sidebar-top">
@@ -49,49 +50,28 @@ export function AtlasCategoryNav({
           label={allLabel}
           count={total}
           isActive={selected === ALL_ATLAS_CATEGORIES}
-          onClick={() => onSelect(ALL_ATLAS_CATEGORIES)}
+          onClick={() => {
+            return onSelect(ALL_ATLAS_CATEGORIES);
+          }}
         />
         <div className="category-list">
-          {categories.map((category) => (
-            <CategoryButton
-              key={category.id}
-              icon={category.icon ?? "grid"}
-              label={category.label}
-              count={category.count}
-              isActive={selected === category.id}
-              onClick={() => onSelect(category.id)}
-            />
-          ))}
+          {categories.map((category) => {
+            return (
+              <CategoryButton
+                key={category.id}
+                icon={category.icon ?? "grid"}
+                label={category.label}
+                count={category.count}
+                isActive={selected === category.id}
+                onClick={() => {
+                  return onSelect(category.id);
+                }}
+              />
+            );
+          })}
         </div>
       </div>
       {children}
     </aside>
-  );
-}
-
-function CategoryButton({
-  icon,
-  label,
-  count,
-  isActive,
-  onClick,
-}: {
-  icon: IconName;
-  label: string;
-  count: number;
-  isActive: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      className={`category-button ${isActive ? "active" : ""}`}
-      onClick={onClick}
-      aria-pressed={isActive}
-    >
-      <Icon name={icon} />
-      <span>{label}</span>
-      <span className="category-count">{count}</span>
-    </button>
   );
 }

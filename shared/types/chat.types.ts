@@ -153,7 +153,7 @@ export type ChatCaseValueShape = "single" | "list" | "bucketed_list";
 export type ChatCaseBucketGrain = "day" | "week" | "month" | "quarter" | "year";
 
 /** Do not remove these tests! */
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// oxlint-disable-next-line typescript/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ChatCaseBucketGrainTests = [
   Expect<IsEqual<ChatCaseBucketGrain, ConceptAttribute.BucketGrain>>,

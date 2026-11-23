@@ -1,7 +1,11 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { CarbonAccounting } from "./CarbonAccounting";
+import { CarbonBoundaryLabel } from "./CarbonBoundaryLabel/CarbonBoundaryLabel";
+import { CarbonDecisionActionLabel } from "./CarbonDecisionActionLabel/CarbonDecisionActionLabel";
+import { CarbonDecisionActorLabel } from "./CarbonDecisionActorLabel/CarbonDecisionActorLabel";
 import { CarbonPhysical } from "./CarbonPhysical";
 import { DEFAULT_INPUT } from "./CarbonStorageAccounting.fixtures";
+import { CarbonStorageAccountingDisclaimerLabel } from "./CarbonStorageAccountingDisclaimerLabel/CarbonStorageAccountingDisclaimerLabel";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./CarbonStorageAccounting.schema";
 import type { ReactNode } from "react";
@@ -18,16 +22,7 @@ export function CarbonStorageAccounting({
   return (
     <g>
       <g data-boundary>
-        <FitText
-          text={input.boundary.label}
-          x={50}
-          y={46}
-          width={860}
-          fontSize={14}
-          maxLines={2}
-          breakLongWords
-          normalizeWhitespace
-        />
+        <CarbonBoundaryLabel input={input} />
         <FitText
           text={input.boundary.periodLabel}
           x={50}
@@ -49,38 +44,11 @@ export function CarbonStorageAccounting({
           normalizeWhitespace
         />
       </g>
-      <FitText
-        text={input.decision.actorLabel}
-        x={50}
-        y={152}
-        width={450}
-        fontSize={12}
-        maxLines={2}
-        breakLongWords
-        normalizeWhitespace
-      />
-      <FitText
-        text={input.decision.actionLabel}
-        x={50}
-        y={188}
-        width={450}
-        fontSize={12}
-        maxLines={2}
-        breakLongWords
-        normalizeWhitespace
-      />
-      <CarbonPhysical input={input} frame={frame} accent={accent} />
-      <CarbonAccounting input={input} frame={frame} accent={accent} />
-      <FitText
-        text={input.copy.disclaimer}
-        x={50}
-        y={585}
-        width={870}
-        fontSize={12}
-        maxLines={1}
-        breakLongWords
-        normalizeWhitespace
-      />
+      <CarbonDecisionActorLabel input={input} />
+      <CarbonDecisionActionLabel input={input} />
+      <CarbonPhysical {...{ input, frame, accent }} />
+      <CarbonAccounting {...{ input, frame, accent }} />
+      <CarbonStorageAccountingDisclaimerLabel input={input} />
     </g>
   );
 }

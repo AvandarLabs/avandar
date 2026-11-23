@@ -1,6 +1,7 @@
 import { SegmentedControl } from "@mantine/core";
-import { useRowIssueAriaProps } from "../../RowIssueContext/RowIssueContext";
-import { formatDashPattern } from "../controlValueHelpers/controlValueHelpers";
+import { useRowIssueAriaProps } from "../../RowIssueContext/rowIssueHelpers";
+import { ControlValues } from "../ControlValues/ControlValues";
+import type { ReactNode } from "react";
 
 const DASH_PRESETS: Readonly<Record<string, readonly number[]>> = {
   solid: [],
@@ -13,14 +14,16 @@ type Props = Readonly<{
   onChange: (pattern: readonly number[]) => void;
 }>;
 
-/** Solid, dotted, and dashed presets. Shows no selection for a custom pattern. */
-export function DashPresets({ pattern, onChange }: Props) {
+/**
+ * Solid, dotted, and dashed presets. Shows no selection for a custom pattern.
+ */
+export function DashPresets({ pattern, onChange }: Props): ReactNode {
   const issueAriaProps = useRowIssueAriaProps();
-  const patternText = formatDashPattern(pattern);
+  const patternText = ControlValues.formatDashPattern(pattern);
   const preset =
-    Object.entries(DASH_PRESETS).find(
-      ([, dashes]) => formatDashPattern(dashes) === patternText,
-    )?.[0] ?? "";
+    Object.entries(DASH_PRESETS).find(([, dashes]) => {
+      return ControlValues.formatDashPattern(dashes) === patternText;
+    })?.[0] ?? "";
   return (
     <SegmentedControl
       size="xs"
@@ -32,7 +35,9 @@ export function DashPresets({ pattern, onChange }: Props) {
         { value: "dotted", label: "Dotted" },
         { value: "dashed", label: "Dashed" },
       ]}
-      onChange={(presetName) => onChange(DASH_PRESETS[presetName] ?? [])}
+      onChange={(presetName) => {
+        return onChange(DASH_PRESETS[presetName] ?? []);
+      }}
     />
   );
 }

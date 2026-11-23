@@ -8,23 +8,29 @@ test("dense comparison pairs preserve maximum data and inefficiently packed labe
   const input: Input = {
     ...fixtures[2].input,
     finalView: "comparison-pair",
-    groups: fixtures[2].input.groups.map((group) => ({
-      ...group,
-      records: group.records.map((record) => ({
-        ...record,
-        label: `界 ${"界".repeat(17)} ${"界".repeat(6)}`,
-        comparisonValue: `${" \t\n\r".repeat(5)}  `,
-      })),
-    })),
+    groups: fixtures[2].input.groups.map((group) => {
+      return {
+        ...group,
+        records: group.records.map((record) => {
+          return {
+            ...record,
+            label: `界 ${"界".repeat(17)} ${"界".repeat(6)}`,
+            comparisonValue: `${" \t\n\r".repeat(5)}  `,
+          };
+        }),
+      };
+    }),
   };
   assert.deepEqual(inputSchema.parse(input), input);
   [36, 70, 85, 100, 150].forEach((frame) => {
     const markup = render({ frame: frame, input: input });
-    input.groups.forEach((group) =>
-      group.records.forEach((record) =>
-        assert.ok(markup.includes(`aria-label="${record.comparisonValue}"`)),
-      ),
-    );
+    input.groups.forEach((group) => {
+      return group.records.forEach((record) => {
+        return assert.ok(
+          markup.includes(`aria-label="${record.comparisonValue}"`),
+        );
+      });
+    });
   });
   assert.equal(
     inputSchema.safeParse({

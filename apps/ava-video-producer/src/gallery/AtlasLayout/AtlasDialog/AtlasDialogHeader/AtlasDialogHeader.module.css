@@ -1,0 +1,61 @@
+.atlasDialogHeaderHeader {
+  gap: var(--atlas-space-12);
+}
+
+.atlasDialogHeaderHeading {
+  align-items: baseline;
+  display: flex;
+  flex: 1;
+  gap: var(--atlas-space-14);
+  min-width: 0;
+  overflow: hidden;
+}
+
+.atlasDialogHeaderHeading h2 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.atlasDialogHeaderHeading > span {
+  color: var(--atlas-color-muted);
+  flex-shrink: 0;
+  font-size: var(--atlas-font-size-12);
+}
+
+/*
+ * On a phone the title may take two lines, with the subtitle under it,
+ * instead of cutting a long title to a few letters. The header keeps its fixed
+ * height, which the pinned player strip's offset is measured from, so a title
+ * longer than two lines ends in an ellipsis. The full title is the heading's
+ * tooltip.
+ */
+@media (width <= 760px) {
+  .atlasDialogHeaderHeading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--atlas-space-2);
+    overflow: visible;
+  }
+
+  .atlasDialogHeaderHeading h2 {
+    -webkit-box-orient: vertical;
+    display: -webkit-box;
+    font-size: var(--atlas-font-size-17);
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    line-height: 1.15;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+
+  .atlasDialogHeaderHeading > span {
+    font-size: var(--atlas-font-size-11);
+    line-height: 1.2;
+  }
+}
+
+.atlasDialogHeaderDialogHeader {
+  composes: dialog-header from global;
+}

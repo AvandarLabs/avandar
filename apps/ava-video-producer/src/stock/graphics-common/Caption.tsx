@@ -1,19 +1,24 @@
-import { useGraphicTokens } from "../theme/useGraphicTheme/useGraphicTheme";
+import { GraphicThemeHooks } from "../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { GRAPHIC_HEIGHT, GRAPHIC_WIDTH } from "./graphicCanvas.constants";
 import { Text } from "./Text";
 import type { ReactNode } from "react";
 
-/** The one-line caption, centred on the canvas at the theme's caption baseline. */
+type Props = {
+  children: ReactNode;
+  x?: number;
+  anchor?: "start" | "middle" | "end";
+};
+
+/**
+ * The one-line caption, centred on the canvas at the theme's caption baseline.
+ */
 export function Caption({
   children,
   x = GRAPHIC_WIDTH / 2,
   anchor = "middle",
-}: {
-  children: ReactNode;
-  x?: number;
-  anchor?: "start" | "middle" | "end";
-}) {
-  const baseline = useGraphicTokens().layout.graphic.captionBaseline;
+}: Readonly<Props>): ReactNode {
+  const baseline =
+    GraphicThemeHooks.useGraphicTokens().layout.graphic.captionBaseline;
   return (
     <Text role="caption" x={x} y={GRAPHIC_HEIGHT - baseline} anchor={anchor}>
       {children}

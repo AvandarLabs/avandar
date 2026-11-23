@@ -118,12 +118,12 @@ export function AvaForm<
           return field;
         });
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // oxlint-disable-next-line typescript/no-explicit-any
       newFields[fieldKey] = improvedField as any;
     });
     return newFields;
     // disable exhaustive-deps because we only want to generate these once
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // oxlint-disable-next-line react/exhaustive-deps
   }, []);
 
   const formInitializer = useMemo(() => {
@@ -196,7 +196,7 @@ export function AvaForm<
         : ("change" as const),
     };
     // disable exhaustive-deps because we only want to generate these once
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // oxlint-disable-next-line react/exhaustive-deps
   }, []);
 
   const form = useForm(formInitializer as UseFormInput<FormValues>);

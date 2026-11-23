@@ -34,11 +34,11 @@
       "durationInFrames": 80,
       "transitionInFrames": 10,
       "theme": {
-        "ground": "#f8fafc",
-        "foreground": "#0f172a",
-        "muted-foreground": "#64748b",
-        "muted": "#cbd5e1",
-        "border": "#94a3b8",
+        "ground": "$atomic.swatch.slate50",
+        "foreground": "$atomic.swatch.slate900",
+        "muted-foreground": "$atomic.swatch.slate500",
+        "muted": "$atomic.swatch.slate300",
+        "border": "$atomic.swatch.slate400",
         "brand-strong": "var(--brand)"
       },
       "transition": {
@@ -130,11 +130,11 @@
         "revealAtFrame": 22
       },
       "theme": {
-        "ground": "#f8fafc",
-        "foreground": "#0f172a",
-        "muted-foreground": "#64748b",
-        "muted": "#cbd5e1",
-        "border": "#94a3b8",
+        "ground": "$atomic.swatch.slate50",
+        "foreground": "$atomic.swatch.slate900",
+        "muted-foreground": "$atomic.swatch.slate500",
+        "muted": "$atomic.swatch.slate300",
+        "border": "$atomic.swatch.slate400",
         "brand-strong": "var(--brand)"
       }
     }

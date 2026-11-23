@@ -48,12 +48,11 @@ function _film(text: string): Film {
   };
 }
 
-const _syntheticSpeech: typeof scratchTts = async (
+async function _syntheticSpeech({
   plan,
-  _options,
-  root,
+  workspace: root,
   relativeDirectory,
-) => {
+}: Parameters<typeof scratchTts>[0]): Promise<string> {
   const directory = path.join(
     root,
     relativeDirectory ?? `out/${plan.id}/scratch`,
@@ -71,12 +70,14 @@ const _syntheticSpeech: typeof scratchTts = async (
   await fs.writeFile(path.join(root, "public", asset), plan.narration[0].text);
   const derived = {
     ...plan,
-    narration: plan.narration.map((cue) => ({ ...cue, audio: asset })),
+    narration: plan.narration.map((cue) => {
+      return { ...cue, audio: asset };
+    }),
   };
   const filename = path.join(directory, "storyboard.json");
   await fs.writeFile(filename, JSON.stringify(derived), { flag: "wx" });
   return filename;
-};
+}
 
 async function _temporary(action: (root: string) => Promise<void>) {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), "showcase-narration-"));

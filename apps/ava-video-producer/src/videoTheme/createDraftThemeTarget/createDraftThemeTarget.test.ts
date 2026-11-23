@@ -1,14 +1,14 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
-  BUILT_IN_VIDEO_THEMES,
-  createVideoThemeLibrary,
-} from "../builtInVideoThemes/builtInVideoThemes";
+  makeDraftThemeTargetFromLibrary,
+  DRAFT_THEME_ID,
+} from "../makeDraftThemeTargetFromLibrary/makeDraftThemeTargetFromLibrary";
 import { makeResolvedVideoThemeFromLibrary } from "../makeResolvedVideoThemeFromLibrary/makeResolvedVideoThemeFromLibrary";
 import {
-  createDraftThemeTarget,
-  DRAFT_THEME_ID,
-} from "./createDraftThemeTarget";
+  BUILT_IN_VIDEO_THEMES,
+  makeVideoThemeLibraryFromDocuments,
+} from "../makeVideoThemeLibraryFromDocuments/makeVideoThemeLibraryFromDocuments";
 import type {
   VideoThemeDocument,
   VideoThemeLibrary,
@@ -20,17 +20,18 @@ const ORANGE_ACCENT = {
   },
 };
 const CLASSIC = BUILT_IN_VIDEO_THEMES.get("classic")!;
-
-/** Classic with a per-item accent override, like the accents classic authors per composition, plus a custom theme. */
+/**
+ * Classic with a per-item accent override, like the accents classic authors per
+ * composition, plus a custom theme.
+ */
 const LIBRARY: VideoThemeLibrary = new Map<string, VideoThemeDocument>([
-  ...createVideoThemeLibrary([
+  ...makeVideoThemeLibraryFromDocuments([
     { schemaVersion: 1, id: "warm", label: "Warm", extends: "classic" },
   ]),
   ["classic", { ...CLASSIC, overrides: { "network-graph": ORANGE_ACCENT } }],
 ]);
-
 test("a custom theme is its own target", () => {
-  const target = createDraftThemeTarget({
+  const target = makeDraftThemeTargetFromLibrary({
     library: LIBRARY,
     themeId: "warm",
     hasDraft: true,
@@ -38,10 +39,9 @@ test("a custom theme is its own target", () => {
   assert.equal(target.library, LIBRARY);
   assert.equal(target.themeId, "warm");
 });
-
 test("a built-in theme without a draft is its own target", () => {
   assert.equal(
-    createDraftThemeTarget({
+    makeDraftThemeTargetFromLibrary({
       library: LIBRARY,
       themeId: "classic",
       hasDraft: false,
@@ -49,9 +49,8 @@ test("a built-in theme without a draft is its own target", () => {
     "classic",
   );
 });
-
 test("a built-in theme with a draft becomes an unsaved theme that extends it", () => {
-  const target = createDraftThemeTarget({
+  const target = makeDraftThemeTargetFromLibrary({
     library: LIBRARY,
     themeId: "classic",
     hasDraft: true,
@@ -64,22 +63,27 @@ test("a built-in theme with a draft becomes an unsaved theme that extends it", (
     extends: "classic",
   });
 });
-
 test("the unsaved theme does not inherit the built-in's per-item overrides", () => {
   const scope = { overrideIds: ["network-graph"] };
-  const target = createDraftThemeTarget({
+  const target = makeDraftThemeTargetFromLibrary({
     library: LIBRARY,
     themeId: "classic",
     hasDraft: true,
   });
   assert.equal(
-    makeResolvedVideoThemeFromLibrary(LIBRARY, "classic", scope).semantic.color
-      .accent,
+    makeResolvedVideoThemeFromLibrary({
+      library: LIBRARY,
+      themeId: "classic",
+      scope,
+    }).semantic.color.accent,
     "#f0ba83",
   );
   assert.notEqual(
-    makeResolvedVideoThemeFromLibrary(target.library, target.themeId, scope)
-      .semantic.color.accent,
+    makeResolvedVideoThemeFromLibrary({
+      library: target.library,
+      themeId: target.themeId,
+      scope,
+    }).semantic.color.accent,
     "#f0ba83",
   );
 });

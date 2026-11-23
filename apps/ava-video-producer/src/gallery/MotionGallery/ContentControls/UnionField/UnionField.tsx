@@ -2,7 +2,7 @@ import { propEq } from "@avandar/utils";
 import { useState } from "react";
 import { ContentField } from "../ContentField/ContentField";
 import { ContentFields } from "../ContentFields/ContentFields";
-import styles from "./UnionField.module.css";
+import { UnionVariantSelector } from "./UnionVariantSelector/UnionVariantSelector";
 import type { StockControl } from "../../../../stock/contracts/StockContract.types";
 import type { Props as ContentFieldProps } from "../ContentField/ContentField";
 import type { ContentFieldContext } from "../useContentField";
@@ -25,12 +25,11 @@ export function UnionField({
   control,
   context,
   ...remainingProps
-}: Props): ReactNode {
-  const [selectedType, setSelectedType] = useState(
-    () =>
-      ContentFields.getVariantFromValue({ control, value: context.value })
-        .valueType,
-  );
+}: Readonly<Props>): ReactNode {
+  const [selectedType, setSelectedType] = useState(() => {
+    return ContentFields.getVariantFromValue({ control, value: context.value })
+      .valueType;
+  });
   const activeType =
     context.value === ""
       ? selectedType
@@ -46,20 +45,7 @@ export function UnionField({
   };
   return (
     <>
-      <label>
-        <span>{`Value type for ${context.label}`}</span>
-        <select
-          className={styles.unionFieldVariant}
-          value={activeType}
-          onChange={(event) => selectType(event.target.value)}
-        >
-          {control.variants.map((item) => (
-            <option key={item.valueType} value={item.valueType}>
-              {item.label.message}
-            </option>
-          ))}
-        </select>
-      </label>
+      <UnionVariantSelector {...{ context, control, activeType, selectType }} />
       <ContentField
         {...{ ...remainingProps, control, context }}
         control={variant.control}

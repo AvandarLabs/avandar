@@ -37,7 +37,8 @@ export const inputSchema = z
   })
   .superRefine((input, context) => {
     const identifiers = input.entries.map(prop("id"));
-    if (new Set(identifiers).size !== identifiers.length) {
+    const entryIds = new Set(identifiers);
+    if (entryIds.size !== identifiers.length) {
       context.addIssue({
         code: "custom",
         path: ["entries"],
@@ -47,7 +48,9 @@ export const inputSchema = z
     const receiptIds = input.receipts.map(prop("entryId"));
     if (
       new Set(receiptIds).size !== receiptIds.length ||
-      receiptIds.some((entryId) => !identifiers.includes(entryId)) ||
+      receiptIds.some((entryId) => {
+        return !entryIds.has(entryId);
+      }) ||
       input.receipts.length > input.entries.length
     ) {
       context.addIssue({

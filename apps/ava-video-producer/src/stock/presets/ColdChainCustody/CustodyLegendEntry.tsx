@@ -1,5 +1,4 @@
-import { ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CustodyFactMark } from "./CustodyFactMark";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./ColdChainCustody.schema";
@@ -48,6 +47,8 @@ export function CustodyLegendEntry({
   column,
   row,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const x = 32 + column * 305;
   const y = 415 + row * 48;
   const { caption, total, fact } = _getEntry({ input, column, row });
@@ -63,9 +64,11 @@ export function CustodyLegendEntry({
           data-fact-total={`${column}-${row}`}
           x={x}
           y={y + 20}
-          fill={STOCK.text}
-          fontSize={12}
-          opacity={ramp(frame, 116, 10)}
+          fill={tokens.color.text}
+          fontFamily={tokens.text.graphic.data.fontFamily}
+          fontWeight={tokens.text.graphic.data.fontWeight}
+          fontSize={tokens.text.graphic.data.fontSize}
+          opacity={motion.ramp(frame, 116, motion.scale(10))}
         >
           {total}
         </text>

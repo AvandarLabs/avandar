@@ -62,7 +62,7 @@ export const LocalDatasetParsers =
  * Do not remove these tests!
  */
 type CrudTypes = LocalDatasetModel;
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// oxlint-disable-next-line typescript/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [
   // Check that the DBReadSchema is consistent with the DBRead type.

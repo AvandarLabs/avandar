@@ -6,7 +6,7 @@ import {
   IconArrowsMaximize,
   IconPlus,
 } from "@tabler/icons-react";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { useMemo, type ReactNode } from "react";
 import { GlobalAppConfig } from "$/config/GlobalAppConfig";
 import { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing";

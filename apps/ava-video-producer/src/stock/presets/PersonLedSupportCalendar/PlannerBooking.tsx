@@ -1,4 +1,5 @@
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { PlannerBookingLabel } from "./PlannerBookingLabel";
 import type { Input } from "./PersonLedSupportCalendar.schema";
 import type { ReactNode } from "react";
@@ -26,20 +27,23 @@ export function PlannerBooking({
   showLabel = true,
   isProposal = false,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
-      <rect
+      <StockRect
         data-booking={commitment.id}
         data-kind={commitment.kind}
         x={x}
         y={y}
         width={width}
         height={height}
-        rx={5}
-        fill={isProposal ? "none" : STOCK.elevated}
+        rx={scales.corner(5)}
+        fill={isProposal ? "none" : tokens.color.elevated}
         stroke={accent}
-        strokeWidth={2}
-        strokeDasharray={isProposal ? "6 3" : undefined}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
+        strokeDasharray={isProposal ? atomic.dash.notch.join(" ") : undefined}
       />
       {showLabel ? (
         <PlannerBookingLabel

@@ -2,22 +2,22 @@ import { createHash } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { excludeUndefinedShallow, omit, propEq } from "@avandar/utils";
 import { z } from "zod";
-import { createContinuityPlanFromOptions } from "../../../src/continuity/continuityAppearance";
-import { CONTINUITY_CATALOG } from "../../../src/continuity/continuityCatalog";
-import { createContinuityPlanFromVideoThemeSnapshot } from "../../../src/continuity/createContinuityPlanFromVideoTheme/createContinuityPlanFromVideoTheme";
+import { STARTER_VIDEO_THEME_ID } from "../../../src/compositions/StarterVideoTheme/makeStarterVideoThemeSourceFromItemId/makeStarterVideoThemeSourceFromItemId";
+import { createContinuityPlanFromOptions } from "../../../src/continuity/continuityAppearance/continuityAppearance";
+import { ContinuityThemePlans } from "../../../src/continuity/ContinuityThemePlans/ContinuityThemePlans";
+import { CONTINUITY_CATALOG } from "../../../src/continuity/isSceneEntry";
 import {
-  getHelperFromFilmId,
   HELPER_CANVAS,
-} from "../../../src/gallery/HelperGallery/helperCatalog";
-import {
-  storyboardSchema,
-  durationInFrames,
-} from "../../../src/storyboard/schema/schema";
+  HelperFilmIds,
+} from "../../../src/gallery/HelperGallery/HelperFilmIds";
+import { storyboardSchema } from "../../../src/storyboard/schema/schema";
+import { StoryboardTimeline } from "../../../src/storyboard/schema/StoryboardTimeline";
 import {
   VIDEO_THEME_SLUG_PATTERN,
   videoThemePatchSchema,
-} from "../../../src/videoTheme/videoThemeSchemaHelpers/videoThemeSchemaHelpers";
+} from "../../../src/videoTheme/VideoThemeSchemas/VideoThemeSchemas";
 import {
   buildStockContracts,
   type StockContractGeneration,
@@ -28,7 +28,6 @@ import {
 } from "../../stock/StockFingerprintModule/StockFingerprintModule";
 import { loadVideoThemeSnapshot } from "../../videoTheme/loadVideoThemeSnapshot/loadVideoThemeSnapshot";
 import type { Film } from "../../../src/showcase/showcase.types";
-
 /**
  * App location derived from this module, independent of the shell directory.
  */
@@ -38,7 +37,9 @@ export const appRoot: string = fileURLToPath(
 /** Only these authored plans may be served or rendered by the showcase. */
 export const PLANS: Record<string, string> = {
   ...Object.fromEntries(
-    CONTINUITY_CATALOG.map((entry) => [entry.id, entry.path]),
+    CONTINUITY_CATALOG.map((entry) => {
+      return [entry.id, entry.path];
+    }),
   ),
   "avandar-home": "home",
   "scene-library": "library",
@@ -54,14 +55,12 @@ const stockGenerations: WeakMap<Film, StockContractGeneration> = new WeakMap<
   Film,
   StockContractGeneration
 >();
-
 /**
  * Retain the exact validators and defaults until an active export completes.
  */
 function _retainFilmContracts(film: Readonly<Film>): () => Promise<void> {
   return stockGenerations.get(film)?.retain() ?? (async () => {});
 }
-
 /** Bind a frozen stock film to the exact sources that validated its content. */
 async function _fingerprintStockFilm(
   film: Readonly<Film>,
@@ -76,7 +75,6 @@ async function _fingerprintStockFilm(
     expectedSourceHash: generation.sourceHash,
   });
 }
-
 const color = z.string().regex(/^#[0-9a-fA-F]{6}$/) satisfies z.ZodType;
 const optionsSchema = z.strictObject({
   captions: z.boolean().optional(),
@@ -94,15 +92,15 @@ const optionsSchema = z.strictObject({
     })
     .optional(),
 }) satisfies z.ZodType;
-
 function _freezeSnapshot<Value>(value: Value): Value {
   if (value && typeof value === "object") {
-    Object.values(value).forEach((child) => _freezeSnapshot(child));
+    Object.values(value).forEach((child) => {
+      return _freezeSnapshot(child);
+    });
     Object.freeze(value);
   }
   return value;
 }
-
 async function _sourceModuleUrl(relative: string) {
   const filename = path.join(appRoot, relative);
   const hash = createHash("sha256")
@@ -112,18 +110,33 @@ async function _sourceModuleUrl(relative: string) {
   url.searchParams.set("source", hash);
   return url.href;
 }
-
-/** A helper preview at the Atlas canvas size. It accepts no options. */
-function _loadHelperFilm(id: string, options: object): Film | undefined {
-  const helper = getHelperFromFilmId(id);
+/**
+ * A helper preview at the Atlas canvas size. It accepts only a theme, and
+ * renders in `classic` without one.
+ */
+async function _loadHelperFilm({
+  id,
+  options,
+}: Readonly<{
+  id: string;
+  options: FilmOptions;
+}>): Promise<Film | undefined> {
+  const helper = HelperFilmIds.getHelperFromFilmId(id);
   if (!helper) {
     return undefined;
   }
-  if (Object.keys(options).length > 0) {
-    throw new Error("Helper previews accept no options");
+  if (
+    Object.keys(options).some((key) => {
+      return key !== "theme";
+    })
+  ) {
+    throw new Error("Helper previews accept only a theme");
   }
   return {
     id,
+    theme: await loadVideoThemeSnapshot({
+      request: options.theme ?? { id: "classic" },
+    }),
     kind: "helper",
     helper: helper.id,
     assets: helper.demo.assets ?? [],
@@ -136,14 +149,12 @@ function _loadHelperFilm(id: string, options: object): Film | undefined {
     showCaptions: false,
   };
 }
-
 /** Helper previews play live in the gallery and are never rendered to MP4. */
 function _assertExportable(film: Readonly<Film>): void {
   if (film.kind === "helper") {
     throw new Error("Helper previews play live only");
   }
 }
-
 /**
  * The options a continuity film's shots take. Colours, sketch roughness, and
  * the camera preset are theme tokens, so they reach the film through `theme`.
@@ -152,22 +163,34 @@ function _renderOptions(
   options: z.infer<typeof optionsSchema>,
 ): Record<string, boolean> {
   const { captions, cameraMotion, motionBlur, annotations } = options;
-  return Object.fromEntries(
-    Object.entries({ captions, cameraMotion, motionBlur, annotations }).filter(
-      (entry): entry is [string, boolean] => entry[1] !== undefined,
-    ),
-  );
+  return excludeUndefinedShallow({
+    captions,
+    cameraMotion,
+    motionBlur,
+    annotations,
+  });
 }
-
 type FilmOptions = z.infer<typeof optionsSchema>;
-
+/**
+ * The fixed compositions authored on the starter palette. They render in the
+ * `starter` theme unless the viewer picks another.
+ */
+const STARTER_FILM_IDS: readonly string[] = ["title-study", "motion-lab"];
 /** The fields every film shares, with the theme the film renders in. */
 async function _loadBaseFilm({
   id,
   options,
-}: Readonly<{ id: string; options: FilmOptions }>) {
+}: Readonly<{
+  id: string;
+  options: FilmOptions;
+}>) {
+  const defaultThemeId = STARTER_FILM_IDS.includes(id)
+    ? STARTER_VIDEO_THEME_ID
+    : "classic";
   return {
-    theme: await loadVideoThemeSnapshot(options.theme ?? { id: "classic" }),
+    theme: await loadVideoThemeSnapshot({
+      request: options.theme ?? { id: defaultThemeId },
+    }),
     id,
     fps: 30,
     width: 1600,
@@ -177,9 +200,7 @@ async function _loadBaseFilm({
     showCaptions: options.captions ?? true,
   };
 }
-
 type BaseFilm = Awaited<ReturnType<typeof _loadBaseFilm>>;
-
 /** Refuses options the film's kind does not take. */
 function _assertOptionsFit({
   options,
@@ -193,7 +214,9 @@ function _assertOptionsFit({
   if (
     !isStock &&
     !isContinuity &&
-    Object.keys(options).some((key) => key !== "captions" && key !== "theme")
+    Object.keys(options).some((key) => {
+      return key !== "captions" && key !== "theme";
+    })
   ) {
     throw new Error("Stock options require an Atlas preset");
   }
@@ -203,12 +226,12 @@ function _assertOptionsFit({
       options.schemaVersion !== undefined ||
       options.accent !== undefined ||
       options.background !== undefined)
-  )
+  ) {
     throw new Error(
       "Continuity input and colours come from the storyboard and theme",
     );
+  }
 }
-
 /** A stock film bound to the contract generation that validated its content. */
 function _loadStockFilm({
   base,
@@ -227,12 +250,7 @@ function _loadStockFilm({
     kind: "stock",
     ...stockRequestSchema.parse({
       preset: stock.id,
-      ...Object.fromEntries(
-        Object.entries(options).filter(
-          ([key, value]) =>
-            key !== "captions" && key !== "theme" && value !== undefined,
-        ),
-      ),
+      ...excludeUndefinedShallow(omit(options, ["captions", "theme"])),
     }),
     frames: stock.loopFrames,
     fps: STOCK_FPS,
@@ -244,8 +262,9 @@ function _loadStockFilm({
   stockGenerations.set(film, contracts);
   return film;
 }
-
-/** The title study or the motion lab, sized from the current composition timing. */
+/**
+ * The title study or the motion lab, sized from the current composition timing.
+ */
 async function _loadCompositionFilm({
   base,
   id,
@@ -266,7 +285,6 @@ async function _loadCompositionFilm({
     source: `apps/ava-video-producer/src/compositions/${id === "title-study" ? "TitleStudy" : "MotionLab"}.tsx`,
   };
 }
-
 /** A storyboard film, with a continuity film's options applied to its shots. */
 async function _loadStoryboardFilm({
   base,
@@ -287,7 +305,10 @@ async function _loadStoryboardFilm({
     JSON.parse(await fs.readFile(path.join(appRoot, source), "utf8")),
   );
   const configuredPlan = isContinuity
-    ? createContinuityPlanFromOptions(plan, _renderOptions(options))
+    ? createContinuityPlanFromOptions({
+        plan,
+        raw: _renderOptions(options),
+      })
     : plan;
   return {
     ...base,
@@ -295,10 +316,12 @@ async function _loadStoryboardFilm({
     plan: configuredPlan,
     // The film keeps the authored plan; FilmComposition applies the theme,
     // whose camera preset can lengthen beats.
-    frames: durationInFrames(
-      createContinuityPlanFromVideoThemeSnapshot(configuredPlan, base.theme, [
-        id,
-      ]),
+    frames: StoryboardTimeline.durationInFrames(
+      ContinuityThemePlans.fromVideoThemeSnapshot({
+        plan: configuredPlan,
+        snapshot: base.theme,
+        overrideIds: [id],
+      }),
     ),
     fps: plan.fps,
     width: plan.width,
@@ -308,32 +331,35 @@ async function _loadStoryboardFilm({
     source: `apps/ava-video-producer/${source}`,
   };
 }
-
 /**
  * Read current authored inputs and reject unknown IDs or unsupported options.
  */
-async function _loadFilm(id: string, rawOptions: unknown = {}): Promise<Film> {
+async function _loadFilm({
+  id,
+  rawOptions = {},
+}: Readonly<{
+  id: string;
+  rawOptions?: unknown;
+}>): Promise<Film> {
   const options = optionsSchema.parse(rawOptions);
-  const helperFilm = _loadHelperFilm(id, options);
+  const helperFilm = await _loadHelperFilm({ id, options });
   if (helperFilm) {
     return helperFilm;
   }
   const contracts = await buildStockContracts(appRoot);
-  const stock = contracts.STOCK_CATALOG.find(
-    (entry) => `stock-${entry.id}` === id,
-  );
-  const isContinuity = CONTINUITY_CATALOG.some((entry) => entry.id === id);
+  const stock = contracts.STOCK_CATALOG.find((entry) => {
+    return `stock-${entry.id}` === id;
+  });
+  const isContinuity = CONTINUITY_CATALOG.some(propEq("id", id));
   _assertOptionsFit({ options, isStock: Boolean(stock), isContinuity });
   const base = await _loadBaseFilm({ id, options });
   if (stock) {
     return _loadStockFilm({ base, stock, contracts, options });
   }
-  if (id === "title-study" || id === "motion-lab") {
-    return _loadCompositionFilm({ base, id });
-  }
-  return _loadStoryboardFilm({ base, id, options, isContinuity });
+  return id === "title-study" || id === "motion-lab"
+    ? _loadCompositionFilm({ base, id })
+    : _loadStoryboardFilm({ base, id, options, isContinuity });
 }
-
 /** Related ShowcaseFilms operations. */
 export const ShowcaseFilms = {
   /**

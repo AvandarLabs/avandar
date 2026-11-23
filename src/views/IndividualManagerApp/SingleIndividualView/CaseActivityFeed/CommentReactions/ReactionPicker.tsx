@@ -1,7 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import { Button, Popover } from "@mantine/core";
 import { IconThumbUp } from "@tabler/icons-react";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { COMMENT_REACTION_DISPLAY } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/commentReactionKinds";
 import classes from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/CommentReactions.module.css";
 import { ReactionOptions } from "@/views/IndividualManagerApp/SingleIndividualView/CaseActivityFeed/CommentReactions/ReactionOptions";

@@ -1,4 +1,8 @@
 #!/bin/sh
+if [ "${AVA_PRODUCER_ACTIVE_SCRIPT:-}" != "$0" ]; then
+  exec node "$(dirname "$0")/runProducerCommand/runShellCommand.mjs" "render" "$0" "$@"
+fi
+exec 1>&2
 # Render one composition to a delivered mp4 + poster, then gate it.
 #
 #   sh scripts/render.sh <composition-id> [poster-frame]
@@ -7,7 +11,7 @@
 # before changing one.
 set -e
 cd "$(dirname "$0")/.."
-node scripts/require-license.mjs
+node --import tsx scripts/requireLicense.ts
 
 ID="${1:-demo}"
 # A poster is the first painted pixel of the <video> on a page, and it sits
@@ -37,9 +41,16 @@ GATE_FLAGS=""
 
 OUT="${RENDER_OUT_DIR:-out}"
 OUTPUT_ID="${RENDER_OUTPUT_ID:-$ID}"
-case "$OUTPUT_ID" in
-  ""|*[!a-zA-Z0-9_-]*) echo "Invalid output ID" >&2; exit 1 ;;
-esac
+if [ -n "${RENDER_OUTPUT_ID:-}" ]; then
+  case "$OUTPUT_ID" in
+    ""|*[!a-zA-Z0-9_-]*) echo "Invalid output ID" >&2; exit 1 ;;
+  esac
+else
+  node --input-type=module - "$OUTPUT_ID" <<'NODE'
+import { CompositionIds } from "./scripts/runProducerCommand/CompositionIds.mjs";
+CompositionIds.assert(process.argv[2]);
+NODE
+fi
 mkdir -p "$OUT"
 OUT=$(cd "$OUT" && pwd)
 FRAMES="$OUT/$OUTPUT_ID-frames"
@@ -68,7 +79,7 @@ rm -rf "$FRAMES"
 # The renderer API accepts output directories under .videos without treating
 # the hidden parent's name as a file extension. It uses concurrency: 1 and the
 # same JPEG format/quality as the CLI sequence path.
-node scripts/render-sequence.mjs "$ID" "$FRAMES"
+node --import tsx scripts/renderSequence.ts "$ID" "$FRAMES"
 
 # 1536x960 is the same 8:5 as the 1600x1000 canvas and is 16-aligned, so no
 # partial macroblock row. -bf 0 is here only so frame-stepping in a scrubber
@@ -108,16 +119,16 @@ ls -lh "$OUT"
 # already in it: the step that decides whether the encoder is innocent. Clean
 # the frames up before the gate runs and that instruction cannot be followed,
 # which throws away the only reason to render through stills at all.
-if node scripts/check-frames.mjs "$OUT/$OUTPUT_ID.mp4" $GATE_FLAGS; then
+if node --import tsx scripts/checkFrames.ts "$OUT/$OUTPUT_ID.mp4" $GATE_FLAGS; then
   if [ "${KEEP_RENDER_FRAMES:-0}" != "1" ]; then
     rm -rf "$FRAMES"
   fi
 else
   echo
-  echo "Gate failed — frames kept for inspection:"
+  echo "Gate failed - frames kept for inspection:"
   echo "  $FRAMES/element-<NNN>.jpeg"
   echo "Open the flagged frame. If the JPEG is already a grid, the encoder is"
-  echo "innocent — see .claude/skills/product-demo/references/render.md."
+  echo "innocent - see .claude/skills/product-demo/references/render.md."
   exit 1
 fi
 
@@ -129,4 +140,4 @@ fi
 echo
 echo "Picture is done. Sound is a separate pass over this file:"
 echo "  bash scripts/add-sfx.sh $ID          # writes $OUT/$ID-sound.mp4"
-echo "Ask before scoring it — see section 7 of the skill for which question."
+echo "Ask before scoring it - see section 7 of the skill for which question."

@@ -1,0 +1,10 @@
+.sceneTransitionDemoMiniStages {
+  align-content: center;
+  display: grid;
+  gap: var(--demo-space-18);
+  height: 100%;
+}
+
+.sceneTransitionDemoFiveUp {
+  grid-template-columns: repeat(5, 1fr);
+}

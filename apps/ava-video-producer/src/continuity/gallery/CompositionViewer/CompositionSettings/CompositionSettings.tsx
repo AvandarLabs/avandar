@@ -1,19 +1,16 @@
-import { useMemo, type RefObject } from "react";
+import { useMemo, type ReactNode, type RefObject } from "react";
 import {
   AtlasPanelTabs,
   type AtlasPanelTab,
 } from "../../../../gallery/AtlasLayout/AtlasPanelTabs/AtlasPanelTabs";
-import { useGalleryVideoTheme } from "../../../../gallery/GalleryVideoTheme/GalleryVideoTheme";
+import { useGalleryVideoTheme } from "../../../../gallery/GalleryVideoTheme/useGalleryVideoTheme";
 import { VideoThemePanel } from "../../../../gallery/VideoThemePanel/VideoThemePanel";
-import {
-  createExportThemeFromDraft,
-  createSnapshotFromDraft,
-} from "../../../../videoThemeEditor/themeDraft/themeDraft";
-import { isSceneEntry } from "../../../continuityCatalog";
-import { useCompositionTheme } from "../useCompositionTheme";
+import { ThemeDrafts } from "../../../../videoThemeEditor/ThemeDrafts/ThemeDrafts";
+import { isSceneEntry } from "../../../isSceneEntry";
+import { useCompositionTheme } from "../useCompositionTheme/useCompositionTheme";
 import { CompositionSettingsDetails } from "./CompositionSettingsDetails";
-import type { ContinuityCatalogEntry } from "../../../continuityCatalog";
-import type { useCompositionAppearance } from "../useCompositionAppearance";
+import type { ContinuityCatalogEntry } from "../../../isSceneEntry";
+import type { useCompositionAppearance } from "../useCompositionAppearance/useCompositionAppearance";
 
 type Props = Readonly<{
   selected: ContinuityCatalogEntry;
@@ -23,36 +20,37 @@ type Props = Readonly<{
   tab: AtlasPanelTab;
   onTabChange: (tab: AtlasPanelTab) => void;
 }>;
-
-/** The draft's theme for one composition: what its player shows and what its export sends. */
-function useCompositionDraftTheme(
-  selected: ContinuityCatalogEntry,
-  player: RefObject<HTMLIFrameElement | null>,
-) {
+/**
+ * The draft's theme for one composition: what its player shows and what its
+ * export sends.
+ */
+function useCompositionDraftTheme({
+  selected,
+  player,
+}: Readonly<{
+  selected: ContinuityCatalogEntry;
+  player: RefObject<HTMLIFrameElement | null>;
+}>) {
   const { library, themeId, validDraft, hasIssues } = useGalleryVideoTheme();
   const isScene = isSceneEntry(selected);
-  const snapshot = useMemo(
-    () =>
-      isScene
-        ? undefined
-        : createSnapshotFromDraft({
-            library,
-            themeId,
-            draft: validDraft,
-            itemId: selected.id,
-          }),
-    [isScene, library, themeId, validDraft, selected.id],
-  );
-  const exportTheme = useMemo(
-    () =>
-      createExportThemeFromDraft({
-        library,
-        themeId,
-        draft: validDraft,
-        itemId: selected.id,
-      }),
-    [library, themeId, validDraft, selected.id],
-  );
+  const snapshot = useMemo(() => {
+    return isScene
+      ? undefined
+      : ThemeDrafts.toSnapshot({
+          library,
+          themeId,
+          draft: validDraft,
+          itemId: selected.id,
+        });
+  }, [isScene, library, themeId, validDraft, selected.id]);
+  const exportTheme = useMemo(() => {
+    return ThemeDrafts.toExportTheme({
+      library,
+      themeId,
+      draft: validDraft,
+      itemId: selected.id,
+    });
+  }, [library, themeId, validDraft, selected.id]);
   const theme = useCompositionTheme({
     id: selected.id,
     player,
@@ -62,8 +60,10 @@ function useCompositionDraftTheme(
   });
   return { isScene, exportTheme, theme };
 }
-
-/** The settings column: appearance and downloads, plus the design tokens for the composition. */
+/**
+ * The settings column: appearance and downloads, plus the design tokens for the
+ * composition.
+ */
 export function CompositionSettings({
   selected,
   captions,
@@ -71,11 +71,11 @@ export function CompositionSettings({
   appearance,
   tab,
   onTabChange,
-}: Props) {
-  const { isScene, exportTheme, theme } = useCompositionDraftTheme(
+}: Props): ReactNode {
+  const { isScene, exportTheme, theme } = useCompositionDraftTheme({
     selected,
     player,
-  );
+  });
   const tokens = isScene ? undefined : (
     <VideoThemePanel
       key={selected.id}

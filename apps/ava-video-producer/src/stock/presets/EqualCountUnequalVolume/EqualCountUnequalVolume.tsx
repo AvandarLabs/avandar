@@ -1,10 +1,12 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { VolumeShelf } from "./VolumeShelf";
+import { VolumeShelf } from "./VolumeShelf/VolumeShelf";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./EqualCountUnequalVolume.schema";
 import type { ReactNode } from "react";
+
 /** Two equal-cardinality collections and one byte measurement scale. */
 export type Props = GraphicProps & { input: Input };
+
 /**
  * Retained count marks reveal unequal byte quantities without changing grain.
  */
@@ -26,16 +28,18 @@ export function EqualCountUnequalVolume({
           [input.copy.example, 55, 578, 840, 12, 1],
         ]}
       />
-      {input.groups.map((group, index) => (
-        <VolumeShelf
-          key={group.id}
-          group={group}
-          input={input}
-          index={index}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {input.groups.map((group, index) => {
+        return (
+          <VolumeShelf
+            key={group.id}
+            group={group}
+            input={input}
+            index={index}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

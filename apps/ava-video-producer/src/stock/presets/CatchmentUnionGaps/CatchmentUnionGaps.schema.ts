@@ -10,10 +10,9 @@ const polygonSchema: z.ZodArray<z.ZodTuple<[z.ZodNumber, z.ZodNumber], null>> =
     .array(z.tuple([coordinate, coordinate]))
     .min(3)
     .max(8)
-    .refine(
-      (polygon) => PlanarPolygon.isSimple({ polygon }),
-      "Requires a simple open polygon.",
-    );
+    .refine((polygon) => {
+      return PlanarPolygon.isSimple({ polygon });
+    }, "Requires a simple open polygon.");
 /** Complete strict catchment and household input. */
 export const inputSchema = z
   .strictObject({
@@ -68,14 +67,15 @@ export const inputSchema = z
     });
     input.households.forEach((household, index) => {
       if (
-        input.catchments.some(
-          ({ polygon }) =>
+        input.catchments.some(({ polygon }) => {
+          return (
             PlanarPolygon.isSimple({ polygon }) &&
             PlanarPolygon.getPointClassification({
               point: [household.x, household.y],
               polygon,
-            }) === "boundary",
-        )
+            }) === "boundary"
+          );
+        })
       ) {
         context.addIssue({
           code: "custom",

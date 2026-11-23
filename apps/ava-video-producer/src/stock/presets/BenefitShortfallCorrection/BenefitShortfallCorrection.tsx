@@ -1,6 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { PaymentLegend } from "./PaymentLegend";
 import { PaymentRow } from "./PaymentRow";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
@@ -14,6 +14,7 @@ export function BenefitShortfallCorrection({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
       <LabelSlots
@@ -25,16 +26,23 @@ export function BenefitShortfallCorrection({
         ]}
       />
       <PersonGlyph x={250} y={160} color={accent} />
-      <PersonGlyph x={740} y={160} color={STOCK.cyan} role="worker" />
-      {input.payments.map((payment, index) => (
-        <PaymentRow
-          key={payment.id}
-          payment={payment}
-          frame={frame}
-          index={index}
-          accent={accent}
-        />
-      ))}
+      <PersonGlyph
+        x={740}
+        y={160}
+        color={tokens.color.accentAlt}
+        role="worker"
+      />
+      {input.payments.map((payment, index) => {
+        return (
+          <PaymentRow
+            key={payment.id}
+            payment={payment}
+            frame={frame}
+            index={index}
+            accent={accent}
+          />
+        );
+      })}
       <PaymentLegend input={input} accent={accent} />
     </g>
   );

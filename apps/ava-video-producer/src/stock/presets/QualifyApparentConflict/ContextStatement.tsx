@@ -1,7 +1,9 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { StatementContext } from "./StatementContext";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./QualifyApparentConflict.schema";
 import type { ReactNode } from "react";
 
@@ -20,11 +22,10 @@ export function ContextStatement({
   index,
   placement,
 }: Readonly<Props>): ReactNode {
-  const arrival = ramp(frame, 12 + index * 6, 18);
-  const split = ramp(frame, 48, 36, EASE.inOut);
-  const x =
-    mix(split, index ? 680 : 280, index ? 710 : 250) +
-    mix(arrival, index ? 14 : -14, 0);
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const { arrival, x } = _getStatementMotion({ frame, index, motion });
   const contextY = placement === "above" ? 145 : 340;
   return (
     <g
@@ -32,11 +33,12 @@ export function ContextStatement({
       opacity={arrival}
       transform={`translate(${x} 0)`}
     >
-      <path
-        d="M-180 316 H180"
+      <SketchedShape
+        shape={{ kind: "path", d: "M-180 316 H180" }}
+        profile={tokens.sketch.shape}
         fill="none"
-        stroke={STOCK.line}
-        strokeWidth={2}
+        stroke={tokens.color.line}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
       <FitText
         text={statement.claim}
@@ -52,4 +54,35 @@ export function ContextStatement({
       <StatementContext {...{ frame, accent, statement, index, contextY }} />
     </g>
   );
+}
+/** A statement arriving inward, then splitting outward from its partner. */
+function _getStatementMotion({
+  frame,
+  index,
+  motion,
+}: Readonly<{
+  frame: number;
+  index: number;
+  motion: VideoMotion;
+}>) {
+  const arrival = motion.ramp(
+    frame,
+    12 + index * motion.scaleStagger(6),
+    motion.hero,
+  );
+  const split = motion.ramp(frame, 48, motion.scale(36), motion.travel.easing);
+  return {
+    arrival,
+    x:
+      Motion.mix({
+        t: split,
+        from: index ? 680 : 280,
+        to: index ? 710 : 250,
+      }) +
+      Motion.mix({
+        t: arrival,
+        from: index ? 14 : -14,
+        to: 0,
+      }),
+  };
 }

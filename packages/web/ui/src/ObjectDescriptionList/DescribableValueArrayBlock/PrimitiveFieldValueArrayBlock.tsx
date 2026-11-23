@@ -2,6 +2,7 @@ import { Stack, Text } from "@mantine/core";
 import { useI18nMessages } from "@ui/i18n/useI18nMessages";
 import { useMemo } from "react";
 import { PrimitiveValueItem } from "../PrimitiveValueItem/PrimitiveValueItem";
+import { createDescriptionValueEntries } from "./createDescriptionValueEntries";
 import type {
   GenericRootData,
   PrimitiveValue,
@@ -40,14 +41,13 @@ export function PrimitiveFieldValueArrayBlock<
       <Text>{i18n.andMore(remainingCount)}</Text>
     ) : null;
 
-  // TODO(jpsyx): use a stable key
   return (
     <Stack>
-      {valuesToRender.map((v, idx) => {
+      {createDescriptionValueEntries(valuesToRender).map(({ value, key }) => {
         return (
           <PrimitiveValueItem
-            key={idx}
-            value={v}
+            key={key}
+            value={value}
             rootData={rootData}
             {...renderOptions}
           />

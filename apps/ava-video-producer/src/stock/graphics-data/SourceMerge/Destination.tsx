@@ -1,26 +1,27 @@
-import { Arrive } from "../../graphics-common/Arrive";
+import { Arrive } from "../../graphics-common/Arrive/Arrive";
 import { GRAPHIC_WIDTH } from "../../graphics-common/graphicCanvas.constants";
 import { Panel } from "../../graphics-common/Panel";
 import { Text } from "../../graphics-common/Text";
-import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicProps,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { StockRect } from "../../primitives/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { DestinationSlots } from "./DestinationSlots";
 import { DESTINATION } from "./SourceMerge.constants";
 import type { SourceMergeInput } from "../../presets/SourceMerge/SourceMerge.schema";
+import type { ReactNode } from "react";
 
 type Props = Readonly<{
   input: SourceMergeInput;
   frame: number;
   accent: string;
 }>;
-
 /** The destination panel the merged output lands in. */
-export function Destination({ input, frame, accent }: Props) {
-  const style = useGraphicProps("SourceMerge", {});
-  const { layout } = useGraphicTokens();
+export function Destination({ input, frame, accent }: Props): ReactNode {
+  const style = GraphicThemeHooks.useGraphicProps({
+    name: "SourceMerge",
+    props: {},
+  });
+  const { layout } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
   const x = GRAPHIC_WIDTH - layout.graphic.margin - DESTINATION.width;
   const center = x + DESTINATION.width / 2;
   return (
@@ -37,7 +38,7 @@ export function Destination({ input, frame, accent }: Props) {
           y={252}
           width={194}
           height={style.barHeight}
-          rx={style.barHeight / 2}
+          rx={shapes.corner(style.barHeight / 2)}
           fill={accent}
           fillOpacity={style.barAlpha}
         />

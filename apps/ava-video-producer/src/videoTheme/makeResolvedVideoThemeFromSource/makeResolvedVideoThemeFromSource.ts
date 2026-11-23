@@ -2,7 +2,6 @@ import { makeResolvedVideoThemeFromLibrary } from "../makeResolvedVideoThemeFrom
 import type { ResolvedVideoTheme, VideoThemeSource } from "../videoTheme.types";
 
 const RESOLVED_THEMES = new WeakMap<VideoThemeSource, ResolvedVideoTheme>();
-
 /**
  * The resolved theme for a source, computed once per source object. Sources
  * are treated as immutable, so providers that share a source (for example
@@ -15,11 +14,11 @@ export function makeResolvedVideoThemeFromSource(
   if (cached) {
     return cached;
   }
-  const theme = makeResolvedVideoThemeFromLibrary(
-    source.library,
-    source.themeId,
-    source.scope,
-  );
+  const theme = makeResolvedVideoThemeFromLibrary({
+    library: source.library,
+    themeId: source.themeId,
+    scope: source.scope,
+  });
   RESOLVED_THEMES.set(source, theme);
   return theme;
 }

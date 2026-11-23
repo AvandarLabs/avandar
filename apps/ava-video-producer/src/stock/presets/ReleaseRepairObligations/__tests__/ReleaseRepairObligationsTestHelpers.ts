@@ -42,26 +42,28 @@ function _getVisibleTexts({
     input.labels.resolved,
     input.labels.example,
     ...input.issues
-      .filter((issue) => issue.state === "open" || input.showResolvedIssues)
+      .filter((issue) => {
+        return issue.state === "open" || input.showResolvedIssues;
+      })
       .map(prop("label")),
     ...(frame >= 91 ? [input.labels.open] : []),
     ...(frame >= 103
       ? [
-          input.issues.some(
-            (issue) =>
-              issue.state === "open" && issue.releaseRole === "blocking",
-          )
+          input.issues.some((issue) => {
+            return issue.state === "open" && issue.releaseRole === "blocking";
+          })
             ? input.labels.held
             : input.labels.ready,
         ]
       : []),
     ...(frame >= 90
       ? input.issues
-          .filter(
-            (issue) =>
-              issue.state === "open" && issue.releaseRole === "follow-up",
-          )
-          .flatMap((issue) => [issue.label, issue.owner, issue.dueLabel])
+          .filter((issue) => {
+            return issue.state === "open" && issue.releaseRole === "follow-up";
+          })
+          .flatMap((issue) => {
+            return [issue.label, issue.owner, issue.dueLabel];
+          })
       : []),
   ];
 }

@@ -1,4 +1,4 @@
-import { ramp } from "../../../motion";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getScheduleGeometryFromInputAndFrame } from "./getScheduleGeometryFromInputAndFrame";
 import { ScheduleBackdrop } from "./ScheduleBackdrop";
 import { ScheduledTask } from "./ScheduledTask";
@@ -15,22 +15,25 @@ export function ScheduleBuffer({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const state = getScheduleGeometryFromInputAndFrame({ frame, input });
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const state = getScheduleGeometryFromInputAndFrame({ motion, frame, input });
   const numSlots = input.tasks.length + 2;
   return (
-    <g opacity={ramp(frame, 12, 12)}>
+    <g opacity={motion.reveal(frame, 12)}>
       <ScheduleBackdrop input={input} />
-      {state.tasks.map((task, index) => (
-        <ScheduledTask
-          key={task.id}
-          task={task}
-          index={index}
-          input={input}
-          frame={frame}
-          accent={accent}
-          numSlots={numSlots}
-        />
-      ))}
+      {state.tasks.map((task, index) => {
+        return (
+          <ScheduledTask
+            key={task.id}
+            task={task}
+            index={index}
+            input={input}
+            frame={frame}
+            accent={accent}
+            numSlots={numSlots}
+          />
+        );
+      })}
       <ScheduleReserve state={state} input={input} numSlots={numSlots} />
       <ScheduleInterruption
         state={state}

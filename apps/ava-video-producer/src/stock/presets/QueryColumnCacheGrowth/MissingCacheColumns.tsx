@@ -1,14 +1,15 @@
 import { propEq } from "@avandar/utils";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { StockRect } from "../../primitives/StockRect/StockRect";
-import {
-  useGraphicProps,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./QueryColumnCacheGrowth.schema";
 import type { ReactNode } from "react";
 
-type Props = { input: Input; missingIds: string[] };
+type Props = {
+  input: Input;
+  missingIds: string[];
+};
 /**
  * Missing column labels remain explicit independently of set-notation display.
  */
@@ -16,8 +17,12 @@ export function MissingCacheColumns({
   input,
   missingIds,
 }: Readonly<Props>): ReactNode {
-  const style = useGraphicProps("QueryColumnCacheGrowth", {});
-  const { color } = useGraphicTokens();
+  const style = GraphicThemeHooks.useGraphicProps({
+    name: "QueryColumnCacheGrowth",
+    props: {},
+  });
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const { color, sketch } = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
       {missingIds.map((id, index) => {
@@ -32,15 +37,19 @@ export function MissingCacheColumns({
               fill="none"
               stroke={color.highlight}
               strokeDasharray={style.missingDash.join(" ")}
-              strokeWidth={style.missingStrokeWidth}
+              strokeWidth={scales.stroke(style.missingStrokeWidth)}
             />
             <LabelSlots
               labels={[[column.label, 70 + index * 168, 210, 138, 14, 3]]}
             />
-            <path
-              d={`M${198 + index * 168} 238 h10 m-5 -5 v10`}
+            <SketchedShape
+              shape={{
+                kind: "path",
+                d: `M${198 + index * 168} 238 h10 m-5 -5 v10`,
+              }}
+              profile={sketch.shape}
               stroke={color.highlight}
-              strokeWidth={style.missingStrokeWidth}
+              strokeWidth={scales.stroke(style.missingStrokeWidth)}
             />
           </g>
         );

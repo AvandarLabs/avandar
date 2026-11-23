@@ -1,7 +1,7 @@
 import { mergeAttributes, Node } from "@tiptap/core";
 import { NodeSelection } from "@tiptap/pm/state";
 import { NodeViewWrapper, ReactNodeViewRenderer } from "@tiptap/react";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { richTextToPlainText } from "$/models/RichTextDocument/RichTextDocument";
 import { GadgetActionsMenu } from "@/components/RichText/Gadget/GadgetActionsMenu/GadgetActionsMenu";
 import { GadgetCard } from "@/components/RichText/Gadget/GadgetCard/GadgetCard";

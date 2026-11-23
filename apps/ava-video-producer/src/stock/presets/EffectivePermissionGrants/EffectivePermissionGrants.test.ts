@@ -13,6 +13,22 @@ import {
 } from "./EffectivePermissionGrants.fixtures";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 
+/**
+ * The shape a marker names: the marked element itself, or the sketch-aware
+ * shape inside a marked group.
+ */
+function _markedShape({
+  markup,
+  marker,
+}: Readonly<{ markup: string; marker: string }>): string {
+  const wrapped = markup.match(
+    new RegExp(
+      `<g [^>]*data-${marker}="[^"]*"[^>]*><(?:line|path|circle|rect|ellipse)\\b[^>]*>`,
+    ),
+  );
+  return wrapped ? wrapped[0] : SvgAttributes.fromMarker({ markup, marker });
+}
+
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -65,11 +81,12 @@ test("eligible grants combine by maximum rank with a separate action requirement
   );
 });
 test("candidates climb their own ranks before gates close and the result rises", () => {
-  const token = (frame: number) =>
-    SvgAttributes.fromMarker({
+  const token = (frame: number) => {
+    return _markedShape({
       markup: _render({ frame: frame }),
       marker: "grant-token",
     });
+  };
   assert.equal(
     SvgAttributes.getNumberFromMarkup({ attributes: token(13), name: "cy" }),
     440,
@@ -83,14 +100,15 @@ test("candidates climb their own ranks before gates close and the result rises",
     260,
   );
   assert.match(_render({ frame: 100 }), /data-grant-gate="app"/);
-  const result = (frame: number) =>
-    SvgAttributes.getNumberFromMarkup({
-      attributes: SvgAttributes.fromMarker({
+  const result = (frame: number) => {
+    return SvgAttributes.getNumberFromMarkup({
+      attributes: _markedShape({
         markup: _render({ frame: frame }),
         marker: "result-marker",
       }),
       name: "cy",
     });
+  };
   assert.equal(result(101), 440);
   assert.ok(result(120) < 440 && result(120) > 350);
   assert.equal(result(139), 350);
@@ -101,6 +119,21 @@ import { registerStockDefaultTextAssertions } from "../../../../tests/helpers/re
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { effectivePermissionGrantsContract } from "./EffectivePermissionGrants.contract";
 import { inputSchema, type Input } from "./EffectivePermissionGrants.schema";
+
+function _assertEmptyResultMarkerPosition(
+  none: ReturnType<typeof _render>,
+): void {
+  assert.equal(
+    SvgAttributes.getNumberFromMarkup({
+      attributes: _markedShape({
+        markup: none,
+        marker: "result-marker",
+      }),
+      name: "cy",
+    }),
+    440,
+  );
+}
 
 function _getVisibleTexts({
   input,
@@ -113,13 +146,14 @@ function _getVisibleTexts({
     input.labels.editor,
     input.labels.admin,
     ...input.grants
-      .filter(
-        (grant) =>
+      .filter((grant) => {
+        return (
           input.showExcludedGrants ||
           (grant.eligible &&
             (!input.restricted || grant.kind !== "app-default")) ||
-          frame < 100,
-      )
+          frame < 100
+        );
+      })
       .map(prop("label")),
   ];
 }
@@ -158,8 +192,8 @@ test("hidden excluded grants retain the maximum and requirement comparison for e
     [...DEFAULT_INPUT.grants].reverse(),
     [DEFAULT_INPUT.grants[1], DEFAULT_INPUT.grants[2], DEFAULT_INPUT.grants[0]],
   ];
-  grantOrders.forEach((grants) =>
-    [false, true].forEach((showExcludedGrants) => {
+  grantOrders.forEach((grants) => {
+    return [false, true].forEach((showExcludedGrants) => {
       const hold = _render({
         frame: 150,
         input: {
@@ -170,7 +204,7 @@ test("hidden excluded grants retain the maximum and requirement comparison for e
       });
       assert.equal(
         SvgAttributes.getNumberFromMarkup({
-          attributes: SvgAttributes.fromMarker({
+          attributes: _markedShape({
             markup: hold,
             marker: "result-marker",
           }),
@@ -180,8 +214,8 @@ test("hidden excluded grants retain the maximum and requirement comparison for e
       );
       assert.ok(hold.includes(`aria-label="${DEFAULT_INPUT.labels.denied}"`));
       assert.match(hold, /data-required-notch="editor"/);
-    }),
-  );
+    });
+  });
   const none = _render({
     frame: 150,
     input: {
@@ -189,14 +223,5 @@ test("hidden excluded grants retain the maximum and requirement comparison for e
       showExcludedGrants: false,
     },
   });
-  assert.equal(
-    SvgAttributes.getNumberFromMarkup({
-      attributes: SvgAttributes.fromMarker({
-        markup: none,
-        marker: "result-marker",
-      }),
-      name: "cy",
-    }),
-    440,
-  );
+  _assertEmptyResultMarkerPosition(none);
 });

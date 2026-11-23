@@ -1,21 +1,29 @@
 import { createHash } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
+import { isDefined } from "@avandar/utils";
 
-const SOURCE_DIRECTORIES: string[] = [
+const SOURCE_DIRECTORIES = [
   "../../packages/shared/utils/src",
   "src/stock",
   "src/showcase",
   "src/videoTheme",
   "themes",
   "scripts/stock",
+  "scripts/showcase",
+  "scripts/checkFrames",
+  "scripts/buildProduct",
+  "scripts/runProducerCommand",
+  "scripts/videoTheme",
+  // Shared render, media and gate helpers can be extracted within this root.
+  "scripts/lib",
+  "scripts/motion",
   "scripts/yaml",
   "public/fonts",
   "public/stock",
-];
-const SOURCE_FILES: string[] = [
+] as const;
+const SOURCE_FILES = [
   "../../packages/shared/utils/package.json",
-  "scripts/lib/withWorkspaceAliases.mjs",
   "tsconfig.json",
   "src/stock-entry.tsx",
   "src/motion.ts",
@@ -24,11 +32,10 @@ const SOURCE_FILES: string[] = [
   "package.json",
   "../../pnpm-lock.yaml",
   "scripts/render.sh",
-  "scripts/render-sequence.mjs",
-  "scripts/check-frames.mjs",
-  "scripts/motion.ts",
-  "scripts/showcase/render.ts",
-];
+  "scripts/renderSequence.ts",
+  "scripts/requireLicense.ts",
+  "scripts/checkFrames.ts",
+] as const;
 /** Frame samples and fixed canvas geometry used for stock fingerprinting. */
 type StockSampleParameters = {
   samples: number[];
@@ -109,9 +116,9 @@ function _canonicalizeObject(
     if (Object.keys(value).length !== value.length) {
       throw new Error("Unsupported stock value: sparse or extended array");
     }
-    return Array.from(value, (child) =>
-      _canonicalize({ value: child, ancestors }),
-    );
+    return Array.from(value, (child) => {
+      return _canonicalize({ value: child, ancestors });
+    });
   }
   return Object.fromEntries(
     Object.keys(value)
@@ -162,16 +169,17 @@ async function _sourceFiles(
       ? [relative]
       : [];
   }
-  const children = (await fs.readdir(filename)).filter(
-    (name) =>
+  const children = (await fs.readdir(filename)).filter((name) => {
+    return (
       !name.startsWith(".") &&
-      !["out", "node_modules", "__tests__"].includes(name),
-  );
+      !["out", "node_modules", "__tests__"].includes(name)
+    );
+  });
   return (
     await Promise.all(
-      children.map((name) =>
-        _sourceFiles({ root, relative: `${relative}/${name}` }),
-      ),
+      children.map((name) => {
+        return _sourceFiles({ root, relative: `${relative}/${name}` });
+      }),
     )
   ).flat();
 }
@@ -181,30 +189,31 @@ async function _sourceFiles(
  */
 async function _getStockSourceHashFromRoot(root: string): Promise<string> {
   root = await fs.realpath(root);
-  const discovered = await Promise.all(
-    SOURCE_DIRECTORIES.map((directory) =>
-      _sourceFiles({ root, relative: directory }),
+  const [discovered, optional] = await Promise.all([
+    Promise.all(
+      SOURCE_DIRECTORIES.map((directory) => {
+        return _sourceFiles({ root, relative: directory });
+      }),
     ),
-  );
-  const optional = await Promise.all(
-    SOURCE_FILES.map(async (file) => {
-      try {
-        await fs.lstat(path.join(root, file));
-        return file;
-      } catch (error) {
-        if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
-          throw error;
+    Promise.all(
+      SOURCE_FILES.map(async (file) => {
+        try {
+          await fs.lstat(path.join(root, file));
+          return file;
+        } catch (error) {
+          if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
+            throw error;
+          }
+          return undefined;
         }
-        return undefined;
-      }
-    }),
-  );
-  const files = [
-    ...discovered.flat(),
-    ...optional.filter((file): file is string => file !== undefined),
-  ].sort();
+      }),
+    ),
+  ]);
+  const files = [...discovered.flat(), ...optional.filter(isDefined)].sort();
   const hash = createHash("sha256");
   await files.reduce(async (previous, file) => {
+    // Each callback waits for the prior update of this shared, order-sensitive
+    // hash.
     await previous;
     const filename = path.join(root, file);
     const resolved = await fs.realpath(filename);

@@ -1,20 +1,24 @@
 import { useEffect, useRef, type RefObject } from "react";
+import { match, P } from "ts-pattern";
 import {
   continuityAppearanceSchema,
   type ContinuityAppearance,
-} from "../continuity/continuityAppearance";
+} from "../continuity/continuityAppearance/continuityAppearance";
 import {
-  createFilmThemeAcknowledgement,
-  createFilmTokensUsedMessage,
-  createUnsupportedFilmThemeError,
-  parseFilmControlMessage,
   type FilmControl,
-} from "./filmThemeMessageHelpers/filmThemeMessageHelpers";
-import type { VideoThemeSnapshot } from "../videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
+  FilmThemeMessages,
+} from "./FilmThemeMessages/FilmThemeMessages";
+import { postToParentGallery } from "./postToParentGallery";
+import type { VideoThemeSnapshot } from "../videoTheme/VideoThemeSnapshots/VideoThemeSnapshots";
 import type { PlayerRef } from "@remotion/player";
 
-const PLAYBACK_SPEEDS: readonly number[] = [0.5, 1, 1.5, 2];
+const UNHANDLED_HANDLE_PLAYBACK_KINDS = [
+  "appearance",
+  "theme",
+  "options",
+] as const;
 
+const PLAYBACK_SPEEDS: readonly number[] = [0.5, 1, 1.5, 2];
 /** The live player's state and setters that parent messages read and change. */
 export type FilmControlOptions = Readonly<{
   id: string;
@@ -26,15 +30,13 @@ export type FilmControlOptions = Readonly<{
   loop: boolean;
   previewFrames: number;
   usedTokens: readonly string[];
-  send: (message: object) => void;
   onAppearance: (appearance: ContinuityAppearance) => void;
   onTheme: (snapshot: VideoThemeSnapshot) => void;
   onSpeed: (speed: number) => void;
   onLoop: (loop: boolean) => void;
 }>;
-
 function _sendOptions(options: FilmControlOptions): void {
-  options.send({
+  postToParentGallery({
     type: "film-options",
     id: options.id,
     options: options.isContinuity
@@ -43,8 +45,13 @@ function _sendOptions(options: FilmControlOptions): void {
     transport: { speed: options.speed, loop: options.loop },
   });
 }
-
-function _seek(value: unknown, options: FilmControlOptions): void {
+function _seek({
+  value,
+  options,
+}: Readonly<{
+  value: unknown;
+  options: FilmControlOptions;
+}>): void {
   if (typeof value !== "number" || !Number.isFinite(value)) {
     return;
   }
@@ -52,48 +59,67 @@ function _seek(value: unknown, options: FilmControlOptions): void {
   player?.seekTo(Math.max(0, Math.min(options.previewFrames - 1, value)));
   player?.play();
 }
-
-function _handlePlayback(
-  { action, value }: FilmControl,
-  options: FilmControlOptions,
-): boolean {
+function _handlePlayback({
+  filmControl: { action, value },
+  options,
+}: Readonly<{
+  filmControl: FilmControl;
+  options: FilmControlOptions;
+}>): boolean {
   const player = options.player.current;
-  switch (action) {
-    case "play":
+  return match(action)
+    .with("play", () => {
       player?.play();
       return true;
-    case "pause":
+    })
+    .with("pause", () => {
       player?.pause();
       return true;
-    case "replay":
+    })
+    .with("replay", () => {
       player?.seekTo(0);
       player?.play();
       return true;
-    case "seek":
-      _seek(value, options);
+    })
+    .with("seek", () => {
+      _seek({
+        value,
+        options,
+      });
       return true;
-    case "speed":
+    })
+    .with("speed", () => {
       if (typeof value === "number" && PLAYBACK_SPEEDS.includes(value)) {
         options.onSpeed(value);
       }
       return true;
-    case "loop":
+    })
+    .with("loop", () => {
       options.onLoop(Boolean(value));
       return true;
-    default:
+    })
+    .with(P.union(...UNHANDLED_HANDLE_PLAYBACK_KINDS), () => {
       return false;
-  }
+    })
+    .exhaustive();
 }
-
-function _applyTheme(
-  { value, requestKey }: FilmControl,
-  options: FilmControlOptions,
-): void {
+function _applyTheme({
+  filmControl: { value, requestKey },
+  options,
+}: Readonly<{
+  filmControl: FilmControl;
+  options: FilmControlOptions;
+}>): void {
   if (!options.isContinuity) {
-    options.send(createUnsupportedFilmThemeError(options.id, requestKey));
+    postToParentGallery(
+      FilmThemeMessages.makeUnsupportedThemeErrorFromMessage({
+        id: options.id,
+        requestKey,
+      }),
+    );
     return;
   }
-  const { snapshot, message } = createFilmThemeAcknowledgement({
+  const { snapshot, message } = FilmThemeMessages.makeAcknowledgementFromTheme({
     id: options.id,
     value,
     requestKey,
@@ -101,57 +127,66 @@ function _applyTheme(
   if (snapshot) {
     options.onTheme(snapshot);
   }
-  options.send(message);
+  postToParentGallery(message);
 }
-
 /**
  * Posts the film's token usage within the gallery's limits, only when the
  * bounded list differs from the last one sent.
  */
-function useUsedTokensReport(
-  id: string,
-  usedTokens: readonly string[],
-  send: (message: object) => void,
-): void {
+function useUsedTokensReport({
+  id,
+  usedTokens,
+}: Readonly<{
+  id: string;
+  usedTokens: readonly string[];
+}>): void {
   const lastSentPaths = useRef<string[]>([]);
-  useEffect(
-    function reportUsedTokens() {
-      const message = createFilmTokensUsedMessage(id, usedTokens);
-      if (
-        message.paths.length === 0 ||
-        (message.paths.length === lastSentPaths.current.length &&
-          message.paths.every(
-            (path, index) => path === lastSentPaths.current[index],
-          ))
-      ) {
-        return;
-      }
-      lastSentPaths.current = message.paths;
-      send(message);
-    },
-    [usedTokens, id, send],
-  );
-}
-
-function _handleSettings(
-  control: FilmControl,
-  options: FilmControlOptions,
-): void {
-  const { action, value } = control;
-  if (action === "appearance" && options.isContinuity) {
-    const result = continuityAppearanceSchema.safeParse(value);
-    if (result.success) {
-      options.onAppearance(result.data);
+  useEffect(() => {
+    const message = FilmThemeMessages.makeTokensUsedMessageFromTokens({
+      id,
+      paths: usedTokens,
+    });
+    if (
+      message.paths.length === 0 ||
+      (message.paths.length === lastSentPaths.current.length &&
+        message.paths.every((path, index) => {
+          return path === lastSentPaths.current[index];
+        }))
+    ) {
+      return;
     }
-  }
-  if (action === "theme") {
-    _applyTheme(control, options);
-  }
-  if (action === "options") {
-    _sendOptions(options);
-  }
+    lastSentPaths.current = message.paths;
+    postToParentGallery(message);
+  }, [usedTokens, id]);
 }
-
+function _handleSettings({
+  control,
+  options,
+}: Readonly<{
+  control: FilmControl;
+  options: FilmControlOptions;
+}>): void {
+  const { action, value } = control;
+  match(action)
+    .with("appearance", () => {
+      if (options.isContinuity) {
+        const result = continuityAppearanceSchema.safeParse(value);
+        if (result.success) {
+          options.onAppearance(result.data);
+        }
+      }
+    })
+    .with("theme", () => {
+      return _applyTheme({ filmControl: control, options });
+    })
+    .with("options", () => {
+      return _sendOptions(options);
+    })
+    .with("play", "pause", "replay", "seek", "speed", "loop", () => {
+      return undefined;
+    })
+    .exhaustive();
+}
 /**
  * Connects the live player to the gallery that embeds it: answers transport,
  * appearance, and theme messages, acknowledges a theme by its resolved
@@ -164,28 +199,39 @@ export function useFilmControl(options: FilmControlOptions): void {
     latestOptions.current = options;
   });
   const { isContinuity, appearance, captions, speed, loop } = options;
-  const { usedTokens, id, send } = options;
-  useEffect(
-    function reportOptions() {
-      _sendOptions(latestOptions.current);
-    },
-    [isContinuity, appearance, captions, speed, loop],
-  );
-  useEffect(function listenForFilmControls() {
+  const { usedTokens, id } = options;
+  useEffect(() => {
+    _sendOptions(latestOptions.current);
+  }, [isContinuity, appearance, captions, speed, loop]);
+  useEffect(() => {
     const receive = (event: MessageEvent<unknown>) => {
       if (event.origin !== location.origin || event.source !== window.parent) {
         return;
       }
-      const control = parseFilmControlMessage(
-        event.data,
-        latestOptions.current.id,
-      );
-      if (control && !_handlePlayback(control, latestOptions.current)) {
-        _handleSettings(control, latestOptions.current);
+      const control = FilmThemeMessages.parseFilmControlMessage({
+        data: event.data,
+        id: latestOptions.current.id,
+      });
+      if (
+        control &&
+        !_handlePlayback({
+          filmControl: control,
+          options: latestOptions.current,
+        })
+      ) {
+        _handleSettings({
+          control,
+          options: latestOptions.current,
+        });
       }
     };
     window.addEventListener("message", receive);
-    return () => window.removeEventListener("message", receive);
+    return () => {
+      return window.removeEventListener("message", receive);
+    };
   }, []);
-  useUsedTokensReport(id, usedTokens, send);
+  useUsedTokensReport({
+    id,
+    usedTokens,
+  });
 }

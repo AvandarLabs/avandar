@@ -1,16 +1,26 @@
-import { useGraphicProps } from "../theme/useGraphicTheme/useGraphicTheme";
+import { SketchedShape } from "../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../theme/GraphicThemeHooks/GraphicThemeHooks";
+import type { ReactNode } from "react";
 
+type Props = {
+  x1: number;
+  x2: number;
+  y: number;
+};
 /** A themed horizontal divider. */
-export function Rule({ x1, x2, y }: { x1: number; x2: number; y: number }) {
-  const rule = useGraphicProps("Rule", {});
+export function Rule({ x1, x2, y }: Readonly<Props>): ReactNode {
+  const rule = GraphicThemeHooks.useGraphicProps({
+    name: "Rule",
+    props: {},
+  });
+  const { sketch } = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
-    <line
-      x1={x1}
-      y1={y}
-      x2={x2}
-      y2={y}
+    <SketchedShape
+      shape={{ kind: "line", x1, y1: y, x2, y2: y }}
+      profile={sketch.shape}
       stroke={rule.color}
-      strokeWidth={rule.strokeWidth}
+      strokeWidth={scales.stroke(rule.strokeWidth)}
     />
   );
 }

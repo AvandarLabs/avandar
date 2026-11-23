@@ -1,8 +1,6 @@
 import { Text } from "../../../graphics-common/Text";
-import {
-  useGraphicProps,
-  useGraphicTokens,
-} from "../../../theme/useGraphicTheme/useGraphicTheme";
+import { SketchedShape } from "../../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = Readonly<{
@@ -11,21 +9,23 @@ type Props = Readonly<{
   label: string;
   color: string;
 }>;
-
 /** A body's ringed dot and its label. */
 export function BodyMarker({ x, y, label, color }: Props): ReactNode {
-  const style = useGraphicProps("OrbitalSystem", {});
-  const tokens = useGraphicTokens();
+  const style = GraphicThemeHooks.useGraphicProps({
+    name: "OrbitalSystem",
+    props: {},
+  });
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <>
-      <circle
-        cx={x}
-        cy={y}
-        r={style.bodyRadius}
+      <SketchedShape
+        shape={{ kind: "circle", cx: x, cy: y, r: style.bodyRadius }}
+        profile={tokens.sketch.shape}
         fill={tokens.color.ground}
         stroke={color}
         strokeOpacity={style.bodyAlpha}
-        strokeWidth={style.bodyStrokeWidth}
+        strokeWidth={shapes.stroke(style.bodyStrokeWidth)}
       />
       <circle cx={x} cy={y} r={style.bodyCoreRadius} fill={color} />
       <Text

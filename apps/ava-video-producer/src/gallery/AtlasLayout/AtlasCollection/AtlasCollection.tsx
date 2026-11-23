@@ -1,4 +1,7 @@
-import { Icon } from "../../MotionGallery/Icon";
+import css from "./AtlasCollection.module.css";
+import { AtlasCollectionEmptyState } from "./AtlasCollectionEmptyState/AtlasCollectionEmptyState";
+import { AtlasCollectionIntro } from "./AtlasCollectionIntro/AtlasCollectionIntro";
+import { AtlasCollectionToolbar } from "./AtlasCollectionToolbar/AtlasCollectionToolbar";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -40,64 +43,29 @@ export function AtlasCollection({
   onReset,
   resetLabel,
   children,
-}: Props) {
+}: Readonly<Props>): ReactNode {
   return (
-    <main className="library-main" id="library" tabIndex={-1}>
-      <section className="library-intro" aria-labelledby="page-title">
-        <div className="intro-copy">
-          <p className="eyebrow">
-            <span className="tiny-dot" />
-            {eyebrow}
-          </p>
-          <h1 id="page-title">{title}</h1>
-          <p>{description}</p>
-        </div>
-      </section>
-      <section className="collection" aria-labelledby="collection-title">
-        <div className="collection-toolbar">
-          <div className="collection-heading">
-            <h2 id="collection-title">{heading}</h2>
-            <span className="result-count">{resultCount}</span>
-          </div>
-          <div className="toolbar-tools">
-            <div className="search-field">
-              <Icon name="search" size={17} />
-              <label className="sr-only" htmlFor="atlas-search">
-                {searchLabel}
-              </label>
-              <input
-                id="atlas-search"
-                type="search"
-                placeholder={searchPlaceholder}
-                value={query}
-                onChange={(event) => onQueryChange(event.target.value)}
-                autoComplete="off"
-              />
-              {query ? (
-                <button
-                  type="button"
-                  onClick={() => onQueryChange("")}
-                  aria-label="Clear search"
-                >
-                  <Icon name="close" size={14} />
-                </button>
-              ) : null}
-            </div>
-            {tools}
-          </div>
-        </div>
+    <main className={css.atlasCollectionLibraryMain} id="library" tabIndex={-1}>
+      <AtlasCollectionIntro {...{ eyebrow, title, description }} />
+      <section
+        className={css.atlasCollectionCollection}
+        aria-labelledby="collection-title"
+      >
+        <AtlasCollectionToolbar
+          {...{
+            heading,
+            resultCount,
+            searchLabel,
+            searchPlaceholder,
+            query,
+            onQueryChange,
+            tools,
+          }}
+        />
         {resultCount > 0 ? (
-          <div className="motion-grid">{children}</div>
+          <div className={css.atlasCollectionMotionGrid}>{children}</div>
         ) : (
-          <div className="empty-state">
-            <Icon name="search" size={30} />
-            <h3>{emptyTitle}</h3>
-            <p>Try a different keyword, or explore the full collection.</p>
-            <button type="button" className="button" onClick={onReset}>
-              {resetLabel}
-              <Icon name="arrow" size={16} />
-            </button>
-          </div>
+          <AtlasCollectionEmptyState {...{ emptyTitle, onReset, resetLabel }} />
         )}
       </section>
     </main>

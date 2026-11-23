@@ -1,4 +1,4 @@
-import { STOCK_CATALOG, STOCK_CATEGORIES } from "../../stock/catalog";
+import { STOCK_CATALOG, STOCK_CATEGORIES } from "../../stock/stockEntry";
 import type { ReactNode } from "react";
 
 /** Introduction and size of the current motion collection. */

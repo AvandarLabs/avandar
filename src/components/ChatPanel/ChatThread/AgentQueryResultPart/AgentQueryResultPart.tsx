@@ -2,7 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { Skeleton } from "@mantine/core";
 import { IconChartBar } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { useId } from "react";
 import { AgentQueryResult } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResult";
 import { AGENT_QUERY_RESULT_DEFINITION } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition";

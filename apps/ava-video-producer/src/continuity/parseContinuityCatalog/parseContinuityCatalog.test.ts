@@ -26,42 +26,56 @@ const STUDY = {
   avoid: "Unrelated objects.",
   controls: [{ path: "token.label", label: "Label", description: "Name it." }],
 };
-
 test("preserves authored film and study metadata without rewriting prose", () => {
-  assert.deepEqual(parseContinuityCatalog([FILM], [STUDY]), [FILM, STUDY]);
-});
-
-test("rejects nonnumeric frame counts in authored metadata", () => {
-  assert.throws(() =>
-    parseContinuityCatalog([{ ...FILM, frames: "300" }], [STUDY]),
+  assert.deepEqual(
+    parseContinuityCatalog({
+      films: [FILM],
+      studies: [STUDY],
+    }),
+    [FILM, STUDY],
   );
 });
-
+test("rejects nonnumeric frame counts in authored metadata", () => {
+  assert.throws(() => {
+    return parseContinuityCatalog({
+      films: [{ ...FILM, frames: "300" }],
+      studies: [STUDY],
+    });
+  });
+});
 test("rejects missing creative direction in a study", () => {
   const { creativeDirection: _creativeDirection, ...incompleteStudy } = STUDY;
-  assert.throws(() => parseContinuityCatalog([FILM], [incompleteStudy]));
+  assert.throws(() => {
+    return parseContinuityCatalog({
+      films: [FILM],
+      studies: [incompleteStudy],
+    });
+  });
 });
-
 test("rejects duplicate catalog ids across families", () => {
-  assert.throws(
-    () => parseContinuityCatalog([FILM], [{ ...STUDY, id: FILM.id }]),
-    /Duplicate continuity catalog id/,
-  );
+  assert.throws(() => {
+    return parseContinuityCatalog({
+      films: [FILM],
+      studies: [{ ...STUDY, id: FILM.id }],
+    });
+  }, /Duplicate continuity catalog id/);
 });
-
 test("rejects a study whose source film is not registered", () => {
-  assert.throws(
-    () => parseContinuityCatalog([FILM], [{ ...STUDY, sourceFilm: "missing" }]),
-    /Unknown source film/,
-  );
+  assert.throws(() => {
+    return parseContinuityCatalog({
+      films: [FILM],
+      studies: [{ ...STUDY, sourceFilm: "missing" }],
+    });
+  }, /Unknown source film/);
 });
-
 test("rejects unknown metadata fields instead of silently dropping authored copy", () => {
-  assert.throws(() =>
-    parseContinuityCatalog([FILM], [{ ...STUDY, creativeDirections: "Typo" }]),
-  );
+  assert.throws(() => {
+    return parseContinuityCatalog({
+      films: [FILM],
+      studies: [{ ...STUDY, creativeDirections: "Typo" }],
+    });
+  });
 });
-
 const SCENE_FILM = {
   ...FILM,
   id: "scene-film",
@@ -78,27 +92,28 @@ const SCENE_STUDY = {
     { path: "transition.columns", label: "Columns", description: "Count." },
   ],
 };
-
 test("accepts storyboard-scene films and studies and keeps their kind", () => {
   assert.deepEqual(
-    parseContinuityCatalog([FILM, SCENE_FILM], [STUDY, SCENE_STUDY]),
+    parseContinuityCatalog({
+      films: [FILM, SCENE_FILM],
+      studies: [STUDY, SCENE_STUDY],
+    }),
     [FILM, SCENE_FILM, STUDY, SCENE_STUDY],
   );
 });
-
 test("rejects a scene study whose plan is outside storyboards/vocabulary", () => {
-  assert.throws(
-    () =>
-      parseContinuityCatalog(
-        [SCENE_FILM],
-        [{ ...SCENE_STUDY, path: "explainers/scene-study" }],
-      ),
-    /storyboards\/vocabulary/,
-  );
+  assert.throws(() => {
+    return parseContinuityCatalog({
+      films: [SCENE_FILM],
+      studies: [{ ...SCENE_STUDY, path: "explainers/scene-study" }],
+    });
+  }, /storyboards\/vocabulary/);
 });
-
 test("rejects unknown study kinds", () => {
-  assert.throws(() =>
-    parseContinuityCatalog([FILM], [{ ...STUDY, kind: "stock" }]),
-  );
+  assert.throws(() => {
+    return parseContinuityCatalog({
+      films: [FILM],
+      studies: [{ ...STUDY, kind: "stock" }],
+    });
+  });
 });

@@ -2,13 +2,19 @@ import { EFFECT_FIELDS } from "./effectControls.constants";
 import { getDefaultLiteralFromKind } from "./getDefaultLiteralFromKind";
 import { NumberFields, type NumberValues } from "./NumberFields/NumberFields";
 import type { ValueControlProps } from "./valueControl.types";
+import type { ReactNode } from "react";
 
-/** A text shadow token: offsets, blur, and opacity. Its colour comes from the type style. */
+type Props = ValueControlProps;
+
+/**
+ * A text shadow token: offsets, blur, and opacity. Its colour comes from the
+ * type style.
+ */
 export function TextShadowValueControl({
   label,
   value,
   onChange,
-}: ValueControlProps) {
+}: Readonly<Props>): ReactNode {
   return (
     <NumberFields
       legend={label}

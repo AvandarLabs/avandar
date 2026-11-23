@@ -1,5 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { useState } from "react";
 import { getMapLayerOperationalState } from "@/views/GisApp/layers/getMapLayerOperationalState/getMapLayerOperationalState";
 import css from "@/views/GisApp/panels/MapStatusCard/MapStatusCard.module.css";

@@ -1,6 +1,7 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
-import { ByteChunk } from "./ByteChunk";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { ByteChunk } from "./ByteChunk/ByteChunk";
 import { ByteCounters } from "./ByteCounters";
 import { getByteTransferFromFrame } from "./getByteTransferFromFrame";
 import { RetryCheckpoint } from "./RetryCheckpoint";
@@ -17,7 +18,9 @@ export function ResumableByteTransfer({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
-  const transfer = getByteTransferFromFrame({ input, frame });
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const transfer = getByteTransferFromFrame({ motion, input, frame });
   const checkpoint =
     84 + (input.acknowledgedBytes / input.file.sizeBytes) * 792;
   return (
@@ -28,20 +31,23 @@ export function ResumableByteTransfer({
         checkpoint={checkpoint}
         frame={frame}
       />
-      <path
-        d="M900 207 V407 l-5 -8 m5 8 l5 -8"
-        stroke={STOCK.muted}
+      <SketchedShape
+        shape={{ kind: "path", d: "M900 207 V407 l-5 -8 m5 8 l5 -8" }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.inactive}
         fill="none"
       />
-      {transfer.chunks.map((chunk) => (
-        <ByteChunk
-          key={chunk.start}
-          chunk={chunk}
-          input={input}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {transfer.chunks.map((chunk) => {
+        return (
+          <ByteChunk
+            key={chunk.start}
+            chunk={chunk}
+            input={input}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
       <ByteCounters
         input={input}
         confirmed={transfer.confirmed}

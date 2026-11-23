@@ -1,12 +1,15 @@
-import clsx from "clsx";
+import { clsx } from "clsx";
 import css from "./CompositionStage.module.css";
-import type { ContinuityCatalogEntry } from "../../../continuityCatalog";
-import type { RefObject } from "react";
+import type { ContinuityCatalogEntry } from "../../../isSceneEntry";
+import type { ReactNode, RefObject } from "react";
 
 type Props = Readonly<{
   selected: ContinuityCatalogEntry;
   player: RefObject<HTMLIFrameElement | null>;
-  /** Whether the Design tokens tab is open, which pins the stage as a strip on a phone. */
+  /**
+   * Whether the Design tokens tab is open, which pins the stage as a strip on a
+   * phone.
+   */
   isTokenPanel: boolean;
   onLoad: () => void;
 }>;
@@ -17,7 +20,10 @@ export function CompositionStage({
   player,
   isTokenPanel,
   onLoad,
-}: Props) {
+}: Props): ReactNode {
+  // Do not add `sandbox` without `allow-same-origin`: `/live.html` is a
+  // first-party player that reads `sessionStorage`, loads product stores, and
+  // verifies `event.origin === location.origin` on `postMessage`.
   return (
     <div
       className={clsx(
@@ -25,6 +31,7 @@ export function CompositionStage({
         isTokenPanel && css.compositionStageIsTokenPanel,
       )}
     >
+      {/* react-doctor-disable-next-line react-doctor/iframe-missing-sandbox */}
       <iframe
         key={selected.id}
         className={css.compositionStagePlayer}

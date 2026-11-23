@@ -19,21 +19,26 @@ function _render({
   frame,
   input,
 }: Readonly<{ frame: number; input: Input }>): string {
-  return renderToStaticMarkup(
-    createElement(ReturningLearnerWorktable, {
-      frame,
-      input,
-      accent: "#81d7bd",
-      id: "packet15",
-    }),
+  return _joinMarkedShapes(
+    renderToStaticMarkup(
+      createElement(ReturningLearnerWorktable, {
+        frame,
+        input,
+        accent: "#81d7bd",
+        id: "packet15",
+      }),
+    ),
   );
 }
 test("original portfolio identities and marks survive interruption and return", () => {
   [24, 72, 150].forEach((frame) => {
     const markup = _render({ frame: frame, input: changedInput });
-    changedInput.priorWork.forEach((work) =>
-      assert.equal(markup.split(`data-work-id="${work.id}"`).length - 1, 1),
-    );
+    changedInput.priorWork.forEach((work) => {
+      return assert.equal(
+        markup.split(`data-work-id="${work.id}"`).length - 1,
+        1,
+      );
+    });
     assert.equal(markup.split('data-learner="true"').length - 1, 1);
   });
   const hold = _render({ frame: 150, input: changedInput });
@@ -46,6 +51,19 @@ import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/reg
 import { getConservativeWidthFromText } from "../../text/getConservativeWidthFromText";
 import { returningLearnerWorktableContract as contract } from "./ReturningLearnerWorktable.contract";
 import { inputSchema, type Input } from "./ReturningLearnerWorktable.schema";
+
+/**
+ * Rendered markup with each marked sketch-aware shape read as one element.
+ * `SketchedShape` draws its plain shape inside a group that carries the
+ * shape's markers (`data-*`, `aria-label`, `transform`), so the group's
+ * attributes move onto the shape these assertions read.
+ */
+function _joinMarkedShapes(markup: string): string {
+  return markup.replace(
+    /<g((?:\s+(?:data-[\w-]+|aria-label|transform)="[^"]*")+)><(path|line|circle|rect|ellipse)\b([^>]*)><\/\2><\/g>/g,
+    "<$2$1$3></$2>",
+  );
+}
 
 function _getVisibleTexts({
   input,
@@ -62,11 +80,11 @@ function _getVisibleTexts({
     input.people.teacher,
     input.caption,
     ...input.priorWork.map(prop("label")),
-    ...input.returnActivities.flatMap((activity, index) =>
-      frame >= 106 + index * 16
+    ...input.returnActivities.flatMap((activity, index) => {
+      return frame >= 106 + index * 16
         ? [activity.label, input.activityLabels[activity.kind]]
-        : [],
-    ),
+        : [];
+    }),
   ];
 }
 const options = {
@@ -103,10 +121,13 @@ test("the learner carries intact original geometry to the side table and back", 
       const initial = _render({ frame: 24, input: input });
       const interruption = _render({ frame: 64, input: input });
       const hold = _render({ frame: 150, input: input });
-      const marks = (markup: string) =>
-        [...markup.matchAll(/data-work-marks="([^"]+)" d="([^"]+)"/g)].map(
-          (match) => match.slice(1),
-        );
+      const marks = (markup: string) => {
+        return [
+          ...markup.matchAll(/data-work-marks="([^"]+)" d="([^"]+)"/g),
+        ].map((match) => {
+          return match.slice(1);
+        });
+      };
       assert.deepEqual(marks(initial), marks(interruption));
       assert.deepEqual(marks(initial), marks(hold));
       const original = _position({ markup: initial, marker: "data-work-id" });
@@ -156,15 +177,13 @@ test("each teacher placement has continuous hand contact and preserves independe
       );
     });
     const markup = _render({ frame: 150, input: input });
-    input.returnActivities
-      .filter(propEq("kind", "new"))
-      .forEach((activity) =>
-        assert.ok(
-          markup.includes(
-            `data-activity-object="${activity.id}" data-new-activity="true"`,
-          ),
+    input.returnActivities.filter(propEq("kind", "new")).forEach((activity) => {
+      return assert.ok(
+        markup.includes(
+          `data-activity-object="${activity.id}" data-new-activity="true"`,
         ),
       );
+    });
   });
   assert.equal(
     [
@@ -194,15 +213,16 @@ test("review references, new empty references and exact bounds remain strict", (
         { ...DEFAULT_INPUT.returnActivities[0], label: "x".repeat(29) },
       ],
     },
-  ].forEach((value) =>
-    assert.equal(inputSchema.safeParse(value).success, false),
-  );
+  ].forEach((value) => {
+    return assert.equal(inputSchema.safeParse(value).success, false);
+  });
   assert.ok(
-    contract.semanticRules.some(
-      (rule) =>
+    contract.semanticRules.some((rule) => {
+      return (
         rule.paths.includes("returnActivities.*.priorWorkId") &&
-        rule.description.includes("Multiple reviews"),
-    ),
+        rule.description.includes("Multiple reviews")
+      );
+    }),
   );
   assert.deepEqual(inputSchema.parse(newActivitiesInput), newActivitiesInput);
 });
@@ -232,7 +252,9 @@ test("the learner caption stays clear of the numbered original portfolio", () =>
     );
     assert.ok(label);
     const widths = [...label[2].matchAll(/<tspan[^>]*>(.*?)<\/tspan>/g)].map(
-      (line) => getConservativeWidthFromText({ text: line[1], fontSize: 14 }),
+      (line) => {
+        return getConservativeWidthFromText({ text: line[1], fontSize: 14 });
+      },
     );
     const work = _position({ markup, marker: "data-work-id" });
     assert.ok(Number(label[1]) + Math.max(...widths) / 2 <= work[0] - 25);

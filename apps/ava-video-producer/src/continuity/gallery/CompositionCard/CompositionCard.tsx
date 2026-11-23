@@ -1,7 +1,8 @@
 import { AtlasCard } from "../../../gallery/AtlasLayout/AtlasCard/AtlasCard";
-import { isSceneEntry } from "../../continuityCatalog";
+import { isSceneEntry } from "../../isSceneEntry";
 import { PosterThumbnail } from "./PosterThumbnail/PosterThumbnail";
-import type { ContinuityCatalogEntry } from "../../continuityCatalog";
+import type { ContinuityCatalogEntry } from "../../isSceneEntry";
+import type { ReactNode } from "react";
 
 type Props = {
   entry: ContinuityCatalogEntry;
@@ -22,7 +23,7 @@ export function CompositionCard({
   category,
   themeId = "classic",
   onOpen,
-}: Props) {
+}: Props): ReactNode {
   const seconds = Math.round(entry.frames / 30);
   return (
     <AtlasCard
@@ -38,7 +39,9 @@ export function CompositionCard({
         </span>
       }
       thumbnail={<PosterThumbnail id={entry.id} themeId={themeId} />}
-      onOpen={() => onOpen(entry.id)}
+      onOpen={() => {
+        return onOpen(entry.id);
+      }}
     />
   );
 }

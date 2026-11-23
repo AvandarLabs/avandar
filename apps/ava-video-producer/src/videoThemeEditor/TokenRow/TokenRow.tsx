@@ -1,16 +1,17 @@
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { RowIssueContext } from "../RowIssueContext/RowIssueContext";
 import { TokenControl } from "../TokenControl";
 import { useTokenEditor } from "../TokenEditorContext";
-import {
-  findTokenRowIssue,
-  type TokenRow as TokenRowModel,
-} from "../tokenRows/tokenRows";
+import { TokenRows } from "../TokenRows/TokenRows";
+import { type TokenRow } from "../TokenRows/TokenRows.types";
 import { ItemOverrideNote } from "./ItemOverrideNote/ItemOverrideNote";
 import css from "./TokenRow.module.css";
 import { TokenRowHeader } from "./TokenRowHeader/TokenRowHeader";
 import { TokenRowIssue } from "./TokenRowIssue/TokenRowIssue";
 import { useTokenRowLabel } from "./useTokenRowLabel";
+import type { ReactNode } from "react";
+
+type Props = { row: TokenRow };
 
 /**
  * One token: its name and state, its control, its path and description, and
@@ -18,10 +19,10 @@ import { useTokenRowLabel } from "./useTokenRowLabel";
  * "Same as the theme" tag, and its chips and previews dim. A problem puts the
  * control's inputs in Mantine's error state and adds an alert line.
  */
-export function TokenRow({ row }: Readonly<{ row: TokenRowModel }>) {
+export function TokenRow({ row }: Readonly<Props>): ReactNode {
   const editor = useTokenEditor();
   const label = useTokenRowLabel()(row);
-  const issue = findTokenRowIssue({
+  const issue = TokenRows.findTokenRowIssue({
     issues: editor.issues,
     tokenPath: row.path,
   });

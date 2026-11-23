@@ -6,6 +6,7 @@ import { registerStockPresetAssertions } from "../../../../../tests/helpers/regi
 import { registerStockTextLayoutAssertions } from "../../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
 import { SvgPaintAssertions } from "../../../../../tests/helpers/SvgPaintAssertions/SvgPaintAssertions";
+import { parseStockInput } from "../../../contracts/parseStockInput/parseStockInput";
 import { distanceBufferEnvelopeContract as contract } from "../DistanceBufferEnvelope.contract";
 import {
   DEFAULT_INPUT,
@@ -21,6 +22,81 @@ import {
   _getVisibleTexts,
   EXCLUSIONS,
 } from "./DistanceBufferEnvelopeTestHelpers";
+
+function _assertCircleStrokeComplete(
+  end: ReturnType<typeof _tags>[number],
+): void {
+  assert.equal(
+    SvgAttributes.getNumberFromMarkup({
+      attributes: end,
+      name: "stroke-dashoffset",
+    }),
+    0,
+  );
+}
+
+function _assertCircleStrokeStartsHidden(
+  start: ReturnType<typeof _tags>[number],
+): void {
+  assert.equal(
+    SvgAttributes.getNumberFromMarkup({
+      attributes: start,
+      name: "stroke-dashoffset",
+    }),
+    1,
+  );
+}
+
+function _assertMovingCompassDiffersFromHold({
+  moving,
+  hold,
+}: Readonly<{
+  moving: ReturnType<typeof _tags>[number];
+  hold: ReturnType<typeof _tags>[number];
+}>): void {
+  assert.notDeepEqual(
+    [
+      SvgAttributes.getNumberFromMarkup({ attributes: moving, name: "cx" }),
+      SvgAttributes.getNumberFromMarkup({ attributes: moving, name: "cy" }),
+    ],
+    [
+      SvgAttributes.getNumberFromMarkup({ attributes: hold, name: "cx" }),
+      SvgAttributes.getNumberFromMarkup({ attributes: hold, name: "cy" }),
+    ],
+  );
+}
+
+function _assertMovingCompassDiffersFromSetup({
+  moving,
+  setup,
+}: Readonly<{
+  moving: ReturnType<typeof _tags>[number];
+  setup: ReturnType<typeof _tags>[number];
+}>): void {
+  assert.notDeepEqual(
+    [
+      SvgAttributes.getNumberFromMarkup({ attributes: moving, name: "cx" }),
+      SvgAttributes.getNumberFromMarkup({ attributes: moving, name: "cy" }),
+    ],
+    [
+      SvgAttributes.getNumberFromMarkup({ attributes: setup, name: "cx" }),
+      SvgAttributes.getNumberFromMarkup({ attributes: setup, name: "cy" }),
+    ],
+  );
+}
+
+function _assertTinyPositiveCircleRadius(): void {
+  assert.equal(
+    SvgAttributes.getNumberFromMarkup({
+      attributes: _tags({
+        markup: _render({ frame: 150, input: fixtures[1].input }),
+        attribute: "data-buffer-circle",
+      })[0],
+      name: "r",
+    }),
+    3.6e-12,
+  );
+}
 
 registerStockPresetAssertions({
   inputSchema,
@@ -119,26 +195,14 @@ test("compass arm sweeps a real circle before qualifying tokens move into the se
       markup: _render({ frame: 105 }),
       attribute: "data-buffer-circle",
     })[0];
-  assert.equal(
-    SvgAttributes.getNumberFromMarkup({
-      attributes: start,
-      name: "stroke-dashoffset",
-    }),
-    1,
-  );
+  _assertCircleStrokeStartsHidden(start);
   assert.ok(
     SvgAttributes.getNumberFromMarkup({
       attributes: mid,
       name: "stroke-dashoffset",
     }) > 0,
   );
-  assert.equal(
-    SvgAttributes.getNumberFromMarkup({
-      attributes: end,
-      name: "stroke-dashoffset",
-    }),
-    0,
-  );
+  _assertCircleStrokeComplete(end);
   assert.notDeepEqual(
     _tags({ markup: _render({ frame: 60 }), attribute: "data-compass-arm" }),
     _tags({ markup: _render({ frame: 90 }), attribute: "data-compass-arm" }),
@@ -155,26 +219,8 @@ test("compass arm sweeps a real circle before qualifying tokens move into the se
       markup: _render({ frame: 150 }),
       attribute: "data-ledger-token",
     })[0];
-  assert.notDeepEqual(
-    [
-      SvgAttributes.getNumberFromMarkup({ attributes: moving, name: "cx" }),
-      SvgAttributes.getNumberFromMarkup({ attributes: moving, name: "cy" }),
-    ],
-    [
-      SvgAttributes.getNumberFromMarkup({ attributes: setup, name: "cx" }),
-      SvgAttributes.getNumberFromMarkup({ attributes: setup, name: "cy" }),
-    ],
-  );
-  assert.notDeepEqual(
-    [
-      SvgAttributes.getNumberFromMarkup({ attributes: moving, name: "cx" }),
-      SvgAttributes.getNumberFromMarkup({ attributes: moving, name: "cy" }),
-    ],
-    [
-      SvgAttributes.getNumberFromMarkup({ attributes: hold, name: "cx" }),
-      SvgAttributes.getNumberFromMarkup({ attributes: hold, name: "cy" }),
-    ],
-  );
+  _assertMovingCompassDiffersFromSetup({ moving, setup });
+  _assertMovingCompassDiffersFromHold({ moving, hold });
 });
 
 test("all-inside, all-outside, diagonal and tiny-positive radii retain actual geometry and qualifier", () => {
@@ -219,16 +265,7 @@ test("all-inside, all-outside, diagonal and tiny-positive radii retain actual ge
     ),
   );
   assert.match(_render({ frame: 150, input: fixtures[1].input }), /1e-12/);
-  assert.equal(
-    SvgAttributes.getNumberFromMarkup({
-      attributes: _tags({
-        markup: _render({ frame: 150, input: fixtures[1].input }),
-        attribute: "data-buffer-circle",
-      })[0],
-      name: "r",
-    }),
-    3.6e-12,
-  );
+  _assertTinyPositiveCircleRadius();
 });
 
 test("distance ledger captions stay clear through the compass sweep and dense final hold", () => {
@@ -238,9 +275,9 @@ test("distance ledger captions stay clear through the compass sweep and dense fi
     );
     SvgPaintAssertions.assertPaintClearance({
       texts: paint.filter(propEq("kind", "text")),
-      rectangles: paint.filter(
-        (item) => item.kind === "rect" && item.opacity * item.fillOpacity > 0.9,
-      ),
+      rectangles: paint.filter((item) => {
+        return item.kind === "rect" && item.opacity * item.fillOpacity > 0.9;
+      }),
     });
   });
 });
@@ -268,8 +305,8 @@ test("diagonal pairs and moving inclusion tokens preserve the full supplied-loca
     }).length,
     3,
   );
-  [106, 110, 122, 133, 139, 150].forEach((frame) =>
-    _tags({
+  [106, 110, 122, 133, 139, 150].forEach((frame) => {
+    return _tags({
       markup: _render({ frame: frame, input: input }),
       attribute: "data-ledger-token",
     }).forEach((tag) => {
@@ -279,33 +316,41 @@ test("diagonal pairs and moving inclusion tokens preserve the full supplied-loca
         }),
         y = SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "cy" });
       assert.ok(x - 8 >= 40 && x + 8 < 720 && y - 8 >= 182 && y + 8 <= 558);
-    }),
-  );
+    });
+  });
 });
 
-test("approved buffer default and complete binding retain Location A independently of the empty-label minimum", () => {
-  const expected = {
-    origin: { label: "Fictional facility", x: 50, y: 50 },
-    locations: [
-      { id: "a", label: "Location A", x: 60, y: 50 },
-      { id: "b", label: "Location B", x: 70, y: 70 },
-      { id: "c", label: "Location C", x: 90, y: 50 },
-    ],
-    radiusUnits: 30,
-    labels: {
-      unit: "schematic units",
-      inside: "Within radius",
-      outside: "Beyond radius",
-      qualifier: "Straight-line distance, not travel time",
-    },
-    showDistances: true,
-    copy: {
-      context: "Fictional schematic example",
-      source: "Supplied data",
-      result: "Derived illustration",
-    },
-  };
-  assert.deepEqual(DEFAULT_INPUT, expected);
-  assert.deepEqual(contract.bindingExamples[0].input, expected);
-  assert.equal(fixtures[1].input.locations[0].label, "");
+test("omitted and bound buffer input render Location A while explicit empty labels stay empty", () => {
+  const omitted = parseStockInput({ preset: "distance-buffer-envelope" });
+  const bound = parseStockInput({
+    preset: "distance-buffer-envelope",
+    rawInput: contract.bindingExamples[0].input,
+  });
+  const explicitEmpty = parseStockInput({
+    preset: "distance-buffer-envelope",
+    rawInput: fixtures[1].input,
+  });
+  assert.deepEqual(omitted, DEFAULT_INPUT);
+  assert.deepEqual(bound, DEFAULT_INPUT);
+  assert.equal(omitted.locations[0].label, "Location A");
+  assert.equal(bound.locations[0].label, "Location A");
+  assert.equal(explicitEmpty.locations[0].label, "");
+  [omitted, bound].forEach((input) => {
+    const paint = SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup(
+      _render({ frame: 150, input }),
+    );
+    assert.ok(
+      paint.some((item) => {
+        return item.kind === "text" && item.text === "Location A";
+      }),
+    );
+  });
+  const emptyPaint = SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup(
+    _render({ frame: 150, input: explicitEmpty }),
+  );
+  assert.ok(
+    !emptyPaint.some((item) => {
+      return item.kind === "text" && item.text === "Location A";
+    }),
+  );
 });

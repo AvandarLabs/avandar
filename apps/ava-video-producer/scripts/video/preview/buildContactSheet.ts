@@ -1,17 +1,20 @@
 import path from "node:path";
-import { ffmpeg, run } from "../../lib/mediaHelpers";
+import { MediaHelpers } from "../../lib/MediaHelpers/MediaHelpers";
 import type { Storyboard } from "../../../src/storyboard/schema/schema";
-
 /** Tiles the preview stills into one contact sheet image. */
 export async function buildContactSheet({
   plan,
   directory,
   sampleCount,
-}: Readonly<{ plan: Storyboard; directory: string; sampleCount: number }>) {
+}: Readonly<{
+  plan: Storyboard;
+  directory: string;
+  sampleCount: number;
+}>): Promise<void> {
   const tileHeight = Math.round((320 * plan.height) / plan.width);
-  await run(
-    ffmpeg,
-    [
+  await MediaHelpers.run({
+    command: MediaHelpers.ffmpeg,
+    args: [
       "-y",
       "-loglevel",
       "error",
@@ -27,6 +30,6 @@ export async function buildContactSheet({
       "3",
       path.join(directory, "contact-sheet.jpg"),
     ],
-    { quiet: true },
-  );
+    options: { quiet: true },
+  });
 }

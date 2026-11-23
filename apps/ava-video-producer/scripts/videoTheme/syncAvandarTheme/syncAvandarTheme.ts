@@ -1,15 +1,18 @@
-import fs from "node:fs/promises";
-import { fileURLToPath } from "node:url";
-import { requireLicense } from "../../require-license.mjs";
-import { createAvandarTheme } from "./createAvandarTheme/createAvandarTheme";
-import { readAvandarThemeSource } from "./readAvandarThemeSource";
+import { pathToFileURL } from "node:url";
+import { ProducerCli } from "../../runProducerCommand/ProducerCli/ProducerCli.mjs";
 
-requireLicense();
-const output = fileURLToPath(
-  new URL("../../../themes/avandar.theme.json", import.meta.url),
-);
-await fs.writeFile(
-  output,
-  `${JSON.stringify(createAvandarTheme(readAvandarThemeSource()), null, 2)}\n`,
-);
-console.log("Synced themes/avandar.theme.json from the Avandar theme.");
+await ProducerCli.prepare({
+  commandName: "theme:sync-avandar",
+  moduleUrl: import.meta.url,
+});
+
+if (
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(process.argv[1]).href
+) {
+  process.env.AVA_PRODUCER_WORKER_ENTRY = new URL(
+    "./runSyncAvandarTheme.ts",
+    import.meta.url,
+  ).href;
+  await import("./runSyncAvandarTheme.ts");
+}

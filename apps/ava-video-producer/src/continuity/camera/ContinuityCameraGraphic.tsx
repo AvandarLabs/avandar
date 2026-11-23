@@ -1,28 +1,44 @@
 import { useCurrentFrame } from "remotion";
-import { isCameraMoving } from "../../motion-components/cameraTrack";
-import { DiagramCamera } from "../../motion-components/DiagramCamera";
-import { resolveMotionSettings } from "../../motion-components/motionSettings";
-import { useContinuityAppearance } from "../ContinuityAppearanceContext";
+import { CameraTrack } from "../../motion-components/CameraTrack/CameraTrack";
+import { DiagramCamera } from "../../motion-components/DiagramCamera/DiagramCamera";
+import { getObjectFlight } from "../../motion-components/getObjectFlight/getObjectFlight";
+import { MotionSettings } from "../../motion-components/MotionSettings/MotionSettings";
+import { useContinuityAppearance } from "../ContinuityAppearanceContext/useContinuityAppearance";
 import { ContinuityGraphicObjects } from "./ContinuityGraphicObjects";
-import { getObjectFlight } from "./objectFlight";
-import type { ContinuityBeat } from "../continuitySchema";
+import type { ContinuityBeat } from "../continuitySchema/continuitySchema";
+import type { ReactNode } from "react";
 
-type Props = { content: Extract<ContinuityBeat["content"], { kind: "stock" }> };
-
+type Props = {
+  content: Extract<
+    ContinuityBeat["content"],
+    {
+      kind: "stock";
+    }
+  >;
+};
 /** Apply the reusable vector camera to the continuity beat's stock artwork. */
-export function ContinuityCameraGraphic({ content }: Props) {
+export function ContinuityCameraGraphic({ content }: Props): ReactNode {
   const frame = useCurrentFrame();
   const { cameraMotion, motionBlur } = useContinuityAppearance();
+  const theme = MotionSettings.useMotionSettingsTheme();
   const flightActive = Boolean(
-    content.flight && getObjectFlight(content.flight, frame).active,
+    content.flight &&
+    getObjectFlight({ flight: content.flight, frame, theme }).active,
   );
   const useFlightBlur =
     flightActive &&
     content.flight?.motion &&
-    !isCameraMoving(content.camera, frame, content.cameraOptions);
-  const { shutterAngle, samples, blurStrength } = resolveMotionSettings(
-    content.flight?.motion,
-  );
+    !CameraTrack.isMoving({
+      keys: content.camera,
+      frame,
+      options: content.cameraOptions,
+      theme,
+    });
+  const { shutterAngle, samples, blurStrength } =
+    MotionSettings.resolveMotionSettings({
+      options: content.flight?.motion,
+      theme,
+    });
   return (
     <DiagramCamera
       track={content.camera}
@@ -33,9 +49,11 @@ export function ContinuityCameraGraphic({ content }: Props) {
       blurOptions={
         useFlightBlur ? { shutterAngle, samples, blurStrength } : undefined
       }
-      render={(sampleFrame) => (
-        <ContinuityGraphicObjects content={content} frame={sampleFrame} />
-      )}
+      render={(sampleFrame) => {
+        return (
+          <ContinuityGraphicObjects content={content} frame={sampleFrame} />
+        );
+      }}
     />
   );
 }

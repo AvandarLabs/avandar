@@ -18,6 +18,9 @@ export function quotePostgresRelationName(
     tableName: string;
   }>,
 ): unknown {
+  // Both names pass through `quoteSqlIdentifier`, so no raw input reaches
+  // the query text.
+  // react-doctor-disable-next-line react-doctor/raw-sql-injection-risk
   return options.sql.unsafe(
     `${quoteSqlIdentifier(options.schemaName)}.${quoteSqlIdentifier(options.tableName)}`,
   );

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { getStockValueFromPath } from "../../src/stock/copy/getStockValueFromPath";
-import { makeStockDataFromContract } from "../../src/stock/copy/makeStockDataFromContract/makeStockDataFromContract";
+import { makeStockDataFromContract } from "../../src/stock/contracts/makeStockDataFromContract/makeStockDataFromContract";
+import { getStockValueFromPath } from "../../src/stock/data/getStockValueFromPath";
 import type { StockContract } from "../../src/stock/contracts/StockContract.types";
 
 type Options<Input extends object> = {
@@ -23,7 +23,7 @@ export function registerStockDefaultTextAssertions<Input extends object>({
     assert.deepEqual(contract.defaultTextPaths, expectedTextPaths);
     const original = structuredClone(contract.defaultInput);
     const suppliedOriginals = structuredClone(suppliedInputs);
-    const resolved = makeStockDataFromContract({ contract });
+    const resolved = makeStockDataFromContract(contract);
     assert.notEqual(resolved.defaultInput, contract.defaultInput);
     expectedTextPaths.forEach((path) => {
       const text = getStockValueFromPath({ value: original, path });
@@ -35,12 +35,12 @@ export function registerStockDefaultTextAssertions<Input extends object>({
     });
     assert.deepEqual(resolved.defaultInput, original);
     assert.deepEqual(contract.defaultInput, original);
-    suppliedInputs.forEach((input, index) =>
-      assert.deepEqual(
+    suppliedInputs.forEach((input, index) => {
+      return assert.deepEqual(
         contract.inputSchema.parse(input),
         suppliedOriginals[index],
-      ),
-    );
+      );
+    });
     assert.deepEqual(suppliedInputs, suppliedOriginals);
   });
 }

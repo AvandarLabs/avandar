@@ -1,9 +1,11 @@
-import { EASE, mix, ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { Motion } from "../../../motion";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CustodyAcceptance } from "./CustodyAcceptance";
 import { CustodyCaptions } from "./CustodyCaptions";
 import { CustodyObject } from "./CustodyObject";
+import { TRANSFER_CUE, WITHDRAW_CUE } from "./custodyShape";
 import { CustodySupport } from "./CustodySupport";
+import { ResponsibilityMarker } from "./ResponsibilityMarker";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./CustodyTransfer.schema";
 import type { ReactNode } from "react";
@@ -16,13 +18,6 @@ export function CustodyTransfer({
   input,
 }: Readonly<Props>): ReactNode {
   const accepted = input.outcome === "accepted";
-  const transfer = accepted ? ramp(frame, 80, 20, EASE.inOut) : 0;
-  const marker = {
-    cx: mix(transfer, 240, 720),
-    cy: 415,
-    r: 9,
-    fill: STOCK.orange,
-  };
   return (
     <g>
       <CustodySupport
@@ -40,7 +35,7 @@ export function CustodyTransfer({
       />
       <CustodyAcceptance frame={frame} accepted={accepted} accent={accent} />
       {input.showResponsibilityMarker ? (
-        <circle data-responsibility="single" {...marker} />
+        <ResponsibilityMarker frame={frame} accepted={accepted} />
       ) : undefined}
       {input.showLabels ? (
         <CustodyCaptions input={input} frame={frame} />

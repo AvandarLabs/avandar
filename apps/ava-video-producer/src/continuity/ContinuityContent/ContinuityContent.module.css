@@ -1,0 +1,6 @@
+.continuityContentGraphic {
+  inset: var(--video-layout-stage-graphic-inset-top)
+    var(--video-layout-stage-graphic-inset-x)
+    var(--video-layout-stage-graphic-inset-bottom);
+  position: absolute;
+}

@@ -45,9 +45,9 @@ export const inputSchema = z
       !_unique(input.slots) ||
       !input.slots.some(propEq("kind", "work")) ||
       !input.slots.some(propNotEq("kind", "work")) ||
-      input.slots.some(
-        (slot) => slot.kind !== "work" && slot.workLabel !== null,
-      )
+      input.slots.some((slot) => {
+        return slot.kind !== "work" && slot.workLabel !== null;
+      })
     ) {
       context.addIssue({
         code: "custom",

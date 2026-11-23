@@ -14,7 +14,7 @@ import {
 } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { IconWorldSearch } from "@tabler/icons-react";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { useEffect, useState } from "react";
 import { DataCatalogDriveClient } from "@/clients/data-catalog-listings/DataCatalogDriveClient";
 import { DataCatalogListingClient } from "@/clients/data-catalog-listings/DataCatalogListingClient";

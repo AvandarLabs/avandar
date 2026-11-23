@@ -1,4 +1,6 @@
-/** A browsing group in the Helpers section, for example "Curves and durations". */
+/**
+ * A browsing group in the Helpers section, for example "Curves and durations".
+ */
 export type HelperCategory = {
   id: string;
   title: string;
@@ -6,10 +8,7 @@ export type HelperCategory = {
 };
 
 /** An exported name in a listed module that is deliberately not catalogued. */
-export type HelperExclusion = {
-  name: string;
-  reason: string;
-};
+export type HelperExclusion = { name: string; reason: string };
 
 /**
  * A source module whose runtime exports must all be catalogued or excluded.
@@ -19,14 +18,13 @@ export type HelperExclusion = {
 export type HelperModule = {
   path: string;
   exhaustiveMembers: readonly string[];
+  /** Plain modules whose immediate members must be catalogued or excluded. */
+  memberModules: readonly string[];
   excluded: readonly HelperExclusion[];
 };
 
 /** A named default the helper applies when the caller omits an argument. */
-export type HelperDefault = {
-  name: string;
-  value: string;
-};
+export type HelperDefault = { name: string; value: string };
 
 /** The live preview that plays a helper in isolation. */
 export type HelperDemo = {
@@ -44,6 +42,12 @@ export type HelperEntry = {
   description: string;
   /** App-relative source module, for example `src/motion.ts`. */
   source: string;
+  /**
+   * Further app-relative modules that hold some of `exports`, for a helper
+   * whose functions live beside its component rather than in `source`.
+   * Empty when `source` holds every export.
+   */
+  relatedSources: readonly string[];
   /** Exported names, dotted for members such as `EASE.out`. */
   exports: readonly string[];
   signature: string;

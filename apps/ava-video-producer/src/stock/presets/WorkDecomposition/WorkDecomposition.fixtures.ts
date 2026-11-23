@@ -29,11 +29,13 @@ const dense: Input = {
   parentLabel: "W".repeat(28),
   unitLabel: "W".repeat(16),
   groupingLabel: "W".repeat(26),
-  workItems: Array.from({ length: 6 }, (_, index) => ({
-    id: `piece ${index}`,
-    label: "W".repeat(18),
-    effort: index === 0 ? 1 : 5,
-  })),
+  workItems: Array.from({ length: 6 }, (_, index) => {
+    return {
+      id: `piece ${index}`,
+      label: "W".repeat(18),
+      effort: index === 0 ? 1 : 5,
+    };
+  }),
 };
 /** Minimum includes an accepted empty identity and both layouts are covered. */
 export const fixtures: Array<{ id: string; input: Input }> = [
@@ -60,10 +62,12 @@ export const fixtures: Array<{ id: string; input: Input }> = [
     input: {
       ...DEFAULT_INPUT,
       partitionLayout: "strips",
-      workItems: DEFAULT_INPUT.workItems.map((item, index) => ({
-        ...item,
-        effort: 5 - index,
-      })),
+      workItems: DEFAULT_INPUT.workItems.map((item, index) => {
+        return {
+          ...item,
+          effort: 5 - index,
+        };
+      }),
     },
   },
 ];
@@ -84,11 +88,13 @@ export const invalidInputs: unknown[] = [
       DEFAULT_INPUT.workItems[2],
     ],
   },
-  ...[0, 6, 1.5, Infinity].map((effort) => ({
-    ...DEFAULT_INPUT,
-    workItems: DEFAULT_INPUT.workItems.map((item, index) =>
-      index === 0 ? { ...item, effort } : item,
-    ),
-  })),
+  ...[0, 6, 1.5, Infinity].map((effort) => {
+    return {
+      ...DEFAULT_INPUT,
+      workItems: DEFAULT_INPUT.workItems.map((item, index) => {
+        return index === 0 ? { ...item, effort } : item;
+      }),
+    };
+  }),
   { ...DEFAULT_INPUT, partitionLayout: "rows" },
 ];

@@ -37,27 +37,27 @@ const structure = z.strictObject({
 type SchemaInput = z.infer<typeof structure>;
 /** Strict unique records with authored event-bin references. */
 export const inputSchema = structure
-  .refine(
-    (input) =>
+  .refine((input) => {
+    return (
       new Set(input.records.map(prop("id"))).size === input.records.length &&
-      new Set(input.eventBins.map(prop("id"))).size === input.eventBins.length,
-    "Record and bin IDs must be unique.",
-  )
-  .refine(
-    (input) =>
-      input.records.every((record) =>
-        input.eventBins.some(propEq("id", record.eventBinId)),
-      ) &&
-      [0, 1].every((snapshot) =>
-        input.records.some(
+      new Set(input.eventBins.map(prop("id"))).size === input.eventBins.length
+    );
+  }, "Record and bin IDs must be unique.")
+  .refine((input) => {
+    return (
+      input.records.every((record) => {
+        return input.eventBins.some(propEq("id", record.eventBinId));
+      }) &&
+      [0, 1].every((snapshot) => {
+        return input.records.some(
           propEq<{ firstSnapshot: unknown }, "firstSnapshot", unknown>(
             "firstSnapshot",
             snapshot,
           ),
-        ),
-      ),
-    "Records reference existing bins and both snapshots have at least one first appearance.",
-  ) satisfies z.ZodType;
+        );
+      })
+    );
+  }, "Records reference existing bins and both snapshots have at least one first appearance.") satisfies z.ZodType;
 /** Schema-inferred accepted document. */
 export type Input = z.infer<typeof inputSchema>;
 /** Runtime-only semantic constraints. */

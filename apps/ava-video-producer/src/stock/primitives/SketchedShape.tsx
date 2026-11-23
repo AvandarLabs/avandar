@@ -1,9 +1,10 @@
+import { match } from "ts-pattern";
 import {
   getSketchPathsFromShape,
   type SketchShape,
-} from "../../videoTheme/sketchShape/sketchShape";
+} from "../../videoTheme/getSketchPathsFromShape/getSketchPathsFromShape";
 import type { ResolvedSketchProfile } from "../../videoTheme/videoTheme.types";
-import type { SVGProps } from "react";
+import type { ReactNode, SVGProps } from "react";
 
 type PathAttributes = Pick<
   SVGProps<SVGPathElement>,
@@ -13,7 +14,6 @@ type PathAttributes = Pick<
   | "strokeLinecap"
   | "strokeLinejoin"
 >;
-
 type Props = Readonly<
   {
     shape: SketchShape;
@@ -26,10 +26,9 @@ type Props = Readonly<
     opacity?: number;
   } & PathAttributes
 >;
-
-function _plainShape({ shape, profile: _profile, ...attributes }: Props) {
-  switch (shape.kind) {
-    case "rect":
+function _plainShape({ shape: form, profile: _profile, ...attributes }: Props) {
+  return match(form)
+    .with({ kind: "rect" }, (shape) => {
       return (
         <rect
           x={shape.x}
@@ -39,9 +38,11 @@ function _plainShape({ shape, profile: _profile, ...attributes }: Props) {
           {...attributes}
         />
       );
-    case "circle":
+    })
+    .with({ kind: "circle" }, (shape) => {
       return <circle cx={shape.cx} cy={shape.cy} r={shape.r} {...attributes} />;
-    case "ellipse":
+    })
+    .with({ kind: "ellipse" }, (shape) => {
       return (
         <ellipse
           cx={shape.cx}
@@ -51,7 +52,8 @@ function _plainShape({ shape, profile: _profile, ...attributes }: Props) {
           {...attributes}
         />
       );
-    case "line":
+    })
+    .with({ kind: "line" }, (shape) => {
       return (
         <line
           x1={shape.x1}
@@ -61,17 +63,18 @@ function _plainShape({ shape, profile: _profile, ...attributes }: Props) {
           {...attributes}
         />
       );
-    case "path":
+    })
+    .with({ kind: "path" }, (shape) => {
       return <path d={shape.d} {...attributes} />;
-  }
+    })
+    .exhaustive();
 }
-
 /**
  * A circle, ellipse, line, path, or rect drawn smooth, exactly as the plain
  * SVG element, or as seeded hand-drawn paths when the profile is rough. Path
  * attributes such as a draw-on dash apply to every sketched path.
  */
-export function SketchedShape(props: Props) {
+export function SketchedShape(props: Props): ReactNode {
   const {
     shape,
     profile,
@@ -85,10 +88,14 @@ export function SketchedShape(props: Props) {
   } = props;
   const paths =
     stroke && stroke !== "none"
-      ? getSketchPathsFromShape(shape, profile, {
-          stroke,
-          strokeWidth: strokeWidth ?? 1,
-          fill,
+      ? getSketchPathsFromShape({
+          shape,
+          profile,
+          paint: {
+            stroke,
+            strokeWidth: strokeWidth ?? 1,
+            fill,
+          },
         })
       : [];
   if (paths.length === 0) {
@@ -101,9 +108,9 @@ export function SketchedShape(props: Props) {
       opacity={opacity}
       data-rough-shape={profile.roughness}
     >
-      {paths.map((path, index) => (
-        <path key={index} {...path} {...pathAttributes} />
-      ))}
+      {paths.map((path, index) => {
+        return <path key={index} {...path} {...pathAttributes} />;
+      })}
     </g>
   );
 }

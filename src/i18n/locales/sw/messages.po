@@ -9287,9 +9287,8 @@ msgstr "Ongeza"
 msgid "Pick one from the list to see its details."
 msgstr "Chagua moja kwenye orodha ili kuona maelezo yake."
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesFieldsetControls.tsx
 msgid "What is a series?"
 msgstr "Nini maana ya series?"
 
@@ -9662,9 +9661,8 @@ msgstr "Mkoa au eneo, jina au msimbo"
 msgid "Created {0}"
 msgstr "Imeundwa {0}"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesFieldsetControls.tsx
 msgid "Add series"
 msgstr "Ongeza mfululizo"
 

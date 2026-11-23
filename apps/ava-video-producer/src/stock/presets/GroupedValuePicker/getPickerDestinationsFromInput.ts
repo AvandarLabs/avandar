@@ -14,17 +14,20 @@ export function getPickerDestinationsFromInput({
 }> {
   const isMode = input.rule === "most-frequent";
   const observations = input.observations
-    .map((observation, index) => ({ ...observation, index }))
-    .filter(
-      ({ value }) =>
+    .map((observation, index) => {
+      return { ...observation, index };
+    })
+    .filter(({ value }) => {
+      return (
         input.rule !== "first" &&
-        (value !== null || (isMode && input.nullPolicy === "include-in-mode")),
-    );
+        (value !== null || (isMode && input.nullPolicy === "include-in-mode"))
+      );
+    });
   return observations.map(({ value, index }, position) => {
     const group = groups.find(propEq("value", value));
-    const rank = observations
-      .slice(0, position)
-      .filter((candidate) => !isMode || candidate.value === value).length;
+    const rank = observations.slice(0, position).filter((candidate) => {
+      return !isMode || candidate.value === value;
+    }).length;
     return {
       index,
       x: isMode && group ? group.x + 8 : 56 + rank * 144,

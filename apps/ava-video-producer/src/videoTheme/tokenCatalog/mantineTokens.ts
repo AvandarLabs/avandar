@@ -1,4 +1,4 @@
-import { scale, token } from "./defineTokensHelpers";
+import { TokenDefinitions } from "./TokenDefinitions";
 
 const PALETTE_NAMES = [
   "primary",
@@ -9,14 +9,18 @@ const PALETTE_NAMES = [
   "danger",
   "info",
 ] as const;
-
-function _palette(label: string, description: string) {
-  return token({ kind: "colorTuple", label, description });
+function _palette({
+  label,
+  description,
+}: Readonly<{
+  label: string;
+  description: string;
+}>) {
+  return TokenDefinitions.token({ kind: "colorTuple", label, description });
 }
-
 function _headingLevel(role: string) {
   return {
-    fontSize: token({
+    fontSize: TokenDefinitions.token({
       kind: "cssLength",
       unit: "px",
       min: 8,
@@ -25,7 +29,7 @@ function _headingLevel(role: string) {
       label: `${role} size`,
       description: `Font size of the ${role.toLowerCase()} heading level on the stage.`,
     }),
-    fontWeight: token({
+    fontWeight: TokenDefinitions.token({
       kind: "cssNumber",
       min: 100,
       max: 900,
@@ -33,7 +37,7 @@ function _headingLevel(role: string) {
       label: `${role} weight`,
       description: `Weight of the ${role.toLowerCase()} heading level on the stage.`,
     }),
-    lineHeight: token({
+    lineHeight: TokenDefinitions.token({
       kind: "cssNumber",
       min: 0.8,
       max: 2,
@@ -43,7 +47,6 @@ function _headingLevel(role: string) {
     }),
   };
 }
-
 /**
  * Mantine-native theme keys a video theme sets, at the top level of a theme
  * file exactly where Mantine expects them. They are atomic: semantic tokens
@@ -51,50 +54,55 @@ function _headingLevel(role: string) {
  */
 export const MANTINE_TOKENS = {
   colors: {
-    primary: _palette(
-      "Primary palette",
-      "Ten shades of the brand colour, lightest first. The accent reads one of them through the primary shade.",
-    ),
-    neutral: _palette(
-      "Neutral palette",
-      "Ten shades of the cool grey that carries muted text on light grounds.",
-    ),
-    secondary: _palette(
-      "Secondary palette",
-      "Ten shades of the warm companion colour.",
-    ),
-    success: _palette(
-      "Success palette",
-      "Ten shades of green for positive outcomes.",
-    ),
-    warning: _palette("Warning palette", "Ten shades of yellow for caution."),
-    danger: _palette(
-      "Danger palette",
-      "Ten shades of red for errors and losses.",
-    ),
-    info: _palette(
-      "Info palette",
-      "Ten shades of cyan for neutral information.",
-    ),
+    primary: _palette({
+      label: "Primary palette",
+      description:
+        "Ten shades of the brand colour, lightest first. The accent reads one of them through the primary shade.",
+    }),
+    neutral: _palette({
+      label: "Neutral palette",
+      description:
+        "Ten shades of the cool grey that carries muted text on light grounds.",
+    }),
+    secondary: _palette({
+      label: "Secondary palette",
+      description: "Ten shades of the warm companion colour.",
+    }),
+    success: _palette({
+      label: "Success palette",
+      description: "Ten shades of green for positive outcomes.",
+    }),
+    warning: _palette({
+      label: "Warning palette",
+      description: "Ten shades of yellow for caution.",
+    }),
+    danger: _palette({
+      label: "Danger palette",
+      description: "Ten shades of red for errors and losses.",
+    }),
+    info: _palette({
+      label: "Info palette",
+      description: "Ten shades of cyan for neutral information.",
+    }),
   },
-  white: token({
+  white: TokenDefinitions.token({
     kind: "color",
     label: "White",
     description: "The white Mantine mixes into derived colours.",
   }),
-  black: token({
+  black: TokenDefinitions.token({
     kind: "color",
     label: "Black",
     description: "The black Mantine mixes into derived colours.",
   }),
-  primaryColor: token({
+  primaryColor: TokenDefinitions.token({
     kind: "paletteName",
     options: PALETTE_NAMES,
     label: "Primary palette name",
     description:
       "Which palette is primary. The accent comes from this palette.",
   }),
-  primaryShade: token({
+  primaryShade: TokenDefinitions.token({
     kind: "shade",
     min: 0,
     max: 9,
@@ -103,32 +111,32 @@ export const MANTINE_TOKENS = {
     description:
       "The primary palette shade used as the accent: one shade on dark grounds and one on light grounds.",
   }),
-  defaultGradient: token({
+  defaultGradient: TokenDefinitions.token({
     kind: "gradient",
     label: "Ground gradient",
     description:
       "The gradient a ground fill uses when it is not a solid colour.",
   }),
-  fontFamily: token({
+  fontFamily: TokenDefinitions.token({
     kind: "fontStack",
     label: "Body font stack",
     description:
       "Mantine's body font. It must be the stack of a registered font.",
   }),
-  fontFamilyMonospace: token({
+  fontFamilyMonospace: TokenDefinitions.token({
     kind: "fontStack",
     label: "Monospace font stack",
     description:
       "Mantine's monospace font. It must be the stack of a registered font.",
   }),
   headings: {
-    fontFamily: token({
+    fontFamily: TokenDefinitions.token({
       kind: "fontStack",
       label: "Heading font stack",
       description:
         "Mantine's heading font. It must be the stack of a registered font.",
     }),
-    fontWeight: token({
+    fontWeight: TokenDefinitions.token({
       kind: "cssNumber",
       min: 100,
       max: 900,
@@ -138,7 +146,7 @@ export const MANTINE_TOKENS = {
     }),
     sizes: { h1: _headingLevel("Thesis"), h2: _headingLevel("Heading") },
   },
-  fontSizes: scale({
+  fontSizes: TokenDefinitions.scale({
     kind: "cssLength",
     unit: "px",
     min: 8,
@@ -148,7 +156,7 @@ export const MANTINE_TOKENS = {
     description:
       "A step of the type scale, in pixels of the surface that draws the text.",
   }),
-  lineHeights: scale({
+  lineHeights: TokenDefinitions.scale({
     kind: "cssNumber",
     min: 0.8,
     max: 2.4,
@@ -156,7 +164,7 @@ export const MANTINE_TOKENS = {
     label: "Line height",
     description: "A line height step, as a multiple of the font size.",
   }),
-  radius: scale({
+  radius: TokenDefinitions.scale({
     kind: "cssLength",
     unit: "px",
     min: 0,
@@ -166,7 +174,7 @@ export const MANTINE_TOKENS = {
     description:
       "A corner radius step, in pixels. The full step rounds a shape into a pill.",
   }),
-  spacing: scale({
+  spacing: TokenDefinitions.scale({
     kind: "cssLength",
     unit: "px",
     min: 0,
@@ -176,13 +184,13 @@ export const MANTINE_TOKENS = {
     description:
       "A spacing step used by layout insets and gaps, in pixels of the surface.",
   }),
-  autoContrast: token({
+  autoContrast: TokenDefinitions.token({
     kind: "boolean",
     label: "Mantine auto contrast",
     description:
       "Whether Mantine picks readable text on its own filled components.",
   }),
-  luminanceThreshold: token({
+  luminanceThreshold: TokenDefinitions.token({
     kind: "number",
     min: 0,
     max: 1,
@@ -191,7 +199,7 @@ export const MANTINE_TOKENS = {
     description:
       "Grounds whose luminance is below this count as dark, so colour pairs use their on-dark value.",
   }),
-  fontSmoothing: token({
+  fontSmoothing: TokenDefinitions.token({
     kind: "boolean",
     label: "Font smoothing",
     description: "Whether Mantine applies antialiased font smoothing.",

@@ -1,0 +1,9 @@
+[
+  "showcase/*.css",
+  "src/gallery/**/*.css",
+  "!src/gallery/HelperGallery/demos/**",
+  "!src/gallery/HelperGallery/HelperPlayer/**",
+  "src/continuity/gallery/**/*.css",
+  "src/videoThemeEditor/**/*.css",
+  "src/showcase/player.css"
+]

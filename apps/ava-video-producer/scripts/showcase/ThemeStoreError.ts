@@ -5,6 +5,7 @@ export class ThemeStoreError extends Error {
   readonly status: 400 | 403 | 404 | 409 | 413 | 428;
   readonly issues: readonly VideoThemeIssue[];
 
+  /** Creates a theme operation error with its HTTP status and token issues. */
   constructor(
     status: ThemeStoreError["status"],
     message: string,

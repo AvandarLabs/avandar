@@ -5,51 +5,51 @@ import {
   STOCK_CATALOG,
   stockEntry,
   type StockEntry,
-} from "../../src/stock/catalog";
-import { safeInputFile } from "../lib/planHelpers";
+} from "../../src/stock/stockEntry";
+import { safeInputFile } from "../lib/planHelpers/planHelpers";
 import { buildStockContracts } from "../stock/buildStockContracts/buildStockContracts";
 import { loadVideoThemeSnapshot } from "../videoTheme/loadVideoThemeSnapshot/loadVideoThemeSnapshot";
 import type { ResolvedStockRequest } from "../../src/stock/contracts/stockRequestSchema/stockRequestSchema";
-import type { VideoThemeSnapshot } from "../../src/videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
+import type { VideoThemeSnapshot } from "../../src/videoTheme/VideoThemeSnapshots/VideoThemeSnapshots";
 
 const ROOT: string = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "../..",
 );
-
+/** A stock request with its resolved entry, source hash, and theme. */
 export type MotionRequest = {
   entry: StockEntry;
   request: ResolvedStockRequest;
   sourceHash: string;
   theme: VideoThemeSnapshot;
 };
-
 const MOTION_USAGE =
   "Usage: pnpm motion -- list | preview [all|preset-id] [--input file.json] [--theme id] | render [all|preset-id] [--input file.json] [--theme id]";
-
-function _parseFlags(
-  extra: readonly string[],
-): Readonly<Record<string, string>> {
+function _parseFlags(extra: readonly string[]): Record<string, string> {
   const pairs = Array.from(
     { length: Math.ceil(extra.length / 2) },
-    (_, pairIndex): [string, string] => [
-      extra[pairIndex * 2],
-      extra[pairIndex * 2 + 1],
-    ],
+    (_, pairIndex): [string, string] => {
+      return [extra[pairIndex * 2], extra[pairIndex * 2 + 1]];
+    },
   );
-  const isInvalid = pairs.some(
-    ([flag, value], pairIndex) =>
+  const isInvalid = pairs.some(([flag, value], pairIndex) => {
+    return (
       !["--input", "--theme"].includes(flag) ||
       !value ||
-      pairs.findIndex(([otherFlag]) => otherFlag === flag) !== pairIndex,
-  );
+      pairs.findIndex(([otherFlag]) => {
+        return otherFlag === flag;
+      }) !== pairIndex
+    );
+  });
   if (isInvalid) {
     throw new Error(MOTION_USAGE);
   }
   return Object.fromEntries(pairs);
 }
-
-/** Resolve stable CLI selections, the optional complete-input file, and the theme. */
+/**
+ * Resolve stable CLI selections, the optional complete-input file, and the
+ * theme.
+ */
 function _parseMotionArgs(args: readonly string[]): {
   command: string;
   entries: StockEntry[];
@@ -76,15 +76,15 @@ function _parseMotionArgs(args: readonly string[]): {
     themeId: flags["--theme"] ?? "classic",
   };
 }
-
 function _freezeSnapshot<Value>(value: Value): Value {
   if (value && typeof value === "object") {
-    Object.values(value).forEach((child) => _freezeSnapshot(child));
+    Object.values(value).forEach((child) => {
+      return _freezeSnapshot(child);
+    });
     Object.freeze(value);
   }
   return value;
 }
-
 /** Validate complete authored requests before starting any renderer bundle. */
 async function _makeMotionRequestsFromArgs(
   options: Readonly<{
@@ -93,12 +93,17 @@ async function _makeMotionRequestsFromArgs(
   }>,
 ): Promise<MotionRequest[]> {
   const { args, root = ROOT } = options;
-  const contracts = await buildStockContracts(root);
-  const theme = await loadVideoThemeSnapshot({ id: args.themeId });
+  const [contracts, theme] = await Promise.all([
+    buildStockContracts(root),
+    loadVideoThemeSnapshot({ request: { id: args.themeId } }),
+  ]);
   const supplied: unknown = args.inputFile
     ? JSON.parse(
         await fs.readFile(
-          await safeInputFile(path.resolve(root, args.inputFile), [".json"]),
+          await safeInputFile({
+            filename: path.resolve(root, args.inputFile),
+            extensions: [".json"],
+          }),
           "utf8",
         ),
       )
@@ -120,7 +125,10 @@ async function _makeMotionRequestsFromArgs(
 }
 /** Related MotionRequests operations. */
 export const MotionRequests = {
-  /** Resolve stable CLI selections, the optional complete-input file, and the theme. */
+  /**
+   * Resolve stable CLI selections, the optional complete-input file, and the
+   * theme.
+   */
   parseArgs: _parseMotionArgs,
   /**
    * Validate complete authored requests before starting any renderer bundle.

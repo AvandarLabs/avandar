@@ -1,4 +1,4 @@
-import { scale } from "./defineTokensHelpers";
+import { TokenDefinitions } from "./TokenDefinitions";
 
 /**
  * Atomic scales under `other.video.atomic`: the only literal values in a
@@ -6,19 +6,19 @@ import { scale } from "./defineTokensHelpers";
  * them, for example `$atomic.strokeWidth.sm`.
  */
 export const ATOMIC_TOKENS = {
-  swatch: scale({
+  swatch: TokenDefinitions.scale({
     kind: "color",
     label: "Swatch",
     description:
       "A named colour. Semantic colours point at swatches, and a colour picked in the editor becomes a new swatch.",
   }),
-  fontFamily: scale({
+  fontFamily: TokenDefinitions.scale({
     kind: "fontFamily",
     label: "Font face",
     description:
       "A registered font face. Graphic text accepts only faces with measured glyph widths.",
   }),
-  fontWeight: scale({
+  fontWeight: TokenDefinitions.scale({
     kind: "fontWeight",
     min: 100,
     max: 900,
@@ -26,7 +26,7 @@ export const ATOMIC_TOKENS = {
     label: "Font weight",
     description: "A font weight step.",
   }),
-  letterSpacing: scale({
+  letterSpacing: TokenDefinitions.scale({
     kind: "letterSpacing",
     unit: "em",
     min: -0.1,
@@ -35,7 +35,7 @@ export const ATOMIC_TOKENS = {
     label: "Letter spacing",
     description: "Tracking as a fraction of the font size.",
   }),
-  size: scale({
+  size: TokenDefinitions.scale({
     kind: "length",
     unit: "px",
     min: 0,
@@ -45,7 +45,7 @@ export const ATOMIC_TOKENS = {
     description:
       "A dimension of a drawn shape such as a dot, node, or glyph, in pixels of the surface that draws it.",
   }),
-  strokeWidth: scale({
+  strokeWidth: TokenDefinitions.scale({
     kind: "length",
     unit: "px",
     min: 0,
@@ -54,7 +54,7 @@ export const ATOMIC_TOKENS = {
     label: "Stroke width",
     description: "A line thickness step.",
   }),
-  opacity: scale({
+  opacity: TokenDefinitions.scale({
     kind: "opacity",
     unit: "%",
     min: 0,
@@ -63,25 +63,25 @@ export const ATOMIC_TOKENS = {
     label: "Opacity",
     description: "An opacity step, keyed by its percentage.",
   }),
-  shadow: scale({
+  shadow: TokenDefinitions.scale({
     kind: "shadow",
     label: "Shadow",
     description:
       "Shadow geometry as stacked layers. Its colour comes from the elevation that uses it.",
   }),
-  glow: scale({
+  glow: TokenDefinitions.scale({
     kind: "glow",
     label: "Glow",
     description:
       "A soft halo: how far it spreads past its shape, how blurred it is, and how opaque.",
   }),
-  textShadow: scale({
+  textShadow: TokenDefinitions.scale({
     kind: "textShadow",
     label: "Text shadow",
     description:
       "Text shadow geometry. Its colour comes from the text style that uses it.",
   }),
-  blur: scale({
+  blur: TokenDefinitions.scale({
     kind: "length",
     unit: "px",
     min: 0,
@@ -90,7 +90,7 @@ export const ATOMIC_TOKENS = {
     label: "Blur",
     description: "A blur radius step.",
   }),
-  roughness: scale({
+  roughness: TokenDefinitions.scale({
     kind: "number",
     min: 0,
     max: 3,
@@ -99,7 +99,7 @@ export const ATOMIC_TOKENS = {
     description:
       "How far a hand-drawn line wanders from its true path. Zero draws a clean line.",
   }),
-  bowing: scale({
+  bowing: TokenDefinitions.scale({
     kind: "number",
     min: 0,
     max: 10,
@@ -107,7 +107,7 @@ export const ATOMIC_TOKENS = {
     label: "Bowing",
     description: "How much a hand-drawn line bends between its ends.",
   }),
-  seed: scale({
+  seed: TokenDefinitions.scale({
     kind: "number",
     min: 0,
     max: 9999,
@@ -116,7 +116,7 @@ export const ATOMIC_TOKENS = {
     description:
       "Fixes the random wobble of hand-drawn lines so every frame draws the same shape.",
   }),
-  randomness: scale({
+  randomness: TokenDefinitions.scale({
     kind: "length",
     unit: "px",
     min: 0,
@@ -126,13 +126,13 @@ export const ATOMIC_TOKENS = {
     description:
       "The largest random offset the points of a hand-drawn line may take.",
   }),
-  dash: scale({
+  dash: TokenDefinitions.scale({
     kind: "dash",
     label: "Dash pattern",
     description:
       "Alternating dash and gap lengths. An empty pattern draws a solid line.",
   }),
-  curveTension: scale({
+  curveTension: TokenDefinitions.scale({
     kind: "number",
     min: 0,
     max: 1,
@@ -141,7 +141,7 @@ export const ATOMIC_TOKENS = {
     description:
       "Where a curved connector places its control points along the line between its ends.",
   }),
-  duration: scale({
+  duration: TokenDefinitions.scale({
     kind: "duration",
     unit: "frames",
     min: 0,
@@ -150,19 +150,19 @@ export const ATOMIC_TOKENS = {
     label: "Duration",
     description: "An animation length in frames at 30 fps.",
   }),
-  easing: scale({
+  easing: TokenDefinitions.scale({
     kind: "easing",
     label: "Easing curve",
     description:
       "How an animation accelerates: cubic Bezier control points, or a symmetric power curve.",
   }),
-  spring: scale({
+  spring: TokenDefinitions.scale({
     kind: "spring",
     label: "Spring",
     description:
       "Physical spring settings for a landing that should feel weighty.",
   }),
-  stagger: scale({
+  stagger: TokenDefinitions.scale({
     kind: "number",
     unit: "frames",
     min: 0,
@@ -171,7 +171,7 @@ export const ATOMIC_TOKENS = {
     label: "Stagger",
     description: "Frames between siblings that start one after another.",
   }),
-  period: scale({
+  period: TokenDefinitions.scale({
     kind: "duration",
     unit: "frames",
     min: 1,
@@ -180,7 +180,7 @@ export const ATOMIC_TOKENS = {
     label: "Period",
     description: "Frames for one cycle of a repeating motion.",
   }),
-  distance: scale({
+  distance: TokenDefinitions.scale({
     kind: "length",
     unit: "px",
     min: 0,
@@ -190,7 +190,7 @@ export const ATOMIC_TOKENS = {
     description:
       "How far an element travels during an entrance, an exit, or a drift.",
   }),
-  typingRate: scale({
+  typingRate: TokenDefinitions.scale({
     kind: "number",
     unit: "cps",
     min: 1,
@@ -199,7 +199,7 @@ export const ATOMIC_TOKENS = {
     label: "Typing rate",
     description: "Characters typed per second.",
   }),
-  tempo: scale({
+  tempo: TokenDefinitions.scale({
     kind: "number",
     unit: "×",
     min: 0.8,
@@ -209,7 +209,7 @@ export const ATOMIC_TOKENS = {
     description:
       "A tempo step. Tempo divides animation durations inside a beat.",
   }),
-  cameraSpeed: scale({
+  cameraSpeed: TokenDefinitions.scale({
     kind: "number",
     unit: "×",
     min: 0.1,
@@ -219,7 +219,7 @@ export const ATOMIC_TOKENS = {
     description:
       "How fast a camera preset travels relative to its authored timing.",
   }),
-  shutter: scale({
+  shutter: TokenDefinitions.scale({
     kind: "number",
     unit: "deg",
     min: 0,
@@ -228,7 +228,7 @@ export const ATOMIC_TOKENS = {
     label: "Shutter angle",
     description: "A motion blur shutter angle. 180 degrees matches film.",
   }),
-  samples: scale({
+  samples: TokenDefinitions.scale({
     kind: "number",
     min: 2,
     max: 16,
@@ -236,7 +236,7 @@ export const ATOMIC_TOKENS = {
     label: "Blur samples",
     description: "A count of sub-frames blended for camera motion blur.",
   }),
-  zoom: scale({
+  zoom: TokenDefinitions.scale({
     kind: "number",
     unit: "×",
     min: 1,
@@ -245,7 +245,35 @@ export const ATOMIC_TOKENS = {
     label: "Zoom",
     description: "A camera zoom limit.",
   }),
-  velocityBlur: scale({
+  multiplier: TokenDefinitions.scale({
+    kind: "number",
+    unit: "×",
+    min: 0,
+    max: 3,
+    step: 0.05,
+    label: "Multiplier",
+    description:
+      "A factor a global option scales by, such as line weight or corner style. 1 leaves values as authored.",
+  }),
+  pressDepth: TokenDefinitions.scale({
+    kind: "number",
+    min: 0,
+    max: 0.2,
+    step: 0.005,
+    label: "Press depth",
+    description:
+      "How far a pressed element shrinks, as a fraction of its size.",
+  }),
+  entranceScale: TokenDefinitions.scale({
+    kind: "number",
+    min: 0.5,
+    max: 1,
+    step: 0.01,
+    label: "Entrance scale start",
+    description:
+      "The size an element scaling in starts from, as a fraction of its full size.",
+  }),
+  velocityBlur: TokenDefinitions.scale({
     kind: "number",
     min: 0,
     max: 5,

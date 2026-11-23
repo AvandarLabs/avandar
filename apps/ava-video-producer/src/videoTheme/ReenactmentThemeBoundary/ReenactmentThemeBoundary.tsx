@@ -9,7 +9,7 @@ type Props = Readonly<{ children: ReactNode }>;
  * without this boundary a reenactment would inherit the video theme's type
  * sizes, spacing, and component defaults. Wrap every reenactment root in it.
  */
-export function ReenactmentThemeBoundary({ children }: Props) {
+export function ReenactmentThemeBoundary({ children }: Props): ReactNode {
   return (
     <MantineThemeProvider inherit={false}>{children}</MantineThemeProvider>
   );

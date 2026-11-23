@@ -16,11 +16,70 @@ import {
 } from "./ChoroplethClassBreaks.fixtures";
 import { inputSchema, type Input } from "./ChoroplethClassBreaks.schema";
 
+function _assertMissingClassLegends({
+  legends,
+  input,
+}: Readonly<{ legends: readonly string[]; input: Input }>): void {
+  legends.forEach((legend, index) => {
+    const missing = _marks({ markup: legend, name: "missing-class-key" });
+    assert.equal(missing.length, 1);
+    assert.equal(_attribute({ markup: missing[0], name: "fill" }), "#728794");
+    assert.equal(_number({ markup: missing[0], name: "fill-opacity" }), 0.15);
+    assert.equal(_attribute({ markup: missing[0], name: "stroke" }), "#728794");
+    assert.equal(
+      _attribute({ markup: missing[0], name: "stroke-dasharray" }),
+      "4 5",
+    );
+    assert.ok(legend.includes(`aria-label="${input.noDataLabel}"`));
+    assert.ok(legend.includes(`aria-label="${input.unitLabel}"`));
+    const breaks = input.schemes[index].breaks;
+    assert.ok(legend.includes(`aria-label="[${breaks[0]}, ${breaks[1]})"`));
+    assert.ok(legend.includes(`aria-label="[${breaks[1]}, ${breaks[2]}]"`));
+  });
+}
+
+function _assertMovingClassBreaksReclassifyOnlyDataValue(): void {
+  [51, 60, 70, 80, 90, 110, 150].forEach((frame) => {
+    const markup = render({ frame: frame });
+    const threshold = _number({
+      markup: _marks({ markup, name: "threshold" })[0],
+      name: "data-value",
+    });
+    assert.ok(threshold >= 3 && threshold <= 5);
+    _marks({ markup, name: "zone" }).forEach((mark, i) => {
+      const value = DEFAULT_INPUT.zones[i].value;
+      assert.equal(
+        _attribute({ markup: mark, name: "data-value" }),
+        value === null ? "null" : String(value),
+      );
+      assert.equal(
+        _attribute({ markup: mark, name: "data-class" }),
+        value === null ? "missing" : value < threshold ? "low" : "high",
+      );
+    });
+  });
+}
+
+const UNCHANGED_AND_EXTREME_FINITE_SCHEMES_RETAIN_EXACT_CASES = [
+  {
+    ...DEFAULT_INPUT,
+    schemes: [{ label: "x", breaks: [0, 5] }, DEFAULT_INPUT.schemes[1]],
+  },
+  {
+    ...DEFAULT_INPUT,
+    zones: [
+      DEFAULT_INPUT.zones[0],
+      DEFAULT_INPUT.zones[0],
+      DEFAULT_INPUT.zones[1],
+    ],
+  },
+];
+
 const render = ({
   frame,
   input = DEFAULT_INPUT,
-}: Readonly<{ frame: number; input?: Input }>): string =>
-  renderToStaticMarkup(
+}: Readonly<{ frame: number; input?: Input }>): string => {
+  return renderToStaticMarkup(
     createElement(
       "svg",
       {},
@@ -32,10 +91,13 @@ const render = ({
       }),
     ),
   );
+};
 function _marks({ markup, name }: { markup: string; name: string }): string[] {
   return [
     ...markup.matchAll(new RegExp(`<[^>]*data-${name}="[^"]*"[^>]*>`, "g")),
-  ].map((match) => match[0]);
+  ].map((match) => {
+    return match[0];
+  });
 }
 function _attribute({
   markup,
@@ -56,32 +118,18 @@ test("moving class breaks reclassify only values crossing the current threshold"
     final = _marks({ markup: render({ frame: 150 }), name: "zone" });
   assert.equal(initial.length, 4);
   assert.deepEqual(
-    initial.map((mark) => _attribute({ markup: mark, name: "data-class" })),
+    initial.map((mark) => {
+      return _attribute({ markup: mark, name: "data-class" });
+    }),
     ["low", "low", "high", "missing"],
   );
   assert.deepEqual(
-    final.map((mark) => _attribute({ markup: mark, name: "data-class" })),
+    final.map((mark) => {
+      return _attribute({ markup: mark, name: "data-class" });
+    }),
     ["low", "high", "high", "missing"],
   );
-  [51, 60, 70, 80, 90, 110, 150].forEach((frame) => {
-    const markup = render({ frame: frame });
-    const threshold = _number({
-      markup: _marks({ markup, name: "threshold" })[0],
-      name: "data-value",
-    });
-    assert.ok(threshold >= 3 && threshold <= 5);
-    _marks({ markup, name: "zone" }).forEach((mark, i) => {
-      const value = DEFAULT_INPUT.zones[i].value;
-      assert.equal(
-        _attribute({ markup: mark, name: "data-value" }),
-        value === null ? "null" : String(value),
-      );
-      assert.equal(
-        _attribute({ markup: mark, name: "data-class" }),
-        value === null ? "missing" : value < threshold ? "low" : "high",
-      );
-    });
-  });
+  _assertMovingClassBreaksReclassifyOnlyDataValue();
   assert.notEqual(
     _number({
       markup: _marks({ markup: render({ frame: 75 }), name: "threshold" })[0],
@@ -104,45 +152,51 @@ test("lower, interior and inclusive final breaks classify without altering value
   };
   assert.deepEqual(
     _marks({ markup: render({ frame: 50, input: input }), name: "zone" }).map(
-      (mark) => _attribute({ markup: mark, name: "data-class" }),
+      (mark) => {
+        return _attribute({ markup: mark, name: "data-class" });
+      },
     ),
     ["low", "high", "high"],
   );
   const missing = {
     ...DEFAULT_INPUT,
-    zones: DEFAULT_INPUT.zones.map((zone: Input["zones"][number]) => ({
-      ...zone,
-      value: null,
-    })),
+    zones: DEFAULT_INPUT.zones.map((zone: Input["zones"][number]) => {
+      return {
+        ...zone,
+        value: null,
+      };
+    }),
   };
   assert.ok(
     _marks({
       markup: render({ frame: 80, input: missing }),
       name: "zone",
-    }).every(
-      (mark) => _attribute({ markup: mark, name: "data-class" }) === "missing",
-    ),
+    }).every((mark) => {
+      return _attribute({ markup: mark, name: "data-class" }) === "missing";
+    }),
   );
 });
 test("fixtures retain exact input while schemas reject invalid documents", () => {
-  fixtures.forEach(({ input }) =>
-    assert.deepEqual(inputSchema.parse(input), input),
-  );
-  invalidInputs.forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  );
+  fixtures.forEach(({ input }) => {
+    return assert.deepEqual(inputSchema.parse(input), input);
+  });
+  invalidInputs.forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
 });
 
 const getVisibleTexts = ({
   input,
   frame,
-}: Readonly<{ input: Input; frame: number }>): string[] => [
-  ...Object.values(input.copy),
-  ...input.zones.map(prop("label")),
-  ...input.schemes.map(prop("label")),
-  input.unitLabel,
-  input.noDataLabel,
-];
+}: Readonly<{ input: Input; frame: number }>): string[] => {
+  return [
+    ...Object.values(input.copy),
+    ...input.zones.map(prop("label")),
+    ...input.schemes.map(prop("label")),
+    input.unitLabel,
+    input.noDataLabel,
+  ];
+};
 registerStockPresetAssertions({
   inputSchema,
   defaultInput: DEFAULT_INPUT,
@@ -187,36 +241,32 @@ test("unchanged and extreme finite schemes retain exact missing and value states
     ],
   };
   assert.deepEqual(inputSchema.parse(input), input);
-  [24, 75, 110, 150].forEach((frame) =>
-    assert.doesNotMatch(render({ frame: frame, input: input }), /NaN|Infinity/),
-  );
+  [24, 75, 110, 150].forEach((frame) => {
+    return assert.doesNotMatch(
+      render({ frame: frame, input: input }),
+      /NaN|Infinity/,
+    );
+  });
   const unchanged = fixtures[3].input;
   assert.deepEqual(
     _marks({
       markup: render({ frame: 50, input: unchanged }),
       name: "zone",
-    }).map((mark) => _attribute({ markup: mark, name: "data-class" })),
+    }).map((mark) => {
+      return _attribute({ markup: mark, name: "data-class" });
+    }),
     _marks({
       markup: render({ frame: 150, input: unchanged }),
       name: "zone",
-    }).map((mark) => _attribute({ markup: mark, name: "data-class" })),
+    }).map((mark) => {
+      return _attribute({ markup: mark, name: "data-class" });
+    }),
   );
-  [
-    {
-      ...DEFAULT_INPUT,
-      schemes: [{ label: "x", breaks: [0, 5] }, DEFAULT_INPUT.schemes[1]],
-    },
-    {
-      ...DEFAULT_INPUT,
-      zones: [
-        DEFAULT_INPUT.zones[0],
-        DEFAULT_INPUT.zones[0],
-        DEFAULT_INPUT.zones[1],
-      ],
-    },
-  ].forEach((value) =>
-    assert.equal(inputSchema.safeParse(value).success, false),
-  );
+  structuredClone(
+    UNCHANGED_AND_EXTREME_FINITE_SCHEMES_RETAIN_EXACT_CASES,
+  ).forEach((value) => {
+    return assert.equal(inputSchema.safeParse(value).success, false);
+  });
 });
 test("each scheme legend owns its missing key, supplied label and unit", () => {
   [
@@ -224,10 +274,12 @@ test("each scheme legend owns its missing key, supplied label and unit", () => {
     fixtures[2].input,
     {
       ...DEFAULT_INPUT,
-      zones: DEFAULT_INPUT.zones.map((zone) => ({ ...zone, value: null })),
+      zones: DEFAULT_INPUT.zones.map((zone) => {
+        return { ...zone, value: null };
+      }),
     },
-  ].forEach((input) =>
-    [50, 80, 150].forEach((frame) => {
+  ].forEach((input) => {
+    return [50, 80, 150].forEach((frame) => {
       const markup = render({ frame: frame, input: input }),
         legends = markup.split(/<g data-class-legend-index="\d+">/).slice(1);
       assert.equal(
@@ -235,42 +287,19 @@ test("each scheme legend owns its missing key, supplied label and unit", () => {
         input.zones.filter(propEq("value", null)).length + 2,
       );
       assert.equal(legends.length, 2);
-      legends.forEach((legend, index) => {
-        const missing = _marks({ markup: legend, name: "missing-class-key" });
-        assert.equal(missing.length, 1);
-        assert.equal(
-          _attribute({ markup: missing[0], name: "fill" }),
-          "#728794",
-        );
-        assert.equal(
-          _number({ markup: missing[0], name: "fill-opacity" }),
-          0.15,
-        );
-        assert.equal(
-          _attribute({ markup: missing[0], name: "stroke" }),
-          "#728794",
-        );
-        assert.equal(
-          _attribute({ markup: missing[0], name: "stroke-dasharray" }),
-          "4 5",
-        );
-        assert.ok(legend.includes(`aria-label="${input.noDataLabel}"`));
-        assert.ok(legend.includes(`aria-label="${input.unitLabel}"`));
-        const breaks = input.schemes[index].breaks;
-        assert.ok(legend.includes(`aria-label="[${breaks[0]}, ${breaks[1]})"`));
-        assert.ok(legend.includes(`aria-label="[${breaks[1]}, ${breaks[2]}]"`));
-      });
-    }),
-  );
+      _assertMissingClassLegends({ legends, input });
+    });
+  });
 });
 test("fixed value ticks share the shortened ruler domain clear of both legends", () => {
   [50, 80, 150].forEach((frame) => {
     const markup = render({ frame: frame });
     _marks({ markup, name: "value-tick" }).forEach((mark) => {
-      const zone = DEFAULT_INPUT.zones.find(
-        (item) =>
-          item.id === _attribute({ markup: mark, name: "data-value-tick" }),
-      )!;
+      const zone = DEFAULT_INPUT.zones.find((item) => {
+        return (
+          item.id === _attribute({ markup: mark, name: "data-value-tick" })
+        );
+      })!;
       assert.equal(
         _number({ markup: mark, name: "cx" }),
         64 + 424 * (zone.value! / 10),

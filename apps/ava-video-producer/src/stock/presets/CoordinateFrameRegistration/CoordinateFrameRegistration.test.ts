@@ -19,6 +19,42 @@ import {
 } from "./CoordinateFrameRegistration.fixtures";
 import { inputSchema, type Input } from "./CoordinateFrameRegistration.schema";
 
+function _assertHiddenCoordinatePairs(): void {
+  assert.equal(
+    getSvgAttributeMatchesFromMarkup({
+      markup: _render({ frame: 150, input: CHANGED_INPUT }),
+      attribute: "data-coordinate-pair",
+    }).tags.length,
+    0,
+  );
+}
+
+function _assertAuthoredLandmarkTargets(
+  markup: ReturnType<typeof _render>,
+): void {
+  assert.deepEqual(
+    getSvgAttributeMatchesFromMarkup({
+      markup: markup,
+      attribute: "data-landmark",
+    }).tags.map((tag) => {
+      return [
+        SvgAttributes.getNumberFromMarkup({
+          attributes: tag,
+          name: "data-target-x",
+        }),
+        SvgAttributes.getNumberFromMarkup({
+          attributes: tag,
+          name: "data-target-y",
+        }),
+      ];
+    }),
+    [
+      [0, 0],
+      [100, 100],
+    ],
+  );
+}
+
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -127,25 +163,7 @@ test("every landmark uses both affine coefficients with unchanged identity and e
     }).values,
     ["", "界".repeat(12)],
   );
-  assert.deepEqual(
-    getSvgAttributeMatchesFromMarkup({
-      markup: markup,
-      attribute: "data-landmark",
-    }).tags.map((tag) => [
-      SvgAttributes.getNumberFromMarkup({
-        attributes: tag,
-        name: "data-target-x",
-      }),
-      SvgAttributes.getNumberFromMarkup({
-        attributes: tag,
-        name: "data-target-y",
-      }),
-    ]),
-    [
-      [0, 0],
-      [100, 100],
-    ],
-  );
+  _assertAuthoredLandmarkTargets(markup);
   assert.equal(
     inputSchema.safeParse({
       ...input,
@@ -188,16 +206,10 @@ test("source representations travel continuously to stationary matched targets w
     attribute: "data-stationary-target",
   }).tags;
   assert.deepEqual(targetStart, targetHold);
-  assert.equal(
-    getSvgAttributeMatchesFromMarkup({
-      markup: _render({ frame: 150, input: CHANGED_INPUT }),
-      attribute: "data-coordinate-pair",
-    }).tags.length,
-    0,
-  );
-  Object.values(DEFAULT_INPUT.frames).forEach((text) =>
-    assert.ok(_render({ frame: 80 }).includes(`aria-label="${text}"`)),
-  );
+  _assertHiddenCoordinatePairs();
+  Object.values(DEFAULT_INPUT.frames).forEach((text) => {
+    return assert.ok(_render({ frame: 80 }).includes(`aria-label="${text}"`));
+  });
   assert.ok(
     _render({ frame: 80 }).indexOf("data-grid-ground") <
       _render({ frame: 80 }).indexOf("data-landmark"),
@@ -206,15 +218,19 @@ test("source representations travel continuously to stationary matched targets w
 test("full precision coordinate pairs coexist with all maximum labels and units", () => {
   const input = inputSchema.parse({
     ...fixtures[2].input,
-    landmarks: fixtures[2].input.landmarks.map((point, index) => ({
-      ...point,
-      id: `${"界".repeat(11)}${index}`,
-      x: 0.0000010000000000000002,
-      y: 0.0000010000000000000002,
-    })),
+    landmarks: fixtures[2].input.landmarks.map((point, index) => {
+      return {
+        ...point,
+        id: `${"界".repeat(11)}${index}`,
+        x: 0.0000010000000000000002,
+        y: 0.0000010000000000000002,
+      };
+    }),
     transform: { scaleX: 1, scaleY: 1, offsetX: 0, offsetY: 0 },
   });
-  assert.doesNotThrow(() => _render({ frame: 150, input: input }));
+  assert.doesNotThrow(() => {
+    return _render({ frame: 150, input: input });
+  });
 });
 
 test("complete authored captions remain clear of other captions and opaque foreground rectangles", () => {
@@ -224,15 +240,16 @@ test("complete authored captions remain clear of other captions and opaque foreg
         _render({ frame: frame, input: input }),
       );
       SvgPaintAssertions.assertPaintClearance({
-        texts: paint.filter(
-          (item) => item.kind === "text" && item.ariaLabel !== undefined,
-        ),
-        rectangles: paint.filter(
-          (item) =>
+        texts: paint.filter((item) => {
+          return item.kind === "text" && item.ariaLabel !== undefined;
+        }),
+        rectangles: paint.filter((item) => {
+          return (
             item.kind === "rect" &&
             item.fill !== "none" &&
-            item.opacity * item.fillOpacity > 0.9,
-        ),
+            item.opacity * item.fillOpacity > 0.9
+          );
+        }),
       });
     });
   });

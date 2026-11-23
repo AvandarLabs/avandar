@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { clsx } from "clsx";
 import css from "@/components/caseStatuses/StatusDot/StatusDot.module.css";
 import type { ReactNode } from "react";
 

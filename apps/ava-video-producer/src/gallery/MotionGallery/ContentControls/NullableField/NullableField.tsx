@@ -20,13 +20,13 @@ export function NullableField({
         type="checkbox"
         checked={context.value === null}
         aria-describedby={context.field["aria-describedby"]}
-        onChange={(event) =>
-          context.update(
+        onChange={(event) => {
+          return context.update(
             event.target.checked
               ? null
               : ContentFields.getBlankValueFromControl(control),
-          )
-        }
+          );
+        }}
       />
       Empty value for {context.label}
     </label>

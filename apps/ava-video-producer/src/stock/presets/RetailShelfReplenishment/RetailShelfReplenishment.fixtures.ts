@@ -144,23 +144,29 @@ export const invalidInputs: unknown[] = [
   },
   {
     ...DENSE_INPUT,
-    goods: DENSE_INPUT.goods.map((good, index) => ({
-      ...good,
-      openingUnits: index === 0 ? 4 : 3,
-      incomingUnits: 1,
-    })),
+    goods: DENSE_INPUT.goods.map((good, index) => {
+      return {
+        ...good,
+        openingUnits: index === 0 ? 4 : 3,
+        incomingUnits: 1,
+      };
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    goods: DEFAULT_INPUT.goods.map((good, index) => ({
-      ...good,
-      openingUnits: 0,
-      incomingUnits: index === 0 ? 3 : 4,
-    })),
+    goods: DEFAULT_INPUT.goods.map((good, index) => {
+      return {
+        ...good,
+        openingUnits: 0,
+        incomingUnits: index === 0 ? 3 : 4,
+      };
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    goods: DEFAULT_INPUT.goods.map((good) => ({ ...good, selectedUnits: 2 })),
+    goods: DEFAULT_INPUT.goods.map((good) => {
+      return { ...good, selectedUnits: 2 };
+    }),
   },
   {
     ...DEFAULT_INPUT,
@@ -174,12 +180,14 @@ export const invalidInputs: unknown[] = [
 /** Concentrated incoming and selected quantities with twelve physical units. */
 export const concentratedInput: Input = {
   ...DENSE_INPUT,
-  goods: DENSE_INPUT.goods.map((good, index) => ({
-    ...good,
-    openingUnits: [1, 3, 2][index],
-    incomingUnits: [4, 2, 0][index],
-    selectedUnits: index === 0 ? 3 : 0,
-  })),
+  goods: DENSE_INPUT.goods.map((good, index) => {
+    return {
+      ...good,
+      openingUnits: [1, 3, 2][index],
+      incomingUnits: [4, 2, 0][index],
+      selectedUnits: index === 0 ? 3 : 0,
+    };
+  }),
 };
 
 /** Stable complete accepted examples. */

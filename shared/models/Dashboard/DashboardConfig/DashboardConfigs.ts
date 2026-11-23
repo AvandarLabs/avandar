@@ -5,7 +5,7 @@ export function createInitialDashboardPuckData(options: {
   dashboardTitle: string;
   // TODO(jpsyx): remove `any` usage here. It should return AvaPageData
   // somehow but still remain in `shared` directory.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // oxlint-disable-next-line typescript/no-explicit-any
 }): any {
   return {
     root: {
@@ -31,7 +31,7 @@ export function createInitialDashboardPuckData(options: {
 export const DashboardConfigs = {
   // TODO(jpsyx): remove `any` usage here. It should return AvaPageData
   // somehow but still remain in `shared` directory.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // oxlint-disable-next-line typescript/no-explicit-any
   makeEmpty: (): any => {
     return createInitialDashboardPuckData({
       dashboardTitle: "Untitled dashboard",

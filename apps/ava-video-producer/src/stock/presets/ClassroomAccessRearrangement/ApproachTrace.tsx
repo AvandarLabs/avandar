@@ -1,3 +1,5 @@
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./ClassroomAccessRearrangement.schema";
 import type { ReactNode } from "react";
 
@@ -8,15 +10,19 @@ export function ApproachTrace({
   progress,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return input.showApproachTrace ? (
-    <path
+    <SketchedShape
+      shape={{ kind: "path", d: "M160 250 V490 H605" }}
+      profile={tokens.sketch.shape}
       data-approach-trace="true"
-      d="M160 250 V490 H605"
       fill="none"
       stroke={accent}
-      strokeWidth={2}
-      strokeDasharray="5 7"
-      opacity={progress * 0.5}
+      strokeWidth={scales.stroke(tokens.stroke.default)}
+      strokeDasharray={atomic.dash.boundary.join(" ")}
+      opacity={progress * tokens.alpha.guide}
     />
   ) : undefined;
 }

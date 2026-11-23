@@ -1,8 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import {
-  useGraphicProps,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CacheCell } from "./CacheCell";
 import type { Input } from "./QueryColumnCacheGrowth.schema";
 import type { ReactNode } from "react";
@@ -24,28 +22,38 @@ export function CacheColumn({
   growth,
   accent,
 }: Readonly<Props>): ReactNode {
-  const style = useGraphicProps("QueryColumnCacheGrowth", {});
-  const { color } = useGraphicTokens();
+  const style = GraphicThemeHooks.useGraphicProps({
+    name: "QueryColumnCacheGrowth",
+    props: {},
+  });
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const { color, sketch } = GraphicThemeHooks.useGraphicTokens();
   return (
     <g data-cache-column={column.id} opacity={isAdded ? growth : 1}>
-      <path
-        d={`M${60 + index * 168} 260 V${334 + rowCount * 44}`}
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${60 + index * 168} 260 V${334 + rowCount * 44}`,
+        }}
+        profile={sketch.shape}
         stroke={isAdded ? accent : color.line}
-        strokeWidth={style.gridStrokeWidth}
+        strokeWidth={scales.stroke(style.gridStrokeWidth)}
       />
       <LabelSlots
         labels={[[column.label, 70 + index * 168, 280, 148, 14, 4]]}
       />
-      {column.cells.map((value, rowIndex) => (
-        <CacheCell
-          key={rowIndex}
-          value={value}
-          columnId={column.id}
-          rowIndex={rowIndex}
-          x={70 + index * 168}
-          y={351 + rowIndex * 44}
-        />
-      ))}
+      {column.cells.map((value, rowIndex) => {
+        return (
+          <CacheCell
+            key={rowIndex}
+            value={value}
+            columnId={column.id}
+            rowIndex={rowIndex}
+            x={70 + index * 168}
+            y={351 + rowIndex * 44}
+          />
+        );
+      })}
     </g>
   );
 }

@@ -34,8 +34,7 @@ dist-ssr
 !.env.video-producer.example
 *client_secret*
 
-# Ignorable development files 
-.eslintcache
+# Ignorable development files
 __pycache__/
 
 # Supabase

@@ -9171,9 +9171,8 @@ msgstr "Add"
 msgid "Pick one from the list to see its details."
 msgstr "Pick one from the list to see its details."
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesFieldsetControls.tsx
 msgid "What is a series?"
 msgstr "What is a series?"
 
@@ -9542,9 +9541,8 @@ msgstr "Province or region, name or code"
 msgid "Created {0}"
 msgstr "Created {0}"
 
-#: src/components/VisualizationContainer/VizSettingsForm/BubbleSeriesFieldset/BubbleSeriesFieldset.tsx
-#: src/components/VisualizationContainer/VizSettingsForm/PairSeriesFieldset/PairSeriesFieldset.tsx
 #: src/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.tsx
+#: src/components/VisualizationContainer/VizSettingsForm/SeriesFieldsetControls.tsx
 msgid "Add series"
 msgstr "Add series"
 

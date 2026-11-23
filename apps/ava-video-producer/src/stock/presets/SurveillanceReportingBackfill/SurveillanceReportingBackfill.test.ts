@@ -18,21 +18,34 @@ import {
   inputSchema,
   type Input,
 } from "./SurveillanceReportingBackfill.schema";
-
+/**
+ * Rendered markup with each marked sketch-aware shape read as one element.
+ * `SketchedShape` draws its plain shape inside a group that carries the
+ * shape's markers (`data-*`, `aria-label`, `transform`), so the group's
+ * attributes move onto the shape these assertions read.
+ */
+function _joinMarkedShapes(markup: string): string {
+  return markup.replace(
+    /<g((?:\s+(?:data-[\w-]+|aria-label|transform)="[^"]*")+)><(path|line|circle|rect|ellipse)\b([^>]*)><\/\2><\/g>/g,
+    "<$2$1$3></$2>",
+  );
+}
 function _render({
   frame,
   input = DEFAULT_INPUT,
 }: Readonly<{ frame: number; input?: Input }>): string {
-  return renderToStaticMarkup(
-    createElement(
-      "svg",
-      {},
-      createElement(SurveillanceReportingBackfill, {
-        frame,
-        input,
-        accent: "#46dbc9",
-        id: "packet18",
-      }),
+  return _joinMarkedShapes(
+    renderToStaticMarkup(
+      createElement(
+        "svg",
+        {},
+        createElement(SurveillanceReportingBackfill, {
+          frame,
+          input,
+          accent: "#46dbc9",
+          id: "packet18",
+        }),
+      ),
     ),
   );
 }
@@ -43,7 +56,6 @@ test("default reporting cutoffs retain totals of two and five", () => {
     ),
   );
 });
-
 function _getVisibleTexts({
   input,
   frame,
@@ -91,21 +103,21 @@ test("each receipt reaches its earlier event bin and bars retain first-snapshot 
   const start = _render({ frame: 0 }),
     hold = _render({ frame: 150 });
   assert.deepEqual(
-    [...start.matchAll(/<rect data-bin-bar[^>]+>/g)].map((match) =>
-      SvgAttributes.getNumberFromMarkup({
+    [...start.matchAll(/<rect data-bin-bar[^>]+>/g)].map((match) => {
+      return SvgAttributes.getNumberFromMarkup({
         attributes: match[0],
         name: "height",
-      }),
-    ),
+      });
+    }),
     [18, 18, 0],
   );
   assert.deepEqual(
-    [...hold.matchAll(/<rect data-bin-bar[^>]+>/g)].map((match) =>
-      SvgAttributes.getNumberFromMarkup({
+    [...hold.matchAll(/<rect data-bin-bar[^>]+>/g)].map((match) => {
+      return SvgAttributes.getNumberFromMarkup({
         attributes: match[0],
         name: "height",
-      }),
-    ),
+      });
+    }),
     [36, 36, 18],
   );
   assert.equal((hold.match(/data-record-token=/g) ?? []).length, 5);
@@ -127,7 +139,9 @@ test("array order and hidden prior outlines preserve totals and empty-bin backfi
   const hold = _render({ frame: 150, input: changedInput });
   assert.deepEqual(
     [...hold.matchAll(/data-prior="([^"]+)" data-revised="([^"]+)"/g)].map(
-      (match) => match.slice(1),
+      (match) => {
+        return match.slice(1);
+      },
     ),
     [
       ["1", "2"],
@@ -139,20 +153,18 @@ test("array order and hidden prior outlines preserve totals and empty-bin backfi
   assert.match(hold, /data-earlier-total="2" data-revised-total="5"/);
   const input = inputSchema.parse({
     ...fixtures[2].input,
-    records: fixtures[2].input.records.map((record) => ({
-      ...record,
-      eventBinId: "0",
-    })),
+    records: fixtures[2].input.records.map((record) => {
+      return { ...record, eventBinId: "0" };
+    }),
   });
   assert.equal(
-    (_render({ frame: 150, input: input }).match(/data-record-token=/g) ?? [])
-      .length,
+    (_render({ frame: 150, input }).match(/data-record-token=/g) ?? []).length,
     12,
   );
   assert.equal(
     SvgAttributes.getNumberFromMarkup({
       attributes: SvgAttributes.fromMarker({
-        markup: _render({ frame: 150, input: input }),
+        markup: _render({ frame: 150, input }),
         marker: "bin-bar",
       }),
       name: "height",

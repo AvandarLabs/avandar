@@ -1,0 +1,3 @@
+.motionResultGridMotionGrid {
+  composes: motion-grid from global;
+}

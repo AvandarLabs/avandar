@@ -46,7 +46,9 @@ export const inputSchema = z
     }
     if (
       input.legendMaximum <
-      input.points.reduce((total, point) => total + point.weight, 0)
+      input.points.reduce((total, point) => {
+        return total + point.weight;
+      }, 0)
     ) {
       context.addIssue({
         code: "custom",

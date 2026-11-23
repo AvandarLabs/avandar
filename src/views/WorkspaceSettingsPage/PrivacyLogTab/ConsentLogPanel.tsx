@@ -18,6 +18,7 @@ import { buildConsentAuditCsv } from "@/clients/privacy/buildConsentAuditCsv/bui
 import { ConsentAuditEntryClient } from "@/clients/privacy/ConsentAuditEntryClient/ConsentAuditEntryClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifySuccess } from "@/utils/notifications/notify";
+import { PrivacyLogTableHeader } from "./PrivacyLogTableHeader";
 import type { ConsentAuditEntry } from "@/models/privacy/ConsentAuditEntry/ConsentAuditEntry";
 
 type FilterValue = "all" | ConsentAuditEntry.T["decision"];
@@ -186,25 +187,15 @@ export function ConsentLogPanel(): React.ReactNode {
         </Card>
       ) : (
         <Table striped withTableBorder>
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>
-                <Trans>When</Trans>
-              </Table.Th>
-              <Table.Th>
-                <Trans>Context</Trans>
-              </Table.Th>
-              <Table.Th>
-                <Trans>Decision</Trans>
-              </Table.Th>
-              <Table.Th>
-                <Trans>Detected</Trans>
-              </Table.Th>
-              <Table.Th>
-                <Trans>Source column</Trans>
-              </Table.Th>
-            </Table.Tr>
-          </Table.Thead>
+          <PrivacyLogTableHeader
+            labels={[
+              t`When`,
+              t`Context`,
+              t`Decision`,
+              t`Detected`,
+              t`Source column`,
+            ]}
+          />
           <Table.Tbody>
             {filtered.map((entry) => {
               return (

@@ -2,7 +2,7 @@ import { sql } from "@codemirror/lang-sql";
 import { Compartment, EditorState, Extension } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
 import CodeMirror from "@uiw/react-codemirror";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createSqlDisplayCodeMirrorExtension } from "@/components/sql/sql-helpers/createSqlDisplayCodeMirrorExtension";
 import { createSqlMentionExtension } from "@/components/sql/sql-helpers/createSqlMentionExtension";

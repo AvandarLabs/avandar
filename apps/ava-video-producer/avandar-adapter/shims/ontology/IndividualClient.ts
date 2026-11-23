@@ -3,6 +3,7 @@
  * the product does before its query resolves. No backend is contacted.
  */
 export const IndividualClient = {
+  /** Returns the unavailable, nonloading record count for ontology films. */
   useGetCount: (_where: unknown): readonly [undefined, false] => {
     return [undefined, false];
   },

@@ -1,16 +1,16 @@
-import { Text } from "../../graphics-common/Text";
-import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { BatteryEquationTerms } from "./BatteryEquationTerms/BatteryEquationTerms";
 import type { Input } from "./BatteryDispatchBalance.schema";
 import type { ReactNode } from "react";
+
 /** Inputs for BatteryEquation. */
 type Props = { input: Input };
-
 /**
  * The complete energy equation remains visible even when loss ribbons are
  * hidden.
  */
 export function BatteryEquation({ input }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const { battery, cycle, copy } = input;
   const final =
     battery.initialStoredKwh +
@@ -28,33 +28,7 @@ export function BatteryEquation({ input }: Readonly<Props>): ReactNode {
   ];
   return (
     <g data-energy-equation="true">
-      {terms.map(({ label, value, operator }, index) => (
-        <g key={index}>
-          <FitText
-            text={label}
-            x={32 + index * 152}
-            y={455}
-            width={124}
-            fontSize={12}
-            maxLines={4}
-            breakLongWords
-            normalizeWhitespace
-          />
-          <FitText
-            text={String(value)}
-            x={32 + index * 152}
-            y={530}
-            width={124}
-            fontSize={12}
-            maxLines={3}
-            breakLongWords
-            normalizeWhitespace
-          />
-          <Text x={164 + index * 152} y={539} size={16} fill={STOCK.muted}>
-            {operator}
-          </Text>
-        </g>
-      ))}
+      <BatteryEquationTerms terms={terms} tokens={tokens} />
     </g>
   );
 }

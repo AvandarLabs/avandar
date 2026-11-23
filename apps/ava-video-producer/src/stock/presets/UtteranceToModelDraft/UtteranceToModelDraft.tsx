@@ -1,8 +1,8 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
-import { DraftModel } from "./DraftModel";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { DraftModel } from "./DraftModel/DraftModel";
 import { DraftReview } from "./DraftReview";
-import { SourceSentence } from "./SourceSentence";
+import { SourceSentence } from "./SourceSentence/SourceSentence";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./UtteranceToModelDraft.schema";
 import type { ReactNode } from "react";
@@ -13,8 +13,10 @@ export function UtteranceToModelDraft({
   frame,
   input,
   accent,
-  background = STOCK.ground,
+  background,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const ground = background ?? tokens.color.ground;
   return (
     <g>
       <DraftModel frame={frame} input={input} accent={accent} />
@@ -24,7 +26,7 @@ export function UtteranceToModelDraft({
         y={208}
         width={896}
         height={48}
-        fill={background}
+        fill={ground}
       />
       <LabelSlots
         labels={[
@@ -37,7 +39,7 @@ export function UtteranceToModelDraft({
         frame={frame}
         input={input}
         accent={accent}
-        background={background}
+        background={ground}
       />
       <DraftReview frame={frame} input={input} accent={accent} />
     </g>

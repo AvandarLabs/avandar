@@ -1,12 +1,14 @@
-import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { FoundationApproach } from "./FoundationApproach";
-import { FoundationBase } from "./FoundationBase";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { FoundationApproach } from "./FoundationApproach/FoundationApproach";
+import { FoundationBase } from "./FoundationBase/FoundationBase";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./SharedFoundation.schema";
 import type { ReactNode } from "react";
+
 /** Two authored approaches and their single shared principle. */
 export type Props = GraphicProps & { input: Input };
+
 /** Distinct approaches lift to reveal one continuous common foundation. */
 export function SharedFoundation({
   input,
@@ -14,9 +16,10 @@ export function SharedFoundation({
   accent,
   ...remainingProps
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g>
-      <g opacity={ramp(frame, 12, 18)}>
+      <g opacity={motion.ramp(frame, 12, motion.hero)}>
         <FitText
           text={input.openingConnector}
           x={480}
@@ -29,13 +32,15 @@ export function SharedFoundation({
           normalizeWhitespace
         />
       </g>
-      {input.approaches.map((approach, index) => (
-        <FoundationApproach
-          key={approach.id}
-          {...{ approach, index, frame, accent }}
-          showTrait={input.showDistinctTraits}
-        />
-      ))}
+      {input.approaches.map((approach, index) => {
+        return (
+          <FoundationApproach
+            key={approach.id}
+            {...{ approach, index, frame, accent }}
+            showTrait={input.showDistinctTraits}
+          />
+        );
+      })}
       <FoundationBase {...{ ...remainingProps, input, frame, accent }} />
     </g>
   );

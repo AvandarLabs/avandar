@@ -1,23 +1,22 @@
 import { propEq } from "@avandar/utils";
-import { ramp } from "../../../motion";
-import { DrawPath } from "../../graphics-common/DrawPath";
+import { Motion } from "../../../motion";
 import { Text } from "../../graphics-common/Text";
-import { useGraphicMotion } from "../../theme/useGraphicTheme/useGraphicTheme";
-import { DecisionBranch } from "./DecisionBranch";
-import { DecisionHeading } from "./DecisionHeading";
-import { DecisionMarker } from "./DecisionMarker/DecisionMarker";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { DecisionBranches } from "./DecisionBranches";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { DecisionForkInput } from "./DecisionFork.schema";
 import type { ReactNode } from "react";
 
 /** Frame-controlled authored choice preserves the established input type. */
-export type Props = GraphicProps & { input: DecisionForkInput };
+export type Props = GraphicProps & {
+  input: DecisionForkInput;
+};
 
 /**
  * A bounded authored decision shows conditions, closed gates and one outcome.
  */
 export function DecisionFork({ frame, accent, input }: Props): ReactNode {
-  const motion = useGraphicMotion();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const branchSpacing = 880 / input.branches.length;
   const selectedIndex = input.branches.findIndex(
     propEq("id", input.selectedBranchId),
@@ -25,27 +24,21 @@ export function DecisionFork({ frame, accent, input }: Props): ReactNode {
   const selectedX = 40 + branchSpacing * (selectedIndex + 0.5);
   return (
     <g>
-      <DecisionHeading frame={frame} input={input} />
-      <DrawPath d="M480 174 L480 235" frame={frame} at={16} color={accent} />
-      {input.branches.map((branch, index) => (
-        <DecisionBranch
-          key={branch.id}
-          branch={branch}
-          x={40 + branchSpacing * (index + 0.5)}
-          frame={frame}
-          index={index}
-          accent={accent}
-          isSelected={branch.id === input.selectedBranchId}
-          showUnchosenOutcomes={input.showUnchosenOutcomes}
-        />
-      ))}
-      <DecisionMarker
+      <DecisionBranches
         frame={frame}
-        x={selectedX}
         accent={accent}
-        branchId={input.selectedBranchId}
+        input={input}
+        branchSpacing={branchSpacing}
+        selectedX={selectedX}
       />
-      <g opacity={ramp(frame, 120, motion.chip)}>
+      <g
+        opacity={Motion.ramp({
+          frame,
+          at: 120,
+          dur: motion.chip,
+          easing: motion.reveal.easing,
+        })}
+      >
         <Text role="secondary" x={480} y={557} anchor="middle">
           {input.selectionLabel}
         </Text>

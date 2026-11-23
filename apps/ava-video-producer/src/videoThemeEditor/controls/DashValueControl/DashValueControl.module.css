@@ -1,4 +1,4 @@
-.dashValueStack {
+.dashValueControlStack {
   display: grid;
-  gap: 8px;
+  gap: var(--atlas-space-8);
 }

@@ -44,7 +44,7 @@ const MantineRouterNavLink = createLink(MantineNavLinkComponent);
 /**
  * This is a Mantine NavLink that works with our router.
  */
-// eslint-disable-next-line react/function-component-definition
+// oxlint-disable-next-line react-js/function-component-definition -- typed API
 export const NavLink: LinkComponent<typeof MantineRouterNavLink> = (props) => {
   const [isClicked, setIsClicked] = useState(false);
   const { hovered, ref: hoverRef } = useHover();

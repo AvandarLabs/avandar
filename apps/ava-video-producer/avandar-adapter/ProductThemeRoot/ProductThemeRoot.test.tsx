@@ -5,7 +5,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { DEFAULT_THEME, useMantineTheme } from "@mantine/core";
 import { renderToStaticMarkup } from "react-dom/server";
-import { DEFAULT_VIDEO_THEME_SOURCE } from "../../src/videoTheme/builtInVideoThemes/builtInVideoThemes";
+import { DEFAULT_VIDEO_THEME_SOURCE } from "../../src/videoTheme/makeVideoThemeLibraryFromDocuments/makeVideoThemeLibraryFromDocuments";
 import { VideoThemeProvider } from "../../src/videoTheme/VideoThemeProvider/VideoThemeProvider";
 import { ProductThemeRoot } from "./ProductThemeRoot";
 

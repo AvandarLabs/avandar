@@ -1,8 +1,8 @@
 import { InvestigationStencil } from "./InvestigationStencil";
 import { OverlapLedger } from "./OverlapLedger";
 import { OverlapSetting } from "./OverlapSetting";
-import { PresenceAxis } from "./PresenceAxis";
-import { PresenceRibbon } from "./PresenceRibbon";
+import { PresenceAxis } from "./PresenceAxis/PresenceAxis";
+import { PresenceRibbon } from "./PresenceRibbon/PresenceRibbon";
 import { SceneLabel } from "./SceneLabel";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ContactWindowOverlap.schema";
@@ -20,16 +20,18 @@ export function ContactWindowOverlap({
       <OverlapSetting input={input} accent={accent} />
       <PresenceAxis input={input} />
       <InvestigationStencil input={input} frame={frame} accent={accent} />
-      {input.records.map((record, index) => (
-        <PresenceRibbon
-          key={record.id}
-          record={record}
-          index={index}
-          frame={frame}
-          accent={accent}
-          input={input}
-        />
-      ))}
+      {input.records.map((record, index) => {
+        return (
+          <PresenceRibbon
+            key={record.id}
+            record={record}
+            index={index}
+            frame={frame}
+            accent={accent}
+            input={input}
+          />
+        );
+      })}
       <OverlapLedger input={input} frame={frame} />
       <SceneLabel
         text={input.copy.qualifier}

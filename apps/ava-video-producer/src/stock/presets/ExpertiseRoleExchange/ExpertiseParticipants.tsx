@@ -1,11 +1,105 @@
-import { mix, ramp } from "../../../motion";
-import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
-import { STOCK } from "../../stockPalette";
+import { Motion } from "../../../motion";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import {
+  DEMONSTRATE_CUE,
+  HANDOFF_CUE,
+  RELEASE_CUE,
+  SECOND_DEMONSTRATION_CUE,
+} from "./exchangeTiming";
+import { ExpertiseParticipantBody } from "./ExpertiseParticipantBody/ExpertiseParticipantBody";
 import type { Input } from "./ExpertiseRoleExchange.schema";
 import type { ReactNode } from "react";
+/** Inputs for getExpertiseTopicAndReach. */
+type GetExpertiseTopicAndReachArguments = {
+  input: Input;
+  frame: number;
+  motion: ReturnType<typeof GraphicThemeHooks.useGraphicMotion>;
+};
 
-type Props = { input: Input; frame: number; accent: string; toolX: number };
+/** Samples the active topic and initial reach on the authored cue. */
+function _getExpertiseTopicAndReach({
+  input,
+  frame,
+  motion,
+}: Readonly<GetExpertiseTopicAndReachArguments>): {
+  topic: Input["topics"][number];
+  reach: number;
+} {
+  const topic = input.topics[frame < HANDOFF_CUE ? 0 : 1];
+  const reach = Motion.ramp({
+    frame,
+    at: DEMONSTRATE_CUE,
+    dur: motion.scale(REACH_FRAMES),
+    easing: motion.entrance.easing,
+  });
+  return { topic, reach };
+}
+
+/** Inputs for getExpertiseSeatGeometry. */
+type GetExpertiseSeatGeometryArguments = { input: Input; index: number };
+
+/** Locates a participant and its label for the authored table arrangement. */
+function _getExpertiseSeatGeometry({
+  input,
+  index,
+}: Readonly<GetExpertiseSeatGeometryArguments>): { x: number; labelX: number } {
+  const x =
+    index === 0
+      ? input.tableArrangement === "side-by-side"
+        ? 350
+        : 210
+      : input.tableArrangement === "side-by-side"
+        ? 610
+        : 750;
+  const labelX =
+    input.tableArrangement === "side-by-side"
+      ? index === 0
+        ? 240
+        : 500
+      : index === 0
+        ? 60
+        : 680;
+  return { x, labelX };
+}
+
+type Props = {
+  input: Input;
+  frame: number;
+  accent: string;
+  toolX: number;
+};
+/** Frames the first expert takes to reach for the tool. */
+const REACH_FRAMES = 15;
+
+/** Preserves the outgoing release and incoming tool-contact cue spans. */
+function _getExpertiseHandContact({
+  transfer,
+  isOutgoing,
+  frame,
+  motion,
+  isExpert,
+  reach,
+}: Readonly<GetExpertiseHandContactOptions>): number {
+  return transfer
+    ? isOutgoing
+      ? 1 -
+        Motion.ramp({
+          frame,
+          at: RELEASE_CUE,
+          dur: SECOND_DEMONSTRATION_CUE - RELEASE_CUE,
+          easing: motion.exit.easing,
+        })
+      : Motion.ramp({
+          frame,
+          at: HANDOFF_CUE,
+          dur: RELEASE_CUE - HANDOFF_CUE,
+          easing: motion.entrance.easing,
+        })
+    : isExpert
+      ? reach
+      : 0;
+}
+
 /** Equal-scale participants retain names and organizational roles. */
 export function ExpertiseParticipants({
   input,
@@ -13,98 +107,48 @@ export function ExpertiseParticipants({
   accent,
   toolX,
 }: Readonly<Props>): ReactNode {
-  const topic = input.topics[frame < 83 ? 0 : 1];
-  const reach = ramp(frame, 35, 15);
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const { topic, reach } = _getExpertiseTopicAndReach({ input, frame, motion });
   return (
     <g>
       {input.people.map((person, index) => {
-        const x =
-          index === 0
-            ? input.tableArrangement === "side-by-side"
-              ? 350
-              : 210
-            : input.tableArrangement === "side-by-side"
-              ? 610
-              : 750;
-        const labelX =
-          input.tableArrangement === "side-by-side"
-            ? index === 0
-              ? 240
-              : 500
-            : index === 0
-              ? 60
-              : 680;
+        const { x, labelX } = _getExpertiseSeatGeometry({ input, index });
         const isExpert = person.id === topic.expertId;
         const restingX = x + (index === 0 ? 22 : -22);
         const isOutgoing = person.id === input.topics[0].expertId;
-        const transfer = frame >= 83 && frame <= 103;
-        const contact = transfer
-          ? isOutgoing
-            ? 1 - ramp(frame, 93, 10)
-            : ramp(frame, 83, 10)
-          : isExpert
-            ? reach
-            : 0;
-        const handX = mix(contact, restingX, toolX);
-        const handY = mix(contact, 315, 325);
+        // The handoff keeps its cue spans: one hand lets go as the other takes
+        // hold, and both finish as the second demonstration starts.
+        const transfer =
+          frame >= HANDOFF_CUE && frame <= SECOND_DEMONSTRATION_CUE;
+        const contact = _getExpertiseHandContact({
+          transfer,
+          isOutgoing,
+          frame,
+          motion,
+          isExpert,
+          reach,
+        });
+        const handX = Motion.mix({ t: contact, from: restingX, to: toolX });
+        const handY = Motion.mix({ t: contact, from: 315, to: 325 });
         return (
-          <g
+          <ExpertiseParticipantBody
             key={person.id}
-            data-person-id={person.id}
-            opacity={ramp(frame, 12 + index * 2, 12)}
-          >
-            <LabelSlots
-              labels={[
-                [person.label, labelX, 95, 220, 20, 3],
-                ...(input.showJobRoles
-                  ? [
-                      [person.roleLabel, labelX, 185, 220, 14, 3] as [
-                        string,
-                        number,
-                        number,
-                        number,
-                        14,
-                        number,
-                      ],
-                    ]
-                  : []),
-              ]}
-            />
-            <PersonGlyph x={x} y={290} size={72} color={accent} />
-            <path
-              d={`M${x} 290 L${handX} ${handY}`}
-              fill="none"
-              stroke={isExpert ? accent : STOCK.muted}
-              strokeWidth={4}
-            />
-            <circle
-              data-transfer-hand={
-                frame >= 83 && frame <= 103 ? "true" : undefined
-              }
-              data-demonstrating-hand={isExpert ? "true" : undefined}
-              data-person-id={person.id}
-              cx={handX}
-              cy={handY}
-              r={5}
-              fill={accent}
-            />
-            <g opacity={ramp(frame, 35, 12)}>
-              <LabelSlots
-                labels={[
-                  [
-                    isExpert ? input.labels.demonstrates : input.labels.learns,
-                    index === 0 ? 60 : 680,
-                    360,
-                    220,
-                    14,
-                    4,
-                  ],
-                ]}
-              />
-            </g>
-          </g>
+            {...{ person, motion, frame, index, labelX, input, x, accent }}
+            {...{ handX, handY, tokens, isExpert, scales, transfer }}
+          />
         );
       })}
     </g>
   );
 }
+
+type GetExpertiseHandContactOptions = {
+  transfer: boolean;
+  isOutgoing: boolean;
+  frame: number;
+  motion: ReturnType<typeof GraphicThemeHooks.useGraphicMotion>;
+  isExpert: boolean;
+  reach: number;
+};

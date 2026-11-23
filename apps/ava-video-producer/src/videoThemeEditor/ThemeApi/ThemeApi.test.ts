@@ -42,10 +42,13 @@ test("a refused save keeps the server's status and issues", async () => {
   });
   await assert.rejects(
     ThemeApi.save({ document: WARM, hash: "hash" }),
-    (error: unknown) =>
-      error instanceof ThemeApiError &&
-      error.status === 400 &&
-      error.issues[0]?.path === "color.accent",
+    (error: unknown) => {
+      return (
+        error instanceof ThemeApiError &&
+        error.status === 400 &&
+        error.issues[0]?.path === "color.accent"
+      );
+    },
   );
 });
 
@@ -64,4 +67,26 @@ test("loading the library reads every listed theme with its hash", async () => {
   const loaded = await ThemeApi.loadAll();
   assert.deepEqual([...loaded.stored.keys()], ["classic", "warm"]);
   assert.equal(loaded.stored.get("warm")?.hash, "b");
+});
+
+test("malformed successful write responses are rejected before their hashes can be reused", async () => {
+  for (const body of [{}, { id: "warm", hash: 4 }, { id: 4, hash: "a" }]) {
+    _respondWith({ "/api/themes": [200, body] });
+    await assert.rejects(ThemeApi.create(WARM));
+  }
+  _respondWith({ "/api/themes/warm": [200, { hash: 4 }] });
+  await assert.rejects(ThemeApi.save({ document: WARM, hash: "a" }));
+});
+
+test("a malformed stored hash is rejected even when the document is valid", async () => {
+  _respondWith({ "/api/themes/warm": [200, { document: WARM, hash: 4 }] });
+  await assert.rejects(ThemeApi.read("warm"));
+});
+
+test("malformed theme summaries are rejected before library reads", async () => {
+  _respondWith({
+    "/api/themes": [200, [{ id: "warm", label: 4, builtIn: "no" }]],
+    "/api/themes/warm": [200, { document: WARM, hash: "a" }],
+  });
+  await assert.rejects(ThemeApi.loadAll());
 });

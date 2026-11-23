@@ -163,12 +163,9 @@ async function _postRunRequest(
 ): Promise<Response> {
   const { body } = args;
   try {
-    return await fetch(args.url, {
+    const requestOptions: RequestInit & { dispatcher: Agent } = {
       method: "POST",
-      // The global `fetch` types come from the older `undici-types` that
-      // `@types/node` pins, so they do not match this `undici` Agent's types.
-      // At runtime Node's bundled undici accepts it.
-      dispatcher: args.dispatcher as unknown as RequestInit["dispatcher"],
+      dispatcher: args.dispatcher,
       headers: {
         authorization: `Bearer ${args.serverSecret}`,
         [_SUPABASE_URL_HEADER]: args.supabase.apiUrl,
@@ -181,7 +178,8 @@ async function _postRunRequest(
           : { [_INVOCATION_HEADER]: args.invocationHeader }),
       },
       ...(body === undefined ? {} : { body: JSON.stringify(body) }),
-    });
+    };
+    return await fetch(args.url, requestOptions);
   } catch (error: unknown) {
     if (_getFetchErrorCode(error) === "ECONNREFUSED") {
       throw new Error(

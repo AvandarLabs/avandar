@@ -1,5 +1,6 @@
 /**
- * FitText draws wrapped labels with fixed font size and themed colour and spacing.
+ * FitText draws wrapped labels with fixed font size and themed colour and
+ * spacing.
  */
 import assert from "node:assert/strict";
 import test from "node:test";
@@ -42,10 +43,9 @@ test("opt-in label whitespace normalization fits hard breaks without changing st
     }),
     ["A B C D"],
   );
-  assert.throws(
-    () => wrapTextToLines({ text, width: 200, fontSize: 18, maxLines: 1 }),
-    /line count/,
-  );
+  assert.throws(() => {
+    return wrapTextToLines({ text, width: 200, fontSize: 18, maxLines: 1 });
+  }, /line count/);
   const markup = renderToStaticMarkup(
     createElement(FitText, {
       text,
@@ -63,10 +63,9 @@ test("opt-in label whitespace normalization fits hard breaks without changing st
 
 test("seven and eight authored lines retain fixed-size leading within explicit capacity", () => {
   [7, 8].forEach((numLines) => {
-    const text = Array.from(
-      { length: numLines },
-      (_, index) => `Line ${index + 1}`,
-    ).join("\n");
+    const text = Array.from({ length: numLines }, (_, index) => {
+      return `Line ${index + 1}`;
+    }).join("\n");
     const lines = wrapTextToLines({
       text,
       width: 368,
@@ -96,9 +95,10 @@ test("fitted text takes its colour and line spacing from the data role", () => {
     other: { video: { atomic: { swatch: { text: "#ffeedd" } } } },
   };
   const markup = renderToStaticMarkup(
-    createElement(VideoThemeScope, {
-      patches: [patch],
-      children: createElement(FitText, {
+    createElement(
+      VideoThemeScope,
+      { patches: [patch] },
+      createElement(FitText, {
         text: "one two three four",
         x: 0,
         y: 0,
@@ -106,7 +106,7 @@ test("fitted text takes its colour and line spacing from the data role", () => {
         fontSize: 12,
         maxLines: 4,
       }),
-    }),
+    ),
   );
   assert.match(markup, /fill="#ffeedd"/);
   assert.match(markup, /dy="18"/);

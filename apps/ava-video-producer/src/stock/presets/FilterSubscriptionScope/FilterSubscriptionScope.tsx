@@ -1,20 +1,22 @@
-import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { SubscriptionSocket } from "./SubscriptionSocket";
-import { SubscriptionView } from "./SubscriptionView";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { SubscriptionSocket } from "./SubscriptionSocket/SubscriptionSocket";
+import { SubscriptionView } from "./SubscriptionView/SubscriptionView";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./FilterSubscriptionScope.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
+
 /** A shared category socket reaches only explicitly subscribed views. */
 export function FilterSubscriptionScope({
   frame,
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
-    <g opacity={ramp(frame, 0, 12)}>
+    <g opacity={motion.reveal(frame, 0)}>
       <LabelSlots
         labels={[
           [input.copy.context, 48, 28, 864, 14, 1],
@@ -24,12 +26,14 @@ export function FilterSubscriptionScope({
         ]}
       />
       <SubscriptionSocket {...{ frame, input, accent }} />
-      {input.views.map((view, index) => (
-        <SubscriptionView
-          key={view.id}
-          {...{ view, index, input, frame, accent }}
-        />
-      ))}
+      {input.views.map((view, index) => {
+        return (
+          <SubscriptionView
+            key={view.id}
+            {...{ view, index, input, frame, accent }}
+          />
+        );
+      })}
     </g>
   );
 }

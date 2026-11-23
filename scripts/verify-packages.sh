@@ -28,7 +28,7 @@
 #     maps `@/*` and `$/*` repo-wide, so those resolve from inside a package and
 #     tsup would inline them; the resulting tarball is self-consistent and every
 #     check below still passes. The `no-restricted-imports` rule scoped to
-#     `packages/**` in `eslint.config.js` is what catches that, at lint time.
+#     `packages/**` in `.oxlintrc.json` is what catches that, at lint time.
 #
 # Note the tarballs are built with `pnpm pack`, NOT `npm pack`. `publishConfig`
 # hoisting and `workspace:*` rewriting are pnpm features; `npm pack` produces a

@@ -106,7 +106,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { bundle } from "@remotion/bundler";
 import { buildProduct } from "../../build-avandar.mjs";
-import { assetReferences, publicAsset } from "../../lib/planHelpers";
+import { assetReferences, publicAsset } from "../../lib/planHelpers/planHelpers";
 import { withWorkspaceAliases } from "../../lib/withWorkspaceAliases.mjs";
 import { appRoot } from "../ShowcaseFilms/ShowcaseFilms";
 import type { Film } from "../../../src/showcase/showcase.types";
@@ -666,7 +666,7 @@ Expected: FAIL, module not found.
 
 ```ts
 import { DEFAULT_ACCENT, DEFAULT_BACKGROUND } from "../../../../src/gallery/palette";
-import { previewFrames } from "../../../lib/planHelpers";
+import { previewFrames } from "../../../lib/planHelpers/previewFrames";
 import { StockFingerprintModule } from "../../../stock/StockFingerprintModule/StockFingerprintModule";
 import type { ParityRegion } from "../compareRgbaFrames/compareRgbaFrames";
 import type { Film } from "../../../../src/showcase/showcase.types";

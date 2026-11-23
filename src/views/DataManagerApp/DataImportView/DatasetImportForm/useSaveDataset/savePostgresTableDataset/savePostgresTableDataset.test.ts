@@ -57,11 +57,14 @@ describe("savePostgresTableDataset", () => {
       payload,
     });
 
-    const { columns } = insertPostgresTableDatasetMock.mock.calls[0]?.[0] as {
-      columns: Array<Record<string, unknown>>;
-    };
+    const firstCallPayload = insertPostgresTableDatasetMock.mock
+      .calls[0]?.[0] as
+      | {
+          columns: Array<Record<string, unknown>>;
+        }
+      | undefined;
     expect(
-      columns.map((column) => {
+      firstCallPayload?.columns.map((column) => {
         return [
           column.name,
           column.detected_data_type,

@@ -1,10 +1,12 @@
-import { ClassroomDays } from "./ClassroomDays";
-import { ClassroomDesk } from "./ClassroomDesk";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { ClassroomDays } from "./ClassroomDays/ClassroomDays";
+import { ClassroomDesk } from "./ClassroomDesk/ClassroomDesk";
 import { ClassroomTotals } from "./ClassroomTotals";
 import { makeClassroomStateFromInputAndFrame } from "./makeClassroomStateFromInputAndFrame";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ClassroomDayPresence.schema";
 import type { ReactNode } from "react";
+
 /** Inputs for ClassroomDayPresence. */
 type Props = GraphicProps & { input: Input };
 
@@ -14,24 +16,24 @@ export function ClassroomDayPresence({
   accent,
   input,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const { activeIndex, transition, desks, day } =
-    makeClassroomStateFromInputAndFrame({
-      frame,
-      input,
-    });
+    makeClassroomStateFromInputAndFrame({ motion, frame, input });
   return (
     <g>
       <ClassroomDays input={input} activeIndex={activeIndex} />
-      {desks.map((desk) => (
-        <ClassroomDesk
-          key={desk.id}
-          desk={desk}
-          transition={transition}
-          accent={accent}
-          input={input}
-          activeIndex={activeIndex}
-        />
-      ))}
+      {desks.map((desk) => {
+        return (
+          <ClassroomDesk
+            key={desk.id}
+            desk={desk}
+            transition={transition}
+            accent={accent}
+            input={input}
+            activeIndex={activeIndex}
+          />
+        );
+      })}
       <ClassroomTotals input={input} day={day} />
     </g>
   );

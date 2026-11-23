@@ -1,11 +1,32 @@
 /** Runtime-versus-structural acceptance witnesses for tuple export. */
 import assert from "node:assert/strict";
 import test from "node:test";
-import { prop } from "@avandar/utils";
+import { prop, propEq } from "@avandar/utils";
 import { z } from "zod";
 import { stockContracts } from "../../registry/stockContracts";
 import { makeStockJsonSchemaFromZodSchema } from "./makeStockJsonSchemaFromZodSchema";
 import type { StockJsonSchema } from "../StockContract.types";
+
+function _acceptsObject({
+  schema,
+  value,
+}: Readonly<{ schema: StockJsonSchema; value: unknown }>): boolean {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return false;
+  }
+  const record = value as Record<string, unknown>;
+  return (
+    (schema.required ?? []).every((key) => {
+      return Object.hasOwn(record, key);
+    }) &&
+    Object.entries(schema.properties ?? {}).every(([key, child]) => {
+      return (
+        !Object.hasOwn(record, key) ||
+        _accepts({ schema: child, value: record[key] })
+      );
+    })
+  );
+}
 
 function _acceptsArray({
   schema,
@@ -21,15 +42,15 @@ function _acceptsArray({
   ) {
     return false;
   }
-  return value.every((item, index) =>
-    _accepts({
+  return value.every((item, index) => {
+    return _accepts({
       schema:
         schema.prefixItems?.[index] ??
         (schema.items as StockJsonSchema | boolean) ??
         true,
       value: item,
-    }),
-  );
+    });
+  });
 }
 
 // Evaluate the JSON Schema keywords these tuple witnesses exercise. Importing
@@ -45,24 +66,15 @@ function _accepts({
     return schema;
   }
   if (schema.anyOf) {
-    return schema.anyOf.some((branch) => _accepts({ schema: branch, value }));
+    return schema.anyOf.some((branch) => {
+      return _accepts({ schema: branch, value });
+    });
   }
   if (schema.type === "array") {
     return _acceptsArray({ schema, value });
   }
   if (schema.type === "object") {
-    if (!value || typeof value !== "object" || Array.isArray(value)) {
-      return false;
-    }
-    const record = value as Record<string, unknown>;
-    return (
-      (schema.required ?? []).every((key) => Object.hasOwn(record, key)) &&
-      Object.entries(schema.properties ?? {}).every(
-        ([key, child]) =>
-          !Object.hasOwn(record, key) ||
-          _accepts({ schema: child, value: record[key] }),
-      )
-    );
+    return _acceptsObject({ schema, value });
   }
   if (schema.type === "null") {
     return value === null;
@@ -128,13 +140,13 @@ const CASES = [
 CASES.forEach(({ name, schema, values }) => {
   test(`structural ${name} tuples preserve JSON input acceptance`, () => {
     const structural = makeStockJsonSchemaFromZodSchema(schema);
-    values.forEach((value) =>
-      assert.equal(
+    values.forEach((value) => {
+      return assert.equal(
         _accepts({ schema: structural, value }),
         schema.safeParse(value).success,
         JSON.stringify(value),
-      ),
-    );
+      );
+    });
   });
 });
 
@@ -157,10 +169,9 @@ test("empty-prefix rest tuples omit prefixItems while retaining typed items", ()
 });
 
 test("unrepresentable transforms fail instead of emitting permissive schemas", () => {
-  assert.throws(
-    () => makeStockJsonSchemaFromZodSchema(z.string().transform(Number)),
-    /transform/i,
-  );
+  assert.throws(() => {
+    return makeStockJsonSchemaFromZodSchema(z.string().transform(Number));
+  }, /transform/i);
 });
 
 test("registry tuple dimensions and coordinates reject missing or extra members", () => {
@@ -201,7 +212,7 @@ test("registry tuple dimensions and coordinates reject missing or extra members"
 
 test("editor coordinate item schemas reject missing and extra coordinates", () => {
   const control = stockContracts["geometry-detail-budget"].controls.find(
-    ({ path }) => path === "vertices",
+    propEq("path", "vertices"),
   );
   assert.ok(control?.kind === "collection");
   const structural = control.itemSchema;
@@ -216,7 +227,7 @@ function _tupleSchemas(value: unknown): StockJsonSchema[] {
   }
   const record = value as Record<string, unknown>;
   return [
-    ...(Array.isArray(record.prefixItems) ? [record as StockJsonSchema] : []),
+    ...(Array.isArray(record.prefixItems) ? [record] : []),
     ...Object.values(record).flatMap(_tupleSchemas),
   ];
 }

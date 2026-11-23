@@ -40,12 +40,14 @@ export const fixtures: Array<{ id: string; input: Input }> = [
     id: "dense",
     input: {
       ...DEFAULT_INPUT,
-      participants: Array.from({ length: 5 }, (_, index) => ({
-        id: `branch ${index}`,
-        label: "W".repeat(24),
-        ready: true,
-        workUnits: index + 1,
-      })),
+      participants: Array.from({ length: 5 }, (_, index) => {
+        return {
+          id: `branch ${index}`,
+          label: "W".repeat(24),
+          ready: true,
+          workUnits: index + 1,
+        };
+      }),
       sharedAction: "W".repeat(32),
       copy: {
         ready: "W".repeat(30),

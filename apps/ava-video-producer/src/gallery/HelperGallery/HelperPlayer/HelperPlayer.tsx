@@ -1,6 +1,12 @@
 import { Player } from "@remotion/player";
 import { HelperComposition } from "./HelperComposition";
+import { useHelperFilmTheme } from "./useHelperFilmTheme";
 import type { Film } from "../../../showcase/showcase.types";
+import type { ReactNode } from "react";
+
+type Props = {
+  film: Extract<Film, { kind: "helper" }>;
+};
 
 /**
  * The Remotion player sizes itself through inline styles, so the full-width
@@ -17,19 +23,17 @@ function _isReducedMotionPreferred(): boolean {
 
 /**
  * The live player for a helper preview: a looping Remotion player with
- * frame controls, autoplaying unless the viewer prefers reduced motion.
+ * frame controls, autoplaying unless the viewer prefers reduced motion. It
+ * draws in the theme the embedding Atlas page posts, else the film's theme.
  */
-export function HelperPlayer({
-  film,
-}: {
-  film: Extract<Film, { kind: "helper" }>;
-}) {
+export function HelperPlayer({ film }: Readonly<Props>): ReactNode {
+  const theme = useHelperFilmTheme(film);
   return (
     <div className="liveFilm">
       <Player
         style={PLAYER_STYLE}
         component={HelperComposition}
-        inputProps={{ helperId: film.helper }}
+        inputProps={{ helperId: film.helper, theme }}
         compositionWidth={film.width}
         compositionHeight={film.height}
         durationInFrames={film.frames}
@@ -39,11 +43,13 @@ export function HelperPlayer({
         autoPlay={!_isReducedMotionPreferred()}
         clickToPlay={false}
         spaceKeyToPlayOrPause
-        errorFallback={() => (
-          <p className="liveError">
-            Preview unavailable. Check the showcase terminal, then reload.
-          </p>
-        )}
+        errorFallback={() => {
+          return (
+            <p className="liveError">
+              Preview unavailable. Check the showcase terminal, then reload.
+            </p>
+          );
+        }}
       />
     </div>
   );

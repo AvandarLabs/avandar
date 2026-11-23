@@ -16,9 +16,9 @@ export function CapabilityMatrix({
   return (
     <g>
       <CapabilityGrid frame={frame} input={input} />
-      {input.capabilities.map((row, index) => (
-        <CapabilityRow key={row.id} {...{ row, index, input, frame }} />
-      ))}
+      {input.capabilities.map((row, index) => {
+        return <CapabilityRow key={row.id} {...{ row, index, input, frame }} />;
+      })}
       <CapabilityFocus frame={frame} input={input} accent={accent} />
       <CapabilityLegend frame={frame} input={input} />
     </g>

@@ -3,7 +3,8 @@ import css from "./ThemeExportNotice.module.css";
 import type {
   ThemeExportState,
   ThemeRefusalReason,
-} from "../../themeExportStateHelpers/themeExportStateHelpers";
+} from "../../ThemeExportState/ThemeExportState";
+import type { ReactNode } from "react";
 
 type Props = Readonly<{
   id: string;
@@ -31,7 +32,7 @@ const REFUSAL_COPY: Record<ThemeRefusalReason, string> = {
  * Why Download MP4 is unavailable when the live player refused the theme or
  * never answered, with a retry for the latter. Renders nothing otherwise.
  */
-export function ThemeExportNotice({ id, state, onRetry }: Props) {
+export function ThemeExportNotice({ id, state, onRetry }: Props): ReactNode {
   if (state.kind !== "refused" && state.kind !== "timed-out") {
     return null;
   }

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Formats files changed on the current branch relative to its base branch.
 #
-# Runs oxfmt, prettier (SQL only), eslint --fix, and stylelint --fix on files
+# Runs oxfmt, prettier (SQL only), oxlint --fix, and stylelint --fix on files
 # changed vs the merge-base with origin/develop or origin/main.
 #
 # Usable in two contexts:
@@ -177,7 +177,7 @@ done
 # nothing at all. `.gitignore` is honoured regardless.
 #
 # Errors are tolerated (`|| true`) so a single bad file doesn't stop
-# eslint/stylelint from running on the others.
+# oxlint/stylelint from running on the others.
 # ---------------------------------------------------------------------------
 OXFMT_FILES=()
 SQL_FILES=()
@@ -209,10 +209,10 @@ for f in "${EXISTING[@]}"; do
 done
 
 # ---------------------------------------------------------------------------
-# Stage 8: eslint --fix on JS/TS, stylelint --fix on CSS
+# Stage 8: oxlint --fix on JS/TS, stylelint --fix on CSS
 # ---------------------------------------------------------------------------
 if [ ${#JSTS[@]} -gt 0 ]; then
-  pnpm exec eslint --fix --no-warn-ignored "${JSTS[@]}" >&2 || true
+  pnpm exec oxlint --fix --no-error-on-unmatched-pattern "${JSTS[@]}" >&2 || true
 fi
 
 if [ ${#CSS[@]} -gt 0 ]; then

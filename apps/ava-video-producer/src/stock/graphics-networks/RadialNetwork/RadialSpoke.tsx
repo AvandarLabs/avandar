@@ -1,31 +1,32 @@
-import { wave } from "../../../motion";
-import { CircleNode } from "../../graphics-common/CircleNode";
+import { Motion } from "../../../motion";
+import { CircleNode } from "../../graphics-common/CircleNode/CircleNode";
 import { DrawPath } from "../../graphics-common/DrawPath";
-import { Packet } from "../../graphics-common/Packet";
-import {
-  useGraphicMotion,
-  useGraphicProps,
-  useGraphicTokens,
-} from "../../theme/useGraphicTheme/useGraphicTheme";
+import { Packet } from "../../graphics-common/Packet/Packet";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CENTER } from "./RadialNetwork.constants";
 import type { ReactNode } from "react";
 
 const SPOKE_CUE = 20;
 const PACKET_PHASE_STEP = 12;
 const NODE_PHASE_STEP = 10;
-
 type Props = Readonly<{
-  node: { label: string; x: number; y: number };
+  node: {
+    label: string;
+    x: number;
+    y: number;
+  };
   index: number;
   frame: number;
   accent: string;
 }>;
-
 /** One spoke: its edge, the packet travelling it, and the node at its end. */
 export function RadialSpoke({ node, index, frame, accent }: Props): ReactNode {
-  const style = useGraphicProps("RadialNetwork", {});
-  const { color } = useGraphicTokens();
-  const motion = useGraphicMotion();
+  const style = GraphicThemeHooks.useGraphicProps({
+    name: "RadialNetwork",
+    props: {},
+  });
+  const { color } = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const nodeAccent = index % 2 ? accent : color.accentAlt;
   return (
     <g>
@@ -50,8 +51,11 @@ export function RadialSpoke({ node, index, frame, accent }: Props): ReactNode {
         accent={nodeAccent}
         size="xs"
         active={
-          wave(frame, style.spokePulsePeriod, index * NODE_PHASE_STEP) *
-          style.spokePulseSwing
+          Motion.wave({
+            frame,
+            period: style.spokePulsePeriod,
+            offset: index * NODE_PHASE_STEP,
+          }) * style.spokePulseSwing
         }
       />
     </g>

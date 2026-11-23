@@ -20,11 +20,16 @@ export const inputSchema = z
     }),
   })
   .superRefine((input, context) => {
-    const isNumeric = (value: string) =>
-      /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(value) &&
-      Number.isFinite(Number(value));
+    const isNumeric = (value: string) => {
+      return (
+        /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(value) &&
+        Number.isFinite(Number(value))
+      );
+    };
     if (
-      input.values.slice(0, -1).some((value) => !isNumeric(value)) ||
+      input.values.slice(0, -1).some((value) => {
+        return !isNumeric(value);
+      }) ||
       isNumeric(input.values.at(-1) ?? "")
     ) {
       context.addIssue({

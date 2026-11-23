@@ -15,7 +15,9 @@ export function getBrowserStorage(): BrowserStorage {
   } catch {
     const values = new Map<string, string>();
     return {
-      getItem: (key) => values.get(key) ?? null,
+      getItem: (key) => {
+        return values.get(key) ?? null;
+      },
       setItem: (key, value) => {
         values.set(key, value);
       },

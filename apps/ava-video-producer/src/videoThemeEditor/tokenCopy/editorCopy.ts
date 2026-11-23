@@ -1,14 +1,17 @@
 import { capitalize } from "@avandar/utils";
-import { humanizeScaleKey } from "../customScaleKey/customScaleKey";
+import { CustomScaleKeys } from "../CustomScaleKeys/CustomScaleKeys";
 
 /*
  * Names the editor shows that are not catalog copy: section names, composite
  * field names, and enum options.
  */
 
-/** Readable words for a component name, such as `Progress bar` for `ProgressBar`. */
+/**
+ * Readable words for a component name, such as `Progress bar` for
+ * `ProgressBar`.
+ */
 function _humanize(name: string): string {
-  return capitalize(humanizeScaleKey(name));
+  return capitalize(CustomScaleKeys.humanizeScaleKey(name));
 }
 
 const GROUP_NAMES: Readonly<Record<string, string>> = {
@@ -29,8 +32,11 @@ const GROUP_NAMES: Readonly<Record<string, string>> = {
   "mantine:rendering": "Rendering",
 };
 
-/** Section names for semantic and Mantine groups. Atomic groups use their scale's catalog label. */
-export function getGroupName(group: string): string | undefined {
+/**
+ * Section names for semantic and Mantine groups. Atomic groups use their
+ * scale's catalog label.
+ */
+function _getGroupName(group: string): string | undefined {
   const [tier, name] = group.split(":");
   return tier === "component" ? _humanize(name) : GROUP_NAMES[group];
 }
@@ -80,7 +86,7 @@ const FIELD_NAMES: Readonly<Record<string, string>> = {
 };
 
 /** Names of every composite field, for labels such as "Size" or "Curve". */
-export function getFieldName(field: string): string {
+function _getFieldName(field: string): string {
   return FIELD_NAMES[field] ?? field;
 }
 
@@ -146,9 +152,22 @@ const OPTION_COPY: Readonly<
 };
 
 /** Names for enum options by token path or composite field name. */
-export function getOptionCopy(
+function _getOptionCopy(
   options: Readonly<{ key: string; option: string }>,
 ): OptionCopy {
   const { key, option } = options;
   return OPTION_COPY[key]?.[option] ?? { label: option };
 }
+
+/**
+ * Provides contextual group, field, and option labels for the video theme
+ * editor.
+ */
+export const EditorCopy = {
+  /** Section names for semantic and Mantine groups. */
+  getGroupName: _getGroupName,
+  /** Names of every composite field, for labels such as "Size" or "Curve". */
+  getFieldName: _getFieldName,
+  /** Names for enum options by token path or composite field name. */
+  getOptionCopy: _getOptionCopy,
+};

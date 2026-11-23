@@ -1,6 +1,5 @@
-import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CapabilityGlyph } from "./CapabilityGlyph";
 import type { Input } from "./CapabilityMatrix.schema";
 import type { ReactNode } from "react";
@@ -8,9 +7,11 @@ import type { ReactNode } from "react";
 type Props = { frame: number; input: Input };
 /** Authored legend labels explain all four independent categorical states. */
 export function CapabilityLegend({ frame, input }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const states = ["included", "absent", "conditional", "unknown"] as const;
   return (
-    <g opacity={ramp(frame, 96, 12)}>
+    <g opacity={motion.reveal(frame, 96)}>
       {states.map((state, index) => {
         const label = {
           text: input.stateLabels[state],
@@ -27,7 +28,7 @@ export function CapabilityLegend({ frame, input }: Readonly<Props>): ReactNode {
               {...label}
               breakLongWords
               normalizeWhitespace
-              color={STOCK.muted}
+              color={tokens.color.textMuted}
             />
           </g>
         );

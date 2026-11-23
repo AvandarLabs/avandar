@@ -162,18 +162,22 @@ const dense: Input = {
     actionLabel: "W".repeat(32),
   },
   windowLabel: "W".repeat(36),
-  hosts: Array.from({ length: 4 }, (_, index) => ({
-    id: `host-${index}`,
-    label: "W".repeat(20),
-    capacityCpuHours: [8, 4, 2, 1][index],
-  })),
-  jobs: Array.from({ length: 8 }, (_, index) => ({
-    id: `job-${index}`,
-    label: "W".repeat(18),
-    cpuHours: 1,
-    initialHostId: `host-${index < 4 ? 0 : index < 6 ? 1 : index === 6 ? 2 : 3}`,
-    finalHostId: "host-0",
-  })),
+  hosts: Array.from({ length: 4 }, (_, index) => {
+    return {
+      id: `host-${index}`,
+      label: "W".repeat(20),
+      capacityCpuHours: [8, 4, 2, 1][index],
+    };
+  }),
+  jobs: Array.from({ length: 8 }, (_, index) => {
+    return {
+      id: `job-${index}`,
+      label: "W".repeat(18),
+      cpuHours: 1,
+      initialHostId: `host-${index < 4 ? 0 : index < 6 ? 1 : index === 6 ? 2 : 3}`,
+      finalHostId: "host-0",
+    };
+  }),
 };
 const swap: Input = {
   ...DEFAULT_INPUT,
@@ -195,7 +199,9 @@ const swap: Input = {
 };
 const unchanged: Input = {
   ...dense,
-  jobs: dense.jobs.map((job) => ({ ...job, finalHostId: job.initialHostId })),
+  jobs: dense.jobs.map((job) => {
+    return { ...job, finalHostId: job.initialHostId };
+  }),
   showCapacityGuides: false,
 };
 const extraFixtures: StockContract<typeof swap>["fixtures"] = [
@@ -206,6 +212,7 @@ const extraFixtures: StockContract<typeof swap>["fixtures"] = [
     input: { ...dense, emptyHostState: "available" as const },
   },
 ];
+/** Invalid stock inputs used to check this preset contract rejects bad data. */
 export const invalidInputs: unknown[] = [
   { ...DEFAULT_INPUT, extra: true },
   {
@@ -225,11 +232,13 @@ export const invalidInputs: unknown[] = [
   },
   {
     ...DEFAULT_INPUT,
-    jobs: DEFAULT_INPUT.jobs.map((job) => ({
-      ...job,
-      cpuHours: 4,
-      finalHostId: "a",
-    })),
+    jobs: DEFAULT_INPUT.jobs.map((job) => {
+      return {
+        ...job,
+        cpuHours: 4,
+        finalHostId: "a",
+      };
+    }),
   },
 ];
 

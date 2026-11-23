@@ -1,12 +1,14 @@
-import { ramp } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ActiveDeviation } from "./ActiveDeviation";
+import { DetailActiveRecursiveSplit } from "./DetailActiveRecursiveSplit/DetailActiveRecursiveSplit";
 import { makeCompletedDetailPathFromInputAndFrame } from "./makeCompletedDetailPathFromInputAndFrame";
 import { makeDetailSimplificationFromInput } from "./makeDetailSimplificationFromInput";
-import { RecursiveSplit } from "./RecursiveSplit";
 import type { Input } from "./GeometryDetailBudget.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number; accent: string };
+const RECURSION_AT = 51;
 /**
  * Recursive splits retain their completed trace through the final highlight.
  */
@@ -15,6 +17,9 @@ export function DetailRecursion({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { stroke, sketch } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const { events } = makeDetailSimplificationFromInput(input);
   const span = 60 / events.length;
   const activeIndex = Math.min(
@@ -28,33 +33,25 @@ export function DetailRecursion({
   const path = makeCompletedDetailPathFromInputAndFrame({ input, frame });
   return (
     <g>
-      <path
+      <SketchedShape
         data-recursive-trace="retained"
-        d={path}
+        shape={{ kind: "path", d: path }}
+        profile={sketch.shape}
         fill="none"
         stroke={accent}
-        strokeWidth={2}
-        opacity={ramp(frame, 51, 6)}
+        strokeWidth={shapes.stroke(stroke.default)}
+        opacity={motion.ramp(frame, RECURSION_AT, motion.chip)}
       />
       {frame < 111 ? (
         <ActiveDeviation
-          input={input}
-          event={event}
-          frame={frame}
+          {...{ input, event, frame }}
           at={51 + activeIndex * span}
           duration={span}
         />
       ) : undefined}
-      {frame < 111 && event.split ? (
-        <RecursiveSplit
-          input={input}
-          event={event}
-          frame={frame}
-          at={51 + activeIndex * span}
-          duration={span}
-          accent={accent}
-        />
-      ) : undefined}
+      <DetailActiveRecursiveSplit
+        {...{ frame, event, input, activeIndex, span, accent }}
+      />
     </g>
   );
 }

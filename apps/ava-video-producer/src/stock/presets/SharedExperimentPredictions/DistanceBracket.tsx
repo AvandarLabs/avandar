@@ -1,4 +1,5 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./SharedExperimentPredictions.schema";
 import type { ReactNode } from "react";
 
@@ -17,13 +18,20 @@ export function DistanceBracket({
   targetX,
   y,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return input.showDistanceDifferences && frame >= 108 ? (
-    <path
-      data-distance-bracket={learner.id}
-      d={`M${targetX} ${y + 32} V${y + 38} H${450 + (430 * input.observationDistance) / input.track.maximum} V${y + 32}`}
-      fill="none"
-      stroke={STOCK.orange}
-      strokeWidth={1.5}
-    />
+    <g data-distance-bracket={learner.id}>
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${targetX} ${y + 32} V${y + 38} H${450 + (430 * input.observationDistance) / input.track.maximum} V${y + 32}`,
+        }}
+        profile={tokens.sketch.shape}
+        fill="none"
+        stroke={tokens.color.highlight}
+        strokeWidth={scales.stroke(tokens.stroke.outline)}
+      />
+    </g>
   ) : undefined;
 }

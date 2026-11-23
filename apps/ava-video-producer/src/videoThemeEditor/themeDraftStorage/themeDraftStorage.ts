@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { videoThemePatchSchema } from "../../videoTheme/videoThemeSchemaHelpers/videoThemeSchemaHelpers";
-import { isThemeDraftEmpty, type ThemeDraft } from "../themeDraft/themeDraft";
+import { videoThemePatchSchema } from "../../videoTheme/VideoThemeSchemas/VideoThemeSchemas";
+import { type ThemeDraft, ThemeDrafts } from "../ThemeDrafts/ThemeDrafts";
 
 const DRAFT_KEY_PREFIX = "video-theme-draft:v1:";
 const ACTIVE_THEME_KEY = "video-theme-active:v1";
@@ -27,7 +27,7 @@ type WritableStorage = Pick<Storage, "setItem" | "removeItem">;
  * longer matches the theme schema. Drafts are kept per viewer so they
  * survive a reload.
  */
-export function readStoredThemeDraft(
+function _readStoredThemeDraft(
   options: Readonly<{ storage: ReadableStorage; themeId: string }>,
 ): StoredThemeDraft | undefined {
   const { storage, themeId } = options;
@@ -42,7 +42,7 @@ export function readStoredThemeDraft(
 }
 
 /** Stores a theme's draft, or forgets it when the draft is empty. */
-export function writeStoredThemeDraft(
+function _writeStoredThemeDraft(
   options: Readonly<{
     storage: WritableStorage;
     themeId: string;
@@ -52,7 +52,7 @@ export function writeStoredThemeDraft(
   const { storage, themeId, stored } = options;
   const key = `${DRAFT_KEY_PREFIX}${themeId}`;
   try {
-    if (isThemeDraftEmpty(stored.draft)) {
+    if (ThemeDrafts.isThemeDraftEmpty(stored.draft)) {
       storage.removeItem(key);
     } else {
       storage.setItem(key, JSON.stringify(stored));
@@ -66,7 +66,7 @@ export function writeStoredThemeDraft(
  * The theme to open: `?theme=` when it names an available theme, then the
  * viewer's last choice, then `classic`.
  */
-export function getActiveThemeIdFromLocation(
+function _getActiveThemeIdFromLocation(
   options: Readonly<{
     search: string;
     storage: ReadableStorage;
@@ -90,7 +90,7 @@ export function getActiveThemeIdFromLocation(
 }
 
 /** Remembers the viewer's theme choice for their next visit. */
-export function rememberActiveThemeId(
+function _rememberActiveThemeId(
   options: Readonly<{ storage: WritableStorage; themeId: string }>,
 ): void {
   const { storage, themeId } = options;
@@ -100,3 +100,21 @@ export function rememberActiveThemeId(
     // The choice still applies for this visit.
   }
 }
+
+/** Persists editor drafts and the selected theme in browser storage. */
+export const ThemeDraftStorage = {
+  /**
+   * The draft stored for a theme, or undefined when there is none or it no
+   * longer matches the theme schema.
+   */
+  readStoredThemeDraft: _readStoredThemeDraft,
+  /** Stores a theme's draft, or forgets it when the draft is empty. */
+  writeStoredThemeDraft: _writeStoredThemeDraft,
+  /**
+   * The theme to open: `?theme=` when it names an available theme, then the
+   * viewer's last choice, then `classic`.
+   */
+  getActiveThemeIdFromLocation: _getActiveThemeIdFromLocation,
+  /** Remembers the viewer's theme choice for their next visit. */
+  rememberActiveThemeId: _rememberActiveThemeId,
+};

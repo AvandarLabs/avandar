@@ -56,10 +56,12 @@ export const changedInput: Input = {
   ...DEFAULT_INPUT,
   session: { ...DEFAULT_INPUT.session, mode: "co-planning" },
   showClassroomResponsibility: false,
-  learners: Array.from({ length: 6 }, (_, index) => ({
-    id: `learner ${index}`,
-    label: `Learner ${index}`,
-  })),
+  learners: Array.from({ length: 6 }, (_, index) => {
+    return {
+      id: `learner ${index}`,
+      label: `Learner ${index}`,
+    };
+  }),
 };
 /** Schema rejection examples. */
 export const invalidInputs: unknown[] = [
@@ -93,10 +95,12 @@ export const denseInput: Input = {
     cover: { id: "cover", label: "界".repeat(20) },
     mentor: { id: "mentor", label: "界".repeat(20) },
   },
-  learners: changedInput.learners.map((learner) => ({
-    ...learner,
-    label: "界".repeat(16),
-  })),
+  learners: changedInput.learners.map((learner) => {
+    return {
+      ...learner,
+      label: "界".repeat(16),
+    };
+  }),
   session: {
     label: "界".repeat(24),
     mode: "rehearsal",

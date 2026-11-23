@@ -93,7 +93,7 @@ type _ScalarKey = (typeof _SCALAR_KEYS)[number];
  * sites, nor `_isSameFeatureList` account for, so a forgotten field can never
  * silently make `_isSameLayout` treat a real edit as a no-op.
  */
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// oxlint-disable-next-line typescript/ban-ts-comment
 // @ts-ignore Type test - this variable is intentionally not used
 type _ExhaustiveExportLayoutKeys = Expect<
   IsEqual<keyof ExportLayout, _ScalarKey | "title" | "subtitle" | "featureList">

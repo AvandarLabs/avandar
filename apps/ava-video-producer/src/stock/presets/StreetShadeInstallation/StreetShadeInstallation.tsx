@@ -18,15 +18,17 @@ export function StreetShadeInstallation({
   return (
     <g>
       <ShadeHeader input={input} />
-      {input.zones.map((zone, index) => (
-        <ShadeZone
-          key={zone.id}
-          input={input}
-          index={index}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {input.zones.map((zone, index) => {
+        return (
+          <ShadeZone
+            key={zone.id}
+            input={input}
+            index={index}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
       <ShadeLegend input={input} />
       <ShadeSummary input={input} frame={frame} />
     </g>

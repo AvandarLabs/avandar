@@ -1,6 +1,6 @@
-import { type StockPresetId } from "../../stock/catalog";
-import { buildReferenceBrief } from "./buildReferenceBrief";
+import { type StockPresetId } from "../../stock/stockEntry";
 import { Icon } from "./Icon";
+import { referenceBrief } from "./referenceBrief";
 import type { Preset } from "./Preset.types";
 import type { ReactNode, Dispatch, SetStateAction } from "react";
 
@@ -30,17 +30,26 @@ export function ReferenceTray({
           {saved.length === 1 ? "reference saved" : "references saved"}
         </span>
       </div>
-      <button className="tray-clear" onClick={() => setSaved([])}>
+      <button
+        className="tray-clear"
+        onClick={() => {
+          return setSaved([]);
+        }}
+      >
         Clear
       </button>
       <button
         className="button button-primary"
-        onClick={() =>
-          onCopy(
-            `Motion Atlas / Creative reference brief\n${saved.length} selected motion references\n\n${savedPresets.map((preset) => buildReferenceBrief({ preset, accent, background })).join("\n\n---\n\n")}`,
+        onClick={() => {
+          return onCopy(
+            `Motion Atlas / Creative reference brief\n${saved.length} selected motion references\n\n${savedPresets
+              .map((preset) => {
+                return referenceBrief({ preset, accent, background });
+              })
+              .join("\n\n---\n\n")}`,
             "Reference brief copied",
-          )
-        }
+          );
+        }}
       >
         <Icon name="copy" size={15} />
         Copy brief

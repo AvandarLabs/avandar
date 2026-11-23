@@ -1,5 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { useState } from "react";
 import { MapCanvasSurface } from "@/views/GisApp/MapCanvas/MapCanvasSurface/MapCanvasSurface";
 import { useMapCanvas } from "@/views/GisApp/MapCanvas/useMapCanvas";

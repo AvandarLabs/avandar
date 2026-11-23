@@ -5,8 +5,11 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { VideoThemeScope } from "../../../videoTheme/VideoThemeScope/VideoThemeScope";
 import { LiteralDataText } from "./LiteralDataText";
 
-const render = ({ value }: Readonly<{ value: string }>): string =>
-  renderToStaticMarkup(createElement(LiteralDataText, { value, x: 20, y: 30 }));
+const render = ({ value }: Readonly<{ value: string }>): string => {
+  return renderToStaticMarkup(
+    createElement(LiteralDataText, { value, x: 20, y: 30 }),
+  );
+};
 test("exact data retains raw accessible content while whitespace is bounded visible marks", () => {
   const value = " \t\n\r\u00a0".repeat(5);
   const markup = render({ value: value });
@@ -49,10 +52,11 @@ test("whitespace marks use the theme's highlight colour", () => {
     other: { video: { atomic: { swatch: { orange: "#00ff00" } } } },
   };
   const markup = renderToStaticMarkup(
-    createElement(VideoThemeScope, {
-      patches: [patch],
-      children: createElement(LiteralDataText, { value: "a b", x: 0, y: 0 }),
-    }),
+    createElement(
+      VideoThemeScope,
+      { patches: [patch] },
+      createElement(LiteralDataText, { value: "a b", x: 0, y: 0 }),
+    ),
   );
   assert.match(markup, /fill="#00ff00"/);
 });

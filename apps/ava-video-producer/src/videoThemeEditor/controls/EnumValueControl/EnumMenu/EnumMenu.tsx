@@ -1,6 +1,8 @@
+import { makeMap } from "@avandar/utils";
 import { AtlasSelect } from "../../../../gallery/AtlasSelect/AtlasSelect";
 import css from "./EnumMenu.module.css";
-import type { OptionCopy } from "../../../tokenCopy/editorCopy";
+import type { OptionCopy } from "../../../tokenCopy/EditorCopy";
+import type { ReactNode } from "react";
 
 type EnumOption = OptionCopy & Readonly<{ option: string }>;
 
@@ -13,21 +15,32 @@ type Props = Readonly<{
 }>;
 
 /** An enum menu whose options show their explanations under their names. */
-export function EnumMenu({ label, value, options, hasIssue, onChange }: Props) {
-  const descriptions = new Map(
-    options.map((entry) => [entry.option, entry.description]),
-  );
+export function EnumMenu({
+  label,
+  value,
+  options,
+  hasIssue,
+  onChange,
+}: Props): ReactNode {
+  const descriptions = makeMap(options, {
+    key: "option",
+    valueKey: "description",
+  });
   return (
     <AtlasSelect
       aria-label={label}
       error={hasIssue}
       value={value ?? null}
       placeholder="Not set"
-      data={options.map((entry) => ({
-        value: entry.option,
-        label: entry.label,
-      }))}
-      onChange={(selectedOption) => selectedOption && onChange(selectedOption)}
+      data={options.map((entry) => {
+        return {
+          value: entry.option,
+          label: entry.label,
+        };
+      })}
+      onChange={(selectedOption) => {
+        return selectedOption && onChange(selectedOption);
+      }}
       renderOption={({ option }) => {
         const description = descriptions.get(option.value);
         return (

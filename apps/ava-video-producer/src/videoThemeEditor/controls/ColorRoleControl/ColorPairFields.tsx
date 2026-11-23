@@ -1,20 +1,16 @@
-import { getFieldName } from "../../tokenCopy/editorCopy";
+import { EditorCopy } from "../../tokenCopy/EditorCopy";
 import { useTokenEditor } from "../../TokenEditorContext";
+import { type TokenRow } from "../../TokenRows/TokenRows.types";
 import { ReferenceControl } from "../ReferenceControl/ReferenceControl";
-import type { TokenRow } from "../../tokenRows/tokenRows";
 import type { ColorPair } from "../roleValueHelpers/roleValueHelpers";
+import type { ReactNode } from "react";
 
-type Props = Readonly<{
-  row: TokenRow;
-  label: string;
-  pair: ColorPair;
-}>;
-
+type Props = Readonly<{ row: TokenRow; label: string; pair: ColorPair }>;
 /** One picker per ground for a colour role that differs on light grounds. */
-export function ColorPairFields({ row, label, pair }: Props) {
+export function ColorPairFields({ row, label, pair }: Props): ReactNode {
   const editor = useTokenEditor();
   return (["onDark", "onLight"] as const).map((side) => {
-    const sideName = getFieldName(side);
+    const sideName = EditorCopy.getFieldName(side);
     return (
       <ReferenceControl
         key={side}
@@ -25,9 +21,9 @@ export function ColorPairFields({ row, label, pair }: Props) {
         value={pair[side]}
         tokenValue={row.value}
         allowLiteral={row.tier === "component"}
-        onChange={(reference) =>
-          editor.setToken(row.path, { ...pair, [side]: reference })
-        }
+        onChange={(reference) => {
+          return editor.setToken(row.path, { ...pair, [side]: reference });
+        }}
       />
     );
   });

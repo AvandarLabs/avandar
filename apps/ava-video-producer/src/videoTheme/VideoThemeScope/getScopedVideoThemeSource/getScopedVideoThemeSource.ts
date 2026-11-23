@@ -1,4 +1,4 @@
-import { createScopedVideoThemeSource } from "../createScopedVideoThemeSource/createScopedVideoThemeSource";
+import { makeScopedVideoThemeSourceFromScopes } from "../makeScopedVideoThemeSourceFromScopes/makeScopedVideoThemeSourceFromScopes";
 import type {
   VideoThemeScope as Scope,
   VideoThemeSource,
@@ -8,16 +8,19 @@ const SCOPED_SOURCES = new WeakMap<
   VideoThemeSource,
   Map<string, VideoThemeSource>
 >();
-
 /**
- * `createScopedVideoThemeSource`, returning the same object for the same
+ * `makeScopedVideoThemeSourceFromScopes`, returning the same object for the
+ * same
  * outer source and inner scope, so resolution caches and memoized providers
  * see a stable identity across mounts and frames.
  */
-export function getScopedVideoThemeSource(
-  outer: VideoThemeSource,
-  inner: Scope,
-): VideoThemeSource {
+export function getScopedVideoThemeSource({
+  outer,
+  inner,
+}: Readonly<{
+  outer: VideoThemeSource;
+  inner: Scope;
+}>): VideoThemeSource {
   const key = JSON.stringify(inner);
   const byScope =
     SCOPED_SOURCES.get(outer) ?? new Map<string, VideoThemeSource>();
@@ -26,7 +29,10 @@ export function getScopedVideoThemeSource(
   if (cached) {
     return cached;
   }
-  const source = createScopedVideoThemeSource(outer, inner);
+  const source = makeScopedVideoThemeSourceFromScopes({
+    outer,
+    inner,
+  });
   byScope.set(key, source);
   return source;
 }

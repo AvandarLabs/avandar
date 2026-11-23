@@ -1,10 +1,17 @@
-import { mix, ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { Motion } from "../../../motion";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ContactCard } from "./ContactCard";
 import { ContactHandling } from "./ContactHandling";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./ReferralConsentWithdrawal.schema";
 import type { ReactNode } from "react";
 
+type GetPreparationOptions = {
+  frame: number;
+  index: number;
+  order: number;
+  motion: VideoMotion;
+};
 type Props = {
   frame: number;
   labels: Input["labels"];
@@ -24,11 +31,14 @@ export function PreparedContact({
   order,
   permissionTurn,
 }: Readonly<Props>): ReactNode {
-  const progress = order < 0 ? 0 : ramp(frame, 60 + order * 16, 16);
-  const x = mix(progress, 520, 560);
-  const y = 194 + index * 102 - 20 * Math.sin(progress * Math.PI);
-  const isHandling =
-    order >= 0 && frame >= 60 + order * 16 && frame <= 76 + order * 16;
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const { progress, x, y, isHandling } = _getPreparation({
+    frame,
+    index,
+    order,
+    motion,
+  });
   return (
     <g>
       <ContactHandling
@@ -51,8 +61,41 @@ export function PreparedContact({
               : labels.withdrawn
             : labels.permitted
         }
-        color={order >= 0 ? STOCK.orange : accent}
+        color={order >= 0 ? tokens.color.highlight : accent}
       />
     </g>
   );
+}
+/**
+ * A contact affected by the withdrawal lifts and moves to the held column
+ * on its turn; the worker handles it while it moves.
+ */
+function _getPreparation({
+  frame,
+  index,
+  order,
+  motion,
+}: Readonly<GetPreparationOptions>) {
+  const progress =
+    order < 0
+      ? 0
+      : motion.ramp(
+          frame,
+          60 + order * motion.scaleStagger(16),
+          motion.scale(16),
+          motion.entrance.easing,
+        );
+  return {
+    progress,
+    x: Motion.mix({
+      t: progress,
+      from: 520,
+      to: 560,
+    }),
+    y: 194 + index * 102 - 20 * Math.sin(progress * Math.PI),
+    isHandling:
+      order >= 0 &&
+      frame >= 60 + order * motion.scaleStagger(16) &&
+      frame <= 76 + order * motion.scaleStagger(16),
+  };
 }

@@ -1,4 +1,4 @@
-import { DialogueBubble } from "./DialogueBubble";
+import { DialogueBubble } from "./DialogueBubble/DialogueBubble";
 import { DialogueLegend } from "./DialogueLegend";
 import { DialoguePeople } from "./DialoguePeople";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
@@ -18,24 +18,26 @@ export function InterpretedCaseDialogue({
     <g>
       <DialogueLegend input={input} accent={accent} />{" "}
       <DialoguePeople input={input} frame={frame} accent={accent} />
-      {input.turns.map((turn, turnIndex) => (
-        <g key={turn.id}>
-          <DialogueBubble
-            input={input}
-            frame={frame}
-            turnIndex={turnIndex}
-            interpreted={false}
-            accent={accent}
-          />
-          <DialogueBubble
-            input={input}
-            frame={frame}
-            turnIndex={turnIndex}
-            interpreted
-            accent={accent}
-          />
-        </g>
-      ))}
+      {input.turns.map((turn, turnIndex) => {
+        return (
+          <g key={turn.id}>
+            <DialogueBubble
+              input={input}
+              frame={frame}
+              turnIndex={turnIndex}
+              interpreted={false}
+              accent={accent}
+            />
+            <DialogueBubble
+              input={input}
+              frame={frame}
+              turnIndex={turnIndex}
+              interpreted
+              accent={accent}
+            />
+          </g>
+        );
+      })}
     </g>
   );
 }

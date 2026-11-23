@@ -1,5 +1,5 @@
 import { Skeleton } from "@mantine/core";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { lazy, Suspense, useId } from "react";
 import { AgentQueryResult } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/AgentQueryResult";
 import { AGENT_QUERY_RESULT_DEFINITION } from "@/components/ChatPanel/ChatThread/AgentQueryResultPart/agentQueryResultDefinition";

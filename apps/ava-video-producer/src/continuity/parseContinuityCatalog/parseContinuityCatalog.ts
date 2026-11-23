@@ -1,9 +1,8 @@
+import { prop } from "@avandar/utils";
 import { z } from "zod";
-import type { ContinuityCatalogEntry } from "../continuityCatalog";
-
+import type { ContinuityCatalogEntry } from "../isSceneEntry";
 /** Directory, under `storyboards/`, that holds every scene study's plan. */
 const SCENE_STUDY_DIRECTORY = "vocabulary/";
-
 const BASE_SCHEMA = z.object({
   id: z.string().min(1),
   title: z.string().min(1),
@@ -24,16 +23,13 @@ const STUDY_SCHEMA = BASE_SCHEMA.extend({
   creativeDirection: z.string().min(1),
   avoid: z.string().min(1),
   controls: z.array(
-    z
-      .object({
-        path: z.string().min(1),
-        label: z.string().min(1),
-        description: z.string().min(1),
-      })
-      .strict(),
+    z.strictObject({
+      path: z.string().min(1),
+      label: z.string().min(1),
+      description: z.string().min(1),
+    }),
   ),
 }).strict();
-
 function _assertUniqueIds(entries: readonly ContinuityCatalogEntry[]) {
   const ids = new Set<string>();
   entries.forEach((entry) => {
@@ -43,17 +39,19 @@ function _assertUniqueIds(entries: readonly ContinuityCatalogEntry[]) {
     ids.add(entry.id);
   });
 }
-
 /** Parses authored continuity metadata for gallery and render consumers. */
-export function parseContinuityCatalog(
-  films: unknown,
-  studies: unknown,
-): readonly ContinuityCatalogEntry[] {
+export function parseContinuityCatalog({
+  films,
+  studies,
+}: Readonly<{
+  films: unknown;
+  studies: unknown;
+}>): readonly ContinuityCatalogEntry[] {
   const parsedFilms = z.array(FILM_SCHEMA).parse(films);
   const parsedStudies = z.array(STUDY_SCHEMA).parse(studies);
   const entries = [...parsedFilms, ...parsedStudies];
   _assertUniqueIds(entries);
-  const filmIds = new Set(parsedFilms.map((entry) => entry.id));
+  const filmIds = new Set(parsedFilms.map(prop("id")));
   parsedStudies.forEach((entry) => {
     if (!filmIds.has(entry.sourceFilm)) {
       throw new Error(

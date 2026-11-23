@@ -1,14 +1,10 @@
-import { Arrive } from "../../graphics-common/Arrive";
+import { Arrive } from "../../graphics-common/Arrive/Arrive";
 import { Text } from "../../graphics-common/Text";
 import { ForkLabel } from "./ForkLabel/ForkLabel";
 import type { DecisionForkInput } from "./DecisionFork.schema";
 import type { ReactNode } from "react";
 
-type Props = {
-  frame: number;
-  input: DecisionForkInput;
-};
-
+type Props = { frame: number; input: DecisionForkInput };
 /** The authored question and scenario establish the single decision. */
 export function DecisionHeading({ frame, input }: Readonly<Props>): ReactNode {
   return (

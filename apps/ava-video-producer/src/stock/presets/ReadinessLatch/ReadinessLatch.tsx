@@ -1,13 +1,14 @@
 import { prop } from "@avandar/utils";
 import { ReadinessCaptions } from "./ReadinessCaptions";
-import { ReadinessGate } from "./ReadinessGate";
+import { ReadinessGate } from "./ReadinessGate/ReadinessGate";
 import { ReadinessResult } from "./ReadinessResult";
-import { ReadinessRibbon } from "./ReadinessRibbon";
+import { ReadinessRibbon } from "./ReadinessRibbon/ReadinessRibbon";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ReadinessLatch.schema";
 import type { ReactNode } from "react";
 
 type Props = GraphicProps & { input: Input };
+
 /** Every authored branch must finish and withdraw its pin before release. */
 export function ReadinessLatch({
   frame,
@@ -26,14 +27,16 @@ export function ReadinessLatch({
   };
   return (
     <g>
-      {input.participants.map((participant, index) => (
-        <ReadinessRibbon
-          key={participant.id}
-          participant={participant}
-          index={index}
-          {...ribbonProps}
-        />
-      ))}
+      {input.participants.map((participant, index) => {
+        return (
+          <ReadinessRibbon
+            key={participant.id}
+            participant={participant}
+            index={index}
+            {...ribbonProps}
+          />
+        );
+      })}
       <ReadinessGate
         horizontal={horizontal}
         allReady={allReady}

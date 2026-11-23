@@ -1,79 +1,12 @@
-import { getIsMacPlatform } from "@avandar/browser-utils";
-import { hasDefinedProps, isPlainObject } from "@avandar/utils";
-import { Box, Button, Group, Text, Textarea, TextInput } from "@mantine/core";
-import { getHotkeyHandler } from "@mantine/hooks";
+import { Box, Group, Text } from "@mantine/core";
 import { useI18nMessages } from "@ui/i18n/useI18nMessages";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { EditButton } from "../buttons/EditButton";
 import { TruncatedText } from "../text/TruncatedText";
-import type { TextareaProps, TextInputProps, TextProps } from "@mantine/core";
+import { EditableDisplayTextEditor } from "./EditableDisplayTextEditor/EditableDisplayTextEditor";
+import type { EditableDisplayTextProps as Props } from "./EditableDisplayText.types";
 
-type BaseProps = {
-  /**
-   * The current text value. This makes the component controlled.
-   */
-  value: string;
-
-  /**
-   * Called whenever the text changes in edit mode.
-   */
-  onChange: (value: string) => void;
-
-  /**
-   * Called when the user clicks save.
-   */
-  onSave: (value: string) => void;
-
-  /**
-   * Called when the user cancels editing.
-   */
-  onCancel?: () => void;
-  isSaving?: boolean;
-  disabled?: boolean;
-
-  /**
-   * The name of the item to edit. The name will be used in the tooltip label
-   * as "Edit ${name}".
-   */
-  name?: string;
-
-  /** Display text to show when `value` is empty */
-  emptyDisplayText?: string;
-  isSaveDisabled?: boolean;
-  displayTextProps?: TextProps;
-};
-
-type TextInputVariantProps = BaseProps & {
-  /**
-   * Whether or not to render the component as a textarea.
-   * @default false
-   */
-  textarea?: false;
-};
-
-type TextareaVariantProps = BaseProps & {
-  /**
-   * Whether or not to render the component as a textarea.
-   * @default false
-   */
-  textarea: true;
-
-  /** Min rows for the editable text area */
-  minRows?: number;
-
-  /** Max rows for the editable text area */
-  maxRows?: number;
-};
-
-type Props =
-  | (TextInputVariantProps &
-      Omit<TextInputProps, "value" | "onChange" | "onSubmit">)
-  | (TextareaVariantProps &
-      Omit<
-        TextareaProps,
-        "value" | "onChange" | "onSubmit" | "minRows" | "maxRows"
-      >);
-
+/** Controlled inline text with display, save, and cancel states. */
 export function EditableDisplayText({
   name,
   value,
@@ -90,35 +23,7 @@ export function EditableDisplayText({
   const i18n = useI18nMessages();
   const resolvedEmptyDisplayText = emptyDisplayText ?? i18n.empty;
   const [isEditing, setIsEditing] = useState(false);
-  const textInputRef = useRef<HTMLInputElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const hasText = value.trim().length > 0;
-
-  useEffect(() => {
-    if (isEditing) {
-      if (passThroughProps.textarea) {
-        textareaRef.current?.focus();
-      } else {
-        textInputRef.current?.focus();
-      }
-    }
-  }, [isEditing, passThroughProps.textarea]);
-  const hasExplicitWidth =
-    (!passThroughProps.textarea && hasDefinedProps(passThroughProps, "w")) ||
-    (isPlainObject(passThroughProps.style) &&
-      hasDefinedProps(passThroughProps.style, "width"));
-
-  const isMac = getIsMacPlatform();
-  const keyboardShortcut = passThroughProps.textarea
-    ? isMac
-      ? "⌘↵"
-      : "Ctrl↵"
-    : "Enter";
-  const keyboardShortcutSymbol = passThroughProps.textarea
-    ? isMac
-      ? "⌘↵"
-      : "Ctrl↵"
-    : "↵";
 
   const onStartEditing = () => {
     if (disabled) {
@@ -144,137 +49,19 @@ export function EditableDisplayText({
     setIsEditing(false);
   };
 
-  const inputStyles = {
-    input: {
-      padding: 0,
-      border: 0,
-      fontSize: "inherit",
-      lineHeight: "inherit",
-      color: "inherit",
-      width:
-        !passThroughProps.textarea && !hasExplicitWidth ? "100%" : undefined,
-      minWidth: !passThroughProps.textarea && !hasExplicitWidth ? 0 : undefined,
-    },
-  };
-
-  const elements = {
-    textInput() {
-      if (passThroughProps.textarea) {
-        return null;
-      }
-      return (
-        <TextInput
-          ref={textInputRef}
-          variant="unstyled"
-          name={name}
-          value={value}
-          onChange={(event) => {
-            onChange(event.currentTarget.value);
-          }}
-          onKeyDown={getHotkeyHandler([
-            [
-              "Enter",
-              (event) => {
-                event.preventDefault();
-                onSaveClick();
-              },
-            ],
-            [
-              "Escape",
-              (event) => {
-                event.preventDefault();
-                onCancelClick();
-              },
-            ],
-          ])}
-          styles={inputStyles}
-          {...passThroughProps}
-        />
-      );
-    },
-    textarea() {
-      if (!passThroughProps.textarea) {
-        return null;
-      }
-      const { minRows = 2, maxRows = 8, ...textareaProps } = passThroughProps;
-
-      return (
-        <Textarea
-          ref={textareaRef}
-          variant="unstyled"
-          name={name}
-          autosize
-          minRows={minRows}
-          maxRows={maxRows}
-          value={value}
-          onChange={(event) => {
-            onChange(event.currentTarget.value);
-          }}
-          onKeyDown={getHotkeyHandler([
-            [
-              "mod+Enter",
-              (event) => {
-                event.preventDefault();
-                onSaveClick();
-              },
-            ],
-            [
-              "Escape",
-              (event) => {
-                event.preventDefault();
-                onCancelClick();
-              },
-            ],
-          ])}
-          styles={inputStyles}
-          {...textareaProps}
-        />
-      );
-    },
-  };
-
   if (isEditing) {
     return (
-      <Box
-        p="xs"
-        bdrs="sm"
-        bd="1px dashed var(--mantine-color-neutral-4)"
-        bg="neutral.0"
-        w={!passThroughProps.textarea && !hasExplicitWidth ? "100%" : undefined}
-        maw="100%"
-        miw={0}
-      >
-        {passThroughProps.textarea ? elements.textarea() : elements.textInput()}
-        <Group mt="xxs" gap="xs">
-          <Button
-            size="compact-sm"
-            variant="light"
-            onClick={() => {
-              onSaveClick();
-            }}
-            loading={isSaving}
-            disabled={disabled || isSaveDisabled}
-          >
-            <Group gap="xxs" align="bottom">
-              {i18n.save}
-              <Text span size="xs" c="primary.6">
-                {keyboardShortcutSymbol}
-              </Text>
-            </Group>
-          </Button>
-          <Button
-            size="compact-sm"
-            variant="default"
-            onClick={onCancelClick}
-            disabled={disabled || isSaving}
-          >
-            {i18n.cancel}
-          </Button>
-          <Text size="xs" c="dimmed">
-            {i18n.saveWithShortcut(keyboardShortcut)}
-          </Text>
-        </Group>
-      </Box>
+      <EditableDisplayTextEditor
+        name={name}
+        value={value}
+        onChange={onChange}
+        onSaveClick={onSaveClick}
+        onCancelClick={onCancelClick}
+        isSaving={isSaving}
+        disabled={disabled}
+        isSaveDisabled={isSaveDisabled}
+        passThroughProps={passThroughProps}
+      />
     );
   }
 

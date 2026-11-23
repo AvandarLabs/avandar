@@ -3,6 +3,9 @@
 /** @jsxRuntime automatic */
 import { MantineProvider, type MantineProviderProps } from "@mantine/core";
 import { ReenactmentThemeBoundary } from "../../src/videoTheme/ReenactmentThemeBoundary/ReenactmentThemeBoundary";
+import type { ReactNode } from "react";
+
+type Props = MantineProviderProps;
 
 /**
  * The product's `MantineProvider`, behind a boundary that hides any video
@@ -10,7 +13,7 @@ import { ReenactmentThemeBoundary } from "../../src/videoTheme/ReenactmentThemeB
  * root of every reenactment the adapter renders; it passes every prop
  * through unchanged.
  */
-export function ProductThemeRoot(props: MantineProviderProps) {
+export function ProductThemeRoot(props: Readonly<Props>): ReactNode {
   return (
     <ReenactmentThemeBoundary>
       <MantineProvider {...props} />

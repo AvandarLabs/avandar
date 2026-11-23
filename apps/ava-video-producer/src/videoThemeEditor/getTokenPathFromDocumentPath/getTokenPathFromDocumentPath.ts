@@ -13,8 +13,7 @@ export function getTokenPathFromDocumentPath(
   if (isVideo && segments[2] === "semantic") {
     return segments.slice(3).join(".");
   }
-  if (segments[0] === "components" && segments[2] === "defaultProps") {
-    return ["components", segments[1], ...segments.slice(3)].join(".");
-  }
-  return segments.join(".");
+  return segments[0] === "components" && segments[2] === "defaultProps"
+    ? ["components", segments[1], ...segments.slice(3)].join(".")
+    : segments.join(".");
 }

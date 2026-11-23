@@ -1,16 +1,29 @@
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { FitText } from "../FitText/FitText";
+import { SketchedShape } from "../SketchedShape";
 import type { ReactNode } from "react";
-
+/** The fragment box's own corner, scaled by the theme's corner style. */
+const FRAGMENT_CORNER = 5;
 type Props = {
   x: number;
   y: number;
   width: number;
   text: string;
   emphasized?: boolean;
+  /** Defaults to the theme's positive colour. */
   color?: string;
 };
-
+function _assertFragmentPlacement({
+  x,
+  y,
+  width,
+}: Readonly<{ x: number; y: number; width: number }>) {
+  if (![x, y, width].every(Number.isFinite) || width < 100 || width > 800) {
+    throw new Error(
+      "Document fragments require finite placement and widths from 100 to 800 pixels.",
+    );
+  }
+}
 /**
  * Draws an authored fragment at a stable anchor with at most two text lines.
  */
@@ -20,13 +33,13 @@ export function DocumentFragment({
   width,
   text,
   emphasized = false,
-  color = STOCK.mint,
+  color,
 }: Readonly<Props>): ReactNode {
-  if (![x, y, width].every(Number.isFinite) || width < 100 || width > 800) {
-    throw new Error(
-      "Document fragments require finite placement and widths from 100 to 800 pixels.",
-    );
-  }
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  _assertFragmentPlacement({ x, y, width });
+  const accent = color ?? tokens.color.positive;
   return (
     <g>
       <rect
@@ -34,14 +47,17 @@ export function DocumentFragment({
         y={y}
         width={width}
         height={64}
-        rx={5}
-        fill={emphasized ? color : STOCK.surface}
-        fillOpacity={emphasized ? 0.09 : 1}
+        rx={scales.corner(FRAGMENT_CORNER)}
+        fill={emphasized ? accent : tokens.color.surface}
+        fillOpacity={emphasized ? scales.wash(atomic.opacity["9"]) : 1}
       />
-      <path
-        d={`M${x} ${y + 64} H${x + width}`}
-        stroke={emphasized ? color : STOCK.line}
-        strokeWidth={emphasized ? 2 : 1}
+      <SketchedShape
+        shape={{ kind: "path", d: `M${x} ${y + 64} H${x + width}` }}
+        profile={tokens.sketch.shape}
+        stroke={emphasized ? accent : tokens.color.line}
+        strokeWidth={scales.stroke(
+          emphasized ? tokens.stroke.default : tokens.stroke.hairline,
+        )}
       />
       <FitText
         x={x + 10}

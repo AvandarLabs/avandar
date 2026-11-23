@@ -1,4 +1,4 @@
-import { buildFailureStatusFromError } from "../buildFailureStatusFromError";
+import { makeFailureStatusFromError } from "../makeFailureStatusFromError";
 import type { FailureKind, ThemeSaveStatus } from "../useThemeSaving.types";
 import type { RefObject } from "react";
 
@@ -28,7 +28,7 @@ export async function runThemeRequest(
     setStatus({ kind: "saved" });
     return true;
   } catch (error) {
-    setStatus(buildFailureStatusFromError({ error, kind: failureKind }));
+    setStatus(makeFailureStatusFromError({ error, kind: failureKind }));
     return false;
   } finally {
     inFlight.current = false;

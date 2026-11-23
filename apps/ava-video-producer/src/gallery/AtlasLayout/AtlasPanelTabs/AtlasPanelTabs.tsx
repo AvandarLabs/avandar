@@ -19,7 +19,12 @@ type Props = Readonly<{
  * when the item can be themed. The tokens panel mounts on its first visit
  * and both panels stay mounted, so a running export keeps its status.
  */
-export function AtlasPanelTabs({ tab, onTabChange, details, tokens }: Props) {
+export function AtlasPanelTabs({
+  tab,
+  onTabChange,
+  details,
+  tokens,
+}: Props): ReactNode {
   const [hasVisitedTokens, setVisitedTokens] = useState(tab === "tokens");
   if (!tokens) {
     return <>{details}</>;

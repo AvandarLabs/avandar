@@ -2,7 +2,7 @@ import { AtlasDialog } from "../../AtlasLayout/AtlasDialog/AtlasDialog";
 import {
   PreviewDialogContent,
   type Props as ContentProps,
-} from "./PreviewDialogContent";
+} from "./PreviewDialogContent/PreviewDialogContent";
 import type React from "react";
 
 /** Modal controls and motion-specific preview content. */

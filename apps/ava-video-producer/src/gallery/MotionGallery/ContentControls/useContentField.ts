@@ -1,5 +1,5 @@
 import { useId } from "react";
-import { getStockValueFromPath } from "../../../stock/copy/getStockValueFromPath";
+import { getStockValueFromPath } from "../../../stock/data/getStockValueFromPath";
 import { ContentDraftModule } from "./ContentDraftModule/ContentDraftModule";
 import type { StockJsonValue } from "../../../stock/contracts/StockContract.types";
 import type { Props } from "./ContentField/ContentField";
@@ -27,18 +27,14 @@ export function useContentField({
   onChange,
 }: Readonly<Props>): UseContentFieldResult {
   const id = useId();
-  const path = [
-    ...parentPath,
-    ...control.path
-      .split(".")
-      .filter(Boolean)
-      .map((key) => (/^\d+$/.test(key) ? Number(key) : key)),
-  ];
-  const issueIds = state.issues.flatMap((issue, index) =>
-    path.every((key, position) => issue.path[position] === key)
+  const path = _createContentPath({ parentPath, control });
+  const issueIds = state.issues.flatMap((issue, index) => {
+    return path.every((key, position) => {
+      return issue.path[position] === key;
+    })
       ? [`content-issue-${index}`]
-      : [],
-  );
+      : [];
+  });
   const describedBy =
     [control.help ? `${id}-help` : "", ...issueIds].filter(Boolean).join(" ") ||
     undefined;
@@ -50,10 +46,11 @@ export function useContentField({
     label,
     value: getStockValueFromPath({ value: state.draft, path }),
     help: control.help ? control.help.message : undefined,
-    update: (replacement: StockJsonValue) =>
-      onChange(
+    update: (replacement: StockJsonValue) => {
+      return onChange(
         ContentDraftModule.edit({ preset, state, path, value: replacement }),
-      ),
+      );
+    },
     field: {
       id,
       "aria-label": label,
@@ -64,3 +61,20 @@ export function useContentField({
 }
 /** Derived field values and native accessibility attributes. */
 export type ContentFieldContext = ReturnType<typeof useContentField>;
+
+function _createContentPath({
+  parentPath,
+  control,
+}: Readonly<
+  Pick<Props, "parentPath" | "control">
+>): UseContentFieldResult["path"] {
+  return [
+    ...parentPath,
+    ...control.path
+      .split(".")
+      .filter(Boolean)
+      .map((key) => {
+        return /^\d+$/.test(key) ? Number(key) : key;
+      }),
+  ];
+}

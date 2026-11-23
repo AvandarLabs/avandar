@@ -300,7 +300,7 @@ export function useDataExplorerUrlSync({
     // decision is captured once via shouldHydrateRef so that mid-hydration
     // state changes (from the dispatches above) do not re-trigger the
     // bail-out check.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // oxlint-disable-next-line react/exhaustive-deps
     [
       isHydrated,
       urlState,

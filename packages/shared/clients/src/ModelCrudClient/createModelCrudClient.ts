@@ -360,7 +360,7 @@ export function createModelCrudClient<
       parsers,
       // Using `any` here only because TypeScript is struggling with the
       // complexity of the generics and function name extractions.
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // oxlint-disable-next-line typescript/no-explicit-any
     } as any;
   });
 }

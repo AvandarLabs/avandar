@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
-import { useVideoTokens } from "../useVideoTheme";
+import { useVideoTokens } from "../videoThemeHelpers";
 import { VideoThemeScope } from "./VideoThemeScope";
 
 function AccentProbe() {

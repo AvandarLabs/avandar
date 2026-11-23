@@ -1,5 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./WorkspaceCapacityExtension.schema";
 import type { ReactNode } from "react";
 
@@ -24,6 +25,9 @@ export function ResourceTab({
   isExisting = false,
   isSeated = false,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g
       data-existing-resource={isExisting ? resource.id : undefined}
@@ -32,16 +36,18 @@ export function ResourceTab({
         isExisting ? undefined : isSeated ? "seated" : "pending"
       }
     >
-      <rect
+      <StockRect
         data-resource-tab={resource.id}
         x={x}
         y={y}
         width={78}
         height={132}
-        rx={6}
-        fill={STOCK.surface}
+        rx={scales.corner(6)}
+        fill={tokens.color.surface}
         stroke={accent}
-        strokeDasharray={!isExisting && !isSeated ? "4 3" : undefined}
+        strokeDasharray={
+          !isExisting && !isSeated ? atomic.dash.tight.join(" ") : undefined
+        }
       />
       <LabelSlots labels={[[String(index + 1), x + 10, y + 18, 58, 14, 1]]} />
       {showLabel ? (

@@ -1,7 +1,8 @@
 import { Badge, SegmentedControl } from "@mantine/core";
 import css from "./ScopeSwitch.module.css";
-import type { ThemeEditScope } from "../../../themeDraft/themeDraft";
+import type { ThemeEditScope } from "../../../ThemeDrafts/ThemeDrafts";
 import type { EditorItem } from "../EditorToolbar";
+import type { ReactNode } from "react";
 
 type Props = Readonly<{
   scope: ThemeEditScope;
@@ -10,13 +11,16 @@ type Props = Readonly<{
   onScopeChange: (scope: ThemeEditScope) => void;
 }>;
 
-/** Switches between editing the whole theme and the previewed item, with its change count. */
+/**
+ * Switches between editing the whole theme and the previewed item, with its
+ * change count.
+ */
 export function ScopeSwitch({
   scope,
   item,
   overrideCount,
   onScopeChange,
-}: Props) {
+}: Props): ReactNode {
   return (
     <div className={css.scopeSwitch}>
       <SegmentedControl
@@ -28,13 +32,13 @@ export function ScopeSwitch({
           { value: "theme", label: "Whole theme" },
           { value: "item", label: item.scopeLabel },
         ]}
-        onChange={(kind) =>
-          onScopeChange(
+        onChange={(kind) => {
+          return onScopeChange(
             kind === "item"
               ? { kind: "item", itemId: item.id }
               : { kind: "theme" },
-          )
-        }
+          );
+        }}
       />
       {overrideCount > 0 ? (
         <Badge

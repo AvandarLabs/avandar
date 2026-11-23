@@ -10,7 +10,7 @@ import {
 } from "@avandar/query-hooks";
 
 export function createUsableServiceClient<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // oxlint-disable-next-line typescript/no-explicit-any
   Client extends ModelCrudClient<any>,
   UseQueryFnName extends FnNameReturningPromise<Client>,
   UseMutationFnName extends FnNameReturningPromise<Client>,

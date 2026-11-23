@@ -1,5 +1,5 @@
 import { NgrokDevUrlsManager } from "@fanout-server/NgrokDevUrlsManager";
-import z from "zod";
+import { z } from "zod";
 import type { NgrokDevUrlTarget } from "@fanout-server/NgrokDevUrlsManager";
 import type { FastifyReply, FastifyRequest } from "fastify";
 

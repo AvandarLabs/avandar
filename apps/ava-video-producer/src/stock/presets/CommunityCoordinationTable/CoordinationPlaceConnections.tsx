@@ -1,3 +1,5 @@
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getCoordinationPlaceColorFromIndex } from "./getCoordinationPlaceColorFromIndex";
 import type { Input } from "./CommunityCoordinationTable.schema";
 import type { ReactNode } from "react";
@@ -10,18 +12,30 @@ export function CoordinationPlaceConnections({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
-      {input.places.map((place, index) => (
-        <path
-          key={place.id}
-          data-place-connector={place.id}
-          d={`M322 ${120 + 108 * index} L330 ${120 + 108 * index} L${340 + place.x * 270} ${160 + place.y * 280}`}
-          fill="none"
-          stroke={getCoordinationPlaceColorFromIndex({ index, accent })}
-          strokeWidth={1.5}
-        />
-      ))}
+      {input.places.map((place, index) => {
+        return (
+          <SketchedShape
+            key={place.id}
+            shape={{
+              kind: "path",
+              d: `M322 ${120 + 108 * index} L330 ${120 + 108 * index} L${340 + place.x * 270} ${160 + place.y * 280}`,
+            }}
+            profile={tokens.sketch.shape}
+            data-place-connector={place.id}
+            fill="none"
+            stroke={getCoordinationPlaceColorFromIndex({
+              index,
+              accent,
+              color: tokens.color,
+            })}
+            strokeWidth={scales.stroke(tokens.stroke.outline)}
+          />
+        );
+      })}
     </g>
   );
 }

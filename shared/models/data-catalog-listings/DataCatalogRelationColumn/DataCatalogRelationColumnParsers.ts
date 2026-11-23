@@ -62,7 +62,7 @@ export const DataCatalogRelationColumnParsers =
  * Do not remove these tests!
  */
 type CrudTypes = DataCatalogRelationColumnModel;
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// oxlint-disable-next-line typescript/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [
   Expect<

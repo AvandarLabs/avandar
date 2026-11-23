@@ -1,4 +1,4 @@
-.reference {
+.referenceControl {
   display: grid;
-  gap: 4px;
+  gap: var(--atlas-space-4);
 }

@@ -1,3 +1,4 @@
+import { makeMap } from "@avandar/utils";
 import type { Input } from "./TravelTimeNetworkFrontier.schema";
 /** Data for getTravelCostsFromInput. */
 type GetTravelCostsFromInputResult = {
@@ -13,18 +14,45 @@ type GetTravelCostsFromInputResult = {
 export function getTravelCostsFromInput(
   input: Readonly<Input>,
 ): GetTravelCostsFromInputResult[] {
-  const costs = new Map(input.nodes.map((node) => [node.id, Infinity]));
+  const costs = makeMap(input.nodes, {
+    key: "id",
+    valueFn: () => {
+      return Infinity;
+    },
+  });
   const predecessors = new Map<string, string>();
   const settled = new Set<string>();
   costs.set(input.originId, 0);
+  _settleTravelCostsFromInput({ input, costs, predecessors, settled });
+  return input.nodes.map((node) => {
+    return {
+      ...node,
+      cost: costs.get(node.id)!,
+      predecessor: predecessors.get(node.id),
+    };
+  });
+}
+
+/** Relaxes authored roads in stable node and neighbor order. */
+function _settleTravelCostsFromInput({
+  input,
+  costs,
+  predecessors,
+  settled,
+}: Readonly<{
+  input: Input;
+  costs: Map<string, number>;
+  predecessors: Map<string, string>;
+  settled: Set<string>;
+}>): void {
   input.nodes.forEach(() => {
     const current = input.nodes
-      .filter((node) => !settled.has(node.id))
-      .reduce<(typeof input.nodes)[number] | undefined>(
-        (best, node) =>
-          !best || costs.get(node.id)! < costs.get(best.id)! ? node : best,
-        undefined,
-      );
+      .filter((node) => {
+        return !settled.has(node.id);
+      })
+      .reduce<(typeof input.nodes)[number] | undefined>((best, node) => {
+        return !best || costs.get(node.id)! < costs.get(best.id)! ? node : best;
+      }, undefined);
     if (!current) {
       return;
     }
@@ -46,9 +74,4 @@ export function getTravelCostsFromInput(
       }
     });
   });
-  return input.nodes.map((node) => ({
-    ...node,
-    cost: costs.get(node.id)!,
-    predecessor: predecessors.get(node.id),
-  }));
 }

@@ -1,16 +1,19 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { LABELS_CUE } from "./journalTiming";
 import type { Input } from "./JournalReceipts.schema";
 import type { ReactNode } from "react";
 
 type Props = { entry: Input["entries"][number]; input: Input; frame: number };
-
 function _createLabelsFromEntry({
   entry,
   input,
+  color,
 }: {
   entry: Readonly<Input["entries"][number]>;
   input: Readonly<Input>;
+  color: Readonly<{ text: string; textMuted: string }>;
 }) {
   const horizontal = input.foldDirection === "horizontal";
   return [
@@ -21,7 +24,7 @@ function _createLabelsFromEntry({
       width: horizontal ? 134 : 222,
       fontSize: 14 as const,
       maxLines: horizontal ? 4 : 3,
-      color: STOCK.text,
+      color: color.text,
     },
     ...(input.showIdentifiers
       ? [
@@ -32,40 +35,47 @@ function _createLabelsFromEntry({
             width: horizontal ? 130 : 68,
             fontSize: 12 as const,
             maxLines: horizontal ? 2 : 3,
-            color: STOCK.muted,
+            color: color.textMuted,
           },
         ]
       : []),
   ];
 }
-
 /** Entry labels and optional identities occupy separate fixed-size slots. */
 export function JournalEntryText({
   entry,
   input,
   frame,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const horizontal = input.foldDirection === "horizontal";
-  if (!input.showLabels || frame < 56) {
+  if (!input.showLabels || frame < LABELS_CUE) {
     return (
-      <path
-        d={horizontal ? "M12 36 h96 M12 48 h70" : "M12 25 h220 M12 36 h160"}
-        stroke={STOCK.muted}
-        strokeWidth={2}
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: horizontal ? "M12 36 h96 M12 48 h70" : "M12 25 h220 M12 36 h160",
+        }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.inactive}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
     );
   }
-  const labels = _createLabelsFromEntry({ entry, input });
+  const labels = _createLabelsFromEntry({ entry, input, color: tokens.color });
   return (
     <g>
-      {labels.map((label) => (
-        <FitText
-          key={label.x + label.y}
-          {...label}
-          normalizeWhitespace
-          breakLongWords
-        />
-      ))}
+      {labels.map((label) => {
+        return (
+          <FitText
+            key={label.x + label.y}
+            {...label}
+            normalizeWhitespace
+            breakLongWords
+          />
+        );
+      })}
     </g>
   );
 }

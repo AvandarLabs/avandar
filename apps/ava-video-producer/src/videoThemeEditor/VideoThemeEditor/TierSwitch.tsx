@@ -1,5 +1,6 @@
 import { SegmentedControl } from "@mantine/core";
 import type { EditorFilters } from "./EditorToolbar/EditorToolbar";
+import type { ReactNode } from "react";
 
 type Props = Readonly<{
   filters: EditorFilters;
@@ -7,7 +8,7 @@ type Props = Readonly<{
 }>;
 
 /** The tabs that choose which tier of settings the editor lists. */
-export function TierSwitch({ filters, onFiltersChange }: Props) {
+export function TierSwitch({ filters, onFiltersChange }: Props): ReactNode {
   return (
     <SegmentedControl
       size="xs"
@@ -22,7 +23,9 @@ export function TierSwitch({ filters, onFiltersChange }: Props) {
         { value: "semantic", label: "Styles" },
         { value: "atomic", label: "Base values" },
       ]}
-      onChange={(tier) => onFiltersChange({ ...filters, tier })}
+      onChange={(tier) => {
+        return onFiltersChange({ ...filters, tier });
+      }}
     />
   );
 }

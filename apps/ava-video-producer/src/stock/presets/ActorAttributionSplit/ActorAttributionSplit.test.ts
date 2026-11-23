@@ -43,12 +43,14 @@ const options = {
     "collaboratorId",
     "phase",
   ],
-  getVisibleTexts: ({ input }: Readonly<{ input: Input }>) => [
-    ...input.collaborators.map(prop("label")),
-    ...input.accounts.map(prop("label")),
-    ...input.events.map(prop("label")),
-    ...Object.values(input.copy),
-  ],
+  getVisibleTexts: ({ input }: Readonly<{ input: Input }>) => {
+    return [
+      ...input.collaborators.map(prop("label")),
+      ...input.accounts.map(prop("label")),
+      ...input.events.map(prop("label")),
+      ...Object.values(input.copy),
+    ];
+  },
 } satisfies Pick<
   PresetAssertions<Input>,
   | "inputSchema"
@@ -68,8 +70,9 @@ registerStockTextLayoutAssertions({
   getVisibleTexts: ({
     input,
     frame,
-  }: Readonly<{ input: Input; frame: number }>) =>
-    frame >= 141 ? options.getVisibleTexts({ input: input }) : [],
+  }: Readonly<{ input: Input; frame: number }>) => {
+    return frame >= 141 ? options.getVisibleTexts({ input: input }) : [];
+  },
 });
 
 test("historical shared attribution survives separation and later accounts", () => {
@@ -149,10 +152,12 @@ test("historical accounts retain the actual shared label under reordered actions
       DEFAULT_INPUT.events[3],
       DEFAULT_INPUT.events[2],
     ],
-    accounts: DEFAULT_INPUT.accounts.map((account) => ({
-      ...account,
-      label: ` ${account.label} `,
-    })),
+    accounts: DEFAULT_INPUT.accounts.map((account) => {
+      return {
+        ...account,
+        label: ` ${account.label} `,
+      };
+    }),
     showActionGuides: false,
   };
   assert.equal(inputSchema.safeParse(input).success, true);

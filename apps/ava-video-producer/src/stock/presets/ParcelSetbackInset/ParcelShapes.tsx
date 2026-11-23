@@ -1,4 +1,5 @@
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ParcelEnvelopeGeometry } from "./makeParcelEnvelopeGeometryFromParcel";
 import type { ReactNode } from "react";
 
@@ -17,23 +18,25 @@ export function ParcelShapes({
   accent,
   hatchId,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
-      <rect
+      <StockRect
         data-original-parcel={parcelId}
         {...geometry.original}
         fill={`url(#${hatchId})`}
-        stroke={STOCK.muted}
-        strokeWidth={1.5}
+        stroke={tokens.color.inactive}
+        strokeWidth={scales.stroke(tokens.stroke.outline)}
       />
-      <rect
+      <StockRect
         data-envelope={parcelId}
         data-envelope-width={geometry.finalWidth}
         data-envelope-height={geometry.finalHeight}
         {...geometry.inset}
-        fill={STOCK.surface}
+        fill={tokens.color.surface}
         stroke={accent}
-        strokeWidth={1.5}
+        strokeWidth={scales.stroke(tokens.stroke.outline)}
       />
     </g>
   );

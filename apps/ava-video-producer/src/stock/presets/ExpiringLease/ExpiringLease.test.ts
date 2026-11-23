@@ -10,6 +10,93 @@ import { expiringLeaseContract } from "./ExpiringLease.contract";
 import { DEFAULT_INPUT, fixtures } from "./ExpiringLease.fixtures";
 import { inputSchema, type Input } from "./ExpiringLease.schema";
 
+function _assertExpiredOwnership(input: Readonly<Input>): void {
+  [108, 120, 136, 150, 166].forEach((frame) => {
+    assert.equal(
+      _getMarkedElementsFromMarkup({
+        markup: _render({ frame: frame, input: input }),
+        field: "socket-owner",
+      }).length,
+      0,
+    );
+    assert.equal(
+      _getMarkedElementsFromMarkup({
+        markup: _render({ frame: frame, input: input }),
+        field: "permission-token",
+      }).length,
+      1,
+    );
+  });
+}
+
+function _assertSocketElementBounds(element: string): void {
+  assert.ok(
+    SvgAttributes.getNumberFromMarkup({
+      attributes: element,
+      name: "cx",
+    }) >= 60 &&
+      SvgAttributes.getNumberFromMarkup({
+        attributes: element,
+        name: "cx",
+      }) <= 900,
+  );
+  assert.ok(
+    SvgAttributes.getNumberFromMarkup({
+      attributes: element,
+      name: "cy",
+    }) >= 60 &&
+      SvgAttributes.getNumberFromMarkup({
+        attributes: element,
+        name: "cy",
+      }) <= 540,
+  );
+}
+
+function _assertSocketTokenGeometry(
+  input: (typeof fixtures)[number]["input"],
+): void {
+  input.participants.forEach(({ id }) => {
+    [12, 14, 16, 18, 36, 108, 115, 122, 129, 136, 166].forEach((frame) => {
+      const markup = _render({
+        frame: frame,
+        input: { ...input, holderId: id },
+      });
+      assert.equal(
+        _getMarkedElementsFromMarkup({ markup, field: "socket" }).length,
+        4,
+      );
+      assert.equal(
+        _getMarkedElementsFromMarkup({ markup, field: "permission-token" })
+          .length,
+        1,
+      );
+      _getMarkedElementsFromMarkup({ markup, field: "socket" })
+        .concat(
+          _getMarkedElementsFromMarkup({ markup, field: "permission-token" }),
+        )
+        .forEach((element) => {
+          _assertSocketElementBounds(element);
+        });
+    });
+  });
+}
+
+/**
+ * The shape a marker names: the marked element itself, or the sketch-aware
+ * shape inside a marked group.
+ */
+function _markedShape({
+  markup,
+  marker,
+}: Readonly<{ markup: string; marker: string }>): string {
+  const wrapped = markup.match(
+    new RegExp(
+      `<g [^>]*data-${marker}="[^"]*"[^>]*><(?:line|path|circle|rect|ellipse)\\b[^>]*>`,
+    ),
+  );
+  return wrapped ? wrapped[0] : SvgAttributes.fromMarker({ markup, marker });
+}
+
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -27,6 +114,7 @@ function _render({
     ),
   );
 }
+
 function _getVisibleTextsFromInput({
   input,
   frame,
@@ -45,6 +133,7 @@ function _getVisibleTextsFromInput({
     ...(input.showLifetime ? [input.lifetime.unit] : []),
   ];
 }
+
 registerStockPresetAssertions({
   inputSchema,
   defaultInput: DEFAULT_INPUT,
@@ -71,6 +160,7 @@ registerStockPresetAssertions({
     { ...DEFAULT_INPUT, lifetime: { value: 2, unit: "" } },
   ],
 });
+
 function _getMarkedElementsFromMarkup({
   markup,
   field,
@@ -78,10 +168,15 @@ function _getMarkedElementsFromMarkup({
   markup: string;
   field: string;
 }): string[] {
-  return (markup.match(/<[^>]+>/g) ?? []).filter((element) =>
-    element.includes(`data-${field}=`),
-  );
+  const tags = markup.match(/<[^>]+>/g) ?? [];
+  // A marked group wraps the sketch-aware shape it names.
+  return tags.flatMap((tag, index) => {
+    return !tag.includes(`data-${field}=`)
+      ? []
+      : [tag.startsWith("<g ") ? `${tag}${tags[index + 1]}` : tag];
+  });
 }
+
 test("exactly one holder loses its single token at expiry without a successor", () => {
   [
     DEFAULT_INPUT,
@@ -104,23 +199,8 @@ test("exactly one holder loses its single token at expiry without a successor", 
         })[0].includes(`data-socket-owner="${input.holderId}"`),
       );
     });
-    [108, 120, 136, 150, 166].forEach((frame) => {
-      assert.equal(
-        _getMarkedElementsFromMarkup({
-          markup: _render({ frame: frame, input: input }),
-          field: "socket-owner",
-        }).length,
-        0,
-      );
-      assert.equal(
-        _getMarkedElementsFromMarkup({
-          markup: _render({ frame: frame, input: input }),
-          field: "permission-token",
-        }).length,
-        1,
-      );
-    });
-    const token = SvgAttributes.fromMarker({
+    _assertExpiredOwnership(input);
+    const token = _markedShape({
       markup: _render({ frame: 150, input: input }),
       marker: "permission-token",
     });
@@ -134,6 +214,7 @@ test("exactly one holder loses its single token at expiry without a successor", 
     );
   });
 });
+
 test("finite collar segments drain at evenly spaced beats and stay empty after return", () => {
   const input = fixtures[2].input;
   [36, 45, 54, 63, 72, 81, 90, 99, 108, 150].forEach((frame, index) => {
@@ -143,8 +224,9 @@ test("finite collar segments drain at evenly spaced beats and stay empty after r
     });
     assert.equal(segments.length, 8);
     assert.equal(
-      segments.filter((element) => element.includes('data-active="true"'))
-        .length,
+      segments.filter((element) => {
+        return element.includes('data-active="true"');
+      }).length,
       Math.max(0, 8 - index),
     );
   });
@@ -156,51 +238,10 @@ test("finite collar segments drain at evenly spaced beats and stay empty after r
     0,
   );
 });
+
 test("dense socket arcs and returned token stay within the canvas through all holder choices", () => {
   const input = fixtures[2].input;
-  input.participants.forEach(({ id }) => {
-    [12, 14, 16, 18, 36, 108, 115, 122, 129, 136, 166].forEach((frame) => {
-      const markup = _render({
-        frame: frame,
-        input: { ...input, holderId: id },
-      });
-      assert.equal(
-        _getMarkedElementsFromMarkup({ markup, field: "socket" }).length,
-        4,
-      );
-      assert.equal(
-        _getMarkedElementsFromMarkup({ markup, field: "permission-token" })
-          .length,
-        1,
-      );
-      _getMarkedElementsFromMarkup({ markup, field: "socket" })
-        .concat(
-          _getMarkedElementsFromMarkup({ markup, field: "permission-token" }),
-        )
-        .forEach((element) => {
-          assert.ok(
-            SvgAttributes.getNumberFromMarkup({
-              attributes: element,
-              name: "cx",
-            }) >= 60 &&
-              SvgAttributes.getNumberFromMarkup({
-                attributes: element,
-                name: "cx",
-              }) <= 900,
-          );
-          assert.ok(
-            SvgAttributes.getNumberFromMarkup({
-              attributes: element,
-              name: "cy",
-            }) >= 60 &&
-              SvgAttributes.getNumberFromMarkup({
-                attributes: element,
-                name: "cy",
-              }) <= 540,
-          );
-        });
-    });
-  });
+  _assertSocketTokenGeometry(input);
 });
 
 test("hiding labels preserves expiry and the optional collar independently", () => {
@@ -226,7 +267,7 @@ test("hiding labels preserves expiry and the optional collar independently", () 
   );
   assert.equal(
     SvgAttributes.getNumberFromMarkup({
-      attributes: SvgAttributes.fromMarker({
+      attributes: _markedShape({
         markup: hiddenLifetime,
         marker: "permission-token",
       }),
@@ -260,12 +301,12 @@ test("the full lifetime value and unit clear every supported holder route and co
       );
       const lines = paint.filter(propEq("ariaLabel", input.lifetime.unit));
       assert.ok(lines.length > 0);
-      lines.forEach((line) =>
-        assert.ok(
+      lines.forEach((line) => {
+        return assert.ok(
           line.top > 134 && line.bottom < 158 && line.right < 430,
           "Lifetime copy stays above all routes and clear of the middle collar",
-        ),
-      );
+        );
+      });
       assert.equal(
         paint.filter(propEq("kind", "rect")).length,
         0,

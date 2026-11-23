@@ -17,9 +17,9 @@ export function LocationUncertaintyBoundary({
   accent,
 }: Readonly<Props>): ReactNode {
   const assignments = getAssignmentsFromLocations(input);
-  const definite = assignments.filter(
-    (location) => location.district >= 0,
-  ).length;
+  const definite = assignments.filter((location) => {
+    return location.district >= 0;
+  }).length;
   return (
     <g
       data-definite={definite}

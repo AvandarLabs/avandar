@@ -1,4 +1,4 @@
-import { prop } from "@avandar/utils";
+import { prop, propEq } from "@avandar/utils";
 import { z } from "zod";
 import type { StockSemanticRule } from "../../contracts/StockContract.types";
 /** Complete authored input with bounded collections and semantic validation. */
@@ -69,12 +69,14 @@ export const inputSchema = z
         path: ["sites"],
       });
     }
-    const assigned = input.people.flatMap(({ slotId }) =>
-      slotId === null ? [] : [slotId],
-    );
+    const assigned = input.people.flatMap(({ slotId }) => {
+      return slotId === null ? [] : [slotId];
+    });
     if (
       new Set(assigned).size !== assigned.length ||
-      assigned.some((slotId) => !input.slots.some(({ id }) => id === slotId))
+      assigned.some((slotId) => {
+        return !input.slots.some(propEq("id", slotId));
+      })
     ) {
       context.addIssue({
         code: "custom",

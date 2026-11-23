@@ -1,12 +1,14 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { bundle } from "@remotion/bundler";
-import { buildProduct } from "../build-avandar.mjs";
-import { assetReferences, publicAsset } from "../lib/planHelpers";
-import { withWorkspaceAliases } from "../lib/withWorkspaceAliases.mjs";
+import { buildProduct } from "../buildProduct/buildProduct";
+import { makeWorkspaceWebpackConfigFromConfig } from "../lib/makeWorkspaceWebpackConfigFromConfig";
+import {
+  getAssetReferencesFromPlan,
+  getPublicAssetPathFromAsset,
+} from "../lib/planHelpers/planHelpers";
 import { appRoot } from "./ShowcaseFilms/ShowcaseFilms";
 import type { Film } from "../../src/showcase/showcase.types";
-
 /**
  * Headless Chrome options for rendering showcase stills. Every still script
  * uses the same options so two runs on one machine render identical pixels,
@@ -17,17 +19,19 @@ export const SHOWCASE_STILL_BROWSER_OPTIONS = {
   chromiumOptions: { headless: true, gl: "angle" },
   logLevel: "error",
 } as const;
-
 /**
  * Bundles the showcase render entry with one public directory that holds
  * every film's assets, so stills of several films render from one serve URL.
  * Use it before a batch of `renderStill` calls, for example to render poster
  * or parity frames. Returns the serve URL.
  */
-export async function bundleShowcaseFilms(
-  films: readonly Film[],
-  directory: string,
-): Promise<string> {
+export async function bundleShowcaseFilms({
+  films,
+  directory,
+}: Readonly<{
+  films: readonly Film[];
+  directory: string;
+}>): Promise<string> {
   const publicDir = path.join(directory, "public");
   await fs.mkdir(publicDir, { recursive: true });
   await fs.cp(
@@ -36,16 +40,24 @@ export async function bundleShowcaseFilms(
     { recursive: true },
   );
   const assets = new Set(
-    films.flatMap((film) => (film.plan ? assetReferences(film.plan) : [])),
+    films.flatMap((film) => {
+      return film.plan ? getAssetReferencesFromPlan(film.plan) : [];
+    }),
   );
   for (const asset of assets) {
     const target = path.join(publicDir, asset);
     await fs.mkdir(path.dirname(target), { recursive: true });
-    await fs.copyFile(await publicAsset(appRoot, asset), target);
+    await fs.copyFile(
+      await getPublicAssetPathFromAsset({
+        root: appRoot,
+        asset,
+      }),
+      target,
+    );
   }
   await buildProduct();
   return bundle({
-    webpackOverride: withWorkspaceAliases,
+    webpackOverride: makeWorkspaceWebpackConfigFromConfig,
     entryPoint: path.join(appRoot, "src/showcase/render-entry.tsx"),
     rootDir: appRoot,
     outDir: path.join(directory, "bundle"),

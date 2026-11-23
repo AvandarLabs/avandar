@@ -1,32 +1,13 @@
-/**
- * Design tokens for the tilted window: its resting 3D plane, its box on the
- * canvas, and its chrome. Shared by every layout of `TiltedWindowScene` so
- * the window sits in the same plane in every shot of a film.
+/*
+ * The tilted window's boxes on the canvas. Its 3D plane, chrome, and blur
+ * are the theme's `components.WindowTilt` and `components.WindowMotion`,
+ * shared by every layout of `TiltedWindowScene` so the window sits in the
+ * same plane in every shot of a film.
  *
  * The tilt is only ever applied to layers holding stills or footage. Live
  * product UI must never sit inside it: a lasting transform resamples every
  * glyph of the interface.
  */
-export const WINDOW_TILT = {
-  perspective: 1400,
-  /** Negative brings the right edge toward the camera. */
-  rotateY: -13,
-  rotateX: 3,
-  rotateZ: -1,
-  /** The steeper angle a window enters at before it settles. */
-  entryRotateY: -24,
-} as const;
-
-/** Mirrored, flatter tilt of the two windows in the `pair` layout. */
-export const PAIR_TILT = {
-  perspective: 1600,
-  /** The left window turns this way; the right one mirrors it. */
-  rotateY: 8,
-  rotateX: 2,
-  /** A longer lens for the joined card flipping in, so its near edge is
-   *  not magnified past the frame. */
-  flipPerspective: 3200,
-} as const;
 
 /**
  * The single window's box, as fractions of the canvas, before the tilt.
@@ -66,11 +47,3 @@ export const PAIR_BOXES = [
 
 /** The headline column, as fractions of the canvas. */
 export const HEADLINE_BOX = { x: 0.062, y: 0.115, width: 0.27 };
-
-/** Window chrome: corner radius in pixels and titlebar height in canvas
- *  fractions. */
-export const WINDOW_CHROME = { radius: 10, titlebarHeight: 0.035 };
-
-/** A soft cast shadow, from the `shadow` token or a mix of the background. */
-export const WINDOW_SHADOW =
-  "0 30px 60px var(--shadow, color-mix(in oklab, var(--background) 60%, transparent))";

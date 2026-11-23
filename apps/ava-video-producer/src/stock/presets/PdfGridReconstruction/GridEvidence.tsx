@@ -1,7 +1,8 @@
-import { ramp } from "../../../motion";
-import { RuledGridEvidence } from "./RuledGridEvidence";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { getEvidenceFromFrame } from "./getEvidenceFromFrame";
+import { RuledGridEvidence } from "./RuledGridEvidence/RuledGridEvidence";
 import { TaggedGridEvidence } from "./TaggedGridEvidence";
-import { WhitespaceGridEvidence } from "./WhitespaceGridEvidence";
+import { WhitespaceGridEvidence } from "./WhitespaceGridEvidence/WhitespaceGridEvidence";
 import type { Input } from "./PdfGridReconstruction.schema";
 import type { ReactNode } from "react";
 
@@ -12,8 +13,9 @@ export function GridEvidence({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
-    <g opacity={ramp(frame, 13, 42)}>
+    <g opacity={getEvidenceFromFrame({ frame, motion })}>
       <TaggedGridEvidence input={input} frame={frame} accent={accent} />
       <RuledGridEvidence input={input} frame={frame} accent={accent} />
       <WhitespaceGridEvidence input={input} frame={frame} accent={accent} />

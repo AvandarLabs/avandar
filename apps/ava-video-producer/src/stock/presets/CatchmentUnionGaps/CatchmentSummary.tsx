@@ -7,24 +7,23 @@ type Props = { input: Input; accent: string };
 
 /** Unique union membership and its complete denominator use the chosen unit. */
 export function CatchmentSummary({ input }: Readonly<Props>): ReactNode {
-  const denominator = input.households.reduce(
-    (sum, home) => sum + (input.measure === "members" ? home.members : 1),
-    0,
-  );
+  const denominator = input.households.reduce((sum, home) => {
+    return sum + (input.measure === "members" ? home.members : 1);
+  }, 0);
   const covered = input.households
-    .filter((home) =>
-      input.catchments.some(
-        ({ polygon }) =>
+    .filter((home) => {
+      return input.catchments.some(({ polygon }) => {
+        return (
           PlanarPolygon.getPointClassification({
             point: [home.x, home.y],
             polygon,
-          }) === "inside",
-      ),
-    )
-    .reduce(
-      (sum, home) => sum + (input.measure === "members" ? home.members : 1),
-      0,
-    );
+          }) === "inside"
+        );
+      });
+    })
+    .reduce((sum, home) => {
+      return sum + (input.measure === "members" ? home.members : 1);
+    }, 0);
   return (
     <g data-covered={covered} data-denominator={denominator}>
       <LabelSlots

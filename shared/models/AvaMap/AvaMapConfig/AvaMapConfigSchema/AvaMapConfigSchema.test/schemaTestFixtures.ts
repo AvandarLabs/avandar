@@ -3,7 +3,7 @@ import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig.ts";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* oxlint-disable typescript/explicit-module-boundary-types */
 /* Test JSON fixtures: return types are inferred from `as const` payloads. */
 
 export const waveCLayer = MapLayer.makeEmpty("Cases");

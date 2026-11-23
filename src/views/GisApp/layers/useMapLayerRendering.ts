@@ -58,7 +58,7 @@ export function useMapLayerRendering(
   const simplificationReferenceLatitude = useMemo(() => {
     return options.view.center[1];
     // Capture latitude only when a new integer zoom band begins.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // oxlint-disable-next-line react/exhaustive-deps
   }, [zoomBand]);
   const renderedMapConfig = useMapConfigWithPlaceIds({
     mapConfig: options.mapConfig,

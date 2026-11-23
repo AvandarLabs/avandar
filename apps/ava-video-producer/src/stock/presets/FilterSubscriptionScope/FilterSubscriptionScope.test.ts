@@ -16,65 +16,60 @@ import {
 } from "./FilterSubscriptionScope.fixtures";
 import { inputSchema, type Input } from "./FilterSubscriptionScope.schema";
 
-const render = ({
-  frame,
-  input = DEFAULT_INPUT,
-}: Readonly<{ frame: number; input?: Input }>): string =>
-  renderToStaticMarkup(
-    createElement(
-      "svg",
-      {},
-      createElement(FilterSubscriptionScope, {
-        frame,
-        input,
-        accent: "#72d5bd",
-        id: "packet28",
-      }),
-    ),
-  );
-function _marks({ markup, name }: { markup: string; name: string }): string[] {
-  return [
-    ...markup.matchAll(new RegExp(`<[^>]*data-${name}="[^"]*"[^>]*>`, "g")),
-  ].map((match) => match[0]);
-}
-function _attribute({
-  markup,
-  name,
-}: {
-  markup: string;
-  name: string;
-}): string {
-  const result = markup.match(new RegExp(` ${name}="([^"]*)"`));
-  assert.ok(result, `Missing ${name} in ${markup}`);
-  return result[1];
-}
-function _number({ markup, name }: { markup: string; name: string }): number {
-  return Number(_attribute({ markup, name }));
-}
-test("only subscribed views change their row counts and sums", () => {
-  const before = _marks({ markup: render({ frame: 40 }), name: "view" });
-  assert.equal(before.length, 3);
+type AssertViewDenominatorsOptions = Readonly<{
+  views: readonly string[];
+  selected: Input["records"];
+  records: Input["records"];
+}>;
+
+function _assertViewDenominators({
+  views,
+  selected,
+  records,
+}: AssertViewDenominatorsOptions): void {
   assert.deepEqual(
-    before.map((row) => [
-      _number({ markup: row, name: "data-count" }),
-      _number({ markup: row, name: "data-sum" }),
-    ]),
+    views.map((view) => {
+      return [
+        _number({ markup: view, name: "data-count" }),
+        _number({ markup: view, name: "data-sum" }),
+      ];
+    }),
     [
-      [3, 10],
-      [3, 10],
-      [3, 10],
+      [
+        selected.length,
+        selected.reduce((sum, row) => {
+          return sum + row.value;
+        }, 0),
+      ],
+      [
+        selected.length,
+        selected.reduce((sum, row) => {
+          return sum + row.value;
+        }, 0),
+      ],
+      [
+        records.length,
+        records.reduce((sum, row) => {
+          return sum + row.value;
+        }, 0),
+      ],
     ],
   );
+}
+
+function _assertOnlySubscribedViewsChangeTheirDataCount(): void {
   [DEFAULT_INPUT, fixtures[3].input].forEach((input, index) => {
     const views = _marks({
       markup: render({ frame: 150, input: input }),
       name: "view",
     });
     assert.deepEqual(
-      views.map((row) => [
-        _number({ markup: row, name: "data-count" }),
-        _number({ markup: row, name: "data-sum" }),
-      ]),
+      views.map((row) => {
+        return [
+          _number({ markup: row, name: "data-count" }),
+          _number({ markup: row, name: "data-sum" }),
+        ];
+      }),
       index === 0
         ? [
             [2, 5],
@@ -98,6 +93,63 @@ test("only subscribed views change their row counts and sums", () => {
       );
     });
   });
+}
+
+const render = ({
+  frame,
+  input = DEFAULT_INPUT,
+}: Readonly<{ frame: number; input?: Input }>): string => {
+  return renderToStaticMarkup(
+    createElement(
+      "svg",
+      {},
+      createElement(FilterSubscriptionScope, {
+        frame,
+        input,
+        accent: "#72d5bd",
+        id: "packet28",
+      }),
+    ),
+  );
+};
+function _marks({ markup, name }: { markup: string; name: string }): string[] {
+  return [
+    ...markup.matchAll(new RegExp(`<[^>]*data-${name}="[^"]*"[^>]*>`, "g")),
+  ].map((match) => {
+    return match[0];
+  });
+}
+function _attribute({
+  markup,
+  name,
+}: {
+  markup: string;
+  name: string;
+}): string {
+  const result = markup.match(new RegExp(` ${name}="([^"]*)"`));
+  assert.ok(result, `Missing ${name} in ${markup}`);
+  return result[1];
+}
+function _number({ markup, name }: { markup: string; name: string }): number {
+  return Number(_attribute({ markup, name }));
+}
+test("only subscribed views change their row counts and sums", () => {
+  const before = _marks({ markup: render({ frame: 40 }), name: "view" });
+  assert.equal(before.length, 3);
+  assert.deepEqual(
+    before.map((row) => {
+      return [
+        _number({ markup: row, name: "data-count" }),
+        _number({ markup: row, name: "data-sum" }),
+      ];
+    }),
+    [
+      [3, 10],
+      [3, 10],
+      [3, 10],
+    ],
+  );
+  _assertOnlySubscribedViewsChangeTheirDataCount();
 });
 test("excluded masks travel across only subscribed nonmatching rows", () => {
   const a = _marks({ markup: render({ frame: 91 }), name: "excluded-mask" }),
@@ -120,38 +172,44 @@ test("excluded masks travel across only subscribed nonmatching rows", () => {
     _marks({
       markup: render({ frame: 150, input: fixtures[3].input }),
       name: "excluded-row",
-    }).every((mark) => _number({ markup: mark, name: "opacity" }) === 0),
+    }).every((mark) => {
+      return _number({ markup: mark, name: "opacity" }) === 0;
+    }),
   );
 });
 test("fixtures retain exact input while schemas reject invalid documents", () => {
-  fixtures.forEach(({ input }) =>
-    assert.deepEqual(inputSchema.parse(input), input),
-  );
-  invalidInputs.forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  );
+  fixtures.forEach(({ input }) => {
+    return assert.deepEqual(inputSchema.parse(input), input);
+  });
+  invalidInputs.forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
 });
 
 const getVisibleTexts = ({
   input,
   frame,
-}: Readonly<{ input: Input; frame: number }>): string[] => [
-  ...Object.values(input.copy),
-  input.metric.valueLabel,
-  ...input.views.map(prop("label")),
-  ...input.records.map(prop("category")),
-  input.selectedCategory,
-  ...input.views.flatMap((view) => {
-    const rows =
-      view.subscribed && frame >= 139
-        ? input.records.filter(propEq("category", input.selectedCategory))
-        : input.records;
-    return [
-      `${rows.reduce((sum, record) => sum + record.value, 0)} ${input.metric.valueUnit}`,
-      `${rows.length} ${input.metric.countUnit}`,
-    ];
-  }),
-];
+}: Readonly<{ input: Input; frame: number }>): string[] => {
+  return [
+    ...Object.values(input.copy),
+    input.metric.valueLabel,
+    ...input.views.map(prop("label")),
+    ...input.records.map(prop("category")),
+    input.selectedCategory,
+    ...input.views.flatMap((view) => {
+      const rows =
+        view.subscribed && frame >= 139
+          ? input.records.filter(propEq("category", input.selectedCategory))
+          : input.records;
+      return [
+        `${rows.reduce((sum, record) => {
+          return sum + record.value;
+        }, 0)} ${input.metric.valueUnit}`,
+        `${rows.length} ${input.metric.countUnit}`,
+      ];
+    }),
+  ];
+};
 registerStockPresetAssertions({
   inputSchema,
   defaultInput: DEFAULT_INPUT,
@@ -187,29 +245,24 @@ registerStockDefaultTextAssertions({
 });
 test("all-category and zero-value selections retain the independent denominator", () => {
   [
-    DEFAULT_INPUT.records.map((record) => ({ ...record, category: "West" })),
-    DEFAULT_INPUT.records.map((record) => ({
-      ...record,
-      value: record.category === "West" ? 0 : record.value,
-    })),
+    DEFAULT_INPUT.records.map((record) => {
+      return { ...record, category: "West" };
+    }),
+    DEFAULT_INPUT.records.map((record) => {
+      return {
+        ...record,
+        value: record.category === "West" ? 0 : record.value,
+      };
+    }),
   ].forEach((records) => {
+    const originalRecords = structuredClone(records);
     const input = { ...DEFAULT_INPUT, records };
     const views = _marks({
       markup: render({ frame: 150, input: input }),
       name: "view",
     });
     const selected = records.filter(propEq("category", input.selectedCategory));
-    assert.deepEqual(
-      views.map((view) => [
-        _number({ markup: view, name: "data-count" }),
-        _number({ markup: view, name: "data-sum" }),
-      ]),
-      [
-        [selected.length, selected.reduce((sum, row) => sum + row.value, 0)],
-        [selected.length, selected.reduce((sum, row) => sum + row.value, 0)],
-        [records.length, records.reduce((sum, row) => sum + row.value, 0)],
-      ],
-    );
+    _assertViewDenominators({ views, selected, records });
     assert.equal(
       _marks({
         markup: render({ frame: 150, input: input }),
@@ -217,20 +270,24 @@ test("all-category and zero-value selections retain the independent denominator"
       }).length,
       records.length * input.views.length,
     );
-    assert.deepEqual(input.records, records);
+    assert.deepEqual(input.records, originalRecords);
   });
 });
 test("empty, Unicode and maximum-length identities preserve exact keys", () => {
   const input = {
     ...DEFAULT_INPUT,
-    records: DEFAULT_INPUT.records.map((record, index) => ({
-      ...record,
-      id: ["", "界 key", "W".repeat(12)][index],
-    })),
-    views: DEFAULT_INPUT.views.map((view, index) => ({
-      ...view,
-      id: ["", "view key", "W".repeat(12)][index],
-    })),
+    records: DEFAULT_INPUT.records.map((record, index) => {
+      return {
+        ...record,
+        id: ["", "界 key", "W".repeat(12)][index],
+      };
+    }),
+    views: DEFAULT_INPUT.views.map((view, index) => {
+      return {
+        ...view,
+        id: ["", "view key", "W".repeat(12)][index],
+      };
+    }),
   };
   assert.deepEqual(inputSchema.parse(input), input);
   assert.equal(
@@ -244,6 +301,8 @@ test("hidden excluded records leave no visible mask at the resolved hold", () =>
     _marks({
       markup: render({ frame: 150, input: fixtures[3].input }),
       name: "excluded-mask",
-    }).every((mark) => _number({ markup: mark, name: "opacity" }) === 0),
+    }).every((mark) => {
+      return _number({ markup: mark, name: "opacity" }) === 0;
+    }),
   );
 });

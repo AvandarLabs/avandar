@@ -1,43 +1,70 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getCatchmentShapesFromInput } from "./getCatchmentShapesFromInput";
+import { getFootprintDashFromIndex } from "./getFootprintDashFromIndex";
 import type { Input } from "./CatchmentUnionGaps.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; progress: number; accent: string };
+const FOOTPRINT_WIDTH = 1.4;
 /** Each original service footprint retains its authored outline toggle. */
 export function IndividualFootprints({
   input,
   progress,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const shapes = getCatchmentShapesFromInput(input);
+  const colors = _getFootprintColors({ accent, tokens });
   return (
     <g>
       <g data-separate-tint="" opacity={1 - progress}>
-        {shapes.map((shape, index) => (
-          <polygon
-            key={shape.id}
-            points={shape.points}
-            fill={[accent, STOCK.cyan, STOCK.orange, STOCK.mint][index]}
-            fillOpacity={0.25}
-          />
-        ))}
+        {shapes.map((shape, index) => {
+          return (
+            <polygon
+              key={shape.id}
+              points={shape.points}
+              fill={colors[index]}
+              fillOpacity={tokens.alpha.ghost}
+            />
+          );
+        })}
       </g>
       <g
         data-original-outlines=""
         opacity={input.showOriginalOutlines ? 1 : 1 - progress}
       >
-        {shapes.map((shape, index) => (
-          <polygon
-            key={shape.id}
-            points={shape.points}
-            fill="none"
-            stroke={[accent, STOCK.cyan, STOCK.orange, STOCK.mint][index]}
-            strokeWidth={1.4}
-            strokeDasharray={["1 0", "6 4", "2 4", "10 3 2 3"][index]}
-          />
-        ))}
+        {shapes.map((shape, index) => {
+          return (
+            <SketchedShape
+              key={shape.id}
+              shape={{ kind: "path", d: `M${shape.points}Z` }}
+              profile={tokens.sketch.shape}
+              fill="none"
+              stroke={colors[index]}
+              strokeWidth={scales.stroke(FOOTPRINT_WIDTH)}
+              strokeDasharray={getFootprintDashFromIndex({ atomic, index })}
+            />
+          );
+        })}
       </g>
     </g>
   );
+}
+/** One colour per footprint, in the order the input lists them. */
+function _getFootprintColors({
+  accent,
+  tokens,
+}: Readonly<{
+  accent: string;
+  tokens: ReturnType<typeof GraphicThemeHooks.useGraphicTokens>;
+}>): readonly string[] {
+  return [
+    accent,
+    tokens.color.accentAlt,
+    tokens.color.highlight,
+    tokens.color.positive,
+  ];
 }

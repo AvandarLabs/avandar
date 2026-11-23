@@ -1,2 +1,4 @@
+/** Center of the radial network in canvas pixels. */
 export const CENTER = { x: 480, y: 295 };
-export const ORBIT = { rx: 278, ry: 181 };
+/** The orbit geometry used to place radial-network nodes. */
+export const ORBIT = { radiusX: 278, radiusY: 181 };

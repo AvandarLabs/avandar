@@ -14,7 +14,7 @@ env:
   NODE_VERSION: 24.15.0
 
 jobs:
-  # ESLint and TypeScript checks.
+  # Lint and TypeScript checks.
   lint-typecheck:
     runs-on: ubuntu-latest
     timeout-minutes: 15

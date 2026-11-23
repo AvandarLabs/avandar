@@ -1,29 +1,29 @@
-.preview {
+.helperPreviewPreview {
   background: var(--white);
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  border: var(--atlas-border-1) solid var(--line);
+  border-radius: var(--atlas-radius-8);
   min-width: 0;
 }
 
-.stage {
-  padding: 16px 16px 0;
+.helperPreviewStage {
+  padding: var(--atlas-space-16) var(--atlas-space-16) 0;
 }
 
-.player {
+.helperPreviewPlayer {
   aspect-ratio: 1.6;
   background: var(--ava-neutral-9);
   border: 0;
-  border-radius: 6px;
+  border-radius: var(--atlas-radius-6);
   display: block;
   margin: 0 auto;
   max-width: calc((100dvh - 190px) * 1.6);
   width: 100%;
 }
 
-.notice {
-  color: var(--muted);
-  font-size: 13px;
+.helperPreviewNotice {
+  color: var(--atlas-color-muted);
+  font-size: var(--atlas-font-size-13);
   line-height: 1.5;
   margin: 0;
-  padding: 10px 16px 14px;
+  padding: var(--atlas-space-10) var(--atlas-space-16) var(--atlas-space-14);
 }

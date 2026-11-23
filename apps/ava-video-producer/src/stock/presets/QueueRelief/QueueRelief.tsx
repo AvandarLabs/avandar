@@ -1,4 +1,4 @@
-import { ramp } from "../../../motion";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { QueueItem } from "./QueueItem";
 import { QueueStructure } from "./QueueStructure";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
@@ -12,19 +12,22 @@ export function QueueRelief({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
-    <g opacity={ramp(frame, 0, 12)}>
+    <g opacity={motion.reveal(frame, 0)}>
       <QueueStructure frame={frame} input={input} accent={accent} />
-      {input.items.map((item, index) => (
-        <QueueItem
-          key={item.id}
-          frame={frame}
-          input={input}
-          item={item}
-          index={index}
-          accent={accent}
-        />
-      ))}
+      {input.items.map((item, index) => {
+        return (
+          <QueueItem
+            key={item.id}
+            frame={frame}
+            input={input}
+            item={item}
+            index={index}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

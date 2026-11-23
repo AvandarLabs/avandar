@@ -1,0 +1,31 @@
+.mediaPlaneDemoCentered {
+  align-items: center;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+}
+
+.mediaPlaneDemoFootnote {
+  bottom: 0;
+  color: var(--demo-muted);
+  font-size: var(--demo-font-size-2xs);
+  position: absolute;
+  right: 0;
+}
+
+.mediaPlaneDemoMediaFrame {
+  border: var(--demo-stroke-hairline) solid var(--demo-line);
+  border-radius: var(--demo-corner-label);
+  height: 400px;
+  overflow: hidden;
+  position: relative;
+  width: 640px;
+}
+
+.mediaPlaneDemoMediaFrame .mediaPlaneDemoFootnote {
+  background: var(--demo-ground);
+  border-radius: var(--demo-corner-chip);
+  bottom: 10px;
+  padding: var(--demo-space-4) var(--demo-space-8);
+  right: 10px;
+}

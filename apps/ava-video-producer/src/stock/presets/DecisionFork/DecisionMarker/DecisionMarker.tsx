@@ -1,17 +1,23 @@
-import { mix, ramp } from "../../../../motion";
+import { Motion } from "../../../../motion";
 import { cubicPoint } from "../../../graphics-common/cubicPoint";
-import { useGraphicMotion } from "../../../theme/useGraphicTheme/useGraphicTheme";
-import { MarkerDot } from "./MarkerDot";
+import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { DecisionMarkerMarkerBranch } from "./DecisionMarkerMarkerBranch";
 import type { ReactNode } from "react";
 
-type Props = { frame: number; x: number; accent: string; branchId: string };
+type Props = {
+  frame: number;
+  x: number;
+  accent: string;
+  branchId: string;
+};
 
 const DEPART_CUE = 74;
+
 const DEPART_FRAMES = 40;
+
 const DROP_CUE = 18;
+
 const DROP_FRAMES = 18;
-const APPEAR_CUE = 12;
-const APPEAR_FRAMES = 6;
 
 /** The single scenario marker pauses at the junction then takes one branch. */
 export function DecisionMarker({
@@ -20,39 +26,42 @@ export function DecisionMarker({
   accent,
   branchId,
 }: Readonly<Props>): ReactNode {
-  const motion = useGraphicMotion();
-  const progress = ramp(
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const progress = Motion.ramp({
     frame,
-    DEPART_CUE,
-    motion.scale(DEPART_FRAMES),
-    motion.travel.easing,
-  );
-  const point = cubicPoint(
-    { x: 480, y: 235 },
-    { x: 480, y: 280 },
-    { x, y: 280 },
-    { x, y: 408 },
-    progress,
-  );
+    at: DEPART_CUE,
+    dur: motion.scale(DEPART_FRAMES),
+    easing: motion.travel.easing,
+  });
+  const point = cubicPoint({
+    a: { x: 480, y: 235 },
+    b: { x: 480, y: 280 },
+    c: { x, y: 280 },
+    d: { x, y: 408 },
+    t: progress,
+  });
+  const dropProgress = Motion.ramp({
+    frame,
+    at: DROP_CUE,
+    dur: motion.scale(DROP_FRAMES),
+    easing: motion.travel.easing,
+  });
   const markerY =
     frame < DEPART_CUE
-      ? mix(
-          ramp(
-            frame,
-            DROP_CUE,
-            motion.scale(DROP_FRAMES),
-            motion.travel.easing,
-          ),
-          174,
-          235,
-        )
+      ? Motion.mix({
+          t: dropProgress,
+          from: 174,
+          to: 235,
+        })
       : point.y;
   return (
-    <g
-      data-marker-branch={branchId}
-      opacity={ramp(frame, APPEAR_CUE, motion.scale(APPEAR_FRAMES))}
-    >
-      <MarkerDot x={point.x} y={markerY} accent={accent} />
-    </g>
+    <DecisionMarkerMarkerBranch
+      frame={frame}
+      accent={accent}
+      branchId={branchId}
+      motion={motion}
+      point={point}
+      markerY={markerY}
+    />
   );
 }

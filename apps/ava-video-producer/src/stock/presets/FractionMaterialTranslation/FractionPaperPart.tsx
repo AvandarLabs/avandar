@@ -1,4 +1,5 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -20,17 +21,23 @@ export function FractionPaperPart({
   selected,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const fold = Math.sin(progress * Math.PI) * 18 * (index % 2 === 0 ? -1 : 1);
   return (
-    <path
+    <SketchedShape
+      shape={{
+        kind: "path",
+        d: `M${centerX - cellWidth / 2} -24 L${centerX + cellWidth / 2} ${-24 + fold} V${24 + fold} L${centerX - cellWidth / 2} 24 Z`,
+      }}
+      profile={tokens.sketch.shape}
       data-piece-owner={id}
       data-selected={selected}
-      d={`M${centerX - cellWidth / 2} -24 L${centerX + cellWidth / 2} ${-24 + fold} V${24 + fold} L${centerX - cellWidth / 2} 24 Z`}
-      fill={selected ? accent : STOCK.surface}
+      fill={selected ? accent : tokens.color.surface}
       fillOpacity={selected ? progress : 1}
-      stroke={STOCK.text}
+      stroke={tokens.color.text}
       strokeOpacity={progress}
-      strokeWidth={1}
+      strokeWidth={scales.stroke(tokens.stroke.hairline)}
     />
   );
 }

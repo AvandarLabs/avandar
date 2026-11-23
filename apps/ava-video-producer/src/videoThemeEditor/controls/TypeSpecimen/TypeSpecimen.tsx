@@ -1,19 +1,19 @@
-import {
-  buildColorWithAlpha,
-  fillToCss,
-  textShadowToCss,
-} from "../../../videoTheme/cssValueHelpers/cssValueHelpers";
+import { VideoCssValues } from "../../../videoTheme/VideoCssValues/VideoCssValues";
 import { useTokenEditor } from "../../TokenEditorContext";
 import { ContrastBadge } from "../ContrastBadge/ContrastBadge";
 import css from "./TypeSpecimen.module.css";
 import type { ResolvedTypeStyle } from "../../../videoTheme/videoTheme.types";
+import type { ReactNode } from "react";
 
+type Props = {
+  style: ResolvedTypeStyle | undefined;
+};
 const SPECIMEN_MAX_SIZE = 40;
-
-/** A sample line set in a resolved type style on the theme's ground, with its contrast. */
-export function TypeSpecimen({
-  style,
-}: Readonly<{ style: ResolvedTypeStyle | undefined }>) {
+/**
+ * A sample line set in a resolved type style on the theme's ground, with its
+ * contrast.
+ */
+export function TypeSpecimen({ style }: Readonly<Props>): ReactNode {
   const { theme } = useTokenEditor();
   if (!style) {
     return null;
@@ -24,8 +24,13 @@ export function TypeSpecimen({
         className={css.typeSpecimen}
         data-inherit-dim
         style={{
-          background: fillToCss(theme.semantic.color.groundFill),
-          color: buildColorWithAlpha(style.color, style.alpha),
+          background: VideoCssValues.makeCssFromFill(
+            theme.semantic.color.groundFill,
+          ),
+          color: VideoCssValues.makeColorFromAlpha({
+            color: style.color,
+            alpha: style.alpha,
+          }),
           fontFamily: style.fontFamily,
           fontSize: Math.min(style.fontSize, SPECIMEN_MAX_SIZE),
           fontWeight: style.fontWeight,
@@ -37,7 +42,7 @@ export function TypeSpecimen({
           textTransform: style.textTransform,
           fontVariantNumeric: style.fontVariantNumeric,
           textShadow: style.textShadow
-            ? textShadowToCss(style.textShadow)
+            ? VideoCssValues.makeCssFromTextShadow(style.textShadow)
             : undefined,
         }}
       >

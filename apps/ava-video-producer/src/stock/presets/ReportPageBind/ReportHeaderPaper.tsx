@@ -1,23 +1,33 @@
-import { mix } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { Motion } from "../../../motion";
+import { StockRect } from "../../primitives/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
-type Props = { x: number; y: number; margins: number };
+type Props = {
+  x: number;
+  y: number;
+  margins: number;
+};
 /** The upper paper margin meets the first section without a gap. */
 export function ReportHeaderPaper({
   x,
   y,
   margins,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
-    <rect
+    <StockRect
       data-header-paper="first-page"
       x={x - 16}
       y={14}
-      width={mix(margins, 740, 800)}
+      width={Motion.mix({
+        t: margins,
+        from: 740,
+        to: 800,
+      })}
       height={y - 22}
-      fill={STOCK.surface}
-      stroke={STOCK.line}
+      fill={tokens.color.surface}
+      stroke={tokens.color.line}
     />
   );
 }

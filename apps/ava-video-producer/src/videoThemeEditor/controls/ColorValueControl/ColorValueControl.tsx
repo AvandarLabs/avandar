@@ -14,11 +14,11 @@ export function ColorValueControl({
   onChange,
   swatches = [],
   badge,
-}: Props) {
+}: Props): ReactNode {
   return (
     <Group gap="xs" wrap="nowrap" align="center">
       <HexColorInput
-        className={css.colorValueField}
+        className={css.colorValueControlField}
         size="xs"
         aria-label={label}
         value={typeof value === "string" ? value : "#000000"}

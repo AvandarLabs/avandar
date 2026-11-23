@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { mixAudio } from "../../lib/mediaHelpers";
-import { requireMatchingPreview } from "../../lib/planHelpers";
+import { MediaHelpers } from "../../lib/MediaHelpers/MediaHelpers";
+import { requireMatchingPreview } from "../../lib/planHelpers/requireMatchingPreview";
 import { assertFingerprintUnchanged } from "../assertFingerprintUnchanged";
 import { exportPlan } from "../exportPlan";
 import { fingerprintThemedPlan } from "../fingerprintThemedPlan";
@@ -11,35 +11,81 @@ import { writeJson } from "../writeJson";
 import { runPictureRender } from "./runPictureRender";
 import { writeRenderManifest } from "./writeRenderManifest";
 import type { Storyboard } from "../../../src/storyboard/schema/schema";
-import type { VideoThemeSnapshot } from "../../../src/videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
+import type { VideoThemeSnapshot } from "../../../src/videoTheme/VideoThemeSnapshots/VideoThemeSnapshots";
 
-/** Delegate picture creation to the original JPEG, encode and mandatory gate path. */
-export async function render(
-  plan: Storyboard,
-  filename: string,
-  workspace: string,
-  theme: VideoThemeSnapshot,
-) {
+type RenderParameters = {
+  plan: Storyboard;
+  filename: string;
+  workspace: string;
+  theme: VideoThemeSnapshot;
+};
+async function _requirePreview({
+  plan,
+  workspace,
+  fingerprint,
+}: Readonly<{
+  plan: Storyboard;
+  workspace: string;
+  fingerprint: Awaited<ReturnType<typeof fingerprintThemedPlan>>;
+}>): Promise<void> {
+  const previewDirectory = path.join(workspace, "out", plan.id, "preview");
+  await requireMatchingPreview({
+    filename: path.join(previewDirectory, "manifest.json"),
+    fingerprint,
+  });
+  await fs.access(path.join(previewDirectory, "contact-sheet.jpg"));
+}
+async function _renderPicture({
+  plan,
+  theme,
+  directory,
+  workspace,
+}: Readonly<
+  Pick<RenderParameters, "plan" | "theme" | "workspace"> & { directory: string }
+>): Promise<void> {
+  const props = path.join(directory, "props.json");
+  await writeJson({
+    filename: props,
+    value: { plan, theme },
+  });
+  const publicDir = await stageAssets({
+    plan,
+    directory,
+    workspace,
+  });
+  await runPictureRender({ plan, directory, props, publicDir });
+}
+/**
+ * Delegate picture creation to the original JPEG, encode and mandatory gate
+ * path.
+ */
+export async function render({
+  plan,
+  filename,
+  workspace,
+  theme,
+}: Readonly<RenderParameters>): Promise<string> {
   const fingerprint = await fingerprintThemedPlan({
     plan,
     filename,
     workspace,
     theme,
   });
-  const previewDirectory = path.join(workspace, "out", plan.id, "preview");
-  await requireMatchingPreview(
-    path.join(previewDirectory, "manifest.json"),
-    fingerprint,
-  );
-  await fs.access(path.join(previewDirectory, "contact-sheet.jpg"));
-  const directory = await freshStage(plan, "render", workspace);
-  const props = path.join(directory, "props.json");
-  await writeJson(props, { plan, theme });
-  const publicDir = await stageAssets(plan, directory, workspace);
-  await runPictureRender({ plan, directory, props, publicDir });
+  await _requirePreview({ plan, workspace, fingerprint });
+  const directory = await freshStage({
+    plan,
+    name: "render",
+    workspace,
+  });
+  await _renderPicture({ plan, theme, directory, workspace });
   const picture = path.join(directory, `${plan.id}.mp4`);
   const final = path.join(directory, "final.mp4");
-  const hasAudio = await mixAudio(plan, workspace, picture, final);
+  const hasAudio = await MediaHelpers.mixAudio({
+    plan,
+    root: workspace,
+    picture,
+    destination: final,
+  });
   assertFingerprintUnchanged({
     before: fingerprint,
     after: await fingerprintThemedPlan({ plan, filename, workspace, theme }),
@@ -47,7 +93,10 @@ export async function render(
       "Plan, media or renderer changed during render; outputs remain for inspection",
   });
   await writeRenderManifest({ plan, directory, fingerprint, hasAudio });
-  await exportPlan(plan, workspace);
+  await exportPlan({
+    plan,
+    workspace,
+  });
   await fs.rm(path.join(directory, `${plan.id}-frames`), {
     recursive: true,
     force: true,

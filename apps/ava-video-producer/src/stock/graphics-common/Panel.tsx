@@ -1,10 +1,17 @@
-import { StockRect } from "../primitives/StockRect/StockRect";
-import {
-  useGraphicFilter,
-  useGraphicProps,
-} from "../theme/useGraphicTheme/useGraphicTheme";
+import { StockRect } from "../primitives/StockRect";
+import { GraphicThemeHooks } from "../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
+type Props = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  children?: ReactNode;
+  stroke?: string;
+  fill?: string;
+  radius?: number;
+};
 /** A themed panel; `stroke`, `fill`, and `radius` are content overrides. */
 export function Panel({
   x,
@@ -15,18 +22,19 @@ export function Panel({
   stroke,
   fill,
   radius,
-}: {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  children?: ReactNode;
-  stroke?: string;
-  fill?: string;
-  radius?: number;
-}) {
-  const panel = useGraphicProps("Panel", { stroke, fill, radius });
-  const filter = useGraphicFilter("components.Panel.elevation");
+}: Readonly<Props>): ReactNode {
+  const panel = GraphicThemeHooks.useGraphicProps({
+    name: "Panel",
+    props: {
+      stroke,
+      fill,
+      radius,
+    },
+  });
+  const filter = GraphicThemeHooks.useGraphicFilter(
+    "components.Panel.elevation",
+  );
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g filter={filter}>
       <StockRect
@@ -34,10 +42,10 @@ export function Panel({
         y={y}
         width={width}
         height={height}
-        rx={panel.radius}
+        rx={scales.corner(panel.radius)}
         fill={panel.fill}
         stroke={panel.stroke}
-        strokeWidth={panel.strokeWidth}
+        strokeWidth={scales.stroke(panel.strokeWidth)}
       />
       {children}
     </g>

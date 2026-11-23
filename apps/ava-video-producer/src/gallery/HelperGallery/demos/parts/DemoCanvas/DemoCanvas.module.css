@@ -1,0 +1,10 @@
+.demoCanvasCanvas {
+  background: var(--demo-ground);
+  border: var(--demo-stroke-hairline) dashed var(--demo-line);
+  height: 400px;
+  left: calc(50% - 320px);
+  overflow: hidden;
+  position: absolute;
+  top: calc(50% - 200px);
+  width: 640px;
+}

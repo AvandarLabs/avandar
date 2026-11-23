@@ -1,11 +1,12 @@
 import { useRef, useState } from "react";
 import { reloadThenFocus } from "../../videoThemeEditor/ThemeBar/themeBarHelpers/themeBarHelpers";
 import { VideoThemeEditor } from "../../videoThemeEditor/VideoThemeEditor/VideoThemeEditor";
-import { useGalleryVideoTheme } from "../GalleryVideoTheme/GalleryVideoTheme";
+import { useGalleryVideoTheme } from "../GalleryVideoTheme/useGalleryVideoTheme";
 import { ThemePanelHeader } from "./ThemePanelHeader";
 import css from "./VideoThemePanel.module.css";
-import type { ThemeEditScope } from "../../videoThemeEditor/themeDraft/themeDraft";
+import type { ThemeEditScope } from "../../videoThemeEditor/ThemeDrafts/ThemeDrafts";
 import type { EditorItem } from "../../videoThemeEditor/VideoThemeEditor/EditorToolbar/EditorToolbar";
+import type { ReactNode } from "react";
 
 type Props = Readonly<{
   item: EditorItem;
@@ -17,15 +18,18 @@ type Props = Readonly<{
  * with the theme bar and the changed-on-disk banner pinned above its toolbar.
  * Key it by the item so its scope resets when the item changes.
  */
-export function VideoThemePanel({ item, usedTokens }: Props) {
+export function VideoThemePanel({ item, usedTokens }: Props): ReactNode {
   const gallery = useGalleryVideoTheme();
   const [scope, setScope] = useState<ThemeEditScope>({ kind: "theme" });
   const barRef = useRef<HTMLDivElement>(null);
-  const reloadTheme = () =>
-    void reloadThenFocus({
+  const reloadTheme = () => {
+    return void reloadThenFocus({
       reload: gallery.reloadTheme,
-      focus: () => barRef.current?.focus(),
+      focus: () => {
+        return barRef.current?.focus();
+      },
     });
+  };
   return (
     <div className={css.videoThemePanel}>
       <VideoThemeEditor

@@ -1,3 +1,4 @@
+import { prop, propEq } from "@avandar/utils";
 import { z } from "zod";
 import type { HelperCatalog } from "../helperCatalog.types";
 
@@ -12,6 +13,7 @@ const CATEGORY_SCHEMA = z.strictObject({
 const MODULE_SCHEMA = z.strictObject({
   path: TEXT,
   exhaustiveMembers: z.array(TEXT).default([]),
+  memberModules: z.array(TEXT).default([]),
   excluded: z.array(z.strictObject({ name: TEXT, reason: TEXT })),
 });
 
@@ -21,6 +23,7 @@ const HELPER_SCHEMA = z.strictObject({
   category: TEXT,
   description: TEXT,
   source: TEXT,
+  relatedSources: z.array(TEXT).default([]),
   exports: z.array(TEXT).min(1),
   signature: TEXT,
   defaults: z.array(z.strictObject({ name: TEXT, value: TEXT })),
@@ -52,8 +55,8 @@ function _assertUniqueIds(ids: readonly string[]): void {
 }
 
 function _assertReferences(catalog: HelperCatalog): void {
-  const categories = new Set(catalog.categories.map((item) => item.id));
-  const modules = new Set(catalog.modules.map((item) => item.path));
+  const categories = new Set(catalog.categories.map(prop("id")));
+  const modules = new Set(catalog.modules.map(prop("path")));
   catalog.helpers.forEach((helper) => {
     if (!categories.has(helper.category)) {
       throw new Error(
@@ -65,9 +68,16 @@ function _assertReferences(catalog: HelperCatalog): void {
         `Unlisted source module "${helper.source}" for "${helper.id}"`,
       );
     }
+    helper.relatedSources.forEach((relatedSource) => {
+      if (!modules.has(relatedSource)) {
+        throw new Error(
+          `Unlisted related source module "${relatedSource}" for "${helper.id}"`,
+        );
+      }
+    });
   });
   catalog.categories.forEach((category) => {
-    if (!catalog.helpers.some((helper) => helper.category === category.id)) {
+    if (!catalog.helpers.some(propEq("category", category.id))) {
       throw new Error(`Category "${category.id}" has no helpers`);
     }
   });
@@ -79,7 +89,7 @@ function _assertReferences(catalog: HelperCatalog): void {
  */
 export function parseHelperCatalog(raw: unknown): HelperCatalog {
   const catalog = CATALOG_SCHEMA.parse(raw);
-  _assertUniqueIds(catalog.helpers.map((helper) => helper.id));
+  _assertUniqueIds(catalog.helpers.map(prop("id")));
   _assertReferences(catalog);
   return catalog;
 }

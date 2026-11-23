@@ -1,13 +1,16 @@
 import { SegmentedControl } from "@mantine/core";
-import { CurvePlot } from "../../../gallery/HelperGallery/demos/parts/CurvePlot";
-import { createEasingFromToken } from "../../../videoTheme/createEasingFromToken/createEasingFromToken";
-import { useRowIssueAriaProps } from "../../RowIssueContext/RowIssueContext";
+import { CurvePlot } from "../../../gallery/HelperGallery/demos/parts/CurvePlot/CurvePlot";
+import { makeEasingFromToken } from "../../../videoTheme/makeEasingFromToken/makeEasingFromToken";
+import { useRowIssueAriaProps } from "../../RowIssueContext/rowIssueHelpers";
 import { getDefaultLiteralFromKind } from "../getDefaultLiteralFromKind";
 import { BezierFields } from "./BezierFields/BezierFields";
 import css from "./EasingValueControl.module.css";
 import { PowerFields } from "./PowerFields";
 import type { EasingValue } from "../../../videoTheme/videoTheme.types";
 import type { ValueControlProps } from "../valueControl.types";
+import type { ReactNode } from "react";
+
+type Props = ValueControlProps;
 
 const DEFAULT_BEZIER = getDefaultLiteralFromKind("easing");
 const DEFAULT_POWER: EasingValue = { powerInOut: 3 };
@@ -22,13 +25,13 @@ export function EasingValueControl({
   value,
   onChange,
   isCameraCurve = false,
-}: ValueControlProps) {
+}: Readonly<Props>): ReactNode {
   const issueAriaProps = useRowIssueAriaProps();
   const easing = (value ?? DEFAULT_BEZIER) as EasingValue;
   const points = "powerInOut" in easing ? undefined : easing;
   const power = "powerInOut" in easing ? easing.powerInOut : 3;
   return (
-    <div className={css.easing} role="group" aria-label={label}>
+    <div className={css.easingValueControl} role="group" aria-label={label}>
       <SegmentedControl
         size="xs"
         aria-label="Curve type"
@@ -38,13 +41,13 @@ export function EasingValueControl({
           { value: "bezier", label: "Bezier" },
           { value: "power", label: "Power" },
         ]}
-        onChange={(kind) =>
-          onChange(kind === "power" ? DEFAULT_POWER : DEFAULT_BEZIER)
-        }
+        onChange={(kind) => {
+          return onChange(kind === "power" ? DEFAULT_POWER : DEFAULT_BEZIER);
+        }}
       />
-      <div className={css.easingBody}>
+      <div className={css.easingValueControlBody}>
         <CurvePlot
-          easing={createEasingFromToken(easing)}
+          easing={makeEasingFromToken(easing)}
           t={1}
           size={96}
           handles={points}

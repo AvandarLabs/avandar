@@ -1,8 +1,8 @@
 import { Extension } from "@tiptap/core";
-import Placeholder from "@tiptap/extension-placeholder";
+import { Placeholder } from "@tiptap/extension-placeholder";
 import { PluginKey } from "@tiptap/pm/state";
 import { ReactNodeViewRenderer } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
+import { StarterKit } from "@tiptap/starter-kit";
 import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
 import { ChatGadgetLinkView } from "@/components/ChatPanel/ChatThread/Composer/ChatGadgetLinkView";
 import { createGadgetRefFromAttrs } from "@/components/RichText/Gadget/GadgetNodes/createGadgetRefFromAttrs";

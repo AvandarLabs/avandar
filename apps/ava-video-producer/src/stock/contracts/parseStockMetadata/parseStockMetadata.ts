@@ -3,7 +3,9 @@ import type { StockMetadata } from "../StockContract.types";
 
 const MESSAGE = z.strictObject({
   id: z.string().min(1),
-  message: z.string().refine((text) => text.trim().length > 0),
+  message: z.string().refine((text) => {
+    return text.trim().length > 0;
+  }),
 });
 const MESSAGES = z.array(MESSAGE).min(1);
 const METADATA = z.strictObject({
@@ -26,7 +28,9 @@ const METADATA = z.strictObject({
         endFrame: z.number().int().nonnegative(),
         description: MESSAGE,
       })
-      .refine((beat) => beat.endFrame >= beat.startFrame),
+      .refine((beat) => {
+        return beat.endFrame >= beat.startFrame;
+      }),
   ),
   distinction: MESSAGE,
 });

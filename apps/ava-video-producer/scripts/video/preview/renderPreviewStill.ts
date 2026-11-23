@@ -4,11 +4,11 @@ import {
   renderStill,
   type selectComposition,
 } from "@remotion/renderer";
-import { timeline } from "../../../src/storyboard/schema/schema";
-import { requireLicense } from "../../require-license.mjs";
+import { StoryboardTimeline } from "../../../src/storyboard/schema/StoryboardTimeline";
+import { requireLicense } from "../../requireLicense";
 import { getBrowserSettingsFromPlan } from "./getBrowserSettingsFromPlan";
 import type { Storyboard } from "../../../src/storyboard/schema/schema";
-import type { VideoThemeSnapshot } from "../../../src/videoTheme/videoThemeSnapshotHelpers/videoThemeSnapshotHelpers";
+import type { VideoThemeSnapshot } from "../../../src/videoTheme/VideoThemeSnapshots/VideoThemeSnapshots";
 import type { PreviewSample } from "../video.types";
 
 type Props = Readonly<{
@@ -50,8 +50,8 @@ export async function renderPreviewStill({
     logLevel: "error",
     licenseKey: requireLicense().privateKey,
   });
-  const shot = timeline(plan).find(
-    (item) => frame >= item.startFrame && frame < item.endFrame,
-  )!;
+  const shot = StoryboardTimeline.timeline(plan).find((item) => {
+    return frame >= item.startFrame && frame < item.endFrame;
+  })!;
   return { frame, file, shot: shot.id };
 }

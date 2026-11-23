@@ -1,13 +1,19 @@
-import { StockRect } from "../../primitives/StockRect/StockRect";
-import { useGraphicProps } from "../../theme/useGraphicTheme/useGraphicTheme";
+import { StockRect } from "../../primitives/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { FIRST_LINE_Y, LINE_STEP } from "./CodeFocus.constants";
 import type { ReactNode } from "react";
 
-type Props = Readonly<{ line: number; accent: string }>;
-
+type Props = Readonly<{
+  line: number;
+  accent: string;
+}>;
 /** The tinted band and accent marker behind the focused line. */
 export function CodeHighlight({ line, accent }: Props): ReactNode {
-  const style = useGraphicProps("CodeFocus", {});
+  const style = GraphicThemeHooks.useGraphicProps({
+    name: "CodeFocus",
+    props: {},
+  });
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
   const y = FIRST_LINE_Y + line * LINE_STEP;
   return (
     <>
@@ -16,16 +22,16 @@ export function CodeHighlight({ line, accent }: Props): ReactNode {
         y={y - 23}
         width={792}
         height={40}
-        rx={style.highlightRadius}
+        rx={shapes.corner(style.highlightRadius)}
         fill={accent}
-        fillOpacity={style.highlightAlpha}
+        fillOpacity={shapes.wash(style.highlightAlpha)}
       />
       <StockRect
         x={84}
         y={y - 23}
         width={style.markerWidth}
         height={40}
-        rx={style.markerWidth / 2}
+        rx={shapes.corner(style.markerWidth / 2)}
         fill={accent}
       />
     </>

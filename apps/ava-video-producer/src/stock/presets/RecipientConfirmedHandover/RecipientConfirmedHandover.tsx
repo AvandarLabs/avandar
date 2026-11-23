@@ -1,6 +1,9 @@
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
-import { STOCK } from "../../stockPalette";
-import { HandoverGoodsRow } from "./HandoverGoodsRow";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { HandoverFurniture } from "./HandoverFurniture";
+import { HandoverGoodsRow } from "./HandoverGoodsRow/HandoverGoodsRow";
 import { HandoverLabels } from "./HandoverLabels";
 import { HandoverReceipt } from "./HandoverReceipt";
 import { HandoverRecipient } from "./HandoverRecipient";
@@ -15,35 +18,29 @@ export function RecipientConfirmedHandover({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
       <HandoverLabels input={input} />
-      <PersonGlyph x={368} y={95} size={36} role="worker" color={STOCK.cyan} />
-      <rect
-        x={353}
-        y={165}
-        width={140}
-        height={300}
-        rx={8}
-        fill={STOCK.elevated}
-        stroke={STOCK.line}
-        strokeDasharray="4 6"
+      <PersonGlyph
+        x={368}
+        y={95}
+        size={36}
+        role="worker"
+        color={tokens.color.accentAlt}
       />
-      <path
-        d="M520 165 V475 H678 V165 M520 455 H678 M540 450 V475 M560 450 V475 M580 450 V475 M600 450 V475 M620 450 V475 M640 450 V475 M660 450 V475"
-        fill="none"
-        stroke={accent}
-        strokeWidth={2}
-      />
-      {input.contents.map((content, index) => (
-        <HandoverGoodsRow
-          key={content.id}
-          input={input}
-          index={index}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      <HandoverFurniture accent={accent} />
+      {input.contents.map((content, index) => {
+        return (
+          <HandoverGoodsRow
+            key={content.id}
+            input={input}
+            index={index}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
       <HandoverRecipient input={input} frame={frame} accent={accent} />
       <HandoverReceipt input={input} frame={frame} accent={accent} />
     </g>

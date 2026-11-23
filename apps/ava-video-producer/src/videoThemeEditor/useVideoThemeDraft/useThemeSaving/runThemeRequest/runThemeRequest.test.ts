@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { prop } from "@avandar/utils";
 import { ThemeApiError } from "../../../ThemeApi/ThemeApiError";
 import { createRequestHarness } from "../createRequestHarness";
 import { runThemeRequest } from "./runThemeRequest";
@@ -11,10 +12,7 @@ test("a request that succeeds resolves true and ends saved", async () => {
     request: async () => {},
   });
   assert.equal(didSucceed, true);
-  assert.deepEqual(
-    harness.statuses.map((status) => status.kind),
-    ["saving", "saved"],
-  );
+  assert.deepEqual(harness.statuses.map(prop("kind")), ["saving", "saved"]);
   assert.equal(harness.inFlight.current, false);
 });
 

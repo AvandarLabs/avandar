@@ -110,13 +110,13 @@ export type NullToUndefinedDeep<T> = SwapDeep<T, null, undefined>;
 /**
  * Represents any function with inferrable parameters and return types.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// oxlint-disable-next-line typescript/no-explicit-any
 export type AnyFunction = (...args: any[]) => any;
 
 /**
  * Represents any function with a given return type.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// oxlint-disable-next-line typescript/no-explicit-any
 export type AnyFunctionWithReturn<R> = (...args: any[]) => R;
 
 /**
@@ -124,7 +124,7 @@ export type AnyFunctionWithReturn<R> = (...args: any[]) => R;
  */
 export type AnyFunctionWithArguments<Params extends unknown[]> = (
   ...args: Params
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // oxlint-disable-next-line typescript/no-explicit-any
 ) => any;
 
 export type AnyFunctionWithSignature<Params extends unknown[], Return> = (
@@ -221,7 +221,7 @@ export type ObjectRegistry<
   KeyProp extends ConditionalKeys<U, string>,
 > = Simplify<
   UnionToIntersection<
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // oxlint-disable-next-line typescript/no-explicit-any
     U extends any
       ? {
           [V in U as Extract<U[KeyProp], string>]: V;

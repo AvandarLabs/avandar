@@ -1,9 +1,7 @@
 import { propEq } from "@avandar/utils";
-import { ramp } from "../../../../motion";
-import {
-  useGraphicMotion,
-  useGraphicProps,
-} from "../../../theme/useGraphicTheme/useGraphicTheme";
+import { Motion } from "../../../../motion";
+import { SketchedShape } from "../../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { getCacheSceneFromFrame } from "../getCacheSceneFromFrame";
 import type { Input } from "../QueryColumnCacheGrowth.schema";
 import type { ReactNode } from "react";
@@ -14,10 +12,13 @@ type Props = Readonly<{
   frame: number;
   accent: string;
 }>;
-
 const ROUTE_CUE = 13;
 const ROUTE_FRAMES = 27;
-
+/**
+ * The route draws on as one dash over a path normalised to this length, so
+ * it is geometry, not a theme dash.
+ */
+const DRAW_ON_LENGTH = 1;
 /** Draws each covered request's route into its cached column. */
 export function RequestedRoutes({
   input,
@@ -25,35 +26,40 @@ export function RequestedRoutes({
   frame,
   accent,
 }: Props): ReactNode {
-  const style = useGraphicProps("QueryColumnCacheGrowth", {});
-  const motion = useGraphicMotion();
-  const progress = ramp(
+  const style = GraphicThemeHooks.useGraphicProps({
+    name: "QueryColumnCacheGrowth",
+    props: {},
+  });
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const { sketch } = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const progress = Motion.ramp({
     frame,
-    ROUTE_CUE,
-    motion.scale(ROUTE_FRAMES),
-    motion.travel.easing,
-  );
+    at: ROUTE_CUE,
+    dur: motion.scale(ROUTE_FRAMES),
+    easing: motion.travel.easing,
+  });
   return input.requests[0].columnIds.map((id) => {
     const index = scene.original.findIndex(propEq("id", id)),
       x = 144 + index * 168;
     return (
       <g key={id} data-requested-column={id}>
-        <path
-          d={`M260 178 V225 H${x} V247`}
+        <SketchedShape
+          shape={{ kind: "path", d: `M260 178 V225 H${x} V247` }}
+          profile={sketch.shape}
           fill="none"
           stroke={accent}
-          pathLength={1}
-          strokeDasharray={1}
-          strokeDashoffset={1 - progress}
-          strokeWidth={style.routeStrokeWidth}
+          pathLength={DRAW_ON_LENGTH}
+          strokeDasharray={DRAW_ON_LENGTH}
+          strokeDashoffset={DRAW_ON_LENGTH * (1 - progress)}
+          strokeWidth={scales.stroke(style.routeStrokeWidth)}
         />
-        <circle
-          cx={x}
-          cy={252}
-          r={style.portRadius}
+        <SketchedShape
+          shape={{ kind: "circle", cx: x, cy: 252, r: style.portRadius }}
+          profile={sketch.shape}
           fill="none"
           stroke={accent}
-          strokeWidth={style.routeStrokeWidth}
+          strokeWidth={scales.stroke(style.routeStrokeWidth)}
         />
       </g>
     );

@@ -26,9 +26,9 @@ export const networkGraphInputSchema = z
     edges: z.array(edgeSchema).min(1).max(10),
     showPackets: z.boolean(),
   })
-  .superRefine((input, context) =>
-    validateGraph({ input, context }),
-  ) satisfies z.ZodType;
+  .superRefine((input, context) => {
+    return validateGraph({ input, context });
+  }) satisfies z.ZodType;
 
 /** Schema-inferred content supplied to the renderer. */
 export type NetworkGraphInput = z.output<typeof networkGraphInputSchema>;

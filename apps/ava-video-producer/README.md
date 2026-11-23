@@ -85,7 +85,7 @@ has a stable link such as `motion.html#plexus-field`.
 The live gallery and Remotion use the same deterministic React/SVG renderer. These are conceptual graphics with fixed illustrative content, separate from recorded product evidence. The [stock motion catalog](docs/stock-motion-library.md) lists every ID, usage boundary, and reuse command. `StockScene` also supports these presets in the storyboard pipeline.
 
 ```bash
-npm run motion:build                 # Build the ignored browser bundle
+npm run motion:build                 # Build the ignored showcase pages with Vite
 npm run motion -- list
 npm run motion -- preview all        # Inspect out/motion/preview/<id>/contact-sheet.jpg
 npm run motion -- render all         # Matching previews, serial renders, unchanged frame gate

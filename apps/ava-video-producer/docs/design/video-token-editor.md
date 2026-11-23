@@ -32,6 +32,18 @@ switch says "Whole theme" and the open motion or composition's own name, never
 search for. The editor
 spells colour the British way throughout, matching the token catalog.
 
+## Look and feel
+
+Look and feel holds the tokens that change a look the most, then the global
+options that adjust them, each placed beside the token it acts on: line
+weight after the default stroke, corner style after the panel corner, the
+easing family, stagger, entrance style, and loop fade after tempo, and the
+shape and annotation sketches after the box sketch. The nine category colours
+close the group. Every option opens at its identity value (1, `authored`, or
+`rise`), so the group reads as unedited on a fresh theme, and options use the
+same row, control, and edited-dot states as every other token. The order is
+`ESSENTIAL_TOKEN_PATHS` in `src/videoThemeEditor/TokenRows/TokenRows.ts`.
+
 ## Density and rhythm
 
 Mantine size `xs` controls. 12 px body copy, 11 px descriptions, 10 px

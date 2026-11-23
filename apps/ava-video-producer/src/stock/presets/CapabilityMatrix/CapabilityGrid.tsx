@@ -1,16 +1,28 @@
-import { ramp } from "../../../motion";
-import { FitText } from "../../primitives/FitText/FitText";
-import { StockRect } from "../../primitives/StockRect/StockRect";
-import { STOCK } from "../../stockPalette";
-import { CapabilityColumn } from "./CapabilityColumn";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { CapabilityCaption } from "./CapabilityCaption/CapabilityCaption";
+import { CapabilityGridOptionsLayer } from "./CapabilityGridOptionsLayer/CapabilityGridOptionsLayer";
 import type { Input } from "./CapabilityMatrix.schema";
 import type { ReactNode } from "react";
 
-type Props = { frame: number; input: Input };
+type Props = {
+  frame: number;
+  input: Input;
+};
+/** The table panel's corner before the corner style scales it. */
+const PANEL_CORNER = 8;
 /** The table skeleton establishes shared row and column geometry first. */
 export function CapabilityGrid({ frame, input }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const height = input.capabilities.length * 66;
-  const panel = { x: 54, y: 176, width: 854, height, rx: 8 };
+  const panel = {
+    x: 54,
+    y: 176,
+    width: 854,
+    height,
+    rx: scales.corner(PANEL_CORNER),
+  };
   const caption = {
     text: input.caption,
     x: 480,
@@ -21,34 +33,10 @@ export function CapabilityGrid({ frame, input }: Readonly<Props>): ReactNode {
   };
   return (
     <g>
-      <g aria-label={input.caption} opacity={ramp(frame, 12, 18)}>
-        <FitText
-          {...caption}
-          breakLongWords
-          normalizeWhitespace
-          anchor="middle"
-        />
-      </g>
-      <g opacity={ramp(frame, 18, 18)}>
-        <StockRect {...panel} fill={STOCK.surface} stroke={STOCK.line} />
-        {input.options.map((option, index) => (
-          <CapabilityColumn
-            key={option.id}
-            {...{ option, index, height }}
-            columnWidth={606 / input.options.length}
-          />
-        ))}
-        {input.capabilities.map((row, index) => (
-          <line
-            key={row.id}
-            x1={54}
-            x2={908}
-            y1={176 + index * 66}
-            y2={176 + index * 66}
-            stroke={STOCK.line}
-          />
-        ))}
-      </g>
+      <CapabilityCaption {...{ frame, input, motion, caption }} />
+      <CapabilityGridOptionsLayer
+        {...{ frame, motion, panel, tokens, input, height }}
+      />
     </g>
   );
 }

@@ -1,7 +1,7 @@
 import { projectGlobePoint } from "../../geography/projectGlobePoint/projectGlobePoint";
-import { STOCK } from "../../stockPalette";
-import { buildIncidentLeaderFromPoints } from "./buildIncidentLeaderFromPoints";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { GlobeIncidentLabel } from "./GlobeIncidentLabel";
+import { GlobeIncidentMarker } from "./GlobeIncidentMarker/GlobeIncidentMarker";
 import type { Input } from "./FictionalConflictGlobe.schema";
 import type { ReactNode } from "react";
 
@@ -22,6 +22,8 @@ export function GlobeIncident({
   showLabel,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const point = projectGlobePoint({
     ...incident,
     centerLongitude: longitude,
@@ -33,38 +35,13 @@ export function GlobeIncident({
   const labelY = 145 + index * 100;
   return (
     <g>
-      {point.visible ? (
-        <g data-incident-id={incident.id} data-x={x} data-y={y}>
-          {showLabel ? (
-            <path
-              data-leader={incident.id}
-              d={buildIncidentLeaderFromPoints({
-                incident,
-                incidents,
-                longitude,
-                x,
-                y,
-                labelY,
-              })}
-              fill="none"
-              stroke={STOCK.muted}
-            />
-          ) : undefined}
-          <path
-            data-incident-cross={incident.id}
-            d={`M${x - 7} ${y - 7} L${x + 7} ${y + 7} M${x + 7} ${y - 7} L${x - 7} ${y + 7}`}
-            fill="none"
-            stroke={accent}
-            strokeWidth={3}
-            strokeLinecap="round"
-          />
-        </g>
-      ) : undefined}
+      <GlobeIncidentMarker
+        {...{ point, incident, x, y, showLabel, incidents, longitude }}
+        {...{ labelY, tokens, accent, scales }}
+      />
       {showLabel ? (
         <GlobeIncidentLabel
-          incident={incident}
-          index={index}
-          labelY={labelY}
+          {...{ incident, index, labelY }}
           visible={point.visible}
           accent={accent}
         />

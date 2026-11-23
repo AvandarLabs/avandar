@@ -1,5 +1,5 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./DistanceBufferEnvelope.schema";
 import type { ReactNode } from "react";
 
@@ -8,11 +8,13 @@ type Props = { input: Input; accent: string };
  * Captions distinguish complete sources, qualifying results and distance units.
  */
 export function BufferHeadings({ input, accent }: Readonly<Props>): ReactNode {
-  const numIncluded = input.locations.filter(
-    (location) =>
+  const { color, text } = GraphicThemeHooks.useGraphicTokens();
+  const numIncluded = input.locations.filter((location) => {
+    return (
       Math.hypot(location.x - input.origin.x, location.y - input.origin.y) <=
-      input.radiusUnits,
-  ).length;
+      input.radiusUnits
+    );
+  }).length;
   return (
     <g>
       <LabelSlots
@@ -28,13 +30,14 @@ export function BufferHeadings({ input, accent }: Readonly<Props>): ReactNode {
           [input.labels.outside, 60, 580, 860, 12, 1],
         ]}
       />
-      <circle cx={40} cy={576} r={5} fill={STOCK.orange} />
+      <circle cx={40} cy={576} r={5} fill={color.highlight} />
       <text
         data-buffer-count={`${numIncluded}/${input.locations.length}`}
         x={400}
         y={170}
         textAnchor="end"
-        fontSize={12}
+        fontSize={text.graphic.data.fontSize}
+        fontWeight={text.graphic.data.fontWeight}
         fill={accent}
       >
         {numIncluded}/{input.locations.length}

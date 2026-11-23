@@ -1,34 +1,29 @@
-import { token } from "../defineTokensHelpers";
-import {
-  createAlphaToken,
-  createDurationToken,
-  createEasingToken,
-  createLengthToken,
-  createOffsetToken,
-  createStrokeToken,
-} from "./componentTokenHelpers";
-
-/** Tokens of the overlays drawn over a scene: thesis, underline, annotation, spotlight, connector, and floating pieces. */
+import { TokenDefinitions } from "../TokenDefinitions";
+import { ComponentTokenDefinitions } from "./ComponentTokenDefinitions";
+/**
+ * Tokens of the overlays drawn over a scene: thesis, underline, annotation,
+ * spotlight, connector, and floating pieces.
+ */
 export const OVERLAY_TOKENS = {
   Thesis: {
-    gap: createLengthToken(
-      "Thesis line gap",
-      "Space between thesis lines.",
-      "stage",
-    ),
-    inset: token({
+    gap: ComponentTokenDefinitions.makeLengthToken({
+      label: "Thesis line gap",
+      description: "Space between thesis lines.",
+      surface: "stage",
+    }),
+    inset: TokenDefinitions.token({
       kind: "box",
       surface: "stage",
       label: "Thesis inset",
       description:
         "Where the thesis block sits: top, x from both sides, and bottom.",
     }),
-    emphasisGap: createLengthToken(
-      "Thesis emphasis gap",
-      "Space above the thesis's supporting line.",
-      "stage",
-    ),
-    lineStagger: token({
+    emphasisGap: ComponentTokenDefinitions.makeLengthToken({
+      label: "Thesis emphasis gap",
+      description: "Space above the thesis's supporting line.",
+      surface: "stage",
+    }),
+    lineStagger: TokenDefinitions.token({
       kind: "number",
       surface: "stage",
       unit: "frames",
@@ -38,29 +33,29 @@ export const OVERLAY_TOKENS = {
       label: "Thesis line stagger",
       description: "Frames between thesis lines starting to arrive.",
     }),
-    lineDuration: createDurationToken(
-      "Thesis line duration",
-      "How long a thesis line takes to arrive.",
-      "stage",
-    ),
-    lineEasing: createEasingToken(
-      "Thesis line curve",
-      "The curve of a thesis line arriving.",
-      "stage",
-    ),
-    lineDistance: createLengthToken(
-      "Thesis line rise",
-      "How far a thesis line rises as it arrives.",
-      "stage",
-    ),
+    lineDuration: ComponentTokenDefinitions.makeDurationToken({
+      label: "Thesis line duration",
+      description: "How long a thesis line takes to arrive.",
+      surface: "stage",
+    }),
+    lineEasing: ComponentTokenDefinitions.makeEasingToken({
+      label: "Thesis line curve",
+      description: "The curve of a thesis line arriving.",
+      surface: "stage",
+    }),
+    lineDistance: ComponentTokenDefinitions.makeLengthToken({
+      label: "Thesis line rise",
+      description: "How far a thesis line rises as it arrives.",
+      surface: "stage",
+    }),
   },
   Underline: {
-    strokeWidth: createStrokeToken(
-      "Underline width",
-      "Width of the hand-drawn teaching underline.",
-      "stage",
-    ),
-    seed: token({
+    strokeWidth: ComponentTokenDefinitions.makeStrokeToken({
+      label: "Underline width",
+      description: "Width of the hand-drawn teaching underline.",
+      surface: "stage",
+    }),
+    seed: TokenDefinitions.token({
       kind: "number",
       surface: "stage",
       min: 0,
@@ -70,36 +65,38 @@ export const OVERLAY_TOKENS = {
       description:
         "Fixes the wobble of the teaching underline so every frame draws the same line.",
     }),
-    drawIn: createDurationToken(
-      "Underline draw-in",
-      "How long the teaching underline takes to draw.",
-      "stage",
-    ),
+    drawIn: ComponentTokenDefinitions.makeDurationToken({
+      label: "Underline draw-in",
+      description: "How long the teaching underline takes to draw.",
+      surface: "stage",
+    }),
   },
   Annotation: {
-    strokeWidth: createStrokeToken(
-      "Annotation width",
-      "Width of hand-drawn boxes, brackets, and circles on the product stage.",
-      "stage",
-    ),
-    highlightAlpha: createAlphaToken(
-      "Highlight opacity",
-      "Opacity of a hand-drawn highlight on the product stage.",
-      "stage",
-    ),
-    drawIn: createDurationToken(
-      "Annotation draw-in",
-      "How long a hand-drawn mark takes to draw and to retract.",
-      "stage",
-    ),
+    strokeWidth: ComponentTokenDefinitions.makeStrokeToken({
+      label: "Annotation width",
+      description:
+        "Width of hand-drawn boxes, brackets, and circles on the product stage.",
+      surface: "stage",
+    }),
+    highlightAlpha: ComponentTokenDefinitions.makeAlphaToken({
+      label: "Highlight opacity",
+      description: "Opacity of a hand-drawn highlight on the product stage.",
+      surface: "stage",
+    }),
+    drawIn: ComponentTokenDefinitions.makeDurationToken({
+      label: "Annotation draw-in",
+      description: "How long a hand-drawn mark takes to draw and to retract.",
+      surface: "stage",
+    }),
   },
   Spotlight: {
-    padding: createLengthToken(
-      "Spotlight padding",
-      "Space between a spotlit region and the edge of its cut-out.",
-      "stage",
-    ),
-    scrimSpread: token({
+    padding: ComponentTokenDefinitions.makeLengthToken({
+      label: "Spotlight padding",
+      description:
+        "Space between a spotlit region and the edge of its cut-out.",
+      surface: "stage",
+    }),
+    scrimSpread: TokenDefinitions.token({
       kind: "length",
       surface: "stage",
       unit: "px",
@@ -112,59 +109,60 @@ export const OVERLAY_TOKENS = {
     }),
   },
   Connector: {
-    strokeWidth: createStrokeToken(
-      "Connector width",
-      "Width of the dashed connector from a source to its explanation.",
-      "stage",
-    ),
-    dash: token({
+    strokeWidth: ComponentTokenDefinitions.makeStrokeToken({
+      label: "Connector width",
+      description:
+        "Width of the dashed connector from a source to its explanation.",
+      surface: "stage",
+    }),
+    dash: TokenDefinitions.token({
       kind: "dash",
       surface: "stage",
       label: "Connector dash",
       description: "Dash pattern of a connector, in pixels.",
     }),
-    bend: createOffsetToken(
-      "Connector bend",
-      "How far past its target a connector's end swings sideways.",
-      "stage",
-    ),
-    drop: createOffsetToken(
-      "Connector drop",
-      "How far below its target a connector ends.",
-      "stage",
-    ),
-    drawIn: createDurationToken(
-      "Connector draw-in",
-      "How long a connector takes to draw.",
-      "stage",
-    ),
-    easing: createEasingToken(
-      "Connector curve",
-      "The curve of a connector drawing in.",
-      "stage",
-    ),
+    bend: ComponentTokenDefinitions.makeOffsetToken({
+      label: "Connector bend",
+      description: "How far past its target a connector's end swings sideways.",
+      surface: "stage",
+    }),
+    drop: ComponentTokenDefinitions.makeOffsetToken({
+      label: "Connector drop",
+      description: "How far below its target a connector ends.",
+      surface: "stage",
+    }),
+    drawIn: ComponentTokenDefinitions.makeDurationToken({
+      label: "Connector draw-in",
+      description: "How long a connector takes to draw.",
+      surface: "stage",
+    }),
+    easing: ComponentTokenDefinitions.makeEasingToken({
+      label: "Connector curve",
+      description: "The curve of a connector drawing in.",
+      surface: "stage",
+    }),
   },
   FloatingLabel: {
-    padding: token({
+    padding: TokenDefinitions.token({
       kind: "box",
       surface: "stage",
       label: "Floating label padding",
       description:
         "Space inside a floating label: x on the sides and y above and below.",
     }),
-    offset: createLengthToken(
-      "Floating label offset",
-      "Space between a floating label and the artwork it names.",
-      "stage",
-    ),
-    borderWidth: createStrokeToken(
-      "Floating label border",
-      "Border width of a floating label.",
-      "stage",
-    ),
+    offset: ComponentTokenDefinitions.makeLengthToken({
+      label: "Floating label offset",
+      description: "Space between a floating label and the artwork it names.",
+      surface: "stage",
+    }),
+    borderWidth: ComponentTokenDefinitions.makeStrokeToken({
+      label: "Floating label border",
+      description: "Border width of a floating label.",
+      surface: "stage",
+    }),
   },
   FloatingDiagram: {
-    elevation: token({
+    elevation: TokenDefinitions.token({
       kind: "elevation",
       surface: "stage",
       label: "Floating diagram elevation",

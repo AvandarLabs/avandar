@@ -1,14 +1,17 @@
 import { MantineThemeProvider } from "@mantine/core";
 import { useMemo, type CSSProperties, type ReactNode } from "react";
-import { buildVideoCssVariables } from "../buildVideoCssVariables/buildVideoCssVariables";
 import { makeResolvedVideoThemeFromSource } from "../makeResolvedVideoThemeFromSource/makeResolvedVideoThemeFromSource";
-import { VideoThemeContext } from "../useVideoTheme";
+import { makeVideoCssVariablesFromTheme } from "../makeVideoCssVariablesFromTheme/makeVideoCssVariablesFromTheme";
+import { VideoThemeContext } from "../videoThemeHelpers";
 import type { ResolvedVideoTheme, VideoThemeSource } from "../videoTheme.types";
 
 type Props = Readonly<{
   source: VideoThemeSource;
   children: ReactNode;
-  /** `none` renders no wrapper, for use inside an SVG; CSS variables are then unset. */
+  /**
+   * `none` renders no wrapper, for use inside an SVG; CSS variables are then
+   * unset.
+   */
   element?: "div" | "none";
 }>;
 
@@ -21,7 +24,7 @@ function _styleFromTheme(theme: ResolvedVideoTheme): CSSProperties {
   }
   const style: CSSProperties = {
     display: "contents",
-    ...buildVideoCssVariables(theme),
+    ...makeVideoCssVariablesFromTheme(theme),
   };
   CSS_STYLES.set(theme, style);
   return style;
@@ -39,12 +42,13 @@ export function VideoThemeProvider({
   source,
   children,
   element = "div",
-}: Props) {
-  const theme = useMemo(
-    () => makeResolvedVideoThemeFromSource(source),
-    [source],
-  );
-  const value = useMemo(() => ({ theme, source }), [theme, source]);
+}: Props): ReactNode {
+  const theme = useMemo(() => {
+    return makeResolvedVideoThemeFromSource(source);
+  }, [source]);
+  const value = useMemo(() => {
+    return { theme, source };
+  }, [theme, source]);
   const style = _styleFromTheme(theme);
   const content = (
     <MantineThemeProvider theme={theme.mantine} inherit={false}>

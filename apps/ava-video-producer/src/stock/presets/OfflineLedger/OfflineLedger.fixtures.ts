@@ -1,3 +1,4 @@
+import { objectValuesMap } from "@avandar/utils";
 import type { Input } from "./OfflineLedger.schema";
 /** Complete fictional local notebook. */
 export const DEFAULT_INPUT: Input = {
@@ -33,15 +34,17 @@ export const fixtures: Array<{ id: string; input: Input }> = [
     id: "dense",
     input: {
       ...DEFAULT_INPUT,
-      entries: Array.from({ length: 4 }, (_, index) => ({
-        id: `entry-${index}`,
-        label: "W".repeat(22),
-        value: "W".repeat(28),
-      })),
+      entries: Array.from({ length: 4 }, (_, index) => {
+        return {
+          id: `entry-${index}`,
+          label: "W".repeat(22),
+          value: "W".repeat(28),
+        };
+      }),
       surfaceLabel: "W".repeat(32),
-      copy: Object.fromEntries(
-        Object.keys(DEFAULT_INPUT.copy).map((key) => [key, "W".repeat(32)]),
-      ) as Input["copy"],
+      copy: objectValuesMap(DEFAULT_INPUT.copy, () => {
+        return "W".repeat(32);
+      }) as Input["copy"],
       deviceShape: "laptop",
     },
   },

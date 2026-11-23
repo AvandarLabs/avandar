@@ -39,7 +39,7 @@
  */
 import { clearOpfs } from "@avandar/browser-utils";
 import { prop } from "@avandar/utils";
-import Dexie from "dexie";
+import { Dexie } from "dexie";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { DexieDBVersionManager } from "@/clients/dexie/DexieDBVersionManager";
 import { deleteObsoleteIndexedDBs } from "@/db/dexie/deleteObsoleteIndexedDBs";

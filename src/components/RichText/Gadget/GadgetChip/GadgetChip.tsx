@@ -3,7 +3,7 @@ import { useLingui } from "@lingui/react/macro";
 import { VisuallyHidden } from "@mantine/core";
 import { IconLock } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import classes from "@/components/RichText/Gadget/GadgetChip/GadgetChip.module.css";
 import { GADGET_REGISTRY } from "@/components/RichText/Gadget/gadgetRegistry/gadgetRegistry";
 import type { Gadget } from "$/models/gadgets/Gadget/Gadget";

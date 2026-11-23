@@ -1,6 +1,6 @@
 import { AssistantRuntimeProvider } from "@assistant-ui/react";
 import { Box, Stack } from "@mantine/core";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { ChatPanelHeader } from "@/components/ChatPanel/ChatPanelHeader/ChatPanelHeader";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { useChatSessions } from "@/components/ChatPanel/ChatSessionProvider/useChatSessions";

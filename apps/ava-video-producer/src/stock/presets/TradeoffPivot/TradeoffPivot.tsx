@@ -1,6 +1,6 @@
 import { DrawPath } from "../../graphics-common/DrawPath";
-import { TradeoffCopy } from "./TradeoffCopy";
-import { TradeoffLeaf } from "./TradeoffLeaf";
+import { TradeoffCopy } from "./TradeoffCopy/TradeoffCopy";
+import { TradeoffLeaf } from "./TradeoffLeaf/TradeoffLeaf";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./TradeoffPivot.schema";
 import type { ReactNode } from "react";

@@ -1,0 +1,12 @@
+.loopPhaseDemoCentered {
+  align-items: center;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+}
+
+.loopPhaseDemoCards {
+  display: flex;
+  gap: var(--demo-space-sm);
+  justify-content: center;
+}

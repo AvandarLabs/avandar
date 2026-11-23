@@ -1,5 +1,6 @@
-import { ramp } from "../../../motion";
-import { RestoreImpression } from "./RestoreImpression";
+import { propEq } from "@avandar/utils";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { RestoreImpression } from "./RestoreImpression/RestoreImpression";
 import { RevisionDocument } from "./RevisionDocument";
 import { RevisionHeadings } from "./RevisionHeadings";
 import { RevisionHistory } from "./RevisionHistory";
@@ -16,19 +17,20 @@ export function RevisionRestore({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const selectedIndex = input.revisions.findIndex(
-    ({ id }) => id === input.restoreRevisionId,
+    propEq("id", input.restoreRevisionId),
   );
   const selected = input.revisions[selectedIndex];
   const previous = input.revisions.at(-1)!.content;
   const numLines = Math.max(previous.length, selected.content.length);
-  const content = Array.from({ length: numLines }, (_, index) =>
-    frame >= 78 + ((index + 1) * 48) / numLines
+  const content = Array.from({ length: numLines }, (_, index) => {
+    return frame >= 78 + ((index + 1) * 48) / numLines
       ? selected.content[index]
-      : previous[index],
-  );
+      : previous[index];
+  });
   return (
-    <g opacity={ramp(frame, 12, 12)}>
+    <g opacity={motion.reveal(frame, 12)}>
       <RevisionHeadings input={input} frame={frame} accent={accent} />
       <RevisionDocument
         input={input}

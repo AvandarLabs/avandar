@@ -1,6 +1,16 @@
-import { wave } from "../../motion";
-import { useGraphicProps } from "../theme/useGraphicTheme/useGraphicTheme";
+import { Motion } from "../../motion";
+import { GraphicThemeHooks } from "../theme/GraphicThemeHooks/GraphicThemeHooks";
+import type { ReactNode } from "react";
 
+type Props = {
+  x: number;
+  y: number;
+  frame: number;
+  phase: number;
+  color: string;
+  haloColor: string;
+  isLarge: boolean;
+};
 /** A themed, twinkling ambient particle with an optional halo. */
 export function Particle({
   x,
@@ -10,20 +20,23 @@ export function Particle({
   color,
   haloColor,
   isLarge,
-}: {
-  x: number;
-  y: number;
-  frame: number;
-  phase: number;
-  color: string;
-  haloColor: string;
-  isLarge: boolean;
-}) {
-  const particle = useGraphicProps("Particle", {});
+}: Readonly<Props>): ReactNode {
+  const particle = GraphicThemeHooks.useGraphicProps({
+    name: "Particle",
+    props: {},
+  });
   const floor = particle.twinkleFloor;
   return (
     <g
-      opacity={floor + wave(frame, particle.twinklePeriod, phase) * (1 - floor)}
+      opacity={
+        floor +
+        Motion.wave({
+          frame,
+          period: particle.twinklePeriod,
+          offset: phase,
+        }) *
+          (1 - floor)
+      }
     >
       {isLarge ? (
         <circle

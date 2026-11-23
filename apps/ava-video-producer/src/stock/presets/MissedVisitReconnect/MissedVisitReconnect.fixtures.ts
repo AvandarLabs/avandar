@@ -1,3 +1,4 @@
+import { objectValuesMap } from "@avandar/utils";
 import type { Input } from "./MissedVisitReconnect.schema";
 /** Complete fictional default, replaced only as a whole input. */
 export const DEFAULT_INPUT: Input = {
@@ -56,21 +57,23 @@ const minimum: Input = {
 };
 const dense: Input = {
   ...DEFAULT_INPUT,
-  cases: Array.from({ length: 6 }, (_, index) => ({
-    ...DEFAULT_INPUT.cases[index % 4],
-    id: `case ${index}界`,
-    label: "界".repeat(18),
-    attempts: 3,
-  })),
+  cases: Array.from({ length: 6 }, (_, index) => {
+    return {
+      ...DEFAULT_INPUT.cases[index % 4],
+      id: `case ${index}界`,
+      label: "界".repeat(18),
+      attempts: 3,
+    };
+  }),
   places: {
     homeLabel: "界".repeat(24),
     clinicLabel: "界".repeat(24),
     calendarLabel: "界".repeat(24),
   },
   sceneLabel: "界".repeat(40),
-  copy: Object.fromEntries(
-    Object.keys(DEFAULT_INPUT.copy).map((key) => [key, "界".repeat(42)]),
-  ) as Input["copy"],
+  copy: objectValuesMap(DEFAULT_INPUT.copy, () => {
+    return "界".repeat(42);
+  }) as Input["copy"],
 };
 const OUTCOMES: readonly ["booked", "attended", "unreached", "contacted"] = [
   "booked",
@@ -80,10 +83,12 @@ const OUTCOMES: readonly ["booked", "attended", "unreached", "contacted"] = [
 ] as const;
 const changed: Input = {
   ...DEFAULT_INPUT,
-  cases: DEFAULT_INPUT.cases.map((item, index) => ({
-    ...item,
-    outcome: OUTCOMES[index],
-  })),
+  cases: DEFAULT_INPUT.cases.map((item, index) => {
+    return {
+      ...item,
+      outcome: OUTCOMES[index],
+    };
+  }),
 };
 const toggles: Input = {
   ...changed,

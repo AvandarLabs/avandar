@@ -1,14 +1,20 @@
-import { ramp } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Props } from "./QualifyApparentConflict";
 import type { ReactNode } from "react";
 /** The opening question holds between the two apparently conflicting claims. */
 export function ContextQuestion({ frame, input }: Readonly<Props>): ReactNode {
-  const resolution = ramp(frame, 96, 24);
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const resolution = motion.ramp(frame, 96, motion.scale(24));
   return (
     <>
-      <g opacity={ramp(frame, 12, 18) * (1 - ramp(frame, 84, 18))}>
+      <g
+        opacity={
+          motion.ramp(frame, 12, motion.hero) *
+          (1 - motion.ramp(frame, 84, motion.hero))
+        }
+      >
         <FitText
           text={input.openingLabel}
           x={480}
@@ -24,9 +30,10 @@ export function ContextQuestion({ frame, input }: Readonly<Props>): ReactNode {
       <text
         x={480}
         y={270}
-        fill={STOCK.muted}
-        fontSize={32}
-        fontFamily="Arial, sans-serif"
+        fill={tokens.text.graphic.mark.color}
+        fontSize={tokens.text.graphic.mark.fontSize}
+        fontFamily={tokens.text.graphic.mark.fontFamily}
+        fontWeight={tokens.text.graphic.mark.fontWeight}
         textAnchor="middle"
         opacity={1 - resolution}
         aria-hidden="true"

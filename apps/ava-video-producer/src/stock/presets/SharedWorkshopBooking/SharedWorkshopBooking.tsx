@@ -20,15 +20,17 @@ export function SharedWorkshopBooking({
       <WorkshopCaptions input={input} />
       <WorkshopTimeRuler input={input} />{" "}
       <SharedMachine input={input} accent={accent} />
-      {input.requests.map((request, index) => (
-        <BookingRequest
-          key={request.id}
-          input={input}
-          frame={frame}
-          index={index}
-          accent={accent}
-        />
-      ))}
+      {input.requests.map((request, index) => {
+        return (
+          <BookingRequest
+            key={request.id}
+            input={input}
+            frame={frame}
+            index={index}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

@@ -1,7 +1,6 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { lingui } from "@lingui/vite-plugin";
-import eslintPlugin from "@nabla/vite-plugin-eslint";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
 import { loadEnv, runnerImport } from "vite";
@@ -111,13 +110,17 @@ export default defineConfig(async ({ mode }): Promise<ViteUserConfig> => {
               semicolons: true,
               routesDirectory: "src/routes",
               generatedRouteTree: "src/routeTree.gen.ts",
+              routeTreeFileHeader: [
+                "/* oxlint-disable */",
+                "// @ts-nocheck",
+                "// noinspection JSUnusedGlobalSymbols",
+              ],
             }),
             (await loadVitePluginAvaPlugins())({
               isBundleCheckEnabled: process.env.AVA_PLUGIN_BUNDLE_CHECK === "1",
             }),
             reactWithLinguiMacro(),
             lingui(),
-            eslintPlugin(),
             nodePolyfills(),
             VitePWA({
               // Do not switch this to "autoUpdate": paired with

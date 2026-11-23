@@ -1,8 +1,9 @@
+import { prop, propEq } from "@avandar/utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   BUILT_IN_VIDEO_THEMES,
-  createVideoThemeLibrary,
-} from "../../videoTheme/builtInVideoThemes/builtInVideoThemes";
+  makeVideoThemeLibraryFromDocuments,
+} from "../../videoTheme/makeVideoThemeLibraryFromDocuments/makeVideoThemeLibraryFromDocuments";
 import {
   ThemeApi,
   type StoredTheme,
@@ -18,7 +19,9 @@ type ThemeCollection = Readonly<{
   stored: ReadonlyMap<string, StoredTheme>;
 }>;
 
-/** Themes the editor knows, their files' hashes, and a library to resolve them. */
+/**
+ * Themes the editor knows, their files' hashes, and a library to resolve them.
+ */
 export type ThemeLibraryState = ThemeCollection &
   Readonly<{
     library: VideoThemeLibrary;
@@ -47,7 +50,7 @@ const BUILT_IN_COLLECTION: ThemeCollection = {
 export function useThemeLibrary(): ThemeLibraryState {
   const [collection, setCollection] =
     useState<ThemeCollection>(BUILT_IN_COLLECTION);
-  useEffect(function loadThemeCollectionFromApi() {
+  useEffect(() => {
     let isCurrent = true;
     ThemeApi.loadAll().then(
       (loaded) => {
@@ -63,22 +66,20 @@ export function useThemeLibrary(): ThemeLibraryState {
       isCurrent = false;
     };
   }, []);
-  const library = useMemo(
-    () =>
-      createVideoThemeLibrary(
-        [...collection.stored.values()].map((entry) => entry.document),
-      ),
-    [collection.stored],
-  );
-  const storeTheme = useCallback(
-    (stored: StoredTheme) =>
-      setCollection((current) => ({
-        themes: current.themes.some((theme) => theme.id === stored.document.id)
+  const library = useMemo(() => {
+    return makeVideoThemeLibraryFromDocuments(
+      [...collection.stored.values()].map(prop("document")),
+    );
+  }, [collection.stored]);
+  const storeTheme = useCallback((stored: StoredTheme) => {
+    return setCollection((current) => {
+      return {
+        themes: current.themes.some(propEq("id", stored.document.id))
           ? current.themes
           : [...current.themes, _summaryFromDocument(stored.document)],
         stored: new Map([...current.stored, [stored.document.id, stored]]),
-      })),
-    [],
-  );
+      };
+    });
+  }, []);
   return { ...collection, library, storeTheme };
 }

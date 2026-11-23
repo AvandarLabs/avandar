@@ -1,17 +1,24 @@
-import { ramp } from "../../../motion";
-import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
-import { FeedbackDraft } from "./FeedbackDraft";
-import { FeedbackNote } from "./FeedbackNote";
+import { Motion } from "../../../motion";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { ArtifactHeadingAndGuide } from "./ArtifactHeadingAndGuide";
+import { CurrentReviewRound } from "./CurrentReviewRound";
+import { FinalArtifactCaption } from "./FinalArtifactCaption";
 import { getFeedbackStateFromInputAndFrame } from "./getFeedbackStateFromInputAndFrame";
+import { ReviewNotes } from "./ReviewNotes";
+import { ReviewRoleBrackets } from "./ReviewRoleBrackets";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./FeedbackRefinement.schema";
 import type { ReactNode } from "react";
 
-type Props = GraphicProps & { input: Input };
+type Props = GraphicProps & {
+  input: Input;
+};
+
+/** Frames the whole study takes to fade in. */
+const INTRO_FRAMES = 20;
+
 /**
- * Authored feedback travels with a changing draft through sequential
- * reviews.
+ * Authored feedback travels with a changing draft through sequential reviews.
  */
 export function FeedbackRefinement({
   frame,
@@ -19,81 +26,39 @@ export function FeedbackRefinement({
   accent,
   id,
 }: Readonly<Props>): ReactNode {
-  const state = getFeedbackStateFromInputAndFrame({ frame, input });
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const state = getFeedbackStateFromInputAndFrame({ frame, input, motion });
   return (
-    <g opacity={ramp(frame, 12, 20)}>
-      <FitText
-        text={input.artifactLabel}
-        x={80}
-        y={76}
-        width={800}
-        fontSize={24}
-        maxLines={2}
-        breakLongWords
-        normalizeWhitespace
+    <g
+      opacity={Motion.ramp({
+        frame,
+        at: 12,
+        dur: motion.scale(INTRO_FRAMES),
+        easing: motion.reveal.easing,
+      })}
+    >
+      <ArtifactHeadingAndGuide input={input} atomic={atomic} tokens={tokens} />
+      <ReviewRoleBrackets
+        labels={[input.roleLabels.author, input.roleLabels.reviewer]}
+        tokens={tokens}
       />
-      <path d="M100 330 H860" stroke={STOCK.line} strokeDasharray="4 8" />
-      {[input.roleLabels.author, input.roleLabels.reviewer].map(
-        (label, index) => (
-          <g key={index}>
-            <path
-              d={`M${100 + 460 * index} 188 V174 H${400 + 460 * index} V188`}
-              fill="none"
-              stroke={STOCK.line}
-            />
-            <FitText
-              text={label}
-              x={250 + 460 * index}
-              y={140}
-              width={300}
-              fontSize={16}
-              maxLines={2}
-              anchor="middle"
-              breakLongWords
-              normalizeWhitespace
-            />
-          </g>
-        ),
-      )}
-      {input.showRoundLabels ? (
-        <FitText
-          text={state.round.label}
-          x={state.x + 150}
-          y={208}
-          width={300}
-          fontSize={14}
-          maxLines={1}
-          anchor="middle"
-          breakLongWords
-          normalizeWhitespace
-          color={STOCK.muted}
-        />
-      ) : undefined}
-      <FeedbackDraft state={state} accent={accent} id={id} />
-      <g opacity={ramp(frame, state.doneAt, 12)}>
-        <FitText
-          text={input.finalLabel}
-          x={480}
-          y={460}
-          width={780}
-          fontSize={20}
-          maxLines={2}
-          anchor="middle"
-          breakLongWords
-          normalizeWhitespace
-          color={accent}
-        />
-      </g>
-      {input.rounds.map((round, index) => (
-        <FeedbackNote
-          key={round.draft}
-          frame={frame}
-          round={round}
-          index={index}
-          numRounds={input.rounds.length}
-          showReviewTrail={input.showReviewTrail}
-        />
-      ))}
+      <CurrentReviewRound
+        input={input}
+        accent={accent}
+        id={id}
+        tokens={tokens}
+        state={state}
+      />
+      <FinalArtifactCaption
+        frame={frame}
+        input={input}
+        accent={accent}
+        motion={motion}
+        state={state}
+      />
+      <ReviewNotes input={input} frame={frame} />
     </g>
   );
 }

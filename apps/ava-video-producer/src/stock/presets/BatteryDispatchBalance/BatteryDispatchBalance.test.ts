@@ -68,78 +68,9 @@ import { batteryDispatchBalanceContract as contract } from "./BatteryDispatchBal
 import { inputSchema, SEMANTIC_RULES } from "./BatteryDispatchBalance.schema";
 import type { Input } from "./BatteryDispatchBalance.schema";
 
-function _getVisibleTexts({ input }: Readonly<{ input: Input }>): string[] {
-  return [
-    ...Object.values(input.windows),
-    ...Object.values(input.decision),
-    ...Object.values(input.copy),
-  ];
-}
-const assertions = {
-  inputSchema,
-  defaultInput: DEFAULT_INPUT,
-  fixtures,
-  invalidInputs,
-  contract,
-  render: _render,
-  excludedTextFields: [
-    "id",
-    "cellId",
-    "fromPatchId",
-    "toPatchId",
-    "learnerId",
-    "state",
-    "orientation",
-    "context",
-    "stage",
-    "deskLayout",
-  ],
-  getVisibleTexts: _getVisibleTexts,
-} satisfies PresetAssertions<Input>;
-registerStockPresetAssertions(assertions);
-registerStockTextLayoutAssertions(assertions);
-test("serialized semantic rules retain every runtime relation", () => {
-  assert.deepEqual(
-    JSON.parse(JSON.stringify(contract.semanticRules)).map(
-      ({ id, paths }: { id: string; paths: string[] }) => ({ id, paths }),
-    ),
-    [
-      {
-        id: "initial-capacity",
-        paths: ["battery.initialStoredKwh", "battery.capacityKwh"],
-      },
-      {
-        id: "charge-loss",
-        paths: ["cycle.chargeLossKwh", "cycle.chargeInputKwh"],
-      },
-      {
-        id: "peak-capacity",
-        paths: ["battery", "cycle"],
-      },
-      {
-        id: "final-nonnegative",
-        paths: ["battery", "cycle"],
-      },
-    ],
-  );
-  assert.ok(
-    SEMANTIC_RULES.every(
-      (rule) => rule.paths.length && rule.description.length,
-    ),
-  );
-});
-
-test("every orientation preserves exact fractional endpoints and bounded fill throughout dispatch", () => {
-  const fractional: Input = {
-    ...DEFAULT_INPUT,
-    battery: { capacityKwh: 0.1 + 0.2, initialStoredKwh: 0.1 },
-    cycle: {
-      chargeInputKwh: 0.2,
-      chargeLossKwh: 0,
-      deliveredKwh: 0.2,
-      dischargeLossKwh: 0.1,
-    },
-  };
+function _assertFractionalStorageAcrossOrientations(
+  fractional: Readonly<Input>,
+): void {
   [fractional, ...fixtures.map(prop("input"))].forEach((input) => {
     ["horizontal", "vertical"].forEach((orientation) => {
       const variant = inputSchema.parse({ ...input, orientation });
@@ -175,6 +106,105 @@ test("every orientation preserves exact fractional endpoints and bounded fill th
       );
     });
   });
+}
+
+function _assertHandStartsAwayFromDispatchButton({
+  earlier,
+  button,
+}: Readonly<{
+  earlier: ReturnType<typeof _render>;
+  button: ReturnType<typeof SvgAttributes.fromMarker>;
+}>): void {
+  assert.notEqual(
+    SvgAttributes.getNumberFromMarkup({
+      attributes: SvgAttributes.fromMarker({
+        markup: earlier,
+        marker: "dispatch-hand",
+      }),
+      name: "cx",
+    }),
+    SvgAttributes.getNumberFromMarkup({ attributes: button, name: "cx" }),
+  );
+}
+
+function _getVisibleTexts({ input }: Readonly<{ input: Input }>): string[] {
+  return [
+    ...Object.values(input.windows),
+    ...Object.values(input.decision),
+    ...Object.values(input.copy),
+  ];
+}
+const assertions = {
+  inputSchema,
+  defaultInput: DEFAULT_INPUT,
+  fixtures,
+  invalidInputs,
+  contract,
+  render: _render,
+  excludedTextFields: [
+    "id",
+    "cellId",
+    "fromPatchId",
+    "toPatchId",
+    "learnerId",
+    "state",
+    "orientation",
+    "context",
+    "stage",
+    "deskLayout",
+  ],
+  getVisibleTexts: _getVisibleTexts,
+} satisfies PresetAssertions<Input>;
+registerStockPresetAssertions(assertions);
+registerStockTextLayoutAssertions(assertions);
+test("serialized semantic rules retain every runtime relation", () => {
+  assert.deepEqual(
+    // This assertion exercises the JSON serialization boundary of the public
+    // contract.
+    // react-doctor-disable-next-line no-json-parse-stringify-clone
+    JSON.parse(JSON.stringify(contract.semanticRules)).map(
+      ({ id, paths }: { id: string; paths: string[] }) => {
+        return { id, paths };
+      },
+    ),
+    [
+      {
+        id: "initial-capacity",
+        paths: ["battery.initialStoredKwh", "battery.capacityKwh"],
+      },
+      {
+        id: "charge-loss",
+        paths: ["cycle.chargeLossKwh", "cycle.chargeInputKwh"],
+      },
+      {
+        id: "peak-capacity",
+        paths: ["battery", "cycle"],
+      },
+      {
+        id: "final-nonnegative",
+        paths: ["battery", "cycle"],
+      },
+    ],
+  );
+  assert.ok(
+    SEMANTIC_RULES.every((rule) => {
+      return rule.paths.length && rule.description.length;
+    }),
+  );
+});
+
+test("every orientation preserves exact fractional endpoints and bounded fill throughout dispatch", () => {
+  const fractional: Input = {
+    ...DEFAULT_INPUT,
+    battery: { capacityKwh: 0.1 + 0.2, initialStoredKwh: 0.1 },
+    cycle: {
+      chargeInputKwh: 0.2,
+      chargeLossKwh: 0,
+      deliveredKwh: 0.2,
+      dischargeLossKwh: 0.1,
+    },
+  };
+  _assertFractionalStorageAcrossOrientations(fractional);
 });
 test("the operator contacts the dispatch control before the delivery path advances", () => {
   const earlier = _render({ frame: 68, input: DEFAULT_INPUT }),
@@ -195,16 +225,7 @@ test("the operator contacts the dispatch control before the delivery path advanc
     SvgAttributes.getNumberFromMarkup({ attributes: hand, name: "cy" }),
     SvgAttributes.getNumberFromMarkup({ attributes: button, name: "cy" }),
   );
-  assert.notEqual(
-    SvgAttributes.getNumberFromMarkup({
-      attributes: SvgAttributes.fromMarker({
-        markup: earlier,
-        marker: "dispatch-hand",
-      }),
-      name: "cx",
-    }),
-    SvgAttributes.getNumberFromMarkup({ attributes: button, name: "cx" }),
-  );
+  _assertHandStartsAwayFromDispatchButton({ earlier, button });
   assert.equal(
     SvgAttributes.getNumberFromMarkup({
       attributes: SvgAttributes.fromMarker({
@@ -232,8 +253,8 @@ test("hidden loss paths leave the full conserved equation and supplied loss numb
     input: { ...changedInput, showLossChannels: false },
   });
   assert.doesNotMatch(markup, /data-loss-channel/);
-  ["0.5", "0.75", "2.75"].forEach((value) =>
-    assert.ok(markup.includes(`aria-label="${value}"`)),
-  );
+  ["0.5", "0.75", "2.75"].forEach((value) => {
+    return assert.ok(markup.includes(`aria-label="${value}"`));
+  });
   assert.match(markup, /data-energy-equation/);
 });

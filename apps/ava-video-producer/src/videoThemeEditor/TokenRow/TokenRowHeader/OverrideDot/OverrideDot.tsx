@@ -1,11 +1,14 @@
-import clsx from "clsx";
+import { clsx } from "clsx";
 import css from "./OverrideDot.module.css";
-import type { TokenRow } from "../../../tokenRows/tokenRows";
+import type { TokenRow } from "../../../TokenRows/TokenRows.types";
+import type { ReactNode } from "react";
 
 type Props = Readonly<{ state: TokenRow["overrideState"] }>;
-
-/** A dot marking a row that is edited, or saved for one motion or composition only. */
-export function OverrideDot({ state }: Props) {
+/**
+ * A dot marking a row that is edited, or saved for one motion or composition
+ * only.
+ */
+export function OverrideDot({ state }: Props): ReactNode {
   if (state === "none") {
     return null;
   }

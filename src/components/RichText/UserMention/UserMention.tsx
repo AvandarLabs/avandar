@@ -1,5 +1,5 @@
 import { mergeAttributes } from "@tiptap/core";
-import Mention from "@tiptap/extension-mention";
+import { Mention } from "@tiptap/extension-mention";
 import { NodeViewWrapper, ReactNodeViewRenderer } from "@tiptap/react";
 import { UserMentionChip } from "@/components/RichText/UserMention/UserMentionChip";
 import type { NodeViewProps } from "@tiptap/react";

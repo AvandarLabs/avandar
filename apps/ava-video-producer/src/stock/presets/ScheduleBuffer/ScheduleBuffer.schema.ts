@@ -1,4 +1,4 @@
-import { prop } from "@avandar/utils";
+import { prop, propEq } from "@avandar/utils";
 import { z } from "zod";
 import type {
   StockJsonSchema,
@@ -36,7 +36,7 @@ export const inputSchema = z
       new Set(input.tasks.map(prop("id"))).size !== input.tasks.length ||
       !input.tasks
         .slice(0, -1)
-        .some(({ id }) => id === input.interruption.afterTaskId) ||
+        .some(propEq("id", input.interruption.afterTaskId)) ||
       input.interruption.duration > input.reserveUnits
     ) {
       context.addIssue({

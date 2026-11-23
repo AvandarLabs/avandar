@@ -18,11 +18,14 @@ export const metricCounterInputSchema = z
     showBars: z.boolean(),
   })
   .refine(
-    (input) =>
-      getLegacyWidthFromText({
-        text: `${input.value.toLocaleString("en-US")}${input.unit}`,
-        fontSize: 103,
-      }) <= 624,
+    (input) => {
+      return (
+        getLegacyWidthFromText({
+          text: `${input.value.toLocaleString("en-US")}${input.unit}`,
+          fontSize: 103,
+        }) <= 624
+      );
+    },
     {
       path: ["unit"],
       message: "The complete metric and unit must fit the fixed display.",

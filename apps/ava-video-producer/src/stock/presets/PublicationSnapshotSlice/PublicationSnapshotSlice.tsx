@@ -1,8 +1,9 @@
-import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { SnapshotCell } from "./SnapshotCell";
+import { PublishedSnapshotFrame } from "./PublishedSnapshotFrame";
+import { SnapshotCell } from "./SnapshotCell/SnapshotCell";
 import { SnapshotHeadings } from "./SnapshotHeadings";
 import { SnapshotRowGuide } from "./SnapshotRowGuide";
+import { usePublicationSnapshotSlicePresentation } from "./usePublicationSnapshotSlicePresentation";
 import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./PublicationSnapshotSlice.schema";
 import type { ReactNode } from "react";
@@ -11,55 +12,48 @@ export type Props = GraphicProps & { input: Input };
 /**
  * Copies a bounded selection, then changes only the live table's authored cell.
  */
-export function PublicationSnapshotSlice({
-  input,
-  frame,
-  accent,
-}: Readonly<Props>): ReactNode {
+export function PublicationSnapshotSlice(props: Readonly<Props>): ReactNode {
+  const presentation = usePublicationSnapshotSlicePresentation(props);
+
   return (
-    <g opacity={ramp(frame, 0, 12)}>
+    <g opacity={presentation.motion.reveal(props.frame, 0)}>
       <LabelSlots
         labels={[
-          [input.copy.context, 52, 40, 856, 18, 2],
-          [input.copy.source, 52, 90, 400, 12, 3],
-          [input.copy.result, 508, 90, 400, 12, 3],
+          [props.input.copy.context, 52, 40, 856, 18, 2],
+          [props.input.copy.source, 52, 90, 400, 12, 3],
+          [props.input.copy.result, 508, 90, 400, 12, 3],
         ]}
       />
-      <rect
-        x={500}
-        y={142}
-        width={416}
-        height={402}
-        rx={8}
-        fill="none"
-        stroke={accent}
-        opacity={ramp(frame, 56, 39)}
-      />
-      <SnapshotHeadings input={input} frame={frame} />
-      {input.selection.rowIds.map((rowId, selectedRow) => (
-        <SnapshotRowGuide
-          key={rowId}
-          input={input}
-          frame={frame}
-          accent={accent}
-          selectedRow={selectedRow}
-        />
-      ))}
-      {[false, true].flatMap((snapshot) =>
-        input.table.rows.flatMap((row, rowIndex) =>
-          input.table.columns.map((column, columnIndex) => (
-            <SnapshotCell
-              key={`${snapshot}:${rowIndex}:${columnIndex}`}
-              input={input}
-              frame={frame}
-              accent={accent}
-              rowIndex={rowIndex}
-              columnIndex={columnIndex}
-              snapshot={snapshot}
-            />
-          )),
-        ),
-      )}
+      <PublishedSnapshotFrame {...presentation} />
+      <SnapshotHeadings input={props.input} frame={props.frame} />
+      {props.input.selection.rowIds.map((rowId, selectedRow) => {
+        return (
+          <SnapshotRowGuide
+            key={rowId}
+            input={props.input}
+            frame={props.frame}
+            accent={props.accent}
+            selectedRow={selectedRow}
+          />
+        );
+      })}
+      {[false, true].flatMap((snapshot) => {
+        return props.input.table.rows.flatMap((row, rowIndex) => {
+          return props.input.table.columns.map((column, columnIndex) => {
+            return (
+              <SnapshotCell
+                key={`${snapshot}:${rowIndex}:${columnIndex}`}
+                input={props.input}
+                frame={props.frame}
+                accent={props.accent}
+                rowIndex={rowIndex}
+                columnIndex={columnIndex}
+                snapshot={snapshot}
+              />
+            );
+          });
+        });
+      })}
     </g>
   );
 }
