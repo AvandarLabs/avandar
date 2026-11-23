@@ -355,7 +355,7 @@ API. It's new work, not something this branch built.
 | after F136 | F137 | Frontend only: F136's migration carries everything it reads. Deploy the frontend; the `chat` function is unchanged (same prompt, same route). |
 | after F128, F131 | F139 | Stores each session's dashboard card statuses beside its thread and tray, and adds the card to F128's panel. Its e2e specs read F128's session tabs. Its prompt `data-agent-v6` is F131's `data-agent-v5` plus the dashboard rules, and its proxy adds the dashboard tool to the plugin AI tools' per-version list, so it ships after F131 and the plugin AI tools. Deploy the `chat` edge function (it serves v6), then the frontend (it asks for v6). |
 | after F139 | F140 | Frontend only: no edge function or migration to deploy first. It changes the agent turn F139 builds and the dashboard paths F139 adds. |
-| after the lock-out PR | F141 | Its `ava release` tells mainline releasers that pushing `main` does not touch production, which is true only once `chore/mainline-lockout` (`chore(ci)!: stop main from deploying production`) is in `develop`. That PR also carries the final `production.yaml` and `vercel.json` this feature's commits reach. |
+| none | F141 | No merge-order constraint and no PR of its own: it reaches `develop` with the `demo/measles` promotion. |
 | 19 | F9 | Last, because the docs describe the merged features. |
 
 F5 is dropped: the Postgres branch carries the `external-datasets` to
@@ -12314,8 +12314,9 @@ on a release line:
 a second release line.
 
 **Design:** `docs/measles-demo/production-cutover-plan.md`, sections 8 to
-10. The alpha line's own plan, audit, runbook, and Stage 0 plan are kept as
-history and are superseded.
+10. The alpha line's own plan, runbook, and Stage 0 plan are kept as
+history and are superseded. Its migration audit is refreshed for production
+and staging and renamed `production-migration-audit.md` by the cutover.
 
 **PR title:** none of its own. It reaches `develop` with the `demo/measles`
 promotion (section 11 of the production cutover plan).
@@ -12323,7 +12324,7 @@ promotion (section 11 of the production cutover plan).
 **Depends on:** no feature in this log. `develop` already has every catalog
 table the catalog move scripts move. No Postgres connector work.
 
-**Files, by area** (take each file's final content on `feat/alpha-line`):
+**Files, by area** (history: port nothing from `feat/alpha-line`):
 
 - Release lines in the CLI (`950ef617a`, `d0df8f676`, `b1db119c0`,
   `d94e6555e`, `fd89fd8c6`, `600f93fdf`, `6fd6d8a54`, `7179ea969`,
@@ -12347,8 +12348,8 @@ table the catalog move scripts move. No Postgres connector work.
 - `alpha` deploys (`e4cd3a580`, `92f51b148`, `23071851d`): new
   `.github/workflows/alpha.yaml`.
 - Lock-out on the alpha line (`39b6b98ae`, `bdcec197c`, `1ca23db7f`):
-  `.github/workflows/production.yaml` and `vercel.json`. Port nothing: the
-  lock-out PR carries the same final files.
+  `.github/workflows/production.yaml` and `vercel.json`. Port nothing: they
+  are `develop`'s copies, restored by `ca358d64c`.
 - Version (`24afff0dc`): `package.json` set to `0.15.0-alpha-dev`. Port
   nothing: `develop` keeps its own `-dev` version.
 - Catalog move (`6fb5ac142`, `6dbcdb881`, `9618cc386`, `ad624f57f`,
