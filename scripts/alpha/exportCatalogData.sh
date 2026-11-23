@@ -5,7 +5,11 @@
 # production without re-running every pipeline. Only reads the source.
 #
 # Usage:
-#   bash scripts/alpha/exportCatalogData.sh <source-db-url> <out-file.sql>
+#   SOURCE_DB_URL=<source-db-url> bash scripts/alpha/exportCatalogData.sh <out-file.sql>
+#
+# The source URL comes from the SOURCE_DB_URL environment variable, never an
+# argument, since `ps` shows every process's arguments to every user. A URL
+# passed as an argument is refused.
 #
 # The table list lives in catalogTables.sh, shared with importCatalogData.sh.
 # Refuses to overwrite an existing file. Prints each table's row count from
@@ -16,8 +20,9 @@
 # fails on the foreign key triggers. It is not needed either: pg_dump writes
 # parents before children, and the catalog's own triggers fire on update only.
 #
-# pg_dump gets the URL without its password, and the password in PGPASSWORD,
-# so `ps` never shows it.
+# pg_dump gets the URL without its password, and the password in PGPASSWORD
+# for that one command, so no process's arguments carry it. A process's
+# environment is readable only by its own user and root.
 #
 # PG_DUMP_BIN overrides the pg_dump binary. Its major version must be at
 # least the source server's.
@@ -30,13 +35,27 @@ unset PGHOST PGHOSTADDR PGPORT PGDATABASE PGUSER PGPASSFILE PGSERVICE \
   PGSERVICEFILE PGSYSCONFDIR PGOPTIONS PGTARGETSESSIONATTRS PGSSLMODE \
   PGREQUIRESSL
 
-USAGE="Usage: exportCatalogData.sh <source-db-url> <out-file.sql>"
-SOURCE_DB_URL="${1:?$USAGE}"
-OUT_FILE="${2:?$USAGE}"
+USAGE="Usage: SOURCE_DB_URL=<source-db-url> exportCatalogData.sh <out-file.sql>"
 PG_DUMP_BIN="${PG_DUMP_BIN:-pg_dump}"
 
 # shellcheck source=scripts/alpha/catalogTables.sh
 source "$(dirname "${BASH_SOURCE[0]}")/catalogTables.sh"
+
+for argument in "$@"; do
+  if looks_like_db_url "$argument"; then
+    echo "Pass the source URL in SOURCE_DB_URL, not as an argument: ps shows every argument. $USAGE" >&2
+    exit 1
+  fi
+done
+[[ $# -eq 1 ]] || {
+  echo "$USAGE" >&2
+  exit 1
+}
+[[ -n "${SOURCE_DB_URL:-}" ]] || {
+  echo "SOURCE_DB_URL is not set. Export the source URL in it. $USAGE" >&2
+  exit 1
+}
+OUT_FILE="$1"
 
 if [[ -e "$OUT_FILE" ]]; then
   echo "Refusing to overwrite $OUT_FILE. Move it away or pick another name." >&2
@@ -54,7 +73,7 @@ for table in "${CATALOG_TABLES[@]}"; do
 done
 
 # pg_dump gets the URL without its password, and the password in PGPASSWORD
-# for this one command, so `ps` never shows it.
+# for this one command, so its arguments never carry it.
 split_db_url_password "$SOURCE_DB_URL" || {
   echo "The source URL's password has an invalid percent-encoding. Encode each special character as %XX." >&2
   exit 1

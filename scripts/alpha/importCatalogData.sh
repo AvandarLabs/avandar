@@ -6,13 +6,16 @@
 # move the catalog built on demo-measles into alpha-dev and production.
 #
 # Usage:
-#   bash scripts/alpha/importCatalogData.sh <target-db-url> <dump.sql> \
+#   TARGET_DB_URL=<target-db-url> bash scripts/alpha/importCatalogData.sh <dump.sql> \
 #     [--dry-run] [--yes-i-know-the-target <user@host>] \
 #     [--rewrite-storage-host <source-storage-host> <target-storage-host>] \
 #     [--replace-existing --backup-file <backup.sql> \
 #      [--yes-i-know-the-cascade <rows>]]
 #
-# <target-db-url> is the target's `postgres` connection string, exactly
+# The target URL comes from the TARGET_DB_URL environment variable, never an
+# argument, since `ps` shows every process's arguments to every user. A
+# URL passed as an argument is refused. It is the target's `postgres`
+# connection string, exactly
 # postgresql://<user>:<percent-encoded password>@<host>:<port>/postgres,
 # optionally followed by ?sslmode=require (or verify-ca, verify-full) and
 # nothing else, on the direct host or the session pooler. Port 6543, the
@@ -44,8 +47,11 @@
 # listing still mentions the source host.
 #
 # A dump's `pipeline_executions` rows carry developers' command lines
-# (`cli_argv`) and `<user>@<hostname>` (`actor`). The import loads them as
-# null, and refuses to commit while any loaded execution still has one.
+# (`cli_argv`), `<user>@<hostname>` (`actor`), and the executing machine's
+# hostname (`host`). The import loads them as null, and refuses to commit
+# while any loaded execution still has one. `arguments` and `request_body`
+# are copied on purpose: they hold the catalog crawl's parameters, which
+# say how each run built the catalog.
 #
 # By default it refuses a target whose catalog tables hold any row. With
 # `--replace-existing` it deletes them first, children first, in the same
@@ -56,8 +62,11 @@
 # `public.datasets` rows, and every row that cascades from them, but only
 # when every member of each one's workspace has an @avandarlabs.com email:
 # a workspace with no members, or with any other member, stops the whole
-# transaction. That delete deletes or changes every dependent row the report
-# lists, so it also:
+# transaction. Each deleted dataset fires
+# `tr__datasets__log_deleted_analytics_event`, which adds one
+# `usage_analytics_events` row per dataset, and restoring the backup does not
+# remove those rows. That delete deletes or changes every dependent row the
+# report lists, so it also:
 #   - refuses when a restricting foreign key has rows that would block it;
 #   - needs `--backup-file`, a pg_dump data-only dump made in the last 24
 #     hours of the catalog, the facet counts, and every dependent table,
@@ -76,8 +85,12 @@
 # Row counts are printed before and after the import, and after a failed one
 # to show the transaction rolled back.
 #
-# psql gets the URL without its password, and the password in PGPASSWORD,
-# so `ps` never shows it.
+# Every psql the script starts gets the URL without its password, and the
+# password in PGPASSWORD for that one command, so no process's arguments
+# carry it: a process's environment is readable only by its own user and
+# root. The commands it prints for you to run (the backup and restore)
+# call `with_db_url`, the alpha cutover runbook's shell helper (1.4), which
+# does the same.
 #
 # PSQL_BIN overrides the psql binary.
 #-------------------------------------------------------------------------------
@@ -92,7 +105,7 @@ unset PGHOST PGHOSTADDR PGPORT PGDATABASE PGUSER PGPASSFILE PGSERVICE \
 TARGET_FLAG="--yes-i-know-the-target"
 CASCADE_FLAG="--yes-i-know-the-cascade"
 REWRITE_FLAG="--rewrite-storage-host"
-USAGE="Usage: importCatalogData.sh <target-db-url> <dump.sql> [--dry-run] [$TARGET_FLAG <user@host>] [$REWRITE_FLAG <source-host> <target-host>] [--replace-existing --backup-file <backup.sql> [$CASCADE_FLAG <rows>]]"
+USAGE="Usage: TARGET_DB_URL=<target-db-url> importCatalogData.sh <dump.sql> [--dry-run] [$TARGET_FLAG <user@host>] [$REWRITE_FLAG <source-host> <target-host>] [--replace-existing --backup-file <backup.sql> [$CASCADE_FLAG <rows>]]"
 TARGET_URL_PATTERN='^postgres(ql)?://([A-Za-z0-9._-]+)(:[^@/?#]*)?@([A-Za-z0-9.-]+)(:([0-9]+))?/postgres(\?sslmode=(require|verify-ca|verify-full))?$'
 STORAGE_HOST_PATTERN='^[A-Za-z0-9.-]+(:[0-9]+)?$'
 PSQL_BIN="${PSQL_BIN:-psql}"
@@ -113,9 +126,10 @@ AVANDAR_EMAIL_DOMAIN="@avandarlabs.com"
 OPEN_DATA_DATASET_IDS_SQL="select dataset_id from $OPEN_DATA_TABLE where catalog_listing_id in (select id from public.data_catalog_listings)"
 OPEN_DATA_DATASETS_SQL="select * from $DATASETS_TABLE where id in ($OPEN_DATA_DATASET_IDS_SQL)"
 EXECUTIONS_TABLE="public.pipeline_executions"
-# The execution columns that hold a developer's command line and
-# `<user>@<hostname>`, which the import loads as null.
-REDACTED_EXECUTION_COLUMNS=(cli_argv actor)
+# The execution columns that hold a developer's command line,
+# `<user>@<hostname>`, and the executing machine's hostname, which the import
+# loads as null.
+REDACTED_EXECUTION_COLUMNS=(cli_argv actor host)
 # The schema the printed restore steps stage the backup's rows in.
 RESTORE_SCHEMA="catalog_restore"
 LOCK_TIMEOUT="10s"
@@ -182,7 +196,7 @@ check_target_url() {
 }
 
 # Runs psql on the target URL without its password, which travels in
-# PGPASSWORD for this one command, so `ps` never shows it.
+# PGPASSWORD for this one command, so its arguments never carry it.
 target_psql() {
   if [[ -n "$TARGET_PASSWORD" ]]; then
     PGPASSWORD="$TARGET_PASSWORD" "$PSQL_BIN" "$TARGET_CONNECT_URL" "$@"
@@ -266,12 +280,16 @@ parse_args() {
       --replace-existing) IS_REPLACE=true && shift ;;
       --dry-run) IS_DRY_RUN=true && shift ;;
       --*) fail "unknown option $1. $USAGE" ;;
-      *) positional+=("$1") && shift ;;
+      *)
+        ! looks_like_db_url "$1" ||
+          fail "Pass the target URL in TARGET_DB_URL, not as an argument: ps shows every argument. $USAGE"
+        positional+=("$1") && shift
+        ;;
     esac
   done
-  [[ ${#positional[@]} -eq 2 ]] || fail "$USAGE"
-  TARGET_DB_URL="${positional[0]}"
-  DUMP_FILE="${positional[1]}"
+  [[ ${#positional[@]} -eq 1 ]] || fail "$USAGE"
+  [[ -n "${TARGET_DB_URL:-}" ]] || fail "TARGET_DB_URL is not set. Export the target URL in it. $USAGE"
+  DUMP_FILE="${positional[0]}"
 }
 
 # Prints a file's absolute path, refusing one psql's `\i` cannot quote.
@@ -333,24 +351,7 @@ dependents_query() {
   local catalog_array="array[$quoted_tables]"
   cat <<SQL
 with recursive fk as (
-  select
-    format('%I.%I', child_ns.nspname, child.relname) as child,
-    format('%I.%I', parent_ns.nspname, parent.relname) as parent,
-    con.confdeltype as action,
-    (select string_agg(format('%I', att.attname), ', ' order by key.ord)
-      from unnest(con.conkey) with ordinality as key (attnum, ord)
-      join pg_attribute att on att.attrelid = con.conrelid and att.attnum = key.attnum
-    ) as child_columns,
-    (select string_agg(format('%I', att.attname), ', ' order by key.ord)
-      from unnest(con.confkey) with ordinality as key (attnum, ord)
-      join pg_attribute att on att.attrelid = con.confrelid and att.attnum = key.attnum
-    ) as parent_columns
-  from pg_constraint con
-  join pg_class child on child.oid = con.conrelid
-  join pg_namespace child_ns on child_ns.oid = child.relnamespace
-  join pg_class parent on parent.oid = con.confrelid
-  join pg_namespace parent_ns on parent_ns.oid = parent.relnamespace
-  where con.contype = 'f' and con.conparentid = 0
+$(foreign_keys_sql)
 ),
 roots (parent, parent_rows, skipped_child) as (
   select * from (values $catalog_roots) as catalog_root (parent, parent_rows, skipped_child)
@@ -379,6 +380,32 @@ chain as (
 )
 select depth, child, child_columns, parent, action, affected_sql
 from chain order by depth, child, child_columns
+SQL
+}
+
+# Every foreign key in the database, as its referencing table and columns,
+# its referenced table and columns, and its `confdeltype` action. The body of
+# dependents_query's `fk` CTE.
+foreign_keys_sql() {
+  cat <<SQL
+  select
+    format('%I.%I', child_ns.nspname, child.relname) as child,
+    format('%I.%I', parent_ns.nspname, parent.relname) as parent,
+    con.confdeltype as action,
+    (select string_agg(format('%I', att.attname), ', ' order by key.ord)
+      from unnest(con.conkey) with ordinality as key (attnum, ord)
+      join pg_attribute att on att.attrelid = con.conrelid and att.attnum = key.attnum
+    ) as child_columns,
+    (select string_agg(format('%I', att.attname), ', ' order by key.ord)
+      from unnest(con.confkey) with ordinality as key (attnum, ord)
+      join pg_attribute att on att.attrelid = con.confrelid and att.attnum = key.attnum
+    ) as parent_columns
+  from pg_constraint con
+  join pg_class child on child.oid = con.conrelid
+  join pg_namespace child_ns on child_ns.oid = child.relnamespace
+  join pg_class parent on parent.oid = con.confrelid
+  join pg_namespace parent_ns on parent_ns.oid = parent.relnamespace
+  where con.contype = 'f' and con.conparentid = 0
 SQL
 }
 
@@ -604,9 +631,9 @@ backup_tables() {
 
 # Prints the pg_dump command that makes the backup a replace needs.
 print_backup_command() {
-  echo "Make the backup with a pg_dump at least as new as the target's server, such as /opt/homebrew/opt/libpq@18/bin/pg_dump:"
+  echo "Make the backup with a pg_dump at least as new as the target's server, such as /opt/homebrew/opt/libpq@18/bin/pg_dump, through the cutover runbook's with_db_url helper (1.4), which keeps the password out of pg_dump's arguments:"
   # shellcheck disable=SC2016 # The variable is for the reader to fill in.
-  printf '  pg_dump "$TARGET_DB_URL" --data-only --no-owner --no-privileges %s--file %s\n' \
+  printf '  with_db_url "$TARGET_DB_URL" pg_dump --data-only --no-owner --no-privileges %s--file %s\n' \
     "$(backup_tables | sed "s/.*/--table '&'/" | tr '\n' ' ')" \
     "'catalog-backup-$TARGET_HOST-$(date +%Y%m%d-%H%M).sql'"
 }
@@ -700,7 +727,7 @@ print_restore_steps() {
   echo "  2. Beside it, write restore.sql, which empties the catalog and puts back every backed-up row the target no longer has, in one transaction:"
   print_restore_sql | sed 's/^/       /'
   # shellcheck disable=SC2016 # The variable is for the reader to fill in.
-  echo "  3. Run it with psql $PSQL_VERSIONS:"' psql "$TARGET_DB_URL" -X -P pager=off -v ON_ERROR_STOP=1 --file restore.sql'
+  echo "  3. Run it with psql $PSQL_VERSIONS:"' with_db_url "$TARGET_DB_URL" psql -X -P pager=off -v ON_ERROR_STOP=1 --file restore.sql'
   if [[ -n "$SET_NULL_TABLES" ]]; then
     echo "  The delete only nulls rows of: $SET_NULL_TABLES. Their backup rows cannot load over them, so restore those columns by hand."
   fi
@@ -765,8 +792,8 @@ end \$storage\$;
 SQL
 }
 
-# Writes the statements that, inside the transaction, stop membership changes,
-# raise unless every member of each open data dataset's workspace has an
+# Writes the statements that, inside the transaction, stop membership changes
+# and email changes of those workspaces' members, raise unless every member of each open data dataset's workspace has an
 # @avandarlabs.com email (a workspace with no members raises too), and then
 # delete those datasets, with every row that cascades from them.
 write_open_data_dataset_delete() {
@@ -777,6 +804,7 @@ do \$guard\$
 declare
   blocked record;
 begin
+  perform 1 from auth.users where id in (select user_id from $MEMBERSHIPS_TABLE where workspace_id in (select workspace_id from ($OPEN_DATA_DATASETS_SQL) as dataset)) for share;
   select * into blocked
   from (
 $(open_data_datasets_query)
@@ -804,7 +832,7 @@ write_redaction_check() {
   done
   echo "do \$redacted\$ begin"
   echo "  if exists (select 1 from $EXECUTIONS_TABLE where $condition) then"
-  echo "    raise exception '$EXECUTIONS_TABLE still holds a command line or actor after the load.';"
+  echo "    raise exception '$EXECUTIONS_TABLE still holds a command line, actor, or host after the load.';"
   echo "  end if;"
   echo "end \$redacted\$;"
 }

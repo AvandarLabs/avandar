@@ -49,6 +49,7 @@ create table public.pipeline_executions (
   pipeline_name text not null,
   cli_argv text[],
   actor text,
+  host text,
   unique (id, pipeline_name)
 );
 create table public.pipeline_execution_scopes (
@@ -157,8 +158,8 @@ COPY public.data_catalog_listings__relation_columns (id, catalog_listing_id) FRO
 c1000000-0000-0000-0000-000000000001\tb0000000-0000-0000-0000-000000000001
 \\.
 
-COPY public.pipeline_executions (id, pipeline_name, cli_argv, actor) FROM stdin;
-e1000000-0000-0000-0000-000000000001\tsocrata\t{run,--all}\tdeveloper@laptop.local
+COPY public.pipeline_executions (id, pipeline_name, cli_argv, actor, host) FROM stdin;
+e1000000-0000-0000-0000-000000000001\tsocrata\t{run,--all}\tdeveloper@laptop.local\tlaptop.local
 \\.
 
 COPY public.pipeline_execution_scopes (id, execution_id, pipeline_name) FROM stdin;
@@ -323,7 +324,6 @@ function _runImport(
     "bash",
     [
       join(SCRIPTS_DIR, "importCatalogData.sh"),
-      `postgresql://${OWNER}@127.0.0.1:${port}/postgres`,
       _writeFile("catalog.sql", dump),
       "--replace-existing",
       "--rewrite-storage-host",
@@ -334,7 +334,11 @@ function _runImport(
     {
       encoding: "utf8",
       stdio: ["pipe", "pipe", "pipe"],
-      env: { PATH: process.env.PATH ?? "", PSQL_BIN: psqlBin },
+      env: {
+        PATH: process.env.PATH ?? "",
+        PSQL_BIN: psqlBin,
+        TARGET_DB_URL: `postgresql://${OWNER}@127.0.0.1:${port}/postgres`,
+      },
     },
   );
   return { status: result.status, output: `${result.stdout}${result.stderr}` };
@@ -543,6 +547,20 @@ describe.skipIf(TOOLS === undefined)(
       expect(_targetCounts()).toBe(SEED_COUNTS);
     });
 
+    it("refuses a replace, changing nothing, when a workspace has no members", () => {
+      _query(
+        "delete from public.workspace_memberships where workspace_id = '70000000-0000-0000-0000-000000000000'",
+      );
+
+      const run = _runReplace(CATALOG_DUMP);
+
+      expect(run.status).toBe(1);
+      expect(run.output).toMatch(
+        /Refusing to import: open data dataset e0000000-0000-0000-0000-00000000000[24] in workspace 70000000-0000-0000-0000-000000000000 has no members/,
+      );
+      expect(_targetCounts()).toBe(SEED_COUNTS);
+    });
+
     it("rolls the whole transaction back when an outside member joins after the report", () => {
       const run = _runReplace(CATALOG_DUMP, _writeOutsiderPsql());
 
@@ -574,9 +592,9 @@ describe.skipIf(TOOLS === undefined)(
       expect(run.status, run.output).toBe(0);
       expect(
         _query(
-          "select count(*) || ' executions, ' || count(cli_argv) || ' command lines, ' || count(actor) || ' actors' from public.pipeline_executions",
+          "select count(*) || ' executions, ' || count(cli_argv) || ' command lines, ' || count(actor) || ' actors, ' || count(host) || ' hosts' from public.pipeline_executions",
         ),
-      ).toBe("1 executions, 0 command lines, 0 actors");
+      ).toBe("1 executions, 0 command lines, 0 actors, 0 hosts");
     });
 
     it("restores the catalog and the deleted datasets from the printed restore steps", () => {

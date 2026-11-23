@@ -245,9 +245,18 @@ percent_decode() {
   done
 }
 
+# Whether an argument looks like a connection URL, which the scripts refuse
+# as an argument because `ps` shows it.
+#
+# Usage: looks_like_db_url <argument>
+looks_like_db_url() {
+  [[ "$1" == *://* ]]
+}
+
 # Splits the password out of a `postgres://` or `postgresql://` URL, so a
 # command line can carry the URL without it while the password travels in
-# PGPASSWORD, which `ps` does not show. Sets DB_URL_WITHOUT_PASSWORD, and
+# PGPASSWORD: `ps` shows every process's arguments to every user, but its
+# environment only to its own user and root. Sets DB_URL_WITHOUT_PASSWORD, and
 # DB_URL_PASSWORD to the percent-decoded password, empty when the URL has
 # none. Any other connection string passes through unchanged. Returns 1 when
 # the password has an invalid percent-encoding.
