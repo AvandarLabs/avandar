@@ -324,7 +324,8 @@ deploy.
 
 `ava release` runs on `develop` only. Its warning says again that pushing
 `main` deploys production and migrates the production database. On a CI
-verdict other than a pass it asks, as it did before the alpha work.
+verdict other than a pass it asks. With `--yes` it stops instead, so
+overriding a non-passing verdict takes `--skip-ci-check`.
 `package.json` goes from `0.15.0-alpha-dev` to `0.15.0-dev`.
 
 ## 10. The catalog
@@ -409,7 +410,7 @@ Each can be overruled before execution.
 | --- | --- |
 | Integration branch `chore/production-cutover`, cut from `docs/production-cutover` | Keeps `demo/measles` untouched until the work is verified. |
 | The one-entry `ReleaseLine` is folded back into constants | "No parallel release line" should be true of the code as well. It is its own task and can be dropped. |
-| `ava release` asks on a non-passing CI verdict | That was `develop`'s behavior. `production.yaml` gates the deploy again on `main`. |
+| `ava release` asks on a non-passing CI verdict, and `--yes` stops instead of overriding it | `main` now deploys production, so an unattended release must not ship past a failing CI. Pablo chose this on 2026-11-23. Overriding it takes `--skip-ci-check`. |
 | `scripts/alpha/` becomes `scripts/catalog-move/` | The feature log already calls them the catalog move scripts. |
 | The staging and production deploy jobs are written out twice | A reusable workflow is cleaner, and changing the reviewed job's shape right before a release is not worth it. |
 | Pull request previews stop with the Git integration | D2 removes the integration. A CI preview job is a later choice. |
