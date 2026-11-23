@@ -5,9 +5,9 @@ which serves `app.avandarlabs.com`. Written 2026-11-23. It replaces
 [alpha-launch-plan.md](alpha-launch-plan.md). The implementation plan is
 [2026-11-23-production-cutover.md](../superpowers/plans/2026-11-23-production-cutover.md).
 
-**Status:** waiting for Pablo's approval. Nothing in this document has been
-executed. Pablo answered D1 to D7 and E1 on 2026-11-23 (section 2). No
-decision is open.
+**Status:** approved by Pablo on 2026-11-23. Nothing in this document has
+been executed yet. Pablo answered D1 to D7 and E1 the same day (section 2).
+No decision is open.
 
 ## 1. The decision
 
