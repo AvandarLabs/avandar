@@ -370,6 +370,12 @@ function _targetCounts(): string {
   );
 }
 
+/** The catalog dump with a row whose listing does not exist, so it fails. */
+const BROKEN_DUMP = CATALOG_DUMP.replace(
+  "c1000000-0000-0000-0000-000000000001\tb0000000-0000-0000-0000-000000000001",
+  "c1000000-0000-0000-0000-000000000001\tff000000-0000-0000-0000-000000000000",
+);
+
 /** The seed's counts, which a refused or rolled-back import leaves alone. */
 const SEED_COUNTS =
   "6 listings, 4 open data rows, 5 datasets, 10 columns, facets old:99";
@@ -557,12 +563,7 @@ describe.skipIf(TOOLS === undefined)(
     });
 
     it("rolls the deletes back when the dump fails mid-load", () => {
-      const brokenDump = CATALOG_DUMP.replace(
-        "c1000000-0000-0000-0000-000000000001\tb0000000-0000-0000-0000-000000000001",
-        "c1000000-0000-0000-0000-000000000001\tff000000-0000-0000-0000-000000000000",
-      );
-
-      const run = _runReplace(brokenDump);
+      const run = _runReplace(BROKEN_DUMP);
 
       expect(run.status).toBe(1);
       expect(run.output).toContain("its transaction rolled back");
@@ -631,6 +632,18 @@ describe.skipIf(TOOLS === undefined)(
         "unaffected workspace member: written",
         "affected workspace member: blocked",
       ]);
+    });
+
+    it("says a failed load rolled back even when unaffected datasets changed meanwhile", () => {
+      const resultFile = join(clusterDir, "probe-result.txt");
+
+      const run = _runReplace(BROKEN_DUMP, _writeProbingPsql(resultFile));
+
+      expect(run.status).toBe(1);
+      expect(readFileSync(resultFile, "utf8")).toContain(
+        "unaffected workspace dataset: written",
+      );
+      expect(run.output).toContain("its transaction rolled back");
     });
 
     it("lists the open data datasets and their members on a dry run, changing nothing", () => {

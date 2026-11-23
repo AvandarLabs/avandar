@@ -98,13 +98,15 @@ with_db_url() {
   shift
   rest="${url#*://}"
   userinfo="${rest%%@*}"
-  if [[ "$url" == postgres*://* && "$rest" == *@* && "$userinfo" == *:* && "$userinfo" != */* ]]; then
+  local authority="${rest#*@}"
+  authority="${authority%%[/?#]*}"
+  if [[ "$url" == postgres*://* && "$rest" == *@* && "$userinfo" == *:* && "$userinfo" != */* && "$authority" != *@* ]]; then
     password="${userinfo#*:}"
     PGPASSWORD="$(printf '%b' "${password//\%/\\x}")" "$1" \
       "${url%%://*}://${userinfo%%:*}@${rest#*@}" "${@:2}"
   elif [[ "$rest" == *@* && "$userinfo" == *:* ]]; then
-    # A password it cannot split, such as one with an unencoded "/". Never
-    # print the URL.
+    # A password it cannot split, such as one with an unencoded "/" or "@".
+    # Never print the URL.
     echo "with_db_url: cannot split the password out of the URL. Percent-encode it. Not running $1." >&2
     return 1
   else
@@ -1312,7 +1314,9 @@ the read-only report and again inside the transaction, after it locks the
 affected rows: the 4 datasets, their workspaces, those workspaces'
 memberships, and their members' `auth.users` rows. A member added before
 that lock stops the import; one added after it waits for the import to
-finish. Every other dataset and workspace stays writable.
+finish, and a sign-in by one of those members may wait too. Edits and new
+datasets elsewhere do not wait, but deleting any dataset or workspace does
+(6.11.6).
 
 Production has 4 such datasets, all named "World Development Indicators
 (WDI)", one each in the workspaces ChangeNOW Demo, ICT4D, Mytest, and New
@@ -1334,7 +1338,8 @@ cd "$REPO"
 pnpm vitest run scripts/alpha/__tests__/catalogImportOnPostgres.integration.test.ts
 ```
 
-**Expect:** `Tests  9 passed (9)`, with none skipped.
+**Expect:** all tests passed and none skipped: `Tests  10 passed (10)` when
+this was written. A higher count is fine if it equals the total.
 **If not:** skipped tests mean the tools above are missing: install them and
 run it again. A failure: stop, and do not import into production.
 
@@ -1456,8 +1461,10 @@ prints the exact command again. The backup must be under 24 hours old.
 **6.11.6 Import** (**Writes to production** when the target is production).
 Run it in a quiet window. Until it commits, minutes for the full catalog,
 the import holds whole-table locks on the catalog tables and
-`datasets__open_data`, so a user adding a catalog dataset, or anything else
-that writes those tables, waits until it finishes.
+`datasets__open_data`. Until then, a user adding a catalog dataset waits,
+and so does deleting any dataset or workspace, since the delete cascades
+into `datasets__open_data`. A sign-in by a member of the 4 affected
+workspaces may wait too, since their `auth.users` rows are locked.
 
 ```bash
 bash scripts/alpha/importCatalogData.sh "$CATALOG_DUMP" \
@@ -1467,22 +1474,25 @@ bash scripts/alpha/importCatalogData.sh "$CATALOG_DUMP" \
 ```
 
 It prints the same report as the dry run, how to restore the backup (keep
-that log: 6.5.4 reads the restore from it), the plan, then asks you to type `<user>@<host>` and
+that log: 6.5.4 reads the restore from it), the plan, then asks you to type
+`<user>@<host>` and
 `delete <N> dependent rows`, noting that the replace deletes the 4
 `public.datasets` rows added from the catalog. Inside the transaction it
 checks the guard again, deletes the 4 datasets, then the catalog, and loads
 the dump with every `pipeline_executions.cli_argv`, `actor`, and `host`
 null.
 **Expect:** `Rewrote the Storage URLs of <n> listings.`, catalog counts equal
-to the dump's, `public.datasets` 4 lower than the report, and `Open data
-datasets with no open data details now: 0 public.datasets rows in 0
-workspaces.`
+to the dump's, `Open data datasets the replace deleted that remain, by id: 0
+of 4.`, and `Open data datasets with no open data details now: 0
+public.datasets rows in 0 workspaces.` The whole `public.datasets` count is
+not checked: users can add datasets elsewhere during the load.
 The printed restore deletes the whole catalog the import loaded, which
 cascades to the `datasets__open_data` rows of every catalog dataset users
 added since. Use it only right after a wrong import, before users add
 catalog datasets, never as a later rollback.
-**If not:** `The import failed and its transaction rolled back: every count
-matches the report.` means nothing changed: fix and run again. A
+**If not:** `The import failed and its transaction rolled back: every
+catalog count matches the report, and all 4 open data datasets are still
+there.` means nothing changed: fix and run again. A
 `Refusing to delete open data dataset ...` error is the guard: a member
 outside `@avandarlabs.com` joined one of the workspaces; stop and raise it.
 Counts that differ from the report: stop and check the target.

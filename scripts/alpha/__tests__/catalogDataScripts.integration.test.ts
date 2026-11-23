@@ -214,6 +214,9 @@ case "$query" in
     printf '%s' "\${FAKE_TARGET_IDS:-}"
     ;;
   "select id::text from "*) printf '%s' "\${FAKE_DEPENDENT_IDS:-}" ;;
+  *"id::text in"*)
+    if [[ -f "$FAKE_STATE/imported" ]]; then echo 0; else echo "\${FAKE_REMAINING_DATASETS:-4}"; fi
+    ;;
   "select count(*) from "*)
     table="\${query#select count(*) from }"
     if [[ -f "$FAKE_STATE/imported" ]]; then
@@ -496,6 +499,18 @@ describe("exportCatalogData.sh", SHELL_TEST_OPTIONS, () => {
     const run = _runScript("exportCatalogData.sh", [join(workDir, "out.sql")], {
       SOURCE_DB_URL:
         "postgresql://postgres.demo-ref:pa/ss-secret@pooler.example.com:5432/postgres",
+    });
+
+    expect(run.status).toBe(1);
+    expect(run.output).toContain("cannot split the password");
+    expect(run.output).not.toContain("ss-secret");
+    expect(run.log).toBe("");
+  });
+
+  it("refuses a source password with a raw @, without calling pg_dump or printing it", () => {
+    const run = _runScript("exportCatalogData.sh", [join(workDir, "out.sql")], {
+      SOURCE_DB_URL:
+        "postgresql://postgres.demo-ref:p@ss-secret@pooler.example.com:5432/postgres",
     });
 
     expect(run.status).toBe(1);
@@ -1172,6 +1187,31 @@ describe("importCatalogData.sh --replace-existing", SHELL_TEST_OPTIONS, () => {
       /delete the 4 public\.datasets rows in 2 workspaces added from the catalog/,
     );
     expect(run.output).toContain("delete or change 8 dependent rows");
+  });
+
+  it("checks by id that the deleted open data datasets are gone after the import", () => {
+    const run = _runReplace(_confirmedReplaceArgs());
+
+    expect(run.output).toContain(
+      "Open data datasets the replace deleted that remain, by id: 0 of 4.",
+    );
+  });
+
+  it("says a failed replace rolled back when every affected dataset is still there", () => {
+    const run = _runReplace(_confirmedReplaceArgs(), { FAKE_IMPORT_EXIT: "3" });
+
+    expect(run.status).toBe(1);
+    expect(run.output).toContain("its transaction rolled back");
+  });
+
+  it("says a failed replace needs a check when an affected dataset is gone", () => {
+    const run = _runReplace(_confirmedReplaceArgs(), {
+      FAKE_IMPORT_EXIT: "3",
+      FAKE_REMAINING_DATASETS: "3",
+    });
+
+    expect(run.status).toBe(1);
+    expect(run.output).toContain("Check the target now.");
   });
 
   it("counts the orphaned datasets again after the import", () => {

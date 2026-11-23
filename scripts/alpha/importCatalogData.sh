@@ -82,14 +82,19 @@
 # catalog table must hold exactly the dump's rows before `commit`. Any error
 # rolls the whole transaction back. The catalog tables and the dependents
 # their cascade reaches (`datasets__open_data`) stay locked until `commit`,
-# for the whole load, so a user adding a catalog dataset waits. Of the open
-# data datasets' side, only the affected rows are locked: those datasets,
-# their workspaces, those workspaces' memberships, and their members'
-# `auth.users` rows. Every other dataset and workspace stays writable.
+# for the whole load, so a user adding a catalog dataset waits, and so does
+# deleting any dataset or workspace, since that delete cascades into
+# `datasets__open_data`. Of the open data datasets' side, only the affected
+# rows are locked: those datasets, their workspaces, those workspaces'
+# memberships, and their members' `auth.users` rows, so a sign-in by one of
+# those members may wait too. Other writes to datasets and workspaces, such
+# as an edit or a new dataset, do not wait.
 #
 # `--dry-run` prints the report and the plan, then exits 0 without writing.
 # Row counts are printed before and after the import, and after a failed one
-# to show the transaction rolled back.
+# to show the transaction rolled back. That check compares only the tables
+# the import locks whole, and looks up the affected open data datasets by
+# id, since other datasets can change while the dump loads.
 #
 # Every psql the script starts gets the URL without its password, and the
 # password in PGPASSWORD for that one command, so no process's arguments
@@ -164,6 +169,9 @@ BLOCKING_DEPENDENTS=""
 OPEN_DATA_DATASET_SUMMARY=""
 HAS_OPEN_DATA_DATASETS=false
 GUARD_REFUSAL=""
+# The ids of the open data datasets the report found, which the replace
+# deletes.
+AFFECTED_DATASET_IDS=()
 DUMP_REDACTED_COLUMNS=()
 TARGET_CONNECT_URL=""
 TARGET_PASSWORD=""
@@ -557,6 +565,8 @@ report_open_data_datasets() {
     [[ -n "$dataset_id" ]] || continue
     [[ "$members" =~ ^[0-9]+$ && "$others" =~ ^[0-9]+$ ]] || fail "could not read the members of workspace $workspace_id."
     count=$((count + 1))
+    [[ "$dataset_id" =~ ^[A-Za-z0-9-]+$ ]] || fail "could not read the id of open data dataset $count."
+    AFFECTED_DATASET_IDS+=("$dataset_id")
     failure="$(guard_failure "$dataset_id" "$workspace_id" "$members" "$others")"
     verdict="passes"
     if [[ -n "$failure" ]]; then
@@ -813,7 +823,7 @@ SQL
 # affected set: each open data dataset, its workspace (which blocks a new
 # membership there, through the foreign key), the workspace's memberships,
 # and its members' `auth.users` rows (which blocks an email change). Other
-# datasets and workspaces stay writable while the dump loads.
+# datasets and workspaces can still be edited or added while the dump loads.
 write_open_data_row_locks() {
   [[ "$HAS_OPEN_DATA_DATASETS" == true ]] || return 0
   local workspaces="select workspace_id from $DATASETS_TABLE where id in ($OPEN_DATA_DATASET_IDS_SQL)"
@@ -960,14 +970,44 @@ plan_refusal() {
   fi
 }
 
+# Prints the `<table> <rows>` lines of a counts list for only the tables the
+# import locks whole, which nothing else can change while it runs.
+#
+# Usage: locked_counts <counts>
+locked_counts() {
+  local locked table rows
+  locked=" ${CATALOG_TABLES[*]} $FACET_COUNTS_TABLE ${LOCKED_DEPENDENT_TABLES[*]:-} "
+  while read -r table rows; do
+    [[ -n "$table" && "$locked" == *" $table "* ]] && echo "$table $rows"
+  done <<<"$1"
+  return 0
+}
+
+# Prints how many of the affected open data datasets still exist, by id.
+remaining_affected_datasets() {
+  local ids
+  ids="$(printf "'%s', " "${AFFECTED_DATASET_IDS[@]}")"
+  read_target "select count(*) from $DATASETS_TABLE where id::text in (${ids%, })"
+}
+
 report_failed_import() {
   print_target_counts "After the failed import, the target holds, per table:" >&2
-  if [[ "$LAST_COUNTS" == "$BEFORE_COUNTS" ]]; then
-    echo "The import failed and its transaction rolled back: every count matches the report." >&2
+  local remaining="${#AFFECTED_DATASET_IDS[@]}"
+  if ((${#AFFECTED_DATASET_IDS[@]})); then
+    remaining="$(remaining_affected_datasets)"
+  fi
+  if [[ "$(locked_counts "$LAST_COUNTS")" == "$(locked_counts "$BEFORE_COUNTS")" && "$remaining" == "${#AFFECTED_DATASET_IDS[@]}" ]]; then
+    echo "The import failed and its transaction rolled back: every catalog count matches the report, and all ${#AFFECTED_DATASET_IDS[@]} open data datasets are still there." >&2
   else
-    echo "The import failed, and the counts differ from the report. Check the target now." >&2
+    echo "The import failed, and the catalog counts or the open data datasets differ from the report. Check the target now." >&2
   fi
   exit 1
+}
+
+# Says how many of the open data datasets the replace deleted remain, by id.
+report_deleted_datasets() {
+  ((${#AFFECTED_DATASET_IDS[@]})) || return 0
+  echo "Open data datasets the replace deleted that remain, by id: $(remaining_affected_datasets) of ${#AFFECTED_DATASET_IDS[@]}."
 }
 
 run_import() {
@@ -979,6 +1019,7 @@ run_import() {
   target_psql -X -P pager=off -q --set ON_ERROR_STOP=1 \
     --file "$wrapper" || report_failed_import
   print_target_counts "After the import, the target holds, per table:"
+  report_deleted_datasets
   report_orphans_after
 }
 
