@@ -42,6 +42,7 @@ review gets a public post-commit review.
 | D6 | When the demo domain, the Vercel `demo` environment, the `demo-measles` Supabase branch, and `demo/measles` are deleted | **Seven days after the production smoke test passes** and the catalog dump is archived. |
 | D7 | Creating the public review labels, board, and issues | **All 139 issues are opened together, and only on Pablo's approval.** Nothing is created automatically. The runbook holds a prompt Pablo pastes into a new agent session when he is ready. |
 | E1 | How CI addresses the staging site in Vercel | **The Vercel environment named `staging`.** It already exists, with staging's variables pointing at the staging Supabase project. |
+| A2 | Does `ava release --yes` proceed on a non-passing CI verdict | **No: it stops.** Overriding takes `--skip-ci-check`. Chosen because `main` now deploys production. |
 
 Carried over from the alpha plan, still true:
 
@@ -319,7 +320,7 @@ deploy.
 | `-alpha` and `-alpha-dev` versions | The current branch is read with `git symbolic-ref` |
 | The colored line banner | The re-check that HEAD is still where preflight found it, before the version commit |
 | `ava release notes --alpha` | The version commit touches `package.json` only |
-| "Refuse on any CI verdict but a pass", which was alpha-only | Pushes use full refspecs |
+| "Refuse on any CI verdict but a pass", as the default without `--yes`, which was alpha-only | Pushes use full refspecs |
 | The wording that `main` "does not touch production" | The end-to-end tests that drive real git in a temporary repository |
 
 `ava release` runs on `develop` only. Its warning says again that pushing
@@ -410,7 +411,7 @@ Each can be overruled before execution.
 | --- | --- |
 | Integration branch `chore/production-cutover`, cut from `docs/production-cutover` | Keeps `demo/measles` untouched until the work is verified. |
 | The one-entry `ReleaseLine` is folded back into constants | "No parallel release line" should be true of the code as well. It is its own task and can be dropped. |
-| `ava release` asks on a non-passing CI verdict, and `--yes` stops instead of overriding it | `main` now deploys production, so an unattended release must not ship past a failing CI. Pablo chose this on 2026-11-23. Overriding it takes `--skip-ci-check`. |
+| `ava release` asks on a non-passing CI verdict, and `--yes` stops instead of overriding it | `main` now deploys production, so an unattended release must not ship past a failing CI. Overriding it takes `--skip-ci-check`. |
 | `scripts/alpha/` becomes `scripts/catalog-move/` | The feature log already calls them the catalog move scripts. |
 | The staging and production deploy jobs are written out twice | A reusable workflow is cleaner, and changing the reviewed job's shape right before a release is not worth it. |
 | Pull request previews stop with the Git integration | D2 removes the integration. A CI preview job is a later choice. |
