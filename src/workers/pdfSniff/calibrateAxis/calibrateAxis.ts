@@ -104,7 +104,10 @@ export function calibrateAxis(
   return linear;
 }
 
-/** Reads a value from a calibrated position. */
+/**
+ * Returns the axis value at a calibrated PDF-space position.
+ * Use it, for example, to read a chart value from a plotted position.
+ */
 export function applyCalibration(
   calibration: AxisCalibration,
   position: number,

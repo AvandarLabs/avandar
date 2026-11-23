@@ -1,9 +1,9 @@
 import { Skeleton, Stack } from "@mantine/core";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { ColumnSection } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSection/ColumnSection";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { ReactNode } from "react";
 
 type Props = {

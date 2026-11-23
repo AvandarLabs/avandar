@@ -1,7 +1,7 @@
 import { Trans } from "@lingui/react/macro";
 import { Stack, Text } from "@mantine/core";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { ResyncDatasetCard } from "@/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetCard";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 type Props = {
   datasets: Dataset.T[];

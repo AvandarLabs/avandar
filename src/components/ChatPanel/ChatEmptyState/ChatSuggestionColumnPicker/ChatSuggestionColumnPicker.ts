@@ -206,7 +206,6 @@ function _pickGroupByColumn(
   return textColumns[0]?.name;
 }
 
-/** Picks the first numeric column for "average …" suggestions. */
 function _pickAverageColumn(
   columns: readonly ColumnMeta[],
 ): string | undefined {
@@ -251,6 +250,7 @@ export const ChatSuggestionColumnPicker = {
   isIdentifierColumnName: _isIdentifierColumnName,
   isNonAverageableColumnName: _isNonAverageableColumnName,
   isNonGroupableColumnName: _isNonGroupableColumnName,
+  /** Picks the first numeric column for "average …" suggestions. */
   pickAverageColumn: _pickAverageColumn,
   pickGroupByColumn: _pickGroupByColumn,
 };

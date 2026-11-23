@@ -23,10 +23,6 @@ import { FeatureFlag, isFlagEnabled } from "@/config/FeatureFlagConfig";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { ConceptCreatorStore } from "@/views/OntologyDesignerApp/ConceptCreatorView/ConceptCreatorStore/index";
 import css from "@/views/OntologyDesignerApp/ConceptCreatorView/ConceptCreatorView.module.css";
-import type {
-  ConceptFormSubmitValues,
-  ConceptFormType,
-  ConceptFormValues} from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
 import {
   getDefaultConceptFormValues,
   makeDefaultDatasetColumnAttribute,
@@ -41,6 +37,11 @@ import { getStatusSetValueFromFormValues } from "@/views/OntologyDesignerApp/Con
 import { keepKeyAndLabelFieldsSingle } from "@/views/OntologyDesignerApp/ConceptCreatorView/keepKeyAndLabelFieldsSingle/keepKeyAndLabelFieldsSingle";
 import { ManualEntryAttributesBlock } from "@/views/OntologyDesignerApp/ConceptCreatorView/ManualEntryAttributesBlock";
 import { useSubmitConceptCreatorForm } from "@/views/OntologyDesignerApp/ConceptCreatorView/useSubmitConceptCreatorForm";
+import type {
+  ConceptFormSubmitValues,
+  ConceptFormType,
+  ConceptFormValues,
+} from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
 
 const IS_MANUAL_DATA_DISABLED = isFlagEnabled(FeatureFlag.DisableManualData);
 

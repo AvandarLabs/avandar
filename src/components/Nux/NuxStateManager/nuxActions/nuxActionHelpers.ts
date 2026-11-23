@@ -17,7 +17,10 @@ export function withoutMilestoneKey(
   });
 }
 
-/** Status after a completion set changes. Dismissal is sticky until restart. */
+/**
+ * Returns the tutorial status for a completion set, preserving dismissal.
+ * Use it, for example, after marking or unmarking a milestone.
+ */
 export function tutorialStatusAfterCompletions(
   state: NuxAppState,
   completedMilestones: readonly NuxProgress.MilestoneKey[],

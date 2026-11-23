@@ -1,5 +1,3 @@
-import type { ReactNode } from "react";
-import type { Simplify } from "type-fest";
 import type { CURRENT_SCHEMA_VERSION } from "@/views/DashboardApp/AvaPage/migrations/config";
 import type { Props as DataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 import type { Props as FilterPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock";
@@ -9,6 +7,8 @@ import type {
   Config as PuckConfig,
   Data as PuckData,
 } from "@puckeditor/core";
+import type { ReactNode } from "react";
+import type { Simplify } from "type-fest";
 
 export type SlotRenderer = (options?: unknown) => ReactNode;
 

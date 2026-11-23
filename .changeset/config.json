@@ -20,17 +20,11 @@
       "@avandar/ui",
       "@avandar/utils"
     ],
-    [
-      "@avandar/lint",
-      "@avandar/lint-typescript",
-      "@avandar/lint-css"
-    ]
+    ["@avandar/lint", "@avandar/lint-typescript", "@avandar/lint-css"]
   ],
   "linked": [],
   "access": "public",
   "baseBranch": "develop",
   "updateInternalDependencies": "patch",
-  "ignore": [
-    "@avandar/ava-cli"
-  ]
+  "ignore": ["@avandar/ava-cli"]
 }

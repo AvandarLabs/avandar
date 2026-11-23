@@ -1,8 +1,5 @@
 import { Box } from "@mantine/core";
 import { Render as PuckPageRender } from "@puckeditor/core";
-import type { getAvaPageMetadataFromDashboard } from "@/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard/getAvaPageMetadataFromDashboard";
-import type { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
-import type { useDashboardPuckConfig } from "@/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig";
 import { DashboardFilterStateManager } from "@/views/DashboardApp/DashboardFilterStateManager/DashboardFilterStateManager";
 import { DashboardAccessDeniedView } from "@/views/DashboardApp/DashboardViewerView/DashboardAccessDeniedView/DashboardAccessDeniedView";
 import { DashboardLoadErrorState } from "@/views/DashboardApp/DashboardViewerView/DashboardLoadErrorState";
@@ -10,6 +7,9 @@ import { DashboardLoadingState } from "@/views/DashboardApp/DashboardViewerView/
 import { DashboardPreviewBanner } from "@/views/DashboardApp/DashboardViewerView/DashboardPreviewBanner/DashboardPreviewBanner";
 import { useHighlightTile } from "@/views/DashboardApp/DashboardViewerView/useHighlightTile";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { getAvaPageMetadataFromDashboard } from "@/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard/getAvaPageMetadataFromDashboard";
+import type { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
+import type { useDashboardPuckConfig } from "@/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig";
 import type { ReactNode } from "react";
 
 type Props = {

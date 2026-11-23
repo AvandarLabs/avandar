@@ -8,7 +8,10 @@ type Props = {
   onCreate: () => void;
 };
 
-/** Dashed create card: describe the work in chat, Avandar proposes the type. */
+/**
+ * Renders a new case type action and calls onCreate when selected.
+ * Use it, for example, to offer creation from a case type home screen.
+ */
 export function NewCaseTypeCard({ onCreate }: Readonly<Props>): ReactNode {
   return (
     <button type="button" className={css.createCard} onClick={onCreate}>

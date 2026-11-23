@@ -1,9 +1,9 @@
 import { AtlasCollection } from "../../AtlasLayout/AtlasCollection/AtlasCollection";
 import { HELPER_CATEGORIES } from "../helperCategoryHelpers";
 import { HelperPlaybackToggle } from "../HelperPlaybackToggle/HelperPlaybackToggle";
-import type { useHelperGallery } from "../useHelperGallery";
 import { HelperResultCard } from "./HelperResultCard/HelperResultCard";
-import type { ReactNode, Dispatch, SetStateAction } from "react";
+import type { useHelperGallery } from "../useHelperGallery";
+import type { Dispatch, ReactNode, SetStateAction } from "react";
 
 type Props = {
   gallery: ReturnType<typeof useHelperGallery>;

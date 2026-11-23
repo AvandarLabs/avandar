@@ -1,5 +1,8 @@
-import type { DEFAULT_INPUT, fixtures } from "../../SpatialGridBinning.fixtures";
 import { assertZeroCopyOwnsExplicitFrame as _assertZeroCopyOwnsExplicitFrame } from "./assertZeroCopyOwnsExplicitFrame";
+import type {
+  DEFAULT_INPUT,
+  fixtures,
+} from "../../SpatialGridBinning.fixtures";
 
 /**
  * Asserts zero copy owns an explicit zero sample even when every observed

@@ -1,5 +1,4 @@
 import { useBoolean } from "@avandar/hooks";
-import type { StringKeyOf } from "@avandar/utils";
 import { Button, Group, Table } from "@mantine/core";
 import { useI18nMessages } from "@ui/i18n/useI18nMessages";
 import { useState } from "react";
@@ -12,6 +11,7 @@ import type {
   GetChildObjects,
   ObjectRowRenderOptions,
 } from "../../ObjectDescriptionList.types";
+import type { StringKeyOf } from "@avandar/utils";
 
 const ACTION_COLUMN_HEADER_KEY = "__ACTION_COLUMN__";
 

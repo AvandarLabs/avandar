@@ -1,20 +1,20 @@
 import { useForm } from "@avandar/ui/hooks";
-import type { UnknownDataFrame } from "@avandar/utils";
 import { prop } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Box, Button, Stack, TextInput } from "@mantine/core";
 import { uuid } from "$/lib/uuid";
-import type { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { DataGrid } from "@/lib/ui/viz/DataGrid";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import css from "@/views/DataExplorerApp/SaveAsNewDatasetForm/SaveAsNewDatasetForm.module.css";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { UnknownDataFrame } from "@avandar/utils";
 
 type Props = {
   queryResultData: UnknownDataFrame;
-  columns: readonly QueryResultColumn[];
+  columns: readonly QueryResult.Column[];
   dateColumns: ReadonlySet<string>;
   rawSql: string;
   onSaveSuccess: () => void;

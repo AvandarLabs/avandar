@@ -1,12 +1,12 @@
 import { useMediaQuery } from "@mantine/hooks";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { User } from "$/models/User/User";
 import { isDesktop } from "$/platform/isDesktop";
 import { useNuxEligibility } from "@/components/Nux/useNuxEligibility/useNuxEligibility";
 import { useIsGlobalAdmin } from "@/hooks/permissions/useIsGlobalAdmin/useIsGlobalAdmin";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { renderHook, TestProviders } from "@/test-utils";
+import type { User } from "$/models/User/User";
 
 vi.mock("@/hooks/users/useCurrentUser", () => {
   return { useCurrentUser: vi.fn() };

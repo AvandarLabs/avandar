@@ -1,4 +1,3 @@
-import type { StringKeyOf } from "@avandar/utils";
 import { objectKeys } from "@avandar/utils";
 import { List, Table, Text } from "@mantine/core";
 import { useI18nMessages } from "@ui/i18n/useI18nMessages";
@@ -17,6 +16,7 @@ import type {
   ObjectArrayRenderOptions,
   ObjectRenderOptions,
 } from "../../ObjectDescriptionList.types";
+import type { StringKeyOf } from "@avandar/utils";
 
 const DEFAULT_EXCLUDE_KEYS_PATTERN = "_";
 const ACTION_COLUMN_HEADER_KEY = "__ACTION_COLUMN__";

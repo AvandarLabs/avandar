@@ -1,8 +1,5 @@
 import { Model } from "@avandar/models";
 import { uuid } from "$/lib/uuid";
-import type { AttributeMappingRegistry } from "$/models/ontology/AttributeMapping/AttributeMapping.types";
-import type { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
-import type { ManualEntryMapping } from "$/models/ontology/AttributeMapping/ManualEntryMapping/ManualEntryMapping.types";
 import { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus";
 import { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRule";
@@ -14,6 +11,9 @@ import type {
   DatasetColumnId,
   DatasetColumnRead,
 } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
+import type { AttributeMappingRegistry } from "$/models/ontology/AttributeMapping/AttributeMapping.types";
+import type { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
+import type { ManualEntryMapping } from "$/models/ontology/AttributeMapping/ManualEntryMapping/ManualEntryMapping.types";
 import type {
   ConceptId,
   ConceptModel,

@@ -1,16 +1,6 @@
 import { getCurrentUrl, navigateToExternalUrl } from "@avandar/browser-utils";
 import { Trans, useLingui } from "@lingui/react/macro";
-import type {
-  BoxProps} from "@mantine/core";
-import {
-  Box,
-  Button,
-  Group,
-  Loader,
-  Select,
-  Stack,
-  Text,
-} from "@mantine/core";
+import { Box, Button, Group, Loader, Select, Stack, Text } from "@mantine/core";
 import { IconBrandGoogleDrive } from "@tabler/icons-react";
 import { useCallback } from "react";
 import { APIClient } from "@/clients/APIClient";
@@ -23,6 +13,7 @@ import { useLoadGoogleSheet } from "@/views/DataManagerApp/DataImportView/Google
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { GPicker, GPickerResponseObject } from "@/lib/types/google-picker";
 import type { GoogleSheetsDataSourceMetadata } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm.types";
+import type { BoxProps } from "@mantine/core";
 
 type Props = BoxProps & {
   /**

@@ -91,7 +91,11 @@ function ChangeUrlButton({
   );
 }
 
-/** The published URL plus copy, QR, and an inline custom-path editor. */
+/**
+ * Displays a published URL, with sharing and path editing when available.
+ * Use it, for example, to show a dashboard's published link in its sharing
+ * dialog.
+ */
 export function PublishedTargetUrl({
   targetUrl,
   pathPrefix,

@@ -98,7 +98,9 @@ ATTACHED AND MENTIONED
 - A dataset marked not queryable in this chat cannot be queried; say so. An unavailable item is one you cannot see: tell the user, never guess what it held.
 - Call mentioned things by their names, without the @ and never with the tags.`;
 
-/** v3: v2's rules, plus how to read the attached and mentioned blocks. */
+/**
+ * Gives DATA_AGENT_INSTRUCTIONS_V3 schema-answer guidance that avoids queries.
+ */
 const SCHEMA_ANSWER_RULES = `
 
 SCHEMA

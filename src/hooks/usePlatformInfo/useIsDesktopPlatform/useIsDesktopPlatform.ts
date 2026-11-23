@@ -31,13 +31,17 @@ export function useIsDesktopPlatform(): boolean {
   });
 
   useEffect(() => {
-    if (isDesktopPlatform) {return;}
+    if (isDesktopPlatform) {
+      return;
+    }
     if (isDesktop()) {
       setIsDesktopPlatform(true);
       return;
     }
     const observer = new MutationObserver(() => {
-      if (isDesktop()) {setIsDesktopPlatform(true);}
+      if (isDesktop()) {
+        setIsDesktopPlatform(true);
+      }
     });
     observer.observe(document.documentElement, {
       attributes: true,

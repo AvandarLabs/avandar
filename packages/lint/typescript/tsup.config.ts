@@ -1,6 +1,7 @@
 import { defineConfig } from "tsup";
 
-export default defineConfig({
+/** Builds the publishable package entrypoints and declarations. */
+export const tsup = defineConfig({
   entry: { oxlint: "src/oxlint/index.js" },
   tsconfig: "tsconfig.build.json",
   format: ["esm"],

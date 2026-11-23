@@ -2,7 +2,6 @@ import { Model } from "@avandar/models";
 import { useQuery } from "@avandar/query-hooks";
 import { prop, sortObjList } from "@avandar/utils";
 import { match } from "ts-pattern";
-import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { createQueryMetadataProvenance } from "@/clients/queries/createQueryMetadataProvenance";
 import { runStructuredQueryWithMetadata } from "@/clients/queries/runStructuredQuery/runStructuredQueryWithMetadata";
 import { RAW_SQL_KEY_MARKER } from "@/views/DataExplorerApp/useDataQuery/isWorkspaceRawSqlDataQueryKey";
@@ -13,6 +12,7 @@ import type {
   UserQueryAnalyticsTrigger,
 } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { QueryMetadataProvenance } from "@/clients/queries/createQueryMetadataProvenance";
 import type {

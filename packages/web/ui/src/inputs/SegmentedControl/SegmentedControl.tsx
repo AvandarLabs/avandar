@@ -1,8 +1,7 @@
+import { SegmentedControl as MantineSegmentedControl } from "@mantine/core";
 import type {
   SegmentedControlItem as MantineSegmentedControlItem,
-  SegmentedControlProps as MantineSegmentedControlProps} from "@mantine/core";
-import {
-  SegmentedControl as MantineSegmentedControl
+  SegmentedControlProps as MantineSegmentedControlProps,
 } from "@mantine/core";
 
 export type SegmentedControlItem<T extends NonNullable<string>> = {

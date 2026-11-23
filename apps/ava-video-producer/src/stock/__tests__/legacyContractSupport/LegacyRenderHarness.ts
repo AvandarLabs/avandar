@@ -1,8 +1,8 @@
 import { readFileSync } from "node:fs";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import type { LEGACY_IDS } from "../../../../tests/fixtures/legacyStockIds";
 import { stockRenderers } from "../../registry/stockRenderers/stockRenderers";
+import type { LEGACY_IDS } from "../../../../tests/fixtures/legacyStockIds";
 
 const BASELINE: {
   records: Array<{

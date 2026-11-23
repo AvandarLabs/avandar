@@ -1,5 +1,5 @@
-import type { fixtures } from "../RecipientConfirmedHandover.fixtures";
 import { assertReceiptQuantitiesEqualCompletedFrame as _assertReceiptQuantitiesEqualCompletedFrame } from "./assertReceiptQuantitiesEqualCompletedFrame";
+import type { fixtures } from "../RecipientConfirmedHandover.fixtures";
 
 /**
  * Asserts receipt quantities equal completed physical moves while each

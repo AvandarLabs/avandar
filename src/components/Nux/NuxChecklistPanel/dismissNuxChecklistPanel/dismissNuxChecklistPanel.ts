@@ -1,5 +1,5 @@
-import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 import { nuxSelectors } from "@/components/Nux/NuxStateManager/nuxSelectors/nuxSelectors";
+import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 
 /**
  * Runs the checklist X action: confirm, then dismiss, unless every milestone

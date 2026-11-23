@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { renderHook } from "@/test-utils";
 import { useImportedColumns } from "./useImportedColumns";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 import type {
   CsvFileLoadResult,

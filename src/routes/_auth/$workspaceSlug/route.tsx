@@ -1,9 +1,9 @@
 import { propEq } from "@avandar/utils";
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import type { Workspace } from "$/models/Workspace/Workspace";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { RootLayout } from "@/components/layouts/RootLayout/RootLayout";
 import { AppLinks } from "@/config/AppLinks/AppLinks";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 export const Route = createFileRoute("/_auth/$workspaceSlug")({
   component: WorkspaceRootLayout,
@@ -29,7 +29,10 @@ export const Route = createFileRoute("/_auth/$workspaceSlug")({
   },
 });
 
-/** This is the layout for loading a workspace. */
+/**
+ * Renders the workspace-mode root layout.
+ * Registered by `Route` as its component.
+ */
 function WorkspaceRootLayout() {
   return <RootLayout mode="workspace" />;
 }

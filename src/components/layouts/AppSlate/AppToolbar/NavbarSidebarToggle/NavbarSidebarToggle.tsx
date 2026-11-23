@@ -7,7 +7,10 @@ import {
 } from "@tabler/icons-react";
 import { AppShellStateManager } from "@/components/AppShell/AppShellStateManager";
 
-/** Toggle icon to control the navbar sidebar visibility on desktop. */
+/**
+ * Renders a control for opening or closing the navigation sidebar.
+ * Use it, for example, in a desktop toolbar that controls sidebar visibility.
+ */
 export function NavbarSidebarToggle(): JSX.Element {
   const { t } = useLingui();
   const [{ isNavbarSidebarCollapsed }, dispatch] =

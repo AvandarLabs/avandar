@@ -10,12 +10,9 @@ import {
   TextInput,
 } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
-import type {
-  ConceptFormValues} from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
-import {
-  makeDefaultManualEntryAttribute,
-} from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
+import { makeDefaultManualEntryAttribute } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
 import type { ConceptId } from "$/models/ontology/Concept/Concept.types";
+import type { ConceptFormValues } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
 import type { FormType } from "@avandar/ui/hooks";
 
 type Props = {

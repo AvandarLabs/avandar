@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
-import type { DEFAULT_INPUT } from "../SchemaPlanLocalExecution.fixtures";
 import { assertActualRawRowsRemainBoundary as _assertActualRawRowsRemainBoundary } from "./assertActualRawRowsRemainBoundary";
 import { render } from "./SchemaPlanLocalExecutionTestHelpers";
+import type { DEFAULT_INPUT } from "../SchemaPlanLocalExecution.fixtures";
 
 /**
  * Asserts all actual raw rows remain inside the device throughout outbound

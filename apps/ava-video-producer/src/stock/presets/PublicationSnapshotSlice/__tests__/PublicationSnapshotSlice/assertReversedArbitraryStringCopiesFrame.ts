@@ -1,7 +1,7 @@
 import { SvgPaintAssertions } from "../../../../../../tests/helpers/SvgPaintAssertions/SvgPaintAssertions";
-import type { DEFAULT_INPUT } from "../../PublicationSnapshotSlice.fixtures";
 import { assertReversedArbitraryStringCopiesColumnId as _assertReversedArbitraryStringCopiesColumnId } from "./assertReversedArbitraryStringCopiesColumnId";
 import { PublicationSnapshotTestHelpers } from "./PublicationSnapshotTestHelpers";
+import type { DEFAULT_INPUT } from "../../PublicationSnapshotSlice.fixtures";
 
 /**
  * Asserts reversed arbitrary-string copies retain readable destination

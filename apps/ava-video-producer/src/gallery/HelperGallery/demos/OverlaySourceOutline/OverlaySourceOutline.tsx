@@ -1,5 +1,5 @@
-import type { MotionRect } from "../../../../motion-components/getOverlayTimings";
 import css from "./OverlaySourceOutline.module.css";
+import type { MotionRect } from "../../../../motion-components/getOverlayTimings";
 import type { ReactNode } from "react";
 
 const CELL: MotionRect = { x: 60, y: 260, width: 160, height: 44 };

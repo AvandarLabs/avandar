@@ -6,7 +6,10 @@ import {
 } from "./e2e-credentials";
 import { bestEffortPurgeE2EWorkspacesForOwners } from "./e2eTestWorkspaceLifecycle";
 
-/** Loads `.env.development` from the repository root (same as global setup). */
+/**
+ * Loads development environment settings for `globalTeardown` to use when
+ * cleaning up leftover E2E workspaces.
+ */
 function _loadDevelopmentEnv(): void {
   config({ path: path.resolve(process.cwd(), ".env.development") });
 }

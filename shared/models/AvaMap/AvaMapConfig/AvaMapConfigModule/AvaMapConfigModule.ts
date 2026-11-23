@@ -9,7 +9,6 @@ import {
   EMPTY_ANNOTATIONS,
   overlayConfigUpdaters,
 } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigModule/overlayConfigUpdaters/overlayConfigUpdaters.ts";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
 import type {
   AvaMapConfigRead,
   MapBookmark,
@@ -17,6 +16,7 @@ import type {
   MapViewState,
 } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig.types.ts";
 import type { ExportLayout } from "$/models/AvaMap/AvaMapConfig/ExportLayout.types.ts";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
 
 /** The export layout, minus its feature list if that list prints `layerId`. */
 function _clearFeatureListOfLayer(

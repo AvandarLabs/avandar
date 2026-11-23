@@ -1,5 +1,3 @@
-import type {
-  AnyFunction} from "@avandar/utils";
 import {
   capitalize,
   excludeDeep,
@@ -9,9 +7,16 @@ import {
   objectKeys,
   prefix,
 } from "@avandar/utils";
-import type { DefaultError, QueryClient, QueryKey } from "@query-hooks/core.types";
 import { useMutation } from "@query-hooks/useMutation/useMutation";
 import { useQuery } from "@query-hooks/useQuery/useQuery";
+import type { ServiceClient } from "@avandar/clients";
+import type { AnyFunction } from "@avandar/utils";
+import type {
+  DefaultError,
+  QueryClient,
+  QueryKey,
+} from "@query-hooks/core.types";
+import type { UseMutationOptions } from "@query-hooks/useMutation/useMutation";
 import type {
   ClientFnFirstParameter,
   ClientWithCache,
@@ -24,8 +29,6 @@ import type {
   UseQueryFunctionsRecord,
   WithQueryHooks,
 } from "@query-hooks/withQueryHooks/withQueryHooks.types";
-import type { ServiceClient } from "@avandar/clients";
-import type { UseMutationOptions } from "@query-hooks/useMutation/useMutation";
 
 function isSingletonObject(arg: unknown): arg is { arg: unknown } {
   return isPlainObject(arg) && "arg" in arg && objectKeys(arg).length === 1;

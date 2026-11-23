@@ -113,7 +113,10 @@ function _editorReducer(state: EditorState, action: EditorAction): EditorState {
     .exhaustive();
 }
 
-/** Built-in presets (read-only) and CRUD for custom role groups. */
+/**
+ * Renders built-in role presets and controls for custom role groups.
+ * Use it, for example, to manage role groups in workspace settings.
+ */
 export function WorkspaceRolesTab(): JSX.Element {
   const { t } = useLingui();
   const workspace = useCurrentWorkspace();

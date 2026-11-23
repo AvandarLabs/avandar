@@ -1,19 +1,5 @@
-import {
-  assertIsDefined,
-  hasDefinedProps,
-  isDefined,
-  makeBucketRecord,
-  makeMap,
-  makeObject,
-  objectValuesMap,
-  prop,
-  propEq,
-  sqlTemplate,
-  where,
-} from "@avandar/utils";
+import { hasDefinedProps, makeMap, sqlTemplate, where } from "@avandar/utils";
 import { t } from "@lingui/core/macro";
-import { Concept } from "$/models/ontology/Concept/Concept";
-import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { getStagingIndividualsTableName } from "@/clients/DuckDbClient/duckDbSqlText";
 import { IndividualClient } from "@/clients/ontology/IndividualClient";
@@ -26,15 +12,12 @@ import {
   getNewlyStaleIndividuals,
   makeBulkInsertRowsFromUpsertRows,
 } from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/diffStagedIndividualsHelpers/diffStagedIndividualsHelpers";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { DatasetColumnRead } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
+import { resolveIndividualSourceMappings } from "./resolveIndividualSourceMappings";
 import type { AttributeMapping } from "$/models/ontology/AttributeMapping/AttributeMapping.types";
-import type {
-  DatasetColumnMapping,
-  DatasetColumnMappingId,
-} from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
+import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { BuildableConcept } from "$/models/ontology/Concept/Concept.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { IndividualSourceMappings } from "./resolveIndividualSourceMappings";
 import type { JobId } from "@/lib/utils/state/JobProgressStore/JobProgressStore";
 import type {
   ExistingIndividual,
@@ -149,107 +132,6 @@ async function _diffAndUpsertPage(options: {
 }
 
 /**
- * The dataset-column mapping lookups needed to build the staging SQL: which
- * mappings identify an individual, which one supplies its label, and the
- * dataset columns and column lists each of those mappings resolves to.
- */
-type IndividualSourceMappings = {
-  identifierMappings: DatasetColumnMapping[];
-  labelMapping: DatasetColumnMapping;
-  titleColumn: DatasetColumnRead;
-  titleDatasetPrimaryKeyColumn: DatasetColumnRead;
-  mappingColumnsLookup: Record<DatasetColumnMappingId, DatasetColumnRead>;
-  neededColumnsByDatasetId: Record<Dataset.Id, string[]>;
-};
-
-/**
- * Resolves a concept's identifier and label attributes down to the dataset
- * columns they map to, returning everything the staging SQL needs to select
- * external ids and names from those columns.
- */
-async function _resolveIndividualSourceMappings(
-  concept: BuildableConcept,
-): Promise<IndividualSourceMappings> {
-  const entConfig = Concept.bind(concept);
-
-  const identifierAttributes = entConfig.getIdentifierAttributes();
-  const labelAttribute = entConfig.getLabelAttribute();
-  const allAttributes = [...identifierAttributes, labelAttribute];
-
-  const datasetColumnMappings = allAttributes
-    .map((attribute) => {
-      return attribute.mapping.type === "dataset_column"
-        ? attribute.mapping
-        : undefined;
-    })
-    .filter(isDefined);
-
-  // get all columns that we need to extract values from
-  const sourceDatasetColumns = await DatasetColumnClient.getAll(
-    where("id", "in", datasetColumnMappings.map(prop("datasetColumnId"))),
-  );
-  const columnsById = makeObject(sourceDatasetColumns, { key: "id" });
-
-  // map each mapping to its column and table name
-  const mappingColumnsLookup = makeObject(datasetColumnMappings, {
-    key: "id",
-    valueFn: (mapping) => {
-      const column = columnsById[mapping.datasetColumnId];
-      assertIsDefined(
-        column,
-        `Could not find column "${mapping.datasetColumnId}"`,
-      );
-      return column;
-    },
-  });
-
-  // Get the dataset columns to use for external IDs and the individual title
-  const identifierMappings = datasetColumnMappings.filter((mapping) => {
-    return identifierAttributes.some(propEq("id", mapping.conceptAttributeId));
-  });
-  const labelMapping = datasetColumnMappings.find((mapping) => {
-    return mapping.conceptAttributeId === labelAttribute.id;
-  })!;
-  // The label names each record with one value, so its mapping must name the
-  // rule that picks it.
-  if (labelMapping.valuePickerRuleType === undefined) {
-    throw new Error(
-      `Label attribute '${labelAttribute.name}' (${labelAttribute.id}) keeps ` +
-        `one value, but its mapping names no value rule.`,
-    );
-  }
-  const identifierMappingsByDatasetId = makeObject(identifierMappings, {
-    key: "datasetId",
-  });
-  const titleColumn = mappingColumnsLookup[labelMapping.id]!;
-  const titleDatasetPrimaryKeyColumn =
-    mappingColumnsLookup[
-      identifierMappingsByDatasetId[titleColumn.datasetId]!.id
-    ]!;
-
-  const neededColumnsByDatasetId = objectValuesMap(
-    makeBucketRecord(
-      datasetColumnMappings.map((mapping) => {
-        return mappingColumnsLookup[mapping.id]!;
-      }),
-      { key: "datasetId" },
-    ),
-    (columns) => {
-      return columns.map(prop("name"));
-    },
-  );
-
-  return {
-    identifierMappings,
-    labelMapping,
-    titleColumn,
-    titleDatasetPrimaryKeyColumn,
-    mappingColumnsLookup,
-    neededColumnsByDatasetId,
-  };
-}
-
-/**
  * Builds and runs the `CREATE TABLE AS SELECT` that stages a concept's
  * individuals into DuckDB under `stagingTableName`, keyed by external id with
  * one resolved name column.
@@ -323,12 +205,15 @@ async function _stageIndividuals(options: {
   Logger.log("Successfully generated all individuals. Starting diff/upsert...");
 }
 
-/** Runs the sync for one concept once its progress job already exists. */
+/**
+ * Synchronizes individuals for a concept using an existing progress job.
+ * Called by `generateIndividuals`, resolving when the sync is complete.
+ */
 async function _runGenerateIndividuals(
   concept: BuildableConcept,
   jobId: JobId,
 ): Promise<void> {
-  const mappings = await _resolveIndividualSourceMappings(concept);
+  const mappings = await resolveIndividualSourceMappings(concept);
 
   // Read every existing individual for this concept before touching DuckDB,
   // so a failure here never creates a staging table that then needs cleanup.

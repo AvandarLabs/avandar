@@ -1,7 +1,7 @@
 import { LabelSlots } from "../../../primitives/LabelSlots/LabelSlots";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import type { getObservationSlotFromFrame } from "../getObservationSlotFromFrame";
 import { roleMessages } from "../ProseMeasurementLedger.controls";
+import type { getObservationSlotFromFrame } from "../getObservationSlotFromFrame";
 import type { ReactNode } from "react";
 
 type Props = {

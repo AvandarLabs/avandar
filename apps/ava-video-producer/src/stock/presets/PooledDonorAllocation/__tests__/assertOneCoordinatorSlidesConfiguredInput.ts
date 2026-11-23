@@ -1,5 +1,5 @@
-import type { fixtures } from "../PooledDonorAllocation.fixtures";
 import { assertOneCoordinatorSlidesConfiguredHand as _assertOneCoordinatorSlidesConfiguredHand } from "./assertOneCoordinatorSlidesConfiguredHand";
+import type { fixtures } from "../PooledDonorAllocation.fixtures";
 
 /**
  * Asserts one coordinator slides each configured request batch with a

@@ -25,7 +25,11 @@ export type RunOfflineChatTurnArgs = {
   onPhase?: (label: string) => void;
 };
 
-/** Runs the full offline chat turn: schema, engine, multi-pass pipeline. */
+/**
+ * Runs an offline chat turn and returns assistant text, generated SQL, and any
+ * clarification.
+ * Use it, for example, to answer a chat prompt with the local model.
+ */
 export async function runOfflineChatTurn(
   args: RunOfflineChatTurnArgs,
 ): Promise<OfflineChatTurnResult> {

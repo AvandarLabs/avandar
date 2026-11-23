@@ -66,7 +66,11 @@ export async function restrictDatasetWithNoWorkspaceAccess(
   await closeShareModal(page);
 }
 
-/** Asserts the dataset link is absent from the data-manager sidebar. */
+/**
+ * Asserts that a dataset link is absent from the data-manager page.
+ * Use it, for example, to check that a restricted dataset is hidden from a
+ * user.
+ */
 export async function expectDatasetHiddenInDataManager(
   page: Page,
   options: { workspaceSlug: string; datasetName: string },
@@ -77,7 +81,10 @@ export async function expectDatasetHiddenInDataManager(
   ).toHaveCount(0, { timeout: LONG_WAIT });
 }
 
-/** Asserts the dataset link is visible in the data-manager sidebar. */
+/**
+ * Asserts that a dataset link is visible on the data-manager page.
+ * Use it, for example, to check that a shared dataset is visible to a user.
+ */
 export async function expectDatasetVisibleInDataManager(
   page: Page,
   options: { workspaceSlug: string; datasetName: string },
@@ -90,7 +97,11 @@ export async function expectDatasetVisibleInDataManager(
   });
 }
 
-/** Direct navigation: restricted users should not load dataset metadata. */
+/**
+ * Asserts that direct navigation to dataset metadata shows a denial or load
+ * error.
+ * Use it, for example, to check that a user cannot open a restricted dataset.
+ */
 export async function expectDatasetMetaPageDenied(
   page: Page,
   options: { workspaceSlug: string; datasetId: string },
@@ -109,7 +120,10 @@ export async function expectDatasetMetaPageDenied(
   ).toBeVisible({ timeout: LONG_WAIT });
 }
 
-/** Direct navigation: user can open dataset metadata. */
+/**
+ * Asserts that a dataset name is visible on its metadata page.
+ * Use it, for example, to check that a user can open a shared dataset.
+ */
 export async function expectDatasetMetaPageAccessible(
   page: Page,
   options: {

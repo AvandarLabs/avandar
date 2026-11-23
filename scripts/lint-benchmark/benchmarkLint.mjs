@@ -1,13 +1,22 @@
 #!/usr/bin/env node
 import { spawn } from "node:child_process";
-import { appendFile, mkdir, access, readFile, writeFile } from "node:fs/promises";
-import { dirname, resolve } from "node:path";
-import { pathToFileURL } from "node:url";
-import { performance } from "node:perf_hooks";
+import { constants } from "node:fs";
 import {
-  openTerminal,
+  access,
+  appendFile,
+  lstat,
+  mkdir,
+  readFile,
+  writeFile,
+} from "node:fs/promises";
+import { dirname, resolve } from "node:path";
+import { performance } from "node:perf_hooks";
+import { pathToFileURL } from "node:url";
+import {
+  buildHelpText,
   createTheme,
-} from "../../packages/lint/core/src/cli/terminal.ts";
+  openTerminal,
+} from "../../packages/lint/core/src/cli/terminalHelpers.ts";
 
 const HELP = `Measure one cold and five warm runs of the repository lint command.
 
@@ -45,15 +54,17 @@ async function _runSample(index) {
   return { durationMs: Math.round(performance.now() - started), exitCode };
 }
 
-/** Measures lint timings for repeatable performance comparisons. */
+/**
+ * Measures cold and warm lint timings and returns the samples, median, and exit
+ * codes.
+ * Use it, for example, to compare lint performance across configuration
+ * changes.
+ */
 export async function benchmarkLint({ label, runSample = _runSample }) {
-  const samples = await Array.from({ length: 6 }).reduce(
-    async (previous, _, index) => {
-      const completed = await previous;
-      return [...completed, await runSample(index)];
-    },
-    Promise.resolve([]),
-  );
+  const samples = [];
+  for (let index = 0; index < 6; index += 1) {
+    samples.push(await runSample(index));
+  }
   const warmMs = samples.slice(1).map((sample) => sample.durationMs);
   return {
     label,
@@ -64,33 +75,61 @@ export async function benchmarkLint({ label, runSample = _runSample }) {
   };
 }
 
-async function _recordMeasurement(result) {
+async function _prepareDestination() {
   const destination = resolve("docs/lint-benchmarks/oxlint-phase-3.md");
   await mkdir(dirname(destination), { recursive: true });
   try {
+    const information = await lstat(destination);
+    if (!information.isFile()) {
+      throw new Error(
+        `Benchmark destination must be a regular file: ${destination}`,
+      );
+    }
+    await access(destination, constants.R_OK | constants.W_OK);
+  } catch (error) {
+    if (error.code !== "ENOENT") {
+      throw error;
+    }
+    await access(dirname(destination), constants.W_OK);
+  }
+  return destination;
+}
+
+async function _recordMeasurement({ result, destination }) {
+  try {
     await access(destination);
-  } catch {
+  } catch (error) {
+    if (error.code !== "ENOENT") {
+      throw error;
+    }
     await writeFile(
       destination,
       "# Lint benchmark\n\nFirst run is cold; warm samples follow without cache eviction. Durations are\nwall-clock milliseconds. A failed lint run is not a passing performance baseline.\n\n| Label | Cold ms | Warm 1 | Warm 2 | Warm 3 | Warm 4 | Warm 5 | Warm median ms | Exit codes |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- |\n",
+      { flag: "wx" },
     );
   }
   const row = `| ${result.label} | ${result.coldMs} | ${result.warmMs.join(" | ")} | ${result.warmMedianMs} | ${result.exitCodes.join(", ")} |\n`;
   const document = await readFile(destination, "utf8");
-  const table = /^\| Label \|[^\n]*\n\| ---[^\n]*\n(?:\|[^\n]*\n)*/m.exec(document);
+  const table = /^\| Label \|[^\n]*\n\| ---[^\n]*\n(?:\|[^\n]*\n)*/m.exec(
+    document,
+  );
   if (table) {
     const end = table.index + table[0].length;
     await writeFile(
-      destination, document.slice(0, end) + row + document.slice(end),
+      destination,
+      `${document.slice(0, end)}${row}${document.slice(end)}`,
     );
   } else {
     await appendFile(destination, row);
   }
 }
 
-/** Gets the explicit or wizard-selected label for one lint measurement. */
+/**
+ * Returns the explicit or prompted label for a lint measurement.
+ * Use it, for example, to accept a label in unattended or interactive runs.
+ */
 export async function getBenchmarkLabel(args, terminal = openTerminal) {
-  if (!args.length) {
+  if (!args.length || (args.length === 1 && args[0] === "--label")) {
     const prompt = terminal();
     if (!prompt) {
       throw new Error("Provide --label <name> without a terminal");
@@ -110,8 +149,11 @@ export async function getBenchmarkLabel(args, terminal = openTerminal) {
 }
 
 async function _main(args) {
+  const theme = createTheme(Boolean(process.stderr.isTTY));
   if (args.includes("--help") || args.includes("-h")) {
-    process.stdout.write(HELP);
+    process.stdout.write(
+      buildHelpText({ text: HELP, isTerminal: Boolean(process.stdout.isTTY) }),
+    );
     return 0;
   }
   try {
@@ -119,14 +161,14 @@ async function _main(args) {
     if (!/^[a-zA-Z0-9][a-zA-Z0-9.-]*$/.test(label)) {
       throw new Error("Label must use letters, digits, dots, or hyphens");
     }
-    const theme = createTheme(Boolean(process.stderr.isTTY));
+    const destination = await _prepareDestination();
     const timer = setInterval(
       () => process.stderr.write("Still measuring lint...\n"),
       10000,
     );
     try {
       const result = await benchmarkLint({ label });
-      await _recordMeasurement(result);
+      await _recordMeasurement({ result, destination });
       process.stdout.write(`${JSON.stringify(result)}\n`);
       const hasFailures = result.exitCodes.some((code) => code !== 0);
       process.stderr.write(
@@ -140,7 +182,7 @@ async function _main(args) {
     }
   } catch (error) {
     process.stderr.write(
-      `❌ lint:benchmark: ${error.message}\n  ⚠️ Run pnpm lint:benchmark --label phase-3-before-package and retry.\n\n${HELP}`,
+      `${theme.error(`❌ lint:benchmark: ${error.message}`)}\n${theme.warning("  ⚠️ Run pnpm lint:benchmark --label phase-3-before-package and retry.")}\n\n${buildHelpText({ text: HELP, isTerminal: Boolean(process.stderr.isTTY) })}`,
     );
     return 1;
   }

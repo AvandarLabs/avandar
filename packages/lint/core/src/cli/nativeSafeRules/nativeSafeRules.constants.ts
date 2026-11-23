@@ -1,4 +1,4 @@
-import type { CoverageEvidence } from "../coverage.ts";
+import type { CoverageEvidence } from "../coverageHelpers.ts";
 
 /** Exact seed capabilities used by native coverage probes. */
 export const CAPABILITIES = [
@@ -20,6 +20,7 @@ export const CAPABILITIES = [
   ["AF-16", "fresh-data-object", "straight-line-object-construction"],
   ["AF-17", "optional-parameter-candidates", "optional-array-candidates"],
 ] as const;
+/** Capabilities that require the custom native plugin. */
 export const CUSTOM_RULE_IDS: readonly string[] = [
   "AF-06",
   "AF-07",
@@ -34,6 +35,7 @@ export const CUSTOM_RULE_IDS: readonly string[] = [
   "AF-16",
   "AF-17",
 ];
+/** Capabilities whose native seeds support JavaScript. */
 export const JS_RULE_IDS: readonly string[] = [
   "AF-01",
   "AF-06",
@@ -47,12 +49,14 @@ export const JS_RULE_IDS: readonly string[] = [
   "AF-16",
   "AF-17",
 ];
+/** Native diagnostic codes indexed by their configured rule names. */
 export const NATIVE_CODES: Record<string, string> = {
   curly: "eslint(curly)",
   "consistent-type-imports": "typescript(consistent-type-imports)",
   "consistent-type-exports": "typescript(consistent-type-exports)",
   "prefer-as-const": "typescript(prefer-as-const)",
 };
+/** Neutral evidence used when a native capability has not been proven. */
 export const UNPROVEN: CoverageEvidence = {
   available: false,
   enabled: false,

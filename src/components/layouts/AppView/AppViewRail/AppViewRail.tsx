@@ -9,7 +9,10 @@ type Props = {
   className?: string;
 };
 
-/** The stack of property groups that fills an `AppViewBody` rail. */
+/**
+ * Wraps property groups in an app view rail.
+ * Use it, for example, to show dataset properties beside view content.
+ */
 export function AppViewRail({
   children,
   className,

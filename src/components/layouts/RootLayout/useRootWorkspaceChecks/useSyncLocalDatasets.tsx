@@ -8,7 +8,6 @@ import {
 } from "@avandar/utils";
 import { modals } from "@mantine/modals";
 import { useEffect, useState } from "react";
-import type { UserId } from "$/models/User/User.types";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
@@ -16,6 +15,7 @@ import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { difference } from "@/lib/utils/arrays/difference/difference";
 import { isEmptyArray, or } from "@/lib/utils/guards/guards";
 import { ResyncDatasetsBlock } from "@/views/DataManagerApp/ResyncDatasetsBlock/ResyncDatasetsBlock";
+import type { User } from "$/models/User/User";
 
 /**
  * This hook handles garbage collection of local datasets. Any datasets in
@@ -33,7 +33,7 @@ function useGarbageDatasetCollection(): void {
 
   const [localDatasets] = LocalDatasetClient.useGetAll({
     where: {
-      userId: { eq: user!.id as UserId },
+      userId: { eq: user!.id as User.Id },
       workspaceId: { eq: workspace.id },
     },
     useQueryOptions: {
@@ -113,7 +113,7 @@ export function useSyncLocalDatasets(): void {
           await LocalDatasetClient.fetchCloudDatasetToLocalStorage({
             datasetId: dataset.id,
             workspaceId: workspace.id,
-            userId: user.id as UserId,
+            userId: user.id as User.Id,
           });
 
           return { dataset, isLoaded: true };

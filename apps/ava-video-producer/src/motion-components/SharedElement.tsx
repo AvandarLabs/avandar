@@ -1,6 +1,6 @@
 import { interpolateStyles } from "@remotion/animation-utils";
-import type { MotionRect } from "./getOverlayTimings";
 import { MotionSettings } from "./MotionSettings/MotionSettings";
+import type { MotionRect } from "./getOverlayTimings";
 import type { MotionOptions } from "./MotionSettings/MotionSettings";
 import type { CSSProperties, ReactNode } from "react";
 /**

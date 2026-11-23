@@ -1,28 +1,44 @@
-import { createRuleMetadata } from "@avandar/lint/metadata";
+import { getRuleMetadataFromIdentity } from "@avandar/lint/metadata";
 import {
-  getDirectCallBinding, hasOnlyFollowingCalls, hasOrdinarySignature,
+  getDirectCallBindingFromDeclaration,
+  hasOnlyFollowingCalls,
+  hasOrdinarySignature,
   hasUnsafeFunctionContract,
 } from "./functionSafety.js";
 
 function _getReplacement(sourceCode, declaration) {
   const binding = declaration.declarations[0];
   const node = binding.init;
-  if (binding.id.type !== "Identifier" || binding.id.typeAnnotation ||
+  if (
+    binding.id.type !== "Identifier" ||
+    binding.id.typeAnnotation ||
     !["ArrowFunctionExpression", "FunctionExpression"].includes(node?.type) ||
-    node.id || !hasOrdinarySignature(sourceCode, node, declaration.range[0])) {
+    node.id ||
+    !hasOrdinarySignature(sourceCode, node, declaration.range[0])
+  ) {
     return undefined;
   }
-  const symbol = getDirectCallBinding(sourceCode, declaration, node);
-  if (!symbol || !hasOnlyFollowingCalls(symbol, declaration) ||
-    hasUnsafeFunctionContract(sourceCode, node, binding.id.name)) {
+  const symbol = getDirectCallBindingFromDeclaration(
+    sourceCode,
+    declaration,
+    node,
+  );
+  if (
+    !symbol ||
+    !hasOnlyFollowingCalls(symbol, declaration) ||
+    hasUnsafeFunctionContract(sourceCode, node, binding.id.name)
+  ) {
     return undefined;
   }
   if (node.type === "FunctionExpression") {
     return `function ${binding.id.name}${sourceCode.getText(node).slice(8)}`;
   }
-  const arrow = sourceCode.getTokens(node).filter((token) => {
-    return token.value === "=>" && token.range[1] <= node.body.range[0];
-  }).at(-1);
+  const arrow = sourceCode
+    .getTokens(node)
+    .filter((token) => {
+      return token.value === "=>" && token.range[1] <= node.body.range[0];
+    })
+    .at(-1);
   if (!arrow) {
     return undefined;
   }
@@ -32,26 +48,46 @@ function _getReplacement(sourceCode, declaration) {
   return `function ${binding.id.name}${parameters} ${body}`;
 }
 
-/** Repairs private top-level function syntax only for proven direct calls. */
+/**
+ * Reports and fixes eligible private top-level function expressions as
+ * declarations.
+ * For example, Oxlint can apply the fix to a binding used only by later direct
+ * calls.
+ */
 const rule = {
   meta: {
-    ...createRuleMetadata("AF-08", "https://github.com/AvandarLabs/avandar/blob/develop/packages/lint/docs/rules/top-level-function-declaration.md"),
-    type: "suggestion", fixable: "code", schema: [],
+    ...getRuleMetadataFromIdentity({
+      ruleId: "AF-08",
+      documentationPath:
+        "https://github.com/AvandarLabs/avandar/blob/develop/packages/lint/docs/rules/top-level-function-declaration.md",
+    }),
+    type: "suggestion",
+    fixable: "code",
+    schema: [],
     messages: { declaration: "AF-08: Use a top-level function declaration." },
   },
-  createOnce(context) {
-    return { VariableDeclaration(node) {
-      if (node.parent.type !== "Program" || node.kind !== "const" ||
-        node.declarations.length !== 1) {
-        return;
-      }
-      const replacement = _getReplacement(context.sourceCode, node);
-      if (replacement) {
-        context.report({ node, messageId: "declaration", fix(fixer) {
-          return fixer.replaceText(node, replacement);
-        } });
-      }
-    } };
+  createOnce: (context) => {
+    return {
+      VariableDeclaration: (node) => {
+        if (
+          node.parent.type !== "Program" ||
+          node.kind !== "const" ||
+          node.declarations.length !== 1
+        ) {
+          return;
+        }
+        const replacement = _getReplacement(context.sourceCode, node);
+        if (replacement) {
+          context.report({
+            node,
+            messageId: "declaration",
+            fix: (fixer) => {
+              return fixer.replaceText(node, replacement);
+            },
+          });
+        }
+      },
+    };
   },
 };
 export default rule;

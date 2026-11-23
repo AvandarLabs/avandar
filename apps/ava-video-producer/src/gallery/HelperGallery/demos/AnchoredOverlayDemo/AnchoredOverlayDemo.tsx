@@ -1,14 +1,14 @@
 import { AnchoredOverlay } from "../../../../motion-components/AnchoredOverlay";
 import { getOverlayPose } from "../../../../motion-components/getOverlayPose";
-import type {
-  MotionRect,
-  OverlayCue,
-} from "../../../../motion-components/getOverlayTimings";
 import { MotionSettings } from "../../../../motion-components/MotionSettings/MotionSettings";
 import { DemoTheme } from "../DemoTheme";
 import { HelperDemoFrame } from "../HelperDemoFrame/HelperDemoFrame";
 import { OverlaySourceOutline } from "../OverlaySourceOutline/OverlaySourceOutline";
 import css from "./AnchoredOverlayDemo.module.css";
+import type {
+  MotionRect,
+  OverlayCue,
+} from "../../../../motion-components/getOverlayTimings";
 import type { HelperDemoProps } from "../helperDemo.types";
 import type { DemoReadout } from "../HelperDemoFrame/HelperDemoFrame";
 import type { ReactNode } from "react";

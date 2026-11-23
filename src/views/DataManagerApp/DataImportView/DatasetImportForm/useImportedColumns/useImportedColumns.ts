@@ -1,13 +1,13 @@
 import { useMemo } from "react";
 import { match } from "ts-pattern";
-import type { ImportedDatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
-import type { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { DataSourceMetadata } from "../DatasetImportForm.types";
+import type { DuckDbColumnSchema } from "@/clients/DuckDbClient/DuckDbClient.types";
 
 function _duckDbColumnsToImportedColumns(
   columns: DuckDbColumnSchema[],
-): ImportedDatasetColumn[] {
+): DatasetColumn.Imported[] {
   return columns.map((duckDbCol, idx) => {
     return {
       name: duckDbCol.column_name,
@@ -22,7 +22,7 @@ function _duckDbColumnsToImportedColumns(
 
 export function useImportedColumns(
   dataSourceMetadata: DataSourceMetadata,
-): ImportedDatasetColumn[] {
+): DatasetColumn.Imported[] {
   return useMemo(() => {
     return match(dataSourceMetadata)
       .with(

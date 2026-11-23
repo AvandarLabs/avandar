@@ -2,12 +2,7 @@ import { useToggleBoolean } from "@avandar/hooks";
 import { useLingui } from "@lingui/react/macro";
 import { AppShell as MantineAppShell } from "@mantine/core";
 import { useHotkeys } from "@mantine/hooks";
-import type {
-  SpotlightActionData,
-  SpotlightActionGroupData} from "@mantine/spotlight";
-import {
-  Spotlight
-} from "@mantine/spotlight";
+import { Spotlight } from "@mantine/spotlight";
 import { IconSearch } from "@tabler/icons-react";
 import { Outlet } from "@tanstack/react-router";
 import css from "@/components/AppShell/AppShell.module.css";
@@ -26,6 +21,10 @@ import { useIsMobileSize } from "@/lib/hooks/ui/useIsMobileSize";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { AppLink } from "@/config/AppLinks/AppLinks";
 import type { NavbarLink } from "@/config/NavbarLinks/NavbarLinks";
+import type {
+  SpotlightActionData,
+  SpotlightActionGroupData,
+} from "@mantine/spotlight";
 import type { CSSProperties, ReactNode } from "react";
 
 // `-webkit-app-region: drag` is what Electrobun's preload detects on

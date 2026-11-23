@@ -1,10 +1,4 @@
-import type {
-  SegmentedControlItem,
-  SegmentedControlProps} from "@avandar/ui";
-import {
-  makeSegmentedControlItems,
-  SegmentedControl
-} from "@avandar/ui";
+import { makeSegmentedControlItems, SegmentedControl } from "@avandar/ui";
 import {
   isNonEmptyArray,
   makeBucketRecord,
@@ -24,7 +18,6 @@ import {
 } from "@mantine/core";
 import { usePrevious, useUncontrolled } from "@mantine/hooks";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
-import type { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
@@ -35,17 +28,18 @@ import type {
   DatasetWithColumns,
 } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type { SegmentedControlItem, SegmentedControlProps } from "@avandar/ui";
 
 type Props = {
   /** The IDs of the datasets that we can select columns from */
   datasetIds: readonly DatasetId[];
-  value?: DatasetColumnId;
-  defaultValue?: DatasetColumnId;
-  onChange?: (value: DatasetColumnId) => void;
+  value?: DatasetColumn.Id;
+  defaultValue?: DatasetColumn.Id;
+  onChange?: (value: DatasetColumn.Id) => void;
 
   /** The IDs of the columns to exclude from the list */
-  excludeColumns?: readonly DatasetColumnId[];
-  segmentedControlProps?: Omit<SegmentedControlProps<DatasetColumnId>, "data">;
+  excludeColumns?: readonly DatasetColumn.Id[];
+  segmentedControlProps?: Omit<SegmentedControlProps<DatasetColumn.Id>, "data">;
 };
 
 /**

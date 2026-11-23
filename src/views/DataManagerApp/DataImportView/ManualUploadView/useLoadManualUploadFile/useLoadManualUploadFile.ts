@@ -1,131 +1,33 @@
-import type { UseMutationResultTuple } from "@avandar/query-hooks";
 import { useMutation } from "@avandar/query-hooks";
 import { MIMEType } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { useState } from "react";
 import { match } from "ts-pattern";
 import { uuid } from "$/lib/uuid";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
-import type { UserId } from "$/models/User/User.types";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { makeCsvFromPdfTable } from "@/clients/datasets/makeCsvFromPdfTable/makeCsvFromPdfTable";
 import { extractPdfRegions } from "@/clients/datasets/pdfSniff";
+import { useCurrentUser } from "@/hooks/users/useCurrentUser";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { notifyError } from "@/utils/notifications/notify";
+import { buildDataSourceMetadataFromLoadResult } from "./buildDataSourceMetadataFromLoadResult";
+import type { User } from "$/models/User/User";
+import type { ManualUploadDataSourceMetadata } from "../../DatasetImportForm/DatasetImportForm.types";
+import type {
+  CsvFileLoadResult,
+  FileLoadResult,
+  LoadAndParseFileOptions,
+  PdfFileLoadResult,
+  UseLoadManualUploadFileResult,
+  XlsxFileLoadResult,
+} from "./useLoadManualUploadFile.types";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type {
   DuckDbColumnSchema,
   DuckDbLoadCsvResult,
   DuckDbLoadXlsxResult,
 } from "@/clients/DuckDbClient/DuckDbClient.types";
-import { useCurrentUser } from "@/hooks/users/useCurrentUser";
-import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { notifyError } from "@/utils/notifications/notify";
-import type {
-  BaseLoadResult,
-  ManualUploadDataSourceMetadata,
-} from "../../DatasetImportForm/DatasetImportForm.types";
-import type {
-  CsvParseOptions,
-  PdfParseOptions,
-  XlsxParseOptions,
-} from "../../DatasetImportForm/useSaveDataset/useSaveDataset";
-import type { PdfOutputMode } from "$/models/datasets/PdfFileDataset/PdfFileDataset.types";
-import type { RegionClassification } from "@/workers/pdfSniff/classifyRegion/classifyRegion";
-import type {
-  DocumentMetadata,
-  ExtractedTable,
-  PageGeometry,
-  PdfRegion,
-} from "@/workers/pdfSniff/pdfSniff.types";
-
-type FileLoadOptions = {
-  file: File;
-  datasetId: Dataset.Id;
-};
-
-export type ParseManualFileOptions =
-  | CsvParseOptions
-  | XlsxParseOptions
-  | PdfParseOptions;
-
-type LoadAndParseFileOptions = FileLoadOptions & ParseManualFileOptions;
-
-export type CsvFileLoadResult = BaseLoadResult & DuckDbLoadCsvResult;
-
-export type XlsxFileLoadResult = BaseLoadResult & {
-  availableSheetNames: string[];
-} & DuckDbLoadXlsxResult;
-
-export type PdfFileLoadResult = BaseLoadResult & {
-  /**
-   * Identifies this particular load, so re-parsing remounts the import form.
-   * The CSV and XLSX results get theirs from the DuckDB load result; a PDF
-   * never touches DuckDB during the sniff, so it is minted here.
-   */
-  id: string;
-  type: "pdf";
-  pageCount: number;
-  /** Geometry for the pages read, so the picker can render and clip them. */
-  pages: readonly PageGeometry[];
-  /**
-   * `needs_selection` means the document parsed fine and is waiting for the
-   * user to choose a region. It is NOT an error, and the form must not treat
-   * it as one.
-   */
-  status: "needs_selection" | "extracted";
-  /**
-   * The row shape the extraction actually used, which is the user's pick when
-   * they made one and the shape derived from the regions' detected kinds when
-   * they did not. Undefined until a region has been selected.
-   *
-   * Reported for the same reason `regions` is: it is what really happened, and
-   * the form seeds the control from it. Defaulting the control to a fixed mode
-   * instead is what offered "keep the printed table" for a line chart.
-   */
-  outputMode: PdfOutputMode | undefined;
-  /**
-   * The regions as they were actually read, which is the requested regions
-   * with each classified shape written back into them.
-   *
-   * Without this the picker's "Read as" control shows the shape the region was
-   * created with rather than the one the rows in front of the user came out
-   * of, and a user correcting a shape would be correcting a value that was
-   * never used.
-   */
-  regions: readonly PdfRegion[];
-  columns: DuckDbColumnSchema[];
-  /** One per selected region, for the review grid. */
-  tables: readonly ExtractedTable[];
-  classifications: Readonly<Record<string, RegionClassification>>;
-  documentMetadata: DocumentMetadata;
-  /**
-   * The combined result the dataset is actually built from. Kept alongside
-   * `tables` because the fingerprint and the CSV are computed from the
-   * combination, not from any single region.
-   */
-  combinedCells: ReadonlyArray<readonly string[]>;
-  combinedHeaderRows: number;
-};
-
-type FileLoadResult =
-  | CsvFileLoadResult
-  | XlsxFileLoadResult
-  | PdfFileLoadResult;
-
-type UseLoadManualUploadFileResult = {
-  loadFile: UseMutationResultTuple<FileLoadResult, LoadAndParseFileOptions>[0];
-  isLoadingFile: UseMutationResultTuple<
-    FileLoadResult,
-    LoadAndParseFileOptions
-  >[1];
-  dataSourceMetadata: ManualUploadDataSourceMetadata | undefined;
-  setDataSourceMetadata: (
-    newDataSourceMetadata: ManualUploadDataSourceMetadata | undefined,
-  ) => void;
-  previewRows: UnknownRow[] | undefined;
-
-  /** Forgets the loaded file's metadata and preview rows. */
-  clearLoadedFile: () => void;
-};
+import type { PdfRegion } from "@/workers/pdfSniff/pdfSniff.types";
 
 const EMPTY_PARQUET_PLACEHOLDER = new Blob([], {
   type: MIMEType.APPLICATION_PARQUET,
@@ -150,97 +52,6 @@ function _xlsxColumnNamesToSchema(columnNames: string[]): DuckDbColumnSchema[] {
       extra: null,
     };
   });
-}
-
-function _buildDataSourceMetadataFromLoadResult({
-  loadResult,
-  file,
-  loadAndParseOptions,
-}: {
-  loadResult: FileLoadResult;
-  file: File;
-  loadAndParseOptions?: LoadAndParseFileOptions;
-}): ManualUploadDataSourceMetadata {
-  return match(loadResult)
-    .with({ type: "csv" }, (csvLoadResult): ManualUploadDataSourceMetadata => {
-      const csvParseRequest =
-        loadAndParseOptions?.type === "csv_file"
-          ? loadAndParseOptions
-          : undefined;
-      return {
-        sourceType: "csv_file",
-        onlineStorageAllowed: true,
-        sizeInBytes: file.size,
-        datasetLoadResult: csvLoadResult,
-        parseOptions: {
-          type: "csv_file",
-          numRowsToSkip:
-            csvParseRequest?.numRowsToSkip ?? csvLoadResult.csvSniff.SkipRows,
-          delimiter:
-            csvParseRequest?.delimiter ?? csvLoadResult.csvSniff.Delimiter,
-        },
-      };
-    })
-    .with(
-      { type: "xlsx" },
-      (xlsxLoadResult): ManualUploadDataSourceMetadata => {
-        const xlsxRequest =
-          loadAndParseOptions?.type === "xlsx_file"
-            ? loadAndParseOptions
-            : undefined;
-        const defaultSheetName =
-          xlsxLoadResult.availableSheetNames.length === 1
-            ? xlsxLoadResult.availableSheetNames[0]
-            : xlsxLoadResult.sheet;
-        return {
-          sourceType: "xlsx_file",
-          onlineStorageAllowed: true,
-          sizeInBytes: file.size,
-          datasetLoadResult: xlsxLoadResult,
-          parseOptions: {
-            type: "xlsx_file",
-            sheetName: xlsxRequest?.sheetName ?? defaultSheetName,
-            hasHeader: xlsxRequest?.hasHeader ?? true,
-            numRowsToSkip: xlsxRequest?.numRowsToSkip ?? 0,
-            dateFormat: xlsxRequest?.dateFormat ?? null,
-            timestampFormat: xlsxRequest?.timestampFormat ?? null,
-          },
-        };
-      },
-    )
-    .with({ type: "pdf" }, (pdfLoadResult): ManualUploadDataSourceMetadata => {
-      const pdfRequest =
-        loadAndParseOptions?.type === "pdf_file"
-          ? loadAndParseOptions
-          : undefined;
-      return {
-        sourceType: "pdf_file",
-        // A PDF is retained in full, so the cloud-storage toggle is the
-        // user's only say over whether the document leaves the device.
-        // Default it on, like the other file sources.
-        onlineStorageAllowed: true,
-        sizeInBytes: file.size,
-        datasetLoadResult: pdfLoadResult,
-        parseOptions: {
-          type: "pdf_file",
-          // The load result's regions, not the request's: they are the same
-          // regions with the shape each one was actually read as written in.
-          // Taking the request's back would put the placeholder shape in front
-          // of the user again on every extraction.
-          regions: pdfLoadResult.regions,
-          pageRange: pdfRequest?.pageRange,
-          // The load result's mode, not the request's, for the same reason as
-          // the regions above: it is the mode the extraction really used, and
-          // on a first load the request has none for detection to lose to.
-          outputMode: pdfLoadResult.outputMode ?? pdfRequest?.outputMode,
-          isOutputModeUserChosen: pdfRequest?.isOutputModeUserChosen,
-          // Carried through re-parses so the model that contributed rows is
-          // still known at save time, whichever re-extraction wrote them.
-          llmModel: pdfRequest?.llmModel,
-        },
-      };
-    })
-    .exhaustive();
 }
 
 /**
@@ -296,7 +107,7 @@ export function useLoadManualUploadFile(): UseLoadManualUploadFileResult {
           const sniff = await LocalDatasetClient.startCsvImport({
             datasetId,
             workspaceId: workspace.id,
-            userId: user!.id as UserId,
+            userId: user!.id as User.Id,
             file,
             parseOptions: { numRowsToSkip, delimiter },
           });
@@ -328,7 +139,7 @@ export function useLoadManualUploadFile(): UseLoadManualUploadFileResult {
           const sniff = await LocalDatasetClient.startXlsxImport({
             datasetId,
             workspaceId: workspace.id,
-            userId: user!.id as UserId,
+            userId: user!.id as User.Id,
             file,
             parseOptions: {
               sheet: sheetName,
@@ -362,7 +173,7 @@ export function useLoadManualUploadFile(): UseLoadManualUploadFileResult {
           const sniff = await LocalDatasetClient.startPdfImport({
             datasetId,
             workspaceId: workspace.id,
-            userId: user!.id as UserId,
+            userId: user!.id as User.Id,
             file,
             parseOptions: { pageRange },
           });
@@ -425,7 +236,7 @@ export function useLoadManualUploadFile(): UseLoadManualUploadFileResult {
           const csvSniff = await LocalDatasetClient.transcodePdfExtraction({
             datasetId,
             workspaceId: workspace.id,
-            userId: user!.id as UserId,
+            userId: user!.id as User.Id,
             csvFile,
           });
 
@@ -457,7 +268,7 @@ export function useLoadManualUploadFile(): UseLoadManualUploadFileResult {
     onSuccess: (loadResult, inputParams) => {
       const file = inputParams.file;
       setDataSourceMetadata(
-        _buildDataSourceMetadataFromLoadResult({
+        buildDataSourceMetadataFromLoadResult({
           loadResult,
           file,
           loadAndParseOptions: inputParams,
@@ -488,3 +299,12 @@ export function useLoadManualUploadFile(): UseLoadManualUploadFileResult {
     },
   };
 }
+
+export type {
+  CsvFileLoadResult,
+  FileLoadResult,
+  LoadAndParseFileOptions,
+  ParseManualFileOptions,
+  PdfFileLoadResult,
+  XlsxFileLoadResult,
+} from "./useLoadManualUploadFile.types";

@@ -133,7 +133,10 @@ function _appendVertexFromClick(
   callbacks.setVertices(nextVertices);
 }
 
-/** Registers AOI drawing: rectangle drag, Shift-lasso, or vertex polygon. */
+/**
+ * Registers area-of-interest drawing gestures for useMapToolGestures.
+ * Returns a function that removes the registered gesture listeners.
+ */
 export function attachAoiGestures(
   map: MapLibreMap,
   callbacks: AoiGestureCallbacks,

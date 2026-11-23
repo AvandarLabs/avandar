@@ -1,6 +1,6 @@
-import type { ReactNode} from "react";
 import { useEffect } from "react";
 import { ChatPanelStateManager } from "../ChatPanelStateManager/ChatPanelStateManager";
+import type { ReactNode } from "react";
 
 export const CHAT_PANEL_LOCAL_STORAGE_KEY = "ava.chat.aside.isOpen" as const;
 

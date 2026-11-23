@@ -1,5 +1,4 @@
 import { DangerText } from "@avandar/ui";
-import type { UnknownDataFrame} from "@avandar/utils";
 import { prop } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Box, Flex } from "@mantine/core";
@@ -22,6 +21,7 @@ import { RadarChart } from "@/lib/ui/viz/RadarChart/RadarChart";
 import { ScatterChart } from "@/lib/ui/viz/ScatterChart/ScatterChart";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig.types";
+import type { UnknownDataFrame } from "@avandar/utils";
 
 type Props = {
   columns: readonly QueryResult.ColumnWithId[];

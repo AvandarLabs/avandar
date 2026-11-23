@@ -2,8 +2,8 @@ import { AtlasDialog } from "../../AtlasLayout/AtlasDialog/AtlasDialog";
 import { getHelperCategoryLabelFromId } from "../helperCategoryHelpers";
 import { HelperDetail } from "../HelperDetail/HelperDetail";
 import { HelperPreview } from "../HelperPreview/HelperPreview";
-import type { useHelperGallery } from "../useHelperGallery";
 import css from "./HelperPreviewDialog.module.css";
+import type { useHelperGallery } from "../useHelperGallery";
 import type { ReactNode } from "react";
 
 type Props = {

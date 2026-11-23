@@ -170,7 +170,10 @@ function _createConfiguredDexieCrudClient<
   });
 }
 
-/** Creates a client for a model that maps to a Dexie table. */
+/**
+ * Creates a CRUD client for a model backed by a Dexie table.
+ * Use it, for example, to provide model operations against a browser database.
+ */
 export function createDexieCrudClient<
   M extends DexieCrudModelSpec,
   ExtendedQueriesClient extends ClientReturningOnlyPromises = EmptyObject,

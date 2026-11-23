@@ -1,10 +1,10 @@
-import type { Get } from "type-fest";
 import { CURRENT_SCHEMA_VERSION } from "@/views/DashboardApp/AvaPage/migrations/config";
 import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";
 import type {
   AvaPageData,
   AvaPageGenericData,
 } from "@/views/DashboardApp/AvaPage/AvaPage.types";
+import type { Get } from "type-fest";
 
 type MigrationFunction<
   InputData extends AvaPageGenericData,
@@ -28,7 +28,10 @@ export type AvaPageDataMigration<
   downgrade: MigrationFunction<UpVersionData, DownVersionData>;
 };
 
-/** A version migrator for AvaPageData objects. */
+/**
+ * Contract for registering and applying AvaPageData version migrations.
+ * Used as the return type of `createAvaPageDataMigrator`.
+ */
 type IAvaPageDataMigrator = {
   /**
    * Registers a list of migrations.

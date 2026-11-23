@@ -1,11 +1,21 @@
-/** Returns exact prose lines, rejecting directives and structured markup. */
-export function getProseLines(comment) {
+/**
+ * Returns prose lines, or undefined for directives or unsupported markup.
+ * Use it, for example, when preparing a prose comment for a fixer.
+ */
+export function getProseLinesFromComment(comment) {
   const value = comment.value.replace(/^\*/, "");
-  if (value.startsWith("!") || /[\u2028\u2029]|\r(?!\n)/.test(value) ||
-    /^\s*(?:globals?|exported|jshint|jslint)\b|sourceURL/.test(value)) {
+  if (
+    value.startsWith("!") ||
+    /[\u2028\u2029]|\r(?!\n)/.test(value) ||
+    /^\s*(?:globals?|exported|jshint|jslint)\b|sourceURL/.test(value)
+  ) {
     return undefined;
   }
-  if (/@|eslint|istanbul|\bc8\b|prettier|webpack|vite|sourceMappingURL|#__/i.test(value)) {
+  if (
+    /@|eslint|istanbul|\bc8\b|prettier|webpack|vite|sourceMappingURL|#__/i.test(
+      value,
+    )
+  ) {
     return undefined;
   }
   const lines = value.split(/\r?\n/);
@@ -19,30 +29,46 @@ export function getProseLines(comment) {
     const match = /^\s*\*(?: ?)(.*)$/.exec(line);
     return match?.[1];
   });
-  return content.length && content.every((line) => {
-    return line !== undefined;
-  })
+  return content.length &&
+    content.every((line) => {
+      return line !== undefined;
+    })
     ? content
     : undefined;
 }
 
-/** Preserves formatted prose unless one complete documentation line fits. */
-export function getCollapsedJsdoc(comment, indent) {
-  const lines = getProseLines(comment);
-  if (!lines || lines.some((line) => {
-    return !line.trim() || line.endsWith("\\") ||
-      /\s$|^\s|^[-+*#>]|^\d+\.|```|<\/?(?:pre|code)\b/.test(line);
-  })) {
+/**
+ * Returns a one-line JSDoc replacement when prose fits, otherwise undefined.
+ * Use it, for example, when shortening a standalone documentation comment.
+ */
+export function buildCollapsedJsdocFromComment(comment, indent) {
+  const lines = getProseLinesFromComment(comment);
+  if (
+    !lines ||
+    lines.some((line) => {
+      return (
+        !line.trim() ||
+        line.endsWith("\\") ||
+        /\s$|^\s|^[-+*#>]|^\d+\.|```|<\/?(?:pre|code)\b/.test(line)
+      );
+    })
+  ) {
     return undefined;
   }
   const replacement = `/** ${lines.join(" ")} */`;
-  return (indent + replacement).replace(/\t/g, "  ").length <= 80
-    ? replacement : undefined;
+  return `${indent}${replacement}`.replace(/\t/g, "  ").length <= 80
+    ? replacement
+    : undefined;
 }
 
-/** Whole-line comments can become line comments without consuming code. */
-export function getStandaloneLayout(
-  sourceCode, node, hasTrailingComma = false,
+/**
+ * Returns indentation and newline style for a standalone node, or undefined.
+ * Use it, for example, when a fixer must preserve surrounding code.
+ */
+export function getStandaloneLayoutFromComment(
+  sourceCode,
+  node,
+  hasTrailingComma = false,
 ) {
   const text = sourceCode.text;
   const start = text.lastIndexOf("\n", node.range[0] - 1) + 1;
@@ -55,25 +81,41 @@ export function getStandaloneLayout(
     : undefined;
 }
 
-/** Finds the function body containing a comment, excluding parameter lists. */
-export function getContainingFunction(sourceCode, comment) {
+/**
+ * Returns the function whose body contains a comment, or undefined.
+ * Use it, for example, when checking comments inside function bodies.
+ */
+export function getContainingFunctionFromComment(sourceCode, comment) {
   let node = sourceCode.getNodeByRangeIndex(comment.range[0]);
   while (node) {
-    if (/^(FunctionDeclaration|FunctionExpression|ArrowFunctionExpression)$/.test(node.type)) {
+    if (
+      /^(FunctionDeclaration|FunctionExpression|ArrowFunctionExpression)$/.test(
+        node.type,
+      )
+    ) {
       return node.body.range[0] < comment.range[0] &&
-        comment.range[1] < node.body.range[1] ? node : undefined;
+        comment.range[1] < node.body.range[1]
+        ? node
+        : undefined;
     }
     node = node.parent;
   }
   return undefined;
 }
 
-/** Keeps declaration documentation attached to nested identifiers. */
+/**
+ * Reports whether a comment belongs to a declaration.
+ * Use it, for example, to preserve declaration documentation in a fixer.
+ */
 export function isDeclarationComment(sourceCode, comment) {
   const token = sourceCode.getTokenAfter(comment);
   let node = token && sourceCode.getNodeByRangeIndex(token.range[0]);
   while (node && node.range[0] === token.range[0]) {
-    if (/Declaration$|^(Property|MethodDefinition|PropertyDefinition|AccessorProperty|TSPropertySignature|TSMethodSignature|TSEnumMember|TSAbstractMethodDefinition|TSAbstractPropertyDefinition)$/.test(node.type)) {
+    if (
+      /Declaration$|^(Property|MethodDefinition|PropertyDefinition|AccessorProperty|TSPropertySignature|TSMethodSignature|TSEnumMember|TSAbstractMethodDefinition|TSAbstractPropertyDefinition)$/.test(
+        node.type,
+      )
+    ) {
       // Other comments do not remove a declaration's documentation ownership.
       return true;
     }

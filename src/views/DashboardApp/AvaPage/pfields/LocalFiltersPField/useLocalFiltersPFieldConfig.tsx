@@ -1,5 +1,4 @@
 import { useLingui } from "@lingui/react/macro";
-import type { CustomField } from "@puckeditor/core";
 import { useMemo } from "react";
 import { LocalFiltersPField } from "@/views/DashboardApp/AvaPage/pfields/LocalFiltersPField/LocalFiltersPField";
 import type { StructuredQueryAuth } from "@/clients/queries/runStructuredQuery/runStructuredQuery.types";
@@ -7,6 +6,7 @@ import type {
   LegacyLocalFilter,
   LocalFilter,
 } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
+import type { CustomField } from "@puckeditor/core";
 
 /**
  * React hook that returns the Puck `CustomField` config for the local-filters

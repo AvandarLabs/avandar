@@ -1,7 +1,10 @@
 import { ensureLocalStoragePersistence } from "@avandar/browser-utils";
 import { useEffect } from "react";
 
-/** On mount, requests persistent local storage in the background. */
+/**
+ * Requests persistent browser storage when the component mounts.
+ * Use it, for example, when a workspace relies on locally stored data.
+ */
 export function useEnsureLocalStoragePersistence(): void {
   useEffect(() => {
     ensureLocalStoragePersistence();

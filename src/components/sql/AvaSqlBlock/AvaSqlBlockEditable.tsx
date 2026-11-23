@@ -1,4 +1,3 @@
-import type { EditorView } from "@codemirror/view";
 import { clsx } from "clsx";
 import { useMemo, useRef, useState } from "react";
 import { computeSqlScope } from "@/components/sql/sql-helpers/computeSqlScope/computeSqlScope";
@@ -7,6 +6,7 @@ import css from "./AvaSqlBlock.module.css";
 import { PillEditPopover } from "./PillEditPopover/PillEditPopover";
 import type { SqlPillClickInfo } from "@/components/sql/sql-helpers/createSqlDisplayCodeMirrorExtension";
 import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
+import type { EditorView } from "@codemirror/view";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -25,7 +25,7 @@ export function AvaSqlBlockEditable({
   minRows,
   className,
   dataTestId,
-}: Props): ReactNode {
+}: Readonly<Props>): ReactNode {
   const editorViewRef = useRef<EditorView | null>(null);
   const [activePill, setActivePill] = useState<SqlPillClickInfo | null>(null);
 

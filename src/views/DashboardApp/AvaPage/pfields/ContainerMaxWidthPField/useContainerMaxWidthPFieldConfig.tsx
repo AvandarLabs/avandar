@@ -1,11 +1,8 @@
 import { useLingui } from "@lingui/react/macro";
-import type { CustomField } from "@puckeditor/core";
 import { useMemo } from "react";
-import type {
-  ContainerMaxWidthValue} from "@/views/DashboardApp/AvaPage/pfields/ContainerMaxWidthPField/ContainerMaxWidthPField";
-import {
-  ContainerMaxWidthPField
-} from "@/views/DashboardApp/AvaPage/pfields/ContainerMaxWidthPField/ContainerMaxWidthPField";
+import { ContainerMaxWidthPField } from "@/views/DashboardApp/AvaPage/pfields/ContainerMaxWidthPField/ContainerMaxWidthPField";
+import type { ContainerMaxWidthValue } from "@/views/DashboardApp/AvaPage/pfields/ContainerMaxWidthPField/ContainerMaxWidthPField";
+import type { CustomField } from "@puckeditor/core";
 
 /**
  * React hook that returns the Puck `CustomField` config for the container

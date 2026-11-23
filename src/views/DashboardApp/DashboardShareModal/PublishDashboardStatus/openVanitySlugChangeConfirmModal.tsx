@@ -2,7 +2,11 @@ import { t } from "@lingui/core/macro";
 import { Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 
-/** Warns that replacing a live vanity path retires the previous URL. */
+/**
+ * Opens a confirmation before replacing a dashboard's custom URL.
+ * Use it, for example, when an existing URL will become unreachable.
+ * Calls onConfirm when the user confirms.
+ */
 export function openVanitySlugChangeConfirmModal(
   options: Readonly<{ onConfirm: () => void }>,
 ): void {

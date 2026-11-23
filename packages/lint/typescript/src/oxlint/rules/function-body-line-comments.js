@@ -1,43 +1,59 @@
-import { createRuleMetadata } from "@avandar/lint/metadata";
+import { getRuleMetadataFromIdentity } from "@avandar/lint/metadata";
 import {
-  getContainingFunction,
-  getProseLines,
-  getStandaloneLayout,
+  getContainingFunctionFromComment,
+  getProseLinesFromComment,
+  getStandaloneLayoutFromComment,
   isDeclarationComment,
 } from "./commentSyntax.js";
 
-/** Converts standalone body prose while preserving declaration docs. */
+/**
+ * Reports standalone block prose in function bodies and fixes it as line
+ * comments.
+ * For example, use it when linting function bodies that contain prose comments.
+ */
 const rule = {
   meta: {
-    ...createRuleMetadata(
-      "AF-06",
-      "https://github.com/AvandarLabs/avandar/blob/develop/packages/lint/docs/rules/no-function-body-doc-comments.md",
-    ),
+    ...getRuleMetadataFromIdentity({
+      ruleId: "AF-06",
+      documentationPath:
+        "https://github.com/AvandarLabs/avandar/blob/develop/packages/lint/docs/rules/no-function-body-doc-comments.md",
+    }),
     type: "suggestion",
     fixable: "code",
     schema: [],
-    messages: { ordinary: "AF-06: Use ordinary line comments inside function bodies." },
+    messages: {
+      ordinary: "AF-06: Use ordinary line comments inside function bodies.",
+    },
   },
-  createOnce(context) {
+  createOnce: (context) => {
     return {
-      Program() {
+      Program: () => {
         const sourceCode = context.sourceCode;
         sourceCode.getAllComments().forEach((comment) => {
-          if (comment.type !== "Block" || !getContainingFunction(sourceCode, comment) ||
-            isDeclarationComment(sourceCode, comment)) {
+          if (
+            comment.type !== "Block" ||
+            !getContainingFunctionFromComment(sourceCode, comment) ||
+            isDeclarationComment(sourceCode, comment)
+          ) {
             return;
           }
-          const layout = getStandaloneLayout(sourceCode, comment);
-          const lines = getProseLines(comment);
+          const layout = getStandaloneLayoutFromComment(sourceCode, comment);
+          const lines = getProseLinesFromComment(comment);
           if (!layout || !lines) {
             return;
           }
-          const replacement = lines.map((line) => {
-            return line ? `// ${line}` : "//";
-          }).join(layout.newline + layout.indent);
-          context.report({ node: comment, messageId: "ordinary", fix(fixer) {
-            return fixer.replaceText(comment, replacement);
-          } });
+          const replacement = lines
+            .map((line) => {
+              return line ? `// ${line}` : "//";
+            })
+            .join(`${layout.newline}${layout.indent}`);
+          context.report({
+            node: comment,
+            messageId: "ordinary",
+            fix: (fixer) => {
+              return fixer.replaceText(comment, replacement);
+            },
+          });
         });
       },
     };

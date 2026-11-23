@@ -31,7 +31,10 @@ function _openBillingSetupModal(workspace: Workspace.WithSubscription): string {
   });
 }
 
-/** Hook to ensure that the workspace has a billing setup. */
+/**
+ * Prompts for a plan when the current workspace needs billing setup.
+ * Use it, for example, when checking workspace access outside checkout.
+ */
 export function useEnsureWorkspaceBilling(): void {
   const workspace = useCurrentWorkspace();
   const { subscription } = workspace;

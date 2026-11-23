@@ -1,9 +1,9 @@
-/** Shared map-tool harnesses for MapToolCluster tests. */
 import { useRef, useState } from "react";
 import { useMapToolGestures } from "@/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures";
-import type { createFakeMap } from "@/views/GisApp/shell/MapToolCluster/createFakeMap";
 import { MapToolCluster } from "@/views/GisApp/shell/MapToolCluster/MapToolCluster";
+/** Shared map-tool harnesses for MapToolCluster tests. */
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import type { createFakeMap } from "@/views/GisApp/shell/MapToolCluster/createFakeMap";
 import type { MapToolMode } from "@/views/GisApp/tools/MapToolMode.types";
 import type { ReactNode } from "react";
 

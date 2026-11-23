@@ -2,7 +2,11 @@ import { isPlainObject } from "@avandar/utils";
 import type { QueryAggregationTypeT } from "$/models/queries/QueryAggregationType/QueryAggregationType.types.ts";
 import type { QueryFilterOperator } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 
-/** Maps the AST's aggregation function name onto our QueryAggregationType. */
+/**
+ * Maps a SQL aggregation name to a query aggregation type, or undefined if
+ * unsupported.
+ * Use it, for example, when translating a parsed SQL projection.
+ */
 export function matchAggregation(
   name: string,
 ): QueryAggregationTypeT | undefined {
@@ -46,7 +50,11 @@ export function identifierToString(value: unknown): string | undefined {
   return undefined;
 }
 
-/** Extract a column name from an AST column-ref node. */
+/**
+ * Extracts a column name from a column-reference AST node, or returns
+ * undefined.
+ * Use it, for example, when translating a parsed SQL filter.
+ */
 export function columnRefName(node: unknown): string | undefined {
   if (node === null || typeof node !== "object") {
     return undefined;

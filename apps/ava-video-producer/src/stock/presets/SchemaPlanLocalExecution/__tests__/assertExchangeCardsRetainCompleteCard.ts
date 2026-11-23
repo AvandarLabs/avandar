@@ -1,11 +1,12 @@
 import assert from "node:assert/strict";
 import { assertExchangeCardsRetainCompleteRow as _assertExchangeCardsRetainCompleteRow } from "./assertExchangeCardsRetainCompleteRow";
-import type {
-  render,
-  _getCardBounds} from "./SchemaPlanLocalExecutionTestHelpers";
 import {
-  _getTextLineBounds,
   _assertSeparate,
+  _getTextLineBounds,
+} from "./SchemaPlanLocalExecutionTestHelpers";
+import type {
+  _getCardBounds,
+  render,
 } from "./SchemaPlanLocalExecutionTestHelpers";
 
 /**

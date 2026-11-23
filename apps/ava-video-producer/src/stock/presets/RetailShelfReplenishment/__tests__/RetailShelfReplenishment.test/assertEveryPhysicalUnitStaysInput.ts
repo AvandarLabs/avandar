@@ -1,5 +1,5 @@
-import type { fixtures } from "../../RetailShelfReplenishment.fixtures";
 import { assertEveryPhysicalUnitStaysFrame as _assertEveryPhysicalUnitStaysFrame } from "./assertEveryPhysicalUnitStaysFrame";
+import type { fixtures } from "../../RetailShelfReplenishment.fixtures";
 
 /**
  * Asserts every physical unit stays unique and handled units contact the

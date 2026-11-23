@@ -2,7 +2,6 @@ import { useLingui } from "@lingui/react/macro";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useRef } from "react";
 import { vizTypeLabel } from "$/copy/vizTypeLabel";
-import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import {
   AvaVizConfigs,
   VizTypes,
@@ -15,6 +14,7 @@ import { useLocalFiltersPFieldConfig } from "@/views/DashboardApp/AvaPage/pfield
 import { useNLQueryPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/NLQueryPField/useNLQueryPFieldConfig";
 import { useVizConfigPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/VizConfigPField/useVizConfigPFieldConfig";
 import { DashboardColumnBindingPreparation } from "../../utils/DashboardColumnBindingPreparation/DashboardColumnBindingPreparation";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { AvaPageConfig } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type { Props as DataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";

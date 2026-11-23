@@ -87,7 +87,11 @@ you probably forgot to escape it when running this command.
   }
 }
 
-/** Replaces template variables in a string */
+/**
+ * Replaces named variables in template content and returns the resulting
+ * string.
+ * Used by `processTemplate` to prepare route source.
+ */
 function replaceTemplateVariables(
   content: string,
   variables: Record<string, string>,
@@ -108,7 +112,10 @@ function _routePathToDefaultComponentName(routePath: string): string {
   return `${toPascalCase(cleanPart)}Page`;
 }
 
-/** Reads a template file and replaces variables */
+/**
+ * Returns route source populated from a template for the requested route path.
+ * Used by `createRouteFile` to prepare the file content.
+ */
 function processTemplate(templatePath: string, routePath: string): string {
   const templateContent = readFileSync(templatePath, "utf-8");
   return replaceTemplateVariables(templateContent, {
@@ -117,7 +124,11 @@ function processTemplate(templatePath: string, routePath: string): string {
   });
 }
 
-/** Gets the project root directory */
+/**
+ * Returns the project root directory path.
+ * Used by `createRouteDirectories`, `createRouteFile`, and `main` to locate
+ * project paths.
+ */
 function getProjectRoot(): string {
   return execSync("pnpm -s util:get-project-root", {
     encoding: "utf-8",
@@ -143,7 +154,10 @@ function createRouteDirectories(baseDir: string, routePath: string): string {
   return currentPath;
 }
 
-/** Creates a route file in the given directory */
+/**
+ * Creates a formatted route file unless it already exists.
+ * Used by `main` after preparing the route directory.
+ */
 async function createRouteFile(
   directory: string,
   fileName: string,

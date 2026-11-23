@@ -1,10 +1,7 @@
 import { useId } from "react";
-import type {
-  ObjectFlight} from "./getObjectFlight/getObjectFlight";
-import {
-  getObjectFlight,
-} from "./getObjectFlight/getObjectFlight";
+import { getObjectFlight } from "./getObjectFlight/getObjectFlight";
 import { MotionSettings } from "./MotionSettings/MotionSettings";
+import type { ObjectFlight } from "./getObjectFlight/getObjectFlight";
 import type { ReactNode } from "react";
 
 type Props = {

@@ -1,8 +1,8 @@
 import { prop } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
 import { uuid } from "$/lib/uuid";
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { makeMapSpecFromAnnotations } from "@/views/GisApp/layers/makeMapSpecFromAnnotations/makeMapSpecFromAnnotations";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 
 /**
  * `makeMapSpecFromAnnotations` turns persisted annotations into one MapLibre

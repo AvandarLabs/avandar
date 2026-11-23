@@ -1,18 +1,11 @@
-import type { Extension} from "@codemirror/state";
 import { RangeSetBuilder } from "@codemirror/state";
-import type {
-  DecorationSet,
-  EditorView,
-  ViewUpdate} from "@codemirror/view";
-import {
-  Decoration,
-  ViewPlugin,
-  WidgetType,
-} from "@codemirror/view";
+import { Decoration, ViewPlugin, WidgetType } from "@codemirror/view";
 import { buildSqlDisplaySegments } from "@/components/sql/sql-helpers/buildSqlDisplaySegments/buildSqlDisplaySegments";
 import { computeSqlScope } from "@/components/sql/sql-helpers/computeSqlScope/computeSqlScope";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
+import type { Extension } from "@codemirror/state";
+import type { DecorationSet, EditorView, ViewUpdate } from "@codemirror/view";
 
 export type SqlPillClickInfo =
   | {

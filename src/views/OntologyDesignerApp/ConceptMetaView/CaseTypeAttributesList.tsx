@@ -15,7 +15,10 @@ type Props = {
   datasets?: readonly Dataset.T[];
 };
 
-/** Readable attribute rows for a case type, instead of a raw object dump. */
+/**
+ * Renders a case type's attributes as readable rows, or an empty state.
+ * Use it, for example, to show attributes in a case type details view.
+ */
 export function CaseTypeAttributesList({
   attributes,
   datasets,

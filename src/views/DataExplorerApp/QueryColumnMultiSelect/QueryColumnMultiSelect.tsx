@@ -22,7 +22,10 @@ import type {
 } from "@mantine/core";
 import type { ReactNode } from "react";
 
-/** Maps combobox option values to items, including nested group items. */
+/**
+ * Maps parsed combobox option values to their items, including group items.
+ * Use it, for example, to retrieve options for matched column IDs in a filter.
+ */
 function _optionByValueFromParsed(
   options: ComboboxParsedItem[],
 ): Map<string, ComboboxItem> {

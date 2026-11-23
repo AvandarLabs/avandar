@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import {
   createDataset,
   createGridBinLayer,
   createQueryableLayer,
   createSpatialLayer,
 } from "@/views/GisApp/layers/useMapLayersData/useMapLayersData.fixtures";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 
 const { MapLayerData } =
   await import("@/views/GisApp/layers/useMapLayersData/MapLayerData");

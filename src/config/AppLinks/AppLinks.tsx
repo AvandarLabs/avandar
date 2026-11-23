@@ -1,6 +1,6 @@
 import { t } from "@lingui/core/macro";
-import type { Key } from "react";
 import type { LinkProps } from "@avandar/ui";
+import type { Key } from "react";
 
 /**
  * Configuration for a navigable link in the app.

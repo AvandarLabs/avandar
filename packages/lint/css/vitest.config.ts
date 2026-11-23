@@ -1,3 +1,6 @@
 import { defineConfig } from "vitest/config";
 
-export default defineConfig({ test: { environment: "node", passWithNoTests: true } });
+/** Runs package tests in the Node environment. */
+export default defineConfig({
+  test: { environment: "node", passWithNoTests: true },
+});

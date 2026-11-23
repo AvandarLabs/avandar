@@ -1,18 +1,14 @@
 import { Callout } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { Center } from "@mantine/core";
-import type {
-  ErrorComponentProps} from "@tanstack/react-router";
-import {
-  createFileRoute,
-  notFound,
-} from "@tanstack/react-router";
+import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { uuid } from "$/lib/uuid";
 import { ConceptClient } from "@/clients/ontology/ConceptClient";
 import { Logger } from "@/utils/Logger";
 import { ConceptMetaView } from "@/views/OntologyDesignerApp/ConceptMetaView";
 import type { Concept } from "$/models/ontology/Concept/Concept";
+import type { ErrorComponentProps } from "@tanstack/react-router";
 
 export const Route = createFileRoute(
   "/_auth/$workspaceSlug/ontology-designer/$conceptId",

@@ -60,14 +60,17 @@ export function toCamelCase<
   return `${first}${rest}` as CamelCase<T, PreserveUppercase>;
 }
 
-/** Splits `input` on runs of characters that are not alphanumeric. */
+/** Gives `toCamelCase` nonempty alphanumeric segments to convert. */
 function _splitIntoSegments(input: string): string[] {
   return input.split(/[^a-zA-Z0-9]+/g).filter((segment) => {
     return segment.length > 0;
   });
 }
 
-/** Inserts word boundaries for camelCase / PascalCase style strings. */
+/**
+ * Gives `_processFirstSegment` and `_processLaterSegment` words to case
+ * when converting their segments to camel case.
+ */
 function _splitIntoWords(input: string): string[] {
   const withSpaces: string = input
     .replace(/([a-z])([A-Z])/g, "$1 $2")

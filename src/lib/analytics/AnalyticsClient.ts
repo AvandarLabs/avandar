@@ -94,5 +94,8 @@ function createAnalyticsClient(): WithLogger<
   });
 }
 
-/** Client for recording product-usage analytics events. */
+/**
+ * Records product-usage analytics events from the client.
+ * Use it, for example, to record a dashboard export interaction.
+ */
 export const AnalyticsClient = createAnalyticsClient();

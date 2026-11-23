@@ -1,7 +1,7 @@
-import type { CursorMotionHelpers } from "../../../../../CursorMotionHelpers";
 import { useVideoTheme } from "../../../../../videoTheme/videoThemeHelpers";
 import { PointerDemosShared } from "../PointerDemosShared/PointerDemosShared";
 import css from "./ShutterInset.module.css";
+import type { CursorMotionHelpers } from "../../../../../CursorMotionHelpers";
 import type { ReactNode } from "react";
 
 type Props = {

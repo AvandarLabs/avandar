@@ -1,10 +1,9 @@
+import assert from "node:assert/strict";
+import { assertRecipientIndicatesPullsReleasesHand as _assertRecipientIndicatesPullsReleasesHand } from "./assertRecipientIndicatesPullsReleasesHand";
 import { RecipientConfirmedHandoverTestState } from "./RecipientConfirmedHandoverTestState";
+import type { fixtures } from "../RecipientConfirmedHandover.fixtures";
 
 const { render: _render } = RecipientConfirmedHandoverTestState;
-import assert from "node:assert/strict";
-import test from "node:test";
-import type { fixtures } from "../RecipientConfirmedHandover.fixtures";
-import { assertRecipientIndicatesPullsReleasesHand as _assertRecipientIndicatesPullsReleasesHand } from "./assertRecipientIndicatesPullsReleasesHand";
 
 /**
  * Asserts recipient indicates, pulls and releases each selected unit with a

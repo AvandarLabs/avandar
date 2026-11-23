@@ -1,13 +1,9 @@
 import { createServiceClient, withSupabaseClient } from "@avandar/clients";
 import { withLogger } from "@avandar/logger";
-import type { WithQueryHooks} from "@avandar/query-hooks";
 import { withQueryHooks } from "@avandar/query-hooks";
 import { camelCaseKeysShallow, makeObject, omit } from "@avandar/utils";
 import { z } from "zod";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
-import type { WorkspaceId } from "$/models/Workspace/Workspace.types";
-import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
-import type { Tables,Database } from "$/types/database.types";
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import type {
   RoleLevel,
@@ -19,8 +15,12 @@ import type {
   MembershipId,
   UserProfileId,
 } from "$/models/User/UserProfile.types";
+import type { Workspace } from "$/models/Workspace/Workspace";
+import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
+import type { Database, Tables } from "$/types/database.types";
 import type { ServiceClient, WithSupabaseClient } from "@avandar/clients";
 import type { ILogger, WithLogger } from "@avandar/logger";
+import type { WithQueryHooks } from "@avandar/query-hooks";
 
 export type ResourceType = Database["public"]["Enums"]["resource_type"];
 
@@ -31,10 +31,10 @@ type TUserClient = WithSupabaseClient<
         getProfile: ({
           workspaceId,
         }: {
-          workspaceId: WorkspaceId;
+          workspaceId: Workspace.Id;
         }) => Promise<UserProfile.T>;
         getUserAppRoles: (params: {
-          workspaceId: WorkspaceId;
+          workspaceId: Workspace.Id;
           userId: UserId | undefined;
         }) => Promise<UserAppRolesMatrix>;
         canAccessResource: (params: {
@@ -81,7 +81,7 @@ export const UserProfileDBReadToModelReadSchema: z.ZodType<
       profileId: obj.id as UserProfileId,
       membershipId: model.membershipId as MembershipId,
       userId: model.userId as UserId,
-      workspaceId: model.workspaceId as WorkspaceId,
+      workspaceId: model.workspaceId as Workspace.Id,
       createdAt: new Date(model.createdAt),
       updatedAt: new Date(model.updatedAt),
     };
@@ -106,7 +106,7 @@ function createUserClient(options?: TUserClientOptions): TUserClient {
         getProfile: async ({
           workspaceId,
         }: {
-          workspaceId: WorkspaceId;
+          workspaceId: Workspace.Id;
         }): Promise<UserProfile.T> => {
           const logger = baseLogger.appendName("getProfile");
           logger.log("Calling `getProfile` with params", {
@@ -148,7 +148,7 @@ function createUserClient(options?: TUserClientOptions): TUserClient {
           workspaceId,
           userId,
         }: {
-          workspaceId: WorkspaceId;
+          workspaceId: Workspace.Id;
           userId: UserId | undefined;
         }): Promise<UserAppRolesMatrix> => {
           const logger = baseLogger.appendName("getUserAppRoles");

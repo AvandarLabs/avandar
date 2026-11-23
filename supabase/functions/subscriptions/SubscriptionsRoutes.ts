@@ -18,7 +18,7 @@ import type {
   SubscriptionsAPI,
 } from "@sbfn/subscriptions/SubscriptionsRoutes.types.ts";
 
-/** This is the route handler for all billing-related endpoints. */
+/** Defines billing and subscription endpoints served by `MiniServer`. */
 export const SubscriptionsRoutes = defineRoutes<SubscriptionsAPI>(
   "subscriptions",
   {

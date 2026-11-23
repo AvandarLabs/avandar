@@ -11,7 +11,7 @@ import type { DuckDbSniffableDataType } from "@etl/NodeDuckDb/DuckDbSniffableDat
 
 type UnknownRow = Record<string, unknown>;
 
-/** Promisifies `Connection.all` for a single SQL statement. */
+/** Returns SQL result rows for `NodeDuckDb.runRawQuery`. */
 function _connectionAll(
   connection: duckdb.Connection,
   sql: string,
@@ -30,7 +30,11 @@ function _connectionAll(
   });
 }
 
-/** Promisifies `Connection.exec`. */
+/**
+ * Resolves after SQL execution for `NodeDuckDb.execSQL`,
+ * `NodeDuckDb.readCsvIntoView`, and
+ * `NodeDuckDb.exportTableOrViewAsZSTDParquetBlob`.
+ */
 function _connectionExec(
   connection: duckdb.Connection,
   sql: string,
@@ -46,7 +50,7 @@ function _connectionExec(
   });
 }
 
-/** Promisifies `Connection.close`. */
+/** Resolves after closing the connection for `NodeDuckDb.close`. */
 function _connectionClose(connection: duckdb.Connection): Promise<void> {
   return new Promise((resolve, reject) => {
     connection.close((err: duckdb.DuckDbError | null) => {
@@ -59,7 +63,7 @@ function _connectionClose(connection: duckdb.Connection): Promise<void> {
   });
 }
 
-/** Promisifies `Database.close`. */
+/** Resolves after closing the database for `NodeDuckDb.close`. */
 function _databaseClose(db: duckdb.Database): Promise<void> {
   return new Promise((resolve, reject) => {
     db.close((err: duckdb.DuckDbError | null) => {

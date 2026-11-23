@@ -117,7 +117,12 @@ export async function addShare(options: {
   ).toBeVisible({ timeout: MEDIUM_WAIT });
 }
 
-/** Toggles "Limit to app access" for a group share row (idempotent). */
+/**
+ * Sets the app-access limit for a group share to the requested state.
+ * Use it, for example, when a sharing test needs to enable or disable that
+ * limit.
+ * Resolves after the checkbox reflects the requested state.
+ */
 export async function toggleRequiresAppAccess(options: {
   page: Page;
   groupLabel: string;

@@ -1,12 +1,7 @@
 import { Callout } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { Center } from "@mantine/core";
-import type {
-  ErrorComponentProps} from "@tanstack/react-router";
-import {
-  createFileRoute,
-  notFound,
-} from "@tanstack/react-router";
+import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { appLabel } from "$/copy/appLabel";
 import { uuid } from "$/lib/uuid";
@@ -15,6 +10,7 @@ import { Logger } from "@/utils/Logger";
 import { RouteMiddleware } from "@/utils/RouteMiddleware";
 import { IndividualManagerApp } from "@/views/IndividualManagerApp";
 import type { Concept } from "$/models/ontology/Concept/Concept";
+import type { ErrorComponentProps } from "@tanstack/react-router";
 
 export const Route = createFileRoute(
   "/_auth/$workspaceSlug/individual-manager/$conceptId",

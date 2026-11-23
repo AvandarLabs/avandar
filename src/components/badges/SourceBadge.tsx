@@ -20,9 +20,11 @@ export function SourceBadge({
   sourceType?: DatasetSource.SourceType;
   sourceName?: string;
   size?: number;
-}): JSX.Element | null {
+}): JSX.Element | undefined {
   const { t } = useLingui();
-  if (!sourceType) {return null;}
+  if (!sourceType) {
+    return undefined;
+  }
 
   const { Icon, tooltip } = match(sourceType)
     .with("csv_file", () => {

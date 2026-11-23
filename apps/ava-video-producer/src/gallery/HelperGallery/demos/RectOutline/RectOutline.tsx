@@ -1,5 +1,5 @@
-import type { MotionRect } from "../../../../motion-components/getOverlayTimings";
 import css from "./RectOutline.module.css";
+import type { MotionRect } from "../../../../motion-components/getOverlayTimings";
 import type { ReactNode } from "react";
 
 /** Renders RectOutline for live helper catalog previews. */

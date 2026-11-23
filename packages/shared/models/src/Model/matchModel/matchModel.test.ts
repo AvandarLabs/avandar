@@ -1,6 +1,6 @@
 import { matchModel } from "@models/Model/matchModel/matchModel.ts";
-import type { Model } from "@models/Model/Model.ts";
 import { describe, expect, it } from "vitest";
+import type { Model } from "@models/Model/Model.ts";
 
 describe("matchModel", () => {
   type User = Model.Base<"User", { id: string; name: string }>;

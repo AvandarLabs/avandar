@@ -3,7 +3,11 @@ import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageCont
 import type { ChatViewSnapshot } from "@/components/ChatPanel/ChatViewEvent/ChatViewEvent";
 import type { ThreadMessageLike } from "@assistant-ui/react";
 
-/** Builds the coalesced thread list for a page snapshot. */
+/**
+ * Builds a thread with the page snapshot represented as a view-change message.
+ * Use it, for example, when starting a chat thread from the current page
+ * context.
+ */
 export function makeThreadMessagesFromSnapshot(
   options: Readonly<{
     messages: readonly ThreadMessageLike[];

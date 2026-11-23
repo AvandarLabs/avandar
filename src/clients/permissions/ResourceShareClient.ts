@@ -145,7 +145,10 @@ async function _insertShare(
   return _mapResourceShareRow(data);
 }
 
-/** CRUD for `resource_shares` and `is_restricted` on resources. */
+/**
+ * Creates the client for reading and managing resource shares and restrictions.
+ * Called by `ResourceShareClient` to provide its sharing operations.
+ */
 function createResourceShareClient(supabaseClient: AvaSupabaseDBClient) {
   const baseClient = createServiceClient("ResourceShareClient").mixin(
     withSupabaseClient(supabaseClient),

@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
-import type { fixtures } from "../SavedSeedSeasonReturn.fixtures";
 import { assertOpaqueMaterialBandsRemainBands as _assertOpaqueMaterialBandsRemainBands } from "./assertOpaqueMaterialBandsRemainBands";
 import { _render } from "./SavedSeedSeasonReturnTestHelpers";
+import type { fixtures } from "../SavedSeedSeasonReturn.fixtures";
 
 /**
  * Asserts opaque material bands remain disjoint and visible across

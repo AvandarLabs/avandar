@@ -6,11 +6,11 @@
   "type": "module",
   "exports": {
     "./catalog": "./src/catalog/index.ts",
-    "./metadata": "./src/shared/ruleMetadata.ts",
-    "./coverage": "./src/cli/coverage.ts"
+    "./metadata": "./src/shared/getRuleMetadataFromIdentity.ts",
+    "./coverage": "./src/cli/coverageHelpers.ts"
   },
   "bin": {
-    "avandar-lint": "./src/cli/main.ts"
+    "avandar-lint": "./src/cli/cliHelpers.ts"
   },
   "files": [
     "dist"

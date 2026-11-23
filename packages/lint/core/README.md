@@ -24,9 +24,12 @@ Callers must retain review detection until an integration proves coverage.
 
 Exports:
 
-- `@avandar/lint/catalog`: loader, validator, renderer, and catalog types.
-- `@avandar/lint/coverage`: exact-file engine probe and aggregation contracts.
-- `@avandar/lint/metadata`: canonical rule metadata for engine diagnostics.
+- `@avandar/lint/catalog`: `loadRuleCatalog`, `validateRuleCatalog`,
+  `buildMarkdownFromRuleCatalog`, and catalog types.
+- `@avandar/lint/coverage`: `collectCoverage`,
+  `createCoverageSummariesFromOutcomes`, and exact-file engine contracts.
+- `@avandar/lint/metadata`: `getRuleMetadataFromIdentity` creates canonical
+  rule metadata for engine diagnostics.
 
 The umbrella README and schema live one directory above this package. Build
 copies canonical data into the tarball so consumers need no repository files.

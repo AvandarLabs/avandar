@@ -1,5 +1,5 @@
-import type { renderToStaticMarkup } from "react-dom/server";
 import type { fixtures } from "../UtteranceToModelDraft.fixtures";
+import type { renderToStaticMarkup } from "react-dom/server";
 
 /** Inputs consumed by the corresponding rendered assertions. */
 

@@ -15,7 +15,11 @@ export const CSV_QUOTE_PROBE_CHUNK_SIZE = 65_536;
  */
 export const CSV_QUOTE_PROBE_OFFSET_FRACTIONS = [0, 0.25, 0.5, 0.75] as const;
 
-/** Resolves quote char from sniff metadata and optional UTF-8 probe chunks. */
+/**
+ * Resolves a CSV quote character from sniff metadata and probe text, or returns
+ * undefined if neither identifies one. Use it, for example, when checking CSV
+ * probe chunks after sniff metadata did not identify a quote character.
+ */
 export function inferQuoteCharFromSniffAndProbeTexts(options: {
   sniffQuoteToken: string | null | undefined;
   probeTexts: readonly string[];

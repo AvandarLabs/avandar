@@ -1,14 +1,14 @@
 import assert from "node:assert/strict";
+import { assertEachReaderKeepsItsAuthoredBook as _assertEachReaderKeepsItsAuthoredBook } from "./assertEachReaderKeepsItsAuthoredBook";
+import {
+  _bookPositions,
+  _render,
+} from "./SharedReadingCirclesTestHelpers/SharedReadingCirclesTestHelpers";
 import type {
   changedInput,
   denseInput,
   minimumInput,
 } from "../SharedReadingCircles.fixtures";
-import { assertEachReaderKeepsItsAuthoredBook as _assertEachReaderKeepsItsAuthoredBook } from "./assertEachReaderKeepsItsAuthoredBook";
-import {
-  _render,
-  _bookPositions,
-} from "./SharedReadingCirclesTestHelpers/SharedReadingCirclesTestHelpers";
 
 /**
  * Asserts four copies and nonuniform reader groups survive both shelf

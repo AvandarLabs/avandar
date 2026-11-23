@@ -6,7 +6,11 @@ import { template } from "@avandar/utils";
 
 const EDGE_TEMPLATES_DIR = "scripts/edge-functions/newEdgeFunction/templates";
 
-/** Converts a kebab-case or snake_case string to camelCase. */
+/**
+ * Converts a kebab-case or snake_case string to camelCase.
+ * Use it, for example, to derive a template variable name from an edge function
+ * name.
+ */
 export function toCamelCase(str: string): string {
   return str
     .split(/[-_]/)
@@ -19,7 +23,10 @@ export function toCamelCase(str: string): string {
     .join("");
 }
 
-/** Converts a kebab-case or snake_case string to PascalCase. */
+/**
+ * Converts a kebab-case or snake_case string to PascalCase.
+ * Use it, for example, to derive an API type name from an edge function name.
+ */
 export function toPascalCase(str: string): string {
   return str
     .split(/[-_]/)
@@ -29,7 +36,11 @@ export function toPascalCase(str: string): string {
     .join("");
 }
 
-/** Replaces template placeholders for edge function files. */
+/**
+ * Returns edge function template content with function-name placeholders
+ * filled.
+ * Use it, for example, to prepare scaffolded routes for a new named function.
+ */
 export function replaceTemplateVariables(
   content: string,
   functionName: string,
@@ -77,7 +88,11 @@ export function updateRootDenoWorkspace(options: {
   return true;
 }
 
-/** Adds the new function API type to `src/types/http-api.types.ts`. */
+/**
+ * Registers a new edge function API in the combined HTTP API type.
+ * Use it, for example, after scaffolding routes so typed HTTP callers can
+ * access them.
+ */
 export function updateHTTPAPITypes(options: {
   httpAPITypesPath: string;
   functionName: string;
@@ -119,7 +134,11 @@ type WriteTemplatesOptions = Readonly<{
   functionName: string;
 }>;
 
-/** Writes scaffolded edge function files from repo templates. */
+/**
+ * Creates edge function source and configuration files from repository
+ * templates.
+ * Use it, for example, to scaffold a new named function in a project.
+ */
 export function writeEdgeFunctionTemplateFiles(
   options: WriteTemplatesOptions,
 ): void {
@@ -194,7 +213,11 @@ type RunNewEdgeFunctionOptions = Readonly<{
   functionName: string;
 }>;
 
-/** True when `line` opens a new TOML table (e.g. `[functions.foo]`). */
+/**
+ * Reports whether a trimmed line has TOML table-header delimiters.
+ * Used by `setEdgeFunctionVerifyJWTInConfigTOML` to bound the target function
+ * section.
+ */
 function _isTOMLSectionHeaderLine(line: string): boolean {
   const trimmed = line.trim();
   return trimmed.startsWith("[") && trimmed.endsWith("]");

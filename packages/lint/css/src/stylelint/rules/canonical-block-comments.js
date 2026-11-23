@@ -95,7 +95,7 @@ function _getLineWidth(line) {
 }
 
 function _fitReplacement(replacement, indent) {
-  return (indent + replacement).split(/\r?\n/).every((line) => {
+  return `${indent}${replacement}`.split(/\r?\n/).every((line) => {
     return _getLineWidth(line) <= 80;
   })
     ? replacement
@@ -131,7 +131,7 @@ function _buildReplacement(comment) {
 }
 
 /** Formats only standalone, unambiguous ordinary CSS prose comment nodes. */
-const rule = (primary) => {
+function rule(primary) {
   return (root, result) => {
     if (
       !stylelint.utils.validateOptions(result, ruleName, {
@@ -162,7 +162,7 @@ const rule = (primary) => {
       });
     });
   };
-};
+}
 rule.ruleName = ruleName;
 rule.messages = messages;
 rule.meta = {
@@ -170,5 +170,9 @@ rule.meta = {
   fixable: true,
 };
 
-/** Stylelint integration for safe ordinary CSS comment marker normalization. */
+/**
+ * Provides a Stylelint rule for normalizing ordinary CSS prose comments.
+ * Use it, for example, to report and fix noncanonical standalone comment
+ * markers.
+ */
 export default stylelint.createPlugin(ruleName, rule);

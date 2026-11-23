@@ -1,6 +1,6 @@
-import type ts from "typescript";
 import { LiteralSourceHelpers } from "./LiteralSourceHelpers";
 import { type LiteralCountReporter } from "./ThemeLiteralCounter.types";
+import type ts from "typescript";
 
 const SVG_TEXT_TAGS = new Set(["text", "tspan"]);
 /**

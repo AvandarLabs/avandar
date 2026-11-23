@@ -95,10 +95,14 @@ export function setupApplicationMenu(
 
   ApplicationMenu.on("application-menu-clicked", (event: unknown) => {
     const action = (event as MenuClickedEvent).data?.action;
-    if (action === undefined) {return;}
+    if (action === undefined) {
+      return;
+    }
 
     const webview = window.webview;
-    if (webview === undefined) {return;}
+    if (webview === undefined) {
+      return;
+    }
 
     if (action === RELOAD_ACTION) {
       webview.executeJavascript("location.reload()");

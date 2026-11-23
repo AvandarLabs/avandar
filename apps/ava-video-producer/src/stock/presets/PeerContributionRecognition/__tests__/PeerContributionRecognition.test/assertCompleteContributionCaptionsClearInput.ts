@@ -1,8 +1,8 @@
+import { assertCompleteContributionCaptionsClearForm as _assertCompleteContributionCaptionsClearForm } from "./assertCompleteContributionCaptionsClearForm";
 import type {
   DEFAULT_INPUT,
   fixtures,
 } from "../../PeerContributionRecognition.fixtures";
-import { assertCompleteContributionCaptionsClearForm as _assertCompleteContributionCaptionsClearForm } from "./assertCompleteContributionCaptionsClearForm";
 
 /**
  * Asserts complete contribution captions clear both acknowledgment

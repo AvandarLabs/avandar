@@ -1,5 +1,5 @@
-import type { MotionRect } from "../getOverlayTimings";
 import { MotionSettings } from "../MotionSettings/MotionSettings";
+import type { MotionRect } from "../getOverlayTimings";
 import type {
   MotionOptions,
   MotionSettingsTheme,

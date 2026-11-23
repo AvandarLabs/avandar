@@ -12,7 +12,10 @@ type Props = {
   children: ReactNode;
 };
 
-/** One run of related facts under a small label. */
+/**
+ * Groups related facts in a description list, optionally under a heading.
+ * Use it, for example, to group related properties in a view rail.
+ */
 export function AppViewRailGroup({
   title,
   action,

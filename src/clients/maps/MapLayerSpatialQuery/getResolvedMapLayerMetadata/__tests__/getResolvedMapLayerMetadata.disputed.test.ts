@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import { uuid } from "$/lib/uuid";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { getResolvedMapLayerMetadata } from "../getResolvedMapLayerMetadata";
 import {
@@ -9,6 +8,7 @@ import {
   createGridBinLayer,
   createResolvedFixture,
 } from "./getResolvedMapLayerMetadata.fixtures";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 
 describe("getResolvedMapLayerMetadata disputed-status column", () => {

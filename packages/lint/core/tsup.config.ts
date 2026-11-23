@@ -1,12 +1,13 @@
-import { defineConfig } from "tsup";
 import { copyFileSync } from "node:fs";
+import { defineConfig } from "tsup";
 
-export default defineConfig({
+/** Builds the publishable package entrypoints and declarations. */
+export const tsup = defineConfig({
   entry: {
     catalog: "src/catalog/index.ts",
-    coverage: "src/cli/coverage.ts",
-    main: "src/cli/main.ts",
-    metadata: "src/shared/ruleMetadata.ts",
+    coverage: "src/cli/coverageHelpers.ts",
+    main: "src/cli/cliHelpers.ts",
+    metadata: "src/shared/getRuleMetadataFromIdentity.ts",
   },
   tsconfig: "tsconfig.build.json",
   format: ["esm"],

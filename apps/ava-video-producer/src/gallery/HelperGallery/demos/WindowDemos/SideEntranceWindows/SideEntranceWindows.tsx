@@ -1,9 +1,9 @@
-import type { useWindowStage } from "../../../../../scenes/TiltedWindowScene/useWindowStage";
-import type { WindowMotion } from "../../../../../scenes/TiltedWindowScene/WindowMotion/WindowMotion";
 import { PAIR_BOXES } from "../../../../../scenes/TiltedWindowScene/windowTilt";
 import { DemoCanvas } from "../../parts/DemoCanvas/DemoCanvas";
 import { getCanvasRect } from "../../parts/getCanvasRect";
 import { TiltedDemoWindow } from "../../parts/TiltedDemoWindow/TiltedDemoWindow";
+import type { useWindowStage } from "../../../../../scenes/TiltedWindowScene/useWindowStage";
+import type { WindowMotion } from "../../../../../scenes/TiltedWindowScene/WindowMotion/WindowMotion";
 import type { ReactNode } from "react";
 
 const PAIR = PAIR_BOXES.map((box) => {

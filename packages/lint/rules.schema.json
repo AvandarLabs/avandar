@@ -2,11 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
   "additionalProperties": false,
-  "required": [
-    "version",
-    "languages",
-    "rules"
-  ],
+  "required": ["version", "languages", "rules"],
   "properties": {
     "version": {
       "const": 1
@@ -66,12 +62,7 @@
             "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
           },
           "class": {
-            "enum": [
-              "AF",
-              "GD",
-              "RP",
-              "JR"
-            ]
+            "enum": ["AF", "GD", "RP", "JR"]
           },
           "title": {
             "type": "string",
@@ -109,30 +100,17 @@
             }
           },
           "repair": {
-            "enum": [
-              "safe",
-              "guided",
-              "evidence",
-              "judgment"
-            ]
+            "enum": ["safe", "guided", "evidence", "judgment"]
           },
           "phases": {
             "type": "array",
             "uniqueItems": true,
             "items": {
-              "enum": [
-                3,
-                4,
-                5,
-                6
-              ]
+              "enum": [3, 4, 5, 6]
             }
           },
           "owner": {
-            "enum": [
-              "lint",
-              "avandar-code-review"
-            ]
+            "enum": ["lint", "avandar-code-review"]
           },
           "boundary": {
             "type": "string",

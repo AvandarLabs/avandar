@@ -1,13 +1,13 @@
+import assert from "node:assert/strict";
+import { assertVisibleTransferAccountingWaitsFrame as _assertVisibleTransferAccountingWaitsFrame } from "./assertVisibleTransferAccountingWaitsFrame";
 import { PredicatePushdownBoundaryTestState } from "./PredicatePushdownBoundaryTestState";
+import type { DEFAULT_INPUT } from "../../PredicatePushdownBoundary.fixtures";
 
 const {
   render,
   marks: _marks,
   accounting: _accounting,
 } = PredicatePushdownBoundaryTestState;
-import assert from "node:assert/strict";
-import type { DEFAULT_INPUT } from "../../PredicatePushdownBoundary.fixtures";
-import { assertVisibleTransferAccountingWaitsFrame as _assertVisibleTransferAccountingWaitsFrame } from "./assertVisibleTransferAccountingWaitsFrame";
 
 /**
  * Asserts visible transfer accounting waits for arrival and distinguishes

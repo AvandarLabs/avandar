@@ -1,5 +1,3 @@
-/** Token and heuristic scoring helpers for offline dataset name resolution. */
-
 function _tokenize(text: string): string[] {
   return text
     .toLowerCase()

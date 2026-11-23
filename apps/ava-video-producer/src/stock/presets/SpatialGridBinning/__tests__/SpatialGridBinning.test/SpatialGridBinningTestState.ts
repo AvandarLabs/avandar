@@ -1,9 +1,9 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import type { getSvgAttributeMatchesFromMarkup } from "../../../../../../tests/helpers/getSvgAttributeMatchesFromMarkup/getSvgAttributeMatchesFromMarkup";
 import { SpatialGridBinning } from "../../SpatialGridBinning";
 import { DEFAULT_INPUT } from "../../SpatialGridBinning.fixtures";
 import { type Input } from "../../SpatialGridBinning.schema";
+import type { getSvgAttributeMatchesFromMarkup } from "../../../../../../tests/helpers/getSvgAttributeMatchesFromMarkup/getSvgAttributeMatchesFromMarkup";
 
 /** Inputs consumed by the corresponding rendered assertions. */
 

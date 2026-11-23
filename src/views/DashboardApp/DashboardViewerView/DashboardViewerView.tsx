@@ -1,8 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { useEffect, useMemo } from "react";
 import { notifyError } from "@/utils/notifications/notify";
-import "@puckeditor/core/puck.css";
-import type { AvaPageGenericData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import { getVersionFromAvaPageData } from "@/views/DashboardApp/AvaPage/migrations/getVersionFromAvaPageData";
 import { getAvaPageMetadataFromDashboard } from "@/views/DashboardApp/AvaPage/utils/getAvaPageMetadataFromDashboard/getAvaPageMetadataFromDashboard";
 import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
@@ -10,6 +8,8 @@ import { useDashboardPuckConfig } from "@/views/DashboardApp/DashboardEditorView
 import { DashboardViewerContent } from "@/views/DashboardApp/DashboardViewerView/DashboardViewerContent";
 import { useEnsurePublishedDashboardDatasets } from "@/views/DashboardApp/DashboardViewerView/useEnsurePublishedDashboardDatasets/useEnsurePublishedDashboardDatasets";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import "@puckeditor/core/puck.css";
+import type { AvaPageGenericData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type { ReactNode } from "react";
 
 type Props = {

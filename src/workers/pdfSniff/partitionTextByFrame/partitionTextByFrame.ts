@@ -95,7 +95,11 @@ function _promoteGroupLabels(partition: TextPartition): TextPartition {
   return { ...partition, xGroupLabels, other };
 }
 
-/** Assigns each visible text item a role relative to `frame`. */
+/**
+ * Groups visible region text by its role relative to a plot frame.
+ * Use the partition, for example, to distinguish chart data labels from axis
+ * text.
+ */
 export function partitionTextByFrame(
   region: RegionGeometry,
   frame: PlotFrame,

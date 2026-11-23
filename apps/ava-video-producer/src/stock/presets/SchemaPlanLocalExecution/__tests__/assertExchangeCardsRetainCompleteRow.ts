@@ -1,9 +1,6 @@
 import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
-import type {
-  _getCardBounds} from "./SchemaPlanLocalExecutionTestHelpers";
-import {
-  _assertSeparate,
-} from "./SchemaPlanLocalExecutionTestHelpers";
+import { _assertSeparate } from "./SchemaPlanLocalExecutionTestHelpers";
+import type { _getCardBounds } from "./SchemaPlanLocalExecutionTestHelpers";
 
 /**
  * Asserts exchange cards retain complete wrapped text and avoid other cards,

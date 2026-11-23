@@ -16,7 +16,11 @@ type AssignResult = {
   insertedCustomRoleGroupId: string | null;
 };
 
-/** Points the secondary E2E user's membership at a built-in role group. */
+/**
+ * Assigns the secondary E2E member a built-in role group and returns IDs for
+ * cleanup.
+ * Use it, for example, when testing access with a global viewer role.
+ */
 export async function assignE2ESecondaryMemberBuiltinRoleGroup(options: {
   supabaseAdminClient: AvaSupabaseDBClient;
   workspaceId: string;
@@ -48,7 +52,11 @@ export async function assignE2ESecondaryMemberBuiltinRoleGroup(options: {
   return { previousRoleGroupId, insertedCustomRoleGroupId: null };
 }
 
-/** Assigns a custom per-app matrix by inserting a disposable role group. */
+/**
+ * Assigns the secondary E2E member a custom role matrix and returns IDs for
+ * cleanup.
+ * Use it, for example, when testing access for one app role.
+ */
 export async function assignE2ESecondaryMemberCustomMatrix(options: {
   supabaseAdminClient: AvaSupabaseDBClient;
   workspaceId: string;
@@ -107,7 +115,10 @@ export async function assignE2ESecondaryMemberCustomMatrix(options: {
   };
 }
 
-/** Restores membership role group and deletes a disposable custom group. */
+/**
+ * Restores a non-null previous role group and deletes a supplied custom group.
+ * Use it, for example, to clean up a temporary E2E permission assignment.
+ */
 export async function restoreE2ESecondaryMemberRoleGroup(options: {
   supabaseAdminClient: AvaSupabaseDBClient;
   workspaceId: string;
@@ -186,7 +197,10 @@ export function createRolesMatrixWithoutApp(app: AppType): UserAppRolesMatrix {
   };
 }
 
-/** Single-app viewer matrix for positive route-guard cases. */
+/**
+ * Returns a matrix granting viewer access only to the selected app.
+ * Use it, for example, to test a route with viewer permissions.
+ */
 export function createSingleAppViewerRolesMatrix(
   app: AppType,
 ): UserAppRolesMatrix {
@@ -201,7 +215,11 @@ export function createSingleAppViewerRolesMatrix(
   };
 }
 
-/** Single-app editor matrix (settings has no editor tier in catalog). */
+/**
+ * Returns a matrix granting editor access only to the selected app, except
+ * settings.
+ * Use it, for example, to test a route with editor permissions.
+ */
 export function createSingleAppEditorRolesMatrix(
   app: AppType,
 ): UserAppRolesMatrix {
@@ -217,7 +235,10 @@ export function createSingleAppEditorRolesMatrix(
   };
 }
 
-/** Single-app admin matrix (only meaningful for settings in catalog). */
+/**
+ * Returns a matrix granting admin access only to the selected app.
+ * Use it, for example, to test a settings route with admin permissions.
+ */
 export function createSingleAppAdminRolesMatrix(
   app: AppType,
 ): UserAppRolesMatrix {

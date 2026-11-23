@@ -2,7 +2,6 @@ import { prop } from "@avandar/utils";
 import { useLingui } from "@lingui/react/macro";
 import { Modal } from "@mantine/core";
 import { useRef, useState } from "react";
-import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { AddMapToDashboardModal } from "@/views/GisApp/export/AddMapToDashboardModal/AddMapToDashboardModal";
 import { ExportSheet } from "@/views/GisApp/export/ExportSheet/ExportSheet";
@@ -24,6 +23,7 @@ import { MapTimeSlider } from "@/views/GisApp/shell/MapTimeSlider/MapTimeSlider"
 import { useBasemapAttribution } from "@/views/GisApp/useBasemapAttribution";
 import { useGisAppLayerActions } from "@/views/GisApp/useGisAppLayerActions";
 import type { AvaMap } from "$/models/AvaMap/AvaMap";
+import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import type { GisAppState } from "@/views/GisApp/useGisApp/useGisApp";
 import type { ReactNode } from "react";
 

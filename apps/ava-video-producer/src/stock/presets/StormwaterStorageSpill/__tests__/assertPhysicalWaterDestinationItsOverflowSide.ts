@@ -1,6 +1,6 @@
+import { assertPhysicalWaterDestinationItsShowBalance as _assertPhysicalWaterDestinationItsShowBalance } from "./assertPhysicalWaterDestinationItsShowBalance";
 import type { fixtures } from "../StormwaterStorageSpill.fixtures";
 import type { REVIEW_FIXTURES } from "../StormwaterStorageSpill.reviewFixtures";
-import { assertPhysicalWaterDestinationItsShowBalance as _assertPhysicalWaterDestinationItsShowBalance } from "./assertPhysicalWaterDestinationItsShowBalance";
 
 /**
  * Asserts each physical water destination and its caption share a visible

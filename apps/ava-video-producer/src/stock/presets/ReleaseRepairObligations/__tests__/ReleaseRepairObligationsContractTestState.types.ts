@@ -1,5 +1,5 @@
-import type { fixtures } from "../ReleaseRepairObligations.fixtures";
 import { type Input } from "../ReleaseRepairObligations.schema";
+import type { fixtures } from "../ReleaseRepairObligations.fixtures";
 import type { render } from "./ReleaseRepairObligationsTestHelpers";
 
 /** Inputs consumed by the corresponding rendered assertions. */

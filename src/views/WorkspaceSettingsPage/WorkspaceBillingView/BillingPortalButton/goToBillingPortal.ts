@@ -1,11 +1,11 @@
 import { getCurrentUrl, navigateToExternalUrl } from "@avandar/browser-utils";
 import { i18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
-import type { UserId } from "$/models/User/User.types";
 import { APIClient } from "@/clients/APIClient";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { notifyError } from "@/utils/notifications/notify";
+import type { User } from "$/models/User/User";
 
 /**
  * Opens the Polar customer portal for a user, redirecting the browser. Shows
@@ -14,7 +14,7 @@ import { notifyError } from "@/utils/notifications/notify";
 export async function goToBillingPortal({
   userId,
 }: {
-  userId: UserId;
+  userId: User.Id;
 }): Promise<void> {
   try {
     const customerPortalResponse = await APIClient.get({

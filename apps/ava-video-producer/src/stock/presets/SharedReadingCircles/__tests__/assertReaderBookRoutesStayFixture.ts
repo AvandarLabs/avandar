@@ -1,11 +1,10 @@
 import assert from "node:assert/strict";
-import type {
-  _createRouteInputs} from "./SharedReadingCirclesTestHelpers/SharedReadingCirclesTestHelpers";
 import {
-  _render,
   _bookPositions,
-  _getReaderPosition
+  _getReaderPosition,
+  _render,
 } from "./SharedReadingCirclesTestHelpers/SharedReadingCirclesTestHelpers";
+import type { _createRouteInputs } from "./SharedReadingCirclesTestHelpers/SharedReadingCirclesTestHelpers";
 
 /**
  * Asserts reader and book routes stay continuous across fractional phase

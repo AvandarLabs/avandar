@@ -1,7 +1,6 @@
 import { Trans, useLingui } from "@lingui/react/macro";
 import { Group, Skeleton, Stack, Text } from "@mantine/core";
 import { clsx } from "clsx";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import css from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody.module.css";
@@ -10,6 +9,7 @@ import { NumberColumnSummary } from "@/views/DataManagerApp/DatasetMetaView/Data
 import { TextColumnSummary } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/columnVisuals/TextColumnSummary";
 import { formatColumnShare } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/formatColumnShare";
 import { SummaryTag } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/SummaryTag";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { ColumnSummary } from "@/clients/datasets/DatasetQueryClient";
 import type { ReactNode } from "react";
 

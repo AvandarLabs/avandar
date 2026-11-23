@@ -166,8 +166,11 @@ test("existing project and symlink claims never overwrite or remove existing con
           path.join(target, "storyboard.json"),
           "existing owner",
         );
-        if (isSymlink) {await fs.symlink(target, fixture.project);}
-        else {await fs.cp(target, fixture.project, { recursive: true });}
+        if (isSymlink) {
+          await fs.symlink(target, fixture.project);
+        } else {
+          await fs.cp(target, fixture.project, { recursive: true });
+        }
         _assertFailed(_runProject(fixture));
         assert.equal(
           await fs.readFile(

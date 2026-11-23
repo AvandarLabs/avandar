@@ -1,6 +1,5 @@
 import { isDefined } from "@avandar/utils";
 import { Trans } from "@lingui/react/macro";
-import type { BoxProps} from "@mantine/core";
 import { Box, Stack, Text } from "@mantine/core";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
@@ -13,6 +12,7 @@ import { UploadedFileBar } from "@/views/DataManagerApp/DataImportView/ManualUpl
 import { useFileUrlImport } from "@/views/DataManagerApp/DataImportView/ManualUploadView/useFileUrlImport/useFileUrlImport";
 import { useManualUploadParse } from "@/views/DataManagerApp/DataImportView/ManualUploadView/useManualUploadParse/useManualUploadParse";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { BoxProps } from "@mantine/core";
 import type { ReactNode } from "react";
 
 type Props = BoxProps & {

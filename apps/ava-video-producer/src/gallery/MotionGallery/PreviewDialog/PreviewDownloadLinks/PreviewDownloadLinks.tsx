@@ -1,8 +1,8 @@
 import { getReferenceUrlFromPreset } from "../../getReferenceUrlFromPreset";
 import { Icon } from "../../Icon";
-import type { usePreviewDownload } from "../usePreviewDownload";
 import css from "./PreviewDownloadLinks.module.css";
 import type { Props as PreviewProps } from "../PreviewDialogContent/PreviewDialogContent";
+import type { usePreviewDownload } from "../usePreviewDownload";
 import type { ReactNode } from "react";
 
 type Props = Pick<PreviewProps, "preset" | "onCopy" | "contentState"> &

@@ -1,4 +1,8 @@
-/** Replaces FROM/JOIN table identifiers that are not workspace dataset ids. */
+/**
+ * Rewrites disallowed FROM and JOIN table references to the target dataset ID.
+ * Returns the SQL and whether a reference changed.
+ * Use it, for example, to repair generated SQL that names an invented table.
+ */
 export function forceFromTableToDatasetId(args: {
   sql: string;
   datasetTableId: string;

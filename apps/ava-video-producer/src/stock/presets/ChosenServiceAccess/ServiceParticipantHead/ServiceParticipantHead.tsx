@@ -1,6 +1,6 @@
 import { SketchedShape } from "../../../primitives/SketchedShape";
-import type { AccessParticipantGetServiceParticipantPoseValue } from "../AccessParticipant";
 import type { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import type { AccessParticipantGetServiceParticipantPoseValue } from "../AccessParticipant";
 import type { ReactNode } from "react";
 
 type Props = {

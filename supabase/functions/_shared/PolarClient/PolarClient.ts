@@ -1,8 +1,8 @@
 import { getPolarAccessToken } from "@sbfn/_shared/PolarClient/getPolarAccessToken.ts";
 import { getPolarServerType } from "@sbfn/_shared/PolarClient/getPolarServerType.ts";
 import { Polar } from "npm:@polar-sh/sdk@0.41.5";
-import type { CustomerSession } from "npm:@polar-sh/sdk@0.41.5/models/components/customersession.js";
 import type { Checkout } from "npm:@polar-sh/sdk@0.41.5/models/components/checkout.js";
+import type { CustomerSession } from "npm:@polar-sh/sdk@0.41.5/models/components/customersession.js";
 import type { Product } from "npm:@polar-sh/sdk@0.41.5/models/components/product.js";
 import type { Subscription } from "npm:@polar-sh/sdk@0.41.5/models/components/subscription.js";
 

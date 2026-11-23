@@ -13,23 +13,21 @@ import {
 } from "@mantine/core";
 import { IconArrowLeft, IconArrowRight } from "@tabler/icons-react";
 import { useCallback, useMemo, useState } from "react";
-import type { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnPickerList } from "@/components/DatasetColumnPickerList";
 import { useMap } from "@/lib/hooks/state/useMap";
 import { removeItemWhere } from "@/lib/utils/arrays/removeItemWhere/removeItemWhere";
-import type {
-  ConceptFormType,
-  ConceptFormValues} from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
-import {
-  makeDefaultDatasetColumnAttribute,
-} from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
+import { makeDefaultDatasetColumnAttribute } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
 import { DatasetColumnMappingCreator } from "@/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator";
 import { IdentifierBlock } from "@/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index";
 import type { DatasetWithColumns } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { ConceptId } from "$/models/ontology/Concept/Concept.types";
 import type { ConceptAttributeId } from "$/models/ontology/ConceptAttribute/ConceptAttribute.types";
+import type {
+  ConceptFormType,
+  ConceptFormValues,
+} from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
 
 type Props = {
   conceptForm: ConceptFormType;
@@ -40,7 +38,7 @@ type Props = {
 /** The ids of the columns picked as the ID of their dataset. */
 function _getIdentifierColumnIds(
   sourceDatasets: ConceptFormValues["sourceDatasets"],
-): ReadonlySet<DatasetColumnId> {
+): ReadonlySet<DatasetColumn.Id> {
   return new Set(
     sourceDatasets.map(prop("primaryKeyColumnId")).filter(isDefined),
   );
@@ -81,7 +79,7 @@ export function DatasetColumnAttributesBlock({
 }: Props): JSX.Element {
   const { t } = useLingui();
   const [selectedDatasetColumnId, setSelectedDatasetColumnId] = useState<
-    DatasetColumnId | undefined
+    DatasetColumn.Id | undefined
   >();
   const [selectedAttributeId, setSelectedAttributeId] = useState<
     ConceptAttributeId | undefined

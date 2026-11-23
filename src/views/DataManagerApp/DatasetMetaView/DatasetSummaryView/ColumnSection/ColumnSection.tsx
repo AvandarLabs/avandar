@@ -2,12 +2,12 @@ import { useLingui } from "@lingui/react/macro";
 import { Group, Skeleton, Stack, Text } from "@mantine/core";
 import { useIntersection } from "@mantine/hooks";
 import { useContext, useEffect, useState } from "react";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { ActiveColumnContext } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ActiveColumnContext";
 import css from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSection/ColumnSection.module.css";
 import { ColumnSummaryBody } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody";
 import { buildFullDataTypeLabel } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels";
 import { makeColumnSectionIdFromColumnName } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/makeColumnSectionIdFromColumnName";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { ReactNode } from "react";
 
 /** How far ahead of the viewport a section's summary query is started. */

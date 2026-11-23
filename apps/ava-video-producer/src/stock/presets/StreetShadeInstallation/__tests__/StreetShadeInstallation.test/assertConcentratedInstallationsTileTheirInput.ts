@@ -1,10 +1,10 @@
-import { StreetShadeInstallationTestState } from "./StreetShadeInstallationTestState";
-
-const { render: _render } = StreetShadeInstallationTestState;
 import assert from "node:assert/strict";
 import { SvgAttributes } from "../../../../../../tests/helpers/SvgAttributes";
-import type { fixtures } from "../../StreetShadeInstallation.fixtures";
 import { assertConcentratedInstallationsTileTheirFrame as _assertConcentratedInstallationsTileTheirFrame } from "./assertConcentratedInstallationsTileTheirFrame";
+import { StreetShadeInstallationTestState } from "./StreetShadeInstallationTestState";
+import type { fixtures } from "../../StreetShadeInstallation.fixtures";
+
+const { render: _render } = StreetShadeInstallationTestState;
 
 /**
  * Asserts concentrated installations tile their actual zone without covering

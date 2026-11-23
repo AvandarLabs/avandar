@@ -1,9 +1,9 @@
 import { StockRect } from "../../../primitives/StockRect";
 import { GraphicThemeHooks } from "../../../theme/GraphicThemeHooks/GraphicThemeHooks";
-import type { getMaterialItemsFromInput } from "../getMaterialItemsFromInput";
 import { ROUTE_CATEGORY_KEYS } from "../routeColors";
 import { SceneLabel } from "../SceneLabel";
 import { MaterialPartsShared } from "./MaterialPartsShared";
+import type { getMaterialItemsFromInput } from "../getMaterialItemsFromInput";
 import type { ReactNode } from "react";
 
 type Props = {

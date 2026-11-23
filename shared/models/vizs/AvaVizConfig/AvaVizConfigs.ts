@@ -8,17 +8,17 @@ import { AvaPieChartVizConfigs } from "$/models/vizs/AvaPieChartVizConfig/AvaPie
 import { AvaRadarChartVizConfigs } from "$/models/vizs/AvaRadarChartVizConfig/AvaRadarChartVizConfigs.ts";
 import { AvaScatterPlotVizConfigs } from "$/models/vizs/AvaScatterPlotVizConfig/AvaScatterPlotVizConfigs.ts";
 import { AvaTableVizConfigs } from "$/models/vizs/AvaTableVizConfig/AvaTableVizConfigs.ts";
+import { makeAvaVizConfigFromUiVizConfig } from "$/models/vizs/AvaVizConfig/makeAvaVizConfigFromUiVizConfig/makeAvaVizConfigFromUiVizConfig.ts";
+import { makeUiVizConfigFromAvaVizConfig } from "$/models/vizs/AvaVizConfig/makeUiVizConfigFromAvaVizConfig/makeUiVizConfigFromAvaVizConfig.ts";
+import { remapProvisionalColumnIdsInAvaVizConfig } from "$/models/vizs/AvaVizConfig/remapProvisionalColumnIdsInAvaVizConfig/remapProvisionalColumnIdsInAvaVizConfig.ts";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
+import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type {
   AvaVizConfig,
   AvaVizConfigType,
   AvaVizConfigUtilRegistry,
   VizType,
 } from "$/models/vizs/AvaVizConfig/AvaVizConfig.types.ts";
-import { makeAvaVizConfigFromUiVizConfig } from "$/models/vizs/AvaVizConfig/makeAvaVizConfigFromUiVizConfig/makeAvaVizConfigFromUiVizConfig.ts";
-import { makeUiVizConfigFromAvaVizConfig } from "$/models/vizs/AvaVizConfig/makeUiVizConfigFromAvaVizConfig/makeUiVizConfigFromAvaVizConfig.ts";
-import { remapProvisionalColumnIdsInAvaVizConfig } from "$/models/vizs/AvaVizConfig/remapProvisionalColumnIdsInAvaVizConfig/remapProvisionalColumnIdsInAvaVizConfig.ts";
-import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
-import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type { IAvaVizConfigModule } from "$/models/vizs/AvaVizConfig/IAvaVizConfigModule.ts";
 
 const AvaVizConfigModulesRegistry = {

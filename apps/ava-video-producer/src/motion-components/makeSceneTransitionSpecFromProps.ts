@@ -1,7 +1,7 @@
 import { linearTiming } from "@remotion/transitions";
-import type { SceneTransitionProps } from "./getSceneTransitionStyle";
 import { MotionSettings } from "./MotionSettings/MotionSettings";
 import { SceneTransition } from "./SceneTransition";
+import type { SceneTransitionProps } from "./getSceneTransitionStyle";
 import type { MotionSettingsTheme } from "./MotionSettings/MotionSettings";
 import type { TransitionTiming } from "@remotion/transitions";
 /** The timing and presentation a `TransitionSeries.Transition` takes. */

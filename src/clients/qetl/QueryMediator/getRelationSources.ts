@@ -137,7 +137,10 @@ async function _getOpenDataExtractors(
   });
 }
 
-/** Pairs `google_sheets` datasets with their stored Drive file and tab. */
+/**
+ * Returns Google Sheets source records paired with their datasets.
+ * Used by `_EXTRACTOR_READER_BY_SOURCE_TYPE` to resolve Google Sheets sources.
+ */
 async function _getGoogleSheetsExtractors(
   options: Readonly<SourceRecordReaderOptions>,
 ): Promise<RelationSource[]> {

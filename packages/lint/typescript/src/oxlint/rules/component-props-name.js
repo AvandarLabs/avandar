@@ -1,58 +1,85 @@
-import { createRuleMetadata } from "@avandar/lint/metadata";
+import { getRuleMetadataFromIdentity } from "@avandar/lint/metadata";
 import {
-  hasRenameCollision, hasUnsafeFunctionContract,
+  hasRenameCollision,
+  hasUnsafeFunctionContract,
 } from "./functionSafety.js";
 
 function _getComponent(node) {
-  const declaration = node.type === "ExportNamedDeclaration"
-    ? node.declaration : node;
+  const declaration =
+    node.type === "ExportNamedDeclaration" ? node.declaration : node;
   return declaration?.type === "FunctionDeclaration" &&
-    /^[A-Z]/.test(declaration.id?.name ?? "") && declaration.body &&
+    /^[A-Z]/.test(declaration.id?.name ?? "") &&
+    declaration.body &&
     declaration.body.body.some((statement) => {
-      return statement.type === "ReturnStatement" &&
-        ["JSXElement", "JSXFragment"].includes(statement.argument?.type);
-    }) ? declaration : undefined;
+      return (
+        statement.type === "ReturnStatement" &&
+        ["JSXElement", "JSXFragment"].includes(statement.argument?.type)
+      );
+    })
+    ? declaration
+    : undefined;
 }
 
 function _hasRepairBoundary(sourceCode, node, reference) {
-  return sourceCode.getTokens(node.typeAnnotation).some((token) => {
-    return ["Array", "["].includes(token.value);
-  }) || sourceCode.getAllComments().some((comment) => {
-    return comment.range[0] >= node.range[0] &&
-      comment.range[1] <= reference.identifier.range[1];
-  });
+  return (
+    sourceCode.getTokens(node.typeAnnotation).some((token) => {
+      return ["Array", "["].includes(token.value);
+    }) ||
+    sourceCode.getAllComments().some((comment) => {
+      return (
+        comment.range[0] >= node.range[0] &&
+        comment.range[1] <= reference.identifier.range[1]
+      );
+    })
+  );
 }
 
 function _getPropsBinding(sourceCode, node, component) {
-  if (node.type !== "TSTypeAliasDeclaration" || node.typeParameters ||
+  if (
+    node.type !== "TSTypeAliasDeclaration" ||
+    node.typeParameters ||
     node.typeAnnotation.type !== "TSTypeLiteral" ||
-    !/^[A-Z].*Props$/.test(node.id.name)) {
+    !/^[A-Z].*Props$/.test(node.id.name)
+  ) {
     return undefined;
   }
-  if (!node.parent.body.some((statement) => {
-    return statement.range[0] < node.range[0] &&
-      ["ImportDeclaration", "ExportNamedDeclaration",
-        "ExportDefaultDeclaration", "ExportAllDeclaration"]
-        .includes(statement.type);
-  })) {
+  if (
+    !node.parent.body.some((statement) => {
+      return (
+        statement.range[0] < node.range[0] &&
+        [
+          "ImportDeclaration",
+          "ExportNamedDeclaration",
+          "ExportDefaultDeclaration",
+          "ExportAllDeclaration",
+        ].includes(statement.type)
+      );
+    })
+  ) {
     return undefined;
   }
   const variable = sourceCode.getDeclaredVariables(node).find((candidate) => {
     return candidate.identifiers.includes(node.id);
   });
-  if (!variable || variable.defs.length !== 1 ||
-    variable.references.length !== 1 || component.params.length !== 1) {
+  if (
+    !variable ||
+    variable.defs.length !== 1 ||
+    variable.references.length !== 1 ||
+    component.params.length !== 1
+  ) {
     return undefined;
   }
   const reference = variable.references[0];
   const annotation = component.params[0].typeAnnotation?.typeAnnotation;
   const binding = { variable, references: [reference] };
   return annotation?.type === "TSTypeReference" &&
-    annotation.typeName === reference.identifier && !annotation.typeArguments &&
+    annotation.typeName === reference.identifier &&
+    !annotation.typeArguments &&
     !_hasRepairBoundary(sourceCode, node, reference) &&
     !hasRenameCollision(sourceCode, binding, "Props") &&
     !hasUnsafeFunctionContract(sourceCode, node, node.id.name)
-    ? binding : undefined;
+    ? binding
+    : undefined;
 }
 
 function _getJsxOwner(node) {
@@ -71,22 +98,37 @@ function _reportPropsCandidates(context, program, component) {
     if (!binding) {
       return;
     }
-    context.report({ node: node.id, messageId: "rename", fix(fixer) {
-      return [node.id, binding.references[0].identifier].map(
-        (identifier) => { return fixer.replaceText(identifier, "Props"); },
-      );
-    } });
+    context.report({
+      node: node.id,
+      messageId: "rename",
+      fix: (fixer) => {
+        return [node.id, binding.references[0].identifier].map((identifier) => {
+          return fixer.replaceText(identifier, "Props");
+        });
+      },
+    });
   });
 }
 
-/** Names a sole component's private, unshared object props alias `Props`. */
+/**
+ * Reports and fixes eligible private component props aliases to use `Props`.
+ * For example, use this rule to check a TSX module with one component.
+ */
 const rule = {
   meta: {
-    ...createRuleMetadata("AF-12", "https://github.com/AvandarLabs/avandar/blob/develop/packages/lint/docs/rules/component-props-name.md"),
-    type: "suggestion", fixable: "code", schema: [],
-    messages: { rename: "AF-12: Name the component's private props alias Props." },
+    ...getRuleMetadataFromIdentity({
+      ruleId: "AF-12",
+      documentationPath:
+        "https://github.com/AvandarLabs/avandar/blob/develop/packages/lint/docs/rules/component-props-name.md",
+    }),
+    type: "suggestion",
+    fixable: "code",
+    schema: [],
+    messages: {
+      rename: "AF-12: Name the component's private props alias Props.",
+    },
   },
-  createOnce(context) {
+  createOnce: (context) => {
     let component;
     let hasOtherJsxOwner;
     const visitJsx = (node) => {
@@ -95,7 +137,7 @@ const rule = {
       }
     };
     return {
-      Program(program) {
+      Program: (program) => {
         component = undefined;
         hasOtherJsxOwner = false;
         if (/\.tsx$/.test(context.filename)) {
@@ -105,7 +147,7 @@ const rule = {
       },
       JSXElement: visitJsx,
       JSXFragment: visitJsx,
-      "Program:exit"(program) {
+      "Program:exit": (program) => {
         if (component && !hasOtherJsxOwner) {
           _reportPropsCandidates(context, program, component);
         }

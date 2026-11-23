@@ -1,10 +1,10 @@
-import { ReportPageBindTestState } from "./ReportPageBindTestState";
-
-const { render: _render } = ReportPageBindTestState;
 import assert from "node:assert/strict";
 import { SvgAttributes } from "../../../../../../tests/helpers/SvgAttributes";
-import type { fixtures } from "../../ReportPageBind.fixtures";
 import { assertEverySectionRetainsItsFinalView as _assertEverySectionRetainsItsFinalView } from "./assertEverySectionRetainsItsFinalView";
+import { ReportPageBindTestState } from "./ReportPageBindTestState";
+import type { fixtures } from "../../ReportPageBind.fixtures";
+
+const { render: _render } = ReportPageBindTestState;
 
 /**
  * Asserts every section retains its order and page identity in both final

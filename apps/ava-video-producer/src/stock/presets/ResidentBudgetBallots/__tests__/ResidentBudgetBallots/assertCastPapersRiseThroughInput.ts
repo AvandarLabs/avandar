@@ -1,5 +1,8 @@
-import type { DEFAULT_INPUT, fixtures } from "../../ResidentBudgetBallots.fixtures";
 import { assertCastPapersRiseThroughBallot as _assertCastPapersRiseThroughBallot } from "./assertCastPapersRiseThroughBallot";
+import type {
+  DEFAULT_INPUT,
+  fixtures,
+} from "../../ResidentBudgetBallots.fixtures";
 
 /**
  * Asserts cast papers rise through the open top before traveling toward

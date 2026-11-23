@@ -4,7 +4,8 @@ import type { ObjectPaths, UnknownObject } from "@avandar/utils";
 import type {
   FormErrors,
   UseFormInput as MantineUseFormInput,
- formRootRule} from "@mantine/form";
+  formRootRule,
+} from "@mantine/form";
 import type { FormType } from "@ui/hooks/useForm/useForm.types";
 import type { Merge } from "type-fest";
 

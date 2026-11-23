@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { assertLossLidClosesOnlyFrame as _assertLossLidClosesOnlyFrame } from "./assertLossLidClosesOnlyFrame";
-import type { _lossInputs } from "./SavedSeedSeasonReturnTestHelpers";
 import { _lid } from "./SavedSeedSeasonReturnTestHelpers";
+import type { _lossInputs } from "./SavedSeedSeasonReturnTestHelpers";
 
 /**
  * Asserts loss lid closes only after the full material shape clears its

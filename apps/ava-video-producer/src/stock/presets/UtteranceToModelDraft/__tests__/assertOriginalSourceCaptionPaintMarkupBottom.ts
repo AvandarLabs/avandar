@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
-import type { renderToStaticMarkup } from "react-dom/server";
 import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
-import type { fixtures } from "../UtteranceToModelDraft.fixtures";
 import { assertOriginalSourceCaptionPaintMarkup as _assertOriginalSourceCaptionPaintMarkup } from "./assertOriginalSourceCaptionPaintMarkup";
+import type { fixtures } from "../UtteranceToModelDraft.fixtures";
+import type { renderToStaticMarkup } from "react-dom/server";
 
 /**
  * Asserts original source and caption paint over copies with full opaque

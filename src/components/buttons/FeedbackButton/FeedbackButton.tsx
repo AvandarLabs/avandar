@@ -11,7 +11,10 @@ import {
 } from "./openFeaturebaseFeedbackWidget";
 import { useFeaturebaseInit } from "./useFeaturebaseInit";
 
-/** Button that opens the Featurebase feedback widget (logged-in users only). */
+/**
+ * Renders feedback options for a user with an email, or nothing otherwise.
+ * Use it, for example, to let signed-in users report bugs or request features.
+ */
 export function FeedbackButton(): JSX.Element | null {
   const { user } = RootRoute.useRouteContext();
   const [menuOpened, setMenuOpened] = useState(false);

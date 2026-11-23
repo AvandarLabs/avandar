@@ -1,5 +1,5 @@
-import type { fixtures } from "../../NestedDrilldownWindow.fixtures";
 import { assertDenseSetupSelectedDetailFrame as _assertDenseSetupSelectedDetailFrame } from "./assertDenseSetupSelectedDetailFrame";
+import type { fixtures } from "../../NestedDrilldownWindow.fixtures";
 
 /**
  * Asserts dense setup and selected detail geometry stays bounded through

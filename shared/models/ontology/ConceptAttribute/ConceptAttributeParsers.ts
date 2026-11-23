@@ -10,12 +10,12 @@ import {
 } from "@avandar/utils";
 import { z } from "zod";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
-import type { ConceptId } from "$/models/ontology/Concept/Concept.types.ts";
+import { ConceptAttributeModule } from "$/models/ontology/ConceptAttribute/ConceptAttributeModule/ConceptAttributeModule.ts";
+import type { Concept } from "$/models/ontology/Concept/Concept.ts";
 import type {
   ConceptAttributeId,
   ConceptAttributeModel,
 } from "$/models/ontology/ConceptAttribute/ConceptAttribute.types.ts";
-import { ConceptAttributeModule } from "$/models/ontology/ConceptAttribute/ConceptAttributeModule/ConceptAttributeModule.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 import type { Expect } from "@avandar/utils";
 import type { ZodSchemaEqualsTypes } from "@utils/zod/index.ts";
@@ -48,7 +48,7 @@ export const ConceptAttributeParsers =
         return Model.make("ConceptAttribute", {
           ...obj,
           id: obj.id as ConceptAttributeId,
-          conceptId: obj.conceptId as ConceptId,
+          conceptId: obj.conceptId as Concept.Id,
           workspaceId: obj.workspaceId as Workspace.Id,
         });
       },

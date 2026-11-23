@@ -25,7 +25,10 @@ export const SAMPLE_AOI: AvaMapConfig.AoiPolygon = {
   ],
 };
 
-/** Overlay with no AOI or time range, plus a stack of only this layer. */
+/**
+ * Adds an empty overlay and a stack containing the supplied layer to options.
+ * Use it, for example, to test compilation without AOI or time filters.
+ */
 export function withEmptyOverlay<T extends { layer: MapLayer.T }>(
   options: T,
 ): T & Pick<CompileOptions, "overlay" | "stack"> {
@@ -36,7 +39,10 @@ export function withEmptyOverlay<T extends { layer: MapLayer.T }>(
   };
 }
 
-/** Overlay with a unit-square AOI and a stack of only this layer. */
+/**
+ * Adds a unit-square AOI overlay and a stack containing the supplied layer.
+ * Use it, for example, to test compilation with an AOI and no time filter.
+ */
 export function withAoiOverlay<T extends { layer: MapLayer.T }>(
   options: T,
 ): T & Pick<CompileOptions, "overlay" | "stack"> {

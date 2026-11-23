@@ -35,7 +35,11 @@ function resolveColumnFromAliasDictionary(
     .find(isDefined)?.name;
 }
 
-/** Extracts a missing column name from a DuckDB binder error message. */
+/**
+ * Gets the missing column name from an error, or undefined if it does not
+ * match.
+ * Use it, for example, to identify a column reported missing by DuckDB.
+ */
 export function extractMissingColumnFromError(
   error: string,
 ): string | undefined {
@@ -43,7 +47,11 @@ export function extractMissingColumnFromError(
   return match?.[1]?.trim();
 }
 
-/** Replaces a wrong column identifier in SQL when DuckDB reports it missing. */
+/**
+ * Attempts to repair a missing column in SQL using the dataset schema.
+ * Returns the SQL and repair status, with the replacement column on success.
+ * Use it, for example, when handling a missing-column error from generated SQL.
+ */
 export function repairOfflineColumnFromError(args: {
   sql: string;
   error: string;

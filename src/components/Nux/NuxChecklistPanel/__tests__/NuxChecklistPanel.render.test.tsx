@@ -1,7 +1,6 @@
 import { Modal } from "@mantine/core";
 import { ModalsProvider } from "@mantine/modals";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 import { NuxProgressClient } from "@/clients/NuxProgressClient/NuxProgressClient";
 import classes from "@/components/Nux/NuxChecklistPanel/NuxChecklistMilestoneRow/NuxChecklistMilestoneRow.module.css";
 import { NuxChecklistPanel } from "@/components/Nux/NuxChecklistPanel/NuxChecklistPanel";
@@ -11,6 +10,7 @@ import { NuxWelcomeModal } from "@/components/Nux/NuxWelcomeModal/NuxWelcomeModa
 import { DEFAULT_MODAL_PROPS, NUX_CHECKLIST_Z_INDEX } from "@/config/Theme";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { fireEvent, render, screen, waitFor } from "@/test-utils";
+import type { NuxProgress } from "$/models/NuxProgress/NuxProgress";
 import type { NuxWorkspaceArtifacts } from "@/clients/NuxProgressClient/NuxProgressClient";
 import type { NuxAppState } from "@/components/Nux/NuxStateManager/NuxAppState.types";
 import type { ReactNode } from "react";
