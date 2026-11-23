@@ -37,9 +37,11 @@
     var(--ava-animation-easing-out);
 }
 
-/* Revealed on hover to keep the grid calm, but always present for keyboard
-   users, who never produce a hover. The focus rule is stated first so it does
-   not sit at lower specificity than the hover rule that follows. */
+/*
+ * Revealed on hover to keep the grid calm, but always present for keyboard
+ * users, who never produce a hover. The focus rule is stated first so it does
+ * not sit at lower specificity than the hover rule that follows.
+ */
 .cardDeleteButton:focus-visible {
   opacity: 1;
 }

@@ -239,3 +239,56 @@ imports or module markers, and AF-17 seeds satisfy the explicit array-type
 boundary only for TS/TSX. Unsupported shapes retain fallback throughout.
 
 **7,468 ms is the preceding warm median for the next batch.**
+
+## CSS comment markers
+
+The CSS batch enables AF-20 for standalone ordinary prose comment nodes using
+Stylelint and PostCSS source ranges. Repairs only change comment delimiters,
+spacing and leading markers. Declaration documentation, legal notices,
+directives, maps, hacks, inline comments, ambiguous markers and repairs beyond
+80 columns remain outside this safe subset. Explicit unsupported-shape fallback
+keeps rule-level review active.
+
+The complete root CSS command selects 456 stylesheets. Its ordinary safe-fix
+application changes one multiline comment in `CaseTypeHome.module.css`.
+Independent parsed-node audits confirm unchanged prose and every non-comment
+byte. A second complete CSS fix is byte-identical across all 456 files.
+Generated stylesheets are excluded and compiled Lingui catalogs are untouched.
+Both lint and repair commands select `src/**/*.css` and
+`apps/ava-video-producer/**/*.css`.
+
+The preceding warm median is **7,468 ms**. The six samples below run
+sequentially without concurrent tests, builds or dependency installation.
+Doctor configuration and its existing await-loop advisory remain unchanged.
+
+| Label | Cold ms | Warm 1 | Warm 2 | Warm 3 | Warm 4 | Warm 5 | Warm median ms | Exit codes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| phase-3-stylelint-fixer | 7705 | 7753 | 7914 | 8505 | 8384 | 8449 | 8384 | 0, 0, 0, 0, 0, 0 |
+
+The cold sample is 7,705 ms and the warm median is **8,384 ms**, up 916 ms
+(12.27%) from the preceding 7,468 ms. All six exits are zero. Neither stop
+threshold is crossed, so no separate profile is required. Doctor scans 667
+files and reuses its existing cache during these samples. These timings do
+not establish causal attribution for the change.
+
+The source export repairs CSS without a prebuild; the packed CSS export also
+performs a real Stylelint repair in an isolated consumer. Its tarball is
+13,689 bytes. CSS package tests pass with 38 cases and core tests pass with
+325 cases. Both packages build and type-check; the main TypeScript build and
+root lint pass. The actual built CLI proves the supported CSS capability
+against the real root configuration without writing the reviewed file.
+
+CSS coverage uses the real repository, original filename, full root path
+selection, actual error-severity seed and nonzero child status. Overrides,
+disables, missing engines/plugins, unknown commands and operational failures
+remain fail-closed. Unsupported syntax retains an independent fallback
+outcome. The native proof scheduler and native AF rule boundaries are unchanged;
+CSS proof startup and full-selection cost remain for later scaling work.
+
+The plugin leaves parsed source-map comment nodes intact. Stylelint/PostCSS
+itself consumes source-map annotations before rules run, with this rule both
+enabled and disabled under the same root configuration. The controlled test
+records that existing engine behavior rather than claiming whole-command
+annotation preservation.
+
+**8,384 ms is the preceding warm median for the next batch.**

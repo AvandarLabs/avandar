@@ -292,7 +292,7 @@ rules:
     phases:
       - 3
     owner: lint
-    boundary: Delimiters and leading markers only
+    boundary: Standalone ordinary CSS prose comment nodes within 80 columns; delimiters and leading markers only; preserve documentation, directives, maps, legal notices, hacks and ambiguous syntax; unsupported shapes remain fallback
   - id: AF-21
     slug: sql-comment-markers
     class: AF

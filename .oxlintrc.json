@@ -460,7 +460,10 @@
       }
     },
     {
-      "files": ["packages/lint/typescript/src/oxlint/**/*.js"],
+      "files": [
+        "packages/lint/typescript/src/oxlint/**/*.js",
+        "packages/lint/css/src/stylelint/**/*.js"
+      ],
       "rules": {
         "import/extensions": ["error", "ignorePackages", { "js": "always" }]
       }
