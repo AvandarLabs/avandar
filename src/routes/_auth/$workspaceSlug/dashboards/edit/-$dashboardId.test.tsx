@@ -25,12 +25,6 @@ vi.mock("@/clients/UserClient", () => {
   };
 });
 
-// The route's editor imports maplibre-gl, which needs browser APIs jsdom
-// lacks at module load. These tests cover route access, not maps.
-vi.mock("maplibre-gl", () => {
-  return { default: {} };
-});
-
 const { Route } = await import("./$dashboardId");
 
 type BeforeLoadArgs = {
