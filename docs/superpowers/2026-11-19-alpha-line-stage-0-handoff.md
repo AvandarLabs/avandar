@@ -1,5 +1,7 @@
 # Alpha line Stage 0: handoff
 
+> **Superseded on 2026-11-23** by [the production cutover plan](../measles-demo/production-cutover-plan.md). The alpha line was abandoned.
+
 Start a fresh Claude Code session on `sonnet`, medium effort, in the
 `demo/measles` worktree, and paste:
 

@@ -209,7 +209,7 @@ merged in twice since (`56f31f603` and `f920d223c`), so the merge-base is now
 | F137 | Crosswalks at scale: meaning suggestions for mappings, a virtualized layout list past 100 layouts, per-dataset progress while combining, and the 100-dataset materialization measurement | not started | F136 | |
 | F139 | Dashboard blocks from any page, online and offline: `add_dashboard_block`, prompt v6, and the confirm card | not started | F81 to F87, F89 to F91, F128, F22 | |
 | F140 | Try again and parity in the agent: the Try again line, the shared card audit, and the agent's analytics events | not started | F139 | |
-| F141 | The alpha release line: `ava release` on two lines, the `alpha-dev` and `alpha` workflows, the catalog move scripts, and the cutover docs | not started (built on `feat/alpha-line`, merged into `demo/measles` before cutover) | the lock-out PR (`chore/mainline-lockout`) in `develop` | |
+| F141 | Release and deploy hardening kept from the abandoned alpha line: `ava release` preflight and push safety, the production deploy job, and the catalog move scripts | not started | | |
 
 Follow-up after F1: [AVA-384](https://linear.app/avandar/issue/AVA-384), which
 moves `ServiceClient`, `withQueryHooks` and `withLogger` onto the new factory
@@ -692,8 +692,8 @@ Take only your feature's hunks from these files. The last feature in the
 | `packages/shared/utils/src/types/Empty/Empty.ts` | `develop` (`9a8b24233`, #315), F126, F127 | All three rewrap the same docstring. `develop` already wraps it within 80 columns: F126's `48ad53a7b` and F127's `d45e26490` take `develop`'s wrap. |
 | `src/views/GisApp/useGisApp/MapSourceHydration/useHydratedMapSources/useHydratedMapSources.ts` | F127, F35 | F127: the stable `updateConfig` (plus `d45e26490`'s `HydrationInputs` names, which only PR #321 has). F35: `aad4d700d` moves the config hydration into `useHydratedMapConfig.ts`. |
 | `.github/workflows/pr-develop.yaml` | F127, F96 to F112 | F127: `ubuntu-24.04` and the timeout. F96 to F112: `pnpm check:plugin-bundle`. |
-| `.github/workflows/demo.yaml`, replaced by `.github/workflows/alpha-dev.yaml` | F13, F25, F32, F141 | F13, plus its `2efc74421` addendum (Supabase CLI 2.114.0). F25: `AVA_PIPELINE_SERVER_URL`. F32: the `GEOAPIFY_API_KEY` line. F141: deletes `demo.yaml` and deploys `alpha-dev` from `alpha-dev.yaml` instead, which keeps the F25 and F32 lines and the 2.114.0 CLI (`b6cb5837d`). |
-| `.github/workflows/production.yaml`, `vercel.json` | F127, the lock-out PR, F141 | F127: `ubuntu-24.04` and the 70-minute e2e timeout in `production.yaml`. The lock-out PR (`chore/mainline-lockout`, off `develop`) replaces the `migrate` job with `deploy-mainline` and turns off Git-integration deploys for `main`, `alpha`, and `alpha-dev`. Its `production.yaml` already has F127's hunks, so whichever of #321 and the lock-out lands second takes the lock-out's file. F141's `39b6b98ae`, `bdcec197c`, and `1ca23db7f` end at the lock-out's exact files: port nothing from them. |
+| `.github/workflows/demo.yaml`, deleted and not replaced | F13, F25, F32, F141 | F13, plus its `2efc74421` addendum (Supabase CLI 2.114.0). F25: `AVA_PIPELINE_SERVER_URL`. F32: the `GEOAPIFY_API_KEY` line. F141: deletes `demo.yaml` (`b6cb5837d`). The `alpha-dev.yaml` that briefly replaced it was deleted on `chore/production-cutover` (`ca358d64c`), so nothing replaces it. |
+| `.github/workflows/production.yaml`, `vercel.json` | F127, F141 | F127: `ubuntu-24.04` and the 70-minute e2e timeout in `production.yaml`. F141's lock-out commits (`39b6b98ae`, `bdcec197c`, `1ca23db7f`) were undone on `chore/production-cutover`, which restored `develop`'s copies of both files (`ca358d64c`). They are then to be given the deploy job written for the alpha workflow. |
 
 ### Data dictionaries (F129 to F138)
 
@@ -1427,8 +1427,10 @@ Add to **Commits to read**:
 `.github/workflows/demo.yaml` (`b6cb5837d`) and moves
 `scripts/demo/ensureSupabaseBranch.sh` to
 `scripts/alpha-dev/ensureSupabaseBranch.sh` (`a6488b085`, `22bc12611`).
-`alpha-dev` now deploys from `.github/workflows/alpha-dev.yaml` to
-`alpha.avandarlabs.com`, and `demo.avandarlabs.com` is removed at cutover.
+Both the `alpha-dev` workflow that replaced the demo deploy and
+`scripts/alpha-dev/` were deleted on `chore/production-cutover`
+(`ca358d64c`), so nothing replaces it, and `demo.avandarlabs.com` is
+removed after cutover.
 Read F141 before porting F13: `develop` already holds both F13 files as
 `demo/measles` last had them, and the Verification above (a throwaway
 `demo/*` branch) no longer applies once F141 lands.
@@ -12285,37 +12287,41 @@ pnpm test:frontend
 pnpm vitest run scripts/ai-eval
 ```
 The eval commands are in `docs/ai-agent/eval.md#reproducing-every-result`.
-## F141: The alpha release line
+## F141: Release and deploy hardening kept from the abandoned alpha line
 
 Status: not started for `develop`. Built on `feat/alpha-line` and merged
-into `demo/measles` before cutover, where `demo/measles` becomes `alpha-dev`.
-The lock-out it depends on is its own PR branch, `chore/mainline-lockout`
-(off `develop`: `b3fb7abf2`, `7d2942650`, `01e1975d1`).
+into `demo/measles`. The alpha line was abandoned on 2026-11-23: the
+`alpha-dev` and `alpha` workflows and the two-line release were removed on
+`chore/production-cutover` (`ca358d64c`, `1ac86dd0b`, `53059c412`).
 
-**Purpose:** Production moves from `main` to a new `alpha` branch, cut from
-`alpha-dev` (today `demo/measles`). `ava release` releases two lines: on
-`alpha-dev` it sets `alpha` to `alpha-dev`'s tree and tags `vX.Y.Z-alpha`;
-on `develop` it releases `main` as before; on any other branch it refuses.
-`alpha-dev.yaml` deploys `alpha-dev` to `alpha.avandarlabs.com` on a
-persistent `alpha-dev` Supabase branch, and is the CI gate `ava release`
-reads. `alpha.yaml` gates and deploys `alpha` to production, checking the
-tip, the configuration, and the build before it migrates. `scripts/alpha/`
-moves the open data catalog and its Parquet objects between projects.
-**Value:** Production runs the line users already rely on, through a
-release command and a gated deploy, while `develop` and `main` stop
-touching production.
+**Purpose:** Keep the release and deploy safety work that does not depend
+on a release line:
 
-**Design:** `docs/measles-demo/alpha-launch-plan.md`. Audit:
-`docs/measles-demo/alpha-migration-audit.md`. Runbook:
-`docs/measles-demo/alpha-cutover-runbook.md`. Implementation plan:
-`docs/superpowers/plans/2026-11-19-alpha-line-stage-0.md`.
+- `ava release` runs on `develop` only. Preflight resolves branches by full
+  ref, so a tag named `main` cannot win. The current branch is read with
+  `git symbolic-ref`. Before the version commit it re-checks that HEAD is
+  still where preflight found it. The version commit touches `package.json`
+  only, and pushes use full refspecs.
+- The deploy job written for the alpha workflow, to be used by
+  `production.yaml` and `staging.yaml`: it refuses to deploy anything but
+  the branch tip, checks the configuration, builds before any write, scopes
+  credentials to the step that needs them, writes secrets to a single-quoted
+  file, and never cancels a running deploy.
+- The catalog move scripts, now under `scripts/catalog-move/` (`3769ba532`),
+  move the open data catalog and its Parquet objects between projects.
 
-**PR title:** `feat(ci): release and deploy the alpha line`
+**Value:** Releases and deploys keep the alpha line's safety checks without
+a second release line.
 
-**Depends on:** the lock-out PR in `develop` (see **Merge order**). No
-feature in this log: `develop`'s release CLI and CI files equal
-`demo/measles`'s before this work, and `develop` already has every catalog
-table `scripts/alpha/` moves. No Postgres connector work.
+**Design:** `docs/measles-demo/production-cutover-plan.md`, sections 8 to
+10. The alpha line's own plan, audit, runbook, and Stage 0 plan are kept as
+history and are superseded.
+
+**PR title:** none of its own. It reaches `develop` with the `demo/measles`
+promotion (section 11 of the production cutover plan).
+
+**Depends on:** no feature in this log. `develop` already has every catalog
+table the catalog move scripts move. No Postgres connector work.
 
 **Files, by area** (take each file's final content on `feat/alpha-line`):
 
@@ -12361,16 +12367,15 @@ table `scripts/alpha/` moves. No Postgres connector work.
 
 **Schema:** none.
 
-**Deploy:** nothing deploys from `develop`. `alpha-dev.yaml` runs only on
-`alpha-dev` and `alpha.yaml` only on `alpha`; GitHub, Vercel, and Supabase
-setup is in the runbook.
+**Deploy:** nothing of its own. `alpha.yaml`, `alpha-dev.yaml`, and
+`scripts/alpha-dev/` are deleted. `production.yaml` and `vercel.json` are
+`develop`'s copies until they take the deploy job.
 
 **Verification:**
 ```sh
 pnpm --filter @avandar/ava-cli test
-pnpm vitest run scripts/alpha
-shellcheck -x scripts/alpha/*.sh scripts/alpha-dev/*.sh
-npx --yes actionlint@1.7.7 .github/workflows/alpha.yaml .github/workflows/alpha-dev.yaml
+pnpm vitest run scripts/catalog-move
+shellcheck -x scripts/catalog-move/*.sh
 ```
 
 ---
