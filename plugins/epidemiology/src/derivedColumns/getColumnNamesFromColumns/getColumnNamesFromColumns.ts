@@ -30,9 +30,10 @@ export function getColumnNamesFromColumns(
   }>,
 ): string[] {
   const { columns, dataTypes } = options;
+  const allowedDataTypes = new Set(dataTypes);
   return columns
     .filter((column) => {
-      return dataTypes.includes(column.dataType);
+      return allowedDataTypes.has(column.dataType);
     })
     .map((column) => {
       return column.name;
