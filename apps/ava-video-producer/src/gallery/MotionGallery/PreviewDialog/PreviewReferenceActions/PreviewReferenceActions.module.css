@@ -1,0 +1,7 @@
+.previewReferenceActionsDialogActions {
+  composes: dialog-actions from global;
+}
+
+.previewReferenceActionsButtonButtonPrimary {
+  composes: button button-primary from global;
+}

@@ -11,6 +11,7 @@ import {
 } from "@/clients/dashboards/DashboardClient/__tests__/dashboardTransitionConstants";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { VisibilityState } from "@/clients/dashboards/DashboardClient/__tests__/dashboardTransitionConstants";
+import type { MapSnapshot } from "@/clients/maps/MapSnapshot/MapSnapshot.types";
 
 type MockClientConfig = {
   clientLogger: {
@@ -189,8 +190,10 @@ const {
   getDatasetsMock,
   operationLog,
   persistedVisibilityState,
+  prepareMapSnapshotsMock,
   reconcileSnapshotsMock,
   uploadDatasetMock,
+  uploadMapSnapshotsMock,
   useBulkDeleteDashboardsMock,
   useDeleteDashboardMock,
   uuidMock,
@@ -247,8 +250,14 @@ const {
     getDatasetsMock: vi.fn(),
     operationLog: operationHistory,
     persistedVisibilityState: visibilityState,
+    prepareMapSnapshotsMock: vi.fn(async (): Promise<MapSnapshot[]> => {
+      return [];
+    }),
     reconcileSnapshotsMock: vi.fn(),
     uploadDatasetMock: vi.fn(),
+    uploadMapSnapshotsMock: vi.fn(async (): Promise<void> => {
+      return undefined;
+    }),
     useBulkDeleteDashboardsMock: vi.fn(),
     useDeleteDashboardMock: vi.fn(),
     uuidMock: vi.fn(() => {
@@ -348,6 +357,16 @@ vi.mock(
   },
 );
 
+vi.mock(
+  "@/clients/dashboards/DashboardClient/dashboardSnapshotHelpers/dashboardMapSnapshots",
+  () => {
+    return {
+      prepareMapSnapshots: prepareMapSnapshotsMock,
+      uploadMapSnapshots: uploadMapSnapshotsMock,
+    };
+  },
+);
+
 export const { DashboardClient } =
   await import("@/clients/dashboards/DashboardClient/DashboardClient");
 
@@ -373,8 +392,10 @@ export {
   getDatasetsMock,
   operationLog,
   persistedVisibilityState,
+  prepareMapSnapshotsMock,
   reconcileSnapshotsMock,
   uploadDatasetMock,
+  uploadMapSnapshotsMock,
   useBulkDeleteDashboardsMock,
   useDeleteDashboardMock,
   uuidMock,

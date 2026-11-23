@@ -1,0 +1,53 @@
+/*
+ * Height passes through to the panels only when the host has a definite
+ * height to give. Otherwise `height: 100%` resolves to auto and the tabs
+ * flow like any other block.
+ */
+.dataImportTabs {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.dataImportTabsPanel {
+  flex: 1;
+  min-height: 0;
+}
+
+/*
+ * The tab strip is the first thing on the page, so it takes half the page
+ * gutter above it and the same step below, instead of the full gutter plus
+ * the list's own margin plus each panel's top padding. `--ava-content-gutter`
+ * is the gutter the host pays; a host that sets none (the Open dataset
+ * modal's other tabs) is left as it is.
+ */
+.dataImportTabs .dataImportTabsList {
+  margin-bottom: var(--mantine-spacing-sm);
+  margin-top: min(
+    0px,
+    calc(
+      var(--mantine-spacing-sm) -
+        var(--ava-content-gutter, var(--mantine-spacing-sm))
+    )
+  );
+}
+
+/*
+ * The catalog search shares this row. It starts just after the Open data tab
+ * and grows into the free width. The shared tab list pins a trailing section
+ * to the far edge, so this row left-aligns that section and lets it grow.
+ */
+.dataImportTabsList:has(.dataImportTabsSearch) {
+  justify-content: flex-start;
+}
+
+.dataImportTabsList:has(.dataImportTabsSearch) > :last-child {
+  flex: 1 1 auto;
+  margin-left: var(--mantine-spacing-sm);
+  min-width: 0;
+}
+
+.dataImportTabsSearch {
+  width: 100%;
+}

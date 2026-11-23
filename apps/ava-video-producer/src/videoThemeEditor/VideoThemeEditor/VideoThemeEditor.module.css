@@ -1,0 +1,38 @@
+.videoThemeEditor {
+  display: grid;
+  gap: var(--atlas-space-12);
+  min-width: 0;
+}
+
+/*
+ * The theme bar, the changed-on-disk banner, and the toolbar stay pinned
+ * together under an Atlas panel's tab list (or at the top without one) while
+ * the rows scroll. A 1px rule closes the block so rows never clip against it
+ * with no edge. The block scrolls inside itself past a share of the viewport,
+ * so the rows always keep room. The 4px of padding, offset by matching
+ * negative inline margins, keeps a focus ring from clipping at the edge.
+ */
+.videoThemeEditorPinned {
+  background: var(--paper);
+  border-bottom: var(--atlas-border-1) solid var(--line);
+  display: grid;
+  gap: var(--atlas-space-8);
+  grid-auto-rows: max-content;
+  inset-block-start: calc(
+    var(--atlas-panel-tabs-height, 0px) + var(--atlas-pin-offset, 0px)
+  );
+  margin-inline: calc(var(--atlas-space-4) * -1);
+  max-block-size: 45dvh;
+  overflow-y: auto;
+  padding-block: var(--atlas-space-4) var(--atlas-space-8);
+  padding-inline: var(--atlas-space-4);
+  position: sticky;
+  z-index: var(--atlas-layer-2);
+}
+
+/* On a phone the player strip is pinned above, so this block keeps less. */
+@media (width <= 760px) {
+  .videoThemeEditorPinned {
+    max-block-size: 36dvh;
+  }
+}

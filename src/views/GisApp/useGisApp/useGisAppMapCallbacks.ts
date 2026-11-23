@@ -8,7 +8,7 @@ import type { ClusterSelection } from "@/views/GisApp/MapCanvas/MapInstanceHelpe
 
 type MapCallbackOptions = Readonly<{
   editor: ReturnType<typeof useAvaMapEditor>;
-  expandPanel: (panel: "inspector") => void;
+  openLayerSettings: () => void;
   featureInspector: ReturnType<typeof useFeatureInspector>;
   mapConfig: AvaMapConfig.T;
   setSelectedLayerId: (layerId: MapLayer.Id | undefined) => void;
@@ -49,7 +49,7 @@ function _selectAnnotationFromClick(
   );
   options.setIsAnnotationRowSelected(true);
   options.setSelectedLayerId(undefined);
-  options.expandPanel("inspector");
+  options.openLayerSettings();
 }
 
 function _selectLayerFromClick(

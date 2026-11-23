@@ -19,6 +19,7 @@ type Props = {
 
 /**
  * Text query columns on the layer's own source, offered for a direct bind.
+ * List fields are left out, since a list has no single status value.
  *
  * The `id` used is the query column's own id, matching what a resolved
  * `queryColumn` reference is looked up by, not the underlying dataset or
@@ -29,7 +30,10 @@ function _queryColumnOptions(
 ): ColumnOption[] {
   return columns
     .filter((column) => {
-      return AvaDataType.isText(column.baseColumn.dataType);
+      return (
+        QueryColumn.isNotList(column) &&
+        AvaDataType.isText(column.baseColumn.dataType)
+      );
     })
     .map((column) => {
       return {

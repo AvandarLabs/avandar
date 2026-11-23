@@ -1,6 +1,8 @@
 import { FitText } from "../../primitives/FitText/FitText";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { CarbonAccountingOperatingEmissionsLayer } from "./CarbonAccountingOperatingEmissionsLayer/CarbonAccountingOperatingEmissionsLayer";
 import { CarbonNetAccounting } from "./CarbonNetAccounting";
-import { OperatingEmissionRow } from "./OperatingEmissionRow";
 import type { Input } from "./CarbonStorageAccounting.schema";
 import type { ReactNode } from "react";
 
@@ -13,12 +15,13 @@ export function CarbonAccounting({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const retained =
     input.capture.capturedTonnesCO2 - input.capture.releasedTonnesCO2;
-  const emissions = input.operatingEmissions.reduce(
-    (sum, row) => sum + row.tonnesCO2e,
-    0,
-  );
+  const emissions = input.operatingEmissions.reduce((sum, row) => {
+    return sum + row.tonnesCO2e;
+  }, 0);
   return (
     <g data-emissions={emissions}>
       <FitText
@@ -31,27 +34,16 @@ export function CarbonAccounting({
         breakLongWords
         normalizeWhitespace
       />
-      {input.operatingEmissions.map((row, index) => (
-        <OperatingEmissionRow
-          key={row.id}
-          row={row}
-          index={index}
-          unit={input.copy.accountingUnit}
-          frame={frame}
-        />
-      ))}
+      <CarbonAccountingOperatingEmissionsLayer input={input} frame={frame} />
       {input.showNetAccounting && frame >= 108 ? (
-        <CarbonNetAccounting
-          input={input}
-          retained={retained}
-          emissions={emissions}
-        />
+        <CarbonNetAccounting {...{ input, retained, emissions }} />
       ) : undefined}
-      <path
-        d="M918 183 V442 H900"
+      <SketchedShape
+        shape={{ kind: "path", d: "M918 183 V442 H900" }}
+        profile={tokens.sketch.shape}
         stroke={accent}
         fill="none"
-        strokeWidth={2}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
     </g>
   );

@@ -1,0 +1,46 @@
+.ctaBeatLinesHeadline {
+  font-size: var(--demo-font-size-46);
+  font-weight: var(--demo-font-weight-semibold);
+  letter-spacing: var(--demo-tracking-slight);
+  line-height: 1.2;
+  margin: 0;
+}
+
+.ctaBeatLinesKicker {
+  color: var(--demo-muted);
+  font-size: var(--demo-font-size-4xl);
+  margin: var(--demo-space-10) 0 0;
+}
+
+.ctaBeatLinesLines {
+  display: flex;
+  flex-direction: column;
+  gap: var(--demo-space-6);
+  justify-content: center;
+  padding-left: var(--demo-space-48);
+}
+
+.ctaBeatLinesTerminal {
+  background: var(--demo-panel);
+  border: var(--demo-stroke-hairline) solid var(--demo-line);
+  border-radius: var(--demo-corner-label);
+  font-family: var(--demo-mono);
+  font-size: var(--demo-font-size-34);
+  padding: var(--demo-space-28) var(--demo-space-sm);
+  width: 640px;
+}
+
+.ctaBeatLinesPrompt {
+  color: var(--demo-accent);
+}
+
+.ctaBeatLinesBadge {
+  align-self: flex-start;
+  background: var(--demo-success);
+  border-radius: var(--demo-corner-pill);
+  color: var(--demo-ground);
+  font-size: var(--demo-font-size-md);
+  font-weight: var(--demo-font-weight-bold);
+  margin-top: var(--demo-space-12);
+  padding: var(--demo-space-6) var(--demo-space-14);
+}

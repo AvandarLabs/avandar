@@ -30,8 +30,9 @@ export const inputSchema = z
     scenarioCaption: z.string().min(1).max(48),
   })
   .superRefine((input, context) => {
-    const issue = (path: string, message: string) =>
-      context.addIssue({ code: "custom", path: [path], message });
+    const issue = (path: string, message: string) => {
+      return context.addIssue({ code: "custom", path: [path], message });
+    };
     const goods = input.goods;
     if (new Set(goods.map(prop("id"))).size !== goods.length) {
       issue("goods", "Good IDs must be unique.");
@@ -44,12 +45,15 @@ export const inputSchema = z
         issue("goods", `Good ${index} exceeds available or five shelf slots.`);
       }
     });
-    const available = goods.reduce(
-      (sum, good) => sum + good.openingUnits + good.incomingUnits,
-      0,
-    );
-    const incoming = goods.reduce((sum, good) => sum + good.incomingUnits, 0);
-    const selected = goods.reduce((sum, good) => sum + good.selectedUnits, 0);
+    const available = goods.reduce((sum, good) => {
+      return sum + good.openingUnits + good.incomingUnits;
+    }, 0);
+    const incoming = goods.reduce((sum, good) => {
+      return sum + good.incomingUnits;
+    }, 0);
+    const selected = goods.reduce((sum, good) => {
+      return sum + good.selectedUnits;
+    }, 0);
     if (
       available > 12 ||
       incoming < 1 ||

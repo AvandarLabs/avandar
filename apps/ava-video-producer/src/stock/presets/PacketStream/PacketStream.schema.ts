@@ -1,6 +1,6 @@
 import { z } from "zod";
+import { contentColorSchema } from "../../theme/getContentColorFromValue/getContentColorFromValue";
 import { createLabelSchema } from "../legacy/createLabelSchema";
-import { legacyColorSchema } from "../legacy/legacyColorSchema.constants";
 
 /** Strict authored content within the fixed PacketStream layout. */
 export const packetStreamInputSchema = z.strictObject({
@@ -11,7 +11,7 @@ export const packetStreamInputSchema = z.strictObject({
           maxLength: 12,
           bounds: { fontSize: 16, width: 150, mono: true },
         }),
-        color: legacyColorSchema,
+        color: contentColorSchema,
         offset: z.number().min(0).max(179),
       }),
     )

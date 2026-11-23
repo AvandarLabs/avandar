@@ -1,5 +1,7 @@
-import { EASE, mix, ramp } from "../../../motion";
-import { STOCK } from "../../stockPalette";
+import { Motion } from "../../../motion";
+import { StockRect } from "../../primitives/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { DocumentTextRules } from "./DocumentTextRules/DocumentTextRules";
 import type { Input } from "./DocumentRegionDriftCheck.schema";
 import type { ReactNode } from "react";
 
@@ -9,6 +11,30 @@ type Props = {
   accent: string;
   side: "saved" | "current";
 };
+/** Frames the current page takes to settle over the saved one. */
+const SETTLE_FRAMES = 37;
+/** Samples the saved or current page's authored settling origin. */
+function _getPageOrigin({
+  frame,
+  side,
+  motion,
+}: Readonly<
+  Pick<Props, "frame" | "side"> & {
+    motion: ReturnType<typeof GraphicThemeHooks.useGraphicMotion>;
+  }
+>): { x: number; y: number } {
+  const progress = Motion.ramp({
+      frame,
+      at: 13,
+      dur: motion.scale(SETTLE_FRAMES),
+      easing: motion.travel.easing,
+    }),
+    x = side === "saved" ? 52 : Motion.mix({ t: progress, from: 608, to: 508 }),
+    y =
+      side === "saved" ? 180 : Motion.mix({ t: progress, from: 196, to: 180 });
+  return { x, y };
+}
+
 /** Page outlines retain the exact normalized region without label clamping. */
 export function RegionPage({
   input,
@@ -16,30 +42,24 @@ export function RegionPage({
   accent,
   side,
 }: Readonly<Props>): ReactNode {
-  const progress = ramp(frame, 13, 37, EASE.inOut),
-    x = side === "saved" ? 52 : mix(progress, 608, 508),
-    y = side === "saved" ? 180 : mix(progress, 196, 180);
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const { x, y } = _getPageOrigin({ frame, side, motion });
   const [left, top, right, bottom] = input.saved.box;
   return (
     <g>
-      <rect
+      <StockRect
         data-page-outline={side}
         x={x}
         y={y}
         width={300}
         height={200}
-        fill={STOCK.surface}
-        stroke={STOCK.line}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
       />
-      {[0, 1, 2, 3].map((index) => (
-        <path
-          key={index}
-          d={`M${x + 18} ${y + 26 + index * 34} h264`}
-          stroke={STOCK.line}
-          strokeOpacity={0.4}
-        />
-      ))}
-      <rect
+      <DocumentTextRules {...{ tokens, x, y }} />
+      <StockRect
         data-saved-region={side}
         data-page={input.saved.page}
         x={x + left * 3}
@@ -47,9 +67,9 @@ export function RegionPage({
         width={(right - left) * 3}
         height={(bottom - top) * 2}
         fill={accent}
-        fillOpacity={0.08}
+        fillOpacity={scales.wash(tokens.alpha.wash)}
         stroke={accent}
-        strokeWidth={1.5}
+        strokeWidth={scales.stroke(tokens.stroke.outline)}
       />
     </g>
   );

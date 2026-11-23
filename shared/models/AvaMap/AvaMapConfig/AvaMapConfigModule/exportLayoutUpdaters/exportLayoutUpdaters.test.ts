@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
+import { uuid } from "$/lib/uuid.ts";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig.ts";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 
 describe("exportLayoutUpdaters", () => {
   it("defaults a new map to A4 landscape with no disclaimer", () => {
@@ -58,4 +61,83 @@ describe("exportLayoutUpdaters", () => {
 
     expect(config.exportLayout.disclaimer).toBe("Data unverified");
   });
+
+  it("defaults a new map to no feature list", () => {
+    expect(AvaMapConfig.makeEmpty().exportLayout.featureList).toBeUndefined();
+  });
+
+  it("stores a changed feature list sort direction", () => {
+    const columnId = uuid<QueryColumn.Id>();
+    const featureList: AvaMapConfig.ExportFeatureList = {
+      layerId: uuid<MapLayer.Id>(),
+      columnIds: [columnId],
+      sort: { columnId, direction: "asc" },
+      maxRows: 200,
+    };
+    const config = AvaMapConfig.withExportLayout({
+      config: AvaMapConfig.makeEmpty(),
+      exportLayout: { ...AvaMapConfig.defaultExportLayout, featureList },
+    });
+
+    const nextConfig = AvaMapConfig.withExportLayout({
+      config,
+      exportLayout: {
+        ...config.exportLayout,
+        featureList: { ...featureList, sort: { columnId, direction: "desc" } },
+      },
+    });
+
+    expect(nextConfig.exportLayout.featureList?.sort?.direction).toBe("desc");
+  });
+
+  it("returns the same config when an equal feature list is applied", () => {
+    const featureList: AvaMapConfig.ExportFeatureList = {
+      layerId: uuid<MapLayer.Id>(),
+      columnIds: [uuid<QueryColumn.Id>()],
+      sort: undefined,
+      maxRows: 200,
+    };
+    const config = AvaMapConfig.withExportLayout({
+      config: AvaMapConfig.makeEmpty(),
+      exportLayout: { ...AvaMapConfig.defaultExportLayout, featureList },
+    });
+
+    expect(
+      AvaMapConfig.withExportLayout({
+        config,
+        exportLayout: {
+          ...config.exportLayout,
+          featureList: {
+            ...featureList,
+            columnIds: [...featureList.columnIds],
+          },
+        },
+      }),
+    ).toBe(config);
+  });
+
+  it.each([
+    { typedRows: 5000, storedRows: 1000 },
+    { typedRows: 0, storedRows: 1 },
+    { typedRows: 12.6, storedRows: 13 },
+    { typedRows: Number.NaN, storedRows: 200 },
+  ])(
+    "stores a typed row cap of $typedRows as $storedRows",
+    ({ typedRows, storedRows }) => {
+      const config = AvaMapConfig.withExportLayout({
+        config: AvaMapConfig.makeEmpty(),
+        exportLayout: {
+          ...AvaMapConfig.defaultExportLayout,
+          featureList: {
+            layerId: uuid<MapLayer.Id>(),
+            columnIds: [],
+            sort: undefined,
+            maxRows: typedRows,
+          },
+        },
+      });
+
+      expect(config.exportLayout.featureList?.maxRows).toBe(storedRows);
+    },
+  );
 });

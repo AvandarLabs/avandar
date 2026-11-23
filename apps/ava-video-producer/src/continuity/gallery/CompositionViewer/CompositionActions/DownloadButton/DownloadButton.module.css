@@ -1,0 +1,18 @@
+.downloadButton {
+  background: var(--ava-primary-7);
+  border: 0;
+  border-radius: var(--atlas-radius-5);
+  color: var(--atlas-color-white);
+  cursor: pointer;
+  padding: var(--atlas-space-12) var(--atlas-space-18);
+}
+
+.downloadButton:disabled {
+  cursor: wait;
+  opacity: var(--atlas-opacity-55);
+}
+
+/* A download the theme blocks is unavailable, not busy: it explains itself in the notice below. */
+.downloadButton.downloadButtonIsBlocked:disabled {
+  cursor: not-allowed;
+}

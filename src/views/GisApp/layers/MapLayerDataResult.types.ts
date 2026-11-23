@@ -6,7 +6,10 @@ import type {
   PointCoordinateAudit,
 } from "@/clients/maps/MapLayerSpatialQuery/PointAggregate/PointAggregate.types";
 
-/** Data returned by either a row-based or DuckDB Spatial map-layer query. */
+/**
+ * Data a map layer draws: a row-based or DuckDB Spatial query result, or the
+ * features a published snapshot file carries.
+ */
 export type MapLayerDataResult =
   | {
       type: "rows";
@@ -37,4 +40,13 @@ export type MapLayerDataResult =
       type: "spatial";
       featureCollection: GeoJSON.FeatureCollection;
       diagnostics: MapLayerSpatialDiagnostics;
+    }
+  | {
+      /**
+       * Features compiled when a dashboard was published, with the layer's
+       * sensitivity already applied. Drawn as given: never re-jittered.
+       */
+      type: "snapshot";
+      featureCollection: GeoJSON.FeatureCollection;
+      aggregation: PointAggregation | undefined;
     };

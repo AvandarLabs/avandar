@@ -1,0 +1,8 @@
+.continuityCompositeProduct {
+  background: var(--video-component-product-frame-backdrop);
+  inset: 0;
+  isolation: isolate;
+  overflow: hidden;
+  position: absolute;
+  z-index: 0;
+}

@@ -7,6 +7,7 @@ import { DisputedStatusControls } from "@/views/GisApp/panels/LayerInspector/Dat
 import { GeometryBindingTypeSelect } from "@/views/GisApp/panels/LayerInspector/DataSection/GeometryBindingTypeSelect/GeometryBindingTypeSelect";
 import { TimeColumnSelect } from "@/views/GisApp/panels/LayerInspector/DataSection/TimeColumnSelect/TimeColumnSelect";
 import { useBoundarySourceOptions } from "@/views/GisApp/panels/LayerInspector/DataSection/useBoundarySourceOptions/useBoundarySourceOptions";
+import { useGeometryPopupColumns } from "@/views/GisApp/panels/LayerInspector/DataSection/useGeometryPopupColumns";
 import { InspectorSection } from "@/views/GisApp/panels/LayerInspector/InspectorSection/InspectorSection";
 import { useLayerSourceColumns } from "@/views/GisApp/panels/LayerInspector/useLayerSourceColumns";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
@@ -60,6 +61,7 @@ export function DataSection({
     ? Model.getTypedId(layer.source.dataSource)
     : undefined;
   const sourceColumns = useLayerSourceColumns(sourceId);
+  useGeometryPopupColumns({ layer, sourceColumns, onLayerChange });
   const boundarySources = useBoundarySourceOptions(
     layer.source.dataSource?.workspaceId,
   );

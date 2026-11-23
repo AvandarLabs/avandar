@@ -21,8 +21,11 @@ export const inputSchema = z
     partitionLayout: z.enum(["strips", "alternating-cuts"]),
   })
   .refine(
-    (input) =>
-      new Set(input.workItems.map(prop("id"))).size === input.workItems.length,
+    (input) => {
+      return (
+        new Set(input.workItems.map(prop("id"))).size === input.workItems.length
+      );
+    },
     { path: ["workItems"], message: "Work item identities must be unique." },
   ) satisfies z.ZodType;
 /** Validated authored partition input. */

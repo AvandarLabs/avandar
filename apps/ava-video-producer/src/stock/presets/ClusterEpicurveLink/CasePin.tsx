@@ -1,7 +1,7 @@
-import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
-import { CaseKey } from "./CaseKey";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { CaseKey } from "./CaseKey/CaseKey";
 import type { getCasePositionsFromInput } from "./getCasePositionsFromInput";
 import type { ReactNode } from "react";
 
@@ -18,30 +18,33 @@ export function CasePin({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const { record, index, mapX, mapY, isInvestigated, isFocused } = position;
   return (
     <g>
-      <path
-        d={`M${mapX} ${mapY} L628 ${154 + index * 26}`}
-        stroke={STOCK.muted}
-        strokeOpacity={0.16}
+      <SketchedShape
+        shape={{ kind: "path", d: `M${mapX} ${mapY} L628 ${154 + index * 26}` }}
+        profile={tokens.sketch.shape}
+        stroke={tokens.color.inactive}
+        strokeOpacity={atomic.opacity["16"]}
       />
       <circle
         data-map-case={record.id}
         cx={mapX}
         cy={mapY}
         r={4}
-        fill={isInvestigated ? accent : STOCK.muted}
+        fill={isInvestigated ? accent : tokens.color.inactive}
       />
-      <circle
+      <SketchedShape
+        shape={{ kind: "circle", cx: mapX, cy: mapY, r: 8 }}
+        profile={tokens.sketch.shape}
         data-focused-case={record.id}
         data-is-focused={isFocused}
-        cx={mapX}
-        cy={mapY}
-        r={8}
         fill="none"
-        stroke={STOCK.orange}
-        opacity={isFocused ? ramp(frame, 90, 18) : 0}
+        stroke={tokens.color.highlight}
+        opacity={isFocused ? motion.ramp(frame, 90, motion.hero) : 0}
       />
       <CaseKey position={position} frame={frame} accent={accent} />
       <LabelSlots

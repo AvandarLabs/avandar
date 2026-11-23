@@ -56,13 +56,15 @@ export function AppSlate({
   return (
     <Flex
       direction="column"
-      p="xs"
+      className={css.frame}
       // On desktop, drop the Flex's top padding so the drag spacer below
       // sits flush against the bottom of the AppShell header — otherwise the
       // 8px gap between them is a dead zone in the title-bar drag region.
       pt={isDesktopPlatform ? 0 : undefined}
-      mah="100dvh"
-      h="100dvh"
+      // Main sits below the mobile header on a phone, so the slate gives
+      // back that offset to keep its bottom edge on screen.
+      mah="calc(100dvh - var(--ava-shell-main-offset-top, 0px))"
+      h="calc(100dvh - var(--ava-shell-main-offset-top, 0px))"
     >
       {isDesktopPlatform ? (
         <div

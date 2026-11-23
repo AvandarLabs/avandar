@@ -1,71 +1,52 @@
 import path from "node:path";
-import { createSupabaseLocalEnvironmentIo } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIo/createSupabaseLocalEnvironmentIo";
+import { SupabaseBranchTarget } from "@ava-cli/SupabaseCli/SupabaseBranchTarget";
+import { SHARED_STACK_BRANCH } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.constants";
 import { SupabaseStatus } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseStatus/SupabaseStatus";
-import { printError, printWarn } from "@ava-cli/utils/cliOutput/cliOutput";
+import { SupabaseTargetHeadline } from "@ava-cli/SupabaseCli/SupabaseTargetHeadline/SupabaseTargetHeadline";
+import { CliTheme } from "@ava-cli/utils/CliTheme/CliTheme";
 import { Acclimate } from "@avandar/acclimate";
 import type {
   SupabaseStatusEntry,
   SupabaseStatusReport,
 } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.types";
+import type { CliStyle } from "@ava-cli/utils/CliTheme/CliTheme";
+import type { CommandHelpSpec } from "@ava-cli/utils/CommandHelp/CommandHelp";
 
-/** Describes the current stack, in the words that fit this branch. */
-function _makeHeadlineDescription(
-  options: Readonly<{ report: SupabaseStatusReport; color: string }>,
-): string {
-  const { report, color } = options;
-  if (report.isSwitched) {
-    return report.isExpectedForBranch
-      ? `This worktree runs its own local Supabase: |${color}|$projectId$|reset| (branch $branch$).`
-      : `Branch $branch$ is on an isolated local Supabase: |${color}|$projectId$|reset|, not the stack it shares with everyone else.`;
-  }
-  return report.isExpectedForBranch
-    ? `This worktree uses the shared local Supabase: |${color}|$projectId$|reset|, which is where branch $branch$ belongs.`
-    : `This worktree uses the |${color}|shared|reset| local Supabase: |${color}|$projectId$|reset| (branch $branch$).`;
+const COMMAND_NAME = "ava supabase status";
+
+function _print(options: Readonly<{ style?: CliStyle; text: string }>): void {
+  CliTheme.writeLine({ stream: process.stdout, ...options });
 }
 
-/** The way out of an unhealthy state, or nothing when the state is healthy. */
-function _makeHeadlineAdvice(
+/** The way out of a state that is wrong for the branch, if it is wrong. */
+function _makeAdvice(
   report: Readonly<SupabaseStatusReport>,
 ): string | undefined {
+  const restoreAdvice = `   ${SHARED_STACK_BRANCH} belongs on the shared stack. Run \`ava supabase restore\` to put it back.`;
+  const switchAdvice =
+    "   Every worktree that is not switched writes to this database. Run `ava supabase switch` to give this branch its own.";
   return report.isExpectedForBranch
     ? undefined
-    : report.isSwitched
-      ? "   Run `ava supabase restore` to put $branch$ back on the shared stack."
-      : "   Every unswitched worktree writes to this database. Run `ava supabase switch` to isolate this branch.";
-}
-
-function _printHeadline(report: Readonly<SupabaseStatusReport>): void {
-  const color = report.isExpectedForBranch ? "bright_green" : "bright_yellow";
-  const badge = report.isExpectedForBranch ? "✅" : "⚠️ ";
-  const label = report.isSwitched ? "SWITCHED" : "STANDARD";
-  const params = { projectId: report.projectId, branch: report.branch };
-
-  Acclimate.log(
-    `|${color}|${badge} ${label} |reset|${_makeHeadlineDescription({ report, color })}`,
-    params,
-  );
-  const advice = _makeHeadlineAdvice(report);
-  if (advice !== undefined) {
-    Acclimate.log(`|yellow|${advice}`, params);
-  }
+    : report.branch === SHARED_STACK_BRANCH
+      ? restoreAdvice
+      : switchAdvice;
 }
 
 function _printSection(
   options: Readonly<{ title: string; entries: readonly SupabaseStatusEntry[] }>,
 ): void {
-  const { title, entries } = options;
-  if (entries.length === 0) {
-    return;
-  }
-  const labelWidth = Math.max(
-    ...entries.map(({ label }) => {
-      return label.length;
+  CliTheme.makeSectionLines({
+    title: options.title,
+    entries: options.entries.map(({ label, value }) => {
+      return { label, text: value };
     }),
-  );
-  Acclimate.log("");
-  Acclimate.log(`|bright_cyan|${title}`);
-  entries.forEach(({ label, value }) => {
-    Acclimate.log(`|cyan|  ${label.padEnd(labelWidth)}  |reset|${value}`);
+    labelStyle: "accent",
+    isColorEnabled: CliTheme.isColorEnabled({
+      stream: process.stdout,
+      env: process.env,
+    }),
+  }).forEach((line) => {
+    _print({ text: line });
   });
 }
 
@@ -73,26 +54,55 @@ function _printEnvironmentDrift(report: Readonly<SupabaseStatusReport>): void {
   if (report.environmentDrift.length === 0) {
     return;
   }
-  Acclimate.log("");
-  Acclimate.log("|bright_cyan|Environment files");
+  _print({ text: "" });
+  _print({ style: "heading", text: "Environment files" });
   report.environmentDrift.forEach(({ filePath, staleKeys }) => {
     const fileName = path.basename(filePath);
-    Acclimate.log(
+    _print(
       staleKeys.length === 0
-        ? `|green|  ✅ ${fileName} matches the running stack`
-        : `|bright_yellow|  ⚠️  ${fileName} is stale: ${staleKeys.join(", ")}`,
+        ? {
+            style: "success",
+            text: `  ✅ ${fileName} matches the running stack`,
+          }
+        : {
+            style: "warning",
+            text: `  ⚠️  ${fileName} is stale: ${staleKeys.join(", ")}`,
+          },
     );
   });
 }
 
+function _printRemoteReport(report: Readonly<SupabaseStatusReport>): void {
+  _printSection({
+    title: "Remote project",
+    entries: [
+      { label: "Project id", value: report.projectId },
+      { label: "API URL", value: report.remoteApiUrl ?? "unknown" },
+    ],
+  });
+  _printSection({
+    title: "Values this codebase reads",
+    entries: report.environmentValues,
+  });
+}
+
 function _printReport(report: Readonly<SupabaseStatusReport>): void {
-  _printHeadline(report);
+  SupabaseTargetHeadline.print({ summary: report, stream: process.stdout });
+  const advice = _makeAdvice(report);
+  if (advice !== undefined) {
+    _print({ style: "warning", text: advice });
+  }
+  if (report.switchKind === "remote") {
+    _printRemoteReport(report);
+    return;
+  }
   _printSection({ title: "Ports", entries: report.ports });
   if (!report.isRunning) {
-    Acclimate.log("");
-    printWarn(
-      "Local Supabase is not running, so no live values are available. Start it with `supabase start`.",
-    );
+    _print({ text: "" });
+    _print({
+      style: "warning",
+      text: "⚠️  Local Supabase is not running, so no live values are available. Start it with `ava supabase start`.",
+    });
     return;
   }
   _printSection({
@@ -103,15 +113,55 @@ function _printReport(report: Readonly<SupabaseStatusReport>): void {
   _printEnvironmentDrift(report);
 }
 
-/** CLI for reporting which local Supabase this worktree is pointed at. */
+async function _run(branch: string | undefined): Promise<void> {
+  const target = await SupabaseBranchTarget.read(branch);
+  if (target.kind === "failed") {
+    CliTheme.error({ command: COMMAND_NAME, ...target });
+    process.exitCode = 1;
+    return;
+  }
+  CliTheme.progress("Reading the Supabase project, ports, and keys...");
+  _printReport(await SupabaseStatus.readStatusReport(target.io));
+}
+
+/** CLI for reporting which Supabase a worktree is pointed at. */
 export const SupabaseStatusCli = Acclimate.createCLI("status")
-  .description("Report the local Supabase project, ports, and keys in use")
-  .action(() => {
-    const io = createSupabaseLocalEnvironmentIo(process.cwd());
-    return SupabaseStatus.readStatusReport(io)
-      .then(_printReport)
-      .catch((error: unknown) => {
-        printError(error instanceof Error ? error.message : String(error));
-        process.exitCode = 1;
+  .description(
+    "Report which Supabase a branch uses (the shared develop stack, its own switched project, or a remote one) and its ports, keys, and endpoints.",
+  )
+  .addOption({
+    name: "--branch",
+    aliases: ["-b"],
+    description:
+      "Report on this local branch's worktree instead of the current one. The branch must exist locally and be checked out in a worktree.",
+    required: false,
+    type: "string",
+  })
+  .action((commandArguments: Readonly<{ branch?: string }>) => {
+    return _run(commandArguments.branch).catch((error: unknown) => {
+      CliTheme.error({
+        command: COMMAND_NAME,
+        message: error instanceof Error ? error.message : String(error),
+        hint: "Check that this is a worktree of the Avandar repository, then retry.",
       });
+      process.exitCode = 1;
+    });
   });
+
+/** What `ava supabase status --help` prints. */
+export const SupabaseStatusHelp: CommandHelpSpec = {
+  commandPath: ["supabase", "status"],
+  cli: SupabaseStatusCli,
+  usage: ["ava supabase status [--branch <name>]"],
+  labels: { "--branch": "<name>" },
+  examples: [
+    {
+      label: "ava supabase status",
+      description: "Report on the current branch.",
+    },
+    {
+      label: "ava supabase status --branch feat/nux",
+      description: "Report on the worktree that has feat/nux checked out.",
+    },
+  ],
+};

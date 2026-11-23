@@ -15,11 +15,23 @@ import {
 } from "./FeedbackRefinement.fixtures";
 import { inputSchema, type Input } from "./FeedbackRefinement.schema";
 
+function _assertReturnedNoteStartsClipped(
+  clips: (frame: number) => Array<RegExpMatchArray[][number][number]>,
+): void {
+  assert.equal(
+    SvgAttributes.getNumberFromMarkup({
+      attributes: clips(62)[1],
+      name: "width",
+    }),
+    0,
+  );
+}
+
 const render = ({
   frame,
   input = DEFAULT_INPUT,
-}: Readonly<{ frame: number; input?: Input }>): string =>
-  renderToStaticMarkup(
+}: Readonly<{ frame: number; input?: Input }>): string => {
+  return renderToStaticMarkup(
     createElement(
       "svg",
       {},
@@ -31,6 +43,7 @@ const render = ({
       }),
     ),
   );
+};
 function _draft({ frame, input }: { frame: number; input: Input }) {
   const markup = render({ frame: frame, input: input });
   const rect = markup.match(/<rect[^>]*data-draft="[^"]*"[^>]*>/)?.[0];
@@ -87,10 +100,11 @@ test("single review revises the returned draft before its closing journey", () =
       _draft({ frame: 94, input: DEFAULT_INPUT }).x,
   );
 });
-test("invalid revision chains and exact nested keys are rejected", () =>
-  invalidInputs.forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  ));
+test("invalid revision chains and exact nested keys are rejected", () => {
+  return invalidInputs.forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
+});
 
 registerStockPresetAssertions({
   inputSchema,
@@ -145,17 +159,14 @@ test("the returned note stays tethered before physically detaching into the revi
     SvgAttributes.getNumberFromMarkup({ attributes: note(120), name: "y" }),
     500,
   );
-  const clips = (frame: number) =>
-    [
+  const clips = (frame: number) => {
+    return [
       ...render({ frame: frame }).matchAll(/<clipPath[^>]*>\s*(<rect[^>]*>)/g),
-    ].map((match) => match[1]);
-  assert.equal(
-    SvgAttributes.getNumberFromMarkup({
-      attributes: clips(62)[1],
-      name: "width",
-    }),
-    0,
-  );
+    ].map((match) => {
+      return match[1];
+    });
+  };
+  _assertReturnedNoteStartsClipped(clips);
   assert.ok(
     SvgAttributes.getNumberFromMarkup({
       attributes: clips(82)[1],

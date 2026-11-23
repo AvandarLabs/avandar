@@ -36,7 +36,11 @@ export const inputSchema = z
         message: "Collection IDs must be unique.",
       });
     }
-    if (input.categories.some((item) => item.value > input.axisMaximum)) {
+    if (
+      input.categories.some((item) => {
+        return item.value > input.axisMaximum;
+      })
+    ) {
       context.addIssue({
         code: "custom",
         path: ["axisMaximum"],

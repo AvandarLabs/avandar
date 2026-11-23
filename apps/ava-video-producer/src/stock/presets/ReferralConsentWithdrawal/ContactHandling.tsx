@@ -1,4 +1,5 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -18,27 +19,36 @@ export function ContactHandling({
   isAffected,
   isHandling,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
       {" "}
       {isAffected ? (
-        <path
-          data-tray={contactId}
-          d={`M550 ${281 + index * 102} v16 h366 v-13`}
-          fill="none"
-          stroke={STOCK.orange}
-          strokeWidth={3}
-        />
+        <g data-tray={contactId}>
+          <SketchedShape
+            shape={{
+              kind: "path",
+              d: `M550 ${281 + index * 102} v16 h366 v-13`,
+            }}
+            profile={tokens.sketch.shape}
+            fill="none"
+            stroke={tokens.color.highlight}
+            strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+          />
+        </g>
       ) : undefined}
       {isHandling ? (
-        <path
-          data-worker-hand={contactId}
-          d={`M760 150 L${x + 350} ${y + 28}`}
-          fill="none"
-          stroke={STOCK.cyan}
-          strokeWidth={4}
-          strokeLinecap="round"
-        />
+        <g data-worker-hand={contactId}>
+          <SketchedShape
+            shape={{ kind: "path", d: `M760 150 L${x + 350} ${y + 28}` }}
+            profile={tokens.sketch.shape}
+            fill="none"
+            stroke={tokens.color.accentAlt}
+            strokeWidth={scales.stroke(tokens.stroke.heavy)}
+            strokeLinecap="round"
+          />
+        </g>
       ) : undefined}
     </g>
   );

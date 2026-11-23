@@ -182,7 +182,7 @@ export type ServerRouteHandler<
      * For other types of requests, if no body schema is specified, it will
      * default to `z.record(z.string(), z.never())` (i.e. an empty record).
      */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // oxlint-disable-next-line typescript/no-explicit-any
     bodySchema: z.ZodType<Body, any>;
 
     /**

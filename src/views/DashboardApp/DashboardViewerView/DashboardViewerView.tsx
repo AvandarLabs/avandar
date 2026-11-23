@@ -24,6 +24,8 @@ type Props = {
   workspaceSlug?: string;
   /** Whether the current viewer can navigate back to the dashboard editor. */
   canEdit?: boolean;
+  /** Puck id of a DataViz tile to scroll to and highlight once it renders. */
+  highlightedTileId?: string;
 };
 
 function _getDashboardViewerData(
@@ -148,6 +150,7 @@ export function DashboardViewerView({
   mode = "published",
   workspaceSlug,
   canEdit = false,
+  highlightedTileId,
 }: Readonly<Props>): ReactNode {
   const state = useDashboardViewerState({ dashboard, mode });
   return (
@@ -156,6 +159,7 @@ export function DashboardViewerView({
       mode={mode}
       workspaceSlug={workspaceSlug}
       canEdit={canEdit}
+      highlightedTileId={highlightedTileId}
       {...state}
     />
   );

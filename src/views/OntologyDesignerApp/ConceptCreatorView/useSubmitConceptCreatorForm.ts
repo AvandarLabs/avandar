@@ -1,10 +1,8 @@
 import { useMutation, UseMutationResultTuple } from "@avandar/query-hooks";
 import { ConceptClient } from "@/clients/ontology/ConceptClient";
+import { ConceptStatusClient } from "@/clients/ontology/ConceptStatusClient";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import {
-  insertConceptFromFormValues,
-  rollbackConceptFormInsert,
-} from "@/views/OntologyDesignerApp/insertConceptFromFormValues/insertConceptFromFormValues";
+import { insertConceptFromFormValues } from "@/views/OntologyDesignerApp/insertConceptFromFormValues/insertConceptFromFormValues";
 import type { ConceptFormSubmitValues } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
 
 export function useSubmitConceptCreatorForm(): UseMutationResultTuple<
@@ -21,10 +19,9 @@ export function useSubmitConceptCreatorForm(): UseMutationResultTuple<
       });
     },
 
-    onError: async (_error, conceptFormValues) => {
-      await rollbackConceptFormInsert(conceptFormValues);
-    },
-
-    queryToInvalidate: ConceptClient.QueryKeys.getAll(),
+    queriesToInvalidate: [
+      ConceptClient.QueryKeys.getAll(),
+      ConceptStatusClient.QueryKeys.getAll(),
+    ],
   });
 }

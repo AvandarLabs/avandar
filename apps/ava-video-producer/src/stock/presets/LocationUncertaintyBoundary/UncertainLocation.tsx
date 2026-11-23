@@ -1,4 +1,5 @@
-import { ramp } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { LocationPin } from "./LocationPin";
 import type { Input } from "./LocationUncertaintyBoundary.schema";
 import type { ReactNode } from "react";
@@ -22,20 +23,27 @@ export function UncertainLocation({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const x = 50 + location.x * 3.6,
     y = 140 + location.y * 3.6;
   return (
     <g>
       {showFootprint ? (
-        <circle
+        <SketchedShape
+          shape={{
+            kind: "circle",
+            cx: x,
+            cy: y,
+            r: location.radius * 3.6 * motion.ramp(frame, 36, motion.scale(48)),
+          }}
+          profile={tokens.sketch.shape}
           data-footprint={location.id}
-          cx={x}
-          cy={y}
-          r={location.radius * 3.6 * ramp(frame, 36, 48)}
           fill={accent}
-          fillOpacity={0.12}
+          fillOpacity={scales.wash(tokens.alpha.tint)}
           stroke={accent}
-          strokeWidth={1.5}
+          strokeWidth={scales.stroke(tokens.stroke.outline)}
         />
       ) : undefined}
       <LocationPin

@@ -1225,8 +1225,12 @@ execute on function public.util__storage_object_workspace_id (text) to authentic
  * Extracts a dashboard UUID from a published snapshot object path.
  *
  * Versioned snapshot objects are named
- * `dashboards/<dashboardId>/revisions/<revision>/datasets/<datasetId>.parquet`.
- * Legacy objects use `dashboards/<dashboardId>/datasets/<datasetId>.parquet`.
+ * `dashboards/<dashboardId>/revisions/<revision>/datasets/<datasetId>.parquet`
+ * for a dataset and
+ * `dashboards/<dashboardId>/revisions/<revision>/maps/<mapId>.json` for a
+ * map's rendered output. Legacy objects use
+ * `dashboards/<dashboardId>/datasets/<datasetId>.parquet`. Map snapshots have
+ * no legacy form.
  *
  * Returns NULL for any name that does not match that shape, including a
  * non-UUID id segment. NULL is DENY in the storage policies that call this:
@@ -1243,6 +1247,8 @@ set
   select case
     when p_object_name ~
       '^dashboards/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/revisions/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/datasets/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\.parquet$'
+      or p_object_name ~
+      '^dashboards/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/revisions/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/maps/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\.json$'
       or p_object_name ~
       '^dashboards/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/datasets/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\.parquet$'
     then split_part(p_object_name, '/', 2)::uuid
@@ -1270,9 +1276,10 @@ execute on function public.util__storage_object_dashboard_id (text) to authentic
 /**
  * Extracts a revision UUID from an exact published snapshot object path.
  *
- * Exact legacy paths map to the all-zero UUID reserved for the legacy
- * generation. Returns NULL for malformed or extended paths so storage policies
- * fail closed instead of authorizing an object whose generation is ambiguous.
+ * Accepts a revisioned dataset Parquet or a revisioned map JSON. Exact legacy
+ * dataset paths map to the all-zero UUID reserved for the legacy generation.
+ * Returns NULL for malformed or extended paths so storage policies fail closed
+ * instead of authorizing an object whose generation is ambiguous.
  *
  * @param p_object_name The `storage.objects.name` value.
  * @returns The snapshot revision, or NULL when the path is not exact.
@@ -1283,6 +1290,8 @@ set
   select case
     when p_object_name ~
       '^dashboards/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/revisions/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/datasets/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\.parquet$'
+      or p_object_name ~
+      '^dashboards/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/revisions/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/maps/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\.json$'
     then split_part(p_object_name, '/', 4)::uuid
     when p_object_name ~
       '^dashboards/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/datasets/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\.parquet$'

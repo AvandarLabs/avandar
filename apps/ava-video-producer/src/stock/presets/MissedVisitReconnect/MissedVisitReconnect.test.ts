@@ -25,7 +25,7 @@ function _render({
     }),
   );
 }
-test("Contact and booking do not move a person through the clinic door; only the authored attended outcome does, and all original cases retain a final state.", () => {
+test("default missed-visit hold frame retains case count and exposes booked and attended outcomes", () => {
   const markup = _render({ frame: 150 });
   assert.equal(
     (markup.match(/data-case=/g) ?? []).length,
@@ -40,44 +40,9 @@ import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/reg
 import { missedVisitReconnectContract } from "./MissedVisitReconnect.contract";
 import { inputSchema, type Input } from "./MissedVisitReconnect.schema";
 
-const textLayoutOptions = {
-  inputSchema,
-  fixtures,
-  render: _render,
-  excludedTextFields: ["id", "outcome", "channel"],
-  getVisibleTexts: ({ input }: Readonly<{ input: Input }>) => [
-    input.sceneLabel,
-    ...Object.values(input.places),
-    ...input.cases.map(prop("label")),
-    input.copy.group,
-    ...(input.showAttemptCount ? [input.copy.attempts] : []),
-    ...(input.showOutcomeLedger
-      ? [
-          input.copy.unreached,
-          input.copy.contacted,
-          input.copy.booked,
-          input.copy.attended,
-        ]
-      : []),
-  ],
-} satisfies Pick<
-  PresetAssertions<Input>,
-  | "inputSchema"
-  | "fixtures"
-  | "render"
-  | "excludedTextFields"
-  | "getVisibleTexts"
->;
-registerStockPresetAssertions({
-  ...textLayoutOptions,
-  defaultInput: DEFAULT_INPUT,
-  invalidInputs,
-  contract: missedVisitReconnectContract,
-});
-registerStockTextLayoutAssertions(textLayoutOptions);
-
-test("only attendance crosses the complete clinic boundary; booking folds onto its own calendar", () => {
-  const input = fixtures[2].input;
+function _assertAttendanceGeometryAcrossFrames(
+  input: (typeof fixtures)[number]["input"],
+): void {
   [30, 44, 64, 84, 96, 108, 115, 150].forEach((frame) => {
     const markup = _render({ frame: frame, input: input });
     const people = Array.from(
@@ -102,6 +67,49 @@ test("only attendance crosses the complete clinic boundary; booking folds onto i
       input.cases.filter(propEq("outcome", "booked")).length,
     );
   });
+}
+
+const textLayoutOptions = {
+  inputSchema,
+  fixtures,
+  render: _render,
+  excludedTextFields: ["id", "outcome", "channel"],
+  getVisibleTexts: ({ input }: Readonly<{ input: Input }>) => {
+    return [
+      input.sceneLabel,
+      ...Object.values(input.places),
+      ...input.cases.map(prop("label")),
+      input.copy.group,
+      ...(input.showAttemptCount ? [input.copy.attempts] : []),
+      ...(input.showOutcomeLedger
+        ? [
+            input.copy.unreached,
+            input.copy.contacted,
+            input.copy.booked,
+            input.copy.attended,
+          ]
+        : []),
+    ];
+  },
+} satisfies Pick<
+  PresetAssertions<Input>,
+  | "inputSchema"
+  | "fixtures"
+  | "render"
+  | "excludedTextFields"
+  | "getVisibleTexts"
+>;
+registerStockPresetAssertions({
+  ...textLayoutOptions,
+  defaultInput: DEFAULT_INPUT,
+  invalidInputs,
+  contract: missedVisitReconnectContract,
+});
+registerStockTextLayoutAssertions(textLayoutOptions);
+
+test("only attendance crosses the complete clinic boundary; booking folds onto its own calendar", () => {
+  const input = fixtures[2].input;
+  _assertAttendanceGeometryAcrossFrames(input);
   const markup = _render({ frame: 150, input: input });
   assert.match(markup, /data-group-total="6"/);
   assert.match(markup, /data-attempt-total="18"/);

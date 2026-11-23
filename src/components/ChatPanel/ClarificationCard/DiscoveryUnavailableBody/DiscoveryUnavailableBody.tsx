@@ -1,6 +1,9 @@
 import { Trans } from "@lingui/react/macro";
-import { Alert, Code, Stack, Text } from "@mantine/core";
+import { Alert, Anchor, Code, Stack, Text } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import { IconAlertCircle } from "@tabler/icons-react";
+import { QueryErrorKind } from "@/lib/sql/QueryErrorKind/QueryErrorKind";
+import { useQueryErrorExplanation } from "@/views/DataExplorerApp/useQueryErrorExplanation/useQueryErrorExplanation";
 import { DiscoveryCustomFallback } from "./DiscoveryCustomFallback";
 import { DiscoveryRecoveryActions } from "./DiscoveryRecoveryActions";
 import type { ClarificationSubmitAnswer } from "../ClarificationAnswerModule/ClarificationAnswer";
@@ -14,7 +17,11 @@ type Props = {
   onSubmit: (answer: ClarificationSubmitAnswer) => void;
 };
 
-/** Renders a fallback when discovery errors or returns no values. */
+/**
+ * Renders a fallback when discovery errors or returns no values. A failed
+ * lookup is explained in plain language, with the technical message and the
+ * lookup's SQL behind "Show details".
+ */
 export function DiscoveryUnavailableBody({
   column,
   error,
@@ -23,6 +30,8 @@ export function DiscoveryUnavailableBody({
   onRequestDifferentDiscovery,
   onSubmit,
 }: Readonly<Props>): React.ReactNode {
+  const [isDetailsOpen, { toggle: toggleDetails }] = useDisclosure(false);
+  const explanation = useQueryErrorExplanation(error);
   return (
     <Stack gap="xs">
       {error ? (
@@ -33,10 +42,30 @@ export function DiscoveryUnavailableBody({
           radius="sm"
           p="xs"
         >
-          <Text size="xs">{error}</Text>
-          <Code block fz="xs" mt={4}>
-            {queryPreview}
-          </Code>
+          <Text size="xs">{explanation}</Text>
+          <Anchor
+            component="button"
+            type="button"
+            size="xs"
+            aria-expanded={isDetailsOpen}
+            onClick={toggleDetails}
+          >
+            {isDetailsOpen ? (
+              <Trans>Hide details</Trans>
+            ) : (
+              <Trans>Show details</Trans>
+            )}
+          </Anchor>
+          {isDetailsOpen ? (
+            <Stack gap={4} mt={4}>
+              <Code block fz="xs">
+                {QueryErrorKind.toTechnicalDetails(error)}
+              </Code>
+              <Code block fz="xs">
+                {queryPreview}
+              </Code>
+            </Stack>
+          ) : null}
         </Alert>
       ) : (
         <Text size="xs" c="dimmed">

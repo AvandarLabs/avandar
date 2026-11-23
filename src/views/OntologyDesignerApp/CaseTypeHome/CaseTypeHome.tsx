@@ -13,7 +13,8 @@ export type CaseTypeHomeItem = {
 
 type Props = {
   caseTypes: readonly CaseTypeHomeItem[];
-  onCreate: () => void;
+  /** Omitted when the user cannot create case types. */
+  onCreate?: () => void;
   onOpenCaseType: (caseType: CaseTypeHomeItem) => void;
   /** Omitted when the caller does not support deleting case types. */
   onDeleteCaseType?: (caseType: CaseTypeHomeItem) => void;
@@ -21,7 +22,8 @@ type Props = {
 };
 
 /**
- * Case Manager home: a card grid of case types plus a dashed create card.
+ * Case Manager home: a card grid of case types, plus a dashed create card
+ * when the caller handles creation.
  */
 export function CaseTypeHome({
   caseTypes,
@@ -62,7 +64,7 @@ export function CaseTypeHome({
               />
             );
           })}
-          <NewCaseTypeCard onCreate={onCreate} />
+          {onCreate ? <NewCaseTypeCard onCreate={onCreate} /> : null}
         </div>
       )}
     </div>

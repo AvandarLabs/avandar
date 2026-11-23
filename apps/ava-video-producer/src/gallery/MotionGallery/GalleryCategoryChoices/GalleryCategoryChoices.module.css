@@ -1,0 +1,11 @@
+.galleryCategoryChoicesCategoryList {
+  composes: category-list from global;
+}
+
+.galleryCategoryChoicesCategoryCount {
+  composes: category-count from global;
+}
+
+.galleryCategoryChoicesCategoryButton {
+  composes: category-button from global;
+}

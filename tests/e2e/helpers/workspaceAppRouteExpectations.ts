@@ -40,6 +40,16 @@ export const WORKSPACE_APP_ROUTES = {
     path: "/map",
     allowedUrlPattern: /\/map/,
   },
+  caseTypes: {
+    label: "Case Types",
+    path: "/ontology-designer",
+    allowedUrlPattern: /\/ontology-designer/,
+  },
+  caseRecords: {
+    label: "Case Records",
+    path: "/individual-manager",
+    allowedUrlPattern: /\/individual-manager\//,
+  },
   settings: {
     label: "Workspace Settings",
     path: "/settings",

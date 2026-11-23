@@ -1,0 +1,9 @@
+.plotHandlesPlotHandle {
+  fill: none;
+  stroke: var(--demo-muted);
+  stroke-width: var(--demo-stroke-outline, 1.5);
+}
+
+.plotHandlesPlotHandlePoint {
+  fill: var(--demo-muted);
+}

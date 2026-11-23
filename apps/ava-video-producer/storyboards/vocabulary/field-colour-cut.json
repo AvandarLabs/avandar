@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "id": "field-colour-cut",
+  "title": "Field-colour cut",
+  "description": "Hard cuts that change the whole field colour, from a dark field to the accent and then to a light field, using a per-shot theme instead of a transition.",
+  "sourceNotes": [
+    "Scene study extracted from the shot vocabulary film; an editorial example, not a claim about Avandar features.",
+    "The count is fictional demonstration data."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1920,
+  "height": 1080,
+  "delivery": {
+    "width": 1920,
+    "height": 1080
+  },
+  "captions": false,
+  "shots": [
+    {
+      "id": "dark-field",
+      "scene": "typography",
+      "durationInFrames": 60,
+      "transitionInFrames": 0,
+      "props": {
+        "lines": ["Cases, visits, facilities"],
+        "fontSize": 84,
+        "revealAtFrame": 4
+      }
+    },
+    {
+      "id": "accent-field",
+      "scene": "typography",
+      "durationInFrames": 60,
+      "transitionInFrames": 0,
+      "transition": {
+        "kind": "cut"
+      },
+      "theme": {
+        "ground": "var(--brand)",
+        "foreground": "$atomic.swatch.slateInk",
+        "brand-strong": "$white",
+        "muted-foreground": "$atomic.swatch.slate800",
+        "background": "$atomic.swatch.slateInk",
+        "card": "$atomic.swatch.slate800",
+        "border": "$atomic.swatch.slate700"
+      },
+      "props": {
+        "lines": ["One model"],
+        "emphasis": ["model"],
+        "fontSize": 120,
+        "revealAtFrame": 2
+      }
+    },
+    {
+      "id": "light-field",
+      "scene": "metric",
+      "durationInFrames": 90,
+      "transitionInFrames": 0,
+      "transition": {
+        "kind": "cut"
+      },
+      "theme": {
+        "ground": "$atomic.swatch.slate50",
+        "foreground": "$atomic.swatch.slate900",
+        "muted-foreground": "$atomic.swatch.slate500",
+        "muted": "$atomic.swatch.slate300",
+        "border": "$atomic.swatch.slate300",
+        "card": "$white",
+        "brand-strong": "var(--brand)"
+      },
+      "props": {
+        "label": "Districts reporting this week",
+        "value": 42,
+        "countAtFrame": 4,
+        "countDurationInFrames": 30,
+        "detail": "Fictional demonstration data"
+      }
+    }
+  ]
+}

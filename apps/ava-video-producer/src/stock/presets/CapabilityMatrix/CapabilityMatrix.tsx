@@ -2,7 +2,7 @@ import { CapabilityFocus } from "./CapabilityFocus";
 import { CapabilityGrid } from "./CapabilityGrid";
 import { CapabilityLegend } from "./CapabilityLegend";
 import { CapabilityRow } from "./CapabilityRow";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./CapabilityMatrix.schema";
 import type { ReactNode } from "react";
 /** Frame-controlled categorical matrix with complete authored content. */
@@ -16,9 +16,9 @@ export function CapabilityMatrix({
   return (
     <g>
       <CapabilityGrid frame={frame} input={input} />
-      {input.capabilities.map((row, index) => (
-        <CapabilityRow key={row.id} {...{ row, index, input, frame }} />
-      ))}
+      {input.capabilities.map((row, index) => {
+        return <CapabilityRow key={row.id} {...{ row, index, input, frame }} />;
+      })}
       <CapabilityFocus frame={frame} input={input} accent={accent} />
       <CapabilityLegend frame={frame} input={input} />
     </g>

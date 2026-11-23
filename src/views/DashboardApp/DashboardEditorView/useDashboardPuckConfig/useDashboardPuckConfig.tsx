@@ -18,6 +18,7 @@ import { Workspace } from "$/models/Workspace/Workspace";
 import { CURRENT_SCHEMA_VERSION } from "@/views/DashboardApp/AvaPage/migrations/config";
 import { useDataVizPBlockConfig } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/useDataVizPBlockConfig";
 import { useFilterPBlockConfig } from "@/views/DashboardApp/AvaPage/pblocks/FilterPBlock/useFilterPBlockConfig";
+import { useMapPBlockConfig } from "@/views/DashboardApp/AvaPage/pblocks/MapPBlock/useMapPBlockConfig";
 import { useContainerMaxWidthPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/ContainerMaxWidthPField/useContainerMaxWidthPFieldConfig";
 import { DashboardDesignTokens } from "@/views/DashboardApp/AvaPage/utils/DashboardDesignTokens/DashboardDesignTokens";
 import puckConfigCss from "./useDashboardPuckConfig.module.css";
@@ -391,6 +392,7 @@ export function useDashboardPuckConfig(options: {
     dashboardId,
   });
   const filterFieldConfig = useFilterPBlockConfig();
+  const mapFieldConfig = useMapPBlockConfig();
   const containerMaxWidthFieldConfig = useContainerMaxWidthPFieldConfig();
   return useMemo<AvaPageConfig>(() => {
     return {
@@ -697,6 +699,7 @@ export function useDashboardPuckConfig(options: {
           components: [
             "DataViz",
             "Filter",
+            "Map",
             "Card",
             "CalloutBlock",
             "CodeBlock",
@@ -1163,6 +1166,7 @@ export function useDashboardPuckConfig(options: {
         },
         DataViz: dataVizFieldConfig,
         Filter: filterFieldConfig,
+        Map: mapFieldConfig,
         HeadingBlock: {
           label: i18n._(msg`Heading`),
           fields: {
@@ -1588,6 +1592,7 @@ export function useDashboardPuckConfig(options: {
     typographyOptions,
     dataVizFieldConfig,
     filterFieldConfig,
+    mapFieldConfig,
     containerMaxWidthFieldConfig,
   ]);
 }

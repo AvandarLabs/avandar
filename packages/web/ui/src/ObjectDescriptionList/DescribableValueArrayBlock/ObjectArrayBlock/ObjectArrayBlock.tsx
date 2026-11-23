@@ -6,6 +6,7 @@ import { CollapsibleItem } from "../../CollapsibleItem";
 import { getOrderedKeys } from "../../gerOrderedKeys/getOrderedKeys";
 import { getObjectKeyTransformFn } from "../../getObjectKeyTransformFn";
 import { ValueItemContainer } from "../../ValueItemContainer";
+import { createDescriptionValueEntries } from "../createDescriptionValueEntries";
 import { ObjectTableRow } from "./ObjectTableRow";
 import type {
   AnyDescribableValueRenderOptions,
@@ -107,23 +108,23 @@ export function ObjectArrayBlock<
       );
     });
 
-    const rows = valuesToRender.map((rowObject, idx) => {
-      const rowId = String(rowObject[idKey ?? "id"] ?? idx);
-
-      return (
-        <ObjectTableRow<T, RootData>
-          key={rowId}
-          rowObject={rowObject}
-          headerKeysToRender={headerKeysToRender}
-          rootData={rootData}
-          parentRenderOptions={
-            parentRenderOptions as AnyDescribableValueRenderOptions
-          }
-          itemRenderOptions={itemRenderOptions}
-          onSubmitChange={onSubmitChange}
-        />
-      );
-    });
+    const rows = createDescriptionValueEntries(valuesToRender, idKey).map(
+      ({ value: rowObject, key: rowKey }) => {
+        return (
+          <ObjectTableRow<T, RootData>
+            key={rowKey}
+            rowObject={rowObject}
+            headerKeysToRender={headerKeysToRender}
+            rootData={rootData}
+            parentRenderOptions={
+              parentRenderOptions as AnyDescribableValueRenderOptions
+            }
+            itemRenderOptions={itemRenderOptions}
+            onSubmitChange={onSubmitChange}
+          />
+        );
+      },
+    );
 
     return (
       <Table>
@@ -147,32 +148,31 @@ export function ObjectArrayBlock<
 
   // render the entities as a list, where each entity is a collapsible
   // entity description list.
-  const listItems = valuesToRender.map((val, idx) => {
-    // TODO(jpsyx): use a stable key
-    const entityId = String(val[idKey ?? "id"] ?? idx);
-
-    return (
-      <CollapsibleItem
-        key={entityId}
-        label={titleKey ? String(val[titleKey]) : String(idx + 1)}
-        defaultOpen={defaultExpanded}
-      >
-        {/* We intentionally pass the `parentRenderOptions` because the
+  const listItems = createDescriptionValueEntries(valuesToRender, idKey).map(
+    ({ value: val, key: entityKey }, idx) => {
+      return (
+        <CollapsibleItem
+          key={entityKey}
+          label={titleKey ? String(val[titleKey]) : String(idx + 1)}
+          defaultOpen={defaultExpanded}
+        >
+          {/* We intentionally pass the `parentRenderOptions` because the
           child-specific render options will be computed inside the object
           description list */}
-        <ValueItemContainer
-          type="object"
-          value={val}
-          rootData={rootData}
-          onSubmitChange={onSubmitChange}
-          {...(parentRenderOptions as ObjectRenderOptions<
-            DescribableObject,
-            RootData
-          >)}
-        />
-      </CollapsibleItem>
-    );
-  });
+          <ValueItemContainer
+            type="object"
+            value={val}
+            rootData={rootData}
+            onSubmitChange={onSubmitChange}
+            {...(parentRenderOptions as ObjectRenderOptions<
+              DescribableObject,
+              RootData
+            >)}
+          />
+        </CollapsibleItem>
+      );
+    },
+  );
 
   const remainingCount = values.length - valuesToRender.length;
   const moreText =

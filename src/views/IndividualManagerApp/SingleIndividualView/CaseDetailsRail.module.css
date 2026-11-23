@@ -1,0 +1,21 @@
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-xs);
+}
+
+/*
+ * While the fields load, or when there are none, the group's fact list is
+ * empty. Hiding it keeps the status below the label the same distance away
+ * as the first fact would be.
+ */
+.details dl:empty {
+  display: none;
+}
+
+/* Source lines read as plain dimmed lines, one per dataset. */
+.sourceList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}

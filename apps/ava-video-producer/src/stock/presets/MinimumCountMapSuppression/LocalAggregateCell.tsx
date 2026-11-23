@@ -1,5 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { LocalCountValue } from "./LocalCountValue";
 import { ThresholdShutter } from "./ThresholdShutter";
 import type { Input } from "./MinimumCountMapSuppression.schema";
@@ -20,18 +21,20 @@ export function LocalAggregateCell({
   showLocalCounts,
   frame,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const x = 40 + (index % 2) * 190;
   const y = 170 + Math.floor(index / 2) * 100;
   return (
     <g>
-      <rect
+      <StockRect
         x={x}
         y={y}
         width={170}
         height={88}
-        rx={8}
-        fill={STOCK.surface}
-        stroke={STOCK.line}
+        rx={scales.corner(tokens.corner.cell)}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
       />
       <LabelSlots labels={[[cell.label, x + 12, y + 20, 146, 12, 3]]} />
       {showLocalCounts && cell.count !== null ? (

@@ -59,10 +59,11 @@ export const inputSchema = z
     }
     input.fields.forEach((field, index) => {
       if (
-        input.sources.some(
-          (source) =>
-            field.candidates.filter(propEq("sourceId", source.id)).length !== 1,
-        )
+        input.sources.some((source) => {
+          return (
+            field.candidates.filter(propEq("sourceId", source.id)).length !== 1
+          );
+        })
       ) {
         context.addIssue({
           code: "custom",

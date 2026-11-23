@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { prop } from "@avandar/utils";
 import { getSvgAttributeMatchesFromMarkup } from "../../../../../tests/helpers/getSvgAttributeMatchesFromMarkup/getSvgAttributeMatchesFromMarkup";
-import { registerStockLocalizationAssertions } from "../../../../../tests/helpers/registerStockLocalizationAssertions";
+import { registerStockDefaultTextAssertions } from "../../../../../tests/helpers/registerStockDefaultTextAssertions";
 import { registerStockPresetAssertions } from "../../../../../tests/helpers/registerStockPresetAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
@@ -21,6 +21,19 @@ import {
   EXCLUSIONS,
 } from "./GeometryDetailBudgetTestHelpers";
 
+function _assertActiveSegmentAdvances(): void {
+  assert.notEqual(
+    getSvgAttributeMatchesFromMarkup({
+      markup: _render({ frame: 53 }),
+      attribute: "data-active-segment",
+    }).values[0],
+    getSvgAttributeMatchesFromMarkup({
+      markup: _render({ frame: 102 }),
+      attribute: "data-active-segment",
+    }).values[0],
+  );
+}
+
 registerStockPresetAssertions({
   inputSchema,
   defaultInput: DEFAULT_INPUT,
@@ -32,7 +45,7 @@ registerStockPresetAssertions({
   getVisibleTexts: _getVisibleTexts,
 });
 
-registerStockLocalizationAssertions({
+registerStockDefaultTextAssertions({
   contract,
   expectedTextPaths: [
     ["labels", "original"],
@@ -206,16 +219,7 @@ test("recursive chords and deviation guides use actual evaluated segment endpoin
     }),
     3,
   );
-  assert.notEqual(
-    getSvgAttributeMatchesFromMarkup({
-      markup: _render({ frame: 53 }),
-      attribute: "data-active-segment",
-    }).values[0],
-    getSvgAttributeMatchesFromMarkup({
-      markup: _render({ frame: 102 }),
-      attribute: "data-active-segment",
-    }).values[0],
-  );
+  _assertActiveSegmentAdvances();
   assert.equal(
     getSvgAttributeMatchesFromMarkup({
       markup: _render({ frame: 150, input: CHANGED_INPUT }),
@@ -233,12 +237,12 @@ test("recursive chords and deviation guides use actual evaluated segment endpoin
 });
 
 test("full precision tolerance remains complete beside dense recursive event data", () => {
-  assert.doesNotThrow(() =>
-    _render({
+  assert.doesNotThrow(() => {
+    return _render({
       frame: 80,
       input: { ...fixtures[2].input, tolerance: 0.0000010000000000000002 },
-    }),
-  );
+    });
+  });
 });
 
 test("complete authored captions remain clear of other captions and opaque foreground rectangles", () => {
@@ -248,15 +252,16 @@ test("complete authored captions remain clear of other captions and opaque foreg
         _render({ frame: frame, input: input }),
       );
       SvgPaintAssertions.assertPaintClearance({
-        texts: paint.filter(
-          (item) => item.kind === "text" && item.ariaLabel !== undefined,
-        ),
-        rectangles: paint.filter(
-          (item) =>
+        texts: paint.filter((item) => {
+          return item.kind === "text" && item.ariaLabel !== undefined;
+        }),
+        rectangles: paint.filter((item) => {
+          return (
             item.kind === "rect" &&
             item.fill !== "none" &&
-            item.opacity * item.fillOpacity > 0.9,
-        ),
+            item.opacity * item.fillOpacity > 0.9
+          );
+        }),
       });
     });
   });
@@ -264,10 +269,9 @@ test("complete authored captions remain clear of other captions and opaque foreg
 
 test("resolved recursive trace remains present across the final split and highlight handoff", () => {
   const expected = [0, 2, 3, 4, 5]
-    .map(
-      (index, position) =>
-        `${position ? "L" : "M"}${60 + DEFAULT_INPUT.vertices[index][0] * 3.6} ${160 + DEFAULT_INPUT.vertices[index][1] * 3.6}`,
-    )
+    .map((index, position) => {
+      return `${position ? "L" : "M"}${60 + DEFAULT_INPUT.vertices[index][0] * 3.6} ${160 + DEFAULT_INPUT.vertices[index][1] * 3.6}`;
+    })
     .join(" ");
   const trace = getSvgAttributeMatchesFromMarkup({
     markup: _render({ frame: 111 }),

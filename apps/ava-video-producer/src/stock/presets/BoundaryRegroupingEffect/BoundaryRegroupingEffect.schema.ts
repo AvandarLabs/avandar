@@ -1,4 +1,4 @@
-import { propEq, prop } from "@avandar/utils";
+import { prop, propEq, propIsInArray } from "@avandar/utils";
 import { z } from "zod";
 import { OrthogonalGrid } from "../../geometry/OrthogonalGrid/OrthogonalGrid";
 /** Strict authored input structure. */
@@ -59,25 +59,32 @@ function _validGrouping(input: SchemaInput): boolean {
       new Set(grouping.zones.map(prop("id"))).size === grouping.zones.length &&
       ids.length === input.cells.length &&
       new Set(ids).size === ids.length &&
-      ids.every((id) => input.cells.some(propEq("id", id))) &&
-      grouping.zones.every((zone) =>
-        OrthogonalGrid.areCellsConnected(
-          input.cells.filter((cell) => zone.cellIds.includes(cell.id)),
-        ),
-      )
+      ids.every((id) => {
+        return input.cells.some(propEq("id", id));
+      }) &&
+      grouping.zones.every((zone) => {
+        return OrthogonalGrid.areCellsConnected(
+          input.cells.filter(propIsInArray("id", zone.cellIds)),
+        );
+      })
     );
   });
 }
 /** Strict complete partitions of unchanged atomic cells. */
 export const inputSchema = structure
-  .refine(
-    (input) =>
+  .refine((input) => {
+    return (
       new Set(input.cells.map(prop("id"))).size === input.cells.length &&
-      new Set(input.cells.map((cell) => `${cell.column},${cell.row}`)).size ===
-        input.cells.length &&
-      input.cells.every((cell) => cell.records <= cell.population),
-    "Cells require unique IDs/positions and records <= population.",
-  )
+      new Set(
+        input.cells.map((cell) => {
+          return `${cell.column},${cell.row}`;
+        }),
+      ).size === input.cells.length &&
+      input.cells.every((cell) => {
+        return cell.records <= cell.population;
+      })
+    );
+  }, "Cells require unique IDs/positions and records <= population.")
   .refine(
     _validGrouping,
     "Each grouping must partition every cell exactly once into unique contiguous zones.",

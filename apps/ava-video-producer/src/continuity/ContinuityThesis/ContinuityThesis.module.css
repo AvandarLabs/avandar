@@ -1,0 +1,19 @@
+.continuityThesis {
+  display: flex;
+  flex-direction: column;
+  gap: var(--video-component-thesis-gap);
+  inset: var(--video-component-thesis-inset-top)
+    var(--video-component-thesis-inset-x)
+    var(--video-component-thesis-inset-bottom);
+  justify-content: center;
+  position: absolute;
+}
+
+.continuityThesisLine {
+  color: var(--video-text-stage-thesis-color);
+  font-family: var(--video-text-stage-thesis-font-family);
+  font-size: var(--video-text-stage-thesis-font-size);
+  font-weight: var(--video-text-stage-thesis-font-weight);
+  letter-spacing: var(--video-text-stage-thesis-letter-spacing);
+  line-height: var(--video-text-stage-thesis-line-height);
+}

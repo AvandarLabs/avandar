@@ -1,4 +1,4 @@
-import { ramp } from "../../../motion";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CargoCarrierShape } from "./CargoCarrierShape/CargoCarrierShape";
 import { getCarrierPositionFromInputAndFrame } from "./getCarrierPositionFromInputAndFrame";
 import type { Input } from "./AidCargoModeHandoff.schema";
@@ -19,12 +19,18 @@ export function CargoCarrier({
   index,
   accent,
 }: Readonly<Props>): ReactNode {
-  const { x, y } = getCarrierPositionFromInputAndFrame({ input, frame, index });
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const { x, y } = getCarrierPositionFromInputAndFrame({
+    motion,
+    input,
+    frame,
+    index,
+  });
   return (
     <g
       data-carrier={carrier.id}
       data-mode={carrier.mode}
-      opacity={ramp(frame, 10 + index * 3, 12)}
+      opacity={motion.reveal(frame, 10 + index * motion.scaleStagger(3))}
       transform={`translate(${x} ${y})`}
     >
       <CargoCarrierShape mode={carrier.mode} accent={accent} />

@@ -8,7 +8,9 @@ type Props = { input: Input };
 export function AliquotEquation({ input }: Readonly<Props>): ReactNode {
   const remainder =
     input.parent.volume -
-    input.aliquots.reduce((total, { volume }) => total + volume, 0);
+    input.aliquots.reduce((total, { volume }) => {
+      return total + volume;
+    }, 0);
   return (
     <FitText
       text={`${input.parent.volume} = ${input.aliquots.map(prop("volume")).join(" + ")} + ${remainder}`}

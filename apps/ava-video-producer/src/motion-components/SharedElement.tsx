@@ -1,11 +1,12 @@
 import { interpolateStyles } from "@remotion/animation-utils";
-import { getMotionProgress } from "./motionSettings";
-import type { MotionRect } from "./AnchoredOverlay";
-import type { MotionOptions } from "./motionSettings";
+import { MotionRect } from "./getOverlayTimings";
+import { MotionSettings } from "./MotionSettings/MotionSettings";
+import type { MotionOptions } from "./MotionSettings/MotionSettings";
 import type { CSSProperties, ReactNode } from "react";
-
-/** A persistent child's source, destination and frame-authored travel controls. */
-export type SharedElementProps = {
+/**
+ * A persistent child's source, destination and frame-authored travel controls.
+ */
+export type Props = {
   source: MotionRect;
   target: MotionRect;
   frame: number;
@@ -16,7 +17,9 @@ export type SharedElementProps = {
   className?: string;
   style?: CSSProperties;
 };
-
+function _rectToGeometry(rect: MotionRect) {
+  return { left: rect.x, top: rect.y, width: rect.width, height: rect.height };
+}
 /** Keep one semantic object mounted as its measured rectangle changes. */
 export function SharedElement({
   source,
@@ -28,25 +31,20 @@ export function SharedElement({
   children,
   className,
   style,
-}: SharedElementProps) {
-  const progress = getMotionProgress(frame, at, durationInFrames, motion);
+}: Props): ReactNode {
+  const theme = MotionSettings.useMotionSettingsTheme();
+  const progress = MotionSettings.getMotionProgress({
+    frame,
+    at,
+    duration: durationInFrames,
+    options: motion,
+    fallback: undefined,
+    theme,
+  });
   const geometry = interpolateStyles(
     progress,
     [0, 1],
-    [
-      {
-        left: source.x,
-        top: source.y,
-        width: source.width,
-        height: source.height,
-      },
-      {
-        left: target.x,
-        top: target.y,
-        width: target.width,
-        height: target.height,
-      },
-    ],
+    [_rectToGeometry(source), _rectToGeometry(target)],
   );
   return (
     <div
@@ -57,3 +55,5 @@ export function SharedElement({
     </div>
   );
 }
+/** The public input contract for shared-element motion. */
+export type SharedElementProps = Props;

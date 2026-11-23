@@ -1,11 +1,11 @@
-import { STOCK } from "../../stockPalette";
 /**
- * Fixed route swatches connect authored route captions to intact components.
+ * Fixed categorical swatch keys connect authored route captions to intact
+ * components. Each key reads `color.categorical.<key>` from the theme.
  */
-export const ROUTE_COLORS = {
-  reuse: STOCK.mint,
-  repair: STOCK.cyan,
-  recycle: STOCK.orange,
-  residue: "#b7a3e8",
-  replacement: "#df95aa",
+export const ROUTE_CATEGORY_KEYS = {
+  reuse: 1,
+  repair: 2,
+  recycle: 3,
+  residue: 5,
+  replacement: 4,
 } as const;

@@ -45,21 +45,24 @@ function _hasTwoDecimalPlaces(value: number): boolean {
 }
 /** Strict contiguous floor with exact authored hundredths. */
 export const inputSchema = structure
-  .refine(
-    (input) =>
+  .refine((input) => {
+    return (
       new Set(input.floorTiles.map(prop("id"))).size ===
         input.floorTiles.length &&
-      new Set(input.floorTiles.map((tile) => `${tile.column},${tile.row}`))
-        .size === input.floorTiles.length &&
-      OrthogonalGrid.areCellsConnected(input.floorTiles),
-    "Floor IDs and positions are unique and the footprint is contiguous.",
-  )
-  .refine(
-    (input) =>
+      new Set(
+        input.floorTiles.map((tile) => {
+          return `${tile.column},${tile.row}`;
+        }),
+      ).size === input.floorTiles.length &&
+      OrthogonalGrid.areCellsConnected(input.floorTiles)
+    );
+  }, "Floor IDs and positions are unique and the footprint is contiguous.")
+  .refine((input) => {
+    return (
       _hasTwoDecimalPlaces(input.areaPerTile) &&
-      _hasTwoDecimalPlaces(input.illustrativeAreaPerPlace),
-    "Areas permit at most two decimal places.",
-  ) satisfies z.ZodType;
+      _hasTwoDecimalPlaces(input.illustrativeAreaPerPlace)
+    );
+  }, "Areas permit at most two decimal places.") satisfies z.ZodType;
 /** Schema-inferred accepted document. */
 export type Input = z.infer<typeof inputSchema>;
 /** Runtime-only semantic constraints. */

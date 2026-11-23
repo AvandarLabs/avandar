@@ -52,16 +52,20 @@ export const fixtures: Array<{ id: string; input: Input }> = [
     input: {
       ...DEFAULT_INPUT,
       question: "界".repeat(60),
-      alternatives: DEFAULT_INPUT.alternatives.map((item) => ({
-        ...item,
-        label: "界".repeat(24),
-      })),
-      criteria: Array.from({ length: 3 }, (_, index) => ({
-        id: `criterion-${index}`,
-        label: "界".repeat(20),
-        leftText: "界".repeat(34),
-        rightText: "界".repeat(34),
-      })),
+      alternatives: DEFAULT_INPUT.alternatives.map((item) => {
+        return {
+          ...item,
+          label: "界".repeat(24),
+        };
+      }),
+      criteria: Array.from({ length: 3 }, (_, index) => {
+        return {
+          id: `criterion-${index}`,
+          label: "界".repeat(20),
+          leftText: "界".repeat(34),
+          rightText: "界".repeat(34),
+        };
+      }),
       focusCriterionId: "criterion-2",
       comparisonLabel: "界".repeat(48),
     },
@@ -97,8 +101,13 @@ export const invalidInputs: unknown[] = [
   },
 ];
 
-const _wideWords = (...lengths: number[]): string =>
-  lengths.map((length) => "界".repeat(length)).join(" ");
+const _wideWords = (...lengths: number[]): string => {
+  return lengths
+    .map((length) => {
+      return "界".repeat(length);
+    })
+    .join(" ");
+};
 /**
  * Accepted word-packing and whitespace cases preserve original authored values.
  */
@@ -151,16 +160,20 @@ export const textRegressionInputs: Array<{
     input: {
       ...DEFAULT_INPUT,
       question: "A\nB\tC\nD\nE",
-      alternatives: DEFAULT_INPUT.alternatives.map((item) => ({
-        ...item,
-        label: "A\nB\tC\nD\nE",
-      })),
-      criteria: DEFAULT_INPUT.criteria.map((item) => ({
-        ...item,
-        label: "A\nB\tC\nD\nE",
-        leftText: "A\nB\tC\nD\nE",
-        rightText: "A\nB\tC\nD\nE",
-      })),
+      alternatives: DEFAULT_INPUT.alternatives.map((item) => {
+        return {
+          ...item,
+          label: "A\nB\tC\nD\nE",
+        };
+      }),
+      criteria: DEFAULT_INPUT.criteria.map((item) => {
+        return {
+          ...item,
+          label: "A\nB\tC\nD\nE",
+          leftText: "A\nB\tC\nD\nE",
+          rightText: "A\nB\tC\nD\nE",
+        };
+      }),
       comparisonLabel: "A\nB\tC\nD\nE",
     },
   },

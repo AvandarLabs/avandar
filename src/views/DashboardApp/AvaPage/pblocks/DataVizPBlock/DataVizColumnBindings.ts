@@ -91,7 +91,7 @@ function _getQueryOptions(
 ): DiscoveryOptions {
   return {
     // Saved registries seed identities without splitting the discovery cache.
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    // oxlint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: [
       DISCOVERY_QUERY_KEY,
       options.auth,

@@ -83,10 +83,12 @@ const minimum: Input = {
 };
 const dense: Input = {
   ...changedInput,
-  patches: changedInput.patches.map((patch) => ({
-    ...patch,
-    label: "界".repeat(24),
-  })),
+  patches: changedInput.patches.map((patch) => {
+    return {
+      ...patch,
+      label: "界".repeat(24),
+    };
+  }),
   corridor: { ...changedInput.corridor, label: "界".repeat(32) },
   decision: {
     actorLabel: "界".repeat(34),
@@ -140,6 +142,8 @@ invalidInputs.push(
   },
   {
     ...DEFAULT_INPUT,
-    patches: DEFAULT_INPUT.patches.map((patch) => ({ ...patch, id: "same" })),
+    patches: DEFAULT_INPUT.patches.map((patch) => {
+      return { ...patch, id: "same" };
+    }),
   },
 );

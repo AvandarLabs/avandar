@@ -39,4 +39,12 @@ describe("clarificationAnswerFormat", () => {
     );
     expect(parseClarificationAnswerBody("plain question")).toBeUndefined();
   });
+
+  it("parses the body when a note line follows the answer", () => {
+    expect(
+      parseClarificationAnswerBody(
+        "[Clarification answer: New York]\n(Matched automatically to your candidate values.)",
+      ),
+    ).toBe("New York");
+  });
 });

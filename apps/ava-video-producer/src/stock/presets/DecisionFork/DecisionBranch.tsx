@@ -1,7 +1,8 @@
-import { DrawPath, STOCK } from "../../graphics-common";
-import { DecisionCondition } from "./DecisionCondition";
+import { DrawPath } from "../../graphics-common/DrawPath";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { DecisionCondition } from "./DecisionCondition/DecisionCondition";
 import { DecisionGate } from "./DecisionGate";
-import { DecisionOutcome } from "./DecisionOutcome";
+import { DecisionOutcome } from "./DecisionOutcome/DecisionOutcome";
 import type { DecisionForkInput } from "./DecisionFork.schema";
 import type { ReactNode } from "react";
 
@@ -26,13 +27,18 @@ export function DecisionBranch({
   isSelected,
   ...remainingProps
 }: Readonly<Props>): ReactNode {
+  const style = GraphicThemeHooks.useGraphicProps({
+    name: "DecisionFork",
+    props: {},
+  });
+  const { color } = GraphicThemeHooks.useGraphicTokens();
   return (
     <g data-branch={branch.id} data-selected={isSelected}>
       <DrawPath
         d={`M480 235 C480 280 ${x} 280 ${x} 408`}
         frame={frame}
         at={18 + index * 2}
-        color={STOCK.line}
+        color={color.line}
       />
       {isSelected ? (
         <DrawPath
@@ -41,7 +47,7 @@ export function DecisionBranch({
           at={74}
           duration={40}
           color={accent}
-          width={3}
+          width={style.selectedWidth}
         />
       ) : null}
       <DecisionCondition

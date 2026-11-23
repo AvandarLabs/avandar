@@ -1,5 +1,7 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { BackoffDelay } from "./BackoffDelay";
 import type { Input } from "./RetryBackoff.schema";
 import type { ReactNode } from "react";
@@ -12,22 +14,27 @@ export function BackoffWait({
   x,
   width,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const waitX = 40 + index * 290;
   return (
     <g>
-      <rect
+      <StockRect
         data-wait-index={index}
         x={x}
         y={348}
         width={width}
         height={12}
         fill="none"
-        stroke={STOCK.muted}
+        stroke={tokens.color.inactive}
       />
-      <path
-        d={`M${x + width / 2} 348 V255 L${waitX + 125} 240`}
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M${x + width / 2} 348 V255 L${waitX + 125} 240`,
+        }}
+        profile={tokens.sketch.shape}
         fill="none"
-        stroke={STOCK.line}
+        stroke={tokens.color.line}
       />
       <FitText
         text={input.outcomeLabels.wait}

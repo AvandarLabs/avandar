@@ -106,17 +106,23 @@ export const invalidInputs: unknown[] = [
   { ...DEFAULT_INPUT, budgetMinutes: 1.2 },
   {
     ...DEFAULT_INPUT,
-    nodes: DEFAULT_INPUT.nodes.map((node, index) => ({
-      ...node,
-      id: index === 0 ? "x".repeat(13) : node.id,
-    })),
+    nodes: DEFAULT_INPUT.nodes.map((node, index) => {
+      return {
+        ...node,
+        id: index === 0 ? "x".repeat(13) : node.id,
+      };
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    roads: DEFAULT_INPUT.roads.map((road) => ({ ...road, id: "x".repeat(13) })),
+    roads: DEFAULT_INPUT.roads.map((road) => {
+      return { ...road, id: "x".repeat(13) };
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    roads: DEFAULT_INPUT.roads.map((road) => ({ ...road, toId: road.fromId })),
+    roads: DEFAULT_INPUT.roads.map((road) => {
+      return { ...road, toId: road.fromId };
+    }),
   },
 ];

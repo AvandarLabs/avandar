@@ -1,7 +1,9 @@
-import { formatDate, isDefined } from "@avandar/utils";
+import { formatDate, isDefined, where } from "@avandar/utils";
 import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { useState } from "react";
+import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
+import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { BasemapStyle } from "@/views/GisApp/basemap/BasemapStyle";
 import { captureExportMapCanvas } from "@/views/GisApp/export/captureExportMapCanvas/captureExportMapCanvas";
 import { composeExportPdf } from "@/views/GisApp/export/composeExportPdf/composeExportPdf";
@@ -10,10 +12,13 @@ import { getExportFilename } from "@/views/GisApp/export/getExportFilename/getEx
 import { getExportFilterReadout } from "@/views/GisApp/export/getExportFilterReadout/getExportFilterReadout";
 import { getExportFurnitureText } from "@/views/GisApp/export/getExportFurnitureText/getExportFurnitureText";
 import { getExportMetersPerPixel } from "@/views/GisApp/export/getExportMetersPerPixel/getExportMetersPerPixel";
+import { loadExportFeatureTable } from "@/views/GisApp/export/loadExportFeatureTable/loadExportFeatureTable";
 import { makeExportMapSpec } from "@/views/GisApp/export/makeExportMapSpec/makeExportMapSpec";
 import { MapScale } from "@/views/GisApp/shell/MapFurnitureBar/MapScale/MapScale";
 import type { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
+import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ExportPdfInput } from "@/views/GisApp/export/composeExportPdf/composeExportPdf";
+import type { ExportFeatureTable } from "@/views/GisApp/export/composeExportPdf/drawExportFeatureTable/drawExportFeatureTable";
 import type { ExportLegendEntry } from "@/views/GisApp/export/composeExportPdf/drawExportLegend/drawExportLegend";
 import type { ExportPageGeometry } from "@/views/GisApp/export/ExportPageLayout/ExportPageLayout";
 import type { ExportFurnitureText } from "@/views/GisApp/export/getExportFurnitureText/getExportFurnitureText";
@@ -37,6 +42,8 @@ export type UseExportPdfDownloadInput = {
   view: AvaMapConfig.ViewState;
   mapName: string;
   workspaceName: string;
+  /** The map's workspace, whose datasets a feature list query reads. */
+  workspaceId: Workspace.Id;
   basemapAttribution: string;
   legendEntries: readonly ExportLegendEntry[];
   hasDrawnDisputedFeature: boolean;
@@ -178,9 +185,10 @@ function _buildComposePdfInput(
     strings: ResolvedExportStrings;
     input: UseExportPdfDownloadInput;
     i18n: I18n;
+    featureTable: ExportFeatureTable | undefined;
   }>,
 ): ExportPdfInput {
-  const { canvas, page, config, strings, input, i18n } = options;
+  const { canvas, page, config, strings, input, i18n, featureTable } = options;
   return {
     canvas,
     page,
@@ -198,6 +206,7 @@ function _buildComposePdfInput(
     pageNumberLabel: ({ page: pageNumber, total }) => {
       return i18n._(msg`Page ${pageNumber} of ${total}`);
     },
+    featureTable,
   };
 }
 
@@ -212,11 +221,23 @@ function _buildComposePdfInput(
  * compose sets `status: "error"` with a localized message and never reaches
  * the next step, so a failed export writes no file; calling `download`
  * again retries from a clean slate.
+ *
+ * When the layout includes a feature list, its rows are fetched first, at
+ * download, with the map's on-screen filters, so the printed list and the
+ * printed map cannot disagree. A failed fetch fails the download like a
+ * failed capture does, and so does downloading before the workspace's
+ * datasets and columns have loaded.
  */
 export function useExportPdfDownload(
   input: Readonly<UseExportPdfDownloadInput>,
 ): UseExportPdfDownloadResult {
   const { i18n } = useLingui();
+  const [datasets] = DatasetClient.useGetAll(
+    where("workspace_id", "eq", input.workspaceId),
+  );
+  const [datasetColumns] = DatasetColumnClient.useGetAll(
+    where("workspace_id", "eq", input.workspaceId),
+  );
   const [status, setStatus] = useState<ExportDownloadStatus>("idle");
   const [errorMessage, setErrorMessage] = useState<string | undefined>(
     undefined,
@@ -228,6 +249,13 @@ export function useExportPdfDownload(
     try {
       const { config, spec, view, mapName, basemapAttribution } = input;
       const page = ExportPageLayout.fromLayout(config.exportLayout);
+      const featureTable = await loadExportFeatureTable({
+        config,
+        workspaceId: input.workspaceId,
+        datasets,
+        datasetColumns,
+        i18n,
+      });
       const exportSpec = makeExportMapSpec({
         spec,
         annotations: config.annotations,
@@ -250,7 +278,15 @@ export function useExportPdfDownload(
         i18n,
       });
       await composeExportPdf(
-        _buildComposePdfInput({ canvas, page, config, strings, input, i18n }),
+        _buildComposePdfInput({
+          canvas,
+          page,
+          config,
+          strings,
+          input,
+          i18n,
+          featureTable,
+        }),
       );
       setStatus("success");
     } catch (error) {

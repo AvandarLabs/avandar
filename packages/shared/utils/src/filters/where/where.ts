@@ -2,6 +2,7 @@ import type {
   ArrayValueOperator,
   FilterOperator,
   FiltersByColumn,
+  NullOperator,
   SingleValueOperator,
 } from "@utils/filters/filters.ts";
 import type { UnknownObject } from "@utils/types/common.types.ts";
@@ -18,8 +19,13 @@ export function where<T extends UnknownObject, K extends keyof T>(
 ): { where: FiltersByColumn<T> };
 export function where<T extends UnknownObject, K extends keyof T>(
   column: K,
+  operator: NullOperator,
+  value: null,
+): { where: FiltersByColumn<T> };
+export function where<T extends UnknownObject, K extends keyof T>(
+  column: K,
   operator: FilterOperator,
-  value: T[K] | ReadonlyArray<T[K] | undefined>,
+  value: T[K] | ReadonlyArray<T[K] | undefined> | null,
 ): { where: FiltersByColumn<T> } {
   return {
     where: {

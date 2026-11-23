@@ -46,15 +46,14 @@ export const inputSchema = z
       });
     }
     if (
-      !input.incidents.some(
-        (incident) =>
-          projectGlobePoint({
-            ...incident,
-            centerLongitude: input.longitudeSweep.end,
-            centerLatitude: 0,
-            radius: 1,
-          }).visible,
-      )
+      !input.incidents.some((incident) => {
+        return projectGlobePoint({
+          ...incident,
+          centerLongitude: input.longitudeSweep.end,
+          centerLatitude: 0,
+          radius: 1,
+        }).visible;
+      })
     ) {
       context.addIssue({
         code: "custom",

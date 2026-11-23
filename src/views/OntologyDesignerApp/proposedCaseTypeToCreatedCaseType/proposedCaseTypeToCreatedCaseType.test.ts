@@ -42,6 +42,7 @@ function makeDraft(
         columnId: DEATHS_KEY_COLUMN_ID,
         name: "County code",
         isIncluded: true,
+        valueShape: "single",
         valuePickerRuleType: "first",
       },
       {
@@ -49,6 +50,7 @@ function makeDraft(
         columnId: STATE_COLUMN_ID,
         name: "State",
         isIncluded: true,
+        valueShape: "single",
         valuePickerRuleType: "max",
       },
       {
@@ -56,6 +58,7 @@ function makeDraft(
         columnId: DEATHS_COLUMN_ID,
         name: "Total deaths",
         isIncluded: false,
+        valueShape: "single",
         valuePickerRuleType: "sum",
       },
       {
@@ -63,6 +66,7 @@ function makeDraft(
         columnId: CENSUS_KEY_COLUMN_ID,
         name: "Census county code",
         isIncluded: true,
+        valueShape: "single",
         valuePickerRuleType: "first",
       },
       {
@@ -70,6 +74,7 @@ function makeDraft(
         columnId: POPULATION_COLUMN_ID,
         name: "Population",
         isIncluded: true,
+        valueShape: "single",
         valuePickerRuleType: "max",
       },
     ],
@@ -157,6 +162,46 @@ describe("proposedCaseTypeToCreatedCaseType", () => {
     });
   });
 
+  it("carries a field switched to every value without a value rule", () => {
+    const draft = makeDraft();
+    const created = proposedCaseTypeToCreatedCaseType({
+      ...draft,
+      attributes: draft.attributes.map((attribute) => {
+        return attribute.columnId === POPULATION_COLUMN_ID
+          ? { ...attribute, valueShape: "list" }
+          : attribute;
+      }),
+    });
+    const population = created.attributes.find((attribute) => {
+      return attribute.name === "Population";
+    });
+
+    expect(population).toMatchObject({ valueShape: "list" });
+    expect(population).not.toHaveProperty("valuePickerRuleType");
+  });
+
+  it("keeps the label and every join key to one value", () => {
+    const draft = makeDraft();
+    const created = proposedCaseTypeToCreatedCaseType({
+      ...draft,
+      attributes: draft.attributes.map((attribute) => {
+        return { ...attribute, valueShape: "list" };
+      }),
+    });
+
+    expect(
+      created.attributes
+        .filter((attribute) => {
+          return ["State", "County code", "Census county code"].includes(
+            attribute.name,
+          );
+        })
+        .map((attribute) => {
+          return "valueShape" in attribute ? attribute.valueShape : undefined;
+        }),
+    ).toEqual(["single", "single", "single"]);
+  });
+
   it("marks the label column as the label attribute", () => {
     const created = proposedCaseTypeToCreatedCaseType(makeDraft());
     const labelled = created.attributes.filter((attribute) => {
@@ -221,6 +266,60 @@ describe("proposedCaseTypeToCreatedCaseType", () => {
       name: "County COVID record",
       description: "One county's reported deaths",
       allowManualCreation: true,
+    });
+  });
+
+  it("carries the card's statuses and default into the created case type", () => {
+    const created = proposedCaseTypeToCreatedCaseType(
+      makeDraft({
+        statuses: [
+          { name: "Suspected", description: "", color: "#fab005" },
+          { name: "Confirmed", description: "", color: "#fa5252" },
+        ],
+        defaultStatusName: "Confirmed",
+      }),
+    );
+
+    expect(
+      created.statuses?.map((status) => {
+        return status.name;
+      }),
+    ).toEqual(["Suspected", "Confirmed"]);
+    expect(created.defaultStatusName).toBe("Confirmed");
+  });
+
+  it("leaves statuses out when the draft has none", () => {
+    const created = proposedCaseTypeToCreatedCaseType(makeDraft());
+
+    expect(created).not.toHaveProperty("statuses");
+    expect(created).not.toHaveProperty("defaultStatusName");
+  });
+
+  it("carries a per-year field's rule, period, and date column", () => {
+    const draft = makeDraft();
+    const created = proposedCaseTypeToCreatedCaseType({
+      ...draft,
+      attributes: draft.attributes.map((attribute) => {
+        return attribute.name === "Population"
+          ? {
+              ...attribute,
+              valueShape: "bucketed_list",
+              bucketGrain: "year",
+              bucketColumnId: "6f708192-cccc-4bbb-8ccc-ddddeeeeffff",
+            }
+          : attribute;
+      }),
+    });
+
+    expect(
+      created.attributes.find((attribute) => {
+        return attribute.name === "Population";
+      }),
+    ).toMatchObject({
+      valueShape: "bucketed_list",
+      bucketGrain: "year",
+      bucketColumnId: "6f708192-cccc-4bbb-8ccc-ddddeeeeffff",
+      valuePickerRuleType: "max",
     });
   });
 });

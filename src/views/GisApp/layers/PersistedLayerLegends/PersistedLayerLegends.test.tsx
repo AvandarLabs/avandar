@@ -104,3 +104,50 @@ describe("PersistedLayerLegends.usePersistedLayerLegends", () => {
     expect(updateConfig).not.toHaveBeenCalled();
   });
 });
+
+describe("PersistedLayerLegends.withLegendUpdates", () => {
+  it("writes an update whose fingerprint matches and skips a stale one", () => {
+    const current = MapLayer.makeEmpty("Coverage");
+    const stale = MapLayer.makeEmpty("Schools");
+    const entries = [
+      {
+        type: "value" as const,
+        color: "#c92a2a",
+        label: "Below 95%",
+        count: 4,
+      },
+    ];
+    const mapConfig = {
+      ...AvaMapConfig.makeEmpty(),
+      layers: [current, stale],
+    } satisfies AvaMapConfig.T;
+
+    const updated = PersistedLayerLegends.withLegendUpdates({
+      mapConfig,
+      legendUpdates: new Map([
+        [
+          current.id,
+          {
+            layerFingerprint:
+              PersistedLayerLegends.makeFingerprintFromMapLayer(current),
+            breaks: [],
+            entries,
+            sizeStops: [],
+          },
+        ],
+        [
+          stale.id,
+          {
+            layerFingerprint: "an older layer",
+            breaks: [],
+            entries,
+            sizeStops: [],
+          },
+        ],
+      ]),
+    });
+
+    expect(updated.layers[0]!.legend.entries).toEqual(entries);
+    expect(updated.layers[1]!.legend.entries).toEqual([]);
+  });
+});

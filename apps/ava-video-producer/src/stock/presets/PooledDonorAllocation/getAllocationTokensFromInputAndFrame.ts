@@ -1,9 +1,16 @@
-import { prop } from "@avandar/utils";
-import { EASE, mix, ramp } from "../../../motion";
+import { prop, propEq } from "@avandar/utils";
+import { Motion } from "../../../motion";
 import { getAllocationIdentitiesFromInput } from "./getAllocationIdentitiesFromInput";
 import { getDonorTrayFromInputAndFrame } from "./getDonorTrayFromInputAndFrame";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./PooledDonorAllocation.schema";
 
+type GetPooledPointOptions = {
+  token: Identity;
+  tray: ReturnType<typeof getDonorTrayFromInputAndFrame>;
+  placement: Placement;
+  pooling: number;
+};
 type Identity = ReturnType<typeof getAllocationIdentitiesFromInput>[number];
 /** Data for getAllocationTokensFromInputAndFrame. */
 type GetAllocationTokensResult = {
@@ -20,29 +27,31 @@ type GetAllocationTokensResult = {
   };
   donorIndex: number;
   unitIndex: number;
-  requestId: string;
+  requestId: string | null;
 };
-
 function _getPlacement({
   input,
   identities,
   index,
-}: Readonly<{ input: Input; identities: Identity[]; index: number }>) {
+}: Readonly<{
+  input: Input;
+  identities: Identity[];
+  index: number;
+}>) {
   const token = identities[index];
   const destinations = [...input.requests.map(prop("id")), null];
   const groupIndex = destinations.indexOf(token.requestId);
-  const counts = destinations.map(
-    (id) => identities.filter(({ requestId }) => requestId === id).length,
-  );
+  const counts = destinations.map((id) => {
+    return identities.filter(propEq("requestId", id)).length;
+  });
   const precedingColumns = counts
     .slice(0, groupIndex)
-    .reduce(
-      (sum, numDestinationTokens) => sum + Math.min(7, numDestinationTokens),
-      0,
-    );
-  const ordinal = identities
-    .slice(0, index)
-    .filter(({ requestId }) => requestId === token.requestId).length;
+    .reduce((sum, numDestinationTokens) => {
+      return sum + Math.min(7, numDestinationTokens);
+    }, 0);
+  const ordinal = identities.slice(0, index).filter(({ requestId }) => {
+    return requestId === token.requestId;
+  }).length;
   const column = ordinal % 7;
   const row = Math.floor(ordinal / 7);
   const fanOffset =
@@ -58,7 +67,75 @@ function _getPlacement({
     corridorY: 400 - row * 38,
   };
 }
-
+type AllocationTokensArgs = Readonly<{
+  input: Input;
+  frame: number;
+  motion: VideoMotion;
+}>;
+type Placement = ReturnType<typeof _getPlacement>;
+/** A credit tipping off its donor's tray, then across into the pool. */
+function _getPooledPoint({
+  token,
+  tray,
+  placement,
+  pooling,
+}: Readonly<GetPooledPointOptions>) {
+  const sourceX = tray.x - 20 + (token.unitIndex * 32 + 20) * tray.cosine;
+  const sourceY = tray.y + (token.unitIndex * 32 + 20) * tray.sine;
+  return {
+    x: Motion.mix({
+      t: Math.min(1, pooling * 2),
+      from: sourceX,
+      to: placement.poolX,
+    }),
+    y: Motion.mix({
+      t: Math.max(0, pooling * 2 - 1),
+      from: sourceY,
+      to: placement.poolY,
+    }),
+  };
+}
+/** A carried credit descends to the corridor, then drops into its request. */
+function _getAllocatedY({
+  allocation,
+  y,
+  placement,
+}: Readonly<{
+  allocation: number;
+  y: number;
+  placement: Placement;
+}>): number {
+  if (allocation === 0) {
+    return y;
+  }
+  const descend = Math.min(1, allocation / 0.45);
+  const insert = Math.max(0, (allocation - 0.85) / 0.15);
+  return Motion.mix({
+    t: insert,
+    from: Motion.mix({
+      t: descend,
+      from: y,
+      to: placement.corridorY,
+    }),
+    to: placement.targetY,
+  });
+}
+/** Who holds a credit: its donor, the pool, the coordinator, or a request. */
+function _getTokenOwner({
+  allocation,
+  pooling,
+}: Readonly<{
+  allocation: number;
+  pooling: number;
+}>): string {
+  return allocation === 1
+    ? "request"
+    : allocation > 0
+      ? "coordinator"
+      : pooling === 1
+        ? "pool"
+        : "donor";
+}
 /**
  * Every authored credit tips into the pool, then shares its request scoop's
  * rigid travel.
@@ -66,7 +143,8 @@ function _getPlacement({
 export function getAllocationTokensFromInputAndFrame({
   input,
   frame,
-}: Readonly<{ input: Input; frame: number }>): GetAllocationTokensResult[] {
+  motion,
+}: AllocationTokensArgs): GetAllocationTokensResult[] {
   const identities = getAllocationIdentitiesFromInput(input);
   return identities.map((token, index) => {
     const placement = _getPlacement({ input, identities, index });
@@ -74,38 +152,34 @@ export function getAllocationTokensFromInputAndFrame({
       input,
       frame,
       donorIndex: token.donorIndex,
+      motion,
     });
-    const pooling = ramp(frame, 32 + token.donorIndex * 3, 20, EASE.inOut);
-    const sourceX = tray.x - 20 + (token.unitIndex * 32 + 20) * tray.cosine;
-    const sourceY = tray.y + (token.unitIndex * 32 + 20) * tray.sine;
-    const x = mix(Math.min(1, pooling * 2), sourceX, placement.poolX);
-    const y = mix(Math.max(0, pooling * 2 - 1), sourceY, placement.poolY);
+    const pooling = motion.ramp(
+      frame,
+      32 + token.donorIndex * motion.scaleStagger(3),
+      motion.scale(20),
+      motion.travel.easing,
+    );
+    const { x, y } = _getPooledPoint({ token, tray, placement, pooling });
     const allocation =
       token.requestId === null
         ? 0
-        : ramp(frame, 64 + placement.requestIndex * 20, 14, EASE.inOut);
-    const descend = Math.min(1, allocation / 0.45);
+        : motion.ramp(
+            frame,
+            64 + placement.requestIndex * motion.scaleStagger(20),
+            motion.scale(14),
+            motion.travel.easing,
+          );
     const slide = Math.max(0, Math.min(1, (allocation - 0.45) / 0.4));
-    const insert = Math.max(0, (allocation - 0.85) / 0.15);
     return {
       ...token,
-      x: mix(slide, x, placement.targetX),
-      y:
-        allocation === 0
-          ? y
-          : mix(
-              insert,
-              mix(descend, y, placement.corridorY),
-              placement.targetY,
-            ),
-      owner:
-        allocation === 1
-          ? "request"
-          : allocation > 0
-            ? "coordinator"
-            : pooling === 1
-              ? "pool"
-              : "donor",
+      x: Motion.mix({
+        t: slide,
+        from: x,
+        to: placement.targetX,
+      }),
+      y: _getAllocatedY({ allocation, y, placement }),
+      owner: _getTokenOwner({ allocation, pooling }),
       arrived: allocation === 1,
     };
   });

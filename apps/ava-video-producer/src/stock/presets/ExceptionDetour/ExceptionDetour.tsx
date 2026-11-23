@@ -1,7 +1,7 @@
-import { ExceptionCase } from "./ExceptionCase";
-import { ExceptionRoute } from "./ExceptionRoute";
-import { RuleGate } from "./RuleGate";
-import type { GraphicProps } from "../../graphics-common";
+import { ExceptionCase } from "./ExceptionCase/ExceptionCase";
+import { ExceptionRoute } from "./ExceptionRoute/ExceptionRoute";
+import { RuleGate } from "./RuleGate/RuleGate";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./ExceptionDetour.schema";
 import type { ReactNode } from "react";
 /** Complete authored rule and exception content. */

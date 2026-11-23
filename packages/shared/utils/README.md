@@ -117,7 +117,7 @@ express row-level predicates.
 
 | Type                     | Description                                          |
 | ------------------------ | ---------------------------------------------------- |
-| `FilterOperator`         | Union of every supported operator string             |
+| `FilterOperator`         | `eq`, `in`, and `is` (null only)                     |
 | `FilterOperatorRecord`   | A `{ operator: value }` record                       |
 | `FiltersByColumn<Row>`   | `{ [column]: FilterOperatorRecord }` filter shape    |
 | `FiltersByOperator<Row>` | `{ [operator]: { [column]: value } }` filter shape   |

@@ -16,8 +16,14 @@ import {
 } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV3Schema.ts";
 import { AvaMapConfigV4Schema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV4Schema.ts";
 import { AvaMapConfigV5Schema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV5Schema.ts";
+import {
+  AvaMapConfigV6LayerSchema,
+  AvaMapConfigV6Schema,
+} from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV6Schema.ts";
+import { AvaMapConfigV7Schema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV7Schema.ts";
+import { AvaMapConfigV8Schema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV8Schema.ts";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
-// eslint-disable-next-line no-restricted-imports
+// oxlint-disable-next-line no-restricted-imports
 import type { AvaMapConfigRead } from "../AvaMapConfig.types.ts";
 
 type ConfigV1 = z.infer<typeof AvaMapConfigV1Schema>;
@@ -26,6 +32,18 @@ type ConfigV2 = z.infer<typeof AvaMapConfigV2Schema>;
 type ConfigV2Layer = z.infer<typeof AvaMapConfigV2LayerSchema>;
 type ConfigV3 = z.infer<typeof AvaMapConfigV3Schema>;
 type ConfigV4 = z.infer<typeof AvaMapConfigV4Schema>;
+type ConfigV5 = z.infer<typeof AvaMapConfigV5Schema>;
+type ConfigV5Layer = ConfigV5["layers"][number];
+type ConfigV6 = z.infer<typeof AvaMapConfigV6Schema>;
+type ConfigV6Layer = z.infer<typeof AvaMapConfigV6LayerSchema>;
+type ConfigV7 = z.infer<typeof AvaMapConfigV7Schema>;
+
+/**
+ * Export furniture a version 4 map gains on its way to version 5: today's
+ * default without `featureList`, a key version 5's strict schema rejects.
+ */
+const { featureList: _featureList, ...VERSION_5_EXPORT_LAYOUT } =
+  DEFAULT_EXPORT_LAYOUT;
 
 /** Migrates one version 1 layer without weakening its sensitivity. */
 function _migrateVersion1Layer(layer: ConfigV1Layer): ConfigV2Layer {
@@ -113,12 +131,12 @@ function _migrateVersion3(config: ConfigV3): ConfigV4 {
   });
 }
 
-/** Migrates a valid version 4 config into the current persisted shape. */
-function _migrateVersion4(config: ConfigV4): AvaMapConfigRead {
+/** Migrates a valid version 4 config into the version 5 representation. */
+function _migrateVersion4(config: ConfigV4): ConfigV5 {
   return AvaMapConfigV5Schema.parse({
     ...config,
     version: 5,
-    exportLayout: DEFAULT_EXPORT_LAYOUT,
+    exportLayout: VERSION_5_EXPORT_LAYOUT,
     layers: config.layers.map((layer) => {
       return {
         ...layer,
@@ -126,6 +144,86 @@ function _migrateVersion4(config: ConfigV4): AvaMapConfigRead {
         disputedStatusValues: { disputed: [], undetermined: [] },
       };
     }),
+  });
+}
+
+/**
+ * Resamples a version 5 graduated ramp to one color per class and recolors
+ * the layer's persisted legend keys to match, so a saved legend agrees with
+ * the map before the GIS app reclassifies the layer. Every class starts with
+ * an unset label.
+ */
+function _migrateVersion5Layer(layer: ConfigV5Layer): ConfigV6Layer {
+  const { symbology } = layer;
+  if (!("color" in symbology) || symbology.color.type !== "graduated") {
+    return AvaMapConfigV6LayerSchema.parse(layer);
+  }
+  const classCount = MapLayer.getGraduatedClassCount(
+    symbology.color.classification,
+  );
+  const ramp = MapLayer.resampleColorRamp(symbology.color.ramp, classCount);
+  return AvaMapConfigV6LayerSchema.parse({
+    ...layer,
+    symbology: {
+      ...symbology,
+      color: {
+        ...symbology.color,
+        ramp,
+        classLabels: Array.from({ length: classCount }, () => {
+          return undefined;
+        }),
+      },
+    },
+    legend: {
+      ...layer.legend,
+      entries: layer.legend.entries.map((entry, index) => {
+        return entry.type === "value"
+          ? { ...entry, color: ramp[index] ?? entry.color }
+          : entry;
+      }),
+    },
+  });
+}
+
+/** Migrates a valid version 5 config into the version 6 representation. */
+function _migrateVersion5(config: ConfigV5): ConfigV6 {
+  return AvaMapConfigV6Schema.parse({
+    ...config,
+    version: 6,
+    layers: config.layers.map(_migrateVersion5Layer),
+  });
+}
+
+/** Adds the version 7 buffer fields: a meters unit and no ring label. */
+function _migrateVersion6GeoBinding(
+  binding: ConfigV6Layer["geoBinding"],
+): unknown {
+  return binding?.type === "bufferOfLayer"
+    ? { ...binding, distanceUnit: "m", labelColumn: undefined }
+    : binding;
+}
+
+/** Migrates a valid version 6 config into the version 7 representation. */
+function _migrateVersion6(config: ConfigV6): ConfigV7 {
+  return AvaMapConfigV7Schema.parse({
+    ...config,
+    version: 7,
+    layers: config.layers.map((layer) => {
+      return {
+        ...layer,
+        geoBinding: _migrateVersion6GeoBinding(layer.geoBinding),
+        spatialFilter: undefined,
+      };
+    }),
+  });
+}
+
+/** Migrates a valid version 7 config into the current persisted shape. */
+function _migrateVersion7(config: ConfigV7): AvaMapConfigRead {
+  return AvaMapConfigV8Schema.parse({
+    ...config,
+    version: 8,
+    exportLayout: { ...config.exportLayout, featureList: undefined },
     // The cast bridges `PopupConfig.action`, a required `| undefined` field
     // on `MapLayer.T` that `PopupSchema` still infers as an optional key.
   }) as AvaMapConfigRead;
@@ -135,21 +233,34 @@ function _migrateVersion4(config: ConfigV4): AvaMapConfigRead {
 export const migrateAvaMapConfig = {
   /** Migrates a valid version 1 config into the current representation. */
   fromV1: (config: ConfigV1): AvaMapConfigRead => {
-    return _migrateVersion4(
-      _migrateVersion3(_migrateVersion2(_migrateVersion1(config))),
-    );
+    return migrateAvaMapConfig.fromV2(_migrateVersion1(config));
   },
 
   /** Migrates a valid version 2 config into the current representation. */
   fromV2: (config: ConfigV2): AvaMapConfigRead => {
-    return _migrateVersion4(_migrateVersion3(_migrateVersion2(config)));
+    return migrateAvaMapConfig.fromV3(_migrateVersion2(config));
   },
 
   /** Migrates a valid version 3 config into the current representation. */
   fromV3: (config: ConfigV3): AvaMapConfigRead => {
-    return _migrateVersion4(_migrateVersion3(config));
+    return migrateAvaMapConfig.fromV4(_migrateVersion3(config));
   },
 
   /** Migrates a valid version 4 config into the current representation. */
-  fromV4: _migrateVersion4,
+  fromV4: (config: ConfigV4): AvaMapConfigRead => {
+    return migrateAvaMapConfig.fromV5(_migrateVersion4(config));
+  },
+
+  /** Migrates a valid version 5 config into the current representation. */
+  fromV5: (config: ConfigV5): AvaMapConfigRead => {
+    return migrateAvaMapConfig.fromV6(_migrateVersion5(config));
+  },
+
+  /** Migrates a valid version 6 config into the current representation. */
+  fromV6: (config: ConfigV6): AvaMapConfigRead => {
+    return migrateAvaMapConfig.fromV7(_migrateVersion6(config));
+  },
+
+  /** Migrates a valid version 7 config into the current representation. */
+  fromV7: _migrateVersion7,
 };

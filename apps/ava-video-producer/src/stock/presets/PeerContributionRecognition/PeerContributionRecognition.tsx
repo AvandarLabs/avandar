@@ -1,20 +1,25 @@
 import { propEq } from "@avandar/utils";
-import { ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { RecognitionExchange } from "./RecognitionExchange";
-import { RecognitionObjects } from "./RecognitionObjects";
-import type { GraphicProps } from "../../graphics-common";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { RecognitionExchange } from "./RecognitionExchange/RecognitionExchange";
+import { RecognitionObjects } from "./RecognitionObjects/RecognitionObjects";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./PeerContributionRecognition.schema";
 import type { ReactNode } from "react";
 
-type Props = GraphicProps & { input: Input };
-
+type Props = GraphicProps & {
+  input: Input;
+};
+/** Frames the people's names take to fade in. */
+const NAMES_FRAMES = 14;
 /** Specific appreciation retains the contributor's objects and authorship. */
 export function PeerContributionRecognition({
   input,
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const focusedIndex = input.contributions.findIndex(
     propEq("id", input.focusedContributionId),
   );
@@ -30,7 +35,14 @@ export function PeerContributionRecognition({
         focusedX={focusedX}
       />
       <RecognitionObjects input={input} frame={frame} accent={accent} />
-      <g opacity={ramp(frame, 12, 14)}>
+      <g
+        opacity={Motion.ramp({
+          frame,
+          at: 12,
+          dur: motion.scale(NAMES_FRAMES),
+          easing: motion.reveal.easing,
+        })}
+      >
         <LabelSlots
           labels={[
             [input.people.contributor, 60, 420, 200, 20, 4],

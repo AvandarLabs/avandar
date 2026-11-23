@@ -1,0 +1,22 @@
+.barRowRow {
+  align-items: center;
+  display: flex;
+  gap: var(--demo-space-24);
+}
+
+.barRowBar {
+  background: var(--demo-brand);
+  border-radius: var(--demo-corner-chip);
+  height: 36px;
+}
+
+.barRowBarLabel {
+  color: var(--demo-muted);
+  font-size: var(--demo-font-size-xl);
+  width: 140px;
+}
+
+.barRowBarValue {
+  font-family: var(--demo-mono);
+  font-size: var(--demo-font-size-xl);
+}

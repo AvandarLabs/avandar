@@ -14,11 +14,45 @@ import {
 } from "./KeyedRowZipper.fixtures";
 import { inputSchema, type Input } from "./KeyedRowZipper.schema";
 
+function _assertDenseRowBoundsAcrossFrames(): void {
+  [36, 42, 54, 72, 90, 108, 150].forEach((frame) => {
+    const markup = render({ frame: frame, input: fixtures[2].input });
+    [
+      ..._rows({ markup, side: "left" }),
+      ..._rows({ markup, side: "right" }),
+    ].forEach((row) => {
+      const x = SvgAttributes.getNumberFromMarkup({
+          attributes: row,
+          name: "x",
+        }),
+        y = SvgAttributes.getNumberFromMarkup({ attributes: row, name: "y" });
+      assert.ok(
+        x >= 0 &&
+          x +
+            SvgAttributes.getNumberFromMarkup({
+              attributes: row,
+              name: "width",
+            }) <=
+            960,
+      );
+      assert.ok(
+        y >= 0 &&
+          y +
+            SvgAttributes.getNumberFromMarkup({
+              attributes: row,
+              name: "height",
+            }) <=
+            600,
+      );
+    });
+  });
+}
+
 const render = ({
   frame,
   input = DEFAULT_INPUT,
-}: Readonly<{ frame: number; input?: Input }>): string =>
-  renderToStaticMarkup(
+}: Readonly<{ frame: number; input?: Input }>): string => {
+  return renderToStaticMarkup(
     createElement(KeyedRowZipper, {
       frame,
       input,
@@ -26,10 +60,13 @@ const render = ({
       id: "test",
     }),
   );
+};
 function _rows({ markup, side }: { markup: string; side: string }) {
   return [
     ...markup.matchAll(new RegExp(`<rect[^>]*data-side="${side}"[^>]*>`, "g")),
-  ].map((match) => match[0]);
+  ].map((match) => {
+    return match[0];
+  });
 }
 registerStockPresetAssertions({
   inputSchema,
@@ -40,27 +77,30 @@ registerStockPresetAssertions({
   render,
   excludedTextFields: ["key", "joinType"],
   textFrames: [36, 150],
-  getVisibleTexts: ({ input, frame }) => [
-    input.labels.title,
-    ...(frame < 42
-      ? [
-          input.labels.left,
-          input.labels.right,
-          input.labels.key,
-          ...input.leftRows.map(prop("value")),
-          ...input.rightRows.map(prop("value")),
-        ]
-      : [
-          input.labels.result,
-          ...input.leftRows
-            .filter(
-              (row) =>
-                input.joinType === "left" ||
-                input.rightRows.some(propEq("key", row.key)),
-            )
-            .map(prop("value")),
-        ]),
-  ],
+  getVisibleTexts: ({ input, frame }) => {
+    return [
+      input.labels.title,
+      ...(frame < 42
+        ? [
+            input.labels.left,
+            input.labels.right,
+            input.labels.key,
+            ...input.leftRows.map(prop("value")),
+            ...input.rightRows.map(prop("value")),
+          ]
+        : [
+            input.labels.result,
+            ...input.leftRows
+              .filter((row) => {
+                return (
+                  input.joinType === "left" ||
+                  input.rightRows.some(propEq("key", row.key))
+                );
+              })
+              .map(prop("value")),
+          ]),
+    ];
+  },
 });
 test("exact matches zip once while unmatched rows obey inner and left membership", () => {
   const changed = fixtures[3].input;
@@ -110,44 +150,14 @@ test("facing table cells close their gap and reorder matching rows at one seam",
   );
 });
 test("dense rows stay on canvas across travel and final tray rows remain disjoint", () => {
-  [36, 42, 54, 72, 90, 108, 150].forEach((frame) => {
-    const markup = render({ frame: frame, input: fixtures[2].input });
-    [
-      ..._rows({ markup, side: "left" }),
-      ..._rows({ markup, side: "right" }),
-    ].forEach((row) => {
-      const x = SvgAttributes.getNumberFromMarkup({
-          attributes: row,
-          name: "x",
-        }),
-        y = SvgAttributes.getNumberFromMarkup({ attributes: row, name: "y" });
-      assert.ok(
-        x >= 0 &&
-          x +
-            SvgAttributes.getNumberFromMarkup({
-              attributes: row,
-              name: "width",
-            }) <=
-            960,
-      );
-      assert.ok(
-        y >= 0 &&
-          y +
-            SvgAttributes.getNumberFromMarkup({
-              attributes: row,
-              name: "height",
-            }) <=
-            600,
-      );
-    });
-  });
+  _assertDenseRowBoundsAcrossFrames();
   const markup = render({ frame: 150, input: fixtures[2].input });
   ["left", "right"].forEach((side) => {
-    const tray = _rows({ markup, side }).filter((row) =>
-      row.includes("data-context-key="),
-    );
-    tray.slice(1).forEach((row, index) =>
-      assert.ok(
+    const tray = _rows({ markup, side }).filter((row) => {
+      return row.includes("data-context-key=");
+    });
+    tray.slice(1).forEach((row, index) => {
+      return assert.ok(
         SvgAttributes.getNumberFromMarkup({
           attributes: tray[index],
           name: "y",
@@ -157,8 +167,8 @@ test("dense rows stay on canvas across travel and final tray rows remain disjoin
             name: "height",
           }) <=
           SvgAttributes.getNumberFromMarkup({ attributes: row, name: "y" }),
-      ),
-    );
+      );
+    });
   });
 });
 test("hidden context does not change membership and keys remain visible while matching", () => {

@@ -1,4 +1,5 @@
 import type { AvaDataTypeT } from "$/models/datasets/AvaDataType/AvaDataType.types.ts";
+import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute.ts";
 import type { UnknownObject, UUID } from "@avandar/utils";
 
 export type QueryResultId = UUID<"QueryResult">;
@@ -6,6 +7,19 @@ export type QueryResultId = UUID<"QueryResult">;
 export type QueryResultColumn = {
   name: string;
   dataType: AvaDataTypeT;
+  /**
+   * True for a LIST column, such as a case type field that keeps every
+   * value. Its `dataType` is `varchar` because a list renders as text.
+   * Controls that build SQL from a column's values, like a dashboard filter,
+   * leave it out. Absent means false.
+   */
+  isArray?: boolean;
+  /**
+   * The period of a per-period field read whole, known when the query was
+   * built in the query builder. A results grid labels each period by it.
+   * Absent for any other column, and for a raw SQL result.
+   */
+  bucketGrain?: ConceptAttribute.BucketGrain;
 };
 
 export type QueryResult<T extends UnknownObject = UnknownObject> = {

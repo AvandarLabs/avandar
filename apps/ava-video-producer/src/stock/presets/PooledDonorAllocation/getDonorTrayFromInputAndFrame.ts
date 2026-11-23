@@ -1,4 +1,4 @@
-import { ramp } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./PooledDonorAllocation.schema";
 /** Data for getDonorTrayFromInputAndFrame. */
 type GetDonorTrayResult = {
@@ -16,12 +16,17 @@ export function getDonorTrayFromInputAndFrame({
   input,
   frame,
   donorIndex,
+  motion,
 }: Readonly<{
   input: Input;
   frame: number;
   donorIndex: number;
+  motion: VideoMotion;
 }>): GetDonorTrayResult {
-  const angle = 0.22 * ramp(frame, 18, 12) * (1 - ramp(frame, 62, 8));
+  const angle =
+    0.22 *
+    motion.reveal(frame, 18) *
+    (1 - motion.ramp(frame, 62, motion.whip, motion.exit.easing));
   return {
     x: 64 + (donorIndex * 880) / input.contributions.length,
     y: 148,

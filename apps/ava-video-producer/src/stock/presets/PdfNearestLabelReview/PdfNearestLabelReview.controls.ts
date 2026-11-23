@@ -28,13 +28,15 @@ const supported: StockControl[] = makeStockControlsFromSchema({
   messageNamespace: NAMESPACE,
 });
 function _positionControls(prefix: string): StockControl[] {
-  return ["x", "y"].map((path) => ({
-    path,
-    kind: "number",
-    min: 5,
-    max: 95,
-    label: { id: `${NAMESPACE}.controls.${prefix}.${path}`, message: path },
-  }));
+  return ["x", "y"].map((path) => {
+    return {
+      path,
+      kind: "number",
+      min: 5,
+      max: 95,
+      label: { id: `${NAMESPACE}.controls.${prefix}.${path}`, message: path },
+    };
+  });
 }
 /**
  * Explicit spatial and nullable reference editors plus shared text controls.

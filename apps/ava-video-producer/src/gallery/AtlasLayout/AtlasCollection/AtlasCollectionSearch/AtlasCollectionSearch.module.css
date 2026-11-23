@@ -1,0 +1,7 @@
+.atlasCollectionSearchSearchField {
+  composes: search-field from global;
+}
+
+.atlasCollectionSearchSrOnly {
+  composes: sr-only from global;
+}

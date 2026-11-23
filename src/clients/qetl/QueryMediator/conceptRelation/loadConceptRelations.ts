@@ -32,7 +32,7 @@ async function _loadConceptRelation(
 ): Promise<void> {
   const spineTableName = await loadConceptSpine({
     ref: options.plan.ref,
-    externalIds: options.plan.externalIds,
+    spineRows: options.plan.spineRows,
     datasetDuckDbLease: options.datasetDuckDbLease,
   });
 

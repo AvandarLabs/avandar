@@ -18,6 +18,8 @@ import {
 } from "@/clients/DuckDbClient/duckDbTableIntrospection";
 import { loadXlsxIntoDuckDb } from "@/clients/DuckDbClient/duckDbXlsxLoad";
 import { makeDuckDbConnectionManager } from "@/clients/DuckDbClient/makeDuckDbConnectionManager";
+import { mergeParquetBlobs as mergeParquetBlobsWithClient } from "@/clients/DuckDbClient/mergeParquetBlobs/mergeParquetBlobs";
+import { previewParquetBlob as previewParquetBlobWithClient } from "@/clients/DuckDbClient/previewParquetBlob/previewParquetBlob";
 import { projectParquetBlob as projectParquetBlobWithClient } from "@/clients/DuckDbClient/projectParquetBlob/projectParquetBlob";
 import { Logger } from "@/utils/Logger";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
@@ -328,6 +330,35 @@ class DuckDbClientImpl {
     }>,
   ): Promise<Blob> {
     return await projectParquetBlobWithClient({
+      ...options,
+      client: this.#getOperations(),
+    });
+  }
+
+  /**
+   * One Parquet blob holding every row of `parquetBlobs`, in order. The
+   * blobs must share one schema. A single blob is returned unchanged.
+   */
+  async mergeParquetBlobs(
+    options: Readonly<{
+      datasetDuckDbLease: DatasetDuckDbLease;
+      parquetBlobs: readonly Blob[];
+    }>,
+  ): Promise<Blob> {
+    return await mergeParquetBlobsWithClient({
+      ...options,
+      client: this.#getOperations(),
+    });
+  }
+
+  /**
+   * The first `maxPreviewRows` rows of a Parquet blob and its column schema,
+   * read without loading the blob into a table.
+   */
+  async previewParquetBlob(
+    options: Readonly<{ parquetBlob: Blob; maxPreviewRows: number }>,
+  ): Promise<{ columns: DuckDbColumnSchema[]; previewRows: UnknownRow[] }> {
+    return await previewParquetBlobWithClient({
       ...options,
       client: this.#getOperations(),
     });

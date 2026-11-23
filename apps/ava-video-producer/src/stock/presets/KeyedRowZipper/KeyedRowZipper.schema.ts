@@ -50,9 +50,9 @@ export const inputSchema = z
       }
     });
     if (
-      !input.leftRows.some((left) =>
-        input.rightRows.some(propEq("key", left.key)),
-      )
+      !input.leftRows.some((left) => {
+        return input.rightRows.some(propEq("key", left.key));
+      })
     ) {
       context.addIssue({
         code: "custom",

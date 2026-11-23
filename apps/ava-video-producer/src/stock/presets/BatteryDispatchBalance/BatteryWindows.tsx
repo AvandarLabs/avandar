@@ -1,6 +1,7 @@
-import { FitText } from "../../primitives/FitText/FitText";
+import { BatteryWindowLabels } from "./BatteryWindowLabels/BatteryWindowLabels";
 import type { Input } from "./BatteryDispatchBalance.schema";
 import type { ReactNode } from "react";
+
 /** Inputs for BatteryWindows. */
 type Props = { input: Input };
 
@@ -39,19 +40,7 @@ export function BatteryWindows({ input }: Readonly<Props>): ReactNode {
   ];
   return (
     <g>
-      {labels.map(({ text, x, y, width }, index) => (
-        <FitText
-          key={index}
-          text={text}
-          x={x}
-          y={y}
-          width={width}
-          fontSize={12}
-          maxLines={3}
-          breakLongWords
-          normalizeWhitespace
-        />
-      ))}
+      <BatteryWindowLabels labels={labels} />
     </g>
   );
 }

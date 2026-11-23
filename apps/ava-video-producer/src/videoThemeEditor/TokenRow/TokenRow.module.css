@@ -1,0 +1,33 @@
+.tokenRow {
+  border-bottom: var(--atlas-border-1) solid var(--line);
+  display: grid;
+  gap: var(--atlas-space-8);
+  padding-block: var(--atlas-space-12);
+}
+
+/* Only non-text parts dim when inherited: chips, swatches, specimens, and previews. */
+.tokenRowInherited [data-inherit-dim] {
+  opacity: var(--atlas-opacity-60);
+}
+
+.tokenRowMeta {
+  color: var(--atlas-color-muted);
+  font-size: var(--atlas-font-size-11);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.tokenRowPath {
+  font: var(--atlas-font-size-10) var(--mono);
+}
+
+/* On a phone, descriptions are 12px and token paths 11px. */
+@media (width <= 760px) {
+  .tokenRowMeta {
+    font-size: var(--atlas-font-size-12);
+  }
+
+  .tokenRowPath {
+    font-size: var(--atlas-font-size-11);
+  }
+}

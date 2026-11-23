@@ -142,6 +142,32 @@ describe("DataVizPBlock", () => {
     expect(viz).toHaveAttribute("data-columns", "category,value,score");
   });
 
+  it("marks the chart with its block id so a link can scroll to it", () => {
+    renderBlock({
+      prompt: "find me data",
+      rawSql: "SELECT * FROM foo",
+      vizType: "table",
+      vizConfig: { vizType: "table" },
+    });
+    expect(
+      screen.getByTestId("visualization-container").closest("[data-tile-id]"),
+    ).toHaveAttribute("data-tile-id", "chart");
+  });
+
+  it("marks the empty state with its block id so a link can scroll to it", () => {
+    renderBlock({
+      prompt: "",
+      rawSql: "",
+      vizType: "table",
+      vizConfig: { vizType: "table" },
+    });
+    expect(
+      screen
+        .getByText(/add a prompt and generate SQL/i)
+        .closest("[data-tile-id]"),
+    ).toHaveAttribute("data-tile-id", "chart");
+  });
+
   it("renders for bar viz type", () => {
     renderBlock({
       prompt: "find me data",

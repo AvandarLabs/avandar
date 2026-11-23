@@ -6,7 +6,10 @@ import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import { NuxEvents } from "@/components/Nux/NuxEvents/NuxEvents";
 import { DatasetImportForm } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetImportForm";
 import { FileDropzone } from "@/views/DataManagerApp/DataImportView/ManualUploadView/FileDropzone/FileDropzone";
+import { FileUrlChoice } from "@/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlChoice/FileUrlChoice";
+import { FileUrlField } from "@/views/DataManagerApp/DataImportView/ManualUploadView/FileUrlField/FileUrlField";
 import { UploadedFileBar } from "@/views/DataManagerApp/DataImportView/ManualUploadView/UploadedFileBar/UploadedFileBar";
+import { useFileUrlImport } from "@/views/DataManagerApp/DataImportView/ManualUploadView/useFileUrlImport/useFileUrlImport";
 import { useManualUploadParse } from "@/views/DataManagerApp/DataImportView/ManualUploadView/useManualUploadParse/useManualUploadParse";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { ReactNode } from "react";
@@ -32,11 +35,13 @@ type Props = BoxProps & {
 };
 
 /**
- * The manual import flow: choose a file, then review and name what came out
- * of it.
+ * The manual import flow: choose a file or paste a link, then review and
+ * name what came out of it.
  *
  * The file target and the review form occupy the same place in the layout
  * one after the other, so the view always has exactly one thing to do next.
+ * A pasted link is downloaded and then reviewed as a dropped file. The link
+ * is not kept.
  */
 export function ManualUploadView({
   initialFile,
@@ -45,11 +50,15 @@ export function ManualUploadView({
   ...boxProps
 }: Readonly<Props>): ReactNode {
   const manualUpload = useManualUploadParse(initialFile);
+  const fileUrl = useFileUrlImport(manualUpload.onFileSubmit);
   const { uploadedFile, previewRows, dataSourceMetadata } = manualUpload;
   const hasParsedFile =
     isDefined(previewRows) &&
     isDefined(uploadedFile) &&
     isDefined(dataSourceMetadata);
+  const isAcquiring =
+    manualUpload.isLoadingFile || fileUrl.phase === "fetching";
+  const isChoosingFile = !hasParsedFile && fileUrl.members.length > 0;
 
   return (
     <Box {...boxProps}>
@@ -59,25 +68,46 @@ export function ManualUploadView({
             <UploadedFileBar
               file={uploadedFile}
               sourceType={dataSourceMetadata.sourceType}
-              isBusy={manualUpload.isLoadingFile}
+              isBusy={isAcquiring}
               onReplace={manualUpload.onFileSubmit}
+              onUseLink={() => {
+                manualUpload.clearParsedFile();
+                fileUrl.returnToLink();
+              }}
+            />
+          ) : isChoosingFile ? (
+            <FileUrlChoice
+              members={fileUrl.members}
+              errorMessage={fileUrl.errorMessage}
+              isBusy={fileUrl.phase === "fetching"}
+              onChoose={fileUrl.chooseMember}
+              onUseDifferentLink={fileUrl.returnToLink}
             />
           ) : (
-            <Stack gap="xs">
+            <Stack gap="sm">
               <FileDropzone
-                isLoading={manualUpload.isLoadingFile}
+                isLoading={isAcquiring}
                 onSelect={manualUpload.onFileSubmit}
               />
+              <FileUrlField
+                url={fileUrl.url}
+                errorMessage={fileUrl.errorMessage}
+                isBusy={isAcquiring}
+                status={fileUrl.status}
+                fieldRef={fileUrl.fieldRef}
+                onUrlChange={fileUrl.setUrl}
+                onSubmit={fileUrl.submitUrl}
+              />
               {/*
-                Where the file is read is a real question for a team handling
-                sensitive data, and the answer is a selling point rather than
-                a disclaimer. It sits under the target because that is the
-                moment the question comes up.
+                Where the bytes are read is a real question for a team
+                handling sensitive data. A dropped file never leaves the
+                device until save. A pasted link is downloaded by Avandar
+                first, then read here the same way.
               */}
               <Text size="xs" c="dimmed">
                 <Trans>
-                  Avandar reads the file in your browser. Nothing leaves this
-                  device until you save the dataset.
+                  A file you drop stays on this device until you save. A link is
+                  downloaded by Avandar first, then read here the same way.
                 </Trans>
               </Text>
             </Stack>

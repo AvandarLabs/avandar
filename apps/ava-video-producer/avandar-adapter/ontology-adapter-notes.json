@@ -12,7 +12,8 @@
       "The service-backed CaseTypeActions group is excluded. No record navigation, synchronization, deletion or persistence is demonstrated.",
       "The actual ConceptNavbar is mounted. Its active status, active class and Mantine data-active attribute are driven by the frame because the existing fixture router does not distinguish concept route params.",
       "Concept metadata uses source-typed Pick projections for the exact fields consumed by these presentation leaves. Fixed IDs are validated by the product UUID helper. One documented assertion at the unchanged ConceptNavbar/ConceptMetaView prop seam accounts for absent ownership, timestamps, allowManualCreation and model branding. Fixture hydration remains explicitly projection-typed.",
-      "Response-case inspection occupies frames 0-337. Facility inspection occupies frames 338-599. No case record detail is reused."
+      "Response-case inspection occupies frames 0-337. Facility inspection occupies frames 338-599. No case record detail is reused.",
+      "ConceptMetaView's record count, rail and Statuses section are mounted unchanged with film-only data and permission shims (shims/ontology/): IndividualClient.useGetCount reads as not loaded so the header omits the count, WorkspaceClient lists no members so the rail omits the owner, ConceptStatusClient lists no statuses, and useHasPermission is false so Edit statuses and its modal never mount (the modal is aliased to a shim that throws). The fixtures carry none of these values, so none are invented."
     ]
   },
   "attribute-mapping": {
@@ -35,7 +36,7 @@
     "date": "2026-10-18",
     "bridge": "component:build passed with the existing shared license guard, importing 673 product source files. Generated JavaScript and CSS were built, not edited.",
     "focusedTests": "Seven frame-state tests and the three existing fixture provenance tests passed after review corrections. The new defaults/name-selection tests were observed failing against the incorrect prior behavior before the correction.",
-    "scopedLint": "Scoped ESLint, Stylelint, app TypeScript (tsconfig.app.json), and diff whitespace checks passed after review corrections.",
+    "scopedLint": "Scoped oxlint, Stylelint, app TypeScript (tsconfig.app.json), and diff whitespace checks passed after review corrections.",
     "browser": "Initial adapter states were inspected with Playwright MCP before review correction. The source-correct defaults and selected-name states at 338-442 require controller visual verification. No browser was used during this follow-up because the controller owns the active session.",
     "console": "Zero runtime errors. The existing Remotion Player license reminder remains.",
     "evidence": ".temp/feat-motion-catalog/ontology-final-{0,599}.png and attribute-mapping-final-{98,180,400,659}.png are initial-version evidence. The mapping screenshots do not establish the corrected Add field defaults or text-selection behavior.",

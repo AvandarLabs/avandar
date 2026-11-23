@@ -33,3 +33,48 @@ run_migration_replay \
   "$repo_root/supabase/migration-upgrade-tests/dashboard_snapshot_revision.prelude.sql" \
   "$repo_root/supabase/migrations/20260816020100_add_dashboard_snapshot_revision.sql" \
   "$repo_root/supabase/migration-upgrade-tests/dashboard_snapshot_revision.assertions.sql"
+
+# API listing pipeline backfill: name the pipeline on Socrata and HDX
+# listings, and leave every other row alone.
+run_migration_replay \
+  "$repo_root/supabase/migration-upgrade-tests/data_catalog_listings_pipeline_name.prelude.sql" \
+  "$repo_root/supabase/migrations/20261020174732_backfill_api_listing_pipeline_name.sql" \
+  "$repo_root/supabase/migration-upgrade-tests/data_catalog_listings_pipeline_name.assertions.sql"
+
+# Scope seed: key existing pipeline listings by the scope that produced them,
+# and seed per-scope checkpoints from each drive's newest update.
+run_migration_replay \
+  "$repo_root/supabase/migration-upgrade-tests/pipeline_scope_seed.prelude.sql" \
+  "$repo_root/supabase/migrations/20261021211630_seed_pipeline_scope_keys_and_checkpoints.sql" \
+  "$repo_root/supabase/migration-upgrade-tests/pipeline_scope_seed.assertions.sql"
+
+# Case app role backfill: re-seed built-in groups with both case apps, and
+# mirror each custom group's data_sources role into case_types and
+# case_records.
+run_migration_replay \
+  "$repo_root/supabase/migration-upgrade-tests/case_app_roles_backfill.prelude.sql" \
+  "$repo_root/supabase/migrations/20261026105957_backfill_case_app_role_group_app_roles.sql" \
+  "$repo_root/supabase/migration-upgrade-tests/case_app_roles_backfill.assertions.sql"
+
+# Case statuses backfill: give every existing case type Active, Inactive,
+# and its records' other status values, then point each record at its status.
+run_migration_replay \
+  "$repo_root/supabase/migration-upgrade-tests/case_statuses_backfill.prelude.sql" \
+  "$repo_root/supabase/migrations/20261026115137_backfill_case_statuses.sql" \
+  "$repo_root/supabase/migration-upgrade-tests/case_statuses_backfill.assertions.sql"
+
+# Catalog field mapping: renaming `external_organization_name` to
+# `organization1_name` keeps every listing's organization, and the rebuilt
+# search finds a listing by it.
+run_migration_replay \
+  "$repo_root/supabase/migration-upgrade-tests/catalog_field_mapping.prelude.sql" \
+  "$repo_root/supabase/migrations/20261107180000_catalog_field_mapping.sql" \
+  "$repo_root/supabase/migration-upgrade-tests/catalog_field_mapping.assertions.sql"
+
+# Value rule data types: replace rules a column's type does not allow with
+# most_frequent, and store each field's rule output type, even in a case type
+# that already breaks the identifier rule.
+run_migration_replay \
+  "$repo_root/supabase/migration-upgrade-tests/value_rule_data_types.prelude.sql" \
+  "$repo_root/supabase/migrations/20261108031541_correct_value_rule_data_types.sql" \
+  "$repo_root/supabase/migration-upgrade-tests/value_rule_data_types.assertions.sql"

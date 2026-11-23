@@ -6,8 +6,9 @@ import type { Query, QueryCache } from "@tanstack/react-query";
 /**
  * How the Data Explorer query for SQL the chat applied ended.
  *
- * - `rows`: it succeeded and returned at least one row.
- * - `empty`: it succeeded with no rows.
+ * - `rows`: it succeeded and returned at least one row with a value in it.
+ * - `empty`: it succeeded with no rows, or with rows whose every value is
+ *   blank, as a `SUM` over no matching rows returns.
  * - `failed`: it errored, after any retries the query client makes.
  * - `unknown`: no outcome was observed, because nothing ran the SQL or it did
  *   not settle in time.
@@ -44,6 +45,21 @@ function _findDisplayedQuery(
     .at(-1);
 }
 
+/**
+ * Whether every row holds only blanks. A total over a period with no data
+ * comes back as one row of nulls, which is no answer to show as results.
+ */
+function _hasOnlyBlankValues(result: QueryResult.T): boolean {
+  return (
+    result.data.length > 0 &&
+    result.data.every((row) => {
+      return Object.values(row).every((value) => {
+        return value === null || value === undefined;
+      });
+    })
+  );
+}
+
 function _getSettledOutcome(
   query: Query | undefined,
 ): AppliedSqlOutcome | undefined {
@@ -59,7 +75,11 @@ function _getSettledOutcome(
           // The cache types every query's data as unknown; a
           // `useDataQuery` query always holds a `QueryResult`.
           const result = query.state.data as QueryResult.T | undefined;
-          return (result?.numRows ?? 0) > 0 ? "rows" : "empty";
+          return result !== undefined &&
+            result.numRows > 0 &&
+            !_hasOnlyBlankValues(result)
+            ? "rows"
+            : "empty";
         })
         .exhaustive()
     : undefined;
@@ -72,6 +92,11 @@ function _getSettledOutcome(
  * The explorer runs the statement through `useDataQuery` once it renders the
  * new `rawSql`, so this watches the shared query cache rather than running
  * the SQL a second time.
+ *
+ * A result card in the chat runs its SQL through `useDataQuery` too, so a
+ * mounted card running the same statement in the same workspace also
+ * matches. Its outcome is equivalent: the same SQL against the same
+ * workspace through the same query path.
  *
  * @param options.queryCache The cache the explorer's queries live in.
  * @param options.workspaceId The workspace the explorer runs the SQL against.
@@ -120,4 +145,24 @@ export async function waitForAppliedSqlOutcome(
       settle("unknown");
     }, timeoutMs);
   });
+}
+
+/**
+ * The result or error of the query the Data Explorer is showing for
+ * `rawSql`, read after {@link waitForAppliedSqlOutcome} settles. Undefined
+ * fields mean the explorer is not showing that query.
+ */
+export function readAppliedSqlResult(
+  options: Readonly<{
+    queryCache: QueryCache;
+    workspaceId: string;
+    rawSql: string;
+  }>,
+): { result?: QueryResult.T; errorMessage?: string } {
+  const query = _findDisplayedQuery(options);
+  const error = query?.state.error;
+  return {
+    result: query?.state.data as QueryResult.T | undefined,
+    errorMessage: error instanceof Error ? error.message : undefined,
+  };
 }

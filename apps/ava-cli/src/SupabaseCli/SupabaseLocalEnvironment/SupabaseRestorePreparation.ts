@@ -2,12 +2,14 @@ import path from "node:path";
 import { SupabaseBackupHierarchy } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseBackupHierarchy";
 import { SupabaseBackupPaths } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseBackupPaths";
 import { SupabaseBackupStore } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseBackupStore";
-import { SupabaseConfig } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseConfig/SupabaseConfig";
+import { SupabaseConfigOverrides } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseConfigOverrides/SupabaseConfigOverrides";
 import {
   MANIFEST_FILE,
   PROJECT_ID_PATTERN,
 } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.constants";
 import { SupabaseManifestPathChecks } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseManifestPathChecks";
+import { SupabaseProjectPaths } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseProjectPaths";
+import { SupabaseSwitchState } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseSwitchState";
 import { makeMap, makeSet, promiseMap, propEq } from "@avandar/utils";
 import type {
   RestorePaths,
@@ -46,7 +48,10 @@ function _requireRestoreIdentity(
       `Supabase backup belongs to worktree ${options.manifest.worktreePath}, not ${options.worktreePath}.`,
     );
   }
-  if (!PROJECT_ID_PATTERN.test(options.manifest.temporaryProjectId)) {
+  const projectId = SupabaseBackupStore.getProjectIdFromManifest(
+    options.manifest,
+  );
+  if (!PROJECT_ID_PATTERN.test(projectId)) {
     throw new Error("Supabase backup has an unsafe temporary project id.");
   }
 }
@@ -119,12 +124,6 @@ async function _requireCurrentSourcesInManifest(
 ): Promise<void> {
   const { io, manifest } = options;
   const manifestSources = makeSet(manifest.files, { key: "sourcePath" });
-  const configPath = path.join(io.projectRoot, "supabase", "config.toml");
-  if (!manifestSources.has(configPath)) {
-    throw new Error(
-      "Supabase backup complete deterministic file set must include the config backup.",
-    );
-  }
   const currentEnvFiles = await io.findDevelopmentEnvFiles();
   if (
     currentEnvFiles.some((sourcePath) => {
@@ -193,6 +192,20 @@ async function _validateRestoreManifest(
   });
 }
 
+/** The hosted project `.env.development` says this worktree points at. */
+async function _readRemoteProjectId(
+  io: Readonly<SupabaseLocalEnvironmentIo>,
+): Promise<string | undefined> {
+  const envPath = SupabaseProjectPaths.getDevelopmentEnvPathFromProjectRoot(
+    io.projectRoot,
+  );
+  return (await io.pathExists(envPath))
+    ? SupabaseConfigOverrides.getRemoteProjectIdFromEnvContents(
+        await io.readTextFile(envPath),
+      )
+    : undefined;
+}
+
 async function _hasProvenRestoreOwnership(
   options: Readonly<{
     io: SupabaseLocalEnvironmentIo;
@@ -202,9 +215,9 @@ async function _hasProvenRestoreOwnership(
   const { io, manifest } = options;
   const activeProjectId = await (async (): Promise<string | undefined> => {
     try {
-      const configPath = path.join(io.projectRoot, "supabase", "config.toml");
-      const configContents = await io.readTextFile(configPath);
-      return SupabaseConfig.makeStateFromContents(configContents).projectId;
+      return manifest.kind === "local"
+        ? (await SupabaseSwitchState.readEffectiveConfig(io)).projectId
+        : await _readRemoteProjectId(io);
     } catch {
       if (manifest.state === "active") {
         throw new Error("Cannot validate the active Supabase config.");
@@ -212,12 +225,24 @@ async function _hasProvenRestoreOwnership(
       return undefined;
     }
   })();
-  if (activeProjectId === manifest.temporaryProjectId) {
+  if (
+    activeProjectId === SupabaseBackupStore.getProjectIdFromManifest(manifest)
+  ) {
     return true;
   }
-  if (manifest.state === "active") {
+  // A manifest that backs up supabase/config.toml comes from a switch that
+  // rewrote that file, and the git hooks tell anyone blocked by it to put the
+  // file back by hand. Its backup still restores everything, so only cleanup
+  // of the project waits on proof.
+  const hasConfigBackup = manifest.files.some(
+    propEq(
+      "sourcePath",
+      SupabaseProjectPaths.getConfigPathFromProjectRoot(io.projectRoot),
+    ),
+  );
+  if (manifest.state === "active" && !hasConfigBackup) {
     throw new Error(
-      "Supabase backup project id does not match the active Supabase config.",
+      "Supabase backup project id does not match the active Supabase project.",
     );
   }
   return false;

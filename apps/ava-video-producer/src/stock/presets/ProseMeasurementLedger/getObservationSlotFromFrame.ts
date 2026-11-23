@@ -1,19 +1,16 @@
 import { propEq } from "@avandar/utils";
-import { EASE, mix, ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { getSentenceGlyphsFromInput } from "./getSentenceGlyphsFromInput";
+import {
+  ProseSemanticRoles,
+  type ProseSemanticRole,
+} from "./ProseSemanticRoles";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./ProseMeasurementLedger.schema";
 
-const ROLES: readonly [
-  "subject",
-  "metric",
-  "value",
-  "unit",
-  "period",
-  "qualifier",
-] = ["subject", "metric", "value", "unit", "period", "qualifier"] as const;
 /** Data for getObservationSlotFromFrame. */
 type GetObservationSlotFromFrameResult = {
-  role: "value" | "unit" | "qualifier" | "metric" | "period" | "subject";
+  role: ProseSemanticRole;
   progress: number;
   slotX: number;
   slotY: number;
@@ -25,7 +22,12 @@ type GetObservationSlotFromFrameResult = {
   y: number;
   value: string;
 };
-
+type ObservationSlotArgs = Readonly<{
+  input: Input;
+  frame: number;
+  index: number;
+  motion: VideoMotion;
+}>;
 /**
  * Exact derived text travels through a clear rail before its destination
  * column.
@@ -34,26 +36,17 @@ export function getObservationSlotFromFrame({
   input,
   frame,
   index,
-}: Readonly<{
-  input: Input;
-  frame: number;
-  index: number;
-}>): GetObservationSlotFromFrameResult {
-  const role = ROLES[index],
+  motion,
+}: ObservationSlotArgs): GetObservationSlotFromFrameResult {
+  const role = ProseSemanticRoles.values[index],
     fragment = input.fragments.find(propEq("role", role))!;
-  const fragmentIndex = input.fragments.indexOf(fragment),
-    start =
-      input.fragments
-        .slice(0, fragmentIndex)
-        .reduce((total, item) => total + item.text.length, 0) +
-      fragment.contentStart;
-  const origin = getSentenceGlyphsFromInput(input).find(
-    (glyph) => glyph.end > start,
-  )!;
+  const origin = _findFragmentOrigin({ input, fragment });
   const departure = 56 + ((index + 3) % 6) * 8.5;
-  const progress = ramp(frame, departure, 8, EASE.inOut),
-    alignment = ramp(frame, departure, 3, EASE.inOut),
-    descent = ramp(frame, departure + 3, 5, EASE.inOut);
+  const { progress, alignment, descent } = _getTravelPhases({
+    frame,
+    departure,
+    motion,
+  });
   const slotX = 52 + (index % 3) * 294,
     slotY = 315 + Math.floor(index / 3) * 110;
   return {
@@ -62,13 +55,65 @@ export function getObservationSlotFromFrame({
     slotX,
     slotY,
     departure,
-    opacity: ramp(frame, departure, 1),
-    captionOpacity: ramp(frame, departure + 8, 2),
-    movingCaptionOpacity: 1 - ramp(frame, departure + 7, 1),
-    x: mix(alignment, Math.min(origin.x, 664), slotX + 12),
-    y: mix(descent, 238, slotY + 49),
+    opacity: motion.ramp(frame, departure, motion.scale(1)),
+    captionOpacity: motion.ramp(frame, departure + 8, motion.scale(2)),
+    movingCaptionOpacity:
+      1 - motion.ramp(frame, departure + 7, motion.scale(1)),
+    x: Motion.mix({
+      t: alignment,
+      from: Math.min(origin.x, 664),
+      to: slotX + 12,
+    }),
+    y: Motion.mix({
+      t: descent,
+      from: 238,
+      to: slotY + 49,
+    }),
     value: fragment.text
       .slice(fragment.contentStart, fragment.contentEnd)
       .trim(),
+  };
+}
+/** The sentence glyph where a fragment's content starts. */
+function _findFragmentOrigin({
+  input,
+  fragment,
+}: Readonly<{
+  input: Input;
+  fragment: Input["fragments"][number];
+}>) {
+  const fragmentIndex = input.fragments.indexOf(fragment),
+    start =
+      input.fragments.slice(0, fragmentIndex).reduce((total, item) => {
+        return total + item.text.length;
+      }, 0) + fragment.contentStart;
+  return getSentenceGlyphsFromInput(input).find((glyph) => {
+    return glyph.end > start;
+  })!;
+}
+/** The fragment's overall travel, its alignment, and its descent, 0 to 1. */
+function _getTravelPhases({
+  frame,
+  departure,
+  motion,
+}: Readonly<{
+  frame: number;
+  departure: number;
+  motion: VideoMotion;
+}>) {
+  return {
+    progress: motion.ramp(frame, departure, motion.whip, motion.travel.easing),
+    alignment: motion.ramp(
+      frame,
+      departure,
+      motion.scale(3),
+      motion.travel.easing,
+    ),
+    descent: motion.ramp(
+      frame,
+      departure + 3,
+      motion.scale(5),
+      motion.travel.easing,
+    ),
   };
 }

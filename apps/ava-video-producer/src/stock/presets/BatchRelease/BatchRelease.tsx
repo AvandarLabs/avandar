@@ -1,7 +1,7 @@
-import { ramp } from "../../../motion";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { BatchEnvelope } from "./BatchEnvelope";
-import { BatchHeadings } from "./BatchHeadings";
-import type { GraphicProps } from "../../graphics-common";
+import { BatchHeadings } from "./BatchHeadings/BatchHeadings";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./BatchRelease.schema";
 import type { ReactNode } from "react";
 
@@ -12,19 +12,22 @@ export function BatchRelease({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
-    <g opacity={ramp(frame, 12, 12)}>
+    <g opacity={motion.reveal(frame, 12)}>
       <BatchHeadings input={input} />
-      {input.batches.map((batch, index) => (
-        <BatchEnvelope
-          key={batch.id}
-          batch={batch}
-          index={index}
-          input={input}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {input.batches.map((batch, index) => {
+        return (
+          <BatchEnvelope
+            key={batch.id}
+            batch={batch}
+            index={index}
+            input={input}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

@@ -2,6 +2,7 @@ import { Model } from "@avandar/models";
 import { describe, expect, it } from "vitest";
 import { uuid } from "$/lib/uuid";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import { createConceptAttributeQueryColumn } from "$/models/queries/QueryColumn/QueryColumn.fixtures";
 import { isMapTimeColumn } from "@/views/GisApp/layers/isMapTimeColumn/isMapTimeColumn";
 import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -44,5 +45,13 @@ describe("isMapTimeColumn", () => {
   it("rejects double and boolean columns", () => {
     expect(isMapTimeColumn(_column("double"))).toBe(false);
     expect(isMapTimeColumn(_column("boolean"))).toBe(false);
+  });
+
+  it("rejects a case type field that keeps every value", () => {
+    expect(
+      isMapTimeColumn(
+        createConceptAttributeQueryColumn({ name: "Symptoms", isArray: true }),
+      ),
+    ).toBe(false);
   });
 });

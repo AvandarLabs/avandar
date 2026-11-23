@@ -34,6 +34,11 @@ export type RelationCacheWrite = {
   /** The columns actually held. Sorted and deduplicated before storing. */
   columns: readonly string[] | "all";
   payload: Blob;
+  /**
+   * Epoch ms from which the stored rows are no longer served, so a live
+   * source is acquired again; `undefined` for rows that never go stale.
+   */
+  staleAt: number | undefined;
 };
 
 /** One requested key that `probe` found no servable entry for. */

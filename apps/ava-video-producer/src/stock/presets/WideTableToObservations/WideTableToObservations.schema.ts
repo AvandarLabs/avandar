@@ -45,12 +45,15 @@ export const inputSchema = z
     if (
       ids.size !== input.measures.length ||
       new Set(input.subjects.map(prop("id"))).size !== input.subjects.length ||
-      input.subjects.some(
-        ({ values }) =>
+      input.subjects.some(({ values }) => {
+        return (
           values.length !== ids.size ||
-          new Set(values.map(({ measureId }) => measureId)).size !== ids.size ||
-          values.some(({ measureId }) => !ids.has(measureId)),
-      )
+          new Set(values.map(prop("measureId"))).size !== ids.size ||
+          values.some(({ measureId }) => {
+            return !ids.has(measureId);
+          })
+        );
+      })
     ) {
       context.addIssue({
         code: "custom",

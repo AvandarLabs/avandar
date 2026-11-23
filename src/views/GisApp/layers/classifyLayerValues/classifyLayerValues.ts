@@ -1,6 +1,6 @@
 import { isDefined } from "@avandar/utils";
+import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { makeJenksBreaksFromValues } from "./makeJenksBreaksFromValues/makeJenksBreaksFromValues";
-import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 
 /** One feature id paired with the value used for classification. */
 export type LayerValue = { featureId: string; value: unknown };
@@ -14,6 +14,8 @@ export type LayerClassification = {
   classifiedValueCount: number;
   distinctValueCount: number;
   didSample: boolean;
+  /** Lowest and highest classified value, or `undefined` when none. */
+  valueDomain: readonly [number, number] | undefined;
   recommendation: "classified" | "singleColor" | "noData";
 };
 
@@ -21,6 +23,7 @@ type Options = {
   classification: MapLayer.Classification;
   ramp: readonly string[];
   noData: { color: string; label: string };
+  classLabels: ReadonlyArray<string | undefined>;
 };
 
 function _makeQuantileCuts(
@@ -109,7 +112,12 @@ function _buildBreaks(cuts: readonly number[]): MapLayer.LegendBreak[] {
   });
 }
 
-function _formatBreak(value: MapLayer.LegendBreak): string {
+/**
+ * The generated legend label for one interval, such as `< 95` or `≥ 95`.
+ * Use it wherever a class needs a name the user has not written, such as a
+ * legend entry or the placeholder of a class label input.
+ */
+export function legendBreakToLabel(value: MapLayer.LegendBreak): string {
   if (value.lower === undefined) {
     return `< ${value.upper}`;
   }
@@ -124,6 +132,57 @@ function _findClassIndex(value: number, cuts: readonly number[]): number {
     return value < cut;
   });
   return cutIndex === -1 ? cuts.length : cutIndex;
+}
+
+function _countClasses(
+  options: Readonly<{
+    finiteValues: ReadonlyArray<{ featureId: string; value: number }>;
+    cuts: readonly number[];
+    classCount: number;
+  }>,
+): { classIndexByFeatureId: Map<string, number>; counts: number[] } {
+  const classIndexByFeatureId = new Map<string, number>();
+  const counts = Array.from({ length: options.classCount }, () => {
+    return 0;
+  });
+  options.finiteValues.forEach(({ featureId, value }) => {
+    const classIndex = _findClassIndex(value, options.cuts);
+    classIndexByFeatureId.set(featureId, classIndex);
+    counts[classIndex] = (counts[classIndex] ?? 0) + 1;
+  });
+  return { classIndexByFeatureId, counts };
+}
+
+function _buildValueEntries(
+  options: Readonly<{
+    breaks: readonly MapLayer.LegendBreak[];
+    counts: readonly number[];
+    ramp: readonly string[];
+    classLabels: ReadonlyArray<string | undefined>;
+  }>,
+): MapLayer.LegendEntry[] {
+  const { breaks, counts, ramp } = options;
+  // A label names one interval, so labels apply only while the data still
+  // yields exactly the classes they were written for.
+  const labels =
+    options.classLabels.length === breaks.length ? options.classLabels : [];
+  return breaks.map((legendBreak, index): MapLayer.LegendEntry => {
+    return {
+      type: "value",
+      color: ramp[Math.min(index, ramp.length - 1)] ?? "",
+      label: labels[index] ?? legendBreakToLabel(legendBreak),
+      count: counts[index] ?? 0,
+    };
+  });
+}
+
+function _getRecommendation(
+  distinctValueCount: number,
+): LayerClassification["recommendation"] {
+  if (distinctValueCount === 0) {
+    return "noData";
+  }
+  return distinctValueCount === 1 ? "singleColor" : "classified";
 }
 
 /** Classifies finite feature values into deterministic legend intervals. */
@@ -144,55 +203,45 @@ export function classifyLayerValues(
       return left - right;
     });
   const distinctValueCount = new Set(sortedNumbers).size;
-  const requestedCount =
-    options.classification.method === "manual"
-      ? options.classification.breaks.length + 1
-      : options.classification.classCount;
-  const classCount = Math.min(requestedCount, distinctValueCount);
+  const classCount = Math.min(
+    MapLayer.getGraduatedClassCount(options.classification),
+    distinctValueCount,
+  );
   const { cuts, didSample } =
     classCount === 0
       ? { cuts: [], didSample: false }
       : _makeCuts(sortedNumbers, options.classification, classCount);
   const breaks = classCount === 0 ? [] : _buildBreaks(cuts);
-  const classIndexByFeatureId = new Map<string, number>();
-  const counts = Array.from({ length: breaks.length }, () => {
-    return 0;
-  });
-  finiteValues.forEach(({ featureId, value }) => {
-    const classIndex = _findClassIndex(value, cuts);
-    classIndexByFeatureId.set(featureId, classIndex);
-    counts[classIndex] = (counts[classIndex] ?? 0) + 1;
-  });
-  const entries: MapLayer.LegendEntry[] = breaks.map((value, index) => {
-    return {
-      type: "value",
-      color: options.ramp[Math.min(index, options.ramp.length - 1)] ?? "",
-      label: _formatBreak(value),
-      count: counts[index] ?? 0,
-    };
+  const { classIndexByFeatureId, counts } = _countClasses({
+    finiteValues,
+    cuts,
+    classCount: breaks.length,
   });
   const noDataCount = sourceValues.length - finiteValues.length;
-  if (noDataCount > 0) {
-    entries.push({
-      type: "noData",
-      color: options.noData.color,
-      label: options.noData.label,
-      count: noDataCount,
-    });
-  }
+  const noDataEntries: MapLayer.LegendEntry[] =
+    noDataCount > 0
+      ? [{ type: "noData", ...options.noData, count: noDataCount }]
+      : [];
   return {
     breaks,
-    entries,
+    entries: [
+      ..._buildValueEntries({
+        breaks,
+        counts,
+        ramp: options.ramp,
+        classLabels: options.classLabels,
+      }),
+      ...noDataEntries,
+    ],
     classIndexByFeatureId,
     sourceValueCount: sourceValues.length,
     classifiedValueCount: finiteValues.length,
     distinctValueCount,
     didSample,
-    recommendation:
-      distinctValueCount === 0
-        ? "noData"
-        : distinctValueCount === 1
-          ? "singleColor"
-          : "classified",
+    valueDomain:
+      sortedNumbers.length === 0
+        ? undefined
+        : [sortedNumbers[0]!, sortedNumbers.at(-1)!],
+    recommendation: _getRecommendation(distinctValueCount),
   };
 }

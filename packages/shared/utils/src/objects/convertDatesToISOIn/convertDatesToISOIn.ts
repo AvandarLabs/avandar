@@ -25,7 +25,7 @@ export function convertDatesToISOIn<
   const newObj = { ...obj };
   keys.forEach((key) => {
     if (obj[key] instanceof Date) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // oxlint-disable-next-line typescript/ban-ts-comment
       // @ts-expect-error
       newObj[key] = obj[key].toISOString();
     }

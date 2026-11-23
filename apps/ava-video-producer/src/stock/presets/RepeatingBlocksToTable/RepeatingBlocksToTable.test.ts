@@ -18,8 +18,8 @@ import type { PresetAssertions } from "../../../../tests/helpers/registerStockPr
 const render = ({
   frame,
   input = DEFAULT_INPUT,
-}: Readonly<{ frame: number; input?: Input }>): string =>
-  renderToStaticMarkup(
+}: Readonly<{ frame: number; input?: Input }>): string => {
+  return renderToStaticMarkup(
     createElement(RepeatingBlocksToTable, {
       frame,
       input,
@@ -27,6 +27,7 @@ const render = ({
       id: "packet27",
     }),
   );
+};
 function _marker({
   markup,
   key,
@@ -36,10 +37,12 @@ function _marker({
   key: string;
   value: string;
 }): string {
-  const tags = [...markup.matchAll(/<[^>]+>/g)].map((match) => match[0]);
-  const tag = tags.find((candidateTag) =>
-    candidateTag.includes(`data-${key}="${value}"`),
-  );
+  const tags = [...markup.matchAll(/<[^>]+>/g)].map((match) => {
+    return match[0];
+  });
+  const tag = tags.find((candidateTag) => {
+    return candidateTag.includes(`data-${key}="${value}"`);
+  });
   assert.ok(tag, `${key} ${value}`);
   return tag;
 }
@@ -88,7 +91,7 @@ test("field-value strips physically rotate their block organization into table r
   );
 });
 
-import { registerStockLocalizationAssertions } from "../../../../tests/helpers/registerStockLocalizationAssertions";
+import { registerStockDefaultTextAssertions } from "../../../../tests/helpers/registerStockDefaultTextAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { repeatingBlocksToTableContract as contract } from "./RepeatingBlocksToTable.contract";
 
@@ -96,14 +99,18 @@ const EXCLUDED_TEXT_FIELDS: string[] = ["id", "fieldId"];
 const getVisibleTexts = ({
   input,
   frame,
-}: Readonly<{ input: Input; frame: number }>): string[] => [
-  ...Object.values(input.copy),
-  ...input.fields.map(prop("label")),
-  ...input.blocks.map(prop("heading")),
-  ...input.blocks.flatMap(({ cells }) =>
-    cells.map(({ text }) => text ?? input.missingLabel),
-  ),
-];
+}: Readonly<{ input: Input; frame: number }>): string[] => {
+  return [
+    ...Object.values(input.copy),
+    ...input.fields.map(prop("label")),
+    ...input.blocks.map(prop("heading")),
+    ...input.blocks.flatMap(({ cells }) => {
+      return cells.map(({ text }) => {
+        return text ?? input.missingLabel;
+      });
+    }),
+  ];
+};
 const options = {
   inputSchema,
   defaultInput: DEFAULT_INPUT,
@@ -116,7 +123,7 @@ const options = {
 } satisfies PresetAssertions<Input>;
 registerStockPresetAssertions(options);
 registerStockTextLayoutAssertions(options);
-registerStockLocalizationAssertions({
+registerStockDefaultTextAssertions({
   contract,
   expectedTextPaths: [
     ["fields", 0, "label"],
@@ -155,7 +162,9 @@ test("maximum source and final strip rectangles stay inside the canvas", () => {
     const markup = render({ frame: frame, input: fixtures[2].input });
     const cells = [
       ...markup.matchAll(/<rect[^>]*data-transfer-cell=[^>]*>/g),
-    ].map((match) => match[0]);
+    ].map((match) => {
+      return match[0];
+    });
     cells.forEach((cell) => {
       const x = SvgAttributes.getNumberFromMarkup({
           attributes: cell,
@@ -188,10 +197,11 @@ function _assertReadablePaint(markup: string): void {
   const paint = SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup(markup);
   SvgPaintAssertions.assertPaintClearance({
     texts: paint.filter(propEq("kind", "text")),
-    rectangles: paint.filter(
-      (item) =>
-        item.kind === "rect" && item.fill !== "none" && item.fillOpacity > 0,
-    ),
+    rectangles: paint.filter((item) => {
+      return (
+        item.kind === "rect" && item.fill !== "none" && item.fillOpacity > 0
+      );
+    }),
   });
 }
 
@@ -203,30 +213,32 @@ test("RepeatingBlocksToTable transfer sampling preserves visible text and foregr
   [
     DEFAULT_INPUT,
     fixtures[1].input,
-    ...[2, 3].flatMap((numBlocks) =>
-      [2, 3].map((numFields) => {
+    ...[2, 3].flatMap((numBlocks) => {
+      return [2, 3].map((numFields) => {
         const dense = fixtures[2].input,
           fields = dense.fields.slice(0, numFields);
         return inputSchema.parse({
           ...dense,
           fields,
-          blocks: dense.blocks.slice(0, numBlocks).map((block) => ({
-            ...block,
-            cells: block.cells.filter((cell) =>
-              fields.some(propEq("id", cell.fieldId)),
-            ),
-          })),
+          blocks: dense.blocks.slice(0, numBlocks).map((block) => {
+            return {
+              ...block,
+              cells: block.cells.filter((cell) => {
+                return fields.some(propEq("id", cell.fieldId));
+              }),
+            };
+          }),
         });
-      }),
-    ),
+      });
+    }),
   ].forEach((input) => {
-    Array.from({ length: 111 }, (_, index) => 56 + index / 2).forEach(
-      (frame) => {
-        SvgPaintAssertions.assertTextCanvasBounds({
-          markup: render({ frame: frame, input: input }),
-        });
-        _assertReadablePaint(render({ frame: frame, input: input }));
-      },
-    );
+    Array.from({ length: 111 }, (_, index) => {
+      return 56 + index / 2;
+    }).forEach((frame) => {
+      SvgPaintAssertions.assertTextCanvasBounds({
+        markup: render({ frame: frame, input: input }),
+      });
+      _assertReadablePaint(render({ frame: frame, input: input }));
+    });
   });
 });

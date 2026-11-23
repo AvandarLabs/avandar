@@ -1,4 +1,6 @@
-import { STOCK } from "../../stockPalette";
+import { propEq } from "@avandar/utils";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./PdfNearestLabelReview.schema";
 import type { ReactNode } from "react";
 
@@ -11,25 +13,38 @@ export function ReviewChoiceMark({
   accent,
   rowRight,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const width = scales.stroke(tokens.stroke.default);
   return (
     <g>
       {" "}
       {input.reviewedLabelId === null ? (
-        <path
-          data-unresolved-bracket="true"
-          d="M920 190 h8 v192 h-8"
-          fill="none"
-          stroke={STOCK.orange}
-          strokeWidth={2}
-        />
+        <g data-unresolved-bracket="true">
+          <SketchedShape
+            shape={{ kind: "path", d: "M920 190 h8 v192 h-8" }}
+            profile={tokens.sketch.shape}
+            fill="none"
+            stroke={tokens.color.highlight}
+            strokeWidth={width}
+          />
+        </g>
       ) : (
-        <path
-          data-review-choice={input.reviewedLabelId}
-          d={`M904 ${225 + input.labels.findIndex(({ id }) => id === input.reviewedLabelId) * 95} H${rowRight + 8} V440 H${rowRight}`}
-          fill="none"
-          stroke={accent}
-          strokeWidth={2}
-        />
+        <g data-review-choice={input.reviewedLabelId}>
+          <SketchedShape
+            shape={{
+              kind: "path",
+              d: `M904 ${
+                225 +
+                input.labels.findIndex(propEq("id", input.reviewedLabelId)) * 95
+              } H${rowRight + 8} V440 H${rowRight}`,
+            }}
+            profile={tokens.sketch.shape}
+            fill="none"
+            stroke={accent}
+            strokeWidth={width}
+          />
+        </g>
       )}
     </g>
   );

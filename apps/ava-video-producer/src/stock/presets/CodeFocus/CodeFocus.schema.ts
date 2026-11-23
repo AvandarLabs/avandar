@@ -1,8 +1,8 @@
 import { prop } from "@avandar/utils";
 import { z } from "zod";
+import { contentColorSchema } from "../../theme/getContentColorFromValue/getContentColorFromValue";
 import { createLabelSchema } from "../legacy/createLabelSchema";
 import { getLegacyWidthFromText } from "../legacy/getLegacyWidthFromText/getLegacyWidthFromText";
-import { legacyColorSchema } from "../legacy/legacyColorSchema.constants";
 
 /** Strict authored content within the fixed CodeFocus layout. */
 export const codeFocusInputSchema = z
@@ -16,7 +16,7 @@ export const codeFocusInputSchema = z
                 .string()
                 .max(54)
                 .regex(/^[^\r\n\t]*$/),
-              color: legacyColorSchema,
+              color: contentColorSchema,
             }),
           )
           .min(1)

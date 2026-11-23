@@ -1,10 +1,11 @@
-import { CorridorDecision } from "./CorridorDecision";
+import { CorridorDecision } from "./CorridorDecision/CorridorDecision";
 import { HabitatCaptions } from "./HabitatCaptions";
 import { HabitatLandBalance } from "./HabitatLandBalance";
 import { HabitatPlan } from "./HabitatPlan";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./HabitatCorridorReconnection.schema";
 import type { ReactNode } from "react";
+
 /** Inputs for HabitatCorridorReconnection. */
 type Props = GraphicProps & { input: Input };
 

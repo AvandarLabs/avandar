@@ -7,7 +7,6 @@ type Props = {
   onClose?: () => void;
   frame?: RefObject<HTMLElement | null>;
 };
-
 /** Browse previews with arrows while preserving native form-control keys. */
 export function usePreviewKeys({
   enabled,
@@ -15,31 +14,41 @@ export function usePreviewKeys({
   onNext,
   onClose,
   frame,
-}: Props) {
-  useEffect(() => {
-    if (!enabled) {
-      return;
-    }
-    const navigate = (event: KeyboardEvent) =>
-      _navigate(event, { enabled, onPrevious, onNext, onClose });
-    window.addEventListener("keydown", navigate);
-    const iframe = frame?.current?.querySelector("iframe");
-    const listenInFrame = () =>
-      iframe?.contentWindow?.addEventListener("keydown", navigate);
-    listenInFrame();
-    iframe?.addEventListener("load", listenInFrame);
-    return () => {
-      window.removeEventListener("keydown", navigate);
-      iframe?.removeEventListener("load", listenInFrame);
-      iframe?.contentWindow?.removeEventListener("keydown", navigate);
-    };
-  }, [enabled, onPrevious, onNext, onClose, frame]);
+}: Props): void {
+  useEffect(
+    function listenForPreviewNavigationKeys() {
+      if (!enabled) {
+        return;
+      }
+      const navigate = (event: KeyboardEvent) => {
+        return _navigate({
+          event,
+          props: { enabled, onPrevious, onNext, onClose },
+        });
+      };
+      window.addEventListener("keydown", navigate);
+      const iframe = frame?.current?.querySelector("iframe");
+      const listenInFrame = () => {
+        return iframe?.contentWindow?.addEventListener("keydown", navigate);
+      };
+      listenInFrame();
+      iframe?.addEventListener("load", listenInFrame);
+      return () => {
+        window.removeEventListener("keydown", navigate);
+        iframe?.removeEventListener("load", listenInFrame);
+        iframe?.contentWindow?.removeEventListener("keydown", navigate);
+      };
+    },
+    [enabled, onPrevious, onNext, onClose, frame],
+  );
 }
-
-function _navigate(
-  event: KeyboardEvent,
-  { onPrevious, onNext, onClose }: Props,
-) {
+function _navigate({
+  event,
+  props: { onPrevious, onNext, onClose },
+}: Readonly<{
+  event: KeyboardEvent;
+  props: Props;
+}>) {
   if (event.defaultPrevented) {
     return;
   }

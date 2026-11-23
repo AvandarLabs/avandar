@@ -68,4 +68,76 @@ describe("buildCaseManagerSystemPrompt", () => {
     expect(prompt).toContain("long-us-deaths.csv id=dataset-1");
     expect(prompt).toContain("state (varchar id=column-1)");
   });
+
+  it("asks for a described status set when the domain implies a workflow", () => {
+    const prompt = buildCaseManagerSystemPrompt({
+      datasets: [],
+      columns: [],
+      concepts: [],
+    });
+
+    expect(prompt).toContain("fill `statuses`");
+    expect(prompt).toContain("`defaultStatusName`");
+    expect(prompt).toContain("one-sentence description");
+  });
+
+  it("tells the model every case type already has a built-in status", () => {
+    const prompt = buildCaseManagerSystemPrompt({
+      datasets: [],
+      columns: [],
+      concepts: [],
+    });
+
+    expect(prompt).toContain('never propose an attribute named "status"');
+  });
+
+  it("no longer suggests a manual-entry triage status", () => {
+    const prompt = buildCaseManagerSystemPrompt({
+      datasets: [],
+      columns: [],
+      concepts: [],
+    });
+
+    expect(prompt).not.toContain("triage status");
+  });
+
+  it("tells the model which column types each value rule needs", () => {
+    const prompt = buildCaseManagerSystemPrompt({
+      datasets: [],
+      columns: [],
+      concepts: [],
+    });
+
+    expect(prompt).toContain(
+      "sum and avg only work on bigint and double columns",
+    );
+    expect(prompt).toContain(
+      "compare alphabetically, ignoring case and accents",
+    );
+  });
+
+  it("tells the model when a field should keep every value", () => {
+    const prompt = buildCaseManagerSystemPrompt({
+      datasets: [],
+      columns: [],
+      concepts: [],
+    });
+
+    expect(prompt).toContain("Set `valueShape` to `list` only when");
+    expect(prompt).toContain("always for the label column and every join key");
+  });
+
+  it("tells the model to keep a value per period when the user asks for one", () => {
+    const prompt = buildCaseManagerSystemPrompt({
+      datasets: [],
+      columns: [],
+      concepts: [],
+    });
+
+    expect(prompt).toContain('`valueShape: "bucketed_list"`');
+    expect(prompt).toContain("per day, week, month, quarter, or year");
+    expect(prompt).toContain(
+      "Never make a per-period field the label or a join key",
+    );
+  });
 });

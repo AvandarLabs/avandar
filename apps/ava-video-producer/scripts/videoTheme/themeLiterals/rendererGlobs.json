@@ -1,0 +1,21 @@
+[
+  "src/stock/presets/**",
+  "src/stock/graphics-*/**",
+  "src/stock/primitives/**",
+  "src/stock/graphics-common/**",
+  "src/stock/StockGraphic/**",
+  "src/gallery/palette.ts",
+  "src/scenes/**",
+  "src/chrome/**",
+  "src/TitleCard/**",
+  "src/CursorMotionHelpers.ts",
+  "src/storyboard/**",
+  "src/motion-components/**",
+  "src/continuity/**",
+  "!src/continuity/gallery/**",
+  "src/avandar/AvandarScene/**",
+  "src/compositions/**",
+  "src/Root/**",
+  "src/gallery/HelperGallery/demos/**",
+  "src/gallery/HelperGallery/HelperPlayer/**"
+]

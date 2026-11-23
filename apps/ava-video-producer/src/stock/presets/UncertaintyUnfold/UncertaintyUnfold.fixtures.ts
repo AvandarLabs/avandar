@@ -88,10 +88,12 @@ export const invalidInputs: unknown[] = [
     { lower: 8, point: 5, upper: 3 },
     { lower: 3, point: 9, upper: 8 },
     { lower: -1, point: 5, upper: 8 },
-  ].map((estimate) => ({
-    ...DEFAULT_INPUT,
-    estimate: { label: "E", ...estimate },
-  })),
+  ].map((estimate) => {
+    return {
+      ...DEFAULT_INPUT,
+      estimate: { label: "E", ...estimate },
+    };
+  }),
   { ...DEFAULT_INPUT, reference: { value: 11, label: "R" } },
   { ...DEFAULT_INPUT, reference: { value: 5, label: "R", extra: true } },
   { ...DEFAULT_INPUT, interval: { kind: "unknown", label: "I" } },

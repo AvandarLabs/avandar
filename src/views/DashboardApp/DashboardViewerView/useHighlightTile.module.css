@@ -1,0 +1,22 @@
+.highlighted {
+  animation: tile-highlight-fade 2.4s ease-in forwards;
+  outline: 6px solid var(--mantine-color-primary-0);
+}
+
+/* Holds the linked-tile ring, then fades it before the class is dropped. */
+@keyframes tile-highlight-fade {
+  0%,
+  60% {
+    outline-color: var(--mantine-color-primary-0);
+  }
+
+  100% {
+    outline-color: transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .highlighted {
+    animation: none;
+  }
+}

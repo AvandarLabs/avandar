@@ -1,5 +1,5 @@
-// eslint-disable-next-line import-x/extensions
-import XlsxSniffWorker from "@/workers/xlsxSniff.worker.ts?worker";
+// oxlint-disable-next-line import/default -- Vite query has virtual default
+import XlsxSniffWorker from "@/workers/xlsxSniff.worker?worker";
 import type { XlsxSniffResult } from "@/workers/xlsxSniff.worker";
 
 /**

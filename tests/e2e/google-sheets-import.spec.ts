@@ -8,8 +8,9 @@ import {
 } from "../data/google-sheet-late-prose/makeTestXlsxData";
 import { expect, test } from "./fixtures/e2e.fixture";
 import { signInWithEmailPassword } from "./helpers/auth";
+import { importGoogleSheetTab } from "./helpers/importGoogleSheetTab";
 import { installFakeGooglePicker } from "./helpers/installFakeGooglePicker";
-import { parseDatasetIdFromDataManagerUrl } from "./helpers/manualUploadCloudSyncFlow";
+import { saveCloudOnlyDataset } from "./helpers/saveCloudOnlyDataset";
 import { removeGoogleTokens, seedGoogleToken } from "./helpers/seedGoogleToken";
 import {
   createSupabaseAdminClient,
@@ -55,12 +56,6 @@ const FIXTURE_TABS = [
 ];
 
 type DriveRequestLog = { urls: string[] };
-
-/** Matches the dataset detail URL a completed save lands on. */
-function _datasetMetaUrlPattern(workspaceSlug: string): RegExp {
-  const escaped = workspaceSlug.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  return new RegExp(`/${escaped}/data-manager/[0-9a-f-]{36}`, "i");
-}
 
 /**
  * Answers Google out of the local fixture and records what was asked for.
@@ -130,15 +125,6 @@ async function _stubGoogleSheet(page: Page): Promise<DriveRequestLog> {
   );
 
   return log;
-}
-
-/** Chooses a tab in the pre-import selector and starts the import. */
-async function _importTab(page: Page, tabTitle: string): Promise<void> {
-  const tabSelect = page.getByRole("combobox", { name: "Tab to import" });
-  await expect(tabSelect).toBeVisible({ timeout: LONG_WAIT });
-  await tabSelect.click();
-  await page.getByRole("option", { name: tabTitle, exact: true }).click();
-  await page.getByRole("button", { name: "Process", exact: true }).click();
 }
 
 /** Opens the Connectors tab and picks a sheet through the stubbed Picker. */
@@ -254,7 +240,7 @@ test.describe("Google Sheets connector", () => {
         }),
       ).toBe(false);
 
-      await _importTab(page, FIXTURE_TABS[0]!.title);
+      await importGoogleSheetTab({ page, tabTitle: FIXTURE_TABS[0]!.title });
 
       await _expectImportedPreview(page, FIXTURE_SHEET.name);
 
@@ -280,33 +266,13 @@ test.describe("Google Sheets connector", () => {
       // here is the output of the read that has to survive the prose cell in
       // row 702. No parquet, no upload, and this poll never turns true.
       //
-      // Saved directly rather than through the shared cloud-sync save helper,
-      // which first looks for the offline-only checkbox. A `google_sheets`
-      // source has nowhere offline to live (see
-      // `DatasetSource.canBeOfflineOnly`), so
-      // that control is deliberately absent here and the dataset is always
+      // A `google_sheets` source has nowhere offline to live (see
+      // `DatasetSource.canBeOfflineOnly`), so the dataset is always
       // cloud-stored.
-      await page.getByRole("button", { name: "Save Dataset" }).click();
-      await expect
-        .poll(
-          () => {
-            return _datasetMetaUrlPattern(e2eWorkerDb.workspaceSlug).test(
-              page.url(),
-            );
-          },
-          { timeout: LONG_WAIT },
-        )
-        .toBe(true);
-
-      const datasetId = parseDatasetIdFromDataManagerUrl({
-        url: page.url(),
+      await saveCloudOnlyDataset({
+        page,
         workspaceSlug: e2eWorkerDb.workspaceSlug,
       });
-      if (!datasetId) {
-        throw new Error(`Could not parse dataset id from URL: ${page.url()}`);
-      }
-
-      expect(datasetId).toBeTruthy();
 
       // The summary's row count is read with `COUNT(*)` over the transcoded
       // table, so it is only reachable if the transcode finished. All 701 rows,
@@ -381,7 +347,7 @@ test.describe("Google Sheets connector", () => {
         // the second one is what proves the gid reached Google: a download that
         // ignored it would return the first tab's columns.
         const secondTab = process.env.E2E_GOOGLE_SHEET_SECOND_TAB ?? "Cities";
-        await _importTab(page, secondTab);
+        await importGoogleSheetTab({ page, tabTitle: secondTab });
 
         // No cell assertion here: the sheet's contents are not this repo's
         // to pin. That the preview rendered at all means Google answered, the

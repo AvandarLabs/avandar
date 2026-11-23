@@ -1,0 +1,18 @@
+/*
+ * A square rather than a circle: the form language is rectilinear. The inset
+ * hairline keeps a light color such as yellow visible on a white surface.
+ */
+.statusDot {
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px var(--ava-border-default);
+  display: inline-block;
+  flex-shrink: 0;
+  height: calc(0.5rem * var(--mantine-scale));
+  width: calc(0.5rem * var(--mantine-scale));
+}
+
+.statusDot[data-size="md"] {
+  border-radius: var(--mantine-radius-xs);
+  height: calc(0.875rem * var(--mantine-scale));
+  width: calc(0.875rem * var(--mantine-scale));
+}

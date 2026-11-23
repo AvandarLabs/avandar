@@ -41,9 +41,9 @@ export const inputSchema = z
     }
     if (
       input.observationDistance > input.track.maximum ||
-      input.learners.some(
-        ({ predictionDistance }) => predictionDistance > input.track.maximum,
-      )
+      input.learners.some(({ predictionDistance }) => {
+        return predictionDistance > input.track.maximum;
+      })
     ) {
       context.addIssue({
         code: "custom",

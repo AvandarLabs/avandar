@@ -7,8 +7,13 @@ import { uuid } from "$/lib/uuid";
 import { createdCaseTypeToFormValues } from "./createdCaseTypeToFormValues";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetColumnId } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
+import type { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRule";
 import type { Workspace } from "$/models/Workspace/Workspace";
-import type { ChatCreatedCaseType } from "$/types/chat.types";
+import type {
+  ChatCreatedCaseAttribute,
+  ChatCreatedCaseType,
+} from "$/types/chat.types";
+import type { AttributeFormValues } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
 
 const DATASET_ID = uuid<DatasetId>();
 const CENSUS_DATASET_ID = uuid<DatasetId>();
@@ -16,6 +21,9 @@ const PK_COLUMN_ID = uuid<DatasetColumnId>();
 const STATUS_COLUMN_ID = uuid<DatasetColumnId>();
 const CENSUS_KEY_COLUMN_ID = uuid<DatasetColumnId>();
 const POPULATION_COLUMN_ID = uuid<DatasetColumnId>();
+const VISIT_DATE_COLUMN_ID = uuid<DatasetColumnId>();
+const VISITS_COLUMN_ID = uuid<DatasetColumnId>();
+const CENSUS_DATE_COLUMN_ID = uuid<DatasetColumnId>();
 const WORKSPACE_ID = uuid<Workspace.Id>();
 
 const COLUMNS = [
@@ -43,6 +51,24 @@ const COLUMNS = [
     name: "population",
     dataType: "bigint" as const,
   },
+  {
+    id: VISIT_DATE_COLUMN_ID,
+    datasetId: DATASET_ID,
+    name: "visit_date",
+    dataType: "date" as const,
+  },
+  {
+    id: VISITS_COLUMN_ID,
+    datasetId: DATASET_ID,
+    name: "visits",
+    dataType: "bigint" as const,
+  },
+  {
+    id: CENSUS_DATE_COLUMN_ID,
+    datasetId: CENSUS_DATASET_ID,
+    name: "census_date",
+    dataType: "date" as const,
+  },
 ];
 
 function _covidCase(
@@ -55,7 +81,7 @@ function _covidCase(
     identities: [{ datasetId: DATASET_ID, primaryKeyColumnId: PK_COLUMN_ID }],
     attributes: [
       {
-        name: "Status",
+        name: "Case status",
         kind: "dataset_column",
         datasetId: DATASET_ID,
         columnId: STATUS_COLUMN_ID,
@@ -65,6 +91,64 @@ function _covidCase(
     ],
     ...overrides,
   };
+}
+
+/** A chat attribute averaging visits per month, by `bucketColumnId`. */
+function _visitsPerMonth(bucketColumnId: string): ChatCreatedCaseAttribute {
+  return {
+    name: "Visits per month",
+    kind: "dataset_column",
+    datasetId: DATASET_ID,
+    columnId: VISITS_COLUMN_ID,
+    valueShape: "bucketed_list",
+    valuePickerRuleType: "avg",
+    bucketGrain: "month",
+    bucketColumnId,
+  };
+}
+
+function _findAttribute(
+  values: ReturnType<typeof createdCaseTypeToFormValues>,
+  name: string,
+): AttributeFormValues | undefined {
+  return values.attributes.find((attribute) => {
+    return attribute.name === name;
+  });
+}
+
+/** Converts a case type with one field, "Field", reading `columnId`. */
+function _convertField(options: {
+  columnId: string;
+  valuePickerRuleType: ValuePickerRule.T;
+}): AttributeFormValues | undefined {
+  const column = COLUMNS.find((candidate) => {
+    return candidate.id === options.columnId;
+  });
+  const formValues = createdCaseTypeToFormValues({
+    caseType: _covidCase({
+      identities: [
+        { datasetId: DATASET_ID, primaryKeyColumnId: PK_COLUMN_ID },
+        {
+          datasetId: CENSUS_DATASET_ID,
+          primaryKeyColumnId: CENSUS_KEY_COLUMN_ID,
+        },
+      ],
+      attributes: [
+        {
+          name: "Field",
+          kind: "dataset_column",
+          datasetId: column?.datasetId ?? DATASET_ID,
+          columnId: options.columnId,
+          valuePickerRuleType: options.valuePickerRuleType,
+        },
+      ],
+    }),
+    workspaceId: WORKSPACE_ID,
+    columns: COLUMNS,
+  });
+  return formValues.attributes.find((attribute) => {
+    return attribute.name === "Field";
+  });
 }
 
 describe("createdCaseTypeToFormValues", () => {
@@ -98,7 +182,7 @@ describe("createdCaseTypeToFormValues", () => {
     const label = formValues.attributes.find((attribute) => {
       return attribute.isLabel;
     });
-    expect(label?.name).toBe("Status");
+    expect(label?.name).toBe("Case status");
     expect(label?.mappings.datasetColumn.datasetColumnId).toBe(
       STATUS_COLUMN_ID,
     );
@@ -115,7 +199,7 @@ describe("createdCaseTypeToFormValues", () => {
       caseType: _covidCase({
         attributes: [
           {
-            name: "Status",
+            name: "Case status",
             kind: "dataset_column",
             datasetId: DATASET_ID,
             columnId: STATUS_COLUMN_ID,
@@ -129,7 +213,7 @@ describe("createdCaseTypeToFormValues", () => {
     });
 
     const status = formValues.attributes.find((attribute) => {
-      return attribute.name === "Status";
+      return attribute.name === "Case status";
     });
     expect(status?.mappings.datasetColumn.valuePickerRuleType).toBe("max");
   });
@@ -142,7 +226,7 @@ describe("createdCaseTypeToFormValues", () => {
     });
 
     const status = formValues.attributes.find((attribute) => {
-      return attribute.name === "Status";
+      return attribute.name === "Case status";
     });
     expect(status?.mappings.datasetColumn.valuePickerRuleType).toBe(
       "most_frequent",
@@ -161,7 +245,7 @@ describe("createdCaseTypeToFormValues", () => {
         ],
         attributes: [
           {
-            name: "Status",
+            name: "Case status",
             kind: "dataset_column",
             datasetId: DATASET_ID,
             columnId: STATUS_COLUMN_ID,
@@ -257,5 +341,256 @@ describe("createdCaseTypeToFormValues", () => {
     expect(keyAttributes).toHaveLength(1);
     expect(keyAttributes[0]?.name).toBe("County code");
     expect(keyAttributes[0]?.isIdentifier).toBe(true);
+  });
+
+  it("starts a chat-created case type with the default status set", () => {
+    const formValues = createdCaseTypeToFormValues({
+      caseType: _covidCase(),
+      workspaceId: WORKSPACE_ID,
+      columns: COLUMNS,
+    });
+
+    expect(
+      formValues.statuses.map((status) => {
+        return status.name;
+      }),
+    ).toEqual(["Active", "Inactive"]);
+    expect(formValues.defaultStatusId).toBe(formValues.statuses[0]?.id);
+  });
+
+  it("renames a field called status so it does not collide with the built-in status", () => {
+    const formValues = createdCaseTypeToFormValues({
+      caseType: _covidCase({
+        attributes: [
+          {
+            name: "Status",
+            kind: "dataset_column",
+            datasetId: DATASET_ID,
+            columnId: STATUS_COLUMN_ID,
+            isLabel: true,
+          },
+          { name: "status", kind: "manual_entry" },
+        ],
+      }),
+      workspaceId: WORKSPACE_ID,
+      columns: COLUMNS,
+    });
+
+    expect(
+      formValues.attributes
+        .map((attribute) => {
+          return attribute.name;
+        })
+        .filter((name) => {
+          return name.toLowerCase().startsWith("status");
+        }),
+    ).toEqual(["Status (attribute)", "status (attribute)"]);
+  });
+
+  it("starts a chat-created case type with the statuses chat proposed", () => {
+    const formValues = createdCaseTypeToFormValues({
+      caseType: _covidCase({
+        statuses: [
+          { name: "Suspected", description: "", color: "#fab005" },
+          { name: "Confirmed", description: "", color: "#fa5252" },
+        ],
+        defaultStatusName: "Confirmed",
+      }),
+      workspaceId: WORKSPACE_ID,
+      columns: COLUMNS,
+    });
+
+    expect(
+      formValues.statuses.map((status) => {
+        return status.name;
+      }),
+    ).toEqual(["Suspected", "Confirmed"]);
+    expect(formValues.defaultStatusId).toBe(formValues.statuses[1]?.id);
+  });
+
+  it("stores a count over a text column as a whole number", () => {
+    const field = _convertField({
+      columnId: STATUS_COLUMN_ID,
+      valuePickerRuleType: "count",
+    });
+
+    expect(field?.dataType).toBe("bigint");
+  });
+
+  it("stores a sum of whole numbers as a decimal", () => {
+    const field = _convertField({
+      columnId: POPULATION_COLUMN_ID,
+      valuePickerRuleType: "sum",
+    });
+
+    expect(field?.dataType).toBe("double");
+  });
+
+  it("keeps a text column's type when the rule is max", () => {
+    const field = _convertField({
+      columnId: STATUS_COLUMN_ID,
+      valuePickerRuleType: "max",
+    });
+
+    expect(field?.dataType).toBe("varchar");
+  });
+
+  it("falls back to most_frequent and keeps the text type for a sum over a text column", () => {
+    const field = _convertField({
+      columnId: STATUS_COLUMN_ID,
+      valuePickerRuleType: "sum",
+    });
+
+    expect(field?.mappings.datasetColumn.valuePickerRuleType).toBe(
+      "most_frequent",
+    );
+    expect(field?.dataType).toBe("varchar");
+  });
+
+  it("keeps the key column's type for an identifier given a count", () => {
+    const field = _convertField({
+      columnId: PK_COLUMN_ID,
+      valuePickerRuleType: "count",
+    });
+
+    expect(field?.isIdentifier).toBe(true);
+    expect(field?.mappings.datasetColumn.valuePickerRuleType).toBe(
+      "most_frequent",
+    );
+    expect(field?.dataType).toBe("varchar");
+  });
+
+  it("makes a field marked every value a list typed as its column", () => {
+    const formValues = createdCaseTypeToFormValues({
+      caseType: {
+        ..._covidCase(),
+        identities: [
+          { datasetId: DATASET_ID, primaryKeyColumnId: PK_COLUMN_ID },
+          {
+            datasetId: CENSUS_DATASET_ID,
+            primaryKeyColumnId: CENSUS_KEY_COLUMN_ID,
+          },
+        ],
+        attributes: [
+          {
+            name: "Population",
+            kind: "dataset_column",
+            datasetId: CENSUS_DATASET_ID,
+            columnId: POPULATION_COLUMN_ID,
+            valueShape: "list",
+            valuePickerRuleType: "sum",
+          },
+        ],
+      },
+      workspaceId: WORKSPACE_ID,
+      columns: COLUMNS,
+    });
+    const population = formValues.attributes.find((attribute) => {
+      return attribute.name === "Population";
+    });
+
+    expect(population?.isArray).toBe(true);
+    expect(population?.dataType).toBe("bigint");
+  });
+
+  it("keeps a join key and the label to one value even when marked every value", () => {
+    const formValues = createdCaseTypeToFormValues({
+      caseType: _covidCase({
+        attributes: [
+          {
+            name: "Case id",
+            kind: "dataset_column",
+            datasetId: DATASET_ID,
+            columnId: PK_COLUMN_ID,
+            valueShape: "list",
+          },
+          {
+            name: "Case status",
+            kind: "dataset_column",
+            datasetId: DATASET_ID,
+            columnId: STATUS_COLUMN_ID,
+            isLabel: true,
+            valueShape: "list",
+          },
+        ],
+      }),
+      workspaceId: WORKSPACE_ID,
+      columns: COLUMNS,
+    });
+
+    expect(
+      formValues.attributes.map((attribute) => {
+        return attribute.isArray;
+      }),
+    ).toEqual([false, false]);
+  });
+
+  it("builds a per-month field as a list with its period, date column, and the rule's output type", () => {
+    const values = createdCaseTypeToFormValues({
+      caseType: _covidCase({
+        attributes: [
+          ..._covidCase().attributes,
+          _visitsPerMonth(VISIT_DATE_COLUMN_ID),
+        ],
+      }),
+      workspaceId: WORKSPACE_ID,
+      columns: COLUMNS,
+    });
+
+    expect(_findAttribute(values, "Visits per month")).toMatchObject({
+      isArray: true,
+      bucketGrain: "month",
+      // The average of whole numbers is a decimal.
+      dataType: "double",
+      mappings: {
+        datasetColumn: {
+          valuePickerRuleType: "avg",
+          bucketColumnId: VISIT_DATE_COLUMN_ID,
+        },
+      },
+    });
+  });
+
+  it.each([
+    ["is unknown", uuid<DatasetColumnId>()],
+    ["belongs to another dataset", CENSUS_DATE_COLUMN_ID],
+    ["is not a date", STATUS_COLUMN_ID],
+  ])("drops a per-month field whose date column %s", (_reason, columnId) => {
+    const values = createdCaseTypeToFormValues({
+      caseType: _covidCase({
+        attributes: [..._covidCase().attributes, _visitsPerMonth(columnId)],
+      }),
+      workspaceId: WORKSPACE_ID,
+      columns: COLUMNS,
+    });
+
+    expect(_findAttribute(values, "Visits per month")).toBeUndefined();
+  });
+
+  it("keeps a join key column as one value even when chat asked for a period", () => {
+    const values = createdCaseTypeToFormValues({
+      caseType: _covidCase({
+        attributes: [
+          {
+            name: "Case id",
+            kind: "dataset_column",
+            datasetId: DATASET_ID,
+            columnId: PK_COLUMN_ID,
+            valueShape: "bucketed_list",
+            valuePickerRuleType: "first",
+            bucketGrain: "month",
+            bucketColumnId: VISIT_DATE_COLUMN_ID,
+          },
+        ],
+      }),
+      workspaceId: WORKSPACE_ID,
+      columns: COLUMNS,
+    });
+
+    expect(_findAttribute(values, "Case id")).toMatchObject({
+      isIdentifier: true,
+      isArray: false,
+      bucketGrain: undefined,
+    });
   });
 });

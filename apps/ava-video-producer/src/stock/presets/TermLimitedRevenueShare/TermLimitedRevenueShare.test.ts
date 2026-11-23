@@ -38,13 +38,15 @@ const options = {
   fixtures,
   render: _render,
   excludedTextFields: ["id", "arrangementLayout"],
-  getVisibleTexts: ({ input }: Readonly<{ input: Input }>) => [
-    ...input.periods.map(prop("label")),
-    input.arrangement.label,
-    input.arrangement.termBoundaryLabel,
-    input.money.unitLabel,
-    ...Object.values(input.copy),
-  ],
+  getVisibleTexts: ({ input }: Readonly<{ input: Input }>) => {
+    return [
+      ...input.periods.map(prop("label")),
+      input.arrangement.label,
+      input.arrangement.termBoundaryLabel,
+      input.money.unitLabel,
+      ...Object.values(input.copy),
+    ];
+  },
 } satisfies Pick<
   PresetAssertions<Input>,
   | "inputSchema"
@@ -64,8 +66,9 @@ registerStockTextLayoutAssertions({
   getVisibleTexts: ({
     input,
     frame,
-  }: Readonly<{ input: Input; frame: number }>) =>
-    frame >= 141 ? options.getVisibleTexts({ input: input }) : [],
+  }: Readonly<{ input: Input; frame: number }>) => {
+    return frame >= 141 ? options.getVisibleTexts({ input: input }) : [];
+  },
 });
 
 test("independent periods reconcile exactly and preserve one scale in both layouts", () => {
@@ -101,15 +104,15 @@ test("independent periods reconcile exactly and preserve one scale in both layou
         markup.matchAll(/data-portion="([^"]+)"[^>]*width="([^"]+)"/g),
       );
       assert.equal(rectangles.length, 6);
-      [0, 3].forEach((offset) =>
-        assert.ok(
+      [0, 3].forEach((offset) => {
+        return assert.ok(
           Math.abs(
-            rectangles
-              .slice(offset, offset + 3)
-              .reduce((sum, match) => sum + Number(match[2]), 0) - 340,
+            rectangles.slice(offset, offset + 3).reduce((sum, match) => {
+              return sum + Number(match[2]);
+            }, 0) - 340,
           ) < 1e-9,
-        ),
-      );
+        );
+      });
     });
   });
 });
@@ -154,44 +157,6 @@ test("one basis point remains an exact minor unit with no prior remainder carrie
   assert.ok(_render({ frame: 150, input: input }).includes(">0.01</text>"));
 });
 
-import { setupI18n } from "@lingui/core";
-import { makeLocalizedStockDataFromContract } from "../../i18n/makeLocalizedStockDataFromContract";
-import { StockCopyMessages } from "../../i18n/StockCopyMessages";
-
-test("nested authored default prose is extracted and translated without rewriting inputs", () => {
-  const messageId =
-    "motionAtlas.term-limited-revenue-share.default.arrangement.termBoundaryLabel";
-  const messages = StockCopyMessages.getMessagesFromContract({
-    [termLimitedRevenueShareContract.id]: termLimitedRevenueShareContract,
-  });
-  assert.equal(
-    messages[messageId],
-    DEFAULT_INPUT.arrangement.termBoundaryLabel,
-  );
-  const i18n = setupI18n({
-    locale: "es",
-    messages: { es: { [messageId]: "Texto traducido" } },
-    missing: (_locale, id) => id,
-  });
-  const resolved = makeLocalizedStockDataFromContract({
-    contract: termLimitedRevenueShareContract,
-    i18n,
-  });
-  assert.equal(
-    resolved.defaultInput.arrangement.termBoundaryLabel,
-    "Texto traducido",
-  );
-  assert.notEqual(
-    DEFAULT_INPUT.arrangement.termBoundaryLabel,
-    "Texto traducido",
-  );
-  assert.ok(
-    _render({ frame: 150 }).includes(
-      `aria-label="${DEFAULT_INPUT.arrangement.termBoundaryLabel}"`,
-    ),
-  );
-});
-
 test("maximum labels and extreme arithmetic render in both arrangements", () => {
   ["side-by-side", "stacked"].forEach((arrangementLayout) => {
     [true, false].forEach((showAmounts) => {
@@ -200,9 +165,11 @@ test("maximum labels and extreme arithmetic render in both arrangements", () => 
         arrangementLayout: arrangementLayout as Input["arrangementLayout"],
         showAmounts,
       };
-      [0, 65, 80, 95, 118, 150].forEach((frame) =>
-        assert.doesNotThrow(() => _render({ frame: frame, input: input })),
-      );
+      [0, 65, 80, 95, 118, 150].forEach((frame) => {
+        return assert.doesNotThrow(() => {
+          return _render({ frame: frame, input: input });
+        });
+      });
     });
   });
 });

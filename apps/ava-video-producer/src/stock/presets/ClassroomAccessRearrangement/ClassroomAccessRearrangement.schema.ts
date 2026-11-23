@@ -51,7 +51,9 @@ export const inputSchema = z
         input.adaptations.length ||
       new Set(input.adaptations.map(prop("kind"))).size !==
         input.adaptations.length ||
-      !input.adaptations.some(({ kind }) => kind === "clear-approach")
+      !input.adaptations.some(({ kind }) => {
+        return kind === "clear-approach";
+      })
     ) {
       context.addIssue({
         code: "custom",

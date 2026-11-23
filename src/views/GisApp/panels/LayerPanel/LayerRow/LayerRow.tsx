@@ -1,4 +1,5 @@
 import { useSortable } from "@dnd-kit/react/sortable";
+import { getFeatureListAccessFromMapLayer } from "@/clients/maps/MapLayerFeatureList/getFeatureListAccessFromMapLayer/getFeatureListAccessFromMapLayer";
 import { LayerActionsMenu } from "@/views/GisApp/panels/LayerPanel/LayerActionsMenu/LayerActionsMenu";
 import css from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerRow.module.css";
 import { LayerRowDragHandle } from "@/views/GisApp/panels/LayerPanel/LayerRow/LayerRowDragHandle/LayerRowDragHandle";
@@ -21,6 +22,7 @@ type Props = {
   onDuplicate: () => void;
   onZoomToLayer: () => void;
   onDelete: () => void;
+  onOpenFeatureList?: () => void;
 };
 
 /** Renders the selection, visibility, drag, status, and action controls. */
@@ -36,6 +38,7 @@ export function LayerRow({
   onDuplicate,
   onZoomToLayer,
   onDelete,
+  onOpenFeatureList,
 }: Props): ReactNode {
   const dragId = `layer-${layer.id}-drag-instructions`;
   const keyboardMoveId = `layer-${layer.id}-keyboard-move-instructions`;
@@ -74,6 +77,11 @@ export function LayerRow({
           onDuplicate={onDuplicate}
           onZoomToLayer={onZoomToLayer}
           onDelete={onDelete}
+          onOpenFeatureList={
+            getFeatureListAccessFromMapLayer(layer) === "unavailable"
+              ? undefined
+              : onOpenFeatureList
+          }
         />
         <LayerRowInstructions dragId={dragId} keyboardMoveId={keyboardMoveId} />
       </div>

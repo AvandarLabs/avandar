@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* oxlint-disable typescript/no-explicit-any */
 import type { ModelBase, ModelType } from "@models/Model/Model.types.ts";
 import type { UnionToIntersection } from "type-fest";
 

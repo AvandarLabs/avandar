@@ -58,7 +58,7 @@ export const ChromePanelState = {
     const defaultState = useMemo(() => {
       return _panelStateFromCanvasWidth(canvasWidth);
       // The default is a first-run value only, so it must not follow a resize.
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+      // oxlint-disable-next-line react/exhaustive-deps
     }, []);
     const [panelState, setPanelState] = useLocalStorage<ChromePanelState>({
       key: "ava:gis:chrome-panels",

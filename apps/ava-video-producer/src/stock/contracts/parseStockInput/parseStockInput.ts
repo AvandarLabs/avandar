@@ -1,6 +1,5 @@
-import { makeLocalizedStockDataFromContract } from "../../i18n/makeLocalizedStockDataFromContract";
-import { stockI18n } from "../../i18n/stockI18n/stockI18n";
 import { stockContracts } from "../../registry/stockContracts";
+import { makeStockDataFromContract } from "../makeStockDataFromContract/makeStockDataFromContract";
 import type { StockInputByPreset, StockPresetId } from "../StockContract.types";
 import type { z } from "zod";
 
@@ -37,8 +36,7 @@ export function parseStockInput({
   const contract = stockContracts[preset];
   const candidate =
     rawInput === undefined
-      ? makeLocalizedStockDataFromContract({ contract, i18n: stockI18n })
-          .defaultInput
+      ? makeStockDataFromContract(contract).defaultInput
       : rawInput;
   const parsed = contract.inputSchema.safeParse(candidate);
   if (!parsed.success) {

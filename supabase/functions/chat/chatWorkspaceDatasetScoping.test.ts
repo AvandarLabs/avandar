@@ -199,6 +199,7 @@ describe("chat dataset context for a user in two workspaces", () => {
       priorClarifications: 0,
       datasets: schema.datasets,
       concepts: schema.concepts,
+      columns: schema.columns,
     });
 
     expect(parsed.generatedSql?.sql).toContain(`FROM "${ACTIVE_DATASET_ID}"`);

@@ -16,26 +16,37 @@ beat-relative narration. Whole-player Speed remains a separate control.
 
 `MotionOptions` is serializable in JSX and storyboard JSON. Explicit numeric values and `easing` override the selected preset. An authored 24-frame move at 30 fps demonstrates the range:
 
-| Preset | Speed multiplier | Actual travel | Shutter angle | Easing | Typical purpose |
-| --- | ---: | ---: | ---: | --- | --- |
-| `deliberate` | 0.25 | 96 frames / 3.2 s | 45° | `ease-in-out` | Inspect unfamiliar detail or establish geography |
-| `gentle` | 0.5 | 48 frames / 1.6 s | 90° | `ease-in-out` | Follow a teaching explanation |
-| `balanced` | 0.75 | 32 frames / 1.07 s | 120° | `ease-in-out` | Connect related ideas with readable travel |
-| `brisk` | 1 | 24 frames / 0.8 s | 180° | `ease-in-out-cubic` | Redirect attention between familiar landmarks |
-| `whip` | 1.5 | 16 frames / 0.53 s | 240° | `ease-in-out-cubic` | One energetic departure or major subject change |
+| Preset       | Speed multiplier |      Actual travel | Shutter angle | Easing              | Typical purpose                                  |
+| ------------ | ---------------: | -----------------: | ------------: | ------------------- | ------------------------------------------------ |
+| `deliberate` |             0.25 |  96 frames / 3.2 s |           45° | `ease-in-out`       | Inspect unfamiliar detail or establish geography |
+| `gentle`     |              0.5 |  48 frames / 1.6 s |           90° | `ease-in-out`       | Follow a teaching explanation                    |
+| `balanced`   |             0.75 | 32 frames / 1.07 s |          120° | `ease-in-out`       | Connect related ideas with readable travel       |
+| `brisk`      |                1 |  24 frames / 0.8 s |          180° | `ease-in-out-cubic` | Redirect attention between familiar landmarks    |
+| `whip`       |              1.5 | 16 frames / 0.53 s |          240° | `ease-in-out-cubic` | One energetic departure or major subject change  |
 
 Travel frames resolve to `max(1, round(authoredFrames / speed))`; zero-length cuts stay zero. Speed is a multiplier of the authored duration, not pixels per second or whole-film playback rate. Distance and zoom magnitude also affect perceived speed. Omitting motion options preserves the existing authored curves, durations and 180° shutter. Explicitly selecting a preset also selects its easing. Numeric speed alone retains each camera key's authored easing.
 
-| Option | Range / default | Meaning |
-| --- | --- | --- |
-| `preset` | Five names above; defaults to brisk speed/blur | Semantic starting point |
-| `speed` | 0.1–4 | Travel rate. 0.5 takes twice as long; 2 takes half as long |
-| `easing` | Named easing or `[x1, y1, x2, y2]` | Overrides preset/key easing |
-| `shutterAngle` | 0–360° | Exposure length. Zero disables blur |
-| `blurStrength` | 0–2, default 1 | Scales blur. Zero disables it |
-| `samples` | Integer 2–16, default 10 | Temporal sample count for vector cameras only |
+What the options leave out comes from the [video theme](video-theme.md): each
+preset's speed and shutter from `camera.presets`, samples and blur from
+`motionBlur` (including `motionBlur.strength`, the default `blurStrength`),
+the named curves from the theme's atomic easings, a camera key's `push`,
+`whip`, and `glide` eases from `camera.easing`, and an unnamed cue's curve
+from `motion.travel`. The motion components read the surrounding theme, or
+`classic` outside any provider; the pure helpers (`resolveMotionSettings`,
+`getMotionProgress`, `getCameraPose`, `getObjectFlight`, `getOverlayPose`)
+take the theme as their last argument and default to `classic`. The tables
+below give `classic`'s values.
 
-Named easing: `linear`, `ease-in`, `ease-out`, `ease-in-out`, `ease-in-out-cubic`. `ease-in` and `ease-out` use CSS cubic curves; `ease-in-out` uses the producer's smooth `(0.45, 0, 0.55, 1)` curve; `ease-in-out-cubic` uses the piecewise symmetric cubic. Custom Bézier values must all lie in `[0, 1]` to keep travel within its authored bounds. Use a separate landing spring for deliberate overshoot.
+| Option         | Range / default                                | Meaning                                                    |
+| -------------- | ---------------------------------------------- | ---------------------------------------------------------- |
+| `preset`       | Five names above; defaults to brisk speed/blur | Semantic starting point                                    |
+| `speed`        | 0.1–4                                          | Travel rate. 0.5 takes twice as long; 2 takes half as long |
+| `easing`       | Named easing or `[x1, y1, x2, y2]`             | Overrides preset/key easing                                |
+| `shutterAngle` | 0–360°                                         | Exposure length. Zero disables blur                        |
+| `blurStrength` | 0–2, default 1                                 | Scales blur. Zero disables it                              |
+| `samples`      | Integer 2–16, default 10                       | Temporal sample count for vector cameras only              |
+
+Named easing: `linear`, `ease-in`, `ease-out`, `ease-in-out`, `ease-in-out-cubic`. `ease-in` and `ease-out` are the theme's CSS cubic curves (`atomic.easing.cssEaseIn` and `cssEaseOut`); `ease-in-out` is `atomic.easing.inOut`, the producer's smooth `(0.45, 0, 0.55, 1)` curve in `classic`; `ease-in-out-cubic` is `atomic.easing.inOutCubic`, the piecewise symmetric cubic. Custom Bézier values must all lie in `[0, 1]` to keep travel within its authored bounds. Use a separate landing spring for deliberate overshoot.
 
 ## Vector camera
 
@@ -71,13 +82,13 @@ Keep live product components outside `DiagramCamera`: temporal samples duplicate
 
 ## Other extracted components
 
-| Component | Main props | Use |
-| --- | --- | --- |
-| `SvgObjectDeparture` | `frame`, `flight: {at, duration, dx, dy, rect, motion?}`, `width`, `height` | Mask one SVG region and swipe it away while surroundings stay fixed. Use inside the camera and drive `blurActive` from `getObjectFlight(flight, frame).active` |
-| `AnchoredOverlay` | `frame`, measured `source`, `cue: {at, until, target, entryFrames?, exitFrames?, fadeFrames?, motion?}`, `motionBlur`, children | Lift explanatory artwork from a UI region, hold over the product, return to source. Single-instance CSS blur tracks travel velocity |
-| `SharedElement` | `source`, `target`, `frame`, `at`, `durationInFrames`, `motion`, children | Keep a single identity token mounted while its rectangle travels or changes size. Consumes speed/easing; blur belongs to its surrounding transition |
-| `SceneTransition` | Remotion presentation props; passed `kind`, `anchor`, `origin`, stage size, appearance flags, `motion` | Cut/dissolve/wipe/aperture/spatial/handoff/morph presentation |
-| `createSceneTransition` | `durationInFrames` plus scene props | Return matching `timing` and `presentation` for a `TransitionSeries.Transition`; use this factory so speed and easing affect both sides of the same boundary |
+| Component               | Main props                                                                                                                      | Use                                                                                                                                                            |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `SvgObjectDeparture`    | `frame`, `flight: {at, duration, dx, dy, rect, motion?}`, `width`, `height`                                                     | Mask one SVG region and swipe it away while surroundings stay fixed. Use inside the camera and drive `blurActive` from `getObjectFlight(flight, frame).active` |
+| `AnchoredOverlay`       | `frame`, measured `source`, `cue: {at, until, target, entryFrames?, exitFrames?, fadeFrames?, motion?}`, `motionBlur`, children | Lift explanatory artwork from a UI region, hold over the product, return to source. Single-instance CSS blur tracks travel velocity                            |
+| `SharedElement`         | `source`, `target`, `frame`, `at`, `durationInFrames`, `motion`, children                                                       | Keep a single identity token mounted while its rectangle travels or changes size. Consumes speed/easing; blur belongs to its surrounding transition            |
+| `SceneTransition`       | Remotion presentation props; passed `kind`, `anchor`, `origin`, stage size, appearance flags, `motion`                          | Cut/dissolve/wipe/aperture/spatial/handoff/morph presentation                                                                                                  |
+| `createSceneTransition` | `durationInFrames` plus scene props                                                                                             | Return matching `timing` and `presentation` for a `TransitionSeries.Transition`; use this factory so speed and easing affect both sides of the same boundary   |
 
 Overlay defaults are 36 entry frames, 30 return frames, and 20 fade frames. Speed changes entry/return travel inside a fixed `at`–`until` window; it does not change fades or the end cue. Increase `until` if a slower move crowds the reading hold. A window without room for travel and a hold is rejected.
 

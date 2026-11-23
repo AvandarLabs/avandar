@@ -6,6 +6,7 @@ import {
   getParquetProjectionClauses,
   getRowNumberedViewName,
 } from "@/clients/DuckDbClient/duckDbSqlText";
+import { getLoadedDuckDbTableShape } from "@/clients/DuckDbClient/duckDbTableIntrospection";
 import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import type { DuckDbLoadParquetResult } from "@/clients/DuckDbClient/DuckDbClient.types";
 import type {
@@ -126,10 +127,7 @@ async function _getParquetLoadResult(
   DatasetDuckDbCoordinator.markDatasetDuckDbTableValidForWorkspace(
     options.tableName,
   );
-  const [columns, rowCount] = await Promise.all([
-    options.client.getTableSchema(options),
-    options.client.getTableRowCount(options),
-  ]);
+  const { columns, rowCount } = await getLoadedDuckDbTableShape(options);
   return {
     name: options.tableName,
     columns,

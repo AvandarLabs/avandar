@@ -4,7 +4,7 @@ import test from "node:test";
 import { parse } from "yaml";
 import { parseStockMetadata } from "./parseStockMetadata";
 
-test("authored YAML retains translation IDs and descriptive metadata", async () => {
+test("authored YAML retains copy IDs and descriptive metadata", async () => {
   const source = parse(
     await readFile(
       new URL(
@@ -32,18 +32,25 @@ test("invalid YAML metadata fails validation instead of entering the catalog", a
       "utf8",
     ),
   );
-  assert.throws(() =>
-    parseStockMetadata({ ...source, creativeDirection: undefined }),
-  );
-  assert.throws(() => parseStockMetadata({ ...source, tags: ["untyped tag"] }));
-  assert.throws(() => parseStockMetadata({ ...source, goodFor: [] }));
-  assert.throws(() =>
-    parseStockMetadata({ ...source, name: { id: "", message: "Title" } }),
-  );
-  assert.throws(() =>
-    parseStockMetadata({
+  assert.throws(() => {
+    return parseStockMetadata({ ...source, creativeDirection: undefined });
+  });
+  assert.throws(() => {
+    return parseStockMetadata({ ...source, tags: ["untyped tag"] });
+  });
+  assert.throws(() => {
+    return parseStockMetadata({ ...source, goodFor: [] });
+  });
+  assert.throws(() => {
+    return parseStockMetadata({
+      ...source,
+      name: { id: "", message: "Title" },
+    });
+  });
+  assert.throws(() => {
+    return parseStockMetadata({
       ...source,
       creativeDiretion: source.creativeDirection,
-    }),
-  );
+    });
+  });
 });

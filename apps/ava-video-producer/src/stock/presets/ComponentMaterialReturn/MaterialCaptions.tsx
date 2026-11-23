@@ -1,4 +1,5 @@
-import { ROUTE_COLORS } from "./routeColors";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { ROUTE_CATEGORY_KEYS } from "./routeColors";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./ComponentMaterialReturn.schema";
 import type { ReactNode } from "react";
@@ -8,6 +9,7 @@ type Props = { input: Input };
  * Stable captions and route swatches remain above the complete handling path.
  */
 export function MaterialCaptions({ input }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const captions = [
     { text: input.copy.returned, x: 50, y: 70, width: 270 },
     { text: input.copy.output, x: 420, y: 70, width: 280 },
@@ -21,22 +23,24 @@ export function MaterialCaptions({ input }: Readonly<Props>): ReactNode {
   ] as const;
   return (
     <g>
-      {captions.map((label) => (
-        <SceneLabel key={label.x} {...label} />
-      ))}
-      {routes.map(({ route, x, y, width }) => (
-        <g key={route}>
-          <rect
-            data-route-key={route}
-            x={x - 18}
-            y={y - 10}
-            width={10}
-            height={10}
-            fill={ROUTE_COLORS[route]}
-          />
-          <SceneLabel text={input.copy[route]} x={x} y={y} width={width} />
-        </g>
-      ))}
+      {captions.map((label) => {
+        return <SceneLabel key={label.x} {...label} />;
+      })}
+      {routes.map(({ route, x, y, width }) => {
+        return (
+          <g key={route}>
+            <rect
+              data-route-key={route}
+              x={x - 18}
+              y={y - 10}
+              width={10}
+              height={10}
+              fill={tokens.color.categorical[ROUTE_CATEGORY_KEYS[route]]}
+            />
+            <SceneLabel text={input.copy[route]} x={x} y={y} width={width} />
+          </g>
+        );
+      })}
     </g>
   );
 }

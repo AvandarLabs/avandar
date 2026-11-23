@@ -1,0 +1,19 @@
+{
+  "label": "holdout-v2:anthropic/claude-haiku-5.5",
+  "answers": 121,
+  "requiredFound": 0,
+  "requiredTotal": 0,
+  "recall": 1,
+  "useful": 0,
+  "duplicates": 0,
+  "fair": 0,
+  "spurious": 295,
+  "fabricated": 23,
+  "yearLike": 0,
+  "subjectMisses": 0,
+  "unitErrors": 0,
+  "emptyReplies": 0,
+  "errors": 0,
+  "costPerRegion": 0.0008239338842975202,
+  "latencyMedianMs": 2315.1721250000005
+}

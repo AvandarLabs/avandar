@@ -1,0 +1,17 @@
+{
+  "label": "d21:followups#1",
+  "questionCount": 5,
+  "passCount": 5,
+  "needlessQuestions": 0,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 5,
+  "promptTokens": 39629,
+  "cachedPromptTokens": 0,
+  "completionTokens": 1582,
+  "totalCost": 0.09507800000000001,
+  "costPerQuestion": 0.0190156,
+  "latencyMedianMs": 3544.725957999999,
+  "latencyP90Ms": 5761.234792,
+  "failedIds": []
+}

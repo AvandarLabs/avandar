@@ -1,9 +1,11 @@
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { getSeedSceneFromFrame } from "./getSeedSceneFromFrame";
 import { SeedCaptions } from "./SeedCaptions";
-import { SeedContainers } from "./SeedContainers";
+import { SeedContainers } from "./SeedContainers/SeedContainers";
 import { SeedCultivator } from "./SeedCultivator";
 import { SeedMaterial } from "./SeedMaterial";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./SavedSeedSeasonReturn.schema";
 import type { ReactNode } from "react";
 
@@ -16,7 +18,10 @@ export function SavedSeedSeasonReturn({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
-  const scene = getSeedSceneFromFrame({ input, frame });
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
+  const scene = getSeedSceneFromFrame({ input, frame, motion });
   return (
     <g>
       <SeedContainers scene={scene} frame={frame} accent={accent} />
@@ -27,17 +32,21 @@ export function SavedSeedSeasonReturn({
         frame={frame}
         accent={accent}
       />
-      <path
-        data-crop-symbol={input.crop.symbol}
-        d={
-          input.crop.symbol === "bean"
-            ? "M422 82 C402 80 402 102 414 100 C430 98 414 89 422 82 Z"
-            : "M414 80 V102 M414 88 l-8 -6 M414 94 l8 -8"
-        }
-        fill="none"
-        stroke={accent}
-        strokeWidth={2}
-      />
+      <g data-crop-symbol={input.crop.symbol}>
+        <SketchedShape
+          shape={{
+            kind: "path",
+            d:
+              input.crop.symbol === "bean"
+                ? "M422 82 C402 80 402 102 414 100 C430 98 414 89 422 82 Z"
+                : "M414 80 V102 M414 88 l-8 -6 M414 94 l8 -8",
+          }}
+          profile={tokens.sketch.shape}
+          fill="none"
+          stroke={accent}
+          strokeWidth={scales.stroke(tokens.stroke.default)}
+        />
+      </g>
       <SeedCaptions input={input} scene={scene} frame={frame} />
     </g>
   );

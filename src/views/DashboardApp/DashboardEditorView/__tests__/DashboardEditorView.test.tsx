@@ -47,7 +47,7 @@ vi.mock("@puckeditor/core", async (importOriginal) => {
       });
       // Puck's load resolve fires once after mount, not on every data identity
       // change. Matching that keeps this mock from looping.
-      // eslint-disable-next-line react-hooks/exhaustive-deps -- mount-only echo
+      // oxlint-disable-next-line react/exhaustive-deps -- mount-only echo
     }, []);
 
     return createElement(

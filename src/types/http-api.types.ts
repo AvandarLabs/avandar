@@ -1,8 +1,10 @@
 import type { ChatAPI } from "@sbfn/chat/ChatRoutes.types";
+import type { ConnectorsApi } from "@sbfn/connectors/ConnectorRoutes/ConnectorRoutes.types";
 import type { DashboardsApi } from "@sbfn/dashboards/DashboardsRoutes/DashboardsRoutes.types";
+import type { GeocodeAPI } from "@sbfn/geocode/GeocodeRoutes/GeocodeRoutes.types";
 import type { GoogleAuthCallbackAPI } from "@sbfn/google-auth-callback/GoogleAuthCallbackRoutes.types";
 import type { GoogleAuthAPI } from "@sbfn/google-auth/GoogleAuthRoutes.types";
-import type { GoogleSheetsAPI } from "@sbfn/google-sheets/GoogleSheetsRoutes.types";
+import type { GoogleSheetsAPI } from "@sbfn/google-sheets/GoogleSheetsRoutes/GoogleSheetsRoutes.types";
 import type { HealthzAPI } from "@sbfn/healthz/HealthzRoutes.types";
 import type { OpenDataAPI } from "@sbfn/open-data/OpenDataRoutes.types";
 import type { PolarPublicAPI } from "@sbfn/polar-public/PolarPublicRoutes.types";
@@ -23,10 +25,12 @@ type FullAPI = SupportAPI &
   QueriesAPI &
   ChatAPI &
   DashboardsApi &
+  ConnectorsApi &
   WorkspacesAPI &
   GoogleAuthAPI &
   GoogleAuthCallbackAPI &
   GoogleSheetsAPI &
+  GeocodeAPI &
   OpenDataAPI &
   PolarPublicAPI &
   SubscriptionsAPI;
@@ -43,7 +47,7 @@ type FlattenedAPI = {
 }[Extract<keyof FullAPI, string>];
 
 type UnionToIntersection<U> =
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // oxlint-disable-next-line typescript/no-explicit-any
   (U extends any ? (k: U) => void : never) extends (k: infer I) => void
     ? I
     : never;

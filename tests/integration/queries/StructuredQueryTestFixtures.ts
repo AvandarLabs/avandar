@@ -1,6 +1,7 @@
 import { Model } from "@avandar/models";
 import { propEq } from "@avandar/utils";
 import { expect, it } from "vitest";
+import { ConceptStatusColumn } from "$/models/queries/ConceptStatusColumn/ConceptStatusColumn";
 import { EMPTY_QUERY_FILTER } from "$/models/queries/StructuredQuery/QueryFilter.types";
 import { sqlToStructuredQuery } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlToStructuredQuery";
 import { makeFilterColumnFromStructuredQuery } from "$/models/queries/StructuredQuery/structuredQueryToSql/makeFilterColumnFromStructuredQuery";
@@ -40,6 +41,12 @@ type MakeConceptAttributeColumnOptions = {
   name: string;
   dataType?: AvaDataType.T;
   aggregation?: QueryAggregationTypeT;
+  /** The view column the field reads when it is not the field's own name. */
+  sourceColumnName?: string;
+  /** The result name the field takes when it is not the field's own name. */
+  resultColumnName?: string;
+  /** Whether the field keeps every value, which the view emits as a list. */
+  isArray?: boolean;
 };
 
 type MakeQueryOptions = {
@@ -93,11 +100,11 @@ const _FIXTURE_SQL = `
   ) AS t(pop_key, population);
 
   CREATE TABLE "${_CONCEPT_TABLE_NAME}" AS SELECT * FROM (VALUES
-    ('p1', 'North', 5),
-    ('p2', 'North', 2),
-    ('p3', 'South', 3),
-    ('p4', 'East', 1)
-  ) AS t(external_id, region, headcount);
+    ('p1', 'North', 5, 'Confirmed', 'k1', 10, 20, ['mild', 'rash']),
+    ('p2', 'North', 2, 'Suspected', 'k2', 11, 21, ['mild', 'rash']),
+    ('p3', 'South', 3, 'Confirmed', 'k3', 12, 22, ['severe']),
+    ('p4', 'East', 1, 'Ruled out', 'k4', 13, 23, [])
+  ) AS t(external_id, region, headcount, status, external_id_2, age, "Age_2", symptoms);
 `;
 
 /** A dataset whose `id` is used verbatim as the FROM table name. */
@@ -150,10 +157,32 @@ function _makeConceptAttributeColumn(
       dataType: args.dataType ?? "varchar",
       isLabel: false,
       isIdentifier: false,
-      isArray: false,
+      isArray: args.isArray ?? false,
     }),
     aggregation: args.aggregation,
+    ...(args.sourceColumnName === undefined
+      ? {}
+      : { sourceColumnName: args.sourceColumnName }),
+    ...(args.resultColumnName === undefined
+      ? {}
+      : { resultColumnName: args.resultColumnName }),
   }) as unknown as QueryColumnRead;
+}
+
+/**
+ * A query column over the fixture concept's built-in `status` column, built
+ * with the same `ConceptStatusColumn.fromConceptId` the Data Explorer uses, so
+ * its name is the one the concept view emits.
+ */
+function _makeConceptStatusColumn(args: {
+  id: string;
+  aggregation?: QueryAggregationTypeT;
+}): QueryColumnRead {
+  return Model.make("QueryColumn", {
+    id: args.id as QueryColumnId,
+    baseColumn: ConceptStatusColumn.fromConceptId(_CONCEPT_ID as Concept.Id),
+    aggregation: args.aggregation,
+  });
 }
 
 /**
@@ -185,26 +214,38 @@ function _makeQuery(args: MakeQueryOptions): PartialStructuredQuery {
   }) as unknown as PartialStructuredQuery;
 }
 
+function _normalizeValue(value: unknown): unknown {
+  if (typeof value === "bigint") {
+    return Number(value);
+  }
+  if (
+    typeof value === "object" &&
+    value !== null &&
+    "toDouble" in value &&
+    typeof value.toDouble === "function"
+  ) {
+    return (value as { toDouble: () => number }).toDouble();
+  }
+  if (
+    typeof value === "object" &&
+    value !== null &&
+    "items" in value &&
+    Array.isArray(value.items)
+  ) {
+    return value.items.map(_normalizeValue);
+  }
+  return value;
+}
+
 /**
- * DuckDB returns integer aggregates as `bigint` and decimals as objects.
- * Normalising to `number` keeps the row assertions readable while still
- * comparing real values.
+ * DuckDB returns integer aggregates as `bigint`, decimals as objects and
+ * lists as wrapper objects. Normalising to `number` and plain arrays keeps
+ * the row assertions readable while still comparing real values.
  */
 function _normalizeRow(row: Record<string, unknown>): Record<string, unknown> {
   return Object.fromEntries(
     Object.entries(row).map(([key, value]) => {
-      if (typeof value === "bigint") {
-        return [key, Number(value)];
-      }
-      if (
-        typeof value === "object" &&
-        value !== null &&
-        "toDouble" in value &&
-        typeof value.toDouble === "function"
-      ) {
-        return [key, (value as { toDouble: () => number }).toDouble()];
-      }
-      return [key, value];
+      return [key, _normalizeValue(value)];
     }),
   );
 }
@@ -255,6 +296,7 @@ export const StructuredQueryTestFixtures = {
   _makeColumn,
   _makeConcept,
   _makeConceptAttributeColumn,
+  _makeConceptStatusColumn,
   _makeQuery,
   _normalizeRow,
   _runQuery,

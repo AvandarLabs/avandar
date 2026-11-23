@@ -1,7 +1,9 @@
+import { OpenRouterUsage } from "@sbfn/chat/PostChatMessages/openRouter/OpenRouterUsage.ts";
 import { sendOpenRouterRequest } from "@sbfn/chat/PostChatMessages/openRouter/sendOpenRouterRequest.ts";
 import { isEmptyParsedAttempt } from "@sbfn/chat/PostChatMessages/parsing/isEmptyParsedAttempt.ts";
 import { parseOpenRouterResponse } from "@sbfn/chat/PostChatMessages/parsing/parseOpenRouterResponse.ts";
 import type { ParsedAttempt } from "@sbfn/chat/PostChatMessages/parsing/parseOpenRouterResponse.ts";
+import type { DatasetColumn } from "@sbfn/chat/PostChatMessages/schema/fetchWorkspaceSchema.ts";
 
 /**
  * Runs a chat turn against OpenRouter, escalating up to three times while the
@@ -13,7 +15,8 @@ import type { ParsedAttempt } from "@sbfn/chat/PostChatMessages/parsing/parseOpe
  * registered tools, and is skipped on the generic surface where the request
  * carries no tools to choose from.
  *
- * Returns the parsed attempt alongside how many calls it took.
+ * Returns the parsed attempt alongside how many calls it took and the tokens
+ * and cost of every call.
  * `analytics.chat_health` averages that count into `avg_attempt_count`, which
  * is how often this escalation is visible on the dashboard. A non-2xx response
  * throws, leaving the caller to record the failure.
@@ -27,9 +30,15 @@ export async function runChatAttemptsWithEscalation(
     priorClarifications: number;
     datasets?: ReadonlyArray<{ id: string; name: string }>;
     concepts?: ReadonlyArray<{ id: string; name: string }>;
+    /** Catalog columns, so proposed value rules are held to their types. */
+    columns: readonly DatasetColumn[];
     skipSqlExtraction?: boolean;
   }>,
-): Promise<{ parsed: ParsedAttempt; attemptCount: number }> {
+): Promise<{
+  parsed: ParsedAttempt;
+  attemptCount: number;
+  usage: OpenRouterUsage;
+}> {
   const {
     requestBody,
     apiKey,
@@ -38,10 +47,12 @@ export async function runChatAttemptsWithEscalation(
     priorClarifications,
     datasets,
     concepts,
+    columns,
     skipSqlExtraction,
   } = options;
 
   let attemptCount = 0;
+  let usage = OpenRouterUsage.empty;
   const runAttempt = async (
     attemptRequestBody: Record<string, unknown>,
   ): Promise<ParsedAttempt> => {
@@ -51,6 +62,7 @@ export async function runChatAttemptsWithEscalation(
       apiKey,
       referer,
     });
+    usage = OpenRouterUsage.add(usage, attempt.usage);
     return parseOpenRouterResponse({
       message: attempt.message,
       attemptText: attempt.text,
@@ -58,6 +70,7 @@ export async function runChatAttemptsWithEscalation(
       priorClarifications,
       datasets,
       concepts,
+      columns,
       skipSqlExtraction,
     });
   };
@@ -79,5 +92,5 @@ export async function runChatAttemptsWithEscalation(
     });
   }
 
-  return { parsed, attemptCount };
+  return { parsed, attemptCount, usage };
 }

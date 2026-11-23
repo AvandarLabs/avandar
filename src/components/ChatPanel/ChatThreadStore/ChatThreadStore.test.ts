@@ -95,4 +95,39 @@ describe("ChatThreadStore", () => {
       }),
     ).toEqual([]);
   });
+
+  it("round-trips a query result part without storing rows", () => {
+    const part = {
+      type: "data" as const,
+      name: "agent-query-result",
+      data: {
+        version: 1,
+        sql: "SELECT 1",
+        chartType: "table",
+        title: "How many?",
+        display: "embed",
+      },
+    };
+    const messages: ThreadMessageLike[] = [
+      { role: "user", content: "How many?" },
+      { role: "assistant", content: [{ type: "text", text: "One." }, part] },
+    ];
+    ChatThreadStore.write({
+      workspaceId: WORKSPACE_ID,
+      userId: USER_ID,
+      messages,
+    });
+
+    expect(
+      ChatThreadStore.read({ workspaceId: WORKSPACE_ID, userId: USER_ID }),
+    ).toEqual(messages);
+    expect(
+      window.localStorage.getItem(
+        ChatThreadStore.storageKey({
+          workspaceId: WORKSPACE_ID,
+          userId: USER_ID,
+        }),
+      ),
+    ).not.toContain("rows");
+  });
 });

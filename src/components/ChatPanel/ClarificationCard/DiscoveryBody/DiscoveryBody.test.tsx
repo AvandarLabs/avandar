@@ -68,6 +68,59 @@ describe("DiscoveryBody", () => {
     expect(screen.queryByRole("radio")).not.toBeInTheDocument();
   });
 
+  it("asks the resolver to look up the candidates beyond its own list", async () => {
+    const resolveDiscovery = vi.fn().mockResolvedValue({
+      values: ["United Kingdom", "Afghanistan"],
+    });
+    const onSubmit = vi.fn();
+    render(
+      <DiscoveryBody
+        {...DISCOVERY_PROPS}
+        candidateValues={["UK", "United Kingdom"]}
+        resolveDiscovery={resolveDiscovery}
+        onSubmit={onSubmit}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith({
+        answer: { kind: "preset", value: "United Kingdom" },
+        isInternalDiscovery: true,
+      });
+    });
+    expect(resolveDiscovery).toHaveBeenCalledWith({
+      query: DISCOVERY_PROPS.query,
+      column: DISCOVERY_PROPS.column,
+      candidateValues: ["UK", "United Kingdom"],
+    });
+  });
+
+  it("submits every named value of a multi-value lookup when each matches one stored value", async () => {
+    const onSubmit = vi.fn();
+    render(
+      <DiscoveryBody
+        {...DISCOVERY_PROPS}
+        multi
+        candidateValues={["California", "Texas"]}
+        candidateGroups={[
+          ["California", "CA"],
+          ["Texas", "TX"],
+        ]}
+        resolveDiscovery={vi.fn().mockResolvedValue({
+          values: ["California", "Nevada", "Texas"],
+        })}
+        onSubmit={onSubmit}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith({
+        answer: { kind: "preset", value: ["California", "Texas"] },
+        isInternalDiscovery: true,
+      });
+    });
+  });
+
   it("shows the catalog when more than one stored value matches", async () => {
     const onSubmit = vi.fn();
     render(
@@ -143,5 +196,36 @@ describe("DiscoveryBody", () => {
       screen.getByRole("button", { name: "Try a different lookup" }),
     );
     expect(onRequestDifferentDiscovery).toHaveBeenCalledOnce();
+  });
+
+  it("explains a failed lookup in plain words and keeps the raw error and SQL behind details", async () => {
+    const resolveDiscovery = vi.fn().mockResolvedValue({
+      error:
+        "Catalog Error: Table with name 8fc84d6a-f864-46fe-bd1c-7d7cb897a173 does not exist!",
+    });
+    render(
+      <DiscoveryBody
+        {...DISCOVERY_PROPS}
+        candidateValues={["California"]}
+        resolveDiscovery={resolveDiscovery}
+        onSubmit={vi.fn()}
+      />,
+    );
+
+    expect(
+      await screen.findByText(
+        "This query uses a dataset that isn't in this workspace or hasn't finished loading.",
+      ),
+    ).toBeVisible();
+    expect(screen.queryByText(/Catalog Error/)).toBeNull();
+    expect(screen.queryByText(DISCOVERY_PROPS.query)).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "Show details" }));
+    expect(
+      screen.getByText(
+        "Catalog Error: Table with name <dataset> does not exist!",
+      ),
+    ).toBeVisible();
+    expect(screen.getByText(DISCOVERY_PROPS.query)).toBeVisible();
   });
 });

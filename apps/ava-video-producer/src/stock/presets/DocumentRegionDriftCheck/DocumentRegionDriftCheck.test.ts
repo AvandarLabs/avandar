@@ -17,8 +17,8 @@ import type { PresetAssertions } from "../../../../tests/helpers/registerStockPr
 const render = ({
   frame,
   input = DEFAULT_INPUT,
-}: Readonly<{ frame: number; input?: Input }>): string =>
-  renderToStaticMarkup(
+}: Readonly<{ frame: number; input?: Input }>): string => {
+  return renderToStaticMarkup(
     createElement(DocumentRegionDriftCheck, {
       frame,
       input,
@@ -26,6 +26,7 @@ const render = ({
       id: "packet27",
     }),
   );
+};
 function _marker({
   markup,
   key,
@@ -35,12 +36,17 @@ function _marker({
   key: string;
   value: string;
 }): string {
-  const tags = [...markup.matchAll(/<[^>]+>/g)].map((match) => match[0]);
-  const tag = tags.find((candidateTag) =>
-    candidateTag.includes(`data-${key}="${value}"`),
-  );
-  assert.ok(tag, `${key} ${value}`);
-  return tag;
+  const tags = [...markup.matchAll(/<[^>]+>/g)].map((match) => {
+    return match[0];
+  });
+  const index = tags.findIndex((candidateTag) => {
+    return candidateTag.includes(`data-${key}="${value}"`);
+  });
+  assert.ok(index >= 0, `${key} ${value}`);
+  // A marked group wraps the sketch-aware shape it names.
+  return tags[index].startsWith("<g ")
+    ? `${tags[index]}${tags[index + 1]}`
+    : tags[index];
 }
 
 test("exact header and fingerprint determine the review latch independently of ordinal", () => {
@@ -127,7 +133,7 @@ test("saved and current outlines register at exact supplied page coordinates eve
   );
 });
 
-import { registerStockLocalizationAssertions } from "../../../../tests/helpers/registerStockLocalizationAssertions";
+import { registerStockDefaultTextAssertions } from "../../../../tests/helpers/registerStockDefaultTextAssertions";
 import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/registerStockTextLayoutAssertions/registerStockTextLayoutAssertions";
 import { documentRegionDriftCheckContract as contract } from "./DocumentRegionDriftCheck.contract";
 
@@ -135,24 +141,26 @@ const EXCLUDED_TEXT_FIELDS: string[] = [];
 const getVisibleTexts = ({
   input,
   frame,
-}: Readonly<{ input: Input; frame: number }>): string[] => [
-  ...Object.values(input.copy),
-  input.labels.saved,
-  input.labels.current,
-  input.labels.geometry,
-  input.saved.header,
-  input.saved.fingerprint,
-  input.current.header,
-  input.current.fingerprint,
-  ...(frame >= 139
-    ? [
-        input.saved.header === input.current.header &&
-        input.saved.fingerprint === input.current.fingerprint
-          ? input.labels.matched
-          : input.labels.review,
-      ]
-    : []),
-];
+}: Readonly<{ input: Input; frame: number }>): string[] => {
+  return [
+    ...Object.values(input.copy),
+    input.labels.saved,
+    input.labels.current,
+    input.labels.geometry,
+    input.saved.header,
+    input.saved.fingerprint,
+    input.current.header,
+    input.current.fingerprint,
+    ...(frame >= 139
+      ? [
+          input.saved.header === input.current.header &&
+          input.saved.fingerprint === input.current.fingerprint
+            ? input.labels.matched
+            : input.labels.review,
+        ]
+      : []),
+  ];
+};
 const options = {
   inputSchema,
   defaultInput: DEFAULT_INPUT,
@@ -165,7 +173,7 @@ const options = {
 } satisfies PresetAssertions<Input>;
 registerStockPresetAssertions(options);
 registerStockTextLayoutAssertions(options);
-registerStockLocalizationAssertions({
+registerStockDefaultTextAssertions({
   contract,
   expectedTextPaths: [
     ["saved", "header"],
@@ -217,8 +225,8 @@ test("saved geometry preserves full boundary extents while comparison captions r
   ["saved", "current"].forEach((side) => {
     const page = _marker({ markup, key: "page-outline", value: side }),
       region = _marker({ markup, key: "saved-region", value: side });
-    ["x", "y", "width", "height"].forEach((attribute) =>
-      assert.equal(
+    ["x", "y", "width", "height"].forEach((attribute) => {
+      return assert.equal(
         SvgAttributes.getNumberFromMarkup({
           attributes: region,
           name: attribute,
@@ -227,8 +235,8 @@ test("saved geometry preserves full boundary extents while comparison captions r
           attributes: page,
           name: attribute,
         }),
-      ),
-    );
+      );
+    });
   });
   const closed = _marker({
       markup: render({ frame: 150 }),
@@ -244,6 +252,9 @@ test("saved geometry preserves full boundary extents while comparison captions r
 });
 
 test("serialized saved-region tuple retains exact four-coordinate cardinality", () => {
+  // This assertion exercises the JSON serialization boundary of the public
+  // contract.
+  // react-doctor-disable-next-line no-json-parse-stringify-clone
   const schema = JSON.parse(JSON.stringify(contract.jsonSchema));
   assert.equal(schema.properties.saved.properties.box.minItems, 4);
   assert.equal(schema.properties.saved.properties.box.maxItems, 4);

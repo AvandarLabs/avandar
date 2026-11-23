@@ -1,6 +1,7 @@
 import { RunLocalCommand } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/createSupabaseLocalEnvironmentIo/RunLocalCommand/RunLocalCommand";
 import { DockerPublishedPorts } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/DockerPublishedPorts/DockerPublishedPorts";
 import { SupabaseCommandOutput } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseCommandOutput/SupabaseCommandOutput";
+import { SupabaseConfigOverrides } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseConfigOverrides/SupabaseConfigOverrides";
 import { SUPABASE_DOCKER_CLEANUP_RESOURCE_ORDER } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/SupabaseLocalEnvironment.constants";
 import {
   constant,
@@ -10,6 +11,8 @@ import {
   valNotEq,
 } from "@avandar/utils";
 import type {
+  CommandOutputMode,
+  CommandResult,
   SupabaseDockerResource,
   SupabaseDockerResourceInspection,
   SupabaseDockerResourceType,
@@ -171,6 +174,26 @@ async function _listPublishedHostPorts(projectRoot: string): Promise<number[]> {
   return DockerPublishedPorts.fromPsOutput(result.stdout);
 }
 
+async function _runSupabaseCommand(
+  options: Readonly<{
+    projectRoot: string;
+    commandArguments: readonly string[];
+    outputMode: CommandOutputMode | undefined;
+  }>,
+): Promise<CommandResult> {
+  return await RunLocalCommand.run({
+    command: "pnpm",
+    args: ["exec", "supabase", ...options.commandArguments],
+    cwd: options.projectRoot,
+    // `ava` loaded the invoking worktree's .env.development into its own
+    // environment, and the CLI ranks real variables above the env file it
+    // reads. Dropping them lets `projectRoot`'s .env.development decide.
+    shouldOmitEnvKey: SupabaseConfigOverrides.isOverrideKey,
+    outputMode: options.outputMode,
+    transformStreamLine: SupabaseCommandOutput.redactSecretsFromLine,
+  });
+}
+
 /** Creates the Docker and Supabase command adapter for a project root. */
 export function createDockerIo(
   projectRoot: string,
@@ -203,12 +226,10 @@ export function createDockerIo(
       });
     },
     runSupabase: async (commandArguments, options) => {
-      return await RunLocalCommand.run({
-        command: "pnpm",
-        args: ["exec", "supabase", ...commandArguments],
-        cwd: projectRoot,
+      return await _runSupabaseCommand({
+        projectRoot,
+        commandArguments,
         outputMode: options?.outputMode,
-        transformStreamLine: SupabaseCommandOutput.redactSecretsFromLine,
       });
     },
     listPublishedHostPorts: async () => {

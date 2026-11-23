@@ -1,0 +1,8 @@
+.sourceListLinks {
+  display: flex;
+  flex-flow: column wrap;
+  gap: var(--atlas-space-6);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}

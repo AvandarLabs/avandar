@@ -1,0 +1,11 @@
+/* Matches the space RichTextView leaves above an embed. */
+.embed {
+  margin-block-start: var(--mantine-spacing-xs);
+}
+
+/* Outlines a selected chip or card before Backspace removes it. */
+.selected {
+  border-radius: var(--mantine-radius-sm);
+  outline: 2px solid var(--ava-border-focus);
+  outline-offset: 1px;
+}

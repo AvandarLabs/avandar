@@ -1,0 +1,445 @@
+import { useForm } from "@avandar/ui/hooks";
+import { describe, expect, it } from "vitest";
+import { uuid } from "$/lib/uuid";
+import { act, fireEvent, render, screen, within } from "@/test-utils";
+import {
+  getMantineSelectDropdown,
+  pickMantineSelectOption,
+} from "@/test-utils/pickMantineSelectOption";
+import { ConceptCreatorStore } from "@/views/OntologyDesignerApp/ConceptCreatorView/ConceptCreatorStore/index";
+import {
+  getDefaultConceptFormValues,
+  makeDefaultDatasetColumnAttribute,
+} from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
+import { createBucketColumnValidator } from "@/views/OntologyDesignerApp/ConceptCreatorView/createBucketColumnValidator/createBucketColumnValidator";
+import { DatasetColumnMappingCreator } from "@/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator";
+import type { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
+import type { ConceptFormValues } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
+import type { FormType } from "@avandar/ui/hooks";
+
+// `makeDefaultDatasetColumnAttribute` reads only the dataset's id.
+const DATASET = { id: uuid<Dataset.Id>() } as Dataset.T;
+const VISIT_DATE_COLUMN = {
+  id: uuid<DatasetColumn.Id>(),
+  name: "visit_date",
+  datasetId: DATASET.id,
+  dataType: "date",
+} as DatasetColumn.T;
+
+const MISSING_DATE_COLUMN_MESSAGE = "Choose the date column for this field";
+
+/** The creator for one field, "district", over a column of the given type. */
+function CreatorHarness({
+  columnDataType,
+  isIdentifierColumn = false,
+  isLabelColumn = false,
+  hasDateColumn = true,
+  onForm,
+}: Readonly<{
+  columnDataType: AvaDataType.T;
+  /** Whether the dataset's ID column is the one this field reads. */
+  isIdentifierColumn?: boolean;
+  /** Whether the case type's title is the field this one reads. */
+  isLabelColumn?: boolean;
+  /** Whether the field's dataset has a date column a period can use. */
+  hasDateColumn?: boolean;
+  /** Receives the form on every render, so a test can read its values. */
+  onForm?: (conceptForm: FormType<ConceptFormValues>) => void;
+}>): React.ReactNode {
+  const defaults = getDefaultConceptFormValues();
+  const column = {
+    id: uuid<DatasetColumn.Id>(),
+    name: "district",
+    dataType: columnDataType,
+  } as DatasetColumn.T;
+  const attribute = makeDefaultDatasetColumnAttribute({
+    conceptId: defaults.id,
+    name: "district",
+    dataset: DATASET,
+    datasetColumn: column,
+  });
+  const conceptForm: FormType<ConceptFormValues> = useForm<ConceptFormValues>({
+    mode: "uncontrolled",
+    validate: {
+      datasetColumnAttributes: {
+        bucketGrain: createBucketColumnValidator(MISSING_DATE_COLUMN_MESSAGE),
+      },
+    },
+    initialValues: {
+      ...defaults,
+      // The field's dataset, with a date column a period can group rows by.
+      sourceDatasets: [
+        {
+          dataset: {
+            ...DATASET,
+            columns: hasDateColumn ? [column, VISIT_DATE_COLUMN] : [column],
+          } as ConceptFormValues["sourceDatasets"][number]["dataset"],
+        },
+      ],
+      datasetColumnAttributes: [
+        {
+          ...attribute,
+          // The user had picked "count" before making this the ID column.
+          mappings: {
+            ...attribute.mappings,
+            datasetColumn: {
+              ...attribute.mappings.datasetColumn,
+              valuePickerRuleType: "count",
+            },
+          },
+        },
+      ],
+    },
+  });
+  onForm?.(conceptForm);
+  return (
+    <ConceptCreatorStore.Provider>
+      <DatasetColumnMappingCreator
+        conceptForm={conceptForm}
+        attributeIdx={0}
+        attributeName="district"
+        columnDataType={columnDataType}
+        isIdentifierColumn={isIdentifierColumn}
+        isLabelColumn={isLabelColumn}
+      />
+    </ConceptCreatorStore.Provider>
+  );
+}
+
+/** The option labels the field's value rule select offers, in order. */
+function _offeredRules(): string[] {
+  return within(
+    getMantineSelectDropdown(/If there are multiple district values/),
+  )
+    .queryAllByRole("option", { hidden: true })
+    .map((option) => {
+      return option.textContent ?? "";
+    });
+}
+
+describe("DatasetColumnMappingCreator", () => {
+  it("offers no sum or average for a text column", () => {
+    render(<CreatorHarness columnDataType="varchar" />);
+
+    expect(_offeredRules()).toEqual([
+      "Choose the most frequent value",
+      "Choose the first value we see",
+      "Get a count of how many values there are",
+      "Choose the value that comes last alphabetically",
+      "Choose the value that comes first alphabetically",
+    ]);
+  });
+
+  it("labels max and min alphabetically on a text column", () => {
+    render(<CreatorHarness columnDataType="varchar" />);
+
+    expect(_offeredRules()).toContain(
+      "Choose the value that comes last alphabetically",
+    );
+    expect(_offeredRules()).toContain(
+      "Choose the value that comes first alphabetically",
+    );
+  });
+
+  it("offers neither maximum nor minimum for a yes/no column", () => {
+    render(<CreatorHarness columnDataType="boolean" />);
+
+    expect(_offeredRules()).toEqual([
+      "Choose the most frequent value",
+      "Choose the first value we see",
+      "Get a count of how many values there are",
+    ]);
+  });
+
+  it("names max and min plainly on a number column", () => {
+    render(<CreatorHarness columnDataType="bigint" />);
+
+    expect(_offeredRules()).toContain("Choose the maximum value");
+    expect(_offeredRules()).toContain("Choose the minimum value");
+  });
+
+  it("locks the rule select to the default for the dataset's ID column", () => {
+    render(<CreatorHarness columnDataType="varchar" isIdentifierColumn />);
+
+    const select = screen.getByRole("combobox", {
+      name: /If there are multiple district values/,
+    });
+    expect(select).toBeDisabled();
+    expect(select).toHaveValue("Choose the most frequent value");
+    expect(select).toHaveAccessibleDescription(
+      "ID fields keep their value as is.",
+    );
+  });
+
+  it("leaves the rule select open for any other column", () => {
+    render(<CreatorHarness columnDataType="varchar" />);
+
+    const select = screen.getByRole("combobox", {
+      name: /If there are multiple district values/,
+    });
+    expect(select).toBeEnabled();
+    expect(select).not.toHaveAccessibleDescription();
+  });
+
+  it("offers the one value or every value switch instead of a checkbox", () => {
+    render(<CreatorHarness columnDataType="varchar" />);
+
+    expect(
+      screen.getByRole("radiogroup", {
+        name: "How many values district keeps",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("checkbox", { name: "Only allow one value" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("hides the rule select once the field keeps every value", () => {
+    render(<CreatorHarness columnDataType="varchar" />);
+
+    fireEvent.click(screen.getByRole("radio", { name: "Every value" }));
+
+    expect(
+      screen.queryByRole("combobox", {
+        name: /If there are multiple district values/,
+      }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("brings the rule select back when the field keeps one value again", () => {
+    render(<CreatorHarness columnDataType="varchar" />);
+
+    fireEvent.click(screen.getByRole("radio", { name: "Every value" }));
+    fireEvent.click(screen.getByRole("radio", { name: "One value" }));
+
+    expect(
+      screen.getByRole("combobox", {
+        name: /If there are multiple district values/,
+      }),
+    ).toBeEnabled();
+  });
+
+  it("locks the switch to one value for the dataset's ID column", () => {
+    render(<CreatorHarness columnDataType="varchar" isIdentifierColumn />);
+
+    expect(screen.getByRole("radio", { name: "One value" })).toBeChecked();
+    expect(screen.getByRole("radio", { name: "Every value" })).toBeDisabled();
+  });
+
+  it("says why the switch is locked for the dataset's ID column", () => {
+    render(<CreatorHarness columnDataType="varchar" isIdentifierColumn />);
+
+    expect(
+      screen.getByRole("radiogroup", {
+        name: "How many values district keeps",
+      }),
+    ).toHaveAccessibleDescription("ID fields keep their value as is.");
+  });
+
+  it("locks the switch to one value for the title field", () => {
+    render(<CreatorHarness columnDataType="varchar" isLabelColumn />);
+
+    expect(screen.getByRole("radio", { name: "One value" })).toBeChecked();
+    expect(screen.getByRole("radio", { name: "Every value" })).toBeDisabled();
+    expect(
+      screen.getByRole("radiogroup", {
+        name: "How many values district keeps",
+      }),
+    ).toHaveAccessibleDescription("The title field keeps one value.");
+  });
+
+  it("leaves the switch open and unexplained for any other field", () => {
+    render(<CreatorHarness columnDataType="varchar" />);
+
+    expect(screen.getByRole("radio", { name: "Every value" })).toBeEnabled();
+    expect(
+      screen.getByRole("radiogroup", {
+        name: "How many values district keeps",
+      }),
+    ).not.toHaveAccessibleDescription();
+  });
+
+  it("keeps the picked rule when the field switches to every value and back", () => {
+    render(<CreatorHarness columnDataType="varchar" />);
+
+    pickMantineSelectOption(
+      /If there are multiple district values/,
+      "Choose the first value we see",
+    );
+    fireEvent.click(screen.getByRole("radio", { name: "Every value" }));
+    fireEvent.click(screen.getByRole("radio", { name: "One value" }));
+
+    expect(
+      screen.getByRole("combobox", {
+        name: /If there are multiple district values/,
+      }),
+    ).toHaveValue("Choose the first value we see");
+  });
+
+  it("keeps a per-period field's values per month of the dataset's first date column", () => {
+    let conceptForm: FormType<ConceptFormValues> | undefined;
+    render(
+      <CreatorHarness
+        columnDataType="bigint"
+        onForm={(form) => {
+          conceptForm = form;
+        }}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("radio", { name: "Per period" }));
+
+    expect(
+      screen.getByRole("combobox", { name: "Date column for district" }),
+    ).toHaveValue("visit_date");
+    expect(
+      screen.getByRole("combobox", { name: "Period for district" }),
+    ).toHaveValue("Per month");
+    expect(conceptForm?.getValues().datasetColumnAttributes[0]).toMatchObject({
+      isArray: true,
+      bucketGrain: "month",
+      mappings: { datasetColumn: { bucketColumnId: VISIT_DATE_COLUMN.id } },
+    });
+  });
+
+  it("asks which value to keep in each period of a per-period field", () => {
+    render(<CreatorHarness columnDataType="bigint" />);
+
+    fireEvent.click(screen.getByRole("radio", { name: "Per period" }));
+
+    expect(
+      screen.getByRole("combobox", {
+        name: /In each period, if there are multiple district values/,
+      }),
+    ).toBeEnabled();
+  });
+
+  it("drops the period and date column when a per-period field keeps every value", () => {
+    let conceptForm: FormType<ConceptFormValues> | undefined;
+    render(
+      <CreatorHarness
+        columnDataType="bigint"
+        onForm={(form) => {
+          conceptForm = form;
+        }}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("radio", { name: "Per period" }));
+    fireEvent.click(screen.getByRole("radio", { name: "Every value" }));
+
+    expect(
+      screen.queryByRole("combobox", { name: "Period for district" }),
+    ).not.toBeInTheDocument();
+    const attribute = conceptForm?.getValues().datasetColumnAttributes[0];
+    expect(attribute?.isArray).toBe(true);
+    expect(attribute?.bucketGrain).toBeUndefined();
+    expect(attribute?.mappings.datasetColumn.bucketColumnId).toBeUndefined();
+  });
+
+  it("shows and stores the period picked for a per-period field", () => {
+    let conceptForm: FormType<ConceptFormValues> | undefined;
+    render(
+      <CreatorHarness
+        columnDataType="bigint"
+        onForm={(form) => {
+          conceptForm = form;
+        }}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("radio", { name: "Per period" }));
+    pickMantineSelectOption("Period for district", "Per year");
+
+    expect(
+      screen.getByRole("combobox", { name: "Period for district" }),
+    ).toHaveValue("Per year");
+    expect(
+      conceptForm?.getValues().datasetColumnAttributes[0]?.bucketGrain,
+    ).toBe("year");
+  });
+
+  it("says why a per-period field with no date column cannot be saved", () => {
+    let conceptForm: FormType<ConceptFormValues> | undefined;
+    render(
+      <CreatorHarness
+        columnDataType="bigint"
+        hasDateColumn={false}
+        onForm={(form) => {
+          conceptForm = form;
+        }}
+      />,
+    );
+    fireEvent.click(screen.getByRole("radio", { name: "Per period" }));
+
+    act(() => {
+      conceptForm?.validate();
+    });
+
+    const dateColumn = screen.getByRole("combobox", {
+      name: "Date column for district",
+    });
+    expect(dateColumn).toHaveAttribute("aria-invalid", "true");
+    expect(dateColumn).toHaveAccessibleDescription(
+      expect.stringContaining(MISSING_DATE_COLUMN_MESSAGE),
+    );
+    expect(screen.getByText(MISSING_DATE_COLUMN_MESSAGE)).toBeVisible();
+  });
+
+  it("clears the date column error once the field stops being per period", () => {
+    let conceptForm: FormType<ConceptFormValues> | undefined;
+    render(
+      <CreatorHarness
+        columnDataType="bigint"
+        hasDateColumn={false}
+        onForm={(form) => {
+          conceptForm = form;
+        }}
+      />,
+    );
+    fireEvent.click(screen.getByRole("radio", { name: "Per period" }));
+    act(() => {
+      conceptForm?.validate();
+    });
+    expect(screen.getByText(MISSING_DATE_COLUMN_MESSAGE)).toBeVisible();
+
+    fireEvent.click(screen.getByRole("radio", { name: "Every value" }));
+
+    expect(
+      screen.queryByText(MISSING_DATE_COLUMN_MESSAGE),
+    ).not.toBeInTheDocument();
+    expect(conceptForm?.errors).toEqual({});
+  });
+
+  it("clears the date column error once a date column is chosen", () => {
+    let conceptForm: FormType<ConceptFormValues> | undefined;
+    render(
+      <CreatorHarness
+        columnDataType="bigint"
+        onForm={(form) => {
+          conceptForm = form;
+        }}
+      />,
+    );
+    fireEvent.click(screen.getByRole("radio", { name: "Per period" }));
+    act(() => {
+      conceptForm?.setFieldValue(
+        "datasetColumnAttributes.0.mappings.datasetColumn.bucketColumnId",
+        undefined,
+      );
+      conceptForm?.validate();
+    });
+    expect(screen.getByText(MISSING_DATE_COLUMN_MESSAGE)).toBeVisible();
+
+    pickMantineSelectOption("Date column for district", "visit_date");
+
+    expect(
+      screen.queryByText(MISSING_DATE_COLUMN_MESSAGE),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("combobox", { name: "Date column for district" }),
+    ).not.toHaveAttribute("aria-invalid", "true");
+  });
+});

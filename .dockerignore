@@ -1,0 +1,23 @@
+# The Docker build context is the repository root (`fly deploy .`), so this
+# file decides what any Dockerfile in the repo can see. Each Dockerfile still
+# copies only what it names.
+
+# Never let an env file, and the credentials in it, into an image.
+.env
+.env.*
+**/.env
+**/.env.*
+
+# Installed and generated files: each image installs its own dependencies.
+**/node_modules
+**/dist
+**/coverage
+**/.turbo
+
+# Local-only working files.
+.git
+.temp
+.videos
+.difit
+supabase/.branches
+supabase/.temp

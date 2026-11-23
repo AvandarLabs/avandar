@@ -1,0 +1,12 @@
+.waveDemoCentered {
+  align-items: center;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+}
+
+.waveDemoCards {
+  display: flex;
+  gap: var(--demo-space-sm);
+  justify-content: center;
+}

@@ -1,4 +1,4 @@
-import { EASE, ramp } from "../../../motion";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ParcelEnvelope } from "./ParcelEnvelope";
 import { SetbackHatch } from "./SetbackHatch";
 import { StructureFootprint } from "./StructureFootprint";
@@ -15,25 +15,35 @@ export function ParcelGeometry({
   accent,
   id,
 }: Readonly<Props>): ReactNode {
-  const progress = ramp(frame, 36, 48, EASE.inOut);
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const progress = motion.ramp(
+    frame,
+    36,
+    motion.scale(48),
+    motion.travel.easing,
+  );
   const hatchId = `setback-${Array.from(id)
-    .map((character) => character.codePointAt(0)?.toString(16))
+    .map((character) => {
+      return character.codePointAt(0)?.toString(16);
+    })
     .join("-")}`;
   return (
     <g>
       <SetbackHatch hatchId={hatchId} />
-      {input.parcels.map((parcel, index) => (
-        <ParcelEnvelope
-          key={parcel.id}
-          parcel={parcel}
-          index={index}
-          setback={input.setback}
-          progress={progress}
-          accent={accent}
-          hatchId={hatchId}
-          showDimensions={input.showDimensions}
-        />
-      ))}
+      {input.parcels.map((parcel, index) => {
+        return (
+          <ParcelEnvelope
+            key={parcel.id}
+            parcel={parcel}
+            index={index}
+            setback={input.setback}
+            progress={progress}
+            accent={accent}
+            hatchId={hatchId}
+            showDimensions={input.showDimensions}
+          />
+        );
+      })}
       <StructureFootprint input={input} frame={frame} accent={accent} />
     </g>
   );

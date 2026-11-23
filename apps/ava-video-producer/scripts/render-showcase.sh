@@ -1,7 +1,11 @@
 #!/bin/sh
+if [ "${AVA_PRODUCER_ACTIVE_SCRIPT:-}" != "$0" ]; then
+  exec node "$(dirname "$0")/runProducerCommand/runShellCommand.mjs" "render:showcase" "$0" "$@"
+fi
+exec 1>&2
 set -eu
 cd "$(dirname "$0")/.."
-node scripts/require-license.mjs
+node --import tsx scripts/requireLicense.ts
 npm run typecheck
 npm run video -- preview storyboards/home.json
 TITLE_OFFSET=0 sh scripts/preview.sh title-study 8 30 90 114 174 198

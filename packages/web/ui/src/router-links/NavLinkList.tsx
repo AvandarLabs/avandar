@@ -1,7 +1,7 @@
 import { objectEntries } from "@avandar/utils";
 import { Box, MantineColor, Text } from "@mantine/core";
 import { IconChevronRight } from "@tabler/icons-react";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { Key, ReactNode } from "react";
 import { TruncatedText } from "../text/TruncatedText";
 import { NavLink } from "./NavLink";
@@ -35,7 +35,7 @@ function generateLinkKey(linkProps: NavLinkProps): string {
   const keyParts: string[] = [linkProps.to as string];
   if (linkProps.params && typeof linkProps.params === "object") {
     // Using `any` here but it's safe.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // oxlint-disable-next-line typescript/no-explicit-any
     const paramKeyVals = objectEntries(linkProps.params as any).map(
       ([key, val]: [string, unknown]) => {
         return `${key}=${String(val)}`;

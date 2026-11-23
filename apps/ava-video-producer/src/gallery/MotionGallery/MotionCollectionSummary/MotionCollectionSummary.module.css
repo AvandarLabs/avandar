@@ -1,0 +1,7 @@
+.motionCollectionSummaryCollectionSubline {
+  composes: collection-subline from global;
+}
+
+.motionCollectionSummaryLoopSpec {
+  composes: loop-spec from global;
+}

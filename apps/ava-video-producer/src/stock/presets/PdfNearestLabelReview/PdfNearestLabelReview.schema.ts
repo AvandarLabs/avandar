@@ -1,4 +1,4 @@
-import { prop } from "@avandar/utils";
+import { prop, propEq } from "@avandar/utils";
 import { z } from "zod";
 import type {
   StockJsonSchema,
@@ -53,7 +53,7 @@ export const inputSchema = z
     });
     if (
       input.reviewedLabelId !== null &&
-      !input.labels.some(({ id }) => id === input.reviewedLabelId)
+      !input.labels.some(propEq("id", input.reviewedLabelId))
     ) {
       context.addIssue({
         code: "custom",

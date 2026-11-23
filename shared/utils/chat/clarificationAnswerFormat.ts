@@ -53,18 +53,28 @@ export function containsClarificationAnswerLine(content: string): boolean {
   return content.split("\n").some(isClarificationAnswerLine);
 }
 
-/** Extracts the body of a clarification answer line, if it is one. */
+/**
+ * Extracts the body of a clarification answer line, if it is one. An
+ * automatically matched answer carries a note on a second line, so the
+ * answer line itself may not be the whole message.
+ */
 export function parseClarificationAnswerBody(
   content: string,
 ): string | undefined {
+  const noteLineStart = content.lastIndexOf("\n");
+  const answerLine =
+    noteLineStart > 0 &&
+    content.slice(0, noteLineStart).endsWith(ANSWER_SUFFIX)
+      ? content.slice(0, noteLineStart)
+      : content;
   if (
-    !isClarificationAnswerLine(content) ||
-    !content.endsWith(ANSWER_SUFFIX) ||
-    content.length < ANSWER_PREFIX.length + ANSWER_SUFFIX.length + 1
+    !isClarificationAnswerLine(answerLine) ||
+    !answerLine.endsWith(ANSWER_SUFFIX) ||
+    answerLine.length < ANSWER_PREFIX.length + ANSWER_SUFFIX.length + 1
   ) {
     return undefined;
   }
-  return content.slice(ANSWER_PREFIX.length, -ANSWER_SUFFIX.length).trim();
+  return answerLine.slice(ANSWER_PREFIX.length, -ANSWER_SUFFIX.length).trim();
 }
 
 /** Extracts the text from a custom answer body, if it is one. */

@@ -1,30 +1,32 @@
-import { ramp } from "../../../motion";
-import { stockI18n } from "../../i18n/stockI18n/stockI18n";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { audienceMessages } from "./PublicationSnapshotSlice.controls";
-import { SnapshotColumnHeading } from "./SnapshotColumnHeading";
+import { SnapshotColumnHeading } from "./SnapshotColumnHeading/SnapshotColumnHeading";
 import type { Input } from "./PublicationSnapshotSlice.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number };
 /** Frozen snapshot metadata stays separate from the mutable source table. */
 export function SnapshotHeadings({ input, frame }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g>
-      {input.table.columns.map((column, index) => (
-        <SnapshotColumnHeading
-          key={column.id}
-          input={input}
-          frame={frame}
-          index={index}
-        />
-      ))}
+      {input.table.columns.map((column, index) => {
+        return (
+          <SnapshotColumnHeading
+            key={column.id}
+            input={input}
+            frame={frame}
+            index={index}
+          />
+        );
+      })}
       <g
         data-revision={input.publication.revision}
         data-audience={input.publication.audience}
-        opacity={ramp(frame, 56, 39)}
+        opacity={motion.ramp(frame, 56, motion.scale(39))}
       >
-        <g opacity={ramp(frame, 95, 4)}>
+        <g opacity={motion.ramp(frame, 95, motion.press.duration)}>
           <LabelSlots
             labels={[[input.publication.label, 508, 153, 400, 14, 2]]}
           />
@@ -33,7 +35,7 @@ export function SnapshotHeadings({ input, frame }: Readonly<Props>): ReactNode {
           labels={[
             [input.publication.revision, 508, 558, 400, 14, 2],
             [
-              stockI18n._(audienceMessages[input.publication.audience]),
+              audienceMessages[input.publication.audience].message,
               508,
               596,
               400,

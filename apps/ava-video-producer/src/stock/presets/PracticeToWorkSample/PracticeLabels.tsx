@@ -1,6 +1,6 @@
 import { FitText } from "../../primitives/FitText/FitText";
 import { type FitTextSize } from "../../primitives/FitText/wrapTextToLines";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./PracticeToWorkSample.schema";
 import type { ReactNode } from "react";
 
@@ -19,26 +19,29 @@ type Slot = [
  * bound.
  */
 export function PracticeLabels({ input, frame }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const slots: Slot[] = [
     [input.task.instruction, 48, 38, 864, 20, 1],
     [input.settingLabels.practice, 48, 91, 390, 16, 3],
     [input.settingLabels.application, 510, 91, 390, 16, 3],
     [input.workpieces.applicationLabel, 590, 520, 300, 16, 3],
-    [input.caption, 48, 589, 864, 12, 1, STOCK.muted],
+    [input.caption, 48, 589, 864, 12, 1, tokens.color.inactive],
     ...(input.showFirstArtifactAtHold || frame < 112
       ? ([[input.workpieces.practiceLabel, 100, 520, 300, 16, 3]] as Slot[])
       : []),
   ];
   return (
     <g>
-      {slots.map(([text, x, y, width, fontSize, maxLines, color], index) => (
-        <FitText
-          key={index}
-          {...{ text, x, y, width, fontSize, maxLines, color }}
-          breakLongWords
-          normalizeWhitespace
-        />
-      ))}
+      {slots.map(([text, x, y, width, fontSize, maxLines, color]) => {
+        return (
+          <FitText
+            key={`${x}:${y}`}
+            {...{ text, x, y, width, fontSize, maxLines, color }}
+            breakLongWords
+            normalizeWhitespace
+          />
+        );
+      })}
     </g>
   );
 }

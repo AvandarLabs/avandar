@@ -1,122 +1,118 @@
-.compositionViewer {
-  min-width: 0;
-  padding: 16px;
-}
-
-.compositionViewerPlayer {
-  aspect-ratio: 1.6;
-  background: #0b1219;
-  border: 0;
-  border-radius: 6px;
-  display: block;
-  width: 100%;
-}
-
-.compositionViewerSummary {
-  display: grid;
-  gap: 24px;
-  grid-template-columns: 1fr auto;
-  padding-top: 24px;
-}
-
-.compositionViewerSummary h2 {
-  font-size: 27px;
-  font-weight: 500;
-  margin: 0 0 10px;
-}
-
-.compositionViewerSummary p {
-  color: var(--muted);
-  line-height: 1.5;
-  margin: 8px 0;
-  max-width: 66ch;
-}
-
-.compositionViewerDuration {
-  font-size: 18px;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-
-.compositionViewerNotice {
-  border-top: 1px solid var(--line);
-  color: var(--muted);
-  font-size: 14px;
-  line-height: 1.5;
-  margin-top: 26px;
-  padding-top: 16px;
-}
-
-@media (width <= 900px) {
-  .compositionViewerSummary {
-    gap: 0;
-    grid-template-columns: 1fr;
-  }
-}
-
-.stage,
-.settings,
-.details,
-.guidance {
+.compositionViewerSettings,
+.compositionViewerDetails,
+.compositionViewerGuidance {
   min-height: 0;
   min-width: 0;
 }
 
-:global(dialog:modal) .compositionViewer {
+/*
+ * The viewer fills the Atlas preview modal: the player, its summary and
+ * reuse guidance scroll in the left column, and the settings keep the right.
+ * The rows are content height: auto rows would shrink to fit the modal and
+ * overlap.
+ */
+.compositionViewer {
+  align-content: start;
+  column-gap: var(--atlas-space-24);
   display: grid;
-  gap: 20px;
-  grid-template-columns: minmax(0, 1fr) 380px;
-  grid-template-rows: minmax(0, 1fr);
+  grid-template:
+    "stage settings" max-content
+    "details settings" max-content
+    "guidance settings" max-content
+    / minmax(0, 1fr) 380px;
+  height: 100%;
+  min-width: 0;
+  overflow-y: auto;
+  padding: var(--atlas-space-16);
 }
 
-:global(dialog:modal) .stage {
-  align-items: center;
-  background: var(--ava-neutral-9);
-  border-radius: 6px;
-  container-type: size;
-  display: flex;
-  justify-content: center;
+.compositionViewerDetails {
+  grid-area: details;
 }
 
-:global(dialog:modal) .compositionViewerPlayer {
-  flex: none;
-  height: min(100cqh, 62.5cqw);
-  width: min(100cqw, 160cqh);
+.compositionViewerSettings {
+  align-self: start;
+  grid-area: settings;
+  position: sticky;
+  top: 0;
 }
 
-:global(dialog:modal) .details,
-:global(dialog:modal) .guidance {
-  display: none;
+.compositionViewerGuidance {
+  grid-area: guidance;
 }
-/* stylelint-disable-next-line selector-class-pattern -- Shared Motion Atlas palette class. */
-:global(dialog:modal) .settings :global(.palette-controls) {
-  gap: 10px;
-  margin: 0 0 12px;
-  padding: 10px;
-}
-/* stylelint-disable-next-line selector-class-pattern -- Shared Motion Atlas palette class. */
-:global(dialog:modal) .settings :global(.palette-group) {
-  flex-basis: 100%;
-  gap: 6px;
-}
-/* stylelint-disable-next-line selector-class-pattern -- Shared Motion Atlas palette class. */
-:global(dialog:modal) .settings :global(.palette-help) {
-  display: none;
+
+/* At phone widths the whole Atlas dialog scrolls, so the viewer does not. */
+@media (width <= 760px) {
+  .compositionViewer {
+    height: auto;
+    overflow-y: visible;
+  }
 }
 
 @media (width <= 800px) {
-  :global(dialog:modal) .compositionViewer {
-    gap: 10px;
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: minmax(80px, 1fr) auto;
-    padding: 10px;
-  }
-  /* stylelint-disable-next-line selector-class-pattern -- Shared Motion Atlas palette class. */
-  :global(dialog:modal) .settings :global(.palette-group) {
-    flex: 1 1 140px;
+  .compositionViewer {
+    grid-template:
+      "stage" max-content
+      "settings" max-content
+      "details" max-content
+      "guidance" max-content
+      / minmax(0, 1fr);
+    padding: var(--atlas-space-10);
   }
 
-  :global(dialog:modal) .settings :global(.swatches) {
-    display: none;
+  .compositionViewerSettings {
+    position: static;
+  }
+}
+
+/*
+ * The Design tokens tab widens the settings column, which then scrolls with
+ * the viewer. The guidance row takes up the tall panel's extra height, so the
+ * stage keeps the player's own height.
+ */
+.compositionViewer.compositionViewerIsTokenPanel {
+  grid-template-columns: minmax(0, 1fr) 420px;
+  grid-template-rows: max-content max-content 1fr;
+}
+
+.compositionViewerIsTokenPanel .compositionViewerSettings {
+  position: static;
+}
+
+@media (width <= 800px) {
+  .compositionViewer.compositionViewerIsTokenPanel {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: repeat(4, max-content);
+  }
+}
+
+/*
+ * While the Design tokens tab is open on a phone, the player stays pinned
+ * under the dialog header as a small strip, as in the motion preview. A
+ * sticky grid item cannot leave its grid area, so the viewer becomes a flex
+ * column here, with the same order the single-column grid had. The strip
+ * sizes come from the gallery stylesheet, with the same values as fallbacks.
+ */
+@media (width <= 760px) {
+  .compositionViewer.compositionViewerIsTokenPanel {
+    --atlas-pin-offset: calc(
+      var(--atlas-header-height, var(--atlas-size-64)) +
+        var(--atlas-strip-height, calc(14dvh + var(--atlas-size-48)))
+    );
+
+    display: flex;
+    flex-direction: column;
+  }
+
+  .compositionViewerIsTokenPanel .compositionViewerSettings {
+    order: 1;
+  }
+
+  .compositionViewerIsTokenPanel .compositionViewerDetails {
+    order: 2;
+  }
+
+  .compositionViewerIsTokenPanel .compositionViewerGuidance {
+    order: 3;
   }
 }

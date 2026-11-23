@@ -20,30 +20,32 @@ export function AliquotLedger({
   ];
   return (
     <g>
-      {rows.map(({ label, value }, index) => (
-        <g key={index}>
-          <FitText
-            text={label}
-            x={755}
-            y={112 + index * 88}
-            width={175}
-            fontSize={12}
-            maxLines={5}
-            breakLongWords
-            normalizeWhitespace
-          />
-          <FitText
-            text={String(value)}
-            x={740}
-            y={112 + index * 88}
-            width={65}
-            fontSize={18}
-            maxLines={1}
-            anchor="end"
-            normalizeWhitespace
-          />
-        </g>
-      ))}
+      {rows.map(({ label, value }, index) => {
+        return (
+          <g key={index}>
+            <FitText
+              text={label}
+              x={755}
+              y={112 + index * 88}
+              width={175}
+              fontSize={12}
+              maxLines={5}
+              breakLongWords
+              normalizeWhitespace
+            />
+            <FitText
+              text={String(value)}
+              x={740}
+              y={112 + index * 88}
+              width={65}
+              fontSize={18}
+              maxLines={1}
+              anchor="end"
+              normalizeWhitespace
+            />
+          </g>
+        );
+      })}
     </g>
   );
 }

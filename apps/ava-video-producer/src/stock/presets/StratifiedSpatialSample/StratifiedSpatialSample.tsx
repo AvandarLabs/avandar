@@ -1,7 +1,7 @@
 import { SampleCopy } from "./SampleCopy";
 import { SampleSites } from "./SampleSites";
 import { StratumFrame } from "./StratumFrame";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./StratifiedSpatialSample.schema";
 import type { ReactNode } from "react";
 /** Inputs for StratifiedSpatialSample. */

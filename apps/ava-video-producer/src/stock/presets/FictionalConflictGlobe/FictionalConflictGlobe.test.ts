@@ -17,6 +17,83 @@ import {
 import { inputSchema, type Input } from "./FictionalConflictGlobe.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 
+function _getIncidentMarks(markup: string): { marks: RegExpMatchArray[] } {
+  const marks = [
+    ...markup.matchAll(
+      /data-incident-id="([^"]*)" data-x="([^"]*)" data-y="([^"]*)"/g,
+    ),
+  ];
+  return { marks };
+}
+
+type AssertUnrelatedMarkerClearanceOptions = Readonly<{
+  points: ReadonlyArray<readonly number[]>;
+  index: number;
+  endX: number;
+  endY: number;
+  marks: readonly RegExpMatchArray[];
+  id: string;
+  markerX: string;
+  markerY: string;
+}>;
+
+function _getLeaderPoints(leader: string): { points: number[][] } {
+  const points = [...leader.matchAll(/[ML]([\d.e+-]+) ([\d.e+-]+)/g)].map(
+    ([, x, y]) => {
+      return [Number(x), Number(y)];
+    },
+  );
+  return { points };
+}
+
+function _assertUnrelatedMarkerClearance({
+  points,
+  index,
+  endX,
+  endY,
+  marks,
+  id,
+  markerX,
+  markerY,
+}: AssertUnrelatedMarkerClearanceOptions): void {
+  const [startX, startY] = points[index],
+    deltaX = endX - startX,
+    deltaY = endY - startY;
+  const progress = Math.max(
+    0,
+    Math.min(
+      1,
+      ((Number(markerX) - startX) * deltaX +
+        (Number(markerY) - startY) * deltaY) /
+        (deltaX ** 2 + deltaY ** 2),
+    ),
+  );
+  const own = marks.find((mark) => {
+    return mark[1] === id;
+  })!;
+  if (own[2] !== markerX || own[3] !== markerY) {
+    assert.ok(
+      Math.hypot(
+        Number(markerX) - startX - progress * deltaX,
+        Number(markerY) - startY - progress * deltaY,
+      ) >= 14,
+      "The actual continuous leader clears every unrelated X footprint",
+    );
+  }
+}
+
+function _assertSurfaceCoordinatesObeyFrontBackOcclusionDataTotalIncidents(
+  input: (typeof fixtures)[number]["input"],
+): void {
+  [24, 72, 150].forEach((frame) => {
+    return assert.ok(
+      _render({ frame: frame, input: input }).includes(
+        'data-total-incidents="4"',
+      ),
+    );
+  });
+}
+
 function _render({
   frame,
   input,
@@ -43,16 +120,16 @@ function _attributes({
   attribute: string;
   value: string;
 }): string {
-  const element = markup
-    .match(/<[^>]+>/g)
-    ?.find((tag) => tag.includes(`${attribute}="${value}"`));
+  const element = markup.match(/<[^>]+>/g)?.find((tag) => {
+    return tag.includes(`${attribute}="${value}"`);
+  });
   assert.ok(element, `${attribute}=${value}`);
   return element;
 }
 test("invalid authored inputs reject before rendering", () => {
-  invalidInputs.forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  );
+  invalidInputs.forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
 });
 test("surface coordinates obey front-back occlusion while authored incident totals stay fixed", () => {
   const input = fixtures[2].input;
@@ -72,13 +149,7 @@ test("surface coordinates obey front-back occlusion while authored incident tota
   );
   assert.ok(!after.includes('data-incident-id="rear"'));
   assert.ok(after.includes('data-incident-id="coincident"'));
-  [24, 72, 150].forEach((frame) =>
-    assert.ok(
-      _render({ frame: frame, input: input }).includes(
-        'data-total-incidents="4"',
-      ),
-    ),
-  );
+  _assertSurfaceCoordinatesObeyFrontBackOcclusionDataTotalIncidents(input);
   const across = _render({ frame: 76, input: changedInput });
   const longitude = SvgAttributes.getNumberFromMarkup({
     attributes: _attributes({
@@ -138,12 +209,14 @@ test("actual X paths project authored latitude and longitude without spreading c
   assert.ok(cross.includes(`M${x - 7} ${y - 7} L${x + 7} ${y + 7}`));
   const coincident = inputSchema.parse({
     ...DEFAULT_INPUT,
-    incidents: [0, 1, 2, 3].map((index) => ({
-      id: String(index),
-      label: `Situation ${index}`,
-      latitude: 0,
-      longitude: 85,
-    })),
+    incidents: [0, 1, 2, 3].map((index) => {
+      return {
+        id: String(index),
+        label: `Situation ${index}`,
+        latitude: 0,
+        longitude: 85,
+      };
+    }),
   });
   const coincidentMarkup = _render({ frame: 150, input: coincident });
   assert.equal(
@@ -154,47 +227,62 @@ test("actual X paths project authored latitude and longitude without spreading c
     (coincidentMarkup.match(/data-incident-label=/g) ?? []).length,
     4,
   );
-  coincident.incidents.forEach(({ id }) =>
-    assert.ok(
+  coincident.incidents.forEach(({ id }) => {
+    return assert.ok(
       _attributes({
         markup: coincidentMarkup,
         attribute: "data-incident-cross",
         value: id,
       }).includes('d="M383 278 L397 292 M397 278 L383 292"'),
-    ),
-  );
+    );
+  });
   assert.equal((coincidentMarkup.match(/data-leader=/g) ?? []).length, 4);
 });
 
 test("serialized contract exposes incident identity validation", () => {
+  // This assertion exercises the JSON serialization boundary of the public
+  // contract.
+  // react-doctor-disable-next-line no-json-parse-stringify-clone
   const rules = JSON.parse(
     JSON.stringify(fictionalConflictGlobeContract.semanticRules),
   ) as typeof fictionalConflictGlobeContract.semanticRules;
   const paths = ["incidents.*.id"];
-  const rule = rules.find(
-    (candidate) =>
+  const rule = rules.find((candidate) => {
+    return (
       candidate.paths.length === paths.length &&
-      paths.every((path) => candidate.paths.includes(path)),
-  );
+      paths.every((path) => {
+        return candidate.paths.includes(path);
+      })
+    );
+  });
   assert.ok(rule, "Runtime-only rule retains its precise field paths.");
   assert.match(rule.description, /unique/i);
 });
 
 test("serialized contract exposes shortest sweep validation", () => {
+  // This assertion exercises the JSON serialization boundary of the public
+  // contract.
+  // react-doctor-disable-next-line no-json-parse-stringify-clone
   const rules = JSON.parse(
     JSON.stringify(fictionalConflictGlobeContract.semanticRules),
   ) as typeof fictionalConflictGlobeContract.semanticRules;
   const paths = ["longitudeSweep.start", "longitudeSweep.end"];
-  const rule = rules.find(
-    (candidate) =>
+  const rule = rules.find((candidate) => {
+    return (
       candidate.paths.length === paths.length &&
-      paths.every((path) => candidate.paths.includes(path)),
-  );
+      paths.every((path) => {
+        return candidate.paths.includes(path);
+      })
+    );
+  });
   assert.ok(rule, "Runtime-only rule retains its precise field paths.");
   assert.match(rule.description, /shortest.*40.*160.*inclusive/i);
 });
 
 test("serialized contract exposes endpoint visibility validation", () => {
+  // This assertion exercises the JSON serialization boundary of the public
+  // contract.
+  // react-doctor-disable-next-line no-json-parse-stringify-clone
   const rules = JSON.parse(
     JSON.stringify(fictionalConflictGlobeContract.semanticRules),
   ) as typeof fictionalConflictGlobeContract.semanticRules;
@@ -203,11 +291,14 @@ test("serialized contract exposes endpoint visibility validation", () => {
     "incidents.*.longitude",
     "longitudeSweep.end",
   ];
-  const rule = rules.find(
-    (candidate) =>
+  const rule = rules.find((candidate) => {
+    return (
       candidate.paths.length === paths.length &&
-      paths.every((path) => candidate.paths.includes(path)),
-  );
+      paths.every((path) => {
+        return candidate.paths.includes(path);
+      })
+    );
+  });
   assert.ok(rule, "Runtime-only rule retains its precise field paths.");
   assert.match(
     rule.description,
@@ -221,14 +312,10 @@ test("continuous incident leaders bend clear of unrelated geographic crosses", a
   [
     correctionContract.defaultInput,
     correctionContract.fixtures.find(propEq("id", "dense"))!.input,
-  ].forEach((input) =>
-    [90, 150].forEach((frame) => {
+  ].forEach((input) => {
+    return [90, 150].forEach((frame) => {
       const markup = _render({ frame: frame, input: input });
-      const marks = [
-        ...markup.matchAll(
-          /data-incident-id="([^"]*)" data-x="([^"]*)" data-y="([^"]*)"/g,
-        ),
-      ];
+      const { marks } = _getIncidentMarks(markup);
       const leaders = [
         ...markup.matchAll(/data-leader="([^"]*)" d="([^"]*)"/g),
       ];
@@ -238,39 +325,27 @@ test("continuous incident leaders bend clear of unrelated geographic crosses", a
           1,
           "A continuous bend replaces collinear marker gaps",
         );
-        const points = [...leader.matchAll(/[ML]([\d.e+-]+) ([\d.e+-]+)/g)].map(
-          ([, x, y]) => [Number(x), Number(y)],
-        );
+        const { points } = _getLeaderPoints(leader);
         assert.ok(points.length >= 2);
-        points.slice(1).forEach(([endX, endY], index) =>
-          marks
-            .filter(([, other]) => other !== id)
+        points.slice(1).forEach(([endX, endY], index) => {
+          return marks
+            .filter(([, other]) => {
+              return other !== id;
+            })
             .forEach(([, , markerX, markerY]) => {
-              const [startX, startY] = points[index],
-                deltaX = endX - startX,
-                deltaY = endY - startY;
-              const progress = Math.max(
-                0,
-                Math.min(
-                  1,
-                  ((Number(markerX) - startX) * deltaX +
-                    (Number(markerY) - startY) * deltaY) /
-                    (deltaX ** 2 + deltaY ** 2),
-                ),
-              );
-              const own = marks.find((mark) => mark[1] === id)!;
-              if (own[2] !== markerX || own[3] !== markerY) {
-                assert.ok(
-                  Math.hypot(
-                    Number(markerX) - startX - progress * deltaX,
-                    Number(markerY) - startY - progress * deltaY,
-                  ) >= 14,
-                  "The actual continuous leader clears every unrelated X footprint",
-                );
-              }
-            }),
-        );
+              _assertUnrelatedMarkerClearance({
+                points,
+                index,
+                endX,
+                endY,
+                marks,
+                id,
+                markerX,
+                markerY,
+              });
+            });
+        });
       });
-    }),
-  );
+    });
+  });
 });

@@ -1,0 +1,47 @@
+.themeBarBar {
+  background: var(--paper);
+  border-bottom: var(--atlas-border-1) solid var(--line);
+  display: grid;
+  gap: var(--atlas-space-8);
+  padding-bottom: var(--atlas-space-12);
+  position: relative;
+}
+
+/*
+ * Focus lands here from code, after a button leaves. A keyboard user gets the
+ * panel's focus ring (see VideoThemePanel.module.css). A mouse click does not.
+ */
+.themeBarBar:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.themeBarNotice {
+  color: var(--atlas-color-muted);
+  font-size: var(--atlas-font-size-11);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.themeBarStatus {
+  color: var(--atlas-color-muted);
+  font-size: var(--atlas-font-size-11);
+  margin: 0;
+  min-height: 1.4em;
+}
+
+/*
+ * Empty, the live region leaves the grid flow so it reserves no row or gap,
+ * but it stays in the accessibility tree so the next message is announced.
+ */
+.themeBarStatus:empty {
+  min-height: 0;
+  position: absolute;
+}
+
+/* On a phone, descriptions are 12px. */
+@media (width <= 760px) {
+  .themeBarNotice,
+  .themeBarStatus {
+    font-size: var(--atlas-font-size-12);
+  }
+}

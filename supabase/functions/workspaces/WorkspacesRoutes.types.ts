@@ -4,24 +4,8 @@ import type { APITypeDef } from "@sbfn/_shared/MiniServer/api.types.ts";
 
 export type WorkspacesAPI = APITypeDef<
   "workspaces",
-  ["/validate-slug", "/:workspaceId/invite", "/:workspaceId/delete"],
+  ["/:workspaceId/invite", "/:workspaceId/delete"],
   {
-    "/validate-slug": {
-      POST: {
-        body: {
-          slug: string;
-        };
-        returnType:
-          | {
-              isValid: true;
-            }
-          | {
-              isValid: false;
-              reason: string;
-            };
-      };
-    };
-
     /**
      * Send a workspace invite to an email address.
      *

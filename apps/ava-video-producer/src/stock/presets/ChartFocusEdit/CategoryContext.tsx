@@ -1,4 +1,4 @@
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CategoryContextHeading } from "./CategoryContextHeading";
 import type { Input } from "./ChartFocusEdit.schema";
 import type { ReactNode } from "react";
@@ -18,6 +18,7 @@ export function CategoryContext({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g>
       {input.showValueLabels ? (
@@ -25,9 +26,10 @@ export function CategoryContext({
           data-value-label={category.id}
           x={884}
           y={y + 15}
-          fill={STOCK.text}
-          fontSize={14}
-          fontFamily="Arial, sans-serif"
+          fill={tokens.text.graphic.value.color}
+          fontSize={tokens.text.graphic.value.fontSize}
+          fontFamily={tokens.text.graphic.value.fontFamily}
+          fontWeight={tokens.text.graphic.value.fontWeight}
           textAnchor="end"
         >
           {category.value}

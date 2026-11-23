@@ -1,5 +1,8 @@
 import { Trans } from "@lingui/react/macro";
 import { Badge, Group, Stack, Text } from "@mantine/core";
+import { match } from "ts-pattern";
+import { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
+import { useBucketGrainLabels } from "@/components/caseFields/useBucketGrainLabels/useBucketGrainLabels";
 import css from "@/views/OntologyDesignerApp/ConceptMetaView/CaseTypeAttributesList.module.css";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { Concept } from "$/models/ontology/Concept/Concept";
@@ -94,6 +97,7 @@ function AttributeChips({
           <Trans>Name</Trans>
         </Badge>
       ) : null}
+      <ValueShapeBadge attribute={attribute} />
       {sourceName ? (
         <Text className={css.source} lineClamp={1}>
           {sourceName}
@@ -109,6 +113,34 @@ function AttributeChips({
       )}
     </Group>
   );
+}
+
+/**
+ * Says how many values a field keeps when it keeps more than one: "Every
+ * value" for a list, or its period, such as "Per month". A single value
+ * shows nothing.
+ */
+function ValueShapeBadge({ attribute }: { attribute: Attribute }): ReactNode {
+  const grainLabels = useBucketGrainLabels();
+  return match(ConceptAttribute.getValueShape(attribute))
+    .with("single", () => {
+      return null;
+    })
+    .with("list", () => {
+      return (
+        <Badge variant="light" color="neutral" size="sm">
+          <Trans>Every value</Trans>
+        </Badge>
+      );
+    })
+    .with("bucketed_list", () => {
+      return attribute.bucketGrain ? (
+        <Badge variant="light" color="neutral" size="sm">
+          {grainLabels[attribute.bucketGrain].perPeriod}
+        </Badge>
+      ) : null;
+    })
+    .exhaustive();
 }
 
 function datasetNameForAttribute(

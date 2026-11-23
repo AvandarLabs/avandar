@@ -1,6 +1,7 @@
-import { STOCK } from "../../stockPalette";
-import { buildFloorOutlineFromTiles } from "./buildFloorOutlineFromTiles";
-import { ShelterTile } from "./ShelterTile";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { makeFloorOutlineFromTiles } from "./makeFloorOutlineFromTiles";
+import { ShelterTile } from "./ShelterTile/ShelterTile";
 import type { Input } from "./ShelterUsableAreaCapacity.schema";
 import type { ReactNode } from "react";
 
@@ -11,26 +12,35 @@ export function ShelterFloor({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
       {input.keepGrossOutline || frame < 36 ? (
-        <path
-          data-gross-outline=""
-          d={buildFloorOutlineFromTiles(input.floorTiles)}
-          fill="none"
-          stroke={STOCK.text}
-          strokeWidth={2}
-        />
+        <g data-gross-outline="">
+          <SketchedShape
+            shape={{
+              kind: "path",
+              d: makeFloorOutlineFromTiles(input.floorTiles),
+            }}
+            profile={tokens.sketch.shape}
+            fill="none"
+            stroke={tokens.color.text}
+            strokeWidth={scales.stroke(tokens.stroke.default)}
+          />
+        </g>
       ) : undefined}
-      {input.floorTiles.map((tile) => (
-        <ShelterTile
-          key={tile.id}
-          input={input}
-          tile={tile}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
+      {input.floorTiles.map((tile) => {
+        return (
+          <ShelterTile
+            key={tile.id}
+            input={input}
+            tile={tile}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

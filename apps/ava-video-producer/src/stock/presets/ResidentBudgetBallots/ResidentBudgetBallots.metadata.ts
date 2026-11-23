@@ -7,7 +7,7 @@ import type {
 } from "../../contracts/StockContract.types";
 /** Public authored retrieval descriptors. */
 export const METADATA: StockMetadata = parseStockMetadata(authoredMetadata);
-/** Explicit indexed default translation paths. */
+/** Explicit indexed default copy paths. */
 export const DEFAULT_TEXT_PATHS: Array<Array<string | number>> = [
   ["projects", 0, "label"],
   ["projects", 1, "label"],

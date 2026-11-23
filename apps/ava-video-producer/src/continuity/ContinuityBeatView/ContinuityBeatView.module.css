@@ -1,0 +1,33 @@
+.continuityBeatView {
+  background: var(--video-color-ground-fill);
+  inset: 0;
+  position: absolute;
+}
+
+.continuityBeatViewHeading {
+  left: var(--video-layout-stage-heading-inset-x);
+  position: absolute;
+  right: var(--video-layout-stage-heading-inset-x);
+  top: var(--video-layout-stage-heading-inset-top);
+}
+
+.continuityBeatViewHeading h1 {
+  color: var(--video-text-stage-heading-color);
+  font-family: var(--video-text-stage-heading-font-family);
+  font-size: var(--video-text-stage-heading-font-size);
+  font-weight: var(--video-text-stage-heading-font-weight);
+  letter-spacing: var(--video-text-stage-heading-letter-spacing);
+  line-height: var(--video-text-stage-heading-line-height);
+  margin: 0;
+  text-shadow: var(--video-text-stage-heading-text-shadow, none);
+}
+
+.continuityBeatViewHeading p {
+  color: var(--video-text-stage-subtitle-color);
+  font-family: var(--video-text-stage-subtitle-font-family);
+  font-size: var(--video-text-stage-subtitle-font-size);
+  font-weight: var(--video-text-stage-subtitle-font-weight);
+  line-height: var(--video-text-stage-subtitle-line-height);
+  margin: var(--video-component-subtitle-gap) 0 0;
+  text-shadow: var(--video-text-stage-subtitle-text-shadow, none);
+}

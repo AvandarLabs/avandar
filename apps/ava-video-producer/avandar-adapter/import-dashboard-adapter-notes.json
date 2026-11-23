@@ -48,7 +48,8 @@
     "Dashboard draft Share/Delete and Explorer Save dropdown markup follow their product parents; service mutations are excluded. The film activates only create and preview state changes.",
     "The original preview banner retains Not yet published. Viewers will not see this. No sharing or publication is demonstrated.",
     "Mantine's BarChart disables native animation. Frame-driven clip masks reveal original bars while fixture totals and axis domains remain constant.",
-    "Phase transitions keep outgoing states opaque while incoming opaque screens dissolve over them. No screenshot or recorded-video media is used."
+    "Phase transitions keep outgoing states opaque while incoming opaque screens dissolve over them. No screenshot or recorded-video media is used.",
+    "The map block's Puck config is aliased to shims/import-dashboard/useMapPBlockConfig.tsx, like the filter block. The real config pulls in the DuckDB map viewer, which cannot be bundled for the browser film. The film never adds a map block; the shim throws if it renders one."
   ],
   "fixtures": {
     "source": "demo-data/cases.csv",

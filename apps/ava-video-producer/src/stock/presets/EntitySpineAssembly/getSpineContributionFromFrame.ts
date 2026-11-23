@@ -1,4 +1,6 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { propEq } from "@avandar/utils";
+import { Motion } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./EntitySpineAssembly.schema";
 
 type Params = {
@@ -6,6 +8,7 @@ type Params = {
   observation: Input["observations"][number];
   index: number;
   frame: number;
+  motion: VideoMotion;
 };
 /** Data for getSpineContributionFromFrame. */
 type GetSpineContributionFromFrameResult = {
@@ -17,38 +20,103 @@ type GetSpineContributionFromFrameResult = {
   sum: number;
 };
 
+/** Measures the preceding entity stacks with the authored row spacing. */
+function _getSpineGroupStartFromInput({
+  input,
+  entityIndex,
+}: Readonly<GetSpineGroupStartFromInputOptions>): number {
+  return (
+    112 +
+    input.entities.slice(0, entityIndex).reduce((height, entity) => {
+      const numEntityObservations = input.observations.filter(
+        propEq("entityId", entity.id),
+      ).length;
+      return (
+        height + (numEntityObservations ? numEntityObservations * 20 + 34 : 0)
+      );
+    }, 0)
+  );
+}
+
 /** Foreground numeric contribution position through stacking and collapse. */
 export function getSpineContributionFromFrame({
   input,
   observation,
   index,
   frame,
+  motion,
 }: Readonly<Params>): GetSpineContributionFromFrameResult {
   const entityIndex = input.entities.findIndex(
-    ({ id }) => id === observation.entityId,
+    propEq("id", observation.entityId),
   );
-  const groupStart =
-    112 +
-    input.entities.slice(0, entityIndex).reduce((height, entity) => {
-      const numEntityObservations = input.observations.filter(
-        ({ entityId }) => entityId === entity.id,
-      ).length;
-      return (
-        height + (numEntityObservations ? numEntityObservations * 20 + 34 : 0)
-      );
-    }, 0);
-  const entityRows = input.observations.filter(
-    ({ entityId }) => entityId === observation.entityId,
-  );
-  const rank = entityRows.findIndex(({ id }) => id === observation.id);
-  const stackY = groupStart + 36 + rank * 20;
-  const y = mix(ramp(frame, 61, 21, EASE.inOut), 154 + index * 60, stackY);
+  const groupStart = _getSpineGroupStartFromInput({ input, entityIndex });
+  const entityRows = input.observations.filter(({ entityId }) => {
+    return entityId === observation.entityId;
+  });
+  const pose = _getContributionPoseFromRowsAndFrame({
+    entityRows,
+    observation,
+    groupStart,
+    index,
+    frame,
+    motion,
+  });
   return {
-    x: mix(ramp(frame, 49, 12, EASE.inOut), 60, 235),
-    y: mix(ramp(frame, 86, 19, EASE.inOut), y, groupStart + 36),
-    opacity: 1 - ramp(frame, 96, 9),
+    ...pose,
+    opacity:
+      1 -
+      Motion.ramp({ frame, at: 96, dur: 105 - 96, easing: motion.exit.easing }),
     groupStart,
     entityIndex,
-    sum: entityRows.reduce((total, { value }) => total + value, 0),
+    sum: entityRows.reduce((total, { value }) => {
+      return total + value;
+    }, 0),
+  };
+}
+
+type GetSpineGroupStartFromInputOptions = {
+  input: Input;
+  entityIndex: number;
+};
+
+/** A contribution's across, stacking, and collapse positions. */
+function _getContributionPoseFromRowsAndFrame({
+  entityRows,
+  observation,
+  groupStart,
+  index,
+  frame,
+  motion,
+}: Readonly<{
+  entityRows: Input["observations"];
+  observation: Input["observations"][number];
+  groupStart: number;
+  index: number;
+  frame: number;
+  motion: VideoMotion;
+}>): { x: number; y: number } {
+  const rank = entityRows.findIndex(({ id }) => {
+    return id === observation.id;
+  });
+  const stackY = groupStart + 36 + rank * 20;
+  // Each move runs cue to cue: across from 49, into the stack from 61, and
+  // collapsed from 86 until the contributions unmount at 105.
+  const travel = motion.travel.easing;
+  const y = Motion.mix({
+    t: Motion.ramp({ frame, at: 61, dur: 82 - 61, easing: travel }),
+    from: 154 + index * 60,
+    to: stackY,
+  });
+  return {
+    x: Motion.mix({
+      t: Motion.ramp({ frame, at: 49, dur: 61 - 49, easing: travel }),
+      from: 60,
+      to: 235,
+    }),
+    y: Motion.mix({
+      t: Motion.ramp({ frame, at: 86, dur: 105 - 86, easing: travel }),
+      from: y,
+      to: groupStart + 36,
+    }),
   };
 }

@@ -1,5 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import css from "@/views/GisApp/panels/LegendPanel/MapLegend/MapLegendGroup/MapLegendGroup.module.css";
 import type { ReactNode } from "react";
 

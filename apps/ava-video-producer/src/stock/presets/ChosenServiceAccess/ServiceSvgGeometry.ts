@@ -1,6 +1,16 @@
 import assert from "node:assert/strict";
 import { SvgAttributes } from "../../../../tests/helpers/SvgAttributes";
 
+type ParticipantCircle = {
+  x: number;
+  y: number;
+  rimRadius: number;
+  radius: number;
+};
+
+/** The stroke width SVG draws when no ancestor sets one. */
+const SVG_INITIAL_STROKE_WIDTH = 1;
+
 /** One actual SVG point in the service scene. */
 export type ServicePoint = { x: number; y: number };
 /** A straight emitted SVG path segment. */
@@ -74,7 +84,7 @@ function _getServiceParticipantGeometryFromMarkup(
   markup: string,
 ): ServiceParticipantGeometry {
   const result: ServiceParticipantGeometry = { circles: [], segments: [] };
-  const styles = [{ hasStroke: false, strokeWidth: 1 }];
+  const styles = [{ hasStroke: false, strokeWidth: SVG_INITIAL_STROKE_WIDTH }];
   [...markup.matchAll(/<\/?(?:g|path|circle)\b[^>]*>/g)].forEach(([tag]) => {
     if (tag.startsWith("</")) {
       if (tag.startsWith("</g")) {
@@ -93,23 +103,15 @@ function _getServiceParticipantGeometryFromMarkup(
     if (tag.startsWith("<g")) {
       styles.push(style);
     } else if (tag.startsWith("<circle")) {
-      result.circles.push({
-        x: SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "cx" }),
-        y: SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "cy" }),
-        rimRadius: SvgAttributes.getNumberFromMarkup({
-          attributes: tag,
-          name: "r",
-        }),
-        radius:
-          SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "r" }) +
-          (style.hasStroke ? style.strokeWidth / 2 : 0),
-      });
+      result.circles.push(_getParticipantCircleFromTag({ tag, style }));
     } else {
       result.segments.push(
-        ..._getServicePathSegmentsFromTag(tag).map((segment) => ({
-          ...segment,
-          strokeWidth: style.hasStroke ? style.strokeWidth : 0,
-        })),
+        ..._getServicePathSegmentsFromTag(tag).map((segment) => {
+          return {
+            ...segment,
+            strokeWidth: style.hasStroke ? style.strokeWidth : 0,
+          };
+        }),
       );
     }
   });
@@ -120,17 +122,22 @@ function _getServiceParticipantGeometryFromMarkup(
 function _getServiceObstaclesFromMarkup(markup: string): ServiceObstacle[] {
   return [
     ...markup.matchAll(
-      /<path data-barrier="[^"]*"[^>]*data-barrier-selected="false"[^>]*>/g,
+      /<path\b[^>]*\bdata-barrier="[^"]*"[^>]*data-barrier-selected="false"[^>]*>/g,
     ),
-  ].map(([tag]) => ({
-    segments: _getServicePathSegmentsFromTag(tag),
-    hasFill: _getAttribute({ tag, key: "fill" }) !== "none",
-    strokeWidth: SvgAttributes.getNumberFromMarkup({
-      attributes: tag,
-      name: "stroke-width",
-    }),
-  }));
+  ].map(([tag]) => {
+    return {
+      segments: _getServicePathSegmentsFromTag(tag),
+      hasFill: _getAttribute({ tag, key: "fill" }) !== "none",
+      strokeWidth: SvgAttributes.getNumberFromMarkup({
+        attributes: tag,
+        name: "stroke-width",
+      }),
+    };
+  });
 }
+
+type GetServiceParticipantGeometryFromMarkup =
+  typeof _getServiceParticipantGeometryFromMarkup;
 
 /** Related service svg geometry operations. */
 export const ServiceSvgGeometry = {
@@ -142,6 +149,28 @@ export const ServiceSvgGeometry = {
   getObstaclesFromMarkup: _getServiceObstaclesFromMarkup,
 } satisfies {
   getPathSegmentsFromTag: typeof _getServicePathSegmentsFromTag;
-  getParticipantGeometryFromMarkup: typeof _getServiceParticipantGeometryFromMarkup;
+  getParticipantGeometryFromMarkup: GetServiceParticipantGeometryFromMarkup;
   getObstaclesFromMarkup: typeof _getServiceObstaclesFromMarkup;
 };
+
+type GetParticipantCircleFromTagOptions = {
+  tag: string;
+  style: Readonly<{ hasStroke: boolean; strokeWidth: number }>;
+};
+/** Reads the circle radius together with its inherited stroke envelope. */
+function _getParticipantCircleFromTag({
+  tag,
+  style,
+}: Readonly<GetParticipantCircleFromTagOptions>): ParticipantCircle {
+  return {
+    x: SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "cx" }),
+    y: SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "cy" }),
+    rimRadius: SvgAttributes.getNumberFromMarkup({
+      attributes: tag,
+      name: "r",
+    }),
+    radius:
+      SvgAttributes.getNumberFromMarkup({ attributes: tag, name: "r" }) +
+      (style.hasStroke ? style.strokeWidth / 2 : 0),
+  };
+}

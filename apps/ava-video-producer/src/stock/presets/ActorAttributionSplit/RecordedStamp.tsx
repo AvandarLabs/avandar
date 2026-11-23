@@ -1,5 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -9,6 +10,8 @@ type Props = {
   y: number;
   color: string;
 };
+/** A ledger imprint's corner before the corner style scales it. */
+const IMPRINT_CORNER = 5;
 /** The permanent ledger imprint retains the recorded account label. */
 export function RecordedStamp({
   eventId,
@@ -17,14 +20,16 @@ export function RecordedStamp({
   y,
   color,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g data-stamp-event={eventId} transform={`translate(${x} ${y})`}>
-      <rect
+      <StockRect
         width={325}
         height={43}
         y={-9}
-        rx={5}
-        fill={STOCK.elevated}
+        rx={scales.corner(IMPRINT_CORNER)}
+        fill={tokens.color.elevated}
         stroke={color}
       />
       <LabelSlots labels={[[accountLabel, 10, 7, 305, 12, 2]]} />

@@ -19,7 +19,7 @@
   --chat-syntax-class: #4ec9b0;
 
   font-size: var(--mantine-font-size-sm);
-  line-height: 1.5;
+  line-height: 1.55;
   overflow-wrap: anywhere;
 }
 
@@ -32,7 +32,7 @@
 }
 
 .markdownTextPartMarkdown p {
-  margin: 0 0 var(--mantine-spacing-xs);
+  margin: 0 0 var(--mantine-spacing-sm);
 }
 
 .markdownTextPartMarkdown h1,
@@ -60,7 +60,20 @@
 .markdownTextPartMarkdown ul,
 .markdownTextPartMarkdown ol {
   margin: 0 0 var(--mantine-spacing-xs);
-  padding-left: 1.25rem;
+  padding-inline-start: 1.25rem;
+}
+
+/* The global reset strips list markers, so restore them for prose. */
+.markdownTextPartMarkdown ul {
+  list-style: disc;
+}
+
+.markdownTextPartMarkdown ol {
+  list-style: decimal;
+}
+
+.markdownTextPartMarkdown li::marker {
+  color: var(--mantine-color-neutral-5);
 }
 
 .markdownTextPartMarkdown li + li {
@@ -108,6 +121,7 @@
 .markdownTextPartMarkdown :not(pre) > code {
   background: var(--mantine-color-neutral-1);
   border-radius: var(--mantine-radius-xs);
+  color: var(--mantine-color-neutral-9);
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.85em;
   padding: 1px 4px;
@@ -131,7 +145,11 @@
   margin-top: 0;
 }
 
-.markdownTextPartCodeBlockCode,
+/*
+ * The `code` override tags every code element with this class, inline ones
+ * included, so the block treatment is scoped to code inside a `pre`. Inline
+ * code keeps the pill styling above.
+ */
 .markdownTextPartMarkdown pre code.markdownTextPartCodeBlockCode {
   background: transparent;
   border-radius: 0;

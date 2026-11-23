@@ -45,7 +45,11 @@ export const inputSchema = z
         message: "Observation IDs must be unique.",
       });
     }
-    if (input.observations.every(({ value }) => value === null)) {
+    if (
+      input.observations.every(({ value }) => {
+        return value === null;
+      })
+    ) {
       context.addIssue({
         code: "custom",
         path: ["observations"],

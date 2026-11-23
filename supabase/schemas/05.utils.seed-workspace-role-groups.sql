@@ -59,6 +59,14 @@ begin
           'admin'::public.role_level
         ),
         (
+          'case_types'::public.app_type,
+          'admin'::public.role_level
+        ),
+        (
+          'case_records'::public.app_type,
+          'admin'::public.role_level
+        ),
+        (
           'settings'::public.app_type,
           'admin'::public.role_level
         )
@@ -104,6 +112,14 @@ begin
         (
           'gis'::public.app_type,
           'editor'::public.role_level
+        ),
+        (
+          'case_types'::public.app_type,
+          'editor'::public.role_level
+        ),
+        (
+          'case_records'::public.app_type,
+          'editor'::public.role_level
         )
     ) as a (
       app,
@@ -146,6 +162,14 @@ begin
         ),
         (
           'gis'::public.app_type,
+          'viewer'::public.role_level
+        ),
+        (
+          'case_types'::public.app_type,
+          'viewer'::public.role_level
+        ),
+        (
+          'case_records'::public.app_type,
           'viewer'::public.role_level
         )
     ) as a (

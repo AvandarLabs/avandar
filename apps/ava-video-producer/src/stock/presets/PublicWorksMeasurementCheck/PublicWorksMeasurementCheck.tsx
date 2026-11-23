@@ -1,8 +1,8 @@
-import { EASE, ramp } from "../../../motion";
-import { MeasuredStructure } from "./MeasuredStructure";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { MeasuredStructure } from "./MeasuredStructure/MeasuredStructure";
 import { MeasurementCaptions } from "./MeasurementCaptions";
-import { TapeObservers } from "./TapeObservers";
-import type { GraphicProps } from "../../graphics-common";
+import { TapeObservers } from "./TapeObservers/TapeObservers";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./PublicWorksMeasurementCheck.schema";
 import type { ReactNode } from "react";
 
@@ -13,8 +13,12 @@ export function PublicWorksMeasurementCheck({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const endX =
-    200 + input.observation.length * 65 * ramp(frame, 36, 72, EASE.inOut);
+    200 +
+    input.observation.length *
+      65 *
+      motion.ramp(frame, 36, motion.scale(72), motion.travel.easing);
   return (
     <g>
       <MeasuredStructure input={input} accent={accent} />

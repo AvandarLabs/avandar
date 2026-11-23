@@ -1,7 +1,10 @@
+/* The Atlas chrome scale, shared with the showcase pages. */
+@import url("../../showcase/chrome-tokens.css");
+
 html,
 body,
 #root {
-  background: #080b12;
+  background: var(--atlas-color-player-ground);
   margin: 0;
   width: 100%;
 }
@@ -12,29 +15,25 @@ body,
 
 .captionToggle {
   align-items: center;
-  background: #101820e8;
-  border-radius: 4px;
-  color: #fff;
+  background: var(--atlas-color-player-control);
+  border-radius: var(--atlas-radius-4);
+  color: var(--atlas-color-white);
   display: flex;
-  font:
-    11px system-ui,
-    sans-serif;
-  gap: 5px;
-  padding: 5px 8px;
+  font: var(--atlas-font-size-11) var(--atlas-font-family-system);
+  gap: var(--atlas-space-5);
+  padding: var(--atlas-space-5) var(--atlas-space-8);
   position: absolute;
   right: 7px;
   top: 7px;
-  z-index: 20000;
+  z-index: var(--atlas-layer-20000);
 }
 
 .captionToggle input {
-  accent-color: #1563fe;
+  accent-color: var(--atlas-color-player-accent);
 }
 
 .liveError {
-  color: #fff;
-  font:
-    14px system-ui,
-    sans-serif;
-  padding: 20px;
+  color: var(--atlas-color-white);
+  font: var(--atlas-font-size-14) var(--atlas-font-family-system);
+  padding: var(--atlas-space-20);
 }
