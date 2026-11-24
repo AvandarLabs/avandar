@@ -1,4 +1,5 @@
 import { useQueries } from "@tanstack/react-query";
+import { useEffect, useRef } from "react";
 import { MapLayerData } from "@/views/GisApp/layers/useMapLayersData/MapLayerData";
 import { useDuckDbSpatialAvailability } from "@/views/GisApp/useDuckDbSpatialAvailability";
 import { isSpatialMapLayerBinding, runMapLayerQuery } from "./runMapLayerQuery";
@@ -83,7 +84,25 @@ type LayerQueryContext = {
   overlay: MapOverlay;
   spatialAvailability: DuckDbSpatialAvailability;
   jitterSalt: string;
+
+  /** The data a layer last resolved to, under any earlier query key. */
+  getLastData: (layerId: MapLayer.Id) => MapLayerDataResult | undefined;
 };
+
+/** Each layer's current data, keyed by layer, for layers that have any. */
+function _makeLastDataByLayerId(
+  layers: readonly MapLayer.T[],
+  results: readonly LayerQueryResult[],
+): Map<MapLayer.Id, MapLayerDataResult> {
+  const lastDataByLayerId = new Map<MapLayer.Id, MapLayerDataResult>();
+  layers.forEach((layer, layerIndex) => {
+    const data = results[layerIndex]?.data;
+    if (data !== undefined) {
+      lastDataByLayerId.set(layer.id, data);
+    }
+  });
+  return lastDataByLayerId;
+}
 
 function _createLayerQuery(
   layer: MapLayer.T,
@@ -128,10 +147,13 @@ function _createLayerQuery(
     ],
     // A point layer re-aggregates on every zoom band, so without a placeholder
     // the layer would blank out and refit on each step rather than repaint.
+    // `useQueries` gives a layer whose key changed a new observer, so the
+    // `previous` argument is empty then and the layer's last data comes from
+    // `getLastData` instead.
     placeholderData:
       isSpatialMapLayerBinding(layer) || isLatLngPointLayer
         ? (previous: MapLayerDataResult | undefined) => {
-            return previous;
+            return previous ?? context.getLastData(layer.id);
           }
         : undefined,
     queryFn: async ({ signal }): Promise<MapLayerDataResult> => {
@@ -203,6 +225,9 @@ export function useMapLayersData({
 }: UseMapLayersDataOptions): Map<MapLayer.Id, MapLayerQueryState> {
   const spatialAvailability = useDuckDbSpatialAvailability();
   const zoomBand = Math.max(0, Math.min(24, Math.floor(zoom)));
+  const lastDataByLayerIdRef = useRef<
+    ReadonlyMap<MapLayer.Id, MapLayerDataResult>
+  >(new Map());
   const results = useQueries({
     queries: layers.map((layer) => {
       return _createLayerQuery(layer, {
@@ -215,8 +240,16 @@ export function useMapLayersData({
         overlay,
         spatialAvailability,
         jitterSalt,
+        getLastData: (layerId) => {
+          return lastDataByLayerIdRef.current.get(layerId);
+        },
       });
     }),
+  });
+  // Runs after every commit: the `useQueries` result is a new array on each
+  // render, so it cannot serve as a dependency.
+  useEffect(function rememberLastLayerData() {
+    lastDataByLayerIdRef.current = _makeLastDataByLayerId(layers, results);
   });
   return _toLayerQueryStateMap(layers, overlay, spatialAvailability, results);
 }

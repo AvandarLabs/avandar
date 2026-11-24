@@ -883,4 +883,53 @@ describe("useMapLayersData with query-time widened layers", () => {
     expect(runSpatialQueryMock).toHaveBeenCalledTimes(1);
     expect(runSpatialQueryMock.mock.calls[0]![0].rawSql).toContain("loc_name");
   });
+
+  it("keeps a geometry layer's previous features while the next zoom band loads", async () => {
+    const layer = createSpatialLayer();
+    const firstBandFeatures: GeoJSON.Feature[] = [
+      {
+        type: "Feature",
+        geometry: { type: "Point", coordinates: [10, 10] },
+        properties: {},
+      },
+    ];
+    runSpatialQueryMock.mockResolvedValueOnce(
+      _createSpatialEnvelopeResult(firstBandFeatures),
+    );
+    // The next zoom band's query never settles, so the layer stays mid-load.
+    runSpatialQueryMock.mockReturnValueOnce(
+      new Promise(() => {
+        return undefined;
+      }),
+    );
+    const { result, rerender } = renderHook(
+      ({ zoom }: { zoom: number }) => {
+        return useMapLayersData({
+          jitterSalt: "test-map-salt",
+          layers: [layer],
+          workspaceId,
+          zoom,
+          overlay: EMPTY_MAP_OVERLAY,
+        });
+      },
+      { wrapper: wrapperForHook, initialProps: { zoom: 8 } },
+    );
+    await waitFor(() => {
+      expect(result.current.get(layer.id)?.data?.type).toBe("spatial");
+    });
+
+    rerender({ zoom: 14 });
+
+    await waitFor(() => {
+      expect(runSpatialQueryMock).toHaveBeenCalledTimes(2);
+    });
+    const layerState = result.current.get(layer.id);
+    expect(
+      layerState?.data?.type === "spatial"
+        ? layerState.data.featureCollection.features
+        : undefined,
+    ).toEqual(firstBandFeatures);
+    expect(layerState?.isLoading).toBe(false);
+    expect(layerState?.isRefreshing).toBe(true);
+  });
 });
