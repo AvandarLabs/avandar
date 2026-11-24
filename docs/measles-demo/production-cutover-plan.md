@@ -40,7 +40,7 @@ review gets a public post-commit review.
 | D4 | The crosswalk privacy gap | **Release with it and fix forward.** Production has no active users, and the release is needed for marketing. Tracked as Linear AVA-611, High priority. |
 | D5 | Does staging get the catalog through the same replace import as production | **Yes, staging first**, as the rehearsal of the production load. |
 | D6 | When the demo domain, the Vercel `demo` environment, the `demo-measles` Supabase branch, and `demo/measles` are deleted | **Seven days after the production smoke test passes** and the catalog dump is archived. |
-| D7 | Creating the public review labels, board, and issues | **All 139 issues are opened together, and only on Pablo's approval.** Nothing is created automatically. The runbook holds a prompt Pablo pastes into a new agent session when he is ready. |
+| D7 | Creating the public review labels, board, and issues | **All 141 issues are opened together, and only on Pablo's approval.** Nothing is created automatically. The runbook holds a prompt Pablo pastes into a new agent session when he is ready. |
 | E1 | How CI addresses the staging site in Vercel | **The Vercel environment named `staging`.** It already exists, with staging's variables pointing at the staging Supabase project. |
 | A2 | Does `ava release --yes` proceed on a non-passing CI verdict | **No: it stops.** Overriding takes `--skip-ci-check`. Chosen because `main` now deploys production. |
 
@@ -71,7 +71,7 @@ Verified on 2026-11-23 from a fresh `git fetch origin`. Rows marked
 | Files that conflict in one plain merge | 110: 83 modify/delete, 26 content, 2 rename/delete |
 | Migrations | 192 on `demo/measles`, 184 on `develop`, 115 on `main`. Shared files are byte-identical. Nine only on `demo/measles`, one only on `develop`. |
 | Edge functions | 17 on both branches, 13 on `main`. New for production: `connectors`, `file-url`, `geocode`, `_eval`. |
-| Feature log | **Changed:** 139 features, numbered F1 to F141. The alpha line is F141, not F139. |
+| Feature log | **Changed:** 141 features, numbered F1 to F141. The alpha line is F141, not F139. |
 | `demo-measles` Supabase branch | `ACTIVE_HEALTHY`, not persistent |
 | Supabase CLI on this machine | 2.114.0, logged in. `psql` and `pg_dump` are version 14, too old for the catalog scripts. |
 
@@ -390,7 +390,7 @@ that already landed, and history is never rewritten.
   It stops being a porting list and becomes the review backlog.
 - **One public issue per feature**, from a `retro-review` template and label,
   on a public board: not reviewed, in review, findings open, reviewed.
-- **All 139 issues are opened together, on Pablo's approval** (D7). No agent
+- **All 141 issues are opened together, on Pablo's approval** (D7). No agent
   creates a label, a board, or an issue as part of the cutover. The runbook
   holds a prompt that Pablo pastes into a new agent session when he is ready.
   The issue template and the policy document are repository files, so they

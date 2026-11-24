@@ -36,6 +36,34 @@ describe("getFeaturesFromFeatureLog", () => {
       },
     ]);
   });
+
+  it("keeps a row with no section, with an empty section", () => {
+    const featureLog = `
+| F1 | Case statuses | not started | | |
+
+## F2: Catalog search
+
+A search box.
+`;
+
+    expect(getFeaturesFromFeatureLog(featureLog)).toEqual([
+      { id: "F1", title: "Case statuses", section: "" },
+    ]);
+  });
+
+  it("skips a section with no table row", () => {
+    const featureLog = `${FEATURE_LOG}
+## F3: Offline uploads
+
+Reads the local copy.
+`;
+
+    expect(
+      getFeaturesFromFeatureLog(featureLog).map((feature) => {
+        return feature.id;
+      }),
+    ).toEqual(["F1", "F2"]);
+  });
 });
 
 describe("getReviewTierFromSection", () => {
