@@ -603,7 +603,9 @@ report_missing_listing_ids() {
     return 0
   fi
   echo "$missing_count listing ids in the target are not in the dump, so a replace drops them:"
-  printf '%s\n' "$missing_ids" | head -n "$MAX_LISTED_IDS" | sed 's/^/  /'
+  # sed reads every line, where `head` would exit early and break the pipe
+  # under pipefail once the ids outgrow the pipe's buffer.
+  printf '%s\n' "$missing_ids" | sed -n "1,${MAX_LISTED_IDS}s/^/  /p"
   if ((missing_count > MAX_LISTED_IDS)); then
     echo "  ...and $((missing_count - MAX_LISTED_IDS)) more."
   fi

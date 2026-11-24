@@ -146,6 +146,12 @@ const AVANDAR_OPEN_DATA_DATASETS = [
 /** The cascade total: 4 `datasets__open_data` rows and 4 datasets. */
 const CASCADE_ROWS = "8";
 
+/**
+ * How many listing ids a target holds that the dump does not, in the test
+ * for the report's list of them: over 64 KB of ids, more than a pipe holds.
+ */
+const MANY_MISSING_IDS = 6_000;
+
 /** The ids 1 to 6, one per line, as the fake target reports them. */
 const SIX_IDS = "1\n2\n3\n4\n5\n6\n";
 
@@ -1195,7 +1201,9 @@ describe("importCatalogData.sh --replace-existing", SHELL_TEST_OPTIONS, () => {
     const replica = lines.indexOf(
       "set local session_replication_role = replica;",
     );
-    const origin = lines.indexOf("set local session_replication_role = origin;");
+    const origin = lines.indexOf(
+      "set local session_replication_role = origin;",
+    );
     const inserts = lines.flatMap((line, index) => {
       return line.startsWith("insert into ") ? [index] : [];
     });
@@ -1279,6 +1287,31 @@ describe("importCatalogData.sh --replace-existing", SHELL_TEST_OPTIONS, () => {
     expect(run.output).toMatch(
       /2 listing ids in the target are not in the dump[\s\S]*old-1[\s\S]*old-2/,
     );
+  });
+
+  it("lists only the first 50 of more than 5,000 missing listing ids on a dry run, without a broken pipe", () => {
+    const missingIds = Array.from({ length: MANY_MISSING_IDS }, (_, index) => {
+      return `old-listing-${String(index + 1).padStart(6, "0")}`;
+    });
+    const idsFile = join(workDir, "target-listing-ids.txt");
+    writeFileSync(idsFile, `l1\n${missingIds.join("\n")}\n`);
+
+    const run = _runReplace(["--dry-run"], { FAKE_IDS_FILE: idsFile });
+
+    expect(run.status, run.output).toBe(0);
+    expect(run.output).toContain(
+      `${MANY_MISSING_IDS} listing ids in the target are not in the dump`,
+    );
+    const listedIds = run.output.split("\n").filter((line) => {
+      return line.startsWith("  old-listing-");
+    });
+    expect(listedIds).toEqual(
+      missingIds.slice(0, 50).map((id) => {
+        return `  ${id}`;
+      }),
+    );
+    expect(run.output).toContain(`...and ${MANY_MISSING_IDS - 50} more.`);
+    expect(run.output).toContain("Dry run: nothing was written.");
   });
 
   it("refuses a replace without a backup file", () => {
