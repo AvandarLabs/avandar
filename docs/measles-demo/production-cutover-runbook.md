@@ -579,10 +579,10 @@ REHEARSAL="$(wt new chore production-rehearsal chore/production-cutover)" && cd 
 export REHEARSAL
 git log -1 --format='%h %s'
 pnpm install --frozen-lockfile
-ava supabase status | grep -m1 -E "switched local|develop local"
+ava supabase status | grep -E "switched local|develop local"
 [[ -n "$REHEARSAL" && "$PWD" == "$REHEARSAL" ]] && ava supabase switch --no-seed
 pnpm fns:update-env
-ava supabase status | grep -m1 -E "switched local|develop local"
+ava supabase status | grep -E "switched local|develop local"
 git fetch origin
 export PROD_PENDING="$(comm -23 <(ls supabase/migrations | sort) <(git ls-tree --name-only origin/main supabase/migrations/ | sed 's#.*/##' | sort) | wc -l | tr -d ' ')"
 export TREE_COUNT="$(ls supabase/migrations | wc -l | tr -d ' ')"
@@ -2333,7 +2333,7 @@ git fetch origin && git status -sb
 pnpm install --frozen-lockfile
 pnpm build:ava-cli
 readlink "$(dirname "$(which pnpm)")/ava"
-ava release --help | head -3
+ava release --help | sed -n '1,3p'
 ```
 
 **Expect:** `## develop...origin/develop` with no changed files listed,
@@ -3159,7 +3159,7 @@ the status line:
 
 ```bash
 cd "$(wt path chore/production-cutover)" && ava supabase restore &&
-  ava supabase status | grep -m1 -E "switched local|develop local"
+  ava supabase status | grep -E "switched local|develop local"
 ```
 
 **Expect:** `This branch is back on the develop local Supabase. Its env
@@ -3274,3 +3274,4 @@ handled.
 | [The pipeline server runbook](pipeline-server-fly-runbook.md) | Still says production's edge secrets are set by hand. CI sets them now |
 | Public Actions logs | A failed `supabase db push` can print row data (11.9). The Vercel CLI prints the team slug, project name, and deployment URL |
 | `ava` | One global symlink: whoever last ran `pnpm build:ava-cli` decides which code `ava release` runs (11.1) |
+| `ava` output | If `ava` prints `write EPIPE` after a status line, it only means the next command stopped reading early: the status was already printed and nothing failed. |
