@@ -222,10 +222,11 @@ with_db_url() {
 read_db() { with_db_url "$1" "$PSQL_BIN" -X -P pager=off -q -t -A -v ON_ERROR_STOP=1 \
   -c 'begin transaction read only' -c "$2" -c 'rollback'; }
 COUNTS_SQL="select (select count(*) from auth.users) as users, (select count(*) from public.workspaces) as workspaces, (select count(*) from public.dashboards) as dashboards, (select count(*) from public.datasets) as datasets, (select count(*) from public.dataset_columns) as dataset_columns"
-# Auth tables the data dump (4.2) leaves out. The last four exist only in
-# production's Auth version, so loading them fails on the local stack. All
-# four held 0 rows on 2026-11-24, and the rehearsal does not need them.
-AUTH_SEED_EXCLUDES=(-x auth.sessions -x auth.refresh_tokens -x auth.one_time_tokens -x auth.flow_state -x auth.audit_log_entries -x auth.mfa_amr_claims -x auth.mfa_recovery_code_sets -x auth.mfa_recovery_codes -x auth.scim_tokens -x auth.scim_users)
+# Auth tables the data dump (4.2) leaves out. Four exist only in production's
+# Auth version, so loading them fails on the local stack. auth.saml_providers
+# exists locally but lacks production's dedicated_scope column. All five held
+# 0 rows on 2026-11-24, and the rehearsal does not need them.
+AUTH_SEED_EXCLUDES=(-x auth.sessions -x auth.refresh_tokens -x auth.one_time_tokens -x auth.flow_state -x auth.audit_log_entries -x auth.mfa_amr_claims -x auth.mfa_recovery_code_sets -x auth.mfa_recovery_codes -x auth.scim_tokens -x auth.scim_users -x auth.saml_providers)
 # The rehearsal worktree (4.1). Every local reset, `migration up`, and load
 # of production data runs behind on_rehearsal_stack: it moves into that
 # worktree and succeeds only when its status names the rehearsal's own
@@ -704,35 +705,51 @@ read_db "$LOCAL_DB_URL" "$COUNTS_SQL"
 first line of `~/avandar-cutover/dumps/prod-rehearsal-counts.txt` (4.2).
 **If not:** no psql output at all means `on_rehearsal_stack` failed and
 nothing ran: stop. An `ERROR` line means the whole transaction rolled back,
-so nothing was loaded: fix the cause, then repeat from 4.3. An error on an
-`auth` table (a missing column or a duplicate key) means the local Auth
-version differs from production's. A missing table fails with a line such
-as `ERROR:  relation "auth.mfa_recovery_code_sets" does not exist`, which
-is what the four tables in 2.4 part 1 cause when they are missing locally.
-To recover, first list every auth table the dump has that the local schema
-lacks, with this read-only check run in the open terminal. The second
-command prints each COPY block's row count, so you can see which listed
-tables hold rows:
+so nothing was loaded. The database is still exactly as 4.3 and 4.4 left
+it, so after the fix below you go straight back to this load without
+repeating 4.3 or 4.4. Repeat from 4.3 only when you are unsure of the
+database's state, such as after opening a new terminal or changing the
+stack. An error on an `auth` table means the local Auth version differs
+from production's. A missing table fails with a line such as
+`ERROR:  relation "auth.mfa_recovery_code_sets" does not exist`, which is
+what the four tables in 2.4 part 1 cause when they are missing locally. A
+missing column fails with a line such as
+`ERROR:  column "dedicated_scope" of relation "saml_providers" does not exist`,
+which is what `auth.saml_providers` causes. To find every mismatch at once,
+run this read-only check in the open terminal. It compares each COPY
+block's table and columns in both dumps with the local database, and prints
+one line per mismatch with that block's row count:
 
 ```bash
-# Tables in the auth dump that the local schema does not have.
-comm -23 <(grep -oE '^COPY "?auth"?\."?[a-z_]+' "$D/prod-rehearsal-data-auth.sql" | sed -E 's/.*\.//; s/"//g' | sort) <(read_db "$LOCAL_DB_URL" "select table_name from information_schema.tables where table_schema='auth' and table_type='BASE TABLE'" | sort)
-# Row count of each COPY block in the auth dump.
-awk '/^COPY /{t=$2; n=0; inBlock=1; next} inBlock && /^\\\.$/{print t, n; inBlock=0; next} inBlock{n++}' "$D/prod-rehearsal-data-auth.sql"
+# Read-only. Prints one line per mismatch, and nothing when both dumps match.
+read_db "$LOCAL_DB_URL" "select table_schema || '.' || table_name || '.' || column_name from information_schema.columns where table_schema in ('auth','public')" > "$D/local-columns.txt"
+for f in "$D/prod-rehearsal-data-auth.sql" "$D/prod-rehearsal-data-public.sql"; do
+  awk '
+    !inside && /^COPY [^ ]+ \(/ { t=$2; gsub(/"/,"",t); c=$0; sub(/^[^(]*\(/,"",c); sub(/\) FROM stdin;.*/,"",c); gsub(/[" ]/,"",c); n=0; inside=1; next }
+    inside && /^\\\.$/ { print t "\t" n "\t" c; inside=0; next }
+    inside { n++ }' "$f"
+done | while IFS=$'\t' read -r tbl rows cols; do
+  if ! grep -qF "$tbl." "$D/local-columns.txt"; then echo "$tbl ($rows rows): table missing locally"; continue; fi
+  for col in $(echo "$cols" | tr ',' ' '); do
+    grep -qxF "$tbl.$col" "$D/local-columns.txt" || echo "$tbl ($rows rows): local table lacks column $col"
+  done
+done
 ```
 
-Any listed table can be excluded the same way, including one with rows,
-except `auth.users` and `auth.identities`. A missing one of those is a
-blocker to raise, so stop there. For each table you exclude, run
+No output means every table and column in both dumps exists locally, so
+the load needs no more exclusions. Each printed line names a table to
+exclude when it is an `auth` table with 0 rows. For each one, run
 `AUTH_SEED_EXCLUDES+=(-x auth.<table>)` once in the open terminal, so the
 array holds it. (A new terminal needs the updated `AUTH_SEED_EXCLUDES` line
-from 2.4 part 1 instead.) Then run `cd "$REHEARSAL"`, re-run only the auth
-dump line of 4.2, which is `supabase db dump --db-url "$PROD_DB_URL" --data-only --use-copy -s auth "${AUTH_SEED_EXCLUDES[@]}" -f "$D/prod-rehearsal-data-auth.sql"`,
+from 2.4 part 1 instead.) A mismatch on `auth.users` or `auth.identities`,
+on any `public` table, or on any table with rows is a blocker: stop and
+raise it. Do not exclude it. Once every printed line is excluded, run
+`cd "$REHEARSAL"`, re-run only the auth dump line of 4.2, which is `supabase db dump --db-url "$PROD_DB_URL" --data-only --use-copy -s auth "${AUTH_SEED_EXCLUDES[@]}" -f "$D/prod-rehearsal-data-auth.sql"`,
 then run the `sed -i ''` cleanup and the `grep -c` check on that one file
 only: `sed -i '' '/^SET transaction_timeout = 0;$/d' "$D/prod-rehearsal-data-auth.sql"`
 and `grep -c 'PostgreSQL database dump complete' "$D/prod-rehearsal-data-auth.sql"`,
-which should print `1`. The failed load rolled back and loaded nothing, so
-repeat from 4.3.
+which should print `1`. Then run this block's load again, without
+repeating 4.3 or 4.4.
 
 ### 4.6 Apply the migrations production does not have
 
