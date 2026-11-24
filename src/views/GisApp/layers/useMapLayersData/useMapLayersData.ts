@@ -1,4 +1,4 @@
-import { useQueries } from "@tanstack/react-query";
+import { hashKey, useQueries } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import { MapLayerData } from "@/views/GisApp/layers/useMapLayersData/MapLayerData";
 import { useDuckDbSpatialAvailability } from "@/views/GisApp/useDuckDbSpatialAvailability";
@@ -11,6 +11,7 @@ import type { DuckDbSpatialAvailability } from "@/clients/DuckDbClient/DuckDbSpa
 import type { MapOverlay } from "@/clients/maps/MapLayerSpatialQuery/compileMapLayerSpatialQuery/compileMapLayerSpatialQuery.types";
 import type { MapLayerDataResult } from "@/views/GisApp/layers/MapLayerDataResult.types";
 import type { UseQueryOptions } from "@tanstack/react-query";
+import type { RefObject } from "react";
 
 type LayerQueryResult = {
   data: MapLayerDataResult | undefined;
@@ -85,42 +86,103 @@ type LayerQueryContext = {
   spatialAvailability: DuckDbSpatialAvailability;
   jitterSalt: string;
 
-  /** The data a layer last resolved to, under any earlier query key. */
-  getLastData: (layerId: MapLayer.Id) => MapLayerDataResult | undefined;
+  /**
+   * The data a layer last resolved to, when it was queried under the same
+   * view-free key hash. Undefined once anything but the view has changed.
+   */
+  getLastData: (
+    layerId: MapLayer.Id,
+    viewFreeKeyHash: string,
+  ) => MapLayerDataResult | undefined;
 };
 
-/** Each layer's current data, keyed by layer, for layers that have any. */
-function _makeLastDataByLayerId(
-  layers: readonly MapLayer.T[],
+/** A layer's last data and the view-free key hash it was queried under. */
+type LastLayerData = {
+  data: MapLayerDataResult;
+  viewFreeKeyHash: string;
+};
+
+/**
+ * Hashes a layer's query key without its view contexts, so the hash ignores
+ * the zoom band and the simplification latitude but changes with anything
+ * else the key holds: the source and its filters, the geo binding, the
+ * sensitivity, the time range, the AOI, and the layers it depends on.
+ */
+function _makeViewFreeKeyHashFromLayer(
+  layer: MapLayer.T,
+  context: Pick<LayerQueryContext, "workspaceId" | "overlay" | "layers">,
+): string {
+  return hashKey([
+    context.workspaceId,
+    ...MapLayerData.getQueryKeyFromMapLayer(
+      layer,
+      undefined,
+      context.overlay,
+      context.layers,
+      undefined,
+    ),
+  ]);
+}
+
+/** A layer paired with its view-free key hash for one render. */
+type HashedLayer = {
+  layer: MapLayer.T;
+  viewFreeKeyHash: string;
+};
+
+/** Each layer's current data and key hash, for layers that have any data. */
+function _makeLastDataByLayerIdFromResults(
+  hashedLayers: readonly HashedLayer[],
   results: readonly LayerQueryResult[],
-): Map<MapLayer.Id, MapLayerDataResult> {
-  const lastDataByLayerId = new Map<MapLayer.Id, MapLayerDataResult>();
-  layers.forEach((layer, layerIndex) => {
+): Map<MapLayer.Id, LastLayerData> {
+  const lastDataByLayerId = new Map<MapLayer.Id, LastLayerData>();
+  hashedLayers.forEach(({ layer, viewFreeKeyHash }, layerIndex) => {
     const data = results[layerIndex]?.data;
     if (data !== undefined) {
-      lastDataByLayerId.set(layer.id, data);
+      lastDataByLayerId.set(layer.id, { data, viewFreeKeyHash });
     }
   });
   return lastDataByLayerId;
 }
 
+/**
+ * Reads a layer's last data from the ref, only under a matching key hash.
+ *
+ * TanStack calls `placeholderData` inside `getOptimisticResult`, which runs
+ * during render, so this getter reads the ref during render. That is safe:
+ * the ref only ever holds data from a committed render, and it is written in
+ * an effect, never during render.
+ */
+function _makeLastDataGetterFromRef(
+  lastDataByLayerIdRef: RefObject<ReadonlyMap<MapLayer.Id, LastLayerData>>,
+): LayerQueryContext["getLastData"] {
+  return (layerId, viewFreeKeyHash) => {
+    const lastLayerData = lastDataByLayerIdRef.current.get(layerId);
+    return lastLayerData?.viewFreeKeyHash === viewFreeKeyHash
+      ? lastLayerData.data
+      : undefined;
+  };
+}
+
 function _createLayerQuery(
   layer: MapLayer.T,
   context: LayerQueryContext,
+  viewFreeKeyHash: string,
 ): UseQueryOptions<MapLayerDataResult> {
   const needsSpatial = _layerNeedsSpatial(layer, context.overlay);
   const isCapabilityReady =
     !needsSpatial || context.spatialAvailability === "available";
   const isLatLngPointLayer = layer.geoBinding?.type === "latLngColumns";
+  const isEnabled =
+    MapLayerData.isQueryable(layer, context.layers) &&
+    isCapabilityReady &&
+    MapLayerData.hasReadySourceFilters({
+      layer: layer,
+      stack: context.layers,
+    });
 
   return {
-    enabled:
-      MapLayerData.isQueryable(layer, context.layers) &&
-      isCapabilityReady &&
-      MapLayerData.hasReadySourceFilters({
-        layer: layer,
-        stack: context.layers,
-      }),
+    enabled: isEnabled,
 
     // `context.zoomBand` is read by `runLatLngLayer` but only enters the key
     // for a lat/lng layer, which is the only binding that reaches it: every
@@ -148,12 +210,14 @@ function _createLayerQuery(
     // A point layer re-aggregates on every zoom band, so without a placeholder
     // the layer would blank out and refit on each step rather than repaint.
     // `useQueries` gives a layer whose key changed a new observer, so the
-    // `previous` argument is empty then and the layer's last data comes from
-    // `getLastData` instead.
+    // placeholder's `previous` argument is always empty and the layer's last
+    // data comes from `getLastData` instead. It is offered only when the view
+    // alone changed: a disabled layer, or one whose filters, sensitivity, or
+    // other query inputs changed, must not keep drawing its old features.
     placeholderData:
-      isSpatialMapLayerBinding(layer) || isLatLngPointLayer
-        ? (previous: MapLayerDataResult | undefined) => {
-            return previous ?? context.getLastData(layer.id);
+      isEnabled && (isSpatialMapLayerBinding(layer) || isLatLngPointLayer)
+        ? () => {
+            return context.getLastData(layer.id, viewFreeKeyHash);
           }
         : undefined,
     queryFn: async ({ signal }): Promise<MapLayerDataResult> => {
@@ -226,30 +290,47 @@ export function useMapLayersData({
   const spatialAvailability = useDuckDbSpatialAvailability();
   const zoomBand = Math.max(0, Math.min(24, Math.floor(zoom)));
   const lastDataByLayerIdRef = useRef<
-    ReadonlyMap<MapLayer.Id, MapLayerDataResult>
+    ReadonlyMap<MapLayer.Id, LastLayerData>
   >(new Map());
-  const results = useQueries({
-    queries: layers.map((layer) => {
-      return _createLayerQuery(layer, {
-        layers,
+  const hashedLayers = layers.map((layer): HashedLayer => {
+    return {
+      layer,
+      viewFreeKeyHash: _makeViewFreeKeyHashFromLayer(layer, {
         workspaceId,
-        zoomBand,
-        simplificationReferenceLatitude,
-        datasets,
-        datasetColumns,
         overlay,
-        spatialAvailability,
-        jitterSalt,
-        getLastData: (layerId) => {
-          return lastDataByLayerIdRef.current.get(layerId);
+        layers,
+      }),
+    };
+  });
+  // Reads the ref during render: see `_makeLastDataGetterFromRef`.
+  const getLastData = _makeLastDataGetterFromRef(lastDataByLayerIdRef);
+  const results = useQueries({
+    queries: hashedLayers.map(({ layer, viewFreeKeyHash }) => {
+      return _createLayerQuery(
+        layer,
+        {
+          layers,
+          workspaceId,
+          zoomBand,
+          simplificationReferenceLatitude,
+          datasets,
+          datasetColumns,
+          overlay,
+          spatialAvailability,
+          jitterSalt,
+          getLastData,
         },
-      });
+        viewFreeKeyHash,
+      );
     }),
   });
   // Runs after every commit: the `useQueries` result is a new array on each
   // render, so it cannot serve as a dependency.
   useEffect(function rememberLastLayerData() {
-    lastDataByLayerIdRef.current = _makeLastDataByLayerId(layers, results);
+    lastDataByLayerIdRef.current = _makeLastDataByLayerIdFromResults(
+      hashedLayers,
+      results,
+    );
   });
   return _toLayerQueryStateMap(layers, overlay, spatialAvailability, results);
 }
