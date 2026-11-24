@@ -81,6 +81,17 @@ async function _agreeToSend(page: Page): Promise<void> {
   await dialog.getByRole("button", { name: "Send" }).click();
 }
 
+/**
+ * Confirms the prompt that the first send in a flow opens when nothing in it
+ * looks personal, such as a column with no value list.
+ */
+async function _confirmSend(page: Page): Promise<void> {
+  await page
+    .getByRole("dialog", { name: "Send to AI?" })
+    .getByRole("button", { name: "Send" })
+    .click();
+}
+
 async function _openCreateFromDataset(page: Page): Promise<void> {
   await page.getByRole("button", { name: "More dataset actions" }).click();
   await page
@@ -235,7 +246,7 @@ test.describe("learning a dictionary from a dataset", () => {
       await page
         .getByRole("button", { name: "Suggest a description for onset_dt" })
         .click();
-      await _agreeToSend(page);
+      await _confirmSend(page);
       await expect(onsetDescription).toHaveValue("Where the person was seen.", {
         timeout: MEDIUM_WAIT,
       });
