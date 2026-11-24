@@ -6,9 +6,13 @@ name: CI/CD for Staging
 # and reports its result, but does not block the deploy.
 #
 # Nothing touches staging until the deploy job has confirmed it is running
-# for the tip of `develop`, checked the staging configuration, and built the
-# web app. Only then does it migrate the database, set the edge function
-# secrets, deploy the edge functions, and finally deploy the prebuilt app.
+# for the tip of `develop`, checked the staging configuration and the Vercel
+# build environment, and built the web app. Only then does it migrate the
+# database, deploy the edge functions, and finally deploy the prebuilt app.
+#
+# The web app's build variables come from the Vercel staging environment.
+# Edge function secrets are managed on the staging Supabase project, and
+# this workflow does not change them.
 
 on:
   push:
@@ -38,7 +42,6 @@ env:
   # with "Module not found". 2.114.0 picks the longest matching entry.
   SUPABASE_CLI_VERSION: 2.114.0
   VERCEL_CLI_VERSION: 64.7.0
-  STAGING_APP_URL: https://staging.avandarlabs.com
 
 jobs:
   # Lint and TypeScript checks.
@@ -181,13 +184,14 @@ jobs:
           if-no-files-found: warn
 
   # Deploys to staging. The first steps only read: the tip check, the
-  # configuration check, and the Vercel pull and build. A failure in any of
-  # them leaves staging as it was. Then the job migrates the database, sets
-  # the edge function secrets, deploys the edge functions, and deploys the
-  # prebuilt app last.
+  # configuration check, the Vercel pull, the build environment check, and
+  # the build. A failure in any of them leaves staging as it was. Then the
+  # job migrates the database, deploys the edge functions, and deploys the
+  # prebuilt app last. It never changes the edge function secrets, which are
+  # managed on the staging Supabase project.
   #
-  # Staging credentials are set on the steps that use them, never on the job,
-  # so they do not reach the setup actions or unrelated scripts.
+  # Production credentials are set on the steps that use them, never on the
+  # job, so they do not reach the setup actions or unrelated scripts.
   deploy:
     if: github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
@@ -213,8 +217,8 @@ jobs:
           fi
 
       # Every value comes from the `staging` GitHub environment. An empty
-      # value would otherwise blank a staging edge function secret or
-      # point the build at nothing, after the migrations had already run.
+      # value would otherwise fail a later step, possibly after the
+      # migrations had already run.
       - name: Check the staging configuration
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
@@ -223,47 +227,10 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-          STAGING_SB_SECRET_KEY: ${{ secrets.STAGING_SB_SECRET_KEY }}
-          STAGING_SB_PUBLISHABLE_KEY: ${{ vars.STAGING_SB_PUBLISHABLE_KEY }}
-          STAGING_SUPABASE_URL: ${{ vars.STAGING_SUPABASE_URL }}
-          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-          POLAR_ACCESS_TOKEN: ${{ secrets.POLAR_ACCESS_TOKEN }}
-          UPSTASH_REDIS_API_URL: ${{ secrets.UPSTASH_REDIS_API_URL }}
-          UPSTASH_REDIS_REST_API_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_API_TOKEN }}
-          RESEND_SENDING_API_KEY: ${{ secrets.RESEND_SENDING_API_KEY }}
-          RESEND_FULL_ACCESS_API_KEY: ${{ secrets.RESEND_FULL_ACCESS_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPEN_ROUTER_API_KEY: ${{ secrets.OPEN_ROUTER_API_KEY }}
-          FEATUREBASE_JWT_SECRET: ${{ secrets.FEATUREBASE_JWT_SECRET }}
-          AVA_PIPELINE_SERVER_SECRET: ${{ secrets.AVA_PIPELINE_SERVER_SECRET }}
-          AVA_PIPELINE_SERVER_URL: ${{ secrets.AVA_PIPELINE_SERVER_URL }}
-          VITE_GOOGLE_PICKER_API_KEY: ${{ secrets.VITE_GOOGLE_PICKER_API_KEY }}
-          VITE_GOOGLE_PICKER_APP_ID: ${{ vars.VITE_GOOGLE_PICKER_APP_ID }}
-          GEOAPIFY_API_KEY: ${{ secrets.GEOAPIFY_API_KEY }}
         run: |
           required_names=(
             SUPABASE_ACCESS_TOKEN SUPABASE_DB_PASSWORD SUPABASE_PROJECT_ID
             VERCEL_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID
-            STAGING_SB_SECRET_KEY STAGING_SB_PUBLISHABLE_KEY
-            STAGING_SUPABASE_URL GOOGLE_CLIENT_ID GOOGLE_CLIENT_SECRET
-            POLAR_ACCESS_TOKEN UPSTASH_REDIS_API_URL
-            UPSTASH_REDIS_REST_API_TOKEN RESEND_SENDING_API_KEY
-            RESEND_FULL_ACCESS_API_KEY OPENAI_API_KEY OPEN_ROUTER_API_KEY
-            FEATUREBASE_JWT_SECRET AVA_PIPELINE_SERVER_SECRET
-            AVA_PIPELINE_SERVER_URL VITE_GOOGLE_PICKER_API_KEY
-            VITE_GOOGLE_PICKER_APP_ID
-          )
-          # Values written to the edge function secrets file. Each is single
-          # quoted there, so none may contain a single quote or a line break.
-          secrets_file_names=(
-            STAGING_SB_SECRET_KEY STAGING_SB_PUBLISHABLE_KEY
-            STAGING_SUPABASE_URL GOOGLE_CLIENT_ID GOOGLE_CLIENT_SECRET
-            POLAR_ACCESS_TOKEN UPSTASH_REDIS_API_URL
-            UPSTASH_REDIS_REST_API_TOKEN RESEND_SENDING_API_KEY
-            RESEND_FULL_ACCESS_API_KEY OPENAI_API_KEY OPEN_ROUTER_API_KEY
-            FEATUREBASE_JWT_SECRET AVA_PIPELINE_SERVER_SECRET
-            AVA_PIPELINE_SERVER_URL GEOAPIFY_API_KEY
           )
           has_problem=false
           for name in "${required_names[@]}"; do
@@ -274,7 +241,7 @@ jobs:
           done
           # A pasted value often picks up stray whitespace or a Windows line
           # ending, which would reach staging as part of the value.
-          for name in "${required_names[@]}" GEOAPIFY_API_KEY; do
+          for name in "${required_names[@]}"; do
             value="${!name}"
             if [ -n "$value" ] && [[ "$value" =~ ^[[:space:]]*$ ]]; then
               echo "$name is only whitespace." >&2
@@ -288,27 +255,6 @@ jobs:
               has_problem=true
             fi
           done
-          for name in "${secrets_file_names[@]}"; do
-            if [[ "${!name}" == *"'"* || "${!name}" == *$'\n'* ]]; then
-              echo "$name contains a single quote or a line break." >&2
-              has_problem=true
-            fi
-          done
-          if [ -n "$SUPABASE_PROJECT_ID" ] &&
-            [ "$STAGING_SUPABASE_URL" != "https://$SUPABASE_PROJECT_ID.supabase.co" ]; then
-            echo "STAGING_SUPABASE_URL must be https://<STAGING_PROJECT_ID>.supabase.co." >&2
-            has_problem=true
-          fi
-          if [ -n "$STAGING_SB_PUBLISHABLE_KEY" ] &&
-            [[ ! "$STAGING_SB_PUBLISHABLE_KEY" =~ ^sb_publishable_[A-Za-z0-9_-]+$ ]]; then
-            echo "STAGING_SB_PUBLISHABLE_KEY must be the publishable key (sb_publishable_...)." >&2
-            has_problem=true
-          fi
-          if [ -n "$STAGING_SB_SECRET_KEY" ] &&
-            [[ ! "$STAGING_SB_SECRET_KEY" =~ ^sb_secret_[A-Za-z0-9_-]+$ ]]; then
-            echo "STAGING_SB_SECRET_KEY must be an unmasked secret key (sb_secret_...)." >&2
-            has_problem=true
-          fi
           # `vercel deploy` looks the team up by this ID and only accepts a
           # Team ID. `vercel pull` skips that lookup, so check it here rather
           # than after a full build.
@@ -341,31 +287,83 @@ jobs:
           npx --yes "vercel@$VERCEL_CLI_VERSION" pull --yes \
             --environment=staging --token="$VERCEL_TOKEN"
           env_file=".vercel/.env.staging.local"
-          # The build sets these three from GitHub below, so a value set in
-          # Vercel never reaches the staging build.
-          sed -i -E '/^(VITE_SUPABASE_API_URL|VITE_SUPABASE_ANON_KEY|VITE_APP_URL)=/d' "$env_file"
           # Vercel never sends Sensitive values to `vercel pull`, only a
           # "[SENSITIVE]" placeholder, which the build would bake into the
-          # app. Drop them. The Google Picker values come from GitHub instead.
+          # app. A variable without the `VITE_` prefix never reaches the
+          # browser bundle, so drop it from the build. A `VITE_` placeholder
+          # stays in the file for the next step to refuse.
           sensitive_pattern='^[A-Z0-9_]+="?\[SENSITIVE\]"?$'
-          sensitive_names="$(grep -E "$sensitive_pattern" "$env_file" | cut -d= -f1 || true)"
+          sensitive_names="$(grep -E "$sensitive_pattern" "$env_file" | grep -v '^VITE_' | cut -d= -f1 || true)"
           echo "Sensitive Vercel variables left out of the build:"
           echo "${sensitive_names:-(none)}"
-          sed -i -E "/$sensitive_pattern/d; /^VITE_GOOGLE_PICKER_(API_KEY|APP_ID)=/d" "$env_file"
+          sed -i -E "/^VITE_/!{/$sensitive_pattern/d}" "$env_file"
+
+      # The build takes its variables only from the Vercel environment pulled
+      # above. Refuse, before anything is written, a build that would ship a
+      # placeholder, miss a required value, or reach a different database
+      # than the one this job migrates. The log is public, so this prints
+      # names and fixed sentences only, never a value.
+      - name: Check the Vercel build environment
+        env:
+          SUPABASE_PROJECT_ID: ${{ secrets.STAGING_PROJECT_ID }}
+        run: |
+          env_file=".vercel/.env.staging.local"
+          # Prints the last value set for the name in $1, without one pair of
+          # surrounding double quotes. `vercel pull` quotes every value.
+          read_pulled_value() {
+            local line
+            local value
+            line="$(grep -E "^$1=" "$env_file" | tail -n 1 || true)"
+            value="${line#*=}"
+            if [[ "$value" == \"*\" ]]; then
+              value="${value:1:${#value}-2}"
+            fi
+            printf '%s' "$value"
+          }
+          has_problem=false
+          sensitive_pattern='^VITE_[A-Z0-9_]*="?\[SENSITIVE\]"?$'
+          sensitive_names="$(grep -E "$sensitive_pattern" "$env_file" | cut -d= -f1 || true)"
+          if [ -n "$sensitive_names" ]; then
+            echo "These VITE_ variables are Sensitive in the Vercel staging environment, so the CLI cannot read them for a CI build:" >&2
+            echo "$sensitive_names" >&2
+            echo "A VITE_ value ships in the browser bundle, so it is public by nature. Make each one a plain variable in Vercel. Nothing was deployed." >&2
+            has_problem=true
+          fi
+          for name in VITE_SUPABASE_API_URL VITE_SUPABASE_ANON_KEY VITE_APP_URL; do
+            if [ -z "$(read_pulled_value "$name")" ]; then
+              echo "$name is missing or empty in the Vercel staging environment. Nothing was deployed." >&2
+              has_problem=true
+            fi
+          done
+          # Compared exactly, with no trailing slash allowed: the app appends
+          # paths such as `/functions/v1` and `/update-password` to these.
+          api_url="$(read_pulled_value VITE_SUPABASE_API_URL)"
+          if [ -z "$SUPABASE_PROJECT_ID" ]; then
+            echo "STAGING_PROJECT_ID is empty in the staging environment. Nothing was deployed." >&2
+            has_problem=true
+          elif [ -n "$api_url" ] &&
+            [ "$api_url" != "https://$SUPABASE_PROJECT_ID.supabase.co" ]; then
+            echo "VITE_SUPABASE_API_URL in the Vercel staging environment must be https://<STAGING_PROJECT_ID>.supabase.co with no trailing slash, the project this job migrates. Nothing was deployed." >&2
+            has_problem=true
+          fi
+          app_url="$(read_pulled_value VITE_APP_URL)"
+          if [ -n "$app_url" ] && [ "$app_url" != "https://staging.avandarlabs.com" ]; then
+            echo "VITE_APP_URL in the Vercel staging environment must be https://staging.avandarlabs.com with no trailing slash. Nothing was deployed." >&2
+            has_problem=true
+          fi
+          if [ "$has_problem" = true ]; then
+            exit 1
+          fi
+          echo "The Vercel staging build environment is complete."
 
       # Built before anything touches staging, so a failed build leaves
-      # staging as it was. The build only embeds these public values and
-      # never connects to the staging database.
+      # staging as it was. The build never connects to the staging
+      # database.
       - name: Build the web app for Vercel
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-          VITE_SUPABASE_API_URL: ${{ vars.STAGING_SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ vars.STAGING_SB_PUBLISHABLE_KEY }}
-          VITE_APP_URL: ${{ env.STAGING_APP_URL }}
-          VITE_GOOGLE_PICKER_API_KEY: ${{ secrets.VITE_GOOGLE_PICKER_API_KEY }}
-          VITE_GOOGLE_PICKER_APP_ID: ${{ vars.VITE_GOOGLE_PICKER_APP_ID }}
         run: |
           npx --yes "vercel@$VERCEL_CLI_VERSION" build \
             --environment=staging --token="$VERCEL_TOKEN"
@@ -378,71 +376,6 @@ jobs:
         run: |
           supabase link --project-ref "$SUPABASE_PROJECT_ID"
           supabase db push --include-all
-
-      - name: Set edge function secrets
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          SUPABASE_PROJECT_ID: ${{ secrets.STAGING_PROJECT_ID }}
-          STAGING_SB_SECRET_KEY: ${{ secrets.STAGING_SB_SECRET_KEY }}
-          STAGING_SB_PUBLISHABLE_KEY: ${{ vars.STAGING_SB_PUBLISHABLE_KEY }}
-          STAGING_SUPABASE_URL: ${{ vars.STAGING_SUPABASE_URL }}
-          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-          POLAR_ACCESS_TOKEN: ${{ secrets.POLAR_ACCESS_TOKEN }}
-          UPSTASH_REDIS_API_URL: ${{ secrets.UPSTASH_REDIS_API_URL }}
-          UPSTASH_REDIS_REST_API_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_API_TOKEN }}
-          RESEND_SENDING_API_KEY: ${{ secrets.RESEND_SENDING_API_KEY }}
-          RESEND_FULL_ACCESS_API_KEY: ${{ secrets.RESEND_FULL_ACCESS_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPEN_ROUTER_API_KEY: ${{ secrets.OPEN_ROUTER_API_KEY }}
-          FEATUREBASE_JWT_SECRET: ${{ secrets.FEATUREBASE_JWT_SECRET }}
-          AVA_PIPELINE_SERVER_SECRET: ${{ secrets.AVA_PIPELINE_SERVER_SECRET }}
-          AVA_PIPELINE_SERVER_URL: ${{ secrets.AVA_PIPELINE_SERVER_URL }}
-          GEOAPIFY_API_KEY: ${{ secrets.GEOAPIFY_API_KEY }}
-        run: |
-          secrets_file="$RUNNER_TEMP/staging-functions.env"
-          trap 'rm -f "$secrets_file"' EXIT
-          # The CLI parses this file with `dotenv`, which ends an unquoted
-          # value at its first `#`. Single quotes keep every value literal.
-          # The configuration check refused values with a single quote or a
-          # line break, and this refuses them again in case that check moves.
-          write_secret() {
-            if [[ "$2" == *"'"* || "$2" == *$'\n'* || "$2" == *$'\r'* ]]; then
-              echo "$1 contains a single quote or a line break." >&2
-              exit 1
-            fi
-            printf "%s='%s'\n" "$1" "$2"
-          }
-          {
-            write_secret SB_SECRET_KEY "$STAGING_SB_SECRET_KEY"
-            write_secret SB_PUBLISHABLE_KEY "$STAGING_SB_PUBLISHABLE_KEY"
-            write_secret MODE staging
-            write_secret VITE_APP_URL "$STAGING_APP_URL"
-            write_secret GOOGLE_CLIENT_ID "$GOOGLE_CLIENT_ID"
-            write_secret GOOGLE_CLIENT_SECRET "$GOOGLE_CLIENT_SECRET"
-            write_secret GOOGLE_REDIRECT_URI \
-              "$STAGING_SUPABASE_URL/functions/v1/google-auth-callback"
-            write_secret POLAR_ACCESS_TOKEN "$POLAR_ACCESS_TOKEN"
-            write_secret POLAR_SERVER_TYPE sandbox
-            write_secret UPSTASH_REDIS_API_URL "$UPSTASH_REDIS_API_URL"
-            write_secret UPSTASH_REDIS_REST_API_TOKEN \
-              "$UPSTASH_REDIS_REST_API_TOKEN"
-            write_secret RESEND_SENDING_API_KEY "$RESEND_SENDING_API_KEY"
-            write_secret RESEND_FULL_ACCESS_API_KEY "$RESEND_FULL_ACCESS_API_KEY"
-            write_secret RESEND_SITE_IMG_URL https://avandarlabs.com
-            write_secret OPENAI_API_KEY "$OPENAI_API_KEY"
-            write_secret OPEN_ROUTER_API_KEY "$OPEN_ROUTER_API_KEY"
-            write_secret FEATUREBASE_JWT_SECRET "$FEATUREBASE_JWT_SECRET"
-            write_secret AVA_PIPELINE_SERVER_SECRET "$AVA_PIPELINE_SERVER_SECRET"
-            write_secret AVA_PIPELINE_SERVER_URL "$AVA_PIPELINE_SERVER_URL"
-            # Only when the GitHub secret exists: an empty value would
-            # overwrite a key set directly on the staging project.
-            if [ -n "$GEOAPIFY_API_KEY" ]; then
-              write_secret GEOAPIFY_API_KEY "$GEOAPIFY_API_KEY"
-            fi
-          } > "$secrets_file"
-          supabase secrets set --project-ref "$SUPABASE_PROJECT_ID" \
-            --env-file "$secrets_file"
 
       - name: Deploy edge functions
         env:
