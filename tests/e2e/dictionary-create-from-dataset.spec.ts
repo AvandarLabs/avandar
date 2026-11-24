@@ -176,7 +176,7 @@ test.describe("learning a dictionary from a dataset", () => {
         page.getByRole("button", { name: "gender", exact: true }),
       ).toBeVisible();
       await expect(page.getByRole("row", { name: /hosp_yn/ })).toContainText(
-        "2 values need a label",
+        "2 values need a target value",
       );
       const { data } = await admin
         .from("data_dictionaries")
