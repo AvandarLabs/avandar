@@ -403,6 +403,20 @@ const ROW_LOCK_LINES = [
   "end $locks$;",
 ];
 
+/** The lines of the restore.sql an import printed, trimmed. */
+function _printedRestoreLines(output: string): string[] {
+  const lines = output.split("\n");
+  const start = lines.findIndex((line) => {
+    return line.startsWith("  2. Beside it, write restore.sql");
+  });
+  const end = lines.findIndex((line) => {
+    return line.startsWith("  3. Run it");
+  });
+  return lines.slice(start + 1, end).map((line) => {
+    return line.trim();
+  });
+}
+
 /** The wrapper's lines without the multi-line guard block. */
 function _linesWithoutGuard(wrapper: string): string[] {
   const lines = wrapper.trim().split("\n");
@@ -1215,6 +1229,30 @@ describe("importCatalogData.sh --replace-existing", SHELL_TEST_OPTIONS, () => {
     expect(lines.indexOf("do $foreign_keys$")).toBeGreaterThan(origin);
     expect(lines.indexOf("commit;")).toBeGreaterThan(
       lines.indexOf("end $foreign_keys$;"),
+    );
+  });
+
+  it("prints a restore that stops on the first error, then checks its staged rows and bounds each lock wait before any delete", () => {
+    const run = _runReplace(_confirmedReplaceArgs());
+    const lines = _printedRestoreLines(run.output);
+
+    const rowsLoad = lines.indexOf("\\ir 'restore-rows.sql'");
+    const lockTimeout = lines.indexOf(
+      "set local lock_timeout = '10s';",
+      rowsLoad,
+    );
+    const stagedCheck = lines.indexOf(
+      "if (select count(*) from catalog_restore.datasets) <> 6 then",
+    );
+    const firstDelete = lines.findIndex((line) => {
+      return line.startsWith("delete from ");
+    });
+    expect(lines[0]).toBe("\\set ON_ERROR_STOP on");
+    expect(lockTimeout).toBeGreaterThan(rowsLoad);
+    expect(stagedCheck).toBeGreaterThan(rowsLoad);
+    expect(firstDelete).toBeGreaterThan(Math.max(lockTimeout, stagedCheck));
+    expect(lines).toContain(
+      "raise exception 'catalog_restore.datasets holds % staged rows, not the backup''s 6.', (select count(*) from catalog_restore.datasets);",
     );
   });
 

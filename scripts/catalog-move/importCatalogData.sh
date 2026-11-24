@@ -764,14 +764,24 @@ restore_tables() {
 # foreign key. Supabase lets its `postgres` role, which is not a superuser,
 # set it. The deletes run before it, so their cascades still fire, and
 # print_restore_foreign_key_check checks the foreign keys after it.
+#
+# It sets ON_ERROR_STOP itself, so a client-side error, such as a missing
+# restore-rows.sql, stops psql before `commit` even when the command line
+# leaves it out, and print_restore_staged_row_check refuses a staging load
+# with fewer or more rows than the backup, before anything is deleted.
 print_restore_sql() {
   local table columns
+  echo '\set ON_ERROR_STOP on'
   echo "begin;"
+  echo "set local lock_timeout = '$LOCK_TIMEOUT';"
   echo "create schema $RESTORE_SCHEMA;"
   while read -r table; do
     echo "create table $RESTORE_SCHEMA.${table#public.} (like $table);"
   done < <(restore_tables)
   echo "\\ir 'restore-rows.sql'"
+  # The backup sets lock_timeout to 0 for the session, so set it again.
+  echo "set local lock_timeout = '$LOCK_TIMEOUT';"
+  print_restore_staged_row_check
   while read -r table; do
     echo "delete from $table;"
   done < <(catalog_tables_children_first)
@@ -785,6 +795,23 @@ print_restore_sql() {
   print_restore_foreign_key_check
   echo "drop schema $RESTORE_SCHEMA cascade;"
   echo "commit;"
+}
+
+# Prints the statement that raises, so the restore rolls back, unless each
+# staging table holds exactly the rows the backup's index counted for its
+# table. The counts are literals, so the check needs nothing but restore.sql.
+print_restore_staged_row_check() {
+  local table staged rows
+  echo "do \$staged\$ begin"
+  while read -r table; do
+    staged="$RESTORE_SCHEMA.${table#public.}"
+    rows="$(backup_index_value rows "$table")"
+    [[ "$rows" =~ ^[0-9]+$ ]] || fail_backup "$BACKUP_FILE has no rows block for $table."
+    echo "  if (select count(*) from $staged) <> $rows then"
+    echo "    raise exception '$staged holds % staged rows, not the backup''s $rows.', (select count(*) from $staged);"
+    echo "  end if;"
+  done < <(restore_tables)
+  echo "end \$staged\$;"
 }
 
 # Prints the statement that raises, so the restore rolls back, unless every
@@ -825,7 +852,7 @@ print_restore_steps() {
   echo "To restore the backup later:"
   echo "  1. In an empty folder, copy the backup's rows into staging tables, without 'SET transaction_timeout = 0;', which Postgres before 17 rejects:"
   echo "       sed -E -e '/^SET transaction_timeout = 0;\$/d' -e 's/^COPY public\\./COPY $RESTORE_SCHEMA./' '$backup_path' > restore-rows.sql"
-  echo "  2. Beside it, write restore.sql, which empties the catalog and puts back every backed-up row the target no longer has, in one transaction. It inserts with triggers and foreign key checks off, since some backed-up tables reference each other, then checks every foreign key of the restored tables:"
+  echo "  2. Beside it, write restore.sql, which empties the catalog and puts back every backed-up row the target no longer has, in one transaction that stops on the first error and refuses staged rows that do not match the backup's counts. It inserts with triggers and foreign key checks off, since some backed-up tables reference each other, then checks every foreign key of the restored tables:"
   print_restore_sql | sed 's/^/       /'
   # shellcheck disable=SC2016 # The variable is for the reader to fill in.
   echo "  3. Run it with psql $PSQL_VERSIONS, which PSQL_BIN names:"' with_db_url "$TARGET_DB_URL" "$PSQL_BIN" -X -P pager=off -v ON_ERROR_STOP=1 --file restore.sql'

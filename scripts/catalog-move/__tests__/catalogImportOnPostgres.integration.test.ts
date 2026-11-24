@@ -498,43 +498,79 @@ function _writeProbingPsql(resultFile: string): string {
 }
 
 /**
- * Runs the restore steps the import printed: the `sed` that stages the
- * backup, then restore.sql, from a folder of their own.
+ * Writes the restore steps the import printed into a folder of their own:
+ * runs the `sed` that stages the backup into restore-rows.sql, and writes
+ * restore.sql. Returns the folder.
  */
-function _runPrintedRestore(output: string): void {
+function _writePrintedRestore(output: string): string {
   const lines = output.split("\n");
   const sedLine = lines.find((line) => {
     return line.startsWith("       sed ");
   });
-  const begin = lines.indexOf("       begin;");
+  const restoreStart =
+    lines.findIndex((line) => {
+      return line.startsWith("  2. Beside it, write restore.sql");
+    }) + 1;
   const commit = lines.indexOf("       commit;");
   const restoreDir = mkdtempSync(join(clusterDir, "restore-"));
   _run("bash", ["-c", `cd '${restoreDir}' && ${sedLine!.trim()}`]);
   writeFileSync(
     join(restoreDir, "restore.sql"),
     lines
-      .slice(begin, commit + 1)
+      .slice(restoreStart, commit + 1)
       .map((line) => {
         return line.slice(7);
       })
       .join("\n"),
   );
-  _run(TOOLS!.psql, [
-    "-h",
-    "127.0.0.1",
-    "-p",
-    String(port),
-    "-U",
-    OWNER,
-    "-d",
-    "postgres",
-    "-X",
-    "-q",
+  return restoreDir;
+}
+
+/**
+ * Runs a folder's restore.sql with psql and these extra arguments, and
+ * returns its exit status and output.
+ */
+function _runRestoreFile(restoreDir: string, extraArgs: readonly string[]) {
+  const result = spawnSync(
+    TOOLS!.psql,
+    [
+      "-h",
+      "127.0.0.1",
+      "-p",
+      String(port),
+      "-U",
+      OWNER,
+      "-d",
+      "postgres",
+      "-X",
+      "-q",
+      ...extraArgs,
+      "--file",
+      join(restoreDir, "restore.sql"),
+    ],
+    { encoding: "utf8" },
+  );
+  return { status: result.status, output: `${result.stdout}${result.stderr}` };
+}
+
+/**
+ * Runs the restore steps the import printed, as the steps say to: the `sed`
+ * that stages the backup, then restore.sql with ON_ERROR_STOP. Throws with
+ * psql's output when the restore fails.
+ */
+function _runPrintedRestore(output: string): void {
+  const restore = _runRestoreFile(_writePrintedRestore(output), [
     "-v",
     "ON_ERROR_STOP=1",
-    "--file",
-    join(restoreDir, "restore.sql"),
   ]);
+  if (restore.status !== 0) {
+    throw new Error(`psql failed: ${restore.output}`);
+  }
+}
+
+/** The restore's staged rows file, in a folder _writePrintedRestore wrote. */
+function _restoreRowsFile(restoreDir: string): string {
+  return join(restoreDir, "restore-rows.sql");
 }
 
 /**
@@ -751,6 +787,42 @@ describe.skipIf(TOOLS === undefined)(
         _runPrintedRestore(run.output);
       }).toThrow(
         "The restore left rows of public.datasets whose (workspace_id) match no row of public.workspaces: 1 distinct values.",
+      );
+      expect(_targetCounts()).toBe(countsAfterReplace);
+    });
+
+    it("leaves the catalog unchanged when the printed restore runs without ON_ERROR_STOP and its rows file is missing", () => {
+      const run = _runReplace(CATALOG_DUMP);
+      expect(run.status, run.output).toBe(0);
+      const countsAfterReplace = _targetCounts();
+      const restoreDir = _writePrintedRestore(run.output);
+      rmSync(_restoreRowsFile(restoreDir));
+
+      const restore = _runRestoreFile(restoreDir, []);
+
+      expect(restore.status, restore.output).not.toBe(0);
+      expect(_targetCounts()).toBe(countsAfterReplace);
+    });
+
+    it("rolls the printed restore back when its rows file holds fewer rows than the backup", () => {
+      const run = _runReplace(CATALOG_DUMP);
+      expect(run.status, run.output).toBe(0);
+      const countsAfterReplace = _targetCounts();
+      const restoreDir = _writePrintedRestore(run.output);
+      const rowsFile = _restoreRowsFile(restoreDir);
+      const rows = readFileSync(rowsFile, "utf8");
+      const truncatedRows = rows.replace(
+        /^a0000000-0000-0000-0000-000000000006\t.*\n/m,
+        "",
+      );
+      expect(truncatedRows).not.toBe(rows);
+      writeFileSync(rowsFile, truncatedRows);
+
+      const restore = _runRestoreFile(restoreDir, ["-v", "ON_ERROR_STOP=1"]);
+
+      expect(restore.status, restore.output).not.toBe(0);
+      expect(restore.output).toContain(
+        "catalog_restore.data_catalog_listings holds 5 staged rows, not the backup's 6.",
       );
       expect(_targetCounts()).toBe(countsAfterReplace);
     });
