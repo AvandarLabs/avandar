@@ -335,20 +335,31 @@ jobs:
               has_problem=true
             fi
           done
-          # Compared exactly, with no trailing slash allowed: the app appends
-          # paths such as `/functions/v1` and `/update-password` to these.
+          # Prints the URL in $1 lowercased, without trailing slashes, for
+          # comparison only. A URL host is case-insensitive, and the
+          # Git-integration builds already ship these values as Vercel holds
+          # them, so neither difference blocks a deploy. The build still uses
+          # the pulled values unchanged.
+          comparable_url() {
+            local url="$1"
+            while [[ "$url" == */ ]]; do
+              url="${url%/}"
+            done
+            printf '%s' "${url,,}"
+          }
           api_url="$(read_pulled_value VITE_SUPABASE_API_URL)"
           if [ -z "$SUPABASE_PROJECT_ID" ]; then
             echo "STAGING_PROJECT_ID is empty in the staging environment. Nothing was deployed." >&2
             has_problem=true
           elif [ -n "$api_url" ] &&
-            [ "$api_url" != "https://$SUPABASE_PROJECT_ID.supabase.co" ]; then
-            echo "VITE_SUPABASE_API_URL in the Vercel staging environment must be https://<STAGING_PROJECT_ID>.supabase.co with no trailing slash, the project this job migrates. Nothing was deployed." >&2
+            [ "$(comparable_url "$api_url")" != "$(comparable_url "https://$SUPABASE_PROJECT_ID.supabase.co")" ]; then
+            echo "VITE_SUPABASE_API_URL in the Vercel staging environment must be https://<STAGING_PROJECT_ID>.supabase.co, the project this job migrates. Nothing was deployed." >&2
             has_problem=true
           fi
           app_url="$(read_pulled_value VITE_APP_URL)"
-          if [ -n "$app_url" ] && [ "$app_url" != "https://staging.avandarlabs.com" ]; then
-            echo "VITE_APP_URL in the Vercel staging environment must be https://staging.avandarlabs.com with no trailing slash. Nothing was deployed." >&2
+          if [ -n "$app_url" ] &&
+            [ "$(comparable_url "$app_url")" != "https://staging.avandarlabs.com" ]; then
+            echo "VITE_APP_URL in the Vercel staging environment must be https://staging.avandarlabs.com. Nothing was deployed." >&2
             has_problem=true
           fi
           if [ "$has_problem" = true ]; then
