@@ -408,8 +408,19 @@ beforeEach(() => {
   _writeExecutable("psql", FAKE_PSQL);
 });
 
-afterEach(() => {
+/*
+ * Every test here blocks on `spawnSync`, so without this yield the Vitest
+ * worker never reaches its event loop until the whole file finishes. On a
+ * busy machine the file runs past Vitest's 60-second worker RPC timeout, and
+ * the run then fails with `Timeout calling "onTaskUpdate"` although every test
+ * passed. Waiting one `setImmediate` turn after each test lets the worker read
+ * the RPC replies it is waiting for.
+ */
+afterEach(async () => {
   rmSync(workDir, { recursive: true, force: true });
+  await new Promise((resolveTurn) => {
+    setImmediate(resolveTurn);
+  });
 });
 
 describe("exportCatalogData.sh", SHELL_TEST_OPTIONS, () => {
