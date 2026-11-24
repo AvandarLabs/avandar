@@ -25,8 +25,10 @@ for a review. The promotion landed as a fast-forward, so every commit ID the
 feature log cites still points at the same code.
 
 Each feature gets one public GitHub issue, labelled `retro-review`, with the
-feature's ID in its title, such as `Retro review F98: ...`. A public project
-board named "Retroactive review" tracks every issue through four states:
+feature's ID in its title, such as `Retro review F98: ...`. A feature dropped
+before the promotion gets no issue, since it never shipped as that feature.
+F5 is the only one. A public project board named "Retroactive review" tracks
+every issue through four states:
 
 | State | Meaning |
 | --- | --- |
@@ -62,7 +64,10 @@ label:
 
 A feature's tier comes from what its feature log section mentions, so it is a
 starting point. A reviewer who finds that a feature belongs in a riskier tier
-relabels it.
+relabels it. For the same reason, reviewers should audit each of the 33
+functions `anon` can execute on its own, not only through the features that
+add them: a feature's section may not mention a function it adds, so its
+issue can land outside the security tier.
 
 ## Adding a finding
 

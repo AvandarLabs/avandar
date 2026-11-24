@@ -1,6 +1,7 @@
 <!--
-Paste everything below this comment into the promotion PR's description.
-The PR title is `feat: promote the measles demo to develop`. CI checks the
+This whole file is the promotion PR's description: the runbook's `gh pr
+create --body-file` step posts it as is, and GitHub does not render this
+comment. The PR title is `feat: promote the measles demo to develop`. CI checks the
 title against Conventional Commits (`lint-pr-title`), so keep it as is.
 -->
 
@@ -49,7 +50,7 @@ The feature log becomes the review backlog for this work, and
 Crosswalk layouts and mappings can be read by every member who can view Data
 Sources, even when a dataset in the crosswalk is restricted to other people.
 Such a member can read a restricted dataset's column names, source columns,
-and fill rules when that dataset is alone in its layout. The restricted rows
+and fill rules when that dataset is alone in its layout. The membership rows
 themselves stay hidden. The warning at the top of the feature log describes
 it.
 

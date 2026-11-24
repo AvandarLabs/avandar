@@ -4,8 +4,9 @@ Every fix listed here reaches `develop` with the `demo/measles` promotion, so
 its rows need no separate PR.
 
 Bugs fixed on `demo/measles` whose bug also exists in `develop`'s code, and
-where each one stands on its way to `develop`. Each row is one PR into
-`develop`, tracked by one Linear issue. The Linear issue holds the repro, the
+where each one stands on its way to `develop`. Before the promotion, each row
+was meant to become its own PR into `develop`. Now they all arrive together
+with it. Each row is tracked by one Linear issue. The Linear issue holds the repro, the
 `demo/measles` commits and files to take, and the verification steps.
 
 Where the details live:

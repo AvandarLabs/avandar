@@ -873,10 +873,9 @@ gh pr create --base develop --head demo/measles \
   --body-file docs/measles-demo/promotion-pr-description.md
 ```
 
-**Expect:** a PR URL. The body comes from
-`docs/measles-demo/promotion-pr-description.md`, written by a later task of
-the implementation plan. It says what landed without review and where the
-post-commit reviews live. **PUSHES** (creates a public PR).
+**Expect:** a PR URL. The body is the whole of
+`docs/measles-demo/promotion-pr-description.md`. It says what landed without
+review and where the post-commit reviews live. **PUSHES** (creates a public PR).
 **If not:** if the file is missing, stop: the integration branch is not the
 final one.
 
@@ -1914,7 +1913,7 @@ new agent session.
 ```text
 You are publishing the retroactive review backlog for the public repository
 AvandarLabs/avandar. Pablo has approved creating public labels, a public
-project board, and 141 public issues. Create nothing else.
+project board, and 140 public issues. Create nothing else.
 
 1. Read docs/reviews/README.md and section 12 of
    docs/measles-demo/production-cutover-plan.md.
@@ -1926,7 +1925,7 @@ project board, and 141 public issues. Create nothing else.
 4. Generate the drafts:
    node scripts/reviews/buildRetroReviewIssues/buildRetroReviewIssues.ts \
      --sha "$PIN" --out .temp/retro-review-issues
-   Expect 141 JSON files and order.md.
+   Expect 140 JSON files and order.md.
 5. Show Pablo order.md and three drafts, one from each tier. Wait for him to
    say go in this session before creating anything on GitHub.
 6. Create the labels that do not exist yet: retro-review,

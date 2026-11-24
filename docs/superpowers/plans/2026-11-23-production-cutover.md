@@ -12,7 +12,7 @@
 
 **Answered by Pablo on 2026-11-23:** D1 keep plugins. D2 CI deploys staging and production, and Vercel's Git integration is removed. D3 a PR, then an admin fast-forward. D4 release with the privacy gap.
 
-**Also answered on 2026-11-23:** D5 staging gets the replace import first. D6 demo resources are deleted seven days after the smoke test. D7 all 141 review issues are opened together, only on Pablo's approval, by a new agent from a prompt in the runbook. E1 staging deploys to the existing Vercel environment named `staging`. No decision is open.
+**Also answered on 2026-11-23:** D5 staging gets the replace import first. D6 demo resources are deleted seven days after the smoke test. D7 all 140 review issues are opened together, only on Pablo's approval, by a new agent from a prompt in the runbook. E1 staging deploys to the existing Vercel environment named `staging`. No decision is open.
 
 ---
 
@@ -1333,7 +1333,7 @@ git commit -m "docs(cutover): add the production cutover runbook"
 
 ### Task 20: Review scaffolding
 
-**Risk class:** ordinary. Nothing here is published. The labels, the board, and the 141 issues are created later by a new agent, only when Pablo pastes the runbook's prompt (D7).
+**Risk class:** ordinary. Nothing here is published. The labels, the board, and the 140 issues are created later by a new agent, only when Pablo pastes the runbook's prompt (D7).
 
 **Files:**
 - Create: `docs/reviews/README.md`
@@ -1527,7 +1527,7 @@ pnpm vite-script scripts/reviews/buildRetroReviewIssues/buildRetroReviewIssues.t
 ls .temp/chore-production-cutover/retro-review-issues | wc -l
 ```
 
-Expected: PASS, then 142: one file per feature row (141) plus `order.md`. Read five of the drafts.
+Expected: PASS, then 141: one file per feature row that is not dropped (140) plus `order.md`. Read five of the drafts.
 
 - [ ] **Step 5: Write the policy and the template**
 
@@ -1550,7 +1550,7 @@ In `docs/measles-demo/production-cutover-runbook.md`, section 16 gets the headin
 ```text
 You are publishing the retroactive review backlog for the public repository
 AvandarLabs/avandar. Pablo has approved creating public labels, a public
-project board, and 141 public issues. Create nothing else.
+project board, and 140 public issues. Create nothing else.
 
 1. Read docs/reviews/README.md and section 12 of
    docs/measles-demo/production-cutover-plan.md.
@@ -1562,7 +1562,7 @@ project board, and 141 public issues. Create nothing else.
 4. Generate the drafts:
    pnpm vite-script scripts/reviews/buildRetroReviewIssues/buildRetroReviewIssues.ts \
      --sha "$PIN" --out .temp/retro-review-issues
-   Expect 141 JSON files and order.md.
+   Expect 140 JSON files and order.md.
 5. Show Pablo order.md and three drafts, one from each tier. Wait for him to
    say go in this session before creating anything on GitHub.
 6. Create the labels that do not exist yet: retro-review,
