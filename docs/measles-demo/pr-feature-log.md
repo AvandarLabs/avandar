@@ -14,9 +14,10 @@
 > Details: [design doc section 11](data-dictionaries-design.md#11-permissions-and-rls)
 
 
-The running list of features built on `demo/measles` that must each land
-in `develop` as their own PR. When every feature below reads `merged`,
-everything this branch built is in `develop`.
+The running list of features built on `demo/measles`. It is now the review
+backlog, not a porting list: every feature reaches `develop` with the
+`demo/measles` promotion, and each one gets a public retroactive review,
+explained in [docs/reviews/README.md](../reviews/README.md).
 
 Bug fixes ready to port to `develop`, and the PR and Linear status of
 each, are tracked in [bug-log.md](bug-log.md).

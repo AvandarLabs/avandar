@@ -1908,7 +1908,43 @@ normal PR into `develop` with a new migration, then a release.
 
 ### Publish the review backlog
 
-The prompt for publishing the review backlog is added in a later commit.
+Nothing in this subsection runs until Pablo pastes the prompt below into a
+new agent session.
+
+```text
+You are publishing the retroactive review backlog for the public repository
+AvandarLabs/avandar. Pablo has approved creating public labels, a public
+project board, and 139 public issues. Create nothing else.
+
+1. Read docs/reviews/README.md and section 12 of
+   docs/measles-demo/production-cutover-plan.md.
+2. Confirm the promotion has landed:
+   git fetch origin && git merge-base --is-ancestor origin/demo/measles origin/develop
+   If that fails, stop and tell Pablo.
+3. Work from origin/develop in a new worktree. Pin the commit:
+   PIN="$(git rev-parse origin/develop)"
+4. Generate the drafts:
+   node scripts/reviews/buildRetroReviewIssues/buildRetroReviewIssues.ts \
+     --sha "$PIN" --out .temp/retro-review-issues
+   Expect 139 JSON files and order.md.
+5. Show Pablo order.md and three drafts, one from each tier. Wait for him to
+   say go in this session before creating anything on GitHub.
+6. Create the labels that do not exist yet: retro-review,
+   retro-review:security, retro-review:data, retro-review:ui.
+7. Create a public project board named "Retroactive review" under
+   AvandarLabs, with a Status field holding: Not reviewed, In review,
+   Findings open, Reviewed. If gh lacks the project scope, ask Pablo to run
+   gh auth refresh -s project. If the CLI cannot set the Status options,
+   give Pablo the click path and wait.
+8. Create the issues in order.md's order, one gh issue create per draft,
+   with the draft's title, body, and labels. Add each to the board as
+   "Not reviewed". Before creating one, search for an open or closed issue
+   whose title starts with "Retro review F<n>:" and skip it if found, so a
+   second run is safe. Pause one second between issues.
+9. Report the number created, the number skipped, the board's URL, and every
+   failure with its output. Do not edit code, do not close or change any
+   other issue, and do not push.
+```
 
 ## 17. Cleanup (D6)
 

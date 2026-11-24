@@ -1,5 +1,8 @@
 # demo/measles: bug port tracker
 
+Every fix listed here reaches `develop` with the `demo/measles` promotion, so
+its rows need no separate PR.
+
 Bugs fixed on `demo/measles` whose bug also exists in `develop`'s code, and
 where each one stands on its way to `develop`. Each row is one PR into
 `develop`, tracked by one Linear issue. The Linear issue holds the repro, the
