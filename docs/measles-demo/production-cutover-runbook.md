@@ -149,7 +149,7 @@ on_rehearsal_stack() { [[ -z "$(env | grep -E '^SUPABASE_(PROJECT_ID|[A-Z0-9_]+_
 supabase --version
 "$PSQL_BIN" --version
 "$PG_DUMP_BIN" --version
-env | grep '^PG' || echo "no PG variables"
+env | grep -E '^PG(HOST|HOSTADDR|PORT|DATABASE|USER|PASSWORD|PASSFILE|SERVICE|SERVICEFILE|SYSCONFDIR|OPTIONS|TARGETSESSIONATTRS|SSLMODE|REQUIRESSL)=' || echo "no PG variables"
 supabase projects list -o json | jq -r '.[] | [.name, (.ref // .id)] | @tsv'
 ```
 
