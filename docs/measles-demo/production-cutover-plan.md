@@ -45,6 +45,7 @@ review gets a public post-commit review.
 | A2 | Does `ava release --yes` proceed on a non-passing CI verdict | **No: it stops.** Overriding takes `--skip-ci-check`. Chosen because `main` now deploys production. |
 | A3 | When the GitHub `production` environment is protected | **Before any production secret is added:** a deployment branch policy allowing only `main`, and a required reviewer. |
 | H1 | Which `FEATUREBASE_JWT_SECRET` value is authoritative for staging | **The GitHub `staging` environment's value.** The first staging deploy overwrites staging's own value with it. |
+| K1 | The staging environment's tokens can be read by any branch's workflow and reach production | **Accept it for the cutover, and narrow the staging tokens after the full cutover.** The runbook's section 16 holds the work. |
 
 Carried over from the alpha plan, still true:
 
@@ -377,8 +378,9 @@ Stage G in order:
    secrets, deploys functions, and deploys the app.
 7. Load the catalog into production. Smoke test.
 8. Disconnect the Git integration in Vercel.
-9. Start the privacy fix (AVA-611). When Pablo is ready, he pastes the
-   runbook's prompt into a new agent session, which publishes the review
+9. Start the privacy fix (AVA-611) and narrow the staging tokens (K1). When
+   Pablo is ready, he pastes the runbook's prompt into a new agent session,
+   which publishes the review
    backlog (D7). Clean up seven days after the smoke test (D6).
 
 **Rollback.** Before step 6 production is untouched: stop. After step 6,

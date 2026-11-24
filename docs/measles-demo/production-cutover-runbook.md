@@ -45,7 +45,7 @@ production at all.
 | 6 | Choose the rollback basis (10.1). Release `0.15.0` with `ava release` (11.1 to 11.4). While the `deploy` job waits, back up production and test the backup (10.2, 10.3), then approve (11.5) | 10.1, 11.1 to 11.4, 10.2, 10.3, 11.5 to 11.9 | **WRITES TO PRODUCTION** through CI, from the approval in 11.5 | 10.3's restore test fails: do not approve |
 | 7 | Load the catalog into production. Smoke test | 12, 13 | **WRITES TO PRODUCTION** | Anything in 13 fails: section 14 |
 | 8 | Disconnect Vercel's Git integration | 15 | No. **CHANGES VERCEL** | Either `deploy` job did not succeed |
-| 9 | Start the privacy fix. Publish the review backlog when ready. Clean up seven days after the smoke test | 16, 17 | 17 deletes the demo resources | |
+| 9 | Start the privacy fix. Publish the review backlog when ready. Narrow the staging tokens (section 16, Narrow the staging tokens). Clean up seven days after the smoke test | 16, 17 | 17 deletes the demo resources | |
 
 **The migration audit refresh is still pending** (4.8). It must be done
 before step 3, the promotion. The reason: the push in 8.5 makes the
@@ -946,8 +946,7 @@ of the job waits again.
 
 ### 5.2 The `staging` environment's branch policy: not now
 
-Nothing to change here, except option (b) of the decision below if you
-choose it.
+Nothing to change here.
 
 The plan recommended the same protection for `staging`, a `develop` policy.
 **Do not add a `develop`-only policy.** Three workflows use the `staging`
@@ -960,8 +959,9 @@ likely be blocked too (**verify**: GitHub evaluates a pull request run's
 ref, not `develop`). Staging stays unprotected for now. That is a known gap
 (section 18): its secrets are readable by any branch's workflow, and no
 deployment branch policy is possible while `production.yaml`'s test jobs use
-`environment: staging` on `main`. The fix is a later change that gives the
-test jobs an environment of their own.
+`environment: staging` on `main`. The fix is a later change, in section 16
+(Narrow the staging tokens), that gives the test jobs an environment of their
+own.
 
 **What A3's protection does not cover.** 5.1 protects only the database
 password and the secrets of the `production` environment. Two `staging`
@@ -974,15 +974,13 @@ secrets reach further:
   account that can also reach project `Avandar`, any branch's workflow can
   reach production through the Management API with it. Supabase personal
   access tokens are account-wide: they reach every project the account
-  can. **Verify** which account created staging's token.
+  can. Which account created staging's token decides whether this applies
+  (section 16, Narrow the staging tokens).
 
-**Decision for Pablo: accept this exposure for now, or narrow the staging
-tokens.**
-
-| Option | What it takes | Leaves |
-| --- | --- | --- |
-| (a) Accept it for now | Nothing. Low risk while only maintainers can push branches to the repository | Any branch's workflow can deploy production's web app, and reach production through staging's Supabase token if that token's account can |
-| (b) Narrow the staging tokens | Vercel: your avatar > **Account Settings** > **Tokens** > **Create**, a token of its own for `staging`, with the narrowest scope your plan offers (**verify** whether that is the team or the project: no Vercel token scope known to this runbook limits a token to one environment, so it may still deploy production; it can at least be revoked on its own). Supabase: your avatar > **Account preferences** > **Access Tokens** > **Generate new token**, created by a separate machine or service account that is a member of the staging project's organization only, never of `Avandar`'s (**verify** that the two projects are in different organizations; if they share one, a separate account does not isolate them). Store both on `staging` only: `gh secret set VERCEL_TOKEN --env staging`, `gh secret set SUPABASE_ACCESS_TOKEN --env staging`. **CHANGES VERCEL**, **CHANGES GITHUB SETTINGS** | Whatever the Vercel scope cannot narrow (**verify**) |
+**Decided (K1, Pablo, 2026-11-24):** accept this exposure for the cutover,
+and narrow the staging tokens after the full cutover (section 16, Narrow the
+staging tokens). Only maintainers can push branches to the repository, so the
+risk is low until then.
 
 ### 5.3 Set the `production` environment's names
 
@@ -3138,6 +3136,63 @@ project board, and 140 public issues. Create nothing else.
    other issue, and do not push.
 ```
 
+### Narrow the staging tokens (after the cutover)
+
+**Why.** Any branch's workflow can read the `staging` environment's secrets,
+including a Vercel token that can deploy production's web app and a Supabase
+token that may reach production's project (5.2). Pablo accepted this only for
+the cutover (K1, 2026-11-24).
+
+**When.** After the smoke test passes (section 13) and the Vercel Git
+integration is removed (section 15). It does not block the release.
+
+**The goal.** No branch other than `develop` can read staging's deploy secrets,
+and staging's tokens cannot reach production.
+
+**The work**, in order. Step b is a normal pull request into `develop`. Steps
+a, c, and d change settings that only Pablo can change.
+
+a. **Split the secrets (CHANGES GITHUB SETTINGS).** Create a GitHub environment
+   named `ci` for the test jobs. Give it only the names those jobs read, and
+   none of these deploy-only names: `VERCEL_TOKEN`, `VERCEL_ORG_ID`,
+   `VERCEL_PROJECT_ID`, `SUPABASE_ACCESS_TOKEN`, `STAGING_DB_PASSWORD`,
+   `STAGING_PROJECT_ID`, `STAGING_SB_SECRET_KEY`. Take the test jobs' names from
+   the workflows at that time, with
+   `grep -oE "(secrets|vars)\.[A-Z0-9_]+"`, not from this document.
+b. **Point the test jobs at it (code change).** In `pr-develop.yaml`,
+   `production.yaml`, and `staging.yaml`, change `environment: staging` to
+   `environment: ci` on the test jobs only. Only `staging.yaml`'s `deploy` job
+   keeps `environment: staging`. Check the workflows with `actionlint`, land the
+   change through a reviewed pull request into `develop`, and release it to
+   `main`, since `production.yaml` runs from `main`.
+c. **Protect `staging` (CHANGES GITHUB SETTINGS).** Do this only after step b is
+   on both `develop` and `main`. Before that, the test jobs on `main` would be
+   blocked. Add a deployment branch policy that allows only `develop`, using the
+   click path in 5.1 with `develop` in place of `main`.
+d. **Narrow the tokens (CHANGES VERCEL, CHANGES GITHUB SETTINGS).** Pablo only.
+   - Vercel: your avatar > **Account Settings** > **Tokens** > **Create**, with
+     the narrowest **Scope** Vercel offers (**verify** the choices, because 7.5
+     does not confirm that a project-scoped token exists). Store it with
+     `gh secret set VERCEL_TOKEN --env staging`. Production holds the same
+     shared token (7.5), so create another one for production with
+     `gh secret set VERCEL_TOKEN --env production`. Then delete the old token on
+     the same **Tokens** page, once both environments hold a new one.
+   - Supabase: find the account that created staging's `SUPABASE_ACCESS_TOKEN`
+     (**verify**). Personal access tokens are account-wide, so use a token from
+     an account that can reach only the staging project (**verify** what the
+     current plan offers). Generate it at your avatar > **Account preferences**
+     > **Access Tokens** > **Generate new token**, and store it with
+     `gh secret set SUPABASE_ACCESS_TOKEN --env staging`. Then revoke the old
+     token, once no environment uses it (**verify** whether production's copy
+     is the same token). Pablo revokes tokens in the Supabase account settings.
+e. **Check (no deploy).** Pablo starts a run from a throwaway branch whose
+   workflow names `environment: staging`. Expect GitHub to refuse the job before
+   it starts, so none of its steps run. Then confirm that the next `staging.yaml`
+   run on `develop` still deploys staging.
+
+Track this as its own issue, for example a Linear issue next to AVA-611, so it
+is not lost. It is not part of the release.
+
 ## 17. Cleanup (D6)
 
 Seven days after the smoke test passes, and after the catalog dump is
@@ -3304,9 +3359,9 @@ handled.
 | Local databases and the `demo-measles` branch | Any built before the slot migrations were renamed already ran them under their old names, and cannot migrate forward. Reset local stacks (`pnpm db:reset` on a switched stack). The branch is deleted in 17.3 |
 | Desktop app `metadata.sqlite` | Files created from `demo/measles` or `develop` before the regeneration stop with `migration history mismatch`. Delete them. The desktop app is private, at version 0.0.0 |
 | Five French `.po` entries | Came from `develop` with corrupted control characters. Out of scope for the cutover |
-| The `staging` GitHub environment | No branch policy, so any branch's workflow can read its tokens. A `develop`-only policy would break `production.yaml`'s test jobs (5.2). A3's protection covers only the database and the secrets of the `production` environment: with the shared `VERCEL_TOKEN` (7.5), any branch's workflow can run `vercel deploy --prod`, and if staging's `SUPABASE_ACCESS_TOKEN` belongs to an account that can reach `Avandar`, any branch's workflow can reach production too. Pablo's decision in 5.2: accept for now, or narrow the staging tokens |
+| The `staging` GitHub environment | No branch policy, so any branch's workflow can read its tokens. A `develop`-only policy would break `production.yaml`'s test jobs (5.2). A3's protection covers only the database and the secrets of the `production` environment: with the shared `VERCEL_TOKEN` (7.5), any branch's workflow can run `vercel deploy --prod`, and if staging's `SUPABASE_ACCESS_TOKEN` belongs to an account that can reach `Avandar`, any branch's workflow can reach production too. Accepted for the cutover (K1, 5.2). Fixed after the cutover in section 16, Narrow the staging tokens |
 | Environments restrict branches, not workflows | Any workflow on `main`, including one added through `develop`, can use `production` once it is on `main`. The required reviewer is the stop |
-| Test jobs on `main` | `production.yaml`'s `test-quick` and `test-e2e` read the `staging` environment's secrets |
+| Test jobs on `main` | `production.yaml`'s `test-quick` and `test-e2e` read the `staging` environment's secrets. Accepted for the cutover (K1). Fixed after it in section 16, Narrow the staging tokens |
 | Catalog restore | Restores whole tables and leaves the gaps listed in 12.3. `session_replication_role` was verified on a local stack only: 9.6 C3 probes each project |
 | Catalog script messages | `importCatalogData.sh` calls the `with_db_url` helper "the cutover runbook's ... (1.4)": in this runbook it is 2.4 |
 | `[skip deploy]` | Not a GitHub keyword: each release commit on `develop` starts a `staging.yaml` run |
