@@ -43,6 +43,8 @@ review gets a public post-commit review.
 | D7 | Creating the public review labels, board, and issues | **All 140 issues are opened together, and only on Pablo's approval.** Nothing is created automatically. The runbook holds a prompt Pablo pastes into a new agent session when he is ready. |
 | E1 | How CI addresses the staging site in Vercel | **The Vercel environment named `staging`.** It already exists, with staging's variables pointing at the staging Supabase project. |
 | A2 | Does `ava release --yes` proceed on a non-passing CI verdict | **No: it stops.** Overriding takes `--skip-ci-check`. Chosen because `main` now deploys production. |
+| A3 | When the GitHub `production` environment is protected | **Before any production secret is added:** a deployment branch policy allowing only `main`, and a required reviewer. |
+| H1 | Which `FEATUREBASE_JWT_SECRET` value is authoritative for staging | **The GitHub `staging` environment's value.** The first staging deploy overwrites staging's own value with it. |
 
 Carried over from the alpha plan, still true:
 
@@ -235,15 +237,15 @@ What each database then applies:
 
 | Database | Has today | Applies | Notes |
 | --- | --- | --- | --- |
-| Production (Postgres 15.8) | 115 | 79 files, in timestamp order | The table is created, dropped, and created again in one push, empty the whole time. |
-| Staging (Postgres 17.4) | 184 | 10 files: the 7 dictionary and crosswalk files out of order, then the restore and the two slot files | `staging.yaml` already passes `--include-all`. |
-| Local reset | 0 | 194 files | Verified on a switched stack, with an empty `supabase db diff` against `supabase/schemas/`. |
+| Production (Postgres 15.8) | 115 | 80 files, in timestamp order | The table is created, dropped, and created again in one push, empty the whole time. |
+| Staging (Postgres 17.4) | 185 | 10 files: the 7 dictionary and crosswalk files out of order, then the restore and the two slot files | `staging.yaml` already passes `--include-all`. |
+| Local reset | 0 | 195 files | Verified on a switched stack, with an empty `supabase db diff` against `supabase/schemas/`. |
 
 The `demo-measles` branch is never migrated again. The desktop app's
 generated SQLite migrations are regenerated from the final set.
 
 The audit ([alpha-migration-audit.md](alpha-migration-audit.md)) covered 76
-files on 2026-11-19. It is refreshed, read-only, for production's 79 files
+files on 2026-11-19. It is refreshed, read-only, for production's 80 files
 and staging's 10, and renamed `production-migration-audit.md`.
 
 ## 8. Deploys
@@ -357,10 +359,13 @@ replace breaks no other user's data. The import backs the old rows up first.
 | F | Agent | Retroactive review scaffolding: policy document, issue template, the script that drafts the issues, the publishing prompt for the runbook, the promotion PR description. Nothing is published. |
 | G | Pablo | The cutover, from the runbook. |
 
+Stage D (Task 17 of the implementation plan) was deferred by Pablo and is
+still a precondition of the promotion: the runbook's section 4.8 holds it.
+
 Stage G in order:
 
 1. Announce the freeze. Rehearse: restore a production dump into a switched
-   local stack, apply the 79 migrations, open old dashboards.
+   local stack, apply the 80 migrations, open old dashboards.
 2. Set the GitHub `staging` and `production` environment values, and a
    required reviewer on `production`.
 3. Push the integration result to `demo/measles`. Open the PR into `develop`.

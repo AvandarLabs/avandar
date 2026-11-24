@@ -52,7 +52,8 @@ undoing.
 
 ### 2.1 Read first
 
-- [The cutover plan](production-cutover-plan.md): decisions D1 to D7, E1, A2.
+- [The cutover plan](production-cutover-plan.md): decisions D1 to D7, E1, A2, A3,
+  H1.
 - [The migration audit](alpha-migration-audit.md), dated 2026-11-19. It
   covers 76 files and found no blocker. **Its refresh for production's
   current set and staging's 10 files has not been done** (4.8). It must be
@@ -783,6 +784,18 @@ client whose ID is the production `GOOGLE_CLIENT_ID` > **Authorized
 redirect URIs** must contain the URI printed above. `production.yaml` sets
 exactly this as `GOOGLE_REDIRECT_URI`. Add it if missing: **CHANGES GOOGLE
 CLOUD CONSOLE**.
+
+Staging too: every staging deploy sets staging's `GOOGLE_REDIRECT_URI` to
+staging's own callback, so check staging's OAuth client the same way.
+
+```bash
+echo "https://$STAGING_REF.supabase.co/functions/v1/google-auth-callback"
+```
+
+Same screen > the OAuth client whose ID is the staging `GOOGLE_CLIENT_ID` >
+**Authorized redirect URIs** must contain the URI printed above.
+`staging.yaml` writes `<STAGING_SUPABASE_URL>/functions/v1/google-auth-callback`
+on every deploy. Add it if missing: **CHANGES GOOGLE CLOUD CONSOLE**.
 
 ### 6.3 Polar
 
@@ -1679,8 +1692,14 @@ It then commits `Release: v0.15.0 [skip deploy]` on `develop` and pushes it,
 builds the `main` commit from that tree, creates the annotated tag
 `v0.15.0`, pushes `main` and the tag together, then commits `Bump version
 to 0.15.1-dev [skip deploy]` on `develop` and pushes it. `[skip deploy]` is
-not a GitHub keyword: each `develop` push starts a `staging.yaml` run that
-redeploys staging. That is harmless.
+not a GitHub keyword: each of the two `develop` pushes starts a
+`staging.yaml` run. Expect the run for `Release: v0.15.0` to end red at the
+deploy job's `Refuse anything but the tip of develop` step (`develop is at
+<sha>, this run is for <sha>`): `develop` has already moved on to the
+version bump, so the tip check refuses the stale commit before it touches
+staging. That is not a failure. The run for `Bump version to 0.15.1-dev` is
+the one that redeploys staging and must pass, and `ava release` checked
+staging's CI verdict before it pushed anything.
 
 | Release fails at | State | Do |
 | --- | --- | --- |

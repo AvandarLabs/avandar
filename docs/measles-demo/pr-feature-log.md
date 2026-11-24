@@ -12308,8 +12308,9 @@ on a release line:
   still where preflight found it. The version commit touches `package.json`
   only, and pushes use full refspecs.
 - The deploy job from `.github/workflows/alpha.yaml` (read it with
-  `git show ca358d64c^:.github/workflows/alpha.yaml`), to be copied into
-  `production.yaml` and `staging.yaml`: it refuses to deploy anything but
+  `git show ca358d64c^:.github/workflows/alpha.yaml`), now the deploy job
+  of `production.yaml` and `staging.yaml` on `chore/production-cutover`: it
+  refuses to deploy anything but
   the branch tip, checks the configuration, builds before any write, scopes
   credentials to the step that needs them, writes secrets to a single-quoted
   file, and never cancels a running deploy.

@@ -67,9 +67,9 @@ AVA-611.
   dropped, and created again in one push, and it is empty the whole time.
 - **Two plugin migrations get later timestamps,** with unchanged contents, so
   they run after the restore. No shared database has run them yet.
-- **What each database applies:** production applies 79 migration files in
+- **What each database applies:** production applies 80 migration files in
   timestamp order, staging applies 10, and a fresh local database applies
-  all 194, with no difference from the declared schema in
+  all 195, with no difference from the declared schema in
   `supabase/schemas/`.
 
 ## How it lands
