@@ -51,7 +51,7 @@ it("resolves the catalog export from the packed tarball", () => {
   const directory = mkdtempSync(join(tmpdir(), "avandar-lint-pack-"));
   try {
     installPublicPackages({ directory: directory, names: ["core"] });
-    ["ajv", "yaml"].forEach((dependency) => {
+    ["ajv", "yaml", "@avandar/acclimate"].forEach((dependency) => {
       symlinkSync(
         resolve(import.meta.dirname, "../../node_modules", dependency),
         join(directory, "node_modules", dependency),

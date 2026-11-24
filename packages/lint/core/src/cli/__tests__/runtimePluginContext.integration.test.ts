@@ -270,7 +270,7 @@ it("proves the official packed entry from a standalone core package", async () =
     });
   readdirSync(join(ROOT, "node_modules/@avandar"))
     .filter((name) => {
-      return !["lint", "lint-typescript"].includes(name);
+      return !["acclimate", "lint", "lint-typescript"].includes(name);
     })
     .forEach((name) => {
       symlinkSync(
@@ -278,7 +278,7 @@ it("proves the official packed entry from a standalone core package", async () =
         join(directory, "node_modules/@avandar", name),
       );
     });
-  ["ajv", "yaml"].forEach((name) => {
+  ["ajv", "yaml", "@avandar/acclimate"].forEach((name) => {
     if (!existsSync(join(directory, "node_modules", name))) {
       symlinkSync(
         join(ROOT, "packages/lint/core/node_modules", name),

@@ -34,6 +34,7 @@ function _runTerminalCommand(
   options: Readonly<{
     path: string;
     args: readonly string[];
+    env?: Readonly<Record<string, string | undefined>>;
   }>,
 ): SpawnSyncReturns<string> {
   return spawnSync(
@@ -48,7 +49,12 @@ function _runTerminalCommand(
     {
       encoding: "utf8",
       timeout: 6000,
-      env: { ...process.env, NO_COLOR: "", TERM: "xterm-256color" },
+      env: {
+        ...process.env,
+        NO_COLOR: "",
+        TERM: "xterm-256color",
+        ...options.env,
+      },
     },
   );
 }
@@ -62,9 +68,26 @@ it.each([
     args: ["--help"],
   });
   expect(result.status, result.stderr).toBe(0);
-  expect(result.stdout).toContain("Usage:");
+  expect(result.stdout).toContain("Usage");
   expect(result.stdout).toContain("\u001b[");
 });
+
+it.each([
+  ["NO_COLOR", { NO_COLOR: "1", TERM: "xterm-256color" }],
+  ["TERM=dumb", { NO_COLOR: "", TERM: "dumb" }],
+])(
+  "omits ANSI escapes in coverage help when %s is set",
+  (_label: string, env: Readonly<Record<string, string>>) => {
+    const result = _runTerminalCommand({
+      path: resolve(import.meta.dirname, "../../../src/cli/cliHelpers.ts"),
+      args: ["--help"],
+      env,
+    });
+    expect(result.status, result.stderr).toBe(0);
+    expect(result.stdout).toContain("Usage");
+    expect(result.stdout).not.toContain("\u001b[");
+  },
+);
 
 it("colors benchmark invocation errors on a capable terminal", () => {
   const result = _runTerminalCommand({
@@ -84,15 +107,15 @@ it.each([
     "paste and arrow Enter",
     "fixture.ts\r",
     0,
-    '"path":"fixture.ts","format":2',
+    '"paths":["fixture.ts"],"format":"json"',
   ],
-  ["Ctrl-C", "\u0003", 1, "Cancelled"],
-  ["EOF", "\u0004", 1, "Cancelled"],
+  ["Ctrl-C", "\u0003", 130, "prompt_cancelled"],
+  ["EOF", "\u0004", 130, "prompt_cancelled"],
 ] as const)(
-  "accepts terminal %s without dropping keys or hanging",
+  "accepts terminal %s through Acclimate wizard without dropping keys or hanging",
   (_, input, exitCode, expected) => {
-    const terminalPath = resolve(import.meta.dirname, "../terminalHelpers.ts");
-    const script = `import {openTerminal} from ${JSON.stringify(terminalPath)}; const prompt=openTerminal(); try { const path=await prompt.ask('Paths','.'); const format=await prompt.choose('Format',['stylish','agent','json'],0); console.log(JSON.stringify({path,format})); } finally {prompt.close();}`;
+    const cliPath = resolve(import.meta.dirname, "../cliHelpers.ts");
+    const script = `import { CLIError } from "@avandar/acclimate"; import { runCoverageWizard } from ${JSON.stringify(cliPath)}; try { const result = await runCoverageWizard(); console.log(JSON.stringify(result)); } catch (error) { console.error(error instanceof CLIError ? error.code : String(error)); process.exitCode = error instanceof CLIError && error.code === "prompt_cancelled" ? 130 : 1; }`;
     const result = spawnSync(
       "python3",
       [
@@ -114,10 +137,10 @@ while time.time() < deadline:
         if not chunk:
             break
         output += chunk
-        if stage == 0 and b'Paths [default:' in output:
+        if stage == 0 and b'Paths (comma-separated)' in output:
             os.write(descriptor, sys.argv[3].encode())
             stage = 1
-        elif stage == 1 and b'Format [default:' in output:
+        elif stage == 1 and b'Format' in output:
             os.write(descriptor, b'\\x1b[A\\r')
             stage = 2
     child, status = os.waitpid(pid, os.WNOHANG)
@@ -140,11 +163,18 @@ sys.exit(os.waitstatus_to_exitcode(status))
       {
         encoding: "utf8",
         timeout: 6000,
-        env: { ...process.env, NO_COLOR: "1" },
+        env: {
+          ...process.env,
+          NO_COLOR: "1",
+          TERM: "xterm-256color",
+          CI: "",
+        },
       },
     );
     expect(result.status, result.stdout + result.stderr).toBe(exitCode);
     expect(result.stdout).toContain(expected);
-    expect(result.stdout).not.toContain("\u001b[");
+    expect(result.stdout).not.toMatch(
+      new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*m`),
+    );
   },
 );

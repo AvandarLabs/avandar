@@ -2,64 +2,120 @@ import { spawnSync } from "node:child_process";
 import { writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
+import { PassThrough } from "node:stream";
 import { describe, expect, it } from "vitest";
+import type { PromptIo } from "@avandar/acclimate";
 import { createCoverageDirectory as _createDirectory } from "../../__tests__/coverage.fixtures";
 import { createNativeRepository } from "../../__tests__/nativeProof.fixtures";
-import {
-  getMenuSelectionFromKey,
-  runCli,
-  runCoverageWizard,
-} from "../cliHelpers";
+import { runCli, runCoverageWizard } from "../cliHelpers";
 
-/** Wizard contracts are independent of terminal drawing and filesystem IO. */
+function _createScriptedPromptIo(
+  options: Readonly<{
+    isRawModeSupported?: boolean;
+    onWrite?: (chunk: string, input: PassThrough) => void;
+    onClose?: () => void;
+  }> = {},
+): {
+  promptIo: PromptIo;
+  input: PassThrough;
+  output: string[];
+} {
+  const input = new PassThrough();
+  const output: string[] = [];
+  const rawInput = Object.assign(input, {
+    isTTY: options.isRawModeSupported ?? true,
+    isRaw: false,
+    setRawMode: (mode: boolean) => {
+      rawInput.isRaw = mode;
+    },
+  });
+  return {
+    input,
+    output,
+    promptIo: {
+      input: rawInput,
+      output: {
+        isTTY: true,
+        write: (chunk: string) => {
+          output.push(chunk);
+          options.onWrite?.(chunk, input);
+        },
+      },
+      isColorEnabled: false,
+      isRawModeSupported: options.isRawModeSupported ?? true,
+      close: () => {
+        options.onClose?.();
+      },
+    },
+  };
+}
+
+/** CLI contracts verify Acclimate parsing, prompts, streams, and exits. */
 describe("coverage CLI", () => {
   it.each([
-    ["j", 0, 1],
-    ["k", 0, 2],
-    ["down", 2, 0],
-    ["up", 0, 2],
-    ["g", 2, 0],
-    ["G", 0, 2],
-  ])("moves %s from %i to %i", (key, selected, expected) => {
-    expect(
-      getMenuSelectionFromKey({ key: key, selected: selected, numChoices: 3 }),
-    ).toBe(expected);
-  });
-
-  it("offers every optional field and visible default in the bare wizard", async () => {
-    const prompts: string[] = [];
-    const result = await runCoverageWizard({
-      ask: async (label, defaultValue) => {
-        prompts.push(`${label}: ${defaultValue}`);
-        return "";
-      },
-      choose: async (label, values, selected) => {
-        prompts.push(`${label}: ${values.join("|")}: ${selected}`);
-        return selected;
-      },
-    });
-    expect(prompts).toEqual([
-      "Paths (comma-separated): .",
-      "Format: stylish|agent|json: 0",
-    ]);
-    expect(result).toEqual({ paths: ["."], format: "stylish" });
-  });
-
-  it.each(["Ctrl-C", "EOF"])(
-    "cancels the wizard on %s before coverage runs",
-    async (reason) => {
-      await expect(
-        runCoverageWizard({
-          ask: async () => {
-            throw new Error(reason);
-          },
-          choose: async () => {
-            return 0;
-          },
-        }),
-      ).rejects.toThrow(reason);
+    ["j", "j\r", "agent"],
+    ["k", "k\r", "json"],
+    ["down wrap", "jjj\r", "stylish"],
+    ["up wrap", "\u001b[A\r", "json"],
+    ["g", "jkg\r", "stylish"],
+    ["G", "G\r", "json"],
+  ])(
+    "navigates the wizard format menu with %s to select %s",
+    async (_label, menuKeys, expectedFormat) => {
+      let stage = 0;
+      const { promptIo, output } = _createScriptedPromptIo({
+        onWrite: (_chunk, input) => {
+          const combined = output.join("");
+          if (stage === 0 && combined.includes("Paths (comma-separated)")) {
+            stage = 1;
+            queueMicrotask(() => {
+              input.write("\n");
+            });
+          } else if (stage === 1 && combined.includes("Format")) {
+            stage = 2;
+            queueMicrotask(() => {
+              input.write(menuKeys);
+            });
+          }
+        },
+      });
+      const result = await runCoverageWizard({ promptIo, interactive: true });
+      expect(output.join("")).toContain("Paths (comma-separated)");
+      expect(output.join("")).toContain("[default: .]");
+      expect(output.join("")).toContain("Format");
+      expect(result).toEqual({ paths: ["."], format: expectedFormat });
     },
   );
+
+  it.each([
+    [
+      "Ctrl-C",
+      (input: PassThrough) => {
+        return input.write("\u0003");
+      },
+    ],
+    [
+      "EOF",
+      (input: PassThrough) => {
+        return input.end();
+      },
+    ],
+  ])("cancels the wizard on %s before coverage runs", async (_label, trigger) => {
+    let didSend = false;
+    const { promptIo, output } = _createScriptedPromptIo({
+      onWrite: (_chunk, input) => {
+        if (!didSend && output.join("").includes("Paths (comma-separated)")) {
+          didSend = true;
+          queueMicrotask(() => {
+            trigger(input);
+          });
+        }
+      },
+    });
+    await expect(
+      runCoverageWizard({ promptIo, interactive: true }),
+    ).rejects.toMatchObject({ code: "prompt_cancelled" });
+  });
 
   it("prints help outside a repository before invalid arguments or coverage access", async () => {
     const stdout: string[] = [];
@@ -68,7 +124,7 @@ describe("coverage CLI", () => {
       io: {
         cwd: "/missing/repository",
         stdout: (value) => {
-          return stdout.push(value);
+          stdout.push(value);
         },
         stderr: () => {
           throw new Error("unexpected diagnostics");
@@ -77,31 +133,45 @@ describe("coverage CLI", () => {
     });
     expect(status).toBe(0);
     expect(stdout.join("")).toContain("--format stylish|agent|json");
-    expect(stdout.join("")).toContain("Examples:");
+    expect(stdout.join("")).toContain("Examples");
   });
 
-  it("keeps explicit JSON stdout parseable and emits progress on stderr", async () => {
+  it("keeps explicit JSON stdout parseable with interleaved variadic paths and emits progress on stderr", async () => {
     const directory = _createDirectory();
-    writeFileSync(join(directory, "data.json"), "{}");
+    writeFileSync(join(directory, "first.json"), "{}");
+    writeFileSync(join(directory, "second.json"), "{}");
     const stdout: string[] = [];
     const stderr: string[] = [];
     const status = await runCli({
-      args: ["coverage", "data.json", "--format", "json", "--no-prompt"],
+      args: [
+        "coverage",
+        "--format",
+        "json",
+        "first.json",
+        "--no-prompt",
+        "second.json",
+      ],
       io: {
         cwd: directory,
         stdout: (value) => {
-          return stdout.push(value);
+          stdout.push(value);
         },
         stderr: (value) => {
-          return stderr.push(value);
+          stderr.push(value);
         },
-        terminal: () => {
+        openTty: async () => {
           throw new Error("explicit values must not prompt");
         },
       },
     });
     expect(status).toBe(0);
-    expect(JSON.parse(stdout.join("")).outcomes.length).toBeGreaterThan(0);
+    const parsed = JSON.parse(stdout.join(""));
+    expect(parsed.outcomes).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ path: join(directory, "first.json") }),
+        expect.objectContaining({ path: join(directory, "second.json") }),
+      ]),
+    );
     expect(stderr.join("")).toContain("Checking coverage");
   });
 
@@ -114,12 +184,10 @@ describe("coverage CLI", () => {
       io: {
         cwd: directory,
         stdout: (value) => {
-          return stdout.push(value);
+          stdout.push(value);
         },
         stderr: () => {},
-        terminal: () => {
-          return undefined;
-        },
+        interactive: false,
       },
     });
     expect(status).toBe(0);
@@ -130,34 +198,36 @@ describe("coverage CLI", () => {
     const directory = _createDirectory();
     writeFileSync(join(directory, "data.json"), "{}");
     const stdout: string[] = [];
-    const prompts: string[] = [];
     let hasClosed = false;
+    let didSelect = false;
+    const { promptIo, output } = _createScriptedPromptIo({
+      onWrite: (_chunk, input) => {
+        if (!didSelect && output.join("").includes("Format")) {
+          didSelect = true;
+          queueMicrotask(() => {
+            input.write("\u001b[A\r");
+          });
+        }
+      },
+      onClose: () => {
+        hasClosed = true;
+      },
+    });
     const status = await runCli({
       args: ["coverage", "data.json", "--format"],
       io: {
         cwd: directory,
-        stdout: (value: string): void => {
+        stdout: (value) => {
           stdout.push(value);
         },
-        stderr: (): void => {},
-        terminal: () => {
-          return {
-            ask: async (): Promise<string> => {
-              throw new Error("The explicit path must not be prompted again");
-            },
-            choose: async (label: string): Promise<number> => {
-              prompts.push(label);
-              return 2;
-            },
-            close: (): void => {
-              hasClosed = true;
-            },
-          };
-        },
+        stderr: () => {},
+        promptIo,
+        interactive: true,
       },
     });
     expect(status).toBe(0);
-    expect(prompts).toEqual(["Format"]);
+    expect(output.join("")).not.toContain("Paths (comma-separated)");
+    expect(output.join("")).toContain("Format");
     expect(hasClosed).toBe(true);
     expect(JSON.parse(stdout.join("")).outcomes).toEqual(
       expect.arrayContaining([
@@ -172,13 +242,13 @@ describe("coverage CLI", () => {
     const status = await runCli({
       args: ["coverage", "--format", "--no-prompt"],
       io: {
-        stdout: (value: string): void => {
+        stdout: (value) => {
           stdout.push(value);
         },
-        stderr: (value: string): void => {
+        stderr: (value) => {
           stderr.push(value);
         },
-        terminal: () => {
+        openTty: async () => {
           throw new Error("Unattended invocations must not prompt");
         },
       },
@@ -186,29 +256,35 @@ describe("coverage CLI", () => {
     expect(status).toBe(1);
     expect(stdout).toEqual([]);
     expect(stderr.join("")).toContain("--format");
-    expect(stderr.join("")).toContain("Examples:");
+    expect(stderr.join("")).toContain("Examples");
   });
 
-  it("rejects invalid invocations with full usage and recovery guidance on stderr", async () => {
-    const stdout: string[] = [];
-    const stderr: string[] = [];
-    expect(
-      await runCli({
-        args: ["coverage", "--format", "xml"],
-        io: {
-          stdout: (value) => {
-            return stdout.push(value);
+  it.each([
+    ["invalid format choice", ["coverage", "--format", "xml"]],
+    ["unknown flag", ["coverage", "--unknown-flag"]],
+  ])(
+    "rejects %s with full usage and recovery guidance on stderr",
+    async (_label, args) => {
+      const stdout: string[] = [];
+      const stderr: string[] = [];
+      expect(
+        await runCli({
+          args,
+          io: {
+            stdout: (value) => {
+              stdout.push(value);
+            },
+            stderr: (value) => {
+              stderr.push(value);
+            },
           },
-          stderr: (value) => {
-            return stderr.push(value);
-          },
-        },
-      }),
-    ).toBe(1);
-    expect(stdout).toEqual([]);
-    expect(stderr.join("")).toContain("  ⚠️");
-    expect(stderr.join("")).toContain("Examples:");
-  });
+        }),
+      ).toBe(1);
+      expect(stdout).toEqual([]);
+      expect(stderr.join("")).toContain("  ⚠️");
+      expect(stderr.join("")).toContain("Examples");
+    },
+  );
 
   it.each(["listing", "proof"])(
     "retains the native %s failure reason on stderr while keeping JSON parseable",
@@ -235,10 +311,10 @@ describe("coverage CLI", () => {
         ],
         io: {
           cwd: directory,
-          stdout: (value: string): void => {
+          stdout: (value) => {
             stdout.push(value);
           },
-          stderr: (value: string): void => {
+          stderr: (value) => {
             stderr.push(value);
           },
         },
@@ -248,6 +324,7 @@ describe("coverage CLI", () => {
       expect(stderr.join("")).toContain("engine-fixture-failure");
       expect(stderr.join("")).toContain("exit 2");
     },
+    15000,
   );
 });
 
@@ -261,5 +338,6 @@ it("prints coverage help through the installed workspace binary", () => {
     { cwd: tmpdir(), encoding: "utf8" },
   );
   expect(result.status, result.stderr).toBe(0);
-  expect(result.stdout).toContain("Usage: avandar-lint");
+  expect(result.stdout).toContain("Usage");
+  expect(result.stdout).toContain("avandar-lint coverage");
 });

@@ -1,232 +1,236 @@
 #!/usr/bin/env node
 /* oxlint-disable import/extensions -- Node needs source extensions. */
+import {
+  Acclimate,
+  CLIError,
+  openTerminalSession,
+} from "@avandar/acclimate";
+import type {
+  AnyCLI,
+  ChoiceMenuItem,
+  PromptIo,
+  TerminalInputStream,
+  TerminalOutputStream,
+  TerminalSession,
+} from "@avandar/acclimate";
 import { collectCoverage } from "./coverageHelpers.ts";
 import { createCssCoverageProbes } from "./createCssCoverageProbes.ts";
 import { createNativeCoverageProbes } from "./nativeSafeRules/createNativeCoverageProbes.ts";
-import {
-  buildHelpText,
-  createTheme,
-  openTerminal,
-  type PromptIo,
-} from "./terminalHelpers.ts";
 
-export { getMenuSelectionFromKey } from "./terminalHelpers.ts";
-
-const HELP: string = `Inspect proven lint coverage for exact files and capabilities.
-
-Usage: avandar-lint
-       avandar-lint coverage [PATH]... [--format stylish|agent|json] [--no-prompt]
-
-Commands:
-  coverage                 Report enforced, not-applicable, or fallback outcomes.
-
-Arguments:
-  PATH                     File or directory, repeatable. Default: current directory.
-
-Options:
-  --format stylish|agent|json  Output format. Default: stylish.
-  --no-prompt               Use defaults without opening the terminal wizard.
-  -h, --help                Print help and exit before repository access.
-
-A bare root opens the action menu; bare coverage offers paths and format in a
-controlling terminal. Without a terminal, defaults execute immediately. Explicit
-values bypass prompts. A missing --format value prompts only for the format,
-unless --no-prompt is supplied. JSON stdout contains only the coverage result. Progress
-and recovery advice use stderr. Unknown or unproven capabilities remain fallback.
-Operational failures exit 1; completed coverage (including fallback) exits 0.
-
-Examples:
-  avandar-lint coverage src/example.ts --format json
-  avandar-lint coverage src shared --format agent --no-prompt
-`;
 const FORMATS = ["stylish", "agent", "json"] as const;
-type Format = (typeof FORMATS)[number];
-type Options = { paths: string[]; format: Format };
+const FORMAT_CHOICES: ReadonlyArray<ChoiceMenuItem<Format>> = [
+  { value: "stylish", label: "stylish" },
+  { value: "agent", label: "agent" },
+  { value: "json", label: "json" },
+];
+const USAGE_SYNOPSIS =
+  "avandar-lint coverage [PATH]... [--format stylish|agent|json] [--no-prompt]";
+const EXAMPLES = [
+  { command: "avandar-lint coverage src/example.ts --format json" },
+  { command: "avandar-lint coverage src shared --format agent --no-prompt" },
+] as const;
 
-/**
- * Collects coverage paths and output format with visible defaults.
- * For example, use it to configure coverage through a terminal prompt.
- * Returns the selected paths and format.
- */
-export async function runCoverageWizard(
-  prompt: Readonly<PromptIo>,
-): Promise<Options> {
-  const paths = (await prompt.ask("Paths (comma-separated)", "."))
-    .split(",")
-    .map((path) => {
-      return path.trim();
-    })
-    .filter(Boolean);
-  const format =
-    FORMATS[await prompt.choose("Format", FORMATS, 0)] ?? "stylish";
-  return { paths: paths.length ? paths : ["."], format };
+type Format = (typeof FORMATS)[number];
+type CoverageOptions = { paths: string[]; format: Format };
+type CliIo = {
+  cwd?: string;
+  stdin?: TerminalInputStream;
+  stdout?: (value: string) => void;
+  stderr?: (value: string) => void;
+  env?: Readonly<Record<string, string | undefined>>;
+  isStdoutTTY?: boolean;
+  isStderrTTY?: boolean;
+  interactive?: boolean;
+  terminal?: TerminalSession;
+  promptIo?: PromptIo;
+  openTty?: () => Promise<TerminalSession | undefined>;
+};
+type WizardOptions = {
+  terminal?: TerminalSession;
+  promptIo?: PromptIo;
+  stdin?: TerminalInputStream;
+  stdout?: TerminalOutputStream;
+  stderr?: TerminalOutputStream;
+  env?: Readonly<Record<string, string | undefined>>;
+  interactive?: boolean;
+  openTty?: () => Promise<TerminalSession | undefined>;
+};
+
+function _toOutputStream(
+  write: ((value: string) => void) | undefined,
+  isTTY: boolean | undefined,
+): TerminalOutputStream | undefined {
+  if (!write) {
+    return undefined;
+  }
+  return { write, isTTY: isTTY ?? false };
 }
 
-function _parseOptions(args: readonly string[]): Options {
-  const formats: Format[] = args.flatMap((argument, index) => {
-    if (argument === "--format") {
-      const format = FORMATS.find((candidate) => {
-        return candidate === args[index + 1];
-      });
-      if (!format) {
-        throw new Error("--format requires stylish, agent, or json");
-      }
-      return [format];
-    }
-    if (
-      args[index - 1] !== "--format" &&
-      argument !== "--no-prompt" &&
-      argument.startsWith("-")
-    ) {
-      throw new Error(`Unknown option: ${argument}`);
-    }
-    return [];
-  });
-  const paths: string[] = args.filter((argument, index) => {
-    return (
-      argument !== "--format" &&
-      argument !== "--no-prompt" &&
-      args[index - 1] !== "--format"
-    );
-  });
+function _toSessionFromPromptIo(promptIo: Readonly<PromptIo>): TerminalSession {
   return {
-    paths: paths.length ? paths : ["."],
-    format: formats.at(-1) ?? "stylish",
+    input: promptIo.input,
+    output: promptIo.output,
+    isColorEnabled: promptIo.isColorEnabled ?? false,
+    isRawModeSupported: promptIo.isRawModeSupported ?? false,
+    close: async () => {
+      await promptIo.close?.();
+    },
   };
 }
 
-async function _getExplicitOptions({
-  args,
-  terminal,
-}: Readonly<{
-  args: readonly string[];
-  terminal: () => PromptIo | undefined;
-}>): Promise<Options> {
-  const missingIndex = args.findIndex((argument, index) => {
-    const value = args[index + 1];
-    return argument === "--format" && (!value || value.startsWith("-"));
+function _buildSessionOptions(
+  io: Readonly<CliIo>,
+  isPromptDisabled: boolean,
+): Parameters<typeof openTerminalSession>[0] {
+  const effectiveInteractive = isPromptDisabled ? false : io.interactive;
+  if (io.terminal) {
+    return { session: io.terminal, interactive: effectiveInteractive };
+  }
+  if (io.promptIo) {
+    const promptIo = io.promptIo;
+    return {
+      interactive: effectiveInteractive,
+      env: io.env,
+      openTty: async () => {
+        return _toSessionFromPromptIo(promptIo);
+      },
+    };
+  }
+  return {
+    interactive: effectiveInteractive,
+    stdin: io.stdin,
+    stdout: _toOutputStream(io.stdout, io.isStdoutTTY),
+    stderr: _toOutputStream(io.stderr, io.isStderrTTY),
+    env: io.env,
+    openTty: io.openTty,
+  };
+}
+
+function _findDanglingFormatIndex(args: readonly string[]): number {
+  if (args[0] !== "coverage") {
+    return -1;
+  }
+  const endOfOptionsIndex = args.indexOf("--");
+  const optionSlice =
+    endOfOptionsIndex === -1
+      ? args.slice(1)
+      : args.slice(1, endOfOptionsIndex);
+  if (
+    optionSlice.includes("--help") ||
+    optionSlice.includes("-h") ||
+    optionSlice.includes("--no-prompt")
+  ) {
+    return -1;
+  }
+  const hasUnknownOption = optionSlice.some((token, index) => {
+    if (!token.startsWith("-") || optionSlice[index - 1] === "--format") {
+      return false;
+    }
+    return token !== "--format" && !token.startsWith("--format=");
   });
-  if (missingIndex === -1) {
-    return _parseOptions(args);
+  if (hasUnknownOption) {
+    return -1;
   }
-  _parseOptions(args.toSpliced(missingIndex + 1, 0, "stylish"));
-  const prompt = args.includes("--no-prompt") ? undefined : terminal();
-  if (!prompt) {
-    throw new Error(
-      "--format requires a value. Try avandar-lint coverage --format json --no-prompt",
-    );
-  }
-  try {
-    const selection = await prompt.choose("Format", FORMATS, 0);
-    const format = FORMATS[selection];
-    if (!format) {
-      throw new Error("Choose stylish, agent, or json for --format");
-    }
-    return _parseOptions(args.toSpliced(missingIndex + 1, 0, format));
-  } finally {
-    prompt.close?.();
-  }
+  const relativeIndex = optionSlice.findIndex((token, index) => {
+    const nextToken = optionSlice[index + 1];
+    return token === "--format" && (!nextToken || nextToken.startsWith("-"));
+  });
+  return relativeIndex === -1 ? -1 : relativeIndex + 1;
 }
 
-async function _getOptions({
+async function _resolveMissingFormatArg({
   args,
-  terminal,
+  io,
 }: Readonly<{
   args: readonly string[];
-  terminal: () => PromptIo | undefined;
-}>): Promise<Options> {
-  if (args.length) {
-    return _getExplicitOptions({ args, terminal });
+  io: Readonly<CliIo>;
+}>): Promise<{ args: readonly string[]; cancelledCode?: number }> {
+  const missingIndex = _findDanglingFormatIndex(args);
+  if (missingIndex === -1) {
+    return { args };
   }
-  const prompt = terminal();
-  if (!prompt) {
-    return { paths: ["."], format: "stylish" };
+  const session = await openTerminalSession(_buildSessionOptions(io, false));
+  if (!session) {
+    return { args };
   }
   try {
-    return await runCoverageWizard(prompt);
-  } finally {
-    prompt.close?.();
-  }
-}
-
-type CliIo = {
-  cwd?: string;
-  stdout?: (value: string) => void;
-  stderr?: (value: string) => void;
-  terminal?: () => PromptIo | undefined;
-};
-type OutputIo = {
-  cwd?: string;
-  stdout: (value: string) => void;
-  stderr: (value: string) => void;
-  theme: ReturnType<typeof createTheme>;
-};
-
-async function _selectAction(
-  terminal: () => PromptIo | undefined,
-): Promise<void> {
-  const prompt = terminal();
-  if (prompt) {
-    try {
-      await prompt.choose("Action", ["coverage"], 0);
-    } finally {
-      prompt.close?.();
+    const chosen = await Acclimate.requestChoice<Format>({
+      message: "Format",
+      choices: FORMAT_CHOICES,
+      defaultValue: "stylish",
+      terminal: session,
+      cliName: "avandar-lint coverage",
+    });
+    return { args: args.toSpliced(missingIndex + 1, 0, chosen) };
+  } catch (error) {
+    if (error instanceof CLIError && error.code === "prompt_cancelled") {
+      Acclimate.printError(error.message, {
+        stream: _toOutputStream(io.stderr, io.isStderrTTY),
+        env: io.env,
+      });
+      return { args, cancelledCode: 130 };
     }
+    throw error;
+  } finally {
+    await session.close();
   }
 }
 
-function _writeResult({
+function _writeCoverageResult({
   result,
   format,
-  io,
 }: Readonly<{
   result: Awaited<ReturnType<typeof collectCoverage>>;
   format: Format;
-  io: Readonly<OutputIo>;
 }>): void {
-  io.stdout(
-    format === "json"
-      ? `${JSON.stringify(result)}\n`
-      : `${result.outcomes
-          .map((outcome) => {
-            return `${outcome.ruleId} ${outcome.language} ${outcome.path} [${outcome.capability}] ${outcome.state}${outcome.recovery ? `: ${outcome.recovery}` : ""}`;
-          })
-          .join("\n")}\n`,
-  );
-  io.stderr(
-    `${result.operational ? io.theme.success("✅ Coverage complete") : io.theme.error("❌ Coverage encountered engine errors")}: ${result.outcomes.length} outcomes.\n`,
-  );
-  if (!result.operational) {
-    const failures = new Set(
-      result.outcomes
-        .filter((outcome) => {
-          return !outcome.operational;
-        })
-        .map((outcome) => {
-          return outcome.recovery;
-        }),
-    );
-    failures.forEach((failure) => {
-      if (failure) {
-        io.stderr(`${io.theme.error(`❌ ${failure}`)}\n`);
-      }
-    });
-    io.stderr(
-      `${io.theme.warning("  ⚠️ Repair the reported engine error and retry coverage.")}\n`,
-    );
+  if (format === "json") {
+    Acclimate.writeJson(result);
+  } else {
+    const lines = result.outcomes
+      .map((outcome) => {
+        return `${outcome.ruleId} ${outcome.language} ${outcome.path} [${outcome.capability}] ${outcome.state}${outcome.recovery ? `: ${outcome.recovery}` : ""}`;
+      })
+      .join("\n");
+    Acclimate.writeData(lines);
   }
+  if (result.operational) {
+    Acclimate.printSuccess(
+      `Coverage complete: ${result.outcomes.length} outcomes.`,
+    );
+    return;
+  }
+  const failures = Array.from(
+    new Set(
+      result.outcomes.flatMap((outcome) => {
+        return !outcome.operational && outcome.recovery
+          ? [outcome.recovery]
+          : [];
+      }),
+    ),
+  );
+  const recoveryHint = "Repair the reported engine error and retry coverage.";
+  Acclimate.printError(
+    `Coverage encountered engine errors: ${result.outcomes.length} outcomes.`,
+    failures.length === 0 ? { hint: recoveryHint } : undefined,
+  );
+  failures.forEach((failure, index) => {
+    Acclimate.printError(
+      failure,
+      index === failures.length - 1 ? { hint: recoveryHint } : undefined,
+    );
+  });
 }
 
 async function _executeCoverage({
   options,
-  io,
+  cwd,
 }: Readonly<{
-  options: Readonly<Options>;
-  io: Readonly<OutputIo>;
+  options: Readonly<CoverageOptions>;
+  cwd?: string;
 }>): Promise<number> {
-  io.stderr(`${io.theme.heading("Checking coverage for reviewed paths...")}\n`);
+  Acclimate.log("|heading|Checking coverage for reviewed paths...|reset|");
   const timer = setInterval(() => {
-    io.stderr("Still checking coverage...\n");
+    Acclimate.log("Still checking coverage...");
   }, 10000);
   try {
     const { loadRuleCatalog } = await import("../catalog/loadRuleCatalog.ts");
@@ -234,20 +238,173 @@ async function _executeCoverage({
       catalog: loadRuleCatalog(),
       probes: [...createNativeCoverageProbes(), ...createCssCoverageProbes()],
       paths: options.paths,
-      cwd: io.cwd,
+      cwd,
     });
-    _writeResult({ result: result, format: options.format, io: io });
+    _writeCoverageResult({ result, format: options.format });
     return result.operational ? 0 : 1;
   } finally {
     clearInterval(timer);
   }
 }
 
+function _createCoverageCli(
+  options: Readonly<{
+    io: Readonly<CliIo>;
+    isBareCoverage: boolean;
+    onOperationalExitCode?: (exitCode: number) => void;
+  }>,
+): AnyCLI {
+  return Acclimate.createCLI("coverage")
+    .description("Report enforced, not-applicable, or fallback outcomes.")
+    .usage(USAGE_SYNOPSIS)
+    .addPositionalArg({
+      name: "paths",
+      type: "string",
+      variadic: true,
+      required: false,
+      defaultValue: ["."],
+      description: "File or directory, repeatable. Default: current directory.",
+    })
+    .addOption({
+      name: "--format",
+      type: "string",
+      required: false,
+      choices: FORMATS,
+      defaultValue: "stylish",
+      description: "Output format. Default: stylish.",
+    })
+    .addOption({
+      name: "--no-prompt",
+      type: "boolean",
+      required: false,
+      defaultValue: false,
+      description: "Use defaults without opening the terminal wizard.",
+    })
+    .addExample(EXAMPLES[0])
+    .addExample(EXAMPLES[1])
+    .action(async ({ paths, format, noPrompt }) => {
+      const parsedFormat =
+        FORMATS.find((candidate) => {
+          return candidate === format;
+        }) ?? "stylish";
+      let resolvedOptions: CoverageOptions = {
+        paths: paths.length ? paths : ["."],
+        format: parsedFormat,
+      };
+      if (options.isBareCoverage && !noPrompt) {
+        const session = await openTerminalSession(
+          _buildSessionOptions(options.io, false),
+        );
+        if (session) {
+          resolvedOptions = await runCoverageWizard({
+            terminal: session,
+            env: options.io.env,
+          });
+        }
+      }
+      const exitCode = await _executeCoverage({
+        options: resolvedOptions,
+        cwd: options.io.cwd,
+      });
+      options.onOperationalExitCode?.(exitCode);
+    });
+}
+
 /**
- * Runs the coverage CLI with separate output and diagnostic streams.
- * For example, use it to execute coverage with injectable IO in an integration
- * test.
- * Returns zero on completion or help, and one on an operational error.
+ * Collects coverage paths and output format with visible defaults using
+ * Acclimate's controlling-terminal input and choice menu prompts.
+ * For example, use it to configure a bare interactive coverage invocation.
+ */
+export async function runCoverageWizard(
+  options: Readonly<WizardOptions> = {},
+): Promise<CoverageOptions> {
+  const session = await openTerminalSession({
+    session:
+      options.terminal ??
+      (options.promptIo
+        ? _toSessionFromPromptIo(options.promptIo)
+        : undefined),
+    interactive: options.interactive,
+    stdin: options.stdin,
+    stdout: options.stdout,
+    stderr: options.stderr,
+    env: options.env,
+    openTty: options.openTty,
+  });
+  const borrowedSession: TerminalSession | undefined = session
+    ? {
+        ...session,
+        close: async () => {},
+      }
+    : undefined;
+  try {
+    const rawPaths =
+      (await Acclimate.requestInput({
+        message: "Paths (comma-separated)",
+        params: {},
+        responseOptions: {
+          required: false,
+          type: "string",
+          defaultValue: ".",
+        },
+        terminal: borrowedSession,
+        env: options.env,
+        interactive: options.interactive,
+        cliName: "avandar-lint coverage",
+      })) ?? ".";
+    const paths = rawPaths
+      .split(",")
+      .map((path) => {
+        return path.trim();
+      })
+      .filter(Boolean);
+    const format = await Acclimate.requestChoice<Format>({
+      message: "Format",
+      choices: FORMAT_CHOICES,
+      defaultValue: "stylish",
+      terminal: borrowedSession,
+      env: options.env,
+      interactive: options.interactive,
+      cliName: "avandar-lint coverage",
+    });
+    return { paths: paths.length ? paths : ["."], format };
+  } finally {
+    await session?.close();
+  }
+}
+
+/**
+ * Creates the Acclimate CLI tree for `avandar-lint`, wiring `coverage` with
+ * variadic paths, format validation, help metadata, and interactive wizard
+ * handling for bare terminal invocations.
+ */
+export function createAvandarLintCli(
+  options: Readonly<{
+    io?: Readonly<CliIo>;
+    isBareCoverage?: boolean;
+    onOperationalExitCode?: (exitCode: number) => void;
+  }> = {},
+): AnyCLI {
+  const coverageCli = _createCoverageCli({
+    io: options.io ?? {},
+    isBareCoverage: options.isBareCoverage ?? false,
+    onOperationalExitCode: options.onOperationalExitCode,
+  });
+  return Acclimate.createCLI("avandar-lint")
+    .description(
+      "Inspect proven lint coverage for exact files and capabilities.",
+    )
+    .usage(USAGE_SYNOPSIS)
+    .addExample(EXAMPLES[0])
+    .addExample(EXAMPLES[1])
+    .addCommand("coverage", coverageCli);
+}
+
+/**
+ * Runs the coverage CLI through Acclimate with separate output and diagnostic
+ * streams. For example, use it to execute coverage with injectable IO in an
+ * integration test. Returns zero on completion or help, 130 on cancellation,
+ * and one on an operational or invocation error.
  */
 export async function runCli({
   args,
@@ -256,52 +413,38 @@ export async function runCli({
   args: readonly string[];
   io?: Readonly<CliIo>;
 }>): Promise<number> {
-  const stdout =
-    io.stdout ??
-    ((value: string) => {
-      process.stdout.write(value);
-    });
-  const stderr =
-    io.stderr ??
-    ((value: string) => {
-      process.stderr.write(value);
-    });
-  const theme = createTheme(!io.stderr && Boolean(process.stderr.isTTY));
-  if (args.includes("--help") || args.includes("-h")) {
-    stdout(
-      buildHelpText({
-        text: HELP,
-        isTerminal: !io.stdout && Boolean(process.stdout.isTTY),
-      }),
-    );
-    return 0;
+  const { args: resolvedArgs, cancelledCode } = await _resolveMissingFormatArg({
+    args,
+    io,
+  });
+  if (cancelledCode !== undefined) {
+    return cancelledCode;
   }
-  try {
-    if (args[0] && args[0] !== "coverage") {
-      throw new Error(`Unknown command: ${args[0]}`);
-    }
-    if (!args.length) {
-      await _selectAction(io.terminal ?? openTerminal);
-    }
-    const options = await _getOptions({
-      args: args.slice(1),
-      terminal: io.terminal ?? openTerminal,
-    });
-    return await _executeCoverage({
-      options: options,
-      io: {
-        stdout,
-        stderr,
-        theme,
-        cwd: io.cwd,
-      },
-    });
-  } catch (error) {
-    stderr(
-      `${theme.error(`❌ avandar-lint: ${error instanceof Error ? error.message : String(error)}`)}\n${theme.warning("  ⚠️ Run avandar-lint coverage --help, correct the invocation or reported path, and retry.")}\n\n${buildHelpText({ text: HELP, isTerminal: !io.stderr && Boolean(process.stderr.isTTY) })}`,
-    );
-    return 1;
-  }
+  const isBareCoverage =
+    resolvedArgs.length === 0 ||
+    (resolvedArgs.length === 1 && resolvedArgs[0] === "coverage");
+  let operationalExitCode = 0;
+  const cli = createAvandarLintCli({
+    io,
+    isBareCoverage,
+    onOperationalExitCode: (code) => {
+      operationalExitCode = code;
+    },
+  });
+  const acclimateExitCode = await Acclimate.execute(cli, {
+    args: resolvedArgs,
+    stdin: io.stdin,
+    stdout: _toOutputStream(io.stdout, io.isStdoutTTY),
+    stderr: _toOutputStream(io.stderr, io.isStderrTTY),
+    env: io.env,
+    isStdoutTTY: io.isStdoutTTY ?? (io.stdout ? false : undefined),
+    isStderrTTY: io.isStderrTTY ?? (io.stderr ? false : undefined),
+    terminal: io.terminal,
+    promptIo: io.promptIo,
+    interactive: io.interactive,
+    openTty: io.openTty,
+  });
+  return acclimateExitCode !== 0 ? acclimateExitCode : operationalExitCode;
 }
 
 if (import.meta.main) {

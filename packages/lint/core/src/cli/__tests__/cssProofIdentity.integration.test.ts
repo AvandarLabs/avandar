@@ -115,7 +115,7 @@ function _standalone(directory: string): void {
         join(directory, "node_modules", name),
       );
     });
-  ["ajv", "yaml"].forEach((name) => {
+  ["ajv", "yaml", "@avandar/acclimate"].forEach((name) => {
     if (!existsSync(join(directory, "node_modules", name))) {
       symlinkSync(
         join(ROOT, "packages/lint/core/node_modules", name),

@@ -16,7 +16,7 @@ import {
   buildHelpText,
   createTheme,
   openTerminal,
-} from "../../packages/lint/core/src/cli/terminalHelpers.ts";
+} from "./benchmarkTerminalHelpers.mjs";
 
 const HELP = `Measure one cold and five warm runs of the repository lint command.
 
