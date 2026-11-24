@@ -267,7 +267,14 @@ function _findPostgresTools(): { binDir: string; psql: string } | undefined {
       dir !== undefined &&
       ["initdb", "pg_ctl", "pg_dump"].every((tool) => {
         return existsSync(join(dir, tool));
-      })
+      }) &&
+      // Postgres 15 is the first that can grant `session_replication_role`.
+      Number(
+        /(\d+)\./.exec(
+          spawnSync(join(dir, "initdb"), ["--version"], { encoding: "utf8" })
+            .stdout ?? "",
+        )?.[1] ?? 0,
+      ) >= 15
     );
   });
   const psql = [
