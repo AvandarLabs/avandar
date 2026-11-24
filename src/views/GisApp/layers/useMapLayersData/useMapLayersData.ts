@@ -107,6 +107,10 @@ type LastLayerData = {
  * the zoom band and the simplification latitude but changes with anything
  * else the key holds: the source and its filters, the geo binding, the
  * sensitivity, the time range, the AOI, and the layers it depends on.
+ *
+ * It also ignores Spatial availability, which sits inside `spatialContext`.
+ * That is safe only because the `isEnabled` guard on the placeholder drops a
+ * layer's last data once availability changes to "unavailable".
  */
 function _makeViewFreeKeyHashFromLayer(
   layer: MapLayer.T,
@@ -129,6 +133,23 @@ type HashedLayer = {
   layer: MapLayer.T;
   viewFreeKeyHash: string;
 };
+
+/**
+ * Pairs each layer in the context's stack with its view-free key hash.
+ *
+ * `useMapLayersData` builds this once per render, so `_createLayerQuery` and
+ * `_makeLastDataByLayerIdFromResults` see the same hash for each layer.
+ */
+function _makeHashedLayersFromContext(
+  context: Pick<LayerQueryContext, "workspaceId" | "overlay" | "layers">,
+): HashedLayer[] {
+  return context.layers.map((layer) => {
+    return {
+      layer,
+      viewFreeKeyHash: _makeViewFreeKeyHashFromLayer(layer, context),
+    };
+  });
+}
 
 /** Each layer's current data and key hash, for layers that have any data. */
 function _makeLastDataByLayerIdFromResults(
@@ -162,6 +183,31 @@ function _makeLastDataGetterFromRef(
       ? lastLayerData.data
       : undefined;
   };
+}
+
+/**
+ * Builds the `placeholderData` that `_createLayerQuery` gives a layer's query,
+ * so a layer keeps drawing its last data while only its view changes.
+ */
+function _makePlaceholderDataFromContext(
+  layer: MapLayer.T,
+  context: Pick<LayerQueryContext, "getLastData">,
+  options: { isEnabled: boolean; viewFreeKeyHash: string },
+): UseQueryOptions<MapLayerDataResult>["placeholderData"] {
+  const isLatLngPointLayer = layer.geoBinding?.type === "latLngColumns";
+  // A point layer re-aggregates on every zoom band, so without a placeholder
+  // the layer would blank out and refit on each step rather than repaint.
+  // `useQueries` gives a layer whose key changed a new observer, so the
+  // placeholder's `previous` argument is always empty and the layer's last
+  // data comes from `getLastData` instead. It is offered only when the view
+  // alone changed: a disabled layer, or one whose filters, sensitivity, or
+  // other query inputs changed, must not keep drawing its old features.
+  return options.isEnabled &&
+    (isSpatialMapLayerBinding(layer) || isLatLngPointLayer)
+    ? () => {
+        return context.getLastData(layer.id, options.viewFreeKeyHash);
+      }
+    : undefined;
 }
 
 function _createLayerQuery(
@@ -207,19 +253,10 @@ function _createLayerQuery(
         isLatLngPointLayer ? { zoomBand: context.zoomBand } : undefined,
       ),
     ],
-    // A point layer re-aggregates on every zoom band, so without a placeholder
-    // the layer would blank out and refit on each step rather than repaint.
-    // `useQueries` gives a layer whose key changed a new observer, so the
-    // placeholder's `previous` argument is always empty and the layer's last
-    // data comes from `getLastData` instead. It is offered only when the view
-    // alone changed: a disabled layer, or one whose filters, sensitivity, or
-    // other query inputs changed, must not keep drawing its old features.
-    placeholderData:
-      isEnabled && (isSpatialMapLayerBinding(layer) || isLatLngPointLayer)
-        ? () => {
-            return context.getLastData(layer.id, viewFreeKeyHash);
-          }
-        : undefined,
+    placeholderData: _makePlaceholderDataFromContext(layer, context, {
+      isEnabled,
+      viewFreeKeyHash,
+    }),
     queryFn: async ({ signal }): Promise<MapLayerDataResult> => {
       return await runMapLayerQuery({
         layer,
@@ -288,40 +325,26 @@ export function useMapLayersData({
   jitterSalt,
 }: UseMapLayersDataOptions): Map<MapLayer.Id, MapLayerQueryState> {
   const spatialAvailability = useDuckDbSpatialAvailability();
-  const zoomBand = Math.max(0, Math.min(24, Math.floor(zoom)));
-  const lastDataByLayerIdRef = useRef<
-    ReadonlyMap<MapLayer.Id, LastLayerData>
-  >(new Map());
-  const hashedLayers = layers.map((layer): HashedLayer => {
-    return {
-      layer,
-      viewFreeKeyHash: _makeViewFreeKeyHashFromLayer(layer, {
-        workspaceId,
-        overlay,
-        layers,
-      }),
-    };
-  });
-  // Reads the ref during render: see `_makeLastDataGetterFromRef`.
-  const getLastData = _makeLastDataGetterFromRef(lastDataByLayerIdRef);
+  const lastDataByLayerIdRef = useRef<ReadonlyMap<MapLayer.Id, LastLayerData>>(
+    new Map(),
+  );
+  const context = {
+    layers,
+    workspaceId,
+    zoomBand: Math.max(0, Math.min(24, Math.floor(zoom))),
+    simplificationReferenceLatitude,
+    datasets,
+    datasetColumns,
+    overlay,
+    spatialAvailability,
+    jitterSalt,
+    // Reads the ref during render: see `_makeLastDataGetterFromRef`.
+    getLastData: _makeLastDataGetterFromRef(lastDataByLayerIdRef),
+  };
+  const hashedLayers = _makeHashedLayersFromContext(context);
   const results = useQueries({
     queries: hashedLayers.map(({ layer, viewFreeKeyHash }) => {
-      return _createLayerQuery(
-        layer,
-        {
-          layers,
-          workspaceId,
-          zoomBand,
-          simplificationReferenceLatitude,
-          datasets,
-          datasetColumns,
-          overlay,
-          spatialAvailability,
-          jitterSalt,
-          getLastData,
-        },
-        viewFreeKeyHash,
-      );
+      return _createLayerQuery(layer, context, viewFreeKeyHash);
     }),
   });
   // Runs after every commit: the `useQueries` result is a new array on each

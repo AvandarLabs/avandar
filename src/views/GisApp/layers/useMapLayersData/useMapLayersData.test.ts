@@ -1004,6 +1004,24 @@ describe("useMapLayersData while a layer's next query loads", () => {
     expect(result.current.get(layer.id)?.isRefreshing).toBe(false);
   });
 
+  it("drops a spatial layer's previous features once Spatial becomes unavailable", async () => {
+    const layer = createSpatialLayer();
+    runSpatialQueryMock.mockResolvedValueOnce(
+      _createSpatialEnvelopeResult(firstFeatures),
+    );
+    const { result, rerender } = _renderLayer({ layer, zoom: 8 });
+    await waitFor(() => {
+      expect(result.current.get(layer.id)?.data?.type).toBe("spatial");
+    });
+    // Availability sits inside the key's spatial context, so the layer's
+    // view-free key hash still matches its last data after this change.
+    spatialAvailability.value = "unavailable";
+
+    rerender({ layer, zoom: 8 });
+
+    expect(result.current.get(layer.id)?.data).toBeUndefined();
+  });
+
   it("does not draw a layer's previous features while its new filters load", async () => {
     const layer = createSpatialLayer();
     const geometryColumn = layer.source.queryColumns[0]!;
