@@ -68,9 +68,11 @@ dump_has_table() {
 # check never reads a large dump once per table. Prints, one fact per line:
 #   - `pg_dump_header <1|0>`: whether one of its first 5 lines says
 #     "PostgreSQL database dump";
-#   - `creates <1|0>`: whether any line starts with `CREATE `;
-#   - `other_table <schema.table>`: the first table a `COPY` line names that
-#     is not one of the given tables, when there is one;
+#   - `creates <1|0>`: whether any line outside a rows block starts with
+#     `CREATE `;
+#   - `other_table <schema.table>`: the first table a `COPY` line outside a
+#     rows block names that is not one of the given tables, when there is
+#     one;
 #   - for each given table with a rows block, `rows <schema.table> <rows>`,
 #     its rows across its blocks, and `header <schema.table> <columns>`, the
 #     column list of its first `COPY ... FROM stdin;` header;
@@ -90,16 +92,14 @@ index_dump() {
       for (i = 1; i <= count; i++) { number[names[i]] = i }
     }
     NR <= 5 && /PostgreSQL database dump/ { is_pg_dump = 1 }
-    /^CREATE / { creates = 1 }
-    /^[ \t]*COPY([ \t]|$)/ && $1 == "COPY" {
+    !inside && /^CREATE / { creates = 1 }
+    !inside && /^[ \t]*COPY([ \t]|$)/ && $1 == "COPY" {
       if (other == "" && $2 != "" && !($2 in number)) { other = $2 }
-      if (!inside) {
-        inside = 1
-        table = ($2 in number) ? number[$2] : 0
-        id_column = 0
-        if (table) { open_block() }
-        next
-      }
+      inside = 1
+      table = ($2 in number) ? number[$2] : 0
+      id_column = 0
+      if (table) { open_block() }
+      next
     }
     inside && $0 == "\\." {
       if (id_column) { close(ids_file) }

@@ -1503,6 +1503,18 @@ function _backupBlock(
 }
 
 /**
+ * One `COPY` block of a backup, with a `name` and an `id` column, whose first
+ * row's name is the given text, so that row's line starts with it, as a text
+ * column's value can in a real pg_dump dump.
+ */
+function _backupBlockWithFirstName(table: string, firstName: string): string {
+  return _backupBlock(table, TARGET_IDS, true).replace(
+    `${table} row ${TARGET_IDS[0]}\t`,
+    `${firstName}\t`,
+  );
+}
+
+/**
  * A backup as pg_dump writes it: its preamble, a block per backed-up table
  * holding the target's ids, unless `blocks` replaces a table's block (an
  * empty string drops it), and its footer.
@@ -1621,6 +1633,38 @@ describe("importCatalogData.sh backup check", SHELL_TEST_OPTIONS, () => {
       "backup.sql also holds public.workspaces, which this import does not touch.",
     );
     expect(run.log).not.toContain("--file");
+  });
+
+  it("accepts a backup with a row whose text starts with CREATE TABLE", () => {
+    const run = _runReplace(
+      _confirmedReplaceArgs(
+        _makeDumpedBackup({
+          "public.datasets": _backupBlockWithFirstName(
+            "public.datasets",
+            "CREATE TABLE x",
+          ),
+        }),
+      ),
+    );
+
+    expect(run.status, run.output).toBe(0);
+    expect(run.log).toContain("--file");
+  });
+
+  it("accepts a backup with a row whose text reads as a COPY of another table", () => {
+    const run = _runReplace(
+      _confirmedReplaceArgs(
+        _makeDumpedBackup({
+          "public.datasets": _backupBlockWithFirstName(
+            "public.datasets",
+            "COPY public.zzz (a) FROM stdin;",
+          ),
+        }),
+      ),
+    );
+
+    expect(run.status, run.output).toBe(0);
+    expect(run.log).toContain("--file");
   });
 
   it("refuses a backup with no block for the facet counts, naming the table", () => {
