@@ -45,6 +45,7 @@ export function AvaTextInput<
   debounceMs,
   fields,
   onChange,
+  error,
   ...props
 }: Props<FieldKey, FieldSchemaRecord, FormValues>): JSX.Element {
   const formInputProps = form.getInputProps(
@@ -113,6 +114,7 @@ export function AvaTextInput<
       key={form.key(fieldKey as unknown as ObjectPaths<FormValues>)}
       {...formInputProps}
       {...props}
+      error={error ?? formInputProps.error}
       name={props.name ?? fieldKey}
       onChange={(event: ChangeEvent<HTMLInputElement>) => {
         const newValue = event.target.value as FormValues[FieldKey];

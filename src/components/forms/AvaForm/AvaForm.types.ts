@@ -127,6 +127,25 @@ export type TextFieldSchema<
    * The function to call when the field value changes.
    */
   onChange?: (value: string) => void;
+
+  /**
+   * Content rendered at the input's trailing edge, such as a status icon.
+   * Unlike most schema props, this is read on every render, so it can change
+   * after the form mounts.
+   */
+  rightSection?: ReactNode;
+
+  /**
+   * An error to show under the input. This is read on every render. When
+   * defined, it takes precedence over any error from `validateFn`.
+   */
+  error?: ReactNode;
+
+  /**
+   * Wraps the input element, which lets a field render content directly
+   * under the input and above its error. This is read on every render.
+   */
+  inputContainer?: (children: ReactNode) => ReactNode;
 };
 
 export type ValueOfSelectData<Data extends SelectData<string>> =
