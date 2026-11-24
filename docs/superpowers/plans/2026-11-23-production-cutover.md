@@ -950,6 +950,11 @@ Write, per check, the command and its last output line. A failing check is repor
 
 ## Stage C: deploy parity
 
+> **Note (2026-11-24):** Stage C was implemented and reviewed, then set
+> aside before the release (decision M1): the workflows and `vercel.json`
+> were restored to `develop`'s copies in `b9601f995`, and the work is kept
+> on the local branch `feat/ci-deploy-jobs`.
+
 ### Task 15: The production deploy job
 
 **Risk class:** high-risk. This job writes to production.

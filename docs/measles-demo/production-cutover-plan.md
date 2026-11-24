@@ -6,8 +6,10 @@ which serves `app.avandarlabs.com`. Written 2026-11-23. It replaces
 [2026-11-23-production-cutover.md](../superpowers/plans/2026-11-23-production-cutover.md).
 
 **Status:** approved by Pablo on 2026-11-23. Nothing in this document has
-been executed yet. Pablo answered D1 to D7 and E1 the same day, and K1 and
-L1 on 2026-11-24 (section 2). No decision is open.
+been executed yet. Pablo answered D1 to D7 and E1 the same day, and K1, L1,
+and M1 on 2026-11-24 (section 2). No decision is open. M1 reverses the
+deploy scope: this cutover changes no CI/CD, and the CI deploys (D2) follow
+after the release.
 
 ## 1. The decision
 
@@ -35,22 +37,24 @@ review gets a public post-commit review.
 | C2 | Fate of the alpha-line work | Remove the line, keep the hardening: the catalog scripts and the release and deploy safety fixes that do not depend on a line. |
 | C3 | Public retroactive reviews | Issues plus fix-forward PRs, tracked on a public project board. |
 | D1 | Does the plugin system ship, which settles `plugin_installations` | **Keep plugins**, the `demo/measles` side. |
-| D2 | How staging and production deploy | **CI deploys everything, for `develop` and `main` alike, and Vercel's Git integration is removed.** In Pablo's words: "Deployments should be handled purely through CI/CD now with no integration magic handled by web portals. We want to handle things via code as much as possible, without ever leaking private, sensitive, or secret data that the general public has no business knowing." |
+| D2 | How staging and production deploy | **CI deploys everything, for `develop` and `main` alike, and Vercel's Git integration is removed.** In Pablo's words: "Deployments should be handled purely through CI/CD now with no integration magic handled by web portals. We want to handle things via code as much as possible, without ever leaking private, sensitive, or secret data that the general public has no business knowing." Deferred until after the cutover (M1). |
 | D3 | How the promotion lands on `develop` under the squash-only ruleset | **A PR for CI and the public record, then Pablo fast-forwards `develop`** to the PR head with the admin bypass. |
 | D4 | The crosswalk privacy gap | **Release with it and fix forward.** Production has no active users, and the release is needed for marketing. Tracked as Linear AVA-611, High priority. |
 | D5 | Does staging get the catalog through the same replace import as production | **Yes, staging first**, as the rehearsal of the production load. |
 | D6 | When the demo domain, the Vercel `demo` environment, the `demo-measles` Supabase branch, and `demo/measles` are deleted | **Seven days after the production smoke test passes** and the catalog dump is archived. |
 | D7 | Creating the public review labels, board, and issues | **All 140 issues are opened together, and only on Pablo's approval.** Nothing is created automatically. The runbook holds a prompt Pablo pastes into a new agent session when he is ready. |
-| E1 | How CI addresses the staging site in Vercel | **The Vercel environment named `staging`.** It already exists, with staging's variables pointing at the staging Supabase project. |
+| E1 | How CI addresses the staging site in Vercel | **The Vercel environment named `staging`.** It already exists, with staging's variables pointing at the staging Supabase project. Not used in this cutover (M1). |
 | A2 | Does `ava release --yes` proceed on a non-passing CI verdict | **No: it stops.** Overriding takes `--skip-ci-check`. Chosen because `main` now deploys production. |
-| A3 | When the GitHub `production` environment is protected | **Before any production secret is added:** a deployment branch policy allowing only `main`, and a required reviewer. |
+| A3 | When the GitHub `production` environment is protected | **Before any production secret is added:** a deployment branch policy allowing only `main`, and a required reviewer. Already in place on 2026-11-24. |
 | H1 | Which `FEATUREBASE_JWT_SECRET` value is authoritative for staging | **The GitHub `staging` environment's value.** The first staging deploy overwrites staging's own value with it. Superseded by L1: CI no longer writes edge function secrets, so staging's value is not overwritten. |
 | K1 | The staging environment's tokens can be read by any branch's workflow and reach production | **Accept it for the cutover, and narrow the staging tokens after the full cutover.** The runbook's section 16 holds the work. |
-| L1 | How much of secrets management moves to GitHub in this cutover | **None.** CI deploys the web app to Vercel in place of the Git integration, and that is all. Secrets stay where they are (GitHub, Vercel, Fly.io, Supabase edge function secrets). GitHub as the only place for secrets is follow-up work. |
+| L1 | How much of secrets management moves to GitHub in this cutover | **None.** Secrets stay where they are (GitHub, Vercel, Fly.io, Supabase edge function secrets). GitHub as the only place for secrets is follow-up work. |
+| M1 | Does this cutover change CI/CD | **No.** The web app keeps deploying through Vercel's Git integration, and `staging.yaml` and `production.yaml` keep `develop`'s existing migrate jobs. The CI deploy work (D2) and GitHub-managed secrets (L1) follow after the release. |
 
-L1 (Pablo, 2026-11-24) narrows how D2 is carried out in this cutover: CI
-takes over deploying, while the secrets and build variables stay managed
-where they are today.
+M1 (Pablo, 2026-11-24), in his words: "Any changes to Vercel and GitHub
+should be done AFTER we have deployed. Let's just get demo/measles into
+develop and main and get the Supabase databases migrated and seeded with all
+the catalog data. THEN we can focus on updating CI/CD."
 
 Carried over from the alpha plan, still true:
 
@@ -186,13 +190,15 @@ None open. D1 to D7 and E1 are answered and recorded in section 2.
 6. **Supply the database password, or use `--db-url`.** In CLI 2.114.0 a
    `--linked` connection that finds no password creates a temporary
    write-capable login role.
-7. **Nothing deploys without the gate:** lint, type-check, and the quick
-   suite.
+7. **Nothing migrates without the gate:** lint, type-check, and the quick
+   suite. In this cutover the web app deploys at push, through Vercel's Git
+   integration, before the gate (M1, section 8).
 8. **`demo/measles` and `develop` are frozen for other work** from the start
    of stage B until the promotion lands. Feature branches cut from
    `demo/measles` retarget `develop` afterwards.
-9. **Deployments happen in CI only**, for `develop` and for `main` (D2). No
-   Git integration, deploy hook, or console action deploys the app.
+9. **Deployments stay as they are in this cutover** (M1): Vercel's Git
+   integration deploys the app, and `staging.yaml` and `production.yaml`
+   migrate. Moving every deploy into CI (D2) is the follow-up.
 10. **The repository and its Actions logs are public.** Secrets, private
     hostnames, and anything about a user stay in GitHub environment secrets
     or outside the repository. They never appear in a file, a GitHub
@@ -227,7 +233,7 @@ two `ChatThread` helper files that `develop` removed.
 | `shared/types/database.types.ts`, `apps/desktop/migrations/*.gen.sql`, `src/routeTree.gen.ts` | Regenerated, never merged by hand. |
 | `src/i18n/locales/**` | `.po` files through `pnpm translations resolve`. `messages.ts` is recompiled. |
 | `pnpm-lock.yaml` | `develop`'s copy, then `pnpm install` rewrites it for the merged manifests. |
-| `.github/workflows/`, `vercel.json` | `develop`'s copies, restored on purpose and verified with a diff, before the deploy port in section 8. |
+| `.github/workflows/`, `vercel.json` | `develop`'s copies, unchanged. |
 | `.changeset/config.json` | `demo/measles` wins. The three plugin packages stay unpublished. |
 | `AGENTS.md`, `docs/` | Both sides. Lint and tooling wording from `develop`. |
 
@@ -244,7 +250,7 @@ What each database then applies:
 | Database | Has today | Applies | Notes |
 | --- | --- | --- | --- |
 | Production (Postgres 15.8) | 115 | 80 files, in timestamp order | The table is created, dropped, and created again in one push, empty the whole time. |
-| Staging (Postgres 17.4) | 185 | 10 files: the 7 dictionary and crosswalk files out of order, then the restore and the two slot files | `staging.yaml` already passes `--include-all`. |
+| Staging (Postgres 17.4) | 185 | 11 files: `develop`'s own `20261105212729`, which staging has not applied because its CI has been red since 2026-11-20, and the 7 dictionary and crosswalk files, all 8 out of order, then the restore and the two slot files | `staging.yaml` already passes `--include-all`. |
 | Local reset | 0 | 195 files | Verified on a switched stack, with an empty `supabase db diff` against `supabase/schemas/`. |
 
 The `demo-measles` branch is never migrated again. The desktop app's
@@ -252,81 +258,71 @@ generated SQLite migrations are regenerated from the final set.
 
 The audit ([alpha-migration-audit.md](alpha-migration-audit.md)) covered 76
 files on 2026-11-19. It is refreshed, read-only, for production's 80 files
-and staging's 10, and renamed `production-migration-audit.md`.
+and staging's 11, and renamed `production-migration-audit.md`.
 
 ## 8. Deploys
 
-Pablo's answer to D2: CI deploys staging and production, and Vercel's Git
-integration is removed.
+Unchanged in this cutover (M1). Staging and production deploy the way they
+do on `develop` and `main` today:
 
-| Step | Demo (`demo.yaml`) | Staging and production today | After this plan, both |
-| --- | --- | --- | --- |
-| Supabase CLI | 2.114.0 | 2.98.2 | 2.114.0. 2.98.2 resolves import maps in random order and can break an edge function bundle. |
-| Migrations | `db push --include-all` | Staging `--include-all`, production plain | `db push --include-all` |
-| Edge function secrets | Written by CI | Set by hand | Set by hand, unchanged. CI does not write them (L1) |
-| Edge functions | Deployed by CI | Deployed by CI | Unchanged. Production gains 4 functions. |
-| Web app | Vercel CLI from CI | Vercel's Git integration, at push | Vercel CLI from CI, built with the Vercel environment's own variables, deployed after the migrations |
-| Order | Migrate, secrets, functions, app | App at push, migrations about 25 minutes later | Check the configuration, pull the Vercel environment, check the build environment, build, migrate, functions, app |
-| Plugin bundle check | None | None | `pnpm check:plugin-bundle` in the quick gate |
-
-Both deploy jobs come from the job written and reviewed for `alpha.yaml`: the
-refusal to deploy anything but the branch tip, the configuration check, the
-build before any write, credentials scoped to the step that needs them, and
-a concurrency group that never cancels a running deploy. Its step that
-wrote edge function secrets was removed before the release (L1).
-`production.yaml` targets `main` and the `production` environment.
-`staging.yaml` targets `develop` and the `staging` environment. The job is
-written out twice. Folding the two into one reusable workflow is
-a later cleanup, not something to do right before a release.
-
-**Removing the Git integration**, in this order:
-
-1. `vercel.json` turns Git-triggered deployments off for every branch. It
-   arrives with the promotion, so from that commit on Vercel builds nothing
-   by itself.
-2. The first staging deploy and the first production deploy run from CI.
-3. Pablo disconnects the repository in Vercel, from the runbook's click
-   path. Doing it last keeps a way back while the CI path is new.
-
-One consequence: Vercel stops building a preview for every pull request
-branch. A CI preview job can be added later.
-
-Staging deploys to the Vercel environment named `staging`, which already
-exists with staging's variables (E1). Production deploys to Vercel's
-production target. The build uses only the variables `vercel pull` returns
-from that Vercel environment: GitHub overrides none of them. Before the
-build, and before anything is written, a "Check the Vercel build
-environment" step stops the deploy when a `VITE_` variable is marked
-Sensitive in Vercel (the CLI cannot read it), when `VITE_SUPABASE_API_URL`,
-`VITE_SUPABASE_ANON_KEY`, or `VITE_APP_URL` is missing or empty, when
-`VITE_SUPABASE_API_URL` is not the URL of the project the job migrates, or
-when `VITE_APP_URL` is not the environment's public address.
-
-What Pablo adds, once:
-
-| Where | Names |
+| What | How |
 | --- | --- |
-| GitHub `production` environment | 3: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`. It already holds `SUPABASE_ACCESS_TOKEN`, `PRODUCTION_DB_PASSWORD`, and `PRODUCTION_PROJECT_ID`. |
-| GitHub `staging` environment | Nothing. It already holds all six names its deploy job reads. |
-| The `AVA_PIPELINE_SERVER_URL` variable-to-secret move | Not needed: no workflow reads it. |
-| Vercel build variables, Production and `staging` | No `VITE_` variable may be marked Sensitive. `VITE_SUPABASE_API_URL`, `VITE_SUPABASE_ANON_KEY`, and `VITE_APP_URL` must be set and point at the environment's own project and address. Plus `VITE_AVA_DATA_AGENT`: `on` enables the data agent for every user. |
-| Supabase edge function secrets, by hand, on both projects | `GEOAPIFY_API_KEY`, `AVA_PIPELINE_SERVER_URL`, `AVA_PIPELINE_SERVER_SECRET`. |
+| Web app | Vercel's Git integration, at push: `develop` to the Vercel `staging` environment (`staging.avandarlabs.com`), `main` to Production (`app.avandarlabs.com`), with the variables already set in each Vercel environment. Other branches get previews, as before |
+| Migrations and edge functions | The `migrate` job of `staging.yaml` and `production.yaml`, after `lint-typecheck` and `test-quick` (`test-e2e` runs alongside and does not block it): `supabase link`, `supabase db push`, `supabase functions deploy` |
+| `db push` | Staging `--include-all` (8 of its 11 files apply out of order). Production plain: every one of its 80 pending files is newer than its newest applied file |
+| Supabase CLI in CI | 2.98.2 |
+| Approval | Production's `migrate` waits for the required reviewer of the GitHub `production` environment (A3). Staging's does not wait |
+| Edge function secrets | Set by hand on each Supabase project. CI writes none (L1) |
 
-Three edge function secrets are on neither staging nor production today
-(names checked on 2026-11-23, again on 2026-11-24): `AVA_PIPELINE_SERVER_URL`,
-`AVA_PIPELINE_SERVER_SECRET`, and `GEOAPIFY_API_KEY`. Only the demo deploy
-ever set them. Pablo sets them by hand on both projects. Without
-`GEOAPIFY_API_KEY`, address search answers 503. Without the two pipeline
-server values, the catalog's copy builds stay off. The pipeline server must
-point at production before the release.
+Two consequences, both accepted for this release:
 
-CI writes no edge function secret, so the secrets each project has by hand
-stay as they are. A read-only digest comparison on 2026-11-23 found that
-staging's `FEATUREBASE_JWT_SECRET` differs from the GitHub `staging`
-environment's copy. That no longer matters to the deploy: CI does not write
-it (L1).
+1. **The app deploys before the migrations.** On a push to `main`, Vercel
+   serves the new app within minutes, while `production.yaml` reaches
+   `migrate` only after `lint-typecheck` (about 3 minutes) and `test-quick`
+   (about 12 minutes), and then waits for approval. The new app runs
+   against the old schema and old edge functions for at least about 16
+   minutes. Acceptable because production has no active users (D4). The
+   runbook takes the production backup before the release, so `migrate` is
+   approved the moment it asks. If `test-quick` fails, `migrate` never runs:
+   fix forward, or promote the previous Vercel deployment until the fix is
+   released.
+2. **The functions deploy is flaky.** CLI 2.98.2 tries import map entries in
+   random order when it bundles the edge functions, so
+   `supabase functions deploy` fails with `Module not found` about one
+   attempt in two (it happened on staging on 2026-11-20). `db push` runs
+   first, so the schema is new and the functions old until the failed job is
+   re-run. The runbook re-runs it until it passes. On production each re-run
+   waits for approval again.
+
+What Pablo adds: nothing in GitHub and nothing in Vercel. By hand, on both
+Supabase projects: `GEOAPIFY_API_KEY` (address search answers 503 without
+it), and optionally `AVA_PIPELINE_SERVER_URL` and
+`AVA_PIPELINE_SERVER_SECRET` (without them the catalog's copy builds stay
+off). Recommended, not blocking. Only the demo deploy ever set these three,
+and they are on neither project today (names checked on 2026-11-23, again on
+2026-11-24). Optionally, `VITE_AVA_DATA_AGENT` set to `on` in Vercel enables
+the data agent for every user.
+
+A read-only digest comparison on 2026-11-23 found that staging's
+`FEATUREBASE_JWT_SECRET` differs from the GitHub `staging` environment's
+copy. It does not matter to the deploy: CI does not write it (L1).
 
 `alpha.yaml`, `alpha-dev.yaml`, and `scripts/alpha-dev/` are deleted.
+
+**Follow-up: CI deploys (D2).** The CI deploy design was built and reviewed,
+then set aside before the release. It is kept on the local branch
+`feat/ci-deploy-jobs` (commit `7dccc6d92`), and in the integration branch's
+history: the production job in `8dd9c2d70`, the staging job in `50eff770a`,
+and the version without GitHub-managed secrets in `dcf372384` and
+`7b08e7fea`. `b9601f995` restored `develop`'s workflows and `vercel.json`.
+In short, that design checks the configuration and the Vercel build
+environment, builds the app with the Vercel environment's own variables,
+migrates, deploys the functions, and only then deploys the app with the
+Vercel CLI. It also bumps the CI's Supabase CLI to 2.114.0, adds
+`pnpm check:plugin-bundle` to the quick gate, turns Git-triggered Vercel
+deployments off in `vercel.json`, and removes the Git integration last. It
+gets its own spec and plan, with the GitHub-managed secrets of L1. The
+runbook's section 16 lists what it carries.
 
 ## 9. `ava release` without the alpha line
 
@@ -367,7 +363,7 @@ replace breaks no other user's data. The import backs the old rows up first.
 | --- | --- | --- |
 | A | Agent | Undo the alpha line on `chore/production-cutover`: workflows, lock-out, `ava release`, version, script names, docs. |
 | B | Agent | Merge `develop` in three steps, repair the migrations, restore the lint rule, regenerate catalogs and types, then type-check, lint, the quick suite, a reset on a switched stack, and targeted end-to-end tests. |
-| C | Agent | CI deploys for staging and production: `production.yaml`, `staging.yaml`, `vercel.json`, `pr-develop.yaml`. |
+| C | Agent | Deferred: CI deploys (kept on `feat/ci-deploy-jobs`). Built and reviewed, then set aside before the release (M1). |
 | D | Agent | Refresh the migration audit, read-only, for production and staging. |
 | E | Agent | The cutover runbook for Pablo, and the catalog export dry run. |
 | F | Agent | Retroactive review scaffolding: policy document, issue template, the script that drafts the issues, the publishing prompt for the runbook, the promotion PR description. Nothing is published. |
@@ -380,31 +376,34 @@ Stage G in order:
 
 1. Announce the freeze. Rehearse: restore a production dump into a switched
    local stack, apply the 80 migrations, open old dashboards.
-2. Protect the GitHub `production` environment and add the three Vercel
-   values. Run the Vercel pre-flight: no `VITE_` variable Sensitive, and the
-   Supabase URL, key, and app URL right, on Production and `staging`. Set
-   the three missing edge function secrets by hand on both Supabase
-   projects.
+2. Check, read-only, that the GitHub `production` environment keeps its
+   protection (A3) and its three secrets. Set the missing edge function
+   secrets by hand on both Supabase projects (recommended, not blocking).
+   Nothing is added to GitHub or changed in Vercel.
 3. Push the integration result to `demo/measles`. Open the PR into `develop`.
-4. Land it on `develop` (D3). `staging.yaml` gates, checks the Vercel build
-   environment, builds, migrates, deploys functions, and deploys the staging
-   app.
+4. Land it on `develop` (D3). Vercel deploys the staging app, and
+   `staging.yaml` gates, then migrates staging (11 files) and deploys the
+   functions. Re-run the functions deploy if the flake strikes.
 5. Load the catalog into staging (D5). Check staging.
-6. Back up production. Run `ava release` on `develop` for `0.15.0`.
-   `production.yaml` gates, waits for the reviewer, checks the Vercel build
-   environment, builds, migrates, deploys functions, and deploys the app.
-7. Load the catalog into production. Smoke test.
-8. Disconnect the Git integration in Vercel.
-9. Start the privacy fix (AVA-611), narrow the staging tokens (K1), and
-   plan the secrets follow-up (L1). When
-   Pablo is ready, he pastes the runbook's prompt into a new agent session,
-   which publishes the review
-   backlog (D7). Clean up seven days after the smoke test (D6).
+6. Back up production and test the backup, before the release.
+7. Run `ava release` on `develop` for `0.15.0`. Vercel deploys the new app
+   to production at once, and `production.yaml` gates.
+8. Approve `production.yaml`'s `migrate` job as soon as it waits: it
+   migrates production and deploys the functions.
+9. Load the catalog into production. Smoke test.
+10. Follow-ups: start the privacy fix (AVA-611), publish the review backlog
+    when Pablo is ready (he pastes the runbook's prompt into a new agent
+    session, D7), narrow the staging tokens (K1), and plan the CI deploys and
+    GitHub-managed secrets (D2, L1).
+11. Clean up seven days after the smoke test (D6).
 
-**Rollback.** Before step 6 production is untouched: stop. After step 6,
-restore the database backup, redeploy `main`'s previous functions, and
-promote the previous Vercel deployment. There is no partial rollback,
-because the old app does not match the migrated schema.
+**Rollback.** Before step 7 production is untouched: stop. After step 7 and
+before the migrations, the database is untouched but the new app is live:
+fix forward, or promote the previous Vercel deployment. After the
+migrations, restore the database backup, redeploy `main`'s previous
+functions, and promote the previous Vercel deployment. The Git integration
+stays connected, so the next push to `main` deploys again. There is no
+partial rollback, because the old app does not match the migrated schema.
 
 ## 12. Retroactive review (C3)
 
@@ -438,8 +437,8 @@ Each can be overruled before execution.
 | The one-entry `ReleaseLine` is folded back into constants | "No parallel release line" should be true of the code as well. It is its own task and can be dropped. |
 | `ava release` asks on a non-passing CI verdict, and `--yes` stops instead of overriding it | `main` now deploys production, so an unattended release must not ship past a failing CI. Overriding it takes `--skip-ci-check`. |
 | `scripts/alpha/` becomes `scripts/catalog-move/` | The feature log already calls them the catalog move scripts. |
-| The staging and production deploy jobs are written out twice | A reusable workflow is cleaner, and changing the reviewed job's shape right before a release is not worth it. |
-| Pull request previews stop with the Git integration | D2 removes the integration. A CI preview job is a later choice. |
+| The CI deploy jobs, when the follow-up lands, are written out twice, once for staging and once for production | A reusable workflow is cleaner, and changing the reviewed job's shape is not worth it. Not part of this cutover (M1). |
+| Pull request previews continue | The Git integration stays connected in this cutover (M1). Whether previews stop belongs to the CI deploy follow-up. |
 | The demo site stays frozen | Restoring `demo.yaml` would be CI that exists only for the demo. Staging is the first deployed check. |
 | The two unpushed docs commits are cherry-picked onto the integration branch | They are docs only and would otherwise stay on one machine. |
 

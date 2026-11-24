@@ -24,16 +24,20 @@ it describes before you rely on the claim.
 The repository and its GitHub Actions logs are public. Secret values,
 connection strings, and anything about a user never go into a file, an
 issue, a chat, or a log. This runbook names secrets by their variable names
-only, and says for each one where you get the value (2.4, 5.3, 6.4, and
-6.6).
+only, and says for each one where you get the value (2.4, 6.4, and 6.6).
 
-**Where secrets live (L1).** This cutover changes how the web app deploys,
-not where secrets are kept. CI now deploys the app to Vercel in place of
-Vercel's Git integration, and that is the only change. Secrets stay where
-they are today: GitHub (what the CI jobs themselves need), Vercel (the web
-app's build variables), Fly.io (the pipeline server), and each Supabase
-project's edge function secrets (set by hand, never by CI). Managing every
-secret in GitHub is follow-up work (section 16).
+**This cutover changes no CI/CD (M1).** The web app deploys through
+Vercel's Git integration, as it does today: a push to `develop` deploys
+staging and a push to `main` deploys production, built with the variables
+already set in Vercel. `develop`'s existing `staging.yaml` and
+`production.yaml` migrate the two databases and deploy the edge functions,
+and nothing is added to GitHub or changed in Vercel.
+
+**Where secrets live (L1).** Secrets stay where they are today: GitHub
+(what the CI jobs themselves need), Vercel (the web app's build variables),
+Fly.io (the pipeline server), and each Supabase project's edge function
+secrets (set by hand, never by CI). Moving the deploys into CI and
+managing every secret in GitHub are follow-up work (section 16).
 
 ## 1. Day-of checklist
 
@@ -47,22 +51,24 @@ production at all.
 | --- | --- | --- | --- | --- |
 | 0 | Tools, shell setup, rules | 2 | No | A tool version differs from 2.3 |
 | 1 | Announce the freeze. Rehearse on a local copy of production | 3, 4 | Reads (a dump) | Any row of 4.9 fails |
-| 2 | Protect the GitHub `production` environment, then add its three Vercel values (staging needs nothing new). Third parties, including the missing edge function secrets on staging, and on production now or before 11.4 (6.6). The Vercel pre-flight | 5, 6, 7 | Only if you set production's edge function secrets now (6.6): **WRITES TO PRODUCTION** (configuration, no data). Also **CHANGES GITHUB SETTINGS**, **CHANGES STAGING CONFIGURATION**, **CHANGES VERCEL** | 5.6 shows a missing name, or 7.2 finds a `VITE_` variable you cannot fix |
+| 2 | Check that the GitHub `production` environment still has its protection and its three secrets (read-only: nothing is added to GitHub). Third parties, including the missing edge function secrets on staging, and on production now or before 11.4 (6.6, recommended, not blocking). Vercel needs nothing (7) | 5, 6, 7 | Only if you set production's edge function secrets now (6.6): **WRITES TO PRODUCTION** (configuration, no data). Also **CHANGES STAGING CONFIGURATION** (6.6), and **CHANGES GOOGLE CLOUD CONSOLE** only if 6.2 finds a redirect URI missing | 5.1 or 5.6 shows a missing protection rule or a missing name |
 | 3 | Push the integration branch to `demo/measles`. Open the PR into `develop` | 8.1 to 8.4 | No. **PUSHES** | 4.8 is not done, or `pr-develop.yaml` fails |
-| 4 | Fast-forward `develop`. `staging.yaml` deploys staging | 8.5, 8.6, 9.1, 9.2 | No. **PUSHES**, **WRITES TO STAGING** through CI | The staging deploy fails (9.1 says which failures wrote nothing) |
+| 4 | Fast-forward `develop`. Vercel deploys the staging app, and `staging.yaml` migrates staging and deploys its edge functions | 8.5, 8.6, 9.1, 9.2 | No. **PUSHES**, **WRITES TO STAGING** through Vercel and CI | Staging's `migrate` job fails at `supabase db push` (9.1). A functions deploy that fails with `Module not found` is the known flake: re-run it (9.1) |
 | 5 | Load the catalog into staging. Check staging | 9.5 to 9.7 | No. **WRITES TO STAGING** | The staging import or restore check fails |
-| 6 | Choose the rollback basis (10.1). Release `0.15.0` with `ava release` (11.1 to 11.4). While the `deploy` job waits, back up production and test the backup (10.2, 10.3), then approve (11.5) | 10.1, 11.1 to 11.4, 10.2, 10.3, 11.5 to 11.9 | **WRITES TO PRODUCTION** through CI, from the approval in 11.5 | 10.3's restore test fails: do not approve |
+| 6 | Choose the rollback basis, back up production, and test the backup (10.1 to 10.3). Then release `0.15.0` with `ava release` (11.1 to 11.4): the push to `main` makes Vercel deploy the new app to production. When `production.yaml`'s `migrate` job waits for approval, approve it at once (11.5) | 10, 11 | **WRITES TO PRODUCTION**: the app through Vercel from the push in 11.4, the database and edge functions through CI from the approval in 11.5 | 10.3's restore test fails: do not release |
 | 7 | Load the catalog into production. Smoke test | 12, 13 | **WRITES TO PRODUCTION** | Anything in 13 fails: section 14 |
-| 8 | Disconnect Vercel's Git integration | 15 | No. **CHANGES VERCEL** | Either `deploy` job did not succeed |
-| 9 | Start the privacy fix. Publish the review backlog when ready. Narrow the staging tokens (section 16, Narrow the staging tokens). Plan the secrets follow-up (section 16, Manage every secret in GitHub). Clean up seven days after the smoke test | 16, 17 | 17 deletes the demo resources | |
+| 8 | Start the privacy fix. Publish the review backlog when ready. Narrow the staging tokens (section 16, Narrow the staging tokens). Plan the CI deploy and secrets follow-up (section 16, Move deploys to CI and manage secrets in GitHub). Clean up seven days after the smoke test. Vercel's Git integration stays connected (15) | 16, 17 | 17 deletes the demo resources | |
 
 **The migration audit refresh is still pending** (4.8). It must be done
 before step 3, the promotion. The reason: the push in 8.5 makes the
-`staging.yaml` workflow apply staging's 10 out-of-order migration files
-automatically, and nothing rehearses those files first. A blocker found
-after 8.5 can only be fixed forward, with a new migration. Rollback is
-section 14. Until you approve the production deploy in 11.5, production is
-untouched: you can stop at any point before that and nothing needs undoing.
+`staging.yaml` workflow apply staging's 11 pending migration files, 8 of
+them out of order, automatically, and nothing rehearses those files first.
+A blocker found after 8.5 can only be fixed forward, with a new migration.
+Rollback is section 14. Until the push to `main` in 11.4, production's app
+and database are untouched (6.6 and 10.1 may add configuration only): you
+can stop at any point before that and nothing needs undoing. From 11.4 on,
+Vercel serves the new app on production, and from your approval in 11.5
+the `migrate` job writes to the database.
 
 ## 2. Before you start
 
@@ -71,9 +77,9 @@ browser sites. Each step says which one. The terminals:
 
 | Terminal or place | Directory | When you use it | Paste first |
 | --- | --- | --- | --- |
-| **The cutover terminal** | The cutover worktree: `cd "$(wt go chore/production-cutover)"` (on Pablo's laptop, `~/src/worktrees/avandar/chore/production-cutover`). Some blocks `cd` it elsewhere (4.1 into the rehearsal worktree, 3.3 into `develop`, 8.1 back): that is expected, because every block that needs a particular directory starts with its own `cd` | Sections 2 to 10 (10.2 and 10.3 run later, in the develop terminal) | 2.4 setup, all three parts |
+| **The cutover terminal** | The cutover worktree: `cd "$(wt go chore/production-cutover)"` (on Pablo's laptop, `~/src/worktrees/avandar/chore/production-cutover`). Some blocks `cd` it elsewhere (4.1 into the rehearsal worktree, 3.3 into `develop`, 8.1 back): that is expected, because every block that needs a particular directory starts with its own `cd` | Sections 2 to 10 | 2.4 setup, all three parts |
 | **The app terminal** | The rehearsal worktree: `cd "$(wt path chore/production-rehearsal)"` | 4.7 only. It runs `pnpm dev`, which keeps running | Nothing |
-| **The develop terminal** | A new terminal. 11.1's first line, `cd "$(wt go develop)"`, puts it in the `develop` worktree | 11.1 to 13, and 10.2 and 10.3 while the `deploy` job waits in 11.5 | 11.1's block, then 2.4 setup parts 1 and 2 |
+| **The develop terminal** | A new terminal. 11.1's first line, `cd "$(wt go develop)"`, puts it in the `develop` worktree | 11.1 to 13 | 11.1's block, then 2.4 setup parts 1 and 2 |
 | **The rollback terminal** | A new terminal in the `develop` worktree: `cd "$(wt go develop)"` | Section 14, only if you roll back | 2.4 setup parts 1 and 2 |
 | **The cleanup terminal** | A new terminal in the `develop` worktree: `cd "$(wt go develop)"` | Section 17, seven days later | 2.4 setup parts 1 and 2 |
 | **A new agent session** | Any | Section 16's backlog prompt | Nothing: the prompt is self-contained |
@@ -88,10 +94,10 @@ The browser sites, each signed in with an account that has admin rights:
 
 | Site | What it is called below | Used in |
 | --- | --- | --- |
-| `supabase.com/dashboard`, projects `Avandar` (production) and `Avandar Staging` | The Supabase dashboard | 2.4, 6.1, 6.5, 7.2, 9.6 C2, 10.1, 14.3 |
-| `github.com/AvandarLabs/avandar` | GitHub | 5, 11.5, 11.9 |
-| `vercel.com`, team `avandar`, project `avandar` | The Vercel dashboard | 5.3, 7, 14.5, 15, 17.2 |
-| `console.cloud.google.com` | The Google Cloud console | 6.2, 7.2 |
+| `supabase.com/dashboard`, projects `Avandar` (production) and `Avandar Staging` | The Supabase dashboard | 2.4, 6.1, 6.5, 9.6 C2, 10.1, 14.3 |
+| `github.com/AvandarLabs/avandar` | GitHub | 5, 9.1, 11.5, 11.9 |
+| `vercel.com`, team `avandar`, project `avandar` | The Vercel dashboard | 7 (optional), 9.2, 14.5, 17.2 |
+| `console.cloud.google.com` | The Google Cloud console | 6.2 |
 | `myprojects.geoapify.com` | The Geoapify dashboard | 6.6 |
 | `staging.avandarlabs.com`, `app.avandarlabs.com` | The staging app, the production app | 9.2, 9.7, 12.2, 13 |
 
@@ -105,8 +111,9 @@ The browser sites, each signed in with an account that has admin rights:
   may read slightly differently, or marks it **Verify**.
 - **Expect:** what you should see when the step worked.
 - **If not:** what the other outcomes mean and what to do next. "Stop"
-  means do not go on to the next step: production is untouched until 11.5,
-  so stopping before then is always safe.
+  means do not go on to the next step: production's app and database are
+  untouched until the push to `main` in 11.4, so stopping before then is
+  always safe.
 
 A bold mark such as **WRITES TO PRODUCTION** means that step changes
 something outside your laptop (the full list is at the top of this
@@ -116,13 +123,16 @@ step says to run its lines one at a time.
 
 ### 2.1 Read first
 
-- [The cutover plan](production-cutover-plan.md): decisions D1 to D7, E1, A2, A3,
-  K1, and L1. H1 no longer applies: it chose which `FEATUREBASE_JWT_SECRET`
-  value CI would write to staging, and under L1 CI writes no edge function
-  secret.
+- [The cutover plan](production-cutover-plan.md): decisions D1 to D7, A2,
+  A3, K1, L1, and M1. M1: this cutover changes no CI/CD. D2 (CI deploys
+  everything, with no Vercel Git integration) is deferred until after the
+  cutover (M1). E1 is not used in this cutover: Vercel's Git integration
+  deploys staging, as today. A3 is already in place (5.1 checks it). H1
+  no longer applies: it chose which `FEATUREBASE_JWT_SECRET` value CI would
+  write to staging, and under L1 CI writes no edge function secret.
 - [The migration audit](alpha-migration-audit.md), dated 2026-11-19. It
   covers 76 files and found no blocker. **Its refresh for production's
-  current set and staging's 10 files has not been done** (4.8). It must be
+  current set and staging's 11 files has not been done** (4.8). It must be
   done before the promotion (step 3).
 - The privacy gap at the top of [the feature log](pr-feature-log.md):
   crosswalk layouts and mappings are readable by every Data Sources viewer.
@@ -159,7 +169,7 @@ preferences** > **Access Tokens** (the labels may read slightly
 differently). A new token does not break any existing one, so logging in
 again is safe. It reaches every project your account can reach, production
 included, so it never leaves this laptop. The GitHub secret
-`SUPABASE_ACCESS_TOKEN` is a separate token that already exists (5.3).
+`SUPABASE_ACCESS_TOKEN` is a separate token that already exists (5.1).
 
 ### 2.3 Tools
 
@@ -422,7 +432,11 @@ before the promotion. `<n>` is the number of migration files on
 same terminal, prints that number:
 `git ls-tree --name-only origin/develop supabase/migrations/ | wc -l`.
 **If not:** the same causes as part 2. A smaller `<n>` means staging has
-not applied every `develop` migration: 4.8's last check lists which.
+not applied every `develop` migration: 4.8's last check lists which. On
+2026-11-24 one of them is expected: staging's CI has been red since
+2026-11-20, so staging has not applied `develop`'s own
+`20261105212729_add_rpc_workspaces__is_slug_available.sql`. The promotion
+applies it (9.2). Note the `<n>` printed here: 9.2 compares against it.
 
 ### 2.5 Rules for production access and the dumps
 
@@ -452,7 +466,7 @@ in the last row, is Supabase's point-in-time recovery add-on (10.1):
 | `importCatalogData.sh --dry-run`, and the run stopped at its prompt | 9.6 C4, C6 | Reads only, in read-only transactions |
 | The `session_replication_role` probe | 9.6 C3 | Opens a transaction, changes one setting inside it, rolls back. Writes no data |
 | The foreign key pre-flight | 9.6 C8 | One read-only transaction |
-| **WRITES TO PRODUCTION** | 6.1 (only if keys are missing), 6.6 (the missing edge function secrets: configuration, no data), 10.1 (only if you turn PITR on), 11 (through CI), 12 (catalog import and Parquet copy), 14 (rollback), 17 (optional WDI object delete) | As each step says |
+| **WRITES TO PRODUCTION** | 6.1 (only if keys are missing), 6.6 (the missing edge function secrets: configuration, no data), 10.1 (only if you turn PITR on), 11 (the app through Vercel from the push to `main`, the database and functions through CI from the approval), 12 (catalog import and Parquet copy), 14 (rollback), 17 (optional WDI object delete) | As each step says |
 
 The dumps hold real user data. The sensitive tables:
 
@@ -565,10 +579,13 @@ never a commit written here.
 `develop` also gained a migration after planning:
 `20261105212729_add_rpc_workspaces__is_slug_available.sql`. The integration
 branch merged it on 2026-11-24: production now applies 80 files, the tree
-holds 195, and staging applies 10, one more file for production and the
-tree than the plan counted on 2026-11-23. Every count below comes from a
-command (`$PROD_PENDING` and `$TREE_COUNT`, 4.1), so take the number it
-prints.
+holds 195, one more file for production and the tree than the plan counted
+on 2026-11-23. Staging applies 11: the 10 files `develop` lacks, and that
+same `develop` file, which staging has not applied because its CI has been
+red since 2026-11-20. 8 of the 11 are older than staging's newest applied
+file, so they apply out of order. Every production and tree count below
+comes from a command (`$PROD_PENDING` and `$TREE_COUNT`, 4.1), so take the
+number it prints.
 
 ## 4. Rehearsal (local)
 
@@ -780,8 +797,9 @@ read_db "$LOCAL_DB_URL" "select to_regclass('public.plugin_installations'), (sel
 the 2026-11-24 tip; `echo "$PROD_PENDING"` shows it), with no error in the
 log. Then `20261123200200|<the number in $TREE_COUNT>`, then the same
 counts as 4.5, then `plugin_installations|0`. Production applies all of
-these files in one `supabase db push --include-all` (11.6), in timestamp
-order. The plugin table is created, dropped, and restored empty within that
+these files in one plain `supabase db push` (11.6), in timestamp order:
+every pending file is newer than production's newest applied file, so it
+needs no `--include-all`. The plugin table is created, dropped, and restored empty within that
 one push, which is why it ends empty here.
 **If not:** no `Applying migration` output and no log means
 `on_rehearsal_stack` failed and nothing ran: stop. A failed migration is a
@@ -848,8 +866,8 @@ production's and staging's live data (Task 17 of the implementation plan)
 was deferred by Pablo. Per Task 17, an agent session given read-only URLs
 runs it, when Pablo chooses to start one. The rehearsal above is the
 primary safety check for production's files, but nothing rehearses
-staging's 10 out-of-order files, and 8.5 makes `staging.yaml` apply them
-automatically. So the refresh, and these read-only checks on live data,
+staging's 11 pending files (8 of them out of order), and 8.5 makes
+`staging.yaml` apply them automatically. So the refresh, and these read-only checks on live data,
 must be done **before step 3 of section 1** (the promotion). A blocker
 found after 8.5 can only be fixed forward.
 
@@ -878,7 +896,7 @@ comm -23 <(ls "$REHEARSAL/supabase/migrations" | cut -d_ -f1 | sort) <(sort "$D/
 | Datasets linked to the catalog | `4` | More than 4: the catalog replace deletes more than planned. Stop |
 | Their workspaces, on production | Every row `members` 1 and `outside` 0: Pablo's own single-member test workspaces. A member with no email counts as outside, as in the import's guard | Any `outside` above 0, or `members` 0: the import guard refuses. Stop and raise it |
 | Their workspaces, on staging | No rows, or every row `outside` 0 and `members` above 0 | Any `outside` above 0, or `members` 0: the staging import (9.6) would refuse after the promotion landed. Stop and raise it before step 3 |
-| Files staging has not applied (last command) | The 10 files of 9.2 | Another file: staging's history differs from the plan. Stop |
+| Files staging has not applied (last command) | The 11 versions of 9.2, `20261105212729` among them | Another file: staging's history differs from the plan. Stop |
 
 Then refresh the audit's verdict for every file counted in `$PROD_PENDING`
 and every file in the staging list, read-only, as the implementation
@@ -903,234 +921,123 @@ in it. Section 17.4 removes both.
 
 ## 5. GitHub setup
 
-### 5.1 Protect the `production` environment first (A3)
+Nothing is added to GitHub in this cutover (M1). This section only reads:
+it checks that the `production` environment still has the protection it
+has had since 2026-11-24, and that both environments still hold the names
+their `migrate` jobs read.
 
-On 2026-11-24 the GitHub `production` environment has no protection: no
-deployment branch policy and no required reviewer. Add both **before any
-production secret is added** in 5.3. **CHANGES GITHUB SETTINGS.**
+### 5.1 The `production` environment is already protected (A3)
 
-Why first: pushing a branch cannot deploy production by itself, since
-`production.yaml` deploys only from a push to `main`, and its `deploy` job
-runs only for `refs/heads/main` and refuses anything but the tip of `main`.
-But a workflow run from another branch, a manual `workflow_dispatch` run or
-an edited workflow on a pushed branch, can read production's secrets
-whenever the environment allows that branch. Today it allows every branch.
-So: branch policy, then secrets, then the push in 8.2.
+On 2026-11-24 the GitHub `production` environment already had a deployment
+branch policy that allows only `main`, and a required reviewer. Its secrets
+are exactly the three that `production.yaml`'s `migrate` job reads:
+`SUPABASE_ACCESS_TOKEN`, `PRODUCTION_DB_PASSWORD`, and
+`PRODUCTION_PROJECT_ID`.
 
-**Where:** GitHub in the browser, signed in as an organization admin. Open
-`github.com/AvandarLabs/avandar` > the **Settings** tab > **Environments**
-(left sidebar, under "Code and automation") > **production**. Both changes
-are on that one page.
-
-1. **The deployment branch policy.** Under **Deployment branches and
-   tags**, open the menu (it reads **No restriction** today) and choose
-   **Selected branches and tags**. Click **Add deployment branch or tag
-   rule**. In the dialog, set **Ref type** to **Branch**, type `main` as
-   the name pattern, and click **Add rule**. Add no other rule, and do not
-   choose **Protected branches only**.
-2. **The required reviewer.** Under **Deployment protection rules**, tick
-   **Required reviewers**, type your GitHub username in the search box
-   under it, and pick yourself. Clear **Prevent self-review** (you push
-   `main` yourself through `ava release`, so with it on you could never
-   approve). Click **Save protection rules**.
-
-Then check both from the cutover terminal. These two `gh api` calls only
-read:
+**Where:** the cutover terminal (any directory inside the repository works
+for `gh`). These three commands only read: the protection rules, the
+branch policy, and the secret names, never a value:
 
 ```bash
 gh api repos/AvandarLabs/avandar/environments/production \
-  --jq '{policy: .deployment_branch_policy, rules: [.protection_rules[].type]}'
+  --jq '{branch_policy: .deployment_branch_policy, rules: [.protection_rules[].type]}'
 gh api repos/AvandarLabs/avandar/environments/production/deployment-branch-policies \
   --jq '.branch_policies[] | {name, type}'
+gh secret list --env production --json name -q '.[].name' | sort
 ```
 
-**Expect:** the first command prints `"protected_branches": false` and
-`"custom_branch_policies": true`, and its rule types include
-`required_reviewers` and `branch_policy`. The second prints one policy,
-`main`, of type `branch`.
-**If not:** fix it on the same GitHub page. Do not go on to 5.3 until both
-print as expected.
+**Expect:** the first command prints
+`{"branch_policy":{"custom_branch_policies":true,"protected_branches":false},"rules":["branch_policy","required_reviewers"]}`
+(the order of the two rules may differ). The second prints
+`{"name":"main","type":"branch"}`. The third prints exactly
+`PRODUCTION_DB_PASSWORD`, `PRODUCTION_PROJECT_ID`, and
+`SUPABASE_ACCESS_TOKEN`, one per line.
 
-From now on, `production.yaml`'s `deploy` job waits for your approval
-before its first step, which is when the backup (10.2) is taken. A re-run
-of the job waits again.
+**What the reviewer rule means for the release.** `production.yaml`'s
+`migrate` job waits for your approval before its first step, and every
+re-run of it waits again (11.5, 11.6). Vercel does not wait: it deploys the
+new app as soon as `main` is pushed (11.4).
+
+**If not:** a missing rule means someone removed it. Put it back in the
+browser (**CHANGES GITHUB SETTINGS**): GitHub > the repository's
+**Settings** tab > **Environments** (left sidebar, under "Code and
+automation") > **production**. Under **Deployment branches and tags**,
+choose **Selected branches and tags** and add one rule with **Ref type**
+**Branch** and the name pattern `main`, and no other rule (not **Protected
+branches only**). Under **Deployment protection rules**, tick **Required
+reviewers**, pick yourself, clear **Prevent self-review** (you push `main`
+yourself through `ava release`, so with it on you could never approve), and
+click **Save protection rules**. Then run the block again. A missing secret
+name: stop and raise it before 11.4, since the `migrate` job cannot run
+without it. An extra name does no harm.
 
 ### 5.2 The `staging` environment's branch policy: not now
 
 Nothing to change here.
 
-The plan recommended the same protection for `staging`, a `develop` policy.
-**Do not add a `develop`-only policy.** Three workflows use the `staging`
-environment outside `develop`: `production.yaml`'s `test-quick` and
-`test-e2e` run on `main` with `environment: staging`, and `pr-develop.yaml`'s
-test jobs run on pull requests with it. A `develop`-only policy would block
-`production.yaml`'s `test-quick` on `main`, and its `deploy` job needs
-`test-quick`, so production would never deploy. Pull request runs would
-likely be blocked too (**verify**: GitHub evaluates a pull request run's
-ref, not `develop`). Staging stays unprotected for now. That is a known gap
-(section 18): its secrets are readable by any branch's workflow, and no
-deployment branch policy is possible while `production.yaml`'s test jobs use
-`environment: staging` on `main`. The fix is a later change, in section 16
-(Narrow the staging tokens), that gives the test jobs an environment of their
-own.
+**Do not add a `develop`-only policy to `staging`.** Three workflows use
+the `staging` environment outside `develop`: `production.yaml`'s
+`test-quick` and `test-e2e` run on `main` with `environment: staging`, and
+`pr-develop.yaml`'s test jobs run on pull requests with it. A
+`develop`-only policy would block `production.yaml`'s `test-quick` on
+`main`, and its `migrate` job needs `test-quick`, so production would never
+migrate. Pull request runs would likely be blocked too (**verify**: GitHub
+evaluates a pull request run's ref, not `develop`).
 
-**What A3's protection does not cover.** 5.1 protects only the database
-password and the secrets of the `production` environment. Two `staging`
-secrets reach further:
+**The exposure.** So `staging` stays unprotected, and any branch's workflow
+can read its secrets (section 18). Two of them reach further than staging.
+5.1's protection covers only the `production` environment's secrets:
 
-- `VERCEL_TOKEN`: `staging` already holds a Vercel token for project
-  `avandar`, the same project that serves `app.avandarlabs.com`. Any
-  branch's workflow can read it and run `vercel deploy --prod` with it.
-  Production gets a token of its own in 7.5, but that does not narrow
-  staging's.
-- `SUPABASE_ACCESS_TOKEN`: if staging's is a personal access token of an
-  account that can also reach project `Avandar`, any branch's workflow can
-  reach production through the Management API with it. Supabase personal
-  access tokens are account-wide: they reach every project the account
-  can. Which account created staging's token decides whether this applies
-  (section 16, Narrow the staging tokens).
+- `VERCEL_TOKEN`: a Vercel token for project `avandar`, the same project
+  that serves `app.avandarlabs.com`. Any branch's workflow can read it and
+  run `vercel deploy --prod` with it. No workflow in this cutover uses it.
+- `SUPABASE_ACCESS_TOKEN`: if it is a personal access token of an account
+  that can also reach project `Avandar`, any branch's workflow can reach
+  production through the Management API with it. Supabase personal access
+  tokens reach every project the account can.
 
 **Decided (K1, Pablo, 2026-11-24):** accept this exposure for the cutover,
 and narrow the staging tokens after the full cutover (section 16, Narrow the
 staging tokens). Only maintainers can push branches to the repository, so the
 risk is low until then.
 
-### 5.3 Add the three Vercel values to the `production` environment
+### 5.3 Nothing to add to the `production` environment
 
-`production.yaml`'s deploy job reads six names from the GitHub
-`production` environment, and nothing else. Three exist today. The other
-three are new, and they are the only values GitHub gains in this cutover
-(L1): every other secret stays where it is today.
-
-| Name | Exists today | What it is |
-| --- | --- | --- |
-| `SUPABASE_ACCESS_TOKEN` | Yes | The Supabase token CI migrates and deploys functions with. Nothing to do |
-| `PRODUCTION_DB_PASSWORD` | Yes | Production's database password (2.4 part 2). Nothing to do |
-| `PRODUCTION_PROJECT_ID` | Yes | Production's project ref. Nothing to do |
-| `VERCEL_TOKEN` | No | The new Vercel token you create in 7.5 |
-| `VERCEL_ORG_ID` | No | The Vercel team ID, `team_...` |
-| `VERCEL_PROJECT_ID` | No | The Vercel project ID of `avandar`, `prj_...` |
-
-All three are secrets, set on the **environment**, never on the repository
-or the organization: a same-named repository or organization value
-silently fills a missing environment value. A secret is write-only once
-saved: GitHub never displays it again, to you or anyone.
-
-**Where to get each value.**
-
-- `VERCEL_ORG_ID`: Vercel dashboard > team `avandar` (the team switcher at
-  the top left) > **Settings** > **General** > **Team ID**. Shape
-  `team_` followed by letters and digits. Always visible.
-- `VERCEL_PROJECT_ID`: Vercel dashboard > project `avandar` > **Settings** >
-  **General** > **Project ID**. Shape `prj_` followed by letters and
-  digits. Always visible.
-- `VERCEL_TOKEN`: you create it in 7.5, so do 7.5 first and come back.
-  Vercel shows it once, so have it in your password manager.
-
-**Where:** the cutover terminal, after 5.1 is done. Paste this block whole.
-It asks for the three values one after another: for each, it prints
-`Production value of <name>:`, then waits. Paste the value from the
-Vercel dashboard or your password manager and press Enter. Nothing is
-shown while you paste, and that is expected:
-
-```bash
-for name in VERCEL_ORG_ID VERCEL_PROJECT_ID VERCEL_TOKEN; do
-  echo "Production value of $name:"
-  gh secret set "$name" --env production || break
-done
-```
-
-**CHANGES GITHUB SETTINGS.** Each value prints a `Set Actions secret`
-confirmation (the wording may differ slightly). Paste each value with no
-quotes around it and no trailing space or line break: the configuration
-check refuses those (5.5).
-**If not:** if you stop the loop with Ctrl-C, the `break` ends it, and
-running the block again asks for all three again. To set a single one,
-run `gh secret set <NAME> --env production` on its own line and paste the
-value at its prompt.
-
-Then check the names. This reads names only, never values:
-
-```bash
-gh secret list --env production --json name -q '.[].name' | sort
-```
-
-**Expect:** exactly these six lines: `PRODUCTION_DB_PASSWORD`,
-`PRODUCTION_PROJECT_ID`, `SUPABASE_ACCESS_TOKEN`, `VERCEL_ORG_ID`,
-`VERCEL_PROJECT_ID`, `VERCEL_TOKEN`.
-**If not:** a missing name: set it as above. An extra name does no harm
-to the deploy, but nothing reads it.
+Nothing to run here. `production.yaml`'s `migrate` job reads only the three
+secrets 5.1 lists, and all three exist. The values a CI deploy of the web
+app would need belong to the follow-up (section 16, Move deploys to CI and
+manage secrets in GitHub).
 
 ### 5.4 The `staging` environment needs nothing new
 
-`staging.yaml`'s deploy job reads the same six kinds of name from the
-GitHub `staging` environment: `SUPABASE_ACCESS_TOKEN`,
-`STAGING_DB_PASSWORD`, `STAGING_PROJECT_ID`, `VERCEL_TOKEN`,
-`VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID`. All six exist today, so there is
-nothing to add. The other names in that environment belong to the test
-jobs, which use `environment: staging` too: leave them as they are.
+Nothing to run here. `staging.yaml`'s `migrate` job reads three names from
+the GitHub `staging` environment: `SUPABASE_ACCESS_TOKEN`,
+`STAGING_DB_PASSWORD`, and `STAGING_PROJECT_ID`. The other names in that
+environment belong to the test jobs, which use `environment: staging` too:
+leave them as they are. 5.6 checks the three names.
 
-**Where:** the cutover terminal. This lists, from the names `staging`
-holds, only the six the deploy job reads. It reads names only:
+### 5.5 No deploy checks in this cutover
 
-```bash
-gh secret list --env staging --json name -q '.[].name' \
-  | grep -xE 'SUPABASE_ACCESS_TOKEN|STAGING_DB_PASSWORD|STAGING_PROJECT_ID|VERCEL_TOKEN|VERCEL_ORG_ID|VERCEL_PROJECT_ID' | sort
-```
-
-**Expect:** the six names above, one per line.
-**If not:** a missing name was deleted since 2026-11-24: set it with
-`gh secret set <NAME> --env staging` and paste the value at its prompt
-(**CHANGES GITHUB SETTINGS**).
-
-### 5.5 What the two deploy checks enforce
-
-Nothing to run here. Each deploy job runs two checks before it writes
-anything. When either one fails, the job stops there: the database, the
-edge functions, and the Vercel deployment stay as they were. Both print
-names and fixed sentences only, never a value, because the Actions logs
-are public.
-
-**1. "Check the production configuration"** (on staging, "Check the
-staging configuration", with `STAGING_` in place of `PRODUCTION_`). It
-looks at the six GitHub names from 5.3 and 5.4:
-
-| Rule | Applies to |
-| --- | --- |
-| Not empty | All six. `SUPABASE_DB_PASSWORD` and `SUPABASE_PROJECT_ID` in the message are read from `PRODUCTION_DB_PASSWORD` and `PRODUCTION_PROJECT_ID` |
-| Not only whitespace, no leading or trailing whitespace, no carriage return | All six |
-| Starts `team_`, then only letters and digits | `VERCEL_ORG_ID` |
-
-**2. "Check the Vercel build environment".** It runs after "Pull the
-Vercel production environment" (on staging, the environment named
-`staging`) and looks at the variables Vercel returned for the build. It
-refuses the build in four cases:
-
-| Refuses when | Why |
-| --- | --- |
-| A variable whose name starts with `VITE_` is marked Sensitive in Vercel | The Vercel command-line tool cannot read a Sensitive value. The build would ship a placeholder in its place |
-| `VITE_SUPABASE_API_URL`, `VITE_SUPABASE_ANON_KEY`, or `VITE_APP_URL` is missing or empty | The app cannot reach its database or build its own links without them |
-| `VITE_SUPABASE_API_URL` is not `https://<project id>.supabase.co` for the project this job migrates | The app would talk to a different database than the one the job just migrated |
-| `VITE_APP_URL` is not the public address: `https://app.avandarlabs.com` on production, `https://staging.avandarlabs.com` on staging | Links and sign-in redirects would point at the wrong site |
-
-A trailing `/` and upper or lower case are ignored in both URL
-comparisons. The build itself uses the values exactly as Vercel holds
-them. 7.2 is the pre-flight that makes this check pass the first time.
+Nothing to run here. `develop`'s `migrate` jobs run `supabase link`,
+`supabase db push`, and `supabase functions deploy`, and have no step that
+checks the configuration before they write. The configuration and Vercel
+build checks were part of the CI deploy jobs, which are deferred (section
+16). 5.1 and 5.6 check the names instead.
 
 ### 5.6 Check the names (before 8.2 and before every release)
 
 **Where:** the cutover terminal (in 11.2, the develop terminal). This
-lists, for each environment, every name the deploy job needs that GitHub
-does not have, then the repository-level names that could shadow them. It
-reads names only, never values:
+lists, for each environment, every name its `migrate` job reads that
+GitHub does not have, then the repository-level names that could shadow
+them. It reads names only, never values:
 
 ```bash
-check_env_names() {   # check_env_names <env> "<names the deploy job reads>"
+check_env_names() {   # check_env_names <env> "<names the migrate job reads>"
   echo "$1, missing secrets:"; comm -23 <(tr ' ' '\n' <<<"$2" | sort) \
     <(gh secret list --env "$1" --json name -q '.[].name' | sort)
 }
-check_env_names production "PRODUCTION_DB_PASSWORD PRODUCTION_PROJECT_ID SUPABASE_ACCESS_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID VERCEL_TOKEN"
-check_env_names staging "STAGING_DB_PASSWORD STAGING_PROJECT_ID SUPABASE_ACCESS_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID VERCEL_TOKEN"
+check_env_names production "PRODUCTION_DB_PASSWORD PRODUCTION_PROJECT_ID SUPABASE_ACCESS_TOKEN"
+check_env_names staging "STAGING_DB_PASSWORD STAGING_PROJECT_ID SUPABASE_ACCESS_TOKEN"
 echo "Repository secrets:"; gh secret list --json name -q '.[].name'
 echo "Repository variables:"; gh variable list --json name -q '.[].name'
 ```
@@ -1141,26 +1048,18 @@ echo "Repository variables:"; gh variable list --json name -q '.[].name'
 secrets in the browser: GitHub > the repository's **Settings** >
 **Secrets and variables** > **Actions** shows none under **Organization
 secrets**.
-**If not:** set each missing name as 5.3 or 5.4 shows. Delete any
-repository or organization value that shares a name with one of these
-environment values (same page, the trash icon next to it, **CHANGES
-GITHUB SETTINGS**).
+**If not:** a missing name: stop and raise it. It is set with
+`gh secret set <NAME> --env <environment>`, pasting the value at its
+prompt (**CHANGES GITHUB SETTINGS**). Delete any repository or
+organization value that shares a name with one of these environment
+values, since it silently fills a missing environment value (same page,
+the trash icon next to it, **CHANGES GITHUB SETTINGS**).
 
 ### 5.7 What happens when a check fails
 
-The deploy stops before anything is written, and the step's message says
-why:
-
-| Stops at | What it means | Do |
-| --- | --- | --- |
-| Check the production configuration (or staging) | A GitHub name is missing or malformed, for example `VERCEL_TOKEN is empty in the production environment.` Nothing was written | Fix the name in GitHub (5.3 or 5.4), then re-run the failed jobs |
-| Check the Vercel build environment | A Vercel variable problem: a Sensitive `VITE_` variable, a missing value, or a URL for the wrong project or site. Nothing was written | Fix the variable in Vercel (7.2), then re-run the failed jobs. GitHub needs no change |
-
-To re-run the failed jobs of that run: `gh run rerun "$STAGING_RUN_ID"
---failed` for staging, in the cutover terminal where 9.1 set
-`STAGING_RUN_ID`, or `gh run rerun "$RUN_ID" --failed` for production, in
-the develop terminal where 11.5 set `RUN_ID`. A re-run pulls the Vercel
-environment again, so it sees a fix made in Vercel.
+Nothing to run here. The checks this subsection described belonged to the
+deferred CI deploy jobs. What to do when a `migrate` job fails is in 9.1
+for staging and in 11.6 for production.
 
 ## 6. Third parties
 
@@ -1327,8 +1226,12 @@ secrets, so you set them by hand, on each project:
 | `AVA_PIPELINE_SERVER_URL` | The open data catalog's copy builds | Copy builds stay turned off. Nothing else is affected |
 | `AVA_PIPELINE_SERVER_SECRET` | The same copy builds | The same |
 
-**When:** on staging before the promotion (8.5), on production before the
-release (11.4). Doing either earlier is safe: it adds configuration only,
+**Recommended, not blocking.** The release works without these three:
+only address search (503) and the catalog's copy builds (off) need them,
+as the table says. You may set them later, by hand, at any time.
+
+**When:** best on staging before the promotion (8.5), and on production
+before the release (11.4). Doing either earlier is safe: it adds configuration only,
 changes no data, and the functions production runs today (`v0.14.1`) do
 not read these names. Every other secret either project needs already
 exists there, and stays as it is.
@@ -1439,166 +1342,52 @@ interrupted run: delete it with `rm -f` and the path it printed.
 
 ## 7. Vercel before the cutover
 
+**Nothing changes in Vercel for this cutover** (M1). This section is a
+short orientation, and you may skip it. Every change in Vercel is yours:
+no command in this runbook changes Vercel. **CHANGES VERCEL** marks the one
+optional step that changes something.
+
 **Where:** the Vercel dashboard in the browser, team `avandar`, project
 `avandar` (open `vercel.com`, pick the `avandar` team at the top left, then
-the `avandar` project). Every path below starts on that project's page.
-Every change here is yours: no command in this runbook changes Vercel.
-**CHANGES VERCEL** marks the steps that change something.
+the `avandar` project).
 
-### 7.1 `staging.avandarlabs.com` serves the environment named `staging`
+### 7.1 How the app deploys today
 
-Project `avandar` > **Settings** > **Domains** > find
-`staging.avandarlabs.com`. It must be connected to the custom environment
-named `staging` (E1), not to Preview or to a Git branch. If it is not:
-**Edit** next to the domain > choose environment `staging` > **Save**.
-**CHANGES VERCEL.** **Verify:** the exact label Vercel shows next to the
-domain. Why it matters: `staging.yaml` deploys with
-`--environment=staging`, so a domain attached to another environment would
-keep serving an old build.
+Nothing to change. Vercel's Git integration builds every push to `develop`
+into the Vercel environment named `staging`, which serves
+`staging.avandarlabs.com`, and every push to `main` into Production, which
+serves `app.avandarlabs.com`. Each build uses the variables already set in
+that Vercel environment. Other pushed branches get preview deployments, as
+they always have. A deployment is ready a few minutes after its push.
 
-### 7.2 Pre-flight: the `VITE_` variables of Production and of `staging`
+### 7.2 Optional: turn the data agent on for everyone (**CHANGES VERCEL**)
 
-The CI build takes every build variable from Vercel and nothing from
-GitHub. It pulls the Vercel environment with the Vercel command-line tool,
-then the deploy job's "Check the Vercel build environment" step (5.5)
-stops the deploy, before anything is written, if a `VITE_` variable is
-wrong. This pre-flight is how you make that check pass the first time.
+`VITE_AVA_DATA_AGENT` set to `on` enables the data agent for every user.
+It is new for production. If you want it, set it in project `avandar` >
+**Settings** > **Environment Variables** (**verify** the label: it may sit
+under **Settings** > **Environments** > the environment instead), for
+Production, and for `staging` if you want it there too. Vite copies a
+`VITE_` value into the app when it builds, so the value takes effect at the
+next deployment: set it before 8.5 (staging) or 11.4 (production) to have
+it in the release's build, or set it afterwards and let the next push
+deploy it. Leaving it unset changes nothing.
 
-**Where:** the Vercel dashboard. Project `avandar` > **Settings** >
-**Environment Variables** (**verify** the label: it may sit under
-**Settings** > **Environments** > the environment instead). Look at the
-list once for **Production** and once for the environment named
-`staging`, using the environment filter above the list (**verify** the
-filter's label). For each of the two environments, check every row of
-this table:
+### 7.3 Deploy hooks
 
-| Check | Production | `staging` |
-| --- | --- | --- |
-| No variable whose name starts with `VITE_` is marked Sensitive | Required | Required |
-| `VITE_SUPABASE_API_URL` | Exactly production's own project URL, `https://<production ref>.supabase.co` | Exactly staging's own project URL, `https://<staging ref>.supabase.co` |
-| `VITE_SUPABASE_ANON_KEY` | Set, not empty | Set, not empty |
-| `VITE_APP_URL` | Exactly `https://app.avandarlabs.com` | Exactly `https://staging.avandarlabs.com` |
+Nothing to change: deploy hooks stay as they are. Removing them belongs to
+the CI deploy follow-up (section 16, Move deploys to CI and manage secrets
+in GitHub).
 
-A trailing `/` and upper or lower case do not matter to the check. The
-two refs are `PROD_REF` and `STAGING_REF` from 2.4 part 1, and a project
-ref is not secret: the web app's bundle carries it. In the cutover
-terminal, this prints both URLs to compare with what Vercel shows:
+### 7.4 CLI deploys
 
-```bash
-echo "Production: https://$PROD_REF.supabase.co"; echo "staging: https://$STAGING_REF.supabase.co"
-```
+Nothing to check: nothing deploys with the Vercel command-line tool in this
+cutover.
 
-**How a Sensitive variable looks, and how to fix it.** Vercel shows a
-Sensitive variable's value as hidden, with no way to reveal it, and marks
-it as Sensitive in the list (**verify** the exact marker). Vercel may not
-let you turn Sensitive off on an existing variable (**verify**: open the
-variable's **...** menu > **Edit** and look for the switch). If there is
-no switch, delete the variable (**...** > **Remove**) and add it again
-with **Add New** (**verify** the button label), with the same name, the
-same environment, and **Sensitive** off. **CHANGES VERCEL.** If the team
-has a policy that makes every new variable Sensitive (**verify**: team
-`avandar` > **Settings** > **Security & Privacy**, a setting about
-Sensitive environment variables), turn it off first, or the new variable
-comes back Sensitive.
+### 7.5 The Vercel token
 
-**Why this is harmless.** Vite copies the value of every `VITE_` variable
-into the JavaScript bundle it builds, and every browser that opens the app
-downloads that bundle. A `VITE_` value is therefore public by nature,
-whatever Vercel calls it. Marking it Sensitive hides it in the dashboard
-only, and it keeps the CI build from reading it at all. Never give a
-real secret a `VITE_` name.
-
-**Where to get a value you have to re-enter**, since Vercel cannot show
-you a Sensitive one:
-
-- `VITE_SUPABASE_API_URL` and `VITE_APP_URL`: the table above.
-- `VITE_SUPABASE_ANON_KEY`: Supabase dashboard > the project (**Avandar**
-  or **Avandar Staging**) > **Project Settings** > **API Keys**. Use the
-  same kind of key the environment holds today: the publishable key
-  (`sb_publishable_...`) or the legacy `anon` key (**verify** which one
-  your password manager says it is). Both are public by design.
-- `VITE_GOOGLE_PICKER_API_KEY`: Google Cloud console > the project that
-  owns that environment's OAuth client (the project picker at the top) >
-  **APIs & Services** > **Credentials** > under **API Keys**, the Picker
-  key > **Show key**. Shape: starts `AIza`, about 39 characters.
-- `VITE_GOOGLE_PICKER_APP_ID`: the Google Cloud project number of that
-  same project, shown as **Project number** on the console's project
-  dashboard. It is also the run of digits before the first `-` in the
-  OAuth client ID.
-- Any other `VITE_` variable: its value is in the bundle the site serves
-  today, and in your notes or password manager. Check the table below for
-  what it should be.
-
-Then check the other build variables against this table, and edit a value
-with the **...** menu next to it > **Edit** > **Save** (**CHANGES
-VERCEL**):
-
-| Name | What it does |
-| --- | --- |
-| `VITE_FEATURE_FLAGS` | Comma-separated flags, defined in `src/config/FeatureFlagConfig.ts`. Compare Production with `staging` and with `demo` |
-| `VITE_AVA_DATA_AGENT` | New for production. `on` enables the data agent for every user. Decide the value for each environment |
-| `VITE_HIDE_DEV_TOOLS` | `true` hides the router dev tools. Set it on Production |
-| `VITE_OFFLINE_CHAT_MOCK` | Must be unset on Production and `staging` |
-
-A Sensitive variable whose name does not start with `VITE_` is fine: it
-never reaches the browser bundle, so the "Pull the Vercel production
-environment" step (or the staging one) leaves it out of the build and
-prints its name under `Sensitive Vercel variables left out of the build:`.
-
-**The first staging deploy rehearses this.** If staging's deploy (9.1)
-stops at "Check the Vercel build environment", nothing was written to
-staging. The step's message names each variable it refused. Fix those in
-Vercel's `staging` environment as above, then re-run the deploy job
-(5.7). Production's check reads the Production environment, so fix the
-same thing there before the release.
-
-### 7.3 Delete every deploy hook
-
-Project `avandar` > **Settings** > **Git** > **Deploy Hooks** > delete
-every hook listed there. **CHANGES VERCEL.** A deploy hook is a URL that
-starts a deployment when anyone calls it, outside CI (continuous
-integration, here the GitHub Actions workflows), so D2 removes them. An
-empty list needs nothing.
-
-### 7.4 Nothing blocks CLI deploys to production
-
-`production.yaml` deploys with the Vercel command-line tool
-(`vercel deploy --prebuilt --prod`), not through Vercel's Git integration.
-Check these three, in project `avandar` > **Settings** (**verify** each
-label). Change a setting only if it is wrong (**CHANGES VERCEL**):
-
-- **Environments** > **Production**: custom domains are assigned to new
-  production deployments automatically. If that is off, the CI deploy
-  creates a production deployment that does not serve `app.avandarlabs.com`.
-- **Deployment Protection**: no rule that stops a CLI deployment or holds
-  it for approval.
-- No rolling release or deployment check that waits on a Git status.
-
-### 7.5 Make the Vercel token as narrow as Vercel allows
-
-This token is for the GitHub `production` environment only. `staging`
-already holds a Vercel token of its own, which its deploy job uses: leave
-it as it is.
-
-**Where:** the Vercel dashboard, then the cutover terminal. **CHANGES
-VERCEL**, **CHANGES GITHUB SETTINGS.**
-
-1. Vercel dashboard > your avatar (top right) > **Account Settings** >
-   **Tokens** > **Create**. Name it (for example `github-actions-production`),
-   set **Scope** to the `avandar` team (or to the `avandar` project, if your
-   plan offers project-scoped tokens: **verify**), and pick an expiry date.
-   Click **Create**.
-2. Copy the token at once: Vercel shows it only once. It is a long string
-   of letters and digits. Save it in your password manager.
-3. Store it as `VERCEL_TOKEN` in the GitHub `production` environment
-   through 5.3's loop.
-4. Do not delete any existing token: staging's deploy uses the one it
-   holds. Narrowing staging's token is follow-up work (section 16, Narrow
-   the staging tokens).
-
-The token in `staging` stays readable by any branch's workflow, and it can
-deploy project `avandar` to production (5.2). Pablo accepted that for the
-cutover (K1).
+Nothing to create: GitHub gets no Vercel token in this cutover. The token
+the `staging` environment already holds is section 16's (Narrow the staging
+tokens).
 
 ## 8. Promote to `develop` (D3)
 
@@ -1607,8 +1396,9 @@ The promotion is a PR, for CI and the public record, then a fast-forward of
 commits with one and break every commit ID the feature log cites.
 
 It carries everything on the integration branch: the demo features, the
-plugin system (D1), the CI deploys, the catalog move scripts, the GIS fixes,
-and the video producer file-name casing fix.
+plugin system (D1), the catalog move scripts, the GIS fixes, and the video
+producer file-name casing fix. Its workflows and `vercel.json` are
+`develop`'s own copies, unchanged (M1).
 
 **Where:** the cutover terminal for every step of this section, plus
 GitHub in the browser to look at the PR.
@@ -1634,8 +1424,8 @@ Then run 5.6's block in the same terminal.
 **Expect:** `## chore/production-cutover` with no changed files listed
 under it; the short SHA is the tip Task 21's final report names;
 `demo/measles can fast-forward`, `develop can fast-forward`, and
-`rehearsed migrations` all print; 5.6 shows nothing missing; and 5.1 is
-done.
+`rehearsed migrations` all print; 5.6 shows nothing missing; and 5.1
+printed the protection as expected.
 **If not:** a missing `develop can fast-forward` means `develop` moved again
 (3.4): stop, and catch the branch up as Task 21 does before going on. A
 missing `demo/measles can fast-forward` means someone pushed to
@@ -1655,10 +1445,12 @@ gh run list --branch demo/measles --limit 5
 
 **Expect:** the push prints `<old>..<new>  <commit> -> demo/measles` (a
 fast-forward, no `forced update`). The run list shows no new deploy run:
-`demo.yaml` is gone from this tree, and `vercel.json` turns Vercel's Git
-deployments off, so Vercel builds nothing for this push either.
-`demo.avandarlabs.com` keeps serving its last build, frozen until section
-17.
+`demo.yaml` is gone from this tree. Vercel's Git integration may build a
+preview deployment for this push, as it does for pushed branches: that
+changes nothing on staging or production. `demo.avandarlabs.com` keeps
+serving its last build, frozen until section 17 (**verify** in the Vercel
+dashboard > project `avandar` > **Deployments** that a deployment for this
+push, if there is one, is marked Preview, not `demo`).
 **If not:** a rejected push means `demo/measles` moved: stop and talk to
 whoever pushed it.
 
@@ -1690,9 +1482,13 @@ of minutes:
 gh pr checks demo/measles --watch
 ```
 
-**Expect:** every check passes, `pr-test-e2e` included: `lint-pr-title`,
-`lint-typecheck`, `test-quick`, `pr-test-e2e`, `verify-packages`, and
-`react-doctor.yml`'s check. No ruleset requires a GitHub status check, so
+**Expect:** every check passes, `pr-test-e2e` included. `pr-develop.yaml`
+is `develop`'s own and runs `lint-pr-title`, `lint-typecheck`,
+`test-quick`, `pr-test-e2e`, and `verify-packages`; `react-doctor.yml`
+adds its own check, and Vercel may add one for its preview deployment.
+`lint-typecheck` has failed on `develop` since 2026-11-20 because of a
+video producer file-name casing bug; this branch fixes it (`33c4034e1`), so
+it passes here. No ruleset requires a GitHub status check, so
 your admin bypass could fast-forward `develop` even with a red PR. Do not:
 staging's CI gate and `ava release` (11.2) need staging's whole run green,
 `test-e2e` included.
@@ -1705,7 +1501,8 @@ The open PR picks up the new push by itself.
 
 This checks, once more, that `develop` can fast-forward to `TIP` and that
 the PR's head is `TIP`, and only then pushes `TIP` to `develop`. This push
-is the promotion: it starts the staging deploy (section 9).
+is the promotion: Vercel deploys the new app to staging, and `staging.yaml`
+migrates staging (section 9).
 
 ```bash
 git fetch origin
@@ -1734,8 +1531,8 @@ in 8.5 starts:
 | What | Expect |
 | --- | --- |
 | The PR | Shows merged, since its head is now on `develop`. **Verify** on the PR page. The repository has `delete_branch_on_merge: true`: **verify** with `git ls-remote origin refs/heads/demo/measles` whether GitHub deleted `demo/measles` when the PR showed merged. Either way nothing is lost: 17.4 deletes it anyway, and its delete then fails harmlessly |
-| Vercel | Builds nothing by itself: `vercel.json` sets `git.deploymentEnabled` to false, and Vercel reads it from the pushed commit |
-| `staging.yaml` | Runs for the push and deploys staging step by step (9.1) |
+| Vercel | Its Git integration builds `develop` and deploys it to staging (`staging.avandarlabs.com`) within minutes, with the variables of the Vercel `staging` environment. Until `staging.yaml`'s `migrate` job finishes, the new staging app runs on the old staging schema and the old edge functions. Vercel also keeps building previews for other pushed branches, as it always has |
+| `staging.yaml` | Runs for the push: `lint-typecheck`, then `test-quick` and `test-e2e`, then `migrate`, which applies staging's 11 pending migrations and deploys the edge functions (9.1) |
 | `release-packages.yaml` | Writes changesets for changed `packages/**` and opens a version PR. Nothing is published to npm until that PR is merged, but only when the run finds changesets. With none, its "Create version PR or publish" step publishes every `@avandar/*` version npm does not have yet. Check that step's log: it must say it opened or updated the version PR, and the version PR must stay unmerged (**verify**) |
 | `demo.yaml` | Deleted from `develop` by this push |
 
@@ -1746,9 +1543,15 @@ holds `TIP` (8.1) and `STAGING_DB_URL` (2.4 part 3).
 
 ### 9.1 Watch the staging deploy
 
-This waits 15 seconds for GitHub to start the `staging.yaml` run for the
-push in 8.5, saves that run's id as `STAGING_RUN_ID`, and follows it live
-until it ends:
+The push in 8.5 starts two things that run independently. Vercel's Git
+integration builds the app and deploys it to staging within a few minutes:
+nothing to run for that, and 9.2 checks it. `staging.yaml` runs the checks,
+then migrates staging and deploys its edge functions. Until its `migrate`
+job finishes, the new staging app runs on the old schema.
+
+This block waits 15 seconds for GitHub to start the `staging.yaml` run for
+the push in 8.5, saves that run's id as `STAGING_RUN_ID`, and follows it
+live until it ends:
 
 ```bash
 sleep 15
@@ -1758,72 +1561,110 @@ sleep 15
 
 If the block ends without following a run, either `TIP` is unset (re-run
 8.1 in this terminal) or the run for `TIP` has not started yet: wait a
-minute and run the block again. The run's steps, in order:
+minute and run the block again. The run's jobs and steps, in order:
 
-| Order | Job or step | Writes to staging |
-| --- | --- | --- |
-| 1 | `lint-typecheck`, then `test-quick` (`test-e2e` alongside, not blocking the deploy) | No |
-| 2 | `deploy`: Refuse anything but the tip of develop | No |
-| 3 | Check the staging configuration: prints `The staging configuration is complete.` | No |
-| 4 | Pull the Vercel staging environment: prints `Sensitive Vercel variables left out of the build:` and their names, or `(none)` | No |
-| 5 | Check the Vercel build environment: prints `The Vercel staging build environment is complete.` | No |
-| 6 | Build the web app for Vercel | No |
-| 7 | Apply migrations (`supabase db push --include-all`) | Yes |
-| 8 | Deploy edge functions | Yes |
-| 9 | Deploy the prebuilt web app to Vercel (`--environment=staging`) | Yes |
+| Order | Job or step | Writes to staging | Takes about |
+| --- | --- | --- | --- |
+| 1 | `lint-typecheck` | No | 3 minutes |
+| 2 | `test-quick`, with `test-e2e` alongside. `test-e2e` does not block `migrate`, but it does decide the run's verdict | No | 12 minutes (`test-e2e` longer) |
+| 3 | `migrate`: `Run supabase link --project-ref $SUPABASE_PROJECT_ID` | No | Seconds |
+| 4 | `migrate`: `Run supabase db push --include-all`, one line per migration, 11 of them | Yes | Seconds |
+| 5 | `migrate`: `Run supabase functions deploy`, one line per function | Yes | Under a minute |
 
-The run never changes staging's edge function secrets: they stay as set
-by hand on the project (6.6).
+The `staging` environment has no protection rules, so `migrate` starts
+without an approval. The run never changes staging's edge function
+secrets: they stay as set by hand on the project (6.6).
 
 **Expect:** `gh run watch` ends with every job green and the run marked
 successful. `ava release` later needs the whole run, `test-e2e` (the
 end-to-end browser tests) included, to pass for the commit it releases
 (11.2).
-**If not:** open the run in the browser (GitHub > **Actions** > the run) to
-see which step failed, then find it below. Re-run commands run here, in
-the cutover terminal, which holds `STAGING_RUN_ID`:
+
+**The known functions deploy flake.** Supabase CLI 2.98.2, which
+`develop`'s workflows pin, tries import map entries in random order when it
+bundles the edge functions. So `@avandar/utils/sql` sometimes resolves to
+the wrong file, and `Run supabase functions deploy` fails with
+`Module not found ".../packages/shared/utils/src/sql/index.ts"`. It
+happened on staging with `develop`'s own code on 2026-11-20, and the next
+run deployed fine: expect about one failure in two attempts. `db push` runs
+before it, so the migrations are already applied, and staging runs the new
+schema with the old edge functions until a re-run passes. The fix is to
+re-run the failed job until it passes. The repeated `db push` finds nothing
+to apply. GitHub re-runs jobs only after the whole run has ended,
+`test-e2e` included, so wait for `gh run watch` to end first. Then, in this
+terminal, this shows whether the failure is the flake, re-runs only the
+failed jobs, and follows the new attempt:
+
+```bash
+gh run view "$STAGING_RUN_ID" --log-failed | grep -F 'Module not found' | head -3
+gh run rerun "$STAGING_RUN_ID" --failed
+sleep 15
+gh run watch "$STAGING_RUN_ID"
+```
+
+**Expect:** the first command prints at least one `Module not found` line
+naming `packages/shared/utils/src/sql/index.ts`, and the re-run ends with
+`migrate` green. If it fails the same way again, run the block again, as
+often as it takes. The run's page in the browser has a **Re-run failed
+jobs** button that does the same as the second line. A failed `test-e2e`
+is re-run too, which takes longer but does not block `migrate`.
+**If not:** if the first command prints nothing, the failure is something
+else: find it in the table below. Bumping the CLI version would fix the
+flake, but it is a CI change and waits for the follow-up (section 16, Move
+deploys to CI and manage secrets in GitHub).
+
+**If the run fails** at a step other than the flake, open the run in the
+browser (GitHub > **Actions** > the run) to see which step failed, then
+find it below. Re-run commands run here, in the cutover terminal, which
+holds `STAGING_RUN_ID`:
 
 | Stops at | Staging | Do |
 | --- | --- | --- |
-| 1 or 2 | Untouched | Fix the cause, then `gh run rerun "$STAGING_RUN_ID" --failed` |
-| 3, Check the staging configuration | Untouched: a GitHub name is missing or malformed, and nothing was written | Fix the name in GitHub (5.4, 5.7), then re-run the same way |
-| 5, Check the Vercel build environment | Untouched: a Vercel variable problem, and nothing was written | Fix the variable named in the message in Vercel's `staging` environment (7.2), then re-run the same way. GitHub needs no change |
-| 4 or 6, the pull or the build | Untouched | Fix the cause, then re-run the same way |
-| 7, Apply migrations | Partly migrated | A migration problem: read 11.9 about the public log first, then stop and raise it |
-| 8 or 9 | Migrated, but the functions or the app are not deployed | Fix the cause and re-run the failed jobs the same way |
+| `lint-typecheck` or `test-quick` | Database and functions untouched. Vercel already serves the new app, on the old schema | Fix the cause, then `gh run rerun "$STAGING_RUN_ID" --failed`. A known flaky test is in section 18 ("Quick suite flake") |
+| `Run supabase link` | Untouched | Read the step's log, fix the cause, then re-run the same way |
+| `Run supabase db push --include-all` | Partly migrated | A migration problem: read 11.9 about the public log first, then stop and raise it |
+| `Run supabase functions deploy`, with `Module not found` | Migrated, old functions | The flake: the block above |
+| `Run supabase functions deploy`, another error | Migrated, old functions | Fix the cause and re-run the same way |
+| `test-e2e` only | Migrated and deployed | Read its report. A flaky test: re-run the same way. `ava release` needs the run green (11.2) |
 
-### 9.2 The 10 migrations applied, and the domain serves the new build
+### 9.2 The 11 migrations applied, and the domain serves the new build
 
-These three read-only queries show staging's newest migration and count,
-which of the 10 expected versions it has, and whether the plugin table
-exists:
+These four read-only queries show staging's newest migration and count,
+which of the 11 expected versions it has, whether the plugin table exists,
+and every file in the tree that staging still lacks:
 
 ```bash
 read_db "$STAGING_DB_URL" "select max(version), count(*) from supabase_migrations.schema_migrations"
-read_db "$STAGING_DB_URL" "select version from supabase_migrations.schema_migrations where version in ('20261112000050','20261112201046','20261113022522','20261113154906','20261113181028','20261113232435','20261114213908','20261123200000','20261123200100','20261123200200') order by 1"
+read_db "$STAGING_DB_URL" "select version from supabase_migrations.schema_migrations where version in ('20261105212729','20261112000050','20261112201046','20261113022522','20261113154906','20261113181028','20261113232435','20261114213908','20261123200000','20261123200100','20261123200200') order by 1"
 read_db "$STAGING_DB_URL" "select to_regclass('public.plugin_installations')"
+comm -23 <(ls supabase/migrations | cut -d_ -f1 | sort) <(read_db "$STAGING_DB_URL" "select version from supabase_migrations.schema_migrations" | sort)
 ```
 
-**Expect:** first `20261123200200|<n>`, where `<n>` is the tip's migration
-file count (`ls supabase/migrations | wc -l` in the cutover worktree
-prints it). Then all 10 versions, one per line: the 7 dictionary and
-crosswalk files (applied out of order by `--include-all`), the restore,
-and the two slot files. Then `plugin_installations`. Then, in the browser,
-open `https://staging.avandarlabs.com`, sign in, and press Cmd+K: the
-command palette shows the version `0.15.0-dev`.
-**If not:** a missing version means `db push` skipped it: read the "Apply
-migrations" step's log in the run (GitHub > **Actions** > the run >
-`deploy`). An older version in Cmd+K means the domain is attached to
-another Vercel environment: fix it as 7.1 says.
+**Expect:** first `20261123200200|<n>`, where `<n>` is 11 more than the
+count 2.4 part 3 printed. Then all 11 versions, one per line: `develop`'s
+own `20261105212729` and the 7 dictionary and crosswalk files (these 8
+applied out of order by `--include-all`), then the restore and the two
+slot files. Then `plugin_installations`. The last command prints nothing:
+staging has every file in the tree. Then, in the browser, open
+`https://staging.avandarlabs.com`, sign in, and press Cmd+K: the command
+palette shows the version `0.15.0-dev`.
+**If not:** a missing version means `db push` skipped it: read the
+`Run supabase db push --include-all` step's log in the run (GitHub >
+**Actions** > the run > `migrate`). An older version in Cmd+K means
+Vercel's build for the push has not finished, or failed: in the Vercel
+dashboard > project `avandar` > **Deployments**, the newest deployment for
+the `staging` environment must show the commit `echo "${TIP:0:9}"` prints,
+marked Ready. Reload the page once it is. A failed build shows its log
+there: stop and raise it.
 
 Local databases, and the `demo-measles` branch, that ran the slot migrations
 under their old names cannot migrate forward: reset them (section 18).
 
 ### 9.3 No secrets check after the deploy
 
-Nothing to run here. CI no longer writes edge function secrets (L1), so
-there is no value to compare after the deploy, and H1's
-`FEATUREBASE_JWT_SECRET` check no longer applies.
+Nothing to run here. CI writes no edge function secrets (L1), so there is
+no value to compare after the deploy, and H1's `FEATUREBASE_JWT_SECRET`
+check no longer applies.
 
 ### 9.4 The old `AVA_PIPELINE_SERVER_URL` variable on `staging`
 
@@ -2296,8 +2137,18 @@ still untouched.
 
 ## 10. Back up production
 
-Do 10.1 now, in the cutover terminal. Run 10.2 and 10.3 later, from 11.5,
-in the develop terminal, while the `deploy` job waits for your approval.
+Do all of section 10 in the cutover terminal, after section 9 and right
+before section 11: choose the rollback basis, take the backup, and test that
+it restores, all **before** `ava release` pushes `main` (11.4). The order
+matters because the push deploys the new app at once (Vercel), and every
+minute between the push and the migration is a minute of the new app on the
+old schema. So the backup comes first, and 11.5's approval follows the
+moment `migrate` asks for it.
+
+Production is quiet (no active users, D4), so a backup taken shortly before
+the release is current. Any production write between this backup and the
+migration would be missing from it if you restore it (option B). PITR
+(option A) covers that gap, since it restores to any second.
 
 ### 10.1 Choose the rollback basis (before 11.4)
 
@@ -2352,12 +2203,11 @@ SQL
 
 ### 10.2 Take the backup (reads production)
 
-**When:** while 11.5's `deploy` job waits for your approval. Writes made
-between this backup and the migrations are lost if you restore it, so
-approve as soon as 10.3 passes.
+**When:** after 10.1, right before section 11. Writes made between this
+backup and the migrations are lost if you restore it under option B, so go
+on to section 11 as soon as 10.3 passes.
 
-**Where:** the develop terminal, after you stopped watching the run with
-Ctrl-C in 11.5. Run 10.2 and 10.3 in this same terminal: 10.3 reads
+**Where:** the cutover terminal. Run 10.2 and 10.3 in this same terminal: 10.3 reads
 `BACKUP_T`, which 10.2 sets. The first line moves the terminal into the
 rehearsal worktree, which is expected. The block saves production's row
 counts, dumps the roles, schema, all data, the `public` and `auth` data on
@@ -2393,7 +2243,7 @@ does not change edge function secrets, since CI writes none (L1).
 
 ### 10.3 Verify the dump restores
 
-**Where:** the develop terminal, right after 10.2. This runs on the
+**Where:** the cutover terminal, right after 10.2. This runs on the
 rehearsal's local stack only, behind `on_rehearsal_stack`, and rehearses
 option B: the rehearsal dump from 4.2 stands in for the scheduled backup,
 then the top-up empties every `public` and `auth` table and loads this
@@ -2420,9 +2270,8 @@ this terminal had 2.4 setup, and that `echo "$REHEARSAL"` prints the
 rehearsal worktree. If the reset fails because the rehearsal stack is stopped
 (`ava supabase status` says `Local Supabase is not running`), start it only
 behind the guard, `on_rehearsal_stack && ava supabase start`, then run the
-block again. For any other failure, do not approve. Leave the deployment
-waiting, or reject it (GitHub > the run's page > **Review deployments** >
-**Reject**). Fix the cause, take the backup again (10.2), and test again. A
+block again. For any other failure, do not start section 11: nothing has
+been released yet. Fix the cause, take the backup again (10.2), and test again. A
 failure with `cannot truncate a table referenced in a foreign key
 constraint` names a table outside `public` and `auth`: never add
 `CASCADE`. Raise it, and choose option A. A failure on an `auth` table that
@@ -2438,7 +2287,7 @@ diff "$D/auth-tables-dump.txt" "$D/auth-tables-local.txt" && echo "same auth tab
 
 If `same auth tables` does not print, the lists differ (`diff` shows how):
 this test cannot pass here and option B stays untested. Choose option A,
-turn PITR on (10.1), and only then approve.
+turn PITR on (10.1), and only then release (section 11).
 
 ## 11. Release
 
@@ -2487,15 +2336,16 @@ gh run list --workflow staging.yaml --branch develop --limit 1 --json headSha,st
 git rev-parse origin/develop
 ```
 
-Then run 5.6's block here, and confirm from your notes that 5.1's reviewer
-is set, 6.4's pipeline server answers, 6.6's three edge function secrets
-are set on production (6.6's names-only check lists them), 7.2's
-pre-flight passed for the Production environment, 4.8's audit refresh is
-done, and 10.1's choice is made (and PITR is on, if you chose A).
+Then run 5.6's block here, and confirm from your notes that 5.1 printed the
+reviewer rule, 6.4's pipeline server answers, 6.6's edge function secrets
+are set on production if you chose to set them now (recommended, not
+blocking), 4.8's audit refresh is done, 10.3 passed, and PITR is on if 10.1
+chose A.
 **Expect:** the run's `headSha` equals the commit printed on the next
 line, with `"status":"completed"` and `"conclusion":"success"`. `ava
-release` reads the same run: its verdict covers the whole run, `test-e2e`
-included.
+release` reads the same `staging.yaml` run: its verdict covers the whole
+run, `test-e2e` included, and with `--yes` it stops on any verdict but a
+pass (A2).
 **If not:** if the run is still going, wait for it. If it failed, re-run
 its failed jobs until it passes. This block finds the run for
 `origin/develop`'s commit and re-runs only its failed jobs:
@@ -2544,7 +2394,7 @@ one generated summary, and a dry run without it makes a real OpenAI call.
 The promotion PR is the record. Notes can be published later with
 `ava release notes --version 0.15.0`.
 
-### 11.4 Release (**PUSHES** `main`; nothing is written until 11.5)
+### 11.4 Release (**PUSHES** `main`: from this push, Vercel deploys the new app to production)
 
 `ava release` runs on `develop` only. Do not pass `--yes` or
 `--skip-ci-check`. With `--yes`, a CI verdict other than a pass (failed,
@@ -2552,9 +2402,22 @@ pending, missing, or unknown) **stops** the release (A2). Without `--yes`
 it asks. Overriding a non-passing verdict takes `--skip-ci-check`: never
 here.
 
-**Where:** the develop terminal. Pushing `main` starts `production.yaml`,
-which then waits for your approval (11.5) before it touches production.
-Answer the prompts as the table after the block says:
+**What the push to `main` starts.** Two things, at once and independently:
+
+- **Vercel deploys the new app to production.** Its Git integration builds
+  `main` and makes it the Production deployment of `app.avandarlabs.com`
+  within a few minutes. From then on, production serves the new app
+  against the old schema and the old edge functions, until 11.5's
+  `migrate` job finishes. Production has no active users (D4), which is
+  why this is acceptable for this release (11.8).
+- **`production.yaml` starts.** It runs `lint-typecheck` (about 3 minutes)
+  and `test-quick` (about 12 minutes), and then its `migrate` job waits for
+  your approval (11.5). Nothing writes to the database until you approve.
+
+10.2 and 10.3 must have passed before you start this step.
+
+**Where:** the develop terminal. Answer the prompts as the table after the
+block says:
 
 ```bash
 ava release --skip-changelog
@@ -2573,14 +2436,14 @@ It then commits `Release: v0.15.0 [skip deploy]` on `develop` and pushes it,
 builds the `main` commit from that tree, creates the annotated tag
 `v0.15.0`, pushes `main` and the tag together, then commits `Bump version
 to 0.15.1-dev [skip deploy]` on `develop` and pushes it. `[skip deploy]` is
-not a GitHub keyword: each of the two `develop` pushes starts a
-`staging.yaml` run. Expect the run for `Release: v0.15.0` to end red at the
-deploy job's `Refuse anything but the tip of develop` step (`develop is at
-<sha>, this run is for <sha>`): `develop` has already moved on to the
-version bump, so the tip check refuses the stale commit before it touches
-staging. That is not a failure. The run for `Bump version to 0.15.1-dev` is
-the one that redeploys staging and must pass, and `ava release` checked
-staging's CI verdict before it pushed anything.
+not a GitHub keyword, and Vercel does not read it either: each of the two
+`develop` pushes starts a `staging.yaml` run and a Vercel staging build.
+Both runs simply run. Their `migrate` jobs find no migration to apply,
+since staging already has every file (9.2), and deploy the same edge
+functions again, so the flake (9.1) can fail either one: re-run it as 9.1
+says. The run for `Bump version to 0.15.1-dev` is the one the next release
+checks, so it must end green. `ava release` checked staging's CI verdict
+before it pushed anything.
 
 **If not:** if the release stops with an error, find the message in the
 first column below and do what the last column says, in the develop
@@ -2593,7 +2456,7 @@ terminal:
 | `Could not push main and v0.15.0` | `develop` is at `0.15.0` and pushed. `main` and the tag are not | Wait for the new `staging.yaml` run to pass, then `cd "$(wt go develop)" && ava release --version 0.15.0 --next 0.15.1 --skip-changelog` |
 | `v0.15.0 is released, but develop could not be bumped to 0.15.1-dev` | Released | `cd "$(wt go develop)" && pnpm version 0.15.1-dev --no-git-tag-version && git commit -m "Bump version to 0.15.1-dev [skip deploy]" -- package.json && git push origin HEAD:refs/heads/develop` |
 
-### 11.5 Approve the `deploy` job (**WRITES TO PRODUCTION**: approving starts the migrations)
+### 11.5 Approve the `migrate` job (**WRITES TO PRODUCTION**: approving runs the migrations)
 
 **Where:** the develop terminal, then GitHub in the browser. This waits 15
 seconds for GitHub to start the `production.yaml` run for the new `main`,
@@ -2612,61 +2475,80 @@ rollback (14.3). The version in the name keeps a later release from
 overwriting it. If nothing is watched, the run for the new `main` commit has not
 started yet: wait a minute and run the block again.
 
-When `test-quick` passes, the `deploy` job waits for your approval, and
-`gh run watch` keeps waiting with it. Then:
+When `test-quick` passes, about 15 minutes after the push, the `migrate`
+job waits for your approval, and `gh run watch` keeps waiting with it.
+**Approve it right away**: the backup (10.2) already exists, and every
+minute of waiting is a minute of the new app on the old schema.
 
-1. Press Ctrl-C to stop watching. The run keeps waiting on GitHub.
-2. In this terminal, run 10.2 and then 10.3 to take the backup and test
-   it. Approve only if 10.3 passed.
-3. In the browser, open the run's page: GitHub > **Actions** >
-   **production.yaml** (left sidebar) > the newest run, or
-   `gh run view "$RUN_ID" --web` from this terminal. Click **Review
+1. In the browser, open the run's page: GitHub > **Actions** >
+   **CI/CD for Production** (left sidebar; the workflow file is
+   `production.yaml`) > the newest run, or run
+   `gh run view "$RUN_ID" --web` in another terminal. Click **Review
    deployments**, tick `production`, and click **Approve and deploy**.
    This approval is the production write: the job then migrates
-   production without asking again.
-4. Follow the rest of the run with `gh run watch "$RUN_ID"`, or on the
-   run's page. 11.6 says what each step does.
+   production and deploys the edge functions without asking again.
+2. Keep following the run with `gh run watch "$RUN_ID"` in the develop
+   terminal, or on the run's page. 11.6 says what each step does.
 
-### 11.6 What each step of the `deploy` job does and prints
+### 11.6 What each step of the `migrate` job does and prints
+
+These are `production.yaml`'s jobs and steps as `develop` has them. GitHub
+names each unnamed step "Run" and the first line of its command:
 
 | Order | Job or step | Touches production | Prints |
 | --- | --- | --- | --- |
-| 1 | `lint-typecheck`, then `test-quick` (`test-e2e` alongside, not blocking) | No | Test output. These jobs use the `staging` environment's test secrets |
-| 2 | `deploy` waits for approval | No | |
-| 3 | Refuse anything but the tip of main | No | Nothing on success. Otherwise `main is at <sha>, this run is for <sha>. Re-run the newest main run.` |
-| 4 | Check the production configuration | No | `The production configuration is complete.` or one line per problem (5.5) |
-| 5 | Pull the Vercel production environment | No | `Sensitive Vercel variables left out of the build:` and their names, or `(none)` |
-| 6 | Check the Vercel build environment | No | `The Vercel production build environment is complete.` or a message for each problem, naming the variable (5.5) |
-| 7 | Build the web app for Vercel | No | The Vercel build output |
-| 8 | Apply migrations: `supabase link`, then `supabase db push --include-all` | **Yes** | One line per migration it applies, `$PROD_PENDING` of them (80 at the 2026-11-24 tip), in one push |
-| 9 | Deploy edge functions | **Yes** | One line per function. Production gains `connectors`, `file-url`, and `geocode`, and possibly `_eval` (**verify** in the log) |
-| 10 | Deploy the prebuilt web app to Vercel (`--prod`) | **Yes** | The deployment URL |
+| 1 | `lint-typecheck` (about 3 minutes) | No. Vercel already serves the new app (11.4) | Lint and type-check output |
+| 2 | `test-quick` (about 12 minutes), with `test-e2e` alongside, which does not block `migrate` | No | Test output. These jobs use the `staging` environment's test secrets |
+| 3 | `migrate` waits for approval (11.5) | No | |
+| 4 | `migrate`: `Run supabase link --project-ref $SUPABASE_PROJECT_ID` | No | The link output. The project ref is masked (11.9) |
+| 5 | `migrate`: `Run supabase db push` | **Yes** | One line per migration it applies, `$PROD_PENDING` of them (80 at the 2026-11-24 tip), in timestamp order. Plain `db push`, with no `--include-all`, is enough: every pending file is newer than production's newest applied file (4.6). On the last production release it took 2 seconds |
+| 6 | `migrate`: `Run supabase functions deploy` | **Yes** | One line per function. Production gains `connectors`, `file-url`, and `geocode`, and possibly `_eval` (**verify** in the log). It took 33 seconds last time |
 
 The job never changes production's edge function secrets: they stay as
 set by hand on the project (6.6).
 
-**First-deploy behavior.** `production.yaml` also has `workflow_dispatch`,
-but its `deploy` job runs only for `refs/heads/main`, and step 3 refuses
-anything but the tip of `main`. So re-running an old run refuses, which is
-the point: it would deploy older code over newer. The concurrency group
-`production-deploy` runs one deploy at a time, never cancels a running one,
-and keeps only the newest pending run.
+**Re-runs.** `production.yaml` has no concurrency group and does not check
+that its commit is still the tip of `main`. A re-run, or a
+`workflow_dispatch` run started on `main`, migrates and deploys the
+functions of the commit that run checked out. `db push` applies only the
+files production lacks, but `functions deploy` deploys that run's code, so
+only ever re-run the newest run. The `production` environment allows only
+`main` (5.1), so a run started on another branch cannot use it.
 
-If the run fails, find the failed step in the first column below and do
-what the last column says. Re-run commands run in the develop terminal,
-which holds `RUN_ID`:
+**The functions deploy flake** (9.1) can fail step 6 here too: about one
+attempt in two, with `Module not found ".../packages/shared/utils/src/sql/index.ts"`.
+The migrations are already applied by then, so production runs the new
+schema with the old edge functions until a re-run passes. GitHub re-runs
+jobs only after the whole run has ended, and `test-e2e` runs about 15
+minutes longer than `migrate`, so wait for `gh run watch` to end. Then, in
+the develop terminal, this shows whether the failure is the flake and
+re-runs only the failed jobs:
+
+```bash
+gh run view "$RUN_ID" --log-failed | grep -F 'Module not found' | head -3
+gh run rerun "$RUN_ID" --failed
+```
+
+The re-run's `migrate` waits for approval again: approve it on the run's
+page as in 11.5 (**WRITES TO PRODUCTION**), then follow it with
+`gh run watch "$RUN_ID"`. The repeated `db push` finds nothing to apply.
+Repeat until `migrate` is green.
+
+If the run fails anywhere else, find the failed step in the first column
+below and do what the last column says. Re-run commands run in the develop
+terminal, which holds `RUN_ID`:
 
 | Fails at | Production | Do |
 | --- | --- | --- |
-| 4, Check the production configuration | Untouched: a GitHub name is missing or malformed, and nothing was written | Fix the name in GitHub (5.3, 5.7), then `gh run rerun "$RUN_ID" --failed` on the newest run. Approve again |
-| 6, Check the Vercel build environment | Untouched: a Vercel variable problem, and nothing was written | Fix the variable named in the message in Vercel's Production environment (7.2), then re-run the same way. GitHub needs no change. Approve again |
-| Steps 1 to 3, 5, or 7 | Untouched | Fix the cause, then re-run the same way. Approve again |
-| 8, Apply migrations | Partly migrated: each file applies in its own transaction, so the files before the failing one stay applied | Read 11.9 first, then 14.1, row "A migration fails midway" |
-| 9 or 10 | Migrated, but the functions or the app are not deployed: the window in 11.8 is open | Fix the cause and re-run the failed jobs of the newest run at once. The migration step is then a no-op |
+| `lint-typecheck` or `test-quick` | `migrate` never runs: the database and functions are untouched, but Vercel already serves the new app on the old schema | Decide at once. A flaky test (section 18, "Quick suite flake"): `gh run rerun "$RUN_ID" --failed`, then approve as in 11.5. A real failure: fix forward (a fix on `develop`, staging green, `ava release`), or promote the previous Vercel deployment (14.5) until the fix is released |
+| `Run supabase link` | Untouched database, new app | Read the step's log, fix the cause, then re-run the same way. Approve again |
+| `Run supabase db push` | Partly migrated: each file applies in its own transaction, so the files before the failing one stay applied | Read 11.9 first, then section 14 (14.1, row "A migration fails midway") |
+| `Run supabase functions deploy`, with `Module not found` | Migrated, old functions | The flake: the block above |
+| `Run supabase functions deploy`, another error | Migrated, old functions | Fix the cause and re-run the failed jobs of the newest run at once. Approve again |
 
 ### 11.7 Check the version
 
-**Where:** the develop terminal, after the run's `deploy` job finished.
+**Where:** the develop terminal, after the run's `migrate` job finished.
 This lists each job's result, then production's newest migration and
 count:
 
@@ -2675,45 +2557,54 @@ gh run view "$RUN_ID" --json jobs --jq '.jobs[] | [.name, .conclusion] | @tsv'
 read_db "$PROD_DB_URL" "select max(version), count(*) from supabase_migrations.schema_migrations"
 ```
 
-**Expect:** a line `deploy`, a tab, `success` (the other jobs may still run:
-`test-e2e` does not block the deploy and does not decide this check); then
-`20261123200200|<n>`, where `<n>` is the tip's migration file count (the
-same number as 9.2). Go to section 12, then 13, without delay.
-**If not:** a `deploy` line with `failure`: 11.6's failure table. A lower
-migration version or count: the migration step did not finish, so read
-its log (11.9 first) and go to 14.1.
+**Expect:** a line `migrate`, a tab, `success` (the other jobs may still
+run: `test-e2e` does not block `migrate` and does not decide this check);
+then `20261123200200|<n>`, where `<n>` is the tip's migration file count
+(`ls supabase/migrations | wc -l` in the develop worktree prints it, 195 at
+the 2026-11-24 tip). Go to section 12, then 13, without delay.
+**If not:** a `migrate` line with `failure`: 11.6. A lower migration
+version or count: the migration step did not finish, so read its log (11.9
+first) and go to 14.1.
 
 ### 11.8 The migration window
 
-From the start of "Apply migrations" to the end of "Deploy the prebuilt web
-app to Vercel", users with the app open run `main`'s old app against the
-migrated schema: catalog tables are renamed,
-`rpc_datasets__add_open_data_dataset` takes a new parameter, and
-`individuals.status` is gone. The app is built before the migrations, so
-the window is the migrations, the functions, and the Vercel upload:
-expect a few minutes. Staging's run measured all three. To
-see how long each step of staging's `deploy` job took, run this in the
-cutover terminal, where 9.1 set `STAGING_RUN_ID` (the develop terminal does
-not have it):
+Two windows, both accepted for this release because production has no
+active users (D4):
+
+- **New app, old schema.** From the push in 11.4 until `Run supabase db
+  push` finishes, production serves the new app against the old schema and
+  the old edge functions. That is at least about 16 minutes
+  (`lint-typecheck`, `test-quick`, and the start of `migrate`), plus however
+  long the approval waits. Anything in the new app that needs a table,
+  column, or function the pending migrations add, or one of the new edge
+  functions, fails in that window. If `test-quick` fails, the window stays open until
+  a fix is released or the previous Vercel deployment is promoted (11.6,
+  14.5).
+- **New schema, old functions.** From `Run supabase db push` until `Run
+  supabase functions deploy` finishes: under a minute, or until a re-run
+  passes when the flake strikes (11.6).
+
+A browser tab opened before the Vercel deployment keeps the old app until
+it reloads, and the old app breaks once the migrations rename catalog
+tables, add a parameter to `rpc_datasets__add_open_data_dataset`, and drop
+`individuals.status`. Staging's run measured the steps. To see how long each step of
+staging's `migrate` job took, run this in the cutover terminal, where 9.1
+set `STAGING_RUN_ID` (the develop terminal does not have it):
 
 ```bash
 gh run view "$STAGING_RUN_ID" --json jobs \
-  --jq '.jobs[] | select(.name == "deploy") | .steps[] | [.name, .startedAt, .completedAt] | @tsv'
+  --jq '.jobs[] | select(.name == "migrate") | .steps[] | [.name, .startedAt, .completedAt] | @tsv'
 ```
 
-It prints one line per step: its name, start time, and end time. Release
-at a quiet hour. A browser tab opened before the deploy keeps the old app
-until it reloads.
+It prints one line per step: its name, start time, and end time.
 
 ### 11.9 The Actions logs are public
 
 The repository and its Actions logs are public. The project ref is masked
 in the Actions logs because `PRODUCTION_PROJECT_ID` is a secret there, but
 the ref itself is public elsewhere: the web app's bundle carries it, and so
-does 2.4. The Vercel CLI's
-output shows the team slug, the project name, and the deployment URL: low
-sensitivity, accepted. A failed `supabase db push` can print Postgres error
-details, including row data. **If "Apply migrations" fails** on staging or
+does 2.4. A failed `supabase db push` can print Postgres error details,
+including row data. **If `Run supabase db push` fails** on staging or
 production, copy what you need from its log into your private notes, then
 delete the run's logs in the browser: GitHub > **Actions** > the run > the
 **...** menu at the top right > **Delete all logs**. Anyone can read them
@@ -2841,6 +2732,7 @@ note the result in your own notes:
 | Run a query on an existing dataset | Results appear |
 | Install the epidemiology plugin in one of your test workspaces | It installs and its pages open |
 | Cmd+K | Shows `0.15.0` |
+| Search for an address where the app offers address search (the `geocode` function) | Results appear, if 6.6 set `GEOAPIFY_API_KEY` on production. Without it the search answers 503, `Address search is not configured`: expected, and fixed by setting it with 6.6, not a reason to roll back |
 | `supabase functions list --project-ref "$PROD_REF"` | Every function shows an update time from this release |
 
 **If not:** go to section 14 and use its first table (14.1) to decide what
@@ -2861,8 +2753,8 @@ Find the row that matches what happened, and do what it says:
 
 | Situation | Do |
 | --- | --- |
-| `production.yaml` failed before "Apply migrations" | Nothing to roll back. Production is untouched: stop, fix, release again |
-| A migration fails midway | Production is partly migrated, and once a rename has applied, the old app is broken. A transient error (network, lock timeout): re-run the failed jobs of the newest run, and `db push` resumes at the first unapplied file. A bug in a migration, or production data it cannot handle: restore (14.3). `db push` stops at the failing file, so a later-timestamped migration cannot get past it. A fix needs a new migration timestamped before the failing file (staging applies it out of order with `--include-all`), a PR, staging's full CI including `test-e2e`, and `ava release`: hours, not one |
+| `production.yaml` failed before `Run supabase db push` | The database and edge functions are untouched, but Vercel already serves the new app on the old schema (11.8). No database rollback: fix forward and release again, or promote the previous Vercel deployment (14.5) until the fix is released |
+| A migration fails midway | Production is partly migrated, and once a rename has applied, the old app is broken. A transient error (network, lock timeout): re-run the failed jobs of the newest run and approve again (11.6), and `db push` resumes at the first unapplied file. A bug in a migration, or production data it cannot handle: restore (14.3). `db push` stops at the failing file, so a later-timestamped migration cannot get past it. A fix needs a new migration timestamped before the failing file (staging applies it out of order with `--include-all`), a PR, staging's full CI including `test-e2e`, and `ava release`: hours, not one |
 | Migrations applied, a later step failed | Re-run the failed jobs of the newest run (11.6). Not a rollback |
 | The catalog import is wrong | 12.3, promptly |
 | Deployed, with a bug that loses no data | Fix forward: a fix on `develop`, then `ava release` |
@@ -2874,7 +2766,9 @@ schema, and the schema cannot be rolled back without the data.
 ### 14.2 Stop deploys after a restore
 
 Do this as soon as you decide to restore (14.3), so that no push to `main`
-redeploys the new code onto the restored database. In the rollback
+migrates the restored database again. It does not stop Vercel: its Git
+integration stays connected, so any push to `main` still deploys that
+commit's app to production, whatever the workflow does. In the rollback
 terminal:
 
 ```bash
@@ -2885,7 +2779,8 @@ gh workflow disable production.yaml
 `main` back to an older commit: that push is itself a production deploy.
 
 A disabled workflow does not run on a push, so the fix release would not
-deploy. When the fix is ready, enable the workflow right before its
+migrate, while Vercel would still deploy its app. When the fix is ready,
+enable the workflow right before its
 `ava release` (11.4), or enable it afterwards and start the run for the new
 `main` by hand (`gh workflow run production.yaml --ref main`), then approve
 it as in 11.5. **CHANGES GITHUB SETTINGS.** This is the command that
@@ -2925,18 +2820,19 @@ files and the run id 11.5 saved. 14.4 uses both as well.
 
 Then follow only the option 10.1 chose: A, B, or (as a last resort) C.
 
-**A. PITR.** Restore to the second before the **first** attempt's "Apply
-migrations" started. A re-run of failed jobs (11.6, 14.1) is a later
-attempt, and its "Apply migrations" started after the first attempt's
-migrations had applied, so restoring there leaves production partly
-migrated. This block reads that start time from GitHub, takes 5 seconds
+**A. PITR.** Restore to the second before the **first** attempt's `Run
+supabase db push` step (in the `migrate` job) started. A re-run of failed
+jobs (11.6, 14.1) is a later attempt, and its `Run supabase db push`
+started after the first attempt's migrations had applied, so restoring
+there leaves production partly migrated. This block reads that start time
+from GitHub, takes 5 seconds
 off it, saves the result as `RESTORE_TO` (seconds since 1970, the form
 the CLI takes), and prints it in UTC and in local time, next to the
 backup's local time:
 
 ```bash
 RUN_ID="${RUN_ID:-$(cat "$CUTOVER_DIR/production-run-id-0.15.0")}"
-STARTED_AT="$(gh run view "$RUN_ID" --attempt 1 --json jobs --jq '.jobs[] | select(.name == "deploy") | .steps[] | select(.name == "Apply migrations" and .conclusion != "skipped") | .startedAt')"
+STARTED_AT="$(gh run view "$RUN_ID" --attempt 1 --json jobs --jq '.jobs[] | select(.name == "migrate") | .steps[] | select(.name == "Run supabase db push" and .conclusion != "skipped") | .startedAt')"
 echo "$STARTED_AT"
 RESTORE_TO=""
 STARTED_EPOCH="$(date -j -u -f '%Y-%m-%dT%H:%M:%SZ' "$STARTED_AT" +%s)" &&
@@ -2950,10 +2846,13 @@ echo "backup taken at local $BACKUP_T"
 a `local <date>-<time>` line, then `backup taken at local <date>-<time>`.
 Check that the restore time is after the backup in 10.2 (`BACKUP_T` is
 local time, so compare it with the `local` line) and after you approved in
-11.5: the job builds the app between the approval and "Apply migrations",
-so the restore point is a few minutes after the approval.
+11.5: the job only checks out the code, installs the CLI, and runs
+`supabase link` between the approval and `Run supabase db push`, so the
+restore point is seconds after the approval (10 seconds on the last
+production release).
 **If not:** an empty `STARTED_AT`, or an error from `date`, means attempt 1
-never reached "Apply migrations" (it failed in steps 3 to 6): run the block
+never reached `Run supabase db push` (it failed earlier, for example in
+`test-quick` or `Run supabase link`): run the block
 again with `--attempt 2`, and so on, and take the first attempt that
 prints a time. The restore below uses the `RESTORE_TO` of the last time
 the block ran. Run the restore right after the block that printed the time
@@ -3122,9 +3021,16 @@ the release (made by the Git integration from `main` at commit
 **Promote** (Vercel may call it **Instant Rollback**) > confirm.
 **Expect:** the promoted deployment is marked as the current production
 deployment, and `app.avandarlabs.com` serves the old app after a reload.
+The Git integration stays connected, so a later push to `main` deploys
+again: Vercel builds that commit and makes it production's deployment.
 **Verify:** if Vercel then says automatic production domain assignment is
-paused, the next CI production deployment will not serve
-`app.avandarlabs.com` until you undo that pause the same way.
+paused (an Instant Rollback can pause it), a later push to `main` builds but
+does not serve `app.avandarlabs.com` until you undo that pause on the same
+page.
+
+Promoting the previous deployment alone, with no database restore, is the
+way back when `production.yaml` stopped before `Run supabase db push`
+(14.1): the old app then matches the old schema again.
 
 ### 14.6 The catalog
 
@@ -3134,38 +3040,11 @@ restores everything, so after 14.3 do not run 12.3.
 
 ## 15. Remove the Vercel Git integration
 
-Only after both CI deploys were green, meaning both `deploy` jobs
-succeeded: staging's (9.1) and production's (11.7).
-
-**Where:** the Vercel dashboard. Project `avandar` > **Settings** >
-**Git** > under **Connected Git Repository**, click **Disconnect** and
-confirm. **CHANGES VERCEL.**
-
-**What stops:** a preview deployment for every branch and pull request, and
-any Git-triggered deployment (already off through `vercel.json`). A CI
-preview job can be added later. CI deploys are unaffected: they use the
-Vercel CLI and a token.
-
-**Confirm nothing builds on the next push.** After the next push to any
-branch (yours or anyone's), run this in any terminal inside the
-repository. It lists the 5 newest GitHub deployments Vercel's bot made,
-with environment, commit, and time:
-
-```bash
-gh api 'repos/AvandarLabs/avandar/deployments?per_page=10' \
-  --jq '.[] | select(.creator.login == "vercel[bot]") | [.environment, .sha[0:9], .created_at] | @tsv' | head -5
-```
-
-**Expect:** no entry newer than the disconnect, and the Vercel dashboard's
-**Deployments** list for project `avandar` shows only CI deployments.
-**If not:** a newer entry means something still builds from Git: check
-that the disconnect saved, and that no deploy hook is left (7.3).
-
-**To reconnect:** Vercel dashboard > project `avandar` > **Settings** >
-**Git** > **Connect Git Repository** > GitHub > `AvandarLabs/avandar`.
-**CHANGES VERCEL.** `vercel.json` still
-keeps Git-triggered deployments off, so reconnecting brings back only the
-repository link.
+Nothing to do: this is not part of the cutover (M1). Vercel's Git
+integration stays connected and keeps deploying `develop` to staging, `main`
+to production, and other branches as previews. Removing it belongs to the
+CI deploy follow-up (section 16, Move deploys to CI and manage secrets in
+GitHub), and comes last in that work.
 
 ## 16. Start the privacy fix (AVA-611)
 
@@ -3226,8 +3105,8 @@ including a Vercel token that can deploy production's web app and a Supabase
 token that may reach production's project (5.2). Pablo accepted this only for
 the cutover (K1, 2026-11-24).
 
-**When.** After the smoke test passes (section 13) and the Vercel Git
-integration is removed (section 15). It does not block the release.
+**When.** After the smoke test passes (section 13). It does not block the
+release.
 
 **The goal.** No branch other than `develop` can read staging's deploy secrets,
 and staging's tokens cannot reach production.
@@ -3244,21 +3123,27 @@ a. **Split the secrets (CHANGES GITHUB SETTINGS).** Create a GitHub environment
    `grep -oE "(secrets|vars)\.[A-Z0-9_]+"`, not from this document.
 b. **Point the test jobs at it (code change).** In `pr-develop.yaml`,
    `production.yaml`, and `staging.yaml`, change `environment: staging` to
-   `environment: ci` on the test jobs only. Only `staging.yaml`'s `deploy` job
-   keeps `environment: staging`. Check the workflows with `actionlint`, land the
-   change through a reviewed pull request into `develop`, and release it to
-   `main`, since `production.yaml` runs from `main`.
+   `environment: ci` on the test jobs only. Only `staging.yaml`'s `migrate`
+   job (or the deploy job that replaces it, if the CI deploy follow-up lands
+   first) keeps `environment: staging`. Check the workflows with
+   `actionlint`, land the change through a reviewed pull request into
+   `develop`, and release it to `main`, since `production.yaml` runs from
+   `main`.
 c. **Protect `staging` (CHANGES GITHUB SETTINGS).** Do this only after step b is
    on both `develop` and `main`. Before that, the test jobs on `main` would be
    blocked. Add a deployment branch policy that allows only `develop`, using the
-   click path in 5.1 with `develop` in place of `main`.
-d. **Narrow the tokens (CHANGES VERCEL, CHANGES GITHUB SETTINGS).** Pablo only.
-   - Vercel: your avatar > **Account Settings** > **Tokens** > **Create**, with
-     the narrowest **Scope** Vercel offers (**verify** the choices, because 7.5
-     does not confirm that a project-scoped token exists). Store it with
-     `gh secret set VERCEL_TOKEN --env staging`. Then delete staging's old
-     token on the same **Tokens** page. Production already has a token of its
-     own (7.5), so it needs no change here.
+   click path in 5.1's "If not" with `develop` in place of `main`.
+d. **Narrow or rotate the tokens (CHANGES VERCEL, CHANGES GITHUB SETTINGS).**
+   Pablo only. Staging's environment holds a Vercel token and a Supabase
+   access token today: narrow or rotate them.
+   - Vercel: no workflow in `develop` reads staging's `VERCEL_TOKEN` today.
+     If the CI deploy follow-up has not landed, remove it from the
+     environment (`gh secret delete VERCEL_TOKEN --env staging`) and delete
+     the token on your avatar > **Account Settings** > **Tokens**. If the
+     follow-up needs it, create a new one there with the narrowest
+     **Scope** Vercel offers (**verify** the choices), store it with
+     `gh secret set VERCEL_TOKEN --env staging`, and then delete the old
+     token on the same page.
    - Supabase: find the account that created staging's `SUPABASE_ACCESS_TOKEN`
      (**verify**). Personal access tokens are account-wide, so use a token from
      an account that can reach only the staging project (**verify** what the
@@ -3270,29 +3155,47 @@ d. **Narrow the tokens (CHANGES VERCEL, CHANGES GITHUB SETTINGS).** Pablo only.
 e. **Check (no deploy).** Pablo starts a run from a throwaway branch whose
    workflow names `environment: staging`. Expect GitHub to refuse the job before
    it starts, so none of its steps run. Then confirm that the next `staging.yaml`
-   run on `develop` still deploys staging.
+   run on `develop` still migrates staging.
 
 Track this as its own issue, for example a Linear issue next to AVA-611, so it
 is not lost. It is not part of the release.
 
-### Manage every secret in GitHub (after the cutover)
+### Move deploys to CI and manage secrets in GitHub (after the cutover)
 
-**The goal (Pablo, L1).** GitHub becomes the only place where Avandar's
-secrets are managed. Today they live in four places: GitHub (what the CI
-jobs need), Vercel (the web app's build variables), Fly.io (the pipeline
-server), and each Supabase project's edge function secrets.
+**The goals.** D2 (Pablo, 2026-11-23): deployments are handled by CI, with
+no integration in a web portal, for `develop` and `main` alike. L1 (Pablo,
+2026-11-24): GitHub becomes the only place where Avandar's secrets are
+managed. Today they live in four places: GitHub (what the CI jobs need),
+Vercel (the web app's build variables), Fly.io (the pipeline server), and
+each Supabase project's edge function secrets. M1 set both aside so the
+cutover could run on what `develop` and `main` already had.
 
-**Why it waits.** A deploy step that wrote edge function secrets from
-GitHub, and GitHub overrides of the web app's build values, were written
-and reviewed, then removed before the release to keep the cutover small.
-They are in the repository history: commit `8dd9c2d70` holds the
-production job and `50eff770a` the staging job, with the full secrets
-step.
+**What was built, and where it is kept.** CI deploy jobs for
+`production.yaml` and `staging.yaml` were written and reviewed, then set
+aside before the release. They are on the local branch
+`feat/ci-deploy-jobs`, at commit `7dccc6d92`. That branch exists only on
+Pablo's laptop until he pushes it. They are also in the cutover branch's
+history: the production job in `8dd9c2d70`, the staging job in
+`50eff770a`, and the scoped-back version without GitHub-managed secrets in
+`dcf372384` and `7b08e7fea`. `b9601f995` restored `develop`'s workflows and
+`vercel.json` for the cutover.
 
-**The work.** It is its own piece of work, with its own spec and plan:
-move one secret at a time into GitHub, verify each one by digest against
-the value the service holds today, and only then make CI authoritative
-for it.
+**What that work also carries.** The Supabase CLI bump in CI from 2.98.2
+to 2.114.0, which fixes the functions deploy flake (9.1);
+`pnpm check:plugin-bundle` in CI; migrating before the app deploys, so the
+new app never runs on the old schema; `vercel.json` turning Git-triggered
+deployments off; and removing the Vercel Git integration last, once both
+CI deploys are green (section 15).
+
+**Lessons to carry.** A CI build cannot read a Vercel variable marked
+Sensitive, so no `VITE_` variable may be Sensitive before CI builds the
+app. The `staging` environment cannot get a branch policy until the test
+jobs stop using it (Narrow the staging tokens, above).
+
+**The work.** It should get its own spec and plan, starting from
+`feat/ci-deploy-jobs`: move one secret at a time into GitHub, verify each
+one by digest against the value the service holds today, and only then
+make CI authoritative for it.
 
 ## 17. Cleanup (D6)
 
@@ -3383,6 +3286,7 @@ it merges. Then clean up locally, in the cleanup terminal:
 | 1 | `cd "$(wt path chore/production-rehearsal)"`, then `ava supabase restore`, then `cd "$(wt rm chore/production-rehearsal)"`. This deletes its local stack and the production copy in it |
 | 2 | `cd "$(wt rm chore/production-rollback)"`, if 14.4 created it |
 | 3 | Reset every local database built before the slot migrations were renamed (section 18) |
+| 4 | Keep the local branch `feat/ci-deploy-jobs`: do not delete it. It holds the CI deploy work for the follow-up (section 16, Move deploys to CI and manage secrets in GitHub), and it exists only on this laptop. Push it when you want it backed up (`git push origin feat/ci-deploy-jobs`, **PUSHES**), or it lives on one machine until the follow-up starts |
 
 ### 17.5 Optional: delete the legacy WDI Parquet objects
 
@@ -3452,8 +3356,8 @@ handled.
 
 | Gap | State |
 | --- | --- |
-| Migration audit refresh | Deferred (Task 17): an agent session given read-only URLs runs it when Pablo chooses. The rehearsal is the primary check for production's files, but nothing rehearses staging's 10 out-of-order files. The refresh and the live read-only checks in 4.8 must be done before step 3 of section 1 (the promotion). A blocker found after 8.5 can only be fixed forward |
-| Migration counts | `develop` gained `20261105212729_add_rpc_workspaces__is_slug_available.sql` after planning, and the integration branch merged it on 2026-11-24: the tree now holds 195 files, production applies 80, and staging 10, one more file for production and the tree than the plan counted on 2026-11-23. The runbook computes them (`$PROD_PENDING`, `$TREE_COUNT`, 4.1). Staging's 10 files assume its CI already applied that file (4.8 checks it) |
+| Migration audit refresh | Deferred (Task 17): an agent session given read-only URLs runs it when Pablo chooses. The rehearsal is the primary check for production's files, but nothing rehearses staging's 11 pending files, 8 of them out of order. The refresh and the live read-only checks in 4.8 must be done before step 3 of section 1 (the promotion). A blocker found after 8.5 can only be fixed forward |
+| Migration counts | `develop` gained `20261105212729_add_rpc_workspaces__is_slug_available.sql` after planning, and the integration branch merged it on 2026-11-24: the tree now holds 195 files, production applies 80, one more file for production and the tree than the plan counted on 2026-11-23. The runbook computes them (`$PROD_PENDING`, `$TREE_COUNT`, 4.1). Staging applies 11: the 10 files `develop` lacks, and that same file, which staging's red CI has not applied since 2026-11-20 (4.8 lists it) |
 | Quick suite flake | `ReferenceError: window is not defined` from `plugins/epidemiology/src/RegressionModal/RegressionModal.test.tsx` fails the quick suite now and then: Mantine 9.2.0's `Button` loader timer fires after jsdom's teardown under full-suite load. Not a regression. Re-run the quick suite once |
 | Crosswalk privacy gap (AVA-611) | Ships with the release (D4). Fixed forward (section 16) |
 | `db:validate-migrations` check 3 | Fails by design on the 7 dictionary and crosswalk files, which sort before `develop`'s newest file. It runs in no CI job or hook, and clears once the promotion lands |
@@ -3467,10 +3371,15 @@ handled.
 | Catalog script messages | `importCatalogData.sh` calls the `with_db_url` helper "the cutover runbook's ... (1.4)": in this runbook it is 2.4 |
 | `[skip deploy]` | Not a GitHub keyword: each release commit on `develop` starts a `staging.yaml` run |
 | Release notes | `--skip-changelog` for `0.15.0`: 2,673 non-merge commits since `v0.14.1` on 2026-11-24 |
-| `test-e2e` | Never blocks a deploy, but it does decide the run's verdict that `ava release` reads |
-| Pull request previews | Stop with the Git integration (section 15). A CI preview job is a later choice |
+| `test-e2e` | Never blocks `migrate`, but it does decide the run's verdict that `ava release` reads |
+| Pull request previews | Continue as before: Vercel's Git integration stays connected in this cutover (section 15) |
 | `demo.avandarlabs.com` | Frozen at its last build until 17.2 |
-| Secrets live in four places (L1) | GitHub (what the CI jobs need), Vercel (the web app's build variables), Fly.io (the pipeline server), and each Supabase project's edge function secrets, set by hand. CI writes none of the edge function secrets. Making GitHub the only place is follow-up work (section 16, Manage every secret in GitHub) |
-| Public Actions logs | A failed `supabase db push` can print row data (11.9). The Vercel CLI prints the team slug, project name, and deployment URL |
+| Secrets live in four places (L1) | GitHub (what the CI jobs need), Vercel (the web app's build variables), Fly.io (the pipeline server), and each Supabase project's edge function secrets, set by hand. CI writes none of the edge function secrets. Making GitHub the only place is follow-up work (section 16, Move deploys to CI and manage secrets in GitHub) |
+| Public Actions logs | A failed `supabase db push` can print row data (11.9) |
+| New app on the old schema | Vercel deploys the new app at the push to `main`, and `production.yaml`'s `migrate` job runs only after `lint-typecheck`, `test-quick`, and your approval: at least about 16 minutes of the new app on the old schema and old edge functions (11.8). Accepted because production has no active users (D4). If `test-quick` fails, `migrate` never runs: fix forward or promote the previous Vercel deployment (14.5). The CI deploy follow-up migrates first (section 16) |
+| Functions deploy flake | Supabase CLI 2.98.2, pinned in `develop`'s workflows, fails `supabase functions deploy` about one attempt in two with `Module not found ".../packages/shared/utils/src/sql/index.ts"`. The migrations are already applied by then. Fixed by re-running the failed job (9.1, 11.6). The CLI bump to 2.114.0 is part of the CI deploy follow-up (section 16) |
+| `pnpm check:plugin-bundle` | Not run in CI: it was only in the deferred CI deploy work. The script still exists for local use. Follow-up (section 16) |
+| `workflow_dispatch` on `staging.yaml` | Anyone who can push a branch can start `staging.yaml` by hand from that branch, and its `migrate` job then migrates staging and deploys that branch's edge functions, because the `staging` environment has no branch policy (5.2). An existing exposure, unchanged by this cutover. Section 16, Narrow the staging tokens, closes it |
+| CI deploy work | Kept on the local branch `feat/ci-deploy-jobs` (`7dccc6d92`), on one laptop only until it is pushed (17.4). Section 16, Move deploys to CI and manage secrets in GitHub |
 | `ava` | One global symlink: whoever last ran `pnpm build:ava-cli` decides which code `ava release` runs (11.1) |
 | `ava` output | If `ava` prints `write EPIPE` after a status line, it only means the next command stopped reading early: the status was already printed and nothing failed. |

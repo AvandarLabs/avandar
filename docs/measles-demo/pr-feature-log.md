@@ -699,7 +699,7 @@ Take only your feature's hunks from these files. The last feature in the
 | `src/views/GisApp/useGisApp/MapSourceHydration/useHydratedMapSources/useHydratedMapSources.ts` | F127, F35 | F127: the stable `updateConfig` (plus `d45e26490`'s `HydrationInputs` names, which only PR #321 has). F35: `aad4d700d` moves the config hydration into `useHydratedMapConfig.ts`. |
 | `.github/workflows/pr-develop.yaml` | F127, F96 to F112 | F127: `ubuntu-24.04` and the timeout. F96 to F112: `pnpm check:plugin-bundle`. |
 | `.github/workflows/demo.yaml`, deleted and not replaced | F13, F25, F32, F141 | F13, plus its `2efc74421` addendum (Supabase CLI 2.114.0). F25: `AVA_PIPELINE_SERVER_URL`. F32: the `GEOAPIFY_API_KEY` line. F141: deletes `demo.yaml` (`b6cb5837d`). The `alpha-dev.yaml` that briefly replaced it was deleted on `chore/production-cutover` (`ca358d64c`), so nothing replaces it. |
-| `.github/workflows/production.yaml`, `vercel.json` | F127, F141 | F127: `ubuntu-24.04` and the 70-minute e2e timeout in `production.yaml`. F141's lock-out commits (`39b6b98ae`, `bdcec197c`, `1ca23db7f`) were undone on `chore/production-cutover`, which restored `develop`'s copies of both files (`ca358d64c`). Both files are to receive the `alpha.yaml` deploy job described in F141. |
+| `.github/workflows/production.yaml`, `vercel.json` | F127, F141 | F127: `ubuntu-24.04` and the 70-minute e2e timeout in `production.yaml`. F141's lock-out commits (`39b6b98ae`, `bdcec197c`, `1ca23db7f`) were undone on `chore/production-cutover`, which restored `develop`'s copies of both files (`ca358d64c`). F141's deploy job was built for both files, then set aside for follow-up work, so both ship as `develop`'s copies. |
 
 ### Data dictionaries (F129 to F138)
 
@@ -12308,20 +12308,21 @@ on a release line:
   still where preflight found it. The version commit touches `package.json`
   only, and pushes use full refspecs.
 - The deploy job from `.github/workflows/alpha.yaml` (read it with
-  `git show ca358d64c^:.github/workflows/alpha.yaml`), now the deploy job
-  of `production.yaml` and `staging.yaml` on `chore/production-cutover`: it
-  refuses to deploy anything but
-  the branch tip, checks the configuration, builds before any write, scopes
-  credentials to the step that needs them, and never cancels a running
-  deploy. Its step that wrote edge function secrets from GitHub was removed
-  before the release (`dcf372384`): edge function secrets stay set by hand
-  on each Supabase project.
+  `git show ca358d64c^:.github/workflows/alpha.yaml`): it refuses to deploy
+  anything but the branch tip, checks the configuration, builds before any
+  write, scopes credentials to the step that needs them, and never cancels
+  a running deploy. It was built into `production.yaml` and `staging.yaml`
+  on `chore/production-cutover`, then set aside for follow-up work before
+  the release (decision M1, `b9601f995`): the workflows that ship are
+  `develop`'s, and the deploy job is kept on the local branch
+  `feat/ci-deploy-jobs`. Edge function secrets stay set by hand on each
+  Supabase project.
 - The catalog move scripts, now under `scripts/catalog-move/` (`3769ba532`),
   move the open data catalog and its Parquet objects between projects.
 
 **Value:** Releases keep the alpha line's safety checks without a second
-release line, and the staging and production deploys can take its deploy
-job.
+release line. A later change can give the staging and production deploys
+its deploy job.
 
 **Design:** `docs/measles-demo/production-cutover-plan.md` (its "Deploys",
 "`ava release` without the alpha line", and "The catalog" sections). The
@@ -12383,8 +12384,8 @@ table the catalog move scripts move. No Postgres connector work.
 **Deploy:** nothing of its own. The promotion deletes `develop`'s
 `demo.yaml` and `scripts/demo/`, so `demo/*` pushes stop deploying.
 `alpha.yaml`, `alpha-dev.yaml`, and `scripts/alpha-dev/` are deleted.
-`production.yaml` and `vercel.json` are `develop`'s copies until they take
-the deploy job.
+The workflows and `vercel.json` are `develop`'s copies: the deploy job was
+set aside for follow-up work (M1).
 
 **Verification:**
 ```sh

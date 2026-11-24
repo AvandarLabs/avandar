@@ -68,9 +68,9 @@ AVA-611.
 - **Two plugin migrations get later timestamps,** with unchanged contents, so
   they run after the restore. No shared database has run them yet.
 - **What each database applies:** production applies 80 migration files in
-  timestamp order, staging applies 10, and a fresh local database applies
-  all 195, with no difference from the declared schema in
-  `supabase/schemas/`.
+  timestamp order, staging applies 11 (the 10 new files plus one `develop`
+  already had), and a fresh local database applies all 195, with no
+  difference from the declared schema in `supabase/schemas/`.
 
 ## How it lands
 
