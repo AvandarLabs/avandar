@@ -12,9 +12,13 @@ line like this", and the walkthrough answers "what is this change, and why is
 it shaped this way".
 
 The walkthrough is always a markdown file in `.difit/`, named from the same
-stem as every other artifact (see [Artifact names](../SKILL.md#artifact-names)). It is
-printed from that file. Never publish it to a hosting service, and never
-substitute a hosted page for the file.
+stem as every other artifact (see [Artifact names](../SKILL.md#artifact-names)),
+with its co-located PDF rendered automatically to
+`.difit/pdfs/<stem>-walkthrough.pdf` via
+`python3 <skill-dir>/scripts/render-pdf.py <walkthrough-md-path>` (`--compact`).
+Never place PDFs in the top-level `.difit/` directory, never publish the
+walkthrough to a hosting service, and never substitute a hosted page for the
+file.
 
 Contents:
 

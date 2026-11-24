@@ -15,7 +15,9 @@ against: [`structure.md`](structure.md), [`purpose.md`](purpose.md),
 [`figures.md`](figures.md), [`code-and-citations.md`](code-and-citations.md),
 [`writing.md`](writing.md), and [`contracts/prose.md`](../contracts/prose.md).
 
-**Authority:** edit the walkthrough file and nothing else.
+**Authority:** edit the walkthrough file and render its companion PDF at
+`.difit/pdfs/<stem>-walkthrough.pdf` with `scripts/render-pdf.py`; change
+nothing else in the repository.
 
 It runs the marking script after its last edit and before its last render, per
 closing check 10, and returns the list of changes it made and anything it
@@ -46,13 +48,21 @@ looks.
 
 The loop:
 
-1. Render the walkthrough to PDF with `markdown-to-pdf <file.md> --out <pdf> --compact`,
-   giving each round its own output name, because the tool writes a `-v2`
-   copy rather than overwrite an existing PDF.
+1. Render the walkthrough to `.difit/pdfs/<stem>-walkthrough.pdf`:
+
+   ```sh
+   python3 <skill-dir>/scripts/render-pdf.py <file.md>
+   ```
+
+   `<skill-dir>` is the directory above this `walkthrough/` folder. The script
+   creates `.difit/pdfs/` if needed, runs `markdown-to-pdf --compact`,
+   atomically overwrites `.difit/pdfs/<stem>-walkthrough.pdf` in place without
+   creating `-v2` copies, and prints the written PDF path on stdout. Never run
+   `markdown-to-pdf` directly against `.difit/` or invent custom PDF paths.
 2. Find the pages that carry diagrams, for example by searching each
    caption's text with `pdftotext -f N -l N <pdf> -`, rasterize them with
-   `pdftoppm -r 80 -png -f N -l N <pdf> <prefix>`, and **look at each
-   image**.
+   `pdftoppm -r 80 -png -f N -l N <pdf> <prefix>` into a scratch directory
+   outside `.difit/`, and **look at each image**.
 3. Judge each diagram against three things, all of them visual:
    - **No overlap.** No label over another label, over a node, or over an edge.
    - **No awkward break.** A label must not break mid-word, mid-identifier, or
@@ -209,13 +219,16 @@ own draft.
    explainer threads, or leaves something to them, comes out whole. There is
    no reading-order section.
 
-10. **Confirm the glossary markers are current,** per
+10. **Confirm the glossary markers and co-located PDF are current,** per
     [Marking glossary terms in the text](glossary.md#marking-glossary-terms-in-the-text).
     Run `mark-glossary-terms.py` after the last edit, then again with
     `--check`, which must pass. Act on every entry it reports as unused. Skim
     the markers on everyday words and confirm each marks the glossary's
     meaning; where one does not, qualify the entry's term or reword the
-    sentence, then run the script again.
+    sentence, then run the script again. Once `mark-glossary-terms.py --check`
+    passes, run `python3 <skill-dir>/scripts/render-pdf.py <file.md>` as the
+    final action of this pass so `.difit/pdfs/<stem>-walkthrough.pdf` matches
+    the marked markdown, and return its page count to the parent.
 
 11. **Check the draft against the plan,** when the parent gave you its path,
     per [Planning the walkthrough](planning.md). Every lifecycle it lists has
