@@ -1107,6 +1107,10 @@ msgstr "تحميل ملف"
 msgid "Privacy log cleared."
 msgstr "تم مسح سجل الخصوصية."
 
+#: src/components/forms/CreateWorkspaceForm/SlugCheckMessage.tsx
+msgid "{slug} is already taken. Try another ID."
+msgstr "‏{slug} مستخدم بالفعل. جرّب معرّفًا آخر."
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Export CSV"
 msgstr "تصدير CSV"
@@ -1175,7 +1179,7 @@ msgid "That link isn't public. Avandar can only download a file anyone can "
 "open."
 msgstr "هذا الرابط غير عام. لا يمكن لـ Avandar تنزيل سوى ملف يمكن لأي شخص فتحه."
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "About you"
 msgstr "حولك"
 
@@ -2868,10 +2872,6 @@ msgid "This crosswalk would include its own combined dataset. Remove it from "
 msgstr "سيتضمن جدول المطابقة هذا مجموعة البيانات المجمعة الخاصة به. أزلها من "
 "مجموعات البيانات وحاول مرة أخرى."
 
-#: src/components/forms/CreateWorkspaceForm.tsx
-msgid "The workspace ID must be less than {SLUG_MAX_LENGTH} characters long"
-msgstr "يجب أن يكون معرّف مساحة العمل أقصر من {SLUG_MAX_LENGTH} حرفًا"
-
 #: src/views/DataManagerApp/DatasetMetaView/useRefreshGoogleSheetDataset.ts
 msgid "Refreshed from Google Sheets"
 msgstr "تم التحديث من Google Sheets"
@@ -3250,10 +3250,6 @@ msgstr "أنت توفر {discount}% مقارنة بالفوترة الشهرية
 msgid "Source values"
 msgstr "قيم المصدر"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
-msgid "The workspace ID must be at least {SLUG_MIN_LENGTH} characters long"
-msgstr "يجب ألا يقل طول معرّف مساحة العمل عن {SLUG_MIN_LENGTH} أحرف"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Built-in presets"
 msgstr "الإعدادات المدمجة"
@@ -3386,6 +3382,10 @@ msgstr "فجوة"
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Select a data source"
 msgstr "اختر مصدر البيانات"
+
+#: src/components/forms/CreateWorkspaceForm/SlugCheckMessage.tsx
+msgid "{slug} is available"
+msgstr "‏{slug} متاح"
 
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
 msgid "Keep the name under 200 characters."
@@ -3617,7 +3617,7 @@ msgstr "هل أنت متأكد أنك تريد المتابعة مع هذا ال
 msgid "No datasets left"
 msgstr "لم تعد هناك مجموعات بيانات"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "This is the unique ID of your organization used in URLs."
 msgstr "هذا هو المعرف الفريد لمؤسستك المستخدم في عناوين URL."
 
@@ -3680,6 +3680,10 @@ msgstr "عمود التاريخ"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Are you sure you want to remove this user from the workspace?"
 msgstr "هل أنت متأكد أنك تريد إزالة هذا المستخدم من مساحة العمل؟"
+
+#: src/components/forms/CreateWorkspaceForm/SlugFormatMessage.tsx
+msgid "Enter an ID for your workspace."
+msgstr "أدخل معرّفًا لمساحة العمل الخاصة بك."
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock.tsx
 msgid "Configure this filter: set its id, label, and column name in the side "
@@ -3762,6 +3766,12 @@ msgstr "واجه المكوّن الإضافي {pluginId} خطأً أثناء ر
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Body"
 msgstr "المتن"
+
+#: src/components/forms/CreateWorkspaceForm/SlugCheckMessage.tsx
+msgid "We couldn't check this ID. Check your connection, then edit the ID to "
+"try again."
+msgstr "تعذّر علينا التحقق من هذا المعرّف. تحقّق من اتصالك، ثم عدّل المعرّف "
+"وحاول مرة أخرى."
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftDatasetPicker.tsx
 msgid "Add a dataset"
@@ -4091,10 +4101,6 @@ msgstr "مرفقة كمرجع"
 msgid "Set by a conversion"
 msgstr "تم تعيينها بواسطة تحويل"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
-msgid "The workspace ID cannot be empty"
-msgstr "لا يمكن أن يكون معرّف مساحة العمل فارغًا"
-
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "By default we use a direct UUID-based link."
 msgstr "نستخدم تلقائيًا رابطًا مباشرًا يستند إلى UUID."
@@ -4216,6 +4222,10 @@ msgid "Same name, different values. Kept as separate code lists under one "
 "entry."
 msgstr "الاسم نفسه، وقيم مختلفة. تم الاحتفاظ بها كقوائم رموز منفصلة ضمن إدخال "
 "واحد."
+
+#: src/components/forms/CreateWorkspaceForm/SlugFormatMessage.tsx
+msgid "Use {WORKSPACE_SLUG_MAX_LENGTH} characters or fewer."
+msgstr "استخدم {WORKSPACE_SLUG_MAX_LENGTH} حرفًا أو أقل."
 
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupActionFields.tsx
 msgid "Write a field name in braces to fill it from the clicked feature, for "
@@ -4497,7 +4507,7 @@ msgstr "لم يتم نشر تحديثك. لا يزال في مربع الكتا�
 msgid "PDF downloaded."
 msgstr "تم تنزيل PDF."
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "Workspace ID"
 msgstr "معرّف مساحة العمل"
 
@@ -4825,6 +4835,10 @@ msgstr "E"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 5"
 msgstr "العمود 5"
+
+#: src/components/forms/CreateWorkspaceForm/SlugFormatMessage.tsx
+msgid "Use only letters, numbers, and hyphens."
+msgstr "استخدم الأحرف والأرقام والواصلات فقط."
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/StrokeControls.tsx
 msgid "Outline"
@@ -6109,6 +6123,10 @@ msgstr "لم يتمكن من التقاط اللوحة"
 msgid "Processing dataset…"
 msgstr "جارٍ معالجة مجموعة البيانات…"
 
+#: src/components/forms/CreateWorkspaceForm/SlugFormatMessage.tsx
+msgid "Use at least {WORKSPACE_SLUG_MIN_LENGTH} characters."
+msgstr "استخدم {WORKSPACE_SLUG_MIN_LENGTH} أحرف على الأقل."
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftValueRuleSelect.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueShapeFields.tsx
@@ -6222,7 +6240,7 @@ msgstr "يُرجى <0>مراسلتنا عبر البريد الإلكتروني<
 msgid "Private maps"
 msgstr "الخرائط الخاصة"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "About your workspace"
 msgstr "حول مساحة العمل الخاصة بك"
 
@@ -8570,10 +8588,6 @@ msgstr "عدّ الصفوف في {datasetName} حسب {groupByColumn}"
 msgid "SQL was not applied. Sign in to approve filter values."
 msgstr "لم يتم تطبيق SQL. سجّل الدخول للموافقة على قيم عامل التصفية."
 
-#: src/components/forms/CreateWorkspaceForm.tsx
-msgid "The workspace ID can only contain letters, numbers, and hyphens"
-msgstr "يمكن أن يحتوي معرّف مساحة العمل على أحرف وأرقام وواصلات فقط"
-
 #. placeholder {0}: workspace.name
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "This will permanently delete <0>{0}</0> and all of its data. This action "
@@ -8641,7 +8655,7 @@ msgstr "يطلب هذا الإصدار الأذونات المدرجة في بط
 msgid "New field"
 msgstr "حقل جديد"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "Workspace created successfully!"
 msgstr "تم إنشاء مساحة العمل بنجاح!"
 
@@ -9284,7 +9298,7 @@ msgstr "تخطيط مرجعي"
 msgid "The {pluginId} plugin's chart code didn't load."
 msgstr "تعذّر تحميل رمز المخطط الخاص بالمكوّن الإضافي {pluginId}."
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "The name you want other team members to see."
 msgstr "الاسم الذي تريد أن يراه أعضاء الفريق الآخرون."
 
@@ -11316,6 +11330,10 @@ msgstr "فارغ"
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Add layer"
 msgstr "إضافة طبقة"
+
+#: src/components/forms/CreateWorkspaceForm/SlugCheckMessage.tsx
+msgid "Checking if {slug} is available…"
+msgstr "جارٍ التحقق من توفّر {slug}…"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DeleteDatasetConfirmBody.tsx
 msgid "Are you sure you want to delete {datasetName}?"
@@ -13533,10 +13551,6 @@ msgstr "لا توجد طبقة حدود على هذه الخريطة للبحث 
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditorHeader.tsx
 msgid "Order"
 msgstr "الترتيب"
-
-#: src/components/forms/CreateWorkspaceForm.tsx
-msgid "The workspace ID cannot contain spaces"
-msgstr "لا يمكن أن يحتوي معرّف مساحة العمل على مسافات"
 
 #: src/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures.ts
 msgid "Enter your text here"

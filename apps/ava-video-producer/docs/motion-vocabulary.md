@@ -252,7 +252,7 @@ alignment, and speech-driven word animation are not.
 
 ## Rules for extending the vocabulary
 
-1. Add shared curves, timing tokens, and helpers to `src/motion.ts`, keeping it free of runtime dependencies. Update this inventory with the same change, and add the helper to the [Motion Atlas helper catalog](#add-a-helper-to-the-catalog); the catalog's drift test fails until you do. A renderer reaches a curve or a duration through a theme token and the [themed motion](#themed-motion), never through `EASE`, `DUR`, or `STAGGER` directly, and passes a curve to every `ramp()`. The renderer ESLint restrictions enforce this in every renderer directory.
+1. Add shared curves, timing tokens, and helpers to `src/motion.ts`, keeping it free of runtime dependencies. Update this inventory with the same change, and add the helper to the [Motion Atlas helper catalog](#add-a-helper-to-the-catalog); the catalog's drift test fails until you do. A renderer reaches a curve or a duration through a theme token and the [themed motion](#themed-motion), never through `EASE`, `DUR`, or `STAGGER` directly, and passes a curve to every `ramp()`. The renderer Oxlint restrictions enforce this in every renderer directory.
 2. Derive animation from frames. CSS transitions, timers, and wall-clock animation do not define a reproducible Remotion timeline.
 3. Use small element travel and sibling stagger. Springs are for landing; ramps are for travel. Spend the main visual beat once per phase.
 4. Keep app chrome stationary during explanation and avoid sustained scaling of UI or title text. A brief press returns to exactly 1. Native-size spatial boundaries and SVG viewBox cameras have separate contracts in the reusable motion API.
@@ -362,7 +362,7 @@ The curve, duration, and stagger entries document the portable `motion.ts`
 vocabulary, so their snippets read `EASE`, `DUR`, and `STAGGER` and no
 renderer imports them. A renderer reads the same steps from the themed
 motion (`useVideoMotion()` or `useGraphicMotion()`), whose `classic` values
-they are; ESLint bans the `motion.ts` constants in renderer directories.
+they are; Oxlint bans the `motion.ts` constants in renderer directories.
 
 ### How it is built
 

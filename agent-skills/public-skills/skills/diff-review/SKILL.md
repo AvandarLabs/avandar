@@ -34,6 +34,8 @@ represented below as `<skill-dir>`.
 4. In PR review mode, `gh` is optional. `scripts/get-pr-info.py` falls back to
    the GitHub REST API; private repositories then require `GITHUB_TOKEN` or
    `GH_TOKEN`.
+5. In the modes that write a walkthrough (Initial, PR review, and
+   Walkthrough), require `markdown-to-pdf` (`command -v markdown-to-pdf`).
 
 If a required tool is missing, stop and give the user the exact remediation.
 
@@ -56,8 +58,10 @@ session with no reviewer comment is Initial coordination state, not Continue.
 For an existing unchanged review with no open comments, do not reset or rewrite
 artifacts. If its walkthrough is missing, write it by running steps 2 to 13 of
 [Walkthrough](modes/walkthrough.md), per
-[When a walkthrough is written](#when-a-walkthrough-is-written); otherwise
-report that no comments are open and wait for a concrete request.
+[When a walkthrough is written](#when-a-walkthrough-is-written); if
+`-walkthrough.md` exists without `.difit/pdfs/<stem>-walkthrough.pdf`, render
+the PDF with `python3 <skill-dir>/scripts/render-pdf.py <walkthrough-md-path>`;
+otherwise report that no comments are open and wait for a concrete request.
 
 `walkthrough` as the first argument names the mode, not a comparison:
 `/diff-review walkthrough` uses the default comparison, and
@@ -93,7 +97,8 @@ walkthrough/    the walkthrough's contract, one file per part, and one file
 references/     comment and reply voice, a worked pipeline explanation,
                 worked screenshot examples
 scripts/        validators, helpers, the glossary marker, the changed-unit
-                lister, the blast radius counter, and the dif runner
+                lister, the blast radius counter, the PDF renderer, and
+                the dif runner
 ```
 
 ## Artifact names
@@ -126,8 +131,14 @@ Use the slug rules in `scripts/dif/src/comparison.rs` and
 | GitHub sync record (TUI-owned) | `-github.json` |
 | Held comments (TUI-owned) | `-held.json` |
 
-The skill writes these artifacts, except `-github.json` and `-held.json`. The TUI reads them and
-owns live session metadata, transcript mirroring, and the GitHub sync record.
+The skill writes these artifacts, except `-github.json` and `-held.json`. Every
+`-walkthrough.md` also gets a co-located PDF at
+`<repo>/.difit/pdfs/<branch-slug>-difit-<scope-slug>-walkthrough.pdf`, rendered
+automatically with `--compact` by
+`python3 <skill-dir>/scripts/render-pdf.py <walkthrough-md-path>` so PDFs live
+in `.difit/pdfs/` rather than the top-level `.difit/` directory. The TUI reads
+the JSON and markdown artifacts and owns live session metadata, transcript
+mirroring, and the GitHub sync record.
 
 `-github.json` lists the transcript comments that belong to the branch's GitHub
 PR rather than to you: comments the reviewer sent to the PR, and every comment

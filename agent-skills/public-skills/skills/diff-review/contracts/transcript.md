@@ -152,8 +152,9 @@ takes its section's number (`§6, "Step 3. _getPriorMatch"`), and a heading
 longer than about ten words may be cited by its number and opening words.
 
 When writing a thread shows a walkthrough claim to be wrong or imprecise, and
-this round wrote the walkthrough, correct the walkthrough, run its marking
-script again, and cite the corrected section. When the walkthrough predates
+this round wrote the walkthrough, correct the walkthrough, run
+`scripts/mark-glossary-terms.py` and `scripts/render-pdf.py` on it again, and
+cite the corrected section. When the walkthrough predates
 this round, describe the code as it is, leave the walkthrough alone, and name
 the discrepancy and `/diff-review walkthrough` in the chat report.
 

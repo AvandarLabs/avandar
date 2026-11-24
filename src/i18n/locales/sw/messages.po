@@ -1126,6 +1126,10 @@ msgstr "Pakia faili"
 msgid "Privacy log cleared."
 msgstr "Kumbukumbu ya faragha imeondolewa."
 
+#: src/components/forms/CreateWorkspaceForm/SlugCheckMessage.tsx
+msgid "{slug} is already taken. Try another ID."
+msgstr "{slug} tayari imetumika. Jaribu Kitambulisho kingine."
+
 #: src/views/WorkspaceSettingsPage/PrivacyLogTab/ConsentLogPanel.tsx
 msgid "Export CSV"
 msgstr "Sasisha CSV"
@@ -1196,7 +1200,7 @@ msgid "That link isn't public. Avandar can only download a file anyone can "
 msgstr "Kiungo hicho si cha umma. Avandar inaweza kupakua faili ambalo mtu "
 "yeyote anaweza kufungua pekee."
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "About you"
 msgstr "Kuhusu wewe"
 
@@ -2911,11 +2915,6 @@ msgid "This crosswalk would include its own combined dataset. Remove it from "
 msgstr "Crosswalk hii ingejumuisha seti yake ya data iliyounganishwa. Iondoe "
 "kwenye seti za data kisha ujaribu tena."
 
-#: src/components/forms/CreateWorkspaceForm.tsx
-msgid "The workspace ID must be less than {SLUG_MAX_LENGTH} characters long"
-msgstr "Kitambulisho cha nafasi ya kazi lazima kiwe na urefu wa chini ya herufi "
-"{SLUG_MAX_LENGTH}"
-
 #: src/views/DataManagerApp/DatasetMetaView/useRefreshGoogleSheetDataset.ts
 msgid "Refreshed from Google Sheets"
 msgstr "Imesasishwa kutoka Google Sheets"
@@ -3301,11 +3300,6 @@ msgstr "Unahifadhi {discount}% ikilinganishwa na malipo ya kila mwezi"
 msgid "Source values"
 msgstr "Thamani chanzo"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
-msgid "The workspace ID must be at least {SLUG_MIN_LENGTH} characters long"
-msgstr "Kitambulisho cha nafasi ya kazi lazima kiwe na urefu wa angalau herufi "
-"{SLUG_MIN_LENGTH}"
-
 #: src/views/WorkspaceSettingsPage/WorkspaceRolesTab/WorkspaceRolesTab.tsx
 msgid "Built-in presets"
 msgstr "Mipangilio iliyojengwa ndani"
@@ -3439,6 +3433,10 @@ msgstr "Pengo"
 #: src/views/DataExplorerApp/QueryDataSourceSelect.tsx
 msgid "Select a data source"
 msgstr "Chagua chanzo cha data"
+
+#: src/components/forms/CreateWorkspaceForm/SlugCheckMessage.tsx
+msgid "{slug} is available"
+msgstr "{slug} inapatikana"
 
 #: src/views/GisApp/shell/MapToolCluster/PlaceMapTool/PlaceForm/PlaceForm.tsx
 msgid "Keep the name under 200 characters."
@@ -3672,7 +3670,7 @@ msgstr "Je, uko tayari kuendelea na hatua hii? Hii haiwezi kubadilishwa."
 msgid "No datasets left"
 msgstr "Hakuna seti za data zilizosalia"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "This is the unique ID of your organization used in URLs."
 msgstr "Hii ni ID ya kipekee ya shirika lako inayotumika katika URL."
 
@@ -3738,6 +3736,10 @@ msgstr "Safu ya tarehe"
 #: src/views/WorkspaceSettingsPage/WorkspaceUsersTab/WorkspaceUsersTab.tsx
 msgid "Are you sure you want to remove this user from the workspace?"
 msgstr "Je, uko tayari kumuondoa mtumiaji huyu katika eneo la kazi?"
+
+#: src/components/forms/CreateWorkspaceForm/SlugFormatMessage.tsx
+msgid "Enter an ID for your workspace."
+msgstr "Weka Kitambulisho cha nafasi yako ya kazi."
 
 #: src/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock.tsx
 msgid "Configure this filter: set its id, label, and column name in the side "
@@ -3824,6 +3826,12 @@ msgstr "Plugin ya {pluginId} imekumbana na hitilafu ilipokuwa ikichora chati "
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Body"
 msgstr "Mwili"
+
+#: src/components/forms/CreateWorkspaceForm/SlugCheckMessage.tsx
+msgid "We couldn't check this ID. Check your connection, then edit the ID to "
+"try again."
+msgstr "Hatukuweza kuangalia Kitambulisho hiki. Angalia muunganisho wako, kisha "
+"hariri Kitambulisho na ujaribu tena."
 
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftDatasetPicker.tsx
 msgid "Add a dataset"
@@ -4156,10 +4164,6 @@ msgstr "imeambatishwa kama rejeleo"
 msgid "Set by a conversion"
 msgstr "Imewekwa na ubadilishaji"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
-msgid "The workspace ID cannot be empty"
-msgstr "Kitambulisho cha workspace hakiwezi kuwa tupu"
-
 #: src/views/DashboardApp/DashboardShareModal/PublishDashboardStatus/PublishDashboardStatus.tsx
 msgid "By default we use a direct UUID-based link."
 msgstr "Kwa chaguomsingi tunatumia kiungo cha moja kwa moja kinachotegemea "
@@ -4284,6 +4288,10 @@ msgid "Same name, different values. Kept as separate code lists under one "
 "entry."
 msgstr "Jina lilelile, thamani tofauti. Zimehifadhiwa kama orodha tofauti za "
 "misimbo chini ya ingizo moja."
+
+#: src/components/forms/CreateWorkspaceForm/SlugFormatMessage.tsx
+msgid "Use {WORKSPACE_SLUG_MAX_LENGTH} characters or fewer."
+msgstr "Tumia vibambo {WORKSPACE_SLUG_MAX_LENGTH} au pungufu."
 
 #: src/views/GisApp/panels/LayerInspector/PopupSection/PopupActionFields.tsx
 msgid "Write a field name in braces to fill it from the clicked feature, for "
@@ -4571,7 +4579,7 @@ msgstr "Sasisho lako halikuchapishwa. Bado liko kwenye kisanduku, kwa hivyo "
 msgid "PDF downloaded."
 msgstr "PDF imeshukuliwa."
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "Workspace ID"
 msgstr "Kitambulisho cha eneo la kazi"
 
@@ -4901,6 +4909,10 @@ msgstr "E"
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Column 5"
 msgstr "Safu wima ya 5"
+
+#: src/components/forms/CreateWorkspaceForm/SlugFormatMessage.tsx
+msgid "Use only letters, numbers, and hyphens."
+msgstr "Tumia herufi, nambari na vistari pekee."
 
 #: src/views/GisApp/panels/LayerInspector/StyleSection/StrokeControls.tsx
 msgid "Outline"
@@ -6200,6 +6212,10 @@ msgstr "Haiwezi kunasa dashibodi"
 msgid "Processing dataset…"
 msgstr "Inashughulikia seti ya data…"
 
+#: src/components/forms/CreateWorkspaceForm/SlugFormatMessage.tsx
+msgid "Use at least {WORKSPACE_SLUG_MIN_LENGTH} characters."
+msgstr "Tumia angalau vibambo {WORKSPACE_SLUG_MIN_LENGTH}."
+
 #: src/components/ChatPanel/CaseTypeDraftBlock/CaseTypeDraftValueRuleSelect.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueRuleField.tsx
 #: src/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/ValueShapeFields.tsx
@@ -6314,7 +6330,7 @@ msgstr "Tafadhali <0>tutumie barua pepe</0> ikiwa ungependa kupata ufikiaji."
 msgid "Private maps"
 msgstr "Ramani za faragha"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "About your workspace"
 msgstr "Kuhusu eneo lako la kazi"
 
@@ -8686,11 +8702,6 @@ msgstr "Hesabu safu katika {datasetName} kwa {groupByColumn}"
 msgid "SQL was not applied. Sign in to approve filter values."
 msgstr "SQL haikutumika. Ingia ili kuidhinisha thamani za kichujio."
 
-#: src/components/forms/CreateWorkspaceForm.tsx
-msgid "The workspace ID can only contain letters, numbers, and hyphens"
-msgstr "Kitambulisho cha nafasi ya kazi kinaweza kuwa na herufi, nambari na "
-"vistari pekee"
-
 #. placeholder {0}: workspace.name
 #: src/views/WorkspaceSettingsPage/WorkspaceDangerZone.tsx
 msgid "This will permanently delete <0>{0}</0> and all of its data. This action "
@@ -8760,7 +8771,7 @@ msgstr "Toleo hili linaomba ruhusa zilizoorodheshwa kwenye kadi yake. Litasalia 
 msgid "New field"
 msgstr "Uwanja mpya"
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "Workspace created successfully!"
 msgstr "Ofisi imeundwa kwa mafanikio!"
 
@@ -9411,7 +9422,7 @@ msgstr "Muundo wa marejeo"
 msgid "The {pluginId} plugin's chart code didn't load."
 msgstr "Msimbo wa chati wa plugin ya {pluginId} haukupakia."
 
-#: src/components/forms/CreateWorkspaceForm.tsx
+#: src/components/forms/CreateWorkspaceForm/CreateWorkspaceForm.tsx
 msgid "The name you want other team members to see."
 msgstr "Jina unalotaka wanachama wengine wa timu waone."
 
@@ -11470,6 +11481,10 @@ msgstr "tupu"
 #: src/views/GisApp/panels/LayerPanel/LayerPanel.tsx
 msgid "Add layer"
 msgstr "Ongeza safu"
+
+#: src/components/forms/CreateWorkspaceForm/SlugCheckMessage.tsx
+msgid "Checking if {slug} is available…"
+msgstr "Inaangalia kama {slug} inapatikana…"
 
 #: src/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DeleteDatasetConfirmBody.tsx
 msgid "Are you sure you want to delete {datasetName}?"
@@ -13715,10 +13730,6 @@ msgstr "Hakuna safu ya mipaka kwenye ramani hii ya kutafuta P-code."
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditorHeader.tsx
 msgid "Order"
 msgstr "Panga"
-
-#: src/components/forms/CreateWorkspaceForm.tsx
-msgid "The workspace ID cannot contain spaces"
-msgstr "Kitambulisho cha nafasi ya kazi hakiwezi kuwa na nafasi"
 
 #: src/views/GisApp/MapCanvas/useMapToolGestures/useMapToolGestures.ts
 msgid "Enter your text here"
