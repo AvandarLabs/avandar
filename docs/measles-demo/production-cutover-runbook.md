@@ -15,7 +15,8 @@ what to do when you see something else (**If not**). Run commands from the
 root of the worktree the step names. Steps that change something outside
 your laptop carry a bold mark: **WRITES TO PRODUCTION**, **WRITES TO
 STAGING**, **CHANGES STAGING CONFIGURATION**, **CHANGES VERCEL**, **CHANGES
-GITHUB SETTINGS**, or **PUSHES**. An unmarked step only reads. **Verify**
+GITHUB SETTINGS**, **CHANGES GOOGLE CLOUD CONSOLE**, **CHANGES POLAR**, or
+**PUSHES**. An unmarked step only reads. **Verify**
 marks a claim that could not be checked from the repository when this was
 written: do the read-only check it gives first. The repository and its
 Actions logs are public: secret values, connection strings, and anything
@@ -32,17 +33,20 @@ section 11.
 | 0 | Tools, shell setup, rules | 2 | No | A tool version differs from 2.3 |
 | 1 | Announce the freeze. Rehearse on a local copy of production | 3, 4 | Reads (a dump) | Any row of 4.9 fails |
 | 2 | Protect the GitHub `production` environment, then set both environments' names. Third parties. Vercel values | 5, 6, 7 | No. **CHANGES GITHUB SETTINGS**, **CHANGES VERCEL** | 5.6 shows a missing name |
-| 3 | Push the integration branch to `demo/measles`. Open the PR into `develop` | 8.1 to 8.4 | No. **PUSHES** | `pr-develop.yaml` fails |
+| 3 | Push the integration branch to `demo/measles`. Open the PR into `develop` | 8.1 to 8.4 | No. **PUSHES** | 4.8 is not done, or `pr-develop.yaml` fails |
 | 4 | Fast-forward `develop`. `staging.yaml` deploys staging | 8.5, 8.6, 9.1 to 9.4 | No. **PUSHES**, **WRITES TO STAGING** through CI | The staging deploy fails |
 | 5 | Load the catalog into staging. Check staging | 9.5 to 9.7 | No. **WRITES TO STAGING** | The staging import or restore check fails |
-| 6 | Back up production. Release `0.15.0` with `ava release` | 10, 11 | **WRITES TO PRODUCTION** through CI | 4.8 is not done, or 10.3's restore test fails: do not approve |
+| 6 | Choose the rollback basis (10.1). Release `0.15.0` with `ava release` (11.1 to 11.4). While the `deploy` job waits, back up production and test the backup (10.2, 10.3), then approve (11.5) | 10.1, 11.1 to 11.4, 10.2, 10.3, 11.5 to 11.9 | **WRITES TO PRODUCTION** through CI, from the approval in 11.5 | 10.3's restore test fails: do not approve |
 | 7 | Load the catalog into production. Smoke test | 12, 13 | **WRITES TO PRODUCTION** | Anything in 13 fails: section 14 |
-| 8 | Disconnect Vercel's Git integration | 15 | No. **CHANGES VERCEL** | Either CI deploy was not green |
+| 8 | Disconnect Vercel's Git integration | 15 | No. **CHANGES VERCEL** | Either `deploy` job did not succeed |
 | 9 | Start the privacy fix. Publish the review backlog when ready. Clean up seven days after the smoke test | 16, 17 | 17 deletes the demo resources | |
 
 **The migration audit refresh is still pending** (4.8). It must be done
-before step 6. Rollback is section 14. Before step 6, production is
-untouched: stop and nothing needs undoing.
+before step 3, the promotion: 8.5 makes `staging.yaml` apply staging's 10
+out-of-order files automatically, and nothing rehearses them. A blocker
+found after 8.5 can only be fixed forward. Rollback is section 14. Before
+the approval in 11.5, production is untouched: stop and nothing needs
+undoing.
 
 ## 2. Before you start
 
@@ -51,7 +55,8 @@ untouched: stop and nothing needs undoing.
 - [The cutover plan](production-cutover-plan.md): decisions D1 to D7, E1, A2.
 - [The migration audit](alpha-migration-audit.md), dated 2026-11-19. It
   covers 76 files and found no blocker. **Its refresh for production's
-  current set and staging's 10 files has not been done** (4.8).
+  current set and staging's 10 files has not been done** (4.8). It must be
+  done before the promotion (step 3).
 - The privacy gap at the top of [the feature log](pr-feature-log.md):
   crosswalk layouts and mappings are readable by every Data Sources viewer.
   It ships with this release (D4) and is fixed forward as Linear AVA-611
@@ -80,8 +85,10 @@ untouched: stop and nothing needs undoing.
 
 ### 2.4 Shell setup (every new terminal)
 
+Run it in every new terminal, from the root of the worktree the step names:
+`chore/production-cutover` until 11.1, then `develop`.
+
 ```bash
-# From the root of the worktree the step names.
 export REPO="$PWD"
 supabase() { "$REPO/node_modules/.bin/supabase" "$@"; }
 export PSQL_BIN="$(brew --prefix postgresql@17)/bin/psql"
@@ -127,6 +134,13 @@ read_db() { with_db_url "$1" "$PSQL_BIN" -X -P pager=off -q -t -A -v ON_ERROR_ST
   -c 'begin transaction read only' -c "$2" -c 'rollback'; }
 COUNTS_SQL="select (select count(*) from auth.users) as users, (select count(*) from public.workspaces) as workspaces, (select count(*) from public.dashboards) as dashboards, (select count(*) from public.datasets) as datasets, (select count(*) from public.dataset_columns) as dataset_columns"
 AUTH_SEED_EXCLUDES=(-x auth.sessions -x auth.refresh_tokens -x auth.one_time_tokens -x auth.flow_state -x auth.audit_log_entries -x auth.mfa_amr_claims)
+# The rehearsal worktree (4.1). Every local reset, `migration up`, and load
+# of production data runs behind on_rehearsal_stack: it moves into that
+# worktree and succeeds only when its status names the rehearsal's own
+# switched stack, never the shared `avandar` stack.
+export REHEARSAL="$(wt path chore/production-rehearsal)"
+on_rehearsal_stack() { [[ -d "$REHEARSAL" ]] && cd "$REHEARSAL" &&
+  ava supabase status | grep -qF "is on a switched local Supabase database: chore-production-rehearsal."; }
 supabase --version
 "$PSQL_BIN" --version
 "$PG_DUMP_BIN" --version
@@ -190,7 +204,7 @@ it.
 
 | Connects to production | Sections | What it does there |
 | --- | --- | --- |
-| `read_db "$PROD_DB_URL" ...` | 2.4, 4.2, 4.8, 9.6 (production run), 10.2, 12 | Queries in a read-only transaction |
+| `read_db "$PROD_DB_URL" ...` | 2.4, 4.2, 4.8, 9.6 (production run), 10.1, 10.2, 12, 14.3 | Queries in a read-only transaction |
 | `supabase db dump --db-url "$PROD_DB_URL" ...` | 4.2, 10.2 | `pg_dump` as `postgres`: reads only |
 | `supabase projects api-keys`, `branches list`, `backups list`, `secrets list`, `functions list`, with `--project-ref "$PROD_REF"` | 5.3, 6.1, 6.5, 10.1, 10.2, 13 | Management API reads |
 | `with_db_url "$PROD_DB_URL" "$PG_DUMP_BIN" ...` | 9.6 C5 | The catalog backup: reads only |
@@ -258,8 +272,11 @@ local `develop`. On 2026-11-24 it is in `origin/feat/oxlint-phase3`, so it
 lands with PR #330 and needs nothing else. The last command prints nothing.
 **If not:** a commit listed by the last command exists only on this
 machine's `develop`. Push it on its own branch and open a PR after the
-promotion, or drop it with `git branch -f develop origin/develop` once you
-are sure nothing in it is needed. Do this on every machine you use.
+promotion, or drop it once you are sure nothing in it is needed. Git
+refuses `git branch -f develop` while a worktree has `develop` checked out,
+so reset it inside that worktree, which must have no uncommitted changes:
+`cd "$(wt sw develop)" && [[ -z "$(git status --porcelain)" ]] && git reset --hard origin/develop`.
+Do this on every machine you use.
 
 ### 3.4 `develop` moved after planning
 
@@ -306,7 +323,9 @@ Supabase database: chore-production-rehearsal.` The last line reads
 tip carries `20261105212729`, 3.4).
 **If not:** never run 4.3 to 4.6 while the status line says `This is the
 develop local Supabase`: they would reset the shared stack every other
-worktree uses. Fix the switch first (CLAUDE.md, "Supabase").
+worktree uses, and load production's users into it. Fix the switch first
+(CLAUDE.md, "Supabase"). From here on, `on_rehearsal_stack` (2.4) guards
+every reset and load: `echo "$REHEARSAL"` must print this worktree's path.
 
 ### 4.2 Dump production (reads production)
 
@@ -340,10 +359,8 @@ Google tokens, and Auth sessions. No migration reads them.
 ### 4.3 Reset the local stack to production's migration version
 
 ```bash
-cd "$REHEARSAL"
-ava supabase status | grep -m1 -E "switched local|develop local"   # must name chore-production-rehearsal
-supabase db reset --local --no-seed --version 20261013212914
-export LOCAL_DB_URL="$(supabase status -o json | jq -er '.DB_URL')"
+on_rehearsal_stack && supabase db reset --local --no-seed --version 20261013212914
+on_rehearsal_stack && export LOCAL_DB_URL="$(supabase status -o json | jq -er '.DB_URL')"
 [[ "$LOCAL_DB_URL" == postgres*"://"*"@127.0.0.1:"* ]] && echo "local URL ok"
 read_db "$LOCAL_DB_URL" "select max(version), count(*) from supabase_migrations.schema_migrations"
 ```
@@ -351,7 +368,9 @@ read_db "$LOCAL_DB_URL" "select max(version), count(*) from supabase_migrations.
 **Expect:** `local URL ok`, then `20261013212914|115`: the local schema is
 `main`'s 115 migrations, as on production. The local stack runs Postgres 15,
 like production (`supabase/config.toml`, `major_version = 15`).
-**If not:** no `local URL ok` means the wrong directory: stop.
+**If not:** if the reset did not run, `on_rehearsal_stack` failed: nothing
+ran. Stop, and fix the switch (4.1). No `local URL ok` means the wrong
+directory: stop.
 
 ### 4.4 Compare the schemas (informational)
 
@@ -369,16 +388,18 @@ and raise it.
 ### 4.5 Load production's roles and data
 
 ```bash
-with_db_url "$LOCAL_DB_URL" "$PSQL_BIN" -X -P pager=off --single-transaction --set ON_ERROR_STOP=1 \
-  --file "$D/prod-rehearsal-roles.sql" \
-  --file "$D/prod-rehearsal-data-auth.sql" \
-  --file "$D/prod-rehearsal-data-public.sql"
+on_rehearsal_stack &&
+  with_db_url "$LOCAL_DB_URL" "$PSQL_BIN" -X -P pager=off --single-transaction --set ON_ERROR_STOP=1 \
+    --file "$D/prod-rehearsal-roles.sql" \
+    --file "$D/prod-rehearsal-data-auth.sql" \
+    --file "$D/prod-rehearsal-data-public.sql"
 read_db "$LOCAL_DB_URL" "$COUNTS_SQL"
 ```
 
 **Expect:** psql ends without an error, and the counts equal
 `prod-rehearsal-counts.txt`.
-**If not:** the transaction rolled back: repeat from 4.3 after the fix. An
+**If not:** no psql output at all means `on_rehearsal_stack` failed: nothing
+ran. Stop. Otherwise the transaction rolled back: repeat from 4.3 after the fix. An
 error on an `auth` table (a missing column or a duplicate key) means the
 local Auth version differs from production's: add `-x auth.<table>` for that
 table to `AUTH_SEED_EXCLUDES` and repeat 4.2's auth dump, unless it is
@@ -387,9 +408,7 @@ table to `AUTH_SEED_EXCLUDES` and repeat 4.2's auth dump, unless it is
 ### 4.6 Apply the migrations production does not have
 
 ```bash
-cd "$REHEARSAL"
-ava supabase status | grep -m1 -E "switched local|develop local"   # must name chore-production-rehearsal
-supabase migration up --local --include-all 2>&1 | tee "$D/rehearsal-migration-up.log"
+on_rehearsal_stack && supabase migration up --local --include-all 2>&1 | tee "$D/rehearsal-migration-up.log"
 grep -c '^Applying migration' "$D/rehearsal-migration-up.log"
 read_db "$LOCAL_DB_URL" "select max(version), count(*) from supabase_migrations.schema_migrations"
 read_db "$LOCAL_DB_URL" "$COUNTS_SQL"
@@ -401,7 +420,9 @@ error; then `20261123200200|$TREE_COUNT`; the same counts as 4.5; then
 `plugin_installations|0`. Production applies all of them in one
 `supabase db push --include-all` (11.6), in timestamp order. The plugin
 table is created, dropped, and restored empty within that one push.
-**If not:** a failed migration is a cutover blocker. Record its file and
+**If not:** no `Applying migration` output and no log means
+`on_rehearsal_stack` failed: nothing ran. Stop. A failed migration is a
+cutover blocker. Record its file and
 error, stop, and fix it with a new migration before the release.
 
 ### 4.7 Open old dashboards
@@ -413,7 +434,6 @@ cd "$REHEARSAL"
 read -r MY_EMAIL     # your production sign-in email; stays in this shell
 read_db "$LOCAL_DB_URL" "select w.slug, d.id, d.name from public.dashboards d join public.workspaces w on w.id = d.workspace_id join public.workspace_memberships m on m.workspace_id = d.workspace_id join auth.users u on u.id = m.user_id where u.email = '$MY_EMAIL' order by d.created_at limit 5"
 grep '^VITE_APP_URL=' .env.development
-pnpm dev
 ```
 
 If you sign in with Google on production, set a local-only password first.
@@ -421,11 +441,14 @@ It writes to the local stack only:
 
 ```bash
 read -rs LOCAL_PASSWORD     # a throwaway password for this local stack
-printf '%s\n' "update auth.users set encrypted_password = extensions.crypt(:'pw', extensions.gen_salt('bf')) where email = :'email';" |
+on_rehearsal_stack &&
+  printf '%s\n' "update auth.users set encrypted_password = extensions.crypt(:'pw', extensions.gen_salt('bf')) where email = :'email';" |
   with_db_url "$LOCAL_DB_URL" "$PSQL_BIN" -X -P pager=off -v ON_ERROR_STOP=1 -v pw="$LOCAL_PASSWORD" -v email="$MY_EMAIL"
 ```
 
-Sign in at the `VITE_APP_URL`, then open each as
+Then start the app in a second terminal, since `pnpm dev` keeps running:
+`cd` to the rehearsal worktree (`echo "$REHEARSAL"` prints it) and run
+`pnpm dev`. Sign in at the `VITE_APP_URL`, then open each as
 `<VITE_APP_URL>/<slug>/dashboards/edit/<id>` and note the result in your own
 notes (not in the repository).
 
@@ -441,16 +464,23 @@ restart `pnpm dev`.
 
 The refresh of [the migration audit](alpha-migration-audit.md) against
 production's and staging's live data (Task 17 of the implementation plan)
-was deferred by Pablo. The rehearsal above is the primary safety check. The
-refresh, and these read-only checks on live data, remain to be done
-**before step 6 of section 1**. Each runs in a read-only transaction:
+was deferred by Pablo. Per Task 17, an agent session given read-only URLs
+runs it, when Pablo chooses to start one. The rehearsal above is the
+primary safety check for production's files, but nothing rehearses
+staging's 10 out-of-order files, and 8.5 makes `staging.yaml` apply them
+automatically. So the refresh, and these read-only checks on live data,
+must be done **before step 3 of section 1** (the promotion). A blocker
+found after 8.5 can only be fixed forward. Each runs in a read-only
+transaction:
 
 ```bash
 read_db "$PROD_DB_URL" "$COUNTS_SQL"
 read_db "$PROD_DB_URL" "select status, count(*) from public.individuals group by 1 order by 1"
 read_db "$PROD_DB_URL" "select count(*), count(api_service) from public.catalog_entries__open_data"
 read_db "$PROD_DB_URL" "select count(*) from public.datasets__open_data"
-read_db "$PROD_DB_URL" "select o.workspace_id, count(distinct m.user_id) as members, count(distinct m.user_id) filter (where lower(u.email) not like '%@avandarlabs.com') as outside from public.datasets__open_data o left join public.workspace_memberships m on m.workspace_id = o.workspace_id left join auth.users u on u.id = m.user_id group by 1 order by 1"
+OPEN_DATA_MEMBERS_SQL="select o.workspace_id, count(distinct m.user_id) as members, count(distinct m.user_id) filter (where lower(coalesce(u.email, '')) not like '%@avandarlabs.com') as outside from public.datasets__open_data o left join public.workspace_memberships m on m.workspace_id = o.workspace_id left join auth.users u on u.id = m.user_id group by 1 order by 1"
+read_db "$PROD_DB_URL" "$OPEN_DATA_MEMBERS_SQL"
+read_db "$STAGING_DB_URL" "$OPEN_DATA_MEMBERS_SQL"
 read_db "$STAGING_DB_URL" "select version from supabase_migrations.schema_migrations order by 1" > "$D/staging-applied-versions.txt"
 comm -23 <(ls "$REHEARSAL/supabase/migrations" | cut -d_ -f1 | sort) <(sort "$D/staging-applied-versions.txt")
 ```
@@ -461,7 +491,8 @@ comm -23 <(ls "$REHEARSAL/supabase/migrations" | cut -d_ -f1 | sort) <(sort "$D/
 | `individuals.status` values | 16 rows, every value one the audit mapped to a case status | A value the audit did not list: the status backfill may not map it. Stop and raise it |
 | Catalog listings, non-null `api_service` | `6|0` | A non-null `api_service`: the enum recreation may fail. Stop |
 | Datasets linked to the catalog | `4` | More than 4: the catalog replace deletes more than planned. Stop |
-| Their workspaces | Every row `members` 1 and `outside` 0: Pablo's own single-member test workspaces | Any `outside` above 0, or `members` 0: the import guard refuses. Stop and raise it |
+| Their workspaces, on production | Every row `members` 1 and `outside` 0: Pablo's own single-member test workspaces. A member with no email counts as outside, as in the import's guard | Any `outside` above 0, or `members` 0: the import guard refuses. Stop and raise it |
+| Their workspaces, on staging | No rows, or every row `outside` 0 and `members` above 0 | Any `outside` above 0, or `members` 0: the staging import (9.6) would refuse after the promotion landed. Stop and raise it before step 3 |
 | Files staging has not applied (last command) | The 10 files of 9.2 | Another file: staging's history differs from the plan. Stop |
 
 Then refresh the audit's verdict for every file of `$PROD_PENDING` and the
@@ -476,7 +507,7 @@ staging list, read-only, as the implementation plan's Task 17 describes.
 | `plugin_installations` | Exists and is empty after the migrations |
 | 5 old dashboards (4.7) | All open without an error screen |
 | Schema drift (4.4) | Nothing a migration reads |
-| Live checks and audit refresh (4.8) | Every row as expected, before step 6 |
+| Live checks and audit refresh (4.8) | Every row as expected, before step 3 |
 
 Leave the rehearsal worktree and its stack in place: 10.3 tests the backup
 in it.
@@ -533,9 +564,31 @@ test jobs run on pull requests with it. A `develop`-only policy would block
 `test-quick`, so production would never deploy. Pull request runs would
 likely be blocked too (**verify**: GitHub evaluates a pull request run's
 ref, not `develop`). Staging stays unprotected for now. That is a known gap
-(section 18): its secrets, a Supabase access token among them, are readable
-by any branch's workflow. The fix is a later change that gives the test jobs
-an environment of their own.
+(section 18): its secrets are readable by any branch's workflow, and no
+deployment branch policy is possible while `production.yaml`'s test jobs use
+`environment: staging` on `main`. The fix is a later change that gives the
+test jobs an environment of their own.
+
+**What A3's protection does not cover.** 5.1 protects only the database
+password and the secrets of the `production` environment. Two `staging`
+secrets reach further:
+
+- `VERCEL_TOKEN`: 7.5 puts the same token in `staging`. Any branch's
+  workflow can read it and run `vercel deploy --prod` on project `avandar`,
+  which serves `app.avandarlabs.com`.
+- `SUPABASE_ACCESS_TOKEN`: if staging's is a personal access token of an
+  account that can also reach project `Avandar`, any branch's workflow can
+  reach production through the Management API with it. Supabase personal
+  access tokens are account-wide: they reach every project the account
+  can. **Verify** which account created staging's token.
+
+**Decision for Pablo: accept this exposure for now, or narrow the staging
+tokens.**
+
+| Option | What it takes | Leaves |
+| --- | --- | --- |
+| (a) Accept it for now | Nothing. Low risk while only maintainers can push branches to the repository | Any branch's workflow can deploy production's web app, and reach production through staging's Supabase token if that token's account can |
+| (b) Narrow the staging tokens | Vercel: Account settings > **Tokens** > **Create**, a token of its own for `staging`, with the narrowest scope your plan offers (**verify** whether that is the team or the project: no Vercel token scope known to this runbook limits a token to one environment, so it may still deploy production; it can at least be revoked on its own). Supabase: **Account** > **Access Tokens** > **Generate new token**, created by a separate machine or service account that is a member of the staging project's organization only, never of `Avandar`'s (**verify** that the two projects are in different organizations; if they share one, a separate account does not isolate them). Store both on `staging` only: `gh secret set VERCEL_TOKEN --env staging`, `gh secret set SUPABASE_ACCESS_TOKEN --env staging`. **CHANGES VERCEL**, **CHANGES GITHUB SETTINGS** | Whatever the Vercel scope cannot narrow (**verify**) |
 
 ### 5.3 Set the `production` environment's names
 
@@ -583,6 +636,10 @@ supabase projects api-keys --project-ref "$PROD_REF" -o json | jq -r '.[] | [.na
 
 **Expect:** a `publishable` and a `secret` key, names and types only.
 **If not:** 6.1.
+
+Have ready first: 6.2 (the Google client), 6.3 (the Polar token), 6.4 (the
+pipeline server's URL and secret), and the new token from 7.5. They come
+later in this runbook, but this loop needs their values.
 
 ```bash
 for name in AVA_PIPELINE_SERVER_SECRET AVA_PIPELINE_SERVER_URL FEATUREBASE_JWT_SECRET \
@@ -715,13 +772,14 @@ echo "https://$PROD_REF.supabase.co/functions/v1/google-auth-callback"
 Google Cloud console > **APIs & Services** > **Credentials** > the OAuth
 client whose ID is the production `GOOGLE_CLIENT_ID` > **Authorized
 redirect URIs** must contain the URI printed above. `production.yaml` sets
-exactly this as `GOOGLE_REDIRECT_URI`. Add it if missing.
+exactly this as `GOOGLE_REDIRECT_URI`. Add it if missing: **CHANGES GOOGLE
+CLOUD CONSOLE**.
 
 ### 6.3 Polar
 
-Polar dashboard, **production** organization (not the sandbox) >
-**Settings** > **Developers** > create an access token > store it as
-`POLAR_ACCESS_TOKEN` (5.3). `production.yaml` sets
+**CHANGES POLAR.** Polar dashboard, **production** organization (not the
+sandbox) > **Settings** > **Developers** > create an access token > store it
+as `POLAR_ACCESS_TOKEN` (5.3). `production.yaml` sets
 `POLAR_SERVER_TYPE=production`. Staging keeps `sandbox`.
 
 ### 6.4 Pipeline server (before the release)
@@ -759,6 +817,14 @@ supabase branches list --project-ref "$PROD_REF"
 **Expect:** an error that Branching is not enabled, or no branches.
 **If not:** stop. A Git integration on `main` would deploy production
 outside `production.yaml`.
+
+The same for staging, read only: `Avandar Staging` > **Project Settings** >
+**Integrations** > **GitHub** is not connected (**verify** the label).
+Staging has Branching on, for the `demo-measles` branch (9.5): that is
+expected, and needs no Git integration.
+**If not:** stop. A Supabase Git integration would migrate staging, or
+create branches, outside `staging.yaml`. Disconnecting it is **CHANGES
+STAGING CONFIGURATION**, yours only.
 
 ## 7. Vercel before the cutover
 
@@ -817,7 +883,9 @@ Account settings > **Tokens** > **Create**: scope it to the `avandar` team
 (or to the `avandar` project, if your plan offers project-scoped tokens:
 **verify**), with an expiry date. Store it as `VERCEL_TOKEN` in both GitHub
 environments (5.3 and `gh secret set VERCEL_TOKEN --env staging`), then
-delete the old token. **CHANGES VERCEL**, **CHANGES GITHUB SETTINGS.**
+delete the old token. With option (b) of 5.2's decision, `staging` gets a
+token of its own instead. Either way, a token in `staging` is readable by
+any branch's workflow (5.2). **CHANGES VERCEL**, **CHANGES GITHUB SETTINGS.**
 
 ## 8. Promote to `develop` (D3)
 
@@ -885,22 +953,27 @@ final one.
 gh pr checks demo/measles --watch
 ```
 
-**Expect:** every check passes: `lint-pr-title`, `lint-typecheck`,
-`test-quick`, `verify-packages`.
-**If not:** fix on the integration branch, push to `demo/measles` again
-(8.2 with the new `TIP`), and repeat section 4 if a migration changed.
+**Expect:** every check passes, `pr-test-e2e` included: `lint-pr-title`,
+`lint-typecheck`, `test-quick`, `pr-test-e2e`, `verify-packages`, and
+`react-doctor.yml`'s check. No ruleset requires a GitHub status check, so
+your admin bypass could fast-forward `develop` even with a red PR. Do not:
+staging's CI gate and `ava release` (11.2) need staging's whole run green,
+`test-e2e` included.
+**If not:** fix on the integration branch, re-run 8.1 to reset `TIP`, push
+to `demo/measles` again (8.2), and repeat section 4 if a migration changed.
 
 ### 8.5 Fast-forward `develop` (**PUSHES**)
 
 ```bash
 git fetch origin
-git merge-base --is-ancestor origin/develop "$TIP" && echo "still a fast-forward"
-[[ "$(git rev-parse origin/demo/measles)" == "$TIP" ]] && echo "PR head is the tip"
-git push origin "$TIP:refs/heads/develop"
+git merge-base --is-ancestor origin/develop "$TIP" && echo "still a fast-forward" &&
+  [[ "$(git rev-parse origin/demo/measles)" == "$TIP" ]] && echo "PR head is the tip" &&
+  git push origin "$TIP:refs/heads/develop"
 ```
 
 **Expect:** both lines print, then a fast-forward push that your
-organization admin role lets through the `Develop` ruleset.
+organization admin role lets through the `Develop` ruleset. The push runs
+only when both checks pass, and Git still refuses a non-fast-forward push.
 **If not:** `develop` moved (stop, catch up, and repeat 8.2 to 8.4), or the
 ruleset refused the push: check that you are an organization admin. Never
 force-push `develop`.
@@ -909,10 +982,10 @@ force-push `develop`.
 
 | What | Expect |
 | --- | --- |
-| The PR | Shows merged, since its head is now on `develop`. **Verify** on the PR page |
+| The PR | Shows merged, since its head is now on `develop`. **Verify** on the PR page. The repository has `delete_branch_on_merge: true`: **verify** with `git ls-remote origin refs/heads/demo/measles` whether GitHub deleted `demo/measles` when the PR showed merged. Either way nothing is lost: 17.4 deletes it anyway, and its delete then fails harmlessly |
 | Vercel | Builds nothing by itself: `vercel.json` sets `git.deploymentEnabled` to false, and Vercel reads it from the pushed commit |
 | `staging.yaml` | Runs for the push and deploys staging step by step (9.1) |
-| `release-packages.yaml` | Writes changesets for changed `packages/**` and opens a version PR. Nothing is published to npm until that PR is merged |
+| `release-packages.yaml` | Writes changesets for changed `packages/**` and opens a version PR. Nothing is published to npm until that PR is merged, but only when the run finds changesets. With none, its "Create version PR or publish" step publishes every `@avandar/*` version npm does not have yet. Check that step's log: it must say it opened or updated the version PR, and the version PR must stay unmerged (**verify**) |
 | `demo.yaml` | Deleted from `develop` by this push |
 
 ## 9. Staging
@@ -921,9 +994,13 @@ force-push `develop`.
 
 ```bash
 sleep 15
-export STAGING_RUN_ID="$(gh run list --workflow staging.yaml --branch develop --limit 1 --json databaseId,headSha --jq ".[] | select(.headSha == \"$TIP\") | .databaseId")"
-gh run watch "$STAGING_RUN_ID"
+[[ -n "$TIP" ]] && export STAGING_RUN_ID="$(gh run list --workflow staging.yaml --branch develop --limit 5 --json databaseId,headSha --jq ".[] | select(.headSha == \"$TIP\") | .databaseId" | head -1)"
+[[ -n "$TIP" && -n "$STAGING_RUN_ID" ]] && gh run watch "$STAGING_RUN_ID"
 ```
+
+If nothing is watched, either `TIP` is unset (re-run 8.1 in this terminal)
+or the run for `TIP` has not started yet: wait a minute and run the block
+again.
 
 | Order | Job or step | Writes to staging |
 | --- | --- | --- |
@@ -977,23 +1054,28 @@ read -rs FEATUREBASE_VALUE && printf '%s' "$FEATUREBASE_VALUE" | shasum -a 256 |
 ```
 
 **Expect:** the two digests match. **Verify:** the digest is the SHA-256 of
-the value in hex. If neither matches on the first try, compare against the
-`supabase secrets list` output from before the deploy instead.
-**If not:** the GitHub `staging` value is not the one in your password
-manager: set it again (`gh secret set FEATUREBASE_JWT_SECRET --env
-staging`) and re-run the deploy job. Only feedback posts' user details are
-affected.
+the value in hex.
+**If not:** the password manager does not hold GitHub's value. Take the JWT
+secret from Featurebase's dashboard, set it on both environments
+(`gh secret set FEATUREBASE_JWT_SECRET --env staging`, then `--env
+production`), save it in your password manager, and re-run the staging
+deploy job. **CHANGES GITHUB SETTINGS.** Only feedback posts' user details
+are affected.
 
 ### 9.4 Delete the old `AVA_PIPELINE_SERVER_URL` variable on `staging`
 
 `demo.yaml` is gone from `develop`, and nothing reads the variable now.
 
 ```bash
-git grep -n "vars.AVA_PIPELINE_SERVER_URL" origin/develop -- .github/workflows/ || echo "nothing reads it"
-gh variable delete AVA_PIPELINE_SERVER_URL --env staging
+git fetch origin && git rev-parse -q --verify origin/develop >/dev/null &&
+  [[ -z "$(git grep -l "vars.AVA_PIPELINE_SERVER_URL" origin/develop -- .github/workflows/)" ]] &&
+  echo "nothing reads it" &&
+  gh variable delete AVA_PIPELINE_SERVER_URL --env staging
 ```
 
-**Expect:** `nothing reads it`, then the delete. **CHANGES GITHUB
+**Expect:** `nothing reads it`, then the delete. Without that line, nothing
+was deleted: `git grep -n "vars.AVA_PIPELINE_SERVER_URL" origin/develop --
+.github/workflows/` shows what still reads it. **CHANGES GITHUB
 SETTINGS.**
 
 ### 9.5 Export the catalog from `demo-measles` (once, reads staging)
@@ -1010,7 +1092,7 @@ supabase branches list --project-ref "$STAGING_REF" -o json \
 **Expect:** `"persistent": false` and `"preview_project_status":
 "ACTIVE_HEALTHY"`.
 **If not:** a paused branch must be unpaused, or made persistent, before
-the export and before the Parquet copies (9.6 C10, 12.3). Both write to
+the export and before the Parquet copies (9.6 C10, 12.1). Both write to
 staging's configuration: **CHANGES STAGING CONFIGURATION**, yours only.
 `supabase branches unpause demo-measles --project-ref "$STAGING_REF"`, then
 list again until it reads `ACTIVE_HEALTHY`.
@@ -1079,7 +1161,8 @@ terminal: `export CATALOG_DUMP="$(ls -t "$CUTOVER_DIR"/catalog/catalog-2*.sql | 
 
 Run it for staging now, and for production in section 12, only after the
 release migrated production. Staging first is the rehearsal of the
-production load (D5).
+production load (D5). Run C1 to C10 in one terminal: each step reads
+variables the earlier ones set.
 
 **What `--replace-existing` does.** In one transaction it deletes every row
 of the six catalog tables, loads the dump, and recounts
@@ -1130,8 +1213,8 @@ df -h "${TMPDIR:-/tmp}"
 datasets); at least 3 GB free. In the Supabase dashboard, **Project
 Settings** > **Compute and Disk**: free disk at least 3 times the dump's
 size.
-**If not:** another owner: stop. `pg_cron` installed: list `cron.job` and
-pause any catalog job. Run no `ava pipeline run` against the target until
+**If not:** another owner: stop. `pg_cron` installed: list `cron.job`, and
+if any job touches the catalog, stop and raise it. Run no `ava pipeline run` against the target until
 C10 is done.
 
 **C3. Probe `session_replication_role`.** The printed restore (C7) needs it,
@@ -1366,15 +1449,30 @@ open:
 
 ## 10. Back up production
 
+Do 10.1 now. Run 10.2 and 10.3 from 11.5, while the `deploy` job waits.
+
 ### 10.1 Choose the rollback basis (before 11.4)
 
 ```bash
 supabase backups list --project-ref "$PROD_REF"
 ```
 
+Option B truncates every `public` and `auth` table on production and loads
+them again. It was tested only on a local stack, where `postgres` owns
+everything. Check that production's `postgres` may truncate and insert into
+each one. Each privilege is tested on its own, since a list of privileges
+passes if any one is held:
+
+```bash
+read_db "$PROD_DB_URL" "select format('%I.%I',schemaname,tablename) from pg_tables where schemaname in ('public','auth') and not (schemaname='auth' and tablename='schema_migrations') and not (has_table_privilege(format('%I.%I',schemaname,tablename),'TRUNCATE') and has_table_privilege(format('%I.%I',schemaname,tablename),'INSERT'))"
+```
+
+**Expect:** no rows.
+**If not:** option B is impossible: choose A.
+
 | Option | What it costs | What a restore loses |
 | --- | --- | --- |
-| **A (recommended if affordable).** Turn PITR on for the cutover window: `Avandar` > **Project Settings** > **Add-ons** > **Point in time recovery**. **WRITES TO PRODUCTION** (project configuration and billing). Turn it off once the release is settled (17.1). | The add-on's price for the days it is on. **Verify** the price, and whether the compute size must grow first | Only writes after the second you restore to |
+| **A (recommended if affordable).** Turn PITR on for the cutover window: `Avandar` > **Project Settings** > **Add-ons** > **Point in time recovery**. **WRITES TO PRODUCTION** (project configuration and billing). Turn it off once the release is settled (17.1). | The add-on's price for the days it is on. **Verify** the price, and whether the compute size must grow first. A compute upgrade restarts the database: a short outage, so do it at a quiet hour, well before the release | Only writes after the second you restore to |
 | **B.** No PITR. Start 11.4 right after the daily scheduled backup (its time is in `backups list`), and restore with that backup plus the top-up 10.3 tests | Nothing | Writes since the scheduled backup outside `public` and `auth` (for example Storage rows of files uploaded since: the files stay, the app no longer sees them), and every write after 10.2 |
 
 Write the truncate file 14.3 uses after a scheduled-backup restore:
@@ -1432,11 +1530,9 @@ for the scheduled backup, then the top-up replaces every `public` and
 `auth` row with this backup's.
 
 ```bash
-cd "$REHEARSAL"
-ava supabase status | grep -m1 -E "switched local|develop local"   # must name chore-production-rehearsal
-supabase db reset --local --no-seed --version 20261013212914
-export LOCAL_DB_URL="$(supabase status -o json | jq -er '.DB_URL')"
-[[ "$LOCAL_DB_URL" == postgres*"://"*"@127.0.0.1:"* ]] &&
+on_rehearsal_stack && supabase db reset --local --no-seed --version 20261013212914
+on_rehearsal_stack && export LOCAL_DB_URL="$(supabase status -o json | jq -er '.DB_URL')"
+on_rehearsal_stack && [[ "$LOCAL_DB_URL" == postgres*"://"*"@127.0.0.1:"* ]] &&
   with_db_url "$LOCAL_DB_URL" "$PSQL_BIN" -X -P pager=off --single-transaction --set ON_ERROR_STOP=1 \
     --file "$D/prod-rehearsal-roles.sql" \
     --file "$D/prod-rehearsal-data-auth.sql" \
@@ -1448,7 +1544,10 @@ export LOCAL_DB_URL="$(supabase status -o json | jq -er '.DB_URL')"
 ```
 
 **Expect:** the counts in `prod-$BACKUP_T-counts.txt`.
-**If not:** do not approve. Leave the deployment waiting, or **Reject** it
+**If not:** if nothing ran, `on_rehearsal_stack` failed (this terminal is
+usually in the `develop` worktree, on the shared stack): nothing ran. Stop,
+run 2.4 here, and check that `echo "$REHEARSAL"` prints the rehearsal
+worktree. Otherwise do not approve. Leave the deployment waiting, or **Reject** it
 under **Review deployments**. Fix the cause, take the backup again, and
 test again. A failure with `cannot truncate a table referenced in a foreign
 key constraint` names a table outside `public` and `auth`: never add
@@ -1495,8 +1594,13 @@ covers the whole run, `test-e2e` included.
 **If not:** wait for the run, or re-run its failed jobs until it passes:
 
 ```bash
-gh run rerun "$(gh run list --workflow staging.yaml --branch develop --limit 1 --json databaseId --jq '.[0].databaseId')" --failed
+git fetch origin && export DEVELOP_SHA="$(git rev-parse origin/develop)"
+export STAGING_RERUN_ID="$(gh run list --workflow staging.yaml --branch develop --limit 5 --json databaseId,headSha --jq ".[] | select(.headSha == \"$DEVELOP_SHA\") | .databaseId" | head -1)"
+[[ -n "$STAGING_RERUN_ID" ]] && gh run rerun "$STAGING_RERUN_ID" --failed
 ```
+
+Nothing re-runs when no `staging.yaml` run exists for `origin/develop`'s
+commit yet: wait for it to start, then run the block again.
 
 ### 11.3 Dry run
 
@@ -1504,6 +1608,7 @@ gh run rerun "$(gh run list --workflow staging.yaml --branch develop --limit 1 -
 ava release --dry-run --skip-changelog
 ```
 
+The dry run asks both version questions too (11.4): press Enter twice.
 **Expect:** `Dry run: no local or remote state will change.`; under
 Preflight, `On develop, clean, in sync with origin/develop.`; the versions
 (current on `main`: `0.14.1`, current on `develop`: `0.15.0-dev`); under
@@ -1525,7 +1630,7 @@ one generated summary, and a dry run without it makes a real OpenAI call.
 The promotion PR is the record. Notes can be published later with
 `ava release notes --version 0.15.0`.
 
-### 11.4 Release (**PUSHES**, then **WRITES TO PRODUCTION** through CI)
+### 11.4 Release (**PUSHES** `main`; nothing is written until 11.5)
 
 `ava release` runs on `develop` only. Do not pass `--yes` or
 `--skip-ci-check`. With `--yes`, a CI verdict other than a pass (failed,
@@ -1560,17 +1665,24 @@ redeploys staging. That is harmless.
 | `Could not push main and v0.15.0` | `develop` is at `0.15.0` and pushed. `main` and the tag are not | Wait for the new `staging.yaml` run to pass, then `ava release --version 0.15.0 --next 0.15.1 --skip-changelog` |
 | `v0.15.0 is released, but develop could not be bumped to 0.15.1-dev` | Released | `pnpm version 0.15.1-dev --no-git-tag-version && git commit -m "Bump version to 0.15.1-dev [skip deploy]" -- package.json && git push origin HEAD:refs/heads/develop` |
 
-### 11.5 Approve the `deploy` job
+### 11.5 Approve the `deploy` job (**WRITES TO PRODUCTION**: approving starts the migrations)
 
 ```bash
 sleep 15
-export RUN_ID="$(gh run list --workflow production.yaml --branch main --limit 1 --json databaseId --jq '.[0].databaseId')"
-gh run watch "$RUN_ID"
+git fetch origin && export MAIN_SHA="$(git rev-parse origin/main)"
+export RUN_ID="$(gh run list --workflow production.yaml --branch main --limit 5 --json databaseId,headSha --jq ".[] | select(.headSha == \"$MAIN_SHA\") | .databaseId" | head -1)"
+[[ -n "$RUN_ID" ]] && echo "$RUN_ID" > "$CUTOVER_DIR/production-run-id" && gh run watch "$RUN_ID"
 ```
+
+The run id is saved in `$CUTOVER_DIR/production-run-id`, for the rollback
+(14.3). If nothing is watched, the run for the new `main` commit has not
+started yet: wait a minute and run the block again.
 
 When `test-quick` passes, the `deploy` job waits for your approval. Now take
 the backup and test it (10.2, 10.3). Then, on the run's page: **Review
-deployments** > tick `production` > **Approve and deploy**.
+deployments** > tick `production` > **Approve and deploy**. This approval is
+the production write: the job then migrates production without asking
+again.
 
 ### 11.6 What each step of the `deploy` job does and prints
 
@@ -1603,12 +1715,14 @@ and keeps only the newest pending run.
 ### 11.7 Check the version
 
 ```bash
-gh run view "$RUN_ID" --json conclusion,jobs --jq '.conclusion, (.jobs[] | [.name, .conclusion] | @tsv)'
+gh run view "$RUN_ID" --json jobs --jq '.jobs[] | [.name, .conclusion] | @tsv'
 read_db "$PROD_DB_URL" "select max(version), count(*) from supabase_migrations.schema_migrations"
 ```
 
-**Expect:** `success`; then `20261123200200|<the tip's file count>`. Go to
-section 12, then 13, without delay.
+**Expect:** a line `deploy`, a tab, `success` (the other jobs may still run:
+`test-e2e` does not block the deploy and does not decide this check); then
+`20261123200200|<the tip's file count>`. Go to section 12, then 13, without
+delay.
 
 ### 11.8 The migration window
 
@@ -1631,7 +1745,9 @@ until it reloads.
 ### 11.9 The Actions logs are public
 
 The repository and its Actions logs are public. The project ref is masked
-in the logs, since `PRODUCTION_PROJECT_ID` is a secret. The Vercel CLI's
+in the Actions logs because `PRODUCTION_PROJECT_ID` is a secret there, but
+the ref itself is public elsewhere: the web app's bundle carries it, and so
+does 2.4. The Vercel CLI's
 output shows the team slug, the project name, and the deployment URL: low
 sensitivity, accepted. A failed `supabase db push` can print Postgres error
 details, including row data. **If "Apply migrations" fails** on staging or
@@ -1673,17 +1789,22 @@ session settings leak between clients. psql must understand `\restrict`
 (17.6 or newer):
 
 ```bash
-cd "$RESTORE_DIR"
-with_db_url "$TARGET_DB_URL" "$PSQL_BIN" -X -P pager=off -v ON_ERROR_STOP=1 --file restore.sql
+cd "$RESTORE_DIR" &&
+  [[ "$RESTORE_DIR" == *"/restore-$TARGET_REF-"* && "$TARGET_DB_URL" == *"$TARGET_REF"* ]] &&
+  with_db_url "$TARGET_DB_URL" "$PSQL_BIN" -X -P pager=off -v ON_ERROR_STOP=1 --file restore.sql
 read_db "$TARGET_DB_URL" "select (select count(*) from public.data_catalog_listings), (select count(*) from public.datasets__open_data), (select count(*) from public.datasets)"
 cd "$REPO"
 ```
 
-What it does: stages the backup in a `catalog_restore` schema, then in one
-transaction (`ON_ERROR_STOP` on, `lock_timeout` 10s) checks the staged row
-counts equal the backup's, deletes the catalog, inserts the backed-up rows
-under `session_replication_role = replica`, checks every foreign key of the
-restored tables, and commits. **Expect:** `COMMIT`, and the counts under
+The guard runs the restore only when the restore folder (C7 names it
+`restore-<ref>-<time>`) and the URL are both the target's. With no psql
+output, it refused: check `TARGET_REF`, `TARGET_DB_URL`, and `RESTORE_DIR`.
+
+What it does: in one transaction (`ON_ERROR_STOP` on, `lock_timeout` 10s)
+it stages the backup in a `catalog_restore` schema (dropped before commit),
+checks the staged row counts equal the backup's, deletes the catalog,
+inserts the backed-up rows under `session_replication_role = replica`,
+checks every foreign key of the restored tables, and commits. **Expect:** `COMMIT`, and the counts under
 `The target holds, per table:` at the top of the import log (the state
 before the import).
 
@@ -1708,9 +1829,9 @@ backed-up tables. Rows users deleted after the import come back, or, when
 their parent is gone, the foreign key check rejects the whole restore. So
 roll back promptly, or not at all: the window closes as users act.
 
-Run it from the shell where you ran 12.1, so `RESTORE_DIR` and
-`TARGET_DB_URL` are production's. In a new terminal, run 2.4, then
-`export TARGET_DB_URL="$PROD_DB_URL"`, then
+Run it from the shell where you ran 12.1, so `TARGET_REF`, `RESTORE_DIR`,
+and `TARGET_DB_URL` are production's. In a new terminal, run 2.4, then
+`export TARGET_REF="$PROD_REF" TARGET_DB_URL="$PROD_DB_URL"`, then
 `export RESTORE_DIR="$(ls -dt "$CUTOVER_DIR"/catalog/restore-"$PROD_REF"-* | head -1)"`.
 
 ## 13. Smoke test
@@ -1736,7 +1857,7 @@ On `https://app.avandarlabs.com`, as soon as 11.7 and 12 pass:
 | Situation | Do |
 | --- | --- |
 | `production.yaml` failed before "Apply migrations" | Nothing to roll back. Production is untouched: stop, fix, release again |
-| A migration fails midway | Production is partly migrated, and once a rename has applied, the old app is broken. A transient error (network, lock timeout): re-run the failed jobs of the newest run, and `db push` resumes at the first unapplied file. A bug in a migration: fix forward with a new migration on `develop` and release, if that takes under about an hour. Otherwise restore (14.3) |
+| A migration fails midway | Production is partly migrated, and once a rename has applied, the old app is broken. A transient error (network, lock timeout): re-run the failed jobs of the newest run, and `db push` resumes at the first unapplied file. A bug in a migration, or production data it cannot handle: restore (14.3). `db push` stops at the failing file, so a later-timestamped migration cannot get past it. A fix needs a new migration timestamped before the failing file (staging applies it out of order with `--include-all`), a PR, staging's full CI including `test-e2e`, and `ava release`: hours, not one |
 | Migrations applied, a later step failed | Re-run the failed jobs of the newest run (11.6). Not a rollback |
 | The catalog import is wrong | 12.3, promptly |
 | Deployed, with a bug that loses no data | Fix forward: a fix on `develop`, then `ava release` |
@@ -1751,11 +1872,20 @@ So that no push redeploys the new code onto the restored database:
 
 ```bash
 gh workflow disable production.yaml
-gh workflow enable production.yaml     # only once the fix is released
 ```
 
 **CHANGES GITHUB SETTINGS.** Never move `main` back to an older commit:
 that push is itself a production deploy.
+
+A disabled workflow does not run on a push, so the fix release would not
+deploy. When the fix is ready, enable the workflow right before its
+`ava release` (11.4), or enable it afterwards and start the run for the new
+`main` by hand (`gh workflow run production.yaml --ref main`), then approve
+it as in 11.5. **CHANGES GITHUB SETTINGS.**
+
+```bash
+gh workflow enable production.yaml
+```
 
 ### 14.3 Restore the database (**WRITES TO PRODUCTION**)
 
@@ -1769,17 +1899,64 @@ chose:
 | B. Scheduled backup, then the top-up 10.3 tested | Writes since the scheduled backup outside `public` and `auth`, and every write after 10.2 | Below |
 | C. The 10.2 dumps, into a new project | Every Storage file, Vault secrets, API keys, the JWT secret (every user signed out), the Auth configuration, edge function secrets and functions, all sessions, and every write after 10.2. Then every production setting must point at the new project | Last resort, below |
 
-**A. PITR.** Restore to the second before "Apply migrations" started:
+**In a new terminal**, first run 2.4 (with `PROD_DB_URL`), then recover
+the backup's time stamp and the production run's id:
 
 ```bash
-STARTED_AT="$(gh run view "$RUN_ID" --json jobs --jq '.jobs[] | select(.name == "deploy") | .steps[] | select(.name == "Apply migrations") | .startedAt')"
-echo "$STARTED_AT"
-RESTORE_TO="$(( $(date -j -u -f '%Y-%m-%dT%H:%M:%SZ' "$STARTED_AT" +%s) - 5 ))"
-supabase backups restore --project-ref "$PROD_REF" --timestamp "$RESTORE_TO"
+export BACKUP_T="$(ls -t "$D"/prod-2*-counts.txt | head -1 | sed -E 's#.*/prod-([0-9]{8}-[0-9]{4})-counts\.txt#\1#')"
+export RUN_ID="${RUN_ID:-$(cat "$CUTOVER_DIR/production-run-id")}"
+echo "backup $BACKUP_T, run $RUN_ID"
 ```
 
-Or **Database** > **Backups** > **Point in time** in the dashboard.
-**Verify:** `supabase backups restore --help` lists `--timestamp`.
+**Expect:** the time stamp of 10.2's files and the run id 11.5 saved.
+14.4 uses both as well.
+
+**A. PITR.** Restore to the second before the **first** attempt's "Apply
+migrations" started. A re-run of failed jobs (11.6, 14.1) is a later
+attempt, and its "Apply migrations" started after the first attempt's
+migrations had applied, so restoring there leaves production partly
+migrated:
+
+```bash
+RUN_ID="${RUN_ID:-$(cat "$CUTOVER_DIR/production-run-id")}"
+STARTED_AT="$(gh run view "$RUN_ID" --attempt 1 --json jobs --jq '.jobs[] | select(.name == "deploy") | .steps[] | select(.name == "Apply migrations" and .conclusion != "skipped") | .startedAt')"
+echo "$STARTED_AT"
+RESTORE_TO=""
+STARTED_EPOCH="$(date -j -u -f '%Y-%m-%dT%H:%M:%SZ' "$STARTED_AT" +%s)" &&
+  RESTORE_TO="$(( STARTED_EPOCH - 5 ))" &&
+  date -u -r "$RESTORE_TO" &&
+  date -r "$RESTORE_TO" '+local %Y%m%d-%H%M%S'
+echo "backup taken at local $BACKUP_T"
+```
+
+Check the printed time is after the backup in 10.2 (`BACKUP_T` is local
+time, so compare it with the `local` line) and after you approved in 11.5:
+the job builds the app between the approval and "Apply migrations".
+**If not:** an empty `STARTED_AT`, or an error from `date`, means attempt 1
+never reached "Apply migrations" (it failed in steps 3 to 6): run the block
+again with `--attempt 2`, and so on, and take the first attempt that
+prints a time.
+
+Only when the time is right, restore. **WRITES TO PRODUCTION**:
+
+```bash
+[[ "$RESTORE_TO" =~ ^[0-9]{10}$ ]] && supabase backups restore --project-ref "$PROD_REF" --timestamp "$RESTORE_TO"
+```
+
+Or **Database** > **Backups** > **Point in time** in the dashboard, at the
+same time. **Verify:** `supabase backups restore --help` lists
+`--timestamp`.
+
+When the project is back:
+
+```bash
+read_db "$PROD_DB_URL" "select max(version), count(*) from supabase_migrations.schema_migrations"
+```
+
+**Expect:** `20261013212914|115`, production's state before the release.
+**If not:** a later version means the restore point is after a migration
+applied: restore again to an earlier second, never later than the time
+printed above.
 
 **B. Scheduled backup, then the top-up.** **Database** > **Backups** >
 **Scheduled backups** > **Restore** on the newest backup taken before the
@@ -1798,11 +1975,12 @@ restored, pre-migration schema:
 **Expect:** `pre-migration schema`, then the counts in
 `prod-$BACKUP_T-counts.txt`.
 
-**C. Into a new, empty project.** The guard refuses production's URL:
+**C. Into a new, empty project.** The guard refuses production's and
+staging's URLs:
 
 ```bash
 read -rs EMPTY_DB_URL      # the new project's session pooler URI
-[[ -n "$EMPTY_DB_URL" && "$EMPTY_DB_URL" != *"$PROD_REF"* ]] &&
+[[ -n "$EMPTY_DB_URL" && "$EMPTY_DB_URL" != *"$PROD_REF"* && "$EMPTY_DB_URL" != *"$STAGING_REF"* ]] &&
   with_db_url "$EMPTY_DB_URL" "$PSQL_BIN" -X -P pager=off --single-transaction --set ON_ERROR_STOP=1 \
     --file "$D/prod-$BACKUP_T-roles.sql" \
     --file "$D/prod-$BACKUP_T-schema.sql" \
@@ -1820,7 +1998,8 @@ read -rs EMPTY_DB_URL      # the new project's session pooler URI
 A database restore leaves the new functions deployed. From a checkout of
 the previous release, deploy its functions, then delete each function the
 previous release did not have. The `supabase` function from 2.4 keeps the
-2.114.0 CLI: do not change `REPO` here.
+2.114.0 CLI: do not change `REPO` here. In a new terminal, first run 2.4
+and the `BACKUP_T` line from the top of 14.3.
 
 ```bash
 cd "$(wt new chore production-rollback v0.14.1)"
@@ -1869,7 +2048,8 @@ The catalog has its own restore (12.3), with its limits. A database restore
 
 ## 15. Remove the Vercel Git integration
 
-Only after both CI deploys were green: staging (9.1) and production (11.7).
+Only after both CI deploys were green, meaning both `deploy` jobs
+succeeded: staging's (9.1) and production's (11.7).
 
 1. Project `avandar` > **Settings** > **Git** > **Connected Git
    Repository** > **Disconnect**. **CHANGES VERCEL.**
@@ -2005,7 +2185,7 @@ production):
 ```bash
 read_db "$PROD_DB_URL" "select count(*) from public.data_catalog_listings where parquet_cache_folder_path like '%world-bank__wdi%' or metadata->>'storage_object_path' like '%world-bank__wdi%'"
 WDI_BACKUP="$CUTOVER_DIR/storage/wdi-legacy" && mkdir -p "$WDI_BACKUP"
-read_db "$PROD_DB_URL" "select substr(name, length('world-bank__wdi/datasets/') + 1), metadata->>'size', metadata->>'mimetype', metadata->>'cacheControl' from storage.objects where bucket_id = 'opendata' and name like 'world-bank__wdi/%' order by name" | tee "$WDI_BACKUP/objects.txt"
+read_db "$PROD_DB_URL" "select substr(name, length('world-bank__wdi/datasets/') + 1), metadata->>'size', metadata->>'mimetype', metadata->>'cacheControl' from storage.objects where bucket_id = 'opendata' and name like 'world-bank\_\_wdi/datasets/%' order by name" | tee "$WDI_BACKUP/objects.txt"
 while IFS='|' read -r file size mimetype cache_control; do
   supabase storage cp "ss:///opendata/world-bank__wdi/datasets/$file" "$WDI_BACKUP/$file" \
     --project-ref "$PROD_REF" --experimental </dev/null || echo "FAILED $file"
@@ -2021,7 +2201,7 @@ it lists. Never add `--yes`:
 ```bash
 cut -d'|' -f1 "$WDI_BACKUP/objects.txt" | sed 's#^#ss:///opendata/world-bank__wdi/datasets/#' \
   | xargs -o "$REPO/node_modules/.bin/supabase" storage rm --project-ref "$PROD_REF" --experimental
-read_db "$PROD_DB_URL" "select count(*) from storage.objects where bucket_id = 'opendata' and name like 'world-bank__wdi/%'"
+read_db "$PROD_DB_URL" "select count(*) from storage.objects where bucket_id = 'opendata' and name like 'world-bank\_\_wdi/datasets/%'"
 ```
 
 **Expect:** `0`. To restore (**WRITES TO PRODUCTION**):
@@ -2048,14 +2228,14 @@ the catalog backups, the restore folders, and the logs.
 
 | Gap | State |
 | --- | --- |
-| Migration audit refresh | Deferred (Task 17). The rehearsal is the primary check. The refresh and the live read-only checks in 4.8 must be done before step 6 of section 1 |
+| Migration audit refresh | Deferred (Task 17): an agent session given read-only URLs runs it when Pablo chooses. The rehearsal is the primary check for production's files, but nothing rehearses staging's 10 out-of-order files. The refresh and the live read-only checks in 4.8 must be done before step 3 of section 1 (the promotion). A blocker found after 8.5 can only be fixed forward |
 | Migration counts | 79 files for production and 194 in the tree, counted on 2026-11-23. `develop` gained `20261105212729_add_rpc_workspaces__is_slug_available.sql` after planning, so once Task 21 merges it, production applies 80 of 195. Staging's 10 files assume its CI already applied that file (4.8 checks it) |
 | Crosswalk privacy gap (AVA-611) | Ships with the release (D4). Fixed forward (section 16) |
 | `db:validate-migrations` check 3 | Fails by design on the 7 dictionary and crosswalk files, which sort before `develop`'s newest file. It runs in no CI job or hook, and clears once the promotion lands |
 | Local databases and the `demo-measles` branch | Any built before the slot migrations were renamed already ran them under their old names, and cannot migrate forward. Reset local stacks (`pnpm db:reset` on a switched stack). The branch is deleted in 17.3 |
 | Desktop app `metadata.sqlite` | Files created from `demo/measles` or `develop` before the regeneration stop with `migration history mismatch`. Delete them. The desktop app is private, at version 0.0.0 |
 | Five French `.po` entries | Came from `develop` with corrupted control characters. Out of scope for the cutover |
-| The `staging` GitHub environment | No branch policy, so any branch's workflow can read its tokens, a Supabase access token among them. A `develop`-only policy would break `production.yaml`'s test jobs (5.2) |
+| The `staging` GitHub environment | No branch policy, so any branch's workflow can read its tokens. A `develop`-only policy would break `production.yaml`'s test jobs (5.2). A3's protection covers only the database and the secrets of the `production` environment: with the shared `VERCEL_TOKEN` (7.5), any branch's workflow can run `vercel deploy --prod`, and if staging's `SUPABASE_ACCESS_TOKEN` belongs to an account that can reach `Avandar`, any branch's workflow can reach production too. Pablo's decision in 5.2: accept for now, or narrow the staging tokens |
 | Environments restrict branches, not workflows | Any workflow on `main`, including one added through `develop`, can use `production` once it is on `main`. The required reviewer is the stop |
 | Test jobs on `main` | `production.yaml`'s `test-quick` and `test-e2e` read the `staging` environment's secrets |
 | Catalog restore | Restores whole tables and leaves the gaps listed in 12.3. `session_replication_role` was verified on a local stack only: 9.6 C3 probes each project |
