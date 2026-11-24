@@ -206,14 +206,16 @@ done
 case "$query" in
   *pg_constraint*) printf '%s' "\${FAKE_DEPENDENTS:-}" ;;
   *"avandarlabs.com"*) printf '%s' "\${FAKE_OPEN_DATA_DATASETS:-}" ;;
-  *pg_attribute*) echo 1 ;;
+  *pg_attribute*) echo "\${FAKE_HAS_ID_COLUMN:-1}" ;;
   *"count(distinct dataset.id)"*) echo "$FAKE_ORPHANS" ;;
   *"source_type = 'open_data'"*) echo "$FAKE_ORPHANS" ;;
   "select count(*) from ("*) echo "\${FAKE_DEPENDENT_ROWS:-0}" ;;
   "select id::text from public.data_catalog_listings"*)
-    printf '%s' "\${FAKE_TARGET_IDS:-}"
+    if [[ -n "\${FAKE_IDS_FILE:-}" ]]; then cat "$FAKE_IDS_FILE"; else printf '%s' "\${FAKE_TARGET_IDS:-}"; fi
     ;;
-  "select id::text from "*) printf '%s' "\${FAKE_DEPENDENT_IDS:-}" ;;
+  "select id::text from "*)
+    if [[ -n "\${FAKE_IDS_FILE:-}" ]]; then cat "$FAKE_IDS_FILE"; else printf '%s' "\${FAKE_DEPENDENT_IDS:-}"; fi
+    ;;
   *"id::text in"*)
     if [[ -f "$FAKE_STATE/imported" ]]; then echo 0; else echo "\${FAKE_REMAINING_DATASETS:-4}"; fi
     ;;
@@ -306,14 +308,18 @@ function _runStorageRewrite() {
   );
 }
 
-/** Runs a replace import of the standard dump with these extra arguments. */
+/**
+ * Runs a replace import of a dump, the standard one unless a test passes
+ * another, with these extra arguments.
+ */
 function _runReplace(
   extraArgs: readonly string[],
   env: Record<string, string> = {},
+  dump: string = CATALOG_DUMP,
 ) {
   return _runScript(
     "importCatalogData.sh",
-    [_writeDump(), "--replace-existing", ...extraArgs],
+    [_writeDump(dump), "--replace-existing", ...extraArgs],
     {
       FAKE_TARGET_ROWS: "6",
       FAKE_TARGET_IDS: SIX_IDS,
@@ -1400,4 +1406,377 @@ describe("importCatalogData.sh --replace-existing", SHELL_TEST_OPTIONS, () => {
     expect(run.output).toContain("Dry run: nothing was written.");
     expect(run.log).not.toContain("--file");
   });
+});
+
+/** The lines pg_dump writes before a data-only dump's rows. */
+const BACKUP_PREAMBLE = `--
+-- PostgreSQL database dump
+--
+
+\\restrict abc123
+
+-- Dumped from database version 17.6
+-- Dumped by pg_dump version 18.1
+
+SET statement_timeout = 0;
+SET client_encoding = 'UTF8';
+SELECT pg_catalog.set_config('search_path', '', false);
+
+`;
+
+/** The ids the fake target holds in every table, 1 to 6. */
+const TARGET_IDS = ["1", "2", "3", "4", "5", "6"];
+
+/**
+ * One `COPY` block of a backup, with an `id` and a `name` column, one row per
+ * id. With `isIdLast`, the header and rows put `name` first.
+ */
+function _backupBlock(
+  table: string,
+  ids: readonly string[] = TARGET_IDS,
+  isIdLast: boolean = false,
+): string {
+  const rows = ids.map((id) => {
+    return isIdLast ? `${table} row ${id}\t${id}` : `${id}\t${table} row ${id}`;
+  });
+  const header = isIdLast ? "name, id" : "id, name";
+  return [`COPY ${table} (${header}) FROM stdin;`, ...rows, "\\.", ""].join(
+    "\n",
+  );
+}
+
+/**
+ * A backup as pg_dump writes it: its preamble, a block per backed-up table
+ * holding the target's ids, unless `blocks` replaces a table's block (an
+ * empty string drops it), and its footer.
+ */
+function _makeDumpedBackup(
+  blocks: Readonly<Record<string, string>> = {},
+): string {
+  const body = BACKUP_TABLES.map((table) => {
+    return blocks[table] ?? _backupBlock(table);
+  });
+  return `${BACKUP_PREAMBLE}${body.join("\n")}${DUMP_FOOTER}`;
+}
+
+/** Rows per table in the large backup: 9 tables, about 200,000 rows. */
+const LARGE_BACKUP_ROWS = 22_300;
+
+/**
+ * Writes, into the test's own folder, a backup of LARGE_BACKUP_ROWS rows per
+ * table, each about 100 bytes, the ids the fake target holds in every table,
+ * and a catalog dump whose listings have those ids, so the report finds no
+ * listing id the dump would drop. Returns their paths.
+ */
+function _writeLargeBackup(): {
+  backup: string;
+  idsFile: string;
+  dump: string;
+} {
+  const ids = Array.from({ length: LARGE_BACKUP_ROWS }, (_, index) => {
+    return String(index + 1);
+  });
+  const padding = "x".repeat(90);
+  const blocks = BACKUP_TABLES.map((table) => {
+    const rows = ids.map((id) => {
+      return `${id}\t${padding}`;
+    });
+    return [`COPY ${table} (id, name) FROM stdin;`, ...rows, "\\.", ""].join(
+      "\n",
+    );
+  });
+  const idsFile = join(workDir, "target-ids.txt");
+  writeFileSync(idsFile, `${ids.join("\n")}\n`);
+  const listingRows = ids.map((id) => {
+    return `Listing ${id}\t${id}\td1\t\\N\n`;
+  });
+  const dump = CATALOG_DUMP.replace(
+    "Cases\tl1\td1\t{https://data.example.org/cases.csv}\nDeaths\tl2\td1\t\\N\n",
+    listingRows.join(""),
+  );
+  return {
+    backup: _writeBackup(
+      `${BACKUP_PREAMBLE}${blocks.join("\n")}${DUMP_FOOTER}`,
+    ),
+    idsFile,
+    dump,
+  };
+}
+
+/**
+ * How long a replace may take to check the large backup. Reading it once
+ * per table, as the check once did, took far longer.
+ */
+const LARGE_BACKUP_CHECK_SECONDS = 5;
+
+describe("importCatalogData.sh backup check", SHELL_TEST_OPTIONS, () => {
+  it("imports when the backup's tables, row counts, and ids match the target", () => {
+    const run = _runReplace(_confirmedReplaceArgs(_makeDumpedBackup()));
+
+    expect(run.status, run.output).toBe(0);
+    expect(run.log).toContain("--file");
+  });
+
+  it("refuses an empty backup, before importing", () => {
+    const run = _runReplace(_confirmedReplaceArgs(""));
+
+    expect(run.status).toBe(1);
+    expect(run.output).toMatch(/backup\.sql is missing or empty\./);
+    expect(run.log).not.toContain("--file");
+  });
+
+  it("refuses a backup whose first 5 lines do not name a pg_dump dump", () => {
+    const run = _runReplace(
+      _confirmedReplaceArgs(`\n\n\n\n${_makeDumpedBackup()}`),
+    );
+
+    expect(run.status).toBe(1);
+    expect(run.output).toMatch(/backup\.sql is not a pg_dump dump\./);
+    expect(run.log).not.toContain("--file");
+  });
+
+  it("refuses a backup that creates a table, as not data-only", () => {
+    const run = _runReplace(
+      _confirmedReplaceArgs(
+        _makeDumpedBackup().replace(
+          "SET statement_timeout = 0;",
+          "CREATE TABLE public.extra (id integer);\nSET statement_timeout = 0;",
+        ),
+      ),
+    );
+
+    expect(run.status).toBe(1);
+    expect(run.output).toMatch(/backup\.sql is not a data-only dump\./);
+    expect(run.log).not.toContain("--file");
+  });
+
+  it("refuses a backup that also holds a table the import does not touch, naming it", () => {
+    const run = _runReplace(
+      _confirmedReplaceArgs(
+        _makeDumpedBackup({
+          "public.datasets": `${_backupBlock("public.datasets")}\n${_backupBlock("public.workspaces")}`,
+        }),
+      ),
+    );
+
+    expect(run.status).toBe(1);
+    expect(run.output).toContain(
+      "backup.sql also holds public.workspaces, which this import does not touch.",
+    );
+    expect(run.log).not.toContain("--file");
+  });
+
+  it("refuses a backup with no block for the facet counts, naming the table", () => {
+    const run = _runReplace(
+      _confirmedReplaceArgs(
+        _makeDumpedBackup({ "public.data_catalog_facet_counts": "" }),
+      ),
+    );
+
+    expect(run.status).toBe(1);
+    expect(run.output).toContain(
+      "backup.sql has no rows block for public.data_catalog_facet_counts.",
+    );
+    expect(run.log).not.toContain("--file");
+  });
+
+  it("refuses a backup with one dataset more than the target, naming both counts", () => {
+    const run = _runReplace(
+      _confirmedReplaceArgs(
+        _makeDumpedBackup({
+          "public.datasets": _backupBlock("public.datasets", [
+            ...TARGET_IDS,
+            "7",
+          ]),
+        }),
+      ),
+    );
+
+    expect(run.status).toBe(1);
+    expect(run.output).toContain(
+      "backup.sql holds 7 rows of public.datasets, but the target holds 6. Make a fresh backup.",
+    );
+    expect(run.log).not.toContain("--file");
+  });
+
+  it("refuses a backup whose block for a table the target fills is empty", () => {
+    const run = _runReplace(
+      _confirmedReplaceArgs(
+        _makeDumpedBackup({
+          "public.pipeline_executions": _backupBlock(
+            "public.pipeline_executions",
+            [],
+          ),
+        }),
+      ),
+    );
+
+    expect(run.status).toBe(1);
+    expect(run.output).toContain(
+      "backup.sql holds 0 rows of public.pipeline_executions, but the target holds 6.",
+    );
+    expect(run.log).not.toContain("--file");
+  });
+
+  it("refuses a backup missing one listing id the target holds, naming the table", () => {
+    const run = _runReplace(
+      _confirmedReplaceArgs(
+        _makeDumpedBackup({
+          "public.data_catalog_listings": _backupBlock(
+            "public.data_catalog_listings",
+            ["1", "2", "3", "4", "5", "7"],
+          ),
+        }),
+      ),
+    );
+
+    expect(run.status).toBe(1);
+    expect(run.output).toContain(
+      "backup.sql holds other public.data_catalog_listings ids than the target. Make a fresh backup.",
+    );
+    expect(run.log).not.toContain("--file");
+  });
+
+  it("refuses a backup missing one dataset id the target holds, naming the table", () => {
+    const run = _runReplace(
+      _confirmedReplaceArgs(
+        _makeDumpedBackup({
+          "public.datasets": _backupBlock("public.datasets", [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "7",
+          ]),
+        }),
+      ),
+    );
+
+    expect(run.status).toBe(1);
+    expect(run.output).toContain(
+      "backup.sql holds other public.datasets ids than the target.",
+    );
+    expect(run.log).not.toContain("--file");
+  });
+
+  it("refuses a backup that repeats one id in place of another", () => {
+    const run = _runReplace(
+      _confirmedReplaceArgs(
+        _makeDumpedBackup({
+          "public.datasets": _backupBlock("public.datasets", [
+            "1",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+          ]),
+        }),
+      ),
+    );
+
+    expect(run.status).toBe(1);
+    expect(run.output).toContain(
+      "backup.sql holds other public.datasets ids than the target.",
+    );
+  });
+
+  it("reads the ids from the column named id when the header lists it last", () => {
+    const run = _runReplace(
+      _confirmedReplaceArgs(
+        _makeDumpedBackup({
+          "public.datasets": _backupBlock("public.datasets", TARGET_IDS, true),
+        }),
+      ),
+    );
+
+    expect(run.status, run.output).toBe(0);
+  });
+
+  it("compares only row counts when the target's tables have no id column", () => {
+    const run = _runReplace(
+      _confirmedReplaceArgs(
+        _makeDumpedBackup({
+          "public.datasets": _backupBlock("public.datasets", [
+            "a",
+            "b",
+            "c",
+            "d",
+            "e",
+            "f",
+          ]),
+        }),
+      ),
+      { FAKE_HAS_ID_COLUMN: "0" },
+    );
+
+    expect(run.status, run.output).toBe(0);
+  });
+
+  it("reports the first mismatch in the target's table order", () => {
+    const run = _runReplace(
+      _confirmedReplaceArgs(
+        _makeDumpedBackup({
+          "public.data_catalog_drives": _backupBlock(
+            "public.data_catalog_drives",
+            ["1", "2", "3", "4", "5", "9"],
+          ),
+          "public.datasets": _backupBlock("public.datasets", ["1"]),
+        }),
+      ),
+    );
+
+    expect(run.status).toBe(1);
+    expect(run.output).toContain(
+      "backup.sql holds other public.data_catalog_drives ids than the target.",
+    );
+    expect(run.output).not.toContain("rows of public.datasets");
+  });
+
+  it("prints restore inserts that name each table's columns from the backup's header", () => {
+    const run = _runReplace(
+      _confirmedReplaceArgs(
+        _makeDumpedBackup({
+          "public.datasets": _backupBlock("public.datasets", TARGET_IDS, true),
+        }),
+      ),
+    );
+
+    expect(run.output).toContain(
+      "insert into public.datasets (name, id) overriding system value select name, id from catalog_restore.datasets on conflict do nothing;",
+    );
+    expect(run.output).toContain(
+      "insert into public.data_catalog_drives (id, name) overriding system value select id, name from catalog_restore.data_catalog_drives on conflict do nothing;",
+    );
+  });
+
+  it(
+    `checks a backup of about 200,000 rows in under ${LARGE_BACKUP_CHECK_SECONDS} seconds`,
+    { timeout: 45_000 },
+    () => {
+      const { backup, idsFile, dump } = _writeLargeBackup();
+      const startedAt = performance.now();
+
+      const run = _runReplace(
+        [
+          "--backup-file",
+          backup,
+          "--yes-i-know-the-target",
+          TARGET_ID,
+          "--yes-i-know-the-cascade",
+          CASCADE_ROWS,
+        ],
+        {
+          FAKE_TARGET_ROWS: String(LARGE_BACKUP_ROWS),
+          FAKE_IDS_FILE: idsFile,
+        },
+        dump,
+      );
+
+      const seconds = (performance.now() - startedAt) / 1000;
+      expect(run.status, run.output).toBe(0);
+      expect(seconds).toBeLessThan(LARGE_BACKUP_CHECK_SECONDS);
+    },
+  );
 });

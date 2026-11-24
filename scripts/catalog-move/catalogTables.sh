@@ -64,6 +64,95 @@ dump_has_table() {
   ' "$1"
 }
 
+# Reads a pg_dump dump once and prints what a check of it needs, so the
+# check never reads a large dump once per table. Prints, one fact per line:
+#   - `pg_dump_header <1|0>`: whether one of its first 5 lines says
+#     "PostgreSQL database dump";
+#   - `creates <1|0>`: whether any line starts with `CREATE `;
+#   - `other_table <schema.table>`: the first table a `COPY` line names that
+#     is not one of the given tables, when there is one;
+#   - for each given table with a rows block, `rows <schema.table> <rows>`,
+#     its rows across its blocks, and `header <schema.table> <columns>`, the
+#     column list of its first `COPY ... FROM stdin;` header;
+#   - `ids <schema.table> <file>` for each given table whose header has an
+#     `id` column: a file in <folder> holding the `id` of each of its rows,
+#     one per line, in the dump's order.
+# A `COPY` line only opens a rows block outside one: inside, every line up to
+# the closing `\.` is a row.
+#
+# Usage: index_dump <dump.sql> <folder> <schema.table>...
+index_dump() {
+  local dump="$1" folder="$2"
+  shift 2
+  awk -v tables="$*" -v folder="$folder" '
+    BEGIN {
+      count = split(tables, names, " ")
+      for (i = 1; i <= count; i++) { number[names[i]] = i }
+    }
+    NR <= 5 && /PostgreSQL database dump/ { is_pg_dump = 1 }
+    /^CREATE / { creates = 1 }
+    /^[ \t]*COPY([ \t]|$)/ && $1 == "COPY" {
+      if (other == "" && $2 != "" && !($2 in number)) { other = $2 }
+      if (!inside) {
+        inside = 1
+        table = ($2 in number) ? number[$2] : 0
+        id_column = 0
+        if (table) { open_block() }
+        next
+      }
+    }
+    inside && $0 == "\\." {
+      if (id_column) { close(ids_file) }
+      inside = 0
+      table = 0
+      id_column = 0
+      next
+    }
+    inside && table {
+      rows[table]++
+      if (id_column == 1) {
+        tab = index($0, "\t")
+        print (tab ? substr($0, 1, tab - 1) : $0) >> ids_file
+      } else if (id_column) {
+        split($0, fields, "\t")
+        print fields[id_column] >> ids_file
+      }
+    }
+    function open_block(    columns, column_count, i) {
+      has[table] = 1
+      if (!(table in header) && $NF == "stdin;") {
+        header[table] = $0
+        sub(/^[^(]*\(/, "", header[table])
+        sub(/\) FROM stdin;$/, "", header[table])
+      }
+      columns = $0
+      sub(/^[^(]*\(/, "", columns)
+      sub(/\).*$/, "", columns)
+      column_count = split(columns, column_names, ", ")
+      for (i = 1; i <= column_count; i++) {
+        if (column_names[i] == "id") { id_column = i }
+      }
+      if (id_column) {
+        ids_file = folder "/ids." table
+        has_ids[table] = 1
+        # Creates the file even for a block with no rows.
+        printf "" >> ids_file
+      }
+    }
+    END {
+      print "pg_dump_header", is_pg_dump + 0
+      print "creates", creates + 0
+      if (other != "") { print "other_table", other }
+      for (i = 1; i <= count; i++) {
+        if (!(i in has)) { continue }
+        print "rows", names[i], rows[i] + 0
+        if (i in header) { print "header", names[i], header[i] }
+        if (i in has_ids) { print "ids", names[i], folder "/ids." i }
+      }
+    }
+  ' "$dump"
+}
+
 # Prints one column of every row in a dump's block for one table, one value
 # per line, finding the column by name in the `COPY` header.
 #

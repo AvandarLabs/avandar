@@ -157,6 +157,8 @@ REWRITE_SOURCE_HOST=""
 REWRITE_TARGET_HOST=""
 WORK_DIR=""
 LOAD_FILE=""
+# The folder index_backup writes the backup's index into.
+BACKUP_INDEX_DIR=""
 DEPENDENT_TABLES=()
 # The dependent tables the catalog's own cascade reaches, which the import
 # locks whole. Tables reached only from the open data datasets are not
@@ -671,7 +673,7 @@ fail_backup() {
 # Prints the ids a target table holds and the ids the backup holds for it,
 # sorted, and fails when they differ. Tables with no `id` column are skipped.
 check_backup_ids() {
-  local table="$1" has_id target_ids backup_ids
+  local table="$1" has_id target_ids backup_ids ids_file
   has_id="$(read_target "select count(*) from pg_attribute where attrelid = '$table'::regclass and attname = 'id' and not attisdropped")"
   [[ "$has_id" == "1" ]] || return 0
   if [[ "$table" == public.data_catalog_listings ]]; then
@@ -679,26 +681,54 @@ check_backup_ids() {
   else
     target_ids="$(read_target "select id::text from $table order by 1")"
   fi
-  backup_ids="$(print_dump_column "$BACKUP_FILE" "$table" id | LC_ALL=C sort)"
+  ids_file="$(backup_index_value ids "$table")"
+  backup_ids=""
+  if [[ -n "$ids_file" ]]; then
+    backup_ids="$(LC_ALL=C sort "$ids_file")"
+  fi
   [[ "$(printf '%s\n' "$target_ids" | sed '/^$/d' | LC_ALL=C sort)" == "$(printf '%s\n' "$backup_ids" | sed '/^$/d')" ]] ||
     fail_backup "$BACKUP_FILE holds other $table ids than the target. Make a fresh backup."
+}
+
+# Reads the backup once, with index_dump, into BACKUP_INDEX_DIR in the
+# private folder. The checks and the restore steps read the index, never the
+# backup again, which can be over a gigabyte.
+index_backup() {
+  local tables=() table
+  while read -r table; do
+    tables+=("$table")
+  done < <(backup_tables)
+  BACKUP_INDEX_DIR="$WORK_DIR/backup-index"
+  mkdir "$BACKUP_INDEX_DIR"
+  index_dump "$BACKUP_FILE" "$BACKUP_INDEX_DIR" "${tables[@]}" >"$BACKUP_INDEX_DIR/summary"
+}
+
+# Prints the rest of the backup index's first line that starts with these
+# words, such as the rows of one table for `rows <schema.table>`, or nothing.
+#
+# Usage: backup_index_value <word>...
+backup_index_value() {
+  awk -v prefix="$* " '
+    index($0, prefix) == 1 { print substr($0, length(prefix) + 1); exit }
+  ' "$BACKUP_INDEX_DIR/summary"
 }
 
 check_backup() {
   [[ -n "$BACKUP_FILE" ]] || fail_backup "--replace-existing needs --backup-file <backup.sql>."
   [[ -s "$BACKUP_FILE" ]] || fail_backup "$BACKUP_FILE is missing or empty."
   [[ -n "$(find "$BACKUP_FILE" -mmin -1440)" ]] || fail_backup "$BACKUP_FILE is older than 24 hours."
-  awk 'NR <= 5 && /PostgreSQL database dump/ { found = 1 } END { exit !found }' "$BACKUP_FILE" ||
+  index_backup
+  [[ "$(backup_index_value pg_dump_header)" == 1 ]] ||
     fail_backup "$BACKUP_FILE is not a pg_dump dump."
-  ! grep -q '^CREATE ' "$BACKUP_FILE" || fail_backup "$BACKUP_FILE is not a data-only dump."
+  [[ "$(backup_index_value creates)" == 0 ]] || fail_backup "$BACKUP_FILE is not a data-only dump."
   local extra_table
-  extra_table="$(awk '$1 == "COPY" { print $2 }' "$BACKUP_FILE" | grep -vxF -f <(backup_tables) | head -n 1 || true)"
+  extra_table="$(backup_index_value other_table)"
   [[ -z "$extra_table" ]] || fail_backup "$BACKUP_FILE also holds $extra_table, which this import does not touch."
   local table expected actual
   while read -r table expected; do
     [[ -n "$table" ]] || continue
-    dump_has_table "$BACKUP_FILE" "$table" || fail_backup "$BACKUP_FILE has no rows block for $table."
-    actual="$(count_dump_rows "$BACKUP_FILE" "$table")"
+    actual="$(backup_index_value rows "$table")"
+    [[ -n "$actual" ]] || fail_backup "$BACKUP_FILE has no rows block for $table."
     [[ "$actual" == "$expected" ]] ||
       fail_backup "$BACKUP_FILE holds $actual rows of $table, but the target holds $expected. Make a fresh backup."
     check_backup_ids "$table"
@@ -736,7 +766,7 @@ print_restore_sql() {
   done < <(catalog_tables_children_first)
   echo "delete from $FACET_COUNTS_TABLE;"
   while read -r table; do
-    columns="$(print_dump_header_columns "$BACKUP_FILE" "$table")"
+    columns="$(backup_index_value header "$table")"
     echo "insert into $table ($columns) overriding system value select $columns from $RESTORE_SCHEMA.${table#public.} on conflict do nothing;"
   done < <(restore_tables)
   echo "drop schema $RESTORE_SCHEMA cascade;"
