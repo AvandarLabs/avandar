@@ -110,9 +110,10 @@ async function _expectNumResults(
 ): Promise<void> {
   const { page, numResults } = options;
   const results = page.getByRole("region", { name: "Results" });
+  const datasetNoun = numResults === 1 ? "dataset" : "datasets";
   await expect(
     results.getByRole("heading", {
-      name: new RegExp(`^${numResults} datasets$`),
+      name: new RegExp(`^${numResults} ${datasetNoun}$`),
     }),
   ).toBeVisible({ timeout: MEDIUM_WAIT });
   await expect(
