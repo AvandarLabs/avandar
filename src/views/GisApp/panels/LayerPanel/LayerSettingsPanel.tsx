@@ -2,6 +2,7 @@ import { TruncatedText } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { ActionIcon } from "@mantine/core";
 import { IconChevronLeft } from "@tabler/icons-react";
+import { useId } from "react";
 import { AnnotationSettingsBody } from "@/views/GisApp/GisAppLayerInspector/AnnotationInspectorPanel";
 import { LayerInspectorBody } from "@/views/GisApp/panels/LayerInspector/LayerInspectorBody/LayerInspectorBody";
 import { stepLayerPanelBack } from "@/views/GisApp/panels/LayerPanel/layerPanelNavigation";
@@ -73,10 +74,12 @@ function _settingsBody(
 /**
  * The open layer's controls, shown under the layer list. The layer's name
  * stays pinned while the controls scroll. Back leaves a focused screen, or
- * closes the controls and returns to the list.
+ * closes the controls and returns to the list. The controls form a region
+ * named by that heading, so assistive tech can jump to the open layer.
  */
 export function LayerSettingsPanel({ app, actions }: Props): ReactNode {
   const { t } = useLingui();
+  const headingId = useId();
   const layer = app.selectedLayer;
   const title = app.isAnnotationRowSelected
     ? t`Annotations`
@@ -87,10 +90,10 @@ export function LayerSettingsPanel({ app, actions }: Props): ReactNode {
       : t`Back to layer settings`;
 
   return (
-    <div className={css.editorScroll}>
+    <section className={css.editorScroll} aria-labelledby={headingId}>
       <div className={css.editorHeader}>
         {_backButton(app, backLabel)}
-        <h3 className={css.editorHeading}>
+        <h3 id={headingId} className={css.editorHeading}>
           <TruncatedText
             className={css.editorTitle}
             tooltipProps={{ position: "bottom" }}
@@ -100,6 +103,6 @@ export function LayerSettingsPanel({ app, actions }: Props): ReactNode {
         </h3>
       </div>
       {_settingsBody(app, actions, layer)}
-    </div>
+    </section>
   );
 }
