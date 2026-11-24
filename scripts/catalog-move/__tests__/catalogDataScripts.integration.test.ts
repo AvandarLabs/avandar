@@ -417,6 +417,15 @@ function _printedRestoreLines(output: string): string[] {
   });
 }
 
+/** The command restore step 1 prints to stage the backup, trimmed. */
+function _printedStagingCommand(output: string): string {
+  const lines = output.split("\n");
+  const step = lines.findIndex((line) => {
+    return line.startsWith("  1. In an empty folder");
+  });
+  return (lines[step + 1] ?? "").trim();
+}
+
 /** The wrapper's lines without the multi-line guard block. */
 function _linesWithoutGuard(wrapper: string): string[] {
   const lines = wrapper.trim().split("\n");
@@ -1703,6 +1712,48 @@ describe("importCatalogData.sh backup check", SHELL_TEST_OPTIONS, () => {
 
     expect(run.status, run.output).toBe(0);
     expect(run.log).toContain("--file");
+  });
+
+  it("stages a backup row whose text reads as a COPY header unchanged in restore-rows.sql", () => {
+    const copyHeaderText = "COPY public.data_catalog_drives (x) FROM stdin;";
+    const backup = _makeDumpedBackup({
+      "public.datasets": _backupBlockWithFirstName(
+        "public.datasets",
+        copyHeaderText,
+      ),
+    }).replace(
+      "SET statement_timeout = 0;\n",
+      "SET statement_timeout = 0;\nSET transaction_timeout = 0;\n",
+    );
+    const run = _runReplace(_confirmedReplaceArgs(backup));
+    expect(run.status, run.output).toBe(0);
+    const restoreDir = mkdtempSync(join(workDir, "restore-"));
+
+    const staging = spawnSync(
+      "bash",
+      ["-c", _printedStagingCommand(run.output)],
+      { cwd: restoreDir, encoding: "utf8" },
+    );
+
+    expect(staging.status, staging.stderr).toBe(0);
+    const staged = readFileSync(join(restoreDir, "restore-rows.sql"), "utf8");
+    expect(staged).toContain(`\n${copyHeaderText}\t1\n`);
+    expect(staged).toBe(
+      backup
+        .replace("SET transaction_timeout = 0;\n", "")
+        .replace(
+          /^COPY public\.(.*) FROM stdin;$/gm,
+          "COPY catalog_restore.$1 FROM stdin;",
+        ),
+    );
+  });
+
+  it("stages the backup with one awk that reads it once", () => {
+    const run = _runReplace(_confirmedReplaceArgs());
+
+    expect(_printedStagingCommand(run.output)).toMatch(
+      /^awk -v schema=catalog_restore '[^']*' '[^']*\/backup\.sql' > restore-rows\.sql$/,
+    );
   });
 
   it("refuses a backup with no block for the facet counts, naming the table", () => {

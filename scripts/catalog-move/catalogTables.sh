@@ -153,6 +153,16 @@ index_dump() {
   ' "$dump"
 }
 
+# The awk program that copies a backup for a restore to stage, in one pass:
+# it moves each `COPY public.<table>` header into the schema its `schema`
+# variable names and drops `SET transaction_timeout = 0;`, which Postgres
+# before 17 rejects, but only outside a rows block, so no row changes. It
+# opens and closes a rows block exactly as index_dump does, so the copy and
+# the backup's index agree on every block. It is one line with no single
+# quote, so a printed command can quote it whole.
+# shellcheck disable=SC2016,SC2034 # An awk program, read by the scripts that source this file.
+STAGE_BACKUP_AWK='!inside && /^[ \t]*COPY([ \t]|$)/ && $1 == "COPY" { inside = 1; sub(/^COPY public\./, "COPY " schema ".") } inside && $0 == "\\." { inside = 0 } !inside && $0 == "SET transaction_timeout = 0;" { next } { print }'
+
 # Prints one column of every row in a dump's block for one table, one value
 # per line, finding the column by name in the `COPY` header.
 #

@@ -850,8 +850,8 @@ print_restore_steps() {
   local backup_path
   backup_path="$(absolute_path "$BACKUP_FILE")"
   echo "To restore the backup later:"
-  echo "  1. In an empty folder, copy the backup's rows into staging tables, without 'SET transaction_timeout = 0;', which Postgres before 17 rejects:"
-  echo "       sed -E -e '/^SET transaction_timeout = 0;\$/d' -e 's/^COPY public\\./COPY $RESTORE_SCHEMA./' '$backup_path' > restore-rows.sql"
+  echo "  1. In an empty folder, copy the backup's rows into staging tables, without 'SET transaction_timeout = 0;', which Postgres before 17 rejects. It changes only the lines outside the rows, never a row:"
+  printf "       awk -v schema=%s '%s' '%s' > restore-rows.sql\n" "$RESTORE_SCHEMA" "$STAGE_BACKUP_AWK" "$backup_path"
   echo "  2. Beside it, write restore.sql, which empties the catalog and puts back every backed-up row the target no longer has, in one transaction that stops on the first error and refuses staged rows that do not match the backup's counts. It inserts with triggers and foreign key checks off, since some backed-up tables reference each other, then checks every foreign key of the restored tables:"
   print_restore_sql | sed 's/^/       /'
   # shellcheck disable=SC2016 # The variable is for the reader to fill in.

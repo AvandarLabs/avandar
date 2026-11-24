@@ -433,6 +433,12 @@ const BROKEN_DUMP = CATALOG_DUMP.replace(
   "c1000000-0000-0000-0000-000000000001\tff000000-0000-0000-0000-000000000000",
 );
 
+/**
+ * A text value that reads as a `COPY` header, which pg_dump writes as is at
+ * the start of a row whose first column holds it.
+ */
+const COPY_HEADER_TEXT = "COPY public.data_catalog_drives (x) FROM stdin;";
+
 /** The seed's counts, which a refused or rolled-back import leaves alone. */
 const SEED_COUNTS =
   "6 listings, 4 open data rows, 5 datasets, 10 columns, facets old:99";
@@ -506,21 +512,24 @@ function _writeProbingPsql(resultFile: string): string {
 
 /**
  * Writes the restore steps the import printed into a folder of their own:
- * runs the `sed` that stages the backup into restore-rows.sql, and writes
- * restore.sql. Returns the folder.
+ * runs step 1's command, which stages the backup into restore-rows.sql, and
+ * writes restore.sql. Returns the folder.
  */
 function _writePrintedRestore(output: string): string {
   const lines = output.split("\n");
-  const sedLine = lines.find((line) => {
-    return line.startsWith("       sed ");
-  });
+  const stagingLine =
+    lines[
+      lines.findIndex((line) => {
+        return line.startsWith("  1. In an empty folder");
+      }) + 1
+    ];
   const restoreStart =
     lines.findIndex((line) => {
       return line.startsWith("  2. Beside it, write restore.sql");
     }) + 1;
   const commit = lines.indexOf("       commit;");
   const restoreDir = mkdtempSync(join(clusterDir, "restore-"));
-  _run("bash", ["-c", `cd '${restoreDir}' && ${sedLine!.trim()}`]);
+  _run("bash", ["-c", `cd '${restoreDir}' && ${stagingLine!.trim()}`]);
   writeFileSync(
     join(restoreDir, "restore.sql"),
     lines
@@ -561,9 +570,9 @@ function _runRestoreFile(restoreDir: string, extraArgs: readonly string[]) {
 }
 
 /**
- * Runs the restore steps the import printed, as the steps say to: the `sed`
- * that stages the backup, then restore.sql with ON_ERROR_STOP. Throws with
- * psql's output when the restore fails.
+ * Runs the restore steps the import printed, as the steps say to: the
+ * command that stages the backup, then restore.sql with ON_ERROR_STOP.
+ * Throws with psql's output when the restore fails.
  */
 function _runPrintedRestore(output: string): void {
   const restore = _runRestoreFile(_writePrintedRestore(output), [
@@ -779,6 +788,23 @@ describe.skipIf(TOOLS === undefined)(
 
       _runPrintedRestore(run.output);
 
+      expect(_targetCounts()).toBe(SEED_COUNTS);
+    });
+
+    it("restores a checkpoint whose text reads as a COPY header unchanged from the printed restore steps", () => {
+      _query(
+        `insert into public.pipeline_scope_checkpoints values ('${COPY_HEADER_TEXT}', 'drive', 'scope')`,
+      );
+      const run = _runReplace(CATALOG_DUMP);
+      expect(run.status, run.output).toBe(0);
+
+      _runPrintedRestore(run.output);
+
+      expect(
+        _query(
+          "select pipeline_name || ' | ' || drive_key || ' | ' || scope_key from public.pipeline_scope_checkpoints",
+        ),
+      ).toBe(`${COPY_HEADER_TEXT} | drive | scope`);
       expect(_targetCounts()).toBe(SEED_COUNTS);
     });
 
