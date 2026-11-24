@@ -222,7 +222,10 @@ with_db_url() {
 read_db() { with_db_url "$1" "$PSQL_BIN" -X -P pager=off -q -t -A -v ON_ERROR_STOP=1 \
   -c 'begin transaction read only' -c "$2" -c 'rollback'; }
 COUNTS_SQL="select (select count(*) from auth.users) as users, (select count(*) from public.workspaces) as workspaces, (select count(*) from public.dashboards) as dashboards, (select count(*) from public.datasets) as datasets, (select count(*) from public.dataset_columns) as dataset_columns"
-AUTH_SEED_EXCLUDES=(-x auth.sessions -x auth.refresh_tokens -x auth.one_time_tokens -x auth.flow_state -x auth.audit_log_entries -x auth.mfa_amr_claims)
+# Auth tables the data dump (4.2) leaves out. The last four exist only in
+# production's Auth version, so loading them fails on the local stack. All
+# four held 0 rows on 2026-11-24, and the rehearsal does not need them.
+AUTH_SEED_EXCLUDES=(-x auth.sessions -x auth.refresh_tokens -x auth.one_time_tokens -x auth.flow_state -x auth.audit_log_entries -x auth.mfa_amr_claims -x auth.mfa_recovery_code_sets -x auth.mfa_recovery_codes -x auth.scim_tokens -x auth.scim_users)
 # The rehearsal worktree (4.1). Every local reset, `migration up`, and load
 # of production data runs behind on_rehearsal_stack: it moves into that
 # worktree and succeeds only when its status names the rehearsal's own
@@ -703,10 +706,33 @@ first line of `~/avandar-cutover/dumps/prod-rehearsal-counts.txt` (4.2).
 nothing ran: stop. An `ERROR` line means the whole transaction rolled back,
 so nothing was loaded: fix the cause, then repeat from 4.3. An error on an
 `auth` table (a missing column or a duplicate key) means the local Auth
-version differs from production's. Unless the table is `auth.users` or
-`auth.identities` (a blocker to raise), add `-x auth.<table>` for it to
-the `AUTH_SEED_EXCLUDES` line of 2.4 part 1, paste that line again, and
-repeat 4.2's auth dump (the `-s auth` line) before 4.3.
+version differs from production's. A missing table fails with a line such
+as `ERROR:  relation "auth.mfa_recovery_code_sets" does not exist`, which
+is what the four tables in 2.4 part 1 cause when they are missing locally.
+To recover, first list every auth table the dump has that the local schema
+lacks, with this read-only check run in the open terminal. The second
+command prints each COPY block's row count, so you can see which listed
+tables hold rows:
+
+```bash
+# Tables in the auth dump that the local schema does not have.
+comm -23 <(grep -oE '^COPY "?auth"?\."?[a-z_]+' "$D/prod-rehearsal-data-auth.sql" | sed -E 's/.*\.//; s/"//g' | sort) <(read_db "$LOCAL_DB_URL" "select table_name from information_schema.tables where table_schema='auth' and table_type='BASE TABLE'" | sort)
+# Row count of each COPY block in the auth dump.
+awk '/^COPY /{t=$2; n=0; inBlock=1; next} inBlock && /^\\\.$/{print t, n; inBlock=0; next} inBlock{n++}' "$D/prod-rehearsal-data-auth.sql"
+```
+
+Any listed table can be excluded the same way, including one with rows,
+except `auth.users` and `auth.identities`. A missing one of those is a
+blocker to raise, so stop there. For each table you exclude, run
+`AUTH_SEED_EXCLUDES+=(-x auth.<table>)` once in the open terminal, so the
+array holds it. (A new terminal needs the updated `AUTH_SEED_EXCLUDES` line
+from 2.4 part 1 instead.) Then run `cd "$REHEARSAL"`, re-run only the auth
+dump line of 4.2, which is `supabase db dump --db-url "$PROD_DB_URL" --data-only --use-copy -s auth "${AUTH_SEED_EXCLUDES[@]}" -f "$D/prod-rehearsal-data-auth.sql"`,
+then run the `sed -i ''` cleanup and the `grep -c` check on that one file
+only: `sed -i '' '/^SET transaction_timeout = 0;$/d' "$D/prod-rehearsal-data-auth.sql"`
+and `grep -c 'PostgreSQL database dump complete' "$D/prod-rehearsal-data-auth.sql"`,
+which should print `1`. The failed load rolled back and loaded nothing, so
+repeat from 4.3.
 
 ### 4.6 Apply the migrations production does not have
 
