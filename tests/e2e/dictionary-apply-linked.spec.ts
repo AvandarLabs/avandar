@@ -134,7 +134,7 @@ async function _createLinkedDataset(page: Page): Promise<string> {
     page.getByRole("radio", { name: /Create a new linked dataset/ }),
   ).toBeChecked();
   const nameInput = page.getByLabel("Name", { exact: true });
-  await expect(nameInput).toHaveValue(/\(labeled\)$/);
+  await expect(nameInput).toHaveValue(/\(target values\)$/);
   const linkedName = await nameInput.inputValue();
   await page.getByRole("button", { name: "Create linked dataset" }).click();
   return linkedName;
@@ -160,7 +160,7 @@ async function _expectLinkedDatasetPage(
   await page.getByRole("button", { name: "Code list for GENDER" }).focus();
   await expect(
     page.getByRole("dialog", { name: "Code list for GENDER" }),
-  ).toContainText("The values were converted to these labels.");
+  ).toContainText("The values were converted to these target values.");
   await page.keyboard.press("Escape");
 }
 
@@ -181,7 +181,7 @@ async function _relabelFemaleThenOpenLinked(
     timeout: MEDIUM_WAIT,
   });
   await page.getByRole("tab", { name: /Used by/ }).click();
-  // By its link, since the name has regex characters like "(labeled)". In
+  // By its link, since the name has regex characters like "(target values)". In
   // the tab, since the list pane links to the linked dataset too.
   const linkedLink = page.getByRole("link", { name: linkedName, exact: true });
   const linkedRow = page
