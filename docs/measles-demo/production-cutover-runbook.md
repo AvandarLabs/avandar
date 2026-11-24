@@ -137,10 +137,14 @@ AUTH_SEED_EXCLUDES=(-x auth.sessions -x auth.refresh_tokens -x auth.one_time_tok
 # The rehearsal worktree (4.1). Every local reset, `migration up`, and load
 # of production data runs behind on_rehearsal_stack: it moves into that
 # worktree and succeeds only when its status names the rehearsal's own
-# switched stack, never the shared `avandar` stack.
+# switched stack, never the shared `avandar` stack. `ava` drops an exported
+# SUPABASE_PROJECT_ID or SUPABASE_*_PORT before it calls the Supabase CLI,
+# but the plain `supabase` here obeys them, so the guard refuses to pass
+# while one is exported.
 export REHEARSAL="$(wt path chore/production-rehearsal)"
-on_rehearsal_stack() { [[ -d "$REHEARSAL" ]] && cd "$REHEARSAL" &&
-  ava supabase status | grep -qF "is on a switched local Supabase database: chore-production-rehearsal."; }
+on_rehearsal_stack() { [[ -z "$(env | grep -E '^SUPABASE_(PROJECT_ID|[A-Z0-9_]+_PORT)=')" ]] &&
+  [[ -d "$REHEARSAL" ]] && cd "$REHEARSAL" &&
+  ava supabase status | grep -F "is on a switched local Supabase database: chore-production-rehearsal." >/dev/null; }
 supabase --version
 "$PSQL_BIN" --version
 "$PG_DUMP_BIN" --version
@@ -204,7 +208,7 @@ it.
 
 | Connects to production | Sections | What it does there |
 | --- | --- | --- |
-| `read_db "$PROD_DB_URL" ...` | 2.4, 4.2, 4.8, 9.6 (production run), 10.1, 10.2, 12, 14.3 | Queries in a read-only transaction |
+| `read_db "$PROD_DB_URL" ...` | 2.4, 4.2, 4.8, 9.6 (production run), 10.1, 10.2, 11.7, 12, 14.3, 17.5 | Queries in a read-only transaction |
 | `supabase db dump --db-url "$PROD_DB_URL" ...` | 4.2, 10.2 | `pg_dump` as `postgres`: reads only |
 | `supabase projects api-keys`, `branches list`, `backups list`, `secrets list`, `functions list`, with `--project-ref "$PROD_REF"` | 5.3, 6.1, 6.5, 10.1, 10.2, 13 | Management API reads |
 | `with_db_url "$PROD_DB_URL" "$PG_DUMP_BIN" ...` | 9.6 C5 | The catalog backup: reads only |
@@ -287,10 +291,12 @@ contain yet. The final sync of the implementation plan (Task 21) merges
 never a commit written here.
 
 `develop` also gained a migration after planning:
-`20261105212729_add_rpc_workspaces__is_slug_available.sql`. Once Task 21
-merges it, production applies 80 files instead of the 79 counted on
-2026-11-23, and the tree holds 195 files instead of 194. Every count below
-comes from a command, so take the number it prints.
+`20261105212729_add_rpc_workspaces__is_slug_available.sql`. The integration
+branch merged it on 2026-11-24: production now applies 80 files, the tree
+holds 195, and staging applies 10, one more file for production and the
+tree than the plan counted on 2026-11-23. Every count below comes from a
+command (`$PROD_PENDING` and `$TREE_COUNT`, 4.1), so take the number it
+prints.
 
 ## 4. Rehearsal (local)
 
@@ -302,14 +308,14 @@ the audit refresh is pending (4.8).
 ### 4.1 Create the rehearsal worktree and its own stack
 
 ```bash
-cd "$(wt new chore production-rehearsal chore/production-cutover)"
+REHEARSAL="$(wt new chore production-rehearsal chore/production-cutover)" && cd "$REHEARSAL"
+export REHEARSAL
 git log -1 --format='%h %s'
 pnpm install --frozen-lockfile
 ava supabase status | grep -m1 -E "switched local|develop local"
-ava supabase switch --no-seed
+[[ -n "$REHEARSAL" && "$PWD" == "$REHEARSAL" ]] && ava supabase switch --no-seed
 pnpm fns:update-env
 ava supabase status | grep -m1 -E "switched local|develop local"
-export REHEARSAL="$PWD"
 git fetch origin
 export PROD_PENDING="$(comm -23 <(ls supabase/migrations | sort) <(git ls-tree --name-only origin/main supabase/migrations/ | sed 's#.*/##' | sort) | wc -l | tr -d ' ')"
 export TREE_COUNT="$(ls supabase/migrations | wc -l | tr -d ' ')"
@@ -319,10 +325,12 @@ echo "production applies $PROD_PENDING files, the tree holds $TREE_COUNT"
 **Expect:** the commit is the tip Task 21's final report names. The second
 status line reads `Branch chore/production-rehearsal is on a switched local
 Supabase database: chore-production-rehearsal.` The last line reads
-`production applies 79 files, the tree holds 194` (or 80 and 195 once the
-tip carries `20261105212729`, 3.4).
-**If not:** never run 4.3 to 4.6 while the status line says `This is the
-develop local Supabase`: they would reset the shared stack every other
+`production applies 80 files, the tree holds 195` at the 2026-11-24 tip
+(3.4). A later `develop` merge that adds a migration raises both.
+**If not:** an empty `echo "$REHEARSAL"` means `wt new` failed: the switch
+did not run, and the rest of the block ran in the worktree you started in.
+Fix the cause before anything else. Never run 4.3 to 4.6 while the status
+line says `This is the develop local Supabase`: they would reset the shared stack every other
 worktree uses, and load production's users into it. Fix the switch first
 (CLAUDE.md, "Supabase"). From here on, `on_rehearsal_stack` (2.4) guards
 every reset and load: `echo "$REHEARSAL"` must print this worktree's path.
@@ -408,6 +416,7 @@ table to `AUTH_SEED_EXCLUDES` and repeat 4.2's auth dump, unless it is
 ### 4.6 Apply the migrations production does not have
 
 ```bash
+rm -f "$D/rehearsal-migration-up.log"
 on_rehearsal_stack && supabase migration up --local --include-all 2>&1 | tee "$D/rehearsal-migration-up.log"
 grep -c '^Applying migration' "$D/rehearsal-migration-up.log"
 read_db "$LOCAL_DB_URL" "select max(version), count(*) from supabase_migrations.schema_migrations"
@@ -415,7 +424,7 @@ read_db "$LOCAL_DB_URL" "$COUNTS_SQL"
 read_db "$LOCAL_DB_URL" "select to_regclass('public.plugin_installations'), (select count(*) from public.plugin_installations)"
 ```
 
-**Expect:** `$PROD_PENDING` applying lines (79, or 80 after 3.4) with no
+**Expect:** `$PROD_PENDING` applying lines (80 at the 2026-11-24 tip) with no
 error; then `20261123200200|$TREE_COUNT`; the same counts as 4.5; then
 `plugin_installations|0`. Production applies all of them in one
 `supabase db push --include-all` (11.6), in timestamp order. The plugin
@@ -1547,11 +1556,26 @@ on_rehearsal_stack && [[ "$LOCAL_DB_URL" == postgres*"://"*"@127.0.0.1:"* ]] &&
 **If not:** if nothing ran, `on_rehearsal_stack` failed (this terminal is
 usually in the `develop` worktree, on the shared stack): nothing ran. Stop,
 run 2.4 here, and check that `echo "$REHEARSAL"` prints the rehearsal
-worktree. Otherwise do not approve. Leave the deployment waiting, or **Reject** it
+worktree. If the reset fails because the rehearsal stack is stopped
+(`ava supabase status` says `Local Supabase is not running`), start it only
+behind the guard, `on_rehearsal_stack && ava supabase start`, then run the
+block again. Otherwise do not approve. Leave the deployment waiting, or **Reject** it
 under **Review deployments**. Fix the cause, take the backup again, and
 test again. A failure with `cannot truncate a table referenced in a foreign
 key constraint` names a table outside `public` and `auth`: never add
-`CASCADE`. Raise it, and choose option A.
+`CASCADE`. Raise it, and choose option A. A failure on an `auth` table that
+4.5 had to exclude means the local Auth version differs from production's,
+and 10.2's `-data-app` dump excludes nothing. Compare the `auth` tables and
+columns the dump loads with the local stack's:
+
+```bash
+grep '^COPY auth\.' "$D/prod-$BACKUP_T-data-app.sql" | sed 's/ FROM stdin;$//' | LC_ALL=C sort > "$D/auth-tables-dump.txt"
+read_db "$LOCAL_DB_URL" "select format('COPY auth.%I (%s)', c.relname, string_agg(format('%I', a.attname), ', ' order by a.attnum)) from pg_class c join pg_namespace n on n.oid = c.relnamespace join pg_attribute a on a.attrelid = c.oid where n.nspname = 'auth' and c.relkind = 'r' and a.attnum > 0 and not a.attisdropped and a.attgenerated = '' group by c.relname order by 1 collate \"C\"" > "$D/auth-tables-local.txt"
+diff "$D/auth-tables-dump.txt" "$D/auth-tables-local.txt" && echo "same auth tables"
+```
+
+If `same auth tables` does not print, the lists differ: this test cannot
+pass here and option B stays untested. Choose option A.
 
 ## 11. Release
 
@@ -1661,9 +1685,9 @@ redeploys staging. That is harmless.
 | Release fails at | State | Do |
 | --- | --- | --- |
 | Before `Setting develop to 0.15.0` | Nothing changed | Fix, run again |
-| `Could not push develop` | Nothing released. A local version commit exists | `git reset --hard origin/develop`, fix the push, run again |
-| `Could not push main and v0.15.0` | `develop` is at `0.15.0` and pushed. `main` and the tag are not | Wait for the new `staging.yaml` run to pass, then `ava release --version 0.15.0 --next 0.15.1 --skip-changelog` |
-| `v0.15.0 is released, but develop could not be bumped to 0.15.1-dev` | Released | `pnpm version 0.15.1-dev --no-git-tag-version && git commit -m "Bump version to 0.15.1-dev [skip deploy]" -- package.json && git push origin HEAD:refs/heads/develop` |
+| `Could not push develop` | Nothing released. A local version commit exists | `cd "$(wt go develop)" && git reset --hard origin/develop`, fix the push, run again |
+| `Could not push main and v0.15.0` | `develop` is at `0.15.0` and pushed. `main` and the tag are not | Wait for the new `staging.yaml` run to pass, then `cd "$(wt go develop)" && ava release --version 0.15.0 --next 0.15.1 --skip-changelog` |
+| `v0.15.0 is released, but develop could not be bumped to 0.15.1-dev` | Released | `cd "$(wt go develop)" && pnpm version 0.15.1-dev --no-git-tag-version && git commit -m "Bump version to 0.15.1-dev [skip deploy]" -- package.json && git push origin HEAD:refs/heads/develop` |
 
 ### 11.5 Approve the `deploy` job (**WRITES TO PRODUCTION**: approving starts the migrations)
 
@@ -1671,15 +1695,17 @@ redeploys staging. That is harmless.
 sleep 15
 git fetch origin && export MAIN_SHA="$(git rev-parse origin/main)"
 export RUN_ID="$(gh run list --workflow production.yaml --branch main --limit 5 --json databaseId,headSha --jq ".[] | select(.headSha == \"$MAIN_SHA\") | .databaseId" | head -1)"
-[[ -n "$RUN_ID" ]] && echo "$RUN_ID" > "$CUTOVER_DIR/production-run-id" && gh run watch "$RUN_ID"
+[[ -n "$RUN_ID" ]] && echo "$RUN_ID" > "$CUTOVER_DIR/production-run-id-0.15.0" && gh run watch "$RUN_ID"
 ```
 
-The run id is saved in `$CUTOVER_DIR/production-run-id`, for the rollback
-(14.3). If nothing is watched, the run for the new `main` commit has not
+The run id is saved in `$CUTOVER_DIR/production-run-id-0.15.0`, for the
+rollback (14.3). The version in the name keeps a later release from
+overwriting it. If nothing is watched, the run for the new `main` commit has not
 started yet: wait a minute and run the block again.
 
-When `test-quick` passes, the `deploy` job waits for your approval. Now take
-the backup and test it (10.2, 10.3). Then, on the run's page: **Review
+When `test-quick` passes, the `deploy` job waits for your approval, and
+`gh run watch` keeps waiting with it. Press Ctrl-C to stop watching (the
+run keeps waiting), then run 10.2 and 10.3 to take the backup and test it. Then, on the run's page: **Review
 deployments** > tick `production` > **Approve and deploy**. This approval is
 the production write: the job then migrates production without asking
 again.
@@ -1694,7 +1720,7 @@ again.
 | 4 | Check the production configuration | No | `The production configuration is complete.` or one line per problem (5.5) |
 | 5 | Pull the Vercel production environment | No | `Sensitive Vercel variables left out of the build:` and their names, or `(none)` |
 | 6 | Build the web app for Vercel | No | The Vercel build output |
-| 7 | Apply migrations: `supabase link`, then `supabase db push --include-all` | **Yes** | One line per migration it applies, `$PROD_PENDING` of them (79, or 80 after 3.4), in one push |
+| 7 | Apply migrations: `supabase link`, then `supabase db push --include-all` | **Yes** | One line per migration it applies, `$PROD_PENDING` of them (80 at the 2026-11-24 tip), in one push |
 | 8 | Set edge function secrets | **Yes** | The CLI's confirmation. The values are in a single-quoted file that is deleted at the end of the step |
 | 9 | Deploy edge functions | **Yes** | One line per function. Production gains `connectors`, `file-url`, and `geocode`, and possibly `_eval` (**verify** in the log) |
 | 10 | Deploy the prebuilt web app to Vercel (`--prod`) | **Yes** | The deployment URL |
@@ -1904,7 +1930,7 @@ the backup's time stamp and the production run's id:
 
 ```bash
 export BACKUP_T="$(ls -t "$D"/prod-2*-counts.txt | head -1 | sed -E 's#.*/prod-([0-9]{8}-[0-9]{4})-counts\.txt#\1#')"
-export RUN_ID="${RUN_ID:-$(cat "$CUTOVER_DIR/production-run-id")}"
+export RUN_ID="${RUN_ID:-$(cat "$CUTOVER_DIR/production-run-id-0.15.0")}"
 echo "backup $BACKUP_T, run $RUN_ID"
 ```
 
@@ -1918,7 +1944,7 @@ migrations had applied, so restoring there leaves production partly
 migrated:
 
 ```bash
-RUN_ID="${RUN_ID:-$(cat "$CUTOVER_DIR/production-run-id")}"
+RUN_ID="${RUN_ID:-$(cat "$CUTOVER_DIR/production-run-id-0.15.0")}"
 STARTED_AT="$(gh run view "$RUN_ID" --attempt 1 --json jobs --jq '.jobs[] | select(.name == "deploy") | .steps[] | select(.name == "Apply migrations" and .conclusion != "skipped") | .startedAt')"
 echo "$STARTED_AT"
 RESTORE_TO=""
@@ -1935,7 +1961,9 @@ the job builds the app between the approval and "Apply migrations".
 **If not:** an empty `STARTED_AT`, or an error from `date`, means attempt 1
 never reached "Apply migrations" (it failed in steps 3 to 6): run the block
 again with `--attempt 2`, and so on, and take the first attempt that
-prints a time.
+prints a time. The restore below uses the `RESTORE_TO` of the last time
+the block ran. Run the restore right after the block that printed the time
+you chose. Do not re-run the time block in between.
 
 Only when the time is right, restore. **WRITES TO PRODUCTION**:
 
@@ -2002,8 +2030,16 @@ previous release did not have. The `supabase` function from 2.4 keeps the
 and the `BACKUP_T` line from the top of 14.3.
 
 ```bash
-cd "$(wt new chore production-rollback v0.14.1)"
-supabase functions deploy --project-ref "$PROD_REF"
+ROLLBACK_DIR="$(wt path chore/production-rollback)"
+[[ -d "$ROLLBACK_DIR" ]] || ROLLBACK_DIR="$(wt new chore production-rollback v0.14.1)"
+cd "$ROLLBACK_DIR" && [[ "$(git rev-parse HEAD)" == "$(git rev-parse 'v0.14.1^{commit}')" ]] && echo "on v0.14.1" &&
+  supabase functions deploy --project-ref "$PROD_REF"
+```
+
+**Expect:** `on v0.14.1` is printed. **If not:** nothing was deployed.
+Stop. Then list what is deployed and what to delete:
+
+```bash
 supabase functions list --project-ref "$PROD_REF" -o json | jq -r '.[].slug' | sort > "$D/functions-after-rollback.txt"
 comm -13 "$D/prod-$BACKUP_T-function-slugs.txt" "$D/functions-after-rollback.txt" | tee "$D/functions-to-delete.txt"
 ```
@@ -2163,6 +2199,26 @@ gh pr list --base demo/measles --state open --json number --jq '.[].number' \
 gh pr list --base demo/measles --state open
 git push origin --delete demo/measles
 git ls-remote --exit-code origin refs/heads/chore/production-cutover && git push origin --delete chore/production-cutover
+```
+
+The cutover worktree has its own switched stack too
+(`chore-production-cutover`). Undo it before removing the worktree:
+
+```bash
+cd "$(wt path chore/production-cutover)" && ava supabase restore &&
+  ava supabase status | grep -m1 -E "switched local|develop local"
+```
+
+**Expect:** `This branch is back on the develop local Supabase. Its env
+files are restored.`, then a status line that reads `This is the develop
+local Supabase (avandar). Branch chore/production-cutover uses it.`
+`ava supabase restore` deletes only this branch's own local project and its
+data, never the shared `avandar` stack.
+**If not:** an error from `ava supabase restore` names what it could not
+clean up: follow it, and do not remove the worktree until the status line
+reads as above. Then:
+
+```bash
 cd "$(wt rm chore/production-cutover)"
 ```
 
@@ -2229,7 +2285,8 @@ the catalog backups, the restore folders, and the logs.
 | Gap | State |
 | --- | --- |
 | Migration audit refresh | Deferred (Task 17): an agent session given read-only URLs runs it when Pablo chooses. The rehearsal is the primary check for production's files, but nothing rehearses staging's 10 out-of-order files. The refresh and the live read-only checks in 4.8 must be done before step 3 of section 1 (the promotion). A blocker found after 8.5 can only be fixed forward |
-| Migration counts | 79 files for production and 194 in the tree, counted on 2026-11-23. `develop` gained `20261105212729_add_rpc_workspaces__is_slug_available.sql` after planning, so once Task 21 merges it, production applies 80 of 195. Staging's 10 files assume its CI already applied that file (4.8 checks it) |
+| Migration counts | `develop` gained `20261105212729_add_rpc_workspaces__is_slug_available.sql` after planning, and the integration branch merged it on 2026-11-24: the tree now holds 195 files, production applies 80, and staging 10, one more file for production and the tree than the plan counted on 2026-11-23. The runbook computes them (`$PROD_PENDING`, `$TREE_COUNT`, 4.1). Staging's 10 files assume its CI already applied that file (4.8 checks it) |
+| Quick suite flake | `ReferenceError: window is not defined` from `plugins/epidemiology/src/RegressionModal/RegressionModal.test.tsx` fails the quick suite now and then: Mantine 9.2.0's `Button` loader timer fires after jsdom's teardown under full-suite load. Not a regression. Re-run the quick suite once |
 | Crosswalk privacy gap (AVA-611) | Ships with the release (D4). Fixed forward (section 16) |
 | `db:validate-migrations` check 3 | Fails by design on the 7 dictionary and crosswalk files, which sort before `develop`'s newest file. It runs in no CI job or hook, and clears once the promotion lands |
 | Local databases and the `demo-measles` branch | Any built before the slot migrations were renamed already ran them under their old names, and cannot migrate forward. Reset local stacks (`pnpm db:reset` on a switched stack). The branch is deleted in 17.3 |
