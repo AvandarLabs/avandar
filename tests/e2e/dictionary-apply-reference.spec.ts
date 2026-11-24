@@ -340,6 +340,12 @@ test.describe("applying a dictionary as reference", () => {
     await page
       .getByRole("link", { name: "Data Explorer", exact: true })
       .click();
+    // The Data Explorer opens the chat once when it mounts. Wait for it to
+    // mount first, or the "Chat" toggle can land after that open and close
+    // the panel again.
+    await expect(page.getByRole("button", { name: "Reset" })).toBeVisible({
+      timeout: LONG_WAIT,
+    });
     await openAgentChat(page);
     const composer = page.getByLabel("Message", { exact: true });
     await composer.fill("How many female cases were hospitalized?");
