@@ -343,6 +343,13 @@ jobs:
               has_problem=true
             fi
           done
+          # The Google Picker values do not block a deploy: without them the
+          # build works but the Picker does not, so this only warns.
+          for name in VITE_GOOGLE_PICKER_API_KEY VITE_GOOGLE_PICKER_APP_ID; do
+            if [ -z "$(read_pulled_value "$name")" ]; then
+              echo "::warning::$name is missing or empty in the Vercel production environment. The Google Picker will not work in this build."
+            fi
+          done
           # Prints the URL in $1 lowercased, without trailing slashes, for
           # comparison only. A URL host is case-insensitive, and the
           # Git-integration builds already ship these values as Vercel holds

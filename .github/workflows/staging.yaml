@@ -190,8 +190,8 @@ jobs:
   # prebuilt app last. It never changes the edge function secrets, which are
   # managed on the staging Supabase project.
   #
-  # Production credentials are set on the steps that use them, never on the
-  # job, so they do not reach the setup actions or unrelated scripts.
+  # Staging credentials are set on the steps that use them, never on the job,
+  # so they do not reach the setup actions or unrelated scripts.
   deploy:
     if: github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
@@ -333,6 +333,13 @@ jobs:
             if [ -z "$(read_pulled_value "$name")" ]; then
               echo "$name is missing or empty in the Vercel staging environment. Nothing was deployed." >&2
               has_problem=true
+            fi
+          done
+          # The Google Picker values do not block a deploy: without them the
+          # build works but the Picker does not, so this only warns.
+          for name in VITE_GOOGLE_PICKER_API_KEY VITE_GOOGLE_PICKER_APP_ID; do
+            if [ -z "$(read_pulled_value "$name")" ]; then
+              echo "::warning::$name is missing or empty in the Vercel staging environment. The Google Picker will not work in this build."
             fi
           done
           # Prints the URL in $1 lowercased, without trailing slashes, for
