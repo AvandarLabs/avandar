@@ -12312,8 +12312,10 @@ on a release line:
   of `production.yaml` and `staging.yaml` on `chore/production-cutover`: it
   refuses to deploy anything but
   the branch tip, checks the configuration, builds before any write, scopes
-  credentials to the step that needs them, writes secrets to a single-quoted
-  file, and never cancels a running deploy.
+  credentials to the step that needs them, and never cancels a running
+  deploy. Its step that wrote edge function secrets from GitHub was removed
+  before the release (`dcf372384`): edge function secrets stay set by hand
+  on each Supabase project.
 - The catalog move scripts, now under `scripts/catalog-move/` (`3769ba532`),
   move the open data catalog and its Parquet objects between projects.
 

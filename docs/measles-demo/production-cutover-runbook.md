@@ -16,7 +16,7 @@ every step is laid out ("How to read a step"), and what to paste into a new
 terminal (2.4). Steps that change something outside your laptop carry a
 bold mark: **WRITES TO PRODUCTION**, **WRITES TO STAGING**, **CHANGES
 STAGING CONFIGURATION**, **CHANGES VERCEL**, **CHANGES GITHUB SETTINGS**,
-**CHANGES GOOGLE CLOUD CONSOLE**, **CHANGES POLAR**, or **PUSHES**. A step
+**CHANGES GOOGLE CLOUD CONSOLE**, or **PUSHES**. A step
 without a mark only reads. **Verify** marks a claim that could not be
 checked from the repository when this was written: do the read-only check
 it describes before you rely on the claim.
@@ -24,7 +24,16 @@ it describes before you rely on the claim.
 The repository and its GitHub Actions logs are public. Secret values,
 connection strings, and anything about a user never go into a file, an
 issue, a chat, or a log. This runbook names secrets by their variable names
-only, and says for each one where you get the value (5.3 and 2.4).
+only, and says for each one where you get the value (2.4, 5.3, 6.4, and
+6.6).
+
+**Where secrets live (L1).** This cutover changes how the web app deploys,
+not where secrets are kept. CI now deploys the app to Vercel in place of
+Vercel's Git integration, and that is the only change. Secrets stay where
+they are today: GitHub (what the CI jobs themselves need), Vercel (the web
+app's build variables), Fly.io (the pipeline server), and each Supabase
+project's edge function secrets (set by hand, never by CI). Managing every
+secret in GitHub is follow-up work (section 16).
 
 ## 1. Day-of checklist
 
@@ -38,14 +47,14 @@ production at all.
 | --- | --- | --- | --- | --- |
 | 0 | Tools, shell setup, rules | 2 | No | A tool version differs from 2.3 |
 | 1 | Announce the freeze. Rehearse on a local copy of production | 3, 4 | Reads (a dump) | Any row of 4.9 fails |
-| 2 | Protect the GitHub `production` environment, then set both environments' names. Third parties. Vercel values | 5, 6, 7 | No. **CHANGES GITHUB SETTINGS**, **CHANGES VERCEL** | 5.6 shows a missing name |
+| 2 | Protect the GitHub `production` environment, then add its three Vercel values (staging needs nothing new). Third parties, including the missing edge function secrets on staging, and on production now or before 11.4 (6.6). The Vercel pre-flight | 5, 6, 7 | Only if you set production's edge function secrets now (6.6): **WRITES TO PRODUCTION** (configuration, no data). Also **CHANGES GITHUB SETTINGS**, **CHANGES STAGING CONFIGURATION**, **CHANGES VERCEL** | 5.6 shows a missing name, or 7.2 finds a `VITE_` variable you cannot fix |
 | 3 | Push the integration branch to `demo/measles`. Open the PR into `develop` | 8.1 to 8.4 | No. **PUSHES** | 4.8 is not done, or `pr-develop.yaml` fails |
-| 4 | Fast-forward `develop`. `staging.yaml` deploys staging | 8.5, 8.6, 9.1 to 9.4 | No. **PUSHES**, **WRITES TO STAGING** through CI | The staging deploy fails |
+| 4 | Fast-forward `develop`. `staging.yaml` deploys staging | 8.5, 8.6, 9.1, 9.2 | No. **PUSHES**, **WRITES TO STAGING** through CI | The staging deploy fails (9.1 says which failures wrote nothing) |
 | 5 | Load the catalog into staging. Check staging | 9.5 to 9.7 | No. **WRITES TO STAGING** | The staging import or restore check fails |
 | 6 | Choose the rollback basis (10.1). Release `0.15.0` with `ava release` (11.1 to 11.4). While the `deploy` job waits, back up production and test the backup (10.2, 10.3), then approve (11.5) | 10.1, 11.1 to 11.4, 10.2, 10.3, 11.5 to 11.9 | **WRITES TO PRODUCTION** through CI, from the approval in 11.5 | 10.3's restore test fails: do not approve |
 | 7 | Load the catalog into production. Smoke test | 12, 13 | **WRITES TO PRODUCTION** | Anything in 13 fails: section 14 |
 | 8 | Disconnect Vercel's Git integration | 15 | No. **CHANGES VERCEL** | Either `deploy` job did not succeed |
-| 9 | Start the privacy fix. Publish the review backlog when ready. Narrow the staging tokens (section 16, Narrow the staging tokens). Clean up seven days after the smoke test | 16, 17 | 17 deletes the demo resources | |
+| 9 | Start the privacy fix. Publish the review backlog when ready. Narrow the staging tokens (section 16, Narrow the staging tokens). Plan the secrets follow-up (section 16, Manage every secret in GitHub). Clean up seven days after the smoke test | 16, 17 | 17 deletes the demo resources | |
 
 **The migration audit refresh is still pending** (4.8). It must be done
 before step 3, the promotion. The reason: the push in 8.5 makes the
@@ -79,11 +88,11 @@ The browser sites, each signed in with an account that has admin rights:
 
 | Site | What it is called below | Used in |
 | --- | --- | --- |
-| `supabase.com/dashboard`, projects `Avandar` (production) and `Avandar Staging` | The Supabase dashboard | 2.4, 6.1, 6.5, 9.6 C2, 10.1, 14.3 |
+| `supabase.com/dashboard`, projects `Avandar` (production) and `Avandar Staging` | The Supabase dashboard | 2.4, 6.1, 6.5, 7.2, 9.6 C2, 10.1, 14.3 |
 | `github.com/AvandarLabs/avandar` | GitHub | 5, 11.5, 11.9 |
 | `vercel.com`, team `avandar`, project `avandar` | The Vercel dashboard | 5.3, 7, 14.5, 15, 17.2 |
-| `console.cloud.google.com` | The Google Cloud console | 5.3, 6.2 |
-| `polar.sh`, the production organization | The Polar dashboard | 6.3 |
+| `console.cloud.google.com` | The Google Cloud console | 6.2, 7.2 |
+| `myprojects.geoapify.com` | The Geoapify dashboard | 6.6 |
 | `staging.avandarlabs.com`, `app.avandarlabs.com` | The staging app, the production app | 9.2, 9.7, 12.2, 13 |
 
 **How to read a step.** Most steps follow the same pattern:
@@ -108,7 +117,9 @@ step says to run its lines one at a time.
 ### 2.1 Read first
 
 - [The cutover plan](production-cutover-plan.md): decisions D1 to D7, E1, A2, A3,
-  H1.
+  K1, and L1. H1 no longer applies: it chose which `FEATUREBASE_JWT_SECRET`
+  value CI would write to staging, and under L1 CI writes no edge function
+  secret.
 - [The migration audit](alpha-migration-audit.md), dated 2026-11-19. It
   covers 76 files and found no blocker. **Its refresh for production's
   current set and staging's 10 files has not been done** (4.8). It must be
@@ -436,12 +447,12 @@ in the last row, is Supabase's point-in-time recovery add-on (10.1):
 | --- | --- | --- |
 | `read_db "$PROD_DB_URL" ...` | 2.4, 4.2, 4.8, 9.6 (production run), 10.1, 10.2, 11.7, 12, 14.3, 17.5 | Queries in a read-only transaction |
 | `supabase db dump --db-url "$PROD_DB_URL" ...` | 4.2, 10.2 | `pg_dump` as `postgres`: reads only |
-| `supabase projects api-keys`, `branches list`, `backups list`, `secrets list`, `functions list`, with `--project-ref "$PROD_REF"` | 5.3, 6.1, 6.5, 10.1, 10.2, 13 | Management API reads |
+| `supabase projects api-keys`, `branches list`, `backups list`, `secrets list`, `functions list`, with `--project-ref "$PROD_REF"` | 6.1, 6.2, 6.5, 6.6, 10.1, 10.2, 13 | Management API reads |
 | `with_db_url "$PROD_DB_URL" "$PG_DUMP_BIN" ...` | 9.6 C5 | The catalog backup: reads only |
 | `importCatalogData.sh --dry-run`, and the run stopped at its prompt | 9.6 C4, C6 | Reads only, in read-only transactions |
 | The `session_replication_role` probe | 9.6 C3 | Opens a transaction, changes one setting inside it, rolls back. Writes no data |
 | The foreign key pre-flight | 9.6 C8 | One read-only transaction |
-| **WRITES TO PRODUCTION** | 6.1 (only if keys are missing), 10.1 (only if you turn PITR on), 11 (through CI), 12 (catalog import and Parquet copy), 14 (rollback), 17 (optional WDI object delete) | As each step says |
+| **WRITES TO PRODUCTION** | 6.1 (only if keys are missing), 6.6 (the missing edge function secrets: configuration, no data), 10.1 (only if you turn PITR on), 11 (through CI), 12 (catalog import and Parquet copy), 14 (rollback), 17 (optional WDI object delete) | As each step says |
 
 The dumps hold real user data. The sensitive tables:
 
@@ -967,9 +978,11 @@ own.
 password and the secrets of the `production` environment. Two `staging`
 secrets reach further:
 
-- `VERCEL_TOKEN`: 7.5 puts the same token in `staging`. Any branch's
-  workflow can read it and run `vercel deploy --prod` on project `avandar`,
-  which serves `app.avandarlabs.com`.
+- `VERCEL_TOKEN`: `staging` already holds a Vercel token for project
+  `avandar`, the same project that serves `app.avandarlabs.com`. Any
+  branch's workflow can read it and run `vercel deploy --prod` with it.
+  Production gets a token of its own in 7.5, but that does not narrow
+  staging's.
 - `SUPABASE_ACCESS_TOKEN`: if staging's is a personal access token of an
   account that can also reach project `Avandar`, any branch's workflow can
   reach production through the Management API with it. Supabase personal
@@ -982,56 +995,28 @@ and narrow the staging tokens after the full cutover (section 16, Narrow the
 staging tokens). Only maintainers can push branches to the repository, so the
 risk is low until then.
 
-### 5.3 Set the `production` environment's names
+### 5.3 Add the three Vercel values to the `production` environment
 
-`production.yaml`'s "Check the production configuration" step requires the
-23 names below, and reads `GEOAPIFY_API_KEY` when it is set. Today the
-environment holds only `SUPABASE_ACCESS_TOKEN`, `PRODUCTION_DB_PASSWORD`,
-and `PRODUCTION_PROJECT_ID`. It needs 18 more secrets and 3 variables.
+`production.yaml`'s deploy job reads six names from the GitHub
+`production` environment, and nothing else. Three exist today. The other
+three are new, and they are the only values GitHub gains in this cutover
+(L1): every other secret stays where it is today.
 
-A secret is write-only once saved: GitHub never displays it again, to you
-or anyone. A variable is public and readable. The last column says where
-each value comes from: "Where to get each value" below has the click path,
-the value's shape, and what to do if you cannot find it.
+| Name | Exists today | What it is |
+| --- | --- | --- |
+| `SUPABASE_ACCESS_TOKEN` | Yes | The Supabase token CI migrates and deploys functions with. Nothing to do |
+| `PRODUCTION_DB_PASSWORD` | Yes | Production's database password (2.4 part 2). Nothing to do |
+| `PRODUCTION_PROJECT_ID` | Yes | Production's project ref. Nothing to do |
+| `VERCEL_TOKEN` | No | The new Vercel token you create in 7.5 |
+| `VERCEL_ORG_ID` | No | The Vercel team ID, `team_...` |
+| `VERCEL_PROJECT_ID` | No | The Vercel project ID of `avandar`, `prj_...` |
 
-| Name | Kind | Exists today | Value |
-| --- | --- | --- | --- |
-| `SUPABASE_ACCESS_TOKEN` | Secret | Yes | Supabase personal access token. Nothing to do |
-| `PRODUCTION_DB_PASSWORD` | Secret | Yes | Production database password (2.4 part 2). Nothing to do |
-| `PRODUCTION_PROJECT_ID` | Secret | Yes | Production's project ref. Nothing to do |
-| `PRODUCTION_SB_SECRET_KEY` | Secret | No | Production secret key, unmasked, `sb_secret_...`. The block below fetches it |
-| `VERCEL_TOKEN` | Secret | No | The Vercel token (7.5) |
-| `VERCEL_ORG_ID` | Secret | No | Vercel team ID, `team_...` |
-| `VERCEL_PROJECT_ID` | Secret | No | Vercel project ID of `avandar`, `prj_...` |
-| `GOOGLE_CLIENT_ID` | Secret | No | Production Google OAuth client (6.2) |
-| `GOOGLE_CLIENT_SECRET` | Secret | No | Same client (6.2) |
-| `POLAR_ACCESS_TOKEN` | Secret | No | Production Polar organization token (6.3) |
-| `UPSTASH_REDIS_API_URL` | Secret | No | Production Upstash database's REST URL |
-| `UPSTASH_REDIS_REST_API_TOKEN` | Secret | No | Same database's REST token |
-| `RESEND_SENDING_API_KEY` | Secret | No | Resend key with sending access |
-| `RESEND_FULL_ACCESS_API_KEY` | Secret | No | Resend key with full access |
-| `OPENAI_API_KEY` | Secret | No | OpenAI API key |
-| `OPEN_ROUTER_API_KEY` | Secret | No | OpenRouter API key |
-| `FEATUREBASE_JWT_SECRET` | Secret | No | The same value as the GitHub `staging` environment's: one Featurebase organization (5.4) |
-| `AVA_PIPELINE_SERVER_SECRET` | Secret | No | The pipeline server's secret (6.4) |
-| `AVA_PIPELINE_SERVER_URL` | Secret, never a variable | No | The pipeline server's URL (6.4). A private hostname does not belong in a public repository's variables |
-| `VITE_GOOGLE_PICKER_API_KEY` | Secret | No | Google Picker API key |
-| `GEOAPIFY_API_KEY` | Secret, optional to the check | No | Geoapify key. Set it: the `geocode` function needs it, and production has none today. An empty value leaves the project's key untouched |
-| `PRODUCTION_SUPABASE_URL` | Variable | No | Exactly `https://<PRODUCTION_PROJECT_ID>.supabase.co`. The block below builds it |
-| `PRODUCTION_SB_PUBLISHABLE_KEY` | Variable | No | Production publishable key, `sb_publishable_...`. The block below fetches it |
-| `VITE_GOOGLE_PICKER_APP_ID` | Variable | No | Google Picker app ID: the Google Cloud project number |
+All three are secrets, set on the **environment**, never on the repository
+or the organization: a same-named repository or organization value
+silently fills a missing environment value. A secret is write-only once
+saved: GitHub never displays it again, to you or anyone.
 
-Set every one on the **environment**, never on the repository or the
-organization: a same-named repository or organization value silently fills
-a missing environment value. Values are never pasted into chat, a file, or
-a command line. `gh secret set` prompts for the value and does not show
-it. Variables are public, so `--body` on the command line is fine for them.
-
-**Where to get each value.** Look in your password manager first: most of
-these were saved there when they were created. A provider that shows a key
-"only once" cannot show it again, so a lost one means creating a new one.
-Creating a new key is safe unless the entry says otherwise: the old one
-keeps working until you delete it.
+**Where to get each value.**
 
 - `VERCEL_ORG_ID`: Vercel dashboard > team `avandar` (the team switcher at
   the top left) > **Settings** > **General** > **Team ID**. Shape
@@ -1039,218 +1024,156 @@ keeps working until you delete it.
 - `VERCEL_PROJECT_ID`: Vercel dashboard > project `avandar` > **Settings** >
   **General** > **Project ID**. Shape `prj_` followed by letters and
   digits. Always visible.
-- `VERCEL_TOKEN`: you create it in 7.5. Vercel shows it once.
-- `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`: 6.2 says where.
-- `VITE_GOOGLE_PICKER_API_KEY`: Google Cloud console > the project that owns
-  the production OAuth client (the project picker at the top) > **APIs &
-  Services** > **Credentials** > under **API Keys**, the Picker key > **Show
-  key**. Shape: starts `AIza`, about 39 characters. Always visible there.
-  The Vercel dashboard's Production environment variables may also still
-  hold it (**verify**).
-- `VITE_GOOGLE_PICKER_APP_ID`: the Google Cloud project number of that same
-  project. It is the run of digits before the first `-` in
-  `GOOGLE_CLIENT_ID`, and also shows as **Project number** on the Google
-  Cloud console's project dashboard. Not a secret.
-- `POLAR_ACCESS_TOKEN`: you create it in 6.3. Polar shows it once.
-- `UPSTASH_REDIS_API_URL`, `UPSTASH_REDIS_REST_API_TOKEN`:
-  `console.upstash.com` > **Redis** > production's database > its **REST
-  API** section (the label may read slightly differently), which shows a
-  REST URL (shape `https://<name>.upstash.io`) and a REST token. Both
-  stay visible there. Use production's database, not staging's
-  (**verify** which database is production's; if none exists, creating one
-  is a new paid resource: decide before you create it).
-- `RESEND_SENDING_API_KEY`, `RESEND_FULL_ACCESS_API_KEY`: `resend.com` >
-  **API Keys** > **Create API Key**, permission **Sending access** for the
-  first and **Full access** for the second. Shape: starts `re_`. Resend
-  shows a key once.
-- `OPENAI_API_KEY`: `platform.openai.com` > **API keys** > **Create new
-  secret key**. Shape: starts `sk-`. Shown once.
-- `OPEN_ROUTER_API_KEY`: `openrouter.ai` > **Keys** > **Create Key**.
-  Shape: starts `sk-or-`. Shown once.
-- `FEATUREBASE_JWT_SECRET`: the value already in the GitHub `staging`
-  environment, from your password manager (GitHub cannot show it). If the
-  password manager does not have it, take it from the Featurebase
-  dashboard's identity verification (SSO) settings (**verify** the label),
-  and set it on both environments as 9.3 describes. Do not regenerate it
-  in Featurebase: that breaks the value staging uses too.
-- `AVA_PIPELINE_SERVER_URL`, `AVA_PIPELINE_SERVER_SECRET`: 6.4 says where.
-- `GEOAPIFY_API_KEY`: `myprojects.geoapify.com` > your project > **API
-  Keys**. Shape: a 32-character string. Always visible.
-- `PRODUCTION_SB_SECRET_KEY`, `PRODUCTION_SB_PUBLISHABLE_KEY`: nothing to
-  copy. The block below reads them with the CLI and pipes them straight
-  into GitHub. They are also in the Supabase dashboard > **Avandar** >
-  **Project Settings** > **API Keys**, where the secret key is masked until
-  you reveal it.
+- `VERCEL_TOKEN`: you create it in 7.5, so do 7.5 first and come back.
+  Vercel shows it once, so have it in your password manager.
 
-**Where:** the cutover terminal. First check that production has the two
-new-style API keys. This prints names and types only, never a key:
+**Where:** the cutover terminal, after 5.1 is done. Paste this block whole.
+It asks for the three values one after another: for each, it prints
+`Production value of <name>:`, then waits. Paste the value from the
+Vercel dashboard or your password manager and press Enter. Nothing is
+shown while you paste, and that is expected:
 
 ```bash
-supabase projects api-keys --project-ref "$PROD_REF" -o json | jq -r '.[] | [.name, .type] | @tsv'
-```
-
-**Expect:** a line with type `publishable` and a line with type `secret`.
-**If not:** create them first, as 6.1 describes.
-
-Before the next block, do 6.2 (the Google client), 6.3 (the Polar token),
-6.4 (the pipeline server's URL and secret), and 7.5 (the new Vercel
-token), then come back. They come later in this runbook, but this block
-asks for their values. Also replace `<public value>` in the block's last
-line with the Google Cloud project number before you paste it.
-
-The loop asks for 17 values in this order: `AVA_PIPELINE_SERVER_SECRET`,
-`AVA_PIPELINE_SERVER_URL`, `FEATUREBASE_JWT_SECRET`, `GEOAPIFY_API_KEY`,
-`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `OPENAI_API_KEY`,
-`OPEN_ROUTER_API_KEY`, `POLAR_ACCESS_TOKEN`, `RESEND_FULL_ACCESS_API_KEY`,
-`RESEND_SENDING_API_KEY`, `UPSTASH_REDIS_API_URL`,
-`UPSTASH_REDIS_REST_API_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`,
-`VERCEL_TOKEN`, `VITE_GOOGLE_PICKER_API_KEY`. Have them open in your
-password manager first. After the loop, the block sets the two Supabase
-keys and the two variables without asking:
-
-```bash
-for name in AVA_PIPELINE_SERVER_SECRET AVA_PIPELINE_SERVER_URL FEATUREBASE_JWT_SECRET \
-  GEOAPIFY_API_KEY GOOGLE_CLIENT_ID GOOGLE_CLIENT_SECRET OPENAI_API_KEY OPEN_ROUTER_API_KEY \
-  POLAR_ACCESS_TOKEN RESEND_FULL_ACCESS_API_KEY RESEND_SENDING_API_KEY UPSTASH_REDIS_API_URL \
-  UPSTASH_REDIS_REST_API_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID VERCEL_TOKEN VITE_GOOGLE_PICKER_API_KEY; do
+for name in VERCEL_ORG_ID VERCEL_PROJECT_ID VERCEL_TOKEN; do
   echo "Production value of $name:"
   gh secret set "$name" --env production || break
 done
-supabase projects api-keys --project-ref "$PROD_REF" --reveal -o json \
-  | jq -j '[.[] | select(.type == "secret")][0].api_key' \
-  | gh secret set PRODUCTION_SB_SECRET_KEY --env production
-supabase projects api-keys --project-ref "$PROD_REF" -o json \
-  | jq -j '[.[] | select(.type == "publishable")][0].api_key' \
-  | gh variable set PRODUCTION_SB_PUBLISHABLE_KEY --env production
-gh variable set PRODUCTION_SUPABASE_URL --env production --body "https://$PROD_REF.supabase.co"
-gh variable set VITE_GOOGLE_PICKER_APP_ID --env production --body '<public value>'
 ```
 
-**CHANGES GITHUB SETTINGS.** Each `gh secret set` prints `Production value
-of <name>:`, then asks for one value. Paste it from your password manager
-and press Enter. Nothing is shown, and each prints a `Set Actions secret`
-confirmation (the wording may differ slightly).
-**If not:** if you stop the loop with Ctrl-C, the `break` ends it.
-Running the block again asks for every value again. To set a single
-missing one instead, run `gh secret set <NAME> --env production`. 5.6
-lists anything still missing.
+**CHANGES GITHUB SETTINGS.** Each value prints a `Set Actions secret`
+confirmation (the wording may differ slightly). Paste each value with no
+quotes around it and no trailing space or line break: the configuration
+check refuses those (5.5).
+**If not:** if you stop the loop with Ctrl-C, the `break` ends it, and
+running the block again asks for all three again. To set a single one,
+run `gh secret set <NAME> --env production` on its own line and paste the
+value at its prompt.
 
-### 5.4 Set the `staging` environment's names
-
-`staging.yaml`'s deploy job reads the names in commit `50eff770a`'s body.
-The `staging` environment already holds all but four. Add them:
-
-| Name | Kind | Value |
-| --- | --- | --- |
-| `STAGING_SB_SECRET_KEY` | Secret | Staging's secret key, unmasked, `sb_secret_...` |
-| `AVA_PIPELINE_SERVER_URL` | Secret | The pipeline server's URL (6.4). Today it is a variable |
-| `STAGING_SB_PUBLISHABLE_KEY` | Variable | Staging's publishable key, `sb_publishable_...` |
-| `STAGING_SUPABASE_URL` | Variable | Exactly `https://<STAGING_PROJECT_ID>.supabase.co` |
-
-**Where:** the cutover terminal. The first three commands fetch staging's
-two keys with the CLI and build its URL, so there is nothing to copy for
-them. The last line asks for one value: paste the pipeline server's URL
-(6.4 says where it comes from) and press Enter.
+Then check the names. This reads names only, never values:
 
 ```bash
-supabase projects api-keys --project-ref "$STAGING_REF" --reveal -o json \
-  | jq -j '[.[] | select(.type == "secret")][0].api_key' \
-  | gh secret set STAGING_SB_SECRET_KEY --env staging
-supabase projects api-keys --project-ref "$STAGING_REF" -o json \
-  | jq -j '[.[] | select(.type == "publishable")][0].api_key' \
-  | gh variable set STAGING_SB_PUBLISHABLE_KEY --env staging
-gh variable set STAGING_SUPABASE_URL --env staging --body "https://$STAGING_REF.supabase.co"
-gh secret set AVA_PIPELINE_SERVER_URL --env staging
+gh secret list --env production --json name -q '.[].name' | sort
 ```
 
-**CHANGES GITHUB SETTINGS.** Each command prints a confirmation, and the
-last one first asks for the value.
+**Expect:** exactly these six lines: `PRODUCTION_DB_PASSWORD`,
+`PRODUCTION_PROJECT_ID`, `SUPABASE_ACCESS_TOKEN`, `VERCEL_ORG_ID`,
+`VERCEL_PROJECT_ID`, `VERCEL_TOKEN`.
+**If not:** a missing name: set it as above. An extra name does no harm
+to the deploy, but nothing reads it.
 
-Keep the old `AVA_PIPELINE_SERVER_URL` **variable** on `staging` until the
-promotion deletes `demo.yaml` from `develop` (8.5). 9.4 deletes it. A
-secret and a variable may share a name (**verify**: afterwards,
-`gh variable list --env staging` and `gh secret list --env staging` should
-both list it).
+### 5.4 The `staging` environment needs nothing new
 
-**`FEATUREBASE_JWT_SECRET` (H1, decided).** The GitHub `staging` value is
-the source of truth, so nothing changes now. The first staging deploy
-overwrites staging's own value, which differed on 2026-11-23, with
-GitHub's. A wrong value only drops the user's name, email, and workspace
-from feedback posts. 9.3 checks it after the first deploy. Production gets
-the same source-of-truth value in 5.3, since both use one Featurebase
-organization.
+`staging.yaml`'s deploy job reads the same six kinds of name from the
+GitHub `staging` environment: `SUPABASE_ACCESS_TOKEN`,
+`STAGING_DB_PASSWORD`, `STAGING_PROJECT_ID`, `VERCEL_TOKEN`,
+`VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID`. All six exist today, so there is
+nothing to add. The other names in that environment belong to the test
+jobs, which use `environment: staging` too: leave them as they are.
 
-### 5.5 Value rules the configuration check enforces
+**Where:** the cutover terminal. This lists, from the names `staging`
+holds, only the six the deploy job reads. It reads names only:
 
-Nothing to run here: this is what the values you set in 5.3 and 5.4 must
-look like. The deploy job's "Check the production configuration" step (and
-"Check the staging configuration", with `STAGING_` in place of
-`PRODUCTION_`) stops the run before anything is written when a rule fails:
+```bash
+gh secret list --env staging --json name -q '.[].name' \
+  | grep -xE 'SUPABASE_ACCESS_TOKEN|STAGING_DB_PASSWORD|STAGING_PROJECT_ID|VERCEL_TOKEN|VERCEL_ORG_ID|VERCEL_PROJECT_ID' | sort
+```
+
+**Expect:** the six names above, one per line.
+**If not:** a missing name was deleted since 2026-11-24: set it with
+`gh secret set <NAME> --env staging` and paste the value at its prompt
+(**CHANGES GITHUB SETTINGS**).
+
+### 5.5 What the two deploy checks enforce
+
+Nothing to run here. Each deploy job runs two checks before it writes
+anything. When either one fails, the job stops there: the database, the
+edge functions, and the Vercel deployment stay as they were. Both print
+names and fixed sentences only, never a value, because the Actions logs
+are public.
+
+**1. "Check the production configuration"** (on staging, "Check the
+staging configuration", with `STAGING_` in place of `PRODUCTION_`). It
+looks at the six GitHub names from 5.3 and 5.4:
 
 | Rule | Applies to |
 | --- | --- |
-| Not empty | The 23 required names. `SUPABASE_DB_PASSWORD` and `SUPABASE_PROJECT_ID` are read from `PRODUCTION_DB_PASSWORD` and `PRODUCTION_PROJECT_ID` |
-| Not only whitespace, no leading or trailing whitespace, no carriage return | The 23, and `GEOAPIFY_API_KEY` when set |
-| No single quote and no line break | Every value written into the edge function secrets file: the two keys, the URL, the Google, Polar, Upstash, Resend, OpenAI, OpenRouter, Featurebase, and pipeline server values, and `GEOAPIFY_API_KEY` |
-| Exactly `https://<PRODUCTION_PROJECT_ID>.supabase.co` | `PRODUCTION_SUPABASE_URL` |
-| Starts `sb_publishable_`, then only letters, digits, `_`, `-` | `PRODUCTION_SB_PUBLISHABLE_KEY` |
-| Starts `sb_secret_`, then only letters, digits, `_`, `-`. A masked copy fails | `PRODUCTION_SB_SECRET_KEY` |
+| Not empty | All six. `SUPABASE_DB_PASSWORD` and `SUPABASE_PROJECT_ID` in the message are read from `PRODUCTION_DB_PASSWORD` and `PRODUCTION_PROJECT_ID` |
+| Not only whitespace, no leading or trailing whitespace, no carriage return | All six |
 | Starts `team_`, then only letters and digits | `VERCEL_ORG_ID` |
 
-Put no quotes around any value, and paste values without a trailing space
-or line break.
+**2. "Check the Vercel build environment".** It runs after "Pull the
+Vercel production environment" (on staging, the environment named
+`staging`) and looks at the variables Vercel returned for the build. It
+refuses the build in four cases:
+
+| Refuses when | Why |
+| --- | --- |
+| A variable whose name starts with `VITE_` is marked Sensitive in Vercel | The Vercel command-line tool cannot read a Sensitive value. The build would ship a placeholder in its place |
+| `VITE_SUPABASE_API_URL`, `VITE_SUPABASE_ANON_KEY`, or `VITE_APP_URL` is missing or empty | The app cannot reach its database or build its own links without them |
+| `VITE_SUPABASE_API_URL` is not `https://<project id>.supabase.co` for the project this job migrates | The app would talk to a different database than the one the job just migrated |
+| `VITE_APP_URL` is not the public address: `https://app.avandarlabs.com` on production, `https://staging.avandarlabs.com` on staging | Links and sign-in redirects would point at the wrong site |
+
+A trailing `/` and upper or lower case are ignored in both URL
+comparisons. The build itself uses the values exactly as Vercel holds
+them. 7.2 is the pre-flight that makes this check pass the first time.
 
 ### 5.6 Check the names (before 8.2 and before every release)
 
 **Where:** the cutover terminal (in 11.2, the develop terminal). This
-defines a small function, then lists, for each environment, every required
-name that GitHub does not have yet. It reads names only, never values:
+lists, for each environment, every name the deploy job needs that GitHub
+does not have, then the repository-level names that could shadow them. It
+reads names only, never values:
 
 ```bash
-check_env_names() {   # check_env_names <env> "<secrets>" "<variables>"
+check_env_names() {   # check_env_names <env> "<names the deploy job reads>"
   echo "$1, missing secrets:"; comm -23 <(tr ' ' '\n' <<<"$2" | sort) \
     <(gh secret list --env "$1" --json name -q '.[].name' | sort)
-  echo "$1, missing variables:"; comm -23 <(tr ' ' '\n' <<<"$3" | sort) \
-    <(gh variable list --env "$1" --json name -q '.[].name' | sort)
 }
-check_env_names production "AVA_PIPELINE_SERVER_SECRET AVA_PIPELINE_SERVER_URL FEATUREBASE_JWT_SECRET GEOAPIFY_API_KEY GOOGLE_CLIENT_ID GOOGLE_CLIENT_SECRET OPENAI_API_KEY OPEN_ROUTER_API_KEY POLAR_ACCESS_TOKEN PRODUCTION_DB_PASSWORD PRODUCTION_PROJECT_ID PRODUCTION_SB_SECRET_KEY RESEND_FULL_ACCESS_API_KEY RESEND_SENDING_API_KEY SUPABASE_ACCESS_TOKEN UPSTASH_REDIS_API_URL UPSTASH_REDIS_REST_API_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID VERCEL_TOKEN VITE_GOOGLE_PICKER_API_KEY" \
-  "PRODUCTION_SB_PUBLISHABLE_KEY PRODUCTION_SUPABASE_URL VITE_GOOGLE_PICKER_APP_ID"
-check_env_names staging "AVA_PIPELINE_SERVER_SECRET AVA_PIPELINE_SERVER_URL FEATUREBASE_JWT_SECRET GEOAPIFY_API_KEY GOOGLE_CLIENT_ID GOOGLE_CLIENT_SECRET GOOGLE_REDIRECT_URI OPENAI_API_KEY OPEN_ROUTER_API_KEY POLAR_ACCESS_TOKEN RESEND_FULL_ACCESS_API_KEY RESEND_LOCAL_TEST_SEGMENT_ID RESEND_SENDING_API_KEY STAGING_DB_PASSWORD STAGING_PROJECT_ID STAGING_SB_SECRET_KEY SUPABASE_ACCESS_TOKEN UPSTASH_REDIS_API_URL UPSTASH_REDIS_REST_API_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID VERCEL_TOKEN VITE_GOOGLE_PICKER_API_KEY" \
-  "STAGING_SB_PUBLISHABLE_KEY STAGING_SUPABASE_URL VITE_GOOGLE_PICKER_APP_ID"
+check_env_names production "PRODUCTION_DB_PASSWORD PRODUCTION_PROJECT_ID SUPABASE_ACCESS_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID VERCEL_TOKEN"
+check_env_names staging "STAGING_DB_PASSWORD STAGING_PROJECT_ID SUPABASE_ACCESS_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID VERCEL_TOKEN"
 echo "Repository secrets:"; gh secret list --json name -q '.[].name'
 echo "Repository variables:"; gh variable list --json name -q '.[].name'
 ```
 
-**Expect:** nothing under any "missing" line. Only
+**Expect:** nothing under either "missing secrets" line. Only
 `CLAUDE_CODE_OAUTH_TOKEN` under "Repository secrets", and nothing under
 "Repository variables" (true on 2026-11-20). Then check organization
 secrets in the browser: GitHub > the repository's **Settings** >
 **Secrets and variables** > **Actions** shows none under **Organization
 secrets**.
 **If not:** set each missing name as 5.3 or 5.4 shows. Delete any
-repository or organization value that shares a name with an environment
-value (same page, the trash icon next to it, **CHANGES GITHUB SETTINGS**).
+repository or organization value that shares a name with one of these
+environment values (same page, the trash icon next to it, **CHANGES
+GITHUB SETTINGS**).
 
-### 5.7 What happens when a name is missing
+### 5.7 What happens when a check fails
 
-The first deploy of each environment stops at its configuration check,
-before anything is written, until every name exists. The message names
-each problem, such as `VERCEL_TOKEN is empty in the production
-environment.` Fix the name (5.3 or 5.4), then re-run the failed jobs of
-that run: `gh run rerun "$STAGING_RUN_ID" --failed` for staging, in the
-cutover terminal where 9.1 set `STAGING_RUN_ID`, or
-`gh run rerun "$RUN_ID" --failed` for production, in the develop terminal
-where 11.5 set `RUN_ID`.
+The deploy stops before anything is written, and the step's message says
+why:
+
+| Stops at | What it means | Do |
+| --- | --- | --- |
+| Check the production configuration (or staging) | A GitHub name is missing or malformed, for example `VERCEL_TOKEN is empty in the production environment.` Nothing was written | Fix the name in GitHub (5.3 or 5.4), then re-run the failed jobs |
+| Check the Vercel build environment | A Vercel variable problem: a Sensitive `VITE_` variable, a missing value, or a URL for the wrong project or site. Nothing was written | Fix the variable in Vercel (7.2), then re-run the failed jobs. GitHub needs no change |
+
+To re-run the failed jobs of that run: `gh run rerun "$STAGING_RUN_ID"
+--failed` for staging, in the cutover terminal where 9.1 set
+`STAGING_RUN_ID`, or `gh run rerun "$RUN_ID" --failed` for production, in
+the develop terminal where 11.5 set `RUN_ID`. A re-run pulls the Vercel
+environment again, so it sees a fix made in Vercel.
 
 ## 6. Third parties
 
-These steps collect values 5.3 needs and check each outside service
-points at the right project. Do 6.2, 6.3, and 6.4 before 5.3's loop.
+These steps check that each outside service points at the right project,
+and set the three edge function secrets both Supabase projects are missing
+(6.6). None of them changes GitHub: CI does not read these values.
 
 ### 6.1 Production API keys
 
-**Where:** the cutover terminal. This is the same check as in 5.3: it
-lists production's API keys by name and type only.
+**Where:** the cutover terminal. The catalog's Parquet copy (9.6 and 12)
+reads each project's new-style secret key with the CLI, so production must
+have one. This lists production's API keys by name and type only, never a
+key.
 
 ```bash
 supabase projects api-keys --project-ref "$PROD_REF" -o json | jq -r '.[] | [.name, .type] | @tsv'
@@ -1266,89 +1189,87 @@ existing one.
 
 ### 6.2 Google OAuth redirect URI
 
-**Where:** the cutover terminal, then the Google Cloud console. This prints
-the redirect URI production's deploy will use:
+Each Supabase project holds its own `GOOGLE_REDIRECT_URI` edge function
+secret, set by hand, and CI does not change it. Google accepts a sign-in
+only when that URI is listed on the project's OAuth client. Both
+projects' callbacks have this shape:
+`https://<project ref>.supabase.co/functions/v1/google-auth-callback`.
+
+**Where:** the cutover terminal, then the Google Cloud console. First,
+this prints production's callback URI, then compares the digest of
+production's `GOOGLE_REDIRECT_URI` with the digest of that URI. Both
+lines only read, and no value is printed:
 
 ```bash
 echo "https://$PROD_REF.supabase.co/functions/v1/google-auth-callback"
+supabase secrets list --project-ref "$PROD_REF" -o json \
+  | jq -r '.[] | select(.name=="GOOGLE_REDIRECT_URI") | .value'
+printf '%s' "https://$PROD_REF.supabase.co/functions/v1/google-auth-callback" | shasum -a 256 | cut -d' ' -f1
 ```
+
+**Expect:** the URI, then two identical 64-character digests.
+**Verify:** the digest is the SHA-256 of the value in hex, so a mismatch
+may also mean `secrets list` computes it differently. A mismatch, or no
+first digest, means production's secret holds another URI (or none):
+check it before the release, since it was set by hand and nothing in
+this runbook changes it.
 
 Then, in the browser: Google Cloud console > pick the project that holds
 production's OAuth client (the project picker at the top) > **APIs &
 Services** > **Credentials** > under **OAuth 2.0 Client IDs**, click the
 production client > **Authorized redirect URIs** must contain the URI
-printed above. `production.yaml` sets exactly this as
-`GOOGLE_REDIRECT_URI`. If it is missing: **Add URI**, paste it, **Save**.
-**CHANGES GOOGLE CLOUD CONSOLE**.
+printed above. If it is missing: **Add URI**, paste it, **Save**.
+**CHANGES GOOGLE CLOUD CONSOLE**. Which client is production's: the one
+whose client ID production uses today. If your password manager does not
+say, the client's name in the list usually does (**verify** before you
+rely on a name).
 
-**Where to get `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`.** Both come
-from that same client page:
-
-- The client ID is shown on the page, always. Shape: digits, a `-`, a
-  string, then `.apps.googleusercontent.com`. Which client is
-  production's: the one whose ID production uses today. If your password
-  manager does not say, the client's name in the list usually does
-  (**verify** before you rely on a name).
-- The client secret: look in your password manager first. Shape: starts
-  `GOCSPX-`. Google may no longer display an existing client secret
-  (**verify** on the page). If it does not and the password manager does not
-  have it, click **Add secret** on the client page and copy the new one at
-  once, since Google shows it only then. **CHANGES GOOGLE CLOUD CONSOLE**.
-  A new secret does not disable the old one, so production's current
-  Google connection keeps working until the release replaces the value.
-  Disable the old secret only after 13 passes.
-
-Staging too: every staging deploy sets staging's `GOOGLE_REDIRECT_URI` to
-staging's own callback, so check staging's OAuth client the same way. This
-prints staging's URI:
+Staging too. This prints staging's callback URI and the same two digests
+for staging:
 
 ```bash
 echo "https://$STAGING_REF.supabase.co/functions/v1/google-auth-callback"
+supabase secrets list --project-ref "$STAGING_REF" -o json \
+  | jq -r '.[] | select(.name=="GOOGLE_REDIRECT_URI") | .value'
+printf '%s' "https://$STAGING_REF.supabase.co/functions/v1/google-auth-callback" | shasum -a 256 | cut -d' ' -f1
 ```
 
-Same Google Cloud console page > the OAuth client whose ID is the staging
-`GOOGLE_CLIENT_ID` > **Authorized redirect URIs** must contain the URI
-printed above. `staging.yaml` writes
-`<STAGING_SUPABASE_URL>/functions/v1/google-auth-callback` on every
-deploy. If it is missing: **Add URI**, paste it, **Save**. **CHANGES GOOGLE
-CLOUD CONSOLE**.
+Same Google Cloud console page > the OAuth client staging uses >
+**Authorized redirect URIs** must contain the URI printed above. If it is
+missing: **Add URI**, paste it, **Save**. **CHANGES GOOGLE CLOUD
+CONSOLE**.
 
 ### 6.3 Polar
 
-**Where:** the Polar dashboard, in the **production** organization (not
-the sandbox: the sandbox is a separate site, `sandbox.polar.sh`). **CHANGES
-POLAR.**
-
-1. Go to **Settings** > **Developers** (the labels may read slightly
-   differently) and create a new organization access token. Give it a name
-   such as `github-production` and the scopes the app needs (**verify**
-   with the existing staging token's scopes, if you have them noted).
-2. Copy the token at once: Polar shows it only once. Shape: starts
-   `polar_`. Save it in your password manager.
-3. It goes into GitHub as `POLAR_ACCESS_TOKEN` through 5.3's loop.
-
-A new token does not disable any existing one. `production.yaml` sets
-`POLAR_SERVER_TYPE=production`. Staging keeps `sandbox`.
+Nothing to do. Production's Polar token and `POLAR_SERVER_TYPE` are edge
+function secrets set by hand on the production project, and CI does not
+change them, so no new Polar token is needed for this cutover.
 
 ### 6.4 Pipeline server (before the release)
 
-The server must be running before the release. If it is not, follow [the
-pipeline server runbook](pipeline-server-fly-runbook.md) first.
+The server must be running, and production must point at it, before the
+release. If it is not running, follow [the pipeline server
+runbook](pipeline-server-fly-runbook.md) first. Production points at it
+through two edge function secrets, `AVA_PIPELINE_SERVER_URL` and
+`AVA_PIPELINE_SERVER_SECRET`, which neither project has today. 6.6 sets
+them by hand on both projects. Without them, the open data catalog's copy
+builds stay turned off, and everything else works.
 
-**Where to get its URL and secret.**
+**Where to get its URL and secret.** Both projects use the same server,
+so the same two values.
 
 - `AVA_PIPELINE_SERVER_URL`: `https://<app name>.fly.dev`, with no path and
   no trailing `/`. The app name is `FLY_APP_NAME` in your local
   `.env.pipeline-server.prod` file (step 2 of the pipeline server runbook),
-  and `fly apps list` lists it too. It is not a password, but it stays a
-  secret because a public repository should not publish the hostname.
+  and `fly apps list` lists it too. It is not a password, but it stays out
+  of the repository and its logs, because a public repository should not
+  publish the hostname.
 - `AVA_PIPELINE_SERVER_SECRET`: the value made with `openssl rand -hex 32`
   in step 5 of the pipeline server runbook (64 hexadecimal characters),
   saved in your password manager then. Fly never shows a secret again. If
   it is lost, generating a new one means setting it on the server (`fly
-  secrets set`, which restarts it) and in both GitHub environments: the old
-  value stops working for staging at once, until staging redeploys. Avoid
-  this unless it is truly lost.
+  secrets set`, which restarts it) and again on both Supabase projects
+  (6.6). Avoid this unless it is truly lost.
 
 **Where:** the cutover terminal. Check that the server answers. Paste the
 first line alone, paste the URL at its prompt and press Enter (nothing is
@@ -1366,12 +1287,8 @@ URL is wrong: check the URL, then fix the server with its runbook. The
 release must not start until it answers.
 
 The server keeps no Supabase credentials: each request names the project
-to load into. Production is pointed at it by its URL and secret, stored as
-`AVA_PIPELINE_SERVER_URL` and `AVA_PIPELINE_SERVER_SECRET` in the GitHub
-`production` environment (5.3) before the release. The first production
-deploy then writes them to production's edge secrets. Neither staging nor
-production has them today. That runbook's "set by hand" production step is
-now done by every `production.yaml` run.
+to load into. That runbook's "set by hand" production step is 6.6 of this
+runbook.
 
 ### 6.5 Production has no Supabase Git integration or Branching
 
@@ -1398,6 +1315,128 @@ integration.
 create branches, outside `staging.yaml`. Disconnecting it is **CHANGES
 STAGING CONFIGURATION**, and only you make that change.
 
+### 6.6 Set the missing edge function secrets by hand
+
+Three edge function secrets the new code reads are on neither Supabase
+project today (names checked on 2026-11-24). CI does not set edge function
+secrets, so you set them by hand, on each project:
+
+| Name | Needed for | Without it |
+| --- | --- | --- |
+| `GEOAPIFY_API_KEY` | Address search (the `geocode` function) | Address search answers 503, `Address search is not configured` |
+| `AVA_PIPELINE_SERVER_URL` | The open data catalog's copy builds | Copy builds stay turned off. Nothing else is affected |
+| `AVA_PIPELINE_SERVER_SECRET` | The same copy builds | The same |
+
+**When:** on staging before the promotion (8.5), on production before the
+release (11.4). Doing either earlier is safe: it adds configuration only,
+changes no data, and the functions production runs today (`v0.14.1`) do
+not read these names. Every other secret either project needs already
+exists there, and stays as it is.
+
+**Where to get each value.**
+
+- `GEOAPIFY_API_KEY`: your password manager first. Otherwise
+  `myprojects.geoapify.com` > your project > **API Keys**. Shape: a
+  32-character string. Always visible there. The same key can serve both
+  projects.
+- `AVA_PIPELINE_SERVER_URL` and `AVA_PIPELINE_SERVER_SECRET`: 6.4 says
+  where. The same two values go on both projects.
+
+**Where:** the cutover terminal for staging. For production, the cutover
+terminal or the develop terminal, whichever you are in, as long as it had
+2.4 setup part 1. First paste this block. It only defines a function,
+`set_edge_secrets`, and runs nothing:
+
+```bash
+# set_edge_secrets <project ref>: asks for each value without showing it,
+# writes NAME='value' lines into a private file (mode 600) under
+# $CUTOVER_DIR, sets them on that one project, and deletes the file, even
+# when stopped with Ctrl-C. Enter alone skips a name and leaves it as it is
+# on the project. A value with a single quote, a line break, or a leading
+# or trailing space is refused, and then nothing is set. No value reaches
+# the command line or the shell history. Works in bash and zsh.
+set_edge_secrets() (
+  ref="$1"
+  file="$CUTOVER_DIR/edge-secrets-$ref.env"
+  if [[ -z "$ref" || ! -d "$CUTOVER_DIR" ]]; then
+    echo "Paste 2.4 setup part 1 first. Nothing was set." >&2
+    exit 1
+  fi
+  trap 'rm -f "$file"' EXIT
+  trap 'rm -f "$file"; exit 130' INT TERM HUP
+  umask 077
+  : > "$file" || exit 1
+  for name in GEOAPIFY_API_KEY AVA_PIPELINE_SERVER_URL AVA_PIPELINE_SERVER_SECRET; do
+    printf '%s for %s (Enter alone skips it): ' "$name" "$ref"
+    IFS= read -rs value
+    echo
+    if [[ -z "$value" ]]; then
+      echo "  skipped: $name stays as it is on the project"
+      continue
+    fi
+    if [[ "$value" == *"'"* || "$value" == *$'\n'* || "$value" == *$'\r'* ||
+      "$value" == [[:space:]]* || "$value" == *[[:space:]] ]]; then
+      echo "$name has a single quote, a line break, or a leading or trailing space. Nothing was set." >&2
+      exit 1
+    fi
+    if [[ "$name" == AVA_PIPELINE_SERVER_URL && ("$value" != https://* || "$value" == */) ]]; then
+      echo "AVA_PIPELINE_SERVER_URL must start with https:// and have no trailing /. Nothing was set." >&2
+      exit 1
+    fi
+    printf "%s='%s'\n" "$name" "$value" >> "$file"
+  done
+  if [[ ! -s "$file" ]]; then
+    echo "No value given. Nothing was set."
+    exit 0
+  fi
+  supabase secrets set --project-ref "$ref" --env-file "$file"
+)
+```
+
+Why single quotes: the CLI reads the file as a `.env` file, where an
+unquoted value ends at a `#`. Inside single quotes every character is kept
+as it is, which is why a value that itself holds a single quote is
+refused.
+
+**Staging. CHANGES STAGING CONFIGURATION.** Paste this line, then answer
+the three prompts: paste each value and press Enter (nothing is shown):
+
+```bash
+set_edge_secrets "$STAGING_REF"
+```
+
+**Production. WRITES TO PRODUCTION** (configuration, no data). The same,
+with production's ref:
+
+```bash
+set_edge_secrets "$PROD_REF"
+```
+
+**Expect:** for each project, the three prompts, then the CLI's
+confirmation (it may read `Finished supabase secrets set.`; the wording may
+differ). The private file is already gone when the prompt comes back.
+**If not:** a refusal message means nothing was set on that project: fix
+the value in your password manager and run the line again. An error from
+the CLI also leaves the file deleted: read the error, then run the line
+again.
+
+Then check each project by name. This reads names only, never a value or
+a digest:
+
+```bash
+supabase secrets list --project-ref "$STAGING_REF" -o json | jq -r '.[].name' \
+  | grep -E '^(GEOAPIFY_API_KEY|AVA_PIPELINE_SERVER_URL|AVA_PIPELINE_SERVER_SECRET)$' | sort
+supabase secrets list --project-ref "$PROD_REF" -o json | jq -r '.[].name' \
+  | grep -E '^(GEOAPIFY_API_KEY|AVA_PIPELINE_SERVER_URL|AVA_PIPELINE_SERVER_SECRET)$' | sort
+ls "$CUTOVER_DIR"/edge-secrets-*.env 2>/dev/null || echo "no secrets files left"
+```
+
+**Expect:** the three names for each project you have done (before you
+do production, its command prints nothing), then `no secrets files left`.
+**If not:** a missing name means it was skipped or not set: run that
+project's line again. A file listed by the last command was left by an
+interrupted run: delete it with `rm -f` and the path it printed.
+
 ## 7. Vercel before the cutover
 
 **Where:** the Vercel dashboard in the browser, team `avandar`, project
@@ -1417,15 +1456,82 @@ domain. Why it matters: `staging.yaml` deploys with
 `--environment=staging`, so a domain attached to another environment would
 keep serving an old build.
 
-### 7.2 Review the `VITE_*` values of Production and of `staging`
+### 7.2 Pre-flight: the `VITE_` variables of Production and of `staging`
 
-Project `avandar` > **Settings** > **Environment Variables**. Filter the
-list to **Production**, then to `staging`. Some names do not matter here,
-because the deploy jobs drop them: `VITE_SUPABASE_API_URL`,
-`VITE_SUPABASE_ANON_KEY`, and `VITE_APP_URL` (set from GitHub), every
-value marked Sensitive, and the Google Picker pair (set from GitHub).
-Check the rest against this table, and edit a value with the **...** menu
-next to it > **Edit** > **Save** (**CHANGES VERCEL**):
+The CI build takes every build variable from Vercel and nothing from
+GitHub. It pulls the Vercel environment with the Vercel command-line tool,
+then the deploy job's "Check the Vercel build environment" step (5.5)
+stops the deploy, before anything is written, if a `VITE_` variable is
+wrong. This pre-flight is how you make that check pass the first time.
+
+**Where:** the Vercel dashboard. Project `avandar` > **Settings** >
+**Environment Variables** (**verify** the label: it may sit under
+**Settings** > **Environments** > the environment instead). Look at the
+list once for **Production** and once for the environment named
+`staging`, using the environment filter above the list (**verify** the
+filter's label). For each of the two environments, check every row of
+this table:
+
+| Check | Production | `staging` |
+| --- | --- | --- |
+| No variable whose name starts with `VITE_` is marked Sensitive | Required | Required |
+| `VITE_SUPABASE_API_URL` | Exactly production's own project URL, `https://<production ref>.supabase.co` | Exactly staging's own project URL, `https://<staging ref>.supabase.co` |
+| `VITE_SUPABASE_ANON_KEY` | Set, not empty | Set, not empty |
+| `VITE_APP_URL` | Exactly `https://app.avandarlabs.com` | Exactly `https://staging.avandarlabs.com` |
+
+A trailing `/` and upper or lower case do not matter to the check. The
+two refs are `PROD_REF` and `STAGING_REF` from 2.4 part 1, and a project
+ref is not secret: the web app's bundle carries it. In the cutover
+terminal, this prints both URLs to compare with what Vercel shows:
+
+```bash
+echo "Production: https://$PROD_REF.supabase.co"; echo "staging: https://$STAGING_REF.supabase.co"
+```
+
+**How a Sensitive variable looks, and how to fix it.** Vercel shows a
+Sensitive variable's value as hidden, with no way to reveal it, and marks
+it as Sensitive in the list (**verify** the exact marker). Vercel may not
+let you turn Sensitive off on an existing variable (**verify**: open the
+variable's **...** menu > **Edit** and look for the switch). If there is
+no switch, delete the variable (**...** > **Remove**) and add it again
+with **Add New** (**verify** the button label), with the same name, the
+same environment, and **Sensitive** off. **CHANGES VERCEL.** If the team
+has a policy that makes every new variable Sensitive (**verify**: team
+`avandar` > **Settings** > **Security & Privacy**, a setting about
+Sensitive environment variables), turn it off first, or the new variable
+comes back Sensitive.
+
+**Why this is harmless.** Vite copies the value of every `VITE_` variable
+into the JavaScript bundle it builds, and every browser that opens the app
+downloads that bundle. A `VITE_` value is therefore public by nature,
+whatever Vercel calls it. Marking it Sensitive hides it in the dashboard
+only, and it keeps the CI build from reading it at all. Never give a
+real secret a `VITE_` name.
+
+**Where to get a value you have to re-enter**, since Vercel cannot show
+you a Sensitive one:
+
+- `VITE_SUPABASE_API_URL` and `VITE_APP_URL`: the table above.
+- `VITE_SUPABASE_ANON_KEY`: Supabase dashboard > the project (**Avandar**
+  or **Avandar Staging**) > **Project Settings** > **API Keys**. Use the
+  same kind of key the environment holds today: the publishable key
+  (`sb_publishable_...`) or the legacy `anon` key (**verify** which one
+  your password manager says it is). Both are public by design.
+- `VITE_GOOGLE_PICKER_API_KEY`: Google Cloud console > the project that
+  owns that environment's OAuth client (the project picker at the top) >
+  **APIs & Services** > **Credentials** > under **API Keys**, the Picker
+  key > **Show key**. Shape: starts `AIza`, about 39 characters.
+- `VITE_GOOGLE_PICKER_APP_ID`: the Google Cloud project number of that
+  same project, shown as **Project number** on the console's project
+  dashboard. It is also the run of digits before the first `-` in the
+  OAuth client ID.
+- Any other `VITE_` variable: its value is in the bundle the site serves
+  today, and in your notes or password manager. Check the table below for
+  what it should be.
+
+Then check the other build variables against this table, and edit a value
+with the **...** menu next to it > **Edit** > **Save** (**CHANGES
+VERCEL**):
 
 | Name | What it does |
 | --- | --- |
@@ -1434,9 +1540,17 @@ next to it > **Edit** > **Save** (**CHANGES VERCEL**):
 | `VITE_HIDE_DEV_TOOLS` | `true` hides the router dev tools. Set it on Production |
 | `VITE_OFFLINE_CHAT_MOCK` | Must be unset on Production and `staging` |
 
-A `VITE_*` value marked Sensitive never reaches the build: the "Pull the
-Vercel production environment" step prints `Sensitive Vercel variables left
-out of the build:` and lists them.
+A Sensitive variable whose name does not start with `VITE_` is fine: it
+never reaches the browser bundle, so the "Pull the Vercel production
+environment" step (or the staging one) leaves it out of the build and
+prints its name under `Sensitive Vercel variables left out of the build:`.
+
+**The first staging deploy rehearses this.** If staging's deploy (9.1)
+stops at "Check the Vercel build environment", nothing was written to
+staging. The step's message names each variable it refused. Fix those in
+Vercel's `staging` environment as above, then re-run the deploy job
+(5.7). Production's check reads the Production environment, so fix the
+same thing there before the release.
 
 ### 7.3 Delete every deploy hook
 
@@ -1462,25 +1576,29 @@ label). Change a setting only if it is wrong (**CHANGES VERCEL**):
 
 ### 7.5 Make the Vercel token as narrow as Vercel allows
 
+This token is for the GitHub `production` environment only. `staging`
+already holds a Vercel token of its own, which its deploy job uses: leave
+it as it is.
+
 **Where:** the Vercel dashboard, then the cutover terminal. **CHANGES
 VERCEL**, **CHANGES GITHUB SETTINGS.**
 
 1. Vercel dashboard > your avatar (top right) > **Account Settings** >
-   **Tokens** > **Create**. Name it (for example `github-actions`), set
-   **Scope** to the `avandar` team (or to the `avandar` project, if your
+   **Tokens** > **Create**. Name it (for example `github-actions-production`),
+   set **Scope** to the `avandar` team (or to the `avandar` project, if your
    plan offers project-scoped tokens: **verify**), and pick an expiry date.
    Click **Create**.
 2. Copy the token at once: Vercel shows it only once. It is a long string
    of letters and digits. Save it in your password manager.
-3. Store it as `VERCEL_TOKEN` in both GitHub environments: production
-   through 5.3's loop, and staging with
-   `gh secret set VERCEL_TOKEN --env staging` in the cutover terminal
-   (paste the token at its prompt). With option (b) of 5.2's decision,
-   `staging` gets a token of its own instead. Either way, a token in
-   `staging` is readable by any branch's workflow (5.2).
-4. Then delete the old token, on the same **Tokens** page, once both
-   GitHub environments hold the new one. Anything else still using the old
-   token stops working when you delete it.
+3. Store it as `VERCEL_TOKEN` in the GitHub `production` environment
+   through 5.3's loop.
+4. Do not delete any existing token: staging's deploy uses the one it
+   holds. Narrowing staging's token is follow-up work (section 16, Narrow
+   the staging tokens).
+
+The token in `staging` stays readable by any branch's workflow, and it can
+deploy project `avandar` to production (5.2). Pablo accepted that for the
+cutover (K1).
 
 ## 8. Promote to `develop` (D3)
 
@@ -1647,23 +1765,32 @@ minute and run the block again. The run's steps, in order:
 | 1 | `lint-typecheck`, then `test-quick` (`test-e2e` alongside, not blocking the deploy) | No |
 | 2 | `deploy`: Refuse anything but the tip of develop | No |
 | 3 | Check the staging configuration: prints `The staging configuration is complete.` | No |
-| 4 | Pull the Vercel staging environment, Build the web app for Vercel | No |
-| 5 | Apply migrations (`supabase db push --include-all`) | Yes |
-| 6 | Set edge function secrets (overwrites staging's hand-set values, `FEATUREBASE_JWT_SECRET` among them) | Yes |
-| 7 | Deploy edge functions | Yes |
-| 8 | Deploy the prebuilt web app to Vercel (`--environment=staging`) | Yes |
+| 4 | Pull the Vercel staging environment: prints `Sensitive Vercel variables left out of the build:` and their names, or `(none)` | No |
+| 5 | Check the Vercel build environment: prints `The Vercel staging build environment is complete.` | No |
+| 6 | Build the web app for Vercel | No |
+| 7 | Apply migrations (`supabase db push --include-all`) | Yes |
+| 8 | Deploy edge functions | Yes |
+| 9 | Deploy the prebuilt web app to Vercel (`--environment=staging`) | Yes |
+
+The run never changes staging's edge function secrets: they stay as set
+by hand on the project (6.6).
 
 **Expect:** `gh run watch` ends with every job green and the run marked
 successful. `ava release` later needs the whole run, `test-e2e` (the
 end-to-end browser tests) included, to pass for the commit it releases
 (11.2).
 **If not:** open the run in the browser (GitHub > **Actions** > the run) to
-see which step failed. A failure in steps 2 to 4 left staging untouched:
-fix the cause (5.7 for a configuration message), then run
-`gh run rerun "$STAGING_RUN_ID" --failed` here. A failure in step 5 is a
-migration problem: read 11.9 about the public log first, then stop and
-raise it. A failure in steps 6 to 8: fix the cause and re-run the failed
-jobs the same way.
+see which step failed, then find it below. Re-run commands run here, in
+the cutover terminal, which holds `STAGING_RUN_ID`:
+
+| Stops at | Staging | Do |
+| --- | --- | --- |
+| 1 or 2 | Untouched | Fix the cause, then `gh run rerun "$STAGING_RUN_ID" --failed` |
+| 3, Check the staging configuration | Untouched: a GitHub name is missing or malformed, and nothing was written | Fix the name in GitHub (5.4, 5.7), then re-run the same way |
+| 5, Check the Vercel build environment | Untouched: a Vercel variable problem, and nothing was written | Fix the variable named in the message in Vercel's `staging` environment (7.2), then re-run the same way. GitHub needs no change |
+| 4 or 6, the pull or the build | Untouched | Fix the cause, then re-run the same way |
+| 7, Apply migrations | Partly migrated | A migration problem: read 11.9 about the public log first, then stop and raise it |
+| 8 or 9 | Migrated, but the functions or the app are not deployed | Fix the cause and re-run the failed jobs the same way |
 
 ### 9.2 The 10 migrations applied, and the domain serves the new build
 
@@ -1692,55 +1819,16 @@ another Vercel environment: fix it as 7.1 says.
 Local databases, and the `demo-measles` branch, that ran the slot migrations
 under their old names cannot migrate forward: reset them (section 18).
 
-### 9.3 Check `FEATUREBASE_JWT_SECRET` by digest
+### 9.3 No secrets check after the deploy
 
-`supabase secrets list` shows a digest of each value (a fingerprint
-computed from it), never the value. This compares staging's digest with
-the digest of the source-of-truth value from your password manager. The
-first command prints staging's digest. The second waits: paste the
-Featurebase JWT secret from your password manager and press Enter (nothing
-is shown), and it prints that value's digest, then forgets the value:
+Nothing to run here. CI no longer writes edge function secrets (L1), so
+there is no value to compare after the deploy, and H1's
+`FEATUREBASE_JWT_SECRET` check no longer applies.
 
-```bash
-supabase secrets list --project-ref "$STAGING_REF" -o json \
-  | jq -r '.[] | select(.name=="FEATUREBASE_JWT_SECRET") | .value'
-read -rs FEATUREBASE_VALUE && printf '%s' "$FEATUREBASE_VALUE" | shasum -a 256 | cut -d' ' -f1; unset FEATUREBASE_VALUE
-```
+### 9.4 The old `AVA_PIPELINE_SERVER_URL` variable on `staging`
 
-**Expect:** the two printed digests are the same 64-character string.
-**Verify:** the digest is the SHA-256 of the value in hex, so a mismatch
-may also mean `secrets list` computes it differently.
-**If not:** the password manager does not hold GitHub's value. Take the JWT
-secret from Featurebase's dashboard (its identity verification settings:
-**verify** the label), set it on both environments
-(`gh secret set FEATUREBASE_JWT_SECRET --env staging`, then
-`gh secret set FEATUREBASE_JWT_SECRET --env production`, pasting it at
-each prompt), save it in your password manager, and re-run the staging
-deploy job so it writes the value: GitHub > **Actions** > the staging run
-from 9.1 > the re-run menu at the top right > re-run the `deploy` job (the
-labels may read slightly differently). Its tip check refuses if `develop`
-has moved on since. **CHANGES GITHUB SETTINGS.** Only feedback posts' user
-details are affected.
-
-### 9.4 Delete the old `AVA_PIPELINE_SERVER_URL` variable on `staging`
-
-`demo.yaml` is gone from `develop`, and nothing reads the variable now.
-This block checks that no workflow on `origin/develop` still reads it, and
-only then deletes it:
-
-```bash
-git fetch origin && git rev-parse -q --verify origin/develop >/dev/null &&
-  [[ -z "$(git grep -l "vars.AVA_PIPELINE_SERVER_URL" origin/develop -- .github/workflows/)" ]] &&
-  echo "nothing reads it" &&
-  gh variable delete AVA_PIPELINE_SERVER_URL --env staging
-```
-
-**CHANGES GITHUB SETTINGS.**
-**Expect:** `nothing reads it`, then the delete's confirmation.
-**If not:** without `nothing reads it`, nothing was deleted. This shows
-which workflow still reads it:
-`git grep -n "vars.AVA_PIPELINE_SERVER_URL" origin/develop -- .github/workflows/`.
-Leave the variable until that workflow no longer does.
+Nothing to run here: leave the variable as it is. No workflow reads it
+after the promotion, and removing it is not part of this cutover.
 
 ### 9.5 Export the catalog from `demo-measles` (once, reads staging)
 
@@ -2300,9 +2388,8 @@ matches 10.1's choice (PITR on, or a scheduled backup minutes old); and no
 errors. `ls -l "$D"/prod-"$BACKUP_T"-*` shows every file non-empty, and the
 secrets file lists names and digests only.
 **If not:** a `0`, an empty file, or an error: run the block again (it
-uses a new time stamp). Keep the source of every edge function secret
-value in your password manager: `secrets list` shows digests, and the
-release overwrites the values.
+uses a new time stamp). The secrets file is a record only: the release
+does not change edge function secrets, since CI writes none (L1).
 
 ### 10.3 Verify the dump restores
 
@@ -2401,8 +2488,10 @@ git rev-parse origin/develop
 ```
 
 Then run 5.6's block here, and confirm from your notes that 5.1's reviewer
-is set, 6.4's pipeline server answers, 4.8's audit refresh is done, and
-10.1's choice is made (and PITR is on, if you chose A).
+is set, 6.4's pipeline server answers, 6.6's three edge function secrets
+are set on production (6.6's names-only check lists them), 7.2's
+pre-flight passed for the Production environment, 4.8's audit refresh is
+done, and 10.1's choice is made (and PITR is on, if you chose A).
 **Expect:** the run's `headSha` equals the commit printed on the next
 line, with `"status":"completed"` and `"conclusion":"success"`. `ava
 release` reads the same run: its verdict covers the whole run, `test-e2e`
@@ -2547,11 +2636,14 @@ When `test-quick` passes, the `deploy` job waits for your approval, and
 | 3 | Refuse anything but the tip of main | No | Nothing on success. Otherwise `main is at <sha>, this run is for <sha>. Re-run the newest main run.` |
 | 4 | Check the production configuration | No | `The production configuration is complete.` or one line per problem (5.5) |
 | 5 | Pull the Vercel production environment | No | `Sensitive Vercel variables left out of the build:` and their names, or `(none)` |
-| 6 | Build the web app for Vercel | No | The Vercel build output |
-| 7 | Apply migrations: `supabase link`, then `supabase db push --include-all` | **Yes** | One line per migration it applies, `$PROD_PENDING` of them (80 at the 2026-11-24 tip), in one push |
-| 8 | Set edge function secrets | **Yes** | The CLI's confirmation. The values are in a single-quoted file that is deleted at the end of the step |
+| 6 | Check the Vercel build environment | No | `The Vercel production build environment is complete.` or a message for each problem, naming the variable (5.5) |
+| 7 | Build the web app for Vercel | No | The Vercel build output |
+| 8 | Apply migrations: `supabase link`, then `supabase db push --include-all` | **Yes** | One line per migration it applies, `$PROD_PENDING` of them (80 at the 2026-11-24 tip), in one push |
 | 9 | Deploy edge functions | **Yes** | One line per function. Production gains `connectors`, `file-url`, and `geocode`, and possibly `_eval` (**verify** in the log) |
 | 10 | Deploy the prebuilt web app to Vercel (`--prod`) | **Yes** | The deployment URL |
+
+The job never changes production's edge function secrets: they stay as
+set by hand on the project (6.6).
 
 **First-deploy behavior.** `production.yaml` also has `workflow_dispatch`,
 but its `deploy` job runs only for `refs/heads/main`, and step 3 refuses
@@ -2566,9 +2658,11 @@ which holds `RUN_ID`:
 
 | Fails at | Production | Do |
 | --- | --- | --- |
-| Steps 1 to 6 | Untouched | Fix the cause (5.7 for a configuration message), then `gh run rerun "$RUN_ID" --failed` on the newest run. Approve again |
-| 7, Apply migrations | Partly migrated: each file applies in its own transaction, so the files before the failing one stay applied | Read 11.9 first, then 14.1, row "A migration fails midway" |
-| 8 to 10 | Migrated, but the functions or the app are not deployed: the window in 11.8 is open | Fix the cause and re-run the failed jobs of the newest run at once. The migration step is then a no-op |
+| 4, Check the production configuration | Untouched: a GitHub name is missing or malformed, and nothing was written | Fix the name in GitHub (5.3, 5.7), then `gh run rerun "$RUN_ID" --failed` on the newest run. Approve again |
+| 6, Check the Vercel build environment | Untouched: a Vercel variable problem, and nothing was written | Fix the variable named in the message in Vercel's Production environment (7.2), then re-run the same way. GitHub needs no change. Approve again |
+| Steps 1 to 3, 5, or 7 | Untouched | Fix the cause, then re-run the same way. Approve again |
+| 8, Apply migrations | Partly migrated: each file applies in its own transaction, so the files before the failing one stay applied | Read 11.9 first, then 14.1, row "A migration fails midway" |
+| 9 or 10 | Migrated, but the functions or the app are not deployed: the window in 11.8 is open | Fix the cause and re-run the failed jobs of the newest run at once. The migration step is then a no-op |
 
 ### 11.7 Check the version
 
@@ -2596,8 +2690,8 @@ app to Vercel", users with the app open run `main`'s old app against the
 migrated schema: catalog tables are renamed,
 `rpc_datasets__add_open_data_dataset` takes a new parameter, and
 `individuals.status` is gone. The app is built before the migrations, so
-the window is the migrations, the secrets, the functions, and the Vercel
-upload: expect a few minutes. Staging's run measured the last three. To
+the window is the migrations, the functions, and the Vercel upload:
+expect a few minutes. Staging's run measured all three. To
 see how long each step of staging's `deploy` job took, run this in the
 cutover terminal, where 9.1 set `STAGING_RUN_ID` (the develop terminal does
 not have it):
@@ -2964,7 +3058,7 @@ prints.
 production's or staging's, or empty): redo the three blocks with the new
 project's values. An `ERROR` rolled everything back: raise it.
 
-### 14.4 Redeploy `main`'s previous functions and secrets (**WRITES TO PRODUCTION**)
+### 14.4 Redeploy `main`'s previous functions (**WRITES TO PRODUCTION**)
 
 A database restore leaves the new functions deployed. From a checkout of
 the previous release, deploy its functions, then delete each function the
@@ -3014,21 +3108,10 @@ Instead delete only the four above, one at a time, with
 shows a `slug` field. If it does not, both lists above are wrong: delete
 by name, as just described.
 
-**Edge function secrets.** Compare the current names and digests,
-`supabase secrets list --project-ref "$PROD_REF"`, with the file 10.2
-saved, `cat "$D/prod-$BACKUP_T-edge-secrets.txt"`. A changed digest is a
-value the release overwrote. Set the old values back from your password
-manager, through a private file, never on the command line. The first line
-creates an empty file only you can read: open it in a text editor and
-write one `NAME='value'` line per secret to put back (the old value from
-your password manager, in single quotes). Then the second line sets them
-on production (**WRITES TO PRODUCTION**), and the third deletes the file:
-
-```bash
-umask 077 && touch "$CUTOVER_DIR/restore-secrets.env"   # write NAME='value' lines into it with an editor
-supabase secrets set --project-ref "$PROD_REF" --env-file "$CUTOVER_DIR/restore-secrets.env"
-rm -P "$CUTOVER_DIR/restore-secrets.env"
-```
+**Edge function secrets: nothing to restore.** The release does not change
+them, since CI writes no edge function secret (L1). The three that 6.6
+added by hand are new names that `v0.14.1`'s functions do not read, so
+leave them in place.
 
 ### 14.5 Promote the previous Vercel deployment (**CHANGES VERCEL**)
 
@@ -3156,7 +3239,7 @@ a. **Split the secrets (CHANGES GITHUB SETTINGS).** Create a GitHub environment
    named `ci` for the test jobs. Give it only the names those jobs read, and
    none of these deploy-only names: `VERCEL_TOKEN`, `VERCEL_ORG_ID`,
    `VERCEL_PROJECT_ID`, `SUPABASE_ACCESS_TOKEN`, `STAGING_DB_PASSWORD`,
-   `STAGING_PROJECT_ID`, `STAGING_SB_SECRET_KEY`. Take the test jobs' names from
+   `STAGING_PROJECT_ID`. Take the test jobs' names from
    the workflows at that time, with
    `grep -oE "(secrets|vars)\.[A-Z0-9_]+"`, not from this document.
 b. **Point the test jobs at it (code change).** In `pr-develop.yaml`,
@@ -3173,10 +3256,9 @@ d. **Narrow the tokens (CHANGES VERCEL, CHANGES GITHUB SETTINGS).** Pablo only.
    - Vercel: your avatar > **Account Settings** > **Tokens** > **Create**, with
      the narrowest **Scope** Vercel offers (**verify** the choices, because 7.5
      does not confirm that a project-scoped token exists). Store it with
-     `gh secret set VERCEL_TOKEN --env staging`. Production holds the same
-     shared token (7.5), so create another one for production with
-     `gh secret set VERCEL_TOKEN --env production`. Then delete the old token on
-     the same **Tokens** page, once both environments hold a new one.
+     `gh secret set VERCEL_TOKEN --env staging`. Then delete staging's old
+     token on the same **Tokens** page. Production already has a token of its
+     own (7.5), so it needs no change here.
    - Supabase: find the account that created staging's `SUPABASE_ACCESS_TOKEN`
      (**verify**). Personal access tokens are account-wide, so use a token from
      an account that can reach only the staging project (**verify** what the
@@ -3192,6 +3274,25 @@ e. **Check (no deploy).** Pablo starts a run from a throwaway branch whose
 
 Track this as its own issue, for example a Linear issue next to AVA-611, so it
 is not lost. It is not part of the release.
+
+### Manage every secret in GitHub (after the cutover)
+
+**The goal (Pablo, L1).** GitHub becomes the only place where Avandar's
+secrets are managed. Today they live in four places: GitHub (what the CI
+jobs need), Vercel (the web app's build variables), Fly.io (the pipeline
+server), and each Supabase project's edge function secrets.
+
+**Why it waits.** A deploy step that wrote edge function secrets from
+GitHub, and GitHub overrides of the web app's build values, were written
+and reviewed, then removed before the release to keep the cutover small.
+They are in the repository history: commit `8dd9c2d70` holds the
+production job and `50eff770a` the staging job, with the full secrets
+step.
+
+**The work.** It is its own piece of work, with its own spec and plan:
+move one secret at a time into GitHub, verify each one by digest against
+the value the service holds today, and only then make CI authoritative
+for it.
 
 ## 17. Cleanup (D6)
 
@@ -3359,7 +3460,7 @@ handled.
 | Local databases and the `demo-measles` branch | Any built before the slot migrations were renamed already ran them under their old names, and cannot migrate forward. Reset local stacks (`pnpm db:reset` on a switched stack). The branch is deleted in 17.3 |
 | Desktop app `metadata.sqlite` | Files created from `demo/measles` or `develop` before the regeneration stop with `migration history mismatch`. Delete them. The desktop app is private, at version 0.0.0 |
 | Five French `.po` entries | Came from `develop` with corrupted control characters. Out of scope for the cutover |
-| The `staging` GitHub environment | No branch policy, so any branch's workflow can read its tokens. A `develop`-only policy would break `production.yaml`'s test jobs (5.2). A3's protection covers only the database and the secrets of the `production` environment: with the shared `VERCEL_TOKEN` (7.5), any branch's workflow can run `vercel deploy --prod`, and if staging's `SUPABASE_ACCESS_TOKEN` belongs to an account that can reach `Avandar`, any branch's workflow can reach production too. Accepted for the cutover (K1, 5.2). Fixed after the cutover in section 16, Narrow the staging tokens |
+| The `staging` GitHub environment | No branch policy, so any branch's workflow can read its tokens. A `develop`-only policy would break `production.yaml`'s test jobs (5.2). A3's protection covers only the database and the secrets of the `production` environment: with staging's `VERCEL_TOKEN`, any branch's workflow can run `vercel deploy --prod`, and if staging's `SUPABASE_ACCESS_TOKEN` belongs to an account that can reach `Avandar`, any branch's workflow can reach production too. Accepted for the cutover (K1, 5.2). Fixed after the cutover in section 16, Narrow the staging tokens |
 | Environments restrict branches, not workflows | Any workflow on `main`, including one added through `develop`, can use `production` once it is on `main`. The required reviewer is the stop |
 | Test jobs on `main` | `production.yaml`'s `test-quick` and `test-e2e` read the `staging` environment's secrets. Accepted for the cutover (K1). Fixed after it in section 16, Narrow the staging tokens |
 | Catalog restore | Restores whole tables and leaves the gaps listed in 12.3. `session_replication_role` was verified on a local stack only: 9.6 C3 probes each project |
@@ -3369,7 +3470,7 @@ handled.
 | `test-e2e` | Never blocks a deploy, but it does decide the run's verdict that `ava release` reads |
 | Pull request previews | Stop with the Git integration (section 15). A CI preview job is a later choice |
 | `demo.avandarlabs.com` | Frozen at its last build until 17.2 |
-| [The pipeline server runbook](pipeline-server-fly-runbook.md) | Still says production's edge secrets are set by hand. CI sets them now |
+| Secrets live in four places (L1) | GitHub (what the CI jobs need), Vercel (the web app's build variables), Fly.io (the pipeline server), and each Supabase project's edge function secrets, set by hand. CI writes none of the edge function secrets. Making GitHub the only place is follow-up work (section 16, Manage every secret in GitHub) |
 | Public Actions logs | A failed `supabase db push` can print row data (11.9). The Vercel CLI prints the team slug, project name, and deployment URL |
 | `ava` | One global symlink: whoever last ran `pnpm build:ava-cli` decides which code `ava release` runs (11.1) |
 | `ava` output | If `ava` prints `write EPIPE` after a status line, it only means the next command stopped reading early: the status was already printed and nothing failed. |

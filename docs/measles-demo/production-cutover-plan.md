@@ -6,8 +6,8 @@ which serves `app.avandarlabs.com`. Written 2026-11-23. It replaces
 [2026-11-23-production-cutover.md](../superpowers/plans/2026-11-23-production-cutover.md).
 
 **Status:** approved by Pablo on 2026-11-23. Nothing in this document has
-been executed yet. Pablo answered D1 to D7 and E1 the same day (section 2).
-No decision is open.
+been executed yet. Pablo answered D1 to D7 and E1 the same day, and K1 and
+L1 on 2026-11-24 (section 2). No decision is open.
 
 ## 1. The decision
 
@@ -44,8 +44,13 @@ review gets a public post-commit review.
 | E1 | How CI addresses the staging site in Vercel | **The Vercel environment named `staging`.** It already exists, with staging's variables pointing at the staging Supabase project. |
 | A2 | Does `ava release --yes` proceed on a non-passing CI verdict | **No: it stops.** Overriding takes `--skip-ci-check`. Chosen because `main` now deploys production. |
 | A3 | When the GitHub `production` environment is protected | **Before any production secret is added:** a deployment branch policy allowing only `main`, and a required reviewer. |
-| H1 | Which `FEATUREBASE_JWT_SECRET` value is authoritative for staging | **The GitHub `staging` environment's value.** The first staging deploy overwrites staging's own value with it. |
+| H1 | Which `FEATUREBASE_JWT_SECRET` value is authoritative for staging | **The GitHub `staging` environment's value.** The first staging deploy overwrites staging's own value with it. Superseded by L1: CI no longer writes edge function secrets, so staging's value is not overwritten. |
 | K1 | The staging environment's tokens can be read by any branch's workflow and reach production | **Accept it for the cutover, and narrow the staging tokens after the full cutover.** The runbook's section 16 holds the work. |
+| L1 | How much of secrets management moves to GitHub in this cutover | **None.** CI deploys the web app to Vercel in place of the Git integration, and that is all. Secrets stay where they are (GitHub, Vercel, Fly.io, Supabase edge function secrets). GitHub as the only place for secrets is follow-up work. |
+
+L1 (Pablo, 2026-11-24) narrows how D2 is carried out in this cutover: CI
+takes over deploying, while the secrets and build variables stay managed
+where they are today.
 
 Carried over from the alpha plan, still true:
 
@@ -258,19 +263,20 @@ integration is removed.
 | --- | --- | --- | --- |
 | Supabase CLI | 2.114.0 | 2.98.2 | 2.114.0. 2.98.2 resolves import maps in random order and can break an edge function bundle. |
 | Migrations | `db push --include-all` | Staging `--include-all`, production plain | `db push --include-all` |
-| Edge function secrets | Written by CI | Set by hand | Written by CI from the GitHub environment, in a single-quoted file |
+| Edge function secrets | Written by CI | Set by hand | Set by hand, unchanged. CI does not write them (L1) |
 | Edge functions | Deployed by CI | Deployed by CI | Unchanged. Production gains 4 functions. |
-| Web app | Vercel CLI from CI | Vercel's Git integration, at push | Vercel CLI from CI, after the migrations |
-| Order | Migrate, secrets, functions, app | App at push, migrations about 25 minutes later | Check the configuration, build, migrate, secrets, functions, app |
+| Web app | Vercel CLI from CI | Vercel's Git integration, at push | Vercel CLI from CI, built with the Vercel environment's own variables, deployed after the migrations |
+| Order | Migrate, secrets, functions, app | App at push, migrations about 25 minutes later | Check the configuration, pull the Vercel environment, check the build environment, build, migrate, functions, app |
 | Plugin bundle check | None | None | `pnpm check:plugin-bundle` in the quick gate |
 
 Both deploy jobs come from the job written and reviewed for `alpha.yaml`: the
 refusal to deploy anything but the branch tip, the configuration check, the
-build before any write, credentials scoped to the step that needs them, the
-single-quoted secrets file, and a concurrency group that never cancels a
-running deploy. `production.yaml` targets `main` and the `production`
-environment. `staging.yaml` targets `develop` and the `staging` environment.
-The job is written out twice. Folding the two into one reusable workflow is
+build before any write, credentials scoped to the step that needs them, and
+a concurrency group that never cancels a running deploy. Its step that
+wrote edge function secrets was removed before the release (L1).
+`production.yaml` targets `main` and the `production` environment.
+`staging.yaml` targets `develop` and the `staging` environment. The job is
+written out twice. Folding the two into one reusable workflow is
 a later cleanup, not something to do right before a release.
 
 **Removing the Git integration**, in this order:
@@ -287,31 +293,38 @@ branch. A CI preview job can be added later.
 
 Staging deploys to the Vercel environment named `staging`, which already
 exists with staging's variables (E1). Production deploys to Vercel's
-production target. The three values the build takes from GitHub
-(`VITE_SUPABASE_API_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_APP_URL`) are
-dropped from what Vercel returns, on staging as on production, so one source
-decides which database a build points at.
+production target. The build uses only the variables `vercel pull` returns
+from that Vercel environment: GitHub overrides none of them. Before the
+build, and before anything is written, a "Check the Vercel build
+environment" step stops the deploy when a `VITE_` variable is marked
+Sensitive in Vercel (the CLI cannot read it), when `VITE_SUPABASE_API_URL`,
+`VITE_SUPABASE_ANON_KEY`, or `VITE_APP_URL` is missing or empty, when
+`VITE_SUPABASE_API_URL` is not the URL of the project the job migrates, or
+when `VITE_APP_URL` is not the environment's public address.
 
 What Pablo adds, once:
 
 | Where | Names |
 | --- | --- |
-| GitHub `production` environment | About 20: the Supabase keys and URL, the Vercel token and IDs, and every edge function secret. It holds 3 today. |
-| GitHub `staging` environment | 3: `STAGING_SUPABASE_URL`, `STAGING_SB_PUBLISHABLE_KEY`, `STAGING_SB_SECRET_KEY`. It already holds the rest. |
-| Both environments | `AVA_PIPELINE_SERVER_URL` moves from a variable to a secret. A private hostname does not belong in a public repository's variables. |
-| Vercel build variables | `VITE_AVA_DATA_AGENT`. `on` enables the data agent for every user. |
+| GitHub `production` environment | 3: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`. It already holds `SUPABASE_ACCESS_TOKEN`, `PRODUCTION_DB_PASSWORD`, and `PRODUCTION_PROJECT_ID`. |
+| GitHub `staging` environment | Nothing. It already holds all six names its deploy job reads. |
+| The `AVA_PIPELINE_SERVER_URL` variable-to-secret move | Not needed: no workflow reads it. |
+| Vercel build variables, Production and `staging` | No `VITE_` variable may be marked Sensitive. `VITE_SUPABASE_API_URL`, `VITE_SUPABASE_ANON_KEY`, and `VITE_APP_URL` must be set and point at the environment's own project and address. Plus `VITE_AVA_DATA_AGENT`: `on` enables the data agent for every user. |
+| Supabase edge function secrets, by hand, on both projects | `GEOAPIFY_API_KEY`, `AVA_PIPELINE_SERVER_URL`, `AVA_PIPELINE_SERVER_SECRET`. |
 
 Three edge function secrets are on neither staging nor production today
-(names checked on 2026-11-23): `AVA_PIPELINE_SERVER_URL`,
+(names checked on 2026-11-23, again on 2026-11-24): `AVA_PIPELINE_SERVER_URL`,
 `AVA_PIPELINE_SERVER_SECRET`, and `GEOAPIFY_API_KEY`. Only the demo deploy
-ever set them. CI writes them from now on. The pipeline server must point at
-production before the release.
+ever set them. Pablo sets them by hand on both projects. Without
+`GEOAPIFY_API_KEY`, address search answers 503. Without the two pipeline
+server values, the catalog's copy builds stay off. The pipeline server must
+point at production before the release.
 
-CI will also overwrite the secrets staging has by hand. A read-only digest
-comparison on 2026-11-23 showed that the GitHub `staging` environment matches
-staging for every shared name except one: **`FEATUREBASE_JWT_SECRET`
-differs.** Pablo decides which value is right before staging's first CI
-deploy.
+CI writes no edge function secret, so the secrets each project has by hand
+stay as they are. A read-only digest comparison on 2026-11-23 found that
+staging's `FEATUREBASE_JWT_SECRET` differs from the GitHub `staging`
+environment's copy. That no longer matters to the deploy: CI does not write
+it (L1).
 
 `alpha.yaml`, `alpha-dev.yaml`, and `scripts/alpha-dev/` are deleted.
 
@@ -367,18 +380,23 @@ Stage G in order:
 
 1. Announce the freeze. Rehearse: restore a production dump into a switched
    local stack, apply the 80 migrations, open old dashboards.
-2. Set the GitHub `staging` and `production` environment values, and a
-   required reviewer on `production`.
+2. Protect the GitHub `production` environment and add the three Vercel
+   values. Run the Vercel pre-flight: no `VITE_` variable Sensitive, and the
+   Supabase URL, key, and app URL right, on Production and `staging`. Set
+   the three missing edge function secrets by hand on both Supabase
+   projects.
 3. Push the integration result to `demo/measles`. Open the PR into `develop`.
-4. Land it on `develop` (D3). `staging.yaml` gates, builds, migrates, sets
-   secrets, deploys functions, and deploys the staging app.
+4. Land it on `develop` (D3). `staging.yaml` gates, checks the Vercel build
+   environment, builds, migrates, deploys functions, and deploys the staging
+   app.
 5. Load the catalog into staging (D5). Check staging.
 6. Back up production. Run `ava release` on `develop` for `0.15.0`.
-   `production.yaml` gates, builds, waits for the reviewer, migrates, sets
-   secrets, deploys functions, and deploys the app.
+   `production.yaml` gates, waits for the reviewer, checks the Vercel build
+   environment, builds, migrates, deploys functions, and deploys the app.
 7. Load the catalog into production. Smoke test.
 8. Disconnect the Git integration in Vercel.
-9. Start the privacy fix (AVA-611) and narrow the staging tokens (K1). When
+9. Start the privacy fix (AVA-611), narrow the staging tokens (K1), and
+   plan the secrets follow-up (L1). When
    Pablo is ready, he pastes the runbook's prompt into a new agent session,
    which publishes the review
    backlog (D7). Clean up seven days after the smoke test (D6).
