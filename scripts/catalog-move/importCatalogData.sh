@@ -753,6 +753,15 @@ restore_tables() {
 # catalog, and insert each staged row the target no longer has. A dependent
 # table's rows the replace did not delete are still there, and
 # `on conflict do nothing` keeps them as they are.
+#
+# The inserts run with `session_replication_role = replica`, which fires no
+# trigger, foreign key checks included, because some backed-up tables
+# reference each other: a kept original column in `dataset_columns`
+# references its binding in `dataset_columns__dictionary_bindings`, which
+# references the column it binds, so inserting either table first breaks a
+# foreign key. Supabase lets its `postgres` role, which is not a superuser,
+# set it. The deletes run before it, so their cascades still fire, and
+# print_restore_foreign_key_check checks the foreign keys after it.
 print_restore_sql() {
   local table columns
   echo "begin;"
@@ -765,12 +774,47 @@ print_restore_sql() {
     echo "delete from $table;"
   done < <(catalog_tables_children_first)
   echo "delete from $FACET_COUNTS_TABLE;"
+  echo "set local session_replication_role = replica;"
   while read -r table; do
     columns="$(backup_index_value header "$table")"
     echo "insert into $table ($columns) overriding system value select $columns from $RESTORE_SCHEMA.${table#public.} on conflict do nothing;"
   done < <(restore_tables)
+  echo "set local session_replication_role = origin;"
+  print_restore_foreign_key_check
   echo "drop schema $RESTORE_SCHEMA cascade;"
   echo "commit;"
+}
+
+# Prints the statement that raises, so the restore rolls back, unless every
+# row of the restored tables has the row each of its foreign keys
+# references, since the inserts ran without the foreign key checks. A key
+# with a null column references nothing, as in a `match simple` foreign key.
+print_restore_foreign_key_check() {
+  local tables
+  tables="$(restore_tables | sed "s/.*/'&'/" | paste -s -d, - | sed 's/,/, /g')"
+  cat <<SQL
+do \$foreign_keys\$
+declare
+  foreign_key record;
+  missing_keys bigint;
+begin
+  for foreign_key in
+    select * from (
+$(foreign_keys_sql)
+    ) as restored_foreign_key
+    where child = any (array[$tables])
+  loop
+    execute format(
+      'select count(*) from (select %s from %s where (%s) is not null except select %s from %s) as missing',
+      foreign_key.child_columns, foreign_key.child, foreign_key.child_columns,
+      foreign_key.parent_columns, foreign_key.parent
+    ) into missing_keys;
+    if missing_keys > 0 then
+      raise exception 'The restore left rows of % whose (%) match no row of %: % distinct values.', foreign_key.child, foreign_key.child_columns, foreign_key.parent, missing_keys;
+    end if;
+  end loop;
+end \$foreign_keys\$;
+SQL
 }
 
 print_restore_steps() {
@@ -779,7 +823,7 @@ print_restore_steps() {
   echo "To restore the backup later:"
   echo "  1. In an empty folder, copy the backup's rows into staging tables, without 'SET transaction_timeout = 0;', which Postgres before 17 rejects:"
   echo "       sed -E -e '/^SET transaction_timeout = 0;\$/d' -e 's/^COPY public\\./COPY $RESTORE_SCHEMA./' '$backup_path' > restore-rows.sql"
-  echo "  2. Beside it, write restore.sql, which empties the catalog and puts back every backed-up row the target no longer has, in one transaction:"
+  echo "  2. Beside it, write restore.sql, which empties the catalog and puts back every backed-up row the target no longer has, in one transaction. It inserts with triggers and foreign key checks off, since some backed-up tables reference each other, then checks every foreign key of the restored tables:"
   print_restore_sql | sed 's/^/       /'
   # shellcheck disable=SC2016 # The variable is for the reader to fill in.
   echo "  3. Run it with psql $PSQL_VERSIONS, which PSQL_BIN names:"' with_db_url "$TARGET_DB_URL" "$PSQL_BIN" -X -P pager=off -v ON_ERROR_STOP=1 --file restore.sql'

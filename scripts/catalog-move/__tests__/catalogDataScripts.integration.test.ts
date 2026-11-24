@@ -1186,6 +1186,30 @@ describe("importCatalogData.sh --replace-existing", SHELL_TEST_OPTIONS, () => {
     );
   });
 
+  it("prints a restore that inserts with triggers off, after the deletes, and checks every foreign key before commit", () => {
+    const run = _runReplace(_confirmedReplaceArgs());
+    const lines = run.output.split("\n").map((line) => {
+      return line.trim();
+    });
+
+    const replica = lines.indexOf(
+      "set local session_replication_role = replica;",
+    );
+    const origin = lines.indexOf("set local session_replication_role = origin;");
+    const inserts = lines.flatMap((line, index) => {
+      return line.startsWith("insert into ") ? [index] : [];
+    });
+    expect(replica).toBeGreaterThan(
+      lines.indexOf("delete from public.data_catalog_facet_counts;"),
+    );
+    expect(inserts[0]).toBeGreaterThan(replica);
+    expect(origin).toBeGreaterThan(inserts[inserts.length - 1]!);
+    expect(lines.indexOf("do $foreign_keys$")).toBeGreaterThan(origin);
+    expect(lines.indexOf("commit;")).toBeGreaterThan(
+      lines.indexOf("end $foreign_keys$;"),
+    );
+  });
+
   it("reports each dependent table and the rows the cascade deletes", () => {
     const run = _runReplace(_confirmedReplaceArgs());
 

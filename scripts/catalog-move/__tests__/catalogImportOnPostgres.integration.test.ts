@@ -15,11 +15,15 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 /*
  * Runs importCatalogData.sh against a throwaway Postgres cluster on this
  * machine, to prove the real delete, cascade, Storage rewrite, and rollback
- * behaviour. It needs `initdb`, `pg_ctl`, and `pg_dump` (from
- * CATALOG_TEST_PG_BIN_DIR or a Homebrew `postgresql@*` install) and a psql
- * new enough for the import (CATALOG_TEST_PSQL or Homebrew's `libpq@18`),
- * and skips when they are missing, as in CI. The cluster listens on
- * 127.0.0.1 only and is deleted afterwards.
+ * behaviour. It needs `initdb`, `pg_ctl`, and `pg_dump` of Postgres 15 or
+ * later (from CATALOG_TEST_PG_BIN_DIR or a Homebrew `postgresql@*`
+ * install) and a psql new enough for the import (CATALOG_TEST_PSQL or
+ * Homebrew's `libpq@18`), and skips when they are missing, as in CI. The
+ * cluster listens on 127.0.0.1 only and is deleted afterwards.
+ *
+ * Its owner role is not a superuser, as Supabase's `postgres` is not, and
+ * may set `session_replication_role`, as Supabase lets `postgres` do. Postgres
+ * 15 is the first that can grant one setting to a role.
  */
 
 const SCRIPTS_DIR = resolve(__dirname, "..");
@@ -80,6 +84,13 @@ create table public.dataset_columns (
   dataset_id uuid not null references public.datasets (id) on delete cascade,
   name text not null
 );
+create table public.dataset_columns__dictionary_bindings (
+  id uuid primary key,
+  dataset_id uuid not null references public.datasets (id) on delete cascade,
+  dataset_column_id uuid not null unique references public.dataset_columns (id) on delete cascade
+);
+alter table public.dataset_columns add column dictionary_binding_id uuid
+  references public.dataset_columns__dictionary_bindings (id) on delete cascade;
 create table public.datasets__open_data (
   id uuid primary key,
   dataset_id uuid not null unique references public.datasets (id) on delete cascade,
@@ -107,7 +118,8 @@ truncate public.data_catalog_drives, public.data_catalog_listings,
   public.data_catalog_listings__relation_columns, public.pipeline_executions,
   public.pipeline_execution_scopes, public.pipeline_scope_checkpoints,
   public.data_catalog_facet_counts, public.datasets__open_data, public.datasets,
-  public.dataset_columns, public.workspace_memberships, public.workspaces, auth.users;
+  public.dataset_columns, public.dataset_columns__dictionary_bindings,
+  public.workspace_memberships, public.workspaces, auth.users;
 insert into public.data_catalog_drives values ('d0000000-0000-0000-0000-000000000001', 'wdi');
 insert into public.data_catalog_listings (id, display_name, drive_id)
 select ('a0000000-0000-0000-0000-00000000000' || n)::uuid, 'old ' || n, 'd0000000-0000-0000-0000-000000000001'
@@ -189,6 +201,7 @@ const BACKUP_TABLES = [
   "public.datasets__open_data",
   "public.datasets",
   "public.dataset_columns",
+  "public.dataset_columns__dictionary_bindings",
 ];
 
 /**
@@ -196,6 +209,35 @@ const BACKUP_TABLES = [
  * rows, the 4 open data datasets, and their 8 columns.
  */
 const CASCADE_ROWS = "16";
+
+/**
+ * A dictionary binding on a column of open data dataset 1, and the kept
+ * original column that belongs to it, so `dataset_columns` and
+ * `dataset_columns__dictionary_bindings` each hold a row the other's row
+ * references, as a convert binding that keeps the original values leaves
+ * them.
+ */
+const CIRCULAR_BINDING_SQL = `
+insert into public.dataset_columns__dictionary_bindings (id, dataset_id, dataset_column_id)
+select 'b1000000-0000-0000-0000-000000000001', dataset_id, id
+from public.dataset_columns
+where dataset_id = 'e0000000-0000-0000-0000-000000000001'
+order by name
+limit 1;
+insert into public.dataset_columns (id, dataset_id, name, dictionary_binding_id) values (
+  'c2000000-0000-0000-0000-000000000001',
+  'e0000000-0000-0000-0000-000000000001',
+  'column 1_original',
+  'b1000000-0000-0000-0000-000000000001'
+);
+`;
+
+/**
+ * The cascade total with CIRCULAR_BINDING_SQL's rows: CASCADE_ROWS, the kept
+ * column and the binding from their datasets, the binding again from its
+ * column, and the kept column again from its binding.
+ */
+const CIRCULAR_CASCADE_ROWS = "20";
 
 /** psql versions that know pg_dump's `\restrict`, by major version. */
 const MINIMUM_PSQL_MINOR: Record<number, number> = { 15: 14, 16: 10, 17: 6 };
@@ -217,9 +259,9 @@ function _isPsqlNewEnough(path: string): boolean {
 function _findPostgresTools(): { binDir: string; psql: string } | undefined {
   const binDir = [
     process.env.CATALOG_TEST_PG_BIN_DIR,
-    "/opt/homebrew/opt/postgresql@14/bin",
-    "/opt/homebrew/opt/postgresql@16/bin",
     "/opt/homebrew/opt/postgresql@17/bin",
+    "/opt/homebrew/opt/postgresql@16/bin",
+    "/opt/homebrew/opt/postgresql@15/bin",
   ].find((dir) => {
     return (
       dir !== undefined &&
@@ -245,8 +287,12 @@ const TOOLS = _findPostgresTools();
 let clusterDir = "";
 let port = 0;
 
-function _run(command: string, args: readonly string[]) {
-  const result = spawnSync(command, args, { encoding: "utf8" });
+function _run(
+  command: string,
+  args: readonly string[],
+  env: NodeJS.ProcessEnv = process.env,
+) {
+  const result = spawnSync(command, args, { encoding: "utf8", env });
   if (result.status !== 0) {
     throw new Error(`${command} failed: ${result.stderr}`);
   }
@@ -349,7 +395,11 @@ function _runImport(
   return { status: result.status, output: `${result.stdout}${result.stderr}` };
 }
 
-function _runReplace(dump: string, psqlBin?: string) {
+function _runReplace(
+  dump: string,
+  psqlBin?: string,
+  cascadeRows: string = CASCADE_ROWS,
+) {
   return _runImport(
     dump,
     [
@@ -358,7 +408,7 @@ function _runReplace(dump: string, psqlBin?: string) {
       "--yes-i-know-the-target",
       TARGET_ID,
       "--yes-i-know-the-cascade",
-      CASCADE_ROWS,
+      cascadeRows,
     ],
     psqlBin,
   );
@@ -512,17 +562,26 @@ describe.skipIf(TOOLS === undefined)(
         // initdb's time on a busy machine.
         "--no-sync",
       ]);
-      _run(join(TOOLS!.binDir, "pg_ctl"), [
-        "-D",
-        dataDir,
-        "-l",
-        join(clusterDir, "server.log"),
-        "-w",
-        "-o",
-        `-p ${port} -c listen_addresses=127.0.0.1 -c unix_socket_directories='' -c fsync=off -c synchronous_commit=off -c full_page_writes=off`,
-        "start",
-      ]);
+      // Postgres 17 on macOS refuses to start without a valid LC_ALL.
+      _run(
+        join(TOOLS!.binDir, "pg_ctl"),
+        [
+          "-D",
+          dataDir,
+          "-l",
+          join(clusterDir, "server.log"),
+          "-w",
+          "-o",
+          `-p ${port} -c listen_addresses=127.0.0.1 -c unix_socket_directories='' -c fsync=off -c synchronous_commit=off -c full_page_writes=off`,
+          "start",
+        ],
+        { ...process.env, LC_ALL: "C" },
+      );
       _query(`create role ${OWNER} login nosuperuser`, "postgres");
+      _query(
+        `grant set on parameter session_replication_role to ${OWNER}`,
+        "postgres",
+      );
       _query(`alter database postgres owner to ${OWNER}`, "postgres");
       _query(`alter schema public owner to ${OWNER}`, "postgres");
       _query(SCHEMA_SQL);
@@ -678,6 +737,41 @@ describe.skipIf(TOOLS === undefined)(
       _runPrintedRestore(run.output);
 
       expect(_targetCounts()).toBe(SEED_COUNTS);
+    });
+
+    it("rolls the printed restore back when a restored dataset's workspace is gone", () => {
+      const run = _runReplace(CATALOG_DUMP);
+      expect(run.status, run.output).toBe(0);
+      const countsAfterReplace = _targetCounts();
+      _query(
+        "delete from public.workspaces where id = '70000000-0000-0000-0000-000000000001'",
+      );
+
+      expect(() => {
+        _runPrintedRestore(run.output);
+      }).toThrow(
+        "The restore left rows of public.datasets whose (workspace_id) match no row of public.workspaces: 1 distinct values.",
+      );
+      expect(_targetCounts()).toBe(countsAfterReplace);
+    });
+
+    it("restores columns and dictionary bindings that reference each other from the printed restore steps", () => {
+      _query(CIRCULAR_BINDING_SQL);
+      const run = _runReplace(CATALOG_DUMP, undefined, CIRCULAR_CASCADE_ROWS);
+      expect(run.status, run.output).toBe(0);
+
+      _runPrintedRestore(run.output);
+
+      expect(_targetCounts()).toBe(
+        "6 listings, 4 open data rows, 5 datasets, 11 columns, facets old:99",
+      );
+      expect(
+        _query(
+          "select binding.id || ' binds ' || bound.name || ', kept by ' || kept.name from public.dataset_columns__dictionary_bindings binding join public.dataset_columns bound on bound.id = binding.dataset_column_id join public.dataset_columns kept on kept.dictionary_binding_id = binding.id",
+        ),
+      ).toBe(
+        "b1000000-0000-0000-0000-000000000001 binds column 1, kept by column 1_original",
+      );
     });
   },
 );
