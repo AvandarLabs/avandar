@@ -3,6 +3,8 @@ import {
   createRetroReviewIssueFromFeature,
   getFeaturesFromFeatureLog,
   getFeaturesInReviewOrder,
+  getFlagWithoutValue,
+  getLeftoverDraftNames,
   getReviewTierFromSection,
 } from "./buildRetroReviewIssues";
 
@@ -63,6 +65,50 @@ Reads the local copy.
         return feature.id;
       }),
     ).toEqual(["F1", "F2"]);
+  });
+
+  it("leaves out a row whose status starts with dropped", () => {
+    const featureLog = `
+| F1 | Case statuses | not started | | |
+| F5 | ~~Rename an edge function~~ | dropped: another branch carries it | | |
+| F6 | Catalog search | merged | F1 | |
+
+## F5: Rename an edge function
+
+Renames \`external-datasets\`.
+`;
+
+    expect(
+      getFeaturesFromFeatureLog(featureLog).map((feature) => {
+        return feature.id;
+      }),
+    ).toEqual(["F1", "F6"]);
+  });
+});
+
+describe("getFlagWithoutValue", () => {
+  it.each([
+    [["--sha", "abc1234", "--out"], "--out"],
+    [["--out", "drafts", "--sha"], "--sha"],
+    [["--out", "--sha", "abc1234"], "--out"],
+  ])("finds the flag missing its value in %j", (args, flag) => {
+    expect(getFlagWithoutValue(args)).toBe(flag);
+  });
+
+  it("finds nothing when every flag has a value or is absent", () => {
+    expect(getFlagWithoutValue(["--sha", "abc1234"])).toBeUndefined();
+  });
+});
+
+describe("getLeftoverDraftNames", () => {
+  it("lists the drafts and order.md an earlier run left in a folder", () => {
+    expect(
+      getLeftoverDraftNames(["F1.json", "notes.txt", "order.md", "F12.json"]),
+    ).toEqual(["F1.json", "order.md", "F12.json"]);
+  });
+
+  it("lists nothing for a folder without earlier drafts", () => {
+    expect(getLeftoverDraftNames(["notes.txt", "F1.json.bak"])).toEqual([]);
   });
 });
 

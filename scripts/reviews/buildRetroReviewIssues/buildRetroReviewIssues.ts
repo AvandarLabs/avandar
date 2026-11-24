@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { createInterface } from "node:readline/promises";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -20,7 +20,7 @@ export type RetroReviewIssue = Readonly<{
   body: string;
 }>;
 
-const FEATURE_ROW_REGEX = /^\| (F\d+) \| (.+?) \| .*\|$/;
+const FEATURE_ROW_REGEX = /^\| (F\d+) \| (.+?) \| (.*)\|$/;
 const SECTION_HEADING_REGEX = /^## (F\d+): /;
 const SECURITY_REGEX = /\b(RLS|polic(?:y|ies)|anon|security definer|grant)/i;
 const DATA_REGEX = /supabase\/(?:migrations|schemas)|\bmigration|\bsync\b/i;
@@ -32,6 +32,12 @@ const REVIEW_TIERS: readonly ReviewTier[] = ["security", "data", "ui"];
 
 /** A commit ID: 7 to 40 lowercase hexadecimal characters. */
 const COMMIT_SHA_REGEX = /^[0-9a-f]{7,40}$/;
+
+/** The flags that take a value. Each must be followed by one. */
+const VALUE_FLAGS: readonly string[] = ["--sha", "--out"];
+
+/** A file an earlier run wrote: one F<n>.json per feature, or order.md. */
+const DRAFT_FILE_NAME_REGEX = /^(?:F\d+\.json|order\.md)$/;
 
 const DEFAULT_OUT_DIR = ".temp/retro-review-issues";
 const SCRIPT_PATH =
@@ -48,7 +54,8 @@ Options:
   --sha <commit>  The commit every link in the drafts is pinned to: 7 to 40
                   lowercase hex characters. Required. Prompted for when
                   missing and a terminal is attached.
-  --out <dir>     Where to write F<n>.json per feature plus order.md.
+  --out <dir>     Where to write F<n>.json per feature plus order.md. The
+                  folder must not hold drafts from an earlier run.
                   Default: ${DEFAULT_OUT_DIR}
   -h, --help      Print this help and exit.
 
@@ -87,7 +94,9 @@ function _getSectionsById(markdown: string): ReadonlyMap<string, string> {
 /**
  * Reads every feature row of the feature log's table, with the text of the
  * feature's own section. `main` turns each one into an issue draft, so a
- * feature that has a section but no table row gets no draft.
+ * feature that has a section but no table row gets no draft. A row whose
+ * status starts with `dropped` is left out: it never shipped as that feature,
+ * so there is nothing to review under its name.
  */
 export function getFeaturesFromFeatureLog(
   markdown: string,
@@ -98,7 +107,11 @@ export function getFeaturesFromFeatureLog(
     if (match === null) {
       return [];
     }
-    const [, id = "", title = ""] = match;
+    const [, id = "", title = "", restOfRow = ""] = match;
+    const status = restOfRow.split("|")[0]?.trim() ?? "";
+    if (status.startsWith("dropped")) {
+      return [];
+    }
     return [{ id, title, section: sectionsById.get(id) ?? "" }];
   });
 }
@@ -156,6 +169,47 @@ export function createRetroReviewIssueFromFeature(
       "None recorded yet. Each finding cites a permalink at the pinned commit.",
     ].join("\n"),
   };
+}
+
+/**
+ * Finds the first value flag (`--sha` or `--out`) given with no value after
+ * it: last in the arguments, or followed by another flag. Returns undefined
+ * when every value flag present has a value.
+ */
+export function getFlagWithoutValue(
+  args: readonly string[],
+): string | undefined {
+  return args.find((arg, index) => {
+    const value = args[index + 1];
+    return (
+      VALUE_FLAGS.includes(arg) &&
+      (value === undefined || value.startsWith("-"))
+    );
+  });
+}
+
+/**
+ * Lists the files in a folder that an earlier run wrote: F<n>.json drafts
+ * and order.md. Writing over them would mix two runs' drafts in one folder.
+ */
+export function getLeftoverDraftNames(
+  fileNames: readonly string[],
+): readonly string[] {
+  return fileNames.filter((fileName) => {
+    return DRAFT_FILE_NAME_REGEX.test(fileName);
+  });
+}
+
+/** Lists a folder's file names, or none when the folder does not exist. */
+async function _getFileNamesInDir(dir: string): Promise<readonly string[]> {
+  try {
+    return await readdir(dir);
+  } catch (error: unknown) {
+    if (error instanceof Error && "code" in error && error.code === "ENOENT") {
+      return [];
+    }
+    throw error;
+  }
 }
 
 /** Colors a line for stderr, or leaves it plain when color is off. */
@@ -257,15 +311,22 @@ async function _writeDrafts(
 }
 
 /**
- * The script's entry point. It reads the feature log beside this script and
- * writes the review issue drafts that the runbook's publishing prompt later
- * turns into GitHub issues. It creates nothing on GitHub itself.
+ * Reads the commit and output folder from the flags, or from prompts on a
+ * terminal. Prints the problem and returns undefined when a flag has no
+ * value, the commit is not a commit ID, or the folder holds an earlier
+ * run's drafts.
  */
-async function _main(): Promise<number> {
-  const args = process.argv.slice(2);
-  if (args.includes("-h") || args.includes("--help")) {
-    console.log(USAGE);
-    return 0;
+async function _getRunOptions(
+  args: readonly string[],
+): Promise<Readonly<{ sha: string; outDir: string }> | undefined> {
+  const flagWithoutValue = getFlagWithoutValue(args);
+  if (flagWithoutValue !== undefined) {
+    console.error(USAGE);
+    _printError(
+      `${flagWithoutValue} needs a value.`,
+      `Put the value right after ${flagWithoutValue}, or leave the flag out.`,
+    );
+    return undefined;
   }
   const { sha, outDir = DEFAULT_OUT_DIR } = await _promptForMissingValues({
     sha: _getFlagValue(args, "--sha"),
@@ -277,8 +338,39 @@ async function _main(): Promise<number> {
       `--sha must be a commit ID, got ${JSON.stringify(sha ?? "")}.`,
       `Retry with --sha "$(git rev-parse HEAD)".`,
     );
+    return undefined;
+  }
+  const leftoverDraftNames = getLeftoverDraftNames(
+    await _getFileNamesInDir(outDir),
+  );
+  if (leftoverDraftNames.length > 0) {
+    _printError(
+      `${outDir} already holds ${leftoverDraftNames.length} files from an earlier run.`,
+      "Retry with --out <a new folder>, or delete the old F<n>.json files and order.md first.",
+    );
+    return undefined;
+  }
+  return { sha, outDir };
+}
+
+/**
+ * The script's entry point. It reads the feature log beside this script and
+ * writes the review issue drafts that the runbook's publishing prompt later
+ * turns into GitHub issues. It creates nothing on GitHub itself. Run it with
+ * `node`, not `pnpm vite-script`: vite-node hides the script's path from
+ * `process.argv`, so the entry-point check below never calls this function.
+ */
+async function _main(): Promise<number> {
+  const args = process.argv.slice(2);
+  if (args.includes("-h") || args.includes("--help")) {
+    console.log(USAGE);
+    return 0;
+  }
+  const runOptions = await _getRunOptions(args);
+  if (runOptions === undefined) {
     return 1;
   }
+  const { sha, outDir } = runOptions;
   const logPath = fileURLToPath(
     new URL(`../../../${FEATURE_LOG_PATH}`, import.meta.url),
   );
