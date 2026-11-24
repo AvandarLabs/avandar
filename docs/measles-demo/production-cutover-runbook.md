@@ -502,12 +502,29 @@ git branch -r --contains 003e2964c
 git log --oneline origin/develop..develop
 ```
 
-**Expect:** the second command's list includes `origin/feat/oxlint-phase3`, and the
-last command prints nothing. Background: `003e2964c` (`docs(lint): correct
-video producer Oxlint references`) was a docs commit that existed only on
-the first machine's local `develop`. On 2026-11-24 it is in
-`origin/feat/oxlint-phase3`, so it lands with PR #330 and needs nothing
-else.
+**Expect:** The commit is already on `origin/develop` and on the
+`origin/feat/oxlint-phase3` branch (PR #330), so nothing is stranded. The
+second command normally lists `origin/develop` and `origin/feat/oxlint-phase3`.
+Git also prints an `origin/HEAD -> origin/develop` line. That line is a
+pointer to the default branch, not a separate branch. The important check is
+the last command: an empty result means this machine's local `develop` has no
+commits that GitHub lacks.
+
+Background: `003e2964c` (`docs(lint): correct video producer Oxlint
+references`) was a docs commit that once existed only on the first machine's
+local `develop`. It is now an ancestor of `origin/develop` (`cd877216f`) and
+of the cutover branch.
+
+**If the second command prints nothing:** this clone cannot see the commit on
+any remote branch. Run `git fetch origin` again, then run
+`git cat-file -t 003e2964c`, which prints `commit` if this clone has the
+object, and `git rev-parse --short origin/develop`, which should print
+`cd877216f` or a newer commit. If the commit exists locally but no remote
+branch contains it, it exists only on this machine. It is a docs-only change
+(a comment fix in Oxlint docs), so it is safe to leave behind, or to push on
+its own branch after the promotion. The last command (empty) already shows
+that local `develop` does not hold it.
+
 **If not:** a commit listed by the last command exists only on this
 machine's `develop`. Push it on its own branch and open a PR after the
 promotion, or drop it once you are sure nothing in it is needed. Then
