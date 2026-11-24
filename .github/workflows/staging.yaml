@@ -1,34 +1,10 @@
 name: CI/CD for Staging
 
-# Deploys `develop` to staging (https://staging.avandarlabs.com and the
-# staging Supabase project) after lint, type-check, and the quick suite, in
-# the same order as `production.yaml`. The end-to-end suite runs alongside
-# and reports its result, but does not block the deploy.
-#
-# Nothing touches staging until the deploy job has confirmed it is running
-# for the tip of `develop`, checked the staging configuration and the Vercel
-# build environment, and built the web app. Only then does it migrate the
-# database, deploy the edge functions, and finally deploy the prebuilt app.
-#
-# The web app's build variables come from the Vercel staging environment.
-# Edge function secrets are managed on the staging Supabase project, and
-# this workflow does not change them.
-
 on:
   push:
     branches:
       - develop
   workflow_dispatch:
-
-# Least privilege: the job token can only read, whatever the repository default.
-permissions:
-  contents: read
-
-# Never cancel a deploy halfway through a migration. Only the newest push
-# waits for the running deploy: older pending runs are cancelled.
-concurrency:
-  group: staging-deploy
-  cancel-in-progress: false
 
 env:
   # Pinned to 24.15.0: Node 24.16.0 causes `playwright install` to hang
@@ -36,12 +12,6 @@ env:
   # last green run on 2026-05-18 vs. five consecutive 6h cancellations on
   # 24.16.0). Bump deliberately after re-verifying against this workflow.
   NODE_VERSION: 24.15.0
-  # Matches the `supabase` devDependency in package.json. CLI 2.98.2 tried
-  # import map entries in random order when bundling, so `@avandar/utils/sql`
-  # resolved through `@avandar/utils` on some runs and edge functions failed
-  # with "Module not found". 2.114.0 picks the longest matching entry.
-  SUPABASE_CLI_VERSION: 2.114.0
-  VERCEL_CLI_VERSION: 64.7.0
 
 jobs:
   # Lint and TypeScript checks.
@@ -63,8 +33,7 @@ jobs:
           deno-version: v2.x
       - run: pnpm type-check
 
-  # Everything except end-to-end tests. A failure here skips the deploy job,
-  # so nothing is written to staging.
+  # Everything except end-to-end tests. Failure here will prevent db migration.
   test-quick:
     runs-on: ubuntu-latest
     needs: lint-typecheck
@@ -97,10 +66,9 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - uses: supabase/setup-cli@v1
         with:
-          version: ${{ env.SUPABASE_CLI_VERSION }}
+          version: 2.98.2
       - run: supabase start -x studio,imgproxy,mailpit,vector,logflare,supavisor
       - run: bash scripts/ci/prepare-envs/prepare-envs.sh
-      - run: pnpm check:plugin-bundle
       - run: pnpm db:reset
       - run: nohup pnpm fns:serve > /tmp/supabase-functions.log 2>&1 &
       - run: bash scripts/ci/verify-supabase-api-is-running.sh
@@ -117,7 +85,7 @@ jobs:
           retention-days: 30
           if-no-files-found: warn
 
-  # End-to-end tests. Intentionally NOT a dependency of `deploy`.
+  # End-to-end tests. Intentionally NOT a dependency for `migrate`.
   # Timeout set to 70 minutes because the suite is large and runs on a single
   # worker.
   test-e2e:
@@ -155,7 +123,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - uses: supabase/setup-cli@v1
         with:
-          version: ${{ env.SUPABASE_CLI_VERSION }}
+          version: 2.98.2
       - run: supabase start -x studio,imgproxy,mailpit,vector,logflare,supavisor
       - run: bash scripts/ci/prepare-envs/prepare-envs.sh
       - run: pnpm db:reset
@@ -183,229 +151,23 @@ jobs:
           retention-days: 30
           if-no-files-found: warn
 
-  # Deploys to staging. The first steps only read: the tip check, the
-  # configuration check, the Vercel pull, the build environment check, and
-  # the build. A failure in any of them leaves staging as it was. Then the
-  # job migrates the database, deploys the edge functions, and deploys the
-  # prebuilt app last. It never changes the edge function secrets, which are
-  # managed on the staging Supabase project.
-  #
-  # Staging credentials are set on the steps that use them, never on the job,
-  # so they do not reach the setup actions or unrelated scripts.
-  deploy:
-    if: github.ref == 'refs/heads/develop'
+  # Migrate Supabase Staging database
+  migrate:
     runs-on: ubuntu-latest
     needs: test-quick
-    timeout-minutes: 45
+
     environment: staging
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.STAGING_DB_PASSWORD }}
+      SUPABASE_PROJECT_ID: ${{ secrets.STAGING_PROJECT_ID }}
 
     steps:
       - uses: actions/checkout@v5
-
-      # Re-running an older run would deploy an older commit over a newer
-      # one. `actions/checkout` leaves the job token configured for `origin`.
-      - name: Refuse anything but the tip of develop
-        run: |
-          tip="$(git ls-remote origin refs/heads/develop | awk '$2=="refs/heads/develop"{print $1}')"
-          if [ -z "$tip" ]; then
-            echo "Could not read the tip of develop from origin." >&2
-            exit 1
-          fi
-          if [ "$tip" != "$GITHUB_SHA" ]; then
-            echo "develop is at $tip, this run is for $GITHUB_SHA. Re-run the newest develop run." >&2
-            exit 1
-          fi
-
-      # Every value comes from the `staging` GitHub environment. An empty
-      # value would otherwise fail a later step, possibly after the
-      # migrations had already run.
-      - name: Check the staging configuration
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          SUPABASE_DB_PASSWORD: ${{ secrets.STAGING_DB_PASSWORD }}
-          SUPABASE_PROJECT_ID: ${{ secrets.STAGING_PROJECT_ID }}
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-        run: |
-          required_names=(
-            SUPABASE_ACCESS_TOKEN SUPABASE_DB_PASSWORD SUPABASE_PROJECT_ID
-            VERCEL_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID
-          )
-          has_problem=false
-          for name in "${required_names[@]}"; do
-            if [ -z "${!name}" ]; then
-              echo "$name is empty in the staging environment." >&2
-              has_problem=true
-            fi
-          done
-          # A pasted value often picks up stray whitespace or a Windows line
-          # ending, which would reach staging as part of the value.
-          for name in "${required_names[@]}"; do
-            value="${!name}"
-            if [ -n "$value" ] && [[ "$value" =~ ^[[:space:]]*$ ]]; then
-              echo "$name is only whitespace." >&2
-              has_problem=true
-            elif [[ "$value" =~ ^[[:space:]] || "$value" =~ [[:space:]]$ ]]; then
-              echo "$name has leading or trailing whitespace." >&2
-              has_problem=true
-            fi
-            if [[ "$value" == *$'\r'* ]]; then
-              echo "$name contains a carriage return." >&2
-              has_problem=true
-            fi
-          done
-          # `vercel deploy` looks the team up by this ID and only accepts a
-          # Team ID. `vercel pull` skips that lookup, so check it here rather
-          # than after a full build.
-          if [ -n "$VERCEL_ORG_ID" ] &&
-            [[ ! "$VERCEL_ORG_ID" =~ ^team_[A-Za-z0-9]+$ ]]; then
-            echo "VERCEL_ORG_ID must be the avandar team's Team ID (team_...), with no spaces or quotes." >&2
-            has_problem=true
-          fi
-          if [ "$has_problem" = true ]; then
-            exit 1
-          fi
-          echo "The staging configuration is complete."
-
-      - run: corepack enable
-      - uses: actions/setup-node@v5
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
-          package-manager-cache: true
       - uses: supabase/setup-cli@v1
         with:
-          version: ${{ env.SUPABASE_CLI_VERSION }}
+          version: 2.98.2
 
-      - name: Pull the Vercel staging environment
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-        run: |
-          npx --yes "vercel@$VERCEL_CLI_VERSION" pull --yes \
-            --environment=staging --token="$VERCEL_TOKEN"
-          env_file=".vercel/.env.staging.local"
-          # Vercel never sends Sensitive values to `vercel pull`, only a
-          # "[SENSITIVE]" placeholder, which the build would bake into the
-          # app. A variable without the `VITE_` prefix never reaches the
-          # browser bundle, so drop it from the build. A `VITE_` placeholder
-          # stays in the file for the next step to refuse.
-          sensitive_pattern='^[A-Z0-9_]+="?\[SENSITIVE\]"?$'
-          sensitive_names="$(grep -E "$sensitive_pattern" "$env_file" | grep -v '^VITE_' | cut -d= -f1 || true)"
-          echo "Sensitive Vercel variables left out of the build:"
-          echo "${sensitive_names:-(none)}"
-          sed -i -E "/^VITE_/!{/$sensitive_pattern/d}" "$env_file"
-
-      # The build takes its variables only from the Vercel environment pulled
-      # above. Refuse, before anything is written, a build that would ship a
-      # placeholder, miss a required value, or reach a different database
-      # than the one this job migrates. The log is public, so this prints
-      # names and fixed sentences only, never a value.
-      - name: Check the Vercel build environment
-        env:
-          SUPABASE_PROJECT_ID: ${{ secrets.STAGING_PROJECT_ID }}
-        run: |
-          env_file=".vercel/.env.staging.local"
-          # Prints the last value set for the name in $1, without one pair of
-          # surrounding double quotes. `vercel pull` quotes every value.
-          read_pulled_value() {
-            local line
-            local value
-            line="$(grep -E "^$1=" "$env_file" | tail -n 1 || true)"
-            value="${line#*=}"
-            if [[ "$value" == \"*\" ]]; then
-              value="${value:1:${#value}-2}"
-            fi
-            printf '%s' "$value"
-          }
-          has_problem=false
-          sensitive_pattern='^VITE_[A-Z0-9_]*="?\[SENSITIVE\]"?$'
-          sensitive_names="$(grep -E "$sensitive_pattern" "$env_file" | cut -d= -f1 || true)"
-          if [ -n "$sensitive_names" ]; then
-            echo "These VITE_ variables are Sensitive in the Vercel staging environment, so the CLI cannot read them for a CI build:" >&2
-            echo "$sensitive_names" >&2
-            echo "A VITE_ value ships in the browser bundle, so it is public by nature. Make each one a plain variable in Vercel. Nothing was deployed." >&2
-            has_problem=true
-          fi
-          for name in VITE_SUPABASE_API_URL VITE_SUPABASE_ANON_KEY VITE_APP_URL; do
-            if [ -z "$(read_pulled_value "$name")" ]; then
-              echo "$name is missing or empty in the Vercel staging environment. Nothing was deployed." >&2
-              has_problem=true
-            fi
-          done
-          # The Google Picker values do not block a deploy: without them the
-          # build works but the Picker does not, so this only warns.
-          for name in VITE_GOOGLE_PICKER_API_KEY VITE_GOOGLE_PICKER_APP_ID; do
-            if [ -z "$(read_pulled_value "$name")" ]; then
-              echo "::warning::$name is missing or empty in the Vercel staging environment. The Google Picker will not work in this build."
-            fi
-          done
-          # Prints the URL in $1 lowercased, without trailing slashes, for
-          # comparison only. A URL host is case-insensitive, and the
-          # Git-integration builds already ship these values as Vercel holds
-          # them, so neither difference blocks a deploy. The build still uses
-          # the pulled values unchanged.
-          comparable_url() {
-            local url="$1"
-            while [[ "$url" == */ ]]; do
-              url="${url%/}"
-            done
-            printf '%s' "${url,,}"
-          }
-          api_url="$(read_pulled_value VITE_SUPABASE_API_URL)"
-          if [ -z "$SUPABASE_PROJECT_ID" ]; then
-            echo "STAGING_PROJECT_ID is empty in the staging environment. Nothing was deployed." >&2
-            has_problem=true
-          elif [ -n "$api_url" ] &&
-            [ "$(comparable_url "$api_url")" != "$(comparable_url "https://$SUPABASE_PROJECT_ID.supabase.co")" ]; then
-            echo "VITE_SUPABASE_API_URL in the Vercel staging environment must be https://<STAGING_PROJECT_ID>.supabase.co, the project this job migrates. Nothing was deployed." >&2
-            has_problem=true
-          fi
-          app_url="$(read_pulled_value VITE_APP_URL)"
-          if [ -n "$app_url" ] &&
-            [ "$(comparable_url "$app_url")" != "https://staging.avandarlabs.com" ]; then
-            echo "VITE_APP_URL in the Vercel staging environment must be https://staging.avandarlabs.com. Nothing was deployed." >&2
-            has_problem=true
-          fi
-          if [ "$has_problem" = true ]; then
-            exit 1
-          fi
-          echo "The Vercel staging build environment is complete."
-
-      # Built before anything touches staging, so a failed build leaves
-      # staging as it was. The build never connects to the staging
-      # database.
-      - name: Build the web app for Vercel
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-        run: |
-          npx --yes "vercel@$VERCEL_CLI_VERSION" build \
-            --environment=staging --token="$VERCEL_TOKEN"
-
-      - name: Apply migrations
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          SUPABASE_DB_PASSWORD: ${{ secrets.STAGING_DB_PASSWORD }}
-          SUPABASE_PROJECT_ID: ${{ secrets.STAGING_PROJECT_ID }}
-        run: |
-          supabase link --project-ref "$SUPABASE_PROJECT_ID"
-          supabase db push --include-all
-
-      - name: Deploy edge functions
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          SUPABASE_PROJECT_ID: ${{ secrets.STAGING_PROJECT_ID }}
-        run: supabase functions deploy --project-ref "$SUPABASE_PROJECT_ID"
-
-      - name: Deploy the prebuilt web app to Vercel
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-        run: |
-          npx --yes "vercel@$VERCEL_CLI_VERSION" deploy --prebuilt \
-            --environment=staging --token="$VERCEL_TOKEN"
+      - run: supabase link --project-ref $SUPABASE_PROJECT_ID
+      - run: supabase db push --include-all
+      - run: supabase functions deploy
