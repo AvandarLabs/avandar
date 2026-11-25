@@ -5,6 +5,9 @@
  * supplies the SHAs that apply to it.
  */
 import { Acclimate } from "@avandar/acclimate";
+// Node strips types without resolving extensionless paths, so the explicit
+// extension is required when this file runs directly.
+// oxlint-disable-next-line import/extensions
 import { ShouldSkipCi } from "./ShouldSkipCi.ts";
 
 function _emptyToUndefined(value: string | undefined): string | undefined {
