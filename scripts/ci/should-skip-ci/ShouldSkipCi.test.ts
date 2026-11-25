@@ -19,7 +19,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { ShouldSkipCi } from "./ShouldSkipCi";
 import type { CommitRecord, FileChangeEntry } from "./ShouldSkipCi";
 
-const SCRIPT_PATH = resolve(import.meta.dirname, "ShouldSkipCi.ts");
+const SCRIPT_PATH = resolve(import.meta.dirname, "ShouldSkipCiCli.ts");
 const tempDirs: string[] = [];
 
 const GIT_ENV = {
@@ -692,17 +692,23 @@ describe("ShouldSkipCi CLI execution", () => {
     const githubOutputPath = join(repoDir, "github-output.txt");
     writeFileSync(githubOutputPath, "");
 
-    execFileSync("node", [SCRIPT_PATH], {
-      cwd: repoDir,
-      encoding: "utf8",
-      env: {
-        ...GIT_ENV,
-        EVENT_NAME: "push",
-        BEFORE_SHA: beforeSha,
-        AFTER_SHA: afterSha,
-        GITHUB_OUTPUT: githubOutputPath,
-      },
-    });
+    execFileSync(
+      "node",
+      [
+        SCRIPT_PATH,
+        "--event-name",
+        "push",
+        "--before-sha",
+        beforeSha,
+        "--after-sha",
+        afterSha,
+        "--pr-base-sha",
+        "",
+        "--github-output-path",
+        githubOutputPath,
+      ],
+      { cwd: repoDir, encoding: "utf8", env: GIT_ENV },
+    );
 
     const output = readFileSync(githubOutputPath, "utf8");
     expect(output).toContain("should-skip=true\n");

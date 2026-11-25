@@ -5,7 +5,7 @@ description: >-
 
 inputs:
   node-version:
-    description: Node.js version to run the zero-dependency TypeScript check.
+    description: Node.js version to run the TypeScript check.
     required: false
     default: "24.15.0"
 
@@ -24,6 +24,12 @@ runs:
       with:
         node-version: ${{ inputs.node-version }}
 
+    - name: Install Acclimate for the check-skip CLI
+      shell: bash
+      run: >-
+        npm install --prefix scripts/ci/should-skip-ci --no-save
+        --no-package-lock --ignore-scripts @avandar/acclimate@0.4.0
+
     - name: Evaluate commit range for CI skip
       id: evaluate
       shell: bash
@@ -33,4 +39,11 @@ runs:
         AFTER_SHA: ${{ github.sha }}
         PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
         PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-      run: node scripts/ci/should-skip-ci/ShouldSkipCi.ts
+      run: |
+        node scripts/ci/should-skip-ci/ShouldSkipCiCli.ts \
+          --event-name "$EVENT_NAME" \
+          --before-sha "$BEFORE_SHA" \
+          --after-sha "$AFTER_SHA" \
+          --pr-base-sha "$PR_BASE_SHA" \
+          --pr-head-sha "$PR_HEAD_SHA" \
+          --github-output-path "$GITHUB_OUTPUT"

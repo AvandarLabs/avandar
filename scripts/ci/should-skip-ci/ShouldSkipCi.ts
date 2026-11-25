@@ -1,6 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { appendFileSync, realpathSync } from "node:fs";
-import { pathToFileURL } from "node:url";
+import { appendFileSync } from "node:fs";
 
 const SKIP_DEPLOY_TOKEN = "[skip deploy]";
 const SYMLINK_MODE = "120000";
@@ -359,18 +358,6 @@ function _runCli(options: CheckSkipEnv): SkipDecision {
   return decision;
 }
 
-function _isDirectCliExecution(): boolean {
-  const invokedPath = process.argv[1];
-  if (invokedPath === undefined || invokedPath.length === 0) {
-    return false;
-  }
-  try {
-    return import.meta.url === pathToFileURL(realpathSync(invokedPath)).href;
-  } catch {
-    return false;
-  }
-}
-
 /**
  * Evaluates whether a pushed or pull-request commit range qualifies to skip
  * GitHub Actions workflows based on `[skip deploy]` subjects and safe
@@ -388,15 +375,3 @@ export const ShouldSkipCi = {
   evaluateGitRange: _evaluateGitRange,
   runCli: _runCli,
 };
-
-if (_isDirectCliExecution()) {
-  ShouldSkipCi.runCli({
-    eventName: process.env.EVENT_NAME ?? "",
-    beforeSha: process.env.BEFORE_SHA,
-    afterSha: process.env.AFTER_SHA,
-    prBaseSha: process.env.PR_BASE_SHA,
-    prHeadSha: process.env.PR_HEAD_SHA,
-    githubOutputPath: process.env.GITHUB_OUTPUT,
-    repoDir: process.cwd(),
-  });
-}
