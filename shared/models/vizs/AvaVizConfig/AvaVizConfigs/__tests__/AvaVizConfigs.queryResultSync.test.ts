@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs.ts";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs/AvaVizConfigs.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 

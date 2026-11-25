@@ -2,7 +2,7 @@ import { expect, it } from "vitest";
 import { DashboardConfigs } from "$/models/Dashboard/DashboardConfig/DashboardConfigs";
 import { makeProjectionDescriptorsFromSql } from "$/models/queries/QueryResultColumnBindings/makeProjectionDescriptorsFromSql/makeProjectionDescriptorsFromSql";
 import { reconcileQueryResultColumnBindings } from "$/models/queries/QueryResultColumnBindings/reconcileQueryResultColumnBindings/reconcileQueryResultColumnBindings";
-import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs/AvaVizConfigs";
 import { makeSavedColumnBindingsFromDataVizProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/makeSavedColumnBindingsFromDataVizProps/makeSavedColumnBindingsFromDataVizProps";
 import { upgradeAvaPageData } from "@/views/DashboardApp/AvaPage/utils/upgradeAvaPageData";
 import { createDataVizBlock } from "@/views/DataExplorerApp/SaveToDashboardModal/createDataVizBlock/createDataVizBlock";

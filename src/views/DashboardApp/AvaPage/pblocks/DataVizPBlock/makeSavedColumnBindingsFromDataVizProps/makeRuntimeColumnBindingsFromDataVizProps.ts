@@ -1,5 +1,5 @@
 import { objectValuesMap } from "@avandar/utils";
-import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs/AvaVizConfigs";
 import { makeColumnBindingsFromDashboardFilters } from "@/views/DashboardApp/DashboardFilterStateManager/makeColumnBindingsFromDashboardFilters/makeColumnBindingsFromDashboardFilters";
 import { DataVizFilters } from "../DataVizPBlock/DataVizFilters/DataVizFilters";
 import { makeSavedColumnBindingsFromDataVizProps } from "./makeSavedColumnBindingsFromDataVizProps";

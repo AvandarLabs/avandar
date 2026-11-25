@@ -1,6 +1,6 @@
 import { objectFilter, objectValuesMap } from "@avandar/utils";
 import { structuredQueryToSql } from "$/models/queries/StructuredQuery/structuredQueryToSql/structuredQueryToSql";
-import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs/AvaVizConfigs";
 import { makePluginVizMemoryKey } from "@/lib/plugins/vizs/pluginVizOptionHelpers";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { QueryResultColumnBindingRegistry } from "$/models/queries/QueryResultColumnBindings/QueryResultColumnBindings.types";

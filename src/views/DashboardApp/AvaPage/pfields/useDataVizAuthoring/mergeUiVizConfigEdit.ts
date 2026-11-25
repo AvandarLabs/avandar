@@ -1,4 +1,4 @@
-import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs/AvaVizConfigs";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
 import type { UiVizConfig } from "$/models/vizs/UiVizConfig/UiVizConfig.types";

@@ -10,7 +10,7 @@
  */
 import { getValue } from "@avandar/utils";
 import { describe, expect, it, vi } from "vitest";
-import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs/AvaVizConfigs";
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { SeriesAwareVizForm } from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm";
 import { fireEvent, render, screen, within } from "@/test-utils";

@@ -2,7 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useRef } from "react";
 import { Dashboard } from "$/models/Dashboard/Dashboard";
-import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs/AvaVizConfigs";
 import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 import { DataVizPBlock } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
 import { makeDataVizPBlockStateFromProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/makeDataVizPBlockStateFromProps/makeDataVizPBlockStateFromProps";

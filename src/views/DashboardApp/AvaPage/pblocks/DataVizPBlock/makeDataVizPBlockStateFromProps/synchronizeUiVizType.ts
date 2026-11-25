@@ -1,4 +1,4 @@
-import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs/AvaVizConfigs";
 import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
 import type { Props } from "../DataVizPBlock/DataVizPBlock";
 import type { makeDataVizPBlockStateFromProps } from "./makeDataVizPBlockStateFromProps";

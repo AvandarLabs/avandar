@@ -1,4 +1,4 @@
-import { AvaPluginVizConfigSchema } from "$/models/vizs/AvaPluginVizConfig/PluginVizConfigSchemas";
+import { AvaPluginVizConfigSchema } from "$/models/vizs/AvaPluginVizConfig/PluginVizConfigSchemas/PluginVizConfigSchemas";
 import { PluginVizPlaceholder } from "@/lib/plugins/vizs/PluginVizPlaceholder/PluginVizPlaceholder";
 import { PluginVizChartLoader } from "@/lib/plugins/vizs/PluginVizRenderer/PluginVizChartLoader";
 import { PluginVizConfiguredChart } from "@/lib/plugins/vizs/PluginVizRenderer/PluginVizConfiguredChart";

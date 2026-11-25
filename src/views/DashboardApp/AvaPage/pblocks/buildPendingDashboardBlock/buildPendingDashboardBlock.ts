@@ -1,4 +1,4 @@
-import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs/AvaVizConfigs";
 import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 import type { ChatGeneratedDashboardBlock } from "$/types/chat.types";
 import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";

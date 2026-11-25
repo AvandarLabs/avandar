@@ -1,7 +1,7 @@
 import { prop } from "@avandar/utils";
 import { describe, expect, it } from "vitest";
 import { knownVizSettingControlLabels } from "$/copy/vizSettingControlLabel/vizSettingControlLabel.ts";
-import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs.ts";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs/AvaVizConfigs.ts";
 import { makeAxisDescriptors } from "$/models/vizs/descriptors/makeAxisDescriptors/makeAxisDescriptors.ts";
 
 function _keysOf(descriptors: ReadonlyArray<{ key: string }>): string[] {

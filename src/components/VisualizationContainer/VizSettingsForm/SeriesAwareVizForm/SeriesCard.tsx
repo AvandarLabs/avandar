@@ -13,7 +13,7 @@ import { IconTrash } from "@tabler/icons-react";
 import { useCallback, useMemo } from "react";
 import { vizSettingControlLabel } from "$/copy/vizSettingControlLabel/vizSettingControlLabel";
 import { vizSettingGroupLabel } from "$/copy/vizSettingGroupLabel";
-import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs/AvaVizConfigs";
 import { Control } from "@/components/VisualizationContainer/VizSettingsForm/Control/Control";
 import { readSetting } from "@/components/VisualizationContainer/VizSettingsForm/readSetting";
 import css from "@/components/VisualizationContainer/VizSettingsForm/SeriesAwareVizForm/SeriesAwareVizForm.module.css";

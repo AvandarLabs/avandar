@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs/AvaVizConfigs";
 import { makeDataVizPBlockStateFromProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/makeDataVizPBlockStateFromProps/makeDataVizPBlockStateFromProps";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import type { AvaBarChartVizConfig } from "$/models/vizs/AvaBarChartVizConfig/AvaBarChartVizConfig.types";

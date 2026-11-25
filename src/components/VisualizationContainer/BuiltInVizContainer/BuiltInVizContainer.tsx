@@ -1,6 +1,6 @@
 import { prop } from "@avandar/utils";
 import { useMemo } from "react";
-import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs/AvaVizConfigs";
 import { UiVizConfigRenderer } from "@/components/VisualizationContainer/UiVizConfigRenderer/UiVizConfigRenderer";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";

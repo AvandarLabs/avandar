@@ -1,5 +1,5 @@
 import { match } from "ts-pattern";
-import { AvaPluginVizConfigSchema } from "$/models/vizs/AvaPluginVizConfig/PluginVizConfigSchemas";
+import { AvaPluginVizConfigSchema } from "$/models/vizs/AvaPluginVizConfig/PluginVizConfigSchemas/PluginVizConfigSchemas";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { PluginVizSettingValue } from "$/models/vizs/AvaPluginVizConfig/AvaPluginVizConfig.types";
 import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";

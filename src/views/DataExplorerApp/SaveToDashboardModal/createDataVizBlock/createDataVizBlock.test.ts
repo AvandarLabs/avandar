@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs/AvaVizConfigs";
 import {
   DATA_EXPLORER_FALLBACK_PROMPT,
   createDataVizBlock,

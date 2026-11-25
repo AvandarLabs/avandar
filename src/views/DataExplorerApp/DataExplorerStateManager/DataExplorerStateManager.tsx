@@ -2,7 +2,7 @@ import { Model } from "@avandar/models";
 import { setValue } from "@avandar/utils";
 import { normalizeSqlForSubquery } from "@avandar/utils/sql";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
-import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs/AvaVizConfigs";
 import { createAppStateManager } from "@/lib/utils/state/createAppStateManager/createAppStateManager";
 import { INITIAL_DATA_EXPLORER_STATE } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
 import {
