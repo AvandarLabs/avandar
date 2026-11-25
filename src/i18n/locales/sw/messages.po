@@ -359,7 +359,7 @@ msgid "{removedCount, plural, one {# column no longer uses a dictionary.} other 
 msgstr "{removedCount, plural, one {Safu wima # haitumii tena kamusi.} other "
 "{Safu wima # hazitumii tena kamusi.}}"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Right span"
 msgstr "Span ya kulia"
 
@@ -479,7 +479,7 @@ msgid "An error occurred while loading the file"
 msgstr "Kosa lilitokea wakati wa kupakia faili"
 
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createListBlockConfig.tsx
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ColumnTypeSelect.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Type"
@@ -632,7 +632,7 @@ msgstr "Ingiza swali lako au maelekezo kwa lugha ya kawaida ili kuunda swali la 
 msgid "Could not update {pluginName}"
 msgstr "Imeshindikana kusasisha {pluginName}"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
 msgid "H4"
 msgstr "H4"
 
@@ -747,7 +747,7 @@ msgid "Expand"
 msgstr "Panua"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCalloutBlockConfig.tsx
 msgid "Callout"
 msgstr "Wito wa kuzingatia"
 
@@ -821,7 +821,7 @@ msgstr "Hakuna safu inayoweza kuchujwa kwa kutumia buffer hii."
 msgid "Views"
 msgstr "Mionekano"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createListBlockConfig.tsx
 msgid "Second point"
 msgstr "Kipengele cha pili"
 
@@ -859,7 +859,7 @@ msgid "The place is removed from its dataset, so it disappears from every map "
 msgstr "Eneo limeondolewa kwenye mkusanyiko wake wa data, kwa hivyo linatoweka "
 "kwenye kila ramani na chati inayolitumia."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Sidebar layout"
 msgstr "Mpangilio wa upau wa pembeni"
 
@@ -942,7 +942,8 @@ msgstr "Kinachotokea"
 
 #: src/components/caseFields/useFieldValueFormatter/useFieldValueFormatter.ts
 #: src/components/providers/AvandarAppProvider.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "No"
 msgstr "Hapana"
@@ -1054,7 +1055,7 @@ msgid "Pan and select"
 msgstr "Sogeza na uchague"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createListBlockConfig.tsx
 msgid "List"
 msgstr "Orodha"
 
@@ -1160,7 +1161,7 @@ msgid "For more control over your subscription, you can manage your "
 msgstr "Kwa udhibiti zaidi juu ya usajili wako, unaweza kusimamia usajili wako "
 "katika yako"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Extra large"
 msgstr "Kubwa zaidi"
 
@@ -1462,7 +1463,7 @@ msgstr "Kiwango cha wastani"
 msgid "There was an error loading Google services."
 msgstr "Kulikuwa na hitilafu wakati wa kupakia huduma za Google."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Hide published date"
 msgstr "Ficha tarehe ya kuchapishwa"
 
@@ -1500,7 +1501,7 @@ msgstr "stddev"
 msgid "Get a count of how many values there are"
 msgstr "Pata idadi ya thamani zilizopo"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createFigureBlockConfig.tsx
 msgid "Caption"
 msgstr "Manukuu"
 
@@ -1510,7 +1511,8 @@ msgid "Post the first update below. Type @ to mention a teammate or link a "
 msgstr "Chapisha sasisho la kwanza hapa chini. Andika @ ili kumtaja mwenzako wa "
 "timu au kuunganisha dashibodi, seti ya data, au kesi."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Collapse at"
 msgstr "Kunja katika"
 
@@ -1563,6 +1565,8 @@ msgstr "Kitu kingine…"
 msgid "Changing plan to {newPlanName} ({newPlanSubType})"
 msgstr "Kubadilisha mpango kuwa {newPlanName} ({newPlanSubType})"
 
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCardConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Content"
 msgstr "Maudhui"
@@ -1621,7 +1625,7 @@ msgstr "Ramani"
 
 #: shared/copy/vizTypeLabel.ts
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Table"
@@ -1682,7 +1686,11 @@ msgstr "Ambatisha kama rejeleo pekee"
 msgid "Role group updated"
 msgstr "Kikundi cha jukumu kimeboreshwa"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createGridConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Small"
 msgstr "Ndogo"
 
@@ -1799,7 +1807,7 @@ msgstr "Bado hakuna safu."
 msgid "Could not read these records."
 msgstr "Haikuweza kusoma rekodi hizi."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 msgid "Narrow"
 msgstr "Nyembamba"
 
@@ -2363,7 +2371,7 @@ msgstr "Seti za data za kujifunzia"
 msgid "Your question contains language that may bias the AI's answer."
 msgstr "Swali lako lina lugha ambayo inaweza kuathiri jibu la AI."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Vertical padding"
 msgstr "Pengo la wima"
 
@@ -2458,7 +2466,7 @@ msgstr "Onyesha manukuu madogo kwenye ukurasa"
 msgid "Export preview"
 msgstr "Hakiki uhamishaji"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Hide title"
 msgstr "Ficha kichwa"
 
@@ -2746,7 +2754,7 @@ msgstr "Kipindi chako kimekwisha. Unapelekwa kwenye ukurasa wa kuingia."
 msgid "This dataset can be stored in the cloud."
 msgstr "Seti hii ya data inaweza kuhifadhiwa kwenye wingu."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 12"
 msgstr "Safu wima ya 12"
 
@@ -3058,7 +3066,7 @@ msgid "Creating a dictionary needs edit access to Data Sources. Ask a workspace 
 msgstr "Kuunda kamusi kunahitaji ruhusa ya kuhariri Vyanzo vya Data. Muulize "
 "msimamizi wa workspace akupe ruhusa hiyo."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 3"
 msgstr "Safu wima ya 3"
 
@@ -3075,7 +3083,8 @@ msgstr "/mwezi"
 msgid "Filters for this chart"
 msgstr "Vichujio vya chati hii"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createParagraphBlockConfig.tsx
 msgid "Align"
 msgstr "Pangilia"
 
@@ -3198,7 +3207,7 @@ msgid "You chose not to send values to the AI provider, so suggestions are off "
 msgstr "Ulichagua kutotuma thamani kwa mtoa huduma wa AI, kwa hivyo mapendekezo "
 "yamezimwa kwa kamusi hii. Bado unaweza kupanga thamani mwenyewe."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 #: src/views/GisApp/export/ExportSheet/ExportSheetHeaderLineFields.tsx
 msgid "Subtitle"
 msgstr "Kichwa kidogo"
@@ -3336,7 +3345,11 @@ msgid "No entries yet. Add one for each kind of column this dictionary "
 msgstr "Bado hakuna maingizo. Ongeza moja kwa kila aina ya safu ambayo kamusi "
 "hii inaelezea."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createGridConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Medium"
 msgstr "Wastani"
 
@@ -3426,7 +3439,9 @@ msgstr "Tafadhali chagua faili ya kuagiza"
 msgid "Role for everyone in the workspace"
 msgstr "Jukumu kwa kila mtu katika eneo la kazi"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createGridConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Gap"
 msgstr "Pengo"
 
@@ -3823,7 +3838,7 @@ msgid "The {pluginId} plugin ran into an error while drawing this chart."
 msgstr "Plugin ya {pluginId} imekumbana na hitilafu ilipokuwa ikichora chati "
 "hii."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCalloutBlockConfig.tsx
 msgid "Body"
 msgstr "Mwili"
 
@@ -3869,7 +3884,7 @@ msgstr "Kifungu cha FROM si rejeleo la jedwali tambarare."
 msgid "Sign Out"
 msgstr "Toka"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 msgid "Section"
 msgstr "Sehemu"
 
@@ -3929,7 +3944,7 @@ msgid "Unknown group"
 msgstr "Kikundi kisichojulikana"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createParagraphBlockConfig.tsx
 msgid "Paragraph"
 msgstr "Aya"
 
@@ -4186,7 +4201,7 @@ msgstr "Ficha mhimili wa Y"
 msgid "or"
 msgstr "au"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createListBlockConfig.tsx
 msgid "Items"
 msgstr "Vipengee"
 
@@ -4367,7 +4382,7 @@ msgstr "Sogeza, kukuza na uguse kipengele ili kukisoma. Ili kuhariri tabaka, "
 msgid "Could not create the places dataset."
 msgstr "Haikuweza kuunda mkusanyiko wa data wa maeneo."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCalloutBlockConfig.tsx
 msgid "Info"
 msgstr "Maelezo"
 
@@ -4636,7 +4651,7 @@ msgstr "Chagua safu"
 msgid "{numColumns} columns"
 msgstr "{numColumns} safu wima"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 msgid "Normal"
 msgstr "Kawaida"
 
@@ -4731,7 +4746,7 @@ msgid "No case types or datasets match"
 msgstr "Hakuna aina za kesi au seti za data zinazolingana"
 
 #: shared/copy/vizSettingGroupLabel.ts
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createGridConfig.tsx
 msgid "Grid"
 msgstr "Gridi"
 
@@ -4786,7 +4801,7 @@ msgstr "Imefichwa"
 msgid "Dataset name is required"
 msgstr "Jina la dataset linahitajika"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Main"
 msgstr "Kuu"
 
@@ -4906,7 +4921,7 @@ msgstr "Usikivu"
 msgid "E"
 msgstr "E"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 5"
 msgstr "Safu wima ya 5"
 
@@ -5011,7 +5026,7 @@ msgstr "Hakuna sifa au seti ya data iliyosanidiwa."
 msgid "No longer being worked on."
 msgstr "Haifanyiwikiwa tena."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 8"
 msgstr "Safu wima ya 8"
 
@@ -5490,7 +5505,8 @@ msgstr "Kiungo cha rekodi chanzo"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ConfirmContentSummary.tsx
@@ -5679,11 +5695,11 @@ msgstr "Andika thamani"
 msgid "Opens on"
 msgstr "Hufunguka"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 11"
 msgstr "Safu wima ya 11"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 7"
 msgstr "Safu wima ya 7"
 
@@ -5854,7 +5870,7 @@ msgstr "{0, plural, one {safu wima #} other {safu wima #}}"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCodeBlockConfig.tsx
 msgid "Code"
 msgstr "Msimbo"
 
@@ -5988,7 +6004,7 @@ msgstr "Data yako imefupishwa"
 msgid "No topics"
 msgstr "Hakuna mada"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 msgid "Padding"
 msgstr "Pengo la ndani"
 
@@ -6010,7 +6026,7 @@ msgstr "Mipangilio ya safu imehifadhiwa. Jaribu tena muunganisho utakaporejea, "
 msgid "{plainTextLength} of {RICH_TEXT_MAX_TEXT_LENGTH} characters"
 msgstr "{plainTextLength} kati ya herufi {RICH_TEXT_MAX_TEXT_LENGTH}"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Theme"
 msgstr "Mandhari"
 
@@ -6087,7 +6103,7 @@ msgstr "Viunganishi vipya huongezwa kila mwezi. Ikiwa kuna hifadhidata au "
 msgid "Global Admin"
 msgstr "Msimamizi wa Kimataifa"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 msgid "Comma (,)"
 msgstr "Koma (,)"
 
@@ -6166,7 +6182,7 @@ msgstr "Safu {flaggedRowCount} kati ya {0} zinahitaji kukaguliwa. Tulioanisha "
 msgid "Y axis"
 msgstr "Mhimili wa Y"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 9"
 msgstr "Safu wima ya 9"
 
@@ -6360,7 +6376,7 @@ msgstr "Ongeza block ya Kichujio kwenye dashibodi ili kuwezesha uchujaji wa "
 msgid "Recommended with this dataset"
 msgstr "Inapendekezwa pamoja na seti hii ya data"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 msgid "Full"
 msgstr "Kamili"
 
@@ -6536,7 +6552,7 @@ msgstr "Safu {0} imewekwa kuwa Ondoa, ambayo inafanya kazi tu kwa pointi. "
 msgid "Failed to save to dashboard: {0}"
 msgstr "Imeshindwa kuhifadhi kwenye dashibodi: {0}"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Header row"
 msgstr "Safu ya kichwa"
@@ -6749,7 +6765,7 @@ msgstr "Unda makundi kwa wanachama wa ofisi yako. Seti za data na dashboards "
 msgid "Preview:"
 msgstr "Muonekano:"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 msgid "Background"
 msgstr "Mandharinyuma"
 
@@ -7019,7 +7035,7 @@ msgid "The source file isn't in a format Avandar can read as a table."
 msgstr "Faili chanzo haliko katika muundo ambao Avandar anaweza kuusoma kama "
 "jedwali."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createFigureBlockConfig.tsx
 msgid "Image"
 msgstr "Picha"
 
@@ -7101,7 +7117,7 @@ msgstr "Seti za data ilizoziingiza"
 msgid "Next: map values"
 msgstr "Inayofuata: pangilia thamani"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
 msgid "Data"
 msgstr "Data"
@@ -7269,7 +7285,7 @@ msgstr "Uthibitishaji umeshindwa"
 msgid "Hex"
 msgstr "Hex"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Tab"
@@ -7280,7 +7296,7 @@ msgid "Some published datasets could not be loaded. Please try again later."
 msgstr "Seti kadhaa za data zilizochapishwa hazikuweza kupakiwa. Tafadhali "
 "jaribu tena baadaye."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createListBlockConfig.tsx
 msgid "First point"
 msgstr "Hatua ya kwanza"
 
@@ -7399,7 +7415,7 @@ msgstr "Mwisho wa kipindi cha muda: {endLabel}"
 msgid "Home"
 msgstr "Nyumbani"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 msgid "Pipe (|)"
 msgstr "Bomba (|)"
 
@@ -7440,7 +7456,7 @@ msgstr "Avandar (chaguo la kawaida)"
 msgid "Add your first dataset"
 msgstr "Ongeza dataset yako ya kwanza"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 msgid "Wide"
 msgstr "Pana"
 
@@ -7471,7 +7487,7 @@ msgstr "Hakuna seti za data zinazolingana na utafutaji na vichujio vyako. "
 msgid "is true"
 msgstr "ni kweli"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createEmbedBlockConfig.tsx
 msgid "URL"
 msgstr "URL"
 
@@ -8034,7 +8050,7 @@ msgstr "seti data zaidi ya {formattedNumResults}"
 
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
 #: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/LayoutsTable.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
@@ -8287,7 +8303,7 @@ msgstr "{0} imefutwa kwa mafanikio"
 msgid "Open dashboard"
 msgstr "Fungua dashibodi"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
 msgid "H1"
 msgstr "H1"
 
@@ -8443,7 +8459,11 @@ msgstr "Chagua moja au zaidi"
 msgid "Import {title}"
 msgstr "Ingiza {title}"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createGridConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Large"
 msgstr "Kubwa"
 
@@ -8612,7 +8632,7 @@ msgstr "ingizo"
 msgid "Suggested from the column name and values"
 msgstr "Imependekezwa kutokana na jina la safu na thamani"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createEmbedBlockConfig.tsx
 msgid "Embed"
 msgstr "Embed"
 
@@ -8724,7 +8744,7 @@ msgstr "{chartName} haiwezi kuonyeshwa kwa sababu kuna axes au series "
 "zinazokosekana."
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCardConfig.tsx
 msgid "Card"
 msgstr "Kadi"
 
@@ -8898,7 +8918,8 @@ msgstr "Futa safu ya hali ya Zinazobishaniwa"
 
 #: src/components/caseFields/useFieldValueFormatter/useFieldValueFormatter.ts
 #: src/components/providers/AvandarAppProvider.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Yes"
 msgstr "Ndio"
@@ -9112,7 +9133,7 @@ msgstr "Hakuna safu"
 msgid "Shared drives"
 msgstr "Hifadhi za pamoja"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
 msgid "H3"
 msgstr "H3"
 
@@ -9457,7 +9478,9 @@ msgstr "{0, plural, one {# mwitikio} other {# miitikio}}"
 msgid "Ask about your data..."
 msgstr "Uliza kuhusu data yako..."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCalloutBlockConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCardConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createEmbedBlockConfig.tsx
 #: src/views/GisApp/export/ExportSheet/ExportSheetHeaderLineFields.tsx
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendTextControls.tsx
 msgid "Title"
@@ -9494,7 +9517,7 @@ msgstr "{publisher} · toleo {version}"
 msgid "Nothing matches your filter"
 msgstr "Hakuna kinacholingana na kichujio chako"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 4"
 msgstr "Safu wima ya 4"
 
@@ -9510,7 +9533,7 @@ msgstr "Chagua rekodi za {slotTitle}"
 msgid "Received a non-string value for a select field"
 msgstr "Imepokea thamani isiyo ya maandiko kwa uwanja wa kuchagua"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Left span"
 msgstr "Upana wa kushoto"
 
@@ -9738,7 +9761,7 @@ msgstr "Hakuna wanachama au vikundi vya watumiaji bado. Karibisha wanachama au "
 msgid "SQL"
 msgstr "SQL"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createListBlockConfig.tsx
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditorHeader.tsx
 #: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
 msgid "Ordered"
@@ -9777,7 +9800,7 @@ msgstr "URL hii maalum imehifadhiwa. Jaribu kuongeza neno kwake."
 msgid "Reference"
 msgstr "Rejeleo"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createListBlockConfig.tsx
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditorHeader.tsx
 msgid "Unordered"
 msgstr "Isiyo na mpangilio"
@@ -9984,7 +10007,7 @@ msgstr "Mchoro"
 msgid "What this column means, so teammates read it the same way"
 msgstr "Maana ya safu hii, ili washiriki wa timu waielewe kwa njia ileile"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 1"
 msgstr "Safu wima ya 1"
 
@@ -10055,7 +10078,9 @@ msgid "I couldn't build that chart. Its query kept failing."
 msgstr "Sikuweza kuunda chati hiyo. Hoja yake iliendelea kushindwa."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createParagraphBlockConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Right"
 msgstr "Kulia"
 
@@ -10183,7 +10208,7 @@ msgstr "Mistari kutoka kwenye chati hii"
 msgid "member"
 msgstr "mwanachama"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Typography"
 msgstr "Uchapaji"
 
@@ -10251,7 +10276,7 @@ msgstr "Ingiza thamani; bonyeza Enter baada ya kila moja"
 msgid "You haven't added any series"
 msgstr "Hujongeza mfululizo wowote"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Hide author"
 msgstr "Ficha mwandishi"
 
@@ -10395,7 +10420,7 @@ msgstr "Hakuna dataset"
 msgid "US Letter"
 msgstr "US Letter"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
 msgid "Level"
 msgstr "Kiwango"
 
@@ -10689,7 +10714,7 @@ msgstr "Hakuna dashibodi zinazolingana na “{searchQuery}”."
 msgid "Position"
 msgstr "Nafasi"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createListBlockConfig.tsx
 msgid "List item"
 msgstr "Kipengee cha orodha"
 
@@ -10713,7 +10738,7 @@ msgstr "Ongeza seti za data"
 msgid "{0} columns · {1} rows"
 msgstr "{0} safu · {1} safu"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useDataCatalogView.tsx
 msgid "Request a dataset"
 msgstr "Omba seti ya data"
 
@@ -10739,7 +10764,7 @@ msgstr "Uondoe rekodi za {slotTitle}?"
 msgid "Confirm Password"
 msgstr "Thibitisha Neno la Siri"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createQuoteBlockConfig.tsx
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "Attribution"
 msgstr "Uhusishaji"
@@ -10884,7 +10909,7 @@ msgstr "Jina la kuonyesha"
 msgid "Dataset is now synced online"
 msgstr "Dataset sasa imeunganishwa mtandaoni"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createEmbedBlockConfig.tsx
 msgid "Height"
 msgstr "Urefu"
 
@@ -10909,7 +10934,7 @@ msgstr "Orodha ya vipengele haikuweza kupakiwa."
 msgid "The query changed after the columns were added."
 msgstr "Hoja ilibadilika baada ya safu wima kuongezwa."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createParagraphBlockConfig.tsx
 msgid "Write your paragraph here..."
 msgstr "Andika aya yako hapa..."
 
@@ -11089,7 +11114,7 @@ msgstr "Inapakia crosswalk"
 msgid "The latitude must be between -90 and 90."
 msgstr "Latitudo lazima iwe kati ya -90 na 90."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCalloutBlockConfig.tsx
 msgid "Neutral"
 msgstr "Yasiyoegemea upande wowote"
 
@@ -11712,7 +11737,7 @@ msgid "Your plan does not allow sharing more dashboards."
 msgstr "Mpango wako hauruhusu kushiriki dashibodi zaidi."
 
 #: src/utils/notifications/notify.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCalloutBlockConfig.tsx
 msgid "Warning"
 msgstr "Onyo"
 
@@ -11732,7 +11757,7 @@ msgstr "Wakati umewezeshwa, wanachama wa kundi hili wanapata ufikiaji tu ikiwa "
 "hawawezi kufungua {app}."
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDividerBlockConfig.tsx
 msgid "Divider"
 msgstr "Kitenganishi"
 
@@ -11975,7 +12000,7 @@ msgstr "Mkusanyiko huu wa data si wa maeneo, kwa hivyo maeneo hayawezi "
 msgid "Custom URL is available"
 msgstr "URL ya kawaida inapatikana"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createGridConfig.tsx
 msgid "Number of rows"
 msgstr "Idadi ya safu"
 
@@ -12798,7 +12823,10 @@ msgstr "Cheza"
 msgid "Manage how you appear in {0} and the account you use to sign in."
 msgstr "Simamisha jinsi unavyoonekana katika {0} na akaunti unayotumia kuingia."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createGridConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Extra small"
 msgstr "Ndogo zaidi"
 
@@ -13124,7 +13152,7 @@ msgstr "Chagua sheria (mfano: ya kawaida zaidi)"
 msgid "Database is unreachable"
 msgstr "Hifadhidata haifikiwi"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 msgid "Add tabular data to render a simple table."
 msgstr "Ongeza data ya jedwali ili kuonyesha jedwali rahisi."
 
@@ -13224,7 +13252,7 @@ msgstr "Futa kamusi"
 msgid "Visualizations"
 msgstr "Mchoro"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createFigureBlockConfig.tsx
 msgid "Alt text"
 msgstr "Maandishi mbadala"
 
@@ -13332,7 +13360,7 @@ msgstr "Avandar hubadilisha swali lako kuwa query ili kukuonyesha majibu."
 msgid "Status"
 msgstr "Hali"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCalloutBlockConfig.tsx
 msgid "Tone"
 msgstr "Toni"
 
@@ -13387,7 +13415,7 @@ msgstr "portali ya malipo."
 msgid "Dates"
 msgstr "Tarehe"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 2"
 msgstr "Safu wima ya 2"
 
@@ -13483,7 +13511,9 @@ msgid "Bring in your first dataset"
 msgstr "Leta mkusanyiko wako wa kwanza wa data"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createParagraphBlockConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Left"
 msgstr "Kushoto"
 
@@ -13684,7 +13714,7 @@ msgstr "Hii dataset itakuwa ya mtandaoni pekee"
 msgid "Add at least one X / Y / Size series"
 msgstr "Ongeza angalau mfululizo mmoja wa X / Y / Ukubwa"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Sidebar"
 msgstr "Upau wa kando"
 
@@ -13697,7 +13727,7 @@ msgid "This dataset is synced online. Click to make offline-only."
 msgstr "Hii dataset imeunganishwa mtandaoni. Bonyeza kufanya iwe ya mtandaoni "
 "pekee."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Published Date"
 msgstr "Tarehe ya kuchapishwa"
 
@@ -13803,11 +13833,11 @@ msgstr "Hitilafu isiyotarajiwa imetokea wakati wa kuunganisha."
 msgid "Add field"
 msgstr "Ongeza sehemu"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Hide subtitle"
 msgstr "Ficha kichwa kidogo"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Author"
 msgstr "Mwandishi"
 
@@ -13829,7 +13859,7 @@ msgstr "Ongeza chujio"
 msgid "Loading plugins"
 msgstr "Inapakia plugins"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Schema version"
 msgstr "Toleo la schema"
 
@@ -13934,7 +13964,7 @@ msgstr "Badilisha ukubwa wa paneli ya pembeni"
 msgid "Entry"
 msgstr "Ingizo"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Horizontal padding"
 msgstr "Pambizo ya mlalo"
 
@@ -13959,7 +13989,7 @@ msgstr "Chanzo kinahitaji kuingia ili kupakua seti hii ya data."
 msgid "Dataset ready"
 msgstr "Seti ya data iko tayari"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
 msgid "H2"
 msgstr "H2"
 
@@ -13971,7 +14001,7 @@ msgstr "Katika seti ya data iliyounganishwa"
 msgid "Entry no longer available"
 msgstr "Ingizo halipatikani tena"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createQuoteBlockConfig.tsx
 msgid "Add a pull quote..."
 msgstr "Ongeza nukuu inayosisitiza..."
 
@@ -14075,7 +14105,8 @@ msgstr "Chagua seti ya data ili kuona safu zake, inakotoka, na ilivyobadilika "
 msgid "Source column"
 msgstr "Safu ya chanzo"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createGridConfig.tsx
 msgid "Number of columns"
 msgstr "Idadi ya safu"
 
@@ -14142,7 +14173,8 @@ msgstr "Hakuna rekodi zilizokabidhiwa kwa mtu huyu"
 msgid "Update & republish"
 msgstr "Sasisha & chapisha tena"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createParagraphBlockConfig.tsx
 msgid "Center"
 msgstr "Katikati"
 
@@ -14215,7 +14247,7 @@ msgstr "Mipaka hii haina thamani ya kuripotiwa kwa hoja ya sasa."
 msgid "1 field"
 msgstr "Sehemu 1"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCodeBlockConfig.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceLanguageTab/WorkspaceLanguageTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Language"
@@ -14236,7 +14268,7 @@ msgid "Click Offline under the message box to use them. Chat also uses them on "
 msgstr "Bofya Offline chini ya kisanduku cha ujumbe ili kuzitumia. Mazungumzo "
 "pia huzitumia yenyewe unapopoteza muunganisho wako."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createFigureBlockConfig.tsx
 msgid "Image URL"
 msgstr "URL ya picha"
 
@@ -14264,7 +14296,7 @@ msgstr "Kamusi haikuhifadhiwa. Kagua sehemu zilizoangaziwa na ujaribu tena."
 msgid "Regenerate with the error"
 msgstr "Rejesha tena na kosa"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCalloutBlockConfig.tsx
 msgid "Add context, methodology, or a key takeaway."
 msgstr "Ongeza muktadha, mbinu, au jambo kuu la kukumbuka."
 
@@ -14300,7 +14332,7 @@ msgstr "Kagua muunganisho wako na ubofye kitufe tena ili ujaribu upya."
 msgid "This layer's features cannot be listed."
 msgstr "Vipengele vya tabaka hili haviwezi kuorodheshwa."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 6"
 msgstr "Safu wima ya 6"
 
@@ -14565,7 +14597,7 @@ msgstr "Orodha hii imepangwa, ikianza na kiwango cha chini. Ibadilishe "
 msgid "Only what's queried (recommended)"
 msgstr "Tu kile kinachoulizwa (inapendekezwa)"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Untitled"
 msgstr "Bila kichwa"
 
@@ -14835,7 +14867,7 @@ msgstr "Acha kichupo hiki wazi hadi ikamilike."
 msgid "Remove column {columnName}"
 msgstr "Ondoa safu {columnName}"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Delimiter"
@@ -14868,7 +14900,7 @@ msgstr "Hujakabidhiwa chochote."
 msgid "Invalid value column selected"
 msgstr "Thamani isiyo sahihi ya safu imechaguliwa"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/DashboardConfigHelpers.tsx
 msgid "Row {rowNum} / Col {colNum}"
 msgstr "Safu {rowNum} / Safu wima {colNum}"
 
@@ -15009,7 +15041,9 @@ msgstr "Pengo la pau"
 
 #: shared/copy/avaDataTypeLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createListBlockConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createParagraphBlockConfig.tsx
 #: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/useDataSlotAttributeTypeLabels.ts
@@ -15050,7 +15084,7 @@ msgstr "HAVING inatumia jumlishi {funcName} kwenye hoja changamano; uchoraji "
 msgid "Save Dataset"
 msgstr "Hifadhi Dataset"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Sidebar position"
 msgstr "Msimamo wa upau wa pembeni"
 
@@ -15108,7 +15142,7 @@ msgstr "Bado haijaonyeshwa"
 msgid "Selected document: {0}"
 msgstr "Hati iliyochaguliwa: {0}"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 msgid "Subtle"
 msgstr "Isiyoonekana sana"
 
@@ -15817,7 +15851,7 @@ msgstr "Inatumika kuingia kwenye akaunti yako."
 msgid "Could not zoom to this cluster."
 msgstr "Imeshindwa kukuza hadi kwenye kundi hili."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createFigureBlockConfig.tsx
 msgid "Add an image URL to render a figure."
 msgstr "Ongeza URL ya picha ili kuonyesha kielelezo."
 
@@ -15879,11 +15913,11 @@ msgstr "Imeshirikiwa nawe"
 msgid "Run a query to configure a chart."
 msgstr "Endesha hoja ili kusanidi chati."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createEmbedBlockConfig.tsx
 msgid "Add a URL to embed a visualization or external content."
 msgstr "Ongeza URL ili kupachika taswira au maudhui ya nje."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Sidebar span"
 msgstr "Upana wa upau wa pembeni"
 
@@ -15891,7 +15925,7 @@ msgstr "Upana wa upau wa pembeni"
 msgid "matches pattern (legacy)"
 msgstr "inalingana na muundo (wa zamani)"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 msgid "Max width"
 msgstr "Upana wa juu zaidi"
 
@@ -16010,7 +16044,7 @@ msgstr "Futa mahali"
 msgid "Bottom left"
 msgstr "Chini kushoto"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Page title"
 msgstr "Kichwa cha ukurasa"
 
@@ -16027,7 +16061,7 @@ msgstr "Baadhi"
 msgid "Arrow"
 msgstr "Panya"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 10"
 msgstr "Safu wima ya 10"
 
@@ -16053,13 +16087,13 @@ msgid "Values, comma-separated"
 msgstr "Thamani, zilizotengwa kwa koma"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
 msgid "Heading"
 msgstr "Kichwa"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createQuoteBlockConfig.tsx
 msgid "Quote"
 msgstr "Nukuu"
 

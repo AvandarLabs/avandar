@@ -5,7 +5,6 @@ import { HostedAnswerText } from "$/agent/HostedAnswerText/HostedAnswerText";
 import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
 import { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import { APIClient } from "@/clients/APIClient";
-import type { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { ChatViewEvent } from "@/components/ChatPanel/ChatViewEvent/ChatViewEvent";
 import { DiscoveryContinuationMessage } from "@/components/ChatPanel/DiscoveryContinuationMessage/DiscoveryContinuationMessage";
 import { OfflineAnswerMessage } from "@/components/ChatPanel/OfflineAnswerMessage/OfflineAnswerMessage";
@@ -37,7 +36,6 @@ import { DataAgentFeature } from "@/lib/agent/dataAgent/browser/DataAgentFeature
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModelStore";
 import { OfflineModeStore } from "@/stores/OfflineModeStore/OfflineModeStore";
-import type { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import type { PluginAiToolDeclaration } from "$/agent/dataAgent/pluginAiTools.types";
 import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";
@@ -45,6 +43,7 @@ import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
 import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ConsentAck } from "$/types/chat.types";
+import type { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import type { ChatSessionKind } from "@/components/ChatPanel/ChatSessionIndex/ChatSessionIndex";
 import type { ChatRuntimeCopy } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
 import type { AgentTurnGadgetContext } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentConversation.types";
@@ -54,6 +53,7 @@ import type {
   DashboardEditorAppState,
   DashboardEditorStateManager,
 } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
+import type { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import type { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
 import type { ChatModelAdapter, ChatModelRunResult } from "@assistant-ui/react";
 import type { MutableRefObject } from "react";
