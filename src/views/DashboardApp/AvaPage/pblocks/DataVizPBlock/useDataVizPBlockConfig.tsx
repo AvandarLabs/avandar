@@ -1,7 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useRef } from "react";
-import { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
 import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 import { DataVizPBlock } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";

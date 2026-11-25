@@ -1,13 +1,13 @@
 import { createServiceClient, withSupabaseClient } from "@avandar/clients";
 import { withLogger } from "@avandar/logger";
-import { WithQueryHooks, withQueryHooks } from "@avandar/query-hooks";
+import type { WithQueryHooks } from "@avandar/query-hooks";
+import { withQueryHooks } from "@avandar/query-hooks";
 import { camelCaseKeysShallow, makeObject, omit } from "@avandar/utils";
 import { z } from "zod";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
-import { WorkspaceId } from "$/models/Workspace/Workspace.types";
+import type { WorkspaceId } from "$/models/Workspace/Workspace.types";
 import { createServerApiClient } from "$/ServerApiClient";
-import { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
-import { Tables } from "$/types/database.types";
+import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import type {
   RoleLevel,
@@ -20,7 +20,7 @@ import type {
   UserProfileId,
 } from "$/models/User/UserProfile.types";
 import type { ServerApiClient } from "$/ServerApiClient";
-import type { Database } from "$/types/database.types";
+import type { Database, Tables } from "$/types/database.types";
 import type { ServiceClient, WithSupabaseClient } from "@avandar/clients";
 import type { ILogger, WithLogger } from "@avandar/logger";
 

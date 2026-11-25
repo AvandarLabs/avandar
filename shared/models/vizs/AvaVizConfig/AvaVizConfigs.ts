@@ -8,7 +8,7 @@ import { AvaPieChartVizConfigs } from "$/models/vizs/AvaPieChartVizConfig/AvaPie
 import { AvaRadarChartVizConfigs } from "$/models/vizs/AvaRadarChartVizConfig/AvaRadarChartVizConfigs.ts";
 import { AvaScatterPlotVizConfigs } from "$/models/vizs/AvaScatterPlotVizConfig/AvaScatterPlotVizConfigs.ts";
 import { AvaTableVizConfigs } from "$/models/vizs/AvaTableVizConfig/AvaTableVizConfigs.ts";
-import {
+import type {
   AvaVizConfig,
   AvaVizConfigType,
   AvaVizConfigUtilRegistry,

@@ -1,5 +1,5 @@
 import { Skeleton, Stack } from "@mantine/core";
-import { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";

@@ -1,7 +1,7 @@
 import { i18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import { applyChatTurnResponse } from "@/components/ChatPanel/applyChatTurnResponse/applyChatTurnResponse";
-import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
+import type { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { recordClarificationShown } from "@/components/ChatPanel/recordClarificationShown/recordClarificationShown";
 import { ChatAnalyticsPayloads } from "@/components/ChatPanel/useAvandarChatRuntime/ChatAnalyticsPayloads/ChatAnalyticsPayloads";
 import {
@@ -22,8 +22,7 @@ import { isSchemaAnswerTurn } from "@/lib/agent/schemaAnswer/isSchemaAnswerTurn"
 import { AnalyticsClient } from "@/lib/analytics/AnalyticsClient";
 import { notifyError } from "@/utils/notifications/notify";
 import { buildPendingDashboardBlock } from "@/views/DashboardApp/AvaPage/pblocks/buildPendingDashboardBlock/buildPendingDashboardBlock";
-import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
-import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
+import type { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import { applyCreatedCaseTypes } from "@/views/OntologyDesignerApp/applyCreatedCaseTypes/applyCreatedCaseTypes";
 import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
@@ -32,7 +31,10 @@ import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ChatRuntimeCopy } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
 import type { AppliedSqlOutcome } from "@/components/ChatPanel/useAvandarChatRuntime/waitForAppliedSqlOutcome/waitForAppliedSqlOutcome";
-import type { DashboardEditorAppState } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
+import type {
+  DashboardEditorAppState,
+  DashboardEditorStateManager,
+} from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import type { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
 import type { ChatModelRunResult } from "@assistant-ui/react";
 import type { MutableRefObject } from "react";

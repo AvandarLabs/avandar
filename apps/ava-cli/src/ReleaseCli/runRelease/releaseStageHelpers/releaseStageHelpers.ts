@@ -246,9 +246,7 @@ export function updateLocalTargetRef(
   );
 }
 
-/**
- * Move the source branch on to the next dev version (`-dev`) and push it.
- */
+/** Move the source branch on to the next dev version (`-dev`) and push it. */
 export function bumpSourceToNextVersion(
   git: ReleaseCommands,
   plan: Readonly<ReleasePlan>,
