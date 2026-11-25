@@ -1,5 +1,13 @@
 # @avandar/query-hooks
 
+## 0.4.0
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @avandar/clients@0.4.0
+  - @avandar/utils@0.4.0
+
 ## 0.3.0
 
 ### Patch Changes

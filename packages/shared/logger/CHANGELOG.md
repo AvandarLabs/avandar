@@ -1,5 +1,12 @@
 # @avandar/logger
 
+## 0.4.0
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @avandar/modules@0.4.0
+
 ## 0.3.0
 
 ### Patch Changes
