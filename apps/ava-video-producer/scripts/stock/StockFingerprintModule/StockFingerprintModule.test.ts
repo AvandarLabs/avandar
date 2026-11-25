@@ -55,7 +55,9 @@ test("canonical values reject unsupported objects, sparse arrays and nonfinite n
     Infinity,
     -Infinity,
     undefined,
-    () => 1,
+    () => {
+      return 1;
+    },
     1n,
     Symbol("value"),
     new Date(),
@@ -65,10 +67,9 @@ test("canonical values reject unsupported objects, sparse arrays and nonfinite n
     cyclic,
     { [Symbol("key")]: 1 },
   ].forEach((value) => {
-    assert.throws(
-      () => StockFingerprintModule.getCanonicalValueFromValue(value),
-      /stock value/i,
-    );
+    assert.throws(() => {
+      return StockFingerprintModule.getCanonicalValueFromValue(value);
+    }, /stock value/i);
   });
 });
 
@@ -89,40 +90,7 @@ test("equivalent object key order shares evidence but selected content and array
       }),
       initial,
     );
-    assert.notEqual(
-      (
-        await StockFingerprintModule.fromRequest({
-          root,
-          request: {
-            ...REQUEST,
-            input: { branches: ["b", "a"] },
-          },
-        })
-      ).configurationHash,
-      initial.configurationHash,
-    );
-    assert.notEqual(
-      (
-        await StockFingerprintModule.fromRequest({
-          root,
-          request: {
-            ...REQUEST,
-            input: { branches: ["a", "changed"] },
-          },
-        })
-      ).configurationHash,
-      initial.configurationHash,
-    );
-    assert.notEqual(
-      (
-        await StockFingerprintModule.fromRequest({
-          root,
-          request: REQUEST,
-          parameters: { samples: [0, 90] },
-        })
-      ).configurationHash,
-      initial.configurationHash,
-    );
+    await _assertChangedRequestHashes({ root, initial });
   });
 });
 
@@ -132,7 +100,7 @@ test("nested renderer, local geography, assets and shared motion edits invalidat
     await [
       "src/stock/presets/Nested/input.ts",
       "src/stock/presets/Nested/Preset.metadata.yaml",
-      "scripts/yaml/compileYaml.cjs",
+      "scripts/yaml/makeEsModuleFromYaml.ts",
       "src/stock/presets/Nested/Renderer.tsx",
       "src/stock/geography/land.json",
       "src/stock/generated/registry.gen.ts",
@@ -149,20 +117,59 @@ test("nested renderer, local geography, assets and shared motion edits invalidat
   });
 });
 
+[
+  "scripts/showcase/renderFilm.ts",
+  "scripts/showcase/getDeliveryThemeFromFilm/getDeliveryThemeFromFilm.ts",
+  "scripts/showcase/ShowcaseFilms/ShowcaseFilms.ts",
+  "scripts/checkFrames/runCheckFrames.ts",
+  "scripts/lib/FrameGateMeasurements/FrameGateMeasurements.ts",
+  "scripts/lib/FrameGateMeasurements/getFrameMeasurementsFromVideo.ts",
+  "scripts/lib/MediaHelpers/runProcess.ts",
+  "scripts/lib/planHelpers/getPreviewFramesFromPlan.ts",
+  "scripts/buildProduct/compileProductSource.ts",
+  "scripts/runProducerCommand/ProducerCli/ProducerCli.mjs",
+  "scripts/runProducerCommand/runShellCommand.mjs",
+  "scripts/videoTheme/loadVideoThemeSnapshot/loadVideoThemeSnapshot.ts",
+  "scripts/requireLicense.ts",
+].forEach((file) => {
+  test(`editing ${file} invalidates stock source evidence`, async () => {
+    await _withSources(async (root) => {
+      const filename = path.join(root, file);
+      await fs.mkdir(path.dirname(filename), { recursive: true });
+      await fs.writeFile(filename, "export const value = 1;");
+      const digest = await StockFingerprintModule.getSourceHashFromRoot(root);
+      await fs.writeFile(filename, "export const value = 2;");
+      assert.notEqual(
+        await StockFingerprintModule.getSourceHashFromRoot(root),
+        digest,
+      );
+    });
+  });
+});
+
 test("ignored exports and tests cannot invalidate the current renderer", async () => {
   await _withSources(async (root) => {
     const digest = await StockFingerprintModule.getSourceHashFromRoot(root);
-    await fs.mkdir(path.join(root, "out/showcase/exports"), {
-      recursive: true,
-    });
-    await fs.writeFile(
-      path.join(root, "out/showcase/exports/film.mp4"),
-      "unrelated",
-    );
-    await fs.writeFile(
-      path.join(root, "src/stock/presets/Nested/input.test.ts"),
-      "unrelated",
-    );
+    await [
+      "out/showcase/exports/inputs.json",
+      "src/stock/presets/Nested/input.test.ts",
+      "scripts/showcase/renderFilm.test.ts",
+      "scripts/checkFrames/__tests__/fixture.ts",
+      "scripts/lib/MediaHelpers/MediaHelpers.test.ts",
+      "scripts/lib/FrameGateMeasurements/out/measurements.json",
+      "scripts/buildProduct/node_modules/dependency/index.js",
+      "scripts/runProducerCommand/__tests__/fixture.mjs",
+      "scripts/videoTheme/.cache/generated.ts",
+      "scripts/showcase/.env.local",
+      "scripts/lib/.env/credentials.ts",
+      "scripts/unrelated.ts",
+      "src/unrelated.ts",
+    ].reduce(async (previous, file) => {
+      await previous;
+      const filename = path.join(root, file);
+      await fs.mkdir(path.dirname(filename), { recursive: true });
+      await fs.writeFile(filename, "unrelated");
+    }, Promise.resolve());
     assert.equal(
       await StockFingerprintModule.getSourceHashFromRoot(root),
       digest,
@@ -177,6 +184,28 @@ test("escaping source symlinks are rejected before reading their contents", asyn
       StockFingerprintModule.getSourceHashFromRoot(root),
       /outside|symlink/i,
     );
+  });
+});
+
+[
+  "scripts/showcase/escaped",
+  "scripts/checkFrames/escaped",
+  "scripts/lib/escaped",
+  "scripts/buildProduct/escaped",
+  "scripts/runProducerCommand/escaped",
+  "scripts/videoTheme/escaped",
+  "scripts/requireLicense.ts",
+].forEach((file) => {
+  test(`escaping symlinks in ${file} are rejected`, async () => {
+    await _withSources(async (root) => {
+      const filename = path.join(root, file);
+      await fs.mkdir(path.dirname(filename), { recursive: true });
+      await fs.symlink(os.tmpdir(), filename);
+      await assert.rejects(
+        StockFingerprintModule.getSourceHashFromRoot(root),
+        /outside|symlink/i,
+      );
+    });
   });
 });
 
@@ -207,28 +236,10 @@ test("a dense preview preserves the exact unchanged default preview", async () =
         input: { branches: ["a", "b", "c"] },
       },
     });
-    await [defaultEvidence, denseEvidence].reduce(
-      async (previous, fingerprint) => {
-        await previous;
-        const directory = StockFingerprintModule.getPreviewDirectoryFromOptions(
-          {
-            root,
-            preset: REQUEST.preset,
-            fingerprint,
-          },
-        );
-        await fs.mkdir(directory, { recursive: true });
-        await fs.writeFile(
-          path.join(directory, "manifest.json"),
-          JSON.stringify({ complete: true, fingerprint }),
-        );
-        await fs.writeFile(
-          path.join(directory, "contact-sheet.jpg"),
-          "inspected test fixture",
-        );
-      },
-      Promise.resolve(),
-    );
+    await _writeFingerprintPreviewFixtures({
+      root,
+      fingerprints: [defaultEvidence, denseEvidence],
+    });
     assert.equal(
       await StockFingerprintModule.requirePreview({
         root,
@@ -273,3 +284,76 @@ test("source edits after input validation cannot be rebound to a newer fingerpri
     );
   });
 });
+
+/** Checks that content order, values and sample parameters change the hash. */
+async function _assertChangedRequestHashes({
+  root,
+  initial,
+}: Readonly<{
+  root: string;
+  initial: Awaited<ReturnType<typeof StockFingerprintModule.fromRequest>>;
+}>): Promise<void> {
+  assert.notEqual(
+    (
+      await StockFingerprintModule.fromRequest({
+        root,
+        request: {
+          ...REQUEST,
+          input: { branches: ["b", "a"] },
+        },
+      })
+    ).configurationHash,
+    initial.configurationHash,
+  );
+  assert.notEqual(
+    (
+      await StockFingerprintModule.fromRequest({
+        root,
+        request: {
+          ...REQUEST,
+          input: { branches: ["a", "changed"] },
+        },
+      })
+    ).configurationHash,
+    initial.configurationHash,
+  );
+  assert.notEqual(
+    (
+      await StockFingerprintModule.fromRequest({
+        root,
+        request: REQUEST,
+        parameters: { samples: [0, 90] },
+      })
+    ).configurationHash,
+    initial.configurationHash,
+  );
+}
+
+/** Writes ordered preview evidence and contact sheets for each fingerprint. */
+async function _writeFingerprintPreviewFixtures({
+  root,
+  fingerprints,
+}: Readonly<{
+  root: string;
+  fingerprints: ReadonlyArray<
+    Awaited<ReturnType<typeof StockFingerprintModule.fromRequest>>
+  >;
+}>): Promise<void> {
+  await fingerprints.reduce(async (previous, fingerprint) => {
+    await previous;
+    const directory = StockFingerprintModule.getPreviewDirectoryFromOptions({
+      root,
+      preset: REQUEST.preset,
+      fingerprint,
+    });
+    await fs.mkdir(directory, { recursive: true });
+    await fs.writeFile(
+      path.join(directory, "manifest.json"),
+      JSON.stringify({ complete: true, fingerprint }),
+    );
+    await fs.writeFile(
+      path.join(directory, "contact-sheet.jpg"),
+      "inspected test fixture",
+    );
+  }, Promise.resolve());
+}

@@ -1,17 +1,15 @@
 import { Select, makeSelectOptions } from "@avandar/ui";
 import { propPasses, removeAtIndex } from "@avandar/utils";
-import { Trans, useLingui } from "@lingui/react/macro";
+import { useLingui } from "@lingui/react/macro";
 import {
   ActionIcon,
-  Button,
   Card,
   ColorInput,
   Group,
   Stack,
   TextInput,
-  Tooltip,
 } from "@mantine/core";
-import { IconInfoCircle, IconPlus, IconTrash } from "@tabler/icons-react";
+import { IconTrash } from "@tabler/icons-react";
 import { useCallback, useMemo } from "react";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType";
 import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
@@ -19,6 +17,7 @@ import css from "@/components/VisualizationContainer/VizSettingsForm/BubbleSerie
 import { SeriesList } from "@/components/VisualizationContainer/VizSettingsForm/SeriesList/SeriesList";
 import { useUniqueRowKeys } from "@/components/VisualizationContainer/VizSettingsForm/useUniqueRowKeys";
 import { CHART_COLOR_SWATCHES } from "@/lib/ui/viz/ChartConstants";
+import { SeriesFieldsetControls } from "../SeriesFieldsetControls";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { AvaBubbleSeries } from "$/models/vizs/series.types";
 import type { SettingsColumnsLayout } from "@/components/SettingsColumns/SettingsColumns";
@@ -98,30 +97,12 @@ export function BubbleSeriesFieldset({
 
   const seriesGroup = (
     <Stack gap="md">
-      <Group justify="space-between">
-        <Group gap={6} align="center">
-          <Tooltip
-            multiline
-            w={280}
-            label={t`Each series is one cloud of bubbles. The size column determines bubble radius.`}
-          >
-            <IconInfoCircle
-              size={14}
-              aria-label={t`What is a series?`}
-              className={css.helpCursor}
-            />
-          </Tooltip>
-        </Group>
-        <Button
-          size="xs"
-          variant="light"
-          leftSection={<IconPlus size={14} />}
-          onClick={addSeries}
-          disabled={numericFields.length === 0}
-        >
-          <Trans>Add series</Trans>
-        </Button>
-      </Group>
+      <SeriesFieldsetControls
+        help={t`Each series is one cloud of bubbles. The size column determines bubble radius.`}
+        helpClassName={css.helpCursor}
+        onAdd={addSeries}
+        disabled={numericFields.length === 0}
+      />
 
       <SeriesList layout={layout}>
         {series.map((bubbleSeries, idx) => {

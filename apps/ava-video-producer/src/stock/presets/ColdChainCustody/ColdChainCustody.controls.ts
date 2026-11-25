@@ -2,7 +2,10 @@ import { z } from "zod";
 import { inputSchema } from "./ColdChainCustody.schema";
 import type { StockControl } from "../../contracts/StockContract.types";
 
-function _copy({ path, message }: { path: string; message: string }) {
+function _copy({ path, message }: { path: string; message: string }): {
+  id: string;
+  message: string;
+} {
   return { id: `motionAtlas.cold-chain-custody.controls.${path}`, message };
 }
 /** Complete recursive editors, including nullable and referenced values. */
@@ -122,11 +125,7 @@ export const controls: StockControl[] = [
               message: "Stop id",
             }),
             kind: "select",
-            optionsFrom: {
-              path: "stops",
-              valueKey: "id",
-              labelKey: "label",
-            },
+            optionsFrom: { path: "stops", valueKey: "id", labelKey: "label" },
           },
           {
             path: "state",

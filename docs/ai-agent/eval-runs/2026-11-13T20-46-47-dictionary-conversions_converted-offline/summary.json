@@ -1,0 +1,17 @@
+{
+  "label": "dictionary-conversions:converted-offline",
+  "questionCount": 7,
+  "passCount": 6,
+  "needlessQuestions": 1,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 15,
+  "promptTokens": 12545,
+  "cachedPromptTokens": 0,
+  "completionTokens": 717,
+  "totalCost": 0,
+  "costPerQuestion": 0,
+  "latencyMedianMs": 8597.20754199999,
+  "latencyP90Ms": 76807.439125,
+  "failedIds": ["D04"]
+}

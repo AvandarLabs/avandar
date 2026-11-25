@@ -26,9 +26,9 @@ function _Wrapper({
         isOpen: false,
         isAvailable: true,
         layout: "docked",
-        caseDesignSessionNonce: 0,
         pendingClarification: undefined,
         pendingCaseTypeDraft: undefined,
+        contextTray: [],
       }}
     >
       <NuxStateManager.Provider

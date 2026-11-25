@@ -9,12 +9,14 @@ import type { ClarificationSubmitAnswer } from "./ClarificationAnswerModule/Clar
 
 type Props = {
   options: readonly string[];
+  optionLabels?: readonly string[];
   onSubmit: (answer: ClarificationSubmitAnswer) => void;
 };
 
 /** Collects multiple preset clarification answers or custom text. */
 export function MultiOptionBody({
   options,
+  optionLabels,
   onSubmit,
 }: Readonly<Props>): React.ReactNode {
   const answer = useMultiOptionAnswer({ options, onSubmit });
@@ -22,6 +24,7 @@ export function MultiOptionBody({
     <Stack gap="xs" onKeyDown={answer.onKeyDown}>
       <MultiOptionList
         options={options}
+        optionLabels={optionLabels}
         selectedOptions={answer.selectedOptions}
         somethingElseLabel={somethingElseLabel()}
         onChange={answer.onOptionsChange}

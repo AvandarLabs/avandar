@@ -1,8 +1,7 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "types": ["node"],
-    "allowJs": true
+    "types": ["node"]
   },
   "include": ["scripts", "tests", "capture-flows", "src/yaml.d.ts"]
 }

@@ -1,4 +1,4 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
 import { FitText } from "../../primitives/FitText/FitText";
 import type { Input } from "./ChartFocusEdit.schema";
 import type { ReactNode } from "react";
@@ -17,7 +17,11 @@ export function CategoryLabel({
   return (
     <g
       data-category-label={category.id}
-      transform={`translate(${mix(direct, 20, 156)} ${y + 15})`}
+      transform={`translate(${Motion.mix({
+        t: direct,
+        from: 20,
+        to: 156,
+      })} ${y + 15})`}
     >
       <FitText
         text={category.label}

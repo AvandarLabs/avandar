@@ -1,10 +1,12 @@
 # Local Avandar capture pipeline
 
-`scripts/capture-avandar.mjs` records real browser flows through the authorized
-local Avandar app. `capture-flows/avandar.mjs` supplies the product-specific
+`scripts/captureAvandar/runCapture.ts` records real browser flows through the authorized
+local Avandar app. `capture-flows/AvandarCaptureFlows.ts` supplies the product-specific
 actions. The runner supplies authentication, isolation, recording, fixture
 hashes, action timing, screenshots, and a durable evidence manifest. It does
 not create product UI or assert that an unchecked feature works.
+`scripts/captureAvandar/captureAvandar.ts` is the `pnpm capture` command-line
+entry for it.
 
 ## Run a capture
 
@@ -14,9 +16,9 @@ or alter backend configuration. Dependencies come from this repository's
 installation. A standalone run also requires Playwright's Chromium binary.
 
 ```sh
-node scripts/capture-avandar.mjs --list
-node scripts/capture-avandar.mjs --flows import,explorer --run-label harborfield
-node scripts/capture-avandar.mjs --help
+pnpm capture --list
+pnpm capture --flows import,explorer --run-label harborfield
+pnpm capture --help
 ```
 
 Defaults are `http://localhost:5173`, workspace `avandar-labs`, viewport
@@ -56,9 +58,10 @@ browser supplied by an authorized Playwright MCP script. It creates isolated
 contexts and leaves the caller's browser open. Do not pass a persistent user
 profile or another app's authenticated context.
 
-```js
+```ts
+// Run from a TypeScript script loaded with `node --import tsx`.
 const { runCapture } = await import(
-  "file:///absolute/path/to/avandar/apps/ava-video-producer/scripts/capture-avandar.mjs"
+  "file:///absolute/path/to/avandar/apps/ava-video-producer/scripts/captureAvandar/runCapture.ts"
 );
 const result = await runCapture({
   browser,
@@ -205,9 +208,8 @@ or missing video also invalidates a run.
 ## Checks
 
 ```sh
-node --check scripts/capture-avandar.mjs
-node --check scripts/capture-lib.mjs
-node --import ./scripts/yaml/registerYaml.mjs --import tsx --test tests/capture.test.ts
+pnpm typecheck
+node --import tsx --import ./scripts/yaml/registerYaml.ts --test tests/capture-*.test.ts
 ```
 
 Tests cover URL/network restrictions, redaction and credential rejection,
@@ -224,7 +226,7 @@ and its [context request interception and storage-state documentation](https://p
 Run from the repository root after inspecting a successful capture:
 
 ```sh
-node scripts/curate-capture.mjs out/captures/<passed-run-directory>
+node --import tsx scripts/curateCapture/curateCapture.ts out/captures/<passed-run-directory>
 ```
 
 The command accepts one run inside this project's `out/captures/`. It requires
@@ -249,7 +251,7 @@ evidence already exist, the default command refuses to overwrite them. To
 explicitly replace that complete curated set:
 
 ```sh
-node scripts/curate-capture.mjs out/captures/<passed-run-directory> --replace
+node --import tsx scripts/curateCapture/curateCapture.ts out/captures/<passed-run-directory> --replace
 ```
 
 Replacement moves the previous `screens/` directory and evidence file intact
@@ -267,8 +269,8 @@ are intentionally tracked as approved shareable samples in this appsitory. Raw c
 material and customer data remain local under the artifact policy in AGENTS.md.
 
 ```sh
-node --check scripts/curate-capture.mjs
-node --import ./scripts/yaml/registerYaml.mjs --import tsx --test tests/curation.test.ts
+node --check scripts/curateCapture/curateCapture.ts
+node --import tsx --import ./scripts/yaml/registerYaml.ts --test tests/curation.test.ts
 ```
 
 The tests exercise copying and evidence links, rejected failure states,

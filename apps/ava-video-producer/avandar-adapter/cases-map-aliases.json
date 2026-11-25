@@ -1,3 +1,5 @@
 {
-  "@/utils/notifications/notifyNotImplemented": "avandar-adapter/shims/cases-map/notifyNotImplemented.ts"
+  "@/utils/notifications/notifyNotImplemented": "avandar-adapter/shims/cases-map/notifyNotImplemented.ts",
+  "@/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries": "avandar-adapter/shims/cases-map/useGadgetSummaries.ts",
+  "@/clients/gadgets/searchGadgets/searchGadgets": "avandar-adapter/shims/cases-map/searchGadgets.ts"
 }

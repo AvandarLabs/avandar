@@ -1,4 +1,3 @@
-import { STOCK } from "../../stockPalette";
 import type { StockContract } from "../../contracts/StockContract.types";
 import type { CodeFocusInput } from "./CodeFocus.schema";
 
@@ -6,36 +5,36 @@ import type { CodeFocusInput } from "./CodeFocus.schema";
 export const codeFocusDefaultInput: CodeFocusInput = {
   lines: [
     [
-      { text: "const", color: STOCK.cyan },
-      { text: " connect = ", color: STOCK.text },
-      { text: "async", color: STOCK.cyan },
-      { text: " (source) => {", color: STOCK.text },
+      { text: "const", color: "$color.accentAlt" },
+      { text: " connect = ", color: "$color.text" },
+      { text: "async", color: "$color.accentAlt" },
+      { text: " (source) => {", color: "$color.text" },
     ],
     [
-      { text: "  const", color: STOCK.cyan },
-      { text: " rows = ", color: STOCK.text },
-      { text: "await", color: STOCK.cyan },
-      { text: " read(source);", color: STOCK.text },
+      { text: "  const", color: "$color.accentAlt" },
+      { text: " rows = ", color: "$color.text" },
+      { text: "await", color: "$color.accentAlt" },
+      { text: " read(source);", color: "$color.text" },
     ],
     [
-      { text: "  const", color: STOCK.cyan },
-      { text: " clean = rows.", color: STOCK.text },
-      { text: "map", color: STOCK.mint },
-      { text: "(normalize);", color: STOCK.text },
+      { text: "  const", color: "$color.accentAlt" },
+      { text: " clean = rows.", color: "$color.text" },
+      { text: "map", color: "$color.accent" },
+      { text: "(normalize);", color: "$color.text" },
     ],
     [
-      { text: "  const", color: STOCK.cyan },
-      { text: " ready = clean.", color: STOCK.text },
-      { text: "filter", color: STOCK.mint },
-      { text: "(isValid);", color: STOCK.text },
+      { text: "  const", color: "$color.accentAlt" },
+      { text: " ready = clean.", color: "$color.text" },
+      { text: "filter", color: "$color.accent" },
+      { text: "(isValid);", color: "$color.text" },
     ],
     [
-      { text: "  return", color: STOCK.cyan },
-      { text: " { status: ", color: STOCK.text },
-      { text: '"ready"', color: STOCK.orange },
-      { text: ", rows: ready };", color: STOCK.text },
+      { text: "  return", color: "$color.accentAlt" },
+      { text: " { status: ", color: "$color.text" },
+      { text: '"ready"', color: "$color.highlight" },
+      { text: ", rows: ready };", color: "$color.text" },
     ],
-    [{ text: "};", color: STOCK.text }],
+    [{ text: "};", color: "$color.text" }],
   ],
   highlight: [1, 2, 3, 4],
   title: "transform.example.ts",
@@ -49,7 +48,7 @@ export const codeFocusDenseInput: CodeFocusInput = { ...codeFocusDefaultInput };
 /** A complete smaller or differently selected authored example. */
 export const codeFocusChangedInput: CodeFocusInput = {
   ...codeFocusDefaultInput,
-  lines: [[{ text: "const approved = true;", color: STOCK.cyan }]],
+  lines: [[{ text: "const approved = true;", color: "$color.accentAlt" }]],
   highlight: [0],
   title: "authored.example.ts",
   footer: "Authored code example",

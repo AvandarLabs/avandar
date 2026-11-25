@@ -95,6 +95,8 @@ export const invalidInputs: unknown[] = [
   { ...DEFAULT_INPUT, gridSize: 5 },
   {
     ...DEFAULT_INPUT,
-    points: DEFAULT_INPUT.points.map((point) => ({ ...point, weight: 0 })),
+    points: DEFAULT_INPUT.points.map((point) => {
+      return { ...point, weight: 0 };
+    }),
   },
 ];

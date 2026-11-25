@@ -14,6 +14,77 @@ import {
 import { inputSchema } from "./ArgumentBridge.schema";
 import type { Input } from "./ArgumentBridge.schema";
 
+function _assertRelationshipDecorations(): void {
+  ["supports", "requires", "suggests"].forEach((relationship) => {
+    const markup = _render({
+      frame: 150,
+      input: {
+        ...DEFAULT_INPUT,
+        relationship: relationship as Input["relationship"],
+      },
+    });
+    assert.match(markup, new RegExp(`data-relationship="${relationship}"`));
+    if (relationship === "suggests") {
+      assert.match(
+        _markedShape({ markup, marker: "bridge-deck" }),
+        /stroke-dasharray="8 7"/,
+      );
+    }
+    if (relationship === "requires") {
+      assert.match(markup, /data-required-brackets=/);
+    }
+  });
+}
+
+function _assertPremiseSupportGeometry(): void {
+  [DEFAULT_INPUT, fixtures[2].input].forEach((input) => {
+    const held = _render({ frame: 150, input: input });
+    assert.equal(
+      (held.match(/data-premise-join=/g) ?? []).length,
+      input.premises.length,
+    );
+    assert.equal(
+      (held.match(/data-premise=/g) ?? []).length,
+      input.premises.length,
+    );
+    input.premises.forEach(({ id, text }) => {
+      assert.ok(held.includes(`data-premise="${id}"`));
+      assert.ok(held.includes(`aria-label="${text}"`));
+    });
+    assert.equal(
+      SvgAttributes.getNumberFromMarkup({
+        attributes: _markedShape({
+          markup: held,
+          marker: "bridge-deck",
+        }),
+        name: "y1",
+      }),
+      350,
+    );
+    assert.match(
+      SvgAttributes.fromMarker({ markup: held, marker: "conclusion" }),
+      /translate\(0 0\)/,
+    );
+  });
+}
+
+/**
+ * A marker group and the sketch-aware shape it wraps, since the marker sits
+ * on the group around the shape.
+ */
+function _markedShape({
+  markup,
+  marker,
+}: Readonly<{ markup: string; marker: string }>): string {
+  const match = markup.match(
+    new RegExp(
+      `<g [^>]*data-${marker}="[^"]*"[^>]*><(?:line|path|circle|rect|ellipse)\\b[^>]*>`,
+    ),
+  );
+  assert.ok(match, marker);
+  return match[0];
+}
+
 function _render({
   frame,
   input = DEFAULT_INPUT,
@@ -42,35 +113,7 @@ registerStockPresetAssertions({
 });
 
 test("every supplied premise builds its own physical support beneath the authored conclusion", () => {
-  [DEFAULT_INPUT, fixtures[2].input].forEach((input) => {
-    const held = _render({ frame: 150, input: input });
-    assert.equal(
-      (held.match(/data-premise-join=/g) ?? []).length,
-      input.premises.length,
-    );
-    assert.equal(
-      (held.match(/data-premise=/g) ?? []).length,
-      input.premises.length,
-    );
-    input.premises.forEach(({ id, text }) => {
-      assert.ok(held.includes(`data-premise="${id}"`));
-      assert.ok(held.includes(`aria-label="${text}"`));
-    });
-    assert.equal(
-      SvgAttributes.getNumberFromMarkup({
-        attributes: SvgAttributes.fromMarker({
-          markup: held,
-          marker: "bridge-deck",
-        }),
-        name: "y1",
-      }),
-      350,
-    );
-    assert.match(
-      SvgAttributes.fromMarker({ markup: held, marker: "conclusion" }),
-      /translate\(0 0\)/,
-    );
-  });
+  _assertPremiseSupportGeometry();
   assert.match(
     SvgAttributes.fromMarker({
       markup: _render({ frame: 30 }),
@@ -96,25 +139,7 @@ test("every supplied premise builds its own physical support beneath the authore
     }),
     /data-individual-support=/,
   );
-  ["supports", "requires", "suggests"].forEach((relationship) => {
-    const markup = _render({
-      frame: 150,
-      input: {
-        ...DEFAULT_INPUT,
-        relationship: relationship as Input["relationship"],
-      },
-    });
-    assert.match(markup, new RegExp(`data-relationship="${relationship}"`));
-    if (relationship === "suggests") {
-      assert.match(
-        SvgAttributes.fromMarker({ markup, marker: "bridge-deck" }),
-        /stroke-dasharray="8 7"/,
-      );
-    }
-    if (relationship === "requires") {
-      assert.match(markup, /data-required-brackets=/);
-    }
-  });
+  _assertRelationshipDecorations();
 });
 
 test("premise joining arms reach the common deck when central supports are hidden", () => {
@@ -125,7 +150,11 @@ test("premise joining arms reach the common deck when central supports are hidde
       showIndividualSupports: false,
     },
   });
-  const arms = [...markup.matchAll(/data-premise-join="[^"]+" d="([^"]+)"/g)];
+  const arms = [
+    ...markup.matchAll(/data-premise-join="[^"]+"><path d="([^"]+)"/g),
+  ];
   assert.equal(arms.length, 3);
-  arms.forEach(([, path]) => assert.match(path, /V350/));
+  arms.forEach(([, path]) => {
+    return assert.match(path, /V350/);
+  });
 });

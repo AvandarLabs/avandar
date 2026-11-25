@@ -30,8 +30,9 @@ export const inputSchema = z
     scenarioCaption: z.string().min(1).max(48),
   })
   .superRefine((input, context) => {
-    const issue = (path: string, message: string) =>
-      context.addIssue({ code: "custom", path: [path], message });
+    const issue = (path: string, message: string) => {
+      return context.addIssue({ code: "custom", path: [path], message });
+    };
 
     if (
       new Set(input.products.map(prop("id"))).size !== input.products.length
@@ -42,8 +43,9 @@ export const inputSchema = z
     if (
       selected.length < 1 ||
       selected.length > 3 ||
-      selected.reduce((sum, item) => sum + item.price, 0) >
-        input.availableCredits
+      selected.reduce((sum, item) => {
+        return sum + item.price;
+      }, 0) > input.availableCredits
     ) {
       issue(
         "products",

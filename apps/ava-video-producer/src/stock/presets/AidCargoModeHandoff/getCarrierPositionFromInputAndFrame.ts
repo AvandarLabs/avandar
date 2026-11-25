@@ -1,6 +1,6 @@
-import { EASE, mix, ramp } from "../../../motion";
+import { Motion } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./AidCargoModeHandoff.schema";
-
 /**
  * A receiving carrier waits, travels with its complete load, then stops to
  * unload.
@@ -9,7 +9,13 @@ export function getCarrierPositionFromInputAndFrame({
   input,
   frame,
   index,
-}: Readonly<{ input: Input; frame: number; index: number }>): {
+  motion,
+}: Readonly<{
+  input: Input;
+  frame: number;
+  index: number;
+  motion: VideoMotion;
+}>): {
   x: number;
   y: number;
 } {
@@ -19,11 +25,11 @@ export function getCarrierPositionFromInputAndFrame({
   const start = index === 1 ? 66 : 112;
   const duration = isFinal ? (index === 1 ? 30 : 20) : 14;
   return {
-    x: mix(
-      ramp(frame, start, duration, EASE.inOut),
-      destination - distance,
-      destination + (isFinal ? 16 : 0),
-    ),
+    x: Motion.mix({
+      t: motion.ramp(frame, start, duration, motion.travel.easing),
+      from: destination - distance,
+      to: destination + (isFinal ? 16 : 0),
+    }),
     y: 335,
   };
 }

@@ -1,3 +1,4 @@
+import type { DictionarySuggestionsRequest } from "$/agent/dictionarySuggestions/dictionarySuggestionsPrompt.ts";
 import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage.ts";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext.ts";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse.ts";
@@ -10,7 +11,14 @@ import type { APITypeDef } from "@sbfn/_shared/MiniServer/api.types.ts";
 
 export type ChatAPI = APITypeDef<
   "chat",
-  ["/:workspaceId/messages", "/:workspaceId/session-secret"],
+  [
+    "/:workspaceId/messages",
+    "/:workspaceId/session-secret",
+    "/:workspaceId/agent/:promptId/api/stream",
+    "/:workspaceId/title/:promptId",
+    "/:workspaceId/extract-measurements",
+    "/:workspaceId/dictionary-suggestions/:promptId",
+  ],
   {
     "/:workspaceId/messages": {
       POST: {
@@ -20,11 +28,66 @@ export type ChatAPI = APITypeDef<
         body: {
           messages: ChatClientMessage.T[];
           context: ChatPageContext.T;
+          /** Ignored. Kept so older clients that send one still validate. */
           model?: string;
           consentAcks?: ConsentAck[];
           retryContext?: ChatRetryContext;
         };
         returnType: ChatResponse.T;
+      };
+    };
+    "/:workspaceId/agent/:promptId/api/stream": {
+      POST: {
+        pathParams: {
+          workspaceId: string;
+          /** The prompt version, `DATA_AGENT_PROMPT_ID`. */
+          promptId: string;
+        };
+        body: {
+          model: { id: string };
+          context: { messages: unknown[] };
+          options?: {
+            reasoning?: "minimal" | "low" | "medium";
+            sessionId?: string;
+            temperature?: number;
+            maxTokens?: number;
+          };
+        };
+        returnType: Response;
+      };
+    };
+    "/:workspaceId/title/:promptId": {
+      POST: {
+        pathParams: { workspaceId: string; promptId: string };
+        body: { excerpt: string; locale: string; placeholder: string };
+        returnType: { title: string };
+      };
+    };
+    "/:workspaceId/extract-measurements": {
+      POST: {
+        pathParams: {
+          workspaceId: string;
+        };
+        body: {
+          /** The text of the region the user drew, as consented to. */
+          regionText: string;
+          /** Figures the rules already read, so the model adds the rest. */
+          alreadyExtracted: Array<{ metric: string; value: number }>;
+          /** Proof the user agreed to send `regionText`. */
+          ackToken: string;
+        };
+        returnType: { responseText: string; model: string };
+      };
+    };
+    "/:workspaceId/dictionary-suggestions/:promptId": {
+      POST: {
+        pathParams: { workspaceId: string; promptId: string };
+        body: {
+          request: DictionarySuggestionsRequest;
+          /** Proof the user agreed to send exactly `request`. */
+          ackToken: string;
+        };
+        returnType: { reply: string };
       };
     };
     "/:workspaceId/session-secret": {

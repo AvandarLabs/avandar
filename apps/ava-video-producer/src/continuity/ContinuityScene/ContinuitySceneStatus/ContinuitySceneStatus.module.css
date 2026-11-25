@@ -1,0 +1,28 @@
+.continuitySceneStatusEvidence {
+  bottom: var(--video-layout-stage-evidence-row-bottom);
+  color: var(--video-text-stage-evidence-color);
+  display: flex;
+  font-family: var(--video-text-stage-evidence-font-family);
+  font-size: var(--video-text-stage-evidence-font-size);
+  font-weight: var(--video-text-stage-evidence-font-weight);
+  gap: var(--video-layout-stage-evidence-row-gap);
+  justify-content: space-between;
+  left: var(--video-layout-stage-evidence-row-x);
+  pointer-events: none;
+  position: absolute;
+  right: var(--video-layout-stage-evidence-row-x);
+  z-index: 30;
+}
+
+.continuitySceneStatusEvidence span {
+  background: var(--video-color-ground);
+  padding: var(--video-component-evidence-chip-padding-y)
+    var(--video-component-evidence-chip-padding-x);
+}
+
+.continuitySceneStatusProgress {
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  z-index: 40;
+}

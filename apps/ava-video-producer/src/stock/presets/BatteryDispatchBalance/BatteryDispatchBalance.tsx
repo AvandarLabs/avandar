@@ -2,7 +2,7 @@ import { BatteryEquation } from "./BatteryEquation";
 import { BatteryVessel } from "./BatteryVessel";
 import { BatteryWindows } from "./BatteryWindows";
 import { DispatchOperator } from "./DispatchOperator";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./BatteryDispatchBalance.schema";
 import type { ReactNode } from "react";
 /** Inputs for BatteryDispatchBalance. */

@@ -30,38 +30,45 @@ export const inputSchema = z
     exampleLabel: z.string().min(1).max(32),
   })
   .refine(
-    (input) =>
-      new Set(input.payments.map(prop("id"))).size === input.payments.length,
+    (input) => {
+      return (
+        new Set(input.payments.map(prop("id"))).size === input.payments.length
+      );
+    },
     { path: ["payments"], message: "Payment IDs must be unique." },
   )
   .refine(
-    (input) =>
-      input.payments.every(
-        (payment) =>
-          payment.receivedUnits + payment.correctionUnits <=
-          payment.statedUnits,
-      ),
+    (input) => {
+      return input.payments.every((payment) => {
+        return (
+          payment.receivedUnits + payment.correctionUnits <= payment.statedUnits
+        );
+      });
+    },
     {
       path: ["payments"],
       message: "Corrections cannot exceed the original shortfall.",
     },
   )
   .refine(
-    (input) =>
-      input.payments.reduce(
-        (total, payment) => total + payment.statedUnits,
-        0,
-      ) <= 12,
+    (input) => {
+      return (
+        input.payments.reduce((total, payment) => {
+          return total + payment.statedUnits;
+        }, 0) <= 12
+      );
+    },
     {
       path: ["payments"],
       message: "At most twelve stated units are supported.",
     },
   )
   .refine(
-    (input) =>
-      input.payments.some(
-        (payment) => payment.receivedUnits < payment.statedUnits,
-      ),
+    (input) => {
+      return input.payments.some((payment) => {
+        return payment.receivedUnits < payment.statedUnits;
+      });
+    },
     { path: ["payments"], message: "An original shortfall is required." },
   ) satisfies z.ZodType;
 /** Schema-inferred scene input. */

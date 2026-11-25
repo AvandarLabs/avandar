@@ -1,144 +1,202 @@
 import { prop, propEq, propNotEq } from "@avandar/utils";
 import { z } from "zod";
 import type { StockSemanticRule } from "../../contracts/StockContract.types";
-/** Complete strict authored input and semantic constraints. */
-export const inputSchema = z
-  .strictObject({
-    requests: z
-      .array(
-        z.strictObject({
-          id: z.string().min(0).max(24),
-          label: z.string().min(0).max(28),
-        }),
-      )
-      .min(2)
-      .max(3),
-    contributions: z
-      .array(
-        z.strictObject({
-          id: z.string().min(0).max(24),
-          donorLabel: z.string().min(0).max(24),
-          mark: z.string().min(1).max(2),
-          credits: z.number().finite().int().min(1).max(5),
-          earmarkedRequestId: z.string().min(0).max(24).nullable(),
-        }),
-      )
-      .min(2)
-      .max(4),
-    allocations: z
-      .array(
-        z.strictObject({
-          contributionId: z.string().min(0).max(24),
-          requestId: z.string().min(0).max(24),
-          credits: z.number().finite().int().min(1).max(5),
-        }),
-      )
-      .min(2)
-      .max(8),
-    labels: z.strictObject({
-      coordinator: z.string().min(0).max(26),
-      pool: z.string().min(0).max(26),
-      earmarked: z.string().min(0).max(26),
-      flexible: z.string().min(0).max(26),
-      allocated: z.string().min(0).max(26),
-      remaining: z.string().min(0).max(26),
-      unit: z.string().min(0).max(26),
-    }),
-    showAllocationTotals: z.boolean(),
-    envelopeArrangement: z.enum(["fan", "side-by-side"]),
-    scenarioCaption: z.string().min(1).max(48),
-  })
-  .superRefine((input, context) => {
-    const issue = (path: string, message: string) =>
-      context.addIssue({ code: "custom", path: [path], message });
 
-    [input.requests, input.contributions].forEach((items) => {
-      if (
-        new Set(items.map(prop<{ id: string }, "id", string>("id"))).size !==
-        items.length
-      ) {
-        issue(
-          "contributions",
-          "Request and contribution IDs must each be unique.",
-        );
-      }
-    });
+/** Complete strict authored input and semantic constraints. */
+
+const authoredInputSchema = z.strictObject({
+  requests: z
+    .array(
+      z.strictObject({
+        id: z.string().min(0).max(24),
+        label: z.string().min(0).max(28),
+      }),
+    )
+    .min(2)
+    .max(3),
+  contributions: z
+    .array(
+      z.strictObject({
+        id: z.string().min(0).max(24),
+        donorLabel: z.string().min(0).max(24),
+        mark: z.string().min(1).max(2),
+        credits: z.number().finite().int().min(1).max(5),
+        earmarkedRequestId: z.string().min(0).max(24).nullable(),
+      }),
+    )
+    .min(2)
+    .max(4),
+  allocations: z
+    .array(
+      z.strictObject({
+        contributionId: z.string().min(0).max(24),
+        requestId: z.string().min(0).max(24),
+        credits: z.number().finite().int().min(1).max(5),
+      }),
+    )
+    .min(2)
+    .max(8),
+  labels: z.strictObject({
+    coordinator: z.string().min(0).max(26),
+    pool: z.string().min(0).max(26),
+    earmarked: z.string().min(0).max(26),
+    flexible: z.string().min(0).max(26),
+    allocated: z.string().min(0).max(26),
+    remaining: z.string().min(0).max(26),
+    unit: z.string().min(0).max(26),
+  }),
+  showAllocationTotals: z.boolean(),
+  envelopeArrangement: z.enum(["fan", "side-by-side"]),
+  scenarioCaption: z.string().min(1).max(48),
+});
+type ValidatePooledDonorAllocationRequestsContributionsOptions = {
+  input: Readonly<{ input: Input; context: z.RefinementCtx }>["input"];
+  issue: (path: string, message: string) => void;
+};
+type ValidatePooledDonorAllocationContributionsMarkOptions = {
+  input: Readonly<{ input: Input; context: z.RefinementCtx }>["input"];
+  issue: (path: string, message: string) => void;
+};
+type ValidatePooledDonorAllocationContributionsOptions = {
+  input: Readonly<{ input: Input; context: z.RefinementCtx }>["input"];
+  issue: (path: string, message: string) => void;
+};
+type ValidatePooledDonorAllocationAllocationsOptions = {
+  input: Readonly<{ input: Input; context: z.RefinementCtx }>["input"];
+  issue: (path: string, message: string) => void;
+};
+/** Checks the allocations constraint and records any violations. */
+function _validatePooledDonorAllocationAllocations({
+  input,
+  issue,
+}: Readonly<ValidatePooledDonorAllocationAllocationsOptions>): void {
+  input.allocations.forEach((allocation, index) => {
+    const contributor = input.contributions.find(
+      propEq("id", allocation.contributionId),
+    );
     if (
-      new Set(input.contributions.map(prop("mark"))).size !==
-      input.contributions.length
+      !contributor ||
+      !input.requests.some(propEq("id", allocation.requestId)) ||
+      (contributor.earmarkedRequestId !== null &&
+        contributor.earmarkedRequestId !== allocation.requestId)
+    ) {
+      issue(
+        "allocations",
+        "Allocation references must exist and respect the contributor earmark.",
+      );
+    }
+    if (
+      input.allocations.slice(0, index).some((prior) => {
+        return (
+          prior.contributionId === allocation.contributionId &&
+          prior.requestId === allocation.requestId
+        );
+      })
+    ) {
+      issue("allocations", "Contribution/request pairs must be unique.");
+    }
+  });
+}
+
+/** Checks the contributions constraint and records any violations. */
+function _validatePooledDonorAllocationContributions({
+  input,
+  issue,
+}: Readonly<ValidatePooledDonorAllocationContributionsOptions>): void {
+  input.contributions.forEach((item) => {
+    if (
+      item.earmarkedRequestId !== null &&
+      !input.requests.some(propEq("id", item.earmarkedRequestId))
     ) {
       issue(
         "contributions",
-        "Contributor marks must be unique literal strings.",
+        "Every non-null earmark must reference an existing request.",
       );
     }
     if (
-      input.contributions.reduce((sum, item) => sum + item.credits, 0) > 14 ||
-      !input.contributions.some(propEq("earmarkedRequestId", null)) ||
-      !input.contributions.some(propNotEq("earmarkedRequestId", null))
+      input.allocations
+        .filter(propEq("contributionId", item.id))
+        .reduce((sum, allocation) => {
+          return sum + allocation.credits;
+        }, 0) > item.credits
+    ) {
+      issue("allocations", "Allocations may not overspend a contribution.");
+    }
+  });
+}
+
+/** Checks the contributions mark constraint and records any violations. */
+function _validatePooledDonorAllocationContributionsMark({
+  input,
+  issue,
+}: Readonly<ValidatePooledDonorAllocationContributionsMarkOptions>): void {
+  if (
+    new Set(input.contributions.map(prop("mark"))).size !==
+    input.contributions.length
+  ) {
+    issue("contributions", "Contributor marks must be unique literal strings.");
+  }
+}
+
+/** Checks the requests contributions constraint and records any violations. */
+function _validatePooledDonorAllocationRequestsContributions({
+  input,
+  issue,
+}: Readonly<ValidatePooledDonorAllocationRequestsContributionsOptions>): void {
+  [input.requests, input.contributions].forEach((items) => {
+    if (
+      new Set(items.map(prop<{ id: string }, "id", string>("id"))).size !==
+      items.length
     ) {
       issue(
         "contributions",
-        "Total credits must be at most 14 with at least one earmarked and one flexible contribution.",
+        "Request and contribution IDs must each be unique.",
       );
     }
-    input.contributions.forEach((item) => {
-      if (
-        item.earmarkedRequestId !== null &&
-        !input.requests.some(({ id }) => id === item.earmarkedRequestId)
-      ) {
-        issue(
-          "contributions",
-          "Every non-null earmark must reference an existing request.",
-        );
-      }
-      if (
-        input.allocations
-          .filter(({ contributionId }) => contributionId === item.id)
-          .reduce((sum, allocation) => sum + allocation.credits, 0) >
-        item.credits
-      ) {
-        issue("allocations", "Allocations may not overspend a contribution.");
-      }
-    });
-    input.allocations.forEach((allocation, index) => {
-      const contributor = input.contributions.find(
-        ({ id }) => id === allocation.contributionId,
-      );
-      if (
-        !contributor ||
-        !input.requests.some(({ id }) => id === allocation.requestId) ||
-        (contributor.earmarkedRequestId !== null &&
-          contributor.earmarkedRequestId !== allocation.requestId)
-      ) {
-        issue(
-          "allocations",
-          "Allocation references must exist and respect the contributor earmark.",
-        );
-      }
-      if (
-        input.allocations
-          .slice(0, index)
-          .some(
-            (prior) =>
-              prior.contributionId === allocation.contributionId &&
-              prior.requestId === allocation.requestId,
-          )
-      ) {
-        issue("allocations", "Contribution/request pairs must be unique.");
-      }
-    });
-    if (
-      input.requests.some(
-        ({ id }) =>
-          !input.allocations.some(({ requestId }) => id === requestId),
-      )
-    ) {
-      issue("allocations", "Every request must receive at least one credit.");
-    }
-  }) satisfies z.ZodType;
+  });
+}
+
+/** Validates cross-field relationships in the authored input. */
+function _validatePooledDonorAllocationInput({
+  input,
+  context,
+}: Readonly<{ input: Input; context: z.RefinementCtx }>): void {
+  const issue = (path: string, message: string) => {
+    return context.addIssue({ code: "custom", path: [path], message });
+  };
+
+  _validatePooledDonorAllocationRequestsContributions({ input, issue });
+  _validatePooledDonorAllocationContributionsMark({ input, issue });
+  if (
+    input.contributions.reduce((sum, item) => {
+      return sum + item.credits;
+    }, 0) > 14 ||
+    !input.contributions.some(propEq("earmarkedRequestId", null)) ||
+    !input.contributions.some(propNotEq("earmarkedRequestId", null))
+  ) {
+    issue(
+      "contributions",
+      "Total credits must be at most 14 with at least one earmarked and one flexible contribution.",
+    );
+  }
+  _validatePooledDonorAllocationContributions({ input, issue });
+  _validatePooledDonorAllocationAllocations({ input, issue });
+  if (
+    input.requests.some(({ id }) => {
+      return !input.allocations.some(({ requestId }) => {
+        return id === requestId;
+      });
+    })
+  ) {
+    issue("allocations", "Every request must receive at least one credit.");
+  }
+}
+/** Complete authored input with its runtime semantic constraints. */
+export const inputSchema = authoredInputSchema.superRefine((input, context) => {
+  _validatePooledDonorAllocationInput({ input, context });
+}) satisfies z.ZodType;
 /** Input inferred from runtime validation. */
-export type Input = z.output<typeof inputSchema>;
+export type Input = z.output<typeof authoredInputSchema>;
 /** Runtime cross-field constraints and conserved quantities. */
 export const SEMANTIC_RULES: StockSemanticRule[] = [
   {

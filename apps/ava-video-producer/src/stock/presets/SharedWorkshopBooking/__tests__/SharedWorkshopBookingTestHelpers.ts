@@ -9,17 +9,32 @@ import { SharedWorkshopBooking } from "../SharedWorkshopBooking";
 import { defaultInput } from "../SharedWorkshopBooking.fixtures";
 import { type Input } from "../SharedWorkshopBooking.schema";
 
+/**
+ * Rendered markup with each marked sketch-aware shape read as one element.
+ * `SketchedShape` draws its plain shape inside a group that carries the
+ * shape's markers (`data-*`, `aria-label`, `transform`), so the group's
+ * attributes move onto the shape these assertions read.
+ */
+function _joinMarkedShapes(markup: string): string {
+  return markup.replace(
+    /<g((?:\s+(?:data-[\w-]+|aria-label|transform)="[^"]*")+)><(path|line|circle|rect|ellipse)\b([^>]*)><\/\2><\/g>/g,
+    "<$2$1$3></$2>",
+  );
+}
+
 function _render({
   frame,
   input = defaultInput,
 }: Readonly<{ frame: number; input?: Input }>): string {
-  return renderToStaticMarkup(
-    createElement(SharedWorkshopBooking, {
-      frame,
-      input,
-      accent: "#67e8c2",
-      id: "packet20",
-    }),
+  return _joinMarkedShapes(
+    renderToStaticMarkup(
+      createElement(SharedWorkshopBooking, {
+        frame,
+        input,
+        accent: "#67e8c2",
+        id: "packet20",
+      }),
+    ),
   );
 }
 
@@ -217,38 +232,25 @@ function _assertAgreementClearance({
 }): void {
   const markup = _render({ frame: frame, input: input });
   const texts = [...markup.matchAll(/<text[^>]*>.*?<\/text>/g)].map(
-    ([text]) => text,
+    ([text]) => {
+      return text;
+    },
   );
-  const caption = texts.find((text) =>
-    text.includes(`aria-label="${_escape(input.labels.agreed)}"`),
-  );
+  const caption = texts.find((text) => {
+    return text.includes(`aria-label="${_escape(input.labels.agreed)}"`);
+  });
   assert.ok(caption, "the complete authored agreement caption is present");
-  const obstacles = [
-    ...[
-      ...markup.matchAll(/<rect data-(?:original-)?request="[^"]*"[^>]*>/g),
-    ].map(([rect]) => _rectBounds(rect)),
-    ...[...markup.matchAll(/<line data-request-hand="[^"]*"[^>]*>/g)].map(
-      ([line]) => _lineBounds(line),
-    ),
-    ..._actorBounds(markup),
-    ...texts.filter((text) => text !== caption).flatMap(_textBounds),
-    ...[
-      ...markup
-        .slice(markup.indexOf("<g data-machine="))
-        .split("</g>")[0]
-        .matchAll(/<path[^>]*>/g),
-    ].map(([path]) => _pathBounds({ path, x: 0, y: 0, padding: 2.5 })),
-  ];
+  const obstacles = _getAgreementObstacles({ markup, texts, caption });
   assert.equal(_actorBounds(markup).length, input.requests.length * 2);
-  _textBounds(caption).forEach((line) =>
-    obstacles.forEach((obstacle) =>
-      _assertClear({
+  _textBounds(caption).forEach((line) => {
+    return obstacles.forEach((obstacle) => {
+      return _assertClear({
         first: line,
         second: obstacle,
         context: `agreement at frame ${frame}`,
-      }),
-    ),
-  );
+      });
+    });
+  });
 }
 export {
   _render,
@@ -264,3 +266,41 @@ export {
   _assertAgreementClearance,
 };
 export type { Bounds, PathBoundsOptions };
+
+/** Returns request, actor, text and machine bounds around the agreement. */
+function _getAgreementObstacles({
+  markup,
+  texts,
+  caption,
+}: Readonly<{
+  markup: string;
+  texts: readonly string[];
+  caption: string;
+}>): Bounds[] {
+  return [
+    ...[
+      ...markup.matchAll(/<rect data-(?:original-)?request="[^"]*"[^>]*>/g),
+    ].map(([rect]) => {
+      return _rectBounds(rect);
+    }),
+    ...[...markup.matchAll(/<line data-request-hand="[^"]*"[^>]*>/g)].map(
+      ([line]) => {
+        return _lineBounds(line);
+      },
+    ),
+    ..._actorBounds(markup),
+    ...texts
+      .filter((text) => {
+        return text !== caption;
+      })
+      .flatMap(_textBounds),
+    ...[
+      ...markup
+        .slice(markup.indexOf("<g data-machine="))
+        .split("</g>")[0]
+        .matchAll(/<path[^>]*>/g),
+    ].map(([path]) => {
+      return _pathBounds({ path, x: 0, y: 0, padding: 2.5 });
+    }),
+  ];
+}

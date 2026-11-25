@@ -51,6 +51,9 @@ export type RenderAsTypeOptions =
 export type PrimitiveValueRenderOptions<
   T,
   RootData extends GenericRootData | undefined,
+  ParentObject extends DescribableObject | undefined =
+    | DescribableObject
+    | undefined,
 > = {
   /**
    * When rendering we will do our best to infer the type of the value based on
@@ -76,8 +79,16 @@ export type PrimitiveValueRenderOptions<
    *
    * If `undefined` is returned, this will be interpreted as a no-op, and
    * we will fall back to using the other render options for that value.
+   *
+   * `parentObject` is the object the value is a key of, such as the row a
+   * table cell sits in. It is `undefined` for a value that is not inside an
+   * object.
    */
-  renderValue?: (value: T, rootData: RootData) => ReactNode;
+  renderValue?: (
+    value: T,
+    rootData: RootData,
+    parentObject: ParentObject,
+  ) => ReactNode;
 
   /**
    * A custom render function for the value in edit mode. If provided, this will
@@ -85,9 +96,13 @@ export type PrimitiveValueRenderOptions<
    *
    * If `undefined` is returned, this will be interpreted as a no-op, and
    * we will fall back to using `renderAsType` to render the editable value in
-   * edit mode.
+   * edit mode. `parentObject` is the same as in `renderValue`.
    */
-  renderEditableValue?: (value: T, rootData: RootData) => ReactNode;
+  renderEditableValue?: (
+    value: T,
+    rootData: RootData,
+    parentObject: ParentObject,
+  ) => ReactNode;
 
   /** The string to display for empty strings */
   renderEmptyString?: NonNullable<ReactNode>;
@@ -143,8 +158,8 @@ export type ObjectKeyRenderOptionsMap<
     : NonNullable<T[K]> extends ReadonlyArray<infer ArrayType>
       ? DescribableValueArrayRenderOptions<ArrayType, RootData>
       : T[K] extends PrimitiveValue
-        ? PrimitiveValueRenderOptions<T[K], RootData>
-        : PrimitiveValueRenderOptions<unknown, RootData>;
+        ? PrimitiveValueRenderOptions<T[K], RootData, T>
+        : PrimitiveValueRenderOptions<unknown, RootData, T>;
 };
 
 /**
@@ -303,7 +318,7 @@ type BaseObjectArrayRenderOptions<
    * The key to use as the React key in order to render the array of
    * items in a stable way. If an `idKey` is not provided we will
    * automatically test if the object has an "id" key, otherwise
-   * we will fall back to the array index.
+   * we will fall back to the object reference identity.
    */
   idKey?: Extract<keyof T, string | number>;
 };

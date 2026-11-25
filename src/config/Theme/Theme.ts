@@ -58,6 +58,15 @@ import type {
 export const APP_SLATE_Z_INDEX = 150;
 
 /**
+ * Docked chat aside z-index. While docked, Ask Avandar is fused to the
+ * slate's inline-end edge and reads as the slate's right-hand pane, so it
+ * paints just over the slate: that is what keeps the slate's drop shadow from
+ * falling across the chat. It stays below `getDefaultZIndex("modal")` (200)
+ * and `APP_CHROME_Z_INDEX` for the same reasons the slate does.
+ */
+export const APP_CHAT_ASIDE_Z_INDEX = APP_SLATE_Z_INDEX + 1;
+
+/**
  * App chrome z-index. Floating toolbars, the mobile navbar, and the chat
  * composer overlay live here: above the slate but always below modals,
  * drawers, and any overlay layer. Anchoring chrome to this token (instead of
@@ -104,6 +113,16 @@ export const PRODUCT_MODAL_ROOT_CLASSNAME = "ava-product-modal";
 
 /** Selector for a mounted product modal root. */
 export const PRODUCT_MODAL_ROOT_SELECTOR = `.${PRODUCT_MODAL_ROOT_CLASSNAME}`;
+
+/**
+ * Marks every Mantine `Drawer` root. Drawers dock to a viewport edge, which
+ * is where the onboarding checklist docks too, and the checklist outranks
+ * them, so it hides while one is open rather than cover the drawer's footer.
+ */
+export const PRODUCT_DRAWER_ROOT_CLASSNAME = "ava-product-drawer";
+
+/** Selector for a mounted drawer root. */
+export const PRODUCT_DRAWER_ROOT_SELECTOR = `.${PRODUCT_DRAWER_ROOT_CLASSNAME}`;
 
 /** Default props for `<Modal>` and `@mantine/modals` ModalsProvider. */
 export const DEFAULT_MODAL_PROPS = {
@@ -255,7 +274,11 @@ export const Theme = createTheme({
       },
       styles: {
         root: {
-          borderColor: "var(--ava-border-default)",
+          // Theme styles render inline, so no CSS module class can override
+          // them. A Paper that needs a different edge (the slate, on the dark
+          // shell) sets `--ava-paper-border-color` from its own CSS instead.
+          borderColor:
+            "var(--ava-paper-border-color, var(--ava-border-default))",
           transition: interactiveTransition,
         },
       },
@@ -306,6 +329,11 @@ export const Theme = createTheme({
     Drawer: Drawer.extend({
       defaultProps: {
         transitionProps: AnimationTheme.mantine.drawer,
+      },
+      // Theme-level classNames merge with a drawer's own `classNames` prop,
+      // where a default prop would be replaced by it.
+      classNames: {
+        root: PRODUCT_DRAWER_ROOT_CLASSNAME,
       },
     }),
 

@@ -18,9 +18,9 @@ export function ShadeHeader({ input }: Readonly<Props>): ReactNode {
   ];
   return (
     <g>
-      {labels.map((label, index) => (
-        <SceneLabel key={index} {...label} />
-      ))}
+      {labels.map((label) => {
+        return <SceneLabel key={`${label.x}:${label.y}`} {...label} />;
+      })}
     </g>
   );
 }

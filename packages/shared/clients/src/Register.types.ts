@@ -17,7 +17,7 @@
 
 import type { UnknownObject } from "@avandar/utils";
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+// oxlint-disable-next-line typescript/no-empty-object-type
 export interface Register {}
 
 /**
@@ -28,7 +28,7 @@ export type RegisteredSupabaseDatabase = Register extends {
   supabaseDatabase: infer DB extends UnknownObject;
 }
   ? DB
-  : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  : // oxlint-disable-next-line typescript/no-explicit-any
     any;
 
 /**

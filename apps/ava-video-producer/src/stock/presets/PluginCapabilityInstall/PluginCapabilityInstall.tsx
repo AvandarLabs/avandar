@@ -1,9 +1,9 @@
-import { ramp } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { CategoryTallies } from "./CategoryTallies";
 import { RetainedRecordStrip } from "./RetainedRecordStrip";
 import { UtilitySocket } from "./UtilitySocket";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./PluginCapabilityInstall.schema";
 import type { ReactNode } from "react";
 /** A complete authored utility-installation study. */
@@ -14,6 +14,7 @@ export function PluginCapabilityInstall({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g>
       <LabelSlots
@@ -26,7 +27,7 @@ export function PluginCapabilityInstall({
       />
       <RetainedRecordStrip input={input} accent={accent} frame={frame} />
       <UtilitySocket input={input} frame={frame} accent={accent} />
-      <g opacity={ramp(frame, 12, 43)}>
+      <g opacity={motion.ramp(frame, 12, motion.scale(43))}>
         <LabelSlots
           labels={[[input.installation.decisionLabel, 500, 369, 395, 12, 3]]}
         />

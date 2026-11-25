@@ -19,9 +19,13 @@ sections, and the walkthrough takes longer than everything else combined.
    it stands. Initialize reviewed state only when it is absent; otherwise
    preserve and reconcile it. Pass the coverage gate.
 4. When `-walkthrough.md` does not exist for the selected comparison, write it
-   by running steps 2 to 12 of [Walkthrough](walkthrough.md). When it exists,
-   leave it untouched, per
-   [When a walkthrough is written](../SKILL.md#when-a-walkthrough-is-written).
+   by running steps 2 to 12 of [Walkthrough](walkthrough.md) (which also
+   renders `.difit/pdfs/<stem>-walkthrough.pdf`). When `-walkthrough.md`
+   exists, leave it untouched per
+   [When a walkthrough is written](../SKILL.md#when-a-walkthrough-is-written),
+   rendering `.difit/pdfs/<stem>-walkthrough.pdf` with
+   `python3 <skill-dir>/scripts/render-pdf.py <walkthrough-md-path>` only if
+   that PDF is absent.
 5. Write the explainer threads per
    [Explainer threads](../contracts/transcript.md#explainer-threads): list
    the changed units, give every core unit a thread, citing the walkthrough

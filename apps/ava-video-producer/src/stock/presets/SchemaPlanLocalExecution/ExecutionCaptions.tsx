@@ -3,6 +3,17 @@ import type { Input } from "./SchemaPlanLocalExecution.schema";
 import type { ReactNode } from "react";
 
 type Props = { input: Input; frame: number };
+
+/** Samples the outbound boundary labels for the current authored frame. */
+function _getOutboundBoundaryLabels({
+  input,
+  frame,
+}: Readonly<Props>): NonNullable<Parameters<typeof LabelSlots>[0]["labels"]> {
+  return frame >= 55
+    ? [[input.boundaryLabels.outbound, 640, 284, 268, 14, 3]]
+    : [];
+}
+
 /**
  * Authored boundary and phase copy preserves the actual planning distinction.
  */
@@ -24,18 +35,7 @@ export function ExecutionCaptions({
           14,
           1,
         ],
-        ...(frame >= 55
-          ? [
-              [input.boundaryLabels.outbound, 640, 284, 268, 14, 3] as [
-                string,
-                number,
-                number,
-                number,
-                14,
-                number,
-              ],
-            ]
-          : []),
+        ..._getOutboundBoundaryLabels({ input, frame }),
         ...(frame >= 56
           ? [
               [input.boundaryLabels.inbound, 640, 222, 268, 14, 3] as [

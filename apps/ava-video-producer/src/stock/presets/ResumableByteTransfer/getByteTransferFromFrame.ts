@@ -1,4 +1,4 @@
-import { EASE, ramp } from "../../../motion";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
 import type { Input } from "./ResumableByteTransfer.schema";
 /** One exact half-open byte interval and its frame-derived transport state. */
 export type TransferChunk = {
@@ -14,7 +14,8 @@ export type TransferChunk = {
 export function getByteTransferFromFrame({
   input,
   frame,
-}: Readonly<{ input: Input; frame: number }>): {
+  motion,
+}: Readonly<{ input: Input; frame: number; motion: VideoMotion }>): {
   chunks: TransferChunk[];
   confirmed: number;
   remaining: number;
@@ -38,7 +39,9 @@ export function getByteTransferFromFrame({
         index === numPrefixChunks && frame >= 56 && frame <= 90;
       const isResumed = resumedIndex >= 0 && resumedIndex < numResumedChunks;
       const progress =
-        isPrefix || isResumed ? ramp(frame, startsAt, duration, EASE.inOut) : 0;
+        isPrefix || isResumed
+          ? motion.ramp(frame, startsAt, duration, motion.travel.easing)
+          : 0;
       return {
         start,
         end: Math.min(start + chunkBytes, sizeBytes),
@@ -48,9 +51,8 @@ export function getByteTransferFromFrame({
       };
     },
   );
-  const confirmed = chunks.reduce(
-    (total, chunk) => total + (chunk.isConfirmed ? chunk.end - chunk.start : 0),
-    0,
-  );
+  const confirmed = chunks.reduce((total, chunk) => {
+    return total + (chunk.isConfirmed ? chunk.end - chunk.start : 0);
+  }, 0);
   return { chunks, confirmed, remaining: sizeBytes - confirmed };
 }

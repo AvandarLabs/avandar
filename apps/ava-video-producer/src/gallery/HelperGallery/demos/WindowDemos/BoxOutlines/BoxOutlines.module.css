@@ -1,0 +1,21 @@
+.boxOutlinesBox {
+  border: var(--demo-stroke-default) dashed var(--demo-line);
+  border-radius: var(--demo-corner-span);
+  box-sizing: border-box;
+  position: absolute;
+}
+
+.boxOutlinesBoxLabel {
+  color: var(--demo-muted);
+  font-family: var(--demo-mono);
+  font-size: var(--demo-font-size-3xs);
+  left: 8px;
+  position: absolute;
+  top: 6px;
+}
+
+.boxOutlinesBoxActive {
+  background: var(--demo-brand-wash);
+  border-color: var(--demo-brand);
+  border-style: solid;
+}

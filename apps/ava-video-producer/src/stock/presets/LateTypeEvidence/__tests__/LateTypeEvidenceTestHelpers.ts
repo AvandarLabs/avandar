@@ -24,7 +24,6 @@ function _render({
     ),
   );
 }
-
 function _values({
   markup,
   attribute,
@@ -34,7 +33,6 @@ function _values({
 }): string[] {
   return getSvgAttributeMatchesFromMarkup({ markup, attribute }).values;
 }
-
 function _tags({
   markup,
   attribute,
@@ -42,9 +40,19 @@ function _tags({
   markup: string;
   attribute: string;
 }): string[] {
-  return getSvgAttributeMatchesFromMarkup({ markup, attribute }).tags;
+  // A marked group wraps the sketch-aware shape it names.
+  return getSvgAttributeMatchesFromMarkup({ markup, attribute }).tags.map(
+    (tag) => {
+      if (!tag.startsWith("<g ")) {
+        return tag;
+      }
+      const followingTagMatch = markup
+        .slice(markup.indexOf(tag) + tag.length)
+        .match(/^<[^>]+>/);
+      return followingTagMatch ? `${tag}${followingTagMatch[0]}` : tag;
+    },
+  );
 }
-
 function _getVisibleTexts({
   input,
   frame,
@@ -63,7 +71,6 @@ function _getVisibleTexts({
       : []),
   ];
 }
-
 const EXCLUSIONS: string[] = [
   "id",
   "fromId",
@@ -72,7 +79,6 @@ const EXCLUSIONS: string[] = [
   "policy",
   "values",
 ];
-
 /** Inputs for overlaps. */
 type OverlapsFirst = {
   left: number;
@@ -80,7 +86,6 @@ type OverlapsFirst = {
   right: number;
   bottom: number;
 };
-
 /** Inputs for overlaps. */
 type OverlapsSecond = {
   left: number;
@@ -88,7 +93,6 @@ type OverlapsSecond = {
   right: number;
   bottom: number;
 };
-
 function _overlaps({
   first,
   second,
@@ -101,8 +105,14 @@ function _overlaps({
     Math.max(first.top, second.top) < Math.min(first.bottom, second.bottom)
   );
 }
-
-function _getBracketStrokes(markup: string) {
+/** The padded bounds of one painted bracket stroke segment. */
+type BracketStroke = {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+};
+function _getBracketStrokes(markup: string): BracketStroke[] {
   return _tags({ markup, attribute: "data-review-bracket" }).flatMap((tag) => {
     if (Number(_values({ markup: tag, attribute: "opacity" })[0] ?? 1) === 0) {
       return [];
@@ -136,75 +146,37 @@ function _getBracketStrokes(markup: string) {
     ];
   });
 }
-
 function _assertStationaryStrokeShielding({
   markup,
   value,
-}: {
-  markup: string;
-  value: string;
-}): void {
+}: Readonly<{ markup: string; value: string }>): void {
   const paint = SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup(markup),
-    glyphs = paint.filter(
-      (item) => item.kind === "text" && item.ariaLabel === value,
-    );
+    glyphs = paint.filter((item) => {
+      return item.kind === "text" && item.ariaLabel === value;
+    });
   assert.ok(glyphs.length >= 16);
   paint
-    .filter(
-      (item) =>
+    .filter((item) => {
+      return (
         item.kind === "rect" &&
         item.attributes.stroke !== undefined &&
-        item.attributes.stroke !== "none",
-    )
+        item.attributes.stroke !== "none"
+      );
+    })
     .forEach((rectangle) => {
-      const half = Number(rectangle.attributes["stroke-width"] ?? 1) / 2;
-      const edges = [
-        {
-          left: rectangle.left - half,
-          top: rectangle.top - half,
-          right: rectangle.right + half,
-          bottom: rectangle.top + half,
-        },
-        {
-          left: rectangle.left - half,
-          top: rectangle.bottom - half,
-          right: rectangle.right + half,
-          bottom: rectangle.bottom + half,
-        },
-        {
-          left: rectangle.left - half,
-          top: rectangle.top - half,
-          right: rectangle.left + half,
-          bottom: rectangle.bottom + half,
-        },
-        {
-          left: rectangle.right - half,
-          top: rectangle.top - half,
-          right: rectangle.right + half,
-          bottom: rectangle.bottom + half,
-        },
-      ];
-      glyphs.forEach((glyph) =>
-        edges
-          .filter((edge) => _overlaps({ first: edge, second: glyph }))
+      const edges = _getRectangleStrokeEdges(rectangle);
+      glyphs.forEach((glyph) => {
+        return edges
+          .filter((edge) => {
+            return _overlaps({ first: edge, second: glyph });
+          })
           .forEach((edge) => {
             assert.ok(
-              paint.some(
-                (backing) =>
-                  backing.kind === "rect" &&
-                  backing.fill !== "none" &&
-                  backing.opacity * backing.fillOpacity === 1 &&
-                  backing.paintIndex > rectangle.paintIndex &&
-                  backing.paintIndex < glyph.paintIndex &&
-                  backing.left <= Math.max(edge.left, glyph.left) &&
-                  backing.right >= Math.min(edge.right, glyph.right) &&
-                  backing.top <= Math.max(edge.top, glyph.top) &&
-                  backing.bottom >= Math.min(edge.bottom, glyph.bottom),
-              ),
+              _hasOpaqueStrokeBacking({ paint, rectangle, glyph, edge }),
               `Unshielded slot stroke through ${value}`,
             );
-          }),
-      );
+          });
+      });
     });
 }
 export {
@@ -218,3 +190,82 @@ export {
   _assertStationaryStrokeShielding,
 };
 export type { OverlapsFirst, OverlapsSecond };
+
+/** Returns the four padded edges of one stationary rectangle stroke. */
+function _getRectangleStrokeEdges(
+  rectangle: Readonly<
+    ReturnType<
+      typeof SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup
+    >[number]
+  >,
+): BracketStroke[] {
+  const half = Number(rectangle.attributes["stroke-width"] ?? 1) / 2;
+  return [
+    {
+      left: rectangle.left - half,
+      top: rectangle.top - half,
+      right: rectangle.right + half,
+      bottom: rectangle.top + half,
+    },
+    {
+      left: rectangle.left - half,
+      top: rectangle.bottom - half,
+      right: rectangle.right + half,
+      bottom: rectangle.bottom + half,
+    },
+    {
+      left: rectangle.left - half,
+      top: rectangle.top - half,
+      right: rectangle.left + half,
+      bottom: rectangle.bottom + half,
+    },
+    {
+      left: rectangle.right - half,
+      top: rectangle.top - half,
+      right: rectangle.right + half,
+      bottom: rectangle.bottom + half,
+    },
+  ];
+}
+
+/** Paint order and bounds used to verify opaque stroke backing. */
+type StrokeBackingOptions = {
+  paint: ReadonlyArray<
+    ReturnType<
+      typeof SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup
+    >[number]
+  >;
+  rectangle: Readonly<
+    ReturnType<
+      typeof SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup
+    >[number]
+  >;
+  glyph: Readonly<
+    ReturnType<
+      typeof SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup
+    >[number]
+  >;
+  edge: Readonly<BracketStroke>;
+};
+
+/** Checks that an opaque intervening rectangle shields the stroke overlap. */
+function _hasOpaqueStrokeBacking({
+  paint,
+  rectangle,
+  glyph,
+  edge,
+}: Readonly<StrokeBackingOptions>): boolean {
+  return paint.some((backing) => {
+    return (
+      backing.kind === "rect" &&
+      backing.fill !== "none" &&
+      backing.opacity * backing.fillOpacity === 1 &&
+      backing.paintIndex > rectangle.paintIndex &&
+      backing.paintIndex < glyph.paintIndex &&
+      backing.left <= Math.max(edge.left, glyph.left) &&
+      backing.right >= Math.min(edge.right, glyph.right) &&
+      backing.top <= Math.max(edge.top, glyph.top) &&
+      backing.bottom >= Math.min(edge.bottom, glyph.bottom)
+    );
+  });
+}

@@ -19,6 +19,7 @@ function _makeWrite(
 ): RelationCacheWrite {
   return {
     payload: new Blob(["parquet-bytes"]),
+    staleAt: undefined,
     columns: overrides.columns ?? ["a", "b"],
     identity: {
       principal: PRINCIPAL_KEY,

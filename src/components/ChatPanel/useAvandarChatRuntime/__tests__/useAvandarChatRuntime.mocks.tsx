@@ -19,12 +19,16 @@
  * the routed content) without its header and thread UI.
  */
 import { vi } from "vitest";
+import type { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
+import type { ChatSessionActions } from "@/components/ChatPanel/ChatSessionProvider/useChatSessions";
 import type { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
 import type { useLocalRuntime } from "@assistant-ui/react";
 
 type ChatRuntime = ReturnType<typeof useLocalRuntime>;
 type ExplorerState = ReturnType<typeof DataExplorerStateManager.useState>;
 type ExplorerDispatch = ReturnType<typeof DataExplorerStateManager.useDispatch>;
+type ChatPanelState = ReturnType<typeof ChatPanelStateManager.useState>;
+type ChatPanelDispatch = ReturnType<typeof ChatPanelStateManager.useDispatch>;
 
 // Live handles the mocked shell and the explorer stand-in publish for the
 // test body, plus the network fakes each test programs.
@@ -33,9 +37,13 @@ const { hoistedHarness, hoistedApiPostMock, hoistedRunQueryMock } = vi.hoisted(
     return {
       hoistedHarness: {} as {
         runtime?: ChatRuntime;
+        startNewChat?: () => void;
         explorerState?: ExplorerState;
         explorerDispatch?: ExplorerDispatch;
         queryStatus?: "pending" | "success" | "error";
+        chatPanelState?: ChatPanelState;
+        chatPanelDispatch?: ChatPanelDispatch;
+        sessions?: ChatSessionActions;
       },
       hoistedApiPostMock: vi.fn(),
       hoistedRunQueryMock: vi.fn(),
@@ -44,8 +52,9 @@ const { hoistedHarness, hoistedApiPostMock, hoistedRunQueryMock } = vi.hoisted(
 );
 
 /**
- * What the mounted app exposes to the test: the chat runtime, the explorer's
- * state and dispatch, and the status of the explorer's current query.
+ * What the mounted app exposes to the test: the chat runtime and its New chat
+ * action, the explorer's state and dispatch, the status of the explorer's
+ * current query, and the chat panel's state and dispatch.
  */
 export const harness = hoistedHarness;
 
@@ -208,13 +217,24 @@ vi.mock("@/components/AppShell/AppShell", async () => {
     await import("@/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime");
   const { ChatViewTranscriptSync } =
     await import("@/components/ChatPanel/useChatViewTranscript/ChatViewTranscriptSync");
+  const { ChatPanelStateManager } =
+    await import("@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager");
+  const { useChatSessions } =
+    await import("@/components/ChatPanel/ChatSessionProvider/useChatSessions");
+  const { NewCaseTypeButton } =
+    await import("@/views/OntologyDesignerApp/NewCaseTypeButton");
 
   function ChatPanelStandIn(): React.ReactNode {
-    const { runtime } = useAvandarChatRuntime();
+    const { runtime, startNewChat } = useAvandarChatRuntime();
     hoistedHarness.runtime = runtime;
+    hoistedHarness.startNewChat = startNewChat;
+    hoistedHarness.chatPanelState = ChatPanelStateManager.useState();
+    hoistedHarness.chatPanelDispatch = ChatPanelStateManager.useDispatch();
+    hoistedHarness.sessions = useChatSessions();
     return (
       <AssistantRuntimeProvider runtime={runtime}>
         <ChatViewTranscriptSync />
+        <NewCaseTypeButton />
       </AssistantRuntimeProvider>
     );
   }

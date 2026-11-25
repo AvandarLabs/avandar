@@ -1,0 +1,31 @@
+.helperReferenceReference {
+  min-width: 0;
+}
+
+.helperReferenceExports {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--atlas-space-6);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.helperReferenceExports code {
+  background: var(--accent-soft);
+  border-radius: var(--atlas-radius-4);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: var(--atlas-font-size-12);
+  padding: var(--atlas-space-3) var(--atlas-space-7);
+}
+
+.helperReferenceReference a code {
+  font-family: var(--mono);
+  font-size: var(--atlas-font-size-12);
+  overflow-wrap: anywhere;
+}
+
+.helperReferenceReference a {
+  color: var(--accent);
+}

@@ -49,36 +49,48 @@ export const inputSchema = z
     showPurpose: z.boolean(),
   })
   .refine(
-    (input) =>
-      [input.permissions, input.plannedContacts, input.priorRecords].every(
-        (items) =>
+    (input) => {
+      return [
+        input.permissions,
+        input.plannedContacts,
+        input.priorRecords,
+      ].every((items) => {
+        return (
           new Set(items.map(prop<{ id: string }, "id", string>("id"))).size ===
-          items.length,
-      ),
+          items.length
+        );
+      });
+    },
     { message: "IDs must be unique within each collection." },
   )
-  .refine((input) => input.permissions.some(prop("withdrawn")), {
-    path: ["permissions"],
-    message: "At least one permission must be withdrawn.",
-  })
   .refine(
-    (input) =>
-      input.plannedContacts.every((contact) =>
-        input.permissions.some(propEq("id", contact.permissionId)),
-      ),
+    (input) => {
+      return input.permissions.some(prop("withdrawn"));
+    },
+    {
+      path: ["permissions"],
+      message: "At least one permission must be withdrawn.",
+    },
+  )
+  .refine(
+    (input) => {
+      return input.plannedContacts.every((contact) => {
+        return input.permissions.some(propEq("id", contact.permissionId));
+      });
+    },
     {
       path: ["plannedContacts"],
       message: "Every permission reference must exist.",
     },
   )
   .refine(
-    (input) =>
-      input.plannedContacts.some((contact) =>
-        input.permissions.some(
-          (permission) =>
-            permission.id === contact.permissionId && permission.withdrawn,
-        ),
-      ),
+    (input) => {
+      return input.plannedContacts.some((contact) => {
+        return input.permissions.some((permission) => {
+          return permission.id === contact.permissionId && permission.withdrawn;
+        });
+      });
+    },
     {
       path: ["plannedContacts"],
       message: "At least one preparation must be affected.",

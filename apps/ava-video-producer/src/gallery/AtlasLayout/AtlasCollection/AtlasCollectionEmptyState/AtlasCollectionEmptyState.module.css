@@ -1,0 +1,7 @@
+.atlasCollectionEmptyStateEmptyState {
+  composes: empty-state from global;
+}
+
+.atlasCollectionEmptyStateButton {
+  composes: button from global;
+}

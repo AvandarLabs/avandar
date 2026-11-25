@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 type Props = {
   title: string;
   itemCount?: number;
+  leading?: ReactNode;
   headerActions?: ReactNode;
   isCollapsed: boolean;
   onToggleCollapsed: () => void;
@@ -19,6 +20,7 @@ type Props = {
 export function MapChromePanelHeader({
   title,
   itemCount,
+  leading,
   headerActions,
   isCollapsed,
   onToggleCollapsed,
@@ -28,7 +30,11 @@ export function MapChromePanelHeader({
   bodyId,
 }: Props): ReactNode {
   return (
-    <div className={css.mapChromePanelHeader}>
+    <div
+      className={css.mapChromePanelHeader}
+      data-has-leading={leading ? true : undefined}
+    >
+      {leading}
       <h2 className={css.mapChromePanelTitle} id={titleId}>
         {title}
       </h2>

@@ -1,0 +1,8 @@
+.customValue {
+  display: grid;
+  gap: var(--atlas-space-6);
+}
+
+.customValueToggle {
+  justify-self: start;
+}

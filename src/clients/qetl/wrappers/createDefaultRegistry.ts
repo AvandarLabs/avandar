@@ -1,26 +1,25 @@
 import { where } from "@avandar/utils";
 import { match } from "ts-pattern";
-import { APIClient } from "@/clients/APIClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
-import { GoogleSheetsDatasetClient } from "@/clients/datasets/source-datasets/GoogleSheetsDatasetClient";
 import { createRelationRegistry } from "@/clients/qetl/RelationRegistry/RelationRegistry";
-import { createConceptWrapper } from "@/clients/qetl/wrappers/ConceptWrapper/ConceptWrapper";
 import { createDatasetParquetWrapper } from "@/clients/qetl/wrappers/DatasetParquetWrapper/DatasetParquetWrapper";
 import { createGoogleSheetsWrapper } from "@/clients/qetl/wrappers/GoogleSheetsWrapper/GoogleSheetsWrapper";
+import { createPostgresTableWrapper } from "@/clients/qetl/wrappers/PostgresTableWrapper/PostgresTableWrapper";
 import { createVirtualDatasetWrapper } from "@/clients/qetl/wrappers/VirtualDatasetWrapper/VirtualDatasetWrapper";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
-import { fetchOpenDataCatalogResource } from "@/lib/openData/fetchOpenDataCatalogResource";
-import type { OpenDataCatalogEntry } from "$/models/catalog-entries/OpenDataCatalogEntry/OpenDataCatalogEntry";
+import { fetchOpenDataParquetCopy } from "@/lib/openData/fetchOpenDataParquetCopy/fetchOpenDataParquetCopy";
+import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { RelationCapabilities } from "$/models/relations/RelationCapabilities/RelationCapabilities.types";
 import type { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import type {
   AcquiredRelation,
+  RelationCsvReader,
   SourceWrapper,
 } from "$/models/relations/SourceWrapper/SourceWrapper.types";
 import type { RelationRegistry } from "@/clients/qetl/RelationRegistry/RelationRegistry";
-import type { FetchedApiOpenDataResource } from "@/clients/qetl/wrappers/DatasetParquetWrapper/DatasetParquetWrapper";
-import type { GoogleSheetsWrapperOptions } from "@/clients/qetl/wrappers/GoogleSheetsWrapper/GoogleSheetsWrapper";
+import type { NestedParquetQueryResult } from "@/clients/qetl/wrappers/VirtualDatasetWrapper/VirtualDatasetWrapper";
+import type { FetchedOpenDataParquetCopy } from "@/lib/openData/fetchOpenDataParquetCopy/fetchOpenDataParquetCopy";
 
 type DatasetRef = Extract<RelationRef.T, { kind: "dataset" }>;
 
@@ -38,9 +37,12 @@ export type DefaultRegistryOptions = {
    * Runs a nested QETL query and returns Parquet bytes. A virtual dataset's
    * defining SQL is itself a QETL query, so this must be bound per query with
    * the caller's `datasetDuckDbLease` closed over, or the nested query races
-   * the outer one on the shared queryable relation cache.
+   * the outer one on the shared queryable relation cache. It returns the
+   * rows and when the datasets they were read from go stale.
    */
-  runParquetQuery: (options: Readonly<{ rawSql: string }>) => Promise<Blob>;
+  runParquetQuery: (
+    options: Readonly<{ rawSql: string }>,
+  ) => Promise<NestedParquetQueryResult>;
 
   /**
    * Resolves a dataset record, shared by the composite and by the wrappers it
@@ -59,25 +61,19 @@ export type DefaultRegistryOptions = {
    */
   getRawSql?: (ref: DatasetRef) => Promise<string>;
 
-  /** The stored Sheets row for one dataset. */
-  getGoogleSheetsSource?: GoogleSheetsWrapperOptions["getSheetSource"];
+  /**
+   * Reads a live source's acquired CSV under the caller's DuckDB lease, typing
+   * its columns the way the wrapper that acquired it says.
+   */
+  readRelationCsv?: RelationCsvReader;
 
-  /** A live Google access token for the stored account. */
-  getGoogleAccessToken?: GoogleSheetsWrapperOptions["getAccessToken"];
+  /** Reads an API-backed catalog listing's Parquet copy. */
+  fetchApiOpenDataParquetCopy?: (
+    catalogListingId: DataCatalogListing.Id,
+  ) => Promise<FetchedOpenDataParquetCopy>;
 
-  /** Reads one Sheets tab under the caller's DuckDB lease. */
-  readGoogleSheetTabCsv?: GoogleSheetsWrapperOptions["readCsv"];
-
-  /** Fetches one API-backed catalog resource through the open-data proxy. */
-  fetchApiOpenDataResource?: (
-    catalogEntryId: OpenDataCatalogEntry.Id,
-  ) => Promise<FetchedApiOpenDataResource>;
-
-  /** Transcodes CSV bytes into Parquet under the caller's DuckDB lease. */
-  transcodeCsvToParquet?: (params: {
-    datasetId: Dataset.Id;
-    bytes: Uint8Array<ArrayBuffer>;
-  }) => Promise<Blob>;
+  /** Merges a Parquet copy's parts under the caller's DuckDB lease. */
+  mergeParquetParts?: (partBlobs: readonly Blob[]) => Promise<Blob>;
 };
 
 /**
@@ -138,30 +134,6 @@ const DATASET_CAPABILITIES = {
   grantedScope: [],
 } satisfies RelationCapabilities;
 
-async function _getGoogleSheetsSource(id: Dataset.Id): Promise<{
-  googleDocumentId: string;
-  sheetName: string | null;
-  googleAccountId: string;
-}> {
-  const sources = await GoogleSheetsDatasetClient.withCache(AvaQueryClient)
-    .withEnsureQueryData()
-    .getAll(where("dataset_id", "in", [id]));
-  const source = sources[0];
-  if (!source) {
-    throw new Error(`No Google Sheets source record for dataset '${id}'`);
-  }
-  return source;
-}
-
-async function _getGoogleAccessToken(): Promise<string> {
-  const { tokens } = await APIClient.get({ route: "google-auth/tokens" });
-  const accessToken = tokens[0]?.access_token;
-  if (accessToken === undefined) {
-    throw new Error("No Google token is available for this user");
-  }
-  return accessToken;
-}
-
 async function _getDataset(id: Dataset.Id): Promise<Dataset.T> {
   const datasets = await DatasetClient.withCache(AvaQueryClient)
     .withEnsureQueryData()
@@ -188,10 +160,11 @@ function _createDatasetWrapper(
     parquet: SourceWrapper<DatasetRef>;
     virtual: SourceWrapper<DatasetRef>;
     googleSheets: SourceWrapper<DatasetRef>;
+    postgres: SourceWrapper<DatasetRef>;
     getDataset: (id: Dataset.Id) => Promise<Dataset.T>;
   }>,
 ): SourceWrapper<DatasetRef> {
-  const delegateFor = async (
+  const getDelegateFromRef = async (
     ref: DatasetRef,
   ): Promise<SourceWrapper<DatasetRef>> => {
     const dataset = await delegates.getDataset(ref.id);
@@ -205,6 +178,9 @@ function _createDatasetWrapper(
       .with("google_sheets", () => {
         return delegates.googleSheets;
       })
+      .with("postgres_table", () => {
+        return delegates.postgres;
+      })
       .exhaustive();
   };
 
@@ -217,12 +193,12 @@ function _createDatasetWrapper(
     },
 
     describe: async (ref, ctx) => {
-      const delegate = await delegateFor(ref);
+      const delegate = await getDelegateFromRef(ref);
       return await delegate.describe(ref, ctx);
     },
 
     acquire: async (req, ctx): Promise<AcquiredRelation> => {
-      const delegate = await delegateFor(req.ref);
+      const delegate = await getDelegateFromRef(req.ref);
       if (!delegate.acquire) {
         throw new Error(
           `Wrapper '${delegate.name}' cannot acquire relation '${req.ref.id}'`,
@@ -236,9 +212,11 @@ function _createDatasetWrapper(
 /**
  * The wrappers the application runs with, one registry per query session.
  *
- * Two wrappers are registered because there are two relation kinds. The six
- * dataset source types sit behind one composite, so the registry's
- * one-wrapper-per-kind invariant holds without collapsing their behaviour.
+ * One wrapper is registered: the dataset composite, behind which the dataset
+ * source types sit, so the registry's one-wrapper-per-kind invariant holds
+ * without collapsing their behaviour. No wrapper claims the `concept` kind:
+ * the concept planner builds a concept's view inside the query's lease, so a
+ * concept is never acquired.
  */
 export function createDefaultRegistry(
   options: Readonly<DefaultRegistryOptions>,
@@ -250,20 +228,20 @@ export function createDefaultRegistry(
       getDataset,
       parquet: createDatasetParquetWrapper({
         getDataset,
-        fetchApiOpenDataResource:
-          options.fetchApiOpenDataResource ?? fetchOpenDataCatalogResource,
-        transcodeCsvToParquet: options.transcodeCsvToParquet,
+        fetchApiOpenDataParquetCopy:
+          options.fetchApiOpenDataParquetCopy ?? fetchOpenDataParquetCopy,
+        mergeParquetParts: options.mergeParquetParts,
       }),
       virtual: createVirtualDatasetWrapper({
         runParquetQuery: options.runParquetQuery,
         getRawSql: options.getRawSql,
       }),
       googleSheets: createGoogleSheetsWrapper({
-        getSheetSource: options.getGoogleSheetsSource ?? _getGoogleSheetsSource,
-        getAccessToken: options.getGoogleAccessToken ?? _getGoogleAccessToken,
-        readCsv: options.readGoogleSheetTabCsv,
+        readCsv: options.readRelationCsv,
+      }),
+      postgres: createPostgresTableWrapper({
+        readCsv: options.readRelationCsv,
       }),
     }),
-    createConceptWrapper(),
   ]);
 }

@@ -1,29 +1,37 @@
-import { Trans, useLingui } from "@lingui/react/macro";
 import { Stack, Text, Title } from "@mantine/core";
 import { useLayoutEffect, useRef } from "react";
 import { ConceptCreatorStore } from "../../../../src/views/OntologyDesignerApp/ConceptCreatorView/ConceptCreatorStore";
 import css from "./AttributeMappingScreen.module.css";
-import { createMappingStageFromFrame } from "./createMappingStageFromFrame/createMappingStageFromFrame";
+import { makeMappingStageFromFrame } from "./makeMappingStageFromFrame/makeMappingStageFromFrame";
 import { MappingFields } from "./MappingFields";
+import type { ReactNode } from "react";
 
-type Props = { frame: number; width: number; height: number };
-
+type Props = {
+  frame: number;
+  width: number;
+  height: number;
+};
 export {
   ATTRIBUTE_MAPPING_BEATS,
   ATTRIBUTE_MAPPING_DURATION,
-} from "./createMappingStageFromFrame/createMappingStageFromFrame";
-
+} from "./makeMappingStageFromFrame/makeMappingStageFromFrame";
 /** Original dataset mapping and manual field leaves with frame-owned values. */
-export function AttributeMappingScreen({ frame, width, height }: Props) {
-  const { t } = useLingui();
+export function AttributeMappingScreen({
+  frame,
+  width,
+  height,
+}: Props): ReactNode {
   const root = useRef<HTMLDivElement>(null);
-  useMappingTargets(root, frame);
+  useMappingTargets({
+    root,
+    frame,
+  });
   return (
     <ConceptCreatorStore.Provider
       initialStateOverrides={{
-        conceptName: t`Response case`,
-        singularConceptName: t`response case`,
-        pluralConceptName: t`response cases`,
+        conceptName: "Response case",
+        singularConceptName: "response case",
+        pluralConceptName: "response cases",
       }}
     >
       <div
@@ -34,10 +42,10 @@ export function AttributeMappingScreen({ frame, width, height }: Props) {
         <Stack className={css.attributeMappingScreenContent} gap="lg">
           <Stack gap="xs">
             <Title order={2} fw={650}>
-              <Trans>New case type</Trans>
+              New case type
             </Title>
             <Text c="dimmed" size="sm">
-              <Trans>Video - Harborfield visits</Trans>
+              Video - Harborfield visits
             </Text>
           </Stack>
           <MappingFields frame={frame} />
@@ -46,7 +54,6 @@ export function AttributeMappingScreen({ frame, width, height }: Props) {
     </ConceptCreatorStore.Provider>
   );
 }
-
 function _selectManualFieldName(options: {
   nameInput: HTMLInputElement | null | undefined;
   frame: number;
@@ -60,29 +67,39 @@ function _selectManualFieldName(options: {
     return;
   }
   const isSelected =
-    createMappingStageFromFrame(frame).manualField?.isNameSelected;
+    makeMappingStageFromFrame(frame).manualField?.isNameSelected;
   nameInput.focus({ preventScroll: true });
   nameInput.setSelectionRange(
     isSelected ? 0 : nameInput.value.length,
     nameInput.value.length,
   );
 }
-
-function useMappingTargets(
-  root: React.RefObject<HTMLDivElement | null>,
-  frame: number,
-) {
+function useMappingTargets({
+  root,
+  frame,
+}: Readonly<{
+  root: React.RefObject<HTMLDivElement | null>;
+  frame: number;
+}>) {
   useLayoutEffect(() => {
-    const checkboxes = root.current?.querySelectorAll('input[type="checkbox"]');
-    checkboxes?.[1]?.setAttribute("data-video-target", "mapping-single-value");
+    // The switch's "One value" segment: the label that names its radio input.
+    const singleValueInput = root.current?.querySelector<HTMLInputElement>(
+      'input[type="radio"][value="single"]',
+    );
+    singleValueInput?.labels?.[0]?.setAttribute(
+      "data-video-target",
+      "mapping-single-value",
+    );
     root.current
       ?.querySelector(
-        '[data-video-target="mapping-dataset-controls"] input:not([type="checkbox"]):not([type="hidden"])',
+        '[data-video-target="mapping-dataset-controls"] input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"])',
       )
       ?.setAttribute("data-video-target", "mapping-value-rule");
     root.current
       ?.querySelectorAll('[data-video-target="mapping-add-manual"]')
-      .forEach((button) => button.removeAttribute("data-video-target"));
+      .forEach((button) => {
+        return button.removeAttribute("data-video-target");
+      });
     const manualButtons = root.current?.querySelectorAll(
       '[data-video-target="mapping-manual-controls"] button',
     );

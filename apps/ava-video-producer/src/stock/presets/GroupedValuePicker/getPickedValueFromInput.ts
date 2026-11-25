@@ -1,13 +1,42 @@
-import { prop } from "@avandar/utils";
+import { isNonNullish, prop } from "@avandar/utils";
 import { match } from "ts-pattern";
 import type { Input } from "./GroupedValuePicker.schema";
+
+/** Preserves exact frequency counts and the numeric-then-null tie break. */
+function _getMostFrequentPickerValue({
+  values,
+  numeric,
+  matchedInput,
+}: Readonly<GetMostFrequentPickerValueOptions>): number | null {
+  const candidates = [
+    ...new Set(
+      matchedInput.nullPolicy === "include-in-mode" ? values : numeric,
+    ),
+  ];
+  return candidates.sort((first, second) => {
+    const countDifference =
+      values.filter((value) => {
+        return value === second;
+      }).length -
+      values.filter((value) => {
+        return value === first;
+      }).length;
+    return (
+      countDifference ||
+      (first === null ? 1 : second === null ? -1 : first - second)
+    );
+  })[0];
+}
+
 /**
  * Exact deterministic field result, retaining null and unrounded arithmetic.
  */
 export function getPickedValueFromInput(input: Readonly<Input>): number | null {
   const values = input.observations.map(prop("value"));
-  const numeric = values.filter((value): value is number => value !== null);
-  const sum = numeric.reduce((total, value) => total + value, 0);
+  const numeric = values.filter(isNonNullish);
+  const sum = numeric.reduce((total, value) => {
+    return total + value;
+  }, 0);
   return match(input)
     .with({ rule: "first" }, () => {
       return values[0];
@@ -28,20 +57,13 @@ export function getPickedValueFromInput(input: Readonly<Input>): number | null {
       return numeric.length;
     })
     .with({ rule: "most-frequent" }, (matchedInput) => {
-      const candidates = [
-        ...new Set(
-          matchedInput.nullPolicy === "include-in-mode" ? values : numeric,
-        ),
-      ];
-      return candidates.sort((first, second) => {
-        const countDifference =
-          values.filter((value) => value === second).length -
-          values.filter((value) => value === first).length;
-        return (
-          countDifference ||
-          (first === null ? 1 : second === null ? -1 : first - second)
-        );
-      })[0];
+      return _getMostFrequentPickerValue({ values, numeric, matchedInput });
     })
     .exhaustive();
 }
+
+type GetMostFrequentPickerValueOptions = {
+  values: ReadonlyArray<number | null>;
+  numeric: readonly number[];
+  matchedInput: Input;
+};

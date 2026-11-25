@@ -1,0 +1,79 @@
+/*
+ * The preview drawer: the lower part of the view, between the step's body
+ * and its footer. A region of the same lit surface, so a hairline and no
+ * shadow; the body above it gets shorter and keeps scrolling.
+ */
+.applyPreviewDrawer {
+  animation: apply-preview-in var(--ava-animation-duration-moderate)
+    var(--ava-animation-easing-out);
+  background-color: var(--ava-surface-raised);
+  border-top: 1px solid var(--ava-border-default);
+  display: flex;
+  flex: 0 0 46%;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.applyPreviewDrawer:focus-visible {
+  outline: 2px solid var(--ava-border-focus);
+  outline-offset: -2px;
+}
+
+.applyPreviewHeader {
+  border-bottom: 1px solid var(--ava-border-default);
+  flex: none;
+  padding: var(--mantine-spacing-xs) var(--mantine-spacing-lg);
+}
+
+/*
+ * Positioned so the table's visually hidden text, which is absolutely
+ * positioned, is clipped here instead of overflowing the slate.
+ */
+.applyPreviewBody {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  position: relative;
+}
+
+.previewCell {
+  white-space: nowrap;
+}
+
+.previewCell[data-status="unmatched"] {
+  background-color: var(--mantine-color-warning-light);
+  text-decoration: underline dotted var(--mantine-color-warning-7);
+  text-underline-offset: 3px;
+}
+
+.previewOld {
+  color: var(--mantine-color-dimmed);
+}
+
+.previewNew {
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.previewEmpty {
+  color: var(--mantine-color-dimmed);
+  font-style: italic;
+}
+
+@keyframes apply-preview-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .applyPreviewDrawer {
+    animation: none;
+  }
+}

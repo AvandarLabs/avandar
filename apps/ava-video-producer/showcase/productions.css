@@ -1,45 +1,45 @@
 .productions-page .intro {
-  gap: 48px;
+  gap: var(--atlas-space-48);
   grid-template-columns: 1.6fr 1fr;
 }
 
 .productions-page h1 {
-  font-size: clamp(42px, 4.5vw, 65px);
-  letter-spacing: -2.8px;
+  font-size: var(--atlas-font-size-productions-title);
+  letter-spacing: var(--atlas-tracking-tight-2-8);
 }
 
 .production-context {
-  border-bottom: 1px solid var(--line);
-  border-top: 1px solid var(--line);
+  border-bottom: var(--atlas-border-1) solid var(--line);
+  border-top: var(--atlas-border-1) solid var(--line);
   display: grid;
-  gap: 44px;
+  gap: var(--atlas-space-44);
   grid-template-columns: 1fr 1fr;
-  padding: 20px 0;
+  padding: var(--atlas-space-20) 0;
 }
 
 .production-context p {
-  color: var(--muted);
-  font-size: 12px;
+  color: var(--atlas-color-muted);
+  font-size: var(--atlas-font-size-12);
   line-height: 1.7;
   margin: 0;
 }
 
 .production-context strong {
   color: var(--ink);
-  font-weight: 600;
+  font-weight: var(--atlas-font-weight-600);
 }
 
 .production-section {
-  padding-top: 54px;
+  padding-top: var(--atlas-space-54);
 }
 
 .production-section .section-head {
-  gap: 14px 44px;
+  gap: var(--atlas-space-14) var(--atlas-space-44);
 }
 
 .production-grid {
   display: grid;
-  gap: 24px;
+  gap: var(--atlas-space-24);
 }
 
 .primary-productions {
@@ -52,8 +52,8 @@
 
 .production-card {
   background: var(--cream);
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  border: var(--atlas-border-1) solid var(--line);
+  border-radius: var(--atlas-radius-8);
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -62,10 +62,10 @@
 
 .production-card .screening-top {
   background: var(--dark);
-  gap: 16px;
-  letter-spacing: 1.2px;
+  gap: var(--atlas-space-16);
+  letter-spacing: var(--atlas-tracking-wide-1-2);
   line-height: 1.5;
-  padding: 17px 20px;
+  padding: var(--atlas-space-17) var(--atlas-space-20);
 }
 
 .production-card iframe {
@@ -80,50 +80,50 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  padding: 25px;
+  padding: var(--atlas-space-25);
 }
 
 .production-label {
   color: var(--accent);
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 1.1px;
+  font-size: var(--atlas-font-size-9);
+  font-weight: var(--atlas-font-weight-600);
+  letter-spacing: var(--atlas-tracking-wide-1-1);
   line-height: 1.7;
-  margin: 0 0 13px;
+  margin: 0 0 var(--atlas-space-13);
 }
 
 .production-copy h3 {
-  font-size: 25px;
-  font-weight: 450;
-  letter-spacing: -0.7px;
+  font-size: var(--atlas-font-size-25);
+  font-weight: var(--atlas-font-weight-450);
+  letter-spacing: var(--atlas-tracking-tight-0-7);
   line-height: 1.2;
-  margin: 0 0 12px;
+  margin: 0 0 var(--atlas-space-12);
 }
 
 .production-copy > p:not(.production-label) {
-  color: var(--muted);
-  font-size: 13px;
+  color: var(--atlas-color-muted);
+  font-size: var(--atlas-font-size-13);
   line-height: 1.75;
-  margin: 0 0 24px;
+  margin: 0 0 var(--atlas-space-24);
 }
 
 .production-meta {
   align-items: center;
-  border-top: 1px solid var(--line);
-  color: var(--muted);
+  border-top: var(--atlas-border-1) solid var(--line);
+  color: var(--atlas-color-muted);
   display: flex;
   flex-wrap: wrap;
-  font-size: 10px;
-  gap: 15px;
+  font-size: var(--atlas-font-size-10);
+  gap: var(--atlas-space-15);
   justify-content: space-between;
   line-height: 1.6;
   margin-top: auto;
-  padding-top: 16px;
+  padding-top: var(--atlas-space-16);
 }
 
 .production-meta a,
 .production-meta button {
-  border-bottom: 1px solid var(--line);
+  border-bottom: var(--atlas-border-1) solid var(--line);
   color: var(--ink);
   text-decoration: none;
   white-space: nowrap;
@@ -132,7 +132,7 @@
 .production-meta button {
   background: transparent;
   border: 0;
-  border-bottom: 1px solid var(--line);
+  border-bottom: var(--atlas-border-1) solid var(--line);
   cursor: pointer;
   padding: 0;
 }
@@ -143,15 +143,15 @@
 
 .production-meta a span,
 .production-meta button span {
-  margin-left: 6px;
+  margin-left: var(--atlas-space-6);
 }
 
 .production-copy > p.export-status {
   background: transparent;
-  color: var(--muted);
-  font-size: 11px;
+  color: var(--atlas-color-muted);
+  font-size: var(--atlas-font-size-11);
   line-height: 1.6;
-  margin: 12px 0 0;
+  margin: var(--atlas-space-12) 0 0;
   padding: 0;
 }
 
@@ -160,16 +160,16 @@
 }
 
 .feature-productions .screening-top {
-  font-size: 8px;
-  padding: 15px 18px;
+  font-size: var(--atlas-font-size-8);
+  padding: var(--atlas-space-15) var(--atlas-space-18);
 }
 
 .feature-productions .production-copy {
-  padding: 22px;
+  padding: var(--atlas-space-22);
 }
 
 .feature-productions .production-copy h3 {
-  font-size: 22px;
+  font-size: var(--atlas-font-size-22);
 }
 
 .preview-label {
@@ -178,12 +178,12 @@
 
 .production-error {
   background: var(--cream);
-  border-bottom: 1px solid var(--line);
+  border-bottom: var(--atlas-border-1) solid var(--line);
   color: var(--accent);
-  font-size: 12px;
+  font-size: var(--atlas-font-size-12);
   line-height: 1.6;
   margin: 0;
-  padding: 14px 20px;
+  padding: var(--atlas-space-14) var(--atlas-space-20);
 }
 
 .production-error[hidden] {
@@ -191,30 +191,30 @@
 }
 
 .production-review {
-  border-bottom: 1px solid var(--line);
-  border-top: 1px solid var(--line);
+  border-bottom: var(--atlas-border-1) solid var(--line);
+  border-top: var(--atlas-border-1) solid var(--line);
   display: grid;
-  gap: 80px;
+  gap: var(--atlas-space-80);
   grid-template-columns: 1fr 1fr;
-  margin-top: 64px;
-  padding: 40px 0;
+  margin-top: var(--atlas-space-64);
+  padding: var(--atlas-space-40) 0;
 }
 
 .production-review .eyebrow {
-  margin-bottom: 16px;
+  margin-bottom: var(--atlas-space-16);
 }
 
 .production-review > div > p:not(.eyebrow) {
-  color: var(--muted);
-  font-size: 13px;
+  color: var(--atlas-color-muted);
+  font-size: var(--atlas-font-size-13);
   line-height: 1.8;
   max-width: 430px;
 }
 
 .production-review .text-link {
   display: inline-block;
-  font-size: 12px;
-  margin-top: 12px;
+  font-size: var(--atlas-font-size-12);
+  margin-top: var(--atlas-space-12);
 }
 
 .production-sources {
@@ -222,8 +222,8 @@
 }
 
 .production-sources > div {
-  border-bottom: 1px solid var(--line);
-  padding: 12px 0;
+  border-bottom: var(--atlas-border-1) solid var(--line);
+  padding: var(--atlas-space-12) 0;
 }
 
 .production-sources > div:first-child {
@@ -231,13 +231,13 @@
 }
 
 .production-sources dt {
-  font-size: 12px;
-  margin-bottom: 7px;
+  font-size: var(--atlas-font-size-12);
+  margin-bottom: var(--atlas-space-7);
 }
 
 .production-sources dd {
-  color: var(--muted);
-  font-size: 11px;
+  color: var(--atlas-color-muted);
+  font-size: var(--atlas-font-size-11);
   margin: 0;
   overflow-wrap: anywhere;
 }
@@ -248,7 +248,7 @@
   }
 
   .production-review {
-    gap: 40px;
+    gap: var(--atlas-space-40);
   }
 }
 
@@ -262,34 +262,34 @@
   }
 
   .productions-page .intro {
-    gap: 18px;
+    gap: var(--atlas-space-18);
   }
 
   .productions-page h1 {
-    font-size: clamp(38px, 8.8vw, 58px);
-    letter-spacing: -2px;
+    font-size: var(--atlas-font-size-productions-title-narrow);
+    letter-spacing: var(--atlas-tracking-tight-2);
   }
 
   .production-context {
-    gap: 12px;
-    padding: 18px 0;
+    gap: var(--atlas-space-12);
+    padding: var(--atlas-space-18) 0;
   }
 
   .production-section {
-    padding-top: 36px;
+    padding-top: var(--atlas-space-36);
   }
 
   .production-grid {
-    gap: 20px;
+    gap: var(--atlas-space-20);
   }
 
   .production-copy,
   .feature-productions .production-copy {
-    padding: 21px;
+    padding: var(--atlas-space-21);
   }
 
   .production-review {
-    gap: 30px;
-    margin-top: 40px;
+    gap: var(--atlas-space-30);
+    margin-top: var(--atlas-space-40);
   }
 }

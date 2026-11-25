@@ -40,7 +40,7 @@ single raised surface, the **slate**, swaps its contents as you navigate.
 | **Slate** | The raised surface holding the current app view. `AppSlate` is the component that renders it. Rounded, padded away from every edge, drop shadowed, and the only region that changes on navigation. | `AppSlate`'s `Paper`, `src/components/layouts/AppSlate/` |
 | **Gutter** | The strip of shell background between the slate and everything around it (8px on all four sides). It is what makes the slate read as a separate object rather than a pane. | `p="xs"` on `AppSlate`'s outer `Flex` |
 | **Slate toolbar** | The white band across the top of the slate: sidebar toggle, view title, view actions, Send feedback, chat toggle. A view may ask for a *floating toolbar*, which drops the band and overlays the controls on the view instead (Maps does this). | `AppSlate/AppToolbar/` |
-| **Chat aside** | The "Ask Avandar" column on the right. Mantine calls the slot `AppShell.Aside`. Opens docked beside the slate; in Case Manager it expands into **composer mode**, widening over the slate behind a dimming overlay. | `src/components/ChatPanel/` |
+| **Chat aside** | The "Ask Avandar" column on the right. Mantine calls the slot `AppShell.Aside`. Opens **fused** to the slate: the slate drops its inline-end gutter, border, and corners, the chat takes over that edge with the slate's border, corner, and shadow, and the chat draws the light hairline between them, so the pair reads as one surface. In Case Manager it expands into **composer mode**, widening over the slate behind a dimming overlay. | `src/components/ChatPanel/` |
 
 Not part of the shell, but frequently confused with it:
 
@@ -50,7 +50,7 @@ Not part of the shell, but frequently confused with it:
 | **Drawer** | Mantine's slide-over panel, anchored to a viewport edge over everything. |
 | **`CanvasDrawer`** | A general-purpose in-flow drawer that splits a vertical region with the sibling above it, which it measures through a ref. It knows nothing about the shell and does not dock under the slate: Data Explorer passes it the chart region, GIS passes it the map surface. Its "canvas" is that view-local surface, not the slate. |
 | **Modal** | A centered dialog over a blurred backdrop. |
-| **NUX checklist** | The "Get started" card docked bottom-right, above modals by design so tour copy stays readable. |
+| **NUX checklist** | The "Get started" card docked bottom-right, above modals by design so tour copy stays readable. It hides while any `Drawer` is open, because drawers dock to the same viewport edge and it would cover their footer actions. |
 
 ### Why "slate" and not "canvas"
 
@@ -96,19 +96,22 @@ Every z-index in the app comes from a named tier in
 | --- | --- | --- |
 | Mantine app shell | 100 / 101 | The shell's own header, sidebar, and chat aside. Mantine's default, not ours. |
 | `APP_SLATE_Z_INDEX` | 150 | The slate. |
+| `APP_CHAT_ASIDE_Z_INDEX` | 151 | The chat aside while fused to the slate, so the slate's shadow does not fall across it. |
 | Mantine overlay default | 200 | `Drawer` and `Spotlight`, which we do not override. |
 | `APP_CHROME_Z_INDEX` | 250 | Floating toolbars, the mobile sidebar, the chat composer overlay (and the composer aside at 251). |
 | `FLOATING_PANEL_Z_INDEX` | 300 | Floating surfaces that must clear app chrome. |
 | `MODAL_ROOT_Z_INDEX` | 400 | Modals, and the onboarding tour overlay at the same level. |
-| `NUX_CHECKLIST_Z_INDEX` | 401 | The "Get started" card, above the tour overlay. |
+| `NUX_CHECKLIST_Z_INDEX` | 401 | The "Get started" card, above the tour overlay. Hidden while a `Drawer` is open, since it outranks drawers. |
 | `MODAL_ABOVE_NUX_TOUR_Z_INDEX` | 403 | Modals that interrupt the tour and must clear its tooltip. |
 | `POPOVER_Z_INDEX` | 500 | Menus, popovers, comboboxes, tooltips. Above modals so a select inside a modal still opens on top. |
 | `NOTIFICATIONS_Z_INDEX` | 10000 | Toasts. |
 
 Two rules keep this stable:
 
-- **The slate must outrank the sidebar and the chat aside**, or its drop shadow
-  gets clipped at their edges.
+- **The slate must outrank the sidebar**, or its drop shadow gets clipped at
+  the sidebar edge. The fused chat aside is the one exception: it sits just
+  above the slate, because it is the slate's other half and the slate's shadow
+  would otherwise fall across it.
 - **The slate must stay below 200.** Giving the slate a z-index makes it a
   stacking context, so every surface meant to cover it is compared against the
   slate as a whole, not against the element inside it. Mantine's untouched
@@ -138,7 +141,8 @@ testing is untouched: shadows do not capture pointer events.
 - Put every app view inside `AppSlate`.
 - Take z-indexes from the tier constants in `src/config/Theme/Theme.ts`.
 - Keep the gutter on all four sides. A slate flush to one edge stops reading as
-  floating.
+  floating. The fused chat aside is the only thing that may take the slate's
+  inline-end gutter, and it carries the gutter on its own outer edges.
 
 **Don't**
 

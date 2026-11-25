@@ -1,6 +1,6 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { StockRect } from "../../primitives/StockRect/StockRect";
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./SchemaColumnEvolution.schema";
 import type { ReactNode } from "react";
 
@@ -12,6 +12,8 @@ export function EvolutionHeader({
   expansion,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g>
       <StockRect
@@ -20,9 +22,9 @@ export function EvolutionHeader({
         y={145}
         width={520}
         height={65}
-        rx={8}
-        fill={STOCK.surface}
-        stroke={STOCK.line}
+        rx={scales.corner(tokens.corner.cell)}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
       />
       <StockRect
         data-added-header=""
@@ -31,7 +33,7 @@ export function EvolutionHeader({
         width={260 * expansion}
         height={65}
         fill={accent}
-        fillOpacity={0.08}
+        fillOpacity={scales.wash(tokens.alpha.wash)}
         stroke={accent}
       />
       <LabelSlots

@@ -1,7 +1,7 @@
 import { NOTIFICATION_EMAIL_FROM } from "$/EmailClient/EmailClientConfig.ts";
 import { sendBroadcastEmail } from "$/EmailClient/sendBroadcastEmail.ts";
 import { sendTransactionalEmail } from "$/EmailClient/sendTransactionalEmail.ts";
-import WorkspaceInviteEmail from "$/emails/WorkspaceInviteEmail.tsx";
+import { WorkspaceInviteEmail } from "$/emails/WorkspaceInviteEmail.tsx";
 import { getResendSendingAPIKey } from "$/env/getResendSendingAPIKey.ts";
 import type {
   IEmailClient,

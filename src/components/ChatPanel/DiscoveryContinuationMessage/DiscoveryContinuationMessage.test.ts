@@ -14,4 +14,14 @@ describe("DiscoveryContinuationMessage", () => {
       DiscoveryContinuationMessage.isInternal({ custom: { other: true } }),
     ).toBe(false);
   });
+
+  it("tells the model an automatic match was not confirmed by the user", () => {
+    expect(
+      DiscoveryContinuationMessage.toModelContent(
+        "[Clarification answer: New York]",
+      ),
+    ).toMatch(
+      /^\[Clarification answer: New York\]\n\(Matched automatically[\s\S]*not seen or confirmed/,
+    );
+  });
 });

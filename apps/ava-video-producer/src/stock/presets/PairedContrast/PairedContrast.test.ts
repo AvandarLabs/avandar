@@ -56,14 +56,14 @@ test("the focused criterion receives the comparison band while every pair remain
       new RegExp(`data-comparison-band="${input.focusCriterionId}"`),
     );
     assert.equal((markup.match(/data-comparison-band=/g) ?? []).length, 1);
-    input.alternatives.forEach(({ label }) =>
-      assert.ok(markup.includes(label)),
-    );
+    input.alternatives.forEach(({ label }) => {
+      return assert.ok(markup.includes(label));
+    });
     input.criteria.forEach(({ id, label, leftText, rightText }) => {
       assert.ok(markup.includes(`data-criterion="${id}"`));
-      [label, leftText, rightText].forEach((text) =>
-        assert.ok(markup.includes(text)),
-      );
+      [label, leftText, rightText].forEach((text) => {
+        return assert.ok(markup.includes(text));
+      });
     });
   });
   assert.notEqual(
@@ -95,30 +95,31 @@ test("complete default, minimum, dense and changed fixtures retain their text ac
   fixtures.forEach(({ input }) => {
     assert.deepEqual(inputSchema.parse(input), input);
     const frames = [0, 36, 90, 150, 179];
-    const samples = frames.map((frame) => _render({ frame, input }));
-    [...frames]
-      .reverse()
-      .forEach((frame) =>
-        assert.equal(_render({ frame, input }), samples[frames.indexOf(frame)]),
+    const samples = frames.map((frame) => {
+      return _render({ frame, input });
+    });
+    [...frames].reverse().forEach((frame) => {
+      return assert.equal(
+        _render({ frame, input }),
+        samples[frames.indexOf(frame)],
       );
+    });
     const markup = _render({ frame: 150, input });
     [
       input.question,
-      ...input.criteria.flatMap((row) => [
-        row.label,
-        row.leftText,
-        row.rightText,
-      ]),
-    ].forEach((text) =>
-      assert.ok(markup.includes(`aria-label="${text}"`), text),
-    );
+      ...input.criteria.flatMap((row) => {
+        return [row.label, row.leftText, row.rightText];
+      }),
+    ].forEach((text) => {
+      return assert.ok(markup.includes(`aria-label="${text}"`), text);
+    });
   });
 });
 
 test("strict input rejects missing content, extra keys, duplicate IDs and absent focus references", () => {
-  invalidInputs.forEach((input) =>
-    assert.equal(inputSchema.safeParse(input).success, false),
-  );
+  invalidInputs.forEach((input) => {
+    return assert.equal(inputSchema.safeParse(input).success, false);
+  });
   assert.equal(inputSchema.safeParse({}).success, false);
   assert.equal(
     inputSchema.safeParse({ ...DEFAULT_INPUT, question: "Q".repeat(61) })
@@ -129,9 +130,9 @@ test("strict input rejects missing content, extra keys, duplicate IDs and absent
 
 test("the public contract carries complete editable content and a valid binding", () => {
   assert.deepEqual(pairedContrastContract.defaultInput, DEFAULT_INPUT);
-  pairedContrastContract.bindingExamples.forEach(({ input }) =>
-    assert.equal(inputSchema.safeParse(input).success, true),
-  );
+  pairedContrastContract.bindingExamples.forEach(({ input }) => {
+    return assert.equal(inputSchema.safeParse(input).success, true);
+  });
   assert.equal(pairedContrastContract.jsonSchema.additionalProperties, false);
   assert.deepEqual(
     pairedContrastContract.controls.map(prop("path")),
@@ -145,17 +146,15 @@ test("accepted spaced words and hard breaks retain every label without overflowi
     assert.deepEqual(inputSchema.parse(input), input, id);
     const markup = _render({ frame: 150, input });
     assert.ok(markup.includes(`aria-label="${text}"`), id);
-    text
-      .split(/\s+/)
-      .forEach((word) =>
-        assert.ok(
-          markup.includes(`>${word}</tspan>`) ||
-            markup.includes(`>${word} `) ||
-            markup.includes(` ${word}<`) ||
-            markup.includes(` ${word} `),
-          `${id}: ${word}`,
-        ),
+    text.split(/\s+/).forEach((word) => {
+      return assert.ok(
+        markup.includes(`>${word}</tspan>`) ||
+          markup.includes(`>${word} `) ||
+          markup.includes(` ${word}<`) ||
+          markup.includes(` ${word} `),
+        `${id}: ${word}`,
       );
+    });
   });
 });
 
@@ -179,7 +178,9 @@ function _getSegmentsFromBracket(path: string): number[][] {
     } else {
       if (command.toUpperCase() === "H") {
         x = command === "h" ? x + value : value;
-      } else y = command === "v" ? y + value : value;
+      } else {
+        y = command === "v" ? y + value : value;
+      }
       segments.push([previousX, previousY, x, y]);
     }
   });
@@ -206,22 +207,26 @@ test("paired bracket strokes clear the full criterion text area including four-l
           Number(labels[index][1]) +
           ((labels[index][2].match(/<tspan/g) ?? []).length - 1) * 18.2 +
           4;
-        _getSegmentsFromBracket(bracket[1]).forEach(([x1, y1, x2, y2]) =>
-          assert.ok(
+        _getSegmentsFromBracket(bracket[1]).forEach(([x1, y1, x2, y2]) => {
+          return assert.ok(
             Math.max(x1, x2) < 408 ||
               Math.min(x1, x2) > 552 ||
               Math.max(y1, y2) < top ||
               Math.min(y1, y2) > bottom,
             bracket[1],
-          ),
-        );
+          );
+        });
       });
     },
   );
 });
 
 test("a short criterion attribute prefix shares lines with both oversized authored tokens", () => {
-  const text = [1, 15, 15].map((length) => "界".repeat(length)).join(" ");
+  const text = [1, 15, 15]
+    .map((length) => {
+      return "界".repeat(length);
+    })
+    .join(" ");
   const input = {
     ...DEFAULT_INPUT,
     criteria: [

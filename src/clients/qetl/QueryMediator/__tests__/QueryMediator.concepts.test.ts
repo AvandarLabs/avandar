@@ -12,11 +12,14 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createInMemoryRelationCache } from "@/clients/qetl/RelationCache/__tests__/createInMemoryRelationCache";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { Concept } from "$/models/ontology/Concept/Concept";
+import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { ConceptRelationPlan } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
 import type { IQueryMediator } from "@/clients/qetl/QueryMediator/QueryMediator";
 import type { QetlRunnerOptions } from "@/clients/qetl/QueryMediator/QueryMediator.types";
 
 const DATASET_ID = "aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa" as Dataset.Id;
+const VIRTUAL_DATASET_ID = "bbbbbbbb-2222-4222-8222-bbbbbbbbbbbb" as Dataset.Id;
+const VIRTUAL_DATASET_SQL = `SELECT * FROM "${DATASET_ID}"`;
 const CONCEPT_ID = "cccccccc-3333-4333-8333-cccccccccccc" as Concept.Id;
 const SPINE_TABLE = `concept_${CONCEPT_ID}__individuals`;
 const PRINCIPAL_KEY = "w:11111111-1111-4111-8111-111111111111:user";
@@ -32,6 +35,7 @@ const {
   localDatasetGetAllMock,
   runRawQueryMock,
   sourceDatasetGetAllMock,
+  virtualSourceDatasetGetAllMock,
 } = vi.hoisted(() => {
   return {
     callLog: [] as string[],
@@ -44,6 +48,7 @@ const {
     localDatasetGetAllMock: vi.fn(),
     runRawQueryMock: vi.fn(),
     sourceDatasetGetAllMock: vi.fn(),
+    virtualSourceDatasetGetAllMock: vi.fn(),
   };
 });
 
@@ -102,12 +107,34 @@ vi.mock("@/clients/datasets/source-datasets/CsvFileDatasetClient", () => {
   };
 });
 
-vi.mock("@/clients/datasets/DatasetColumnClient", () => {
+vi.mock("@/clients/datasets/source-datasets/VirtualDatasetClient", () => {
   return {
-    DatasetColumnClient: {
+    VirtualDatasetClient: {
       withCache: () => {
         return {
           withEnsureQueryData: () => {
+            return { getAll: virtualSourceDatasetGetAllMock };
+          },
+        };
+      },
+    },
+  };
+});
+
+vi.mock("@/clients/datasets/DatasetColumnClient", () => {
+  return {
+    DatasetColumnClient: {
+      QueryKeys: {
+        getAll: () => {
+          return ["DatasetColumnClient", "getAll"];
+        },
+      },
+      withCache: () => {
+        return {
+          withEnsureQueryData: () => {
+            return { getAll: datasetColumnGetAllMock };
+          },
+          withFetchQuery: () => {
             return { getAll: datasetColumnGetAllMock };
           },
         };
@@ -115,6 +142,27 @@ vi.mock("@/clients/datasets/DatasetColumnClient", () => {
     },
   };
 });
+vi.mock("@/clients/dataDictionaries/DictionaryBindingClient", async () => {
+  return (
+    await import("@/lib/dataDictionaries/loadColumnReplacements/__tests__/noDictionaryBindingsClient")
+  ).NO_DICTIONARY_BINDINGS_CLIENT_MODULE;
+});
+
+vi.mock(
+  "@/clients/qetl/QueryMediator/relationLoading/getVirtualRelationDefinitions/getVirtualRelationDefinitions",
+  async (importOriginal) => {
+    const original =
+      await importOriginal<
+        typeof import("@/clients/qetl/QueryMediator/relationLoading/getVirtualRelationDefinitions/getVirtualRelationDefinitions")
+      >();
+    return {
+      ...original,
+      getVirtualRelationDefinitions: async () => {
+        return {};
+      },
+    };
+  },
+);
 
 /** The shape `getRelationSources` filters datasets with. */
 type DatasetIdFilter = { where?: { id?: { in?: readonly Dataset.Id[] } } };
@@ -123,16 +171,18 @@ type DatasetIdFilter = { where?: { id?: { in?: readonly Dataset.Id[] } } };
 const CONCEPT_PLAN: ConceptRelationPlan = {
   ref: { kind: "concept", id: CONCEPT_ID },
   contributingDatasetIds: [DATASET_ID],
-  externalIds: ["p1"],
+  spineRows: [{ externalId: "p1", statusName: "Active" }],
   attributeColumns: [
     {
       kind: "dataset_column",
+      attributeId: "attr-age" as ConceptAttribute.Id,
       attributeName: "age",
       selectColumnName: "age_years",
       datasetId: DATASET_ID,
+      columnDataType: "bigint",
       primaryKeyColumnName: "person_id",
       valuePickerRuleType: "first",
-      isArray: false,
+      valueShape: "single",
     },
   ],
 };
@@ -155,12 +205,15 @@ async function _createQetlClient(
     },
     columns: "all",
     payload: new Blob(["cached"]),
+    staleAt: undefined,
   });
-  return QueryMediatorFactory.create({
-    getQueryDependencies: options.getQueryDependencies,
-    planConceptRelations: options.planConceptRelations,
-    relationCache,
-    principalKey: PRINCIPAL_KEY,
+  return QueryMediatorFactory.create("QueryMediator", {
+    state: {
+      getQueryDependencies: options.getQueryDependencies,
+      planConceptRelations: options.planConceptRelations,
+      relationCache,
+      principalKey: PRINCIPAL_KEY,
+    },
   });
 }
 
@@ -192,6 +245,9 @@ beforeEach(() => {
       : [];
   });
   sourceDatasetGetAllMock.mockResolvedValue([{ datasetId: DATASET_ID }]);
+  virtualSourceDatasetGetAllMock.mockResolvedValue([
+    { datasetId: VIRTUAL_DATASET_ID, rawSql: VIRTUAL_DATASET_SQL },
+  ]);
   loadParquetMock.mockImplementation(async () => {
     callLog.push("loadParquet");
     return {};
@@ -314,5 +370,142 @@ describe("QueryMediator concept relations", () => {
 
     expect(callLog).toEqual(["loadParquet", "query"]);
     expect(loadCsvMock).not.toHaveBeenCalled();
+  });
+
+  // The restriction travels as data beside the SQL; only the planner can turn
+  // it into a narrower spine.
+  it("hands the caller's spine restrictions to the concept planner", async () => {
+    const planConceptRelations = vi.fn(async () => {
+      return [CONCEPT_PLAN];
+    });
+    const qetlClient = await _createQetlClient({
+      getQueryDependencies: async () => {
+        return [];
+      },
+      planConceptRelations,
+    });
+    const conceptSpineRestrictions = [
+      { conceptId: CONCEPT_ID, externalIds: ["p1"] },
+    ];
+
+    await qetlClient.runQuery({
+      rawSql: `SELECT * FROM "concept_${CONCEPT_ID}"`,
+      conceptSpineRestrictions,
+    });
+
+    expect(planConceptRelations).toHaveBeenCalledWith({
+      rawSql: `SELECT * FROM "concept_${CONCEPT_ID}"`,
+      conceptSpineRestrictions,
+    });
+  });
+
+  // A session with no planner cannot narrow a spine, and answering anyway
+  // would hand the caller rows it asked to exclude.
+  it("refuses spine restrictions in a session that cannot plan concepts", async () => {
+    const qetlClient = await _createQetlClient({
+      getQueryDependencies: async () => {
+        return [DATASET_ID];
+      },
+    });
+
+    await expect(
+      qetlClient.runQuery({
+        rawSql: `SELECT * FROM "${DATASET_ID}"`,
+        conceptSpineRestrictions: [
+          { conceptId: CONCEPT_ID, externalIds: ["p1"] },
+        ],
+      }),
+    ).rejects.toThrow(/cannot restrict a concept's records/);
+    expect(loadParquetMock).not.toHaveBeenCalled();
+  });
+
+  // A caller that passes no restriction still hands the planner a list, so the
+  // planner never has to tell "absent" from "empty".
+  it("hands the planner an empty restriction list when the caller passes none", async () => {
+    const planConceptRelations = vi.fn(async () => {
+      return [CONCEPT_PLAN];
+    });
+    const qetlClient = await _createQetlClient({
+      getQueryDependencies: async () => {
+        return [];
+      },
+      planConceptRelations,
+    });
+
+    await qetlClient.runQuery({
+      rawSql: `SELECT * FROM "concept_${CONCEPT_ID}"`,
+    });
+
+    expect(planConceptRelations).toHaveBeenCalledWith({
+      rawSql: `SELECT * FROM "concept_${CONCEPT_ID}"`,
+      conceptSpineRestrictions: [],
+    });
+  });
+
+  // An empty list narrows nothing, so a session that cannot plan concepts has
+  // nothing to refuse.
+  it("answers an empty restriction list in a session that cannot plan concepts", async () => {
+    const qetlClient = await _createQetlClient({
+      getQueryDependencies: async () => {
+        return [DATASET_ID];
+      },
+    });
+
+    await expect(
+      qetlClient.runQuery({
+        rawSql: `SELECT * FROM "${DATASET_ID}"`,
+        conceptSpineRestrictions: [],
+      }),
+    ).resolves.toEqual({ data: [] });
+    expect(loadParquetMock).toHaveBeenCalledWith(
+      expect.objectContaining({ tableName: DATASET_ID }),
+    );
+  });
+
+  // A virtual dataset's bytes are cached under a key that ignores spine
+  // restrictions, so its nested query must plan unrestricted, or a restricted
+  // result would answer later unrestricted reads of the same dataset.
+  it("keeps the caller's spine restrictions out of a nested virtual-dataset query", async () => {
+    const outerSql =
+      `SELECT * FROM "concept_${CONCEPT_ID}" ` +
+      `JOIN "${VIRTUAL_DATASET_ID}" USING (person_id)`;
+    datasetGetAllMock.mockImplementation(async (filters?: DatasetIdFilter) => {
+      const requestedIds = filters?.where?.id?.in ?? [];
+      return requestedIds.includes(VIRTUAL_DATASET_ID)
+        ? [
+            {
+              id: VIRTUAL_DATASET_ID,
+              name: "virtual people",
+              sourceType: "virtual",
+              workspaceId: "eeeeeeee-5555-4555-8555-eeeeeeeeeeee",
+            },
+          ]
+        : [];
+    });
+    const planConceptRelations = vi.fn(
+      async ({ rawSql }: { rawSql: string }) => {
+        return rawSql === outerSql ? [CONCEPT_PLAN] : [];
+      },
+    );
+    const qetlClient = await _createQetlClient({
+      getQueryDependencies: async (rawSql) => {
+        return rawSql === outerSql ? [VIRTUAL_DATASET_ID] : [DATASET_ID];
+      },
+      planConceptRelations,
+    });
+    const conceptSpineRestrictions = [
+      { conceptId: CONCEPT_ID, externalIds: ["p1"] },
+    ];
+
+    await qetlClient.runQuery({ rawSql: outerSql, conceptSpineRestrictions });
+
+    expect(planConceptRelations).toHaveBeenCalledWith({
+      rawSql: outerSql,
+      conceptSpineRestrictions,
+    });
+    expect(planConceptRelations).toHaveBeenCalledWith({
+      rawSql: VIRTUAL_DATASET_SQL,
+      conceptSpineRestrictions: [],
+    });
   });
 });

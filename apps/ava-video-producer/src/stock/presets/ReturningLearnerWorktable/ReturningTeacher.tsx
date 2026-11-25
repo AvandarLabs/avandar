@@ -1,5 +1,6 @@
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SceneText } from "./SceneText";
 import type { Input } from "./ReturningLearnerWorktable.schema";
 import type { ReactNode } from "react";
@@ -11,18 +12,25 @@ export function ReturningTeacher({
   teacherX,
   handX,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <>
       <g data-teacher="true" transform={`translate(${teacherX} 315)`}>
-        <PersonGlyph x={0} y={0} size={56} color={STOCK.cyan} />
+        <PersonGlyph x={0} y={0} size={56} color={tokens.color.accentAlt} />
       </g>
-      <path
-        data-teacher-hand="true"
-        d={`M${teacherX} 315 L${handX + 20} 333 L${handX} 342`}
-        fill="none"
-        stroke={STOCK.cyan}
-        strokeWidth={3}
-      />
+      <g data-teacher-hand="true">
+        <SketchedShape
+          shape={{
+            kind: "path",
+            d: `M${teacherX} 315 L${handX + 20} 333 L${handX} 342`,
+          }}
+          profile={tokens.sketch.shape}
+          fill="none"
+          stroke={tokens.color.accentAlt}
+          strokeWidth={scales.stroke(tokens.stroke.emphasis)}
+        />
+      </g>
       <SceneText
         text={input.people.teacher}
         anchor="middle"

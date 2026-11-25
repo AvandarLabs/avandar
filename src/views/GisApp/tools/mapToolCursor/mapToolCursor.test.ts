@@ -66,4 +66,14 @@ describe("mapToolCursor", () => {
       expect(cursor).toMatch(/ 10 10, crosshair$/);
     });
   });
+
+  it("shows a crosshair while the place tool waits for a click", () => {
+    expect(
+      mapToolCursor({
+        mapToolMode: { type: "place" },
+        isAltPanHeld: false,
+        isPointerDown: false,
+      }),
+    ).toBe("crosshair");
+  });
 });

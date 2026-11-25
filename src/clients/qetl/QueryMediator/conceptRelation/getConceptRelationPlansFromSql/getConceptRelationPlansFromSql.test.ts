@@ -9,6 +9,7 @@
  * query names.
  */
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { ConceptRelationDenied } from "@/clients/qetl/QueryMediator/conceptRelation/ConceptRelationDenied";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
@@ -19,18 +20,22 @@ const CONCEPT_ID = "cccccccc-3333-4333-8333-cccccccccccc" as Concept.Id;
 const OTHER_CONCEPT_ID = "dddddddd-4444-4444-8444-dddddddddddd" as Concept.Id;
 const DATASET_ID = "aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa" as Dataset.Id;
 const WORKSPACE_ID = "eeeeeeee-5555-4555-8555-eeeeeeeeeeee";
+const ACTIVE_STATUS_ID = "11111111-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
+const RULED_OUT_STATUS_ID = "22222222-bbbb-4bbb-8bbb-bbbbbbbbbbbb";
 
 const {
   conceptAttributeGetAllMock,
   getAllAttributeMappingsMock,
   datasetColumnGetAllMock,
   individualGetAllMock,
+  conceptStatusGetAllMock,
 } = vi.hoisted(() => {
   return {
     conceptAttributeGetAllMock: vi.fn(),
     getAllAttributeMappingsMock: vi.fn(),
     datasetColumnGetAllMock: vi.fn(),
     individualGetAllMock: vi.fn(),
+    conceptStatusGetAllMock: vi.fn(),
   };
 });
 
@@ -49,6 +54,10 @@ vi.mock("@/clients/datasets/DatasetColumnClient", () => {
 
 vi.mock("@/clients/ontology/IndividualClient", () => {
   return { IndividualClient: { getAll: individualGetAllMock } };
+});
+
+vi.mock("@/clients/ontology/ConceptStatusClient", () => {
+  return { ConceptStatusClient: { getAll: conceptStatusGetAllMock } };
 });
 
 const IDENTIFIER_ATTRIBUTE = {
@@ -86,6 +95,39 @@ const IDENTIFIER_COLUMN = {
   datasetId: DATASET_ID,
 } as DatasetColumn.T;
 
+const TEMPERATURE_ATTRIBUTE = {
+  ...IDENTIFIER_ATTRIBUTE,
+  id: "attr-temperature" as ConceptAttribute.Id,
+  name: "temperature per month",
+  dataType: "double",
+  isIdentifier: false,
+  isArray: true,
+  bucketGrain: "month",
+} as ConceptAttribute.T;
+
+const TEMPERATURE_MAPPING = {
+  ...IDENTIFIER_MAPPING,
+  id: "map-temperature",
+  conceptAttributeId: TEMPERATURE_ATTRIBUTE.id,
+  valuePickerRuleType: "avg",
+  datasetColumnId: "col-temperature",
+  bucketColumnId: "col-visit-date",
+} as DatasetColumnMapping;
+
+const TEMPERATURE_COLUMN = {
+  id: "col-temperature",
+  name: "temperature",
+  datasetId: DATASET_ID,
+  dataType: "double",
+} as DatasetColumn.T;
+
+const VISIT_DATE_COLUMN = {
+  id: "col-visit-date",
+  name: "visit_date",
+  datasetId: DATASET_ID,
+  dataType: "date",
+} as DatasetColumn.T;
+
 /** An allowlist that permits the fixture concept and its dataset. */
 function _permissiveAllowlist(): {
   getAllowedConceptIds: () => Promise<Concept.Id[]>;
@@ -107,8 +149,12 @@ beforeEach(() => {
   getAllAttributeMappingsMock.mockResolvedValue([IDENTIFIER_MAPPING]);
   datasetColumnGetAllMock.mockResolvedValue([IDENTIFIER_COLUMN]);
   individualGetAllMock.mockResolvedValue([
-    { externalId: "p1" },
-    { externalId: "p2" },
+    { id: "ind-1", externalId: "p1", statusId: ACTIVE_STATUS_ID },
+    { id: "ind-2", externalId: "p2", statusId: RULED_OUT_STATUS_ID },
+  ]);
+  conceptStatusGetAllMock.mockResolvedValue([
+    { id: ACTIVE_STATUS_ID, name: "Active" },
+    { id: RULED_OUT_STATUS_ID, name: "Ruled out" },
   ]);
 });
 
@@ -131,6 +177,48 @@ describe("getConceptRelationPlansFromSql", () => {
     expect(getAllowedConceptIds).not.toHaveBeenCalled();
     expect(conceptAttributeGetAllMock).not.toHaveBeenCalled();
     expect(individualGetAllMock).not.toHaveBeenCalled();
+    expect(conceptStatusGetAllMock).not.toHaveBeenCalled();
+  });
+
+  it("fetches the date column a per-month field groups its rows by", async () => {
+    conceptAttributeGetAllMock.mockResolvedValue([
+      IDENTIFIER_ATTRIBUTE,
+      TEMPERATURE_ATTRIBUTE,
+    ]);
+    getAllAttributeMappingsMock.mockResolvedValue([
+      IDENTIFIER_MAPPING,
+      TEMPERATURE_MAPPING,
+    ]);
+    // Answers only the ids asked for, as the real client does.
+    datasetColumnGetAllMock.mockImplementation(
+      async (filter: { where: { id: { in: readonly string[] } } }) => {
+        return [
+          IDENTIFIER_COLUMN,
+          TEMPERATURE_COLUMN,
+          VISIT_DATE_COLUMN,
+        ].filter((column) => {
+          return filter.where.id.in.includes(column.id);
+        });
+      },
+    );
+    const { getConceptRelationPlansFromSql } =
+      await import("@/clients/qetl/QueryMediator/conceptRelation/getConceptRelationPlansFromSql/getConceptRelationPlansFromSql");
+
+    const plans = await getConceptRelationPlansFromSql({
+      rawSql: `SELECT * FROM "concept_${CONCEPT_ID}"`,
+      allowlist: _permissiveAllowlist(),
+    });
+
+    expect(
+      plans[0]?.attributeColumns.find((column) => {
+        return column.attributeName === "temperature per month";
+      }),
+    ).toMatchObject({
+      kind: "dataset_column",
+      valueShape: "bucketed_list",
+      bucketGrain: "month",
+      bucketColumnName: "visit_date",
+    });
   });
 
   it("plans a concept the caller is allowed to read", async () => {
@@ -145,7 +233,11 @@ describe("getConceptRelationPlansFromSql", () => {
     expect(plans).toHaveLength(1);
     expect(plans[0]?.ref).toEqual({ kind: "concept", id: CONCEPT_ID });
     expect(plans[0]?.contributingDatasetIds).toEqual([DATASET_ID]);
-    expect(plans[0]?.externalIds).toEqual(["p1", "p2"]);
+    expect(
+      plans[0]?.spineRows.map((row) => {
+        return row.externalId;
+      }),
+    ).toEqual(["p1", "p2"]);
   });
 
   // The highest-risk case in this file. Without this a `concept_<uuid>` from
@@ -161,6 +253,12 @@ describe("getConceptRelationPlansFromSql", () => {
         allowlist: _permissiveAllowlist(),
       }),
     ).rejects.toThrow(/does not belong to this workspace/);
+    await expect(
+      getConceptRelationPlansFromSql({
+        rawSql: `SELECT * FROM "concept_${OTHER_CONCEPT_ID}"`,
+        allowlist: _permissiveAllowlist(),
+      }),
+    ).rejects.toBeInstanceOf(ConceptRelationDenied);
     expect(conceptAttributeGetAllMock).not.toHaveBeenCalled();
   });
 
@@ -184,9 +282,23 @@ describe("getConceptRelationPlansFromSql", () => {
         },
       }),
     ).rejects.toThrow(/not reachable from this workspace/);
+    await expect(
+      getConceptRelationPlansFromSql({
+        rawSql: `SELECT * FROM "concept_${CONCEPT_ID}"`,
+        allowlist: {
+          getAllowedConceptIds: async () => {
+            return [CONCEPT_ID];
+          },
+          getAllowedDatasetIds: async () => {
+            return [];
+          },
+        },
+      }),
+    ).rejects.toBeInstanceOf(ConceptRelationDenied);
     // The individuals are never read either: the refusal comes before the
     // spine.
     expect(individualGetAllMock).not.toHaveBeenCalled();
+    expect(conceptStatusGetAllMock).not.toHaveBeenCalled();
   });
 
   // Fail closed on analysis. An unanalyzable statement carries no relation
@@ -239,5 +351,181 @@ describe("getConceptRelationPlansFromSql", () => {
     });
 
     expect(plans).toHaveLength(1);
+  });
+
+  it("names each record's status in its spine row", async () => {
+    const { getConceptRelationPlansFromSql } =
+      await import("@/clients/qetl/QueryMediator/conceptRelation/getConceptRelationPlansFromSql/getConceptRelationPlansFromSql");
+
+    const plans = await getConceptRelationPlansFromSql({
+      rawSql: `SELECT * FROM "concept_${CONCEPT_ID}"`,
+      allowlist: _permissiveAllowlist(),
+    });
+
+    expect(plans[0]?.spineRows).toEqual([
+      { externalId: "p1", statusName: "Active" },
+      { externalId: "p2", statusName: "Ruled out" },
+    ]);
+    expect(conceptStatusGetAllMock).toHaveBeenCalledTimes(1);
+  });
+
+  // The composite foreign key on `individuals` rules this state out, so seeing
+  // it means the set was saved between the two reads. A NULL status would
+  // misreport the record, so the query fails and a retry sees both agree.
+  it("refuses a record whose status is not one of the concept's statuses", async () => {
+    const { getConceptRelationPlansFromSql } =
+      await import("@/clients/qetl/QueryMediator/conceptRelation/getConceptRelationPlansFromSql/getConceptRelationPlansFromSql");
+    conceptStatusGetAllMock.mockResolvedValue([
+      { id: ACTIVE_STATUS_ID, name: "Active" },
+    ]);
+
+    await expect(
+      getConceptRelationPlansFromSql({
+        rawSql: `SELECT * FROM "concept_${CONCEPT_ID}"`,
+        allowlist: _permissiveAllowlist(),
+      }),
+    ).rejects.toThrow(/is not one of the concept's statuses/);
+  });
+
+  // A record page asks for one record. Its spine must hold that record alone,
+  // so the view computes one row instead of the whole case type.
+  it("loads only the restricted records into the spine", async () => {
+    const { getConceptRelationPlansFromSql } =
+      await import("@/clients/qetl/QueryMediator/conceptRelation/getConceptRelationPlansFromSql/getConceptRelationPlansFromSql");
+    individualGetAllMock.mockResolvedValue([
+      { id: "ind-2", externalId: "p2", statusId: RULED_OUT_STATUS_ID },
+    ]);
+
+    const plans = await getConceptRelationPlansFromSql({
+      rawSql: `SELECT * FROM "concept_${CONCEPT_ID}"`,
+      allowlist: _permissiveAllowlist(),
+      conceptSpineRestrictions: [
+        { conceptId: CONCEPT_ID, externalIds: ["p2"] },
+      ],
+    });
+
+    expect(individualGetAllMock).toHaveBeenCalledWith({
+      where: { concept_id: { eq: CONCEPT_ID }, external_id: { in: ["p2"] } },
+    });
+    expect(plans[0]?.spineRows).toEqual([
+      { externalId: "p2", statusName: "Ruled out" },
+    ]);
+  });
+
+  // A restriction on a concept the statement does not read restricts
+  // nothing, while its caller believes the records are narrowed.
+  it("refuses a restriction on a concept the statement does not read", async () => {
+    const { getConceptRelationPlansFromSql } =
+      await import("@/clients/qetl/QueryMediator/conceptRelation/getConceptRelationPlansFromSql/getConceptRelationPlansFromSql");
+
+    await expect(
+      getConceptRelationPlansFromSql({
+        rawSql: `SELECT * FROM "concept_${CONCEPT_ID}"`,
+        allowlist: _permissiveAllowlist(),
+        conceptSpineRestrictions: [
+          { conceptId: OTHER_CONCEPT_ID, externalIds: ["p1"] },
+        ],
+      }),
+    ).rejects.toThrow(/which this query does not read/);
+    expect(conceptAttributeGetAllMock).not.toHaveBeenCalled();
+  });
+
+  it("refuses two restrictions on one concept", async () => {
+    const { getConceptRelationPlansFromSql } =
+      await import("@/clients/qetl/QueryMediator/conceptRelation/getConceptRelationPlansFromSql/getConceptRelationPlansFromSql");
+
+    await expect(
+      getConceptRelationPlansFromSql({
+        rawSql: `SELECT * FROM "concept_${CONCEPT_ID}"`,
+        allowlist: _permissiveAllowlist(),
+        conceptSpineRestrictions: [
+          { conceptId: CONCEPT_ID, externalIds: ["p1"] },
+          { conceptId: CONCEPT_ID, externalIds: ["p2"] },
+        ],
+      }),
+    ).rejects.toThrow(/more than one spine restriction/);
+    expect(conceptAttributeGetAllMock).not.toHaveBeenCalled();
+  });
+
+  // One restriction costs one Postgres read per 50 keys, so it is bounded.
+  it("refuses a restriction naming more records than one query may read", async () => {
+    const { getConceptRelationPlansFromSql, MAX_RESTRICTED_EXTERNAL_IDS } =
+      await import("@/clients/qetl/QueryMediator/conceptRelation/getConceptRelationPlansFromSql/getConceptRelationPlansFromSql");
+    const externalIds = Array.from(
+      { length: MAX_RESTRICTED_EXTERNAL_IDS + 1 },
+      (_, index) => {
+        return `p${index}`;
+      },
+    );
+
+    await expect(
+      getConceptRelationPlansFromSql({
+        rawSql: `SELECT * FROM "concept_${CONCEPT_ID}"`,
+        allowlist: _permissiveAllowlist(),
+        conceptSpineRestrictions: [{ conceptId: CONCEPT_ID, externalIds }],
+      }),
+    ).rejects.toThrow(/at most 500 may be named/);
+    expect(conceptAttributeGetAllMock).not.toHaveBeenCalled();
+    expect(individualGetAllMock).not.toHaveBeenCalled();
+  });
+
+  // The cap bounds the records read, and a repeated key is read once, so
+  // repeats do not count against it.
+  it("counts each key once against the restriction cap", async () => {
+    const { getConceptRelationPlansFromSql, MAX_RESTRICTED_EXTERNAL_IDS } =
+      await import("@/clients/qetl/QueryMediator/conceptRelation/getConceptRelationPlansFromSql/getConceptRelationPlansFromSql");
+    individualGetAllMock.mockResolvedValue([
+      { id: "ind-2", externalId: "p2", statusId: RULED_OUT_STATUS_ID },
+    ]);
+    const externalIds = Array.from(
+      { length: MAX_RESTRICTED_EXTERNAL_IDS + 1 },
+      () => {
+        return "p2";
+      },
+    );
+
+    const plans = await getConceptRelationPlansFromSql({
+      rawSql: `SELECT * FROM "concept_${CONCEPT_ID}"`,
+      allowlist: _permissiveAllowlist(),
+      conceptSpineRestrictions: [{ conceptId: CONCEPT_ID, externalIds }],
+    });
+
+    expect(plans[0]?.spineRows).toEqual([
+      { externalId: "p2", statusName: "Ruled out" },
+    ]);
+  });
+
+  // An empty restriction names no records, so the view holds none. Reading it
+  // as "no restriction" would load every record of the concept.
+  it("loads no records for a restriction that names none", async () => {
+    const { getConceptRelationPlansFromSql } =
+      await import("@/clients/qetl/QueryMediator/conceptRelation/getConceptRelationPlansFromSql/getConceptRelationPlansFromSql");
+
+    const plans = await getConceptRelationPlansFromSql({
+      rawSql: `SELECT * FROM "concept_${CONCEPT_ID}"`,
+      allowlist: _permissiveAllowlist(),
+      conceptSpineRestrictions: [{ conceptId: CONCEPT_ID, externalIds: [] }],
+    });
+
+    expect(plans[0]?.spineRows).toEqual([]);
+    expect(individualGetAllMock).not.toHaveBeenCalled();
+  });
+
+  // A statement that reads no concept would otherwise return before any
+  // restriction is checked, and the caller would believe its records narrowed.
+  it("refuses a restriction on a statement that reads no concept", async () => {
+    const { getConceptRelationPlansFromSql } =
+      await import("@/clients/qetl/QueryMediator/conceptRelation/getConceptRelationPlansFromSql/getConceptRelationPlansFromSql");
+
+    await expect(
+      getConceptRelationPlansFromSql({
+        rawSql: `SELECT * FROM "${DATASET_ID}"`,
+        allowlist: _permissiveAllowlist(),
+        conceptSpineRestrictions: [
+          { conceptId: CONCEPT_ID, externalIds: ["p1"] },
+        ],
+      }),
+    ).rejects.toThrow(/which this query does not read/);
+    expect(conceptAttributeGetAllMock).not.toHaveBeenCalled();
   });
 });

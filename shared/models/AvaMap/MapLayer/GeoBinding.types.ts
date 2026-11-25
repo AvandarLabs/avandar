@@ -104,11 +104,27 @@ export type GridBinBinding = {
   aggregation: AreaAggregation;
 };
 
+/**
+ * Units a buffer distance is typed and shown in. Distances persist in meters.
+ */
+export const BUFFER_DISTANCE_UNITS = ["m", "km", "ft", "mi"] as const;
+export type BufferDistanceUnit = (typeof BUFFER_DISTANCE_UNITS)[number];
+
 /** Polygon geometry produced by buffering another layer's features. */
 export type BufferOfLayerBinding = {
   type: "bufferOfLayer";
   layerId: MapLayerId;
   distanceMeters: number;
+
+  /** The unit the author typed the distance in, used wherever it is shown. */
+  distanceUnit: BufferDistanceUnit;
+
+  /**
+   * Source column each ring carries when rings are not dissolved, such as a
+   * site name, so a ring's popup and a feature list can name its site.
+   */
+  labelColumn: QueryColumn.Id | undefined;
+
   dissolve: boolean;
 };
 

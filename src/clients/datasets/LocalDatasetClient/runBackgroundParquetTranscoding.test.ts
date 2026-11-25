@@ -1,13 +1,52 @@
 import "fake-indexeddb/auto";
-import { afterAll, beforeEach, describe, expect, it } from "vitest";
-import { makeTranscodeCompletionUpdateFromParquet } from "@/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding";
+import { Model } from "@avandar/models";
+import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  getReconcilableColumnsByOriginalName,
+  makeTranscodeCompletionUpdateFromParquet,
+  runBackgroundParquetTranscoding,
+} from "@/clients/datasets/LocalDatasetClient/runBackgroundParquetTranscoding";
 import {
   AvaDexieVersionManager,
   CURRENT_AVA_DEXIE_VERSION,
 } from "@/db/dexie/dexieVersions/dexieVersions";
+import type { DictionaryBinding } from "$/models/dataDictionaries/DictionaryBinding/DictionaryBinding";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { UserId } from "$/models/User/User.types";
+import type { Workspace } from "$/models/Workspace/Workspace";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types";
+
+const mocks = vi.hoisted(() => {
+  return {
+    loadCsv: vi.fn(),
+    notifySuccess: vi.fn(),
+    notifyWarning: vi.fn(),
+    notifyError: vi.fn(),
+  };
+});
+
+vi.mock("@/clients/DuckDbClient/DuckDbClient", () => {
+  return { DuckDbClient: { loadCsv: mocks.loadCsv } };
+});
+vi.mock("@/utils/notifications/notify", () => {
+  return {
+    notifySuccess: mocks.notifySuccess,
+    notifyWarning: mocks.notifyWarning,
+    notifyError: mocks.notifyError,
+  };
+});
+vi.mock("@/clients/datasets/ImportJobsManager", () => {
+  return {
+    ImportJobsManager: {
+      startJob: vi.fn(),
+      markSucceeded: vi.fn(),
+      markFailed: vi.fn(),
+      clearJob: vi.fn(),
+    },
+  };
+});
 
 const db = AvaDexieVersionManager.getVersion(CURRENT_AVA_DEXIE_VERSION);
 
@@ -97,5 +136,120 @@ describe("makeTranscodeCompletionUpdateFromParquet", () => {
     expect(row).toHaveProperty("sourceBytes");
     expect(row?.sourceBytes).toBeDefined();
     expect(row?.sourceFileSize).toBe(64);
+  });
+});
+
+describe("getReconcilableColumnsByOriginalName", () => {
+  function _makeColumn(
+    name: string,
+    dictionaryBindingId: DictionaryBinding.Id | undefined,
+  ): DatasetColumn.T {
+    return Model.make("DatasetColumn", {
+      id: `${name}-id` as DatasetColumn.Id,
+      datasetId: "33333333-3333-4333-8333-333333333333" as Dataset.Id,
+      workspaceId: "44444444-4444-4444-8444-444444444444" as Workspace.Id,
+      createdAt: "2026-11-13T00:00:00.000Z",
+      updatedAt: "2026-11-13T00:00:00.000Z",
+      name,
+      originalName: "GENDER",
+      originalDataType: "BIGINT",
+      detectedDataType: "BIGINT",
+      dataType: "varchar",
+      description: undefined,
+      columnIdx: 0,
+      dictionaryBindingId,
+    });
+  }
+
+  it("keeps the converted column, not its keep-original copy", () => {
+    const gender = _makeColumn("GENDER", undefined);
+    const copy = _makeColumn(
+      "GENDER_original",
+      "55555555-5555-4555-8555-555555555555" as DictionaryBinding.Id,
+    );
+
+    const byName = getReconcilableColumnsByOriginalName([gender, copy]);
+
+    expect(byName.get("GENDER")).toBe(gender);
+    expect(byName.size).toBe(1);
+  });
+});
+
+describe("runBackgroundParquetTranscoding toasts", () => {
+  beforeEach(async () => {
+    Object.values(mocks).forEach((mock) => {
+      mock.mockReset();
+    });
+    mocks.loadCsv.mockResolvedValue({
+      parquetData: new Blob(["parquet"]),
+      columns: [],
+    });
+    await db.LocalDataset.put({
+      datasetId,
+      workspaceId,
+      userId,
+      parquetData: undefined,
+      parseStatus: "parsing",
+      parseStartedAt: 1_700_000_000_000,
+      parseFailedReason: undefined,
+      sourceBytes: undefined,
+      sourceFileName: "mz-adm1.csv",
+      sourceFileType: "csv",
+      sourceFileSize: 12,
+      lastSourceAccessedAt: undefined,
+      isSourcePinned: false,
+      parseOptions: undefined,
+    });
+  });
+
+  async function _runWithDisplayName(
+    displayName: string | undefined,
+  ): Promise<void> {
+    await runBackgroundParquetTranscoding({
+      datasetId,
+      workspaceId,
+      userId,
+      displayName,
+      source: {
+        kind: "csv",
+        file: new File(["a,b\n1,2\n"], "mz-adm1.csv"),
+        options: { type: "csv" },
+      },
+    });
+  }
+
+  it("names the dataset when a display name is given", async () => {
+    await _runWithDisplayName("Mozambique provinces");
+
+    expect(mocks.notifySuccess).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message:
+          '"Mozambique provinces" finished processing and is ready to use.',
+      }),
+    );
+  });
+
+  it("names the file when no display name is given", async () => {
+    await _runWithDisplayName(undefined);
+
+    expect(mocks.notifySuccess).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: '"mz-adm1.csv" finished processing and is ready to use.',
+      }),
+    );
+  });
+
+  it("keeps the raw parse error out of the translated message", async () => {
+    mocks.loadCsv.mockRejectedValue(new Error("Invalid Input Error: row 4"));
+
+    await expect(_runWithDisplayName("Mozambique provinces")).rejects.toThrow(
+      "Invalid Input Error: row 4",
+    );
+
+    expect(mocks.notifyError).toHaveBeenCalledWith({
+      title: "Dataset failed to process",
+      message: '"Mozambique provinces" could not be parsed.',
+      detail: "Invalid Input Error: row 4",
+    });
   });
 });

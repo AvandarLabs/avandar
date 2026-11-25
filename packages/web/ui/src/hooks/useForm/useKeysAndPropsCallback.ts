@@ -16,12 +16,12 @@ export type GetInputPropsOptions = Simplify<{
   type?: "input" | "checkbox";
   withError?: boolean;
   withFocus?: boolean;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // oxlint-disable-next-line typescript/no-explicit-any
   [key: string]: any;
 }>;
 
 export type GetInputPropsReturnType = {
-  /* eslint-disable @typescript-eslint/no-explicit-any */
+  /* oxlint-disable typescript/no-explicit-any */
   onChange: any;
   value?: any;
   defaultValue?: any;
@@ -30,7 +30,7 @@ export type GetInputPropsReturnType = {
   error?: any;
   onFocus?: any;
   onBlur?: any;
-  /* eslint-enable @typescript-eslint/no-explicit-any */
+  /* oxlint-enable typescript/no-explicit-any */
 };
 
 /**

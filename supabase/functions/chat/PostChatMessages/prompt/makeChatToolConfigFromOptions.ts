@@ -1,5 +1,8 @@
-import { propEq } from "@avandar/utils";
+import { prop, propEq } from "@avandar/utils";
 import { buildDataExplorerToolDefinitions } from "@sbfn/chat/buildDataExplorerToolDefinitions/buildDataExplorerToolDefinitions.ts";
+import { MAX_PROPOSED_STATUSES } from "@sbfn/chat/PostChatMessages/parsing/parseProposedCaseStatuses.ts";
+import { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute.ts";
+import { ConceptStatus } from "$/models/ontology/ConceptStatus/ConceptStatus.ts";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext.ts";
 
 const DASHBOARD_TOOL_DEFINITIONS = [
@@ -193,6 +196,23 @@ const PROPOSE_CASE_TYPE_TOOL_DEFINITIONS = [
                   type: "boolean",
                   description: "Whether the card preselects this attribute.",
                 },
+                valueShape: {
+                  type: "string",
+                  enum: ["single", "list", "bucketed_list"],
+                  description:
+                    "single keeps one value per case, chosen by valuePickerRuleType. list keeps every value the case has, in dataset order. Use list only when one case genuinely has several values of this column and each one matters, such as symptoms recorded at several visits. Use bucketed_list for one value per day, week, month, quarter, or year, with bucketGrain and bucketColumnId. Never list the label column or a join key.",
+                },
+                bucketGrain: {
+                  type: "string",
+                  enum: ConceptAttribute.BUCKET_GRAINS,
+                  description:
+                    "Only with valueShape bucketed_list: the period to keep one value for, such as month for a monthly average.",
+                },
+                bucketColumnId: {
+                  type: "string",
+                  description:
+                    "Only with valueShape bucketed_list: the id of a date or timestamp column in the same dataset, copied verbatim from the catalog, that places each row in a period.",
+                },
                 valuePickerRuleType: {
                   type: "string",
                   enum: [
@@ -205,7 +225,7 @@ const PROPOSE_CASE_TYPE_TOOL_DEFINITIONS = [
                     "min",
                   ],
                   description:
-                    "Which value to keep when a dataset holds several rows per case. Use sum or max for cumulative measures, first for dates, most_frequent for categories.",
+                    "Which value to keep when a dataset holds several rows per case. Use sum or max for cumulative measures, first for dates, most_frequent for categories. sum and avg need a bigint or double column; max and min never apply to a boolean column. For a list, still give the rule the field would use with one value, so the user can switch it back.",
                 },
               },
               required: [
@@ -213,6 +233,7 @@ const PROPOSE_CASE_TYPE_TOOL_DEFINITIONS = [
                 "columnId",
                 "name",
                 "isIncluded",
+                "valueShape",
                 "valuePickerRuleType",
               ],
               additionalProperties: false,
@@ -221,7 +242,7 @@ const PROPOSE_CASE_TYPE_TOOL_DEFINITIONS = [
           manualEntryAttributes: {
             type: "array",
             description:
-              "Fields users fill in by hand that no dataset column supplies, such as review notes or a triage status.",
+              "Fields users fill in by hand that no dataset column supplies, such as review notes. Never a field for where a case stands: every case type already has statuses.",
             items: {
               type: "object",
               properties: {
@@ -235,6 +256,41 @@ const PROPOSE_CASE_TYPE_TOOL_DEFINITIONS = [
               required: ["name", "isIncluded"],
               additionalProperties: false,
             },
+          },
+          statuses: {
+            type: "array",
+            minItems: 1,
+            maxItems: MAX_PROPOSED_STATUSES,
+            description:
+              "The stages one case moves through, in workflow order, when the case type implies a workflow (an investigation, an application, an enrollment). Leave it out when cases have no workflow; the case type then starts with Active and Inactive.",
+            items: {
+              type: "object",
+              properties: {
+                name: {
+                  type: "string",
+                  description:
+                    "Short status name the people working the cases already use, unique within the case type. For example Suspected.",
+                },
+                description: {
+                  type: "string",
+                  description:
+                    "One sentence, written for the people working the cases, saying when a case belongs in this status. For example: A lab test came back positive.",
+                },
+                color: {
+                  type: "string",
+                  enum: ConceptStatus.PALETTE.map(prop("hex")),
+                  description:
+                    "Optional badge color. Leave it out to have a free color assigned.",
+                },
+              },
+              required: ["name", "description"],
+              additionalProperties: false,
+            },
+          },
+          defaultStatusName: {
+            type: "string",
+            description:
+              "The status a new case starts in. Must be one of `statuses`. Defaults to the first.",
           },
         },
         required: [
@@ -299,6 +355,12 @@ const CREATE_CASE_TYPES_TOOL_DEFINITIONS = [
                       datasetId: { type: "string" },
                       columnId: { type: "string" },
                       isLabel: { type: "boolean" },
+                      valueShape: {
+                        type: "string",
+                        enum: ["single", "list"],
+                        description:
+                          "single keeps one value per case. list keeps every value the case has. Never list a join key or the label.",
+                      },
                     },
                     required: ["name", "kind"],
                   },

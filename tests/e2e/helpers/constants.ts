@@ -53,6 +53,82 @@ export const SMALL_CALIFORNIA_CSV_PATH = path.join(
 export const SMALL_CALIFORNIA_CSV_EXPECTED_ROW_COUNT = 100;
 
 /**
+ * 24 measles cases with coded columns (GENDER 1/2/9, hosp_yn Y/N, ses_cat
+ * 1 to 4), onset dates, and case ids, for learning a dictionary from a
+ * dataset.
+ */
+export const MEASLES_LINE_LIST_CSV_PATH = path.join(
+  process.cwd(),
+  "tests/data/measles-line-list-small/measles-line-list-small.csv",
+);
+
+/** Row count DuckDB reports once it parses the measles line list CSV. */
+export const MEASLES_LINE_LIST_CSV_EXPECTED_ROW_COUNT = 24;
+
+/**
+ * Two Kings measles line lists with one column layout (`CaseNo`, `GENDER`
+ * coded 1/2/9, ISO `onset_dt`, `zip`), for combining datasets with a
+ * crosswalk.
+ */
+export const CROSSWALK_KINGS_MARCH_CSV_PATH = path.join(
+  process.cwd(),
+  "tests/data/crosswalk-line-lists/crosswalk-kings-2026-03.csv",
+);
+
+/** The April Kings line list, in the same layout as March. */
+export const CROSSWALK_KINGS_APRIL_CSV_PATH = path.join(
+  process.cwd(),
+  "tests/data/crosswalk-line-lists/crosswalk-kings-2026-04.csv",
+);
+
+/** Rows DuckDB reports once it parses either Kings line list. */
+export const CROSSWALK_KINGS_CSV_EXPECTED_ROW_COUNT = 3;
+
+/**
+ * A Queens measles line list in another layout: `case_id`, `sex` coded
+ * M/F/U, `rash_onset` as month/day/year text with one unreadable value
+ * (so DuckDB keeps it text), and `zip_code`.
+ */
+export const CROSSWALK_QUEENS_MARCH_CSV_PATH = path.join(
+  process.cwd(),
+  "tests/data/crosswalk-line-lists/crosswalk-queens-2026-03.csv",
+);
+
+/** Rows DuckDB reports once it parses the Queens line list. */
+export const CROSSWALK_QUEENS_CSV_EXPECTED_ROW_COUNT = 12;
+
+/**
+ * Seven patient visits with a date and a temperature, for a per-month case
+ * type field. See the README beside it.
+ */
+export const CASE_BUCKETED_VISITS_CSV_PATH = path.join(
+  process.cwd(),
+  "tests/data/case-bucketed-visits/case-bucketed-visits.csv",
+);
+
+/**
+ * Row count reported after DuckDB parses
+ * {@link CASE_BUCKETED_VISITS_CSV_PATH}.
+ */
+export const CASE_BUCKETED_VISITS_CSV_EXPECTED_ROW_COUNT = 7;
+
+/**
+ * Thirty cases, `C001` to `C030`, each with an onset date and a district,
+ * for the epidemiology plugin's cases data slot. The onset dates fall in four
+ * MMWR weeks, starting 2023-12-31 (6 cases), 2024-01-07 (10), 2024-01-14 (9),
+ * and 2024-01-21 (5). The districts are Ilala (14 cases), Kinondoni (10), and
+ * Temeke (6), and every week has a case in each, so the epicurve stacked by
+ * district draws 12 bars.
+ */
+export const CASE_LINE_LIST_CSV_PATH = path.join(
+  process.cwd(),
+  "tests/data/case-line-list/case-line-list.csv",
+);
+
+/** Row count reported after DuckDB parses {@link CASE_LINE_LIST_CSV_PATH}. */
+export const CASE_LINE_LIST_CSV_EXPECTED_ROW_COUNT = 30;
+
+/**
  * Real 10-page tagged PDF (see `public/test-data/pdf/README.md` for its
  * provenance and licence). Well under the 50-page import cap, so its page
  * geometry sniff finishes quickly.
@@ -176,6 +252,34 @@ export const GIS_DATED_POINTS_ROW_COUNT = 9;
 /** Parsed row count of {@link GIS_PCODE_POLYGON_CSV_PATH}. */
 export const GIS_PCODE_POLYGON_ROW_COUNT = 1;
 
+/** Two lower-Manhattan exposure sites as latitude and longitude. */
+export const GIS_NYC_EXPOSURE_SITES_CSV_PATH = path.join(
+  GIS_DATA_DIR,
+  "nyc-exposure-sites.csv",
+);
+
+/** Parsed row count of {@link GIS_NYC_EXPOSURE_SITES_CSV_PATH}. */
+export const GIS_NYC_EXPOSURE_SITES_ROW_COUNT = 2;
+
+/**
+ * The same two sites as {@link GIS_NYC_EXPOSURE_SITES_CSV_PATH}, as Parquet,
+ * so a spec can seed them as a catalog listing instead of uploading the CSV.
+ */
+export const GIS_NYC_EXPOSURE_SITES_PARQUET_PATH = path.join(
+  GIS_DATA_DIR,
+  "nyc-exposure-sites.parquet",
+);
+
+/**
+ * 35 NYC school points (WKT `the_geom`, name in `loc_name`) around
+ * {@link GIS_NYC_EXPOSURE_SITES_CSV_PATH}, with none near the edge of a
+ * half-mile ring around either site.
+ */
+export const GIS_NYC_SCHOOL_POINTS_PARQUET_PATH = path.join(
+  GIS_DATA_DIR,
+  "nyc-school-points-near-sites.parquet",
+);
+
 /** Directory of the export and disputed-boundary GIS fixtures. */
 const GIS_WAVE_E_DATA_DIR = path.join(process.cwd(), "tests/data/gis-wave-e");
 
@@ -190,6 +294,31 @@ export const GIS_DISPUTED_BOUNDARIES_CSV_PATH = path.join(
 
 /** Parsed row count of {@link GIS_DISPUTED_BOUNDARIES_CSV_PATH}. */
 export const GIS_DISPUTED_BOUNDARIES_ROW_COUNT = 4;
+
+/** Directory of the Parquet copies the threshold-colors spec seeds. */
+const GIS_THRESHOLD_COLORS_DATA_DIR = path.join(
+  process.cwd(),
+  "tests/data/gis-threshold-colors",
+);
+
+/**
+ * 25 Manhattan rows of NYC's Modified ZIP Code Tabulation Areas (MODZCTA):
+ * `modzcta` keys and WKT `the_geom` multipolygons.
+ */
+export const GIS_MODZCTA_MANHATTAN_PARQUET_PATH = path.join(
+  GIS_THRESHOLD_COLORS_DATA_DIR,
+  "modzcta-manhattan.parquet",
+);
+
+/**
+ * The 2024-2025 New York State School Immunization Survey rows inside
+ * {@link GIS_MODZCTA_MANHATTAN_PARQUET_PATH}: WKT `location` points and
+ * `percent_immunized_measles` stored as a fraction (0.95, not 95).
+ */
+export const GIS_SCHOOL_IMMUNIZATION_MANHATTAN_PARQUET_PATH = path.join(
+  GIS_THRESHOLD_COLORS_DATA_DIR,
+  "school-immunization-manhattan.parquet",
+);
 
 /** Same data as {@link SMALL_CALIFORNIA_CSV_PATH}, exported as `.xlsx`. */
 export const SMALL_CALIFORNIA_XLSX_PATH = path.join(

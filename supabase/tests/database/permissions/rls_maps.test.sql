@@ -439,6 +439,8 @@ select throws_ok (
   'is_public does not make a map anon-readable'
 );
 
+reset role;
+
 -- 8. An outsider cannot insert a map claiming this workspace.
 select throws_ok (
   $t8$

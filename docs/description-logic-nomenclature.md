@@ -5,6 +5,15 @@ configs". This is the dictionary for the rename tracked as P5.1 in
 `docs/production-plan-world-humanitarian-day.md`, which has shipped; it now
 doubles as the reference for what each name means.
 
+Some of the new names have since been removed, and the rename tables below
+keep them only as history: the `AttributeAssertion` model,
+`AttributeAssertionClient` (with `getAttributeAssertions`,
+`getDatasetColumnAssertions`, and `getConceptExtension`), `HydratedIndividual`
+and `useHydratedIndividual`, `_runConceptQuery`, and
+`_buildConceptQueryResult`. Field values are read through
+`ConceptRecordValuesClient` instead (see
+[ontology-architecture.md](ontology-architecture.md), section 7).
+
 **This is internal nomenclature only.** No user-facing copy changed: every
 English string a user can read is byte-identical to what it was before. See
 "What deliberately does not change" at the bottom.
@@ -30,7 +39,7 @@ code should read the same way.
 | **Individual** | A member of the domain | One `individuals` row |
 | **Role** | Binary relation between individuals | Does not exist yet (P5.2) |
 | **Attribute** (concrete role) | Relation from an individual to a data value | One `concept_attributes` row |
-| **Assertion** | A fact: `C(a)` or `A(a, v)` | One computed `AttributeAssertion` |
+| **Assertion** | A fact: `C(a)` or `A(a, v)` | A record, or one value in a concept view's column, computed per read |
 | **Mapping** | OBDA rule deriving assertions from a source | One `attribute_mappings__*` row |
 
 ### Where the layers sit
@@ -50,11 +59,12 @@ TBox   Patient ⊑ ∃hasAge.Integer     one `concepts` row + its `concept_attri
 
 ABox   Patient(p_001)                one `individuals` row; its `concept_id` IS
                                      the concept assertion
-       hasAge(p_001, 34)             one `AttributeAssertion`
+       hasAge(p_001, 34)             one value of the `age` column of `concept_<id>`
 ```
 
 Note that the ABox here is **virtual**: assertions are derived on demand from
-the mappings rather than stored, which is why `AttributeAssertion` has no table.
+the mappings rather than stored, which is why attribute assertions have no
+table and no model.
 
 ### Two rules that keep the usage honest
 
@@ -70,9 +80,9 @@ the mappings rather than stored, which is why `AttributeAssertion` has no table.
    zero identifiers.
 
 A corollary worth stating, because it is easy to get wrong: **no single client
-is "the ABox".** `IndividualClient` holds the concept assertions,
-`AttributeAssertionClient` holds the attribute assertions. The ABox is both
-together.
+is "the ABox".** `IndividualClient` holds the concept assertions, and
+`ConceptRecordValuesClient` reads the attribute assertions from the concept
+view. The ABox is both together.
 
 ## Database
 
@@ -246,10 +256,10 @@ IndexedDB, or a URL. `dashboards.config` stores Puck blocks with raw SQL, and
 | `…/getEntityFieldValues/getDatasetColumnFieldValues.ts` | `…/getAttributeAssertions/getDatasetColumnAssertions.ts` |
 
 Clients are named after their model, as everywhere else in the tree
-(`DatasetClient`, `DashboardClient`). `AttributeAssertionClient` has no table
+(`DatasetClient`, `DashboardClient`). `AttributeAssertionClient` had no table
 behind it (there is no `entity_field_values` table; it was dropped in
 `20250929162612`) because the assertions are derived from the mappings on
-demand, but it is still the client for that model.
+demand, but it was the client for that model until both were removed.
 
 Its two methods split along a line worth making explicit in the names:
 
@@ -264,8 +274,8 @@ Its two methods split along a line worth making explicit in the names:
 | `_getEntityFieldValuesByExtractorType` | `_getAssertionsByMappingType` | |
 
 The *extension* of a concept is the set of individuals belonging to it, so
-`getConceptExtension` is the precise term for what QETL Phase 3 calls "the ABox
-becomes a relation".
+`getConceptExtension` was the precise term for "the ABox becomes a relation".
+The concept view (`concept_<id>`) is that relation now.
 
 ## Views and routes
 

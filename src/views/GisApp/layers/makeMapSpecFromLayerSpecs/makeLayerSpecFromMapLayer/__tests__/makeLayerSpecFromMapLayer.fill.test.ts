@@ -101,6 +101,7 @@ describe("makeLayerSpecFromMapLayer fill and line paint", () => {
             outputValueId: uuid<MapLayer.AreaAggregationOutputId>(),
           },
           ramp: ["#fee", "#f00"],
+          classLabels: [undefined, undefined],
           classification: { method: "quantile" as const, classCount: 2 },
           normalization: undefined,
           noData: { color: "#ccc", label: "" },

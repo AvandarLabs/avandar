@@ -1,0 +1,17 @@
+{
+  "label": "phase-1d:offline-dashboards",
+  "questionCount": 9,
+  "passCount": 6,
+  "needlessQuestions": 1,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 24,
+  "promptTokens": 21110,
+  "cachedPromptTokens": 0,
+  "completionTokens": 2223,
+  "totalCost": 0,
+  "costPerQuestion": 0,
+  "latencyMedianMs": 18048.747667000003,
+  "latencyP90Ms": 82839.613334,
+  "failedIds": ["D04", "D08", "D09"]
+}

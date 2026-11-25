@@ -1,11 +1,14 @@
-import { STOCK } from "../../stockPalette";
-import { AperturePanel } from "./AperturePanel";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { StockRect } from "../../primitives/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { AperturePanel } from "./AperturePanel/AperturePanel";
+import { DisclosureApertureFieldsLayer } from "./DisclosureApertureFieldsLayer/DisclosureApertureFieldsLayer";
 import { DisclosureCopies } from "./DisclosureCopies";
 import { DisclosureCopy } from "./DisclosureCopy";
-import { DisclosureField } from "./DisclosureField";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./DisclosureAperture.schema";
 import type { ReactNode } from "react";
+
 /** Complete authored disclosure policy and source content. */
 export type Props = GraphicProps & { input: Input };
 /**
@@ -17,41 +20,37 @@ export function DisclosureAperture({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const destinationX = input.direction === "left-to-right" ? 540 : 60;
   return (
     <g data-disclosure-direction={input.direction}>
-      <rect
+      <StockRect
         x={60}
         y={156}
         width={360}
         height={360}
-        rx={4}
-        fill={STOCK.surface}
-        stroke={STOCK.line}
+        rx={scales.corner(tokens.corner.chip)}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
       />
-      <rect
+      <StockRect
         x={540}
         y={156}
         width={360}
         height={360}
-        rx={4}
-        fill={STOCK.surface}
-        stroke={STOCK.line}
+        rx={scales.corner(tokens.corner.chip)}
+        fill={tokens.color.surface}
+        stroke={tokens.color.line}
       />
-      <path
-        d={`M${destinationX} 156 l180 42 l180 -42`}
+      <SketchedShape
+        shape={{ kind: "path", d: `M${destinationX} 156 l180 42 l180 -42` }}
+        profile={tokens.sketch.shape}
         fill="none"
-        stroke={STOCK.line}
+        stroke={tokens.color.line}
       />
       <AperturePanel {...{ frame, input, accent }} />
-      {input.fields.map((field, index) => (
-        <DisclosureField
-          key={field.id}
-          {...{ field, index, frame, input, accent }}
-          shareIndex={0}
-          isCopy={false}
-        />
-      ))}
+      <DisclosureApertureFieldsLayer {...{ input, frame, accent }} />
       <DisclosureCopies {...{ input, frame, accent }} />
       <DisclosureCopy input={input} />
     </g>

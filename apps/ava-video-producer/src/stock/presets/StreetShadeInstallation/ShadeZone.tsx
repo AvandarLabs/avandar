@@ -1,6 +1,7 @@
-import { STOCK } from "../../stockPalette";
+import { StockRect } from "../../primitives/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SceneLabel } from "./SceneLabel";
-import { ShadeFootprint } from "./ShadeFootprint";
+import { ShadeFootprint } from "./ShadeFootprint/ShadeFootprint";
 import type { Input } from "./StreetShadeInstallation.schema";
 import type { ReactNode } from "react";
 
@@ -12,18 +13,21 @@ export function ShadeZone({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const zone = input.zones[index];
   const y = 165 + index * 65;
   return (
     <g data-zone={index} data-zone-id={zone.id}>
       <SceneLabel text={zone.label} x={45} y={y + 13} width={195} lines={3} />
-      <rect
+      <StockRect
         data-ground={index}
         x={285}
         y={y}
         width={600}
         height={36}
-        fill={STOCK.surface}
+        fill={tokens.color.surface}
         stroke={accent}
       />
       <rect
@@ -32,19 +36,19 @@ export function ShadeZone({
         y={y}
         width={(zone.existingShadeM2 / zone.areaM2) * 600}
         height={36}
-        fill={STOCK.cyan}
-        fillOpacity={0.3}
+        fill={tokens.color.accentAlt}
+        fillOpacity={scales.wash(atomic.opacity["30"])}
       />
-      {input.installations.map((item, itemIndex) =>
-        item.zoneId === zone.id ? (
+      {input.installations.map((item, itemIndex) => {
+        return item.zoneId === zone.id ? (
           <ShadeFootprint
             key={item.id}
             input={input}
             index={itemIndex}
             frame={frame}
           />
-        ) : undefined,
-      )}
+        ) : undefined;
+      })}
     </g>
   );
 }

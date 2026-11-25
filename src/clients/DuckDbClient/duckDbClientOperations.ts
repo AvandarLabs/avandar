@@ -1,3 +1,4 @@
+import type { ColumnConversion } from "$/models/dataDictionaries/ColumnConversion/ColumnConversion";
 import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type {
@@ -54,6 +55,10 @@ export type DuckDbLoadParquetOptions = {
     {
       alias?: string;
       dataType?: DuckDbDataType;
+      /** Set for a converted column: its values are translated as it loads. */
+      valueMapping?: ColumnConversion.T;
+      /** The cast for a converted column's keep-original copy, if any. */
+      originalCopyDataType?: DuckDbDataType;
     }
   >;
   datasetDuckDbLease?: DatasetDuckDbLease;

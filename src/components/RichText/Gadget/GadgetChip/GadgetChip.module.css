@@ -1,0 +1,80 @@
+.chip {
+  align-items: center;
+  background-color: var(--mantine-color-neutral-1);
+  border: 1px solid var(--ava-border-default);
+  border-radius: var(--mantine-radius-xs);
+  display: inline-flex;
+  font-weight: 500;
+  gap: 4px;
+  padding-inline: 4px 6px;
+  text-decoration: none;
+  transition: var(--ava-transition-colors);
+  vertical-align: baseline;
+  white-space: nowrap;
+}
+
+/*
+ * The label and icon carry their own color so that rich text styling for
+ * plain links, which colors every anchor, does not recolor the chip.
+ */
+.label {
+  color: var(--mantine-color-neutral-9);
+}
+
+.icon {
+  color: var(--mantine-color-neutral-7);
+  flex: none;
+}
+
+/* An editor's chip is a button, so it drops the browser's button styling. */
+button.chip {
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 500;
+  line-height: inherit;
+  margin: 0;
+  padding-block: 0;
+}
+
+a.chip:hover,
+button.chip:hover,
+button.chip[data-expanded] {
+  background-color: var(--ava-surface-sunken);
+}
+
+a.chip:focus-visible,
+button.chip:focus-visible {
+  outline: 2px solid var(--ava-border-focus);
+  outline-offset: 1px;
+}
+
+.unavailable {
+  background-color: transparent;
+  border-style: dashed;
+}
+
+.unavailable .label {
+  color: var(--mantine-color-dimmed);
+}
+
+.skeleton {
+  animation: gadget-chip-pulse 1.5s ease-in-out infinite;
+  background-color: var(--mantine-color-neutral-2);
+  block-size: 12px;
+  border-radius: var(--mantine-radius-xs);
+  display: inline-block;
+  inline-size: 80px;
+}
+
+@keyframes gadget-chip-pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}

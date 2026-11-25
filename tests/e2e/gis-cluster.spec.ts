@@ -94,7 +94,10 @@ test("collapses nearby points into a cluster that opens a feature table", async 
     await page.getByPlaceholder("Search data sources").click();
     await page.getByRole("option", { name: DATASET_NAME }).click();
 
-    const inspector = page.getByRole("region", { name: "Layer" });
+    const inspector = page.getByRole("region", {
+      name: DATASET_NAME,
+      exact: true,
+    });
     await expect(inspector.getByText("8 of 8 rows mapped")).toBeVisible({
       timeout: LONG_WAIT,
     });
@@ -133,13 +136,27 @@ test("collapses nearby points into a cluster that opens a feature table", async 
       page.getByRole("region", { name: "Feature", exact: true }),
     ).toHaveCount(0);
 
-    // Zooming from here is not asserted: the layer's GeoJSON source is absent
-    // from the map style by the time the table opens, so `zoomToCluster` finds
-    // no source to ask for an expansion zoom and returns without moving the
-    // camera. That is a separate defect from the clustering this test covers,
-    // and it also leaves the table's rows unfetchable, since `getClusterLeaves`
-    // needs the same source.
-    expect(zoomBeforeClick).toBeGreaterThan(0);
+    // The table lists the tight group's six members, fetched from the layer's
+    // GeoJSON source with `getClusterLeaves`.
+    await expect(
+      clusterTable.getByRole("button", { name: /^View details for / }),
+    ).toHaveCount(6);
+    await expect(
+      clusterTable.getByRole("button", { name: "View details for S1" }),
+    ).toBeVisible();
+
+    // "Zoom to cluster" eases the camera in to the cluster's expansion zoom.
+    await clusterTable.getByRole("button", { name: "Zoom to cluster" }).click();
+    await expect
+      .poll(
+        async () => {
+          return page.evaluate(() => {
+            return window.__avandarE2EMap?.getZoom() ?? 0;
+          });
+        },
+        { timeout: LONG_WAIT },
+      )
+      .toBeGreaterThan(zoomBeforeClick);
   } finally {
     await deleteMapsByIds({ admin, mapIds: mapId ? [mapId] : [] });
     if (datasetId) {

@@ -1,0 +1,22 @@
+/*
+ * The side pane's hairline between the column's own settings and how this
+ * layout fills it. The pane sits in the body's rail on the tinted surface,
+ * so a rule, not a box, separates the two.
+ */
+.fillSection {
+  border-top: 1px solid var(--ava-border-default);
+  padding-top: var(--mantine-spacing-md);
+}
+
+/* An example value keeps its exact spacing and wraps only at its own breaks. */
+.exampleValue {
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+/* A long layout's column list scrolls inside the Insert column menu. */
+.insertColumnList {
+  max-height: 15rem;
+  overflow-y: auto;
+}

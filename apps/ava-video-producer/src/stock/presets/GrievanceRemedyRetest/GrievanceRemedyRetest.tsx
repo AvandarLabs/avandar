@@ -1,9 +1,10 @@
-import { STOCK, type GraphicProps } from "../../graphics-common";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
-import { RemedyActions } from "./RemedyActions";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { RemedyActions } from "./RemedyActions/RemedyActions";
 import { RemedyObject } from "./RemedyObject";
 import { RemedyResponse } from "./RemedyResponse";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./GrievanceRemedyRetest.schema";
 import type { ReactNode } from "react";
 
@@ -14,6 +15,7 @@ export function GrievanceRemedyRetest({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   return (
     <g
       data-complaint-state={
@@ -31,7 +33,12 @@ export function GrievanceRemedyRetest({
         ]}
       />
       <PersonGlyph x={200} y={310} color={accent} />
-      <PersonGlyph x={760} y={310} color={STOCK.cyan} role="worker" />
+      <PersonGlyph
+        x={760}
+        y={310}
+        color={tokens.color.accentAlt}
+        role="worker"
+      />
       <RemedyObject frame={frame} input={input} accent={accent} />
       <RemedyActions frame={frame} input={input} accent={accent} />
       <RemedyResponse frame={frame} input={input} accent={accent} />

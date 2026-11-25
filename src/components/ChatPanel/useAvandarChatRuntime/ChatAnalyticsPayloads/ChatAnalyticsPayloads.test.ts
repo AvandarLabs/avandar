@@ -1,3 +1,4 @@
+import { Model } from "@avandar/models";
 import { describe, expect, it } from "vitest";
 import { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import { ChatAnalyticsPayloads } from "@/components/ChatPanel/useAvandarChatRuntime/ChatAnalyticsPayloads/ChatAnalyticsPayloads";
@@ -43,20 +44,18 @@ const EDITOR_STATE_WITH_TWO_BLOCKS: DashboardEditorAppState = {
 };
 
 describe("ChatAnalyticsPayloads", () => {
-  it("describes the initially selected local route", () => {
+  it("describes a turn that runs on the offline models as local", () => {
     expect(
       ChatAnalyticsPayloads.fromMessage({
         content: "show monthly sales",
         pageContext: ChatPageContext.createDataExplorerViewContext({
           openDatasetId: "dataset-1",
         }),
-        selectedModelId: "offline:qwen-1.5b",
-        runtimeMode: { kind: "local", localChatModelId: "qwen-1.5b" },
+        runtimeMode: { kind: "local" },
       }),
     ).toEqual({
       promptChars: 18,
       pageApp: "data-explorer",
-      modelId: "offline:qwen-1.5b",
       runtimeMode: "local",
       hasOpenDataset: true,
     });
@@ -77,6 +76,28 @@ describe("ChatAnalyticsPayloads", () => {
     });
   });
 
+  it("counts mentions and attached items, never names", () => {
+    const payload = ChatAnalyticsPayloads.fromMessage({
+      content: 'Show @"US deaths"',
+      pageContext: ChatPageContext.createDashboardsViewContext({
+        dashboardId: "dashboard-1",
+      }),
+      runtimeMode: { kind: "cloud" },
+      mentionCount: 1,
+      attachedCount: 2,
+    });
+
+    expect(payload).toEqual({
+      promptChars: 17,
+      pageApp: "dashboards",
+      runtimeMode: "cloud",
+      hasOpenDataset: false,
+      mentionCount: 1,
+      attachedCount: 2,
+    });
+    expect(JSON.stringify(payload)).not.toContain("US deaths");
+  });
+
   it("counts SQL without retaining SQL", () => {
     const payload = ChatAnalyticsPayloads.fromSql("select secret from data");
     expect(payload).toEqual({ sqlChars: 23 });
@@ -91,9 +112,7 @@ describe("ChatAnalyticsPayloads", () => {
         sql: "select secret from sales",
         vizType: "bar",
       },
-      pageContext: ChatPageContext.createDashboardsViewContext({
-        dashboardId: "dashboard-1",
-      }),
+      dashboardId: "dashboard-1",
       editorState: EDITOR_STATE_WITH_TWO_BLOCKS,
     });
 
@@ -111,9 +130,7 @@ describe("ChatAnalyticsPayloads", () => {
     expect(
       ChatAnalyticsPayloads.fromDashboardBlock({
         block: { kind: "HeadingBlock", text: "Sales" },
-        pageContext: ChatPageContext.createDashboardsViewContext({
-          dashboardId: "dashboard-1",
-        }),
+        dashboardId: "dashboard-1",
         editorState: {
           ...EDITOR_STATE_WITH_TWO_BLOCKS,
           editorData: undefined,
@@ -123,5 +140,38 @@ describe("ChatAnalyticsPayloads", () => {
       blockKind: "HeadingBlock",
       dashboardId: "dashboard-1",
     });
+  });
+
+  it.each([
+    ["data-explorer", "data_explorer"],
+    ["dashboards", "dashboards"],
+    ["data-sources", "data_sources"],
+    ["case-manager", undefined],
+    ["other", undefined],
+  ] as const)("maps the %s page to the %s app", (app, analyticsApp) => {
+    expect(
+      ChatAnalyticsPayloads.toAnalyticsApp(
+        Model.make("ChatPageContext", { app }),
+      ),
+    ).toBe(analyticsApp);
+  });
+
+  it("leaves out the block count with no editor state", () => {
+    expect(
+      ChatAnalyticsPayloads.fromDashboardBlock({
+        block: { kind: "HeadingBlock", text: "Sales" },
+        dashboardId: "dashboard-1",
+      }),
+    ).toEqual({ blockKind: "HeadingBlock", dashboardId: "dashboard-1" });
+  });
+
+  it("leaves out the block count when the editor shows another dashboard", () => {
+    expect(
+      ChatAnalyticsPayloads.fromDashboardBlock({
+        block: { kind: "HeadingBlock", text: "Sales" },
+        dashboardId: "dashboard-2",
+        editorState: EDITOR_STATE_WITH_TWO_BLOCKS,
+      }),
+    ).toEqual({ blockKind: "HeadingBlock", dashboardId: "dashboard-2" });
   });
 });

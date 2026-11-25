@@ -1,5 +1,5 @@
 import { ActionIcon as MantineActionIcon } from "@mantine/core";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { Tooltip } from "../Tooltip/Tooltip";
 import css from "./ActionIcon.module.css";
 import type { ActionIconProps, TooltipProps } from "@mantine/core";

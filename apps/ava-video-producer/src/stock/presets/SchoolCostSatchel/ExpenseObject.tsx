@@ -1,4 +1,5 @@
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./SchoolCostSatchel.schema";
 import type { ReactNode } from "react";
 
@@ -17,14 +18,18 @@ const OBJECT_PATHS: Record<
 };
 /** Five distinct silhouettes correspond exactly to authored expense kinds. */
 export function ExpenseObject({ kind, color }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
-    <path
-      data-expense-shape={kind}
-      d={OBJECT_PATHS[kind]}
-      fill={STOCK.surface}
-      stroke={color}
-      strokeWidth={2}
-      strokeLinejoin="round"
-    />
+    <g data-expense-shape={kind}>
+      <SketchedShape
+        shape={{ kind: "path", d: OBJECT_PATHS[kind] }}
+        profile={tokens.sketch.shape}
+        fill={tokens.color.surface}
+        stroke={color}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
+        strokeLinejoin="round"
+      />
+    </g>
   );
 }

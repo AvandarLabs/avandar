@@ -13,12 +13,11 @@ function _validateRouteTravel({
     progress > 1 ||
     points.length < 2 ||
     points.length > 32 ||
-    points.some(
-      (point) =>
-        ![point.x, point.y].every(
-          (value) => Number.isFinite(value) && value >= 0 && value <= 1,
-        ),
-    )
+    points.some((point) => {
+      return ![point.x, point.y].every((value) => {
+        return Number.isFinite(value) && value >= 0 && value <= 1;
+      });
+    })
   ) {
     throw new Error(
       "Routes require two to thirty-two normalized points and bounded progress.",
@@ -32,12 +31,12 @@ export function getRoutePointFromProgress({
   progress,
 }: Readonly<RouteTravel>): RoutePoint {
   _validateRouteTravel({ points, progress });
-  const lengths = points
-    .slice(1)
-    .map((point, index) =>
-      Math.hypot(point.x - points[index].x, point.y - points[index].y),
-    );
-  const total = lengths.reduce((sum, length) => sum + length, 0);
+  const lengths = points.slice(1).map((point, index) => {
+    return Math.hypot(point.x - points[index].x, point.y - points[index].y);
+  });
+  const total = lengths.reduce((sum, length) => {
+    return sum + length;
+  }, 0);
   if (total === 0) {
     throw new Error("A route needs a nonzero length.");
   }
@@ -45,16 +44,17 @@ export function getRoutePointFromProgress({
     return { ...points.at(-1)! };
   }
   const distance = progress * total;
-  const index = lengths.findIndex(
-    (length, segmentIndex) =>
+  const index = lengths.findIndex((length, segmentIndex) => {
+    return (
       length > 0 &&
-      lengths
-        .slice(0, segmentIndex + 1)
-        .reduce((sum, segment) => sum + segment, 0) >= distance,
-  );
-  const covered = lengths
-    .slice(0, index)
-    .reduce((sum, length) => sum + length, 0);
+      lengths.slice(0, segmentIndex + 1).reduce((sum, segment) => {
+        return sum + segment;
+      }, 0) >= distance
+    );
+  });
+  const covered = lengths.slice(0, index).reduce((sum, length) => {
+    return sum + length;
+  }, 0);
   const fraction = (distance - covered) / lengths[index];
   return {
     x: points[index].x + (points[index + 1].x - points[index].x) * fraction,

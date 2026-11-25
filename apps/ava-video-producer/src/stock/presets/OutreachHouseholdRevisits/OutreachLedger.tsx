@@ -1,6 +1,6 @@
 import { prop } from "@avandar/utils";
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./OutreachHouseholdRevisits.schema";
 import type { ReactNode } from "react";
 
@@ -12,52 +12,81 @@ export function OutreachLedger({
   input,
   completed,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const visited = new Set(completed.map(prop("householdId")));
   const contactedHouseholds = new Set(
-    completed.filter(({ contacted }) => contacted).map(prop("householdId")),
+    completed.filter(prop("contacted")).map(prop("householdId")),
   );
-  const rows = [
-    {
-      label: input.copy.visits,
-      value: completed.length,
-      visible: input.showUniqueLedger,
-      color: STOCK.text,
-    },
-    {
-      label: input.copy.visited,
-      value: visited.size,
-      visible: input.showUniqueLedger,
-      color: STOCK.text,
-    },
-    {
-      label: input.copy.contacted,
-      value: contactedHouseholds.size,
-      visible: true,
-      color: STOCK.mint,
-    },
-    {
-      label: input.copy.noContact,
-      value: visited.size - contactedHouseholds.size,
-      visible: true,
-      color: STOCK.orange,
-    },
-    {
-      label: input.copy.unvisited,
-      value: input.households.length - visited.size,
-      visible: true,
-      color: STOCK.muted,
-    },
-    {
-      label: input.copy.denominator,
-      value: input.households.length,
-      visible: true,
-      color: STOCK.text,
-    },
+  const rows = _getLedgerRowsFromVisitCounts({
+    input,
+    completed,
+    visited,
+    contactedHouseholds,
+    tokens,
+  });
+  return _getLedgerFromRows(rows);
+}
+
+/** A displayed household ledger row with an independent visibility rule. */
+type LedgerRow = {
+  label: string;
+  value: number;
+  visible: boolean;
+  color: string;
+};
+/**
+ * The ledger preserves separate event counts and exclusive household states.
+ */
+function _getLedgerRowsFromVisitCounts({
+  input,
+  completed,
+  visited,
+  contactedHouseholds,
+  tokens,
+}: Readonly<LedgerRowsOptions>): LedgerRow[] {
+  const rows: Array<[string, number, boolean, string]> = [
+    [
+      input.copy.visits,
+      completed.length,
+      input.showUniqueLedger,
+      tokens.color.text,
+    ],
+    [
+      input.copy.visited,
+      visited.size,
+      input.showUniqueLedger,
+      tokens.color.text,
+    ],
+    [
+      input.copy.contacted,
+      contactedHouseholds.size,
+      true,
+      tokens.color.positive,
+    ],
+    [
+      input.copy.noContact,
+      visited.size - contactedHouseholds.size,
+      true,
+      tokens.color.highlight,
+    ],
+    [
+      input.copy.unvisited,
+      input.households.length - visited.size,
+      true,
+      tokens.color.textMuted,
+    ],
+    [input.copy.denominator, input.households.length, true, tokens.color.text],
   ];
+  return rows.map(([label, value, visible, color]) => {
+    return { label, value, visible, color };
+  });
+}
+/** Both literal values and labels retain their fixed ledger columns. */
+function _getLedgerFromRows(rows: readonly LedgerRow[]): ReactNode {
   return (
     <g>
-      {rows.map((row, index) =>
-        row.visible ? (
+      {rows.map((row, index) => {
+        return row.visible ? (
           <g key={index}>
             <FitText
               text={String(row.value)}
@@ -81,8 +110,15 @@ export function OutreachLedger({
               normalizeWhitespace
             />
           </g>
-        ) : undefined,
-      )}
+        ) : undefined;
+      })}
     </g>
   );
 }
+
+/** Counts and theme values used to assemble the visible household ledger. */
+type LedgerRowsOptions = Props & {
+  visited: ReadonlySet<string>;
+  contactedHouseholds: ReadonlySet<string>;
+  tokens: ReturnType<typeof GraphicThemeHooks.useGraphicTokens>;
+};

@@ -134,39 +134,39 @@ export const invalidInputs: unknown[] = [
   },
   {
     ...DEFAULT_INPUT,
-    collaborators: DEFAULT_INPUT.collaborators.map((item, index) =>
-      index === 0 ? { ...item, id: "" } : item,
-    ),
+    collaborators: DEFAULT_INPUT.collaborators.map((item, index) => {
+      return index === 0 ? { ...item, id: "" } : item;
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    collaborators: DEFAULT_INPUT.collaborators.map((item, index) =>
-      index === 0 ? { ...item, id: "W".repeat(21) } : item,
-    ),
+    collaborators: DEFAULT_INPUT.collaborators.map((item, index) => {
+      return index === 0 ? { ...item, id: "W".repeat(21) } : item;
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    collaborators: DEFAULT_INPUT.collaborators.map((item, index) =>
-      index === 0 ? { ...item, label: "" } : item,
-    ),
+    collaborators: DEFAULT_INPUT.collaborators.map((item, index) => {
+      return index === 0 ? { ...item, label: "" } : item;
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    collaborators: DEFAULT_INPUT.collaborators.map((item, index) =>
-      index === 0 ? { ...item, label: "W".repeat(19) } : item,
-    ),
+    collaborators: DEFAULT_INPUT.collaborators.map((item, index) => {
+      return index === 0 ? { ...item, label: "W".repeat(19) } : item;
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    collaborators: DEFAULT_INPUT.collaborators.map((item, index) =>
-      index === 0 ? { ...item, workpieceLabel: "" } : item,
-    ),
+    collaborators: DEFAULT_INPUT.collaborators.map((item, index) => {
+      return index === 0 ? { ...item, workpieceLabel: "" } : item;
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    collaborators: DEFAULT_INPUT.collaborators.map((item, index) =>
-      index === 0 ? { ...item, workpieceLabel: "W".repeat(25) } : item,
-    ),
+    collaborators: DEFAULT_INPUT.collaborators.map((item, index) => {
+      return index === 0 ? { ...item, workpieceLabel: "W".repeat(25) } : item;
+    }),
   },
   { ...DEFAULT_INPUT, labels: { ...DEFAULT_INPUT.labels, prepare: "" } },
   {
@@ -191,9 +191,9 @@ export const invalidInputs: unknown[] = [
   { ...DEFAULT_INPUT, guide: { ...DEFAULT_INPUT.guide, extra: true } },
   {
     ...DEFAULT_INPUT,
-    collaborators: DEFAULT_INPUT.collaborators.map((item, index) =>
-      index === 0 ? { ...item, extra: true } : item,
-    ),
+    collaborators: DEFAULT_INPUT.collaborators.map((item, index) => {
+      return index === 0 ? { ...item, extra: true } : item;
+    }),
   },
   { ...DEFAULT_INPUT, labels: { ...DEFAULT_INPUT.labels, extra: true } },
 ];

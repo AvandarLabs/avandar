@@ -1,7 +1,5 @@
-import { useLingui } from "@lingui/react";
-import { useLingui as useLinguiMacro } from "@lingui/react/macro";
 import { useId } from "react";
-import { StockCopyMessages } from "../../../stock/i18n/StockCopyMessages";
+import { getStockValueFromPath } from "../../../stock/data/getStockValueFromPath";
 import { ContentDraftModule } from "./ContentDraftModule/ContentDraftModule";
 import type { StockJsonValue } from "../../../stock/contracts/StockContract.types";
 import type { Props } from "./ContentField/ContentField";
@@ -28,36 +26,31 @@ export function useContentField({
   state,
   onChange,
 }: Readonly<Props>): UseContentFieldResult {
-  const { i18n } = useLingui();
-  const { t } = useLinguiMacro();
   const id = useId();
-  const path = [
-    ...parentPath,
-    ...control.path
-      .split(".")
-      .filter(Boolean)
-      .map((key) => (/^\d+$/.test(key) ? Number(key) : key)),
-  ];
-  const issueIds = state.issues.flatMap((issue, index) =>
-    path.every((key, position) => issue.path[position] === key)
+  const path = _createContentPath({ parentPath, control });
+  const issueIds = state.issues.flatMap((issue, index) => {
+    return path.every((key, position) => {
+      return issue.path[position] === key;
+    })
       ? [`content-issue-${index}`]
-      : [],
-  );
+      : [];
+  });
   const describedBy =
     [control.help ? `${id}-help` : "", ...issueIds].filter(Boolean).join(" ") ||
     undefined;
   const label = /^\d+$/.test(control.path)
-    ? t`Cell ${path.join(".")}`
-    : i18n._(control.label);
+    ? `Cell ${path.join(".")}`
+    : control.label.message;
   return {
     path,
     label,
-    value: StockCopyMessages.getValueFromPath({ value: state.draft, path }),
-    help: control.help ? i18n._(control.help) : undefined,
-    update: (replacement: StockJsonValue) =>
-      onChange(
+    value: getStockValueFromPath({ value: state.draft, path }),
+    help: control.help ? control.help.message : undefined,
+    update: (replacement: StockJsonValue) => {
+      return onChange(
         ContentDraftModule.edit({ preset, state, path, value: replacement }),
-      ),
+      );
+    },
     field: {
       id,
       "aria-label": label,
@@ -68,3 +61,20 @@ export function useContentField({
 }
 /** Derived field values and native accessibility attributes. */
 export type ContentFieldContext = ReturnType<typeof useContentField>;
+
+function _createContentPath({
+  parentPath,
+  control,
+}: Readonly<
+  Pick<Props, "parentPath" | "control">
+>): UseContentFieldResult["path"] {
+  return [
+    ...parentPath,
+    ...control.path
+      .split(".")
+      .filter(Boolean)
+      .map((key) => {
+        return /^\d+$/.test(key) ? Number(key) : key;
+      }),
+  ];
+}

@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   ANIMATION_PRESET,
   AnimationTheme,
+  APP_CHAT_ASIDE_Z_INDEX,
   APP_CHROME_Z_INDEX,
   APP_SLATE_Z_INDEX,
   cssVariablesResolver,
@@ -12,6 +13,7 @@ import {
   NUX_CHECKLIST_Z_INDEX,
   NUX_TOUR_Z_INDEX,
   POPOVER_Z_INDEX,
+  PRODUCT_DRAWER_ROOT_CLASSNAME,
   PRODUCT_MODAL_ROOT_CLASSNAME,
   Theme,
 } from "@/config/Theme";
@@ -35,6 +37,14 @@ describe("Theme modal stacking", () => {
     // meant to cover it (Drawer, Spotlight, and the rest of Mantine's
     // untouched "modal" tier) has to outrank it.
     expect(APP_SLATE_Z_INDEX).toBeLessThan(getDefaultZIndex("modal"));
+  });
+
+  it("paints the docked chat aside over the slate's shadow and under every overlay", () => {
+    // The docked chat aside is fused to the slate's inline-end edge, so it
+    // has to cover the slate's shadow rather than wear it.
+    expect(APP_CHAT_ASIDE_Z_INDEX).toBeGreaterThan(APP_SLATE_Z_INDEX);
+    expect(APP_CHAT_ASIDE_Z_INDEX).toBeLessThan(getDefaultZIndex("modal"));
+    expect(APP_CHAT_ASIDE_Z_INDEX).toBeLessThan(APP_CHROME_Z_INDEX);
   });
 
   it("clears the onboarding tour tooltip, not only its overlay", () => {
@@ -61,6 +71,14 @@ describe("Theme modal stacking", () => {
     expect(modal.defaultProps?.classNames?.root).toBe(
       PRODUCT_MODAL_ROOT_CLASSNAME,
     );
+  });
+
+  it("marks every Drawer root so the checklist can step aside for it", () => {
+    const drawer = Theme.components?.Drawer;
+    if (drawer === undefined) {
+      throw new Error("Expected Theme.components.Drawer");
+    }
+    expect(drawer.classNames).toEqual({ root: PRODUCT_DRAWER_ROOT_CLASSNAME });
   });
 
   it("exposes the slate and chrome tiers on theme.other.zIndex", () => {
@@ -91,6 +109,19 @@ describe("Theme design tokens", () => {
     ).toBe(ANIMATION_PRESET.popIn.durationMs);
   });
 
+  it("lets a Paper's own CSS override the themed border color", () => {
+    // Theme `styles` land as an inline style, which no CSS module class can
+    // beat. Routing the color through a custom property is what lets the
+    // slate paint its neutral.7 edge while every other Paper keeps the
+    // default token.
+    const paperStyles = Theme.components?.Paper?.styles as
+      | { root?: { borderColor?: string } }
+      | undefined;
+    expect(paperStyles?.root?.borderColor).toBe(
+      "var(--ava-paper-border-color, var(--ava-border-default))",
+    );
+  });
+
   it("exposes overlay pop-in motion as CSS variables", () => {
     const resolved = cssVariablesResolver(Theme);
     expect(resolved.variables["--ava-animation-duration-pop-in"]).toBe(
@@ -104,6 +135,19 @@ describe("Theme design tokens", () => {
     );
     expect(resolved.variables["--ava-animate-pop-in-from-filter"]).toBe(
       ANIMATION_PRESET.popIn.from.filter,
+    );
+  });
+
+  it("lets a Paper's own CSS override the themed border color", () => {
+    // Theme `styles` land as an inline style, which no CSS module class can
+    // beat. Routing the color through a custom property is what lets the
+    // slate paint its neutral.7 edge while every other Paper keeps the
+    // default token.
+    const paperStyles = Theme.components?.Paper?.styles as
+      | { root?: { borderColor?: string } }
+      | undefined;
+    expect(paperStyles?.root?.borderColor).toBe(
+      "var(--ava-paper-border-color, var(--ava-border-default))",
     );
   });
 

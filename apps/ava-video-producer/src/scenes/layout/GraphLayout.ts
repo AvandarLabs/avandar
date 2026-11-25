@@ -1,0 +1,360 @@
+import { Motion } from "../../motion";
+import { StageTheme } from "../StageTheme/StageTheme";
+import { type Point, type Rect, SceneGeometry } from "./SceneGeometry";
+import { TextLayout } from "./TextLayout";
+import type { VideoMotion } from "../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
+import type {
+  FlowStep,
+  GraphEdge,
+  GraphNode,
+  TraversalBeat,
+} from "../scenes.types";
+
+type GetPacketPositionsOptions = {
+  frame: number;
+  packets: readonly GraphPacket[];
+  start: Point;
+  end: Point;
+  motion?: VideoMotion;
+};
+type NodeHighlightOptions = {
+  frame: number;
+  nodeId: string;
+  traversal: TraversalBeat[];
+  motion?: VideoMotion;
+};
+type EdgeHighlightOptions = {
+  frame: number;
+  edge: GraphEdge;
+  traversal: TraversalBeat[];
+  motion?: VideoMotion;
+};
+/** Rejects invalid graph content and references before scene layout. */
+function _validateGraph({
+  nodes,
+  edges,
+  traversal = [],
+}: Readonly<{
+  nodes: GraphNode[];
+  edges: GraphEdge[];
+  traversal?: TraversalBeat[];
+}>): void {
+  const ids = _getValidatedGraphNodeIds(nodes);
+  const edgeIds = new Set<string>();
+  edges.forEach((edge) => {
+    if (!edge.id || edgeIds.has(edge.id)) {
+      throw new Error(`Duplicate or empty edge id: ${edge.id}`);
+    }
+    if (!ids.has(edge.from) || !ids.has(edge.to) || edge.from === edge.to) {
+      throw new Error(`Invalid graph edge: ${edge.id}`);
+    }
+    edgeIds.add(edge.id);
+  });
+  traversal.forEach((beat, index) => {
+    SceneGeometry.assertFrame({
+      value: beat.atFrame,
+      name: "traversal.atFrame",
+    });
+    if (!ids.has(beat.nodeId)) {
+      throw new Error(`Unknown traversal node: ${beat.nodeId}`);
+    }
+    if (index && beat.atFrame <= traversal[index - 1].atFrame) {
+      throw new Error("Traversal frames must be strictly increasing");
+    }
+  });
+}
+/**
+ * Normalized centers map inside a safe inset so edge nodes remain on canvas.
+ */
+function _graphNodeRect({
+  node,
+  bounds,
+}: Readonly<{
+  node: GraphNode;
+  bounds: Rect;
+}>): Rect {
+  const width = node.width
+    ? node.width * bounds.width
+    : Math.min(280, bounds.width * 0.205);
+  const label = TextLayout.fitTextLines({
+    lines: [node.label],
+    width: width - 40,
+    height: node.detail ? 70 : 130,
+    requested: 25,
+    minimum: 19,
+  });
+  const detail = node.detail
+    ? TextLayout.fitTextLines({
+        lines: [node.detail],
+        width: width - 40,
+        height: 68,
+        requested: 19,
+        minimum: 16,
+      })
+    : undefined;
+  const height = Math.max(
+    128,
+    Math.ceil(
+      40 +
+        label.lines.length * label.fontSize * 1.22 +
+        (detail ? 10 + detail.lines.length * detail.fontSize * 1.22 : 0) +
+        (node.items?.length
+          ? GRAPH_ITEM_GAP + node.items.length * GRAPH_ITEM_PITCH
+          : 0),
+    ),
+  );
+  return {
+    x: bounds.x + node.x * (bounds.width - width),
+    y: bounds.y + node.y * (bounds.height - height),
+    width,
+    height,
+  };
+}
+/** Returns the center point of a scene canvas rectangle. */
+function _rectCenter(rect: Rect): Point {
+  return { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
+}
+/** Ray/rectangle intersection keeps every connector out of the node text. */
+function _edgeEndpoints({
+  from,
+  to,
+}: Readonly<{
+  from: Rect;
+  to: Rect;
+}>): {
+  start: Point;
+  end: Point;
+} {
+  const a = _rectCenter(from);
+  const b = _rectCenter(to);
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  if (!dx && !dy) {
+    throw new Error("Connected graph nodes cannot share a center");
+  }
+  const intersect = (box: Rect, origin: Point, x: number, y: number): Point => {
+    const t = Math.min(
+      x === 0 ? Infinity : box.width / 2 / Math.abs(x),
+      y === 0 ? Infinity : box.height / 2 / Math.abs(y),
+    );
+    return { x: origin.x + x * t, y: origin.y + y * t };
+  };
+  return { start: intersect(from, a, dx, dy), end: intersect(to, b, -dx, -dy) };
+}
+/** Vertical space a node reserves per list item, in pixels. */
+export const GRAPH_ITEM_PITCH = 34;
+/** Space between a node's heading and its first list item, in pixels. */
+export const GRAPH_ITEM_GAP = 14;
+/**
+ * Connector endpoints for one of several parallel edges between the same
+ * two cards: `offset` from -1 to 1 shifts the edge sideways by up to half
+ * the shorter card, so the edges run side by side instead of overlapping.
+ */
+function _offsetEdgeEndpoints({
+  from,
+  to,
+  offset,
+}: Readonly<{
+  from: Rect;
+  to: Rect;
+  offset: number;
+}>): {
+  start: Point;
+  end: Point;
+} {
+  const a = _rectCenter(from);
+  const b = _rectCenter(to);
+  const length = Math.hypot(b.x - a.x, b.y - a.y) || 1;
+  const reach = (offset * Math.min(from.height, to.height)) / 2;
+  // Perpendicular to the centre line, so the shift never changes its length.
+  const shiftX = (-(b.y - a.y) / length) * reach;
+  const shiftY = ((b.x - a.x) / length) * reach;
+  const shift = (rect: Rect) => {
+    return { ...rect, x: rect.x + shiftX, y: rect.y + shiftY };
+  };
+  return _edgeEndpoints({
+    from: shift(from),
+    to: shift(to),
+  });
+}
+/** A dot travelling an edge during its own window of frames. */
+export type GraphPacket = {
+  atFrame: number;
+  durationInFrames: number;
+  direction?: "forward" | "reverse";
+};
+/**
+ * Where each packet currently travelling an edge is, for example a request
+ * moving between two services. Packets outside their window are omitted.
+ */
+function _getPacketPositions({
+  frame,
+  packets,
+  start,
+  end,
+  motion = StageTheme.getClassicStageMotion(),
+}: Readonly<GetPacketPositionsOptions>): Point[] {
+  return packets
+    .filter((packet) => {
+      return (
+        frame > packet.atFrame &&
+        frame < packet.atFrame + packet.durationInFrames
+      );
+    })
+    .map((packet) => {
+      const travel = motion.ramp(
+        frame,
+        packet.atFrame,
+        packet.durationInFrames,
+        motion.travel.easing,
+      );
+      const along = packet.direction === "reverse" ? 1 - travel : travel;
+      return {
+        x: Motion.mix({
+          t: along,
+          from: start.x,
+          to: end.x,
+        }),
+        y: Motion.mix({
+          t: along,
+          from: start.y,
+          to: end.y,
+        }),
+      };
+    });
+}
+/** A serpentine grid keeps a simple sequential process connected locally. */
+function _flowNodes(steps: FlowStep[]): GraphNode[] {
+  if (!steps.length || steps.length > 6) {
+    throw new Error("FlowchartScene needs 1 to 6 steps");
+  }
+  const columns = Math.min(3, steps.length);
+  const rows = Math.ceil(steps.length / columns);
+  return steps.map((step, index) => {
+    const row = Math.floor(index / columns);
+    const column = row % 2 ? columns - 1 - (index % columns) : index % columns;
+    return {
+      ...step,
+      x: columns === 1 ? 0.5 : column / (columns - 1),
+      y: rows === 1 ? 0.5 : row / (rows - 1),
+    };
+  });
+}
+/**
+ * How lit a node is, 0 to 1: it lights over the chip duration when the
+ * traversal reaches it and dims as the traversal moves on.
+ */
+function _nodeHighlight({
+  frame,
+  nodeId,
+  traversal,
+  motion = StageTheme.getClassicStageMotion(),
+}: Readonly<NodeHighlightOptions>): number {
+  const easing = motion.reveal.easing;
+  return Math.max(
+    0,
+    ...traversal.map((beat, index) => {
+      return beat.nodeId !== nodeId
+        ? 0
+        : motion.ramp(frame, beat.atFrame, motion.chip, easing) *
+            (index + 1 === traversal.length
+              ? 1
+              : 1 -
+                motion.ramp(
+                  frame,
+                  traversal[index + 1].atFrame,
+                  motion.chip,
+                  easing,
+                ));
+    }),
+  );
+}
+/**
+ * How far the traversal has drawn along an edge, 0 to 1, over the sheet
+ * duration once it moves from the edge's source to its target.
+ */
+function _edgeHighlight({
+  frame,
+  edge,
+  traversal,
+  motion = StageTheme.getClassicStageMotion(),
+}: Readonly<EdgeHighlightOptions>): number {
+  let amount = 0;
+  traversal.forEach((beat, index) => {
+    if (
+      index &&
+      traversal[index - 1].nodeId === edge.from &&
+      beat.nodeId === edge.to
+    ) {
+      amount = Math.max(
+        amount,
+        motion.ramp(frame, beat.atFrame, motion.sheet, motion.reveal.easing),
+      );
+    }
+  });
+  return amount;
+}
+
+/** Validates authored nodes and returns their unique identities. */
+function _getValidatedGraphNodeIds(nodes: GraphNode[]): Set<string> {
+  if (!nodes.length || nodes.length > 12) {
+    throw new Error("GraphScene needs 1 to 12 nodes");
+  }
+  const ids = new Set<string>();
+  nodes.forEach((node) => {
+    if (!node.id || ids.has(node.id)) {
+      throw new Error(`Duplicate or empty graph node id: ${node.id}`);
+    }
+    if (!node.label.trim()) {
+      throw new Error(`Graph node ${node.id} needs a label`);
+    }
+    ids.add(node.id);
+    SceneGeometry.assertUnit({
+      value: node.x,
+      name: `${node.id}.x`,
+    });
+    SceneGeometry.assertUnit({
+      value: node.y,
+      name: `${node.id}.y`,
+    });
+  });
+
+  return ids;
+}
+
+/** Positions graph nodes, edges, packets, and highlights for diagram scenes. */
+export const GraphLayout = {
+  /** Rejects invalid graph content and references before scene layout. */
+  validateGraph: _validateGraph,
+  /**
+   * Normalized centers map inside a safe inset so edge nodes remain on canvas.
+   */
+  graphNodeRect: _graphNodeRect,
+  /** Returns the center point of a scene canvas rectangle. */
+  rectCenter: _rectCenter,
+  /** Ray/rectangle intersection keeps every connector out of the node text. */
+  edgeEndpoints: _edgeEndpoints,
+  /**
+   * Connector endpoints for one of several parallel edges between the same two
+   * cards: `offset` from -1 to 1 shifts the edge sideways by up to half the
+   * shorter card, so the edges run side by side instead of overlapping.
+   */
+  offsetEdgeEndpoints: _offsetEdgeEndpoints,
+  /**
+   * Where each packet currently travelling an edge is, for example a request
+   * moving between two services.
+   */
+  getPacketPositions: _getPacketPositions,
+  /** A serpentine grid keeps a simple sequential process connected locally. */
+  flowNodes: _flowNodes,
+  /**
+   * How lit a node is, 0 to 1: it lights over the chip duration when the
+   * traversal reaches it and dims as the traversal moves on.
+   */
+  nodeHighlight: _nodeHighlight,
+  /**
+   * How far the traversal has drawn along an edge, 0 to 1, over the sheet
+   * duration once it moves from the edge's source to its target.
+   */
+  edgeHighlight: _edgeHighlight,
+};

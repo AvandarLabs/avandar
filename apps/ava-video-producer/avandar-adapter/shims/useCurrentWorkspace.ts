@@ -4,7 +4,10 @@ const workspace = {
   name: "Avandar Labs",
 };
 
-/** Film-only workspace identity. Product services are never contacted while rendering. */
-export function useCurrentWorkspace() {
+/**
+ * Film-only workspace identity. Product services are never contacted while
+ * rendering.
+ */
+export function useCurrentWorkspace(): typeof workspace {
   return workspace;
 }

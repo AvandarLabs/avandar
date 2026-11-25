@@ -18,6 +18,94 @@ import {
   _createPairInput,
 } from "./DuplicateReviewStackTestHelpers";
 
+type AssertCardsAreDisjointOptions = Readonly<{
+  rect: string;
+  other: string;
+  x: number;
+  y: number;
+  ox: number;
+  oy: number;
+}>;
+
+type GetCardOriginResult = {
+  x: number;
+  y: number;
+};
+
+function _assertCardsAreDisjoint({
+  rect,
+  other,
+  x,
+  y,
+  ox,
+  oy,
+}: AssertCardsAreDisjointOptions): void {
+  assert.ok(
+    x +
+      SvgAttributes.getNumberFromMarkup({
+        attributes: rect,
+        name: "width",
+      }) <=
+      ox ||
+      ox +
+        SvgAttributes.getNumberFromMarkup({
+          attributes: other,
+          name: "width",
+        }) <=
+        x ||
+      y +
+        SvgAttributes.getNumberFromMarkup({
+          attributes: rect,
+          name: "height",
+        }) <=
+        oy ||
+      oy +
+        SvgAttributes.getNumberFromMarkup({
+          attributes: other,
+          name: "height",
+        }) <=
+        y,
+  );
+}
+
+function _getCardOrigin(rect: string): GetCardOriginResult {
+  const x = SvgAttributes.getNumberFromMarkup({
+      attributes: rect,
+      name: "x",
+    }),
+    y = SvgAttributes.getNumberFromMarkup({
+      attributes: rect,
+      name: "y",
+    });
+  return { x, y };
+}
+
+function _assertDenseVariantsKeepCardsBoundedXYWidthHeight(
+  rects: ReturnType<typeof _cards>,
+): void {
+  rects.forEach((rect) => {
+    const { x, y } = _getCardOrigin(rect);
+    assert.ok(
+      x >= 0 &&
+        x +
+          SvgAttributes.getNumberFromMarkup({
+            attributes: rect,
+            name: "width",
+          }) <=
+          960,
+    );
+    assert.ok(
+      y >= 0 &&
+        y +
+          SvgAttributes.getNumberFromMarkup({
+            attributes: rect,
+            name: "height",
+          }) <=
+          600,
+    );
+  });
+}
+
 registerStockPresetAssertions({
   inputSchema,
   defaultInput: DEFAULT_INPUT,
@@ -27,42 +115,51 @@ registerStockPresetAssertions({
   render,
   excludedTextFields: ["id", "retainedId", "finalView"],
   textFrames: [36, 150],
-  getVisibleTexts: ({ input, frame }) => [
-    input.title,
-    input.comparisonFieldLabel,
-    ...input.groups.flatMap((group) => [
-      group.label,
-      ...group.records
-        .filter(
-          (record) =>
-            frame < 100 ||
-            input.finalView === "comparison-pair" ||
-            group.retainedId === null ||
-            record.id === group.retainedId,
-        )
-        .flatMap((record) => [record.label, record.comparisonValue]),
-      ...(input.showRecordIds ? group.records.map(prop("id")) : []),
-    ]),
-  ],
+  getVisibleTexts: ({ input, frame }) => {
+    return [
+      input.title,
+      input.comparisonFieldLabel,
+      ...input.groups.flatMap((group) => {
+        return [
+          group.label,
+          ...group.records
+            .filter((record) => {
+              return (
+                frame < 100 ||
+                input.finalView === "comparison-pair" ||
+                group.retainedId === null ||
+                record.id === group.retainedId
+              );
+            })
+            .flatMap((record) => {
+              return [record.label, record.comparisonValue];
+            }),
+          ...(input.showRecordIds ? group.records.map(prop("id")) : []),
+        ];
+      }),
+    ];
+  },
 });
 
 test("comparison roles follow every retained index and every alternative through two-group travel", () => {
   [2, 3].forEach((recordCount) => {
     Array.from(
       { length: Math.max(0, Math.ceil((recordCount - 0) / 1)) },
-      (_, sampleIndex) => 0 + sampleIndex * 1,
+      (_, sampleIndex) => {
+        return 0 + sampleIndex * 1;
+      },
     ).forEach((retainedIndex) => {
       const input = _createPairInput({ recordCount, retainedIndex });
       [true, false].forEach((showRecordIds) => {
-        [91, 95, 100, 150].forEach((frame) =>
-          _assertPairRoles({
+        [91, 95, 100, 150].forEach((frame) => {
+          return _assertPairRoles({
             markup: render({
               frame: frame,
               input: { ...input, showRecordIds },
             }),
             input,
-          }),
-        );
+          });
+        });
       });
     });
   });
@@ -90,22 +187,23 @@ test("three-line comparison roles stay within their group before the next bracke
   ];
   assert.equal(captions.length, 6);
   captions
-    .filter(
-      (caption) =>
+    .filter((caption) => {
+      return (
         SvgAttributes.getNumberFromMarkup({ attributes: caption, name: "y" }) <
-        nextGroupTop,
-    )
+        nextGroupTop
+      );
+    })
     .forEach((caption) => {
       const spans = [...caption.matchAll(/<tspan\b[^>]*>/g)];
       assert.equal(spans.length, 3);
       const bottom =
         SvgAttributes.getNumberFromMarkup({ attributes: caption, name: "y" }) +
-        spans.reduce(
-          (sum, [span]) =>
+        spans.reduce((sum, [span]) => {
+          return (
             sum +
-            SvgAttributes.getNumberFromMarkup({ attributes: span, name: "dy" }),
-          0,
-        ) +
+            SvgAttributes.getNumberFromMarkup({ attributes: span, name: "dy" })
+          );
+        }, 0) +
         4;
       assert.ok(bottom < nextGroupTop);
     });
@@ -116,10 +214,12 @@ test("unresolved comparison groups have review status without retained or altern
     const seed = _createPairInput({ recordCount: 3, retainedIndex: 2 });
     const input = {
       ...seed,
-      groups: seed.groups.map((group, index) => ({
-        ...group,
-        retainedId: index === unresolvedIndex ? null : group.retainedId,
-      })),
+      groups: seed.groups.map((group, index) => {
+        return {
+          ...group,
+          retainedId: index === unresolvedIndex ? null : group.retainedId,
+        };
+      }),
     };
     const markup = render({ frame: 150, input: input });
     _assertPairRoles({ markup, input });
@@ -130,9 +230,9 @@ test("unresolved comparison groups have review status without retained or altern
     );
     assert.equal(_texts({ markup, label: input.labels.unresolved }).length, 1);
     const unresolved = input.groups[unresolvedIndex];
-    unresolved.records.forEach((record) =>
-      assert.ok(!markup.includes(`data-retained-id="${record.id}"`)),
-    );
+    unresolved.records.forEach((record) => {
+      return assert.ok(!markup.includes(`data-retained-id="${record.id}"`));
+    });
     assert.ok(markup.includes(`data-unresolved-group="${unresolved.id}"`));
   });
 });
@@ -142,9 +242,9 @@ test("only explicit retained identities close groups while all candidate tabs re
   assert.match(markup, /data-retained-id="A1"/);
   assert.doesNotMatch(markup, /data-retained-id="B/);
   assert.match(markup, /data-unresolved-group="ink"/);
-  ["A1", "A2", "B1", "B2"].forEach((id) =>
-    assert.ok(markup.includes(`aria-label="${id}"`)),
-  );
+  ["A1", "A2", "B1", "B2"].forEach((id) => {
+    return assert.ok(markup.includes(`aria-label="${id}"`));
+  });
   assert.match(
     render({ frame: 150, input: fixtures[1].input }),
     /data-retained-id=""/,
@@ -167,10 +267,12 @@ test("comparison values align before resolved slips fold and unresolved slips re
     SvgAttributes.getNumberFromMarkup({ attributes: initial[1], name: "x" }),
   );
   const hold = _cards(render({ frame: 150 }));
-  const retained = hold.find((card) =>
-      card.includes('data-candidate-id="A1"'),
-    )!,
-    alternative = hold.find((card) => card.includes('data-candidate-id="A2"'))!;
+  const retained = hold.find((card) => {
+      return card.includes('data-candidate-id="A1"');
+    })!,
+    alternative = hold.find((card) => {
+      return card.includes('data-candidate-id="A2"');
+    })!;
   assert.ok(
     SvgAttributes.getNumberFromMarkup({ attributes: alternative, name: "y" }) <
       SvgAttributes.getNumberFromMarkup({ attributes: retained, name: "y" }) +
@@ -179,9 +281,9 @@ test("comparison values align before resolved slips fold and unresolved slips re
           name: "height",
         }),
   );
-  const unresolved = hold.filter((card) =>
-    card.includes('data-group-id="ink"'),
-  );
+  const unresolved = hold.filter((card) => {
+    return card.includes('data-group-id="ink"');
+  });
   assert.ok(
     SvgAttributes.getNumberFromMarkup({
       attributes: unresolved[0],
@@ -199,43 +301,16 @@ test("comparison values align before resolved slips fold and unresolved slips re
 });
 
 test("dense variants keep cards bounded and comparison-pair final cards disjoint", () => {
-  (["offset-stack", "comparison-pair"] as const).forEach((finalView) =>
-    [36, 42, 70, 85, 100, 150].forEach((frame) => {
+  (["offset-stack", "comparison-pair"] as const).forEach((finalView) => {
+    return [36, 42, 70, 85, 100, 150].forEach((frame) => {
       const rects = _cards(
         render({ frame: frame, input: { ...fixtures[2].input, finalView } }),
       );
       assert.equal(rects.length, 6);
-      rects.forEach((rect) => {
-        const x = SvgAttributes.getNumberFromMarkup({
-            attributes: rect,
-            name: "x",
-          }),
-          y = SvgAttributes.getNumberFromMarkup({
-            attributes: rect,
-            name: "y",
-          });
-        assert.ok(
-          x >= 0 &&
-            x +
-              SvgAttributes.getNumberFromMarkup({
-                attributes: rect,
-                name: "width",
-              }) <=
-              960,
-        );
-        assert.ok(
-          y >= 0 &&
-            y +
-              SvgAttributes.getNumberFromMarkup({
-                attributes: rect,
-                name: "height",
-              }) <=
-              600,
-        );
-      });
+      _assertDenseVariantsKeepCardsBoundedXYWidthHeight(rects);
       if (finalView === "comparison-pair" && frame === 150) {
-        rects.forEach((rect, index) =>
-          rects.slice(index + 1).forEach((other) => {
+        rects.forEach((rect, index) => {
+          return rects.slice(index + 1).forEach((other) => {
             const x = SvgAttributes.getNumberFromMarkup({
                 attributes: rect,
                 name: "x",
@@ -252,35 +327,10 @@ test("dense variants keep cards bounded and comparison-pair final cards disjoint
                 attributes: other,
                 name: "y",
               });
-            assert.ok(
-              x +
-                SvgAttributes.getNumberFromMarkup({
-                  attributes: rect,
-                  name: "width",
-                }) <=
-                ox ||
-                ox +
-                  SvgAttributes.getNumberFromMarkup({
-                    attributes: other,
-                    name: "width",
-                  }) <=
-                  x ||
-                y +
-                  SvgAttributes.getNumberFromMarkup({
-                    attributes: rect,
-                    name: "height",
-                  }) <=
-                  oy ||
-                oy +
-                  SvgAttributes.getNumberFromMarkup({
-                    attributes: other,
-                    name: "height",
-                  }) <=
-                  y,
-            );
-          }),
-        );
+            _assertCardsAreDisjoint({ rect, other, x, y, ox, oy });
+          });
+        });
       }
-    }),
-  );
+    });
+  });
 });

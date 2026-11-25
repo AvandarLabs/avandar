@@ -54,22 +54,15 @@ test("negative, all-released, tiny positive and zero-operation inputs retain exa
   fixtures.forEach(({ input }) => {
     const retained =
       input.capture.capturedTonnesCO2 - input.capture.releasedTonnesCO2;
-    const operations = input.operatingEmissions.reduce(
-      (sum, row) => sum + row.tonnesCO2e,
-      0,
-    );
+    const operations = input.operatingEmissions.reduce((sum, row) => {
+      return sum + row.tonnesCO2e;
+    }, 0);
     const markup = _render({ frame: 150, input: input });
     const store = markup.match(/<g data-retained[^>]*>/);
     const emissions = markup.match(/<g data-emissions[^>]*>/);
     const net = markup.match(/<g data-net[^>]*>/);
     assert.ok(store && emissions);
-    assert.equal(
-      SvgAttributes.getNumberFromMarkup({
-        attributes: store[0],
-        name: "data-retained",
-      }),
-      retained,
-    );
+    _assertNegativeAllReleasedTinyPositiveAndDataRetained({ store, retained });
     assert.equal(
       SvgAttributes.getNumberFromMarkup({
         attributes: emissions[0],
@@ -94,22 +87,8 @@ test("negative, all-released, tiny positive and zero-operation inputs retain exa
     assert.doesNotMatch(hidden, /data-net=/);
     assert.match(hidden, /data-emissions/);
     assert.match(hidden, /data-boundary/);
-    assert.notEqual(
-      _render({ frame: 24, input: input }).match(
-        /<path data-operator-arm[^>]*>/,
-      )?.[0],
-      _render({ frame: 52, input: input }).match(
-        /<path data-operator-arm[^>]*>/,
-      )?.[0],
-    );
-    assert.equal(
-      (
-        _render({ frame: 150, input: input }).match(
-          /data-operation-ribbon=/g,
-        ) ?? []
-      ).length,
-      input.operatingEmissions.length,
-    );
+    _assertNegativeAllReleasedTinyPositiveAndDataOperatorArm(input);
+    _assertNegativeAllReleasedTinyPositiveAndDataOperationRibbon(input);
     assert.match(markup, /data-retained-ribbon/);
     assert.match(markup, /data-released-ribbon/);
   });
@@ -120,6 +99,89 @@ import { registerStockTextLayoutAssertions } from "../../../../tests/helpers/reg
 import { carbonStorageAccountingContract } from "./CarbonStorageAccounting.contract";
 import { inputSchema, type Input } from "./CarbonStorageAccounting.schema";
 
+function _assertBudgetValueCell({
+  markup,
+  value,
+  index,
+}: Readonly<{ markup: string; value: number; index: number }>): void {
+  const cell = [...markup.matchAll(/<text ([^>]*)>(.*?)<\/text>/g)].find(
+    (match) => {
+      return (
+        SvgAttributes.getNumberFromMarkup({
+          attributes: match[1],
+          name: "x",
+        }) ===
+          540 + index * 135 &&
+        SvgAttributes.getNumberFromMarkup({
+          attributes: match[1],
+          name: "y",
+        }) === 510
+      );
+    },
+  );
+  assert.ok(cell);
+  const spans = [
+    ...cell[2].matchAll(/<tspan[^>]*dy="([^"]*)"[^>]*>([^<]*)<\/tspan>/g),
+  ];
+  assert.equal(
+    spans
+      .map((span) => {
+        return span[2];
+      })
+      .join(""),
+    String(value),
+  );
+  assert.ok(
+    510 +
+      spans.reduce((sum, span) => {
+        return sum + Number(span[1]);
+      }, 0) +
+      3.6 <
+      550,
+  );
+}
+
+function _assertNegativeAllReleasedTinyPositiveAndDataRetained({
+  store,
+  retained,
+}: Readonly<{
+  store: NonNullable<RegExpMatchArray | null>;
+  retained: number;
+}>): void {
+  assert.equal(
+    SvgAttributes.getNumberFromMarkup({
+      attributes: store[0],
+      name: "data-retained",
+    }),
+    retained,
+  );
+}
+
+function _assertNegativeAllReleasedTinyPositiveAndDataOperationRibbon(
+  input: (typeof fixtures)[number]["input"],
+): void {
+  assert.equal(
+    (
+      _render({ frame: 150, input: input }).match(/data-operation-ribbon=/g) ??
+      []
+    ).length,
+    input.operatingEmissions.length,
+  );
+}
+
+function _assertNegativeAllReleasedTinyPositiveAndDataOperatorArm(
+  input: (typeof fixtures)[number]["input"],
+): void {
+  assert.notEqual(
+    _render({ frame: 24, input: input }).match(
+      /<path\b[^>]*\bdata-operator-arm[^>]*>/,
+    )?.[0],
+    _render({ frame: 52, input: input }).match(
+      /<path\b[^>]*\bdata-operator-arm[^>]*>/,
+    )?.[0],
+  );
+}
+
 function _getVisibleTexts({
   input,
   frame,
@@ -128,9 +190,11 @@ function _getVisibleTexts({
     ...Object.values(input.boundary),
     ...Object.values(input.decision),
     ...input.operatingEmissions.map(prop("label")),
-    ...Object.entries(input.copy).flatMap(([key, text]) =>
-      key === "net" && (!input.showNetAccounting || frame < 108) ? [] : [text],
-    ),
+    ...Object.entries(input.copy).flatMap(([key, text]) => {
+      return key === "net" && (!input.showNetAccounting || frame < 108)
+        ? []
+        : [text];
+    }),
   ];
 }
 const EXCLUDED_TEXT_FIELDS: string[] = ["id", "view"];
@@ -157,7 +221,7 @@ test("minimum empty identifiers and maximum accepted collections stay schema-val
 });
 test("zero operating emissions have no physical ribbon width and the operator contacts the valve", () => {
   const markup = _render({ frame: 150, input: MINIMUM_INPUT });
-  const ribbon = markup.match(/<path data-operation-ribbon[^>]*>/);
+  const ribbon = markup.match(/<path\b[^>]*\bdata-operation-ribbon[^>]*>/);
   assert.ok(ribbon);
   assert.equal(
     SvgAttributes.getNumberFromMarkup({
@@ -167,8 +231,8 @@ test("zero operating emissions have no physical ribbon width and the operator co
     0,
   );
   const cue = _render({ frame: 54 });
-  const hand = cue.match(/<circle data-operator-hand[^>]*>/);
-  const valve = cue.match(/<circle data-transfer-valve[^>]*>/);
+  const hand = cue.match(/<circle\b[^>]*\bdata-operator-hand[^>]*>/);
+  const valve = cue.match(/<circle\b[^>]*\bdata-transfer-valve[^>]*>/);
   assert.ok(hand && valve);
   assert.equal(
     SvgAttributes.getNumberFromMarkup({ attributes: hand[0], name: "cx" }),
@@ -181,44 +245,25 @@ test("zero operating emissions have no physical ribbon width and the operator co
 });
 test("full finite signed equation values stay readable above the bracket and beside their operators", () => {
   fixtures
-    .filter(({ input }) => input.showNetAccounting)
+    .filter(({ input }) => {
+      return input.showNetAccounting;
+    })
     .forEach(({ input }) => {
       const markup = _render({ frame: 150, input: input });
       const retained =
         input.capture.capturedTonnesCO2 - input.capture.releasedTonnesCO2;
-      const emissions = input.operatingEmissions.reduce(
-        (sum, row) => sum + row.tonnesCO2e,
-        0,
-      );
+      const emissions = input.operatingEmissions.reduce((sum, row) => {
+        return sum + row.tonnesCO2e;
+      }, 0);
       [retained, emissions, retained - emissions].forEach((value, index) => {
-        const cell = [...markup.matchAll(/<text ([^>]*)>(.*?)<\/text>/g)].find(
-          (match) =>
-            SvgAttributes.getNumberFromMarkup({
-              attributes: match[1],
-              name: "x",
-            }) ===
-              540 + index * 135 &&
-            SvgAttributes.getNumberFromMarkup({
-              attributes: match[1],
-              name: "y",
-            }) === 510,
-        );
-        assert.ok(cell);
-        const spans = [
-          ...cell[2].matchAll(/<tspan[^>]*dy="([^"]*)"[^>]*>([^<]*)<\/tspan>/g),
-        ];
-        assert.equal(spans.map((span) => span[2]).join(""), String(value));
-        assert.ok(
-          510 + spans.reduce((sum, span) => sum + Number(span[1]), 0) + 3.6 <
-            550,
-        );
+        _assertBudgetValueCell({ markup, value, index });
       });
     });
 });
 test("physical separation starts after the operator cue and accounting follows the split", () => {
   const setup = _render({ frame: 24 });
-  const retained = setup.match(/<path data-retained-ribbon[^>]*>/);
-  const released = setup.match(/<path data-released-ribbon[^>]*>/);
+  const retained = setup.match(/<path\b[^>]*\bdata-retained-ribbon[^>]*>/);
+  const released = setup.match(/<path\b[^>]*\bdata-released-ribbon[^>]*>/);
   assert.ok(retained && released);
   assert.match(retained[0], /d="M260 360 V360 H260"/);
   assert.match(released[0], /d="M260 360 H260 V360"/);
@@ -239,20 +284,21 @@ test("the precise captured quantity and unit sit beside the continuous physical 
     const paint = SvgPaintAssertions.getVisiblePaintEnvelopesFromMarkup(
       renderToStaticMarkup(createElement(CarbonPhysicalLabels, { input })),
     );
-    const captured = paint.filter(
-      (item) =>
+    const captured = paint.filter((item) => {
+      return (
         item.kind === "text" &&
         item.top >= 374 &&
         item.bottom < 432 &&
-        item.left < 248,
-    );
+        item.left < 248
+      );
+    });
     assert.ok(captured.length >= 2);
-    captured.forEach((line) =>
-      assert.ok(
+    captured.forEach((line) => {
+      return assert.ok(
         Math.abs(line.right - 236) < 1e-6,
         "Captured numerical copy stays beside the tower and clears the pipe at248",
-      ),
-    );
+      );
+    });
     assert.equal(
       paint.filter(propEq("kind", "rect")).length,
       0,

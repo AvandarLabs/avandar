@@ -32,8 +32,9 @@ export const inputSchema = z
     scenarioCaption: z.string().min(1).max(54),
   })
   .superRefine((input, context) => {
-    const issue = (path: string, message: string) =>
-      context.addIssue({ code: "custom", path: [path], message });
+    const issue = (path: string, message: string) => {
+      return context.addIssue({ code: "custom", path: [path], message });
+    };
     if (new Set(input.groups.map(prop("id"))).size !== input.groups.length) {
       issue("groups", "Group IDs must be unique.");
     }

@@ -10,7 +10,7 @@ type ValidMatchedValues<Key> =
   | UnknownObject;
 
 type ValueRecord<Key extends PropertyKey> = UnionToIntersection<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // oxlint-disable-next-line typescript/no-explicit-any
   Key extends any
     ? {
         [K in Key]: ValidMatchedValues<K>;
@@ -51,7 +51,7 @@ export function matchLiteral<
   | MappedValue<Key, Values>
   | MappedValue<"_otherwise", SetRequired<Values, "_otherwise">> {
   if (key in values) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // oxlint-disable-next-line typescript/no-explicit-any
     const value = (values as any)[key];
     return typeof value === "function" ? value(key) : value;
   } else {

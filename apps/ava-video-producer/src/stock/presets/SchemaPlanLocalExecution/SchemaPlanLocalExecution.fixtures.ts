@@ -190,27 +190,27 @@ export const invalidInputs: unknown[] = [
   },
   {
     ...DEFAULT_INPUT,
-    rows: DEFAULT_INPUT.rows.map((item, index) =>
-      index === 0 ? { ...item, id: "" } : item,
-    ),
+    rows: DEFAULT_INPUT.rows.map((item, index) => {
+      return index === 0 ? { ...item, id: "" } : item;
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    rows: DEFAULT_INPUT.rows.map((item, index) =>
-      index === 0 ? { ...item, id: "W".repeat(13) } : item,
-    ),
+    rows: DEFAULT_INPUT.rows.map((item, index) => {
+      return index === 0 ? { ...item, id: "W".repeat(13) } : item;
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    rows: DEFAULT_INPUT.rows.map((item, index) =>
-      index === 0 ? { ...item, category: "" } : item,
-    ),
+    rows: DEFAULT_INPUT.rows.map((item, index) => {
+      return index === 0 ? { ...item, category: "" } : item;
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    rows: DEFAULT_INPUT.rows.map((item, index) =>
-      index === 0 ? { ...item, category: "W".repeat(17) } : item,
-    ),
+    rows: DEFAULT_INPUT.rows.map((item, index) => {
+      return index === 0 ? { ...item, category: "W".repeat(17) } : item;
+    }),
   },
   { ...DEFAULT_INPUT, request: { ...DEFAULT_INPUT.request, question: "" } },
   {
@@ -288,9 +288,9 @@ export const invalidInputs: unknown[] = [
   { ...DEFAULT_INPUT, columns: { ...DEFAULT_INPUT.columns, extra: true } },
   {
     ...DEFAULT_INPUT,
-    rows: DEFAULT_INPUT.rows.map((item, index) =>
-      index === 0 ? { ...item, extra: true } : item,
-    ),
+    rows: DEFAULT_INPUT.rows.map((item, index) => {
+      return index === 0 ? { ...item, extra: true } : item;
+    }),
   },
   { ...DEFAULT_INPUT, request: { ...DEFAULT_INPUT.request, extra: true } },
   {

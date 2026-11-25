@@ -5,10 +5,31 @@ import { match } from "ts-pattern";
 import { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import { Logger } from "@/utils/Logger";
 
+/**
+ * Whether a field holds dictionary-encoded text, which is how DuckDB sends an
+ * `ENUM` column, such as an ordered list's converted labels.
+ */
+function _isDictionaryOfText(type: arrow.DataType): boolean {
+  return (
+    arrow.DataType.isDictionary(type) &&
+    (arrow.DataType.isUtf8(type.dictionary) ||
+      arrow.DataType.isLargeUtf8(type.dictionary))
+  );
+}
+
 export function arrowFieldToQueryResultField(
   field: arrow.Field<arrow.DataType>,
   { logger = Logger }: { logger?: ILogger } = {},
 ): QueryResultColumn {
+  // A LIST column renders as text wherever a result is shown, and is marked
+  // so the controls that would put its values into SQL can refuse it.
+  if (field.type.typeId === arrow.Type.List) {
+    return { name: field.name, dataType: "varchar", isArray: true };
+  }
+  // An ENUM's labels are text wherever a result is shown or filtered.
+  if (_isDictionaryOfText(field.type)) {
+    return { name: field.name, dataType: "varchar" };
+  }
   return {
     name: field.name,
     dataType: match(field.type.typeId)
@@ -63,7 +84,6 @@ export function arrowFieldToQueryResultField(
         arrow.Type.Null,
         arrow.Type.Binary,
         arrow.Type.Interval,
-        arrow.Type.List,
         arrow.Type.Struct,
         arrow.Type.Union,
         arrow.Type.FixedSizeBinary,

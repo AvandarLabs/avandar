@@ -1,0 +1,565 @@
+import { Model } from "@avandar/models";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
+import { AgentDashboardBlock } from "@/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlock";
+import { createSqlPlaceholderVault } from "@/lib/agent/dataAgent/pagePrivacy/SqlPlaceholderVault";
+import {
+  createAgentConversation,
+  createConversationAgentHost,
+} from "./createConversationAgentHost";
+import type {
+  AgentConversationState,
+  DataAgentTurnOptions,
+} from "./dataAgentConversation.types";
+import type { DataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
+import type { DataAgentHost } from "@/lib/agent/dataAgent/DataAgentHost";
+
+const {
+  showQueryInChatMock,
+  explorerShowQueryMock,
+  runQueryMock,
+  checkQueryOnDeviceMock,
+  addAgentDashboardBlockMock,
+  recordClarificationShownMock,
+} = vi.hoisted(() => {
+  return {
+    recordClarificationShownMock: vi.fn().mockResolvedValue("audit-1"),
+    runQueryMock: vi.fn(),
+    checkQueryOnDeviceMock: vi.fn(),
+    addAgentDashboardBlockMock: vi.fn(),
+    showQueryInChatMock: vi
+      .fn()
+      .mockResolvedValue({ kind: "empty", columns: [], rowCount: 0 }),
+    explorerShowQueryMock: vi
+      .fn()
+      .mockResolvedValue({ kind: "empty", columns: [], rowCount: 0 }),
+  };
+});
+
+vi.mock("@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession", () => {
+  return { WorkspaceQuerySession: { runQuery: runQueryMock } };
+});
+
+vi.mock(
+  "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/showQueryInChat",
+  () => {
+    return {
+      showQueryInChat: showQueryInChatMock,
+      checkQueryOnDevice: checkQueryOnDeviceMock,
+    };
+  },
+);
+
+vi.mock(
+  "@/components/ChatPanel/recordClarificationShown/recordClarificationShown",
+  () => {
+    return { recordClarificationShown: recordClarificationShownMock };
+  },
+);
+
+vi.mock(
+  "@/components/ChatPanel/useAvandarChatRuntime/dashboardBlocks/addAgentDashboardBlock",
+  () => {
+    return { addAgentDashboardBlock: addAgentDashboardBlockMock };
+  },
+);
+
+vi.mock(
+  "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentTurnHelpers",
+  async (importOriginal) => {
+    const original = await importOriginal<object>();
+    return {
+      ...original,
+      createExplorerShowQuery: () => {
+        return explorerShowQueryMock;
+      },
+    };
+  },
+);
+
+afterEach(() => {
+  vi.clearAllMocks();
+});
+
+function _turn(
+  app: "data-explorer" | "dashboard" | undefined,
+  overrides: Partial<DataAgentTurnOptions> = {},
+): DataAgentTurnOptions {
+  return {
+    apiMessages: [{ role: "user", content: "How many?" }],
+    workspaceId: "workspace-1",
+    currentUser: undefined,
+    chatGeneration: 0,
+    parseSqlRef: { current: vi.fn() },
+    dataExplorerDispatch: {},
+    chatPanelDispatch: { setPendingClarification: vi.fn() },
+    pageContext: app ? { app } : undefined,
+    ...overrides,
+  } as unknown as DataAgentTurnOptions;
+}
+
+function _state(turn: DataAgentTurnOptions): AgentConversationState {
+  return {
+    turnRef: { current: turn },
+    results: [],
+    resultsByTurn: [],
+    sqlVault: createSqlPlaceholderVault(),
+    dashboardCards: [],
+  };
+}
+
+const REQUEST = { sql: "SELECT 1", summary: "s" };
+
+/** A conversation state whose vault holds `'Kings'` as `<value 1>`. */
+function _stateWithKings(turn: DataAgentTurnOptions): AgentConversationState {
+  const state = _state(turn);
+  state.sqlVault.redact(`SELECT 1 FROM t WHERE "patient_name" = 'Kings'`, {
+    isSensitiveColumn: (columnName) => {
+      return columnName === "patient_name";
+    },
+    isSensitiveValue: () => {
+      return false;
+    },
+  });
+  return state;
+}
+
+describe("createConversationAgentHost", () => {
+  it("shows results in the explorer on the Data Explorer", async () => {
+    const state = _state(_turn("data-explorer"));
+    await createConversationAgentHost(state).showQuery(REQUEST);
+
+    expect(explorerShowQueryMock).toHaveBeenCalledWith(REQUEST);
+    expect(showQueryInChatMock).not.toHaveBeenCalled();
+  });
+
+  it("follows the page of the current turn, not the first", async () => {
+    const state = _state(_turn("data-explorer"));
+    const host = createConversationAgentHost(state);
+    state.turnRef.current = _turn("dashboard");
+
+    await host.showQuery(REQUEST);
+
+    expect(showQueryInChatMock).toHaveBeenCalledWith(
+      expect.objectContaining({ title: "How many?", request: REQUEST }),
+    );
+  });
+
+  it("titles a chat result with the mention's name, never its token", async () => {
+    const ref = {
+      gadgetType: "dataset",
+      gadgetId: "aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa",
+      subId: null,
+    } as const;
+    const turn = _turn("dashboard", {
+      apiMessages: [
+        Model.make("ChatClientMessage", {
+          role: "user",
+          content: `Totals for ${ChatMentionToken.buildToken(ref)}`,
+        }),
+      ],
+      gadgetContext: {
+        attachedRefs: [],
+        contexts: new Map([
+          [
+            ChatMentionToken.buildRefKey(ref),
+            { kind: "dataset", ref, name: "US deaths" },
+          ],
+        ]),
+      },
+    });
+
+    await createConversationAgentHost(_state(turn)).showQuery(REQUEST);
+
+    expect(showQueryInChatMock).toHaveBeenCalledWith(
+      expect.objectContaining({ title: "Totals for @US deaths" }),
+    );
+  });
+
+  it("shows question cards in the current turn's panel", async () => {
+    const state = _state(_turn("dashboard"));
+    const host = createConversationAgentHost(state);
+    const laterTurn = _turn("dashboard");
+    state.turnRef.current = laterTurn;
+
+    await host.askUser({
+      question: "Which?",
+      options: ["A", "B"],
+      isMulti: false,
+      kind: "choice",
+    });
+
+    expect(
+      laterTurn.chatPanelDispatch.setPendingClarification,
+    ).toHaveBeenCalled();
+  });
+
+  it("shows results in the chat when the page is unknown", async () => {
+    await createConversationAgentHost(_state(_turn(undefined))).showQuery(
+      REQUEST,
+    );
+
+    expect(showQueryInChatMock).toHaveBeenCalled();
+    expect(explorerShowQueryMock).not.toHaveBeenCalled();
+  });
+
+  it("shows an offline turn with no page in the explorer", async () => {
+    const turn = _turn(undefined, { isOffline: true });
+    await createConversationAgentHost(_state(turn)).showQuery(REQUEST);
+
+    expect(explorerShowQueryMock).toHaveBeenCalledWith(REQUEST);
+    expect(showQueryInChatMock).not.toHaveBeenCalled();
+  });
+
+  it("shows an offline turn on a dashboard in the chat", async () => {
+    const turn = _turn("dashboard", { isOffline: true });
+    await createConversationAgentHost(_state(turn)).showQuery(REQUEST);
+
+    expect(showQueryInChatMock).toHaveBeenCalled();
+    expect(explorerShowQueryMock).not.toHaveBeenCalled();
+  });
+
+  it("checks a dashboard chart's SQL on the current turn's workspace", async () => {
+    checkQueryOnDeviceMock.mockResolvedValue({
+      kind: "rows",
+      columns: [],
+      rowCount: 3,
+    });
+    const state = _state(_turn("dashboard"));
+    const host = createConversationAgentHost(state);
+    const laterWorkspaceId =
+      "workspace-2" as DataAgentTurnOptions["workspaceId"];
+    state.turnRef.current = _turn("dashboard", {
+      workspaceId: laterWorkspaceId,
+    });
+
+    await host.checkQuery!("SELECT 1");
+
+    expect(checkQueryOnDeviceMock).toHaveBeenCalledWith({
+      workspaceId: laterWorkspaceId,
+      sql: "SELECT 1",
+    });
+  });
+});
+
+describe("createConversationAgentHost placeholders", () => {
+  it("restores page placeholders before the explorer runs a query", async () => {
+    const host = createConversationAgentHost(
+      _stateWithKings(_turn("data-explorer")),
+    );
+
+    await host.showQuery({
+      sql: `SELECT 1 FROM t WHERE "patient_name" = '<value 1>'`,
+      summary: "s",
+    });
+
+    expect(explorerShowQueryMock).toHaveBeenCalledWith({
+      sql: `SELECT 1 FROM t WHERE "patient_name" = 'Kings'`,
+      summary: "s",
+    });
+  });
+
+  it("stores the restored SQL on the chat result card", async () => {
+    const state = _stateWithKings(_turn("dashboard"));
+
+    await createConversationAgentHost(state).showQuery({
+      sql: `SELECT 1 FROM t WHERE "patient_name" = '<value 1>'`,
+      summary: "s",
+    });
+
+    expect(showQueryInChatMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        request: expect.objectContaining({
+          sql: `SELECT 1 FROM t WHERE "patient_name" = 'Kings'`,
+        }),
+      }),
+    );
+  });
+
+  it("shows a chat result's summary with the real value", async () => {
+    const state = _stateWithKings(_turn("dashboard"));
+
+    await createConversationAgentHost(state).showQuery({
+      sql: `SELECT 1 FROM t WHERE "patient_name" = '<value 1>'`,
+      summary: "Cases for <value 1>.",
+    });
+
+    expect(showQueryInChatMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        request: expect.objectContaining({ summary: "Cases for Kings." }),
+      }),
+    );
+  });
+
+  it("puts the real value in a dashboard card's block", async () => {
+    addAgentDashboardBlockMock.mockImplementation(
+      async ({ cards, request }) => {
+        cards.push(
+          AgentDashboardBlock.create({
+            block: request.block,
+            candidates: [{ id: "dashboard-1", name: "Mortality" }],
+          }),
+        );
+        return { kind: "card_shown" };
+      },
+    );
+    const state = _stateWithKings(_turn("dashboard"));
+
+    await createConversationAgentHost(state).addDashboardBlock!({
+      dashboard: "Mortality",
+      block: { kind: "HeadingBlock", text: "Deaths in <value 1>" },
+    });
+
+    expect(state.dashboardCards[0]?.block).toEqual({
+      kind: "HeadingBlock",
+      text: "Deaths in Kings",
+    });
+  });
+
+  it("shows a question card's text and labels with the real value and posts its options masked", async () => {
+    const turn = _turn("dashboard");
+
+    await createConversationAgentHost(_stateWithKings(turn)).askUser({
+      question: "Did you mean <value 1>?",
+      options: ["<value 1>", "Queens"],
+      isMulti: false,
+      kind: "choice",
+    });
+
+    expect(turn.chatPanelDispatch.setPendingClarification).toHaveBeenCalledWith(
+      expect.objectContaining({
+        question: "Did you mean Kings?",
+        responseShape: expect.objectContaining({
+          options: ["<value 1>", "Queens"],
+          optionLabels: ["Kings", "Queens"],
+        }),
+      }),
+    );
+  });
+
+  it("restores page placeholders before a lookup runs", async () => {
+    runQueryMock.mockResolvedValue({
+      data: [{ x: "Kings" }, { x: "Kingston" }],
+    });
+    const host = createConversationAgentHost(
+      _stateWithKings(_turn("dashboard")),
+    );
+
+    const values = await host.readColumnValues(
+      `SELECT DISTINCT x FROM t WHERE x IN ('<value 1>', 'Kingston')`,
+    );
+
+    expect(runQueryMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        rawSql: `SELECT DISTINCT x FROM t WHERE x IN ('Kings', 'Kingston')`,
+      }),
+    );
+    expect(values).toEqual(["<value 1>", "Kingston"]);
+  });
+});
+
+describe("createAgentConversation", () => {
+  it("gives the agent a host that reads the conversation it returns", async () => {
+    let agentHost: DataAgentHost | undefined;
+    const dataAgent = { ask: vi.fn() } as unknown as DataAgent;
+    const datasets = [{ id: "dataset-1", name: "cases.csv", columns: [] }];
+
+    const conversation = createAgentConversation({
+      turnRef: { current: _turn("data-explorer") },
+      datasets,
+      createDataAgent: (host) => {
+        agentHost = host;
+        return dataAgent;
+      },
+    });
+    conversation.turnRef.current = _turn("dashboard");
+    await agentHost!.showQuery(REQUEST);
+
+    expect(conversation.dataAgent).toBe(dataAgent);
+    expect(conversation.datasets).toBe(datasets);
+    expect(conversation.sqlVault.restore("SELECT '<value 1>'")).toBe(
+      "SELECT '<value 1>'",
+    );
+    expect(showQueryInChatMock).toHaveBeenCalledWith(
+      expect.objectContaining({ results: conversation.results }),
+    );
+  });
+
+  it("adds dashboard cards to the conversation's list", async () => {
+    addAgentDashboardBlockMock.mockImplementation(async ({ cards }) => {
+      cards.push({ cardId: "card-1" });
+      return { kind: "card_shown" };
+    });
+    let agentHost: DataAgentHost | undefined;
+    const conversation = createAgentConversation({
+      turnRef: { current: _turn("dashboard") },
+      datasets: [],
+      createDataAgent: (host) => {
+        agentHost = host;
+        return { ask: vi.fn() } as unknown as DataAgent;
+      },
+    });
+
+    await agentHost!.addDashboardBlock!({
+      dashboard: "Mortality",
+      block: { kind: "HeadingBlock", text: "Deaths" },
+    });
+
+    expect(conversation.dashboardCards).toEqual([{ cardId: "card-1" }]);
+  });
+});
+
+describe("createConversationAgentHost question cards", () => {
+  const CHOICE = {
+    question: "Which?",
+    options: ["A", "B"],
+    isMulti: false,
+    kind: "choice",
+  } as const;
+
+  it("sets an ask_user card with the audit id its row got", async () => {
+    const turn = _turn("dashboard");
+
+    await createConversationAgentHost(_state(turn)).askUser(CHOICE);
+
+    expect(turn.chatPanelDispatch.setPendingClarification).toHaveBeenCalledWith(
+      expect.objectContaining({ question: "Which?", auditId: "audit-1" }),
+    );
+  });
+
+  it("records a value card as a discovery card", async () => {
+    await createConversationAgentHost(_state(_turn("dashboard"))).askUser({
+      question: "Which county?",
+      options: ["Kings"],
+      isMulti: false,
+      kind: "values",
+      lookup: {
+        listQuery: "SELECT DISTINCT x FROM t",
+        column: "x",
+        candidateValues: ["Kings"],
+      },
+    });
+
+    expect(recordClarificationShownMock).toHaveBeenCalledWith({
+      workspaceId: "workspace-1",
+      clarification: expect.objectContaining({
+        responseShape: expect.objectContaining({ kind: "discovery" }),
+      }),
+    });
+  });
+
+  it("numbers a card after two card answers as the third", async () => {
+    const turn = _turn("dashboard", {
+      apiMessages: [
+        { role: "user", content: "show me deaths in georgia" },
+        { role: "assistant", content: "Which Georgia?" },
+        { role: "user", content: "[Clarification answer: The US state]" },
+        { role: "assistant", content: "Which year?" },
+        { role: "user", content: "[Clarification answer: 2022]" },
+      ],
+    } as unknown as Partial<DataAgentTurnOptions>);
+
+    await createConversationAgentHost(_state(turn)).askUser(CHOICE);
+
+    expect(recordClarificationShownMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        clarification: expect.objectContaining({ turnNumber: 3 }),
+      }),
+    );
+  });
+
+  it("sets no card when the turn went stale while its row was written", async () => {
+    let isStale = false;
+    const turn = _turn("dashboard", {
+      isStale: () => {
+        return isStale;
+      },
+    });
+    recordClarificationShownMock.mockImplementationOnce(async () => {
+      isStale = true;
+      return "audit-1";
+    });
+
+    await createConversationAgentHost(_state(turn)).askUser(CHOICE);
+
+    expect(
+      turn.chatPanelDispatch.setPendingClarification,
+    ).not.toHaveBeenCalled();
+  });
+
+  it("sets no card when a newer turn took the conversation while its row was written", async () => {
+    const turn = _turn("dashboard");
+    const state = _state(turn);
+    const newerTurn = _turn("dashboard");
+    recordClarificationShownMock.mockImplementationOnce(async () => {
+      state.turnRef.current = newerTurn;
+      return "audit-1";
+    });
+
+    await createConversationAgentHost(state).askUser(CHOICE);
+
+    expect(
+      turn.chatPanelDispatch.setPendingClarification,
+    ).not.toHaveBeenCalled();
+    expect(
+      newerTurn.chatPanelDispatch.setPendingClarification,
+    ).not.toHaveBeenCalled();
+  });
+
+  it("bias-checks the question the user reads, with real values restored", async () => {
+    await createConversationAgentHost(
+      _stateWithKings(_turn("dashboard")),
+    ).askUser({
+      question: "Did you mean <value 1>?",
+      options: ["<value 1>", "Queens"],
+      isMulti: false,
+      kind: "choice",
+    });
+
+    expect(recordClarificationShownMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        clarification: expect.objectContaining({
+          question: "Did you mean Kings?",
+        }),
+      }),
+    );
+  });
+});
+
+describe("createConversationAgentHost shown queries", () => {
+  const KINGS_SQL = `SELECT 1 FROM t WHERE "patient_name" = '<value 1>'`;
+  const RESTORED_SQL = `SELECT 1 FROM t WHERE "patient_name" = 'Kings'`;
+
+  it("notes the restored SQL as sent to the Data Explorer on that page", async () => {
+    const state = _stateWithKings(_turn("data-explorer"));
+
+    await createConversationAgentHost(state).showQuery({
+      sql: KINGS_SQL,
+      summary: "s",
+    });
+
+    expect(state.lastShownQuery).toEqual({
+      sql: RESTORED_SQL,
+      app: "data_explorer",
+    });
+  });
+
+  it("notes the turn's app for a query shown in the chat", async () => {
+    const state = _state(_turn("dashboard", { analyticsApp: "dashboards" }));
+
+    await createConversationAgentHost(state).showQuery(REQUEST);
+
+    expect(state.lastShownQuery).toEqual({
+      sql: REQUEST.sql,
+      app: "dashboards",
+    });
+  });
+
+  it("notes the Data Explorer for an offline turn with no page", async () => {
+    const state = _state(_turn(undefined, { isOffline: true }));
+
+    await createConversationAgentHost(state).showQuery(REQUEST);
+
+    expect(state.lastShownQuery?.app).toBe("data_explorer");
+  });
+});

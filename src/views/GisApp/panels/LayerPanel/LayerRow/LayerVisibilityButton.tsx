@@ -3,17 +3,24 @@ import { ActionIcon } from "@mantine/core";
 import { IconEye, IconEyeOff } from "@tabler/icons-react";
 import type { ReactNode } from "react";
 
-type Props = { layerName: string; isVisible: boolean; onClick: () => void };
+type Props = {
+  layerName: string;
+  isVisible: boolean;
+  onClick: () => void;
+  className?: string;
+};
 
 /** Toggles a layer's visibility from its row. */
 export function LayerVisibilityButton({
   layerName,
   isVisible,
   onClick,
+  className,
 }: Props): ReactNode {
   const { t } = useLingui();
   return (
     <ActionIcon
+      className={className}
       variant="subtle"
       color="neutral"
       size="sm"

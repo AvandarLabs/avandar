@@ -1,7 +1,7 @@
-import { FitText } from "../../primitives/FitText/FitText";
-import { type FitTextSize } from "../../primitives/FitText/wrapTextToLines";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { GisCaptionSlots } from "./GisCaptionSlots/GisCaptionSlots";
 import { GisTally } from "./GisTally";
+import type { FitTextSize } from "../../primitives/FitText/wrapTextToLines";
 import type { Input } from "./GisLayerIntersectionTally.schema";
 import type { ReactNode } from "react";
 
@@ -30,6 +30,7 @@ export function GisLabels({
   selectedQuantity,
   totalQuantity,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const slots: Slot[] = [
     [input.copy.context, 40, 35, 880, 16, 1],
     [
@@ -42,26 +43,21 @@ export function GisLabels({
       16,
       1,
     ],
-    ...input.layers.map((layer, index): Slot => [
-      layer.label,
-      40 + index * 270,
-      119,
-      250,
-      14,
-      3,
-      index ? STOCK.mint : STOCK.cyan,
-    ]),
+    ...input.layers.map((layer, index): Slot => {
+      return [
+        layer.label,
+        40 + index * 270,
+        119,
+        250,
+        14,
+        3,
+        index ? tokens.color.positive : tokens.color.accentAlt,
+      ];
+    }),
   ];
   return (
     <g>
-      {slots.map(([text, x, y, width, fontSize, maxLines, color], index) => (
-        <FitText
-          key={index}
-          {...{ text, x, y, width, fontSize, maxLines, color }}
-          breakLongWords
-          normalizeWhitespace
-        />
-      ))}
+      <GisCaptionSlots slots={slots} />
       <GisTally {...{ input, frame, selectedQuantity, totalQuantity }} />
     </g>
   );

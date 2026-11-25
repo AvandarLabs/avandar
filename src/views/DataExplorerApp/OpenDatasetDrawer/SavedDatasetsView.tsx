@@ -14,11 +14,12 @@ import {
 import { useDebouncedValue } from "@mantine/hooks";
 import { modals } from "@mantine/modals";
 import { IconSearch, IconTrash } from "@tabler/icons-react";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import { useMemo, useState } from "react";
 import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
+import { useNotifyDatasetDeleteError } from "@/hooks/datasets/useNotifyDatasetDeleteError/useNotifyDatasetDeleteError";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { buildSelectAllPreviewSql } from "@/views/DataExplorerApp/OpenDatasetDrawer/buildSelectAllPreviewSql";
@@ -44,6 +45,7 @@ function useSourceTypeLabels(): Record<DatasetSource.SourceType, string> {
     pdf_file: t`PDF`,
     google_sheets: t`Google Sheets`,
     open_data: t`Open data`,
+    postgres_table: t`Database`,
     virtual: t`Derived`,
   };
 }
@@ -89,14 +91,17 @@ export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
       : undefined;
   }, [filtered, selectedDatasetId]);
 
+  const notifyDeleteError = useNotifyDatasetDeleteError({
+    onOtherError: (error) => {
+      notifyError(t`Failed to delete dataset: ${error.message}`);
+    },
+  });
   const [deleteDataset, isDeletingDataset] = DatasetClient.useFullDelete({
     queryToInvalidate: DatasetClient.QueryKeys.getAll(),
     onSuccess: () => {
       notifySuccess(t`Dataset deleted.`);
     },
-    onError: (error) => {
-      notifyError(t`Failed to delete dataset: ${error.message}`);
-    },
+    onError: notifyDeleteError,
   });
 
   const [loadVirtualDataset, isLoadingVirtualDataset] = useMutation({
@@ -157,6 +162,7 @@ export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
         "pdf_file",
         "google_sheets",
         "open_data",
+        "postgres_table",
         () => {
           openAsRawPreview(selectedDataset);
         },

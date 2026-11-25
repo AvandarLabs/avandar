@@ -3,6 +3,32 @@ import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
 import { truncateSchemaForOffline } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/fetchOfflineChatSchema/truncateSchemaForOffline/truncateSchemaForOffline";
 
 describe("truncateSchemaForOffline", () => {
+  it("keeps a kept column's code list whole", () => {
+    const pairs = Array.from({ length: 40 }, (_, index) => {
+      return {
+        code: String(index),
+        label: `Label ${index}`,
+        acceptedSpellings: [],
+        isMissing: false,
+      };
+    });
+    const schema = {
+      datasets: [{ id: "id-cases", name: "cases.csv" }],
+      columns: [
+        {
+          dataset_id: "id-cases",
+          name: "race_cd",
+          data_type: "bigint",
+          codes: { direction: "decode" as const, pairs },
+        },
+      ],
+    };
+
+    const truncated = truncateSchemaForOffline(schema);
+
+    expect(truncated.columns[0]?.codes?.pairs).toHaveLength(40);
+  });
+
   it("keeps dataset labels when there are no columns yet", () => {
     const schema = {
       datasets: [
@@ -36,6 +62,25 @@ describe("truncateSchemaForOffline", () => {
     expect(after).not.toMatch(
       /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i,
     );
+  });
+
+  it("keeps the statuses of the case types it keeps and drops the rest", () => {
+    const concepts = Array.from({ length: 13 }, (_, index) => {
+      return { id: `c-${index}`, name: `Case type ${index}` };
+    });
+    const truncated = truncateSchemaForOffline({
+      datasets: [],
+      columns: [],
+      concepts,
+      conceptStatuses: [
+        { concept_id: "c-0", name: "Active", position: 0 },
+        { concept_id: "c-12", name: "Active", position: 0 },
+      ],
+    });
+
+    expect(truncated.conceptStatuses).toEqual([
+      { concept_id: "c-0", name: "Active", position: 0 },
+    ]);
   });
 });
 

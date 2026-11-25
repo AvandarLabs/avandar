@@ -15,7 +15,7 @@ import type { AvaScatterPlotVizConfig } from "$/models/vizs/AvaScatterPlotVizCon
 import type { AvaTableVizConfig } from "$/models/vizs/AvaTableVizConfig/AvaTableVizConfig.types.ts";
 import type {
   AvaVizConfigType,
-  VizType,
+  BuiltInVizType,
 } from "$/models/vizs/AvaVizConfig/AvaVizConfig.types.ts";
 import type { IAvaVizConfigModule } from "$/models/vizs/AvaVizConfig/IAvaVizConfigModule.ts";
 import type {
@@ -53,7 +53,7 @@ export const AvaPieChartVizConfigs = {
     return hydratePieFromQueryResult(vizConfig, columns);
   },
 
-  convertVizConfig: <K extends VizType = VizType>(
+  convertVizConfig: <K extends BuiltInVizType = BuiltInVizType>(
     vizConfig: AvaPieChartVizConfig,
     newVizType: K,
   ): AvaVizConfigType<K> => {
@@ -71,7 +71,7 @@ export const AvaPieChartVizConfigs = {
       }
       return [{ renderAs, key: valueKey, color: seriesColor }];
     };
-    return match<VizType>(newVizType)
+    return match<BuiltInVizType>(newVizType)
       .with("table", (vizType): AvaTableVizConfig => {
         return { vizType };
       })

@@ -1,4 +1,6 @@
-import { mix } from "../../../motion";
+import { Motion } from "../../../motion";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./ProportionalSymbolArea.schema";
 import type { ReactNode } from "react";
 
@@ -10,6 +12,19 @@ type Props = {
   accent: string;
   areaPerUnit: number;
 };
+
+type GetAreaTilePointsOptions = {
+  site: Readonly<Props>["site"];
+  unitIndex: Readonly<Props>["unitIndex"];
+  progress: Readonly<Props>["progress"];
+  radius: Readonly<Props>["radius"];
+  side: number;
+  columns: number;
+  rows: number;
+  originX: number;
+  originY: number;
+};
+
 function _getBoundaryPoint(step: number) {
   const distance = step * 4,
     side = Math.floor(distance),
@@ -22,21 +37,20 @@ function _getBoundaryPoint(step: number) {
         ? [0.5 - offset, 0.5]
         : [-0.5, 0.5 - offset];
 }
-/** Each complete source tile morphs into its own sector of the same symbol. */
-export function AreaTile({
+
+/** Samples the area tile points for the current authored frame. */
+function _getAreaTilePoints({
   site,
   unitIndex,
   progress,
   radius,
-  accent,
-  areaPerUnit,
-}: Readonly<Props>): ReactNode {
-  const side = Math.sqrt(areaPerUnit),
-    columns = Math.ceil(Math.sqrt(site.value)),
-    rows = Math.ceil(site.value / columns);
-  const originX = 48 + site.x * 4,
-    originY = 148 + site.y * 4;
-  const points = Array.from({ length: 32 }, (_, vertex) => {
+  side,
+  columns,
+  rows,
+  originX,
+  originY,
+}: Readonly<GetAreaTilePointsOptions>): string[] {
+  return Array.from({ length: 32 }, (_, vertex) => {
     const step = vertex / 32,
       [squareX, squareY] = _getBoundaryPoint(step);
     const angle =
@@ -50,16 +64,62 @@ export function AreaTile({
         ((unitIndex % columns) - (columns - 1) / 2 + squareX) * side,
       sourceY =
         (Math.floor(unitIndex / columns) - (rows - 1) / 2 + squareY) * side;
-    return `${originX + mix(progress, sourceX, sectorX)} ${originY + mix(progress, sourceY, sectorY)}`;
+    return `${
+      originX +
+      Motion.mix({
+        t: progress,
+        from: sourceX,
+        to: sectorX,
+      })
+    } ${
+      originY +
+      Motion.mix({
+        t: progress,
+        from: sourceY,
+        to: sectorY,
+      })
+    }`;
+  });
+}
+
+/** Each complete source tile morphs into its own sector of the same symbol. */
+export function AreaTile({
+  site,
+  unitIndex,
+  progress,
+  radius,
+  accent,
+  areaPerUnit,
+}: Readonly<Props>): ReactNode {
+  const { atomic } = GraphicThemeHooks.useGraphicTheme();
+  const { stroke, alpha, sketch } = GraphicThemeHooks.useGraphicTokens();
+  const shapes = GraphicThemeHooks.useGraphicShapeScales();
+  const side = Math.sqrt(areaPerUnit),
+    columns = Math.ceil(Math.sqrt(site.value)),
+    rows = Math.ceil(site.value / columns);
+  const originX = 48 + site.x * 4,
+    originY = 148 + site.y * 4;
+  const points = _getAreaTilePoints({
+    site,
+    unitIndex,
+    progress,
+    radius,
+    side,
+    columns,
+    rows,
+    originX,
+    originY,
   });
   return (
-    <path
+    <SketchedShape
       data-unit-tile={`${site.id}:${unitIndex}`}
-      d={`M${points.join(" L")} Z`}
+      shape={{ kind: "path", d: `M${points.join(" L")} Z` }}
+      profile={sketch.shape}
       fill={accent}
-      fillOpacity={progress === 1 ? 0 : 0.4}
+      fillOpacity={progress === 1 ? 0 : alpha.dimmed}
       stroke={accent}
-      strokeOpacity={progress === 1 ? 0 : 0.7}
+      strokeOpacity={progress === 1 ? 0 : atomic.opacity["70"]}
+      strokeWidth={shapes.stroke(stroke.hairline)}
     />
   );
 }

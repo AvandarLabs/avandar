@@ -1,0 +1,23 @@
+# The Mozambique pack: province and district boundaries, imported as
+# datasets. It has no code, so it declares no entry and no permissions.
+# scripts/plugins/buildMozambiqueBoundaries.ts rebuilds the content files.
+id: avandar.mozambique
+name: "%plugin.name%"
+description: "%plugin.description%"
+version: "0.1.0"
+license: CC-BY-3.0-IGO
+engines:
+  avandar: "^1"
+icon: map
+contributes:
+  content:
+    - id: provinces
+      kind: dataset
+      title: "%content.provinces.title%"
+      description: "%content.provinces.description%"
+      file: content/mz-adm1.csv
+    - id: districts
+      kind: dataset
+      title: "%content.districts.title%"
+      description: "%content.districts.description%"
+      file: content/mz-adm2.csv

@@ -1,0 +1,3 @@
+.atlasDialogStepButtonAtlasDialogControlsIconButton {
+  composes: icon-button from global;
+}

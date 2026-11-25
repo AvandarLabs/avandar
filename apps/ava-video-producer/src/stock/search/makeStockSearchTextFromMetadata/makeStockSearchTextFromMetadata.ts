@@ -28,7 +28,9 @@ export function makeStockSearchTextFromMetadata(
     ...entry.notFor,
     entry.distinction,
   ]
-    .map((text) => text.trim().replace(/\s+/g, " "))
+    .map((text) => {
+      return text.trim().replace(/\s+/g, " ");
+    })
     .filter(Boolean)
     .join("\n");
 }

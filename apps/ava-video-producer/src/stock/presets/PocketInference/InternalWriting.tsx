@@ -1,4 +1,4 @@
-import { PocketInput } from "./PocketInput";
+import { PocketInput } from "./PocketInput/PocketInput";
 import { PocketResponse } from "./PocketResponse";
 import type { Input } from "./PocketInference.schema";
 import type { ReactNode } from "react";

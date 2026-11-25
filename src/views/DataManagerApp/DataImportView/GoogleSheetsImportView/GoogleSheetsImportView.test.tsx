@@ -100,7 +100,7 @@ vi.mock("@avandar/browser-utils", async (importOriginal) => {
   return { ...actual, navigateToExternalUrl: navigateToExternalUrlMock };
 });
 
-vi.mock("@/clients/google/GoogleDriveClient/GoogleDriveClient", () => {
+vi.mock("$/connectors/googleSheets/GoogleDriveClient/GoogleDriveClient", () => {
   return {
     getGoogleSheetTabs: getGoogleSheetTabsMock,
     getGoogleSheetTabCsvExport: getGoogleSheetTabCsvExportMock,
@@ -702,7 +702,7 @@ describe("GoogleSheetsImportView", () => {
 
   it("names the failure when Drive refuses the export as too large", async () => {
     const { GoogleDriveError } =
-      await import("@/clients/google/GoogleDriveClient/GoogleDriveError");
+      await import("$/connectors/googleSheets/GoogleDriveClient/GoogleDriveError");
     getGoogleSheetTabCsvExportMock.mockRejectedValue(
       new GoogleDriveError({
         code: "export-too-large",
@@ -727,7 +727,7 @@ describe("GoogleSheetsImportView", () => {
 
   it("tells the user to re-pick when the per-file grant is gone", async () => {
     const { GoogleDriveError } =
-      await import("@/clients/google/GoogleDriveClient/GoogleDriveError");
+      await import("$/connectors/googleSheets/GoogleDriveClient/GoogleDriveError");
     getGoogleSheetTabsMock.mockRejectedValue(
       new GoogleDriveError({ code: "file-not-accessible", status: 404 }),
     );

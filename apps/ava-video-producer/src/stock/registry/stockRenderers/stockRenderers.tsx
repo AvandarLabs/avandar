@@ -1,38 +1,28 @@
-import {
-  BarRace,
-  LineTrace,
-  MetricCounter,
-} from "../../graphics-charts/graphics-charts";
-import {
-  CodeFocus,
-  ScanLines,
-  TerminalType,
-} from "../../graphics-code/graphics-code";
-import {
-  DataPipeline,
-  EventBus,
-  PacketStream,
-  SchemaMapping,
-  SourceMerge,
-} from "../../graphics-data/graphics-data";
-import {
-  DotMatrix,
-  StaggerCards,
-  StatusCycle,
-  WordReveal,
-} from "../../graphics-interface/graphics-interface";
-import {
-  NetworkGraph,
-  NodeTraversal,
-  OrbitalSystem,
-  PlexusField,
-  RadialNetwork,
-} from "../../graphics-networks/graphics-networks";
+import { BarRace } from "../../graphics-charts/BarRace/BarRace";
+import { LineTrace } from "../../graphics-charts/LineTrace/LineTrace";
+import { MetricCounter } from "../../graphics-charts/MetricCounter/MetricCounter";
+import { CodeFocus } from "../../graphics-code/CodeFocus/CodeFocus";
+import { ScanLines } from "../../graphics-code/ScanLines/ScanLines";
+import { TerminalType } from "../../graphics-code/TerminalType/TerminalType";
+import { DataPipeline } from "../../graphics-data/DataPipeline/DataPipeline";
+import { EventBus } from "../../graphics-data/EventBus/EventBus";
+import { PacketStream } from "../../graphics-data/PacketStream/PacketStream";
+import { SchemaMapping } from "../../graphics-data/SchemaMapping/SchemaMapping";
+import { SourceMerge } from "../../graphics-data/SourceMerge/SourceMerge";
+import { DotMatrix } from "../../graphics-interface/DotMatrix/DotMatrix";
+import { StaggerCards } from "../../graphics-interface/StaggerCards/StaggerCards";
+import { StatusCycle } from "../../graphics-interface/StatusCycle/StatusCycle";
+import { WordReveal } from "../../graphics-interface/WordReveal/WordReveal";
+import { NetworkGraph } from "../../graphics-networks/NetworkGraph/NetworkGraph";
+import { NodeTraversal } from "../../graphics-networks/NodeTraversal/NodeTraversal";
+import { OrbitalSystem } from "../../graphics-networks/OrbitalSystem/OrbitalSystem";
+import { PlexusField } from "../../graphics-networks/PlexusField/PlexusField";
+import { RadialNetwork } from "../../graphics-networks/RadialNetwork/RadialNetwork";
 import { generalStockRenderers } from "./generalStockRenderers";
 import { makeStockRendererFromComponent } from "./makeStockRendererFromComponent";
 import { socialSectorStockRenderers } from "./socialSectorStockRenderers";
 import type { StockPresetId } from "../../contracts/StockContract.types";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 
 /**
  * Each closure validates its own content before invoking its typed renderer.

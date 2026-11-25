@@ -4,7 +4,7 @@ import { registerStockPresetAssertions } from "../../../../../tests/helpers/regi
 import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
 import { dashboardSlotAssemblyContract } from "../DashboardSlotAssembly.contract";
 import { DEFAULT_INPUT, fixtures } from "../DashboardSlotAssembly.fixtures";
-import { inputSchema } from "../DashboardSlotAssembly.schema";
+import { inputSchema, type Input } from "../DashboardSlotAssembly.schema";
 import {
   _render,
   _getVisibleTextsFromInput,
@@ -14,20 +14,121 @@ import {
   _getPanelMarkupFromId,
 } from "./DashboardSlotAssemblyTestHelpers";
 
+type AssertWidgetTextBoundsOptions = Readonly<{
+  textElements: IterableIterator<RegExpMatchArray>;
+  top: number;
+  bottom: number;
+  id: string;
+  frame: number;
+}>;
+
+function _assertWidgetTextBounds({
+  textElements,
+  top,
+  bottom,
+  id,
+  frame,
+}: AssertWidgetTextBoundsOptions): void {
+  Array.from(textElements).forEach(([, attributes, content]) => {
+    const size = SvgAttributes.getNumberFromMarkup({
+      attributes,
+      name: "font-size",
+    });
+    let baseline = SvgAttributes.getNumberFromMarkup({
+      attributes,
+      name: "y",
+    });
+    Array.from(content.matchAll(/<tspan([^>]*)>/g)).forEach(
+      ([, lineAttributes]) => {
+        baseline += SvgAttributes.getNumberFromMarkup({
+          attributes: lineAttributes,
+          name: "dy",
+        });
+        assert.ok(baseline - size >= top, `${id} top at ${frame}`);
+        assert.ok(baseline + size * 0.25 <= bottom, `${id} bottom at ${frame}`);
+      },
+    );
+  });
+}
+
+function _getPanelRectangles({
+  frame,
+  input,
+}: Readonly<{ frame: number; input: Input }>): {
+  rects: Array<{ x: number; y: number; width: number; height: number }>;
+} {
+  const rects = _getPanelsFromMarkup(_render({ frame, input })).map(
+    (element) => {
+      return {
+        x: SvgAttributes.getNumberFromMarkup({
+          attributes: element,
+          name: "x",
+        }),
+        y: SvgAttributes.getNumberFromMarkup({
+          attributes: element,
+          name: "y",
+        }),
+        width: SvgAttributes.getNumberFromMarkup({
+          attributes: element,
+          name: "width",
+        }),
+        height: SvgAttributes.getNumberFromMarkup({
+          attributes: element,
+          name: "height",
+        }),
+      };
+    },
+  );
+  return { rects };
+}
+
+type AssertRenderedGeometryXYWidthHeightWidthHeightOptions = Readonly<{
+  input: Input;
+  numWidgets: number[][number];
+}>;
+
+function _assertRenderedGeometryXYWidthHeightWidthHeight({
+  input,
+  numWidgets,
+}: AssertRenderedGeometryXYWidthHeightWidthHeightOptions): void {
+  [12, 14, 16, 18, 36, 40, 52, 64, 76, 88, 100, 112, 150, 166].forEach(
+    (frame) => {
+      const { rects } = _getPanelRectangles({ frame, input });
+      assert.equal(rects.length, numWidgets);
+      rects.forEach((rect, index) => {
+        assert.ok(rect.x >= 0 && rect.x + rect.width <= 960);
+        assert.ok(rect.y >= 0 && rect.y + rect.height <= 600);
+        if (frame < 112) {
+          return;
+        }
+        rects.slice(index + 1).forEach((other) => {
+          return assert.ok(
+            rect.x + rect.width <= other.x ||
+              other.x + other.width <= rect.x ||
+              rect.y + rect.height <= other.y ||
+              other.y + other.height <= rect.y,
+          );
+        });
+      });
+    },
+  );
+}
+
 registerStockPresetAssertions({
   inputSchema,
   defaultInput: DEFAULT_INPUT,
   fixtures,
   contract: dashboardSlotAssemblyContract,
-  render: ({ frame, input }) =>
-    `${_render({ frame, input })}${_render({
+  render: ({ frame, input }) => {
+    return `${_render({ frame, input })}${_render({
       frame,
       input: {
         ...input,
         layout:
           input.layout === "feature-left" ? "feature-top" : "feature-left",
       },
-    })}`,
+    })}`;
+  },
   excludedTextFields: ["id", "kind", "featuredWidgetId", "layout"],
   getVisibleTexts: _getVisibleTextsFromInput,
   textFrames: [36, 80, 150],
@@ -154,48 +255,7 @@ test("all collection sizes stay on canvas and finish with nonoverlapping slots",
           featuredWidgetId: id,
           layout,
         };
-        [12, 14, 16, 18, 36, 40, 52, 64, 76, 88, 100, 112, 150, 166].forEach(
-          (frame) => {
-            const rects = _getPanelsFromMarkup(_render({ frame, input })).map(
-              (element) => ({
-                x: SvgAttributes.getNumberFromMarkup({
-                  attributes: element,
-                  name: "x",
-                }),
-                y: SvgAttributes.getNumberFromMarkup({
-                  attributes: element,
-                  name: "y",
-                }),
-                width: SvgAttributes.getNumberFromMarkup({
-                  attributes: element,
-                  name: "width",
-                }),
-                height: SvgAttributes.getNumberFromMarkup({
-                  attributes: element,
-                  name: "height",
-                }),
-              }),
-            );
-            assert.equal(rects.length, numWidgets);
-            rects.forEach((rect, index) => {
-              assert.ok(rect.x >= 0 && rect.x + rect.width <= 960);
-              assert.ok(rect.y >= 0 && rect.y + rect.height <= 600);
-              if (frame < 112) {
-                return;
-              }
-              rects
-                .slice(index + 1)
-                .forEach((other) =>
-                  assert.ok(
-                    rect.x + rect.width <= other.x ||
-                      other.x + other.width <= rect.x ||
-                      rect.y + rect.height <= other.y ||
-                      other.y + other.height <= rect.y,
-                  ),
-                );
-            });
-          },
-        );
+        _assertRenderedGeometryXYWidthHeightWidthHeight({ input, numWidgets });
       });
     });
   });
@@ -231,29 +291,7 @@ test("dense title and content baselines stay inside each moving panel", () => {
         const textElements = _getPanelMarkupFromId({ markup, id }).matchAll(
           /<text([^>]*)>([\s\S]*?)<\/text>/g,
         );
-        Array.from(textElements).forEach(([, attributes, content]) => {
-          const size = SvgAttributes.getNumberFromMarkup({
-            attributes,
-            name: "font-size",
-          });
-          let baseline = SvgAttributes.getNumberFromMarkup({
-            attributes,
-            name: "y",
-          });
-          Array.from(content.matchAll(/<tspan([^>]*)>/g)).forEach(
-            ([, lineAttributes]) => {
-              baseline += SvgAttributes.getNumberFromMarkup({
-                attributes: lineAttributes,
-                name: "dy",
-              });
-              assert.ok(baseline - size >= top, `${id} top at ${frame}`);
-              assert.ok(
-                baseline + size * 0.25 <= bottom,
-                `${id} bottom at ${frame}`,
-              );
-            },
-          );
-        });
+        _assertWidgetTextBounds({ textElements, top, bottom, id, frame });
       });
     });
   });
@@ -274,9 +312,12 @@ test("loose setup uses distinct readable panels independent of final layout and 
           frame,
           input: { ...input, layout, featuredWidgetId },
         });
-        input.widgets.forEach(({ id }, index) =>
-          assert.deepEqual(_getRectFromPanel({ markup, id }), expected[index]),
-        );
+        input.widgets.forEach(({ id }, index) => {
+          return assert.deepEqual(
+            _getRectFromPanel({ markup, id }),
+            expected[index],
+          );
+        });
       });
     });
   });

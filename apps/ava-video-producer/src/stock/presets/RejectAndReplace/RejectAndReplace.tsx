@@ -1,10 +1,12 @@
-import { SelectionCriterion } from "./SelectionCriterion";
-import { SelectionOption } from "./SelectionOption";
-import type { GraphicProps } from "../../graphics-common";
+import { SelectionCriterion } from "./SelectionCriterion/SelectionCriterion";
+import { SelectionOption } from "./SelectionOption/SelectionOption";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./RejectAndReplace.schema";
 import type { ReactNode } from "react";
+
 /** Frame-controlled replacement of one authored selection. */
 export type Props = GraphicProps & { input: Input };
+
 /** A rejected proposal leaves a central slot for its authored replacement. */
 export function RejectAndReplace({
   frame,

@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 /**
  * Vitest `resolve.alias` entries matching `tsconfig.base.json` `paths` for
  * shared packages (`$`, `@clients`, `@logger`, `@models`, `@modules`,
- * `@utils`).
+ * `@plugin-manifest`, `@utils`).
  *
  * @param rootDir Repository root directory.
  */
@@ -16,13 +16,14 @@ function _getSharedPackageVitestAliases(
     "@logger": resolve(rootDir, "packages/shared/logger/src"),
     "@models": resolve(rootDir, "packages/shared/models/src"),
     "@modules": resolve(rootDir, "packages/shared/modules/src"),
+    "@plugin-manifest": resolve(rootDir, "packages/shared/plugin-manifest/src"),
     "@utils": resolve(rootDir, "packages/shared/utils/src"),
   };
 }
 
 /**
  * Extra Vitest aliases for `packages/web/*` (`@ui`, `@hooks`, `@query-hooks`,
- * `@browser-utils`).
+ * `@browser-utils`, `@plugin-sdk`, `@plugin-ui`).
  *
  * @param rootDir Repository root directory.
  */
@@ -32,6 +33,8 @@ function _getWebPackageVitestAliases(rootDir: string): Record<string, string> {
     "@hooks": resolve(rootDir, "packages/web/hooks/src"),
     "@query-hooks": resolve(rootDir, "packages/web/query-hooks/src"),
     "@browser-utils": resolve(rootDir, "packages/web/browser-utils/src"),
+    "@plugin-sdk": resolve(rootDir, "packages/web/plugin-sdk/src"),
+    "@plugin-ui": resolve(rootDir, "packages/web/plugin-ui/src"),
   };
 }
 

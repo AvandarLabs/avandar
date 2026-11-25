@@ -1,4 +1,3 @@
-import { Trans } from "@lingui/react/macro";
 import { stockContracts } from "../../../stock/registry/stockContracts";
 import styles from "./ContentControls.module.css";
 import {
@@ -30,32 +29,32 @@ export function ContentControls({
       aria-labelledby="content-heading"
     >
       <div className={styles.contentControlsHeading}>
-        <h3 id="content-heading">
-          <Trans>Content</Trans>
-        </h3>
+        <h3 id="content-heading">Content</h3>
         <button
-          onClick={() => onChange(ContentDraftModule.resetFromPreset(preset))}
+          onClick={() => {
+            return onChange(ContentDraftModule.resetFromPreset(preset));
+          }}
         >
-          <Trans>Reset content</Trans>
+          Reset content
         </button>
       </div>
       <p className={styles.contentControlsHelp}>
-        <Trans>
-          Edit this preset for the current visit. Preview, copied JSON, and
-          download use the same validated content.
-        </Trans>
+        Edit this preset for the current visit. Preview, copied JSON, and
+        download use the same validated content.
       </p>
-      {stockContracts[preset].controls.map((control) => (
-        <ContentField
-          key={control.path}
-          control={control}
-          parentPath={[]}
-          itemPath={[]}
-          preset={preset}
-          state={state}
-          onChange={onChange}
-        />
-      ))}
+      {stockContracts[preset].controls.map((control) => {
+        return (
+          <ContentField
+            key={control.path}
+            control={control}
+            parentPath={[]}
+            itemPath={[]}
+            preset={preset}
+            state={state}
+            onChange={onChange}
+          />
+        );
+      })}
       <ContentFeedback state={state} />
     </section>
   );

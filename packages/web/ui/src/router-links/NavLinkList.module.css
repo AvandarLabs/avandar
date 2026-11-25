@@ -1,0 +1,12 @@
+/*
+ * A nav-link body refuses to shrink below its text unless min-width is 0,
+ * which would defeat the label's ellipsis.
+ */
+.navLink :global(.mantine-NavLink-body),
+.navLink :global(.mantine-NavLink-label) {
+  min-width: 0;
+}
+
+.navLink :global(.mantine-NavLink-label) {
+  overflow: hidden;
+}

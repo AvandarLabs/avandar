@@ -40,12 +40,15 @@ function _getTextBox(markup: string): Box {
       SvgAttributes.getNumberFromMarkup({ attributes: markup, name: "y" }) -
       fontSize,
     width: Math.max(
-      ...spans.map((span) =>
-        getConservativeWidthFromText({ text: span[2], fontSize }),
-      ),
+      ...spans.map((span) => {
+        return getConservativeWidthFromText({ text: span[2], fontSize });
+      }),
     ),
     height:
-      fontSize * 1.3 + spans.reduce((sum, span) => sum + Number(span[1]), 0),
+      fontSize * 1.3 +
+      spans.reduce((sum, span) => {
+        return sum + Number(span[1]);
+      }, 0),
   };
 }
 /**
@@ -67,10 +70,11 @@ function _assertCommitmentLabelsVisible({
   const bookings = [...markup.matchAll(/<rect data-booking[^>]*>/g)];
   texts.forEach((text, index) => {
     bookings
-      .filter(
-        (booking) =>
-          booking.index! > text.index && !booking[0].includes('fill="none"'),
-      )
+      .filter((booking) => {
+        return (
+          booking.index! > text.index && !booking[0].includes('fill="none"')
+        );
+      })
       .forEach((booking) => {
         assert.ok(
           !_overlaps({
@@ -80,14 +84,12 @@ function _assertCommitmentLabelsVisible({
           `Opaque booking covers ${text.label}`,
         );
       });
-    texts
-      .slice(index + 1)
-      .forEach((other) =>
-        assert.ok(
-          !_overlaps({ first: text.box, second: other.box }),
-          `${text.label} overlaps ${other.label}`,
-        ),
+    texts.slice(index + 1).forEach((other) => {
+      return assert.ok(
+        !_overlaps({ first: text.box, second: other.box }),
+        `${text.label} overlaps ${other.label}`,
       );
+    });
   });
 }
 

@@ -1,22 +1,44 @@
-import { FitText } from "../../primitives/FitText/FitText";
-import { AquiferOwnershipKey } from "./AquiferOwnershipKey";
+import { AquiferBudgetTerms } from "./AquiferBudgetTerms/AquiferBudgetTerms";
 import type { Input } from "./AquiferAllocationBalance.schema";
 import type { ReactNode } from "react";
+
+type AquiferBudgetTerm = {
+  owner: string;
+  number: number | undefined;
+  label: string;
+  value: number;
+};
+
 /** Inputs for AquiferBudget. */
 type Props = { input: Input };
 
-/**
- * Request and unallocated demand are retained separately from the storage
- * equation.
- */
-export function AquiferBudget({ input }: Readonly<Props>): ReactNode {
-  const { copy, aquifer, flows } = input;
-  const final =
-    aquifer.initialM3 +
-    flows.rechargeM3 -
-    flows.naturalOutflowM3 -
-    flows.approvedWithdrawalM3;
-  const terms = [
+/** Retains unallocated request terms only when the authored option is shown. */
+function _createUnallocatedBudgetTerms({
+  input,
+  copy,
+  flows,
+}: Readonly<CreateUnallocatedBudgetTermsOptions>): AquiferBudgetTerm[] {
+  return input.showUnallocatedRequest
+    ? [
+        {
+          owner: "unallocated",
+          number: 4,
+          label: copy.unallocated,
+          value: flows.requestedWithdrawalM3 - flows.approvedWithdrawalM3,
+        },
+      ]
+    : [];
+}
+
+/** Builds the ordered storage equation and separate request quantities. */
+function _createAquiferBudgetTerms({
+  input,
+  copy,
+  aquifer,
+  flows,
+  final,
+}: Readonly<CreateAquiferBudgetTermsOptions>): AquiferBudgetTerm[] {
+  return [
     {
       owner: "initial",
       number: undefined,
@@ -48,50 +70,45 @@ export function AquiferBudget({ input }: Readonly<Props>): ReactNode {
       label: copy.requested,
       value: flows.requestedWithdrawalM3,
     },
-    ...(input.showUnallocatedRequest
-      ? [
-          {
-            owner: "unallocated",
-            number: 4,
-            label: copy.unallocated,
-            value: flows.requestedWithdrawalM3 - flows.approvedWithdrawalM3,
-          },
-        ]
-      : []),
+    ..._createUnallocatedBudgetTerms({ input, copy, flows }),
   ];
+}
+
+/**
+ * Request and unallocated demand are retained separately from the storage
+ * equation.
+ */
+export function AquiferBudget({ input }: Readonly<Props>): ReactNode {
+  const { copy, aquifer, flows } = input;
+  const final =
+    aquifer.initialM3 +
+    flows.rechargeM3 -
+    flows.naturalOutflowM3 -
+    flows.approvedWithdrawalM3;
+  const terms = _createAquiferBudgetTerms({
+    input,
+    copy,
+    aquifer,
+    flows,
+    final,
+  });
   return (
     <g>
-      {terms.map(({ owner, number, label, value }, index) => (
-        <g key={owner} data-budget-term={owner}>
-          {number ? (
-            <AquiferOwnershipKey
-              number={number}
-              x={42 + (index % 4) * 232}
-              y={484 + Math.floor(index / 4) * 75}
-            />
-          ) : undefined}
-          <FitText
-            text={label}
-            x={32 + (index % 4) * 232}
-            y={435 + Math.floor(index / 4) * 75}
-            width={210}
-            fontSize={12}
-            maxLines={3}
-            breakLongWords
-            normalizeWhitespace
-          />
-          <FitText
-            text={String(value)}
-            x={(number ? 64 : 32) + (index % 4) * 232}
-            y={488 + Math.floor(index / 4) * 75}
-            width={number ? 178 : 210}
-            fontSize={12}
-            maxLines={1}
-            breakLongWords
-            normalizeWhitespace
-          />
-        </g>
-      ))}
+      <AquiferBudgetTerms terms={terms} />
     </g>
   );
 }
+
+type CreateUnallocatedBudgetTermsOptions = {
+  input: Input;
+  copy: Input["copy"];
+  flows: Input["flows"];
+};
+
+type CreateAquiferBudgetTermsOptions = {
+  input: Input;
+  copy: Input["copy"];
+  aquifer: Input["aquifer"];
+  flows: Input["flows"];
+  final: number;
+};

@@ -1,0 +1,13 @@
+.caseRecordSidebarPane {
+  align-self: stretch;
+  background: var(--ava-surface-raised);
+  border-right: 1px solid var(--ava-border-default);
+  min-height: 0;
+  min-width: 240px;
+  width: 240px;
+}
+
+.caseRecordSidebarList {
+  min-height: 0;
+  position: relative;
+}

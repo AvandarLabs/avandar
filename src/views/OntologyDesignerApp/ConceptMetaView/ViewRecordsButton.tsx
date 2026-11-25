@@ -12,7 +12,8 @@ type Props = {
 };
 
 /**
- * Opens the records workspace for this case type.
+ * Opens the records workspace for this case type. It is the case type
+ * page's one primary action.
  */
 export function ViewRecordsButton({ concept }: Readonly<Props>): ReactNode {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ export function ViewRecordsButton({ concept }: Readonly<Props>): ReactNode {
   return (
     <Button
       size="compact-sm"
-      variant="light"
+      variant="filled"
       rightSection={<IconArrowRight size={16} aria-hidden />}
       onClick={() => {
         navigate(

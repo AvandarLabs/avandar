@@ -1,5 +1,11 @@
-import { checkDevelopCi } from "@ava-cli/ReleaseCli/checkDevelopCi";
-import { describeCiStatus } from "@ava-cli/ReleaseCli/describeCiStatus";
+import { checkSourceBranchCi } from "@ava-cli/ReleaseCli/checkSourceBranchCi/checkSourceBranchCi";
+import { describeCiStatus } from "@ava-cli/ReleaseCli/describeCiStatus/describeCiStatus";
+import {
+  DEPLOY_WARNING,
+  RELEASE_SOURCE_BRANCH,
+  RELEASE_TARGET_BRANCH,
+  TARGET_DEPLOY_WORKFLOW,
+} from "@ava-cli/ReleaseCli/releaseBranches/releaseBranches";
 import {
   getGitHubRepoSlug,
   readTreeSha,
@@ -8,13 +14,9 @@ import {
 import { promptToConfirm } from "@ava-cli/ReleaseCli/releasePromptHelpers";
 import { toDevVersion } from "@ava-cli/ReleaseCli/releaseVersionUtils/releaseVersionUtils";
 import {
-  RELEASE_SOURCE_BRANCH,
-  RELEASE_TARGET_BRANCH,
-} from "@ava-cli/ReleaseCli/runPreflight/runPreflight";
-import {
   printDetails,
   printHeading,
-} from "@ava-cli/ReleaseCli/runRelease/releaseOutputHelpers";
+} from "@ava-cli/ReleaseCli/runRelease/releaseOutputHelpers/releaseOutputHelpers";
 import {
   printInfo,
   printSuccess,
@@ -30,99 +32,145 @@ import type { ReleasePlan } from "@ava-cli/ReleaseCli/runRelease/releaseStageHel
  * The stages that do mutate state live in `releaseStageHelpers.ts`.
  */
 
+/** What {@link confirmCiVerdict} checks, and whether it may ask or skip. */
+type ConfirmCiVerdictOptions = {
+  /** The source-branch commit being released. */
+  commitSha: string;
+  /** Stop on anything other than a pass instead of asking (`--yes`). */
+  assumeYes: boolean;
+  /** Skip the check entirely (`--skip-ci-check`). */
+  skip: boolean;
+};
+
+/** The warning printed when `--skip-ci-check` skips the source branch's CI. */
+const SKIP_CI_CHECK_WARNING = `Skipping ${RELEASE_SOURCE_BRANCH}'s CI check.`;
+
 /**
- * Report the staging CI verdict for the commit being released, and ask before
- * proceeding on anything other than a pass.
+ * The refusal `--yes` gives on a CI verdict other than a pass, which pushing
+ * the target branch would otherwise deploy to production unreviewed.
+ */
+function _buildCiStopMessage(verdict: string): string {
+  return `${verdict}
+--yes does not release unless ${RELEASE_SOURCE_BRANCH}'s staging CI passed. Nothing has been released. To release anyway, run the command again with --skip-ci-check.`;
+}
+
+/**
+ * Report the source branch's CI verdict for the commit being released. A pass
+ * proceeds. Anything else asks, or under `--yes` throws before anything is
+ * committed, tagged, or pushed. `--skip-ci-check` is the only override.
  */
 export async function confirmCiVerdict(
   git: ReleaseCommands,
-  options: Readonly<{ commitSha: string; assumeYes: boolean; skip: boolean }>,
+  options: Readonly<ConfirmCiVerdictOptions>,
 ): Promise<void> {
   const { commitSha, assumeYes, skip } = options;
 
   if (skip) {
-    printWarn("Skipping the staging CI check.");
+    printWarn(SKIP_CI_CHECK_WARNING);
     return;
   }
   printHeading("CI");
-  const ciStatus = checkDevelopCi(git, {
-    commitSha,
-    branch: RELEASE_SOURCE_BRANCH,
-  });
+  const ciStatus = checkSourceBranchCi(git, { commitSha });
   const verdict = `${describeCiStatus(ciStatus)} (${shortSha(commitSha)})`;
 
   if (ciStatus.kind === "passed") {
     printSuccess(verdict);
     return;
   }
+  if (assumeYes) {
+    throw new Error(_buildCiStopMessage(verdict));
+  }
   printWarn(verdict);
-  if (!assumeYes && !(await promptToConfirm("Release anyway?"))) {
+  if (!(await promptToConfirm("Release anyway?"))) {
     throw new Error("Aborted.");
   }
 }
 
-/** Print what the release will do, then take the last chance to stop. */
-export async function confirmReleasePlan(
-  git: ReleaseCommands,
-  options: Readonly<{
-    plan: ReleasePlan;
-    originDevelopSha: string;
-    originMainSha: string;
-    assumeYes: boolean;
-  }>,
-): Promise<void> {
-  const { plan, originDevelopSha, originMainSha, assumeYes } = options;
-  const { developVersion, releaseVersion, nextVersion, releaseTag } = plan;
+/** The last-chance prompt, e.g. `Release 0.15.0?`. */
+function _buildConfirmPrompt(plan: Readonly<ReleasePlan>): string {
+  return `Release ${plan.releaseVersion}?`;
+}
+
+/** Print the three numbered steps the release will take. */
+function _printPlanSteps(
+  options: Readonly<{ plan: ReleasePlan; originSourceSha: string }>,
+): void {
+  const { plan, originSourceSha } = options;
+  const { sourceVersion, releaseVersion, nextVersion, releaseTag } = plan;
 
   printHeading("Plan");
   printDetails([
     [
       `1. ${RELEASE_SOURCE_BRANCH}:`,
-      `${developVersion} to ${releaseVersion}, pushed`,
+      `${sourceVersion} to ${releaseVersion}, pushed`,
     ],
     [
       `2. ${RELEASE_TARGET_BRANCH}:`,
-      `set to ${RELEASE_SOURCE_BRANCH}@${shortSha(originDevelopSha)}'s tree, tagged ${releaseTag}`,
+      `set to ${RELEASE_SOURCE_BRANCH}@${shortSha(originSourceSha)}'s tree, tagged ${releaseTag}`,
     ],
     [
       `3. ${RELEASE_SOURCE_BRANCH}:`,
       `${releaseVersion} to ${toDevVersion(nextVersion)}, pushed`,
     ],
   ]);
+}
 
-  if (readTreeSha(git, originDevelopSha) === readTreeSha(git, originMainSha)) {
+/** What {@link confirmReleasePlan} prints and compares before asking. */
+type ConfirmReleasePlanOptions = {
+  plan: ReleasePlan;
+  /** `origin/<source>`, the commit whose tree is released. */
+  originSourceSha: string;
+  /** `origin/<target>`, compared with the source to spot an empty release. */
+  originTargetSha: string;
+  /** Skip the confirmation prompt (`--yes`). */
+  assumeYes: boolean;
+};
+
+/** Print what the release will do, then take the last chance to stop. */
+export async function confirmReleasePlan(
+  git: ReleaseCommands,
+  options: Readonly<ConfirmReleasePlanOptions>,
+): Promise<void> {
+  const { plan, originSourceSha, originTargetSha, assumeYes } = options;
+
+  _printPlanSteps({ plan, originSourceSha });
+  if (readTreeSha(git, originSourceSha) === readTreeSha(git, originTargetSha)) {
     printWarn(
       `${RELEASE_SOURCE_BRANCH} and ${RELEASE_TARGET_BRANCH} already have identical content: this release ships no changes.`,
     );
   }
-  printWarn(
-    `Pushing ${RELEASE_TARGET_BRANCH} deploys production and migrates the production database.`,
-  );
+  printWarn(DEPLOY_WARNING);
 
   if (
     !git.dryRun &&
     !assumeYes &&
-    !(await promptToConfirm(`Release ${releaseVersion}?`))
+    !(await promptToConfirm(_buildConfirmPrompt(plan)))
   ) {
     throw new Error("Aborted.");
   }
 }
 
+/** The `ava release notes` command that retries this release's notes. */
+function _buildReleaseNotesRetryHint(plan: Readonly<ReleasePlan>): string {
+  return `Retry publishing release notes: ava release notes --version ${plan.releaseVersion}`;
+}
+
 /**
  * Reports the outcome of generating and publishing this release's GitHub
- * release notes, called right after the tag and main are pushed (or, on a
- * dry run, right after the preview would have been generated).
+ * release notes, called right after the tag and the target branch are pushed
+ * (or, on a dry run, right after the preview would have been generated).
  *
- * A failure here never fails the release: main and the tag are already live
- * by the time this runs, so the only thing left to do is tell the user how
- * to retry the one step that didn't finish.
+ * A failure here never fails the release: the target branch and the tag are
+ * already live by the time this runs, so the only thing left to do is tell
+ * the user how to retry the one step that didn't finish.
  */
 export function reportReleaseNotesOutcome(
   outcome: PublishReleaseNotesOutcome,
-  options: Readonly<{ releaseVersion: string; dryRun: boolean }>,
+  options: Readonly<{ plan: ReleasePlan; dryRun: boolean }>,
 ): void {
-  const { releaseVersion, dryRun } = options;
-  const retryHint = `Retry publishing release notes: ava release notes --version ${releaseVersion}`;
+  const { plan, dryRun } = options;
+  const { releaseTag } = plan;
+  const retryHint = _buildReleaseNotesRetryHint(plan);
 
   switch (outcome.kind) {
     case "published":
@@ -140,12 +188,12 @@ export function reportReleaseNotesOutcome(
       // Retrying would just hit this same outcome again: `ava release
       // notes` refuses to overwrite an existing release's notes.
       printWarn(
-        `Release notes already exist for v${releaseVersion}: ${outcome.url}`,
+        `Release notes already exist for ${releaseTag}: ${outcome.url}`,
       );
       return;
     case "tag-not-found":
       printWarn(
-        `Could not find tag v${releaseVersion} to publish release notes for.`,
+        `Could not find tag ${releaseTag} to publish release notes for.`,
       );
       if (!dryRun) {
         printWarn(retryHint);
@@ -179,9 +227,9 @@ export function printReleaseSummary(
     return;
   }
   printInfo(
-    `Production run: https://github.com/${repoSlug}/actions/workflows/production.yaml`,
+    `Deploy run: https://github.com/${repoSlug}/actions/workflows/${TARGET_DEPLOY_WORKFLOW}`,
   );
   printInfo(
-    `Tag:            https://github.com/${repoSlug}/releases/tag/${releaseTag}`,
+    `Tag:        https://github.com/${repoSlug}/releases/tag/${releaseTag}`,
   );
 }

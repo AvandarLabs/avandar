@@ -189,10 +189,18 @@ Mantine `Select` with stricter generics for `value` / `defaultValue` /
 `SelectOption[]`, picking `value` / `label` by key (`valueKey`, `labelKey`) or
 by function (`valueFn`, `labelFn`), with an optional `isDisabledFn`.
 
+### `TruncatedText`
+
+One line of text. A line wider than its parent ends in an ellipsis, and
+hovering that line shows the full text. `tooltipLabel` replaces that tooltip
+and is shown even when the text fits. The parent has to be allowed to shrink
+(`min-width: 0`), or the line never clips. `withFullTextTooltip={false}`
+turns the full-text tooltip off.
+
 ### Others
 
 `Paper`, `Callout`, `Modal`, `Drawer`, `Tabs`, `DangerousActionButton`,
-`DangerText`, `TruncatedText`, `Link`, `NavLink`, `NavLinkList`,
+`DangerText`, `Link`, `NavLink`, `NavLinkList`,
 `SegmentedControl` (with `makeSegmentedControlItems`), `FloatingLoader`,
 `LoadingOverlay`, and the single-purpose forms `FileUploadForm`,
 `InputTextForm`, `TextareaForm`.
@@ -210,8 +218,8 @@ dot-notation key paths. Exports `FormType`, `UseFormInput`, `FormRule`,
 ### `useCheckTruncatedText(ref)`
 
 Watches a DOM node's text overflow and returns whether the text is currently
-truncated. Used by `EditableDisplayText` and `ObjectDescriptionList` to decide
-whether to show a tooltip on hover.
+truncated. `TruncatedText` uses it to decide whether hovering shows the full
+text.
 
 ## License
 

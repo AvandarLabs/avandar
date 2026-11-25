@@ -1,5 +1,7 @@
 import { propEq } from "@avandar/utils";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { CoordinationMarkerShape } from "./CoordinationMarkerShape/CoordinationMarkerShape";
+import { CoordinationTeamOrdinal } from "./CoordinationTeamOrdinal/CoordinationTeamOrdinal";
 import { getCoordinationPlaceColorFromIndex } from "./getCoordinationPlaceColorFromIndex";
 import { getTeamMarkerPoseFromInputAndFrame } from "./getTeamMarkerPoseFromInputAndFrame";
 import type { Input } from "./CommunityCoordinationTable.schema";
@@ -13,7 +15,11 @@ export function CoordinationMarker({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const { x, y, moved } = getTeamMarkerPoseFromInputAndFrame({
+    motion,
     input,
     index,
     frame,
@@ -23,6 +29,7 @@ export function CoordinationMarker({
   const color = getCoordinationPlaceColorFromIndex({
     index: input.places.findIndex(propEq("id", reference)),
     accent,
+    color: tokens.color,
   });
   return (
     <g
@@ -31,35 +38,8 @@ export function CoordinationMarker({
       data-x={x}
       data-y={y}
     >
-      {input.markerStyle === "flags" ? (
-        <path
-          d={`M${x - 6} ${y + 9} V${y - 9} H${x + 7} V${y + 7} H${x - 6}`}
-          fill={STOCK.surface}
-          stroke={color}
-          strokeWidth={2}
-        />
-      ) : (
-        <rect
-          x={x - 7}
-          y={y - 9}
-          width={14}
-          height={18}
-          rx={4}
-          fill={STOCK.surface}
-          stroke={color}
-          strokeWidth={2}
-        />
-      )}
-      <text
-        data-team-key
-        x={x}
-        y={y + 3}
-        fontSize={12}
-        textAnchor="middle"
-        fill={STOCK.text}
-      >
-        {index + 1}
-      </text>
+      <CoordinationMarkerShape {...{ input, x, y, tokens, color, scales }} />
+      <CoordinationTeamOrdinal {...{ index, tokens, x, y }} />
     </g>
   );
 }

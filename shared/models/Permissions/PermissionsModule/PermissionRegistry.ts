@@ -21,12 +21,16 @@ export const PermissionRegistry = {
     viewer: [
       "data_sources__can_view_dataset",
       "data_sources__can_list_sources",
+      "data_sources__can_view_dictionaries",
     ] as const,
     editor: [
       "data_sources__can_view_dataset",
       "data_sources__can_list_sources",
       "data_sources__can_edit_dataset",
       "data_sources__can_create_dataset",
+      "data_sources__can_view_dictionaries",
+      "data_sources__can_edit_dictionaries",
+      "data_sources__can_edit_crosswalks",
     ] as const,
     admin: [
       "data_sources__can_view_dataset",
@@ -34,6 +38,9 @@ export const PermissionRegistry = {
       "data_sources__can_edit_dataset",
       "data_sources__can_create_dataset",
       "data_sources__can_manage_sources",
+      "data_sources__can_view_dictionaries",
+      "data_sources__can_edit_dictionaries",
+      "data_sources__can_edit_crosswalks",
     ] as const,
   },
   data_explorer: {
@@ -85,6 +92,38 @@ export const PermissionRegistry = {
       "gis__can_manage_maps",
     ] as const,
   },
+  case_types: {
+    viewer: ["case_types__can_view_case_type"] as const,
+    editor: [
+      "case_types__can_view_case_type",
+      "case_types__can_create_case_type",
+      "case_types__can_edit_case_type",
+      // Server-side counterpart: the `individuals` INSERT and UPDATE policies
+      // accept a `case_types` editor, so a refresh can write records.
+      "case_types__can_sync_records",
+    ] as const,
+    admin: [
+      "case_types__can_view_case_type",
+      "case_types__can_create_case_type",
+      "case_types__can_edit_case_type",
+      "case_types__can_sync_records",
+      "case_types__can_delete_case_type",
+    ] as const,
+  },
+  case_records: {
+    viewer: ["case_records__can_view_record"] as const,
+    editor: [
+      "case_records__can_view_record",
+      "case_records__can_edit_record",
+      "case_records__can_sync_records",
+    ] as const,
+    admin: [
+      "case_records__can_view_record",
+      "case_records__can_edit_record",
+      "case_records__can_sync_records",
+      "case_records__can_delete_record",
+    ] as const,
+  },
   settings: {
     viewer: [] as const,
     editor: [] as const,
@@ -92,6 +131,7 @@ export const PermissionRegistry = {
       "settings__can_manage_workspace_users",
       "settings__can_manage_roles_and_tags",
       "settings__can_manage_billing",
+      "settings__can_manage_plugins",
     ] as const,
   },
 } as const satisfies PermissionRegistryType;

@@ -151,27 +151,27 @@ export const invalidInputs: unknown[] = [
   },
   {
     ...DEFAULT_INPUT,
-    artifacts: DEFAULT_INPUT.artifacts.map((item, index) =>
-      index === 0 ? { ...item, id: "" } : item,
-    ),
+    artifacts: DEFAULT_INPUT.artifacts.map((item, index) => {
+      return index === 0 ? { ...item, id: "" } : item;
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    artifacts: DEFAULT_INPUT.artifacts.map((item, index) =>
-      index === 0 ? { ...item, id: "W".repeat(21) } : item,
-    ),
+    artifacts: DEFAULT_INPUT.artifacts.map((item, index) => {
+      return index === 0 ? { ...item, id: "W".repeat(21) } : item;
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    artifacts: DEFAULT_INPUT.artifacts.map((item, index) =>
-      index === 0 ? { ...item, label: "" } : item,
-    ),
+    artifacts: DEFAULT_INPUT.artifacts.map((item, index) => {
+      return index === 0 ? { ...item, label: "" } : item;
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    artifacts: DEFAULT_INPUT.artifacts.map((item, index) =>
-      index === 0 ? { ...item, label: "W".repeat(25) } : item,
-    ),
+    artifacts: DEFAULT_INPUT.artifacts.map((item, index) => {
+      return index === 0 ? { ...item, label: "W".repeat(25) } : item;
+    }),
   },
   { ...DEFAULT_INPUT, labels: { ...DEFAULT_INPUT.labels, originals: "" } },
   {
@@ -206,9 +206,9 @@ export const invalidInputs: unknown[] = [
   { ...DEFAULT_INPUT, tools: { ...DEFAULT_INPUT.tools, extra: true } },
   {
     ...DEFAULT_INPUT,
-    artifacts: DEFAULT_INPUT.artifacts.map((item, index) =>
-      index === 0 ? { ...item, extra: true } : item,
-    ),
+    artifacts: DEFAULT_INPUT.artifacts.map((item, index) => {
+      return index === 0 ? { ...item, extra: true } : item;
+    }),
   },
   { ...DEFAULT_INPUT, labels: { ...DEFAULT_INPUT.labels, extra: true } },
 ];

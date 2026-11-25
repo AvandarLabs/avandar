@@ -6,6 +6,7 @@ import {
   getParenthesisDepths,
   getStatementEndIndex,
   isKeywordToken,
+  isSymbolToken,
 } from "@/lib/sql/DuckDbSqlAnalyzer/duckDbSqlTokens";
 import type {
   MutationTargetAnalysis,
@@ -91,7 +92,7 @@ function _hasUnsupportedTargetComma(
     .slice(options.relationIndex + 1, options.endIndex)
     .some((token, relativeIndex) => {
       const tokenIndex = options.relationIndex + relativeIndex + 1;
-      return token.value === "," && depths[tokenIndex] === 0;
+      return isSymbolToken({ token, value: "," }) && depths[tokenIndex] === 0;
     });
 }
 
@@ -205,7 +206,10 @@ function _getCopyMutationTargets(
   if (copyDirection === undefined) {
     return { indexes: [], isComplete: false };
   }
-  const hasQueryRelation = tokens[mutationIndex + 1]?.value === "(";
+  const hasQueryRelation = isSymbolToken({
+    token: tokens[mutationIndex + 1],
+    value: "(",
+  });
   const isComplete =
     copyDirection.relationIndex !== undefined ||
     (copyDirection.direction === "TO" && hasQueryRelation);

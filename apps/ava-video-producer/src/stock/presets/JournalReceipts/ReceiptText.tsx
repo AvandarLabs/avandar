@@ -1,4 +1,6 @@
-import { FitText } from "../../primitives/FitText/FitText";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { ReceiptLabelSlots } from "./ReceiptLabelSlots/ReceiptLabelSlots";
 import type { Input } from "./JournalReceipts.schema";
 import type { ReactNode } from "react";
 
@@ -15,10 +17,18 @@ export function ReceiptText({
   accent,
   width,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   const horizontal = input.foldDirection === "horizontal";
   if (!input.showLabels) {
     return (
-      <path d={`M12 18 h${width - 26} M12 30 h${width - 52}`} stroke={accent} />
+      <SketchedShape
+        shape={{
+          kind: "path",
+          d: `M12 18 h${width - 26} M12 30 h${width - 52}`,
+        }}
+        profile={tokens.sketch.shape}
+        stroke={accent}
+      />
     );
   }
   const labels = [
@@ -41,17 +51,7 @@ export function ReceiptText({
   ];
   return (
     <g>
-      {labels.map((label) => (
-        <FitText
-          key={label.y}
-          {...label}
-          x={10}
-          width={width - 20}
-          fontSize={12}
-          normalizeWhitespace
-          breakLongWords
-        />
-      ))}
+      <ReceiptLabelSlots labels={labels} width={width} />
     </g>
   );
 }

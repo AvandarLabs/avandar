@@ -18,7 +18,9 @@
  * table in this column the same width as the header above it.
  */
 .appViewBodyContent {
-  padding: var(--mantine-spacing-lg) var(--mantine-spacing-lg)
+  --ava-content-gutter: var(--mantine-spacing-lg);
+
+  padding: var(--ava-content-gutter) var(--ava-content-gutter)
     var(--mantine-spacing-xxl);
 }
 
@@ -27,9 +29,32 @@
 }
 
 /*
+ * A fill-height view scrolls inside its own panes, so the column is exactly
+ * as tall as the scroller and the trailing padding matches the gutter
+ * instead of leaving room to scroll past the end. A pane browser that should
+ * paint to the slate's edges bleeds out by `--ava-content-gutter`.
+ */
+.appViewBodyContentFillHeight {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding-bottom: var(--ava-content-gutter);
+}
+
+/*
+ * `noPadding` means no padding, including the trailing padding a fill-height
+ * column otherwise keeps. A view that paints its own regions (the case
+ * record page) uses both so those regions can reach the bottom of the slate.
+ */
+.appViewBodyContentNoPadding.appViewBodyContentFillHeight {
+  padding-bottom: 0;
+}
+
+/*
  * The rail sits on the tinted body surface so the content column stays the
  * only lit region. It scrolls on its own: a fifty-column outline should not
- * drag the record's facts off screen.
+ * drag the record's facts off screen. A view whose rail holds a table sets
+ * `--ava-app-view-rail-width` through `className` to widen it.
  */
 .appViewBodyRail {
   background-color: var(--ava-surface-body);
@@ -40,7 +65,7 @@
   padding: var(--mantine-spacing-lg) var(--mantine-spacing-md)
     var(--mantine-spacing-xl);
   scrollbar-width: thin;
-  width: calc(15rem * var(--mantine-scale));
+  width: var(--ava-app-view-rail-width, calc(15rem * var(--mantine-scale)));
 }
 
 /*

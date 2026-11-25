@@ -37,11 +37,13 @@ The review server uses `out/component-review/product/`; rendering uses
 file remains source-controlled. Builds record revision and per-file hashes,
 including uncommitted product changes. Source changes invalidate existing
 preview evidence. The shared pnpm lockfile is included in render fingerprints.
-Live gallery builds use ignored `apps/ava-video-producer/out/showcase/browser/`.
+Live gallery builds use ignored `apps/ava-video-producer/out/showcase/`: Vite
+writes the pages to `browser/`, and the showcase's product bundle lives in
+`product/`.
 
 **Download MP4** renders only when requested, using the current composition and
 selected options. Product films preserve the captions toggle; Atlas exports
-preserve the selected accent and background. The local server reports progress,
+render with the video theme the preview shows, unsaved edits included. The local server reports progress,
 serializes renders, and serves the file only after completion. These generated
 exports remain in ignored
 `apps/ava-video-producer/out/showcase/exports/<job-id>/`. No MP4 files are tracked.
@@ -104,9 +106,11 @@ The historical migration record is in
 describe the exports and source revisions verified at that time, not fresh
 tests of the current live compositions or product. MP4 files are generated
 locally when needed and are no longer tracked sample inputs.
-The imported frame DSL and fixture code retain scoped style exceptions in the
-workspace ESLint configuration; behavioral checks remain enabled. Generated
-bundles, render outputs, and private projects are excluded from linting.
+The root Oxlint configuration (`.oxlintrc.json`) applies the workspace rules
+to this app, including the imported frame DSL and fixture code. Renderer
+function-length and video-theme guards run through the repo-local JS plugins
+in `eslint/`. Generated bundles, render outputs, and private projects are
+excluded from linting.
 
 The source repository is retained until the migration is reviewed and merged.
 No merge, push, publication, or GitHub repository deletion is performed by any

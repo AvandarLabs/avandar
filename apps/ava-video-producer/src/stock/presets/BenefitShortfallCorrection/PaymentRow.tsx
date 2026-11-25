@@ -1,5 +1,5 @@
-import { PaymentTray } from "./PaymentTray";
-import { PaymentUnit } from "./PaymentUnit";
+import { PaymentTray } from "./PaymentTray/PaymentTray";
+import { PaymentUnit } from "./PaymentUnit/PaymentUnit";
 import type { Input } from "./BenefitShortfallCorrection.schema";
 import type { ReactNode } from "react";
 
@@ -24,16 +24,18 @@ export function PaymentRow({
         index={index}
         accent={accent}
       />
-      {Array.from({ length: payment.statedUnits }, (_, unitIndex) => (
-        <PaymentUnit
-          key={unitIndex}
-          payment={payment}
-          frame={frame}
-          index={index}
-          unitIndex={unitIndex}
-          accent={accent}
-        />
-      ))}
+      {Array.from({ length: payment.statedUnits }, (_, unitIndex) => {
+        return (
+          <PaymentUnit
+            key={unitIndex}
+            payment={payment}
+            frame={frame}
+            index={index}
+            unitIndex={unitIndex}
+            accent={accent}
+          />
+        );
+      })}
     </g>
   );
 }

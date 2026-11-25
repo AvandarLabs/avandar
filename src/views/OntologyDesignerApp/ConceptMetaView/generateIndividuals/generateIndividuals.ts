@@ -16,14 +16,15 @@ import { Concept } from "$/models/ontology/Concept/Concept";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
 import { getStagingIndividualsTableName } from "@/clients/DuckDbClient/duckDbSqlText";
-import { getSQLSelectOfMapping } from "@/clients/ontology/AttributeAssertionClient/getAttributeAssertions/getSQLSelectOfMapping";
 import { IndividualClient } from "@/clients/ontology/IndividualClient";
+import { buildAttributeValueSql } from "@/clients/qetl/QueryMediator/conceptRelation/buildAttributeValueSql/buildAttributeValueSql";
 import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
 import { JobProgressStore } from "@/lib/utils/state/JobProgressStore/JobProgressStore";
 import { Logger } from "@/utils/Logger";
 import {
   diffStagedIndividualsPage,
   getNewlyStaleIndividuals,
+  makeBulkInsertRowsFromUpsertRows,
 } from "@/views/OntologyDesignerApp/ConceptMetaView/generateIndividuals/diffStagedIndividualsHelpers/diffStagedIndividualsHelpers";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumnRead } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
@@ -137,7 +138,7 @@ async function _diffAndUpsertPage(options: {
     return;
   }
   await IndividualClient.crudFunctions.bulkInsert({
-    data: diffResult.rowsToWrite,
+    data: makeBulkInsertRowsFromUpsertRows(diffResult.rowsToWrite),
     upsert: true,
     onConflict: {
       columnNames: ["external_id", "concept_id"],
@@ -209,6 +210,14 @@ async function _resolveIndividualSourceMappings(
   const labelMapping = datasetColumnMappings.find((mapping) => {
     return mapping.conceptAttributeId === labelAttribute.id;
   })!;
+  // The label names each record with one value, so its mapping must name the
+  // rule that picks it.
+  if (labelMapping.valuePickerRuleType === undefined) {
+    throw new Error(
+      `Label attribute '${labelAttribute.name}' (${labelAttribute.id}) keeps ` +
+        `one value, but its mapping names no value rule.`,
+    );
+  }
   const identifierMappingsByDatasetId = makeObject(identifierMappings, {
     key: "datasetId",
   });
@@ -296,11 +305,13 @@ async function _stageIndividuals(options: {
           return `SELECT "${column.name}" AS external_id FROM "${column.datasetId}"`;
         })
         .join(" UNION ALL "),
-      titleSelector: getSQLSelectOfMapping({
+      titleSelector: buildAttributeValueSql({
         selectColumnName: titleColumn.name,
         primaryKeyColumnName: titleDatasetPrimaryKeyColumn.name,
         datasetId: titleColumn.datasetId,
-        ruleType: labelMapping.valuePickerRuleType,
+        columnDataType: titleColumn.dataType,
+        valuePickerRuleType: labelMapping.valuePickerRuleType,
+        valueShape: "single",
         outputColumnName: "name",
         externalIdsTable: "external_ids",
         externalIdColumn: "external_id",
@@ -371,7 +382,7 @@ async function _runGenerateIndividuals(
     });
     if (staleRows.length > 0) {
       await IndividualClient.crudFunctions.bulkInsert({
-        data: staleRows,
+        data: makeBulkInsertRowsFromUpsertRows(staleRows),
         upsert: true,
         onConflict: {
           columnNames: ["external_id", "concept_id"],

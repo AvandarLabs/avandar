@@ -68,4 +68,32 @@ describe("LayerActionsMenu", () => {
       expect(callbacks[callbackName]).toHaveBeenCalledOnce();
     },
   );
+
+  it("offers the feature list when the row allows one", async () => {
+    const onOpenFeatureList = vi.fn();
+    render(
+      <LayerActionsMenu
+        layerName={LAYER_NAME}
+        onRename={vi.fn()}
+        onDuplicate={vi.fn()}
+        onZoomToLayer={vi.fn()}
+        onDelete={vi.fn()}
+        onOpenFeatureList={onOpenFeatureList}
+      />,
+    );
+
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "More actions for the layer Population",
+      }),
+    );
+    fireEvent.click(
+      await screen.findByRole("menuitem", {
+        name: "Feature list",
+        hidden: true,
+      }),
+    );
+
+    expect(onOpenFeatureList).toHaveBeenCalledOnce();
+  });
 });

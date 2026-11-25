@@ -1,9 +1,9 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { DetailLedger } from "./DetailLedger";
+import { DetailLedger } from "./DetailLedger/DetailLedger";
 import { DetailRecursion } from "./DetailRecursion";
 import { DetailTrace } from "./DetailTrace";
 import { TraceLegend } from "./TraceLegend";
-import type { GraphicProps } from "../../graphics-common";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./GeometryDetailBudget.schema";
 import type { ReactNode } from "react";
 

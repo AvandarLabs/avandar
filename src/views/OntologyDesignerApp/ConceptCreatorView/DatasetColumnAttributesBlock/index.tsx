@@ -1,5 +1,5 @@
 import { makeSegmentedControlItems, SegmentedControl } from "@avandar/ui";
-import { identity, makeObject, prop, propEq } from "@avandar/utils";
+import { identity, isDefined, makeObject, prop, propEq } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   ActionIcon,
@@ -20,9 +20,10 @@ import { useMap } from "@/lib/hooks/state/useMap";
 import { removeItemWhere } from "@/lib/utils/arrays/removeItemWhere/removeItemWhere";
 import {
   ConceptFormType,
+  ConceptFormValues,
   makeDefaultDatasetColumnAttribute,
 } from "@/views/OntologyDesignerApp/ConceptCreatorView/conceptFormTypes";
-import { DatasetColumnMappingCreator } from "@/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator";
+import { DatasetColumnMappingCreator } from "@/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/DatasetColumnMappingCreator/DatasetColumnMappingCreator";
 import { IdentifierBlock } from "@/views/OntologyDesignerApp/ConceptCreatorView/DatasetColumnAttributesBlock/IdentifierBlock/index";
 import type { DatasetWithColumns } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
@@ -34,6 +35,43 @@ type Props = {
   conceptId: ConceptId;
   conceptName: string;
 };
+
+/** The ids of the columns picked as the ID of their dataset. */
+function _getIdentifierColumnIds(
+  sourceDatasets: ConceptFormValues["sourceDatasets"],
+): ReadonlySet<DatasetColumnId> {
+  return new Set(
+    sourceDatasets.map(prop("primaryKeyColumnId")).filter(isDefined),
+  );
+}
+
+/**
+ * Sets every field that is an ID column or the title to keep one value, with
+ * no period or date column. The form stores a field's choice even while its
+ * switch is locked, and the ID and the title are keys the case type reads
+ * one value from.
+ */
+function _keepKeyFieldsSingle(conceptForm: ConceptFormType): void {
+  const { datasetColumnAttributes, sourceDatasets, labelAttributeId } =
+    conceptForm.getValues();
+  const identifierColumnIds = _getIdentifierColumnIds(sourceDatasets);
+  datasetColumnAttributes.forEach((attribute, attributeIdx) => {
+    const { datasetColumnId } = attribute.mappings.datasetColumn;
+    const isKey =
+      attribute.id === labelAttributeId ||
+      (datasetColumnId !== undefined &&
+        identifierColumnIds.has(datasetColumnId));
+    if (isKey && (attribute.isArray || attribute.bucketGrain !== undefined)) {
+      const path = `datasetColumnAttributes.${attributeIdx}` as const;
+      conceptForm.setFieldValue(`${path}.isArray`, false);
+      conceptForm.setFieldValue(`${path}.bucketGrain`, undefined);
+      conceptForm.setFieldValue(
+        `${path}.mappings.datasetColumn.bucketColumnId`,
+        undefined,
+      );
+    }
+  });
+}
 
 export function DatasetColumnAttributesBlock({
   conceptForm,
@@ -179,7 +217,30 @@ export function DatasetColumnAttributesBlock({
     updateAttributeToColumnMap,
   ]);
 
-  const { sourceDatasets } = conceptForm.getValues();
+  const { sourceDatasets, labelAttributeId } = conceptForm.getValues();
+
+  // The ID and title selects are uncontrolled, so a pick does not re-render
+  // this block by itself. The watches trigger a re-render and keep the picked
+  // field to one value. The ID columns and the title are read from the form
+  // each render, so a form reset is reflected too.
+  const [, setKeyPickCount] = useState(0);
+  const handleKeyPick = (): void => {
+    _keepKeyFieldsSingle(conceptForm);
+    setKeyPickCount((pickCount) => {
+      return pickCount + 1;
+    });
+  };
+  conceptForm.useFieldWatch("sourceDatasets", handleKeyPick);
+  conceptForm.useFieldWatch("labelAttributeId", handleKeyPick);
+  const identifierColumnIds = _getIdentifierColumnIds(sourceDatasets);
+
+  // The field being configured. Until submit its `dataType` is its column's
+  // type, which decides the value rules it may use.
+  const selectedAttribute = addedAttributes.find((attribute) => {
+    return attribute.id === selectedAttributeId;
+  });
+  const selectedColumnId =
+    selectedAttribute?.mappings.datasetColumn.datasetColumnId;
 
   return (
     <Fieldset legend={t`Fields that come from datasets`}>
@@ -249,16 +310,21 @@ export function DatasetColumnAttributesBlock({
               </ScrollArea>
             )}
           </Stack>
-          {selectedAttributeId ? (
+          {selectedAttribute ? (
             <Box pt="sm">
               <DatasetColumnMappingCreator
+                key={selectedAttribute.id}
                 conceptForm={conceptForm}
                 attributeIdx={addedAttributes.findIndex(
-                  propEq("id", selectedAttributeId),
+                  propEq("id", selectedAttribute.id),
                 )}
-                attributeName={
-                  addedAttributes.find(propEq("id", selectedAttributeId))!.name
+                attributeName={selectedAttribute.name}
+                columnDataType={selectedAttribute.dataType}
+                isIdentifierColumn={
+                  selectedColumnId !== undefined &&
+                  identifierColumnIds.has(selectedColumnId)
                 }
+                isLabelColumn={selectedAttribute.id === labelAttributeId}
               />
             </Box>
           ) : null}

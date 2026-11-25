@@ -30,8 +30,9 @@ export const inputSchema = z
     scenarioCaption: z.string().min(1).max(48),
   })
   .superRefine((input, context) => {
-    const issue = (path: string, message: string) =>
-      context.addIssue({ code: "custom", path: [path], message });
+    const issue = (path: string, message: string) => {
+      return context.addIssue({ code: "custom", path: [path], message });
+    };
 
     [input.carriers, input.parcels].forEach((items) => {
       if (

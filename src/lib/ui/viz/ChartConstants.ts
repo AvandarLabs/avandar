@@ -29,7 +29,10 @@ export const CHART_COLOR_SWATCHES = [
 
 /**
  * Fixed color cycle used for pie, donut, funnel, and radar chart slices.
- * Expressed as Mantine color strings (e.g. `"blue.6"`).
+ * Expressed as Mantine color strings (e.g. `"blue.6"`). Plugin charts read
+ * the same cycle from `SERIES_COLOR_NAMES` in
+ * `packages/web/plugin-ui/src/useChartTheme/useChartTheme.ts`, so keep the
+ * two in step.
  */
 export const CHART_COLORS = [
   "blue.6",
@@ -43,3 +46,14 @@ export const CHART_COLORS = [
   "green.6",
   "pink.6",
 ] as const;
+
+/**
+ * Time zone that query-result dates and timestamps are displayed in.
+ *
+ * DuckDB `DATE` and `TIMESTAMP` values carry no time zone, and DuckDB-Wasm
+ * hands them to JavaScript as epoch milliseconds measured in UTC. Showing them
+ * in the browser's zone moves them: a user in New York saw `2022-01-01` as
+ * `2021-12-31 19:00`. Rendering in UTC shows the wall-clock value that is
+ * stored.
+ */
+export const QUERY_RESULT_TIMEZONE = "UTC";

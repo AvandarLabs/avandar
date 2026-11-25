@@ -1,3 +1,5 @@
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = {
@@ -18,16 +20,20 @@ export function ZoneSurface({
   accent,
   opacity,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g data-lifted-zone={zoneId} transform={`translate(0 ${-lift})`}>
-      <polygon
-        data-zone-shade={zoneId}
-        points={points}
-        fill={accent}
-        fillOpacity={opacity}
-        stroke={accent}
-        strokeWidth={1.5}
-      />
+      <g data-zone-shade={zoneId}>
+        <SketchedShape
+          shape={{ kind: "path", d: `M${points} Z` }}
+          profile={tokens.sketch.shape}
+          fill={accent}
+          fillOpacity={scales.wash(opacity)}
+          stroke={accent}
+          strokeWidth={scales.stroke(tokens.stroke.outline)}
+        />
+      </g>
     </g>
   );
 }

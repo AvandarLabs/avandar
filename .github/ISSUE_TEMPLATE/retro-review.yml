@@ -1,0 +1,46 @@
+name: Retroactive review
+description: >-
+  Record review findings for a feature that reached develop without a pull
+  request review. See docs/reviews/README.md.
+title: "Retro review F<n>: <feature title>"
+labels:
+  - retro-review
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        Each finding links the lines it is about at the pinned commit, so the
+        link keeps pointing at the code that was read. Do not post the
+        details of a security problem someone could exploit today: ask a
+        maintainer for a private way to send it.
+  - type: input
+    id: feature-id
+    attributes:
+      label: Feature ID
+      description: >-
+        The feature's ID in docs/measles-demo/pr-feature-log.md.
+      placeholder: F98
+    validations:
+      required: true
+  - type: input
+    id: pinned-commit
+    attributes:
+      label: Pinned commit
+      description: >-
+        The full commit ID the review reads the code at. Every permalink in
+        the findings uses this commit.
+      placeholder: 0123456789abcdef0123456789abcdef01234567
+    validations:
+      required: true
+  - type: textarea
+    id: findings
+    attributes:
+      label: Findings
+      description: >-
+        One finding per bullet: what is wrong, the impact you expect, and a
+        permalink to the lines at the pinned commit.
+      placeholder: >-
+        - The policy lets any workspace member read restricted rows.
+        https://github.com/AvandarLabs/avandar/blob/<commit>/supabase/schemas/example.sql#L10-L20
+    validations:
+      required: true

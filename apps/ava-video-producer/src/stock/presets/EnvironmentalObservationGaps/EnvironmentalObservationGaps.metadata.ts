@@ -9,7 +9,7 @@ import type {
 export { CONTROLS as controls } from "./EnvironmentalObservationGaps.controls";
 /** Public retrieval metadata contains no private provenance. */
 export const METADATA: StockMetadata = parseStockMetadata(authoredMetadata);
-/** Indexed authored-copy paths used by Lingui content resolution. */
+/** Indexed authored-copy paths. */
 export const DEFAULT_TEXT_PATHS: Array<Array<string | number>> = [
   ["cells", 0, "label"],
   ["cells", 1, "label"],

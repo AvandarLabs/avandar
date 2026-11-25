@@ -1,6 +1,6 @@
-import { LocalChatModel } from "$/models/chat/LocalChatModel/LocalChatModel.ts";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext.ts";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse.ts";
+import type { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes.ts";
 import type { ChatClarifyRequest } from "$/types/chat.types.ts";
 
 /** Compact schema slice sent to offline prompts. */
@@ -13,6 +13,8 @@ export type OfflineChatSchemaColumn = {
   dataset_id: string;
   name: string;
   data_type: string;
+  /** The column's code list. Absent without a dictionary or in an old cache. */
+  codes?: ColumnCodes.Context;
 };
 
 export type OfflineChatSchemaConcept = {
@@ -21,8 +23,22 @@ export type OfflineChatSchemaConcept = {
 };
 
 export type OfflineChatSchemaConceptAttribute = {
+  /** The field's id. Absent in an older cache, which lists the bare name. */
+  id?: string;
   concept_id: string;
   name: string;
+  /** True for a field that keeps every value. Absent in an older cache. */
+  is_array?: boolean;
+  /** The period of a per-period field. Absent in an older cache. */
+  bucket_grain?: string | null;
+  /** The type of one value, or of each period's. Absent in an older cache. */
+  data_type?: string;
+};
+
+export type OfflineChatSchemaConceptStatus = {
+  concept_id: string;
+  name: string;
+  position: number;
 };
 
 export type OfflineChatSchema = {
@@ -30,6 +46,7 @@ export type OfflineChatSchema = {
   columns: readonly OfflineChatSchemaColumn[];
   concepts?: readonly OfflineChatSchemaConcept[];
   conceptAttributes?: readonly OfflineChatSchemaConceptAttribute[];
+  conceptStatuses?: readonly OfflineChatSchemaConceptStatus[];
 };
 
 export type OfflineChatMessage = {
@@ -103,23 +120,18 @@ export type OfflineChatTurnResult = {
 };
 
 /**
- * The chat runtime mode chosen by `resolveChatRuntimeMode`, based on
- * connectivity, what's downloaded, and whether the cloud request failed. It
- * enumerates every outcome the offline-capability logic can pick, including
- * staying on the normal cloud path:
+ * The chat runtime mode chosen by `resolveChatRuntimeMode`, based on the
+ * user's offline mode choice, connectivity, whether the offline models are
+ * downloaded, and whether the cloud request failed:
  * - `cloud`: use the normal server-backed chat. The default when online, and
- *   the only non-erroring choice when offline with no local model downloaded.
- * - `local`: run the whole turn on-device with a downloaded WebLLM model.
- *   Chosen when the user selected a downloaded local model, or when the device
- *   is offline and a model is available.
- * - `offer_local_fallback`: online, but the cloud request just failed and a
- *   local model is downloaded, so prompt the user to switch to it.
+ *   the only non-erroring choice when offline without the offline models.
+ * - `local`: run the whole turn on the device with the offline models.
+ *   Chosen when offline mode is on, or when the device is offline and the
+ *   offline models are downloaded.
+ * - `offer_local_fallback`: online, but the cloud request just failed and the
+ *   offline models are downloaded, so offer to answer with them instead.
  */
 export type ChatRuntimeMode =
   | { kind: "cloud" }
-  | {
-      kind: "local";
-      /** When set, overrides the offline settings modal selection. */
-      localChatModelId?: LocalChatModel.Id;
-    }
+  | { kind: "local" }
   | { kind: "offer_local_fallback" };

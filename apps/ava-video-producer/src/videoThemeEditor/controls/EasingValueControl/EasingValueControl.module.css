@@ -1,0 +1,12 @@
+.easingValueControl {
+  display: grid;
+  gap: var(--atlas-space-8);
+}
+
+.easingValueControlBody {
+  align-items: start;
+  display: grid;
+  gap: var(--atlas-space-12);
+  grid-template-columns: 96px minmax(0, 1fr);
+  padding-inline-start: var(--atlas-space-12);
+}

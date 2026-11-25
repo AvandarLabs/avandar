@@ -1,5 +1,5 @@
-import { ramp } from "../../../motion";
 import { ObjectGlyph } from "../../primitives/ObjectGlyph/ObjectGlyph";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { SceneLabel } from "./SceneLabel";
 import type { Input } from "./ColdChainCustody.schema";
 import type { ReactNode } from "react";
@@ -11,30 +11,36 @@ export function CustodyStops({
   frame,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   return (
     <g>
-      {input.stops.map((stop, index) => (
-        <g key={stop.id} opacity={ramp(frame, 12 + index * 2, 12)}>
-          <ObjectGlyph
-            kind={
-              stop.kind === "vehicle" || stop.kind === "courier"
-                ? "device"
-                : "building"
-            }
-            x={180 + index * 230}
-            y={110}
-            size={32}
-            color={accent}
-          />
-          <SceneLabel
-            text={stop.label}
-            x={200 + index * 230}
-            y={100}
-            width={220}
-            lines={3}
-          />
-        </g>
-      ))}
+      {input.stops.map((stop, index) => {
+        return (
+          <g
+            key={stop.id}
+            opacity={motion.reveal(frame, 12 + index * motion.scaleStagger(2))}
+          >
+            <ObjectGlyph
+              kind={
+                stop.kind === "vehicle" || stop.kind === "courier"
+                  ? "device"
+                  : "building"
+              }
+              x={180 + index * 230}
+              y={110}
+              size={32}
+              color={accent}
+            />
+            <SceneLabel
+              text={stop.label}
+              x={200 + index * 230}
+              y={100}
+              width={220}
+              lines={3}
+            />
+          </g>
+        );
+      })}
     </g>
   );
 }

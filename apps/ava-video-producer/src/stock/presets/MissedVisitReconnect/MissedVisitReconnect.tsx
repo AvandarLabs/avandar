@@ -1,41 +1,43 @@
-import { EASE, mix, ramp } from "../../../motion";
-import { type GraphicProps } from "../../graphics-common";
+import { Motion } from "../../../motion";
 import { PersonGlyph } from "../../primitives/PersonGlyph/PersonGlyph";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { ReconnectCase } from "./ReconnectCase";
 import { ReconnectLedger } from "./ReconnectLedger";
 import { ReconnectSetting } from "./ReconnectSetting";
+import type { VideoMotion } from "../../../videoTheme/makeVideoMotionFromTokens/makeVideoMotionFromTokens";
+import type { GraphicProps } from "../../graphics-common/graphicCommon.types";
 import type { Input } from "./MissedVisitReconnect.schema";
 import type { ReactNode } from "react";
 
-type Props = GraphicProps & { input: Input };
+type Props = GraphicProps & {
+  input: Input;
+};
 /** A worker contacts the fixed group; only attended people enter the clinic. */
 export function MissedVisitReconnect({
   frame,
   accent,
   input,
 }: Readonly<Props>): ReactNode {
-  const workerPosition = input.cases.reduce(
-    (position, _, index) =>
-      mix(
-        ramp(frame, 39 + index * 9, 7, EASE.inOut),
-        position,
-        160 + index * 48,
-      ),
-    160,
-  );
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const workerPosition = _getWorkerY({ input, frame, motion });
   return (
     <g>
       <ReconnectSetting input={input} />
-      {input.cases.map((item, index) => (
-        <ReconnectCase
-          key={item.id}
-          item={item}
-          index={index}
-          frame={frame}
-          accent={accent}
-        />
-      ))}
-      <g data-worker="outreach" opacity={ramp(frame, 39, 8)}>
+      {input.cases.map((item, index) => {
+        return (
+          <ReconnectCase
+            key={item.id}
+            item={item}
+            index={index}
+            frame={frame}
+            accent={accent}
+          />
+        );
+      })}
+      <g
+        data-worker="outreach"
+        opacity={motion.ramp(frame, 39, motion.whip, motion.reveal.easing)}
+      >
         <PersonGlyph
           x={350}
           y={workerPosition}
@@ -47,4 +49,27 @@ export function MissedVisitReconnect({
       <ReconnectLedger input={input} frame={frame} />
     </g>
   );
+}
+/** The worker stepping down to each case in turn. */
+function _getWorkerY({
+  input,
+  frame,
+  motion,
+}: Readonly<{
+  input: Input;
+  frame: number;
+  motion: VideoMotion;
+}>): number {
+  return input.cases.reduce((position, _, index) => {
+    return Motion.mix({
+      t: motion.ramp(
+        frame,
+        39 + index * motion.scaleStagger(9),
+        motion.scale(7),
+        motion.travel.easing,
+      ),
+      from: position,
+      to: 160 + index * 48,
+    });
+  }, 160);
 }

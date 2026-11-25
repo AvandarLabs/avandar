@@ -1,0 +1,17 @@
+{
+  "label": "attach-dictionaries:agent-mentions",
+  "questionCount": 7,
+  "passCount": 7,
+  "needlessQuestions": 0,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 7,
+  "promptTokens": 27923,
+  "cachedPromptTokens": 27498,
+  "completionTokens": 2056,
+  "totalCost": 0.0013554049999999998,
+  "costPerQuestion": 0.00019362928571428568,
+  "latencyMedianMs": 2102.235166,
+  "latencyP90Ms": 2659.8380829999996,
+  "failedIds": []
+}

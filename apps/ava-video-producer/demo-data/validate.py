@@ -1,6 +1,20 @@
 #!/usr/bin/env python3
 """Validate exported fixture integrity independently of the generation formulas."""
 
+import sys
+
+# Public CLI routing precedes license reads, fixture reads and writes.
+if __name__ == "__main__":
+    import os
+    import sys
+    import subprocess
+    from pathlib import Path
+    if os.environ.get("AVA_PRODUCER_ACTIVE_PYTHON") != str(Path(__file__).resolve()):
+        launcher = Path(__file__).resolve().parent.parent / "scripts/runProducerCommand/runPythonCommand.mjs"
+        raise SystemExit(subprocess.call(["node", str(launcher), "data:validate", str(Path(__file__).resolve()), *sys.argv[1:]]))
+
+
+
 import csv
 import hashlib
 import json
@@ -96,10 +110,10 @@ def main():
         rows = tables[Path(file["path"]).stem]
         require(len(rows) == file["rows"] and list(rows[0]) == file["columns"], "Manifest schema/count mismatch")
         require(all(not value.startswith(("=", "+", "@")) for row in rows for value in row.values()), "Unexpected spreadsheet formula input")
-    print(f"Validated: {len(cases)} cases, {len(visits)} visits, {len(facilities)} facilities, {len(districts)} districts, 36 weekly reports; 19 awaiting contact; 2 missing reports.")
+    print(f"Validated: {len(cases)} cases, {len(visits)} visits, {len(facilities)} facilities, {len(districts)} districts, 36 weekly reports; 19 awaiting contact; 2 missing reports.", file=sys.stderr)
 
 
 if __name__ == "__main__":
     import subprocess
-    subprocess.run(["node", str(Path(__file__).resolve().parent.parent / "scripts/require-license.mjs")], check=True)
+    subprocess.run(["node", "--import", "tsx", str(Path(__file__).resolve().parent.parent / "scripts/requireLicense.ts")], check=True)
     main()

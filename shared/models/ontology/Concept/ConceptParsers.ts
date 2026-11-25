@@ -13,6 +13,7 @@ import type {
   ConceptId,
   ConceptModel,
 } from "$/models/ontology/Concept/Concept.types.ts";
+import type { ConceptStatusId } from "$/models/ontology/ConceptStatus/ConceptStatus.types.ts";
 import type { UserId } from "$/models/User/User.types.ts";
 import type { Workspace } from "$/models/Workspace/Workspace.ts";
 import type { Expect } from "@avandar/utils";
@@ -27,6 +28,7 @@ const DBReadSchema = z.object({
   workspace_id: z.string().uuid(),
   updated_at: z.string().datetime({ offset: true }),
   allow_manual_creation: z.boolean(),
+  default_status_id: z.string().uuid(),
 });
 
 export const ConceptParsers = makeParserRegistry<ConceptModel>().build({
@@ -39,6 +41,7 @@ export const ConceptParsers = makeParserRegistry<ConceptModel>().build({
       return Model.make("Concept", {
         ...obj,
         id: obj.id as ConceptId,
+        defaultStatusId: obj.defaultStatusId as ConceptStatusId,
         ownerId: obj.ownerId as UserId,
         workspaceId: obj.workspaceId as Workspace.Id,
       });
@@ -62,7 +65,7 @@ export const ConceptParsers = makeParserRegistry<ConceptModel>().build({
  * Do not remove these tests!
  */
 type CrudTypes = ConceptModel;
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// oxlint-disable-next-line typescript/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [
   // Check that the DBReadSchema is consistent with the DBRead type.

@@ -1,56 +1,71 @@
-import { mantineColorVar, Tooltip } from "@avandar/ui";
+import { Tooltip } from "@avandar/ui";
 import { Trans, useLingui } from "@lingui/react/macro";
-import { ActionIcon, Button, Group, Text } from "@mantine/core";
-import { IconSparkles, IconX } from "@tabler/icons-react";
+import { ActionIcon, Group, Stack, Title } from "@mantine/core";
+import {
+  IconLayoutSidebarRightCollapse,
+  IconMessagePlus,
+} from "@tabler/icons-react";
 import css from "./ChatPanelHeader.module.css";
+import type { ReactNode } from "react";
 
 type Props = {
   onNewChatClick: () => void;
   onClose: () => void;
+  children?: ReactNode;
 };
 
 /**
- * Title row for the chat panel: Ask Avandar, New chat, and Close.
+ * Header band for Ask Avandar, its panel actions, and chat-session navigation.
  */
 export function ChatPanelHeader({
   onNewChatClick,
   onClose,
+  children,
 }: Readonly<Props>): React.ReactNode {
   const { t } = useLingui();
   return (
-    <Group
-      px="md"
-      py="sm"
-      justify="space-between"
-      className={css.chatPanelHeader}
-    >
-      <Group gap="xs">
-        <IconSparkles size={16} color={mantineColorVar("primary.6")} />
-        <Text size="sm" fw={600} c="neutral.9">
+    <Stack gap={0} className={css.chatPanelHeader}>
+      <Group
+        ps="md"
+        pe="xs"
+        py="xxs"
+        gap="xs"
+        wrap="nowrap"
+        justify="space-between"
+      >
+        <Title order={2} size="sm" fw={500} c="neutral.9">
           <Trans>Ask Avandar</Trans>
-        </Text>
+        </Title>
+        <Group gap="xxs" wrap="nowrap">
+          <Tooltip label={t`New chat`}>
+            <ActionIcon
+              variant="subtle"
+              size="md"
+              color="neutral"
+              onClick={onNewChatClick}
+              aria-label={t`New chat`}
+            >
+              <IconMessagePlus size={18} aria-hidden />
+            </ActionIcon>
+          </Tooltip>
+          <Tooltip label={t`Close panel (⌘/)`}>
+            <ActionIcon
+              variant="subtle"
+              size="md"
+              color="neutral"
+              onClick={onClose}
+              aria-label={t`Close chat panel`}
+            >
+              <IconLayoutSidebarRightCollapse
+                size={18}
+                aria-hidden
+                className={css.chatPanelHeaderCloseIcon}
+              />
+            </ActionIcon>
+          </Tooltip>
+        </Group>
       </Group>
-      <Group gap="xs" wrap="nowrap">
-        <Button
-          variant="outline"
-          size="compact-sm"
-          color="neutral"
-          onClick={onNewChatClick}
-        >
-          <Trans>New chat</Trans>
-        </Button>
-        <Tooltip label={t`Close panel (⌘/)`}>
-          <ActionIcon
-            variant="subtle"
-            size="sm"
-            color="neutral"
-            onClick={onClose}
-            aria-label={t`Close chat panel`}
-          >
-            <IconX size={16} aria-hidden />
-          </ActionIcon>
-        </Tooltip>
-      </Group>
-    </Group>
+      {children}
+    </Stack>
   );
 }

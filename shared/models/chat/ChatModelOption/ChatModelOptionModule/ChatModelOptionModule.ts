@@ -24,6 +24,14 @@ import type { ChatModelOption } from "$/models/chat/ChatModelOption/ChatModelOpt
  */
 const CHAT_MODEL_OPTIONS = [
   Model.make("ChatModelOption", {
+    id: "anthropic/claude-haiku-5.5",
+    name: "Anthropic: Claude Haiku 5.5",
+    pickerLabel: "Claude Haiku",
+    supportsTools: true,
+    licenseTier: "proprietary",
+    provider: "anthropic",
+  }),
+  Model.make("ChatModelOption", {
     id: "anthropic/claude-sonnet-5",
     name: "Anthropic: Claude Sonnet 5",
     pickerLabel: "Claude",
@@ -74,12 +82,14 @@ const CHAT_MODEL_OPTIONS = [
 ] as const satisfies readonly ChatModelOption.T[];
 
 /**
- * Model used when the client sends no selection, or sends one that is not in
- * the catalog. Tool-calling into the Data Explorer is the chat panel's core
- * job, so the default favors reliability there over per-token price.
+ * The model the `chat` edge function answers every chat turn with. Users do
+ * not choose a model, and the server ignores one a client sends. Claude
+ * Haiku 5.5 matched Claude Sonnet 5 on the 45-question eval in
+ * `scripts/ai-eval` at about 1/18th of the cost (decision D31 in
+ * `docs/ai-agent/decisions.md`).
  */
 const DEFAULT_CHAT_MODEL_ID: (typeof CHAT_MODEL_OPTIONS)[number]["id"] =
-  "anthropic/claude-sonnet-5";
+  "anthropic/claude-haiku-5.5";
 
 const CHAT_MODEL_ID_SET = new Set<string>(CHAT_MODEL_OPTIONS.map(prop("id")));
 
@@ -101,7 +111,7 @@ export const ChatModelOptionModule = {
     /** Cloud models available to clients and edge-function validation. */
     values: CHAT_MODEL_OPTIONS,
 
-    /** Model used when a client has no valid catalog selection. */
+    /** The model the `chat` edge function uses for every chat turn. */
     defaultId: DEFAULT_CHAT_MODEL_ID,
 
     /** Returns whether an id belongs to the cloud model catalog. */

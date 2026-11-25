@@ -1,0 +1,17 @@
+{
+  "label": "phase-1d:rerun-p04",
+  "questionCount": 1,
+  "passCount": 0,
+  "needlessQuestions": 0,
+  "missedQuestions": 1,
+  "consentPrompts": 0,
+  "modelCalls": 1,
+  "promptTokens": 5636,
+  "cachedPromptTokens": 5632,
+  "completionTokens": 369,
+  "totalCost": 0.00024122,
+  "costPerQuestion": 0.00024122,
+  "latencyMedianMs": 2210.7557090000005,
+  "latencyP90Ms": 2210.7557090000005,
+  "failedIds": ["P04"]
+}

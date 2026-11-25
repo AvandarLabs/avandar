@@ -20,9 +20,22 @@ export type ChatRuntimeCopy = OfflineChatPipelineCopy & {
   sqlQueryFailed: string;
   /** The SQL was applied but no query outcome was observed. */
   sqlQueryApplied: string;
+  /**
+   * The model offered a block, such as a heading, that only a dashboard can
+   * hold, while the user is in the Data Explorer.
+   */
+  dashboardOnlyBlock: string;
   fallbackTitle: string;
   fallbackMessage: string;
+  /** The button that answers the failed message offline. */
+  fallbackAction: string;
   contextWindowExceeded: string;
+  /** The agent's reply when the proxy refuses the user's role. */
+  agentAccessDenied: string;
+  /** The agent's reply when a turn fails and cannot be answered offline. */
+  agentUnavailable: string;
+  /** The agent's reply when a dashboard chart's query kept failing. */
+  chartNotBuilt: string;
 };
 
 /**
@@ -43,12 +56,25 @@ export function chatMessagesKey(
 }
 
 /**
- * Maps a previously-returned `ChatResponse` to the compact retry
- * context shape the backend wants. Returns `undefined` when the
- * previous turn produced nothing worth telling the model about.
+ * The four fields of a response that a retry context describes.
+ * `ChatResponse.T` has them, and so does the eval's response from today's
+ * chat.
+ */
+export type RetryContextSource = {
+  assistantText?: string;
+  generatedSql?: { sql: string };
+  clarification?: { question: string };
+  dashboardBlock?: { kind: string };
+};
+
+/**
+ * Maps a previously-returned response (any `RetryContextSource`, such as a
+ * `ChatResponse.T`) to the compact retry context shape the backend wants.
+ * Returns `undefined` when the previous turn produced nothing worth telling
+ * the model about.
  */
 export function buildRetryContext(
-  response: ChatResponse.T,
+  response: Readonly<RetryContextSource>,
 ): ChatRetryContext | undefined {
   const retryContext: ChatRetryContext = {
     ...(response.assistantText?.trim()

@@ -17,13 +17,15 @@ test("bounded interpolation keeps exact endpoints and finite convex values acros
   );
   assert.equal(interpolateFiniteRange({ from: 2, to: 10, progress: 0.25 }), 4);
   assert.equal(interpolateFiniteRange({ from: 5, to: 5, progress: 0.5 }), 5);
-  Array.from({ length: 101 }, (_, index) => index / 100).forEach((progress) =>
-    assert.ok(
+  Array.from({ length: 101 }, (_, index) => {
+    return index / 100;
+  }).forEach((progress) => {
+    return assert.ok(
       Number.isFinite(
         interpolateFiniteRange({ from: 1e308, to: Number.MAX_VALUE, progress }),
       ),
-    ),
-  );
+    );
+  });
 });
 [
   {
@@ -69,5 +71,9 @@ test("interpolation rejects nonfinite endpoints and progress outside its bounded
     { from: 0, to: 1, progress: 1.1 },
     { from: Infinity, to: 1, progress: 0 },
     { from: 0, to: 1, progress: NaN },
-  ].forEach((input) => assert.throws(() => interpolateFiniteRange(input)));
+  ].forEach((input) => {
+    return assert.throws(() => {
+      return interpolateFiniteRange(input);
+    });
+  });
 });

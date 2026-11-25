@@ -1,0 +1,59 @@
+import { Trans } from "@lingui/react/macro";
+import { Table } from "@mantine/core";
+import { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
+import { ValueSideHeading } from "@/components/dataDictionaries/ValueSideHint/ValueSideHeading";
+import { LabelValueRow } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/LabelValueRow";
+import { MissingValueHeader } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/LabelValuesStep/MissingValueHeader";
+import type { NewDictionaryAction } from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
+import type { Dispatch, ReactNode } from "react";
+
+type Props = {
+  codeList: DictionaryProposal.CodeList;
+  labels: DictionaryProposal.Labels;
+  dispatch: Dispatch<NewDictionaryAction>;
+};
+
+/** One code list's values, each with its rows, target, and missing flag. */
+export function LabelValuesTable({
+  codeList,
+  labels,
+  dispatch,
+}: Readonly<Props>): ReactNode {
+  const codeListKey = codeList.key;
+  return (
+    <Table verticalSpacing="xs" maw={760}>
+      <Table.Thead>
+        <Table.Tr>
+          <Table.Th w={160}>
+            <ValueSideHeading side="source" />
+          </Table.Th>
+          <Table.Th w={90} ta="right">
+            <Trans>Rows</Trans>
+          </Table.Th>
+          <Table.Th>
+            <ValueSideHeading side="target" />
+          </Table.Th>
+          <Table.Th w={150}>
+            <MissingValueHeader />
+          </Table.Th>
+        </Table.Tr>
+      </Table.Thead>
+      <Table.Tbody>
+        {codeList.values.map((item) => {
+          return (
+            <LabelValueRow
+              key={item.value}
+              item={item}
+              codeListKey={codeListKey}
+              label={DictionaryProposal.getValueLabel(labels, {
+                codeListKey,
+                code: item.value,
+              })}
+              dispatch={dispatch}
+            />
+          );
+        })}
+      </Table.Tbody>
+    </Table>
+  );
+}

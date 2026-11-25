@@ -1,5 +1,5 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./DisclosureAperture.schema";
 import type { ReactNode } from "react";
 
@@ -9,6 +9,7 @@ type Props = { input: Input };
  * wording.
  */
 export function DisclosureCopy({ input }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
   if (!input.showLabels) {
     return undefined;
   }
@@ -24,18 +25,20 @@ export function DisclosureCopy({ input }: Readonly<Props>): ReactNode {
   ];
   return (
     <g>
-      {captions.map(({ text, x, y, width }) => (
-        <FitText
-          key={x + y}
-          {...{ text, x, y, width }}
-          fontSize={14}
-          maxLines={2}
-          anchor="middle"
-          normalizeWhitespace
-          breakLongWords
-          color={STOCK.muted}
-        />
-      ))}
+      {captions.map(({ text, x, y, width }) => {
+        return (
+          <FitText
+            key={x + y}
+            {...{ text, x, y, width }}
+            fontSize={14}
+            maxLines={2}
+            anchor="middle"
+            normalizeWhitespace
+            breakLongWords
+            color={tokens.color.textMuted}
+          />
+        );
+      })}
     </g>
   );
 }

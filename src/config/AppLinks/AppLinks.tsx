@@ -27,7 +27,7 @@ export type AppLink<
 
 type AppLinksRecord = Record<
   string,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // oxlint-disable-next-line typescript/no-explicit-any
   AppLink | ((params: any) => AppLink)
 >;
 
@@ -123,6 +123,99 @@ export const AppLinks = {
       label: () => {
         return datasetName;
       },
+      isAvailableOffline: true,
+    };
+  },
+  dataManagerApplyDictionaries: ({
+    workspaceSlug,
+    datasetId,
+  }: {
+    workspaceSlug: string;
+    datasetId: string;
+  }) => {
+    return {
+      key: "data-manager-apply-dictionaries",
+      to: "/$workspaceSlug/data-manager/$datasetId/apply-dictionaries",
+      params: { workspaceSlug, datasetId },
+      label: (): string => {
+        return t`Apply dictionaries`;
+      },
+      // Matching runs on the device. Only attaching needs a connection, and
+      // the Attach step gates that button itself.
+      isAvailableOffline: true,
+    };
+  },
+  dataManagerDictionaryView: ({
+    workspaceSlug,
+    dictionaryId,
+    dictionaryName,
+  }: {
+    workspaceSlug: string;
+    dictionaryId: string;
+    dictionaryName: string;
+  }) => {
+    return {
+      key: "data-manager-dictionary-view",
+      to: "/$workspaceSlug/data-manager/dictionaries/$dictionaryId",
+      params: {
+        workspaceSlug,
+        dictionaryId,
+      },
+      label: () => {
+        return dictionaryName;
+      },
+      isAvailableOffline: true,
+    };
+  },
+  dataManagerNewDictionary: (workspaceSlug: string) => {
+    return {
+      key: "data-manager-new-dictionary",
+      to: "/$workspaceSlug/data-manager/dictionaries/new",
+      params: { workspaceSlug },
+      label: (): string => {
+        return t`New dictionary`;
+      },
+      // Reading datasets and labeling work offline. Only saving needs a
+      // connection, and the Save step gates that button itself.
+      isAvailableOffline: true,
+    };
+  },
+  dataManagerNewCrosswalk: (workspaceSlug: string) => {
+    return {
+      key: "data-manager-new-crosswalk",
+      to: "/$workspaceSlug/data-manager/crosswalks/new",
+      params: { workspaceSlug },
+      label: (): string => {
+        return t`New crosswalk`;
+      },
+      // Choosing datasets and grouping layouts run on the device. Only
+      // saving needs a connection, and saving says so when offline.
+      isAvailableOffline: true,
+    };
+  },
+  dataManagerCrosswalkView: ({
+    workspaceSlug,
+    crosswalkId,
+    crosswalkName,
+    step,
+    layoutId,
+  }: {
+    workspaceSlug: string;
+    crosswalkId: string;
+    crosswalkName: string;
+    step?: "datasets" | "map" | "combine";
+    layoutId?: string;
+  }) => {
+    return {
+      key: "data-manager-crosswalk-view",
+      to: "/$workspaceSlug/data-manager/crosswalks/$crosswalkId",
+      params: { workspaceSlug, crosswalkId },
+      search: { step, layoutId },
+      label: () => {
+        return crosswalkName;
+      },
+      // A crosswalk read from the persisted cache can be mapped offline.
+      // Saving says so when there is no connection.
       isAvailableOffline: true,
     };
   },
@@ -244,6 +337,17 @@ export const AppLinks = {
   },
 
   // Individual Manager links
+  assignedToMe: (workspaceSlug: string) => {
+    return {
+      key: "assigned-to-me",
+      to: "/$workspaceSlug/individual-manager/assigned",
+      params: { workspaceSlug },
+      label: (): string => {
+        return t`Assigned to me`;
+      },
+      isAvailableOffline: false,
+    };
+  },
   individualManagerHome: ({
     workspaceSlug,
     conceptId,

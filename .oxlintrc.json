@@ -1,0 +1,473 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["eslint", "import", "react", "jsx-a11y", "typescript"],
+  "jsPlugins": [
+    {
+      "name": "eslint-js",
+      "specifier": "oxlint-plugin-eslint"
+    },
+    {
+      "name": "react-js",
+      "specifier": "eslint-plugin-react"
+    },
+    {
+      "name": "react-refresh",
+      "specifier": "eslint-plugin-react-refresh"
+    },
+    "@tanstack/eslint-plugin-query",
+    "@tanstack/eslint-plugin-router",
+    {
+      "name": "video-producer",
+      "specifier": "./eslint/video-producer-function-length.js"
+    },
+    {
+      "name": "video-theme",
+      "specifier": "./eslint/video-theme-restrictions.js"
+    },
+    {
+      "name": "plugin-restrictions",
+      "specifier": "./eslint/plugin-restrictions.js"
+    }
+  ],
+  "categories": {
+    "correctness": "off"
+  },
+  "env": {
+    "builtin": true
+  },
+  "settings": {
+    "react": {
+      "version": "19.2.5"
+    }
+  },
+  "ignorePatterns": [
+    "**/dist/**",
+    ".agents/**",
+    ".claude",
+    ".claude/**",
+    ".cursor",
+    ".cursor/**",
+    ".opencode",
+    ".opencode/**",
+    ".playwright-mcp/**",
+    "agent-skills/**",
+    "apps/desktop/build/**",
+    "**/.videos/**",
+    "apps/ava-video-producer/out/**",
+    "apps/ava-video-producer/src/avandar/generated/**",
+    "apps/desktop/bundle/**",
+    "apps/desktop/.electrobun-cache/**",
+    "playwright-report/**",
+    "**/locales/**/messages.ts",
+    "**/.temp/**",
+    "**/.superpowers/**",
+    "supabase/.temp/**",
+    "dist",
+    "shared/types/database.types.ts",
+    "src/i18n/locales/*/messages.ts"
+  ],
+  "rules": {
+    "@tanstack/router/create-route-property-order": "warn",
+    "@tanstack/router/route-param-names": "error",
+    "@tanstack/query/exhaustive-deps": "error",
+    "@tanstack/query/no-rest-destructuring": "warn",
+    "@tanstack/query/stable-query-client": "error",
+    "@tanstack/query/no-unstable-deps": "error",
+    "@tanstack/query/infinite-query-property-order": "error",
+    "@tanstack/query/no-void-query-fn": "error",
+    "@tanstack/query/mutation-property-order": "error",
+    "import/default": "error",
+    "import/export": "error",
+    "import/named": "error",
+    "import/namespace": "error",
+    "import/no-named-as-default": "warn",
+    "import/no-named-as-default-member": "warn",
+    "import/no-duplicates": "warn",
+    "eslint-js/max-len": [
+      "error",
+      {
+        "code": 80,
+        "tabWidth": 2,
+        "comments": 80,
+        "ignorePattern": "^import\\s.+\\sfrom\\s.+;$",
+        "ignoreUrls": true,
+        "ignoreStrings": true,
+        "ignoreRegExpLiterals": true,
+        "ignoreTemplateLiterals": true
+      }
+    ],
+    "eslint-js/no-octal": "error"
+  },
+  "overrides": [
+    {
+      "files": ["**/*.{js,jsx,ts,tsx}"],
+      "rules": {
+        "constructor-super": "off",
+        "for-direction": "error",
+        "getter-return": "off",
+        "no-async-promise-executor": "error",
+        "no-case-declarations": "error",
+        "no-class-assign": "off",
+        "no-compare-neg-zero": "error",
+        "no-cond-assign": "error",
+        "no-const-assign": "off",
+        "no-constant-binary-expression": "error",
+        "no-constant-condition": "error",
+        "no-control-regex": "error",
+        "no-debugger": "error",
+        "no-delete-var": "error",
+        "no-dupe-class-members": "off",
+        "no-dupe-else-if": "error",
+        "no-dupe-keys": "off",
+        "no-duplicate-case": "error",
+        "no-empty": "error",
+        "no-empty-character-class": "error",
+        "no-empty-pattern": "error",
+        "no-empty-static-block": "error",
+        "no-ex-assign": "error",
+        "no-extra-boolean-cast": "error",
+        "no-fallthrough": "error",
+        "no-func-assign": "off",
+        "no-global-assign": "error",
+        "no-import-assign": "off",
+        "no-invalid-regexp": "error",
+        "no-irregular-whitespace": "error",
+        "no-loss-of-precision": "error",
+        "no-misleading-character-class": "error",
+        "no-new-native-nonconstructor": "off",
+        "no-nonoctal-decimal-escape": "error",
+        "no-obj-calls": "off",
+        "no-prototype-builtins": "error",
+        "no-redeclare": "off",
+        "no-regex-spaces": "error",
+        "no-self-assign": "error",
+        "no-setter-return": "off",
+        "no-shadow-restricted-names": "error",
+        "no-sparse-arrays": "error",
+        "no-this-before-super": "off",
+        "no-unreachable": "off",
+        "no-unsafe-finally": "error",
+        "no-unsafe-negation": "off",
+        "no-unsafe-optional-chaining": "error",
+        "no-unused-labels": "error",
+        "no-unused-private-class-members": "error",
+        "no-unused-vars": "off",
+        "no-useless-backreference": "error",
+        "no-useless-catch": "error",
+        "no-useless-escape": "error",
+        "no-with": "off",
+        "require-yield": "error",
+        "use-isnan": "error",
+        "valid-typeof": "error",
+        "no-var": "error",
+        "prefer-const": "error",
+        "prefer-rest-params": "error",
+        "prefer-spread": "error",
+        "no-array-constructor": "error",
+        "no-unused-expressions": "error",
+        "typescript/ban-ts-comment": "error",
+        "typescript/no-duplicate-enum-values": "error",
+        "typescript/no-empty-object-type": "error",
+        "typescript/no-explicit-any": "error",
+        "typescript/no-extra-non-null-assertion": "error",
+        "typescript/no-misused-new": "error",
+        "typescript/no-namespace": "error",
+        "typescript/no-non-null-asserted-optional-chain": "error",
+        "typescript/no-require-imports": "error",
+        "typescript/no-this-alias": "error",
+        "typescript/no-unnecessary-type-constraint": "error",
+        "typescript/no-unsafe-declaration-merging": "error",
+        "typescript/no-unsafe-function-type": "error",
+        "typescript/no-wrapper-object-types": "error",
+        "typescript/prefer-as-const": "error",
+        "typescript/prefer-namespace-keyword": "error",
+        "typescript/triple-slash-reference": "error",
+        "arrow-body-style": ["error", "always"],
+        "react/function-component-definition": "off",
+        "react-js/function-component-definition": [
+          "error",
+          {
+            "namedComponents": "function-declaration",
+            "unnamedComponents": "arrow-function"
+          }
+        ],
+        "react/jsx-filename-extension": [
+          "warn",
+          {
+            "extensions": [".tsx", ".jsx"]
+          }
+        ],
+        "react/react-in-jsx-scope": "off",
+        "jsx-a11y/anchor-is-valid": [
+          "error",
+          {
+            "components": ["Link"],
+            "specialLink": ["to"]
+          }
+        ],
+        "jsx-a11y/label-has-associated-control": [
+          "error",
+          {
+            "labelComponents": ["LabelWrapper"],
+            "labelAttributes": ["label"],
+            "controlComponents": []
+          }
+        ],
+        "no-shadow": "error",
+        "curly": "off",
+        "prefer-template": "off",
+        "typescript/consistent-type-imports": "off",
+        "import/extensions": [
+          "error",
+          "ignorePackages",
+          {
+            "js": "never",
+            "jsx": "never",
+            "ts": "never",
+            "tsx": "never"
+          }
+        ],
+        "import/no-duplicates": "error",
+        "import/newline-after-import": [
+          "error",
+          {
+            "count": 1
+          }
+        ],
+        "import/no-default-export": "off",
+        "import/prefer-default-export": "off",
+        "react/rules-of-hooks": "error",
+        "react/exhaustive-deps": "error",
+        "react-refresh/only-export-components": [
+          "warn",
+          {
+            "allowConstantExport": true
+          }
+        ],
+        "typescript/explicit-module-boundary-types": "error",
+        "typescript/array-type": [
+          "error",
+          {
+            "default": "array-simple"
+          }
+        ]
+      },
+      "env": {
+        "browser": true,
+        "es2024": true,
+        "node": true
+      }
+    },
+    {
+      "files": ["supabase/functions/**/*.ts"],
+      "rules": {
+        "import/extensions": "off"
+      }
+    },
+    {
+      "files": ["shared/**/*.{ts,tsx}", "packages/shared/**/*.{ts,tsx}"],
+      "rules": {
+        "import/extensions": [
+          "error",
+          "ignorePackages",
+          {
+            "js": "always",
+            "jsx": "always",
+            "ts": "always",
+            "tsx": "always",
+            "checkTypeImports": true
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "supabase/**/*.{js,jsx,ts,tsx}",
+        "shared/**/*.{js,jsx,ts,tsx}",
+        "packages/shared/**/*.{js,jsx,ts,tsx}"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "@avandar/etl",
+                "message": "Deno-allowable code: @avandar/etl is Node-only and is not in the deno.json import maps."
+              },
+              {
+                "name": "@avandar/query-hooks",
+                "message": "Deno-allowable code: @avandar/query-hooks is browser-only and is not in the deno.json import maps."
+              },
+              {
+                "name": "@avandar/browser-utils",
+                "message": "Deno-allowable code: @avandar/browser-utils is browser-only and is not in the deno.json import maps."
+              },
+              {
+                "name": "@avandar/hooks",
+                "message": "Deno-allowable code: @avandar/hooks is browser-only and is not in the deno.json import maps."
+              },
+              {
+                "name": "@avandar/ui",
+                "message": "Deno-allowable code: @avandar/ui is browser-only and is not in the deno.json import maps."
+              },
+              {
+                "name": "@avandar/plugin-sdk",
+                "message": "Deno-allowable code: @avandar/plugin-sdk is browser-only and is not in the deno.json import maps."
+              },
+              {
+                "name": "@avandar/plugin-ui",
+                "message": "Deno-allowable code: @avandar/plugin-ui is browser-only and is not in the deno.json import maps."
+              }
+            ],
+            "patterns": [
+              {
+                "regex": "^\\.{1,2}/",
+                "message": "Deno-allowable code: this file may run under Deno; use absolute path-alias imports instead of relative imports (no ./ or ../)."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["packages/**/*.{js,jsx,ts,tsx}"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["@/*", "$/*"],
+                "message": "Publishable packages cannot import app code. `@/*` (src) and `$/*` (shared) resolve here but would be bundled into the published tarball. Move what you need into a package, or take it as a parameter."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["packages/shared/**/*.{js,jsx,ts,tsx}"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "@avandar/etl",
+                "message": "Deno-allowable code: @avandar/etl is Node-only and is not in the deno.json import maps."
+              },
+              {
+                "name": "@avandar/query-hooks",
+                "message": "Deno-allowable code: @avandar/query-hooks is browser-only and is not in the deno.json import maps."
+              },
+              {
+                "name": "@avandar/browser-utils",
+                "message": "Deno-allowable code: @avandar/browser-utils is browser-only and is not in the deno.json import maps."
+              },
+              {
+                "name": "@avandar/hooks",
+                "message": "Deno-allowable code: @avandar/hooks is browser-only and is not in the deno.json import maps."
+              },
+              {
+                "name": "@avandar/ui",
+                "message": "Deno-allowable code: @avandar/ui is browser-only and is not in the deno.json import maps."
+              },
+              {
+                "name": "@avandar/plugin-sdk",
+                "message": "Deno-allowable code: @avandar/plugin-sdk is browser-only and is not in the deno.json import maps."
+              },
+              {
+                "name": "@avandar/plugin-ui",
+                "message": "Deno-allowable code: @avandar/plugin-ui is browser-only and is not in the deno.json import maps."
+              }
+            ],
+            "patterns": [
+              {
+                "regex": "^\\.{1,2}/",
+                "message": "Deno-allowable code: this file may run under Deno; use absolute path-alias imports instead of relative imports (no ./ or ../)."
+              },
+              {
+                "group": ["@/*", "$/*"],
+                "message": "Publishable packages cannot import app code. `@/*` (src) and `$/*` (shared) resolve here but would be bundled into the published tarball. Move what you need into a package, or take it as a parameter."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["**/vitest*.config.ts"],
+      "rules": {
+        "no-restricted-imports": "off"
+      }
+    },
+    {
+      "files": ["tests/e2e/**/*.{ts,tsx}"],
+      "rules": {
+        "react/rules-of-hooks": "off"
+      }
+    },
+    {
+      "files": ["tests/e2e/**/*.fixture.ts"],
+      "rules": {
+        "no-empty-pattern": "off"
+      }
+    },
+    {
+      "files": ["src/**/*.{ts,tsx}"],
+      "excludeFiles": [
+        "src/lib/privacy/decideIfDataCanCrossBoundary.tsx",
+        "src/lib/privacy/sessionSecret.ts",
+        "src/lib/privacy/pendingAcks.ts",
+        "src/lib/privacy/**/*.test.ts"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "@/lib/privacy/sessionSecret",
+                "importNames": ["issueAckToken"],
+                "message": "Privacy chokepoint: ack tokens must only be minted inside decideIfDataCanCrossBoundary.tsx. Route your call through decideIfDataCanCrossBoundary() instead."
+              },
+              {
+                "name": "@/lib/privacy/pendingAcks",
+                "importNames": ["registerAck"],
+                "message": "Privacy chokepoint: pending acks must only be registered inside decideIfDataCanCrossBoundary.tsx. Route your call through decideIfDataCanCrossBoundary() instead."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["**/*.js"],
+      "rules": {
+        "typescript/explicit-module-boundary-types": "off"
+      }
+    },
+    {
+      "files": ["apps/ava-video-producer/**/*.{js,jsx,mjs,ts,tsx}"],
+      "rules": {
+        "video-producer/max-lines-per-function": "error",
+        "video-theme/no-restricted-imports": "error",
+        "video-theme/no-restricted-syntax": "error"
+      }
+    },
+    {
+      "files": ["plugins/**/*.{js,jsx,ts,tsx}"],
+      "excludeFiles": ["plugins/**/*.test.{js,jsx,ts,tsx}"],
+      "rules": {
+        "plugin-restrictions/no-unapproved-imports": "error"
+      }
+    },
+    {
+      "files": ["plugins/**/*.{js,jsx,ts,tsx}"],
+      "rules": {
+        "plugin-restrictions/no-restricted-paths": "error"
+      }
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 /** Tests that each Parquet source type is fetched the way it is today. */
 
+import { MIMEType } from "@avandar/utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createDatasetParquetWrapper } from "@/clients/qetl/wrappers/DatasetParquetWrapper/DatasetParquetWrapper";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -33,16 +34,24 @@ const {
   datasetColumnGetAllMock,
   datasetGetAllMock,
   downloadDatasetMock,
+  getImportJobMock,
+  localDatasetGetByIdMock,
   openDataSourceGetAllMock,
+  pdfSourceGetAllMock,
+  waitForImportMock,
   xlsxSourceGetAllMock,
 } = vi.hoisted(() => {
   return {
+    getImportJobMock: vi.fn(),
+    localDatasetGetByIdMock: vi.fn(),
+    waitForImportMock: vi.fn(),
     catalogEntryGetOneMock: vi.fn(),
     csvSourceGetAllMock: vi.fn(),
     datasetColumnGetAllMock: vi.fn(),
     datasetGetAllMock: vi.fn(),
     downloadDatasetMock: vi.fn(),
     openDataSourceGetAllMock: vi.fn(),
+    pdfSourceGetAllMock: vi.fn(),
     xlsxSourceGetAllMock: vi.fn(),
   };
 });
@@ -79,6 +88,12 @@ vi.mock("@/clients/datasets/source-datasets/XlsxFileDatasetClient", () => {
   };
 });
 
+vi.mock("@/clients/datasets/source-datasets/PdfFileDatasetClient", () => {
+  return {
+    PdfFileDatasetClient: _cachedClient({ getAll: pdfSourceGetAllMock }),
+  };
+});
+
 vi.mock("@/clients/datasets/source-datasets/OpenDataDatasetClient", () => {
   return {
     OpenDataDatasetClient: _cachedClient({ getAll: openDataSourceGetAllMock }),
@@ -91,9 +106,9 @@ vi.mock("@/clients/datasets/DatasetColumnClient", () => {
   };
 });
 
-vi.mock("@/clients/catalog-entries/OpenDataCatalogEntryClient", () => {
+vi.mock("@/clients/data-catalog-listings/DataCatalogListingClient", () => {
   return {
-    OpenDataCatalogEntryClient: { getOne: catalogEntryGetOneMock },
+    DataCatalogListingClient: { getOne: catalogEntryGetOneMock },
   };
 });
 
@@ -105,6 +120,21 @@ vi.mock(
     };
   },
 );
+
+vi.mock("@/clients/datasets/LocalDatasetClient/LocalDatasetClient", () => {
+  return {
+    LocalDatasetClient: { getById: localDatasetGetByIdMock },
+  };
+});
+
+vi.mock("@/clients/datasets/ImportJobsManager", () => {
+  return {
+    ImportJobsManager: {
+      getJob: getImportJobMock,
+      waitForCompletion: waitForImportMock,
+    },
+  };
+});
 
 function _mockDataset(sourceType: Dataset.T["sourceType"]): void {
   // `getAll` resolves a list, matching the shape every caller of this client
@@ -123,10 +153,13 @@ beforeEach(() => {
   vi.clearAllMocks();
   csvSourceGetAllMock.mockResolvedValue([{ datasetId: DATASET_ID }]);
   xlsxSourceGetAllMock.mockResolvedValue([{ datasetId: DATASET_ID }]);
+  pdfSourceGetAllMock.mockResolvedValue([{ datasetId: DATASET_ID }]);
   openDataSourceGetAllMock.mockResolvedValue([
-    { datasetId: DATASET_ID, catalogEntryId: CATALOG_ENTRY_ID },
+    { datasetId: DATASET_ID, catalogListingId: CATALOG_ENTRY_ID },
   ]);
   datasetColumnGetAllMock.mockResolvedValue([]);
+  getImportJobMock.mockReturnValue(undefined);
+  localDatasetGetByIdMock.mockResolvedValue(undefined);
 });
 
 describe("DatasetParquetWrapper", () => {
@@ -184,7 +217,110 @@ describe("DatasetParquetWrapper", () => {
     );
   });
 
-  it("downloads open data from the parquet url its catalog entry names", async () => {
+  it("reads a file kept offline from this device's copy, not storage", async () => {
+    _mockDataset("csv_file");
+    csvSourceGetAllMock.mockResolvedValue([
+      { datasetId: DATASET_ID, isInCloudStorage: false },
+    ]);
+    const localParquet = new Blob(["local-parquet"]);
+    localDatasetGetByIdMock.mockResolvedValue({
+      datasetId: DATASET_ID,
+      parseStatus: "ready",
+      parquetData: localParquet,
+    });
+    const wrapper = createDatasetParquetWrapper();
+
+    const acquired = await wrapper.acquire!(
+      { ref: DATASET_REF, columns: "all" },
+      CONTEXT,
+    );
+
+    expect(localDatasetGetByIdMock).toHaveBeenCalledWith({ id: DATASET_ID });
+    expect(downloadDatasetMock).not.toHaveBeenCalled();
+    expect(acquired.parquetBlob).toBe(localParquet);
+  });
+
+  it("waits for a resumed transcode before reading a file kept offline", async () => {
+    _mockDataset("xlsx_file");
+    xlsxSourceGetAllMock.mockResolvedValue([
+      { datasetId: DATASET_ID, isInCloudStorage: false },
+    ]);
+    const localParquet = new Blob(["local-parquet"]);
+    getImportJobMock.mockReturnValue({ status: "running" });
+    waitForImportMock.mockImplementation(async () => {
+      localDatasetGetByIdMock.mockResolvedValue({
+        datasetId: DATASET_ID,
+        parseStatus: "ready",
+        parquetData: localParquet,
+      });
+    });
+    const wrapper = createDatasetParquetWrapper();
+
+    const acquired = await wrapper.acquire!(
+      { ref: DATASET_REF, columns: "all" },
+      CONTEXT,
+    );
+
+    expect(waitForImportMock).toHaveBeenCalledWith(DATASET_ID);
+    expect(acquired.parquetBlob).toBe(localParquet);
+  });
+
+  it("reads this device's copy when storage has none", async () => {
+    _mockDataset("csv_file");
+    downloadDatasetMock.mockResolvedValue(undefined);
+    const localParquet = new Blob(["local-parquet"]);
+    localDatasetGetByIdMock.mockResolvedValue({
+      datasetId: DATASET_ID,
+      parseStatus: "ready",
+      parquetData: localParquet,
+    });
+    const wrapper = createDatasetParquetWrapper();
+
+    const acquired = await wrapper.acquire!(
+      { ref: DATASET_REF, columns: "all" },
+      CONTEXT,
+    );
+
+    expect(downloadDatasetMock).toHaveBeenCalledTimes(1);
+    expect(acquired.parquetBlob).toBe(localParquet);
+  });
+
+  it("reads this device's copy when the download fails", async () => {
+    _mockDataset("pdf_file");
+    downloadDatasetMock.mockRejectedValue(new Error("Failed to fetch"));
+    const localParquet = new Blob(["local-parquet"]);
+    localDatasetGetByIdMock.mockResolvedValue({
+      datasetId: DATASET_ID,
+      parseStatus: "ready",
+      parquetData: localParquet,
+    });
+    const wrapper = createDatasetParquetWrapper();
+
+    const acquired = await wrapper.acquire!(
+      { ref: DATASET_REF, columns: "all" },
+      CONTEXT,
+    );
+
+    expect(acquired.parquetBlob).toBe(localParquet);
+  });
+
+  it("reports a file kept offline that this device has no copy of", async () => {
+    _mockDataset("csv_file");
+    csvSourceGetAllMock.mockResolvedValue([
+      { datasetId: DATASET_ID, isInCloudStorage: false },
+    ]);
+    localDatasetGetByIdMock.mockResolvedValue(undefined);
+    const wrapper = createDatasetParquetWrapper();
+
+    await expect(
+      wrapper.acquire!({ ref: DATASET_REF, columns: "all" }, CONTEXT),
+    ).rejects.toThrow(
+      `The csv_file dataset '${DATASET_ID}' (cases) is kept offline, and this device has no copy of its rows`,
+    );
+    expect(downloadDatasetMock).not.toHaveBeenCalled();
+  });
+
+  it("downloads open data from the parquet url its catalog listing names", async () => {
     _mockDataset("open_data");
     catalogEntryGetOneMock.mockResolvedValue({
       id: CATALOG_ENTRY_ID,
@@ -215,7 +351,7 @@ describe("DatasetParquetWrapper", () => {
     expect(acquired.parquetBlob).toBe(parquetBlob);
   });
 
-  it("refuses open data whose catalog entry has no parquet url", async () => {
+  it("refuses open data whose catalog listing has no parquet url", async () => {
     _mockDataset("open_data");
     catalogEntryGetOneMock.mockResolvedValue({
       id: CATALOG_ENTRY_ID,
@@ -228,51 +364,23 @@ describe("DatasetParquetWrapper", () => {
     ).rejects.toThrow("No Parquet URL in catalog for dataset 'cases'");
   });
 
-  it("acquires an API-backed open data resource through the injected fetch", async () => {
+  it("reads an API-backed listing from its one-part Parquet copy", async () => {
     _mockDataset("open_data");
     catalogEntryGetOneMock.mockResolvedValue({
       id: CATALOG_ENTRY_ID,
       accessKind: "api_resource",
     });
-    const parquetBytes = Uint8Array.from([1, 2, 3]) as Uint8Array<ArrayBuffer>;
-    const fetchApiOpenDataResource = vi.fn().mockResolvedValue({
-      contentKind: "parquet",
-      bytes: parquetBytes,
-      sourceVersion: "ckan:hash:abc",
-    });
-    const wrapper = createDatasetParquetWrapper({ fetchApiOpenDataResource });
-
-    const acquired = await wrapper.acquire!(
-      { ref: DATASET_REF, columns: "all" },
-      CONTEXT,
-    );
-
-    expect(fetchApiOpenDataResource).toHaveBeenCalledWith(CATALOG_ENTRY_ID);
-    expect(acquired.sourceVersion).toBe("ckan:hash:abc");
-    expect(acquired.parquetBlob).toBeInstanceOf(Blob);
-    expect(acquired.parquetBlob.size).toBe(parquetBytes.byteLength);
-  });
-
-  it("transcodes an API-backed CSV resource before returning parquet", async () => {
-    _mockDataset("open_data");
-    catalogEntryGetOneMock.mockResolvedValue({
-      id: CATALOG_ENTRY_ID,
-      accessKind: "api_resource",
-    });
-    const csvBytes = new TextEncoder().encode(
-      "a,b\n1,2",
-    ) as Uint8Array<ArrayBuffer>;
-    const parquetBlob = new Blob(["transcoded"]);
-    const transcodeCsvToParquet = vi.fn().mockResolvedValue(parquetBlob);
+    const partBlob = new Blob(["part"], { type: MIMEType.APPLICATION_PARQUET });
+    const mergeParquetParts = vi.fn();
     const wrapper = createDatasetParquetWrapper({
-      fetchApiOpenDataResource: async () => {
+      fetchApiOpenDataParquetCopy: async () => {
         return {
-          contentKind: "csv",
-          bytes: csvBytes,
-          sourceVersion: "ckan:mtime:1",
+          partBlobs: [partBlob],
+          sourceVersion: "socrata:1",
+          isStale: false,
         };
       },
-      transcodeCsvToParquet,
+      mergeParquetParts,
     });
 
     const acquired = await wrapper.acquire!(
@@ -280,12 +388,100 @@ describe("DatasetParquetWrapper", () => {
       CONTEXT,
     );
 
-    expect(transcodeCsvToParquet).toHaveBeenCalledWith({
-      datasetId: DATASET_ID,
-      bytes: csvBytes,
+    expect(acquired.parquetBlob).toBe(partBlob);
+    expect(acquired.sourceVersion).toBe("socrata:1");
+    expect(mergeParquetParts).not.toHaveBeenCalled();
+  });
+
+  it("serves a current copy for 15 minutes, so a changed source is noticed", async () => {
+    _mockDataset("open_data");
+    catalogEntryGetOneMock.mockResolvedValue({
+      id: CATALOG_ENTRY_ID,
+      accessKind: "api_resource",
     });
-    expect(acquired.parquetBlob).toBe(parquetBlob);
-    expect(acquired.sourceVersion).toBe("ckan:mtime:1");
+    const wrapper = createDatasetParquetWrapper({
+      fetchApiOpenDataParquetCopy: async () => {
+        return {
+          partBlobs: [new Blob(["part"])],
+          sourceVersion: "socrata:1",
+          isStale: false,
+        };
+      },
+    });
+
+    const acquired = await wrapper.acquire!(
+      { ref: DATASET_REF, columns: "all" },
+      CONTEXT,
+    );
+
+    expect(acquired.maxAgeMs).toBe(15 * 60_000);
+  });
+
+  it("merges a copy's parts, in row order, into one Parquet blob", async () => {
+    _mockDataset("open_data");
+    catalogEntryGetOneMock.mockResolvedValue({
+      id: CATALOG_ENTRY_ID,
+      accessKind: "api_resource",
+    });
+    const partBlobs = [new Blob(["part-0"]), new Blob(["part-1"])];
+    const mergedBlob = new Blob(["merged"]);
+    const mergeParquetParts = vi.fn().mockResolvedValue(mergedBlob);
+    const wrapper = createDatasetParquetWrapper({
+      fetchApiOpenDataParquetCopy: async () => {
+        return { partBlobs, sourceVersion: undefined, isStale: false };
+      },
+      mergeParquetParts,
+    });
+
+    const acquired = await wrapper.acquire!(
+      { ref: DATASET_REF, columns: "all" },
+      CONTEXT,
+    );
+
+    expect(mergeParquetParts).toHaveBeenCalledWith(partBlobs);
+    expect(acquired.parquetBlob).toBe(mergedBlob);
+  });
+
+  it("serves a stale copy only briefly, so the rebuilt copy is read soon", async () => {
+    _mockDataset("open_data");
+    catalogEntryGetOneMock.mockResolvedValue({
+      id: CATALOG_ENTRY_ID,
+      accessKind: "api_resource",
+    });
+    const wrapper = createDatasetParquetWrapper({
+      fetchApiOpenDataParquetCopy: async () => {
+        return {
+          partBlobs: [new Blob(["part"])],
+          sourceVersion: "socrata:1",
+          isStale: true,
+        };
+      },
+    });
+
+    const acquired = await wrapper.acquire!(
+      { ref: DATASET_REF, columns: "all" },
+      CONTEXT,
+    );
+
+    expect(acquired.maxAgeMs).toBe(5 * 60_000);
+  });
+
+  it("fails the load when the listing's copy cannot be read", async () => {
+    _mockDataset("open_data");
+    catalogEntryGetOneMock.mockResolvedValue({
+      id: CATALOG_ENTRY_ID,
+      accessKind: "api_resource",
+    });
+    const copyError = new Error("no pipeline server is configured");
+    const wrapper = createDatasetParquetWrapper({
+      fetchApiOpenDataParquetCopy: async () => {
+        throw copyError;
+      },
+    });
+
+    await expect(
+      wrapper.acquire!({ ref: DATASET_REF, columns: "all" }, CONTEXT),
+    ).rejects.toBe(copyError);
   });
 
   it("refuses a dataset whose source type belongs to another wrapper", async () => {

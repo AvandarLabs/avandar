@@ -27,6 +27,20 @@ export type VirtualDatasetRead = Model.Base<
 
     /** The raw SQL query that was used to generate the dataset. */
     rawSql: string;
+
+    /**
+     * True for a places dataset, whose `rawSql` is a `VALUES` list the map's
+     * "Add a place" tool rewrites. Read by the GIS app to decide which
+     * datasets it may edit; every other reader treats it as a plain query.
+     */
+    isPlaces: boolean;
+
+    /**
+     * For a linked dataset, the dataset its `rawSql` reads and whose
+     * columns it converts. Undefined for any other virtual dataset, and
+     * once the source dataset is deleted.
+     */
+    linkedSourceDatasetId: DatasetId | undefined;
   }
 >;
 
@@ -40,7 +54,10 @@ export type VirtualDatasetModel = SupabaseCrudModelSpec<
     modelPrimaryKeyType: VirtualDatasetId;
     modelTypes: {
       Read: VirtualDatasetRead;
-      Insert: SetOptional<VirtualDatasetRead, "id" | "createdAt" | "updatedAt">;
+      Insert: SetOptional<
+        VirtualDatasetRead,
+        "id" | "createdAt" | "updatedAt" | "isPlaces" | "linkedSourceDatasetId"
+      >;
 
       Update: Partial<VirtualDatasetRead>;
     };

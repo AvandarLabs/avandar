@@ -1,0 +1,39 @@
+# Fly config template for `apps/pipeline-server`. `pnpm deploy:pipeline-server`
+# fills each placeholder from `.env.pipeline-server.prod`, so no
+# deployment's machine details live in this repository. See
+# `.env.pipeline-server.prod.example` for what each one means.
+
+app = "${FLY_APP_NAME}"
+primary_region = "${FLY_PRIMARY_REGION}"
+
+[env]
+# Builds stream sources and spill DuckDB to the data volume, never to the
+# machine's small root disk.
+TMPDIR = "/data/tmp"
+AVA_DUCKDB_MEMORY_LIMIT = "${AVA_DUCKDB_MEMORY_LIMIT}"
+
+[http_service]
+internal_port = 8080
+force_https = true
+
+# Keep one machine always running. A catalog listing's Parquet copy is built
+# in the background after its build request has returned, so a machine
+# stopped for having no traffic would lose the build.
+auto_stop_machines = "off"
+auto_start_machines = true
+min_machines_running = 1
+
+[[http_service.checks]]
+interval = "15s"
+timeout = "2s"
+grace_period = "10s"
+method = "GET"
+path = "/healthz"
+
+[[vm]]
+size = "${FLY_VM_SIZE}"
+memory = "${FLY_VM_MEMORY}"
+
+[[mounts]]
+source = "${FLY_VOLUME_NAME}"
+destination = "/data"

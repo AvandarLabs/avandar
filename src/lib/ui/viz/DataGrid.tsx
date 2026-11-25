@@ -1,11 +1,13 @@
 import { mantineColorVar, mantineVar } from "@avandar/ui";
-import { formatDate, FormattableTimezone } from "@avandar/utils";
 import { Box } from "@mantine/core";
 import { themeMaterial } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useMemo } from "react";
-import { formatChartNumber } from "@/lib/ui/viz/formatChartNumber/formatChartNumber";
-import type { UnknownDataFrame } from "@avandar/utils";
+import { DataGridColumnTitle } from "@/lib/ui/viz/DataGridColumnTitle/DataGridColumnTitle";
+import { makeDataGridColumnDefs } from "@/lib/ui/viz/makeDataGridColumnDefs/makeDataGridColumnDefs";
+import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
+import type { DataGridPeriodFormatters } from "@/lib/ui/viz/makeDataGridColumnDefs/makeDataGridColumnDefs";
+import type { FormattableTimezone, UnknownDataFrame } from "@avandar/utils";
 import type {
   GridReadyEvent,
   GridSizeChangedEvent,
@@ -27,6 +29,12 @@ type Props = {
   dateColumns?: ReadonlySet<string>;
   dateFormat?: string;
   timezone?: FormattableTimezone;
+
+  /** The period of each per-period column, by column name. */
+  bucketGrains?: Readonly<Record<string, ConceptAttribute.BucketGrain>>;
+
+  /** How to read a per-period cell, together with `bucketGrains`. */
+  periodFormatters?: DataGridPeriodFormatters;
   style?: React.CSSProperties;
   onRowDataUpdated?: (params: RowDataUpdatedEvent) => void;
   onGridReady?: (params: GridReadyEvent) => void;
@@ -41,6 +49,13 @@ const avandarGridTheme = themeMaterial.withParams({
   primaryColor: mantineColorVar("primary"),
 });
 
+/**
+ * A table of rows. A column title that does not fit ends in an ellipsis,
+ * and hovering that title shows the full name, via `DataGridColumnTitle`.
+ *
+ * Used wherever a result set is shown as a table, such as a dataset
+ * preview or the Explorer.
+ */
 export function DataGrid({
   columnNames,
   className,
@@ -49,6 +64,8 @@ export function DataGrid({
   height = 500,
   dateFormat = "YYYY-MM-DD HH:mm:ss",
   timezone,
+  bucketGrains,
+  periodFormatters,
   style,
   pagination = true,
   onRowDataUpdated,
@@ -56,29 +73,24 @@ export function DataGrid({
   onGridSizeChanged,
 }: Props): JSX.Element {
   const columnDefs = useMemo(() => {
-    return columnNames.map((field) => {
-      const isDate = dateColumns?.has(field) ?? false;
-      return {
-        field: field,
-        headerName: field,
-        filter: true,
-        valueFormatter: isDate
-          ? (p: { value: unknown }) => {
-              return formatDate(p.value, {
-                format: dateFormat,
-                zone: timezone,
-              });
-            }
-          : (p: { value: unknown }) => {
-              return typeof p.value === "number"
-                ? formatChartNumber(p.value)
-                : p.value == null
-                  ? ""
-                  : String(p.value);
-            },
-      };
+    return makeDataGridColumnDefs({
+      columnNames,
+      data,
+      dateColumns,
+      dateFormat,
+      timezone,
+      bucketGrains,
+      periodFormatters,
     });
-  }, [columnNames, dateColumns, dateFormat, timezone]);
+  }, [
+    columnNames,
+    data,
+    dateColumns,
+    dateFormat,
+    timezone,
+    bucketGrains,
+    periodFormatters,
+  ]);
 
   // AgGrid will fill the size of the parent container
   return (
@@ -94,7 +106,13 @@ export function DataGrid({
     >
       <AgGridReact
         containerStyle={{ flex: 1, minHeight: 0, width: "100%" }}
-        defaultColDef={{ flex: 1, minWidth: 120 }}
+        defaultColDef={{
+          flex: 1,
+          headerComponentParams: {
+            innerHeaderComponent: DataGridColumnTitle,
+          },
+          minWidth: 120,
+        }}
         columnDefs={columnDefs}
         theme={avandarGridTheme}
         rowData={data as Writable<UnknownDataFrame>}

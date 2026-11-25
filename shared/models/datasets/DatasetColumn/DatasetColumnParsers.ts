@@ -8,9 +8,10 @@ import {
   snakeCaseKeysDeep,
   undefinedsToNullsDeep,
 } from "@avandar/utils";
-import z from "zod";
+import { z } from "zod";
 import { AvaDataType } from "$/models/datasets/AvaDataType/AvaDataType.ts";
 import { DuckDbDataTypes } from "$/models/datasets/DatasetColumn/DuckDbDataTypes.ts";
+import type { DictionaryBinding } from "$/models/dataDictionaries/DictionaryBinding/DictionaryBinding.ts";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type {
   DatasetColumnId,
@@ -27,6 +28,7 @@ const DBReadSchema = z.object({
   data_type: z.enum(AvaDataType.Types),
   dataset_id: z.uuid(),
   description: z.string().nullable(),
+  dictionary_binding_id: z.uuid().nullable(),
   id: z.uuid(),
   original_name: z.string(),
   name: z.string(),
@@ -47,6 +49,9 @@ export const DatasetColumnParsers =
           ...obj,
           id: obj.id as DatasetColumnId,
           datasetId: obj.datasetId as DatasetId,
+          dictionaryBindingId: obj.dictionaryBindingId as
+            | DictionaryBinding.Id
+            | undefined,
           workspaceId: obj.workspaceId as Workspace.Id,
         });
       },
@@ -67,7 +72,7 @@ export const DatasetColumnParsers =
  * Do not remove these tests!
  */
 type CrudTypes = DatasetColumnModel;
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// oxlint-disable-next-line typescript/ban-ts-comment
 // @ts-ignore Type tests - this variable is intentionally not used
 type ZodConsistencyTests = [
   // Check that the DBReadSchema is consistent with the DBRead type.

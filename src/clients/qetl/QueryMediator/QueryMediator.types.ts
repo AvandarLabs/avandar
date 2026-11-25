@@ -1,30 +1,60 @@
+import type { ColumnConversion } from "$/models/dataDictionaries/ColumnConversion/ColumnConversion";
 import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset";
 import type { OpenDataDataset } from "$/models/datasets/OpenDataDataset/OpenDataDataset";
 import type { PdfFileDataset } from "$/models/datasets/PdfFileDataset/PdfFileDataset";
+import type { PostgresTableDataset } from "$/models/datasets/PostgresTableDataset/PostgresTableDataset";
 import type { VirtualDataset } from "$/models/datasets/VirtualDataset/VirtualDataset";
 import type { XlsxFileDataset } from "$/models/datasets/XlsxFileDataset/XlsxFileDataset";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
-import type { PrincipalKey } from "$/models/relations/RelationCacheKey/RelationCacheKey.types";
+import type {
+  LogicalDefinition,
+  PrincipalKey,
+} from "$/models/relations/RelationCacheKey/RelationCacheKey.types";
 import type { RelationCachePort } from "$/models/relations/RelationCachePort/RelationCachePort.types";
 import type {
   DatasetDuckDbLease,
   PublicSnapshotDuckDbOwner,
 } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
-import type { ConceptRelationPlan } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
+import type {
+  ConceptRelationPlan,
+  ConceptSpineRestriction,
+} from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
 import type { UnknownObject } from "@avandar/utils";
 
-/** A column whose stored name or type differs from the source data. */
+/**
+ * A column whose stored name, type, or values differ from the source data.
+ */
 export type ColumnReplacement = {
   /** The original name of the column from the source data. */
   originalName: string;
   /** The new name of the column. */
   alias?: string;
-  /** The new data type of the column. */
+  /**
+   * The new data type of the column. For a converted column, the type its
+   * values are cast to before they are converted.
+   */
   dataType?: DuckDbDataType;
+  /** Set for a converted column: its values are translated as it loads. */
+  valueMapping?: ColumnConversion.T;
+  /**
+   * The cast for a converted column's `<column>_original` copy, when the
+   * copy's stored type differs from the type the column loads as.
+   */
+  originalCopyDataType?: DuckDbDataType;
+};
+
+/**
+ * Each of a query's datasets' renames, casts, and conversions, and the key
+ * that names that projection, read from the dataset catalog before the
+ * query loads its relations.
+ */
+export type LoadedColumnReplacements = {
+  replacementsByDatasetId: Record<string, ColumnReplacement[]>;
+  projectionKeyByDatasetId: Record<string, string>;
 };
 
 /** A dataset paired with the source record that says how to fetch it. */
@@ -58,6 +88,11 @@ export type RelationSource =
       sourceType: "pdf_file";
       dataset: Dataset.T;
       sourceDataset: PdfFileDataset.T;
+    }
+  | {
+      sourceType: "postgres_table";
+      dataset: Dataset.T;
+      sourceDataset: PostgresTableDataset.T;
     };
 
 /**
@@ -69,6 +104,16 @@ export type AcquiredRelationBytes = {
   parquetBlob: Blob;
   /** The columns actually held in `parquetBlob`. */
   columns: readonly string[] | "all";
+  /**
+   * Epoch ms from which these rows are stale, so a live source is acquired
+   * again; `undefined` for rows that never go stale.
+   */
+  staleAt: number | undefined;
+  /**
+   * The definition these rows were produced from, stored with them: a
+   * virtual dataset's SQL, or undefined for a dataset with no defining text.
+   */
+  definition?: LogicalDefinition;
 };
 
 /** Per-dataset column sets a query needs, or `"all"` when unknown. */
@@ -89,13 +134,33 @@ export type QetlRunnerOptions = {
    * interpret) leaves a concept reference unresolved, so the query fails on a
    * missing table rather than answering from whatever happens to be in the
    * catalog.
+   *
+   * `conceptSpineRestrictions` is the caller's, passed through unchanged:
+   * empty unless the caller narrowed a concept to some of its records.
    */
-  planConceptRelations?: (rawSql: string) => Promise<ConceptRelationPlan[]>;
+  planConceptRelations?: (
+    options: Readonly<{
+      rawSql: string;
+      conceptSpineRestrictions: readonly ConceptSpineRestriction[];
+    }>,
+  ) => Promise<ConceptRelationPlan[]>;
   getDuckDbLeaseDatasetIds?: (
     queryDependencies: readonly Dataset.Id[],
   ) => Promise<Dataset.Id[]>;
   duckDbReadMode?: "public" | "workspace";
   publicSnapshotDuckDbOwner?: PublicSnapshotDuckDbOwner;
+  /**
+   * Where a relation's query-facing column names and types come from.
+   *
+   * `catalog`, the default, reads the dataset's `dataset_columns` rows: they
+   * map a query's column names to Parquet headers, and they rename and cast
+   * columns as a relation loads into DuckDB. `stored` trusts the relation's
+   * own Parquet: query names are its headers, and nothing is renamed or cast.
+   * A published dashboard snapshot is `stored`, because its Parquet is written
+   * with the names its queries use, and its visitor may hold no grant on
+   * `dataset_columns`.
+   */
+  datasetColumnSource?: DatasetColumnSource;
   /**
    * The storage tier this session may read and write, and the principal every
    * entry in it is scoped to.
@@ -118,11 +183,25 @@ export type QetlRunnerOptions = {
   ) => Promise<void>;
 };
 
+/** Where a Qetl session takes a relation's column names and types from. */
+export type DatasetColumnSource = "catalog" | "stored";
+
 /** Datasets grouped by their source type. */
 export type DatasetsBySourceType = Record<Dataset.T["sourceType"], Dataset.T[]>;
 
 /** Datasets keyed by their ID. */
 export type DatasetsById = Record<Dataset.Id, Dataset.T | undefined>;
+
+/**
+ * Called at least once for each dataset a query loads, as soon as its
+ * relation is in hand: at once for one DuckDB already serves, after the
+ * storage tier's bytes are read, or after its source returns them. A
+ * virtual dataset's nested query reports its own datasets through the same
+ * callback, so a dataset is reported again from a nested query that reads
+ * the same dataset. A listener that throws is logged and ignored. Lets a
+ * caller show progress across a query that reads many datasets.
+ */
+export type RelationFetchedListener = (datasetId: Dataset.Id) => void;
 
 /** Options for one Qetl query. */
 export type RunQetlQueryOptions = {
@@ -146,6 +225,14 @@ export type RunQetlQueryOptions = {
    * answering from partial data, so this is a caller assertion and not a hint.
    */
   neededColumnsByDatasetId?: NeededColumnsByDatasetId;
+  /**
+   * Narrows the spine of each concept the statement names to the records
+   * listed, so the query computes values for those records only. Travels as
+   * data to the concept planner, never into the SQL.
+   */
+  conceptSpineRestrictions?: readonly ConceptSpineRestriction[];
+  /** Reports each dataset as its relation is in hand. */
+  onRelationFetched?: RelationFetchedListener;
 };
 
 /** The overloaded `runQuery` a Qetl client exposes. */
@@ -169,4 +256,6 @@ export type RunLeasedQueryOptions = {
   signal?: AbortSignal;
   /** The caller's stated column sets, overriding inference per dataset. */
   neededColumnsByDatasetId?: NeededColumnsByDatasetId;
+  /** The caller's progress callback, passed down to relation loading. */
+  onRelationFetched?: RelationFetchedListener;
 };

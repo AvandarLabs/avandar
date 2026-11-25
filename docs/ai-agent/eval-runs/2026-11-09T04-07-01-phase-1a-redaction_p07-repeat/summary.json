@@ -1,0 +1,17 @@
+{
+  "label": "phase-1a-redaction:p07-repeat",
+  "questionCount": 1,
+  "passCount": 1,
+  "needlessQuestions": 0,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 1,
+  "promptTokens": 3169,
+  "cachedPromptTokens": 3165,
+  "completionTokens": 314,
+  "totalCost": 0.00018905,
+  "costPerQuestion": 0.00018905,
+  "latencyMedianMs": 2011.730458,
+  "latencyP90Ms": 2011.730458,
+  "failedIds": []
+}

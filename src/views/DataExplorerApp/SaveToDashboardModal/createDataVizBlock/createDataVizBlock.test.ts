@@ -4,6 +4,7 @@ import {
   DATA_EXPLORER_FALLBACK_PROMPT,
   createDataVizBlock,
 } from "@/views/DataExplorerApp/SaveToDashboardModal/createDataVizBlock/createDataVizBlock";
+import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
 
 describe("createDataVizBlock", () => {
   it("returns a DataViz block whose props mirror the input rawSql, prompt, and viz config", () => {
@@ -113,5 +114,29 @@ describe("createDataVizBlock", () => {
     });
 
     expect(block.props.nlQuery.prompt).toBe(DATA_EXPLORER_FALLBACK_PROMPT);
+  });
+
+  it("stores a plugin chart's type and config in the block unchanged", () => {
+    const vizConfig: AvaVizConfig.Plugin = {
+      vizType: "plugin",
+      pluginId: "avandar.epidemiology",
+      pluginVizId: "epicurve",
+      columnSettings: {},
+      settings: { interval: "epiWeek" },
+    };
+    const block = createDataVizBlock({
+      columnBindings: {
+        version: 1,
+        scopeKey: "explorer",
+        sqlKey: "SELECT onset FROM cases",
+        columns: [],
+      },
+      rawSql: "SELECT onset FROM cases",
+      prompt: "Cases by onset week",
+      vizType: "plugin",
+      vizConfig,
+    });
+
+    expect(block.props).toMatchObject({ vizType: "plugin", vizConfig });
   });
 });

@@ -1,6 +1,8 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { StockRect } from "../../primitives/StockRect";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import { AgreementTab } from "./AgreementTab";
-import { BookingParticipant } from "./BookingParticipant";
+import { BookingParticipant } from "./BookingParticipant/BookingParticipant";
 import { getBookingFromFrame } from "./getBookingFromFrame";
 import { OriginalRequest } from "./OriginalRequest";
 import type { Input } from "./SharedWorkshopBooking.schema";
@@ -16,12 +18,15 @@ export function BookingRequest({
   index,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   const request = input.requests[index];
-  const scene = getBookingFromFrame({ input, frame, index });
+  const scene = getBookingFromFrame({ input, frame, index, motion });
   return (
     <g>
       <OriginalRequest input={input} scene={scene} index={index} />
-      <rect
+      <StockRect
         data-request={request.id}
         x={scene.x}
         y={scene.y}
@@ -29,7 +34,7 @@ export function BookingRequest({
         height={40}
         fill="none"
         stroke={accent}
-        strokeWidth={2}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
       <LabelSlots
         labels={[

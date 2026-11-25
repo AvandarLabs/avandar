@@ -1,0 +1,11 @@
+.galleryNavigationNoteSidebarNote {
+  composes: sidebar-note from global;
+}
+
+.galleryNavigationNoteNoteSymbol {
+  composes: note-symbol from global;
+}
+
+.galleryNavigationNoteNoteRule {
+  composes: note-rule from global;
+}

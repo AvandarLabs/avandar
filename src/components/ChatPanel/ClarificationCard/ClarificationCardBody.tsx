@@ -33,10 +33,11 @@ export function ClarificationCardBody({
         />
       );
     })
-    .with({ kind: "fixed_options" }, ({ options, multi }) => {
+    .with({ kind: "fixed_options" }, ({ options, optionLabels, multi }) => {
       return (
         <FixedOptionsBody
           options={options}
+          optionLabels={optionLabels}
           multi={multi}
           onSubmit={(answer) => {
             return onAnswer({ answer });
@@ -46,7 +47,7 @@ export function ClarificationCardBody({
     })
     .with(
       { kind: "discovery" },
-      ({ query, column, multi, candidateValues }) => {
+      ({ query, column, multi, candidateValues, candidateGroups }) => {
         return (
           <DiscoveryBody
             header={discoveryHeader}
@@ -54,6 +55,7 @@ export function ClarificationCardBody({
             column={column}
             multi={multi}
             candidateValues={candidateValues}
+            candidateGroups={candidateGroups}
             resolveDiscovery={resolveDiscovery}
             onRequestDifferentDiscovery={onRequestDifferentDiscovery}
             onSubmit={onAnswer}

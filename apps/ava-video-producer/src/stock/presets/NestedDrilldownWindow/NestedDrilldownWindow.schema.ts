@@ -38,8 +38,11 @@ export const inputSchema = z
     }
     [0, 1].forEach((dimension) => {
       if (
-        new Set(input.records.map((record) => record.groups[dimension])).size >
-        3
+        new Set(
+          input.records.map((record) => {
+            return record.groups[dimension];
+          }),
+        ).size > 3
       ) {
         context.addIssue({
           code: "custom",
@@ -49,11 +52,11 @@ export const inputSchema = z
       }
     });
     if (
-      !input.records.some((record) =>
-        input.selectionPath.every(
-          (value, index) => record.groups[index] === value,
-        ),
-      )
+      !input.records.some((record) => {
+        return input.selectionPath.every((value, index) => {
+          return record.groups[index] === value;
+        });
+      })
     ) {
       context.addIssue({
         code: "custom",

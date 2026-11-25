@@ -1,4 +1,7 @@
 import "@pipeline-server/ensureEtlPathsRoot";
+import { createParquetCopyBuildQueue } from "@pipeline-server/createParquetCopyBuildQueue";
+import { removeLeftoverCopyTempDirs } from "@pipeline-server/openDataParquetCache/removeLeftoverCopyTempDirs/removeLeftoverCopyTempDirs";
+import { createOpenDataCacheRoutes } from "@pipeline-server/routes/open-data-cache/createOpenDataCacheRoutes";
 import { registerPipelineRoutes } from "@pipeline-server/routes/pipeline-name/registerPipelineRoutes";
 import Fastify from "fastify";
 
@@ -29,6 +32,20 @@ async function main(): Promise<void> {
   });
 
   await server.register(registerPipelineRoutes);
+
+  // Runs before any build is queued, so every folder it finds belongs to a
+  // build a deploy or crash killed.
+  const leftoverDirs = await removeLeftoverCopyTempDirs();
+  if (leftoverDirs.length > 0) {
+    server.log.warn(
+      { leftoverDirs },
+      "Deleted temp folders left by killed Parquet copy builds",
+    );
+  }
+  const copyQueue = createParquetCopyBuildQueue(server.log);
+  await server.register(
+    createOpenDataCacheRoutes({ enqueueBuild: copyQueue.enqueue }),
+  );
 
   await server.listen({
     host: _getHost(),

@@ -6,10 +6,24 @@ import type { ReactNode } from "react";
 
 type Props = {
   /**
+   * Where the view sits, as a link back to the record it acts on. Shown
+   * small above the title, for a task view that belongs to a record (such
+   * as applying dictionaries to a dataset).
+   */
+  breadcrumb?: ReactNode;
+
+  /**
    * The name of the thing on screen. Takes a node rather than a string so a
    * record's title can be an inline-editable field.
    */
   title: ReactNode;
+
+  /**
+   * A control that belongs to the title rather than to the whole view, such
+   * as a record's status. It sits right after the name, outside the heading,
+   * so the heading's accessible name stays the name alone.
+   */
+  titleAccessory?: ReactNode;
 
   /**
    * Short facts about the thing on screen, rendered on one line separated by
@@ -38,7 +52,9 @@ type Props = {
  * a screenful.
  */
 export function AppViewHeader({
+  breadcrumb,
   title,
+  titleAccessory,
   facts,
   description,
   actions,
@@ -49,6 +65,9 @@ export function AppViewHeader({
 
   return (
     <header className={css.appViewHeader}>
+      {breadcrumb ? (
+        <div className={css.appViewHeaderBreadcrumb}>{breadcrumb}</div>
+      ) : null}
       <Group
         gap="sm"
         wrap="nowrap"
@@ -68,6 +87,11 @@ export function AppViewHeader({
             {title}
           </div>
         )}
+        {titleAccessory ? (
+          <div className={css.appViewHeaderTitleAccessory}>
+            {titleAccessory}
+          </div>
+        ) : null}
         {actions ? (
           <Group gap="xs" wrap="nowrap" className={css.appViewHeaderActions}>
             {actions}

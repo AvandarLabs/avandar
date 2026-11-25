@@ -1,6 +1,6 @@
 import { NumberInput, TextInput } from "@mantine/core";
 import type { DatasetParseControls as ProductDatasetParseControls } from "@/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls";
-import type { ComponentProps } from "react";
+import type { ComponentProps, ReactNode } from "react";
 
 type Props = Extract<
   ComponentProps<typeof ProductDatasetParseControls>,
@@ -15,34 +15,35 @@ type Props = Extract<
 export function DatasetParseControls({
   onDataSourceMetadataChange,
   ...csvProps
-}: Props) {
+}: Props): ReactNode {
   const { parseOptions } = csvProps;
-  if (csvProps.sourceType !== "csv_file")
+  if (csvProps.sourceType !== "csv_file") {
     throw new Error("The import film only demonstrates CSV.");
+  }
   return (
     <>
       <NumberInput
         label="Number of rows to skip"
         value={parseOptions.numRowsToSkip ?? 0}
-        onChange={(value) =>
-          onDataSourceMetadataChange({
+        onChange={(value) => {
+          return onDataSourceMetadataChange({
             ...csvProps,
             parseOptions: { ...parseOptions, numRowsToSkip: Number(value) },
-          })
-        }
+          });
+        }}
       />
       <TextInput
         label="Delimiter"
         value={parseOptions.delimiter ?? ","}
-        onChange={(event) =>
-          onDataSourceMetadataChange({
+        onChange={(event) => {
+          return onDataSourceMetadataChange({
             ...csvProps,
             parseOptions: {
               ...parseOptions,
               delimiter: event.currentTarget.value,
             },
-          })
-        }
+          });
+        }}
       />
     </>
   );

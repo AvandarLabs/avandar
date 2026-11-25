@@ -1,4 +1,4 @@
-import { makeBucketRecord, where } from "@avandar/utils";
+import { makeBucketRecord, prop, where } from "@avandar/utils";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetDuckDbCoordinator } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import { DuckDbClient } from "@/clients/DuckDbClient/DuckDbClient";
@@ -11,20 +11,25 @@ import {
   getRelationSources,
   probeRelationCache,
 } from "@/clients/qetl/QueryMediator/getRelationSources";
-import {
-  fetchRelationBytes,
-  loadRelationBytes,
-  probeStorageRelationCache,
-} from "@/clients/qetl/QueryMediator/relationLoading";
+import { notifyRelationFetched } from "@/clients/qetl/QueryMediator/notifyRelationFetched/notifyRelationFetched";
+import { getVirtualRelationDefinitions } from "@/clients/qetl/QueryMediator/relationLoading/getVirtualRelationDefinitions/getVirtualRelationDefinitions";
+import { RelationLoading } from "@/clients/qetl/QueryMediator/relationLoading/RelationLoading";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
+import { loadColumnReplacements } from "@/lib/dataDictionaries/loadColumnReplacements/loadColumnReplacements";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { LogicalDefinition } from "$/models/relations/RelationCacheKey/RelationCacheKey.types";
+import type { DatasetDuckDbLease } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { ConceptRelationPlan } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
 import type {
+  AcquiredRelationBytes,
+  DatasetColumnSource,
+  LoadedColumnReplacements,
   NeededColumnsByDatasetId,
   QetlRunnerOptions,
   QetlRunQuery,
+  RelationFetchedListener,
   RunLeasedQueryOptions,
   RunQetlQueryOptions,
 } from "@/clients/qetl/QueryMediator/QueryMediator.types";
@@ -42,15 +47,20 @@ function _hasFiniteColumnSet(
 /**
  * Maps query-facing names to Parquet headers. Skips the column catalog when
  * every dataset already needs `"all"`, so an `"all"` cache hit still costs
- * no extra dataset-column read.
+ * no extra dataset-column read, and when the session's relations are
+ * `stored`, whose Parquet headers already are the query-facing names.
  */
 async function _getParquetNeededByDatasetId(
   options: Readonly<{
+    datasetColumnSource: DatasetColumnSource;
     datasetIds: readonly Dataset.Id[];
     neededByDatasetId: NeededColumnsByDatasetId;
   }>,
 ): Promise<NeededColumnsByDatasetId> {
-  if (!_hasFiniteColumnSet(options.neededByDatasetId, options.datasetIds)) {
+  if (
+    options.datasetColumnSource === "stored" ||
+    !_hasFiniteColumnSet(options.neededByDatasetId, options.datasetIds)
+  ) {
     return options.neededByDatasetId;
   }
   const columns = await DatasetColumnClient.withCache(AvaQueryClient)
@@ -71,14 +81,19 @@ async function _getParquetNeededByDatasetId(
 }
 
 async function _getNeededParquetColumnsForQuery(
-  queryOptions: RunLeasedQueryOptions,
+  options: Readonly<{
+    datasetColumnSource: DatasetColumnSource;
+    queryOptions: RunLeasedQueryOptions;
+  }>,
 ): Promise<NeededColumnsByDatasetId> {
+  const { queryOptions } = options;
   const inferred = getNeededColumnsFromQuery({
     conceptRelations: queryOptions.conceptRelations,
     datasetIds: queryOptions.queryDependencies,
     rawSql: queryOptions.rawSql,
   });
   return _getParquetNeededByDatasetId({
+    datasetColumnSource: options.datasetColumnSource,
     datasetIds: queryOptions.queryDependencies,
     // A caller-stated set replaces inference for the datasets it names, and
     // only those. Inference reads a select list, which a `CREATE TABLE AS
@@ -91,12 +106,116 @@ async function _getNeededParquetColumnsForQuery(
   });
 }
 
+/** What a query reads from the dataset catalog before it loads relations. */
+type QueryCatalog = {
+  /** Undefined for a `stored` session and for a query that names no dataset. */
+  columnReplacements: LoadedColumnReplacements | undefined;
+  /** Each virtual dataset's definition, its storage entries' key. */
+  definitionByDatasetId: Readonly<Record<string, LogicalDefinition>>;
+};
+
+/**
+ * Reads each dataset's renames, casts, and conversions, with the projection
+ * key its loaded view is checked against, and each virtual dataset's
+ * definition. A `stored` session reads nothing: its Parquet already holds
+ * the query-facing columns, and its visitor may hold no grant on the
+ * catalog. A query that names no dataset reads nothing either. Every other
+ * query reads it, mostly from the query cache, because a view already in
+ * DuckDB is only current if its projection still is.
+ */
+async function _readQueryCatalog(
+  options: Readonly<{
+    datasetColumnSource: DatasetColumnSource;
+    queryDependencies: readonly Dataset.Id[];
+  }>,
+): Promise<QueryCatalog> {
+  if (
+    options.datasetColumnSource === "stored" ||
+    options.queryDependencies.length === 0
+  ) {
+    return { columnReplacements: undefined, definitionByDatasetId: {} };
+  }
+  const [columnReplacements, definitionByDatasetId] = await Promise.all([
+    loadColumnReplacements(options.queryDependencies),
+    getVirtualRelationDefinitions(options.queryDependencies),
+  ]);
+  return { columnReplacements, definitionByDatasetId };
+}
+
+/**
+ * Tells the caller each of these datasets is in hand, leaving out
+ * `exceptIds`. A query without a callback reports nothing.
+ */
+function _reportRelationsInHand(
+  options: Readonly<{
+    datasetIds: readonly Dataset.Id[];
+    exceptIds?: readonly Dataset.Id[];
+    onRelationFetched: RelationFetchedListener | undefined;
+  }>,
+): void {
+  const { onRelationFetched } = options;
+  if (!onRelationFetched) {
+    return;
+  }
+  const exceptIds = new Set<string>(options.exceptIds ?? []);
+  options.datasetIds.forEach((datasetId) => {
+    if (!exceptIds.has(datasetId)) {
+      notifyRelationFetched(onRelationFetched, datasetId);
+    }
+  });
+}
+
+/**
+ * Serves the relations the storage tier holds and acquires the rest from
+ * their sources. An empty uncached list skips `getRelationSources`, which
+ * does not short-circuit on its own.
+ */
+async function _acquireRelations(
+  options: Readonly<{
+    datasetIds: readonly Dataset.Id[];
+    definitionByDatasetId: Readonly<Record<string, LogicalDefinition>>;
+    neededByDatasetId: NeededColumnsByDatasetId;
+    queryOptions: RunLeasedQueryOptions;
+    runQuery: QetlRunQuery;
+    runnerOptions: QetlRunnerOptions;
+  }>,
+): Promise<{
+  cachedRelations: AcquiredRelationBytes[];
+  fetchedRelationBytes: AcquiredRelationBytes[];
+}> {
+  const { cachedRelations, growFromColumnsByDatasetId, uncachedDatasetIds } =
+    await RelationLoading.probeStorageRelationCache({
+      datasetIds: options.datasetIds,
+      definitionByDatasetId: options.definitionByDatasetId,
+      neededByDatasetId: options.neededByDatasetId,
+      principalKey: options.runnerOptions.principalKey,
+      relationCache: options.runnerOptions.relationCache,
+    });
+  _reportRelationsInHand({
+    datasetIds: cachedRelations.map(prop("datasetId")),
+    onRelationFetched: options.queryOptions.onRelationFetched,
+  });
+  const relationSources =
+    uncachedDatasetIds.length > 0
+      ? await getRelationSources(uncachedDatasetIds)
+      : [];
+  const fetchedRelationBytes = await RelationLoading.fetchRelationBytes({
+    datasetDuckDbLease: options.queryOptions.datasetDuckDbLease,
+    growFromColumnsByDatasetId,
+    neededByDatasetId: options.neededByDatasetId,
+    relationSources,
+    runQuery: options.runQuery,
+    onRelationFetched: options.queryOptions.onRelationFetched,
+  });
+  return { cachedRelations, fetchedRelationBytes };
+}
+
 /**
  * Loads each query dataset into DuckDB from the queryable tier, the storage
- * tier, or a source acquire, using the columns the query needs.
- *
- * An empty uncached list skips `getRelationSources`, which does not
- * short-circuit on its own.
+ * tier, or a source acquire, using the columns the query needs. A dataset
+ * already in DuckDB is reloaded when its view was built with another
+ * projection than the catalog now gives it, for example after a code list
+ * it converts with was relabeled.
  */
 async function _loadQueryRelations(
   options: Readonly<{
@@ -106,31 +225,33 @@ async function _loadQueryRelations(
   }>,
 ): Promise<void> {
   const { queryOptions, runnerOptions } = options;
-  const neededByDatasetId =
-    await _getNeededParquetColumnsForQuery(queryOptions);
+  const datasetColumnSource = runnerOptions.datasetColumnSource ?? "catalog";
+  const neededByDatasetId = await _getNeededParquetColumnsForQuery({
+    datasetColumnSource,
+    queryOptions,
+  });
+  const catalog = await _readQueryCatalog({
+    datasetColumnSource,
+    queryDependencies: queryOptions.queryDependencies,
+  });
   const notInQueryableTier = await probeRelationCache(
     queryOptions.queryDependencies,
     neededByDatasetId,
+    catalog.columnReplacements?.projectionKeyByDatasetId,
   );
-  const { cachedRelations, growFromColumnsByDatasetId, uncachedDatasetIds } =
-    await probeStorageRelationCache({
-      datasetIds: notInQueryableTier,
-      neededByDatasetId,
-      principalKey: runnerOptions.principalKey,
-      relationCache: runnerOptions.relationCache,
-    });
-  const relationSources =
-    uncachedDatasetIds.length > 0
-      ? await getRelationSources(uncachedDatasetIds)
-      : [];
-  const fetchedRelationBytes = await fetchRelationBytes({
-    datasetDuckDbLease: queryOptions.datasetDuckDbLease,
-    growFromColumnsByDatasetId,
-    neededByDatasetId,
-    relationSources,
-    runQuery: options.runQuery,
+  _reportRelationsInHand({
+    datasetIds: queryOptions.queryDependencies,
+    exceptIds: notInQueryableTier,
+    onRelationFetched: queryOptions.onRelationFetched,
   });
-  await loadRelationBytes({
+  const { cachedRelations, fetchedRelationBytes } = await _acquireRelations({
+    ...options,
+    datasetIds: notInQueryableTier,
+    definitionByDatasetId: catalog.definitionByDatasetId,
+    neededByDatasetId,
+  });
+  await RelationLoading.loadRelationBytes({
+    columnReplacements: catalog.columnReplacements,
     datasetDuckDbLease: queryOptions.datasetDuckDbLease,
     principalKey: runnerOptions.principalKey,
     relationCache: runnerOptions.relationCache,
@@ -232,6 +353,57 @@ function _getLeaseNames(
   ];
 }
 
+/**
+ * Plans the concept relations a query names, with the caller's spine
+ * restrictions. A session without a planner cannot narrow a spine, so it
+ * refuses a restriction instead of answering unrestricted.
+ */
+async function _getConceptRelationPlans(
+  options: Readonly<{
+    runnerOptions: QetlRunnerOptions;
+    queryOptions: RunQetlQueryOptions;
+  }>,
+): Promise<ConceptRelationPlan[]> {
+  const { planConceptRelations } = options.runnerOptions;
+  const conceptSpineRestrictions =
+    options.queryOptions.conceptSpineRestrictions ?? [];
+  if (planConceptRelations === undefined) {
+    if (conceptSpineRestrictions.length > 0) {
+      throw new Error(
+        "This query session cannot plan concepts, so it cannot restrict a " +
+          "concept's records.",
+      );
+    }
+    return [];
+  }
+  return await planConceptRelations({
+    rawSql: options.queryOptions.rawSql,
+    conceptSpineRestrictions,
+  });
+}
+
+/** The options the leased part of one query runs with. */
+function _toLeasedQueryOptions(
+  options: Readonly<{
+    queryOptions: RunQetlQueryOptions;
+    datasetDuckDbLease: DatasetDuckDbLease;
+    queryDependencies: readonly Dataset.Id[];
+    conceptRelations: readonly ConceptRelationPlan[];
+  }>,
+): RunLeasedQueryOptions {
+  const { queryOptions } = options;
+  return {
+    datasetDuckDbLease: options.datasetDuckDbLease,
+    queryDependencies: options.queryDependencies,
+    conceptRelations: options.conceptRelations,
+    rawSql: queryOptions.rawSql,
+    returnType: queryOptions.returnType ?? "js",
+    signal: queryOptions.signal,
+    neededColumnsByDatasetId: queryOptions.neededColumnsByDatasetId,
+    onRelationFetched: queryOptions.onRelationFetched,
+  };
+}
+
 async function _runQuery<RowObject extends UnknownObject = UnknownRow>(
   options: Readonly<{
     runnerOptions: QetlRunnerOptions;
@@ -243,10 +415,7 @@ async function _runQuery<RowObject extends UnknownObject = UnknownRow>(
   const namedDatasetIds = await options.runnerOptions.getQueryDependencies(
     options.queryOptions.rawSql,
   );
-  const conceptRelations =
-    (await options.runnerOptions.planConceptRelations?.(
-      options.queryOptions.rawSql,
-    )) ?? [];
+  const conceptRelations = await _getConceptRelationPlans(options);
   const queryDependencies = _getExpandedQueryDependencies({
     datasetIds: namedDatasetIds,
     conceptRelations,
@@ -266,16 +435,12 @@ async function _runQuery<RowObject extends UnknownObject = UnknownRow>(
       return _runLeasedQuery<RowObject>({
         runnerOptions: options.runnerOptions,
         runQuery: options.runQuery,
-        queryOptions: {
+        queryOptions: _toLeasedQueryOptions({
+          queryOptions: options.queryOptions,
           datasetDuckDbLease,
           queryDependencies,
           conceptRelations,
-          rawSql: options.queryOptions.rawSql,
-          returnType: options.queryOptions.returnType ?? "js",
-          signal: options.queryOptions.signal,
-          neededColumnsByDatasetId:
-            options.queryOptions.neededColumnsByDatasetId,
-        },
+        }),
       });
     },
   });

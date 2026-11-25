@@ -1,70 +1,65 @@
+import { clsx } from "clsx";
 import { useRef } from "react";
-import { useContinuityCopy } from "../../useContinuityCopy";
-import { CompositionActions } from "./CompositionActions/CompositionActions";
-import { CompositionControls } from "./CompositionControls";
-import { CompositionSummary } from "./CompositionSummary";
+import { useRememberedPanelTab } from "../../../gallery/AtlasLayout/AtlasPanelTabs/useRememberedPanelTab";
+import { isSceneEntry } from "../../isSceneEntry";
+import { CompositionGuidance } from "./CompositionGuidance";
+import { CompositionSettings } from "./CompositionSettings/CompositionSettings";
+import { CompositionStage } from "./CompositionStage/CompositionStage";
+import { CompositionSummary } from "./CompositionSummary/CompositionSummary";
 import css from "./CompositionViewer.module.css";
-import { useCompositionAppearance } from "./useCompositionAppearance";
+import { useCompositionAppearance } from "./useCompositionAppearance/useCompositionAppearance";
 import { useCompositionPlayer } from "./useCompositionPlayer";
-import { VocabularyGuide } from "./VocabularyGuide/VocabularyGuide";
-import type { ContinuityCatalogEntry } from "../../continuityCatalog";
+import type { ContinuityCatalogEntry } from "../../isSceneEntry";
+import type { ReactNode } from "react";
 
 type Props = {
   selected: ContinuityCatalogEntry;
   captions: boolean | undefined;
   onOptions: (options: { id: string; captions: boolean }) => void;
 };
-
-/** One live composition with matching exports and reusable study guidance. */
-export function CompositionViewer({ selected, captions, onOptions }: Props) {
-  const translate = useContinuityCopy();
+/**
+ * One live composition with matching exports, its design tokens, and reusable
+ * study guidance.
+ */
+export function CompositionViewer({
+  selected,
+  captions,
+  onOptions,
+}: Readonly<Props>): ReactNode {
   const player = useRef<HTMLIFrameElement>(null);
-  const appearance = useCompositionAppearance(selected.id, player);
+  const isScene = isSceneEntry(selected);
+  const appearance = useCompositionAppearance({
+    id: selected.id,
+    player,
+    isScene,
+  });
+  const [tab, setTab] = useRememberedPanelTab(selected.id);
   useCompositionPlayer({ id: selected.id, player, onOptions });
+  const isTokenPanel = tab === "tokens" && !isScene;
   return (
     <section
-      className={css.compositionViewer}
-      aria-label={translate("Composition screening")}
+      className={clsx(
+        css.compositionViewer,
+        isTokenPanel && css.compositionViewerIsTokenPanel,
+      )}
+      aria-label="Composition screening"
     >
-      <div className={css.stage}>
-        <iframe
-          key={selected.id}
-          className={css.compositionViewerPlayer}
-          ref={player}
-          src={`/live.html?id=${encodeURIComponent(selected.id)}`}
-          title={translate(selected.title)}
-          onLoad={appearance.loaded}
-          allowFullScreen
-        />
-      </div>
-      <div className={css.details}>
+      <CompositionStage
+        selected={selected}
+        player={player}
+        isTokenPanel={isTokenPanel}
+        onLoad={appearance.loaded}
+      />
+      <div className={css.compositionViewerDetails}>
         <CompositionSummary selected={selected} />
       </div>
-      <div className={css.settings}>
-        <CompositionControls appearance={appearance} />
-        <CompositionActions
-          id={selected.id}
-          captions={captions}
-          options={appearance.options}
+      <div className={css.compositionViewerSettings}>
+        <CompositionSettings
+          {...{ selected, captions, player, appearance, tab }}
+          onTabChange={setTab}
         />
       </div>
-      <div className={css.guidance}>
-        {selected.family === "vocabulary" && (
-          <VocabularyGuide entry={selected} />
-        )}
-        <CompositionNotice />
-      </div>
+      <CompositionGuidance selected={selected} isScene={isScene} />
     </section>
-  );
-}
-
-function CompositionNotice() {
-  const translate = useContinuityCopy();
-  return (
-    <p className={css.compositionViewerNotice}>
-      {translate(
-        "Live React compositions. Fictional demonstration data. Product states are scripted; architecture diagrams are illustrations. Plugin capabilities are future vision. Downloads render the current composition and caption selection.",
-      )}
-    </p>
   );
 }

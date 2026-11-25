@@ -1,0 +1,8 @@
+{
+  "plugin.name": "Mozambique",
+  "plugin.description": "Province and district boundaries of Mozambique, ready to use as map boundaries.",
+  "content.provinces.title": "Mozambique provinces",
+  "content.provinces.description": "The 11 provinces of Mozambique, including Maputo City, with their boundaries as WKT. Source: Mozambique INE and UN OCHA ROSEA, through geoBoundaries (gbHumanitarian). License: CC BY 3.0 IGO. Boundaries simplified for maps.",
+  "content.districts.title": "Mozambique districts",
+  "content.districts.description": "The 159 districts of Mozambique and the province each lies in, with their boundaries as WKT. Source: Mozambique INE and UN OCHA ROSEA, through geoBoundaries (gbHumanitarian). License: CC BY 3.0 IGO. Boundaries simplified for maps."
+}

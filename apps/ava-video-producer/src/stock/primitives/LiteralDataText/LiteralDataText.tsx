@@ -1,4 +1,4 @@
-import { STOCK } from "../../stockPalette";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { ReactNode } from "react";
 
 type Props = { value: string; x: number; y: number; color?: string };
@@ -12,39 +12,42 @@ const WHITESPACE_MARKS: Readonly<Record<string, string>> = {
   "\r": "␍",
 };
 /**
- * Exact data at a fixed 12px size. Callers own the full single-line width.
- * Amber underlined whitespace marks preserve whole graphemes and raw aria.
+ * Exact data at the data role's size (12 px in classic). Callers own the full
+ * single-line width. Amber underlined whitespace marks preserve whole graphemes
+ * and raw aria.
  */
 export function LiteralDataText({
   value,
   x,
   y,
-  color = STOCK.text,
+  color,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const data = tokens.text.graphic.data;
   return (
     <text
       aria-label={value}
       data-literal-value={value}
       x={x}
       y={y}
-      fontSize={12}
-      fontFamily="Arial, sans-serif"
+      fontSize={data.fontSize}
+      fontFamily={data.fontFamily}
+      fontWeight={data.fontWeight}
       xmlSpace="preserve"
-      fill={color}
+      fill={color ?? data.color}
     >
       {Array.from(GRAPHEMES.segment(value)).map(({ segment, index }) => {
         const isWhitespace = /\s/u.test(segment);
         return (
           <tspan
             key={index}
-            fill={isWhitespace ? STOCK.orange : undefined}
+            fill={isWhitespace ? tokens.color.highlight : undefined}
             textDecoration={isWhitespace ? "underline" : undefined}
           >
             {isWhitespace
-              ? segment.replace(
-                  /\s/gu,
-                  (character) => WHITESPACE_MARKS[character] ?? "␣",
-                )
+              ? segment.replace(/\s/gu, (character) => {
+                  return WHITESPACE_MARKS[character] ?? "␣";
+                })
               : segment}
           </tspan>
         );

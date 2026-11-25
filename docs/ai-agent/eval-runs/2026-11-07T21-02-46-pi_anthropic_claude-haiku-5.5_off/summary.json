@@ -1,0 +1,17 @@
+{
+  "label": "pi:anthropic/claude-haiku-5.5@off",
+  "questionCount": 45,
+  "passCount": 45,
+  "needlessQuestions": 0,
+  "missedQuestions": 1,
+  "consentPrompts": 0,
+  "modelCalls": 59,
+  "promptTokens": 160691,
+  "cachedPromptTokens": 141790,
+  "completionTokens": 19583,
+  "totalCost": 0.013566825000000001,
+  "costPerQuestion": 0.00030148500000000005,
+  "latencyMedianMs": 2502.2938330000006,
+  "latencyP90Ms": 3477.227541,
+  "failedIds": []
+}

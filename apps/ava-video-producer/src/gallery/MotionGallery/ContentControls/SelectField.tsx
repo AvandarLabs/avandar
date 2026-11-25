@@ -1,8 +1,7 @@
 import { propEq } from "@avandar/utils";
-import { useLingui } from "@lingui/react";
-import { useLingui as useLinguiMacro } from "@lingui/react/macro";
-import { StockCopyMessages } from "../../../stock/i18n/StockCopyMessages";
+import { getStockValueFromPath } from "../../../stock/data/getStockValueFromPath";
 import { ContentFields } from "./ContentFields/ContentFields";
+import { SelectOptions } from "./SelectOptions";
 import type { StockControl } from "../../../stock/contracts/StockContract.types";
 import type { Props as ContentFieldProps } from "./ContentField/ContentField";
 import type { ContentFieldContext } from "./useContentField";
@@ -25,22 +24,15 @@ export function SelectField({
   context,
   state,
   itemPath,
-}: Props): ReactNode {
-  const { i18n } = useLingui();
-  const { t } = useLinguiMacro();
-  const options = ContentFields.getOptionsFromControl({
-    control,
-    root: state.draft,
-    item: StockCopyMessages.getValueFromPath({
-      value: state.draft,
-      path: itemPath,
-    }),
-  });
+}: Readonly<Props>): ReactNode {
+  const options = _getFieldOptions({ control, state, itemPath });
   const selectedIndex = options.findIndex(
     propEq<{ value: unknown }, "value", unknown>("value", context.value),
   );
   const selectValue = (value: string) => {
-    const option = options.find((_, index) => `option:${index}` === value);
+    const option = options.find((_, index) => {
+      return `option:${index}` === value;
+    });
     if (option) {
       context.update(option.value);
     }
@@ -49,16 +41,31 @@ export function SelectField({
     <select
       {...context.field}
       value={selectedIndex < 0 ? "" : `option:${selectedIndex}`}
-      onChange={(event) => selectValue(event.target.value)}
+      onChange={(event) => {
+        return selectValue(event.target.value);
+      }}
     >
-      <option value="" disabled>{t`Choose a value`}</option>
-      {options.map((option, index) => (
-        <option key={`${option.value}-${index}`} value={`option:${index}`}>
-          {typeof option.label === "string"
-            ? option.label
-            : i18n._(option.label)}
-        </option>
-      ))}
+      <option value="" disabled>
+        {"Choose a value"}
+      </option>
+      <SelectOptions options={options} />
     </select>
   );
+}
+
+function _getFieldOptions({
+  control,
+  state,
+  itemPath,
+}: Readonly<Pick<Props, "control" | "state" | "itemPath">>): ReturnType<
+  typeof ContentFields.getOptionsFromControl
+> {
+  return ContentFields.getOptionsFromControl({
+    control,
+    root: state.draft,
+    item: getStockValueFromPath({
+      value: state.draft,
+      path: itemPath,
+    }),
+  });
 }

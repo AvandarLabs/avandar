@@ -1,9 +1,13 @@
 #!/bin/bash
+if [ "${AVA_PRODUCER_ACTIVE_SCRIPT:-}" != "$0" ]; then
+  exec node "$(dirname "$0")/runProducerCommand/runShellCommand.mjs" "add-sfx" "$0" "$@"
+fi
+exec 1>&2
 # The sound layer.  bash scripts/add-sfx.sh <composition-id>
 #
 # Lays UI sound onto an ALREADY RENDERED mp4. Remotion never runs, no frame is
 # redrawn: the video stream is copied byte for byte (-c:v copy), so neither
-# tiled frames nor luminance jumps can come back and check-frames.mjs does not
+# tiled frames nor luminance jumps can come back and checkFrames.ts does not
 # need re-running. One pass, about a second.
 #
 #   in   out/<id>.mp4          (silent, from render.sh)
@@ -33,7 +37,7 @@
 # and a belt rotation with it too and the whole clip sounds identical.
 set -e
 cd "$(dirname "$0")/.."
-node scripts/require-license.mjs
+node --import tsx scripts/requireLicense.ts
 
 ID="${1:-demo}"
 IN="out/$ID.mp4"
@@ -47,15 +51,12 @@ FPS=30
 
 # Frames in the beat file are BODY frames: the same numbers as the beat-sheet
 # constants at the top of your composition. The body is wrapped in
-# <Sequence from={TITLE_LEN}> in src/Root.tsx, so this script adds the offset.
+# <Sequence from={TITLE_LEN}> in src/Root/Clip.tsx, so this script adds the offset.
 # Beats on the title card itself are written `t6` and are used as-is.
-#
-# The original version of this script made you add 66 by hand and called it
-# "the only trap here". It is not a trap you should have to remember.
 TITLE_OFFSET="${TITLE_OFFSET:-66}"
 
-[ -f "$IN" ] || { echo "no $IN — render it first: sh scripts/render.sh $ID"; exit 1; }
-[ -f "$BEATS_FILE" ] || { echo "no $BEATS_FILE — copy scripts/beats/demo.txt and score your clip"; exit 1; }
+[ -f "$IN" ] || { echo "no $IN - render it first: sh scripts/render.sh $ID"; exit 1; }
+[ -f "$BEATS_FILE" ] || { echo "no $BEATS_FILE - copy scripts/beats/demo.txt and score your clip"; exit 1; }
 
 # Never silently clobber a finished render. out/ is gitignored, so an
 # overwritten file is simply gone. FORCE=1 if you mean it.

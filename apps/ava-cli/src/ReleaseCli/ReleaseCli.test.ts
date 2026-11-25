@@ -8,9 +8,43 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import {
+  expectRefusalWithoutCall,
+  runAvaThroughRealParser,
+  waitForFirstCall,
+} from "@ava-cli/ReleaseCli/__tests__/runAvaThroughRealParser";
+import { checkSourceBranchCi } from "@ava-cli/ReleaseCli/checkSourceBranchCi/checkSourceBranchCi";
 import { ReleaseCli } from "@ava-cli/ReleaseCli/ReleaseCli";
+import { promptToConfirm } from "@ava-cli/ReleaseCli/releasePromptHelpers";
+import { runRelease } from "@ava-cli/ReleaseCli/runRelease/runRelease";
 import { noop } from "@avandar/utils";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
+import type { CiStatus } from "@ava-cli/ReleaseCli/checkSourceBranchCi/checkSourceBranchCi";
+import type { ReleaseOptions } from "@ava-cli/ReleaseCli/runRelease/runRelease";
+
+// The real check asks GitHub, which these fixture repositories are not on.
+// Every test that reaches it sets the verdict it needs.
+vi.mock("@ava-cli/ReleaseCli/checkSourceBranchCi/checkSourceBranchCi");
+// A prompt would wait on stdin. Every test that reaches one says so.
+vi.mock("@ava-cli/ReleaseCli/releasePromptHelpers");
+// The real release runs by default. Tests that only check how argv is parsed
+// stub it, so a parsing bug cannot start a release.
+vi.mock("@ava-cli/ReleaseCli/runRelease/runRelease", async (importOriginal) => {
+  const actualModule =
+    await importOriginal<
+      typeof import("@ava-cli/ReleaseCli/runRelease/runRelease")
+    >();
+  return { ...actualModule, runRelease: vi.fn(actualModule.runRelease) };
+});
 
 /** Run a Git command in the given directory and return trimmed stdout. */
 function _git(
@@ -181,6 +215,979 @@ describe("ava release get-prod-version", () => {
       expect.stringContaining("ava release get-prod-version"),
     );
     expect(console.error).not.toHaveBeenCalled();
+    expect(process.exitCode).toBeUndefined();
+  });
+});
+
+/** Everything `ava release` printed, one `console.log` call per line. */
+function _stdoutText(): string {
+  return vi
+    .mocked(console.log)
+    .mock.calls.map((call) => {
+      return call.map(String).join(" ");
+    })
+    .join("\n");
+}
+
+/**
+ * Run `ava release` with both versions passed, so nothing would prompt if a
+ * refusal regressed.
+ */
+async function _runRelease(
+  options: Readonly<{ dryRun: boolean; yes?: boolean }>,
+): Promise<void> {
+  await ReleaseCli.state.action?.({
+    version: "0.15.0",
+    next: "0.15.1",
+    yes: options.yes ?? false,
+    dryRun: options.dryRun,
+    skipCiCheck: false,
+    skipChangelog: false,
+  });
+}
+
+/** Every ref in a repository with its SHA, to prove nothing moved. */
+function _listRefs(cwd: string): string {
+  return _git({
+    cwd,
+    args: ["for-each-ref", "--format=%(refname) %(objectname)"],
+  });
+}
+
+describe("ava release on a branch that is not a source branch", () => {
+  let directory: string;
+  let repoRoot: string;
+  let originalArgv: string[];
+  let originalExitCode: typeof process.exitCode;
+
+  beforeEach(() => {
+    directory = mkdtempSync(join(tmpdir(), "ava-release-refusal-"));
+    ({ repoRoot } = _createRepos(directory));
+    _git({ cwd: repoRoot, args: ["switch", "main"] });
+    originalArgv = process.argv;
+    originalExitCode = process.exitCode;
+    process.argv = [process.execPath, "ava", "release"];
+    process.exitCode = undefined;
+    vi.spyOn(process, "cwd").mockReturnValue(join(repoRoot, "apps/ava-cli"));
+    vi.spyOn(console, "log").mockImplementation(noop);
+    vi.spyOn(console, "error").mockImplementation(noop);
+  });
+
+  afterEach(() => {
+    process.argv = originalArgv;
+    process.exitCode = originalExitCode;
+    vi.restoreAllMocks();
+    rmSync(directory, { recursive: true, force: true });
+  });
+
+  it.each(["main", "alpha-dev"])(
+    "refuses %s with exit code 1, naming develop",
+    async (branch) => {
+      _git({ cwd: repoRoot, args: ["switch", "-C", branch] });
+
+      await _runRelease({ dryRun: false });
+
+      expect(process.exitCode).toBe(1);
+      expect(_stdoutText()).toContain(
+        `Releases are cut from "develop" (currently on "${branch}").`,
+      );
+    },
+  );
+
+  it("refuses main before fetching, committing, or pushing anything", async () => {
+    const origin = join(directory, "origin");
+    const refsBefore = _listRefs(repoRoot);
+    const originRefsBefore = _listRefs(origin);
+
+    await _runRelease({ dryRun: false });
+
+    // A fetch would move origin/main to origin's newer commit.
+    expect(_listRefs(repoRoot)).toBe(refsBefore);
+    expect(_listRefs(origin)).toBe(originRefsBefore);
+    expect(_git({ cwd: repoRoot, args: ["status", "--short"] })).toBe("");
+    // Every mutating command is echoed as `$ <command>` before it runs.
+    expect(_stdoutText()).not.toContain("$ ");
+  });
+
+  it("accepts the global --env option and reaches the branch check", async () => {
+    process.argv.push("--env", "staging");
+
+    await _runRelease({ dryRun: false });
+
+    const stdout = _stdoutText();
+    expect(stdout).not.toContain("Unknown option");
+    expect(stdout).toContain(
+      'Releases are cut from "develop" (currently on "main").',
+    );
+  });
+
+  it("names the branch, not heads/main, when a tag is also named main", async () => {
+    _git({ cwd: repoRoot, args: ["tag", "main"] });
+
+    await _runRelease({ dryRun: false });
+
+    expect(_stdoutText()).toContain('(currently on "main")');
+  });
+
+  it("refuses a detached HEAD, naming it", async () => {
+    _git({ cwd: repoRoot, args: ["switch", "--detach"] });
+
+    await _runRelease({ dryRun: false });
+
+    expect(process.exitCode).toBe(1);
+    expect(_stdoutText()).toContain('(currently on "a detached HEAD")');
+  });
+});
+
+describe("ava release on develop", () => {
+  let directory: string;
+  let repoRoot: string;
+  let originalArgv: string[];
+  let originalExitCode: typeof process.exitCode;
+
+  beforeEach(() => {
+    directory = mkdtempSync(join(tmpdir(), "ava-release-source-"));
+    ({ repoRoot } = _createRepos(directory));
+    vi.mocked(runRelease).mockClear();
+    originalArgv = process.argv;
+    originalExitCode = process.exitCode;
+    process.argv = [process.execPath, "ava", "release", "--dry-run"];
+    process.exitCode = undefined;
+    vi.spyOn(process, "cwd").mockReturnValue(join(repoRoot, "apps/ava-cli"));
+    vi.spyOn(console, "log").mockImplementation(noop);
+    vi.spyOn(console, "error").mockImplementation(noop);
+  });
+
+  afterEach(() => {
+    process.argv = originalArgv;
+    process.exitCode = originalExitCode;
+    vi.restoreAllMocks();
+    rmSync(directory, { recursive: true, force: true });
+  });
+
+  it("refuses a dirty develop in preflight", async () => {
+    _git({ cwd: repoRoot, args: ["switch", "-c", "develop"] });
+    // A tracked change makes preflight refuse locally, before any fetch.
+    writeFileSync(join(repoRoot, "package.json"), '{"version":"dirty"}\n');
+
+    await _runRelease({ dryRun: true });
+
+    const stdout = _stdoutText();
+    expect(stdout).toContain("The working tree has tracked changes");
+    expect(process.exitCode).toBe(1);
+  });
+
+  it("refuses --dry-run=true --yes before the release starts, with exit code 1", async () => {
+    _git({ cwd: repoRoot, args: ["switch", "-c", "develop"] });
+    const origin = join(directory, "origin");
+    const refsBefore = _listRefs(repoRoot);
+    const originRefsBefore = _listRefs(origin);
+    process.argv = [
+      process.execPath,
+      "ava",
+      "release",
+      "--dry-run=true",
+      "--yes",
+    ];
+
+    // Acclimate reads `--dry-run=true` as an unknown option named
+    // `--dry-run=true`, so the action sees a real, unconfirmed release.
+    await _runRelease({ dryRun: false, yes: true });
+
+    expect(_stdoutText()).toContain("--dry-run=true");
+    expect(runRelease).not.toHaveBeenCalled();
+    // On develop a release that started would fetch, moving origin/main to
+    // origin's newer commit, so unmoved refs also prove it never ran.
+    expect(_listRefs(repoRoot)).toBe(refsBefore);
+    expect(_listRefs(origin)).toBe(originRefsBefore);
+    expect(process.exitCode).toBe(1);
+  });
+});
+
+/**
+ * Give a test repository its own identity and turn off signing and hooks, so
+ * commits and tags work on any machine without touching global config.
+ */
+function _configureRepo(repoRoot: string): void {
+  const settings: Array<[string, string]> = [
+    ["user.name", "Ava CLI Test"],
+    ["user.email", "ava-cli@example.test"],
+    ["commit.gpgSign", "false"],
+    ["tag.gpgSign", "false"],
+    ["core.hooksPath", "/dev/null"],
+  ];
+  settings.forEach(([key, value]) => {
+    _git({ cwd: repoRoot, args: ["config", key, value] });
+  });
+}
+
+/** Commit every change in `repoRoot`, with `package.json` set to `version`. */
+function _commitVersion(
+  options: Readonly<{ repoRoot: string; version: string; message: string }>,
+): void {
+  const { repoRoot, version, message } = options;
+  writeFileSync(
+    join(repoRoot, "package.json"),
+    `${JSON.stringify({ name: "fixture", version }, null, 2)}\n`,
+  );
+  _git({ cwd: repoRoot, args: ["add", "."] });
+  _git({ cwd: repoRoot, args: ["commit", "-m", message] });
+}
+
+/**
+ * Tags named like every release branch, all on `main` before the release, so
+ * a bare branch name in any push or lookup would hit the wrong commit.
+ */
+const BRANCH_NAMED_TAGS = ["main", "alpha", "alpha-dev", "develop"];
+
+/**
+ * Isolate the real releases from the machine they run on: no global or system
+ * git config, and npm (which `pnpm version` runs) writes its logs under
+ * `directory` and skips its registry update check. Undone by
+ * `vi.unstubAllEnvs`.
+ */
+function _isolateFromUserConfig(directory: string): void {
+  vi.stubEnv("GIT_CONFIG_GLOBAL", "/dev/null");
+  vi.stubEnv("GIT_CONFIG_NOSYSTEM", "1");
+  vi.stubEnv("npm_config_update_notifier", "false");
+  vi.stubEnv("npm_config_logs_dir", join(directory, "npm-logs"));
+}
+
+/**
+ * Push `develop` at `0.14.2-dev`, one commit past `main`, from `seed` to
+ * origin, along with every `BRANCH_NAMED_TAGS` tag. A retired release line's
+ * branches are pushed too, `alpha-dev` one commit past `main` and `alpha` at
+ * `main`, so a release can prove it leaves branches it does not own alone.
+ */
+function _pushLineBranches(seed: string): void {
+  _git({ cwd: seed, args: ["switch", "-c", "develop"] });
+  writeFileSync(join(seed, "develop.txt"), "develop work\n");
+  _commitVersion({
+    repoRoot: seed,
+    version: "0.14.2-dev",
+    message: "Develop work",
+  });
+  _git({ cwd: seed, args: ["switch", "-c", "alpha-dev", "main"] });
+  writeFileSync(join(seed, "alpha.txt"), "alpha work\n");
+  _commitVersion({
+    repoRoot: seed,
+    version: "0.15.0-alpha-dev",
+    message: "Alpha work",
+  });
+  BRANCH_NAMED_TAGS.forEach((tag) => {
+    _git({ cwd: seed, args: ["tag", tag, "main"] });
+  });
+  _git({
+    cwd: seed,
+    args: [
+      "push",
+      "origin",
+      "refs/heads/develop:refs/heads/develop",
+      "refs/heads/alpha-dev:refs/heads/alpha-dev",
+      "refs/heads/main:refs/heads/alpha",
+      ...BRANCH_NAMED_TAGS.map((tag) => {
+        return `refs/tags/${tag}`;
+      }),
+    ],
+  });
+}
+
+/**
+ * A bare origin holding the release branches, and a configured clone of it to
+ * release from. The origin is bare so a release can push to any branch.
+ */
+function _createReleaseRepos(directory: string): {
+  origin: string;
+  checkout: string;
+} {
+  const origin = join(directory, "origin.git");
+  const seed = join(directory, "seed");
+  const checkout = join(directory, "checkout");
+  _git({
+    cwd: directory,
+    args: ["init", "--bare", "--initial-branch=main", origin],
+  });
+  mkdirSync(join(seed, "apps/ava-cli"), { recursive: true });
+  _git({ cwd: directory, args: ["init", "--initial-branch=main", seed] });
+  _configureRepo(seed);
+  writeFileSync(join(seed, "pnpm-workspace.yaml"), "packages: []\n");
+  writeFileSync(join(seed, "apps/ava-cli/package.json"), "{}\n");
+  _commitVersion({ repoRoot: seed, version: "0.14.1", message: "Initial" });
+  _git({ cwd: seed, args: ["remote", "add", "origin", origin] });
+  _git({
+    cwd: seed,
+    args: ["push", "origin", "refs/heads/main:refs/heads/main"],
+  });
+  _pushLineBranches(seed);
+  _git({ cwd: directory, args: ["clone", origin, checkout] });
+  _configureRepo(checkout);
+  return { origin, checkout };
+}
+
+/** Every branch tip in `repoRoot`, keyed by branch name. */
+function _readBranchTips(repoRoot: string): Record<string, string> {
+  const output = _git({
+    cwd: repoRoot,
+    args: [
+      "for-each-ref",
+      "--format=%(refname:lstrip=2) %(objectname)",
+      "refs/heads",
+    ],
+  });
+  return Object.fromEntries(
+    output.split("\n").map((row) => {
+      return row.split(" ");
+    }),
+  );
+}
+
+/** The `version` in package.json at `revision`. */
+function _readPackageVersion(
+  options: Readonly<{ repoRoot: string; revision: string }>,
+): string {
+  const contents = _git({
+    cwd: options.repoRoot,
+    args: ["show", `${options.revision}:package.json`],
+  });
+  return (JSON.parse(contents) as { version: string }).version;
+}
+
+/** One line's release in the end-to-end tests, and what it must produce. */
+type EndToEndReleaseCase = {
+  /** The branch released from, and the one checked out. */
+  sourceBranch: string;
+  /** The branch the release publishes to. */
+  targetBranch: string;
+  /** The retired line's branches, which the release must not touch. */
+  retiredLineBranches: string[];
+  version: string;
+  nextVersion: string;
+  /** package.json on the target branch after the release. */
+  releaseVersion: string;
+  releaseTag: string;
+  /** The tag the retired line would have used, which must not appear. */
+  retiredLineTag: string;
+  /** package.json on the source branch after the release. */
+  nextDevVersion: string;
+};
+
+const END_TO_END_RELEASE_CASES: readonly EndToEndReleaseCase[] = [
+  {
+    sourceBranch: "develop",
+    targetBranch: "main",
+    retiredLineBranches: ["alpha", "alpha-dev"],
+    version: "0.14.2",
+    nextVersion: "0.14.3",
+    releaseVersion: "0.14.2",
+    releaseTag: "v0.14.2",
+    retiredLineTag: "v0.14.2-alpha",
+    nextDevVersion: "0.14.3-dev",
+  },
+];
+
+/**
+ * Fresh repositories under `directory` with `sourceBranch` checked out, and
+ * `ava release` pointed at the checkout with its output silenced.
+ */
+function _checkOutFreshSourceBranch(
+  options: Readonly<{ directory: string; sourceBranch: string }>,
+): { origin: string; checkout: string } {
+  const { directory, sourceBranch } = options;
+  const { origin, checkout } = _createReleaseRepos(directory);
+  _git({
+    cwd: checkout,
+    args: ["switch", "-c", sourceBranch, "--track", `origin/${sourceBranch}`],
+  });
+  vi.spyOn(process, "cwd").mockReturnValue(checkout);
+  vi.spyOn(console, "log").mockImplementation(noop);
+  vi.spyOn(console, "error").mockImplementation(noop);
+  return { origin, checkout };
+}
+
+describe.each(END_TO_END_RELEASE_CASES)(
+  "ava release end to end on $sourceBranch",
+  (releaseCase) => {
+    const { sourceBranch, targetBranch, releaseTag } = releaseCase;
+    let directory: string;
+    let origin: string;
+    let checkout: string;
+    let tipsBefore: Record<string, string>;
+    let tipsAfter: Record<string, string>;
+
+    beforeAll(async () => {
+      directory = mkdtempSync(join(tmpdir(), "ava-release-e2e-"));
+      _isolateFromUserConfig(directory);
+      ({ origin, checkout } = _checkOutFreshSourceBranch({
+        directory,
+        sourceBranch,
+      }));
+      tipsBefore = _readBranchTips(origin);
+      await runRelease({
+        version: releaseCase.version,
+        nextVersion: releaseCase.nextVersion,
+        yes: true,
+        dryRun: false,
+        skipCiCheck: true,
+        skipChangelog: true,
+      });
+      tipsAfter = _readBranchTips(origin);
+    }, 30_000);
+
+    afterAll(() => {
+      vi.restoreAllMocks();
+      vi.unstubAllEnvs();
+      rmSync(directory, { recursive: true, force: true });
+    });
+
+    /** The `n`th parent of the published target commit, 1-based. */
+    const _readTargetParent = (parentNumber: number): string => {
+      return _git({
+        cwd: origin,
+        args: ["rev-parse", `${tipsAfter[targetBranch]}^${parentNumber}`],
+      });
+    };
+
+    it(`leaves ${releaseCase.retiredLineBranches.join(" and ")} on origin untouched`, () => {
+      releaseCase.retiredLineBranches.forEach((branch) => {
+        expect(tipsAfter[branch]).toBe(tipsBefore[branch]);
+      });
+    });
+
+    it(`gives ${targetBranch} its old tip as the first parent`, () => {
+      expect(_readTargetParent(1)).toBe(tipsBefore[targetBranch]);
+    });
+
+    it(`gives ${targetBranch} a second parent that is the version commit on the old ${sourceBranch}`, () => {
+      const versionCommit = _readTargetParent(2);
+      expect(
+        _git({
+          cwd: origin,
+          args: ["log", "-1", "--format=%s", versionCommit],
+        }),
+      ).toBe(`Release: ${releaseTag} [skip deploy]`);
+      expect(
+        _git({ cwd: origin, args: ["rev-parse", `${versionCommit}^`] }),
+      ).toBe(tipsBefore[sourceBranch]);
+    });
+
+    it(`gives ${targetBranch} exactly the version commit's tree`, () => {
+      expect(
+        _git({
+          cwd: origin,
+          args: ["rev-parse", `${tipsAfter[targetBranch]}^{tree}`],
+        }),
+      ).toBe(
+        _git({
+          cwd: origin,
+          args: ["rev-parse", `${_readTargetParent(2)}^{tree}`],
+        }),
+      );
+    });
+
+    it(`publishes package.json at ${releaseCase.releaseVersion} on ${targetBranch}`, () => {
+      expect(
+        _readPackageVersion({
+          repoRoot: origin,
+          revision: tipsAfter[targetBranch] ?? "",
+        }),
+      ).toBe(releaseCase.releaseVersion);
+    });
+
+    it(`tags ${targetBranch} with the annotated tag ${releaseTag}`, () => {
+      expect(
+        _git({
+          cwd: origin,
+          args: ["cat-file", "-t", `refs/tags/${releaseTag}`],
+        }),
+      ).toBe("tag");
+      expect(
+        _git({
+          cwd: origin,
+          args: ["rev-parse", `refs/tags/${releaseTag}^{commit}`],
+        }),
+      ).toBe(tipsAfter[targetBranch]);
+    });
+
+    it(`creates no ${releaseCase.retiredLineTag} tag`, () => {
+      expect(
+        _git({
+          cwd: origin,
+          args: ["tag", "--list", releaseCase.retiredLineTag],
+        }),
+      ).toBe("");
+    });
+
+    it(`moves ${sourceBranch} to a bump commit at ${releaseCase.nextDevVersion} on top of the version commit`, () => {
+      const sourceTip = tipsAfter[sourceBranch] ?? "";
+      expect(
+        _git({ cwd: origin, args: ["log", "-1", "--format=%s", sourceTip] }),
+      ).toBe(`Bump version to ${releaseCase.nextDevVersion} [skip deploy]`);
+      expect(_git({ cwd: origin, args: ["rev-parse", `${sourceTip}^`] })).toBe(
+        _readTargetParent(2),
+      );
+      expect(
+        _readPackageVersion({ repoRoot: origin, revision: sourceTip }),
+      ).toBe(releaseCase.nextDevVersion);
+    });
+
+    it(`moves the local ${targetBranch} branch to the release`, () => {
+      expect(
+        _git({
+          cwd: checkout,
+          args: ["rev-parse", `refs/heads/${targetBranch}`],
+        }),
+      ).toBe(tipsAfter[targetBranch]);
+    });
+
+    it(`leaves the local ${sourceBranch} at origin's bump commit`, () => {
+      expect(
+        _git({
+          cwd: checkout,
+          args: ["rev-parse", `refs/heads/${sourceBranch}`],
+        }),
+      ).toBe(tipsAfter[sourceBranch]);
+    });
+
+    it("leaves the tags named like the branches on main", () => {
+      BRANCH_NAMED_TAGS.forEach((tag) => {
+        expect(
+          _git({ cwd: origin, args: ["rev-parse", `refs/tags/${tag}`] }),
+        ).toBe(tipsBefore.main);
+      });
+    });
+
+    it("leaves the checkout clean", () => {
+      expect(_git({ cwd: checkout, args: ["status", "--short"] })).toBe("");
+    });
+  },
+);
+
+describe.each(END_TO_END_RELEASE_CASES)(
+  "ava release --dry-run end to end on $sourceBranch",
+  (releaseCase) => {
+    let directory: string;
+    let origin: string;
+    let checkout: string;
+    let originRefsBefore: string;
+    let checkoutRefsBefore: string;
+    let headBefore: string;
+
+    beforeAll(async () => {
+      directory = mkdtempSync(join(tmpdir(), "ava-release-e2e-dry-"));
+      _isolateFromUserConfig(directory);
+      ({ origin, checkout } = _checkOutFreshSourceBranch({
+        directory,
+        sourceBranch: releaseCase.sourceBranch,
+      }));
+      // Fetched first, so the release's own fetch has nothing left to move.
+      _git({ cwd: checkout, args: ["fetch", "--prune", "--tags", "origin"] });
+      originRefsBefore = _listRefs(origin);
+      checkoutRefsBefore = _listRefs(checkout);
+      headBefore = _git({ cwd: checkout, args: ["rev-parse", "HEAD"] });
+      await runRelease({
+        version: releaseCase.version,
+        nextVersion: releaseCase.nextVersion,
+        yes: true,
+        dryRun: true,
+        skipCiCheck: true,
+        skipChangelog: true,
+      });
+    }, 30_000);
+
+    afterAll(() => {
+      vi.restoreAllMocks();
+      vi.unstubAllEnvs();
+      rmSync(directory, { recursive: true, force: true });
+    });
+
+    it("moves no ref on origin", () => {
+      expect(_listRefs(origin)).toBe(originRefsBefore);
+    });
+
+    it("moves no ref in the checkout", () => {
+      expect(_listRefs(checkout)).toBe(checkoutRefsBefore);
+    });
+
+    it("leaves HEAD where it was", () => {
+      expect(_git({ cwd: checkout, args: ["rev-parse", "HEAD"] })).toBe(
+        headBefore,
+      );
+    });
+
+    it("leaves the checkout clean", () => {
+      expect(_git({ cwd: checkout, args: ["status", "--short"] })).toBe("");
+    });
+  },
+);
+
+/** The run URL the mocked CI check reports, which the CI warning names. */
+const CI_RUN_URL = "https://github.com/AvandarLabs/avandar/actions/runs/7";
+
+/** One release the CI gate must let through, and the verdict it sees. */
+type CiGateProceedCase = {
+  name: string;
+  sourceBranch: string;
+  targetBranch: string;
+  version: string;
+  nextVersion: string;
+  releaseTag: string;
+  ciStatus: CiStatus;
+  skipCiCheck: boolean;
+};
+
+const CI_GATE_PROCEED_CASES: readonly CiGateProceedCase[] = [
+  {
+    name: "develop with a failed verdict, --skip-ci-check and --yes",
+    sourceBranch: "develop",
+    targetBranch: "main",
+    version: "0.14.2",
+    nextVersion: "0.14.3",
+    releaseTag: "v0.14.2",
+    ciStatus: { kind: "failed", conclusion: "failure", url: CI_RUN_URL },
+    skipCiCheck: true,
+  },
+  {
+    name: "develop with a passed verdict and --yes",
+    sourceBranch: "develop",
+    targetBranch: "main",
+    version: "0.14.2",
+    nextVersion: "0.14.3",
+    releaseTag: "v0.14.2",
+    ciStatus: { kind: "passed", url: CI_RUN_URL },
+    skipCiCheck: false,
+  },
+];
+
+describe.each(CI_GATE_PROCEED_CASES)("ava release on $name", (proceedCase) => {
+  let directory: string;
+  let origin: string;
+  let tipsBefore: Record<string, string>;
+
+  beforeAll(() => {
+    directory = mkdtempSync(join(tmpdir(), "ava-release-ci-proceed-"));
+    _isolateFromUserConfig(directory);
+    ({ origin } = _checkOutFreshSourceBranch({
+      directory,
+      sourceBranch: proceedCase.sourceBranch,
+    }));
+    tipsBefore = _readBranchTips(origin);
+    vi.mocked(checkSourceBranchCi).mockClear();
+    vi.mocked(checkSourceBranchCi).mockReturnValue(proceedCase.ciStatus);
+  });
+
+  afterAll(() => {
+    vi.mocked(checkSourceBranchCi).mockReset();
+    vi.restoreAllMocks();
+    vi.unstubAllEnvs();
+    rmSync(directory, { recursive: true, force: true });
+  });
+
+  it(`publishes ${proceedCase.targetBranch} and tags ${proceedCase.releaseTag}`, async () => {
+    await runRelease({
+      version: proceedCase.version,
+      nextVersion: proceedCase.nextVersion,
+      yes: true,
+      dryRun: false,
+      skipCiCheck: proceedCase.skipCiCheck,
+      skipChangelog: true,
+    });
+
+    const tipsAfter = _readBranchTips(origin);
+    expect(tipsAfter[proceedCase.targetBranch]).not.toBe(
+      tipsBefore[proceedCase.targetBranch],
+    );
+    expect(
+      _git({
+        cwd: origin,
+        args: ["rev-parse", `refs/tags/${proceedCase.releaseTag}^{commit}`],
+      }),
+    ).toBe(tipsAfter[proceedCase.targetBranch]);
+    expect(promptToConfirm).not.toHaveBeenCalled();
+    // --skip-ci-check must not read the verdict at all, and every other case
+    // must read it, so the release really went through the CI gate.
+    expect(checkSourceBranchCi).toHaveBeenCalledTimes(
+      proceedCase.skipCiCheck ? 0 : 1,
+    );
+  }, 30_000);
+});
+
+/** One `ava release --yes` the CI gate must stop on a failed verdict. */
+type CiGateStopCase = {
+  name: string;
+  dryRun: boolean;
+  /** The flags on the command line, which the action checks before it runs. */
+  flags: readonly string[];
+};
+
+const CI_GATE_STOP_CASES: readonly CiGateStopCase[] = [
+  { name: "--yes", dryRun: false, flags: ["--yes"] },
+  { name: "--dry-run --yes", dryRun: true, flags: ["--dry-run", "--yes"] },
+];
+
+describe.each(CI_GATE_STOP_CASES)(
+  "ava release $name on develop with a failed verdict",
+  (stopCase) => {
+    let directory: string;
+    let origin: string;
+    let checkout: string;
+    let originRefsBefore: string;
+    let checkoutRefsBefore: string;
+    let originalArgv: string[];
+    let originalExitCode: typeof process.exitCode;
+    let exitCode: typeof process.exitCode;
+
+    beforeAll(async () => {
+      directory = mkdtempSync(join(tmpdir(), "ava-release-ci-stop-"));
+      _isolateFromUserConfig(directory);
+      ({ origin, checkout } = _checkOutFreshSourceBranch({
+        directory,
+        sourceBranch: "develop",
+      }));
+      // Fetched first, so the release's own fetch has nothing left to move.
+      _git({ cwd: checkout, args: ["fetch", "--prune", "--tags", "origin"] });
+      originRefsBefore = _listRefs(origin);
+      checkoutRefsBefore = _listRefs(checkout);
+      vi.mocked(checkSourceBranchCi).mockReturnValue({
+        kind: "failed",
+        conclusion: "failure",
+        url: CI_RUN_URL,
+      });
+      vi.mocked(promptToConfirm).mockClear();
+      originalArgv = process.argv;
+      originalExitCode = process.exitCode;
+      process.argv = [
+        process.execPath,
+        "ava",
+        "release",
+        ...stopCase.flags,
+        "--skip-changelog",
+      ];
+      process.exitCode = undefined;
+
+      await ReleaseCli.state.action?.({
+        version: "0.14.2",
+        next: "0.14.3",
+        yes: true,
+        dryRun: stopCase.dryRun,
+        skipCiCheck: false,
+        skipChangelog: true,
+      });
+      exitCode = process.exitCode;
+    }, 30_000);
+
+    afterAll(() => {
+      process.argv = originalArgv;
+      process.exitCode = originalExitCode;
+      vi.mocked(checkSourceBranchCi).mockReset();
+      vi.restoreAllMocks();
+      vi.unstubAllEnvs();
+      rmSync(directory, { recursive: true, force: true });
+    });
+
+    it("exits with code 1", () => {
+      expect(exitCode).toBe(1);
+    });
+
+    it("says nothing was released and that --skip-ci-check overrides it", () => {
+      const stdout = _stdoutText();
+      expect(stdout).toContain(CI_RUN_URL);
+      expect(stdout).toContain("Nothing has been released.");
+      expect(stdout).toContain("--skip-ci-check");
+    });
+
+    it("echoes no command that would change state", () => {
+      // Every mutating command is echoed as `$ <command>` before it runs, on
+      // a dry run too, so no echo means the stop came before any of them.
+      expect(_stdoutText()).not.toContain("$ ");
+    });
+
+    it("moves no ref on origin and creates no v0.14.2 tag", () => {
+      expect(_listRefs(origin)).toBe(originRefsBefore);
+      expect(_git({ cwd: origin, args: ["tag", "--list", "v0.14.2"] })).toBe(
+        "",
+      );
+    });
+
+    it("moves no ref in the checkout and leaves it clean", () => {
+      expect(_listRefs(checkout)).toBe(checkoutRefsBefore);
+      expect(_git({ cwd: checkout, args: ["status", "--short"] })).toBe("");
+    });
+
+    it("asks nothing", () => {
+      expect(promptToConfirm).not.toHaveBeenCalled();
+    });
+  },
+);
+
+describe("ava release --help", () => {
+  let originalArgv: string[];
+
+  beforeEach(() => {
+    originalArgv = process.argv;
+    process.argv = [process.execPath, "ava", "release", "--help"];
+    vi.spyOn(console, "log").mockImplementation(noop);
+  });
+
+  afterEach(() => {
+    process.argv = originalArgv;
+    vi.restoreAllMocks();
+  });
+
+  it("says main becomes an exact copy of develop, with no other line", async () => {
+    await ReleaseCli.state.action?.({
+      version: "",
+      next: "",
+      yes: false,
+      dryRun: false,
+      skipCiCheck: false,
+      skipChangelog: false,
+    });
+
+    // Collapsed so the assertions survive re-wrapping the help text.
+    const stdout = _stdoutText().replace(/\s+/g, " ");
+    expect(stdout).toContain("main becomes an exact copy of develop");
+    expect(stdout).toContain(
+      "--skip-ci-check Do not check develop's staging CI.",
+    );
+    expect(stdout).not.toMatch(/alpha/i);
+  });
+});
+
+/** What `ava release` hands `runRelease` when only `overrides` were passed. */
+function _createReleaseOptions(
+  overrides: Readonly<Partial<ReleaseOptions>>,
+): ReleaseOptions {
+  return {
+    version: undefined,
+    nextVersion: undefined,
+    yes: false,
+    dryRun: false,
+    skipCiCheck: false,
+    skipChangelog: false,
+    ...overrides,
+  };
+}
+
+/** Run `ava release <flags>` through Acclimate's real argument parser. */
+function _runAvaRelease(flags: readonly string[]): void {
+  runAvaThroughRealParser(["release", ...flags]);
+}
+
+describe("ava release through the real argument parser", () => {
+  let originalArgv: string[];
+  let originalExitCode: typeof process.exitCode;
+
+  beforeEach(() => {
+    originalArgv = process.argv;
+    originalExitCode = process.exitCode;
+    process.exitCode = undefined;
+    vi.mocked(runRelease).mockReset();
+    vi.mocked(runRelease).mockResolvedValue(undefined);
+    vi.spyOn(console, "log").mockImplementation(noop);
+    vi.spyOn(console, "error").mockImplementation(noop);
+  });
+
+  afterEach(() => {
+    process.argv = originalArgv;
+    process.exitCode = originalExitCode;
+    // Puts back the real release for the tests that run it.
+    vi.mocked(runRelease).mockReset();
+    vi.restoreAllMocks();
+  });
+
+  /** Wait for the action to refuse, then prove no release started. */
+  const _expectRefusal = async (expectedText: string): Promise<void> => {
+    await expectRefusalWithoutCall({
+      expectedText,
+      readOutput: _stdoutText,
+      guardedFunction: vi.mocked(runRelease),
+    });
+  };
+
+  /** Wait for the action to start the release, and return its options. */
+  const _waitForReleaseOptions = async (): Promise<ReleaseOptions> => {
+    const [releaseOptions] = await waitForFirstCall(vi.mocked(runRelease));
+    return releaseOptions;
+  };
+
+  it("parses --dry-run as dryRun: true", async () => {
+    _runAvaRelease(["--dry-run"]);
+
+    expect(await _waitForReleaseOptions()).toEqual(
+      _createReleaseOptions({ dryRun: true }),
+    );
+  });
+
+  it("refuses --dry-run=true --yes with exit code 1, starting no release", async () => {
+    _runAvaRelease(["--dry-run=true", "--yes"]);
+
+    await _expectRefusal(
+      "`--dry-run=true`: `--dry-run` takes no value. Pass it to turn it on, " +
+        "or leave it out.",
+    );
+  });
+
+  it("refuses --yes=false, telling the user to leave --yes out", async () => {
+    _runAvaRelease(["--yes=false"]);
+
+    await _expectRefusal(
+      "`--yes=false`: `--yes` takes no value. Pass it to turn it on, or " +
+        "leave it out.",
+    );
+  });
+
+  it("refuses --dry-run=false, telling the user to leave --dry-run out", async () => {
+    _runAvaRelease(["--dry-run=false"]);
+
+    await _expectRefusal(
+      "`--dry-run=false`: `--dry-run` takes no value. Pass it to turn it " +
+        "on, or leave it out.",
+    );
+  });
+
+  it("refuses --yes dry-run, which would otherwise release for real", async () => {
+    _runAvaRelease(["--yes", "dry-run"]);
+
+    await _expectRefusal("Unexpected word: dry-run.");
+  });
+
+  it("names the release's value options when refusing a stray word", async () => {
+    _runAvaRelease(["--yes", "dry-run"]);
+
+    await _expectRefusal(
+      "only these options take a value: `--version`, `-v`, `--next`, `-n`, " +
+        "`--env`.",
+    );
+  });
+
+  it("refuses a mistyped --verison 0.11.0 with only the unknown option", async () => {
+    _runAvaRelease(["--verison", "0.11.0"]);
+
+    await _expectRefusal("Unknown option: --verison. Nothing was released;");
+  });
+
+  it("refuses an option typed with a long dash after --yes", async () => {
+    // An en dash, as an editor's autocorrect turns a pasted `--` into.
+    const token = "\u2013dry-run";
+    _runAvaRelease(["--yes", token]);
+
+    await _expectRefusal(token);
+  });
+
+  it("accepts --version 0.15.0", async () => {
+    _runAvaRelease(["--version", "0.15.0"]);
+
+    expect(await _waitForReleaseOptions()).toEqual(
+      _createReleaseOptions({ version: "0.15.0" }),
+    );
+  });
+
+  it("accepts the global --env staging", async () => {
+    _runAvaRelease(["--env", "staging", "--dry-run"]);
+
+    expect(await _waitForReleaseOptions()).toEqual(
+      _createReleaseOptions({ dryRun: true }),
+    );
     expect(process.exitCode).toBeUndefined();
   });
 });

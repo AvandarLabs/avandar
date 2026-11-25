@@ -46,7 +46,7 @@ the composition that ships here is the generic one above.*
 | | |
 | --- | --- |
 | `src/motion.ts` | The vocabulary. Curves, durations, stagger, and the helpers that stop states teleporting. Imports nothing. |
-| `src/title-card.tsx` | The cold open — words rising out of per-word masks. |
+| `src/TitleCard/TitleCard.tsx` | The cold open — words rising out of per-word masks. |
 | `src/chrome.tsx` | The fake app window, the pointer, the click beats. |
 | `src/compositions/Demo.tsx` | A worked example. Copy this, change the flow. |
 | `scripts/preview.sh` | Stills on every beat, plus a contact sheet. What the gate cannot see. |
@@ -456,7 +456,7 @@ asks whether a frame's left half resembles its right half, which is anomalous
 in a dense interface and perfectly normal elsewhere.
 
 *Flat frames.* Nearly one colour means matching halves by definition, so only
-frames with real contrast are judged (`FLAT = 120`). On a pale, low-contrast
+frames with real contrast are judged (`FLAT_CONTRAST_LIMIT = 120`). On a pale, low-contrast
 UI it will miss corruption a dark one would catch. Lower the threshold for a
 light product; never raise it to make a failure go away.
 

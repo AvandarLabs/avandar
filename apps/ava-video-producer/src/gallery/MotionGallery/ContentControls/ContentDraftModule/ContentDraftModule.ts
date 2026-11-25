@@ -1,5 +1,6 @@
+import { makeObjectFromEntries } from "@avandar/utils";
 import { parseStockInput } from "../../../../stock/contracts/parseStockInput/parseStockInput";
-import { StockCopyMessages } from "../../../../stock/i18n/StockCopyMessages";
+import { getStockValueFromPath } from "../../../../stock/data/getStockValueFromPath";
 import { stockContracts } from "../../../../stock/registry/stockContracts";
 import type {
   StockInputByPreset,
@@ -37,23 +38,22 @@ function _collectRowKeys({
   if (!value || typeof value !== "object") {
     return {};
   }
-  const nested = Object.entries(value).flatMap(([key, item]) =>
-    Object.entries(
+  const nested = Object.entries(value).flatMap(([key, item]) => {
+    return Object.entries(
       _collectRowKeys({
         value: item,
         path: [...path, Array.isArray(value) ? Number(key) : key],
         existing,
       }),
-    ),
-  );
+    );
+  });
   return {
     ...Object.fromEntries(nested),
     ...(Array.isArray(value)
       ? {
-          [JSON.stringify(path)]: value.map(
-            (_, index) =>
-              existing[JSON.stringify(path)]?.[index] ?? _newRowKey(),
-          ),
+          [JSON.stringify(path)]: value.map((_, index) => {
+            return existing[JSON.stringify(path)]?.[index] ?? _newRowKey();
+          }),
         }
       : {}),
   };
@@ -80,12 +80,14 @@ function _validate({
     isValid: parsed.success,
     issues: parsed.success
       ? []
-      : parsed.error.issues.map((issue) => ({
-          path: issue.path.map((key) =>
-            typeof key === "number" ? key : String(key),
-          ),
-          code: issue.code,
-        })),
+      : parsed.error.issues.map((issue) => {
+          return {
+            path: issue.path.map((key) => {
+              return typeof key === "number" ? key : String(key);
+            }),
+            code: issue.code,
+          };
+        }),
   };
 }
 function _setValue({
@@ -102,11 +104,11 @@ function _setValue({
   }
   const [key, ...remainder] = path;
   if (Array.isArray(value)) {
-    return value.map((item, index) =>
-      index === key
+    return value.map((item, index) => {
+      return index === key
         ? _setValue({ value: item, path: remainder, replacement })
-        : item,
-    );
+        : item;
+    });
   }
   if (!value || typeof value !== "object") {
     throw new Error("Invalid draft field path");
@@ -119,7 +121,7 @@ function _setValue({
 /** Starts one independent, fully resolved English content document. */
 function _makeContentDraftFromPreset(preset: StockPresetId): ContentDraft {
   const resolvedInput = parseStockInput({ preset: preset });
-  const draft = structuredClone(resolvedInput) as StockJsonValue;
+  const draft: StockJsonValue = structuredClone(resolvedInput);
   return {
     draft,
     resolvedInput,
@@ -164,38 +166,38 @@ function _getBlankValueFromSchema(
   schema: Readonly<StockJsonSchema>,
 ): StockJsonValue {
   if (schema.type === "object") {
-    return Object.fromEntries(
-      Object.entries(schema.properties ?? {}).map(([key, child]) => [
-        key,
-        typeof child === "object" ? _getBlankValueFromSchema(child) : "",
-      ]),
+    return makeObjectFromEntries(
+      Object.entries(schema.properties ?? {}).map(([key, child]) => {
+        return [
+          key,
+          typeof child === "object" ? _getBlankValueFromSchema(child) : "",
+        ];
+      }),
     );
   }
   if (schema.prefixItems) {
-    return schema.prefixItems.map((child) =>
-      typeof child === "object" ? _getBlankValueFromSchema(child) : "",
-    );
+    return schema.prefixItems.map((child) => {
+      return typeof child === "object" ? _getBlankValueFromSchema(child) : "";
+    });
   }
   if (schema.type === "array") {
     return Array.from(
       {
         length: schema.minItems ?? 0,
       },
-      () =>
-        schema.items &&
-        typeof schema.items === "object" &&
-        !Array.isArray(schema.items)
+      () => {
+        return schema.items &&
+          typeof schema.items === "object" &&
+          !Array.isArray(schema.items)
           ? _getBlankValueFromSchema(schema.items)
-          : "",
+          : "";
+      },
     );
   }
   if (schema.type === "boolean") {
     return false;
   }
-  if (schema.type === "number" || schema.type === "integer") {
-    return "";
-  }
-  return "";
+  return schema.type === "number" || schema.type === "integer" ? "" : "";
 }
 /** Inputs for addDraftItem. */
 type AddDraftItemOptions = {
@@ -212,34 +214,14 @@ function _addDraftItem({
   path,
   schema,
 }: Readonly<AddDraftItemOptions>): ContentDraft {
-  const items = StockCopyMessages.getValueFromPath({
+  const items = getStockValueFromPath({
     value: state.draft,
     path,
   });
   if (!Array.isArray(items)) {
     throw new Error("Expected draft collection");
   }
-  const item = (() => {
-    const blankItem = _getBlankValueFromSchema(schema);
-    if (
-      blankItem &&
-      !Array.isArray(blankItem) &&
-      typeof blankItem === "object" &&
-      schema.properties?.id
-    ) {
-      const ids = new Set(
-        items.map((value: unknown) =>
-          value && typeof value === "object"
-            ? Reflect.get(value, "id")
-            : undefined,
-        ),
-      );
-      let contentId = `item-${++itemSequence}`;
-      while (ids.has(contentId)) contentId = `item-${++itemSequence}`;
-      return { ...blankItem, id: contentId };
-    }
-    return blankItem;
-  })();
+  const item = _createCollectionItem({ schema, items });
   const rowKeys = {
     ...state.rowKeys,
     [JSON.stringify(path)]: [
@@ -274,41 +256,23 @@ function _removeDraftItem({
   path,
   index,
 }: Readonly<RemoveDraftItemOptions>): ContentDraft {
-  const items = StockCopyMessages.getValueFromPath({
+  const items = getStockValueFromPath({
     value: state.draft,
     path,
   });
   if (!Array.isArray(items)) {
     throw new Error("Expected draft collection");
   }
-  const rowKeys = Object.fromEntries(
-    Object.entries(state.rowKeys).flatMap(([key, keys]) => {
-      const keyPath: InputPath = JSON.parse(key);
-      if (key === JSON.stringify(path)) {
-        return [[key, keys.filter((_, position) => position !== index)]];
-      }
-      if (
-        keyPath.length > path.length &&
-        path.every((segment, position) => segment === keyPath[position])
-      ) {
-        const position = Number(keyPath[path.length]);
-        if (position === index) {
-          return [];
-        }
-        if (position > index) {
-          keyPath[path.length] = position - 1;
-        }
-      }
-      return [[JSON.stringify(keyPath), keys]];
-    }),
-  );
+  const rowKeys = _removeCollectionRowKeys({ state, path, index });
   return _validate({
     preset,
     state,
     draft: _setValue({
       value: state.draft,
       path,
-      replacement: items.filter((_, position) => position !== index),
+      replacement: items.filter((_, position) => {
+        return position !== index;
+      }),
     }),
     rowKeys,
   });
@@ -345,3 +309,70 @@ export const ContentDraftModule = {
   addItem: typeof _addDraftItem;
   removeItem: typeof _removeDraftItem;
 };
+
+function _createCollectionItem({
+  schema,
+  items,
+}: Readonly<{
+  schema: AddDraftItemOptions["schema"];
+  items: readonly unknown[];
+}>): StockJsonValue {
+  const blankItem = _getBlankValueFromSchema(schema);
+  if (
+    blankItem &&
+    !Array.isArray(blankItem) &&
+    typeof blankItem === "object" &&
+    schema.properties?.id
+  ) {
+    const ids = new Set(
+      items.map((value: unknown) => {
+        return value && typeof value === "object"
+          ? Reflect.get(value, "id")
+          : undefined;
+      }),
+    );
+    let contentId = `item-${++itemSequence}`;
+    while (ids.has(contentId)) contentId = `item-${++itemSequence}`;
+    return { ...blankItem, id: contentId };
+  }
+  return blankItem;
+}
+
+function _removeCollectionRowKeys({
+  state,
+  path,
+  index,
+}: Readonly<
+  Pick<RemoveDraftItemOptions, "state" | "path" | "index">
+>): ContentDraft["rowKeys"] {
+  return Object.fromEntries(
+    Object.entries(state.rowKeys).flatMap(([key, keys]) => {
+      const keyPath: InputPath = JSON.parse(key);
+      if (key === JSON.stringify(path)) {
+        return [
+          [
+            key,
+            keys.filter((_, position) => {
+              return position !== index;
+            }),
+          ],
+        ];
+      }
+      if (
+        keyPath.length > path.length &&
+        path.every((segment, position) => {
+          return segment === keyPath[position];
+        })
+      ) {
+        const position = Number(keyPath[path.length]);
+        if (position === index) {
+          return [];
+        }
+        if (position > index) {
+          keyPath[path.length] = position - 1;
+        }
+      }
+      return [[JSON.stringify(keyPath), keys]];
+    }),
+  );
+}

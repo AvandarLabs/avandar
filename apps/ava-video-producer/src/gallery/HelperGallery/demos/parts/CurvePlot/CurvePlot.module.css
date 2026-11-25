@@ -1,0 +1,25 @@
+/*
+ * The plot also draws in the theme editor, outside a helper preview, where
+ * the stroke and dash fallbacks apply.
+ */
+.curvePlotPlot {
+  overflow: visible;
+}
+
+.curvePlotPlotCurve {
+  fill: none;
+  stroke: var(--demo-accent);
+  stroke-linecap: round;
+  stroke-width: var(--demo-stroke-emphasis, 3);
+}
+
+.curvePlotPlotTrail {
+  fill: none;
+  stroke: var(--demo-brand);
+  stroke-linecap: round;
+  stroke-width: var(--demo-stroke-trail, 5);
+}
+
+.curvePlotPlotDot {
+  fill: var(--demo-highlight);
+}

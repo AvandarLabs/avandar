@@ -33,10 +33,12 @@ function _texts({
     input.artifactLabel,
     input.statusLabels.history,
     frame < 126 ? input.statusLabels.current : input.statusLabels.restored,
-    ...input.revisions.flatMap((revision) => [
-      ...revision.content,
-      ...(input.showVersionLabels ? [revision.label] : []),
-    ]),
+    ...input.revisions.flatMap((revision) => {
+      return [
+        ...revision.content,
+        ...(input.showVersionLabels ? [revision.label] : []),
+      ];
+    }),
   ];
 }
 registerStockPresetAssertions({
@@ -55,17 +57,21 @@ registerStockPresetAssertions({
     { ...DEFAULT_INPUT, restoreRevisionId: "v3" },
     {
       ...DEFAULT_INPUT,
-      revisions: DEFAULT_INPUT.revisions.map((revision) => ({
-        ...revision,
-        id: "same",
-      })),
+      revisions: DEFAULT_INPUT.revisions.map((revision) => {
+        return {
+          ...revision,
+          id: "same",
+        };
+      }),
     },
     {
       ...DEFAULT_INPUT,
-      revisions: DEFAULT_INPUT.revisions.map((revision) => ({
-        ...revision,
-        content: ["same"],
-      })),
+      revisions: DEFAULT_INPUT.revisions.map((revision) => {
+        return {
+          ...revision,
+          content: ["same"],
+        };
+      }),
     },
   ],
 });
@@ -80,10 +86,14 @@ test("restored current contents equal the selected earlier snapshot while every 
   assert.doesNotMatch(after, /data-change-notch=/);
   assert.equal(
     [...before.matchAll(/<rect[^>]*data-history-id=[^>]*>/g)]
-      .map(([value]) => value)
+      .map(([value]) => {
+        return value;
+      })
       .join(),
     [...after.matchAll(/<rect[^>]*data-history-id=[^>]*>/g)]
-      .map(([value]) => value)
+      .map(([value]) => {
+        return value;
+      })
       .join(),
   );
 });

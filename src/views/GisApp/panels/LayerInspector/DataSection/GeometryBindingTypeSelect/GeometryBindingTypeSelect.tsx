@@ -1,11 +1,15 @@
 import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { Select } from "@mantine/core";
+import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import { applyDetectedGeometryBinding } from "@/views/GisApp/layers/getGeoBindingGuessFromColumns/applyDetectedGeometryBinding";
 import { MapLayerUpdates } from "@/views/GisApp/layers/MapLayerUpdates/MapLayerUpdates";
+import { useGeometryBindingGuess } from "@/views/GisApp/panels/LayerInspector/DataSection/useGeometryBindingGuess";
 import { useDuckDbSpatialAvailability } from "@/views/GisApp/useDuckDbSpatialAvailability";
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
+import type { QueryColumn as QueryColumnModel } from "$/models/queries/QueryColumn/QueryColumn";
 import type { DuckDbSpatialAvailability } from "@/clients/DuckDbClient/DuckDbSpatialAvailability/DuckDbSpatialAvailability";
+import type { GeometryBindingGuess } from "@/views/GisApp/layers/getGeoBindingGuessFromColumns/getGeometryBindingGuessFromColumns";
 import type { BoundarySourceOption } from "@/views/GisApp/panels/LayerInspector/DataSection/useBoundarySourceOptions/useBoundarySourceOptions";
 import type { LayerChangeHandler } from "@/views/GisApp/panels/LayerInspector/LayerInspector";
 import type { I18n } from "@lingui/core";
@@ -134,16 +138,56 @@ function _getPointsFromLayer(layer: MapLayer.T): MapLayer.PointBinding {
   return { type: "latLngColumns", latitude: undefined, longitude: undefined };
 }
 
-function _applyBindingTypeChange(options: {
+function _columnNamed(
+  columns: readonly QueryColumnModel.T[],
+  name: string | undefined,
+): QueryColumnModel.T | undefined {
+  if (!name) {
+    return undefined;
+  }
+  return columns.find((column) => {
+    return QueryColumn.getDerivedColumnName(column) === name;
+  });
+}
+
+function _withGeometryColumnChoice(options: {
+  layer: MapLayer.T;
+  sourceColumns: readonly QueryColumnModel.T[];
+  geometryGuess: GeometryBindingGuess | undefined;
+}): MapLayer.T {
+  const { layer, sourceColumns, geometryGuess } = options;
+  const guessedColumn = _columnNamed(sourceColumns, geometryGuess?.columnName);
+  const geometryColumn = guessedColumn ?? sourceColumns[0];
+  if (!geometryColumn) {
+    return layer;
+  }
+  const canApplyGuess =
+    geometryGuess !== undefined &&
+    guessedColumn !== undefined &&
+    (layer.sensitivity.mode !== "aggregateOnly" ||
+      geometryGuess.family === "polygon");
+  if (!canApplyGuess || !geometryGuess || !guessedColumn) {
+    return MapLayerUpdates.withGeometryBindingType({
+      layer,
+      type: "geometryColumn",
+      geometryColumn,
+    });
+  }
+  return applyDetectedGeometryBinding({
+    layer,
+    column: guessedColumn,
+    guess: geometryGuess,
+    availableColumns: sourceColumns,
+  });
+}
+
+function _applyBoundaryBinding(options: {
   layer: MapLayer.T;
   value: string;
-  sourceColumns: readonly QueryColumn.T[];
+  sourceColumns: readonly QueryColumnModel.T[];
   boundaryOptions: readonly BoundarySourceOption[];
-}): MapLayer.T {
+}): MapLayer.T | undefined {
   const { layer, value, sourceColumns, boundaryOptions } = options;
-  if (value === "binPointsToGrid") {
-    return MapLayerUpdates.withGridBin(layer);
-  }
   const boundaryOption = boundaryOptions.find(({ columns }) => {
     return columns.length >= 2;
   });
@@ -159,17 +203,44 @@ function _applyBindingTypeChange(options: {
       boundary: _createDefaultBoundary(boundaryOption),
     });
   }
-  if (value === "aggregatePointsToBoundaries") {
-    if (!boundaryOption) {
-      return layer;
-    }
-    return MapLayerUpdates.withPointAggregation({
+  if (value !== "aggregatePointsToBoundaries" || !boundaryOption) {
+    return undefined;
+  }
+  return MapLayerUpdates.withPointAggregation({
+    layer,
+    points: _getPointsFromLayer(layer),
+    boundary: _createDefaultBoundary(boundaryOption),
+  });
+}
+
+function _applyBindingTypeChange(options: {
+  layer: MapLayer.T;
+  value: string;
+  sourceColumns: readonly QueryColumnModel.T[];
+  boundaryOptions: readonly BoundarySourceOption[];
+  geometryGuess: GeometryBindingGuess | undefined;
+}): MapLayer.T {
+  const { layer, value, sourceColumns, boundaryOptions } = options;
+  if (value === "binPointsToGrid") {
+    return MapLayerUpdates.withGridBin(layer);
+  }
+  const boundaryBinding = _applyBoundaryBinding({
+    layer,
+    value,
+    sourceColumns,
+    boundaryOptions,
+  });
+  if (boundaryBinding) {
+    return boundaryBinding;
+  }
+  if (value === "geometryColumn") {
+    return _withGeometryColumnChoice({
       layer,
-      points: _getPointsFromLayer(layer),
-      boundary: _createDefaultBoundary(boundaryOption),
+      sourceColumns,
+      geometryGuess: options.geometryGuess,
     });
   }
-  if (value !== "latLngColumns" && value !== "geometryColumn") {
+  if (value !== "latLngColumns") {
     return layer;
   }
   return MapLayerUpdates.withGeometryBindingType({
@@ -187,6 +258,10 @@ export function GeometryBindingTypeSelect({
   onLayerChange,
 }: Props): ReactNode {
   const { t, i18n } = useLingui();
+  const geometryGuess = useGeometryBindingGuess({
+    dataSource: layer.source.dataSource,
+    columns: sourceColumns,
+  }).guess;
   // Read only: `GisApp` requests the extension when the map opens, which is
   // always before this control can be reached, so the options below have the
   // whole time the user spends opening the inspector to become selectable.
@@ -213,6 +288,7 @@ export function GeometryBindingTypeSelect({
             value,
             sourceColumns,
             boundaryOptions,
+            geometryGuess,
           });
         });
       }}

@@ -117,9 +117,17 @@ vi.mock("@/clients/datasets/source-datasets/VirtualDatasetClient", () => {
 vi.mock("@/clients/datasets/DatasetColumnClient", () => {
   return {
     DatasetColumnClient: {
+      QueryKeys: {
+        getAll: () => {
+          return ["DatasetColumnClient", "getAll"];
+        },
+      },
       withCache: () => {
         return {
           withEnsureQueryData: () => {
+            return { getAll: datasetColumnGetAllMock };
+          },
+          withFetchQuery: () => {
             return { getAll: datasetColumnGetAllMock };
           },
         };
@@ -127,6 +135,27 @@ vi.mock("@/clients/datasets/DatasetColumnClient", () => {
     },
   };
 });
+vi.mock("@/clients/dataDictionaries/DictionaryBindingClient", async () => {
+  return (
+    await import("@/lib/dataDictionaries/loadColumnReplacements/__tests__/noDictionaryBindingsClient")
+  ).NO_DICTIONARY_BINDINGS_CLIENT_MODULE;
+});
+
+vi.mock(
+  "@/clients/qetl/QueryMediator/relationLoading/getVirtualRelationDefinitions/getVirtualRelationDefinitions",
+  async (importOriginal) => {
+    const original =
+      await importOriginal<
+        typeof import("@/clients/qetl/QueryMediator/relationLoading/getVirtualRelationDefinitions/getVirtualRelationDefinitions")
+      >();
+    return {
+      ...original,
+      getVirtualRelationDefinitions: async () => {
+        return {};
+      },
+    };
+  },
+);
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -212,6 +241,7 @@ function _configureVirtualDependencyMocks(workspaceId: string): void {
     },
     columns: "all",
     payload: new Blob(["cached"]),
+    staleAt: undefined,
   });
   getTableOrViewNamesMock.mockResolvedValue([]);
   runRawQueryMock.mockImplementation(async (_sql, options) => {
@@ -257,6 +287,7 @@ function _configureVirtualSiblingData(workspaceId: string): void {
     },
     columns: "all",
     payload: new Blob(["cached"]),
+    staleAt: undefined,
   });
   getTableOrViewNamesMock.mockResolvedValue([]);
 }
@@ -293,12 +324,14 @@ describe("QueryMediator DuckDB coordination", () => {
     });
     const { QueryMediatorFactory } =
       await import("@/clients/qetl/QueryMediator/QueryMediator");
-    const qetlClient = QueryMediatorFactory.create({
-      getQueryDependencies: async () => {
-        return [DATASET_ID];
+    const qetlClient = QueryMediatorFactory.create("QueryMediator", {
+      state: {
+        getQueryDependencies: async () => {
+          return [DATASET_ID];
+        },
+        relationCache: fakeRelationCache,
+        principalKey: PRINCIPAL_KEY,
       },
-      relationCache: fakeRelationCache,
-      principalKey: PRINCIPAL_KEY,
     });
 
     const queryPromise = qetlClient.runQuery({
@@ -316,17 +349,19 @@ describe("QueryMediator DuckDB coordination", () => {
     _configureVirtualDependencyMocks(workspaceId);
     const { QueryMediatorFactory } =
       await import("@/clients/qetl/QueryMediator/QueryMediator");
-    const qetlClient = QueryMediatorFactory.create({
-      getQueryDependencies: async (rawSql) => {
-        return rawSql.includes(VIRTUAL_DATASET_ID)
-          ? [VIRTUAL_DATASET_ID]
-          : [DATASET_ID];
+    const qetlClient = QueryMediatorFactory.create("QueryMediator", {
+      state: {
+        getQueryDependencies: async (rawSql) => {
+          return rawSql.includes(VIRTUAL_DATASET_ID)
+            ? [VIRTUAL_DATASET_ID]
+            : [DATASET_ID];
+        },
+        getDuckDbLeaseDatasetIds: async () => {
+          return [VIRTUAL_DATASET_ID, DATASET_ID];
+        },
+        relationCache: fakeRelationCache,
+        principalKey: PRINCIPAL_KEY,
       },
-      getDuckDbLeaseDatasetIds: async () => {
-        return [VIRTUAL_DATASET_ID, DATASET_ID];
-      },
-      relationCache: fakeRelationCache,
-      principalKey: PRINCIPAL_KEY,
     });
     const completedBeforeTimeout = await Promise.race([
       qetlClient
@@ -359,17 +394,19 @@ describe("QueryMediator DuckDB coordination", () => {
     });
     const { QueryMediatorFactory } =
       await import("@/clients/qetl/QueryMediator/QueryMediator");
-    const qetlClient = QueryMediatorFactory.create({
-      getQueryDependencies: async (rawSql) => {
-        return rawSql.includes(VIRTUAL_DATASET_ID)
-          ? [VIRTUAL_DATASET_ID, SECOND_VIRTUAL_DATASET_ID]
-          : [DATASET_ID];
+    const qetlClient = QueryMediatorFactory.create("QueryMediator", {
+      state: {
+        getQueryDependencies: async (rawSql) => {
+          return rawSql.includes(VIRTUAL_DATASET_ID)
+            ? [VIRTUAL_DATASET_ID, SECOND_VIRTUAL_DATASET_ID]
+            : [DATASET_ID];
+        },
+        getDuckDbLeaseDatasetIds: async () => {
+          return [VIRTUAL_DATASET_ID, SECOND_VIRTUAL_DATASET_ID, DATASET_ID];
+        },
+        relationCache: fakeRelationCache,
+        principalKey: PRINCIPAL_KEY,
       },
-      getDuckDbLeaseDatasetIds: async () => {
-        return [VIRTUAL_DATASET_ID, SECOND_VIRTUAL_DATASET_ID, DATASET_ID];
-      },
-      relationCache: fakeRelationCache,
-      principalKey: PRINCIPAL_KEY,
     });
     const queryPromise = qetlClient.runQuery({
       rawSql: `SELECT * FROM "${VIRTUAL_DATASET_ID}" JOIN "${SECOND_VIRTUAL_DATASET_ID}" ON true`,

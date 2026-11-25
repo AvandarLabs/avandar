@@ -40,19 +40,19 @@ test("fractional quantities keep their exact shares and leave the remainder empt
 });
 
 test("invalid denominator, quantities and over-allocation are rejected", () => {
-  [0, -1, NaN, Infinity].forEach((denominator) =>
-    assert.throws(() =>
-      getQuantitySegmentsFromValues({ values: [1], denominator }),
-    ),
-  );
-  [-1, NaN, Infinity].forEach((value) =>
-    assert.throws(() =>
-      getQuantitySegmentsFromValues({ values: [value], denominator: 2 }),
-    ),
-  );
-  assert.throws(() =>
-    getQuantitySegmentsFromValues({ values: [1, 2], denominator: 2 }),
-  );
+  [0, -1, NaN, Infinity].forEach((denominator) => {
+    return assert.throws(() => {
+      return getQuantitySegmentsFromValues({ values: [1], denominator });
+    });
+  });
+  [-1, NaN, Infinity].forEach((value) => {
+    return assert.throws(() => {
+      return getQuantitySegmentsFromValues({ values: [value], denominator: 2 });
+    });
+  });
+  assert.throws(() => {
+    return getQuantitySegmentsFromValues({ values: [1, 2], denominator: 2 });
+  });
   assert.deepEqual(
     getQuantitySegmentsFromValues({ values: [0], denominator: 2 }),
     [{ value: 0, start: 0, fraction: 0 }],
@@ -66,7 +66,10 @@ test("decimal allocations accept floating-point addition at an exact authored wh
   });
   assert.equal(segments[0].fraction, 0.1 / 0.3);
   assert.equal(segments[1].fraction, 0.2 / 0.3);
-  assert.throws(() =>
-    getQuantitySegmentsFromValues({ values: [0.1, 0.20001], denominator: 0.3 }),
-  );
+  assert.throws(() => {
+    return getQuantitySegmentsFromValues({
+      values: [0.1, 0.20001],
+      denominator: 0.3,
+    });
+  });
 });

@@ -1,5 +1,6 @@
 import {
   IconBrandGoogleDrive,
+  IconDatabase,
   IconFileTypeCsv,
   IconFileTypePdf,
   IconFileTypeXls,
@@ -15,6 +16,7 @@ const SOURCE_TYPE_ICONS: Record<DatasetSource.SourceType, Icon> = {
   google_sheets: IconBrandGoogleDrive,
   open_data: IconWorldSearch,
   pdf_file: IconFileTypePdf,
+  postgres_table: IconDatabase,
   virtual: IconMathFunction,
   xlsx_file: IconFileTypeXls,
 };

@@ -49,6 +49,14 @@ describe("validateReleaseVersion", () => {
     expect(validateReleaseVersion("0.11.0-rc.1", "Version").valid).toBe(false);
   });
 
+  it("treats an -alpha suffix as any other malformed version", () => {
+    expect(validateReleaseVersion("0.15.0-alpha", "Version")).toEqual({
+      valid: false,
+      message:
+        "Version must look like X.Y.Z (for example 0.11.0): 0.15.0-alpha",
+    });
+  });
+
   it("uses the label in the message", () => {
     const result = validateReleaseVersion("nope", "The next version");
 

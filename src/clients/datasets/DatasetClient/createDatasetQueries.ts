@@ -4,10 +4,12 @@ import { CsvFileDatasetClient } from "@/clients/datasets/source-datasets/CsvFile
 import { GoogleSheetsDatasetClient } from "@/clients/datasets/source-datasets/GoogleSheetsDatasetClient";
 import { OpenDataDatasetClient } from "@/clients/datasets/source-datasets/OpenDataDatasetClient";
 import { PdfFileDatasetClient } from "@/clients/datasets/source-datasets/PdfFileDatasetClient";
+import { PostgresTableDatasetClient } from "@/clients/datasets/source-datasets/PostgresTableDatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
 import { XlsxFileDatasetClient } from "@/clients/datasets/source-datasets/XlsxFileDatasetClient";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
+import type { Workspace } from "$/models/Workspace/Workspace";
 import type { DatasetQueryConfig } from "@/clients/datasets/DatasetClient/DatasetClient.types";
 import type { FiltersByColumn } from "@avandar/utils";
 
@@ -50,6 +52,11 @@ function _makeGetSourceDataset(config: Readonly<DatasetQueryConfig>): (
       },
       pdf_file: () => {
         return PdfFileDatasetClient.getOne(
+          where("dataset_id", "eq", datasetId),
+        );
+      },
+      postgres_table: () => {
+        return PostgresTableDatasetClient.getOne(
           where("dataset_id", "eq", datasetId),
         );
       },
@@ -111,15 +118,35 @@ function _makeGetAllDatasetsWithColumns(
   };
 }
 
+function _makeGetEditableIds(
+  config: Readonly<DatasetQueryConfig>,
+): (params: Readonly<{ workspaceId: Workspace.Id }>) => Promise<Dataset.Id[]> {
+  return async (params) => {
+    config.clientLogger
+      .appendName("getEditableIds")
+      .log("Getting the datasets the user can edit", params);
+    const { data } = await config.dbClient
+      .rpc("rpc_datasets__get_editable_ids", {
+        p_workspace_id: params.workspaceId,
+      })
+      .throwOnError();
+    // The RPC returns dataset ids, which the generated types leave unbranded.
+    return data as Dataset.Id[];
+  };
+}
+
 /** Builds the dataset queries layered on top of the CRUD client. */
 export function createDatasetQueries(config: Readonly<DatasetQueryConfig>): {
   getSourceDataset: ReturnType<typeof _makeGetSourceDataset>;
   getWithColumns: ReturnType<typeof _makeGetWithColumns>;
   getAllDatasetsWithColumns: ReturnType<typeof _makeGetAllDatasetsWithColumns>;
+  /** The ids of a workspace's datasets the signed-in user can edit. */
+  getEditableIds: ReturnType<typeof _makeGetEditableIds>;
 } {
   return {
     getSourceDataset: _makeGetSourceDataset(config),
     getWithColumns: _makeGetWithColumns(config),
     getAllDatasetsWithColumns: _makeGetAllDatasetsWithColumns(config),
+    getEditableIds: _makeGetEditableIds(config),
   };
 }

@@ -1,0 +1,11 @@
+.gallerySavedChoiceSavedNav {
+  composes: saved-nav from global;
+}
+
+.gallerySavedChoiceCategoryCount {
+  composes: category-count from global;
+}
+
+.gallerySavedChoiceCategoryButton {
+  composes: category-button from global;
+}

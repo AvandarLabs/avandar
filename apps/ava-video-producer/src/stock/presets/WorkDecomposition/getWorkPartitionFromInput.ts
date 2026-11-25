@@ -16,10 +16,9 @@ type Piece = {
  * layout.
  */
 export function getWorkPartitionFromInput(input: Readonly<Input>): Piece[] {
-  let remaining = input.workItems.reduce(
-    (total, item) => total + item.effort,
-    0,
-  );
+  let remaining = input.workItems.reduce((total, item) => {
+    return total + item.effort;
+  }, 0);
   let x = 90,
     y = 230,
     width = 500,

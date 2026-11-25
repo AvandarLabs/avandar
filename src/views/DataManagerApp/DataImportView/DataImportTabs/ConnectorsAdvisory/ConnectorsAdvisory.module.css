@@ -1,0 +1,7 @@
+/*
+ * Mantine's inline-text button otherwise sits on its own text baseline,
+ * which reads as a slight vertical jump against the surrounding sentence.
+ */
+.feedbackLink {
+  vertical-align: baseline;
+}

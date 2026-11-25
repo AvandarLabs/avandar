@@ -23,6 +23,7 @@ async function _seedCache(datasetId: Dataset.Id): Promise<void> {
     },
     columns: "all",
     payload: new Blob(["cached"]),
+    staleAt: undefined,
   });
 }
 
@@ -91,9 +92,17 @@ vi.mock("@/clients/datasets/DatasetClient/DatasetClient", () => {
 vi.mock("@/clients/datasets/DatasetColumnClient", () => {
   return {
     DatasetColumnClient: {
+      QueryKeys: {
+        getAll: () => {
+          return ["DatasetColumnClient", "getAll"];
+        },
+      },
       withCache: () => {
         return {
           withEnsureQueryData: () => {
+            return { getAll: datasetColumnGetAllMock };
+          },
+          withFetchQuery: () => {
             return { getAll: datasetColumnGetAllMock };
           },
         };
@@ -101,6 +110,27 @@ vi.mock("@/clients/datasets/DatasetColumnClient", () => {
     },
   };
 });
+vi.mock("@/clients/dataDictionaries/DictionaryBindingClient", async () => {
+  return (
+    await import("@/lib/dataDictionaries/loadColumnReplacements/__tests__/noDictionaryBindingsClient")
+  ).NO_DICTIONARY_BINDINGS_CLIENT_MODULE;
+});
+
+vi.mock(
+  "@/clients/qetl/QueryMediator/relationLoading/getVirtualRelationDefinitions/getVirtualRelationDefinitions",
+  async (importOriginal) => {
+    const original =
+      await importOriginal<
+        typeof import("@/clients/qetl/QueryMediator/relationLoading/getVirtualRelationDefinitions/getVirtualRelationDefinitions")
+      >();
+    return {
+      ...original,
+      getVirtualRelationDefinitions: async () => {
+        return {};
+      },
+    };
+  },
+);
 
 vi.mock("@/clients/datasets/source-datasets/CsvFileDatasetClient", () => {
   return {
@@ -131,15 +161,17 @@ beforeAll(async () => {
 async function _runQueryForDependencies(
   dependencies: readonly Dataset.Id[],
 ): Promise<void> {
-  const mediator = QueryMediatorFactory.create({
-    getQueryDependencies: async () => {
-      return [...dependencies];
+  const mediator = QueryMediatorFactory.create("QueryMediator", {
+    state: {
+      getQueryDependencies: async () => {
+        return [...dependencies];
+      },
+      getDuckDbLeaseDatasetIds: async () => {
+        return [...dependencies];
+      },
+      relationCache,
+      principalKey: PRINCIPAL_KEY,
     },
-    getDuckDbLeaseDatasetIds: async () => {
-      return [...dependencies];
-    },
-    relationCache,
-    principalKey: PRINCIPAL_KEY,
   });
   await mediator.runQuery({ rawSql: "SELECT 1" });
 }

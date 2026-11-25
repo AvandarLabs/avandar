@@ -1,5 +1,9 @@
 import { FitText } from "../../primitives/FitText/FitText";
-import { STOCK } from "../../stockPalette";
+import { SketchedShape } from "../../primitives/SketchedShape";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { CarbonNetAccountingNetLabel } from "./CarbonNetAccountingNetLabel/CarbonNetAccountingNetLabel";
+import { CarbonNetQuantities } from "./CarbonNetQuantities/CarbonNetQuantities";
+import { CarbonNetSubtractionMark } from "./CarbonNetSubtractionMark/CarbonNetSubtractionMark";
 import type { Input } from "./CarbonStorageAccounting.schema";
 import type { ReactNode } from "react";
 
@@ -10,41 +14,28 @@ export function CarbonNetAccounting({
   retained,
   emissions,
 }: Readonly<Props>): ReactNode {
+  const tokens = GraphicThemeHooks.useGraphicTokens();
+  const scales = GraphicThemeHooks.useGraphicShapeScales();
   return (
     <g data-net={retained - emissions}>
-      <FitText
-        text={input.copy.net}
-        x={540}
-        y={446}
-        width={380}
-        fontSize={14}
-        maxLines={3}
-        breakLongWords
-        normalizeWhitespace
-      />
-      <path
-        d="M535 490 V550 H925 V490"
+      <CarbonNetAccountingNetLabel input={input} />
+      <SketchedShape
+        shape={{ kind: "path", d: "M535 490 V550 H925 V490" }}
+        profile={tokens.sketch.shape}
         fill="none"
-        stroke={STOCK.line}
-        strokeWidth={2}
+        stroke={tokens.color.line}
+        strokeWidth={scales.stroke(tokens.stroke.default)}
       />
-      {[retained, emissions, retained - emissions].map((value, index) => (
-        <FitText
-          key={index}
-          text={String(value)}
-          x={540 + index * 135}
-          y={510}
-          width={110}
-          fontSize={12}
-          maxLines={3}
-          breakLongWords
-          normalizeWhitespace
-        />
-      ))}
-      <text x={658} y={515} fill={STOCK.text} fontSize={16}>
-        −
-      </text>
-      <text x={793} y={515} fill={STOCK.text} fontSize={16}>
+      <CarbonNetQuantities retained={retained} emissions={emissions} />
+      <CarbonNetSubtractionMark tokens={tokens} />
+      <text
+        x={793}
+        y={515}
+        fill={tokens.color.text}
+        fontFamily={tokens.text.graphic.secondary.fontFamily}
+        fontWeight={tokens.text.graphic.secondary.fontWeight}
+        fontSize={tokens.text.graphic.secondary.fontSize}
+      >
         =
       </text>
       <FitText

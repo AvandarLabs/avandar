@@ -274,4 +274,29 @@ describe("PublicDatasetParquetStorageClient cleanup", () => {
       `dashboards/${DASHBOARD_ID}/datasets/${STALE_DATASET_ID}.parquet`,
     ]);
   });
+
+  it("removes a generation's map snapshots along with its datasets", async () => {
+    const mapPath = `dashboards/${DASHBOARD_ID}/revisions/${OLD_SNAPSHOT_REVISION}/maps/66666666-6666-4666-8666-666666666666.json`;
+    listMock.mockImplementation(async (folderPath: string) => {
+      if (folderPath.endsWith("/datasets")) {
+        return { data: [{ name: `${DATASET_ID}.parquet` }], error: null };
+      }
+      if (folderPath.endsWith("/maps")) {
+        return {
+          data: [{ name: "66666666-6666-4666-8666-666666666666.json" }],
+          error: null,
+        };
+      }
+      return { data: [], error: null };
+    });
+    configureSuccessfulRemove();
+
+    await PublicDatasetParquetStorageClient.deleteSnapshotGeneration({
+      bucket: SnapshotStorageUtils.PUBLIC_BUCKET_NAME,
+      dashboardId: DASHBOARD_ID,
+      snapshotRevision: OLD_SNAPSHOT_REVISION,
+    });
+
+    expect(removeMock).toHaveBeenCalledWith([mapPath]);
+  });
 });

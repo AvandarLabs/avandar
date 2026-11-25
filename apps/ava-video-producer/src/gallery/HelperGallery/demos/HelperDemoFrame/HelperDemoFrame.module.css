@@ -1,0 +1,86 @@
+.helperDemoFrameRoot {
+  background: var(--demo-ground);
+  color: var(--demo-text);
+  font-family: var(--demo-font);
+  height: 100%;
+  inset: 0;
+  overflow: hidden;
+  position: absolute;
+  width: 100%;
+}
+
+.helperDemoFrameHeader {
+  align-items: center;
+  border-bottom: var(--demo-stroke-hairline) solid var(--demo-line);
+  display: flex;
+  gap: var(--demo-space-24);
+  height: 56px;
+  justify-content: space-between;
+  left: 0;
+  padding: 0 var(--demo-space-28);
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.helperDemoFrameLabel {
+  color: var(--demo-accent);
+  font-family: var(--demo-mono);
+  font-size: var(--demo-font-size-lg);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.helperDemoFrameCounter {
+  color: var(--demo-muted);
+  flex: none;
+  font-family: var(--demo-mono);
+  font-size: var(--demo-font-size-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The bottom 64px stay clear for the live player's control bar. */
+.helperDemoFrameStage {
+  inset: 112px 28px 64px;
+  position: absolute;
+}
+
+.helperDemoFrameReadouts {
+  align-items: center;
+  display: flex;
+  gap: var(--demo-space-10);
+  height: 48px;
+  left: 0;
+  overflow: hidden;
+  padding: 0 var(--demo-space-28);
+  position: absolute;
+  right: 0;
+  top: 56px;
+}
+
+.helperDemoFrameReadout {
+  align-items: baseline;
+  background: var(--demo-panel);
+  border-radius: var(--demo-corner-span);
+  display: flex;
+  flex: none;
+  font-family: var(--demo-mono);
+  font-size: var(--demo-font-size-xs);
+  gap: var(--demo-space-8);
+  max-width: 100%;
+  overflow: hidden;
+  padding: var(--demo-space-6) var(--demo-space-10);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.helperDemoFrameReadoutName {
+  color: var(--demo-muted);
+}
+
+.helperDemoFrameReadoutValue {
+  color: var(--demo-text);
+  font-variant-numeric: tabular-nums;
+  min-width: 4ch;
+}

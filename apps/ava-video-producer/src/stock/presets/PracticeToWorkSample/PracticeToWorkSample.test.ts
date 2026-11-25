@@ -16,21 +16,36 @@ import {
 import { inputSchema, type Input } from "./PracticeToWorkSample.schema";
 import type { PresetAssertions } from "../../../../tests/helpers/registerStockPresetAssertions";
 
+/**
+ * Rendered markup with each marked sketch-aware shape read as one element.
+ * `SketchedShape` draws its plain shape inside a group that carries the
+ * shape's markers (`data-*`, `aria-label`, `transform`), so the group's
+ * attributes move onto the shape these assertions read.
+ */
+function _joinMarkedShapes(markup: string): string {
+  return markup.replace(
+    /<g((?:\s+(?:data-[\w-]+|aria-label|transform)="[^"]*")+)><(path|line|circle|rect|ellipse)\b([^>]*)><\/\2><\/g>/g,
+    "<$2$1$3></$2>",
+  );
+}
+
 function _render({
   frame,
   input,
 }: Readonly<{ frame: number; input: Input }>): string {
-  return renderToStaticMarkup(
-    createElement(
-      "svg",
-      {},
-      createElement(PracticeToWorkSample, {
-        frame,
-        input,
-        accent: "#79d5bd",
-        background: "#101720",
-        id: "packet16",
-      }),
+  return _joinMarkedShapes(
+    renderToStaticMarkup(
+      createElement(
+        "svg",
+        {},
+        createElement(PracticeToWorkSample, {
+          frame,
+          input,
+          accent: "#79d5bd",
+          background: "#101720",
+          id: "packet16",
+        }),
+      ),
     ),
   );
 }
@@ -83,10 +98,10 @@ registerStockPresetAssertions(options);
 registerStockTextLayoutAssertions(options);
 
 test("all materials preserve values one and ten with optional guides and retained practice sheet", () => {
-  (["wood", "fabric", "card"] as const).forEach((material) =>
-    [1, 10].forEach((value) =>
-      [true, false].forEach((showAlignmentGuides) =>
-        [true, false].forEach((showFirstArtifactAtHold) => {
+  (["wood", "fabric", "card"] as const).forEach((material) => {
+    return [1, 10].forEach((value) => {
+      return [true, false].forEach((showAlignmentGuides) => {
+        return [true, false].forEach((showFirstArtifactAtHold) => {
           const input = {
             ...denseInput,
             task: { ...denseInput.task, value },
@@ -110,14 +125,14 @@ test("all materials preserve values one and ten with optional guides and retaine
           );
           assert.ok(markup.includes(`data-artifact="${material}"`));
           assert.ok(markup.includes(`data-measured-value="${value}"`));
-        }),
-      ),
-    ),
-  );
+        });
+      });
+    });
+  });
 });
 test("both ruler gestures contact the actual growing measurement mark", () => {
-  [1, 10].forEach((value) =>
-    [32.001, 39, 49.999, 90.001, 97, 107.999].forEach((frame) => {
+  [1, 10].forEach((value) => {
+    return [32.001, 39, 49.999, 90.001, 97, 107.999].forEach((frame) => {
       const input = {
         ...DEFAULT_INPUT,
         task: { ...DEFAULT_INPUT.task, value },
@@ -142,8 +157,8 @@ test("both ruler gestures contact the actual growing measurement mark", () => {
       assert.equal(Number(ruler[1]), origin - 14);
       assert.equal(Number(ruler[2]), 336);
       assert.equal(Number(ruler[3]), value * 12 + 28);
-    }),
-  );
+    });
+  });
 });
 test("artifact and furniture travel stays clear of the complete caption lanes", () => {
   [24, 50, 55.999, 56, 56.001, 67, 77.999, 78, 78.001, 108, 150].forEach(
@@ -153,10 +168,14 @@ test("artifact and furniture travel stays clear of the complete caption lanes", 
         ...markup.matchAll(
           /data-artifact="[^"]+" transform="translate\(([-.\d]+) ([-.\d]+)\)"/g,
         ),
-      ].map((match) => [Number(match[1]), Number(match[2])]);
-      artifacts.forEach(([x, y]) =>
-        assert.ok(x >= 100 && x + 222 <= 812 && y >= 270 && y + 118 <= 438),
-      );
+      ].map((match) => {
+        return [Number(match[1]), Number(match[2])];
+      });
+      artifacts.forEach(([x, y]) => {
+        return assert.ok(
+          x >= 100 && x + 222 <= 812 && y >= 270 && y + 118 <= 438,
+        );
+      });
       const desk = markup.match(
         /data-practice-desk="true" transform="translate\(([-.\d]+) ([-.\d]+)\)"/,
       )!;

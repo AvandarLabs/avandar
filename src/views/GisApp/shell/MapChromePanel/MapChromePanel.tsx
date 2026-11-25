@@ -1,14 +1,17 @@
 import { matchLiteral } from "@avandar/utils";
 import { Collapse, Paper } from "@mantine/core";
-import clsx from "clsx";
+import { clsx } from "clsx";
 import css from "@/views/GisApp/shell/MapChromePanel/MapChromePanel.module.css";
 import { MapChromePanelHeader } from "@/views/GisApp/shell/MapChromePanel/MapChromePanelHeader";
 import type { ChromePanelId } from "@/views/GisApp/shell/ChromePanelState/ChromePanelState";
 import type { ReactNode } from "react";
 
+/** Width and height treatment for a floating map panel. */
+export type MapChromePanelVariant = ChromePanelId | "workspace";
+
 type Props = {
   /** Which panel this is, which also picks its width. */
-  variant: ChromePanelId;
+  variant: MapChromePanelVariant;
 
   /** Stable DOM id prefix for the header and body. */
   id: string;
@@ -17,6 +20,9 @@ type Props = {
 
   /** Shown after the title, for example a layer count. */
   itemCount?: number;
+
+  /** Rendered before the title, for example a Back control. */
+  leading?: ReactNode;
 
   /** Rendered in the header, to the left of the collapse control. */
   headerActions?: ReactNode;
@@ -42,6 +48,7 @@ export function MapChromePanel({
   id,
   title,
   itemCount,
+  leading,
   headerActions,
   isCollapsed,
   onToggleCollapsed,
@@ -56,6 +63,7 @@ export function MapChromePanel({
     layers: css["mapChromePanel--layers"]!,
     inspector: css["mapChromePanel--inspector"]!,
     legend: css["mapChromePanel--legend"]!,
+    workspace: css["mapChromePanel--workspace"]!,
   });
 
   return (
@@ -72,6 +80,7 @@ export function MapChromePanel({
       <MapChromePanelHeader
         title={title}
         itemCount={itemCount}
+        leading={leading}
         headerActions={headerActions}
         isCollapsed={isCollapsed}
         onToggleCollapsed={onToggleCollapsed}

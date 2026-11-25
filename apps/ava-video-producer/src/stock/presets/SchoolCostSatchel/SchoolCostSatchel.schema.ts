@@ -36,7 +36,11 @@ export const inputSchema = z
         message: "Expense IDs must be unique.",
       });
     }
-    if (input.expenses.reduce((sum, expense) => sum + expense.amount, 0) <= 0) {
+    if (
+      input.expenses.reduce((sum, expense) => {
+        return sum + expense.amount;
+      }, 0) <= 0
+    ) {
       context.addIssue({
         code: "custom",
         path: ["expenses"],

@@ -1,6 +1,7 @@
-import { ramp } from "../../../motion";
+import { Motion } from "../../../motion";
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
-import { ComparisonVerdict } from "./ComparisonVerdict";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
+import { ComparisonVerdict } from "./ComparisonVerdict/ComparisonVerdict";
 import { StationSheets } from "./StationSheets";
 import type { Input } from "./ExpectationOverlayCheck.schema";
 import type { ReactNode } from "react";
@@ -12,6 +13,10 @@ type Props = {
   input: Input;
   accent: string;
 };
+/** Frames between neighbouring stations appearing. */
+const STATION_STAGGER_FRAMES = 8;
+/** Frames a station takes to fade in. */
+const STATION_FRAMES = 14;
 /**
  * One station retains both values, with explicit mismatch or missing evidence.
  */
@@ -22,6 +27,7 @@ export function ExpectationStation({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const motion = GraphicThemeHooks.useGraphicMotion();
   const state =
     item.observed === null
       ? "unobserved"
@@ -35,7 +41,12 @@ export function ExpectationStation({
     <g
       data-case={item.id}
       data-state={state}
-      opacity={ramp(frame, 12 + index * 8, 14)}
+      opacity={Motion.ramp({
+        frame,
+        at: 12 + index * motion.scaleStagger(STATION_STAGGER_FRAMES),
+        dur: motion.scale(STATION_FRAMES),
+        easing: motion.reveal.easing,
+      })}
     >
       <LabelSlots
         labels={[

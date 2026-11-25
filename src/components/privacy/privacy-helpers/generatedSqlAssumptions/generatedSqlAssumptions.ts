@@ -1,7 +1,10 @@
+import {
+  CLARIFICATION_NONE_OF_ABOVE_BODY,
+  containsClarificationAnswerLine,
+  parseClarificationAnswerBody,
+  parseCustomAnswerText,
+} from "$/utils/chat/clarificationAnswerFormat";
 import { detectPii } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
-
-/** Matches user messages that answer an inline clarification card. */
-export const CLARIFICATION_ANSWER_MARKER_RE = /^\[Clarification answer:/m;
 
 export const MAX_CLARIFICATIONS_PER_QUESTION = 3;
 
@@ -25,10 +28,27 @@ export function countClarificationAnswersInThread(
   messages: readonly ThreadMessage[],
 ): number {
   return messages.filter((msg) => {
-    return (
-      msg.role === "user" && CLARIFICATION_ANSWER_MARKER_RE.test(msg.content)
-    );
+    return msg.role === "user" && containsClarificationAnswerLine(msg.content);
   }).length;
+}
+
+/** Every turn number a clarification card can carry, in order. */
+const CLARIFICATION_TURN_NUMBERS = [1, 2, 3] as const;
+
+/**
+ * The turn number of a card shown now: one more than the thread's card
+ * answers, at most `MAX_CLARIFICATIONS_PER_QUESTION`, as the edge function
+ * counts it.
+ */
+export function buildClarificationTurnNumber(
+  messages: readonly ThreadMessage[],
+): 1 | 2 | 3 {
+  const answerCount = countClarificationAnswersInThread(messages);
+  return (
+    CLARIFICATION_TURN_NUMBERS[
+      Math.min(answerCount, MAX_CLARIFICATIONS_PER_QUESTION - 1)
+    ] ?? MAX_CLARIFICATIONS_PER_QUESTION
+  );
 }
 
 /**
@@ -43,20 +63,19 @@ export function collectApprovedClarificationValues(
     if (message.role !== "user") {
       continue;
     }
-    const match = message.content.match(/^\[Clarification answer: (.+)\]$/s);
-    if (!match) {
+    const body = parseClarificationAnswerBody(message.content);
+    if (body === undefined) {
       continue;
     }
-    const body = match[1]!.trim();
     if (
-      body === "(none of the listed options)" ||
+      body === CLARIFICATION_NONE_OF_ABOVE_BODY ||
       body === "(user let AI decide)"
     ) {
       continue;
     }
-    const customMatch = body.match(/^\(custom answer: (.+)\)$/s);
-    if (customMatch) {
-      approved.add(normalizeAssumptionValue(customMatch[1]!));
+    const customText = parseCustomAnswerText(body);
+    if (customText !== undefined) {
+      approved.add(normalizeAssumptionValue(customText));
       continue;
     }
     for (const part of body.split(",")) {

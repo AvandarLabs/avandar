@@ -1,4 +1,7 @@
-import { objectEntries, objectKeys, prop } from "@avandar/utils";
+import { objectEntries } from "@avandar/utils";
+import { quoteSqlIdentifier } from "@avandar/utils/sql";
+import { ColumnConversion } from "$/models/dataDictionaries/ColumnConversion/ColumnConversion";
+import type { DuckDbDataType } from "$/models/datasets/DatasetColumn/DuckDbDataTypes";
 import type { DuckDbLoadParquetOptions } from "@/clients/DuckDbClient/duckDbClientOperations";
 
 /** Escapes a value for use inside a single-quoted SQL string literal. */
@@ -29,6 +32,36 @@ export function getRowNumberedViewName(tableName: string): string {
 }
 
 /**
+ * Prefix of the auxiliary view that exposes a dataset's values as stored:
+ * its renames and casts, none of its conversions, and no keep-original
+ * copies. Deliberately not a `RelationRef` prefix, for the same reason as
+ * `ava_rows_`.
+ */
+const RAW_VALUES_VIEW_PREFIX = "ava_raw_";
+
+/**
+ * Names the auxiliary view of a dataset's values before any conversion.
+ * Profiling, matching, and the apply flow's preview and unmatched values
+ * read it, because a converted dataset's public view holds labels.
+ */
+export function getRawValuesViewName(tableName: string): string {
+  return `${RAW_VALUES_VIEW_PREFIX}${tableName}`;
+}
+
+/**
+ * The dataset table an `ava_raw_` view reads, or undefined for any other
+ * name. The inverse of `getRawValuesViewName`, which the SQL analyzer uses
+ * to treat the view as a read of that dataset.
+ */
+export function getTableNameFromRawValuesViewName(
+  viewName: string,
+): string | undefined {
+  return viewName.startsWith(RAW_VALUES_VIEW_PREFIX)
+    ? viewName.slice(RAW_VALUES_VIEW_PREFIX.length)
+    : undefined;
+}
+
+/**
  * Prefix of the table that stages one concept's generated individuals.
  *
  * Deliberately not a `RelationRef` prefix, for the same reason as
@@ -37,6 +70,8 @@ export function getRowNumberedViewName(tableName: string): string {
  * resolve it.
  */
 const STAGING_INDIVIDUALS_TABLE_PREFIX = "ava_staging_individuals_";
+const STAGING_INDIVIDUALS_ID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /**
  * Names the table that individual generation writes its rows to before they
@@ -56,7 +91,7 @@ export function getStagingIndividualsTableName(conceptId: string): string {
 
 /**
  * Reports whether a DuckDB table name is an individual-generation staging
- * table.
+ * table: the prefix followed by a concept id.
  *
  * The SQL analyzer needs this for the same reason it needs
  * `getTableNameFromRowNumberedViewName`: it fails closed on any source name it
@@ -72,7 +107,12 @@ export function getStagingIndividualsTableName(conceptId: string): string {
  * authorized for, so it contributes no relation and needs no lease of its own.
  */
 export function isStagingIndividualsTableName(tableName: string): boolean {
-  return tableName.startsWith(STAGING_INDIVIDUALS_TABLE_PREFIX);
+  return (
+    tableName.startsWith(STAGING_INDIVIDUALS_TABLE_PREFIX) &&
+    STAGING_INDIVIDUALS_ID_REGEX.test(
+      tableName.slice(STAGING_INDIVIDUALS_TABLE_PREFIX.length),
+    )
+  );
 }
 
 /**
@@ -91,6 +131,32 @@ export function getTableNameFromRowNumberedViewName(
   return viewName.startsWith(ROW_NUMBERED_VIEW_PREFIX)
     ? viewName.slice(ROW_NUMBERED_VIEW_PREFIX.length)
     : undefined;
+}
+
+/**
+ * The alias every subquery reads its dataset rows under. It must stay
+ * `dataset`: `getEntityKeyComparisonSql` qualifies the key with it.
+ */
+export const DATASET_ALIAS = "dataset";
+
+/**
+ * The aggregate that picks a text column's last or first value
+ * alphabetically, as `arg_max` or `arg_min`.
+ *
+ * The comparison key ignores case and accents. It is cast to `VARCHAR` first,
+ * because DuckDB maps some types (UUID, BLOB, JSON, lists) to text in Ava but
+ * `strip_accents` accepts only `VARCHAR`. The key is paired with the value in
+ * a struct, which compares field by field, so values that share a key
+ * ("apple" and "Apple") tie-break by the value itself in byte order, in the
+ * same direction. The pick never depends on scan order, and the aggregate
+ * returns the original value.
+ */
+export function buildTextExtremeSql(
+  options: Readonly<{ value: string; aggregate: "arg_max" | "arg_min" }>,
+): string {
+  const { value, aggregate } = options;
+  const key = `lower(strip_accents(CAST(${value} AS VARCHAR)))`;
+  return `${aggregate}(${value}, {'k': ${key}, 'v': ${value}})`;
 }
 
 /**
@@ -123,57 +189,156 @@ export function getEntityKeyComparisonSql(
     primaryKeyColumnName: string;
   }>,
 ): string {
-  return (
-    `CAST("${options.externalIdsTable}"."${options.externalIdColumn}" AS VARCHAR)` +
-    ` = CAST(dataset."${options.primaryKeyColumnName}" AS VARCHAR)`
-  );
+  // Quoted rather than wrapped in bare double quotes, so a key column whose
+  // name contains `"` still compiles.
+  const outerKey = `${quoteSqlIdentifier(options.externalIdsTable)}.${quoteSqlIdentifier(options.externalIdColumn)}`;
+  const datasetKey = `${DATASET_ALIAS}.${quoteSqlIdentifier(options.primaryKeyColumnName)}`;
+  return `CAST(${outerKey} AS VARCHAR) = CAST(${datasetKey} AS VARCHAR)`;
 }
 
-/** Builds the `EXCLUDE`/replacement clauses for a parquet projection. */
+/** One stored column's replacement, as a loader receives it. */
+type ParquetColumnReplacement = NonNullable<
+  DuckDbLoadParquetOptions["columnReplacements"]
+>[string];
+
+/** Options for {@link getParquetProjectionClauses}. */
+type ParquetProjectionOptions = Readonly<{
+  /** Kept values to append to each ordered column's ENUM, by original name. */
+  keptValuesByColumn?: Readonly<Record<string, readonly string[]>>;
+  /** Leaves conversions out, for the raw-values view. */
+  omitsValueMappings?: boolean;
+}>;
+
+/**
+ * A stored column's value: the column itself, or `TRY_CAST` to `dataType`.
+ * For a converted column, `dataType` is the type it had before converting,
+ * so the conversion and the raw-values view read the value users saw
+ * before; its keep-original copy is cast to its own stored type.
+ */
+function _getStoredValueSql(
+  columnName: string,
+  dataType: DuckDbDataType | undefined,
+): string {
+  const columnSql = quoteSqlIdentifier(columnName);
+  return dataType ? `TRY_CAST(${columnSql} AS ${dataType})` : columnSql;
+}
+
+/** The select-list items that replace one stored column. */
+function _getReplacementItems(
+  columnName: string,
+  replacement: ParquetColumnReplacement,
+  options: ParquetProjectionOptions,
+): string[] {
+  const outputNameSql = quoteSqlIdentifier(replacement.alias ?? columnName);
+  const storedValueSql = _getStoredValueSql(columnName, replacement.dataType);
+  const { valueMapping } = replacement;
+  if (valueMapping === undefined || options.omitsValueMappings) {
+    return [`${storedValueSql} AS ${outputNameSql}`];
+  }
+  const convertedSql = ColumnConversion.toCaseSql({
+    valueSql: storedValueSql,
+    conversion: valueMapping,
+    keptValues: options.keptValuesByColumn?.[columnName],
+  });
+  const convertedItem = `${convertedSql} AS ${outputNameSql}`;
+  if (valueMapping.keepsOriginalAs === undefined) {
+    return [convertedItem];
+  }
+  const copySql = _getStoredValueSql(
+    columnName,
+    replacement.originalCopyDataType,
+  );
+  return [
+    convertedItem,
+    `${copySql} AS ${quoteSqlIdentifier(valueMapping.keepsOriginalAs)}`,
+  ];
+}
+
+/**
+ * Builds the `EXCLUDE`/replacement clauses for a parquet projection. A
+ * renamed or retyped column is excluded and selected again under its name
+ * and type. A converted column is selected as its conversion, followed by
+ * its `<column>_original` copy when it keeps one, cast to
+ * `originalCopyDataType` when that is set. With
+ * `omitsValueMappings`, conversions and copies are left out, for the view
+ * of a dataset's values as stored.
+ */
 export function getParquetProjectionClauses(
   columnReplacements: DuckDbLoadParquetOptions["columnReplacements"],
+  options: ParquetProjectionOptions = {},
 ): { excludeClause: string; replaceClause: string } {
-  const projections = objectEntries(columnReplacements ?? {}).map(
-    ([columnName, { alias, dataType }]) => {
-      const outputName = alias ?? columnName;
-      const valueExpression = dataType
-        ? `TRY_CAST("${columnName}" AS ${dataType})`
-        : `"${columnName}"`;
-      return {
-        exclusion: `"${columnName}"`,
-        replacement: `${valueExpression} AS "${outputName}"`,
-      };
-    },
-  );
+  const entries = objectEntries(columnReplacements ?? {});
+  const exclusions = entries.map(([columnName]) => {
+    return quoteSqlIdentifier(columnName);
+  });
+  const items = entries.flatMap(([columnName, replacement]) => {
+    return _getReplacementItems(columnName, replacement, options);
+  });
   return {
     excludeClause:
-      projections.length > 0
-        ? `EXCLUDE (${projections.map(prop("exclusion")).join(", ")})`
-        : "",
-    replaceClause:
-      projections.length > 0
-        ? `, ${projections.map(prop("replacement")).join(", ")}`
-        : "",
+      exclusions.length > 0 ? `EXCLUDE (${exclusions.join(", ")})` : "",
+    replaceClause: items.length > 0 ? `, ${items.join(", ")}` : "",
   };
 }
 
-/** Substitutes `$name$` placeholders in a query with their parameters. */
+/**
+ * One query per column whose conversion outputs an `ENUM`, reading the
+ * values it keeps beside its labels from `relationSql`. A loader runs them
+ * before it builds the view and passes their rows to
+ * `getParquetProjectionClauses` as `keptValuesByColumn`, so the cast to the
+ * `ENUM` never meets a value it lacks.
+ */
+export function getKeptEnumValuesQueries(
+  options: Readonly<{
+    columnReplacements: DuckDbLoadParquetOptions["columnReplacements"];
+    relationSql: string;
+  }>,
+): Array<{ columnName: string; sql: string }> {
+  return objectEntries(options.columnReplacements ?? {}).flatMap(
+    ([columnName, replacement]) => {
+      const conversion = replacement.valueMapping;
+      if (
+        conversion === undefined ||
+        ColumnConversion.getOutputType(conversion).kind !== "enum"
+      ) {
+        return [];
+      }
+      const sql = ColumnConversion.toKeptValuesSql({
+        relationSql: options.relationSql,
+        valueSql: _getStoredValueSql(columnName, replacement.dataType),
+        conversion,
+      });
+      return [{ columnName, sql }];
+    },
+  );
+}
+
+/** A `$name$` placeholder: a name of letters, digits, and underscores. */
+const QUERY_PARAM_PLACEHOLDER_REGEX = /\$([A-Za-z_][A-Za-z0-9_]*)\$/g;
+
+/**
+ * Substitutes `$name$` placeholders in a query with their parameters, in
+ * one pass. A parameter's value is inserted as written: `$&`, `` $` ``,
+ * `$'`, and `$$` in it stay literal, and a placeholder inside it is never
+ * substituted in turn, so a code-list label in a view's projection can
+ * never rewrite the statement around it. A placeholder with no parameter,
+ * or an undefined one, is left as it is.
+ */
 export function getQueryStringFromParams(
   options: Readonly<{
     params: Record<string, string | number | bigint | undefined>;
     queryString: string;
   }>,
 ): string {
-  return objectKeys(options.params).reduce((currentQuery, parameterName) => {
-    const argumentValue = options.params[parameterName];
-    if (argumentValue === undefined) {
-      return currentQuery;
-    }
-    return currentQuery.replace(
-      new RegExp(`\\$${parameterName}\\$`, "g"),
-      String(argumentValue),
-    );
-  }, options.queryString);
+  return options.queryString.replace(
+    QUERY_PARAM_PLACEHOLDER_REGEX,
+    (placeholder: string, parameterName: string) => {
+      const argumentValue = Object.hasOwn(options.params, parameterName)
+        ? options.params[parameterName]
+        : undefined;
+      return argumentValue === undefined ? placeholder : String(argumentValue);
+    },
+  );
 }
 
 /** Flattens dataset ID groups into one list without duplicates. */

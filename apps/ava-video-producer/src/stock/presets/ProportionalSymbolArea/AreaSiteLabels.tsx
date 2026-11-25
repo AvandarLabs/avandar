@@ -1,4 +1,5 @@
 import { LabelSlots } from "../../primitives/LabelSlots/LabelSlots";
+import { GraphicThemeHooks } from "../../theme/GraphicThemeHooks/GraphicThemeHooks";
 import type { Input } from "./ProportionalSymbolArea.schema";
 import type { ReactNode } from "react";
 
@@ -15,6 +16,7 @@ export function AreaSiteLabels({
   input,
   accent,
 }: Readonly<Props>): ReactNode {
+  const data = GraphicThemeHooks.useGraphicTokens().text.graphic.data;
   return (
     <g>
       <LabelSlots
@@ -35,7 +37,8 @@ export function AreaSiteLabels({
         y={152 + site.y * 4}
         textAnchor="middle"
         fill={accent}
-        fontSize={12}
+        fontSize={data.fontSize}
+        fontWeight={data.fontWeight}
       >
         {index + 1}
       </text>

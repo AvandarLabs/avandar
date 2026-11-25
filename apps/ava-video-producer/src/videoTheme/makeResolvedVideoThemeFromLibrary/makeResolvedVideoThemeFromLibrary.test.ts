@@ -1,0 +1,327 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import {
+  BUILT_IN_VIDEO_THEMES,
+  makeVideoThemeLibraryFromDocuments,
+} from "../makeVideoThemeLibraryFromDocuments/makeVideoThemeLibraryFromDocuments";
+import { VideoThemeError } from "../VideoThemeError";
+import { makeResolvedVideoThemeFromLibrary } from "./makeResolvedVideoThemeFromLibrary";
+import type { VideoThemeDocument, VideoThemePatch } from "../videoTheme.types";
+
+const LIGHT_GROUND: VideoThemePatch = {
+  other: { video: { atomic: { swatch: { ground: "#f8fafc" } } } },
+};
+function _extending({
+  id,
+  extra,
+}: Readonly<{
+  id: string;
+  extra: Partial<VideoThemeDocument>;
+}>): VideoThemeDocument {
+  return { schemaVersion: 1, id, label: id, extends: "classic", ...extra };
+}
+function _semantic(semantic: object) {
+  return { other: { video: { semantic } } };
+}
+function _issuesOf(run: () => unknown): string {
+  try {
+    run();
+  } catch (error) {
+    if (error instanceof VideoThemeError) {
+      return error.issues
+        .map((issue) => {
+          return `${issue.path}: ${issue.message}`;
+        })
+        .join("\n");
+    }
+    throw error;
+  }
+  return "";
+}
+test("classic resolves the gallery default accent on its dark ground", () => {
+  const theme = makeResolvedVideoThemeFromLibrary({
+    library: BUILT_IN_VIDEO_THEMES,
+    themeId: "classic",
+  });
+  assert.equal(theme.isDarkGround, true);
+  assert.equal(theme.semantic.color.accent, "#51a7ff");
+});
+test("colour pairs switch to their on-light value on a light ground", () => {
+  const theme = makeResolvedVideoThemeFromLibrary({
+    library: BUILT_IN_VIDEO_THEMES,
+    themeId: "classic",
+    scope: {
+      patches: [LIGHT_GROUND],
+    },
+  });
+  assert.equal(theme.isDarkGround, false);
+  assert.equal(theme.semantic.color.text, "#182d27");
+  assert.equal(theme.semantic.color.accent, "#0b4aea");
+});
+test("type styles resolve their size, weight, and font from Mantine headings", () => {
+  const heading = makeResolvedVideoThemeFromLibrary({
+    library: BUILT_IN_VIDEO_THEMES,
+    themeId: "classic",
+  }).semantic.text.stage.heading;
+  assert.deepEqual(
+    [
+      heading.fontFamily,
+      heading.fontSize,
+      heading.fontWeight,
+      heading.lineHeight,
+      heading.letterSpacing,
+    ],
+    ["Figtree, ui-sans-serif, system-ui, sans-serif", 48, 600, 1.12, -0.025],
+  );
+});
+test("a reference to a missing token is reported with its path", () => {
+  const library = makeVideoThemeLibraryFromDocuments([
+    _extending({
+      id: "broken",
+      extra: _semantic({ color: { accent: "$atomic.swatch.nope" } }),
+    }),
+  ]);
+  assert.match(
+    _issuesOf(() => {
+      return makeResolvedVideoThemeFromLibrary({
+        library,
+        themeId: "broken",
+      });
+    }),
+    /^color\.accent: .*nope/m,
+  );
+});
+test("a reference cycle is reported", () => {
+  const library = makeVideoThemeLibraryFromDocuments([
+    _extending({
+      id: "loop",
+      extra: _semantic({
+        color: { accent: "$color.accentAlt", accentAlt: "$color.accent" },
+      }),
+    }),
+  ]);
+  assert.match(
+    _issuesOf(() => {
+      return makeResolvedVideoThemeFromLibrary({
+        library,
+        themeId: "loop",
+      });
+    }),
+    /Reference cycle/,
+  );
+});
+test("graphic text rejects a font without measured widths", () => {
+  const library = makeVideoThemeLibraryFromDocuments([
+    _extending({
+      id: "figtree-labels",
+      extra: _semantic({
+        text: { graphic: { label: { family: "$atomic.fontFamily.figtree" } } },
+      }),
+    }),
+  ]);
+  assert.match(
+    _issuesOf(() => {
+      return makeResolvedVideoThemeFromLibrary({
+        library,
+        themeId: "figtree-labels",
+      });
+    }),
+    /^text\.graphic\.label: /m,
+  );
+});
+test("Mantine shadows derive from atomic shadows and the shadow colour", () => {
+  assert.equal(
+    makeResolvedVideoThemeFromLibrary({
+      library: BUILT_IN_VIDEO_THEMES,
+      themeId: "classic",
+    }).mantine.shadows.lg,
+    "0px 16px 22px 0px #06101455",
+  );
+});
+test("component defaults reach Mantine's theme for useProps", () => {
+  const theme = makeResolvedVideoThemeFromLibrary({
+    library: BUILT_IN_VIDEO_THEMES,
+    themeId: "classic",
+  });
+  assert.equal(theme.mantine.components.ProgressBar?.defaultProps?.height, 3);
+});
+test("a nested preset override ranks below the composition override", () => {
+  const library = makeVideoThemeLibraryFromDocuments([
+    _extending({
+      id: "studio",
+      extra: {
+        overrides: {
+          "data-pipeline": {
+            other: {
+              video: {
+                atomic: { swatch: { cyan: "#111111", orange: "#222222" } },
+              },
+            },
+          },
+          "shared-object-handoff": {
+            other: { video: { atomic: { swatch: { cyan: "#333333" } } } },
+          },
+        },
+      },
+    }),
+  ]);
+  const theme = makeResolvedVideoThemeFromLibrary({
+    library,
+    themeId: "studio",
+    scope: {
+      overrideIds: ["data-pipeline", "shared-object-handoff"],
+    },
+  });
+  assert.equal(theme.semantic.color.accentAlt, "#333333");
+  assert.equal(theme.semantic.color.highlight, "#222222");
+});
+test("the hash ignores authoring key order", () => {
+  const library = makeVideoThemeLibraryFromDocuments([
+    _extending({
+      id: "one",
+      extra: {
+        other: {
+          video: { atomic: { swatch: { mint: "#000001", cyan: "#000002" } } },
+        },
+      },
+    }),
+    _extending({
+      id: "two",
+      extra: {
+        other: {
+          video: { atomic: { swatch: { cyan: "#000002", mint: "#000001" } } },
+        },
+      },
+    }),
+  ]);
+  assert.equal(
+    makeResolvedVideoThemeFromLibrary({
+      library,
+      themeId: "one",
+    }).hash,
+    makeResolvedVideoThemeFromLibrary({
+      library,
+      themeId: "two",
+    }).hash,
+  );
+});
+test("the hash changes when a resolved value changes", () => {
+  assert.notEqual(
+    makeResolvedVideoThemeFromLibrary({
+      library: BUILT_IN_VIDEO_THEMES,
+      themeId: "classic",
+    }).hash,
+    makeResolvedVideoThemeFromLibrary({
+      library: BUILT_IN_VIDEO_THEMES,
+      themeId: "classic",
+      scope: {
+        patches: [LIGHT_GROUND],
+      },
+    }).hash,
+  );
+});
+test("a camera curve that overshoots its framings is rejected", () => {
+  const library = makeVideoThemeLibraryFromDocuments([
+    _extending({
+      id: "bouncy-camera",
+      extra: _semantic({
+        camera: { easing: { push: "$atomic.easing.outBack" } },
+      }),
+    }),
+  ]);
+  assert.match(
+    _issuesOf(() => {
+      return makeResolvedVideoThemeFromLibrary({
+        library,
+        themeId: "bouncy-camera",
+      });
+    }),
+    /^camera\.easing\.push: /m,
+  );
+});
+test("an elevation resolves to its shadow layers and colour", () => {
+  const floating = makeResolvedVideoThemeFromLibrary({
+    library: BUILT_IN_VIDEO_THEMES,
+    themeId: "classic",
+  }).semantic.elevation.floating;
+  assert.deepEqual(floating, {
+    layers: [{ offsetX: 0, offsetY: 16, blur: 22, spread: 0, alpha: 1 }],
+    color: "#06101455",
+  });
+});
+test("text on the accent turns dark on a light accent and stays white on a dark one", () => {
+  const onAccent = (accent: string) => {
+    return makeResolvedVideoThemeFromLibrary({
+      library: BUILT_IN_VIDEO_THEMES,
+      themeId: "classic",
+      scope: {
+        patches: [
+          {
+            other: {
+              video: {
+                atomic: { swatch: { pick: accent } },
+                semantic: { color: { accent: "$atomic.swatch.pick" } },
+              },
+            },
+          },
+        ],
+      },
+    }).semantic.color.onAccent;
+  };
+  assert.deepEqual(
+    [onAccent("#9fefca"), onAccent("#1563fe")],
+    ["#000000", "#ffffff"],
+  );
+});
+test("text on the accent keeps its own threshold, not the ground's", () => {
+  const theme = makeResolvedVideoThemeFromLibrary({
+    library: BUILT_IN_VIDEO_THEMES,
+    themeId: "classic",
+    scope: {
+      patches: [
+        {
+          other: {
+            video: {
+              atomic: { swatch: { pick: "#8c8c8c" } },
+              semantic: { color: { accent: "$atomic.swatch.pick" } },
+            },
+          },
+        },
+      ],
+    },
+  });
+  assert.equal(theme.semantic.color.onAccent, "#000000");
+});
+test("an optional token a theme leaves unset resolves to undefined", () => {
+  const theme = makeResolvedVideoThemeFromLibrary({
+    library: BUILT_IN_VIDEO_THEMES,
+    themeId: "classic",
+  });
+  assert.equal(theme.semantic.color.scene.shadow, undefined);
+});
+test("shadow intensity scales the opacity of every shadow", () => {
+  const theme = makeResolvedVideoThemeFromLibrary({
+    library: BUILT_IN_VIDEO_THEMES,
+    themeId: "classic",
+    scope: {
+      patches: [
+        {
+          other: {
+            video: {
+              atomic: { multiplier: { half: 0.5 } },
+              semantic: { elevation: { strength: "$atomic.multiplier.half" } },
+            },
+          },
+        },
+      ],
+    },
+  });
+  assert.deepEqual(
+    [
+      theme.semantic.elevation.floating.layers[0]?.alpha,
+      theme.semantic.elevation.window.layers[0]?.alpha,
+      theme.components.Cursor.shadow.layers[0]?.alpha,
+    ],
+    [0.5, 0.5, 0.08],
+  );
+});

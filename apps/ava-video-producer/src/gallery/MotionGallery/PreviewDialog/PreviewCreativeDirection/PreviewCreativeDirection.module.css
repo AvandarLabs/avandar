@@ -1,0 +1,3 @@
+.previewCreativeDirectionBriefExcerpt {
+  composes: brief-excerpt from global;
+}

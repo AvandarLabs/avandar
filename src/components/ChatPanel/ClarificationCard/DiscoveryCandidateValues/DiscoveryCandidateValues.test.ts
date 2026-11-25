@@ -47,4 +47,25 @@ describe("DiscoveryCandidateValues", () => {
       }),
     ).toBeUndefined();
   });
+
+  it("returns one stored value per named group when each group matches exactly one", () => {
+    expect(
+      DiscoveryCandidateValues.getGroupMatches({
+        candidateGroups: [
+          ["california", "CA"],
+          ["Texas", "TX"],
+        ],
+        discoveredValues: ["Alabama", "California", "Texas"],
+      }),
+    ).toEqual(["California", "Texas"]);
+  });
+
+  it("does not choose when a named group matches nothing", () => {
+    expect(
+      DiscoveryCandidateValues.getGroupMatches({
+        candidateGroups: [["California"], ["Narnia"]],
+        discoveredValues: ["California", "Texas"],
+      }),
+    ).toBeUndefined();
+  });
 });

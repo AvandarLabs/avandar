@@ -135,61 +135,77 @@ export const invalidInputs: unknown[] = [{}, { ...DEFAULT_INPUT, extra: true }];
 /** Changed input independently exercises the central semantic invariant. */
 export const changedInput: Input = {
   ...DEFAULT_INPUT,
-  days: DEFAULT_INPUT.days.map((day) => ({
-    ...day,
-    records: day.records.map((record) => ({ ...record, state: "unknown" })),
-  })),
+  days: DEFAULT_INPUT.days.map((day) => {
+    return {
+      ...day,
+      records: day.records.map((record) => {
+        return { ...record, state: "unknown" };
+      }),
+    };
+  }),
 };
 invalidInputs.push(
   {
     ...DEFAULT_INPUT,
-    days: DEFAULT_INPUT.days.map((day) => ({
-      ...day,
-      records: day.records.slice(1),
-    })),
+    days: DEFAULT_INPUT.days.map((day) => {
+      return {
+        ...day,
+        records: day.records.slice(1),
+      };
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    days: DEFAULT_INPUT.days.map((day) => ({
-      ...day,
-      records: day.records.map((record) => ({ ...record, learnerId: "a" })),
-    })),
+    days: DEFAULT_INPUT.days.map((day) => {
+      return {
+        ...day,
+        records: day.records.map((record) => {
+          return { ...record, learnerId: "a" };
+        }),
+      };
+    }),
   },
 );
 const minimum: Input = {
   ...DEFAULT_INPUT,
   learners: DEFAULT_INPUT.learners.slice(0, 3),
-  days: DEFAULT_INPUT.days
-    .slice(0, 2)
-    .map((day) => ({ ...day, records: day.records.slice(0, 3) })),
+  days: DEFAULT_INPUT.days.slice(0, 2).map((day) => {
+    return { ...day, records: day.records.slice(0, 3) };
+  }),
   deskLayout: "horseshoe",
   showDayImpressions: false,
 };
 const denseLearners: Array<{ id: string; label: string }> = Array.from(
   { length: 8 },
-  (_, index) => ({
-    id: `learner ${index} 空`,
-    label: "界".repeat(16),
-  }),
+  (_, index) => {
+    return {
+      id: `learner ${index} 空`,
+      label: "界".repeat(16),
+    };
+  },
 );
 const dense: Input = {
   ...DEFAULT_INPUT,
   learners: denseLearners,
-  days: Array.from({ length: 3 }, (_, dayIndex) => ({
-    id: `day ${dayIndex}`,
-    label: "界".repeat(16),
-    records: denseLearners.map((learner, index) => ({
-      learnerId: learner.id,
-      state:
-        dayIndex === 1
-          ? ("unknown" as const)
-          : index % 3 === 0
-            ? ("absent" as const)
-            : index % 3 === 1
-              ? ("present" as const)
-              : ("unknown" as const),
-    })),
-  })),
+  days: Array.from({ length: 3 }, (_, dayIndex) => {
+    return {
+      id: `day ${dayIndex}`,
+      label: "界".repeat(16),
+      records: denseLearners.map((learner, index) => {
+        return {
+          learnerId: learner.id,
+          state:
+            dayIndex === 1
+              ? ("unknown" as const)
+              : index % 3 === 0
+                ? ("absent" as const)
+                : index % 3 === 1
+                  ? ("present" as const)
+                  : ("unknown" as const),
+        };
+      }),
+    };
+  }),
   labels: {
     present: "界".repeat(18),
     absent: "界".repeat(18),
@@ -213,13 +229,17 @@ export const fixtures: StockContract<typeof DEFAULT_INPUT>["fixtures"] = [
 invalidInputs.push(
   {
     ...DEFAULT_INPUT,
-    learners: DEFAULT_INPUT.learners.map((learner) => ({
-      ...learner,
-      id: "same",
-    })),
+    learners: DEFAULT_INPUT.learners.map((learner) => {
+      return {
+        ...learner,
+        id: "same",
+      };
+    }),
   },
   {
     ...DEFAULT_INPUT,
-    days: DEFAULT_INPUT.days.map((day) => ({ ...day, id: "same" })),
+    days: DEFAULT_INPUT.days.map((day) => {
+      return { ...day, id: "same" };
+    }),
   },
 );

@@ -1,0 +1,112 @@
+{
+  "version": 1,
+  "id": "whip-exit",
+  "title": "Whip exit",
+  "description": "A tilted window whips off the left edge into a hard cut, then a second window takes a longer whip that keeps sliding away under a column wipe while the outgoing shot plays on.",
+  "sourceNotes": [
+    "Scene study extracted from the shot vocabulary film; an editorial example, not a claim about Avandar features.",
+    "Window contents are curated fictional Avandar screenshots from public/avandar/screens."
+  ],
+  "purpose": "standalone",
+  "fps": 30,
+  "width": 1920,
+  "height": 1080,
+  "delivery": {
+    "width": 1920,
+    "height": 1080
+  },
+  "captions": false,
+  "shots": [
+    {
+      "id": "records",
+      "scene": "tilted-window",
+      "durationInFrames": 100,
+      "transitionInFrames": 0,
+      "props": {
+        "headlines": [
+          {
+            "atFrame": 2,
+            "lines": ["Find the", "record"],
+            "subtitle": "Cases"
+          }
+        ],
+        "windows": [
+          {
+            "kind": "image",
+            "src": "avandar/screens/cases-cases-records.png"
+          }
+        ],
+        "enter": {
+          "kind": "whip",
+          "atFrame": 1
+        },
+        "exit": {
+          "kind": "whip-left",
+          "atFrame": 90,
+          "durationInFrames": 8
+        },
+        "footnote": "Fictional demonstration data"
+      }
+    },
+    {
+      "id": "facilities",
+      "scene": "tilted-window",
+      "durationInFrames": 110,
+      "transitionInFrames": 0,
+      "transition": {
+        "kind": "cut"
+      },
+      "props": {
+        "headlines": [
+          {
+            "atFrame": 2,
+            "lines": ["Follow it", "to the map"],
+            "subtitle": "Maps"
+          }
+        ],
+        "windows": [
+          {
+            "kind": "image",
+            "src": "avandar/screens/map-map-facilities.png"
+          }
+        ],
+        "enter": {
+          "kind": "whip",
+          "atFrame": 1
+        },
+        "exit": {
+          "kind": "whip-left",
+          "atFrame": 109,
+          "durationInFrames": 20
+        },
+        "footnote": "Fictional demonstration data"
+      }
+    },
+    {
+      "id": "close",
+      "scene": "typography",
+      "durationInFrames": 80,
+      "transitionInFrames": 20,
+      "theme": {
+        "ground": "$atomic.swatch.slate50",
+        "foreground": "$atomic.swatch.slate900",
+        "muted-foreground": "$atomic.swatch.slate500",
+        "muted": "$atomic.swatch.slate300",
+        "border": "$atomic.swatch.slate400",
+        "background": "$atomic.swatch.slateInk",
+        "card": "$atomic.swatch.slate800"
+      },
+      "transition": {
+        "kind": "stepped-column-wipe",
+        "columns": 8,
+        "staggerFrames": 1,
+        "outgoing": "playing"
+      },
+      "props": {
+        "lines": ["Every case, in place"],
+        "fontSize": 84,
+        "revealAtFrame": 18
+      }
+    }
+  ]
+}

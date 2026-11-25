@@ -1,0 +1,19 @@
+.sceneTransitionShotShot {
+  align-items: center;
+  display: flex;
+  font-size: var(--demo-font-size-44);
+  font-weight: var(--demo-font-weight-bold);
+  inset: 0;
+  justify-content: center;
+  position: absolute;
+}
+
+.sceneTransitionShotShotA {
+  background: var(--demo-panel);
+  color: var(--demo-muted);
+}
+
+.sceneTransitionShotShotB {
+  background: var(--demo-brand);
+  color: var(--demo-text);
+}

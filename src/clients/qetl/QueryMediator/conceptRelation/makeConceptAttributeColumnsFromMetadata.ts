@@ -1,10 +1,15 @@
+import { match } from "ts-pattern";
+import { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
+import { ValuePickerRule } from "$/models/ontology/ValuePickerRule/ValuePickerRule";
 import { DuckDbDataTypeUtils } from "@/clients/DuckDbClient/DuckDbDataType";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { AttributeMapping } from "$/models/ontology/AttributeMapping/AttributeMapping.types";
 import type { DatasetColumnMapping } from "$/models/ontology/AttributeMapping/DatasetColumnMapping/DatasetColumnMapping.types";
-import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
-import type { ConceptAttributeColumn } from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql";
+import type {
+  ConceptAttributeColumn,
+  ConceptAttributeValueRule,
+} from "@/clients/qetl/QueryMediator/conceptRelation/buildConceptViewSql/buildConceptViewSql";
 
 /** Each contributing dataset's key column, by dataset id. */
 type PrimaryKeyColumnNameByDatasetId = Record<Dataset.Id, string | undefined>;
@@ -57,21 +62,6 @@ export type ConceptAttributeColumns = {
    */
   renamedColumns: RenamedConceptAttributeColumn[];
 };
-
-/**
- * Orders attributes so two runs over unchanged metadata agree.
- *
- * By name first, because the emitted column order is by name, and by id to
- * break a tie. The tie is not hypothetical: duplicate names are exactly the
- * case `renamedColumns` exists for, and which of the two keeps the unsuffixed
- * name has to be decided the same way every run.
- */
-function _compareAttributes(
-  left: Readonly<ConceptAttribute.T>,
-  right: Readonly<ConceptAttribute.T>,
-): number {
-  return left.name.localeCompare(right.name) || left.id.localeCompare(right.id);
-}
 
 /**
  * Narrows a mapping to the dataset-column arm.
@@ -134,7 +124,7 @@ function _getPrimaryKeyColumnNameByDatasetId(
         attribute.isIdentifier && attribute.mappingType === "dataset_column"
       );
     })
-    .sort(_compareAttributes);
+    .sort(ConceptAttribute.compareInViewOrder);
 
   const primaryKeyColumnNameByDatasetId: PrimaryKeyColumnNameByDatasetId = {};
   identifierAttributes.forEach((attribute) => {
@@ -156,16 +146,310 @@ function _getPrimaryKeyColumnNameByDatasetId(
   return primaryKeyColumnNameByDatasetId;
 }
 
-/** The typed NULL column an attribute with nothing to read becomes. */
+/**
+ * The typed column an attribute with nothing to read becomes: a NULL, or an
+ * empty list for a list or per-period attribute.
+ */
 function _buildUnmappedColumn(
   attribute: Readonly<ConceptAttribute.T>,
 ): ConceptAttributeColumn {
   return {
     kind: "unmapped",
+    attributeId: attribute.id,
     attributeName: attribute.name,
     duckDbDataType: DuckDbDataTypeUtils.fromDatasetColumnType(
       attribute.dataType,
     ),
+    valueShape: ConceptAttribute.getValueShape(attribute),
+  };
+}
+
+/**
+ * Whether a date column loads as a `TIMESTAMP WITH TIME ZONE`. It keeps the
+ * zoned type its file was detected with only while its stored type is still
+ * `timestamp`. A column retyped to `timestamp` from another detected type is
+ * cast to a plain `TIMESTAMP` on load, which has no zone.
+ */
+function _isZonedTimestampColumn(column: DatasetColumn.T): boolean {
+  return (
+    column.dataType === "timestamp" &&
+    (column.detectedDataType === "TIMESTAMP_TZ" ||
+      column.detectedDataType === "TIMESTAMP WITH TIME ZONE")
+  );
+}
+
+/**
+ * The date column a per-period field's mapping names, checked to exist, to
+ * belong to the dataset the mapping reads, and to be a date or timestamp.
+ * `field` names the field in each error.
+ */
+function _findBucketColumn(
+  options: Readonly<{
+    mapping: DatasetColumnMapping & { bucketColumnId: DatasetColumn.Id };
+    metadata: ConceptRelationMetadata;
+    field: string;
+  }>,
+): DatasetColumn.T {
+  const { mapping, metadata, field } = options;
+  const bucketColumn = metadata.datasetColumnsById[mapping.bucketColumnId];
+  if (!bucketColumn) {
+    throw new Error(
+      `${field} groups its rows by date column '${mapping.bucketColumnId}', ` +
+        `which does not exist.`,
+    );
+  }
+  if (bucketColumn.datasetId !== mapping.datasetId) {
+    throw new Error(
+      `${field} groups its rows by column '${bucketColumn.name}' of dataset ` +
+        `'${bucketColumn.datasetId}', not of the dataset it reads ` +
+        `('${mapping.datasetId}').`,
+    );
+  }
+  if (!ConceptAttribute.isBucketDateColumnType(bucketColumn.dataType)) {
+    throw new Error(
+      `${field} groups its rows by column '${bucketColumn.name}', which is ` +
+        `'${bucketColumn.dataType}', not a date or timestamp.`,
+    );
+  }
+  return bucketColumn;
+}
+
+/**
+ * A per-period field's period and the date column it groups its rows by.
+ *
+ * Fails closed, like the value column: a period with no readable date column
+ * would answer every record with an empty list, which reads as "no data"
+ * for data that may well exist.
+ */
+function _buildBucket(
+  options: Readonly<{
+    attribute: ConceptAttribute.T;
+    mapping: DatasetColumnMapping;
+    metadata: ConceptRelationMetadata;
+  }>,
+): Pick<
+  Extract<ConceptAttributeValueRule, { valueShape: "bucketed_list" }>,
+  "bucketGrain" | "bucketColumnName" | "isBucketColumnZoned"
+> {
+  const { attribute, mapping, metadata } = options;
+  const field = `Concept attribute '${attribute.name}' (${attribute.id})`;
+  // `getValueShape` is per-period only for a field with a period; this
+  // restates that for the compiler.
+  if (attribute.bucketGrain === undefined) {
+    throw new Error(`${field} has no period.`);
+  }
+  const { bucketColumnId } = mapping;
+  if (bucketColumnId === undefined) {
+    throw new Error(
+      `${field} keeps one value per ${attribute.bucketGrain}, but its ` +
+        `mapping names no date column.`,
+    );
+  }
+  const bucketColumn = _findBucketColumn({
+    mapping: { ...mapping, bucketColumnId },
+    metadata,
+    field,
+  });
+  return {
+    bucketGrain: attribute.bucketGrain,
+    bucketColumnName: bucketColumn.name,
+    isBucketColumnZoned: _isZonedTimestampColumn(bucketColumn),
+  };
+}
+
+/**
+ * Throws when a field without a period has a mapping that names a date
+ * column. A date column means something only to a per-period field;
+ * anywhere else the ontology is inconsistent, and ignoring it would hide
+ * that.
+ */
+function _assertNoStrayBucketColumn(
+  options: Readonly<{
+    attribute: ConceptAttribute.T;
+    mapping: DatasetColumnMapping;
+    valueShape: ConceptAttribute.ValueShape;
+  }>,
+): void {
+  const { attribute, mapping, valueShape } = options;
+  if (valueShape !== "bucketed_list" && mapping.bucketColumnId !== undefined) {
+    throw new Error(
+      `Concept attribute '${attribute.name}' (${attribute.id}) has no ` +
+        `period, but its mapping names date column '${mapping.bucketColumnId}'.`,
+    );
+  }
+}
+
+/**
+ * How one dataset-column attribute's rows become its value, from the
+ * attribute's value shape. A list keeps every value and drops any rule its
+ * mapping still stores. A single value needs a rule, and an attribute without
+ * one is a broken ontology: guessing a rule would answer with a value nobody
+ * chose, so it throws, naming the attribute. A per-period field needs a rule
+ * and a date column of its own dataset.
+ */
+function _getValueRule(
+  options: Readonly<{
+    attribute: ConceptAttribute.T;
+    mapping: DatasetColumnMapping;
+    metadata: ConceptRelationMetadata;
+  }>,
+): ConceptAttributeValueRule {
+  const { attribute, mapping } = options;
+  const ruleType = mapping.valuePickerRuleType;
+  const valueShape = ConceptAttribute.getValueShape(attribute);
+  _assertNoStrayBucketColumn({ attribute, mapping, valueShape });
+  return match(valueShape)
+    .returnType<ConceptAttributeValueRule>()
+    .with("single", () => {
+      if (ruleType === undefined) {
+        throw new Error(
+          `Concept attribute '${attribute.name}' (${attribute.id}) keeps one ` +
+            `value, but its mapping names no value rule.`,
+        );
+      }
+      return { valueShape: "single", valuePickerRuleType: ruleType };
+    })
+    .with("list", () => {
+      return { valueShape: "list" };
+    })
+    .with("bucketed_list", () => {
+      if (ruleType === undefined) {
+        throw new Error(
+          `Concept attribute '${attribute.name}' (${attribute.id}) keeps ` +
+            `one value per period, but its mapping names no value rule.`,
+        );
+      }
+      return {
+        valueShape: "bucketed_list",
+        valuePickerRuleType: ruleType,
+        ..._buildBucket(options),
+      };
+    })
+    .exhaustive();
+}
+
+/**
+ * Throws when a single-value attribute applies a rule its column's current
+ * type does not allow, which happens when the rule was saved without checking
+ * the column's type, or when the column's type changed afterwards. DuckDB
+ * would otherwise refuse the whole view (`sum(VARCHAR)` does not bind), or
+ * answer `max` over a yes/no column with a value the rule table calls
+ * meaningless, and neither names the field. A per-period attribute applies
+ * its rule to each period, so it is checked the same way. A list attribute
+ * applies no rule, so it is not checked.
+ */
+function _assertRuleAllowedForColumn(
+  options: Readonly<{
+    attribute: ConceptAttribute.T;
+    valueRule: ConceptAttributeValueRule;
+    datasetColumn: DatasetColumn.T;
+  }>,
+): void {
+  const { attribute, valueRule, datasetColumn } = options;
+  if (valueRule.valueShape === "list") {
+    return;
+  }
+  const { valuePickerRuleType } = valueRule;
+  if (
+    ValuePickerRule.isAllowedForColumnType({
+      ruleType: valuePickerRuleType,
+      columnDataType: datasetColumn.dataType,
+    })
+  ) {
+    return;
+  }
+  throw new Error(
+    `Concept attribute '${attribute.name}' (${attribute.id}) applies ` +
+      `'${valuePickerRuleType}' to dataset column ` +
+      `'${datasetColumn.name}', whose type '${datasetColumn.dataType}' ` +
+      `does not allow it.`,
+  );
+}
+
+/**
+ * The dataset column a mapping names.
+ *
+ * Fails closed rather than degrading to a NULL column. A mapping pointing at
+ * a column that no longer exists is a broken ontology, and answering the
+ * query with NULLs would report "no value" for data that may well exist.
+ */
+function _getDatasetColumnForMapping(
+  options: Readonly<{
+    attribute: ConceptAttribute.T;
+    mapping: DatasetColumnMapping;
+    metadata: ConceptRelationMetadata;
+  }>,
+): DatasetColumn.T {
+  const { attribute, mapping, metadata } = options;
+  const datasetColumn = metadata.datasetColumnsById[mapping.datasetColumnId];
+  if (!datasetColumn) {
+    throw new Error(
+      `Concept attribute '${attribute.name}' (${attribute.id}) is mapped to ` +
+        `dataset column '${mapping.datasetColumnId}', which does not exist.`,
+    );
+  }
+  return datasetColumn;
+}
+
+/**
+ * The key column of the dataset a mapping reads. A dataset with no identifier
+ * attribute mapped into it cannot match its rows to an individual, so this
+ * throws rather than returning a key every row would miss.
+ */
+function _getPrimaryKeyColumnNameForMapping(
+  options: Readonly<{
+    attribute: ConceptAttribute.T;
+    mapping: DatasetColumnMapping;
+    primaryKeyColumnNameByDatasetId: PrimaryKeyColumnNameByDatasetId;
+  }>,
+): string {
+  const { attribute, mapping } = options;
+  const primaryKeyColumnName =
+    options.primaryKeyColumnNameByDatasetId[mapping.datasetId];
+  if (primaryKeyColumnName === undefined) {
+    throw new Error(
+      `Concept attribute '${attribute.name}' (${attribute.id}) reads dataset ` +
+        `'${mapping.datasetId}', which has no identifier attribute mapped ` +
+        `into it, so its rows cannot be matched to an individual.`,
+    );
+  }
+  return primaryKeyColumnName;
+}
+
+/**
+ * The column a dataset-column attribute becomes, once its mapping, dataset
+ * column, value rule, and dataset key have each been checked.
+ */
+function _buildMappedAttributeColumn(
+  options: Readonly<{
+    attribute: ConceptAttribute.T;
+    mapping: DatasetColumnMapping;
+    metadata: ConceptRelationMetadata;
+    primaryKeyColumnNameByDatasetId: PrimaryKeyColumnNameByDatasetId;
+  }>,
+): ConceptAttributeColumn {
+  const { attribute, mapping, metadata } = options;
+  const datasetColumn = _getDatasetColumnForMapping({
+    attribute,
+    mapping,
+    metadata,
+  });
+  const valueRule = _getValueRule({ attribute, mapping, metadata });
+  _assertRuleAllowedForColumn({ attribute, valueRule, datasetColumn });
+
+  return {
+    kind: "dataset_column",
+    attributeId: attribute.id,
+    attributeName: attribute.name,
+    selectColumnName: datasetColumn.name,
+    datasetId: mapping.datasetId,
+    columnDataType: datasetColumn.dataType,
+    primaryKeyColumnName: _getPrimaryKeyColumnNameForMapping({
+      attribute,
+      mapping,
+      primaryKeyColumnNameByDatasetId: options.primaryKeyColumnNameByDatasetId,
+    }),
+    ...valueRule,
   };
 }
 
@@ -173,11 +457,11 @@ function _buildUnmappedColumn(
  * Turns one attribute into the column the concept's view emits for it.
  *
  * A `manual_entry` attribute, and an attribute with no mapping row at all,
- * become a typed NULL rather than an error. Today
- * `getAttributeAssertions._getAssertionsByMappingType` throws for any
- * manual-entry mapping, so one manually entered attribute makes a whole concept
- * unqueryable; a typed NULL keeps the relation's schema complete and is honest,
- * because we hold no value for it.
+ * become a typed NULL, or an empty list for a list or per-period attribute,
+ * rather than an error. Do not throw for them instead: one manually entered
+ * attribute would make the whole concept unqueryable, while a typed column
+ * keeps the relation's schema complete and is honest, because no value is
+ * stored for it.
  */
 function _buildAttributeColumn(
   options: Readonly<{
@@ -199,59 +483,10 @@ function _buildAttributeColumn(
     };
   }
 
-  // Fail closed rather than degrading to a NULL column. A mapping pointing at
-  // a column that no longer exists is a broken ontology, and answering the
-  // query with NULLs would report "no value" for data that may well exist.
-  const datasetColumn = metadata.datasetColumnsById[mapping.datasetColumnId];
-  if (!datasetColumn) {
-    throw new Error(
-      `Concept attribute '${attribute.name}' (${attribute.id}) is mapped to ` +
-        `dataset column '${mapping.datasetColumnId}', which does not exist.`,
-    );
-  }
-
-  const primaryKeyColumnName =
-    options.primaryKeyColumnNameByDatasetId[mapping.datasetId];
-  if (primaryKeyColumnName === undefined) {
-    throw new Error(
-      `Concept attribute '${attribute.name}' (${attribute.id}) reads dataset ` +
-        `'${mapping.datasetId}', which has no identifier attribute mapped ` +
-        `into it, so its rows cannot be matched to an individual.`,
-    );
-  }
-
   return {
-    column: {
-      kind: "dataset_column",
-      attributeName: attribute.name,
-      selectColumnName: datasetColumn.name,
-      datasetId: mapping.datasetId,
-      primaryKeyColumnName,
-      valuePickerRuleType: mapping.valuePickerRuleType,
-      isArray: attribute.isArray,
-    },
+    column: _buildMappedAttributeColumn({ ...options, mapping }),
     contributingDatasetId: mapping.datasetId,
   };
-}
-
-/**
- * Suffixes a name that an earlier attribute already took.
- *
- * `<name>_2`, `<name>_3`, and so on, matching the order
- * `_compareAttributes` fixes, so the alphabetically first attribute id keeps
- * the plain name.
- */
-function _getUniqueColumnName(
-  options: Readonly<{ requestedName: string; takenNames: ReadonlySet<string> }>,
-): string {
-  if (!options.takenNames.has(options.requestedName)) {
-    return options.requestedName;
-  }
-  let suffix = 2;
-  while (options.takenNames.has(`${options.requestedName}_${suffix}`)) {
-    suffix += 1;
-  }
-  return `${options.requestedName}_${suffix}`;
 }
 
 /**
@@ -264,21 +499,24 @@ function _getUniqueColumnName(
  * real SQL over a fake concept instead of asserting the shape of this return
  * value.
  *
- * One column per attribute, never one per mapping. That is the difference from
- * `getDatasetColumnAssertions`, which iterates mappings and therefore emits an
- * attribute twice when it has two.
+ * One column per attribute, never one per mapping. Iterating mappings instead
+ * would emit an attribute twice when it has two.
  */
 export function makeConceptAttributeColumnsFromMetadata(
   metadata: Readonly<ConceptRelationMetadata>,
 ): ConceptAttributeColumns {
   const primaryKeyColumnNameByDatasetId =
     _getPrimaryKeyColumnNameByDatasetId(metadata);
-  const orderedAttributes = [...metadata.attributes].sort(_compareAttributes);
+  const orderedAttributes = [...metadata.attributes].sort(
+    ConceptAttribute.compareInViewOrder,
+  );
+  const viewColumnNames = ConceptAttribute.getViewColumnNames(
+    metadata.attributes,
+  );
 
   const attributeColumns: ConceptAttributeColumn[] = [];
   const contributingDatasetIds = new Set<Dataset.Id>();
   const renamedColumns: RenamedConceptAttributeColumn[] = [];
-  const takenNames = new Set<string>();
 
   orderedAttributes.forEach((attribute) => {
     const { column, contributingDatasetId } = _buildAttributeColumn({
@@ -289,10 +527,8 @@ export function makeConceptAttributeColumnsFromMetadata(
     if (contributingDatasetId !== undefined) {
       contributingDatasetIds.add(contributingDatasetId);
     }
-    const emittedName = _getUniqueColumnName({
-      requestedName: column.attributeName,
-      takenNames,
-    });
+    const emittedName =
+      viewColumnNames.get(attribute.id)?.columnName ?? column.attributeName;
     if (emittedName !== column.attributeName) {
       renamedColumns.push({
         attributeId: attribute.id,
@@ -300,7 +536,6 @@ export function makeConceptAttributeColumnsFromMetadata(
         emittedName,
       });
     }
-    takenNames.add(emittedName);
     attributeColumns.push({ ...column, attributeName: emittedName });
   });
 

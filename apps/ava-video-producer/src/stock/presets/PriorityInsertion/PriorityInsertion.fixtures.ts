@@ -30,10 +30,12 @@ export const DEFAULT_INPUT: Input = {
 };
 const dense: Input = {
   ...DEFAULT_INPUT,
-  queue: Array.from({ length: 5 }, (_, index) => ({
-    id: `queue ${index}`,
-    label: "W".repeat(16),
-  })),
+  queue: Array.from({ length: 5 }, (_, index) => {
+    return {
+      id: `queue ${index}`,
+      label: "W".repeat(16),
+    };
+  }),
   incomingItem: { id: "incoming 界", label: "W".repeat(18) },
   insertBeforeId: "queue 0",
   priorityLabel: "W".repeat(34),

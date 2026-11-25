@@ -36,37 +36,32 @@ describe("createDefaultRegistry", () => {
     expect(wrapper?.name).toBe("dataset");
   });
 
-  it("resolves a concept relation to the concept wrapper", () => {
-    const wrapper = _createRegistry().resolve(CONCEPT_REF);
-
-    expect(wrapper?.name).toBe("concept");
+  // A concept is planned and built inside the query's lease, never acquired,
+  // so no wrapper claims it.
+  it("leaves a concept relation to the concept planner", () => {
+    expect(_createRegistry().resolve(CONCEPT_REF)).toBeUndefined();
   });
 
-  it("registers exactly one wrapper per relation kind", () => {
+  it("registers only the dataset wrapper", () => {
     const names = _createRegistry()
       .wrappers()
       .map((wrapper) => {
         return wrapper.name;
       });
 
-    expect(names).toEqual(["dataset", "concept"]);
+    expect(names).toEqual(["dataset"]);
   });
 
-  // The dataset composite acquires, because all five of its source types are
-  // acquire-only. The concept wrapper pushes down instead, so the mediator can
-  // never choose an acquisition path a concept does not implement.
-  it("declares acquisition for datasets and pushdown for concepts", () => {
-    const registry = _createRegistry();
-    const dataset = registry.resolve(DATASET_REF);
-    const concept = registry.resolve(CONCEPT_REF);
+  // The dataset composite acquires, because all of its source types are
+  // acquire-only.
+  it("declares acquisition for datasets", () => {
+    const dataset = _createRegistry().resolve(DATASET_REF);
 
     expect(dataset?.acquire).toBeInstanceOf(Function);
     expect(dataset?.pushDown).toBeUndefined();
-    expect(concept?.pushDown).toBeInstanceOf(Function);
-    expect(concept?.acquire).toBeUndefined();
   });
 
-  it("partitions a mixed batch with no unresolved refs", () => {
+  it("partitions a mixed batch, leaving the concept unresolved", () => {
     const { resolved, unresolved } = _createRegistry().resolveAll([
       DATASET_REF,
       CONCEPT_REF,
@@ -76,7 +71,7 @@ describe("createDefaultRegistry", () => {
       return relation.wrapper.name;
     });
 
-    expect(names).toEqual(["dataset", "concept"]);
-    expect(unresolved).toEqual([]);
+    expect(names).toEqual(["dataset"]);
+    expect(unresolved).toEqual([CONCEPT_REF]);
   });
 });
