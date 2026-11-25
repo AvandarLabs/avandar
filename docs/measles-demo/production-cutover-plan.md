@@ -137,7 +137,7 @@ reached `develop`. This is decision D3.
 `develop`'s `production.yaml` gates, then runs `supabase link`,
 `supabase db push`, and `supabase functions deploy` with CLI 2.98.2. It sets
 no edge function secrets and deploys no web app. Vercel's Git integration
-deploys the app the moment `main` is pushed, about 25 minutes before the
+deploys the app the moment `main` is pushed, about 15 minutes before the
 migrations run. For this release that means the new app would run against
 the old schema for that long. The GitHub `production` environment holds only
 `SUPABASE_ACCESS_TOKEN`, `PRODUCTION_DB_PASSWORD`, and
@@ -284,8 +284,8 @@ Two consequences, both accepted for this release:
    minutes. Acceptable because production has no active users (D4). The
    runbook takes the production backup before the release, so `migrate` is
    approved the moment it asks. If `test-quick` fails, `migrate` never runs:
-   fix forward, or promote the previous Vercel deployment until the fix is
-   released.
+   fix forward, and roll Vercel back to the previous deployment until the
+   fix is released.
 2. **The functions deploy is flaky.** CLI 2.98.2 tries import map entries in
    random order when it bundles the edge functions, so
    `supabase functions deploy` fails with `Module not found` about one
@@ -399,10 +399,11 @@ Stage G in order:
 
 **Rollback.** Before step 7 production is untouched: stop. After step 7 and
 before the migrations, the database is untouched but the new app is live:
-fix forward, or promote the previous Vercel deployment. After the
-migrations, restore the database backup, redeploy `main`'s previous
-functions, and promote the previous Vercel deployment. The Git integration
-stays connected, so the next push to `main` deploys again. There is no
+fix forward, or roll Vercel back to the previous deployment. After the
+migrations, roll Vercel back to the previous deployment, restore the
+database backup, and redeploy `main`'s previous functions. The Git
+integration stays connected, but after an Instant Rollback Vercel stages
+each new `main` build instead of serving it, until Pablo promotes one. There is no
 partial rollback, because the old app does not match the migrated schema.
 
 ## 12. Retroactive review (C3)

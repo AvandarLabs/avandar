@@ -52,10 +52,10 @@ production at all.
 | 0 | Tools, shell setup, rules | 2 | No | A tool version differs from 2.3 |
 | 1 | Announce the freeze. Rehearse on a local copy of production | 3, 4 | Reads (a dump) | Any row of 4.9 fails |
 | 2 | Check that the GitHub `production` environment still has its protection and its three secrets (read-only: nothing is added to GitHub). Third parties, including the missing edge function secrets on staging, and on production now or before 11.4 (6.6, recommended, not blocking). Vercel needs nothing (7) | 5, 6, 7 | Only if you set production's edge function secrets now (6.6): **WRITES TO PRODUCTION** (configuration, no data). Also **CHANGES STAGING CONFIGURATION** (6.6), and **CHANGES GOOGLE CLOUD CONSOLE** only if 6.2 finds a redirect URI missing | 5.1 or 5.6 shows a missing protection rule or a missing name |
-| 3 | Push the integration branch to `demo/measles`. Open the PR into `develop` | 8.1 to 8.4 | No. **PUSHES** | 4.8 is not done, or `pr-develop.yaml` fails |
+| 3 | Push the integration branch to `demo/measles`. Open the PR into `develop` | 8.1 to 8.4 | No. **PUSHES** | 4.8 is not done, or `pr-develop.yaml` fails. A `pr-test-e2e` that only hit its 70-minute limit waits for decision N1 (8.4) |
 | 4 | Fast-forward `develop`. Vercel deploys the staging app, and `staging.yaml` migrates staging and deploys its edge functions | 8.5, 8.6, 9.1, 9.2 | No. **PUSHES**, **WRITES TO STAGING** through Vercel and CI | Staging's `migrate` job fails at `supabase db push` (9.1). A functions deploy that fails with `Module not found` is the known flake: re-run it (9.1) |
 | 5 | Load the catalog into staging. Check staging | 9.5 to 9.7 | No. **WRITES TO STAGING** | The staging import or restore check fails |
-| 6 | Choose the rollback basis, back up production, and test the backup (10.1 to 10.3). Then release `0.15.0` with `ava release` (11.1 to 11.4): the push to `main` makes Vercel deploy the new app to production. When `production.yaml`'s `migrate` job waits for approval, approve it at once (11.5) | 10, 11 | **WRITES TO PRODUCTION**: the app through Vercel from the push in 11.4, the database and edge functions through CI from the approval in 11.5 | 10.3's restore test fails: do not release |
+| 6 | Choose the rollback basis, back up production, and test the backup (10.1 to 10.3). Then release `0.15.0` with `ava release` (11.1 to 11.4): the push to `main` makes Vercel deploy the new app to production. When `production.yaml`'s `migrate` job waits for approval, check that Vercel deployed the new `main` commit, then approve it at once (11.5) | 10, 11 | **WRITES TO PRODUCTION**: the app through Vercel from the push in 11.4, the database and edge functions through CI from the approval in 11.5 | 10.3's restore test fails: do not release. Staging's only non-green check is a timed-out `test-e2e`: wait for decision N1 (11.2). Vercel's build of `main` failed or was canceled: do not approve (11.5) |
 | 7 | Load the catalog into production. Smoke test | 12, 13 | **WRITES TO PRODUCTION** | Anything in 13 fails: section 14 |
 | 8 | Start the privacy fix. Publish the review backlog when ready. Narrow the staging tokens (section 16, Narrow the staging tokens). Plan the CI deploy and secrets follow-up (section 16, Move deploys to CI and manage secrets in GitHub). Clean up seven days after the smoke test. Vercel's Git integration stays connected (15) | 16, 17 | 17 deletes the demo resources | |
 
@@ -437,6 +437,12 @@ not applied every `develop` migration: 4.8's last check lists which. On
 2026-11-20, so staging has not applied `develop`'s own
 `20261105212729_add_rpc_workspaces__is_slug_available.sql`. The promotion
 applies it (9.2). Note the `<n>` printed here: 9.2 compares against it.
+Expect 184 before the promotion: the 185 migration files on
+`origin/develop` on 2026-11-24, less that one. If you did not note it, run
+the query again in this terminal any time before 8.5. Run only the query,
+`read_db "$STAGING_DB_URL" "select max(version), count(*) from supabase_migrations.schema_migrations"`,
+not block 3, whose first line would overwrite `STAGING_DB_URL` with an
+empty value now that its pieces are unset.
 
 ### 2.5 Rules for production access and the dumps
 
@@ -1415,6 +1421,7 @@ git fetch origin
 git status -sb
 export TIP="$(git rev-parse HEAD)"
 git log -1 --format='%h %s' "$TIP"
+git log -1 --format=%B "$TIP" | grep -F '[skip deploy]' && echo "STOP: Vercel would not deploy this commit"
 git merge-base --is-ancestor origin/demo/measles "$TIP" && echo "demo/measles can fast-forward"
 git merge-base --is-ancestor origin/develop "$TIP" && echo "develop can fast-forward"
 git diff --quiet "$TIP" "refs/heads/chore/production-rehearsal" -- supabase/migrations && echo "rehearsed migrations"
@@ -1422,11 +1429,19 @@ git diff --quiet "$TIP" "refs/heads/chore/production-rehearsal" -- supabase/migr
 
 Then run 5.6's block in the same terminal.
 **Expect:** `## chore/production-cutover` with no changed files listed
-under it; the short SHA is the tip Task 21's final report names;
+under it; the short SHA is the tip Task 21's final report names; the
+`[skip deploy]` check prints no output at all;
 `demo/measles can fast-forward`, `develop can fast-forward`, and
 `rehearsed migrations` all print; 5.6 shows nothing missing; and 5.1
 printed the protection as expected.
-**If not:** a missing `develop can fast-forward` means `develop` moved again
+The `[skip deploy]` check matters because the Vercel project's Ignored
+Build Step cancels the build of any commit whose message holds
+`[skip deploy]`. 8.5 pushes this exact commit to `develop`, so if it
+carried the marker, Vercel would not deploy the promotion to staging.
+**If not:** a `STOP: Vercel would not deploy this commit` line means the
+tip commit's message holds `[skip deploy]`: stop, and add a commit without
+it on the integration branch before going on. A missing
+`develop can fast-forward` means `develop` moved again
 (3.4): stop, and catch the branch up as Task 21 does before going on. A
 missing `demo/measles can fast-forward` means someone pushed to
 `demo/measles`: stop and ask who. A missing `rehearsed migrations` means
@@ -1445,12 +1460,12 @@ gh run list --branch demo/measles --limit 5
 
 **Expect:** the push prints `<old>..<new>  <commit> -> demo/measles` (a
 fast-forward, no `forced update`). The run list shows no new deploy run:
-`demo.yaml` is gone from this tree. Vercel's Git integration may build a
-preview deployment for this push, as it does for pushed branches: that
-changes nothing on staging or production. `demo.avandarlabs.com` keeps
-serving its last build, frozen until section 17 (**verify** in the Vercel
-dashboard > project `avandar` > **Deployments** that a deployment for this
-push, if there is one, is marked Preview, not `demo`).
+`demo.yaml` is gone from this tree. Expect no Vercel deployment for this
+push either: the Vercel project cancels builds of `demo/measles` (its last
+commit's Vercel status reads `Canceled by Ignored Build Step`). That
+changes nothing on staging or production, and `demo.avandarlabs.com` keeps
+serving its last build, frozen until section 17. The first Vercel build of
+the integration code is staging's, from the push in 8.5.
 **If not:** a rejected push means `demo/measles` moved: stop and talk to
 whoever pushed it.
 
@@ -1490,8 +1505,14 @@ adds its own check, and Vercel may add one for its preview deployment.
 video producer file-name casing bug; this branch fixes it (`33c4034e1`), so
 it passes here. No ruleset requires a GitHub status check, so
 your admin bypass could fast-forward `develop` even with a red PR. Do not:
-staging's CI gate and `ava release` (11.2) need staging's whole run green,
-`test-e2e` included.
+staging's CI gate and `ava release` (11.2) read the verdict of staging's
+whole run, `test-e2e` included.
+
+If the only check that is not green is the end-to-end job (`pr-test-e2e`),
+and it ended by hitting its 70-minute limit rather than by a failing test,
+this is the known timeout (section 18, "End-to-end job timeout").
+**Decision N1 is open**: do not proceed past this point on a timed-out
+end-to-end job until Pablo has decided how to treat it.
 **If not:** fix the cause with a commit on the integration branch
 (`chore/production-cutover`), re-run 8.1 to reset `TIP`, push to
 `demo/measles` again (8.2), and repeat section 4 if a migration changed.
@@ -1533,7 +1554,7 @@ in 8.5 starts:
 | The PR | Shows merged, since its head is now on `develop`. **Verify** on the PR page. The repository has `delete_branch_on_merge: true`: **verify** with `git ls-remote origin refs/heads/demo/measles` whether GitHub deleted `demo/measles` when the PR showed merged. Either way nothing is lost: 17.4 deletes it anyway, and its delete then fails harmlessly |
 | Vercel | Its Git integration builds `develop` and deploys it to staging (`staging.avandarlabs.com`) within minutes, with the variables of the Vercel `staging` environment. Until `staging.yaml`'s `migrate` job finishes, the new staging app runs on the old staging schema and the old edge functions. Vercel also keeps building previews for other pushed branches, as it always has |
 | `staging.yaml` | Runs for the push: `lint-typecheck`, then `test-quick` and `test-e2e`, then `migrate`, which applies staging's 11 pending migrations and deploys the edge functions (9.1) |
-| `release-packages.yaml` | Writes changesets for changed `packages/**` and opens a version PR. Nothing is published to npm until that PR is merged, but only when the run finds changesets. With none, its "Create version PR or publish" step publishes every `@avandar/*` version npm does not have yet. Check that step's log: it must say it opened or updated the version PR, and the version PR must stay unmerged (**verify**) |
+| `release-packages.yaml` | Writes changesets for changed `packages/**` and opens a version PR. Nothing is published to npm until that PR is merged, but only when the run finds changesets. With none, its "Create version PR or publish" step publishes every `@avandar/*` version npm does not have yet. npm has `@avandar/*` only up to 0.2.0 while `develop` is at 0.3.0 (the version PR merged on 2026-11-24 never published, because `release-packages` has failed at `pnpm type-check` since 2026-11-20). If this run finds no changesets, it publishes 0.3.0 from the promoted tree, and an npm publish is public at once. A version PR is the expected result, because the promotion changes `packages/`. Watch the `release-packages` run for this push: on GitHub > **Actions** > its run, the "Create version PR or publish" step's log must say it opened or updated the version PR, not that it published. The version PR must stay unmerged (**verify**) |
 | `demo.yaml` | Deleted from `develop` by this push |
 
 ## 9. Staging
@@ -1576,8 +1597,11 @@ without an approval. The run never changes staging's edge function
 secrets: they stay as set by hand on the project (6.6).
 
 **Expect:** `gh run watch` ends with every job green and the run marked
-successful. `ava release` later needs the whole run, `test-e2e` (the
-end-to-end browser tests) included, to pass for the commit it releases
+successful. `ava release` later reads the whole run's verdict, `test-e2e`
+(the end-to-end browser tests) included, for the commit it releases
+(11.2). If the only job that is not green is `test-e2e`, and it ended by
+hitting its 70-minute limit rather than by a failing test, that is the
+known timeout (section 18): **decision N1 is open** on how to treat it
 (11.2).
 
 **The known functions deploy flake.** Supabase CLI 2.98.2, which
@@ -1587,11 +1611,17 @@ the wrong file, and `Run supabase functions deploy` fails with
 `Module not found ".../packages/shared/utils/src/sql/index.ts"`. It
 happened on staging with `develop`'s own code on 2026-11-20, and the next
 run deployed fine: expect about one failure in two attempts. `db push` runs
-before it, so the migrations are already applied, and staging runs the new
-schema with the old edge functions until a re-run passes. The fix is to
+before it, so the migrations are already applied. The CLI deploys the
+functions one at a time, in random order, and stops at the failure, so
+staging runs the new schema with some functions new and the rest old until
+a re-run passes. The fix is to
 re-run the failed job until it passes. The repeated `db push` finds nothing
 to apply. GitHub re-runs jobs only after the whole run has ended,
-`test-e2e` included, so wait for `gh run watch` to end first. Then, in this
+`test-e2e` included, so wait for `gh run watch` to end first, up to about
+75 minutes from the push: `test-e2e` has hit its 70-minute limit in every
+`develop` run since 2026-11-19. On staging, waiting is the default, since
+the staging run's verdict, which `ava release` reads, includes `test-e2e`
+(how to treat a timed-out `test-e2e` is decision N1, 11.2). Then, in this
 terminal, this shows whether the failure is the flake, re-runs only the
 failed jobs, and follows the new attempt:
 
@@ -1623,9 +1653,9 @@ holds `STAGING_RUN_ID`:
 | `lint-typecheck` or `test-quick` | Database and functions untouched. Vercel already serves the new app, on the old schema | Fix the cause, then `gh run rerun "$STAGING_RUN_ID" --failed`. A known flaky test is in section 18 ("Quick suite flake") |
 | `Run supabase link` | Untouched | Read the step's log, fix the cause, then re-run the same way |
 | `Run supabase db push --include-all` | Partly migrated | A migration problem: read 11.9 about the public log first, then stop and raise it |
-| `Run supabase functions deploy`, with `Module not found` | Migrated, old functions | The flake: the block above |
-| `Run supabase functions deploy`, another error | Migrated, old functions | Fix the cause and re-run the same way |
-| `test-e2e` only | Migrated and deployed | Read its report. A flaky test: re-run the same way. `ava release` needs the run green (11.2) |
+| `Run supabase functions deploy`, with `Module not found` | Migrated; functions part new, part old | The flake: the block above |
+| `Run supabase functions deploy`, another error | Migrated; functions part new, part old | Fix the cause and re-run the same way |
+| `test-e2e` only | Migrated and deployed | Read its report. A flaky test: re-run the same way. `ava release` reads the run's verdict (11.2). A run to the 70-minute limit with no failing test is the known timeout: decision N1 (11.2) |
 
 ### 9.2 The 11 migrations applied, and the domain serves the new build
 
@@ -1641,7 +1671,8 @@ comm -23 <(ls supabase/migrations | cut -d_ -f1 | sort) <(read_db "$STAGING_DB_U
 ```
 
 **Expect:** first `20261123200200|<n>`, where `<n>` is 11 more than the
-count 2.4 part 3 printed. Then all 11 versions, one per line: `develop`'s
+count 2.4 part 3 printed (184 expected there, so 195 here, the tip's file
+count). Then all 11 versions, one per line: `develop`'s
 own `20261105212729` and the 7 dictionary and crosswalk files (these 8
 applied out of order by `--include-all`), then the restore and the two
 slot files. Then `plugin_installations`. The last command prints nothing:
@@ -2344,8 +2375,17 @@ chose A.
 **Expect:** the run's `headSha` equals the commit printed on the next
 line, with `"status":"completed"` and `"conclusion":"success"`. `ava
 release` reads the same `staging.yaml` run: its verdict covers the whole
-run, `test-e2e` included, and with `--yes` it stops on any verdict but a
-pass (A2).
+run, `test-e2e` included. On any verdict but a pass, it stops when given
+`--yes`, and without `--yes` it prints the verdict and asks
+`Release anyway?`, going on if you answer yes (A2). `--skip-ci-check` skips
+the check entirely.
+
+If the only job that is not green is the end-to-end job (`test-e2e`), and
+it ended by hitting its 70-minute limit rather than by a failing test,
+this is the known timeout (section 18, "End-to-end job timeout"). The
+run's conclusion is then not `success`, so `ava release` asks
+`Release anyway?`. **Decision N1 is open**: do not proceed past this point
+on a timed-out end-to-end job until Pablo has decided how to treat it.
 **If not:** if the run is still going, wait for it. If it failed, re-run
 its failed jobs until it passes. This block finds the run for
 `origin/develop`'s commit and re-runs only its failed jobs:
@@ -2399,8 +2439,9 @@ The promotion PR is the record. Notes can be published later with
 `ava release` runs on `develop` only. Do not pass `--yes` or
 `--skip-ci-check`. With `--yes`, a CI verdict other than a pass (failed,
 pending, missing, or unknown) **stops** the release (A2). Without `--yes`
-it asks. Overriding a non-passing verdict takes `--skip-ci-check`: never
-here.
+it asks `Release anyway?`, and a yes there releases on a non-passing
+verdict. `--skip-ci-check` skips the check entirely: never here. Whether a
+timed-out `test-e2e` alone may be released over is decision N1 (11.2).
 
 **What the push to `main` starts.** Two things, at once and independently:
 
@@ -2429,21 +2470,25 @@ ava release --skip-changelog
 | `What version number do you want for this release?` | The release version | Enter for `0.15.0` |
 | `Which version should develop move to next?` | The next dev version | Enter for `0.15.1` |
 | `Staging CI passed. (<sha>)` | `staging.yaml` passed for the commit being released | |
-| A verdict such as `Staging CI did not pass (failure): <url>`, then `Release anyway?` | CI did not pass | `n`. Fix CI (11.2), then run `ava release` again |
+| A verdict such as `Staging CI did not pass (failure): <url>`, then `Release anyway?` | CI did not pass | `n`. Fix CI (11.2), then run `ava release` again. If the only cause is a timed-out `test-e2e`, answer as decision N1 says (11.2), and `n` while it is open |
 | The plan, then `Pushing main deploys production and migrates the production database.`, then `Release 0.15.0?` | Last chance | `y` |
 
 It then commits `Release: v0.15.0 [skip deploy]` on `develop` and pushes it,
 builds the `main` commit from that tree, creates the annotated tag
 `v0.15.0`, pushes `main` and the tag together, then commits `Bump version
 to 0.15.1-dev [skip deploy]` on `develop` and pushes it. `[skip deploy]` is
-not a GitHub keyword, and Vercel does not read it either: each of the two
-`develop` pushes starts a `staging.yaml` run and a Vercel staging build.
-Both runs simply run. Their `migrate` jobs find no migration to apply,
-since staging already has every file (9.2), and deploy the same edge
-functions again, so the flake (9.1) can fail either one: re-run it as 9.1
-says. The run for `Bump version to 0.15.1-dev` is the one the next release
-checks, so it must end green. `ava release` checked staging's CI verdict
-before it pushed anything.
+not a GitHub keyword, so each of the two `develop` pushes starts a
+`staging.yaml` run. Vercel does read it: the project's Ignored Build Step
+cancels a build whose commit message holds `[skip deploy]` (the 0.14.1
+release commits show `Canceled by Ignored Build Step`), so staging keeps
+the promotion's build, which has the same code. The two runs' `migrate`
+jobs can overlap, since `staging.yaml` has no concurrency group. Both find
+nothing to apply (9.2) and deploy the same functions, so the flake (9.1)
+can fail either one. The `Bump version to 0.15.1-dev` run must end green,
+because it is the one the next release checks: re-run it with 11.2's
+block, in the develop terminal, which finds the run for `origin/develop`'s
+commit. `ava release` checked staging's CI verdict before it pushed
+anything.
 
 **If not:** if the release stops with an error, find the message in the
 first column below and do what the last column says, in the develop
@@ -2471,14 +2516,41 @@ export RUN_ID="$(gh run list --workflow production.yaml --branch main --limit 5 
 ```
 
 The run id is saved in `$CUTOVER_DIR/production-run-id-0.15.0`, for the
-rollback (14.3). The version in the name keeps a later release from
-overwriting it. If nothing is watched, the run for the new `main` commit has not
+rollback (14.3). The file name is fixed in the block, so a fix release
+that runs 11.5 again overwrites it with the fix's run id. When the 0.15.0
+run never migrated (it stopped before `Run supabase db push`, 11.6), that
+is the right outcome for 14.3: the fix's run is the first to migrate
+production. When the 0.15.0 run did migrate and you later fix forward, the
+overwrite would point 14.3 at the wrong run: before that fix release's
+11.5, copy the 0.15.0 run id from the file into your notes, and if you
+ever need 14.3, run `export RUN_ID=<that id>` in the rollback terminal
+before its first block. If nothing is watched, the run for the new `main`
+commit has not
 started yet: wait a minute and run the block again.
 
 When `test-quick` passes, about 15 minutes after the push, the `migrate`
 job waits for your approval, and `gh run watch` keeps waiting with it.
 **Approve it right away**: the backup (10.2) already exists, and every
 minute of waiting is a minute of the new app on the old schema.
+
+Before you approve, check that Vercel deployed this `main` commit. If its
+build failed, production still serves the old app, and approving would put
+the old app on the new schema. Stop `gh run watch` with Ctrl-C (the run
+keeps going on GitHub), then, in the develop terminal, which holds
+`MAIN_SHA` from the block above:
+
+```bash
+gh api "repos/AvandarLabs/avandar/commits/$MAIN_SHA/statuses" --jq '[.[] | select(.context == "Vercel")][0] | [.state, .description] | @tsv'
+```
+
+**Expect:** `success`, a tab, `Deployment has completed` (3 minutes after
+the push for 0.14.1), and Cmd+K on `https://app.avandarlabs.com` shows
+`0.15.0` after a reload. `pending` means the build is still running: check
+again in a minute. `failure`, or `Canceled by Ignored Build Step`, means
+production still runs the old app on the old schema. Do not approve: leave
+the job waiting, read the build log (Vercel dashboard > project `avandar` >
+**Deployments** > the newest Production deployment), and raise it. Then run
+`gh run watch "$RUN_ID"` again.
 
 1. In the browser, open the run's page: GitHub > **Actions** >
    **CI/CD for Production** (left sidebar; the workflow file is
@@ -2488,7 +2560,9 @@ minute of waiting is a minute of the new app on the old schema.
    This approval is the production write: the job then migrates
    production and deploys the edge functions without asking again.
 2. Keep following the run with `gh run watch "$RUN_ID"` in the develop
-   terminal, or on the run's page. 11.6 says what each step does.
+   terminal, or on the run's page. 11.6 says what each step does. Once
+   `migrate` is green, press Ctrl-C: the run keeps going, and 11.7 does
+   not wait for `test-e2e`.
 
 ### 11.6 What each step of the `migrate` job does and prints
 
@@ -2502,7 +2576,7 @@ names each unnamed step "Run" and the first line of its command:
 | 3 | `migrate` waits for approval (11.5) | No | |
 | 4 | `migrate`: `Run supabase link --project-ref $SUPABASE_PROJECT_ID` | No | The link output. The project ref is masked (11.9) |
 | 5 | `migrate`: `Run supabase db push` | **Yes** | One line per migration it applies, `$PROD_PENDING` of them (80 at the 2026-11-24 tip), in timestamp order. Plain `db push`, with no `--include-all`, is enough: every pending file is newer than production's newest applied file (4.6). On the last production release it took 2 seconds |
-| 6 | `migrate`: `Run supabase functions deploy` | **Yes** | One line per function. Production gains `connectors`, `file-url`, and `geocode`, and possibly `_eval` (**verify** in the log). It took 33 seconds last time |
+| 6 | `migrate`: `Run supabase functions deploy` | **Yes** | One line per function. Production gains `connectors`, `file-url`, and `geocode`. `_eval` is not deployed: staging's full deploy on 2026-11-20 listed 15 functions without it. It took 33 seconds last time |
 
 The job never changes production's edge function secrets: they stay as
 set by hand on the project (6.6).
@@ -2517,22 +2591,43 @@ only ever re-run the newest run. The `production` environment allows only
 
 **The functions deploy flake** (9.1) can fail step 6 here too: about one
 attempt in two, with `Module not found ".../packages/shared/utils/src/sql/index.ts"`.
-The migrations are already applied by then, so production runs the new
-schema with the old edge functions until a re-run passes. GitHub re-runs
-jobs only after the whole run has ended, and `test-e2e` runs about 15
-minutes longer than `migrate`, so wait for `gh run watch` to end. Then, in
-the develop terminal, this shows whether the failure is the flake and
-re-runs only the failed jobs:
+The migrations are already applied by then. The CLI deploys the functions
+one at a time, in random order, and stops at the failure, so production
+runs the new schema with some functions new and the rest old (11.8) until
+a re-run passes. GitHub re-runs nothing until the whole run has ended, and
+`test-e2e` has run to its 70-minute limit in every `develop` run since
+2026-11-19. Do not wait for it: `production.yaml`'s verdict gates nothing,
+and `test-e2e` runs only on the runner's own local stack. Once `migrate`
+shows a result (never while it is running), stop `gh run watch` with
+Ctrl-C (the run keeps going on GitHub). Then, in the develop terminal,
+confirm which step failed:
 
 ```bash
-gh run view "$RUN_ID" --log-failed | grep -F 'Module not found' | head -3
-gh run rerun "$RUN_ID" --failed
+MIGRATE_JOB_ID="$(gh run view "$RUN_ID" --json jobs --jq '.jobs[] | select(.name == "migrate") | .databaseId')"
+gh run view "$RUN_ID" --json jobs --jq '.jobs[] | select(.name == "migrate") | [.conclusion, (.steps[] | select(.conclusion == "failure") | .name)] | @tsv'
 ```
 
-The re-run's `migrate` waits for approval again: approve it on the run's
-page as in 11.5 (**WRITES TO PRODUCTION**), then follow it with
+**Expect:** `failure`, a tab, `Run supabase functions deploy`. On the
+run's page, that step's log shows the `Module not found` line. Then cancel
+the rest of the run, which stops only `test-e2e`, and re-run only
+`migrate`:
+
+```bash
+gh run cancel "$RUN_ID"
+sleep 20; gh run view "$RUN_ID" --json status --jq .status
+[[ -n "$MIGRATE_JOB_ID" ]] && gh run rerun "$RUN_ID" --job "$MIGRATE_JOB_ID"
+```
+
+The status line must print `completed` before the re-run works. If it
+does not, run the last two lines again a few seconds later. The re-run's
+`migrate` waits for approval again: approve it on the run's page as in
+11.5 (**WRITES TO PRODUCTION**), then follow it with
 `gh run watch "$RUN_ID"`. The repeated `db push` finds nothing to apply.
-Repeat until `migrate` is green.
+If it fails the same way, run the first block again (a re-run gets a new
+job id), then only the last line: the run has already ended, so nothing
+needs cancelling. Do not use `--failed` here. It also re-runs `test-e2e`
+whenever that job did not succeed, and the run then cannot be re-run again
+for up to 70 minutes.
 
 If the run fails anywhere else, find the failed step in the first column
 below and do what the last column says. Re-run commands run in the develop
@@ -2540,11 +2635,26 @@ terminal, which holds `RUN_ID`:
 
 | Fails at | Production | Do |
 | --- | --- | --- |
-| `lint-typecheck` or `test-quick` | `migrate` never runs: the database and functions are untouched, but Vercel already serves the new app on the old schema | Decide at once. A flaky test (section 18, "Quick suite flake"): `gh run rerun "$RUN_ID" --failed`, then approve as in 11.5. A real failure: fix forward (a fix on `develop`, staging green, `ava release`), or promote the previous Vercel deployment (14.5) until the fix is released |
-| `Run supabase link` | Untouched database, new app | Read the step's log, fix the cause, then re-run the same way. Approve again |
+| `lint-typecheck` or `test-quick` | `migrate` never runs: the database and functions are untouched, but Vercel already serves the new app on the old schema | Decide at once. A flaky test (section 18, "Quick suite flake"): run `gh run cancel "$RUN_ID"`. Only `test-e2e` is still running, and GitHub re-runs nothing until it ends, which can take 70 minutes. Then run the block below, which re-runs `test-quick` and the `migrate` job that needs it, and approve `migrate` as in 11.5. A real failure: Instant Rollback to `8bb5b44f3`'s deployment at once (14.5), then fix forward (a fix on `develop`, staging green, `ava release`). After the rollback, Vercel builds the fix's `main` push but does not serve it: promote it (14.5, "Back to the new app") as soon as that release's `migrate` is green |
+| `Run supabase link` | Untouched database, new app | Read the step's log, fix the cause, then cancel the run and re-run only `migrate` with the flake blocks above. Approve again |
 | `Run supabase db push` | Partly migrated: each file applies in its own transaction, so the files before the failing one stay applied | Read 11.9 first, then section 14 (14.1, row "A migration fails midway") |
-| `Run supabase functions deploy`, with `Module not found` | Migrated, old functions | The flake: the block above |
-| `Run supabase functions deploy`, another error | Migrated, old functions | Fix the cause and re-run the failed jobs of the newest run at once. Approve again |
+| `Run supabase functions deploy`, with `Module not found` | Migrated; functions part new, part old | The flake: the blocks above |
+| `Run supabase functions deploy`, another error | Migrated; functions part new, part old | Fix the cause, then cancel the newest run and re-run only its `migrate` with the flake blocks above, at once. Approve again |
+
+For the flaky-test case in the first row, after `gh run cancel "$RUN_ID"`,
+this block in the develop terminal re-runs `test-quick`, and with it the
+`migrate` job that needs it:
+
+```bash
+TEST_QUICK_JOB_ID="$(gh run view "$RUN_ID" --json jobs --jq '.jobs[] | select(.name == "test-quick") | .databaseId')"
+[[ -n "$TEST_QUICK_JOB_ID" ]] && gh run rerun "$RUN_ID" --job "$TEST_QUICK_JOB_ID"
+```
+
+**Verify** that `migrate` shows as queued after it runs (on the run's page,
+or with `gh run view "$RUN_ID"`), then follow the run with
+`gh run watch "$RUN_ID"` and approve `migrate` as in 11.5 when it waits.
+If the re-run reports that the run is still in progress, the cancel has not
+finished: wait a few seconds and run the block again.
 
 ### 11.7 Check the version
 
@@ -2578,11 +2688,18 @@ active users (D4):
   long the approval waits. Anything in the new app that needs a table,
   column, or function the pending migrations add, or one of the new edge
   functions, fails in that window. If `test-quick` fails, the window stays open until
-  a fix is released or the previous Vercel deployment is promoted (11.6,
-  14.5).
-- **New schema, old functions.** From `Run supabase db push` until `Run
-  supabase functions deploy` finishes: under a minute, or until a re-run
-  passes when the flake strikes (11.6).
+  a fix is released or Vercel is rolled back to the previous deployment
+  (11.6, 14.5).
+- **New schema, mixed functions.** From `Run supabase db push` until `Run
+  supabase functions deploy` finishes: under a minute normally. When the
+  flake strikes, the functions deployed before the failing one are new,
+  and the rest are old, or missing for `connectors`, `file-url`, and
+  `geocode`, until 11.6's re-run passes. In that state database
+  connections (`connectors`), importing from a URL (`file-url`), and
+  address search (`geocode`) fail with a not-found error if their function
+  is missing. An old `open-data` function fails on catalog listings,
+  because it reads `catalog_entries__open_data`, which the migrations
+  rename.
 
 A browser tab opened before the Vercel deployment keeps the old app until
 it reloads, and the old app breaks once the migrations rename catalog
@@ -2753,23 +2870,29 @@ Find the row that matches what happened, and do what it says:
 
 | Situation | Do |
 | --- | --- |
-| `production.yaml` failed before `Run supabase db push` | The database and edge functions are untouched, but Vercel already serves the new app on the old schema (11.8). No database rollback: fix forward and release again, or promote the previous Vercel deployment (14.5) until the fix is released |
-| A migration fails midway | Production is partly migrated, and once a rename has applied, the old app is broken. A transient error (network, lock timeout): re-run the failed jobs of the newest run and approve again (11.6), and `db push` resumes at the first unapplied file. A bug in a migration, or production data it cannot handle: restore (14.3). `db push` stops at the failing file, so a later-timestamped migration cannot get past it. A fix needs a new migration timestamped before the failing file (staging applies it out of order with `--include-all`), a PR, staging's full CI including `test-e2e`, and `ava release`: hours, not one |
-| Migrations applied, a later step failed | Re-run the failed jobs of the newest run (11.6). Not a rollback |
+| `production.yaml` failed before `Run supabase db push` | The database and edge functions are untouched, but Vercel already serves the new app on the old schema (11.8). No database rollback: fix forward and release again, and roll Vercel back (14.5) until the fix's `migrate` is green, then promote the fix's deployment |
+| A migration fails midway | Production is partly migrated, and once a rename has applied, the old app is broken. A transient error (network, lock timeout): cancel the newest run, re-run only its `migrate`, and approve again (11.6, the flake blocks), and `db push` resumes at the first unapplied file. A bug in a migration, or production data it cannot handle: restore (14.3). `db push` stops at the failing file, so a later-timestamped migration cannot get past it. A fix needs a new migration timestamped before the failing file (staging applies it out of order with `--include-all`), a PR, staging's full CI including `test-e2e`, and `ava release`: hours, not one |
+| Migrations applied, a later step failed | Cancel the newest run and re-run only its `migrate` (11.6, the flake blocks). Not a rollback |
 | The catalog import is wrong | 12.3, promptly |
 | Deployed, with a bug that loses no data | Fix forward: a fix on `develop`, then `ava release` |
-| Deployed, and users are losing data, or the app is unusable with no fix in about an hour | Restore (14.3), redeploy `main`'s previous functions (14.4), promote the previous Vercel deployment (14.5) |
+| Deployed, and users are losing data, or the app is unusable with no fix in about an hour | In this order: stop deploys (14.2), roll Vercel back to the previous deployment (14.5), restore the database (14.3), then redeploy `main`'s previous functions (14.4) |
 
 There is no partial rollback: the old app does not match the migrated
 schema, and the schema cannot be rolled back without the data.
+
+For a full rollback, do 14.2, then 14.5, then 14.3, then 14.4, even though
+the subsections are numbered differently. The Instant Rollback in 14.5
+takes effect at once and keeps any later push to `main` from going live,
+so the old app is already serving when the database comes back.
 
 ### 14.2 Stop deploys after a restore
 
 Do this as soon as you decide to restore (14.3), so that no push to `main`
 migrates the restored database again. It does not stop Vercel: its Git
-integration stays connected, so any push to `main` still deploys that
-commit's app to production, whatever the workflow does. In the rollback
-terminal:
+integration stays connected, so any push to `main` still builds that
+commit's app, whatever the workflow does. Until 14.5's Instant Rollback,
+such a build goes live on production at once; after it, the build stays
+staged until you promote it. In the rollback terminal:
 
 ```bash
 gh workflow disable production.yaml
@@ -2779,11 +2902,12 @@ gh workflow disable production.yaml
 `main` back to an older commit: that push is itself a production deploy.
 
 A disabled workflow does not run on a push, so the fix release would not
-migrate, while Vercel would still deploy its app. When the fix is ready,
-enable the workflow right before its
-`ava release` (11.4), or enable it afterwards and start the run for the new
-`main` by hand (`gh workflow run production.yaml --ref main`), then approve
-it as in 11.5. **CHANGES GITHUB SETTINGS.** This is the command that
+migrate. Vercel still builds the fix's `main` push: before 14.5 it goes
+live at once, and after 14.5's Instant Rollback it stays staged until you
+promote it. When the fix is ready, enable the workflow right before its
+`ava release` (11.4), approve its `migrate` (11.5), and promote the fix's
+deployment (14.5, "Back to the new app") only once `migrate` is green.
+**CHANGES GITHUB SETTINGS.** This is the command that
 turns it back on, for that later moment, not now:
 
 ```bash
@@ -2821,8 +2945,8 @@ files and the run id 11.5 saved. 14.4 uses both as well.
 Then follow only the option 10.1 chose: A, B, or (as a last resort) C.
 
 **A. PITR.** Restore to the second before the **first** attempt's `Run
-supabase db push` step (in the `migrate` job) started. A re-run of failed
-jobs (11.6, 14.1) is a later attempt, and its `Run supabase db push`
+supabase db push` step (in the `migrate` job) started. A re-run (11.6,
+14.1) is a later attempt, and its `Run supabase db push`
 started after the first attempt's migrations had applied, so restoring
 there leaves production partly migrated. This block reads that start time
 from GitHub, takes 5 seconds
@@ -2868,8 +2992,9 @@ runs the restore only when `RESTORE_TO` is a 10-digit number:
 Or do the same in the browser: Supabase dashboard > **Avandar** >
 **Database** > **Backups** > **Point in time** > pick the same time (the UTC
 line printed above; the dashboard may show local time, so check which) >
-restore. **Verify:** `supabase backups restore --help` lists
-`--timestamp`. The project is unavailable while it restores: the
+restore. The 2.114.0 CLI's `supabase backups restore --help` lists
+`--timestamp, -t integer`, which the guarded command above uses. The
+project is unavailable while it restores: the
 dashboard shows its progress. That can take a while.
 
 When the dashboard shows the project as healthy again, check its
@@ -2990,8 +3115,9 @@ comm -13 "$D/prod-$BACKUP_T-function-slugs.txt" "$D/functions-after-rollback.txt
 ```
 
 **Expect:** the last command lists only the functions the release added:
-`connectors`, `file-url`, `geocode`, and `_eval` if it was deployed. Read
-the list. If it holds only those, delete them with this loop, one
+`connectors`, `file-url`, and `geocode`. `_eval` is not deployed (staging's
+full deploy on 2026-11-20 listed 15 functions without it), so it is not on
+the list. Read the list. If it holds only those, delete them with this loop, one
 `supabase functions delete` per line of the file:
 
 ```bash
@@ -3001,7 +3127,7 @@ done < "$D/functions-to-delete.txt"
 ```
 
 **If not:** if the list has a name you do not expect, do not run the loop.
-Instead delete only the four above, one at a time, with
+Instead delete only the three above, one at a time, with
 `supabase functions delete <name> --project-ref "$PROD_REF"`. **Verify:**
 `supabase functions list --project-ref "$PROD_REF" -o json | jq '.[0] | keys'`
 shows a `slug` field. If it does not, both lists above are wrong: delete
@@ -3012,25 +3138,27 @@ them, since CI writes no edge function secret (L1). The three that 6.6
 added by hand are new names that `v0.14.1`'s functions do not read, so
 leave them in place.
 
-### 14.5 Promote the previous Vercel deployment (**CHANGES VERCEL**)
+### 14.5 Roll Vercel back to the previous deployment (**CHANGES VERCEL**)
 
 **Where:** the Vercel dashboard. Project `avandar` > **Deployments** >
-filter the list to **Production** > find the last deployment from before
-the release (made by the Git integration from `main` at commit
-`8bb5b44f3`, shown on each deployment's row) > its **...** menu >
-**Promote** (Vercel may call it **Instant Rollback**) > confirm.
-**Expect:** the promoted deployment is marked as the current production
-deployment, and `app.avandarlabs.com` serves the old app after a reload.
-The Git integration stays connected, so a later push to `main` deploys
-again: Vercel builds that commit and makes it production's deployment.
-**Verify:** if Vercel then says automatic production domain assignment is
-paused (an Instant Rollback can pause it), a later push to `main` builds but
-does not serve `app.avandarlabs.com` until you undo that pause on the same
-page.
+filter to **Production** > the last deployment from before the release
+(from `main` at `8bb5b44f3`) > its **...** menu > **Instant Rollback** >
+confirm. A deployment that has served production cannot be promoted again:
+going back to it is always an Instant Rollback. The labels may read
+slightly differently in the dashboard (**verify** them there).
+**Expect:** `app.avandarlabs.com` serves the old app after a reload. After
+an Instant Rollback, Vercel turns off automatic assignment of the
+production domain: every later push to `main` still builds, but stays
+staged and does not go live until you promote it. That keeps a stray push
+from undoing the rollback.
+**Back to the new app** (when a fix release's `migrate` is green, or to
+undo the rollback): project overview > the production deployment tile >
+**Manage** > pick the newest `main` deployment > **Confirm**. That
+promotes it and turns automatic assignment back on. **CHANGES VERCEL.**
 
-Promoting the previous deployment alone, with no database restore, is the
-way back when `production.yaml` stopped before `Run supabase db push`
-(14.1): the old app then matches the old schema again.
+Rolling back to the previous deployment alone, with no database restore,
+is the way back when `production.yaml` stopped before `Run supabase db
+push` (14.1): the old app then matches the old schema again.
 
 ### 14.6 The catalog
 
@@ -3369,15 +3497,16 @@ handled.
 | Test jobs on `main` | `production.yaml`'s `test-quick` and `test-e2e` read the `staging` environment's secrets. Accepted for the cutover (K1). Fixed after it in section 16, Narrow the staging tokens |
 | Catalog restore | Restores whole tables and leaves the gaps listed in 12.3. `session_replication_role` was verified on a local stack only: 9.6 C3 probes each project |
 | Catalog script messages | `importCatalogData.sh` calls the `with_db_url` helper "the cutover runbook's ... (1.4)": in this runbook it is 2.4 |
-| `[skip deploy]` | Not a GitHub keyword: each release commit on `develop` starts a `staging.yaml` run |
+| `[skip deploy]` | Not a GitHub keyword: each release commit on `develop` starts a `staging.yaml` run. Vercel does read it: the project's Ignored Build Step cancels a build whose commit message holds `[skip deploy]`, so staging keeps the promotion's build (11.4). 8.1 checks that the promotion's tip commit does not carry it |
 | Release notes | `--skip-changelog` for `0.15.0`: 2,673 non-merge commits since `v0.14.1` on 2026-11-24 |
 | `test-e2e` | Never blocks `migrate`, but it does decide the run's verdict that `ava release` reads |
+| End-to-end job timeout | The end-to-end job (`pr-test-e2e` on the PR, `test-e2e` on staging and production) has run to or near its 70-minute timeout in every `develop`-based staging and PR run since 2026-11-19, so it may not go green for the promotion either. A run whose only non-green job is a timed-out end-to-end job has a non-passing verdict: without `--yes`, `ava release` asks `Release anyway?`; with `--yes` it stops; `--skip-ci-check` skips the check. **Decision N1 is open** on how to treat it: 8.4 and 11.2 stop there until Pablo decides. On production it gates nothing, and 11.6 cancels the run rather than wait for it |
 | Pull request previews | Continue as before: Vercel's Git integration stays connected in this cutover (section 15) |
 | `demo.avandarlabs.com` | Frozen at its last build until 17.2 |
 | Secrets live in four places (L1) | GitHub (what the CI jobs need), Vercel (the web app's build variables), Fly.io (the pipeline server), and each Supabase project's edge function secrets, set by hand. CI writes none of the edge function secrets. Making GitHub the only place is follow-up work (section 16, Move deploys to CI and manage secrets in GitHub) |
 | Public Actions logs | A failed `supabase db push` can print row data (11.9) |
-| New app on the old schema | Vercel deploys the new app at the push to `main`, and `production.yaml`'s `migrate` job runs only after `lint-typecheck`, `test-quick`, and your approval: at least about 16 minutes of the new app on the old schema and old edge functions (11.8). Accepted because production has no active users (D4). If `test-quick` fails, `migrate` never runs: fix forward or promote the previous Vercel deployment (14.5). The CI deploy follow-up migrates first (section 16) |
-| Functions deploy flake | Supabase CLI 2.98.2, pinned in `develop`'s workflows, fails `supabase functions deploy` about one attempt in two with `Module not found ".../packages/shared/utils/src/sql/index.ts"`. The migrations are already applied by then. Fixed by re-running the failed job (9.1, 11.6). The CLI bump to 2.114.0 is part of the CI deploy follow-up (section 16) |
+| New app on the old schema | Vercel deploys the new app at the push to `main`, and `production.yaml`'s `migrate` job runs only after `lint-typecheck`, `test-quick`, and your approval: at least about 16 minutes of the new app on the old schema and old edge functions (11.8). Accepted because production has no active users (D4). If `test-quick` fails, `migrate` never runs: fix forward, and roll Vercel back to the previous deployment (14.5) until the fix's `migrate` is green. The CI deploy follow-up migrates first (section 16) |
+| Functions deploy flake | Supabase CLI 2.98.2, pinned in `develop`'s workflows, fails `supabase functions deploy` about one attempt in two with `Module not found ".../packages/shared/utils/src/sql/index.ts"`. The migrations are already applied by then. Fixed by re-running the failed job (9.1; on production, 11.6 cancels the run and re-runs only `migrate`). The CLI bump to 2.114.0 is part of the CI deploy follow-up (section 16) |
 | `pnpm check:plugin-bundle` | Not run in CI: it was only in the deferred CI deploy work. The script still exists for local use. Follow-up (section 16) |
 | `workflow_dispatch` on `staging.yaml` | Anyone who can push a branch can start `staging.yaml` by hand from that branch, and its `migrate` job then migrates staging and deploys that branch's edge functions, because the `staging` environment has no branch policy (5.2). An existing exposure, unchanged by this cutover. Section 16, Narrow the staging tokens, closes it |
 | CI deploy work | Kept on the local branch `feat/ci-deploy-jobs` (`7dccc6d92`), on one laptop only until it is pushed (17.4). Section 16, Move deploys to CI and manage secrets in GitHub |

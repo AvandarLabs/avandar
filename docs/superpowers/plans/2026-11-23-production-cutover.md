@@ -1282,6 +1282,10 @@ Write the row counts, the dump's size and SHA-256, and the two psql and pg_dump 
 
 ### Task 19: The cutover runbook
 
+**Note:** the section table below describes the CI deploy design the
+runbook was first written for. Decision M1 set that design aside, and the
+runbook itself is the source of truth.
+
 **Risk class:** high-risk. Pablo writes to production from it.
 
 **Files:**
