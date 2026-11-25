@@ -1,10 +1,9 @@
 #!/usr/bin/env node
 /* oxlint-disable import/extensions -- Node needs source extensions. */
-import {
-  Acclimate,
-  CLIError,
-  openTerminalSession,
-} from "@avandar/acclimate";
+import { Acclimate, CLIError, openTerminalSession } from "@avandar/acclimate";
+import { collectCoverage } from "./coverageHelpers.ts";
+import { createCssCoverageProbes } from "./createCssCoverageProbes.ts";
+import { createNativeCoverageProbes } from "./nativeSafeRules/createNativeCoverageProbes.ts";
 import type {
   AnyCLI,
   ChoiceMenuItem,
@@ -13,9 +12,6 @@ import type {
   TerminalOutputStream,
   TerminalSession,
 } from "@avandar/acclimate";
-import { collectCoverage } from "./coverageHelpers.ts";
-import { createCssCoverageProbes } from "./createCssCoverageProbes.ts";
-import { createNativeCoverageProbes } from "./nativeSafeRules/createNativeCoverageProbes.ts";
 
 const FORMATS = ["stylish", "agent", "json"] as const;
 const FORMAT_CHOICES: ReadonlyArray<ChoiceMenuItem<Format>> = [
@@ -112,9 +108,7 @@ function _findDanglingFormatIndex(args: readonly string[]): number {
   }
   const endOfOptionsIndex = args.indexOf("--");
   const optionSlice =
-    endOfOptionsIndex === -1
-      ? args.slice(1)
-      : args.slice(1, endOfOptionsIndex);
+    endOfOptionsIndex === -1 ? args.slice(1) : args.slice(1, endOfOptionsIndex);
   if (
     optionSlice.includes("--help") ||
     optionSlice.includes("-h") ||
@@ -321,9 +315,7 @@ export async function runCoverageWizard(
   const session = await openTerminalSession({
     session:
       options.terminal ??
-      (options.promptIo
-        ? _toSessionFromPromptIo(options.promptIo)
-        : undefined),
+      (options.promptIo ? _toSessionFromPromptIo(options.promptIo) : undefined),
     interactive: options.interactive,
     stdin: options.stdin,
     stdout: options.stdout,

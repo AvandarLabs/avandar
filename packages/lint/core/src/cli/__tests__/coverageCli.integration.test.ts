@@ -4,10 +4,10 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { PassThrough } from "node:stream";
 import { describe, expect, it } from "vitest";
-import type { PromptIo } from "@avandar/acclimate";
 import { createCoverageDirectory as _createDirectory } from "../../__tests__/coverage.fixtures";
 import { createNativeRepository } from "../../__tests__/nativeProof.fixtures";
 import { runCli, runCoverageWizard } from "../cliHelpers";
+import type { PromptIo } from "@avandar/acclimate";
 
 function _createScriptedPromptIo(
   options: Readonly<{
@@ -100,22 +100,25 @@ describe("coverage CLI", () => {
         return input.end();
       },
     ],
-  ])("cancels the wizard on %s before coverage runs", async (_label, trigger) => {
-    let didSend = false;
-    const { promptIo, output } = _createScriptedPromptIo({
-      onWrite: (_chunk, input) => {
-        if (!didSend && output.join("").includes("Paths (comma-separated)")) {
-          didSend = true;
-          queueMicrotask(() => {
-            trigger(input);
-          });
-        }
-      },
-    });
-    await expect(
-      runCoverageWizard({ promptIo, interactive: true }),
-    ).rejects.toMatchObject({ code: "prompt_cancelled" });
-  });
+  ])(
+    "cancels the wizard on %s before coverage runs",
+    async (_label, trigger) => {
+      let didSend = false;
+      const { promptIo, output } = _createScriptedPromptIo({
+        onWrite: (_chunk, input) => {
+          if (!didSend && output.join("").includes("Paths (comma-separated)")) {
+            didSend = true;
+            queueMicrotask(() => {
+              trigger(input);
+            });
+          }
+        },
+      });
+      await expect(
+        runCoverageWizard({ promptIo, interactive: true }),
+      ).rejects.toMatchObject({ code: "prompt_cancelled" });
+    },
+  );
 
   it("prints help outside a repository before invalid arguments or coverage access", async () => {
     const stdout: string[] = [];
