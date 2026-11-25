@@ -1,0 +1,36 @@
+name: Check Skip CI
+description: >-
+  Determines whether all commits in a push or pull request qualify to skip CI
+  workflows via `[skip deploy]` subjects or safe documentation/skill changes.
+
+inputs:
+  node-version:
+    description: Node.js version to run the zero-dependency TypeScript check.
+    required: false
+    default: "24.15.0"
+
+outputs:
+  should-skip:
+    description: '"true" when every commit qualifies to skip CI, else "false".'
+    value: ${{ steps.evaluate.outputs.should-skip }}
+  reason:
+    description: Human-readable explanation for the skip decision.
+    value: ${{ steps.evaluate.outputs.reason }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v5
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: Evaluate commit range for CI skip
+      id: evaluate
+      shell: bash
+      env:
+        EVENT_NAME: ${{ github.event_name }}
+        BEFORE_SHA: ${{ github.event.before }}
+        AFTER_SHA: ${{ github.sha }}
+        PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      run: node scripts/ci/should-skip-ci/ShouldSkipCi.ts

@@ -14,8 +14,27 @@ env:
   NODE_VERSION: 24.15.0
 
 jobs:
+  # Skip CI/CD when every pushed commit says `[skip deploy]` or only touches
+  # safe documentation and agent-skill files.
+  check-skip:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      should-skip: ${{ steps.skip.outputs.should-skip }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          filter: blob:none
+      - id: skip
+        uses: ./.github/actions/check-skip
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
   # Lint and TypeScript checks.
   lint-typecheck:
+    needs: check-skip
+    if: needs.check-skip.outputs.should-skip != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
