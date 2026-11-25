@@ -1,0 +1,59 @@
+{
+  "name": "@avandar/plugin-ui",
+  "version": "0.1.0",
+  "private": true,
+  "description": "The components Avandar plugin UI and plugin charts may render.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AvandarLabs/avandar.git",
+    "directory": "packages/web/plugin-ui"
+  },
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./charts": "./src/charts.ts"
+  },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "type-check": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@mantine/core": "^9.2.0",
+    "react": "^19.0.0",
+    "recharts": "^3.8.1"
+  },
+  "devDependencies": {
+    "@mantine/core": "catalog:",
+    "@testing-library/react": "^16.3.0",
+    "jsdom": "^26.1.0",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "recharts": "^3.8.1",
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "./charts": {
+        "types": "./dist/charts.d.ts",
+        "default": "./dist/charts.js"
+      }
+    }
+  }
+}

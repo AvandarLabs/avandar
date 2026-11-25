@@ -1,6 +1,6 @@
 import { matchLiteral } from "@avandar/utils";
 import { t } from "@lingui/core/macro";
-import type { VizType } from "$/models/vizs/AvaVizConfig/AvaVizConfig.types.ts";
+import type { BuiltInVizType } from "$/models/vizs/AvaVizConfig/AvaVizConfig.types.ts";
 
 /**
  * Returns the human-readable label for a visualization type. Shared copy used
@@ -10,7 +10,7 @@ import type { VizType } from "$/models/vizs/AvaVizConfig/AvaVizConfig.types.ts";
  * identifier; this is the display counterpart, resolved at call time so it
  * follows the active locale.
  */
-export function vizTypeLabel(vizType: VizType): string {
+export function vizTypeLabel(vizType: BuiltInVizType): string {
   return matchLiteral(vizType, {
     table: () => {
       return t`Table`;

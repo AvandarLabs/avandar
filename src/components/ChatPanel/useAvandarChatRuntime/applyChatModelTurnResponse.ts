@@ -1,9 +1,8 @@
-import { prop } from "@avandar/utils";
 import { i18n } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
-import { ClarificationAuditEntryClient } from "@/clients/privacy/ClarificationAuditEntryClient/ClarificationAuditEntryClient";
 import { applyChatTurnResponse } from "@/components/ChatPanel/applyChatTurnResponse/applyChatTurnResponse";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
+import { recordClarificationShown } from "@/components/ChatPanel/recordClarificationShown/recordClarificationShown";
 import { ChatAnalyticsPayloads } from "@/components/ChatPanel/useAvandarChatRuntime/ChatAnalyticsPayloads/ChatAnalyticsPayloads";
 import {
   assumptionNeedsSignInOrApproval,
@@ -14,7 +13,6 @@ import { getLastQuestionFromMessages } from "@/components/ChatPanel/useAvandarCh
 import { shouldQueueDashboardBlock } from "@/components/ChatPanel/useAvandarChatRuntime/shouldQueueDashboardBlock/shouldQueueDashboardBlock";
 import { waitForAppliedSqlOutcome } from "@/components/ChatPanel/useAvandarChatRuntime/waitForAppliedSqlOutcome/waitForAppliedSqlOutcome";
 import { decideIfDataCanCrossBoundary } from "@/components/privacy/privacy-helpers/decideIfDataCanCrossBoundary";
-import { detectBias } from "@/components/privacy/privacy-helpers/detectBias/detectBias";
 import {
   buildGeneratedSqlAssumptionAckText,
   reviewGeneratedSqlAssumptions,
@@ -230,7 +228,7 @@ export async function applyChatModelTurnResponse(
         }
         const payload = ChatAnalyticsPayloads.fromDashboardBlock({
           block,
-          pageContext: options.currentPageContext,
+          dashboardId: options.currentPageContext.dashboardId,
           editorState: options.dashboardEditorStateRef.current,
         });
         options.dashboardEditorDispatch.queuePendingBlock({
@@ -259,17 +257,10 @@ export async function applyChatModelTurnResponse(
         options.chatPanelDispatch.setPendingClarification,
       setPendingCaseTypeDraft:
         options.chatPanelDispatch.setPendingCaseTypeDraft,
-      recordClarificationShown: async (clarification) => {
-        const questionBias = detectBias(clarification.question);
-        if (questionBias.hits.length > 0) {
-          console.warn(
-            "[chat] LLM clarification trips bias detector; passing through:",
-            questionBias.hits.map(prop("label")),
-          );
-        }
-        return ClarificationAuditEntryClient.recordShown({
+      recordClarificationShown: (clarification) => {
+        return recordClarificationShown({
           workspaceId: options.workspaceId,
-          request: clarification,
+          clarification,
         });
       },
     },

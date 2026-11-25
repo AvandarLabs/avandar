@@ -1,0 +1,17 @@
+{
+  "label": "phase-1d:offline-rerun",
+  "questionCount": 2,
+  "passCount": 0,
+  "needlessQuestions": 0,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 4,
+  "promptTokens": 4567,
+  "cachedPromptTokens": 0,
+  "completionTokens": 526,
+  "totalCost": 0,
+  "costPerQuestion": 0,
+  "latencyMedianMs": 154945.012958,
+  "latencyP90Ms": 154945.012958,
+  "failedIds": ["H04", "N05"]
+}

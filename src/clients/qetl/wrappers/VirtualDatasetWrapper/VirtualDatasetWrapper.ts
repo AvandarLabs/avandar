@@ -27,11 +27,11 @@ const CAPABILITIES = {
   maxBytesPerCall: "unbounded",
 
   /**
-   * A virtual dataset's materialization is not invalidated when its SQL is
-   * edited, so there is no token that tells us it changed. Declaring `none`
-   * keeps the mediator from believing it has a freshness answer here.
+   * A virtual dataset's defining SQL is its token: its cached rows are stored
+   * under it, so an edited definition is a miss without running anything.
+   * Its rows also go stale when the rows it was built from do (`maxAgeMs`).
    */
-  freshnessSignal: "none",
+  freshnessSignal: "version-token",
 
   /**
    * The defining SQL may reorder or reshape rows on every run, so a row's
@@ -45,6 +45,13 @@ const CAPABILITIES = {
   grantedScope: [],
 } satisfies RelationCapabilities;
 
+/** A nested query's Parquet, and when the rows it read go stale. */
+export type NestedParquetQueryResult = {
+  parquetBlob: Blob;
+  /** The earliest epoch ms at which a dataset it read goes stale. */
+  staleAt: number | undefined;
+};
+
 type VirtualDatasetWrapperOptions = {
   /**
    * Runs the virtual dataset's defining SQL and returns Parquet bytes.
@@ -54,8 +61,12 @@ type VirtualDatasetWrapperOptions = {
    * tables into the shared queryable relation cache, so it cannot open a lease
    * of its own.
    * `WrapperContext` carries no lease, so the caller closes over it.
+   * It also says when the datasets the SQL read go stale, so a virtual
+   * dataset over a live source is materialized again with it.
    */
-  runParquetQuery: (params: Readonly<{ rawSql: string }>) => Promise<Blob>;
+  runParquetQuery: (
+    params: Readonly<{ rawSql: string }>,
+  ) => Promise<NestedParquetQueryResult>;
 
   /** Reads the defining SQL. Injected so a test needs no client. */
   getRawSql?: (ref: DatasetRef) => Promise<string>;
@@ -97,12 +108,15 @@ export function createVirtualDatasetWrapper(
     // The column subset is ignored: the defining SQL fixes the result's
     // columns, and a returned superset satisfies the request.
     acquire: async ({ ref }): Promise<AcquiredRelation> => {
+      const { parquetBlob, staleAt } = await options.runParquetQuery({
+        rawSql: await getRawSql(ref),
+      });
       return {
         ref,
-        parquetBlob: await options.runParquetQuery({
-          rawSql: await getRawSql(ref),
-        }),
+        parquetBlob,
         sourceVersion: undefined,
+        maxAgeMs:
+          staleAt === undefined ? undefined : Math.max(0, staleAt - Date.now()),
       };
     },
   };

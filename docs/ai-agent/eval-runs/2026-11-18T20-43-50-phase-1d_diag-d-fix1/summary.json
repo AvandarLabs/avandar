@@ -1,0 +1,17 @@
+{
+  "label": "phase-1d:diag-d-fix1",
+  "questionCount": 3,
+  "passCount": 2,
+  "needlessQuestions": 0,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 3,
+  "promptTokens": 17012,
+  "cachedPromptTokens": 17000,
+  "completionTokens": 1077,
+  "totalCost": 0.0007097,
+  "costPerQuestion": 0.00023656666666666665,
+  "latencyMedianMs": 2168.057417,
+  "latencyP90Ms": 2321.8495,
+  "failedIds": ["D01"]
+}

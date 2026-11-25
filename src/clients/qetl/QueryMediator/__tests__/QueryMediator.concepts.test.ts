@@ -124,9 +124,17 @@ vi.mock("@/clients/datasets/source-datasets/VirtualDatasetClient", () => {
 vi.mock("@/clients/datasets/DatasetColumnClient", () => {
   return {
     DatasetColumnClient: {
+      QueryKeys: {
+        getAll: () => {
+          return ["DatasetColumnClient", "getAll"];
+        },
+      },
       withCache: () => {
         return {
           withEnsureQueryData: () => {
+            return { getAll: datasetColumnGetAllMock };
+          },
+          withFetchQuery: () => {
             return { getAll: datasetColumnGetAllMock };
           },
         };
@@ -134,6 +142,27 @@ vi.mock("@/clients/datasets/DatasetColumnClient", () => {
     },
   };
 });
+vi.mock("@/clients/dataDictionaries/DictionaryBindingClient", async () => {
+  return (
+    await import("@/lib/dataDictionaries/loadColumnReplacements/__tests__/noDictionaryBindingsClient")
+  ).NO_DICTIONARY_BINDINGS_CLIENT_MODULE;
+});
+
+vi.mock(
+  "@/clients/qetl/QueryMediator/relationLoading/getVirtualRelationDefinitions/getVirtualRelationDefinitions",
+  async (importOriginal) => {
+    const original =
+      await importOriginal<
+        typeof import("@/clients/qetl/QueryMediator/relationLoading/getVirtualRelationDefinitions/getVirtualRelationDefinitions")
+      >();
+    return {
+      ...original,
+      getVirtualRelationDefinitions: async () => {
+        return {};
+      },
+    };
+  },
+);
 
 /** The shape `getRelationSources` filters datasets with. */
 type DatasetIdFilter = { where?: { id?: { in?: readonly Dataset.Id[] } } };

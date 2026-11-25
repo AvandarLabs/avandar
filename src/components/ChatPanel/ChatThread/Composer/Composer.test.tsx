@@ -1,19 +1,28 @@
 /** Behavioral tests for when the chat composer accepts input. */
 import { AssistantRuntimeProvider, useLocalRuntime } from "@assistant-ui/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { createChatSessionIndex } from "@/components/ChatPanel/ChatSessionIndex/ChatSessionIndex";
 import { render, screen } from "@/test-utils";
 import { Composer } from "./Composer";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
+import type { ChatSessionKind } from "@/components/ChatPanel/ChatSessionIndex/ChatSessionIndex";
 
-const { pageContextMock, isAgentEnabledMock } = vi.hoisted(() => {
-  return {
-    pageContextMock: vi.fn(),
-    isAgentEnabledMock: vi.fn(),
-  };
-});
+const { pageContextMock, isAgentEnabledMock, chatSessionsMock } = vi.hoisted(
+  () => {
+    return {
+      pageContextMock: vi.fn(),
+      isAgentEnabledMock: vi.fn(),
+      chatSessionsMock: vi.fn(),
+    };
+  },
+);
 
 vi.mock("@/components/ChatPanel/useChatPageContext", () => {
   return { useChatPageContext: pageContextMock };
+});
+
+vi.mock("@/components/ChatPanel/ChatSessionProvider/useChatSessions", () => {
+  return { useChatSessions: chatSessionsMock };
 });
 
 vi.mock("@/lib/agent/dataAgent/browser/DataAgentFeature", () => {
@@ -69,12 +78,20 @@ function ComposerWithRuntime(): React.ReactNode {
   );
 }
 
+function _mockSelectedSession(kind: ChatSessionKind): void {
+  chatSessionsMock.mockReturnValue({
+    index: createChatSessionIndex({ id: "session-1", kind }),
+  });
+}
+
 function _renderComposer(options: {
   isAgentEnabled: boolean;
+  kind?: ChatSessionKind;
   context: Pick<ChatPageContext.T, "app"> & { dashboardId?: string };
 }): HTMLElement {
   isAgentEnabledMock.mockReturnValue(options.isAgentEnabled);
   pageContextMock.mockReturnValue(options.context);
+  _mockSelectedSession(options.kind ?? "data");
   render(<ComposerWithRuntime />);
   return screen.getByRole("textbox");
 }
@@ -97,6 +114,8 @@ describe("Composer", () => {
   beforeEach(() => {
     pageContextMock.mockReset();
     isAgentEnabledMock.mockReset();
+    chatSessionsMock.mockReset();
+    _mockSelectedSession("data");
   });
 
   describe("with the data agent on", () => {
@@ -183,14 +202,24 @@ describe("Composer", () => {
       ).toBeTruthy();
     });
 
-    it("leaves the case designer composer disabled", () => {
+    it("uses the agent editor for a data session on the case manager", () => {
       const input = _renderComposer({
         isAgentEnabled: true,
+        kind: "data",
         context: { app: "case-manager" },
       });
+      _expectEditableEditor(input);
+      expect(screen.getByTestId("chat-context-tray")).toBeInTheDocument();
+    });
 
-      expect(input).toBeDisabled();
-      expect(input).toHaveAttribute("placeholder", DISABLED_PLACEHOLDER);
+    it("uses an enabled textarea for a case-design session", () => {
+      const input = _renderComposer({
+        isAgentEnabled: true,
+        kind: "case-design",
+        context: { app: "data-explorer" },
+      });
+      expect(input).toBeEnabled();
+      expect(input.tagName).toBe("TEXTAREA");
       expect(screen.queryByTestId("chat-context-tray")).not.toBeInTheDocument();
     });
   });
@@ -215,6 +244,17 @@ describe("Composer", () => {
         context: { app: "data-explorer" },
       });
 
+      expect(screen.queryByTestId("chat-context-tray")).not.toBeInTheDocument();
+    });
+
+    it("uses an enabled textarea for a case-design session", () => {
+      const input = _renderComposer({
+        isAgentEnabled: false,
+        kind: "case-design",
+        context: { app: "data-explorer" },
+      });
+      expect(input).toBeEnabled();
+      expect(input.tagName).toBe("TEXTAREA");
       expect(screen.queryByTestId("chat-context-tray")).not.toBeInTheDocument();
     });
 

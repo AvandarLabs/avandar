@@ -62,6 +62,7 @@ loading entirely; they only see tables already resident in the tab.
 | poisoning | Marking a table invalid before a mutating statement runs |
 | spine | `concept_<id>__individuals`: a one-column `VARCHAR` table of a concept's `external_id` values |
 | `ava_rows_<id>` | A second view over a dataset's Parquet file that adds `file_row_number` |
+| `ava_raw_<id>` | A third view over a dataset's Parquet file with its renames and casts but none of its conversions: the values as stored, which profiling and the apply flow read |
 | trusted internal SQL | SQL the DuckDB client or QETL builds itself (loaders, CSV sniffing, projection, concept views), marked with the `TRUSTED_INTERNAL_SQL` symbol so `runRawQuery` accepts it when the analyzer's only objection is a source it cannot inspect (`uninspectable-source`) |
 
 ### 2.1 Client, wrapper, and adapter: three words, two separate layers
@@ -133,12 +134,12 @@ down is shared code._
 Related diagrams in this file: the probe order (section 6), table ownership
 states (section 7), and connector touch points (section 10).
 
-## 4. The thirteen steps of the per-query pipeline
+## 4. The fourteen steps of the per-query pipeline
 
 All steps are called from
 [`queryRunner.ts`](../src/clients/qetl/QueryMediator/queryRunner.ts); the links
 point at the file that implements a step when it lives elsewhere. Steps 1 to 3
-run before any lock; steps 4 to 13 run inside one coordinated operation.
+run before any lock; steps 4 to 14 run inside one coordinated operation.
 
 1. **`getQueryDependencies`** (session policy). Workspace:
    `assertWorkspaceRelations` refuses any dataset outside the workspace. Public:
@@ -164,32 +165,56 @@ run before any lock; steps 4 to 13 run inside one coordinated operation.
    (`getNeededColumnsFromQuery`), applies caller overrides
    (`neededColumnsByDatasetId`), and maps names to Parquet headers
    (`getParquetColumnNamesFromNeeded`).
-7. **`probeRelationCache`**. Datasets DuckDB cannot serve: absent, or present
-   with a sidecar set that does not cover the need
+7. **`_readQueryCatalog`** (`queryRunner.ts`). In a `catalog` session that
+   names a dataset, reads each dataset's replacements and projection key with
+   `loadColumnReplacements`: every column, the convert bindings, and the live
+   code lists they use. A failed columns read is logged and leaves those
+   datasets with no replacements and no key, so the query still runs and a
+   loaded view keeps being served; a view loaded then is recorded with the
+   `UNREAD_PROJECTION_KEY` sentinel, so the first successful read rebuilds it.
+   It also reads each virtual dataset's definition
+   (`getVirtualRelationDefinitions`), which step 9 probes the storage tier
+   under. A `stored` session, and a query that names no dataset, read nothing.
+8. **`probeRelationCache`**. Datasets DuckDB cannot serve: absent, present
+   with a sidecar set that does not cover the need, stale, or built with
+   another projection key than step 7 read
    ([getRelationSources.ts](../src/clients/qetl/QueryMediator/getRelationSources.ts)).
-8. **`probeStorageRelationCache`**. Probes the session's port for the rest,
+9. **`probeStorageRelationCache`**. Probes the session's port for the rest,
    reads hit payloads, and returns `growFrom` for misses
    ([relationLoading.ts](../src/clients/qetl/QueryMediator/relationLoading.ts)).
-9. **`getRelationSources`**. Reads `datasets` rows and per-type source rows for
-   uncached ids. Skipped when nothing is uncached.
-10. **`fetchRelationBytes`** (`relationLoading.ts`). Builds a registry, then for
+10. **`getRelationSources`**. Reads `datasets` rows and per-type source rows
+    for uncached ids. Skipped when nothing is uncached.
+11. **`fetchRelationBytes`** (`relationLoading.ts`). Builds a registry, then for
     each source in order calls `acquire` with the needed set plus `growFrom`,
     and, when that set is a finite column list, projects the result with
     `projectParquetBlob`. Sequential on purpose.
-11. **`loadRelationBytes`** (`relationLoading.ts`). Writes new bytes to the
+12. **`loadRelationBytes`** (`relationLoading.ts`). Writes new bytes to the
     storage tier (failures are logged and ignored), then `loadParquet` for every
-    relation with renames limited to loaded columns, and records the sidecar.
-12. **`loadConceptRelations`**. Builds each concept's spine, then its view.
-13. **`DuckDbClient.runRawQuery`**. Re-analyzes the caller's SQL, proves the
+    relation with the replacements step 7 read (renames, casts, and dictionary
+    conversions), narrowed to the loaded columns, and records the sidecar with
+    the projection key. It reads no catalog itself.
+13. **`loadConceptRelations`**. Builds each concept's spine, then its view.
+14. **`DuckDbClient.runRawQuery`**. Re-analyzes the caller's SQL, proves the
     lease covers it, asserts workspace validity or snapshot ownership, poisons
     mutated tables, and executes; `returnType: "parquet"` exports through a
     temporary view and `COPY`.
 
-A virtual dataset is acquired at step 10 by running its defining SQL through the
+A virtual dataset is acquired at step 11 by running its defining SQL through the
 same `runQuery` with the outer lease (`runParquetQuery` in
-`_createRegistryForFetch`). The nested query repeats steps 1 to 13 without
+`_createRegistryForFetch`). The nested query repeats steps 1 to 14 without
 taking locks, and without the outer statement's `conceptSpineRestrictions`,
 because its parquet bytes are cached without them.
+
+**Progress.** A caller may pass `onRelationFetched` to `runQuery`. It is
+called at least once for each dataset the query loads, as soon as its
+relation is in hand: after step 8 for one the queryable tier serves, after
+step 9 for a storage tier hit, and after each source's bytes arrive in step
+11. A virtual dataset's nested query receives the same callback, so its
+sources report too, and a dataset is reported again by a nested query that
+reads the same dataset. A caller that counts progress counts each dataset it
+asked about once, and ignores the rest. A listener that throws is logged and
+ignored, so it cannot fail the query. A crosswalk's combined preview uses it
+to say how many of its datasets are read.
 
 ## 5. Components, their paths, and their dependencies
 
@@ -230,13 +255,14 @@ flowchart TD
   HIT1["Served by DuckDB"]
   D["probeStorageRelationCache:<br/>does an entry serve it?<br/>same principal, table,<br/>definition token;<br/>not past staleAt; columns<br/>cover the need"]
   E["Is the payload<br/>row readable?"]
-  HIT2["Served by IndexedDB,<br/>loaded at step 11"]
+  HIT2["Served by IndexedDB,<br/>loaded at step 12"]
   F["Miss, with growFrom if<br/>a narrower live entry exists"]
   G["Treated as uncached,<br/>no growFrom"]
   H["Acquire through<br/>the registry"]
   A -->|"no"| D
   A -->|"yes"| B
-  B -->|"no entry: counts as all"| HIT1
+  B -->|"no entry, dataset needs<br/>no replacements: counts as all"| HIT1
+  B -->|"no entry, dataset<br/>needs replacements"| D
   B -->|"entry"| C
   C -->|"yes"| HIT1
   C -->|"no"| D
@@ -253,7 +279,16 @@ reaches a wrapper._
 
 **Queryable tier.** Presence in `information_schema.tables` plus the sidecar.
 It has no principal; it is protected by authorization (step 1), the lease check
-(step 13), and ownership (section 7). A tab reload empties it.
+(step 14), and ownership (section 7). A tab reload empties it. The sidecar also
+records the projection key each view was built with (`getProjectionKey` over
+the dataset's renames, casts, and dictionary conversions, read by
+`loadColumnReplacements`). A workspace query whose key differs treats the
+table as a miss, so the storage tier serves the same bytes and the view is
+rebuilt: a relabeled code list reaches the next query without a cache clear.
+A table the sidecar never recorded, such as one an upload's transcode loaded,
+holds the dataset as stored, so it is current only while the key asks for no
+renames, casts, or conversions.
+A `stored` session passes no keys and never reads the catalog.
 
 **Max age for live sources.** A wrapper whose rows can change without a
 re-import (Google Sheets, Postgres tables) returns `maxAgeMs` from `acquire`
@@ -262,6 +297,10 @@ turns it into a `staleAt` time that both tiers record, and from that time on
 neither serves the rows, so the next query acquires them again. While the
 browser is offline nothing is judged stale (`getRelationFreshnessNow`): stale
 rows beat no rows. Each source's "Refresh" action evicts both tiers at once.
+A virtual dataset (a linked dataset, for example) has no max age of its own:
+it returns the earliest stale-at time among the datasets its SQL read, so a
+linked dataset over a Google Sheet is materialized again when the Sheet's
+rows are. A source's Refresh also evicts the linked datasets that read it.
 
 **Storage key** ([RelationCacheKey.ts](../shared/models/relations/RelationCacheKey/RelationCacheKey.ts)):
 
@@ -272,6 +311,11 @@ rows beat no rows. Each source's "Refresh" action evicts both tiers at once.
 | version token | `v0`, or `v1.` plus a truncated SHA-256 of `sourceVersion` | no, recorded only |
 | definition token | `d0`, or `d1.` plus a truncated SHA-256 of kind and text | exact |
 | columns | sorted, de-duplicated names, or `"all"` | coverage (`coversColumns`) |
+
+A virtual dataset is probed and stored under the definition `virtual_sql`
+with its defining SQL, read from the same cached virtual record acquisition
+reads, so an edited definition is a miss. Every other dataset has no
+definition.
 
 The identity key is `principal|tableName|versionToken|definitionToken`. The
 reuse predicate is `serves`. Column names compare case-sensitively.
@@ -390,7 +434,7 @@ PublicOwned with the exact expected owner, and Invalid is readable by nobody._
 
 - **Loading.** `loadParquetIntoDuckDb` drops the table, registers the blob as a
   `BROWSER_FILEREADER` file handle (byte-range reads, no copy into the WASM
-  heap), and creates the dataset view plus its `ava_rows_<id>` view.
+  heap), reads each ordered conversion's kept values from the file, and creates the dataset view plus its `ava_rows_<id>` and `ava_raw_<id>` views.
   `registerParquetFile` rejects a blob whose type is not
   `application/vnd.apache.parquet`.
 
@@ -413,7 +457,7 @@ Do not break these without changing the reason they exist.
 | Datasets load before concept views, spines before views | DuckDB binds a view's sources at `CREATE VIEW` time | `_runLeasedQuery`, `loadConceptRelations` |
 | Column renames apply only to columns the loaded file holds | `SELECT * EXCLUDE (...)` fails on a projected-away column | `_isColumnInLoadedRelation` in `relationLoading.ts` |
 | A dataset's table name is its bare UUID; every other kind has a prefix, tried longest first | Stored dashboard SQL, virtual dataset SQL, and `?sql=` URLs must keep resolving | `RelationRefModule.ts` |
-| `RelationRef.fromTableName` must not resolve internal names (`concept_<id>__individuals`, `ava_rows_`, `ava_proj_`, `ava_staging_individuals_`) | A resolved name would be authorized and loaded as a relation; the analyzer instead maps `ava_rows_<id>` to a read of dataset `<id>` on purpose and treats staging tables as reading nothing | `RelationRefModule.ts`, `duckDbSqlText.ts`, `duckDbSqlSources.ts`, `loadConceptSpine.ts` |
+| `RelationRef.fromTableName` must not resolve internal names (`concept_<id>__individuals`, `ava_rows_`, `ava_raw_`, `ava_proj_`, `ava_staging_individuals_`) | A resolved name would be authorized and loaded as a relation; the analyzer instead maps `ava_rows_<id>` and `ava_raw_<id>` to a read of dataset `<id>` on purpose and treats staging tables as reading nothing | `RelationRefModule.ts`, `duckDbSqlText.ts`, `duckDbSqlSources.ts`, `loadConceptSpine.ts` |
 | One wrapper per relation kind; declared pushdown or acquirability must have a method | Resolution must not depend on registration order; wiring errors surface when the registry is built, which is once per `fetchRelationBytes` call rather than at startup | `createRelationRegistry` |
 | A spine's key column is `VARCHAR`, loaded through CSV, and empty ids are refused | Keys compare as text; user text must not enter SQL | `loadConceptSpine.ts` |
 
@@ -427,10 +471,10 @@ Do not break these without changing the reason they exist.
 | Runtime strategy selection | `_createDatasetWrapper` in `createDefaultRegistry.ts` | Documented as a "composite"; it dispatches on `sourceType`, it does not form a tree |
 | Strategy (policy injection) | `QetlRunnerOptions` from each session | CRUD reads inside the pipeline are not injectable |
 | Ports and adapters | `RelationCachePort` with Dexie, public, and in-memory test adapters | The port carries Dexie-shaped fields (`identityKey`, `touch`) |
-| Cache-aside | steps 7, 8, 11 | No invalidation on source change |
+| Cache-aside | steps 8, 9, 12 | No invalidation on source change |
 | Facade | `DuckDbClient` over `duckDb*` units | The operation bundle is rebuilt per call so test doubles apply |
 | Capability token | `DatasetDuckDbLease` | Called a lease, but has no expiry |
-| Fail-safe defaults (Saltzer and Schroeder) | analyzer, `assertWorkspaceRelations` | The public session drops out-of-snapshot references at step 1 and relies on the step 13 lease check |
+| Fail-safe defaults (Saltzer and Schroeder) | analyzer, `assertWorkspaceRelations` | The public session drops out-of-snapshot references at step 1 and relies on the step 14 lease check |
 
 `SourceWrapper.describe`, `readFreshness`, `pushDown`, and the capability record
 have no production caller beyond the registry's registration checks; treat them
@@ -661,22 +705,21 @@ means traced through the source but not run.
 
 | Gap | Status | Where |
 | --- | --- | --- |
-| No version-based freshness: `sourceVersion` and `definition` are always `undefined` in the storage key, the acquired `sourceVersion` is dropped, and `readFreshness` has no caller. Live sources (Sheets, Postgres) are re-acquired once their max age passes, but virtual dataset edits and CKAN republishes are never seen | by reading | `relationLoading/RelationLoading.ts` |
+| No version token: `sourceVersion` is always `undefined` in the storage key, the acquired `sourceVersion` is dropped, and `readFreshness` has no caller. Live sources (Sheets, Postgres) are re-acquired once their max age passes, and a virtual dataset is keyed by its SQL and goes stale with its dependencies, but a CKAN republish is never seen, and a virtual dataset's SQL is read from the persisted query cache, so another session's edit is seen once that cache entry is refetched | by reading | `relationLoading/RelationLoading.ts`, `getVirtualRelationDefinitions.ts` |
 | No pushdown and no capability-driven planning | by reading | `QueryMediator.ts` TODO |
 | Eviction only on `QuotaExceededError`; no byte budget | by reading | both cache adapters |
 | Every workspace query locks every workspace dataset, so top-level queries in one workspace serialize across tabs | by reading | `WorkspaceQuerySession.ts`, `queryRunner.ts` |
-| Public sessions cannot plan or build concepts, so `concept_<uuid>` fails as a missing table unless a workspace query in the same tab left that view behind (step 13's public checks cover dataset relations only); they depend on the out-of-band preload in `useEnsurePublishedDashboardDatasets` and cannot acquire | by reading | `PublicQuerySession.ts`, `duckDbRawQuery.ts` |
+| Public sessions cannot plan or build concepts, so `concept_<uuid>` fails as a missing table unless a workspace query in the same tab left that view behind (step 14's public checks cover dataset relations only); they depend on the out-of-band preload in `useEnsurePublishedDashboardDatasets` and cannot acquire | by reading | `PublicQuerySession.ts`, `duckDbRawQuery.ts` |
 | A nested virtual-dataset query that names a concept its outer query did not plan is refused for an insufficient lease | documented in code | `_getLeaseNames` in `queryRunner.ts` |
 | Column inference attributes a table alias written without `AS` and a typed literal's keyword (`TIMESTAMP`, `DATE`, `INTERVAL`) as columns. When the dataset has a column the query does not name and no `"all"` copy is cached, the projection fails with a binder error, unless the keyword happens to equal a column name (`DATE` over a `date` column succeeds with a duplicate `date_1`) | verified | `getNeededColumnsFromQuery.ts`, `getParquetColumnNamesFromNeeded.ts` |
 | In a multi-dataset statement that qualifies some names, unqualified names are not attributed, so the projection can drop a needed column | verified | `getNeededColumnsFromQuery.ts` |
 | The analyzer refuses `EXTRACT(part FROM column)` as `uninspectable-source` | verified | `duckDbSqlSources.ts` |
-| Anonymous public dashboards: `loadRelationBytes` always reads `dataset_columns`, which `anon` cannot read (HTTP 401 on the local stack) | 401 verified; dashboard failure by reading | `relationLoading.ts` |
 | A CKAN resource in Parquet format is wrapped in an untyped Blob and fails `registerParquetFile` when the query needs all columns; the bad entry is cached first. Latent: in-repo registrations are CSV and XLSX | by reading | `DatasetParquetWrapper.ts` |
 | The sidecar is never cleared; a stale narrow entry can make a public query reload a snapshot table and then fail the ownership check | by reading | `QueryableRelationColumns.ts` |
 | Snapshot publishing of an `all_columns` slice fails over API-backed open data without a ready `LocalDataset` row (no `.parquet` canonical URL exists). Google Sheets and Postgres tables keep no parquet in Storage, so every slice of theirs is read through the workspace query instead. An uploaded file's `all_columns` slice copies the stored parquet, which keeps the original column names and detected types, so a column renamed or retyped after import does not match the widget SQL a published viewer runs | by reading | `dashboardPublishSnapshots.ts`, `LocalPublicDatasetRawDataClient.ts` |
 | `extractReferencedRelations`, `buildCsvFromDatastoreRecords`, `RelationRegistry.resolveAll` and `wrappers` have no production caller | by reading | as named |
 | Concept attributes mapped from two datasets read only the first mapping | by reading | `makeConceptAttributeColumnsFromMetadata.ts` |
-| An `ava_rows_` view outlives its dataset when the dataset is dropped and not reloaded | documented in code | `duckDbParquetLoad.ts` |
+| The `ava_rows_` and `ava_raw_` views outlive their dataset when the dataset is dropped and not reloaded | documented in code | `duckDbParquetLoad.ts` |
 | Planned and absent: the 14-day offline authorization window, sorted materialization by entity key, publish-time concept materialization | by reading | design specs below |
 
 ## 14. Related documents

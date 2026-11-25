@@ -5,11 +5,10 @@
  * testable on their own.
  */
 
+import { DEV_VERSION_SUFFIX } from "@ava-cli/ReleaseCli/releaseBranches/releaseBranches";
+
 /** `X.Y.Z`, with nothing before or after. */
 const RELEASE_VERSION_REGEX = /^\d+\.\d+\.\d+$/;
-
-/** The suffix every in-progress version on `develop` carries. */
-export const DEV_SUFFIX = "-dev";
 
 export type VersionValidationResult =
   | Readonly<{ valid: true }>
@@ -53,12 +52,12 @@ export function validateReleaseVersion(
 }
 
 /**
- * Strips any prerelease suffix, so `develop`'s `0.10.2-dev` yields the release
- * it is working towards: `0.10.2`.
+ * Strips any prerelease suffix, so a source branch's `0.10.2-dev` yields the
+ * release it is working towards: `0.10.2`.
  */
-export function toReleaseVersion(developVersion: string): string {
-  const [releaseVersion] = developVersion.trim().split("-");
-  return releaseVersion ?? developVersion.trim();
+export function toReleaseVersion(sourceVersion: string): string {
+  const [releaseVersion] = sourceVersion.trim().split("-");
+  return releaseVersion ?? sourceVersion.trim();
 }
 
 /**
@@ -87,7 +86,7 @@ export function suggestNextVersion(releaseVersion: string): string | undefined {
 
 /** The version `develop` moves to after the release, e.g. `0.10.3-dev`. */
 export function toDevVersion(version: string): string {
-  return `${version}${DEV_SUFFIX}`;
+  return `${version}${DEV_VERSION_SUFFIX}`;
 }
 
 /** The git tag for a release version, e.g. `v0.10.2`. */

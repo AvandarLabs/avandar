@@ -20,7 +20,10 @@ import type { Workspace } from "$/models/Workspace/Workspace";
 import type { UnknownRow } from "@/clients/DuckDbClient/DuckDbClient";
 import type { ConceptSpineRestriction } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
 import type { IQueryMediator } from "@/clients/qetl/QueryMediator/QueryMediator";
-import type { NeededColumnsByDatasetId } from "@/clients/qetl/QueryMediator/QueryMediator.types";
+import type {
+  NeededColumnsByDatasetId,
+  RelationFetchedListener,
+} from "@/clients/qetl/QueryMediator/QueryMediator.types";
 import type { Module } from "@avandar/modules";
 import type { EmptyObject } from "@avandar/utils";
 
@@ -37,6 +40,7 @@ export type IWorkspaceQetlClient = Module<
           signal?: AbortSignal;
           neededColumnsByDatasetId?: NeededColumnsByDatasetId;
           conceptSpineRestrictions?: readonly ConceptSpineRestriction[];
+          onRelationFetched?: RelationFetchedListener;
         }>,
       ): Promise<QueryResult.T<RowObject>>;
       (
@@ -47,6 +51,7 @@ export type IWorkspaceQetlClient = Module<
           signal?: AbortSignal;
           neededColumnsByDatasetId?: NeededColumnsByDatasetId;
           conceptSpineRestrictions?: readonly ConceptSpineRestriction[];
+          onRelationFetched?: RelationFetchedListener;
         }>,
       ): Promise<Blob>;
     };
@@ -190,6 +195,7 @@ export const WorkspaceQuerySession = createModule("WorkspaceQuerySession", {
         signal,
         neededColumnsByDatasetId,
         conceptSpineRestrictions,
+        onRelationFetched,
       }: Readonly<{
         rawSql: string;
         workspaceId: Workspace.Id;
@@ -197,6 +203,7 @@ export const WorkspaceQuerySession = createModule("WorkspaceQuerySession", {
         signal?: AbortSignal;
         neededColumnsByDatasetId?: NeededColumnsByDatasetId;
         conceptSpineRestrictions?: readonly ConceptSpineRestriction[];
+        onRelationFetched?: RelationFetchedListener;
       }>): Promise<QueryResult.T<RowObject> | Blob> => {
         // The assertion owns the session read and hands back the principal it
         // verified, so a query costs one session read rather than two. That
@@ -213,6 +220,7 @@ export const WorkspaceQuerySession = createModule("WorkspaceQuerySession", {
             signal,
             neededColumnsByDatasetId,
             conceptSpineRestrictions,
+            onRelationFetched,
           });
         }
 
@@ -222,6 +230,7 @@ export const WorkspaceQuerySession = createModule("WorkspaceQuerySession", {
           signal,
           neededColumnsByDatasetId,
           conceptSpineRestrictions,
+          onRelationFetched,
         });
       },
     };

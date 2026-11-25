@@ -37,9 +37,11 @@ const AXIS_ROLES_BY_VIZ_TYPE = {
   pie: NEITHER,
   funnel: NEITHER,
   table: NEITHER,
-} as const satisfies Record<AvaVizConfig.Type, AxisRoles>;
+} as const satisfies Record<AvaVizConfig.BuiltInType, AxisRoles>;
 
 /** Returns the X and Y axis roles for a visualization type. */
-export function getAxisRolesFromVizType(vizType: AvaVizConfig.Type): AxisRoles {
+export function getAxisRolesFromVizType(
+  vizType: AvaVizConfig.BuiltInType,
+): AxisRoles {
   return { ...AXIS_ROLES_BY_VIZ_TYPE[vizType] };
 }

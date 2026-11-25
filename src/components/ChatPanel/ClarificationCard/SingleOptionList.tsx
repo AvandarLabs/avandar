@@ -4,6 +4,7 @@ import { ClarificationAnswer } from "./ClarificationAnswerModule/ClarificationAn
 
 type Props = {
   options: readonly string[];
+  optionLabels?: readonly string[];
   selectedOption: string | undefined;
   noneOfAboveLabel: string;
   somethingElseLabel: string;
@@ -13,6 +14,7 @@ type Props = {
 /** Renders the available single-select clarification options. */
 export function SingleOptionList({
   options,
+  optionLabels,
   selectedOption,
   noneOfAboveLabel,
   somethingElseLabel,
@@ -26,8 +28,14 @@ export function SingleOptionList({
       aria-label={t`Pick one`}
     >
       <Stack gap={4}>
-        {options.map((option) => {
-          return <Radio key={option} value={option} label={option} />;
+        {options.map((option, index) => {
+          return (
+            <Radio
+              key={option}
+              value={option}
+              label={optionLabels?.[index] ?? option}
+            />
+          );
         })}
         <Radio
           value={ClarificationAnswer.somethingElse}

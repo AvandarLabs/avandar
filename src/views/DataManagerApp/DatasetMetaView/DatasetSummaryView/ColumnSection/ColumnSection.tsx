@@ -3,11 +3,13 @@ import { Group, Skeleton, Stack, Text } from "@mantine/core";
 import { useIntersection } from "@mantine/hooks";
 import { useContext, useEffect, useState } from "react";
 import { Dataset } from "$/models/datasets/Dataset/Dataset";
+import { CodeListPopover } from "@/components/dataDictionaries/CodeListPopover/CodeListPopover";
 import { ActiveColumnContext } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ActiveColumnContext";
 import css from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSection/ColumnSection.module.css";
 import { ColumnSummaryBody } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSummaryBody/ColumnSummaryBody";
 import { buildFullDataTypeLabel } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels";
 import { makeColumnSectionIdFromColumnName } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/makeColumnSectionIdFromColumnName";
+import type { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes";
 import type { ReactNode } from "react";
 
 /** How far ahead of the viewport a section's summary query is started. */
@@ -24,6 +26,8 @@ type Props = {
   columnName: string;
   dataType: string;
   totalRows: number;
+  /** The column's code list, when a dictionary is attached to it. */
+  codes: ColumnCodes.T | undefined;
 };
 
 /** Lazily loads one column summary and updates the active outline entry. */
@@ -32,6 +36,7 @@ export function ColumnSection({
   columnName,
   dataType,
   totalRows,
+  codes,
 }: Props): ReactNode {
   const { i18n } = useLingui();
   const setActiveColumn = useContext(ActiveColumnContext);
@@ -97,6 +102,13 @@ export function ColumnSection({
           <Text className={css.columnSectionType}>
             {buildFullDataTypeLabel(dataType, i18n)}
           </Text>
+          {codes && codes.pairs.length > 0 ? (
+            <CodeListPopover
+              columnName={columnName}
+              codes={codes}
+              datasetId={datasetId}
+            />
+          ) : null}
         </Group>
         {isReadyToLoad ? (
           <ColumnSummaryBody

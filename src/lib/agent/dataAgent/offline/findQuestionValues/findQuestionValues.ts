@@ -1,4 +1,5 @@
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
+import { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes";
 import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
 import type { DataAgentHost } from "@/lib/agent/dataAgent/DataAgentHost";
 import type { OfflineDatasetProfile } from "@/lib/agent/dataAgent/offline/profileOfflineDatasets/profileOfflineDatasets";
@@ -27,6 +28,11 @@ export type QuestionValueMatch = {
   datasetId: string;
   column: string;
   storedValue: string;
+  /**
+   * Set when the words are a label in the column's code list. `storedValue`
+   * is then the code to filter on, and this is the label it stands for.
+   */
+  codeLabel?: string;
 };
 
 function _isUsableTerm(words: readonly string[]): boolean {
@@ -92,6 +98,38 @@ async function _searchColumn(
 }
 
 /**
+ * The question's words that are labels in a column's code list, each with
+ * the code to filter on. Found from the code lists alone, so no query runs.
+ */
+function _findCodeMatches(
+  datasets: readonly DataAgentDataset[],
+  terms: readonly string[],
+): QuestionValueMatch[] {
+  return datasets.flatMap((dataset) => {
+    return dataset.columns.flatMap((column) => {
+      const { codes } = column;
+      if (codes?.direction !== "decode") {
+        return [];
+      }
+      return terms.flatMap((term) => {
+        const pair = ColumnCodes.findPairByLabel(codes, term);
+        return pair
+          ? [
+              {
+                term,
+                datasetId: dataset.id,
+                column: column.name,
+                storedValue: pair.code,
+                codeLabel: pair.label,
+              },
+            ]
+          : [];
+      });
+    });
+  });
+}
+
+/**
  * Keeps the longest matches: "York" (a county) inside a matched "New York"
  * is part of that name, not a second place the user named.
  */
@@ -115,8 +153,9 @@ function _keepLongestMatches(
 
 /**
  * Finds which words in the question are stored values, and in which text
- * columns, by searching the data on the device. An offline model then uses
- * the exact stored spelling instead of guessing it.
+ * columns, by searching the data on the device, and which are labels in a
+ * column's code list. An offline model then uses the exact stored spelling,
+ * or the code, instead of guessing it.
  */
 export async function findQuestionValues(
   host: DataAgentHost,
@@ -130,7 +169,7 @@ export async function findQuestionValues(
   if (terms.length === 0) {
     return [];
   }
-  const matches: QuestionValueMatch[] = [];
+  const matches = _findCodeMatches(options.datasets, terms);
   for (const profile of options.profiles) {
     for (const column of profile.columns) {
       const distinctCount = column.distinctCount ?? 0;

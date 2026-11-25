@@ -1,0 +1,25 @@
+/*
+ * An opened layout's datasets: a full-width row on the body tint, so the
+ * list reads as belonging to the layout above it rather than as more
+ * layouts.
+ */
+.layoutDatasets {
+  background-color: var(--ava-surface-body);
+}
+
+.layoutDatasetList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-xxs);
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 var(--mantine-spacing-lg);
+}
+
+.layoutDataset {
+  align-items: center;
+  display: flex;
+  gap: var(--mantine-spacing-sm);
+  justify-content: space-between;
+  min-width: 0;
+}

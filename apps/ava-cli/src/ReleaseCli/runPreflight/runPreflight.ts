@@ -1,5 +1,9 @@
 import { describeCommandFailure } from "@ava-cli/ReleaseCli/describeCommandFailure/describeCommandFailure";
 import {
+  RELEASE_SOURCE_BRANCH,
+  RELEASE_TARGET_BRANCH,
+} from "@ava-cli/ReleaseCli/releaseBranches/releaseBranches";
+import {
   getCurrentBranch,
   getDivergence,
   getGitHubRepoSlug,
@@ -8,11 +12,6 @@ import {
   revParse,
 } from "@ava-cli/ReleaseCli/releaseGitHelpers";
 import type { ReleaseCommands } from "@ava-cli/ReleaseCli/createReleaseCommands";
-
-/** The branch releases are cut from. */
-export const RELEASE_SOURCE_BRANCH = "develop";
-/** The branch a release publishes to, and which production deploys from. */
-export const RELEASE_TARGET_BRANCH = "main";
 
 /** Why a release was refused, for callers that need more than the message. */
 export type PreflightRefusalReason =
@@ -34,36 +33,20 @@ export type PreflightRefusal = {
 export type PreflightResult =
   | {
       ok: true;
-      /** Tip of origin/develop: the commit the release is built from. */
-      originDevelopSha: string;
-      /** Tip of origin/main: the first parent of the release commit. */
-      originMainSha: string;
-      /** Local main, when it exists, so it can be fast-forwarded later. */
-      localMainSha: string | undefined;
+      /** Tip of origin/<source>: the commit the release is built from. */
+      originSourceSha: string;
+      /** Tip of origin/<target>: the first parent of the release commit. */
+      originTargetSha: string;
+      /** Local <target>, when it exists, so it can be fast-forwarded later. */
+      localTargetSha: string | undefined;
     }
   | ({ ok: false } & PreflightRefusal);
 
 /**
- * Whether the repository is in a state a release may be cut from.
- *
- * Every check refuses; none of them fixes anything. A release must never be the
- * thing that discovers a branch was stale, and it must never quietly repair
- * state on the way to pushing production.
+ * The refusal when the checkout is not on the source branch, or `undefined`
+ * when it is. Only `develop` qualifies: the target branch (`main`), any other
+ * branch, and a detached HEAD are all refused.
  */
-export function runPreflight(git: ReleaseCommands): PreflightResult {
-  // Cheapest first: two local checks, then the permission call, then the fetch.
-  const refusal =
-    _refuseWrongBranch(git) ??
-    _refuseDirtyTree(git) ??
-    _refuseWithoutPushPermission(git) ??
-    _refuseFailedFetch(git);
-  if (refusal !== undefined) {
-    return { ok: false, ...refusal };
-  }
-  return _resolveReleaseRefs(git);
-}
-
-/** The refusal when the checkout is not on the source branch. */
 function _refuseWrongBranch(
   git: ReleaseCommands,
 ): PreflightRefusal | undefined {
@@ -81,8 +64,9 @@ function _refuseWrongBranch(
  *
  * Untracked files are fine: the release never checks out a branch and never
  * cleans, so they cannot reach it. Tracked modifications and staged changes are
- * a different matter, because the version commits use `git commit -a` and would
- * sweep them in.
+ * a different matter: a change to package.json would be committed with the new
+ * version, and any other one means the checkout is not the commit being
+ * released.
  */
 function _refuseDirtyTree(git: ReleaseCommands): PreflightRefusal | undefined {
   const trackedChanges = getTrackedChanges(git);
@@ -90,7 +74,7 @@ function _refuseDirtyTree(git: ReleaseCommands): PreflightRefusal | undefined {
     ? undefined
     : {
         reason: "dirty-tree",
-        message: `The working tree has tracked changes, which would be swept into the version commit. Commit or stash them first:\n${trackedChanges}`,
+        message: `The working tree has tracked changes. Only package.json is committed with the new version, so any other change means this checkout is not the commit being released. Commit or stash them first:\n${trackedChanges}`,
       };
 }
 
@@ -98,10 +82,10 @@ function _refuseDirtyTree(git: ReleaseCommands): PreflightRefusal | undefined {
  * The refusal when the person running this cannot push to the repository, or
  * `undefined` when they can.
  *
- * A release pushes both branches, deploys production, and migrates the
- * production database, so it refuses here rather than half-way through: without
- * this, the first thing to fail is the `push` after a local version commit has
- * already been made.
+ * A release pushes both of its branches, and pushing the target branch
+ * deploys production, so it refuses here rather than half-way through:
+ * without this, the first thing to fail is the `push` after a local version
+ * commit has already been made.
  */
 function _refuseWithoutPushPermission(
   git: ReleaseCommands,
@@ -146,46 +130,6 @@ function _refuseFailedFetch(
 }
 
 /**
- * The refs the release will be built from, or a refusal when one is missing or
- * the source branch is out of sync with origin.
- */
-function _resolveReleaseRefs(git: ReleaseCommands): PreflightResult {
-  const originDevelopSha = revParse(
-    git,
-    `refs/remotes/origin/${RELEASE_SOURCE_BRANCH}`,
-  );
-  if (originDevelopSha === undefined) {
-    return {
-      ok: false,
-      reason: "missing-ref",
-      message: `origin/${RELEASE_SOURCE_BRANCH} does not exist.`,
-    };
-  }
-
-  const originMainSha = revParse(
-    git,
-    `refs/remotes/origin/${RELEASE_TARGET_BRANCH}`,
-  );
-  if (originMainSha === undefined) {
-    return {
-      ok: false,
-      reason: "missing-ref",
-      message: `origin/${RELEASE_TARGET_BRANCH} does not exist.`,
-    };
-  }
-
-  const outOfSync = _refuseOutOfSyncSourceBranch(git, originDevelopSha);
-  if (outOfSync !== undefined) {
-    return { ok: false, ...outOfSync };
-  }
-
-  const localMainSha = refExists(git, `refs/heads/${RELEASE_TARGET_BRANCH}`)
-    ? revParse(git, RELEASE_TARGET_BRANCH)
-    : undefined;
-  return { ok: true, originDevelopSha, originMainSha, localMainSha };
-}
-
-/**
  * The refusal when the local source branch is not exactly `originSha`.
  *
  * Releasing a commit that only exists locally would ship code the source
@@ -196,23 +140,91 @@ function _refuseOutOfSyncSourceBranch(
   git: ReleaseCommands,
   originSha: string,
 ): PreflightRefusal | undefined {
-  const localDevelopSha = revParse(git, RELEASE_SOURCE_BRANCH);
-  if (localDevelopSha === undefined) {
+  // Fully qualified: the fetch brings in tags, and a tag named like the source
+  // branch would otherwise shadow it and hide unpushed commits.
+  const localSourceRef = `refs/heads/${RELEASE_SOURCE_BRANCH}`;
+  const localSourceSha = revParse(git, localSourceRef);
+  if (localSourceSha === undefined) {
     return {
       reason: "missing-ref",
       message: `Could not resolve ${RELEASE_SOURCE_BRANCH}.`,
     };
   }
-  if (localDevelopSha === originSha) {
+  if (localSourceSha === originSha) {
     return undefined;
   }
   const { ahead, behind } = getDivergence(
     git,
-    RELEASE_SOURCE_BRANCH,
-    `origin/${RELEASE_SOURCE_BRANCH}`,
+    localSourceRef,
+    `refs/remotes/origin/${RELEASE_SOURCE_BRANCH}`,
   );
   return {
     reason: "out-of-sync",
     message: `${RELEASE_SOURCE_BRANCH} is out of sync with origin/${RELEASE_SOURCE_BRANCH} (${ahead} ahead, ${behind} behind). Push or pull it, then release.`,
   };
+}
+
+/**
+ * The refs the release will be built from, or a refusal when one is missing or
+ * the source branch is out of sync with origin.
+ */
+function _readReleaseRefs(git: ReleaseCommands): PreflightResult {
+  const originSourceSha = revParse(
+    git,
+    `refs/remotes/origin/${RELEASE_SOURCE_BRANCH}`,
+  );
+  if (originSourceSha === undefined) {
+    return {
+      ok: false,
+      reason: "missing-ref",
+      message: `origin/${RELEASE_SOURCE_BRANCH} does not exist.`,
+    };
+  }
+
+  const originTargetSha = revParse(
+    git,
+    `refs/remotes/origin/${RELEASE_TARGET_BRANCH}`,
+  );
+  if (originTargetSha === undefined) {
+    return {
+      ok: false,
+      reason: "missing-ref",
+      message: `origin/${RELEASE_TARGET_BRANCH} does not exist.`,
+    };
+  }
+
+  const outOfSync = _refuseOutOfSyncSourceBranch(git, originSourceSha);
+  if (outOfSync !== undefined) {
+    return { ok: false, ...outOfSync };
+  }
+
+  // Fully qualified, so a tag named `main` cannot win the lookup.
+  const localTargetRef = `refs/heads/${RELEASE_TARGET_BRANCH}`;
+  const localTargetSha = refExists(git, localTargetRef)
+    ? revParse(git, localTargetRef)
+    : undefined;
+  return { ok: true, originSourceSha, originTargetSha, localTargetSha };
+}
+
+/**
+ * Whether the repository is in a state a release may be cut from.
+ * `runRelease` calls it before anything else, so any branch other than
+ * `develop` is refused before a single network call.
+ *
+ * Every check refuses. None of them fixes anything. A release must never be
+ * the thing that discovers a branch was stale, and it must never quietly
+ * repair state on the way to a deploy.
+ */
+export function runPreflight(git: ReleaseCommands): PreflightResult {
+  // Cheapest first: two local checks, then the permission call, then the fetch.
+  // The branch check runs first, so nothing runs on a refused branch.
+  const refusal =
+    _refuseWrongBranch(git) ??
+    _refuseDirtyTree(git) ??
+    _refuseWithoutPushPermission(git) ??
+    _refuseFailedFetch(git);
+  if (refusal !== undefined) {
+    return { ok: false, ...refusal };
+  }
+  return _readReleaseRefs(git);
 }

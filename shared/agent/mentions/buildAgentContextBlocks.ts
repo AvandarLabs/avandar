@@ -52,6 +52,13 @@ type ContextBlockOptions = {
   isSensitive?: (text: string) => boolean;
   redactSql?: HideText;
   maskText?: HideText;
+  /**
+   * Charts that keep their SQL across the page, attached, and mentioned
+   * blocks, the page's first. Unset keeps the usual caps: every listed page
+   * chart, and 24 across attached and mentioned gadgets. The offline model's
+   * small context window sets it.
+   */
+  maxSqlTiles?: number;
 };
 
 /**
@@ -207,15 +214,42 @@ function _planMentions(
   ).items;
 }
 
+/** The page with SQL kept for only the first `budget` of its charts. */
+function _budgetPage(
+  page: RedactedPageContext | undefined,
+  budget: number,
+): { page: RedactedPageContext | undefined; remaining: number } {
+  if (!page?.dashboard) {
+    return { page, remaining: budget };
+  }
+  const listed = _spendTileBudget(
+    page.dashboard.tiles,
+    budget,
+    _listAgentPageTile,
+  );
+  return {
+    page: { ...page, dashboard: { ...page.dashboard, tiles: listed.items } },
+    remaining: listed.remaining,
+  };
+}
+
 /**
  * The turn's redacted gadgets cut to the caps: 5 described mentions and 24
- * charts with SQL across the attached and described mentions. A cap only
+ * charts with SQL across the attached and described mentions, or
+ * `maxSqlTiles` charts across the page too when it is set. A cap only
  * empties SQL that was already redacted, so the vault holds its values.
  */
-function _planBlocks(inputs: Readonly<RedactedInputs>): PlannedBlocks {
+function _planBlocks(
+  inputs: Readonly<RedactedInputs>,
+  maxSqlTiles?: number,
+): PlannedBlocks {
+  const budgeted =
+    maxSqlTiles === undefined
+      ? { page: inputs.page, remaining: MAX_GADGET_BLOCK_TILES }
+      : _budgetPage(inputs.page, maxSqlTiles);
   const attached = _spendTileBudget(
     inputs.attached,
-    MAX_GADGET_BLOCK_TILES,
+    budgeted.remaining,
     _listTiles,
   );
   const mentioned = _spendTileBudget(
@@ -230,7 +264,7 @@ function _planBlocks(inputs: Readonly<RedactedInputs>): PlannedBlocks {
     },
   );
   return {
-    page: inputs.page,
+    page: budgeted.page,
     attached: attached.items,
     mentioned: mentioned.items,
   };
@@ -494,11 +528,12 @@ export function buildAgentContextBlocks(
   options: Readonly<ContextBlockOptions>,
 ): AgentContextBlocks {
   // Caps: 5 attached, 5 described mentions, 12 charts per dashboard, and 24
-  // charts with SQL across the attached and described mentions. A mention
+  // charts with SQL across the attached and described mentions, and
+  // `maxSqlTiles` across all three when set. A mention
   // of the page's dashboard or of an attached gadget is one pointer line
   // and does not count toward the 5 described mentions.
   // Every redaction happens here, before anything below masks a name.
-  const redacted = _planBlocks(_redactInputs(options));
+  const redacted = _planBlocks(_redactInputs(options), options.maxSqlTiles);
   const render: BlockRenderOptions = {
     aliases: options.aliases,
     isSensitive: options.isSensitive,

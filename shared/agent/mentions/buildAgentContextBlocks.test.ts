@@ -521,6 +521,70 @@ describe("buildAgentContextBlocks", () => {
   });
 });
 
+describe("maxSqlTiles", () => {
+  const sqlTile = (title: string) => {
+    return _tile(title, `SELECT '${title}'`);
+  };
+  const page = {
+    app: "dashboard" as const,
+    dashboard: {
+      id: "d-1",
+      name: "COVID 2022",
+      tiles: [
+        sqlTile("one"),
+        sqlTile("two"),
+        sqlTile("three"),
+        sqlTile("four"),
+      ],
+    },
+  };
+
+  it("keeps SQL for the page's first charts only", () => {
+    const { pageBlock } = buildAgentContextBlocks({
+      page,
+      attached: [],
+      mentioned: [],
+      aliases: ALIASES,
+      maxSqlTiles: 3,
+    });
+
+    expect(pageBlock).toContain("SELECT 'three'");
+    expect(pageBlock).not.toContain("SELECT 'four'");
+    expect(pageBlock).toContain("four");
+  });
+
+  it("changes nothing when unset", () => {
+    const withoutBudget = buildAgentContextBlocks({
+      page,
+      attached: [],
+      mentioned: [],
+      aliases: ALIASES,
+    });
+
+    expect(withoutBudget.pageBlock).toContain("SELECT 'four'");
+  });
+
+  it("spends what the page leaves on attached gadgets", () => {
+    const { attachedBlock } = buildAgentContextBlocks({
+      page,
+      attached: [
+        {
+          kind: "dashboard",
+          ref: { gadgetType: "dashboard", gadgetId: "d-2", subId: null },
+          name: "Mortality",
+          tiles: [sqlTile("five")],
+        },
+      ],
+      mentioned: [],
+      aliases: ALIASES,
+      maxSqlTiles: 3,
+    });
+
+    expect(attachedBlock).toContain("five");
+    expect(attachedBlock).not.toContain("SELECT 'five'");
+  });
+});
+
 describe("buildAgentGadgetModelName", () => {
   const OPTIONS = {
     isSensitive: (text: string) => {

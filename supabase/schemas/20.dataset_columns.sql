@@ -38,7 +38,12 @@ create table public.dataset_columns (
   -- Description of the column. This is nullable.
   description text,
   -- Column index (to order them)
-  column_idx integer not null
+  column_idx integer not null,
+  -- Set only on the `<column>_original` copy a convert binding keeps: the
+  -- binding that owns it. The copy goes when the binding stops keeping it.
+  -- The foreign key is added in `30.dataset_columns__dictionary_bindings.sql`,
+  -- once that table exists.
+  dictionary_binding_id uuid
 );
 
 -- Enable row level security
@@ -155,3 +160,84 @@ update of original_name,
 dataset_id,
 workspace_id on public.dataset_columns for each row
 execute function public.dataset_columns__prevent_postgres_source_change ();
+
+/**
+ * Refuses a signed-in user adding a kept original column or changing which
+ * binding one belongs to. Only the apply RPCs, which run as the function
+ * owner, add and remove them. A whole-row update that sends the same value
+ * passes, so renaming a kept original column still works.
+ */
+create or replace function public.dataset_columns__guard_dictionary_binding_id () returns trigger language plpgsql
+set
+  search_path = '' as $$
+begin
+  if current_user <> 'authenticated' then
+    return new;
+  end if;
+
+  if tg_op = 'INSERT' then
+    if new.dictionary_binding_id is not null then
+      raise exception 'a kept original column is managed by its dictionary binding'
+        using errcode = '42501';
+    end if;
+  elsif new.dictionary_binding_id is distinct from old.dictionary_binding_id then
+    raise exception 'a kept original column is managed by its dictionary binding'
+      using errcode = '42501';
+  end if;
+
+  return new;
+end;
+$$;
+
+-- Trigger-only. The trigger machinery does not consult EXECUTE.
+revoke
+execute on function public.dataset_columns__guard_dictionary_binding_id ()
+from
+  public,
+  anon,
+  authenticated,
+  service_role;
+
+create trigger tr__dataset_columns__guard_dictionary_binding_id before insert or
+update of dictionary_binding_id on public.dataset_columns for each row
+execute function public.dataset_columns__guard_dictionary_binding_id ();
+
+-- Deleting a binding finds its kept original column through this index.
+create index idx_dataset_columns__dictionary_binding_id on public.dataset_columns (dictionary_binding_id)
+where
+  dictionary_binding_id is not null;
+
+/**
+ * The first of `p_base`, `p_base_2`, `p_base_3`, and so on that no column
+ * of `p_dataset_id` already has, compared ignoring case as DuckDB compares
+ * column names. Names a kept original column.
+ */
+create or replace function public.dataset_columns__get_free_name (p_dataset_id uuid, p_base text) returns text language sql stable
+set
+  search_path = '' as $$
+  select c.candidate
+  from (
+    select
+      s.n,
+      case
+        when s.n = 1 then p_base
+        else p_base || '_' || s.n
+      end as candidate
+    from generate_series(1, 1000) as s (n)
+  ) as c
+  where not exists (
+    select 1
+    from public.dataset_columns dc
+    where dc.dataset_id = p_dataset_id and lower(dc.name) = lower(c.candidate)
+  )
+  order by c.n
+  limit 1;
+$$;
+
+revoke
+execute on function public.dataset_columns__get_free_name (uuid, text)
+from
+  public,
+  anon,
+  authenticated,
+  service_role;

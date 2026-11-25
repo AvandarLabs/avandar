@@ -2,6 +2,7 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { Menu } from "@mantine/core";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
+import { useNotifyDatasetDeleteError } from "@/hooks/datasets/useNotifyDatasetDeleteError/useNotifyDatasetDeleteError";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { DataExplorerDeleteDatasetMenuItem } from "@/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerDeleteDatasetMenuItem";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
@@ -21,6 +22,11 @@ export function DataExplorerOpenDatasetMenuItems(): ReactNode {
       notifyError(t`Failed to save dataset: ${error.message}`);
     },
   });
+  const notifyDeleteError = useNotifyDatasetDeleteError({
+    onOtherError: (error) => {
+      notifyError(t`Failed to delete dataset: ${error.message}`);
+    },
+  });
   const [deleteDataset, isDeletingDataset] = DatasetClient.useFullDelete({
     queryToInvalidate: DatasetClient.QueryKeys.getAll(),
     onSuccess: () => {
@@ -29,9 +35,7 @@ export function DataExplorerOpenDatasetMenuItems(): ReactNode {
       dispatch.setRawSql(undefined);
       notifySuccess(t`Dataset deleted.`);
     },
-    onError: (error) => {
-      notifyError(t`Failed to delete dataset: ${error.message}`);
-    },
+    onError: notifyDeleteError,
   });
   if (!state.openDataset) {
     return null;

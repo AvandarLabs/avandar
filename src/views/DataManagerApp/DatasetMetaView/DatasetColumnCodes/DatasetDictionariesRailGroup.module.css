@@ -1,0 +1,20 @@
+.dictionaryRow + .dictionaryRow {
+  margin-block-start: var(--mantine-spacing-xxs);
+}
+
+.dictionaryName {
+  align-items: center;
+  display: flex;
+  gap: var(--mantine-spacing-xs);
+}
+
+.dictionaryName svg {
+  color: var(--mantine-color-dimmed);
+  flex: none;
+}
+
+/* Lines up under the name, past the icon and its gap. */
+.dictionaryNote {
+  margin: 0;
+  padding-inline-start: calc(16px + var(--mantine-spacing-xs));
+}

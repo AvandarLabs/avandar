@@ -107,6 +107,19 @@ export type DataExplorerAppState = {
    */
   vizConfigMemory: Partial<AvaVizConfig.Registry>;
 
+  /**
+   * The last config the user saw for each plugin chart type, keyed by
+   * `makePluginVizMemoryKey` (`<pluginId>/<pluginVizId>`), so switching away
+   * from a plugin chart and back restores its settings.
+   *
+   * Kept apart from `vizConfigMemory` because every plugin config shares the
+   * one `"plugin"` viz type. Written on the way out of a plugin chart type.
+   * On the way back in, a remembered column setting is kept only while its
+   * column is still in `lastResultColumns` (or while that is unset), and the
+   * picked config fills the rest. In-memory only.
+   */
+  pluginVizConfigMemory: Readonly<Record<string, AvaVizConfig.Plugin>>;
+
   /** The currently open saved dataset, or `undefined` if none is open. */
   openDataset: OpenDatasetInfo | undefined;
 
@@ -161,12 +174,32 @@ export type DataExplorerAppState = {
   queryTrigger: UserQueryAnalyticsTrigger;
 };
 
+/**
+ * The part of the Data Explorer state a plugin command's derived columns
+ * replace: the SQL, the structured query and its sync flags, the chart, the
+ * column bindings, the source columns, and the prompt. Taken by
+ * `useDataExplorerPluginBridge` before it applies the derived columns SQL, and
+ * passed back to `restoreDerivedColumnsSnapshot` when the user clicks Undo.
+ */
+export type DerivedColumnsSnapshot = Pick<
+  DataExplorerAppState,
+  | "rawSql"
+  | "query"
+  | "isStructuredQueryInSync"
+  | "sqlSyncWarnings"
+  | "vizConfig"
+  | "columnBindings"
+  | "sourceCatalog"
+  | "nlPrompt"
+>;
+
 export const INITIAL_DATA_EXPLORER_STATE: DataExplorerAppState = {
   query: StructuredQuery.makeEmpty(),
   vizConfig: {
     vizType: "table",
   },
   vizConfigMemory: {},
+  pluginVizConfigMemory: {},
   rawSql: undefined,
   nlPrompt: undefined,
   openDataset: undefined,

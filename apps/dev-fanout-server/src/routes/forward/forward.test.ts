@@ -195,7 +195,7 @@ describe("registerForwardingRoutes", () => {
     const [firstURL, firstInit] = fetchMock.mock.calls[0]!;
     expect(firstURL).toBe("https://a.example/webhook/foo?x=1&y=2");
     expect(firstInit?.method).toBe("POST");
-    expect(firstInit?.body).toBeInstanceOf(Buffer);
+    expect(firstInit?.body).toBeInstanceOf(Uint8Array);
 
     const firstHeaders = firstInit?.headers ?? {};
     expect(firstHeaders["x-avandar-fanout"]).toBe("1");
@@ -292,8 +292,10 @@ describe("registerForwardingRoutes", () => {
     const [, forwardedInit] = fetchMock.mock.calls[0]!;
     expect(forwardedInit?.method).toBe("POST");
     const forwardedBody: unknown = forwardedInit?.body;
-    expect(forwardedBody).toBeInstanceOf(Buffer);
-    expect((forwardedBody as Buffer).toString("utf8")).toBe(jsonBody);
+    expect(forwardedBody).toBeInstanceOf(Uint8Array);
+    expect(new TextDecoder().decode(forwardedBody as Uint8Array)).toBe(
+      jsonBody,
+    );
   });
 
   it("captures fetch errors per-target and returns them in results", async () => {

@@ -1,0 +1,9 @@
+/* The whole row picks the dataset, so it reads as clickable. */
+.pickDatasetRow {
+  cursor: pointer;
+}
+
+/* A locked or unavailable row cannot be toggled. Clicking it does nothing. */
+.pickDatasetRow[data-locked="true"] {
+  cursor: default;
+}

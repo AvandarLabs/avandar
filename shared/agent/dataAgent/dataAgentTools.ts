@@ -1,4 +1,16 @@
-import { arr, bool, obj, oneOf, opt, str } from "@earendil-works/pi-schema";
+import {
+  arr,
+  bool,
+  int,
+  obj,
+  oneOf,
+  opt,
+  str,
+} from "@earendil-works/pi-schema";
+import {
+  DASHBOARD_BLOCK_KINDS,
+  DASHBOARD_VIZ_TYPES,
+} from "$/agent/dashboardBlocks/DashboardBlockFields.ts";
 
 /*
  * The data agent's tools as the model sees them: name, description, and
@@ -78,15 +90,75 @@ export const ASK_USER_TOOL = {
   parameters: ASK_USER_PARAMETERS,
 };
 
+const DASHBOARD_BLOCK_PARAMETERS = obj({
+  kind: oneOf(DASHBOARD_BLOCK_KINDS, {
+    description:
+      "DataViz for a chart or table from SQL. Every other kind holds text you write.",
+  }),
+  prompt: opt(str({ description: "DataViz: a short chart title." })),
+  sql: opt(
+    str({
+      description:
+        "DataViz: one DuckDB SELECT or WITH statement over the aliases.",
+    }),
+  ),
+  vizType: opt(
+    oneOf(DASHBOARD_VIZ_TYPES, { description: "DataViz: how to show it." }),
+  ),
+  text: opt(str({ description: "HeadingBlock or ParagraphBlock text." })),
+  level: opt(int({ description: "HeadingBlock: 1 to 4." })),
+  align: opt(oneOf(["left", "center", "right"])),
+  quote: opt(str({ description: "QuoteBlock: the quotation." })),
+  cite: opt(str({ description: "QuoteBlock: who said it." })),
+  title: opt(str({ description: "CalloutBlock or Card title." })),
+  body: opt(str({ description: "CalloutBlock body." })),
+  tone: opt(oneOf(["info", "warning", "neutral"])),
+  items: opt(arr(str(), { description: "ListBlock items." })),
+  listType: opt(oneOf(["ordered", "unordered"])),
+  code: opt(str({ description: "CodeBlock source." })),
+  language: opt(str({ description: "CodeBlock language." })),
+  data: opt(str({ description: "TableBlock: CSV text." })),
+  delimiter: opt(oneOf(["comma", "tab", "pipe"])),
+  hasHeader: opt(bool({ description: "TableBlock: first row is a header." })),
+});
+
+const ADD_DASHBOARD_BLOCK_PARAMETERS = obj({
+  dashboard: str({
+    description:
+      'The dashboard\'s name exactly as you saw it, or "current" for the dashboard on the current page.',
+  }),
+  block: DASHBOARD_BLOCK_PARAMETERS,
+  summary: str({
+    description: "One sentence for the user: what you added, and where.",
+  }),
+});
+
+/** Adds one block to a dashboard, through the open editor or a card. */
+export const ADD_DASHBOARD_BLOCK_TOOL = {
+  name: "add_dashboard_block",
+  label: "Add to dashboard",
+  description:
+    "Adds one block to a dashboard: a chart or table from SQL, or text you write. The dashboard open in the editor gets it unsaved; any other dashboard gets it after the user confirms a card. Only when the user asks to add something to a dashboard. Returns only what happened, never rows.",
+  parameters: ADD_DASHBOARD_BLOCK_PARAMETERS,
+};
+
 /**
- * The online data agent's tools, in the order the model sees them. The
- * agent proxy builds every request's tool list from this.
+ * The built-in tools prompts v1 to v5 serve, in the order the model sees
+ * them. Plugin tools, when a version offers them, follow the built-in ones.
  */
 export const DATA_AGENT_TOOLS = [
   RUN_QUERY_TOOL,
   LOOKUP_VALUES_TOOL,
   ASK_USER_TOOL,
 ] as const;
+
+const DATA_AGENT_V6_TOOLS = [
+  ...DATA_AGENT_TOOLS,
+  ADD_DASHBOARD_BLOCK_TOOL,
+] as const;
+
+/** One built-in tool definition the proxy may serve. */
+export type DataAgentToolSpec = (typeof DATA_AGENT_V6_TOOLS)[number];
 
 /**
  * Every prompt version the agent proxy serves. A tab opened before a deploy
@@ -97,18 +169,51 @@ export const DATA_AGENT_PROMPT_IDS = [
   "data-agent-v1",
   "data-agent-v2",
   "data-agent-v3",
+  "data-agent-v4",
+  "data-agent-v5",
+  "data-agent-v6",
 ] as const;
 
 /** One served prompt version. */
 export type DataAgentPromptId = (typeof DATA_AGENT_PROMPT_IDS)[number];
 
 /**
- * The version of the data agent's prompt this build uses. Only the prompt is
- * versioned: every version shares the same tools. The browser names it in
- * the proxy URL. v2 adds the current page block. v3 adds the attached
- * and mentioned blocks.
+ * The built-in tools each prompt version serves. The proxy builds every
+ * request's tool list from it, then adds plugin tools for a version in
+ * `PLUGIN_TOOL_PROMPT_IDS`, and the browser adds only these built-in tools,
+ * so a tab on an older version never meets a tool its prompt does not
+ * describe. v6 adds `add_dashboard_block`.
  */
-export const DATA_AGENT_PROMPT_ID: DataAgentPromptId = "data-agent-v3";
+export const DATA_AGENT_TOOLS_BY_PROMPT_ID: Readonly<
+  Record<DataAgentPromptId, readonly DataAgentToolSpec[]>
+> = {
+  "data-agent-v1": DATA_AGENT_TOOLS,
+  "data-agent-v2": DATA_AGENT_TOOLS,
+  "data-agent-v3": DATA_AGENT_TOOLS,
+  "data-agent-v4": DATA_AGENT_TOOLS,
+  "data-agent-v5": DATA_AGENT_TOOLS,
+  "data-agent-v6": DATA_AGENT_V6_TOOLS,
+};
+
+/**
+ * The version of the data agent's prompt this build uses. The browser names
+ * it in the proxy URL. v2 adds the current page block. v3 adds the attached
+ * and mentioned blocks. v4 adds a TOOLS bullet about plugin tools. v5 adds
+ * the code lists of columns a dictionary is attached to. v6 adds the
+ * dashboard tool and its rules.
+ */
+export const DATA_AGENT_PROMPT_ID: DataAgentPromptId = "data-agent-v6";
+
+/**
+ * The prompt versions whose TOOLS section describes plugin tools. The proxy
+ * offers plugin tools only to these, since a tab on an older version has no
+ * code to run them.
+ */
+export const PLUGIN_TOOL_PROMPT_IDS: readonly DataAgentPromptId[] = [
+  "data-agent-v4",
+  "data-agent-v5",
+  "data-agent-v6",
+];
 
 /** Whether the proxy serves a prompt version. */
 export function isDataAgentPromptId(value: string): value is DataAgentPromptId {

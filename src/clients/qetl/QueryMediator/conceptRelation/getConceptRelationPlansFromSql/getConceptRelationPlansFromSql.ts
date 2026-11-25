@@ -1,6 +1,7 @@
 import { makeIdLookupRecord, prop, where } from "@avandar/utils";
 import { ConceptStatusClient } from "@/clients/ontology/ConceptStatusClient";
 import { IndividualClient } from "@/clients/ontology/IndividualClient";
+import { ConceptRelationDenied } from "@/clients/qetl/QueryMediator/conceptRelation/ConceptRelationDenied";
 import { getConceptAttributeColumnsFromConceptId } from "@/clients/qetl/QueryMediator/conceptRelation/getConceptAttributeColumnsFromConceptId";
 import { getIndividualsByExternalIds } from "@/clients/qetl/QueryMediator/conceptRelation/getIndividualsByExternalIds/getIndividualsByExternalIds";
 import { DuckDbSqlAnalyzer } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer";
@@ -138,10 +139,7 @@ function _assertConceptsAllowed(
     return !allowedIds.has(ref.id);
   });
   if (deniedRef) {
-    throw new Error(
-      `Concept '${deniedRef.id}' does not belong to this workspace, so it ` +
-        `cannot be queried here.`,
-    );
+    throw new ConceptRelationDenied({ conceptId: deniedRef.id });
   }
 }
 
@@ -164,11 +162,10 @@ function _assertContributorsAllowed(
     return !allowedIds.has(datasetId);
   });
   if (deniedIds.length > 0) {
-    throw new Error(
-      `Concept '${options.ref.id}' reads dataset(s) ${deniedIds.join(", ")} ` +
-        `that are not reachable from this workspace, so it cannot be queried ` +
-        `here.`,
-    );
+    throw new ConceptRelationDenied({
+      conceptId: options.ref.id,
+      deniedDatasetIds: deniedIds,
+    });
   }
 }
 

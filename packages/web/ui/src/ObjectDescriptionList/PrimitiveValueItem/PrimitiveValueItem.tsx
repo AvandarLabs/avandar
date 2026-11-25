@@ -44,6 +44,7 @@ export function PrimitiveValueItem<
   value,
   editMode = false,
   rootData,
+  parentObject,
   renderValue,
   renderEditableValue,
   renderAsType: configuredRenderAsType,
@@ -53,7 +54,11 @@ export function PrimitiveValueItem<
 }: Readonly<Props<T, RootData>>): JSX.Element {
   const i18n = useI18nMessages();
   const customRenderer = editMode ? renderEditableValue : renderValue;
-  const customValue = customRenderer?.(value, rootData as RootData);
+  const customValue = customRenderer?.(
+    value,
+    rootData as RootData,
+    parentObject,
+  );
   if (customValue !== undefined) {
     return <>{customValue}</>;
   }

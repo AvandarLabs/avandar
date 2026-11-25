@@ -18,8 +18,9 @@ import type { Locator, Page } from "@playwright/test";
 const CASE_TYPE_NAME = "E2E filtered records";
 
 function _recordLink(page: Page, recordName: string): Locator {
-  // A row's name starts with its status dot's label, so match the end.
-  return page.getByRole("link", { name: new RegExp(`${recordName}$`) });
+  // A row's link names the record between its status dot and its assignee,
+  // so match the record's name as whole words.
+  return page.getByRole("link", { name: new RegExp(`\\b${recordName}\\b`) });
 }
 
 /**

@@ -34,6 +34,18 @@ const DEFAULT_NL_QUERY: DataVizPBlockProps["nlQuery"] = {
 };
 
 /**
+ * The built-in viz type to build an empty config for. A plugin chart's config
+ * needs its manifest, so it falls back to the default like an unset type.
+ */
+function _getEmptyConfigVizType(
+  vizType: AvaVizConfig.Type | undefined,
+): AvaVizConfig.BuiltInType {
+  return vizType === undefined || vizType === "plugin"
+    ? DEFAULT_VIZ_TYPE
+    : vizType;
+}
+
+/**
  * Creates synchronized DataViz block props and type-specific config memory
  * from the current props. Returns defaults for incomplete saved blocks and
  * restores remembered settings when the visualization type changes.
@@ -79,14 +91,22 @@ export function makeDataVizPBlockStateFromProps(options: {
     vizType: columnIdProps.vizType ?? DEFAULT_VIZ_TYPE,
     vizConfig:
       columnIdProps.vizConfig ??
-      AvaVizConfigs.makeEmptyConfig(columnIdProps.vizType ?? DEFAULT_VIZ_TYPE),
+      AvaVizConfigs.makeEmptyConfig(
+        _getEmptyConfigVizType(columnIdProps.vizType),
+      ),
     globalFilterSubscription:
       columnIdProps.globalFilterSubscription ??
       DataVizFilters.defaultGlobalFilterSubscription,
     localFilters: columnIdProps.localFilters ?? [],
   };
 
-  if (changed.vizType && nextProps.vizConfig.vizType !== nextProps.vizType) {
+  // Converting needs a built-in target. A plugin chart's config is built from
+  // its manifest, so a bare "plugin" type leaves the config as it is.
+  if (
+    changed.vizType &&
+    nextProps.vizType !== "plugin" &&
+    nextProps.vizConfig.vizType !== nextProps.vizType
+  ) {
     const outgoingVizConfig = nextProps.vizConfig;
     const blockVizConfigMemory = vizConfigMemory[blockId] ?? {};
     const rememberedVizConfig = blockVizConfigMemory[nextProps.vizType];

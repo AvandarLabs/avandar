@@ -15,7 +15,8 @@ DROP TABLE "datasets__local_csv";
 
 DROP TABLE "entity_field_values";
 
-CREATE TABLE "datasets__csv_file" ("id" UUID NOT NULL, "dataset_id" UUID NOT NULL, "workspace_id" UUID NOT NULL, "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "size_in_bytes" INTEGER NOT NULL, "rows_to_skip" INTEGER NOT NULL DEFAULT 0, "quote_char" TEXT NOT NULL, "escape_char" TEXT NOT NULL, "delimiter" TEXT NOT NULL, "newline_delimiter" TEXT NOT NULL, "comment_char" TEXT, "has_header" INTEGER NOT NULL DEFAULT TRUE, "date_format" TEXT, "timestamp_format" TEXT);
+CREATE TABLE "datasets__csv_file" ("id" UUID NOT NULL, "dataset_id" UUID NOT NULL, "workspace_id" UUID NOT NULL, "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, "size_in_bytes" INTEGER NOT NULL, "rows_to_skip" INTEGER NOT NULL DEFAULT 0, "quote_char" TEXT NOT NULL DEFAULT '"', "escape_char" TEXT NOT NULL DEFAULT '"', "delimiter" TEXT NOT NULL, "newline_delimiter" TEXT NOT NULL DEFAULT '
+', "comment_char" TEXT, "has_header" INTEGER NOT NULL DEFAULT TRUE, "date_format" TEXT, "timestamp_format" TEXT);
 
 CREATE UNIQUE INDEX datasets__csv_file_dataset_id_key ON datasets__csv_file(dataset_id);
 

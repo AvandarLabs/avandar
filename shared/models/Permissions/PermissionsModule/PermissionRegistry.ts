@@ -21,12 +21,16 @@ export const PermissionRegistry = {
     viewer: [
       "data_sources__can_view_dataset",
       "data_sources__can_list_sources",
+      "data_sources__can_view_dictionaries",
     ] as const,
     editor: [
       "data_sources__can_view_dataset",
       "data_sources__can_list_sources",
       "data_sources__can_edit_dataset",
       "data_sources__can_create_dataset",
+      "data_sources__can_view_dictionaries",
+      "data_sources__can_edit_dictionaries",
+      "data_sources__can_edit_crosswalks",
     ] as const,
     admin: [
       "data_sources__can_view_dataset",
@@ -34,6 +38,9 @@ export const PermissionRegistry = {
       "data_sources__can_edit_dataset",
       "data_sources__can_create_dataset",
       "data_sources__can_manage_sources",
+      "data_sources__can_view_dictionaries",
+      "data_sources__can_edit_dictionaries",
+      "data_sources__can_edit_crosswalks",
     ] as const,
   },
   data_explorer: {
@@ -124,6 +131,7 @@ export const PermissionRegistry = {
       "settings__can_manage_workspace_users",
       "settings__can_manage_roles_and_tags",
       "settings__can_manage_billing",
+      "settings__can_manage_plugins",
     ] as const,
   },
 } as const satisfies PermissionRegistryType;

@@ -1,0 +1,17 @@
+{
+  "label": "phase-1d:p04-d04a",
+  "questionCount": 1,
+  "passCount": 1,
+  "needlessQuestions": 0,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 2,
+  "promptTokens": 11883,
+  "cachedPromptTokens": 11718,
+  "completionTokens": 378,
+  "totalCost": 0.000326655,
+  "costPerQuestion": 0.000326655,
+  "latencyMedianMs": 2560.059667,
+  "latencyP90Ms": 2560.059667,
+  "failedIds": []
+}

@@ -6,9 +6,9 @@ import {
 } from "$/models/vizs/AvaVizConfig/AvaVizConfigs.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type {
-  AvaVizConfig,
   AvaVizConfigType,
-  VizType,
+  BuiltInAvaVizConfig,
+  BuiltInVizType,
 } from "$/models/vizs/AvaVizConfig/AvaVizConfig.types.ts";
 import type { ChartStyle } from "$/models/vizs/ChartStyle.types.ts";
 
@@ -32,7 +32,7 @@ const SERIES_COLORS = { North: "#00ff00", South: "#0000ff" };
  * converter that drops a field therefore fails loudly rather than coinciding
  * with the target's `makeEmptyConfig` value.
  */
-const FIXTURES: { [K in VizType]: AvaVizConfigType<K> } = {
+const FIXTURES: { [K in BuiltInVizType]: AvaVizConfigType<K> } = {
   table: { vizType: "table" },
 
   bar: {
@@ -49,6 +49,7 @@ const FIXTURES: { [K in VizType]: AvaVizConfigType<K> } = {
       },
     ],
     layout: "stack",
+    barGap: "none",
     withLegend: false,
     chartStyle: CHART_STYLE,
   },
@@ -158,10 +159,10 @@ const FIXTURES: { [K in VizType]: AvaVizConfigType<K> } = {
  * only has to name the fields that config type declares as optional.
  */
 const OPTIONAL_KEYS: {
-  [K in VizType]: ReadonlyArray<keyof AvaVizConfigType<K>>;
+  [K in BuiltInVizType]: ReadonlyArray<keyof AvaVizConfigType<K>>;
 } = {
   table: [],
-  bar: ["chartStyle"],
+  bar: ["barGap", "chartStyle"],
   line: ["chartStyle"],
   area: ["chartStyle"],
   scatter: ["chartStyle"],
@@ -172,7 +173,7 @@ const OPTIONAL_KEYS: {
 };
 
 /** Returns the fully-populated fixture config for a viz type. */
-function _getFixtureFromVizType(vizType: VizType): AvaVizConfig {
+function _getFixtureFromVizType(vizType: BuiltInVizType): BuiltInAvaVizConfig {
   return FIXTURES[vizType];
 }
 
@@ -214,7 +215,7 @@ describe("AvaVizConfigs.convertVizConfig shape matrix", () => {
 });
 
 type SharedVizFields = {
-  vizType: VizType;
+  vizType: BuiltInVizType;
   chartStyle?: ChartStyle;
   withLegend?: boolean;
   seriesColors?: Record<string, string>;
@@ -229,7 +230,7 @@ const DECLARED_BY = {
   chartStyle: ["bar", "line", "area", "scatter", "bubble", "radar"],
   withLegend: ["bar", "line", "area", "radar"],
   seriesColors: ["pie", "funnel"],
-} as const satisfies Record<string, readonly VizType[]>;
+} as const satisfies Record<string, readonly BuiltInVizType[]>;
 
 describe("AvaVizConfigs.convertVizConfig field preservation", () => {
   describe.each(objectEntries(DECLARED_BY))("%s", (field, declaringTypes) => {
@@ -286,6 +287,18 @@ describe("AvaVizConfigs.convertVizConfig layout mapping", () => {
   });
 });
 
+describe("AvaVizConfigs.convertVizConfig bar gap", () => {
+  it("keeps barGap when a bar chart stays a bar chart", () => {
+    const result = AvaVizConfigs.convertVizConfig(FIXTURES.bar, "bar");
+    expect(result.barGap).toBe("none");
+  });
+
+  it("drops barGap when a bar chart becomes a line chart", () => {
+    const result = AvaVizConfigs.convertVizConfig(FIXTURES.bar, "line");
+    expect(result).not.toHaveProperty("barGap");
+  });
+});
+
 const WITH_LEGEND_TYPES = DECLARED_BY.withLegend;
 
 describe("AvaVizConfigs.convertVizConfig invents no defaults", () => {
@@ -310,7 +323,7 @@ describe("AvaVizConfigs.convertVizConfig invents no defaults", () => {
   // literal baked into the converter. This is what stops the two from
   // drifting apart when a chart's default legend visibility changes.
   const sourcesWithoutLegend = VizTypes.filter((vizType) => {
-    return !(WITH_LEGEND_TYPES as readonly VizType[]).includes(vizType);
+    return !(WITH_LEGEND_TYPES as readonly BuiltInVizType[]).includes(vizType);
   });
 
   sourcesWithoutLegend.forEach((sourceType) => {

@@ -1,5 +1,7 @@
+import "fake-indexeddb/auto";
 import { Model } from "@avandar/models";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { AvaDexie } from "@/db/dexie/AvaDexie";
 import { applyChatModelTurnResponse } from "./applyChatModelTurnResponse";
 import type { ChatRuntimeCopy } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
 
@@ -14,16 +16,20 @@ vi.mock(
   },
 );
 
+const { applyChatTurnResponseMock } = vi.hoisted(() => {
+  return { applyChatTurnResponseMock: vi.fn() };
+});
+
 vi.mock(
   "@/components/ChatPanel/applyChatTurnResponse/applyChatTurnResponse",
   () => {
-    return {
-      applyChatTurnResponse: () => {
-        return { content: [] };
-      },
-    };
+    return { applyChatTurnResponse: applyChatTurnResponseMock };
   },
 );
+
+beforeEach(() => {
+  applyChatTurnResponseMock.mockReset().mockReturnValue({ content: [] });
+});
 
 describe("applyChatModelTurnResponse", () => {
   it("labels the explorer's prompt with the question label", async () => {
@@ -99,5 +105,61 @@ describe("applyChatModelTurnResponse", () => {
     } as unknown as Parameters<typeof applyChatModelTurnResponse>[0]);
 
     expect(setRawSql).not.toHaveBeenCalled();
+  });
+});
+
+describe("applyChatModelTurnResponse question cards", () => {
+  beforeEach(async () => {
+    await AvaDexie.DB.ClarificationAuditEntry.clear();
+    const actual = await vi.importActual<
+      typeof import("@/components/ChatPanel/applyChatTurnResponse/applyChatTurnResponse")
+    >("@/components/ChatPanel/applyChatTurnResponse/applyChatTurnResponse");
+    applyChatTurnResponseMock.mockImplementation(actual.applyChatTurnResponse);
+  });
+
+  it("records a card once and gives the card its row's audit id", async () => {
+    const setPendingClarification = vi.fn();
+
+    await applyChatModelTurnResponse({
+      response: Model.make("ChatResponse", {
+        assistantText: "Which state?",
+        clarification: {
+          question: "Which state do you mean?",
+          responseShape: {
+            kind: "fixed_options",
+            options: ["Georgia", "Texas"],
+            multi: false,
+          },
+          turnNumber: 1,
+        },
+      }),
+      apiMessages: [
+        Model.make("ChatClientMessage", {
+          role: "user",
+          content: "show me deaths in georgia",
+        }),
+      ],
+      currentUser: undefined,
+      currentPageContext: Model.make("ChatPageContext", { app: "other" }),
+      workspaceId: "workspace-1",
+      isGenerationStale: () => {
+        return false;
+      },
+      copyRef: { current: {} as ChatRuntimeCopy },
+      parseSqlRef: { current: vi.fn() },
+      dashboardEditorStateRef: { current: {} },
+      dataExplorerDispatch: {},
+      dashboardEditorDispatch: {},
+      chatPanelDispatch: { setPendingClarification },
+    } as unknown as Parameters<typeof applyChatModelTurnResponse>[0]);
+
+    const rows = await AvaDexie.DB.ClarificationAuditEntry.toArray();
+    expect(rows).toHaveLength(1);
+    expect(setPendingClarification).toHaveBeenCalledWith(
+      expect.objectContaining({
+        question: "Which state do you mean?",
+        auditId: rows[0]!.id,
+      }),
+    );
   });
 });

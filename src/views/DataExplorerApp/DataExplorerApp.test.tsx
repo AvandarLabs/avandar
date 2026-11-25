@@ -40,6 +40,16 @@ vi.mock(
   },
 );
 
+vi.mock(
+  "@/views/DataExplorerApp/useExplorerColumnCodes/useExplorerColumnCodes",
+  () => {
+    return {
+      useExplorerColumnCodes: () => {
+        return new Map();
+      },
+    };
+  },
+);
 vi.mock("@/views/DataExplorerApp/useDataQuery/useDataQuery", () => {
   return {
     useDataQuery: () => {

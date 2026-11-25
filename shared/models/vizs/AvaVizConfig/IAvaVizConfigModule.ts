@@ -2,12 +2,12 @@ import type { QueryResult } from "$/models/queries/QueryResult/QueryResult.ts";
 import type { PartialStructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery.types.ts";
 import type {
   AvaVizConfigType,
-  VizType,
+  BuiltInVizType,
 } from "$/models/vizs/AvaVizConfig/AvaVizConfig.types.ts";
 import type { AnyVizSettingDescriptors } from "$/models/vizs/VizSettingDescriptors.types.ts";
 
 export interface IAvaVizConfigModule<
-  VType extends VizType,
+  VType extends BuiltInVizType,
   TVizConfig = AvaVizConfigType<VType>,
 > {
   readonly vizType: VType;
@@ -69,7 +69,7 @@ export interface IAvaVizConfigModule<
    * @param newVizType The viz type we are converting to
    * @returns The new viz config
    */
-  convertVizConfig<K extends VizType>(
+  convertVizConfig<K extends BuiltInVizType>(
     vizConfig: TVizConfig,
     newVizType: K,
   ): AvaVizConfigType<K>;

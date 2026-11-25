@@ -1,11 +1,20 @@
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias.ts";
+import { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes.ts";
 import type { DataAgentPromptId } from "$/agent/dataAgent/dataAgentTools.ts";
 
-/** A dataset as the data agent sees it: names and column types, no rows. */
+/**
+ * A dataset as the data agent sees it: names, column types, and what an
+ * attached dictionary says about a column. Never rows.
+ */
 export type DataAgentDataset = {
   id: string;
   name: string;
-  columns: ReadonlyArray<{ name: string; dataType: string }>;
+  columns: ReadonlyArray<{
+    name: string;
+    dataType: string;
+    /** The column's code list and description, from an attached dictionary. */
+    codes?: ColumnCodes.Context;
+  }>;
 };
 
 const SHORT_TYPE_BY_DATA_TYPE: Record<string, string> = {
@@ -98,9 +107,6 @@ ATTACHED AND MENTIONED
 - A dataset marked not queryable in this chat cannot be queried; say so. An unavailable item is one you cannot see: tell the user, never guess what it held.
 - Call mentioned things by their names, without the @ and never with the tags.`;
 
-/**
- * v3: v2's rules, plus how to read the attached and mentioned blocks.
- */
 const SCHEMA_ANSWER_RULES = `
 
 SCHEMA
@@ -113,20 +119,125 @@ SCHEMA
   stacked as they are, and name columns that match and columns that differ,
   including names that differ only by a character such as _ or /.`;
 
+/**
+ * v3: v2's rules, plus how to read the attached and mentioned blocks.
+ */
 const DATA_AGENT_INSTRUCTIONS_V3 =
   DATA_AGENT_INSTRUCTIONS_V2 +
   ATTACHED_AND_MENTIONED_RULES +
   SCHEMA_ANSWER_RULES;
 
+/**
+ * The bullet v4 appends to the TOOLS section. It covers any plugin tool the
+ * proxy lists beside the built-in ones.
+ */
+const PLUGIN_TOOL_BULLET =
+  "\n- A plugin tool, when one is listed with the others, runs on the user's device against the result already on screen. Follow that tool's description. You may state the numbers it returns, and the call leaves your turn open so you can explain them.";
+
+/** Where the TOOLS section ends and the SQL section begins. */
+const SQL_SECTION_START = "\n\nSQL\n";
+
+/**
+ * v4: v3's instructions, plus one bullet at the end of the TOOLS section.
+ * The SQL section and everything after it stay as v3 has them.
+ */
+const DATA_AGENT_INSTRUCTIONS_V4 = DATA_AGENT_INSTRUCTIONS_V3.replace(
+  SQL_SECTION_START,
+  PLUGIN_TOOL_BULLET + SQL_SECTION_START,
+);
+
+const CODED_COLUMN_RULES = `
+
+CODED COLUMNS
+- A line such as "  - GENDER: codes 1=Male, 2=Female" under a dataset means the column stores codes. Filter and group on the code ("GENDER" = 2, or 'Y' for a text code) and name the label in your summary. Do not call lookup_values for a label listed there.
+- "(no label)" means nobody has recorded what that code means. Never guess it. If the question needs it, say that code has no label yet.
+- A line such as "  - sex: values Male, Female" means the column stores those labels as written.
+- Text after the codes, or alone after the column name, says what the column means.`;
+
+/** v5: v4's instructions, plus how to read the code lists under DATASETS. */
+const DATA_AGENT_INSTRUCTIONS_V5 =
+  DATA_AGENT_INSTRUCTIONS_V4 + CODED_COLUMN_RULES;
+
+/**
+ * Which chart to change when the page lists several. It sits right after the
+ * sentence that sends a chart shown here to `run_query`, and it leaves a
+ * request to add to a dashboard to the rules around it.
+ */
+const WHICH_CHART_BULLET = `
+- Changing how a chart on the page is shown (for example "show this as a table" or "turn this into a line chart") is a different request from adding to a dashboard. When the page lists more than one chart and the user names none, call ask_user with their titles as options, and run no query until they answer. Never pick a chart yourself. A request to add, put, or pin something on a dashboard is not covered by this rule, and neither is a question with one clear target.`;
+
+/**
+ * What filters a chart added to a dashboard gets. The dashboard's name and
+ * charts are labels: a title that mentions a year is not a request to filter
+ * by that year. A ranking is a total, so the SQL rule that keeps "Unassigned"
+ * and "Out of <state>" rows in totals applies to it.
+ */
+const DASHBOARD_NAME_NOT_A_FILTER_BULLET = `
+- A dashboard's name, title, and charts are labels, not filters. Never copy their year or place into a chart or table you build from the user's words: use only the filters and period the user asked for, and all dates when they named no period, even when the dashboard is about one year. Take a period from the dashboard or from a chart on the page only when the user refers to that period. A chart copied from the page keeps its own filters. A ranking or top-N is still a total, so each total keeps the "Unassigned" and "Out of <state>" rows, as the SQL rules say.`;
+
+/**
+ * How to add to a dashboard: when, which dashboard, which kind, and what a
+ * `<dashboard_card>` line means. v6's addition to v5.
+ */
+const DASHBOARD_BLOCK_RULES = `
+
+DASHBOARD BLOCKS
+- add_dashboard_block adds one block to a dashboard. Call it only when the user asks to add, put, or pin something on a dashboard. When the page block shows a dashboard, "add a chart, table, heading, or note" with no dashboard named means that dashboard: call add_dashboard_block with dashboard "current", even for a chart or table of data. Never answer such a request with run_query alone. A chart that only needs to show here or in the Data Explorer, or a question about the data, uses run_query.${WHICH_CHART_BULLET}
+- dashboard: "current" for the dashboard on the current page. Otherwise the dashboard's name exactly as written in the page block, <mentioned>, <attached>, or the user's message, without @ or quotes. Keep a placeholder such as <value 1> exactly as written.
+- One block per answer. When the user asks for several, add the most important one and say in summary what else you would add.
+- DataViz is a chart or table from SQL: prompt is a short chart title, sql follows the same rules as run_query, and vizType is table for a table. Every other kind holds text you write: HeadingBlock, ParagraphBlock, QuoteBlock, CalloutBlock (tone info, warning, or neutral), ListBlock, CodeBlock, TableBlock (CSV text), Card, DividerBlock. Never write numbers from the data into a text block: you have not seen the rows.${DASHBOARD_NAME_NOT_A_FILTER_BULLET}
+- summary is one sentence for the user saying what you added and where. When the block waits for the user's confirmation, say so.
+- If the tool says no dashboard matched, say plainly that you cannot find a dashboard with that name, then ask which dashboard they mean. Never try another name you made up.
+- A <dashboard_card> line before the message says what the user did with a block you proposed: confirmed or cancelled. Do not propose it again unless asked.`;
+
+/** v6: v5's instructions, plus the dashboard tool's rules. */
+const DATA_AGENT_INSTRUCTIONS_V6 =
+  DATA_AGENT_INSTRUCTIONS_V5 + DASHBOARD_BLOCK_RULES;
+
 const INSTRUCTIONS_BY_PROMPT_ID: Record<DataAgentPromptId, string> = {
   "data-agent-v1": DATA_AGENT_INSTRUCTIONS_V1,
   "data-agent-v2": DATA_AGENT_INSTRUCTIONS_V2,
   "data-agent-v3": DATA_AGENT_INSTRUCTIONS_V3,
+  "data-agent-v4": DATA_AGENT_INSTRUCTIONS_V4,
+  "data-agent-v5": DATA_AGENT_INSTRUCTIONS_V5,
+  "data-agent-v6": DATA_AGENT_INSTRUCTIONS_V6,
 };
+
+/**
+ * Whether a version lists columns' code lists under DATASETS. Versions
+ * before v5 never do, so their prompts stay as they shipped.
+ */
+const LISTS_COLUMN_CODES: Record<DataAgentPromptId, boolean> = {
+  "data-agent-v1": false,
+  "data-agent-v2": false,
+  "data-agent-v3": false,
+  "data-agent-v4": false,
+  "data-agent-v5": true,
+  "data-agent-v6": true,
+};
+
+/** `  - GENDER: codes 1=Male, 2=Female. Sex at intake.`, or undefined. */
+function _formatColumnCodesLine(
+  column: DataAgentDataset["columns"][number],
+): string | undefined {
+  const { codes } = column;
+  const pairsText = codes ? ColumnCodes.formatPairs(codes) : "";
+  const description = ColumnCodes.formatDescription(codes?.description);
+  const parts = [
+    ...(pairsText === ""
+      ? []
+      : [`${codes?.direction === "encode" ? "values" : "codes"} ${pairsText}`]),
+    ...(description ? [description] : []),
+  ];
+  return parts.length === 0
+    ? undefined
+    : `  - ${column.name}: ${parts.join(". ")}`;
+}
 
 function _formatDatasetLine(
   alias: string,
   dataset: Readonly<DataAgentDataset>,
+  codeLines: readonly string[],
 ): string {
   const columns = dataset.columns
     .map((column) => {
@@ -136,14 +247,42 @@ function _formatDatasetLine(
       return `${column.name} ${shortType}`;
     })
     .join(", ");
-  return `${alias} = "${dataset.name}": ${columns}`;
+  return [`${alias} = "${dataset.name}": ${columns}`, ...codeLines].join("\n");
+}
+
+/**
+ * Each dataset's code lines, in the order given, cut to the prompt's
+ * code-list budget, and the note that says how many columns it left out.
+ */
+function _fitCodeLines(
+  datasets: ReadonlyArray<Readonly<DataAgentDataset> | undefined>,
+): { codeLinesByDataset: string[][]; hiddenNote: string | undefined } {
+  const allLines = datasets.map((dataset) => {
+    return (dataset?.columns ?? []).flatMap((column) => {
+      return _formatColumnCodesLine(column) ?? [];
+    });
+  });
+  const { isKept, hiddenCount } = ColumnCodes.fitToPromptBudget(
+    allLines.flat(),
+  );
+  let offset = 0;
+  const codeLinesByDataset = allLines.map((lines) => {
+    const keptLines = lines.filter((_line, index) => {
+      return isKept[offset + index] ?? false;
+    });
+    offset += lines.length;
+    return keptLines;
+  });
+  const note = ColumnCodes.formatHiddenCodesNote(hiddenCount);
+  return { codeLinesByDataset, hiddenNote: note ? `(${note})` : undefined };
 }
 
 /**
  * Builds the system prompt for one prompt version: that version's fixed
  * instructions, then the datasets (aliases in the app's `SqlTableAlias`
  * order), then today's date. Everything before the date stays the same
- * between turns, so providers can cache it.
+ * between turns, so providers can cache it. From v5, each dataset lists
+ * its columns' code lists, within the prompt's code-list budget.
  */
 export function buildDataAgentSystemPrompt(
   options: Readonly<{
@@ -153,16 +292,30 @@ export function buildDataAgentSystemPrompt(
   }>,
 ): string {
   const aliases = SqlTableAlias.fromSchema({ datasets: options.datasets });
-  const datasetLines = aliases.map((entry) => {
-    const dataset = options.datasets.find((candidate) => {
+  const datasets = aliases.map((entry) => {
+    return options.datasets.find((candidate) => {
       return entry.kind === "dataset" && candidate.id === entry.datasetId;
     });
-    return dataset ? _formatDatasetLine(entry.alias, dataset) : "";
+  });
+  const { codeLinesByDataset, hiddenNote } = LISTS_COLUMN_CODES[
+    options.promptId
+  ]
+    ? _fitCodeLines(datasets)
+    : { codeLinesByDataset: [], hiddenNote: undefined };
+  const datasetLines = aliases.map((entry, index) => {
+    const dataset = datasets[index];
+    return dataset
+      ? _formatDatasetLine(
+          entry.alias,
+          dataset,
+          codeLinesByDataset[index] ?? [],
+        )
+      : "";
   });
   return `${INSTRUCTIONS_BY_PROMPT_ID[options.promptId]}
 
 DATASETS
-${datasetLines.join("\n")}
+${[...datasetLines, ...(hiddenNote ? [hiddenNote] : [])].join("\n")}
 
 Today is ${options.today}.`;
 }

@@ -1,5 +1,6 @@
 import { Model } from "@avandar/models";
 import { setValue } from "@avandar/utils";
+import { normalizeSqlForSubquery } from "@avandar/utils/sql";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
 import { createAppStateManager } from "@/lib/utils/state/createAppStateManager/createAppStateManager";
@@ -7,6 +8,9 @@ import { INITIAL_DATA_EXPLORER_STATE } from "@/views/DataExplorerApp/DataExplore
 import {
   applyQueryChange,
   isSameColumnSchema,
+  makePluginVizConfigMemoryFromBindings,
+  makeStateFromPluginVizConfig,
+  makeVizConfigMemoriesFromState,
 } from "@/views/DataExplorerApp/DataExplorerStateManager/dataExplorerStateHelpers";
 import { DataExplorerSourceActions } from "./DataExplorerSourceActions";
 import type { UserQueryAnalyticsTrigger } from "$/analytics/AnalyticsEvents/AnalyticsEvents.types";
@@ -19,6 +23,7 @@ import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
 import type { UiVizConfig } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 import type {
   DataExplorerAppState,
+  DerivedColumnsSnapshot,
   OpenDatasetInfo,
 } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
 
@@ -160,22 +165,30 @@ export const DataExplorerStateManager = createAppStateManager({
 
     /**
      * Activates a visualization type while preserving its most recent config.
-     * Returns state with a restored or hydrated config for the selected type.
+     * A built-in type restores its remembered config or converts the active
+     * one, then fills empty slots. A plugin chart config, built by the viz
+     * type picker, gives way to the config remembered for its plugin chart
+     * type when there is one.
      */
     setActiveVizType: (
       state: DataExplorerAppState,
-      newVizType: AvaVizConfig.Type,
-    ) => {
+      target: AvaVizConfig.Type | AvaVizConfig.Plugin,
+    ): DataExplorerAppState => {
+      if (typeof target !== "string") {
+        return makeStateFromPluginVizConfig({ state, pluginVizConfig: target });
+      }
       const { vizConfig, query, vizConfigMemory, lastResultColumns } = state;
 
-      if (vizConfig.vizType === newVizType) {
+      // A bare "plugin" type names no plugin chart type, so there is nothing
+      // to activate.
+      if (vizConfig.vizType === target || target === "plugin") {
         return state;
       }
 
-      const rememberedVizConfig = vizConfigMemory[newVizType];
+      const rememberedVizConfig = vizConfigMemory[target];
       const initialVizConfig =
         rememberedVizConfig ??
-        AvaVizConfigs.convertVizConfig(vizConfig, newVizType);
+        AvaVizConfigs.convertVizConfig(vizConfig, target);
       const nextVizConfig =
         lastResultColumns !== undefined
           ? AvaVizConfigs.hydrateFromQueryResult(
@@ -186,18 +199,10 @@ export const DataExplorerStateManager = createAppStateManager({
             ? AvaVizConfigs.hydrateFromQuery(initialVizConfig, query)
             : initialVizConfig;
 
-      // TypeScript widens the computed union key to `string` and so cannot see
-      // that `vizConfig` lands under its own `vizType`. The key is taken from
-      // the value itself, so the correlation holds by construction.
-      const nextVizConfigMemory = {
-        ...vizConfigMemory,
-        [vizConfig.vizType]: vizConfig,
-      } as Partial<AvaVizConfig.Registry>;
-
       return {
         ...state,
+        ...makeVizConfigMemoriesFromState(state),
         vizConfig: nextVizConfig,
-        vizConfigMemory: nextVizConfigMemory,
         pendingUrlVizConfig: undefined,
       };
     },
@@ -213,7 +218,10 @@ export const DataExplorerStateManager = createAppStateManager({
     ): DataExplorerAppState => {
       return {
         ...state,
-        vizConfig: AvaVizConfigs.makeEmptyConfig(urlVizConfig.vizType),
+        vizConfig:
+          urlVizConfig.vizType === "plugin"
+            ? { ...urlVizConfig, columnSettings: {} }
+            : AvaVizConfigs.makeEmptyConfig(urlVizConfig.vizType),
         pendingUrlVizConfig: urlVizConfig,
       };
     },
@@ -260,8 +268,8 @@ export const DataExplorerStateManager = createAppStateManager({
     /**
      * Stores the column bindings of the latest bound query result, which the
      * next result is bound from and "Save to dashboard" saves with the chart.
-     * Chart configs on provisional SQL column IDs move to the IDs these
-     * bindings give the same expressions.
+     * Chart configs on provisional SQL column IDs, remembered ones included,
+     * move to the IDs these bindings give the same expressions.
      */
     setColumnBindings: (
       state: DataExplorerAppState,
@@ -288,7 +296,18 @@ export const DataExplorerStateManager = createAppStateManager({
           ];
         }),
       ) as Partial<AvaVizConfig.Registry>;
-      return { ...state, columnBindings, vizConfig, vizConfigMemory };
+      const pluginVizConfigMemory = makePluginVizConfigMemoryFromBindings({
+        memory: state.pluginVizConfigMemory,
+        previous: previous,
+        current: columnBindings,
+      });
+      return {
+        ...state,
+        columnBindings,
+        vizConfig,
+        vizConfigMemory,
+        pluginVizConfigMemory,
+      };
     },
 
     /** Applies an explicit chart edit, replacing any URL-restored chart. */
@@ -319,6 +338,49 @@ export const DataExplorerStateManager = createAppStateManager({
         lastResultColumns: undefined,
         isStructuredQueryInSync: false,
         sqlSyncWarnings: state.sqlSyncWarnings,
+      };
+    },
+
+    /**
+     * Runs the SQL a plugin command built to add derived columns to the
+     * current result. Keeps the chart, and moves the column bindings to the
+     * new SQL so the columns it passes through keep their IDs. Does not parse
+     * the SQL, so the structured query stays as it was, out of sync.
+     */
+    applyDerivedColumnsSql: (
+      state: DataExplorerAppState,
+      sql: string,
+    ): DataExplorerAppState => {
+      const { columnBindings } = state;
+      return {
+        ...state,
+        rawSql: sql,
+        queryTrigger: "plugin_command",
+        isStructuredQueryInSync: false,
+        lastResultColumns: undefined,
+        pendingUrlVizConfig: undefined,
+        nlPrompt: undefined,
+        columnBindings: columnBindings
+          ? { ...columnBindings, sqlKey: normalizeSqlForSubquery(sql) }
+          : undefined,
+      };
+    },
+
+    /**
+     * Puts back what `applyDerivedColumnsSql` replaced, from a snapshot taken
+     * before it ran, and runs that query again. Used by the Undo action of the
+     * derived columns notification.
+     */
+    restoreDerivedColumnsSnapshot: (
+      state: DataExplorerAppState,
+      snapshot: DerivedColumnsSnapshot,
+    ): DataExplorerAppState => {
+      return {
+        ...state,
+        ...snapshot,
+        queryTrigger: "plugin_command",
+        lastResultColumns: undefined,
+        pendingUrlVizConfig: undefined,
       };
     },
 

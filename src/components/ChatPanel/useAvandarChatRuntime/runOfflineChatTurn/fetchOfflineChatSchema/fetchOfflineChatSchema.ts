@@ -1,10 +1,12 @@
 import { where } from "@avandar/utils";
+import { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { ConceptAttributeClient } from "@/clients/ontology/ConceptAttributeClient";
 import { ConceptClient } from "@/clients/ontology/ConceptClient";
 import { ConceptStatusClient } from "@/clients/ontology/ConceptStatusClient";
 import { OfflineChatSchemaCache } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/fetchOfflineChatSchema/OfflineChatSchemaCache";
 import { truncateSchemaForOffline } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/fetchOfflineChatSchema/truncateSchemaForOffline/truncateSchemaForOffline";
+import { loadColumnCodes } from "@/lib/dataDictionaries/loadColumnCodes/loadColumnCodes";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { Concept } from "$/models/ontology/Concept/Concept";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
@@ -22,16 +24,19 @@ const EMPTY_SCHEMA: OfflineChatSchema = {
 
 function _mapDatasets(
   rows: readonly Dataset.WithColumns[],
+  codesByColumnId: ReadonlyMap<string, ColumnCodes.T>,
 ): Pick<OfflineChatSchema, "datasets" | "columns"> {
   const datasets = rows.map((row) => {
     return { id: row.id, name: row.name };
   });
   const columns = rows.flatMap((row) => {
     return row.columns.map((column) => {
+      const codes = codesByColumnId.get(column.id);
       return {
         dataset_id: row.id,
         name: column.name,
         data_type: column.dataType,
+        ...(codes ? { codes: ColumnCodes.toContext(codes) } : {}),
       };
     });
   });
@@ -101,18 +106,19 @@ export async function fetchOfflineChatSchema(
 
   if (args.navigatorOnLine) {
     try {
-      const [datasetRows, concepts] = await Promise.all([
+      const [datasetRows, concepts, codesByColumnId] = await Promise.all([
         DatasetClient.getAllDatasetsWithColumns(
           where("workspace_id", "eq", args.workspace.id),
         ),
         ConceptClient.getAll(where("workspace_id", "eq", args.workspace.id)),
+        loadColumnCodes(args.workspace.id),
       ]);
       const conceptDetails =
         concepts.length === 0
           ? { attributes: [], statuses: [] }
           : await _fetchConceptDetails(args.workspace.id);
       const schema: OfflineChatSchema = {
-        ..._mapDatasets(datasetRows),
+        ..._mapDatasets(datasetRows, codesByColumnId),
         ..._mapConcepts({ concepts, ...conceptDetails }),
       };
       OfflineChatSchemaCache.write(args.workspace.id, schema);

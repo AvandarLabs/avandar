@@ -26,6 +26,14 @@ vi.mock(
   },
 );
 
+vi.mock("@/components/ChatPanel/ChatSessionProvider/useChatSessions", () => {
+  return {
+    useChatSessions: () => {
+      return { startCaseDesignSession: vi.fn() };
+    },
+  };
+});
+
 describe("NewCaseTypeButton", () => {
   beforeEach(() => {
     hasPermissionMock.mockReset();

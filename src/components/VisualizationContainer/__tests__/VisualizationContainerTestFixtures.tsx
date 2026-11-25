@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AvandarAppProvider } from "@/components/providers/AvandarAppProvider";
 import { VisualizationContainer } from "@/components/VisualizationContainer/VisualizationContainer";
 import { render } from "@/test-utils";
@@ -23,22 +24,30 @@ function renderViz(
   vizConfig: Parameters<typeof VisualizationContainer>[0]["vizConfig"],
   data: UnknownDataFrame = DATA,
 ): ReturnType<typeof render> {
+  // A plugin chart looks its manifest up through React Query, so the
+  // container renders under a query client, as it does in the app.
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
   return render(
     <AvandarAppProvider>
-      <VisualizationContainer
-        columns={COLUMNS}
-        data={data}
-        dateColumns={EMPTY_DATE_COLUMNS}
-        vizConfig={vizConfig}
-      />
+      <QueryClientProvider client={queryClient}>
+        <VisualizationContainer
+          columns={COLUMNS}
+          data={data}
+          dateColumns={EMPTY_DATE_COLUMNS}
+          vizConfig={vizConfig}
+        />
+      </QueryClientProvider>
     </AvandarAppProvider>,
   );
 }
 
 /**
  * Columns, rows, and a `renderViz` helper that mounts `VisualizationContainer`
- * over them inside the app providers, so each test supplies only the
- * `AvaVizConfig` it checks. Used by the `VisualizationContainer` tests.
+ * over them inside the app providers and a query client, so each test
+ * supplies only the `AvaVizConfig` it checks. Used by the
+ * `VisualizationContainer` tests.
  */
 export const VisualizationContainerTestFixtures = {
   COLUMNS,

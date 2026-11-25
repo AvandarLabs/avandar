@@ -61,12 +61,22 @@ function _buildDashboardLink(options: {
   };
 }
 
-function _buildChartFacts(
-  vizType: AvaVizConfig.Type | undefined,
-): GadgetFact[] {
-  return vizType === undefined
-    ? []
-    : [{ label: msg`Chart`, value: vizTypeLabel(vizType) }];
+function _getChartFactsFromVizType(options: {
+  vizType: AvaVizConfig.Type | undefined;
+  pluginChartLabel: string;
+}): GadgetFact[] {
+  const { vizType, pluginChartLabel } = options;
+  if (vizType === undefined) {
+    return [];
+  }
+  // A plugin chart's title lives in its plugin's manifest, which loads
+  // lazily, so a summary names every plugin chart the same way.
+  return [
+    {
+      label: msg`Chart`,
+      value: vizType === "plugin" ? pluginChartLabel : vizTypeLabel(vizType),
+    },
+  ];
 }
 
 /**
@@ -153,7 +163,10 @@ export function useDashboardTileSummary(
     facts: withFacts
       ? [
           { label: msg`Dashboard`, value: dashboard.name },
-          ..._buildChartFacts(tile.vizType),
+          ..._getChartFactsFromVizType({
+            vizType: tile.vizType,
+            pluginChartLabel: t`Plugin chart`,
+          }),
           _buildUpdatedFact(dashboard.updatedAt),
         ]
       : [],

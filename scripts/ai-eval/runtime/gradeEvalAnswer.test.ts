@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { gradeEvalAnswer } from "./gradeEvalAnswer";
 import type { EvalQuestion } from "../EvalQuestion";
 import type { EvalAnswer } from "../harnesses/EvalHarness";
@@ -22,6 +22,7 @@ function _createAnswer(overrides: Partial<EvalAnswer>): EvalAnswer {
     clarifications: [],
     consentPrompts: 0,
     valuesSentToModel: [],
+    toolNames: [],
     usage: {
       calls: 1,
       promptTokens: 0,
@@ -134,5 +135,193 @@ describe("gradeEvalAnswer with expectsNoQuery", () => {
     );
 
     expect(graded.pass).toBe(false);
+  });
+});
+
+const FIT_QUESTION = {
+  id: "R01",
+  category: "page_context",
+  prompt: "Fit y on x for the result on screen.",
+  clarification: "not_needed",
+  truth: {},
+  fitRegression: {
+    rows: [1, 2, 3].map((x) => {
+      return { x, y: 2 * x + 1 };
+    }),
+    columns: ["x", "y"],
+    xColumn: "x",
+    yColumn: "y",
+    slope: 2,
+  },
+  grade: () => {
+    return { pass: false, detail: "graded by the tool call" };
+  },
+} as unknown as EvalQuestion;
+
+describe("gradeEvalAnswer with fitRegression", () => {
+  it("passes R01 when the tool was called and the reply states the slope", () => {
+    const graded = gradeEvalAnswer(
+      FIT_QUESTION,
+      _createAnswer({
+        assistantText: "The slope is 2.",
+        toolNames: ["fitRegression"],
+      }),
+      {},
+    );
+
+    expect(graded.pass).toBe(true);
+  });
+
+  it("fails R01 when the tool was not called", () => {
+    const graded = gradeEvalAnswer(
+      FIT_QUESTION,
+      _createAnswer({ assistantText: "The slope is 2.", toolNames: [] }),
+      {},
+    );
+
+    expect(graded.pass).toBe(false);
+  });
+
+  it("fails R01 when the reply does not state the slope", () => {
+    const graded = gradeEvalAnswer(
+      FIT_QUESTION,
+      _createAnswer({
+        assistantText: "I fitted a line.",
+        toolNames: ["fitRegression"],
+      }),
+      {},
+    );
+
+    expect(graded.pass).toBe(false);
+  });
+
+  it.each([
+    "y = 2x + 1",
+    "The fitted line is y = 2x + 1.",
+    "y = 1 + 2x",
+    "The line is y = 2 x + 1.",
+    "The line is y = 2*x + 1.",
+    "The line is y = 2\u00b7x + 1.",
+    "The line is y = 2 \u00d7 x + 1.",
+    "The slope is 2.",
+    "The slope is -2.",
+  ])("passes R01 when the reply states the slope as %j", (assistantText) => {
+    const graded = gradeEvalAnswer(
+      FIT_QUESTION,
+      _createAnswer({ assistantText, toolNames: ["fitRegression"] }),
+      {},
+    );
+
+    expect(graded.pass).toBe(true);
+  });
+
+  it.each([
+    "y = 12x + 1",
+    "y = 2.5x + 1",
+    "The slope is 2.5.",
+    "The slope is 1.2.",
+    "The slope is 20.",
+    "y = 20x + 1",
+    "y = x2 + 1",
+    "y = 3x + 1",
+  ])("fails R01 when the reply states the wrong slope %j", (assistantText) => {
+    const graded = gradeEvalAnswer(
+      FIT_QUESTION,
+      _createAnswer({ assistantText, toolNames: ["fitRegression"] }),
+      {},
+    );
+
+    expect(graded.pass).toBe(false);
+  });
+
+  it("passes R01 when the reply states the slope and also names another slope", () => {
+    const graded = gradeEvalAnswer(
+      FIT_QUESTION,
+      _createAnswer({
+        assistantText: "The slope is 2, not 2.5.",
+        toolNames: ["fitRegression"],
+      }),
+      {},
+    );
+
+    expect(graded.pass).toBe(true);
+  });
+});
+
+describe("gradeEvalAnswer on a follow-up and a Try again", () => {
+  const RESULT = { columns: [{ name: "value", type: "BIGINT" }], rows: [[42]] };
+  const PARENT_RESULT = {
+    columns: [{ name: "name", type: "VARCHAR" }],
+    rows: [["Ohio"]],
+  };
+
+  function _createQueryQuestion(grade: EvalQuestion["grade"]): EvalQuestion {
+    return {
+      id: "T06",
+      category: "try_again",
+      prompt: "show that by month",
+      clarification: "not_needed",
+      truth: {},
+      grade,
+    };
+  }
+
+  it("passes the parent's result to the grader", () => {
+    const grade = vi.fn(() => {
+      return { pass: true, detail: "ok" };
+    });
+
+    gradeEvalAnswer(
+      _createQueryQuestion(grade),
+      _createAnswer({ result: RESULT, error: undefined }),
+      {},
+      PARENT_RESULT,
+    );
+
+    expect(grade).toHaveBeenCalledWith({
+      result: RESULT,
+      truth: {},
+      parentResult: PARENT_RESULT,
+    });
+  });
+
+  it("marks a Try again that repeated its first attempt", () => {
+    const graded = gradeEvalAnswer(
+      NO_QUERY_QUESTION,
+      _createAnswer({
+        assistantText: "I can't see that dashboard.",
+        firstAttempt: _createAnswer({
+          assistantText: "I can't see that dashboard.",
+        }),
+      }),
+      {},
+    );
+
+    expect(graded.isRepeat).toBe(true);
+  });
+
+  it("marks a Try again whose second attempt differs as not a repeat", () => {
+    const graded = gradeEvalAnswer(
+      NO_QUERY_QUESTION,
+      _createAnswer({
+        assistantText: "I can't see that dashboard.",
+        firstAttempt: _createAnswer({
+          assistantText: "I am unable to see that chart.",
+        }),
+      }),
+      {},
+    );
+
+    expect(graded.isRepeat).toBe(false);
+  });
+
+  it("leaves isRepeat unset on an answer with no first attempt", () => {
+    const graded = gradeEvalAnswer(
+      NO_QUERY_QUESTION,
+      _createAnswer({ assistantText: "I can't see that dashboard." }),
+      {},
+    );
+
+    expect(graded).not.toHaveProperty("isRepeat");
   });
 });

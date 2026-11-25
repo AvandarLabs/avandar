@@ -43,6 +43,12 @@ vi.mock(
   },
 );
 
+vi.mock("@/clients/dataDictionaries/DictionaryBindingClient", () => {
+  return {
+    DictionaryBindingClient: { getAll: vi.fn().mockResolvedValue([]) },
+  };
+});
+
 vi.mock("@/clients/datasets/LocalDatasetClient/LocalDatasetClient", () => {
   return {
     LocalDatasetClient: {

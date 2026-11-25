@@ -1,3 +1,4 @@
+import { TruncatedText } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { IconPencil } from "@tabler/icons-react";
 import css from "@/views/GisApp/panels/LayerPanel/AnnotationLayerRow/AnnotationLayerRow.module.css";
@@ -65,7 +66,14 @@ export function AnnotationLayerRow({
           }}
         >
           <IconPencil size={14} stroke={1.5} />
-          <span className={css.annotationLayerRowSelectionName}>{name}</span>
+          <TruncatedText
+            className={css.annotationLayerRowSelectionName}
+            fz={13}
+            fw={500}
+            tooltipProps={{ position: "right" }}
+          >
+            {name}
+          </TruncatedText>
         </button>
         <span aria-hidden />
         <span

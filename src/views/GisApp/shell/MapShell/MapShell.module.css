@@ -71,6 +71,16 @@
   /* The layer panel's body scrolls once the row is shorter than the panel. */
   max-height: 100%;
   min-height: 0;
+
+  /*
+   * The column fills the row so the panel can stop at its foot, but the panel
+   * hugs its content. The empty space below it must let the map take clicks.
+   */
+  pointer-events: none;
+}
+
+.mapShellLeftColumn > * {
+  pointer-events: auto;
 }
 
 .mapShellRightColumn {

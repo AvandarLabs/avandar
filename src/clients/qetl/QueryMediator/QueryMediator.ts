@@ -14,6 +14,7 @@ import type {
   DatasetColumnSource,
   NeededColumnsByDatasetId,
   QetlRunnerOptions,
+  RelationFetchedListener,
 } from "@/clients/qetl/QueryMediator/QueryMediator.types";
 import type { BuilderModule, Module, StateOfModule } from "@avandar/modules";
 
@@ -65,6 +66,7 @@ export type IQueryMediator = Module<
         signal?: AbortSignal;
         neededColumnsByDatasetId?: NeededColumnsByDatasetId;
         conceptSpineRestrictions?: readonly ConceptSpineRestriction[];
+        onRelationFetched?: RelationFetchedListener;
       }): Promise<QueryResult.T<RowObject>>;
       (params: {
         rawSql: string;
@@ -72,6 +74,7 @@ export type IQueryMediator = Module<
         signal?: AbortSignal;
         neededColumnsByDatasetId?: NeededColumnsByDatasetId;
         conceptSpineRestrictions?: readonly ConceptSpineRestriction[];
+        onRelationFetched?: RelationFetchedListener;
       }): Promise<Blob>;
     };
   }

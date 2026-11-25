@@ -163,7 +163,6 @@ export function renderTray(
     isOpen: true,
     isAvailable: true,
     layout: "docked",
-    caseDesignSessionNonce: 0,
     pendingClarification: undefined,
     pendingCaseTypeDraft: undefined,
     contextTray: options.contextTray ?? [],

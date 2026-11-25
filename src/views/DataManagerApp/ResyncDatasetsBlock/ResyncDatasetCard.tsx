@@ -13,6 +13,7 @@ import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalD
 import { CsvFileDatasetClient } from "@/clients/datasets/source-datasets/CsvFileDatasetClient";
 import { XlsxFileDatasetClient } from "@/clients/datasets/source-datasets/XlsxFileDatasetClient";
 import { DatasetPreviewBlock } from "@/components/DatasetPreviewBlock/DatasetPreviewBlock";
+import { useNotifyDatasetDeleteError } from "@/hooks/datasets/useNotifyDatasetDeleteError/useNotifyDatasetDeleteError";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { Logger } from "@/utils/Logger";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
@@ -108,6 +109,24 @@ function useUploadControlConfig(
 }
 
 /**
+ * The delete mutation of a dataset that needs a resync. A refused delete shows
+ * one translated message, and any other failure shows a generic one.
+ */
+function useDeleteDataset(): ReturnType<typeof DatasetClient.useFullDelete> {
+  const { t } = useLingui();
+  const notifyDeleteError = useNotifyDatasetDeleteError({
+    onOtherError: (error) => {
+      Logger.error("Failed to delete dataset", error);
+      notifyError(t`Failed to delete dataset`);
+    },
+  });
+  return DatasetClient.useFullDelete({
+    queryToRefetch: DatasetClient.QueryKeys.getAll(),
+    onError: notifyDeleteError,
+  });
+}
+
+/**
  * A card component for displaying a single dataset that needs to be re-synced
  * because its local data is missing.
  *
@@ -120,9 +139,7 @@ function useUploadControlConfig(
 export function ResyncDatasetCard({ dataset }: Props): JSX.Element {
   const { t } = useLingui();
   const user = useCurrentUser();
-  const [deleteDataset, isDeletingDataset] = DatasetClient.useFullDelete({
-    queryToRefetch: DatasetClient.QueryKeys.getAll(),
-  });
+  const [deleteDataset, isDeletingDataset] = useDeleteDataset();
   const [deleteDatasetLocally] = useMutation({
     queryToRefetch: ["missing-datasets"],
     mutationFn: async (datasetId: Dataset.Id) => {
@@ -251,9 +268,8 @@ export function ResyncDatasetCard({ dataset }: Props): JSX.Element {
               try {
                 await deleteDataset.async({ id: dataset.id });
                 notifySuccess(t`Dataset deleted successfully`);
-              } catch (error) {
-                Logger.error("Failed to delete dataset", error);
-                notifyError(t`Failed to delete dataset`);
+              } catch {
+                // The mutation's `onError` already told the user.
               }
             },
           }}

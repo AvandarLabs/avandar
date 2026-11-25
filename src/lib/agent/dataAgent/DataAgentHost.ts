@@ -1,3 +1,5 @@
+import type { ChatGeneratedDashboardBlock } from "$/types/chat.types";
+
 /** How a query the agent ran for the user ended. */
 export type DataAgentQueryOutcome =
   | {
@@ -22,6 +24,13 @@ export type DataAgentUserAnswer =
   | { kind: "typed"; text: string }
   | { kind: "dismissed" }
   | { kind: "deferred" };
+
+/** How adding a dashboard block ended. */
+export type DataAgentDashboardBlockOutcome =
+  | { kind: "added_to_editor" }
+  | { kind: "card_shown" }
+  | { kind: "no_current" }
+  | { kind: "not_found" };
 
 /**
  * Everything the data agent's tools need from the place they run: the browser
@@ -54,6 +63,11 @@ export type DataAgentHost = {
     request: Readonly<{
       question: string;
       options: readonly string[];
+      /**
+       * What the screen shows for each option, in the same order, when it
+       * differs from `options`. An answer still posts the option itself.
+       */
+      optionLabels?: readonly string[];
       isMulti: boolean;
       kind: "choice" | "values";
       /**
@@ -78,6 +92,25 @@ export type DataAgentHost = {
       reason: "matched_lookup" | "picked_lookup" | "query_filter";
     }>,
   ) => Promise<boolean>;
+  /**
+   * Runs a dashboard chart's SQL on this device without showing it, so the
+   * agent learns whether it works before anything is added. Returns the
+   * result's shape, never rows. Absent on a host that cannot add to
+   * dashboards.
+   */
+  checkQuery?: (sql: string) => Promise<DataAgentQueryOutcome>;
+  /**
+   * Adds a valid block to the dashboard the agent named: unsaved into the
+   * open editor, or as a card the user confirms. `dashboard` is the name as
+   * the model wrote it, or "current". Absent on a host that cannot add to
+   * dashboards.
+   */
+  addDashboardBlock?: (
+    request: Readonly<{
+      dashboard: string;
+      block: ChatGeneratedDashboardBlock;
+    }>,
+  ) => Promise<DataAgentDashboardBlockOutcome>;
   /**
    * True when `text` is exactly a page placeholder (`<value 1>`) this host
    * restores before SQL runs. A lookup treats such a value as already

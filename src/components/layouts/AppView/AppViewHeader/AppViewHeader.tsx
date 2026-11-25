@@ -6,6 +6,13 @@ import type { ReactNode } from "react";
 
 type Props = {
   /**
+   * Where the view sits, as a link back to the record it acts on. Shown
+   * small above the title, for a task view that belongs to a record (such
+   * as applying dictionaries to a dataset).
+   */
+  breadcrumb?: ReactNode;
+
+  /**
    * The name of the thing on screen. Takes a node rather than a string so a
    * record's title can be an inline-editable field.
    */
@@ -45,6 +52,7 @@ type Props = {
  * a screenful.
  */
 export function AppViewHeader({
+  breadcrumb,
   title,
   titleAccessory,
   facts,
@@ -57,6 +65,9 @@ export function AppViewHeader({
 
   return (
     <header className={css.appViewHeader}>
+      {breadcrumb ? (
+        <div className={css.appViewHeaderBreadcrumb}>{breadcrumb}</div>
+      ) : null}
       <Group
         gap="sm"
         wrap="nowrap"

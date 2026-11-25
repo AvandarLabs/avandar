@@ -1,0 +1,17 @@
+/*
+ * The stacked rows: a plain table that scrolls sideways inside the lit
+ * column when the combined dataset has many columns.
+ */
+.combinedPreviewScroller {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.combinedPreviewCell {
+  white-space: nowrap;
+}
+
+.combinedPreviewEmpty {
+  color: var(--mantine-color-dimmed);
+  font-style: italic;
+}

@@ -19,6 +19,7 @@ import { useMemo, useState } from "react";
 import { match } from "ts-pattern";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { VirtualDatasetClient } from "@/clients/datasets/source-datasets/VirtualDatasetClient";
+import { useNotifyDatasetDeleteError } from "@/hooks/datasets/useNotifyDatasetDeleteError/useNotifyDatasetDeleteError";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { buildSelectAllPreviewSql } from "@/views/DataExplorerApp/OpenDatasetDrawer/buildSelectAllPreviewSql";
@@ -90,14 +91,17 @@ export function SavedDatasetsView({ onOpen }: Props): JSX.Element {
       : undefined;
   }, [filtered, selectedDatasetId]);
 
+  const notifyDeleteError = useNotifyDatasetDeleteError({
+    onOtherError: (error) => {
+      notifyError(t`Failed to delete dataset: ${error.message}`);
+    },
+  });
   const [deleteDataset, isDeletingDataset] = DatasetClient.useFullDelete({
     queryToInvalidate: DatasetClient.QueryKeys.getAll(),
     onSuccess: () => {
       notifySuccess(t`Dataset deleted.`);
     },
-    onError: (error) => {
-      notifyError(t`Failed to delete dataset: ${error.message}`);
-    },
+    onError: notifyDeleteError,
   });
 
   const [loadVirtualDataset, isLoadingVirtualDataset] = useMutation({

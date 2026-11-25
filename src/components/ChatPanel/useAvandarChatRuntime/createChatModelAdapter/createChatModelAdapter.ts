@@ -1,6 +1,9 @@
 import { Model } from "@avandar/models";
 import { isNotNull, matchLiteral, propEq } from "@avandar/utils";
+import { PLUGIN_AI_TOOLS } from "$/agent/dataAgent/pluginAiTools.gen";
+import { HostedAnswerText } from "$/agent/HostedAnswerText/HostedAnswerText";
 import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
+import { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import { APIClient } from "@/clients/APIClient";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
 import { ChatViewEvent } from "@/components/ChatPanel/ChatViewEvent/ChatViewEvent";
@@ -36,16 +39,18 @@ import { LocalChatModelStore } from "@/stores/LocalChatModelStore/LocalChatModel
 import { OfflineModeStore } from "@/stores/OfflineModeStore/OfflineModeStore";
 import { DashboardEditorStateManager } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import { DataExplorerStateManager } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerStateManager";
+import type { PluginAiToolDeclaration } from "$/agent/dataAgent/pluginAiTools.types";
 import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage";
-import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse";
 import type { Gadget } from "$/models/gadgets/Gadget/Gadget";
 import type { User } from "$/models/User/User";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { ConsentAck } from "$/types/chat.types";
+import type { ChatSessionKind } from "@/components/ChatPanel/ChatSessionIndex/ChatSessionIndex";
 import type { ChatRuntimeCopy } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
 import type { AgentTurnGadgetContext } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentConversation.types";
 import type { DataAgentTurnOptions } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentTurnHelpers";
+import type { ActivePlugin } from "@/lib/plugins/getActivePluginsFromLoadablePlugins/getActivePluginsFromLoadablePlugins";
 import type { DashboardEditorAppState } from "@/views/DashboardApp/DashboardEditorStateManager/DashboardEditorStateManager";
 import type { useSqlToStructuredQuery } from "@/views/DataExplorerApp/QueryForm/useSqlToStructuredQuery";
 import type { ChatModelAdapter, ChatModelRunResult } from "@assistant-ui/react";
@@ -80,14 +85,30 @@ function _userModelContent(
 type ThreadMessages = Parameters<ChatModelAdapter["run"]>[0]["messages"];
 
 /**
+ * An assistant reply as a hosted model may read it. An offline answer, which
+ * read real gadget names, is a fixed line. A reply the chat shows with real
+ * values reads as the model wrote it, with its placeholders.
+ */
+function _toHostedAssistantContent(
+  metadata: Readonly<{ custom?: Record<string, unknown> }> | undefined,
+  text: string,
+): string {
+  return OfflineAnswerMessage.isOfflineAnswer(metadata)
+    ? OfflineAnswerMessage.hostedContent
+    : HostedAnswerText.getModelText({ text, metadata });
+}
+
+/**
  * The thread as the chat's models read it, mentions still as tokens. With
- * `hideOfflineAnswers`, each answer an offline turn produced reads as a
- * fixed line: an offline model read real gadget names, so its answer must
- * never reach a hosted model.
+ * `isForHostedModel`, each assistant reply reads as a hosted model may see
+ * it: an offline turn's answer as a fixed line, since an offline model read
+ * real gadget names and its answer must never reach a hosted model, and a
+ * hosted reply shown with real values as the text the model wrote. Without
+ * it, replies read as the chat shows them, for uses on the device.
  */
 function _toApiMessages(
   messages: ThreadMessages,
-  options: Readonly<{ hideOfflineAnswers: boolean }>,
+  options: Readonly<{ isForHostedModel: boolean }>,
 ): ChatClientMessage.T[] {
   return messages
     .map((threadMessage) => {
@@ -96,10 +117,8 @@ function _toApiMessages(
         return null;
       }
       const content =
-        options.hideOfflineAnswers &&
-        threadMessage.role === "assistant" &&
-        OfflineAnswerMessage.isOfflineAnswer(threadMessage.metadata)
-          ? OfflineAnswerMessage.hostedContent
+        options.isForHostedModel && threadMessage.role === "assistant"
+          ? _toHostedAssistantContent(threadMessage.metadata, text)
           : text;
       return matchLiteral(threadMessage.role, {
         system: Model.make("ChatClientMessage", {
@@ -124,8 +143,8 @@ function _toApiMessages(
 /** One turn's thread, in the form each path may read. */
 type TurnMessages = {
   /**
-   * The thread with its ref tokens and offline answers hidden. Only the
-   * agent path reads it.
+   * The thread with its ref tokens and offline answers hidden, and each
+   * hosted reply as the model wrote it. Only the agent path reads it.
    */
   apiMessages: ChatClientMessage.T[];
   /**
@@ -134,6 +153,11 @@ type TurnMessages = {
    * applying a response. Never posted to a hosted model.
    */
   localMessages: readonly ChatClientMessage.T[];
+  /**
+   * The thread with ref tokens kept and offline answers readable. Only
+   * offline agent turns read it; they name each token on the device.
+   */
+  localTokenMessages: readonly ChatClientMessage.T[];
   /**
    * The thread as today's hosted chat receives it, each mention named by
    * its type only (`@"a chart"`), and offline answers hidden. Its consent
@@ -206,20 +230,21 @@ async function _prepareTurnMessages(
   }>,
 ): Promise<TurnMessages> {
   const apiMessages = _toApiMessages(options.messages, {
-    hideOfflineAnswers: true,
+    isForHostedModel: true,
   });
   const gadgetContext = await _loadGadgetContext({
     apiMessages,
     attachedRefs: options.attachedRefs,
     workspaceId: options.workspaceId,
   });
+  // Offline answers and real values stay readable on the device.
+  const localTokenMessages = _toApiMessages(options.messages, {
+    isForHostedModel: false,
+  });
   return {
     apiMessages,
-    // Offline answers stay readable on the device.
-    localMessages: toLocalModelMessages(
-      _toApiMessages(options.messages, { hideOfflineAnswers: false }),
-      gadgetContext,
-    ),
+    localMessages: toLocalModelMessages(localTokenMessages, gadgetContext),
+    localTokenMessages,
     hostedChatMessages: toHostedChatMessages(apiMessages),
     gadgetContext,
     mentionCount: options.isAgentTurn
@@ -254,7 +279,38 @@ export type CreateChatModelAdapterOptions = {
   chatPanelDispatch: ReturnType<typeof ChatPanelStateManager.useDispatch>;
   /** The chat's context tray, read when a turn starts. */
   contextTrayRef: MutableRefObject<readonly Gadget.Ref[]>;
+  /** The selected session's reply path, read when a turn starts. */
+  sessionKindRef: MutableRefObject<ChatSessionKind>;
+  /** The selected chat session, for the dashboard cards a turn reports. */
+  activeSessionIdRef: MutableRefObject<string | undefined>;
+  /** The hosted agent turn's mask, retained until its reply is persisted. */
+  titleMaskRef?: MutableRefObject<((text: string) => string) | undefined>;
+  /**
+   * The plugins active in the workspace, from `ActivePluginsContext`. Read
+   * each time the agent starts answering, so its plugin AI tools follow
+   * installs during a conversation. Omitted: the agent gets no plugin tools.
+   */
+  activePluginsRef?: MutableRefObject<readonly ActivePlugin[]>;
 };
+
+/**
+ * Makes the getter that lists the generated plugin AI tools whose plugin
+ * is active right now.
+ */
+function _buildPluginAiToolsGetter(
+  activePluginsRef: MutableRefObject<readonly ActivePlugin[]> | undefined,
+): () => readonly PluginAiToolDeclaration[] {
+  return () => {
+    const activePluginIds = new Set(
+      (activePluginsRef?.current ?? []).map((plugin) => {
+        return plugin.entry.id;
+      }),
+    );
+    return PLUGIN_AI_TOOLS.filter((tool) => {
+      return activePluginIds.has(tool.pluginId);
+    });
+  };
+}
 
 /**
  * Runs a turn with the data agent on any page. The agent, and the code
@@ -327,6 +383,10 @@ function _isAbortError(error: unknown): boolean {
   );
 }
 
+function _identityTitleMask(text: string): string {
+  return text;
+}
+
 /**
  * Handles a failed agent turn like `_recoverFromChatFailure`, except for its
  * last step: a failure that would be rethrown becomes a reply instead, so
@@ -376,9 +436,16 @@ export function createChatModelAdapter(
     dashboardEditorDispatch,
     chatPanelDispatch,
     contextTrayRef,
+    sessionKindRef,
+    activeSessionIdRef,
+    titleMaskRef,
   } = options;
+  const getPluginAiTools = _buildPluginAiToolsGetter(options.activePluginsRef);
   return {
     run: async ({ messages }): Promise<ChatModelRunResult> => {
+      if (titleMaskRef) {
+        titleMaskRef.current = undefined;
+      }
       const generation = chatGenerationRef.current;
       const isGenerationStale = (): boolean => {
         return chatGenerationRef.current !== generation;
@@ -399,8 +466,7 @@ export function createChatModelAdapter(
       const currentDashboardEditorState = dashboardEditorStateRef.current;
       // Only an agent turn reads the tray. Today's chat never sees it.
       const isAgentTurn =
-        currentPageContext.app !== "case-manager" &&
-        DataAgentFeature.isEnabled();
+        sessionKindRef.current === "data" && DataAgentFeature.isEnabled();
       const attachedRefs = isAgentTurn ? contextTrayRef.current : [];
       const turnMessages = await _prepareTurnMessages({
         messages,
@@ -502,6 +568,9 @@ export function createChatModelAdapter(
         pageContext: currentPageContext,
       });
 
+      // Both chat events name the page the same way.
+      const analyticsApp =
+        ChatAnalyticsPayloads.toAnalyticsApp(currentPageContext);
       if (
         lastUserMessage &&
         !shouldSkipUserMessageConsent(lastUserMessage.content)
@@ -509,14 +578,7 @@ export function createChatModelAdapter(
         void AnalyticsClient.logEvent({
           event: "chat.message_sent",
           workspaceId,
-          app:
-            currentPageContext.app === "data-explorer"
-              ? "data_explorer"
-              : currentPageContext.app === "dashboards"
-                ? "dashboards"
-                : currentPageContext.app === "data-sources"
-                  ? "data_sources"
-                  : undefined,
+          app: analyticsApp,
           payload: ChatAnalyticsPayloads.fromMessage({
             content: lastUserMessage.content,
             pageContext: currentPageContext,
@@ -562,20 +624,43 @@ export function createChatModelAdapter(
         workspaceId,
         currentUser,
         chatGeneration: generation,
+        isStale: isGenerationStale,
+        copy: { chartNotBuilt: copyRef.current.chartNotBuilt },
+        titleMaskRef,
         parseSqlRef,
         dataExplorerDispatch,
         chatPanelDispatch,
+        getPluginAiTools,
+        workspaceSlug: workspaceRef.current.slug,
+        analyticsApp,
+        dashboardEditor: {
+          activeDashboardId: currentDashboardEditorState.activeDashboardId,
+          dispatch: dashboardEditorDispatch,
+          getState: () => {
+            return dashboardEditorStateRef.current;
+          },
+        },
+        sessionId: activeSessionIdRef.current,
       };
 
       // Every answer an offline turn produces is marked, so a hosted
       // request later reads a fixed line in its place.
       const runOfflineTurn = async (): Promise<ChatModelRunResult> => {
+        if (titleMaskRef && currentPageContext.app !== "data-explorer") {
+          titleMaskRef.current = _identityTitleMask;
+        }
         const result = await runLocalChatTurn({
           dataAgentTurn: {
             ...dataAgentTurn,
-            apiMessages: localMessages,
-            gadgetContext: undefined,
+            apiMessages: turnMessages.localTokenMessages,
             questionLabel: turnMessages.questionLabel,
+          },
+          pipelineMessages: localMessages,
+          isCaseDesign: sessionKindRef.current === "case-design",
+          page: {
+            pathname: currentPathname,
+            chatPageContext: currentPageContext,
+            dashboardEditorState: currentDashboardEditorState,
           },
           workspace: workspaceRef.current,
           pageContext: currentPageContext,
@@ -618,13 +703,22 @@ export function createChatModelAdapter(
           ? buildRetryContext(cachedTurn.response)
           : undefined;
 
+      // A case-design session is today's case-manager chat on every page.
+      const hostedPageContext =
+        sessionKindRef.current === "case-design"
+          ? ChatPageContext.createCaseManagerViewContext()
+          : currentPageContext;
+
       try {
+        if (titleMaskRef) {
+          titleMaskRef.current = _identityTitleMask;
+        }
         const response = await APIClient.post({
           route: "chat/:workspaceId/messages",
           pathParams: { workspaceId },
           body: {
             messages: [...hostedChatMessages],
-            context: currentPageContext,
+            context: hostedPageContext,
             ...(consentAcks.length > 0 ? { consentAcks } : {}),
             ...(retryContext ? { retryContext } : {}),
           },

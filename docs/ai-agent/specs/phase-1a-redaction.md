@@ -169,7 +169,8 @@ and the result card stores the restored SQL locally, as it does today.
   for display is a UX follow-up, and it must wait: the reply is saved in
   the thread and replayed to the model in the recap after a reload, so
   the recap path has to be redacted first or the value would reach the
-  model.
+  model. Updated 2026-11-18: built. Replies show real values, and the
+  recap and later requests read the model's own text (D39).
 - **Over-redaction.** Any column outside the page's datasets counts as
   personal, so literals compared with a SELECT alias (`HAVING "deaths" >
   100`) become placeholders. Answers stay correct through the round trip;

@@ -53,7 +53,8 @@
 /*
  * The rail sits on the tinted body surface so the content column stays the
  * only lit region. It scrolls on its own: a fifty-column outline should not
- * drag the record's facts off screen.
+ * drag the record's facts off screen. A view whose rail holds a table sets
+ * `--ava-app-view-rail-width` through `className` to widen it.
  */
 .appViewBodyRail {
   background-color: var(--ava-surface-body);
@@ -64,7 +65,7 @@
   padding: var(--mantine-spacing-lg) var(--mantine-spacing-md)
     var(--mantine-spacing-xl);
   scrollbar-width: thin;
-  width: calc(15rem * var(--mantine-scale));
+  width: var(--ava-app-view-rail-width, calc(15rem * var(--mantine-scale)));
 }
 
 /*

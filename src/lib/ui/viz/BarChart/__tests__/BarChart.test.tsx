@@ -199,6 +199,22 @@ it("series stackId reaches barProps callback output", () => {
   expect(props.barProps({ name: "v" }).stackId).toBe("g1");
 });
 
+it('passes barGap "none" as barChartProps.barCategoryGap 0', () => {
+  renderBar({ ...BAR_BASELINE, barGap: "none" });
+  const props = lastProps<{ barChartProps: { barCategoryGap?: number } }>(
+    mantineBarChartMock,
+  );
+  expect(props.barChartProps.barCategoryGap).toBe(0);
+});
+
+it("leaves barCategoryGap unset for the default bar gap", () => {
+  renderBar({ ...BAR_BASELINE, barGap: "default" });
+  const props = lastProps<{ barChartProps: { barCategoryGap?: number } }>(
+    mantineBarChartMock,
+  );
+  expect(props.barChartProps).not.toHaveProperty("barCategoryGap");
+});
+
 it("renders CompositeChart when any series renderAs differs", () => {
   renderBar({
     ...BAR_BASELINE,
@@ -214,6 +230,21 @@ it("renders CompositeChart when any series renderAs differs", () => {
   }>(mantineCompositeChartMock);
   expect(props.series[0]).toMatchObject({ name: "v", type: "bar" });
   expect(props.series[1]).toMatchObject({ name: "w", type: "line" });
+});
+
+it('passes barGap "none" to a composite chart as composedChartProps.barCategoryGap 0', () => {
+  renderBar({
+    ...BAR_BASELINE,
+    barGap: "none",
+    series: [
+      { renderAs: "bar", key: "v" },
+      { renderAs: "line", key: "w" },
+    ],
+  });
+  const props = lastProps<{
+    composedChartProps: { barCategoryGap?: number };
+  }>(mantineCompositeChartMock);
+  expect(props.composedChartProps.barCategoryGap).toBe(0);
 });
 
 it("composite line series strokeWidth flows through lineProps", () => {

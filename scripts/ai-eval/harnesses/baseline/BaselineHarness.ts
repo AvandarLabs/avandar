@@ -1,5 +1,9 @@
+import { omit } from "@avandar/utils";
+import { getGadgetTypeName } from "$/agent/mentions/AgentGadgetContext";
+import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
 import { DiscoveryCandidateValues } from "@/components/ChatPanel/ClarificationCard/DiscoveryCandidateValues/DiscoveryCandidateValues";
 import { DiscoveryContinuationMessage } from "@/components/ChatPanel/DiscoveryContinuationMessage/DiscoveryContinuationMessage";
+import { buildRetryContext } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
 import { detectPii } from "@/components/privacy/privacy-helpers/detectPii/detectPii";
 import { reviewGeneratedSqlAssumptions } from "@/components/privacy/privacy-helpers/generatedSqlAssumptions/generatedSqlAssumptions";
 import { isSchemaAnswerTurn } from "@/lib/agent/schemaAnswer/isSchemaAnswerTurn";
@@ -8,12 +12,22 @@ import { resolveEvalDiscovery } from "../../runtime/resolveEvalDiscovery";
 import { runEvalSql } from "../../runtime/runEvalSql";
 import { SimulatedUser } from "../../runtime/SimulatedUser";
 import { addEvalUsage, EMPTY_EVAL_USAGE } from "../EvalHarness";
+import {
+  getBaselineBlockOutcome,
+  toBaselinePageContext,
+} from "./baselinePageContext";
 import { DenoChatTurnRunner } from "./DenoChatTurnRunner";
+import type {
+  ChatGeneratedDashboardBlock,
+  ChatRetryContext,
+} from "$/types/chat.types";
 import type { EvalQuestion } from "../../EvalQuestion";
-import type { EvalDatabase } from "../../runtime/EvalDatabase";
+import type { EvalDatabase, EvalQueryResult } from "../../runtime/EvalDatabase";
 import type { SimulatedAnswer } from "../../runtime/SimulatedUser";
 import type { EvalAnswer, EvalConversation, EvalHarness } from "../EvalHarness";
+import type { BaselinePageContext } from "./baselinePageContext";
 import type { DenoChatTurnResponse } from "./DenoChatTurnRunner";
+import type { RetryContextSource } from "@/components/ChatPanel/useAvandarChatRuntime/chatRuntimeTurnHelpers";
 
 const MAX_MODEL_TURNS_PER_QUESTION = 6;
 
@@ -25,42 +39,14 @@ const COPY = {
     "I can only add that to a dashboard. Open a dashboard and ask me again there.",
 };
 
-type ThreadMessage = { role: "user" | "assistant"; content: string };
+/** What the first attempt records for a card the user left on screen. */
+const UNANSWERED_CARD_ANSWER = "(unanswered)";
 
-type ExplorerContext = {
-  app: "data-explorer";
-  openDatasetId?: string;
-  lastSql?: string;
-  lastResultColumns?: Array<{ name: string; dataType: string }>;
-  lastError?: string;
-};
+type ThreadMessage = { role: "user" | "assistant"; content: string };
 
 type Clarification = NonNullable<
   NonNullable<DenoChatTurnResponse["result"]>["clarification"]
 >;
-
-/**
- * Today's chat page context for a question whose screen is the Data
- * Explorer. Other screens leave the context as the conversation built it:
- * today's chat sees no tiles, maps, or case types.
- */
-function _toExplorerContext(
-  pageContext: NonNullable<EvalQuestion["pageContext"]>,
-): ExplorerContext {
-  const { dataset, explorer } = pageContext;
-  return {
-    app: "data-explorer",
-    ...(dataset ? { openDatasetId: dataset.id } : {}),
-    ...(explorer?.sql ? { lastSql: explorer.sql } : {}),
-    ...(explorer?.resultColumns.length
-      ? {
-          lastResultColumns: explorer.resultColumns.map((column) => {
-            return { ...column };
-          }),
-        }
-      : {}),
-  };
-}
 
 /** The reply text for applied SQL, as `applyChatTurnResponse` builds it. */
 function _buildThreadText(
@@ -77,12 +63,16 @@ function _buildThreadText(
 /** The SQL a response asks the explorer to run, with its chart type. */
 function _getAppliedSql(
   result: NonNullable<DenoChatTurnResponse["result"]>,
+  context: BaselinePageContext,
 ): { sql: string; vizType?: string } | undefined {
   if (result.generatedSql?.sql) {
     return { sql: result.generatedSql.sql };
   }
   const block = result.dashboardBlock;
-  if (block?.kind === "DataViz" && block.sql) {
+  if (
+    block?.kind === "DataViz" &&
+    getBaselineBlockOutcome(context, block).kind === "explorer_chart"
+  ) {
     return { sql: block.sql, vizType: block.vizType };
   }
   return undefined;
@@ -95,13 +85,42 @@ function _needsConsent(values: readonly string[]): boolean {
 }
 
 /**
+ * The thread and retry context today's chat sends when the user clicks Try
+ * again on the latest answer. assistant-ui drops the trailing assistant
+ * message, and the adapter describes the last response it got with
+ * `buildRetryContext`.
+ */
+export function buildBaselineTryAgainTurn(
+  options: Readonly<{
+    messages: readonly ThreadMessage[];
+    lastResult: Readonly<RetryContextSource> | undefined;
+  }>,
+): { messages: ThreadMessage[]; retryContext: ChatRetryContext | undefined } {
+  const isAssistantLast = options.messages.at(-1)?.role === "assistant";
+  return {
+    messages: isAssistantLast
+      ? options.messages.slice(0, -1)
+      : [...options.messages],
+    retryContext: options.lastResult
+      ? buildRetryContext(options.lastResult)
+      : undefined,
+  };
+}
+
+/**
  * The `chat` edge function as the app runs it today, with the Data Explorer's
  * client behavior played by the eval: lookups run locally, clarification cards
  * are answered by the simulated user, and SQL runs in DuckDB.
  */
 class BaselineConversation implements EvalConversation {
   private readonly messages: ThreadMessage[] = [];
-  private context: ExplorerContext = { app: "data-explorer" };
+  private context: BaselinePageContext = { app: "data-explorer" };
+  /** The last model call's response, which a Try again describes. */
+  private lastResult: DenoChatTurnResponse["result"] = undefined;
+  /** Sent with the next model call only: a Try again's first call. */
+  private pendingRetryContext: ChatRetryContext | undefined = undefined;
+  /** The attempt ends at its first card, left unanswered on screen. */
+  private isFirstCardLeftOpen = false;
 
   constructor(
     private readonly runner: DenoChatTurnRunner,
@@ -110,19 +129,63 @@ class BaselineConversation implements EvalConversation {
   ) {}
 
   async ask(question: EvalQuestion): Promise<EvalAnswer> {
+    // Today's chat hears each mention by its type only (D42).
+    this.messages.push({
+      role: "user",
+      content: ChatMentionToken.toModelText(question.prompt, getGadgetTypeName),
+    });
+    if (!question.tryAgain) {
+      return this.runAttempt(question);
+    }
+    return this.askTryAgain(question, question.tryAgain);
+  }
+
+  /**
+   * Answers the question once, then again as today's chat does when the
+   * user clicks Try again: on the thread without the last reply, with the
+   * retry context on the first model call. Returns the second attempt, with
+   * the first beside it.
+   */
+  private async askTryAgain(
+    question: EvalQuestion,
+    tryAgain: NonNullable<EvalQuestion["tryAgain"]>,
+  ): Promise<EvalAnswer> {
+    this.isFirstCardLeftOpen = tryAgain.isFirstCardUnanswered === true;
+    const firstAttempt = await this.runAttempt(question);
+    this.isFirstCardLeftOpen = false;
+    const retryTurn = buildBaselineTryAgainTurn({
+      messages: this.messages,
+      lastResult: this.lastResult,
+    });
+    this.messages.splice(0, this.messages.length, ...retryTurn.messages);
+    this.pendingRetryContext = retryTurn.retryContext;
+    const secondAttempt = await this.runAttempt(question);
+    return {
+      ...secondAttempt,
+      // The question cost both attempts. Its latency stays the second
+      // attempt's: the wait after the user clicks Try again.
+      usage: addEvalUsage(firstAttempt.usage, secondAttempt.usage),
+      firstAttempt: omit(firstAttempt, ["result", "firstAttempt"]),
+    };
+  }
+
+  /**
+   * Runs model calls on the thread as it stands until the question is
+   * answered.
+   */
+  private async runAttempt(question: EvalQuestion): Promise<EvalAnswer> {
     const startedAt = performance.now();
     const answer: EvalAnswer = {
       assistantText: "",
       clarifications: [],
       consentPrompts: 0,
       valuesSentToModel: [],
+      toolNames: [],
       usage: EMPTY_EVAL_USAGE,
       latencyMs: 0,
+      dashboardWrites: [],
     };
-    if (question.pageContext?.app === "data-explorer") {
-      this.context = _toExplorerContext(question.pageContext);
-    }
-    this.messages.push({ role: "user", content: question.prompt });
+    this.context = toBaselinePageContext(question) ?? this.context;
     for (let turn = 0; turn < MAX_MODEL_TURNS_PER_QUESTION; turn += 1) {
       const isDone = await this.runModelTurn(question, answer);
       if (isDone) {
@@ -136,6 +199,55 @@ class BaselineConversation implements EvalConversation {
     };
   }
 
+  /** One model call on the thread, its usage added to the answer. */
+  private async callModel(answer: EvalAnswer): Promise<DenoChatTurnResponse> {
+    const retryContext = this.pendingRetryContext;
+    this.pendingRetryContext = undefined;
+    const response = await this.runner.runTurn({
+      messages: this.messages,
+      context: this.context,
+      model: this.model,
+      retryContext,
+      schema: COVID_WORKSPACE_SCHEMA,
+    });
+    answer.usage = addEvalUsage(
+      answer.usage,
+      response.usage ?? EMPTY_EVAL_USAGE,
+    );
+    this.lastResult = response.result;
+    return response;
+  }
+
+  /**
+   * Adds the card's text to the thread and has the simulated user answer
+   * it, which leaves the question open. A card the attempt leaves on screen
+   * ends the attempt unanswered instead.
+   */
+  private async applyClarification(
+    options: Readonly<{
+      question: EvalQuestion;
+      assistantText: string;
+      clarification: Clarification;
+      answer: EvalAnswer;
+    }>,
+  ): Promise<boolean> {
+    const { question, assistantText, clarification, answer } = options;
+    this.messages.push({ role: "assistant", content: assistantText });
+    if (!this.isFirstCardLeftOpen) {
+      await this.answerClarification(question, clarification, answer);
+      return false;
+    }
+    this.isFirstCardLeftOpen = false;
+    answer.assistantText = assistantText;
+    answer.clarifications.push({
+      kind: clarification.responseShape.kind,
+      question: clarification.question,
+      answer: UNANSWERED_CARD_ANSWER,
+      isAutomatic: false,
+    });
+    return true;
+  }
+
   /**
    * Runs one model call and applies it. Returns true when the question is
    * answered.
@@ -144,22 +256,15 @@ class BaselineConversation implements EvalConversation {
     question: EvalQuestion,
     answer: EvalAnswer,
   ): Promise<boolean> {
-    const response = await this.runner.runTurn({
-      messages: this.messages,
-      context: this.context,
-      model: this.model,
-      retryContext: undefined,
-      schema: COVID_WORKSPACE_SCHEMA,
-    });
-    answer.usage = addEvalUsage(
-      answer.usage,
-      response.usage ?? EMPTY_EVAL_USAGE,
-    );
+    const response = await this.callModel(answer);
     if (!response.result) {
       answer.error = `Chat request failed: ${response.error ?? "no response"}`;
       return true;
     }
-    const appliedSql = _getAppliedSql(response.result);
+    if (await this.applyDashboardBlock(response.result, answer)) {
+      return true;
+    }
+    const appliedSql = _getAppliedSql(response.result, this.context);
     const userTexts = this.messages.flatMap((message) => {
       return message.role === "user" ? [message.content] : [];
     });
@@ -173,17 +278,14 @@ class BaselineConversation implements EvalConversation {
       await this.applySql(appliedSql, response.result.assistantText, answer);
       return true;
     }
-    if (response.result.clarification) {
-      this.messages.push({
-        role: "assistant",
-        content: response.result.assistantText,
-      });
-      await this.answerClarification(
+    const { clarification } = response.result;
+    if (clarification) {
+      return this.applyClarification({
         question,
-        response.result.clarification,
+        assistantText: response.result.assistantText,
+        clarification,
         answer,
-      );
-      return false;
+      });
     }
     const text = response.result.dashboardBlock
       ? COPY.dashboardOnly
@@ -192,6 +294,54 @@ class BaselineConversation implements EvalConversation {
     answer.assistantText = text;
     answer.error = "Answered in text without running a query";
     return true;
+  }
+
+  /**
+   * Adds a block to the open editor's dashboard, or drops it on a page
+   * without one, as the app does. Returns false when the block is the
+   * Data Explorer's to handle, or there is none.
+   */
+  private async applyDashboardBlock(
+    result: NonNullable<DenoChatTurnResponse["result"]>,
+    answer: EvalAnswer,
+  ): Promise<boolean> {
+    const block = result.dashboardBlock;
+    if (!block) {
+      return false;
+    }
+    const outcome = getBaselineBlockOutcome(this.context, block);
+    if (
+      outcome.kind === "explorer_chart" ||
+      outcome.kind === "dashboard_only"
+    ) {
+      return false;
+    }
+    this.messages.push({ role: "assistant", content: result.assistantText });
+    answer.assistantText = result.assistantText;
+    if (outcome.kind === "dropped") {
+      answer.error = "Offered a dashboard block with no editor open";
+      return true;
+    }
+    answer.dashboardWrites?.push({
+      dashboardId: outcome.dashboardId,
+      via: "editor",
+      block,
+      ...(await this.runBlockSql(block)),
+    });
+    return true;
+  }
+
+  /** A DataViz block's result, the way the editor would run its SQL. */
+  private async runBlockSql(
+    block: ChatGeneratedDashboardBlock,
+  ): Promise<{ result?: EvalQueryResult; error?: string }> {
+    if (block.kind !== "DataViz") {
+      return {};
+    }
+    const outcome = await runEvalSql(this.database, block.sql);
+    return outcome.kind === "failed"
+      ? { error: outcome.error }
+      : { result: outcome.result };
   }
 
   private async applySql(
@@ -210,8 +360,14 @@ class BaselineConversation implements EvalConversation {
     answer.assistantText = threadText;
     answer.finalSql = appliedSql.sql;
     answer.vizType = appliedSql.vizType;
+    // The page context follows the route: SQL applied on another page does
+    // not turn it into the Data Explorer.
+    const isOnExplorer = this.context.app === "data-explorer";
     if (outcome.kind === "failed") {
       answer.error = outcome.error;
+      if (!isOnExplorer) {
+        return;
+      }
       this.context = {
         app: "data-explorer",
         lastSql: appliedSql.sql,
@@ -220,6 +376,9 @@ class BaselineConversation implements EvalConversation {
       return;
     }
     answer.result = outcome.result;
+    if (!isOnExplorer) {
+      return;
+    }
     this.context = {
       app: "data-explorer",
       lastSql: appliedSql.sql,

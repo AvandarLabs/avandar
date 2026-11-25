@@ -1,0 +1,17 @@
+{
+  "label": "phase-1d:diag-p04-v5",
+  "questionCount": 1,
+  "passCount": 0,
+  "needlessQuestions": 0,
+  "missedQuestions": 1,
+  "consentPrompts": 0,
+  "modelCalls": 1,
+  "promptTokens": 4079,
+  "cachedPromptTokens": 4075,
+  "completionTokens": 281,
+  "totalCost": 0.00018165,
+  "costPerQuestion": 0.00018165,
+  "latencyMedianMs": 1799.00225,
+  "latencyP90Ms": 1799.00225,
+  "failedIds": ["P04"]
+}

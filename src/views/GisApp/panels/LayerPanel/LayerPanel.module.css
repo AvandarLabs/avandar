@@ -9,6 +9,46 @@
   outline-offset: -2px;
 }
 
+.layerListSection {
+  flex: none;
+  max-height: 100%;
+  min-height: 0;
+  overflow: auto;
+}
+
+/*
+ * Shut, the editor is clipped to nothing. Open, it takes the room under the
+ * list and scrolls there, so the list stays put.
+ */
+.layerEditor {
+  display: grid;
+  grid-template-rows: 0fr;
+  min-height: 0;
+  transition: grid-template-rows 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.layerEditor[data-open="true"] {
+  flex: 1 1 auto;
+  grid-template-rows: minmax(0, 1fr);
+  overflow: hidden;
+}
+
+.layerEditorInner {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.layerEditor[data-open="true"] .layerEditorInner {
+  height: 100%;
+}
+
+.layerEditor[data-open="true"] .layerEditorInner > * {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
 /* stylelint-disable-next-line container-name-pattern, value-keyword-case */
 @container mapShell (max-width: 792px) {
   .layerPanelHeaderAction {
@@ -16,5 +56,11 @@
     min-height: 44px;
     min-width: 44px;
     width: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layerEditor {
+    transition: none;
   }
 }

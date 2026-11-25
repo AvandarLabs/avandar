@@ -2,8 +2,7 @@ import { Box, Group, Text } from "@mantine/core";
 import { useI18nMessages } from "@ui/i18n/useI18nMessages";
 import { useState } from "react";
 import { EditButton } from "../buttons/EditButton";
-import { useCheckTruncatedText } from "../hooks/useCheckTruncatedText/useCheckTruncatedText";
-import { Tooltip } from "../Tooltip/Tooltip";
+import { TruncatedText } from "../text/TruncatedText";
 import { EditableDisplayTextEditor } from "./EditableDisplayTextEditor/EditableDisplayTextEditor";
 import type { EditableDisplayTextProps as Props } from "./EditableDisplayText.types";
 
@@ -50,14 +49,6 @@ export function EditableDisplayText({
     setIsEditing(false);
   };
 
-  const [displayTextRef, isDisplayTextTruncated] =
-    useCheckTruncatedText<HTMLParagraphElement>([
-      value,
-      hasText,
-      resolvedEmptyDisplayText,
-      passThroughProps.textarea,
-    ]);
-
   if (isEditing) {
     return (
       <EditableDisplayTextEditor
@@ -90,30 +81,17 @@ export function EditableDisplayText({
     );
   }
 
-  const labelForTooltip = hasText ? value : resolvedEmptyDisplayText;
-
   return (
     <Group gap="xxs" align="center" wrap="nowrap" w="100%" miw={0}>
       <Box miw={0} style={{ flex: 1 }}>
-        <Tooltip
-          label={labelForTooltip}
-          disabled={!isDisplayTextTruncated}
-          position="top"
+        <TruncatedText
+          c={hasText ? undefined : "dimmed"}
+          fs={hasText ? undefined : "italic"}
+          tooltipProps={{ position: "top" }}
+          {...displayTextProps}
         >
-          <Text
-            ref={displayTextRef}
-            display="block"
-            truncate
-            w="100%"
-            maw="100%"
-            miw={0}
-            c={hasText ? undefined : "dimmed"}
-            fs={hasText ? undefined : "italic"}
-            {...displayTextProps}
-          >
-            {hasText ? value : resolvedEmptyDisplayText}
-          </Text>
-        </Tooltip>
+          {hasText ? value : resolvedEmptyDisplayText}
+        </TruncatedText>
       </Box>
       <Box style={{ flexShrink: 0 }}>
         <EditButton onClick={onStartEditing} disabled={disabled} name={name} />

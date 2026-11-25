@@ -165,6 +165,23 @@ function _assertTransitionsMigration(generatedPath: string): void {
   ]);
 }
 
+function _assertCastDefaultMigrationExecution(generatedPath: string): void {
+  const sqliteResult = _runGeneratedMigration({
+    generatedPath,
+    sqliteScript: `import { Database } from "bun:sqlite";
+     import { readFileSync } from "node:fs";
+     const db = new Database(":memory:");
+     db.exec("create table dataset_columns__dictionary_bindings (id text primary key)");
+     db.exec("insert into dataset_columns__dictionary_bindings values ('existing')");
+     db.exec(readFileSync(process.argv[1], "utf8"));
+     console.log(JSON.stringify(db.query("select * from dataset_columns__dictionary_bindings").all()));`,
+  });
+  expect(sqliteResult.status, sqliteResult.stderr).toBe(0);
+  expect(JSON.parse(sqliteResult.stdout)).toEqual([
+    { id: "existing", value_overrides: "[]" },
+  ]);
+}
+
 describe("runGenerator", () => {
   it("applies the dashboard visibility override to the historical schema", () => {
     const sourceFile = "20260816020000_dashboard_visibility_model.sql";
@@ -241,5 +258,13 @@ alter table "public"."dashboards" validate constraint "dashboards__settled_snaps
       sourceFile,
     });
     _assertTransitionsMigration(generatedPath);
+  });
+
+  it("keeps a cast literal default so existing rows can take the new column", () => {
+    const generatedPath = _generateMigration({
+      migrationSql: `alter table "public"."dataset_columns__dictionary_bindings" add column "value_overrides" jsonb not null default '[]'::jsonb;`,
+      sourceFile: "20990101000000_cast_literal_default.sql",
+    });
+    _assertCastDefaultMigrationExecution(generatedPath);
   });
 });

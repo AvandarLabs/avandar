@@ -67,6 +67,21 @@ function _formatAssistant(
   return formatLocalAction({ kind: "reply", text });
 }
 
+/**
+ * A system message after the leading one. Chat templates for small models
+ * accept one system message, so an update with text reaches the model as a
+ * user message. A tool-only update has no text: the model already learns
+ * the current tools from the instructions and the action schema, so an empty
+ * user message would only be noise in its conversation.
+ */
+function _toLocalSystemUpdate(
+  message: SystemMessage,
+  isLeadingSystem: boolean,
+): LocalLlmMessage | undefined {
+  const content = isLeadingSystem ? "" : renderSystemMessageUpdate(message);
+  return content === "" ? undefined : { role: "user", content };
+}
+
 function _toLocalMessage(
   message: Message,
   isLeadingSystem: boolean,
@@ -74,11 +89,7 @@ function _toLocalMessage(
 ): LocalLlmMessage | undefined {
   switch (message.role) {
     case "system":
-      // Chat templates for small models accept one system message, so a
-      // later system update reaches the model as a user message.
-      return isLeadingSystem
-        ? undefined
-        : { role: "user", content: renderSystemMessageUpdate(message) };
+      return _toLocalSystemUpdate(message, isLeadingSystem);
     case "user":
       return { role: "user", content: contentText(message.content) };
     case "assistant":

@@ -1,4 +1,4 @@
-import { propNotEq } from "@avandar/utils";
+import { objectValues, propNotEq } from "@avandar/utils";
 import { P, match } from "ts-pattern";
 import { describe, expect, it } from "vitest";
 /**
@@ -75,6 +75,11 @@ function _readValues({
     .with({ vizType: P.union("pie", "funnel") }, (chart) => {
       return [row[chart.nameKey!], row[chart.valueKey!]];
     })
+    .with({ vizType: "plugin" }, (chart) => {
+      return objectValues(chart.columnSettings).map((name) => {
+        return row[name!];
+      });
+    })
     .exhaustive();
 }
 
@@ -135,7 +140,16 @@ const CONFIGS: AvaVizConfig.T[] = [
     seriesColors: { revenue: "#123456" },
   },
   { vizType: "table" },
+  {
+    vizType: "plugin",
+    pluginId: "avandar.epidemiology",
+    pluginVizId: "epicurve",
+    columnSettings: { date: CATEGORY_ID, count: REVENUE_ID },
+    settings: { interval: "epiWeek" },
+  },
 ];
+
+const PLUGIN_CONFIG = CONFIGS[9] as AvaVizConfig.Plugin;
 
 describe("makeUiVizConfigFromAvaVizConfig", () => {
   it.each(CONFIGS)(
@@ -297,4 +311,38 @@ describe("makeUiVizConfigFromAvaVizConfig", () => {
       expect(result.issues).toHaveLength(1);
     },
   );
+
+  it("leaves a plugin column setting unset when its column is missing", () => {
+    const result = makeUiVizConfigFromAvaVizConfig({
+      config: PLUGIN_CONFIG,
+      columns: COLUMNS.filter(propNotEq("id", CATEGORY_ID)),
+    });
+    expect(result.config).toEqual({
+      ...PLUGIN_CONFIG,
+      columnSettings: { date: undefined, count: "amount" },
+    });
+  });
+
+  it.each([undefined, null])(
+    "leaves a stored plugin config whose column settings are %s as it is",
+    (columnSettings) => {
+      const config = {
+        ...PLUGIN_CONFIG,
+        columnSettings,
+      } as unknown as AvaVizConfig.Plugin;
+      expect(
+        makeUiVizConfigFromAvaVizConfig({ config, columns: COLUMNS }),
+      ).toEqual({ config, issues: [] });
+    },
+  );
+
+  it("reports a missing plugin column setting by its setting key", () => {
+    const result = makeUiVizConfigFromAvaVizConfig({
+      config: PLUGIN_CONFIG,
+      columns: COLUMNS.filter(propNotEq("id", CATEGORY_ID)),
+    });
+    expect(result.issues).toEqual([
+      { target: "columnSettings.date", reason: "missing" },
+    ]);
+  });
 });

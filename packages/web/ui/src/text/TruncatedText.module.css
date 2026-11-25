@@ -1,0 +1,10 @@
+/*
+ * Fills the parent's content box and is allowed to shrink inside a flex or
+ * grid item. The ellipsis is measured on this element.
+ */
+.root {
+  display: block;
+  max-width: 100%;
+  min-width: 0;
+  width: 100%;
+}
