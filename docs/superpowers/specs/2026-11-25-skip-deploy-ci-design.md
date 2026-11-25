@@ -72,7 +72,7 @@ Non-markdown files inside `docs/`, `agent-skills/`, `.agents/`, `.claude/skills/
 - Treat `workflow_dispatch` as never skippable.
 - Fail closed (run CI) on empty commit ranges, all-zero `before` SHAs, unreachable SHAs, empty commits without `[skip deploy]`, type-changed files where either old or new mode is unsafe, and git errors.
 - Check merge commits via their subject or first-parent diff so `Release X.Y.Z` merges to `main` never skip.
-- Use `fetch-depth: 0` with `filter: blob:none` in the composite action so git inspects arbitrary commit counts quickly without downloading historical file blobs.
+- Use `fetch-depth: 0` with `filter: blob:none` in each workflow's `check-skip` checkout step (before calling the local composite action) so git inspects arbitrary commit counts quickly without downloading historical file blobs.
 
 ## Left to the Planner and Builder
 
