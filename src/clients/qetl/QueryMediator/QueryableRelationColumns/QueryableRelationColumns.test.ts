@@ -2,6 +2,7 @@
 
 import { beforeEach, describe, expect, it } from "vitest";
 import { QueryableRelationColumns } from "@/clients/qetl/QueryMediator/QueryableRelationColumns/QueryableRelationColumns";
+import { getProjectionKey } from "@/clients/qetl/QueryMediator/relationLoading/getColumnReplacementsFromColumns/getColumnReplacementsFromColumns";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 const DATASET_ID = "aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa" as Dataset.Id;
@@ -57,5 +58,89 @@ describe("QueryableRelationColumns", () => {
         now: Number.MAX_SAFE_INTEGER,
       }),
     ).toBe(false);
+  });
+
+  it("reports the projection a view was built with as current only for that key", () => {
+    QueryableRelationColumns.remember({
+      datasetId: DATASET_ID,
+      columns: "all",
+      staleAt: undefined,
+      projectionKey: "key-1",
+    });
+
+    expect(
+      QueryableRelationColumns.isProjectionCurrent({
+        datasetId: DATASET_ID,
+        projectionKey: "key-1",
+      }),
+    ).toBe(true);
+    expect(
+      QueryableRelationColumns.isProjectionCurrent({
+        datasetId: DATASET_ID,
+        projectionKey: "key-2",
+      }),
+    ).toBe(false);
+  });
+
+  it("never judges a view recorded without a key out of date", () => {
+    QueryableRelationColumns.remember({
+      datasetId: DATASET_ID,
+      columns: "all",
+      staleAt: undefined,
+    });
+
+    expect(
+      QueryableRelationColumns.isProjectionCurrent({
+        datasetId: DATASET_ID,
+        projectionKey: "key-1",
+      }),
+    ).toBe(true);
+  });
+
+  it("judges a view loaded outside the recorder current only while it needs no projection", () => {
+    // An upload's transcode loads its table as stored, with no renames,
+    // casts, or conversions.
+    expect(
+      QueryableRelationColumns.isProjectionCurrent({
+        datasetId: DATASET_ID,
+        projectionKey: getProjectionKey([]),
+      }),
+    ).toBe(true);
+    expect(
+      QueryableRelationColumns.isProjectionCurrent({
+        datasetId: DATASET_ID,
+        projectionKey: "key-1",
+      }),
+    ).toBe(false);
+  });
+
+  it("names the earliest stale-at time among the datasets it is asked about", () => {
+    const otherId = "bbbbbbbb-2222-4222-8222-bbbbbbbbbbbb" as Dataset.Id;
+    QueryableRelationColumns.remember({
+      datasetId: DATASET_ID,
+      columns: "all",
+      staleAt: 5_000,
+    });
+    QueryableRelationColumns.remember({
+      datasetId: otherId,
+      columns: "all",
+      staleAt: 2_000,
+    });
+
+    expect(
+      QueryableRelationColumns.getEarliestStaleAt([DATASET_ID, otherId]),
+    ).toBe(2_000);
+  });
+
+  it("names no stale-at time when none of the datasets goes stale", () => {
+    QueryableRelationColumns.remember({
+      datasetId: DATASET_ID,
+      columns: "all",
+      staleAt: undefined,
+    });
+
+    expect(
+      QueryableRelationColumns.getEarliestStaleAt([DATASET_ID]),
+    ).toBeUndefined();
   });
 });

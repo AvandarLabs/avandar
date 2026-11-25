@@ -1,0 +1,5 @@
+.columnTitle:global(.mantine-Text-root) {
+  flex: 1 1 auto;
+  font: inherit;
+  min-width: 0;
+}

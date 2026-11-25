@@ -143,11 +143,12 @@ async function _setRecordStatus(options: {
 }): Promise<void> {
   const { page } = options;
   await page.getByRole("link", { name: CASE_TYPE_NAME, exact: true }).click();
-  // Each row's link names the record after its status dot, and the record
-  // page's status control is a menu button named "Status: <current status>".
+  // Each row's link names the record between its status dot and its
+  // assignee, and the record page's status control is a menu button named
+  // "Status: <current status>".
   // Both match `case-statuses-record.spec.ts`.
   await page
-    .getByRole("link", { name: new RegExp(`${options.recordKey}$`) })
+    .getByRole("link", { name: new RegExp(`\\b${options.recordKey}\\b`) })
     .click();
   await page.getByRole("button", { name: /^Status: / }).click();
   await page

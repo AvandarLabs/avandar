@@ -1,13 +1,20 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ChatMentionToken } from "$/agent/mentions/ChatMentionToken";
+import { TRY_AGAIN_LINE } from "$/agent/pageContext/buildAgentTurnText";
+import { ExplorerPluginResultStore } from "@/lib/plugins/ExplorerPluginResultStore/ExplorerPluginResultStore";
+import { DASHBOARD_QUESTIONS } from "../../covid/covidDashboardQuestions";
 import { MENTION_QUESTIONS } from "../../covid/covidMentionQuestions";
 import { PAGE_QUESTIONS } from "../../covid/covidPageQuestions";
 import { createPiConversation } from "./PiHarness";
 import type { AgentGadgetContext } from "$/agent/mentions/AgentGadgetContext";
+import type { ChatGeneratedDashboardBlock } from "$/types/chat.types";
 import type { EvalQuestion } from "../../EvalQuestion";
 import type { EvalDatabase } from "../../runtime/EvalDatabase";
 import type { DataAgent } from "@/lib/agent/dataAgent/createDataAgent/createDataAgent";
-import type { DataAgentHost } from "@/lib/agent/dataAgent/DataAgentHost";
+import type {
+  DataAgentHost,
+  DataAgentUserAnswer,
+} from "@/lib/agent/dataAgent/DataAgentHost";
 
 const { runEvalSqlMock } = vi.hoisted(() => {
   return { runEvalSqlMock: vi.fn() };
@@ -86,6 +93,12 @@ describe("createPiConversation", () => {
     expect(answer.latencyMs).toBeGreaterThanOrEqual(0);
   });
 });
+
+function _pageQuestionById(id: string): EvalQuestion {
+  return PAGE_QUESTIONS.find((question) => {
+    return question.id === id;
+  })!;
+}
 
 /** P07: a dashboard chart filtered to Kings County, a personal column. */
 const P07 = PAGE_QUESTIONS.find((question) => {
@@ -392,5 +405,555 @@ describe("createPiConversation mention placeholders", () => {
       expect.anything(),
       `SELECT 1 FROM t WHERE "Admin2" = 'Kings'`,
     );
+  });
+});
+
+const FIT_QUESTION = {
+  id: "R01",
+  category: "page_context",
+  prompt: "Fit y on x for the result on screen.",
+  clarification: "not_needed",
+  truth: {},
+  fitRegression: {
+    rows: [{ x: 1, y: 3 }],
+    columns: ["x", "y"],
+    xColumn: "x",
+    yColumn: "y",
+    slope: 2,
+  },
+} as unknown as EvalQuestion;
+
+/** An agent that reads the store during `ask` and calls `fitRegression`. */
+function _createFitAgent(
+  seenDuringAsk: Array<ReturnType<typeof ExplorerPluginResultStore.get>>,
+): DataAgent {
+  const messages: unknown[] = [];
+  return {
+    agent: { state: { messages } },
+    ask: async () => {
+      seenDuringAsk.push(ExplorerPluginResultStore.get());
+      messages.push(
+        { role: "user", content: "Fit y on x for the result on screen." },
+        {
+          role: "assistant",
+          content: [
+            { type: "toolCall", id: "1", name: "fitRegression", arguments: {} },
+          ],
+        },
+      );
+      return {
+        text: "The slope is 2.",
+        state: { questions: [], valuesSentToModel: [] },
+        usage: {},
+      };
+    },
+  } as unknown as DataAgent;
+}
+
+describe("createPiConversation with a fitRegression question", () => {
+  it("shows the rows to the tool during ask, then clears them", async () => {
+    const seenDuringAsk: Array<
+      ReturnType<typeof ExplorerPluginResultStore.get>
+    > = [];
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      createAgent: () => {
+        return _createFitAgent(seenDuringAsk);
+      },
+    });
+
+    const answer = await conversation.ask(FIT_QUESTION);
+
+    expect(seenDuringAsk).toEqual([
+      {
+        columns: [
+          { name: "x", dataType: "double" },
+          { name: "y", dataType: "double" },
+        ],
+        rows: [{ x: 1, y: 3 }],
+      },
+    ]);
+    expect(ExplorerPluginResultStore.get()).toBeUndefined();
+    expect(answer.toolNames).toEqual(["fitRegression"]);
+  });
+
+  it("records no tool names for a question that calls none", async () => {
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      createAgent: _createFailingAgent,
+    });
+
+    const answer = await conversation.ask(QUESTION);
+
+    expect(answer.toolNames).toEqual([]);
+  });
+});
+
+describe("createPiConversation store isolation", () => {
+  it("does not clear rows a fit ask set when a non-fit ask finishes", async () => {
+    ExplorerPluginResultStore.set({
+      columns: [{ name: "x", dataType: "double" }],
+      rows: [{ x: 1 }],
+    });
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      createAgent: _createFailingAgent,
+    });
+
+    await conversation.ask(QUESTION);
+
+    expect(ExplorerPluginResultStore.get()?.rows).toEqual([{ x: 1 }]);
+    ExplorerPluginResultStore.clear();
+  });
+
+  it("does not write the store for a non-fit ask", async () => {
+    const seenDuringAsk: Array<
+      ReturnType<typeof ExplorerPluginResultStore.get>
+    > = [];
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      createAgent: () => {
+        return _createFitAgent(seenDuringAsk);
+      },
+    });
+
+    await conversation.ask(QUESTION);
+
+    expect(seenDuringAsk).toEqual([undefined]);
+  });
+});
+
+describe("createPiConversation on a device conversation", () => {
+  it("M06 keeps the county's real value instead of a placeholder", async () => {
+    const asked: string[] = [];
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      privacy: "device",
+      createAgent: () => {
+        return _createRecordingAgent(asked);
+      },
+    });
+
+    await conversation.ask(_questionById("M06"));
+
+    expect(asked[0]).toContain("Kings");
+    expect(asked[0]).not.toContain("<value 1>");
+  });
+});
+
+describe("createPiConversation with dashboard questions", () => {
+  const questionOf = (id: string): EvalQuestion => {
+    return DASHBOARD_QUESTIONS.find((question) => {
+      return question.id === id;
+    })!;
+  };
+
+  /** A fake agent that adds `block` to `dashboard` once. */
+  function _createAddingAgent(
+    host: DataAgentHost,
+    request: { dashboard: string; block: ChatGeneratedDashboardBlock },
+  ): DataAgent {
+    return {
+      agent: { state: { messages: [] } },
+      ask: async () => {
+        await host.addDashboardBlock!(request);
+        return {
+          text: "Added.",
+          state: { questions: [], valuesSentToModel: [] },
+          usage: {},
+        };
+      },
+    } as unknown as DataAgent;
+  }
+
+  it("records an editor write for the open dashboard", async () => {
+    const question = questionOf("D02");
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      createAgent: (host) => {
+        return _createAddingAgent(host, {
+          dashboard: "current",
+          block: { kind: "HeadingBlock", text: "Deaths in 2022" },
+        });
+      },
+    });
+
+    const answer = await conversation.ask(question);
+
+    expect(answer.dashboardWrites).toEqual([
+      {
+        dashboardId: question.openEditorDashboardId,
+        via: "editor",
+        block: { kind: "HeadingBlock", text: "Deaths in 2022" },
+      },
+    ]);
+  });
+
+  it("picks the scripted dashboard on the card and runs the chart", async () => {
+    runEvalSqlMock.mockResolvedValue({
+      kind: "rows",
+      result: { columns: [{ name: "value", type: "bigint" }], rows: [[1]] },
+    });
+    const question = questionOf("D09");
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      createAgent: (host) => {
+        return _createAddingAgent(host, {
+          dashboard: "COVID",
+          block: {
+            kind: "DataViz",
+            prompt: "Deaths",
+            sql: "SELECT 1",
+            vizType: "line",
+          },
+        });
+      },
+    });
+
+    const answer = await conversation.ask(question);
+
+    expect(answer.dashboardWrites).toEqual([
+      expect.objectContaining({
+        dashboardId: question.card?.pickDashboardId,
+        via: "card",
+        result: { columns: [{ name: "value", type: "bigint" }], rows: [[1]] },
+      }),
+    ]);
+  });
+
+  it("writes nothing for a name no dashboard has", async () => {
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      createAgent: (host) => {
+        return _createAddingAgent(host, {
+          dashboard: "Budget",
+          block: { kind: "HeadingBlock", text: "Spending" },
+        });
+      },
+    });
+
+    const answer = await conversation.ask(questionOf("D08"));
+
+    expect(answer.dashboardWrites).toEqual([]);
+  });
+});
+
+/**
+ * A data agent that records each message it is asked and, as the app's
+ * Data Explorer would, ends each answer with `sql` on screen.
+ */
+function _createQueryingAgent(
+  host: DataAgentHost,
+  asked: string[],
+  sql: string,
+): DataAgent {
+  return {
+    agent: { state: { messages: [] } },
+    ask: async (text: string) => {
+      asked.push(text);
+      await host.showQuery({ sql, summary: "Totals" });
+      return {
+        text: "Done.",
+        state: { questions: [], valuesSentToModel: [], lastQuery: { sql } },
+        usage: {},
+      };
+    },
+  } as unknown as DataAgent;
+}
+
+describe("createPiConversation with a default page", () => {
+  it("sends a plain question no page block when no default page is set", async () => {
+    const asked: string[] = [];
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      createAgent: () => {
+        return _createRecordingAgent(asked);
+      },
+    });
+
+    await conversation.ask(QUESTION);
+
+    expect(asked[0]).toBe("How many cases?");
+  });
+
+  it("sends a plain question the Data Explorer page block", async () => {
+    const asked: string[] = [];
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      defaultPage: "data-explorer",
+      createAgent: () => {
+        return _createRecordingAgent(asked);
+      },
+    });
+
+    await conversation.ask(QUESTION);
+
+    expect(asked[0]).toBe(
+      "<current_page>\nPage: Data Explorer\n</current_page>\n\nHow many cases?",
+    );
+  });
+
+  it("keeps a page question's own page instead of the default", async () => {
+    const asked: string[] = [];
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      defaultPage: "data-explorer",
+      createAgent: () => {
+        return _createRecordingAgent(asked);
+      },
+    });
+
+    await conversation.ask(_pageQuestionById("P05"));
+
+    expect(asked[0]).toContain("Page: Map");
+    expect(asked[0]).not.toContain("Data Explorer");
+  });
+
+  it("shows a follow-up the query and columns the last answer left on screen", async () => {
+    runEvalSqlMock.mockResolvedValue({
+      kind: "rows",
+      result: { columns: [{ name: "cases", type: "BIGINT" }], rows: [[42]] },
+    });
+    const asked: string[] = [];
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      defaultPage: "data-explorer",
+      createAgent: (host) => {
+        return _createQueryingAgent(host, asked, "SELECT 42 AS cases");
+      },
+    });
+
+    await conversation.ask(QUESTION);
+    await conversation.ask({ ...QUESTION, prompt: "and by month?" });
+
+    expect(asked[1]).toContain("Query on screen: SELECT 42 AS cases");
+    expect(asked[1]).toContain("Result columns: cases bigint");
+  });
+
+  it("sends the unchanged line when the page did not change", async () => {
+    const asked: string[] = [];
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      defaultPage: "data-explorer",
+      createAgent: () => {
+        return _createRecordingAgent(asked);
+      },
+    });
+
+    await conversation.ask(QUESTION);
+    await conversation.ask({ ...QUESTION, prompt: "and last year?" });
+
+    expect(asked[1]).toBe(
+      "<current_page>Unchanged since the last message.</current_page>\n\nand last year?",
+    );
+  });
+
+  it("sends a device conversation no page block while the Data Explorer shows nothing", async () => {
+    const asked: string[] = [];
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      privacy: "device",
+      defaultPage: "data-explorer",
+      createAgent: () => {
+        return _createRecordingAgent(asked);
+      },
+    });
+
+    await conversation.ask(QUESTION);
+    await conversation.ask({ ...QUESTION, prompt: "and last year?" });
+
+    expect(asked).toEqual(["How many cases?", "and last year?"]);
+  });
+
+  it("sends a device follow-up the query its last answer left on screen", async () => {
+    runEvalSqlMock.mockResolvedValue({
+      kind: "rows",
+      result: { columns: [{ name: "cases", type: "BIGINT" }], rows: [[42]] },
+    });
+    const asked: string[] = [];
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      privacy: "device",
+      defaultPage: "data-explorer",
+      createAgent: (host) => {
+        return _createQueryingAgent(host, asked, "SELECT 42 AS cases");
+      },
+    });
+
+    await conversation.ask(QUESTION);
+    await conversation.ask({ ...QUESTION, prompt: "and by month?" });
+    await conversation.ask({ ...QUESTION, prompt: "and by week?" });
+
+    expect(asked[0]).toBe("How many cases?");
+    expect(asked[1]).toContain("Query on screen: SELECT 42 AS cases");
+    expect(asked[2]).toContain(
+      "<current_page>Unchanged since the last message.</current_page>",
+    );
+  });
+});
+
+/** QUESTION as a Try again question. */
+const TRY_AGAIN_QUESTION = {
+  ...QUESTION,
+  id: "T02",
+  category: "try_again",
+  tryAgain: {},
+} as unknown as EvalQuestion;
+
+/**
+ * A data agent that records each message and answers "First." then
+ * "Second.". With `cardAnswers`, each ask shows one card first and records
+ * the host's answer to it.
+ */
+function _createTwoAttemptAgent(
+  host: DataAgentHost,
+  asked: string[],
+  cardAnswers?: DataAgentUserAnswer[],
+): DataAgent {
+  return {
+    agent: { state: { messages: [] } },
+    ask: async (text: string) => {
+      asked.push(text);
+      if (cardAnswers) {
+        cardAnswers.push(
+          await host.askUser({
+            question: "Which Georgia?",
+            options: ["The US state", "The country"],
+            isMulti: false,
+            kind: "choice",
+          }),
+        );
+      }
+      return {
+        text: asked.length === 1 ? "First." : "Second.",
+        state: { questions: [], valuesSentToModel: [] },
+        usage: {
+          calls: 1,
+          inputTokens: 10,
+          cachedInputTokens: 0,
+          outputTokens: 2,
+          reasoningTokens: 0,
+          cost: 0.001,
+        },
+      };
+    },
+  } as unknown as DataAgent;
+}
+
+/** A two-attempt agent whose first ask fails on a model call. */
+function _createFailingFirstAttemptAgent(
+  host: DataAgentHost,
+  asked: string[],
+): DataAgent {
+  const dataAgent = _createTwoAttemptAgent(host, asked);
+  return {
+    ...dataAgent,
+    ask: async (text: string) => {
+      const reply = await dataAgent.ask(text);
+      if (asked.length === 1) {
+        throw new Error("429 Too Many Requests");
+      }
+      return reply;
+    },
+  } as DataAgent;
+}
+
+describe("createPiConversation with a Try again question", () => {
+  it("asks twice on one conversation, the second time with the Try again line", async () => {
+    const asked: string[] = [];
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      createAgent: (host) => {
+        return _createTwoAttemptAgent(host, asked);
+      },
+    });
+
+    await conversation.ask(TRY_AGAIN_QUESTION);
+
+    expect(asked).toEqual([
+      "How many cases?",
+      `${TRY_AGAIN_LINE}\n\nHow many cases?`,
+    ]);
+  });
+
+  it("sends a device conversation's Try again no line", async () => {
+    const asked: string[] = [];
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      privacy: "device",
+      createAgent: (host) => {
+        return _createTwoAttemptAgent(host, asked);
+      },
+    });
+
+    await conversation.ask(TRY_AGAIN_QUESTION);
+
+    expect(asked).toEqual(["How many cases?", "How many cases?"]);
+  });
+
+  it("sends no Try again line after a first attempt that failed", async () => {
+    const asked: string[] = [];
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      createAgent: (host) => {
+        return _createFailingFirstAttemptAgent(host, asked);
+      },
+    });
+
+    await conversation.ask(TRY_AGAIN_QUESTION);
+
+    expect(asked).toEqual(["How many cases?", "How many cases?"]);
+  });
+
+  it("leaves the first attempt's first card on screen and answers the second's", async () => {
+    const asked: string[] = [];
+    const cardAnswers: DataAgentUserAnswer[] = [];
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      createAgent: (host) => {
+        return _createTwoAttemptAgent(host, asked, cardAnswers);
+      },
+    });
+
+    await conversation.ask({
+      ...TRY_AGAIN_QUESTION,
+      tryAgain: { isFirstCardUnanswered: true },
+    });
+
+    expect(cardAnswers).toEqual([
+      { kind: "deferred" },
+      { kind: "picked", values: ["The US state"] },
+    ]);
+  });
+
+  it("returns the second attempt, with the first kept beside it", async () => {
+    const asked: string[] = [];
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      createAgent: (host) => {
+        return _createTwoAttemptAgent(host, asked);
+      },
+    });
+
+    const answer = await conversation.ask(TRY_AGAIN_QUESTION);
+
+    expect(answer.assistantText).toBe("Second.");
+    expect(answer.firstAttempt?.assistantText).toBe("First.");
+    expect(answer.firstAttempt).not.toHaveProperty("result");
+  });
+
+  it("counts both attempts' model calls in the question's usage", async () => {
+    const asked: string[] = [];
+    const conversation = createPiConversation({
+      database: {} as EvalDatabase,
+      createAgent: (host) => {
+        return _createTwoAttemptAgent(host, asked);
+      },
+    });
+
+    const answer = await conversation.ask(TRY_AGAIN_QUESTION);
+
+    expect(answer.usage.calls).toBe(2);
+    expect(answer.firstAttempt?.usage.calls).toBe(1);
   });
 });

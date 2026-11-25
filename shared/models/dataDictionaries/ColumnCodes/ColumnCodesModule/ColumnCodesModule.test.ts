@@ -1,0 +1,425 @@
+import { describe, expect, it } from "vitest";
+import { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes.ts";
+
+const SEX_PAIRS: ColumnCodes.Pair[] = [
+  { code: "1", label: "Male", acceptedSpellings: ["M"], isMissing: false },
+  { code: "2", label: "Female", acceptedSpellings: ["F"], isMissing: false },
+  { code: "9", label: "Unknown", acceptedSpellings: [], isMissing: true },
+];
+
+/**
+ * A binding's fields that only conversions set, as a reference binding has
+ * them.
+ */
+const REFERENCE_FIELDS = {
+  keepsOriginal: false,
+  pinnedPairs: undefined,
+  pinnedIsOrdered: undefined,
+  appliedDictionaryVersion: 2,
+};
+
+const ROWS: ColumnCodes.Rows = {
+  bindings: [
+    {
+      id: "binding-gender",
+      datasetColumnId: "col-gender",
+      dictionaryId: "dict-1",
+      entryId: "entry-sex",
+      codeListId: "list-sex",
+      mode: "reference",
+      direction: "decode",
+      ...REFERENCE_FIELDS,
+    },
+    {
+      id: "binding-case",
+      datasetColumnId: "col-case",
+      dictionaryId: "dict-1",
+      entryId: "entry-case",
+      codeListId: undefined,
+      mode: "reference",
+      direction: "decode",
+      ...REFERENCE_FIELDS,
+    },
+    {
+      id: "binding-orphan",
+      datasetColumnId: "col-orphan",
+      dictionaryId: undefined,
+      entryId: undefined,
+      codeListId: undefined,
+      mode: "reference",
+      direction: "decode",
+      ...REFERENCE_FIELDS,
+    },
+  ],
+  dictionaries: [{ id: "dict-1", name: "NYS measles case report", version: 3 }],
+  entries: [
+    { id: "entry-sex", name: "sex", description: "Sex on the report." },
+    { id: "entry-case", name: "case_id", description: undefined },
+  ],
+  codeLists: [
+    { id: "list-sex", name: "Sex (1/2/9)", isOrdered: false, pairs: SEX_PAIRS },
+  ],
+};
+
+describe("ColumnCodes.fromRows", () => {
+  it("joins a binding to its dictionary, entry, and code list", () => {
+    const codes = ColumnCodes.fromRows(ROWS).get("col-gender");
+
+    expect(codes).toMatchObject({
+      dictionaryName: "NYS measles case report",
+      entryName: "sex",
+      codeListName: "Sex (1/2/9)",
+      description: "Sex on the report.",
+      pairs: SEX_PAIRS,
+    });
+  });
+
+  it("keeps a description-only binding with no pairs", () => {
+    const codes = ColumnCodes.fromRows(ROWS).get("col-case");
+
+    expect(codes?.pairs).toEqual([]);
+    expect(codes?.codeListName).toBeUndefined();
+  });
+
+  it("leaves out a binding whose entry is gone", () => {
+    expect(ColumnCodes.fromRows(ROWS).has("col-orphan")).toBe(false);
+  });
+
+  it("gives a reference binding its versions and no pin", () => {
+    expect(ColumnCodes.fromRows(ROWS).get("col-gender")).toMatchObject({
+      isPinned: false,
+      isSourceDeleted: false,
+      keepsOriginal: false,
+      appliedDictionaryVersion: 2,
+      currentDictionaryVersion: 3,
+      direction: "decode",
+    });
+  });
+
+  it("describes a decoded column by the labels it now holds", () => {
+    const rows: ColumnCodes.Rows = {
+      ...ROWS,
+      bindings: [
+        { ...ROWS.bindings[0]!, mode: "convert", direction: "decode" },
+      ],
+    };
+
+    expect(ColumnCodes.fromRows(rows).get("col-gender")?.direction).toBe(
+      "encode",
+    );
+  });
+
+  it("describes an encoded column by the codes it now holds", () => {
+    const rows: ColumnCodes.Rows = {
+      ...ROWS,
+      bindings: [
+        { ...ROWS.bindings[0]!, mode: "convert", direction: "encode" },
+      ],
+    };
+
+    expect(ColumnCodes.fromRows(rows).get("col-gender")?.direction).toBe(
+      "decode",
+    );
+  });
+
+  it("shows a pinned binding's pairs and order, not the live list's", () => {
+    const pinnedPairs = [SEX_PAIRS[0]!];
+    const rows: ColumnCodes.Rows = {
+      ...ROWS,
+      bindings: [
+        {
+          ...ROWS.bindings[0]!,
+          mode: "convert",
+          pinnedPairs,
+          pinnedIsOrdered: true,
+        },
+      ],
+    };
+
+    expect(ColumnCodes.fromRows(rows).get("col-gender")).toMatchObject({
+      pairs: pinnedPairs,
+      isOrdered: true,
+      isPinned: true,
+    });
+  });
+
+  it("keeps a pinned binding whose dictionary was deleted, with blank names", () => {
+    const rows: ColumnCodes.Rows = {
+      ...ROWS,
+      bindings: [
+        {
+          ...ROWS.bindings[2]!,
+          mode: "convert",
+          pinnedPairs: SEX_PAIRS,
+          pinnedIsOrdered: false,
+        },
+      ],
+    };
+
+    expect(ColumnCodes.fromRows(rows).get("col-orphan")).toMatchObject({
+      dictionaryId: "",
+      dictionaryName: "",
+      entryName: "",
+      pairs: SEX_PAIRS,
+      isSourceDeleted: true,
+      currentDictionaryVersion: undefined,
+      direction: "encode",
+    });
+  });
+});
+
+describe("ColumnCodes.fromStoredPairs", () => {
+  it("reads stored snake_case pairs", () => {
+    expect(
+      ColumnCodes.fromStoredPairs([
+        {
+          code: "1",
+          label: "Male",
+          accepted_spellings: ["M"],
+          is_missing: false,
+        },
+      ]),
+    ).toEqual([
+      { code: "1", label: "Male", acceptedSpellings: ["M"], isMissing: false },
+    ]);
+  });
+
+  it("skips a pair without a code", () => {
+    expect(ColumnCodes.fromStoredPairs([{ label: "Male" }, "junk"])).toEqual(
+      [],
+    );
+  });
+});
+
+describe("ColumnCodes.formatPairs", () => {
+  it("writes codes with their labels and marks missing values", () => {
+    expect(
+      ColumnCodes.formatPairs({ direction: "decode", pairs: SEX_PAIRS }),
+    ).toBe("1=Male, 2=Female, 9=Unknown (missing)");
+  });
+
+  it("says when a code has no label yet", () => {
+    expect(
+      ColumnCodes.formatPairs({
+        direction: "decode",
+        pairs: [{ ...SEX_PAIRS[0]!, label: "  " }],
+      }),
+    ).toBe("1=(no label)");
+  });
+
+  it("writes a label or code with a newline on one line", () => {
+    expect(
+      ColumnCodes.formatPairs({
+        direction: "decode",
+        pairs: [{ ...SEX_PAIRS[0]!, code: " 1\n", label: "Male\n  adult" }],
+      }),
+    ).toBe("1=Male adult");
+  });
+
+  it("quotes a label that holds a comma or an equals sign", () => {
+    expect(
+      ColumnCodes.formatPairs({
+        direction: "decode",
+        pairs: [
+          { ...SEX_PAIRS[0]!, label: "Yes, confirmed" },
+          { ...SEX_PAIRS[1]!, label: "a=b" },
+        ],
+      }),
+    ).toBe('1="Yes, confirmed", 2="a=b"');
+  });
+
+  it("escapes a quote inside a quoted label", () => {
+    expect(
+      ColumnCodes.formatPairs({
+        direction: "encode",
+        pairs: [{ ...SEX_PAIRS[0]!, label: 'Said "no", twice' }],
+      }),
+    ).toBe('"Said \\"no\\", twice"');
+  });
+
+  it("leaves a quote alone in a label that needs no quoting", () => {
+    expect(
+      ColumnCodes.formatPairs({
+        direction: "decode",
+        pairs: [{ ...SEX_PAIRS[0]!, label: 'The "other" one' }],
+      }),
+    ).toBe('1=The "other" one');
+  });
+
+  it("lists only the labels for a column that holds labels", () => {
+    expect(
+      ColumnCodes.formatPairs({ direction: "encode", pairs: SEX_PAIRS }),
+    ).toBe("Male, Female, Unknown (missing)");
+  });
+
+  it("stops after 30 pairs and says how many more there are", () => {
+    const pairs = Array.from({ length: 42 }, (_, index) => {
+      return {
+        code: String(index),
+        label: `Label ${index}`,
+        acceptedSpellings: [],
+        isMissing: false,
+      };
+    });
+
+    const text = ColumnCodes.formatPairs({ direction: "decode", pairs });
+
+    expect(text.endsWith("29=Label 29, and 12 more")).toBe(true);
+  });
+});
+
+describe("ColumnCodes.formatPairs caps and brackets", () => {
+  it("cuts a long label and a long code to 60 characters", () => {
+    const text = ColumnCodes.formatPairs({
+      direction: "decode",
+      pairs: [
+        { ...SEX_PAIRS[0]!, code: "c".repeat(80), label: "l".repeat(80) },
+      ],
+    });
+
+    expect(text).toBe(`${"c".repeat(57)}...=${"l".repeat(57)}...`);
+  });
+
+  it("quotes a label or code that holds a bracket", () => {
+    expect(
+      ColumnCodes.formatPairs({
+        direction: "decode",
+        pairs: [{ ...SEX_PAIRS[0]!, code: "[1]", label: "Male]" }],
+      }),
+    ).toBe('"[1]"="Male]"');
+  });
+
+  it("quotes a code that holds a comma", () => {
+    expect(
+      ColumnCodes.formatPairs({
+        direction: "decode",
+        pairs: [{ ...SEX_PAIRS[0]!, code: "1,2" }],
+      }),
+    ).toBe('"1,2"=Male');
+  });
+});
+
+describe("ColumnCodes.toPromptText", () => {
+  it("escapes a quote", () => {
+    expect(ColumnCodes.toPromptText('Said "no"')).toBe('Said \\"no\\"');
+  });
+
+  it("writes a newline as a space", () => {
+    expect(ColumnCodes.toPromptText(" Male\n  adult ")).toBe("Male adult");
+  });
+
+  it("cuts long text to 60 characters", () => {
+    expect(ColumnCodes.toPromptText("x".repeat(80))).toBe(
+      `${"x".repeat(57)}...`,
+    );
+  });
+});
+
+describe("ColumnCodes.fitToPromptBudget", () => {
+  it("keeps every text that fits", () => {
+    expect(ColumnCodes.fitToPromptBudget(["a", "", "b"])).toEqual({
+      isKept: [true, true, true],
+      hiddenCount: 0,
+    });
+  });
+
+  it("leaves out texts from the first one past the budget", () => {
+    const half = "x".repeat(ColumnCodes.MAX_PROMPT_CODES_CHARS / 2);
+
+    expect(
+      ColumnCodes.fitToPromptBudget([half, "", half, "y", "", "z"]),
+    ).toEqual({
+      isKept: [true, true, true, false, true, false],
+      hiddenCount: 2,
+    });
+  });
+});
+
+describe("ColumnCodes.formatHiddenCodesNote", () => {
+  it("says how many columns' code lists were left out", () => {
+    expect(ColumnCodes.formatHiddenCodesNote(0)).toBeUndefined();
+    expect(ColumnCodes.formatHiddenCodesNote(1)).toBe(
+      "and 1 more column with a code list",
+    );
+    expect(ColumnCodes.formatHiddenCodesNote(3)).toBe(
+      "and 3 more columns with code lists",
+    );
+  });
+});
+
+describe("ColumnCodes.formatDescription", () => {
+  it("cuts a long description to 120 characters", () => {
+    const text = ColumnCodes.formatDescription("word ".repeat(40));
+
+    expect(text?.length).toBeLessThanOrEqual(120);
+    expect(text?.endsWith("...")).toBe(true);
+  });
+
+  it("gives nothing for a blank description", () => {
+    expect(ColumnCodes.formatDescription("   ")).toBeUndefined();
+  });
+});
+
+describe("ColumnCodes.findPairByLabel", () => {
+  it("finds a pair by its label, ignoring case", () => {
+    expect(
+      ColumnCodes.findPairByLabel(
+        { direction: "decode", pairs: SEX_PAIRS },
+        "female",
+      )?.code,
+    ).toBe("2");
+  });
+
+  it("finds a pair by an accepted spelling", () => {
+    expect(
+      ColumnCodes.findPairByLabel(
+        { direction: "decode", pairs: SEX_PAIRS },
+        "m",
+      )?.code,
+    ).toBe("1");
+  });
+
+  it("does not match a pair whose label is blank", () => {
+    expect(
+      ColumnCodes.findPairByLabel(
+        {
+          direction: "decode",
+          pairs: [{ ...SEX_PAIRS[0]!, label: "  ", acceptedSpellings: [] }],
+        },
+        "male",
+      ),
+    ).toBeUndefined();
+  });
+
+  it("finds nothing for a blank query", () => {
+    expect(
+      ColumnCodes.findPairByLabel(
+        { direction: "decode", pairs: SEX_PAIRS },
+        "  ",
+      ),
+    ).toBeUndefined();
+  });
+});
+
+describe("ColumnCodes.getRowIdsFromBindings", () => {
+  it("lists each named id once and skips the ones a binding lacks", () => {
+    const binding = ROWS.bindings[0]!;
+    const ids = ColumnCodes.getRowIdsFromBindings([
+      binding,
+      { ...binding, datasetColumnId: "col-other" },
+      {
+        ...binding,
+        datasetColumnId: "col-orphan",
+        dictionaryId: "dict-2",
+        entryId: undefined,
+        codeListId: undefined,
+      },
+    ]);
+
+    expect(ids).toEqual({
+      dictionaryIds: ["dict-1", "dict-2"],
+      entryIds: ["entry-sex"],
+      codeListIds: ["list-sex"],
+    });
+  });
+});

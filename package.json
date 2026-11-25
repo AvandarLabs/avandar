@@ -2,7 +2,7 @@
   "name": "avandar",
   "license": "CPAL-1.0",
   "private": true,
-  "version": "0.14.2-dev",
+  "version": "0.15.0-dev",
   "type": "module",
   "engines": {
     "node": "24.x"
@@ -44,6 +44,7 @@
     "test:utils": "pnpm --filter @avandar/utils test",
     "translations": "./scripts/i18n/update-translations.sh",
     "build": "tsc -b && vite build",
+    "check:plugin-bundle": "AVA_PLUGIN_BUNDLE_CHECK=1 vite build --outDir node_modules/.tmp/plugin-bundle-check",
     "build:ava-cli": "pnpm --filter @avandar/ava-cli build && ln -sf \"$(pwd)/apps/ava-cli/dist/main.cjs\" \"$(dirname $(which pnpm))/ava\"",
     "build:desktop": "pnpm build && pnpm --filter @avandar/desktop build",
     "build:packages": "pnpm --filter \"./packages/**\" build",
@@ -111,6 +112,9 @@
     "@avandar/logger": "workspace:*",
     "@avandar/models": "workspace:*",
     "@avandar/modules": "workspace:*",
+    "@avandar/plugin-manifest": "workspace:*",
+    "@avandar/plugin-sdk": "workspace:*",
+    "@avandar/plugin-ui": "workspace:*",
     "@avandar/query-hooks": "workspace:*",
     "@avandar/ui": "workspace:*",
     "@avandar/utils": "workspace:*",

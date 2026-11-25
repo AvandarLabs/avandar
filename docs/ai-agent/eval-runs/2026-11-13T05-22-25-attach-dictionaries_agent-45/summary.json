@@ -1,0 +1,17 @@
+{
+  "label": "attach-dictionaries:agent-45",
+  "questionCount": 45,
+  "passCount": 44,
+  "needlessQuestions": 0,
+  "missedQuestions": 0,
+  "consentPrompts": 0,
+  "modelCalls": 57,
+  "promptTokens": 222519,
+  "cachedPromptTokens": 198255,
+  "completionTokens": 18438,
+  "totalCost": 0.014229450000000003,
+  "costPerQuestion": 0.00031621000000000004,
+  "latencyMedianMs": 2318.471958000002,
+  "latencyP90Ms": 3432.7971659999967,
+  "failedIds": ["N04"]
+}

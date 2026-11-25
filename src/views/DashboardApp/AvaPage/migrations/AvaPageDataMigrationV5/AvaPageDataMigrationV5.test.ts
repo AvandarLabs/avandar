@@ -5,8 +5,8 @@ import type { AvaPageData } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 
 /**
  * Narrows an upgraded document to the version 5 shape `downgrade` takes. The
- * current `PBlockPropsRegistry` also includes blocks added after version 4
- * (such as `Map`), whereas these documents hold only version 4/5 blocks.
+ * current DataViz `vizType` also allows `"plugin"`, which version 5 keeps out
+ * of its frozen version 4 list. These documents hold only built-in charts.
  */
 function _asV5Data(data: AvaPageData): V5_AvaPageData {
   return data as V5_AvaPageData;

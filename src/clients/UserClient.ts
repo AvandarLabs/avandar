@@ -1,9 +1,13 @@
 import { createServiceClient, withSupabaseClient } from "@avandar/clients";
 import { withLogger } from "@avandar/logger";
-import { withQueryHooks } from "@avandar/query-hooks";
+import { WithQueryHooks, withQueryHooks } from "@avandar/query-hooks";
 import { camelCaseKeysShallow, makeObject, omit } from "@avandar/utils";
 import { z } from "zod";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
+import { WorkspaceId } from "$/models/Workspace/Workspace.types";
+import { createServerApiClient } from "$/ServerApiClient";
+import { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
+import { Tables } from "$/types/database.types";
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
 import type {
   RoleLevel,
@@ -15,12 +19,10 @@ import type {
   MembershipId,
   UserProfileId,
 } from "$/models/User/UserProfile.types";
-import type { Workspace } from "$/models/Workspace/Workspace";
-import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
-import type { Database, Tables } from "$/types/database.types";
+import type { ServerApiClient } from "$/ServerApiClient";
+import type { Database } from "$/types/database.types";
 import type { ServiceClient, WithSupabaseClient } from "@avandar/clients";
 import type { ILogger, WithLogger } from "@avandar/logger";
-import type { WithQueryHooks } from "@avandar/query-hooks";
 
 export type ResourceType = Database["public"]["Enums"]["resource_type"];
 
@@ -31,10 +33,10 @@ type TUserClient = WithSupabaseClient<
         getProfile: ({
           workspaceId,
         }: {
-          workspaceId: Workspace.Id;
+          workspaceId: WorkspaceId;
         }) => Promise<UserProfile.T>;
         getUserAppRoles: (params: {
-          workspaceId: Workspace.Id;
+          workspaceId: WorkspaceId;
           userId: UserId | undefined;
         }) => Promise<UserAppRolesMatrix>;
         canAccessResource: (params: {
@@ -55,6 +57,14 @@ type TUserClient = WithSupabaseClient<
 
 type TUserClientOptions = {
   dbClient?: AvaSupabaseDBClient;
+
+  /**
+   * Builds the platform-aware server API client. Called on every use, never
+   * at module load: the desktop shell marks the page as desktop only after
+   * it has loaded, so a client built at import time can keep the browser
+   * adapter, which runs as `anon`, for the whole session.
+   */
+  getServerApi?: () => ServerApiClient;
 };
 
 export const UserProfileDBReadToModelReadSchema: z.ZodType<
@@ -81,14 +91,15 @@ export const UserProfileDBReadToModelReadSchema: z.ZodType<
       profileId: obj.id as UserProfileId,
       membershipId: model.membershipId as MembershipId,
       userId: model.userId as UserId,
-      workspaceId: model.workspaceId as Workspace.Id,
+      workspaceId: model.workspaceId as WorkspaceId,
       createdAt: new Date(model.createdAt),
       updatedAt: new Date(model.updatedAt),
     };
   });
 
 function createUserClient(options?: TUserClientOptions): TUserClient {
-  const { dbClient = AvaSupabase.db() } = options ?? {};
+  const { dbClient = AvaSupabase.db(), getServerApi = createServerApiClient } =
+    options ?? {};
   const baseClient = createServiceClient("UserClient");
 
   const client = withLogger(baseClient, (baseLogger: ILogger) => {
@@ -106,7 +117,7 @@ function createUserClient(options?: TUserClientOptions): TUserClient {
         getProfile: async ({
           workspaceId,
         }: {
-          workspaceId: Workspace.Id;
+          workspaceId: WorkspaceId;
         }): Promise<UserProfile.T> => {
           const logger = baseLogger.appendName("getProfile");
           logger.log("Calling `getProfile` with params", {
@@ -148,7 +159,7 @@ function createUserClient(options?: TUserClientOptions): TUserClient {
           workspaceId,
           userId,
         }: {
-          workspaceId: Workspace.Id;
+          workspaceId: WorkspaceId;
           userId: UserId | undefined;
         }): Promise<UserAppRolesMatrix> => {
           const logger = baseLogger.appendName("getUserAppRoles");
@@ -192,7 +203,10 @@ function createUserClient(options?: TUserClientOptions): TUserClient {
 
         /**
          * Returns whether the auth user can access a resource at a minimum
-         * role. Wraps the SQL helper `util__auth_user_can_access_resource`.
+         * role. Wraps the SQL helper `util__auth_user_can_access_resource`,
+         * called through the platform server API so it carries the user's
+         * session on desktop as well as on web. A failed call throws and is
+         * never read as "no access".
          *
          * Used by the route middleware `resourceFallback` so a user who only
          * has share-derived access on a dataset or dashboard can still load
@@ -214,7 +228,10 @@ function createUserClient(options?: TUserClientOptions): TUserClient {
             minRole,
           });
 
-          const { data, error } = await dbClient.rpc(
+          // Through the server API, not `dbClient`: on desktop the webview's
+          // Supabase client holds no session, so its RPC would run as `anon`,
+          // which may not execute this function.
+          const canAccess = await getServerApi().rpc<boolean | null>(
             "util__auth_user_can_access_resource",
             {
               p_resource_type: resourceType,
@@ -223,11 +240,7 @@ function createUserClient(options?: TUserClientOptions): TUserClient {
             },
           );
 
-          if (error) {
-            throw new Error(error.message);
-          }
-
-          return data ?? false;
+          return canAccess ?? false;
         },
 
         /**

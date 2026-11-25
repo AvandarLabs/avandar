@@ -42,6 +42,9 @@ export function ObjectTableRow<
   const i18n = useI18nMessages();
   const [isEditing, startEditMode, endEditMode] = useBoolean(false);
   const [editedObjectValue, setEditedObjectValue] = useState<T>(rowObject);
+  // Outside edit mode the row shows its current data, so a refetch that
+  // changes a value reaches the screen. An edit starts from that data.
+  const shownObjectValue = isEditing ? editedObjectValue : rowObject;
 
   return (
     <Table.Tr>
@@ -84,6 +87,7 @@ export function ObjectTableRow<
               <EditButton
                 as="button"
                 onClick={() => {
+                  setEditedObjectValue(rowObject);
                   startEditMode();
                 }}
               />
@@ -91,7 +95,7 @@ export function ObjectTableRow<
           );
         }
 
-        const fieldVal = editedObjectValue[fieldKey];
+        const fieldVal = shownObjectValue[fieldKey];
 
         const childRenderOptions = {
           ...parentRenderOptions,
@@ -112,6 +116,7 @@ export function ObjectTableRow<
               type="unknown"
               value={fieldVal}
               rootData={rootData}
+              parentObject={shownObjectValue}
               {...childRenderOptions}
             />
           </Table.Td>

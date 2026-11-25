@@ -9,11 +9,14 @@ import type {
 /** A placeholder's text inside its quotes, such as `<value 3>`. */
 const PLACEHOLDER_VALUE = /^<value ([1-9]\d*)>$/;
 
+/** Every placeholder in a piece of text, such as `<value 2>`. */
+const PLACEHOLDERS_IN_TEXT = /<value ([1-9]\d*)>/g;
+
 /**
  * Anything a model may have meant as a placeholder: any case, spacing, or
  * leading zeros, as in `<VALUE 01>`.
  */
-const PLACEHOLDER_LIKE = /<\s*value\s*\d+\s*>/i;
+export const PLACEHOLDER_LIKE = /<\s*value\s*\d+\s*>/i;
 
 /**
  * In SQL that could not be read, numbers this small stay as written when
@@ -81,6 +84,13 @@ export type SqlPlaceholderVault = {
    * use it on SQL: `redact` already hides held literals there.
    */
   maskText: (text: string) => string;
+  /**
+   * Text the model wrote (a dashboard name, a chart title) with each held
+   * placeholder swapped back for its value, for the user's own screen. An
+   * unknown placeholder is left as written. Never send the result to a
+   * hosted model.
+   */
+  unmaskText: (text: string) => string;
   /**
    * Text that comes back from running restored SQL (column names, errors,
    * preview cells), with every held value masked as a quoted literal and as
@@ -306,6 +316,16 @@ export function createSqlPlaceholderVault(): SqlPlaceholderVault {
     },
     maskText: (text) => {
       return _maskTextWithStore(store, text, "page");
+    },
+    unmaskText: (text) => {
+      return text.replace(
+        PLACEHOLDERS_IN_TEXT,
+        (placeholder, placeholderNumber) => {
+          return (
+            store.values[Number(placeholderNumber) - 1]?.value ?? placeholder
+          );
+        },
+      );
     },
     maskResultText: (text) => {
       return _maskTextWithStore(store, text, "result");

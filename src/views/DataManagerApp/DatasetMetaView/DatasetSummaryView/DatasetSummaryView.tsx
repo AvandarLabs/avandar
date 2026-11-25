@@ -1,13 +1,16 @@
 import { Skeleton, Stack } from "@mantine/core";
+import { Dataset } from "$/models/datasets/Dataset/Dataset";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { ColumnSection } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ColumnSection/ColumnSection";
-import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes";
 import type { ReactNode } from "react";
 
 type Props = {
   datasetId: Dataset.Id;
+  /** What attached dictionaries say about each column, by column name. */
+  columnCodesByName: ReadonlyMap<string, ColumnCodes.T>;
 };
 
 /**
@@ -33,7 +36,10 @@ type Props = {
  * the lazy-loaders use, which works incrementally and avoids a second
  * observer pass.
  */
-export function DatasetSummaryView({ datasetId }: Readonly<Props>): ReactNode {
+export function DatasetSummaryView({
+  datasetId,
+  columnCodesByName,
+}: Readonly<Props>): ReactNode {
   const workspace = useCurrentWorkspace();
   const [meta, isLoadingMeta] = DatasetQueryClient.useGetDatasetMeta({
     datasetId,
@@ -66,6 +72,7 @@ export function DatasetSummaryView({ datasetId }: Readonly<Props>): ReactNode {
             columnName={column.name}
             dataType={column.dataType}
             totalRows={meta.rows}
+            codes={columnCodesByName.get(column.name)}
           />
         );
       })}

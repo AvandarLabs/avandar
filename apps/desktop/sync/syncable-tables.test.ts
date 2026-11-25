@@ -44,6 +44,11 @@ describe("syncable-tables manifest", () => {
     expect(isSyncable("usage_analytics_events")).toBe(false);
   });
 
+  it("keeps plugin data slot bindings and content imports out of the desktop mirror", () => {
+    expect(isExcluded("plugin_data_slot_bindings")).toBe(true);
+    expect(isExcluded("plugin_content_imports")).toBe(true);
+  });
+
   it("isSyncable returns false for excluded tables", () => {
     EXCLUDED_TABLES.forEach((tableName) => {
       expect(isSyncable(tableName)).toBe(false);

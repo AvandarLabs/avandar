@@ -3,6 +3,7 @@ import {
   ChatPanelContents,
 } from "@/components/ChatPanel/ChatPanelProvider/ChatPanelContents";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
+import { ChatSessionProvider } from "@/components/ChatPanel/ChatSessionProvider/ChatSessionProvider";
 import type { ReactNode } from "react";
 
 function _readInitialChatPanelOpenState(): boolean {
@@ -39,13 +40,14 @@ export function ChatPanelProvider({
         isOpen: _readInitialChatPanelOpenState(),
         isAvailable: isChatAvailable,
         layout: "docked",
-        caseDesignSessionNonce: 0,
         pendingClarification: undefined,
         pendingCaseTypeDraft: undefined,
         contextTray: [],
       }}
     >
-      <ChatPanelContents>{children}</ChatPanelContents>
+      <ChatSessionProvider>
+        <ChatPanelContents>{children}</ChatPanelContents>
+      </ChatSessionProvider>
     </ChatPanelStateManager.Provider>
   );
 }

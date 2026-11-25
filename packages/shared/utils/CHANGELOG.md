@@ -1,5 +1,19 @@
 # @avandar/utils
 
+## 0.3.0
+
+### Minor Changes
+
+- feat(filters): match an empty column with is null (e89d8cc)
+
+### Patch Changes
+
+- fix(filters): keep an is-null filter when bucketing by operator (3626c3d)
+
+- chore(lint): replace eslint directives with canonical oxlint rules (605670e)
+
+- refactor: Local supabase switching should use env vars instead of config.toml ([#320](https://github.com/AvandarLabs/avandar/issues/320))
+
 ## 0.2.0
 
 ### Minor Changes

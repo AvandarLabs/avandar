@@ -1,0 +1,11 @@
+/* Codes in a fixed-width column so the labels line up. */
+.codeListPopoverTable {
+  font-size: var(--mantine-font-size-sm);
+}
+
+.codeListPopoverCode {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  white-space: nowrap;
+  width: 1%;
+}

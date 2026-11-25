@@ -2,6 +2,7 @@ import { AvaEnv, DEFAULT_ENV_NAME } from "@ava-cli/AvaEnv/AvaEnv";
 import { DevCli } from "@ava-cli/DevCli/DevCli";
 import { NewBoilerplateCli } from "@ava-cli/DevCli/NewBoilerplateCli/NewBoilerplateCli";
 import { PipelineCli } from "@ava-cli/PipelineCli/PipelineCli";
+import { PluginCli } from "@ava-cli/PluginCli/PluginCli";
 import { PolarCli } from "@ava-cli/PolarCli/PolarCli";
 import { ReleaseCli } from "@ava-cli/ReleaseCli/ReleaseCli";
 import {
@@ -38,6 +39,7 @@ const cli = Acclimate.createCLI("ava")
   .addCommand("dev", DevCli)
   .addCommand("new", NewBoilerplateCli)
   .addCommand("pipeline", PipelineCli)
+  .addCommand("plugin", PluginCli)
   .addCommand("polar", PolarCli)
   .addCommand("release", ReleaseCli)
   .addCommand("supabase", SupabaseCli);

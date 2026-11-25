@@ -4,6 +4,7 @@ import { IconChevronRight } from "@tabler/icons-react";
 import { clsx } from "clsx";
 import { TruncatedText } from "../text/TruncatedText";
 import { NavLink } from "./NavLink";
+import css from "./NavLinkList.module.css";
 import type { NavLinkProps } from "./NavLink";
 import type { BoxProps, MantineColor } from "@mantine/core";
 import type { Key, ReactNode } from "react";
@@ -73,6 +74,7 @@ export function NavLinkList({
 
     const { label, className, key, ...restOfLinkProps } = link;
     const navLinkClassName = clsx(
+      css.navLink,
       "transition-colors",
       "[&:not(.active)]:text-neutral-700",
       "[&:not(.active)]:hover:text-black",

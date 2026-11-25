@@ -1,3 +1,4 @@
+import type { DictionarySuggestionsRequest } from "$/agent/dictionarySuggestions/dictionarySuggestionsPrompt.ts";
 import type { ChatClientMessage } from "$/models/chat/ChatClientMessage/ChatClientMessage.ts";
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext.ts";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse.ts";
@@ -14,7 +15,9 @@ export type ChatAPI = APITypeDef<
     "/:workspaceId/messages",
     "/:workspaceId/session-secret",
     "/:workspaceId/agent/:promptId/api/stream",
+    "/:workspaceId/title/:promptId",
     "/:workspaceId/extract-measurements",
+    "/:workspaceId/dictionary-suggestions/:promptId",
   ],
   {
     "/:workspaceId/messages": {
@@ -53,6 +56,13 @@ export type ChatAPI = APITypeDef<
         returnType: Response;
       };
     };
+    "/:workspaceId/title/:promptId": {
+      POST: {
+        pathParams: { workspaceId: string; promptId: string };
+        body: { excerpt: string; locale: string; placeholder: string };
+        returnType: { title: string };
+      };
+    };
     "/:workspaceId/extract-measurements": {
       POST: {
         pathParams: {
@@ -67,6 +77,17 @@ export type ChatAPI = APITypeDef<
           ackToken: string;
         };
         returnType: { responseText: string; model: string };
+      };
+    };
+    "/:workspaceId/dictionary-suggestions/:promptId": {
+      POST: {
+        pathParams: { workspaceId: string; promptId: string };
+        body: {
+          request: DictionarySuggestionsRequest;
+          /** Proof the user agreed to send exactly `request`. */
+          ackToken: string;
+        };
+        returnType: { reply: string };
       };
     };
     "/:workspaceId/session-secret": {

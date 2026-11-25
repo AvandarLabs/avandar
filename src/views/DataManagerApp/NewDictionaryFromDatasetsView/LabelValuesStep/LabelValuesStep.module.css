@@ -1,0 +1,52 @@
+/*
+ * The code lists flank beside the selected list's values. The flank paints
+ * the body surface edge to edge with a single hairline against the lit
+ * column, and sits outside the content column's gutter. Its corners take
+ * the design system's default panel radius.
+ */
+.labelValuesStep {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+}
+
+.labelValuesStepNav {
+  background-color: var(--ava-surface-body);
+  border-inline-end: 1px solid var(--ava-border-default);
+  border-radius: var(--mantine-radius-sm);
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  min-height: 0;
+  width: calc(18.75rem * var(--mantine-scale));
+}
+
+/* The header never scrolls: it labels the lists underneath it. */
+.labelValuesStepNavHeader {
+  flex: none;
+  padding: var(--mantine-spacing-md) var(--mantine-spacing-md)
+    var(--mantine-spacing-xs);
+}
+
+.labelValuesStepNavList {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 var(--mantine-spacing-sm) var(--mantine-spacing-md);
+  scrollbar-width: thin;
+}
+
+@media (width < 62em) {
+  .labelValuesStep {
+    flex-direction: column;
+  }
+
+  .labelValuesStepNav {
+    border-block-end: 1px solid var(--ava-border-default);
+    border-inline-end: 0;
+    max-height: 40%;
+    width: auto;
+  }
+}

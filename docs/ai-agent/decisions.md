@@ -50,6 +50,9 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
 | D40 | 1E brings the agent's question cards and analytics to parity | Approved |
 | D41 | Attachable context: inline mentions plus a chat-long tray | Built |
 | D42 | Mentions add three privacy rules beyond the page block | Built |
+| D43 | Several chat sessions, stored in the browser | Approved |
+| D44 | Dashboard blocks from any page, online and offline | Approved |
+| D45 | Try again keeps the first attempt, and cards and analytics share today's code | Built |
 
 ---
 
@@ -702,6 +705,39 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
   refused, and names show placeholders unescaped. Replies still show
   `<value N>`: mapping them back for the user needs the recap redacted
   first.
+- **Updated 2026-11-18: replies show real values.** A hosted reply now
+  shows the user real values on their device. The chat stores the text the
+  user reads and keeps the model's own text, with its placeholders, in the
+  message's `metadata.custom` (`shared/agent/HostedAnswerText`). Every later
+  hosted request reads the model's text: the recap after a reload or
+  session switch, today's chat, and the chat title excerpt. This holds even
+  when a reload has lost the vault that knew the value. The same unmasking
+  applies to a query's summary, a question card's text, and the labels of a
+  question card's options. An option's value stays a placeholder, since the
+  option the user picks is posted back to the model as their next message
+  with no consent check, so that message reads `<value N>` in the thread.
+  The dashboard card carries no summary: the reply above it is the
+  summary. Device turns are unchanged.
+- **Updated 2026-11-18: an earlier chat's placeholders mean nothing in a
+  new one.** A placeholder's number means a value only inside the vault that
+  issued it, and each new conversation (a reload, or a switch to another
+  session and back) starts a new vault that numbers its own values from
+  `<value 1>`. The recap of the thread kept the old numbers, so a model that
+  repeated "`<value 1>` had 2 visits" could be shown the new vault's
+  `<value 1>`: another person's name. The recap, and the message being
+  answered, now read every placeholder in the thread's own text as
+  `[earlier value]`, a text no vault issues or unmasks
+  (`hideEarlierPlaceholders`, in `askConversationDataAgent`). The names and
+  values the new vault masks afterwards stay as they are. Nothing stored
+  changes: the thread keeps the model's text with its placeholders. The
+  other design, starting the new vault's numbers above the highest one in
+  the thread, was not taken. It would change how the vault numbers,
+  restores, and checks placeholders, depend on scanning every stored message
+  for numbers, and still show the model old placeholders it would try to
+  reuse in SQL. The cost of the chosen one: the model cannot tell that an
+  `[earlier value]` is the page's `<value 1>` again, even when the same
+  page shows the same person. The chat title request reads the model's text
+  as it is, since a title is never unmasked.
 - **Costs.** About 120 to 170 more input tokens per call for the prompt
   rules.
   Columns outside the page's datasets count as personal, and DuckDB-only
@@ -773,3 +809,152 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
   and hosted models never see an offline answer's text. Offline replies
   stored before the mark existed are sent as written; none could have read
   a mention name.
+
+## D43. Several chat sessions, stored in the browser (approved)
+
+- **Decision (Pablo, 2026-11-09).** The chat panel holds several sessions
+  per workspace and user. Opening the panel returns to the selected
+  session. The strip shows three open sessions, with the rest in an
+  overflow list. Closing a tab archives the session. The archive keeps
+  the 50 newest and is separate from the overflow. Delete exists only
+  there. The wide drawer belongs to the panel. **New case type** adds a
+  case-design session, selects it, expands the panel, and keeps today's
+  plain case-manager composer. Each session has its own thread and tray
+  in localStorage, plus an index. Spec:
+  [phase-1c.md](specs/phase-1c.md).
+- **Why.** One thread cannot keep a data question and a case-type draft
+  at the same time, and closing the panel was the only way to leave a
+  chat. Per-session keys extend the stores the thread and tray already
+  use, so a bad write cannot erase every session at once.
+- **Alternatives.** One localStorage blob for every session (a bad write
+  loses all of them). IndexedDB for threads (a second storage system
+  beside stores that already work). Each session remembering docked or
+  expanded (tab switches would jump).
+- **Left out.** Database history, plan limits, and moving case management
+  onto the agent.
+
+## D44. Dashboard blocks from any page, online and offline (approved)
+
+- **Decision (Pablo, 2026-11-11).** The agent gets `add_dashboard_block`
+  under prompt `data-agent-v6`, with today's ten block kinds. On the
+  dashboard open in the editor the block is added unsaved, as today's chat
+  does. On any other dashboard a card in the chat shows the block and the
+  target, and only Confirm saves it. The tool names the dashboard as the
+  model saw it, or `"current"`, and the browser resolves the name against
+  the page, mentions, the tray, and the workspace's editable dashboards.
+  Several matches put a picker on the card. The offline agent gets the
+  same tool and card and answers on every page. Spec:
+  [phase-1d.md](specs/phase-1d.md).
+- **Why.** Dashboards are the last thing today's chat does that the agent
+  cannot (D33). A saved change to a dashboard the user is not looking at
+  follows D33's rule of a confirm card first, while the open editor's
+  Save already confirms. Resolving names on the device needs no extra
+  tool or model call, and the model never sees the workspace's dashboard
+  list. Offline ships too because nothing in it needs a connection except
+  the save itself (Pablo: offline is left out only when it cannot be built
+  without one).
+- **Tools per version.** v1 to v5 keep their three built-in tools
+  unchanged. v6 is the first version whose built-in tool list differs, so
+  the proxy and the browser read `DATA_AGENT_TOOLS_BY_PROMPT_ID`, and the
+  proxy adds plugin tools after them for v4 to v6.
+- **Renumbered on rebase (2026-11-18).** Approved as `data-agent-v4`,
+  built on v3. `demo/measles` shipped v4 (plugin tools) and v5 (coded
+  columns) first, so the dashboard prompt is `data-agent-v6`, v5's
+  instructions plus the dashboard rules. v4 and v5 stay as they shipped.
+- **Revised after a review against the code (2026-11-11).** The editor
+  saves without checking for changes made elsewhere, so Confirm on a
+  dashboard open in the editor adds the block there, unsaved, instead of
+  writing a row the editor's next Save would overwrite. Confirm prepares
+  column bindings as the editor's Save does. Edit rights are checked only
+  for dashboards whose name matches. The card's status lives in a
+  per-session store beside the tray, because a message part cannot change
+  after its turn and the thread record is rewritten at the end of every
+  run. Offline routing reads only the user's message, and offline blocks
+  keep SQL for at most three tiles to fit the offline model's window.
+- **Alternatives.** Saving at once with Undo in the chat (breaks D33's
+  confirm-first rule). Only the open dashboard (misses "from anywhere").
+  A separate `find_dashboard` tool (a model call more per request). Listing
+  every dashboard in each turn (tokens on every turn, and names unrelated
+  to the question). Fewer block kinds (a regression from today's chat).
+  Offline left for later (Pablo reversed it).
+- **Left out.** Try again, question-card parity, and
+  `dashboard.block_added_via_chat` (1E, D40). Editing, moving, removing,
+  and creating dashboards (Phase 3.1). Confirmation for other tools
+  (roadmap 2.3).
+
+## D45. Try again keeps the first attempt, and cards and analytics share today's code (built)
+
+- **Decision (2026-11-19, delegated by Pablo).** On Try again of the
+  agent's latest answer, the agent keeps its first attempt in its
+  transcript, and a hosted turn adds one fixed line before the message
+  saying the user wants a different answer. Prompt v6 does not change. Try
+  again on an earlier answer starts the agent over from the thread's
+  recap. An offline turn, or one after a failed attempt, asks again with
+  no line, as today's chat sends no `retryContext` there. Every card the
+  agent shows goes through `recordClarificationShown`, shared with today's
+  chat: the bias check, then the audit row, before the card shows, with
+  `turnNumber` counted from the thread as the server counts it. The agent
+  logs one `chat.sql_generated` per answer that showed a query, and
+  `dashboard.block_added_via_chat` for every block that reaches a
+  dashboard through the open editor or a confirmed card. Spec:
+  [phase-1e.md](specs/phase-1e.md). The line that ships is the third of
+  three wordings the Try again eval tried (`TRY_AGAIN_LINE` in
+  `shared/agent/pageContext/buildAgentTurnText.ts`,
+  [eval](eval.md#phase-1e)): "The user clicked Try again: they want a
+  different answer to the message below than your last one above, one that
+  still does everything the message asks, exactly as asked, even what your
+  last answer already did, since that answer is the one being replaced. Do
+  not repeat it, but if the message has only one right answer, give that
+  answer again, reached another way. Read the message another way, take a
+  different approach, or ask one question if your last answer had to
+  guess, but never change what the message asks for."
+- **Why.** The model gets its first attempt in its own words, tool calls
+  and results included, for about 130 tokens per retry and no prompt
+  version. One card function keeps the two paths from drifting. One SQL
+  event per answer keeps that event's ratio to `chat.message_sent` when
+  the agent is turned on. Since 1D a block reaches a dashboard from any
+  page, so the event follows every path that adds one.
+- **Departs from [phase-1.md](specs/phase-1.md).** Its 1E row said
+  regenerating "rolls the agent back to before the last turn". A
+  rolled-back attempt has to be described to the model again anyway, and
+  rolling back adds transcript surgery and restored block memory. The
+  goal, an agent history in step with the thread, is kept where the two
+  would mislead the model: Try again on an earlier answer. The thread has
+  no edit action, so "an edited message resyncs" is dropped.
+- **How a Try again is told apart, as built.** Each conversation keeps, in
+  memory only, a record of the user messages of the thread it was last
+  asked (`chatMessagesKey` over them, and their count) and whether that
+  ask's reply was kept. The record leaves out assistant messages, because
+  a run that a newer message stops can land its reply after the newer turn
+  was sent without it, which would put an assistant message between two
+  user messages and make a follow-up look like a rewind. The same user
+  messages again are a Try again of the latest answer. More user messages
+  after the recorded ones are a follow-up. Anything else (fewer user
+  messages, as on Try again of an earlier answer, or a changed one) starts
+  the agent over. A stopped run settles before the newer turn takes the
+  conversation, so it can write its own record first. The newer turn's
+  thread extends it, and the newer turn writes its record last. A stopped
+  run never logs `chat.sql_generated`: stopping it clears the query it
+  showed and marks its turn as stopped.
+- **Known limit.** The app has no branch picker and no edit action, so two
+  branches with the same user messages and different replies cannot
+  happen today, and the record could not tell them apart. Revisit the
+  record if either is added.
+- **Fallbacks.** Roll back and describe the attempt, if the Try again eval
+  shows the kept attempt misleads the retry or the follow-up. A
+  `<try_again>` block under prompt v7, if the model ignores the plain line
+  after three wordings. Neither shipped: the third wording met every bar,
+  and no miss showed a follow-up built on the first attempt.
+- **Alternatives.** Today's `retryContext` sent to the agent proxy
+  (changes the request Pi's `streamProxy` sends, and breaks the system
+  prompt's cache or needs a new version). Detecting a retry with
+  `lastTurnRef` (cannot see an earlier answer's retry, and the offline
+  agent never reaches it). The line on offline turns (today's offline chat
+  sends nothing, and the 4B model's window is tight). A copy of the card
+  code in the browser host (two copies drift). Recording the card after
+  the reply (a quick answer would find no `auditId`). An event per query
+  shown (up to three per answer). Only the open editor's blocks (misses
+  every block added from another page).
+- **Cost.** About 130 uncached input tokens on a hosted retry turn. The
+  transcript holds both attempts, as cached prefix. Each agent card waits
+  for one local Dexie insert, as today's chat's cards do.

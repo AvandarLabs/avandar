@@ -1,12 +1,19 @@
+import { recordClarificationShown } from "@/components/ChatPanel/recordClarificationShown/recordClarificationShown";
+import { addAgentDashboardBlock } from "@/components/ChatPanel/useAvandarChatRuntime/dashboardBlocks/addAgentDashboardBlock";
 import {
   createExplorerShowQuery,
   getTurnQuestionLabel,
 } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/dataAgentTurnHelpers";
-import { showQueryInChat } from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/showQueryInChat";
+import {
+  checkQueryOnDevice,
+  showQueryInChat,
+} from "@/components/ChatPanel/useAvandarChatRuntime/dataAgentTurnHelpers/showQueryInChat";
+import { buildClarificationTurnNumber } from "@/components/privacy/privacy-helpers/generatedSqlAssumptions/generatedSqlAssumptions";
 import { createBrowserDataAgentHost } from "@/lib/agent/dataAgent/browser/createBrowserDataAgentHost";
 import { createPlaceholderRestoringHost } from "@/lib/agent/dataAgent/pagePrivacy/createPlaceholderRestoringHost";
 import { createSqlPlaceholderVault } from "@/lib/agent/dataAgent/pagePrivacy/SqlPlaceholderVault";
 import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
+import type { ChatClarifyRequest } from "$/types/chat.types";
 import type {
   AgentConversationState,
   DataAgentConversation,
@@ -16,12 +23,77 @@ import type { DataAgent } from "@/lib/agent/dataAgent/createDataAgent/createData
 import type { DataAgentHost } from "@/lib/agent/dataAgent/DataAgentHost";
 
 /**
- * Results go to the Data Explorer only when the turn says so: the user is on
- * it, or the turn is offline (offline turns run only there). An unknown page
- * sends them to the chat, which shows them on any page.
+ * Results go to the Data Explorer when the user is on it, and for an
+ * offline turn that carries no page at all. Any other page, including one
+ * the app could not identify, sends them to the chat, which shows them
+ * anywhere.
  */
 function _isOnDataExplorer(turn: DataAgentTurnOptions): boolean {
-  return turn.isOffline === true || turn.pageContext?.app === "data-explorer";
+  return (
+    turn.pageContext?.app === "data-explorer" ||
+    (turn.isOffline === true && turn.pageContext === undefined)
+  );
+}
+
+/**
+ * Bias-checks and records a question card the agent shows, then sets it in
+ * the current turn's chat panel with its audit id. The turn number counts
+ * the turn's card answers. A card whose turn went stale, or stopped being
+ * the conversation's current turn, while its row was written is not set.
+ * The row stays.
+ */
+async function _showQuestionCard(
+  options: Readonly<{
+    state: AgentConversationState;
+    card: Omit<ChatClarifyRequest, "turnNumber">;
+  }>,
+): Promise<void> {
+  const { state, card } = options;
+  const turn = state.turnRef.current;
+  const clarification: ChatClarifyRequest = {
+    ...card,
+    turnNumber: buildClarificationTurnNumber(turn.apiMessages),
+  };
+  const auditId = await recordClarificationShown({
+    workspaceId: turn.workspaceId,
+    clarification,
+  });
+  if (turn.isStale?.() || state.turnRef.current !== turn) {
+    return;
+  }
+  turn.chatPanelDispatch.setPendingClarification({
+    ...clarification,
+    auditId,
+  });
+}
+
+/**
+ * Shows the agent's query where the turn's page sends it, first noting it as
+ * the turn's last shown query: `data_explorer` when it goes to the Data
+ * Explorer, the turn's app otherwise. The SQL is already restored.
+ */
+function _showQuery(
+  options: Readonly<{
+    state: AgentConversationState;
+    request: Parameters<DataAgentHost["showQuery"]>[0];
+  }>,
+): ReturnType<DataAgentHost["showQuery"]> {
+  const { state, request } = options;
+  const turn = state.turnRef.current;
+  const isOnExplorer = _isOnDataExplorer(turn);
+  state.lastShownQuery = {
+    sql: request.sql,
+    app: isOnExplorer ? "data_explorer" : turn.analyticsApp,
+  };
+  if (isOnExplorer) {
+    return createExplorerShowQuery(turn)(request);
+  }
+  return showQueryInChat({
+    workspaceId: turn.workspaceId,
+    title: getTurnQuestionLabel(turn),
+    results: state.results,
+    request,
+  });
 }
 
 /**
@@ -40,21 +112,23 @@ export function createConversationAgentHost(
     workspaceId: firstTurn.workspaceId,
     userId: firstTurn.currentUser?.id,
     showQuery: (request) => {
-      const turn = state.turnRef.current;
-      if (_isOnDataExplorer(turn)) {
-        return createExplorerShowQuery(turn)(request);
-      }
-      return showQueryInChat({
-        workspaceId: turn.workspaceId,
-        title: getTurnQuestionLabel(turn),
-        results: state.results,
+      return _showQuery({ state, request });
+    },
+    checkQuery: (sql) => {
+      return checkQueryOnDevice({
+        workspaceId: state.turnRef.current.workspaceId,
+        sql,
+      });
+    },
+    addDashboardBlock: (request) => {
+      return addAgentDashboardBlock({
+        turn: state.turnRef.current,
+        cards: state.dashboardCards,
         request,
       });
     },
-    showQuestionCard: (clarification) => {
-      state.turnRef.current.chatPanelDispatch.setPendingClarification(
-        clarification,
-      );
+    showQuestionCard: (card) => {
+      return _showQuestionCard({ state, card });
     },
   });
   return createPlaceholderRestoringHost(browserHost, state.sqlVault);
@@ -75,7 +149,9 @@ export function createAgentConversation(
   const state: AgentConversationState = {
     turnRef: options.turnRef,
     results: [],
+    resultsByTurn: [],
     sqlVault: createSqlPlaceholderVault(),
+    dashboardCards: [],
   };
   const host = createConversationAgentHost(state);
   return Object.assign(state, {

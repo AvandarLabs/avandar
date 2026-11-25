@@ -20,7 +20,8 @@ const INVISIBLE_CHARACTER =
   /^[\s\p{Cc}\p{Cf}\p{Mn}\p{Zs}\u115f\u1160\u3164\uffa0\u2800]$/u;
 
 /** An agent block tag's start, opening or closing, spelled plainly. */
-const PLAIN_BLOCK_TAG_START = /<\/?(?:current_page|attached|mentioned)/gi;
+const PLAIN_BLOCK_TAG_START =
+  /<\/?(?:current_page|attached|mentioned|dashboard_card)/gi;
 
 /**
  * SQL is cut to this length before its block tags are escaped, so the
@@ -31,7 +32,8 @@ const MAX_ESCAPED_SQL_CHARACTERS = MAX_PAGE_SQL_CHARACTERS * 2;
 
 /**
  * The text with every `<` that would start an agent block tag
- * (`current_page`, `attached`, `mentioned`) escaped as `\u003c`, including
+ * (`current_page`, `attached`, `mentioned`, `dashboard_card`) escaped as
+ * `\u003c`, including
  * spellings with invisible characters anywhere in the tag, such as
  * `< /attached>` or `</ment\u200bioned>`. Tags are found on a copy with
  * invisible characters removed, with each kept character's index in the

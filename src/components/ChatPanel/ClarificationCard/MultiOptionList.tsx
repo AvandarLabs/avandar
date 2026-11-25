@@ -4,6 +4,7 @@ import { ClarificationAnswer } from "./ClarificationAnswerModule/ClarificationAn
 
 type Props = {
   options: readonly string[];
+  optionLabels?: readonly string[];
   selectedOptions: string[];
   somethingElseLabel: string;
   onChange: (values: string[]) => void;
@@ -13,6 +14,7 @@ type Props = {
 /** Renders the available multi-select clarification options. */
 export function MultiOptionList({
   options,
+  optionLabels,
   selectedOptions,
   somethingElseLabel,
   onChange,
@@ -27,8 +29,14 @@ export function MultiOptionList({
         aria-label={t`Pick one or more`}
       >
         <Stack gap={4}>
-          {options.map((option) => {
-            return <Checkbox key={option} value={option} label={option} />;
+          {options.map((option, index) => {
+            return (
+              <Checkbox
+                key={option}
+                value={option}
+                label={optionLabels?.[index] ?? option}
+              />
+            );
           })}
           <Checkbox
             value={ClarificationAnswer.somethingElse}

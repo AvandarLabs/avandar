@@ -3,8 +3,20 @@
  * datasets, and must not pull attribute values.
  */
 import { fetchWorkspaceSchema } from "@sbfn/chat/PostChatMessages/schema/fetchWorkspaceSchema.ts";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
+
+const { loadColumnCodesMock } = vi.hoisted(() => {
+  return { loadColumnCodesMock: vi.fn() };
+});
+
+vi.mock("@sbfn/chat/utils/loadColumnCodes/loadColumnCodes.ts", () => {
+  return { loadColumnCodes: loadColumnCodesMock };
+});
+
+beforeEach(() => {
+  loadColumnCodesMock.mockResolvedValue(new Map());
+});
 
 function createFakeClient(rowsByTable: Record<string, unknown[]>): {
   supabaseClient: AvaSupabaseClient;
@@ -84,6 +96,36 @@ describe("fetchWorkspaceSchema", () => {
     expect(schema.conceptAttributes).toEqual([
       { concept_id: CONCEPT_ID, name: "status" },
     ]);
+  });
+
+  it("gives a bound column its code list", async () => {
+    const datasetId = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
+    const codes = {
+      direction: "decode",
+      pairs: [
+        { code: "1", label: "Male", acceptedSpellings: [], isMissing: false },
+      ],
+    };
+    loadColumnCodesMock.mockResolvedValue(new Map([["col-gender", codes]]));
+    const fake = createFakeClient({
+      datasets: [{ id: datasetId, name: "Line list" }],
+      dataset_columns: [
+        {
+          id: "col-gender",
+          dataset_id: datasetId,
+          name: "GENDER",
+          data_type: "bigint",
+        },
+      ],
+      concepts: [],
+    });
+
+    const schema = await fetchWorkspaceSchema({
+      supabaseClient: fake.supabaseClient,
+      workspaceId: WORKSPACE_ID,
+    });
+
+    expect(schema.columns[0]?.codes).toEqual(codes);
   });
 
   it("does not query concept attributes or statuses when the workspace has no concepts", async () => {

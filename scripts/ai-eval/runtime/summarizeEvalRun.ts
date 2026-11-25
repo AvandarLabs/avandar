@@ -7,6 +7,8 @@ export type EvalRunSummary = {
   passCount: number;
   needlessQuestions: number;
   missedQuestions: number;
+  /** Try again answers whose second attempt repeated the first. */
+  repeatCount: number;
   consentPrompts: number;
   modelCalls: number;
   promptTokens: number;
@@ -62,6 +64,9 @@ export function summarizeEvalRun(
     }).length,
     missedQuestions: answers.filter((answer) => {
       return answer.isMissedQuestion;
+    }).length,
+    repeatCount: answers.filter((answer) => {
+      return answer.isRepeat === true;
     }).length,
     consentPrompts: _sum(answers, (answer) => {
       return answer.answer.consentPrompts;

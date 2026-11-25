@@ -3,6 +3,32 @@ import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
 import { truncateSchemaForOffline } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/fetchOfflineChatSchema/truncateSchemaForOffline/truncateSchemaForOffline";
 
 describe("truncateSchemaForOffline", () => {
+  it("keeps a kept column's code list whole", () => {
+    const pairs = Array.from({ length: 40 }, (_, index) => {
+      return {
+        code: String(index),
+        label: `Label ${index}`,
+        acceptedSpellings: [],
+        isMissing: false,
+      };
+    });
+    const schema = {
+      datasets: [{ id: "id-cases", name: "cases.csv" }],
+      columns: [
+        {
+          dataset_id: "id-cases",
+          name: "race_cd",
+          data_type: "bigint",
+          codes: { direction: "decode" as const, pairs },
+        },
+      ],
+    };
+
+    const truncated = truncateSchemaForOffline(schema);
+
+    expect(truncated.columns[0]?.codes?.pairs).toHaveLength(40);
+  });
+
   it("keeps dataset labels when there are no columns yet", () => {
     const schema = {
       datasets: [

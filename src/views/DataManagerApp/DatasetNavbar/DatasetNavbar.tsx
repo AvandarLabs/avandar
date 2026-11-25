@@ -1,4 +1,4 @@
-import { NavLinkList, Tooltip, useCheckTruncatedText } from "@avandar/ui";
+import { NavLinkList, TruncatedText } from "@avandar/ui";
 import { makeBucketMap, prop } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
@@ -11,7 +11,12 @@ import {
   TextInput,
   Tooltip as MantineTooltip,
 } from "@mantine/core";
-import { IconDatabaseOff, IconSearch } from "@tabler/icons-react";
+import {
+  IconArrowMerge,
+  IconBook,
+  IconDatabaseOff,
+  IconSearch,
+} from "@tabler/icons-react";
 import { useDeferredValue, useMemo, useState } from "react";
 import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
@@ -24,6 +29,8 @@ import { useIsOnline } from "@/lib/hooks/browser/useIsOnline/useIsOnline";
 import css from "@/views/DataManagerApp/DatasetNavbar/DatasetNavbar.module.css";
 import { DatasetParseStatusIndicator } from "@/views/DataManagerApp/DatasetParseStatusIndicator";
 import { DatasetSourceIcon } from "@/views/DataManagerApp/DatasetSourceIcon";
+import type { Crosswalk } from "$/models/crosswalks/Crosswalk/Crosswalk";
+import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { NavLinkProps } from "@avandar/ui";
 import type { ReactNode } from "react";
@@ -36,9 +43,16 @@ const FILTER_VISIBLE_THRESHOLD = 8;
 
 type Props = {
   datasets: Dataset.T[];
+  /** Dictionaries listed in their own group below the datasets. */
+  dictionaries?: readonly DataDictionary.T[];
+  /** Crosswalks listed in their own group below the dictionaries. */
+  crosswalks?: readonly Crosswalk.T[];
   isLoading: boolean;
   className?: string;
 };
+
+const NO_DICTIONARIES: readonly DataDictionary.T[] = [];
+const NO_CROSSWALKS: readonly Crosswalk.T[] = [];
 
 type DatasetGroup = {
   sourceType: DatasetSource.SourceType;
@@ -69,27 +83,15 @@ function DatasetNavbarName({
   name,
   tooltipLabel,
 }: DatasetNavbarNameProps): ReactNode {
-  const [textRef, isTruncated] = useCheckTruncatedText<HTMLSpanElement>([name]);
-
-  // `truncate` rather than `lineClamp`: a row is one line. `lineClamp` also
-  // sets `display: -webkit-box`, so the block display on this name would
-  // silently disable it.
   return (
-    <Tooltip
-      label={tooltipLabel ?? name}
-      disabled={tooltipLabel === undefined && !isTruncated}
-      position="right"
+    <TruncatedText
+      className={css.datasetNavbarName}
+      size="sm"
+      tooltipLabel={tooltipLabel}
+      tooltipProps={{ position: "right" }}
     >
-      <Text
-        ref={textRef}
-        className={css.datasetNavbarName}
-        size="sm"
-        component="span"
-        truncate
-      >
-        {name}
-      </Text>
-    </Tooltip>
+      {name}
+    </TruncatedText>
   );
 }
 
@@ -148,9 +150,74 @@ function makeDatasetLink(
   return link as NavLinkProps & { key: string };
 }
 
+function makeDictionaryLink(options: {
+  workspaceSlug: string;
+  dictionary: DataDictionary.T;
+}): NavLinkProps & { key: string } {
+  const { workspaceSlug, dictionary } = options;
+  // Destination only, for the same reasons as `makeDatasetLink`.
+  const { to, params } = AppLinks.dataManagerDictionaryView({
+    workspaceSlug,
+    dictionaryId: dictionary.id,
+    dictionaryName: dictionary.name,
+  });
+  return {
+    key: dictionary.id,
+    to,
+    params,
+    className: css.datasetNavbarLink,
+    leftSection: <IconBook size={16} stroke={1.6} aria-hidden />,
+    label: <DatasetNavbarName name={dictionary.name} />,
+  } as NavLinkProps & { key: string };
+}
+
+function makeCrosswalkLink(options: {
+  workspaceSlug: string;
+  crosswalk: Crosswalk.T;
+}): NavLinkProps & { key: string } {
+  const { workspaceSlug, crosswalk } = options;
+  // Destination only, for the same reasons as `makeDatasetLink`.
+  const { to, params } = AppLinks.dataManagerCrosswalkView({
+    workspaceSlug,
+    crosswalkId: crosswalk.id,
+    crosswalkName: crosswalk.name,
+  });
+  return {
+    key: crosswalk.id,
+    to,
+    params,
+    className: css.datasetNavbarLink,
+    leftSection: <IconArrowMerge size={16} stroke={1.6} aria-hidden />,
+    label: <DatasetNavbarName name={crosswalk.name} />,
+  } as NavLinkProps & { key: string };
+}
+
+/** The crosswalks whose names contain the filter, as list rows. */
+function useCrosswalkLinks(
+  options: Readonly<{
+    crosswalks: readonly Crosswalk.T[];
+    filter: string;
+    workspaceSlug: string;
+  }>,
+): ReadonlyArray<NavLinkProps & { key: string }> {
+  const { crosswalks, filter, workspaceSlug } = options;
+  return useMemo(() => {
+    const query = filter.trim().toLocaleLowerCase();
+    return crosswalks
+      .filter((crosswalk) => {
+        return (
+          query === "" || crosswalk.name.toLocaleLowerCase().includes(query)
+        );
+      })
+      .map((crosswalk) => {
+        return makeCrosswalkLink({ workspaceSlug, crosswalk });
+      });
+  }, [crosswalks, filter, workspaceSlug]);
+}
+
 /**
- * The master pane of Data Sources: every dataset in the workspace, grouped
- * by where it came from.
+ * The master pane of Data Sources: every dataset, dictionary, and crosswalk in
+ * the workspace, datasets grouped by where they came from.
  *
  * The grouping is withheld while the workspace has only one kind of source,
  * because a single heading over every row labels nothing. The filter is
@@ -158,6 +225,8 @@ function makeDatasetLink(
  */
 export function DatasetNavbar({
   datasets,
+  dictionaries = NO_DICTIONARIES,
+  crosswalks = NO_CROSSWALKS,
   isLoading,
   className,
 }: Readonly<Props>): ReactNode {
@@ -237,7 +306,34 @@ export function DatasetNavbar({
     });
   }, [matchingDatasets, localDatasetIds, workspaceSlug, isOnline]);
 
-  const isGrouped = datasetGroups.length > 1;
+  const matchingDictionaries = useMemo(() => {
+    const query = deferredFilter.trim().toLocaleLowerCase();
+    if (query === "") {
+      return dictionaries;
+    }
+    return dictionaries.filter((dictionary) => {
+      return dictionary.name.toLocaleLowerCase().includes(query);
+    });
+  }, [dictionaries, deferredFilter]);
+
+  const dictionaryLinks = useMemo(() => {
+    return matchingDictionaries.map((dictionary) => {
+      return makeDictionaryLink({ workspaceSlug, dictionary });
+    });
+  }, [matchingDictionaries, workspaceSlug]);
+
+  const crosswalkLinks = useCrosswalkLinks({
+    crosswalks,
+    filter: deferredFilter,
+    workspaceSlug,
+  });
+
+  const totalCount = datasets.length + dictionaries.length + crosswalks.length;
+  const isGrouped =
+    datasetGroups.length +
+      (dictionaryLinks.length > 0 ? 1 : 0) +
+      (crosswalkLinks.length > 0 ? 1 : 0) >
+    1;
 
   const elements = {
     loading() {
@@ -260,10 +356,10 @@ export function DatasetNavbar({
             className={css.datasetNavbarEmptyIcon}
           />
           <Text size="sm" c="dimmed">
-            {datasets.length === 0 ? (
-              <Trans>No datasets yet</Trans>
+            {totalCount === 0 ? (
+              <Trans>No data yet</Trans>
             ) : (
-              <Trans>No datasets match your filter</Trans>
+              <Trans>Nothing matches your filter</Trans>
             )}
           </Text>
         </Stack>
@@ -271,36 +367,68 @@ export function DatasetNavbar({
     },
 
     groups() {
-      return datasetGroups.map((group) => {
-        return (
-          <div key={group.sourceType} className={css.datasetNavbarGroup}>
-            {isGrouped ? (
-              <Text component="h4" className={css.datasetNavbarGroupTitle}>
-                {sourceGroupLabels[group.sourceType]}
-              </Text>
-            ) : null}
-            <NavLinkList
-              links={group.links}
-              gap={6}
-              inactiveHoverColor="neutral.1"
-            />
-          </div>
-        );
-      });
+      return (
+        <>
+          {datasetGroups.map((group) => {
+            return (
+              <div key={group.sourceType} className={css.datasetNavbarGroup}>
+                {isGrouped ? (
+                  <Text component="h4" className={css.datasetNavbarGroupTitle}>
+                    {sourceGroupLabels[group.sourceType]}
+                  </Text>
+                ) : null}
+                <NavLinkList
+                  links={group.links}
+                  gap={6}
+                  inactiveHoverColor="neutral.1"
+                />
+              </div>
+            );
+          })}
+          {dictionaryLinks.length > 0 ? (
+            <div className={css.datasetNavbarGroup}>
+              {isGrouped ? (
+                <Text component="h4" className={css.datasetNavbarGroupTitle}>
+                  <Trans>Dictionaries</Trans>
+                </Text>
+              ) : null}
+              <NavLinkList
+                links={dictionaryLinks}
+                gap={6}
+                inactiveHoverColor="neutral.1"
+              />
+            </div>
+          ) : null}
+          {crosswalkLinks.length > 0 ? (
+            <div className={css.datasetNavbarGroup}>
+              {isGrouped ? (
+                <Text component="h4" className={css.datasetNavbarGroupTitle}>
+                  <Trans>Crosswalks</Trans>
+                </Text>
+              ) : null}
+              <NavLinkList
+                links={crosswalkLinks}
+                gap={6}
+                inactiveHoverColor="neutral.1"
+              />
+            </div>
+          ) : null}
+        </>
+      );
     },
   };
 
   return (
     <AppListPane
       className={className}
-      title={<Trans>Datasets</Trans>}
-      count={isLoading ? undefined : datasets.length}
+      title={<Trans>All data</Trans>}
+      count={isLoading ? undefined : totalCount}
       action={isLoading ? <Loader size={14} /> : null}
       filter={
-        datasets.length >= FILTER_VISIBLE_THRESHOLD ? (
+        totalCount >= FILTER_VISIBLE_THRESHOLD ? (
           <TextInput
-            aria-label={t`Filter datasets`}
-            placeholder={t`Filter datasets`}
+            aria-label={t`Filter data`}
+            placeholder={t`Filter data`}
             leftSection={<IconSearch size={14} stroke={1.6} />}
             size="xs"
             value={filter}
@@ -311,9 +439,11 @@ export function DatasetNavbar({
         ) : null
       }
     >
-      {isLoading && datasets.length === 0
+      {isLoading && totalCount === 0
         ? elements.loading()
-        : datasetGroups.length === 0
+        : datasetGroups.length === 0 &&
+            dictionaryLinks.length === 0 &&
+            crosswalkLinks.length === 0
           ? elements.empty()
           : elements.groups()}
     </AppListPane>

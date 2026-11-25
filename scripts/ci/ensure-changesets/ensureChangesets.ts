@@ -11,8 +11,10 @@ import { findLastReleaseCommitSha } from "./findLastReleaseCommitSha/findLastRel
 import { getPackageNamesFromChangedFiles } from "./getPackageNamesFromChangedFiles/getPackageNamesFromChangedFiles";
 import { inferBumpType } from "./inferBumpType/inferBumpType";
 import { makeChangesetMarkdown } from "./makeChangesetMarkdown/makeChangesetMarkdown";
+import { makePackageNameByDirFromEntries } from "./makePackageNameByDirFromEntries/makePackageNameByDirFromEntries";
 import type { CommitSummary } from "./findLastReleaseCommitSha/findLastReleaseCommitSha";
 import type { SemverBump } from "./inferBumpType/inferBumpType";
+import type { PackageDirEntry } from "./makePackageNameByDirFromEntries/makePackageNameByDirFromEntries";
 
 const REPO_ROOT = process.cwd();
 const CHANGESET_DIR = join(REPO_ROOT, ".changeset");
@@ -43,29 +45,32 @@ function _runGh(args: string[]): string {
   }).trim();
 }
 
-/** Maps each `packages/<tier>/<name>` directory to its package.json name. */
+/**
+ * Maps each publishable `packages/<tier>/<name>` directory to its package.json
+ * name. Private packages are left out, see `makePackageNameByDirFromEntries`.
+ */
 function _loadPackageDirToName(): Map<string, string> {
-  const packageDirEntries = PACKAGE_TIERS.flatMap((tier) => {
+  const packageEntries = PACKAGE_TIERS.flatMap((tier) => {
     const tierDir = join(REPO_ROOT, "packages", tier);
     if (!existsSync(tierDir)) {
       return [];
     }
     return readdirSync(tierDir)
-      .map((packageDirName): [string, string] | undefined => {
-        const packageJsonPath = join(tierDir, packageDirName, "package.json");
-        if (!existsSync(packageJsonPath)) {
-          return undefined;
-        }
-        const packageJson = JSON.parse(
-          readFileSync(packageJsonPath, "utf8"),
-        ) as { name: string };
-        return [`packages/${tier}/${packageDirName}`, packageJson.name];
+      .filter((packageDirName) => {
+        return existsSync(join(tierDir, packageDirName, "package.json"));
       })
-      .filter((entry): entry is [string, string] => {
-        return entry !== undefined;
+      .map((packageDirName): PackageDirEntry => {
+        const packageJsonPath = join(tierDir, packageDirName, "package.json");
+        return {
+          packageDir: `packages/${tier}/${packageDirName}`,
+          packageJson: JSON.parse(readFileSync(packageJsonPath, "utf8")) as {
+            name: string;
+            private?: boolean;
+          },
+        };
       });
   });
-  return new Map(packageDirEntries);
+  return makePackageNameByDirFromEntries(packageEntries);
 }
 
 /**

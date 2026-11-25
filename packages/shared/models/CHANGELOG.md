@@ -1,5 +1,14 @@
 # @avandar/models
 
+## 0.3.0
+
+### Patch Changes
+
+- chore(lint): replace eslint directives with canonical oxlint rules (605670e)
+
+- Updated dependencies []:
+  - @avandar/utils@0.3.0
+
 ## 0.2.0
 
 ### Minor Changes

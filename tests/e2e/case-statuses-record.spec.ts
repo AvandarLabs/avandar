@@ -53,7 +53,9 @@ function _insertCaseType(
 
 async function _openRecordFromSidebar(page: Page): Promise<void> {
   await page.getByRole("link", { name: CASE_TYPE_NAME, exact: true }).click();
-  await page.getByRole("link", { name: new RegExp(`${RECORD_NAME}$`) }).click();
+  await page
+    .getByRole("link", { name: new RegExp(`\\b${RECORD_NAME}\\b`) })
+    .click();
   await expect(
     page.getByRole("heading", { name: RECORD_NAME, level: 3 }),
   ).toBeVisible({ timeout: LONG_WAIT });
@@ -98,7 +100,7 @@ test.describe("record status", () => {
       ).toBeVisible();
       await expect(
         page
-          .getByRole("link", { name: new RegExp(`${RECORD_NAME}$`) })
+          .getByRole("link", { name: new RegExp(`\\b${RECORD_NAME}\\b`) })
           .getByRole("img", { name: "Confirmed" }),
       ).toBeVisible({ timeout: MEDIUM_WAIT });
 

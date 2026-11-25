@@ -19,14 +19,23 @@ const ROUTE_SCHEMA = {
 const CHAT_PATTERN =
   /^((hi|hello|hey)( there)?|thanks|thank you|thx|ok|okay|great|cool|bye|good (morning|afternoon|evening))[\s!.,]*$|^(how do i|how can i|what can you|who are you|what are you|help\b)/i;
 
+/** A request to change a dashboard, which only the data tools can do. */
+const DASHBOARD_PATTERN = /\bdashboards?\b/i;
+
+/** True when a message names a dashboard. */
+export function namesDashboard(message: string): boolean {
+  return DASHBOARD_PATTERN.test(message);
+}
+
 /** Words that only a question about the data would use. */
 const DATA_PATTERN =
   /\b(how many|how much|total|count|sum|average|mean|median|most|least|top|highest|lowest|trend|over time|per|by (day|week|month|year|state|county|country|region)|daily|weekly|monthly|yearly|compare|vs|versus|chart|graph|plot|table|show|list|which|when|where|rate|percent|share|change|growth|increase|decrease|rank)\b/i;
 
 /**
  * Settles the clear cases without a model call: greetings, thanks, and
- * how-to questions are chat; a message using analysis words or naming a
- * dataset is data. Returns undefined when only a model can tell.
+ * how-to questions are chat; a message using analysis words, naming a
+ * dataset, or naming a dashboard is data. Returns undefined when only a
+ * model can tell.
  */
 export function routeOfflineMessageByRules(
   message: string,
@@ -35,6 +44,9 @@ export function routeOfflineMessageByRules(
   const text = message.trim();
   if (CHAT_PATTERN.test(text)) {
     return "chat";
+  }
+  if (namesDashboard(text)) {
+    return "data";
   }
   const namesDataset = datasetNames.some((name) => {
     const stem = name.replace(/\.[a-z0-9]+$/i, "").toLowerCase();

@@ -1,20 +1,59 @@
+import { createHash } from "node:crypto";
 import { describe, expect, it, vi } from "vitest";
+import { formatDashboardCardLine } from "$/agent/dashboardBlocks/dashboardCardLine";
+import { buildAgentContextBlocks } from "$/agent/mentions/buildAgentContextBlocks";
+import { buildAgentTurnText } from "$/agent/pageContext/buildAgentTurnText";
 import {
   buildOfflineDataAgentSystemPrompt,
   buildOfflineQuestionMessage,
 } from "@/lib/agent/dataAgent/offline/buildOfflineDataAgentSystemPrompt/buildOfflineDataAgentSystemPrompt";
-import { routeOfflineMessageByRules } from "@/lib/agent/dataAgent/offline/classifyOfflineMessage/classifyOfflineMessage";
+import {
+  classifyOfflineMessage,
+  routeOfflineMessageByRules,
+} from "@/lib/agent/dataAgent/offline/classifyOfflineMessage/classifyOfflineMessage";
 import { createOfflineDataAgent } from "@/lib/agent/dataAgent/offline/createOfflineDataAgent/createOfflineDataAgent";
 import {
   extractQuestionTerms,
   findQuestionValues,
 } from "@/lib/agent/dataAgent/offline/findQuestionValues/findQuestionValues";
 import { profileOfflineDatasets } from "@/lib/agent/dataAgent/offline/profileOfflineDatasets/profileOfflineDatasets";
+import type { AgentGadgetContext } from "$/agent/mentions/AgentGadgetContext";
+import type { AgentPageContext } from "$/agent/pageContext/AgentPageContext";
 import type { DataAgentHost } from "@/lib/agent/dataAgent/DataAgentHost";
+import type { OfflineDatasetProfile } from "@/lib/agent/dataAgent/offline/profileOfflineDatasets/profileOfflineDatasets";
 import type {
   LocalLlm,
   LocalLlmRequest,
 } from "@/lib/agent/localModels/LocalLlm";
+
+// Wrap the router and value matcher so a test can read what they were given.
+// Each still runs its real implementation.
+vi.mock(
+  "@/lib/agent/dataAgent/offline/classifyOfflineMessage/classifyOfflineMessage",
+  async (importOriginal) => {
+    const actual =
+      await importOriginal<
+        typeof import("@/lib/agent/dataAgent/offline/classifyOfflineMessage/classifyOfflineMessage")
+      >();
+    return {
+      ...actual,
+      classifyOfflineMessage: vi.fn(actual.classifyOfflineMessage),
+    };
+  },
+);
+vi.mock(
+  "@/lib/agent/dataAgent/offline/findQuestionValues/findQuestionValues",
+  async (importOriginal) => {
+    const actual =
+      await importOriginal<
+        typeof import("@/lib/agent/dataAgent/offline/findQuestionValues/findQuestionValues")
+      >();
+    return {
+      ...actual,
+      findQuestionValues: vi.fn(actual.findQuestionValues),
+    };
+  },
+);
 
 const US = {
   id: "aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa",
@@ -29,6 +68,32 @@ const WORLD = {
   id: "bbbbbbbb-2222-4222-8222-bbbbbbbbbbbb",
   name: "world.csv",
   columns: [{ name: "country", dataType: "varchar" }],
+};
+
+/** A line list whose GENDER column has a code list attached. */
+const LINE_LIST = {
+  id: "cccccccc-3333-4333-8333-cccccccccccc",
+  name: "line list",
+  columns: [
+    {
+      name: "GENDER",
+      dataType: "bigint",
+      codes: {
+        direction: "decode" as const,
+        pairs: [
+          { code: "1", label: "Male", acceptedSpellings: [], isMissing: false },
+          {
+            code: "2",
+            label: "Female",
+            acceptedSpellings: ["F"],
+            isMissing: false,
+          },
+          { code: "9", label: "", acceptedSpellings: [], isMissing: true },
+        ],
+      },
+    },
+    { name: "hosp_yn", dataType: "varchar" },
+  ],
 };
 
 /** Answers the profile and lookup queries the offline agent sends. */
@@ -126,6 +191,208 @@ describe("findQuestionValues", () => {
         return match.storedValue;
       }),
     ).toEqual(["New York"]);
+  });
+});
+
+describe("findQuestionValues with code lists", () => {
+  it("finds a label in a code list and gives the code to filter on", async () => {
+    const host = _createHost({
+      readColumnValues: vi.fn(async (sql: string) => {
+        return sql.includes("concat_ws") ? ["24|2"] : [];
+      }),
+    });
+    const profiles = await profileOfflineDatasets(host, [LINE_LIST]);
+
+    const matches = await findQuestionValues(host, {
+      datasets: [LINE_LIST],
+      profiles,
+      question: "How many female cases were hospitalized?",
+    });
+
+    expect(matches).toContainEqual({
+      term: "female",
+      datasetId: LINE_LIST.id,
+      column: "GENDER",
+      storedValue: "2",
+      codeLabel: "Female",
+    });
+  });
+});
+
+describe("offline prompt with code lists", () => {
+  it("lists a coded column's codes and marks a code with no label", async () => {
+    const host = _createHost({
+      readColumnValues: vi.fn(async (sql: string) => {
+        return sql.includes("concat_ws") ? ["24|2"] : ["Y", "N"];
+      }),
+    });
+    const profiles = await profileOfflineDatasets(host, [LINE_LIST]);
+
+    const prompt = buildOfflineDataAgentSystemPrompt({
+      datasets: [LINE_LIST],
+      profiles,
+      today: "2026-11-12",
+    });
+
+    expect(prompt).toContain(
+      '- GENDER bigint, codes: 1 = "Male", 2 = "Female", 9 = (no label) (missing value)',
+    );
+  });
+
+  it("tells the model the code a label in the question stands for", () => {
+    const message = buildOfflineQuestionMessage({
+      question: "How many female cases?",
+      matches: [
+        {
+          term: "female",
+          datasetId: LINE_LIST.id,
+          column: "GENDER",
+          storedValue: "2",
+          codeLabel: "Female",
+        },
+      ],
+      datasets: [LINE_LIST],
+    });
+
+    expect(message).toContain(
+      '- "female" is code 2 in t0."GENDER" (2 = Female).',
+    );
+  });
+});
+
+/** A one-column dataset whose column holds `pairs` as codes. */
+function _createCodedDataset(
+  id: string,
+  dataType: string,
+  pairs: ReadonlyArray<{ code: string; label: string }>,
+): {
+  dataset: typeof LINE_LIST;
+  profile: OfflineDatasetProfile;
+} {
+  const column = {
+    name: "coded",
+    dataType,
+    codes: {
+      direction: "decode" as const,
+      pairs: pairs.map((pair) => {
+        return { ...pair, acceptedSpellings: [], isMissing: false };
+      }),
+    },
+  };
+  return {
+    dataset: { id, name: `dataset ${id}`, columns: [column] },
+    profile: { datasetId: id, rowCount: 1, columns: [column] },
+  };
+}
+
+describe("offline prompt code-list limits", () => {
+  it("escapes a quote and writes a newline as a space in a code list", () => {
+    const { dataset, profile } = _createCodedDataset(LINE_LIST.id, "varchar", [
+      { code: 'A"1', label: 'Said "yes"\nloudly' },
+    ]);
+
+    const prompt = buildOfflineDataAgentSystemPrompt({
+      datasets: [dataset],
+      profiles: [profile],
+      today: "2026-11-12",
+    });
+
+    expect(prompt).toContain(
+      '- coded varchar, codes: "A\\"1" = "Said \\"yes\\" loudly"',
+    );
+  });
+
+  it("cuts a long label to 60 characters", () => {
+    const { dataset, profile } = _createCodedDataset(LINE_LIST.id, "bigint", [
+      { code: "1", label: "x".repeat(80) },
+    ]);
+
+    const prompt = buildOfflineDataAgentSystemPrompt({
+      datasets: [dataset],
+      profiles: [profile],
+      today: "2026-11-12",
+    });
+
+    expect(prompt).toContain(`codes: 1 = "${"x".repeat(57)}..."`);
+  });
+
+  it("names coded columns past the code-list budget by name and type", () => {
+    const pairs = Array.from({ length: 30 }, (_, index) => {
+      return { code: String(index), label: `Label number ${index}` };
+    });
+    const coded = Array.from({ length: 20 }, (_, index) => {
+      return _createCodedDataset(
+        `dddddddd-${String(index).padStart(4, "0")}-4ddd-8ddd-dddddddddddd`,
+        "bigint",
+        pairs,
+      );
+    });
+
+    const prompt = buildOfflineDataAgentSystemPrompt({
+      datasets: coded.map(({ dataset }) => {
+        return dataset;
+      }),
+      profiles: coded.map(({ profile }) => {
+        return profile;
+      }),
+      today: "2026-11-12",
+    });
+
+    expect(prompt).toContain("  - coded bigint\n");
+    expect(prompt).toMatch(
+      /\n\(and \d+ more columns with code lists\)\n\nToday/,
+    );
+  });
+
+  it("lists one label's codes on one line and flags it across datasets", () => {
+    const { dataset: first } = _createCodedDataset(LINE_LIST.id, "bigint", []);
+    const { dataset: second } = _createCodedDataset(WORLD.id, "varchar", []);
+
+    const message = buildOfflineQuestionMessage({
+      question: "How many female cases?",
+      matches: [
+        {
+          term: "female",
+          datasetId: first.id,
+          column: "GENDER",
+          storedValue: "2",
+          codeLabel: "Female",
+        },
+        {
+          term: "female",
+          datasetId: second.id,
+          column: "sex_cd",
+          storedValue: "F",
+          codeLabel: "Female",
+        },
+      ],
+      datasets: [first, second],
+    });
+
+    expect(message).toMatch(
+      /- "female" is code 2 in t\d\."GENDER" \(2 = Female\), code F in t\d\."sex_cd" \(F = Female\)\. This name means different things/,
+    );
+  });
+
+  it("caps the columns one label lists", () => {
+    const matches = Array.from({ length: 8 }, (_, index) => {
+      return {
+        term: "yes",
+        datasetId: LINE_LIST.id,
+        column: `flag_${index}`,
+        storedValue: "Y",
+        codeLabel: "Yes",
+      };
+    });
+
+    const message = buildOfflineQuestionMessage({
+      question: "How many said yes?",
+      matches,
+      datasets: [LINE_LIST],
+    });
+
+    expect(message).toContain('t0."flag_4" (Y = Yes), and 3 more columns.');
+    expect(message).not.toContain("flag_5");
   });
 });
 
@@ -306,5 +573,527 @@ describe("routeOfflineMessageByRules", () => {
     ["covid in georgia", undefined],
   ])("routes %j as %s", (message, route) => {
     expect(routeOfflineMessageByRules(message, ["us.csv"])).toBe(route);
+  });
+});
+
+/**
+ * Asks the offline agent one turn and reports the message the router was
+ * given, the question the value matcher read, the text the answer model
+ * read as the user's turn, and the system message it read first.
+ */
+async function _askOffline(turnText: string): Promise<{
+  routerMessage: string | undefined;
+  matchedQuestion: string | undefined;
+  modelText: string;
+  systemText: string;
+}> {
+  const { llm, requests } = _createLlm([
+    '{"action":"run_query","args":{"sql":"SELECT 1 FROM \\"t0\\"","summary":"Deaths."}}',
+    '{"action":"reply","text":"Done."}',
+  ]);
+  vi.mocked(classifyOfflineMessage).mockClear();
+  vi.mocked(findQuestionValues).mockClear();
+  const agent = createOfflineDataAgent({
+    datasets: [US],
+    host: _createHost(),
+    llm,
+    models: { answer: "answer-model", router: "router-model" },
+    contextWindow: 8192,
+    today: "2026-11-11",
+  });
+
+  await agent.ask(turnText);
+
+  const userMessage = requests[0]?.messages.find((message) => {
+    return message.role === "user";
+  });
+  const systemMessage = requests[0]?.messages.find((message) => {
+    return message.role === "system";
+  });
+  return {
+    routerMessage: vi.mocked(classifyOfflineMessage).mock.calls[0]?.[1].message,
+    matchedQuestion: vi.mocked(findQuestionValues).mock.calls[0]?.[1].question,
+    modelText: userMessage?.content ?? "",
+    systemText: systemMessage?.content ?? "",
+  };
+}
+
+/**
+ * SHA-256 of the offline prompt for a plain question with no datasets, as
+ * `origin/demo/measles` builds it. A plain question must keep it, since a
+ * small model reads a longer prompt less well.
+ */
+const PLAIN_SQL_PROMPT_SHA256 =
+  "249e1098f621a8aa52c2309d7350c699279542e58276457ce68d27661dac0069";
+const PLAIN_PLAN_PROMPT_SHA256 =
+  "fbf6f7a6eb62bc1593b6dba40ce977b21c83c6f613b4294a5d9442e5df617880";
+
+function _sha256(text: string): string {
+  return createHash("sha256").update(text).digest("hex");
+}
+
+const EXPLORER_PAGE: AgentPageContext = { app: "data-explorer" };
+
+/** The Data Explorer after an answer, showing its query and columns. */
+const EXPLORER_PAGE_WITH_QUERY: AgentPageContext = {
+  app: "data-explorer",
+  explorer: {
+    sql: 'SELECT SUM("cases") FROM "t0"',
+    resultColumns: [{ name: "sum", dataType: "bigint" }],
+  },
+};
+
+const DASHBOARD_ID = "dddddddd-4444-4444-8444-dddddddddddd";
+
+const DASHBOARD_PAGE: AgentPageContext = {
+  app: "dashboard",
+  dashboard: {
+    id: DASHBOARD_ID,
+    name: "Budget",
+    tiles: [{ title: "Cases", chartType: "line", sql: 'SELECT 1 FROM "t0"' }],
+  },
+};
+
+const DASHBOARD: AgentGadgetContext = {
+  kind: "dashboard",
+  ref: { gadgetType: "dashboard", gadgetId: DASHBOARD_ID, subId: null },
+  name: "Budget",
+  tiles: [{ title: "Cases", chartType: "line", sql: 'SELECT 1 FROM "t0"' }],
+};
+
+const DASHBOARD_TILE: AgentGadgetContext = {
+  kind: "dashboard_tile",
+  ref: {
+    gadgetType: "dashboard_tile",
+    gadgetId: DASHBOARD_ID,
+    subId: "tile-1",
+  },
+  dashboardName: "Budget",
+  tile: { title: "Cases", chartType: "line", sql: 'SELECT 1 FROM "t0"' },
+};
+
+const CANCELLED_CARD_LINE = formatDashboardCardLine(
+  { kind: "cancelled" },
+  (text) => {
+    return text;
+  },
+);
+
+type TurnInput = {
+  message: string;
+  page?: AgentPageContext;
+  attached?: AgentGadgetContext[];
+  mentioned?: AgentGadgetContext[];
+  cardLines?: string[];
+};
+
+/**
+ * The text of each turn of one conversation as the app builds it: the card
+ * lines, the page, attached, and mentioned blocks, then the message. A page
+ * or tray identical to the last turn's reads "unchanged".
+ */
+function _buildTurnTexts(turns: readonly TurnInput[]): string[] {
+  let lastPageBlock: string | undefined;
+  let lastAttachedBlock: string | undefined;
+  return turns.map((turn) => {
+    const blocks = buildAgentContextBlocks({
+      page: turn.page,
+      attached: turn.attached ?? [],
+      mentioned: turn.mentioned ?? [],
+      aliases: [],
+    });
+    const text = buildAgentTurnText({
+      message: turn.message,
+      pageBlock: blocks.pageBlock,
+      previousPageBlock: lastPageBlock,
+      attachedBlock: blocks.attachedBlock,
+      previousAttachedBlock: lastAttachedBlock,
+      mentionedBlock: blocks.mentionedBlock,
+      dashboardCardLines: turn.cardLines,
+    });
+    lastPageBlock = blocks.pageBlock ?? lastPageBlock;
+    lastAttachedBlock = blocks.attachedBlock;
+    return text;
+  });
+}
+
+describe("offline dashboard requests", () => {
+  it("routes an add-to-dashboard request to data by rules", () => {
+    expect(
+      routeOfflineMessageByRules("Add a heading to the Budget dashboard", []),
+    ).toBe("data");
+    expect(routeOfflineMessageByRules("how do I make a dashboard?", [])).toBe(
+      "chat",
+    );
+  });
+
+  it("tells the offline model about blocks and the dashboard tool when asked to", () => {
+    const prompt = buildOfflineDataAgentSystemPrompt({
+      datasets: [],
+      profiles: [],
+      today: "2026-11-11",
+      hasDashboardContext: true,
+    });
+    const planPrompt = buildOfflineDataAgentSystemPrompt({
+      datasets: [],
+      profiles: [],
+      today: "2026-11-11",
+      queryStyle: "plan",
+      hasDashboardContext: true,
+    });
+
+    expect(prompt).toContain("add_dashboard_block");
+    expect(prompt).toContain("<current_page>");
+    expect(planPrompt).toContain("add_dashboard_block");
+    expect(planPrompt).toContain("<current_page>");
+  });
+
+  it("keeps the dashboard text out of the prompt for a plain question", () => {
+    const prompt = buildOfflineDataAgentSystemPrompt({
+      datasets: [],
+      profiles: [],
+      today: "2026-11-11",
+    });
+    const planPrompt = buildOfflineDataAgentSystemPrompt({
+      datasets: [],
+      profiles: [],
+      today: "2026-11-11",
+      queryStyle: "plan",
+    });
+
+    for (const text of [prompt, planPrompt]) {
+      expect(text).not.toContain("add_dashboard_block");
+      expect(text).not.toContain("<current_page>");
+      expect(text).not.toContain("DASHBOARDS");
+    }
+    expect(prompt).toContain(
+      "Never answer a data question without calling run_query. Never ask",
+    );
+  });
+
+  it("builds the same prompt for a plain question as before dashboards", () => {
+    const prompt = buildOfflineDataAgentSystemPrompt({
+      datasets: [],
+      profiles: [],
+      today: "2026-11-11",
+    });
+    const planPrompt = buildOfflineDataAgentSystemPrompt({
+      datasets: [],
+      profiles: [],
+      today: "2026-11-11",
+      queryStyle: "plan",
+    });
+
+    expect(_sha256(prompt)).toBe(PLAIN_SQL_PROMPT_SHA256);
+    expect(_sha256(planPrompt)).toBe(PLAIN_PLAN_PROMPT_SHA256);
+  });
+
+  it("names the dashboard tool in the never-answer rule once it applies", () => {
+    const prompt = buildOfflineDataAgentSystemPrompt({
+      datasets: [],
+      profiles: [],
+      today: "2026-11-11",
+      hasDashboardContext: true,
+    });
+
+    expect(prompt).toContain(
+      "Never answer a data question without calling run_query, or add_dashboard_block when the user asks to add something to a dashboard. Never ask",
+    );
+  });
+
+  it("sends no dashboard text with a plain question", async () => {
+    const asked = await _askOffline("how many deaths in total?");
+
+    expect(asked.systemText).not.toContain("DASHBOARDS");
+    expect(asked.systemText).not.toContain("<current_page>");
+  });
+
+  it("sends no dashboard text with a plain question on a Data Explorer page", async () => {
+    const asked = await _askOffline(
+      _buildTurnTexts([
+        { message: "how many deaths in total?", page: EXPLORER_PAGE },
+      ])[0]!,
+    );
+
+    expect(asked.systemText).not.toContain("DASHBOARDS");
+    expect(asked.systemText).not.toContain("CONTEXT");
+    expect(asked.systemText).not.toContain("add_dashboard_block");
+    expect(asked.modelText.startsWith("<current_page>")).toBe(true);
+  });
+
+  it.each([
+    ["on a dashboard page", { page: DASHBOARD_PAGE }],
+    [
+      "when a dashboard is mentioned",
+      { page: EXPLORER_PAGE, mentioned: [DASHBOARD] },
+    ],
+    [
+      "when a chart from a dashboard is attached",
+      { page: EXPLORER_PAGE, attached: [DASHBOARD_TILE] },
+    ],
+    [
+      "when the turn has a dashboard card line",
+      { page: EXPLORER_PAGE, cardLines: [CANCELLED_CARD_LINE] },
+    ],
+  ])("sends the dashboard text %s", async (_name, turn) => {
+    const asked = await _askOffline(
+      _buildTurnTexts([{ message: "how many deaths in total?", ...turn }])[0]!,
+    );
+
+    expect(asked.systemText).toContain("DASHBOARDS");
+    expect(asked.systemText).toContain("<current_page>");
+  });
+
+  it("sends the dashboard text when the message names a dashboard", async () => {
+    const asked = await _askOffline("Add a heading to the Budget dashboard");
+
+    expect(asked.systemText).toContain("DASHBOARDS");
+  });
+
+  it("routes and matches values on the message, keeping the blocks", async () => {
+    const asked = await _askOffline(
+      "<current_page>Page: Map\nTitle: Ohio cases</current_page>\n\nhow many deaths in total?",
+    );
+
+    expect(asked.routerMessage).toBe("how many deaths in total?");
+    expect(asked.matchedQuestion).toBe("how many deaths in total?");
+    expect(asked.modelText.startsWith("<current_page>")).toBe(true);
+    expect(asked.modelText).toContain("how many deaths in total?");
+  });
+});
+
+/**
+ * Asks the offline agent each turn in order, with a model that runs one
+ * query and then replies, and reports for each turn whether the model's
+ * first request offered `add_dashboard_block`.
+ */
+async function _offersDashboardToolOnEachTurn(
+  turnTexts: readonly string[],
+): Promise<boolean[]> {
+  const { llm, requests } = _createLlm(
+    turnTexts.flatMap(() => {
+      return [
+        '{"action":"run_query","args":{"sql":"SELECT 1 FROM \\"t0\\"","summary":"Deaths."}}',
+        '{"action":"reply","text":"Done."}',
+      ];
+    }),
+  );
+  const agent = createOfflineDataAgent({
+    datasets: [US],
+    host: _createHost(),
+    llm,
+    models: { answer: "answer-model", router: "router-model" },
+    contextWindow: 8192,
+    today: "2026-11-11",
+  });
+  const offered: boolean[] = [];
+  for (const turnText of turnTexts) {
+    const firstRequestIndex = requests.length;
+    await agent.ask(turnText);
+    offered.push(
+      JSON.stringify(requests[firstRequestIndex]?.jsonSchema).includes(
+        "add_dashboard_block",
+      ),
+    );
+  }
+  return offered;
+}
+
+describe("offline dashboard tool", () => {
+  it("is not offered on a plain question", async () => {
+    expect(
+      await _offersDashboardToolOnEachTurn(["how many deaths in total?"]),
+    ).toEqual([false]);
+  });
+
+  it("is not offered on a plain question on a Data Explorer page", async () => {
+    expect(
+      await _offersDashboardToolOnEachTurn(
+        _buildTurnTexts([
+          { message: "how many deaths in total?", page: EXPLORER_PAGE },
+          {
+            message: "how many deaths in Ohio?",
+            page: EXPLORER_PAGE_WITH_QUERY,
+          },
+        ]),
+      ),
+    ).toEqual([false, false]);
+  });
+
+  it("is not offered on a map page", async () => {
+    expect(
+      await _offersDashboardToolOnEachTurn(
+        _buildTurnTexts([
+          { message: "how many deaths in total?", page: { app: "map" } },
+        ]),
+      ),
+    ).toEqual([false]);
+  });
+
+  it.each([
+    ["on a dashboard page", { page: DASHBOARD_PAGE }],
+    [
+      "when a dashboard is mentioned",
+      { page: EXPLORER_PAGE, mentioned: [DASHBOARD] },
+    ],
+    [
+      "when a dashboard is attached",
+      { page: EXPLORER_PAGE, attached: [DASHBOARD] },
+    ],
+    [
+      "when the turn has a dashboard card line",
+      { page: EXPLORER_PAGE, cardLines: [CANCELLED_CARD_LINE] },
+    ],
+  ])("is offered %s", async (_name, turn) => {
+    expect(
+      await _offersDashboardToolOnEachTurn(
+        _buildTurnTexts([{ message: "how many deaths in total?", ...turn }]),
+      ),
+    ).toEqual([true]);
+  });
+
+  it("is offered when the message names a dashboard", async () => {
+    expect(
+      await _offersDashboardToolOnEachTurn([
+        "Add a heading to the Budget dashboard",
+      ]),
+    ).toEqual([true]);
+  });
+
+  it("goes away again on the next plain question", async () => {
+    expect(
+      await _offersDashboardToolOnEachTurn([
+        "Add a heading to the Budget dashboard",
+        "how many deaths in total?",
+        ..._buildTurnTexts([
+          { message: "how many deaths in total?", page: DASHBOARD_PAGE },
+        ]),
+      ]),
+    ).toEqual([true, false, true]);
+  });
+
+  it("stays offered while the user stays on a dashboard page, then goes away", async () => {
+    const turnTexts = _buildTurnTexts([
+      { message: "how many deaths in total?", page: DASHBOARD_PAGE },
+      { message: "how many deaths in Ohio?", page: DASHBOARD_PAGE },
+      { message: "how many deaths in Utah?", page: EXPLORER_PAGE },
+    ]);
+
+    expect(turnTexts[1]).toContain("Unchanged since the last message.");
+    expect(await _offersDashboardToolOnEachTurn(turnTexts)).toEqual([
+      true,
+      true,
+      false,
+    ]);
+  });
+
+  it("stays offered while a dashboard stays attached, then goes away", async () => {
+    const turnTexts = _buildTurnTexts([
+      {
+        message: "how many deaths?",
+        page: EXPLORER_PAGE,
+        attached: [DASHBOARD],
+      },
+      {
+        message: "how many deaths in Ohio?",
+        page: EXPLORER_PAGE,
+        attached: [DASHBOARD],
+      },
+      { message: "how many deaths in Utah?", page: EXPLORER_PAGE },
+    ]);
+
+    expect(await _offersDashboardToolOnEachTurn(turnTexts)).toEqual([
+      true,
+      true,
+      false,
+    ]);
+  });
+});
+
+/**
+ * An offline agent with a router, whose local model fails while `isDown` is
+ * set, and the requests its model received.
+ */
+function _createFlakyOfflineAgent(): {
+  agent: ReturnType<typeof createOfflineDataAgent>;
+  requests: LocalLlmRequest[];
+  setIsDown: (isDown: boolean) => void;
+} {
+  const { llm, requests } = _createLlm([]);
+  let isDown = false;
+  const agent = createOfflineDataAgent({
+    datasets: [US],
+    host: _createHost(),
+    llm: {
+      complete: async (request) => {
+        if (isDown) {
+          throw new Error("engine down");
+        }
+        return llm.complete(request);
+      },
+    },
+    models: { answer: "answer-model", router: "router-model" },
+    contextWindow: 8192,
+    today: "2026-11-11",
+  });
+  return {
+    agent,
+    requests,
+    setIsDown: (nextIsDown) => {
+      isDown = nextIsDown;
+    },
+  };
+}
+
+/** Whether a model request listed `add_dashboard_block`. */
+function _offersDashboardTool(request: LocalLlmRequest | undefined): boolean {
+  return JSON.stringify(request?.jsonSchema).includes("add_dashboard_block");
+}
+
+describe("offline dashboard tool after a failed turn", () => {
+  it("stays offered when a turn failed before the model had its text", async () => {
+    const { agent, requests } = _createFlakyOfflineAgent();
+    // The failed turn never reached the model, so the app's memory is still
+    // the first turn's and the third turn's page reads unchanged.
+    const [firstText, unchangedThirdText] = _buildTurnTexts([
+      { message: "how many deaths in total?", page: DASHBOARD_PAGE },
+      { message: "how many deaths in Utah?", page: DASHBOARD_PAGE },
+    ]);
+    const [explorerText] = _buildTurnTexts([
+      { message: "how many deaths in Ohio?", page: EXPLORER_PAGE },
+    ]);
+    await agent.ask(firstText!);
+    vi.mocked(findQuestionValues).mockRejectedValueOnce(
+      new Error("host failed"),
+    );
+    await expect(agent.ask(explorerText!)).rejects.toThrow("host failed");
+
+    const firstRequestIndex = requests.length;
+    await agent.ask(unchangedThirdText!);
+
+    expect(unchangedThirdText).toContain("Unchanged since the last message.");
+    expect(_offersDashboardTool(requests[firstRequestIndex])).toBe(true);
+  });
+
+  it("follows the turn the model heard when its call then failed", async () => {
+    const { agent, requests, setIsDown } = _createFlakyOfflineAgent();
+    const [dashboardText, explorerText, unchangedExplorerText] =
+      _buildTurnTexts([
+        { message: "how many deaths in total?", page: DASHBOARD_PAGE },
+        { message: "how many deaths in Ohio?", page: EXPLORER_PAGE },
+        { message: "how many deaths in Utah?", page: EXPLORER_PAGE },
+      ]);
+    await agent.ask(dashboardText!);
+    setIsDown(true);
+    await expect(agent.ask(explorerText!)).rejects.toThrow("engine down");
+    setIsDown(false);
+
+    const firstRequestIndex = requests.length;
+    await agent.ask(unchangedExplorerText!);
+
+    expect(unchangedExplorerText).toContain(
+      "Unchanged since the last message.",
+    );
+    expect(_offersDashboardTool(requests[firstRequestIndex])).toBe(false);
   });
 });

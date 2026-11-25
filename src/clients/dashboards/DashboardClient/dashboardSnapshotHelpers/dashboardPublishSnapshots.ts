@@ -10,6 +10,7 @@ import { msg } from "@lingui/core/macro";
 import { match } from "ts-pattern";
 import { DashboardSliceBuilder } from "@/clients/dashboards/DashboardSliceBuilder/DashboardSliceBuilder";
 import { getDatasetIdsFromDashboardConfig } from "@/clients/dashboards/getDatasetIdsFromDashboardConfig/getDatasetIdsFromDashboardConfig";
+import { DictionaryBindingClient } from "@/clients/dataDictionaries/DictionaryBindingClient";
 import { DatasetClient } from "@/clients/datasets/DatasetClient/DatasetClient";
 import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
@@ -36,7 +37,7 @@ import type { ILogger } from "@avandar/logger";
 type SnapshotDatasetOptions = {
   availableColumns: readonly string[];
   dataset: Dataset.T;
-  /** Whether the dataset's catalog renames or casts a stored column. */
+  /** Whether the catalog renames, casts, or converts a stored column. */
   hasColumnReplacements: boolean;
   queriedColumns: readonly string[];
   slice: PublishSliceConfig.T;
@@ -209,19 +210,46 @@ async function _getPublishDatasets(
 }
 
 /**
- * The datasets whose column catalog renames or casts a stored column, by the
- * same rule a workspace query applies when it loads the dataset.
+ * The datasets whose stored Parquet differs from what a workspace query
+ * reads: a column the catalog renames or casts, by the same rule a workspace
+ * query applies when it loads the dataset, or any column a dictionary
+ * converts. Their slices are read through the workspace query.
  */
 function _getDatasetIdsWithColumnReplacements(
   columns: readonly DatasetColumn.T[],
+  convertedDatasetIds: readonly Dataset.Id[],
 ): ReadonlySet<Dataset.Id> {
-  return new Set(
-    columns
+  return new Set([
+    ...columns
       .filter((column) => {
         return getColumnReplacementsFromColumns([column]).length > 0;
       })
       .map(prop("datasetId")),
-  );
+    ...convertedDatasetIds,
+  ]);
+}
+
+/**
+ * The datasets with a convert binding. Read fresh, not from the query cache:
+ * publishing writes what visitors see until the next publish.
+ */
+async function _getConvertedDatasetIds(
+  options: Readonly<{
+    datasetIds: readonly Dataset.Id[];
+    workspaceId: Dashboard.T["workspaceId"];
+  }>,
+): Promise<Dataset.Id[]> {
+  if (options.datasetIds.length === 0) {
+    return [];
+  }
+  const bindings = await DictionaryBindingClient.getAll({
+    where: {
+      dataset_id: { in: [...options.datasetIds] },
+      mode: { eq: "convert" },
+      workspace_id: { eq: options.workspaceId },
+    },
+  });
+  return bindings.map(prop("datasetId"));
 }
 
 /** Collects the datasets, columns, and slice config a publish will need. */
@@ -253,10 +281,16 @@ export async function preparePublishSnapshot(
     key: "datasetId",
     valueKey: "name",
   });
+  const convertedDatasetIds = await _getConvertedDatasetIds({
+    datasetIds,
+    workspaceId: dashboard.workspaceId,
+  });
   return {
     columnsByDataset,
-    datasetIdsWithColumnReplacements:
-      _getDatasetIdsWithColumnReplacements(columns),
+    datasetIdsWithColumnReplacements: _getDatasetIdsWithColumnReplacements(
+      columns,
+      convertedDatasetIds,
+    ),
     datasets,
     datasetIds,
     publishConfig,

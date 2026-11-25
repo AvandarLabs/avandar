@@ -1,4 +1,5 @@
 import type {
+  DescribableObject,
   GenericRootData,
   PrimitiveValue,
   PrimitiveValueRenderOptions,
@@ -27,4 +28,10 @@ export type PrimitiveValueItemProps<
    * passed in.
    */
   rootData?: RootData;
+
+  /**
+   * The object this value is a key of, such as the row a table cell sits
+   * in. It gets passed into `renderValue` and `renderEditableValue`.
+   */
+  parentObject?: DescribableObject;
 } & PrimitiveValueRenderOptions<T, RootData>;

@@ -96,6 +96,25 @@ vi.mock("@/views/DataExplorerApp/useDataQuery/useDataQuery", () => {
   return { useDataQuery: useDataQueryMock };
 });
 
+vi.mock(
+  "@/components/VisualizationContainer/VizSettingsForm/PluginVizSettingsForm/PluginVizSettingsForm",
+  () => {
+    return {
+      PluginVizSettingsForm: ({
+        config,
+      }: {
+        config: { pluginVizId: string };
+      }) => {
+        return (
+          <output data-testid="plugin-viz-settings-form">
+            {config.pluginVizId}
+          </output>
+        );
+      },
+    };
+  },
+);
+
 function _renderField(props: RenderFieldOptions): {
   onChange: ReturnType<typeof vi.fn>;
 } {
@@ -200,6 +219,21 @@ describe("VizConfigPField", () => {
           }),
         }),
       }),
+    );
+  });
+
+  it("renders the plugin settings form when the block holds a plugin chart", () => {
+    _renderField({
+      value: {
+        vizType: "plugin",
+        pluginId: "avandar.epidemiology",
+        pluginVizId: "epicurve",
+        columnSettings: {},
+        settings: { interval: "epiWeek" },
+      },
+    });
+    expect(screen.getByTestId("plugin-viz-settings-form")).toHaveTextContent(
+      "epicurve",
     );
   });
 });

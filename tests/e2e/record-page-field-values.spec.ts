@@ -140,10 +140,10 @@ test.describe("Record page field values", () => {
       workspaceSlug,
     });
     await page.getByRole("link", { name: CASE_TYPE_NAME, exact: true }).click();
-    // Each row's link names the record after its status dot, as in
-    // `case-statuses-data-explorer.spec.ts`.
+    // Each row's link names the record between its status dot and its
+    // assignee, as in `case-statuses-data-explorer.spec.ts`.
     await page
-      .getByRole("link", { name: new RegExp(`${RECORD_KEY}$`) })
+      .getByRole("link", { name: new RegExp(`\\b${RECORD_KEY}\\b`) })
       .click();
 
     // Scoped to the one fact whose term is the field's name, so the record's

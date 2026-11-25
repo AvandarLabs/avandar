@@ -131,3 +131,246 @@ assistant's runs are in [pdf/](pdf/README.md).
 | [2026-11-09T11-40-15](2026-11-09T11-40-15-phase-1b_agent-page/results.jsonl) | `phase-1b:agent-page` | 7/7 | 0 | 0 | $0.00021 | 1.7 s / 2.7 s | none |
 | [2026-11-09T11-40-56](2026-11-09T11-40-56-phase-1b_agent-45/results.jsonl) | `phase-1b:agent-45` | 44/45 | 0 | 0 | $0.00055 | 2.1 s / 3.5 s | N04 |
 | [2026-11-09T11-41-09](2026-11-09T11-41-09-phase-1b_rerun-n04/results.jsonl) | `phase-1b:rerun-n04` | 1/1 | 0 | 0 | $0.00036 | 3.5 s / 3.5 s | none |
+| [2026-11-11T19-32-45](2026-11-11T19-32-45-phase-1d_today-dashboards/results.jsonl) | `phase-1d:today-dashboards` | 5/9 | 1 | 0 | $0.00149 | 3.0 s / 9.1 s | D06 D07 D08 D09 |
+| [2026-11-11T19-33-07](2026-11-11T19-33-07-phase-1d_today-dashboards/results.jsonl) | `phase-1d:today-dashboards` | 5/9 | 0 | 0 | $0.00122 | 2.8 s / 4.7 s | D06 D07 D08 D09 |
+| [2026-11-11T19-33-16](2026-11-11T19-33-16-phase-1d_today-dashboards/results.jsonl) | `phase-1d:today-dashboards` | 5/9 | 0 | 0 | $0.00124 | 3.0 s / 4.8 s | D06 D07 D08 D09 |
+| [2026-11-13T05-21-34](2026-11-13T05-21-34-attach-dictionaries_coded/results.jsonl) | `attach-dictionaries:coded` | 4/4 | 0 | 0 | $0.00055 | 2.5 s / 2.6 s | none |
+| [2026-11-13T05-21-42](2026-11-13T05-21-42-attach-dictionaries_coded/results.jsonl) | `attach-dictionaries:coded` | 4/4 | 0 | 0 | $0.00013 | 1.7 s / 1.8 s | none |
+| [2026-11-13T05-21-48](2026-11-13T05-21-48-attach-dictionaries_coded/results.jsonl) | `attach-dictionaries:coded` | 4/4 | 0 | 0 | $0.00306 | 1.9 s / 3.2 s | none |
+| [2026-11-13T05-22-25](2026-11-13T05-22-25-attach-dictionaries_agent-45/results.jsonl) | `attach-dictionaries:agent-45` | 44/45 | 0 | 0 | $0.00032 | 2.3 s / 3.4 s | N04 |
+| [2026-11-13T05-22-35](2026-11-13T05-22-35-attach-dictionaries_agent-page/results.jsonl) | `attach-dictionaries:agent-page` | 6/7 | 0 | 1 | $0.00020 | 1.9 s / 2.2 s | P04 |
+| [2026-11-13T05-22-42](2026-11-13T05-22-42-attach-dictionaries_agent-mentions/results.jsonl) | `attach-dictionaries:agent-mentions` | 6/7 | 0 | 0 | $0.00021 | 2.1 s / 2.9 s | M05 |
+| [2026-11-13T05-24-43](2026-11-13T05-24-43-attach-dictionaries_coded-offline/results.jsonl) | `attach-dictionaries:coded-offline` | 4/4 | 0 | 0 | $0.00000 | 6.0 s / 72.7 s | none |
+| [2026-11-13T05-27-22](2026-11-13T05-27-22-attach-dictionaries_agent-page/results.jsonl) | `attach-dictionaries:agent-page` | 7/7 | 0 | 0 | $0.00020 | 2.2 s / 3.7 s | none |
+| [2026-11-13T05-27-29](2026-11-13T05-27-29-attach-dictionaries_agent-mentions/results.jsonl) | `attach-dictionaries:agent-mentions` | 7/7 | 0 | 0 | $0.00019 | 2.1 s / 2.7 s | none |
+| [2026-11-13T20-44-13](2026-11-13T20-44-13-dictionary-conversions_converted/results.jsonl) | `dictionary-conversions:converted` | 7/7 | 0 | 0 | $0.00041 | 2.0 s / 2.1 s | none |
+| [2026-11-13T20-44-22](2026-11-13T20-44-22-dictionary-conversions_converted/results.jsonl) | `dictionary-conversions:converted` | 7/7 | 0 | 0 | $0.00016 | 1.7 s / 2.0 s | none |
+| [2026-11-13T20-44-29](2026-11-13T20-44-29-dictionary-conversions_converted/results.jsonl) | `dictionary-conversions:converted` | 7/7 | 0 | 0 | $0.00014 | 1.8 s / 2.1 s | none |
+| [2026-11-13T20-46-47](2026-11-13T20-46-47-dictionary-conversions_converted-offline/results.jsonl) | `dictionary-conversions:converted-offline` | 6/7 | 1 | 0 | $0.00000 | 8.6 s / 76.8 s | D04 |
+| [2026-11-17T19-33-12](2026-11-17T19-33-12-phase-1d_agent-dashboards/results.jsonl) | `phase-1d:agent-dashboards` | 8/9 | 0 | 0 | $0.00061 | 2.5 s / 3.2 s | D01 |
+| [2026-11-17T19-33-21](2026-11-17T19-33-21-phase-1d_rerun-d01/results.jsonl) | `phase-1d:rerun-d01` | 0/1 | 0 | 0 | $0.00019 | 1.8 s / 1.8 s | D01 |
+| [2026-11-17T19-33-25](2026-11-17T19-33-25-phase-1d_rerun-d01/results.jsonl) | `phase-1d:rerun-d01` | 0/1 | 0 | 0 | $0.00019 | 1.9 s / 1.9 s | D01 |
+| [2026-11-17T19-33-29](2026-11-17T19-33-29-phase-1d_rerun-d01/results.jsonl) | `phase-1d:rerun-d01` | 0/1 | 0 | 0 | $0.00019 | 1.8 s / 1.8 s | D01 |
+| [2026-11-17T19-33-51](2026-11-17T19-33-51-phase-1d_rerun-d01-fix1/results.jsonl) | `phase-1d:rerun-d01-fix1` | 2/2 | 0 | 0 | $0.00057 | 2.4 s / 2.4 s | none |
+| [2026-11-17T19-33-56](2026-11-17T19-33-56-phase-1d_rerun-d01-fix1/results.jsonl) | `phase-1d:rerun-d01-fix1` | 2/2 | 0 | 0 | $0.00025 | 2.8 s / 2.8 s | none |
+| [2026-11-17T19-34-05](2026-11-17T19-34-05-phase-1d_agent-dashboards/results.jsonl) | `phase-1d:agent-dashboards` | 9/9 | 0 | 0 | $0.00024 | 1.9 s / 2.3 s | none |
+| [2026-11-17T19-34-11](2026-11-17T19-34-11-phase-1d_agent-dashboards/results.jsonl) | `phase-1d:agent-dashboards` | 7/9 | 0 | 0 | $0.00021 | 1.9 s / 2.3 s | D01 D08 |
+| [2026-11-17T19-34-18](2026-11-17T19-34-18-phase-1d_agent-dashboards/results.jsonl) | `phase-1d:agent-dashboards` | 8/9 | 0 | 0 | $0.00022 | 2.0 s / 2.9 s | D08 |
+| [2026-11-17T19-34-51](2026-11-17T19-34-51-phase-1d_agent-dashboards/results.jsonl) | `phase-1d:agent-dashboards` | 9/9 | 0 | 0 | $0.00042 | 2.0 s / 2.9 s | none |
+| [2026-11-17T19-34-57](2026-11-17T19-34-57-phase-1d_agent-dashboards/results.jsonl) | `phase-1d:agent-dashboards` | 9/9 | 0 | 0 | $0.00020 | 2.0 s / 2.2 s | none |
+| [2026-11-17T19-35-03](2026-11-17T19-35-03-phase-1d_agent-dashboards/results.jsonl) | `phase-1d:agent-dashboards` | 9/9 | 0 | 0 | $0.00021 | 2.1 s / 2.4 s | none |
+| [2026-11-17T19-35-17](2026-11-17T19-35-17-phase-1d_agent-page/results.jsonl) | `phase-1d:agent-page` | 7/7 | 0 | 0 | $0.00239 | 2.0 s / 3.3 s | none |
+| [2026-11-17T19-35-23](2026-11-17T19-35-23-phase-1d_agent-mentions/results.jsonl) | `phase-1d:agent-mentions` | 7/7 | 0 | 0 | $0.00023 | 2.0 s / 2.5 s | none |
+| [2026-11-17T19-35-48](2026-11-17T19-35-48-phase-1d_agent-45/results.jsonl) | `phase-1d:agent-45` | 44/45 | 0 | 0 | $0.00045 | 2.3 s / 3.5 s | H07 |
+| [2026-11-17T19-35-56](2026-11-17T19-35-56-phase-1d_rerun-h07/results.jsonl) | `phase-1d:rerun-h07` | 1/1 | 0 | 0 | $0.00022 | 2.0 s / 2.0 s | none |
+| [2026-11-17T19-36-01](2026-11-17T19-36-01-phase-1d_rerun-h07/results.jsonl) | `phase-1d:rerun-h07` | 1/1 | 0 | 0 | $0.00026 | 2.6 s / 2.6 s | none |
+| [2026-11-17T19-40-19](2026-11-17T19-40-19-phase-1d_offline-dashboards/results.jsonl) | `phase-1d:offline-dashboards` | 6/9 | 1 | 0 | $0.00000 | 18.0 s / 82.8 s | D04 D08 D09 |
+| [2026-11-17T19-55-12](2026-11-17T19-55-12-phase-1d_offline-45/results.jsonl) | `phase-1d:offline-45` | 25/45 | 0 | 1 | $0.00000 | 16.9 s / 23.0 s | B08 H01 H02 H04 H05 H06 H09 H10 I04 I06 I07 I08 I09 N03 N04 N05 N07 N10 N11 N12 |
+| [2026-11-17T19-58-24](2026-11-17T19-58-24-phase-1d_offline-rerun/results.jsonl) | `phase-1d:offline-rerun` | 0/2 | 0 | 0 | $0.00000 | 154.9 s / 154.9 s | H04 N05 |
+| [2026-11-18T19-43-28](2026-11-18T19-43-28-phase-1d_agent-dashboards/results.jsonl) | `phase-1d:agent-dashboards` | 9/9 | 0 | 0 | $0.00065 | 2.6 s / 3.2 s | none |
+| [2026-11-18T19-43-34](2026-11-18T19-43-34-phase-1d_agent-dashboards/results.jsonl) | `phase-1d:agent-dashboards` | 9/9 | 0 | 0 | $0.00022 | 1.9 s / 2.4 s | none |
+| [2026-11-18T19-43-40](2026-11-18T19-43-40-phase-1d_agent-dashboards/results.jsonl) | `phase-1d:agent-dashboards` | 9/9 | 0 | 0 | $0.00023 | 1.9 s / 2.3 s | none |
+| [2026-11-18T19-44-00](2026-11-18T19-44-00-phase-1d_agent-page/results.jsonl) | `phase-1d:agent-page` | 6/7 | 0 | 1 | $0.00023 | 1.9 s / 2.5 s | P04 |
+| [2026-11-18T19-44-06](2026-11-18T19-44-06-phase-1d_agent-mentions/results.jsonl) | `phase-1d:agent-mentions` | 7/7 | 0 | 0 | $0.00023 | 1.9 s / 2.6 s | none |
+| [2026-11-18T19-44-28](2026-11-18T19-44-28-phase-1d_agent-45/results.jsonl) | `phase-1d:agent-45` | 45/45 | 0 | 0 | $0.00031 | 2.2 s / 3.3 s | none |
+| [2026-11-18T19-44-51](2026-11-18T19-44-51-phase-1d_rerun-p04/results.jsonl) | `phase-1d:rerun-p04` | 1/1 | 0 | 0 | $0.00036 | 3.2 s / 3.2 s | none |
+| [2026-11-18T19-44-57](2026-11-18T19-44-57-phase-1d_rerun-p04/results.jsonl) | `phase-1d:rerun-p04` | 1/1 | 0 | 0 | $0.00039 | 3.2 s / 3.2 s | none |
+| [2026-11-18T19-45-01](2026-11-18T19-45-01-phase-1d_rerun-p04/results.jsonl) | `phase-1d:rerun-p04` | 0/1 | 0 | 1 | $0.00022 | 2.1 s / 2.1 s | P04 |
+| [2026-11-18T19-45-16](2026-11-18T19-45-16-phase-1d_rerun-p04/results.jsonl) | `phase-1d:rerun-p04` | 1/1 | 0 | 0 | $0.00035 | 3.1 s / 3.1 s | none |
+| [2026-11-18T19-45-22](2026-11-18T19-45-22-phase-1d_rerun-p04/results.jsonl) | `phase-1d:rerun-p04` | 1/1 | 0 | 0 | $0.00036 | 3.3 s / 3.3 s | none |
+| [2026-11-18T19-45-26](2026-11-18T19-45-26-phase-1d_rerun-p04/results.jsonl) | `phase-1d:rerun-p04` | 0/1 | 0 | 1 | $0.00024 | 2.2 s / 2.2 s | P04 |
+| [2026-11-18T19-45-31](2026-11-18T19-45-31-phase-1d_rerun-p04/results.jsonl) | `phase-1d:rerun-p04` | 0/1 | 0 | 1 | $0.00025 | 2.4 s / 2.4 s | P04 |
+| [2026-11-18T19-45-38](2026-11-18T19-45-38-phase-1d_rerun-p04/results.jsonl) | `phase-1d:rerun-p04` | 1/1 | 0 | 0 | $0.00039 | 3.9 s / 3.9 s | none |
+| [2026-11-18T19-45-42](2026-11-18T19-45-42-phase-1d_rerun-p04/results.jsonl) | `phase-1d:rerun-p04` | 0/1 | 0 | 1 | $0.00020 | 1.7 s / 1.7 s | P04 |
+| [2026-11-18T19-46-06](2026-11-18T19-46-06-phase-1d_diag-p04-v5/results.jsonl) | `phase-1d:diag-p04-v5` | 0/1 | 0 | 1 | $0.00066 | 1.8 s / 1.8 s | P04 |
+| [2026-11-18T19-46-10](2026-11-18T19-46-10-phase-1d_diag-p04-v5/results.jsonl) | `phase-1d:diag-p04-v5` | 0/1 | 0 | 1 | $0.00018 | 1.8 s / 1.8 s | P04 |
+| [2026-11-18T19-46-14](2026-11-18T19-46-14-phase-1d_diag-p04-v5/results.jsonl) | `phase-1d:diag-p04-v5` | 0/1 | 0 | 1 | $0.00018 | 1.7 s / 1.7 s | P04 |
+| [2026-11-18T19-46-19](2026-11-18T19-46-19-phase-1d_diag-p04-v5/results.jsonl) | `phase-1d:diag-p04-v5` | 1/1 | 0 | 0 | $0.00030 | 2.6 s / 2.6 s | none |
+| [2026-11-18T19-46-23](2026-11-18T19-46-23-phase-1d_diag-p04-v5/results.jsonl) | `phase-1d:diag-p04-v5` | 0/1 | 0 | 1 | $0.00019 | 1.7 s / 1.7 s | P04 |
+| [2026-11-18T19-46-28](2026-11-18T19-46-28-phase-1d_diag-p04-v5/results.jsonl) | `phase-1d:diag-p04-v5` | 1/1 | 0 | 0 | $0.00031 | 2.6 s / 2.6 s | none |
+| [2026-11-18T19-46-34](2026-11-18T19-46-34-phase-1d_diag-p04-v5/results.jsonl) | `phase-1d:diag-p04-v5` | 1/1 | 0 | 0 | $0.00031 | 2.9 s / 2.9 s | none |
+| [2026-11-18T19-46-39](2026-11-18T19-46-39-phase-1d_diag-p04-v5/results.jsonl) | `phase-1d:diag-p04-v5` | 1/1 | 0 | 0 | $0.00031 | 2.8 s / 2.8 s | none |
+| [2026-11-18T19-46-45](2026-11-18T19-46-45-phase-1d_diag-p04-v5/results.jsonl) | `phase-1d:diag-p04-v5` | 1/1 | 0 | 0 | $0.00035 | 3.1 s / 3.1 s | none |
+| [2026-11-18T19-46-49](2026-11-18T19-46-49-phase-1d_diag-p04-v5/results.jsonl) | `phase-1d:diag-p04-v5` | 0/1 | 0 | 1 | $0.00019 | 1.7 s / 1.7 s | P04 |
+| [2026-11-18T19-46-59](2026-11-18T19-46-59-phase-1d_diag-p04-v3/results.jsonl) | `phase-1d:diag-p04-v3` | 1/1 | 0 | 0 | $0.00062 | 2.7 s / 2.7 s | none |
+| [2026-11-18T19-47-04](2026-11-18T19-47-04-phase-1d_diag-p04-v3/results.jsonl) | `phase-1d:diag-p04-v3` | 1/1 | 0 | 0 | $0.00029 | 2.6 s / 2.6 s | none |
+| [2026-11-18T19-47-09](2026-11-18T19-47-09-phase-1d_diag-p04-v3/results.jsonl) | `phase-1d:diag-p04-v3` | 1/1 | 0 | 0 | $0.00030 | 2.8 s / 2.8 s | none |
+| [2026-11-18T19-47-15](2026-11-18T19-47-15-phase-1d_diag-p04-v3/results.jsonl) | `phase-1d:diag-p04-v3` | 1/1 | 0 | 0 | $0.00030 | 2.9 s / 2.9 s | none |
+| [2026-11-18T19-47-20](2026-11-18T19-47-20-phase-1d_diag-p04-v3/results.jsonl) | `phase-1d:diag-p04-v3` | 1/1 | 0 | 0 | $0.00029 | 2.6 s / 2.6 s | none |
+| [2026-11-18T19-47-25](2026-11-18T19-47-25-phase-1d_diag-p04-v3/results.jsonl) | `phase-1d:diag-p04-v3` | 1/1 | 0 | 0 | $0.00029 | 2.8 s / 2.8 s | none |
+| [2026-11-18T19-47-31](2026-11-18T19-47-31-phase-1d_diag-p04-v3/results.jsonl) | `phase-1d:diag-p04-v3` | 1/1 | 0 | 0 | $0.00030 | 2.6 s / 2.6 s | none |
+| [2026-11-18T19-47-36](2026-11-18T19-47-36-phase-1d_diag-p04-v3/results.jsonl) | `phase-1d:diag-p04-v3` | 1/1 | 0 | 0 | $0.00031 | 2.9 s / 2.9 s | none |
+| [2026-11-18T19-47-41](2026-11-18T19-47-41-phase-1d_diag-p04-v3/results.jsonl) | `phase-1d:diag-p04-v3` | 1/1 | 0 | 0 | $0.00029 | 2.5 s / 2.5 s | none |
+| [2026-11-18T19-47-46](2026-11-18T19-47-46-phase-1d_diag-p04-v3/results.jsonl) | `phase-1d:diag-p04-v3` | 1/1 | 0 | 0 | $0.00033 | 2.7 s / 2.7 s | none |
+| [2026-11-18T19-48-04](2026-11-18T19-48-04-phase-1d_diag-p04-v4/results.jsonl) | `phase-1d:diag-p04-v4` | 1/1 | 0 | 0 | $0.00060 | 2.5 s / 2.5 s | none |
+| [2026-11-18T19-48-09](2026-11-18T19-48-09-phase-1d_diag-p04-v4/results.jsonl) | `phase-1d:diag-p04-v4` | 1/1 | 0 | 0 | $0.00031 | 2.7 s / 2.7 s | none |
+| [2026-11-18T19-48-15](2026-11-18T19-48-15-phase-1d_diag-p04-v4/results.jsonl) | `phase-1d:diag-p04-v4` | 1/1 | 0 | 0 | $0.00029 | 3.2 s / 3.2 s | none |
+| [2026-11-18T19-48-20](2026-11-18T19-48-20-phase-1d_diag-p04-v4/results.jsonl) | `phase-1d:diag-p04-v4` | 1/1 | 0 | 0 | $0.00030 | 2.7 s / 2.7 s | none |
+| [2026-11-18T19-48-25](2026-11-18T19-48-25-phase-1d_diag-p04-v4/results.jsonl) | `phase-1d:diag-p04-v4` | 1/1 | 0 | 0 | $0.00030 | 2.6 s / 2.6 s | none |
+| [2026-11-18T19-48-30](2026-11-18T19-48-30-phase-1d_diag-p04-v4/results.jsonl) | `phase-1d:diag-p04-v4` | 1/1 | 0 | 0 | $0.00030 | 2.6 s / 2.6 s | none |
+| [2026-11-18T19-48-36](2026-11-18T19-48-36-phase-1d_diag-p04-v4/results.jsonl) | `phase-1d:diag-p04-v4` | 1/1 | 0 | 0 | $0.00030 | 2.8 s / 2.8 s | none |
+| [2026-11-18T19-48-41](2026-11-18T19-48-41-phase-1d_diag-p04-v4/results.jsonl) | `phase-1d:diag-p04-v4` | 1/1 | 0 | 0 | $0.00030 | 2.7 s / 2.7 s | none |
+| [2026-11-18T19-48-46](2026-11-18T19-48-46-phase-1d_diag-p04-v4/results.jsonl) | `phase-1d:diag-p04-v4` | 1/1 | 0 | 0 | $0.00030 | 2.7 s / 2.7 s | none |
+| [2026-11-18T19-48-51](2026-11-18T19-48-51-phase-1d_diag-p04-v4/results.jsonl) | `phase-1d:diag-p04-v4` | 1/1 | 0 | 0 | $0.00030 | 2.7 s / 2.7 s | none |
+| [2026-11-18T20-05-11](2026-11-18T20-05-11-phase-1d_offline-45/results.jsonl) | `phase-1d:offline-45` | 25/45 | 0 | 1 | $0.00000 | 19.5 s / 28.1 s | B08 H01 H02 H04 H05 H06 H09 H10 I04 I06 I07 I08 I09 N03 N04 N05 N07 N10 N11 N12 |
+| [2026-11-18T20-09-47](2026-11-18T20-09-47-phase-1d_offline-diag-a/results.jsonl) | `phase-1d:offline-diag-a` | 3/3 | 0 | 0 | $0.00000 | 21.4 s / 89.1 s | none |
+| [2026-11-18T20-25-18](2026-11-18T20-25-18-phase-1d_offline-45/results.jsonl) | `phase-1d:offline-45` | 26/45 | 0 | 1 | $0.00000 | 16.4 s / 27.7 s | B08 H01 H02 H05 H06 H09 H10 I04 I06 I07 I08 I09 N01 N03 N04 N07 N10 N11 N12 |
+| [2026-11-18T20-27-08](2026-11-18T20-27-08-phase-1d_offline-diag-notool/results.jsonl) | `phase-1d:offline-diag-notool` | 1/1 | 0 | 0 | $0.00000 | 86.3 s / 86.3 s | none |
+| [2026-11-18T20-31-40](2026-11-18T20-31-40-phase-1d_offline-dashboards/results.jsonl) | `phase-1d:offline-dashboards` | 6/9 | 1 | 0 | $0.00000 | 18.0 s / 83.2 s | D04 D08 D09 |
+| [2026-11-18T20-39-54](2026-11-18T20-39-54-phase-1d_p04-fix1/results.jsonl) | `phase-1d:p04-fix1` | 1/1 | 0 | 0 | $0.00101 | 3.5 s / 3.5 s | none |
+| [2026-11-18T20-40-00](2026-11-18T20-40-00-phase-1d_p04-fix1/results.jsonl) | `phase-1d:p04-fix1` | 1/1 | 0 | 0 | $0.00035 | 3.0 s / 3.0 s | none |
+| [2026-11-18T20-40-05](2026-11-18T20-40-05-phase-1d_p04-fix1/results.jsonl) | `phase-1d:p04-fix1` | 1/1 | 0 | 0 | $0.00037 | 3.0 s / 3.0 s | none |
+| [2026-11-18T20-40-10](2026-11-18T20-40-10-phase-1d_p04-fix1/results.jsonl) | `phase-1d:p04-fix1` | 1/1 | 0 | 0 | $0.00034 | 2.8 s / 2.8 s | none |
+| [2026-11-18T20-40-15](2026-11-18T20-40-15-phase-1d_p04-fix1/results.jsonl) | `phase-1d:p04-fix1` | 1/1 | 0 | 0 | $0.00034 | 2.8 s / 2.8 s | none |
+| [2026-11-18T20-40-21](2026-11-18T20-40-21-phase-1d_p04-fix1/results.jsonl) | `phase-1d:p04-fix1` | 1/1 | 0 | 0 | $0.00035 | 3.2 s / 3.2 s | none |
+| [2026-11-18T20-40-27](2026-11-18T20-40-27-phase-1d_p04-fix1/results.jsonl) | `phase-1d:p04-fix1` | 1/1 | 0 | 0 | $0.00036 | 3.0 s / 3.0 s | none |
+| [2026-11-18T20-40-32](2026-11-18T20-40-32-phase-1d_p04-fix1/results.jsonl) | `phase-1d:p04-fix1` | 1/1 | 0 | 0 | $0.00036 | 2.8 s / 2.8 s | none |
+| [2026-11-18T20-40-37](2026-11-18T20-40-37-phase-1d_p04-fix1/results.jsonl) | `phase-1d:p04-fix1` | 1/1 | 0 | 0 | $0.00036 | 2.9 s / 2.9 s | none |
+| [2026-11-18T20-40-43](2026-11-18T20-40-43-phase-1d_p04-fix1/results.jsonl) | `phase-1d:p04-fix1` | 1/1 | 0 | 0 | $0.00036 | 2.9 s / 2.9 s | none |
+| [2026-11-18T20-40-58](2026-11-18T20-40-58-phase-1d_agent-page-fix1/results.jsonl) | `phase-1d:agent-page-fix1` | 7/7 | 0 | 0 | $0.00024 | 1.7 s / 2.9 s | none |
+| [2026-11-18T20-41-04](2026-11-18T20-41-04-phase-1d_agent-mentions-fix1/results.jsonl) | `phase-1d:agent-mentions-fix1` | 7/7 | 0 | 0 | $0.00023 | 1.7 s / 2.4 s | none |
+| [2026-11-18T20-41-26](2026-11-18T20-41-26-phase-1d_agent-45-fix1/results.jsonl) | `phase-1d:agent-45-fix1` | 42/45 | 1 | 1 | $0.00030 | 2.1 s / 3.4 s | F02 F03 N11 |
+| [2026-11-18T20-41-32](2026-11-18T20-41-32-phase-1d_agent-dashboards-fix1/results.jsonl) | `phase-1d:agent-dashboards-fix1` | 7/9 | 0 | 0 | $0.00024 | 1.8 s / 2.6 s | D01 D06 |
+| [2026-11-18T20-41-38](2026-11-18T20-41-38-phase-1d_agent-dashboards-fix1/results.jsonl) | `phase-1d:agent-dashboards-fix1` | 7/9 | 0 | 0 | $0.00022 | 1.8 s / 2.3 s | D04 D06 |
+| [2026-11-18T20-41-45](2026-11-18T20-41-45-phase-1d_agent-dashboards-fix1/results.jsonl) | `phase-1d:agent-dashboards-fix1` | 8/9 | 0 | 0 | $0.00022 | 1.8 s / 2.3 s | D01 |
+| [2026-11-18T20-43-50](2026-11-18T20-43-50-phase-1d_diag-d-fix1/results.jsonl) | `phase-1d:diag-d-fix1` | 2/3 | 0 | 0 | $0.00024 | 2.2 s / 2.3 s | D01 |
+| [2026-11-18T20-43-55](2026-11-18T20-43-55-phase-1d_diag-d-fix1/results.jsonl) | `phase-1d:diag-d-fix1` | 2/3 | 0 | 0 | $0.00024 | 2.0 s / 2.5 s | D01 |
+| [2026-11-18T20-44-00](2026-11-18T20-44-00-phase-1d_diag-d-fix1/results.jsonl) | `phase-1d:diag-d-fix1` | 1/3 | 0 | 0 | $0.00024 | 2.1 s / 2.3 s | D01 D06 |
+| [2026-11-18T20-44-05](2026-11-18T20-44-05-phase-1d_diag-d-fix1/results.jsonl) | `phase-1d:diag-d-fix1` | 2/3 | 0 | 0 | $0.00025 | 2.3 s / 2.6 s | D01 |
+| [2026-11-18T20-44-10](2026-11-18T20-44-10-phase-1d_diag-d-fix1/results.jsonl) | `phase-1d:diag-d-fix1` | 2/3 | 0 | 0 | $0.00024 | 2.1 s / 2.6 s | D01 |
+| [2026-11-18T20-44-15](2026-11-18T20-44-15-phase-1d_diag-d-fix1/results.jsonl) | `phase-1d:diag-d-fix1` | 1/3 | 0 | 0 | $0.00024 | 1.9 s / 2.5 s | D01 D06 |
+| [2026-11-18T20-44-19](2026-11-18T20-44-19-phase-1d_diag-d-fix1/results.jsonl) | `phase-1d:diag-d-fix1` | 1/3 | 0 | 0 | $0.00025 | 1.9 s / 2.5 s | D01 D06 |
+| [2026-11-18T20-44-24](2026-11-18T20-44-24-phase-1d_diag-d-fix1/results.jsonl) | `phase-1d:diag-d-fix1` | 0/3 | 0 | 0 | $0.00024 | 2.2 s / 2.5 s | D01 D04 D06 |
+| [2026-11-18T20-45-24](2026-11-18T20-45-24-phase-1d_p04-fix2/results.jsonl) | `phase-1d:p04-fix2` | 0/1 | 0 | 1 | $0.00052 | 1.4 s / 1.4 s | P04 |
+| [2026-11-18T20-45-29](2026-11-18T20-45-29-phase-1d_p04-fix2/results.jsonl) | `phase-1d:p04-fix2` | 1/1 | 0 | 0 | $0.00034 | 2.7 s / 2.7 s | none |
+| [2026-11-18T20-45-35](2026-11-18T20-45-35-phase-1d_p04-fix2/results.jsonl) | `phase-1d:p04-fix2` | 1/1 | 0 | 0 | $0.00039 | 3.4 s / 3.4 s | none |
+| [2026-11-18T20-45-39](2026-11-18T20-45-39-phase-1d_p04-fix2/results.jsonl) | `phase-1d:p04-fix2` | 0/1 | 0 | 1 | $0.00023 | 2.2 s / 2.2 s | P04 |
+| [2026-11-18T20-45-45](2026-11-18T20-45-45-phase-1d_p04-fix2/results.jsonl) | `phase-1d:p04-fix2` | 1/1 | 0 | 0 | $0.00033 | 2.7 s / 2.7 s | none |
+| [2026-11-18T20-45-50](2026-11-18T20-45-50-phase-1d_p04-fix2/results.jsonl) | `phase-1d:p04-fix2` | 1/1 | 0 | 0 | $0.00034 | 2.8 s / 2.8 s | none |
+| [2026-11-18T20-45-55](2026-11-18T20-45-55-phase-1d_p04-fix2/results.jsonl) | `phase-1d:p04-fix2` | 1/1 | 0 | 0 | $0.00039 | 3.2 s / 3.2 s | none |
+| [2026-11-18T20-46-00](2026-11-18T20-46-00-phase-1d_p04-fix2/results.jsonl) | `phase-1d:p04-fix2` | 1/1 | 0 | 0 | $0.00034 | 2.6 s / 2.6 s | none |
+| [2026-11-18T20-46-07](2026-11-18T20-46-07-phase-1d_p04-fix2/results.jsonl) | `phase-1d:p04-fix2` | 1/1 | 0 | 0 | $0.00039 | 3.7 s / 3.7 s | none |
+| [2026-11-18T20-46-12](2026-11-18T20-46-12-phase-1d_p04-fix2/results.jsonl) | `phase-1d:p04-fix2` | 1/1 | 0 | 0 | $0.00036 | 3.0 s / 3.0 s | none |
+| [2026-11-18T21-05-20](2026-11-18T21-05-20-phase-1d_offline-45-tool-gate/results.jsonl) | `phase-1d:offline-45-tool-gate` | 30/45 | 0 | 1 | $0.00000 | 15.1 s / 24.5 s | B08 H01 H02 H06 H09 H10 I04 I07 I08 I09 N03 N04 N07 N10 N11 |
+| [2026-11-18T21-09-46](2026-11-18T21-09-46-phase-1d_offline-dashboards-tool-gate/results.jsonl) | `phase-1d:offline-dashboards-tool-gate` | 6/9 | 1 | 0 | $0.00000 | 18.0 s / 97.2 s | D04 D08 D09 |
+| [2026-11-18T21-16-15](2026-11-18T21-16-15-phase-1d_p04-fix3/results.jsonl) | `phase-1d:p04-fix3` | 1/1 | 0 | 0 | $0.00098 | 3.1 s / 3.1 s | none |
+| [2026-11-18T21-16-20](2026-11-18T21-16-20-phase-1d_p04-fix3/results.jsonl) | `phase-1d:p04-fix3` | 1/1 | 0 | 0 | $0.00032 | 2.6 s / 2.6 s | none |
+| [2026-11-18T21-16-26](2026-11-18T21-16-26-phase-1d_p04-fix3/results.jsonl) | `phase-1d:p04-fix3` | 1/1 | 0 | 0 | $0.00033 | 3.1 s / 3.1 s | none |
+| [2026-11-18T21-16-31](2026-11-18T21-16-31-phase-1d_p04-fix3/results.jsonl) | `phase-1d:p04-fix3` | 1/1 | 0 | 0 | $0.00031 | 3.1 s / 3.1 s | none |
+| [2026-11-18T21-16-37](2026-11-18T21-16-37-phase-1d_p04-fix3/results.jsonl) | `phase-1d:p04-fix3` | 1/1 | 0 | 0 | $0.00033 | 2.7 s / 2.7 s | none |
+| [2026-11-18T21-16-42](2026-11-18T21-16-42-phase-1d_p04-fix3/results.jsonl) | `phase-1d:p04-fix3` | 1/1 | 0 | 0 | $0.00030 | 2.6 s / 2.6 s | none |
+| [2026-11-18T21-16-47](2026-11-18T21-16-47-phase-1d_p04-fix3/results.jsonl) | `phase-1d:p04-fix3` | 1/1 | 0 | 0 | $0.00035 | 2.7 s / 2.7 s | none |
+| [2026-11-18T21-16-52](2026-11-18T21-16-52-phase-1d_p04-fix3/results.jsonl) | `phase-1d:p04-fix3` | 1/1 | 0 | 0 | $0.00031 | 2.6 s / 2.6 s | none |
+| [2026-11-18T21-16-56](2026-11-18T21-16-56-phase-1d_p04-fix3/results.jsonl) | `phase-1d:p04-fix3` | 1/1 | 0 | 0 | $0.00032 | 2.4 s / 2.4 s | none |
+| [2026-11-18T21-17-02](2026-11-18T21-17-02-phase-1d_p04-fix3/results.jsonl) | `phase-1d:p04-fix3` | 1/1 | 0 | 0 | $0.00031 | 3.1 s / 3.1 s | none |
+| [2026-11-18T21-17-17](2026-11-18T21-17-17-phase-1d_agent-dashboards-fix3/results.jsonl) | `phase-1d:agent-dashboards-fix3` | 9/9 | 0 | 0 | $0.00025 | 1.9 s / 2.5 s | none |
+| [2026-11-18T21-17-23](2026-11-18T21-17-23-phase-1d_agent-dashboards-fix3/results.jsonl) | `phase-1d:agent-dashboards-fix3` | 9/9 | 0 | 0 | $0.00023 | 1.8 s / 3.0 s | none |
+| [2026-11-18T21-17-29](2026-11-18T21-17-29-phase-1d_agent-dashboards-fix3/results.jsonl) | `phase-1d:agent-dashboards-fix3` | 8/9 | 0 | 0 | $0.00022 | 1.8 s / 2.4 s | D04 |
+| [2026-11-18T21-17-35](2026-11-18T21-17-35-phase-1d_agent-page-fix3/results.jsonl) | `phase-1d:agent-page-fix3` | 7/7 | 0 | 0 | $0.00024 | 1.7 s / 2.5 s | none |
+| [2026-11-18T21-17-43](2026-11-18T21-17-43-phase-1d_agent-mentions-fix3/results.jsonl) | `phase-1d:agent-mentions-fix3` | 7/7 | 0 | 0 | $0.00023 | 2.1 s / 3.4 s | none |
+| [2026-11-18T21-18-05](2026-11-18T21-18-05-phase-1d_agent-45-fix3/results.jsonl) | `phase-1d:agent-45-fix3` | 45/45 | 0 | 0 | $0.00030 | 2.1 s / 3.2 s | none |
+| [2026-11-18T21-18-54](2026-11-18T21-18-54-phase-1d_diag-d04-fix3/results.jsonl) | `phase-1d:diag-d04-fix3` | 0/1 | 0 | 0 | $0.00028 | 2.5 s / 2.5 s | D04 |
+| [2026-11-18T21-18-58](2026-11-18T21-18-58-phase-1d_diag-d04-fix3/results.jsonl) | `phase-1d:diag-d04-fix3` | 0/1 | 0 | 0 | $0.00029 | 2.3 s / 2.3 s | D04 |
+| [2026-11-18T21-19-03](2026-11-18T21-19-03-phase-1d_diag-d04-fix3/results.jsonl) | `phase-1d:diag-d04-fix3` | 1/1 | 0 | 0 | $0.00028 | 2.5 s / 2.5 s | none |
+| [2026-11-18T21-19-08](2026-11-18T21-19-08-phase-1d_diag-d04-fix3/results.jsonl) | `phase-1d:diag-d04-fix3` | 1/1 | 0 | 0 | $0.00029 | 2.5 s / 2.5 s | none |
+| [2026-11-18T21-19-13](2026-11-18T21-19-13-phase-1d_diag-d04-fix3/results.jsonl) | `phase-1d:diag-d04-fix3` | 0/1 | 0 | 0 | $0.00026 | 2.2 s / 2.2 s | D04 |
+| [2026-11-18T21-19-18](2026-11-18T21-19-18-phase-1d_diag-d04-fix3/results.jsonl) | `phase-1d:diag-d04-fix3` | 1/1 | 0 | 0 | $0.00028 | 2.4 s / 2.4 s | none |
+| [2026-11-18T21-19-23](2026-11-18T21-19-23-phase-1d_diag-d04-fix3/results.jsonl) | `phase-1d:diag-d04-fix3` | 1/1 | 0 | 0 | $0.00030 | 2.7 s / 2.7 s | none |
+| [2026-11-18T21-19-28](2026-11-18T21-19-28-phase-1d_diag-d04-fix3/results.jsonl) | `phase-1d:diag-d04-fix3` | 1/1 | 0 | 0 | $0.00030 | 2.6 s / 2.6 s | none |
+| [2026-11-18T21-19-32](2026-11-18T21-19-32-phase-1d_diag-d04-fix3/results.jsonl) | `phase-1d:diag-d04-fix3` | 1/1 | 0 | 0 | $0.00026 | 2.2 s / 2.2 s | none |
+| [2026-11-18T21-19-37](2026-11-18T21-19-37-phase-1d_diag-d04-fix3/results.jsonl) | `phase-1d:diag-d04-fix3` | 1/1 | 0 | 0 | $0.00025 | 2.2 s / 2.2 s | none |
+| [2026-11-18T21-19-49](2026-11-18T21-19-49-phase-1d_diag-d04-v6/results.jsonl) | `phase-1d:diag-d04-v6` | 0/1 | 0 | 0 | $0.00066 | 2.2 s / 2.2 s | D04 |
+| [2026-11-18T21-19-54](2026-11-18T21-19-54-phase-1d_diag-d04-v6/results.jsonl) | `phase-1d:diag-d04-v6` | 0/1 | 0 | 0 | $0.00029 | 2.5 s / 2.5 s | D04 |
+| [2026-11-18T21-19-58](2026-11-18T21-19-58-phase-1d_diag-d04-v6/results.jsonl) | `phase-1d:diag-d04-v6` | 0/1 | 0 | 0 | $0.00026 | 2.1 s / 2.1 s | D04 |
+| [2026-11-18T21-20-03](2026-11-18T21-20-03-phase-1d_diag-d04-v6/results.jsonl) | `phase-1d:diag-d04-v6` | 1/1 | 0 | 0 | $0.00030 | 2.5 s / 2.5 s | none |
+| [2026-11-18T21-20-08](2026-11-18T21-20-08-phase-1d_diag-d04-v6/results.jsonl) | `phase-1d:diag-d04-v6` | 0/1 | 0 | 0 | $0.00020 | 1.9 s / 1.9 s | D04 |
+| [2026-11-18T21-20-12](2026-11-18T21-20-12-phase-1d_diag-d04-v6/results.jsonl) | `phase-1d:diag-d04-v6` | 1/1 | 0 | 0 | $0.00027 | 2.5 s / 2.5 s | none |
+| [2026-11-18T21-20-17](2026-11-18T21-20-17-phase-1d_diag-d04-v6/results.jsonl) | `phase-1d:diag-d04-v6` | 0/1 | 0 | 0 | $0.00026 | 2.5 s / 2.5 s | D04 |
+| [2026-11-18T21-20-22](2026-11-18T21-20-22-phase-1d_diag-d04-v6/results.jsonl) | `phase-1d:diag-d04-v6` | 0/1 | 0 | 0 | $0.00026 | 2.2 s / 2.2 s | D04 |
+| [2026-11-18T21-20-27](2026-11-18T21-20-27-phase-1d_diag-d04-v6/results.jsonl) | `phase-1d:diag-d04-v6` | 1/1 | 0 | 0 | $0.00028 | 2.7 s / 2.7 s | none |
+| [2026-11-18T21-20-32](2026-11-18T21-20-32-phase-1d_diag-d04-v6/results.jsonl) | `phase-1d:diag-d04-v6` | 0/1 | 0 | 0 | $0.00025 | 2.0 s / 2.0 s | D04 |
+| [2026-11-18T21-21-18](2026-11-18T21-21-18-phase-1d_agent-dashboards-fix3b/results.jsonl) | `phase-1d:agent-dashboards-fix3b` | 9/9 | 0 | 0 | $0.00023 | 2.0 s / 2.6 s | none |
+| [2026-11-18T21-21-24](2026-11-18T21-21-24-phase-1d_agent-dashboards-fix3b/results.jsonl) | `phase-1d:agent-dashboards-fix3b` | 9/9 | 0 | 0 | $0.00023 | 1.8 s / 2.5 s | none |
+| [2026-11-18T21-21-30](2026-11-18T21-21-30-phase-1d_agent-dashboards-fix3b/results.jsonl) | `phase-1d:agent-dashboards-fix3b` | 8/9 | 0 | 0 | $0.00022 | 1.8 s / 2.3 s | D04 |
+| [2026-11-18T21-25-16](2026-11-18T21-25-16-phase-1d_d04-fix-a/results.jsonl) | `phase-1d:d04-fix-a` | 1/1 | 0 | 0 | $0.00069 | 3.4 s / 3.4 s | none |
+| [2026-11-18T21-25-20](2026-11-18T21-25-20-phase-1d_d04-fix-a/results.jsonl) | `phase-1d:d04-fix-a` | 1/1 | 0 | 0 | $0.00025 | 2.2 s / 2.2 s | none |
+| [2026-11-18T21-25-25](2026-11-18T21-25-25-phase-1d_d04-fix-a/results.jsonl) | `phase-1d:d04-fix-a` | 1/1 | 0 | 0 | $0.00027 | 2.2 s / 2.2 s | none |
+| [2026-11-18T21-25-30](2026-11-18T21-25-30-phase-1d_d04-fix-a/results.jsonl) | `phase-1d:d04-fix-a` | 1/1 | 0 | 0 | $0.00029 | 2.6 s / 2.6 s | none |
+| [2026-11-18T21-25-35](2026-11-18T21-25-35-phase-1d_d04-fix-a/results.jsonl) | `phase-1d:d04-fix-a` | 1/1 | 0 | 0 | $0.00029 | 2.5 s / 2.5 s | none |
+| [2026-11-18T21-25-40](2026-11-18T21-25-40-phase-1d_d04-fix-a/results.jsonl) | `phase-1d:d04-fix-a` | 0/1 | 0 | 0 | $0.00028 | 2.3 s / 2.3 s | D04 |
+| [2026-11-18T21-25-44](2026-11-18T21-25-44-phase-1d_d04-fix-a/results.jsonl) | `phase-1d:d04-fix-a` | 1/1 | 0 | 0 | $0.00025 | 2.0 s / 2.0 s | none |
+| [2026-11-18T21-25-49](2026-11-18T21-25-49-phase-1d_d04-fix-a/results.jsonl) | `phase-1d:d04-fix-a` | 1/1 | 0 | 0 | $0.00026 | 2.4 s / 2.4 s | none |
+| [2026-11-18T21-25-54](2026-11-18T21-25-54-phase-1d_d04-fix-a/results.jsonl) | `phase-1d:d04-fix-a` | 1/1 | 0 | 0 | $0.00028 | 2.5 s / 2.5 s | none |
+| [2026-11-18T21-25-59](2026-11-18T21-25-59-phase-1d_d04-fix-a/results.jsonl) | `phase-1d:d04-fix-a` | 1/1 | 0 | 0 | $0.00024 | 2.3 s / 2.3 s | none |
+| [2026-11-18T21-26-22](2026-11-18T21-26-22-phase-1d_agent-dashboards-d04a/results.jsonl) | `phase-1d:agent-dashboards-d04a` | 8/9 | 0 | 0 | $0.00025 | 2.0 s / 2.2 s | D04 |
+| [2026-11-18T21-26-29](2026-11-18T21-26-29-phase-1d_agent-dashboards-d04a/results.jsonl) | `phase-1d:agent-dashboards-d04a` | 8/9 | 0 | 0 | $0.00023 | 2.1 s / 3.5 s | D04 |
+| [2026-11-18T21-26-35](2026-11-18T21-26-35-phase-1d_agent-dashboards-d04a/results.jsonl) | `phase-1d:agent-dashboards-d04a` | 9/9 | 0 | 0 | $0.00022 | 2.0 s / 2.2 s | none |
+| [2026-11-18T21-26-41](2026-11-18T21-26-41-phase-1d_agent-page-d04a/results.jsonl) | `phase-1d:agent-page-d04a` | 7/7 | 0 | 0 | $0.00024 | 1.6 s / 2.7 s | none |
+| [2026-11-18T21-26-46](2026-11-18T21-26-46-phase-1d_p04-d04a/results.jsonl) | `phase-1d:p04-d04a` | 1/1 | 0 | 0 | $0.00034 | 2.7 s / 2.7 s | none |
+| [2026-11-18T21-26-51](2026-11-18T21-26-51-phase-1d_p04-d04a/results.jsonl) | `phase-1d:p04-d04a` | 1/1 | 0 | 0 | $0.00032 | 2.6 s / 2.6 s | none |
+| [2026-11-18T21-26-56](2026-11-18T21-26-56-phase-1d_p04-d04a/results.jsonl) | `phase-1d:p04-d04a` | 1/1 | 0 | 0 | $0.00032 | 2.9 s / 2.9 s | none |
+| [2026-11-18T21-27-01](2026-11-18T21-27-01-phase-1d_p04-d04a/results.jsonl) | `phase-1d:p04-d04a` | 1/1 | 0 | 0 | $0.00032 | 3.0 s / 3.0 s | none |
+| [2026-11-18T21-27-07](2026-11-18T21-27-07-phase-1d_p04-d04a/results.jsonl) | `phase-1d:p04-d04a` | 1/1 | 0 | 0 | $0.00034 | 2.7 s / 2.7 s | none |
+| [2026-11-18T21-27-12](2026-11-18T21-27-12-phase-1d_p04-d04a/results.jsonl) | `phase-1d:p04-d04a` | 1/1 | 0 | 0 | $0.00032 | 2.6 s / 2.6 s | none |
+| [2026-11-18T21-27-17](2026-11-18T21-27-17-phase-1d_p04-d04a/results.jsonl) | `phase-1d:p04-d04a` | 1/1 | 0 | 0 | $0.00034 | 2.8 s / 2.8 s | none |
+| [2026-11-18T21-27-22](2026-11-18T21-27-22-phase-1d_p04-d04a/results.jsonl) | `phase-1d:p04-d04a` | 1/1 | 0 | 0 | $0.00033 | 2.6 s / 2.6 s | none |
+| [2026-11-18T21-27-27](2026-11-18T21-27-27-phase-1d_p04-d04a/results.jsonl) | `phase-1d:p04-d04a` | 1/1 | 0 | 0 | $0.00033 | 2.7 s / 2.7 s | none |
+| [2026-11-18T21-27-32](2026-11-18T21-27-32-phase-1d_p04-d04a/results.jsonl) | `phase-1d:p04-d04a` | 1/1 | 0 | 0 | $0.00034 | 2.7 s / 2.7 s | none |
+| [2026-11-18T21-27-38](2026-11-18T21-27-38-phase-1d_agent-mentions-d04a/results.jsonl) | `phase-1d:agent-mentions-d04a` | 7/7 | 0 | 0 | $0.00023 | 1.6 s / 2.6 s | none |
+| [2026-11-18T21-28-00](2026-11-18T21-28-00-phase-1d_agent-45-d04a/results.jsonl) | `phase-1d:agent-45-d04a` | 44/45 | 1 | 0 | $0.00031 | 2.2 s / 3.1 s | N11 |
+| [2026-11-18T21-28-59](2026-11-18T21-28-59-phase-1d_d04-fix-b/results.jsonl) | `phase-1d:d04-fix-b` | 1/1 | 0 | 0 | $0.00069 | 2.0 s / 2.0 s | none |
+| [2026-11-18T21-29-03](2026-11-18T21-29-03-phase-1d_d04-fix-b/results.jsonl) | `phase-1d:d04-fix-b` | 0/1 | 0 | 0 | $0.00025 | 2.0 s / 2.0 s | D04 |
+| [2026-11-18T21-29-08](2026-11-18T21-29-08-phase-1d_d04-fix-b/results.jsonl) | `phase-1d:d04-fix-b` | 0/1 | 0 | 0 | $0.00030 | 2.6 s / 2.6 s | D04 |
+| [2026-11-18T21-29-13](2026-11-18T21-29-13-phase-1d_d04-fix-b/results.jsonl) | `phase-1d:d04-fix-b` | 1/1 | 0 | 0 | $0.00025 | 2.3 s / 2.3 s | none |
+| [2026-11-18T21-29-17](2026-11-18T21-29-17-phase-1d_d04-fix-b/results.jsonl) | `phase-1d:d04-fix-b` | 1/1 | 0 | 0 | $0.00025 | 2.1 s / 2.1 s | none |
+| [2026-11-18T21-29-22](2026-11-18T21-29-22-phase-1d_d04-fix-b/results.jsonl) | `phase-1d:d04-fix-b` | 1/1 | 0 | 0 | $0.00027 | 2.3 s / 2.3 s | none |
+| [2026-11-18T21-29-26](2026-11-18T21-29-26-phase-1d_d04-fix-b/results.jsonl) | `phase-1d:d04-fix-b` | 1/1 | 0 | 0 | $0.00025 | 2.1 s / 2.1 s | none |
+| [2026-11-18T21-29-31](2026-11-18T21-29-31-phase-1d_d04-fix-b/results.jsonl) | `phase-1d:d04-fix-b` | 1/1 | 0 | 0 | $0.00025 | 2.0 s / 2.0 s | none |
+| [2026-11-18T21-29-36](2026-11-18T21-29-36-phase-1d_d04-fix-b/results.jsonl) | `phase-1d:d04-fix-b` | 1/1 | 0 | 0 | $0.00026 | 2.5 s / 2.5 s | none |
+| [2026-11-18T21-29-41](2026-11-18T21-29-41-phase-1d_d04-fix-b/results.jsonl) | `phase-1d:d04-fix-b` | 1/1 | 0 | 0 | $0.00026 | 2.3 s / 2.3 s | none |
+| [2026-11-18T21-32-04](2026-11-18T21-32-04-phase-1d_d04-fix-c/results.jsonl) | `phase-1d:d04-fix-c` | 1/1 | 0 | 0 | $0.00069 | 2.2 s / 2.2 s | none |
+| [2026-11-18T21-32-09](2026-11-18T21-32-09-phase-1d_d04-fix-c/results.jsonl) | `phase-1d:d04-fix-c` | 1/1 | 0 | 0 | $0.00027 | 2.3 s / 2.3 s | none |
+| [2026-11-18T21-32-13](2026-11-18T21-32-13-phase-1d_d04-fix-c/results.jsonl) | `phase-1d:d04-fix-c` | 1/1 | 0 | 0 | $0.00027 | 2.4 s / 2.4 s | none |
+| [2026-11-18T21-32-18](2026-11-18T21-32-18-phase-1d_d04-fix-c/results.jsonl) | `phase-1d:d04-fix-c` | 1/1 | 0 | 0 | $0.00027 | 2.3 s / 2.3 s | none |
+| [2026-11-18T21-32-23](2026-11-18T21-32-23-phase-1d_d04-fix-c/results.jsonl) | `phase-1d:d04-fix-c` | 1/1 | 0 | 0 | $0.00025 | 2.0 s / 2.0 s | none |
+| [2026-11-18T21-32-28](2026-11-18T21-32-28-phase-1d_d04-fix-c/results.jsonl) | `phase-1d:d04-fix-c` | 1/1 | 0 | 0 | $0.00031 | 2.9 s / 2.9 s | none |
+| [2026-11-18T21-32-33](2026-11-18T21-32-33-phase-1d_d04-fix-c/results.jsonl) | `phase-1d:d04-fix-c` | 1/1 | 0 | 0 | $0.00030 | 2.4 s / 2.4 s | none |
+| [2026-11-18T21-32-37](2026-11-18T21-32-37-phase-1d_d04-fix-c/results.jsonl) | `phase-1d:d04-fix-c` | 1/1 | 0 | 0 | $0.00026 | 2.1 s / 2.1 s | none |
+| [2026-11-18T21-32-42](2026-11-18T21-32-42-phase-1d_d04-fix-c/results.jsonl) | `phase-1d:d04-fix-c` | 1/1 | 0 | 0 | $0.00027 | 2.2 s / 2.2 s | none |
+| [2026-11-18T21-32-46](2026-11-18T21-32-46-phase-1d_d04-fix-c/results.jsonl) | `phase-1d:d04-fix-c` | 1/1 | 0 | 0 | $0.00025 | 2.2 s / 2.2 s | none |
+| [2026-11-18T21-32-55](2026-11-18T21-32-55-phase-1d_agent-dashboards-d04c/results.jsonl) | `phase-1d:agent-dashboards-d04c` | 9/9 | 0 | 0 | $0.00025 | 1.9 s / 2.6 s | none |
+| [2026-11-18T21-33-01](2026-11-18T21-33-01-phase-1d_agent-dashboards-d04c/results.jsonl) | `phase-1d:agent-dashboards-d04c` | 9/9 | 0 | 0 | $0.00023 | 1.9 s / 2.3 s | none |
+| [2026-11-18T21-33-08](2026-11-18T21-33-08-phase-1d_agent-dashboards-d04c/results.jsonl) | `phase-1d:agent-dashboards-d04c` | 9/9 | 0 | 0 | $0.00022 | 2.1 s / 4.3 s | none |
+| [2026-11-18T21-33-14](2026-11-18T21-33-14-phase-1d_agent-page-d04c/results.jsonl) | `phase-1d:agent-page-d04c` | 7/7 | 0 | 0 | $0.00025 | 1.8 s / 3.0 s | none |
+| [2026-11-18T21-33-20](2026-11-18T21-33-20-phase-1d_p04-d04c/results.jsonl) | `phase-1d:p04-d04c` | 1/1 | 0 | 0 | $0.00033 | 2.9 s / 2.9 s | none |
+| [2026-11-18T21-33-25](2026-11-18T21-33-25-phase-1d_p04-d04c/results.jsonl) | `phase-1d:p04-d04c` | 1/1 | 0 | 0 | $0.00034 | 2.9 s / 2.9 s | none |
+| [2026-11-18T21-33-30](2026-11-18T21-33-30-phase-1d_p04-d04c/results.jsonl) | `phase-1d:p04-d04c` | 1/1 | 0 | 0 | $0.00030 | 2.8 s / 2.8 s | none |
+| [2026-11-18T21-33-35](2026-11-18T21-33-35-phase-1d_p04-d04c/results.jsonl) | `phase-1d:p04-d04c` | 1/1 | 0 | 0 | $0.00031 | 2.9 s / 2.9 s | none |
+| [2026-11-18T21-33-41](2026-11-18T21-33-41-phase-1d_p04-d04c/results.jsonl) | `phase-1d:p04-d04c` | 1/1 | 0 | 0 | $0.00031 | 2.9 s / 2.9 s | none |
+| [2026-11-18T21-33-47](2026-11-18T21-33-47-phase-1d_p04-d04c/results.jsonl) | `phase-1d:p04-d04c` | 1/1 | 0 | 0 | $0.00034 | 3.7 s / 3.7 s | none |
+| [2026-11-18T21-33-52](2026-11-18T21-33-52-phase-1d_p04-d04c/results.jsonl) | `phase-1d:p04-d04c` | 1/1 | 0 | 0 | $0.00031 | 2.8 s / 2.8 s | none |
+| [2026-11-18T21-33-57](2026-11-18T21-33-57-phase-1d_p04-d04c/results.jsonl) | `phase-1d:p04-d04c` | 1/1 | 0 | 0 | $0.00035 | 3.0 s / 3.0 s | none |
+| [2026-11-18T21-34-03](2026-11-18T21-34-03-phase-1d_p04-d04c/results.jsonl) | `phase-1d:p04-d04c` | 1/1 | 0 | 0 | $0.00034 | 3.1 s / 3.1 s | none |
+| [2026-11-18T21-34-08](2026-11-18T21-34-08-phase-1d_p04-d04c/results.jsonl) | `phase-1d:p04-d04c` | 1/1 | 0 | 0 | $0.00031 | 3.0 s / 3.0 s | none |
+| [2026-11-18T21-34-15](2026-11-18T21-34-15-phase-1d_agent-mentions-d04c/results.jsonl) | `phase-1d:agent-mentions-d04c` | 7/7 | 0 | 0 | $0.00023 | 2.1 s / 2.6 s | none |
+| [2026-11-18T21-34-37](2026-11-18T21-34-37-phase-1d_agent-45-d04c/results.jsonl) | `phase-1d:agent-45-d04c` | 44/45 | 0 | 0 | $0.00075 | 2.3 s / 3.4 s | N11 |
+| [2026-11-18T22-20-43](2026-11-18T22-20-43-phase-1d_offline-45-page-before/results.jsonl) | `phase-1d:offline-45-page-before` | 27/45 | 0 | 1 | $0.00000 | 17.5 s / 26.7 s | B08 H01 H02 H06 H09 H10 I04 I07 I08 I09 N01 N03 N04 N05 N06 N07 N11 N12 |
+| [2026-11-18T22-44-20](2026-11-18T22-44-20-phase-1d_offline-45-page-after/results.jsonl) | `phase-1d:offline-45-page-after` | 26/45 | 0 | 1 | $0.00000 | 15.6 s / 26.9 s | B08 H01 H02 H05 H06 H09 H10 I04 I07 I08 I09 N01 N03 N04 N05 N07 N10 N11 N12 |
+| [2026-11-18T22-54-12](2026-11-18T22-54-12-phase-1d_offline-dashboards-page-gate/results.jsonl) | `phase-1d:offline-dashboards-page-gate` | 6/9 | 1 | 0 | $0.00000 | 18.0 s / 77.7 s | D04 D08 D09 |
+| [2026-11-18T23-21-31](2026-11-18T23-21-31-phase-1d_offline-45-page-omit/results.jsonl) | `phase-1d:offline-45-page-omit` | 30/45 | 0 | 1 | $0.00000 | 15.1 s / 24.5 s | B08 H01 H02 H06 H09 H10 I04 I07 I08 I09 N03 N04 N07 N10 N11 |
+| [2026-11-18T23-31-40](2026-11-18T23-31-40-phase-1d_offline-dashboards-page-omit/results.jsonl) | `phase-1d:offline-dashboards-page-omit` | 6/9 | 1 | 0 | $0.00000 | 18.0 s / 77.8 s | D04 D08 D09 |
+| [2026-11-19T18-39-44](2026-11-19T18-39-44-phase-1e_today-retry/results.jsonl) | `phase-1e:today-retry` | 6/6 | 1 | 0 | $0.00301 | 5.3 s / 6.4 s | none |
+| [2026-11-19T18-40-03](2026-11-19T18-40-03-phase-1e_today-retry/results.jsonl) | `phase-1e:today-retry` | 6/6 | 1 | 0 | $0.00292 | 4.6 s / 5.0 s | none |
+| [2026-11-19T18-40-23](2026-11-19T18-40-23-phase-1e_today-retry/results.jsonl) | `phase-1e:today-retry` | 6/6 | 0 | 0 | $0.00280 | 4.6 s / 4.8 s | none |
+| [2026-11-19T20-08-14](2026-11-19T20-08-14-phase-1e_agent-retry/results.jsonl) | `phase-1e:agent-retry` | 4/6 | 1 | 0 | $0.00096 | 3.2 s / 4.1 s | T02 T05 |
+| [2026-11-19T20-08-27](2026-11-19T20-08-27-phase-1e_agent-retry/results.jsonl) | `phase-1e:agent-retry` | 5/6 | 0 | 0 | $0.00046 | 2.1 s / 3.0 s | T02 |
+| [2026-11-19T20-08-36](2026-11-19T20-08-36-phase-1e_agent-retry/results.jsonl) | `phase-1e:agent-retry` | 6/6 | 1 | 0 | $0.00047 | 2.1 s / 3.7 s | none |
+| [2026-11-19T20-10-57](2026-11-19T20-10-57-phase-1e_agent-retry-w2/results.jsonl) | `phase-1e:agent-retry-w2` | 6/6 | 0 | 0 | $0.00052 | 2.8 s / 3.6 s | none |
+| [2026-11-19T20-11-06](2026-11-19T20-11-06-phase-1e_agent-retry-w2/results.jsonl) | `phase-1e:agent-retry-w2` | 5/6 | 0 | 0 | $0.00046 | 1.9 s / 2.5 s | T05 |
+| [2026-11-19T20-11-15](2026-11-19T20-11-15-phase-1e_agent-retry-w2/results.jsonl) | `phase-1e:agent-retry-w2` | 4/6 | 0 | 0 | $0.00046 | 1.8 s / 3.0 s | T03 T05 |
+| [2026-11-19T20-11-59](2026-11-19T20-11-59-phase-1e_agent-retry-w2-recheck/results.jsonl) | `phase-1e:agent-retry-w2-recheck` | 1/1 | 0 | 0 | $0.00075 | 2.9 s / 2.9 s | none |
+| [2026-11-19T20-12-07](2026-11-19T20-12-07-phase-1e_agent-retry-w2-recheck/results.jsonl) | `phase-1e:agent-retry-w2-recheck` | 1/1 | 0 | 0 | $0.00069 | 2.4 s / 2.4 s | none |
+| [2026-11-19T20-12-15](2026-11-19T20-12-15-phase-1e_agent-retry-w2-recheck/results.jsonl) | `phase-1e:agent-retry-w2-recheck` | 1/1 | 0 | 0 | $0.00069 | 2.5 s / 2.5 s | none |
+| [2026-11-19T20-18-44](2026-11-19T20-18-44-phase-1e_agent-retry-w3/results.jsonl) | `phase-1e:agent-retry-w3` | 6/6 | 0 | 0 | $0.00098 | 2.3 s / 3.2 s | none |
+| [2026-11-19T20-18-53](2026-11-19T20-18-53-phase-1e_agent-retry-w3/results.jsonl) | `phase-1e:agent-retry-w3` | 6/6 | 0 | 0 | $0.00053 | 2.4 s / 2.8 s | none |
+| [2026-11-19T20-19-02](2026-11-19T20-19-02-phase-1e_agent-retry-w3/results.jsonl) | `phase-1e:agent-retry-w3` | 6/6 | 0 | 0 | $0.00048 | 2.1 s / 2.8 s | none |

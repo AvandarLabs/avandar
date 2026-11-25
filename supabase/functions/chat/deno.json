@@ -25,6 +25,7 @@
     "@utils/": "../../../packages/shared/utils/src/",
     "ts-pattern": "npm:ts-pattern@5",
     "type-fest": "npm:type-fest@5",
+    "uuid": "npm:uuid@11",
     "zod": "npm:zod@4"
   },
   "compilerOptions": {

@@ -33,10 +33,11 @@ export function ClarificationCardBody({
         />
       );
     })
-    .with({ kind: "fixed_options" }, ({ options, multi }) => {
+    .with({ kind: "fixed_options" }, ({ options, optionLabels, multi }) => {
       return (
         <FixedOptionsBody
           options={options}
+          optionLabels={optionLabels}
           multi={multi}
           onSubmit={(answer) => {
             return onAnswer({ answer });

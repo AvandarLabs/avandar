@@ -1,5 +1,28 @@
 # @avandar/modules
 
+## 0.3.0
+
+### Minor Changes
+
+- feat(modules): add the module and mixin type model (3f8fb41)
+
+- feat(modules): rebuild every layer of a module on each state change (4669a8b)
+
+- feat(modules): give factories a typed default state and mixin tuple (85638b7)
+
+- feat(modules)!: export the rebuilt module and factory API (cb7701a)
+
+### Patch Changes
+
+- Formatted files (2e5214b)
+
+- chore: apply formatter and wrap long comments (648d48a)
+
+- fix(modules): reject member overrides by spreading and reserved keys from mixins (aba430e)
+
+- Updated dependencies []:
+  - @avandar/utils@0.3.0
+
 ## 0.2.0
 
 ### Minor Changes

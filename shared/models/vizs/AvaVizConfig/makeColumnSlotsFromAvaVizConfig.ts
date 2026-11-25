@@ -1,3 +1,4 @@
+import { isPlainObject, objectEntries } from "@avandar/utils";
 import { match } from "ts-pattern";
 
 /**
@@ -17,7 +18,11 @@ type SlotConfig<Key extends string> =
     }
   | { vizType: "radar"; nameKey?: Key; series: ReadonlyArray<SlotSeries<Key>> }
   | { vizType: "scatter" | "bubble"; series: ReadonlyArray<SlotSeries<Key>> }
-  | { vizType: "pie" | "funnel"; nameKey?: Key; valueKey?: Key };
+  | { vizType: "pie" | "funnel"; nameKey?: Key; valueKey?: Key }
+  | {
+      vizType: "plugin";
+      columnSettings: Readonly<Record<string, Key | undefined>>;
+    };
 
 function _makeSeriesSlots<Key extends string>({
   series,
@@ -37,10 +42,11 @@ function _makeSeriesSlots<Key extends string>({
 }
 
 /**
- * Lists every column slot in a chart config, such as the X axis or a series'
- * size column, with its key and its `target` path (for example
- * `series.0.xKey`), including slots with no column set. Works on configs keyed
- * by column ID or by `QueryResult` column name.
+ * Lists every column slot in a chart config, such as the X axis, a series'
+ * size column, or a plugin chart's column setting, with its key and its
+ * `target` path (for example `series.0.xKey` or `columnSettings.date`),
+ * including slots with no column set. Works on configs keyed by column ID or
+ * by `QueryResult` column name.
  *
  * Use it to visit each column a chart reads in one pass, for example to
  * convert every key or to report which slot failed to resolve.
@@ -83,6 +89,16 @@ export function makeColumnSlotsFromAvaVizConfig<Key extends string>(
         { key: chart.nameKey, target: "nameKey" },
         { key: chart.valueKey, target: "valueKey" },
       ];
+    })
+    .with({ vizType: "plugin" }, (chart) => {
+      // A stored plugin config can lack its column settings. It has no slots.
+      const storedColumnSettings: unknown = chart.columnSettings;
+      if (!isPlainObject(storedColumnSettings)) {
+        return [];
+      }
+      return objectEntries(chart.columnSettings).map(([settingKey, key]) => {
+        return { key, target: `columnSettings.${settingKey}` };
+      });
     })
     .exhaustive();
 }

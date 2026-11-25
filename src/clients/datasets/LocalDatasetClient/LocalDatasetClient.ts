@@ -130,6 +130,11 @@ type LocalImportParams<ParseOptions> = {
   userId: UserId;
   file: File;
   parseOptions: ParseOptions;
+  /**
+   * What the import's toasts call the data. Defaults to the file's name.
+   * Pass it when the dataset is named before the file finishes processing.
+   */
+  displayName?: string;
 };
 
 type XlsxSniffResult = {
@@ -297,6 +302,7 @@ function _makeStartCsvImport(
       datasetId: params.datasetId,
       workspaceId: params.workspaceId,
       userId: params.userId,
+      displayName: params.displayName,
       source: {
         kind: "csv",
         file: params.file,
@@ -338,6 +344,7 @@ function _makeStartXlsxImport(
       datasetId: params.datasetId,
       workspaceId: params.workspaceId,
       userId: params.userId,
+      displayName: params.displayName,
       source: { kind: "xlsx", file: params.file, options: parseOptions },
     });
     return sniff;

@@ -11,10 +11,23 @@
  * With no `--questions`, the run asks the 45 original questions. `--questions
  * P` runs the page-context questions (what is on screen when the user asks).
  * `--questions M` runs the mention questions (gadgets the user mentions or
- * attaches).
+ * attaches). `--questions R` runs the fitRegression question, which calls the
+ * epidemiology plugin's tool on a result the Data Explorer shows.
+ * `--questions D` runs the dashboard questions (adding a block).
+ * `--questions T` runs the Try again questions: each is asked, then asked
+ * again as a Try again, and the second attempt is graded. T06 follows
+ * T01's second attempt.
  *
  * `--harness pi-local --model <WebLLM id>` runs the offline agent on WebLLM
  * in a headless Chromium instead of calling OpenRouter.
+ *
+ * `--page data-explorer` (pi and pi-local) sends every question that sets no
+ * page the Data Explorer page block the app always sends. Without it a
+ * question that sets no page is sent no page block.
+ *
+ * `--workspace measles` asks the coded-column questions (D) over the
+ * measles line list with its code lists attached, on the `pi` and
+ * `pi-local` harnesses. It needs no `~/cleaned-test-data`.
  *
  * Needs `~/cleaned-test-data` (the JHU long-format CSVs) and
  * `OPEN_ROUTER_API_KEY` (read from `.env.development.edge` when not set).
@@ -23,10 +36,11 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { parseArgs } from "node:util";
-import { COVID_QUESTIONS } from "./covid/covidQuestions";
 import { createBaselineHarness } from "./harnesses/baseline/BaselineHarness";
 import { createPiHarness } from "./harnesses/pi/PiHarness";
 import { createPiLocalHarness } from "./harnesses/pi/PiLocalHarness";
+import { MEASLES_QUESTIONS } from "./measles/measlesQuestions";
+import { MEASLES_DATASETS } from "./measles/measlesWorkspace";
 import { EvalDatabase } from "./runtime/EvalDatabase";
 import { gradeEvalAnswer } from "./runtime/gradeEvalAnswer";
 import { readOpenRouterApiKey } from "./runtime/readOpenRouterApiKey";
@@ -35,8 +49,10 @@ import {
   SUMMARY_TABLE_HEADER,
   summarizeEvalRun,
 } from "./runtime/summarizeEvalRun";
+import { selectEvalQuestions } from "./selectEvalQuestions";
 import type { EvalQuestion } from "./EvalQuestion";
 import type { EvalHarness } from "./harnesses/EvalHarness";
+import type { PiEvalDefaultPage } from "./harnesses/pi/piEvalConfigs";
 import type { EvalQueryResult } from "./runtime/EvalDatabase";
 import type { GradedAnswer } from "./runtime/gradeEvalAnswer";
 
@@ -83,12 +99,20 @@ async function _runConversation(
   }>,
 ): Promise<void> {
   const conversation = options.harness.startConversation();
+  // Each answer's result by question id, so a follow-up's grader reads its
+  // parent's.
+  const resultsById = new Map<string, EvalQueryResult | undefined>();
   for (const question of options.questions) {
     const [answer, truth] = await Promise.all([
       conversation.ask(question),
       _computeTruth(options.database, question),
     ]);
-    options.onGraded(gradeEvalAnswer(question, answer, truth));
+    resultsById.set(question.id, answer.result);
+    const parentResult =
+      question.followsId === undefined
+        ? undefined
+        : resultsById.get(question.followsId);
+    options.onGraded(gradeEvalAnswer(question, answer, truth, parentResult));
   }
 }
 
@@ -119,45 +143,91 @@ function _parseOptions() {
       questions: { type: "string", default: "" },
       concurrency: { type: "string", default: "4" },
       label: { type: "string", default: "" },
+      workspace: { type: "string", default: "covid" },
+      page: { type: "string", default: "" },
     },
   });
   return values;
 }
 
-function _selectQuestions(ids: string): readonly EvalQuestion[] {
-  if (!ids) {
-    // The default run stays the audit's 45 questions, so archived runs
-    // compare. Page questions run with `--questions P`, mention questions
-    // with `--questions M`, schema questions with `--questions S`.
-    return COVID_QUESTIONS.filter((question) => {
-      return (
-        question.category !== "page_context" &&
-        question.category !== "mentions" &&
-        question.category !== "schema"
-      );
-    });
+/** The questions and data of the workspace a run asks about. */
+type EvalWorkspace = {
+  name: string;
+  /** Set for a workspace other than COVID, whose questions are all its own. */
+  questions: readonly EvalQuestion[] | undefined;
+  /** Set for a workspace other than COVID; the harnesses default to COVID. */
+  datasets: typeof MEASLES_DATASETS | undefined;
+  databasePath: string;
+  dataDir: string | undefined;
+};
+
+/** Looks up a `--workspace` name. Throws on a name it does not know. */
+function _getWorkspace(name: string): EvalWorkspace {
+  if (name === "measles") {
+    return {
+      name,
+      questions: MEASLES_QUESTIONS,
+      datasets: MEASLES_DATASETS,
+      databasePath: join(REPO_ROOT, ".temp/ai-eval/measles.duckdb"),
+      dataDir: join(REPO_ROOT, "tests/data/measles-line-list-small"),
+    };
   }
-  const wanted = new Set(ids.split(","));
-  return COVID_QUESTIONS.filter((question) => {
-    return (
-      wanted.has(question.id) ||
-      [...wanted].some((id) => {
-        return question.id.startsWith(id) && id.length === 1;
+  if (name !== "covid") {
+    throw new Error(`Unknown workspace "${name}": use "covid" or "measles"`);
+  }
+  return {
+    name,
+    questions: undefined,
+    datasets: undefined,
+    databasePath: join(REPO_ROOT, ".temp/ai-eval/covid.duckdb"),
+    dataDir: undefined,
+  };
+}
+
+/**
+ * The questions a run asks: a workspace's own questions, cut to `ids` when
+ * set, or the COVID questions `selectEvalQuestions` picks.
+ */
+function _selectQuestions(
+  ids: string,
+  workspaceQuestions: readonly EvalQuestion[] | undefined,
+): readonly EvalQuestion[] {
+  if (!workspaceQuestions) {
+    return selectEvalQuestions(ids);
+  }
+  return ids
+    ? workspaceQuestions.filter((question) => {
+        return ids.split(",").includes(question.id);
       })
-    );
-  });
+    : workspaceQuestions;
+}
+
+/** Looks up a `--page` name. Throws on a name it does not know. */
+function _getDefaultPage(name: string): PiEvalDefaultPage | undefined {
+  if (name === "") {
+    return undefined;
+  }
+  if (name !== "data-explorer") {
+    throw new Error(`Unknown page "${name}": use "data-explorer"`);
+  }
+  return name;
 }
 
 async function _createHarness(
   options: ReturnType<typeof _parseOptions>,
+  workspace: EvalWorkspace,
   database: EvalDatabase,
 ): Promise<EvalHarness> {
+  const { datasets } = workspace;
+  const defaultPage = _getDefaultPage(options.page);
   if (options.harness === "pi-local") {
     return createPiLocalHarness({
       repoRoot: REPO_ROOT,
       database,
       configName: options.config || "default",
       model: options.model,
+      datasets,
+      defaultPage,
     });
   }
   const openRouterApiKey = readOpenRouterApiKey(REPO_ROOT);
@@ -167,7 +237,17 @@ async function _createHarness(
       database,
       configName: options.config || "default",
       model: options.model,
+      datasets,
+      defaultPage,
     });
+  }
+  if (defaultPage) {
+    throw new Error("--page runs on the pi and pi-local harnesses only");
+  }
+  if (datasets) {
+    throw new Error(
+      `The ${workspace.name} workspace runs on the pi and pi-local harnesses only`,
+    );
   }
   return createBaselineHarness({
     repoRoot: REPO_ROOT,
@@ -206,14 +286,17 @@ function _writeRun(
 
 async function main(): Promise<void> {
   const options = _parseOptions();
+  const workspace = _getWorkspace(options.workspace);
   const database = await EvalDatabase.open({
-    databasePath: join(REPO_ROOT, ".temp/ai-eval/covid.duckdb"),
+    databasePath: workspace.databasePath,
+    dataDir: workspace.dataDir,
+    datasets: workspace.datasets,
   });
-  const harness = await _createHarness(options, database);
+  const harness = await _createHarness(options, workspace, database);
   const label = options.label || harness.label;
   const graded: GradedAnswer[] = [];
   await _runAll(
-    _toConversations(_selectQuestions(options.questions)),
+    _toConversations(_selectQuestions(options.questions, workspace.questions)),
     Number(options.concurrency),
     async (questions) => {
       await _runConversation({
@@ -223,7 +306,7 @@ async function main(): Promise<void> {
         onGraded: (answer) => {
           graded.push(answer);
           console.log(
-            `${answer.pass ? "PASS" : "FAIL"} ${answer.id} ${answer.questionsAsked > 0 ? `(asked ${answer.questionsAsked}) ` : ""}$${answer.answer.usage.cost.toFixed(5)} ${(answer.answer.latencyMs / 1000).toFixed(1)}s  ${answer.detail}`,
+            `${answer.pass ? "PASS" : "FAIL"} ${answer.id} ${answer.questionsAsked > 0 ? `(asked ${answer.questionsAsked}) ` : ""}${answer.isRepeat ? "(repeat) " : ""}$${answer.answer.usage.cost.toFixed(5)} ${(answer.answer.latencyMs / 1000).toFixed(1)}s  ${answer.detail}`,
           );
         },
       });

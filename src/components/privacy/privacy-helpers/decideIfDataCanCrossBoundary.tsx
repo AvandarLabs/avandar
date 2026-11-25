@@ -19,7 +19,8 @@ export type CrossBoundaryContext =
   | "discovery_clarification"
   | "generated_sql_assumptions"
   | "user_message_text"
-  | "clarification_answer";
+  | "clarification_answer"
+  | "dictionary_suggestions";
 
 export type CrossBoundaryRequest = {
   /**

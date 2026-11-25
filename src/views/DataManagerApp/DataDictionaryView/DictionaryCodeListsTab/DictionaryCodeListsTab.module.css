@@ -1,0 +1,19 @@
+/* The list of code lists beside the selected list's editor. */
+.dictionaryCodeListsTab {
+  display: grid;
+  gap: var(--mantine-spacing-lg);
+  grid-template-columns: 16rem minmax(0, 1fr);
+}
+
+.dictionaryCodeListsTabList {
+  background-color: var(--ava-surface-body);
+  border: 1px solid var(--ava-border-default);
+  border-radius: var(--mantine-radius-sm);
+  padding: var(--mantine-spacing-xs);
+}
+
+@media (width < 62em) {
+  .dictionaryCodeListsTab {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

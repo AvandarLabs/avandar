@@ -9,7 +9,6 @@ import {
   makeRoleGroupIdFromAcceptedInvite,
   WorkspaceInviteRoleOverrideSchema,
 } from "@sbfn/workspaces/makeRoleGroupIdFromAcceptedInvite/makeRoleGroupIdFromAcceptedInvite.ts";
-import { WorkspaceSlugRoutes } from "@sbfn/workspaces/WorkspaceSlugRoutes.ts";
 import { z } from "zod";
 import { EmailClient } from "$/EmailClient/EmailClient.tsx";
 import { Permissions } from "$/models/Permissions/Permissions.ts";
@@ -22,12 +21,9 @@ import type { WorkspaceId } from "$/models/Workspace/Workspace.types.ts";
 import type { WorkspacesAPI } from "@sbfn/workspaces/WorkspacesRoutes.types.ts";
 
 /**
- * Defines workspace API routes, including workspace slug validation.
- * Use it, for example, to serve workspace operations through MiniServer.
+ * This is the route handler for all workspaces endpoints.
  */
 export const WorkspacesRoutes = defineRoutes<WorkspacesAPI>("workspaces", {
-  ...WorkspaceSlugRoutes,
-
   "/:workspaceId/invite": {
     POST: POST({
       path: "/:workspaceId/invite",

@@ -63,7 +63,9 @@ describe("VirtualDatasetWrapper", () => {
       { datasetId: DATASET_ID, rawSql: 'SELECT * FROM "other"' },
     ]);
     const parquetBlob = new Blob(["virtual-parquet"]);
-    const runParquetQuery = vi.fn().mockResolvedValue(parquetBlob);
+    const runParquetQuery = vi
+      .fn()
+      .mockResolvedValue({ parquetBlob, staleAt: undefined });
     const wrapper = createVirtualDatasetWrapper({ runParquetQuery });
 
     const acquired = await wrapper.acquire!(
@@ -103,5 +105,27 @@ describe("VirtualDatasetWrapper", () => {
       columns: [{ name: "total", dataType: "DOUBLE", isArray: false }],
     });
     expect(runParquetQuery).not.toHaveBeenCalled();
+  });
+
+  it("goes stale when the datasets its SQL reads do", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(1_000_000);
+    virtualSourceGetAllMock.mockResolvedValue([
+      { datasetId: DATASET_ID, rawSql: 'SELECT * FROM "sheet"' },
+    ]);
+    const wrapper = createVirtualDatasetWrapper({
+      runParquetQuery: vi.fn().mockResolvedValue({
+        parquetBlob: new Blob(["rows"]),
+        staleAt: 1_000_000 + 300_000,
+      }),
+    });
+
+    const acquired = await wrapper.acquire!(
+      { ref: DATASET_REF, columns: "all" },
+      CONTEXT,
+    );
+
+    expect(acquired.maxAgeMs).toBe(300_000);
+    vi.useRealTimers();
   });
 });

@@ -7,6 +7,7 @@ import { BAD_REQUEST } from "@sbfn/_shared/httpCodes.ts";
 import { POST } from "@sbfn/_shared/MiniServer/MiniServer.ts";
 import { buildDataAgentProxyContext } from "@sbfn/chat/PostAgentStream/buildDataAgentProxyContext.ts";
 import { loadDataAgentDatasets } from "@sbfn/chat/PostAgentStream/loadDataAgentDatasets.ts";
+import { loadInstalledPluginAiTools } from "@sbfn/chat/PostAgentStream/loadInstalledPluginAiTools.ts";
 import { toProxyEvent } from "@sbfn/chat/PostAgentStream/toProxyEvent.ts";
 import { z } from "zod";
 import { isDataAgentPromptId } from "$/agent/dataAgent/dataAgentTools.ts";
@@ -123,6 +124,10 @@ export const PostAgentStream = POST({
       }),
       today: new Date().toISOString().slice(0, 10),
       promptId,
+      pluginTools: await loadInstalledPluginAiTools({
+        supabaseClient,
+        workspaceId: pathParams.workspaceId,
+      }),
     });
     const stream = models.streamSimple(_resolveModel(body.model.id), context, {
       apiKey: openRouterApiKey,

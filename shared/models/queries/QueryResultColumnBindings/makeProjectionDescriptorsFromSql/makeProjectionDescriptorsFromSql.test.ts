@@ -67,13 +67,53 @@ describe("makeProjectionDescriptorsFromSql", () => {
       }).map(prop("queryResultColumnName")),
     ).toEqual(["region", "amount"]);
   });
+  it("reads a row count beside the column it is grouped by", () => {
+    const columns = _describe({
+      sql: "SELECT region, COUNT(*) FROM sales GROUP BY region",
+      names: ["region", "count_star()"],
+    });
+    expect(columns.map(prop("queryResultColumnName"))).toEqual([
+      "region",
+      "count_star()",
+    ]);
+    expect(columns[0]?.expressionKey).toBe(
+      _describe({ sql: "SELECT region FROM sales", names: ["region"] })[0]
+        ?.expressionKey,
+    );
+  });
+  it("reads a GROUP BY position as the SELECT item it points at", () => {
+    expect(
+      _describe({
+        sql: "SELECT region, COUNT(*) AS amount FROM sales GROUP BY 1",
+        names: ["region", "amount"],
+      }).map(prop("queryResultColumnName")),
+    ).toEqual(["region", "amount"]);
+  });
+  it("names an aliased row count by its alias", () => {
+    expect(
+      _describe({
+        sql: "SELECT count(*) AS amount FROM sales",
+      }).map(prop("queryResultColumnName")),
+    ).toEqual(["amount"]);
+  });
+  it("keys a row count apart from a count of one column", () => {
+    const rowCount = _describe({ sql: "SELECT COUNT(*) AS amount FROM sales" });
+    const revenueCount = _describe({
+      sql: "SELECT COUNT(revenue) AS amount FROM sales",
+    });
+    expect(rowCount).toHaveLength(1);
+    expect(rowCount[0]?.expressionKey).not.toBe(revenueCount[0]?.expressionKey);
+  });
   it.each([
     "SELECT revenue + 1 AS amount FROM sales",
     "SELECT revenue[1] AS amount FROM sales",
     "SELECT revenue AS amount FROM sales GROUP BY lower(revenue)",
     "SELECT SUM(revenue) OVER () AS amount FROM sales",
     "SELECT SUM(DISTINCT revenue) AS amount FROM sales",
-    "SELECT COUNT(*) AS amount FROM sales",
+    "SELECT SUM(*) AS amount FROM sales",
+    "SELECT region, COUNT(*) AS amount FROM sales GROUP BY 2",
+    "SELECT region, COUNT(*) AS amount FROM sales GROUP BY 3",
+    "SELECT COUNT(*) FILTER (WHERE revenue > 0) AS amount FROM sales",
     "SELECT revenue AS amount FROM sales JOIN other ON sales.id = other.id",
     "SELECT revenue AS amount FROM (SELECT * FROM sales) s",
     "WITH s AS (SELECT * FROM sales) SELECT revenue AS amount FROM s",

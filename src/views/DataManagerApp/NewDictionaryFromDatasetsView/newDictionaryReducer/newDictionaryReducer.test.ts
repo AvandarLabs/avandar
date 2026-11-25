@@ -1,0 +1,535 @@
+import { describe, expect, it } from "vitest";
+import { uuid } from "$/lib/uuid";
+import { DictionaryProposal } from "$/models/dataDictionaries/DictionaryProposal/DictionaryProposal";
+import {
+  hasValuesToMap,
+  makeInitialNewDictionaryState,
+  newDictionaryReducer,
+} from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
+import type { ColumnProfile } from "$/models/dataDictionaries/ColumnProfile/ColumnProfile";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type {
+  NewDictionaryState,
+  ProposalReadId,
+} from "@/views/DataManagerApp/NewDictionaryFromDatasetsView/newDictionaryReducer/newDictionaryReducer";
+
+const DATASET_ID = uuid<Dataset.Id>();
+const READ_ID = uuid<ProposalReadId>();
+
+function _column(
+  columnName: string,
+  codes: readonly string[],
+): ColumnProfile.T {
+  return {
+    datasetId: DATASET_ID,
+    datasetName: "Kings line list",
+    columnName,
+    dataType: "varchar",
+    rowCount: 200,
+    nonNullCount: 200,
+    distinctCount: codes.length,
+    values: codes.map((value) => {
+      return { value, rowCount: 50 };
+    }),
+    dateShare: undefined,
+    numberRange: undefined,
+  };
+}
+
+const PROPOSAL = DictionaryProposal.fromColumnProfiles([
+  _column("GENDER", ["1", "2", "9"]),
+  _column("hosp_yn", ["Y", "N"]),
+]);
+
+function _read(state: NewDictionaryState): NewDictionaryState {
+  const picked = state.pickedDatasetIds.includes(DATASET_ID)
+    ? state
+    : newDictionaryReducer(state, {
+        type: "toggle_dataset",
+        datasetId: DATASET_ID,
+      });
+  return newDictionaryReducer(picked, {
+    type: "datasets_read",
+    proposal: PROPOSAL,
+    datasetIds: [DATASET_ID],
+    readId: READ_ID,
+    defaultName: "Kings line list codes",
+  });
+}
+
+function _codeListKeys(): string[] {
+  return DictionaryProposal.getCodings(PROPOSAL).codeLists.map((codeList) => {
+    return codeList.key;
+  });
+}
+
+describe("newDictionaryReducer", () => {
+  it("starts at Pick, or at Review with the dataset picked when opened from it", () => {
+    expect(makeInitialNewDictionaryState(undefined).step).toBe("pick");
+    expect(makeInitialNewDictionaryState(DATASET_ID)).toMatchObject({
+      step: "review",
+      originDatasetId: DATASET_ID,
+      pickedDatasetIds: [DATASET_ID],
+    });
+  });
+
+  it("toggles a dataset in and out of the pick", () => {
+    const picked = newDictionaryReducer(
+      makeInitialNewDictionaryState(undefined),
+      {
+        type: "toggle_dataset",
+        datasetId: DATASET_ID,
+      },
+    );
+    expect(picked.pickedDatasetIds).toEqual([DATASET_ID]);
+    const unpicked = newDictionaryReducer(picked, {
+      type: "toggle_dataset",
+      datasetId: DATASET_ID,
+    });
+    expect(unpicked.pickedDatasetIds).toEqual([]);
+  });
+
+  it("opens Review with the first code list selected once datasets are read", () => {
+    const state = _read(makeInitialNewDictionaryState(undefined));
+    expect(state.step).toBe("review");
+    expect(state.selectedCodeListKey).toBe(_codeListKeys()[0]);
+    expect(state.name).toBe("Kings line list codes");
+    expect(Object.keys(state.labels)).toEqual(_codeListKeys());
+  });
+
+  it("keeps a typed name and typed labels when the datasets are read again", () => {
+    const read = _read(makeInitialNewDictionaryState(undefined));
+    const codeListKey = _codeListKeys()[0] ?? "";
+    const typed = [
+      { type: "set_name", name: "Borough codes" } as const,
+      {
+        type: "set_value_label",
+        codeListKey,
+        code: "1",
+        label: "Male",
+      } as const,
+    ].reduce(newDictionaryReducer, read);
+    const again = _read(typed);
+    expect(again.name).toBe("Borough codes");
+    expect(
+      DictionaryProposal.getValueLabel(again.labels, { codeListKey, code: "1" })
+        ?.label,
+    ).toBe("Male");
+  });
+
+  it("accepts a list and selects the next, staying on the last one", () => {
+    const [firstKey = "", secondKey = ""] = _codeListKeys();
+    const read = _read(makeInitialNewDictionaryState(undefined));
+    const accepted = newDictionaryReducer(read, {
+      type: "accept_code_list",
+      codeListKey: firstKey,
+    });
+    expect(accepted.selectedCodeListKey).toBe(secondKey);
+    expect(accepted.labels[firstKey]?.isAccepted).toBe(true);
+    const last = newDictionaryReducer(accepted, {
+      type: "accept_code_list",
+      codeListKey: secondKey,
+    });
+    expect(last.selectedCodeListKey).toBe(secondKey);
+  });
+
+  it("fills a single-entry list's entry with the suggested description", () => {
+    const read = _read(makeInitialNewDictionaryState(undefined));
+    const entryKey = PROPOSAL.entries[0]?.key;
+    const suggested = newDictionaryReducer(read, {
+      type: "labels_suggested",
+      codeListKey: _codeListKeys()[0] ?? "",
+      entryKey,
+      readId: READ_ID,
+      suggestions: {
+        labels: [{ value: "1", label: "Male", isMissing: false }],
+        description: "Sex recorded at intake.",
+      },
+    });
+    expect(suggested.proposal?.entries[0]).toMatchObject({
+      description: "Sex recorded at intake.",
+      isDescriptionSuggested: true,
+    });
+  });
+
+  it("renames an entry and keeps the labels typed for its list", () => {
+    const read = _read(makeInitialNewDictionaryState(undefined));
+    const entryKey = PROPOSAL.entries[0]?.key ?? "";
+    const codeListKey =
+      DictionaryProposal.getCodings(PROPOSAL).codeLists.find((codeList) => {
+        return codeList.entryKeys.includes(entryKey);
+      })?.key ?? "";
+    const renamed = [
+      {
+        type: "set_value_label",
+        codeListKey,
+        code: "1",
+        label: "Male",
+      } as const,
+      { type: "rename_entry", entryKey, name: "sex_at_intake" } as const,
+    ].reduce(newDictionaryReducer, read);
+    expect(renamed.proposal?.entries[0]?.name).toBe("sex_at_intake");
+    expect(
+      DictionaryProposal.getValueLabel(renamed.labels, {
+        codeListKey,
+        code: "1",
+      })?.label,
+    ).toBe("Male");
+  });
+
+  it("includes or leaves out every entry at once", () => {
+    const read = _read(makeInitialNewDictionaryState(undefined));
+    const leftOut = newDictionaryReducer(read, {
+      type: "set_all_entries_included",
+      isIncluded: false,
+    });
+    expect(
+      leftOut.proposal?.entries.map((entry) => {
+        return entry.isIncluded;
+      }),
+    ).toEqual([false, false]);
+    const included = newDictionaryReducer(leftOut, {
+      type: "set_all_entries_included",
+      isIncluded: true,
+    });
+    expect(
+      included.proposal?.entries.map((entry) => {
+        return entry.isIncluded;
+      }),
+    ).toEqual([true, true]);
+  });
+
+  it("remembers the answer to the first online suggestion", () => {
+    const start = makeInitialNewDictionaryState(undefined);
+    expect(start.suggestionConsent).toBe("not_asked");
+    const approved = newDictionaryReducer(start, {
+      type: "suggestion_consent_decided",
+      isApproved: true,
+    });
+    expect(approved.suggestionConsent).toBe("approved");
+    const declined = newDictionaryReducer(start, {
+      type: "suggestion_consent_decided",
+      isApproved: false,
+    });
+    expect(declined.suggestionConsent).toBe("declined");
+  });
+
+  it("goes back to Pick and forgets the origin on Learn from more datasets", () => {
+    const state = newDictionaryReducer(
+      _read(makeInitialNewDictionaryState(DATASET_ID)),
+      { type: "learn_from_more" },
+    );
+    expect(state).toMatchObject({
+      step: "pick",
+      originDatasetId: undefined,
+      pickedDatasetIds: [DATASET_ID],
+    });
+  });
+
+  it("ignores a read of datasets that are no longer the ones picked", () => {
+    const otherDatasetId = uuid<Dataset.Id>();
+    const picking = [
+      { type: "toggle_dataset", datasetId: DATASET_ID } as const,
+      { type: "toggle_dataset", datasetId: otherDatasetId } as const,
+    ].reduce(newDictionaryReducer, makeInitialNewDictionaryState(undefined));
+    const state = newDictionaryReducer(picking, {
+      type: "datasets_read",
+      proposal: PROPOSAL,
+      datasetIds: [DATASET_ID],
+      readId: READ_ID,
+      defaultName: "Kings line list codes",
+    });
+    expect(state).toBe(picking);
+    expect(state.step).toBe("pick");
+  });
+
+  it("keeps the proposal of a newer read when an older read finishes late", () => {
+    const read = _read(makeInitialNewDictionaryState(undefined));
+    const otherDatasetId = uuid<Dataset.Id>();
+    const repicked = newDictionaryReducer(read, {
+      type: "toggle_dataset",
+      datasetId: otherDatasetId,
+    });
+    const late = newDictionaryReducer(repicked, {
+      type: "datasets_read",
+      proposal: DictionaryProposal.fromColumnProfiles([]),
+      datasetIds: [DATASET_ID],
+      readId: uuid<ProposalReadId>(),
+      defaultName: "Late",
+    });
+    expect(late).toBe(repicked);
+  });
+
+  it("applies meaning matches only to the read they were found for", () => {
+    const read = _read(makeInitialNewDictionaryState(undefined));
+    const matches = [{ name: "hosp_yn", sameAs: "GENDER" }];
+    const stale = newDictionaryReducer(read, {
+      type: "meaning_matches_found",
+      matches,
+      readId: uuid<ProposalReadId>(),
+    });
+    expect(stale).toBe(read);
+    const current = newDictionaryReducer(read, {
+      type: "meaning_matches_found",
+      matches,
+      readId: READ_ID,
+    });
+    expect(current).not.toBe(read);
+  });
+
+  it("drops late matches from an earlier read of the same datasets, so Keep apart stays", () => {
+    const read = _read(makeInitialNewDictionaryState(undefined));
+    const reread = newDictionaryReducer(read, {
+      type: "datasets_read",
+      proposal: PROPOSAL,
+      datasetIds: [DATASET_ID],
+      readId: uuid<ProposalReadId>(),
+      defaultName: "Kings line list codes",
+    });
+    const late = newDictionaryReducer(reread, {
+      type: "meaning_matches_found",
+      matches: [{ name: "hosp_yn", sameAs: "GENDER" }],
+      readId: READ_ID,
+    });
+    expect(late).toBe(reread);
+  });
+
+  it("drops labels suggested for an earlier read", () => {
+    const read = _read(makeInitialNewDictionaryState(undefined));
+    const codeListKey = _codeListKeys()[0] ?? "";
+    const late = newDictionaryReducer(read, {
+      type: "labels_suggested",
+      codeListKey,
+      entryKey: undefined,
+      readId: uuid<ProposalReadId>(),
+      suggestions: {
+        labels: [{ value: "1", label: "Male", isMissing: false }],
+        description: "",
+      },
+    });
+    expect(late).toBe(read);
+  });
+
+  it("keeps columns apart when matches from the same read arrive after Keep apart", () => {
+    const otherDatasetId = uuid<Dataset.Id>();
+    const proposal = DictionaryProposal.fromColumnProfiles([
+      _column("GENDER", ["1", "2", "9"]),
+      { ..._column("sex", ["M", "F", "U"]), datasetId: otherDatasetId },
+    ]);
+    const matches = [{ name: "sex", sameAs: "GENDER" }];
+    const picked = [DATASET_ID, otherDatasetId].reduce((state, datasetId) => {
+      return newDictionaryReducer(state, { type: "toggle_dataset", datasetId });
+    }, makeInitialNewDictionaryState(undefined));
+    const read = newDictionaryReducer(picked, {
+      type: "datasets_read",
+      proposal,
+      datasetIds: [DATASET_ID, otherDatasetId],
+      readId: READ_ID,
+      defaultName: "codes",
+    });
+    const merged = newDictionaryReducer(read, {
+      type: "meaning_matches_found",
+      matches,
+      readId: READ_ID,
+    });
+    expect(merged.proposal?.entries).toHaveLength(1);
+    const apart = newDictionaryReducer(merged, {
+      type: "keep_apart",
+      entryKey: merged.proposal?.entries[0]?.key ?? "",
+    });
+    expect(apart.proposal?.entries).toHaveLength(2);
+    const late = newDictionaryReducer(apart, {
+      type: "meaning_matches_found",
+      matches,
+      readId: READ_ID,
+    });
+    expect(late.proposal?.entries).toHaveLength(2);
+  });
+
+  it("falls back to an empty Pick when the dataset that opened the flow is unavailable", () => {
+    const state = newDictionaryReducer(
+      makeInitialNewDictionaryState(DATASET_ID),
+      { type: "origin_dataset_unavailable" },
+    );
+    expect(state).toMatchObject({
+      step: "pick",
+      originDatasetId: undefined,
+      pickedDatasetIds: [],
+    });
+  });
+
+  describe("read_failed", () => {
+    it("returns to Pick with the picked datasets kept when the first read fails", () => {
+      const state = newDictionaryReducer(
+        makeInitialNewDictionaryState(DATASET_ID),
+        { type: "read_failed", datasetIds: [DATASET_ID] },
+      );
+      expect(state).toMatchObject({
+        step: "pick",
+        originDatasetId: undefined,
+        pickedDatasetIds: [DATASET_ID],
+        proposal: undefined,
+      });
+    });
+
+    it("ignores a failure for datasets that are no longer the picked ones", () => {
+      const initial = makeInitialNewDictionaryState(DATASET_ID);
+      expect(
+        newDictionaryReducer(initial, {
+          type: "read_failed",
+          datasetIds: [uuid<Dataset.Id>()],
+        }),
+      ).toBe(initial);
+    });
+
+    it("ignores a failure once a read has produced the current proposal", () => {
+      const read = newDictionaryReducer(
+        makeInitialNewDictionaryState(DATASET_ID),
+        {
+          type: "datasets_read",
+          proposal: DictionaryProposal.fromColumnProfiles([]),
+          datasetIds: [DATASET_ID],
+          readId: uuid<ProposalReadId>(),
+          defaultName: "codes",
+        },
+      );
+      expect(
+        newDictionaryReducer(read, {
+          type: "read_failed",
+          datasetIds: [DATASET_ID],
+        }),
+      ).toBe(read);
+    });
+  });
+});
+
+describe("newDictionaryReducer descriptions", () => {
+  const NOTES_PROFILE: ColumnProfile.T = {
+    ..._column("clinic_notes", []),
+    distinctCount: 180,
+    values: undefined,
+  };
+  const MIXED = DictionaryProposal.fromColumnProfiles([
+    _column("GENDER", ["1", "2", "9"]),
+    NOTES_PROFILE,
+  ]);
+  const GENDER_KEY = MIXED.entries[0]?.key ?? "";
+  const NOTES_KEY = MIXED.entries[1]?.key ?? "";
+
+  function _readMixed(): NewDictionaryState {
+    const picked = newDictionaryReducer(
+      makeInitialNewDictionaryState(undefined),
+      { type: "toggle_dataset", datasetId: DATASET_ID },
+    );
+    return newDictionaryReducer(picked, {
+      type: "datasets_read",
+      proposal: MIXED,
+      datasetIds: [DATASET_ID],
+      readId: READ_ID,
+      defaultName: "Mixed",
+    });
+  }
+
+  function _descriptionOf(state: NewDictionaryState, entryKey: string) {
+    return state.proposal?.entries.find((entry) => {
+      return entry.key === entryKey;
+    });
+  }
+
+  it("goes to Describe like any other step", () => {
+    const state = newDictionaryReducer(_readMixed(), {
+      type: "go_to_step",
+      step: "describe",
+    });
+    expect(state.step).toBe("describe");
+  });
+
+  it("has values to map only while an included entry has a value list", () => {
+    expect(hasValuesToMap(MIXED)).toBe(true);
+    const gendersLeftOut = DictionaryProposal.setEntryIncluded(MIXED, {
+      entryKey: GENDER_KEY,
+      isIncluded: false,
+    });
+    expect(hasValuesToMap(gendersLeftOut)).toBe(false);
+  });
+
+  it("fills a suggested description in for an empty entry, marked as suggested", () => {
+    const state = newDictionaryReducer(_readMixed(), {
+      type: "descriptions_suggested",
+      readId: READ_ID,
+      suggestions: [{ entryKey: NOTES_KEY, description: "Nurse notes." }],
+      rewritableEntryKeys: [],
+    });
+    expect(_descriptionOf(state, NOTES_KEY)).toMatchObject({
+      description: "Nurse notes.",
+      isDescriptionSuggested: true,
+    });
+  });
+
+  it("keeps a typed description unless its entry may be rewritten", () => {
+    const typed = [GENDER_KEY, NOTES_KEY].reduce((current, entryKey) => {
+      return newDictionaryReducer(current, {
+        type: "set_entry_description",
+        entryKey,
+        description: `Typed for ${entryKey}`,
+      });
+    }, _readMixed());
+    const state = newDictionaryReducer(typed, {
+      type: "descriptions_suggested",
+      readId: READ_ID,
+      suggestions: [
+        { entryKey: GENDER_KEY, description: "Suggested gender." },
+        { entryKey: NOTES_KEY, description: "Suggested notes." },
+      ],
+      rewritableEntryKeys: [NOTES_KEY],
+    });
+    expect(_descriptionOf(state, GENDER_KEY)).toMatchObject({
+      description: `Typed for ${GENDER_KEY}`,
+      isDescriptionSuggested: false,
+    });
+    expect(_descriptionOf(state, NOTES_KEY)).toMatchObject({
+      description: "Suggested notes.",
+      isDescriptionSuggested: true,
+    });
+  });
+
+  it("replaces an earlier suggestion without being told it may rewrite", () => {
+    const first = newDictionaryReducer(_readMixed(), {
+      type: "descriptions_suggested",
+      readId: READ_ID,
+      suggestions: [{ entryKey: NOTES_KEY, description: "First try." }],
+      rewritableEntryKeys: [],
+    });
+    const second = newDictionaryReducer(first, {
+      type: "descriptions_suggested",
+      readId: READ_ID,
+      suggestions: [{ entryKey: NOTES_KEY, description: "Second try." }],
+      rewritableEntryKeys: [],
+    });
+    expect(_descriptionOf(second, NOTES_KEY)?.description).toBe("Second try.");
+  });
+
+  it("drops suggestions asked for an earlier read of the datasets", () => {
+    const read = _readMixed();
+    const state = newDictionaryReducer(read, {
+      type: "descriptions_suggested",
+      readId: uuid<ProposalReadId>(),
+      suggestions: [{ entryKey: NOTES_KEY, description: "Stale." }],
+      rewritableEntryKeys: [NOTES_KEY],
+    });
+    expect(state).toBe(read);
+  });
+
+  it("ignores a suggestion for an entry that no longer exists", () => {
+    const state = newDictionaryReducer(_readMixed(), {
+      type: "descriptions_suggested",
+      readId: READ_ID,
+      suggestions: [{ entryKey: "missing", description: "Nobody's." }],
+      rewritableEntryKeys: ["missing"],
+    });
+    const descriptions = state.proposal?.entries.map((entry) => {
+      return entry.description;
+    });
+    expect(descriptions).toEqual(["", ""]);
+  });
+});

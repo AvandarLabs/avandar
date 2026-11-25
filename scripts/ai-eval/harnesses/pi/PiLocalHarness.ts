@@ -2,8 +2,10 @@ import { createOfflineDataAgent } from "@/lib/agent/dataAgent/offline/createOffl
 import { COVID_DATASETS } from "../../covid/covidWorkspace";
 import { WebLlmBrowser } from "../../runtime/WebLlmBrowser";
 import { createPiConversation } from "./PiHarness";
+import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
 import type { EvalDatabase } from "../../runtime/EvalDatabase";
 import type { EvalHarness } from "../EvalHarness";
+import type { PiEvalDefaultPage } from "./piEvalConfigs";
 import type { OfflineDataAgentModels } from "@/lib/agent/dataAgent/offline/createOfflineDataAgent/createOfflineDataAgent";
 
 /** The context window the app gives offline models. */
@@ -27,18 +29,25 @@ const PI_LOCAL_EVAL_CONFIGS: Record<string, OfflineDataAgentModels> = {
   },
 };
 
+/** What `createPiLocalHarness` needs to run the offline agent. */
+type CreatePiLocalHarnessOptions = {
+  repoRoot: string;
+  database: EvalDatabase;
+  configName: string;
+  model: string;
+  /** The workspace's datasets as the agent sees them. COVID by default. */
+  datasets?: readonly DataAgentDataset[];
+  /** The page on screen for questions that set none. None by default. */
+  defaultPage?: PiEvalDefaultPage;
+};
+
 /**
  * The offline harness: the app's offline data agent, with its model calls
  * answered by WebLLM in a headless Chromium (WebGPU), as the app does
  * offline.
  */
 export async function createPiLocalHarness(
-  options: Readonly<{
-    repoRoot: string;
-    database: EvalDatabase;
-    configName: string;
-    model: string;
-  }>,
+  options: Readonly<CreatePiLocalHarnessOptions>,
 ): Promise<EvalHarness> {
   const isPlan = options.configName === "plan";
   const isSingle =
@@ -59,9 +68,11 @@ export async function createPiLocalHarness(
     startConversation: () => {
       return createPiConversation({
         database: options.database,
+        privacy: "device",
+        defaultPage: options.defaultPage,
         createAgent: (host) => {
           return createOfflineDataAgent({
-            datasets: COVID_DATASETS,
+            datasets: options.datasets ?? COVID_DATASETS,
             host,
             llm: browser,
             models,

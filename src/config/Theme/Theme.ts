@@ -37,6 +37,7 @@ import {
   MODAL_ROOT_Z_INDEX,
   NOTIFICATIONS_Z_INDEX,
   POPOVER_Z_INDEX,
+  PRODUCT_DRAWER_ROOT_CLASSNAME,
 } from "./Theme.constants";
 import { THEME_COLOR_SHADES } from "./ThemeColors.constants";
 // Imported by direct path (not the `@ui` alias) because tailwind.config.js
@@ -210,6 +211,11 @@ export const Theme = createTheme({
     Drawer: Drawer.extend({
       defaultProps: {
         transitionProps: AnimationTheme.mantine.drawer,
+      },
+      // Theme-level classNames merge with a drawer's own `classNames` prop,
+      // where a default prop would be replaced by it.
+      classNames: {
+        root: PRODUCT_DRAWER_ROOT_CLASSNAME,
       },
     }),
 
@@ -391,6 +397,8 @@ export {
   NUX_CHECKLIST_Z_INDEX,
   NUX_TOUR_Z_INDEX,
   POPOVER_Z_INDEX,
+  PRODUCT_DRAWER_ROOT_CLASSNAME,
+  PRODUCT_DRAWER_ROOT_SELECTOR,
   PRODUCT_MODAL_ROOT_CLASSNAME,
   PRODUCT_MODAL_ROOT_SELECTOR,
 } from "./Theme.constants";

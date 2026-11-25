@@ -64,6 +64,14 @@ describe("findDashboardTile", () => {
     });
   });
 
+  it("reads a plugin chart tile's viz type as plugin", () => {
+    const config = {
+      type: "DataViz",
+      props: { id: "DataViz-plugin", vizType: "plugin" },
+    };
+    expect(findDashboardTile(config, "DataViz-plugin")?.vizType).toBe("plugin");
+  });
+
   it("returns undefined for a block id that is not in the config", () => {
     expect(findDashboardTile(CONFIG, "DataViz-gone")).toBeUndefined();
   });

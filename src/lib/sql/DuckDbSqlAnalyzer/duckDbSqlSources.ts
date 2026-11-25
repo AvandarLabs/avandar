@@ -1,5 +1,6 @@
 import { RelationRef } from "$/models/relations/RelationRef/RelationRef";
 import {
+  getTableNameFromRawValuesViewName,
   getTableNameFromRowNumberedViewName,
   isStagingIndividualsTableName,
 } from "@/clients/DuckDbClient/duckDbSqlText";
@@ -277,6 +278,19 @@ function _getAnalysisFromTableFunction(
     : _unsafeSourceAnalysis("uninspectable-source");
 }
 
+/**
+ * The dataset table an auxiliary view (`ava_rows_` or `ava_raw_`) reads, or
+ * undefined for any other name.
+ */
+function _getTableNameFromAuxiliaryViewName(
+  viewName: string,
+): string | undefined {
+  return (
+    getTableNameFromRowNumberedViewName(viewName) ??
+    getTableNameFromRawValuesViewName(viewName)
+  );
+}
+
 function _getAnalysisFromIdentifierSource(
   options: Readonly<IdentifierSourceOptions>,
 ): SourceAnalysis {
@@ -302,22 +316,22 @@ function _getAnalysisFromIdentifierSource(
   if (tableName !== undefined && isRelationTableName(tableName)) {
     return _readSourceAnalysis([tableName]);
   }
-  // An `ava_rows_<datasetId>` view reads the dataset's own registered parquet
-  // file, so it is a read of that dataset: it is reported as that dataset
-  // rather than as an opaque internal table, which is what makes it inherit the
-  // dataset's lease and the workspace allowlist that gates it. Treating it as
-  // contributing nothing would let raw SQL read a dataset the caller was never
-  // authorized for.
-  const rowNumberedTableName =
+  // An `ava_rows_<datasetId>` or `ava_raw_<datasetId>` view reads the
+  // dataset's own registered parquet file, so it is a read of that dataset:
+  // it is reported as that dataset rather than as an opaque internal table,
+  // which is what makes it inherit the dataset's lease and the workspace
+  // allowlist that gates it. Treating it as contributing nothing would let raw
+  // SQL read a dataset the caller was never authorized for.
+  const auxiliaryViewTableName =
     tableName === undefined
       ? undefined
-      : getTableNameFromRowNumberedViewName(tableName);
+      : _getTableNameFromAuxiliaryViewName(tableName);
   if (
     identifier.parts.length === 1 &&
-    rowNumberedTableName !== undefined &&
-    isRelationTableName(rowNumberedTableName)
+    auxiliaryViewTableName !== undefined &&
+    isRelationTableName(auxiliaryViewTableName)
   ) {
-    return _readSourceAnalysis([rowNumberedTableName]);
+    return _readSourceAnalysis([auxiliaryViewTableName]);
   }
   if (
     identifier.parts.length === 1 &&

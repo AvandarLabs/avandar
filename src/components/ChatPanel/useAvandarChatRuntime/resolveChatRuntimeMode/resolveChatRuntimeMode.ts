@@ -5,6 +5,9 @@ import type { ChatRuntimeMode } from "$/types/offlineChat.types";
  * (after a failed cloud request) an offer to switch to the offline models.
  * Called by the chat model adapter before each turn and again when the
  * cloud request fails.
+ * Data dictionary suggestions also call it, through
+ * `DictionarySuggestions.getModelFromRuntimeState`, so they run wherever a
+ * chat turn would.
  */
 export function resolveChatRuntimeMode(
   options: Readonly<{

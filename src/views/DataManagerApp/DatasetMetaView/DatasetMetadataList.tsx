@@ -8,6 +8,10 @@ import { DatasetColumnClient } from "@/clients/datasets/DatasetColumnClient";
 import { DatasetQueryClient } from "@/clients/datasets/DatasetQueryClient";
 import { LocalDatasetClient } from "@/clients/datasets/LocalDatasetClient/LocalDatasetClient";
 import { notifySuccess } from "@/utils/notifications/notify";
+import { BoundColumnName } from "@/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/BoundColumnName";
+import { ConvertedTypeNote } from "@/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/ConvertedTypeNote";
+import { EntryDescription } from "@/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/EntryDescription";
+import type { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes";
 import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";
 import type { DatasetWithColumns } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
@@ -42,6 +46,8 @@ type DatasetWithColumnsAndSource = SetOptional<
 
 type Props = {
   dataset: DatasetWithColumnsAndSource;
+  /** What attached dictionaries say about each column, by column name. */
+  columnCodesByName: ReadonlyMap<string, ColumnCodes.T>;
 };
 
 /**
@@ -54,7 +60,10 @@ type Props = {
  * record: that gives a column's name the same visual weight as the CSV escape
  * character.
  */
-export function DatasetMetadataList({ dataset }: Props): JSX.Element {
+export function DatasetMetadataList({
+  dataset,
+  columnCodesByName,
+}: Props): JSX.Element {
   const { t } = useLingui();
 
   // Only the three shown columns get a header. Anything else falls back to
@@ -108,8 +117,29 @@ export function DatasetMetadataList({ dataset }: Props): JSX.Element {
         itemRenderOptions={{
           includeKeys: ["name", "dataType", "description"],
           keyRenderOptions: {
+            name: {
+              renderValue: (name) => {
+                const columnName = String(name);
+                const codes = columnCodesByName.get(columnName);
+                return codes ? (
+                  <BoundColumnName
+                    name={columnName}
+                    codes={codes}
+                    datasetId={dataset.id}
+                  />
+                ) : undefined;
+              },
+            },
             description: {
               renderAsType: "text",
+              // A column's own description wins. Without one, a bound
+              // column shows its dictionary entry's description.
+              renderValue: (description, _rootData, column) => {
+                const codes = columnCodesByName.get(column.name);
+                return !description && codes?.description ? (
+                  <EntryDescription codes={codes} />
+                ) : undefined;
+              },
             },
             dataType: {
               renderAsType: {
@@ -123,8 +153,22 @@ export function DatasetMetadataList({ dataset }: Props): JSX.Element {
               },
               // The translated counterpart, not `toDisplayValue`: this cell is
               // read by the user, and the untranslated identifier would show
-              // English in every locale.
-              renderValue: avaDataTypeLabel,
+              // English in every locale. A converted column's type follows
+              // its conversion, so it is shown, never edited.
+              renderValue: (dataType, _rootData, column) => {
+                const codes = columnCodesByName.get(column.name);
+                return codes?.mode === "convert" ? (
+                  <ConvertedTypeNote dataType={dataType} codes={codes} />
+                ) : (
+                  avaDataTypeLabel(dataType)
+                );
+              },
+              renderEditableValue: (dataType, _rootData, column) => {
+                const codes = columnCodesByName.get(column.name);
+                return codes?.mode === "convert" ? (
+                  <ConvertedTypeNote dataType={dataType} codes={codes} />
+                ) : undefined;
+              },
             },
           },
         }}

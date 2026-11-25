@@ -16,17 +16,21 @@ import { AppViewSection } from "@/components/layouts/AppView/AppViewSection/AppV
 import { NuxAnchors } from "@/components/Nux/NuxAnchors/NuxAnchors";
 import { NuxEvents } from "@/components/Nux/NuxEvents/NuxEvents";
 import { ShareResourceButton } from "@/components/permissions/ShareResourceModal/ShareResourceButton/ShareResourceButton";
+import { useDatasetColumnCodes } from "@/hooks/dataDictionaries/useDatasetColumnCodes/useDatasetColumnCodes";
 import { useDatasetSourceLabels } from "@/hooks/datasets/useDatasetSourceLabels";
+import { useLinkedDatasets } from "@/hooks/datasets/useLinkedDatasets/useLinkedDatasets";
 import { useUserAppRoles } from "@/hooks/permissions/useUserAppRoles/useUserAppRoles";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
 import { notifyError, notifySuccess } from "@/utils/notifications/notify";
 import { DatasetActionsMenu } from "@/views/DataManagerApp/DatasetMetaView/DatasetActionsMenu/DatasetActionsMenu";
+import { useColumnsSectionMeta } from "@/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/useColumnsSectionMeta";
 import { DatasetMetadataList } from "@/views/DataManagerApp/DatasetMetaView/DatasetMetadataList";
 import css from "@/views/DataManagerApp/DatasetMetaView/DatasetMetaView.module.css";
 import { DatasetSourceRail } from "@/views/DataManagerApp/DatasetMetaView/DatasetSourceRail";
 import { ActiveColumnContext } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/ActiveColumnContext";
 import { DatasetColumnOutline } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetColumnOutline/DatasetColumnOutline";
 import { DatasetSummaryView } from "@/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/DatasetSummaryView";
+import { toColumnsInTableOrder } from "@/views/DataManagerApp/DatasetMetaView/toColumnsInTableOrder/toColumnsInTableOrder";
 import { ToggleOfflineOnlyButton } from "@/views/DataManagerApp/DatasetMetaView/ToggleOfflineOnlyButton";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { ReactNode } from "react";
@@ -75,8 +79,16 @@ export function DatasetMetaView({ dataset }: Readonly<Props>): ReactNode {
       numRows: GlobalAppConfig.dataManagerApp.maxPreviewRows,
       workspaceId: workspace.id,
     });
-  const [datasetColumns, isLoadingDatasetColumns] =
+  const [unorderedDatasetColumns, isLoadingDatasetColumns] =
     DatasetColumnClient.useGetAll(where("dataset_id", "eq", dataset.id));
+  const datasetColumns = useMemo(() => {
+    return toColumnsInTableOrder(unorderedDatasetColumns);
+  }, [unorderedDatasetColumns]);
+  const columnCodes = useDatasetColumnCodes({
+    datasetId: dataset.id,
+    columns: datasetColumns,
+  });
+  const { linkedDatasets } = useLinkedDatasets(dataset.id);
   const [datasetMeta, isLoadingDatasetMeta] =
     DatasetQueryClient.useGetDatasetMeta({
       datasetId: dataset.id,
@@ -145,6 +157,10 @@ export function DatasetMetaView({ dataset }: Readonly<Props>): ReactNode {
       dataset.sourceType === "pdf_file");
 
   const numColumns = datasetColumns?.length ?? datasetMeta?.columns.length;
+  const columnsSectionMeta = useColumnsSectionMeta({
+    columnCount: numColumns,
+    columnCodes: columnCodes.byColumnId,
+  });
 
   const headerFacts = [
     sourceLabels[dataset.sourceType],
@@ -178,6 +194,8 @@ export function DatasetMetaView({ dataset }: Readonly<Props>): ReactNode {
       <DatasetSourceRail
         dataset={dataset}
         source={datasetWithColumnsAndSource.source}
+        columnCodes={columnCodes.byColumnId}
+        linkedDatasets={linkedDatasets}
       />
     );
 
@@ -295,10 +313,11 @@ export function DatasetMetaView({ dataset }: Readonly<Props>): ReactNode {
 
                     <AppViewSection
                       title={<Trans>Columns</Trans>}
-                      meta={numColumns === undefined ? undefined : numColumns}
+                      meta={columnsSectionMeta}
                     >
                       <DatasetMetadataList
                         dataset={datasetWithColumnsAndSource}
+                        columnCodesByName={columnCodes.byColumnName}
                       />
                     </AppViewSection>
 
@@ -318,7 +337,10 @@ export function DatasetMetaView({ dataset }: Readonly<Props>): ReactNode {
                 return isLoadingFullDataset ||
                   !previewData ||
                   !datasetColumns ? null : (
-                  <DatasetSummaryView datasetId={dataset.id} />
+                  <DatasetSummaryView
+                    datasetId={dataset.id}
+                    columnCodesByName={columnCodes.byColumnName}
+                  />
                 );
               },
             }}

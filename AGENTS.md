@@ -5,11 +5,17 @@
 - Use `docs/` for architectural notes, design decisions, and checklists
   (for example `docs/<topic>.md`).
 - Granular workspace permissions: `docs/permissions-architecture.md`.
+- Case comments, reactions, and the case activity log:
+  `docs/measles-demo/case-activity-architecture.md`.
+- Gadgets (what a comment can link or embed, and how to add a type):
+  `docs/measles-demo/gadgets.md`.
 - App shell, slate, and z-index nomenclature: `docs/app-shell-nomenclature.md`.
 - What the `Ava` and `Ui` type prefixes mean: `docs/type-prefix-nomenclature.md`.
 - How a view inside the slate is laid out (header band, content column,
   properties rail, section rhythm): `docs/design/app-view-layout.md`. Read it
   before building or restyling any app view.
+- How to write a bundled plugin (manifest, `when`, the `avandar` API, import
+  rules): `docs/plugin-authoring.md`.
 - If Context7 MCP is configured, use it to reference the most up-to-date
   documentation of any library when you need it.
 
@@ -175,9 +181,9 @@ database, not how the stack is built, so it stays on the shared stack. So do
 app, edge function, and server code changes, `pnpm test:db` (it runs inside
 rolled-back transactions), and end-to-end tests.
 
-`ava supabase status` reads yellow for every unswitched branch other than
-`develop` and advises a switch. On a branch that changes none of the above,
-that yellow line is expected. Do not switch just to clear it.
+`ava supabase status` advises `ava supabase switch` for every unswitched
+branch other than `develop`. On a branch that changes none of the above, that
+advice is expected. Do not switch just to follow it.
 
 ### Check the switch BEFORE any command that rebuilds, resets, or reseeds
 
@@ -186,11 +192,15 @@ before running `pnpm db:new-migration`, `pnpm db:reset`, `pnpm db:seed`,
 `supabase start`, `supabase stop`, or `supabase db diff`:
 
 1. Run `ava supabase status`.
-2. Confirm it reports this worktree on its own switched project, not on the
-   shared `avandar` stack.
+2. Confirm its first line says this branch is on a switched local Supabase
+   database, naming the branch's own project. If it instead says
+   `This is the develop local Supabase`, the worktree is on the shared
+   `avandar` stack.
 3. If it is not switched and the branch makes one of the changes listed above,
-   run `ava supabase switch` and re-check. If the branch makes none of them, it
-   has no reason to run the command: stop and ask the user instead.
+   run `ava supabase switch` and re-check. Do not run the command you were
+   about to run until status names the branch's own project. If the branch
+   makes none of those changes, it has no reason to run the command: stop and
+   ask the user instead.
 
 **Never run any of those commands from a worktree while it points at the shared
 `avandar` stack.** They stop, rebuild, reset, or reseed the one stack that every
@@ -207,16 +217,9 @@ therefore already cost a working stack, not just a bad migration.
 `ava` is built from this repo, not installed separately. If it is not on
 `PATH`, run `pnpm build:ava-cli`, which builds `apps/ava-cli` and symlinks it
 next to `pnpm`. Do not fall back to the shared stack because the binary is
-missing, and do not hand-edit `supabase/config.toml` to fake a switch: git
-hooks reject a branch-scoped config, and a half-switched worktree points some
-tools at one project and some at another.
-
-A switch rewrites `supabase/config.toml` with a branch project id and its own
-ports. Never stage that rewrite. When the branch also changes `config.toml` on
-purpose, stage only that change: the pre-commit hook rejects a staged
-`config.toml` whose project id or ports are not the standard ones. Commit the
-files your change touched by path rather than with `git add -A`, and run
-`ava supabase restore` before any authorized merge to `develop`.
+missing, and do not fake a switch by hand: never change the project id or
+ports in `supabase/config.toml` (git hooks reject it), and never edit the
+`ava supabase switch` block in `.env.development`.
 
 ### Migrations
 
@@ -253,19 +256,9 @@ files your change touched by path rather than with `git add -A`, and run
 - Run `ava supabase status` to see whether the current worktree is on the
   shared `avandar` stack or on a switched project, along with its ports, keys,
   endpoints, and whether the development environment files still match the
-  running stack. Its first line reads green for `develop` on the shared stack
-  or for a switched branch, and yellow otherwise. A yellow line on an
-  unswitched branch that does not change what the stack is built from is
-  expected.
-- Keep the switched local instance active unless the user explicitly asks to
-  merge into `develop`. When an authorized merge to `develop` is requested, run
-  `ava supabase restore` before staging, committing, or merging, then verify
-  `supabase/config.toml` uses the standard local `avandar` project id and ports.
-  If no merge is requested, tell the user they are responsible for running
-  `ava supabase restore` when they finish validating their branch.
-- Never commit a branch-scoped Supabase `config.toml` or switch-generated
-  environment changes. Git hooks enforce the standard configuration, but do not
-  bypass those hooks.
+  running stack. Pass `--branch <name>` to ask about another worktree's branch.
+- Leave the switch in place when you finish. It changes no tracked file, so
+  nothing needs restoring before a commit or merge.
 
 ### Production database prohibition
 
@@ -297,6 +290,30 @@ files your change touched by path rather than with `git add -A`, and run
   - Only use inline styles if we need to dynamically compute styles.
 - Use `clsx` for conditional classes
 - Never use TailwindCSS. We are trying to deprecate it.
+
+## Copy and nomenclature
+
+- Write user-facing copy for the user's mental model of what they are doing,
+  not for the codebase's internal nomenclature, even where the two words
+  genuinely differ. Low-tech does not mean non-tech: the audience includes
+  people who are comfortable using software day to day but have no reason to
+  know this codebase's entity names.
+- Concretely: a Postgres `connections` row is the right name for
+  that backend entity, because a "connection" is genuinely what
+  `MySQL`/`MSSQL`/`Snowflake` connectors will all persist as too - but a user
+  never sees that word. They are "adding a database," not "creating a
+  connection," even though the latter is technically what happens. Pick the
+  noun that matches what the user believes they are doing, and let each
+  connector or feature choose its own (a spreadsheet connector says
+  "sheet"/"spreadsheet"; a database connector says "database"), rather than
+  reusing one internal term everywhere for consistency's sake.
+- This is a copy rule, not a rename: it governs what a label, placeholder, or
+  error message says, never what a table, column, type, or variable is
+  called. Keep the internal name and the user-facing word different on
+  purpose when they diverge; do not rename the internal entity to chase the
+  copy, and do not leak the internal name into the UI to avoid picking a
+  separate word.
+- See `DESIGN.md`'s Do's and Don'ts for the matching design-system rule.
 
 ## Internationalization
 

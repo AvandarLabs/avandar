@@ -1,0 +1,51 @@
+/**
+ * Why a plugin API call failed.
+ *
+ * - `PermissionDenied`: the plugin did not request, or was not granted, the
+ *   permission the call needs.
+ * - `InvalidHandle`: the call named a `QueryHandle` the host does not know,
+ *   or the Data Explorer no longer shows the result the command was invoked
+ *   on.
+ * - `LoadFailed`: the plugin's code or data could not be loaded.
+ * - `CommandFailed`: a command handler, or SDK code it called, threw, or
+ *   the host could not read a data slot for a reason it does not share.
+ * - `InvalidExpression`: `avandar.dataExplorer.addColumns` got a column it
+ *   cannot add: a bad name, a placeholder with no input, an input naming a
+ *   column the result does not have, an expression that is not exactly one
+ *   SQL scalar or window expression, or an empty list.
+ * - `InvalidToolInput`: an AI tool handler rejected the arguments the model
+ *   passed it. The host may show this error's message to the model so it can
+ *   correct the call, so write it for the model and keep it free of secrets.
+ * - `SlotNotBound`: `avandar.data.querySlot` named a data slot the manifest
+ *   declares, but no admin has chosen the records it reads yet.
+ * - `SlotBroken`: the data slot's binding no longer fits the slot: its case
+ *   type or dataset was deleted, a chosen field is gone or changed type, or
+ *   a required attribute has no field. The message names the attribute and
+ *   the reason, never a value.
+ * - `InvalidSlot`: the call named a data slot id the manifest does not
+ *   declare.
+ */
+export type PluginErrorCode =
+  | "PermissionDenied"
+  | "InvalidHandle"
+  | "LoadFailed"
+  | "CommandFailed"
+  | "InvalidExpression"
+  | "InvalidToolInput"
+  | "SlotNotBound"
+  | "SlotBroken"
+  | "InvalidSlot";
+
+/**
+ * A typed error from the plugin API. A plugin command can branch on `code`
+ * to recover from one failure, such as an invalid handle, and rethrow others.
+ */
+export class PluginError extends Error {
+  readonly code: PluginErrorCode;
+
+  constructor(code: PluginErrorCode, message: string) {
+    super(message);
+    this.name = "PluginError";
+    this.code = code;
+  }
+}

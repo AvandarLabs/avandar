@@ -1,5 +1,6 @@
 import type { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext.ts";
 import type { ChatResponse } from "$/models/chat/ChatResponse/ChatResponse.ts";
+import type { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes.ts";
 import type { ChatClarifyRequest } from "$/types/chat.types.ts";
 
 /** Compact schema slice sent to offline prompts. */
@@ -12,6 +13,8 @@ export type OfflineChatSchemaColumn = {
   dataset_id: string;
   name: string;
   data_type: string;
+  /** The column's code list. Absent without a dictionary or in an old cache. */
+  codes?: ColumnCodes.Context;
 };
 
 export type OfflineChatSchemaConcept = {

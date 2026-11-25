@@ -2,6 +2,10 @@ import { formatDate, formatFileSize, isNonNullish } from "@avandar/utils";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { match } from "ts-pattern";
 import { AppViewRail } from "@/components/layouts/AppView/AppViewRail/AppViewRail";
+import { CombinedByFact } from "@/views/DataManagerApp/DatasetMetaView/CombinedByFact/CombinedByFact";
+import { DatasetDictionariesRailGroup } from "@/views/DataManagerApp/DatasetMetaView/DatasetColumnCodes/DatasetDictionariesRailGroup";
+import { LinkedSourceFact } from "@/views/DataManagerApp/DatasetMetaView/LinkedSourceFact";
+import type { ColumnCodes } from "$/models/dataDictionaries/ColumnCodes/ColumnCodes";
 import type { CsvFileDataset } from "$/models/datasets/CsvFileDataset/CsvFileDataset";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { GoogleSheetsDataset } from "$/models/datasets/GoogleSheetsDataset/GoogleSheetsDataset";
@@ -10,6 +14,7 @@ import type { PdfFileDataset } from "$/models/datasets/PdfFileDataset/PdfFileDat
 import type { PostgresTableDataset } from "$/models/datasets/PostgresTableDataset/PostgresTableDataset";
 import type { VirtualDataset } from "$/models/datasets/VirtualDataset/VirtualDataset";
 import type { XlsxFileDataset } from "$/models/datasets/XlsxFileDataset/XlsxFileDataset";
+import type { LinkedDataset } from "@/hooks/datasets/useLinkedDatasets/useLinkedDatasets";
 import type { ReactNode } from "react";
 
 export type DatasetSourceRecord =
@@ -24,7 +29,20 @@ export type DatasetSourceRecord =
 type Props = {
   dataset: Dataset.T;
   source: DatasetSourceRecord | undefined;
+  /**
+   * What attached dictionaries say about each column, by column id. Left
+   * out where no dictionary data is loaded, such as a preview.
+   */
+  columnCodes?: ReadonlyMap<string, ColumnCodes.T>;
+  /**
+   * The linked datasets that read this dataset. Left out where they are
+   * not loaded, such as a preview.
+   */
+  linkedDatasets?: readonly LinkedDataset[];
 };
+
+const NO_CODES: ReadonlyMap<string, ColumnCodes.T> = new Map();
+const NO_LINKED_DATASETS: readonly LinkedDataset[] = [];
 
 /**
  * The provenance of a dataset: how it was read, and where the bytes live.
@@ -41,6 +59,8 @@ type Props = {
 export function DatasetSourceRail({
   dataset,
   source,
+  columnCodes = NO_CODES,
+  linkedDatasets = NO_LINKED_DATASETS,
 }: Readonly<Props>): ReactNode {
   const { t, i18n } = useLingui();
 
@@ -137,8 +157,20 @@ export function DatasetSourceRail({
     .with(undefined, () => {
       return null;
     })
-    .with({ __type: "OpenDataDataset" }, { __type: "VirtualDataset" }, () => {
+    .with({ __type: "OpenDataDataset" }, () => {
       return null;
+    })
+    .with({ __type: "VirtualDataset" }, (virtualDataset) => {
+      // Only a virtual dataset can be a crosswalk's combined dataset.
+      return (
+        <>
+          <LinkedSourceFact
+            linkedSourceDatasetId={virtualDataset.linkedSourceDatasetId}
+            columnCodes={columnCodes}
+          />
+          <CombinedByFact datasetId={dataset.id} />
+        </>
+      );
     })
     .exhaustive();
 
@@ -173,6 +205,11 @@ export function DatasetSourceRail({
           </AppViewRail.Fact>
         ) : null}
       </AppViewRail.Group>
+      <DatasetDictionariesRailGroup
+        dataset={dataset}
+        columnCodes={columnCodes}
+        linkedDatasets={linkedDatasets}
+      />
     </AppViewRail>
   );
 }

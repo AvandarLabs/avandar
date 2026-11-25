@@ -8,6 +8,7 @@ import { useDataVizPBlockConfig } from "../../useDataVizPBlockConfig";
 import { createDataVizTestWrapper } from "./createDataVizTestWrapper";
 import { DataVizPBlockTestFixtures } from "./DataVizPBlockTestFixtures";
 import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { UiVizConfig } from "$/models/vizs/UiVizConfig/UiVizConfig.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { Props } from "../DataVizPBlock";
 
@@ -69,26 +70,37 @@ vi.mock(
   },
 );
 
-vi.mock("@/components/VisualizationContainer/VisualizationContainer", () => {
-  return {
-    VisualizationContainer: (props: {
-      columns: ReadonlyArray<{ name: string }>;
-      vizConfig: { vizType: string };
-    }) => {
-      return (
-        <div
-          data-testid="visualization-container"
-          data-viz-type={props.vizConfig.vizType}
-          data-columns={props.columns
-            .map((c) => {
-              return c.name;
-            })
-            .join(",")}
-        />
-      );
-    },
-  };
-});
+// Built-in charts draw a stand-in. A plugin chart draws through the real
+// container, so its placeholders show.
+vi.mock(
+  "@/components/VisualizationContainer/VisualizationContainer",
+  async (importOriginal) => {
+    const actual =
+      await importOriginal<
+        typeof import("@/components/VisualizationContainer/VisualizationContainer")
+      >();
+    return {
+      VisualizationContainer: (
+        props: Parameters<typeof actual.VisualizationContainer>[0],
+      ) => {
+        if (props.vizConfig.vizType === "plugin") {
+          return <actual.VisualizationContainer {...props} />;
+        }
+        return (
+          <div
+            data-testid="visualization-container"
+            data-viz-type={props.vizConfig.vizType}
+            data-columns={props.columns
+              .map((c) => {
+                return c.name;
+              })
+              .join(",")}
+          />
+        );
+      },
+    };
+  },
+);
 
 const { TEST_DASHBOARD_ID, TEST_WORKSPACE_ID, renderBlock } =
   DataVizPBlockTestFixtures;
@@ -310,6 +322,30 @@ describe("DataVizPBlock", () => {
       "bubble",
     );
   });
+
+  it.each([
+    { malformedKey: "columnSettings", malformedValue: undefined },
+    { malformedKey: "columnSettings", malformedValue: null },
+    { malformedKey: "settings", malformedValue: null },
+  ])(
+    "shows the invalid-settings placeholder for a plugin chart whose $malformedKey is $malformedValue",
+    ({ malformedKey, malformedValue }) => {
+      renderBlock({
+        prompt: "find me data",
+        rawSql: "SELECT * FROM foo",
+        vizType: "plugin",
+        vizConfig: {
+          vizType: "plugin",
+          pluginId: "avandar.epidemiology",
+          pluginVizId: "epicurve",
+          columnSettings: { date: "category" },
+          settings: {},
+          [malformedKey]: malformedValue,
+        } as unknown as UiVizConfig,
+      });
+      expect(screen.getByText("Invalid chart settings")).toBeInTheDocument();
+    },
+  );
 });
 
 it("converts the migrated top-level type picker and restores unresolved legacy styles on return", async () => {

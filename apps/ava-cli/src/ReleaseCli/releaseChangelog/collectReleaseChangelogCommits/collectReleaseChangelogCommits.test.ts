@@ -75,6 +75,21 @@ describe("getPreviousReleaseTagFromTag", () => {
 
 const SEP = "\x1f";
 
+/** The changelog commits from a range holding one commit, `subject`. */
+function _collectSingleSubject(
+  subject: string,
+): ReturnType<typeof collectReleaseChangelogCommits> {
+  const git = _createFakeGit({
+    "log v0.1.0..v0.2.0 --no-merges --format=%H\x1f%s": `sha1${SEP}${subject}`,
+    "show --stat --format= sha1": "1 file changed",
+    "show --format= sha1": "diff",
+  });
+  return collectReleaseChangelogCommits(git, {
+    previousTag: "v0.1.0",
+    headRevision: "v0.2.0",
+  });
+}
+
 describe("collectReleaseChangelogCommits", () => {
   it("drops housekeeping commits and keeps real ones with their stat and diff", () => {
     const log = [
@@ -103,6 +118,22 @@ describe("collectReleaseChangelogCommits", () => {
         diff: "diff --git a/foo b/foo\n+line",
       },
     ]);
+  });
+
+  it.each([
+    "Release: v0.13.3 [skip deploy]",
+    "Release: v0.13.3",
+    "Bump version to 0.13.4-dev [skip deploy]",
+    "Bump version to 0.13.4-dev",
+  ])("drops the release's own commit %s", (subject) => {
+    expect(_collectSingleSubject(subject)).toEqual([]);
+  });
+
+  it.each([
+    "Release: v0.15.0-beta [skip deploy]",
+    "Bump version to 0.15.1 [skip deploy]",
+  ])("keeps %s, which the release never writes", (subject) => {
+    expect(_collectSingleSubject(subject)).toHaveLength(1);
   });
 
   it("truncates a diff larger than the configured budget", () => {

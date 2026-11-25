@@ -129,11 +129,15 @@ is written to:
     stays out, with its one-sentence reason in the document. A plan answer it
     reports under check 11 as missing from the draft is one too: write it in,
     checking it against the code, then run the style check again. A coverage gap or
-    a judgment call it reports goes into the step 13 report instead.
+    a judgment call it reports goes into the step 13 report instead. Once the
+    style check settles, run
+    `python3 <skill-dir>/scripts/render-pdf.py <walkthrough-md-path>` so
+    `.difit/pdfs/<stem>-walkthrough.pdf` is guaranteed to exist and match the
+    final marked `-walkthrough.md`.
 13. Report the plan's path, the form it chose and why, and every answer it
     cut. Then report the walkthrough's size beside the diff's in one line,
     so a walkthrough out of proportion to its change is visible: its words
-    and printed pages (from the style check's last render), its strand count,
+    and printed pages (from `.difit/pdfs/<stem>-walkthrough.pdf`), its strand count,
     and the summary line of
     `python3 <skill-dir>/scripts/list-changed-units.py <comparison-key>`,
     which counts the diff's changed units, files, and lines without tests or
@@ -144,13 +148,14 @@ is written to:
     changed, the captures steps 8 and 12 added and any left out as blocked,
     and any section the deletion test shortened or removed. When a
     regeneration moved a section that an existing thread cites, list those
-    threads. Then end the response with a table naming the walkthrough. One row is expected; the
-    table is there so the path stands out at the end of a long reply.
+    threads. Then end the response with a table naming the walkthrough and its
+    co-located PDF. One row is expected; the table is there so the paths stand
+    out at the end of a long reply.
 
     ```markdown
-    | Walkthrough | Location |
-    | --- | --- |
-    | <the document's H1 title> | `.difit/<stem>-walkthrough.md` |
+    | Walkthrough | Markdown | PDF |
+    | --- | --- | --- |
+    | <the document's H1 title> | `.difit/<stem>-walkthrough.md` | `.difit/pdfs/<stem>-walkthrough.pdf` |
     ```
 
 Contents:

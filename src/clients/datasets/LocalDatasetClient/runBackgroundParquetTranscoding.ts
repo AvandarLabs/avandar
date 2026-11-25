@@ -10,6 +10,7 @@ import {
   notifyWarning,
 } from "@/utils/notifications/notify";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
+import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { UserId } from "$/models/User/User.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type {
@@ -22,6 +23,23 @@ import type {
   LocalDatasetCsvParseOptions,
   LocalDatasetXlsxParseOptions,
 } from "@/models/LocalDataset/LocalDataset.types";
+
+/**
+ * The columns background transcoding may reconcile, by original name. A
+ * keep-original copy shares its converted column's original name but is not
+ * a column of the file, so it is left out and never shadows the column it
+ * copies.
+ */
+export function getReconcilableColumnsByOriginalName(
+  columns: readonly DatasetColumn.T[],
+): Map<string, DatasetColumn.T> {
+  return makeMap(
+    columns.filter((column) => {
+      return column.dictionaryBindingId === undefined;
+    }),
+    { key: "originalName" },
+  );
+}
 
 /**
  * Reconciles the background parquet transcoding's authoritative column
@@ -71,7 +89,7 @@ async function _reconcileColumns(params: {
     return { changedCount: 0 };
   }
 
-  const byName = makeMap(existingColumns, { key: "originalName" });
+  const byName = getReconcilableColumnsByOriginalName(existingColumns);
 
   let changedCount = 0;
   for (const detected of params.transcodeColumns) {
@@ -145,6 +163,11 @@ export async function runBackgroundParquetTranscoding(params: {
   datasetId: DatasetId;
   workspaceId: Workspace.Id;
   userId: UserId;
+  /**
+   * What the toasts call the data. Defaults to the file's name. Pass it when
+   * the dataset is named before the file finishes processing.
+   */
+  displayName?: string;
   source:
     | { kind: "csv"; file: File; options: LocalDatasetCsvParseOptions }
     | { kind: "xlsx"; file: File; options: LocalDatasetXlsxParseOptions };
@@ -152,7 +175,7 @@ export async function runBackgroundParquetTranscoding(params: {
   const { datasetId } = params;
   const startedAt = Date.now();
   const sourceFileSize = params.source.file.size;
-  const sourceFileName = params.source.file.name;
+  const displayName = params.displayName ?? params.source.file.name;
 
   await AvaDexie.DB.LocalDataset.update(datasetId, {
     parseStatus: "parsing",
@@ -197,7 +220,7 @@ export async function runBackgroundParquetTranscoding(params: {
     notifySuccess({
       title: i18n._(msg`Dataset ready`),
       message: i18n._(
-        msg`"${sourceFileName}" finished processing and is ready to use.`,
+        msg`"${displayName}" finished processing and is ready to use.`,
       ),
     });
     if (changedCount > 0) {
@@ -206,10 +229,10 @@ export async function runBackgroundParquetTranscoding(params: {
         message:
           changedCount === 1
             ? i18n._(
-                msg`Detected column types for 1 column in "${sourceFileName}" differed from the import preview and have been overwritten with the actual values.`,
+                msg`Detected column types for 1 column in "${displayName}" differed from the import preview and have been overwritten with the actual values.`,
               )
             : i18n._(
-                msg`Detected column types for ${changedCount} columns in "${sourceFileName}" differed from the import preview and have been overwritten with the actual values.`,
+                msg`Detected column types for ${changedCount} columns in "${displayName}" differed from the import preview and have been overwritten with the actual values.`,
               ),
       });
     }
@@ -231,7 +254,8 @@ export async function runBackgroundParquetTranscoding(params: {
     ImportJobsManager.markFailed(datasetId, message);
     notifyError({
       title: i18n._(msg`Dataset failed to process`),
-      message: i18n._(msg`"${sourceFileName}" could not be parsed: ${message}`),
+      message: i18n._(msg`"${displayName}" could not be parsed.`),
+      detail: message,
     });
     setTimeout(() => {
       ImportJobsManager.clearJob(datasetId);

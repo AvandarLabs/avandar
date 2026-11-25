@@ -18,6 +18,8 @@ import { getDateColumns } from "@/components/VisualizationContainer/getDateColum
 import { useCategorySplitChartInput } from "@/components/VisualizationContainer/useCategorySplitChartInput/useCategorySplitChartInput";
 import { VisualizationContainer } from "@/components/VisualizationContainer/VisualizationContainer";
 import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { PluginMenuSlot } from "@/lib/plugins/PluginMenuSlot/PluginMenuSlot";
+import { ColumnCodesContext } from "@/lib/ui/viz/DataGridColumnTitle/ColumnCodesContext";
 import css from "@/views/DataExplorerApp/DataExplorerApp.module.css";
 import { DataExplorerDrawer } from "@/views/DataExplorerApp/DataExplorerDrawer/DataExplorerDrawer";
 import { DataExplorerSaveMenu } from "@/views/DataExplorerApp/DataExplorerSaveMenu/DataExplorerSaveMenu";
@@ -30,8 +32,11 @@ import { GeneratedPromptBanner } from "@/views/DataExplorerApp/GeneratedPromptBa
 import { OpenDatasetModal } from "@/views/DataExplorerApp/OpenDatasetDrawer/OpenDatasetModal";
 import { QueryExplorerResultsChrome } from "@/views/DataExplorerApp/QueryExplorerResultsChrome";
 import { selectSqlToExecute } from "@/views/DataExplorerApp/selectSqlToExecute/selectSqlToExecute";
+import { useDataExplorerPluginBridge } from "@/views/DataExplorerApp/useDataExplorerPluginBridge/useDataExplorerPluginBridge";
+import { useDataExplorerPluginContext } from "@/views/DataExplorerApp/useDataExplorerPluginContext/useDataExplorerPluginContext";
 import { useDataExplorerUrlSync } from "@/views/DataExplorerApp/useDataExplorerUrlSync";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery/useDataQuery";
+import { useExplorerColumnCodes } from "@/views/DataExplorerApp/useExplorerColumnCodes/useExplorerColumnCodes";
 import { useQueryResultColumnBindings } from "@/views/DataExplorerApp/useQueryResultColumnBindings/useQueryResultColumnBindings";
 import { useSyncLargeDatasetAutoLimit } from "@/views/DataExplorerApp/useSyncLargeDatasetAutoLimit/useSyncLargeDatasetAutoLimit";
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
@@ -161,6 +166,10 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
     savableSql,
     queryResults?.columns,
   ]);
+  const columnCodes = useExplorerColumnCodes(
+    projections,
+    queryResults?.columns,
+  );
   const schema = useQueryResultColumnBindings({
     scopeKey: `${workspace.id}:${columnBindingScope.current}`,
     sqlKey: savableSql ?? "",
@@ -205,6 +214,13 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
   );
 
   const queryResultData = queryResults?.data ?? NO_ROWS;
+  const pluginContext = useDataExplorerPluginContext({
+    queryResults,
+    isLoadingResults,
+  });
+  const pluginBridge = useDataExplorerPluginBridge({
+    executedSql: isLoadingResults ? undefined : queryResults?.executedSql,
+  });
   const dateColumns = useMemo(() => {
     return getDateColumns(queryResultColumns, queryResultData);
   }, [queryResultColumns, queryResultData]);
@@ -245,6 +261,12 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
           pos="relative"
           style={styles.toolbar}
         >
+          <PluginMenuSlot
+            slotId="dataExplorer.toolbar"
+            getContext={pluginContext.getContext}
+            getDataExplorerBridge={pluginBridge}
+            facts={pluginContext.facts}
+          />
           <Button
             variant="subtle"
             color="neutral"
@@ -307,13 +329,15 @@ export function DataExplorerApp({ urlSearch, navigate }: Props): ReactNode {
             aria-hidden
           />
           <LoadingOverlay visible={isLoadingResults} zIndex={99} />
-          <VisualizationContainer
-            rawColumns={queryResults?.columns}
-            columns={chartInput.columns}
-            data={chartInput.data}
-            dateColumns={chartInput.dateColumns}
-            vizConfig={chartInput.vizConfig}
-          />
+          <ColumnCodesContext.Provider value={columnCodes}>
+            <VisualizationContainer
+              rawColumns={queryResults?.columns}
+              columns={chartInput.columns}
+              data={chartInput.data}
+              dateColumns={chartInput.dateColumns}
+              vizConfig={chartInput.vizConfig}
+            />
+          </ColumnCodesContext.Provider>
         </Box>
         <DataExplorerDrawer
           columns={queryResultColumns}

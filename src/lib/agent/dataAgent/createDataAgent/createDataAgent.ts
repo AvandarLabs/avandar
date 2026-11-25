@@ -1,17 +1,28 @@
 import { Agent } from "@earendil-works/pi-agent-core";
 import { buildDataAgentSystemPrompt } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
-import { DATA_AGENT_PROMPT_ID } from "$/agent/dataAgent/dataAgentTools";
+import {
+  ADD_DASHBOARD_BLOCK_TOOL,
+  DATA_AGENT_PROMPT_ID,
+  DATA_AGENT_TOOLS_BY_PROMPT_ID,
+} from "$/agent/dataAgent/dataAgentTools";
 import { SqlTableAlias } from "$/models/chat/SqlTableAlias/SqlTableAlias";
+import { createAddDashboardBlockTool } from "@/lib/agent/dataAgent/createDataAgentTools/addDashboardBlockTool";
 import { createAskUserTool } from "@/lib/agent/dataAgent/createDataAgentTools/askUserTool";
+import { createPluginAiTool } from "@/lib/agent/dataAgent/createDataAgentTools/createPluginAiTool";
 import { createLookupValuesTool } from "@/lib/agent/dataAgent/createDataAgentTools/lookupValuesTool";
 import { createPlanQueryTool } from "@/lib/agent/dataAgent/createDataAgentTools/planQueryTool";
-import { createRunQueryTool } from "@/lib/agent/dataAgent/createDataAgentTools/runQueryTool";
+import {
+  createRunQueryTool,
+  MAX_QUERY_RUNS_PER_ANSWER,
+} from "@/lib/agent/dataAgent/createDataAgentTools/runQueryTool";
 import {
   beginDataAgentRun,
   createDataAgentRunState,
 } from "@/lib/agent/dataAgent/DataAgentRunState";
 import type { DataAgentDataset } from "$/agent/dataAgent/buildDataAgentSystemPrompt";
 import type { DataAgentPromptId } from "$/agent/dataAgent/dataAgentTools";
+import type { PluginAiToolDeclaration } from "$/agent/dataAgent/pluginAiTools.types";
+import type { RunPluginAiTool } from "@/lib/agent/dataAgent/createDataAgentTools/createPluginAiTool";
 import type { DataAgentHost } from "@/lib/agent/dataAgent/DataAgentHost";
 import type { DataAgentRunState } from "@/lib/agent/dataAgent/DataAgentRunState";
 import type {
@@ -54,10 +65,23 @@ export type DataAgentUsage = {
   cost: number;
 };
 
+/**
+ * Why an answer has no text of its own. The code that shows the reply
+ * writes the words, in the user's language.
+ *
+ * - `chart_not_built`: a chart's query kept failing until the query cap.
+ */
+export type DataAgentReplyFailure = "chart_not_built";
+
 /** What one user message produced. */
 export type DataAgentReply = {
-  /** The text to show: the model's reply, or the query summary. */
+  /**
+   * The text to show: the model's reply, or the query summary. Empty when
+   * `failure` is set.
+   */
   text: string;
+  /** Set when the answer failed in a way the reader must be told. */
+  failure?: DataAgentReplyFailure;
   state: DataAgentRunState;
   usage: DataAgentUsage;
   /** Models that answered, in order. */
@@ -117,23 +141,64 @@ function _throwIfModelCallFailed(messages: Agent["state"]["messages"]): void {
   }
 }
 
+/** Whether the answer ended on a chart whose query cap ran out. */
+function _endedOnFailedChart(
+  lastToolNames: readonly string[],
+  state: DataAgentRunState,
+): boolean {
+  return (
+    lastToolNames.includes(ADD_DASHBOARD_BLOCK_TOOL.name) &&
+    !state.dashboardBlock &&
+    state.queryRuns >= MAX_QUERY_RUNS_PER_ANSWER
+  );
+}
+
+function _toolNamesOfLastAssistant(
+  messages: Agent["state"]["messages"],
+): string[] {
+  return (_findLastAssistant(messages)?.content ?? []).flatMap((block) => {
+    return block.type === "toolCall" ? [block.name] : [];
+  });
+}
+
+/**
+ * Why the answer has no text of its own, if it does not: its dashboard
+ * chart could not be built because the query cap ran out. Read with
+ * `getDataAgentReplyText` for every answer, so the code that shows the
+ * reply can write the failure's words in the user's language.
+ */
+export function getDataAgentReplyFailure(
+  messages: Agent["state"]["messages"],
+  state: DataAgentRunState,
+): DataAgentReplyFailure | undefined {
+  return _endedOnFailedChart(_toolNamesOfLastAssistant(messages), state)
+    ? "chart_not_built"
+    : undefined;
+}
+
 /**
  * The reply to show. When the turn ended on a query, the query's summary is
  * the answer; any text the model wrote beside the tool call is narration
- * ("let me run that") written before the query ran.
+ * ("let me run that") written before the query ran. When it ended on a
+ * dashboard block, that tool's summary is the reply. It is empty when the
+ * chart could not be built, which `getDataAgentReplyFailure` reports.
  */
-function _getReplyText(
+export function getDataAgentReplyText(
   messages: Agent["state"]["messages"],
   state: DataAgentRunState,
 ): string {
-  const lastAssistant = _findLastAssistant(messages);
-  const endedOnToolCall = (lastAssistant?.content ?? []).some((block) => {
-    return block.type === "toolCall";
-  });
+  const lastToolNames = _toolNamesOfLastAssistant(messages);
+  const endedOnToolCall = lastToolNames.length > 0;
+  if (endedOnToolCall && state.dashboardBlock) {
+    return state.dashboardBlock.summary;
+  }
+  if (_endedOnFailedChart(lastToolNames, state)) {
+    return "";
+  }
   if (endedOnToolCall && state.lastQuery?.outcome.kind === "rows") {
     return state.lastQuery.summary;
   }
-  const text = (lastAssistant?.content ?? [])
+  const text = (_findLastAssistant(messages)?.content ?? [])
     .flatMap((block) => {
       return block.type === "text" ? [block.text] : [];
     })
@@ -142,16 +207,64 @@ function _getReplyText(
   return text || state.lastQuery?.summary || "";
 }
 
-function _createTools(
-  options: Readonly<CreateDataAgentOptions>,
-  aliases: readonly SqlTableAlias.T[],
-  state: DataAgentRunState,
-): Array<
+function _buildReply(
+  messages: Agent["state"]["messages"],
+  run: Pick<DataAgentReply, "state" | "usage" | "modelIds">,
+): DataAgentReply {
+  return {
+    text: getDataAgentReplyText(messages, run.state),
+    failure: getDataAgentReplyFailure(messages, run.state),
+    ...run,
+  };
+}
+
+function _getNoPluginAiTools(): readonly PluginAiToolDeclaration[] {
+  return [];
+}
+
+/** One tool of an agent built with these options. */
+type DataAgentTool =
   | ReturnType<typeof createRunQueryTool>
   | ReturnType<typeof createPlanQueryTool>
   | ReturnType<typeof createLookupValuesTool>
   | ReturnType<typeof createAskUserTool>
-> {
+  | ReturnType<typeof createAddDashboardBlockTool>
+  | ReturnType<typeof createPluginAiTool>;
+
+/** Whether the agent's prompt version serves the dashboard tool. */
+function _servesDashboardTool(
+  options: Readonly<CreateDataAgentOptions>,
+): boolean {
+  const promptId = options.promptId ?? DATA_AGENT_PROMPT_ID;
+  return DATA_AGENT_TOOLS_BY_PROMPT_ID[promptId].some((tool) => {
+    return tool.name === ADD_DASHBOARD_BLOCK_TOOL.name;
+  });
+}
+
+/**
+ * Whether this ask lists the dashboard tool: the prompt version serves it,
+ * and the caller has not held it back for this turn.
+ */
+function _offersDashboardTool(
+  options: Readonly<CreateDataAgentOptions>,
+): boolean {
+  return (
+    _servesDashboardTool(options) &&
+    (options.shouldOfferDashboardTool?.() ?? true)
+  );
+}
+
+/**
+ * The built-in tools: the query tools for the query style, `ask_user`, and
+ * `add_dashboard_block` when the prompt version serves it and the caller
+ * offers it for this ask, so the browser never offers a tool the proxy
+ * would refuse.
+ */
+function _createBuiltInTools(
+  options: Readonly<CreateDataAgentOptions>,
+  aliases: readonly SqlTableAlias.T[],
+  state: DataAgentRunState,
+): DataAgentTool[] {
   const queryContext = {
     host: options.host,
     aliases,
@@ -159,26 +272,54 @@ function _createTools(
     previewRowCount: options.previewRowCount,
   };
   const askUser = createAskUserTool({ host: options.host, state });
-  if (options.queryTools === "plan") {
-    return [
-      createPlanQueryTool(queryContext, options.datasets),
-      createRunQueryTool(queryContext),
-      askUser,
-    ];
+  const dashboardTools = _offersDashboardTool(options)
+    ? [createAddDashboardBlockTool(queryContext)]
+    : [];
+  const queryTools =
+    options.queryTools === "plan"
+      ? [
+          createPlanQueryTool(queryContext, options.datasets),
+          createRunQueryTool(queryContext),
+        ]
+      : [
+          createRunQueryTool(queryContext),
+          createLookupValuesTool({
+            host: options.host,
+            aliases,
+            datasets: options.datasets,
+            state,
+          }),
+        ];
+  return [...queryTools, askUser, ...dashboardTools];
+}
+
+/**
+ * The agent's tools: the built-in tools, then one tool per installed plugin
+ * AI tool, in the order the proxy lists them. The offline agent (`plan`)
+ * gets no plugin tools, and neither does an agent with no way to run them.
+ */
+export function createDataAgentToolList(
+  options: Readonly<CreateDataAgentOptions>,
+  aliases: readonly SqlTableAlias.T[],
+  state: DataAgentRunState,
+): DataAgentTool[] {
+  const builtInTools = _createBuiltInTools(options, aliases, state);
+  const { runPluginAiTool, getPluginAiTools = _getNoPluginAiTools } = options;
+  if (options.queryTools === "plan" || runPluginAiTool === undefined) {
+    return builtInTools;
   }
-  return [
-    createRunQueryTool(queryContext),
-    createLookupValuesTool({ host: options.host, aliases, state }),
-    askUser,
-  ];
+  const pluginTools = getPluginAiTools().map((declaration) => {
+    return createPluginAiTool({ declaration, runPluginAiTool });
+  });
+  return [...builtInTools, ...pluginTools];
 }
 
 function _createAgent(
   options: Readonly<CreateDataAgentOptions>,
+  aliases: readonly SqlTableAlias.T[],
   state: DataAgentRunState,
   turnCounter: { turns: number },
 ): Agent {
-  const aliases = SqlTableAlias.fromSchema({ datasets: options.datasets });
   const { primary, escalation } = options.policy;
   return new Agent({
     initialState: {
@@ -189,7 +330,7 @@ function _createAgent(
       }),
       model: primary.model,
       thinkingLevel: primary.thinkingLevel,
-      tools: _createTools(options, aliases, state),
+      tools: createDataAgentToolList(options, aliases, state),
     },
     streamFn: options.streamFn,
     sessionId: options.sessionId,
@@ -234,12 +375,29 @@ export type CreateDataAgentOptions = {
    * on-device models. Default `sql`.
    */
   queryTools?: "sql" | "plan";
+  /**
+   * The plugin AI tools installed in the workspace. Read at the start of
+   * every `ask`, so a plugin installed mid-conversation is offered on the
+   * next message. Default: none.
+   */
+  getPluginAiTools?: () => readonly PluginAiToolDeclaration[];
+  /** Runs a plugin AI tool the model calls. Without it, none is offered. */
+  runPluginAiTool?: RunPluginAiTool;
+  /**
+   * Whether the next `ask` lists `add_dashboard_block`, for a prompt version
+   * that serves it. Read at the start of every `ask`. A model that reads a
+   * long tool list less well, such as the offline one, lists it only on
+   * turns that can use it. Default: always listed.
+   */
+  shouldOfferDashboardTool?: () => boolean;
 };
 
 /**
  * Creates the Pi-based data agent for one conversation: three tools (run a
- * query, look up stored values, ask the user), a cache-friendly system
- * prompt, and a model policy that escalates to a stronger model only when a
+ * query, look up stored values, ask the user), `add_dashboard_block` when
+ * its prompt version serves it, and the installed plugin AI tools, rebuilt
+ * on every `ask`, a cache-friendly system prompt, and a
+ * model policy that escalates to a stronger model only when a
  * query fails or comes back empty. `ask` rejects when a model call fails,
  * so callers can show the error or offer another way to answer.
  */
@@ -248,12 +406,14 @@ export function createDataAgent(
 ): DataAgent {
   const state = createDataAgentRunState();
   const turnCounter = { turns: 0 };
-  const agent = _createAgent(options, state, turnCounter);
+  const aliases = SqlTableAlias.fromSchema({ datasets: options.datasets });
+  const agent = _createAgent(options, aliases, state, turnCounter);
   return {
     agent,
     ask: async (message) => {
       Object.assign(state, beginDataAgentRun(state, message));
       turnCounter.turns = 0;
+      agent.state.tools = createDataAgentToolList(options, aliases, state);
       agent.state.model = options.policy.primary.model;
       agent.state.thinkingLevel = options.policy.primary.thinkingLevel;
       let usage: DataAgentUsage = EMPTY_USAGE;
@@ -273,12 +433,7 @@ export function createDataAgent(
         unsubscribe();
       }
       _throwIfModelCallFailed(agent.state.messages);
-      return {
-        text: _getReplyText(agent.state.messages, state),
-        state,
-        usage,
-        modelIds,
-      };
+      return _buildReply(agent.state.messages, { state, usage, modelIds });
     },
   };
 }

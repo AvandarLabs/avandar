@@ -1,10 +1,16 @@
 import { createReleaseCommands } from "@ava-cli/ReleaseCli/createReleaseCommands";
 import { listSortedReleaseTags } from "@ava-cli/ReleaseCli/releaseChangelog/collectReleaseChangelogCommits/collectReleaseChangelogCommits";
 import { publishReleaseNotes } from "@ava-cli/ReleaseCli/releaseChangelog/publishReleaseNotes/publishReleaseNotes";
-import { wantsHelp } from "@ava-cli/ReleaseCli/releaseFlagUtils/releaseFlagUtils";
+import {
+  createReleaseFlagSpecFromOptions,
+  describeReleaseFlagProblems,
+  getReleaseFlagProblemsFromArgv,
+  wantsHelp,
+} from "@ava-cli/ReleaseCli/releaseFlagUtils/releaseFlagUtils";
 import { promptForVersion } from "@ava-cli/ReleaseCli/releasePromptHelpers";
 import {
   toReleaseTag,
+  toReleaseVersion,
   validateReleaseVersion,
 } from "@ava-cli/ReleaseCli/releaseVersionUtils/releaseVersionUtils";
 import {
@@ -43,15 +49,34 @@ type ReleaseNotesCliArgs = {
   update?: boolean;
 };
 
-/** Asks which released version to publish notes for; defaults to latest. */
+/**
+ * The bare `X.Y.Z` of the newest release tag, or undefined when there is none.
+ * A tag counts when a release would tag that version with it, so `v0.14.2`
+ * counts and a suffixed tag such as `v0.15.0-rc` does not.
+ */
+function _getNewestVersionFromTags(
+  tags: readonly string[],
+): string | undefined {
+  const releasedVersions = tags
+    .map((tag) => {
+      return { tag, version: toReleaseVersion(tag.replace(/^v/, "")) };
+    })
+    .filter(({ tag, version }) => {
+      return toReleaseTag(version) === tag;
+    });
+  return releasedVersions.at(-1)?.version;
+}
+
+/**
+ * Asks which released version to publish notes for, suggesting the newest
+ * release.
+ */
 async function _promptForReleasedVersion(
   git: ReleaseCommands,
 ): Promise<string> {
-  const tags = listSortedReleaseTags(git);
-  const mostRecentTag = tags.at(-1);
   return promptForVersion({
     message: "Which released version should get published notes?",
-    defaultValue: mostRecentTag?.replace(/^v/, ""),
+    defaultValue: _getNewestVersionFromTags(listSortedReleaseTags(git)),
     label: "Version",
   });
 }
@@ -144,8 +169,30 @@ export const ReleaseNotesCli = Acclimate.createCLI("notes")
     description: "Generate and print the notes, but do not publish them.",
   })
   .action((args: Readonly<ReleaseNotesCliArgs>) => {
-    if (wantsHelp(process.argv.slice(2))) {
+    const argv = process.argv.slice(2);
+    if (wantsHelp(argv)) {
       printInfo(USAGE);
+      return undefined;
+    }
+    // Acclimate drops an option it does not recognise, so any other option
+    // is refused: a mistyped one would otherwise publish notes the user did
+    // not ask for.
+    const flagSpec = createReleaseFlagSpecFromOptions(
+      ReleaseNotesCli.state.optionArgs,
+    );
+    const flagProblems = getReleaseFlagProblemsFromArgv({
+      argv,
+      ...flagSpec,
+    });
+    if (flagProblems.length > 0) {
+      const problemText = describeReleaseFlagProblems({
+        problems: flagProblems,
+        valueFlags: flagSpec.valueFlags,
+      });
+      printError(
+        `${problemText} Nothing was published; run \`ava release notes --help\`.`,
+      );
+      process.exitCode = 1;
       return undefined;
     }
     return _runReleaseNotes(args).catch((error: unknown) => {

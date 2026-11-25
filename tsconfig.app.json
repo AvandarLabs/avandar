@@ -24,6 +24,7 @@
     "next.config.js",
     "./packages/shared/*/src",
     "./packages/web/*/src",
+    "./plugins/*/src",
     "./apps/ava-video-producer/avandar-adapter"
   ],
   "exclude": ["supabase/functions"]

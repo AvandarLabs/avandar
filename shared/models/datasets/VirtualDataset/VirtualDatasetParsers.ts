@@ -1,6 +1,11 @@
 import { makeParserRegistry } from "@avandar/clients";
 import { Model } from "@avandar/models";
-import { camelCaseKeysDeep, pipe, snakeCaseKeysDeep } from "@avandar/utils";
+import {
+  camelCaseKeysDeep,
+  nullsToUndefinedDeep,
+  pipe,
+  snakeCaseKeysDeep,
+} from "@avandar/utils";
 import { z } from "zod";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types.ts";
 import type {
@@ -19,20 +24,28 @@ const DBReadSchema = z.object({
   updated_at: z.iso.datetime({ offset: true }),
   raw_sql: z.string(),
   is_places: z.boolean(),
+  linked_source_dataset_id: z.uuid().nullable(),
 });
 
 export const VirtualDatasetParsers =
   makeParserRegistry<VirtualDatasetModel>().build({
     modelName: "VirtualDataset",
     DBReadSchema,
-    fromDBReadToModelRead: pipe(camelCaseKeysDeep, (obj) => {
-      return Model.make("VirtualDataset", {
-        ...obj,
-        id: obj.id as VirtualDatasetId,
-        datasetId: obj.datasetId as DatasetId,
-        workspaceId: obj.workspaceId as Workspace.Id,
-      });
-    }),
+    fromDBReadToModelRead: pipe(
+      camelCaseKeysDeep,
+      nullsToUndefinedDeep,
+      (obj) => {
+        return Model.make("VirtualDataset", {
+          ...obj,
+          id: obj.id as VirtualDatasetId,
+          datasetId: obj.datasetId as DatasetId,
+          linkedSourceDatasetId: obj.linkedSourceDatasetId as
+            | DatasetId
+            | undefined,
+          workspaceId: obj.workspaceId as Workspace.Id,
+        });
+      },
+    ),
     fromModelInsertToDBInsert: snakeCaseKeysDeep,
     fromModelUpdateToDBUpdate: snakeCaseKeysDeep,
   });

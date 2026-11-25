@@ -17,7 +17,10 @@ create table public.concepts (
   allow_manual_creation boolean not null,
   -- Status new records of this case type start in. Its foreign key is
   -- declared in `11.concept_statuses.sql`, which defines the target table.
-  default_status_id uuid not null
+  default_status_id uuid not null,
+  -- The target of a `(concept_id, workspace_id)` foreign key, which keeps
+  -- that row's workspace equal to its case type's.
+  constraint concepts__id_workspace_id_key unique (id, workspace_id)
 );
 
 -- Enable row level security

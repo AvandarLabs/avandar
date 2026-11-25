@@ -1,12 +1,12 @@
 import { AssistantRuntimeProvider } from "@assistant-ui/react";
 import { Box, Stack } from "@mantine/core";
 import { clsx } from "clsx";
-import { useEffect, useRef } from "react";
 import { ChatPanelHeader } from "@/components/ChatPanel/ChatPanelHeader/ChatPanelHeader";
 import { ChatPanelStateManager } from "@/components/ChatPanel/ChatPanelStateManager/ChatPanelStateManager";
+import { useChatSessions } from "@/components/ChatPanel/ChatSessionProvider/useChatSessions";
+import { ChatSessionStrip } from "@/components/ChatPanel/ChatThread/ChatSessionStrip/ChatSessionStrip";
 import { ChatThread } from "@/components/ChatPanel/ChatThread/ChatThread";
 import { useAvandarChatRuntime } from "@/components/ChatPanel/useAvandarChatRuntime/useAvandarChatRuntime";
-import { useChatPageContext } from "@/components/ChatPanel/useChatPageContext";
 import { ChatViewTranscriptSync } from "@/components/ChatPanel/useChatViewTranscript/ChatViewTranscriptSync";
 import { NuxOpenChatPanelEffect } from "@/components/Nux/NuxTour/useNuxOpenChatPanel/NuxOpenChatPanelEffect";
 import css from "./ChatPanel.module.css";
@@ -21,42 +21,19 @@ import css from "./ChatPanel.module.css";
  */
 export function ChatPanel(): React.ReactNode {
   const dispatch = ChatPanelStateManager.useDispatch();
-  const { layout, caseDesignSessionNonce } = ChatPanelStateManager.useState();
-  const { runtime, startNewChat } = useAvandarChatRuntime();
-  const context = useChatPageContext();
-  const handledCaseDesignNonceRef = useRef(0);
-
-  useEffect(
-    function resetThreadForCaseDesignSession() {
-      if (
-        caseDesignSessionNonce === 0 ||
-        caseDesignSessionNonce === handledCaseDesignNonceRef.current
-      ) {
-        return;
-      }
-      handledCaseDesignNonceRef.current = caseDesignSessionNonce;
-      startNewChat();
-    },
-    [caseDesignSessionNonce, startNewChat],
-  );
-
-  useEffect(
-    function collapseComposerOutsideCaseManager() {
-      if (context.app !== "case-manager") {
-        dispatch.collapseComposer();
-      }
-    },
-    [context.app, dispatch],
-  );
-
-  const onNewChatClick =
-    context.app === "case-manager" ? dispatch.beginCaseDesign : startNewChat;
+  const { layout } = ChatPanelStateManager.useState();
+  const { runtime } = useAvandarChatRuntime();
+  const sessions = useChatSessions();
+  const onNewChatClick = () => {
+    sessions?.startDataSession();
+  };
 
   return (
     <>
       <NuxOpenChatPanelEffect />
       <Box
         className={clsx(css.dock, layout === "composer" && css.dockComposer)}
+        data-chat-layout={layout}
       >
         <Stack
           className={clsx(
@@ -68,7 +45,9 @@ export function ChatPanel(): React.ReactNode {
           <ChatPanelHeader
             onNewChatClick={onNewChatClick}
             onClose={dispatch.close}
-          />
+          >
+            <ChatSessionStrip />
+          </ChatPanelHeader>
           <AssistantRuntimeProvider runtime={runtime}>
             <ChatViewTranscriptSync />
             <ChatThread />

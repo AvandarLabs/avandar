@@ -13,6 +13,7 @@ import {
   NUX_CHECKLIST_Z_INDEX,
   NUX_TOUR_Z_INDEX,
   POPOVER_Z_INDEX,
+  PRODUCT_DRAWER_ROOT_CLASSNAME,
   PRODUCT_MODAL_ROOT_CLASSNAME,
   Theme,
 } from "@/config/Theme";
@@ -70,6 +71,14 @@ describe("Theme modal stacking", () => {
     expect(modal.defaultProps?.classNames?.root).toBe(
       PRODUCT_MODAL_ROOT_CLASSNAME,
     );
+  });
+
+  it("marks every Drawer root so the checklist can step aside for it", () => {
+    const drawer = Theme.components?.Drawer;
+    if (drawer === undefined) {
+      throw new Error("Expected Theme.components.Drawer");
+    }
+    expect(drawer.classNames).toEqual({ root: PRODUCT_DRAWER_ROOT_CLASSNAME });
   });
 
   it("exposes the slate and chrome tiers on theme.other.zIndex", () => {

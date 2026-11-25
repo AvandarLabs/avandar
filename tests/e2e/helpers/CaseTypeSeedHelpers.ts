@@ -55,7 +55,7 @@ async function _getDatasetColumnId(
 type SeedAttribute = {
   id: string;
   name: string;
-  dataType: "varchar" | "double";
+  dataType: "varchar" | "double" | "date";
   /** The label and identifier. A case type has exactly one. */
   isKey: boolean;
   isArray: boolean;
@@ -338,6 +338,75 @@ async function _seedCaseTypeWithPerMonthField(
   });
 }
 
+type SeedCaseTypeWithFieldsOptions = {
+  supabaseAdminClient: AvaSupabaseDBClient;
+  workspaceId: string;
+  caseTypeName: string;
+  datasetId: string;
+  /** The dataset column whose values key, and label, each record. */
+  keyColumnName: string;
+  keyAttributeName: string;
+  /**
+   * One field per entry, named after the dataset column it reads and
+   * keeping the first value of that column for each record.
+   */
+  fields: ReadonlyArray<{
+    columnName: string;
+    dataType: SeedAttribute["dataType"];
+  }>;
+  /** One record per key, named after it. */
+  recordKeys: readonly string[];
+};
+
+/**
+ * Seeds a case type whose label and identifier reads `keyColumnName`, plus
+ * one single-value field per entry of `fields`, with Active and Inactive
+ * statuses and one Active record per key.
+ */
+async function _seedCaseTypeWithFields(
+  options: Readonly<SeedCaseTypeWithFieldsOptions>,
+): Promise<SeededCaseType> {
+  const { supabaseAdminClient, datasetId } = options;
+  const getColumnId = (columnName: string): Promise<string> => {
+    return _getDatasetColumnId({ supabaseAdminClient, datasetId, columnName });
+  };
+  const [keyColumnId, fieldAttributes] = await Promise.all([
+    getColumnId(options.keyColumnName),
+    Promise.all(
+      options.fields.map(async (field): Promise<SeedAttribute> => {
+        return {
+          id: randomUUID(),
+          name: field.columnName,
+          dataType: field.dataType,
+          isKey: false,
+          isArray: false,
+          valuePickerRuleType: "first",
+          datasetColumnId: await getColumnId(field.columnName),
+        };
+      }),
+    ),
+  ]);
+  return _seedCaseType({
+    supabaseAdminClient,
+    workspaceId: options.workspaceId,
+    caseTypeName: options.caseTypeName,
+    datasetId,
+    recordKeys: options.recordKeys,
+    attributes: [
+      {
+        id: randomUUID(),
+        name: options.keyAttributeName,
+        dataType: "varchar",
+        isKey: true,
+        isArray: false,
+        valuePickerRuleType: "first",
+        datasetColumnId: keyColumnId,
+      },
+      ...fieldAttributes,
+    ],
+  });
+}
+
 /** Deletes a seeded case type, which cascades to its statuses and records. */
 async function _deleteCaseType(
   options: Readonly<{
@@ -365,6 +434,12 @@ export const CaseTypeSeedHelpers = {
    * per month, and one Active record per key.
    */
   seedCaseTypeWithPerMonthField: _seedCaseTypeWithPerMonthField,
+
+  /**
+   * Seeds a dataset-backed case type with single-value fields named after
+   * the columns they read, and one Active record per key.
+   */
+  seedCaseTypeWithFields: _seedCaseTypeWithFields,
 
   /** Deletes a seeded case type with its statuses and records. */
   deleteCaseType: _deleteCaseType,

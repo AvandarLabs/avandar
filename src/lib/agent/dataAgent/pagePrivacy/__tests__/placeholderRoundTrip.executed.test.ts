@@ -108,6 +108,7 @@ describe("placeholder round trip in DuckDB", () => {
       const tool = createLookupValuesTool({
         host: createPlaceholderRestoringHost(inner, _createVault()),
         aliases: ALIASES,
+        datasets: [],
         state: createDataAgentRunState(),
       });
 
@@ -133,6 +134,7 @@ describe("placeholder round trip in DuckDB", () => {
       const tool = createLookupValuesTool({
         host: createPlaceholderRestoringHost(inner, _createVault()),
         aliases: ALIASES,
+        datasets: [],
         state: createDataAgentRunState(),
       });
 
@@ -157,6 +159,7 @@ describe("placeholder round trip in DuckDB", () => {
       const tool = createLookupValuesTool({
         host: createPlaceholderRestoringHost(inner, _createVault()),
         aliases: ALIASES,
+        datasets: [],
         state: createDataAgentRunState(),
       });
 

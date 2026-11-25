@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
-import { fireEvent, render, screen } from "@/test-utils";
+import { fireEvent, render, screen, within } from "@/test-utils";
 import { GisAppLayerPanel } from "@/views/GisApp/GisAppLayerPanel";
 import type { MapLayerViewState } from "@/views/GisApp/layers/MapLayerViewState.types";
 import type { GisAppState } from "@/views/GisApp/useGisApp/useGisApp";
@@ -106,16 +106,22 @@ describe("GisAppLayerPanel", () => {
     expect(app.openLayerSettings).toHaveBeenCalledOnce();
   });
 
-  it("shows the layer name and returns to the list without clearing the selection", () => {
+  it("keeps the layer list visible while that layer's controls are open", () => {
     const layer = MapLayer.makeEmpty("Schools");
     const app = _app(layer, "settings");
     _renderPanel(app);
 
+    expect(screen.getByRole("heading", { name: "Layers" })).toBeInTheDocument();
     expect(
       screen.getByRole("heading", { name: "Schools" }),
     ).toBeInTheDocument();
     expect(screen.getByText("Layer settings body")).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Add layer" })).toBeNull();
+    expect(
+      screen.getByRole("button", { name: "Add layer" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /^Schools/ }),
+    ).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: "Hide the layer Schools" }),
     ).toBeInTheDocument();
@@ -129,6 +135,18 @@ describe("GisAppLayerPanel", () => {
 
     expect(app.closeLayerSettings).toHaveBeenCalledOnce();
     expect(app.setSelectedLayerId).not.toHaveBeenCalled();
+  });
+
+  it("exposes the open layer's controls as a region named after the layer", () => {
+    const layer = MapLayer.makeEmpty("Schools");
+    const app = _app(layer, "settings");
+    _renderPanel(app);
+
+    const settingsRegion = screen.getByRole("region", { name: "Schools" });
+
+    expect(
+      within(settingsRegion).getByText("Layer settings body"),
+    ).toBeInTheDocument();
   });
 
   it("returns to the layer's sections before the list", () => {

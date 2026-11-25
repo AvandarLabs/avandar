@@ -1,3 +1,4 @@
+import { Model } from "@avandar/models";
 import { describe, expect, it } from "vitest";
 import { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import { ChatAnalyticsPayloads } from "@/components/ChatPanel/useAvandarChatRuntime/ChatAnalyticsPayloads/ChatAnalyticsPayloads";
@@ -111,9 +112,7 @@ describe("ChatAnalyticsPayloads", () => {
         sql: "select secret from sales",
         vizType: "bar",
       },
-      pageContext: ChatPageContext.createDashboardsViewContext({
-        dashboardId: "dashboard-1",
-      }),
+      dashboardId: "dashboard-1",
       editorState: EDITOR_STATE_WITH_TWO_BLOCKS,
     });
 
@@ -131,9 +130,7 @@ describe("ChatAnalyticsPayloads", () => {
     expect(
       ChatAnalyticsPayloads.fromDashboardBlock({
         block: { kind: "HeadingBlock", text: "Sales" },
-        pageContext: ChatPageContext.createDashboardsViewContext({
-          dashboardId: "dashboard-1",
-        }),
+        dashboardId: "dashboard-1",
         editorState: {
           ...EDITOR_STATE_WITH_TWO_BLOCKS,
           editorData: undefined,
@@ -143,5 +140,38 @@ describe("ChatAnalyticsPayloads", () => {
       blockKind: "HeadingBlock",
       dashboardId: "dashboard-1",
     });
+  });
+
+  it.each([
+    ["data-explorer", "data_explorer"],
+    ["dashboards", "dashboards"],
+    ["data-sources", "data_sources"],
+    ["case-manager", undefined],
+    ["other", undefined],
+  ] as const)("maps the %s page to the %s app", (app, analyticsApp) => {
+    expect(
+      ChatAnalyticsPayloads.toAnalyticsApp(
+        Model.make("ChatPageContext", { app }),
+      ),
+    ).toBe(analyticsApp);
+  });
+
+  it("leaves out the block count with no editor state", () => {
+    expect(
+      ChatAnalyticsPayloads.fromDashboardBlock({
+        block: { kind: "HeadingBlock", text: "Sales" },
+        dashboardId: "dashboard-1",
+      }),
+    ).toEqual({ blockKind: "HeadingBlock", dashboardId: "dashboard-1" });
+  });
+
+  it("leaves out the block count when the editor shows another dashboard", () => {
+    expect(
+      ChatAnalyticsPayloads.fromDashboardBlock({
+        block: { kind: "HeadingBlock", text: "Sales" },
+        dashboardId: "dashboard-2",
+        editorState: EDITOR_STATE_WITH_TWO_BLOCKS,
+      }),
+    ).toEqual({ blockKind: "HeadingBlock", dashboardId: "dashboard-2" });
   });
 });
