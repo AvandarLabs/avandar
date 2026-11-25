@@ -94,8 +94,7 @@ function _isSafeFileChange(entry: FileChangeEntry): boolean {
     });
   }
   return (
-    SKILL_SYMLINK_PATTERN.test(entry.filePath) &&
-    _isSymlinkModeForStatus(entry)
+    SKILL_SYMLINK_PATTERN.test(entry.filePath) && _isSymlinkModeForStatus(entry)
   );
 }
 
@@ -191,9 +190,7 @@ function _shouldSkipCommits(commits: readonly CommitRecord[]): SkipDecision {
 }
 
 function _isUsableSha(sha: string | undefined): sha is string {
-  return (
-    sha !== undefined && sha.length > 0 && !ALL_ZERO_SHA_PATTERN.test(sha)
-  );
+  return sha !== undefined && sha.length > 0 && !ALL_ZERO_SHA_PATTERN.test(sha);
 }
 
 function _getRangeFromEnv(options: CheckSkipEnv): CommitRangeResult {
