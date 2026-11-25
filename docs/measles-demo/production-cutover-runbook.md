@@ -1456,7 +1456,7 @@ This pushes `TIP` (from 8.1, same terminal) to `demo/measles` on GitHub,
 then lists that branch's recent workflow runs:
 
 ```bash
-git push origin "$TIP:refs/heads/demo/measles"
+git push origin "${TIP}:refs/heads/demo/measles"
 gh run list --branch demo/measles --limit 5
 ```
 
@@ -1469,7 +1469,7 @@ changes nothing on staging or production, and `demo.avandarlabs.com` keeps
 serving its last build, frozen until section 17. The first Vercel build of
 the integration code is staging's, from the push in 8.5.
 **If not:** a rejected push means `demo/measles` moved: stop and talk to
-whoever pushed it.
+whoever pushed it. An error like `src refspec <sha>efs/heads/demo/measles does not match any` means the shell changed the refspec and nothing was pushed: use the command exactly as written with `${TIP}`.
 
 ### 8.3 Open the PR
 
@@ -1540,7 +1540,7 @@ migrates staging (section 9).
 git fetch origin
 git merge-base --is-ancestor origin/develop "$TIP" && echo "still a fast-forward" &&
   [[ "$(git rev-parse origin/demo/measles)" == "$TIP" ]] && echo "PR head is the tip" &&
-  git push origin "$TIP:refs/heads/develop"
+  git push origin "${TIP}:refs/heads/develop"
 ```
 
 **Expect:** `still a fast-forward` and `PR head is the tip` print, then a
