@@ -1,5 +1,18 @@
 # @avandar/ui
 
+## 0.4.0
+
+### Minor Changes
+
+- feat: promote disease outbreak response featureset to develop ([#331](https://github.com/AvandarLabs/avandar/issues/331))
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @avandar/browser-utils@0.4.0
+  - @avandar/hooks@0.4.0
+  - @avandar/utils@0.4.0
+
 ## 0.3.0
 
 ### Patch Changes

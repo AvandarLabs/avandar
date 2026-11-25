@@ -12317,19 +12317,21 @@ on a release line:
   `develop`'s, and the deploy job is kept on the local branch
   `feat/ci-deploy-jobs`. Edge function secrets stay set by hand on each
   Supabase project.
-- The catalog move scripts, now under `scripts/catalog-move/` (`3769ba532`),
-  move the open data catalog and its Parquet objects between projects.
+- The catalog move scripts, under `scripts/catalog-move/` (`3769ba532`),
+  moved the open data catalog and its Parquet objects between projects.
+  They were deleted once the cutover was done. Their last version is at tag
+  `v0.15.0`.
 
 **Value:** Releases keep the alpha line's safety checks without a second
 release line. A later change can give the staging and production deploys
 its deploy job.
 
-**Design:** `docs/measles-demo/production-cutover-plan.md` (its "Deploys",
-"`ava release` without the alpha line", and "The catalog" sections). The
-alpha line's own plan, runbook, and Stage 0 plan are kept as history and
-are superseded. Its migration audit, `alpha-migration-audit.md`, is to be
-refreshed for production and staging and renamed
-`production-migration-audit.md`.
+**Design:** the production cutover plan (its "Deploys", "`ava release`
+without the alpha line", and "The catalog" sections). That plan, the
+cutover runbook, and the alpha line's own plan, runbook, migration audit,
+and Stage 0 plan were deleted once the cutover was done. Their last
+versions are at tag `v0.15.0`: for example,
+`git show v0.15.0:docs/measles-demo/production-cutover-plan.md`.
 
 **PR title:** none of its own. It reaches `develop` with the `demo/measles`
 promotion (the production cutover plan, its "Stages" section).
@@ -12390,8 +12392,6 @@ set aside for follow-up work (M1).
 **Verification:**
 ```sh
 pnpm --filter @avandar/ava-cli test
-pnpm vitest run scripts/catalog-move
-shellcheck -x scripts/catalog-move/*.sh
 ```
 
 ---

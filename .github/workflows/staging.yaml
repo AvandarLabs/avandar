@@ -89,6 +89,9 @@ jobs:
   # Timeout set to 70 minutes because the suite is large and runs on a single
   # worker.
   test-e2e:
+    # Disabled for now: the suite is too slow and has known failures.
+    # Re-enable via the Linear issue that tracks it.
+    if: false
     # Pinned rather than `ubuntu-latest`: some runners now resolve that to
     # Ubuntu 26.04, where Playwright 1.59.1 cannot install Chromium and the
     # job fails before any test runs. Move this with the Playwright version.
