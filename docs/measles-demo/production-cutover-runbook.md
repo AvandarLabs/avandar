@@ -52,10 +52,10 @@ production at all.
 | 0 | Tools, shell setup, rules | 2 | No | A tool version differs from 2.3 |
 | 1 | Announce the freeze. Rehearse on a local copy of production | 3, 4 | Reads (a dump) | Any row of 4.9 fails |
 | 2 | Check that the GitHub `production` environment still has its protection and its three secrets (read-only: nothing is added to GitHub). Third parties, including the missing edge function secrets on staging, and on production now or before 11.4 (6.6, recommended, not blocking). Vercel needs nothing (7) | 5, 6, 7 | Only if you set production's edge function secrets now (6.6): **WRITES TO PRODUCTION** (configuration, no data). Also **CHANGES STAGING CONFIGURATION** (6.6), and **CHANGES GOOGLE CLOUD CONSOLE** only if 6.2 finds a redirect URI missing | 5.1 or 5.6 shows a missing protection rule or a missing name |
-| 3 | Push the integration branch to `demo/measles`. Open the PR into `develop` | 8.1 to 8.4 | No. **PUSHES** | 4.8 is not done, or `pr-develop.yaml` fails. A `pr-test-e2e` that only hit its 70-minute limit waits for decision N1 (8.4) |
+| 3 | Push the integration branch to `demo/measles`. Open the PR into `develop` | 8.1 to 8.4 | No. **PUSHES** | 4.8 is not done, or a check in `pr-develop.yaml` fails other than a `pr-test-e2e` that only hit its 70-minute limit, which does not block (decision N1, 8.4; the fix is in section 16) |
 | 4 | Fast-forward `develop`. Vercel deploys the staging app, and `staging.yaml` migrates staging and deploys its edge functions | 8.5, 8.6, 9.1, 9.2 | No. **PUSHES**, **WRITES TO STAGING** through Vercel and CI | Staging's `migrate` job fails at `supabase db push` (9.1). A functions deploy that fails with `Module not found` is the known flake: re-run it (9.1) |
 | 5 | Load the catalog into staging. Check staging | 9.5 to 9.7 | No. **WRITES TO STAGING** | The staging import or restore check fails |
-| 6 | Choose the rollback basis, back up production, and test the backup (10.1 to 10.3). Then release `0.15.0` with `ava release` (11.1 to 11.4): the push to `main` makes Vercel deploy the new app to production. When `production.yaml`'s `migrate` job waits for approval, check that Vercel deployed the new `main` commit, then approve it at once (11.5) | 10, 11 | **WRITES TO PRODUCTION**: the app through Vercel from the push in 11.4, the database and edge functions through CI from the approval in 11.5 | 10.3's restore test fails: do not release. Staging's only non-green check is a timed-out `test-e2e`: wait for decision N1 (11.2). Vercel's build of `main` failed or was canceled: do not approve (11.5) |
+| 6 | Choose the rollback basis, back up production, and test the backup (10.1 to 10.3). Then release `0.15.0` with `ava release` (11.1 to 11.4): the push to `main` makes Vercel deploy the new app to production. When `production.yaml`'s `migrate` job waits for approval, check that Vercel deployed the new `main` commit, then approve it at once (11.5) | 10, 11 | **WRITES TO PRODUCTION**: the app through Vercel from the push in 11.4, the database and edge functions through CI from the approval in 11.5 | 10.3's restore test fails: do not release. Staging's `lint-typecheck`, `test-quick`, or `migrate` is not green. A timed-out `test-e2e` alone does not block (decision N1, 11.2; the fix is in section 16). Vercel's build of `main` failed or was canceled: do not approve (11.5) |
 | 7 | Load the catalog into production. Smoke test | 12, 13 | **WRITES TO PRODUCTION** | Anything in 13 fails: section 14 |
 | 8 | Start the privacy fix. Publish the review backlog when ready. Narrow the staging tokens (section 16, Narrow the staging tokens). Plan the CI deploy and secrets follow-up (section 16, Move deploys to CI and manage secrets in GitHub). Clean up seven days after the smoke test. Vercel's Git integration stays connected (15) | 16, 17 | 17 deletes the demo resources | |
 
@@ -124,12 +124,14 @@ step says to run its lines one at a time.
 ### 2.1 Read first
 
 - [The cutover plan](production-cutover-plan.md): decisions D1 to D7, A2,
-  A3, K1, L1, and M1. M1: this cutover changes no CI/CD. D2 (CI deploys
+  A3, K1, L1, M1, and N1. M1: this cutover changes no CI/CD. D2 (CI deploys
   everything, with no Vercel Git integration) is deferred until after the
   cutover (M1). E1 is not used in this cutover: Vercel's Git integration
   deploys staging, as today. A3 is already in place (5.1 checks it). H1
   no longer applies: it chose which `FEATUREBASE_JWT_SECRET` value CI would
-  write to staging, and under L1 CI writes no edge function secret.
+  write to staging, and under L1 CI writes no edge function secret. N1:
+  an end-to-end job that only reaches its 70-minute limit does not block
+  the promotion or the release (8.4, 11.2).
 - [The migration audit](alpha-migration-audit.md), dated 2026-11-19. It
   covers 76 files and found no blocker. **Its refresh for production's
   current set and staging's 11 files has not been done** (4.8). It must be
@@ -1497,8 +1499,8 @@ of minutes:
 gh pr checks demo/measles --watch
 ```
 
-**Expect:** every check passes, `pr-test-e2e` included. `pr-develop.yaml`
-is `develop`'s own and runs `lint-pr-title`, `lint-typecheck`,
+**Expect:** every check passes, `pr-test-e2e` included, unless the one case
+below applies. `pr-develop.yaml` is `develop`'s own and runs `lint-pr-title`, `lint-typecheck`,
 `test-quick`, `pr-test-e2e`, and `verify-packages`; `react-doctor.yml`
 adds its own check, and Vercel may add one for its preview deployment.
 `lint-typecheck` has failed on `develop` since 2026-11-20 because of a
@@ -1510,10 +1512,19 @@ whole run, `test-e2e` included.
 
 If the only check that is not green is the end-to-end job (`pr-test-e2e`),
 and it ended by hitting its 70-minute limit rather than by a failing test,
-this is the known timeout (section 18, "End-to-end job timeout").
-**Decision N1 is open**: do not proceed past this point on a timed-out
-end-to-end job until Pablo has decided how to treat it.
-**If not:** fix the cause with a commit on the integration branch
+this is the known timeout (section 18, "End-to-end job timeout"). It does
+not block the promotion (decision N1): proceed. To see each check's result
+and duration on the PR:
+
+```bash
+gh pr checks demo/measles --json name,bucket,startedAt,completedAt --jq '.[] | [.name, .bucket, .startedAt, .completedAt] | @tsv'
+```
+
+A timeout runs for about 70 minutes, and its log ends with the timeout
+message, not with a failed spec. A `pr-test-e2e` that failed a test before
+the limit is a real finding: do not proceed.
+**If not** (another check is not green, or `pr-test-e2e` failed a test):
+fix the cause with a commit on the integration branch
 (`chore/production-cutover`), re-run 8.1 to reset `TIP`, push to
 `demo/measles` again (8.2), and repeat section 4 if a migration changed.
 The open PR picks up the new push by itself.
@@ -1596,13 +1607,13 @@ The `staging` environment has no protection rules, so `migrate` starts
 without an approval. The run never changes staging's edge function
 secrets: they stay as set by hand on the project (6.6).
 
-**Expect:** `gh run watch` ends with every job green and the run marked
-successful. `ava release` later reads the whole run's verdict, `test-e2e`
-(the end-to-end browser tests) included, for the commit it releases
-(11.2). If the only job that is not green is `test-e2e`, and it ended by
-hitting its 70-minute limit rather than by a failing test, that is the
-known timeout (section 18): **decision N1 is open** on how to treat it
-(11.2).
+**Expect:** `gh run watch` ends with `lint-typecheck`, `test-quick`, and
+`migrate` green, and `test-e2e` (the end-to-end browser tests) green too.
+`ava release` later reads the whole run's verdict, `test-e2e` included, for
+the commit it releases (11.2). If `test-e2e` is the only job that is not
+green, and it ended by hitting its 70-minute limit rather than by a failing
+test, that is the known timeout (section 18). It does not block the release
+(decision N1, 11.2).
 
 **The known functions deploy flake.** Supabase CLI 2.98.2, which
 `develop`'s workflows pin, tries import map entries in random order when it
@@ -1617,13 +1628,20 @@ staging runs the new schema with some functions new and the rest old until
 a re-run passes. The fix is to
 re-run the failed job until it passes. The repeated `db push` finds nothing
 to apply. GitHub re-runs jobs only after the whole run has ended,
-`test-e2e` included, so wait for `gh run watch` to end first, up to about
-75 minutes from the push: `test-e2e` has hit its 70-minute limit in every
-`develop` run since 2026-11-19. On staging, waiting is the default, since
-the staging run's verdict, which `ava release` reads, includes `test-e2e`
-(how to treat a timed-out `test-e2e` is decision N1, 11.2). Then, in this
-terminal, this shows whether the failure is the flake, re-runs only the
-failed jobs, and follows the new attempt:
+`test-e2e` included, so the run cannot be re-run until `test-e2e` ends.
+`test-e2e` has hit its 70-minute limit in every `develop` run since
+2026-11-19, so wait for `gh run watch` to end first, up to about 75 minutes
+from the push. On staging, you may cancel the run sooner, once `migrate` has
+a result, if you need to re-run `migrate` for this flake. 11.6 shows the
+steps for production, and on staging they are the same with `STAGING_RUN_ID`
+in place of `RUN_ID`. No approval is needed on staging. If you cancel, re-run
+only `migrate` with those steps instead of the block below, so `test-e2e` is
+not re-run. A cancelled `test-e2e` shows as cancelled, not timed out, so at
+`ava release`'s prompt it needs the same judgment as a timeout, after 11.2's
+check (decision N1). Waiting is still the default, because the run's verdict,
+which `ava release` reads, includes `test-e2e`. Then, in this terminal, this
+shows whether the failure is the flake, re-runs only the failed jobs, and
+follows the new attempt:
 
 ```bash
 gh run view "$STAGING_RUN_ID" --log-failed | grep -F 'Module not found' | head -3
@@ -1655,7 +1673,7 @@ holds `STAGING_RUN_ID`:
 | `Run supabase db push --include-all` | Partly migrated | A migration problem: read 11.9 about the public log first, then stop and raise it |
 | `Run supabase functions deploy`, with `Module not found` | Migrated; functions part new, part old | The flake: the block above |
 | `Run supabase functions deploy`, another error | Migrated; functions part new, part old | Fix the cause and re-run the same way |
-| `test-e2e` only | Migrated and deployed | Read its report. A flaky test: re-run the same way. `ava release` reads the run's verdict (11.2). A run to the 70-minute limit with no failing test is the known timeout: decision N1 (11.2) |
+| `test-e2e` only | Migrated and deployed | Read its report. A flaky test: re-run the same way. `ava release` reads the run's verdict (11.2). A run to the 70-minute limit with no failing test is the known timeout, which does not block the release (decision N1, 11.2) |
 
 ### 9.2 The 11 migrations applied, and the domain serves the new build
 
@@ -2373,19 +2391,28 @@ are set on production if you chose to set them now (recommended, not
 blocking), 4.8's audit refresh is done, 10.3 passed, and PITR is on if 10.1
 chose A.
 **Expect:** the run's `headSha` equals the commit printed on the next
-line, with `"status":"completed"` and `"conclusion":"success"`. `ava
+line, and its `lint-typecheck`, `test-quick`, and `migrate` jobs are green.
+Its overall `conclusion` is `success` only if every job passed. `ava
 release` reads the same `staging.yaml` run: its verdict covers the whole
-run, `test-e2e` included. On any verdict but a pass, it stops when given
-`--yes`, and without `--yes` it prints the verdict and asks
-`Release anyway?`, going on if you answer yes (A2). `--skip-ci-check` skips
-the check entirely.
+run, `test-e2e` included. On any verdict but a pass, `--yes` stops it, and
+without `--yes` it prints the verdict and asks `Release anyway?`, going on
+if you answer yes (A2). `--skip-ci-check` skips the check entirely: never
+here.
 
-If the only job that is not green is the end-to-end job (`test-e2e`), and
-it ended by hitting its 70-minute limit rather than by a failing test,
-this is the known timeout (section 18, "End-to-end job timeout"). The
-run's conclusion is then not `success`, so `ava release` asks
-`Release anyway?`. **Decision N1 is open**: do not proceed past this point
-on a timed-out end-to-end job until Pablo has decided how to treat it.
+If `test-e2e` is the only job that is not green, and it ended by hitting its
+70-minute limit rather than by a failing test, it is the known timeout
+(section 18). It does not block the release (decision N1), but the run's
+`conclusion` is then not `success`, so `ava release` asks `Release anyway?`
+(11.4). Check the jobs of the newest `staging.yaml` run on `develop`, which
+the first block above shows is the tip's:
+
+```bash
+gh run view "$(gh run list --workflow staging.yaml --branch develop --limit 1 --json databaseId --jq '.[0].databaseId')" --json jobs --jq '.jobs[] | [.name, .conclusion] | @tsv'
+```
+
+**Expect:** `lint-typecheck`, `test-quick`, and `migrate` print `success`.
+Any other line that is not `success` is `test-e2e`, and only if it hit its
+limit.
 **If not:** if the run is still going, wait for it. If it failed, re-run
 its failed jobs until it passes. This block finds the run for
 `origin/develop`'s commit and re-runs only its failed jobs:
@@ -2409,11 +2436,14 @@ ava release --dry-run --skip-changelog
 ```
 
 The dry run asks both version questions too (11.4): press Enter twice to
-accept the defaults.
+accept the defaults. It runs without `--yes`, so if the staging verdict is
+not a pass (a timed-out `test-e2e`, for example), it also asks
+`Release anyway?`: answer as 11.4 says. Its answers change nothing.
 **Expect:** `Dry run: no local or remote state will change.`; under
 Preflight, `On develop, clean, in sync with origin/develop.`; the versions
 (current on `main`: `0.14.1`, current on `develop`: `0.15.0-dev`); under
-CI, `Staging CI passed. (<sha>)`; the plan:
+CI, `Staging CI passed. (<sha>)` (or, for a timed-out `test-e2e`, the
+verdict and `Release anyway?`, answered as 11.4 says); the plan:
 
 ```text
 1. develop:  0.15.0-dev to 0.15.0, pushed
@@ -2440,8 +2470,10 @@ The promotion PR is the record. Notes can be published later with
 `--skip-ci-check`. With `--yes`, a CI verdict other than a pass (failed,
 pending, missing, or unknown) **stops** the release (A2). Without `--yes`
 it asks `Release anyway?`, and a yes there releases on a non-passing
-verdict. `--skip-ci-check` skips the check entirely: never here. Whether a
-timed-out `test-e2e` alone may be released over is decision N1 (11.2).
+verdict. For this release, that yes is the only way past a timed-out
+`test-e2e`: give it only when 11.2's check showed that `test-e2e` is the only
+job that is not green (decision N1). `--skip-ci-check` skips the check
+entirely: never here.
 
 **What the push to `main` starts.** Two things, at once and independently:
 
@@ -2470,7 +2502,7 @@ ava release --skip-changelog
 | `What version number do you want for this release?` | The release version | Enter for `0.15.0` |
 | `Which version should develop move to next?` | The next dev version | Enter for `0.15.1` |
 | `Staging CI passed. (<sha>)` | `staging.yaml` passed for the commit being released | |
-| A verdict such as `Staging CI did not pass (failure): <url>`, then `Release anyway?` | CI did not pass | `n`. Fix CI (11.2), then run `ava release` again. If the only cause is a timed-out `test-e2e`, answer as decision N1 says (11.2), and `n` while it is open |
+| A verdict such as `Staging CI did not pass (failure): <url>`, then `Release anyway?` | CI did not pass | `n` when `lint-typecheck`, `test-quick`, or `migrate` is not green, or when `test-e2e` failed a test: fix CI (11.2), then run `ava release` again. `y` only when 11.2's check showed that a timed-out `test-e2e` is the only job that is not green (decision N1) |
 | The plan, then `Pushing main deploys production and migrates the production database.`, then `Release 0.15.0?` | Last chance | `y` |
 
 It then commits `Release: v0.15.0 [skip deploy]` on `develop` and pushes it,
@@ -2484,11 +2516,12 @@ release commits show `Canceled by Ignored Build Step`), so staging keeps
 the promotion's build, which has the same code. The two runs' `migrate`
 jobs can overlap, since `staging.yaml` has no concurrency group. Both find
 nothing to apply (9.2) and deploy the same functions, so the flake (9.1)
-can fail either one. The `Bump version to 0.15.1-dev` run must end green,
-because it is the one the next release checks: re-run it with 11.2's
-block, in the develop terminal, which finds the run for `origin/develop`'s
-commit. `ava release` checked staging's CI verdict before it pushed
-anything.
+can fail either one. The `Bump version to 0.15.1-dev` run must have
+`lint-typecheck`, `test-quick`, and `migrate` green, because it is the one
+the next release checks. Its `test-e2e` may time out (decision N1). If one
+of the three is not green, re-run it with 11.2's block, in the develop
+terminal, which finds the run for `origin/develop`'s commit. `ava release`
+checked staging's CI verdict before it pushed anything.
 
 **If not:** if the release stops with an error, find the message in the
 first column below and do what the last column says, in the develop
@@ -3325,6 +3358,21 @@ jobs stop using it (Narrow the staging tokens, above).
 one by digest against the value the service holds today, and only then
 make CI authoritative for it.
 
+### Fix the end-to-end CI job (after the cutover)
+
+The end-to-end job (`pr-test-e2e` on pull requests, `test-e2e` in
+`staging.yaml` and `production.yaml`) has reached its 70-minute limit in
+every `develop` run since 2026-11-19. Until it is fixed, every release needs
+the manual check in 11.2 and an answer at the `Release anyway?` prompt
+(11.4). Run one spec at a time, locally, and it passes: 29 targeted specs
+passed in about 10 to 80 seconds each on 2026-11-24. The work is to find out
+why the full job runs long, refactor it (for example by splitting it into
+shards that run in parallel), and bring it back under its limit.
+
+The follow-ups in this section that concern CI/CD (moving deploys to CI,
+managing secrets in GitHub, narrowing the staging tokens, and the end-to-end
+job) are tracked together as one Linear project for streamlining CI/CD.
+
 ## 17. Cleanup (D6)
 
 Seven days after the smoke test passes, and after the catalog dump is
@@ -3500,7 +3548,7 @@ handled.
 | `[skip deploy]` | Not a GitHub keyword: each release commit on `develop` starts a `staging.yaml` run. Vercel does read it: the project's Ignored Build Step cancels a build whose commit message holds `[skip deploy]`, so staging keeps the promotion's build (11.4). 8.1 checks that the promotion's tip commit does not carry it |
 | Release notes | `--skip-changelog` for `0.15.0`: 2,673 non-merge commits since `v0.14.1` on 2026-11-24 |
 | `test-e2e` | Never blocks `migrate`, but it does decide the run's verdict that `ava release` reads |
-| End-to-end job timeout | The end-to-end job (`pr-test-e2e` on the PR, `test-e2e` on staging and production) has run to or near its 70-minute timeout in every `develop`-based staging and PR run since 2026-11-19, so it may not go green for the promotion either. A run whose only non-green job is a timed-out end-to-end job has a non-passing verdict: without `--yes`, `ava release` asks `Release anyway?`; with `--yes` it stops; `--skip-ci-check` skips the check. **Decision N1 is open** on how to treat it: 8.4 and 11.2 stop there until Pablo decides. On production it gates nothing, and 11.6 cancels the run rather than wait for it |
+| End-to-end job timeout | The end-to-end job (`pr-test-e2e` on the PR, `test-e2e` on staging and production) has run to its 70-minute limit in every `develop` run since 2026-11-19. It does not block the promotion or the release (decision N1): 8.4 and 9.1 say how to check a timed-out job, and 11.2 to 11.4 say how the release prompt is answered. The fix is follow-up work (section 16, Fix the end-to-end CI job). On production it gates nothing, and 11.6 cancels the run rather than wait for it |
 | Pull request previews | Continue as before: Vercel's Git integration stays connected in this cutover (section 15) |
 | `demo.avandarlabs.com` | Frozen at its last build until 17.2 |
 | Secrets live in four places (L1) | GitHub (what the CI jobs need), Vercel (the web app's build variables), Fly.io (the pipeline server), and each Supabase project's edge function secrets, set by hand. CI writes none of the edge function secrets. Making GitHub the only place is follow-up work (section 16, Move deploys to CI and manage secrets in GitHub) |

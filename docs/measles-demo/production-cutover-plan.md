@@ -50,6 +50,7 @@ review gets a public post-commit review.
 | K1 | The staging environment's tokens can be read by any branch's workflow and reach production | **Accept it for the cutover, and narrow the staging tokens after the full cutover.** The runbook's section 16 holds the work. |
 | L1 | How much of secrets management moves to GitHub in this cutover | **None.** Secrets stay where they are (GitHub, Vercel, Fly.io, Supabase edge function secrets). GitHub as the only place for secrets is follow-up work. |
 | M1 | Does this cutover change CI/CD | **No.** The web app keeps deploying through Vercel's Git integration, and `staging.yaml` and `production.yaml` keep `develop`'s existing migrate jobs. The CI deploy work (D2) and GitHub-managed secrets (L1) follow after the release. |
+| N1 | What to do when the end-to-end CI job only reaches its 70-minute limit | **Proceed: it does not block the promotion or the release.** `lint-typecheck`, `test-quick` and `migrate` must still pass, and `ava release` runs without `--yes` so Pablo answers its prompt. Fixing the job is follow-up work. |
 
 M1 (Pablo, 2026-11-24), in his words: "Any changes to Vercel and GitHub
 should be done AFTER we have deployed. Let's just get demo/measles into
@@ -394,7 +395,7 @@ Stage G in order:
 10. Follow-ups: start the privacy fix (AVA-611), publish the review backlog
     when Pablo is ready (he pastes the runbook's prompt into a new agent
     session, D7), narrow the staging tokens (K1), and plan the CI deploys and
-    GitHub-managed secrets (D2, L1).
+    GitHub-managed secrets (D2, L1), and fix the end-to-end CI job (N1).
 11. Clean up seven days after the smoke test (D6).
 
 **Rollback.** Before step 7 production is untouched: stop. After step 7 and
