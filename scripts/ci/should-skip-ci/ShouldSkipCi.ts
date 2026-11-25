@@ -4,6 +4,7 @@ import { pathToFileURL } from "node:url";
 
 const SKIP_DEPLOY_TOKEN = "[skip deploy]";
 const SYMLINK_MODE = "120000";
+const GIT_MAX_BUFFER_BYTES = 64 * 1024 * 1024;
 const ALL_ZERO_SHA_PATTERN = /^0+$/;
 const SAFE_BASENAMES = new Set(["AGENTS.md", "CLAUDE.md", "README.md"]);
 const SAFE_MARKDOWN_PREFIXES = [
@@ -219,6 +220,7 @@ function _runGitRaw(args: string[], repoDir: string): string {
   return execFileSync("git", args, {
     cwd: repoDir,
     encoding: "utf8",
+    maxBuffer: GIT_MAX_BUFFER_BYTES,
     stdio: ["ignore", "pipe", "pipe"],
   });
 }
@@ -226,6 +228,22 @@ function _runGitRaw(args: string[], repoDir: string): string {
 function _commitExists(sha: string, repoDir: string): boolean {
   try {
     _runGitRaw(["cat-file", "-e", `${sha}^{commit}`], repoDir);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function _isAncestor(
+  ancestorSha: string,
+  descendantSha: string,
+  repoDir: string,
+): boolean {
+  try {
+    _runGitRaw(
+      ["merge-base", "--is-ancestor", ancestorSha, descendantSha],
+      repoDir,
+    );
     return true;
   } catch {
     return false;
@@ -261,6 +279,32 @@ function _loadCommitRecord(
   };
 }
 
+function _evaluateLogEntries(
+  entries: readonly CommitLogEntry[],
+  repoDir: string,
+): SkipDecision {
+  if (entries.length === 0) {
+    return {
+      shouldSkip: false,
+      reason: "No commits found in range; running CI.",
+    };
+  }
+  // Stop at the first blocking commit to avoid diffing thousands of commits.
+  const blockingEntry = entries.find((entry) => {
+    return !_isCommitSkippable(_loadCommitRecord(entry, repoDir));
+  });
+  if (blockingEntry !== undefined) {
+    return {
+      shouldSkip: false,
+      reason: `Commit ${blockingEntry.sha.slice(0, 7)} requires CI.`,
+    };
+  }
+  return {
+    shouldSkip: true,
+    reason: `All ${entries.length} commit(s) qualify for skip.`,
+  };
+}
+
 function _evaluateGitRange(options: CheckSkipEnv): SkipDecision {
   const range = _getRangeFromEnv(options);
   if ("failReason" in range) {
@@ -277,14 +321,20 @@ function _evaluateGitRange(options: CheckSkipEnv): SkipDecision {
         reason: "Base or head commit is not reachable in local git history.",
       };
     }
+    if (
+      options.eventName === "push" &&
+      !_isAncestor(range.baseSha, range.headSha, repoDir)
+    ) {
+      return {
+        shouldSkip: false,
+        reason: "Push is not a fast-forward from base commit; running CI.",
+      };
+    }
     const logOutput = _runGitRaw(
       ["log", "--format=%H%x1f%P%x1f%s", `${range.baseSha}..${range.headSha}`],
       repoDir,
     );
-    const commits = _parseCommitLog(logOutput).map((entry) => {
-      return _loadCommitRecord(entry, repoDir);
-    });
-    return _shouldSkipCommits(commits);
+    return _evaluateLogEntries(_parseCommitLog(logOutput), repoDir);
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
     return {

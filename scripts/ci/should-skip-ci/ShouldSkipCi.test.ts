@@ -623,6 +623,64 @@ describe("ShouldSkipCi.evaluateGitRange", () => {
       }).shouldSkip,
     ).toBe(false);
   });
+
+  it("handles commits whose raw diff-tree output exceeds 1 MiB", () => {
+    const repoDir = _createTempRepo();
+    const beforeSha = _git(repoDir, ["rev-parse", "HEAD"]);
+    const fileEntries = Array.from({ length: 10000 }, (_, fileIndex) => {
+      const paddedIndex = String(fileIndex).padStart(5, "0");
+      return `M 100644 inline docs/bulk-generated-doc-entry-${paddedIndex}.md\ndata 4\n# x\n`;
+    }).join("");
+    const fastImportStream = [
+      "commit refs/heads/develop",
+      "committer Test Bot <test@example.com> 1700000000 +0000",
+      "data 22",
+      "docs: bulk import docs",
+      `from ${beforeSha}`,
+      fileEntries,
+      "",
+    ].join("\n");
+
+    execFileSync("git", ["fast-import", "--quiet"], {
+      cwd: repoDir,
+      input: fastImportStream,
+      encoding: "utf8",
+      env: GIT_ENV,
+      stdio: ["pipe", "pipe", "pipe"],
+    });
+    const afterSha = _git(repoDir, ["rev-parse", "refs/heads/develop"]);
+
+    const decision = ShouldSkipCi.evaluateGitRange({
+      eventName: "push",
+      beforeSha,
+      afterSha,
+      repoDir,
+    });
+
+    expect(decision.shouldSkip).toBe(true);
+  });
+
+  it("fails closed when a force-push drops a still-reachable code commit", () => {
+    const repoDir = _createTempRepo();
+    const ancestorSha = _git(repoDir, ["rev-parse", "HEAD"]);
+
+    _writeFile(repoDir, "src/feature.ts", "export const feature = 1;\n");
+    const droppedCodeSha = _commitAll(repoDir, "feat: add feature");
+    _git(repoDir, ["tag", "retained-old-tip", droppedCodeSha]);
+
+    _git(repoDir, ["reset", "--hard", ancestorSha]);
+    _writeFile(repoDir, "docs/guide.md", "# Guide\n");
+    const forcedDocsSha = _commitAll(repoDir, "docs: update guide");
+
+    const decision = ShouldSkipCi.evaluateGitRange({
+      eventName: "push",
+      beforeSha: droppedCodeSha,
+      afterSha: forcedDocsSha,
+      repoDir,
+    });
+
+    expect(decision.shouldSkip).toBe(false);
+  });
 });
 
 describe("ShouldSkipCi CLI execution", () => {
