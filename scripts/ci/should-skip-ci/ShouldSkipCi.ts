@@ -1,7 +1,14 @@
 import { execFileSync } from "node:child_process";
 import { appendFileSync } from "node:fs";
 
-const SKIP_DEPLOY_TOKEN = "[skip deploy]";
+/**
+ * Matches the same markers as the Vercel ignored-build command:
+ * `[skip deploy]`, `[no build]` and similar, in square brackets or
+ * parentheses, with an optional single space between the words. It is
+ * case-sensitive, like `grep -E`.
+ */
+const SKIP_MARKER_PATTERN =
+  /\[(?:skip|no) ?(?:deploy|build)\]|\((?:skip|no) ?(?:deploy|build)\)/;
 const SYMLINK_MODE = "120000";
 const GIT_MAX_BUFFER_BYTES = 64 * 1024 * 1024;
 const ALL_ZERO_SHA_PATTERN = /^0+$/;
@@ -155,7 +162,7 @@ function _parseCommitLog(logOutput: string): CommitLogEntry[] {
 }
 
 function _isCommitSkippable(commit: CommitRecord): boolean {
-  if (commit.subject.includes(SKIP_DEPLOY_TOKEN)) {
+  if (SKIP_MARKER_PATTERN.test(commit.subject)) {
     return true;
   }
   if (commit.changes.length === 0) {
@@ -250,7 +257,7 @@ function _loadCommitRecord(
   entry: CommitLogEntry,
   repoDir: string,
 ): CommitRecord {
-  if (entry.subject.includes(SKIP_DEPLOY_TOKEN)) {
+  if (SKIP_MARKER_PATTERN.test(entry.subject)) {
     return { sha: entry.sha, subject: entry.subject, changes: [] };
   }
   const rawDiff = _runGitRaw(
@@ -360,8 +367,8 @@ function _runCli(options: CheckSkipEnv): SkipDecision {
 
 /**
  * Evaluates whether a pushed or pull-request commit range qualifies to skip
- * GitHub Actions workflows based on `[skip deploy]` subjects and safe
- * documentation or agent-skill file rules.
+ * GitHub Actions workflows based on skip markers such as `[skip deploy]` in
+ * subjects and safe documentation or agent-skill file rules.
  *
  * Called by the `.github/actions/check-skip` composite action and verified by
  * `ShouldSkipCi.test.ts`.

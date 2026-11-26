@@ -219,6 +219,42 @@ describe("ShouldSkipCi.isCommitSkippable", () => {
     expect(ShouldSkipCi.isCommitSkippable(commit)).toBe(true);
   });
 
+  it.each([
+    "[skip deploy]",
+    "[skip build]",
+    "[no deploy]",
+    "[no build]",
+    "[skipdeploy]",
+    "[nobuild]",
+    "(skip deploy)",
+    "(no build)",
+    "(skipbuild)",
+  ])("skips a commit whose subject contains %s", (marker) => {
+    const commit: CommitRecord = {
+      sha: "a",
+      subject: `chore: change code ${marker}`,
+      changes: [ShouldSkipCiFixtures.makeFileEntry("src/App.tsx")],
+    };
+
+    expect(ShouldSkipCi.isCommitSkippable(commit)).toBe(true);
+  });
+
+  it.each([
+    "skip deploy",
+    "[skip  deploy]",
+    "[skip-deploy]",
+    "[Skip Deploy]",
+    "[skip deploy)",
+  ])("does not skip a commit whose subject contains %s", (marker) => {
+    const commit: CommitRecord = {
+      sha: "a",
+      subject: `chore: change code ${marker}`,
+      changes: [ShouldSkipCiFixtures.makeFileEntry("src/App.tsx")],
+    };
+
+    expect(ShouldSkipCi.isCommitSkippable(commit)).toBe(false);
+  });
+
   it("skips an empty commit only when subject contains [skip deploy]", () => {
     expect(
       ShouldSkipCi.isCommitSkippable({
