@@ -76,7 +76,8 @@ export async function seedDashboard(
 }
 
 /**
- * Deletes the given dashboards by id (best-effort).
+ * Deletes dashboards by ID on a best-effort basis, for example during E2E
+ * teardown of dashboards created by a test. Warns if deletion fails.
  */
 export async function deleteDashboardsByIds(
   options: Readonly<{

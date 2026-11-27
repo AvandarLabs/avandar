@@ -28,7 +28,9 @@ export function MediaCallout({
   callout,
   ...context
 }: Readonly<Props>): ReactNode {
-  if (frame < callout.startFrame || frame >= callout.endFrame) return null;
+  if (frame < callout.startFrame || frame >= callout.endFrame) {
+    return undefined;
+  }
   const content = _getMediaCalloutLayoutFromCue({ frame, callout, ...context });
   return <MediaCalloutContent {...content} />;
 }

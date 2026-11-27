@@ -1,12 +1,5 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import {
-  Box,
-  Button,
-  Group,
-  LoadingOverlay,
-  MantineTheme,
-  Stack,
-} from "@mantine/core";
+import { Box, Button, Group, LoadingOverlay, Stack } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import {
   IconDownload,
@@ -49,6 +42,7 @@ import { useSyncLargeDatasetAutoLimit } from "@/views/DataExplorerApp/useSyncLar
 import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
 import type { DataExplorerUrlSearch } from "@/views/DataExplorerApp/DataExplorerUrlState";
 import type { UnknownDataFrame } from "@avandar/utils";
+import type { MantineTheme } from "@mantine/core";
 import type { ReactNode } from "react";
 
 /** Stable stand-ins before a result arrives, so memoized values hold. */

@@ -3,7 +3,9 @@ import { doesSubscriptionGrantEntitlements } from "$/models/Subscription/Subscri
 import type { SubscriptionRead } from "$/models/Subscription/Subscription.types.ts";
 
 /**
- * Limits applied for permission checks (free tier when inactive).
+ * Gets subscription limits for permission checks, using free-plan limits when
+ * inactive.
+ * Use it, for example, when checking whether a member can be invited.
  */
 export function getEffectiveEntitlementLimits(subscription: SubscriptionRead): {
   maxSeatsAllowed: number;

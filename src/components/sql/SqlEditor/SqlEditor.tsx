@@ -1,5 +1,5 @@
 import { sql } from "@codemirror/lang-sql";
-import { Compartment, EditorState, Extension } from "@codemirror/state";
+import { Compartment, EditorState } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
 import CodeMirror from "@uiw/react-codemirror";
 import { clsx } from "clsx";
@@ -9,6 +9,7 @@ import { createSqlMentionExtension } from "@/components/sql/sql-helpers/createSq
 import css from "./SqlEditor.module.css";
 import type { SqlPillClickInfo } from "@/components/sql/sql-helpers/createSqlDisplayCodeMirrorExtension";
 import type { SqlDisplayCatalog } from "@/components/sql/sql-helpers/sqlDisplay.types";
+import type { Extension } from "@codemirror/state";
 import type { ReactNode } from "react";
 
 /** Matches `line-height: 1.55` on `.cm-line` at `font-size-sm` (~14px). */

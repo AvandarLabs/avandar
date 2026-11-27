@@ -36,9 +36,9 @@ async function _main(): Promise<void> {
     return;
   }
   const result = await runCapture(options);
-  if (result.status === "passed")
+  if (result.status === "passed") {
     CliOutput.success(`Capture ${result.status}: ${result.manifestPath}`);
-  else {
+  } else {
     ProducerCli.failure(
       "capture",
       new Error(`Capture ${result.status}: ${result.manifestPath}`),

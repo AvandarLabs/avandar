@@ -14,9 +14,7 @@ const currentDexieDBVersion = AvaDexieVersionManager.getVersion(
 export const AvaDexie = {
   DB: currentDexieDBVersion,
 
-  /**
-   * Deletes the Avandar IndexedDB from the browser.
-   */
+  /** Deletes the Avandar IndexedDB from the browser. */
   deleteDatabase: async (): Promise<void> => {
     try {
       await currentDexieDBVersion.delete();

@@ -1,7 +1,7 @@
 import { AvaQueryProvider } from "@avandar/query-hooks";
 import { AvaUiProvider } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
-import { ReactNode, useMemo } from "react";
+import { useMemo } from "react";
 import {
   cssVariablesResolver,
   DEFAULT_NOTIFICATIONS_PROPS,
@@ -11,6 +11,7 @@ import {
 import { useStickyActionBarInset } from "@/lib/hooks/ui/useStickyActionBarInset/useStickyActionBarInset";
 import { notifyError } from "@/utils/notifications/notify";
 import type { I18nMessages } from "@avandar/ui";
+import type { ReactNode } from "react";
 
 type Props = {
   children: ReactNode;

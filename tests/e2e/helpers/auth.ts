@@ -37,7 +37,8 @@ export async function signInWithEmailPassword(
 }
 
 /**
- * Opens the workspace user menu and signs out.
+ * Signs out through the workspace user menu and resolves on the sign-in page.
+ * Use it, for example, when an E2E test needs to end a workspace session.
  */
 export async function signOutViaUserMenu(page: Page): Promise<void> {
   await page
@@ -48,7 +49,8 @@ export async function signOutViaUserMenu(page: Page): Promise<void> {
 }
 
 /**
- * Signs out the current user, then signs in as another account.
+ * Changes the signed-in account and opens the requested workspace.
+ * Use it, for example, to test access to shared content as another user.
  */
 export async function switchToWorkspaceUser(
   page: Page,

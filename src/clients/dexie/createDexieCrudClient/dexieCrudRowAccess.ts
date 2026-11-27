@@ -31,7 +31,8 @@ function _extractPrimaryKeyFromRow(
 }
 
 /**
- * Returns whether two rows match on every `onConflict.columnNames` field.
+ * Returns whether two rows match on every specified conflict column.
+ * Use it, for example, to identify a conflicting row during an upsert.
  */
 export function rowsMatchOnConflictColumns(
   a: Record<string, unknown>,
@@ -57,7 +58,9 @@ export function findConflictingRow<T extends Record<string, unknown>>(
 }
 
 /**
- * Returns whether `columnNames` matches the table primary key path exactly.
+ * Returns whether the conflict columns match the table primary key path in
+ * order.
+ * Use it, for example, to select a primary-key upsert path.
  */
 export function isPrimaryKeyConflictColumns(
   columnNames: readonly string[],

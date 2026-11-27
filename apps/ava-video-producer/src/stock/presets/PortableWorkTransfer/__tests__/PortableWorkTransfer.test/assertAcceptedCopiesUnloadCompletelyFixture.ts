@@ -1,10 +1,10 @@
-import { PortableWorkTransferTestState } from "./PortableWorkTransferTestState";
-
-const { render } = PortableWorkTransferTestState;
 import assert from "node:assert/strict";
 import { SvgAttributes } from "../../../../../../tests/helpers/SvgAttributes";
-import { FIXTURES } from "../../PortableWorkTransfer.fixtures";
 import { assertAcceptedCopiesUnloadCompletelyId as _assertAcceptedCopiesUnloadCompletelyId } from "./assertAcceptedCopiesUnloadCompletelyId";
+import { PortableWorkTransferTestState } from "./PortableWorkTransferTestState";
+import type { FIXTURES } from "../../PortableWorkTransfer.fixtures";
+
+const { render } = PortableWorkTransferTestState;
 
 /**
  * Asserts accepted copies unload completely outside the folio onto the

@@ -1,7 +1,5 @@
 import { describe, expect, it } from "vitest";
-/**
- * Offline prompts must show short table aliases, never dataset UUIDs.
- */
+/** Offline prompts must show short table aliases, never dataset UUIDs. */
 import { ChatPageContext } from "$/models/chat/ChatPageContext/ChatPageContext";
 import { truncateSchemaForOffline } from "@/components/ChatPanel/useAvandarChatRuntime/runOfflineChatTurn/fetchOfflineChatSchema/truncateSchemaForOffline/truncateSchemaForOffline";
 import {

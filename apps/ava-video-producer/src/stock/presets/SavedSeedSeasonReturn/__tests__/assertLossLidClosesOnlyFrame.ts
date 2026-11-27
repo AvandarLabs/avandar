@@ -1,6 +1,7 @@
 import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
 import { assertLossLidClosesOnlyLid as _assertLossLidClosesOnlyLid } from "./assertLossLidClosesOnlyLid";
-import { _render, _lossInputs } from "./SavedSeedSeasonReturnTestHelpers";
+import { _render } from "./SavedSeedSeasonReturnTestHelpers";
+import type { _lossInputs } from "./SavedSeedSeasonReturnTestHelpers";
 
 /**
  * Asserts loss lid closes only after the full material shape clears its

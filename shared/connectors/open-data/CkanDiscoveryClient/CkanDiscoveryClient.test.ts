@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { createCkanDiscoveryClient } from "$/connectors/open-data/CkanDiscoveryClient/CkanDiscoveryClient.ts";
-import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
+import { OpenDataAcquisitionFailedError } from "$/connectors/open-data/openDataErrors.ts";
 import { parseCkanTimestamp } from "$/connectors/open-data/parseCkanTimestamp/parseCkanTimestamp.ts";
 import type { OpenDataHttp } from "$/connectors/open-data/CkanClient/CkanClient.types.ts";
 
@@ -354,7 +354,7 @@ describe("CkanDiscoveryClient.searchDatasets", () => {
         rows: 1000,
       }),
     ).rejects.toSatisfy((error: unknown) => {
-      return OpenDataAcquisitionFailed.is(error, "ckan-action-failed");
+      return OpenDataAcquisitionFailedError.is(error, "ckan-action-failed");
     });
   });
 });

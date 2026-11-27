@@ -16,7 +16,8 @@ type SubscriptionUpdatedData = z.infer<
 >;
 
 /**
- * Handles a 'subscription.updated' event from the Polar API.
+ * Updates a subscription from a Polar subscription.updated event for
+ * PolarPublicRoutes. Returns a webhook success or validation failure response.
  */
 export async function handleSubscriptionUpdatedEvent(
   options: PolarWebhookHandlerOptions<SubscriptionUpdatedData>,

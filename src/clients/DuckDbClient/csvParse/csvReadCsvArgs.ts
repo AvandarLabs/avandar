@@ -9,7 +9,8 @@ function _escapeSqlSingleQuotedLiteral(value: string): string {
 }
 
 /**
- * Builds comma-separated `read_csv` argument list for DuckDB SQL.
+ * Builds SQL arguments for DuckDB's `read_csv` from resolved CSV options.
+ * Use them, for example, when constructing a CSV preview query.
  */
 export function buildReadCsvArgList(options: {
   parseOptions: CsvParseResolvedOptions;
@@ -86,7 +87,8 @@ export function buildReadCsvArgList(options: {
 }
 
 /**
- * `sniff_csv` constraint args from resolved options (re-sniff on retry).
+ * Builds `sniff_csv` constraint arguments from resolved CSV options.
+ * Use them, for example, when re-sniffing a CSV on retry.
  */
 export function buildSniffCsvConstraintArgs(
   parseOptions: CsvParseResolvedOptions,

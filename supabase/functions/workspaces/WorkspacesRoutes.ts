@@ -20,9 +20,7 @@ import type { UserId } from "$/models/User/User.types.ts";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types.ts";
 import type { WorkspacesAPI } from "@sbfn/workspaces/WorkspacesRoutes.types.ts";
 
-/**
- * This is the route handler for all workspaces endpoints.
- */
+/** This is the route handler for all workspaces endpoints. */
 export const WorkspacesRoutes = defineRoutes<WorkspacesAPI>("workspaces", {
   "/:workspaceId/invite": {
     POST: POST({

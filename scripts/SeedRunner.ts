@@ -1,8 +1,8 @@
 import { promiseMap, promiseMapSequential } from "@avandar/utils";
 import { ScriptsUtil } from "scripts/ScriptsUtil";
 import { createSupabaseAdminClient } from "$/db/supabase/createSupabaseAdminClient";
-import { Database } from "$/types/database.types";
 import type { User } from "$/models/User/User";
+import type { Database } from "$/types/database.types";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 export type SeedHelpers = {

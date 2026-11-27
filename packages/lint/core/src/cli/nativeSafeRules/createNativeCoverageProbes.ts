@@ -1,0 +1,220 @@
+/* oxlint-disable import/extensions -- Node needs source extensions. */
+import { resolve } from "node:path";
+import { loadNativeProof } from "./loadNativeProof.ts";
+import {
+  CAPABILITIES,
+  CUSTOM_RULE_IDS,
+  JS_RULE_IDS,
+  NATIVE_CODES,
+  UNPROVEN,
+} from "./nativeSafeRules.constants.ts";
+import type { CoverageProbe } from "../coverageHelpers.ts";
+import type { Proof } from "./nativeSafeRules.types.ts";
+
+/** Inputs consumed by _hasDiagnostic. */
+type HasDiagnosticOptions = {
+  proof: Readonly<Proof>;
+  capability: string;
+  code: string;
+  prefix?: string;
+};
+
+/** Inputs consumed by _getRecovery. */
+type GetRecoveryOptions = {
+  proof: Readonly<Proof>;
+  hasSuppression: boolean;
+  hasProvenContext: boolean;
+  requiresOriginalModule: boolean;
+  hasOriginalModule: boolean;
+};
+
+function _hasDiagnostic({
+  proof,
+  capability,
+  code,
+  prefix,
+}: Readonly<HasDiagnosticOptions>): boolean {
+  const range = proof.capabilityRanges[capability];
+  if (
+    !range ||
+    !proof.directory ||
+    !proof.mirrorPath ||
+    proof.evidence.exitCode !== 1 ||
+    !proof.evidence.operational
+  ) {
+    return false;
+  }
+  return proof.diagnostics.some((diagnostic) => {
+    return (
+      diagnostic.severity === "error" &&
+      diagnostic.code === code &&
+      (!prefix || diagnostic.message?.startsWith(prefix)) &&
+      typeof diagnostic.filename === "string" &&
+      diagnostic.filename.length > 0 &&
+      resolve(proof.directory!, diagnostic.filename) === proof.mirrorPath &&
+      diagnostic.labels?.some(({ span }) => {
+        const offset = span?.offset;
+        const length = span?.length;
+        return (
+          Number.isSafeInteger(offset) &&
+          Number.isSafeInteger(length) &&
+          offset! >= range.start &&
+          length! > 0 &&
+          offset! + length! <= range.end
+        );
+      }) === true
+    );
+  });
+}
+
+function _hasOriginalModule(proof: Readonly<Proof>): boolean {
+  return (
+    proof.hasProvenPluginContext === true &&
+    _hasDiagnostic({
+      proof: proof,
+      capability: "module-context",
+      code: "avandar(module-context-witness)",
+      prefix: "Module context:",
+    })
+  );
+}
+
+function _hasProvenRuleContext({
+  proof,
+  ruleId,
+  path,
+}: Readonly<{
+  proof: Readonly<Proof>;
+  ruleId: string;
+  path: string;
+}>): boolean {
+  if (!CUSTOM_RULE_IDS.includes(ruleId)) {
+    return true;
+  }
+  const isUtility = ["avlint-ts-012", "avlint-ts-014"].includes(ruleId);
+  const isExcludedUtility =
+    /\/(?:packages\/shared\/utils|node_modules\/@avandar\/utils)\//.test(
+      path.replaceAll("\\", "/"),
+    );
+  return (
+    proof.hasProvenPluginContext === true && (!isUtility || !isExcludedUtility)
+  );
+}
+
+function _getRecovery({
+  proof,
+  hasSuppression,
+  hasProvenContext,
+  requiresOriginalModule,
+  hasOriginalModule,
+}: Readonly<GetRecoveryOptions>): string | undefined {
+  return hasSuppression
+    ? "Run fallback review for original suppression contexts. A tail seed cannot prove enforcement in disabled regions or lines, even after re-enable."
+    : !hasProvenContext && proof.mirrorPath && proof.evidence.operational
+      ? "Run fallback review for this plugin runtime context. Only the matching installed official Avandar implementation with supported registrations and original filename boundaries has proven mirrored applicability."
+      : requiresOriginalModule &&
+          !hasOriginalModule &&
+          proof.mirrorPath &&
+          proof.evidence.operational
+        ? "Run fallback review. Exact early module context witness error evidence could not establish original module context. Enable the context witness at error severity and preserve an original AST import/export marker before retrying."
+        : proof.evidence.recovery;
+}
+
+function _createProbe({
+  capabilityDefinition: [ruleId, capability, nativeRule],
+  language,
+  getProof,
+}: Readonly<{
+  capabilityDefinition: (typeof CAPABILITIES)[number];
+  language: string;
+  getProof: (
+    options: Readonly<{ path: string; cwd: string }>,
+  ) => Promise<Proof>;
+}>): CoverageProbe {
+  return {
+    ruleId,
+    language,
+    capability,
+    prove: async ({ path, cwd }) => {
+      const proof = await getProof({ path, cwd });
+      const hasOriginalModule = _hasOriginalModule(proof);
+      const requiresOriginalModule = [
+        "avlint-ts-006",
+        "avlint-ts-007",
+        "avlint-ts-008",
+      ].includes(ruleId);
+      const code = CUSTOM_RULE_IDS.includes(ruleId)
+        ? `avandar(${nativeRule})`
+        : NATIVE_CODES[nativeRule]!;
+      const hasProvenContext = _hasProvenRuleContext({
+        proof: proof,
+        ruleId: ruleId,
+        path: path,
+      });
+      const hasSuppression =
+        proof.suppressedRuleNames?.some((name) => {
+          return name === "*" || name === nativeRule;
+        }) === true;
+      const diagnosed =
+        !hasSuppression &&
+        hasProvenContext &&
+        (!requiresOriginalModule || hasOriginalModule) &&
+        _hasDiagnostic({
+          proof: proof,
+          capability: capability,
+          code: code,
+          prefix: CUSTOM_RULE_IDS.includes(ruleId) ? `${ruleId}:` : undefined,
+        });
+      return {
+        ...proof.evidence,
+        recovery: _getRecovery({
+          proof,
+          hasSuppression,
+          hasProvenContext,
+          requiresOriginalModule,
+          hasOriginalModule,
+        }),
+        enabled: diagnosed,
+        diagnosticRuleIds: diagnosed ? [ruleId] : [],
+      };
+    },
+  };
+}
+
+/**
+ * Gives `runCli` real engine proofs for independently seeded safe fixes.
+ * Exact reviewed paths retain root and nested config, ignore and project rules.
+ */
+export function createNativeCoverageProbes(): CoverageProbe[] {
+  const getProof = loadNativeProof();
+  return CAPABILITIES.flatMap((capability) => {
+    const languages = JS_RULE_IDS.includes(capability[0])
+      ? ["typescript", "javascript"]
+      : ["typescript"];
+    return languages.flatMap((language) => {
+      const probe = _createProbe({
+        capabilityDefinition: capability,
+        language: language,
+        getProof: getProof,
+      });
+      if (!CUSTOM_RULE_IDS.includes(capability[0])) {
+        return [probe];
+      }
+      return [
+        probe,
+        {
+          ruleId: capability[0],
+          language,
+          capability: "unsupported-shapes",
+          prove: async () => {
+            return {
+              ...UNPROVEN,
+              recovery:
+                "Run fallback review for unsupported syntax shapes. No exact syntax classifier is installed.",
+            };
+          },
+        },
+      ];
+    });
+  });
+}

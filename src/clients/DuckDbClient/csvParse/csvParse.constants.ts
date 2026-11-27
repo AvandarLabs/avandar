@@ -1,6 +1,4 @@
-/**
- * Maximum rejected rows DuckDB stores per CSV scan (see DuckDbClient docs).
- */
+/** Maximum rejected rows DuckDB stores per CSV scan (see DuckDbClient docs). */
 export const REJECTED_ROW_STORAGE_LIMIT = 1001;
 
 /** Sniff sample size for DuckDB `sniff_csv` / `read_csv` auto-detect. */

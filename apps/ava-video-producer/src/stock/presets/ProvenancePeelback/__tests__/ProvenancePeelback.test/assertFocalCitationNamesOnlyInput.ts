@@ -1,11 +1,11 @@
-import { ProvenancePeelbackTestState } from "./ProvenancePeelbackTestState";
-
-const { render: _render } = ProvenancePeelbackTestState;
 import assert from "node:assert/strict";
 import { propEq } from "@avandar/utils";
 import { SvgAttributes } from "../../../../../../tests/helpers/SvgAttributes";
-import { fixtures } from "../../ProvenancePeelback.fixtures";
 import { assertFocalCitationNamesOnlyCitation as _assertFocalCitationNamesOnlyCitation } from "./assertFocalCitationNamesOnlyCitation";
+import { ProvenancePeelbackTestState } from "./ProvenancePeelbackTestState";
+import type { fixtures } from "../../ProvenancePeelback.fixtures";
+
+const { render: _render } = ProvenancePeelbackTestState;
 
 /**
  * Asserts the focal citation names only the selected source's exact passage

@@ -4,7 +4,8 @@ import type { I18n } from "@lingui/core";
 import type { DashboardSlugValidationFailure } from "@sbfn/dashboards/DashboardsRoutes/DashboardsRoutes.types";
 
 /**
- * Turns a server slug rejection into the sentence shown under the field.
+ * Returns a localized message for a server slug validation failure.
+ * Use it, for example, to show a publishing form's slug validation error.
  */
 export function makeSlugErrorMessageFromValidationFailure(
   options: Readonly<{ failure: DashboardSlugValidationFailure; i18n: I18n }>,

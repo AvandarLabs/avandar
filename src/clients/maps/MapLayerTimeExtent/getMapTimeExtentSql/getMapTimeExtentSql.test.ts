@@ -1,6 +1,4 @@
-/**
- * Union min/max timestamp SQL for the map clock extent.
- */
+/** Union min/max timestamp SQL for the map clock extent. */
 import { describe, expect, it } from "vitest";
 import { getMapTimeExtentSql } from "./getMapTimeExtentSql";
 

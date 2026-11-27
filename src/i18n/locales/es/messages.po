@@ -366,7 +366,7 @@ msgid "{removedCount, plural, one {# column no longer uses a dictionary.} other 
 msgstr "{removedCount, plural, one {La columna # ya no usa un diccionario.} "
 "other {Las columnas # ya no usan un diccionario.}}"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Right span"
 msgstr "Extensión derecha"
 
@@ -488,7 +488,7 @@ msgid "An error occurred while loading the file"
 msgstr "Ocurrió un error al cargar el archivo"
 
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createListBlockConfig.tsx
 #: src/views/DataManagerApp/CrosswalkView/MapLayoutsStep/MappingPane/ColumnTypeSelect.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetMetadataList.tsx
 msgid "Type"
@@ -638,7 +638,7 @@ msgstr "Ingresa tu pregunta o instrucciones en lenguaje natural para generar "
 msgid "Could not update {pluginName}"
 msgstr "No se pudo actualizar {pluginName}"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
 msgid "H4"
 msgstr "H4"
 
@@ -753,7 +753,7 @@ msgid "Expand"
 msgstr "Expandir"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCalloutBlockConfig.tsx
 msgid "Callout"
 msgstr "Destacado"
 
@@ -827,7 +827,7 @@ msgstr "Ninguna capa se puede filtrar con este búfer."
 msgid "Views"
 msgstr "Vistas"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createListBlockConfig.tsx
 msgid "Second point"
 msgstr "Segundo punto"
 
@@ -865,7 +865,7 @@ msgid "The place is removed from its dataset, so it disappears from every map "
 msgstr "El lugar se eliminó de su conjunto de datos, por lo que desaparece de "
 "todos los mapas y gráficos que lo utilizan."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Sidebar layout"
 msgstr "Diseño con barra lateral"
 
@@ -949,7 +949,8 @@ msgstr "Qué sucede"
 
 #: src/components/caseFields/useFieldValueFormatter/useFieldValueFormatter.ts
 #: src/components/providers/AvandarAppProvider.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "No"
 msgstr "No"
@@ -1062,7 +1063,7 @@ msgid "Pan and select"
 msgstr "Desplazarse y seleccionar"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createListBlockConfig.tsx
 msgid "List"
 msgstr "Lista"
 
@@ -1167,7 +1168,7 @@ msgid "For more control over your subscription, you can manage your "
 "subscription in your"
 msgstr "Para tener más control sobre su suscripción, puede gestionarla en su"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Extra large"
 msgstr "Extra grande"
 
@@ -1472,7 +1473,7 @@ msgstr "Promedio"
 msgid "There was an error loading Google services."
 msgstr "Se produjo un error al cargar los servicios de Google."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Hide published date"
 msgstr "Ocultar fecha de publicación"
 
@@ -1510,7 +1511,7 @@ msgstr "desviación estándar"
 msgid "Get a count of how many values there are"
 msgstr "Obtener un conteo de cuántos valores hay"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createFigureBlockConfig.tsx
 msgid "Caption"
 msgstr "Leyenda"
 
@@ -1521,7 +1522,8 @@ msgstr "Publica la primera actualización a continuación. Escribe @ para "
 "mencionar a un compañero de equipo o enlazar un panel, conjunto de "
 "datos o caso."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Collapse at"
 msgstr "Contraer en"
 
@@ -1574,6 +1576,8 @@ msgstr "Algo más…"
 msgid "Changing plan to {newPlanName} ({newPlanSubType})"
 msgstr "Cambiando el plan a {newPlanName} ({newPlanSubType})"
 
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCardConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 #: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
 msgid "Content"
 msgstr "Contenido"
@@ -1632,7 +1636,7 @@ msgstr "Mapa"
 
 #: shared/copy/vizTypeLabel.ts
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 #: src/views/DataManagerApp/DataImportView/ManualUploadView/PdfTablePicker/PdfRegionCard.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Table"
@@ -1693,7 +1697,11 @@ msgstr "Adjuntar solo como referencia"
 msgid "Role group updated"
 msgstr "Grupo de roles actualizado"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createGridConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Small"
 msgstr "Pequeño"
 
@@ -1810,7 +1818,7 @@ msgstr "Aún no hay capas."
 msgid "Could not read these records."
 msgstr "No se pudieron leer estos registros."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 msgid "Narrow"
 msgstr "Estrecho"
 
@@ -2375,7 +2383,7 @@ msgstr "Conjuntos de datos de referencia"
 msgid "Your question contains language that may bias the AI's answer."
 msgstr "Tu pregunta contiene lenguaje que puede sesgar la respuesta de la IA."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Vertical padding"
 msgstr "Relleno vertical"
 
@@ -2472,7 +2480,7 @@ msgstr "Mostrar el subtítulo en la página"
 msgid "Export preview"
 msgstr "Vista previa de exportación"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Hide title"
 msgstr "Ocultar título"
 
@@ -2762,7 +2770,7 @@ msgstr "Su sesión ha expirado. Se le redirigirá para iniciar sesión."
 msgid "This dataset can be stored in the cloud."
 msgstr "Este conjunto de datos se puede almacenar en la nube."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 12"
 msgstr "Columna 12"
 
@@ -3075,7 +3083,7 @@ msgid "Creating a dictionary needs edit access to Data Sources. Ask a workspace 
 msgstr "Para crear un diccionario, necesita acceso de edición a Fuentes de "
 "datos. Solicítelo a un administrador del espacio de trabajo."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 3"
 msgstr "Columna 3"
 
@@ -3092,7 +3100,8 @@ msgstr "/mes"
 msgid "Filters for this chart"
 msgstr "Filtros para este gráfico"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createParagraphBlockConfig.tsx
 msgid "Align"
 msgstr "Alinear"
 
@@ -3216,7 +3225,7 @@ msgstr "Elegiste no enviar valores al proveedor de IA, por lo que las "
 "sugerencias están desactivadas para este diccionario. Aún puedes "
 "asignar los valores manualmente."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 #: src/views/GisApp/export/ExportSheet/ExportSheetHeaderLineFields.tsx
 msgid "Subtitle"
 msgstr "Subtítulo"
@@ -3353,7 +3362,11 @@ msgid "No entries yet. Add one for each kind of column this dictionary "
 msgstr "Aún no hay entradas. Agregue una para cada tipo de columna que describa "
 "este diccionario."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createGridConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Medium"
 msgstr "Mediano"
 
@@ -3443,7 +3456,9 @@ msgstr "Por favor, selecciona un archivo para importar"
 msgid "Role for everyone in the workspace"
 msgstr "Rol para todos en el espacio de trabajo"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createGridConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Gap"
 msgstr "Espacio"
 
@@ -3841,7 +3856,7 @@ msgstr "Sesgo detectado:"
 msgid "The {pluginId} plugin ran into an error while drawing this chart."
 msgstr "El plugin {pluginId} encontró un error al dibujar este gráfico."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCalloutBlockConfig.tsx
 msgid "Body"
 msgstr "Cuerpo"
 
@@ -3887,7 +3902,7 @@ msgstr "La cláusula FROM no es una referencia simple a una tabla."
 msgid "Sign Out"
 msgstr "Cerrar sesión"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 msgid "Section"
 msgstr "Sección"
 
@@ -3947,7 +3962,7 @@ msgid "Unknown group"
 msgstr "Grupo desconocido"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createParagraphBlockConfig.tsx
 msgid "Paragraph"
 msgstr "Párrafo"
 
@@ -4203,7 +4218,7 @@ msgstr "Ocultar eje Y"
 msgid "or"
 msgstr "o"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createListBlockConfig.tsx
 msgid "Items"
 msgstr "Elementos"
 
@@ -4385,7 +4400,7 @@ msgstr "Desplácese, haga zoom y toque una característica para leerla. Para "
 msgid "Could not create the places dataset."
 msgstr "No se pudo crear el conjunto de datos de lugares."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCalloutBlockConfig.tsx
 msgid "Info"
 msgstr "Información"
 
@@ -4654,7 +4669,7 @@ msgstr "Selecciona una columna"
 msgid "{numColumns} columns"
 msgstr "{numColumns} columnas"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 msgid "Normal"
 msgstr "Normal"
 
@@ -4750,7 +4765,7 @@ msgid "No case types or datasets match"
 msgstr "Ningún tipo de caso o conjunto de datos coincide"
 
 #: shared/copy/vizSettingGroupLabel.ts
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createGridConfig.tsx
 msgid "Grid"
 msgstr "Cuadrícula"
 
@@ -4805,7 +4820,7 @@ msgstr "Oculto"
 msgid "Dataset name is required"
 msgstr "Se requiere el nombre del conjunto de datos"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Main"
 msgstr "Principal"
 
@@ -4926,7 +4941,7 @@ msgstr "Sensibilidad"
 msgid "E"
 msgstr "E"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 5"
 msgstr "Columna 5"
 
@@ -5032,7 +5047,7 @@ msgstr "No hay atributos ni conjuntos de datos configurados."
 msgid "No longer being worked on."
 msgstr "Ya no se está trabajando en esto."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 8"
 msgstr "Columna 8"
 
@@ -5514,7 +5529,8 @@ msgstr "Enlace al registro de origen"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
 #: src/views/DashboardApp/AvaPage/pfields/GlobalFilterSubscriptionPField/GlobalFilterSubscriptionPField.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 #: src/views/DataExplorerApp/AggregationSelect.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceAppRoleMatrixForm/WorkspaceAppRoleMatrixForm.tsx
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/PluginInstallWizard/ConfirmContentSummary.tsx
@@ -5703,11 +5719,11 @@ msgstr "Ingrese un valor"
 msgid "Opens on"
 msgstr "Se abre en"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 11"
 msgstr "Columna 11"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 7"
 msgstr "Columna 7"
 
@@ -5881,7 +5897,7 @@ msgstr "{0, plural, one {# columna} other {# columnas}}"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCodeBlockConfig.tsx
 msgid "Code"
 msgstr "Código"
 
@@ -6016,7 +6032,7 @@ msgstr "Tus datos están resumidos"
 msgid "No topics"
 msgstr "Sin temas"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 msgid "Padding"
 msgstr "Relleno"
 
@@ -6038,7 +6054,7 @@ msgstr "La configuración de la capa está guardada. Vuelve a intentarlo cuando 
 msgid "{plainTextLength} of {RICH_TEXT_MAX_TEXT_LENGTH} characters"
 msgstr "{plainTextLength} de {RICH_TEXT_MAX_TEXT_LENGTH} caracteres"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Theme"
 msgstr "Tema"
 
@@ -6116,7 +6132,7 @@ msgstr "Se agregan nuevos conectores cada mes. Si necesita una base de datos o "
 msgid "Global Admin"
 msgstr "Administrador global"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 msgid "Comma (,)"
 msgstr "Coma (,)"
 
@@ -6195,7 +6211,7 @@ msgstr "{flaggedRowCount} de {0} filas requieren revisión. Asociamos estos "
 msgid "Y axis"
 msgstr "Eje Y"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 9"
 msgstr "Columna 9"
 
@@ -6390,7 +6406,7 @@ msgstr "Agrega un bloque de Filtro al panel para habilitar el filtrado global "
 msgid "Recommended with this dataset"
 msgstr "Recomendado con este conjunto de datos"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 msgid "Full"
 msgstr "Completo"
 
@@ -6566,7 +6582,7 @@ msgstr "La capa {0} está configurada como Desplazar, una opción que solo "
 msgid "Failed to save to dashboard: {0}"
 msgstr "Error al guardar en el panel: {0}"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Header row"
 msgstr "Fila de encabezado"
@@ -6780,7 +6796,7 @@ msgstr "Crea grupos para los miembros de tu espacio de trabajo. Los conjuntos "
 msgid "Preview:"
 msgstr "Vista previa:"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 msgid "Background"
 msgstr "Fondo"
 
@@ -7051,7 +7067,7 @@ msgid "The source file isn't in a format Avandar can read as a table."
 msgstr "El archivo de origen no está en un formato que Avandar pueda leer como "
 "tabla."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createFigureBlockConfig.tsx
 msgid "Image"
 msgstr "Imagen"
 
@@ -7133,7 +7149,7 @@ msgstr "Conjuntos de datos que importó"
 msgid "Next: map values"
 msgstr "Siguiente: asignar valores"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 #: src/views/GisApp/panels/LayerInspector/DataSection/DataSection.tsx
 msgid "Data"
 msgstr "Datos"
@@ -7302,7 +7318,7 @@ msgstr "La autenticación falló"
 msgid "Hex"
 msgstr "Hexágono"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Tab"
@@ -7313,7 +7329,7 @@ msgid "Some published datasets could not be loaded. Please try again later."
 msgstr "No se pudieron cargar algunos conjuntos de datos publicados. Por favor, "
 "inténtalo de nuevo más tarde."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createListBlockConfig.tsx
 msgid "First point"
 msgstr "Primer punto"
 
@@ -7432,7 +7448,7 @@ msgstr "Fin del intervalo de tiempo: {endLabel}"
 msgid "Home"
 msgstr "Inicio"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 msgid "Pipe (|)"
 msgstr "Barra vertical (|)"
 
@@ -7474,7 +7490,7 @@ msgstr "Avandar (predeterminado)"
 msgid "Add your first dataset"
 msgstr "Agregue su primer conjunto de datos"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 msgid "Wide"
 msgstr "Ancho"
 
@@ -7505,7 +7521,7 @@ msgstr "Ningún conjunto de datos coincide con su búsqueda y sus filtros. Prueb
 msgid "is true"
 msgstr "es verdadero"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createEmbedBlockConfig.tsx
 msgid "URL"
 msgstr "URL"
 
@@ -8072,7 +8088,7 @@ msgstr "Más de {formattedNumResults} conjuntos de datos"
 
 #: src/components/DatasetPreviewBlock/DatasetPreviewBlock.tsx
 #: src/components/RichText/Gadget/useGadgetSummaries/useGadgetSummaries.ts
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 #: src/views/DashboardApp/DashboardShareModal/CustomSliceEditor/ColumnPicker.tsx
 #: src/views/DataManagerApp/CrosswalkView/ChooseDatasetsStep/LayoutsTable.tsx
 #: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogListingColumns/DataCatalogListingColumns.tsx
@@ -8326,7 +8342,7 @@ msgstr "{0} eliminado con éxito"
 msgid "Open dashboard"
 msgstr "Abrir panel"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
 msgid "H1"
 msgstr "H1"
 
@@ -8484,7 +8500,11 @@ msgstr "Elige una o más"
 msgid "Import {title}"
 msgstr "Importar {title}"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createGridConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Large"
 msgstr "Grande"
 
@@ -8655,7 +8675,7 @@ msgstr "entrada"
 msgid "Suggested from the column name and values"
 msgstr "Sugerida a partir del nombre y los valores de la columna"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createEmbedBlockConfig.tsx
 msgid "Embed"
 msgstr "Insertar"
 
@@ -8768,7 +8788,7 @@ msgid "The {chartName} cannot be displayed because there are missing axes or "
 msgstr "El {chartName} no se puede mostrar porque faltan ejes o series."
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCardConfig.tsx
 msgid "Card"
 msgstr "Tarjeta"
 
@@ -8942,7 +8962,8 @@ msgstr "Borrar columna de estado de disputa"
 
 #: src/components/caseFields/useFieldValueFormatter/useFieldValueFormatter.ts
 #: src/components/providers/AvandarAppProvider.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Yes"
 msgstr "Sí"
@@ -9157,7 +9178,7 @@ msgstr "Sin filas"
 msgid "Shared drives"
 msgstr "Unidades compartidas"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
 msgid "H3"
 msgstr "H3"
 
@@ -9502,7 +9523,9 @@ msgstr "{0, plural, one {# reacción} other {# reacciones}}"
 msgid "Ask about your data..."
 msgstr "Pregunta sobre tus datos..."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCalloutBlockConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCardConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createEmbedBlockConfig.tsx
 #: src/views/GisApp/export/ExportSheet/ExportSheetHeaderLineFields.tsx
 #: src/views/GisApp/panels/LayerInspector/LegendSection/LegendTextControls.tsx
 msgid "Title"
@@ -9539,7 +9562,7 @@ msgstr "{publisher} · versión {version}"
 msgid "Nothing matches your filter"
 msgstr "Nada coincide con su filtro"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 4"
 msgstr "Columna 4"
 
@@ -9555,7 +9578,7 @@ msgstr "Elegir los registros para {slotTitle}"
 msgid "Received a non-string value for a select field"
 msgstr "Se recibió un valor no string para un campo de selección"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Left span"
 msgstr "Extensión izquierda"
 
@@ -9783,7 +9806,7 @@ msgstr "No hay miembros ni grupos de usuarios aún. Invita a miembros o crea "
 msgid "SQL"
 msgstr "SQL"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createListBlockConfig.tsx
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditorHeader.tsx
 #: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
 msgid "Ordered"
@@ -9822,7 +9845,7 @@ msgstr "Esta URL personalizada está reservada. Intente agregarle una palabra."
 msgid "Reference"
 msgstr "Referencia"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createListBlockConfig.tsx
 #: src/views/DataManagerApp/DataDictionaryView/CodeListEditor/CodeListEditorHeader.tsx
 msgid "Unordered"
 msgstr "Desordenada"
@@ -10030,7 +10053,7 @@ msgid "What this column means, so teammates read it the same way"
 msgstr "Qué significa esta columna, para que el equipo la interprete de la "
 "misma manera"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 1"
 msgstr "Columna 1"
 
@@ -10100,7 +10123,9 @@ msgid "I couldn't build that chart. Its query kept failing."
 msgstr "No pude crear ese gráfico. Su consulta siguió fallando."
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createParagraphBlockConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Right"
 msgstr "Derecha"
 
@@ -10228,7 +10253,7 @@ msgstr "Filas de este gráfico"
 msgid "member"
 msgstr "miembro"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Typography"
 msgstr "Tipografía"
 
@@ -10296,7 +10321,7 @@ msgstr "Ingrese valores; presione Enter después de cada uno"
 msgid "You haven't added any series"
 msgstr "No has agregado ninguna serie"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Hide author"
 msgstr "Ocultar autor"
 
@@ -10441,7 +10466,7 @@ msgstr "No hay conjuntos de datos"
 msgid "US Letter"
 msgstr "Carta de EE. UU."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
 msgid "Level"
 msgstr "Nivel"
 
@@ -10735,7 +10760,7 @@ msgstr "No hay tableros que coincidan con “{searchQuery}”."
 msgid "Position"
 msgstr "Posición"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createListBlockConfig.tsx
 msgid "List item"
 msgstr "Elemento de lista"
 
@@ -10759,7 +10784,7 @@ msgstr "Agregar conjuntos de datos"
 msgid "{0} columns · {1} rows"
 msgstr "{0} columnas · {1} filas"
 
-#: src/views/DataManagerApp/DataImportView/DataCatalogView/DataCatalogView.tsx
+#: src/views/DataManagerApp/DataImportView/DataCatalogView/useDataCatalogView.tsx
 msgid "Request a dataset"
 msgstr "Solicitar un conjunto de datos"
 
@@ -10785,7 +10810,7 @@ msgstr "¿Quitar los registros de {slotTitle}?"
 msgid "Confirm Password"
 msgstr "Confirmar contraseña"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createQuoteBlockConfig.tsx
 #: src/views/GisApp/shell/MapTopBar/BasemapControl/CustomBasemapFields.tsx
 msgid "Attribution"
 msgstr "Atribución"
@@ -10928,7 +10953,7 @@ msgstr "Nombre para mostrar"
 msgid "Dataset is now synced online"
 msgstr "El conjunto de datos ahora está sincronizado en línea"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createEmbedBlockConfig.tsx
 msgid "Height"
 msgstr "Altura"
 
@@ -10953,7 +10978,7 @@ msgstr "No se pudo cargar la lista de entidades."
 msgid "The query changed after the columns were added."
 msgstr "La consulta cambió después de agregar las columnas."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createParagraphBlockConfig.tsx
 msgid "Write your paragraph here..."
 msgstr "Escriba aquí su párrafo..."
 
@@ -11134,7 +11159,7 @@ msgstr "Cargando la tabla de correspondencias"
 msgid "The latitude must be between -90 and 90."
 msgstr "La latitud debe estar entre -90 y 90."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCalloutBlockConfig.tsx
 msgid "Neutral"
 msgstr "Neutro"
 
@@ -11766,7 +11791,7 @@ msgid "Your plan does not allow sharing more dashboards."
 msgstr "Su plan no permite compartir más dashboards."
 
 #: src/utils/notifications/notify.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCalloutBlockConfig.tsx
 msgid "Warning"
 msgstr "Advertencia"
 
@@ -11786,7 +11811,7 @@ msgstr "Cuando está activado, los miembros de este grupo solo obtienen acceso "
 "normalmente no puede abrir {app}."
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDividerBlockConfig.tsx
 msgid "Divider"
 msgstr "Separador"
 
@@ -12034,7 +12059,7 @@ msgstr "Este conjunto de datos no es un conjunto de datos de lugares, por lo "
 msgid "Custom URL is available"
 msgstr "URL personalizada disponible"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createGridConfig.tsx
 msgid "Number of rows"
 msgstr "Número de filas"
 
@@ -12859,7 +12884,10 @@ msgid "Manage how you appear in {0} and the account you use to sign in."
 msgstr "Administre cómo aparece en {0} y la cuenta que utiliza para iniciar "
 "sesión."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createGridConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Extra small"
 msgstr "Extra pequeño"
 
@@ -13192,7 +13220,7 @@ msgstr "Seleccionar regla (por ejemplo, la más frecuente)"
 msgid "Database is unreachable"
 msgstr "No se puede acceder a la base de datos"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 msgid "Add tabular data to render a simple table."
 msgstr "Agregue datos tabulares para mostrar una tabla simple."
 
@@ -13293,7 +13321,7 @@ msgstr "Eliminar diccionario"
 msgid "Visualizations"
 msgstr "Visualizaciones"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createFigureBlockConfig.tsx
 msgid "Alt text"
 msgstr "Texto alternativo"
 
@@ -13403,7 +13431,7 @@ msgstr "Avandar convierte su pregunta en una consulta para mostrarle las "
 msgid "Status"
 msgstr "Estado"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCalloutBlockConfig.tsx
 msgid "Tone"
 msgstr "Tono"
 
@@ -13458,7 +13486,7 @@ msgstr "portal de facturación."
 msgid "Dates"
 msgstr "Fechas"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 2"
 msgstr "Columna 2"
 
@@ -13554,7 +13582,9 @@ msgid "Bring in your first dataset"
 msgstr "Incorpore su primer conjunto de datos"
 
 #: shared/copy/vizSettingControlLabel/vizSettingControlLabel.ts
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createParagraphBlockConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Left"
 msgstr "Izquierda"
 
@@ -13757,7 +13787,7 @@ msgstr "Este conjunto de datos será solo offline"
 msgid "Add at least one X / Y / Size series"
 msgstr "Agrega al menos una serie de X / Y / Tamaño"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Sidebar"
 msgstr "Barra lateral"
 
@@ -13770,7 +13800,7 @@ msgid "This dataset is synced online. Click to make offline-only."
 msgstr "Este conjunto de datos está sincronizado en línea. Haga clic para "
 "hacerlo solo offline."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Published Date"
 msgstr "Fecha de publicación"
 
@@ -13878,11 +13908,11 @@ msgstr "Ocurrió un error inesperado al conectarse."
 msgid "Add field"
 msgstr "Agregar campo"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Hide subtitle"
 msgstr "Ocultar subtítulo"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Author"
 msgstr "Autor"
 
@@ -13904,7 +13934,7 @@ msgstr "Agregar filtro"
 msgid "Loading plugins"
 msgstr "Cargando complementos"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Schema version"
 msgstr "Versión del esquema"
 
@@ -14011,7 +14041,7 @@ msgstr "Cambiar tamaño del panel"
 msgid "Entry"
 msgstr "Entrada"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Horizontal padding"
 msgstr "Relleno horizontal"
 
@@ -14037,7 +14067,7 @@ msgstr "La fuente requiere iniciar sesión para descargar este conjunto de "
 msgid "Dataset ready"
 msgstr "Conjunto de datos listo"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
 msgid "H2"
 msgstr "H2"
 
@@ -14049,7 +14079,7 @@ msgstr "En el conjunto de datos combinado"
 msgid "Entry no longer available"
 msgstr "La entrada ya no está disponible"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createQuoteBlockConfig.tsx
 msgid "Add a pull quote..."
 msgstr "Agregue una cita destacada..."
 
@@ -14153,7 +14183,8 @@ msgstr "Seleccione un conjunto de datos para ver sus columnas, su origen y "
 msgid "Source column"
 msgstr "Columna de origen"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createGridConfig.tsx
 msgid "Number of columns"
 msgstr "Número de columnas"
 
@@ -14221,7 +14252,8 @@ msgstr "No hay registros asignados a esta persona"
 msgid "Update & republish"
 msgstr "Actualizar y republicar"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createParagraphBlockConfig.tsx
 msgid "Center"
 msgstr "Centro"
 
@@ -14294,7 +14326,7 @@ msgstr "Estos límites no tienen un valor reportable para la consulta actual."
 msgid "1 field"
 msgstr "1 campo"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCodeBlockConfig.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceLanguageTab/WorkspaceLanguageTab.tsx
 #: src/views/WorkspaceSettingsPage/WorkspaceSettingsPage.tsx
 msgid "Language"
@@ -14315,7 +14347,7 @@ msgid "Click Offline under the message box to use them. Chat also uses them on "
 msgstr "Haz clic en Sin conexión debajo del cuadro de mensaje para usarlos. El "
 "chat también los usa automáticamente cuando pierdes la conexión."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createFigureBlockConfig.tsx
 msgid "Image URL"
 msgstr "URL de la imagen"
 
@@ -14345,7 +14377,7 @@ msgstr "El diccionario no se guardó. Revise los campos resaltados y vuelva a "
 msgid "Regenerate with the error"
 msgstr "Regenerar con el error"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createCalloutBlockConfig.tsx
 msgid "Add context, methodology, or a key takeaway."
 msgstr "Agregue contexto, metodología o una conclusión clave."
 
@@ -14382,7 +14414,7 @@ msgstr "Verifique su conexión y haga clic nuevamente en el botón para "
 msgid "This layer's features cannot be listed."
 msgstr "No se pueden listar las entidades de esta capa."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 6"
 msgstr "Columna 6"
 
@@ -14647,7 +14679,7 @@ msgstr "Esta lista está ordenada, con el nivel más bajo primero. Si el orden e
 msgid "Only what's queried (recommended)"
 msgstr "Solo lo que se consulta (recomendado)"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Untitled"
 msgstr "Sin título"
 
@@ -14918,7 +14950,7 @@ msgstr "Mantén esta pestaña abierta hasta que termine."
 msgid "Remove column {columnName}"
 msgstr "Eliminar columna {columnName}"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createTableBlockConfig.tsx
 #: src/views/DataManagerApp/DataImportView/DatasetImportForm/DatasetParseControls.tsx
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSourceRail.tsx
 msgid "Delimiter"
@@ -14951,7 +14983,7 @@ msgstr "No tienes nada asignado."
 msgid "Invalid value column selected"
 msgstr "Columna de valor seleccionada inválida"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/DashboardConfigHelpers.tsx
 msgid "Row {rowNum} / Col {colNum}"
 msgstr "Fila {rowNum} / Col {colNum}"
 
@@ -15093,7 +15125,9 @@ msgstr "Espacio entre barras"
 
 #: shared/copy/avaDataTypeLabel.ts
 #: src/views/DashboardApp/DashboardEditorView/ExportPdfModal/PdfAnnotationToolbar.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createListBlockConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createParagraphBlockConfig.tsx
 #: src/views/DataManagerApp/DataDictionaryView/useDictionaryCopy.ts
 #: src/views/DataManagerApp/DatasetMetaView/DatasetSummaryView/datasetSummaryLabels.ts
 #: src/views/WorkspaceSettingsPage/WorkspacePluginsTab/DataSlotBinding/useDataSlotAttributeTypeLabels.ts
@@ -15134,7 +15168,7 @@ msgstr "HAVING usa la función de agregación {funcName} en un argumento "
 msgid "Save Dataset"
 msgstr "Guardar conjunto de datos"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Sidebar position"
 msgstr "Posición de la barra lateral"
 
@@ -15193,7 +15227,7 @@ msgstr "Aún no se ha trazado"
 msgid "Selected document: {0}"
 msgstr "Documento seleccionado: {0}"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 msgid "Subtle"
 msgstr "Sutil"
 
@@ -15909,7 +15943,7 @@ msgstr "Se utiliza para iniciar sesión en tu cuenta."
 msgid "Could not zoom to this cluster."
 msgstr "No se pudo ampliar este clúster."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createFigureBlockConfig.tsx
 msgid "Add an image URL to render a figure."
 msgstr "Agregue la URL de una imagen para mostrar una figura."
 
@@ -15972,11 +16006,11 @@ msgstr "Compartido contigo"
 msgid "Run a query to configure a chart."
 msgstr "Ejecute una consulta para configurar un gráfico."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createEmbedBlockConfig.tsx
 msgid "Add a URL to embed a visualization or external content."
 msgstr "Agregue una URL para insertar una visualización o contenido externo."
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSidebarLayoutConfig.tsx
 msgid "Sidebar span"
 msgstr "Extensión de la barra lateral"
 
@@ -15984,7 +16018,7 @@ msgstr "Extensión de la barra lateral"
 msgid "matches pattern (legacy)"
 msgstr "coincide con el patrón (heredado)"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createSectionConfig.tsx
 msgid "Max width"
 msgstr "Ancho máximo"
 
@@ -16104,7 +16138,7 @@ msgstr "Eliminar lugar"
 msgid "Bottom left"
 msgstr "Abajo a la izquierda"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createDashboardRootConfig.tsx
 msgid "Page title"
 msgstr "Título de la página"
 
@@ -16121,7 +16155,7 @@ msgstr "Algunos"
 msgid "Arrow"
 msgstr "Flecha"
 
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createColumnsConfig.tsx
 msgid "Column 10"
 msgstr "Columna 10"
 
@@ -16146,13 +16180,13 @@ msgid "Values, comma-separated"
 msgstr "Valores, separados por comas"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createHeadingBlockConfig.tsx
 msgid "Heading"
 msgstr "Encabezado"
 
 #: src/components/ChatPanel/ChatThread/AgentDashboardBlockPart/AgentDashboardBlockPart.tsx
 #: src/components/RichText/RichTextComposer/RichTextComposer.tsx
-#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/useDashboardPuckConfig.tsx
+#: src/views/DashboardApp/DashboardEditorView/useDashboardPuckConfig/createQuoteBlockConfig.tsx
 msgid "Quote"
 msgstr "Cita"
 

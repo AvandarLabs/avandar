@@ -1,10 +1,10 @@
+import { prop } from "@avandar/utils";
+import { Parser } from "node-sql-parser";
 /**
  * Splits raw SQL into display segments for pills: known datasets (by id or
  * name) and known column identifiers. The concatenation of each segment's
  * `value` or `raw` reproduces the original SQL string.
  */
-import { prop } from "@avandar/utils";
-import { Parser } from "node-sql-parser";
 import type { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
 import type {
   SqlDisplayCatalog,
@@ -265,7 +265,8 @@ function _spansToSegments(
 }
 
 /**
- * Build ordered display segments for a SQL string and workspace catalog.
+ * Builds ordered SQL display segments using the workspace catalog.
+ * Use them, for example, to render recognized datasets and columns as pills.
  */
 export function buildSqlDisplaySegments(options: {
   sql: string;

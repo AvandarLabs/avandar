@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
+import { OpenDataAcquisitionFailedError } from "$/connectors/open-data/openDataErrors.ts";
 import { readFreshnessProbeToken } from "$/connectors/open-data/readFreshnessProbeToken/readFreshnessProbeToken.ts";
 import type { OpenDataHttp } from "$/connectors/open-data/CkanClient/CkanClient.types.ts";
 import type { FreshnessProbe } from "$/connectors/open-data/readFreshnessProbeToken/readFreshnessProbeToken.types.ts";
@@ -33,7 +33,7 @@ async function _readFailureCode(promise: Promise<unknown>): Promise<string> {
       return caught;
     },
   );
-  return OpenDataAcquisitionFailed.is(error) ? error.failure.code : "none";
+  return OpenDataAcquisitionFailedError.is(error) ? error.failure.code : "none";
 }
 
 describe("readFreshnessProbeToken", () => {

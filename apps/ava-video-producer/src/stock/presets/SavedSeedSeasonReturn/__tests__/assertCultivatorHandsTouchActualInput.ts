@@ -1,5 +1,5 @@
-import { defaultInput, fixtures } from "../SavedSeedSeasonReturn.fixtures";
 import { assertCultivatorHandsTouchActualFrame as _assertCultivatorHandsTouchActualFrame } from "./assertCultivatorHandsTouchActualFrame";
+import type { defaultInput, fixtures } from "../SavedSeedSeasonReturn.fixtures";
 
 /**
  * Asserts cultivator hands touch the actual transferred lot after the jar

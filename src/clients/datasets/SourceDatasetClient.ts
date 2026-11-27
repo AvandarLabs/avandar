@@ -1,8 +1,6 @@
 import { createServiceClient } from "@avandar/clients";
 import { withQueryHooks } from "@avandar/query-hooks";
-import { Registry, where } from "@avandar/utils";
-import { DatasetId } from "$/models/datasets/Dataset/Dataset.types";
-import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
+import { where } from "@avandar/utils";
 import { CsvFileDatasetClient } from "./source-datasets/CsvFileDatasetClient";
 import { GoogleSheetsDatasetClient } from "./source-datasets/GoogleSheetsDatasetClient";
 import { OpenDataDatasetClient } from "./source-datasets/OpenDataDatasetClient";
@@ -10,6 +8,9 @@ import { PdfFileDatasetClient } from "./source-datasets/PdfFileDatasetClient";
 import { PostgresTableDatasetClient } from "./source-datasets/PostgresTableDatasetClient";
 import { VirtualDatasetClient } from "./source-datasets/VirtualDatasetClient";
 import { XlsxFileDatasetClient } from "./source-datasets/XlsxFileDatasetClient";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
+import type { Registry } from "@avandar/utils";
 
 const SourceDatasetClientRegistry = {
   csv_file: CsvFileDatasetClient,
@@ -47,7 +48,7 @@ export const SourceDatasetClient = withQueryHooks(
           datasetId,
         }: {
           sourceType: DatasetSource.SourceType;
-          datasetId: DatasetId;
+          datasetId: Dataset.Id;
         }) => {
           const SourceClient = SourceDatasetClientRegistry[sourceType];
           return await SourceClient.getOne(

@@ -1,6 +1,5 @@
 import { objectEntries, prop } from "@avandar/utils";
 import { quoteSqlIdentifier } from "@avandar/utils/sql";
-import * as arrow from "apache-arrow";
 import knex from "knex";
 import { match } from "ts-pattern";
 import { DuckDbQueryAggregations } from "$/models/queries/QueryAggregationType/QueryAggregationType";
@@ -15,6 +14,7 @@ import type {
   UnknownRow,
 } from "@/clients/DuckDbClient/DuckDbClient.types";
 import type { DuckDbClientOperations } from "@/clients/DuckDbClient/duckDbClientOperations";
+import type * as arrow from "apache-arrow";
 import type { Knex } from "knex";
 
 const sql = knex({

@@ -1,14 +1,16 @@
 import { isDevBuild } from "@query-hooks/isDevBuild";
 import { useAvaQueryErrorReporter } from "@query-hooks/useAvaQueryErrorReporter";
 import {
+  useMutation as tanstackUseMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
+import type {
   DefaultError,
   QueryKey,
   UseMutateAsyncFunction as TanstackUseMutateAsyncFunction,
   UseMutateFunction as TanstackUseMutateFunction,
-  useMutation as tanstackUseMutation,
   UseMutationOptions as TanstackUseMutationOptions,
   UseMutationResult as TanstackUseMutationResult,
-  useQueryClient,
 } from "@tanstack/react-query";
 import type { Simplify } from "type-fest";
 
@@ -34,9 +36,7 @@ export type UseMutationOptions<
   TError = DefaultError,
   TContext = unknown,
 > = TanstackUseMutationOptions<TData, TError, TFnVariables, TContext> & {
-  /**
-   * Invalidate the specified query after the mutation is successful.
-   */
+  /** Invalidate the specified query after the mutation is successful. */
   queryToInvalidate?: QueryKey;
 
   /**
@@ -45,9 +45,7 @@ export type UseMutationOptions<
    */
   queriesToInvalidate?: readonly QueryKey[];
 
-  /**
-   * Refetch the specified query after the mutation is successful.
-   */
+  /** Refetch the specified query after the mutation is successful. */
   queryToRefetch?: QueryKey;
 
   /**

@@ -3,7 +3,9 @@ import type { QueryAggregationTypeT } from "$/models/queries/QueryAggregationTyp
 import type { QueryFilterOperator } from "$/models/queries/StructuredQuery/QueryFilter.types.ts";
 
 /**
- * Maps the AST's aggregation function name onto our QueryAggregationType.
+ * Maps a SQL aggregation name to a query aggregation type, or undefined if
+ * unsupported.
+ * Use it, for example, when translating a parsed SQL projection.
  */
 export function matchAggregation(
   name: string,
@@ -49,7 +51,9 @@ export function identifierToString(value: unknown): string | undefined {
 }
 
 /**
- * Extract a column name from an AST column-ref node.
+ * Extracts a column name from a column-reference AST node, or returns
+ * undefined.
+ * Use it, for example, when translating a parsed SQL filter.
  */
 export function columnRefName(node: unknown): string | undefined {
   if (node === null || typeof node !== "object") {

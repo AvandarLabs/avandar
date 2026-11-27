@@ -16,7 +16,8 @@ import type {
 import type { Collection, IndexableType, IndexSpec, Table } from "dexie";
 
 /**
- * Returns the Dexie `orderBy` index name for the table primary key.
+ * Returns the Dexie `orderBy` index name for a table primary key.
+ * Use it, for example, to order a collection by its table's primary key.
  */
 export function dexiePrimaryKeyOrderByName(primKey: IndexSpec): string {
   const { keyPath } = primKey;

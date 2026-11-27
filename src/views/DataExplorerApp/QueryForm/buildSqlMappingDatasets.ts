@@ -3,9 +3,7 @@ import type { DatasetModel } from "$/models/datasets/Dataset/Dataset.types";
 import type { DatasetColumnRead } from "$/models/datasets/DatasetColumn/DatasetColumn.types";
 import type { SqlMappingInput } from "$/models/queries/StructuredQuery/sqlToStructuredQuery/sqlToStructuredQuery";
 
-/**
- * Groups workspace dataset columns by dataset for `sqlToStructuredQuery`.
- */
+/** Groups workspace dataset columns by dataset for `sqlToStructuredQuery`. */
 export function buildSqlMappingDatasets(
   datasets: ReadonlyArray<DatasetModel["Read"]>,
   allColumns: readonly DatasetColumnRead[],

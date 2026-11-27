@@ -4,14 +4,10 @@ export const SINGLE_VALUE_OPERATORS = ["eq"] as const;
 export const ARRAY_VALUE_OPERATORS = ["in"] as const;
 export const NULL_OPERATORS = ["is"] as const;
 
-/**
- * These are filter operators that are evaluated against a single value.
- */
+/** These are filter operators that are evaluated against a single value. */
 export type SingleValueOperator = (typeof SINGLE_VALUE_OPERATORS)[number];
 
-/**
- * These are filter operators that are evaluated against an array of values.
- */
+/** These are filter operators that are evaluated against an array of values. */
 export type ArrayValueOperator = (typeof ARRAY_VALUE_OPERATORS)[number];
 
 /**

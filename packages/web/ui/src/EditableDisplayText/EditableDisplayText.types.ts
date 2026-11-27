@@ -1,24 +1,16 @@
 import type { TextareaProps, TextInputProps, TextProps } from "@mantine/core";
 
 type BaseProps = {
-  /**
-   * The current text value. This makes the component controlled.
-   */
+  /** The current text value. This makes the component controlled. */
   value: string;
 
-  /**
-   * Called whenever the text changes in edit mode.
-   */
+  /** Called whenever the text changes in edit mode. */
   onChange: (value: string) => void;
 
-  /**
-   * Called when the user clicks save.
-   */
+  /** Called when the user clicks save. */
   onSave: (value: string) => void;
 
-  /**
-   * Called when the user cancels editing.
-   */
+  /** Called when the user cancels editing. */
   onCancel?: () => void;
   isSaving?: boolean;
   disabled?: boolean;

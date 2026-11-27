@@ -16,9 +16,7 @@ export namespace Model {
     MProps extends Record<string, unknown> = EmptyObject,
   > = ModelBase<MType, MProps>;
 
-  /**
-   * A model that has a version field.
-   */
+  /** A model that has a version field. */
   export type Versioned<
     MType extends string = string,
     Version extends number = number,

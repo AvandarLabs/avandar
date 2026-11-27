@@ -106,9 +106,7 @@ export const overlayConfigUpdaters = {
     return { ...config, timeRange };
   },
 
-  /**
-   * Appends one annotation feature, keeping overlay visibility.
-   */
+  /** Appends one annotation feature, keeping overlay visibility. */
   withAnnotationFeature: (
     options: Readonly<{
       config: AvaMapConfigRead;
@@ -125,9 +123,7 @@ export const overlayConfigUpdaters = {
     };
   },
 
-  /**
-   * Replaces one annotation with `nextFeatures` at the same index.
-   */
+  /** Replaces one annotation with `nextFeatures` at the same index. */
   withAnnotationFeaturesReplaced: (
     options: Readonly<{
       config: AvaMapConfigRead;
@@ -153,9 +149,7 @@ export const overlayConfigUpdaters = {
     };
   },
 
-  /**
-   * Removes an annotation by id. The last removal leaves an empty overlay.
-   */
+  /** Removes an annotation by id. The last removal leaves an empty overlay. */
   withoutAnnotationFeature: (
     options: Readonly<{
       config: AvaMapConfigRead;

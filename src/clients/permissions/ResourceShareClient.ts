@@ -146,7 +146,8 @@ async function _insertShare(
 }
 
 /**
- * CRUD for `resource_shares` and `is_restricted` on resources.
+ * Creates the client for reading and managing resource shares and restrictions.
+ * Called by `ResourceShareClient` to provide its sharing operations.
  */
 function createResourceShareClient(supabaseClient: AvaSupabaseDBClient) {
   const baseClient = createServiceClient("ResourceShareClient").mixin(
@@ -157,9 +158,7 @@ function createResourceShareClient(supabaseClient: AvaSupabaseDBClient) {
     const dbClient = baseClient.getDb();
     const newClient = baseClient.mixin(
       withNewMembers({
-        /**
-         * Loads shares and restriction flag for one resource.
-         */
+        /** Loads shares and restriction flag for one resource. */
         getResourceSharingState: async (options: {
           workspaceId: WorkspaceId;
           resourceType: ResourceType;
@@ -236,9 +235,7 @@ function createResourceShareClient(supabaseClient: AvaSupabaseDBClient) {
           return _insertShare(dbClient, options);
         },
 
-        /**
-         * Removes a share by id.
-         */
+        /** Removes a share by id. */
         deleteResourceShare: async (options: {
           shareId: string;
         }): Promise<void> => {
@@ -251,9 +248,7 @@ function createResourceShareClient(supabaseClient: AvaSupabaseDBClient) {
             .throwOnError();
         },
 
-        /**
-         * Sets `is_restricted` on a dashboard, dataset, or map row.
-         */
+        /** Sets `is_restricted` on a dashboard, dataset, or map row. */
         setResourceRestricted: async (options: {
           workspaceId: WorkspaceId;
           resourceType: ResourceType;

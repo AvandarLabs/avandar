@@ -1,9 +1,9 @@
 import { Motion } from "../../../../../motion";
-import { BrandLockupMotion } from "../../../../../scenes/BrandLockupScene/BrandLockupMotion/BrandLockupMotion";
 import { TextReveal } from "../../../../../scenes/TextReveal/TextReveal";
 import { useVideoMotion } from "../../../../../videoTheme/useVideoMotion";
 import { BuildDemosShared } from "../BuildDemosShared/BuildDemosShared";
 import css from "./CtaBeatLines.module.css";
+import type { BrandLockupMotion } from "../../../../../scenes/BrandLockupScene/BrandLockupMotion/BrandLockupMotion";
 import type { ReactNode } from "react";
 
 type Props = {

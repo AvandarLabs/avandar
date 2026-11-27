@@ -2,7 +2,8 @@ import type { WorkspaceId } from "$/models/Workspace/Workspace.types.ts";
 import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types.ts";
 
 /**
- * Display name for an auto-created role group at index `n` (1-based).
+ * Formats a 1-based custom role group name for
+ * `buildInitialCustomRoleGroupName`.
  */
 function _formatCustomRoleGroupName(n: number): string {
   return `Custom Role Group ${String(n)}`;

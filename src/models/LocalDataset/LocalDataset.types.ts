@@ -89,9 +89,7 @@ type LocalDatasetDBRead = {
    */
   parquetData: Blob | undefined;
 
-  /**
-   * Current parsing lifecycle stage. See `LocalDatasetParseStatus`.
-   */
+  /** Current parsing lifecycle stage. See `LocalDatasetParseStatus`. */
   parseStatus: LocalDatasetParseStatus;
 
   /**
@@ -101,9 +99,7 @@ type LocalDatasetDBRead = {
    */
   parseStartedAt: number | undefined;
 
-  /**
-   * Human-readable failure reason set when `parseStatus === "failed"`.
-   */
+  /** Human-readable failure reason set when `parseStatus === "failed"`. */
   parseFailedReason: string | undefined;
 
   /**

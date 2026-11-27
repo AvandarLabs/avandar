@@ -1,6 +1,4 @@
-/**
- * Always-on OpenRouter tool catalog for unified chat sessions.
- */
+/** Always-on OpenRouter tool catalog for unified chat sessions. */
 import { prop } from "@avandar/utils";
 import { makeChatToolConfigFromOptions } from "@sbfn/chat/PostChatMessages/prompt/makeChatToolConfigFromOptions.ts";
 import { describe, expect, it } from "vitest";

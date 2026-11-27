@@ -1,7 +1,9 @@
 export default {
+  ignoreFiles: ["**/*.gen.*"],
   extends: ["stylelint-config-standard", "stylelint-config-css-modules"],
-  plugins: ["stylelint-order"],
+  plugins: ["stylelint-order", "@avandar/lint-css/stylelint"],
   rules: {
+    "avandar/canonical-block-comments": true,
     "at-rule-no-unknown": [
       true,
       {

@@ -1,16 +1,13 @@
 import { Callout } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { Center } from "@mantine/core";
-import {
-  createFileRoute,
-  ErrorComponentProps,
-  notFound,
-} from "@tanstack/react-router";
+import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { DataDictionaryClient } from "@/clients/dataDictionaries/DataDictionaryClient/DataDictionaryClient";
 import { Logger } from "@/utils/Logger";
 import { DataDictionaryView } from "@/views/DataManagerApp/DataDictionaryView/DataDictionaryView";
 import type { DataDictionary } from "$/models/dataDictionaries/DataDictionary/DataDictionary";
+import type { ErrorComponentProps } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 
 export const Route = createFileRoute(

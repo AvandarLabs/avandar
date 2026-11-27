@@ -1,7 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useRef } from "react";
-import { Dashboard } from "$/models/Dashboard/Dashboard";
 import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs/AvaVizConfigs";
 import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 import { DataVizPBlock } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";
@@ -12,6 +11,7 @@ import { useNLQueryPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/NLQ
 import { useVizConfigPFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/VizConfigPField/useVizConfigPFieldConfig";
 import { useVizTypePFieldConfig } from "@/views/DashboardApp/AvaPage/pfields/VizTypePField/useVizTypePFieldConfig";
 import { DashboardColumnBindingPreparation } from "../../utils/DashboardColumnBindingPreparation/DashboardColumnBindingPreparation";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { Workspace } from "$/models/Workspace/Workspace";
 import type { AvaPageConfig } from "@/views/DashboardApp/AvaPage/AvaPage.types";
 import type { Props as DataVizPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizPBlock";

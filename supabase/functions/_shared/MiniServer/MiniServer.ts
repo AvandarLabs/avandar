@@ -1,15 +1,12 @@
 import { authMiddleware } from "@sbfn/_shared/authMiddleware.ts";
 import { corsHeaders } from "@sbfn/_shared/cors.ts";
 import { BAD_REQUEST, INTERNAL_SERVER_ERROR } from "@sbfn/_shared/httpCodes.ts";
-import { createDefaultRouteHandler } from "@sbfn/_shared/MiniServer/createServerRouteHandler.ts";
-import {
-  parseURLPathParams,
-  ValidPathParamsSchemaShape,
-} from "@sbfn/_shared/MiniServer/parseURLPathParams.ts";
+import { parseURLPathParams } from "@sbfn/_shared/MiniServer/parseURLPathParams.ts";
 import { isRedirect } from "@sbfn/_shared/MiniServer/redirect.ts";
 import { responseError } from "@sbfn/_shared/MiniServer/responseError.ts";
 import { responseSuccess } from "@sbfn/_shared/MiniServer/responseSuccess.ts";
-import { AvaSupabaseClient, SupabaseAdmin } from "@sbfn/_shared/supabase.ts";
+import { parseBodyParams } from "@sbfn/_shared/MiniServer/RouteMethodHelpers.ts";
+import { SupabaseAdmin } from "@sbfn/_shared/supabase.ts";
 import { z } from "zod";
 import type {
   AnyValidPathParamsRecord,
@@ -18,18 +15,16 @@ import type {
   HTTPMethod,
   URLPathPattern,
   ValidBody,
-  ValidPathParams,
   ValidReturnType,
 } from "@sbfn/_shared/MiniServer/api.types.ts";
-import type { AnyZodType } from "@sbfn/_shared/MiniServer/createServerRouteHandler.ts";
 import type {
   MiniServerAPIDef,
   MiniServerRoutesDef,
   QueryParamsSchema,
   ServerRouteHandler,
-  URLPathWithoutParams,
   ValidQueryParams,
 } from "@sbfn/_shared/MiniServer/MiniServer.types.ts";
+import type { AvaSupabaseClient } from "@sbfn/_shared/supabase.ts";
 import type { User } from "@supabase/supabase-js";
 
 function parseSearchParamsFromURL<
@@ -64,199 +59,6 @@ function parseSearchParamsFromURL<
     }
     throw new Error(`${baseMessage}: ${String(error)}`);
   }
-}
-
-async function parseBodyParams<Body extends AnyZodType>(
-  req: Request,
-  bodySchema: Body,
-): Promise<z.infer<Body>> {
-  try {
-    const reqBody = await req.json();
-    return bodySchema.parse(reqBody);
-  } catch (error) {
-    const baseMessage = "Error parsing body params";
-    if (error instanceof z.ZodError) {
-      throw new Error(`${baseMessage}. ${z.prettifyError(error)}`);
-    }
-    if (error instanceof Error) {
-      throw new Error(`${baseMessage}: ${String(error.message)}`);
-    }
-    throw new Error(`${baseMessage}: ${String(error)}`);
-  }
-}
-
-export function GET<
-  Path extends URLPathPattern,
-  ReturnType extends ValidReturnType,
->(
-  path: URLPathWithoutParams<Path>,
-): ServerRouteHandler<
-  "GET",
-  Path,
-  ReturnType,
-  undefined,
-  undefined,
-  undefined,
-  false
->;
-export function GET<
-  Path extends URLPathPattern,
-  ReturnType extends ValidReturnType,
-  PathParams extends ValidPathParams<Path>,
->(options: {
-  path: Path;
-  schema: ValidPathParamsSchemaShape<PathParams>;
-}): ServerRouteHandler<
-  "GET",
-  Path,
-  ReturnType,
-  PathParams,
-  undefined,
-  undefined,
-  false
->;
-export function GET<
-  Path extends URLPathPattern,
-  ReturnType extends ValidReturnType,
-  PathParams extends ValidPathParams<Path>,
->(
-  path:
-    | Path
-    | {
-        path: Path;
-        schema: ValidPathParamsSchemaShape<PathParams>;
-      } = "/" as Path,
-): ServerRouteHandler<
-  "GET",
-  Path,
-  ReturnType,
-  PathParams,
-  undefined,
-  undefined,
-  false
-> {
-  return createDefaultRouteHandler({
-    method: "GET",
-    path: typeof path === "string" ? path : path.path,
-    pathSchema:
-      typeof path === "object" && "schema" in path ? path.schema : undefined,
-  });
-}
-
-export function POST<
-  Path extends URLPathPattern,
-  ReturnType extends ValidReturnType,
->(
-  path: URLPathWithoutParams<Path>,
-): ServerRouteHandler<
-  "POST",
-  Path,
-  ReturnType,
-  undefined,
-  undefined,
-  Record<string, never>,
-  false
->;
-export function POST<
-  Path extends URLPathPattern,
-  ReturnType extends ValidReturnType,
-  PathParams extends ValidPathParams<Path>,
->(options: {
-  path: Path;
-  schema: ValidPathParamsSchemaShape<PathParams>;
-}): ServerRouteHandler<
-  "POST",
-  Path,
-  ReturnType,
-  PathParams,
-  undefined,
-  Record<string, never>,
-  false
->;
-export function POST<
-  Path extends URLPathPattern,
-  ReturnType extends ValidReturnType,
-  PathParams extends ValidPathParams<Path> | undefined,
->(
-  path:
-    | Path
-    | {
-        path: Path;
-        schema: ValidPathParamsSchemaShape<PathParams>;
-      } = "/" as Path,
-): ServerRouteHandler<
-  "POST",
-  Path,
-  ReturnType,
-  PathParams,
-  undefined,
-  Record<string, never>,
-  false
-> {
-  return createDefaultRouteHandler({
-    method: "POST",
-    path: typeof path === "string" ? path : path.path,
-    pathSchema:
-      typeof path === "object" && "schema" in path ? path.schema : undefined,
-  });
-}
-
-export function PATCH<
-  Path extends URLPathPattern,
-  ReturnType extends ValidReturnType,
->(
-  path: URLPathWithoutParams<Path>,
-): ServerRouteHandler<
-  "PATCH",
-  Path,
-  ReturnType,
-  undefined,
-  undefined,
-  Record<string, never>,
-  false
->;
-export function PATCH<
-  Path extends URLPathPattern,
-  ReturnType extends ValidReturnType,
-  PathParams extends ValidPathParams<Path>,
->(options: {
-  path: Path;
-  schema: ValidPathParamsSchemaShape<PathParams>;
-}): ServerRouteHandler<
-  "PATCH",
-  Path,
-  ReturnType,
-  PathParams,
-  undefined,
-  Record<string, never>,
-  false
->;
-export function PATCH<
-  Path extends URLPathPattern,
-  ReturnType extends ValidReturnType,
-  PathParams extends ValidPathParams<Path> | undefined,
->(
-  path:
-    | Path
-    | {
-        path: Path;
-        schema: ValidPathParamsSchemaShape<PathParams>;
-      } = "/" as Path,
-): ServerRouteHandler<
-  "PATCH",
-  Path,
-  ReturnType,
-  PathParams,
-  undefined,
-  Record<string, never>,
-  false
-> {
-  return createDefaultRouteHandler({
-    method: "PATCH",
-    path: typeof path === "string" ? path : path.path,
-    pathSchema:
-      typeof path === "object" && "schema" in path ? path.schema : undefined,
-  });
 }
 
 /**
@@ -421,3 +223,9 @@ export function MiniServer<API extends GenericRouteAPIRecord>(
     },
   };
 }
+
+export {
+  GET,
+  PATCH,
+  POST,
+} from "@sbfn/_shared/MiniServer/RouteMethodHelpers.ts";

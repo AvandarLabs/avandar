@@ -1,7 +1,8 @@
 const DUCKDB_EMPTY_TOKEN = "(empty)";
 
 /**
- * DuckDB uses `(empty)` in sniff/reject metadata for disabled options.
+ * Returns whether a token is absent, blank, or DuckDB's `(empty)` marker.
+ * Use it, for example, to detect a disabled CSV option in sniff metadata.
  */
 export function isDuckDbEmptyToken(value: string | null | undefined): boolean {
   if (value == null) {
@@ -13,7 +14,9 @@ export function isDuckDbEmptyToken(value: string | null | undefined): boolean {
 }
 
 /**
- * Normalizes UI / sniff tokens to `undefined` when the option is disabled.
+ * Returns `undefined` for an empty DuckDB CSV option token, or the original
+ * value.
+ * Use it, for example, when interpreting a sniffed quote or escape option.
  */
 export function normalizeDuckDbCsvOptionToken(
   value: string | null | undefined,

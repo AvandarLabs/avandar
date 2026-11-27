@@ -1,8 +1,9 @@
 import { assertIsDefined } from "@avandar/utils";
 import { Button, Loader } from "@mantine/core";
-import { ReactNode, useState } from "react";
+import { useState } from "react";
 import { useCurrentUser } from "@/hooks/users/useCurrentUser";
 import { goToBillingPortal } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/BillingPortalButton/goToBillingPortal";
+import type { ReactNode } from "react";
 
 type Props = {
   children: ReactNode;

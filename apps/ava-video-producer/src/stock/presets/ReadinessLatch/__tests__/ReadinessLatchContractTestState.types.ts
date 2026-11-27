@@ -1,5 +1,5 @@
 import { type Input } from "../ReadinessLatch.schema";
-import {
+import type {
   _render,
   _getResultBoundsFromMarkup,
 } from "./ReadinessLatchTestHelpers";

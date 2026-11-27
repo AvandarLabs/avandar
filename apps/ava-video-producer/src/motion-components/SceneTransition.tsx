@@ -1,9 +1,7 @@
 import { AbsoluteFill } from "remotion";
-import {
-  SceneTransitionProps,
-  getSceneTransitionStyle,
-} from "./getSceneTransitionStyle";
+import { getSceneTransitionStyle } from "./getSceneTransitionStyle";
 import { MotionSettings } from "./MotionSettings/MotionSettings";
+import type { SceneTransitionProps } from "./getSceneTransitionStyle";
 import type { TransitionPresentationComponentProps as Props } from "@remotion/transitions";
 import type { ReactNode } from "react";
 /**

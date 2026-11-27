@@ -1,8 +1,8 @@
 import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
-import { fixtures } from "../StormwaterStorageSpill.fixtures";
 import { assertDestinationKeysClearCompleteMarkup as _assertDestinationKeysClearCompleteMarkup } from "./assertDestinationKeysClearCompleteMarkup";
 import { makeDestinationKeysClearCompleteSegmentsFromX as _makeDestinationKeysClearCompleteSegmentsFromX } from "./makeDestinationKeysClearCompleteSegmentsFromX";
 import { _render } from "./StormwaterStorageSpillTestHelpers";
+import type { fixtures } from "../StormwaterStorageSpill.fixtures";
 
 /** Asserts destination keys clear the complete visible overflow crest. */
 export function assertDestinationKeysClearCompleteOverflowSide({

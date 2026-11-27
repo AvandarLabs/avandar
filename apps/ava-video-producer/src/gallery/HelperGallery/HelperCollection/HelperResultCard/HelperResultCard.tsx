@@ -1,6 +1,6 @@
 import { HelperCard } from "../../HelperCard/HelperCard";
 import { getHelperCategoryLabelFromId } from "../../helperCategoryHelpers";
-import { useHelperGallery } from "../../useHelperGallery";
+import type { useHelperGallery } from "../../useHelperGallery";
 import type { ReactNode } from "react";
 
 type Props = {

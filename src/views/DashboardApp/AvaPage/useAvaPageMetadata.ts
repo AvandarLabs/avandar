@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 import { z } from "zod";
 import { uuidType } from "$/lib/zodHelpers";
-import { Dashboard } from "$/models/Dashboard/Dashboard";
-import { Workspace } from "$/models/Workspace/Workspace";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { Workspace } from "$/models/Workspace/Workspace";
 import type { PuckContext } from "@puckeditor/core";
 
 /** Where a page's dashboard data comes from. */

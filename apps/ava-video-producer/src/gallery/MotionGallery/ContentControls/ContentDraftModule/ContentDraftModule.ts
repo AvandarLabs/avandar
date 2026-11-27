@@ -332,7 +332,9 @@ function _createCollectionItem({
       }),
     );
     let contentId = `item-${++itemSequence}`;
-    while (ids.has(contentId)) contentId = `item-${++itemSequence}`;
+    while (ids.has(contentId)) {
+      contentId = `item-${++itemSequence}`;
+    }
     return { ...blankItem, id: contentId };
   }
   return blankItem;

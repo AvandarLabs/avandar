@@ -51,9 +51,7 @@ type ConceptStatusInsert = SetOptional<
 
 type ConceptStatusUpdate = Partial<ConceptStatusInsert>;
 
-/**
- * CRUD type definitions for the ConceptStatus model.
- */
+/** CRUD type definitions for the ConceptStatus model. */
 export type ConceptStatusModel = SupabaseCrudModelSpec<
   {
     tableName: "concept_statuses";

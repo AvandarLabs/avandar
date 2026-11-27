@@ -1,7 +1,9 @@
 import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 
 /**
- * Makes frozen minimum, mid-radius, and maximum proportional-symbol stops.
+ * Creates labeled radius stops from finite values for a size legend.
+ * For example, use it to show proportional-symbol sizes on a map.
+ * Returns no stops when there are no finite values.
  */
 export function makeSizeLegendStops(
   options: Readonly<{

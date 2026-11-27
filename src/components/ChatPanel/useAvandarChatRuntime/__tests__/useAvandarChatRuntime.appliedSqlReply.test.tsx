@@ -8,7 +8,7 @@
  */
 import { waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { WorkspaceRelationsDenied } from "@/clients/qetl/assertWorkspaceRelations/WorkspaceRelationsDenied";
+import { WorkspaceRelationsDeniedError } from "@/clients/qetl/assertWorkspaceRelations/WorkspaceRelationsDeniedError";
 import {
   DATASET_A_ID,
   DATASET_B_ID,
@@ -40,7 +40,7 @@ afterEach(() => {
 describe("useAvandarChatRuntime reply to SQL it applied", () => {
   it("does not say the results are ready when the query is refused", async () => {
     runQueryMock.mockRejectedValue(
-      new WorkspaceRelationsDenied({
+      new WorkspaceRelationsDeniedError({
         workspaceId: WORKSPACE_A.id,
         deniedDatasetIds: [DATASET_B_ID],
       }),

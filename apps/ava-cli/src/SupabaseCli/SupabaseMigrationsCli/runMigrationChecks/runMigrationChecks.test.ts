@@ -37,11 +37,9 @@ function findCheck(
 }
 
 describe("runMigrationChecks", () => {
-  /**
-   * A check that only names the problem leaves the reader to guess the fix, so
-   * every non-passing check has to say what to do about it. This drives one
-   * snapshot that trips every check at once.
-   */
+  // A check that only names the problem leaves the reader to guess the fix, so
+  // every non-passing check has to say what to do about it. This drives one
+  // snapshot that trips every check at once.
   it("tells the reader how to fix every check that does not pass", () => {
     const storageFile = "20990101000000_STORAGE-bad.sql";
     const results = runMigrationChecks(

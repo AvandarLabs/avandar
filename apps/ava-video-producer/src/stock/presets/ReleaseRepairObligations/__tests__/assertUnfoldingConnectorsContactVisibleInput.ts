@@ -1,5 +1,5 @@
-import { fixtures } from "../ReleaseRepairObligations.fixtures";
 import { assertUnfoldingConnectorsContactVisibleIssueMarks as _assertUnfoldingConnectorsContactVisibleIssueMarks } from "./assertUnfoldingConnectorsContactVisibleIssueMarks";
+import type { fixtures } from "../ReleaseRepairObligations.fixtures";
 
 /**
  * Asserts unfolding connectors contact the visible mark boundary before

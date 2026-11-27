@@ -1,5 +1,5 @@
-import { fixtures } from "../PooledDonorAllocation.fixtures";
 import { assertEveryAttributedCreditStaysFrame as _assertEveryAttributedCreditStaysFrame } from "./assertEveryAttributedCreditStaysFrame";
+import type { fixtures } from "../PooledDonorAllocation.fixtures";
 
 /**
  * Asserts every attributed credit stays singular, restricted and visibly

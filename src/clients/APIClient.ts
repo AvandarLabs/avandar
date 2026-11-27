@@ -1,6 +1,5 @@
-import { Simplify } from "type-fest";
 import { createServerApiClient } from "$/ServerApiClient";
-import { ValidUrlQueryParamValue } from "$/utils/urls/buildHttpQueryString/buildHttpQueryString";
+import type { ValidUrlQueryParamValue } from "$/utils/urls/buildHttpQueryString/buildHttpQueryString";
 import type {
   API,
   APIBody,
@@ -9,6 +8,7 @@ import type {
   APIReturnType,
 } from "@/types/http-api.types";
 import type { HTTPMethod } from "@sbfn/_shared/MiniServer/api.types";
+import type { Simplify } from "type-fest";
 
 // Platform-aware server API client. On web this delegates to the registered
 // Supabase client's `functions.invoke`; on desktop it bridges
@@ -61,7 +61,9 @@ async function sendHTTPRequest<
 }
 
 /**
- * HTTP client for making requests to our Supabase edge functions API.
+ * Sends typed requests to Supabase edge-function API routes and returns their
+ * responses.
+ * Use it, for example, when a feature needs to call an edge-function endpoint.
  */
 export const APIClient = {
   get: async <Route extends keyof API>(

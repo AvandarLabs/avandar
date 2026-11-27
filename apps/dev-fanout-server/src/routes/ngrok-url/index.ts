@@ -3,7 +3,7 @@ import {
   onListNgrokUrls,
   onRemoveNgrokUrl,
 } from "@fanout-server/routes/ngrok-url/ngrok-url";
-import { FastifyPluginAsync } from "fastify";
+import type { FastifyPluginAsync } from "fastify";
 
 /** Register endpoints to manage persisted ngrok dev URLs. */
 export const registerNgrokUrlRoutes: FastifyPluginAsync = async (server) => {

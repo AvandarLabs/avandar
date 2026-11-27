@@ -1,6 +1,6 @@
 import { propEq } from "@avandar/utils";
 import { AuthClient } from "@/clients/AuthClient/AuthClient";
-import { WorkspaceMembershipDenied } from "@/clients/qetl/assertWorkspaceMembership/WorkspaceMembershipDenied";
+import { WorkspaceMembershipDeniedError } from "@/clients/qetl/assertWorkspaceMembership/WorkspaceMembershipDeniedError";
 import { WorkspaceClient } from "@/clients/WorkspaceClient";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import type { UserId } from "$/models/User/User.types";
@@ -44,8 +44,8 @@ import type { Workspace } from "$/models/Workspace/Workspace";
  * the authenticated user. Defaults to the authenticated user.
  * @returns The authenticated user id, cross-checked against `userId` when one
  * was given.
- * @throws WorkspaceMembershipDenied if nobody is authenticated, if `userId` is
- * not the authenticated user, or if that user is not a member of
+ * @throws WorkspaceMembershipDeniedError if nobody is authenticated, if
+ * `userId` is not the authenticated user, or if that user is not a member of
  * `workspaceId`. Rethrows the underlying error if membership could not be
  * read.
  */
@@ -65,13 +65,13 @@ export async function assertWorkspaceMembership(
   // below would answer from whatever list a previously signed-in user left in
   // the query cache for this tab.
   if (!authenticatedUserId) {
-    throw new WorkspaceMembershipDenied({
+    throw new WorkspaceMembershipDeniedError({
       code: "not-authenticated",
       workspaceId: options.workspaceId,
     });
   }
   if (options.userId !== undefined && options.userId !== authenticatedUserId) {
-    throw new WorkspaceMembershipDenied({
+    throw new WorkspaceMembershipDeniedError({
       code: "principal-mismatch",
       workspaceId: options.workspaceId,
     });
@@ -89,7 +89,7 @@ export async function assertWorkspaceMembership(
 
   // An empty list is an answer (deny), never a cache miss worth retrying.
   if (!workspaces.some(propEq("id", options.workspaceId))) {
-    throw new WorkspaceMembershipDenied({
+    throw new WorkspaceMembershipDeniedError({
       code: "not-a-member",
       workspaceId: options.workspaceId,
     });

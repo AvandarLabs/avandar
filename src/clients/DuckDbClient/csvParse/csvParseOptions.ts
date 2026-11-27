@@ -26,7 +26,8 @@ function _isRecoverableRejectErrorType(errorType: string): boolean {
 }
 
 /**
- * Builds baseline resolved options from user hints before sniffing.
+ * Builds resolved CSV options from user hints and defaults.
+ * Use it, for example, to prepare options before sniffing a CSV.
  */
 export function createCsvParseOptionsFromUserHints(
   hints: CsvParseUserHints,
@@ -49,7 +50,9 @@ export function createCsvParseOptionsFromUserHints(
 }
 
 /**
- * Merges `sniff_csv` into resolved options (user hints win when set).
+ * Returns resolved options merged with a sniffed CSV row, preserving user
+ * hints.
+ * Use it, for example, to incorporate detected CSV settings before parsing.
  */
 export function mergeSniffCsvRowIntoParseOptions(options: {
   base: CsvParseResolvedOptions;
@@ -100,7 +103,10 @@ export function mergeSniffCsvRowIntoParseOptions(options: {
 }
 
 /**
- * Applies best-guess fixes after a failed or partial parse.
+ * Returns adjusted CSV options for recoverable rejected rows, or the original
+ * options.
+ * Use it, for example, when preparing another parse attempt after rejected
+ * rows.
  */
 export function refineCsvParseOptionsAfterFailure(options: {
   parseOptions: CsvParseResolvedOptions;

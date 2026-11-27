@@ -79,9 +79,7 @@ export type PartitionResult = {
   unknown: Statement[];
 };
 
-/**
- * Options for `partitionStatements`.
- */
+/** Options for `partitionStatements`. */
 export type PartitionStatementsOptions = {
   statements: readonly Statement[];
   syncable: readonly string[];

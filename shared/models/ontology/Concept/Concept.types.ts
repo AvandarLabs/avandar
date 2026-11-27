@@ -64,9 +64,7 @@ type ConceptFull = ConceptRead & {
   >;
 };
 
-/**
- * CRUD type definitions for the Concept model.
- */
+/** CRUD type definitions for the Concept model. */
 export type ConceptModel = SupabaseCrudModelSpec<
   {
     tableName: "concepts";

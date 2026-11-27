@@ -1,7 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-/**
- * Go-to search: coordinate fly, P-code lookup, and inline errors.
- */
+/** Go-to search: coordinate fly, P-code lookup, and inline errors. */
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { MapLayerSpatialFeatureProperties } from "@/clients/maps/MapLayerSpatialQuery/MapLayerSpatialQuery.constants";

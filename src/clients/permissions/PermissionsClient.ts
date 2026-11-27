@@ -4,58 +4,24 @@ import { withNewMembers } from "@avandar/modules";
 import { withQueryHooks } from "@avandar/query-hooks";
 import { AvaSupabase } from "$/db/supabase/AvaSupabase";
 import { Permissions } from "$/models/Permissions/Permissions";
-import { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
+import { createRoleGroupWithMatrixFromRow } from "./createRoleGroupWithMatrixFromRow";
+import {
+  deleteCustomRoleGroup,
+  getRoleGroupIdFromMatrix,
+  getUserGroupsFromWorkspace,
+  saveUserGroupMemberships,
+} from "./PermissionMembershipHelpers";
 import type {
-  AppType,
   RoleLevel,
   UserAppRolesMatrix,
 } from "$/models/Permissions/Permissions.types";
 import type { UserId } from "$/models/User/User.types";
 import type { WorkspaceId } from "$/models/Workspace/Workspace.types";
-import type { Database } from "$/types/database.types";
+import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
+import type { RoleGroupWithMatrix } from "./createRoleGroupWithMatrixFromRow";
+import type { ResourceType, UserGroupRow } from "./PermissionsClient.types";
 import type { ILogger } from "@avandar/logger";
 
-export type ResourceType = Database["public"]["Enums"]["resource_type"];
-
-export type RoleGroupWithMatrix = {
-  id: string;
-  workspaceId: WorkspaceId;
-  name: string;
-  isBuiltin: boolean;
-  roleMatrix: UserAppRolesMatrix;
-};
-
-export type UserGroupRow = {
-  id: string;
-  workspaceId: WorkspaceId;
-  name: string;
-  color: string;
-};
-
-function mapRoleGroupRow(row: {
-  id: string;
-  workspace_id: string;
-  name: string;
-  is_builtin: boolean;
-  role_group_app_roles: Array<{ app: AppType; role: RoleLevel }> | null;
-}): RoleGroupWithMatrix {
-  const rows = row.role_group_app_roles ?? [];
-  return {
-    id: row.id,
-    workspaceId: row.workspace_id as WorkspaceId,
-    name: row.name,
-    isBuiltin: row.is_builtin,
-    roleMatrix: Permissions.RolesMatrix.rowsToUserAppRolesMatrix(
-      rows.map((r) => {
-        return { app: r.app, role: r.role };
-      }),
-    ),
-  };
-}
-
-// TODO(jpsyx): investigate if this can be significantly refactored by creating
-// clients for each permission-related table. Because right now this file is
-// just way too big.
 function createPermissionsClient(supabaseClient: AvaSupabaseDBClient) {
   const baseClient = createServiceClient("PermissionsClient").mixin(
     withSupabaseClient(supabaseClient),
@@ -65,9 +31,7 @@ function createPermissionsClient(supabaseClient: AvaSupabaseDBClient) {
     const dbClient = baseClient.getDb();
     const newClient = baseClient.mixin(
       withNewMembers({
-        /**
-         * Loads role groups and their per-app matrices for a workspace.
-         */
+        /** Loads role groups and their per-app matrices for a workspace. */
         getRoleGroupsWithMatrices: async ({
           workspaceId,
         }: {
@@ -90,12 +54,10 @@ function createPermissionsClient(supabaseClient: AvaSupabaseDBClient) {
             .order("is_builtin", { ascending: false })
             .order("name")
             .throwOnError();
-          return (data ?? []).map(mapRoleGroupRow);
+          return (data ?? []).map(createRoleGroupWithMatrixFromRow);
         },
 
-        /**
-         * Loads per-app roles for any workspace member (settings-admin UI).
-         */
+        /** Loads per-app roles for any workspace member (settings-admin UI). */
         getMemberAppRoles: async ({
           workspaceId,
           userId,
@@ -170,29 +132,16 @@ function createPermissionsClient(supabaseClient: AvaSupabaseDBClient) {
           return role;
         },
 
-        /**
-         * Loads workspace user-group tags.
-         */
+        /** Loads workspace user-group tags. */
         getUserGroups: async ({
           workspaceId,
         }: {
           workspaceId: WorkspaceId;
         }): Promise<UserGroupRow[]> => {
-          const logger = baseLogger.appendName("getUserGroups");
-          logger.log("fetch user groups", { workspaceId });
-          const { data } = await dbClient
-            .from("user_groups")
-            .select("id, workspace_id, name, color")
-            .eq("workspace_id", workspaceId)
-            .order("name")
-            .throwOnError();
-          return (data ?? []).map((row) => {
-            return {
-              id: row.id,
-              workspaceId: row.workspace_id as WorkspaceId,
-              name: row.name,
-              color: row.color,
-            };
+          return getUserGroupsFromWorkspace({
+            dbClient,
+            baseLogger,
+            workspaceId,
           });
         },
 
@@ -218,49 +167,12 @@ function createPermissionsClient(supabaseClient: AvaSupabaseDBClient) {
           const logger = baseLogger.appendName("saveMemberWorkspaceRoles");
           logger.log("save member roles", { membershipId, userId });
 
-          const match = knownRoleGroups.find((group) => {
-            return Permissions.RolesMatrix.areRoleMatricesEqual(
-              group.roleMatrix,
-              targetMatrix,
-            );
+          const resolvedGroupId = await getRoleGroupIdFromMatrix({
+            dbClient,
+            workspaceId,
+            targetMatrix,
+            knownRoleGroups,
           });
-          let resolvedGroupId: string;
-          if (match) {
-            resolvedGroupId = match.id;
-          } else {
-            const roleGroupName =
-              await Permissions.buildInitialCustomRoleGroupName({
-                db: dbClient,
-                workspaceId,
-              });
-            const { data: created } = await dbClient
-              .from("role_groups")
-              .insert({
-                workspace_id: workspaceId,
-                name: roleGroupName,
-                is_builtin: false,
-              })
-              .select("id")
-              .single()
-              .throwOnError();
-            resolvedGroupId = created.id;
-            const rows =
-              Permissions.RolesMatrix.userAppRolesMatrixToRows(targetMatrix);
-            if (rows.length > 0) {
-              await dbClient
-                .from("role_group_app_roles")
-                .insert(
-                  rows.map((row) => {
-                    return {
-                      role_group_id: resolvedGroupId,
-                      app: row.app,
-                      role: row.role,
-                    };
-                  }),
-                )
-                .throwOnError();
-            }
-          }
 
           await dbClient
             .from("workspace_memberships")
@@ -269,37 +181,15 @@ function createPermissionsClient(supabaseClient: AvaSupabaseDBClient) {
             .eq("workspace_id", workspaceId)
             .throwOnError();
 
-          const { data: workspaceGroups } = await dbClient
-            .from("user_groups")
-            .select("id")
-            .eq("workspace_id", workspaceId)
-            .throwOnError();
-          const workspaceGroupIds = (workspaceGroups ?? []).map((g) => {
-            return g.id;
+          await saveUserGroupMemberships({
+            dbClient,
+            workspaceId,
+            userId,
+            userGroupIds,
           });
-          if (workspaceGroupIds.length > 0) {
-            await dbClient
-              .from("user_group_memberships")
-              .delete()
-              .eq("user_id", userId)
-              .in("user_group_id", workspaceGroupIds)
-              .throwOnError();
-          }
-          if (userGroupIds.length > 0) {
-            await dbClient
-              .from("user_group_memberships")
-              .insert(
-                userGroupIds.map((userGroupId) => {
-                  return { user_group_id: userGroupId, user_id: userId };
-                }),
-              )
-              .throwOnError();
-          }
         },
 
-        /**
-         * Creates a custom role group with a full per-app matrix.
-         */
+        /** Creates a custom role group with a full per-app matrix. */
         createCustomRoleGroup: async ({
           workspaceId,
           name,
@@ -345,9 +235,7 @@ function createPermissionsClient(supabaseClient: AvaSupabaseDBClient) {
           };
         },
 
-        /**
-         * Replaces name and matrix rows for a non-built-in role group.
-         */
+        /** Replaces name and matrix rows for a non-built-in role group. */
         updateCustomRoleGroup: async ({
           workspaceId,
           roleGroupId,
@@ -408,28 +296,15 @@ function createPermissionsClient(supabaseClient: AvaSupabaseDBClient) {
           workspaceId: WorkspaceId;
           roleGroupId: string;
         }): Promise<void> => {
-          const logger = baseLogger.appendName("deleteCustomRoleGroup");
-          logger.log("delete role group", { roleGroupId });
-          const { data: rg } = await dbClient
-            .from("role_groups")
-            .select("id, is_builtin")
-            .eq("id", roleGroupId)
-            .eq("workspace_id", workspaceId)
-            .single()
-            .throwOnError();
-          if (rg.is_builtin) {
-            throw new Error("Built-in role groups cannot be deleted.");
-          }
-          await dbClient
-            .from("role_groups")
-            .delete()
-            .eq("id", roleGroupId)
-            .throwOnError();
+          return deleteCustomRoleGroup({
+            dbClient,
+            baseLogger,
+            workspaceId,
+            roleGroupId,
+          });
         },
 
-        /**
-         * Creates or updates a user-group tag.
-         */
+        /** Creates or updates a user-group tag. */
         saveUserGroup: async ({
           workspaceId,
           userGroupId,
@@ -473,9 +348,7 @@ function createPermissionsClient(supabaseClient: AvaSupabaseDBClient) {
           };
         },
 
-        /**
-         * Deletes a user-group tag.
-         */
+        /** Deletes a user-group tag. */
         deleteUserGroup: async ({
           workspaceId,
           userGroupId,
@@ -518,3 +391,7 @@ function createPermissionsClient(supabaseClient: AvaSupabaseDBClient) {
 }
 
 export const PermissionsClient = createPermissionsClient(AvaSupabase.db());
+
+export type { RoleGroupWithMatrix } from "./createRoleGroupWithMatrixFromRow";
+
+export type { ResourceType, UserGroupRow } from "./PermissionsClient.types";

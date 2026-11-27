@@ -91,9 +91,7 @@ export type DashboardRead = Model.Base<
   }
 >;
 
-/**
- * CRUD type definitions for the Dashboard model.
- */
+/** CRUD type definitions for the Dashboard model. */
 export type DashboardModel = SupabaseCrudModelSpec<
   {
     tableName: "dashboards";

@@ -1,6 +1,4 @@
-/**
- * Derives the default temporary project id from a Git branch name.
- */
+/** Derives the default temporary project id from a Git branch name. */
 import { makeTemporaryProjectIdFromBranch } from "@ava-cli/SupabaseCli/SupabaseLocalEnvironment/makeTemporaryProjectIdFromBranch/makeTemporaryProjectIdFromBranch";
 import { describe, expect, it } from "vitest";
 

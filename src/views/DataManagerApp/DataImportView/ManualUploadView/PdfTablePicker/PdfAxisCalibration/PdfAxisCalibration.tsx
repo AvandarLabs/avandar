@@ -40,7 +40,10 @@ function _hintsFrom(
 }
 
 /**
- * Two-point y-axis calibration: click ticks on the page, type their values.
+ * Collects two y-axis tick values and supplies position/value hints for
+ * calibration.
+ * Use it, for example, when manually calibrating a chart region imported from a
+ * PDF.
  */
 export function PdfAxisCalibration({
   isPicking,

@@ -2,7 +2,7 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { assertWorkspaceRelations } from "@/clients/qetl/assertWorkspaceRelations/assertWorkspaceRelations";
-import { WorkspaceRelationsDenied } from "@/clients/qetl/assertWorkspaceRelations/WorkspaceRelationsDenied";
+import { WorkspaceRelationsDeniedError } from "@/clients/qetl/assertWorkspaceRelations/WorkspaceRelationsDeniedError";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -131,8 +131,8 @@ describe("assertWorkspaceRelations", () => {
       }),
     );
 
-    expect(error).toBeInstanceOf(WorkspaceRelationsDenied);
-    expect((error as WorkspaceRelationsDenied).deniedDatasetIds).toEqual([
+    expect(error).toBeInstanceOf(WorkspaceRelationsDeniedError);
+    expect((error as WorkspaceRelationsDeniedError).deniedDatasetIds).toEqual([
       FOREIGN_DATASET_ID,
     ]);
   });
@@ -148,8 +148,8 @@ describe("assertWorkspaceRelations", () => {
       }),
     );
 
-    expect(error).toBeInstanceOf(WorkspaceRelationsDenied);
-    expect((error as WorkspaceRelationsDenied).deniedDatasetIds).toEqual([
+    expect(error).toBeInstanceOf(WorkspaceRelationsDeniedError);
+    expect((error as WorkspaceRelationsDeniedError).deniedDatasetIds).toEqual([
       FOREIGN_DATASET_ID,
     ]);
   });
@@ -182,7 +182,7 @@ describe("assertWorkspaceRelations", () => {
       }),
     );
 
-    expect(error).toBeInstanceOf(WorkspaceRelationsDenied);
+    expect(error).toBeInstanceOf(WorkspaceRelationsDeniedError);
   });
 
   it("deduplicates references so a self-join is not reported twice", async () => {
@@ -224,7 +224,7 @@ describe("assertWorkspaceRelations", () => {
     );
 
     expect(error).toBe(readFailure);
-    expect(error).not.toBeInstanceOf(WorkspaceRelationsDenied);
+    expect(error).not.toBeInstanceOf(WorkspaceRelationsDeniedError);
   });
 
   it("honors invalidation, so a revoked dataset stops authorizing", async () => {
@@ -250,7 +250,7 @@ describe("assertWorkspaceRelations", () => {
       }),
     );
 
-    expect(error).toBeInstanceOf(WorkspaceRelationsDenied);
+    expect(error).toBeInstanceOf(WorkspaceRelationsDeniedError);
     expect(fetchDatasetsMock).toHaveBeenCalledTimes(2);
   });
 

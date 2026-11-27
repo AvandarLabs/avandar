@@ -1,14 +1,14 @@
 import {
   formatDate,
-  FormattableTimezone,
   isDate,
   isISODateString,
   isNullish,
   isValidDateValue,
 } from "@avandar/utils";
 import { Text } from "@mantine/core";
-import { ReactNode } from "react";
 import { NullOrUndefinedValueItem } from "./NullOrUndefinedValueItem";
+import type { FormattableTimezone } from "@avandar/utils";
+import type { ReactNode } from "react";
 
 type Props = {
   /** The value to render. */
@@ -26,14 +26,10 @@ type Props = {
   /** What we display for undefined values. */
   renderUndefinedString: NonNullable<ReactNode>;
 
-  /**
-   * The format to use for dates.
-   */
+  /** The format to use for dates. */
   dateFormat: string;
 
-  /**
-   * The timezone to use for dates.
-   */
+  /** The timezone to use for dates. */
   dateTimeZone: FormattableTimezone;
 };
 

@@ -119,9 +119,7 @@ SCHEMA
   stacked as they are, and name columns that match and columns that differ,
   including names that differ only by a character such as _ or /.`;
 
-/**
- * v3: v2's rules, plus how to read the attached and mentioned blocks.
- */
+/** v3: v2's rules, plus how to read the attached and mentioned blocks. */
 const DATA_AGENT_INSTRUCTIONS_V3 =
   DATA_AGENT_INSTRUCTIONS_V2 +
   ATTACHED_AND_MENTIONED_RULES +

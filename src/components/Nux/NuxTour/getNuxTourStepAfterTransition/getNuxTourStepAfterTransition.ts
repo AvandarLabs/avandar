@@ -1,6 +1,4 @@
-/**
- * What the tour should do after Joyride reports the user left a tooltip.
- */
+/** What the tour should do after Joyride reports the user left a tooltip. */
 export type NuxTourStepAfterTransition =
   | { kind: "close" }
   | { kind: "goToStep"; index: number };

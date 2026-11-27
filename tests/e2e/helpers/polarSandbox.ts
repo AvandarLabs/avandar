@@ -5,7 +5,9 @@ import type { AvaSupabaseDBClient } from "$/types/AvaSupabaseDbClient.types";
 type PolarServerType = "sandbox" | "production";
 
 /**
- * Creates a Polar SDK client for e2e cleanup using `.env.development` vars.
+ * Creates the configured Polar client for `bestEffortRevokePolarSubscription`.
+ * Returns undefined when the token or server configuration is missing or
+ * invalid.
  */
 function _createE2EPolarClient(): Polar | undefined {
   const accessToken = process.env.POLAR_ACCESS_TOKEN;
@@ -33,7 +35,8 @@ function _createE2EPolarClient(): Polar | undefined {
 }
 
 /**
- * Revokes a Polar subscription immediately (best-effort).
+ * Attempts to revoke a Polar subscription immediately and logs revoke failures.
+ * Use it, for example, to clean up a subscription after an end-to-end test.
  */
 export async function bestEffortRevokePolarSubscription(options: {
   polarSubscriptionId: string;
@@ -58,7 +61,9 @@ export async function bestEffortRevokePolarSubscription(options: {
 }
 
 /**
- * Loads the workspace subscription row and revokes Polar if present.
+ * Attempts to revoke the Polar subscription associated with a workspace, if
+ * present.
+ * Use it, for example, to clean up a workspace after a billing test.
  */
 export async function bestEffortRevokePolarSubscriptionForWorkspace(options: {
   supabaseAdminClient: AvaSupabaseDBClient;

@@ -1,6 +1,4 @@
-/**
- * Shared map-tool fakes and pointer helpers for AnnotateMapTool tests.
- */
+/** Shared map-tool fakes and pointer helpers for AnnotateMapTool tests. */
 import { fireEvent, screen } from "@/test-utils";
 
 export {

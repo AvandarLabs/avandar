@@ -1,4 +1,4 @@
-import { getVisibleReleaseIssueRowsFromInput } from "../getVisibleReleaseIssueRowsFromInput";
+import type { getVisibleReleaseIssueRowsFromInput } from "../getVisibleReleaseIssueRowsFromInput";
 /** Inputs shared by the RepairRegister visuals. */
 export type Point = Readonly<{ x: number; y: number }>;
 /** Inputs shared by the RepairRegister visuals. */

@@ -1,6 +1,5 @@
 import { isDefined, prop } from "@avandar/utils";
 import { SubscriptionParsers } from "$/models/Subscription/SubscriptionParsers";
-import { Workspace } from "$/models/Workspace/Workspace";
 import { WorkspaceParsers } from "$/models/Workspace/WorkspaceParsers";
 import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient";
 import { createServerApiClient } from "$/ServerApiClient";
@@ -10,6 +9,7 @@ import { UserProfileDBReadToModelReadSchema } from "@/clients/UserClient";
 import { createUsableServiceClient } from "@/utils/createUsableServiceClient";
 import type { UserId } from "$/models/User/User.types";
 import type { WorkspaceMemberProfile } from "$/models/User/UserProfile.types";
+import type { Workspace } from "$/models/Workspace/Workspace";
 
 // Platform-aware server API client; lazy-readable from any mutation/query.
 const serverApi = createServerApiClient();

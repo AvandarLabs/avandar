@@ -1,6 +1,4 @@
-/**
- * Buffer distance unit conversions on the `MapLayer` module.
- */
+/** Buffer distance unit conversions on the `MapLayer` module. */
 import { describe, expect, it } from "vitest";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
 

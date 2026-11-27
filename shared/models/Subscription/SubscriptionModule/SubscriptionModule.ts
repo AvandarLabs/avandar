@@ -113,9 +113,7 @@ export const SubscriptionModule = {
     return { type: "plan", featurePlanType: subscription.featurePlanType };
   },
 
-  /**
-   * Whether a subscription row is a native free subscription (no Polar).
-   */
+  /** Whether a subscription row is a native free subscription (no Polar). */
   isNativeFreeSubscription: (
     subscription: Pick<
       SubscriptionRead,
@@ -128,9 +126,7 @@ export const SubscriptionModule = {
     );
   },
 
-  /**
-   * Whether create-free should run for this workspace subscription state.
-   */
+  /** Whether create-free should run for this workspace subscription state. */
   shouldCreateNativeFreeSubscription: (
     subscription:
       | Pick<

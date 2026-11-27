@@ -1,5 +1,8 @@
-import { DEFAULT_INPUT, fixtures } from "../../PdfGridReconstruction.fixtures";
 import { assertCompleteMovingColumnsRemainFrame as _assertCompleteMovingColumnsRemainFrame } from "./assertCompleteMovingColumnsRemainFrame";
+import type {
+  DEFAULT_INPUT,
+  fixtures,
+} from "../../PdfGridReconstruction.fixtures";
 
 /**
  * Asserts complete moving columns remain distinct from all retained source

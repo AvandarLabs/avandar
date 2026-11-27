@@ -1,9 +1,9 @@
-import { QueryClient } from "@tanstack/react-query";
 import { createRouter } from "@tanstack/react-router";
 import { AppErrorBoundary } from "@/components/AppErrorBoundary/AppErrorBoundary";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import { routeTree } from "@/routeTree.gen";
 import type { User } from "$/models/User/User";
+import type { QueryClient } from "@tanstack/react-query";
 
 export const AvaRouter = createRouter({
   routeTree,

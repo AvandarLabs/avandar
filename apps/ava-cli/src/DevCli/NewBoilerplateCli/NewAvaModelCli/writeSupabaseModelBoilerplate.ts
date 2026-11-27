@@ -4,7 +4,8 @@ import { writeFileFromTemplate } from "@ava-cli/utils/writeFileFromTemplate/writ
 import { Acclimate } from "@avandar/acclimate";
 
 /**
- * Writes a Supabase-backed model folder with parsers and a client stub.
+ * Creates model types, parsers, and a client stub for a Supabase table.
+ * Use it, for example, when scaffolding a database-backed model.
  */
 export function writeSupabaseModelBoilerplate(options: {
   modelName: string;

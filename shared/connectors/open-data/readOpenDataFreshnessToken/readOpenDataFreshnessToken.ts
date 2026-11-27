@@ -3,7 +3,7 @@ import { match } from "ts-pattern";
 import { buildCkanSourceVersion } from "$/connectors/open-data/buildCkanSourceVersion.ts";
 import { createCkanClient } from "$/connectors/open-data/CkanClient/CkanClient.ts";
 import { makeSourceVersionFromSocrataViewMetadata } from "$/connectors/open-data/makeSourceVersionFromSocrataViewMetadata/makeSourceVersionFromSocrataViewMetadata.ts";
-import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
+import { OpenDataAcquisitionFailedError } from "$/connectors/open-data/openDataErrors.ts";
 import { readFreshnessProbeToken } from "$/connectors/open-data/readFreshnessProbeToken/readFreshnessProbeToken.ts";
 import { createSocrataClient } from "$/connectors/open-data/SocrataClient/SocrataClient.ts";
 import { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.ts";
@@ -52,7 +52,7 @@ async function _readServiceToken(params: {
     .with({ apiService: "odata" }, async () => {
       // OData has no metadata call that says when a resource changed, so an
       // OData listing is only checked through the probe its pipeline wrote.
-      throw new OpenDataAcquisitionFailed({
+      throw new OpenDataAcquisitionFailedError({
         code: "access-shape-invalid",
         accessKind: params.accessKind,
       });
@@ -68,7 +68,7 @@ async function _readServiceToken(params: {
  * source's metadata is read (`CkanClient.getPackage` /
  * `SocrataClient.getMetadata`), never its rows.
  *
- * @throws `OpenDataAcquisitionFailed` with `access-shape-invalid` when the
+ * @throws `OpenDataAcquisitionFailedError` with `access-shape-invalid` when the
  *   entry is not API-backed, is an OData listing with no probe, or names a
  *   CKAN resource its dataset no longer lists.
  */
@@ -79,7 +79,7 @@ export async function readOpenDataFreshnessToken(params: {
   const { entry, http } = params;
   const access = DataCatalogListing.toAccess(entry);
   if (!access || access.kind !== "api_resource") {
-    throw new OpenDataAcquisitionFailed({
+    throw new OpenDataAcquisitionFailedError({
       code: "access-shape-invalid",
       accessKind: entry.accessKind,
     });
@@ -99,7 +99,7 @@ export async function readOpenDataFreshnessToken(params: {
     http,
   });
   if (token === undefined) {
-    throw new OpenDataAcquisitionFailed({
+    throw new OpenDataAcquisitionFailedError({
       code: "access-shape-invalid",
       accessKind: entry.accessKind,
     });

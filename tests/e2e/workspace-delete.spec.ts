@@ -198,7 +198,9 @@ type CleanupOwnedWorkspaceOptions = {
 };
 
 /**
- * Best-effort cleanup when the test failed before deletion finished.
+ * Attempts to remove a workspace owned by the supplied user, logging cleanup
+ * errors.
+ * Use it, for example, to clean up a workspace after a deletion test.
  */
 async function _cleanupOwnedWorkspaceIfPresent(
   options: Readonly<CleanupOwnedWorkspaceOptions>,

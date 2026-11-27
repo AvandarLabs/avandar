@@ -1,7 +1,7 @@
 /** Tests that workspace QETL queries are authorized before any query work. */
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { WorkspaceMembershipDenied } from "@/clients/qetl/assertWorkspaceMembership/WorkspaceMembershipDenied";
+import { WorkspaceMembershipDeniedError } from "@/clients/qetl/assertWorkspaceMembership/WorkspaceMembershipDeniedError";
 import { WorkspaceQuerySession } from "@/clients/qetl/WorkspaceQuerySession/WorkspaceQuerySession";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import type { Dataset } from "$/models/datasets/Dataset/Dataset";
@@ -159,8 +159,8 @@ async function getDenialCode(promise: Promise<unknown>): Promise<unknown> {
       return thrown;
     },
   );
-  expect(error).toBeInstanceOf(WorkspaceMembershipDenied);
-  return (error as WorkspaceMembershipDenied).code;
+  expect(error).toBeInstanceOf(WorkspaceMembershipDeniedError);
+  return (error as WorkspaceMembershipDeniedError).code;
 }
 
 beforeEach(() => {

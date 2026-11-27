@@ -91,7 +91,7 @@ export type RelationCachePort = {
    * Stores one relation. Idempotent on the identity's `identityKey`, and
    * supersedes any other live entry for the same principal and relation.
    * A quota-exceeded failure evicts to make room and retries exactly once;
-   * if the retry also fails, throws `RelationCacheWriteFailed`.
+   * if the retry also fails, throws `RelationCacheWriteFailedError`.
    */
   write: (write: RelationCacheWrite) => Promise<void>;
 

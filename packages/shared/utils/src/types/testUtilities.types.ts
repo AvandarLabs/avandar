@@ -1,6 +1,4 @@
-/**
- * This file contains utility types to test typescript types.
- */
+/** This file contains utility types to test typescript types. */
 
 // re-export these for easier importing from this file
 export type { And, IsEqual } from "type-fest";

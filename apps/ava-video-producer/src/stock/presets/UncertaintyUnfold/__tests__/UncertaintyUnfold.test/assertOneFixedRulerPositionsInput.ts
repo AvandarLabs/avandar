@@ -1,11 +1,11 @@
-import { UncertaintyUnfoldTestState } from "./UncertaintyUnfoldTestState";
-
-const { render } = UncertaintyUnfoldTestState;
 import assert from "node:assert/strict";
 import { SvgAttributes } from "../../../../../../tests/helpers/SvgAttributes";
-import { fixtures } from "../../UncertaintyUnfold.fixtures";
 import { assertOneFixedRulerPositionsFrame as _assertOneFixedRulerPositionsFrame } from "./assertOneFixedRulerPositionsFrame";
 import { assertOneFixedRulerPositionsHold as _assertOneFixedRulerPositionsHold } from "./assertOneFixedRulerPositionsHold";
+import { UncertaintyUnfoldTestState } from "./UncertaintyUnfoldTestState";
+import type { fixtures } from "../../UncertaintyUnfold.fixtures";
+
+const { render } = UncertaintyUnfoldTestState;
 
 /**
  * Asserts one fixed ruler positions the estimate, both endpoints and an

@@ -1,7 +1,7 @@
 import { useLingui } from "@lingui/react/macro";
-import { ComponentConfig } from "@puckeditor/core";
 import { FilterPBlock } from "@/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock";
 import type { Props as FilterPBlockProps } from "@/views/DashboardApp/AvaPage/pblocks/FilterPBlock/FilterPBlock";
+import type { ComponentConfig } from "@puckeditor/core";
 
 /**
  * Build the Puck component config for the dashboard's Filter block. Reads the

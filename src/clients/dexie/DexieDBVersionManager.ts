@@ -1,7 +1,12 @@
 import { assertIsDefined, identity, objectKeys, propEq } from "@avandar/utils";
-import { Dexie } from "dexie";
 import type { DexieCrudModelSpec } from "@/clients/dexie/DexieCrudClient/DexieCrudClient.types";
-import type { EntityTable, IndexableType, Table, Transaction } from "dexie";
+import type {
+  Dexie,
+  EntityTable,
+  IndexableType,
+  Table,
+  Transaction,
+} from "dexie";
 import type { UnionToIntersection } from "type-fest";
 
 /**
@@ -38,14 +43,10 @@ type DexieModelTableRecord<M extends DexieCrudModelSpec> = UnionToIntersection<
     : never
 >;
 
-/**
- * A Dexie table representing the 'meta' table.
- */
+/** A Dexie table representing the 'meta' table. */
 type DexieMetaTable = EntityTable<{ key: string; value: string }, "key">;
 
-/**
- * A type representing a Dexie database with a specific union of models.
- */
+/** A type representing a Dexie database with a specific union of models. */
 export type DexieDBType<M extends DexieCrudModelSpec> = Dexie &
   DexieModelTableRecord<M> & {
     meta: DexieMetaTable;

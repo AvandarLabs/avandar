@@ -71,7 +71,9 @@ export function buildOpenDataDatasetColumnInputs(
 }
 
 /**
- * Stable order for catalog column rows: `display_order` then name.
+ * Returns catalog column rows ordered by display order and then name.
+ * Used by `buildOpenDataDatasetColumnInputsFromCatalogRows` to order RPC column
+ * inputs.
  */
 function _sortDataCatalogRelationColumns(
   rows: readonly DataCatalogRelationColumnRead[],

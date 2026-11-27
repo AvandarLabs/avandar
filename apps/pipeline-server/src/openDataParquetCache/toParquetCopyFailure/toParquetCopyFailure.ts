@@ -2,7 +2,7 @@ import { ParquetCopyError } from "@pipeline-server/openDataParquetCache/buildOpe
 import { PIPELINE_DOWNLOAD_MISSING_ERROR_NAME } from "@pipeline-server/openDataParquetCache/loadPipelineListingDownload/loadPipelineListingDownload";
 import { SourceDownloadFailedError } from "@pipeline-server/openDataParquetCache/streamUrlToFile/streamUrlToFile";
 import { failureToInvalidDatasetReason } from "$/connectors/open-data/failureToInvalidDatasetReason/failureToInvalidDatasetReason";
-import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors";
+import { OpenDataAcquisitionFailedError } from "$/connectors/open-data/openDataErrors";
 import type { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing";
 
 /** Why a build failed, as it is recorded on the listing. */
@@ -53,7 +53,7 @@ function _fromDownloadStatus(status: number): ParquetCopyFailure {
  * @returns The failure code, and the invalid reason when there is one.
  */
 export function toParquetCopyFailure(error: unknown): ParquetCopyFailure {
-  if (error instanceof OpenDataAcquisitionFailed) {
+  if (error instanceof OpenDataAcquisitionFailedError) {
     const invalidReason = failureToInvalidDatasetReason(error.failure);
     return {
       code: error.failure.code,

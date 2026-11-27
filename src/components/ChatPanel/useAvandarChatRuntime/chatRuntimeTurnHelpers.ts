@@ -127,7 +127,9 @@ export function assumptionNeedsSignInOrApproval(
 }
 
 /**
- * Appends the SQL-not-applied suffix for the current auth state.
+ * Returns assistant text with the sign-in or approval message appended.
+ * Use it, for example, when generated SQL cannot be applied until assumed
+ * filter values are approved or the user signs in.
  */
 export function buildSqlNotAppliedAssistantText(
   assistantText: string,

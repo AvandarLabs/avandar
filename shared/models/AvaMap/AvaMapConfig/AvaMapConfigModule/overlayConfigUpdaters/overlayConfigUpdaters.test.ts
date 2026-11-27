@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { uuid } from "$/lib/uuid.ts";
 import { AvaMapConfig } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig.ts";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
-import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
+import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 
 /** An area layer with a polygon geometry binding. */
 function _makePolygonLayer(): MapLayer.T {

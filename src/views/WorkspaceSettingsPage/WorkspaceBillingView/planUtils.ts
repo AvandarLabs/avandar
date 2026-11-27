@@ -1,5 +1,4 @@
 import { useLingui } from "@lingui/react/macro";
-import { SegmentedControlItem } from "@mantine/core";
 import { match } from "ts-pattern";
 import {
   BasicPlanConfig,
@@ -8,7 +7,7 @@ import {
 } from "$/config/FeaturePlansConfig";
 import { isOneOf } from "@/lib/utils/guards/guards";
 import { Logger } from "@/utils/Logger";
-import {
+import type {
   AnnualPaidSeatsPlan,
   FeaturePlan,
   FreePlanVariants,
@@ -17,6 +16,7 @@ import {
   PaidPlanVariants,
   SubscriptionPlan,
 } from "@/views/WorkspaceSettingsPage/WorkspaceBillingView/SubscriptionPlan.types";
+import type { SegmentedControlItem } from "@mantine/core";
 import type { SubscriptionsAPI } from "@sbfn/subscriptions/SubscriptionsRoutes.types";
 
 type AvaPolarProduct =
@@ -68,7 +68,8 @@ export function getBasePlanName(fullPlanName: string | undefined): string {
 }
 
 /**
- * Checks if a plan is a Free plan.
+ * Narrows a subscription plan to a free plan, for example when selecting
+ * the free option from a group of plans. Returns false for undefined.
  */
 export function isFreePlan(
   plan: SubscriptionPlan | undefined,
@@ -83,7 +84,8 @@ export function isSeatBasedPlan(
 }
 
 /**
- * Checks if a plan is a monthly plan.
+ * Narrows a subscription plan to a monthly paid-seat plan, for example when
+ * selecting a monthly option from a plan group. Returns false for undefined.
  */
 export function isMonthlyPaidSeatsPlan(
   plan: SubscriptionPlan | undefined,
@@ -92,7 +94,8 @@ export function isMonthlyPaidSeatsPlan(
 }
 
 /**
- * Checks if a plan is an annual plan.
+ * Narrows a subscription plan to an annual paid-seat plan, for example when
+ * selecting an annual option from a plan group. Returns false for undefined.
  */
 export function isAnnualPaidSeatsPlan(
   plan: SubscriptionPlan | undefined,

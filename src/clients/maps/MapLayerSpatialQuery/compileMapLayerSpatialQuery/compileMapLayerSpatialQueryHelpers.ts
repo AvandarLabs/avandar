@@ -11,9 +11,7 @@ import type {
 } from "../MapLayerSpatialQuery.types";
 import type { CompileOptions } from "./compileMapLayerSpatialQuery.types";
 
-/**
- * Shared SQL fragment builders used by every spatial-layer compiler.
- */
+/** Shared SQL fragment builders used by every spatial-layer compiler. */
 
 /** Overlay AOI when the layer participates in area filtering. */
 export function getAppliedAoiFromCompileOptions(

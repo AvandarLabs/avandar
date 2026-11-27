@@ -1,11 +1,11 @@
 import { Model } from "@avandar/models";
 import { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";
 import { QueryColumnReconciliation } from "$/models/queries/QueryColumn/QueryColumnReconciliation/QueryColumnReconciliation";
-import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs/AvaVizConfigs";
 import { applyQueryChange } from "@/views/DataExplorerApp/DataExplorerStateManager/dataExplorerStateHelpers";
 import { applyDefaultManualQueryLimit } from "@/views/DataExplorerApp/manualQueryLimit/manualQueryLimit";
 import type { QueryDataSource } from "$/models/queries/QueryDataSource/QueryDataSource";
+import type { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
 import type { DataExplorerAppState } from "@/views/DataExplorerApp/DataExplorerStateManager/DataExplorerAppState.types";
 
 function _getQueryFromSourceColumns(options: {

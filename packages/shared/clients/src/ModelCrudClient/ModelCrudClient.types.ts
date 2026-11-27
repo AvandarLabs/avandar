@@ -92,22 +92,13 @@ export type CrudModelSpec = {
   /** The type expected when doing a DB `update` operation */
   DBUpdate: UnknownObject;
 
-  /**
-   * The frontend model type returned from a DB `get` (Read)
-   * operation
-   */
+  /** The frontend model type returned from a DB `get` (Read) operation */
   Read: UnknownObject;
 
-  /**
-   * The frontend model type expected when inserting (creating) a
-   * new model
-   */
+  /** The frontend model type expected when inserting (creating) a new model */
   Insert: UnknownObject;
 
-  /**
-   * The frontend model type expected when updating an existing
-   * model
-   */
+  /** The frontend model type expected when updating an existing model */
   Update: UnknownObject;
 };
 

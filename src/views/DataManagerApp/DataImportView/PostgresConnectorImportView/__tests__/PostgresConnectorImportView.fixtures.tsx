@@ -1,3 +1,8 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { fireEvent } from "@testing-library/react";
+import { vi } from "vitest";
+import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
+import { act, render, screen } from "@/test-utils";
 /**
  * Shared setup for `PostgresConnectorImportView`'s split suite. Each test file
  * imports this first so its `vi.mock` calls register before the module graph.
@@ -9,12 +14,8 @@
  * function returns, so an assertion about the rendered preview cannot pass
  * against a stub that proves nothing.
  */
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { fireEvent } from "@testing-library/react";
-import { vi } from "vitest";
-import { useCurrentWorkspace } from "@/hooks/workspaces/useCurrentWorkspace";
-import { act, render, RenderOptions, screen } from "@/test-utils";
 import type { Workspace } from "$/models/Workspace/Workspace";
+import type { RenderOptions } from "@/test-utils";
 import type { ReactElement, ReactNode } from "react";
 
 /** A test-and-save result whose connection has two tables to pick from. */

@@ -1,5 +1,5 @@
-import { fixtures } from "../UtteranceToModelDraft.fixtures";
 import { assertOriginalSourceCaptionPaintFrame as _assertOriginalSourceCaptionPaintFrame } from "./assertOriginalSourceCaptionPaintFrame";
+import type { fixtures } from "../UtteranceToModelDraft.fixtures";
 
 /**
  * Asserts original source and caption paint over copies with full opaque

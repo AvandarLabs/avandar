@@ -167,7 +167,8 @@ export function reviewGeneratedSqlAssumptions(args: {
 }
 
 /**
- * Stable text hashed into consent acks for assumed SQL filter values.
+ * Builds stable text for hashing into consent acknowledgements.
+ * Use it, for example, when requesting consent for assumed SQL filter values.
  */
 export function buildGeneratedSqlAssumptionAckText(
   values: readonly string[],

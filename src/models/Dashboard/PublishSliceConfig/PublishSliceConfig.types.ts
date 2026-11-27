@@ -1,4 +1,4 @@
-import { Dataset } from "$/models/datasets/Dataset/Dataset";
+import type { Dataset } from "$/models/datasets/Dataset/Dataset";
 
 /** Internal union backing `PublishSliceConfig.RowFilter`. */
 export type PublishSliceRowFilter =

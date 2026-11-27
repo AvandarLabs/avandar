@@ -12,58 +12,6 @@ checklist**, even if the repo has unrelated helpers with the same names.
 The general functional-style and TypeScript checklists still apply; only
 the helpers below are package-specific.
 
-## Higher-order property helpers (`prop`, `propEq`)
-
-- Prefer the higher-order helpers `prop`, `propEq`, `propIn`, etc. from
-  `@avandar/utils` over inline arrow functions that only read a property,
-  compare a property, or return a property. These helpers are point-free,
-  more declarative, and avoid the visual noise of `(x) => x.foo`.
-
-  **Find candidates** (inline lambdas inside `.map` / `.filter` / `.find`
-  / `.some` / `.every` / `.flatMap` that only read a property or compare
-  one):
-
-  ```bash
-  # property-read lambdas: .map((x) => x.foo) or .map((x) => { return x.foo; })
-  grep -rEn '\.(map|flatMap|filter|find|some|every)\(\s*\(([a-zA-Z_]+)\)\s*=>\s*\2\.[a-zA-Z_]+' \
-    --include="*.ts" --include="*.tsx" .
-
-  # property-equality lambdas: .find((x) => x.id === value)
-  grep -rEn '\.(find|filter|some|every)\(\s*\(([a-zA-Z_]+)\)\s*=>\s*\2\.[a-zA-Z_]+\s*===' \
-    --include="*.ts" --include="*.tsx" .
-  ```
-
-  Non-exhaustive: misses block-body arrows (`(x) => { return x.foo; }`)
-  and lambdas bound to a named variable. Scan the diff by eye for those.
-
-  This is bad:
-
-  ```ts
-  models.map((model) => {
-    return model.id;
-  });
-  models.find((model) => {
-    return model.id === resolvedModelId;
-  });
-  resources.filter((r) => {
-    return r.resourceType === "dataset";
-  });
-  groups.flatMap((g) => g.models);
-  ```
-
-  This is good:
-
-  ```ts
-  models.map(prop("id"));
-  models.find(propEq("id", resolvedModelId));
-  resources.filter(propEq("resourceType", "dataset"));
-  groups.flatMap(prop("models"));
-  ```
-
-  `prop` also accepts dotted paths (`prop("baseColumn.name")`), and `propEq`
-  composes the same way (`propEq("baseColumn.name", targetName)`). Use the
-  dotted form rather than an inline lambda for nested reads.
-
 ## Exhaustive union dispatch (`matchLiteral`)
 
 - Dispatch on a string-literal or enum union with `matchLiteral` (from

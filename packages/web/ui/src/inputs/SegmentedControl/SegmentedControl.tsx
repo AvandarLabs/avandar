@@ -1,5 +1,5 @@
-import {
-  SegmentedControl as MantineSegmentedControl,
+import { SegmentedControl as MantineSegmentedControl } from "@mantine/core";
+import type {
   SegmentedControlItem as MantineSegmentedControlItem,
   SegmentedControlProps as MantineSegmentedControlProps,
 } from "@mantine/core";

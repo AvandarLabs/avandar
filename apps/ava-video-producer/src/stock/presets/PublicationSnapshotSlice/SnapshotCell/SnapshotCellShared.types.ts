@@ -1,4 +1,4 @@
-import { getSnapshotCellFromFrame } from "../getSnapshotCellFromFrame";
+import type { getSnapshotCellFromFrame } from "../getSnapshotCellFromFrame";
 /** Inputs shared by the SnapshotCell visuals. */
 export type CellFrameProps = Readonly<{
   scene: ReturnType<typeof getSnapshotCellFromFrame>;

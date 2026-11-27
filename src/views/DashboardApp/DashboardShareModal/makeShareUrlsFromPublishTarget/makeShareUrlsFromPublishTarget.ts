@@ -1,4 +1,4 @@
-import { Dashboard } from "$/models/Dashboard/Dashboard";
+import type { Dashboard } from "$/models/Dashboard/Dashboard";
 import type { PublishedVisibility } from "@/clients/storage/PublicDatasetParquetStorageClient/SnapshotStorageUtils/SnapshotStorageUtils";
 
 /**

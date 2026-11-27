@@ -2,7 +2,8 @@ import { ManualEntryMappingParsers } from "$/models/ontology/AttributeMapping/Ma
 import { createRdbCrudClient } from "$/RdbCrudClient/createRdbCrudClient";
 
 /**
- * Client for managing manual entry mapping configurations
+ * CRUD client for manual entry mapping configurations.
+ * Use it, for example, to retrieve or insert manual entry mappings.
  */
 export const ManualEntryMappingClient = createRdbCrudClient({
   modelName: "ManualEntryMapping",

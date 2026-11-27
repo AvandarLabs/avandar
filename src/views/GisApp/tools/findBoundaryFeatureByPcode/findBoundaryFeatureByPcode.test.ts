@@ -1,7 +1,5 @@
 import { describe, expect, it } from "vitest";
-/**
- * Go-to P-code lookup against loaded boundary FeatureCollections.
- */
+/** Go-to P-code lookup against loaded boundary FeatureCollections. */
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { MapLayerSpatialFeatureProperties } from "@/clients/maps/MapLayerSpatialQuery/MapLayerSpatialQuery.constants";

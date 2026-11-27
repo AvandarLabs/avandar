@@ -1,0 +1,54 @@
+{
+  "name": "@avandar/lint-typescript",
+  "version": "0.1.0",
+  "description": "Avandar typescript lint integration",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    "./oxlint": "./src/oxlint/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": "24.x"
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run --passWithNoTests",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@avandar/lint": "workspace:*",
+    "@oxlint/plugins": "1.93.0"
+  },
+  "devDependencies": {
+    "eslint": "9.39.3",
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      "./oxlint": {
+        "types": "./dist/oxlint.d.ts",
+        "default": "./dist/oxlint.js"
+      }
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AvandarLabs/avandar.git",
+    "directory": "packages/lint/typescript"
+  },
+  "peerDependencies": {
+    "oxlint": "1.93.0"
+  },
+  "peerDependenciesMeta": {
+    "oxlint": {
+      "optional": true
+    }
+  }
+}

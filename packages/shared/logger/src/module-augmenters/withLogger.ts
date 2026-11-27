@@ -31,9 +31,7 @@ export function withLogger<ReturnModule extends UnknownModule>(
   return {
     ...module,
 
-    /**
-     * Enables the logger for this module.
-     */
+    /** Enables the logger for this module. */
     withLogger: (callerNameOverride?: string): ReturnModule => {
       if (!callerNameOverride) {
         return moduleWithEnabledLogger;

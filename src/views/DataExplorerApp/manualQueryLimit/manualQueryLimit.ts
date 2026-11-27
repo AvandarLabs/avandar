@@ -73,7 +73,10 @@ export function shouldAutoLimitLargeDataset(
 }
 
 /**
- * Applies the default manual-query LIMIT to an otherwise empty query.
+ * Returns a query with the default LIMIT when the query is blank.
+ * Use it, for example, to prepare a blank manual query with a default row
+ * limit.
+ * Returns the original query when no limit needs to be added.
  */
 export function applyDefaultManualQueryLimit(
   query: PartialStructuredQuery,

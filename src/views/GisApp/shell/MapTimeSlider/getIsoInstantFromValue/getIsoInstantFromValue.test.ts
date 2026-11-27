@@ -1,6 +1,4 @@
-/**
- * Query timestamp cells from DuckDB/Arrow into ISO-8601 instants.
- */
+/** Query timestamp cells from DuckDB/Arrow into ISO-8601 instants. */
 import { describe, expect, it } from "vitest";
 import { getIsoInstantFromValue } from "./getIsoInstantFromValue";
 

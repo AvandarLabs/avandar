@@ -1,5 +1,4 @@
 import { MIMEType } from "@avandar/utils";
-import * as arrow from "apache-arrow";
 import { uuid } from "$/lib/uuid";
 import { abortDuckDbQuery } from "@/clients/DuckDbClient/abortDuckDbQuery/abortDuckDbQuery";
 import { DatasetDuckDbCoordinator } from "@/clients/DuckDbClient/DatasetDuckDbCoordinator/DatasetDuckDbCoordinator";
@@ -19,6 +18,7 @@ import type {
 } from "@/clients/DuckDbClient/duckDbClientOperations";
 import type { DuckDbSqlAnalysis } from "@/lib/sql/DuckDbSqlAnalyzer/DuckDbSqlAnalyzer.types";
 import type * as duckdb from "@duckdb/duckdb-wasm";
+import type * as arrow from "apache-arrow";
 
 /**
  * Where a raw query may read dataset tables from. A public read carries the

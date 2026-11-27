@@ -2,7 +2,6 @@ import { assertIsDefined, objectEntries } from "@avandar/utils";
 import { withSupabaseClient } from "@clients/mixins/withSupabaseClient.ts";
 import { createModelCrudClient } from "@clients/ModelCrudClient/createModelCrudClient.ts";
 import { match } from "ts-pattern";
-import { EmptyObject } from "type-fest";
 import type { ILogger } from "@avandar/logger";
 import type {
   FilterOperator,
@@ -21,6 +20,7 @@ import type {
 } from "@clients/SupabaseCrudClient/SupabaseCrudClient.types.ts";
 import type { PostgrestFilterBuilder } from "@supabase/postgrest-js";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import type { EmptyObject } from "type-fest";
 
 /** The maximum page size configured in Supabase */
 const MAXIMUM_PAGE_SIZE = 1000;
@@ -38,7 +38,9 @@ type AnySupabaseFilterableQuery = PostgrestFilterBuilder<
 /* oxlint-enable typescript/no-explicit-any */
 
 /**
- * Creates a client for a model that maps to a Supabase table.
+ * Creates a CRUD client for a model backed by a Supabase table.
+ * Use it, for example, when defining a reusable client for a table-backed
+ * model.
  */
 export function createSupabaseCrudClient<
   M extends AnySupabaseCrudModelSpec,

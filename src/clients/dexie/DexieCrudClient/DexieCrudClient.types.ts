@@ -108,9 +108,7 @@ export type DexieCrudModelSpec<
     /** The model name. Also used as the Dexie table name. */
     modelName: ModelTypes["modelName"];
 
-    /**
-     * The type of the primary key field in a frontend model
-     */
+    /** The type of the primary key field in a frontend model */
     modelPrimaryKeyType: ModelTypes["primaryKeyType"];
 
     /**

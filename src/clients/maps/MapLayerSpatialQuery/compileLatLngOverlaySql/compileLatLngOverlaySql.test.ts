@@ -1,7 +1,5 @@
 import { describe, expect, it } from "vitest";
-/**
- * Latitude/longitude overlay SQL compilation for time and AOI filters.
- */
+/** Latitude/longitude overlay SQL compilation for time and AOI filters. */
 import { uuid } from "$/lib/uuid";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { compileLatLngOverlaySql } from "./compileLatLngOverlaySql";

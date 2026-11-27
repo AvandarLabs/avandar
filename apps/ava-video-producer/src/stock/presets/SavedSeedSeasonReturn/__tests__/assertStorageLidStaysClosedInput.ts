@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { _lid, _lossInputs } from "./SavedSeedSeasonReturnTestHelpers";
+import { _lid } from "./SavedSeedSeasonReturnTestHelpers";
+import type { _lossInputs } from "./SavedSeedSeasonReturnTestHelpers";
 
 /**
  * Asserts storage lid stays closed without loss and joins smoothly before

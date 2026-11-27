@@ -11,8 +11,9 @@ async function _readIdentity(
       ? undefined
       : { filename, device: stat.dev, inode: stat.ino };
   } catch (error) {
-    if (error instanceof Error && "code" in error && error.code === "ENOENT")
+    if (error instanceof Error && "code" in error && error.code === "ENOENT") {
       return undefined;
+    }
     throw error;
   }
 }
@@ -29,8 +30,11 @@ async function _remove(
       identity.inode === artifact.inode
     ) {
       try {
-        if (isDirectory) await fs.rmdir(artifact.filename);
-        else await fs.unlink(artifact.filename);
+        if (isDirectory) {
+          await fs.rmdir(artifact.filename);
+        } else {
+          await fs.unlink(artifact.filename);
+        }
       } catch (error) {
         if (
           !(
@@ -38,8 +42,9 @@ async function _remove(
             "code" in error &&
             ["ENOENT", "ENOTEMPTY", "EEXIST"].includes(String(error.code))
           )
-        )
+        ) {
           throw error;
+        }
       }
     }
   }

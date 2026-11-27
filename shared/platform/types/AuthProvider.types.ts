@@ -33,7 +33,5 @@ export type Session = Readonly<{
   mode: "online" | "offline-cached";
 }>;
 
-/**
- * Cancels an event subscription registered via `onAuthChange` or similar.
- */
+/** Cancels an event subscription registered via `onAuthChange` or similar. */
 export type Unsubscribe = () => void;

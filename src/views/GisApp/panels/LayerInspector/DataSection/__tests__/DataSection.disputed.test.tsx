@@ -1,7 +1,6 @@
 import { Model } from "@avandar/models";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { uuid } from "$/lib/uuid";
-import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import { QueryColumn as QueryColumnModel } from "$/models/queries/QueryColumn/QueryColumn";
 import { fireEvent, render, screen } from "@/test-utils";
 import {
@@ -11,6 +10,7 @@ import {
   resetDataSectionFixtures,
 } from "@/views/GisApp/panels/LayerInspector/DataSection/__tests__/DataSection.fixtures";
 import { DisputedStatusControls } from "@/views/GisApp/panels/LayerInspector/DataSection/DisputedStatusControls/DisputedStatusControls";
+import type { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer";
 import type { DatasetColumn } from "$/models/datasets/DatasetColumn/DatasetColumn";
 import type { ConceptAttribute } from "$/models/ontology/ConceptAttribute/ConceptAttribute";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn";

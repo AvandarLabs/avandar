@@ -325,7 +325,9 @@ function _attachAreaGestures(
 }
 
 /**
- * Registers text, arrow, freehand, and area annotation drawing on the map.
+ * Registers annotation drawing gestures for the selected kind and returns a
+ * cleanup function.
+ * Use it, for example, when enabling an annotation tool on a map.
  */
 export function attachAnnotateGestures(
   map: MapLibreMap,

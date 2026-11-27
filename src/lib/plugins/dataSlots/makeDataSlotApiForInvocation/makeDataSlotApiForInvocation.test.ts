@@ -1,7 +1,7 @@
 import { PluginError } from "@avandar/plugin-sdk";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { WorkspaceRelationsDenied } from "@/clients/qetl/assertWorkspaceRelations/WorkspaceRelationsDenied";
-import { ConceptRelationDenied } from "@/clients/qetl/QueryMediator/conceptRelation/ConceptRelationDenied";
+import { WorkspaceRelationsDeniedError } from "@/clients/qetl/assertWorkspaceRelations/WorkspaceRelationsDeniedError";
+import { ConceptRelationDeniedError } from "@/clients/qetl/QueryMediator/conceptRelation/ConceptRelationDeniedError";
 import { QUERY_SLOT_MAX_ROWS } from "@/lib/pluginDataSlots/makeDataSlotSqlFromBinding/makeDataSlotSqlFromBinding";
 import { PluginDrawerStore } from "@/lib/plugins/PluginDrawerHost/PluginDrawerStore";
 import { MAX_LIVE_QUERY_HANDLES } from "@/lib/plugins/QueryHandleRegistry/QueryHandleRegistry";
@@ -279,7 +279,7 @@ describe("makeDataSlotApiForInvocation", () => {
 
     it("rejects a query outside the workspace's relations with PermissionDenied", async () => {
       runQueryMock.mockRejectedValue(
-        new WorkspaceRelationsDenied({
+        new WorkspaceRelationsDeniedError({
           workspaceId: WORKSPACE_ID,
           deniedDatasetIds: ["dataset_other" as Dataset.Id],
         }),
@@ -292,7 +292,7 @@ describe("makeDataSlotApiForInvocation", () => {
 
     it("rejects a case type whose records the user cannot reach with PermissionDenied", async () => {
       runQueryMock.mockRejectedValue(
-        new ConceptRelationDenied({
+        new ConceptRelationDeniedError({
           conceptId: "concept_1" as Concept.Id,
           deniedDatasetIds: ["dataset_other" as Dataset.Id],
         }),

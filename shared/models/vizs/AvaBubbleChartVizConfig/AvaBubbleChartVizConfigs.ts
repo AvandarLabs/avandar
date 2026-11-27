@@ -83,9 +83,7 @@ export const AvaBubbleChartVizConfigs = {
     return hydrateBubbleSeriesFromQueryResult(vizConfig, columns);
   },
 
-  /**
-   * Convert a bubble config to any other viz type.
-   */
+  /** Convert a bubble config to any other viz type. */
   convertVizConfig: <K extends BuiltInVizType = BuiltInVizType>(
     vizConfig: AvaBubbleChartVizConfig,
     newVizType: K,

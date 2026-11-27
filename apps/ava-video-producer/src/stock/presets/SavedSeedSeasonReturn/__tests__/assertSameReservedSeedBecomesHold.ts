@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
-import { _render } from "./SavedSeedSeasonReturnTestHelpers";
+import type { _render } from "./SavedSeedSeasonReturnTestHelpers";
 
 /**
  * Asserts the same reserved seed becomes exact loss, sowing and unsown

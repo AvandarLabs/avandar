@@ -1,9 +1,9 @@
+import assert from "node:assert/strict";
+import { assertChangedGreetingChangesActualPeople as _assertChangedGreetingChangesActualPeople } from "./assertChangedGreetingChangesActualPeople";
 import { VoluntaryFamilyReunionTestState } from "./VoluntaryFamilyReunionTestState";
+import type { fixtures } from "../../VoluntaryFamilyReunion.fixtures";
 
 const { render: _render } = VoluntaryFamilyReunionTestState;
-import assert from "node:assert/strict";
-import { fixtures } from "../../VoluntaryFamilyReunion.fixtures";
-import { assertChangedGreetingChangesActualPeople as _assertChangedGreetingChangesActualPeople } from "./assertChangedGreetingChangesActualPeople";
 
 /**
  * Asserts changed greeting changes actual arms and every member stays

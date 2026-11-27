@@ -1,0 +1,556 @@
+# Lint benchmark
+
+First run is cold; warm samples follow without cache eviction. Durations are
+wall-clock milliseconds. A failed lint run is not a passing performance baseline.
+
+The preflight row contains transient source lint failures and is excluded from
+performance comparisons. The accepted `phase-3-before-package` row runs before
+either ecosystem plugin is enabled. All six lint samples passed. Its warm median
+is 7,238 ms: use this row as the preceding baseline for subsequent batches.
+The preverification row overlapped package verification and is retained for
+traceability, excluded from comparisons.
+
+## Compressed package baseline
+
+| Package | Tarball bytes |
+| --- | --- |
+| `@avandar/lint` | 61,948 |
+| `@avandar/lint-typescript` | 43,078 |
+| `@avandar/lint-css` | 13,689 |
+
+These historical `pnpm pack` sizes include the repository license file and
+published build artifacts. Runtime dependencies are installed separately.
+The [final review fixes](#final-review-fixes) record the latest archive sizes,
+contents and verification order. Earlier batch tables remain historical.
+
+## Lint samples
+
+| Label | Cold ms | Warm 1 | Warm 2 | Warm 3 | Warm 4 | Warm 5 | Warm median ms | Exit codes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| phase-3-preflight | 6342 | 5705 | 10639 | 7146 | 6832 | 10133 | 7146 | 1, 1, 0, 0, 0, 0 |
+| phase-3-preverification | 10214 | 10253 | 7384 | 7361 | 10717 | 10671 | 10253 | 0, 0, 0, 0, 0, 0 |
+| phase-3-before-package | 11241 | 7622 | 7238 | 7239 | 7104 | 7142 | 7238 | 0, 0, 0, 0, 0, 0 |
+| phase-3-native-safe-rules | 16734 | 16772 | 16618 | 16884 | 16738 | 16784 | 16772 | 0, 0, 0, 0, 0, 0 |
+| phase-3-native-safe-rules-review-fixes | 7292 | 7039 | 7479 | 7292 | 7404 | 7321 | 7321 | 0, 0, 0, 0, 0, 0 |
+| phase-3-comment-fixers | 19907 | 18821 | 19127 | 18915 | 18917 | 19026 | 18917 | 0, 0, 0, 0, 0, 0 |
+| phase-3-comment-fixers-final | 19266 | 19046 | 19093 | 19166 | 19218 | 19067 | 19093 | 0, 0, 0, 0, 0, 0 |
+| phase-3-function-fixers | 7691 | 7672 | 7346 | 7550 | 7665 | 7509 | 7550 | 0, 0, 0, 0, 0, 0 |
+| phase-3-complete | 7745 | 7678 | 7692 | 7829 | 7654 | 7522 | 7678 | 0, 0, 0, 0, 0, 0 |
+
+## Initial native batch profile
+
+The `phase-3-native-safe-rules` warm median is **16,772 ms**, an increase of
+9,534 ms (131.72%) over the accepted 7,238 ms baseline. All six lint runs pass,
+but the increase exceeds both stop thresholds. Batch expansion stopped for
+sequential profiling with no concurrent builds or tests.
+
+On the same transformed source, toggling only root `options.typeAware` while
+preserving the exact config location and every override produced:
+
+| Component | Samples ms | Median ms | Exit codes |
+| --- | --- | --- | --- |
+| Oxlint, type-aware on | 6,495; 6,099; 6,369 | 6,369 | 0, 0, 0 |
+| Oxlint, type-aware off | 5,543; 6,075; 5,808 | 5,808 | 0, 0, 0 |
+| Existing Stylelint command | 870 | 870 | 0 |
+| Existing React Doctor command | 10,364 | 10,364 | 0 |
+
+The native type-aware increment is 561 ms (9.66%), below the stop threshold.
+React Doctor's existing `--scope changed --base develop` now scans 374 files,
+which persists after a worktree commit and dominates the expanded root cost.
+The Doctor command and its advisory exit handling are unchanged. The profiled
+measurement is retained as the pre-review result. Its 16,772 ms median was the
+preceding baseline for the review correction below.
+
+At that initial measurement, root native repair enabled avlint-ts-001 through avlint-ts-004.
+avlint-ts-005 remains disabled because native assertion removal breaks TypeScript 5.9 generic CRUD
+contracts. The initial 33-file exclusion attempt was discarded entirely. avlint-ts-016
+remains repair fallback because Oxlint 1.93.0 implements no safe extension fixer.
+No assertion-removal source edits or per-file assertion exceptions are retained.
+
+## Review correction
+
+`phase-3-native-safe-rules-review-fixes` measures the corrected safe subset.
+avlint-ts-002 is now disabled and has no production safe probe: native `prefer-template`
+changes custom object coercion and exposes no operand-restriction option.
+All 21 introduced template expressions were reverted. Ordinary root repair
+preserves concatenation, and every original template expression is unchanged.
+avlint-ts-005 and avlint-ts-016 remain fallback as recorded above. avlint-ts-001, both avlint-ts-003
+capabilities, and avlint-ts-004 retain proven coverage. A canonical seeded diagnostic
+must itself have error severity; another capability's error cannot make a
+warning-only rule enforced.
+
+The corrected cold sample is 7,292 ms and its warm median is **7,321 ms**, with
+six zero exits. It is 9,451 ms below the preceding 16,772 ms median and 83 ms
+(1.15%) above the original accepted 7,238 ms baseline. No causal attribution is
+made from this timing change. No tests or builds ran alongside the six samples.
+Root lint retains the existing Doctor await-in-loop performance warning; Doctor
+now scans 364 files. **7,321 ms is the preceding warm median for the next batch.**
+
+## Comment and documentation batch
+
+The batch enables avlint-common-001 standalone function-body prose, avlint-common-002 short plain
+JSDoc, and avlint-ts-009 unambiguous exported-object documentation relocation. Root
+safe repair changed 305 existing files: nine block-to-line comment repairs and
+426 short JSDoc collapses. No root avlint-ts-009 candidate met the narrow boundary.
+Every one of the 435 comment-only hunks preserves prose. Independent TypeScript
+syntax-tree comparisons confirm unchanged code in all 305 files. Generated
+files and compiled Lingui catalogs were excluded. A subsequent whole-root
+ordinary `--fix` pass made no tracked changes and exited zero.
+
+Both comment benchmark rows have six zero exits. The initial warm median is
+18,917 ms. After safety rejection for directive comments, unusual JavaScript
+line terminators and Markdown hard breaks, the final cold sample is 19,266 ms
+and the final warm median is **19,093 ms**. Compared with the preceding 7,321 ms
+baseline, this adds 11,772 ms (160.80%), exceeding both stop thresholds. Batch
+expansion stopped for sequential profiling. The final measurement ran without
+concurrent package builds, tests or dependency installation.
+
+The final profile toggles only the three custom rules in the actual root
+configuration, restores the original bytes afterwards, and holds transformed
+source constant. The plugin remains installed in both configurations.
+
+| Component | Samples ms | Median ms | Exit codes |
+| --- | --- | --- | --- |
+| Oxlint, custom rules enabled | 6,643; 6,300; 6,221 | 6,300 | 0, 0, 0 |
+| Oxlint, custom rules disabled | 6,026; 6,284; 5,934 | 6,026 | 0, 0, 0 |
+| Existing Stylelint command | 1,122 | 1,122 | 0 |
+| Existing React Doctor command | 9,649 | 9,649 | 0 |
+
+The custom visitor increment is 274 ms (4.55%), below both stop thresholds.
+The existing Doctor command now scans 641 files versus the preceding 364,
+because its comparison is against `develop` and includes these comment edits.
+It retains the existing await-in-loop advisory warning. The measurements show
+that the custom visitor increment is small; they do not establish a complete
+causal attribution for the root regression. The root increase remains visible,
+and no Doctor configuration or process scheduler was changed.
+
+Coverage inserts custom diagnostic seeds into the existing serialized per-file
+native proof run. This adds no engine invocations per reviewed file. The known
+per-file serial latency remains. Safe comment capabilities can be enforced,
+but every custom safe-fix rule also retains an explicit `unsupported-shapes`
+fallback. No exact classifier proves their absence, so rule-level review
+fallback IDs must remain active. Non-JS avlint-common-001/avlint-common-002 outcomes also stay fallback.
+
+| Comment batch package | Tarball bytes |
+| --- | --- |
+| `@avandar/lint` | 45,359 |
+| `@avandar/lint-typescript` | 16,944 |
+| `@avandar/lint-css` | 10,139 |
+
+All three built tarballs import successfully together in an isolated consumer.
+The core catalog returns 90 rules and the TypeScript export exposes the three
+comment rules. **19,093 ms is the preceding warm median for the next batch.**
+
+## Function declarations and private helpers
+
+The function batch enables avlint-ts-006, avlint-ts-007, and avlint-ts-008 for narrowly proved direct
+call shapes. The complete root ordinary safe-fix pass found **zero eligible
+existing source candidates**. No application, generated, or compiled catalog
+files changed. Every changed and new file was byte-identical after the next
+whole-root ordinary fix pass.
+
+The cold sample is 7,691 ms and the five-run warm median is **7,550 ms**, with
+six zero exits. This is 11,543 ms (60.46%) below the preceding 19,093 ms median,
+so neither stop threshold is crossed. No tests, builds, or installation ran
+alongside the samples. React Doctor reused its existing cache, reporting 647
+files in 33-36 ms for these samples; its configuration and existing await-loop
+warning are unchanged. These measurements do not establish causal attribution
+for the timing decrease.
+
+A subsequent safety tightening rejects escaped string/template contracts. Its
+covering TypeScript and native tests pass, as do the refreshed root fix and
+main TypeScript build checks. The completed timing row is retained rather than
+repeating six samples for this small additional refusal check.
+
+avlint-ts-006 and avlint-ts-007 reject hoisting, recursion, overloads, escapes, lexical bindings,
+and competing repair syntax. avlint-ts-008 requires scope-proved calls inside the
+immediately adjacent exported function and rejects unresolved-name capture.
+These stable boundaries keep native fixes, comment fixes, and independently
+disabled function rules separate in one ordinary native fix invocation. Each
+new safe capability has a canonical error-seed proof on the exact reviewed
+path, plus explicit `unsupported-shapes` fallback. The existing serialized
+proof scheduler and cache are unchanged.
+
+**7,550 ms is the preceding warm median for the next batch.**
+
+## Component props, local acronym and JSX ternaries
+
+This batch enables avlint-ts-010, `local-e2e-casing` (removed) and avlint-ts-011 for their narrow proved subsets.
+The complete-root ordinary application changes one source file: the private
+`EditableProps` alias and its parameter reference become `Props`. It applies
+no existing `local-e2e-casing` (removed) or avlint-ts-011 candidates. Unknown scalar JSX conditions retain
+exact values, and the supported boolean ternary uses `false` as its false arm.
+
+The preceding warm median is **7,550 ms**. Samples below run sequentially
+without concurrent tests, package builds or dependency installation. The
+existing Doctor configuration is unchanged.
+
+| Label | Cold ms | Warm 1 | Warm 2 | Warm 3 | Warm 4 | Warm 5 | Warm median ms | Exit codes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| phase-3-component-fixers | 18869 | 7593 | 7604 | 7452 | 7490 | 7400 | 7490 | 0, 0, 0, 0, 0, 0 |
+
+The warm median is **7,490 ms**, 60 ms (0.79%) below the preceding 7,550 ms.
+All six exits are zero, so neither stop threshold is crossed and no separate
+visitor profiling is required. The cold sample includes a fresh Doctor scan
+of 653 files; warm samples reuse its existing cache. The existing await-loop
+advisory remains, and Doctor configuration is unchanged. These timings do not
+establish causal attribution for the small median difference.
+
+The final ordinary root repair was byte-identical across all 10,285 selected
+files. Package tests pass with 181 TypeScript cases and 222 core cases,
+including the new 104-case native safety/context matrix. Both lint packages
+build and type-check, and the main TypeScript build passes. Module-private
+coverage seeds now precede synthetic module markers and introduce none;
+TSX shares one JSX owner between its props and rendering probes. Exact
+unsupported-shape fallback and the existing per-file cache/serial engine
+scheduler remain intact.
+
+**7,490 ms is the preceding warm median for the next batch.**
+
+## Property helpers and straight-line collections
+
+This batch enables avlint-ts-012, avlint-ts-013 and avlint-ts-014 for their documented conservative
+subsets. The complete root ordinary safe-fix application finds no eligible
+existing source candidates in any family. All 10,293 selected files are
+byte-identical across consecutive ordinary fix passes. The 193 tracked
+generated and compiled Lingui catalog files remain unchanged and excluded.
+
+The preceding warm median is **7,490 ms**. Samples run sequentially without
+concurrent tests, builds or dependency installation. Doctor configuration and
+its existing await-loop advisory remain unchanged.
+
+| Label | Cold ms | Warm 1 | Warm 2 | Warm 3 | Warm 4 | Warm 5 | Warm median ms | Exit codes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| phase-3-utility-fixers | 16390 | 7468 | 7639 | 7402 | 7548 | 7370 | 7468 | 0, 0, 0, 0, 0, 0 |
+
+The warm median is **7,468 ms**, 22 ms (0.29%) below the preceding 7,490 ms.
+All six exits are zero, so neither stop threshold is crossed. Warm Doctor scans
+reuse its cache and retain the existing await-loop advisory. These timings do
+not establish causal attribution for the small median difference.
+
+The completed measurement precedes the final declaration-envelope correction.
+Native keyword normalization reserves the entire declaration. Both construction
+rules therefore retain the initializer and construct at the final return,
+keeping all custom fix spans after the declaration. avlint-ts-013 rejects annotated
+bindings. avlint-ts-014 now requires typed TS/TSX primitive arrays, an existing helper,
+and ordinary Array intrinsics. The same visitors and serialized proof scheduler
+remain, with no additional engine invocations. The single completed benchmark
+is retained for this narrow correction; root correctness gates were refreshed.
+
+avlint-ts-012 map and equality probes have independent seed spans. Utility seeds add no
+imports or module markers, and avlint-ts-014 seeds satisfy the explicit array-type
+boundary only for TS/TSX. Unsupported shapes retain fallback throughout.
+
+**7,468 ms is the preceding warm median for the next batch.**
+
+## CSS comment markers
+
+The CSS batch enables avlint-css-001 for standalone ordinary prose comment nodes using
+Stylelint and PostCSS source ranges. Repairs only change comment delimiters,
+spacing and leading markers. Declaration documentation, legal notices,
+directives, maps, hacks, inline comments, ambiguous markers and repairs beyond
+80 columns remain outside this safe subset. Explicit unsupported-shape fallback
+keeps rule-level review active.
+
+The complete root CSS command selects 456 stylesheets. Its ordinary safe-fix
+application changes one multiline comment in `CaseTypeHome.module.css`.
+Independent parsed-node audits confirm unchanged prose and every non-comment
+byte. A second complete CSS fix is byte-identical across all 456 files.
+Generated stylesheets are excluded and compiled Lingui catalogs are untouched.
+Both lint and repair commands select `src/**/*.css` and
+`apps/ava-video-producer/**/*.css`.
+
+The preceding warm median is **7,468 ms**. The six samples below run
+sequentially without concurrent tests, builds or dependency installation.
+Doctor configuration and its existing await-loop advisory remain unchanged.
+
+| Label | Cold ms | Warm 1 | Warm 2 | Warm 3 | Warm 4 | Warm 5 | Warm median ms | Exit codes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| phase-3-stylelint-fixer | 7705 | 7753 | 7914 | 8505 | 8384 | 8449 | 8384 | 0, 0, 0, 0, 0, 0 |
+
+The cold sample is 7,705 ms and the warm median is **8,384 ms**, up 916 ms
+(12.27%) from the preceding 7,468 ms. All six exits are zero. Neither stop
+threshold is crossed, so no separate profile is required. Doctor scans 667
+files and reuses its existing cache during these samples. These timings do
+not establish causal attribution for the change.
+
+The source export repairs CSS without a prebuild; the packed CSS export also
+performs a real Stylelint repair in an isolated consumer. Its tarball is
+13,689 bytes. CSS package tests pass with 38 cases and core tests pass with
+325 cases. Both packages build and type-check; the main TypeScript build and
+root lint pass. The actual built CLI proves the supported CSS capability
+against the real root configuration without writing the reviewed file.
+
+CSS coverage uses the real repository, original filename, full root path
+selection, actual error-severity seed and nonzero child status. Overrides,
+disables, missing engines/plugins, unknown commands and operational failures
+remain fail-closed. Unsupported syntax retains an independent fallback
+outcome. The native proof scheduler and native safe-fix rule boundaries are unchanged;
+CSS proof startup and full-selection cost remain for later scaling work.
+
+The plugin leaves parsed source-map comment nodes intact. Stylelint/PostCSS
+itself consumes source-map annotations before rules run, with this rule both
+enabled and disabled under the same root configuration. The controlled test
+records that existing engine behavior rather than claiming whole-command
+annotation preservation.
+
+**8,384 ms is the preceding warm median for the next batch.**
+
+## Exact coverage proof and inclusion caching
+
+Coverage accepts only the pinned Oxlint JSON envelope and normal lint statuses.
+A proof requires the exact mirrored filename, canonical engine namespace, error
+severity and a nonempty UTF-8 label contained entirely in that capability's
+seed range. Unknown envelopes, truncation indicators, runtime/configuration
+errors, stderr, unexpected exits and incomplete output fail closed. The engine's
+nested-config output can legitimately report `number_of_rules: null`.
+
+avlint-ts-006, avlint-ts-007, avlint-ts-008 additionally require the early `local-e2e-casing` (removed) error diagnostic as a witness
+of an original AST import/export marker. This witness precedes every synthetic
+module marker. A script, textual marker, disabled/warning/suppressed `local-e2e-casing` (removed) rule,
+or missing witness leaves those function capabilities in fallback with context
+recovery. Function fixer behavior is unchanged. Every custom rule still has its
+independent `unsupported-shapes` fallback.
+
+One factory lifetime caches the source-workspace inclusion listing by accepted
+command and cwd, and proof promises by cwd and exact path. The existing serial,
+rejection-safe loader still runs strictly isolated one-file mirrors. Each
+selected file retains original siblings and imports. Supported strict-JSON
+configs rebase relative plugin entries to original source paths and inherited
+config references to their original files. Aliases, overrides and rule settings
+are preserved without flattening. Root/nested string/object plugin fixtures
+also review the plugin and its helper, proving that seeded copies never execute
+as engine plugins. Import origins alone do not establish runtime applicability:
+custom safe-fix proofs also require the actual host-resolved, version-matched official
+Avandar implementation, a static public export and explicit canonical alias.
+Conditional/package wrappers, ambiguous declaration groups and inherited custom
+plugin contexts remain fallback. The official extension and utility-directory
+filename boundaries are preserved; native rule evidence remains independent.
+Unsupported copied JSONC/dynamic/symlink configuration and selected symlink paths
+remain fallback.
+
+| Bounded mixed-language coverage fixture | Before cache | After cache |
+| --- | --- | --- |
+| Six initial paths, one late path, one cached repeat | 7 unique proofs | 7 unique proofs |
+| Source inclusion children | 7 | 1 |
+| Isolated seed children | 7 | 7 |
+| Total children | 14 | 8 |
+| Maximum active native engine child | 1 | 1 |
+| Measured wall time, ms | 5,093 | 3,204 |
+
+These are bounded single-run coverage measurements against the actual engine,
+including an instrumenting process wrapper. They establish a 42.9% child-count
+reduction and an observed 37.1% wall-time reduction for this fixture. They are
+not a root-lint benchmark or a general latency guarantee. The later full suite
+also exercises the same process-count assertion. No builds, tests or benchmarks
+overlap these runs, and original source bytes and temporary-mirror cleanup are
+checked.
+
+Native proofs retain a 30-second timeout and 8 MiB output bound per captured
+stream, and add a 1 MiB selected-source and 16 KiB selected-path argument bound.
+Mirrors are created only when their serialized proof starts and removed in
+`finally`. Missing/malformed output, overflow, signal and a real timeout are
+covered by focused process-failure tests. Root/subcommand help remains lazy and
+JSON stdout remains machine-clean.
+
+Shared multi-file seed batching is deliberately not enabled. Its closed
+avlint-ts-003 dependency and cross-seeded config/plugin/import independence gates have
+not been established. Isolated proofs avoid batch poisoning and preserve
+conservative semantics, but still pay one engine startup and one mirror per
+native path. CSS is unchanged: its provider starts at most one Node proof child
+at a time, and each CSS path still repeats Stylelint's full root selection in
+that child. Native and CSS providers can each have one active child. No second
+CSS scheduler or inclusion cache is introduced here. Normal root lint behavior
+is unchanged, so the preceding accepted 8,384 ms warm median remains the root
+baseline and no additional six-run root benchmark was performed.
+
+## Coverage-gated review handoff and final release gates
+
+The public review skill runs configured lint and exact-path coverage before
+selecting deterministic detectors. Exact operational enforced/not-applicable
+outcomes omit only the matching rule, language, file and capability. Missing,
+partial, unsupported, disabled, excluded, operationally failed, unknown-language
+and summary-only evidence retains fallback. Native avlint-ts-002, avlint-ts-005, avlint-ts-016 and JS avlint-ts-014
+remain outside safe repair. Plain CSS gets avlint-css-001 fallback independently of the
+CSS-module review phase. All judgment/contextual obligations and avlint-ts-015, avlint-sql-001 remain.
+
+The core skill is 569 lines after coherent extraction of its existing focused
+packs, execution pipeline, common/general checks and repo-local routing.
+Detectors, scanners and duplicate examples live in the on-demand fallback.
+Four public-CLI fixtures pass against enabled TSX/plain-CSS, plugin-disabled,
+missing-package and unknown-language consumers. Five fresh-agent application
+reports make the correct routing decisions. Four were correct on first report;
+the fifth needed a bounded reread of the unchanged scenario. Three over-read
+fallback reference text while applying only the correct retained detectors.
+These are recorded context-loading limits, not five flawless first attempts.
+
+The final cold sample is **7,745 ms** and the warm median is **7,678 ms**,
+706 ms (8.42%) below the preceding 8,384 ms baseline. All six exits are zero;
+neither stop threshold is crossed. The six lint samples run without concurrent
+tests, builds, packing or installation. Doctor configuration and its existing
+await-loop advisory are unchanged. These timings do not establish causal
+attribution. The benchmark recorder now inserts rows into the samples table;
+a real-CLI regression failed before that minimal fix and passes afterward.
+
+Final package gates pass: core 394 tests in serial-file mode, TypeScript 260,
+CSS 38, all three package type checks/builds, consumer manifest/type resolution
+verification, and the main application build. Root lint passes. The default
+core suite's file parallelism produced 16 temporary-mirror inventory assertion
+failures; the complete serial-file run passes all 394. No adapter or test
+refactor is included to address that separate cross-file assertion hazard.
+
+Root type checking completes the main application check, then stops on 28 video
+producer TS1261/TS1149 casing diagnostics. The exact file/line/code set matches
+the saved earlier Task 2 output, which also contains 28; an earlier narrative
+recorded 25. No video producer source changed in this final unit. Deno checking
+is not reached by the short-circuiting root command. No E2E or database command
+is used. Complete-root Oxlint and Stylelint safe repairs are applied, with final
+staged idempotence checked separately. Generated files and compiled catalogs
+remain unchanged.
+
+### Compressed archive contents before final review fixes
+
+Every archive contains only its manifest, license, README and published `dist`
+artifacts. The generated tarballs are removed after inspection.
+
+`@avandar/lint`: **61,948 bytes**.
+
+```text
+package/LICENSE
+package/README.md
+package/dist/RuleCatalog.types-C1KQfq6n.d.ts
+package/dist/catalog.d.ts
+package/dist/catalog.js
+package/dist/catalog.js.map
+package/dist/coverage.d.ts
+package/dist/coverage.js
+package/dist/coverage.js.map
+package/dist/main.d.ts
+package/dist/main.js
+package/dist/main.js.map
+package/dist/metadata.d.ts
+package/dist/metadata.js
+package/dist/metadata.js.map
+package/dist/rules.schema.json
+package/dist/rules.yaml
+package/package.json
+```
+
+`@avandar/lint-css`: **13,689 bytes**.
+
+```text
+package/LICENSE
+package/README.md
+package/dist/stylelint.d.ts
+package/dist/stylelint.js
+package/dist/stylelint.js.map
+package/package.json
+```
+
+`@avandar/lint-typescript`: **43,078 bytes**.
+
+```text
+package/LICENSE
+package/README.md
+package/dist/oxlint.d.ts
+package/dist/oxlint.js
+package/dist/oxlint.js.map
+package/package.json
+```
+
+
+### Original suppression-context limit
+
+Coverage's appended errors prove their own locations. An original native/custom
+`eslint-disable` or `oxlint-disable`, or a CSS `stylelint-disable`, therefore
+retains the affected whole-file capability in fallback even after re-enable.
+Line and next-line forms have the same boundary. Named directives preserve
+unaffected capabilities; blanket and ambiguous directives retain all applicable
+detectors. A conservative text scan may also match directive-like strings or
+unusual comments. No parser, region contract, source mutation or injected enable
+is introduced. The public handoff receives explicit affected fallback rows and
+uncovered summaries, so it cannot omit those manual checks.
+
+This producer-only correction adds no engine children or selection scans. Native
+and CSS provider serialization and time/output limits remain unchanged. The
+normal root lint median above is retained; no root benchmark was repeated for
+this loader-only change. The core archive record below supersedes the earlier
+core size because the compiled producer artifact changed. Ecosystem rule
+artifacts are unchanged.
+
+
+Refreshed `@avandar/lint` archive: **63,795 bytes**, from the final core build
+and `pnpm --filter @avandar/lint pack --pack-destination <owned internal temp>`.
+Its 18 entries remain the same manifest, LICENSE, README and published `dist`
+files listed above. Both ecosystem archives are unchanged. The new archive was
+inspected and removed after measurement; no archive is a retained artifact.
+
+## Final review fixes
+
+The consolidated final fix wave closes CSS implementation-identity and test
+isolation gaps. CSS coverage requires the same compatible installed official
+static source or published entry in core and the consumer, matching package
+version, official rule-function identity and final registration precedence.
+Narrower replacements, including ones registered after the official plugin,
+named-module and object-default wrappers, static package wrappers, conditional
+exports and version mismatches retain fallback. Accepted warnings belong to the
+selected nonignored result and have finite, nonempty closed ranges wholly inside
+the seed. Original cwd/path, selection, severity, disableFix, suppression and
+operational contracts remain; native evidence stays independent.
+
+The CSS fixer also refuses mixed LF/CRLF within a prose comment, preserving its
+exact bytes. Homogeneous LF/CRLF support remains. avlint-ts-014 refusal fixtures now use
+typed native inputs, existing `isDefined` and valid primitive annotations, with
+an eligible positive and explicit JavaScript fallback. All four named oversized
+source/test units, including the native adapter, were split at behavior boundaries.
+Extracted avlint-ts-005, avlint-common-001, avlint-ts-013 fallback pointers now link to their contextual rules.
+
+Cleanup assertions now inspect only fixture-owned mirror paths. Core test setup
+copies source/config into owned temporary packages, builds and packs the three
+lint packages sequentially, and provides fresh public artifacts before consumer
+tests run. It neither reads stale repository distributions nor rebuilds shared
+output during parallel tests. Default file parallelism remains enabled.
+
+### Verification order
+
+These are completed verification results from the final fix wave, recorded
+without another test, build, pack or benchmark run for this documentation update.
+
+| Command or check | Actual result and boundary |
+| --- | --- |
+| `pnpm --filter @avandar/lint test` | Exit 0: 448 tests in 25 files, 73.49 seconds, ordinary default parallel command. Includes owned cleanup, fresh public artifacts and the module/test splits. |
+| Final focused CSS proof command | `pnpm --filter @avandar/lint test test/coverage/__tests__/cssProofIdentity.integration.test.ts test/coverage/__tests__/cssCommentFixer.integration.test.ts`: exit 0, 34 tests in 2 files. Ran after the final static-wrapper and named-module/object-default identity refinements, with fresh source/packed positives, precedence negatives, closed spans, queue recovery and source preservation. The earlier 448-test run does not cover those later producer refinements. |
+| `pnpm --filter @avandar/lint-typescript test` | Exit 0: 246 tests in 6 files. The obsolete JS refusal matrix was replaced by the meaningful typed native cases in core. |
+| `pnpm --filter @avandar/lint-css test` | Exit 0: 40 tests, including both mixed-ending refusals. |
+| All three lint package `type-check` and `build` commands | Exit 0 each. Core types/build were refreshed after the final producer refinements. |
+| `pnpm verify:packages` | Exit 0: all packages verified. |
+| `pnpm lint` | Exit 0 after the final producer edits. The existing Doctor await-loop advisory remains. |
+| `pnpm exec oxlint --fix .`, then `pnpm lint:css:fix` | Exit 0 each. Before/after source comparison found no changed files. |
+
+The regressions were observed failing before their fixes: original CSS proof
+produced 12 failures with 2 positive controls passing; static-wrapper identity
+produced 1 failure; named-module/object-default registration produced 2 failures
+with the official-final positive passing. The unrelated-mirror fixture failed
+the old global temporary inventory assertion. Both mixed-ending fixtures failed
+before refusal was added. Removing avlint-ts-014 undefined/candidate guard clauses caused
+3 expected typed-fixture failures; the production rule was restored unchanged.
+
+### Latest measured compressed archives
+
+These supersede the earlier archive sizes. Measurements use the completed final
+distributions and `pnpm pack --pack-destination <owned-temp>` from each package.
+Every pack command exited 0. Every entry was inspected, and all generated
+archives and their owned temporary directory were removed.
+
+| Package | Tarball bytes | Entries | Final contents |
+| --- | ---: | ---: | --- |
+| `@avandar/lint` | 66,662 | 18 | Same manifest, LICENSE, README and published `dist` paths listed in the earlier core archive contents, including `RuleCatalog.types-C1KQfq6n.d.ts`, catalog/schema data, declarations, JavaScript and maps. |
+| `@avandar/lint-typescript` | 43,078 | 6 | Manifest, LICENSE, README, `dist/oxlint.d.ts`, `dist/oxlint.js` and `dist/oxlint.js.map`. |
+| `@avandar/lint-css` | 13,741 | 6 | Manifest, LICENSE, README, `dist/stylelint.d.ts`, `dist/stylelint.js` and `dist/stylelint.js.map`. |
+
+Public exports and package version alignment remain intact. This is local
+artifact verification, with no publication or remote integration performed.
+No new timing samples were collected for these fixes: the 7,678 ms median above
+is historical evidence from before them. The existing 28 video casing
+diagnostics and Doctor advisory remain disclosed; Deno was not reached by the
+earlier aggregate type gate. No application/E2E/database rerun was added.

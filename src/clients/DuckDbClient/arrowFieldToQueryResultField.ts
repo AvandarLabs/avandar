@@ -1,9 +1,9 @@
-import { ILogger } from "@avandar/logger";
 import { constant } from "@avandar/utils";
 import * as arrow from "apache-arrow";
 import { match } from "ts-pattern";
-import { QueryResultColumn } from "$/models/queries/QueryResult/QueryResult.types";
 import { Logger } from "@/utils/Logger";
+import type { QueryResult } from "$/models/queries/QueryResult/QueryResult";
+import type { ILogger } from "@avandar/logger";
 
 /**
  * Whether a field holds dictionary-encoded text, which is how DuckDB sends an
@@ -20,7 +20,7 @@ function _isDictionaryOfText(type: arrow.DataType): boolean {
 export function arrowFieldToQueryResultField(
   field: arrow.Field<arrow.DataType>,
   { logger = Logger }: { logger?: ILogger } = {},
-): QueryResultColumn {
+): QueryResult.Column {
   // A LIST column renders as text wherever a result is shown, and is marked
   // so the controls that would put its values into SQL can refuse it.
   if (field.type.typeId === arrow.Type.List) {

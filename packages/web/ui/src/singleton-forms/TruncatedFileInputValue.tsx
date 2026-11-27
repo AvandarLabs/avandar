@@ -5,7 +5,10 @@ type Props = {
 };
 
 /**
- * Renders FileInput value with ellipsis and full-name tooltip when clipped.
+ * Displays selected file names with truncation and a full-text tooltip when
+ * clipped.
+ * Use it, for example, as a FileInput value component in an upload form.
+ * Returns null when no file name is available.
  */
 export function TruncatedFileInputValue({ value }: Props): JSX.Element | null {
   const label = Array.isArray(value)

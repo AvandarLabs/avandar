@@ -1,11 +1,6 @@
-import { z } from "zod";
 import {
   DEFAULT_EXPORT_LAYOUT, // oxfmt-ignore
 } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigModule/exportLayoutUpdaters/exportLayoutUpdaters.ts";
-import {
-  AvaMapConfigV1LayerSchema,
-  AvaMapConfigV1Schema,
-} from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV1Schema.ts";
 import {
   AvaMapConfigV2LayerSchema,
   AvaMapConfigV2Schema,
@@ -23,8 +18,12 @@ import {
 import { AvaMapConfigV7Schema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV7Schema.ts";
 import { AvaMapConfigV8Schema } from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV8Schema.ts";
 import { MapLayer } from "$/models/AvaMap/MapLayer/MapLayer.ts";
-// oxlint-disable-next-line no-restricted-imports
-import type { AvaMapConfigRead } from "../AvaMapConfig.types.ts";
+import type { AvaMapConfigRead } from "$/models/AvaMap/AvaMapConfig/AvaMapConfig.types.ts";
+import type {
+  AvaMapConfigV1LayerSchema,
+  AvaMapConfigV1Schema,
+} from "$/models/AvaMap/AvaMapConfig/AvaMapConfigSchema/AvaMapConfigV1Schema.ts";
+import type { z } from "zod";
 
 type ConfigV1 = z.infer<typeof AvaMapConfigV1Schema>;
 type ConfigV1Layer = z.infer<typeof AvaMapConfigV1LayerSchema>;

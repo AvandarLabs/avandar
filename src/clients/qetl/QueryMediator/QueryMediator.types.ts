@@ -25,9 +25,7 @@ import type {
 } from "@/clients/qetl/QueryMediator/conceptRelation/conceptRelation.types";
 import type { UnknownObject } from "@avandar/utils";
 
-/**
- * A column whose stored name, type, or values differ from the source data.
- */
+/** A column whose stored name, type, or values differ from the source data. */
 export type ColumnReplacement = {
   /** The original name of the column from the source data. */
   originalName: string;

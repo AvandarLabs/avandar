@@ -1,5 +1,5 @@
 import { onFanoutRequest } from "@fanout-server/routes/forward/forward";
-import { FastifyPluginAsync } from "fastify";
+import type { FastifyPluginAsync } from "fastify";
 
 /**
  * Registers a catch-all `/forward` route that fans out requests to dev URLs.

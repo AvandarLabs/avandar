@@ -1,6 +1,4 @@
-/**
- * Geometry type select never offers buffer-of-layer as a binding choice.
- */
+/** Geometry type select never offers buffer-of-layer as a binding choice. */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@/test-utils";
 import {

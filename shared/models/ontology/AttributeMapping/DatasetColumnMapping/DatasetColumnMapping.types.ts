@@ -57,9 +57,7 @@ type DatasetColumnMappingInsert = SetOptional<
 
 type DatasetColumnMappingUpdate = Partial<DatasetColumnMappingRead>;
 
-/**
- * CRUD type definitions for the DatasetColumnMapping model.
- */
+/** CRUD type definitions for the DatasetColumnMapping model. */
 export type DatasetColumnMappingModel = SupabaseCrudModelSpec<
   {
     tableName: "attribute_mappings__dataset_column";

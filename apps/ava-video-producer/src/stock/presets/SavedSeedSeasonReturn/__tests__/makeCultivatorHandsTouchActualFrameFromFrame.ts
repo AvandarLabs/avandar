@@ -1,7 +1,7 @@
 import { SvgAttributes } from "../../../../../tests/helpers/SvgAttributes";
-import { fixtures } from "../SavedSeedSeasonReturn.fixtures";
 import { type MakeCultivatorHandsTouchActualFrameFromFrameResult } from "./SavedSeedSeasonReturnContractTestState.types";
 import { _render } from "./SavedSeedSeasonReturnTestHelpers";
+import type { fixtures } from "../SavedSeedSeasonReturn.fixtures";
 
 /**
  * Makes fresh fixture state for cultivator hands touch the actual

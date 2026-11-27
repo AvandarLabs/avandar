@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { cameraTrackSchema, CameraTrack } from "../CameraTrack";
+import { CameraTrack, cameraTrackSchema } from "../CameraTrack";
 
 const track = [
   { at: 0, x: 480, y: 300, zoom: 1, ease: "glide" as const },

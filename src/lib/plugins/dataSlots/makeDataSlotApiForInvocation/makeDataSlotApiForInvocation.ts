@@ -3,8 +3,8 @@ import { isDefined } from "@avandar/utils";
 import { match } from "ts-pattern";
 import { PluginDataSlotBindingClient } from "@/clients/plugins/PluginDataSlotBindingClient/PluginDataSlotBindingClient";
 import { PluginInstallationClient } from "@/clients/plugins/PluginInstallationClient/PluginInstallationClient";
-import { WorkspaceRelationsDenied } from "@/clients/qetl/assertWorkspaceRelations/WorkspaceRelationsDenied";
-import { ConceptRelationDenied } from "@/clients/qetl/QueryMediator/conceptRelation/ConceptRelationDenied";
+import { WorkspaceRelationsDeniedError } from "@/clients/qetl/assertWorkspaceRelations/WorkspaceRelationsDeniedError";
+import { ConceptRelationDeniedError } from "@/clients/qetl/QueryMediator/conceptRelation/ConceptRelationDeniedError";
 import { getDataSlotBindingStatus } from "@/lib/pluginDataSlots/getDataSlotBindingStatus/getDataSlotBindingStatus";
 import { loadDataSlotSource } from "@/lib/pluginDataSlots/loadDataSlotSource/loadDataSlotSource";
 import {
@@ -360,8 +360,8 @@ function _getPluginErrorFromFailure(
     return hostError as PluginError;
   }
   if (
-    error instanceof WorkspaceRelationsDenied ||
-    error instanceof ConceptRelationDenied
+    error instanceof WorkspaceRelationsDeniedError ||
+    error instanceof ConceptRelationDeniedError
   ) {
     return new PluginError("PermissionDenied", PERMISSION_DENIED_MESSAGE);
   }

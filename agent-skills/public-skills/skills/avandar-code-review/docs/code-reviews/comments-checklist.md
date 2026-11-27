@@ -13,38 +13,9 @@ This file is the core of the `docstrings` focused review. That pack also
 applies the comment bullets listed under **Focused Reviews** in
 `SKILL.md`; it does not apply any other phase.
 
-- Use block comments (`/** ... */`) only as documentation attached to an
-  identifier (functions, types, exports, etc.). Do not use file-level header
-  comments (see the file-level-comment rule below). Any comment inside a
-  function body must use `//` line comments, even when it spans multiple lines.
-
-  This is bad:
-
-  ```ts
-  function load(id: string): Result {
-    /**
-     * We bail early on empty ids because the upstream cache treats them
-     * as wildcards and would return stale rows.
-     */
-    if (id === "") {
-      return emptyResult();
-    }
-    // ...
-  }
-  ```
-
-  This is good:
-
-  ```ts
-  function load(id: string): Result {
-    // We bail early on empty ids because the upstream cache treats them
-    // as wildcards and would return stale rows.
-    if (id === "") {
-      return emptyResult();
-    }
-    // ...
-  }
-  ```
+- Attach identifier documentation to the documented declaration. Detached
+  headers and API purpose remain contextual checks below. Function-body
+  marker detection is selected separately through avlint-common-001 fallback.
 
 - Keep function JSDoc focused on what the function is: its purpose and the
   output callers get back. Do not use the block comment above a function to
@@ -135,6 +106,8 @@ applies the comment bullets listed under **Focused Reviews** in
   export function getQueryColumnIdFromQueryResultColumnName(
   ```
 
+<a id="file-level-comments"></a>
+
 - Do not use file-level comments in a file that has a main export. A file-level
   comment is a detached block comment describing the file as a whole rather than
   a specific member; it counts whether it sits at the very top of the file or
@@ -183,51 +156,6 @@ applies the comment bullets listed under **Focused Reviews** in
    */
   export function isReadOnlyDiscoveryQuery(query: string): boolean {}
   ```
-
-- Put the docstring on the module's exported key, not on the underlying
-  declaration, when a non-exported declaration is defined in the same file as
-  the module object that exports it. TypeScript intellisense does not carry a
-  declaration's docstring across the assignment into a module object: hovering
-  `MyModule.myFunc` or `MyModule.MY_LIMIT` shows the type but not the docstring
-  that sits on `_myFunc` or `MY_LIMIT`. This covers every kind of key, not just
-  methods: constants and other values lose their docstring the same way, and a
-  shorthand key (`{ MY_LIMIT }`) hides it exactly as an explicit one does. Flag
-  a docstring that sits on the underlying declaration while its exported object
-  key has none.
-
-  This is bad (neither docstring is visible at the call site):
-
-  ```ts
-  /** Smallest allowed value. */
-  const MY_LIMIT = 10;
-
-  /** What myFunc does. */
-  function _myFunc() {}
-
-  export const MyModule = { MY_LIMIT, myFunc: _myFunc };
-  ```
-
-  This is good:
-
-  ```ts
-  const MY_LIMIT = 10;
-
-  function _myFunc() {}
-
-  export const MyModule = {
-    /** Smallest allowed value. */
-    MY_LIMIT,
-
-    /** What myFunc does. */
-    myFunc: _myFunc,
-  };
-  ```
-
-  Exception: when the object is annotated by an interface or type that already
-  documents its members (`const Store: BlobStore = { ... }`), that interface is
-  the intellisense source; the docstrings belong there, not on the object keys
-  or the underlying declarations. Do not flag missing key docstrings in that
-  case.
 
 - Comments must describe the present, never the past. Flag any comment that
   narrates what the code *used to* do: a former implementation, a rename, a

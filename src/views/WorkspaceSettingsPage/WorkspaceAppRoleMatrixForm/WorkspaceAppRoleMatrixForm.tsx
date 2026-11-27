@@ -60,7 +60,8 @@ type Props = {
 };
 
 /**
- * Per-app role matrix editor with a built-in preset segmented control.
+ * Renders a per-app role matrix editor with preset selection.
+ * Use it, for example, when editing a workspace role group's app access.
  */
 export function WorkspaceAppRoleMatrixForm({
   rolesMatrix,

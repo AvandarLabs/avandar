@@ -7,7 +7,7 @@ import {
   IconMathFunction,
   IconWorldSearch,
 } from "@tabler/icons-react";
-import { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
+import type { DatasetSource } from "$/models/datasets/DatasetSource/DatasetSource";
 import type { Icon } from "@tabler/icons-react";
 import type { ReactNode } from "react";
 

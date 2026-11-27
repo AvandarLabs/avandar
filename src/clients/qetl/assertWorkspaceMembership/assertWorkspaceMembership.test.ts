@@ -2,7 +2,7 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { assertWorkspaceMembership } from "@/clients/qetl/assertWorkspaceMembership/assertWorkspaceMembership";
-import { WorkspaceMembershipDenied } from "@/clients/qetl/assertWorkspaceMembership/WorkspaceMembershipDenied";
+import { WorkspaceMembershipDeniedError } from "@/clients/qetl/assertWorkspaceMembership/WorkspaceMembershipDeniedError";
 import { AvaQueryClient } from "@/config/AvaQueryClient";
 import type { UserId } from "$/models/User/User.types";
 import type { Workspace } from "$/models/Workspace/Workspace";
@@ -104,8 +104,8 @@ async function getThrownError(promise: Promise<unknown>): Promise<unknown> {
 
 async function getDenialCode(promise: Promise<unknown>): Promise<unknown> {
   const error = await getThrownError(promise);
-  expect(error).toBeInstanceOf(WorkspaceMembershipDenied);
-  return (error as WorkspaceMembershipDenied).code;
+  expect(error).toBeInstanceOf(WorkspaceMembershipDeniedError);
+  return (error as WorkspaceMembershipDeniedError).code;
 }
 
 beforeEach(() => {
@@ -169,7 +169,7 @@ describe("assertWorkspaceMembership", () => {
       }),
     );
 
-    expect(error).toBeInstanceOf(WorkspaceMembershipDenied);
+    expect(error).toBeInstanceOf(WorkspaceMembershipDeniedError);
     expect((error as Error).message).toContain(FOREIGN_WORKSPACE_ID);
     expect((error as Error).message).not.toContain(USER_ID);
   });
@@ -315,7 +315,7 @@ describe("assertWorkspaceMembership", () => {
     );
 
     expect(error).toBeInstanceOf(Error);
-    expect(error).not.toBeInstanceOf(WorkspaceMembershipDenied);
+    expect(error).not.toBeInstanceOf(WorkspaceMembershipDeniedError);
     expect((error as Error).message).toBe("Network request failed");
   });
 

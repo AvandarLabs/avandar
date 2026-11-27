@@ -1,6 +1,6 @@
 import { clsx } from "clsx";
-import { useVideoMotion } from "../../../../../../videoTheme/useVideoMotion";
 import css from "./ClickFeedbackTarget.module.css";
+import type { useVideoMotion } from "../../../../../../videoTheme/useVideoMotion";
 import type { ReactNode } from "react";
 
 const PRESS_CLICKS = [35, 62];

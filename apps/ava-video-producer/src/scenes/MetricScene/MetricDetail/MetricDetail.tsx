@@ -22,7 +22,9 @@ export function MetricDetail({
   countAtFrame,
   countDurationInFrames,
 }: Readonly<Props>): ReactNode {
-  if (!layout.detail) return null;
+  if (!layout.detail) {
+    return undefined;
+  }
   return (
     <div
       className={css.metricDetaildiv1}

@@ -62,9 +62,7 @@ export type PostgresDatabaseConnectionRead = Model.Base<
   }
 >;
 
-/**
- * CRUD type definitions for the PostgresDatabaseConnection model.
- */
+/** CRUD type definitions for the PostgresDatabaseConnection model. */
 export type PostgresDatabaseConnectionModel = SupabaseCrudModelSpec<
   {
     tableName: "connections__postgres";

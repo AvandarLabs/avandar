@@ -157,9 +157,7 @@ export const PoCatalog = {
    *   lines so we can filter by `#: source/path` references).
    */
   parse: _parsePo,
-  /**
-   * Serialize a parsed PO structure back to text.
-   */
+  /** Serialize a parsed PO structure back to text. */
   serialize: _serializePo,
   /**
    * Returns true if the entry's `#: ...` source-file reference comments

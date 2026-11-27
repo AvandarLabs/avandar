@@ -4,7 +4,7 @@ import { buildCsvFromDatastoreRecords } from "$/connectors/open-data/buildCsvFro
 import { createCkanClient } from "$/connectors/open-data/CkanClient/CkanClient.ts";
 import { formatToContentKind } from "$/connectors/open-data/formatToContentKind.ts";
 import { getCkanResourceFromPackage } from "$/connectors/open-data/getCkanResourceFromPackage.ts";
-import { OpenDataAcquisitionFailed } from "$/connectors/open-data/openDataErrors.ts";
+import { OpenDataAcquisitionFailedError } from "$/connectors/open-data/openDataErrors.ts";
 import { createSocrataClient } from "$/connectors/open-data/SocrataClient/SocrataClient.ts";
 import { DataCatalogListing } from "$/models/data-catalog-listings/DataCatalogListing/DataCatalogListing.ts";
 import { HttpClientError } from "$/utils/HttpClientFactory/HttpClientError.ts";
@@ -140,23 +140,23 @@ async function _getCkanPackage(args: {
       ckanDatasetId: access.externalDatasetId,
     });
   } catch (cause) {
-    if (OpenDataAcquisitionFailed.is(cause)) {
+    if (OpenDataAcquisitionFailedError.is(cause)) {
       throw cause;
     }
     const status = _readHttpStatus(cause);
     if (status !== undefined && _GONE_STATUSES.has(status)) {
-      throw new OpenDataAcquisitionFailed(
+      throw new OpenDataAcquisitionFailedError(
         { code: "resource-not-found", ckanResourceId: access.apiResourceId },
         cause,
       );
     }
     if (status !== undefined && _AUTHORIZATION_STATUSES.has(status)) {
-      throw new OpenDataAcquisitionFailed(
+      throw new OpenDataAcquisitionFailedError(
         { code: "ckan-authorization-required", action: "package_show" },
         cause,
       );
     }
-    throw new OpenDataAcquisitionFailed(
+    throw new OpenDataAcquisitionFailedError(
       { code: "ckan-unreachable", action: "package_show" },
       cause,
     );
@@ -167,16 +167,16 @@ async function _getCkanPackage(args: {
 function _createFileReadFailure(
   error: unknown,
   ckanResourceId: string,
-): OpenDataAcquisitionFailed {
+): OpenDataAcquisitionFailedError {
   const status = _readHttpStatus(error) ?? 0;
   if (status === _RANGE_NOT_SATISFIABLE_STATUS) {
-    return new OpenDataAcquisitionFailed(
+    return new OpenDataAcquisitionFailedError(
       { code: "resource-empty", ckanResourceId },
       error,
     );
   }
   if (_GONE_STATUSES.has(status)) {
-    return new OpenDataAcquisitionFailed(
+    return new OpenDataAcquisitionFailedError(
       { code: "resource-not-found", ckanResourceId },
       error,
     );
@@ -184,7 +184,7 @@ function _createFileReadFailure(
   const code = _AUTHORIZATION_STATUSES.has(status)
     ? "resource-authorization-required"
     : "resource-unreachable";
-  return new OpenDataAcquisitionFailed({ code, ckanResourceId }, error);
+  return new OpenDataAcquisitionFailedError({ code, ckanResourceId }, error);
 }
 
 /**
@@ -206,7 +206,7 @@ async function _readCkanFileStart(args: {
     throw _createFileReadFailure(error, args.ckanResourceId);
   }
   if (_isBlank(bytes)) {
-    throw new OpenDataAcquisitionFailed({
+    throw new OpenDataAcquisitionFailedError({
       code: "resource-empty",
       ckanResourceId: args.ckanResourceId,
     });
@@ -236,7 +236,7 @@ async function _sampleCkanResource(args: {
     maxBytes: Number.MAX_SAFE_INTEGER,
   });
   if (formatToContentKind(resource.format) !== "csv") {
-    throw new OpenDataAcquisitionFailed({
+    throw new OpenDataAcquisitionFailedError({
       code: "resource-format-unsupported",
       ckanResourceId: resource.id,
       format: resource.format,
@@ -275,20 +275,23 @@ async function _getODataRows(args: {
   try {
     body = await args.http.get(_buildODataSampleUrl(args.access));
   } catch (cause) {
-    throw new OpenDataAcquisitionFailed(
+    throw new OpenDataAcquisitionFailedError(
       { code: "odata-unreachable", apiResourceId },
       cause,
     );
   }
   const rows: unknown = isPlainObject(body) ? body["value"] : undefined;
   if (!Array.isArray(rows) || !rows.every(isPlainObject)) {
-    throw new OpenDataAcquisitionFailed({
+    throw new OpenDataAcquisitionFailedError({
       code: "odata-response-invalid",
       apiResourceId,
     });
   }
   if (rows.length === 0) {
-    throw new OpenDataAcquisitionFailed({ code: "odata-empty", apiResourceId });
+    throw new OpenDataAcquisitionFailedError({
+      code: "odata-empty",
+      apiResourceId,
+    });
   }
   return rows;
 }
@@ -343,8 +346,8 @@ async function _sampleODataResource(args: {
  * @param params.http - Reads CKAN metadata, Socrata exports, and OData rows.
  * @param params.readByteRange - Reads the start of a CKAN file.
  * @returns The sample's raw bytes, and whether they are the whole source.
- * @throws `OpenDataAcquisitionFailed` when the listing is not API-backed, or
- *   names a CKAN resource that is not a CSV or cannot be read. Its code says
+ * @throws `OpenDataAcquisitionFailedError` when the listing is not API-backed,
+ *   or names a CKAN resource that is not a CSV or cannot be read. Its code says
  *   whether the CKAN API failed (`ckan-unreachable`) or the resource did
  *   (`resource-empty`, `resource-unreachable`, and the rest). An OData
  *   resource that cannot be read fails with an `odata-*` code.
@@ -356,7 +359,7 @@ export async function acquireOpenDataColumnTypeSample(params: {
 }): Promise<OpenDataColumnTypeSample> {
   const access = DataCatalogListing.toAccess(params.entry);
   if (access?.kind !== "api_resource") {
-    throw new OpenDataAcquisitionFailed({
+    throw new OpenDataAcquisitionFailedError({
       code: "access-shape-invalid",
       accessKind: params.entry.accessKind,
     });

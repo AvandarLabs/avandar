@@ -42,9 +42,7 @@ export type DatabaseConnectionRead = Model.Base<
   }
 >;
 
-/**
- * CRUD type definitions for the DatabaseConnection model.
- */
+/** CRUD type definitions for the DatabaseConnection model. */
 export type DatabaseConnectionModel = SupabaseCrudModelSpec<
   {
     tableName: "connections";
