@@ -68,7 +68,7 @@ it.each(["root-object", "root-string", "inherited", "override", "nested"])(
     expect(result.status).toBe(0);
     expect(
       result.outcomes.filter((entry: { ruleId: string; state: string }) => {
-        return entry.ruleId === "AF-01" && entry.state === "enforced";
+        return entry.ruleId === "avlint-ts-001" && entry.state === "enforced";
       }),
     ).toHaveLength(2);
     const imports: string[] = readFileSync(log, "utf8")
@@ -125,7 +125,7 @@ it.each(["jsonc", "dynamic", "symlink"])(
     const result = await _coverage({ directory: directory });
     expect(result.status).toBe(shape === "dynamic" ? 1 : 0);
     expect(result.outcomes).toContainEqual(
-      expect.objectContaining({ ruleId: "AF-01", state: "fallback" }),
+      expect.objectContaining({ ruleId: "avlint-ts-001", state: "fallback" }),
     );
     const events = readFileSync(join(directory, "children.jsonl"), "utf8");
     expect(events).not.toContain('"json"');
@@ -151,7 +151,7 @@ it("retains original import relationships for isolated type-aware seed proofs", 
   expect(result.status).toBe(0);
   expect(
     result.outcomes.filter((entry: { ruleId: string; state: string }) => {
-      return entry.ruleId === "AF-03" && entry.state === "enforced";
+      return entry.ruleId === "avlint-ts-003" && entry.state === "enforced";
     }),
   ).toHaveLength(4);
   expect(readFileSync(join(directory, "src/first.ts"), "utf8")).toBe(first);

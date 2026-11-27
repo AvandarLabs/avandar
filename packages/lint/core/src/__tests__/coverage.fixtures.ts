@@ -27,7 +27,7 @@ export const COVERAGE_CATALOG: RuleCatalog = {
   languages: ["typescript", "json"],
   rules: [
     loadRuleCatalog().rules.find((entry) => {
-      return entry.id === "AF-01";
+      return entry.id === "avlint-ts-001";
     })!,
   ],
 };

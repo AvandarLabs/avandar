@@ -102,7 +102,7 @@ when the gate matches.
   `shared/`, or `packages/shared/`. Skip if none of those directories
   are touched.
 - **Path facts:** those three directories are Deno-reachable. Supply these
-  facts to the public AF-19 fallback when its exact coverage outcome requires
+  facts to the public avlint-ts-016 fallback when its exact coverage outcome requires
   detection. Package entry points and import-map aliases retain their existing
   resolver checks; extension repair is not proven by the native detector.
 

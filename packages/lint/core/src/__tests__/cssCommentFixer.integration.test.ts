@@ -124,7 +124,7 @@ it.each(["src/reviewed.css", "apps/ava-video-producer/reviewed.css"])(
     const result = await _coverage({ directory: directory, path: path });
     expect(result.outcomes).toContainEqual(
       expect.objectContaining({
-        ruleId: "AF-20",
+        ruleId: "avlint-css-001",
         language: "css",
         capability: "standalone-prose-comments",
         state: "enforced",
@@ -132,13 +132,13 @@ it.each(["src/reviewed.css", "apps/ava-video-producer/reviewed.css"])(
     );
     expect(result.outcomes).toContainEqual(
       expect.objectContaining({
-        ruleId: "AF-20",
+        ruleId: "avlint-css-001",
         capability: "unsupported-shapes",
         state: "fallback",
       }),
     );
     expect(result.summaries).toContainEqual(
-      expect.objectContaining({ ruleId: "AF-20", state: "fallback" }),
+      expect.objectContaining({ ruleId: "avlint-css-001", state: "fallback" }),
     );
     expect(readFileSync(join(directory, path), "utf8")).toBe(SOURCE);
   },
@@ -171,7 +171,7 @@ it.each([
   });
   expect(result.outcomes).toContainEqual(
     expect.objectContaining({
-      ruleId: "AF-20",
+      ruleId: "avlint-css-001",
       capability: "standalone-prose-comments",
       state: "fallback",
     }),
@@ -195,7 +195,7 @@ export default {
   );
   expect((await _coverage({ directory: directory })).outcomes).toContainEqual(
     expect.objectContaining({
-      ruleId: "AF-20",
+      ruleId: "avlint-css-001",
       capability: "standalone-prose-comments",
       state: "enforced",
     }),
@@ -209,7 +209,7 @@ export default {
     ).outcomes,
   ).toContainEqual(
     expect.objectContaining({
-      ruleId: "AF-20",
+      ruleId: "avlint-css-001",
       capability: "standalone-prose-comments",
       state: "fallback",
     }),
@@ -225,7 +225,7 @@ it("keeps generated stylesheets outside the root repair coverage", async () => {
   });
   expect(result.outcomes).toContainEqual(
     expect.objectContaining({
-      ruleId: "AF-20",
+      ruleId: "avlint-css-001",
       capability: "standalone-prose-comments",
       state: "fallback",
     }),
@@ -301,7 +301,7 @@ it("serializes real CSS proof children across eager directory coverage", async (
   expect(
     result.outcomes.filter((entry: { ruleId: string; capability: string }) => {
       return (
-        entry.ruleId === "AF-20" &&
+        entry.ruleId === "avlint-css-001" &&
         entry.capability === "standalone-prose-comments"
       );
     }),
@@ -329,7 +329,7 @@ it("continues queued real CSS proofs after a preceding proof rejects", async () 
   const probes = createCssCoverageProbes();
   const catalog = loadRuleCatalog();
   const rule = catalog.rules.find((entry) => {
-    return entry.id === "AF-20";
+    return entry.id === "avlint-css-001";
   })!;
   const rejectedProof = probes[0]!.prove({
     cwd: brokenDirectory,
@@ -348,7 +348,7 @@ it("continues queued real CSS proofs after a preceding proof rejects", async () 
   expect(result.operational).toBe(true);
   expect(result.outcomes).toContainEqual(
     expect.objectContaining({
-      ruleId: "AF-20",
+      ruleId: "avlint-css-001",
       capability: "standalone-prose-comments",
       state: "enforced",
       path: join(directory, "src/reviewed.css"),
@@ -356,7 +356,7 @@ it("continues queued real CSS proofs after a preceding proof rejects", async () 
   );
   expect(result.outcomes).toContainEqual(
     expect.objectContaining({
-      ruleId: "AF-20",
+      ruleId: "avlint-css-001",
       capability: "unsupported-shapes",
       state: "fallback",
     }),

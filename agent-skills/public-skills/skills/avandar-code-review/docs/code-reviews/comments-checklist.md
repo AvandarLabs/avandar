@@ -15,7 +15,7 @@ applies the comment bullets listed under **Focused Reviews** in
 
 - Attach identifier documentation to the documented declaration. Detached
   headers and API purpose remain contextual checks below. Function-body
-  marker detection is selected separately through AF-06 fallback.
+  marker detection is selected separately through avlint-common-001 fallback.
 
 - Keep function JSDoc focused on what the function is: its purpose and the
   output callers get back. Do not use the block comment above a function to

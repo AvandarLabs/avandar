@@ -69,7 +69,7 @@ function _getRenameBinding(sourceCode, node, newName) {
 const rule = {
   meta: {
     ...getRuleMetadataFromIdentity({
-      ruleId: "AF-22",
+      ruleId: "avlint-ts-017",
       documentationPath:
         "https://github.com/AvandarLabs/avandar/blob/develop/packages/lint/docs/rules/error-class-suffix.md",
     }),
@@ -77,7 +77,7 @@ const rule = {
     fixable: "code",
     schema: [],
     messages: {
-      suffix: "AF-22: Name this Error subclass `{{name}}`.",
+      suffix: "avlint-ts-017: Name this Error subclass `{{name}}`.",
     },
   },
   createOnce: (context) => {

@@ -16,9 +16,9 @@ import type { CoverageReport } from "../coverageHelpers";
 const ROOT: string = resolve(import.meta.dirname, "../../../../../..");
 const directories: string[] = [];
 const SAFE = [
-  ["AF-06", "standalone-body-prose", "function-body-line-comments"],
-  ["AF-07", "short-prose-jsdoc", "single-line-short-jsdoc"],
-  ["AF-11", "one-to-one-module-key", "export-key-jsdoc"],
+  ["avlint-common-001", "standalone-body-prose", "function-body-line-comments"],
+  ["avlint-common-002", "short-prose-jsdoc", "single-line-short-jsdoc"],
+  ["avlint-ts-009", "one-to-one-module-key", "export-key-jsdoc"],
 ] as const;
 
 afterEach(() => {
@@ -134,7 +134,7 @@ it.each(["js", "tsx", "jsx"])(
     if (extension !== "tsx") {
       expect(result.outcomes).toContainEqual(
         expect.objectContaining({
-          ruleId: "AF-11",
+          ruleId: "avlint-ts-009",
           state: "not-applicable",
         }),
       );
@@ -213,7 +213,7 @@ it("keeps unsupported languages in fallback alongside proven TS files", async ()
     directory: directory,
     paths: ["src/reviewed.ts", "src/reviewed.rs"],
   });
-  ["AF-06", "AF-07"].forEach((ruleId) => {
+  ["avlint-common-001", "avlint-common-002"].forEach((ruleId) => {
     expect(result.outcomes).toContainEqual(
       expect.objectContaining({
         ruleId,

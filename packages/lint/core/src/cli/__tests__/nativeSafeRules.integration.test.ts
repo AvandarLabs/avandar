@@ -102,9 +102,14 @@ async function _coverage({
   const result = JSON.parse(stdout.join(""));
   expect(code).toBe(expectedStatus);
   return result.outcomes.filter((entry: { ruleId: string }) => {
-    return ["AF-01", "AF-02", "AF-03", "AF-04", "AF-05", "AF-19"].includes(
-      entry.ruleId,
-    );
+    return [
+      "avlint-ts-001",
+      "avlint-ts-002",
+      "avlint-ts-003",
+      "avlint-ts-004",
+      "avlint-ts-005",
+      "avlint-ts-016",
+    ].includes(entry.ruleId);
   });
 }
 
@@ -114,29 +119,29 @@ it("proves native TS capabilities through the production CLI", async () => {
   const outcomes = await _coverage({ directory: directory });
   expect(
     outcomes.filter((entry: { ruleId: string }) => {
-      return entry.ruleId !== "AF-19";
+      return entry.ruleId !== "avlint-ts-016";
     }),
   ).toEqual(
     expect.arrayContaining([
-      expect.objectContaining({ ruleId: "AF-01", state: "enforced" }),
-      expect.objectContaining({ ruleId: "AF-02", state: "fallback" }),
+      expect.objectContaining({ ruleId: "avlint-ts-001", state: "enforced" }),
+      expect.objectContaining({ ruleId: "avlint-ts-002", state: "fallback" }),
       expect.objectContaining({
-        ruleId: "AF-03",
+        ruleId: "avlint-ts-003",
         capability: "type-imports",
         state: "enforced",
       }),
       expect.objectContaining({
-        ruleId: "AF-03",
+        ruleId: "avlint-ts-003",
         capability: "type-exports",
         state: "enforced",
       }),
-      expect.objectContaining({ ruleId: "AF-04", state: "enforced" }),
-      expect.objectContaining({ ruleId: "AF-05", state: "fallback" }),
+      expect.objectContaining({ ruleId: "avlint-ts-004", state: "enforced" }),
+      expect.objectContaining({ ruleId: "avlint-ts-005", state: "fallback" }),
     ]),
   );
   expect(
     outcomes.find((entry: { ruleId: string }) => {
-      return entry.ruleId === "AF-19";
+      return entry.ruleId === "avlint-ts-016";
     })?.state,
   ).toBe("fallback");
   expect(readFileSync(join(directory, "src/reviewed.ts"), "utf8")).toBe(
@@ -177,7 +182,7 @@ it.each([
   const outcomes = await _coverage({ directory: directory });
   expect(
     outcomes.find((entry: { ruleId: string }) => {
-      return entry.ruleId === "AF-01";
+      return entry.ruleId === "avlint-ts-001";
     })?.state,
   ).toBe("fallback");
 });
@@ -190,16 +195,19 @@ it("proves JavaScript capabilities independently of TS-only capabilities", async
   expect(outcomes).toEqual(
     expect.arrayContaining([
       expect.objectContaining({
-        ruleId: "AF-01",
+        ruleId: "avlint-ts-001",
         language: "javascript",
         state: "enforced",
       }),
       expect.objectContaining({
-        ruleId: "AF-02",
+        ruleId: "avlint-ts-002",
         language: "javascript",
         state: "fallback",
       }),
-      expect.objectContaining({ ruleId: "AF-03", state: "not-applicable" }),
+      expect.objectContaining({
+        ruleId: "avlint-ts-003",
+        state: "not-applicable",
+      }),
     ]),
   );
 });
@@ -214,7 +222,7 @@ it("reports an operational fallback for malformed effective configuration", asyn
   });
   expect(
     outcomes.find((entry: { ruleId: string }) => {
-      return entry.ruleId === "AF-01";
+      return entry.ruleId === "avlint-ts-001";
     }),
   ).toMatchObject({ state: "fallback", operational: false });
 });
@@ -229,7 +237,7 @@ it("keeps unconfigured module syntax and unknown frameworks in fallback", async 
   });
   expect(
     outcomes.filter((entry: { ruleId: string }) => {
-      return entry.ruleId === "AF-01";
+      return entry.ruleId === "avlint-ts-001";
     }),
   ).toEqual(
     expect.arrayContaining([
@@ -264,7 +272,7 @@ process.exit(result.status ?? 1);
   const outcomes = await _coverage({ directory: directory, paths: ["src"] });
   expect(
     outcomes.filter((entry: { ruleId: string; state: string }) => {
-      return entry.ruleId === "AF-01" && entry.state === "enforced";
+      return entry.ruleId === "avlint-ts-001" && entry.state === "enforced";
     }),
   ).toHaveLength(2);
   const events = readFileSync(log, "utf8")
@@ -299,12 +307,12 @@ it("keeps warning-only curly in fallback beside independently blocking seeds", a
   const outcomes = await _coverage({ directory: directory });
   expect(
     outcomes.find((entry: { ruleId: string }) => {
-      return entry.ruleId === "AF-01";
+      return entry.ruleId === "avlint-ts-001";
     }),
   ).toMatchObject({ state: "fallback" });
   expect(
     outcomes.find((entry: { ruleId: string }) => {
-      return entry.ruleId === "AF-04";
+      return entry.ruleId === "avlint-ts-004";
     }),
   ).toMatchObject({ state: "enforced" });
 });

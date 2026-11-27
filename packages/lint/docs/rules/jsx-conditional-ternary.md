@@ -1,6 +1,6 @@
 # JSX conditional ternaries
 
-`avandar/jsx-conditional-ternary` (AF-14) spells a proved boolean JSX child as a
+`avandar/jsx-conditional-ternary` (avlint-ts-011) spells a proved boolean JSX child as a
 ternary. `!ready && <Node />` becomes `(!ready) ? <Node /> : false`.
 
 The exact `false` arm preserves the child value custom components observe.

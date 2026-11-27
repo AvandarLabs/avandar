@@ -2,7 +2,7 @@ import stylelint from "stylelint";
 
 const ruleName = "avandar/canonical-block-comments";
 const messages = stylelint.utils.ruleMessages(ruleName, {
-  expected: "AF-20: Use canonical CSS block comment markers.",
+  expected: "avlint-css-001: Use canonical CSS block comment markers.",
 });
 
 function _getCommentSource(comment) {

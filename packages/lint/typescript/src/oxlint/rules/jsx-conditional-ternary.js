@@ -68,14 +68,16 @@ function _hasNewLineOverflow(sourceCode, expression, replacement) {
 const rule = {
   meta: {
     ...getRuleMetadataFromIdentity({
-      ruleId: "AF-14",
+      ruleId: "avlint-ts-011",
       documentationPath:
         "https://github.com/AvandarLabs/avandar/blob/develop/packages/lint/docs/rules/jsx-conditional-ternary.md",
     }),
     type: "suggestion",
     fixable: "code",
     schema: [],
-    messages: { ternary: "AF-14: Use a ternary for this boolean JSX child." },
+    messages: {
+      ternary: "avlint-ts-011: Use a ternary for this boolean JSX child.",
+    },
   },
   createOnce: (context) => {
     return {

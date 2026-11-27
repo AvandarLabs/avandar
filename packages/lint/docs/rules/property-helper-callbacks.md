@@ -1,6 +1,6 @@
 # Property helper callbacks
 
-`avandar/property-helper-callbacks` (AF-15) replaces exact callbacks on literal
+`avandar/property-helper-callbacks` (avlint-ts-012) replaces exact callbacks on literal
 arrays of plain data objects with the public `prop` and `propEq` helpers.
 
 | Input | Repair |

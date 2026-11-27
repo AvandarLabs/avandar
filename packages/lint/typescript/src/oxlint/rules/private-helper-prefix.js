@@ -40,7 +40,7 @@ function _getHelper(node) {
 const rule = {
   meta: {
     ...getRuleMetadataFromIdentity({
-      ruleId: "AF-10",
+      ruleId: "avlint-ts-008",
       documentationPath:
         "https://github.com/AvandarLabs/avandar/blob/develop/packages/lint/docs/rules/private-helper-prefix.md",
     }),
@@ -48,7 +48,8 @@ const rule = {
     fixable: "code",
     schema: [],
     messages: {
-      prefix: "AF-10: Prefix a private top-level helper with an underscore.",
+      prefix:
+        "avlint-ts-008: Prefix a private top-level helper with an underscore.",
     },
   },
   createOnce: (context) => {

@@ -77,7 +77,7 @@ describe("native safe fixes", () => {
     ).toBe("if (enabled) {consume();}\n");
   });
   it.each(["ts", "tsx", "js", "jsx"])(
-    "preserves concatenation in AF-02 fallback in %s",
+    "preserves concatenation in avlint-ts-002 fallback in %s",
     (extension) => {
       expect(
         _fix({
@@ -112,7 +112,7 @@ describe("native safe fixes", () => {
       }),
     ).toBe("const count: number = 1;\nconst copy = count as number;\n");
   });
-  it("leaves AF-19 repair in fallback because native extensions has no fixer", () => {
+  it("leaves avlint-ts-016 repair in fallback because native extensions has no fixer", () => {
     expect(
       _fix({
         source: 'import { value } from "./target.ts";\n\nconsole.log(value);\n',

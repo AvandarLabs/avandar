@@ -55,7 +55,7 @@
         "properties": {
           "id": {
             "type": "string",
-            "pattern": "^(AF|GD|RP|JR)-[0-9]{2}[AB]?$"
+            "pattern": "^avlint-(common|ts|css|sql|py|rs)-[0-9]{3}$"
           },
           "slug": {
             "type": "string",

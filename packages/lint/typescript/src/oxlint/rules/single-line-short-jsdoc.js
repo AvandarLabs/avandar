@@ -14,14 +14,16 @@ import { getExportKeyMovesFromProgram } from "./export-key-jsdoc.js";
 const rule = {
   meta: {
     ...getRuleMetadataFromIdentity({
-      ruleId: "AF-07",
+      ruleId: "avlint-common-002",
       documentationPath:
         "https://github.com/AvandarLabs/avandar/blob/develop/packages/lint/docs/rules/single-line-doc-comment.md",
     }),
     type: "suggestion",
     fixable: "code",
     schema: [],
-    messages: { singleLine: "AF-07: Keep short, tag-free JSDoc on one line." },
+    messages: {
+      singleLine: "avlint-common-002: Keep short, tag-free JSDoc on one line.",
+    },
   },
   createOnce: (context) => {
     return {

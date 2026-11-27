@@ -5,6 +5,18 @@ import { getCatalogUrlFromFilename } from "./getCatalogUrlFromFilename.ts";
 import type { RuleCatalog } from "./RuleCatalog.types.ts";
 
 /**
+ * Languages each language-specific ID namespace must apply to. The `common`
+ * namespace holds language-agnostic rules and has no language requirement.
+ */
+const NAMESPACE_LANGUAGES: Readonly<Record<string, readonly string[]>> = {
+  ts: ["typescript", "javascript"],
+  css: ["css"],
+  sql: ["sql"],
+  py: ["python"],
+  rs: ["rust"],
+};
+
+/**
  * Validates catalog data before consumers use it. Use it, for example, to
  * reject malformed catalogs or duplicate rule identities before coverage runs.
  */
@@ -25,8 +37,15 @@ export function validateRuleCatalog(value: unknown): RuleCatalog {
     }
   });
   value.rules.forEach((rule) => {
-    if (!rule.id.startsWith(`${rule.class}-`)) {
-      throw new Error(`Catalog class disagrees with ${rule.id}`);
+    const namespace = rule.id.split("-")[1]!;
+    const namespaceLanguages = NAMESPACE_LANGUAGES[namespace];
+    if (
+      namespaceLanguages &&
+      !rule.applicability.some((language) => {
+        return namespaceLanguages.includes(language);
+      })
+    ) {
+      throw new Error(`Catalog namespace disagrees with ${rule.id}`);
     }
     if (
       !rule.applicability.every((language) => {

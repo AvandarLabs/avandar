@@ -64,7 +64,7 @@ it("reports the canonical error ID and the original comment range", async () => 
     expect.objectContaining({
       rule: RULE,
       severity: "error",
-      text: expect.stringContaining("AF-20:"),
+      text: expect.stringContaining("avlint-css-001:"),
       line: 2,
       column: 3,
       endLine: 3,

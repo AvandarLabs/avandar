@@ -65,7 +65,7 @@ function _isSeedWarning(warning, code, start, end) {
   const from = _getOffset(code, warning.line, warning.column);
   const to = _getOffset(code, warning.endLine, warning.endColumn);
   return warning.rule === ruleName && warning.severity === 'error' &&
-    warning.text.startsWith('AF-20:') && from !== undefined && to !== undefined &&
+    warning.text.startsWith('avlint-css-001:') && from !== undefined && to !== undefined &&
     from >= start && to > from && to <= end;
 }
 const result = await (async () => {
@@ -87,7 +87,7 @@ const result = await (async () => {
     return {
       ...base, included, enabled, operational: !_hasErrors(seeded.results),
       recovery: hasIdentity ? undefined : 'Run fallback review for this CSS plugin runtime context. The effective canonical rule must be the matching installed official static public entry.',
-      exitCode: seeded.errored ? 2 : 0, diagnosticRuleIds: enabled ? ['AF-20'] : [],
+      exitCode: seeded.errored ? 2 : 0, diagnosticRuleIds: enabled ? ['avlint-css-001'] : [],
     };
   } catch {
     return { ...base, operational: false, exitCode: 1 };
@@ -218,7 +218,7 @@ export function createCssCoverageProbes(): CoverageProbe[] {
   let preceding: Promise<unknown> = Promise.resolve();
   return [
     {
-      ruleId: "AF-20",
+      ruleId: "avlint-css-001",
       language: "css",
       capability: "standalone-prose-comments",
       prove: ({ path, cwd }) => {
@@ -234,7 +234,7 @@ export function createCssCoverageProbes(): CoverageProbe[] {
       },
     },
     {
-      ruleId: "AF-20",
+      ruleId: "avlint-css-001",
       language: "css",
       capability: "unsupported-shapes",
       prove: async () => {

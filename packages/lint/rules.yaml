@@ -19,7 +19,7 @@ languages:
   - jsonc
   - json
 rules:
-  - id: AF-01
+  - id: avlint-ts-001
     slug: curly
     class: AF
     title: Braces around every `if` body
@@ -32,7 +32,7 @@ rules:
       - 3
     owner: lint
     boundary: Native `curly`; add braces
-  - id: AF-02
+  - id: avlint-ts-002
     slug: prefer-template
     class: AF
     title: Template interpolation instead of concatenation
@@ -45,7 +45,7 @@ rules:
       - 3
     owner: lint
     boundary: Native prefer-template changes object coercion and has no operand restriction; disabled and remains fallback
-  - id: AF-03
+  - id: avlint-ts-003
     slug: consistent-type-imports
     class: AF
     title: "`type` on type-only imports and exports"
@@ -57,7 +57,7 @@ rules:
       - 3
     owner: lint
     boundary: Native type imports and type-aware exports; import() annotations remain unchanged
-  - id: AF-04
+  - id: avlint-ts-004
     slug: prefer-as-const
     class: AF
     title: "`as const` for eligible literals"
@@ -69,7 +69,7 @@ rules:
       - 3
     owner: lint
     boundary: Native `typescript/prefer-as-const`
-  - id: AF-05
+  - id: avlint-ts-005
     slug: no-unnecessary-type-assertion
     class: AF
     title: Remove unnecessary type assertions
@@ -81,7 +81,7 @@ rules:
       - 3
     owner: lint
     boundary: Native assertion fixer breaks TS5.9 generic CRUD contracts; disabled and remains fallback
-  - id: AF-06
+  - id: avlint-common-001
     slug: no-function-body-doc-comments
     class: AF
     title: Ordinary comments inside function bodies
@@ -103,7 +103,7 @@ rules:
       - 6
     owner: lint
     boundary: TS/JS standalone body prose only; preserve nested declarations, inline comments and directives; unsupported shapes remain fallback
-  - id: AF-07
+  - id: avlint-common-002
     slug: single-line-doc-comment
     class: AF
     title: Single-line short docstring
@@ -128,7 +128,7 @@ rules:
       - 6
     owner: lint
     boundary: TS/JS plain tag-free starred JSDoc only; full line including indentation fits 80; preserve paragraphs and markup; other shapes remain fallback
-  - id: AF-08
+  - id: avlint-ts-006
     slug: top-level-function-declaration
     class: AF
     title: Top-level function declarations
@@ -141,7 +141,7 @@ rules:
       - 3
     owner: lint
     boundary: Module-only unique private direct calls after declaration in the same activation; ordinary function expressions or block arrows excluding single-return blocks; refuse exports, recursion, escapes, lexical bindings, comments and competing repairs; unsupported shapes remain fallback
-  - id: AF-09
+  - id: avlint-ts-007
     slug: nested-arrow-function
     class: AF
     title: Nested arrow functions
@@ -154,7 +154,7 @@ rules:
       - 3
     owner: lint
     boundary: Module-only unique nested declarations called directly after initialization in the same function body; refuse recursion, overloads, escapes, lexical bindings, nested functions, comments and competing repairs; unsupported shapes remain fallback
-  - id: AF-10
+  - id: avlint-ts-008
     slug: private-helper-prefix
     class: AF
     title: "`_` prefix on private top-level helpers"
@@ -167,7 +167,7 @@ rules:
       - 3
     owner: lint
     boundary: Module-only unique private helpers called exclusively by the immediately adjacent exported function; reject scope and unresolved-name collisions, exports, escapes, string contracts, nested functions, comments and competing repairs; unsupported shapes remain fallback
-  - id: AF-11
+  - id: avlint-ts-009
     slug: module-member-jsdoc
     class: AF
     title: Existing JSDoc on an exported module key
@@ -179,7 +179,7 @@ rules:
       - 3
     owner: lint
     boundary: TS direct untyped exported object only; one local declaration reference and static key; no intervening comments or owning interface; other shapes remain fallback
-  - id: AF-12
+  - id: avlint-ts-010
     slug: component-props-name
     class: AF
     title: Component props type named `Props`
@@ -191,7 +191,7 @@ rules:
       - 3
     owner: lint
     boundary: TSX adjacent private object alias after a module marker with one JSX owner and parameter reference; no exports, collisions, comments, arrays or intervening repairs; other shapes remain fallback
-  - id: AF-14
+  - id: avlint-ts-011
     slug: jsx-conditional-ternary
     class: AF
     title: JSX conditional rendering uses a ternary
@@ -204,7 +204,7 @@ rules:
       - 3
     owner: lint
     boundary: Boolean comparison or negation in declaration-owned JSX children with an attribute-free self-closing element; exact false arm preserves child values; other shapes remain fallback
-  - id: AF-15
+  - id: avlint-ts-012
     slug: prefer-prop-callback
     class: AF
     title: Exact `prop` and `propEq` callbacks
@@ -217,7 +217,7 @@ rules:
       - 3
     owner: lint
     boundary: Anonymous ordinary callbacks on literal plain-data arrays with dot-free identifier keys and non-null literal strict equality; existing leading runtime utils imports, capture-safe helper bindings and isolated import edits; other shapes remain fallback
-  - id: AF-16
+  - id: avlint-ts-013
     slug: straight-line-object
     class: AF
     title: Straight-line object construction
@@ -230,7 +230,7 @@ rules:
       - 3
     owner: lint
     boundary: Unannotated fresh local data objects with consecutive primitive writes, folded into one returned literal that replaces the declaration; existing own keys or explicit null prototype, scope-proved no escape; annotated bindings and other shapes remain fallback
-  - id: AF-17
+  - id: avlint-ts-014
     slug: optional-array-candidates
     class: AF
     title: Straight-line optional array candidates
@@ -243,7 +243,7 @@ rules:
       - 3
     owner: lint
     boundary: TS/TSX explicitly typed primitive or literal arrays excluding undefined, consecutive multiline parameter guards, replaced by a ternary for one candidate or a filtered literal for several; several candidates need an existing resolved isDefined; a declared return type or exactly matching candidate types, unshadowed Array binding and ordinary Array intrinsics; JS, evolving arrays, missing helpers and other shapes remain fallback
-  - id: AF-18
+  - id: avlint-ts-015
     slug: no-redundant-error-guard
     class: AF
     title: Redundant `instanceof Error` guard
@@ -255,7 +255,7 @@ rules:
       - 5
     owner: lint
     boundary: Type information proves the value and branches equivalent
-  - id: AF-19
+  - id: avlint-ts-016
     slug: import-extensions
     class: AF
     title: File-extension convention
@@ -268,7 +268,7 @@ rules:
       - 3
     owner: lint
     boundary: Native import/extensions detects resolvable targets but has no safe fixer in Oxlint 1.93.0; repair remains fallback
-  - id: AF-20
+  - id: avlint-css-001
     slug: css-block-comment
     class: AF
     title: Canonical CSS block comment shape
@@ -280,7 +280,7 @@ rules:
       - 3
     owner: lint
     boundary: Standalone ordinary CSS prose comment nodes within 80 columns; delimiters and leading markers only; preserve documentation, directives, maps, legal notices, hacks and ambiguous syntax; unsupported shapes remain fallback
-  - id: AF-21
+  - id: avlint-sql-001
     slug: sql-comment-markers
     class: AF
     title: SQL declaration and body comment markers
@@ -292,7 +292,7 @@ rules:
       - 5
     owner: lint
     boundary: SQL parser proves declaration ownership or statement body
-  - id: AF-22
+  - id: avlint-ts-017
     slug: error-class-suffix
     class: AF
     title: Error subclass names end in `Error`
@@ -305,7 +305,7 @@ rules:
       - 3
     owner: lint
     boundary: Reports any class extending `Error` or a class named `*Error` without the suffix; renames module-private class declarations whose references all stay in the file; exported classes, string contracts, reflective names and collisions are reported without a fix
-  - id: GD-01
+  - id: avlint-common-003
     slug: no-em-dashes
     class: GD
     title: No em dashes
@@ -334,7 +334,7 @@ rules:
       - 6
     owner: lint
     boundary: Comment token contains U+2014
-  - id: GD-02
+  - id: avlint-common-004
     slug: lines-stay-within-80-columns
     class: GD
     title: Lines stay within 80 columns
@@ -363,7 +363,7 @@ rules:
       - 6
     owner: lint
     boundary: Comment or docstring token exceeds the configured width
-  - id: GD-03
+  - id: avlint-common-005
     slug: public-exported-values-have-documentation
     class: GD
     title: Public/exported values have documentation
@@ -389,7 +389,7 @@ rules:
       - 6
     owner: lint
     boundary: Public AST node lacks attached documentation
-  - id: GD-04
+  - id: avlint-ts-018
     slug: no-file-level-comment-when-a-main-export-exists
     class: GD
     title: No file-level comment when a main export exists
@@ -402,7 +402,7 @@ rules:
       - 4
     owner: lint
     boundary: Detached block plus basename-matching export
-  - id: GD-05
+  - id: avlint-ts-019
     slug: exported-object-keys-have-documentation
     class: GD
     title: Exported object keys have documentation
@@ -414,7 +414,7 @@ rules:
       - 4
     owner: lint
     boundary: Undocumented exported key without documented owner
-  - id: GD-06
+  - id: avlint-common-006
     slug: functions-stay-at-or-below-45-lines
     class: GD
     title: Functions stay at or below 45 lines
@@ -426,7 +426,7 @@ rules:
       - 6
     owner: lint
     boundary: Function span exceeds 45 lines after exclusions
-  - id: GD-07
+  - id: avlint-common-007
     slug: files-stay-at-or-below-400-lines-with-500-hard
     class: GD
     title: Files stay at or below 400 lines, with 500 hard
@@ -447,7 +447,7 @@ rules:
       - 6
     owner: lint
     boundary: Reviewed source exceeds a threshold after exclusions
-  - id: GD-08
+  - id: avlint-ts-020
     slug: named-exports-only
     class: GD
     title: Named exports only
@@ -460,7 +460,7 @@ rules:
       - 4
     owner: lint
     boundary: Default export AST
-  - id: GD-09
+  - id: avlint-common-008
     slug: closed-vague-identifier-denylist
     class: GD
     title: Closed vague-identifier denylist
@@ -472,7 +472,7 @@ rules:
       - 6
     owner: lint
     boundary: Identifier equals an approved denied name
-  - id: GD-10
+  - id: avlint-ts-021
     slug: event-handlers-use-on
     class: GD
     title: Event handlers use `on...`
@@ -485,7 +485,7 @@ rules:
       - 4
     owner: lint
     boundary: Proven handler position uses disallowed name
-  - id: GD-11
+  - id: avlint-ts-022
     slug: helpers-appear-before-exports-that-use-them
     class: GD
     title: Helpers appear before exports that use them
@@ -498,7 +498,7 @@ rules:
       - 4
     owner: lint
     boundary: Same-file dependency order violates exceptions
-  - id: GD-12
+  - id: avlint-ts-023
     slug: function-declaration-style-outside-af-shapes
     class: GD
     title: Function declaration style outside AF shapes
@@ -511,7 +511,7 @@ rules:
       - 4
     owner: lint
     boundary: Native/custom function-style diagnostic
-  - id: GD-13
+  - id: avlint-ts-024
     slug: object-types-prefer-type
     class: GD
     title: Object types prefer `type`
@@ -523,7 +523,7 @@ rules:
       - 4
     owner: lint
     boundary: Native type-definition diagnostic
-  - id: GD-14
+  - id: avlint-ts-025
     slug: no-explicit-any
     class: GD
     title: No explicit `any`
@@ -535,7 +535,7 @@ rules:
       - 4
     owner: lint
     boundary: Native AST diagnostic
-  - id: GD-15
+  - id: avlint-ts-026
     slug: no-double-assertions
     class: GD
     title: No double assertions
@@ -547,7 +547,7 @@ rules:
       - 4
     owner: lint
     boundary: "`as unknown as` or `as any as`"
-  - id: GD-16
+  - id: avlint-ts-027
     slug: string-unions-instead-of-string-enums
     class: GD
     title: String unions instead of string enums
@@ -559,7 +559,7 @@ rules:
       - 4
     owner: lint
     boundary: String-only enum declaration
-  - id: GD-17
+  - id: avlint-ts-028
     slug: prefer-undefined-over-null
     class: GD
     title: Prefer `undefined` over `null`
@@ -571,7 +571,7 @@ rules:
       - 5
     owner: lint
     boundary: Project-owned API contains non-boundary `null`
-  - id: GD-18
+  - id: avlint-ts-029
     slug: large-inline-shapes-become-named-types
     class: GD
     title: Large inline shapes become named types
@@ -583,7 +583,7 @@ rules:
       - 4
     owner: lint
     boundary: Eligible inline object type has at least four properties
-  - id: GD-19
+  - id: avlint-ts-030
     slug: explicit-module-boundary-types
     class: GD
     title: Explicit module-boundary types
@@ -595,7 +595,7 @@ rules:
       - 4
     owner: lint
     boundary: Native rule
-  - id: GD-20
+  - id: avlint-ts-031
     slug: readonly-inputs-mutable-outputs-explicit-mutation-apis
     class: GD
     title: Readonly inputs, mutable outputs, explicit mutation APIs
@@ -607,7 +607,7 @@ rules:
       - 5
     owner: lint
     boundary: Type-aware structural contract violation
-  - id: GD-21
+  - id: avlint-ts-032
     slug: function-signature-shape
     class: GD
     title: Function signature shape
@@ -621,7 +621,7 @@ rules:
       - 5
     owner: lint
     boundary: Closed positional/options-object shapes
-  - id: GD-22
+  - id: avlint-common-009
     slug: imperative-collection-loops-require-a-reason
     class: GD
     title: Imperative collection loops require a reason
@@ -633,7 +633,7 @@ rules:
       - 6
     owner: lint
     boundary: Loop over a collection lacks a reasoned disable
-  - id: GD-23
+  - id: avlint-ts-033
     slug: one-component-per-file-and-no-jsx-only-render-helper
     class: GD
     title: One component per file and no JSX-only render helper
@@ -646,7 +646,7 @@ rules:
       - 4
     owner: lint
     boundary: Native component count plus helper AST shape
-  - id: GD-24
+  - id: avlint-ts-034
     slug: multi-line-useeffect-callbacks-are-named
     class: GD
     title: Multi-line `useEffect` callbacks are named
@@ -659,7 +659,7 @@ rules:
       - 4
     owner: lint
     boundary: Closed callback shape
-  - id: GD-25
+  - id: avlint-common-010
     slug: meaningful-assertion-and-no-closed-tautology
     class: GD
     title: Meaningful assertion and no closed tautology
@@ -671,7 +671,7 @@ rules:
       - 6
     owner: lint
     boundary: Assertion-free test or closed tautology pattern
-  - id: GD-26
+  - id: avlint-ts-035
     slug: display-copy-is-translated-and-t-does-not-escape
     class: GD
     title: Display copy is translated and `t` does not escape
@@ -684,7 +684,7 @@ rules:
       - 4
     owner: lint
     boundary: Closed display positions and macro scope
-  - id: GD-27
+  - id: avlint-ts-036
     slug: stateless-modules-avoid-createmodule
     class: GD
     title: Stateless modules avoid `createModule`
@@ -696,7 +696,7 @@ rules:
       - 4
     owner: lint
     boundary: Closure/dataflow proves no state or mutable capture
-  - id: GD-28
+  - id: avlint-ts-037
     slug: model-construction-and-namespace-imports
     class: GD
     title: Model construction and namespace imports
@@ -708,7 +708,7 @@ rules:
       - 5
     owner: lint
     boundary: Type and import evidence
-  - id: GD-29
+  - id: avlint-ts-038
     slug: exhaustive-union-dispatch-uses-matchliteral
     class: GD
     title: Exhaustive union dispatch uses `matchLiteral`
@@ -720,7 +720,7 @@ rules:
       - 5
     owner: lint
     boundary: Type information proves a closed string union
-  - id: GD-30
+  - id: avlint-ts-039
     slug: static-ui-styles-avoid-inline-styles-and-tailwind
     class: GD
     title: Static UI styles avoid inline styles and Tailwind
@@ -734,7 +734,7 @@ rules:
       - 4
     owner: lint
     boundary: Closed UI paths and static style tokens
-  - id: GD-31
+  - id: avlint-ts-040
     slug: supabase-null-is-normalized-at-the-boundary
     class: GD
     title: Supabase `null` is normalized at the boundary
@@ -746,7 +746,7 @@ rules:
       - 5
     owner: lint
     boundary: Type-aware dataflow crosses into undefined domain type
-  - id: GD-32
+  - id: avlint-ts-041
     slug: class-declarations-require-a-real-constraint-and-a-reasoned-exception
     class: GD
     title: Class declarations require a real constraint and a reasoned exception
@@ -759,7 +759,7 @@ rules:
       - 4
     owner: lint
     boundary: Class declaration lacks an approved reasoned disable
-  - id: RP-01
+  - id: avlint-ts-042
     slug: one-module-per-file-and-filename-matches-main-export
     class: RP
     title: One module per file and filename matches main export
@@ -772,7 +772,7 @@ rules:
       - 5
     owner: lint
     boundary: File AST, basename, export set
-  - id: RP-02
+  - id: avlint-ts-043
     slug: directory-module-same-stem-and-casing-conventions
     class: RP
     title: Directory-module, same-stem, and casing conventions
@@ -785,7 +785,7 @@ rules:
       - 5
     owner: lint
     boundary: Directory tree and import graph
-  - id: RP-03
+  - id: avlint-ts-044
     slug: no-prefixed-components-under-src-routes
     class: RP
     title: No `-`-prefixed components under `src/routes/`
@@ -797,7 +797,7 @@ rules:
       - 5
     owner: lint
     boundary: Paths
-  - id: RP-04
+  - id: avlint-ts-045
     slug: no-bare-types-ts-or-constants-ts
     class: RP
     title: No bare `types.ts` or `constants.ts`
@@ -809,7 +809,7 @@ rules:
       - 5
     owner: lint
     boundary: Path plus export kinds
-  - id: RP-05
+  - id: avlint-ts-046
     slug: barrels-only-at-approved-roots-and-no-export
     class: RP
     title: Barrels only at approved roots and no `export *`
@@ -822,7 +822,7 @@ rules:
       - 5
     owner: lint
     boundary: Path allowlist, exports, graph
-  - id: RP-06
+  - id: avlint-ts-047
     slug: extensions-public-entries-allowed-subpaths-import-maps
     class: RP
     title: Extensions, public entries, allowed subpaths, import maps
@@ -834,7 +834,7 @@ rules:
       - 5
     owner: lint
     boundary: Resolver, package ownership, Deno reachability
-  - id: RP-07
+  - id: avlint-ts-048
     slug: test-filename-aspect-integration-label-fixture-placement
     class: RP
     title: Test filename, aspect, integration label, fixture placement
@@ -847,7 +847,7 @@ rules:
       - 5
     owner: lint
     boundary: Filesystem and module ownership
-  - id: RP-08
+  - id: avlint-ts-049
     slug: component-owns-css-module-and-domain-prefixed-classes
     class: RP
     title: Component owns CSS Module and domain-prefixed classes
@@ -860,7 +860,7 @@ rules:
       - 5
     owner: lint
     boundary: TSX graph and CSS selectors
-  - id: RP-09
+  - id: avlint-ts-050
     slug: copy-functions-satisfy-mechanical-contracts
     class: RP
     title: Copy functions satisfy mechanical contracts
@@ -872,7 +872,7 @@ rules:
       - 5
     owner: lint
     boundary: Type checker, macro AST, call graph, paths
-  - id: RP-10
+  - id: avlint-sql-002
     slug: new-migrations-sort-last-and-consolidate
     class: RP
     title: New migrations sort last and consolidate
@@ -884,7 +884,7 @@ rules:
       - 5
     owner: lint
     boundary: Git diff and timestamps
-  - id: RP-11
+  - id: avlint-sql-003
     slug: storage-migration-shape-and-schema-mirroring
     class: RP
     title: Storage migration shape and schema mirroring
@@ -896,7 +896,7 @@ rules:
       - 5
     owner: lint
     boundary: Git diff, SQL AST, config, schema
-  - id: RP-12
+  - id: avlint-sql-004
     slug: numeric-declarative-schema-dependency-layers
     class: RP
     title: Numeric declarative-schema dependency layers
@@ -908,7 +908,7 @@ rules:
       - 5
     owner: lint
     boundary: SQL dependency graph and paths
-  - id: RP-13
+  - id: avlint-ts-051
     slug: migration-versions-agree-and-snapshots-avoid-live-types
     class: RP
     title: Migration versions agree and snapshots avoid live types
@@ -920,7 +920,7 @@ rules:
       - 5
     owner: lint
     boundary: Constants, paths, imports, types
-  - id: RP-14
+  - id: avlint-ts-052
     slug: new-models-live-in-approved-roots
     class: RP
     title: New models live in approved roots
@@ -932,7 +932,7 @@ rules:
       - 5
     owner: lint
     boundary: Added paths and model structure
-  - id: RP-15
+  - id: avlint-ts-053
     slug: serialized-shape-changes-bump-cache-schema
     class: RP
     title: Serialized shape changes bump cache schema
@@ -944,7 +944,7 @@ rules:
       - 5
     owner: lint
     boundary: Git diff, types, serializer/parser
-  - id: RP-16A
+  - id: avlint-ts-054
     slug: closed-playwright-static-rules
     class: RP
     title: Closed Playwright static rules
@@ -956,7 +956,7 @@ rules:
       - 5
     owner: lint
     boundary: Playwright AST, paths, fixture APIs
-  - id: RP-16B
+  - id: avlint-common-011
     slug: behavior-under-test-db-writes-and-missing-cleanup-paths
     class: RP
     title: Behavior-under-test DB writes and missing cleanup paths
@@ -967,7 +967,7 @@ rules:
       - 6
     owner: lint
     boundary: Framework adapter, mutation registry, control flow
-  - id: RP-17
+  - id: avlint-sql-005
     slug: closed-sql-identifiers-trigger-names-comment-forms
     class: RP
     title: Closed SQL identifiers, trigger names, comment forms
@@ -979,7 +979,7 @@ rules:
       - 5
     owner: lint
     boundary: SQL AST and object context
-  - id: RP-18
+  - id: avlint-sql-006
     slug: changed-policies-have-required-pgtap-coverage
     class: RP
     title: Changed policies have required pgTAP coverage
@@ -991,7 +991,7 @@ rules:
       - 5
     owner: lint
     boundary: Schema diff, policy operations, tests
-  - id: RP-19
+  - id: avlint-ts-055
     slug: new-package-subpaths-update-every-import-map
     class: RP
     title: New package subpaths update every import map
@@ -1003,7 +1003,7 @@ rules:
       - 5
     owner: lint
     boundary: Package exports diff and import maps
-  - id: JR-01
+  - id: avlint-common-012
     slug: documentation-purpose-use-cases-caller-lists-output-jargon-and-length-quality
     class: JR
     title: Documentation purpose, use cases, caller lists, output, jargon, and length quality
@@ -1031,7 +1031,7 @@ rules:
     phases: []
     owner: avandar-code-review
     boundary: Useful documentation depends on audience and behavior. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate.
-  - id: JR-02
+  - id: avlint-common-013
     slug: historical-and-roadmap-language-in-comments
     class: JR
     title: Historical and roadmap language in comments
@@ -1059,7 +1059,7 @@ rules:
     phases: []
     owner: avandar-code-review
     boundary: Present-day warnings and real code phases are valid exceptions. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate.
-  - id: JR-03
+  - id: avlint-common-014
     slug: inline-one-use-bindings-and-avoid-unnecessary-indirection
     class: JR
     title: Inline one-use bindings and avoid unnecessary indirection
@@ -1087,7 +1087,7 @@ rules:
     phases: []
     owner: avandar-code-review
     boundary: Identity, opacity, reuse, and readability decide whether it helps. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate.
-  - id: JR-04
+  - id: avlint-common-015
     slug: descriptive-names-abbreviations-acronym-discovery-conversion-naming
     class: JR
     title: Descriptive names, abbreviations, acronym discovery, conversion naming
@@ -1115,7 +1115,7 @@ rules:
     phases: []
     owner: avandar-code-review
     boundary: The business noun and semantic source and target are not syntax. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate.
-  - id: JR-05
+  - id: avlint-common-016
     slug: where-to-split-a-long-function-file-or-component
     class: JR
     title: Where to split a long function, file, or component
@@ -1143,7 +1143,7 @@ rules:
     phases: []
     owner: avandar-code-review
     boundary: Threshold detection is deterministic; the seam is architectural. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate.
-  - id: JR-06
+  - id: avlint-common-017
     slug: positive-nesting-ternary-readability-iifes-control-flow-style
     class: JR
     title: Positive nesting, ternary readability, IIFEs, control-flow style
@@ -1171,7 +1171,7 @@ rules:
     phases: []
     owner: avandar-code-review
     boundary: Equivalent syntax can be clearer or worse in context. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate.
-  - id: JR-07
+  - id: avlint-common-018
     slug: reuse-of-repo-or-library-utilities
     class: JR
     title: Reuse of repo or library utilities
@@ -1199,7 +1199,7 @@ rules:
     phases: []
     owner: avandar-code-review
     boundary: Equivalence and abstraction value require semantic comparison. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate.
-  - id: JR-08
+  - id: avlint-common-019
     slug: module-grouping-global-bridges-god-objects-integration-architecture
     class: JR
     title: Module grouping, global bridges, god objects, integration architecture
@@ -1227,7 +1227,7 @@ rules:
     phases: []
     owner: avandar-code-review
     boundary: Ownership and coupling are architectural decisions. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate.
-  - id: JR-09
+  - id: avlint-ts-056
     slug: whether-a-usememo-derivation-is-trivial-or-load-bearing
     class: JR
     title: Whether a `useMemo` derivation is trivial or load-bearing
@@ -1239,7 +1239,7 @@ rules:
     phases: []
     owner: avandar-code-review
     boundary: Cost and identity stability are contextual
-  - id: JR-10
+  - id: avlint-ts-057
     slug: hook-array-defaults-and
     class: JR
     title: Hook array defaults and `?? []`
@@ -1251,7 +1251,7 @@ rules:
     phases: []
     owner: avandar-code-review
     boundary: Loading state, identity, and downstream behavior decide the form
-  - id: JR-11
+  - id: avlint-common-020
     slug: test-names-observable-behavior-assertion-strength-placeholder-intent
     class: JR
     title: Test names, observable behavior, assertion strength, placeholder intent
@@ -1279,7 +1279,7 @@ rules:
     phases: []
     owner: avandar-code-review
     boundary: A useful behavioral claim cannot be inferred from syntax alone. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate.
-  - id: JR-12
+  - id: avlint-common-021
     slug: e2e-behavior-flake-mechanism-locator-risk-dataset-realism-browser-isolation
     class: JR
     title: E2E behavior, flake mechanism, locator risk, dataset realism, browser isolation
@@ -1307,7 +1307,7 @@ rules:
     phases: []
     owner: avandar-code-review
     boundary: Relevant behavior and failure mechanism require investigation. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate.
-  - id: JR-13
+  - id: avlint-sql-007
     slug: sql-domain-nouns-namespaces-enum-docs-and-rls-security-semantics
     class: JR
     title: SQL domain nouns, namespaces, enum docs, and RLS security semantics
@@ -1318,7 +1318,7 @@ rules:
     phases: []
     owner: avandar-code-review
     boundary: Domain language and authorization intent are not closed syntax
-  - id: JR-14
+  - id: avlint-common-022
     slug: whether-related-helpers-should-become-a-module
     class: JR
     title: Whether related helpers should become a module
@@ -1346,7 +1346,7 @@ rules:
     phases: []
     owner: avandar-code-review
     boundary: Relatedness and public API shape are design judgments. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate.
-  - id: JR-15
+  - id: avlint-common-023
     slug: fresh-read-requirements-for-permission-and-mutation-owned-lists
     class: JR
     title: Fresh-read requirements for permission and mutation-owned lists
@@ -1374,7 +1374,7 @@ rules:
     phases: []
     owner: avandar-code-review
     boundary: Mutation ownership needs a closed hook registry or judgment. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate.
-  - id: JR-16
+  - id: avlint-common-024
     slug: composite-type-reuse-and-runtime-union-source-of-truth
     class: JR
     title: Composite type reuse and runtime union source of truth
@@ -1402,7 +1402,7 @@ rules:
     phases: []
     owner: avandar-code-review
     boundary: Semantic equivalence and ownership require judgment. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate.
-  - id: JR-17
+  - id: avlint-ts-058
     slug: mantine-token-choice-a11y-beyond-existing-rules-dynamic-style-legitimacy
     class: JR
     title: Mantine token choice, a11y beyond existing rules, dynamic-style legitimacy

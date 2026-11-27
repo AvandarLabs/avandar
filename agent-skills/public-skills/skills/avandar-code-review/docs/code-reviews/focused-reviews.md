@@ -54,17 +54,17 @@ only one way of running.
 ## Deterministic IDs by pack
 
 After the core handoff, select only the uncovered capabilities for these IDs:
-`comments`: AF-06/07/11/20; `naming`: AF-10/12/13;
+`comments`: avlint-common-001, avlint-common-002, avlint-ts-009, avlint-css-001; `naming`: avlint-ts-008, avlint-ts-010;
 `files` and `tests`: none. Retain every contextual bullet in selected packs. Load selected
 IDs from `deterministic-fallback-checklist.md`; the focused lane receives the
-partition without loading omitted detector prose. AF-21 SQL comment forms
+partition without loading omitted detector prose. avlint-sql-001 SQL comment forms
 remain in the comments pack. All unrelated phases stay excluded.
 
 ### Pack: `comments`
 
 Gate: the diff includes any source file that supports a block comment
 and a line comment (same gate as Phase: comments), which includes `.sql`.
-Plain CSS comments also select AF-20, independent of the CSS-module gate.
+Plain CSS comments also select avlint-css-001, independent of the CSS-module gate.
 
 Apply **only**:
 

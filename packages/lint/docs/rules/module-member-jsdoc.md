@@ -1,4 +1,4 @@
-# AF-11: Exported module key documentation
+# avlint-ts-009: Exported module key documentation
 
 Engine rule: `avandar/export-key-jsdoc`.
 

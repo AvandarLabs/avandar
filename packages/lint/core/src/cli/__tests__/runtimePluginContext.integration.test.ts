@@ -111,14 +111,14 @@ export default eslintCompatPlugin({ meta: { name: "runtime-guard" }, rules: {
     expect(result.status).toBe(0);
     expect(result.outcomes).toContainEqual(
       expect.objectContaining({
-        ruleId: "AF-16",
+        ruleId: "avlint-ts-013",
         capability: "fresh-data-object",
         state: "fallback",
         recovery: expect.stringContaining("plugin runtime context"),
       }),
     );
     expect(result.outcomes).toContainEqual(
-      expect.objectContaining({ ruleId: "AF-01", state: "enforced" }),
+      expect.objectContaining({ ruleId: "avlint-ts-001", state: "enforced" }),
     );
   },
 );
@@ -157,7 +157,7 @@ it.each(["root", "nested", "override", "relative-entry"])(
     expect(result.status).toBe(0);
     expect(result.outcomes).toContainEqual(
       expect.objectContaining({
-        ruleId: "AF-16",
+        ruleId: "avlint-ts-013",
         capability: "fresh-data-object",
         state: "enforced",
       }),
@@ -247,13 +247,13 @@ export default eslintCompatPlugin({ meta: { name: "conditional-wrapper" }, rules
   expect(result.status).toBe(0);
   expect(result.outcomes).toContainEqual(
     expect.objectContaining({
-      ruleId: "AF-16",
+      ruleId: "avlint-ts-013",
       capability: "fresh-data-object",
       state: "fallback",
     }),
   );
   expect(result.outcomes).toContainEqual(
-    expect.objectContaining({ ruleId: "AF-01", state: "enforced" }),
+    expect.objectContaining({ ruleId: "avlint-ts-001", state: "enforced" }),
   );
 });
 
@@ -314,7 +314,7 @@ it("proves the official packed entry from a standalone core package", async () =
   expect(result.status, `${result.stdout}${result.stderr}`).toBe(0);
   expect(JSON.parse(result.stdout).outcomes).toContainEqual(
     expect.objectContaining({
-      ruleId: "AF-16",
+      ruleId: "avlint-ts-013",
       capability: "fresh-data-object",
       state: "enforced",
     }),
@@ -358,7 +358,7 @@ it("keeps the official utility-directory filename exclusion in the original cont
     expectedSource: source,
   });
   expect(result.status).toBe(0);
-  ["AF-15", "AF-17"].forEach((ruleId) => {
+  ["avlint-ts-012", "avlint-ts-014"].forEach((ruleId) => {
     expect(
       result.outcomes.filter((entry: { ruleId: string; state: string }) => {
         return entry.ruleId === ruleId && entry.state === "enforced";

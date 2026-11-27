@@ -178,7 +178,7 @@ command/status, exact reviewed paths, and retained/omitted
    Match the ID's language, path and capability inside that file. Preserve
    partial families: an enforced safe capability omits only itself, while an
    explicit `unsupported-shapes` fallback still runs for the same path.
-5. Continue every normal JR/semantic, guided, contextual, AF-18/21 and selected
+5. Continue every normal JR/semantic, guided, contextual, avlint-ts-015, avlint-sql-001 and selected
    pack obligation. Coverage subtraction applies only to proven deterministic
    capabilities. Recompute this record after changing source or lint config.
 
@@ -191,16 +191,16 @@ command/status, exact reviewed paths, and retained/omitted
 | Unknown extension/language | Retain fallback; assess actual language applicability before choosing native syntax. |
 
 Full reviews select all relevant shipped AF IDs. Focused reviews select only
-IDs assigned to their packs in the focused reference. AF-02/05/19, unsupported
-AF-17 JS shapes, and any missing proof remain fallback. Generic AF-06/07
+IDs assigned to their packs in the focused reference. avlint-ts-002, avlint-ts-005, avlint-ts-016, unsupported
+avlint-ts-014 JS shapes, and any missing proof remain fallback. Generic avlint-common-001, avlint-common-002
 fallback assesses the actual language; it does not impose JS syntax on an
-unknown language. AF-20 applies to **plain CSS and CSS Modules** independently
+unknown language. avlint-css-001 applies to **plain CSS and CSS Modules** independently
 of the CSS-module gate, including in a focused `comments` review.
 
-Example: for one TSX path, AF-06 `standalone-body-prose: enforced` omits that
-capability; AF-06 `unsupported-shapes: fallback` retains only the unsupported
-shapes. An AF-01 `if-body: enforced` row omits that exact detector. An AF-20
-fallback on plain CSS loads AF-20; an unknown-language AF-06 fallback first
+Example: for one TSX path, avlint-common-001 `standalone-body-prose: enforced` omits that
+capability; avlint-common-001 `unsupported-shapes: fallback` retains only the unsupported
+shapes. An avlint-ts-001 `if-body: enforced` row omits that exact detector. An avlint-css-001
+fallback on plain CSS loads avlint-css-001; an unknown-language avlint-common-001 fallback first
 checks that language's comment forms. Summary-only evidence omits none.
 
 ## Review Order
@@ -327,7 +327,7 @@ SKILL file.
 - **Find lane:** one selected-capability lane on full reviews; selected pack
   lanes carry their own partition on focused reviews. Count it only when used.
 - **Applicability:** all reviewed source languages, including unknown-language
-  assessment and plain CSS. CSS Modules are not the AF-20 applicability gate.
+  assessment and plain CSS. CSS Modules are not the avlint-css-001 applicability gate.
 
 ### Phase: comments
 

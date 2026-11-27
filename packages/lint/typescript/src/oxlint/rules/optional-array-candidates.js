@@ -186,14 +186,16 @@ function _preservesReturnType(sourceCode, plan) {
 const rule = {
   meta: {
     ...getRuleMetadataFromIdentity({
-      ruleId: "AF-17",
+      ruleId: "avlint-ts-014",
       documentationPath:
         "https://github.com/AvandarLabs/avandar/blob/develop/packages/lint/docs/rules/optional-array-candidates.md",
     }),
     type: "suggestion",
     fixable: "code",
     schema: [],
-    messages: { candidates: "AF-17: Filter these exact optional candidates." },
+    messages: {
+      candidates: "avlint-ts-014: Filter these exact optional candidates.",
+    },
   },
   createOnce: (context) => {
     return {

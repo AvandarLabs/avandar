@@ -31,10 +31,14 @@ const directories: string[] = [];
 
 /** Utility capabilities exercised by the fixer fixtures. */
 export const SAFE = [
-  ["AF-15", "literal-property-map", "property-helper-callbacks"],
-  ["AF-15", "literal-property-equality", "property-helper-callbacks"],
-  ["AF-16", "fresh-data-object", "straight-line-object-construction"],
-  ["AF-17", "optional-parameter-candidates", "optional-array-candidates"],
+  ["avlint-ts-012", "literal-property-map", "property-helper-callbacks"],
+  ["avlint-ts-012", "literal-property-equality", "property-helper-callbacks"],
+  ["avlint-ts-013", "fresh-data-object", "straight-line-object-construction"],
+  [
+    "avlint-ts-014",
+    "optional-parameter-candidates",
+    "optional-array-candidates",
+  ],
 ] as const;
 
 /** Minimal utility import establishing the fixture dependency. */

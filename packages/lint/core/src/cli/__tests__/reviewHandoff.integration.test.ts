@@ -102,9 +102,14 @@ it("separates exact TSX and plain CSS proofs from unsupported review obligations
   });
   expect(report.operational).toBe(true);
   [
-    ["AF-01", "typescript", "src/reviewed.tsx", "if-body"],
-    ["AF-06", "typescript", "src/reviewed.tsx", "standalone-body-prose"],
-    ["AF-20", "css", "src/theme.css", "standalone-prose-comments"],
+    ["avlint-ts-001", "typescript", "src/reviewed.tsx", "if-body"],
+    [
+      "avlint-common-001",
+      "typescript",
+      "src/reviewed.tsx",
+      "standalone-body-prose",
+    ],
+    ["avlint-css-001", "css", "src/theme.css", "standalone-prose-comments"],
   ].forEach(([ruleId, language, path, capability]) => {
     expect(report.outcomes).toContainEqual(
       expect.objectContaining({
@@ -116,7 +121,7 @@ it("separates exact TSX and plain CSS proofs from unsupported review obligations
       }),
     );
   });
-  ["AF-06", "AF-20"].forEach((ruleId) => {
+  ["avlint-common-001", "avlint-css-001"].forEach((ruleId) => {
     expect(report.outcomes).toContainEqual(
       expect.objectContaining({
         ruleId,
@@ -125,7 +130,7 @@ it("separates exact TSX and plain CSS proofs from unsupported review obligations
       }),
     );
   });
-  ["AF-02", "AF-05", "AF-19"].forEach((ruleId) => {
+  ["avlint-ts-002", "avlint-ts-005", "avlint-ts-016"].forEach((ruleId) => {
     expect(report.outcomes).toContainEqual(
       expect.objectContaining({
         ruleId,
@@ -159,14 +164,14 @@ it("retains custom fallback when the plugin is disabled while native proof stays
   });
   expect(report.outcomes).toContainEqual(
     expect.objectContaining({
-      ruleId: "AF-06",
+      ruleId: "avlint-common-001",
       capability: "standalone-body-prose",
       state: "fallback",
     }),
   );
   expect(report.outcomes).toContainEqual(
     expect.objectContaining({
-      ruleId: "AF-01",
+      ruleId: "avlint-ts-001",
       capability: "if-body",
       state: "enforced",
     }),
@@ -181,7 +186,7 @@ it("returns unknown-language fallback without inventing JS inapplicability", asy
   });
   expect(report.outcomes).toContainEqual(
     expect.objectContaining({
-      ruleId: "AF-06",
+      ruleId: "avlint-common-001",
       language: "unknown",
       path: join(directory, "src/policy.rego"),
       capability: "all",
@@ -204,7 +209,7 @@ it("retains native fallback when the consumer has no installed lint engines", as
   expect(report.operational).toBe(true);
   expect(report.outcomes).toContainEqual(
     expect.objectContaining({
-      ruleId: "AF-01",
+      ruleId: "avlint-ts-001",
       capability: "if-body",
       state: "fallback",
       recovery: expect.stringContaining("Install"),

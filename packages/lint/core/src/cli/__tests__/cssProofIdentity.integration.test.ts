@@ -63,7 +63,7 @@ export default stylelint.createPlugin(ruleName, () => (root, result) => {
   root.walkComments((comment) => {
     if (!comment.text.includes("\\n")) { return; }
     stylelint.utils.report({ ruleName, result, node: comment,
-      message: "AF-20: Use canonical CSS block comment markers." });
+      message: "avlint-css-001: Use canonical CSS block comment markers." });
   });
 });
 `,
@@ -94,7 +94,7 @@ async function _coverage(directory: string): Promise<CoverageReport> {
   const result = JSON.parse(output.join(""));
   expect(result.outcomes).toContainEqual(
     expect.objectContaining({
-      ruleId: "AF-01",
+      ruleId: "avlint-ts-001",
       state: "enforced",
       path: join(directory, "src/control.ts"),
     }),
@@ -157,7 +157,7 @@ it.each([
     const result = await _coverage(directory);
     expect(result.outcomes).toContainEqual(
       expect.objectContaining({
-        ruleId: "AF-20",
+        ruleId: "avlint-css-001",
         language: "css",
         capability: "standalone-prose-comments",
         path: join(directory, "src/reviewed.css"),
@@ -167,7 +167,7 @@ it.each([
     );
     expect(result.summaries).toContainEqual(
       expect.objectContaining({
-        ruleId: "AF-20",
+        ruleId: "avlint-css-001",
         language: "css",
         state: "fallback",
         uncovered: expect.arrayContaining([
@@ -188,7 +188,7 @@ it("credits the final official registration rather than an earlier replacement",
   ]);
   expect((await _coverage(directory)).outcomes).toContainEqual(
     expect.objectContaining({
-      ruleId: "AF-20",
+      ruleId: "avlint-css-001",
       capability: "standalone-prose-comments",
       state: "enforced",
     }),
@@ -226,7 +226,7 @@ export default {
     const result = await _coverage(directory);
     expect(result.outcomes).toContainEqual(
       expect.objectContaining({
-        ruleId: "AF-20",
+        ruleId: "avlint-css-001",
         capability: "standalone-prose-comments",
         state: "fallback",
         operational: true,
@@ -234,7 +234,7 @@ export default {
     );
     expect(result.summaries).toContainEqual(
       expect.objectContaining({
-        ruleId: "AF-20",
+        ruleId: "avlint-css-001",
         language: "css",
         state: "fallback",
         uncovered: expect.arrayContaining([
@@ -264,7 +264,7 @@ function _packedCoverage(directory: string): CoverageReport {
   expect(result.status, result.stderr).toBe(0);
   const report = JSON.parse(result.stdout);
   expect(report.outcomes).toContainEqual(
-    expect.objectContaining({ ruleId: "AF-01", state: "enforced" }),
+    expect.objectContaining({ ruleId: "avlint-ts-001", state: "enforced" }),
   );
   expect(readFileSync(join(directory, "src/reviewed.css"), "utf8")).toBe(
     SOURCE,
@@ -277,7 +277,7 @@ it("proves the freshly packed official CSS entry from a standalone core consumer
   _standalone(directory);
   expect(_packedCoverage(directory).outcomes).toContainEqual(
     expect.objectContaining({
-      ruleId: "AF-20",
+      ruleId: "avlint-css-001",
       capability: "standalone-prose-comments",
       state: "enforced",
     }),
@@ -291,7 +291,7 @@ it.each(["version", "conditional-export", "static-wrapper"])(
     _standalone(directory);
     expect(_packedCoverage(directory).outcomes).toContainEqual(
       expect.objectContaining({
-        ruleId: "AF-20",
+        ruleId: "avlint-css-001",
         capability: "standalone-prose-comments",
         state: "enforced",
       }),
@@ -319,7 +319,7 @@ it.each(["version", "conditional-export", "static-wrapper"])(
     writeFileSync(packagePath, JSON.stringify(manifest));
     expect(_packedCoverage(directory).outcomes).toContainEqual(
       expect.objectContaining({
-        ruleId: "AF-20",
+        ruleId: "avlint-css-001",
         capability: "standalone-prose-comments",
         state: "fallback",
       }),
@@ -362,7 +362,7 @@ ${config}
   );
   expect((await _coverage(directory)).outcomes).toContainEqual(
     expect.objectContaining({
-      ruleId: "AF-20",
+      ruleId: "avlint-css-001",
       capability: "standalone-prose-comments",
       state: "fallback",
       operational: true,

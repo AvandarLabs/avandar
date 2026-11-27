@@ -167,11 +167,11 @@ it.each(["tsx", "jsx", "ts", "js"])(
       extension: extension,
     });
     SAFE.forEach(([ruleId, capability]) => {
-      if (ruleId === "AF-12" && ["jsx", "js"].includes(extension)) {
+      if (ruleId === "avlint-ts-010" && ["jsx", "js"].includes(extension)) {
         return;
       }
       const supported =
-        ruleId === "AF-12"
+        ruleId === "avlint-ts-010"
           ? extension === "tsx"
           : ["tsx", "jsx"].includes(extension);
       expect(result.outcomes).toContainEqual(

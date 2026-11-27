@@ -20,22 +20,22 @@ it("accepts canonical pinned-engine diagnostics inside exact Unicode byte ranges
         return `${entry.ruleId}:${entry.capability}`;
       }),
   ).toEqual([
-    "AF-01:if-body",
-    "AF-03:type-imports",
-    "AF-03:type-exports",
-    "AF-04:literal-assertions",
-    "AF-06:standalone-body-prose",
-    "AF-07:short-prose-jsdoc",
-    "AF-08:direct-top-level-calls",
-    "AF-09:direct-nested-calls",
-    "AF-10:private-direct-calls",
-    "AF-11:one-to-one-module-key",
-    "AF-12:single-component-props",
-    "AF-14:boolean-jsx-children",
-    "AF-15:literal-property-map",
-    "AF-15:literal-property-equality",
-    "AF-16:fresh-data-object",
-    "AF-17:optional-parameter-candidates",
+    "avlint-ts-001:if-body",
+    "avlint-ts-003:type-imports",
+    "avlint-ts-003:type-exports",
+    "avlint-ts-004:literal-assertions",
+    "avlint-common-001:standalone-body-prose",
+    "avlint-common-002:short-prose-jsdoc",
+    "avlint-ts-006:direct-top-level-calls",
+    "avlint-ts-007:direct-nested-calls",
+    "avlint-ts-008:private-direct-calls",
+    "avlint-ts-009:one-to-one-module-key",
+    "avlint-ts-010:single-component-props",
+    "avlint-ts-011:boolean-jsx-children",
+    "avlint-ts-012:literal-property-map",
+    "avlint-ts-012:literal-property-equality",
+    "avlint-ts-013:fresh-data-object",
+    "avlint-ts-014:optional-parameter-candidates",
   ]);
 });
 
@@ -125,14 +125,14 @@ it("does not credit the equality seed diagnostic to the map capability", async (
   expect(result.status).toBe(0);
   expect(result.outcomes).toContainEqual(
     expect.objectContaining({
-      ruleId: "AF-15",
+      ruleId: "avlint-ts-012",
       capability: "literal-property-map",
       state: "fallback",
     }),
   );
   expect(result.outcomes).toContainEqual(
     expect.objectContaining({
-      ruleId: "AF-15",
+      ruleId: "avlint-ts-012",
       capability: "literal-property-equality",
       state: "enforced",
     }),

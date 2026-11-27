@@ -1,6 +1,6 @@
 # Optional array candidates
 
-`avandar/optional-array-candidates` (AF-17) replaces an empty array that is
+`avandar/optional-array-candidates` (avlint-ts-014) replaces an empty array that is
 filled through consecutive exact undefined guards with the shortest equivalent
 return, and removes the declaration.
 
@@ -52,7 +52,7 @@ self-import boundaries follow
 Guard bodies must start on a following line. `undefined` must be unshadowed.
 Aliases, member reads, unknown calls, comments, truthiness/null checks,
 branches, interleaved effects and early returns receive no repair. As with
-AF-16, removing the declaration drops an overlapping native fix on it for one
+avlint-ts-013, removing the declaration drops an overlapping native fix on it for one
 pass. Long return expressions wrap to fit the root line limit. Coverage proves
 `optional-parameter-candidates` with a several-candidate seed, so the proof
 still requires the helper context. `unsupported-shapes` always remains

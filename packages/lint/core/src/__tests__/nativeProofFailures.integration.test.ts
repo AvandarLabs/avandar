@@ -30,14 +30,14 @@ it("keeps oversized source bounded without starting a seed child", async () => {
   const result = JSON.parse(stdout.join(""));
   expect(result.outcomes).toContainEqual(
     expect.objectContaining({
-      ruleId: "AF-01",
+      ruleId: "avlint-ts-001",
       state: "fallback",
       recovery: expect.stringContaining("source-byte bound"),
     }),
   );
   expect(result.outcomes).toContainEqual(
     expect.objectContaining({
-      ruleId: "AF-08",
+      ruleId: "avlint-ts-006",
       capability: "direct-top-level-calls",
       state: "fallback",
       recovery: expect.stringContaining("source-byte bound"),
@@ -64,7 +64,7 @@ it("chooses seed identifiers absent from the original prefix", async () => {
   expect(result.operational).toBe(true);
   expect(result.outcomes).toContainEqual(
     expect.objectContaining({
-      ruleId: "AF-08",
+      ruleId: "avlint-ts-006",
       capability: "direct-top-level-calls",
       state: "enforced",
     }),
@@ -93,7 +93,7 @@ it.each([
     expect(result.status).toBe(1);
     expect(result.outcomes).toContainEqual(
       expect.objectContaining({
-        ruleId: "AF-01",
+        ruleId: "avlint-ts-001",
         state: "fallback",
         operational: false,
       }),
@@ -122,7 +122,7 @@ it("fails operationally when the actual configured plugin throws during rule cre
   expect(result.status).toBe(1);
   expect(result.outcomes).toContainEqual(
     expect.objectContaining({
-      ruleId: "AF-01",
+      ruleId: "avlint-ts-001",
       state: "fallback",
       operational: false,
     }),

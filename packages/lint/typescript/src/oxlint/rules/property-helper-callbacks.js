@@ -85,14 +85,16 @@ function _hasLiteralRows(call, key) {
 const rule = {
   meta: {
     ...getRuleMetadataFromIdentity({
-      ruleId: "AF-15",
+      ruleId: "avlint-ts-012",
       documentationPath:
         "https://github.com/AvandarLabs/avandar/blob/develop/packages/lint/docs/rules/property-helper-callbacks.md",
     }),
     type: "suggestion",
     fixable: "code",
     schema: [],
-    messages: { helper: "AF-15: Use the exact property helper callback." },
+    messages: {
+      helper: "avlint-ts-012: Use the exact property helper callback.",
+    },
   },
   createOnce: (context) => {
     return {

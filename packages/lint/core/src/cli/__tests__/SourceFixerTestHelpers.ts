@@ -27,9 +27,13 @@ const directories: string[] = [];
 
 /** Capability identities exercised by these fixer regression tests. */
 export const SAFE = [
-  ["AF-08", "direct-top-level-calls", "top-level-function-declarations"],
-  ["AF-09", "direct-nested-calls", "nested-arrow-functions"],
-  ["AF-10", "private-direct-calls", "private-helper-prefix"],
+  [
+    "avlint-ts-006",
+    "direct-top-level-calls",
+    "top-level-function-declarations",
+  ],
+  ["avlint-ts-007", "direct-nested-calls", "nested-arrow-functions"],
+  ["avlint-ts-008", "private-direct-calls", "private-helper-prefix"],
 ] as const;
 
 /** Creates a repository for source declaration fixer tests. */

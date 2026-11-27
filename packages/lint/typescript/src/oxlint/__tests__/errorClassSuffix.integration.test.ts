@@ -25,7 +25,7 @@ it.each([
   "export const Denied = class Denied extends Error {};",
 ])("reports an Error subclass without the suffix: %s", (source) => {
   expect(_getMessages(source)).toEqual([
-    "AF-22: Name this Error subclass `DeniedError`.",
+    "avlint-ts-017: Name this Error subclass `DeniedError`.",
   ]);
 });
 
@@ -72,6 +72,6 @@ it.each([
       result.messages.map(({ message }) => {
         return message;
       }),
-    ).toEqual(["AF-22: Name this Error subclass `DeniedError`."]);
+    ).toEqual(["avlint-ts-017: Name this Error subclass `DeniedError`."]);
   },
 );

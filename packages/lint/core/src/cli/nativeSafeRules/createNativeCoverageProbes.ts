@@ -91,7 +91,7 @@ function _hasProvenRuleContext({
   if (!CUSTOM_RULE_IDS.includes(ruleId)) {
     return true;
   }
-  const isUtility = ["AF-15", "AF-17"].includes(ruleId);
+  const isUtility = ["avlint-ts-012", "avlint-ts-014"].includes(ruleId);
   const isExcludedUtility =
     /\/(?:packages\/shared\/utils|node_modules\/@avandar\/utils)\//.test(
       path.replaceAll("\\", "/"),
@@ -138,9 +138,11 @@ function _createProbe({
     prove: async ({ path, cwd }) => {
       const proof = await getProof({ path, cwd });
       const hasOriginalModule = _hasOriginalModule(proof);
-      const requiresOriginalModule = ["AF-08", "AF-09", "AF-10"].includes(
-        ruleId,
-      );
+      const requiresOriginalModule = [
+        "avlint-ts-006",
+        "avlint-ts-007",
+        "avlint-ts-008",
+      ].includes(ruleId);
       const code = CUSTOM_RULE_IDS.includes(ruleId)
         ? `avandar(${nativeRule})`
         : NATIVE_CODES[nativeRule]!;

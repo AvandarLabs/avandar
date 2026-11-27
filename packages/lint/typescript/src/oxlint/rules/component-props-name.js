@@ -117,7 +117,7 @@ function _reportPropsCandidates(context, program, component) {
 const rule = {
   meta: {
     ...getRuleMetadataFromIdentity({
-      ruleId: "AF-12",
+      ruleId: "avlint-ts-010",
       documentationPath:
         "https://github.com/AvandarLabs/avandar/blob/develop/packages/lint/docs/rules/component-props-name.md",
     }),
@@ -125,7 +125,7 @@ const rule = {
     fixable: "code",
     schema: [],
     messages: {
-      rename: "AF-12: Name the component's private props alias Props.",
+      rename: "avlint-ts-010: Name the component's private props alias Props.",
     },
   },
   createOnce: (context) => {

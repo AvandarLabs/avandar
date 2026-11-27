@@ -111,14 +111,16 @@ function _buildMergedEntries(sourceCode, plan) {
 const rule = {
   meta: {
     ...getRuleMetadataFromIdentity({
-      ruleId: "AF-16",
+      ruleId: "avlint-ts-013",
       documentationPath:
         "https://github.com/AvandarLabs/avandar/blob/develop/packages/lint/docs/rules/straight-line-object-construction.md",
     }),
     type: "suggestion",
     fixable: "code",
     schema: [],
-    messages: { object: "AF-16: Construct this fresh data object directly." },
+    messages: {
+      object: "avlint-ts-013: Construct this fresh data object directly.",
+    },
   },
   createOnce: (context) => {
     return {

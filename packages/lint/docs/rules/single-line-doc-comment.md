@@ -1,4 +1,4 @@
-# AF-07: Short JSDoc
+# avlint-common-002: Short JSDoc
 
 Engine rule: `avandar/single-line-short-jsdoc`.
 

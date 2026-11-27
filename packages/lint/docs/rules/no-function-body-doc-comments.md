@@ -1,4 +1,4 @@
-# AF-06: Ordinary function-body comments
+# avlint-common-001: Ordinary function-body comments
 
 Engine rule: `avandar/function-body-line-comments`.
 

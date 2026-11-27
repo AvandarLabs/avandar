@@ -29,7 +29,7 @@ describe("coverage", () => {
       "if (true) console.log('seed');\n",
     );
     const probe: CoverageProbe = {
-      ruleId: "AF-01",
+      ruleId: "avlint-ts-001",
       language: "typescript",
       capability: "if-body",
       prove: async () => {
@@ -59,7 +59,7 @@ describe("coverage", () => {
               return diagnostic.code.includes("curly");
             },
           )
-            ? ["AF-01"]
+            ? ["avlint-ts-001"]
             : [],
         };
       },
@@ -90,7 +90,7 @@ describe("coverage", () => {
       paths: [path],
       probes: [
         {
-          ruleId: "AF-01",
+          ruleId: "avlint-ts-001",
           language: "typescript",
           capability: "if-body",
           prove: async () => {
@@ -100,7 +100,7 @@ describe("coverage", () => {
               included: reason !== "excluded",
               operational: reason !== "operational",
               exitCode: reason === "unproven" ? 0 : 1,
-              diagnosticRuleIds: ["AF-01"],
+              diagnosticRuleIds: ["avlint-ts-001"],
             };
           },
         },
@@ -125,7 +125,7 @@ describe("coverage", () => {
       paths,
       probes: [
         {
-          ruleId: "AF-01",
+          ruleId: "avlint-ts-001",
           language: "typescript",
           capability: "supported-framework",
           prove: async ({ path }) => {
@@ -137,7 +137,7 @@ describe("coverage", () => {
               exitCode: 1,
               diagnosticRuleIds: path.endsWith("unsupported.ts")
                 ? []
-                : ["AF-01"],
+                : ["avlint-ts-001"],
             };
           },
         },
@@ -169,7 +169,10 @@ describe("coverage", () => {
     ).toBe("fallback");
     expect(
       result.outcomes.find((entry) => {
-        return entry.path.endsWith("data.json") && entry.ruleId === "GD-01";
+        return (
+          entry.path.endsWith("data.json") &&
+          entry.ruleId === "avlint-common-003"
+        );
       })?.state,
     ).toBe("not-applicable");
   });
@@ -206,7 +209,7 @@ describe("coverage", () => {
       paths: [supportedPath, unsupportedPath],
       probes: [
         {
-          ruleId: "AF-01",
+          ruleId: "avlint-ts-001",
           language: "typescript",
           capability: "if-body",
           prove: async () => {
@@ -216,7 +219,7 @@ describe("coverage", () => {
               included: true,
               operational: true,
               exitCode: 1,
-              diagnosticRuleIds: ["AF-01"],
+              diagnosticRuleIds: ["avlint-ts-001"],
             };
           },
         },
@@ -244,7 +247,7 @@ describe("coverage", () => {
       paths: [path],
       probes: [
         {
-          ruleId: "AF-01",
+          ruleId: "avlint-ts-001",
           language: "typescript",
           capability: "if-body",
           prove: async () => {

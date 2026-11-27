@@ -8,26 +8,16 @@ import { validateRuleCatalog } from "../validateRuleCatalog";
 describe("canonical catalog", () => {
   it("includes every inventory ID once with unique documentation slugs", () => {
     const catalog = loadRuleCatalog();
-    const expected = [
-      ...Array.from({ length: 22 }, (_, index) => {
-        return `AF-${String(index + 1).padStart(2, "0")}`;
-      }).filter((id) => {
-        return id !== "AF-13";
-      }),
-      ...Array.from({ length: 32 }, (_, index) => {
-        return `GD-${String(index + 1).padStart(2, "0")}`;
-      }),
-      ...Array.from({ length: 19 }, (_, index) => {
-        return `RP-${String(index + 1).padStart(2, "0")}`;
-      }).filter((id) => {
-        return id !== "RP-16";
-      }),
-      "RP-16A",
-      "RP-16B",
-      ...Array.from({ length: 17 }, (_, index) => {
-        return `JR-${String(index + 1).padStart(2, "0")}`;
-      }),
-    ];
+    const expected = Object.entries({
+      common: 24,
+      ts: 58,
+      css: 1,
+      sql: 7,
+    }).flatMap(([namespace, count]) => {
+      return Array.from({ length: count }, (_, index) => {
+        return `avlint-${namespace}-${String(index + 1).padStart(3, "0")}`;
+      });
+    });
     expect(
       catalog.rules
         .map((rule) => {
@@ -109,6 +99,32 @@ describe("canonical catalog", () => {
     }).toThrow();
   });
 
+  it("rejects a language namespace that disagrees with applicability", () => {
+    const catalog = loadRuleCatalog();
+    const sqlRule = catalog.rules.find((rule) => {
+      return rule.id === "avlint-sql-001";
+    })!;
+    expect(() => {
+      return validateRuleCatalog({
+        ...catalog,
+        rules: [{ ...sqlRule, applicability: ["typescript"] }],
+      });
+    }).toThrow("Catalog namespace disagrees with avlint-sql-001");
+  });
+
+  it.each(["AF-01", "avlint-ts-1", "avlint-go-001"])(
+    "rejects a rule ID outside the avlint namespaces: %s",
+    (id) => {
+      const catalog = loadRuleCatalog();
+      expect(() => {
+        return validateRuleCatalog({
+          ...catalog,
+          rules: [{ ...catalog.rules[0]!, id: id }],
+        });
+      }).toThrow();
+    },
+  );
+
   it("uses the inventory's exact source, TSX, and contextual judgment language gates", () => {
     const catalog = loadRuleCatalog();
     const applicability = (id: string): string[] => {
@@ -116,7 +132,7 @@ describe("canonical catalog", () => {
         return rule.id === id;
       })!.applicability;
     };
-    expect(applicability("GD-07")).toEqual([
+    expect(applicability("avlint-common-007")).toEqual([
       "typescript",
       "javascript",
       "python",
@@ -127,11 +143,21 @@ describe("canonical catalog", () => {
       "kotlin",
       "swift",
     ]);
-    expect(applicability("RP-08")).toEqual(["typescript", "css"]);
-    expect(applicability("JR-09")).toEqual(["typescript", "javascript"]);
-    expect(applicability("JR-10")).toEqual(["typescript", "javascript"]);
-    expect(applicability("JR-13")).toEqual(["sql"]);
-    expect(applicability("JR-17")).toEqual(["typescript", "javascript", "css"]);
+    expect(applicability("avlint-ts-049")).toEqual(["typescript", "css"]);
+    expect(applicability("avlint-ts-056")).toEqual([
+      "typescript",
+      "javascript",
+    ]);
+    expect(applicability("avlint-ts-057")).toEqual([
+      "typescript",
+      "javascript",
+    ]);
+    expect(applicability("avlint-sql-007")).toEqual(["sql"]);
+    expect(applicability("avlint-ts-058")).toEqual([
+      "typescript",
+      "javascript",
+      "css",
+    ]);
   });
 
   it("keeps unenumerated judgment gates broad with contextual applicability guidance", () => {
@@ -139,7 +165,12 @@ describe("canonical catalog", () => {
     const broad = catalog.rules.filter((rule) => {
       return (
         rule.class === "JR" &&
-        !["JR-09", "JR-10", "JR-13", "JR-17"].includes(rule.id)
+        ![
+          "avlint-ts-056",
+          "avlint-ts-057",
+          "avlint-sql-007",
+          "avlint-ts-058",
+        ].includes(rule.id)
       );
     });
     expect(

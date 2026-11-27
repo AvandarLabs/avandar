@@ -1,6 +1,6 @@
 # Error class suffix
 
-`avandar/error-class-suffix` (AF-22) reports a class that extends `Error`, or
+`avandar/error-class-suffix` (avlint-ts-017) reports a class that extends `Error`, or
 any class whose name ends in `Error`, when its own name does not end in
 `Error`. The fix appends the suffix.
 

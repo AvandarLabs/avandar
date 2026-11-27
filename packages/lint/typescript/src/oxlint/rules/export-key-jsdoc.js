@@ -160,7 +160,7 @@ export function getExportKeyMovesFromProgram(program, sourceCode) {
 const rule = {
   meta: {
     ...getRuleMetadataFromIdentity({
-      ruleId: "AF-11",
+      ruleId: "avlint-ts-009",
       documentationPath:
         "https://github.com/AvandarLabs/avandar/blob/develop/packages/lint/docs/rules/module-member-jsdoc.md",
     }),
@@ -168,7 +168,8 @@ const rule = {
     fixable: "code",
     schema: [],
     messages: {
-      member: "AF-11: Put existing documentation on the exported module key.",
+      member:
+        "avlint-ts-009: Put existing documentation on the exported module key.",
     },
   },
   createOnce: (context) => {

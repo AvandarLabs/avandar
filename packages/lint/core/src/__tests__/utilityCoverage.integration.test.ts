@@ -22,7 +22,7 @@ it.each(["ts", "tsx", "js", "jsx"])(
           ruleId,
           capability,
           state:
-            ruleId === "AF-17" && ["js", "jsx"].includes(extension)
+            ruleId === "avlint-ts-014" && ["js", "jsx"].includes(extension)
               ? "fallback"
               : "enforced",
         }),
@@ -120,7 +120,7 @@ it.each([
       directory: _createRepository({ extension: "ts", source: source }),
     });
     SAFE.filter(([ruleId]) => {
-      return ruleId !== "AF-16";
+      return ruleId !== "avlint-ts-013";
     }).forEach(([ruleId, capability]) => {
       expect(result.outcomes).toContainEqual(
         expect.objectContaining({ ruleId, capability, state: "fallback" }),
@@ -138,21 +138,21 @@ it("keeps two import-dependent capabilities independent in the seeded proof", as
   });
   expect(result.outcomes).toContainEqual(
     expect.objectContaining({
-      ruleId: "AF-15",
+      ruleId: "avlint-ts-012",
       capability: "literal-property-map",
       state: "enforced",
     }),
   );
   expect(result.outcomes).toContainEqual(
     expect.objectContaining({
-      ruleId: "AF-15",
+      ruleId: "avlint-ts-012",
       capability: "literal-property-equality",
       state: "fallback",
     }),
   );
   expect(result.outcomes).toContainEqual(
     expect.objectContaining({
-      ruleId: "AF-17",
+      ruleId: "avlint-ts-014",
       capability: "optional-parameter-candidates",
       state: "fallback",
     }),
@@ -168,14 +168,14 @@ it("does not credit the map capability from an equality diagnostic", async () =>
   });
   expect(result.outcomes).toContainEqual(
     expect.objectContaining({
-      ruleId: "AF-15",
+      ruleId: "avlint-ts-012",
       capability: "literal-property-map",
       state: "fallback",
     }),
   );
   expect(result.outcomes).toContainEqual(
     expect.objectContaining({
-      ruleId: "AF-15",
+      ruleId: "avlint-ts-012",
       capability: "literal-property-equality",
       state: "enforced",
     }),

@@ -14,7 +14,7 @@ import {
 const rule = {
   meta: {
     ...getRuleMetadataFromIdentity({
-      ruleId: "AF-06",
+      ruleId: "avlint-common-001",
       documentationPath:
         "https://github.com/AvandarLabs/avandar/blob/develop/packages/lint/docs/rules/no-function-body-doc-comments.md",
     }),
@@ -22,7 +22,8 @@ const rule = {
     fixable: "code",
     schema: [],
     messages: {
-      ordinary: "AF-06: Use ordinary line comments inside function bodies.",
+      ordinary:
+        "avlint-common-001: Use ordinary line comments inside function bodies.",
     },
   },
   createOnce: (context) => {

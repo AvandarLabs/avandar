@@ -13,21 +13,21 @@ family in the review's packs. These instructions work without Avandar lint.
   never proves the absence of unsupported syntax in the reviewed file.
 - For absent outcomes, missing commands/packages/plugins/rules, disabled or
   excluded paths, config errors and summary-only evidence, retain applicable
-  detectors. Native AF-02/05/19 and JS AF-17 have no safe repair proof.
+  detectors. Native avlint-ts-002, avlint-ts-005, avlint-ts-016 and JS avlint-ts-014 have no safe repair proof.
 - For unknown source extensions or languages, first establish the actual
   language and whether each selected rule's syntax and rationale apply.
   Unknown is not `not-applicable`. Keep the unresolved obligation visible;
   inspect language-native constructs instead of imposing JavaScript syntax.
-  AF-06 applies to C-like block/line comments, AF-07 to native docstrings,
-  AF-20 to CSS, and TS/JS-only checks require those languages.
-- AF-20 applies to **all CSS**, including plain `.css`, independently of the
-  CSS-module phase. AF-15 requires the actual `@avandar/utils` dependency or
+  avlint-common-001 applies to C-like block/line comments, avlint-common-002 to native docstrings,
+  avlint-css-001 to CSS, and TS/JS-only checks require those languages.
+- avlint-css-001 applies to **all CSS**, including plain `.css`, independently of the
+  CSS-module phase. avlint-ts-012 requires the actual `@avandar/utils` dependency or
   a documented alias. Check helper availability before proposing a repair.
 - Unsupported shapes require contextual verification, not an unsafe textual
   rewrite. Preserve directives, legal comments, external contracts, hoisting,
   lexical bindings, coercion, evaluation order and observable return values.
-  For AF-06, preserve documentation owned by nested declarations. For AF-07,
-  preserve tags, paragraphs and markup. For AF-20, preserve declaration docs,
+  For avlint-common-001, preserve documentation owned by nested declarations. For avlint-common-002,
+  preserve tags, paragraphs and markup. For avlint-css-001, preserve declaration docs,
   directives, maps, legal notices, hacks and inline/ambiguous markers.
 
 Scanners below find candidates only. Restrict every command to reviewed paths
@@ -40,23 +40,23 @@ capabilities below never discharge a separate unsupported-shapes outcome.
 
 | ID | Safe capability |
 | --- | --- |
-| AF-01 | `if-body` |
-| AF-03 | `type-imports`, `type-exports` independently |
-| AF-04 | `literal-assertions` |
-| AF-06 | `standalone-body-prose` |
-| AF-07 | `short-prose-jsdoc` |
-| AF-08 | `direct-top-level-calls` |
-| AF-09 | `direct-nested-calls` |
-| AF-10 | `private-direct-calls` |
-| AF-11 | `one-to-one-module-key` |
-| AF-12 | `single-component-props` |
-| AF-14 | `boolean-jsx-children` |
-| AF-15 | `literal-property-map`, `literal-property-equality` independently |
-| AF-16 | `fresh-data-object` |
-| AF-17 | `optional-parameter-candidates` in TS/TSX only |
-| AF-20 | `standalone-prose-comments` |
+| avlint-ts-001 | `if-body` |
+| avlint-ts-003 | `type-imports`, `type-exports` independently |
+| avlint-ts-004 | `literal-assertions` |
+| avlint-common-001 | `standalone-body-prose` |
+| avlint-common-002 | `short-prose-jsdoc` |
+| avlint-ts-006 | `direct-top-level-calls` |
+| avlint-ts-007 | `direct-nested-calls` |
+| avlint-ts-008 | `private-direct-calls` |
+| avlint-ts-009 | `one-to-one-module-key` |
+| avlint-ts-010 | `single-component-props` |
+| avlint-ts-011 | `boolean-jsx-children` |
+| avlint-ts-012 | `literal-property-map`, `literal-property-equality` independently |
+| avlint-ts-013 | `fresh-data-object` |
+| avlint-ts-014 | `optional-parameter-candidates` in TS/TSX only |
+| avlint-css-001 | `standalone-prose-comments` |
 
-## AF-01: Braces around if bodies
+## avlint-ts-001: Braces around if bodies
 
 Braces make branch boundaries explicit and avoid accidental statement capture.
 
@@ -73,7 +73,7 @@ Braces make branch boundaries explicit and avoid accidental statement capture.
   Multi-line `if (...)\n  doThing();` patterns are missed; still scan by
   eye for those.
 
-## AF-02: Template interpolation
+## avlint-ts-002: Template interpolation
 
 Interpolation makes the resulting string readable. Verify operand coercion before changing concatenation.
 
@@ -85,7 +85,7 @@ Interpolation makes the resulting string readable. Verify operand coercion befor
   grep -rEn '"[^"]*" *\+|\+ *"[^"]*"' --include="*.ts" --include="*.tsx" .
   ```
 
-## AF-03: Type-only import and export markers
+## avlint-ts-003: Type-only import and export markers
 
 Explicit type markers keep erased dependencies separate from runtime imports and exports.
 
@@ -104,13 +104,13 @@ Explicit type markers keep erased dependencies separate from runtime imports and
   Heuristic only; still scan import lists manually for type-only names
   this regex doesn't anticipate.
 
-## AF-04: Literal const assertions
+## avlint-ts-004: Literal const assertions
 
 Literal const assertions retain the intended literal type without repeating its value.
 
 - Use `as const` for literals that never change.
 
-## AF-05: Unnecessary type assertions
+## avlint-ts-005: Unnecessary type assertions
 
 - Never keep an `as T` cast that the compiler does not need. A cast tells
   the reader "TypeScript cannot prove this", so a cast that proves nothing
@@ -178,7 +178,7 @@ Literal const assertions retain the intended literal type without repeating its 
   const rows = await fetchRows();
   ```
 
-## AF-06: Ordinary function-body comments
+## avlint-common-001: Ordinary function-body comments
 
 Line comments distinguish implementation prose from API documentation.
 
@@ -217,7 +217,7 @@ Line comments distinguish implementation prose from API documentation.
   }
   ```
 
-## AF-07: Single-line short docstrings
+## avlint-common-002: Single-line short docstrings
 
 A short docstring is easier to scan on one line. Preserve every word.
 
@@ -225,7 +225,7 @@ A short docstring is easier to scan on one line. Preserve every word.
   This is a formatting rule only: never cut a docstring's content to make it
   fit on one line.
 
-## AF-08: Top-level function declarations
+## avlint-ts-006: Top-level function declarations
 
 Declaration syntax makes module-level functions immediately recognizable. Preserve hoisting and lexical semantics.
 
@@ -241,19 +241,19 @@ Declaration syntax makes module-level functions immediately recognizable. Preser
   Many hits will be true single-expression utilities or factory results;
   flag only ones that are real top-level function declarations.
 
-## AF-09: Nested arrow functions
+## avlint-ts-007: Nested arrow functions
 
 Arrow syntax distinguishes local functions from module entry points. Preserve binding and initialization behavior.
 
 - Nested functions and object methods should use arrow functions.
 
-## AF-10: Private helper prefixes
+## avlint-ts-008: Private helper prefixes
 
 The prefix distinguishes private helpers from the public API at call sites.
 
 - Non-exported top-level helper functions should be prefixed with `_`.
 
-## AF-11: Exported module-key documentation
+## avlint-ts-009: Exported module-key documentation
 
 - Put the docstring on the module's exported key, not on the underlying
   declaration, when a non-exported declaration is defined in the same file as
@@ -300,7 +300,7 @@ The prefix distinguishes private helpers from the public API at call sites.
   or the underlying declarations. Do not flag missing key docstrings in that
   case.
 
-## AF-12: Component props names
+## avlint-ts-010: Component props names
 
 A local Props name stays readable as a component is renamed. Verify ownership and external references.
 
@@ -314,7 +314,7 @@ A local Props name stays readable as a component is renamed. Verify ownership an
     | grep -Ev '\btype Props\b'
   ```
 
-## AF-14: JSX conditional ternaries
+## avlint-ts-011: JSX conditional ternaries
 
 An explicit false branch avoids rendering non-boolean falsy values. Preserve exact JSX child behavior.
 
@@ -330,7 +330,7 @@ An explicit false branch avoids rendering non-boolean falsy values. Preserve exa
   Non-exhaustive: multi-line `{cond && (\n <jsx>\n)}` patterns are
   missed. Also scan diff hunks for those by eye.
 
-## AF-15: Property helper callbacks
+## avlint-ts-012: Property helper callbacks
 
 - Prefer the higher-order helpers `prop`, `propEq`, `propIn`, etc. from
   `@avandar/utils` over inline arrow functions that only read a property,
@@ -382,7 +382,7 @@ An explicit false branch avoids rendering non-boolean falsy values. Preserve exa
   composes the same way (`propEq("baseColumn.name", targetName)`). Use the
   dotted form rather than an inline lambda for nested reads.
 
-## AF-16: Straight-line object construction
+## avlint-ts-013: Straight-line object construction
 
 - Construct objects as a single literal at the end of the function,
   not by declaring an empty object and mutating fields onto it. Compute
@@ -480,7 +480,7 @@ An explicit false branch avoids rendering non-boolean falsy values. Preserve exa
   of `= {}` exist (passing a fresh empty options bag into a library
   call, seeding a `useState({})`, etc.); filter those out first.
 
-## AF-17: Optional array candidates
+## avlint-ts-014: Optional array candidates
 
 - Build variable-length arrays by listing every candidate inline with a
   conditional that evaluates to `undefined`, then filter out the
@@ -517,7 +517,7 @@ An explicit false branch avoids rendering non-boolean falsy values. Preserve exa
   ].filter(isDefined);
   ```
 
-## AF-19: File import extensions
+## avlint-ts-016: File import extensions
 
 - In Deno-reachable code, imports **that name a file** must include the
   file extension (e.g. `.ts`). Repos that use Deno usually pin a few
@@ -548,7 +548,7 @@ An explicit false branch avoids rendering non-boolean falsy values. Preserve exa
   When you do, first decide whether the specifier is a package name or a
   file path; only flag the latter.
 
-## AF-20: CSS block comments
+## avlint-css-001: CSS block comments
 
 - Use canonical CSS block comment formatting. Consistent comment shape makes
   stylesheet comments easy to scan and keeps formatter output predictable.
@@ -584,7 +584,7 @@ An explicit false branch avoids rendering non-boolean falsy values. Preserve exa
   }
   ```
 
-## AF-22: Error subclass suffix
+## avlint-ts-017: Error subclass suffix
 
 - A class that extends `Error`, or a class whose name ends in `Error`, ends in
   `Error` itself. The suffix tells a reader at the throw and catch sites that
@@ -596,8 +596,8 @@ An explicit false branch avoids rendering non-boolean falsy values. Preserve exa
 
 ## Deferred detector ownership
 
-AF-18 remains in `functional-style-checklist.md` (typed Error guards).
-AF-21 remains in `sql-checklist.md` (SQL declaration/body comment forms).
+avlint-ts-015 remains in `functional-style-checklist.md` (typed Error guards).
+avlint-sql-001 remains in `sql-checklist.md` (SQL declaration/body comment forms).
 These later automation families and every JR judgment obligation remain active
 under their normal full/focused phase gates; coverage subtraction here does
 not discharge them.

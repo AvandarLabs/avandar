@@ -1,6 +1,6 @@
 # Straight-line object construction
 
-`avandar/straight-line-object-construction` (AF-16) folds consecutive
+`avandar/straight-line-object-construction` (avlint-ts-013) folds consecutive
 primitive writes to a fresh local object into one returned literal, and removes
 the declaration.
 

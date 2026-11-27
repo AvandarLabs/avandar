@@ -57,14 +57,16 @@ function _getReplacement(sourceCode, declaration) {
 const rule = {
   meta: {
     ...getRuleMetadataFromIdentity({
-      ruleId: "AF-08",
+      ruleId: "avlint-ts-006",
       documentationPath:
         "https://github.com/AvandarLabs/avandar/blob/develop/packages/lint/docs/rules/top-level-function-declaration.md",
     }),
     type: "suggestion",
     fixable: "code",
     schema: [],
-    messages: { declaration: "AF-08: Use a top-level function declaration." },
+    messages: {
+      declaration: "avlint-ts-006: Use a top-level function declaration.",
+    },
   },
   createOnce: (context) => {
     return {

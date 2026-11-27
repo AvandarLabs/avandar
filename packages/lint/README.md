@@ -9,96 +9,96 @@ from `rules.yaml`, validated against `rules.schema.json`.
 <!-- catalog:start -->
 | ID | Slug | Requirement | Applicability | Repair | Phases | Owner | Proof boundary |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| AF-01 | curly | Braces around every `if` body | typescript, javascript | safe | 3 | lint | Native `curly`; add braces |
-| AF-02 | prefer-template | Template interpolation instead of concatenation | typescript, javascript | safe | 3 | lint | Native prefer-template changes object coercion and has no operand restriction; disabled and remains fallback |
-| AF-03 | consistent-type-imports | `type` on type-only imports and exports | typescript | safe | 3 | lint | Native type imports and type-aware exports; import() annotations remain unchanged |
-| AF-04 | prefer-as-const | `as const` for eligible literals | typescript | safe | 3 | lint | Native `typescript/prefer-as-const` |
-| AF-05 | no-unnecessary-type-assertion | Remove unnecessary type assertions | typescript | safe | 3 | lint | Native assertion fixer breaks TS5.9 generic CRUD contracts; disabled and remains fallback |
-| AF-06 | no-function-body-doc-comments | Ordinary comments inside function bodies | typescript, javascript, rust, go, java, kotlin, swift, c, cpp, csharp | safe | 3, 6 | lint | TS/JS standalone body prose only; preserve nested declarations, inline comments and directives; unsupported shapes remain fallback |
-| AF-07 | single-line-doc-comment | Single-line short docstring | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql | safe | 3, 6 | lint | TS/JS plain tag-free starred JSDoc only; full line including indentation fits 80; preserve paragraphs and markup; other shapes remain fallback |
-| AF-08 | top-level-function-declaration | Top-level function declarations | typescript, javascript | safe | 3 | lint | Module-only unique private direct calls after declaration in the same activation; ordinary function expressions or block arrows excluding single-return blocks; refuse exports, recursion, escapes, lexical bindings, comments and competing repairs; unsupported shapes remain fallback |
-| AF-09 | nested-arrow-function | Nested arrow functions | typescript, javascript | safe | 3 | lint | Module-only unique nested declarations called directly after initialization in the same function body; refuse recursion, overloads, escapes, lexical bindings, nested functions, comments and competing repairs; unsupported shapes remain fallback |
-| AF-10 | private-helper-prefix | `_` prefix on private top-level helpers | typescript, javascript | safe | 3 | lint | Module-only unique private helpers called exclusively by the immediately adjacent exported function; reject scope and unresolved-name collisions, exports, escapes, string contracts, nested functions, comments and competing repairs; unsupported shapes remain fallback |
-| AF-11 | module-member-jsdoc | Existing JSDoc on an exported module key | typescript | safe | 3 | lint | TS direct untyped exported object only; one local declaration reference and static key; no intervening comments or owning interface; other shapes remain fallback |
-| AF-12 | component-props-name | Component props type named `Props` | typescript | safe | 3 | lint | TSX adjacent private object alias after a module marker with one JSX owner and parameter reference; no exports, collisions, comments, arrays or intervening repairs; other shapes remain fallback |
-| AF-14 | jsx-conditional-ternary | JSX conditional rendering uses a ternary | typescript, javascript | safe | 3 | lint | Boolean comparison or negation in declaration-owned JSX children with an attribute-free self-closing element; exact false arm preserves child values; other shapes remain fallback |
-| AF-15 | prefer-prop-callback | Exact `prop` and `propEq` callbacks | typescript, javascript | safe | 3 | lint | Anonymous ordinary callbacks on literal plain-data arrays with dot-free identifier keys and non-null literal strict equality; existing leading runtime utils imports, capture-safe helper bindings and isolated import edits; other shapes remain fallback |
-| AF-16 | straight-line-object | Straight-line object construction | typescript, javascript | safe | 3 | lint | Unannotated fresh local data objects with consecutive primitive writes, folded into one returned literal that replaces the declaration; existing own keys or explicit null prototype, scope-proved no escape; annotated bindings and other shapes remain fallback |
-| AF-17 | optional-array-candidates | Straight-line optional array candidates | typescript, javascript | safe | 3 | lint | TS/TSX explicitly typed primitive or literal arrays excluding undefined, consecutive multiline parameter guards, replaced by a ternary for one candidate or a filtered literal for several; several candidates need an existing resolved isDefined; a declared return type or exactly matching candidate types, unshadowed Array binding and ordinary Array intrinsics; JS, evolving arrays, missing helpers and other shapes remain fallback |
-| AF-18 | no-redundant-error-guard | Redundant `instanceof Error` guard | typescript | safe | 5 | lint | Type information proves the value and branches equivalent |
-| AF-19 | import-extensions | File-extension convention | typescript, javascript | safe | 3 | lint | Native import/extensions detects resolvable targets but has no safe fixer in Oxlint 1.93.0; repair remains fallback |
-| AF-20 | css-block-comment | Canonical CSS block comment shape | css | safe | 3 | lint | Standalone ordinary CSS prose comment nodes within 80 columns; delimiters and leading markers only; preserve documentation, directives, maps, legal notices, hacks and ambiguous syntax; unsupported shapes remain fallback |
-| AF-21 | sql-comment-markers | SQL declaration and body comment markers | sql | safe | 5 | lint | SQL parser proves declaration ownership or statement body |
-| AF-22 | error-class-suffix | Error subclass names end in `Error` | typescript, javascript | safe | 3 | lint | Reports any class extending `Error` or a class named `*Error` without the suffix; renames module-private class declarations whose references all stay in the file; exported classes, string contracts, reflective names and collisions are reported without a fix |
-| GD-01 | no-em-dashes | No em dashes | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, css, shell, yaml, jsonc | guided | 4, 6 | lint | Comment token contains U+2014 |
-| GD-02 | lines-stay-within-80-columns | Lines stay within 80 columns | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, css, shell, yaml, jsonc | guided | 4, 6 | lint | Comment or docstring token exceeds the configured width |
-| GD-03 | public-exported-values-have-documentation | Public/exported values have documentation | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, shell | guided | 4, 6 | lint | Public AST node lacks attached documentation |
-| GD-04 | no-file-level-comment-when-a-main-export-exists | No file-level comment when a main export exists | typescript, javascript | guided | 4 | lint | Detached block plus basename-matching export |
-| GD-05 | exported-object-keys-have-documentation | Exported object keys have documentation | typescript | guided | 4 | lint | Undocumented exported key without documented owner |
-| GD-06 | functions-stay-at-or-below-45-lines | Functions stay at or below 45 lines | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, shell | guided | 4, 6 | lint | Function span exceeds 45 lines after exclusions |
-| GD-07 | files-stay-at-or-below-400-lines-with-500-hard | Files stay at or below 400 lines, with 500 hard | typescript, javascript, python, rust, go, ruby, java, kotlin, swift | guided | 4, 6 | lint | Reviewed source exceeds a threshold after exclusions |
-| GD-08 | named-exports-only | Named exports only | typescript, javascript | guided | 4 | lint | Default export AST |
-| GD-09 | closed-vague-identifier-denylist | Closed vague-identifier denylist | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, shell | guided | 4, 6 | lint | Identifier equals an approved denied name |
-| GD-10 | event-handlers-use-on | Event handlers use `on...` | typescript, javascript | guided | 4 | lint | Proven handler position uses disallowed name |
-| GD-11 | helpers-appear-before-exports-that-use-them | Helpers appear before exports that use them | typescript, javascript | guided | 4 | lint | Same-file dependency order violates exceptions |
-| GD-12 | function-declaration-style-outside-af-shapes | Function declaration style outside AF shapes | typescript, javascript | guided | 4 | lint | Native/custom function-style diagnostic |
-| GD-13 | object-types-prefer-type | Object types prefer `type` | typescript | guided | 4 | lint | Native type-definition diagnostic |
-| GD-14 | no-explicit-any | No explicit `any` | typescript | guided | 4 | lint | Native AST diagnostic |
-| GD-15 | no-double-assertions | No double assertions | typescript | guided | 4 | lint | `as unknown as` or `as any as` |
-| GD-16 | string-unions-instead-of-string-enums | String unions instead of string enums | typescript | guided | 4 | lint | String-only enum declaration |
-| GD-17 | prefer-undefined-over-null | Prefer `undefined` over `null` | typescript | guided | 5 | lint | Project-owned API contains non-boundary `null` |
-| GD-18 | large-inline-shapes-become-named-types | Large inline shapes become named types | typescript | guided | 4 | lint | Eligible inline object type has at least four properties |
-| GD-19 | explicit-module-boundary-types | Explicit module-boundary types | typescript | guided | 4 | lint | Native rule |
-| GD-20 | readonly-inputs-mutable-outputs-explicit-mutation-apis | Readonly inputs, mutable outputs, explicit mutation APIs | typescript | guided | 5 | lint | Type-aware structural contract violation |
-| GD-21 | function-signature-shape | Function signature shape | typescript, javascript | guided | 4, 5 | lint | Closed positional/options-object shapes |
-| GD-22 | imperative-collection-loops-require-a-reason | Imperative collection loops require a reason | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, shell | guided | 4, 6 | lint | Loop over a collection lacks a reasoned disable |
-| GD-23 | one-component-per-file-and-no-jsx-only-render-helper | One component per file and no JSX-only render helper | typescript, javascript | guided | 4 | lint | Native component count plus helper AST shape |
-| GD-24 | multi-line-useeffect-callbacks-are-named | Multi-line `useEffect` callbacks are named | typescript, javascript | guided | 4 | lint | Closed callback shape |
-| GD-25 | meaningful-assertion-and-no-closed-tautology | Meaningful assertion and no closed tautology | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, shell | guided | 4, 6 | lint | Assertion-free test or closed tautology pattern |
-| GD-26 | display-copy-is-translated-and-t-does-not-escape | Display copy is translated and `t` does not escape | typescript, javascript | guided | 4 | lint | Closed display positions and macro scope |
-| GD-27 | stateless-modules-avoid-createmodule | Stateless modules avoid `createModule` | typescript | guided | 4 | lint | Closure/dataflow proves no state or mutable capture |
-| GD-28 | model-construction-and-namespace-imports | Model construction and namespace imports | typescript | guided | 5 | lint | Type and import evidence |
-| GD-29 | exhaustive-union-dispatch-uses-matchliteral | Exhaustive union dispatch uses `matchLiteral` | typescript | guided | 5 | lint | Type information proves a closed string union |
-| GD-30 | static-ui-styles-avoid-inline-styles-and-tailwind | Static UI styles avoid inline styles and Tailwind | typescript, javascript, css | guided | 4 | lint | Closed UI paths and static style tokens |
-| GD-31 | supabase-null-is-normalized-at-the-boundary | Supabase `null` is normalized at the boundary | typescript | guided | 5 | lint | Type-aware dataflow crosses into undefined domain type |
-| GD-32 | class-declarations-require-a-real-constraint-and-a-reasoned-exception | Class declarations require a real constraint and a reasoned exception | typescript, javascript | guided | 4 | lint | Class declaration lacks an approved reasoned disable |
-| RP-01 | one-module-per-file-and-filename-matches-main-export | One module per file and filename matches main export | typescript, javascript | evidence | 5 | lint | File AST, basename, export set |
-| RP-02 | directory-module-same-stem-and-casing-conventions | Directory-module, same-stem, and casing conventions | typescript, javascript | evidence | 5 | lint | Directory tree and import graph |
-| RP-03 | no-prefixed-components-under-src-routes | No `-`-prefixed components under `src/routes/` | typescript | evidence | 5 | lint | Paths |
-| RP-04 | no-bare-types-ts-or-constants-ts | No bare `types.ts` or `constants.ts` | typescript | evidence | 5 | lint | Path plus export kinds |
-| RP-05 | barrels-only-at-approved-roots-and-no-export | Barrels only at approved roots and no `export *` | typescript, javascript | evidence | 5 | lint | Path allowlist, exports, graph |
-| RP-06 | extensions-public-entries-allowed-subpaths-import-maps | Extensions, public entries, allowed subpaths, import maps | typescript | evidence | 5 | lint | Resolver, package ownership, Deno reachability |
-| RP-07 | test-filename-aspect-integration-label-fixture-placement | Test filename, aspect, integration label, fixture placement | typescript, javascript | evidence | 5 | lint | Filesystem and module ownership |
-| RP-08 | component-owns-css-module-and-domain-prefixed-classes | Component owns CSS Module and domain-prefixed classes | typescript, css | evidence | 5 | lint | TSX graph and CSS selectors |
-| RP-09 | copy-functions-satisfy-mechanical-contracts | Copy functions satisfy mechanical contracts | typescript | evidence | 5 | lint | Type checker, macro AST, call graph, paths |
-| RP-10 | new-migrations-sort-last-and-consolidate | New migrations sort last and consolidate | sql | evidence | 5 | lint | Git diff and timestamps |
-| RP-11 | storage-migration-shape-and-schema-mirroring | Storage migration shape and schema mirroring | sql | evidence | 5 | lint | Git diff, SQL AST, config, schema |
-| RP-12 | numeric-declarative-schema-dependency-layers | Numeric declarative-schema dependency layers | sql | evidence | 5 | lint | SQL dependency graph and paths |
-| RP-13 | migration-versions-agree-and-snapshots-avoid-live-types | Migration versions agree and snapshots avoid live types | typescript | evidence | 5 | lint | Constants, paths, imports, types |
-| RP-14 | new-models-live-in-approved-roots | New models live in approved roots | typescript | evidence | 5 | lint | Added paths and model structure |
-| RP-15 | serialized-shape-changes-bump-cache-schema | Serialized shape changes bump cache schema | typescript | evidence | 5 | lint | Git diff, types, serializer/parser |
-| RP-16A | closed-playwright-static-rules | Closed Playwright static rules | typescript | evidence | 5 | lint | Playwright AST, paths, fixture APIs |
-| RP-16B | behavior-under-test-db-writes-and-missing-cleanup-paths | Behavior-under-test DB writes and missing cleanup paths | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, shell | evidence | 6 | lint | Framework adapter, mutation registry, control flow |
-| RP-17 | closed-sql-identifiers-trigger-names-comment-forms | Closed SQL identifiers, trigger names, comment forms | sql | evidence | 5 | lint | SQL AST and object context |
-| RP-18 | changed-policies-have-required-pgtap-coverage | Changed policies have required pgTAP coverage | sql | evidence | 5 | lint | Schema diff, policy operations, tests |
-| RP-19 | new-package-subpaths-update-every-import-map | New package subpaths update every import map | typescript | evidence | 5 | lint | Package exports diff and import maps |
-| JR-01 | documentation-purpose-use-cases-caller-lists-output-jargon-and-length-quality | Documentation purpose, use cases, caller lists, output, jargon, and length quality | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, css, shell, yaml, jsonc, json | judgment | Judgment | avandar-code-review | Useful documentation depends on audience and behavior. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate. |
-| JR-02 | historical-and-roadmap-language-in-comments | Historical and roadmap language in comments | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, css, shell, yaml, jsonc, json | judgment | Judgment | avandar-code-review | Present-day warnings and real code phases are valid exceptions. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate. |
-| JR-03 | inline-one-use-bindings-and-avoid-unnecessary-indirection | Inline one-use bindings and avoid unnecessary indirection | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, css, shell, yaml, jsonc, json | judgment | Judgment | avandar-code-review | Identity, opacity, reuse, and readability decide whether it helps. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate. |
-| JR-04 | descriptive-names-abbreviations-acronym-discovery-conversion-naming | Descriptive names, abbreviations, acronym discovery, conversion naming | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, css, shell, yaml, jsonc, json | judgment | Judgment | avandar-code-review | The business noun and semantic source and target are not syntax. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate. |
-| JR-05 | where-to-split-a-long-function-file-or-component | Where to split a long function, file, or component | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, css, shell, yaml, jsonc, json | judgment | Judgment | avandar-code-review | Threshold detection is deterministic; the seam is architectural. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate. |
-| JR-06 | positive-nesting-ternary-readability-iifes-control-flow-style | Positive nesting, ternary readability, IIFEs, control-flow style | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, css, shell, yaml, jsonc, json | judgment | Judgment | avandar-code-review | Equivalent syntax can be clearer or worse in context. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate. |
-| JR-07 | reuse-of-repo-or-library-utilities | Reuse of repo or library utilities | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, css, shell, yaml, jsonc, json | judgment | Judgment | avandar-code-review | Equivalence and abstraction value require semantic comparison. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate. |
-| JR-08 | module-grouping-global-bridges-god-objects-integration-architecture | Module grouping, global bridges, god objects, integration architecture | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, css, shell, yaml, jsonc, json | judgment | Judgment | avandar-code-review | Ownership and coupling are architectural decisions. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate. |
-| JR-09 | whether-a-usememo-derivation-is-trivial-or-load-bearing | Whether a `useMemo` derivation is trivial or load-bearing | typescript, javascript | judgment | Judgment | avandar-code-review | Cost and identity stability are contextual |
-| JR-10 | hook-array-defaults-and | Hook array defaults and `?? []` | typescript, javascript | judgment | Judgment | avandar-code-review | Loading state, identity, and downstream behavior decide the form |
-| JR-11 | test-names-observable-behavior-assertion-strength-placeholder-intent | Test names, observable behavior, assertion strength, placeholder intent | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, css, shell, yaml, jsonc, json | judgment | Judgment | avandar-code-review | A useful behavioral claim cannot be inferred from syntax alone. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate. |
-| JR-12 | e2e-behavior-flake-mechanism-locator-risk-dataset-realism-browser-isolation | E2E behavior, flake mechanism, locator risk, dataset realism, browser isolation | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, css, shell, yaml, jsonc, json | judgment | Judgment | avandar-code-review | Relevant behavior and failure mechanism require investigation. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate. |
-| JR-13 | sql-domain-nouns-namespaces-enum-docs-and-rls-security-semantics | SQL domain nouns, namespaces, enum docs, and RLS security semantics | sql | judgment | Judgment | avandar-code-review | Domain language and authorization intent are not closed syntax |
-| JR-14 | whether-related-helpers-should-become-a-module | Whether related helpers should become a module | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, css, shell, yaml, jsonc, json | judgment | Judgment | avandar-code-review | Relatedness and public API shape are design judgments. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate. |
-| JR-15 | fresh-read-requirements-for-permission-and-mutation-owned-lists | Fresh-read requirements for permission and mutation-owned lists | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, css, shell, yaml, jsonc, json | judgment | Judgment | avandar-code-review | Mutation ownership needs a closed hook registry or judgment. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate. |
-| JR-16 | composite-type-reuse-and-runtime-union-source-of-truth | Composite type reuse and runtime union source of truth | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, css, shell, yaml, jsonc, json | judgment | Judgment | avandar-code-review | Semantic equivalence and ownership require judgment. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate. |
-| JR-17 | mantine-token-choice-a11y-beyond-existing-rules-dynamic-style-legitimacy | Mantine token choice, a11y beyond existing rules, dynamic-style legitimacy | typescript, javascript, css | judgment | Judgment | avandar-code-review | UI semantics and the correct token are contextual |
+| avlint-ts-001 | curly | Braces around every `if` body | typescript, javascript | safe | 3 | lint | Native `curly`; add braces |
+| avlint-ts-002 | prefer-template | Template interpolation instead of concatenation | typescript, javascript | safe | 3 | lint | Native prefer-template changes object coercion and has no operand restriction; disabled and remains fallback |
+| avlint-ts-003 | consistent-type-imports | `type` on type-only imports and exports | typescript | safe | 3 | lint | Native type imports and type-aware exports; import() annotations remain unchanged |
+| avlint-ts-004 | prefer-as-const | `as const` for eligible literals | typescript | safe | 3 | lint | Native `typescript/prefer-as-const` |
+| avlint-ts-005 | no-unnecessary-type-assertion | Remove unnecessary type assertions | typescript | safe | 3 | lint | Native assertion fixer breaks TS5.9 generic CRUD contracts; disabled and remains fallback |
+| avlint-common-001 | no-function-body-doc-comments | Ordinary comments inside function bodies | typescript, javascript, rust, go, java, kotlin, swift, c, cpp, csharp | safe | 3, 6 | lint | TS/JS standalone body prose only; preserve nested declarations, inline comments and directives; unsupported shapes remain fallback |
+| avlint-common-002 | single-line-doc-comment | Single-line short docstring | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql | safe | 3, 6 | lint | TS/JS plain tag-free starred JSDoc only; full line including indentation fits 80; preserve paragraphs and markup; other shapes remain fallback |
+| avlint-ts-006 | top-level-function-declaration | Top-level function declarations | typescript, javascript | safe | 3 | lint | Module-only unique private direct calls after declaration in the same activation; ordinary function expressions or block arrows excluding single-return blocks; refuse exports, recursion, escapes, lexical bindings, comments and competing repairs; unsupported shapes remain fallback |
+| avlint-ts-007 | nested-arrow-function | Nested arrow functions | typescript, javascript | safe | 3 | lint | Module-only unique nested declarations called directly after initialization in the same function body; refuse recursion, overloads, escapes, lexical bindings, nested functions, comments and competing repairs; unsupported shapes remain fallback |
+| avlint-ts-008 | private-helper-prefix | `_` prefix on private top-level helpers | typescript, javascript | safe | 3 | lint | Module-only unique private helpers called exclusively by the immediately adjacent exported function; reject scope and unresolved-name collisions, exports, escapes, string contracts, nested functions, comments and competing repairs; unsupported shapes remain fallback |
+| avlint-ts-009 | module-member-jsdoc | Existing JSDoc on an exported module key | typescript | safe | 3 | lint | TS direct untyped exported object only; one local declaration reference and static key; no intervening comments or owning interface; other shapes remain fallback |
+| avlint-ts-010 | component-props-name | Component props type named `Props` | typescript | safe | 3 | lint | TSX adjacent private object alias after a module marker with one JSX owner and parameter reference; no exports, collisions, comments, arrays or intervening repairs; other shapes remain fallback |
+| avlint-ts-011 | jsx-conditional-ternary | JSX conditional rendering uses a ternary | typescript, javascript | safe | 3 | lint | Boolean comparison or negation in declaration-owned JSX children with an attribute-free self-closing element; exact false arm preserves child values; other shapes remain fallback |
+| avlint-ts-012 | prefer-prop-callback | Exact `prop` and `propEq` callbacks | typescript, javascript | safe | 3 | lint | Anonymous ordinary callbacks on literal plain-data arrays with dot-free identifier keys and non-null literal strict equality; existing leading runtime utils imports, capture-safe helper bindings and isolated import edits; other shapes remain fallback |
+| avlint-ts-013 | straight-line-object | Straight-line object construction | typescript, javascript | safe | 3 | lint | Unannotated fresh local data objects with consecutive primitive writes, folded into one returned literal that replaces the declaration; existing own keys or explicit null prototype, scope-proved no escape; annotated bindings and other shapes remain fallback |
+| avlint-ts-014 | optional-array-candidates | Straight-line optional array candidates | typescript, javascript | safe | 3 | lint | TS/TSX explicitly typed primitive or literal arrays excluding undefined, consecutive multiline parameter guards, replaced by a ternary for one candidate or a filtered literal for several; several candidates need an existing resolved isDefined; a declared return type or exactly matching candidate types, unshadowed Array binding and ordinary Array intrinsics; JS, evolving arrays, missing helpers and other shapes remain fallback |
+| avlint-ts-015 | no-redundant-error-guard | Redundant `instanceof Error` guard | typescript | safe | 5 | lint | Type information proves the value and branches equivalent |
+| avlint-ts-016 | import-extensions | File-extension convention | typescript, javascript | safe | 3 | lint | Native import/extensions detects resolvable targets but has no safe fixer in Oxlint 1.93.0; repair remains fallback |
+| avlint-css-001 | css-block-comment | Canonical CSS block comment shape | css | safe | 3 | lint | Standalone ordinary CSS prose comment nodes within 80 columns; delimiters and leading markers only; preserve documentation, directives, maps, legal notices, hacks and ambiguous syntax; unsupported shapes remain fallback |
+| avlint-sql-001 | sql-comment-markers | SQL declaration and body comment markers | sql | safe | 5 | lint | SQL parser proves declaration ownership or statement body |
+| avlint-ts-017 | error-class-suffix | Error subclass names end in `Error` | typescript, javascript | safe | 3 | lint | Reports any class extending `Error` or a class named `*Error` without the suffix; renames module-private class declarations whose references all stay in the file; exported classes, string contracts, reflective names and collisions are reported without a fix |
+| avlint-common-003 | no-em-dashes | No em dashes | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, css, shell, yaml, jsonc | guided | 4, 6 | lint | Comment token contains U+2014 |
+| avlint-common-004 | lines-stay-within-80-columns | Lines stay within 80 columns | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, css, shell, yaml, jsonc | guided | 4, 6 | lint | Comment or docstring token exceeds the configured width |
+| avlint-common-005 | public-exported-values-have-documentation | Public/exported values have documentation | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, shell | guided | 4, 6 | lint | Public AST node lacks attached documentation |
+| avlint-ts-018 | no-file-level-comment-when-a-main-export-exists | No file-level comment when a main export exists | typescript, javascript | guided | 4 | lint | Detached block plus basename-matching export |
+| avlint-ts-019 | exported-object-keys-have-documentation | Exported object keys have documentation | typescript | guided | 4 | lint | Undocumented exported key without documented owner |
+| avlint-common-006 | functions-stay-at-or-below-45-lines | Functions stay at or below 45 lines | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, shell | guided | 4, 6 | lint | Function span exceeds 45 lines after exclusions |
+| avlint-common-007 | files-stay-at-or-below-400-lines-with-500-hard | Files stay at or below 400 lines, with 500 hard | typescript, javascript, python, rust, go, ruby, java, kotlin, swift | guided | 4, 6 | lint | Reviewed source exceeds a threshold after exclusions |
+| avlint-ts-020 | named-exports-only | Named exports only | typescript, javascript | guided | 4 | lint | Default export AST |
+| avlint-common-008 | closed-vague-identifier-denylist | Closed vague-identifier denylist | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, shell | guided | 4, 6 | lint | Identifier equals an approved denied name |
+| avlint-ts-021 | event-handlers-use-on | Event handlers use `on...` | typescript, javascript | guided | 4 | lint | Proven handler position uses disallowed name |
+| avlint-ts-022 | helpers-appear-before-exports-that-use-them | Helpers appear before exports that use them | typescript, javascript | guided | 4 | lint | Same-file dependency order violates exceptions |
+| avlint-ts-023 | function-declaration-style-outside-af-shapes | Function declaration style outside AF shapes | typescript, javascript | guided | 4 | lint | Native/custom function-style diagnostic |
+| avlint-ts-024 | object-types-prefer-type | Object types prefer `type` | typescript | guided | 4 | lint | Native type-definition diagnostic |
+| avlint-ts-025 | no-explicit-any | No explicit `any` | typescript | guided | 4 | lint | Native AST diagnostic |
+| avlint-ts-026 | no-double-assertions | No double assertions | typescript | guided | 4 | lint | `as unknown as` or `as any as` |
+| avlint-ts-027 | string-unions-instead-of-string-enums | String unions instead of string enums | typescript | guided | 4 | lint | String-only enum declaration |
+| avlint-ts-028 | prefer-undefined-over-null | Prefer `undefined` over `null` | typescript | guided | 5 | lint | Project-owned API contains non-boundary `null` |
+| avlint-ts-029 | large-inline-shapes-become-named-types | Large inline shapes become named types | typescript | guided | 4 | lint | Eligible inline object type has at least four properties |
+| avlint-ts-030 | explicit-module-boundary-types | Explicit module-boundary types | typescript | guided | 4 | lint | Native rule |
+| avlint-ts-031 | readonly-inputs-mutable-outputs-explicit-mutation-apis | Readonly inputs, mutable outputs, explicit mutation APIs | typescript | guided | 5 | lint | Type-aware structural contract violation |
+| avlint-ts-032 | function-signature-shape | Function signature shape | typescript, javascript | guided | 4, 5 | lint | Closed positional/options-object shapes |
+| avlint-common-009 | imperative-collection-loops-require-a-reason | Imperative collection loops require a reason | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, shell | guided | 4, 6 | lint | Loop over a collection lacks a reasoned disable |
+| avlint-ts-033 | one-component-per-file-and-no-jsx-only-render-helper | One component per file and no JSX-only render helper | typescript, javascript | guided | 4 | lint | Native component count plus helper AST shape |
+| avlint-ts-034 | multi-line-useeffect-callbacks-are-named | Multi-line `useEffect` callbacks are named | typescript, javascript | guided | 4 | lint | Closed callback shape |
+| avlint-common-010 | meaningful-assertion-and-no-closed-tautology | Meaningful assertion and no closed tautology | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, shell | guided | 4, 6 | lint | Assertion-free test or closed tautology pattern |
+| avlint-ts-035 | display-copy-is-translated-and-t-does-not-escape | Display copy is translated and `t` does not escape | typescript, javascript | guided | 4 | lint | Closed display positions and macro scope |
+| avlint-ts-036 | stateless-modules-avoid-createmodule | Stateless modules avoid `createModule` | typescript | guided | 4 | lint | Closure/dataflow proves no state or mutable capture |
+| avlint-ts-037 | model-construction-and-namespace-imports | Model construction and namespace imports | typescript | guided | 5 | lint | Type and import evidence |
+| avlint-ts-038 | exhaustive-union-dispatch-uses-matchliteral | Exhaustive union dispatch uses `matchLiteral` | typescript | guided | 5 | lint | Type information proves a closed string union |
+| avlint-ts-039 | static-ui-styles-avoid-inline-styles-and-tailwind | Static UI styles avoid inline styles and Tailwind | typescript, javascript, css | guided | 4 | lint | Closed UI paths and static style tokens |
+| avlint-ts-040 | supabase-null-is-normalized-at-the-boundary | Supabase `null` is normalized at the boundary | typescript | guided | 5 | lint | Type-aware dataflow crosses into undefined domain type |
+| avlint-ts-041 | class-declarations-require-a-real-constraint-and-a-reasoned-exception | Class declarations require a real constraint and a reasoned exception | typescript, javascript | guided | 4 | lint | Class declaration lacks an approved reasoned disable |
+| avlint-ts-042 | one-module-per-file-and-filename-matches-main-export | One module per file and filename matches main export | typescript, javascript | evidence | 5 | lint | File AST, basename, export set |
+| avlint-ts-043 | directory-module-same-stem-and-casing-conventions | Directory-module, same-stem, and casing conventions | typescript, javascript | evidence | 5 | lint | Directory tree and import graph |
+| avlint-ts-044 | no-prefixed-components-under-src-routes | No `-`-prefixed components under `src/routes/` | typescript | evidence | 5 | lint | Paths |
+| avlint-ts-045 | no-bare-types-ts-or-constants-ts | No bare `types.ts` or `constants.ts` | typescript | evidence | 5 | lint | Path plus export kinds |
+| avlint-ts-046 | barrels-only-at-approved-roots-and-no-export | Barrels only at approved roots and no `export *` | typescript, javascript | evidence | 5 | lint | Path allowlist, exports, graph |
+| avlint-ts-047 | extensions-public-entries-allowed-subpaths-import-maps | Extensions, public entries, allowed subpaths, import maps | typescript | evidence | 5 | lint | Resolver, package ownership, Deno reachability |
+| avlint-ts-048 | test-filename-aspect-integration-label-fixture-placement | Test filename, aspect, integration label, fixture placement | typescript, javascript | evidence | 5 | lint | Filesystem and module ownership |
+| avlint-ts-049 | component-owns-css-module-and-domain-prefixed-classes | Component owns CSS Module and domain-prefixed classes | typescript, css | evidence | 5 | lint | TSX graph and CSS selectors |
+| avlint-ts-050 | copy-functions-satisfy-mechanical-contracts | Copy functions satisfy mechanical contracts | typescript | evidence | 5 | lint | Type checker, macro AST, call graph, paths |
+| avlint-sql-002 | new-migrations-sort-last-and-consolidate | New migrations sort last and consolidate | sql | evidence | 5 | lint | Git diff and timestamps |
+| avlint-sql-003 | storage-migration-shape-and-schema-mirroring | Storage migration shape and schema mirroring | sql | evidence | 5 | lint | Git diff, SQL AST, config, schema |
+| avlint-sql-004 | numeric-declarative-schema-dependency-layers | Numeric declarative-schema dependency layers | sql | evidence | 5 | lint | SQL dependency graph and paths |
+| avlint-ts-051 | migration-versions-agree-and-snapshots-avoid-live-types | Migration versions agree and snapshots avoid live types | typescript | evidence | 5 | lint | Constants, paths, imports, types |
+| avlint-ts-052 | new-models-live-in-approved-roots | New models live in approved roots | typescript | evidence | 5 | lint | Added paths and model structure |
+| avlint-ts-053 | serialized-shape-changes-bump-cache-schema | Serialized shape changes bump cache schema | typescript | evidence | 5 | lint | Git diff, types, serializer/parser |
+| avlint-ts-054 | closed-playwright-static-rules | Closed Playwright static rules | typescript | evidence | 5 | lint | Playwright AST, paths, fixture APIs |
+| avlint-common-011 | behavior-under-test-db-writes-and-missing-cleanup-paths | Behavior-under-test DB writes and missing cleanup paths | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, shell | evidence | 6 | lint | Framework adapter, mutation registry, control flow |
+| avlint-sql-005 | closed-sql-identifiers-trigger-names-comment-forms | Closed SQL identifiers, trigger names, comment forms | sql | evidence | 5 | lint | SQL AST and object context |
+| avlint-sql-006 | changed-policies-have-required-pgtap-coverage | Changed policies have required pgTAP coverage | sql | evidence | 5 | lint | Schema diff, policy operations, tests |
+| avlint-ts-055 | new-package-subpaths-update-every-import-map | New package subpaths update every import map | typescript | evidence | 5 | lint | Package exports diff and import maps |
+| avlint-common-012 | documentation-purpose-use-cases-caller-lists-output-jargon-and-length-quality | Documentation purpose, use cases, caller lists, output, jargon, and length quality | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, css, shell, yaml, jsonc, json | judgment | Judgment | avandar-code-review | Useful documentation depends on audience and behavior. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate. |
+| avlint-common-013 | historical-and-roadmap-language-in-comments | Historical and roadmap language in comments | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, css, shell, yaml, jsonc, json | judgment | Judgment | avandar-code-review | Present-day warnings and real code phases are valid exceptions. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate. |
+| avlint-common-014 | inline-one-use-bindings-and-avoid-unnecessary-indirection | Inline one-use bindings and avoid unnecessary indirection | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, css, shell, yaml, jsonc, json | judgment | Judgment | avandar-code-review | Identity, opacity, reuse, and readability decide whether it helps. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate. |
+| avlint-common-015 | descriptive-names-abbreviations-acronym-discovery-conversion-naming | Descriptive names, abbreviations, acronym discovery, conversion naming | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, css, shell, yaml, jsonc, json | judgment | Judgment | avandar-code-review | The business noun and semantic source and target are not syntax. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate. |
+| avlint-common-016 | where-to-split-a-long-function-file-or-component | Where to split a long function, file, or component | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, css, shell, yaml, jsonc, json | judgment | Judgment | avandar-code-review | Threshold detection is deterministic; the seam is architectural. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate. |
+| avlint-common-017 | positive-nesting-ternary-readability-iifes-control-flow-style | Positive nesting, ternary readability, IIFEs, control-flow style | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, css, shell, yaml, jsonc, json | judgment | Judgment | avandar-code-review | Equivalent syntax can be clearer or worse in context. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate. |
+| avlint-common-018 | reuse-of-repo-or-library-utilities | Reuse of repo or library utilities | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, css, shell, yaml, jsonc, json | judgment | Judgment | avandar-code-review | Equivalence and abstraction value require semantic comparison. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate. |
+| avlint-common-019 | module-grouping-global-bridges-god-objects-integration-architecture | Module grouping, global bridges, god objects, integration architecture | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, css, shell, yaml, jsonc, json | judgment | Judgment | avandar-code-review | Ownership and coupling are architectural decisions. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate. |
+| avlint-ts-056 | whether-a-usememo-derivation-is-trivial-or-load-bearing | Whether a `useMemo` derivation is trivial or load-bearing | typescript, javascript | judgment | Judgment | avandar-code-review | Cost and identity stability are contextual |
+| avlint-ts-057 | hook-array-defaults-and | Hook array defaults and `?? []` | typescript, javascript | judgment | Judgment | avandar-code-review | Loading state, identity, and downstream behavior decide the form |
+| avlint-common-020 | test-names-observable-behavior-assertion-strength-placeholder-intent | Test names, observable behavior, assertion strength, placeholder intent | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, css, shell, yaml, jsonc, json | judgment | Judgment | avandar-code-review | A useful behavioral claim cannot be inferred from syntax alone. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate. |
+| avlint-common-021 | e2e-behavior-flake-mechanism-locator-risk-dataset-realism-browser-isolation | E2E behavior, flake mechanism, locator risk, dataset realism, browser isolation | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, css, shell, yaml, jsonc, json | judgment | Judgment | avandar-code-review | Relevant behavior and failure mechanism require investigation. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate. |
+| avlint-sql-007 | sql-domain-nouns-namespaces-enum-docs-and-rls-security-semantics | SQL domain nouns, namespaces, enum docs, and RLS security semantics | sql | judgment | Judgment | avandar-code-review | Domain language and authorization intent are not closed syntax |
+| avlint-common-022 | whether-related-helpers-should-become-a-module | Whether related helpers should become a module | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, css, shell, yaml, jsonc, json | judgment | Judgment | avandar-code-review | Relatedness and public API shape are design judgments. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate. |
+| avlint-common-023 | fresh-read-requirements-for-permission-and-mutation-owned-lists | Fresh-read requirements for permission and mutation-owned lists | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, css, shell, yaml, jsonc, json | judgment | Judgment | avandar-code-review | Mutation ownership needs a closed hook registry or judgment. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate. |
+| avlint-common-024 | composite-type-reuse-and-runtime-union-source-of-truth | Composite type reuse and runtime union source of truth | typescript, javascript, python, rust, go, ruby, java, kotlin, swift, c, cpp, csharp, sql, css, shell, yaml, jsonc, json | judgment | Judgment | avandar-code-review | Semantic equivalence and ownership require judgment. Apply only when this judgment family is relevant to the reviewed code. The inventory defines no narrower language gate. |
+| avlint-ts-058 | mantine-token-choice-a11y-beyond-existing-rules-dynamic-style-legitimacy | Mantine token choice, a11y beyond existing rules, dynamic-style legitimacy | typescript, javascript, css | judgment | Judgment | avandar-code-review | UI semantics and the correct token are contextual |
 <!-- catalog:end -->
 
 ## Native safe repairs
@@ -115,16 +115,16 @@ leaves `import()` type annotations unchanged because their diagnostic has no
 safe native fix. Type-only exports and eligible `as const` literals use the
 corresponding native TypeScript rules.
 
-AF-02 remains disabled and in fallback: native `prefer-template` changes object
+avlint-ts-002 remains disabled and in fallback: native `prefer-template` changes object
 coercion from the default hint to the string hint. The installed rule exposes
 no option that restricts repairs to equivalent operands. Root repair preserves
 concatenations, and no local replacement or safe coverage claim is supplied.
 
-AF-05 remains disabled and in fallback: the native assertion fixer removes
+avlint-ts-005 remains disabled and in fallback: the native assertion fixer removes
 assertions still required by the repository's TypeScript 5.9 generic CRUD
 contracts. Native safe metadata alone cannot prove compiler compatibility.
 An isolated primitive fixture proves its native behavior without claiming
-repository-wide coverage. AF-19 remains fallback for repair: the installed
+repository-wide coverage. avlint-ts-016 remains fallback for repair: the installed
 `import/extensions` rule detects violations but implements no native fixer.
 Unresolved targets and package imports remain unchanged.
 
@@ -148,23 +148,23 @@ operational or unsupported outcomes stay fallback.
 
 ## Comment and documentation safe fixes
 
-The `avandar` Oxlint plugin enables three safe comment capabilities. AF-06
+The `avandar` Oxlint plugin enables three safe comment capabilities. avlint-common-001
 (`standalone-body-prose`) converts whole-line prose blocks inside TS/JS
 function bodies into line comments. Documentation attached to nested
 declarations, inline blocks, directives and tagged comments stays unchanged.
 
-AF-07 (`short-prose-jsdoc`) joins plain tag-free starred JSDoc only when the
+avlint-common-002 (`short-prose-jsdoc`) joins plain tag-free starred JSDoc only when the
 complete line, including indentation at a two-column tab width, fits 80 columns.
 Paragraphs, lists, code blocks, hard breaks and other structured markup remain
-unchanged. Interior explanation belongs to AF-06 instead.
+unchanged. Interior explanation belongs to avlint-common-001 instead.
 
-AF-11 (`one-to-one-module-key`) moves existing local documentation to a static
+avlint-ts-009 (`one-to-one-module-key`) moves existing local documentation to a static
 key in a directly exported untyped TS object. It requires a top-level function
 or single const binding with one reference and rejects annotated, asserted,
 computed, spread, duplicate and ambiguous mappings. An intervening comment
 makes the span unsupported: Oxlint reserves the full remove/insert span, so
-this restriction prevents interference with interior comment fixes. AF-07
-defers exact relocation candidates to AF-11, which inserts their final
+this restriction prevents interference with interior comment fixes. avlint-common-002
+defers exact relocation candidates to avlint-ts-009, which inserts their final
 width-checked documentation form. This is stable in one ordinary fix pass.
 
 Only `--fix` is used. Root file selection excludes generated `*.gen.*` files
@@ -178,11 +178,11 @@ Each of these rules also reports an `unsupported-shapes` coverage outcome as
 of unsupported candidates in a reviewed file. Safe capabilities can therefore
 be `enforced` while the rule and language summary remain `fallback`. Review
 tools must retain the rule-level fallback detector and may skip only the
-explicit safe capability. Non-JS languages remain fallback for AF-06/AF-07.
+explicit safe capability. Non-JS languages remain fallback for avlint-common-001/avlint-common-002.
 
 ### Component and local naming repairs
 
-AF-12 (`single-component-props`) names an adjacent module-private TSX object alias
+avlint-ts-010 (`single-component-props`) names an adjacent module-private TSX object alias
 `Props` when its sole scope-resolved reference annotates the single component's
 parameter. A preceding import/export establishes the module boundary. Other
 JSX owners, exported, shared, generic, interface, collision, array and comment
@@ -192,9 +192,9 @@ its rename envelope cannot reserve an unrelated native or comment repair.
 The internal `module-context-witness` rule is not a catalog rule. It reports
 only the generated coverage seed binding, and only when an original
 import/export precedes it. That proves the reviewed file is an ES module before
-AF-08, AF-09 and AF-10 count as covered. Keep it enabled at error severity.
+avlint-ts-006, avlint-ts-007 and avlint-ts-008 count as covered. Keep it enabled at error severity.
 
-AF-14 (`boolean-jsx-children`) converts a boolean negation or comparison child
+avlint-ts-011 (`boolean-jsx-children`) converts a boolean negation or comparison child
 `condition && <Node />` into `(condition) ? <Node /> : false`. Keeping `false`
 preserves the precise child observed by custom components. The condition is
 evaluated once, including comparison coercion, and element creation remains
@@ -206,7 +206,7 @@ fragments and arrow owners remain fallback. Edits also defer when they would
 introduce an overflow on a line within the root 80-column limit.
 
 The exact-path native proof seeds these two capabilities into the existing
-serialized, cached engine run. AF-12 is seeded only for TSX; AF-14 only for
+serialized, cached engine run. avlint-ts-010 is seeded only for TSX; avlint-ts-011 only for
 JSX/TSX. Other file syntax remains fallback. Canonical error diagnostics and a
 nonzero engine status are required. Every new rule also retains explicit
 `unsupported-shapes` fallback, so no rule-level detector can be skipped merely

@@ -52,19 +52,19 @@ it.each(
       report: report,
       directory: directory,
       path: "src/reviewed.ts",
-      ruleId: "AF-01",
+      ruleId: "avlint-ts-001",
       capability: "if-body",
     });
     assertSuppressionHandoff({
       report: report,
       directory: directory,
       path: "src/reviewed.ts",
-      ruleId: "AF-16",
+      ruleId: "avlint-ts-013",
       capability: "fresh-data-object",
     });
     expect(report.outcomes).toContainEqual(
       expect.objectContaining({
-        ruleId: "AF-04",
+        ruleId: "avlint-ts-004",
         state: kind!.startsWith("blanket") ? "fallback" : "enforced",
       }),
     );
@@ -86,12 +86,12 @@ it.each(["curly", "avandar/straight-line-object-construction"])(
       report: report,
       directory: directory,
       path: "src/reviewed.ts",
-      ruleId: rule === "curly" ? "AF-01" : "AF-16",
+      ruleId: rule === "curly" ? "avlint-ts-001" : "avlint-ts-013",
       capability: rule === "curly" ? "if-body" : "fresh-data-object",
     });
     expect(report.outcomes).toContainEqual(
       expect.objectContaining({
-        ruleId: rule === "curly" ? "AF-16" : "AF-01",
+        ruleId: rule === "curly" ? "avlint-ts-013" : "avlint-ts-001",
         state: "enforced",
       }),
     );
@@ -121,7 +121,7 @@ it("proves unsuppressed original native/custom violations independently", async 
     path: "src/reviewed.ts",
     source: source,
   });
-  ["AF-01", "AF-16"].forEach((ruleId) => {
+  ["avlint-ts-001", "avlint-ts-013"].forEach((ruleId) => {
     expect(report.outcomes).toContainEqual(
       expect.objectContaining({ ruleId, state: "enforced" }),
     );
@@ -162,7 +162,7 @@ it.each([
     report: report,
     directory: directory,
     path: "src/reviewed.css",
-    ruleId: "AF-20",
+    ruleId: "avlint-css-001",
     capability: "standalone-prose-comments",
   });
 });
@@ -196,7 +196,7 @@ it.each(["none", "other-rule-line"])(
     });
     expect(report.outcomes).toContainEqual(
       expect.objectContaining({
-        ruleId: "AF-20",
+        ruleId: "avlint-css-001",
         capability: "standalone-prose-comments",
         state: "enforced",
       }),
@@ -251,9 +251,9 @@ it("retains every TypeScript native capability under its actual configured names
     source: source,
   });
   [
-    ["AF-03", "type-imports"],
-    ["AF-03", "type-exports"],
-    ["AF-04", "literal-assertions"],
+    ["avlint-ts-003", "type-imports"],
+    ["avlint-ts-003", "type-exports"],
+    ["avlint-ts-004", "literal-assertions"],
   ].forEach(([ruleId, capability]) => {
     assertSuppressionHandoff({
       report: report,
@@ -264,7 +264,7 @@ it("retains every TypeScript native capability under its actual configured names
     });
   });
   expect(report.outcomes).toContainEqual(
-    expect.objectContaining({ ruleId: "AF-01", state: "enforced" }),
+    expect.objectContaining({ ruleId: "avlint-ts-001", state: "enforced" }),
   );
   writeFileSync(join(directory, "src/reviewed.ts"), violation);
   const unsuppressed = spawnSync(

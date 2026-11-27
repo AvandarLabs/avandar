@@ -29,8 +29,8 @@ const directories: string[] = [];
 
 /** Capability identities exercised by these fixer regression tests. */
 export const SAFE = [
-  ["AF-12", "single-component-props", "component-props-name"],
-  ["AF-14", "boolean-jsx-children", "jsx-conditional-ternary"],
+  ["avlint-ts-010", "single-component-props", "component-props-name"],
+  ["avlint-ts-011", "boolean-jsx-children", "jsx-conditional-ternary"],
 ] as const;
 
 /** Creates an isolated repository for component fixer coverage tests. */

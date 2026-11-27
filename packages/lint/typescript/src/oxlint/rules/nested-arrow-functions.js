@@ -15,14 +15,14 @@ import {
 const rule = {
   meta: {
     ...getRuleMetadataFromIdentity({
-      ruleId: "AF-09",
+      ruleId: "avlint-ts-007",
       documentationPath:
         "https://github.com/AvandarLabs/avandar/blob/develop/packages/lint/docs/rules/nested-arrow-function.md",
     }),
     type: "suggestion",
     fixable: "code",
     schema: [],
-    messages: { arrow: "AF-09: Use an arrow for a nested function." },
+    messages: { arrow: "avlint-ts-007: Use an arrow for a nested function." },
   },
   createOnce: (context) => {
     return {

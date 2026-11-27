@@ -125,7 +125,7 @@ library-gated phase.
 
 - Review object-field computations and optional-array choices for readability
   and behavior: absent versus undefined fields, evaluation order, identity,
-  and meaningful grouping remain contextual judgments. Select AF-16/17 syntax
+  and meaningful grouping remain contextual judgments. Select avlint-ts-013, avlint-ts-014 syntax
   detection only through the deterministic fallback handoff.
 
 <a id="iife-for-computed-values"></a>

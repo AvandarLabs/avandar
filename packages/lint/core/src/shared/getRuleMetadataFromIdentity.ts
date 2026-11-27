@@ -9,7 +9,10 @@ export function getRuleMetadataFromIdentity({
   ruleId: string;
   docs: { url: string };
 } {
-  if (!/^(AF|GD|RP|JR)-\d{2}[AB]?$/.test(ruleId) || !documentationPath) {
+  if (
+    !/^avlint-(common|ts|css|sql|py|rs)-\d{3}$/.test(ruleId) ||
+    !documentationPath
+  ) {
     throw new Error(
       "Rule metadata requires a canonical ID and documentation path",
     );

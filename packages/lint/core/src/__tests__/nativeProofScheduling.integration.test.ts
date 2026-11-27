@@ -39,12 +39,12 @@ it("reuses one inclusion listing for isolated mixed-language proofs and late req
   expect(late.operational).toBe(true);
   expect(
     first.outcomes.filter((entry) => {
-      return entry.ruleId === "AF-01" && entry.state === "enforced";
+      return entry.ruleId === "avlint-ts-001" && entry.state === "enforced";
     }),
   ).toHaveLength(6);
   expect(
     late.outcomes.filter((entry) => {
-      return entry.ruleId === "AF-01" && entry.state === "enforced";
+      return entry.ruleId === "avlint-ts-001" && entry.state === "enforced";
     }),
   ).toHaveLength(2);
   const events = readFileSync(join(directory, "children.jsonl"), "utf8")
@@ -118,7 +118,7 @@ it("keeps cached inclusion listings scoped to each source cwd", async () => {
         paths: ["src/reviewed.tsx"],
       });
       expect(result.outcomes).toContainEqual(
-        expect.objectContaining({ ruleId: "AF-01", state }),
+        expect.objectContaining({ ruleId: "avlint-ts-001", state }),
       );
       const events = readFileSync(join(directory, "children.jsonl"), "utf8")
         .trim()
@@ -159,13 +159,17 @@ it("keeps same basenames independent under error warning and disabled overrides"
   writeFileSync(configPath, JSON.stringify(config));
   const result = await _coverage({ directory: directory, paths: paths });
   expect(result.status).toBe(0);
-  ["AF-01", "AF-08", "AF-09", "AF-10"].forEach((ruleId) => {
-    expect(
-      result.outcomes.filter((entry: { ruleId: string; state: string }) => {
-        return entry.ruleId === ruleId && entry.state === "enforced";
-      }),
-    ).toEqual([expect.objectContaining({ path: join(directory, paths[0]!) })]);
-  });
+  ["avlint-ts-001", "avlint-ts-006", "avlint-ts-007", "avlint-ts-008"].forEach(
+    (ruleId) => {
+      expect(
+        result.outcomes.filter((entry: { ruleId: string; state: string }) => {
+          return entry.ruleId === ruleId && entry.state === "enforced";
+        }),
+      ).toEqual([
+        expect.objectContaining({ path: join(directory, paths[0]!) }),
+      ]);
+    },
+  );
 });
 
 it.each([false, true])(
@@ -183,7 +187,7 @@ it.each([false, true])(
     expect(result.operational).toBe(true);
     expect(result.outcomes).toContainEqual(
       expect.objectContaining({
-        ruleId: "AF-01",
+        ruleId: "avlint-ts-001",
         state: "fallback",
       }),
     );
@@ -212,13 +216,13 @@ it("settles later requests after an operational proof failure", async () => {
   expect(first.outcomes).toContainEqual(
     expect.objectContaining({
       path: join(directory, "src/reviewed.tsx"),
-      ruleId: "AF-01",
+      ruleId: "avlint-ts-001",
       state: "enforced",
     }),
   );
   const late = await collect(["src/reviewed.tsx"]);
   expect(late.operational).toBe(true);
   expect(late.outcomes).toContainEqual(
-    expect.objectContaining({ ruleId: "AF-01", state: "enforced" }),
+    expect.objectContaining({ ruleId: "avlint-ts-001", state: "enforced" }),
   );
 });

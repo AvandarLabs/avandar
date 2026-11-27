@@ -10,9 +10,9 @@ import {
 
 /** Capabilities that require the module context witness. */
 const MODULE_ONLY = [
-  ["AF-08", "direct-top-level-calls"],
-  ["AF-09", "direct-nested-calls"],
-  ["AF-10", "private-direct-calls"],
+  ["avlint-ts-006", "direct-top-level-calls"],
+  ["avlint-ts-007", "direct-nested-calls"],
+  ["avlint-ts-008", "private-direct-calls"],
 ] as const;
 
 it("preserves props aliases in scripts with possible cross-file type references", () => {
@@ -58,7 +58,7 @@ it.each(["ts", "tsx", "js", "jsx"])(
     [
       ...MODULE_ONLY,
       ...SAFE.filter(([ruleId]) => {
-        return ruleId === "AF-12" && extension === "tsx";
+        return ruleId === "avlint-ts-010" && extension === "tsx";
       }),
     ].forEach(([ruleId, capability]) => {
       expect(result.outcomes).toContainEqual(
@@ -99,7 +99,7 @@ it("keeps the props capability in fallback when the original module already has 
   const result = await collectComponentCoverage({ directory: directory });
   expect(result.outcomes).toContainEqual(
     expect.objectContaining({
-      ruleId: "AF-12",
+      ruleId: "avlint-ts-010",
       capability: "single-component-props",
       state: "fallback",
     }),
@@ -130,7 +130,7 @@ it("keeps props proof in fallback for an original arrow component", async () => 
   const result = await collectComponentCoverage({ directory: directory });
   expect(result.outcomes).toContainEqual(
     expect.objectContaining({
-      ruleId: "AF-12",
+      ruleId: "avlint-ts-010",
       capability: "single-component-props",
       state: "fallback",
     }),
