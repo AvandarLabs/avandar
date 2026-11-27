@@ -529,8 +529,8 @@ needs Pablo's review), **Proposed** (designed, not built), or **Open**
 
 ## D33. The plan to the full Avandar agent (approved)
 
-- **Decision (Pablo, 2026-11-08).** Approved the four phases in
-  [roadmap.md](roadmap.md): (1) the data agent becomes the default, (2) the
+- **Decision (Pablo, 2026-11-08).** Approved the four phases of the plan (now
+  tracked in Linear): (1) the data agent becomes the default, (2) the
   shared foundations (tool registry, router, confirmation for changes, a
   general host, context management, an eval per area, untrusted data), (3)
   areas one at a time, (4) one agent, retiring today's chat function.

@@ -25,7 +25,6 @@
   this spec wins.
 - **Related:** [qetl-architecture.md](../qetl-architecture.md) (relation
   loading), [permissions-architecture.md](../permissions-architecture.md),
-  [ai-agent/roadmap.md](../ai-agent/roadmap.md),
   [app-view-layout.md](../design/app-view-layout.md), and the key-matching
   crosswalk in
   [joined-cases-7-key-matching-design.md](../superpowers/specs/2026-11-06-joined-cases-7-key-matching-design.md)

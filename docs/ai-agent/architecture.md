@@ -182,8 +182,8 @@ trips, and streaming progress events from Pi for the multi-step tasks.
 
 ## 8. From data agent to Avandar agent
 
-The approved, ordered plan is in [roadmap.md](roadmap.md) (D33); this
-section is the design behind it.
+The approved plan (D33) is tracked in Linear, in the "Ship the app-wide AI
+assistant with chat sessions" project; this section is the design behind it.
 
 1. Move the remaining Data Explorer features into the agent path: charts
    (done through `run_query`'s `chart`), dashboards (`add_dashboard_block`,
