@@ -1,5 +1,5 @@
 import { useLingui } from "@lingui/react/macro";
-import { AvaPluginVizConfigs } from "$/models/vizs/AvaPluginVizConfig/AvaPluginVizConfigs";
+import { AvaPluginVizConfigs } from "$/models/vizs/AvaPluginVizConfig/AvaPluginVizConfigs/AvaPluginVizConfigs";
 import { SettingsColumns } from "@/components/SettingsColumns/SettingsColumns";
 import { PluginVizSettingControls } from "@/components/VisualizationContainer/VizSettingsForm/PluginVizSettingsForm/PluginVizSettingControls";
 import { isPluginVizConfigReadable } from "@/components/VisualizationContainer/VizSettingsForm/PluginVizSettingsForm/pluginVizSettingFormHelpers";

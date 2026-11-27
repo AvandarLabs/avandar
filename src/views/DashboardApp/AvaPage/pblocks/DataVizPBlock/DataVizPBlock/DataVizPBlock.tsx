@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
-import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs/AvaVizConfigs";
 import { getDateColumns } from "@/components/VisualizationContainer/getDateColumns";
 import { useAvaPageMetadata } from "@/views/DashboardApp/AvaPage/useAvaPageMetadata";
 import { useApplyDashboardFiltersToSql } from "@/views/DashboardApp/DashboardFilterStateManager/useApplyDashboardFiltersToSql";

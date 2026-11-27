@@ -3,7 +3,7 @@ import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuer
 import {
   AvaVizConfigs,
   VizTypes,
-} from "$/models/vizs/AvaVizConfig/AvaVizConfigs.ts";
+} from "$/models/vizs/AvaVizConfig/AvaVizConfigs/AvaVizConfigs.ts";
 import type { QueryColumn } from "$/models/queries/QueryColumn/QueryColumn.ts";
 import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig.ts";
 

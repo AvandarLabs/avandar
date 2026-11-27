@@ -1,8 +1,8 @@
 import { Select } from "@avandar/ui";
 import { useLingui } from "@lingui/react/macro";
 import { vizTypeLabel } from "$/copy/vizTypeLabel";
-import { AvaPluginVizConfigs } from "$/models/vizs/AvaPluginVizConfig/AvaPluginVizConfigs";
-import { VizTypes } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
+import { AvaPluginVizConfigs } from "$/models/vizs/AvaPluginVizConfig/AvaPluginVizConfigs/AvaPluginVizConfigs";
+import { VizTypes } from "$/models/vizs/AvaVizConfig/AvaVizConfigs/AvaVizConfigs";
 import {
   getPluginVizSelectionFromOptionValue,
   makePluginVizOptionValue,

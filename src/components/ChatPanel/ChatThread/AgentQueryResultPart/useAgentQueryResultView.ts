@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { makeProjectionDescriptorsFromSql } from "$/models/queries/QueryResultColumnBindings/makeProjectionDescriptorsFromSql/makeProjectionDescriptorsFromSql";
 import { StructuredQuery } from "$/models/queries/StructuredQuery/StructuredQuery";
-import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs/AvaVizConfigs";
 import { getDateColumns } from "@/components/VisualizationContainer/getDateColumns";
 import { useCategorySplitChartInput } from "@/components/VisualizationContainer/useCategorySplitChartInput/useCategorySplitChartInput";
 import { useDataQuery } from "@/views/DataExplorerApp/useDataQuery/useDataQuery";

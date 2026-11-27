@@ -1,5 +1,5 @@
 import { isPlainObject, isString, traverse } from "@avandar/utils";
-import { VizTypes } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
+import { VizTypes } from "$/models/vizs/AvaVizConfig/AvaVizConfigs/AvaVizConfigs";
 import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";
 
 /**

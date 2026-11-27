@@ -1,4 +1,4 @@
-import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs/AvaVizConfigs";
 import { DataVizFilters } from "@/views/DashboardApp/AvaPage/pblocks/DataVizPBlock/DataVizPBlock/DataVizFilters/DataVizFilters";
 import { synchronizeUiVizType } from "./synchronizeUiVizType";
 import type { AvaVizConfig } from "$/models/vizs/AvaVizConfig/AvaVizConfig";

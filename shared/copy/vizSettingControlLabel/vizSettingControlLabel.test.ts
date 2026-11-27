@@ -9,7 +9,7 @@ import { knownVizSettingControlLabels } from "$/copy/vizSettingControlLabel/vizS
 import {
   AvaVizConfigs,
   VizTypes,
-} from "$/models/vizs/AvaVizConfig/AvaVizConfigs.ts";
+} from "$/models/vizs/AvaVizConfig/AvaVizConfigs/AvaVizConfigs.ts";
 
 function collectRegistryLabels(): string[] {
   return VizTypes.flatMap((vizType) => {

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   AvaPluginVizConfigSchema,
   UiPluginVizConfigSchema,
-} from "$/models/vizs/AvaPluginVizConfig/PluginVizConfigSchemas.ts";
+} from "$/models/vizs/AvaPluginVizConfig/PluginVizConfigSchemas/PluginVizConfigSchemas.ts";
 
 const UI_CONFIG = {
   vizType: "plugin",

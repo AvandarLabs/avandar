@@ -29,7 +29,7 @@ directly with a user is reachable even without the app role.
 
 ## 2. Visualization types (9)
 
-Registered in `shared/models/vizs/AvaVizConfig/AvaVizConfigs.ts`. Every type
+Registered in `shared/models/vizs/AvaVizConfig/AvaVizConfigs/AvaVizConfigs.ts`. Every type
 implements `IAvaVizConfigModule`: `displayName`, `descriptors`,
 `makeEmptyConfig`, `hydrateFromQuery`, `hydrateFromQueryResult`,
 `convertVizConfig`.

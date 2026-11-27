@@ -1,4 +1,4 @@
-import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs";
+import { AvaVizConfigs } from "$/models/vizs/AvaVizConfig/AvaVizConfigs/AvaVizConfigs";
 import { DataExplorerIdentityTestFixtures } from "./DataExplorerIdentityTestFixtures";
 import type { QueryColumn as QueryColumnModel } from "$/models/queries/QueryColumn/QueryColumn";
 
